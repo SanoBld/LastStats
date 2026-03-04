@@ -1,8 +1,9 @@
 'use strict';
 
 /* ============================================================
-   LASTSTATS — SCRIPT v2
-   Modules : Cache · API (paginé) · UI · Charts · Stats avancées
+   LASTSTATS — SCRIPT v3
+   Modules : Cache · API · UI · Charts · Streak · Versus ·
+             Mood Tags · Heatmap · Story · Stats avancées · PWA
    ============================================================ */
 
 // ── Constantes ──
@@ -34,7 +35,8 @@ const APP = {
   topTracksData: [],
   regYear:       new Date().getFullYear() - 5,
   currentTheme:  'dark',
-  fullHistory:   null,  // tracks paginées (si chargées)
+  fullHistory:   null,
+  streakData:    null,   // { best, current }
 };
 
 /* ============================================================
@@ -79,7 +81,6 @@ const Cache = {
 
   _purge() {
     const keys = Object.keys(localStorage).filter(k => k.startsWith(this.prefix));
-    // Supprimer les plus anciennes (30 entrées)
     keys.sort().slice(0, Math.min(30, keys.length)).forEach(k => localStorage.removeItem(k));
   },
 
@@ -119,7 +120,6 @@ const API = {
     return data;
   },
 
-  // Scrobbles pour un mois donné (limit=1 → on récupère juste le total)
   async getMonthScrobbles(year, month) {
     const from = Math.floor(new Date(year, month, 1).getTime() / 1000);
     const to   = Math.floor(new Date(year, month + 1, 0, 23, 59, 59).getTime() / 1000);
@@ -129,11 +129,6 @@ const API = {
     } catch { return 0; }
   },
 
-  /* ----------------------------------------------------------
-     PAGINATION : Récupère TOUTES les pages de recentTracks
-     onProgress(page, totalPages, scrobblesLoaded) → callback UI
-     yearFrom/yearTo → filtrer par plage temporelle (UNIX ts)
-  ---------------------------------------------------------- */
   async fetchAllPages(onProgress, yearFrom = null, yearTo = null) {
     const allTracks = [];
     let page = 1;
@@ -145,8 +140,6 @@ const API = {
 
     do {
       const params = { ...baseParams, page };
-
-      // Tentatives : retry x2 en cas d'erreur réseau
       let data = null;
       for (let attempt = 0; attempt < 3; attempt++) {
         try {
@@ -164,17 +157,13 @@ const API = {
       const raw = data.recenttracks?.track || [];
       const tracks = Array.isArray(raw) ? raw : [raw];
 
-      // Filtrer le "now playing"
       for (const t of tracks) {
         if (!t['@attr']?.nowplaying) allTracks.push(t);
       }
 
       if (onProgress) onProgress(page, totalPages, allTracks.length);
       page++;
-
-      // Petite pause entre les requêtes (anti-rate-limit)
       if (page <= totalPages) await sleep(150);
-
     } while (page <= totalPages);
 
     return allTracks;
@@ -376,18 +365,30 @@ async function initApp() {
     setupProfileUI();
     await loadDashboard();
 
+    // ── PWA : Restaurer la dernière section visitée ──
+    const savedSection = localStorage.getItem('ls_section');
+    if (savedSection && document.getElementById('s-' + savedSection)) {
+      nav(savedSection);
+    }
+
     // Chargement parallèle (non bloquant)
     Promise.all([
       loadTopArtists('overall'),
       loadTopAlbums('overall'),
       loadTopTracks('overall'),
-    ]);
+    ]).then(() => {
+      // Mood tags dès que topArtistsData est prêt
+      loadMoodTags();
+    });
 
     setupChartsSection();
     setupWrappedSection();
     loadAdvancedStats();
     initPeriodSelectors();
     pollNowPlaying();
+
+    // Versus chargé en parallèle (non bloquant)
+    loadVersus();
 
   } catch (err) {
     const msg = err.message.toLowerCase().includes('user not found') || err.message.includes('Invalid API')
@@ -412,7 +413,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ============================================================
-   NAVIGATION
+   NAVIGATION  +  PWA section save
    ============================================================ */
 function nav(section) {
   document.querySelectorAll('.nav-lnk').forEach(el =>
@@ -431,6 +432,9 @@ function nav(section) {
     advanced:      'Stats Avancées',
   };
   document.getElementById('hd-title').textContent = titles[section] || section;
+
+  // ── PWA : Sauvegarder la section courante ──
+  localStorage.setItem('ls_section', section);
 
   if (window.innerWidth <= 1024) closeSb();
 }
@@ -498,7 +502,6 @@ async function pollNowPlaying() {
     const last = Array.isArray(tracks) ? tracks[0] : tracks;
 
     const wrap = document.getElementById('now-playing-wrap');
-    const bar  = document.getElementById('now-playing-bar');
 
     if (last['@attr']?.nowplaying) {
       document.getElementById('np-track').textContent  = last.name || '—';
@@ -577,7 +580,6 @@ async function loadDashboard() {
       <div class="stat-card-sub">${c.sub}</div>
     </div>`).join('');
 
-  // Animation du compteur sur le total scrobbles
   const scrobbleEl = document.getElementById('sv-0');
   if (scrobbleEl) animateValue(scrobbleEl, 0, totalPlay, 1000);
 
@@ -657,6 +659,273 @@ async function loadDashArtistsChart() {
       },
     });
   } catch (e) { console.warn('dash-artists chart:', e); }
+}
+
+/* ============================================================
+   ██  VERSUS — Comparaison de périodes  ██
+   Compare mois actuel vs mois précédent (Scrobbles)
+   ============================================================ */
+async function loadVersus() {
+  const vsBody = document.getElementById('vs-body');
+  if (!vsBody) return;
+
+  try {
+    const now       = new Date();
+    const currYear  = now.getFullYear();
+    const currMonth = now.getMonth();
+    const prevMonth = currMonth === 0 ? 11 : currMonth - 1;
+    const prevYear  = currMonth === 0 ? currYear - 1 : currYear;
+
+    const [currScrobbles, prevScrobbles] = await Promise.all([
+      API.getMonthScrobbles(currYear, currMonth),
+      API.getMonthScrobbles(prevYear, prevMonth),
+    ]);
+
+    const scrobbleDiff = currScrobbles - prevScrobbles;
+    const scrobblePct  = prevScrobbles > 0
+      ? ((scrobbleDiff / prevScrobbles) * 100).toFixed(1)
+      : null;
+
+    // Artistes uniques ce mois (via top artists 1month)
+    let currArtists = null, prevArtists = null;
+    try {
+      const [ca, pa] = await Promise.all([
+        API.call('user.getTopArtists', { period: '1month', limit: 1 }),
+        API.call('user.getTopArtists', { period: '3month', limit: 1 }), // proxy pour "mois passé"
+      ]);
+      currArtists = parseInt(ca.topartists?.['@attr']?.total || 0);
+      prevArtists = parseInt(pa.topartists?.['@attr']?.total || 0);
+    } catch { /* optionnel */ }
+
+    function arrowBadge(diff, pct) {
+      if (pct === null || diff === 0) return `<span class="vs-arrow flat">→ stable</span>`;
+      const cls  = diff > 0 ? 'up' : 'down';
+      const icon = diff > 0 ? '▲' : '▼';
+      const sign = diff > 0 ? '+' : '';
+      return `<span class="vs-arrow ${cls}">${icon} ${sign}${pct}%</span>`;
+    }
+
+    let html = `
+      <div class="vs-metric">
+        <span class="vs-label">🎵 Scrobbles</span>
+        <div class="vs-values">
+          <span class="vs-curr">${formatNum(currScrobbles)}</span>
+          ${arrowBadge(scrobbleDiff, scrobblePct)}
+        </div>
+      </div>
+      <div class="vs-prev-row">
+        <span class="vs-prev-txt">${formatNum(prevScrobbles)} en ${MONTHS_FR[prevMonth]}</span>
+      </div>`;
+
+    if (currArtists !== null) {
+      const artDiff = currArtists - prevArtists;
+      const artPct  = prevArtists > 0 ? ((artDiff / prevArtists) * 100).toFixed(1) : null;
+      html += `
+        <div class="vs-metric" style="margin-top:10px">
+          <span class="vs-label">🎤 Artistes</span>
+          <div class="vs-values">
+            <span class="vs-curr">${formatNum(currArtists)}</span>
+            ${arrowBadge(artDiff, artPct)}
+          </div>
+        </div>`;
+    }
+
+    html += `<div class="vs-months">${MONTHS_FR[currMonth]} <span>vs</span> ${MONTHS_FR[prevMonth]}</div>`;
+    vsBody.innerHTML = html;
+
+  } catch (e) {
+    if (vsBody) vsBody.innerHTML = `<p class="vs-na">Données indisponibles</p>`;
+  }
+}
+
+/* ============================================================
+   ██  MOOD — Nuage de Tags musicaux  ██
+   Récupère les tags des 10 meilleurs artistes via artist.getTopTags
+   ============================================================ */
+async function loadMoodTags() {
+  const tagsEl = document.getElementById('mood-tags');
+  if (!tagsEl) return;
+
+  try {
+    if (!APP.topArtistsData.length) {
+      const d = await API.call('user.getTopArtists', { period: 'overall', limit: 10 });
+      APP.topArtistsData = d.topartists?.artist || [];
+    }
+
+    const top10 = APP.topArtistsData.slice(0, 10);
+    const tagScores = new Map();
+
+    // Fetch tags pour chaque artiste (en parallèle)
+    const tagResults = await Promise.allSettled(
+      top10.map(a => API.call('artist.getTopTags', { artist: a.name }))
+    );
+
+    // Mots à ignorer (non-genres)
+    const IGNORED = new Set([
+      'seen live','favorites','favourite','love','awesome','beautiful','epic',
+      'amazing','classic','favourite music','my favourite','under 2000 listeners',
+      'all','featured','good','new','old','best','cool','hot','great','perfect',
+    ]);
+
+    tagResults.forEach((result, i) => {
+      if (result.status !== 'fulfilled') return;
+      const tags = result.value.toptags?.tag || [];
+      const artistWeight = 10 - i; // Plus de poids aux artistes en tête
+      tags.slice(0, 8).forEach((tag, j) => {
+        const name = tag.name?.toLowerCase().trim();
+        if (!name || name.length < 2 || IGNORED.has(name)) return;
+        // Score = count API × poids artiste × (moins de poids pour tags loin dans la liste)
+        const score = (parseInt(tag.count) || 50) * artistWeight * (8 - j);
+        tagScores.set(name, (tagScores.get(name) || 0) + score);
+      });
+    });
+
+    const top5 = [...tagScores.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    if (!top5.length) {
+      tagsEl.innerHTML = '<p class="mood-na">Aucun genre trouvé</p>';
+      return;
+    }
+
+    tagsEl.innerHTML = top5.map(([tag], i) => {
+      const label = tag.charAt(0).toUpperCase() + tag.slice(1);
+      return `<span class="mood-tag rank-${i + 1}">#${escHtml(label)}</span>`;
+    }).join('');
+
+  } catch (e) {
+    console.warn('loadMoodTags:', e);
+    if (tagsEl) tagsEl.innerHTML = '<p class="mood-na">Genres indisponibles</p>';
+  }
+}
+
+/* ============================================================
+   ██  LISTENING STREAK  ██
+   Calcule le record ET la streak actuelle depuis l'historique
+   ============================================================ */
+function calcStreak(tracks) {
+  // Collecte les jours uniques (YYYY-MM-DD) triés
+  const daySet = new Set();
+  for (const t of tracks) {
+    const ts = parseInt(t.date?.uts || 0);
+    if (!ts) continue;
+    const d = new Date(ts * 1000);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    daySet.add(key);
+  }
+
+  const sorted = [...daySet].sort(); // chronologique
+  if (!sorted.length) return { best: 0, current: 0 };
+
+  // Calcul du record (parcours séquentiel)
+  let best = 1, streak = 1;
+  for (let i = 1; i < sorted.length; i++) {
+    const prev = new Date(sorted[i - 1]);
+    const curr = new Date(sorted[i]);
+    const diffDays = Math.round((curr - prev) / 86400000);
+    if (diffDays === 1) {
+      streak++;
+      if (streak > best) best = streak;
+    } else {
+      streak = 1;
+    }
+  }
+
+  // Calcul de la streak actuelle (depuis aujourd'hui ou hier en remontant)
+  const todayMs  = new Date();
+  todayMs.setHours(0, 0, 0, 0);
+  const todayStr = `${todayMs.getFullYear()}-${String(todayMs.getMonth() + 1).padStart(2, '0')}-${String(todayMs.getDate()).padStart(2, '0')}`;
+  const yestMs   = new Date(todayMs - 86400000);
+  const yestStr  = `${yestMs.getFullYear()}-${String(yestMs.getMonth() + 1).padStart(2, '0')}-${String(yestMs.getDate()).padStart(2, '0')}`;
+
+  // Parcours à rebours depuis le jour le plus récent
+  const rev = [...sorted].reverse();
+  let current = 0;
+  if (rev[0] === todayStr || rev[0] === yestStr) {
+    current = 1;
+    for (let i = 1; i < rev.length; i++) {
+      const a = new Date(rev[i - 1]);
+      const b = new Date(rev[i]);
+      const diff = Math.round((a - b) / 86400000);
+      if (diff === 1) {
+        current++;
+      } else {
+        break;
+      }
+    }
+  }
+
+  return { best, current };
+}
+
+function updateStreakUI(streakData) {
+  const bestEl  = document.getElementById('streak-best');
+  const currEl  = document.getElementById('streak-curr');
+  const hintEl  = document.getElementById('streak-hint');
+
+  if (bestEl) bestEl.textContent = streakData.best;
+  if (currEl) currEl.textContent = streakData.current;
+  if (hintEl) {
+    if (streakData.current > 0) {
+      hintEl.textContent = streakData.current === streakData.best
+        ? '🔥 Vous êtes sur votre record !'
+        : `🔥 Streak en cours — record : ${streakData.best} jours`;
+    } else {
+      hintEl.textContent = `Record calculé sur ${formatNum(APP.fullHistory?.length || 0)} scrobbles`;
+    }
+  }
+}
+
+/* ============================================================
+   ██  HEATMAP HORAIRE (CSS Grid — anti-lag)  ██
+   Grille 24 cellules, intensité par couleur indigo
+   ============================================================ */
+function renderHeatmap(hourCounts) {
+  const el = document.getElementById('heatmap-grid');
+  if (!el) return;
+
+  // Vider l'état "vide"
+  const emptyState = document.getElementById('heatmap-empty');
+  if (emptyState) emptyState.remove();
+
+  const max = Math.max(...hourCounts, 1);
+  const total = hourCounts.reduce((a, b) => a + b, 0);
+
+  const cells = hourCounts.map((count, h) => {
+    const intensity = count / max; // 0–1
+    // Dégradé : indigo pâle (#c7d2fe = 199,210,254) → indigo vif (#4338ca = 67,56,202)
+    const r = Math.round(199 + (67  - 199) * intensity);
+    const g = Math.round(210 + (56  - 210) * intensity);
+    const b = Math.round(254 + (202 - 254) * intensity);
+    const alpha = 0.15 + intensity * 0.85;
+    const bg    = `rgba(${r},${g},${b},${alpha})`;
+    const textC = intensity > 0.45 ? 'rgba(255,255,255,.95)' : 'rgba(200,195,240,.8)';
+    const pct   = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+
+    return `
+      <div class="heatmap-cell" style="background:${bg};color:${textC}"
+           title="${h}h–${h + 1}h : ${formatNum(count)} scrobbles (${pct}%)">
+        <span class="hm-hour">${h}h</span>
+        <span class="hm-val">${count > 9999 ? Math.round(count / 1000) + 'k' : count > 0 ? count : ''}</span>
+      </div>`;
+  }).join('');
+
+  // Légende de l'échelle de couleur
+  const scaleStops = [0.1, 0.3, 0.5, 0.7, 0.9].map(v => {
+    const r = Math.round(199 + (67 - 199) * v);
+    const g = Math.round(210 + (56 - 210) * v);
+    const b = Math.round(254 + (202 - 254) * v);
+    return `<div style="width:28px;height:10px;border-radius:3px;background:rgba(${r},${g},${b},${0.15 + v * 0.85})"></div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="heatmap-cells">${cells}</div>
+    <div class="heatmap-legend">
+      <span>Calme</span>
+      <div class="heatmap-scale">${scaleStops}</div>
+      <span>Intense</span>
+    </div>`;
 }
 
 /* ============================================================
@@ -873,7 +1142,6 @@ async function loadCumulativeChart() {
 
   destroyChart('chart-cumul');
   const c = getThemeColors();
-  // Désactiver les animations sur les gros volumes (anti-lag CPU)
   const animDuration = cumulative.length > 80 ? 0 : 600;
   APP.charts['chart-cumul'] = new Chart(document.getElementById('chart-cumul'), {
     type: 'line',
@@ -992,7 +1260,6 @@ async function loadWrapped(year) {
   document.getElementById('w-scrobbles').textContent = formatNum(totalYear);
   document.getElementById('w-top-m').textContent     = MONTHS_FR[maxMonth];
 
-  // Tops artistes/tracks/albums (12month comme proxy)
   try {
     const [artData, trkData, albData] = await Promise.all([
       API.call('user.getTopArtists', { period: '12month', limit: 50 }),
@@ -1016,7 +1283,6 @@ async function loadWrapped(year) {
 
   } catch (e) { console.warn('wrapped tops:', e); }
 
-  // Mini chart
   destroyChart('w-mini');
   APP.charts['w-mini'] = new Chart(document.getElementById('w-mini'), {
     type: 'bar',
@@ -1068,10 +1334,7 @@ async function exportWrapped() {
     document.body.classList.add('export-mode');
     const canvas = await html2canvas(card, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: null });
     document.body.classList.remove('export-mode');
-    const link = document.createElement('a');
-    link.download = `laststats-wrapped-${document.getElementById('w-yr-sel').value}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    downloadCanvas(canvas, `laststats-wrapped-${document.getElementById('w-yr-sel').value}.png`);
     showToast('Image téléchargée !');
   } catch (e) {
     document.body.classList.remove('export-mode');
@@ -1084,6 +1347,167 @@ function copyLink() {
   navigator.clipboard.writeText(url)
     .then(() => showToast('Lien copié dans le presse-papiers !'))
     .catch(() => prompt('Copiez ce lien :', url));
+}
+
+/* ============================================================
+   ██  GÉNÉRATION DE STORY / CARTE D'IDENTITÉ  ██
+   generateStory('mini')  → Format 9:16 • Top 3 artistes/titres
+   generateStory('full')  → Grande carte • Toutes les stats
+   ============================================================ */
+async function generateStory(type) {
+  showToast('Préparation de la carte…');
+
+  try {
+    const u       = APP.userInfo;
+    const year    = document.getElementById('w-yr-sel')?.value || new Date().getFullYear() - 1;
+    const artists = APP.topArtistsData.slice(0, type === 'mini' ? 3 : 10);
+    const tracks  = APP.topTracksData.slice(0, type === 'mini' ? 3 : 5);
+
+    if (!artists.length) {
+      showToast('Chargez d\'abord les données (Top Artistes)', 'error');
+      return;
+    }
+
+    if (type === 'mini') {
+      // ── MINI STORY 9:16 (360×640) ──
+      const card = document.getElementById('story-mini-card');
+
+      card.innerHTML = `
+        <div class="story-header">
+          <span class="story-brand">LastStats</span>
+          <span class="story-year">${year}</span>
+        </div>
+        <div class="story-body">
+          <p class="story-user">@${escHtml(u?.name || APP.username)}</p>
+
+          <p class="story-section-title">🎤 Top Artistes</p>
+          <div class="story-list">
+            ${artists.map((a, i) => `
+              <div class="story-item">
+                <span class="story-item-rank">#${i + 1}</span>
+                <span class="story-item-name">${escHtml(a.name)}</span>
+                <span class="story-item-plays">${formatNum(a.playcount)}</span>
+              </div>`).join('')}
+          </div>
+
+          ${tracks.length ? `
+          <p class="story-section-title" style="margin-top:18px">🎵 Top Titres</p>
+          <div class="story-list">
+            ${tracks.map((t, i) => `
+              <div class="story-item">
+                <span class="story-item-rank">#${i + 1}</span>
+                <span class="story-item-name">${escHtml(t.name)}</span>
+                <span class="story-item-plays">${formatNum(t.playcount)}</span>
+              </div>`).join('')}
+          </div>` : ''}
+        </div>
+        <div class="story-footer">
+          <span>last.fm/user/${escHtml(u?.name || APP.username)}</span>
+          <span>LastStats</span>
+        </div>`;
+
+      await _captureStory('story-mini-card', 360, 640, `laststats-story-${year}.png`);
+
+    } else {
+      // ── FULL CARD (680×860) ──
+      const u2       = APP.userInfo;
+      const total    = parseInt(u2?.playcount || 0);
+      const regTs    = parseInt(u2?.registered?.unixtime || 0);
+      const eddington = APP.topArtistsData.length
+        ? calcEddington(APP.topArtistsData.map(a => parseInt(a.playcount)))
+        : '—';
+
+      const streakBest    = APP.streakData?.best    ?? '—';
+      const streakCurrent = APP.streakData?.current ?? '—';
+
+      // Mood tags si disponibles
+      const moodEl = document.getElementById('mood-tags');
+      const moodHTML = moodEl?.innerHTML || '';
+
+      const card = document.getElementById('story-full-card');
+      card.innerHTML = `
+        <div class="story-header">
+          <div>
+            <span class="story-brand">LastStats — Carte Complète</span>
+            <div class="story-user" style="margin-top:6px">@${escHtml(u2?.name || APP.username)}</div>
+          </div>
+          <span class="story-year">${year}</span>
+        </div>
+
+        <div class="story-stats-row">
+          <div class="story-stat"><strong>${formatNum(total)}</strong><span>Scrobbles totaux</span></div>
+          <div class="story-stat"><strong>${streakBest}</strong><span>🔥 Streak record</span></div>
+          <div class="story-stat"><strong>${eddington}</strong><span>Eddington</span></div>
+          <div class="story-stat"><strong>${formatDate(regTs).replace(/ /g, '\u00A0')}</strong><span>Membre depuis</span></div>
+        </div>
+
+        ${moodHTML ? `
+        <div class="story-mood">
+          <p class="story-section-title">🎭 Mood Musical</p>
+          <div class="story-mood-tags">${moodHTML}</div>
+        </div>` : ''}
+
+        <p class="story-section-title">🎤 Top ${artists.length} Artistes</p>
+        <div class="story-list story-list-grid">
+          ${artists.map((a, i) => `
+            <div class="story-item">
+              <span class="story-item-rank">#${i + 1}</span>
+              <span class="story-item-name">${escHtml(a.name)}</span>
+              <span class="story-item-plays">${formatNum(a.playcount)}</span>
+            </div>`).join('')}
+        </div>
+
+        ${tracks.length ? `
+        <p class="story-section-title" style="margin-top:16px">🎵 Top Titres</p>
+        <div class="story-list story-list-grid">
+          ${tracks.map((t, i) => `
+            <div class="story-item">
+              <span class="story-item-rank">#${i + 1}</span>
+              <span class="story-item-name">${escHtml(t.name)}</span>
+              <span class="story-item-plays">${formatNum(t.playcount)}</span>
+            </div>`).join('')}
+        </div>` : ''}
+
+        <div class="story-footer" style="margin-top:auto">
+          <span>Généré avec LastStats · ${new Date().toLocaleDateString('fr-FR')}</span>
+          <span>last.fm/user/${escHtml(u2?.name || APP.username)}</span>
+        </div>`;
+
+      await _captureStory('story-full-card', 680, 860, `laststats-full-${year}.png`);
+    }
+
+    showToast('Carte téléchargée !');
+
+  } catch (e) {
+    document.body.classList.remove('export-mode');
+    showToast('Erreur génération : ' + e.message, 'error');
+    console.error('generateStory:', e);
+  }
+}
+
+async function _captureStory(cardId, w, h, filename) {
+  const card = document.getElementById(cardId);
+  document.body.classList.add('export-mode');
+  await sleep(60); // Laisser le DOM se peindre
+  const canvas = await html2canvas(card, {
+    scale: 2,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: null,
+    width: w,
+    height: h,
+    windowWidth: w,
+    windowHeight: h,
+  });
+  document.body.classList.remove('export-mode');
+  downloadCanvas(canvas, filename);
+}
+
+function downloadCanvas(canvas, filename) {
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
 }
 
 /* ============================================================
@@ -1122,7 +1546,7 @@ async function loadAdvancedStats() {
     document.getElementById('adv-grid').innerHTML = cards.map((c, i) => `
       <div class="adv-card" style="animation-delay:${i * 0.05}s">
         <div class="adv-card-icon">${c.icon}</div>
-        <div class="adv-card-value" style="color:${c.color}">${c.noAnim ? c.value : c.value}</div>
+        <div class="adv-card-value" style="color:${c.color}">${c.value}</div>
         <div class="adv-card-label">${c.label}</div>
         <div class="adv-card-sub">${c.sub}</div>
       </div>`).join('');
@@ -1151,7 +1575,6 @@ async function fetchFullHistory() {
   const btn = document.getElementById('fetch-history-btn');
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Chargement…'; }
 
-  // Overlay de progression
   const overlay  = document.getElementById('fetch-overlay');
   const fillEl   = document.getElementById('fetch-fill');
   const pctEl    = document.getElementById('fetch-pct');
@@ -1178,7 +1601,6 @@ async function fetchFullHistory() {
     APP.fullHistory = tracks;
     overlay.classList.add('hidden');
 
-    // Traitement
     processFullHistory(tracks);
     showToast(`${formatNum(tracks.length)} scrobbles chargés avec succès !`);
 
@@ -1193,38 +1615,31 @@ async function fetchFullHistory() {
 function processFullHistory(tracks) {
   if (!tracks || !tracks.length) return;
 
-  // ── Compte par heure ──
   const hourCounts = Array(24).fill(0);
-  // ── Compte par jour de semaine (0=Lun … 6=Dim) ──
   const dayCounts  = Array(7).fill(0);
-  // ── Artistes uniques ──
   const artistMap  = new Map();
 
   for (const t of tracks) {
     const ts = parseInt(t.date?.uts || 0);
     if (ts) {
-      const d  = new Date(ts * 1000);
+      const d   = new Date(ts * 1000);
       hourCounts[d.getHours()]++;
-      // JS getDay() : 0=Dim, 1=Lun…
-      const dow = (d.getDay() + 6) % 7; // recaler sur Lun=0
+      const dow = (d.getDay() + 6) % 7;
       dayCounts[dow]++;
     }
     const artist = t.artist?.['#text'] || t.artist?.name || '';
     if (artist) artistMap.set(artist, (artistMap.get(artist) || 0) + 1);
   }
 
-  // One-hit wonders (artistes avec exactement 1 écoute)
   const oneHitWonders = [...artistMap.entries()]
     .filter(([, n]) => n === 1)
     .map(([name]) => name)
     .slice(0, 20);
 
-  // Eddington depuis les données réelles
   const allPlays    = [...artistMap.values()];
   const eddington   = calcEddington(allPlays);
   const uniqueCount = artistMap.size;
 
-  // Mise à jour de la grille adv-stats
   const u         = APP.userInfo;
   const regTs     = parseInt(u?.registered?.unixtime || 0);
   const daysSince = regTs ? Math.floor((Date.now() - regTs * 1000) / 86400000) : 1;
@@ -1234,13 +1649,19 @@ function processFullHistory(tracks) {
   const top1 = sortedArtists[0];
   const topPct = top1 ? ((top1[1] / tracks.length) * 100).toFixed(1) : 0;
 
+  // ── Calcul et affichage du Streak ──
+  const streakData  = calcStreak(tracks);
+  APP.streakData    = streakData;
+  updateStreakUI(streakData);
+
+  // ── Mise à jour grille stats avancées ──
   document.getElementById('adv-grid').innerHTML = [
     { icon: '⚡', value: avgDay,    label: 'Scrobbles / jour', sub: `Calculé sur ${formatNum(tracks.length)} scrobbles réels`, color: '#6366f1' },
     { icon: '🔢', value: eddington, label: 'Nombre d\'Eddington', sub: `${eddington} artistes écoutés ≥ ${eddington}×`, color: '#8b5cf6' },
     { icon: '🌟', value: top1?.[0] || '—', label: 'Artiste n°1 (all time)', sub: `${formatNum(top1?.[1] || 0)} écoutes · ${topPct}% du total`, color: '#a855f7', noAnim: true },
-    { icon: '💀', value: oneHitWonders.length, label: 'One-Hit Wonders', sub: `${formatNum(oneHitWonders.length)} artistes écoutés 1 seule fois`, color: '#ec4899' },
-    { icon: '🎤', value: formatNum(uniqueCount), label: 'Artistes uniques', sub: 'Sur l\'historique complet', color: '#f97316', noAnim: true },
-    { icon: '🎵', value: formatNum(tracks.length), label: 'Scrobbles analysés', sub: `Chargés depuis l'API`, color: '#22c55e', noAnim: true },
+    { icon: '🔥', value: streakData.best, label: 'Streak Record', sub: `Actuel : ${streakData.current} jour${streakData.current > 1 ? 's' : ''}`, color: '#f97316' },
+    { icon: '🎤', value: formatNum(uniqueCount), label: 'Artistes uniques', sub: 'Sur l\'historique complet', color: '#ec4899', noAnim: true },
+    { icon: '🎵', value: formatNum(tracks.length), label: 'Scrobbles analysés', sub: 'Chargés depuis l\'API', color: '#22c55e', noAnim: true },
   ].map((c, i) => `
     <div class="adv-card" style="animation-delay:${i * 0.05}s">
       <div class="adv-card-icon">${c.icon}</div>
@@ -1249,11 +1670,14 @@ function processFullHistory(tracks) {
       <div class="adv-card-sub">${c.sub}</div>
     </div>`).join('');
 
-  // Afficher les graphiques avancés
+  // ── Graphiques avancés ──
   document.getElementById('adv-charts').classList.remove('hidden');
   renderHourlyChart(hourCounts);
   renderWeekdayChart(dayCounts);
   renderOneHitWonders(oneHitWonders, artistMap);
+
+  // ── Heatmap dans la section Graphiques ──
+  renderHeatmap(hourCounts);
 }
 
 function renderHourlyChart(hourCounts) {
@@ -1266,14 +1690,20 @@ function renderHourlyChart(hourCounts) {
       labels,
       datasets: [{
         data: hourCounts,
-        backgroundColor: hourCounts.map((_, i) => `${CHART_PALETTE[Math.floor(i / 4) % CHART_PALETTE.length]}bb`),
-        borderColor:     hourCounts.map((_, i) => CHART_PALETTE[Math.floor(i / 4) % CHART_PALETTE.length]),
+        backgroundColor: hourCounts.map((v, i) => {
+          const intensity = v / Math.max(...hourCounts, 1);
+          return `rgba(99,102,241,${0.2 + intensity * 0.7})`;
+        }),
+        borderColor: hourCounts.map((v, i) => {
+          const intensity = v / Math.max(...hourCounts, 1);
+          return `rgba(99,102,241,${0.4 + intensity * 0.6})`;
+        }),
         borderWidth: 1, borderRadius: 4,
       }],
     },
     options: {
       ...baseChartOpts(),
-      animation: { duration: 0 },  // Désactivé : données volumineuses de l'historique complet
+      animation: { duration: 0 },
       plugins: {
         ...baseChartOpts().plugins,
         tooltip: { ...baseChartOpts().plugins.tooltip, callbacks: { label: ctx => ` ${formatNum(ctx.raw)} scrobbles` } },
@@ -1302,7 +1732,7 @@ function renderWeekdayChart(dayCounts) {
     },
     options: {
       ...baseChartOpts(),
-      animation: { duration: 0 },  // Désactivé : données volumineuses de l'historique complet
+      animation: { duration: 0 },
       plugins: {
         ...baseChartOpts().plugins,
         tooltip: { ...baseChartOpts().plugins.tooltip, callbacks: { label: ctx => ` ${formatNum(ctx.raw)} scrobbles` } },
@@ -1324,7 +1754,6 @@ function renderOneHitWonders(names, artistMap) {
     return;
   }
 
-  // Afficher aussi les artistes avec très peu d'écoutes (1-3)
   const raresAll = [...artistMap.entries()]
     .filter(([, n]) => n <= 3)
     .sort((a, b) => a[1] - b[1])
@@ -1346,9 +1775,12 @@ async function refreshData() {
   icon.classList.add('fa-spin');
   Cache.clear();
   APP.fullHistory = null;
+  APP.streakData  = null;
 
   try {
     await loadDashboard();
+    loadVersus();
+    loadMoodTags();
     const activeSection = document.querySelector('.app-sec.active')?.id?.replace('s-', '');
     if (activeSection === 'top-artists') await loadTopArtists('overall');
     if (activeSection === 'top-albums')  await loadTopAlbums('overall');
@@ -1363,10 +1795,12 @@ function logout() {
   Cache.clear();
   localStorage.removeItem('ls_username');
   localStorage.removeItem('ls_apikey');
-  APP.username  = '';
-  APP.apiKey    = '';
-  APP.userInfo  = null;
+  localStorage.removeItem('ls_section');
+  APP.username    = '';
+  APP.apiKey      = '';
+  APP.userInfo    = null;
   APP.fullHistory = null;
+  APP.streakData  = null;
   Object.values(APP.charts).forEach(c => c?.destroy());
   APP.charts = {};
 
