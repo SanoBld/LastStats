@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LastStats — Statistiques Last.fm avancées</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ÉCRAN DE CONNEXION
+═══════════════════════════════════════════════════════════ -->
+<div id="setup-screen">
+  <div class="setup-bg">
+    <div class="orb o1"></div>
+    <div class="orb o2"></div>
+    <div class="orb o3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+  <div class="setup-wrap">
+    <div class="setup-logo">
+      <div class="logo-icon"><i class="fas fa-headphones-alt"></i></div>
+      <h1>LastStats</h1>
+      <p>Vos statistiques musicales Last.fm, réinventées.</p>
+    </div>
+    <div class="setup-card glass">
+      <h2>Analyser un profil</h2>
+
+      <div class="field">
+        <label><i class="fas fa-user"></i> Nom d'utilisateur Last.fm</label>
+        <input type="text" id="input-username" placeholder="votre_pseudo" autocomplete="off" spellcheck="false"
+               onkeydown="if(event.key==='Enter')initApp()">
+      </div>
+
+      <div class="field">
+        <label>
+          <i class="fas fa-key"></i> Clé API Last.fm
+          <a href="https://www.last.fm/api/account/create" target="_blank" rel="noopener" class="label-link">
+            <i class="fas fa-external-link-alt"></i> Obtenir gratuitement
+          </a>
+        </label>
+        <div class="input-row">
+          <input type="password" id="input-apikey" placeholder="32 caractères hexadécimaux" autocomplete="off"
+                 onkeydown="if(event.key==='Enter')initApp()">
+          <button class="icon-btn" onclick="toggleApiKey()" title="Afficher/masquer">
+            <i class="fas fa-eye" id="eye-icon"></i>
+          </button>
+        </div>
+        <p class="hint"><i class="fas fa-shield-alt"></i> Stockée dans votre navigateur. Jamais transmise à un tiers.</p>
+      </div>
+
+      <label class="chk-label">
+        <input type="checkbox" id="remember-me" checked>
+        <span class="chk-box"></span>
+        Se souvenir de mes informations
+      </label>
+
+      <button class="btn-primary" id="load-btn" onclick="initApp()">
+        <i class="fas fa-chart-bar"></i> Lancer l'analyse
+      </button>
+
+      <div id="setup-err" class="err-block hidden">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span id="setup-err-txt"></span>
+      </div>
+
+      <details class="help-acc">
+        <summary><i class="fas fa-question-circle"></i> Comment obtenir une clé API ?</summary>
+        <div class="help-body">
+          <ol>
+            <li>Connectez-vous sur <a href="https://www.last.fm" target="_blank">last.fm</a></li>
+            <li>Allez sur <a href="https://www.last.fm/api/account/create" target="_blank">last.fm/api/account/create</a></li>
+            <li>Remplissez <strong>Application name</strong> = "LastStats" (reste optionnel)</li>
+            <li>Cliquez <strong>Submit</strong></li>
+            <li>Copiez l'<strong>API key</strong> (32 chars) — pas le "Shared secret"</li>
+          </ol>
+          <div class="help-note">
+            <i class="fas fa-info-circle"></i>
+            Création 100% gratuite. Le scrobbling doit être actif sur votre profil.
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     OVERLAY DE CHARGEMENT GLOBAL (pagination recentTracks)
+═══════════════════════════════════════════════════════════ -->
+<div id="fetch-overlay" class="hidden">
+  <div class="fetch-modal glass">
+    <div class="fetch-icon">
+      <i class="fas fa-headphones-alt"></i>
+      <div class="fetch-ring"></div>
+    </div>
+    <h3 id="fetch-title">Chargement de l'historique…</h3>
+    <p id="fetch-msg">Initialisation des requêtes…</p>
+    <div class="fetch-prog-wrap">
+      <div class="fetch-prog-bar">
+        <div class="fetch-prog-fill" id="fetch-fill"></div>
+      </div>
+      <div class="fetch-prog-meta">
+        <span id="fetch-pct">0%</span>
+        <span id="fetch-tracks">0 scrobbles</span>
+      </div>
+    </div>
+    <p class="fetch-sub" id="fetch-sub">Page 1 / …</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     APPLICATION PRINCIPALE
+═══════════════════════════════════════════════════════════ -->
+<div id="app" class="hidden">
+  <div class="sidebar-ov" id="sidebar-ov" onclick="closeSb()"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-head">
+      <div class="sb-logo">
+        <i class="fas fa-headphones-alt"></i>
+        <span>LastStats</span>
+      </div>
+      <button class="sb-close-btn" onclick="closeSb()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="sb-profile" id="sb-profile">
+      <div class="sb-av" id="sb-av"></div>
+      <div class="sb-info">
+        <strong id="sb-name">…</strong>
+        <span id="sb-plays"></span>
+        <span id="sb-country" class="sb-country"></span>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+      <a class="nav-lnk active" data-s="dashboard" onclick="nav('dashboard')">
+        <i class="fas fa-home"></i><span>Dashboard</span>
+      </a>
+      <a class="nav-lnk" data-s="top-artists" onclick="nav('top-artists')">
+        <i class="fas fa-microphone-alt"></i><span>Top Artistes</span>
+      </a>
+      <a class="nav-lnk" data-s="top-albums" onclick="nav('top-albums')">
+        <i class="fas fa-compact-disc"></i><span>Top Albums</span>
+      </a>
+      <a class="nav-lnk" data-s="top-tracks" onclick="nav('top-tracks')">
+        <i class="fas fa-music"></i><span>Top Titres</span>
+      </a>
+      <a class="nav-lnk" data-s="charts" onclick="nav('charts')">
+        <i class="fas fa-chart-bar"></i><span>Graphiques</span>
+      </a>
+      <a class="nav-lnk" data-s="wrapped" onclick="nav('wrapped')">
+        <i class="fas fa-gift"></i><span>Wrapped</span>
+        <span class="nav-bdg">✦</span>
+      </a>
+      <a class="nav-lnk" data-s="advanced" onclick="nav('advanced')">
+        <i class="fas fa-flask"></i><span>Stats Avancées</span>
+      </a>
+    </nav>
+
+    <div class="sb-foot">
+      <div class="theme-row">
+        <span>Thème</span>
+        <div class="theme-btns">
+          <button class="th-btn" data-t="light" onclick="setTheme('light')" title="Clair">
+            <i class="fas fa-sun"></i>
+          </button>
+          <button class="th-btn" data-t="auto" onclick="setTheme('auto')" title="Auto">
+            <i class="fas fa-adjust"></i>
+          </button>
+          <button class="th-btn active" data-t="dark" onclick="setTheme('dark')" title="Sombre">
+            <i class="fas fa-moon"></i>
+          </button>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i><span>Déconnexion</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- CONTENU PRINCIPAL -->
+  <div class="main-wrap">
+    <header class="app-hd">
+      <button class="burger-btn" onclick="openSb()"><i class="fas fa-bars"></i></button>
+      <h1 class="hd-title" id="hd-title">Dashboard</h1>
+      <div class="hd-right">
+        <div class="hd-mini-user" id="hd-mini-user"></div>
+        <button class="icon-btn" id="refresh-btn" onclick="refreshData()" title="Actualiser">
+          <i class="fas fa-sync-alt" id="refresh-icon"></i>
+        </button>
+      </div>
+    </header>
+
+    <main class="main-content">
+
+      <!-- ══ DASHBOARD ══ -->
+      <section id="s-dashboard" class="app-sec active">
+        <div class="sec-hd">
+          <h2>Tableau de bord</h2>
+          <p class="sec-sub">Vue d'ensemble de votre activité musicale</p>
+        </div>
+
+        <div class="stat-grid" id="stat-grid">
+          <!-- Skeletons -->
+          <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
+        </div>
+
+        <!-- Écoute en cours -->
+        <div id="now-playing-wrap" class="hidden">
+          <div class="now-playing-bar" id="now-playing-bar">
+            <div class="np-pulse"></div>
+            <div class="np-art" id="np-art"></div>
+            <div class="np-info">
+              <span class="np-live">● EN COURS</span>
+              <strong id="np-track">—</strong>
+              <span id="np-artist">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-charts">
+          <div class="chart-card glass">
+            <div class="cc-hd">
+              <span><i class="fas fa-chart-bar"></i> Activité mensuelle <b id="dash-yr"></b></span>
+            </div>
+            <canvas id="dash-monthly" height="220"></canvas>
+          </div>
+          <div class="chart-card glass">
+            <div class="cc-hd">
+              <span><i class="fas fa-trophy"></i> Top 5 Artistes</span>
+            </div>
+            <canvas id="dash-artists" height="220"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ TOP ARTISTES ══ -->
+      <section id="s-top-artists" class="app-sec">
+        <div class="sec-hd flex-bw">
+          <div>
+            <h2>Top Artistes</h2>
+            <p class="sec-sub">Vos artistes les plus écoutés</p>
+          </div>
+          <div class="period-sel" id="prd-artists">
+            <button class="prd" data-p="7day">7j</button>
+            <button class="prd" data-p="1month">1M</button>
+            <button class="prd" data-p="3month">3M</button>
+            <button class="prd" data-p="6month">6M</button>
+            <button class="prd" data-p="12month">12M</button>
+            <button class="prd active" data-p="overall">Tout</button>
+          </div>
+        </div>
+        <div class="music-grid" id="artists-grid"></div>
+      </section>
+
+      <!-- ══ TOP ALBUMS ══ -->
+      <section id="s-top-albums" class="app-sec">
+        <div class="sec-hd flex-bw">
+          <div>
+            <h2>Top Albums</h2>
+            <p class="sec-sub">Vos albums les plus écoutés</p>
+          </div>
+          <div class="period-sel" id="prd-albums">
+            <button class="prd" data-p="7day">7j</button>
+            <button class="prd" data-p="1month">1M</button>
+            <button class="prd" data-p="3month">3M</button>
+            <button class="prd" data-p="6month">6M</button>
+            <button class="prd" data-p="12month">12M</button>
+            <button class="prd active" data-p="overall">Tout</button>
+          </div>
+        </div>
+        <div class="music-grid" id="albums-grid"></div>
+      </section>
+
+      <!-- ══ TOP TITRES ══ -->
+      <section id="s-top-tracks" class="app-sec">
+        <div class="sec-hd flex-bw">
+          <div>
+            <h2>Top Titres</h2>
+            <p class="sec-sub">Vos titres les plus écoutés</p>
+          </div>
+          <div class="period-sel" id="prd-tracks">
+            <button class="prd" data-p="7day">7j</button>
+            <button class="prd" data-p="1month">1M</button>
+            <button class="prd" data-p="3month">3M</button>
+            <button class="prd" data-p="6month">6M</button>
+            <button class="prd" data-p="12month">12M</button>
+            <button class="prd active" data-p="overall">Tout</button>
+          </div>
+        </div>
+        <div class="tracks-list" id="tracks-list"></div>
+      </section>
+
+      <!-- ══ GRAPHIQUES ══ -->
+      <section id="s-charts" class="app-sec">
+        <div class="sec-hd">
+          <h2>Graphiques</h2>
+          <p class="sec-sub">Visualisez vos tendances d'écoute dans le temps</p>
+        </div>
+
+        <div class="chart-card glass full">
+          <div class="cc-hd">
+            <span><i class="fas fa-calendar-alt"></i> Scrobbles par mois</span>
+            <select id="yr-sel" class="yr-sel" onchange="loadMonthlyChart(this.value)"></select>
+          </div>
+          <div id="monthly-prog" class="prog-wrap hidden">
+            <div class="prog-bar"><div class="prog-fill" id="monthly-fill"></div></div>
+            <span id="monthly-prog-txt">Chargement…</span>
+          </div>
+          <canvas id="chart-monthly" height="280"></canvas>
+        </div>
+
+        <div class="chart-card glass full">
+          <div class="cc-hd">
+            <span><i class="fas fa-chart-line"></i> Évolution cumulative des scrobbles</span>
+          </div>
+          <canvas id="chart-cumul" height="280"></canvas>
+        </div>
+
+        <div class="charts-duo">
+          <div class="chart-card glass">
+            <div class="cc-hd"><span><i class="fas fa-chart-pie"></i> Répartition artistes (top 10)</span></div>
+            <canvas id="chart-art-pie" height="260"></canvas>
+          </div>
+          <div class="chart-card glass">
+            <div class="cc-hd"><span><i class="fas fa-chart-pie"></i> Répartition albums (top 10)</span></div>
+            <canvas id="chart-alb-pie" height="260"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ WRAPPED ══ -->
+      <section id="s-wrapped" class="app-sec">
+        <div class="sec-hd flex-bw">
+          <div>
+            <h2><i class="fas fa-gift"></i> Wrapped</h2>
+            <p class="sec-sub">Votre bilan musical annuel</p>
+          </div>
+          <select id="w-yr-sel" class="yr-sel" onchange="loadWrapped(this.value)"></select>
+        </div>
+
+        <div id="w-loader" class="w-loader hidden">
+          <div class="spinner-lg"></div>
+          <p>Génération du Wrapped…</p>
+          <p class="w-loader-sub">Données mensuelles : <span id="w-prog-n">0</span>/12</p>
+          <div class="prog-bar" style="max-width:280px;margin:10px auto 0">
+            <div class="prog-fill" id="w-prog-fill" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- Carte exportable -->
+        <div id="wrapped-card" class="w-card">
+          <div class="w-decos">
+            <div class="w-d d1"></div>
+            <div class="w-d d2"></div>
+            <div class="w-d d3"></div>
+          </div>
+          <div class="w-inner">
+            <div class="w-top-row">
+              <div class="w-yr-badge" id="w-yr-badge">2025</div>
+              <div class="w-title">
+                <h2>Votre Année en Musique</h2>
+                <p id="w-uname">@username</p>
+              </div>
+            </div>
+            <div class="w-nums">
+              <div class="w-num"><strong id="w-scrobbles">—</strong><span>Scrobbles</span></div>
+              <div class="w-num"><strong id="w-art-cnt">—</strong><span>Artistes</span></div>
+              <div class="w-num"><strong id="w-top-m">—</strong><span>Mois le + actif</span></div>
+            </div>
+            <div class="w-podium">
+              <div class="w-pod">
+                <div class="w-pod-lbl"><i class="fas fa-crown"></i> Artiste n°1</div>
+                <div class="w-pod-img" id="w-art-img"><span id="w-art-lt">?</span></div>
+                <div class="w-pod-name" id="w-art-name">—</div>
+                <div class="w-pod-plays" id="w-art-plays"></div>
+              </div>
+              <div class="w-pod">
+                <div class="w-pod-lbl"><i class="fas fa-music"></i> Titre n°1</div>
+                <div class="w-pod-img" id="w-trk-img"><span id="w-trk-lt">?</span></div>
+                <div class="w-pod-name" id="w-trk-name">—</div>
+                <div class="w-pod-plays" id="w-trk-plays"></div>
+              </div>
+              <div class="w-pod">
+                <div class="w-pod-lbl"><i class="fas fa-compact-disc"></i> Album n°1</div>
+                <div class="w-pod-img" id="w-alb-img"><span id="w-alb-lt">?</span></div>
+                <div class="w-pod-name" id="w-alb-name">—</div>
+                <div class="w-pod-plays" id="w-alb-plays"></div>
+              </div>
+            </div>
+            <div class="w-mini-chart">
+              <canvas id="w-mini" height="60"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-actions">
+          <button class="btn-dl" onclick="exportWrapped()">
+            <i class="fas fa-download"></i> Télécharger en PNG
+          </button>
+          <button class="btn-lnk" onclick="copyLink()">
+            <i class="fas fa-link"></i> Copier le lien du profil
+          </button>
+        </div>
+      </section>
+
+      <!-- ══ STATS AVANCÉES ══ -->
+      <section id="s-advanced" class="app-sec">
+        <div class="sec-hd flex-bw">
+          <div>
+            <h2>Stats Avancées</h2>
+            <p class="sec-sub">Des métriques pour les véritables passionnés de musique</p>
+          </div>
+          <button class="btn-fetch" id="fetch-history-btn" onclick="fetchFullHistory()">
+            <i class="fas fa-database"></i> Charger l'historique complet
+          </button>
+        </div>
+
+        <!-- Cards de stats avancées -->
+        <div class="adv-grid" id="adv-grid">
+          <div class="adv-card sk"><div class="sk-ln w60"></div><div class="sk-ln w40 mt8"></div></div>
+          <div class="adv-card sk"><div class="sk-ln w60"></div><div class="sk-ln w40 mt8"></div></div>
+          <div class="adv-card sk"><div class="sk-ln w60"></div><div class="sk-ln w40 mt8"></div></div>
+          <div class="adv-card sk"><div class="sk-ln w60"></div><div class="sk-ln w40 mt8"></div></div>
+          <div class="adv-card sk"><div class="sk-ln w60"></div><div class="sk-ln w40 mt8"></div></div>
+          <div class="adv-card sk"><div class="sk-ln w60"></div><div class="sk-ln w40 mt8"></div></div>
+        </div>
+
+        <!-- Graphiques Avancés (heures + jours) -->
+        <div id="adv-charts" class="hidden">
+          <div class="charts-duo">
+            <div class="chart-card glass">
+              <div class="cc-hd"><span><i class="fas fa-clock"></i> Répartition horaire</span></div>
+              <canvas id="chart-hourly" height="220"></canvas>
+            </div>
+            <div class="chart-card glass">
+              <div class="cc-hd"><span><i class="fas fa-calendar-week"></i> Activité par jour de semaine</span></div>
+              <canvas id="chart-weekday" height="220"></canvas>
+            </div>
+          </div>
+          <div class="chart-card glass full">
+            <div class="cc-hd"><span><i class="fas fa-list-ol"></i> One-Hit Wonders (top 20 artistes uniques)</span></div>
+            <div id="ohw-list" class="ohw-list"></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast">
+  <i class="fas fa-check-circle" id="toast-icon"></i>
+  <span id="toast-txt"></span>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
