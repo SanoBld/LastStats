@@ -428,6 +428,9 @@ function nav(section) {
     'top-albums':  'Top Albums',
     'top-tracks':  'Top Titres',
     charts:        'Graphiques',
+    vizplus:       'Visualisations Avancées',
+    badges:        'Succès',
+    obscurity:     'Mainstream vs Obscur',
     wrapped:       'Wrapped',
     advanced:      'Stats Avancées',
   };
@@ -504,14 +507,31 @@ async function pollNowPlaying() {
     const wrap = document.getElementById('now-playing-wrap');
 
     if (last['@attr']?.nowplaying) {
-      document.getElementById('np-track').textContent  = last.name || '—';
-      document.getElementById('np-artist').textContent = last.artist?.name || last.artist?.['#text'] || '—';
+      const trackName  = last.name || '—';
+      const artistName = last.artist?.name || last.artist?.['#text'] || '—';
+      document.getElementById('np-track').textContent  = trackName;
+      document.getElementById('np-artist').textContent = artistName;
 
-      const artEl = document.getElementById('np-art');
-      const img   = last.image?.find(i => i.size === 'medium')?.['#text'];
-      artEl.innerHTML = img && !isDefaultImg(img)
-        ? `<img src="${img}" alt="" style="width:100%;height:100%;object-fit:cover">`
-        : '';
+      const artEl  = document.getElementById('np-art');
+      const artImg = document.getElementById('np-art-img');
+      const img    = last.image?.find(i => i.size === 'medium')?.['#text'];
+
+      if (img && !isDefaultImg(img)) {
+        artEl.innerHTML = `<img src="${img}" alt="" style="width:100%;height:100%;object-fit:cover">`;
+        // ColorThief dynamic accent
+        if (APP.currentAccent === 'dynamic') {
+          _applyColorThiefFromUrl(img);
+        }
+      } else {
+        artEl.innerHTML = '';
+      }
+
+      // Boutons lecture
+      const q = encodeURIComponent(`${trackName} ${artistName}`);
+      const spBtn = document.getElementById('np-spotify-btn');
+      const ytBtn = document.getElementById('np-youtube-btn');
+      if (spBtn) spBtn.href = `spotify:search:${encodeURIComponent(trackName + ' ' + artistName)}`;
+      if (ytBtn) ytBtn.href = `https://www.youtube.com/results?search_query=${q}`;
 
       wrap.classList.remove('hidden');
       _npTimer = setTimeout(pollNowPlaying, 30000);
@@ -940,26 +960,35 @@ async function loadTopArtists(period) {
     APP.topArtistsData = data.topartists?.artist || [];
 
     grid.innerHTML = artists.map((a, i) => {
-      const imgUrl = a.image?.find(img => img.size === 'extralarge')?.['#text'] || '';
-      const hasImg = !isDefaultImg(imgUrl);
+      // Last.fm ne fournit plus les images : on utilise getTopAlbums comme source
       const letter = (a.name || '?')[0].toUpperCase();
       const bg     = nameToGradient(a.name);
-      return `
-        <div class="music-card" style="animation-delay:${i * 0.04}s" onclick="window.open('${a.url}','_blank')">
+      const safeUrl = a.url || '#';
+      const spQ  = encodeURIComponent(a.name);
+      const ytQ  = encodeURIComponent(a.name);
+      const imgId = `artist-img-${i}`;
+      // On rend d'abord le fallback, puis on injecte l'image async
+      const html = `
+        <div class="music-card" style="animation-delay:${i * 0.04}s" onclick="window.open('${safeUrl}','_blank')">
           <div class="music-card-img" style="height:160px">
-            ${hasImg ? `<img src="${imgUrl}" alt="${escHtml(a.name)}" loading="lazy"
-                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
-            <div class="spotify-cover" style="background:${bg};display:${hasImg ? 'none' : 'flex'}">
+            <div id="${imgId}" class="spotify-cover" style="background:${bg}">
               <span class="sc-letter">${letter}</span>
               <span class="sc-name">${escHtml(a.name)}</span>
             </div>
             <div class="music-card-rank">${i + 1}</div>
+            <div class="music-card-actions">
+              <a class="mc-play-btn sp" href="spotify:search:${spQ}" onclick="event.stopPropagation()" title="Spotify"><i class="fab fa-spotify"></i></a>
+              <a class="mc-play-btn yt" href="https://www.youtube.com/results?search_query=${ytQ}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="YouTube"><i class="fab fa-youtube"></i></a>
+            </div>
           </div>
           <div class="music-card-body">
             <div class="music-card-name" title="${escHtml(a.name)}">${escHtml(a.name)}</div>
             <div class="music-card-plays">${formatNum(a.playcount)} écoutes</div>
           </div>
         </div>`;
+      // Injection image différée (non bloquant)
+      setTimeout(() => injectArtistImage(a.name, imgId, bg, letter), i * 120);
+      return html;
     }).join('');
   } catch (e) {
     grid.innerHTML = errMsg(e);
@@ -1020,6 +1049,8 @@ async function loadTopTracks(period) {
     list.innerHTML = tracks.map((t, i) => {
       const pct = ((parseInt(t.playcount) / maxPlay) * 100).toFixed(1);
       const medal = i < 3 ? ['🥇','🥈','🥉'][i] : i + 1;
+      const spQ   = encodeURIComponent(`${t.name} ${t.artist?.name || ''}`);
+      const ytQ   = encodeURIComponent(`${t.name} ${t.artist?.name || ''}`);
       return `
         <div class="track-item" style="animation-delay:${i * 0.025}s" onclick="window.open('${t.url}','_blank')">
           <div class="track-rank">${medal}</div>
@@ -1031,6 +1062,10 @@ async function loadTopTracks(period) {
             <div class="track-bar" style="width:${pct}%"></div>
           </div>
           <div class="track-plays">${formatNum(t.playcount)}</div>
+          <div class="track-play-btns">
+            <a class="track-play-btn sp" href="spotify:search:${spQ}" title="Ouvrir dans Spotify" onclick="event.stopPropagation()"><i class="fab fa-spotify"></i></a>
+            <a class="track-play-btn yt" href="https://www.youtube.com/results?search_query=${ytQ}" target="_blank" rel="noopener" title="Rechercher sur YouTube" onclick="event.stopPropagation()"><i class="fab fa-youtube"></i></a>
+          </div>
         </div>`;
     }).join('');
   } catch (e) {
@@ -1827,3 +1862,1011 @@ function errMsg(e) {
     <i class="fas fa-exclamation-triangle" style="color:#f97316"></i> ${escHtml(e.message)}
   </p>`;
 }
+
+/* ============================================================
+   ██  ARTIST IMAGE (via artist.getTopAlbums)  ██
+   Last.fm ne fournit plus les images d'artistes directement.
+   On récupère la pochette du 1er album comme substitut.
+   ============================================================ */
+const _imgCache = new Map();
+
+async function getArtistImage(artistName) {
+  if (_imgCache.has(artistName)) return _imgCache.get(artistName);
+  try {
+    const data = await API._fetch('artist.getTopAlbums', { artist: artistName, limit: 3, autocorrect: 1 });
+    const albums = data.topalbums?.album || [];
+    for (const alb of albums) {
+      const img = alb.image?.find(i => i.size === 'extralarge')?.['#text']
+               || alb.image?.find(i => i.size === 'large')?.['#text']
+               || '';
+      if (!isDefaultImg(img)) {
+        _imgCache.set(artistName, img);
+        return img;
+      }
+    }
+  } catch { /* silencieux */ }
+  _imgCache.set(artistName, null);
+  return null;
+}
+
+async function injectArtistImage(artistName, containerId, fallbackBg, fallbackLetter) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const img = await getArtistImage(artistName);
+  if (img && container) {
+    container.innerHTML = `
+      <img src="${img}" alt="${escHtml(artistName)}" loading="lazy"
+           style="width:100%;height:100%;object-fit:cover;border-radius:0"
+           onerror="this.outerHTML='<div class=\\'spotify-cover\\' style=\\'background:${fallbackBg}\\'>
+             <span class=\\'sc-letter\\'>${fallbackLetter}</span>
+             <span class=\\'sc-name\\'>${escHtml(artistName)}</span></div>'">`;
+  }
+}
+
+/* ============================================================
+   ██  ACCENT DYNAMIQUE — ColorThief  ██
+   ============================================================ */
+const _colorThief = typeof ColorThief !== 'undefined' ? new ColorThief() : null;
+
+function setAccent(colorKey) {
+  APP.currentAccent = colorKey;
+  localStorage.setItem('ls_accent', colorKey);
+
+  // Mettre à jour les boutons
+  document.querySelectorAll('.acc-dot').forEach(b =>
+    b.classList.toggle('active', b.dataset.color === colorKey)
+  );
+
+  if (colorKey === 'dynamic') {
+    // On extrait la couleur de la pochette du titre en cours si disponible
+    const npArtEl = document.querySelector('#np-art img');
+    if (npArtEl?.complete && npArtEl.naturalWidth > 0) {
+      _applyColorThiefFromEl(npArtEl);
+    }
+    return;
+  }
+
+  // Palettes Material You prédéfinies (dark)
+  const PALETTES = {
+    purple: { accent:'#d0bcff', container:'#4f378b', on:'#381e72', onCont:'#eaddff', glow:'rgba(208,188,255,0.18)', lt:'rgba(208,188,255,0.12)' },
+    blue:   { accent:'#9ecaff', container:'#004a77', on:'#001d36', onCont:'#cde5ff', glow:'rgba(158,202,255,0.18)', lt:'rgba(158,202,255,0.12)' },
+    green:  { accent:'#78dc77', container:'#1e5c1c', on:'#002105', onCont:'#94f990', glow:'rgba(120,220,119,0.18)', lt:'rgba(120,220,119,0.12)' },
+    red:    { accent:'#ffb4ab', container:'#93000a', on:'#690005', onCont:'#ffdad6', glow:'rgba(255,180,171,0.18)', lt:'rgba(255,180,171,0.12)' },
+    orange: { accent:'#ffb77c', container:'#6d3400', on:'#3d1d00', onCont:'#ffdcc0', glow:'rgba(255,183,124,0.18)', lt:'rgba(255,183,124,0.12)' },
+  };
+
+  // Variantes light
+  const LIGHT = {
+    purple: { accent:'#6750a4', container:'#eaddff', on:'#ffffff', onCont:'#21005d', glow:'rgba(103,80,164,0.3)', lt:'rgba(103,80,164,0.1)' },
+    blue:   { accent:'#0061a4', container:'#cde5ff', on:'#ffffff', onCont:'#001d36', glow:'rgba(0,97,164,0.3)',   lt:'rgba(0,97,164,0.1)'   },
+    green:  { accent:'#006e1c', container:'#94f990', on:'#ffffff', onCont:'#002105', glow:'rgba(0,110,28,0.3)',   lt:'rgba(0,110,28,0.1)'   },
+    red:    { accent:'#ba1a1a', container:'#ffdad6', on:'#ffffff', onCont:'#410002', glow:'rgba(186,26,26,0.3)',   lt:'rgba(186,26,26,0.1)'  },
+    orange: { accent:'#9c4e00', container:'#ffdcc0', on:'#ffffff', onCont:'#3d1d00', glow:'rgba(156,78,0,0.3)',   lt:'rgba(156,78,0,0.1)'   },
+  };
+
+  const isDark = APP.currentTheme === 'dark'
+    || (APP.currentTheme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+  const pal = (isDark ? PALETTES : LIGHT)[colorKey] || PALETTES.purple;
+  _applyCSSAccent(pal);
+  updateAllChartThemes();
+}
+
+function _applyCSSAccent({ accent, container, on, onCont, glow, lt }) {
+  const root = document.documentElement.style;
+  root.setProperty('--accent',           accent);
+  root.setProperty('--accent-container', container);
+  root.setProperty('--accent-on',        on);
+  root.setProperty('--accent-on-cont',   onCont);
+  root.setProperty('--accent-glow',      glow);
+  root.setProperty('--accent-lt',        lt);
+}
+
+function _applyColorThiefFromUrl(imgUrl) {
+  if (!_colorThief) return;
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => _applyColorThiefFromEl(img);
+  img.onerror = () => {}; // silencieux
+  img.src = imgUrl;
+}
+
+function _applyColorThiefFromEl(imgEl) {
+  if (!_colorThief || !imgEl) return;
+  try {
+    const [r, g, b] = _colorThief.getColor(imgEl);
+    // Convertir RGB → palette M3 simplifiée
+    const h = _rgbToHsl(r, g, b)[0];
+    const accent    = `hsl(${h},65%,75%)`;
+    const container = `hsl(${h},45%,28%)`;
+    const on        = `hsl(${h},45%,14%)`;
+    const onCont    = `hsl(${h},65%,90%)`;
+    const glow      = `hsla(${h},65%,75%,0.18)`;
+    const lt        = `hsla(${h},65%,75%,0.12)`;
+    _applyCSSAccent({ accent, container, on, onCont, glow, lt });
+  } catch (e) { console.warn('ColorThief:', e); }
+}
+
+function _rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h, s; const l = (max + min) / 2;
+  if (max === min) { h = s = 0; }
+  else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
+    }
+  }
+  return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+}
+
+/* ============================================================
+   ██  BADGE ENGINE  ██
+   Système de gamification infinie — paliers exponentiels
+   ============================================================ */
+const BadgeEngine = (() => {
+
+  // ── Définition des paliers (Bronze → Elite) ──
+  const TIERS = [
+    { key: 'bronze',  label: 'Bronze',  icon: '🥉', xp: 10  },
+    { key: 'argent',  label: 'Argent',  icon: '🥈', xp: 25  },
+    { key: 'or',      label: 'Or',      icon: '🥇', xp: 50  },
+    { key: 'diamant', label: 'Diamant', icon: '💎', xp: 100 },
+    { key: 'elite',   label: 'Élite',   icon: '👑', xp: 200 },
+  ];
+
+  // Formule exponentielle : chaque palier supérieur nécessite ~2× plus
+  // threshold(tier, level) = base * 2^(level-1)
+  function thresholds(base, count = 5) {
+    return Array(count).fill(0).map((_, i) => Math.round(base * Math.pow(2, i)));
+  }
+
+  // ── Définitions des badges ──
+  const BADGE_DEFS = [
+    // --- NOCTAMBULE ---
+    {
+      id: 'night_owl', cat: 'noctambule', icon: '🦉', name: 'Oiseau de Nuit',
+      desc: 'Nombre d\'écoutes entre 00h et 05h du matin',
+      thresholds: thresholds(50),
+      compute: (hist) => hist.filter(t => {
+        const h = new Date(parseInt(t.date?.uts || 0) * 1000).getHours();
+        return h >= 0 && h < 5;
+      }).length,
+    },
+    // --- EXPLORATEUR ---
+    {
+      id: 'explorer', cat: 'exploration', icon: '🧭', name: 'Explorateur',
+      desc: 'Ratio artistes uniques / écoutes totales × 1000',
+      thresholds: thresholds(50),
+      compute: (hist) => {
+        if (!hist.length) return 0;
+        const unique = new Set(hist.map(t => (t.artist?.['#text'] || t.artist?.name || '').toLowerCase())).size;
+        return Math.round((unique / hist.length) * 1000);
+      },
+    },
+    {
+      id: 'discoverer', cat: 'exploration', icon: '🔭', name: 'Découvreur',
+      desc: 'Nombre d\'artistes distincts écoutés',
+      thresholds: thresholds(50),
+      compute: (hist) => new Set(hist.map(t => (t.artist?.['#text'] || t.artist?.name || '').toLowerCase())).size,
+    },
+    // --- FIDÉLITÉ ---
+    {
+      id: 'loyal', cat: 'fidelite', icon: '💖', name: 'Fidélité',
+      desc: 'Max d\'écoutes d\'un même artiste sur 7 jours consécutifs',
+      thresholds: thresholds(20),
+      compute: (hist) => {
+        if (!hist.length) return 0;
+        // Grouper par semaine ISO × artiste
+        const weekMap = new Map();
+        for (const t of hist) {
+          const ts = parseInt(t.date?.uts || 0);
+          if (!ts) continue;
+          const d   = new Date(ts * 1000);
+          const week = `${d.getFullYear()}-W${Math.ceil((d.getDate() + 6 - (d.getDay() || 7)) / 7)}`;
+          const art  = (t.artist?.['#text'] || t.artist?.name || '').toLowerCase();
+          const k    = `${week}::${art}`;
+          weekMap.set(k, (weekMap.get(k) || 0) + 1);
+        }
+        return Math.max(0, ...[...weekMap.values()]);
+      },
+    },
+    {
+      id: 'obsessed', cat: 'fidelite', icon: '🔁', name: 'Obsessionnel',
+      desc: 'Max d\'écoutes d\'un même artiste en une seule journée',
+      thresholds: thresholds(10),
+      compute: (hist) => {
+        const dayMap = new Map();
+        for (const t of hist) {
+          const ts  = parseInt(t.date?.uts || 0);
+          if (!ts) continue;
+          const d   = new Date(ts * 1000);
+          const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}::${(t.artist?.['#text'] || '').toLowerCase()}`;
+          dayMap.set(key, (dayMap.get(key) || 0) + 1);
+        }
+        return Math.max(0, ...[...dayMap.values()]);
+      },
+    },
+    // --- VOLUME ---
+    {
+      id: 'scrobbler', cat: 'volume', icon: '🎵', name: 'Scrobbler',
+      desc: 'Nombre total de scrobbles',
+      thresholds: thresholds(1000),
+      compute: (hist) => hist.length,
+    },
+    {
+      id: 'binge', cat: 'volume', icon: '🎧', name: 'Binge Listener',
+      desc: 'Max de scrobbles en une seule journée',
+      thresholds: thresholds(50),
+      compute: (hist) => {
+        const dayMap = new Map();
+        for (const t of hist) {
+          const ts = parseInt(t.date?.uts || 0);
+          if (!ts) continue;
+          const d  = new Date(ts * 1000);
+          const k  = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+          dayMap.set(k, (dayMap.get(k) || 0) + 1);
+        }
+        return Math.max(0, ...[...dayMap.values()]);
+      },
+    },
+    // --- DIVERSITÉ ---
+    {
+      id: 'diversified', cat: 'diversite', icon: '🌈', name: 'Éclectique',
+      desc: 'Nombre de genres distincts écoutés (via mood tags en cache)',
+      thresholds: thresholds(5),
+      compute: () => {
+        // Approximation : genres identifiés dans le mood tags cache
+        const moods = document.querySelectorAll('.mood-tag');
+        return moods.length;
+      },
+    },
+    {
+      id: 'marathon', cat: 'volume', icon: '🏃', name: 'Marathonien',
+      desc: 'Streak record (jours consécutifs d\'écoute)',
+      thresholds: thresholds(7),
+      compute: () => APP.streakData?.best || 0,
+    },
+  ];
+
+  // ── Calcul d'un badge ──
+  function computeBadge(def, history) {
+    const value = def.compute(history);
+    let tierIdx = -1;
+    for (let i = def.thresholds.length - 1; i >= 0; i--) {
+      if (value >= def.thresholds[i]) { tierIdx = i; break; }
+    }
+    const nextThreshold = tierIdx < def.thresholds.length - 1
+      ? def.thresholds[tierIdx + 1]
+      : null;
+    return {
+      ...def,
+      value,
+      tierIdx,
+      tier: tierIdx >= 0 ? TIERS[tierIdx] : null,
+      unlocked: tierIdx >= 0,
+      nextThreshold,
+    };
+  }
+
+  // ── Titre de niveau global ──
+  const LEVEL_TITLES = [
+    'Audiophile débutant','Mélomane','Scrobbleur',
+    'Curateur musical','Expert','Virtuose','Légende','Demi-dieu de la musique',
+  ];
+
+  function levelFromXP(xp) {
+    // niveau = floor(log2(xp/100 + 1)) + 1, plafonné
+    if (xp <= 0) return { level: 1, xpCurr: 0, xpNext: 100, pct: 0 };
+    const level    = Math.min(LEVEL_TITLES.length, Math.floor(Math.log2(xp / 50 + 1)) + 1);
+    const xpForLvl = Math.round(50 * (Math.pow(2, level - 1) - 1));
+    const xpForNext= Math.round(50 * (Math.pow(2, level) - 1));
+    const pct      = Math.min(100, Math.round(((xp - xpForLvl) / (xpForNext - xpForLvl)) * 100));
+    return { level, xpCurr: xp, xpNext: xpForNext, pct, title: LEVEL_TITLES[level - 1] || LEVEL_TITLES.at(-1) };
+  }
+
+  // ── Entrée publique : compute() ──
+  function compute() {
+    const history = APP.fullHistory;
+
+    if (!history || !history.length) {
+      document.getElementById('badges-empty')?.classList.remove('hidden');
+      document.getElementById('badges-container')?.classList.add('hidden');
+      showToast('Chargez l\'historique complet pour calculer les succès', 'error');
+      return;
+    }
+
+    document.getElementById('badges-empty')?.classList.add('hidden');
+    document.getElementById('badges-load-btn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calcul…';
+
+    // Calcul fragmenté pour ne pas bloquer l'UI
+    const results = [];
+    let i = 0;
+
+    function processNext() {
+      if (i >= BADGE_DEFS.length) {
+        _render(results);
+        document.getElementById('badges-load-btn').innerHTML = '<i class="fas fa-sync-alt"></i> Recalculer';
+        return;
+      }
+      results.push(computeBadge(BADGE_DEFS[i], history));
+      i++;
+      setTimeout(processNext, 0); // non-bloquant
+    }
+    processNext();
+  }
+
+  // ── Rendu ──
+  function _render(results) {
+    document.getElementById('badges-container')?.classList.remove('hidden');
+
+    // Score global
+    const totalXP = results.reduce((acc, b) => acc + (b.unlocked ? TIERS[b.tierIdx].xp : 0), 0);
+    const unlocked = results.filter(b => b.unlocked).length;
+    const lvlData  = levelFromXP(totalXP);
+
+    const lvlEl = document.getElementById('bsc-level');
+    if (lvlEl) lvlEl.textContent = lvlData.level;
+    const titleEl = document.getElementById('bsc-title');
+    if (titleEl) titleEl.textContent = lvlData.title;
+    const xpFill = document.getElementById('bsc-xp-fill');
+    if (xpFill) setTimeout(() => { xpFill.style.width = lvlData.pct + '%'; }, 200);
+    const xpVal = document.getElementById('bsc-xp-val');
+    if (xpVal) xpVal.textContent = `${totalXP} XP (niv. suivant: ${lvlData.xpNext})`;
+
+    const unlockedEl = document.getElementById('bsc-unlocked');
+    if (unlockedEl) unlockedEl.textContent = `${unlocked} succès débloqués`;
+    const totalEl = document.getElementById('bsc-total');
+    if (totalEl) totalEl.textContent = `sur ${results.length}`;
+
+    // Badge count dans la nav
+    const navBadge = document.getElementById('badges-count-badge');
+    if (navBadge) {
+      if (unlocked > 0) { navBadge.textContent = unlocked; navBadge.style.display = ''; }
+      else navBadge.style.display = 'none';
+    }
+
+    // Rendu par catégorie
+    const cats = ['noctambule','exploration','fidelite','volume','diversite'];
+    cats.forEach(cat => {
+      const grid = document.getElementById(`badge-grid-${cat}`);
+      if (!grid) return;
+      const catBadges = results.filter(b => b.cat === cat);
+      grid.innerHTML = catBadges.map(b => _badgeCard(b)).join('');
+    });
+
+    // Stocker pour le modal
+    window._badgeResults = results;
+  }
+
+  function _badgeCard(b) {
+    const tierClass  = b.unlocked ? `tier-${b.tier.key}` : 'tier-bronze';
+    const tierLabel  = b.unlocked ? `${b.tier.icon} ${b.tier.label}` : '🔒 Verrouillé';
+    const nextInfo   = b.nextThreshold !== null
+      ? `${b.value} / ${b.nextThreshold}`
+      : b.unlocked ? 'Max atteint !' : '';
+    const cardClass  = b.unlocked ? 'badge-card unlocked' : 'badge-card locked';
+
+    // Animation décalée par tier
+    const delay      = b.unlocked ? `animation-delay:${(b.tierIdx || 0) * 0.08}s` : '';
+    return `
+      <div class="${cardClass}" style="${delay}" onclick="showBadgeModal('${b.id}')">
+        <div class="badge-card-icon">${b.icon}</div>
+        <div class="badge-card-name">${escHtml(b.name)}</div>
+        <div class="badge-card-tier ${tierClass}">${tierLabel}</div>
+        ${nextInfo ? `<div class="badge-card-progress">${nextInfo}</div>` : ''}
+      </div>`;
+  }
+
+  return { compute, BADGE_DEFS, TIERS };
+})();
+
+/* ── Modale badge ── */
+function showBadgeModal(badgeId) {
+  const results = window._badgeResults || [];
+  const b = results.find(r => r.id === badgeId);
+  if (!b) return;
+
+  document.getElementById('bm-icon').textContent   = b.icon;
+  document.getElementById('bm-title').textContent  = b.name;
+  document.getElementById('bm-desc').textContent   = b.desc;
+
+  const tierEl = document.getElementById('bm-tier');
+  if (b.unlocked) {
+    tierEl.className = `bm-tier badge-card-tier tier-${b.tier.key}`;
+    tierEl.textContent = `${b.tier.icon} ${b.tier.label}`;
+  } else {
+    tierEl.className = 'bm-tier';
+    tierEl.textContent = '🔒 Pas encore débloqué';
+  }
+
+  const nextT   = b.nextThreshold !== null ? b.nextThreshold : b.thresholds.at(-1);
+  const pct     = nextT > 0 ? Math.min(100, Math.round((b.value / nextT) * 100)) : 100;
+  const fillEl  = document.getElementById('bm-progress-fill');
+  if (fillEl) setTimeout(() => { fillEl.style.width = pct + '%'; }, 150);
+
+  document.getElementById('bm-progress-cur').textContent  = `Valeur : ${b.value}`;
+  document.getElementById('bm-progress-next').textContent = b.nextThreshold
+    ? `Prochain palier : ${b.nextThreshold}` : 'Palier max atteint !';
+
+  // Paliers visuels
+  const tiersRow = document.getElementById('bm-tiers-row');
+  if (tiersRow) {
+    tiersRow.innerHTML = b.thresholds.map((thresh, i) => {
+      const tier    = BadgeEngine.TIERS[i];
+      const achieved = b.value >= thresh;
+      const isCurr   = b.unlocked && b.tierIdx === i;
+      const cls      = isCurr ? 'bm-tier-chip current' : achieved ? 'bm-tier-chip achieved' : 'bm-tier-chip';
+      return `<span class="${cls}" title="${tier.label}: ${thresh}">${tier.icon} ${thresh}</span>`;
+    }).join('');
+  }
+
+  document.getElementById('badge-modal').classList.remove('hidden');
+}
+
+function closeBadgeModal(e) {
+  if (e && e.target !== document.getElementById('badge-modal')) return;
+  document.getElementById('badge-modal').classList.add('hidden');
+}
+
+/* ============================================================
+   ██  VISUALISATIONS AVANCÉES  ██
+   1. Radar Chart (genres via mood tags)
+   2. Treemap Top 100 artistes
+   3. Sankey flux d'écoute
+   ============================================================ */
+async function loadVizPlus() {
+  const statusEl  = document.getElementById('vizplus-status');
+  const statusTxt = document.getElementById('vizplus-status-txt');
+  const btn       = document.getElementById('vizplus-load-btn');
+
+  if (statusEl) statusEl.classList.remove('hidden');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Génération…'; }
+
+  try {
+    // ── 1. RADAR ──
+    if (statusTxt) statusTxt.textContent = 'Analyse des genres musicaux…';
+    await _buildRadarChart();
+
+    // ── 2. TREEMAP ──
+    if (statusTxt) statusTxt.textContent = 'Construction du Treemap Top 100…';
+    await _buildTreemap();
+
+    // ── 3. SANKEY ──
+    if (statusTxt) statusTxt.textContent = 'Calcul des flux d\'écoute…';
+    await _buildSankey();
+
+    if (statusEl) statusEl.classList.add('hidden');
+    showToast('Visualisations générées !');
+  } catch (e) {
+    console.error('loadVizPlus:', e);
+    if (statusTxt) statusTxt.textContent = 'Erreur : ' + e.message;
+    setTimeout(() => statusEl?.classList.add('hidden'), 3000);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-magic"></i> Générer'; }
+  }
+}
+
+// ─── RADAR : Genres / Mood Tags ───────────────────────────────
+async function _buildRadarChart() {
+  const phEl  = document.getElementById('vizplus-radar-ph');
+  const wrap  = document.getElementById('vizplus-radar-wrap');
+
+  // Réutiliser les mood tags déjà calculés OU les refetcher
+  const topArtists = APP.topArtistsData.length
+    ? APP.topArtistsData.slice(0, 15)
+    : (await API.call('user.getTopArtists', { period: 'overall', limit: 15 })).topartists?.artist || [];
+
+  // Genres cibles pour le radar
+  const TARGET_GENRES = ['rock','pop','electronic','hip-hop','metal','jazz','classical','indie','r&b','country'];
+  const scores = {};
+  TARGET_GENRES.forEach(g => { scores[g] = 0; });
+
+  const tagResults = await Promise.allSettled(
+    topArtists.map(a => API.call('artist.getTopTags', { artist: a.name }))
+  );
+
+  const IGNORED = new Set(['seen live','favorites','favourite','love','awesome','all','good','new','old']);
+
+  tagResults.forEach((res, i) => {
+    if (res.status !== 'fulfilled') return;
+    const tags   = res.value.toptags?.tag || [];
+    const weight = topArtists.length - i;
+    tags.slice(0, 10).forEach(tag => {
+      const name = (tag.name || '').toLowerCase().trim();
+      for (const genre of TARGET_GENRES) {
+        if (name.includes(genre) && !IGNORED.has(name)) {
+          scores[genre] += (parseInt(tag.count) || 30) * weight;
+        }
+      }
+    });
+  });
+
+  const labels = TARGET_GENRES.map(g => g.charAt(0).toUpperCase() + g.slice(1));
+  const data   = TARGET_GENRES.map(g => scores[g]);
+
+  if (data.every(v => v === 0)) {
+    if (phEl) phEl.innerHTML = '<i class="fas fa-spider fa-2x"></i><p>Pas assez de tags pour ce graphique</p>';
+    return;
+  }
+
+  if (phEl) phEl.classList.add('hidden');
+  if (wrap) wrap.classList.remove('hidden');
+
+  destroyChart('chart-radar');
+  const c = getThemeColors();
+  APP.charts['chart-radar'] = new Chart(document.getElementById('chart-radar'), {
+    type: 'radar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Présence des genres',
+        data,
+        backgroundColor: 'rgba(99,102,241,0.15)',
+        borderColor:     '#6366f1',
+        pointBackgroundColor: CHART_PALETTE,
+        pointBorderColor:     '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        borderWidth: 2,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` Score genre : ${ctx.raw}` } },
+      },
+      scales: {
+        r: {
+          grid:       { color: c.grid },
+          ticks:      { color: c.text, font: { size: 10 }, backdropColor: 'transparent' },
+          pointLabels:{ color: c.text, font: { size: 12 } },
+          beginAtZero: true,
+        },
+      },
+    },
+  });
+}
+
+// ─── TREEMAP : Top 100 artistes ───────────────────────────────
+async function _buildTreemap() {
+  const phEl = document.getElementById('vizplus-treemap-ph');
+  const wrap = document.getElementById('vizplus-treemap-wrap');
+
+  let artists = APP.topArtistsData;
+  if (artists.length < 20) {
+    const d = await API.call('user.getTopArtists', { period: 'overall', limit: 100 });
+    artists = d.topartists?.artist || [];
+    APP.topArtistsData = artists;
+  }
+  const top100 = artists.slice(0, 100);
+  if (!top100.length) return;
+
+  if (phEl) phEl.classList.add('hidden');
+  if (wrap) wrap.classList.remove('hidden');
+
+  const treeData = top100.map((a, i) => ({
+    label: a.name,
+    value: parseInt(a.playcount) || 1,
+    color: CHART_PALETTE[i % CHART_PALETTE.length] + 'cc',
+  }));
+
+  destroyChart('chart-treemap');
+  APP.charts['chart-treemap'] = new Chart(document.getElementById('chart-treemap'), {
+    type: 'treemap',
+    data: {
+      datasets: [{
+        label: 'Top 100 Artistes',
+        tree: treeData,
+        key: 'value',
+        labels: { display: true, formatter: (ctx) => {
+          const d = ctx.dataset.data[ctx.dataIndex];
+          return d ? [d._data.label, formatNum(d._data.value)] : '';
+        }},
+        backgroundColor: (ctx) => {
+          const d = ctx.dataset.data[ctx.dataIndex];
+          return d?._data?.color || '#6366f1cc';
+        },
+        borderWidth: 1,
+        borderColor: 'rgba(0,0,0,0.25)',
+        spacing: 2,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 600 },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: {
+          title: (items) => items[0]?.raw?._data?.label || '',
+          label: (ctx)  => ` ${formatNum(ctx.raw?._data?.value)} écoutes`,
+        }},
+      },
+    },
+  });
+}
+
+// ─── SANKEY : Flux d'écoute entre artistes ────────────────────
+async function _buildSankey() {
+  const phEl = document.getElementById('vizplus-sankey-ph');
+  const wrap = document.getElementById('vizplus-sankey-wrap');
+  const svg  = document.getElementById('chart-sankey');
+
+  // Nécessite l'historique complet
+  if (!APP.fullHistory || APP.fullHistory.length < 50) {
+    if (phEl) phEl.innerHTML = `<i class="fas fa-stream fa-2x"></i>
+      <p>Chargez d'abord l'historique complet (section Stats Avancées)</p>
+      <button class="btn-fetch-sm" onclick="nav('advanced');setTimeout(()=>fetchFullHistory(),300)">
+        <i class="fas fa-database"></i> Charger
+      </button>`;
+    return;
+  }
+
+  if (phEl) phEl.classList.add('hidden');
+  if (wrap) wrap.classList.remove('hidden');
+
+  // Construire les transitions artiste → artiste
+  const transitions = new Map();
+  const top20Artists = new Set(
+    (APP.topArtistsData.slice(0, 20) || []).map(a => a.name.toLowerCase())
+  );
+
+  const history = [...APP.fullHistory]
+    .filter(t => parseInt(t.date?.uts || 0) > 0)
+    .sort((a, b) => parseInt(a.date?.uts) - parseInt(b.date?.uts));
+
+  // Sessions : pause > 30 min = nouvelle session
+  const SESSION_GAP = 30 * 60;
+  let prevArtist = null, prevTs = 0;
+
+  for (const track of history) {
+    const ts     = parseInt(track.date?.uts || 0);
+    const artist = (track.artist?.['#text'] || track.artist?.name || '').trim();
+    if (!artist || !top20Artists.has(artist.toLowerCase())) { prevArtist = null; continue; }
+
+    if (prevArtist && prevArtist !== artist && (ts - prevTs) < SESSION_GAP) {
+      const key = `${prevArtist}→${artist}`;
+      transitions.set(key, (transitions.get(key) || 0) + 1);
+    }
+    prevArtist = artist;
+    prevTs     = ts;
+  }
+
+  // Top 30 transitions
+  const topLinks = [...transitions.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 30);
+
+  if (!topLinks.length) {
+    if (phEl) { phEl.classList.remove('hidden'); phEl.innerHTML = '<i class="fas fa-stream fa-2x"></i><p>Pas assez de transitions entre artistes</p>'; }
+    if (wrap) wrap.classList.add('hidden');
+    return;
+  }
+
+  // Construire nœuds et liens pour d3-sankey
+  const nodeNames = [...new Set(topLinks.flatMap(([k]) => k.split('→')))];
+  const nodeIdx   = Object.fromEntries(nodeNames.map((n, i) => [n, i]));
+
+  const nodes = nodeNames.map(n => ({ name: n }));
+  const links = topLinks
+    .map(([k, v]) => {
+      const [src, tgt] = k.split('→');
+      if (nodeIdx[src] === undefined || nodeIdx[tgt] === undefined) return null;
+      return { source: nodeIdx[src], target: nodeIdx[tgt], value: v };
+    })
+    .filter(Boolean);
+
+  // Rendu D3 Sankey
+  const container = svg.parentElement;
+  const W = container.clientWidth || 700;
+  const H = 440;
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', W);
+
+  // Vider le SVG
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+  const sankey = d3.sankey()
+    .nodeWidth(18)
+    .nodePadding(12)
+    .extent([[12, 12], [W - 12, H - 12]]);
+
+  const graph = sankey({ nodes: nodes.map(d => ({ ...d })), links: links.map(d => ({ ...d })) });
+
+  const isDark = APP.currentTheme !== 'light';
+  const svgEl  = d3.select(svg);
+
+  // Liens
+  svgEl.append('g')
+    .attr('fill', 'none')
+    .selectAll('path')
+    .data(graph.links)
+    .join('path')
+    .attr('d', d3.sankeyLinkHorizontal())
+    .attr('stroke', (d, i) => CHART_PALETTE[i % CHART_PALETTE.length])
+    .attr('stroke-width', d => Math.max(1, d.width))
+    .attr('stroke-opacity', .35)
+    .append('title').text(d => `${d.source.name} → ${d.target.name}: ${d.value}`);
+
+  // Nœuds
+  const g = svgEl.append('g').selectAll('g').data(graph.nodes).join('g');
+  g.append('rect')
+    .attr('x', d => d.x0).attr('y', d => d.y0)
+    .attr('width', d => d.x1 - d.x0).attr('height', d => d.y1 - d.y0)
+    .attr('fill', (_, i) => CHART_PALETTE[i % CHART_PALETTE.length])
+    .attr('rx', 3);
+
+  // Labels
+  g.append('text')
+    .attr('x', d => d.x0 < W / 2 ? d.x1 + 6 : d.x0 - 6)
+    .attr('y', d => (d.y1 + d.y0) / 2)
+    .attr('dy', '.35em')
+    .attr('text-anchor', d => d.x0 < W / 2 ? 'start' : 'end')
+    .style('fill', isDark ? '#cac4d0' : '#1c1b1f')
+    .style('font-size', '11px')
+    .style('font-family', 'Inter, sans-serif')
+    .text(d => d.name.length > 16 ? d.name.slice(0, 16) + '…' : d.name);
+}
+
+/* ============================================================
+   ██  ANALYSE MAINSTREAM VS OBSCUR  ██
+   Score d'originalité basé sur artist.stats.listeners
+   ============================================================ */
+let _obscurityData = [];
+
+async function loadObscurityScore() {
+  const btn     = document.getElementById('obscurity-load-btn');
+  const emptyEl = document.getElementById('obscurity-empty');
+  const listEl  = document.getElementById('obscurity-list');
+
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyse…'; }
+  if (emptyEl) emptyEl.innerHTML = `<div class="spinner-sm"></div><p style="margin-top:10px">Analyse des artistes en cours…</p>`;
+
+  try {
+    let artists = APP.topArtistsData;
+    if (!artists.length) {
+      const d = await API.call('user.getTopArtists', { period: 'overall', limit: 50 });
+      artists = d.topartists?.artist || [];
+      APP.topArtistsData = artists;
+    }
+
+    const top30 = artists.slice(0, 30);
+    const results = [];
+
+    // Récupération des listeners par batch de 5
+    for (let i = 0; i < top30.length; i += 5) {
+      const batch = top30.slice(i, i + 5);
+      const infos = await Promise.allSettled(
+        batch.map(a => API.call('artist.getInfo', { artist: a.name, autocorrect: 1 }))
+      );
+
+      infos.forEach((res, j) => {
+        const artist    = batch[j];
+        const listeners = parseInt(res.value?.artist?.stats?.listeners || 0);
+        const plays     = parseInt(artist.playcount || 0);
+
+        if (!listeners) return;
+        // Score d'obscurité : rapport entre l'engagement de l'utilisateur et la popularité globale
+        // Normalisé : 1 000 000 listeners = très mainstream
+        // Si tu écoutes beaucoup un artiste avec peu de listeners = score élevé
+        const popularityRatio = Math.min(1, listeners / 2_000_000);
+        const obscurityRaw    = (1 - popularityRatio) * Math.log10(plays + 1) / Math.log10(10000 + 1) * 100;
+        const obscurityScore  = Math.min(100, Math.round(obscurityRaw));
+
+        const type = listeners > 2_000_000 ? 'mainstream'
+                   : listeners < 100_000   ? 'obscur'
+                   : 'culte';
+
+        results.push({ name: artist.name, plays, listeners, obscurityScore, type, url: artist.url || '#' });
+      });
+      await sleep(100);
+    }
+
+    _obscurityData = results;
+    _renderObscurityScore(results);
+
+    if (emptyEl) emptyEl.classList.add('hidden');
+    if (listEl)  listEl.classList.remove('hidden');
+
+  } catch (e) {
+    if (emptyEl) emptyEl.innerHTML = `<i class="fas fa-exclamation-triangle fa-3x"></i><p>Erreur : ${escHtml(e.message)}</p>`;
+    console.error('obscurity:', e);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-search"></i> Recalculer'; }
+  }
+}
+
+function _renderObscurityScore(data) {
+  if (!data.length) return;
+
+  // Score moyen global pondéré par les écoutes
+  const totalPlays  = data.reduce((s, d) => s + d.plays, 0);
+  const globalScore = Math.round(
+    data.reduce((s, d) => s + d.obscurityScore * (d.plays / totalPlays), 0)
+  );
+
+  // Jauge SVG
+  const arc   = document.getElementById('oh-gauge-arc');
+  const scoreValEl = document.getElementById('oh-score-val');
+  const labelEl    = document.getElementById('oh-label');
+  const descEl     = document.getElementById('oh-desc');
+  const fillEl     = document.getElementById('oh-sp-fill');
+
+  if (arc) {
+    const totalLen = 251.2;
+    const dash     = totalLen * (1 - globalScore / 100);
+    setTimeout(() => { arc.style.strokeDashoffset = dash; }, 200);
+    const color = globalScore < 30 ? '#f97316' : globalScore < 60 ? '#6366f1' : '#06b6d4';
+    arc.style.stroke = color;
+  }
+  if (scoreValEl) scoreValEl.textContent = globalScore;
+
+  if (labelEl) {
+    labelEl.textContent = globalScore < 25 ? '🎤 Pur mainstream'
+                        : globalScore < 45 ? '🎵 Grand public'
+                        : globalScore < 65 ? '🎸 Auditeur éclairé'
+                        : globalScore < 80 ? '💎 Goûts obscurs'
+                        : '🌑 Ultra-underground';
+  }
+
+  if (descEl) {
+    const mainCount = data.filter(d => d.type === 'mainstream').length;
+    const obscCount = data.filter(d => d.type === 'obscur').length;
+    descEl.textContent = `${mainCount} artiste(s) mainstream · ${obscCount} artiste(s) obscur(s) dans votre top 30.`;
+  }
+
+  if (fillEl) {
+    setTimeout(() => { fillEl.style.left = globalScore + '%'; }, 400);
+  }
+
+  _renderObscurityItems(data, 'ratio');
+}
+
+function sortObscurity(sortKey) {
+  document.querySelectorAll('.obs-filter').forEach(b =>
+    b.classList.toggle('active', b.dataset.sort === sortKey)
+  );
+  _renderObscurityItems(_obscurityData, sortKey);
+}
+
+function _renderObscurityItems(data, sortKey = 'ratio') {
+  const container = document.getElementById('obscurity-items');
+  if (!container) return;
+
+  const sorted = [...data].sort((a, b) =>
+    sortKey === 'plays' ? b.plays - a.plays : b.obscurityScore - a.obscurityScore
+  );
+
+  const maxScore = Math.max(...sorted.map(d => d.obscurityScore), 1);
+
+  container.innerHTML = sorted.map((d, i) => {
+    const typeClass = `obs-type-${d.type}`;
+    const typeLabel = d.type === 'mainstream' ? '🎤 Mainstream'
+                    : d.type === 'obscur'     ? '💎 Obscur'
+                    : '🎸 Culte';
+    const pct       = Math.round((d.obscurityScore / maxScore) * 100);
+    const bg        = nameToGradient(d.name);
+    const letter    = d.name[0].toUpperCase();
+
+    return `
+      <div class="obscurity-item" style="animation-delay:${i * 0.03}s" onclick="window.open('${d.url}','_blank')">
+        <div class="obs-rank">${i + 1}</div>
+        <div class="obs-art-img" id="obs-img-${i}">
+          <div class="obs-art-letter" style="background:${bg}">${letter}</div>
+        </div>
+        <div class="obs-info">
+          <div class="obs-name">${escHtml(d.name)}</div>
+          <div class="obs-plays">${formatNum(d.plays)} écoutes · ${formatNum(d.listeners)} auditeurs</div>
+        </div>
+        <div class="obs-bar-wrap">
+          <div class="obs-bar" style="width:${pct}%"></div>
+        </div>
+        <span class="obs-type-badge ${typeClass}">${typeLabel}</span>
+        <div class="obs-score-wrap">
+          <div class="obs-score">${d.obscurityScore}</div>
+          <div class="obs-score-lbl">/100</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Charger les images artistes en différé
+  sorted.forEach((d, i) => {
+    setTimeout(() => {
+      const bg     = nameToGradient(d.name);
+      const letter = d.name[0].toUpperCase();
+      injectArtistImage(d.name, `obs-img-${i}`, bg, letter);
+    }, i * 100 + 500);
+  });
+}
+
+/* ============================================================
+   ██  EXPORT DONNÉES (JSON & CSV)  ██
+   ============================================================ */
+function exportStats(format) {
+  const payload = {
+    username:    APP.username,
+    exportDate:  new Date().toISOString(),
+    userInfo: {
+      playcount: APP.userInfo?.playcount,
+      country:   APP.userInfo?.country,
+      registered: APP.userInfo?.registered?.unixtime,
+    },
+    topArtists: APP.topArtistsData.slice(0, 50).map(a => ({
+      name:      a.name,
+      playcount: parseInt(a.playcount),
+      url:       a.url,
+    })),
+    topAlbums: APP.topAlbumsData.slice(0, 50).map(a => ({
+      name:      a.name,
+      artist:    a.artist?.name,
+      playcount: parseInt(a.playcount),
+    })),
+    topTracks: APP.topTracksData.slice(0, 50).map(t => ({
+      name:      t.name,
+      artist:    t.artist?.name,
+      playcount: parseInt(t.playcount),
+      url:       t.url,
+    })),
+    streakData: APP.streakData,
+    obscurityScore: _obscurityData.slice(0, 30).map(d => ({
+      name:          d.name,
+      plays:         d.plays,
+      listeners:     d.listeners,
+      obscurityScore: d.obscurityScore,
+      type:          d.type,
+    })),
+  };
+
+  if (format === 'json') {
+    _downloadText(JSON.stringify(payload, null, 2), `laststats-${APP.username}-${Date.now()}.json`, 'application/json');
+    showToast('Export JSON téléchargé !');
+    return;
+  }
+
+  if (format === 'csv') {
+    const rows = ['Type,Nom,Artiste,Écoutes,URL'];
+    payload.topArtists.forEach(a => rows.push(`Artiste,"${a.name.replace(/"/g,'""')}",,${a.playcount},${a.url || ''}`));
+    payload.topAlbums.forEach(a  => rows.push(`Album,"${a.name.replace(/"/g,'""')}","${(a.artist||'').replace(/"/g,'""')}",${a.playcount},`));
+    payload.topTracks.forEach(t  => rows.push(`Titre,"${t.name.replace(/"/g,'""')}","${(t.artist||'').replace(/"/g,'""')}",${t.playcount},${t.url || ''}`));
+    _downloadText(rows.join('\n'), `laststats-${APP.username}-${Date.now()}.csv`, 'text/csv');
+    showToast('Export CSV téléchargé !');
+  }
+}
+
+function _downloadText(content, filename, type) {
+  const blob = new Blob([content], { type });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+}
+
+/* ============================================================
+   ██  INIT  : Restauration accent + nouvelles fonctions  ██
+   ============================================================ */
+// Étendre initApp pour restaurer l'accent enregistré
+const _origInitApp = initApp;
+window.initApp = async function() {
+  await _origInitApp();
+  // Restaurer accent
+  const savedAccent = localStorage.getItem('ls_accent') || 'purple';
+  APP.currentAccent = savedAccent;
+  setAccent(savedAccent);
+};
+
+// Étendre refreshData pour recalculer les nouvelles sections si elles sont actives
+const _origRefreshData = refreshData;
+window.refreshData = async function() {
+  await _origRefreshData();
+  const active = document.querySelector('.app-sec.active')?.id?.replace('s-', '');
+  if (active === 'vizplus')   loadVizPlus();
+  if (active === 'obscurity') loadObscurityScore();
+};
+

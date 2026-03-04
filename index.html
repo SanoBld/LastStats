@@ -15,21 +15,52 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="LastStats">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+<link rel="apple-touch-icon" sizes="167x167" href="icons/icon-167.png">
 
-<!-- Android PWA -->
+<!-- Android / Chrome PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
 
+<!-- Favicon -->
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+
+<!-- ═══ FONTS ═══ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<!-- ═══ ICONS — Font Awesome 6 ═══ -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- ═══ CHART.JS 4 ═══ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<!-- ═══ CHART.JS TREEMAP PLUGIN ═══ -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@2.3.0/build/chartjs-chart-treemap.min.js"></script>
+
+<!-- ═══ D3.js v7 (Sankey + visualisations) ═══ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+
+<!-- ═══ D3-SANKEY ═══ -->
+<script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+
+<!-- ═══ COLOR THIEF (extraction couleur dominante pochette) ═══ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.4.0/color-thief.umd.js"></script>
+
+<!-- ═══ HTML2CANVAS (export Wrapped) ═══ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<!-- ═══ STYLES ═══ -->
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ═══ SETUP SCREEN ═══ -->
+<!-- ═══════════════════════════════════════════
+     SETUP SCREEN
+═══════════════════════════════════════════ -->
 <div id="setup-screen">
   <div class="setup-bg">
     <div class="orb o1"></div>
@@ -93,11 +124,18 @@
           </div>
         </div>
       </details>
+
+      <!-- Bouton Installer PWA — visible uniquement si le prompt est disponible -->
+      <button class="btn-install hidden" id="btn-install" onclick="installPWA()">
+        <i class="fas fa-download"></i> Installer LastStats sur cet appareil
+      </button>
     </div>
   </div>
 </div>
 
-<!-- ═══ OVERLAY CHARGEMENT ═══ -->
+<!-- ═══════════════════════════════════════════
+     OVERLAY CHARGEMENT
+═══════════════════════════════════════════ -->
 <div id="fetch-overlay" class="hidden">
   <div class="fetch-modal">
     <div class="fetch-icon">
@@ -119,10 +157,15 @@
   </div>
 </div>
 
-<!-- ═══ APPLICATION PRINCIPALE ═══ -->
+<!-- ═══════════════════════════════════════════
+     APPLICATION PRINCIPALE
+═══════════════════════════════════════════ -->
 <div id="app" class="hidden">
   <div class="sidebar-ov" id="sidebar-ov" onclick="closeSb()"></div>
 
+  <!-- ════════════════════════
+       SIDEBAR
+  ════════════════════════ -->
   <aside class="sidebar" id="sidebar">
     <div class="sb-head">
       <div class="sb-logo">
@@ -131,6 +174,8 @@
       </div>
       <button class="sb-close-btn" onclick="closeSb()"><i class="fas fa-times"></i></button>
     </div>
+
+    <!-- Profil utilisateur -->
     <div class="sb-profile" id="sb-profile">
       <div class="sb-av" id="sb-av"></div>
       <div class="sb-info">
@@ -139,6 +184,8 @@
         <span id="sb-country" class="sb-country"></span>
       </div>
     </div>
+
+    <!-- Navigation -->
     <nav class="sb-nav">
       <a class="nav-lnk active" data-s="dashboard" onclick="nav('dashboard')">
         <i class="fas fa-home"></i><span>Dashboard</span>
@@ -155,6 +202,21 @@
       <a class="nav-lnk" data-s="charts" onclick="nav('charts')">
         <i class="fas fa-chart-bar"></i><span>Graphiques</span>
       </a>
+
+      <!-- ★ Nouvelles sections ★ -->
+      <a class="nav-lnk" data-s="vizplus" onclick="nav('vizplus')">
+        <i class="fas fa-project-diagram"></i><span>Viz Avancées</span>
+        <span class="nav-bdg nav-bdg--new">NEW</span>
+      </a>
+      <a class="nav-lnk" data-s="badges" onclick="nav('badges')">
+        <i class="fas fa-medal"></i><span>Succès</span>
+        <span class="nav-bdg" id="badges-count-badge"></span>
+      </a>
+      <a class="nav-lnk" data-s="obscurity" onclick="nav('obscurity')">
+        <i class="fas fa-user-secret"></i><span>Mainstream vs Obscur</span>
+        <span class="nav-bdg nav-bdg--new">NEW</span>
+      </a>
+
       <a class="nav-lnk" data-s="wrapped" onclick="nav('wrapped')">
         <i class="fas fa-gift"></i><span>Wrapped</span>
         <span class="nav-bdg">✦</span>
@@ -163,21 +225,57 @@
         <i class="fas fa-flask"></i><span>Stats Avancées</span>
       </a>
     </nav>
+
+    <!-- Footer sidebar -->
     <div class="sb-foot">
+      <!-- Thème -->
       <div class="theme-row">
         <span>Thème</span>
         <div class="theme-btns">
-          <button class="th-btn" data-t="light" onclick="setTheme('light')" title="Clair"><i class="fas fa-sun"></i></button>
-          <button class="th-btn" data-t="auto" onclick="setTheme('auto')" title="Auto"><i class="fas fa-adjust"></i></button>
-          <button class="th-btn active" data-t="dark" onclick="setTheme('dark')" title="Sombre"><i class="fas fa-moon"></i></button>
+          <button class="th-btn"        data-t="light"  onclick="setTheme('light')"  title="Clair"><i class="fas fa-sun"></i></button>
+          <button class="th-btn"        data-t="auto"   onclick="setTheme('auto')"   title="Auto"><i class="fas fa-adjust"></i></button>
+          <button class="th-btn active" data-t="dark"   onclick="setTheme('dark')"   title="Sombre"><i class="fas fa-moon"></i></button>
         </div>
       </div>
+
+      <!-- Accent Material You -->
+      <div class="accent-row">
+        <span>Accent</span>
+        <div class="accent-btns" id="accent-btns">
+          <button class="acc-dot active" data-color="purple" style="background:#6750a4" onclick="setAccent('purple')" title="Violet"></button>
+          <button class="acc-dot"        data-color="blue"   style="background:#0061a4" onclick="setAccent('blue')"   title="Bleu"></button>
+          <button class="acc-dot"        data-color="green"  style="background:#006e1c" onclick="setAccent('green')"  title="Vert"></button>
+          <button class="acc-dot"        data-color="red"    style="background:#ba1a1a" onclick="setAccent('red')"    title="Rouge"></button>
+          <button class="acc-dot"        data-color="orange" style="background:#9c4e00" onclick="setAccent('orange')" title="Orange"></button>
+          <!-- Accent dynamique : extrait la couleur de la pochette Now Playing via ColorThief -->
+          <button class="acc-dot acc-dot--dynamic" data-color="dynamic" onclick="setAccent('dynamic')" title="Dynamique (pochette)">
+            <i class="fas fa-magic" style="font-size:8px;color:#fff"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Export données -->
+      <div class="export-row">
+        <span class="export-lbl"><i class="fas fa-file-export"></i> Exporter</span>
+        <div class="export-btns">
+          <button class="btn-export-sm" onclick="exportStats('json')" title="Exporter les stats en JSON">
+            <i class="fas fa-file-code"></i> JSON
+          </button>
+          <button class="btn-export-sm" onclick="exportStats('csv')" title="Exporter les stats en CSV">
+            <i class="fas fa-file-csv"></i> CSV
+          </button>
+        </div>
+      </div>
+
       <button class="btn-logout" onclick="logout()">
         <i class="fas fa-sign-out-alt"></i><span>Déconnexion</span>
       </button>
     </div>
   </aside>
 
+  <!-- ════════════════════════
+       CONTENU PRINCIPAL
+  ════════════════════════ -->
   <div class="main-wrap">
     <header class="app-hd">
       <button class="burger-btn" onclick="openSb()"><i class="fas fa-bars"></i></button>
@@ -192,13 +290,16 @@
 
     <main class="main-content">
 
-      <!-- ══ DASHBOARD ══ -->
+      <!-- ══════════════════════════════════════════
+           DASHBOARD
+      ══════════════════════════════════════════ -->
       <section id="s-dashboard" class="app-sec active">
         <div class="sec-hd">
           <h2>Tableau de bord</h2>
           <p class="sec-sub">Vue d'ensemble de votre activité musicale</p>
         </div>
 
+        <!-- Stat cards -->
         <div class="stat-grid" id="stat-grid">
           <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
           <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
@@ -208,7 +309,7 @@
           <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
         </div>
 
-        <!-- ══ INSIGHTS : Versus · Mood · Streak ══ -->
+        <!-- Insights : Versus · Mood · Streak -->
         <div class="insights-row">
           <div class="insight-card versus-card">
             <div class="ic-hd"><i class="fas fa-exchange-alt"></i> Ce mois vs Mois passé</div>
@@ -235,19 +336,32 @@
           </div>
         </div>
 
-        <!-- Now Playing -->
+        <!-- Now Playing — avec boutons lecture Spotify / YouTube + ColorThief -->
         <div id="now-playing-wrap" class="hidden">
           <div class="now-playing-bar" id="now-playing-bar">
             <div class="np-pulse"></div>
-            <div class="np-art" id="np-art"></div>
+            <!-- Image album — utilisée aussi par ColorThief pour thème dynamique -->
+            <div class="np-art" id="np-art">
+              <img id="np-art-img" src="" alt="" crossorigin="anonymous" style="display:none">
+            </div>
             <div class="np-info">
               <span class="np-live">● EN COURS</span>
               <strong id="np-track">—</strong>
               <span id="np-artist">—</span>
             </div>
+            <!-- Liens lecture rapide -->
+            <div class="np-actions">
+              <a class="np-play-btn np-spotify" id="np-spotify-btn" href="#" target="_blank" rel="noopener" title="Ouvrir dans Spotify">
+                <i class="fab fa-spotify"></i>
+              </a>
+              <a class="np-play-btn np-youtube" id="np-youtube-btn" href="#" target="_blank" rel="noopener" title="Rechercher sur YouTube">
+                <i class="fab fa-youtube"></i>
+              </a>
+            </div>
           </div>
         </div>
 
+        <!-- Graphiques dashboard -->
         <div class="dash-charts">
           <div class="chart-card">
             <div class="cc-hd"><span><i class="fas fa-chart-bar"></i> Activité mensuelle <b id="dash-yr"></b></span></div>
@@ -260,7 +374,10 @@
         </div>
       </section>
 
-      <!-- ══ TOP ARTISTES ══ -->
+      <!-- ══════════════════════════════════════════
+           TOP ARTISTES
+           Images via artist.getTopAlbums + fallback initiales
+      ══════════════════════════════════════════ -->
       <section id="s-top-artists" class="app-sec">
         <div class="sec-hd flex-bw">
           <div><h2>Top Artistes</h2><p class="sec-sub">Vos artistes les plus écoutés</p></div>
@@ -273,10 +390,13 @@
             <button class="prd active" data-p="overall">Tout</button>
           </div>
         </div>
+        <!-- Chaque carte artiste aura : image (top album) ou dégradé initiales + boutons Spotify/YouTube -->
         <div class="music-grid" id="artists-grid"></div>
       </section>
 
-      <!-- ══ TOP ALBUMS ══ -->
+      <!-- ══════════════════════════════════════════
+           TOP ALBUMS
+      ══════════════════════════════════════════ -->
       <section id="s-top-albums" class="app-sec">
         <div class="sec-hd flex-bw">
           <div><h2>Top Albums</h2><p class="sec-sub">Vos albums les plus écoutés</p></div>
@@ -292,7 +412,9 @@
         <div class="music-grid" id="albums-grid"></div>
       </section>
 
-      <!-- ══ TOP TITRES ══ -->
+      <!-- ══════════════════════════════════════════
+           TOP TITRES — avec icônes Spotify + YouTube
+      ══════════════════════════════════════════ -->
       <section id="s-top-tracks" class="app-sec">
         <div class="sec-hd flex-bw">
           <div><h2>Top Titres</h2><p class="sec-sub">Vos titres les plus écoutés</p></div>
@@ -305,10 +427,13 @@
             <button class="prd active" data-p="overall">Tout</button>
           </div>
         </div>
+        <!-- Chaque ligne titre aura des boutons icônes discrets Spotify / YouTube en fin de ligne -->
         <div class="tracks-list" id="tracks-list"></div>
       </section>
 
-      <!-- ══ GRAPHIQUES ══ -->
+      <!-- ══════════════════════════════════════════
+           GRAPHIQUES
+      ══════════════════════════════════════════ -->
       <section id="s-charts" class="app-sec">
         <div class="sec-hd">
           <h2>Graphiques</h2>
@@ -330,7 +455,7 @@
           <canvas id="chart-cumul" height="280"></canvas>
         </div>
 
-        <!-- ══ HEATMAP HORAIRE ══ -->
+        <!-- Heatmap Horaire -->
         <div class="chart-card full">
           <div class="cc-hd">
             <span><i class="fas fa-fire-alt"></i> Heatmap Horaire — Intensité d'écoute (0h–23h)</span>
@@ -358,7 +483,227 @@
         </div>
       </section>
 
-      <!-- ══ WRAPPED ══ -->
+      <!-- ══════════════════════════════════════════
+           VISUALISATIONS AVANCÉES ★ NEW
+           · Radar Chart (genres/mood tags)
+           · Treemap Top 100 artistes
+           · Sankey flux d'écoute
+      ══════════════════════════════════════════ -->
+      <section id="s-vizplus" class="app-sec">
+        <div class="sec-hd flex-bw">
+          <div>
+            <h2><i class="fas fa-project-diagram"></i> Visualisations Avancées</h2>
+            <p class="sec-sub">Radar de genres · Treemap Top 100 · Flux d'écoute Sankey</p>
+          </div>
+          <button class="btn-fetch" id="vizplus-load-btn" onclick="loadVizPlus()">
+            <i class="fas fa-magic"></i> Générer
+          </button>
+        </div>
+
+        <!-- Indicateur de chargement -->
+        <div id="vizplus-status" class="vizplus-status hidden">
+          <div class="spinner-sm"></div>
+          <span id="vizplus-status-txt">Calcul en cours…</span>
+        </div>
+
+        <!-- ─── RADAR : Equilibre des genres ─── -->
+        <div class="chart-card full vizplus-card">
+          <div class="cc-hd">
+            <span><i class="fas fa-spider"></i> Radar des Genres Musicaux</span>
+            <span class="cc-hint">Basé sur vos Mood Tags Last.fm</span>
+          </div>
+          <div class="vizplus-placeholder" id="vizplus-radar-ph">
+            <i class="fas fa-spider fa-2x"></i>
+            <p>Cliquez sur "Générer" pour analyser vos genres</p>
+          </div>
+          <div class="radar-wrap hidden" id="vizplus-radar-wrap">
+            <canvas id="chart-radar" height="360"></canvas>
+          </div>
+        </div>
+
+        <!-- ─── TREEMAP : Top 100 artistes ─── -->
+        <div class="chart-card full vizplus-card">
+          <div class="cc-hd">
+            <span><i class="fas fa-th-large"></i> Treemap — Top 100 Artistes</span>
+            <span class="cc-hint">Surface proportionnelle aux scrobbles</span>
+          </div>
+          <div class="vizplus-placeholder" id="vizplus-treemap-ph">
+            <i class="fas fa-th-large fa-2x"></i>
+            <p>Cliquez sur "Générer" pour afficher</p>
+          </div>
+          <div class="treemap-wrap hidden" id="vizplus-treemap-wrap">
+            <canvas id="chart-treemap" height="420"></canvas>
+          </div>
+        </div>
+
+        <!-- ─── SANKEY : Flux d'écoute entre artistes ─── -->
+        <div class="chart-card full vizplus-card">
+          <div class="cc-hd">
+            <span><i class="fas fa-stream"></i> Flux d'Écoute — Sankey</span>
+            <span class="cc-hint">Transitions entre artistes durant vos sessions de binge listening</span>
+          </div>
+          <div class="vizplus-placeholder" id="vizplus-sankey-ph">
+            <i class="fas fa-stream fa-2x"></i>
+            <p>Nécessite l'historique complet — Cliquez sur "Générer"</p>
+          </div>
+          <div class="sankey-wrap hidden" id="vizplus-sankey-wrap">
+            <svg id="chart-sankey" width="100%" height="440"></svg>
+          </div>
+          <div class="sankey-legend hidden" id="sankey-legend"></div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════
+           SUCCÈS / BADGES ★ NEW
+           BadgeEngine — Gamification infinie par paliers
+      ══════════════════════════════════════════ -->
+      <section id="s-badges" class="app-sec">
+        <div class="sec-hd flex-bw">
+          <div>
+            <h2><i class="fas fa-medal"></i> Succès</h2>
+            <p class="sec-sub">Vos accomplissements — Gamification par paliers exponentiels</p>
+          </div>
+          <button class="btn-fetch" id="badges-load-btn" onclick="BadgeEngine.compute()">
+            <i class="fas fa-sync-alt"></i> Recalculer
+          </button>
+        </div>
+
+        <!-- Score & niveau global -->
+        <div class="badge-score-card" id="badge-score-card">
+          <div class="bsc-left">
+            <div class="bsc-level" id="bsc-level">1</div>
+            <div class="bsc-title" id="bsc-title">Audiophile débutant</div>
+          </div>
+          <div class="bsc-right">
+            <div class="bsc-xp-row">
+              <span class="bsc-xp-lbl">XP</span>
+              <div class="bsc-xp-bar">
+                <div class="bsc-xp-fill" id="bsc-xp-fill" style="width:0%"></div>
+              </div>
+              <span class="bsc-xp-val" id="bsc-xp-val">0 / 100</span>
+            </div>
+            <div class="bsc-stats-row">
+              <span id="bsc-unlocked">0 succès débloqués</span>
+              <span class="bsc-sep">·</span>
+              <span id="bsc-total">sur 0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- État vide (avant chargement historique) -->
+        <div class="badges-empty" id="badges-empty">
+          <i class="fas fa-medal fa-3x"></i>
+          <p>Chargez l'historique complet pour débloquer vos succès</p>
+          <button class="btn-fetch" onclick="nav('advanced');setTimeout(()=>fetchFullHistory(),300)">
+            <i class="fas fa-database"></i> Charger l'historique
+          </button>
+        </div>
+
+        <!-- Grille badges par catégorie -->
+        <div id="badges-container" class="badges-container hidden">
+
+          <div class="badge-category">
+            <h3 class="badge-cat-title"><i class="fas fa-moon"></i> Oiseau de Nuit</h3>
+            <p class="badge-cat-desc">Écoutes entre 00h et 05h du matin</p>
+            <div class="badge-grid" id="badge-grid-noctambule"></div>
+          </div>
+
+          <div class="badge-category">
+            <h3 class="badge-cat-title"><i class="fas fa-compass"></i> Explorateur</h3>
+            <p class="badge-cat-desc">Ratio nouveaux artistes / écoutes totales</p>
+            <div class="badge-grid" id="badge-grid-exploration"></div>
+          </div>
+
+          <div class="badge-category">
+            <h3 class="badge-cat-title"><i class="fas fa-heart"></i> Fidélité</h3>
+            <p class="badge-cat-desc">Écoutes répétées du même artiste sur une semaine</p>
+            <div class="badge-grid" id="badge-grid-fidelite"></div>
+          </div>
+
+          <div class="badge-category">
+            <h3 class="badge-cat-title"><i class="fas fa-fire"></i> Volume d'Écoute</h3>
+            <p class="badge-cat-desc">Nombre total de scrobbles</p>
+            <div class="badge-grid" id="badge-grid-volume"></div>
+          </div>
+
+          <div class="badge-category">
+            <h3 class="badge-cat-title"><i class="fas fa-layer-group"></i> Diversité</h3>
+            <p class="badge-cat-desc">Nombre d'artistes différents écoutés</p>
+            <div class="badge-grid" id="badge-grid-diversite"></div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════
+           MAINSTREAM vs OBSCUR ★ NEW
+           Score d'originalité basé sur artist.stats.listeners
+      ══════════════════════════════════════════ -->
+      <section id="s-obscurity" class="app-sec">
+        <div class="sec-hd flex-bw">
+          <div>
+            <h2><i class="fas fa-user-secret"></i> Mainstream vs Obscur</h2>
+            <p class="sec-sub">Mesurez l'originalité de vos goûts musicaux</p>
+          </div>
+          <button class="btn-fetch" id="obscurity-load-btn" onclick="loadObscurityScore()">
+            <i class="fas fa-search"></i> Calculer mon score
+          </button>
+        </div>
+
+        <!-- Jauge score global -->
+        <div class="obscurity-hero">
+          <div class="oh-gauge-wrap">
+            <svg class="oh-gauge" viewBox="0 0 200 120" width="200" height="120" aria-hidden="true">
+              <!-- Arc de fond -->
+              <path d="M 20 100 A 80 80 0 0 1 180 100"
+                    fill="none" stroke="var(--surface-variant)" stroke-width="16" stroke-linecap="round"/>
+              <!-- Arc de valeur (animé via JS) -->
+              <path id="oh-gauge-arc"
+                    d="M 20 100 A 80 80 0 0 1 180 100"
+                    fill="none" stroke="var(--accent)" stroke-width="16" stroke-linecap="round"
+                    stroke-dasharray="251.2" stroke-dashoffset="251.2"
+                    style="transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1)"/>
+            </svg>
+            <div class="oh-gauge-val">
+              <span id="oh-score-val">—</span>
+              <small>/100</small>
+            </div>
+          </div>
+          <div class="oh-meta">
+            <div class="oh-label" id="oh-label">Score d'originalité</div>
+            <p class="oh-desc" id="oh-desc">Comparez vos artistes favoris à leur popularité globale sur Last.fm.</p>
+            <div class="oh-spectrum">
+              <span class="oh-sp-left">🎤 Mainstream</span>
+              <div class="oh-sp-bar">
+                <div class="oh-sp-fill" id="oh-sp-fill" style="width:50%"></div>
+              </div>
+              <span class="oh-sp-right">💎 Obscur</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- État chargement / vide -->
+        <div class="obscurity-empty" id="obscurity-empty">
+          <i class="fas fa-user-secret fa-3x"></i>
+          <p>Cliquez sur "Calculer mon score" pour analyser vos artistes</p>
+        </div>
+
+        <!-- Liste artistes avec score d'obscurité -->
+        <div id="obscurity-list" class="hidden">
+          <div class="cc-hd" style="margin-top:1.5rem">
+            <span><i class="fas fa-list-ol"></i> Détail par artiste</span>
+            <div class="obs-sort-row">
+              <button class="obs-filter active" data-sort="ratio"  onclick="sortObscurity('ratio')">Par originalité</button>
+              <button class="obs-filter"        data-sort="plays"  onclick="sortObscurity('plays')">Par écoutes</button>
+            </div>
+          </div>
+          <div id="obscurity-items" class="obscurity-items"></div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════
+           WRAPPED
+      ══════════════════════════════════════════ -->
       <section id="s-wrapped" class="app-sec">
         <div class="sec-hd flex-bw">
           <div><h2><i class="fas fa-gift"></i> Wrapped</h2><p class="sec-sub">Votre bilan musical annuel</p></div>
@@ -428,7 +773,9 @@
         </div>
       </section>
 
-      <!-- ══ STATS AVANCÉES ══ -->
+      <!-- ══════════════════════════════════════════
+           STATS AVANCÉES
+      ══════════════════════════════════════════ -->
       <section id="s-advanced" class="app-sec">
         <div class="sec-hd flex-bw">
           <div><h2>Stats Avancées</h2><p class="sec-sub">Des métriques pour les véritables passionnés de musique</p></div>
@@ -466,19 +813,92 @@
   </div>
 </div>
 
-<!-- TOAST -->
+<!-- ═══════════════════════════════════════════
+     TOAST
+═══════════════════════════════════════════ -->
 <div id="toast" class="toast">
   <i class="fas fa-check-circle" id="toast-icon"></i>
   <span id="toast-txt"></span>
 </div>
 
-<!-- ═══ HIDDEN STORY CARDS (off-screen, rendered by html2canvas) ═══ -->
-<div id="story-mini-wrap" style="position:fixed;left:-9999px;top:0;z-index:-999;width:360px;height:640px;overflow:hidden;pointer-events:none;" aria-hidden="true">
+<!-- ═══════════════════════════════════════════
+     BADGE DETAIL MODAL ★ NEW
+═══════════════════════════════════════════ -->
+<div id="badge-modal" class="badge-modal hidden" onclick="closeBadgeModal(event)">
+  <div class="badge-modal-inner" role="dialog" aria-modal="true" aria-labelledby="bm-title">
+    <button class="badge-modal-close" onclick="closeBadgeModal()" aria-label="Fermer">
+      <i class="fas fa-times"></i>
+    </button>
+    <div class="bm-icon" id="bm-icon" aria-hidden="true"></div>
+    <h3 class="bm-title" id="bm-title">Titre du badge</h3>
+    <div class="bm-tier" id="bm-tier"></div>
+    <p class="bm-desc" id="bm-desc">Description.</p>
+    <div class="bm-progress-wrap">
+      <div class="bm-progress-bar">
+        <div class="bm-progress-fill" id="bm-progress-fill"></div>
+      </div>
+      <div class="bm-progress-meta">
+        <span id="bm-progress-cur"></span>
+        <span id="bm-progress-next"></span>
+      </div>
+    </div>
+    <div class="bm-tiers-row" id="bm-tiers-row"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     HIDDEN STORY CARDS (off-screen, html2canvas)
+═══════════════════════════════════════════ -->
+<div id="story-mini-wrap"
+     style="position:fixed;left:-9999px;top:0;z-index:-999;width:360px;height:640px;overflow:hidden;pointer-events:none;"
+     aria-hidden="true">
   <div id="story-mini-card" class="story-mini-card"></div>
 </div>
-<div id="story-full-wrap" style="position:fixed;left:-9999px;top:0;z-index:-999;width:680px;height:860px;overflow:hidden;pointer-events:none;" aria-hidden="true">
+<div id="story-full-wrap"
+     style="position:fixed;left:-9999px;top:0;z-index:-999;width:680px;height:860px;overflow:hidden;pointer-events:none;"
+     aria-hidden="true">
   <div id="story-full-card" class="story-full-card"></div>
 </div>
+
+<!-- ═══════════════════════════════════════════
+     SERVICE WORKER + PWA INSTALL PROMPT
+═══════════════════════════════════════════ -->
+<script>
+  /* ── Service Worker ── */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg  => console.log('[SW] Enregistré :', reg.scope))
+        .catch(err => console.warn('[SW] Échec :', err));
+    });
+  }
+
+  /* ── Prompt d'installation PWA ── */
+  let _pwaPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    _pwaPrompt = e;
+    const btn = document.getElementById('btn-install');
+    if (btn) btn.classList.remove('hidden');
+  });
+
+  window.addEventListener('appinstalled', () => {
+    _pwaPrompt = null;
+    const btn = document.getElementById('btn-install');
+    if (btn) btn.classList.add('hidden');
+    if (typeof showToast === 'function') showToast('LastStats installé !', 'success');
+  });
+
+  function installPWA() {
+    if (!_pwaPrompt) return;
+    _pwaPrompt.prompt();
+    _pwaPrompt.userChoice.then(r => {
+      console.log('[PWA] Choix :', r.outcome);
+      _pwaPrompt = null;
+    });
+  }
+</script>
 
 <script src="script.js"></script>
 </body>
