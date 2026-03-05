@@ -54,7 +54,7 @@
   --blur-sm:        none;
 }
 
-/* ── M3 Light ── */
+/* ── M3 Light — contraste optimisé cartes & textes secondaires ── */
 [data-theme="light"] {
   --accent:         #6750a4;
   --accent-h:       #4f378b;
@@ -62,29 +62,32 @@
   --accent-on:      #ffffff;
   --accent-container: #eaddff;
   --accent-on-cont: #21005d;
-  --accent-glow:    rgba(103,80,164,0.15);
+  --accent-glow:    rgba(103,80,164,0.22);
   --accent-lt:      rgba(103,80,164,0.1);
 
-  --bg:             #fffbfe;
-  --bg-dim:         #f7f2fa;
-  --bg-card:        #fffbfe;
-  --bg-card-hi:     #f7f2fa;
+  /* Surfaces légèrement différenciées pour créer de la hiérarchie visuelle */
+  --bg:             #f7f2fa;          /* fond page — légèrement teinté */
+  --bg-dim:         #ede8f5;
+  --bg-card:        #ffffff;          /* cartes sur fond page → blanc pur */
+  --bg-card-hi:     #ffffff;
   --bg-sidebar:     #fffbfe;
   --bg-header:      #fffbfe;
-  --bg-hover:       #e8def8;
+  --bg-hover:       #ede8f5;          /* survol : teinté violet discret */
   --bg-elevated:    #f3edf7;
 
-  --text:           #1c1b1f;
-  --text-muted:     #49454f;
-  --text-dim:       #79747e;
+  /* Typographie — contraste WCAG AA garanti */
+  --text:           #1c1b1f;          /* ratio > 15:1 sur blanc */
+  --text-muted:     #44404b;          /* ratio > 7:1  — plus foncé que M3 default */
+  --text-dim:       #5c5870;          /* ratio > 5:1 */
 
-  --border:         rgba(73,69,79,0.18);
-  --border-glow:    rgba(103,80,164,0.3);
+  --border:         rgba(73,69,79,0.22);
+  --border-glow:    rgba(103,80,164,0.35);
 
-  --shadow-sm:      0 1px 2px rgba(0,0,0,0.08);
-  --shadow-md:      0 2px 6px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06);
-  --shadow-lg:      0 4px 8px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.08);
-  --shadow-card:    0 1px 3px rgba(0,0,0,0.1), 0 2px 6px rgba(0,0,0,0.08);
+  /* Ombres légèrement renforcées pour la hiérarchie en mode clair */
+  --shadow-sm:      0 1px 3px rgba(0,0,0,0.1),  0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:      0 2px 6px rgba(0,0,0,0.1),  0 4px 14px rgba(0,0,0,0.08);
+  --shadow-lg:      0 4px 10px rgba(0,0,0,0.1), 0 8px 28px rgba(0,0,0,0.1);
+  --shadow-card:    0 1px 4px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.07);
 }
 
 @media (prefers-color-scheme: light) {
@@ -95,25 +98,25 @@
     --accent-on:      #ffffff;
     --accent-container: #eaddff;
     --accent-on-cont: #21005d;
-    --accent-glow:    rgba(103,80,164,0.15);
+    --accent-glow:    rgba(103,80,164,0.22);
     --accent-lt:      rgba(103,80,164,0.1);
-    --bg:             #fffbfe;
-    --bg-dim:         #f7f2fa;
-    --bg-card:        #fffbfe;
-    --bg-card-hi:     #f7f2fa;
+    --bg:             #f7f2fa;
+    --bg-dim:         #ede8f5;
+    --bg-card:        #ffffff;
+    --bg-card-hi:     #ffffff;
     --bg-sidebar:     #fffbfe;
     --bg-header:      #fffbfe;
-    --bg-hover:       #e8def8;
+    --bg-hover:       #ede8f5;
     --bg-elevated:    #f3edf7;
     --text:           #1c1b1f;
-    --text-muted:     #49454f;
-    --text-dim:       #79747e;
-    --border:         rgba(73,69,79,0.18);
-    --border-glow:    rgba(103,80,164,0.3);
-    --shadow-sm:      0 1px 2px rgba(0,0,0,0.08);
-    --shadow-md:      0 2px 6px rgba(0,0,0,0.08);
-    --shadow-lg:      0 4px 8px rgba(0,0,0,0.08);
-    --shadow-card:    0 1px 3px rgba(0,0,0,0.1);
+    --text-muted:     #44404b;
+    --text-dim:       #5c5870;
+    --border:         rgba(73,69,79,0.22);
+    --border-glow:    rgba(103,80,164,0.35);
+    --shadow-sm:      0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md:      0 2px 6px rgba(0,0,0,0.1), 0 4px 14px rgba(0,0,0,0.08);
+    --shadow-lg:      0 4px 10px rgba(0,0,0,0.1), 0 8px 28px rgba(0,0,0,0.1);
+    --shadow-card:    0 1px 4px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.07);
     --neon:           none;
   }
 }
@@ -3026,5 +3029,704 @@ canvas#w-mini { height: 60px !important; }
   .story-mini-card { /* scaled down via JS pour html2canvas */ }
   .compare-hd .ic-hd { font-size: .78rem; }
   .am-albums { grid-template-columns: repeat(3, 1fr); }
+}
+
+
+
+/* ============================================================
+   LASTSTATS — ADDONS v6
+   Artist Hero · Track Cover · Layout Grids · Populaire/Pépites
+   Déconnexion · Export Wrapped · Cohérence Clair/Sombre
+   ============================================================ */
+
+
+/* ════════════════════════════════════════════════════════════
+   SECTION CONTROLS — wrapper uniforme période + layout toggle
+   (Top Artistes, Albums, Titres)
+   ════════════════════════════════════════════════════════════ */
+
+.section-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Assurer que le layout toggle est visible sur les 3 sections */
+#artists-layout-toggle,
+#albums-layout-toggle,
+#tracks-layout-toggle {
+  flex-shrink: 0;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   MUSIC GRID — Modes d'affichage uniformes
+   (Artistes, Albums, Titres — même système)
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Vue Grille (défaut Artistes + Albums) ── */
+.music-grid.layout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+/* ── Vue Liste ── */
+.music-grid.layout-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Carte en mode liste (music-card) */
+.music-grid.layout-list .music-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  border-radius: var(--radius-sm);
+}
+
+.music-grid.layout-list .music-card-img {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: var(--radius-xs);
+  aspect-ratio: 1;
+}
+
+.music-grid.layout-list .music-card-body {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px 10px 0;
+}
+
+.music-grid.layout-list .music-card:hover {
+  transform: translateX(4px);
+}
+
+/* ── Vue Compacte ── */
+.music-grid.layout-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.music-grid.layout-compact .music-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  border-bottom-width: 0;
+  border-top: 1px solid var(--border);
+  background: transparent;
+  box-shadow: none;
+  padding: 8px 12px;
+}
+
+.music-grid.layout-compact .music-card:first-child {
+  border-top: none;
+}
+
+.music-grid.layout-compact .music-card:hover {
+  background: var(--bg-hover);
+  transform: none;
+  border-color: var(--border);
+}
+
+.music-grid.layout-compact .music-card-img {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--radius-xs);
+  aspect-ratio: 1;
+}
+
+.music-grid.layout-compact .music-card-body {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+}
+
+.music-grid.layout-compact .music-card-name {
+  font-size: .84rem;
+}
+
+.music-grid.layout-compact .music-card-artist,
+.music-grid.layout-compact .music-card-plays {
+  font-size: .72rem;
+}
+
+.music-grid.layout-compact .music-card-img .music-card-rank {
+  display: none;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   TOP ARTISTES — Hero Card
+   Image plein fond avec dégradé sombre (full-width visuel)
+   ════════════════════════════════════════════════════════════ */
+
+/* Carte artiste en vue grille — style Hero */
+.music-grid.layout-grid .artist-hero-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: transform .25s, box-shadow .25s;
+  box-shadow: var(--shadow-card);
+  aspect-ratio: 3 / 4;    /* format portrait pour plus d'impact */
+  border: none;
+  background: var(--bg-hover);
+}
+
+.music-grid.layout-grid .artist-hero-card:hover {
+  transform: translateY(-4px) scale(1.015);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Image héro — couvre toute la carte */
+.artist-hero-card .artist-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  transition: transform .4s ease;
+  border-radius: inherit;
+}
+
+.artist-hero-card:hover .artist-hero-img {
+  transform: scale(1.07);
+}
+
+/* Dégradé sombre sur la moitié basse — lisibilité du texte */
+.artist-hero-card .artist-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0)    20%,
+    rgba(0,0,0,0.35) 55%,
+    rgba(0,0,0,0.85) 100%
+  );
+  border-radius: inherit;
+  z-index: 1;
+}
+
+/* Fallback si pas d'image — dégradé coloré avec initiales */
+.artist-hero-card .artist-hero-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: 900;
+  color: rgba(255,255,255,.9);
+  letter-spacing: -.04em;
+}
+
+/* Corps texte positionné en bas de la carte */
+.artist-hero-card .artist-hero-body {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 14px 14px 12px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.artist-hero-card .artist-hero-rank {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background: rgba(0,0,0,.6);
+  color: white;
+  font-size: .7rem;
+  font-weight: 800;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,.2);
+}
+
+.artist-hero-card .artist-hero-name {
+  font-size: .9rem;
+  font-weight: 800;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 4px rgba(0,0,0,.5);
+}
+
+.artist-hero-card .artist-hero-plays {
+  font-size: .72rem;
+  color: rgba(255,255,255,.72);
+  font-weight: 600;
+}
+
+/* Boutons d'action (Spotify/YT) sur l'image */
+.artist-hero-card .artist-hero-actions {
+  position: absolute;
+  bottom: 46px;
+  right: 10px;
+  z-index: 3;
+  display: flex;
+  gap: 5px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: all .2s;
+}
+
+.artist-hero-card:hover .artist-hero-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   TOP TITRES — Pochette album (toutes vues)
+   ════════════════════════════════════════════════════════════ */
+
+/* Pochette dans vue Liste */
+.tracks-list.layout-list .track-cover,
+.tracks-list.layout-compact .track-cover {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--bg-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .9rem;
+  font-weight: 900;
+  color: var(--text-muted);
+}
+
+.tracks-list.layout-list .track-cover img,
+.tracks-list.layout-compact .track-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Pochette dans vue Compacte — plus petite */
+.tracks-list.layout-compact .track-cover {
+  width: 32px;
+  height: 32px;
+}
+
+/* Ajustement du track-item pour accueillir la pochette */
+.tracks-list.layout-list .track-item,
+.tracks-list.layout-compact .track-item {
+  gap: 12px;
+}
+
+/* Assurer que le rang reste visible avec la pochette */
+.tracks-list.layout-list .track-rank {
+  min-width: 24px;
+  flex-shrink: 0;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   MODALE ARTISTE — Overlay photo hero (am-photo-overlay)
+   ════════════════════════════════════════════════════════════ */
+
+/* Overlay dégradé sur la photo dans la modale artiste */
+.am-photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom right,
+    rgba(0,0,0,0) 30%,
+    rgba(0,0,0,0.45) 100%
+  );
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Quand la photo est en mode hero full-width (optionnel, activé via JS) */
+.am-photo-wrap.hero-mode {
+  width: 100%;
+  height: 220px;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  position: relative;
+}
+
+.am-photo-wrap.hero-mode .am-photo {
+  border-radius: inherit;
+  object-position: center 20%;
+}
+
+.am-photo-wrap.hero-mode .am-photo-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0)    25%,
+    rgba(0,0,0,0.75) 100%
+  );
+}
+
+/* Infos artiste positionnées sur l'image en mode hero */
+.am-hero.hero-mode {
+  position: relative;
+  padding: 0;
+  gap: 0;
+}
+
+.am-hero.hero-mode .am-hero-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 24px 16px;
+  z-index: 2;
+}
+
+.am-hero.hero-mode .am-artist-name {
+  color: white;
+  font-size: 1.55rem;
+  text-shadow: 0 2px 8px rgba(0,0,0,.4);
+}
+
+.am-hero.hero-mode .am-stats-row .am-stat {
+  background: rgba(0,0,0,.4);
+  border-color: rgba(255,255,255,.15);
+  color: rgba(255,255,255,.85);
+}
+
+.am-hero.hero-mode .am-stat--accent {
+  background: var(--accent-lt);
+  color: var(--accent);
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   POPULAIRE vs PÉPITES (ex Mainstream vs Obscur)
+   Nouveaux noms de badges + icônes
+   ════════════════════════════════════════════════════════════ */
+
+/* Alias des classes existantes avec nouveaux noms */
+.obs-type-populaire {
+  background: rgba(249,115,22,.15);
+  color: #f97316;
+}
+.obs-type-pepites {
+  background: rgba(99,102,241,.15);
+  color: #6366f1;
+}
+.obs-type-indie {
+  background: rgba(6,182,212,.15);
+  color: #06b6d4;
+}
+
+/* Rétrocompatibilité — anciens noms conservés */
+.obs-type-mainstream { background: rgba(249,115,22,.15); color: #f97316; }
+.obs-type-obscur     { background: rgba(99,102,241,.15); color: #6366f1; }
+.obs-type-culte      { background: rgba(6,182,212,.15);  color: #06b6d4; }
+
+/* Icône mise à jour dans la section */
+.s-obscurity-icon::before { content: "\f3a5"; } /* fa-gem */
+
+
+/* ════════════════════════════════════════════════════════════
+   DÉCONNEXION — Bouton dans Paramètres > Compte
+   ════════════════════════════════════════════════════════════ */
+
+/* Variante paramètres — plus visible, avec texte */
+.btn-logout--settings {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  background: rgba(239,68,68,.08);
+  border: 1.5px solid rgba(239,68,68,.2);
+  color: #f87171;
+  font-size: .88rem;
+  font-weight: 600;
+  transition: all .2s;
+  width: auto;
+}
+
+.btn-logout--settings:hover {
+  background: rgba(239,68,68,.18);
+  border-color: rgba(239,68,68,.45);
+  color: #ef4444;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(239,68,68,.15);
+}
+
+/* Mode clair — contraste renforcé */
+[data-theme="light"] .btn-logout--settings {
+  color: #dc2626;
+  background: rgba(220,38,38,.07);
+  border-color: rgba(220,38,38,.2);
+}
+
+[data-theme="light"] .btn-logout--settings:hover {
+  background: rgba(220,38,38,.14);
+  color: #b91c1c;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   EXPORT WRAPPED — html2canvas scale:2 + fonts loaded
+   Corrections d'alignement PNG
+   ════════════════════════════════════════════════════════════ */
+
+/* Mode export — stabilise tous les éléments avant capture */
+.export-mode {
+  /* Fige toutes les animations/transitions */
+  animation: none !important;
+  transition: none !important;
+}
+
+.export-mode * {
+  animation: none !important;
+  transition: none !important;
+  /* Force le rendu des polices */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-synthesis: none;
+}
+
+/* Story mini — forcer la police et l'alignement pour html2canvas */
+.story-mini-card,
+.story-full-card {
+  /* Polices explicitement déclarées pour html2canvas */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  /* Prevent layout shift */
+  contain: layout size;
+}
+
+/* Textes dans les stories — alignement stable */
+.story-mini-card *,
+.story-full-card * {
+  box-sizing: border-box;
+  /* Empêcher le reflow pendant la capture */
+  word-break: break-word;
+}
+
+/* Icônes FontAwesome dans html2canvas — forcer le rendu */
+.story-mini-card .fas,
+.story-mini-card .fab,
+.story-full-card .fas,
+.story-full-card .fab {
+  font-family: 'Font Awesome 6 Free', 'Font Awesome 6 Brands' !important;
+  font-style: normal !important;
+  font-weight: 900 !important;
+  display: inline-block;
+  /* Fallback si les icônes ne se chargent pas dans le canvas */
+  line-height: 1;
+}
+
+/* Wrapper off-screen — empêcher les scrollbars d'affecter le layout */
+#story-mini-wrap,
+#story-full-wrap {
+  /* Isolation totale du flux */
+  contain: strict;
+  will-change: transform; /* force GPU layer — évite les artefacts de capture */
+}
+
+/* Overrides spécifiques à l'export (appliqués via JS avant html2canvas) */
+.html2canvas-export .w-card {
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.html2canvas-export .w-decos .w-d {
+  /* Simplifier les dégradés pour html2canvas */
+  filter: none !important;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   COHÉRENCE CLAIR/SOMBRE — Corrections globales
+   ════════════════════════════════════════════════════════════ */
+
+/* Mode clair : stat cards avec légère élévation pour se distinguer du fond */
+[data-theme="light"] .stat-card,
+[data-theme="light"] .insight-card,
+[data-theme="light"] .chart-card,
+[data-theme="light"] .adv-card,
+[data-theme="light"] .compare-section,
+[data-theme="light"] .obscurity-hero,
+[data-theme="light"] .settings-card {
+  border-color: rgba(73,69,79,0.16);
+  box-shadow: var(--shadow-card);
+}
+
+/* Mode clair : fond des cartes bien blanc sur fond violet-gris */
+[data-theme="light"] .stat-card,
+[data-theme="light"] .insight-card,
+[data-theme="light"] .chart-card,
+[data-theme="light"] .adv-card,
+[data-theme="light"] .music-card,
+[data-theme="light"] .track-item,
+[data-theme="light"] .obscurity-item,
+[data-theme="light"] .badge-card {
+  background: var(--bg-card);    /* #ffffff */
+}
+
+/* Mode clair : header sidebar — distinctif du fond */
+[data-theme="light"] .settings-card-hd {
+  background: #f3edf7;
+  border-bottom-color: rgba(73,69,79,0.15);
+}
+
+/* Mode clair : texte secondaire lisible */
+[data-theme="light"] .sec-sub,
+[data-theme="light"] .stat-card-label,
+[data-theme="light"] .stat-card-sub,
+[data-theme="light"] .track-artist,
+[data-theme="light"] .music-card-artist,
+[data-theme="light"] .setting-lbl,
+[data-theme="light"] .cc-hd {
+  color: var(--text-muted);      /* #44404b — contraste garanti */
+}
+
+/* Mode clair : nav sidebar active — fond violet-teinté visible */
+[data-theme="light"] .nav-lnk.active {
+  background: rgba(103,80,164,.12);
+  color: var(--accent);
+}
+
+[data-theme="light"] .nav-lnk:hover {
+  background: rgba(103,80,164,.07);
+}
+
+/* Mode clair : prd (période) actif lisible */
+[data-theme="light"] .prd.active {
+  background: rgba(103,80,164,.1);
+  border-color: rgba(103,80,164,.3);
+  color: var(--accent);
+}
+
+/* Mode clair : heatmap et obs items */
+[data-theme="light"] .ohw-item,
+[data-theme="light"] .obscurity-item {
+  background: var(--bg-card);
+  border-color: rgba(73,69,79,0.15);
+}
+
+/* Mode clair : toast */
+[data-theme="light"] .toast {
+  background: #1c1b1f;
+  color: #e6e1e5;
+  border-color: rgba(255,255,255,.1);
+}
+
+/* Mode clair : inputs focus ring visible */
+[data-theme="light"] .field input:focus,
+[data-theme="light"] .setting-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(103,80,164,.14);
+}
+
+/* Mode clair : now playing bar */
+[data-theme="light"] .now-playing-bar {
+  background: rgba(103,80,164,.07);
+  border-color: rgba(103,80,164,.25);
+}
+
+/* Mode clair : badge unlocked */
+[data-theme="light"] .badge-card.unlocked {
+  background: rgba(103,80,164,.08);
+  border-color: var(--accent);
+}
+
+/* Mode clair : spinner */
+[data-theme="light"] .spinner-sm {
+  border-color: rgba(73,69,79,.15);
+  border-top-color: var(--accent);
+}
+
+/* Mode clair : fetch modal */
+[data-theme="light"] .fetch-modal {
+  background: #ffffff;
+  border-color: rgba(73,69,79,.15);
+}
+
+/* Mode clair : year select */
+[data-theme="light"] .yr-sel,
+[data-theme="light"] .compare-sel {
+  background: var(--bg-card);
+  border-color: rgba(73,69,79,.22);
+  color: var(--text);
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — Nouvelles règles v6
+   ════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .music-grid.layout-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .section-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .artist-hero-card {
+    aspect-ratio: 4 / 5;
+  }
+  .music-grid.layout-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+  }
+  .tracks-list.layout-list .track-cover {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (max-width: 640px) {
+  .section-controls {
+    flex-direction: row;
+    gap: 8px;
+  }
+  /* Sur mobile, masquer layout-compact — trop étroit */
+  .layout-btn[data-layout="compact"] {
+    display: none;
+  }
+  .music-grid.layout-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .music-grid.layout-list .music-card-img {
+    width: 44px;
+    height: 44px;
+  }
+  /* Story mini — pas de transform sur mobile */
+  .story-mini-card,
+  .story-full-card {
+    font-size: 14px; /* base pour proportions px → rem correctes */
+  }
 }
 

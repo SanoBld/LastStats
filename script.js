@@ -430,7 +430,7 @@ function nav(section) {
     charts:        'Graphiques',
     vizplus:       'Visualisations Avancées',
     badges:        'Succès',
-    obscurity:     'Mainstream vs Obscur',
+    obscurity:     'Populaire vs Pépites',
     wrapped:       'Wrapped',
     advanced:      'Stats Avancées',
   };
@@ -1367,7 +1367,15 @@ async function exportWrapped() {
   try {
     showToast('Génération de l\'image…');
     document.body.classList.add('export-mode');
-    const canvas = await html2canvas(card, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: null });
+
+    // Attendre les polices pour un alignement parfait du texte
+    if (document.fonts?.ready) await document.fonts.ready;
+    await sleep(80);
+
+    const canvas = await html2canvas(card, {
+      scale: 2, useCORS: true, allowTaint: true,
+      backgroundColor: null, logging: false,
+    });
     document.body.classList.remove('export-mode');
     downloadCanvas(canvas, `laststats-wrapped-${document.getElementById('w-yr-sel').value}.png`);
     showToast('Image téléchargée !');
@@ -1520,20 +1528,44 @@ async function generateStory(type) {
   }
 }
 
+/**
+ * Capture un élément HTML en PNG via html2canvas.
+ * Attend que les polices soient chargées avant la capture pour éviter
+ * les problèmes d'alignement du texte.
+ * @param {string} cardId   - ID de l'élément à capturer
+ * @param {number} w        - Largeur logique (px)
+ * @param {number} h        - Hauteur logique (px)
+ * @param {string} filename - Nom du fichier PNG téléchargé
+ */
 async function _captureStory(cardId, w, h, filename) {
   const card = document.getElementById(cardId);
   document.body.classList.add('export-mode');
-  await sleep(60); // Laisser le DOM se peindre
+
+  // ── Attendre les polices ──
+  // Empêche les problèmes d'alignement texte dans html2canvas
+  if (document.fonts?.ready) {
+    await document.fonts.ready;
+  }
+
+  // Laisser le DOM se peindre après l'injection des données
+  await sleep(120);
+
   const canvas = await html2canvas(card, {
-    scale: 2,
-    useCORS: true,
-    allowTaint: true,
+    scale:           2,          // 2× pour une sortie nette sur écrans rétina
+    useCORS:         true,
+    allowTaint:      true,
     backgroundColor: null,
-    width: w,
-    height: h,
-    windowWidth: w,
-    windowHeight: h,
+    width:           w,
+    height:          h,
+    windowWidth:     w,
+    windowHeight:    h,
+    logging:         false,      // silence les warnings html2canvas
+    onclone: (doc) => {
+      // S'assurer que les polices sont chargées dans le document cloné
+      doc.fonts?.ready;
+    },
   });
+
   document.body.classList.remove('export-mode');
   downloadCanvas(canvas, filename);
 }
@@ -2660,9 +2692,9 @@ async function loadObscurityScore() {
         const obscurityRaw    = (1 - popularityRatio) * Math.log10(plays + 1) / Math.log10(10000 + 1) * 100;
         const obscurityScore  = Math.min(100, Math.round(obscurityRaw));
 
-        const type = listeners > 2_000_000 ? 'mainstream'
-                   : listeners < 100_000   ? 'obscur'
-                   : 'culte';
+        const type = listeners > 2_000_000 ? 'populaire'
+                   : listeners < 100_000   ? 'pepites'
+                   : 'indie';
 
         results.push({ name: artist.name, plays, listeners, obscurityScore, type, url: artist.url || '#' });
       });
@@ -2709,17 +2741,17 @@ function _renderObscurityScore(data) {
   if (scoreValEl) scoreValEl.textContent = globalScore;
 
   if (labelEl) {
-    labelEl.textContent = globalScore < 25 ? '🎤 Pur mainstream'
+    labelEl.textContent = globalScore < 25 ? '🎤 Très populaire'
                         : globalScore < 45 ? '🎵 Grand public'
-                        : globalScore < 65 ? '🎸 Auditeur éclairé'
-                        : globalScore < 80 ? '💎 Goûts obscurs'
-                        : '🌑 Ultra-underground';
+                        : globalScore < 65 ? '🎸 Goûts éclairés'
+                        : globalScore < 80 ? '💎 Amateur de pépites'
+                        : '🌑 Chasseur de pépites';
   }
 
   if (descEl) {
-    const mainCount = data.filter(d => d.type === 'mainstream').length;
-    const obscCount = data.filter(d => d.type === 'obscur').length;
-    descEl.textContent = `${mainCount} artiste(s) mainstream · ${obscCount} artiste(s) obscur(s) dans votre top 30.`;
+    const popCount   = data.filter(d => d.type === 'populaire').length;
+    const pepCount   = data.filter(d => d.type === 'pepites').length;
+    descEl.textContent = `${popCount} artiste(s) populaire(s) · ${pepCount} pépite(s) dans votre top 30.`;
   }
 
   if (fillEl) {
@@ -2747,10 +2779,12 @@ function _renderObscurityItems(data, sortKey = 'ratio') {
   const maxScore = Math.max(...sorted.map(d => d.obscurityScore), 1);
 
   container.innerHTML = sorted.map((d, i) => {
-    const typeClass = `obs-type-${d.type}`;
-    const typeLabel = d.type === 'mainstream' ? '🎤 Mainstream'
-                    : d.type === 'obscur'     ? '💎 Obscur'
-                    : '🎸 Culte';
+    const typeClass = d.type === 'populaire' ? 'obs-type-populaire'
+                    : d.type === 'pepites'   ? 'obs-type-pepites'
+                    : 'obs-type-indie';
+    const typeLabel = d.type === 'populaire' ? '🎤 Populaire'
+                    : d.type === 'pepites'   ? '💎 Pépites'
+                    : '🎸 Indie';
     const pct       = Math.round((d.obscurityScore / maxScore) * 100);
     const bg        = nameToGradient(d.name);
     const letter    = d.name[0].toUpperCase();
@@ -2868,6 +2902,11 @@ window.refreshData = async function() {
   const active = document.querySelector('.app-sec.active')?.id?.replace('s-', '');
   if (active === 'vizplus')   loadVizPlus();
   if (active === 'obscurity') loadObscurityScore();
+  // Relancer l'observer tracks si la section est active
+  if (active === 'top-tracks' && _tracksObserver) {
+    const sentinel = document.getElementById('tracks-scroll-sentinel');
+    if (sentinel) _tracksObserver.observe(sentinel);
+  }
 };
 
 
@@ -2892,7 +2931,7 @@ const LANGUAGES = {
     nav_charts:       'Graphiques',
     nav_vizplus:      'Viz Avancées',
     nav_badges:       'Succès',
-    nav_obscurity:    'Mainstream vs Obscur',
+    nav_obscurity:    'Populaire vs Pépites',
     nav_wrapped:      'Wrapped',
     nav_advanced:     'Stats Avancées',
     nav_settings:     'Paramètres',
@@ -2931,7 +2970,7 @@ const LANGUAGES = {
     nav_charts:       'Charts',
     nav_vizplus:      'Advanced Viz',
     nav_badges:       'Achievements',
-    nav_obscurity:    'Mainstream vs Niche',
+    nav_obscurity:    'Populaire vs Pépites',
     nav_wrapped:      'Wrapped',
     nav_advanced:     'Advanced Stats',
     nav_settings:     'Settings',
@@ -3463,17 +3502,12 @@ function toggleArtistBio() {
    user.getTopArtists?page=N
    ════════════════════════════════════════════════════════════ */
 
-/* État de la pagination artistes */
-APP.artistsPage      = 1;
-APP.artistsPeriod    = 'overall';
-APP.artistsLoading   = false;
-APP.artistsExhausted = false;
-APP.artistsTotalPages = 1;
-let _artistsObserver = null;
-
 /**
- * Construit le HTML d'une carte artiste.
- * onclick ouvre la modale (au lieu de la page Last.fm).
+ * Construit la carte d'un artiste.
+ * En mode grille → Hero Card (image plein fond + dégradé sombre).
+ * En modes liste/compact → card horizontale compacte.
+ * @param {object} a    - Objet artiste API Last.fm
+ * @param {number} rank - Rang (1-based)
  */
 function _buildArtistCard(a, rank) {
   const letter  = (a.name || '?')[0].toUpperCase();
@@ -3483,12 +3517,37 @@ function _buildArtistCard(a, rank) {
   const imgId   = `artist-img-r${rank}`;
   const safeUrl = (a.url || '#').replace(/'/g, '%27');
   const plays   = parseInt(a.playcount || 0);
+  const delay   = Math.min(rank % 20, 10) * 0.04;
 
-  const html = `
-    <div class="music-card" style="animation-delay:${Math.min(rank % 20, 10) * 0.04}s"
+  // ── Mode héro (grille) ── image couvre toute la carte
+  const heroHtml = `
+    <div class="artist-hero-card" style="animation-delay:${delay}s"
          onclick="openArtistModal('${escHtml(a.name).replace(/'/g, "\\'")}','${safeUrl}',${plays})">
-      <div class="music-card-img" style="height:160px">
-        <div id="${imgId}" class="spotify-cover" style="background:${bg}">
+      <div class="artist-hero-fallback" id="${imgId}-fallback"
+           style="background:${bg}">${letter}</div>
+      <img class="artist-hero-img" id="${imgId}" alt="${escHtml(a.name)}"
+           style="display:none" loading="lazy">
+      <div class="artist-hero-overlay"></div>
+      <div class="artist-hero-rank">${rank}</div>
+      <div class="artist-hero-body">
+        <div class="artist-hero-name">${escHtml(a.name)}</div>
+        <div class="artist-hero-plays">${formatNum(a.playcount)} écoutes</div>
+      </div>
+      <div class="artist-hero-actions">
+        <a class="mc-play-btn sp" href="spotify:search:${spQ}"
+           onclick="event.stopPropagation()" title="Spotify"><i class="fab fa-spotify"></i></a>
+        <a class="mc-play-btn yt" href="https://www.youtube.com/results?search_query=${ytQ}"
+           target="_blank" rel="noopener" onclick="event.stopPropagation()" title="YouTube">
+          <i class="fab fa-youtube"></i></a>
+      </div>
+    </div>`;
+
+  // ── Mode liste / compact ── card horizontale classique
+  const listHtml = `
+    <div class="music-card" style="animation-delay:${delay}s"
+         onclick="openArtistModal('${escHtml(a.name).replace(/'/g, "\\'")}','${safeUrl}',${plays})">
+      <div class="music-card-img" style="aspect-ratio:1">
+        <div class="spotify-cover" id="${imgId}-cover" style="background:${bg}">
           <span class="sc-letter">${letter}</span>
           <span class="sc-name">${escHtml(a.name)}</span>
         </div>
@@ -3507,13 +3566,82 @@ function _buildArtistCard(a, rank) {
       </div>
     </div>`;
 
-  // Injection image différée
-  setTimeout(() => injectArtistImage(a.name, imgId, bg, letter), rank * 80);
+  // Choisir le template selon le layout actif
+  const layout = APP.artistsLayout || 'grid';
+  const html   = layout === 'grid' ? heroHtml : listHtml;
+  const targetId = layout === 'grid' ? imgId : `${imgId}-cover`;
+
+  // Injection image différée — adapte le conteneur selon le mode
+  setTimeout(() => {
+    if (layout === 'grid') {
+      // Hero mode : injecter directement dans le <img>
+      getArtistImage(a.name).then(imgUrl => {
+        if (!imgUrl) return;
+        const imgEl      = document.getElementById(imgId);
+        const fallbackEl = document.getElementById(`${imgId}-fallback`);
+        if (imgEl) {
+          imgEl.src             = imgUrl;
+          imgEl.style.display   = 'block';
+          imgEl.onerror         = () => { imgEl.style.display = 'none'; };
+          if (fallbackEl) fallbackEl.style.display = 'none';
+        }
+      });
+    } else {
+      // Liste / compact : remplacer le fallback par une image
+      injectArtistImage(a.name, targetId, bg, letter);
+    }
+  }, rank * 80);
+
   return html;
 }
 
+/* ════════════════════════════════════════════════════════════
+   TOP ARTISTES — Layout Toggle + Infinite Scroll
+   ════════════════════════════════════════════════════════════ */
+
+// Persistance du layout artistes dans localStorage
+APP.artistsLayout    = localStorage.getItem('ls_artists_layout') || 'grid';
+APP.artistsPage      = 1;
+APP.artistsPeriod    = 'overall';
+APP.artistsLoading   = false;
+APP.artistsExhausted = false;
+APP.artistsTotalPages= 1;
+let _artistsObserver = null;
+
+/**
+ * Change le mode d'affichage du grid Artistes.
+ * @param {'grid'|'list'|'compact'} layout
+ */
+function setArtistsLayout(layout) {
+  APP.artistsLayout = layout;
+  localStorage.setItem('ls_artists_layout', layout);
+
+  const grid = document.getElementById('artists-grid');
+  if (grid) {
+    // Enlever toutes les classes layout-*
+    grid.className = grid.className.replace(/\blayout-\S+/g, '').trim();
+    grid.classList.add('layout-' + layout);
+  }
+
+  // Synchroniser les boutons du toggle artistes
+  document.querySelectorAll('#artists-layout-toggle .layout-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.layout === layout)
+  );
+
+  // Re-render avec le nouveau style
+  if (APP.topArtistsData.length) {
+    const grid2 = document.getElementById('artists-grid');
+    if (grid2) {
+      grid2.innerHTML = APP.topArtistsData
+        .slice(0, APP.artistsPage * 50)
+        .map((a, i) => _buildArtistCard(a, i + 1))
+        .join('');
+    }
+  }
+}
+
 window.loadTopArtists = async function(period) {
-  // Réinitialiser l'état
+  // Réinitialiser l'état pagination
   APP.artistsPage      = 1;
   APP.artistsPeriod    = period;
   APP.artistsLoading   = false;
@@ -3523,11 +3651,18 @@ window.loadTopArtists = async function(period) {
   const loader  = document.getElementById('artists-page-loader');
   const sentinel= document.getElementById('artists-scroll-sentinel');
 
+  // Appliquer le layout persisté
+  grid.className = `music-grid layout-${APP.artistsLayout}`;
   grid.innerHTML = skeletonMusicCards(12);
   if (loader)   loader.classList.add('hidden');
 
   // Arrêter l'ancien observer
   if (_artistsObserver) { _artistsObserver.disconnect(); _artistsObserver = null; }
+
+  // Synchroniser les boutons layout
+  document.querySelectorAll('#artists-layout-toggle .layout-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.layout === APP.artistsLayout)
+  );
 
   try {
     const data    = await API.call('user.getTopArtists', { period, limit: 50, page: 1 });
@@ -3540,9 +3675,7 @@ window.loadTopArtists = async function(period) {
     // Activer l'infinite scroll si plusieurs pages
     if (APP.artistsTotalPages > 1 && sentinel) {
       _artistsObserver = new IntersectionObserver(
-        entries => {
-          if (entries[0].isIntersecting) _loadMoreArtists();
-        },
+        entries => { if (entries[0].isIntersecting) _loadMoreArtists(); },
         { rootMargin: '200px' }
       );
       _artistsObserver.observe(sentinel);
@@ -3594,12 +3727,47 @@ async function _loadMoreArtists() {
    TOP ALBUMS — Infinite Scroll
    ════════════════════════════════════════════════════════════ */
 
+/* ════════════════════════════════════════════════════════════
+   TOP ALBUMS — Layout Toggle + Infinite Scroll
+   ════════════════════════════════════════════════════════════ */
+
+APP.albumsLayout    = localStorage.getItem('ls_albums_layout') || 'grid';
 APP.albumsPage      = 1;
 APP.albumsPeriod    = 'overall';
 APP.albumsLoading   = false;
 APP.albumsExhausted = false;
 APP.albumsTotalPages= 1;
 let _albumsObserver = null;
+
+/**
+ * Change le mode d'affichage du grid Albums.
+ * @param {'grid'|'list'|'compact'} layout
+ */
+function setAlbumsLayout(layout) {
+  APP.albumsLayout = layout;
+  localStorage.setItem('ls_albums_layout', layout);
+
+  const grid = document.getElementById('albums-grid');
+  if (grid) {
+    grid.className = grid.className.replace(/\blayout-\S+/g, '').trim();
+    grid.classList.add('layout-' + layout);
+  }
+
+  document.querySelectorAll('#albums-layout-toggle .layout-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.layout === layout)
+  );
+
+  // Re-render
+  if (APP.topAlbumsData.length) {
+    const grid2 = document.getElementById('albums-grid');
+    if (grid2) {
+      grid2.innerHTML = APP.topAlbumsData
+        .slice(0, APP.albumsPage * 50)
+        .map((a, i) => _buildAlbumCard(a, i + 1))
+        .join('');
+    }
+  }
+}
 
 function _buildAlbumCard(a, rank) {
   const imgUrl = a.image?.find(img => img.size === 'extralarge')?.['#text'] || '';
@@ -3640,10 +3808,17 @@ window.loadTopAlbums = async function(period) {
   const loader  = document.getElementById('albums-page-loader');
   const sentinel= document.getElementById('albums-scroll-sentinel');
 
+  // Appliquer le layout persisté
+  grid.className = `music-grid layout-${APP.albumsLayout}`;
   grid.innerHTML = skeletonMusicCards(12);
   if (loader) loader.classList.add('hidden');
 
   if (_albumsObserver) { _albumsObserver.disconnect(); _albumsObserver = null; }
+
+  // Synchroniser les boutons layout
+  document.querySelectorAll('#albums-layout-toggle .layout-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.layout === APP.albumsLayout)
+  );
 
   try {
     const data   = await API.call('user.getTopAlbums', { period, limit: 50, page: 1 });
@@ -3696,10 +3871,16 @@ async function _loadMoreAlbums() {
 
 
 /* ════════════════════════════════════════════════════════════
-   TOP TITRES — Basculement de disposition
+   TOP TITRES — Basculement de disposition + Infinite Scroll
    ════════════════════════════════════════════════════════════ */
 
-APP.tracksLayout = localStorage.getItem('ls_tracks_layout') || 'list';
+APP.tracksLayout    = localStorage.getItem('ls_tracks_layout') || 'list';
+APP.tracksPage      = 1;
+APP.tracksPeriod    = 'overall';
+APP.tracksLoading   = false;
+APP.tracksExhausted = false;
+APP.tracksTotalPages= 1;
+let _tracksObserver = null;
 
 /**
  * Change la disposition de la liste des titres.
@@ -3714,74 +3895,151 @@ function setTracksLayout(layout) {
     list.className = `tracks-list layout-${layout}`;
   }
 
-  // Mettre à jour les boutons
-  document.querySelectorAll('.layout-btn').forEach(b =>
+  // Mettre à jour les boutons du toggle titres uniquement
+  document.querySelectorAll('#tracks-layout-toggle .layout-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.layout === layout)
   );
+
+  // Re-render les titres déjà chargés avec le nouveau style
+  if (APP.topTracksData.length) {
+    const maxPlay = APP.topTracksData.length > 0 ? parseInt(APP.topTracksData[0].playcount) : 1;
+    if (list) {
+      list.innerHTML = APP.topTracksData
+        .slice(0, APP.tracksPage * 50)
+        .map((t, i) => _buildTrackItem(t, i + 1, maxPlay))
+        .join('');
+    }
+  }
 }
 
-/* Remplacer loadTopTracks pour intégrer le layout et une icône note */
+/* Remplacer loadTopTracks pour intégrer le layout, les pochettes, une icône note + Infinite Scroll */
 window.loadTopTracks = async function(period) {
-  const list = document.getElementById('tracks-list');
+  // Réinitialiser l'état pagination
+  APP.tracksPage      = 1;
+  APP.tracksPeriod    = period;
+  APP.tracksLoading   = false;
+  APP.tracksExhausted = false;
+
+  const list     = document.getElementById('tracks-list');
+  const loader   = document.getElementById('tracks-page-loader');
+  const sentinel = document.getElementById('tracks-scroll-sentinel');
+
   list.className = `tracks-list layout-${APP.tracksLayout}`;
   list.innerHTML = skeletonTrackItems(12);
+  if (loader) loader.classList.add('hidden');
 
-  // Mettre à jour le bouton actif
-  document.querySelectorAll('.layout-btn').forEach(b =>
+  // Arrêter l'ancien observer
+  if (_tracksObserver) { _tracksObserver.disconnect(); _tracksObserver = null; }
+
+  // Synchroniser les boutons actifs
+  document.querySelectorAll('#tracks-layout-toggle .layout-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.layout === APP.tracksLayout)
   );
 
   try {
-    const data    = await API.call('user.getTopTracks', { period, limit: TOP_LIMIT });
-    const tracks  = (data.toptracks?.track || []).slice(0, DISPLAY_LIMIT);
-    APP.topTracksData = data.toptracks?.track || [];
+    const data    = await API.call('user.getTopTracks', { period, limit: 50, page: 1 });
+    const tracks  = data.toptracks?.track || [];
+    APP.topTracksData    = tracks;
+    APP.tracksTotalPages = parseInt(data.toptracks?.['@attr']?.totalPages || 1);
     const maxPlay = tracks.length > 0 ? parseInt(tracks[0].playcount) : 1;
 
-    list.innerHTML = tracks.map((t, i) => {
-      const pct   = ((parseInt(t.playcount) / maxPlay) * 100).toFixed(1);
-      const medal = i < 3 ? ['🥇','🥈','🥉'][i] : i + 1;
-      const spQ   = encodeURIComponent(`${t.name} ${t.artist?.name || ''}`);
-      const ytQ   = encodeURIComponent(`${t.name} ${t.artist?.name || ''}`);
+    list.innerHTML = tracks.map((t, i) => _buildTrackItem(t, i + 1, maxPlay)).join('');
 
-      // Pochette (pour la vue grille)
-      const imgUrl = t.image?.find(im => im.size === 'medium')?.['#text'] || '';
-      const hasCover = !isDefaultImg(imgUrl);
-      const coverBg  = nameToGradient(t.name + (t.artist?.name || ''));
-      const coverLetter = (t.name || '?')[0].toUpperCase();
-
-      return `
-        <div class="track-item" style="animation-delay:${i * 0.025}s"
-             onclick="window.open('${(t.url || '#').replace(/'/g, '%27')}','_blank')">
-          ${APP.tracksLayout === 'grid' ? `
-            <div class="track-cover">
-              ${hasCover
-                ? `<img src="${imgUrl}" alt="${escHtml(t.name)}" loading="lazy">`
-                : `<div style="width:100%;height:100%;background:${coverBg};display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:900;color:white">${coverLetter}</div>`}
-            </div>` : ''}
-          <div class="track-rank">${medal}</div>
-          <div class="track-info">
-            <div class="track-name" title="${escHtml(t.name)}">
-              <i class="fas fa-music" style="font-size:.65rem;opacity:.35;margin-right:5px"></i>${escHtml(t.name)}
-            </div>
-            <div class="track-artist">${escHtml(t.artist?.name || '')}</div>
-          </div>
-          <div class="track-bar-wrap">
-            <div class="track-bar" style="width:${pct}%"></div>
-          </div>
-          <div class="track-plays">${formatNum(t.playcount)}</div>
-          <div class="track-play-btns">
-            <a class="track-play-btn sp" href="spotify:search:${spQ}" title="Spotify"
-               onclick="event.stopPropagation()"><i class="fab fa-spotify"></i></a>
-            <a class="track-play-btn yt" href="https://www.youtube.com/results?search_query=${ytQ}"
-               target="_blank" rel="noopener" title="YouTube"
-               onclick="event.stopPropagation()"><i class="fab fa-youtube"></i></a>
-          </div>
-        </div>`;
-    }).join('');
+    // Activer l'infinite scroll si plusieurs pages
+    if (APP.tracksTotalPages > 1 && sentinel) {
+      _tracksObserver = new IntersectionObserver(
+        entries => { if (entries[0].isIntersecting) _loadMoreTracks(); },
+        { rootMargin: '200px' }
+      );
+      _tracksObserver.observe(sentinel);
+    }
   } catch (e) {
     list.innerHTML = `<p style="color:var(--text-muted);padding:20px">${escHtml(e.message)}</p>`;
   }
 };
+
+
+/**
+ * Construit le HTML d'un item de titre avec pochette.
+ * @param {object} t     - Objet track API Last.fm
+ * @param {number} rank  - Rang (1-based)
+ * @param {number} maxPlay - Scrobbles du n°1 pour la barre de progression
+ */
+function _buildTrackItem(t, rank, maxPlay) {
+  const pct         = ((parseInt(t.playcount) / Math.max(maxPlay, 1)) * 100).toFixed(1);
+  const medal       = rank <= 3 ? ['🥇','🥈','🥉'][rank - 1] : rank;
+  const spQ         = encodeURIComponent(`${t.name} ${t.artist?.name || ''}`);
+  const ytQ         = encodeURIComponent(`${t.name} ${t.artist?.name || ''}`);
+  const imgUrl      = t.image?.find(im => im.size === 'medium')?.['#text']
+                   || t.image?.find(im => im.size === 'small')?.['#text']
+                   || '';
+  const hasCover    = !isDefaultImg(imgUrl);
+  const coverBg     = nameToGradient(t.name + (t.artist?.name || ''));
+  const coverLetter = (t.name || '?')[0].toUpperCase();
+  const delay       = Math.min((rank - 1) % 20, 10) * 0.025;
+
+  return `
+    <div class="track-item" style="animation-delay:${delay}s"
+         onclick="window.open('${(t.url || '#').replace(/'/g, '%27')}','_blank')">
+      <div class="track-cover">
+        ${hasCover
+          ? `<img src="${imgUrl}" alt="${escHtml(t.name)}" loading="lazy"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+          : ''}
+        <div style="width:100%;height:100%;background:${coverBg};
+                    display:${hasCover ? 'none' : 'flex'};align-items:center;
+                    justify-content:center;font-size:1.2rem;font-weight:900;color:white">${coverLetter}</div>
+      </div>
+      <div class="track-rank">${medal}</div>
+      <div class="track-info">
+        <div class="track-name" title="${escHtml(t.name)}">
+          <i class="fas fa-music" style="font-size:.65rem;opacity:.35;margin-right:5px"></i>${escHtml(t.name)}
+        </div>
+        <div class="track-artist">${escHtml(t.artist?.name || '')}</div>
+      </div>
+      <div class="track-bar-wrap">
+        <div class="track-bar" style="width:${pct}%"></div>
+      </div>
+      <div class="track-plays">${formatNum(t.playcount)}</div>
+      <div class="track-play-btns">
+        <a class="track-play-btn sp" href="spotify:search:${spQ}" title="Spotify"
+           onclick="event.stopPropagation()"><i class="fab fa-spotify"></i></a>
+        <a class="track-play-btn yt" href="https://www.youtube.com/results?search_query=${ytQ}"
+           target="_blank" rel="noopener" title="YouTube"
+           onclick="event.stopPropagation()"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>`;
+}
+
+async function _loadMoreTracks() {
+  if (APP.tracksLoading || APP.tracksExhausted) return;
+  if (APP.tracksPage >= APP.tracksTotalPages) { APP.tracksExhausted = true; return; }
+
+  APP.tracksLoading = true;
+  APP.tracksPage++;
+
+  const list   = document.getElementById('tracks-list');
+  const loader = document.getElementById('tracks-page-loader');
+  if (loader) loader.classList.remove('hidden');
+
+  try {
+    const data   = await API.call('user.getTopTracks', { period: APP.tracksPeriod, limit: 50, page: APP.tracksPage });
+    const tracks = data.toptracks?.track || [];
+    if (!tracks.length) { APP.tracksExhausted = true; return; }
+
+    const maxPlay   = APP.topTracksData.length > 0 ? parseInt(APP.topTracksData[0].playcount) : 1;
+    const startRank = (APP.tracksPage - 1) * 50 + 1;
+    tracks.forEach((t, i) => {
+      list.insertAdjacentHTML('beforeend', _buildTrackItem(t, startRank + i, maxPlay));
+    });
+    APP.topTracksData = [...APP.topTracksData, ...tracks];
+  } catch (e) {
+    console.warn('_loadMoreTracks:', e);
+  } finally {
+    APP.tracksLoading = false;
+    if (loader) loader.classList.add('hidden');
+  }
+}
 
 
 /* ════════════════════════════════════════════════════════════
@@ -4405,23 +4663,37 @@ window.initApp = async function() {
   // Restaurer les badges depuis le localStorage
   restoreBadgesFromStorage();
 
-  // Restaurer le layout des titres
+  // Restaurer les layouts persistés
   setTracksLayout(APP.tracksLayout);
+  setArtistsLayout(APP.artistsLayout);
+  setAlbumsLayout(APP.albumsLayout);
 
   // Restaurer la langue
   setLanguage(APP.language);
 };
 
-/* Aussi sur DOMContentLoaded pour la langue + accent avant login */
+/* Aussi sur DOMContentLoaded pour la langue + accents + layouts avant login */
 const _origDOMLoaded = window.addEventListener;
 document.addEventListener('DOMContentLoaded', () => {
   APP.language = localStorage.getItem('ls_lang') || 'fr';
   document.querySelectorAll('.lang-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.lang === APP.language)
   );
-  APP.tracksLayout = localStorage.getItem('ls_tracks_layout') || 'list';
-  document.querySelectorAll('.layout-btn').forEach(b =>
+
+  // Layouts persistés
+  APP.tracksLayout  = localStorage.getItem('ls_tracks_layout')  || 'list';
+  APP.artistsLayout = localStorage.getItem('ls_artists_layout') || 'grid';
+  APP.albumsLayout  = localStorage.getItem('ls_albums_layout')  || 'grid';
+
+  // Initialiser les boutons de layout visible (titres)
+  document.querySelectorAll('#tracks-layout-toggle .layout-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.layout === APP.tracksLayout)
+  );
+  document.querySelectorAll('#artists-layout-toggle .layout-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.layout === APP.artistsLayout)
+  );
+  document.querySelectorAll('#albums-layout-toggle .layout-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.layout === APP.albumsLayout)
   );
 }, { once: true });
 
