@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#060610">
+  <title>LastStats · Votre Année en Musique</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="wrapped.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+          integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+
+  <!-- ══ OVERLAY : Sélection de langue ══ -->
+  <div id="overlay-lang" class="overlay">
+    <div class="cred-blob b1"></div>
+    <div class="cred-blob b2"></div>
+    <div class="cred-blob b3"></div>
+    <div class="lang-card">
+      <div class="lang-logo">LastStats</div>
+      <h1 class="lang-title">Choose your language</h1>
+      <p class="lang-sub">Choisissez votre langue / Elige tu idioma</p>
+      <div class="lang-grid">
+        <button class="lang-btn" data-lang="fr">🇫🇷 Français</button>
+        <button class="lang-btn" data-lang="en">🇬🇧 English</button>
+        <button class="lang-btn" data-lang="es">🇪🇸 Español</button>
+        <button class="lang-btn" data-lang="de">🇩🇪 Deutsch</button>
+        <button class="lang-btn" data-lang="pt">🇵🇹 Português</button>
+        <button class="lang-btn" data-lang="it">🇮🇹 Italiano</button>
+        <button class="lang-btn" data-lang="ja">🇯🇵 日本語</button>
+        <button class="lang-btn" data-lang="zh">🇨🇳 中文</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ OVERLAY : Hors-période ══ -->
+  <div id="overlay-wait" class="overlay hidden">
+    <div class="cred-blob b1"></div>
+    <div class="cred-blob b2"></div>
+    <div class="cred-blob b3"></div>
+    <div class="wait-card">
+      <div class="wait-icon">🎵</div>
+      <div class="wait-logo">LastStats</div>
+      <h1 class="wait-title" id="wait-title">Reviens le 31 décembre</h1>
+      <p class="wait-sub" id="wait-sub">Votre Wrapped annuel sera disponible à partir du 31 décembre.</p>
+      <div class="countdown-wrap">
+        <div class="countdown-unit"><span class="countdown-num" id="cd-days">--</span><span class="countdown-lbl" id="cd-days-lbl">Jours</span></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-unit"><span class="countdown-num" id="cd-hours">--</span><span class="countdown-lbl" id="cd-hours-lbl">Heures</span></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-unit"><span class="countdown-num" id="cd-mins">--</span><span class="countdown-lbl" id="cd-mins-lbl">Min</span></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-unit"><span class="countdown-num" id="cd-secs">--</span><span class="countdown-lbl" id="cd-secs-lbl">Sec</span></div>
+      </div>
+      <a href="index.html" class="wait-back" id="wait-back">← Retour à LastStats</a>
+    </div>
+  </div>
+
+  <!-- ══ OVERLAY : Identifiants + sélecteur d'année ══ -->
+  <div id="overlay-creds" class="overlay hidden">
+    <div class="cred-blob b1"></div>
+    <div class="cred-blob b2"></div>
+    <div class="cred-blob b3"></div>
+    <div class="cred-card">
+      <div class="cred-logo">LastStats</div>
+      <h1 class="cred-title" id="cred-title">Votre Année<br>en Musique</h1>
+      <p class="cred-desc" id="cred-desc">Connectez-vous pour générer votre Wrapped personnalisé.</p>
+      <div class="cred-fields">
+        <div class="cred-field">
+          <label for="inp-user" id="lbl-user">Nom d'utilisateur Last.fm</label>
+          <input id="inp-user" type="text" placeholder="votre_pseudo" autocomplete="username" spellcheck="false">
+        </div>
+        <div class="cred-field">
+          <label for="inp-key" id="lbl-key">
+            Clé API
+            <a href="https://www.last.fm/api/account/create" target="_blank" rel="noopener" class="cred-link" id="lbl-key-get">Obtenir ↗</a>
+          </label>
+          <input id="inp-key" type="password" placeholder="32 hex chars" autocomplete="off" spellcheck="false">
+        </div>
+        <!-- Sélecteur d'année -->
+        <div class="cred-field">
+          <label for="inp-year" id="lbl-year">Année</label>
+          <select id="inp-year" class="cred-select"></select>
+        </div>
+      </div>
+      <label class="cred-remember">
+        <input id="inp-remember" type="checkbox" checked>
+        <span id="lbl-remember">Se souvenir de moi</span>
+      </label>
+      <button id="cred-submit" class="cred-btn">
+        <span id="cred-submit-txt">Lancer mon Wrapped ✦</span>
+      </button>
+      <p id="cred-error" class="cred-error" hidden></p>
+      <div class="cred-footer-row">
+        <a href="index.html" class="cred-back" id="lbl-back">← Retour à LastStats</a>
+        <button class="lang-change-btn" id="lang-change-btn">🌐 Langue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ OVERLAY : Chargement ══ -->
+  <div id="overlay-loading" class="overlay hidden">
+    <div class="cred-blob b1"></div>
+    <div class="cred-blob b2"></div>
+    <div class="cred-blob b3"></div>
+    <div class="loader-content">
+      <div class="loader-logo">LastStats</div>
+      <div class="loader-wave">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <p class="loader-text" id="loader-text">Connexion à Last.fm…</p>
+      <div class="loader-bar-wrap">
+        <div class="loader-bar" id="loader-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STORIES ══ -->
+  <div id="stories" class="hidden">
+    <div id="ambient"></div>
+    <div id="grain"></div>
+    <div id="hud">
+      <div id="progress-bars" role="progressbar" aria-label="Progression"></div>
+      <button id="pause-btn" aria-label="Pause / Lecture" title="Espace">⏸</button>
+    </div>
+    <button id="screenshot-btn" class="screenshot-btn" aria-label="Capturer cette slide" title="Screenshot">📷</button>
+    <div id="nav-prev" role="button" aria-label="Précédent"></div>
+    <div id="nav-next" role="button" aria-label="Suivant"></div>
+    <div id="slides-container"></div>
+  </div>
+
+  <script src="wrapped.js"></script>
+</body>
+</html>
