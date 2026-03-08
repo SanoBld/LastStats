@@ -3730,3 +3730,942 @@ canvas#w-mini { height: 60px !important; }
   }
 }
 
+
+
+/* ============================================================
+   LASTSTATS — ADDONS v7
+   Hero-Grid Albums+Tracks · Bio complète · Compare redesign
+   SW Update Button · OHW Tooltip · Badge Actions · Wrapped Table
+   Story Podium Table · Light Mode Accent Fix · Listen Time Card
+   ============================================================ */
+
+
+/* ════════════════════════════════════════════════════════════
+   HERO-GRID — Style image plein fond pour Albums et Titres
+   Uniformisé avec le style Top Artistes
+   Les grilles Albums et Titres portent maintenant .hero-grid
+   ════════════════════════════════════════════════════════════ */
+
+/* Grille hero partagée par artistes, albums et titres en vue grille */
+.hero-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+/* Carte hero générique — image plein cadre, texte en surimpression */
+.hero-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: transform .25s, box-shadow .25s;
+  box-shadow: var(--shadow-card);
+  aspect-ratio: 1;          /* carré par défaut pour albums et titres */
+  border: none;
+  background: var(--bg-hover);
+  animation: cardIn .3s ease both;
+}
+
+/* Les artistes gardent le ratio portrait */
+.hero-grid.hero-grid--artists .hero-card {
+  aspect-ratio: 3 / 4;
+}
+
+.hero-card:hover {
+  transform: translateY(-4px) scale(1.015);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Image hero — couvre toute la carte */
+.hero-card .hc-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform .4s ease;
+  border-radius: inherit;
+}
+
+/* Artistes : cadrage vers le haut (visages) */
+.hero-grid--artists .hero-card .hc-img {
+  object-position: center top;
+}
+
+.hero-card:hover .hc-img {
+  transform: scale(1.07);
+}
+
+/* Dégradé sombre — lisibilité du texte */
+.hero-card .hc-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0)    20%,
+    rgba(0,0,0,0.35) 55%,
+    rgba(0,0,0,0.88) 100%
+  );
+  border-radius: inherit;
+  z-index: 1;
+}
+
+/* Fallback si pas d'image */
+.hero-card .hc-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: rgba(255,255,255,.9);
+  letter-spacing: -.04em;
+  z-index: 0;
+}
+
+/* Badge de rang */
+.hero-card .hc-rank {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background: rgba(0,0,0,.6);
+  color: white;
+  font-size: .7rem;
+  font-weight: 800;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,.2);
+}
+
+/* Corps texte en bas de la carte */
+.hero-card .hc-body {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 12px 10px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hero-card .hc-name {
+  font-size: .88rem;
+  font-weight: 800;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 4px rgba(0,0,0,.5);
+  line-height: 1.3;
+}
+
+/* Sous-titre (artiste pour albums, artiste pour titres) */
+.hero-card .hc-sub {
+  font-size: .72rem;
+  color: rgba(255,255,255,.72);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.hero-card .hc-plays {
+  font-size: .68rem;
+  color: rgba(255,255,255,.58);
+  font-weight: 600;
+}
+
+/* Boutons action (Spotify / YT) */
+.hero-card .hc-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
+  display: flex;
+  gap: 5px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: all .2s;
+}
+
+.hero-card:hover .hc-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Titres en vue grille hero — ratio carré */
+.tracks-list.layout-grid .hero-card {
+  aspect-ratio: 1;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   BIOGRAPHIE ARTISTE — Collapsed / Expanded complets
+   Remplace l'ancien max-height: 120px fixe
+   ════════════════════════════════════════════════════════════ */
+
+/* État replié : 4 lignes de texte visibles (~100px) */
+.am-bio--collapsed {
+  max-height: 100px;
+  overflow: hidden;
+  position: relative;
+  transition: max-height .45s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* Dégradé de fondu en bas quand replié */
+.am-bio--collapsed:not(.expanded)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  background: linear-gradient(to bottom, transparent, var(--bg-elevated));
+  pointer-events: none;
+}
+
+/* État développé — texte complet visible avec défilement fluide */
+.am-bio--collapsed.expanded {
+  max-height: 800px;   /* assez grand pour n'importe quelle bio */
+}
+
+.am-bio--collapsed.expanded::after {
+  display: none;
+}
+
+/* La biographie elle-même */
+.am-bio {
+  font-size: .88rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+/* Rétrocompatibilité : l'ancien état expanded via JS */
+.am-bio.expanded {
+  max-height: 800px;
+}
+
+.am-bio.expanded::after {
+  display: none;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   COMPARAISON DE PÉRIODES — Redesign ergonomique
+   Labels explicites, icône séparatrice, phrase descriptive
+   ════════════════════════════════════════════════════════════ */
+
+/* Wrapper de chaque sélecteur avec son label au-dessus */
+.compare-period-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 180px;
+}
+
+.compare-period-lbl {
+  font-size: .68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+/* Icône séparatrice entre les deux sélecteurs */
+.compare-vs-icon {
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 8px;
+  color: var(--accent);
+  font-size: .9rem;
+  flex-shrink: 0;
+}
+
+/* Phrase explicative sous les contrôles */
+.compare-desc {
+  font-size: .8rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-lt);
+  border: 1px solid var(--border-glow);
+}
+
+.compare-desc i {
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-size: .8rem;
+}
+
+/* Bouton info dans l'en-tête de la comparaison */
+.compare-hint-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: .82rem;
+  cursor: help;
+  transition: color .15s;
+  margin-left: 4px;
+}
+
+.compare-hint-badge:hover {
+  color: var(--accent);
+}
+
+/* Sous-label dans chaque métrique de comparaison */
+.cmp-sub-label {
+  font-size: .7rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  display: block;
+  font-style: italic;
+}
+
+/* Artiste n°1 — layout deux périodes côte à côte */
+.cmp-vals--artists {
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cmp-period-val {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cmp-period-tag {
+  font-size: .65rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: var(--bg-hover);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Responsive compare redesign */
+@media (max-width: 768px) {
+  .compare-period-wrap {
+    min-width: 140px;
+  }
+}
+
+@media (max-width: 640px) {
+  .compare-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+  }
+  .compare-period-wrap {
+    width: 100%;
+  }
+  .compare-period-wrap .compare-sel {
+    width: 100%;
+  }
+  .compare-vs-icon {
+    align-self: center;
+    padding-bottom: 0;
+    transform: rotate(90deg);
+  }
+  .btn-compare {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   BOUTON MISE À JOUR FORCÉE SW — Paramètres > Données & Export
+   ════════════════════════════════════════════════════════════ */
+
+.btn-update-sw {
+  padding: 9px 18px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(135deg, var(--accent-container), var(--accent));
+  color: white;
+  font-size: .84rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: all .2s;
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+}
+
+.btn-update-sw:hover {
+  opacity: .9;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-update-sw:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Ligne de paramètre mise en valeur (update SW) */
+.setting-row--highlight {
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-lt);
+  border: 1px solid var(--border-glow);
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.setting-lbl-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.setting-lbl-wrap .setting-lbl {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.setting-lbl-wrap .hint {
+  margin-top: 4px;
+  line-height: 1.55;
+}
+
+/* Variante hint pour les accents */
+.hint--accent {
+  font-size: .76rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  line-height: 1.55;
+}
+
+.hint--accent i {
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+@media (max-width: 640px) {
+  .setting-row--highlight {
+    flex-direction: column;
+  }
+  .btn-update-sw {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   TEMPS D'ÉCOUTE — Carte Stat Dashboard
+   Carte dédiée peuplée par JS
+   ════════════════════════════════════════════════════════════ */
+
+#stat-card-listen-time {
+  /* Légère teinte accent pour la distinguer */
+  --card-accent: var(--accent);
+}
+
+#stat-card-listen-time .stat-card-value {
+  /* Police légèrement plus petite si la valeur est longue */
+  font-size: 1.3rem;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   SUCCÈS — Notice de persistance automatique
+   ════════════════════════════════════════════════════════════ */
+
+.badge-persist-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-lt);
+  border: 1px solid var(--border-glow);
+  font-size: .8rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  line-height: 1.55;
+}
+
+.badge-persist-notice i {
+  color: var(--accent);
+  font-size: .85rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   BADGE MODAL — Actions : Partager + Télécharger
+   ════════════════════════════════════════════════════════════ */
+
+.bm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.bm-share-btn,
+.bm-export-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: var(--radius-pill);
+  font-size: .84rem;
+  font-weight: 600;
+  transition: all .2s;
+}
+
+.bm-share-btn {
+  background: var(--accent);
+  color: var(--accent-on);
+  box-shadow: var(--shadow-sm);
+}
+
+.bm-share-btn:hover {
+  opacity: .9;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.bm-export-btn {
+  background: var(--accent-lt);
+  color: var(--accent);
+  border: 1.5px solid var(--border-glow);
+}
+
+.bm-export-btn:hover {
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   ONE-HIT WONDER — Info-bulle explicative
+   ════════════════════════════════════════════════════════════ */
+
+/* Bouton ? discret dans l'en-tête de la carte */
+.info-tooltip-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: var(--text-muted);
+  font-size: .78rem;
+  transition: all .15s;
+  vertical-align: middle;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+.info-tooltip-btn:hover {
+  color: var(--accent);
+  background: var(--accent-lt);
+}
+
+/* Bulle explicative — masquée par défaut */
+.ohw-tooltip {
+  display: none;
+  width: 100%;
+}
+
+.ohw-tooltip--visible {
+  display: block;
+  margin-bottom: 12px;
+  animation: fadeInUp .2s ease;
+}
+
+.ohw-tooltip-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-lt);
+  border: 1px solid var(--border-glow);
+  position: relative;
+}
+
+.ohw-tooltip-inner > i {
+  color: var(--accent);
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.ohw-tooltip-inner > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.ohw-tooltip-inner strong {
+  display: block;
+  font-size: .86rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.ohw-tooltip-inner p {
+  font-size: .8rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.ohw-tooltip-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: .75rem;
+  transition: all .15s;
+}
+
+.ohw-tooltip-close:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   WRAPPED — Podium en display:table
+   Corrige les décalages html2canvas avec flexbox
+   ════════════════════════════════════════════════════════════ */
+
+/* Remplacement du flexbox par un layout table */
+.w-podium--table {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 12px 0;
+  margin-bottom: 24px;
+}
+
+.w-pod--cell {
+  display: table-cell;
+  vertical-align: top;
+  text-align: center;
+  width: 33.33%;
+  /* Réinitialiser les propriétés flexbox */
+  flex: none;
+  min-width: auto;
+}
+
+/* Assurer que les images et textes s'affichent correctement en table-cell */
+.w-podium--table .w-pod-lbl {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.w-podium--table .w-pod-img {
+  margin: 0 auto 10px;
+}
+
+.w-podium--table .w-pod-name {
+  display: block;
+}
+
+/* Fallback flexbox si le navigateur ne rend pas bien le table-layout */
+@supports not (display: table) {
+  .w-podium--table {
+    display: flex;
+    gap: 16px;
+  }
+  .w-pod--cell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* Wrapping pour stat temps d'écoute dans le Wrapped */
+.w-nums {
+  gap: 18px;
+}
+
+.w-num strong {
+  font-size: 1.35rem; /* un peu plus petit pour accueillir 4 chiffres */
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   STORY FULL — Podium en display:table
+   Même correction pour html2canvas
+   ════════════════════════════════════════════════════════════ */
+
+.story-full-podium--table {
+  position: relative;
+  z-index: 1;
+  display: table;
+  width: calc(100% - 80px);  /* 80px = 2×40px padding */
+  margin: 0 40px;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 10px 0;
+  flex: 1;
+}
+
+.story-full-pod--cell {
+  display: table-cell;
+  vertical-align: top;
+  text-align: center;
+  width: 33.33%;
+  /* Réinitialiser flex */
+  flex: none;
+}
+
+/* Images et textes dans table-cell */
+.story-full-podium--table .story-full-pod-img {
+  margin: 0 auto 8px;
+}
+
+.story-full-podium--table strong {
+  display: block;
+}
+
+@supports not (display: table) {
+  .story-full-podium--table {
+    display: flex;
+    gap: 16px;
+    padding: 0 40px;
+  }
+  .story-full-pod--cell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   CORRECTION ACCENT — Mode clair / sombre
+   Les variables CSS changent déjà via [data-theme="light"],
+   mais on s'assure que les éléments "hardcodés" s'adaptent.
+   ════════════════════════════════════════════════════════════ */
+
+/*
+   En mode clair, les éléments qui utilisaient --accent (valeur sombre #d0bcff)
+   se retrouvent avec la valeur claire #6750a4 grâce au :root override.
+   Les corrections ci-dessous ciblent les cas où la couleur était codée en dur.
+*/
+
+/* Mode clair : Stat cards — accent strip adapté */
+[data-theme="light"] .stat-card::before {
+  opacity: .5;
+}
+
+/* Mode clair : Hero cards — dégradé overlay adapté (fond plus clair) */
+[data-theme="light"] .hero-card .hc-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0)    15%,
+    rgba(0,0,0,0.45) 55%,
+    rgba(0,0,0,0.9)  100%
+  );
+}
+
+[data-theme="light"] .artist-hero-card .artist-hero-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0)    15%,
+    rgba(0,0,0,0.45) 55%,
+    rgba(0,0,0,0.9)  100%
+  );
+}
+
+/* Mode clair : badge cards — fond correctement adapté */
+[data-theme="light"] .badge-card.unlocked {
+  background: rgba(103,80,164,.07);
+  border-color: var(--accent);
+}
+
+/* Mode clair : badge score card */
+[data-theme="light"] .badge-score-card {
+  background: linear-gradient(135deg, rgba(103,80,164,.08), var(--bg-card));
+  border-color: rgba(103,80,164,.25);
+}
+
+/* Mode clair : bm (badge modal) */
+[data-theme="light"] .badge-modal-inner {
+  background: var(--bg-card);
+  border-color: rgba(103,80,164,.25);
+}
+
+/* Mode clair : compare section */
+[data-theme="light"] .compare-desc {
+  background: rgba(103,80,164,.06);
+  border-color: rgba(103,80,164,.2);
+}
+
+/* Mode clair : OHW tooltip */
+[data-theme="light"] .ohw-tooltip-inner {
+  background: rgba(103,80,164,.06);
+  border-color: rgba(103,80,164,.2);
+}
+
+/* Mode clair : setting-row--highlight */
+[data-theme="light"] .setting-row--highlight {
+  background: rgba(103,80,164,.05);
+  border-color: rgba(103,80,164,.2);
+}
+
+/* Mode clair : badge persist notice */
+[data-theme="light"] .badge-persist-notice {
+  background: rgba(103,80,164,.06);
+  border-color: rgba(103,80,164,.2);
+}
+
+/* Mode clair : vizplus status */
+[data-theme="light"] .vizplus-status {
+  background: rgba(103,80,164,.06);
+  border-color: rgba(103,80,164,.2);
+}
+
+/* Mode clair : hero cards — fond fallback visible */
+[data-theme="light"] .hero-card {
+  background: #e8e0f0;
+}
+
+/* Mode clair : track cover fallback */
+[data-theme="light"] .tracks-list.layout-list .track-cover,
+[data-theme="light"] .tracks-list.layout-compact .track-cover {
+  background: #e8e0f0;
+  color: var(--text-muted);
+}
+
+/* Mode clair : btn update SW */
+[data-theme="light"] .btn-update-sw {
+  background: linear-gradient(135deg, rgba(103,80,164,.15), var(--accent));
+  color: white;
+}
+
+/* Mode clair : story cards — toujours fond sombre (indépendant du thème) */
+.story-mini-card,
+.story-full-card {
+  color-scheme: dark;  /* force les couleurs sombres dans le canvas */
+}
+
+/* Mode auto light */
+@media (prefers-color-scheme: light) {
+  [data-theme="auto"] .badge-card.unlocked {
+    background: rgba(103,80,164,.07);
+    border-color: var(--accent);
+  }
+  [data-theme="auto"] .compare-desc {
+    background: rgba(103,80,164,.06);
+    border-color: rgba(103,80,164,.2);
+  }
+  [data-theme="auto"] .ohw-tooltip-inner {
+    background: rgba(103,80,164,.06);
+    border-color: rgba(103,80,164,.2);
+  }
+  [data-theme="auto"] .setting-row--highlight {
+    background: rgba(103,80,164,.05);
+    border-color: rgba(103,80,164,.2);
+  }
+  [data-theme="auto"] .hero-card {
+    background: #e8e0f0;
+  }
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — Addons v7
+   ════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+  }
+  .ohw-tooltip-inner {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .bm-actions {
+    flex-direction: column;
+  }
+  .bm-share-btn,
+  .bm-export-btn {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .hero-card .hc-name {
+    font-size: .8rem;
+  }
+  .hero-card .hc-sub {
+    font-size: .66rem;
+  }
+  /* Podium Wrapped en colonne sur mobile */
+  .w-podium--table {
+    display: flex;
+    flex-direction: row;
+    border-spacing: 0;
+    gap: 8px;
+  }
+  .w-pod--cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+  }
+}
+

@@ -1,11 +1,11 @@
 /* ============================================================
-   LastStats — Service Worker v5
+   LastStats — Service Worker v7
    Stratégie : Cache-first pour assets statiques
                Network-first pour appels API Last.fm
-   Mis à jour : v5 — support nouvelles sections (Settings, Story v2)
+   Mis à jour : v7 — support force-update, nouvelles sections
    ============================================================ */
 
-const CACHE_NAME    = 'laststats-v5';
+const CACHE_NAME    = 'laststats-v7';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -38,6 +38,16 @@ self.addEventListener('activate', (e) => {
   );
 });
 
+/* ── Message : force-update depuis le client ── */
+self.addEventListener('message', (e) => {
+  if (e.data === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+  if (e.data === 'CLEAR_CACHE') {
+    caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))));
+  }
+});
+
 /* ── Interception des requêtes ── */
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
@@ -60,7 +70,6 @@ self.addEventListener('fetch', (e) => {
       caches.match(e.request).then(cached =>
         cached ||
         fetch(e.request).then(res => {
-          /* Ne mettre en cache que les réponses valides */
           if (!res || res.status !== 200 || res.type === 'opaqueredirect') return res;
           const clone = res.clone();
           caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
@@ -71,16 +80,16 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  /* Fichiers locaux (index.html, style.css, script.js…) → Cache first + fallback réseau */
+  /* Fichiers locaux (index.html, style.css, script.js…) → Network first avec fallback cache */
+  /* Stratégie network-first pour que les mises à jour soient immédiatement visibles */
   e.respondWith(
-    caches.match(e.request).then(cached =>
-      cached ||
-      fetch(e.request).then(res => {
+    fetch(e.request)
+      .then(res => {
         if (!res || res.status !== 200) return res;
         const clone = res.clone();
         caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
         return res;
       })
-    )
+      .catch(() => caches.match(e.request))
   );
 });

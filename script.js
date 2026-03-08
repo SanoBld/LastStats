@@ -583,6 +583,14 @@ async function loadDashboard() {
     }
   } catch { /* non bloquant */ }
 
+  // Estimation du temps d'écoute : scrobbles × 3.5 minutes
+  const listenMinutes = Math.round(totalPlay * 3.5);
+  const listenHours   = Math.floor(listenMinutes / 60);
+  const listenRem     = listenMinutes % 60;
+  const listenTimeStr = listenHours > 0
+    ? `≈ ${formatNum(listenHours)}h ${listenRem}min`
+    : `≈ ${listenRem} min`;
+
   const cards = [
     { icon: '🎵', value: totalPlay, label: 'Total scrobbles', sub: `~${avgPerDay} / jour en moyenne`, color: '#6366f1' },
     { icon: '🎤', value: uniqueArtists, label: 'Artistes écoutés', sub: 'depuis le début', color: '#8b5cf6', noAnim: true },
@@ -591,6 +599,15 @@ async function loadDashboard() {
     { icon: '📅', value: formatDate(regTs), label: 'Membre depuis', sub: `${formatNum(daysSince)} jours d'activité`, color: '#f97316', noAnim: true },
     { icon: '⏱️', value: lastScrobble, label: 'Dernier scrobble', sub: u.url ? `last.fm/user/${u.name}` : '', color: '#22c55e', noAnim: true },
   ];
+
+  // Carte temps d'écoute séparée
+  const ltCard = document.getElementById('stat-card-listen-time');
+  if (ltCard) {
+    const valEl = ltCard.querySelector('.stat-card-value');
+    const subEl = ltCard.querySelector('.stat-card-sub');
+    if (valEl) valEl.textContent = listenTimeStr;
+    if (subEl) subEl.textContent = `Estimation : ${formatNum(totalPlay)} × 3m30s`;
+  }
 
   document.getElementById('stat-grid').innerHTML = cards.map((c, i) => `
     <div class="stat-card" style="--card-accent:${c.color};animation-delay:${i * 0.05}s">
@@ -2059,7 +2076,7 @@ const BadgeEngine = (() => {
 
   // ── Définitions des badges ──
   const BADGE_DEFS = [
-    // --- NOCTAMBULE ---
+    // ─── NOCTAMBULE ─────────────────────────────────────────
     {
       id: 'night_owl', cat: 'noctambule', icon: '🦉', name: 'Oiseau de Nuit',
       desc: 'Nombre d\'écoutes entre 00h et 05h du matin',
@@ -2069,7 +2086,26 @@ const BadgeEngine = (() => {
         return h >= 0 && h < 5;
       }).length,
     },
-    // --- EXPLORATEUR ---
+    {
+      id: 'early_bird', cat: 'noctambule', icon: '🐦', name: 'Lève-Tôt',
+      desc: 'Nombre d\'écoutes entre 05h et 08h du matin',
+      thresholds: thresholds(30),
+      compute: (hist) => hist.filter(t => {
+        const h = new Date(parseInt(t.date?.uts || 0) * 1000).getHours();
+        return h >= 5 && h < 8;
+      }).length,
+    },
+    {
+      id: 'weekend_warrior', cat: 'noctambule', icon: '🎉', name: 'Mélomane du Weekend',
+      desc: 'Nombre d\'écoutes le samedi et le dimanche',
+      thresholds: thresholds(200),
+      compute: (hist) => hist.filter(t => {
+        const d = new Date(parseInt(t.date?.uts || 0) * 1000).getDay();
+        return d === 0 || d === 6;
+      }).length,
+    },
+
+    // ─── EXPLORATION ─────────────────────────────────────────
     {
       id: 'explorer', cat: 'exploration', icon: '🧭', name: 'Explorateur',
       desc: 'Ratio artistes uniques / écoutes totales × 1000',
@@ -2086,19 +2122,32 @@ const BadgeEngine = (() => {
       thresholds: thresholds(50),
       compute: (hist) => new Set(hist.map(t => (t.artist?.['#text'] || t.artist?.name || '').toLowerCase())).size,
     },
-    // --- FIDÉLITÉ ---
+    {
+      id: 'hidden_gems', cat: 'exploration', icon: '💎', name: 'Pépites Musicales',
+      desc: 'Nombre d\'artistes écoutés seulement 1 ou 2 fois (vraies découvertes)',
+      thresholds: thresholds(10),
+      compute: (hist) => {
+        const artistMap = new Map();
+        hist.forEach(t => {
+          const a = (t.artist?.['#text'] || t.artist?.name || '').toLowerCase();
+          if (a) artistMap.set(a, (artistMap.get(a) || 0) + 1);
+        });
+        return [...artistMap.values()].filter(v => v <= 2).length;
+      },
+    },
+
+    // ─── FIDÉLITÉ ─────────────────────────────────────────────
     {
       id: 'loyal', cat: 'fidelite', icon: '💖', name: 'Fidélité',
       desc: 'Max d\'écoutes d\'un même artiste sur 7 jours consécutifs',
       thresholds: thresholds(20),
       compute: (hist) => {
         if (!hist.length) return 0;
-        // Grouper par semaine ISO × artiste
         const weekMap = new Map();
         for (const t of hist) {
           const ts = parseInt(t.date?.uts || 0);
           if (!ts) continue;
-          const d   = new Date(ts * 1000);
+          const d    = new Date(ts * 1000);
           const week = `${d.getFullYear()}-W${Math.ceil((d.getDate() + 6 - (d.getDay() || 7)) / 7)}`;
           const art  = (t.artist?.['#text'] || t.artist?.name || '').toLowerCase();
           const k    = `${week}::${art}`;
@@ -2114,7 +2163,7 @@ const BadgeEngine = (() => {
       compute: (hist) => {
         const dayMap = new Map();
         for (const t of hist) {
-          const ts  = parseInt(t.date?.uts || 0);
+          const ts = parseInt(t.date?.uts || 0);
           if (!ts) continue;
           const d   = new Date(ts * 1000);
           const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}::${(t.artist?.['#text'] || '').toLowerCase()}`;
@@ -2123,7 +2172,18 @@ const BadgeEngine = (() => {
         return Math.max(0, ...[...dayMap.values()]);
       },
     },
-    // --- VOLUME ---
+    {
+      id: 'collector', cat: 'fidelite', icon: '📀', name: 'Collectionneur',
+      desc: 'Nombre d\'albums distincts scrobblés',
+      thresholds: thresholds(20),
+      compute: (hist) => new Set(hist.map(t => {
+        const alb = t.album?.['#text'] || '';
+        const art = t.artist?.['#text'] || t.artist?.name || '';
+        return alb ? `${art}::${alb}`.toLowerCase() : null;
+      }).filter(Boolean)).size,
+    },
+
+    // ─── VOLUME ───────────────────────────────────────────────
     {
       id: 'scrobbler', cat: 'volume', icon: '🎵', name: 'Scrobbler',
       desc: 'Nombre total de scrobbles',
@@ -2139,22 +2199,11 @@ const BadgeEngine = (() => {
         for (const t of hist) {
           const ts = parseInt(t.date?.uts || 0);
           if (!ts) continue;
-          const d  = new Date(ts * 1000);
-          const k  = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+          const d = new Date(ts * 1000);
+          const k = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
           dayMap.set(k, (dayMap.get(k) || 0) + 1);
         }
         return Math.max(0, ...[...dayMap.values()]);
-      },
-    },
-    // --- DIVERSITÉ ---
-    {
-      id: 'diversified', cat: 'diversite', icon: '🌈', name: 'Éclectique',
-      desc: 'Nombre de genres distincts écoutés (via mood tags en cache)',
-      thresholds: thresholds(5),
-      compute: () => {
-        // Approximation : genres identifiés dans le mood tags cache
-        const moods = document.querySelectorAll('.mood-tag');
-        return moods.length;
       },
     },
     {
@@ -2162,6 +2211,59 @@ const BadgeEngine = (() => {
       desc: 'Streak record (jours consécutifs d\'écoute)',
       thresholds: thresholds(7),
       compute: () => APP.streakData?.best || 0,
+    },
+    {
+      id: 'record_day', cat: 'volume', icon: '📈', name: 'Journée Record',
+      desc: 'Nombre total de journées avec plus de 50 scrobbles',
+      thresholds: thresholds(5),
+      compute: (hist) => {
+        const dayMap = new Map();
+        for (const t of hist) {
+          const ts = parseInt(t.date?.uts || 0);
+          if (!ts) continue;
+          const d = new Date(ts * 1000);
+          const k = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+          dayMap.set(k, (dayMap.get(k) || 0) + 1);
+        }
+        return [...dayMap.values()].filter(v => v >= 50).length;
+      },
+    },
+    {
+      id: 'listen_time', cat: 'volume', icon: '⏳', name: 'Audiophile Chronomètre',
+      desc: 'Estimation du temps d\'écoute total (heures)',
+      thresholds: thresholds(100),
+      compute: (hist) => Math.round(hist.length * 3.5 / 60),
+    },
+
+    // ─── DIVERSITÉ ────────────────────────────────────────────
+    {
+      id: 'diversified', cat: 'diversite', icon: '🌈', name: 'Éclectique',
+      desc: 'Nombre de genres distincts présents dans vos mood tags',
+      thresholds: thresholds(5),
+      compute: () => document.querySelectorAll('.mood-tag').length,
+    },
+    {
+      id: 'genre_curious', cat: 'diversite', icon: '🎭', name: 'Curieux des Genres',
+      desc: 'Nombre de mois distincts ayant au moins 1 scrobble',
+      thresholds: thresholds(6),
+      compute: (hist) => new Set(hist.map(t => {
+        const ts = parseInt(t.date?.uts || 0);
+        if (!ts) return null;
+        const d = new Date(ts * 1000);
+        return `${d.getFullYear()}-${d.getMonth()}`;
+      }).filter(Boolean)).size,
+    },
+    {
+      id: 'multilingual', cat: 'diversite', icon: '🌍', name: 'Globe-Trotter Musical',
+      desc: 'Nombre de titres avec des artistes dont le nom contient des caractères non-latins',
+      thresholds: thresholds(5),
+      compute: (hist) => {
+        const nonLatin = /[^\u0000-\u007F\u00C0-\u024F]/;
+        return new Set(hist.filter(t => {
+          const a = t.artist?.['#text'] || t.artist?.name || '';
+          return nonLatin.test(a);
+        }).map(t => (t.artist?.['#text'] || t.artist?.name || '').toLowerCase())).size;
+      },
     },
   ];
 
@@ -3404,15 +3506,21 @@ async function openArtistModal(artistName, artistUrl, userPlays) {
       if (bio) {
         const bioEl = document.getElementById('am-bio');
         bioEl.textContent = bio;
-        bioEl.classList.remove('hidden');
-        // Afficher "Lire la suite" si le texte est long
+        // Toujours appliquer la classe collapsed — le CSS gère le max-height
+        bioEl.classList.add('am-bio--collapsed');
+        bioEl.classList.remove('expanded', 'hidden');
+        // Afficher "Lire la suite" uniquement si texte long
         if (bio.length > 280) {
           const tog = document.getElementById('am-bio-toggle');
-          tog.classList.remove('hidden');
+          if (tog) {
+            tog.classList.remove('hidden', 'expanded');
+            tog.innerHTML = 'Lire la suite <i class="fas fa-chevron-down"></i>';
+          }
         }
       } else {
-        document.getElementById('am-bio').textContent = 'Aucune biographie disponible.';
-        document.getElementById('am-bio').classList.remove('hidden');
+        const bioEl = document.getElementById('am-bio');
+        bioEl.textContent = 'Aucune biographie disponible.';
+        bioEl.classList.remove('am-bio--collapsed', 'hidden');
       }
     } else {
       document.getElementById('am-bio-loading').classList.add('hidden');
@@ -3488,9 +3596,9 @@ function toggleArtistBio() {
   const togEl = document.getElementById('am-bio-toggle');
   if (!bioEl || !togEl) return;
 
-  const expanded = bioEl.classList.toggle('expanded');
-  togEl.classList.toggle('expanded', expanded);
-  togEl.innerHTML = expanded
+  const isExpanded = bioEl.classList.toggle('expanded');
+  togEl.classList.toggle('expanded', isExpanded);
+  togEl.innerHTML = isExpanded
     ? 'Réduire <i class="fas fa-chevron-up"></i>'
     : 'Lire la suite <i class="fas fa-chevron-down"></i>';
 }
@@ -3751,6 +3859,8 @@ function setAlbumsLayout(layout) {
   if (grid) {
     grid.className = grid.className.replace(/\blayout-\S+/g, '').trim();
     grid.classList.add('layout-' + layout);
+    // Activer hero-grid uniquement en mode grille
+    grid.classList.toggle('hero-grid', layout === 'grid');
   }
 
   document.querySelectorAll('#albums-layout-toggle .layout-btn').forEach(b =>
@@ -3770,14 +3880,53 @@ function setAlbumsLayout(layout) {
 }
 
 function _buildAlbumCard(a, rank) {
-  const imgUrl = a.image?.find(img => img.size === 'extralarge')?.['#text'] || '';
-  const hasImg = !isDefaultImg(imgUrl);
-  const letter = (a.name || '?')[0].toUpperCase();
-  const bg     = nameToGradient((a.name || '') + (a.artist?.name || ''));
-  const safeUrl= (a.url || '#').replace(/'/g, '%27');
+  const imgUrl  = a.image?.find(img => img.size === 'extralarge')?.['#text']
+               || a.image?.find(img => img.size === 'large')?.['#text'] || '';
+  const hasImg  = !isDefaultImg(imgUrl);
+  const letter  = (a.name || '?')[0].toUpperCase();
+  const bg      = nameToGradient((a.name || '') + (a.artist?.name || ''));
+  const safeUrl = (a.url || '#').replace(/'/g, '%27');
+  const spQ     = encodeURIComponent((a.name || '') + ' ' + (a.artist?.name || ''));
+  const ytQ     = encodeURIComponent((a.name || '') + ' ' + (a.artist?.name || ''));
+  const delay   = Math.min(rank % 20, 10) * 0.04;
 
+  // Layout courant
+  const layout = APP.albumsLayout || 'grid';
+
+  if (layout === 'grid') {
+    // ── Hero Card (image plein fond + texte en surimpression) ──
+    return `
+      <div class="hero-card" style="animation-delay:${delay}s"
+           onclick="window.open('${safeUrl}','_blank')">
+        <div class="hc-img">
+          ${hasImg
+            ? `<img src="${imgUrl}" alt="${escHtml(a.name)}" loading="lazy"
+                   onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+            : ''}
+          <div class="hc-fallback" style="background:${bg};display:${hasImg ? 'none' : 'flex'}">
+            ${letter}
+          </div>
+          <div class="hc-overlay"></div>
+          <div class="hc-rank">${rank}</div>
+          <div class="hc-body">
+            <div class="hc-name" title="${escHtml(a.name)}">${escHtml(a.name)}</div>
+            <div class="hc-sub">${escHtml(a.artist?.name || '')}</div>
+            <div class="hc-plays">${formatNum(a.playcount)} écoutes</div>
+            <div class="hc-actions">
+              <a class="mc-play-btn sp" href="spotify:search:${spQ}"
+                 onclick="event.stopPropagation()" title="Spotify"><i class="fab fa-spotify"></i></a>
+              <a class="mc-play-btn yt" href="https://www.youtube.com/results?search_query=${ytQ}"
+                 target="_blank" rel="noopener" onclick="event.stopPropagation()" title="YouTube">
+                <i class="fab fa-youtube"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  // ── Mode liste / compact ── card classique
   return `
-    <div class="music-card" style="animation-delay:${Math.min(rank % 20, 10) * 0.04}s"
+    <div class="music-card" style="animation-delay:${delay}s"
          onclick="window.open('${safeUrl}','_blank')">
       <div class="music-card-img" style="height:160px">
         ${hasImg
@@ -3808,8 +3957,9 @@ window.loadTopAlbums = async function(period) {
   const loader  = document.getElementById('albums-page-loader');
   const sentinel= document.getElementById('albums-scroll-sentinel');
 
-  // Appliquer le layout persisté
+  // Appliquer le layout persisté + hero-grid si mode grille
   grid.className = `music-grid layout-${APP.albumsLayout}`;
+  if (APP.albumsLayout === 'grid') grid.classList.add('hero-grid');
   grid.innerHTML = skeletonMusicCards(12);
   if (loader) loader.classList.add('hidden');
 
@@ -4337,7 +4487,7 @@ async function _buildSunburst() {
     .text(d => d.data.name.length > 10 ? d.data.name.slice(0, 10) + '…' : d.data.name);
 }
 
-/* Étendre loadVizPlus pour inclure le Sunburst après le Radar */
+/* Visualisations avancées : Radar + Sunburst uniquement (Treemap et Sankey supprimés) */
 const _origLoadVizPlus = loadVizPlus;
 window.loadVizPlus = async function() {
   const statusEl  = document.getElementById('vizplus-status');
@@ -4354,16 +4504,10 @@ window.loadVizPlus = async function() {
     if (statusTxt) statusTxt.textContent = 'Construction du Sunburst…';
     await _buildSunburst();
 
-    if (statusTxt) statusTxt.textContent = 'Construction du Treemap Top 100…';
-    await _buildTreemap();
-
-    if (statusTxt) statusTxt.textContent = 'Calcul des flux d\'écoute (Sankey)…';
-    await _buildSankey();
-
     if (statusEl) statusEl.classList.add('hidden');
     showToast('Visualisations générées !');
   } catch (e) {
-    console.error('loadVizPlus v5:', e);
+    console.error('loadVizPlus v7:', e);
     if (statusTxt) statusTxt.textContent = 'Erreur : ' + e.message;
     setTimeout(() => statusEl?.classList.add('hidden'), 3000);
   } finally {
@@ -4696,4 +4840,470 @@ document.addEventListener('DOMContentLoaded', () => {
     b.classList.toggle('active', b.dataset.layout === APP.albumsLayout)
   );
 }, { once: true });
+
+
+
+/* ════════════════════════════════════════════════════════════
+   LASTSTATS — ADDONS v7
+   Nouvelles fonctions : SW force-update · OHW tooltip ·
+   Listening time Wrapped · Period comparison redesign ·
+   Badge share/export · Wrapped listen time
+   ════════════════════════════════════════════════════════════ */
+
+
+/* ── 1. FORCE SW UPDATE ─────────────────────────────────────── */
+
+/**
+ * Vide tous les caches Service Worker, désenregistre le SW
+ * et recharge la page pour forcer la dernière version.
+ */
+async function forceSwUpdate() {
+  const btn = document.getElementById('sw-update-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mise à jour…';
+  }
+
+  try {
+    // 1. Vider les caches SW
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    }
+
+    // 2. Désenregistrer tous les Service Workers
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map(reg => reg.unregister()));
+    }
+
+    // 3. Vider aussi le cache applicatif Last.fm
+    Cache.clear();
+
+    showToast('Caches vidés — rechargement…');
+    await sleep(800);
+
+    // 4. Recharger sans cache
+    window.location.reload(true);
+
+  } catch (e) {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-sync-alt"></i> Forcer la mise à jour';
+    }
+    showToast('Erreur mise à jour : ' + e.message, 'error');
+  }
+}
+
+
+/* ── 2. ONE-HIT WONDER TOOLTIP ──────────────────────────────── */
+
+/**
+ * Affiche/masque la bulle d'information sur la statistique
+ * One-Hit Wonder dans la section Stats Avancées.
+ */
+function toggleOhwTooltip() {
+  const tooltip = document.getElementById('ohw-tooltip');
+  if (!tooltip) return;
+  tooltip.classList.toggle('ohw-tooltip--visible');
+}
+
+/** Ferme le tooltip OHW */
+function closeOhwTooltip() {
+  document.getElementById('ohw-tooltip')?.classList.remove('ohw-tooltip--visible');
+}
+
+// Fermer le tooltip si clic hors de la zone
+document.addEventListener('click', (e) => {
+  const tooltip = document.getElementById('ohw-tooltip');
+  const btn     = document.querySelector('.info-tooltip-btn');
+  if (!tooltip || !btn) return;
+  if (!tooltip.contains(e.target) && !btn.contains(e.target)) {
+    tooltip.classList.remove('ohw-tooltip--visible');
+  }
+});
+
+
+/* ── 3. LISTENING TIME — WRAPPED ────────────────────────────── */
+
+/**
+ * Formate un nombre de scrobbles en temps d'écoute estimé.
+ * Hypothèse : 1 scrobble = 3,5 minutes en moyenne.
+ * @param {number} scrobbles
+ * @returns {string}  ex. "≈ 312h 30min"
+ */
+function estimateListenTime(scrobbles) {
+  const totalMin  = Math.round(scrobbles * 3.5);
+  const hours     = Math.floor(totalMin / 60);
+  const minutes   = totalMin % 60;
+  if (hours > 0) return `≈ ${formatNum(hours)}h ${minutes}min`;
+  return `≈ ${minutes} min`;
+}
+
+/**
+ * Met à jour le widget temps d'écoute du Wrapped
+ * après chaque chargement de l'année.
+ */
+function updateWrappedListenTime() {
+  const scrobblesEl = document.getElementById('w-scrobbles');
+  const ltEl        = document.getElementById('w-listen-time');
+  if (!scrobblesEl || !ltEl) return;
+
+  // Récupérer la valeur textuelle des scrobbles (ex. "12 345")
+  const raw = scrobblesEl.textContent.replace(/\s/g, '').replace(/\u202f/g, '');
+  const n   = parseInt(raw) || 0;
+  if (n <= 0) return;
+
+  ltEl.textContent = estimateListenTime(n);
+}
+
+// Patcher loadWrapped pour mettre à jour le temps d'écoute après chargement
+const _origLoadWrapped = window.loadWrapped || loadWrapped;
+window.loadWrapped = async function(year) {
+  await _origLoadWrapped(year);
+  updateWrappedListenTime();
+};
+
+
+/* ── 4. PERIOD COMPARISON — UI AMÉLIORÉE ───────────────────── */
+
+/**
+ * Labels lisibles pour chaque période Last.fm
+ */
+const PERIOD_LABELS = {
+  '7day':    'Cette semaine',
+  '1month':  'Ce mois',
+  '3month':  '3 derniers mois',
+  '6month':  '6 derniers mois',
+  '12month': 'Cette année',
+  'overall': 'Depuis toujours',
+};
+
+/**
+ * Retourne un label "vs" pour la période précédente
+ */
+const PERIOD_VS_LABELS = {
+  '7day':    'La semaine dernière',
+  '1month':  'Le mois dernier',
+  '3month':  'Les 3 mois précédents',
+  '6month':  'Les 6 mois précédents',
+  '12month': 'L\'année dernière',
+  'overall': 'Depuis toujours',
+};
+
+/**
+ * Version améliorée de loadPeriodComparison.
+ * Affiche labels clairs + description de ce que l'on compare.
+ */
+async function loadPeriodComparison() {
+  const selA  = document.getElementById('compare-period-a');
+  const selB  = document.getElementById('compare-period-b');
+  const resEl = document.getElementById('compare-results');
+  const ldEl  = document.getElementById('compare-loading');
+  const descEl= document.getElementById('compare-desc');
+
+  if (!selA || !selB) return;
+
+  const periodA = selA.value;
+  const periodB = selB.value || _prevPeriodKey(periodA);
+
+  // Mettre à jour la description
+  const labelA = PERIOD_LABELS[periodA]   || periodA;
+  const labelB = PERIOD_VS_LABELS[periodA] || PERIOD_LABELS[periodB] || periodB;
+  if (descEl) {
+    descEl.innerHTML = `<strong>${labelA}</strong> <span class="compare-vs-icon">vs</span> <strong>${labelB}</strong>`;
+  }
+
+  // Mettre à jour les tags de période dans les colonnes
+  const tagA = document.getElementById('cmp-period-tag-a');
+  const tagB = document.getElementById('cmp-period-tag-b');
+  if (tagA) tagA.textContent = labelA;
+  if (tagB) tagB.textContent = labelB;
+
+  if (resEl)  resEl.classList.add('hidden');
+  if (ldEl)   ldEl.classList.remove('hidden');
+
+  try {
+    const prevPeriod = _prevPeriodKey(periodA);
+    const [dataA, dataB, topArtistsB] = await Promise.all([
+      API.call('user.getTopArtists', { period: periodA, limit: 1 }),
+      API.call('user.getTopArtists', { period: prevPeriod, limit: 1 }),
+      API.call('user.getTopArtists', { period: prevPeriod, limit: 3 }),
+    ]);
+
+    const totalA   = parseInt(dataA.topartists?.['@attr']?.total || 0);
+    const totalB   = parseInt(dataB.topartists?.['@attr']?.total || 0);
+    const scDiff   = totalA - totalB;
+    const scPct    = totalB > 0 ? ((scDiff / totalB) * 100).toFixed(1) : null;
+
+    const top1A = dataA.topartists?.artist?.[0]?.name || '—';
+    const top1B = (topArtistsB.topartists?.artist || [])[0]?.name || '—';
+
+    // Estimation temps d'écoute
+    const listenA = estimateListenTime(totalA);
+    const listenB = estimateListenTime(totalB);
+
+    // Injecter les valeurs
+    _setCompareMetric('cmp-scrobbles-a', formatNum(totalA));
+    _setCompareMetric('cmp-scrobbles-b', formatNum(totalB));
+    _setCompareDelta('cmp-scrobbles-delta', scDiff, scPct);
+
+    _setCompareMetric('cmp-artists-a', top1A);
+    _setCompareMetric('cmp-artists-b', top1B);
+
+    // Listening time
+    const ltAEl = document.getElementById('cmp-listen-a');
+    const ltBEl = document.getElementById('cmp-listen-b');
+    if (ltAEl) ltAEl.textContent = listenA;
+    if (ltBEl) ltBEl.textContent = listenB;
+
+    if (resEl) resEl.classList.remove('hidden');
+
+  } catch (e) {
+    showToast('Erreur comparaison : ' + e.message, 'error');
+    console.warn('loadPeriodComparison v7:', e);
+  } finally {
+    if (ldEl) ldEl.classList.add('hidden');
+  }
+}
+
+
+/* ── 5. BADGE SHARE / EXPORT ────────────────────────────────── */
+
+/**
+ * Partage un badge sous forme d'image via Web Share API
+ * ou téléchargement direct si non disponible.
+ * @param {string} badgeId
+ */
+async function shareBadgeAsImage(badgeId) {
+  await _captureBadgeAsImage(badgeId, 'share');
+}
+
+/**
+ * Télécharge un badge sous forme d'image PNG.
+ * @param {string} badgeId
+ */
+async function exportBadgeAsImage(badgeId) {
+  await _captureBadgeAsImage(badgeId, 'download');
+}
+
+/**
+ * Génère une image PNG d'un badge et la partage ou télécharge.
+ * @param {string} badgeId  - ID du badge à capturer
+ * @param {'share'|'download'} mode
+ */
+async function _captureBadgeAsImage(badgeId, mode) {
+  const results = window._badgeResults || [];
+  const b       = results.find(r => r.id === badgeId);
+  if (!b) { showToast('Badge introuvable', 'error'); return; }
+
+  // Construire un élément de capture temporaire
+  const canvas_container = document.createElement('div');
+  canvas_container.id    = 'badge-export-canvas';
+  canvas_container.style.cssText = [
+    'position:fixed', 'left:-9999px', 'top:0',
+    'width:360px', 'height:360px',
+    'background:linear-gradient(135deg,#1a1033,#0f0a1e)',
+    'display:flex', 'flex-direction:column',
+    'align-items:center', 'justify-content:center',
+    'gap:16px', 'padding:32px', 'border-radius:24px',
+    'font-family:Inter,sans-serif',
+  ].join(';');
+
+  const tierClass = b.unlocked && b.tier ? `tier-${b.tier.key}` : '';
+  const tierLabel = b.unlocked && b.tier ? `${b.tier.icon} ${b.tier.label}` : '🔒 Non débloqué';
+  const accentColor = b.tier?.key === 'elite' ? '#a78bfa' :
+                      b.tier?.key === 'diamant' ? '#60a5fa' :
+                      b.tier?.key === 'or' ? '#fbbf24' :
+                      b.tier?.key === 'argent' ? '#94a3b8' : '#cd7f32';
+
+  canvas_container.innerHTML = `
+    <div style="font-size:72px;line-height:1">${b.icon}</div>
+    <div style="color:#fff;font-size:22px;font-weight:700;text-align:center">${escHtml(b.name)}</div>
+    <div style="background:${accentColor}22;color:${accentColor};font-size:14px;font-weight:600;
+                padding:6px 16px;border-radius:99px;border:1px solid ${accentColor}55">
+      ${tierLabel}
+    </div>
+    <div style="color:rgba(255,255,255,.55);font-size:12px;text-align:center;max-width:240px">
+      ${escHtml(b.desc)}
+    </div>
+    <div style="color:rgba(255,255,255,.35);font-size:11px;margin-top:12px">LastStats · last.fm</div>
+  `;
+
+  document.body.appendChild(canvas_container);
+
+  try {
+    // Attendre les polices
+    if (document.fonts?.ready) await document.fonts.ready;
+    await sleep(120);
+
+    const canvas = await html2canvas(canvas_container, {
+      scale: 2, useCORS: true, allowTaint: true,
+      backgroundColor: null, logging: false,
+      width: 360, height: 360,
+    });
+
+    document.body.removeChild(canvas_container);
+
+    if (mode === 'share' && navigator.share && navigator.canShare) {
+      // Convertir en blob pour Web Share
+      canvas.toBlob(async (blob) => {
+        if (!blob) { downloadCanvas(canvas, `badge-${b.id}.png`); return; }
+        const file = new File([blob], `badge-${b.id}.png`, { type: 'image/png' });
+        try {
+          await navigator.share({
+            title: `Succès : ${b.name}`,
+            text: `J'ai débloqué le badge "${b.name}" sur LastStats !`,
+            files: [file],
+          });
+        } catch {
+          downloadCanvas(canvas, `badge-${b.id}.png`);
+        }
+      }, 'image/png');
+    } else {
+      downloadCanvas(canvas, `badge-${b.id}.png`);
+      showToast('Badge téléchargé !');
+    }
+
+  } catch (e) {
+    if (document.body.contains(canvas_container)) document.body.removeChild(canvas_container);
+    showToast('Erreur export badge : ' + e.message, 'error');
+    console.error('_captureBadgeAsImage:', e);
+  }
+}
+
+/* Patcher showBadgeModal pour brancher les boutons Share/Export */
+const _origShowBadgeModal = showBadgeModal;
+window.showBadgeModal = function(badgeId) {
+  _origShowBadgeModal(badgeId);
+
+  // Brancher les boutons de la modale (ajoutés dans le HTML v7)
+  const shareBtn  = document.getElementById('bm-share-btn');
+  const exportBtn = document.getElementById('bm-export-btn');
+
+  if (shareBtn)  shareBtn.onclick  = () => shareBadgeAsImage(badgeId);
+  if (exportBtn) exportBtn.onclick = () => exportBadgeAsImage(badgeId);
+};
+
+
+/* ── 6. WRAPPED — LISTENING TIME VISIBLE ────────────────────── */
+
+/* Patcher loadWrapped pour injecter le temps d'écoute */
+const _origWrappedV7 = window.loadWrapped;
+window.loadWrapped = async function(year) {
+  await _origWrappedV7(year);
+
+  // Mettre à jour la carte temps d'écoute dans Wrapped
+  const scrobblesEl = document.getElementById('w-scrobbles');
+  const ltEl        = document.getElementById('w-listen-time');
+  if (scrobblesEl && ltEl) {
+    const raw = parseInt(scrobblesEl.textContent.replace(/[\s\u202f]/g, '')) || 0;
+    if (raw > 0) ltEl.textContent = estimateListenTime(raw);
+  }
+};
+
+
+/* ── 7. OBSCURITÉ — ONE-HIT WONDER EXPLANATION ──────────────── */
+
+/* Patcher renderOneHitWonders pour ajouter un texte explicatif */
+const _origRenderOHW = renderOneHitWonders;
+window.renderOneHitWonders = function(names, artistMap) {
+  _origRenderOHW(names, artistMap);
+
+  // Injecter la notice explicative si absente
+  const ohwSection = document.getElementById('ohw-list')?.closest('.adv-chart-card');
+  if (!ohwSection) return;
+
+  let notice = ohwSection.querySelector('.ohw-explain');
+  if (!notice) {
+    notice = document.createElement('p');
+    notice.className = 'ohw-explain';
+    notice.style.cssText = 'color:var(--text-muted);font-size:.82rem;margin:8px 0 0;line-height:1.5';
+    notice.innerHTML = '💡 Un <strong>One-Hit Wonder</strong> est un artiste que vous n\'avez écouté qu\'une à trois fois en tout. Ces écoutes isolées révèlent vos découvertes musicales passagères.';
+    const list = document.getElementById('ohw-list');
+    if (list) list.insertAdjacentElement('beforebegin', notice);
+  }
+};
+
+
+/* ── 8. ACCENT — CORRECTION MODE CLAIR ──────────────────────── */
+
+/*
+ * Surcharge setTheme pour forcer la recalculation de l'accent
+ * quand le thème change, évitant les violets résiduels en mode clair.
+ */
+const _origSetTheme = setTheme;
+window.setTheme = function(theme) {
+  _origSetTheme(theme);
+
+  // Re-appliquer l'accent courant avec les variantes adaptées au thème
+  const currentAccent = APP.currentAccent || localStorage.getItem('ls_accent') || 'purple';
+  if (currentAccent && currentAccent !== 'dynamic') {
+    setAccent(currentAccent);
+  }
+};
+
+
+/* ── 9. INIT — BRANCHER LES NOUVELLES FONCTIONNALITÉS ────────── */
+
+const _origInitAppV7 = window.initApp;
+window.initApp = async function() {
+  await _origInitAppV7();
+
+  // Restaurer l'accent depuis localStorage
+  const savedAccent = localStorage.getItem('ls_accent') || 'purple';
+  APP.currentAccent = savedAccent;
+  if (savedAccent !== 'dynamic') setAccent(savedAccent);
+
+  // Synchroniser le bouton SW update
+  const swBtn = document.getElementById('sw-update-btn');
+  if (swBtn) swBtn.onclick = forceSwUpdate;
+
+  // Mettre à jour le temps d'écoute sur le dashboard
+  const totalPlay = parseInt(APP.userInfo?.playcount || 0);
+  if (totalPlay > 0) {
+    const ltCard = document.getElementById('stat-card-listen-time');
+    if (ltCard) {
+      const valEl = ltCard.querySelector('.stat-card-value');
+      const subEl = ltCard.querySelector('.stat-card-sub');
+      if (valEl) valEl.textContent = estimateListenTime(totalPlay);
+      if (subEl) subEl.textContent = `Estimation : ${formatNum(totalPlay)} × 3m30s`;
+    }
+  }
+};
+
+
+/* ── 10. DOM CONTENT LOADED — accents + SW install prompt ─────── */
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Restaurer accent avant login
+  const savedAccent = localStorage.getItem('ls_accent') || 'purple';
+  APP.currentAccent = savedAccent;
+
+  // PWA install prompt
+  let _deferredInstall = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    _deferredInstall = e;
+    const btn = document.getElementById('pwa-install-btn');
+    if (btn) btn.classList.remove('hidden');
+  });
+
+  const installBtn = document.getElementById('pwa-install-btn');
+  if (installBtn) {
+    installBtn.addEventListener('click', async () => {
+      if (!_deferredInstall) return;
+      _deferredInstall.prompt();
+      const { outcome } = await _deferredInstall.userChoice;
+      if (outcome === 'accepted') showToast('Application installée !');
+      _deferredInstall = null;
+    });
+  }
+
+  // Bouton SW update dans les settings
+  const swBtn = document.getElementById('sw-update-btn');
+  if (swBtn) swBtn.addEventListener('click', forceSwUpdate);
+
+}, { once: false });
+
 
