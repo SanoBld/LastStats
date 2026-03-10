@@ -746,7 +746,7 @@ canvas#w-mini { height: 60px !important; }
 .w-yr-badge {
   font-size: 2.2rem; font-weight: 900; letter-spacing: -.04em;
   background: linear-gradient(135deg, #fff, rgba(255,255,255,.7));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; flex-shrink: 0;
+  background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; flex-shrink: 0;
 }
 .w-title h2 { font-size: 1.1rem; font-weight: 700; color: rgba(255,255,255,.95); margin-bottom: 4px; }
 .w-title p { font-size: .82rem; color: rgba(255,255,255,.55); }
@@ -1151,7 +1151,6 @@ canvas#w-mini { height: 60px !important; }
 
 /* Conteneur catégories */
 .badges-container { display: flex; flex-direction: column; gap: 28px; }
-.badge-category {}
 .badge-cat-title {
   font-size: .95rem; font-weight: 700; margin-bottom: 4px;
   display: flex; align-items: center; gap: 8px; color: var(--text-dim);
@@ -3026,7 +3025,6 @@ canvas#w-mini { height: 60px !important; }
 @media (max-width: 640px) {
   .tracks-controls { gap: 6px; }
   .layout-toggle { display: none; } /* masqué sur très petit écran */
-  .story-mini-card { /* scaled down via JS pour html2canvas */ }
   .compare-hd .ic-hd { font-size: .78rem; }
   .am-albums { grid-template-columns: repeat(3, 1fr); }
 }
