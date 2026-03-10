@@ -1,23 +1,72 @@
 {
   "name": "LastStats — Statistiques Last.fm",
   "short_name": "LastStats",
-  "description": "Vos statistiques musicales Last.fm, réinventées.",
+  "description": "Vos statistiques musicales Last.fm, réinventées : dashboard, graphiques et succès.",
   "start_url": "./index.html",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "minimal-ui"],
   "orientation": "portrait-primary",
   "background_color": "#141218",
   "theme_color": "#d0bcff",
-  "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icons/icon-180.png", "sizes": "180x180", "type": "image/png" },
-    { "src": "icons/icon-152.png", "sizes": "152x152", "type": "image/png" },
-    { "src": "icons/icon-32.png",  "sizes": "32x32",   "type": "image/png" }
-  ],
-  "categories": ["music", "entertainment"],
+  "categories": ["music", "entertainment", "utilities"],
   "lang": "fr",
   "dir": "ltr",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "icons/icon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
   "shortcuts": [
-    { "name": "Dashboard", "url": "./index.html", "description": "Ouvrir le tableau de bord" }
+    {
+      "name": "Tableau de bord",
+      "short_name": "Dashboard",
+      "url": "./index.html#dashboard",
+      "description": "Voir mes statistiques globales",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Top Artistes",
+      "short_name": "Artistes",
+      "url": "./index.html#top-artists",
+      "description": "Mes artistes les plus écoutés",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
   ]
 }

@@ -1,95 +1,103 @@
 /* ============================================================
-   LastStats — Service Worker v7
-   Stratégie : Cache-first pour assets statiques
-               Network-first pour appels API Last.fm
-   Mis à jour : v7 — support force-update, nouvelles sections
+   LastStats — Service Worker v8
+   Design System : Material You (M3)
+   Stratégies : 
+     - API & App : Network-First (Priorité données fraîches)
+     - Images & Libs : Cache-First (Performance & Data)
    ============================================================ */
 
-const CACHE_NAME    = 'laststats-v7';
-const STATIC_ASSETS = [
+const CACHE_NAME = 'laststats-v8';
+const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './style.css',
   './script.js',
   './manifest.json',
+  'https://cdn.jsdelivr.net/npm/chart.js' // On met en cache la lib des graphiques
 ];
 
-/* ── Installation : mise en cache des assets statiques ── */
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(STATIC_ASSETS))
-      .then(() => self.skipWaiting())
+// 1. INSTALLATION : Mise en cache initiale
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('[SW] Mise en cache des ressources critiques');
+      return cache.addAll(ASSETS_TO_CACHE);
+    }).then(() => self.skipWaiting())
   );
 });
 
-/* ── Activation : suppression des anciens caches ── */
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys()
-      .then(keys =>
-        Promise.all(
-          keys
-            .filter(k => k !== CACHE_NAME)
-            .map(k => caches.delete(k))
-        )
-      )
-      .then(() => self.clients.claim())
+// 2. ACTIVATION : Nettoyage des anciens caches
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.filter((key) => key !== CACHE_NAME)
+            .map((key) => caches.delete(key))
+      );
+    }).then(() => self.clients.claim())
   );
 });
 
-/* ── Message : force-update depuis le client ── */
-self.addEventListener('message', (e) => {
-  if (e.data === 'SKIP_WAITING') {
+// 3. MESSAGES : Gestion des commandes forcées
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') {
     self.skipWaiting();
   }
-  if (e.data === 'CLEAR_CACHE') {
-    caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))));
+  if (event.data === 'CLEAR_CACHE') {
+    caches.keys().then(keys => {
+      keys.forEach(key => caches.delete(key));
+    });
   }
 });
 
-/* ── Interception des requêtes ── */
-self.addEventListener('fetch', (e) => {
-  const url = new URL(e.request.url);
+// 4. STRATÉGIES DE REQUÊTES (FETCH)
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
 
-  /* API Last.fm → Network first, jamais mis en cache (données live) */
+  // --- A. API LAST.FM (Données Live) ---
+  // Stratégie : Network Only (On ne cache jamais les stats qui changent tout le temps)
   if (url.hostname === 'ws.audioscrobbler.com') {
-    e.respondWith(
-      fetch(e.request).catch(() =>
-        new Response('{"error":503,"message":"Service indisponible"}', {
-          headers: { 'Content-Type': 'application/json' },
-        })
-      )
-    );
-    return;
-  }
-
-  /* CDN externes (Chart.js, D3, FontAwesome, html2canvas…) → Cache first */
-  if (url.hostname !== location.hostname && url.hostname !== '') {
-    e.respondWith(
-      caches.match(e.request).then(cached =>
-        cached ||
-        fetch(e.request).then(res => {
-          if (!res || res.status !== 200 || res.type === 'opaqueredirect') return res;
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
-          return res;
-        })
-      )
-    );
-    return;
-  }
-
-  /* Fichiers locaux (index.html, style.css, script.js…) → Network first avec fallback cache */
-  /* Stratégie network-first pour que les mises à jour soient immédiatement visibles */
-  e.respondWith(
-    fetch(e.request)
-      .then(res => {
-        if (!res || res.status !== 200) return res;
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
-        return res;
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        return new Response(JSON.stringify({ error: 503, message: 'Hors ligne' }), {
+          headers: { 'Content-Type': 'application/json' }
+        });
       })
-      .catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
+  // --- B. IMAGES & COVERS (Pochettes d'albums) ---
+  // Stratégie : Cache-First (Une pochette d'album ne change jamais, on économise la data)
+  if (event.request.destination === 'image' || url.hostname.includes('lastfm.freetls.fastly.net')) {
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        return cached || fetch(event.request).then((response) => {
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+          }
+          return response;
+        });
+      })
+    );
+    return;
+  }
+
+  // --- C. RESSOURCES LOCALES (HTML, CSS, JS) ---
+  // Stratégie : Network-First avec Fallback Cache
+  // On veut la version la plus récente du code, mais on affiche le cache si pas de réseau.
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        if (!response || response.status !== 200) return response;
+        
+        // Mise à jour du cache en arrière-plan
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+        
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
