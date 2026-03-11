@@ -493,13 +493,6 @@ canvas { max-width: 100%; }
   }
 }
 
-/* ── Compatibilité descendante — règles mortes conservées pour éviter les 404 dans devtools ── */
-.fetch-modal,
-.fetch-prog-bar,
-.fetch-prog-wrap,
-.fetch-prog-meta,
-.fetch-sub { /* styles hérités — désactivés, la nouvelle barre les remplace */ }
-
 
 /* ============================================================ APP LAYOUT ============================================================ */
 #app { display: flex; min-height: 100vh; position: relative; z-index: 1; background: var(--bg); }
@@ -4908,13 +4901,43 @@ canvas#w-mini { height: 60px !important; }
   }
 }
 
-/* ── Barre fetch — ajustement hauteur header sur mobile ── */
-/* Quand la barre est visible, le header de l'app doit descendre */
+
 body.fetch-active .app-hd {
-  top: 53px; /* hauteur approximative de la barre */
+  top: 53px; 
   transition: top .3s cubic-bezier(.4,0,.2,1);
 }
 body.fetch-active .sidebar {
   top: 53px;
+}
+
+#progress-wrap {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    
+    height: 64px; 
+    
+    z-index: 99999;
+    
+ 
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    background: var(--bg-header); 
+    border-bottom: 1px solid var(--accent-lt);
+    margin: 0 !important;
+}
+
+
+#progress-wrap.hidden {
+    display: none !important;
+}
+
+.app-hd {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000;
 }
 
