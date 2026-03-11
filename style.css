@@ -269,50 +269,237 @@ canvas { max-width: 100%; }
 }
 .help-note i { color: var(--accent); flex-shrink: 0; margin-top: 2px; }
 
-/* ============================================================ FETCH OVERLAY ============================================================ */
-#fetch-overlay {
-  position: fixed; inset: 0; z-index: 9999;
-  background: rgba(0,0,0,0.82);
-  display: flex; align-items: center; justify-content: center;
-  padding: 24px;
-}
-.fetch-modal {
-  max-width: 420px; width: 100%; border-radius: var(--radius);
-  padding: 40px 32px; text-align: center;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-lg);
-}
-.fetch-icon {
-  width: 80px; height: 80px; margin: 0 auto 24px;
-  position: relative; display: flex; align-items: center; justify-content: center;
-}
-.fetch-icon i {
-  font-size: 2rem; color: var(--accent);
-}
-.fetch-ring {
-  position: absolute; inset: 0; border-radius: 50%;
-  border: 2px solid var(--bg-hover);
-  border-top-color: var(--accent);
-  border-right-color: var(--accent-2);
-  animation: spin 1s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+/* ============================================================
+   FETCH — BARRE NON-INTRUSIVE (remplace l'overlay bloquant)
+   État normal  : barre fine collée en haut de l'écran
+   État réduit  : pill flottante bas-droite
+   Le JS bascule entre les deux via .fetch-overlay--minimized
+   ============================================================ */
 
-.fetch-modal h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; }
-.fetch-modal p { color: var(--text-muted); font-size: .9rem; margin-bottom: 20px; }
-.fetch-prog-wrap { margin-bottom: 10px; }
-.fetch-prog-bar {
-  height: 6px; border-radius: 99px; background: var(--bg-hover);
-  overflow: hidden; margin-bottom: 8px;
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fetchBarSlideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+@keyframes fetchPillPop {
+  from { transform: scale(.7) translateY(12px); opacity: 0; }
+  to   { transform: scale(1)  translateY(0);    opacity: 1; }
+}
+
+/* ── Conteneur racine ── */
+#fetch-overlay {
+  /* En mode normal : barre en haut (pas d'inset, pas de fond plein écran) */
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 9999;
+  pointer-events: none; /* l'UI reste cliquable DERRIÈRE */
+}
+
+/* ── Barre normale ── */
+.fetch-bar {
+  pointer-events: all;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-glow);
+  padding: 10px 16px 10px 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.35);
+  animation: fetchBarSlideDown .3s cubic-bezier(.4,0,.2,1) both;
+  /* La barre s'affiche sur TOUTE la largeur — y compris derrière la sidebar */
+  padding-left: calc(var(--sb-width) + 16px);
+}
+
+/* Sur mobile la sidebar est hors écran → pas de padding gauche étendu */
+@media (max-width: 900px) {
+  .fetch-bar { padding-left: 16px; }
+}
+
+/* Barre de progression — liseré en bas de la barre */
+.fetch-bar-progress {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--bg-hover);
 }
 .fetch-prog-fill {
-  height: 100%; width: 0%; border-radius: 99px;
+  height: 100%;
+  width: 0%;
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  transition: width .4s ease;
+  transition: width .45s cubic-bezier(.4,0,.2,1);
+  border-radius: 0 2px 2px 0;
 }
-.fetch-prog-meta { display: flex; justify-content: space-between; font-size: .8rem; color: var(--text-muted); }
-.fetch-sub { font-size: .8rem; color: var(--text-muted); margin-top: 6px; }
+
+/* Icône pulse */
+.fetch-bar-icon {
+  flex-shrink: 0;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--accent-lt);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent);
+  font-size: .85rem;
+}
+.fetch-bar-icon i {
+  animation: spin 2.5s linear infinite;
+}
+
+/* Textes */
+.fetch-bar-texts {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.fetch-bar-title {
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fetch-bar-msg {
+  font-size: .74rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Méta droite */
+.fetch-bar-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.fetch-pct-badge {
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 36px;
+  text-align: right;
+}
+.fetch-tracks-lbl,
+.fetch-sub-lbl {
+  font-size: .74rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+/* masquer les détails trop verbeux sur mobile */
+@media (max-width: 600px) {
+  .fetch-tracks-lbl,
+  .fetch-sub-lbl { display: none; }
+}
+
+/* Bouton réduire */
+.fetch-min-btn {
+  pointer-events: all;
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--bg-hover);
+  color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .75rem;
+  transition: background .2s, color .2s, transform .2s;
+  border: 1px solid var(--border);
+}
+.fetch-min-btn:hover {
+  background: var(--accent-lt);
+  color: var(--accent);
+  transform: scale(1.1);
+}
+
+/* ── Pill (état réduit) — masquée par défaut ── */
+.fetch-pill {
+  display: none;
+}
+
+/* ── État minimisé ── */
+#fetch-overlay.fetch-overlay--minimized .fetch-bar {
+  display: none;
+}
+#fetch-overlay.fetch-overlay--minimized {
+  /* Repositionne le conteneur en bas à droite pour la pill */
+  top: auto;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 90px);
+  left: auto;
+  right: 16px;
+  width: auto;
+}
+#fetch-overlay.fetch-overlay--minimized .fetch-pill {
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius-pill);
+  padding: 8px 14px 8px 10px;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  animation: fetchPillPop .25s cubic-bezier(.34,1.56,.64,1) both;
+}
+#fetch-overlay.fetch-overlay--minimized .fetch-pill:hover {
+  background: var(--bg-hover);
+}
+
+/* Spinner dans la pill */
+.fetch-pill-spinner {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--bg-hover);
+  border-top-color: var(--accent);
+  animation: spin .8s linear infinite;
+  flex-shrink: 0;
+}
+.fetch-pill-text {
+  font-size: .78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.fetch-pill-pct {
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 30px;
+  text-align: right;
+}
+
+/* ── Mode clair ── */
+[data-theme="light"] .fetch-bar {
+  background: #ffffff;
+  border-bottom-color: rgba(103,80,164,.25);
+  box-shadow: 0 2px 12px rgba(0,0,0,.1);
+}
+[data-theme="light"] #fetch-overlay.fetch-overlay--minimized .fetch-pill {
+  background: #ffffff;
+  border-color: rgba(103,80,164,.25);
+  box-shadow: 0 4px 14px rgba(0,0,0,.12);
+}
+@media (prefers-color-scheme: light) {
+  [data-theme="auto"] .fetch-bar {
+    background: #ffffff;
+    border-bottom-color: rgba(103,80,164,.25);
+    box-shadow: 0 2px 12px rgba(0,0,0,.1);
+  }
+  [data-theme="auto"] #fetch-overlay.fetch-overlay--minimized .fetch-pill {
+    background: #ffffff;
+    border-color: rgba(103,80,164,.25);
+  }
+}
+
+/* ── Compatibilité descendante — règles mortes conservées pour éviter les 404 dans devtools ── */
+.fetch-modal,
+.fetch-prog-bar,
+.fetch-prog-wrap,
+.fetch-prog-meta,
+.fetch-sub { /* styles hérités — désactivés, la nouvelle barre les remplace */ }
+
 
 /* ============================================================ APP LAYOUT ============================================================ */
 #app { display: flex; min-height: 100vh; position: relative; z-index: 1; background: var(--bg); }
@@ -3661,11 +3848,7 @@ canvas#w-mini { height: 60px !important; }
   border-top-color: var(--accent);
 }
 
-/* Mode clair : fetch modal */
-[data-theme="light"] .fetch-modal {
-  background: #ffffff;
-  border-color: rgba(73,69,79,.15);
-}
+/* Mode clair : fetch bar (géré dans le bloc FETCH ci-dessus) */
 
 /* Mode clair : year select */
 [data-theme="light"] .yr-sel,
@@ -4665,5 +4848,73 @@ canvas#w-mini { height: 60px !important; }
     align-items: center;
     flex: 1;
   }
+}
+
+
+
+/* ════════════════════════════════════════════════════════════
+   NOUVEAUX COMPOSANTS v5.1
+   · btn-wrapped-link  (lien Wrapped dans Paramètres)
+   · Corrections noms i18n (barre fetch)
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Lien Wrapped — bouton tonal M3 ── */
+.btn-wrapped-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-container);
+  color: var(--accent-on-cont);
+  font-size: .875rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background .2s, transform .15s, box-shadow .2s;
+  box-shadow: var(--shadow-sm);
+}
+.btn-wrapped-link i {
+  font-size: .8rem;
+}
+.btn-wrapped-link:hover {
+  background: var(--accent);
+  color: var(--accent-on);
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md), 0 0 0 3px var(--accent-lt);
+}
+.btn-wrapped-link:active {
+  transform: translateY(0);
+}
+
+/* Mode clair */
+[data-theme="light"] .btn-wrapped-link {
+  background: var(--accent-container);
+  color: var(--accent-on-cont);
+}
+[data-theme="light"] .btn-wrapped-link:hover {
+  background: var(--accent);
+  color: #ffffff;
+}
+@media (prefers-color-scheme: light) {
+  [data-theme="auto"] .btn-wrapped-link {
+    background: var(--accent-container);
+    color: var(--accent-on-cont);
+  }
+  [data-theme="auto"] .btn-wrapped-link:hover {
+    background: var(--accent);
+    color: #ffffff;
+  }
+}
+
+/* ── Barre fetch — ajustement hauteur header sur mobile ── */
+/* Quand la barre est visible, le header de l'app doit descendre */
+body.fetch-active .app-hd {
+  top: 53px; /* hauteur approximative de la barre */
+  transition: top .3s cubic-bezier(.4,0,.2,1);
+}
+body.fetch-active .sidebar {
+  top: 53px;
 }
 
