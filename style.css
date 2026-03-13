@@ -675,6 +675,13 @@ canvas { max-width: 100%; }
   animation: pulse-badge 2s ease infinite;
 }
 
+/* 7-item bottom nav — tighter on narrow screens */
+@media (max-width: 480px) {
+  .bn-item { font-size: .58rem; padding: 6px 2px; gap: 2px; }
+  .bn-item i { font-size: .95rem; }
+  .bn-item.active i { width: 38px; height: 24px; }
+}
+
 
 /* ============================================================
    8. SECTION SYSTEM
@@ -1180,6 +1187,7 @@ canvas#w-mini { height: 60px !important; }
 .tracks-list.layout-grid .track-item { flex-direction: column; align-items: flex-start; padding: 14px; gap: 8px; border-radius: var(--radius); transform: none; }
 .tracks-list.layout-grid .track-item:hover { transform: translateY(-3px); }
 .tracks-list.layout-grid .track-rank  { font-size: .72rem; color: var(--accent); font-weight: 800; min-width: auto; }
+.tracks-list.layout-grid .track-info  { width: 100%; min-width: 0; }
 .tracks-list.layout-grid .track-bar-wrap { width: 100%; }
 .tracks-list.layout-grid .track-plays { min-width: auto; text-align: left; font-size: .78rem; }
 .tracks-list.layout-grid .track-cover { width: 100%; aspect-ratio: 1; border-radius: var(--radius-sm); overflow: hidden; background: var(--bg-hover); display: block; }
