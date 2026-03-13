@@ -1,7 +1,7 @@
 {
-  "name": "LastStats — Statistiques Last.fm",
+  "name": "LastStats — Statistiques Last.fm (BETA)",
   "short_name": "LastStats",
-  "description": "Vos statistiques musicales Last.fm, réinventées : dashboard, graphiques et succès.",
+  "description": "An open-source project developed with passion by a beginner developer. This is a beta version created to learn and improve, while offering you a new and simple way to explore your Last.fm statistics.",
   "start_url": "./index.html",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "minimal-ui"],
@@ -59,14 +59,14 @@
       "short_name": "Dashboard",
       "url": "./index.html#dashboard",
       "description": "Voir mes statistiques globales",
-      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "icons/icon-512.png", "sizes": "512x512" }]
     },
     {
       "name": "Top Artistes",
       "short_name": "Artistes",
       "url": "./index.html#top-artists",
       "description": "Mes artistes les plus écoutés",
-      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "icons/icon-512.png", "sizes": "512x512" }]
     }
   ]
 }
