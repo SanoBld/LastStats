@@ -78,6 +78,10 @@ const TRANSLATIONS = {
     weekDays:['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'],
     months:['Janv','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sept','Oct','Nov','Déc'],
     yearbadgeArchive:'Archives',yearbadgeCurrent:'Cette année',
+    gcSimilar:'Artistes similaires',gcAvgPlays:'Moy. mondiale/auditeur',gcUserVsAvg:'Tes écoutes vs moy.',gcRealMins:'Minutes réelles',gcTop3Label:'Tes 3 artistes',gcTrackUserPlay:'Tes écoutes titre #1',
+    streakEyebrow:'Streak',streakTitle:'Ta flamme',streakUnit:'jours',streakLabel:'consécutifs',streakPeriod:'Période',streakNone:'Données insuffisantes.',
+    vibeEyebrow:'Profil',vibeTitle:'Ton vibe',vibeIntensityLabel:'Intensité',vibeTimeLabel:'Moment',vibeGenreLabel:'Genres',vibeTopGenreLabel:'Genre dominant',
+    vibeTypes:{extreme:'Acharné·e',passionate:'Passionné·e',regular:'Régulier·ère',casual:'Éclectique'},
   },
   en:{
     waitTitle:'Come back on January 1st',
@@ -132,6 +136,10 @@ const TRANSLATIONS = {
     weekDays:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
     months:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
     yearbadgeArchive:'Archive',yearbadgeCurrent:'Current',
+    gcSimilar:'Similar artists',gcAvgPlays:'Avg global/listener',gcUserVsAvg:'Your plays vs avg',gcRealMins:'Real minutes',gcTop3Label:'Your 3 artists',gcTrackUserPlay:'Your #1 track plays',
+    streakEyebrow:'Streak',streakTitle:'Your Flame',streakUnit:'days',streakLabel:'in a row',streakPeriod:'Period',streakNone:'Not enough data.',
+    vibeEyebrow:'Profile',vibeTitle:'Your Vibe',vibeIntensityLabel:'Intensity',vibeTimeLabel:'Time Slot',vibeGenreLabel:'Genres',vibeTopGenreLabel:'Top Genre',
+    vibeTypes:{extreme:'Devoted',passionate:'Passionate',regular:'Regular',casual:'Casual'},
   },
   es:{
     waitTitle:'Vuelve el 1 de enero',
@@ -169,6 +177,10 @@ const TRANSLATIONS = {
     weekDays:['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],
     months:['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
     yearbadgeArchive:'Archivo',yearbadgeCurrent:'Actual',
+    gcSimilar:'Artistas similares',gcAvgPlays:'Media global/oyente',gcUserVsAvg:'Tus escuchas vs media',gcRealMins:'Minutos reales',gcTop3Label:'Tus 3 artistas',gcTrackUserPlay:'Tus escuchas canción #1',
+    streakEyebrow:'Racha',streakTitle:'Tu llama',streakUnit:'días',streakLabel:'consecutivos',streakPeriod:'Período',streakNone:'Datos insuficientes.',
+    vibeEyebrow:'Perfil',vibeTitle:'Tu vibe',vibeIntensityLabel:'Intensidad',vibeTimeLabel:'Momento',vibeGenreLabel:'Géneros',vibeTopGenreLabel:'Género top',
+    vibeTypes:{extreme:'Fanático',passionate:'Apasionado',regular:'Regular',casual:'Casual'},
   },
   de:{
     waitTitle:'Komm am 1. Januar zurück',
@@ -205,6 +217,10 @@ const TRANSLATIONS = {
     weekDays:['Mo','Di','Mi','Do','Fr','Sa','So'],
     months:['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'],
     yearbadgeArchive:'Archiv',yearbadgeCurrent:'Aktuell',
+    gcSimilar:'Ähnliche Künstler',gcAvgPlays:'Globaler Ø/Hörer',gcUserVsAvg:'Deine Plays vs Ø',gcRealMins:'Echte Minuten',gcTop3Label:'Deine 3 Künstler',gcTrackUserPlay:'Deine Plays Track #1',
+    streakEyebrow:'Streak',streakTitle:'Deine Flamme',streakUnit:'Tage',streakLabel:'am Stück',streakPeriod:'Zeitraum',streakNone:'Nicht genug Daten.',
+    vibeEyebrow:'Profil',vibeTitle:'Dein Vibe',vibeIntensityLabel:'Intensität',vibeTimeLabel:'Zeitraum',vibeGenreLabel:'Genres',vibeTopGenreLabel:'Top Genre',
+    vibeTypes:{extreme:'Leidenschaftlich',passionate:'Begeistert',regular:'Regelmäßig',casual:'Entspannt'},
   },
   pt:{
     waitTitle:'Volta no dia 1 de janeiro',
@@ -241,6 +257,10 @@ const TRANSLATIONS = {
     weekDays:['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
     months:['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
     yearbadgeArchive:'Arquivo',yearbadgeCurrent:'Atual',
+    gcSimilar:'Artistas similares',gcAvgPlays:'Média global/ouvinte',gcUserVsAvg:'Tuas repr. vs média',gcRealMins:'Minutos reais',gcTop3Label:'Os teus 3 artistas',gcTrackUserPlay:'As tuas repr. música #1',
+    streakEyebrow:'Sequência',streakTitle:'A tua chama',streakUnit:'dias',streakLabel:'consecutivos',streakPeriod:'Período',streakNone:'Dados insuficientes.',
+    vibeEyebrow:'Perfil',vibeTitle:'O teu vibe',vibeIntensityLabel:'Intensidade',vibeTimeLabel:'Momento',vibeGenreLabel:'Géneros',vibeTopGenreLabel:'Género top',
+    vibeTypes:{extreme:'Dedicado',passionate:'Apaixonado',regular:'Regular',casual:'Casual'},
   },
   it:{
     waitTitle:'Torna il 1 gennaio',
@@ -277,6 +297,10 @@ const TRANSLATIONS = {
     weekDays:['Lun','Mar','Mer','Gio','Ven','Sab','Dom'],
     months:['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'],
     yearbadgeArchive:'Archivio',yearbadgeCurrent:'Attuale',
+    gcSimilar:'Artisti simili',gcAvgPlays:'Media globale/ascoltatore',gcUserVsAvg:'I tuoi ascolti vs media',gcRealMins:'Minuti reali',gcTop3Label:'I tuoi 3 artisti',gcTrackUserPlay:'I tuoi ascolti brano #1',
+    streakEyebrow:'Streak',streakTitle:'La tua fiamma',streakUnit:'giorni',streakLabel:'consecutivi',streakPeriod:'Periodo',streakNone:'Dati insufficienti.',
+    vibeEyebrow:'Profilo',vibeTitle:'Il tuo vibe',vibeIntensityLabel:'Intensità',vibeTimeLabel:'Momento',vibeGenreLabel:'Generi',vibeTopGenreLabel:'Genere top',
+    vibeTypes:{extreme:'Accanito',passionate:'Appassionato',regular:'Regolare',casual:'Rilassato'},
   },
   ja:{
     waitTitle:'1月1日にまた来てください',
@@ -313,6 +337,10 @@ const TRANSLATIONS = {
     weekDays:['月','火','水','木','金','土','日'],
     months:['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
     yearbadgeArchive:'アーカイブ',yearbadgeCurrent:'今年',
+    gcSimilar:'似ているアーティスト',gcAvgPlays:'グローバル平均/リスナー',gcUserVsAvg:'あなたの再生数vs平均',gcRealMins:'実際の分数',gcTop3Label:'あなたのトップ3',gcTrackUserPlay:'あなたの#1曲の再生',
+    streakEyebrow:'ストリーク',streakTitle:'あなたの炎',streakUnit:'日',streakLabel:'連続',streakPeriod:'期間',streakNone:'データ不足.',
+    vibeEyebrow:'プロフィール',vibeTitle:'あなたのバイブ',vibeIntensityLabel:'強度',vibeTimeLabel:'時間帯',vibeGenreLabel:'ジャンル',vibeTopGenreLabel:'主要ジャンル',
+    vibeTypes:{extreme:'献身的',passionate:'情熱的',regular:'定期的',casual:'気軽'},
   },
   zh:{
     waitTitle:'请于1月1日回来',
@@ -349,6 +377,10 @@ const TRANSLATIONS = {
     weekDays:['周一','周二','周三','周四','周五','周六','周日'],
     months:['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
     yearbadgeArchive:'存档',yearbadgeCurrent:'当前',
+    gcSimilar:'相似艺术家',gcAvgPlays:'全球平均/听众',gcUserVsAvg:'你的播放vs平均',gcRealMins:'实际分钟',gcTop3Label:'你的3位艺术家',gcTrackUserPlay:'你的#1曲目播放',
+    streakEyebrow:'连续',streakTitle:'你的火焰',streakUnit:'天',streakLabel:'连续不断',streakPeriod:'时间段',streakNone:'数据不足.',
+    vibeEyebrow:'个性',vibeTitle:'你的氛围',vibeIntensityLabel:'强度',vibeTimeLabel:'时段',vibeGenreLabel:'流派',vibeTopGenreLabel:'主要流派',
+    vibeTypes:{extreme:'狂热',passionate:'热情',regular:'规律',casual:'随性'},
   },
 };
 
@@ -360,6 +392,8 @@ function setLang(code) {
   T = TRANSLATIONS[code] || TRANSLATIONS.fr;
   try { localStorage.setItem('ls_lang', code); } catch {}
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === code));
+  // Mettre à jour l'attribut lang sur <html> pour l'accessibilité
+  document.documentElement.lang = code;
   applyLangToDOM();
 }
 function applyLangToDOM() {
@@ -382,6 +416,7 @@ function applyLangToDOM() {
   s('step-profile-lbl', T.stepProfile); s('step-top-lbl', T.stepTop);
   s('step-images-lbl', T.stepImages); s('step-history-lbl', T.stepHistory);
   s('step-compare-lbl', T.stepCompare);
+  s('share-heading', T.shareViewTitle||'Wrapped partagé');
   s('share-sub', T.shareViewSub); s('share-enter-txt', T.shareEnter); s('share-own-link', T.shareOwnLink);
   s('modal-share-title', T.shareModal); s('modal-share-sub', T.shareModalSub);
   s('modal-copy-link-lbl', T.shareCopy); s('modal-web-share-lbl', T.shareVia);
@@ -567,7 +602,9 @@ const STORE = {
   habitMonthPeak: { month: -1, plays: 0 },
   recordDay: null,     // { date, plays, tracks }
   gotAwayArtist: null, // { name, img, before, after }
-  globalStats: {},     // { listeners, playcount, userListeners, percentile }
+  globalStats: {},
+  streak: null,        // { days, startDate, endDate }
+  dayMap: null,     // { listeners, playcount, userListeners, percentile }
   isReadOnly: false,
   readOnlyData: null,
   // Helpers
@@ -575,7 +612,7 @@ const STORE = {
   get regYear() { const ts = parseInt(this.user?.registered?.unixtime || 0); return ts ? new Date(ts*1000).getFullYear() : null; },
   get avatar() { return getImg(this.user?.image || [], 'extralarge','large','medium'); },
   get artist1() { return this.artists[0] || null; },
-  get listenMins() { return Math.round(this.annualPlays * 3.5); },
+  get listenMins() { return this.annualMins || Math.round(this.annualPlays * 3.5); },
   get listenHours() { return Math.round(this.listenMins / 60); },
   get avgPerDay() { return Math.round(this.annualPlays / 365 * 10) / 10; },
   get listenerType() { const a = this.avgPerDay; if (a >= 30) return 'extreme'; if (a >= 15) return 'passionate'; if (a >= 5) return 'regular'; return 'casual'; },
@@ -663,12 +700,16 @@ async function loadAllData(onProgress) {
     ...top5Art.slice(0,3).map(a => LASTFM.call('artist.getTopTags', { artist: a.name, autocorrect: 1 }).catch(() => null)),
     // Infos artiste (images via artist.getTopAlbums)
     ...top5Art.map(a => LASTFM.call('artist.getTopAlbums', { artist: a.name, limit: 3, autocorrect: 1 }).catch(() => null)),
-    // artist.getInfo pour global stats (top 1 artiste)
-    LASTFM.call('artist.getInfo', { artist: top5Art[0]?.name || '', autocorrect: 1 }).catch(() => null),
+    // artist.getInfo pour global stats (top 1 artiste) + userplaycount
+    LASTFM.call('artist.getInfo', { artist: top5Art[0]?.name || '', autocorrect: 1, username: STORE.username }).catch(() => null),
+    // artist.getSimilar pour artiste #1 (diversité / profil)
+    LASTFM.call('artist.getSimilar', { artist: top5Art[0]?.name || '', limit: 6, autocorrect: 1 }).catch(() => null),
+    // artist.getInfo artiste #2 pour comparaison
+    LASTFM.call('artist.getInfo', { artist: top5Art[1]?.name || top5Art[0]?.name || '', autocorrect: 1, username: STORE.username }).catch(() => null),
     // album.getInfo pour images albums
     ...top5Alb.map(a => LASTFM.call('album.getInfo', { artist: a.artist?.name || '', album: a.name, autocorrect: 1 }).catch(() => null)),
-    // track.getInfo pour images titres
-    ...top5Trk.map(t => LASTFM.call('track.getInfo', { artist: t.artist?.name || '', track: t.name, autocorrect: 1 }).catch(() => null)),
+    // track.getInfo pour images titres + durée
+    ...top5Trk.map(t => LASTFM.call('track.getInfo', { artist: t.artist?.name || '', track: t.name, autocorrect: 1, username: STORE.username }).catch(() => null)),
   ];
 
   const results = await Promise.all(enrichJobs);
@@ -703,16 +744,41 @@ async function loadAllData(onProgress) {
     const ai = artInfoRes.artist;
     const globalListeners = parseInt(ai.stats?.listeners || 0);
     const globalPlays     = parseInt(ai.stats?.playcount || 0);
-    const userListeners   = parseInt(ai.stats?.userplaycount || STORE.artists[0]?.playcount || 0);
-    // Percentile approximatif (formule log inversée)
-    const percentile = globalListeners > 0
-      ? Math.max(1, Math.min(99, Math.round(100 - (userListeners / Math.max(1, globalListeners * 0.001)) * 100))).toString()
-      : '—';
-    STORE.globalStats = { listeners: globalListeners, playcount: globalPlays, userListeners, percentile };
+    const userPlaycount   = parseInt(ai.stats?.userplaycount || STORE.artists[0]?.playcount || 0);
+    // Percentile amélioré : comparaison logarithmique réaliste
+    let percentile = '—';
+    if (globalListeners > 0 && userPlaycount > 0) {
+      // avg plays par auditeur mondial
+      const avgPlays = globalListeners > 0 ? globalPlays / globalListeners : 100;
+      const ratio = userPlaycount / Math.max(1, avgPlays);
+      // Plus le ratio est élevé, plus le percentile est petit (meilleur)
+      const raw = Math.round(100 - Math.min(99, ratio * 12));
+      percentile = String(Math.max(1, raw));
+    }
+    STORE.globalStats = {
+      listeners: globalListeners, playcount: globalPlays,
+      userPlaycount, percentile,
+      avgPlaysPerListener: globalListeners > 0 ? Math.round(globalPlays / globalListeners) : 0,
+      artistTags: (artInfoRes.artist.tags?.tag || []).slice(0,3).map(t=>t.name),
+    };
     if (STORE.artists[0]) {
       STORE.artists[0]._listeners = globalListeners;
       STORE.artists[0]._globalPlays = globalPlays;
+      STORE.artists[0]._userPlaycount = userPlaycount;
     }
+  }
+  // getSimilar artiste #1
+  const similarRes = results[ri]; ri++;
+  if (similarRes?.similarartists?.artist) {
+    STORE.globalStats.similar = (similarRes.similarartists.artist || []).slice(0,5).map(a=>a.name);
+  }
+  // artist.getInfo artiste #2
+  const art2InfoRes = results[ri]; ri++;
+  if (art2InfoRes?.artist && STORE.artists[1]) {
+    const ai2 = art2InfoRes.artist;
+    STORE.artists[1]._listeners = parseInt(ai2.stats?.listeners || 0);
+    STORE.artists[1]._globalPlays = parseInt(ai2.stats?.playcount || 0);
+    STORE.artists[1]._userPlaycount = parseInt(ai2.stats?.userplaycount || STORE.artists[1]?.playcount || 0);
   }
 
   // Album images (album.getInfo)
@@ -725,12 +791,29 @@ async function loadAllData(onProgress) {
   }
   ri += top5Alb.length;
 
-  // Track images (track.getInfo)
+  // Track images + durée (track.getInfo)
+  let totalDurSec = 0, durCount = 0;
   for (let i = 0; i < top5Trk.length; i++) {
     const res = results[ri + i];
-    if (res?.track?.album?.image) {
-      if (STORE.tracks[i]) STORE.tracks[i].image = res.track.album.image;
+    if (!res?.track) continue;
+    if (res.track.album?.image && STORE.tracks[i]) {
+      STORE.tracks[i].image = res.track.album.image;
     }
+    const dur = parseInt(res.track.duration || 0);
+    if (dur > 30000) { totalDurSec += dur / 1000; durCount++; } // dur en ms
+    else if (dur > 30) { totalDurSec += dur; durCount++; } // dur en s
+    if (STORE.tracks[i]) {
+      STORE.tracks[i]._globalListeners = parseInt(res.track.listeners || 0);
+      STORE.tracks[i]._globalPlays = parseInt(res.track.playcount || 0);
+      STORE.tracks[i]._userPlaycount = parseInt(res.track.userplaycount || 0);
+    }
+  }
+  // Recalculer les minutes avec durée réelle si possible
+  if (durCount >= 2) {
+    const avgDurSec = totalDurSec / durCount;
+    STORE._realAvgDurSec = Math.round(avgDurSec);
+    // écoutes × durée moyenne (en min)
+    STORE.annualMins = Math.round(STORE.annualPlays * avgDurSec / 60);
   }
 
   setLoaderStep('images', 'done');
@@ -803,6 +886,33 @@ async function loadTemporalData(from, to) {
     STORE.recordDay = { date: new Date(y, m-1, d), plays };
   }
 
+  // Streak — jours consécutifs
+  STORE.dayMap = dayMap;
+  const sortedDays = Object.keys(dayMap).sort();
+  let maxStreak = 0, curStreak = 0, curStart = null, bestStart = null, bestEnd = null;
+  for (let i = 0; i < sortedDays.length; i++) {
+    const d = new Date(sortedDays[i] + 'T00:00:00');
+    const prev = i > 0 ? new Date(sortedDays[i-1] + 'T00:00:00') : null;
+    const isConsec = prev && Math.round((d - prev) / 86400000) === 1;
+    if (isConsec) {
+      curStreak++;
+    } else {
+      if (curStreak > maxStreak) {
+        maxStreak = curStreak;
+        bestStart = curStart;
+        bestEnd = i > 0 ? new Date(sortedDays[i-1] + 'T00:00:00') : curStart;
+      }
+      curStreak = 1;
+      curStart = d;
+    }
+  }
+  if (curStreak > maxStreak) {
+    maxStreak = curStreak;
+    bestStart = curStart;
+    bestEnd = sortedDays.length ? new Date(sortedDays[sortedDays.length-1] + 'T00:00:00') : curStart;
+  }
+  STORE.streak = { days: maxStreak, startDate: bestStart, endDate: bestEnd };
+
   // The One That Got Away
   // Artiste le plus scrobblé en H1 mais quasi absent en H2
   const candidates = Object.entries(artistFirstH)
@@ -838,11 +948,19 @@ async function loadGlobalTrackStats() {
    ═══════════════════════════════════════════════════════════════ */
 function generateSharePayload() {
   return {
-    v: 1,
+    v: 2,
     u: STORE.username,
     y: WRAPPED_YEAR,
     sc: STORE.annualPlays,
-    ar: STORE.artists.slice(0, 5).map(a => ({ n: a.name, p: a.playcount, i: a._img || '' })),
+    min: STORE.listenMins,
+    tags: STORE.tags.slice(0, 8),
+    av: STORE.avatar || '',
+    pct: STORE.globalStats?.percentile || '—',
+    sim: STORE.globalStats?.similar || [],
+    ar: STORE.artists.slice(0, 5).map(a => ({
+      n: a.name, p: a.playcount, i: a._img || '',
+      gl: a._globalPlays || 0, li: a._listeners || 0,
+    })),
     al: STORE.albums.slice(0, 5).map(a => ({
       n: a.name, ar: a.artist?.name || '', p: a.playcount,
       i: getImg(a.image, 'extralarge','large','medium'),
@@ -850,10 +968,8 @@ function generateSharePayload() {
     tr: STORE.tracks.slice(0, 5).map(t => ({
       n: t.name, ar: t.artist?.name || t.artist || '', p: t.playcount,
       i: getImg(t.image, 'extralarge','large','medium'),
+      gp: t._globalPlays || 0,
     })),
-    min: STORE.listenMins,
-    tags: STORE.tags.slice(0, 5),
-    av: STORE.avatar || '',
   };
 }
 
@@ -882,10 +998,14 @@ function populateStoreFromShareData(data) {
   STORE.readOnlyData = data;
   STORE.username = data.u || '—';
   STORE.annualPlays = data.sc || 0;
+  STORE.annualMins = data.min || 0;
   WRAPPED_YEAR = data.y || new Date().getFullYear() - 1;
   STORE.tags = data.tags || [];
   STORE.user = { name: data.u, image: data.av ? [{ size: 'extralarge', '#text': data.av }] : [] };
-  STORE.artists = (data.ar || []).map(a => ({ name: a.n, playcount: a.p, _img: a.i, image: [] }));
+  STORE.artists = (data.ar || []).map(a => ({
+    name: a.n, playcount: a.p, _img: a.i, image: [],
+    _globalPlays: a.gl || 0, _listeners: a.li || 0,
+  }));
   STORE.albums  = (data.al || []).map(a => ({
     name: a.n, artist: { name: a.ar }, playcount: a.p,
     image: a.i ? [{ size:'extralarge','#text':a.i },{ size:'large','#text':a.i }] : [],
@@ -893,8 +1013,16 @@ function populateStoreFromShareData(data) {
   STORE.tracks  = (data.tr || []).map(t => ({
     name: t.n, artist: { name: t.ar }, playcount: t.p,
     image: t.i ? [{ size:'extralarge','#text':t.i }] : [],
+    _globalPlays: t.gp || 0,
   }));
   STORE.artist1Img = STORE.artists[0]?._img || '';
+  STORE.globalStats = { percentile: data.pct || '—', similar: data.sim || [], listeners: 0, playcount: 0 };
+  // Pre-warm image cache for screenshots in read-only mode
+  STORE._shareImages = [
+    ...STORE.artists.map(a => a._img).filter(Boolean),
+    ...STORE.albums.map(a => a.image?.[0]?.['#text']).filter(Boolean),
+    ...STORE.tracks.map(t => t.image?.[0]?.['#text']).filter(Boolean),
+  ];
 }
 
 /* ─ Copier dans le presse-papier ─ */
@@ -1012,7 +1140,7 @@ function buildNumbers() {
       </div>
       <div class="stat-card stat-card--wide" id="stat-minutes">
         <span class="stat-value">${fmtNum(STORE.listenMins)}</span>
-        <span class="stat-label">${T.lblMinutes}</span>
+        <span class="stat-label">${T.lblMinutes}${STORE._realAvgDurSec ? ' ✓' : ''}</span>
       </div>
       <div class="stat-card stat-card--wide" id="stat-days">
         <span class="stat-value">${fmtNum(days)}</span>
@@ -1032,8 +1160,8 @@ function buildTopArtists() {
   const podiumCols = ORDER.map(di => {
     const a = artists[di]; if (!a) return '';
     const img = a._img || getImg(a.image||[],'extralarge','large');
-    const globalBadge = di===0 && STORE.globalStats?.percentile
-      ? `<div class="podium-global-badge"><span class="global-badge-text">Top ${STORE.globalStats.percentile}% mondial</span></div>`
+    const globalBadge = di===0 && STORE.globalStats?.percentile && STORE.globalStats.percentile !== '—'
+      ? `<div class="podium-global-badge"><span class="global-badge-text">Top ${STORE.globalStats.percentile}%</span></div>`
       : '';
     return `
       <div class="podium-col ${RANK_CLASSES[di]}" data-rank="${di+1}">
@@ -1089,7 +1217,7 @@ function buildTopAlbums() {
         <div class="mosaic-info">
           <span class="mosaic-name">${esc(a.name)}</span>
           ${i===0?`<span class="mosaic-artist">${esc(a.artist?.name||'')}</span>`:''}
-          <span class="mosaic-plays">${fmtNum(a.playcount)} écoutes</span>
+          <span class="mosaic-plays">${fmtNum(a.playcount)} ${T.scrobbles||'écoutes'}</span>
         </div>
       </div>`;
   }).join('');
@@ -1141,16 +1269,44 @@ function buildTopTracks() {
 /* ── SLIDE 5 — COMPARAISON MONDIALE ── */
 function buildGlobalCompare() {
   const artist = STORE.artists[0];
-  const gs = STORE.globalStats;
+  const gs = STORE.globalStats || {};
   const track1 = STORE.tracks[0];
   const img = STORE.artist1Img || '';
   const percentile = gs?.percentile || '—';
-  const gaugeAngle = percentile !== '—' ? Math.max(0, Math.min(100, 100 - parseInt(percentile))) : 50;
-  // Dasharray pour la jauge SVG semi-circulaire : arc = 283
-  const dashArc = Math.round(gaugeAngle * 283 / 100);
+
+  // Uniqueness : basé sur tags niche + artistes peu connus
+  const nicheTags = STORE.tags.filter(t => {
+    const t2 = t.toLowerCase();
+    return t2.length > 4 && !['rock','pop','metal','rap','jazz','soul','folk','indie'].includes(t2);
+  }).length;
   const uniquenessScore = STORE.tags.length
-    ? Math.min(99, Math.round(50 + (STORE.tags.length * 3) + (STORE.artists.filter(a=>!a._listeners||a._listeners<50000).length*5)))
+    ? Math.min(99, Math.round(52 + nicheTags * 4 + (STORE.artists.filter(a => !a._listeners || a._listeners < 100000).length * 4)))
     : '—';
+
+  // X fois la moyenne mondiale
+  const avgPL = gs.avgPlaysPerListener || 0;
+  const userPC = gs.userPlaycount || 0;
+  const vsAvgX = avgPL > 0 ? Math.round((userPC / avgPL) * 10) / 10 : '—';
+  const vsAvgTxt = vsAvgX !== '—' ? `${vsAvgX}×` : '—';
+
+  // Similar artists list
+  const similarList = (gs.similar || []).slice(0, 4);
+
+  // Artist tags (genre)
+  const artistTags = (gs.artistTags || []).slice(0, 2).join(' · ') || '—';
+
+  // Track user plays
+  const trackUserPlay = track1?._userPlaycount || track1?.playcount || 0;
+  const trackGlobalListeners = track1?._globalListeners || 0;
+
+  // Artist #2 stats
+  const artist2 = STORE.artists[1];
+  const a2UserPlay = artist2?._userPlaycount || artist2?.playcount || 0;
+  const a2Global = artist2?._listeners || 0;
+  const a2VsAvg = a2Global > 0 && a2UserPlay > 0
+    ? Math.round((a2UserPlay / Math.max(1, gs.avgPlaysPerListener||100)) * 10) / 10
+    : null;
+
 
   return `
     <svg width="0" height="0" style="position:absolute">
@@ -1170,11 +1326,14 @@ function buildGlobalCompare() {
       <h2 class="slide-title">${T.globalTitle}</h2>
     </div>
     <div class="global-stats-container">
+
+      <!-- Carte rang percentile -->
       <div class="global-card global-card--rank" id="global-rank-card" style="opacity:0">
         <div class="global-card-img-wrap">${imgOrInitials(img, artist?.name||'')}</div>
         <div class="global-card-body">
           <p class="global-card-label">${T.gcRankLabel}</p>
           <p class="global-card-artist">${esc(artist?.name||'—')}</p>
+          <p class="global-card-tag-row">${esc(artistTags)}</p>
           <p class="global-card-desc" id="gc-rank-desc">${(T.gcRankDesc||'').replace('{pct}',percentile)}</p>
         </div>
         <div class="percentile-gauge">
@@ -1185,16 +1344,28 @@ function buildGlobalCompare() {
           </svg>
         </div>
       </div>
+
+      <!-- Grille stats étendue (2 colonnes, scroll) -->
       <div class="global-mini-grid" id="global-mini-grid" style="opacity:0">
         <div class="global-mini-card">
           <span class="gmc-icon">👥</span>
-          <span class="gmc-value">${gs?.listeners ? fmtNum(gs.listeners) : '—'}</span>
+          <span class="gmc-value">${gs.listeners ? fmtNum(gs.listeners) : '—'}</span>
           <span class="gmc-label">${T.gcListeners}</span>
         </div>
         <div class="global-mini-card">
           <span class="gmc-icon">🌍</span>
-          <span class="gmc-value">${gs?.playcount ? fmtNum(gs.playcount) : '—'}</span>
+          <span class="gmc-value">${gs.playcount ? fmtNum(gs.playcount) : '—'}</span>
           <span class="gmc-label">${T.gcScrobblesGlobal}</span>
+        </div>
+        <div class="global-mini-card">
+          <span class="gmc-icon">📊</span>
+          <span class="gmc-value">${gs.avgPlaysPerListener ? fmtNum(gs.avgPlaysPerListener) : '—'}</span>
+          <span class="gmc-label">${T.gcAvgPlays||'Moy./auditeur'}</span>
+        </div>
+        <div class="global-mini-card gmc-highlight">
+          <span class="gmc-icon">⚡</span>
+          <span class="gmc-value">${vsAvgTxt}</span>
+          <span class="gmc-label">${T.gcUserVsAvg||'Tes écoutes vs moy.'}</span>
         </div>
         <div class="global-mini-card">
           <span class="gmc-icon">🎵</span>
@@ -1202,11 +1373,37 @@ function buildGlobalCompare() {
           <span class="gmc-label">${T.gcTrackPlays}</span>
         </div>
         <div class="global-mini-card">
+          <span class="gmc-icon">🎧</span>
+          <span class="gmc-value">${trackUserPlay ? fmtNum(trackUserPlay) : '—'}</span>
+          <span class="gmc-label">${T.gcTrackUserPlay||'Tes écoutes titre #1'}</span>
+        </div>
+        <div class="global-mini-card">
           <span class="gmc-icon">💎</span>
           <span class="gmc-value">${uniquenessScore}${uniquenessScore!=='—'?'%':''}</span>
           <span class="gmc-label">${T.gcUniqueness}</span>
         </div>
+        ${trackGlobalListeners > 0 ? `
+        <div class="global-mini-card">
+          <span class="gmc-icon">👂</span>
+          <span class="gmc-value">${fmtNum(trackGlobalListeners)}</span>
+          <span class="gmc-label">Auditeurs titre #1</span>
+        </div>` : `
+        <div class="global-mini-card">
+          <span class="gmc-icon">⏱</span>
+          <span class="gmc-value">${STORE.listenMins ? fmtNum(STORE.listenMins) : '—'}</span>
+          <span class="gmc-label">${T.gcRealMins||'Minutes'}</span>
+        </div>`}
       </div>
+
+      <!-- Similar artists -->
+      ${similarList.length > 0 ? `
+      <div class="global-similar" id="global-similar" style="opacity:0">
+        <span class="global-similar-label">${T.gcSimilar||'Artistes similaires'}</span>
+        <div class="global-similar-list">
+          ${similarList.map(n=>`<span class="global-similar-chip">${esc(n)}</span>`).join('')}
+        </div>
+      </div>` : ''}
+
     </div>`;
 }
 
@@ -1266,7 +1463,7 @@ function buildHabits() {
         <div class="habit-month-info">
           <span class="habit-month-label">${T.habitMonthLabel}</span>
           <span class="habit-month-value">${monthName}</span>
-          <span class="habit-month-plays">${peakMonth.plays ? fmtNum(peakMonth.plays) + ' écoutes' : '—'}</span>
+          <span class="habit-month-plays">${peakMonth.plays ? fmtNum(peakMonth.plays) + ' ' + (T.scrobbles||'écoutes') : '—'}</span>
         </div>
       </div>
     </div>`;
@@ -1352,7 +1549,7 @@ function buildGotAway() {
         </div>
         <div class="got-away-info">
           <span class="got-away-artist">${esc(ga.name)}</span>
-          <p class="got-away-desc">${fmtNum(ga.before)} écoutes → ${fmtNum(ga.after)} écoutes</p>
+          <p class="got-away-desc">${fmtNum(ga.before)} ${T.scrobbles||'écoutes'} → ${fmtNum(ga.after)} ${T.scrobbles||'écoutes'}</p>
           <div class="got-away-timeline">
             <div class="timeline-half">
               <span class="timeline-label">${T.tlBeforeLbl}</span>
@@ -1369,6 +1566,98 @@ function buildGotAway() {
         </div>
       </div>
       <p class="got-away-footnote" id="got-away-footnote">${T.gotAwayFootnote}</p>
+    </div>`;
+}
+
+/* ── SLIDE A — STREAK ── */
+function buildStreak() {
+  const s = STORE.streak;
+  if (!s || !s.days) return buildFallback(T.streakNone || 'Données insuffisantes.');
+  const months = T.months || ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sept','Oct','Nov','Déc'];
+  const fmt = d => d ? `${d.getDate()} ${months[d.getMonth()]}` : '—';
+  const pct = Math.min(100, Math.round((s.days / 366) * 100));
+  const totalDays = STORE.dayMap ? Object.keys(STORE.dayMap).length : 0;
+
+  return `
+    <div style="position:absolute;inset:0;z-index:0">
+      <div style="position:absolute;border-radius:50%;background:#f59e0b;left:50%;top:30%;width:60vmax;height:60vmax;transform:translate(-50%,-50%);opacity:.18;filter:blur(80px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#ea580c;left:25%;top:65%;width:45vmax;height:45vmax;transform:translate(-50%,-50%);opacity:.14;filter:blur(80px)"></div>
+    </div>
+    <div class="slide-header">
+      <span class="slide-label">${T.streakEyebrow||'Streak'}</span>
+      <h2 class="slide-title">${T.streakTitle||'Ta flamme'}</h2>
+    </div>
+    <div class="streak-layout">
+      <div class="streak-fire-wrap" id="streak-fire-wrap" style="opacity:0">
+        <div class="streak-fire">🔥</div>
+        <div class="streak-num-wrap">
+          <span class="streak-num" id="streak-num">${fmtNum(s.days)}</span>
+          <span class="streak-unit">${T.streakUnit||'jours'}</span>
+        </div>
+        <div class="streak-sub">${T.streakLabel||'consécutifs'}</div>
+      </div>
+      <div class="streak-period-card" id="streak-period-card" style="opacity:0">
+        <span class="streak-period-label">${T.streakPeriod||'Période'}</span>
+        <span class="streak-period-dates">${fmt(s.startDate)} → ${fmt(s.endDate)}</span>
+      </div>
+      <div class="streak-bar-wrap" id="streak-bar-wrap" style="opacity:0">
+        <div class="streak-bar-label">${pct}% de l'année</div>
+        <div class="streak-bar-track">
+          <div class="streak-bar-fill" id="streak-bar-fill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ── SLIDE B — VIBE ── */
+function buildVibe() {
+  const type = STORE.listenerType;
+  const timecat = STORE.habitTimeCategory;
+  const topGenre = STORE.tags[0] || '—';
+  const diversity = STORE.tags.length;
+  const typeEmoji = { extreme:'🤘', passionate:'🎸', regular:'🎧', casual:'😌' };
+  const timeEmoji = { night:'🌙', morning:'☀️', afternoon:'🌤️', evening:'🌆' };
+  const typeLabel = (T.vibeTypes||{})[type] || type;
+  const timeLabel = (T.habitTimeLabels||{})[timecat] || timecat;
+  const scrobblePer = STORE.avgPerDay;
+
+  return `
+    <div style="position:absolute;inset:0;z-index:0">
+      <div style="position:absolute;border-radius:50%;background:#4338ca;left:28%;top:24%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.22;filter:blur(80px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#7c3aed;left:74%;top:68%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.18;filter:blur(80px)"></div>
+    </div>
+    <div class="slide-header">
+      <span class="slide-label">${T.vibeEyebrow||'Profil'}</span>
+      <h2 class="slide-title">${T.vibeTitle||'Ton vibe'}</h2>
+    </div>
+    <div class="vibe-layout">
+      <div class="vibe-hero" id="vibe-hero" style="opacity:0">
+        <div class="vibe-emoji">${typeEmoji[type]||'🎵'} ${timeEmoji[timecat]||'🎵'}</div>
+        <div class="vibe-name">${esc(typeLabel)}</div>
+        <div class="vibe-time-name">${esc(timeLabel)}</div>
+      </div>
+      <div class="vibe-badges" id="vibe-badges" style="opacity:0">
+        <div class="vibe-badge">
+          <span class="vibe-badge-icon">⚡</span>
+          <span class="vibe-badge-label">${T.vibeIntensityLabel||'Intensité'}</span>
+          <span class="vibe-badge-value">${esc(typeLabel)}</span>
+        </div>
+        <div class="vibe-badge">
+          <span class="vibe-badge-icon">${timeEmoji[timecat]||'🕐'}</span>
+          <span class="vibe-badge-label">${T.vibeTimeLabel||'Moment'}</span>
+          <span class="vibe-badge-value">${esc(timeLabel)}</span>
+        </div>
+        <div class="vibe-badge">
+          <span class="vibe-badge-icon">🎨</span>
+          <span class="vibe-badge-label">${T.vibeGenreLabel||'Genres'}</span>
+          <span class="vibe-badge-value">${diversity}</span>
+        </div>
+        <div class="vibe-badge vibe-badge--wide">
+          <span class="vibe-badge-icon">🎵</span>
+          <span class="vibe-badge-label">${T.vibeTopGenreLabel||'Genre dominant'}</span>
+          <span class="vibe-badge-value">${esc(topGenre)}</span>
+        </div>
+      </div>
     </div>`;
 }
 
@@ -1471,6 +1760,8 @@ const SLIDES = [
   { id:'habits',     theme:'teal',   duration:9000,    build:buildHabits },
   { id:'record',     theme:'record', duration:7000,    build:buildRecord },
   { id:'gotaway',    theme:'gotAway',duration:9000,    build:buildGotAway },
+  { id:'streak',     theme:'record', duration:7000,    build:buildStreak },
+  { id:'vibe',       theme:'blue',   duration:8000,    build:buildVibe },
   { id:'genres',     theme:'pink',   duration:9000,    build:buildGenres },
   { id:'recap',      theme:'recap',  duration:Infinity, build:buildRecap },
 ];
@@ -1646,15 +1937,30 @@ const Stories = {
       case 'global':
         setTimeout(() => {
           fadeIn(document.getElementById('global-rank-card'), 100);
-          setTimeout(() => fadeIn(document.getElementById('global-mini-grid'), 0), 400);
+          setTimeout(() => {
+            fadeIn(document.getElementById('global-mini-grid'), 0);
+          }, 350);
+          setTimeout(() => {
+            fadeIn(document.getElementById('global-similar'), 0);
+          }, 650);
           // Animer la jauge
           setTimeout(() => {
             const fill = document.getElementById('gauge-fill');
             const gs = STORE.globalStats;
             const pct = gs?.percentile && gs.percentile !== '—' ? parseInt(gs.percentile) : 50;
             const arc = Math.round((100-pct) * 283 / 100);
-            if (fill) fill.style.strokeDasharray = `${arc} 283`;
-          }, 700);
+            if (fill) { fill.style.strokeDasharray = `${arc} 283`; fill.style.transition='stroke-dasharray 1.6s cubic-bezier(.22,1,.36,1)'; }
+          }, 600);
+          // Animer mini-cards une par une
+          setTimeout(() => {
+            document.querySelectorAll('.global-mini-card').forEach((el,i) => {
+              el.style.opacity='0'; el.style.transform='translateY(12px)';
+              setTimeout(() => {
+                el.style.transition='opacity .35s ease, transform .4s cubic-bezier(.22,1,.36,1)';
+                el.style.opacity='1'; el.style.transform='translateY(0)';
+              }, i * 70);
+            });
+          }, 400);
         }, 300);
         break;
 
@@ -1710,6 +2016,33 @@ const Stories = {
               setTimeout(()=>fill.style.width=`${afterPct}%`,250);
             });
           }, 300);
+        }, 200);
+        break;
+
+      case 'streak':
+        setTimeout(() => {
+          const fw = document.getElementById('streak-fire-wrap'); fadeIn(fw, 100);
+          setTimeout(() => {
+            const pc = document.getElementById('streak-period-card'); fadeIn(pc, 0);
+          }, 350);
+          setTimeout(() => {
+            const bw = document.getElementById('streak-bar-wrap'); fadeIn(bw, 0);
+            const fill = document.getElementById('streak-bar-fill');
+            const s = STORE.streak;
+            if (fill && s) {
+              const pct = Math.min(100, Math.round((s.days / 366) * 100));
+              setTimeout(() => { fill.style.transition='width 1.5s cubic-bezier(.22,1,.36,1)'; fill.style.width=`${pct}%`; }, 100);
+            }
+            const numEl = document.getElementById('streak-num');
+            if (numEl && s?.days) animCount(numEl, s.days, 1200);
+          }, 600);
+        }, 200);
+        break;
+
+      case 'vibe':
+        setTimeout(() => {
+          fadeIn(document.getElementById('vibe-hero'), 100);
+          setTimeout(() => fadeIn(document.getElementById('vibe-badges'), 0), 350);
         }, 200);
         break;
 
@@ -1792,7 +2125,40 @@ function buildRadarChart() {
 /* ═══════════════════════════════════════════════════════════════
    EXPORT MANAGER (html2canvas)
    ═══════════════════════════════════════════════════════════════ */
+/* Fetch image as base64 data URL (CORS) */
+async function fetchDataUrl(src) {
+  if (!src || src.startsWith('data:')) return src;
+  try {
+    const r = await fetch(src, { mode: 'cors', cache: 'force-cache' });
+    if (!r.ok) return src;
+    const blob = await r.blob();
+    return await new Promise(res => {
+      const fr = new FileReader();
+      fr.onload = () => res(fr.result);
+      fr.onerror = () => res(src);
+      fr.readAsDataURL(blob);
+    });
+  } catch { return src; }
+}
+
 const ExportManager = {
+  _imgCache: new Map(),
+
+  /* Pre-bake ALL visible images in a slide to data URLs */
+  async _bakeImages(root) {
+    const jobs = [];
+    root.querySelectorAll('img[src]').forEach(img => {
+      if (!img.src || img.src.startsWith('data:') || this._imgCache.has(img.src)) return;
+      jobs.push(fetchDataUrl(img.src).then(d => { if (d !== img.src) this._imgCache.set(img.src, d); }));
+    });
+    root.querySelectorAll('[style]').forEach(el => {
+      const m = (el.style.backgroundImage || '').match(/url\(['"]?([^'"\)\s]+)['"]?\)/);
+      if (!m || !m[1] || m[1].startsWith('data:') || this._imgCache.has(m[1])) return;
+      jobs.push(fetchDataUrl(m[1]).then(d => { if (d !== m[1]) this._imgCache.set(m[1], d); }));
+    });
+    await Promise.allSettled(jobs);
+  },
+
   _fixClone(doc) {
     doc.querySelectorAll('*').forEach(el => {
       el.style.backdropFilter = 'none';
@@ -1848,10 +2214,11 @@ const ExportManager = {
     setT('es-artists', fmtNum(STORE._uniqueArtists||STORE.artists.length));
     setT('es-minutes', fmtNum(STORE.listenMins));
     stage.style.left = '-9999px'; stage.style.top = '0';
+    await this._bakeImages(stage);
 
     try {
       const canvas = await html2canvas(stage, {
-        backgroundColor: '#060610', scale: 2, useCORS: true, allowTaint: true, logging: false,
+        backgroundColor: '#060610', scale: 2, useCORS: true, logging: false,
         width: 360, height: 640,
         onclone: (doc) => this._fixClone(doc),
       });
@@ -1888,9 +2255,10 @@ const ExportManager = {
       }).join('');
     }
     stage.style.left = '-9999px'; stage.style.top = '0';
+    await this._bakeImages(stage);
     try {
       const canvas = await html2canvas(stage, {
-        backgroundColor: '#060610', scale: 2, useCORS: true, allowTaint: true, logging: false,
+        backgroundColor: '#060610', scale: 2, useCORS: true, logging: false,
         width: 680, height: 860,
         onclone: (doc) => this._fixClone(doc),
       });
@@ -1906,28 +2274,63 @@ const ExportManager = {
     const btn = document.getElementById('screenshot-btn');
     if (btn) { btn.textContent = '⏳'; btn.classList.add('capturing'); }
     try {
-      const canvas = await html2canvas(document.getElementById('stories'), {
+      // Pre-bake all images to data URLs so html2canvas doesn't hit CORS
+      const storiesEl = document.getElementById('stories');
+      if (storiesEl) await this._bakeImages(storiesEl);
+      const canvas = await html2canvas(storiesEl || document.getElementById('stories'), {
         backgroundColor: '#060610', scale: Math.min(window.devicePixelRatio || 2, 3),
-        useCORS: true, allowTaint: true, logging: false,
+        useCORS: true, logging: false,
         ignoreElements: el => ['screenshot-btn','hud','nav-prev','nav-next','modal-share'].includes(el.id),
         onclone: (doc) => {
           this._fixClone(doc);
+          // Fix animated bar heights
           doc.querySelectorAll('.week-bar-fill').forEach(el => {
             const pct = parseInt(el.dataset.pct||0); el.style.height=`${pct}%`;
           });
-          const fill = document.getElementById('gauge-fill');
+          // Fix gauge — use DOC not document
+          const fill = doc.getElementById('gauge-fill');
           const gs = STORE.globalStats;
           if (fill && gs?.percentile && gs.percentile!=='—') {
             const arc = Math.round((100-parseInt(gs.percentile))*283/100);
             fill.style.strokeDasharray=`${arc} 283`;
+            fill.style.transition='none';
           }
+          // Fix track bars
           doc.querySelectorAll('.track-bar').forEach((el,i) => {
             const pct=Math.round((parseInt(STORE.tracks[i]?.playcount||0)/Math.max(1,parseInt(STORE.tracks[0]?.playcount||1)))*100);
+            el.style.setProperty('--w',`${pct}%`);
             el.style.width=`${pct}%`;
+            el.style.transition='none';
           });
+          // Fix streak bar
+          const sf = doc.getElementById('streak-bar-fill');
+          const sk = STORE.streak;
+          if (sf && sk) { const p=Math.min(100,Math.round(sk.days/366*100)); sf.style.width=`${p}%`; sf.style.transition='none'; }
+          // Fix timeline bars
+          doc.querySelectorAll('.timeline-bar').forEach(el => {
+            const fill2=el.querySelector('div');
+            if(fill2) fill2.style.transition='none';
+          });
+          // Fix ambient / grain
           const amb=doc.getElementById('ambient'); if(amb) amb.style.opacity='1';
           const grain=doc.getElementById('grain'); if(grain) grain.style.display='none';
           const canvas2=doc.getElementById('particle-canvas'); if(canvas2) canvas2.style.display='none';
+          // Replace cross-origin images with cached data URLs
+          doc.querySelectorAll('img[src]').forEach(img => {
+            const cached = ExportManager._imgCache.get(img.src);
+            if (cached) img.src = cached;
+          });
+          // Replace background-image cross-origin
+          doc.querySelectorAll('[style]').forEach(el => {
+            const m = el.style.backgroundImage.match(/url\(['"]?([^'")\s]+)['"]?\)/);
+            if (!m) return;
+            const cached = ExportManager._imgCache.get(m[1]);
+            if (cached) el.style.backgroundImage = `url('${cached}')`;
+          });
+          // Make all anim elements fully visible
+          doc.querySelectorAll('[style*="opacity:0"], .anim-rise, .anim-pop, .anim-fade').forEach(el => {
+            el.style.opacity='1'; el.style.transform='none'; el.style.transition='none';
+          });
         },
       });
       const sl = SLIDES[Stories.current];
@@ -2007,10 +2410,18 @@ document.getElementById('modal-share-close')?.addEventListener('click', closeSha
 document.getElementById('modal-share-backdrop')?.addEventListener('click', closeShareModal);
 
 // Share view overlay
-document.getElementById('share-enter-btn')?.addEventListener('click', () => {
+document.getElementById('share-enter-btn')?.addEventListener('click', async () => {
   document.getElementById('overlay-share-view')?.classList.add('hidden');
   document.getElementById('stories')?.classList.remove('hidden');
   Stories.init();
+  // Pre-warm image cache for read-only screenshots
+  if (STORE._shareImages?.length) {
+    STORE._shareImages.forEach(url => {
+      if (url && !ExportManager._imgCache.has(url)) {
+        fetchDataUrl(url).then(d => { if (d && d !== url) ExportManager._imgCache.set(url, d); });
+      }
+    });
+  }
 });
 
 // Toggle mot de passe
@@ -2049,6 +2460,7 @@ async function startWrapped(username, apiKey) {
   STORE._uniqueArtists = 0; STORE._uniqueTracks = 0;
   STORE.habitHours = []; STORE.habitDays = []; STORE.habitMonthPeak = {month:-1,plays:0};
   STORE.recordDay = null; STORE.gotAwayArtist = null; STORE.globalStats = {};
+  STORE.streak = null; STORE.dayMap = null;
   STORE.isReadOnly = false;
 
   const errEl = document.getElementById('cred-error'), submitEl = document.getElementById('cred-submit');
@@ -2173,8 +2585,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (y === last) { o.selected = true; }
       sel.appendChild(o);
     }
-    // Badge année
+    // Badge année + sync WRAPPED_YEAR
     sel.addEventListener('change', () => {
+      WRAPPED_YEAR = parseInt(sel.value) || WRAPPED_YEAR;
       const badge = document.getElementById('year-badge');
       const hint  = document.getElementById('year-hint');
       const selectedYear = parseInt(sel.value);
