@@ -462,7 +462,7 @@ const I18N_DATA = {
     settings_forceUpdateHint: 'Vide le cache du Service Worker et recharge l\'application.',
     settings_forceUpdateBtn: 'Mettre à jour maintenant',
     settings_about: 'À propos',
-    settings_aboutDesc: 'Un projet Open Source développé avec passion par un développeur débutant. C’est une version Beta créée pour apprendre et s’améliorer, tout en vous offrant une nouvelle manière de découvrir vos statistiques Last.fm en toute simplicité.',
+    settings_aboutDesc: 'Un projet Open Source développé avec passion par un développeur passioné. C’est une version Beta créée pour apprendre et s’améliorer, tout en vous offrant une nouvelle manière de découvrir vos statistiques Last.fm en toute simplicité.',
     loading_generic: 'Chargement…',
     loading_more: 'Chargement…',
   },
