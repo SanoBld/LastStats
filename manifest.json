@@ -7,7 +7,7 @@
   "display_override": ["window-controls-overlay", "minimal-ui"],
   "orientation": "portrait-primary",
   "background_color": "#141218",
-  "theme_color": "#d0bcff",
+  "theme_color": "#141218",
   "categories": ["music", "entertainment", "utilities"],
   "lang": "fr",
   "dir": "ltr",

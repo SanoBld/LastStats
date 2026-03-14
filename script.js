@@ -1239,7 +1239,7 @@ function _buildArtistCard(a, rank) {
     <div class="artist-hero-card" style="animation-delay:${delay}s"
          onclick="openArtistModal('${safeName}','${safeUrl}',${plays})">
       <div class="artist-hero-fallback" id="${imgId}-fallback" style="background:${bg}">${letter}</div>
-      <img class="artist-hero-img" id="${imgId}" alt="${escHtml(a.name)}" style="display:none" loading="lazy">
+      <img class="artist-hero-img" id="${imgId}" alt="${escHtml(a.name)}" style="display:none">
       <div class="artist-hero-overlay"></div>
       <div class="artist-hero-rank">${rank}</div>
       <div class="artist-hero-tags" id="${tagsId}"></div>
