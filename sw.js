@@ -48,6 +48,41 @@ self.addEventListener('message', (event) => {
       keys.forEach(key => caches.delete(key));
     });
   }
+
+  // Commande d'affichage de notification Wrapped
+  if (event.data?.type === 'SHOW_NOTIFICATION') {
+    const { title, body, tag } = event.data;
+    self.registration.showNotification(title, {
+      body,
+      tag:  tag || 'laststats-wrapped',
+      icon: './icons/icon-192.png',
+      badge:'./icons/icon-32.png',
+      data: { url: 'https://sanobld.github.io/LastStats/#s-wrapped' },
+      requireInteraction: false,
+      vibrate: [200, 100, 200],
+    });
+  }
+});
+
+// 3b. NOTIFICATION CLICK : Ouvre / focalise l'app sur la section Wrapped
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const target = event.notification.data?.url || 'https://sanobld.github.io/LastStats/#s-wrapped';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+      // Cherche un onglet déjà ouvert sur l'app
+      for (const client of windowClients) {
+        if (client.url.startsWith('https://sanobld.github.io/LastStats') && 'focus' in client) {
+          client.focus();
+          client.navigate(target);
+          return;
+        }
+      }
+      // Aucun onglet ouvert → en ouvre un nouveau
+      if (clients.openWindow) return clients.openWindow(target);
+    })
+  );
 });
 
 // 4. STRATÉGIES DE REQUÊTES (FETCH)

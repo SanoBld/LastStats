@@ -625,6 +625,10 @@ async function initApp(usernameOverride, apiKeyOverride) {
     syncSettingsFields();
     restoreBadgesFromStorage();
 
+    // Notification Wrapped Nouvel An
+    setupNewYearNotification();
+    _syncNotifBtn();
+
     const savedAccent = localStorage.getItem('ls_accent') || 'purple';
     APP.currentAccent = savedAccent;
     if (savedAccent !== 'dynamic') setAccent(savedAccent);
@@ -3576,6 +3580,112 @@ async function forceSwUpdate() {
   } catch {
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-sync-alt"></i>'; }
     showToast(t('toast_update_error'), 'error');
+  }
+}
+
+/* ============================================================
+   NEW YEAR WRAPPED NOTIFICATION
+   ============================================================ */
+
+/**
+ * Demande la permission de notifications puis active l'alerte Wrapped.
+ * Appelé par le bouton cloche dans les paramètres.
+ */
+async function requestNotificationAccess() {
+  const btn = document.getElementById('btn-notif-wrapped');
+  if (!('Notification' in window)) {
+    showToast('Notifications not supported on this browser.', 'error');
+    return;
+  }
+
+  const permission = await Notification.requestPermission();
+  if (permission === 'granted') {
+    showToast('🔔 Wrapped notification enabled!');
+    setupNewYearNotification();
+    _syncNotifBtn();
+  } else {
+    showToast('Notification permission denied.', 'error');
+    _syncNotifBtn();
+  }
+}
+
+/**
+ * Met à jour l'état visuel du bouton cloche selon la permission actuelle.
+ */
+function _syncNotifBtn() {
+  const btn = document.getElementById('btn-notif-wrapped');
+  if (!btn) return;
+  const perm = Notification?.permission;
+  if (perm === 'granted') {
+    btn.classList.add('active');
+    btn.title = 'New Year Wrapped notification: ON';
+    btn.querySelector('span').textContent = 'Notification enabled';
+  } else if (perm === 'denied') {
+    btn.classList.add('disabled');
+    btn.title = 'Permission denied in browser settings';
+    btn.querySelector('span').textContent = 'Permission denied';
+  } else {
+    btn.classList.remove('active', 'disabled');
+    btn.querySelector('span').textContent = 'Enable Wrapped notification';
+  }
+}
+
+/**
+ * Planifie (ou déclenche immédiatement) la notification Wrapped du Nouvel An.
+ * - Si on est avant le 1er janvier → setTimeout jusqu'à 00:01:00.
+ * - Si on est après le 1er janvier et la notif n'a pas encore été envoyée → envoi immédiat.
+ * Utilise localStorage 'ls_newyear_notif_{YEAR}' pour n'envoyer qu'une seule fois.
+ */
+function setupNewYearNotification() {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+  const now        = new Date();
+  const nextYear   = now.getFullYear() + (now.getMonth() >= 0 && now.getDate() >= 1 ? 1 : 0);
+  // Wrapped de l'année écoulée (ex. Wrapped 2025 → notif le 1er jan 2026)
+  const wrappedYear = nextYear - 1;
+  const storageKey  = `ls_newyear_notif_${nextYear}`;
+
+  // Déjà envoyé pour ce Nouvel An → ne rien faire
+  if (localStorage.getItem(storageKey)) return;
+
+  const fireNotif = () => {
+    localStorage.setItem(storageKey, '1');
+    _sendWrappedNotification(wrappedYear);
+  };
+
+  // Date cible : 1er janvier nextYear à 00:01:00
+  const target = new Date(nextYear, 0, 1, 0, 1, 0);
+  const msUntilNewYear = target - now;
+
+  if (msUntilNewYear > 0) {
+    // L'utilisateur est connecté avant minuit → on planifie
+    setTimeout(fireNotif, msUntilNewYear);
+  } else {
+    // L'utilisateur ouvre l'app après le 1er janvier sans avoir encore reçu la notif
+    fireNotif();
+  }
+}
+
+/**
+ * Envoie la notification via le Service Worker actif.
+ */
+function _sendWrappedNotification(wrappedYear) {
+  const title = 'Happy New Year! 🎧';
+  const body  = `Your ${wrappedYear} Music Wrapped is officially ready. Discover your top artists and tracks of the past year now!`;
+
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({
+      type: 'SHOW_NOTIFICATION',
+      title,
+      body,
+      tag: `laststats-wrapped-${wrappedYear}`,
+    });
+  } else {
+    // Fallback : notification directe si pas de SW actif
+    new Notification(title, {
+      body,
+      icon: './icons/icon-192.png',
+    });
   }
 }
 

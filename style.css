@@ -1864,6 +1864,13 @@ canvas#w-mini { height: 60px !important; }
 .btn-update-sw:hover    { opacity: .9; box-shadow: var(--shadow-md); transform: translateY(-1px); }
 .btn-update-sw:disabled { opacity: .6; cursor: not-allowed; transform: none; }
 
+/* Notification Wrapped button */
+.btn-notif-wrapped { padding: 7px 14px; border-radius: var(--radius-pill); background: var(--bg-hover); border: 1px solid var(--border); color: var(--text-muted); font-size: .82rem; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: all .2s; }
+.btn-notif-wrapped:hover        { background: var(--accent-lt); color: var(--accent); border-color: var(--border-glow); }
+.btn-notif-wrapped.active       { background: var(--accent-lt); color: var(--accent); border-color: var(--border-glow); }
+.btn-notif-wrapped.active i     { animation: swing .4s ease; }
+.btn-notif-wrapped.disabled     { opacity: .45; cursor: not-allowed; pointer-events: none; }
+@keyframes swing { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-15deg)} 75%{transform:rotate(15deg)} }
 
 /* ============================================================
    25. TOAST SNACKBAR
