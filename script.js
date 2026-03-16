@@ -515,20 +515,21 @@ const NAV_TITLE_KEYS = {
   badges:        'nav_badges',
   obscurity:     'nav_obscurity',
   wrapped:       'nav_wrapped',
-  advanced:      'nav_advanced',
   settings:      'nav_settings',
 };
 
 function setLanguage(lang) {
   if (!window.I18N?.setLang) return;
-  window.I18N.setLang(lang);
+
+  // ── 0. Persister et synchroniser immédiatement ──────────────
+  localStorage.setItem('ls_lang', lang);
   APP.language = lang;
+  window.I18N.setLang(lang);
 
   // ── 1. Boutons langue ───────────────────────────────────────
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
 
   // ── 2. Appliquer TOUTES les traductions data-i18n ───────────
-  // Convertit la notation dot (nav.dashboard → nav_dashboard) puis appelle t()
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const raw = el.getAttribute('data-i18n');
     const key = raw.replace(/\./g, '_');
@@ -536,8 +537,8 @@ function setLanguage(lang) {
     if (val && val !== key && val !== raw) el.textContent = val;
   });
 
-  // ── 3. Navigation labels ─────────────────────────────────────
-  document.querySelectorAll('.nav-lnk[data-s]').forEach(el => {
+  // ── 3. Navigation labels (sidebar + bottom nav) ──────────────
+  document.querySelectorAll('.nav-lnk[data-s], .bn-item[data-s]').forEach(el => {
     const key  = NAV_TITLE_KEYS[el.dataset.s];
     const span = el.querySelector('span:not(.nav-bdg)');
     if (key && span) span.textContent = t(key);
@@ -1252,9 +1253,9 @@ function _buildArtistCard(a, rank) {
         <div class="artist-hero-plays">${formatNum(a.playcount)} ${t('plays')}</div>
       </div>
       <div class="artist-hero-actions">
-        <a class="mc-play-btn sp" href="spotify:search:${spQ}" onclick="event.stopPropagation()" title="Spotify"><i class="fab fa-spotify"></i></a>
-        <a class="mc-play-btn yt" href="https://www.youtube.com/results?search_query=${spQ}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="YouTube"><i class="fab fa-youtube"></i></a>
-        <button class="mc-play-btn share" onclick="event.stopPropagation();shareArtist(${JSON.stringify(a.name)},${plays},'${safeUrl}')" title="${t('share')}"><i class="fas fa-share-alt"></i></button>
+        <a class="mc-play-btn sp" href="spotify:search:${spQ}" onclick="event.stopPropagation()" aria-label="Open in Spotify" title="Spotify"><i class="fab fa-spotify"></i></a>
+        <a class="mc-play-btn yt" href="https://www.youtube.com/results?search_query=${spQ}" target="_blank" rel="noopener" onclick="event.stopPropagation()" aria-label="Search on YouTube" title="YouTube"><i class="fab fa-youtube"></i></a>
+        <button class="mc-play-btn share" onclick="event.stopPropagation();shareArtist(${JSON.stringify(a.name)},${plays},'${safeUrl}')" aria-label="${t('share')} ${escHtml(a.name)}" title="${t('share')}"><i class="fas fa-share-alt"></i></button>
       </div>
     </div>`;
 
@@ -1311,7 +1312,12 @@ function _buildArtistCard(a, rank) {
         const fallbackEl = document.getElementById(`${imgId}-fallback`);
         if (!imgEl) return;
         if (imgUrl) {
-          imgEl.onload  = () => { imgEl.style.display = 'block'; if (fallbackEl) fallbackEl.style.display = 'none'; };
+          imgEl.classList.add('img-fade');
+          imgEl.onload  = () => {
+            imgEl.style.display = 'block';
+            if (fallbackEl) fallbackEl.style.display = 'none';
+            requestAnimationFrame(() => imgEl.classList.add('img-loaded'));
+          };
           imgEl.onerror = () => { imgEl.style.display = 'none';  if (fallbackEl) fallbackEl.style.display = 'flex'; };
           imgEl.src = imgUrl;
         }
@@ -1429,14 +1435,14 @@ function _buildAlbumCard(a, rank) {
   const gridHtml = `
     <div class="music-card" style="animation-delay:${delay}s" onclick="window.open('${safeUrl}','_blank')">
       <div class="music-card-img" style="height:160px">
-        ${hasImg ? `<img src="${imgUrl}" alt="${escHtml(a.name)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
+        ${hasImg ? `<img src="${imgUrl}" alt="${escHtml(a.name)}" loading="lazy" class="img-fade" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
         <div class="spotify-cover" style="background:${bg};display:${hasImg ? 'none' : 'flex'}">
           <span class="sc-letter">${letter}</span><span class="sc-name">${escHtml(a.name)}</span>
         </div>
         <div class="music-card-rank">${rank}</div>
         <div class="music-card-actions">
-          <a class="mc-play-btn sp" href="spotify:search:${spQ}" onclick="event.stopPropagation()" title="Spotify"><i class="fab fa-spotify"></i></a>
-          <button class="mc-play-btn share" onclick="event.stopPropagation();shareAlbum(${JSON.stringify(a.name)},${JSON.stringify(artistNm)},${a.playcount},'${safeUrl}')" title="${t('share')}"><i class="fas fa-share-alt"></i></button>
+          <a class="mc-play-btn sp" href="spotify:search:${spQ}" onclick="event.stopPropagation()" aria-label="Open in Spotify" title="Spotify"><i class="fab fa-spotify"></i></a>
+          <button class="mc-play-btn share" onclick="event.stopPropagation();shareAlbum(${JSON.stringify(a.name)},${JSON.stringify(artistNm)},${a.playcount},'${safeUrl}')" aria-label="${t('share')} ${escHtml(a.name)}" title="${t('share')}"><i class="fas fa-share-alt"></i></button>
         </div>
       </div>
       <div class="music-card-body">
@@ -1555,7 +1561,7 @@ function _buildTrackItem(track, rank, maxPlay) {
     <div class="track-item" style="animation-delay:${delay}s"
          onclick="window.open('${(track.url || '#').replace(/'/g,'%27')}','_blank')">
       <div class="track-cover" id="${coverElId}">
-        ${hasCover ? `<img src="${imgUrl}" alt="${escHtml(track.name)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
+        ${hasCover ? `<img src="${imgUrl}" alt="${escHtml(track.name)}" loading="lazy" class="img-fade" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
         <div style="width:100%;height:100%;background:${coverBg};display:${hasCover ? 'none' : 'flex'};align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:white">${coverLtr}</div>
       </div>
       <div class="track-rank">${medal}</div>
@@ -1568,9 +1574,9 @@ function _buildTrackItem(track, rank, maxPlay) {
       <div class="track-bar-wrap"><div class="track-bar" style="width:${pct}%"></div></div>
       <div class="track-plays">${formatNum(track.playcount)}</div>
       <div class="track-play-btns">
-        <a class="track-play-btn sp" href="spotify:search:${spQ}" title="Spotify" onclick="event.stopPropagation()"><i class="fab fa-spotify"></i></a>
-        <a class="track-play-btn yt" href="https://www.youtube.com/results?search_query=${ytQ}" target="_blank" rel="noopener" title="YouTube" onclick="event.stopPropagation()"><i class="fab fa-youtube"></i></a>
-        <button class="track-play-btn share" title="${t('share')}" onclick="event.stopPropagation();shareTrack(${JSON.stringify(track.name)},${JSON.stringify(track.artist?.name||'')},${track.playcount},'${(track.url||'').replace(/'/g,'%27')}')"><i class="fas fa-share-alt"></i></button>
+        <a class="track-play-btn sp" href="spotify:search:${spQ}" aria-label="Open in Spotify" title="Spotify" onclick="event.stopPropagation()"><i class="fab fa-spotify"></i></a>
+        <a class="track-play-btn yt" href="https://www.youtube.com/results?search_query=${ytQ}" target="_blank" rel="noopener" aria-label="Search on YouTube" title="YouTube" onclick="event.stopPropagation()"><i class="fab fa-youtube"></i></a>
+        <button class="track-play-btn share" aria-label="${t('share')} ${escHtml(track.name)}" title="${t('share')}" onclick="event.stopPropagation();shareTrack(${JSON.stringify(track.name)},${JSON.stringify(track.artist?.name||'')},${track.playcount},'${(track.url||'').replace(/'/g,'%27')}')"><i class="fas fa-share-alt"></i></button>
       </div>
     </div>`;
 }
@@ -1615,9 +1621,14 @@ function _injectTrackCoverImg(coverEl, imgUrl) {
   if (!coverEl || !imgUrl || coverEl.querySelector('img[src]')) return;
   const img     = document.createElement('img');
   img.src       = imgUrl; img.alt = ''; img.loading = 'lazy';
+  img.className = 'img-fade';
   img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:inherit;position:absolute;inset:0';
   img.onerror   = () => img.remove();
-  img.onload    = () => { const fb = coverEl.querySelector('div'); if (fb) fb.style.display = 'none'; };
+  img.onload    = () => {
+    img.classList.add('img-loaded');
+    const fb = coverEl.querySelector('div');
+    if (fb) fb.style.display = 'none';
+  };
   coverEl.style.position = 'relative';
   coverEl.prepend(img);
 }
@@ -2235,6 +2246,7 @@ async function fetchFullHistory(backgroundMode = false) {
       if (ts) hourCounts[new Date(ts * 1000).getHours()]++;
     }
     renderHeatmap(hourCounts);
+    _renderHourlyChart(hourCounts);
 
     APP.streakData = calcStreak(tracks);
     updateStreakUI(APP.streakData);
@@ -2246,6 +2258,10 @@ async function fetchFullHistory(backgroundMode = false) {
     }
 
     _renderDayOfWeekChart(tracks);
+    _renderOHWList(tracks);
+
+    // Reveal the adv-charts block (was hidden until history loaded)
+    document.getElementById('adv-charts')?.classList.remove('hidden');
 
     if (backgroundMode) {
       showToast(t('fetch_auto_done'));
@@ -2298,15 +2314,53 @@ function _renderDayOfWeekChart(tracks) {
     const ts = parseInt(tr.date?.uts || 0);
     if (ts) dayCounts[(new Date(ts * 1000).getDay() + 6) % 7]++;
   }
-  destroyChart('chart-dow');
+  destroyChart('chart-weekday');
   const c = getThemeColors();
-  const canvasEl = document.getElementById('chart-dow');
+  const canvasEl = document.getElementById('chart-weekday');
   if (!canvasEl) return;
-  APP.charts['chart-dow'] = new Chart(canvasEl, {
-    type:'bar',
-    data:{ labels:DAYS(), datasets:[{ data:dayCounts, backgroundColor:CHART_PALETTE.map(p => p+'aa'), borderColor:CHART_PALETTE, borderWidth:1, borderRadius:6 }] },
-    options:{ ...baseChartOpts(), plugins:{ ...baseChartOpts().plugins, tooltip:{ ...baseChartOpts().plugins.tooltip, callbacks:{ label:ctx => ` ${formatNum(ctx.raw)} ${t('scrobbles')}` } } }, scales:{ x:{ grid:{ display:false }, ticks:{ color:c.text } }, y:{ grid:{ color:c.grid }, ticks:{ color:c.text } } } },
+  APP.charts['chart-weekday'] = new Chart(canvasEl, {
+    type: 'bar',
+    data: { labels: DAYS(), datasets: [{ data: dayCounts, backgroundColor: CHART_PALETTE.map(p => p + 'aa'), borderColor: CHART_PALETTE, borderWidth: 1, borderRadius: 6 }] },
+    options: { ...baseChartOpts(), plugins: { ...baseChartOpts().plugins, tooltip: { ...baseChartOpts().plugins.tooltip, callbacks: { label: ctx => ` ${formatNum(ctx.raw)} ${t('scrobbles')}` } } }, scales: { x: { grid: { display: false }, ticks: { color: c.text } }, y: { grid: { color: c.grid }, ticks: { color: c.text } } } },
   });
+}
+
+function _renderHourlyChart(hourCounts) {
+  destroyChart('chart-hourly');
+  const c = getThemeColors();
+  const labels = Array.from({ length: 24 }, (_, i) => i + 'h');
+  const canvasEl = document.getElementById('chart-hourly');
+  if (!canvasEl) return;
+  APP.charts['chart-hourly'] = new Chart(canvasEl, {
+    type: 'bar',
+    data: { labels, datasets: [{ data: hourCounts, backgroundColor: CHART_PALETTE.map(p => p + 'aa'), borderColor: CHART_PALETTE, borderWidth: 1, borderRadius: 4 }] },
+    options: { ...baseChartOpts(), plugins: { ...baseChartOpts().plugins, tooltip: { ...baseChartOpts().plugins.tooltip, callbacks: { label: ctx => ` ${formatNum(ctx.raw)} ${t('scrobbles')}` } } }, scales: { x: { grid: { display: false }, ticks: { color: c.text } }, y: { grid: { color: c.grid }, ticks: { color: c.text } } } },
+  });
+}
+
+function _renderOHWList(tracks) {
+  const playcountByArtist = {};
+  for (const tr of tracks) {
+    const name = tr.artist?.['#text'] || tr.artist?.name || '';
+    if (!name) continue;
+    playcountByArtist[name] = (playcountByArtist[name] || 0) + 1;
+  }
+  const ohwList = document.getElementById('ohw-list');
+  if (!ohwList) return;
+  const items = Object.entries(playcountByArtist)
+    .filter(([, p]) => p >= 1 && p <= 3)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 20);
+  if (!items.length) {
+    ohwList.innerHTML = `<p style="color:var(--text-muted);padding:10px 0;font-size:.85rem">${t('adv_ohw_none') || 'No one-hit wonders found.'}</p>`;
+    return;
+  }
+  ohwList.innerHTML = items.map(([name, plays], i) => `
+    <div class="ohw-item">
+      <span class="ohw-num">${i + 1}</span>
+      <span class="ohw-name" title="${name}">${name}</span>
+      <span class="ohw-plays">${plays} ${t('plays')}</span>
+    </div>`).join('');
 }
 
 /* ── Smart refresh ───────────────────────────────────────────── */
