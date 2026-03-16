@@ -47,8 +47,9 @@
   --accent-on:        #381e72;
   --accent-container: #4f378b;
   --accent-on-cont:   #eaddff;
-  --accent-glow:      rgba(208,188,255,0.18);
-  --accent-lt:        rgba(208,188,255,0.12);
+  --accent-glow:      rgba(208,188,255,0.30);
+  --accent-lt:        rgba(208,188,255,0.14);
+  --accent-strip:     rgba(208,188,255,0.55);
 
   /* --- M3 Surfaces (Dark) --- */
   --bg:           #141218;
@@ -101,8 +102,9 @@
   --accent-on:        #ffffff;
   --accent-container: #eaddff;
   --accent-on-cont:   #21005d;
-  --accent-glow:      rgba(103,80,164,0.22);
+  --accent-glow:      rgba(103,80,164,0.30);
   --accent-lt:        rgba(103,80,164,0.10);
+  --accent-strip:     rgba(103,80,164,0.50);
 
   --bg:         #f4f4f5;
   --bg-dim:     #e8e8ea;
@@ -723,17 +725,17 @@ canvas { max-width: 100%; }
 
 /* ============================================================
    9. STAT GRID & CARDS — Dashboard overview numbers
-   Supports 8 cards at minmax(180px)
+   Supports 11 cards at minmax(180px)
    ============================================================ */
 
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px; margin-bottom: 20px;
+  gap: 20px; margin-bottom: 24px;
 }
 .stat-card {
   background: var(--surface-container-low, var(--bg-card-hi));
-  border: 1px solid transparent;
+  border: 1px solid var(--border);
   border-radius: var(--radius); padding: 20px;
   box-shadow: var(--shadow-card);
   transition: background .3s, border-color .3s, transform .2s, box-shadow .2s;
@@ -741,14 +743,15 @@ canvas { max-width: 100%; }
 }
 /* Colored accent strip on top */
 .stat-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
   background: var(--card-accent, var(--accent));
-  border-radius: var(--radius) var(--radius) 0 0; opacity: .7;
+  border-radius: var(--radius) var(--radius) 0 0; opacity: .85;
 }
 .stat-card:hover {
   background: var(--surface-container-high, var(--bg-card-hi));
   border-color: var(--border-glow);
-  transform: translateY(-2px); box-shadow: var(--shadow-md);
+  box-shadow: 0 0 0 1px var(--border-glow), var(--shadow-md);
+  transform: translateY(-2px);
 }
 .stat-card-icon  { font-size: 1.3rem; margin-bottom: 10px; }
 .stat-card-value { font-size: 1.55rem; font-weight: 800; letter-spacing: -.04em; line-height: 1; margin-bottom: 4px; }
@@ -769,8 +772,12 @@ canvas { max-width: 100%; }
 
 .insights-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px; margin-bottom: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px; margin-bottom: 24px;
+}
+/* 2-column version used when Versus card is absent */
+.insights-row--2col {
+  grid-template-columns: repeat(2, 1fr);
 }
 .insight-card {
   background: var(--bg-card-hi); border: 1px solid var(--border);
@@ -855,15 +862,18 @@ canvas { max-width: 100%; }
    12. CHARTS & CHART CARDS
    ============================================================ */
 
-.dash-charts  { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.charts-duo   { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.dash-charts  { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+.charts-duo   { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
 .chart-card {
-  background: var(--bg-card-hi); border: 1px solid var(--border);
+  background: var(--surface-container-low, var(--bg-card-hi)); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 20px;
-  box-shadow: var(--shadow-card); transition: border-color .2s;
+  box-shadow: var(--shadow-card); transition: border-color .2s, box-shadow .2s;
 }
 .chart-card.full { grid-column: 1 / -1; }
-.chart-card:hover { border-color: var(--border-glow); }
+.chart-card:hover {
+  border-color: var(--border-glow);
+  box-shadow: 0 0 0 1px var(--border-glow), var(--shadow-md);
+}
 .cc-hd {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 16px; font-size: .85rem; font-weight: 600; color: var(--text-dim);
@@ -1450,17 +1460,72 @@ canvas#w-mini { height: 60px !important; }
 .btn-fetch:hover    { background: var(--accent); color: var(--accent-on); }
 .btn-fetch:disabled { opacity: .5; cursor: not-allowed; }
 
+/* ─── Dashboard section header ─── */
+.dash-sec-hd {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 16px;
+}
+
+/* ─── Visual analysis sub-heading ─── */
+.dash-visuals-hd {
+  display: flex; align-items: center; gap: 8px;
+  font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--accent); margin: 24px 0 12px;
+  padding-left: 2px;
+}
+.dash-visuals-hd--sub { margin-top: 28px; color: var(--text-muted); }
+
+/* ─── Advanced stats chip grid ─── */
 .adv-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 12px; margin-bottom: 20px;
+  gap: 20px; margin-bottom: 24px;
 }
-.adv-card { background: var(--bg-card-hi); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-card); transition: all .2s; }
-.adv-card:not(.sk):hover { border-color: var(--border-glow); transform: translateY(-2px); }
+/* Compact chip variant used in dashboard header */
+.adv-grid--chips {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px; margin-bottom: 24px;
+}
+
+.adv-card {
+  background: var(--surface-container-low, var(--bg-card-hi));
+  border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px;
+  box-shadow: var(--shadow-card); transition: all .2s;
+  position: relative; overflow: hidden;
+}
+.adv-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--chip-accent, var(--accent)); border-radius: var(--radius) var(--radius) 0 0;
+  opacity: .8;
+}
+.adv-card:not(.sk):hover {
+  border-color: var(--border-glow);
+  box-shadow: 0 0 0 1px var(--border-glow), var(--shadow-md);
+  transform: translateY(-2px);
+}
 .adv-card-icon  { font-size: 1.8rem; margin-bottom: 12px; }
 .adv-card-value { font-size: 1.75rem; font-weight: 900; letter-spacing: -.04em; line-height: 1; margin-bottom: 6px; }
 .adv-card-label { font-size: .8rem; font-weight: 600; color: var(--text-dim); margin-bottom: 4px; }
 .adv-card-sub   { font-size: .74rem; color: var(--text-muted); line-height: 1.5; }
+
+/* Chip variant (used in dashboard adv-grid--chips) */
+.adv-chip { padding: 14px 16px; }
+.adv-chip-top {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 6px; margin-bottom: 6px;
+}
+.adv-chip-icon  { font-size: 1rem; line-height: 1; flex-shrink: 0; }
+.adv-chip-value { font-size: 1.2rem; font-weight: 900; letter-spacing: -.035em; line-height: 1; }
+.adv-chip-label { font-size: .72rem; font-weight: 600; color: var(--text-dim); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.adv-chip-sub   { font-size: .66rem; color: var(--text-muted); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.adv-chip-sk    { padding: 14px 16px; min-height: 72px; }
+
+/* btn-fetch small variant */
+.btn-fetch--sm {
+  padding: 7px 14px; font-size: .78rem;
+}
+
 
 /* One-hit wonders list */
 .ohw-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
@@ -2072,8 +2137,8 @@ canvas#w-mini { height: 60px !important; }
   .burger-btn { display: flex; }
 
   /* Charts stack to single column */
-  .dash-charts  { grid-template-columns: 1fr; }
-  .charts-duo   { grid-template-columns: 1fr; }
+  .dash-charts  { grid-template-columns: 1fr; gap: 20px; }
+  .charts-duo   { grid-template-columns: 1fr; gap: 20px; }
 
   /* Bottom nav visible */
   .bottom-nav { display: flex; }
@@ -2107,6 +2172,10 @@ canvas#w-mini { height: 60px !important; }
   canvas#chart-hourly, canvas#chart-weekday  { height: 180px !important; }
 
   .insights-row { grid-template-columns: 1fr; }
+  .insights-row--2col { grid-template-columns: 1fr; }
+  /* Chips stack to 2 columns on small screens */
+  .adv-grid--chips { grid-template-columns: repeat(2, 1fr); }
+  .dash-sec-hd { flex-direction: column; gap: 8px; }
   .heatmap-cells  { grid-template-columns: repeat(12, 1fr); }
   .heatmap-labels { grid-template-columns: repeat(12, 1fr); }
 

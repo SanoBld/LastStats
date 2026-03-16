@@ -41,6 +41,22 @@ if (typeof window.t !== 'function') window.t = k => k;
 
   const PATCH = {
     share:              { fr:'Partager',      en:'Share',         es:'Compartir',   pt:'Partilhar',  de:'Teilen',      it:'Condividi',  ru:'Поделиться', ar:'مشاركة', ja:'シェア',  zh:'分享', ko:'공유', tr:'Paylaş'   },
+    stat_diversity:     { fr:'Ratio de diversité', en:'Diversity ratio', es:'Ratio diversidad', pt:'Rácio diversidade', de:'Diversitätsrate', it:'Ratio diversità', ru:'Коэф. разнообразия', ar:'نسبة التنوع', ja:'多様性率', zh:'多样性比率', ko:'다양성 비율', tr:'Çeşitlilik oranı' },
+    stat_diversity_sub: { fr:'(Artistes / Total) × 100', en:'(Artists / Total) × 100', es:'(Artistas / Total) × 100', pt:'(Artistas / Total) × 100', de:'(Künstler / Total) × 100', it:'(Artisti / Totale) × 100', ru:'(Исполнителей / Всего) × 100', ar:'(فنانون / إجمالي) × 100', ja:'(アーティスト / 合計) × 100', zh:'(艺术家 / 总计) × 100', ko:'(아티스트 / 전체) × 100', tr:'(Sanatçı / Toplam) × 100' },
+    // Nouveaux succès — Tempo
+    badge_crescendo_name: { fr:'Crescendo',         en:'Crescendo',         es:'Crescendo',     pt:'Crescendo',      de:'Crescendo',     it:'Crescendo',     ru:'Крещендо',       ar:'كريشيندو',  ja:'クレッシェンド',    zh:'渐强',     ko:'크레셴도',  tr:'Crescendo'    },
+    badge_crescendo_desc: { fr:'Mois consécutifs en hausse (écoutes en progression)', en:'Consecutive months of growth (increasing plays)', es:'Meses consecutivos de crecimiento', pt:'Meses consecutivos de crescimento', de:'Aufeinanderfolgende Wachstumsmonate', it:'Mesi consecutivi di crescita', ru:'Последовательные месяцы роста', ar:'أشهر متتالية من النمو', ja:'連続成長月数', zh:'连续增长月份', ko:'연속 성장 월수', tr:'Ardışık büyüme ayları' },
+    badge_regular_name:   { fr:'Régulier',           en:'Consistent',        es:'Constante',     pt:'Regular',        de:'Regelmäßig',    it:'Costante',      ru:'Постоянный',     ar:'منتظم',     ja:'コンスタント',     zh:'规律',     ko:'꾸준함',    tr:'Düzenli'      },
+    badge_regular_desc:   { fr:'Jours d\'activité musicale répartis sur la durée', en:'Days of musical activity spread over time', es:'Días de actividad musical repartidos en el tiempo', pt:'Dias de atividade musical ao longo do tempo', de:'Musikalische Aktivitätstage über die Zeit', it:'Giorni di attività musicale nel tempo', ru:'Дни музыкальной активности за период', ar:'أيام النشاط الموسيقي على مدار الوقت', ja:'時間にわたる音楽活動日', zh:'随时间分布的音乐活动日', ko:'시간에 걸친 음악 활동 일수', tr:'Zamanla dağılmış müzik aktivite günleri' },
+    badge_comeback_name:  { fr:'Come-back',          en:'Come-back',         es:'Come-back',     pt:'Come-back',      de:'Come-back',     it:'Come-back',     ru:'Камбэк',         ar:'عودة',      ja:'カムバック',       zh:'回归',     ko:'컴백',      tr:'Geri dönüş'   },
+    badge_comeback_desc:  { fr:'Pauses de +30 jours puis reprise active', en:'Breaks of +30 days followed by active return', es:'Pausas de +30 días seguidas de regreso activo', pt:'Pausas de +30 dias seguidas de retorno ativo', de:'Pausen von +30 Tagen mit aktivem Comeback', it:'Pause di +30 giorni seguite da ritorno attivo', ru:'Перерывы >30 дней и активное возвращение', ar:'فترات راحة أكثر من 30 يومًا ثم عودة نشطة', ja:'30日超の休止後の復帰', zh:'超30天的休息后活跃回归', ko:'30일 이상 휴식 후 활발한 복귀', tr:'+30 günlük aranın ardından aktif geri dönüş' },
+    // Nouveaux succès — Social
+    badge_ambassador_name:  { fr:'Ambassadeur',      en:'Ambassador',        es:'Embajador',     pt:'Embaixador',     de:'Botschafter',   it:'Ambasciatore',  ru:'Посол',          ar:'سفير',      ja:'アンバサダー',     zh:'大使',     ko:'앰배서더',  tr:'Büyükelçi'    },
+    badge_ambassador_desc:  { fr:'Artistes écoutés ≥ 100 fois (fidèles absolus)', en:'Artists played ≥ 100 times (absolute loyalists)', es:'Artistas escuchados ≥ 100 veces', pt:'Artistas ouvidos ≥ 100 vezes', de:'Künstler ≥ 100 Mal gespielt', it:'Artisti ascoltati ≥ 100 volte', ru:'Артисты прослушаны ≥ 100 раз', ar:'فنانون استُمع إليهم ≥ 100 مرة', ja:'100回以上再生したアーティスト数', zh:'播放次数≥100的艺术家数量', ko:'100회 이상 재생한 아티스트 수', tr:'≥100 kez çalınan sanatçılar' },
+    badge_tastemaker_name:  { fr:'Prescripteur',     en:'Tastemaker',        es:'Prescriptor',   pt:'Influenciador',  de:'Trendsetter',   it:'Precursore',    ru:'Законодатель',   ar:'مؤثر',      ja:'テイストメーカー', zh:'品味引领者', ko:'트렌드세터', tr:'Trend belirleyici' },
+    badge_tastemaker_desc:  { fr:'Artistes représentant +10% de vos écoutes', en:'Artists representing +10% of your plays', es:'Artistas que representan +10% de tus reproducciones', pt:'Artistas representando +10% das reproduções', de:'Künstler mit +10% Ihrer Wiedergaben', it:'Artisti che rappresentano +10% degli ascolti', ru:'Артисты с долей >10% прослушиваний', ar:'فنانون يمثلون أكثر من 10٪ من استماعاتك', ja:'再生回数の10%超を占めるアーティスト', zh:'占播放总量10%以上的艺术家', ko:'전체 재생의 10% 이상을 차지하는 아티스트', tr:'Çalmalarınızın +%10\'unu temsil eden sanatçılar' },
+    badge_nomad_name:       { fr:'Nomade Musical',   en:'Musical Nomad',     es:'Nómada Musical',pt:'Nômade Musical', de:'Musikalischer Nomade', it:'Nomade Musicale', ru:'Музыкальный кочевник', ar:'البدوي الموسيقي', ja:'ミュージカルノマド', zh:'音乐游牧者', ko:'음악 유목민', tr:'Müzik Göçebesi' },
+    badge_nomad_desc:       { fr:'Mois avec ≥10 artistes différents actifs', en:'Months with ≥10 different active artists', es:'Meses con ≥10 artistas diferentes activos', pt:'Meses com ≥10 artistas diferentes ativos', de:'Monate mit ≥10 verschiedenen aktiven Künstlern', it:'Mesi con ≥10 artisti diversi attivi', ru:'Месяцы с ≥10 разными активными артистами', ar:'أشهر مع ≥10 فنانين مختلفين نشطين', ja:'10人以上の異なるアーティストがいる月', zh:'有≥10位不同活跃艺术家的月份', ko:'≥10명의 다른 활성 아티스트가 있는 달', tr:'≥10 farklı aktif sanatçılı aylar' },
     profile_retry:      { fr:'Réessayer',     en:'Retry',         es:'Reintentar',  pt:'Tentar novamente', de:'Erneut versuchen', it:'Riprova', ru:'Повторить', ar:'إعادة المحاولة', ja:'再試行', zh:'重试', ko:'재시도', tr:'Tekrar dene' },
     profile_reload:     { fr:'Actualiser',    en:'Reload',        es:'Actualizar',  pt:'Recarregar', de:'Neu laden',   it:'Aggiorna',   ru:'Обновить',   ar:'تحديث',  ja:'更新',    zh:'刷新', ko:'새로고침', tr:'Yenile' },
     toast_settings_saved:{ fr:'Paramètres sauvegardés !', en:'Settings saved!', es:'Ajustes guardados!', pt:'Definições guardadas!', de:'Einstellungen gespeichert!', it:'Impostazioni salvate!', ru:'Настройки сохранены!', ar:'تم حفظ الإعدادات!', ja:'設定を保存しました!', zh:'设置已保存!', ko:'설정이 저장되었습니다!', tr:'Ayarlar kaydedildi!' },
@@ -618,7 +634,6 @@ async function initApp(usernameOverride, apiKeyOverride) {
 
     setupChartsSection();
     setupWrappedSection();
-    loadAdvancedStats();
     initPeriodSelectors();
     pollNowPlaying();
     loadVersus();
@@ -741,6 +756,7 @@ function nav(section) {
 
     if (window.innerWidth <= 1024) closeSb();
 
+    if (section === 'charts')    setupChartsSection();
     if (section === 'vizplus')   loadVizPlus();
     if (section === 'obscurity') loadObscurityScore();
   };
@@ -853,53 +869,70 @@ async function shareNowPlaying() {
 }
 
 /* ============================================================
-   DASHBOARD
+   DASHBOARD — grille unifiée 8 cartes sans doublons
+   Volume · Moyenne · Eddington · Artistes · Jours · Top1 · Diversité · Temps
    ============================================================ */
 async function loadDashboard() {
   const u = APP.userInfo;
   if (!u) return;
 
-  const regTs     = parseInt(u.registered?.unixtime || 0);
-  const daysSince = regTs ? Math.floor((Date.now() - regTs * 1000) / 86400000) : 1;
-  const totalPlay = parseInt(u.playcount || 0);
-  const avgPerDay = daysSince > 0 ? (totalPlay / daysSince).toFixed(1) : 0;
-  const avgPerWeek= (parseFloat(avgPerDay) * 7).toFixed(0);
-  const currentYear = new Date().getFullYear();
+  const regTs      = parseInt(u.registered?.unixtime || 0);
+  const daysSince  = regTs ? Math.floor((Date.now() - regTs * 1000) / 86400000) : 1;
+  const totalPlay  = parseInt(u.playcount || 0);
+  const avgPerDay  = daysSince > 0 ? (totalPlay / daysSince).toFixed(1) : 0;
+  const avgPerWeek = (parseFloat(avgPerDay) * 7).toFixed(0);
+  const listenHours= Math.round(totalPlay * 3.5 / 60);
+  const currentYear= new Date().getFullYear();
 
-  let uniqueArtists = '…', uniqueAlbums = '…', uniqueTracks = '…', lastScrobble = '—';
-
+  // Parallel: top artists + albums total + tracks total + last scrobble
+  let uniqueArtistsRaw = 0, uniqueAlbums = '…', uniqueTracks = '…', lastScrobble = '—';
   try {
-    const [a, b, c] = await Promise.all([
-      API.call('user.getTopArtists', { period:'overall', limit:1 }),
+    const [aData, bData, cData, rData] = await Promise.all([
+      APP.topArtistsData.length
+        ? API.call('user.getTopArtists', { period:'overall', limit:1 })
+        : API.call('user.getTopArtists', { period:'overall', limit: TOP_LIMIT }),
       API.call('user.getTopAlbums',  { period:'overall', limit:1 }),
       API.call('user.getTopTracks',  { period:'overall', limit:1 }),
+      API.call('user.getRecentTracks',{ limit:1 }),
     ]);
-    uniqueArtists = formatNum(a.topartists?.['@attr']?.total);
-    uniqueAlbums  = formatNum(b.topalbums?.['@attr']?.total);
-    uniqueTracks  = formatNum(c.toptracks?.['@attr']?.total);
-  } catch {}
 
-  try {
-    const recent = await API.call('user.getRecentTracks', { limit:1 });
-    const tracks  = recent.recenttracks?.track;
+    if (!APP.topArtistsData.length) {
+      // first time: we got TOP_LIMIT artists — re-request just for the total
+      APP.topArtistsData = (await API.call('user.getTopArtists', { period:'overall', limit: TOP_LIMIT })).topartists?.artist || [];
+    }
+    uniqueArtistsRaw = parseInt(aData.topartists?.['@attr']?.total || APP.topArtistsData.length);
+    uniqueAlbums     = formatNum(bData.topalbums?.['@attr']?.total);
+    uniqueTracks     = formatNum(cData.toptracks?.['@attr']?.total);
+
+    const tracks = rData.recenttracks?.track;
     if (tracks) {
       const last = Array.isArray(tracks) ? tracks[0] : tracks;
-      lastScrobble = last['@attr']?.nowplaying ? t('stat_now_playing') : timeAgo(parseInt(last.date?.uts || 0));
+      lastScrobble = last['@attr']?.nowplaying
+        ? t('stat_now_playing')
+        : timeAgo(parseInt(last.date?.uts || 0));
     }
   } catch {}
 
-  const listenTimeStr = estimateListenTime(totalPlay);
-  const totalYearEstimate = Math.round(parseFloat(avgPerDay) * 365);
+  const playcounts   = APP.topArtistsData.map(a => parseInt(a.playcount));
+  const eddington    = calcEddington(playcounts);
+  const maxArtist    = APP.topArtistsData[0];
+  const topPct       = totalPlay > 0 && maxArtist
+    ? ((parseInt(maxArtist.playcount) / totalPlay) * 100).toFixed(1) : 0;
+  const diversityPct = totalPlay > 0 && uniqueArtistsRaw > 0
+    ? ((uniqueArtistsRaw / totalPlay) * 100).toFixed(2) : '0.00';
 
   const cards = [
-    { icon:'🎵', value:totalPlay,      label:t('stat_total_scrobbles'), sub:t('stat_avg_day', avgPerDay),              color:'#6366f1' },
-    { icon:'🎤', value:uniqueArtists,  label:t('stat_artists'),         sub:t('stat_since_start'),                     color:'#8b5cf6', noAnim:true },
-    { icon:'💿', value:uniqueAlbums,   label:t('stat_albums'),          sub:t('stat_since_start'),                     color:'#a855f7', noAnim:true },
-    { icon:'🎼', value:uniqueTracks,   label:t('stat_tracks'),          sub:t('stat_since_start'),                     color:'#ec4899', noAnim:true },
-    { icon:'📅', value:formatDate(regTs),label:t('stat_member_since'),  sub:t('stat_active_days', formatNum(daysSince)), color:'#f97316', noAnim:true },
-    { icon:'⏱️', value:lastScrobble,   label:t('stat_last_scrobble'),   sub:u.url ? `last.fm/user/${u.name}` : '',     color:'#22c55e', noAnim:true },
-    { icon:'🎧', value:listenTimeStr,  label:t('stat_listen_time'),     sub:t('stat_listen_estimate', formatNum(totalPlay)), color:'#06b6d4', noAnim:true },
-    { icon:'📈', value:`~${formatNum(avgPerWeek)}`,label:t('adv_per_week', avgPerWeek), sub:`≈ ${formatNum(totalYearEstimate)} ${t('scrobbles')} / an`, color:'#14b8a6', noAnim:true },
+    { icon:'🎯', value:totalPlay,                      label:t('adv_total'),        sub:t('adv_total_sub'),                               color:'#6366f1' },
+    { icon:'⚡', value:avgPerDay,                       label:t('adv_per_day'),      sub:t('adv_per_week', avgPerWeek),                    color:'#8b5cf6', noAnim:true },
+    { icon:'🔢', value:eddington,                       label:t('adv_eddington'),    sub:t('adv_eddington_sub', eddington),                color:'#a855f7', noAnim:true },
+    { icon:'🎤', value:formatNum(uniqueArtistsRaw),     label:t('stat_artists'),     sub:t('stat_since_start'),                            color:'#ec4899', noAnim:true },
+    { icon:'💿', value:uniqueAlbums,                    label:t('stat_albums'),      sub:t('stat_since_start'),                            color:'#d946ef', noAnim:true },
+    { icon:'🎼', value:uniqueTracks,                    label:t('stat_tracks'),      sub:t('stat_since_start'),                            color:'#f43f5e', noAnim:true },
+    { icon:'⏱️', value:lastScrobble,                    label:t('stat_last_scrobble'),sub:u.name ? `last.fm/user/${u.name}` : '',          color:'#f97316', noAnim:true },
+    { icon:'📆', value:formatNum(daysSince),             label:t('adv_days'),         sub:t('adv_days_sub', formatDate(regTs)),             color:'#eab308', noAnim:true },
+    { icon:'🌟', value:maxArtist ? maxArtist.name:'—',  label:t('adv_top1_alltime'), sub:t('adv_top1_pct', topPct),                       color:'#22c55e', noAnim:true },
+    { icon:'📊', value:`${diversityPct}%`,               label:t('stat_diversity'),   sub:t('stat_diversity_sub'),                          color:'#14b8a6', noAnim:true },
+    { icon:'🎧', value:`${formatNum(listenHours)}h`,    label:t('stat_listen_time'), sub:t('stat_listen_estimate', formatNum(totalPlay)),  color:'#06b6d4', noAnim:true },
   ];
 
   const statGrid = document.getElementById('stat-grid');
@@ -914,14 +947,6 @@ async function loadDashboard() {
 
     const scEl = document.getElementById('sv-0');
     if (scEl) animateValue(scEl, 0, totalPlay, 1000);
-  }
-
-  const ltCard = document.getElementById('stat-card-listen-time');
-  if (ltCard) {
-    const valEl = ltCard.querySelector('.stat-card-value');
-    const subEl = ltCard.querySelector('.stat-card-sub');
-    if (valEl) valEl.textContent = listenTimeStr;
-    if (subEl) subEl.textContent = t('stat_listen_estimate', formatNum(totalPlay));
   }
 
   loadDashMonthlyChart(currentYear);
@@ -1736,6 +1761,35 @@ function setupChartsSection() {
   loadMonthlyChart(currentYear);
   loadCumulativeChart();
   loadPieCharts();
+
+  // If full history already loaded, render hourly/weekday/OHW immediately
+  if (APP.fullHistory?.length) {
+    const hourCounts = Array(24).fill(0);
+    for (const tr of APP.fullHistory) {
+      const ts = parseInt(tr.date?.uts || 0);
+      if (ts) hourCounts[new Date(ts * 1000).getHours()]++;
+    }
+    _renderHourlyChart(hourCounts);
+    _renderDayOfWeekChart(APP.fullHistory);
+    _renderOHWList(APP.fullHistory);
+    const hourlyHint  = document.getElementById('hourly-hint');
+    const weekdayHint = document.getElementById('weekday-hint');
+    if (hourlyHint)  hourlyHint.textContent  = '';
+    if (weekdayHint) weekdayHint.textContent = '';
+    document.getElementById('ohw-empty')?.style.setProperty('display', 'none');
+  } else {
+    // Show empty placeholder for OHW
+    const ohwEmpty = document.getElementById('ohw-empty');
+    const ohwList  = document.getElementById('ohw-list');
+    if (ohwEmpty) ohwEmpty.style.display = '';
+    if (ohwList)  ohwList.innerHTML = '';
+  }
+
+  // Auto-render all visualisations — no button needed
+  setTimeout(() => {
+    loadVizPlus();
+    loadMusicalProfile();
+  }, 1200);
 }
 
 async function loadMonthlyChart(year) {
@@ -2161,11 +2215,13 @@ async function loadAdvancedStats() {
     const grid = document.getElementById('adv-grid');
     if (grid) {
       grid.innerHTML = cards.map((c, i) => `
-        <div class="adv-card" style="animation-delay:${i * 0.05}s">
-          <div class="adv-card-icon">${c.icon}</div>
-          <div class="adv-card-value" style="color:${c.color}">${c.value}</div>
-          <div class="adv-card-label">${c.label}</div>
-          <div class="adv-card-sub">${c.sub}</div>
+        <div class="adv-card adv-chip" style="--chip-accent:${c.color};animation-delay:${i * 0.05}s">
+          <div class="adv-chip-top">
+            <span class="adv-chip-icon">${c.icon}</span>
+            <span class="adv-chip-value" style="color:${c.color}">${c.value}</span>
+          </div>
+          <div class="adv-chip-label">${c.label}</div>
+          <div class="adv-chip-sub">${c.sub}</div>
         </div>`).join('');
     }
   } catch (e) {
@@ -2260,8 +2316,14 @@ async function fetchFullHistory(backgroundMode = false) {
     _renderDayOfWeekChart(tracks);
     _renderOHWList(tracks);
 
-    // Reveal the adv-charts block (was hidden until history loaded)
-    document.getElementById('adv-charts')?.classList.remove('hidden');
+    // Clear "load history" hints from charts section
+    const hourlyHint  = document.getElementById('hourly-hint');
+    const weekdayHint = document.getElementById('weekday-hint');
+    if (hourlyHint)  hourlyHint.textContent  = '';
+    if (weekdayHint) weekdayHint.textContent = '';
+
+    // Hide OHW empty state if it was showing
+    document.getElementById('ohw-empty')?.style?.setProperty?.('display', 'none');
 
     if (backgroundMode) {
       showToast(t('fetch_auto_done'));
@@ -2381,8 +2443,8 @@ async function refreshData() {
     if (activeSection === 'top-artists') await loadTopArtists(APP.artistsPeriod || 'overall');
     if (activeSection === 'top-albums')  await loadTopAlbums(APP.albumsPeriod   || 'overall');
     if (activeSection === 'top-tracks')  await loadTopTracks(APP.tracksPeriod   || 'overall');
-    if (activeSection === 'charts')      setupChartsSection();
-    if (activeSection === 'vizplus')     loadVizPlus();
+    if (activeSection === 'charts')      { _vizPlusLoaded = false; setupChartsSection(); }
+    if (activeSection === 'vizplus')     { _vizPlusLoaded = false; loadVizPlus(); }
     if (activeSection === 'obscurity')   loadObscurityScore();
 
     showToast(t('toast_data_updated'));
@@ -2605,14 +2667,13 @@ function shareTrack(name, artist, plays, url) {
 let _vizPlusLoaded = false;
 
 async function loadVizPlus() {
-  if (_vizPlusLoaded) return;
-
   const statusEl  = document.getElementById('vizplus-status');
   const statusTxt = document.getElementById('vizplus-status-txt');
-  const btn       = document.getElementById('vizplus-load-btn');
+  // Update status hint in charts section header (button removed)
+  const radarHint = document.getElementById('radar-status-hint');
 
   if (statusEl) statusEl.classList.remove('hidden');
-  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
+  if (radarHint) radarHint.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:.75rem;margin-right:4px"></i>';
 
   try {
     if (statusTxt) statusTxt.textContent = t('loading');
@@ -2620,14 +2681,13 @@ async function loadVizPlus() {
     await _buildTreemap();
     await _buildSankey();
     if (statusEl) statusEl.classList.add('hidden');
+    if (radarHint) radarHint.innerHTML = '<i class="fas fa-check" style="font-size:.75rem;margin-right:3px;color:#4ade80"></i>';
     _vizPlusLoaded = true;
-    showToast(t('toast_data_updated'));
   } catch (e) {
     console.error('loadVizPlus:', e);
     if (statusTxt) statusTxt.textContent = t('obs_error', e.message);
+    if (radarHint) radarHint.innerHTML = '';
     setTimeout(() => statusEl?.classList.add('hidden'), 3500);
-  } finally {
-    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-magic"></i>'; }
   }
 }
 
@@ -2889,10 +2949,9 @@ async function loadMusicalProfile() {
   const phEl   = document.getElementById('profile-placeholder');
   const wrapEl = document.getElementById('profile-chart-wrap');
   const legEl  = document.getElementById('profile-tag-legend');
-  const btnEl  = document.getElementById('profile-load-btn');
+  const statusHint = document.getElementById('profile-status-hint');
 
-  if (btnEl) { btnEl.disabled = true; btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
-  if (phEl)  phEl.classList.add('hidden');
+  if (phEl)  phEl.classList.remove('hidden');
 
   const TOP_TAGS_COUNT = 5;
   const MONTHS_BACK    = 6;
@@ -2997,8 +3056,8 @@ async function loadMusicalProfile() {
       .slice(0, TOP_TAGS_COUNT);
 
     if (!tagTotals.length) {
-      if (phEl) { phEl.classList.remove('hidden'); }
-      if (btnEl) { btnEl.disabled = false; btnEl.innerHTML = `<i class="fas fa-redo"></i> ${t('profile_retry')}`; }
+      if (phEl) { phEl.classList.remove('hidden'); phEl.querySelector('p').textContent = t('unavailable'); }
+      if (statusHint) statusHint.innerHTML = '';
       return;
     }
 
@@ -3050,12 +3109,12 @@ async function loadMusicalProfile() {
       },
     });
 
-    if (btnEl) { btnEl.disabled = false; btnEl.innerHTML = `<i class="fas fa-sync-alt"></i> ${t('profile_reload')}`; }
+    if (statusHint) statusHint.innerHTML = '<i class="fas fa-check" style="font-size:.75rem;margin-right:3px;color:#4ade80"></i>';
 
   } catch (e) {
     console.error('loadMusicalProfile:', e);
     if (phEl) phEl.classList.remove('hidden');
-    if (btnEl) { btnEl.disabled = false; btnEl.innerHTML = `<i class="fas fa-redo"></i> ${t('profile_retry')}`; }
+    if (statusHint) statusHint.innerHTML = '';
   }
 }
 
@@ -3234,6 +3293,14 @@ const BadgeEngine = (() => {
     { id:'diversified',    cat:'diversite',  icon:'🌈', get name(){return t('badge_diversified_name');},  get desc(){return t('badge_diversified_desc');}, thresholds:thresholds(5),    compute:() => document.querySelectorAll('.mood-tag').length },
     { id:'genre_curious',  cat:'diversite',  icon:'🎭', get name(){return t('badge_genre_curious_name');}, get desc(){return t('badge_genre_curious_desc');}, thresholds:thresholds(6), compute:(hist) => new Set(hist.map(tr=>{const ts=parseInt(tr.date?.uts||0);if(!ts)return null;const d=new Date(ts*1000);return `${d.getFullYear()}-${d.getMonth()}`;}).filter(Boolean)).size },
     { id:'multilingual',   cat:'diversite',  icon:'🌍', get name(){return t('badge_multilingual_name');}, get desc(){return t('badge_multilingual_desc');}, thresholds:thresholds(5),   compute:(hist) => { const nl=/[^\u0000-\u007F\u00C0-\u024F]/;return new Set(hist.filter(tr=>{const a=tr.artist?.['#text']||tr.artist?.name||'';return nl.test(a);}).map(tr=>(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase())).size; } },
+    // ── Tempo (rythme d'écoute dans le temps) ──
+    { id:'crescendo',      cat:'tempo',      icon:'📈', get name(){return t('badge_crescendo_name');},    get desc(){return t('badge_crescendo_desc');},   thresholds:thresholds(3),    compute:(hist) => { if(hist.length<2)return 0; const byMonth=new Map(); for(const tr of hist){const ts=parseInt(tr.date?.uts||0);if(!ts)continue;const d=new Date(ts*1000);const k=`${d.getFullYear()}-${String(d.getMonth()).padStart(2,'0')}`;byMonth.set(k,(byMonth.get(k)||0)+1);} const months=[...byMonth.entries()].sort((a,b)=>a[0]<b[0]?-1:1); let runs=0,streak=0; for(let i=1;i<months.length;i++){if(months[i][1]>months[i-1][1]){streak++;if(streak>=2)runs++;} else streak=0;} return runs; } },
+    { id:'regular',        cat:'tempo',      icon:'📅', get name(){return t('badge_regular_name');},      get desc(){return t('badge_regular_desc');},     thresholds:thresholds(4),    compute:(hist) => { if(!hist.length)return 0; const days=new Set(hist.map(tr=>{const ts=parseInt(tr.date?.uts||0);if(!ts)return null;const d=new Date(ts*1000);return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;}).filter(Boolean)); return Math.round(days.size/Math.max(1,hist.length/50)); } },
+    { id:'comeback',       cat:'tempo',      icon:'🔄', get name(){return t('badge_comeback_name');},     get desc(){return t('badge_comeback_desc');},    thresholds:thresholds(1),    compute:(hist) => { if(hist.length<2)return 0; let gaps=0; for(let i=1;i<hist.length;i++){const t1=parseInt(hist[i-1].date?.uts||0),t2=parseInt(hist[i].date?.uts||0);if(t1&&t2&&Math.abs(t1-t2)>30*86400)gaps++;} return gaps; } },
+    // ── Social (partage & affinités) ──
+    { id:'ambassador',     cat:'social',     icon:'📣', get name(){return t('badge_ambassador_name');},   get desc(){return t('badge_ambassador_desc');},  thresholds:thresholds(5),    compute:(hist) => { const am=new Map(); hist.forEach(tr=>{const a=(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase();if(a)am.set(a,(am.get(a)||0)+1);}); return [...am.values()].filter(v=>v>=100).length; } },
+    { id:'tastemaker',     cat:'social',     icon:'🎯', get name(){return t('badge_tastemaker_name');},   get desc(){return t('badge_tastemaker_desc');},  thresholds:thresholds(2),    compute:(hist) => { const am=new Map(); hist.forEach(tr=>{const a=(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase();if(a)am.set(a,(am.get(a)||0)+1);}); const total=hist.length; return [...am.values()].filter(v=>v/total>0.1).length; } },
+    { id:'nomad',          cat:'social',     icon:'✈️', get name(){return t('badge_nomad_name');},        get desc(){return t('badge_nomad_desc');},       thresholds:thresholds(5),    compute:(hist) => { const byMonth=new Map(); for(const tr of hist){const ts=parseInt(tr.date?.uts||0);if(!ts)continue;const d=new Date(ts*1000);const mk=`${d.getFullYear()}-${d.getMonth()}`;const ak=(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase();if(!byMonth.has(mk))byMonth.set(mk,new Set());byMonth.get(mk).add(ak);} let months=0; byMonth.forEach(s=>{if(s.size>=10)months++;}); return months; } },
   ];
 
   function computeBadge(def, history) {
@@ -3334,7 +3401,7 @@ const BadgeEngine = (() => {
       else navBadge.style.display = 'none';
     }
 
-    ['noctambule','exploration','fidelite','volume','diversite'].forEach(cat => {
+    ['noctambule','exploration','fidelite','volume','diversite','tempo','social'].forEach(cat => {
       const grid = document.getElementById(`badge-grid-${cat}`);
       if (!grid) return;
       grid.innerHTML = results.filter(b => b.cat === cat).map(b => _badgeCard(b)).join('');
@@ -3463,7 +3530,7 @@ function restoreBadgesFromStorage() {
         const xpFill = document.getElementById('bsc-xp-fill');
         if (xpFill) setTimeout(() => { xpFill.style.width = lvlData.pct + '%'; }, 300);
 
-        ['noctambule','exploration','fidelite','volume','diversite'].forEach(cat => {
+        ['noctambule','exploration','fidelite','volume','diversite','tempo','social'].forEach(cat => {
           const grid = document.getElementById(`badge-grid-${cat}`);
           if (!grid) return;
           grid.innerHTML = window._badgeResults.filter(b => b.cat === cat).map(b => {

@@ -320,64 +320,123 @@
            + comparison, insights, now-playing, charts
       ══════════════════════════════════════════ -->
       <section id="s-dashboard" class="app-sec active" style="view-transition-name:section-dashboard">
-        <div class="sec-hd">
-          <h2 data-i18n="dashboard.title">Dashboard</h2>
-          <p class="sec-sub" data-i18n="dashboard.sub">Overview of your musical activity</p>
+        <div class="sec-hd dash-sec-hd">
+          <div>
+            <h2 data-i18n="dashboard.title">Dashboard</h2>
+            <p class="sec-sub" data-i18n="dashboard.sub">Overview of your musical activity</p>
+          </div>
+          <button class="btn-fetch btn-fetch--sm" id="fetch-history-btn" onclick="fetchFullHistory()">
+            <i class="fas fa-database"></i>
+            <span data-i18n="advanced.loadHistory">Load full history</span>
+          </button>
         </div>
 
-        <!-- Stat cards (JS fills these; skeletons shown while loading) -->
+        <!-- ─── Quick Stats Grid (8 cards) ─── -->
         <div class="stat-grid" id="stat-grid">
-          <!-- Scrobbles -->
-          <div class="stat-card sk">
-            <div class="sk-ln w100"></div>
-            <div class="sk-ln w60 mt8"></div>
-            <div class="sk-ln w40 mt4"></div>
-          </div>
-          <!-- Artists -->
-          <div class="stat-card sk">
-            <div class="sk-ln w100"></div>
-            <div class="sk-ln w60 mt8"></div>
-            <div class="sk-ln w40 mt4"></div>
-          </div>
-          <!-- Albums -->
-          <div class="stat-card sk">
-            <div class="sk-ln w100"></div>
-            <div class="sk-ln w60 mt8"></div>
-            <div class="sk-ln w40 mt4"></div>
-          </div>
-          <!-- Tracks -->
-          <div class="stat-card sk">
-            <div class="sk-ln w100"></div>
-            <div class="sk-ln w60 mt8"></div>
-            <div class="sk-ln w40 mt4"></div>
-          </div>
-          <!-- Member since -->
-          <div class="stat-card sk">
-            <div class="sk-ln w100"></div>
-            <div class="sk-ln w60 mt8"></div>
-            <div class="sk-ln w40 mt4"></div>
-          </div>
-          <!-- Last scrobble -->
-          <div class="stat-card sk">
-            <div class="sk-ln w100"></div>
-            <div class="sk-ln w60 mt8"></div>
-            <div class="sk-ln w40 mt4"></div>
-          </div>
-          <!-- Estimated listen time (filled by JS after history load) -->
-          <div class="stat-card sk" id="stat-card-listen-time">
-            <div class="sk-ln w100"></div>
-            <div class="sk-ln w60 mt8"></div>
-            <div class="sk-ln w40 mt4"></div>
-          </div>
-          <!-- Average scrobbles per day -->
-          <div class="stat-card sk" id="stat-card-avg-day">
-            <div class="sk-ln w100"></div>
-            <div class="sk-ln w60 mt8"></div>
-            <div class="sk-ln w40 mt4"></div>
+          <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
+        </div>
+
+        <!-- ─── 3. Now Playing widget ─── -->
+        <div id="now-playing-wrap" class="hidden">
+          <div class="now-playing-bar" id="now-playing-bar">
+            <div class="np-pulse"></div>
+            <div class="np-art" id="np-art">
+              <img id="np-art-img" src="" alt="" crossorigin="anonymous" style="display:none">
+            </div>
+            <div class="np-info">
+              <span class="np-live" data-i18n="nowPlaying.live">● NOW PLAYING</span>
+              <strong id="np-track">—</strong>
+              <span id="np-artist">—</span>
+            </div>
+            <div class="np-actions">
+              <a class="np-play-btn np-spotify" id="np-spotify-btn"
+                 href="#" target="_blank" rel="noopener" aria-label="Open in Spotify" title="Open in Spotify">
+                <i class="fab fa-spotify"></i>
+              </a>
+              <a class="np-play-btn np-youtube" id="np-youtube-btn"
+                 href="#" target="_blank" rel="noopener" aria-label="Search on YouTube" title="Search on YouTube">
+                <i class="fab fa-youtube"></i>
+              </a>
+              <button class="np-play-btn np-share" id="np-share-btn"
+                      onclick="shareNowPlaying()" aria-label="Share this track" title="Share this track">
+                <i class="fas fa-share-alt"></i>
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- ─── Period comparison ─── -->
+        <!-- ─── 4. Analyses Visuelles ─── -->
+        <div class="dash-visuals-hd">
+          <i class="fas fa-chart-area"></i>
+          <span data-i18n="dash.visualsTitle">Visual Analysis</span>
+        </div>
+
+        <!-- Quick insights row (Mood · Streak) -->
+        <div class="insights-row insights-row--2col">
+          <div class="insight-card mood-card">
+            <div class="ic-hd">
+              <i class="fas fa-hashtag"></i>
+              <span data-i18n="insights.mood">Your Musical Mood</span>
+            </div>
+            <div id="mood-tags" class="mood-tags">
+              <div class="sk-ln w70 mt8"></div>
+              <div class="sk-ln w50 mt4"></div>
+              <div class="sk-ln w60 mt4"></div>
+            </div>
+          </div>
+          <div class="insight-card streak-card">
+            <div class="ic-hd">🔥 <span data-i18n="insights.streak">Listening Streak</span></div>
+            <div class="streak-body">
+              <div class="streak-nums">
+                <div>
+                  <span class="streak-val" id="streak-best">—</span>
+                  <span class="streak-lbl" data-i18n="insights.streakRecord">Record</span>
+                </div>
+                <div class="streak-sep"></div>
+                <div>
+                  <span class="streak-val" id="streak-curr">—</span>
+                  <span class="streak-lbl" data-i18n="insights.streakCurrent">Current</span>
+                </div>
+              </div>
+              <p class="streak-hint" id="streak-hint" data-i18n="insights.streakHint">Load full history to calculate</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard charts (monthly bar + top 5 donut) -->
+        <div class="dash-charts">
+          <div class="chart-card">
+            <div class="cc-hd">
+              <span>
+                <i class="fas fa-chart-bar"></i>
+                <span data-i18n="dash.monthly">Monthly activity</span>
+                <b id="dash-yr"></b>
+              </span>
+            </div>
+            <canvas id="dash-monthly" height="220"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="cc-hd">
+              <span>
+                <i class="fas fa-trophy"></i>
+                <span data-i18n="dash.top5">Top 5 Artists</span>
+              </span>
+            </div>
+            <canvas id="dash-artists" height="220"></canvas>
+          </div>
+        </div>
+
+        <!-- ─── 5. Period comparison ─── -->
         <div class="compare-section">
           <div class="compare-hd">
             <div class="ic-hd">
@@ -465,152 +524,6 @@
           </div>
         </div>
 
-        <!-- ─── Quick insights row ─── -->
-        <div class="insights-row">
-          <div class="insight-card versus-card">
-            <div class="ic-hd">
-              <i class="fas fa-calendar-alt"></i>
-              <span data-i18n="insights.monthVs">This month vs last month</span>
-            </div>
-            <div id="vs-body" class="vs-body">
-              <div class="sk-ln w80 mt8"></div>
-              <div class="sk-ln w60 mt8"></div>
-            </div>
-          </div>
-          <div class="insight-card mood-card">
-            <div class="ic-hd">
-              <i class="fas fa-hashtag"></i>
-              <span data-i18n="insights.mood">Your Musical Mood</span>
-            </div>
-            <div id="mood-tags" class="mood-tags">
-              <div class="sk-ln w70 mt8"></div>
-              <div class="sk-ln w50 mt4"></div>
-              <div class="sk-ln w60 mt4"></div>
-            </div>
-          </div>
-          <div class="insight-card streak-card">
-            <div class="ic-hd">🔥 <span data-i18n="insights.streak">Listening Streak</span></div>
-            <div class="streak-body">
-              <div class="streak-nums">
-                <div>
-                  <span class="streak-val" id="streak-best">—</span>
-                  <span class="streak-lbl" data-i18n="insights.streakRecord">Record</span>
-                </div>
-                <div class="streak-sep"></div>
-                <div>
-                  <span class="streak-val" id="streak-curr">—</span>
-                  <span class="streak-lbl" data-i18n="insights.streakCurrent">Current</span>
-                </div>
-              </div>
-              <p class="streak-hint" id="streak-hint" data-i18n="insights.streakHint">Load full history to calculate</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- ─── Now Playing widget ─── -->
-        <div id="now-playing-wrap" class="hidden">
-          <div class="now-playing-bar" id="now-playing-bar">
-            <div class="np-pulse"></div>
-            <div class="np-art" id="np-art">
-              <img id="np-art-img" src="" alt="" crossorigin="anonymous" style="display:none">
-            </div>
-            <div class="np-info">
-              <span class="np-live" data-i18n="nowPlaying.live">● NOW PLAYING</span>
-              <strong id="np-track">—</strong>
-              <span id="np-artist">—</span>
-            </div>
-            <div class="np-actions">
-              <a class="np-play-btn np-spotify" id="np-spotify-btn"
-                 href="#" target="_blank" rel="noopener" aria-label="Open in Spotify" title="Open in Spotify">
-                <i class="fab fa-spotify"></i>
-              </a>
-              <a class="np-play-btn np-youtube" id="np-youtube-btn"
-                 href="#" target="_blank" rel="noopener" aria-label="Search on YouTube" title="Search on YouTube">
-                <i class="fab fa-youtube"></i>
-              </a>
-              <button class="np-play-btn np-share" id="np-share-btn"
-                      onclick="shareNowPlaying()" aria-label="Share this track" title="Share this track">
-                <i class="fas fa-share-alt"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- ─── Dashboard charts ─── -->
-        <div class="dash-charts">
-          <div class="chart-card">
-            <div class="cc-hd">
-              <span>
-                <i class="fas fa-chart-bar"></i>
-                <span data-i18n="dash.monthly">Monthly activity</span>
-                <b id="dash-yr"></b>
-              </span>
-            </div>
-            <canvas id="dash-monthly" height="220"></canvas>
-          </div>
-          <div class="chart-card">
-            <div class="cc-hd">
-              <span>
-                <i class="fas fa-trophy"></i>
-                <span data-i18n="dash.top5">Top 5 Artists</span>
-              </span>
-            </div>
-            <canvas id="dash-artists" height="220"></canvas>
-          </div>
-        </div>
-
-        <!-- ─── Advanced Stats (fusionné) ─── -->
-        <div class="dash-advanced-hd" style="display:flex;align-items:center;justify-content:space-between;margin-top:28px;margin-bottom:12px;flex-wrap:wrap;gap:12px;">
-          <div>
-            <h3 style="font-size:1rem;font-weight:800;letter-spacing:-.02em;" data-i18n="advanced.title">Advanced Stats</h3>
-            <p class="sec-sub" data-i18n="advanced.sub">Metrics for true music nerds</p>
-          </div>
-          <button class="btn-fetch" id="fetch-history-btn" onclick="fetchFullHistory()">
-            <i class="fas fa-database"></i>
-            <span data-i18n="advanced.loadHistory">Load full history</span>
-          </button>
-        </div>
-        <div class="adv-grid" id="adv-grid">
-          <div class="adv-card sk"><div class="sk-ln w60"></div><div class="sk-ln w40 mt8"></div></div>
-          <div class="adv-card sk"><div class="sk-ln w60"></div><div class="sk-ln w40 mt8"></div></div>
-          <div class="adv-card sk"><div class="sk-ln w60"></div><div class="sk-ln w40 mt8"></div></div>
-          <div class="adv-card sk"><div class="sk-ln w60"></div><div class="sk-ln w40 mt8"></div></div>
-          <div class="adv-card sk"><div class="sk-ln w60"></div><div class="sk-ln w40 mt8"></div></div>
-          <div class="adv-card sk"><div class="sk-ln w60"></div><div class="sk-ln w40 mt8"></div></div>
-        </div>
-        <div id="adv-charts" class="hidden">
-          <div class="charts-duo">
-            <div class="chart-card">
-              <div class="cc-hd"><span><i class="fas fa-clock"></i> <span data-i18n="advanced.hourly">Hourly distribution</span></span></div>
-              <canvas id="chart-hourly" height="220"></canvas>
-            </div>
-            <div class="chart-card">
-              <div class="cc-hd"><span><i class="fas fa-calendar-week"></i> <span data-i18n="advanced.weekday">Activity by day of week</span></span></div>
-              <canvas id="chart-weekday" height="220"></canvas>
-            </div>
-          </div>
-          <div class="chart-card full">
-            <div class="cc-hd">
-              <span>
-                <i class="fas fa-list-ol"></i>
-                <span data-i18n="advanced.ohw">One-Hit Wonders</span>
-                <button class="info-tooltip-btn" aria-label="What is a One-Hit Wonder?" title="Artists you've only listened to 1-3 times." onclick="toggleOhwTooltip(event)"><i class="fas fa-question-circle"></i></button>
-              </span>
-              <span class="cc-hint" data-i18n="advanced.ohwHint">Artists played 1–3 times only</span>
-            </div>
-            <div class="ohw-tooltip" id="ohw-tooltip" aria-live="polite">
-              <div class="ohw-tooltip-inner">
-                <i class="fas fa-lightbulb"></i>
-                <div>
-                  <strong data-i18n="advanced.ohwTooltipTitle">What is a One-Hit Wonder?</strong>
-                  <p data-i18n="advanced.ohwTooltipBody">In LastStats, a One-Hit Wonder is an artist you've listened to very few times — between 1 and 3 scrobbles. These are musical curiosities that never became habits. The list below shows your top 20.</p>
-                </div>
-                <button class="ohw-tooltip-close" onclick="toggleOhwTooltip(event)"><i class="fas fa-times"></i></button>
-              </div>
-            </div>
-            <div id="ohw-list" class="ohw-list"></div>
-          </div>
-        </div>
       </section>
 
 
@@ -795,14 +708,11 @@
               <i class="fas fa-sliders-h"></i>
               <span data-i18n="charts.profile">Musical Profile — Dominant tags evolution</span>
             </span>
-            <button class="cc-btn" id="profile-load-btn" onclick="loadMusicalProfile()">
-              <i class="fas fa-magic"></i>
-              <span data-i18n="charts.analyse">Analyse</span>
-            </button>
+            <span class="cc-hint" id="profile-status-hint" data-i18n="charts.profileAutoHint">Auto-generated</span>
           </div>
           <div class="chart-placeholder" id="profile-placeholder">
             <i class="fas fa-sliders-h fa-2x"></i>
-            <p data-i18n="charts.profileHint">Click "Analyse" to visualise the evolution of your musical tags</p>
+            <p data-i18n="charts.profileHint">Generating your musical profile…</p>
           </div>
           <div class="chart-wrap hidden" id="profile-chart-wrap">
             <canvas id="chart-profile" height="280"></canvas>
@@ -831,8 +741,56 @@
           </div>
         </div>
 
-        <!-- Donut charts — artists & albums distribution -->
+        <!-- Hourly & weekday charts (filled after history load) -->
         <div class="charts-duo">
+          <div class="chart-card">
+            <div class="cc-hd">
+              <span><i class="fas fa-clock"></i> <span data-i18n="advanced.hourly">Hourly distribution</span></span>
+              <span class="cc-hint" id="hourly-hint" data-i18n="charts.heatmapHint">Available after loading full history</span>
+            </div>
+            <canvas id="chart-hourly" height="220"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="cc-hd">
+              <span><i class="fas fa-calendar-week"></i> <span data-i18n="advanced.weekday">Activity by day of week</span></span>
+              <span class="cc-hint" id="weekday-hint" data-i18n="charts.heatmapHint">Available after loading full history</span>
+            </div>
+            <canvas id="chart-weekday" height="220"></canvas>
+          </div>
+        </div>
+
+        <!-- One-Hit Wonders -->
+        <div class="chart-card full">
+          <div class="cc-hd">
+            <span>
+              <i class="fas fa-list-ol"></i>
+              <span data-i18n="advanced.ohw">One-Hit Wonders</span>
+              <button class="info-tooltip-btn" aria-label="What is a One-Hit Wonder?" title="Artists you've only listened to 1-3 times." onclick="toggleOhwTooltip(event)"><i class="fas fa-question-circle"></i></button>
+            </span>
+            <span class="cc-hint" data-i18n="advanced.ohwHint">Artists played 1–3 times only</span>
+          </div>
+          <div class="ohw-tooltip" id="ohw-tooltip" aria-live="polite">
+            <div class="ohw-tooltip-inner">
+              <i class="fas fa-lightbulb"></i>
+              <div>
+                <strong data-i18n="advanced.ohwTooltipTitle">What is a One-Hit Wonder?</strong>
+                <p data-i18n="advanced.ohwTooltipBody">In LastStats, a One-Hit Wonder is an artist you've listened to very few times — between 1 and 3 scrobbles. These are musical curiosities that never became habits. The list below shows your top 20.</p>
+              </div>
+              <button class="ohw-tooltip-close" onclick="toggleOhwTooltip(event)"><i class="fas fa-times"></i></button>
+            </div>
+          </div>
+          <div id="ohw-empty" class="chart-placeholder" style="display:none">
+            <i class="fas fa-database fa-2x"></i>
+            <p data-i18n="charts.heatmapHint">Available after loading full history</p>
+            <button class="btn-fetch-sm" onclick="fetchFullHistory()">
+              <i class="fas fa-play"></i>
+              <span data-i18n="charts.loadHistory">Load history</span>
+            </button>
+          </div>
+          <div id="ohw-list" class="ohw-list"></div>
+        </div>
+
+        <!-- Donut charts — artists & albums distribution -->        <div class="charts-duo">
           <div class="chart-card">
             <div class="cc-hd">
               <span>
@@ -861,14 +819,11 @@
               <span data-i18n="charts.radar">Genre Radar</span>
             </span>
             <span class="cc-hint" data-i18n="charts.radarHint">Based on your Last.fm mood tags</span>
-            <button class="cc-btn" id="radar-load-btn" onclick="loadVizPlus()">
-              <i class="fas fa-magic"></i>
-              <span data-i18n="charts.generate">Generate</span>
-            </button>
+            <span class="cc-hint" id="radar-status-hint"></span>
           </div>
           <div class="chart-placeholder" id="vizplus-radar-ph">
             <i class="fas fa-spider fa-2x"></i>
-            <p data-i18n="charts.radarPh">Click "Generate" to analyse your musical genres</p>
+            <p data-i18n="charts.radarPh">Generating genre analysis…</p>
           </div>
           <div class="radar-wrap hidden" id="vizplus-radar-wrap">
             <canvas id="chart-radar" height="360"></canvas>
@@ -1035,6 +990,20 @@
             <h3 class="badge-cat-title"><i class="fas fa-music"></i> <span data-i18n="badge.cat.genreCuriosity">Genre Curious</span></h3>
             <p class="badge-cat-desc" data-i18n="badge.cat.genreCuriosityDesc">Number of different musical genres explored</p>
             <div class="badge-grid" id="badge-grid-genres"></div>
+          </div>
+
+          <!-- ── Tempo ── -->
+          <div class="badge-category">
+            <h3 class="badge-cat-title"><i class="fas fa-chart-line"></i> <span data-i18n="badge.cat.tempo">Rythme d'écoute</span></h3>
+            <p class="badge-cat-desc" data-i18n="badge.cat.tempoDesc">Progression, régularité et come-back de vos écoutes</p>
+            <div class="badge-grid" id="badge-grid-tempo"></div>
+          </div>
+
+          <!-- ── Social ── -->
+          <div class="badge-category">
+            <h3 class="badge-cat-title"><i class="fas fa-users"></i> <span data-i18n="badge.cat.social">Affinités</span></h3>
+            <p class="badge-cat-desc" data-i18n="badge.cat.socialDesc">Vos liens avec vos artistes favoris</p>
+            <div class="badge-grid" id="badge-grid-social"></div>
           </div>
 
         </div>
