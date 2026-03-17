@@ -1943,6 +1943,36 @@ canvas#w-mini { height: 60px !important; }
 .setting-lbl { display: flex; align-items: center; gap: 6px; font-size: .84rem; font-weight: 500; color: var(--text-muted); }
 .setting-lbl i { color: var(--accent); width: 14px; text-align: center; }
 .setting-ctrl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* ─── Language selector grid ─── */
+.lang-btns {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+  gap: 6px;
+  width: 100%;
+}
+.lang-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 13px; border-radius: var(--radius-xs);
+  font-size: .83rem; font-weight: 500; color: var(--text-muted);
+  border: 1.5px solid var(--border);
+  background: var(--bg-hover);
+  transition: all .18s; text-align: left; cursor: pointer;
+  font-family: inherit;
+}
+.lang-btn:hover {
+  border-color: var(--border-glow);
+  color: var(--text);
+  background: var(--bg-card);
+}
+.lang-btn.active {
+  background: var(--accent-lt);
+  color: var(--accent);
+  border-color: var(--border-glow);
+  font-weight: 700;
+}
+.lang-flag { font-size: 1.15rem; line-height: 1; flex-shrink: 0; }
+
 .setting-input { flex: 1; min-width: 160px; padding: 10px 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: var(--bg-card); color: var(--text); font-family: inherit; font-size: .88rem; transition: border-color .2s, box-shadow .2s; outline: none; }
 .setting-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-lt); }
 .setting-actions { padding-top: 4px; border-top: 1px solid var(--border); }
