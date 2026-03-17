@@ -730,8 +730,12 @@ canvas { max-width: 100%; }
 
 .stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 20px; margin-bottom: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 16px; margin-bottom: 24px;
+}
+/* ── 6 first cards = primary row, highlighted slightly ── */
+.stat-grid .stat-card:nth-child(-n+6) {
+  border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 22%, var(--border));
 }
 .stat-card {
   background: var(--surface-container-low, var(--bg-card-hi));
@@ -765,6 +769,31 @@ canvas { max-width: 100%; }
 /* Avg scrobbles per day */
 #stat-card-avg-day { --card-accent: var(--accent-2); }
 
+/* ── Bouton Partager section (Top Artists / Albums / Tracks) ── */
+.btn-section-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--md-sys-color-primary, var(--accent)) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--md-sys-color-primary, var(--accent)) 28%, transparent);
+  color: var(--md-sys-color-primary, var(--accent));
+  font-size: .78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s, transform .15s, box-shadow .2s, border-color .2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-section-share:hover {
+  background: color-mix(in srgb, var(--md-sys-color-primary, var(--accent)) 22%, transparent);
+  border-color: var(--md-sys-color-primary, var(--accent));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--md-sys-color-primary, var(--accent)) 40%, transparent);
+  transform: translateY(-1px);
+}
+.btn-section-share:active { transform: translateY(0); }
+.btn-section-share i { font-size: .82rem; }
 
 /* ============================================================
    10. INSIGHTS ROW — Versus · Mood Tags · Streak
@@ -2350,14 +2379,18 @@ button.bn-item:focus-visible,
    ============================================================ */
 
 /* Stat grid cards appear in sequence */
-.stat-grid .stat-card:nth-child(1) { animation-delay: .00s; }
-.stat-grid .stat-card:nth-child(2) { animation-delay: .04s; }
-.stat-grid .stat-card:nth-child(3) { animation-delay: .08s; }
-.stat-grid .stat-card:nth-child(4) { animation-delay: .12s; }
-.stat-grid .stat-card:nth-child(5) { animation-delay: .16s; }
-.stat-grid .stat-card:nth-child(6) { animation-delay: .20s; }
-.stat-grid .stat-card:nth-child(7) { animation-delay: .24s; }
-.stat-grid .stat-card:nth-child(8) { animation-delay: .28s; }
+.stat-grid .stat-card:nth-child(1)  { animation-delay: .00s; }
+.stat-grid .stat-card:nth-child(2)  { animation-delay: .04s; }
+.stat-grid .stat-card:nth-child(3)  { animation-delay: .08s; }
+.stat-grid .stat-card:nth-child(4)  { animation-delay: .12s; }
+.stat-grid .stat-card:nth-child(5)  { animation-delay: .16s; }
+.stat-grid .stat-card:nth-child(6)  { animation-delay: .20s; }
+.stat-grid .stat-card:nth-child(7)  { animation-delay: .24s; }
+.stat-grid .stat-card:nth-child(8)  { animation-delay: .28s; }
+.stat-grid .stat-card:nth-child(9)  { animation-delay: .32s; }
+.stat-grid .stat-card:nth-child(10) { animation-delay: .36s; }
+.stat-grid .stat-card:nth-child(11) { animation-delay: .40s; }
+.stat-grid .stat-card:nth-child(12) { animation-delay: .44s; }
 .stat-grid .stat-card { animation: cardIn .35s cubic-bezier(.4,0,.2,1) both; }
 
 

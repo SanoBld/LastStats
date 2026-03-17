@@ -869,8 +869,31 @@ async function shareNowPlaying() {
 }
 
 /* ============================================================
-   DASHBOARD — grille unifiée 8 cartes sans doublons
-   Volume · Moyenne · Eddington · Artistes · Jours · Top1 · Diversité · Temps
+   DASHBOARD — Heure de pointe (200 derniers scrobbles)
+   ============================================================ */
+async function getPeakHourData() {
+  try {
+    const data   = await API.call('user.getRecentTracks', { limit: 200 });
+    const tracks = data.recenttracks?.track || [];
+    const counts = Array(24).fill(0);
+    tracks.forEach(tr => {
+      const uts = parseInt(tr.date?.uts || 0);
+      if (uts) counts[new Date(uts * 1000).getHours()]++;
+    });
+    const peak = counts.indexOf(Math.max(...counts));
+    let mood;
+    if      (peak >= 5  && peak < 12) mood = t('stat_peak_mood_morning');
+    else if (peak >= 12 && peak < 18) mood = t('stat_peak_mood_day');
+    else if (peak >= 18 && peak < 23) mood = t('stat_peak_mood_evening');
+    else                              mood = t('stat_peak_mood_night');
+    return { label: `${peak}h – ${peak + 1}h`, mood };
+  } catch { return { label: '—', mood: '' }; }
+}
+
+/* ============================================================
+   DASHBOARD — grille unifiée 12 cartes
+   ① Volume · ② Fréquence · ③ Habitude · ④ Exploration
+   ⑤ Profondeur · ⑥ Diversité · + secondaires
    ============================================================ */
 async function loadDashboard() {
   const u = APP.userInfo;
@@ -921,18 +944,29 @@ async function loadDashboard() {
   const diversityPct = totalPlay > 0 && uniqueArtistsRaw > 0
     ? ((uniqueArtistsRaw / totalPlay) * 100).toFixed(2) : '0.00';
 
+  // Heure de pointe — chargée en parallèle
+  const peakData = await getPeakHourData();
+
   const cards = [
-    { icon:'🎯', value:totalPlay,                      label:t('adv_total'),        sub:t('adv_total_sub'),                               color:'#6366f1' },
-    { icon:'⚡', value:avgPerDay,                       label:t('adv_per_day'),      sub:t('adv_per_week', avgPerWeek),                    color:'#8b5cf6', noAnim:true },
-    { icon:'🔢', value:eddington,                       label:t('adv_eddington'),    sub:t('adv_eddington_sub', eddington),                color:'#a855f7', noAnim:true },
-    { icon:'🎤', value:formatNum(uniqueArtistsRaw),     label:t('stat_artists'),     sub:t('stat_since_start'),                            color:'#ec4899', noAnim:true },
-    { icon:'💿', value:uniqueAlbums,                    label:t('stat_albums'),      sub:t('stat_since_start'),                            color:'#d946ef', noAnim:true },
-    { icon:'🎼', value:uniqueTracks,                    label:t('stat_tracks'),      sub:t('stat_since_start'),                            color:'#f43f5e', noAnim:true },
-    { icon:'⏱️', value:lastScrobble,                    label:t('stat_last_scrobble'),sub:u.name ? `last.fm/user/${u.name}` : '',          color:'#f97316', noAnim:true },
-    { icon:'📆', value:formatNum(daysSince),             label:t('adv_days'),         sub:t('adv_days_sub', formatDate(regTs)),             color:'#eab308', noAnim:true },
-    { icon:'🌟', value:maxArtist ? maxArtist.name:'—',  label:t('adv_top1_alltime'), sub:t('adv_top1_pct', topPct),                       color:'#22c55e', noAnim:true },
-    { icon:'📊', value:`${diversityPct}%`,               label:t('stat_diversity'),   sub:t('stat_diversity_sub'),                          color:'#14b8a6', noAnim:true },
-    { icon:'🎧', value:`${formatNum(listenHours)}h`,    label:t('stat_listen_time'), sub:t('stat_listen_estimate', formatNum(totalPlay)),  color:'#06b6d4', noAnim:true },
+    // ① Volume
+    { icon:'🎯', value:totalPlay,                      label:t('adv_total'),          sub:t('adv_total_sub'),                                color:'#6366f1' },
+    // ② Fréquence
+    { icon:'⚡', value:avgPerDay,                       label:t('adv_per_day'),        sub:t('adv_per_week', avgPerWeek),                     color:'#8b5cf6', noAnim:true },
+    // ③ Habitude — nouvelle carte Heure de pointe
+    { icon:'🕐', value:peakData.label,                  label:t('stat_peak_hour'),     sub:peakData.mood,                                     color:'#a78bfa', noAnim:true },
+    // ④ Exploration
+    { icon:'🎤', value:formatNum(uniqueArtistsRaw),     label:t('stat_artists'),       sub:t('stat_since_start'),                             color:'#ec4899', noAnim:true },
+    // ⑤ Profondeur
+    { icon:'💿', value:uniqueAlbums,                    label:t('stat_albums'),        sub:t('stat_since_start'),                             color:'#d946ef', noAnim:true },
+    // ⑥ Diversité
+    { icon:'📊', value:`${diversityPct}%`,               label:t('stat_diversity'),     sub:t('stat_diversity_sub'),                           color:'#14b8a6', noAnim:true },
+    // — Cartes secondaires —
+    { icon:'🎼', value:uniqueTracks,                    label:t('stat_tracks'),        sub:t('stat_since_start'),                             color:'#f43f5e', noAnim:true },
+    { icon:'⏱️', value:lastScrobble,                    label:t('stat_last_scrobble'), sub:u.name ? `last.fm/user/${u.name}` : '',            color:'#f97316', noAnim:true },
+    { icon:'📆', value:formatNum(daysSince),             label:t('adv_days'),           sub:t('adv_days_sub', formatDate(regTs)),              color:'#eab308', noAnim:true },
+    { icon:'🌟', value:maxArtist ? maxArtist.name:'—',  label:t('adv_top1_alltime'),   sub:t('adv_top1_pct', topPct),                        color:'#22c55e', noAnim:true },
+    { icon:'🔢', value:eddington,                       label:t('adv_eddington'),      sub:t('adv_eddington_sub', eddington),                 color:'#a855f7', noAnim:true },
+    { icon:'🎧', value:`${formatNum(listenHours)}h`,    label:t('stat_listen_time'),   sub:t('stat_listen_estimate', formatNum(totalPlay)),   color:'#06b6d4', noAnim:true },
   ];
 
   const statGrid = document.getElementById('stat-grid');
@@ -2181,8 +2215,235 @@ function downloadCanvas(canvas, filename) {
 }
 
 /* ============================================================
-   ADVANCED STATS
+   SECTION CARD EXPORT — Story 9:16 (Canvas natif, crossOrigin)
+   Génère une image verticale 360×640 avec les 5 meilleurs items
+   de la section : Top Artistes, Top Albums ou Top Titres.
    ============================================================ */
+async function exportSectionCard(section) {
+  const W = 360, H = 640;
+  const canvas  = document.createElement('canvas');
+  canvas.width  = W * 2;
+  canvas.height = H * 2;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(2, 2);
+
+  /* ── Fond dégradé ─────────────────────────────────────────── */
+  const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+  bgGrad.addColorStop(0,   '#1a1025');
+  bgGrad.addColorStop(0.45,'#0f172a');
+  bgGrad.addColorStop(1,   '#0d1117');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  /* Cercle décoratif haut-gauche */
+  const gCircle = ctx.createRadialGradient(0, 0, 0, 0, 0, 200);
+  gCircle.addColorStop(0, 'rgba(99,102,241,0.18)');
+  gCircle.addColorStop(1, 'transparent');
+  ctx.fillStyle = gCircle;
+  ctx.fillRect(0, 0, W, H);
+
+  /* ── Données selon la section ─────────────────────────────── */
+  let items = [], sectionLabel = '', filename = 'laststats-story.png';
+
+  if (section === 'top-albums') {
+    items        = (APP.topAlbumsData  || []).slice(0, 5);
+    sectionLabel = 'Top Albums';
+    filename     = 'laststats-top-albums.png';
+  } else if (section === 'top-artists') {
+    items        = (APP.topArtistsData || []).slice(0, 5);
+    sectionLabel = 'Top Artists';
+    filename     = 'laststats-top-artists.png';
+  } else if (section === 'top-tracks') {
+    items        = (APP.topTracksData  || []).slice(0, 5);
+    sectionLabel = 'Top Tracks';
+    filename     = 'laststats-top-tracks.png';
+  }
+
+  if (!items.length) { showToast(t('story_no_data'), 'error'); return; }
+  showToast(t('story_preparing'));
+
+  /* ── Chargement des pochettes (crossOrigin anonymous) ─────── */
+  const loadImg = url => new Promise(res => {
+    if (!url || isDefaultImg(url)) return res(null);
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload  = () => res(img);
+    img.onerror = () => res(null);
+    img.src     = url + (url.includes('?') ? '&' : '?') + '_nc=' + Date.now();
+  });
+
+  const imgUrls = items.map(item =>
+    item.image?.find(i => i.size === 'extralarge')?.['#text']
+    || item.image?.find(i => i.size === 'large')?.['#text']
+    || null
+  );
+  const imgs = await Promise.all(imgUrls.map(loadImg));
+
+  /* ── Helper : texte tronqué ───────────────────────────────── */
+  const clampText = (text, maxW) => {
+    let s = String(text || '—');
+    while (ctx.measureText(s).width > maxW && s.length > 1) s = s.slice(0, -1);
+    return s.length < String(text || '—').length ? s + '…' : s;
+  };
+
+  /* ── Header ──────────────────────────────────────────────── */
+  // Logo
+  ctx.font = 'bold 20px system-ui, sans-serif';
+  ctx.fillStyle = '#a78bfa';
+  ctx.textAlign = 'left';
+  ctx.fillText('LastStats', 24, 48);
+
+  // Pseudo
+  const username = '@' + (APP.userInfo?.name || APP.username || '');
+  ctx.font = '12px system-ui, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  ctx.fillText(username, 24, 68);
+
+  // Titre de section
+  ctx.font = 'bold 17px system-ui, sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'right';
+  ctx.fillText(sectionLabel, W - 24, 48);
+
+  // Période (si disponible)
+  const prdEl = document.querySelector(`#prd-${section.replace('top-', '')} .prd.active`);
+  const prdTxt = prdEl ? prdEl.textContent.trim() : '';
+  if (prdTxt) {
+    ctx.font = '11px system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(167,139,250,0.7)';
+    ctx.textAlign = 'right';
+    ctx.fillText(prdTxt, W - 24, 65);
+  }
+
+  // Ligne séparatrice
+  const sepGrad = ctx.createLinearGradient(24, 0, W - 24, 0);
+  sepGrad.addColorStop(0,   'transparent');
+  sepGrad.addColorStop(0.3, 'rgba(167,139,250,0.5)');
+  sepGrad.addColorStop(1,   'transparent');
+  ctx.strokeStyle = sepGrad; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(24, 84); ctx.lineTo(W - 24, 84); ctx.stroke();
+
+  /* ── Cartes des items ─────────────────────────────────────── */
+  const CARD_H   = 84;
+  const CARD_GAP = 8;
+  const IMG_SIZE = 62;
+  const CARD_X   = 18;
+  const CARD_W   = W - 36;
+  const START_Y  = 102;
+
+  const rankColors = ['#fbbf24', '#94a3b8', '#cd7c3e', 'rgba(255,255,255,0.22)', 'rgba(255,255,255,0.22)'];
+  const isArtist   = section === 'top-artists';
+  const isTrack    = section === 'top-tracks';
+
+  items.forEach((item, i) => {
+    const cardY = START_Y + i * (CARD_H + CARD_GAP);
+
+    /* Fond carte */
+    const cGrad = ctx.createLinearGradient(CARD_X, cardY, CARD_X + CARD_W, cardY + CARD_H);
+    cGrad.addColorStop(0, i === 0 ? 'rgba(167,139,250,0.14)' : 'rgba(255,255,255,0.06)');
+    cGrad.addColorStop(1, 'rgba(255,255,255,0.02)');
+    ctx.fillStyle = cGrad;
+    ctx.beginPath();
+    ctx.roundRect(CARD_X, cardY, CARD_W, CARD_H, 14);
+    ctx.fill();
+
+    /* Bordure subtile */
+    ctx.strokeStyle = i === 0 ? 'rgba(167,139,250,0.35)' : 'rgba(255,255,255,0.07)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(CARD_X, cardY, CARD_W, CARD_H, 14);
+    ctx.stroke();
+
+    /* Numéro de rang */
+    ctx.font = `bold ${i < 3 ? 20 : 16}px system-ui, sans-serif`;
+    ctx.fillStyle = rankColors[i];
+    ctx.textAlign = 'center';
+    ctx.fillText(`${i + 1}`, CARD_X + 22, cardY + CARD_H / 2 + 7);
+
+    /* Image pochette / avatar */
+    const imgX = CARD_X + 42;
+    const imgY = cardY + (CARD_H - IMG_SIZE) / 2;
+
+    ctx.save();
+    ctx.beginPath();
+    if (isArtist) {
+      ctx.arc(imgX + IMG_SIZE / 2, imgY + IMG_SIZE / 2, IMG_SIZE / 2, 0, Math.PI * 2);
+    } else {
+      ctx.roundRect(imgX, imgY, IMG_SIZE, IMG_SIZE, 10);
+    }
+    ctx.clip();
+
+    if (imgs[i]) {
+      ctx.drawImage(imgs[i], imgX, imgY, IMG_SIZE, IMG_SIZE);
+    } else {
+      /* Fallback : dégradé coloré + initiale */
+      const PALETTES = [
+        ['#6366f1','#a855f7'],['#ec4899','#f43f5e'],['#06b6d4','#6366f1'],
+        ['#22c55e','#14b8a6'],['#f97316','#eab308'],
+      ];
+      const [c1, c2] = PALETTES[i % PALETTES.length];
+      const fbGrad = ctx.createLinearGradient(imgX, imgY, imgX + IMG_SIZE, imgY + IMG_SIZE);
+      fbGrad.addColorStop(0, c1); fbGrad.addColorStop(1, c2);
+      ctx.fillStyle = fbGrad;
+      ctx.fillRect(imgX, imgY, IMG_SIZE, IMG_SIZE);
+      ctx.font = `bold 24px system-ui, sans-serif`;
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.textAlign = 'center';
+      ctx.fillText((item.name || '?')[0].toUpperCase(), imgX + IMG_SIZE / 2, imgY + IMG_SIZE / 2 + 9);
+    }
+    ctx.restore();
+
+    /* Texte — titre */
+    const textX  = imgX + IMG_SIZE + 12;
+    const maxTW  = CARD_X + CARD_W - textX - 10;
+
+    ctx.font = `bold ${i === 0 ? 14 : 13}px system-ui, sans-serif`;
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'left';
+    ctx.fillText(clampText(item.name, maxTW), textX, cardY + CARD_H / 2 - 6);
+
+    /* Texte — sous-titre */
+    let subTxt;
+    if (isTrack)       subTxt = item.artist?.name || '';
+    else if (isArtist) subTxt = `${formatNum(item.playcount)} ${t('plays')}`;
+    else               subTxt = `${item.artist?.name ? item.artist.name + ' · ' : ''}${formatNum(item.playcount)} ${t('plays')}`;
+
+    ctx.font = '11px system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.48)';
+    ctx.fillText(clampText(subTxt, maxTW), textX, cardY + CARD_H / 2 + 12);
+
+    /* Barre de popularité relative (uniquement pour items avec playcount) */
+    if (item.playcount && items[0]?.playcount) {
+      const ratio  = parseInt(item.playcount) / parseInt(items[0].playcount);
+      const barW   = maxTW * ratio;
+      const barY   = cardY + CARD_H - 14;
+      ctx.fillStyle = 'rgba(255,255,255,0.08)';
+      ctx.beginPath(); ctx.roundRect(textX, barY, maxTW, 3, 2); ctx.fill();
+      const barGrad = ctx.createLinearGradient(textX, 0, textX + barW, 0);
+      barGrad.addColorStop(0, '#a78bfa'); barGrad.addColorStop(1, '#6366f1');
+      ctx.fillStyle = barGrad;
+      ctx.beginPath(); ctx.roundRect(textX, barY, Math.max(barW, 4), 3, 2); ctx.fill();
+    }
+  });
+
+  /* ── Footer ───────────────────────────────────────────────── */
+  const footY = START_Y + 5 * (CARD_H + CARD_GAP) + 24;
+
+  const footSep = ctx.createLinearGradient(40, 0, W - 40, 0);
+  footSep.addColorStop(0, 'transparent');
+  footSep.addColorStop(0.5, 'rgba(167,139,250,0.3)');
+  footSep.addColorStop(1, 'transparent');
+  ctx.strokeStyle = footSep; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(40, footY); ctx.lineTo(W - 40, footY); ctx.stroke();
+
+  ctx.font = '10px system-ui, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.28)';
+  ctx.textAlign = 'center';
+  ctx.fillText('laststats.app  ·  powered by last.fm', W / 2, footY + 18);
+
+  downloadCanvas(canvas, filename);
+  showToast(t('story_downloaded'));
+}
 async function loadAdvancedStats() {
   const u        = APP.userInfo;
   const regTs    = parseInt(u?.registered?.unixtime || 0);
