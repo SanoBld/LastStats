@@ -883,18 +883,25 @@ canvas { max-width: 100%; }
   height: var(--bn-height);
   background: var(--bg-sidebar);
   border-top: 1px solid var(--border);
-  z-index: 300; /* above sidebar (200) and view-transition overlays */
+  z-index: 300;
   padding-bottom: env(safe-area-inset-bottom, 0px);
   box-shadow: 0 -2px 12px rgba(0,0,0,.20);
   view-transition-name: ls-bottom-nav;
-  isolation: isolate; /* own stacking context, immune to vt animations */
+  isolation: isolate;
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* hide scrollbar but keep scroll behaviour */
+  scrollbar-width: none;
 }
+.bottom-nav::-webkit-scrollbar { display: none; }
 .bottom-nav-inner {
   display: flex; align-items: stretch; height: 100%;
 }
 .bn-item {
-  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 5px; cursor: pointer; padding: 10px 4px;
+  flex: 0 0 auto;
+  min-width: 60px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 5px; cursor: pointer; padding: 10px 6px;
   color: var(--text-muted); font-size: .68rem; font-weight: 600;
   transition: color var(--dur-medium1) var(--ease-standard);
   position: relative;
@@ -2944,8 +2951,11 @@ canvas#w-mini { height: 60px !important; }
   .badge-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
 
   /* Obscurity */
-  .obscurity-item { gap: 10px; padding: 10px 12px; }
+  .obscurity-item { gap: 8px; padding: 10px 12px; flex-wrap: nowrap; }
   .obs-bar-wrap { display: none; }
+  .obs-score-wrap { flex-shrink: 0; }
+  .obs-type-badge { flex-shrink: 0; font-size: .58rem; padding: 2px 6px; white-space: nowrap; }
+  .obs-info { min-width: 0; flex: 1; overflow: hidden; }
   .badge-score-card { padding: 14px; }
   .np-actions { display: none; }
 

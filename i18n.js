@@ -490,6 +490,18 @@ const I18N_DATA = {
     settings_aboutDesc: 'Un projet Open Source développé avec passion par un développeur passioné. C’est une version Beta créée pour apprendre et s’améliorer, tout en vous offrant une nouvelle manière de découvrir vos statistiques Last.fm en toute simplicité.',
     loading_generic: 'Chargement…',
     loading_more: 'Chargement…',
+    /* ── History & Nav Visibility (added) ── */
+    nav_history: 'Historique',
+    history_title: 'Historique',
+    history_sub: 'Parcourez vos scrobbles jour par jour',
+    history_today: "Aujourd'hui",
+    history_loading: 'Chargement…',
+    history_viewTimeline: 'Fil chronologique',
+    history_viewList: 'Liste',
+    history_viewStats: 'Statistiques',
+    history_noScrobbles: 'Aucun scrobble ce jour-là',
+    settings_navVisibility: 'Onglets de navigation',
+    settings_navVisibilityHint: "Choisissez quelles sections apparaissent dans la barre de navigation. Dashboard et Paramètres sont toujours visibles.",
   },
 
   /* ══════════════════════════════════════════════════════
@@ -810,6 +822,18 @@ const I18N_DATA = {
     settings_aboutDesc: 'An open-source project developed with passion by a beginner developer. This is a beta version created to learn and improve, while offering you a new and simple way to explore your Last.fm statistics.',
     loading_generic: 'Loading…',
     loading_more: 'Loading…',
+    /* ── History & Nav Visibility (added) ── */
+    nav_history: 'History',
+    history_title: 'History',
+    history_sub: 'Browse your scrobbles day by day',
+    history_today: 'Today',
+    history_loading: 'Loading…',
+    history_viewTimeline: 'Timeline',
+    history_viewList: 'List',
+    history_viewStats: 'Stats',
+    history_noScrobbles: 'No scrobbles on this day',
+    settings_navVisibility: 'Navigation tabs',
+    settings_navVisibilityHint: 'Choose which sections appear in the navigation bar. Dashboard and Settings are always visible.',
   },
 
   /* ══════════════════════════════════════════════════════
@@ -940,6 +964,14 @@ const I18N_DATA = {
     badge_ambassador_name: 'Embajador', badge_ambassador_desc: 'Artistas escuchados ≥ 100 veces (leales absolutos)',
     badge_tastemaker_name: 'Prescriptor', badge_tastemaker_desc: 'Artistas que representan +10% de tus reproducciones',
     badge_nomad_name: 'Nómada Musical', badge_nomad_desc: 'Meses con ≥10 artistas diferentes activos',
+
+    nav_history: 'Historial',
+    history_title: 'Historial', history_sub: 'Explora tus scrobbles día a día',
+    history_today: 'Hoy', history_loading: 'Cargando…',
+    history_viewTimeline: 'Cronología', history_viewList: 'Lista', history_viewStats: 'Estadísticas',
+    history_noScrobbles: 'Sin scrobbles este día',
+    settings_navVisibility: 'Pestañas de navegación',
+    settings_navVisibilityHint: 'Elige qué secciones aparecen en la barra de navegación.',
   },
 
   /* ══════════════════════════════════════════════════════
@@ -1070,6 +1102,14 @@ const I18N_DATA = {
     badge_ambassador_name: 'Embaixador', badge_ambassador_desc: 'Artistas ouvidos ≥ 100 vezes (leais absolutos)',
     badge_tastemaker_name: 'Influenciador', badge_tastemaker_desc: 'Artistas representando +10% das reproduções',
     badge_nomad_name: 'Nómada Musical', badge_nomad_desc: 'Meses com ≥10 artistas diferentes ativos',
+
+    nav_history: 'Histórico',
+    history_title: 'Histórico', history_sub: 'Explore os seus scrobbles dia a dia',
+    history_today: 'Hoje', history_loading: 'Carregando…',
+    history_viewTimeline: 'Cronologia', history_viewList: 'Lista', history_viewStats: 'Estatísticas',
+    history_noScrobbles: 'Sem scrobbles neste dia',
+    settings_navVisibility: 'Abas de navegação',
+    settings_navVisibilityHint: 'Escolha quais seções aparecem na barra de navegação.',
   },
 
   /* ══════════════════════════════════════════════════════
@@ -1200,6 +1240,14 @@ const I18N_DATA = {
     badge_ambassador_name: 'Botschafter', badge_ambassador_desc: 'Künstler ≥ 100 Mal gespielt (absolute Treue)',
     badge_tastemaker_name: 'Trendsetter', badge_tastemaker_desc: 'Künstler mit +10% deiner Wiedergaben',
     badge_nomad_name: 'Musikalischer Nomade', badge_nomad_desc: 'Monate mit ≥10 verschiedenen aktiven Künstlern',
+
+    nav_history: 'Verlauf',
+    history_title: 'Verlauf', history_sub: 'Scrobbles täglich durchsuchen',
+    history_today: 'Heute', history_loading: 'Lädt…',
+    history_viewTimeline: 'Zeitstrahl', history_viewList: 'Liste', history_viewStats: 'Statistiken',
+    history_noScrobbles: 'Keine Scrobbles an diesem Tag',
+    settings_navVisibility: 'Navigationsreiter',
+    settings_navVisibilityHint: 'Wähle, welche Abschnitte in der Navigationsleiste angezeigt werden.',
   },
 
   /* ══════════════════════════════════════════════════════
@@ -1330,6 +1378,14 @@ const I18N_DATA = {
     badge_ambassador_name: 'Ambasciatore', badge_ambassador_desc: 'Artisti ascoltati ≥ 100 volte (fedeli assoluti)',
     badge_tastemaker_name: 'Precursore', badge_tastemaker_desc: 'Artisti che rappresentano +10% degli ascolti',
     badge_nomad_name: 'Nomade Musicale', badge_nomad_desc: 'Mesi con ≥10 artisti diversi attivi',
+
+    nav_history: 'Cronologia',
+    history_title: 'Cronologia', history_sub: 'Sfoglia i tuoi scrobbles giorno per giorno',
+    history_today: 'Oggi', history_loading: 'Caricamento…',
+    history_viewTimeline: 'Sequenza temporale', history_viewList: 'Lista', history_viewStats: 'Statistiche',
+    history_noScrobbles: 'Nessun scrobble in questo giorno',
+    settings_navVisibility: 'Schede di navigazione',
+    settings_navVisibilityHint: 'Scegli quali sezioni appaiono nella barra di navigazione.',
   },
 
   /* ══════════════════════════════════════════════════════
@@ -1460,6 +1516,14 @@ const I18N_DATA = {
     badge_ambassador_name: 'Посол', badge_ambassador_desc: 'Артисты, прослушанные ≥ 100 раз (абсолютная верность)',
     badge_tastemaker_name: 'Законодатель вкуса', badge_tastemaker_desc: 'Артисты с долей >10% прослушиваний',
     badge_nomad_name: 'Музыкальный кочевник', badge_nomad_desc: 'Месяцы с ≥10 разными активными артистами',
+
+    nav_history: 'История',
+    history_title: 'История', history_sub: 'Просматривайте скробблы по дням',
+    history_today: 'Сегодня', history_loading: 'Загрузка…',
+    history_viewTimeline: 'Хронология', history_viewList: 'Список', history_viewStats: 'Статистика',
+    history_noScrobbles: 'Нет скробблов в этот день',
+    settings_navVisibility: 'Вкладки навигации',
+    settings_navVisibilityHint: 'Выберите, какие разделы отображаются на панели навигации.',
   },
 
   /* ══════════════════════════════════════════════════════
@@ -1589,6 +1653,14 @@ const I18N_DATA = {
     badge_ambassador_name: 'アンバサダー', badge_ambassador_desc: '100回以上再生したアーティスト数',
     badge_tastemaker_name: 'テイストメーカー', badge_tastemaker_desc: '再生回数の10%超を占めるアーティスト',
     badge_nomad_name: 'ミュージカルノマド', badge_nomad_desc: '10人以上の異なるアーティストがいる月',
+
+    nav_history: '履歴',
+    history_title: '履歴', history_sub: '日別にスクロブルを閲覧',
+    history_today: '今日', history_loading: '読み込み中…',
+    history_viewTimeline: 'タイムライン', history_viewList: 'リスト', history_viewStats: '統計',
+    history_noScrobbles: 'この日のスクロブルなし',
+    settings_navVisibility: 'ナビゲーションタブ',
+    settings_navVisibilityHint: 'ナビゲーションバーに表示するセクションを選択してください。',
   },
 
   /* ══════════════════════════════════════════════════════
@@ -1718,6 +1790,14 @@ const I18N_DATA = {
     badge_ambassador_name: '大使', badge_ambassador_desc: '播放次数≥100的艺术家数量',
     badge_tastemaker_name: '品味引领者', badge_tastemaker_desc: '占播放总量10%以上的艺术家',
     badge_nomad_name: '音乐游牧者', badge_nomad_desc: '有≥10位不同活跃艺术家的月份',
+
+    nav_history: '历史',
+    history_title: '历史', history_sub: '按日浏览你的记录',
+    history_today: '今天', history_loading: '加载中…',
+    history_viewTimeline: '时间线', history_viewList: '列表', history_viewStats: '统计',
+    history_noScrobbles: '当天无记录',
+    settings_navVisibility: '导航标签',
+    settings_navVisibilityHint: '选择导航栏中显示的部分。',
   },
 
   /* ══════════════════════════════════════════════════════
@@ -1847,6 +1927,14 @@ const I18N_DATA = {
     badge_ambassador_name: '앰배서더', badge_ambassador_desc: '100회 이상 재생한 아티스트 수',
     badge_tastemaker_name: '트렌드세터', badge_tastemaker_desc: '전체 재생의 10% 이상을 차지하는 아티스트',
     badge_nomad_name: '음악 유목민', badge_nomad_desc: '≥10명의 다른 활성 아티스트가 있는 달',
+
+    nav_history: '기록',
+    history_title: '기록', history_sub: '일별로 스크로블 탐색',
+    history_today: '오늘', history_loading: '로딩 중…',
+    history_viewTimeline: '타임라인', history_viewList: '목록', history_viewStats: '통계',
+    history_noScrobbles: '이 날 스크로블 없음',
+    settings_navVisibility: '내비게이션 탭',
+    settings_navVisibilityHint: '내비게이션 바에 표시할 섹션을 선택하세요.',
   },
 
   /* ══════════════════════════════════════════════════════
@@ -1976,6 +2064,14 @@ const I18N_DATA = {
     badge_ambassador_name: 'Büyükelçi', badge_ambassador_desc: '≥100 kez çalınan sanatçılar (mutlak sadakat)',
     badge_tastemaker_name: 'Trend belirleyici', badge_tastemaker_desc: 'Çalmalarınızın +%10\'unu temsil eden sanatçılar',
     badge_nomad_name: 'Müzik Göçebesi', badge_nomad_desc: '≥10 farklı aktif sanatçılı aylar',
+
+    nav_history: 'Geçmiş',
+    history_title: 'Geçmiş', history_sub: "Scrobble'larınıza gün gün göz at",
+    history_today: 'Bugün', history_loading: 'Yükleniyor…',
+    history_viewTimeline: 'Zaman çizelgesi', history_viewList: 'Liste', history_viewStats: 'İstatistikler',
+    history_noScrobbles: 'Bu günde scrobble yok',
+    settings_navVisibility: 'Gezinme sekmeleri',
+    settings_navVisibilityHint: 'Gezinme çubuğunda hangi bölümlerin görüneceğini seçin.',
   },
 
   /* ══════════════════════════════════════════════════════
@@ -2105,6 +2201,14 @@ const I18N_DATA = {
     badge_ambassador_name: 'سفير', badge_ambassador_desc: 'فنانون استُمع إليهم ≥ 100 مرة (ولاء مطلق)',
     badge_tastemaker_name: 'مؤثر', badge_tastemaker_desc: 'فنانون يمثلون أكثر من 10٪ من استماعاتك',
     badge_nomad_name: 'البدوي الموسيقي', badge_nomad_desc: 'أشهر مع ≥10 فنانين مختلفين نشطين',
+
+    nav_history: 'التاريخ',
+    history_title: 'التاريخ', history_sub: 'تصفح سجلاتك يوماً بيوم',
+    history_today: 'اليوم', history_loading: 'جارٍ التحميل…',
+    history_viewTimeline: 'الجدول الزمني', history_viewList: 'قائمة', history_viewStats: 'إحصاءات',
+    history_noScrobbles: 'لا يوجد تسجيل في هذا اليوم',
+    settings_navVisibility: 'علامات التبويب',
+    settings_navVisibilityHint: 'اختر الأقسام التي تظهر في شريط التنقل.',
   },
 };
 
