@@ -2882,12 +2882,12 @@ async function openArtistModal(artistName, artistUrl, userPlaycount) {
   if (tagsEl) tagsEl.innerHTML = '';
 
   // ── Image de l'artiste ───────────────────────────────────────
-  const imgEl     = document.getElementById('am-img');
+  const imgEl     = document.getElementById('am-img-inner');
   const artistImg = await getArtistImage(artistName);
   if (imgEl) {
     imgEl.innerHTML = artistImg
       ? `<img src="${artistImg}" alt="${escHtml(artistName)}"
-             style="width:100%;height:100%;object-fit:cover;object-position:center top"
+             style="width:100%;height:100%;object-fit:cover;object-position:center 20%"
              onerror="this.parentElement.innerHTML='<div style=\\'width:100%;height:100%;background:${nameToGradient(artistName)};display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:800;color:white\\'>${escHtml(artistName[0].toUpperCase())}</div>'">`
       : `<div style="width:100%;height:100%;background:${nameToGradient(artistName)};display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:800;color:white">${escHtml(artistName[0].toUpperCase())}</div>`;
   }

@@ -2266,6 +2266,9 @@ canvas#w-mini { height: 60px !important; }
    22. ARTIST MODAL
    ============================================================ */
 
+/* ============================================================
+   ARTIST MODAL — Spotify-style full-bleed hero
+   ============================================================ */
 .artist-modal { position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,.78); display: flex; align-items: flex-end; justify-content: center; padding: 0; }
 @media (min-width: 640px) { .artist-modal { align-items: center; padding: 24px; } }
 
@@ -2281,78 +2284,129 @@ canvas#w-mini { height: 60px !important; }
 .artist-modal-inner::-webkit-scrollbar-track { background: transparent; }
 .artist-modal-inner::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 99px; }
 
-/* Close button */
+/* Close button — flottant sur le hero */
 .artist-modal-close {
-  position: sticky; top: 12px; float: right; margin: 12px 12px 0 0;
-  width: 32px; height: 32px; border-radius: 50%;
-  background: var(--bg-hover); color: var(--text-muted);
+  position: absolute; top: 14px; right: 14px;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(0,0,0,.48); color: #fff;
   font-size: .85rem; display: flex; align-items: center; justify-content: center;
-  z-index: 10;
+  z-index: 20; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.14);
   transition: background var(--dur-medium1) var(--ease-standard),
-              color      var(--dur-medium1) var(--ease-standard),
               transform  var(--dur-medium1) var(--ease-spring);
 }
-.artist-modal-close:hover {
-  background: var(--bg-elevated); color: var(--text);
-  transform: scale(1.12) rotate(90deg);
+.artist-modal-close:hover { background: rgba(0,0,0,.72); transform: scale(1.1) rotate(90deg); }
+
+/* ── Hero full-bleed ─────────────────────────────────────── */
+.am-hero { position: relative; display: block; padding: 0; }
+
+.am-photo-wrap {
+  width: 100%; height: 310px; overflow: hidden;
+  border-radius: var(--radius) var(--radius) 0 0;
+  position: relative; background: var(--bg-hover);
+  flex-shrink: 0;
+}
+@media (min-width: 640px) { .am-photo-wrap { height: 360px; border-radius: var(--radius) var(--radius) 0 0; } }
+
+/* Image dans le wrapper */
+.am-photo-wrap img, .am-photo-wrap > div:first-child {
+  width: 100%; height: 100%; object-fit: cover; object-position: center 20%;
+  display: block;
 }
 
-/* Hero section */
-.am-hero { display: flex; gap: 20px; padding: 24px 24px 20px; align-items: flex-start; }
-.am-photo-wrap { width: 100px; height: 100px; border-radius: var(--radius-sm); overflow: hidden; flex-shrink: 0; background: var(--bg-hover); position: relative; }
-.am-photo { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; border-radius: inherit; transition: transform .3s; }
-.am-photo-wrap:hover .am-photo { transform: scale(1.04); }
-.am-photo-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2.4rem; font-weight: 900; color: white; border-radius: inherit; }
-.am-photo-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom right, rgba(0,0,0,0) 30%, rgba(0,0,0,.45) 100%); border-radius: inherit; pointer-events: none; z-index: 1; }
+/* Gradient : image → couleur exacte du modal */
+.am-photo-overlay {
+  position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0)          0%,
+    rgba(0,0,0,.08)        30%,
+    rgba(0,0,0,.45)        62%,
+    var(--bg-elevated)    100%
+  );
+}
 
-/* Hero mode (full-width photo) */
-.am-photo-wrap.hero-mode { width: 100%; height: 220px; border-radius: var(--radius-sm) var(--radius-sm) 0 0; position: relative; }
-.am-photo-wrap.hero-mode .am-photo { border-radius: inherit; object-position: center 20%; }
-.am-photo-wrap.hero-mode .am-photo-overlay { background: linear-gradient(to bottom, rgba(0,0,0,0) 25%, rgba(0,0,0,.75) 100%); }
-.am-hero.hero-mode { position: relative; padding: 0; gap: 0; }
-.am-hero.hero-mode .am-hero-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 24px 16px; z-index: 2; }
-.am-hero.hero-mode .am-artist-name { color: white; font-size: 1.55rem; text-shadow: 0 2px 8px rgba(0,0,0,.4); }
-.am-hero.hero-mode .am-stats-row .am-stat { background: rgba(0,0,0,.4); border-color: rgba(255,255,255,.15); color: rgba(255,255,255,.85); }
-.am-hero.hero-mode .am-stat--accent { background: var(--accent-lt); color: var(--accent); }
+/* En thème clair, on renforce l'opacité du gradient */
+[data-theme="light"] .am-photo-overlay,
+:root:not([data-theme="dark"]):not([data-theme="auto"]) .am-photo-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0)    0%,
+    rgba(255,255,255,.1)   30%,
+    rgba(255,255,255,.55)  62%,
+    var(--bg-elevated)    100%
+  );
+}
 
-.am-hero-info { flex: 1; min-width: 0; }
-.am-artist-name { font-size: 1.35rem; font-weight: 900; letter-spacing: -.03em; margin-bottom: 10px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.am-stats-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-.am-stat { display: flex; align-items: center; gap: 5px; font-size: .76rem; color: var(--text-muted); background: var(--bg-hover); padding: 3px 10px; border-radius: var(--radius-pill); border: 1px solid var(--border); }
-.am-stat i { color: var(--accent); font-size: .72rem; }
-.am-stat--accent { background: var(--accent-lt); color: var(--accent); border-color: var(--border-glow); font-weight: 600; }
+/* Infos artiste : nom + chips + liens — se positionne dans la zone gradient */
+.am-hero-info {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 0 20px 20px; z-index: 2;
+}
+
+.am-artist-name {
+  font-size: clamp(1.7rem, 5vw, 2.4rem);
+  font-weight: 900; letter-spacing: -.04em; line-height: 1.1;
+  color: #fff; text-shadow: 0 2px 20px rgba(0,0,0,.55);
+  margin-bottom: 12px;
+}
+
+.am-stats-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.am-stat {
+  display: flex; align-items: center; gap: 5px; font-size: .75rem;
+  color: rgba(255,255,255,.85);
+  background: rgba(0,0,0,.35); padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255,255,255,.16);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.am-stat i { color: rgba(255,255,255,.7); font-size: .72rem; }
+.am-stat--accent {
+  background: var(--accent); color: var(--accent-on);
+  border-color: transparent; font-weight: 700;
+}
+
 .am-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
 .am-tag {
   font-size: .72rem; font-weight: 600; padding: 3px 10px;
   border-radius: var(--radius-pill);
-  background: var(--accent-lt); color: var(--accent); border: 1px solid var(--border-glow);
+  background: rgba(255,255,255,.12); color: rgba(255,255,255,.9);
+  border: 1px solid rgba(255,255,255,.2);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
   transition: transform  var(--dur-medium1) var(--ease-spring),
               box-shadow var(--dur-medium1) var(--ease-standard);
   animation: m3-spring-pop var(--dur-medium1) var(--ease-spring) both;
 }
-.am-tag:hover { transform: scale(1.08) translateY(-1px); box-shadow: 0 2px 8px var(--accent-glow); }
+.am-tag:hover { transform: scale(1.08) translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+
 .am-ext-links { display: flex; flex-wrap: wrap; gap: 6px; }
 .am-ext-btn {
   display: flex; align-items: center; gap: 5px; padding: 5px 12px;
   border-radius: var(--radius-pill); font-size: .76rem; font-weight: 600;
-  border: 1.5px solid var(--border); text-decoration: none;
+  border: 1.5px solid rgba(255,255,255,.22); text-decoration: none;
+  color: rgba(255,255,255,.85); background: rgba(0,0,0,.28);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
   transition: background  var(--dur-medium1) var(--ease-standard),
               border-color var(--dur-medium1) var(--ease-standard),
               color        var(--dur-medium1) var(--ease-standard),
               transform    var(--dur-medium1) var(--ease-spring);
 }
-.am-ext-btn:hover { text-decoration: none; transform: translateY(-2px) scale(1.04); }
-.am-lastfm:hover  { background: rgba(197,33,42,.12); border-color: #c5212a;  color: #c5212a; }
-.am-spotify:hover { background: rgba(29,185,84,.12);  border-color: #1db954;  color: #1db954; }
-.am-youtube:hover { background: rgba(255,0,0,.10);    border-color: #f00;     color: #f00; }
-.am-lastfm  { color: #c5212a; border-color: rgba(197,33,42,.3); }
-.am-spotify { color: #1db954; border-color: rgba(29,185,84,.3); }
-.am-youtube { color: #f00;    border-color: rgba(255,0,0,.25); }
+.am-ext-btn:hover { text-decoration: none; transform: translateY(-2px) scale(1.04); color: #fff; }
+.am-lastfm:hover  { background: rgba(197,33,42,.55); border-color: #e8454d; }
+.am-spotify:hover { background: rgba(29,185,84,.45);  border-color: #1db954; }
+.am-youtube:hover { background: rgba(255,0,0,.40);    border-color: #f55;   }
 
-/* Modal body */
-.am-body { padding: 0 24px 28px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 24px; }
-.am-bio-section, .am-tracks-section, .am-albums-section { padding-top: 20px; }
-.am-section-title { font-size: .88rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: .05em; display: flex; align-items: center; gap: 7px; margin-bottom: 12px; }
+/* ── Corps de la modale ─────────────────────────────────── */
+.am-body {
+  padding: 4px 20px 28px; /* pas de border-top — continuité avec le hero */
+  display: flex; flex-direction: column; gap: 20px;
+}
+.am-bio-section, .am-tracks-section, .am-albums-section { padding-top: 4px; }
+.am-section-title {
+  font-size: .82rem; font-weight: 700; color: var(--text-dim);
+  text-transform: uppercase; letter-spacing: .06em;
+  display: flex; align-items: center; gap: 7px; margin-bottom: 10px;
+}
 .am-section-title i { color: var(--accent); }
 .am-loading { display: flex; align-items: center; gap: 8px; font-size: .84rem; color: var(--text-muted); padding: 8px 0; }
 
