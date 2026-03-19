@@ -1,10 +1,6 @@
-/* ═══════════════════════════════════════════════════════════════
-   wrapped.css — LastStats · Wrapped Ultra v6
-   Design System : Material You M3 · Dark Luxury
-   Architecture  : Overlays → Stories → Slides → Export
-   ═══════════════════════════════════════════════════════════════ */
+/* wrapped.css — LastStats Wrapped */
 
-/* ─── TOKENS ──────────────────────────────────────────────────── */
+/* design tokens */
 :root {
   --accent:      #7c3aed;
   --accent-mid:  #a855f7;
@@ -31,7 +27,7 @@
   --bounce:      .5s  cubic-bezier(.34,1.56,.64,1);
 }
 
-/* ─── RESET ───────────────────────────────────────────────────── */
+/* reset */
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
 html,body {
   width:100%; height:100%; overflow:hidden;
@@ -47,7 +43,7 @@ img { display:block; width:100%; height:100%; object-fit:cover; }
 button { cursor:pointer; border:none; background:none; color:inherit; font-family:inherit; }
 a { color:inherit; text-decoration:none; }
 
-/* ─── UTILITIES ───────────────────────────────────────────────── */
+/* utilities */
 .hidden { display:none !important; }
 .sr-only {
   position:absolute; width:1px; height:1px;
@@ -57,9 +53,7 @@ a { color:inherit; text-decoration:none; }
 .truncate { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   OVERLAYS — BASE
-   ═══════════════════════════════════════════════════════════════ */
+/* overlays */
 .overlay {
   position:fixed; inset:0; z-index:900;
   display:flex; align-items:center; justify-content:center;
@@ -68,7 +62,7 @@ a { color:inherit; text-decoration:none; }
   padding:max(16px, env(safe-area-inset-top, 16px)) 12px max(16px, env(safe-area-inset-bottom, 16px));
 }
 
-/* ── BLOB FIELD (fond animé partagé entre tous les overlays) ── */
+/* animated background blobs, shared across all overlays */
 .blob-field {
   position:fixed; inset:0;
   pointer-events:none; overflow:hidden;
@@ -103,7 +97,7 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ─── GLASS CARD ─────────────────────────────────────────────── */
+/* glass card */
 .glass-card {
   position:relative; z-index:10;
   width:min(448px,96vw);
@@ -118,7 +112,7 @@ a { color:inherit; text-decoration:none; }
   display:flex; flex-direction:column; gap:clamp(14px,4vw,20px);
 }
 
-/* Logo partagé dans tous les overlays */
+/* shared logo style */
 .card-logo {
   font-family:'Bebas Neue',cursive;
   letter-spacing:.3em; font-size:11px;
@@ -137,9 +131,7 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   OVERLAY 0 — LANGUE
-   ═══════════════════════════════════════════════════════════════ */
+/* overlay 0 — language picker */
 .lang-card { align-items:center; text-align:center; }
 
 .lang-grid {
@@ -170,12 +162,10 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   OVERLAY 1 — COMPTE À REBOURS
-   ═══════════════════════════════════════════════════════════════ */
+/* overlay 1 — countdown */
 .wait-card { align-items:center; text-align:center; }
 
-/* Vinyle animé */
+/* spinning vinyl */
 .wait-vinyl {
   position:relative;
   width:clamp(80px,22vw,110px);
@@ -199,7 +189,7 @@ a { color:inherit; text-decoration:none; }
   background:linear-gradient(135deg,#7c3aed,#4338ca);
   display:flex; align-items:center; justify-content:center;
   box-shadow:0 0 14px rgba(124,58,237,.5);
-  animation:vinylSpin 3s linear infinite reverse; /* contre-rotation */
+  animation:vinylSpin 3s linear infinite reverse; /* spins the other way */
 }
 .vinyl-year {
   font-family:'Bebas Neue',cursive;
@@ -207,7 +197,7 @@ a { color:inherit; text-decoration:none; }
   letter-spacing:.04em; color:#fff;
 }
 
-/* Countdown */
+/* countdown timer */
 .countdown {
   display:flex; align-items:center; justify-content:center;
   gap:clamp(4px,1.5vw,8px); flex-wrap:nowrap;
@@ -238,7 +228,7 @@ a { color:inherit; text-decoration:none; }
   margin-bottom:16px; flex-shrink:0;
 }
 
-/* Archives */
+/* past years list */
 .wait-archives { width:100%; display:flex; flex-direction:column; gap:8px; }
 .wait-archives-label {
   font-size:clamp(11px,3vw,13px); font-weight:700;
@@ -259,11 +249,9 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   OVERLAY 2 — CONNEXION
-   ═══════════════════════════════════════════════════════════════ */
+/* overlay 2 — login */
 
-/* Champs */
+/* input fields */
 .cred-fields { display:flex; flex-direction:column; gap:12px; }
 
 .field-group { display:flex; flex-direction:column; gap:6px; }
@@ -342,7 +330,7 @@ a { color:inherit; text-decoration:none; }
   padding-left:2px; line-height:1.5;
 }
 
-/* Toggle "Se souvenir" */
+/* remember me toggle */
 .toggle-row {
   display:flex; align-items:center; gap:10px;
   font-size:clamp(12px,3.5vw,13px); color:var(--text-muted);
@@ -367,7 +355,7 @@ a { color:inherit; text-decoration:none; }
 }
 .toggle-row input:checked + .toggle-track .toggle-thumb { left:20px; }
 
-/* Boutons */
+/* buttons */
 .btn-primary {
   position:relative; overflow:hidden;
   width:100%; padding:clamp(13px,3.8vw,17px);
@@ -429,7 +417,7 @@ a { color:inherit; text-decoration:none; }
 }
 .btn-icon:hover { background:rgba(255,255,255,.12); }
 
-/* Erreur */
+/* error message */
 .error-msg {
   font-size:clamp(11px,3vw,13px); color:#f87171;
   padding:10px 14px;
@@ -445,9 +433,7 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   OVERLAY 3 — CHARGEMENT
-   ═══════════════════════════════════════════════════════════════ */
+/* overlay 3 — loading */
 .loader-content {
   display:flex; flex-direction:column;
   align-items:center; gap:20px; text-align:center;
@@ -456,7 +442,7 @@ a { color:inherit; text-decoration:none; }
   z-index:10; position:relative;
 }
 
-/* Barres audio */
+/* audio bars animation */
 .audio-bars {
   display:flex; align-items:flex-end; gap:4px;
   height:48px;
@@ -507,7 +493,7 @@ a { color:inherit; text-decoration:none; }
   font-size:10px; color:var(--accent-light);
 }
 
-/* Étapes de chargement */
+/* loading steps */
 .loader-steps {
   list-style:none;
   display:flex; flex-direction:column; gap:6px;
@@ -539,9 +525,7 @@ a { color:inherit; text-decoration:none; }
 .step.active .step-label { color:var(--text); font-weight:700; }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   OVERLAY 4 — MODE PARTAGE (lecture seule)
-   ═══════════════════════════════════════════════════════════════ */
+/* overlay 4 — shared view (read-only) */
 .share-preview-card { align-items:center; text-align:center; }
 
 .share-avatar-wrap {
@@ -597,9 +581,7 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   STORIES — CONTENEUR
-   ═══════════════════════════════════════════════════════════════ */
+/* stories container */
 #stories {
   position:fixed; inset:0; overflow:hidden;
   background:var(--bg-deep);
@@ -619,7 +601,7 @@ a { color:inherit; text-decoration:none; }
   background-size:200px; opacity:.6;
 }
 
-/* ─── HUD ─────────────────────────────────────────────────────── */
+/* top HUD bar */
 #hud {
   position:absolute; top:0; left:0; right:0; z-index:100;
   display:flex; align-items:center; gap:5px;
@@ -657,7 +639,7 @@ a { color:inherit; text-decoration:none; }
 .exit-btn { border-color:rgba(239,68,68,.3); }
 .exit-btn:hover { background:rgba(239,68,68,.2); }
 
-/* ─── NAV zones ───────────────────────────────────────────────── */
+/* tap zones for prev/next */
 .nav-zone {
   position:absolute; top:0; bottom:0; z-index:50;
   width:33%; background:none; border:none;
@@ -666,7 +648,7 @@ a { color:inherit; text-decoration:none; }
 #nav-prev { left:0; }
 #nav-next { right:0; }
 
-/* ─── SLIDES BASE ─────────────────────────────────────────────── */
+/* slides base */
 #slides-container { position:absolute; inset:0; overflow:hidden; }
 
 .slide {
@@ -685,7 +667,7 @@ a { color:inherit; text-decoration:none; }
 .slide.exit-to-left     { transform:translateX(-40%) scale(.92); opacity:0; }
 .slide.exit-to-right    { transform:translateX(40%)  scale(.92); opacity:0; }
 
-/* Contenu base */
+/* slide content */
 .slide-content {
   position:relative; z-index:10;
   width:100%; height:100%;
@@ -697,7 +679,7 @@ a { color:inherit; text-decoration:none; }
   gap:clamp(6px,2vw,14px); overflow:hidden;
 }
 
-/* Header commun aux slides */
+/* slide header */
 .slide-header {
   position:relative; z-index:10;
   display:flex; flex-direction:column; gap:4px;
@@ -717,7 +699,7 @@ a { color:inherit; text-decoration:none; }
   letter-spacing:.04em; line-height:.92; color:#fff;
 }
 
-/* Animations d'entrée réutilisables */
+/* reusable entrance animations */
 .anim-rise { animation:animRise var(--spring) both; }
 .anim-pop  { animation:animPop  var(--bounce) both; }
 .anim-fade { animation:animFade .6s ease both; }
@@ -725,7 +707,7 @@ a { color:inherit; text-decoration:none; }
 @keyframes animPop  { from{opacity:0;transform:scale(.8)}         to{opacity:1;transform:scale(1)}  }
 @keyframes animFade { from{opacity:0}                              to{opacity:1}                     }
 
-/* Badge lecture seule */
+/* read-only badge */
 .readonly-badge {
   position:absolute; top:clamp(8px,2.5vw,14px); left:50%;
   transform:translateX(-50%);
@@ -739,9 +721,7 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   SLIDE 0 — INTRO
-   ═══════════════════════════════════════════════════════════════ */
+/* slide 0 — intro */
 .slide--intro { background:var(--bg-deep); }
 
 .slide-bg-art {
@@ -800,7 +780,7 @@ a { color:inherit; text-decoration:none; }
   letter-spacing:.04em;
 }
 
-/* Indicateur de scroll / suite */
+/* scroll hint dots */
 .intro-scroll-hint {
   display:flex; gap:4px; align-items:center;
   margin-top:8px;
@@ -818,9 +798,7 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   SLIDE 1 — CHIFFRES
-   ═══════════════════════════════════════════════════════════════ */
+/* slide 1 — numbers */
 .slide--numbers {}
 
 .numbers-grid {
@@ -839,7 +817,7 @@ a { color:inherit; text-decoration:none; }
   border-radius:var(--radius-lg);
   background:rgba(255,255,255,.06);
   border:1px solid var(--border);
-  opacity:0; /* reset – JS animera */
+  opacity:0; /* starts hidden, JS animates it */
 }
 .stat-card--xl {
   grid-column:span 2;
@@ -865,9 +843,7 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   SLIDE 2 — TOP ARTISTES
-   ═══════════════════════════════════════════════════════════════ */
+/* slide 2 — top artists */
 .slide--top-artists {
   display:flex; flex-direction:column;
 }
@@ -893,7 +869,7 @@ a { color:inherit; text-decoration:none; }
   display:flex; flex-direction:column; align-items:center;
   gap:clamp(3px,1vw,5px);
   width:100%;
-  opacity:0; /* anim */
+  opacity:0; /* JS animates in */
 }
 .podium-crown {
   font-size:clamp(16px,5vw,22px); line-height:1;
@@ -946,7 +922,7 @@ a { color:inherit; text-decoration:none; }
 .podium-col--2nd .podium-plays { color:var(--silver); }
 .podium-col--3rd .podium-plays { color:var(--bronze); }
 
-/* Badge global */
+/* global listener badge */
 .podium-global-badge {
   margin-top:2px; padding:2px 8px;
   border-radius:999px;
@@ -958,7 +934,7 @@ a { color:inherit; text-decoration:none; }
   color:var(--accent-light); white-space:nowrap;
 }
 
-/* Socle podium */
+/* podium base bars */
 .podium-bar {
   width:100%; border-radius:4px 4px 0 0;
   display:flex; align-items:center; justify-content:center;
@@ -986,7 +962,7 @@ a { color:inherit; text-decoration:none; }
   border:1px solid rgba(205,127,50,.18);
 }
 
-/* Liste 4–5 */
+/* artists 4 and 5 */
 .top-list {
   display:flex; flex-direction:column; gap:4px;
   padding:0 clamp(14px,5vw,28px) clamp(12px,4vw,20px);
@@ -1021,9 +997,7 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   SLIDE 3 — TOP ALBUMS
-   ═══════════════════════════════════════════════════════════════ */
+/* slide 3 — top albums */
 .albums-mosaic {
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -1038,7 +1012,7 @@ a { color:inherit; text-decoration:none; }
   position:relative; overflow:hidden;
   border-radius:var(--radius-md);
   border:1px solid var(--border);
-  opacity:0; /* anim */
+  opacity:0; /* JS animates in */
 }
 .mosaic-item--hero {
   grid-column:span 2;
@@ -1072,9 +1046,7 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   SLIDE 4 — TOP TITRES
-   ═══════════════════════════════════════════════════════════════ */
+/* slide 4 — top tracks */
 .tracks-list {
   list-style:none;
   display:flex; flex-direction:column; gap:clamp(3px,1.2vw,6px);
@@ -1089,7 +1061,7 @@ a { color:inherit; text-decoration:none; }
   border-radius:var(--radius-md);
   background:rgba(255,255,255,.05);
   border:1px solid var(--border);
-  opacity:0; /* anim */
+  opacity:0; /* JS animates in */
   transition:background .2s;
 }
 .track-item:hover { background:rgba(255,255,255,.09); }
@@ -1132,7 +1104,7 @@ a { color:inherit; text-decoration:none; }
   color:rgba(255,255,255,.45); flex-shrink:0;
   white-space:nowrap;
 }
-/* Mise en évidence du #1 */
+/* highlight the #1 track */
 .track-item:first-child {
   border-color:rgba(124,58,237,.28);
   background:rgba(124,58,237,.1);
@@ -1140,18 +1112,16 @@ a { color:inherit; text-decoration:none; }
 .track-item:first-child .track-plays { color:var(--accent-light); }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   SLIDE 5 — COMPARAISON MONDIALE
-   ═══════════════════════════════════════════════════════════════ */
+/* slide 5 — global comparison */
 .global-stats-container {
   display:flex; flex-direction:column; gap:clamp(6px,2vw,10px);
   padding:0 clamp(12px,4.5vw,26px) clamp(12px,4.5vw,20px);
   width:100%; margin-top:4px;
-  overflow-y:auto; /* scroll si besoin */
+  overflow-y:auto; /* scrollable if needed */
   max-height:calc(100dvh - 110px);
 }
 
-/* Carte rang percentile */
+/* percentile rank card */
 .global-card {
   border-radius:var(--radius-lg);
   background:rgba(255,255,255,.06);
@@ -1191,7 +1161,7 @@ a { color:inherit; text-decoration:none; }
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
 
-/* Similar artists chips */
+/* similar artists */
 .global-similar {
   display:flex; flex-direction:column; gap:6px;
   padding:clamp(8px,2.5vw,12px) clamp(10px,3vw,14px);
@@ -1217,7 +1187,7 @@ a { color:inherit; text-decoration:none; }
   color:var(--accent-light); white-space:nowrap;
 }
 
-/* Jauge SVG percentile */
+/* SVG gauge */
 .percentile-gauge { width:clamp(80px,22vw,110px); flex-shrink:0; }
 .gauge-svg { width:100%; overflow:visible; }
 .gauge-bg {
@@ -1236,14 +1206,14 @@ a { color:inherit; text-decoration:none; }
   font-size:28px; fill:#fff;
 }
 
-/* Grille mini stats */
+/* mini stats grid */
 .global-mini-grid {
   display:grid; grid-template-columns:1fr 1fr;
   gap:clamp(5px,1.8vw,8px);
   opacity:0;
 }
 .global-mini-card {
-  opacity:0; /* start hidden, JS animates each */
+  opacity:0; /* JS animates each one in */
 }
 .gmc-highlight {
   background:linear-gradient(135deg,rgba(124,58,237,.18),rgba(67,56,202,.12)) !important;
@@ -1276,16 +1246,14 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   SLIDE 6 — HABITUDES
-   ═══════════════════════════════════════════════════════════════ */
+/* slide 6 — listening habits */
 .habits-layout {
   display:flex; flex-direction:column; gap:clamp(8px,2.5vw,12px);
   padding:0 clamp(14px,5vw,28px) clamp(16px,5vw,24px);
   width:100%; margin-top:4px;
 }
 
-/* Hero : moment de la journée */
+/* time of day hero */
 .habit-hero {
   display:flex; align-items:center; gap:clamp(10px,3vw,16px);
   padding:clamp(10px,3vw,16px);
@@ -1311,7 +1279,7 @@ a { color:inherit; text-decoration:none; }
   color:var(--text-muted); margin-top:2px; line-height:1.5;
 }
 
-/* Barres jours de la semaine */
+/* weekday bars */
 .habit-week {
   padding:clamp(10px,3vw,14px);
   border-radius:var(--radius-lg);
@@ -1349,7 +1317,7 @@ a { color:inherit; text-decoration:none; }
   color:var(--text-faint); white-space:nowrap;
 }
 
-/* Mois record */
+/* best month */
 .habit-month {
   display:flex; align-items:center; gap:clamp(10px,3vw,14px);
   padding:clamp(8px,2.5vw,12px) clamp(10px,3vw,16px);
@@ -1375,9 +1343,7 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   SLIDE 7 — RECORD
-   ═══════════════════════════════════════════════════════════════ */
+/* slide 7 — daily record */
 .slide--record { background:var(--bg-deep); }
 .slide-bg-accent {
   position:absolute; inset:0; z-index:0;
@@ -1454,9 +1420,7 @@ a { color:inherit; text-decoration:none; }
 .record-track-list li:last-child { border-bottom:none; }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   SLIDE 8 — THE ONE THAT GOT AWAY
-   ═══════════════════════════════════════════════════════════════ */
+/* slide 8 — the one that got away */
 .slide--got-away { overflow:hidden; }
 
 .got-away-bg {
@@ -1507,7 +1471,7 @@ a { color:inherit; text-decoration:none; }
   line-height:1.55;
 }
 
-/* Timeline semestrielle */
+/* H1 vs H2 timeline */
 .got-away-timeline {
   display:flex; align-items:center; gap:8px; margin-top:4px;
 }
@@ -1544,9 +1508,7 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   SLIDE 9 — GENRES
-   ═══════════════════════════════════════════════════════════════ */
+/* slide 9 — genres */
 .genres-layout {
   display:flex; flex-direction:column; gap:clamp(8px,2.5vw,12px);
   padding:0 clamp(14px,5vw,28px) clamp(16px,5vw,24px);
@@ -1575,7 +1537,7 @@ a { color:inherit; text-decoration:none; }
   flex-shrink:0;
 }
 
-/* Évolution semestrielle */
+/* H1 vs H2 breakdown */
 .genres-evolution {
   border-radius:var(--radius-lg);
   background:rgba(255,255,255,.05);
@@ -1605,9 +1567,7 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   SLIDE 10 — RÉCAPITULATIF FINAL
-   ═══════════════════════════════════════════════════════════════ */
+/* slide 10 — final recap */
 .slide--recap { overflow:hidden; }
 
 .recap-bg {
@@ -1660,7 +1620,7 @@ a { color:inherit; text-decoration:none; }
   font-size:18px; color:var(--text-faint); line-height:1;
 }
 
-/* Top 3 mini vignettes */
+/* top 3 artist thumbnails */
 .recap-top3 {
   display:flex; gap:8px; justify-content:center;
 }
@@ -1680,7 +1640,7 @@ a { color:inherit; text-decoration:none; }
   width:100%;
 }
 
-/* Boutons d'action */
+/* action buttons */
 .recap-actions {
   display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
   width:100%;
@@ -1716,9 +1676,7 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   TOAST
-   ═══════════════════════════════════════════════════════════════ */
+/* toast notification */
 .toast {
   position:fixed; bottom:clamp(20px,6vw,30px); left:50%;
   transform:translateX(-50%) translateY(20px);
@@ -1739,9 +1697,7 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   MODAL PARTAGE (bottom sheet)
-   ═══════════════════════════════════════════════════════════════ */
+/* share modal (bottom sheet) */
 .modal-share {
   position:fixed; inset:0; z-index:8000;
   display:flex; align-items:flex-end;
@@ -1803,11 +1759,9 @@ a { color:inherit; text-decoration:none; }
 .share-action-icon { font-size:clamp(20px,5.5vw,26px); }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   EXPORT STAGE (html2canvas — hors-écran)
-   ═══════════════════════════════════════════════════════════════ */
+/* off-screen export stage for html2canvas */
 
-/* Story 9:16 (360×640) */
+/* story format 9:16 */
 .export-story {
   position:relative; overflow:hidden;
   font-family:'Syne',sans-serif;
@@ -1876,7 +1830,7 @@ a { color:inherit; text-decoration:none; }
   letter-spacing:.06em; margin-top:4px;
 }
 
-/* Carte complète (680×860) */
+/* full card format */
 .export-card {
   position:relative; overflow:hidden;
   font-family:'Syne',sans-serif;
@@ -1940,9 +1894,7 @@ a { color:inherit; text-decoration:none; }
 
 
 
-/* ═══════════════════════════════════════════════════════════════
-   SLIDE STREAK — Jours consécutifs
-   ═══════════════════════════════════════════════════════════════ */
+/* slide — streak */
 .streak-layout {
   display:flex; flex-direction:column; align-items:center;
   gap:clamp(8px,2.5vw,12px);
@@ -2023,9 +1975,7 @@ a { color:inherit; text-decoration:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
-   SLIDE VIBE — Profil musical
-   ═══════════════════════════════════════════════════════════════ */
+/* slide — vibe profile */
 .vibe-layout {
   display:flex; flex-direction:column; gap:clamp(8px,2.5vw,12px);
   padding:0 clamp(12px,4.5vw,26px) clamp(12px,4.5vw,20px);
@@ -2083,9 +2033,7 @@ a { color:inherit; text-decoration:none; }
 }
 .vibe-badge--wide .vibe-badge-value { font-size:clamp(13px,4vw,17px); }
 
-/* ═══════════════════════════════════════════════════════════════
-   RESPONSIVE — petits écrans (≤380px)
-   ═══════════════════════════════════════════════════════════════ */
+/* small screens (≤380px) */
 @media (max-width:380px) {
   .countdown-unit { padding:7px 4px; }
   .countdown-num  { font-size:20px; }
@@ -2106,9 +2054,7 @@ a { color:inherit; text-decoration:none; }
   .streak-num { font-size:clamp(44px,14vw,72px); }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   RESPONSIVE — grands écrans (≥600px)
-   ═══════════════════════════════════════════════════════════════ */
+/* larger screens (≥600px) */
 @media (min-width:600px) {
   .podium-col--1st .podium-img-wrap { width:130px; height:130px; }
   .podium-img-wrap { width:96px; height:96px; }
@@ -2131,9 +2077,7 @@ a { color:inherit; text-decoration:none; }
   .recap-word { font-size:clamp(48px,6.5vw,72px); }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   MOTION SAFE — désactive les animations lourdes
-   ═══════════════════════════════════════════════════════════════ */
+/* reduce motion */
 @media (prefers-reduced-motion:reduce) {
   .blob, .vinyl-disc, .vinyl-label,
   .share-avatar-ring, .btn-shimmer,

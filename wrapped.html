@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#060610">
   <meta name="description" content="Votre Wrapped Last.fm – découvrez votre année en musique.">
 
-  <!-- Open Graph / Partage -->
+  <!-- open graph -->
   <meta property="og:type"        content="website">
   <meta property="og:title"       content="Mon Wrapped LastStats">
   <meta property="og:description" content="Découvrez mes stats musicales de l'année !">
@@ -14,12 +14,12 @@
 
   <title>LastStats · Votre Année en Musique</title>
 
-  <!-- Fonts -->
+  <!-- fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
-  <!-- Styles -->
+  <!-- styles -->
   <link rel="stylesheet" href="wrapped.css">
 
   <!-- Chart.js -->
@@ -34,9 +34,7 @@
 </head>
 <body>
 
-  <!-- ══════════════════════════════════════════════════
-       OVERLAY 0 : Sélection de langue
-  ══════════════════════════════════════════════════ -->
+  <!-- overlay 0: language picker -->
   <div id="overlay-lang" class="overlay" role="dialog" aria-modal="true" aria-labelledby="lang-heading">
     <div class="blob-field">
       <div class="blob b1"></div>
@@ -60,9 +58,7 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════
-       OVERLAY 1 : Compte à rebours (Wrapped non disponible)
-  ══════════════════════════════════════════════════ -->
+  <!-- overlay 1: countdown (Wrapped not available yet) -->
   <div id="overlay-wait" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="wait-heading">
     <div class="blob-field">
       <div class="blob b1"></div>
@@ -83,7 +79,7 @@
         Ton Wrapped <span id="wait-year-label">2025</span> sera disponible dès le 1er janvier <span id="wait-next-year">2026</span>.
       </p>
 
-      <!-- Countdown -->
+      <!-- countdown -->
       <div class="countdown" role="timer" aria-live="polite" aria-atomic="true">
         <div class="countdown-unit">
           <span class="countdown-num" id="cd-days">--</span>
@@ -106,7 +102,7 @@
         </div>
       </div>
 
-      <!-- Archives disponibles -->
+      <!-- past years -->
       <div class="wait-archives" id="wait-archives" hidden>
         <p class="wait-archives-label" id="wait-archives-label">Explorer les années précédentes ↓</p>
         <div class="wait-archives-grid" id="wait-archives-list"></div>
@@ -116,9 +112,7 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════
-       OVERLAY 2 : Connexion + sélecteur d'année (Archives)
-  ══════════════════════════════════════════════════ -->
+  <!-- overlay 2: login + year picker -->
   <div id="overlay-creds" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="cred-heading">
     <div class="blob-field">
       <div class="blob b1"></div>
@@ -131,7 +125,7 @@
       <p class="card-sub" id="cred-desc">Connecte-toi pour générer ton Wrapped personnalisé.</p>
 
       <div class="cred-fields">
-        <!-- Username -->
+        <!-- username -->
         <div class="field-group">
           <label for="inp-user" id="lbl-user" class="field-label">Nom d'utilisateur Last.fm</label>
           <div class="field-wrap">
@@ -145,7 +139,7 @@
           </div>
         </div>
 
-        <!-- API Key -->
+        <!-- API key -->
         <div class="field-group">
           <label for="inp-key" id="lbl-key" class="field-label">
             Clé API
@@ -200,9 +194,7 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════
-       OVERLAY 3 : Chargement avec progression
-  ══════════════════════════════════════════════════ -->
+  <!-- overlay 3: loading -->
   <div id="overlay-loading" class="overlay hidden" role="status" aria-live="polite" aria-atomic="true">
     <div class="blob-field">
       <div class="blob b1"></div>
@@ -253,10 +245,7 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════
-       OVERLAY 4 : Mode Partage (lecture seule)
-       Affiché quand ?share= est présent dans l'URL
-  ══════════════════════════════════════════════════ -->
+  <!-- overlay 4: shared view — shown when ?share= is in the URL -->
   <div id="overlay-share-view" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="share-heading">
     <div class="blob-field">
       <div class="blob b1"></div>
@@ -291,9 +280,7 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════
-       STORIES : Conteneur principal des slides
-  ══════════════════════════════════════════════════ -->
+  <!-- STORIES : Conteneur principal des slides -->
   <main id="stories" class="hidden" role="main" aria-label="Wrapped annuel">
 
     <!-- Ambiance et effets de fond -->
@@ -321,8 +308,7 @@
          SLIDES
     ───────────────────────────────────────────── -->
     <div id="slides-container" aria-live="polite">
-
-      <!-- ══ SLIDE 0 : Intro / Couverture ══ -->
+      <!-- SLIDE 0 : Intro / Couverture -->
       <section class="slide slide--intro" data-slide-id="intro" aria-label="Introduction">
         <div class="slide-bg-art" aria-hidden="true">
           <div class="intro-bg-img" id="intro-bg"></div>
@@ -346,8 +332,7 @@
           <span>👁 Vue partagée</span>
         </div>
       </section>
-
-      <!-- ══ SLIDE 1 : En chiffres ══ -->
+      <!-- SLIDE 1 : En chiffres -->
       <section class="slide slide--numbers" data-slide-id="numbers" aria-label="Stats globales">
         <div class="slide-header">
           <span class="slide-label" id="sl-numbers-eyebrow">En chiffres</span>
@@ -380,8 +365,7 @@
           </div>
         </div>
       </section>
-
-      <!-- ══ SLIDE 2 : Top Artistes ══ -->
+      <!-- SLIDE 2 : Top Artistes -->
       <section class="slide slide--top-artists" data-slide-id="top-artists" aria-label="Top artistes">
         <div class="slide-header">
           <span class="slide-label" id="sl-artists-eyebrow">Classement</span>
@@ -452,8 +436,7 @@
           </div>
         </div>
       </section>
-
-      <!-- ══ SLIDE 3 : Top Albums ══ -->
+      <!-- SLIDE 3 : Top Albums -->
       <section class="slide slide--top-albums" data-slide-id="top-albums" aria-label="Top albums">
         <div class="slide-header">
           <span class="slide-label" id="sl-albums-eyebrow">Collection</span>
@@ -499,8 +482,7 @@
           </div>
         </div>
       </section>
-
-      <!-- ══ SLIDE 4 : Top Titres ══ -->
+      <!-- SLIDE 4 : Top Titres -->
       <section class="slide slide--top-tracks" data-slide-id="top-tracks" aria-label="Top titres">
         <div class="slide-header">
           <span class="slide-label" id="sl-tracks-eyebrow">Obsessions</span>
@@ -580,8 +562,7 @@
           </li>
         </ol>
       </section>
-
-      <!-- ══ SLIDE 5 : Statistiques Comparatives (Global) ══ -->
+      <!-- SLIDE 5 : Statistiques Comparatives (Global) -->
       <section class="slide slide--global-compare" data-slide-id="global-compare" aria-label="Comparaison mondiale">
         <div class="slide-header">
           <span class="slide-label" id="sl-global-eyebrow">Communauté</span>
@@ -632,8 +613,7 @@
           </div>
         </div>
       </section>
-
-      <!-- ══ SLIDE 6 : Habitudes temporelles ══ -->
+      <!-- SLIDE 6 : Habitudes temporelles -->
       <section class="slide slide--habits" data-slide-id="habits" aria-label="Habitudes d'écoute">
         <div class="slide-header">
           <span class="slide-label" id="sl-habits-eyebrow">Rhythme</span>
@@ -671,8 +651,7 @@
           </div>
         </div>
       </section>
-
-      <!-- ══ SLIDE 7 : Record du jour ══ -->
+      <!-- SLIDE 7 : Record du jour -->
       <section class="slide slide--record" data-slide-id="record" aria-label="Record d'écoute">
         <div class="slide-bg-accent" aria-hidden="true"></div>
         <div class="slide-header">
@@ -699,13 +678,12 @@
           <div class="record-top-tracks" id="record-top-tracks">
             <h3 class="record-top-label" id="record-top-label">Ce jour-là tu écoutais</h3>
             <ul class="record-track-list" id="record-track-list">
-              <!-- Injecté par JS -->
+  
             </ul>
           </div>
         </div>
       </section>
-
-      <!-- ══ SLIDE 8 : The One That Got Away ══ -->
+      <!-- SLIDE 8 : The One That Got Away -->
       <section class="slide slide--got-away" data-slide-id="got-away" aria-label="Artiste oublié">
         <div class="got-away-bg" aria-hidden="true" id="got-away-bg"></div>
         <div class="slide-content got-away-content">
@@ -737,8 +715,7 @@
           <p class="got-away-footnote" id="got-away-footnote">L'artiste que tu as abandonné·e en route…</p>
         </div>
       </section>
-
-      <!-- ══ SLIDE 9 : Évolution des Genres ══ -->
+      <!-- SLIDE 9 : Évolution des Genres -->
       <section class="slide slide--genres" data-slide-id="genres" aria-label="Évolution des genres musicaux">
         <div class="slide-header">
           <span class="slide-label" id="sl-genres-eyebrow">Goûts musicaux</span>
@@ -751,7 +728,7 @@
           </div>
           <!-- Légende tags -->
           <div class="genres-legend" id="genres-legend" role="list" aria-label="Légende des genres">
-            <!-- Injecté par JS -->
+
           </div>
           <!-- Évolution semestrielle -->
           <div class="genres-evolution" id="genres-evolution">
@@ -769,8 +746,7 @@
           </div>
         </div>
       </section>
-
-      <!-- ══ SLIDE 10 : Récapitulatif final + Partage ══ -->
+      <!-- slide 10: final recap -->
       <section class="slide slide--recap" data-slide-id="recap" aria-label="Récapitulatif final">
         <div class="recap-bg" aria-hidden="true" id="recap-bg"></div>
         <div class="slide-content recap-content">
@@ -780,7 +756,7 @@
             <br><em id="recap-word" class="recap-word">Passionné·e</em>
           </h2>
 
-          <!-- Résumé compact -->
+          <!-- quick summary -->
           <div class="recap-summary" id="recap-summary">
             <div class="recap-sum-item">
               <span class="recap-sum-val" id="recap-sum-scrobbles">—</span>
@@ -798,12 +774,12 @@
             </div>
           </div>
 
-          <!-- Top 3 artistes (mini vignettes) -->
+          <!-- top 3 artists (filled by JS) -->
           <div class="recap-top3" id="recap-top3" aria-label="Top 3 artistes">
-            <!-- Injecté par JS -->
+
           </div>
 
-          <!-- Actions de partage -->
+          <!-- share buttons -->
           <div class="recap-actions">
             <button class="btn-primary btn-share" id="recap-share-link" type="button">
               <span id="recap-share-link-txt">🔗 Copier le lien</span>
@@ -816,7 +792,7 @@
             </button>
           </div>
 
-          <!-- Feedback copie lien -->
+          <!-- copy link feedback -->
           <p class="share-link-feedback" id="share-link-feedback" role="status" aria-live="polite" hidden></p>
 
           <a href="index.html" class="btn-ghost recap-back" id="recap-back">← Retour à LastStats</a>
@@ -827,16 +803,12 @@
 
   </main><!-- /stories -->
 
-  <!-- ══════════════════════════════════════════════════
-       TOAST / SNACKBAR (notifications)
-  ══════════════════════════════════════════════════ -->
+  <!-- toast notification -->
   <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true" hidden>
     <span id="toast-msg"></span>
   </div>
 
-  <!-- ══════════════════════════════════════════════════
-       MODAL de partage (bottom sheet)
-  ══════════════════════════════════════════════════ -->
+  <!-- share modal (bottom sheet) -->
   <div id="modal-share" class="modal-share hidden" role="dialog" aria-modal="true" aria-labelledby="modal-share-title">
     <div class="modal-share-backdrop" id="modal-share-backdrop"></div>
     <div class="modal-share-sheet">
@@ -865,12 +837,10 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════
-       CANVAS HORS-ÉCRAN pour l'export (html2canvas)
-  ══════════════════════════════════════════════════ -->
+  <!-- off-screen export stage (html2canvas) -->
   <div id="export-stage" aria-hidden="true" style="position:fixed;top:-9999px;left:-9999px;pointer-events:none;z-index:-1;">
 
-    <!-- Template Story (360×640) -->
+    <!-- story template 360×640 -->
     <div id="export-story" class="export-story" style="width:360px;height:640px;">
       <div class="export-story-bg" id="export-story-bg"></div>
       <div class="export-story-grain" aria-hidden="true"></div>
@@ -891,7 +861,7 @@
       </div>
     </div>
 
-    <!-- Template Carte complète (680×860) -->
+    <!-- full card template 680×860 -->
     <div id="export-card" class="export-card" style="width:680px;height:860px;">
       <div class="export-card-bg" id="export-card-bg"></div>
       <div class="export-card-grain" aria-hidden="true"></div>
@@ -901,7 +871,7 @@
         <span class="export-card-user" id="export-card-user"></span>
       </header>
       <div class="export-card-podium" id="export-card-podium">
-        <!-- Top 3 artistes avec images injectés par JS -->
+        <!-- top 3 artists, filled by JS -->
       </div>
       <div class="export-card-stats" id="export-card-stats">
         <div class="ec-stat"><span class="ec-val" id="ec-scrobbles">—</span><span class="ec-lbl">écoutes</span></div>
@@ -919,7 +889,7 @@
 
   </div><!-- /export-stage -->
 
-  <!-- Script principal -->
+  <!-- main script -->
   <script src="wrapped.js"></script>
 </body>
 </html>

@@ -1,29 +1,11 @@
-/**
- * wrapped.js — LastStats · Wrapped Ultra v6
- * ─────────────────────────────────────────────────────────────────
- * NOUVEAUTÉS v6 :
- *  • VERROUILLAGE 1er JANVIER : Wrapped N débloqué le 1er jan N+1
- *  • ARCHIVES : consulter les années précédentes sans restriction
- *  • MODE LECTURE SEULE : ?share=[base64] → vue publique serverless
- *  • PARTAGE PAR LIEN : generateShareLink() compresse les données
- *  • HABITUDES TEMPORELLES : moment du jour + jour de la semaine
- *  • THE ONE THAT GOT AWAY : artiste abandonné en cours d'année
- *  • RECORD DU JOUR : scrobble maximum en 24h
- *  • GENRES RADAR : Chart.js radar + évolution semestrielle
- *  • GLOBAL STATS : percentile + auditeurs mondiaux + score
- *  • IMAGES PARTOUT : artist.getInfo / album.getInfo / track.getInfo
- */
+// wrapped.js — LastStats Wrapped
 
 'use strict';
 
-/* ═══════════════════════════════════════════════════════════════
-   WRAPPED YEAR — défini par le sélecteur
-   ═══════════════════════════════════════════════════════════════ */
+// which year we're showing
 let WRAPPED_YEAR = new Date().getFullYear() - 1;
 
-/* ═══════════════════════════════════════════════════════════════
-   i18n
-   ═══════════════════════════════════════════════════════════════ */
+// translations
 const TRANSLATIONS = {
   fr:{
     waitTitle:'Reviens le 1er janvier',
@@ -392,7 +374,7 @@ function setLang(code) {
   T = TRANSLATIONS[code] || TRANSLATIONS.fr;
   try { localStorage.setItem('ls_lang', code); } catch {}
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === code));
-  // Mettre à jour l'attribut lang sur <html> pour l'accessibilité
+  // update lang attribute for accessibility
   document.documentElement.lang = code;
   applyLangToDOM();
 }
@@ -428,41 +410,35 @@ function autoDetectLang() {
   return Object.keys(TRANSLATIONS).includes(n) ? n : 'fr';
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   TEMPORAL ACCESS CONTROL
-   ─ Wrapped de l'année N : accessible à partir du 1er janvier N+1
-   ─ Années précédentes : toujours accessibles
-   ═══════════════════════════════════════════════════════════════ */
+// access control — current year's Wrapped only available from Jan 1st
 function isYearAvailable(year) {
   const now = new Date();
   const currentYear = now.getFullYear();
-  // Années passées → toujours dispo
+  // past years are always accessible
   if (year < currentYear - 1) return true;
-  // Année précédente → dispo si on est en jan+ de l'année courante
-  if (year === currentYear - 1) return now.getMonth() >= 0; // always true but explicit
-  // Année en cours ou future → jamais dispo
+  // last year is available once January starts
+  if (year === currentYear - 1) return now.getMonth() >= 0; // always true but keeps intent clear
+  // current or future year — never available
   return false;
 }
 
 function isCurrentWrappedLocked() {
-  // Wrapped de l'année écoulée est-il encore verrouillé ?
+  // is the current year's Wrapped still locked?
   const now = new Date();
-  // Accessible dès le 1er janvier (getMonth()===0)
-  return now.getMonth() === 11 && now.getDate() < 31; // locked until Dec 31; let's go strict: until Jan 1
-  // Strict: verrouillé jusqu'au 1er janvier
+  // unlocks on January 1st
+  return now.getMonth() === 11 && now.getDate() < 31;
 }
 
 function isWrappedAvailable() {
   const now = new Date();
-  // Dispo dès le 1er janvier
+  // available from January 1st
   return now.getMonth() >= 0 && !(now.getMonth() === 11);
-  // i.e. not december
 }
 
-/* Plus précis : verrouillé seulement si on est en décembre */
+// locked only in December
 function isCurrentYearWrappedLocked() {
   const now = new Date();
-  return now.getMonth() === 11; // décembre = verrouillé
+  return now.getMonth() === 11; // december means locked
 }
 
 function getNextJan1() {
@@ -488,9 +464,7 @@ function startCountdown() {
   _cdInterval = setInterval(tick, 1000);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   UTILITIES
-   ═══════════════════════════════════════════════════════════════ */
+// utils
 const DEF_HASH = '2a96cbd8b46e442fc41c2b86b821562f';
 const fmtNum = n => new Intl.NumberFormat(
   LANG_CODE === 'en' ? 'en-US' : LANG_CODE === 'de' ? 'de-DE' :
@@ -506,7 +480,7 @@ function getImg(arr, ...sizes) {
     const url = item?.['#text'] || '';
     if (url && url.length > 10 && !url.includes(DEF_HASH)) return url;
   }
-  // fallback: première URL non-vide
+  // fallback: first non-empty URL
   for (const i of arr) {
     const u = i?.['#text'] || '';
     if (u && u.length > 10 && !u.includes(DEF_HASH)) return u;
@@ -567,9 +541,7 @@ function setProgress(pct) {
   if (pt) pt.textContent = `${Math.round(pct)}%`;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   LAST.FM API
-   ═══════════════════════════════════════════════════════════════ */
+// Last.fm API
 const LASTFM = {
   BASE: 'https://ws.audioscrobbler.com/2.0/',
   async call(method, params = {}, customKey = null) {
@@ -587,24 +559,21 @@ const LASTFM = {
   }
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   DATA STORE
-   ═══════════════════════════════════════════════════════════════ */
+// global data store
 const STORE = {
   username: '', apiKey: '',
   user: null, tracks: [], albums: [], artists: [], tags: [],
   artist1Img: '', _uniqueArtists: 0, _uniqueTracks: 0, annualPlays: 0,
-  // Nouvelles données v6
-  recentTracks: [],    // pour habitudes temporelles + record + gotAway
-  tagsByMonth: {},     // {month: [tags]} pour évolution genres
-  habitHours: [],      // [0..23] → count
-  habitDays: [],       // [0..6] → count (lun=0)
+  recentTracks: [],
+  tagsByMonth: {},
+  habitHours: [],      // index = hour (0–23)
+  habitDays: [],       // index = weekday (0=Mon)
   habitMonthPeak: { month: -1, plays: 0 },
-  recordDay: null,     // { date, plays, tracks }
-  gotAwayArtist: null, // { name, img, before, after }
+  recordDay: null,
+  gotAwayArtist: null,
   globalStats: {},
-  streak: null,        // { days, startDate, endDate }
-  dayMap: null,     // { listeners, playcount, userListeners, percentile }
+  streak: null,
+  dayMap: null,
   isReadOnly: false,
   readOnlyData: null,
   // Helpers
@@ -634,14 +603,10 @@ const STORE = {
   }
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   STOP TAGS
-   ═══════════════════════════════════════════════════════════════ */
+// tags we ignore — too generic to be meaningful
 const STOP_TAGS = new Set(['seen live','loved','favorites','favourite','all','good','best','cool','favorite','mellow','under 2000 listeners','american','british','female','male','singer-songwriter','albums i own','beautiful','catchy','sexy','awesome','chill','epic','amazing','great','love','top','nice','<br>','favourite music','american music','british music','canadian','french','german','japanese','male vocalists','female vocalists','acoustic']);
 
-/* ═══════════════════════════════════════════════════════════════
-   DATA LOADING
-   ═══════════════════════════════════════════════════════════════ */
+// data loading
 async function loadAllData(onProgress) {
   const p = (msg, pct, step, stepState) => {
     onProgress?.(msg, pct);
@@ -657,7 +622,7 @@ async function loadAllData(onProgress) {
 
   p(T.loadStep1, 10, 'profile');
 
-  // Round 1 : profil + weekly charts
+  // profile + weekly charts
   const [userRes, tracksRes, albumsRes, artistsRes] = await Promise.all([
     LASTFM.call('user.getInfo'),
     LASTFM.call('user.getWeeklyTrackChart',  { from, to }).catch(() => null),
@@ -715,7 +680,7 @@ async function loadAllData(onProgress) {
   const results = await Promise.all(enrichJobs);
   let ri = 0;
 
-  // Tags
+  // merge tags from top 3 artists
   const seenT = new Set(), merged = [];
   for (let i = 0; i < 3; i++) {
     for (const t of (results[ri+i]?.toptags?.tag || [])) {
@@ -728,7 +693,7 @@ async function loadAllData(onProgress) {
   STORE.tags = merged.slice(0, 10);
   ri += 3;
 
-  // Artist images (getTopAlbums)
+  // grab artist images from their top albums
   for (let i = 0; i < top5Art.length; i++) {
     const res = results[ri + i];
     for (const alb of (res?.topalbums?.album || [])) {
@@ -738,20 +703,19 @@ async function loadAllData(onProgress) {
   }
   ri += top5Art.length;
 
-  // Global stats artiste #1
+  // global stats for artist #1
   const artInfoRes = results[ri]; ri++;
   if (artInfoRes?.artist) {
     const ai = artInfoRes.artist;
     const globalListeners = parseInt(ai.stats?.listeners || 0);
     const globalPlays     = parseInt(ai.stats?.playcount || 0);
     const userPlaycount   = parseInt(ai.stats?.userplaycount || STORE.artists[0]?.playcount || 0);
-    // Percentile amélioré : comparaison logarithmique réaliste
+    // estimate percentile from play count vs global average
     let percentile = '—';
     if (globalListeners > 0 && userPlaycount > 0) {
-      // avg plays par auditeur mondial
       const avgPlays = globalListeners > 0 ? globalPlays / globalListeners : 100;
       const ratio = userPlaycount / Math.max(1, avgPlays);
-      // Plus le ratio est élevé, plus le percentile est petit (meilleur)
+      // higher ratio = better = lower percentile number
       const raw = Math.round(100 - Math.min(99, ratio * 12));
       percentile = String(Math.max(1, raw));
     }
@@ -767,12 +731,12 @@ async function loadAllData(onProgress) {
       STORE.artists[0]._userPlaycount = userPlaycount;
     }
   }
-  // getSimilar artiste #1
+  // similar artists for artist #1
   const similarRes = results[ri]; ri++;
   if (similarRes?.similarartists?.artist) {
     STORE.globalStats.similar = (similarRes.similarartists.artist || []).slice(0,5).map(a=>a.name);
   }
-  // artist.getInfo artiste #2
+  // stats for artist #2
   const art2InfoRes = results[ri]; ri++;
   if (art2InfoRes?.artist && STORE.artists[1]) {
     const ai2 = art2InfoRes.artist;
@@ -781,7 +745,7 @@ async function loadAllData(onProgress) {
     STORE.artists[1]._userPlaycount = parseInt(ai2.stats?.userplaycount || STORE.artists[1]?.playcount || 0);
   }
 
-  // Album images (album.getInfo)
+  // album artwork
   for (let i = 0; i < top5Alb.length; i++) {
     const res = results[ri + i];
     if (res?.album?.image) {
@@ -791,7 +755,7 @@ async function loadAllData(onProgress) {
   }
   ri += top5Alb.length;
 
-  // Track images + durée (track.getInfo)
+  // track artwork and duration
   let totalDurSec = 0, durCount = 0;
   for (let i = 0; i < top5Trk.length; i++) {
     const res = results[ri + i];
@@ -800,43 +764,42 @@ async function loadAllData(onProgress) {
       STORE.tracks[i].image = res.track.album.image;
     }
     const dur = parseInt(res.track.duration || 0);
-    if (dur > 30000) { totalDurSec += dur / 1000; durCount++; } // dur en ms
-    else if (dur > 30) { totalDurSec += dur; durCount++; } // dur en s
+    if (dur > 30000) { totalDurSec += dur / 1000; durCount++; } // duration in ms
+    else if (dur > 30) { totalDurSec += dur; durCount++; } // duration in seconds
     if (STORE.tracks[i]) {
       STORE.tracks[i]._globalListeners = parseInt(res.track.listeners || 0);
       STORE.tracks[i]._globalPlays = parseInt(res.track.playcount || 0);
       STORE.tracks[i]._userPlaycount = parseInt(res.track.userplaycount || 0);
     }
   }
-  // Recalculer les minutes avec durée réelle si possible
+  // recalculate minutes using real track duration if we have enough data
   if (durCount >= 2) {
     const avgDurSec = totalDurSec / durCount;
     STORE._realAvgDurSec = Math.round(avgDurSec);
-    // écoutes × durée moyenne (en min)
     STORE.annualMins = Math.round(STORE.annualPlays * avgDurSec / 60);
   }
 
   setLoaderStep('images', 'done');
   p(T.loadStep3, 62, 'history');
 
-  // Round 3 : historique récent pour habitudes + record + gotAway
+  // recent history for habits, record day, and "got away"
   await loadTemporalData(from, to);
   setLoaderStep('history', 'done');
   p(T.loadStep5, 84, 'compare');
 
-  // Calculer les stats communautaires (track #1)
+  // community stats for track #1
   await loadGlobalTrackStats();
   setLoaderStep('compare', 'done');
   p(T.loadStep8, 100);
 }
 
-/* ── Données temporelles ── */
+// temporal data
 async function loadTemporalData(from, to) {
-  // Charger jusqu'à 5 pages de recenttracks pour l'année
+  // load recent tracks for the year (up to 8 pages)
   STORE.habitHours = new Array(24).fill(0);
   STORE.habitDays  = new Array(7).fill(0);
   const monthPlays = new Array(12).fill(0);
-  const dayMap = {}; // 'YYYY-MM-DD' → count
+  const dayMap = {}; // date string → play count
   const artistFirstH = {}; // artist → {h1count, h2count}
 
   try {
@@ -860,7 +823,7 @@ async function loadTemporalData(from, to) {
         STORE.habitDays[dow]++;
         monthPlays[month]++;
         dayMap[dateKey] = (dayMap[dateKey] || 0) + 1;
-        // gotAway : semestres
+        // track plays per semester for "got away" logic
         const artistName = t.artist?.['#text'] || t.artist?.name || '';
         if (artistName) {
           if (!artistFirstH[artistName]) artistFirstH[artistName] = { h1: 0, h2: 0 };
@@ -874,11 +837,11 @@ async function loadTemporalData(from, to) {
     }
   } catch {}
 
-  // Mois record
+  // best month
   const peakMonth = monthPlays.indexOf(Math.max(...monthPlays));
   STORE.habitMonthPeak = { month: peakMonth, plays: monthPlays[peakMonth] };
 
-  // Record du jour
+  // best single day
   const entries = Object.entries(dayMap).sort((a,b) => b[1]-a[1]);
   if (entries.length) {
     const [dateKey, plays] = entries[0];
@@ -886,7 +849,7 @@ async function loadTemporalData(from, to) {
     STORE.recordDay = { date: new Date(y, m-1, d), plays };
   }
 
-  // Streak — jours consécutifs
+  // calculate longest streak
   STORE.dayMap = dayMap;
   const sortedDays = Object.keys(dayMap).sort();
   let maxStreak = 0, curStreak = 0, curStart = null, bestStart = null, bestEnd = null;
@@ -913,8 +876,7 @@ async function loadTemporalData(from, to) {
   }
   STORE.streak = { days: maxStreak, startDate: bestStart, endDate: bestEnd };
 
-  // The One That Got Away
-  // Artiste le plus scrobblé en H1 mais quasi absent en H2
+  // The One That Got Away — most played in H1 but nearly gone in H2
   const candidates = Object.entries(artistFirstH)
     .filter(([, v]) => v.h1 >= 5 && v.h2 <= Math.max(1, v.h1 * 0.15))
     .sort((a,b) => b[1].h1 - a[1].h1);
@@ -923,13 +885,13 @@ async function loadTemporalData(from, to) {
     const found = STORE.artists.find(a => a.name.toLowerCase() === name.toLowerCase());
     STORE.gotAwayArtist = { name, img: found?._img || '', before: counts.h1, after: counts.h2 };
   } else if (STORE.artists.length >= 2) {
-    // Fallback : comparer artiste 1 et artiste qui a le plus chuté
+    // fallback: use artist #2 with estimated split
     const a = STORE.artists[1];
     STORE.gotAwayArtist = { name: a.name, img: a._img || '', before: Math.round(a.playcount * 0.7), after: Math.round(a.playcount * 0.3) };
   }
 }
 
-/* ── Stats globales du titre #1 ── */
+// global stats for track #1
 async function loadGlobalTrackStats() {
   if (!STORE.tracks[0]) return;
   try {
@@ -943,9 +905,7 @@ async function loadGlobalTrackStats() {
   } catch {}
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   SHARE LINK — Serverless Base64
-   ═══════════════════════════════════════════════════════════════ */
+// share link — base64 encoded payload
 function generateSharePayload() {
   return {
     v: 2,
@@ -1017,7 +977,7 @@ function populateStoreFromShareData(data) {
   }));
   STORE.artist1Img = STORE.artists[0]?._img || '';
   STORE.globalStats = { percentile: data.pct || '—', similar: data.sim || [], listeners: 0, playcount: 0 };
-  // Pre-warm image cache for screenshots in read-only mode
+  // warm up image cache so screenshots work in read-only mode
   STORE._shareImages = [
     ...STORE.artists.map(a => a._img).filter(Boolean),
     ...STORE.albums.map(a => a.image?.[0]?.['#text']).filter(Boolean),
@@ -1025,14 +985,14 @@ function populateStoreFromShareData(data) {
   ];
 }
 
-/* ─ Copier dans le presse-papier ─ */
+// copy to clipboard
 async function copyShareLink() {
   const url = generateShareLink();
   try {
     await navigator.clipboard.writeText(url);
     showToast(T.copiedOk);
   } catch {
-    // Fallback select
+    // fallback for older browsers
     const ta = document.createElement('textarea');
     ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
     document.body.appendChild(ta); ta.select();
@@ -1042,7 +1002,7 @@ async function copyShareLink() {
   }
 }
 
-/* ─ Web Share API ─ */
+// native share (mobile)
 async function nativeShare() {
   const url = generateShareLink();
   if (navigator.share) {
@@ -1052,9 +1012,7 @@ async function nativeShare() {
   await copyShareLink();
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   AMBIENT BACKGROUNDS
-   ═══════════════════════════════════════════════════════════════ */
+// ambient backgrounds per slide
 const AMBIENTS = {
   purple:'radial-gradient(ellipse 80% 60% at 20% 30%,#3b0764 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 75% 70%,#1e1b4b 0%,transparent 65%),#060610',
   gold:  'radial-gradient(ellipse 80% 60% at 15% 30%,#451a03 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 75% 70%,#1c1005 0%,transparent 65%),#060610',
@@ -1073,9 +1031,7 @@ function setAmbient(theme) {
   if (e) e.style.background = AMBIENTS[theme] || AMBIENTS.purple;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   SLIDE BUILDERS
-   ═══════════════════════════════════════════════════════════════ */
+// slide builders
 function buildFallback(msg) {
   return `<div class="slide-content" style="align-items:center;justify-content:center;flex-direction:column;gap:14px;padding-top:60px">
     <div style="font-size:48px">🎵</div>
@@ -1084,7 +1040,7 @@ function buildFallback(msg) {
   </div>`;
 }
 
-/* ── SLIDE 0 — INTRO ── */
+/* slide 0 — intro */
 function buildIntro() {
   const name = esc(STORE.displayName);
   const total = fmtNum(STORE.annualPlays);
@@ -1107,7 +1063,7 @@ function buildIntro() {
     </div>`;
 }
 
-/* ── SLIDE 1 — CHIFFRES ── */
+/* slide 1 — numbers */
 function buildNumbers() {
   const days = STORE.habitDays.reduce((s,v)=>s+v,0) > 0
     ? STORE.habitDays.filter(v=>v>0).length
@@ -1149,7 +1105,7 @@ function buildNumbers() {
     </div>`;
 }
 
-/* ── SLIDE 2 — TOP ARTISTES ── */
+/* slide 2 — top artists */
 function buildTopArtists() {
   const artists = STORE.artists.slice(0, 5);
   if (!artists.length) return buildFallback();
@@ -1204,7 +1160,7 @@ function buildTopArtists() {
     <div class="top-list" id="artists-list-4-5">${listItems}</div>`;
 }
 
-/* ── SLIDE 3 — TOP ALBUMS ── */
+/* slide 3 — top albums */
 function buildTopAlbums() {
   const albums = STORE.albums.slice(0, 5);
   if (!albums.length) return buildFallback();
@@ -1233,7 +1189,7 @@ function buildTopAlbums() {
     <div class="albums-mosaic" id="albums-mosaic">${items}</div>`;
 }
 
-/* ── SLIDE 4 — TOP TITRES ── */
+/* slide 4 — top tracks */
 function buildTopTracks() {
   const tracks = STORE.tracks.slice(0, 5);
   if (!tracks.length) return buildFallback();
@@ -1266,7 +1222,7 @@ function buildTopTracks() {
     <ol class="tracks-list" id="tracks-list">${items}</ol>`;
 }
 
-/* ── SLIDE 5 — COMPARAISON MONDIALE ── */
+/* slide 5 — global comparison */
 function buildGlobalCompare() {
   const artist = STORE.artists[0];
   const gs = STORE.globalStats || {};
@@ -1274,7 +1230,7 @@ function buildGlobalCompare() {
   const img = STORE.artist1Img || '';
   const percentile = gs?.percentile || '—';
 
-  // Uniqueness : basé sur tags niche + artistes peu connus
+  // uniqueness score based on niche tags and lesser-known artists
   const nicheTags = STORE.tags.filter(t => {
     const t2 = t.toLowerCase();
     return t2.length > 4 && !['rock','pop','metal','rap','jazz','soul','folk','indie'].includes(t2);
@@ -1283,23 +1239,19 @@ function buildGlobalCompare() {
     ? Math.min(99, Math.round(52 + nicheTags * 4 + (STORE.artists.filter(a => !a._listeners || a._listeners < 100000).length * 4)))
     : '—';
 
-  // X fois la moyenne mondiale
+  // how many times the user listens vs world average
   const avgPL = gs.avgPlaysPerListener || 0;
   const userPC = gs.userPlaycount || 0;
   const vsAvgX = avgPL > 0 ? Math.round((userPC / avgPL) * 10) / 10 : '—';
   const vsAvgTxt = vsAvgX !== '—' ? `${vsAvgX}×` : '—';
 
-  // Similar artists list
   const similarList = (gs.similar || []).slice(0, 4);
 
-  // Artist tags (genre)
   const artistTags = (gs.artistTags || []).slice(0, 2).join(' · ') || '—';
 
-  // Track user plays
   const trackUserPlay = track1?._userPlaycount || track1?.playcount || 0;
   const trackGlobalListeners = track1?._globalListeners || 0;
 
-  // Artist #2 stats
   const artist2 = STORE.artists[1];
   const a2UserPlay = artist2?._userPlaycount || artist2?.playcount || 0;
   const a2Global = artist2?._listeners || 0;
@@ -1407,7 +1359,7 @@ function buildGlobalCompare() {
     </div>`;
 }
 
-/* ── SLIDE 6 — HABITUDES ── */
+/* slide 6 — habits */
 function buildHabits() {
   const cat = STORE.habitTimeCategory;
   const peakDay = STORE.habitPeakDay;
@@ -1416,10 +1368,10 @@ function buildHabits() {
   const weekDays = T.weekDays || ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
   const months = T.months || ['Janv','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sept','Oct','Nov','Déc'];
 
-  // SVG horloge simple
+  // clock SVG
   const clockSvg = buildClockSvg(STORE.habitHours);
 
-  // Barres jours
+  // weekday bars
   const maxDay = Math.max(1, ...STORE.habitDays);
   const weekBars = STORE.habitDays.length
     ? STORE.habitDays.map((v,i) => {
@@ -1493,7 +1445,7 @@ function buildClockSvg(hours) {
   </svg>`;
 }
 
-/* ── SLIDE 7 — RECORD ── */
+/* slide 7 — record day */
 function buildRecord() {
   const rec = STORE.recordDay;
   const months = T.months || ['Jan','Fév','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Déc'];
@@ -1530,7 +1482,7 @@ function buildRecord() {
     </div>`;
 }
 
-/* ── SLIDE 8 — THE ONE THAT GOT AWAY ── */
+/* slide 8 — got away */
 function buildGotAway() {
   const ga = STORE.gotAwayArtist;
   if (!ga) return buildFallback('Données insuffisantes pour cette analyse.');
@@ -1569,7 +1521,7 @@ function buildGotAway() {
     </div>`;
 }
 
-/* ── SLIDE A — STREAK ── */
+/* slide A — streak */
 function buildStreak() {
   const s = STORE.streak;
   if (!s || !s.days) return buildFallback(T.streakNone || 'Données insuffisantes.');
@@ -1609,7 +1561,7 @@ function buildStreak() {
     </div>`;
 }
 
-/* ── SLIDE B — VIBE ── */
+/* slide B — vibe */
 function buildVibe() {
   const type = STORE.listenerType;
   const timecat = STORE.habitTimeCategory;
@@ -1661,7 +1613,7 @@ function buildVibe() {
     </div>`;
 }
 
-/* ── SLIDE 9 — GENRES (Radar) ── */
+/* slide 9 — genres */
 function buildGenres() {
   const COLORS = ['#f43f5e','#a855f7','#3b82f6','#10b981','#f59e0b','#ec4899','#06b6d4','#8b5cf6','#d97706','#dc2626'];
   if (!STORE.tags.length) return buildFallback('Aucun genre trouvé.');
@@ -1673,7 +1625,7 @@ function buildGenres() {
       <span>${esc(tag)}</span>
     </div>`).join('');
 
-  // On simule une répartition S1/S2 à partir du rang
+  // split tags into two halves for H1/H2 comparison
   const half = Math.ceil(tags.length / 2);
   const s1Tags = tags.slice(0, half).map(t => `<li>${esc(t)}</li>`).join('');
   const s2Tags = tags.slice(half).map(t => `<li>${esc(t)}</li>`).join('');
@@ -1708,7 +1660,7 @@ function buildGenres() {
     </div>`;
 }
 
-/* ── SLIDE 10 — RÉCAPITULATIF ── */
+/* slide 10 — recap */
 function buildRecap() {
   const type = STORE.listenerType;
   const word = (T.recapWords||{})[type] || 'Passionné·e';
@@ -1747,9 +1699,7 @@ function buildRecap() {
     </div>`;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   SLIDE MANIFEST
-   ═══════════════════════════════════════════════════════════════ */
+// slide list
 const SLIDES = [
   { id:'intro',      theme:'purple', duration:5000,    build:buildIntro },
   { id:'numbers',    theme:'blue',   duration:7000,    build:buildNumbers },
@@ -1766,9 +1716,7 @@ const SLIDES = [
   { id:'recap',      theme:'recap',  duration:Infinity, build:buildRecap },
 ];
 
-/* ═══════════════════════════════════════════════════════════════
-   STORIES ENGINE
-   ═══════════════════════════════════════════════════════════════ */
+// stories engine
 let _radarChart = null;
 
 const Stories = {
@@ -1790,7 +1738,7 @@ const Stories = {
   },
 
   _bindRecapButtons() {
-    // Boutons du recap — recréés à chaque init
+    // recap buttons get recreated on each init
     setTimeout(() => {
       document.getElementById('recap-share-link')?.addEventListener('click', () => openShareModal());
       document.getElementById('recap-export-story')?.addEventListener('click', () => ExportManager.story());
@@ -1943,7 +1891,7 @@ const Stories = {
           setTimeout(() => {
             fadeIn(document.getElementById('global-similar'), 0);
           }, 650);
-          // Animer la jauge
+          // animate the gauge
           setTimeout(() => {
             const fill = document.getElementById('gauge-fill');
             const gs = STORE.globalStats;
@@ -1951,7 +1899,7 @@ const Stories = {
             const arc = Math.round((100-pct) * 283 / 100);
             if (fill) { fill.style.strokeDasharray = `${arc} 283`; fill.style.transition='stroke-dasharray 1.6s cubic-bezier(.22,1,.36,1)'; }
           }, 600);
-          // Animer mini-cards une par une
+          // animate mini cards one by one
           setTimeout(() => {
             document.querySelectorAll('.global-mini-card').forEach((el,i) => {
               el.style.opacity='0'; el.style.transform='translateY(12px)';
@@ -2000,7 +1948,7 @@ const Stories = {
             document.querySelectorAll('.timeline-bar--before').forEach(el => {
               el.style.transition='none'; el.style.setProperty('--w','0%');
               setTimeout(()=>{ el.style.transition='--w 1s'; el.style.setProperty('--w',`${beforePct}%`);
-                // Hack: utiliser ::after via style inline non supporté; on cible directement
+                // can't target ::after via inline style, so we inject a div instead
                 el.style.background='none'; el.style.position='relative';
                 const fill=document.createElement('div');
                 fill.style.cssText=`position:absolute;left:0;top:0;bottom:0;width:0%;background:rgba(168,85,247,.7);border-radius:4px;transition:width 1.2s cubic-bezier(.22,1,.36,1)`;
@@ -2062,14 +2010,12 @@ const Stories = {
   }
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   RADAR CHART (Chart.js)
-   ═══════════════════════════════════════════════════════════════ */
+// radar chart (Chart.js)
 function buildRadarChart() {
   const canvas = document.getElementById('genres-radar-chart');
   if (!canvas) return;
 
-  // Charger Chart.js à la volée si absent
+  // lazy-load Chart.js if not already there
   const loadChartJs = () => new Promise((resolve, reject) => {
     if (window.Chart) { resolve(); return; }
     const s = document.createElement('script');
@@ -2082,7 +2028,7 @@ function buildRadarChart() {
   const tags = STORE.tags.slice(0, 8);
   if (!tags.length) return;
 
-  // Données simulées décroissantes avec variation
+  // simulated decreasing values with some randomness
   const data = tags.map((_, i) => Math.max(10, Math.round(100 - i*11 + (Math.random()*12-6))));
 
   loadChartJs().then(() => {
@@ -2122,10 +2068,8 @@ function buildRadarChart() {
   }).catch(err => console.warn('Chart.js not loaded:', err));
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   EXPORT MANAGER (html2canvas)
-   ═══════════════════════════════════════════════════════════════ */
-/* Fetch image as base64 data URL (CORS) */
+// export manager (html2canvas)
+// fetch image as base64 for CORS-safe export
 async function fetchDataUrl(src) {
   if (!src || src.startsWith('data:')) return src;
   try {
@@ -2144,7 +2088,7 @@ async function fetchDataUrl(src) {
 const ExportManager = {
   _imgCache: new Map(),
 
-  /* Pre-bake ALL visible images in a slide to data URLs */
+  // convert all images to data URLs before capture
   async _bakeImages(root) {
     const jobs = [];
     root.querySelectorAll('img[src]').forEach(img => {
@@ -2200,7 +2144,6 @@ const ExportManager = {
     if (!window.html2canvas) { showToast('html2canvas non disponible'); return; }
     const stage = document.getElementById('export-story');
     if (!stage) return;
-    // Préparer le contenu
     const a1 = STORE.artists[0];
     const imgEl = document.getElementById('export-story-artist-img');
     if (imgEl && STORE.artist1Img) imgEl.src = STORE.artist1Img;
@@ -2232,7 +2175,6 @@ const ExportManager = {
     if (!window.html2canvas) { showToast('html2canvas non disponible'); return; }
     const stage = document.getElementById('export-card');
     if (!stage) return;
-    // Préparer
     const setT = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
     const bgEl = document.getElementById('export-card-bg');
     if (bgEl && STORE.artist1Img) bgEl.style.backgroundImage = `url('${STORE.artist1Img}')`;
@@ -2242,7 +2184,7 @@ const ExportManager = {
     setT('ec-artists', fmtNum(STORE._uniqueArtists||STORE.artists.length));
     setT('ec-albums', fmtNum(STORE.albums.length));
     setT('ec-minutes', fmtNum(STORE.listenMins));
-    // Podium dans la carte
+    // build the podium for the card
     const podDiv = document.getElementById('export-card-podium');
     if (podDiv) {
       podDiv.innerHTML = STORE.artists.slice(0,3).map((a,i) => {
@@ -2302,32 +2244,32 @@ const ExportManager = {
             el.style.width=`${pct}%`;
             el.style.transition='none';
           });
-          // Fix streak bar
+          // fix streak bar width
           const sf = doc.getElementById('streak-bar-fill');
           const sk = STORE.streak;
           if (sf && sk) { const p=Math.min(100,Math.round(sk.days/366*100)); sf.style.width=`${p}%`; sf.style.transition='none'; }
-          // Fix timeline bars
+          // fix timeline bar widths
           doc.querySelectorAll('.timeline-bar').forEach(el => {
             const fill2=el.querySelector('div');
             if(fill2) fill2.style.transition='none';
           });
-          // Fix ambient / grain
+          // hide ambient effects that don't export well
           const amb=doc.getElementById('ambient'); if(amb) amb.style.opacity='1';
           const grain=doc.getElementById('grain'); if(grain) grain.style.display='none';
           const canvas2=doc.getElementById('particle-canvas'); if(canvas2) canvas2.style.display='none';
-          // Replace cross-origin images with cached data URLs
+          // swap in cached data URLs to avoid CORS issues
           doc.querySelectorAll('img[src]').forEach(img => {
             const cached = ExportManager._imgCache.get(img.src);
             if (cached) img.src = cached;
           });
-          // Replace background-image cross-origin
+          // same for background images
           doc.querySelectorAll('[style]').forEach(el => {
             const m = el.style.backgroundImage.match(/url\(['"]?([^'")\s]+)['"]?\)/);
             if (!m) return;
             const cached = ExportManager._imgCache.get(m[1]);
             if (cached) el.style.backgroundImage = `url('${cached}')`;
           });
-          // Make all anim elements fully visible
+          // make sure all animated elements are visible
           doc.querySelectorAll('[style*="opacity:0"], .anim-rise, .anim-pop, .anim-fade').forEach(el => {
             el.style.opacity='1'; el.style.transform='none'; el.style.transition='none';
           });
@@ -2347,9 +2289,7 @@ const ExportManager = {
   }
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   SHARE MODAL
-   ═══════════════════════════════════════════════════════════════ */
+// share modal
 function openShareModal() {
   const modal = document.getElementById('modal-share');
   if (!modal) return;
@@ -2360,16 +2300,13 @@ function closeShareModal() {
   if (modal) modal.classList.add('hidden');
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   SHARE PREVIEW OVERLAY
-   ═══════════════════════════════════════════════════════════════ */
+// share preview overlay
 function populateSharePreview(data) {
   const setT = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
   const setI = (id,s) => { const e=document.getElementById(id); if(e) e.src=s; };
   setI('share-avatar', data.av||initialsPlaceholder(data.u||'?'));
   setT('share-username', data.u||'—');
   setT('share-year-tag', `Wrapped ${data.y||'—'}`);
-  // Quick stats
   const qs = document.getElementById('share-quick-stats');
   if (qs && data) {
     qs.innerHTML = [
@@ -2379,9 +2316,7 @@ function populateSharePreview(data) {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   INPUT HANDLERS
-   ═══════════════════════════════════════════════════════════════ */
+// input handlers
 document.addEventListener('keydown', e => {
   if (document.getElementById('stories')?.classList.contains('hidden')) return;
   if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); Stories.next(); }
@@ -2395,13 +2330,13 @@ document.getElementById('nav-next')?.addEventListener('click', () => Stories.nex
 document.getElementById('pause-btn')?.addEventListener('click', e => { e.stopPropagation(); Stories.togglePause(); });
 document.getElementById('screenshot-btn')?.addEventListener('click', e => { e.stopPropagation(); ExportManager.screenshot(); });
 document.getElementById('share-btn')?.addEventListener('click', e => { e.stopPropagation(); openShareModal(); });
-document.getElementById('mute-btn')?.addEventListener('click', e => { e.stopPropagation(); /* future */ });
+document.getElementById('mute-btn')?.addEventListener('click', e => { e.stopPropagation(); /* placeholder */ });
 document.getElementById('exit-btn')?.addEventListener('click', () => {
   document.getElementById('stories')?.classList.add('hidden');
   document.getElementById('overlay-creds')?.classList.remove('hidden');
 });
 
-// Share modal
+// share modal buttons
 document.getElementById('modal-copy-link')?.addEventListener('click', async () => { closeShareModal(); await copyShareLink(); });
 document.getElementById('modal-web-share')?.addEventListener('click', async () => { closeShareModal(); await nativeShare(); });
 document.getElementById('modal-export-story')?.addEventListener('click', () => { closeShareModal(); ExportManager.story(); });
@@ -2409,12 +2344,12 @@ document.getElementById('modal-export-card')?.addEventListener('click', () => { 
 document.getElementById('modal-share-close')?.addEventListener('click', closeShareModal);
 document.getElementById('modal-share-backdrop')?.addEventListener('click', closeShareModal);
 
-// Share view overlay
+// shared view overlay
 document.getElementById('share-enter-btn')?.addEventListener('click', async () => {
   document.getElementById('overlay-share-view')?.classList.add('hidden');
   document.getElementById('stories')?.classList.remove('hidden');
   Stories.init();
-  // Pre-warm image cache for read-only screenshots
+  // warm up image cache for screenshots
   if (STORE._shareImages?.length) {
     STORE._shareImages.forEach(url => {
       if (url && !ExportManager._imgCache.has(url)) {
@@ -2424,13 +2359,13 @@ document.getElementById('share-enter-btn')?.addEventListener('click', async () =
   }
 });
 
-// Toggle mot de passe
+// password toggle
 document.getElementById('toggle-pw')?.addEventListener('click', () => {
   const inp = document.getElementById('inp-key'); if (!inp) return;
   inp.type = inp.type === 'password' ? 'text' : 'password';
 });
 
-// Swipe
+// swipe gestures
 let _tx = 0, _ty = 0, _tt = 0;
 document.addEventListener('touchstart', e => { _tx = e.touches[0].clientX; _ty = e.touches[0].clientY; _tt = Date.now(); }, { passive: true });
 document.addEventListener('touchend', e => {
@@ -2442,9 +2377,7 @@ document.addEventListener('touchend', e => {
   }
 }, { passive: true });
 
-/* ═══════════════════════════════════════════════════════════════
-   LOADING
-   ═══════════════════════════════════════════════════════════════ */
+// loader
 function showLoader(msg, pct) {
   const lt = document.getElementById('loader-text'), lb = document.getElementById('loader-bar'), pt = document.getElementById('loader-pct');
   if (lt && msg) lt.textContent = msg;
@@ -2505,7 +2438,7 @@ document.getElementById('cred-submit')?.addEventListener('click', async () => {
   document.getElementById(id)?.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('cred-submit')?.click(); })
 );
 
-// Langue
+// language selection
 document.querySelectorAll('.lang-btn').forEach(btn => btn.addEventListener('click', () => {
   setLang(btn.dataset.lang);
   document.getElementById('overlay-lang')?.classList.add('hidden');
@@ -2516,14 +2449,12 @@ document.getElementById('lang-change-btn')?.addEventListener('click', () => {
   document.getElementById('overlay-lang')?.classList.remove('hidden');
 });
 
-/* ═══════════════════════════════════════════════════════════════
-   INIT
-   ═══════════════════════════════════════════════════════════════ */
+// init
 document.addEventListener('DOMContentLoaded', () => {
   let savedLang; try { savedLang = localStorage.getItem('ls_lang'); } catch {}
   setLang(savedLang || autoDetectLang());
 
-  // ── Mode partage (?share=...) ──
+  // share mode (?share=...)
   const urlParams = new URLSearchParams(location.search);
   const shareParam = urlParams.get('share');
   if (shareParam) {
@@ -2532,7 +2463,6 @@ document.addEventListener('DOMContentLoaded', () => {
       populateStoreFromShareData(data);
       populateSharePreview(data);
       applyLangToDOM();
-      // Afficher l'overlay de preview
       document.getElementById('overlay-lang')?.classList.add('hidden');
       document.getElementById('overlay-creds')?.classList.add('hidden');
       document.getElementById('overlay-share-view')?.classList.remove('hidden');
@@ -2540,23 +2470,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ── Mode normal ──
+  // normal mode
   const now = new Date();
-  const isDecember = now.getMonth() === 11; // décembre = Wrapped verrouillé
+  const isDecember = now.getMonth() === 11;
 
   if (isDecember) {
-    // Afficher le countdown pour le Wrapped de l'année courante
+    // show countdown — Wrapped isn't out yet
     document.getElementById('overlay-lang')?.classList.add('hidden');
     document.getElementById('overlay-wait')?.classList.remove('hidden');
     applyLangToDOM();
     startCountdown();
 
-    // Proposer les archives (années précédentes : toujours accessibles)
+    // show previous years (always accessible)
     const archivesEl = document.getElementById('wait-archives');
     const archivesList = document.getElementById('wait-archives-list');
     if (archivesEl && archivesList) {
       const cur = now.getFullYear();
-      // Afficher les 5 dernières années passées
+      // show up to 5 past years
       for (let y = cur - 1; y >= Math.max(cur - 5, 2006); y--) {
         const btn = document.createElement('button');
         btn.className = 'archive-year-btn';
@@ -2574,7 +2504,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // Peupler le sélecteur d'année
+  // populate the year selector
   const sel = document.getElementById('inp-year');
   if (sel) {
     const cur = now.getFullYear(), last = cur - 1;
@@ -2585,7 +2515,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (y === last) { o.selected = true; }
       sel.appendChild(o);
     }
-    // Badge année + sync WRAPPED_YEAR
+    // update badge and sync year
     sel.addEventListener('change', () => {
       WRAPPED_YEAR = parseInt(sel.value) || WRAPPED_YEAR;
       const badge = document.getElementById('year-badge');
@@ -2599,13 +2529,13 @@ document.addEventListener('DOMContentLoaded', () => {
     sel.value = String(Math.min(saved, last));
   }
 
-  // Pré-remplir identifiants
+  // pre-fill saved credentials
   let savedUser = '', savedKey = '';
   try { savedUser = localStorage.getItem('ls_username') || ''; savedKey = localStorage.getItem('ls_apikey') || ''; } catch {}
   if (savedUser) { const e = document.getElementById('inp-user'); if (e) e.value = savedUser; }
   if (savedKey)  { const e = document.getElementById('inp-key');  if (e) e.value = savedKey; }
 
-  // Afficher le bon overlay
+  // skip language screen if we already have a language
   if (savedLang) {
     document.getElementById('overlay-lang')?.classList.add('hidden');
     document.getElementById('overlay-creds')?.classList.remove('hidden');
