@@ -99,7 +99,7 @@
             <span data-i18n="setup.getfree">Get it free</span>
           </a>
         </label>
-        <div class="input-row">
+        <div class="input-group">
           <input type="password" id="input-apikey" placeholder="32-character hex key"
                  autocomplete="off"
                  onkeydown="if(event.key==='Enter')initApp()">
@@ -612,15 +612,15 @@
             <div class="layout-toggle" id="albums-layout-toggle"
                  role="group" aria-label="Layout">
               <button class="layout-btn active" data-layout="grid"
-                      onclick="setAlbumsLayout('grid')" title="Grid view">
+                      onclick="setAlbumsLayout('grid')" title="Vue grille">
                 <i class="fas fa-th-large"></i>
               </button>
               <button class="layout-btn" data-layout="list"
-                      onclick="setAlbumsLayout('list')" title="List view">
+                      onclick="setAlbumsLayout('list')" title="Vue liste">
                 <i class="fas fa-list"></i>
               </button>
               <button class="layout-btn" data-layout="compact"
-                      onclick="setAlbumsLayout('compact')" title="Compact view">
+                      onclick="setAlbumsLayout('compact')" title="Vue compacte">
                 <i class="fas fa-grip-lines"></i>
               </button>
             </div>
@@ -663,16 +663,16 @@
             </div>
             <div class="layout-toggle" id="tracks-layout-toggle"
                  role="group" aria-label="Layout">
+              <button class="layout-btn" data-layout="grid"
+                      onclick="setTracksLayout('grid')" title="Vue grille">
+                <i class="fas fa-th-large"></i>
+              </button>
               <button class="layout-btn active" data-layout="list"
-                      onclick="setTracksLayout('list')" title="List view">
+                      onclick="setTracksLayout('list')" title="Vue liste">
                 <i class="fas fa-list"></i>
               </button>
-              <button class="layout-btn" data-layout="grid"
-                      onclick="setTracksLayout('grid')" title="Grid view">
-                <i class="fas fa-th"></i>
-              </button>
               <button class="layout-btn" data-layout="compact"
-                      onclick="setTracksLayout('compact')" title="Compact view">
+                      onclick="setTracksLayout('compact')" title="Vue compacte">
                 <i class="fas fa-grip-lines"></i>
               </button>
             </div>
@@ -1113,11 +1113,17 @@
            HISTORY
       ══════════════════════════════════════════ -->
       <section id="s-history" class="app-sec" style="view-transition-name:section-history">
-        <div class="sec-hd">
+        <div class="sec-hd" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
           <div>
             <h2><i class="fas fa-history"></i> <span data-i18n="history.title">History</span></h2>
             <p class="sec-sub" data-i18n="history.sub">Browse your scrobbles day by day</p>
           </div>
+          <button id="hist-sort-btn" onclick="histToggleSort()"
+            title="Plus récent en premier"
+            style="display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:var(--radius-pill);border:1.5px solid var(--border);background:var(--bg-hover);color:var(--text-muted);font-size:.78rem;font-weight:600;cursor:pointer;flex-shrink:0;transition:border-color .15s,color .15s">
+            <i class="fas fa-sort-amount-down"></i>
+            <span>Récent</span>
+          </button>
         </div>
 
         <!-- ── Day Navigator ── -->
@@ -1233,12 +1239,14 @@
                   <i class="fas fa-user"></i>
                   <span data-i18n="settings.username">Last.fm username</span>
                 </label>
-                <div class="setting-ctrl input-row">
-                  <input type="text" id="settings-username" class="setting-input"
-                         placeholder="your_username" autocomplete="off" spellcheck="false">
-                  <button class="icon-btn" onclick="updateUsername()" aria-label="Save username" title="Save">
-                    <i class="fas fa-check"></i>
-                  </button>
+                <div class="setting-ctrl">
+                  <div class="input-group">
+                    <input type="text" id="settings-username" class="setting-input"
+                           placeholder="your_username" autocomplete="off" spellcheck="false">
+                    <button class="icon-btn" onclick="updateUsername()" aria-label="Enregistrer" title="Enregistrer">
+                      <i class="fas fa-check"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
               <!-- API key -->
@@ -1247,15 +1255,17 @@
                   <i class="fas fa-key"></i>
                   <span data-i18n="settings.apikey">Last.fm API key</span>
                 </label>
-                <div class="setting-ctrl input-row">
-                  <input type="password" id="settings-apikey" class="setting-input"
-                         placeholder="32-character hex key" autocomplete="off">
-                  <button class="icon-btn" onclick="toggleSettingsApiKey()" aria-label="Show/hide API key" title="Show / hide">
-                    <i class="fas fa-eye" id="settings-eye-icon"></i>
-                  </button>
-                  <button class="icon-btn" onclick="updateApiKey()" aria-label="Save API key" title="Save">
-                    <i class="fas fa-check"></i>
-                  </button>
+                <div class="setting-ctrl">
+                  <div class="input-group">
+                    <input type="password" id="settings-apikey" class="setting-input"
+                           placeholder="32 caractères hexadécimaux" autocomplete="off">
+                    <button class="icon-btn" onclick="toggleSettingsApiKey()" aria-label="Afficher/masquer la clé API" title="Afficher / masquer">
+                      <i class="fas fa-eye" id="settings-eye-icon"></i>
+                    </button>
+                    <button class="icon-btn" onclick="updateApiKey()" aria-label="Enregistrer la clé API" title="Enregistrer">
+                      <i class="fas fa-check"></i>
+                    </button>
+                  </div>
                 </div>
                 <p class="hint">
                   <i class="fas fa-shield-alt"></i>

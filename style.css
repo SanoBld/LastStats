@@ -1400,11 +1400,13 @@ canvas#w-mini { height: 60px !important; }
 }
 .music-grid.layout-list .music-card {
   display: flex; flex-direction: row; align-items: center;
-  gap: 14px; border-radius: var(--radius-sm);
+  gap: 12px; border-radius: var(--radius-sm); padding: 10px 12px;
+  overflow: visible;
 }
-.music-grid.layout-list .music-card-img   { width: 56px; height: 56px; flex-shrink: 0; border-radius: var(--radius-xs); aspect-ratio: 1; }
-.music-grid.layout-list .music-card-body  { flex: 1; min-width: 0; padding: 10px 14px 10px 0; }
-.music-grid.layout-list .music-card:hover { transform: translateX(4px); }
+.music-grid.layout-list .music-card-img   { width: 56px; min-width: 56px; height: 56px; flex-shrink: 0; border-radius: var(--radius-xs); aspect-ratio: 1; overflow: hidden; }
+.music-grid.layout-list .music-card-body  { flex: 1; min-width: 0; padding: 0; }
+.music-grid.layout-list .music-card-name  { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; -webkit-line-clamp: unset; }
+.music-grid.layout-list .music-card:hover { transform: translateX(4px) scale(1); box-shadow: var(--shadow-sm); }
 
 /* --- Layout: Compact --- */
 .music-grid.layout-compact { display: flex; flex-direction: column; gap: 0; }
@@ -1522,7 +1524,7 @@ canvas#w-mini { height: 60px !important; }
 .hero-card .hc-img {
   position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; object-position: center;
-  display: block;
+  display: block; z-index: 1;
   transition: transform var(--dur-long1) var(--ease-standard);
   border-radius: inherit;
 }
@@ -1532,7 +1534,7 @@ canvas#w-mini { height: 60px !important; }
 .hero-card .hc-overlay {
   position: absolute; inset: 0;
   background: linear-gradient(to bottom, rgba(0,0,0,0) 20%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.88) 100%);
-  border-radius: inherit; z-index: 1;
+  border-radius: inherit; z-index: 2;
 }
 .hero-card .hc-fallback {
   position: absolute; inset: 0;
@@ -1540,7 +1542,7 @@ canvas#w-mini { height: 60px !important; }
   font-size: 2.8rem; font-weight: 900; color: rgba(255,255,255,.9); z-index: 0;
 }
 .hero-card .hc-rank {
-  position: absolute; top: 10px; left: 10px; z-index: 2;
+  position: absolute; top: 10px; left: 10px; z-index: 3;
   background: rgba(0,0,0,.6); color: white; font-size: .7rem; font-weight: 800;
   width: 26px; height: 26px; border-radius: var(--radius-xs);
   display: flex; align-items: center; justify-content: center;
@@ -1548,7 +1550,7 @@ canvas#w-mini { height: 60px !important; }
 }
 .hero-card .hc-body {
   position: absolute; bottom: 0; left: 0; right: 0;
-  padding: 12px 12px 10px; z-index: 2;
+  padding: 12px 12px 10px; z-index: 3;
   display: flex; flex-direction: column; gap: 2px;
 }
 .hero-card .hc-name {
@@ -1563,7 +1565,7 @@ canvas#w-mini { height: 60px !important; }
 }
 .hero-card .hc-plays { font-size: .68rem; color: rgba(255,255,255,.58); font-weight: 600; }
 .hero-card .hc-actions {
-  position: absolute; top: 10px; right: 10px; z-index: 3;
+  position: absolute; top: 10px; right: 10px; z-index: 4;
   display: flex; gap: 5px; opacity: 0;
   transform: translateY(-6px) scale(.88);
   transition: opacity   var(--dur-medium1) var(--ease-decel),
@@ -3052,15 +3054,11 @@ canvas#w-mini { height: 60px !important; }
   .setting-row--highlight { flex-direction: column; }
   .btn-update-sw { width: 100%; justify-content: center; }
 
-  /* Artist modal */
-  .am-hero { flex-direction: column; align-items: center; text-align: center; padding: 20px 16px 16px; }
-  .am-photo-wrap { width: 120px; height: 120px; }
-  .am-stats-row  { justify-content: center; }
-  .am-tags       { justify-content: center; }
-  .am-ext-links  { justify-content: center; }
-  .am-body       { padding: 0 16px 24px; }
-  .am-artist-name { font-size: 1.15rem; }
-  .am-albums { grid-template-columns: repeat(3, 1fr); }
+  /* Artist modal — keep full-bleed hero on mobile */
+  .am-photo-wrap { height: 260px; }
+  .am-hero-info  { padding: 0 14px 16px; }
+  .am-body       { padding: 4px 14px 24px; }
+  .am-albums     { grid-template-columns: repeat(3, 1fr); }
 
   /* Podium on mobile */
   .w-podium--table { display: flex; flex-direction: row; gap: 8px; }
@@ -3866,4 +3864,60 @@ button.bn-item:focus-visible,
 ::-moz-selection {
   background-color: var(--accent);
   color: var(--accent-on);
+}
+
+/* ── Sort button ── */
+#hist-sort-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-lt); }
+
+/* Albums in hero-grid = carré */
+#albums-grid.hero-grid .hero-card { aspect-ratio: 1; }
+
+/* Tracks in hero-grid = carré */
+#tracks-list.hero-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 12px; }
+#tracks-list.hero-grid .hero-card { aspect-ratio: 1; }
+
+/* sec-hd flex alignment fix */
+.sec-hd { display: flex; flex-direction: column; margin-bottom: 20px; }
+
+/* ── Input group (champ API key : input + boutons dans une même boîte) ── */
+.input-group {
+  display: flex; align-items: center;
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg-card); overflow: hidden;
+  transition: border-color var(--dur-medium1) var(--ease-standard),
+              box-shadow   var(--dur-medium1) var(--ease-standard);
+}
+.input-group:focus-within {
+  border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-lt);
+}
+.input-group .setting-input {
+  border: none; background: transparent; box-shadow: none;
+  border-radius: 0; flex: 1; min-width: 0;
+  padding: 10px 12px;
+}
+.input-group .setting-input:focus { box-shadow: none; border-color: transparent; }
+.input-group .icon-btn {
+  width: 38px; height: 38px; border-left: 1px solid var(--border);
+  border-radius: 0; flex-shrink: 0; color: var(--text-muted);
+}
+.input-group .icon-btn:hover { background: var(--bg-hover); color: var(--text); transform: none; }
+
+/* input-group dans l'écran de login */
+.setup-field .input-group,
+.setup-card .input-group {
+  width: 100%;
+}
+.setup-field .input-group .icon-btn,
+.setup-card .input-group .icon-btn {
+  background: transparent;
+  border-left: 1px solid var(--border);
+}
+
+/* Albums layout-list : image carrée bien positionnée */
+.music-grid.layout-list .music-card-img img,
+.music-grid.layout-list .music-card-img .spotify-cover {
+  width: 100%; height: 100%; object-fit: cover; border-radius: inherit;
+}
+.music-grid.layout-list .music-card-rank {
+  top: 4px; left: 4px; width: 20px; height: 20px; font-size: .62rem;
 }

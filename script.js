@@ -1380,8 +1380,7 @@ function setArtistsLayout(layout) {
   localStorage.setItem('ls_artists_layout', layout);
   const grid = document.getElementById('artists-grid');
   if (grid) {
-    grid.className = grid.className.replace(/\blayout-\S+/g, '').trim();
-    grid.classList.add('layout-' + layout);
+    grid.className = layout === 'compact' ? 'music-grid layout-compact' : 'hero-grid';
   }
   document.querySelectorAll('#artists-layout-toggle .layout-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.layout === layout)
@@ -1572,13 +1571,24 @@ async function _loadMoreArtists() {
    ============================================================ */
 let _albumsObserver = null;
 
+function _albumsGridClass(layout) {
+  if (layout === 'grid')    return 'hero-grid';
+  if (layout === 'list')    return 'music-grid layout-list';
+  return 'music-grid layout-compact';
+}
+
 function setAlbumsLayout(layout) {
   APP.albumsLayout = layout;
   localStorage.setItem('ls_albums_layout', layout);
   const grid = document.getElementById('albums-grid');
   if (grid) {
-    grid.className = grid.className.replace(/\blayout-\S+/g, '').trim();
-    grid.classList.add('layout-' + layout);
+    grid.className = _albumsGridClass(layout);
+    if (APP.topAlbumsData?.length) {
+      grid.innerHTML = APP.topAlbumsData
+        .slice(0, APP.albumsPage * 50)
+        .map((a, i) => _buildAlbumCard(a, i + 1))
+        .join('');
+    }
   }
   document.querySelectorAll('#albums-layout-toggle .layout-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.layout === layout)
@@ -1596,16 +1606,33 @@ function _buildAlbumCard(a, rank) {
   const spQ      = encodeURIComponent(`${a.name} ${artistNm}`);
 
   const gridHtml = `
+    <div class="hero-card" style="animation-delay:${delay}s" onclick="window.open('${safeUrl}','_blank')">
+      <div class="hc-fallback" style="background:${bg}${hasImg ? ';display:none' : ''}">${letter}</div>
+      ${hasImg ? `<img class="hc-img img-fade" src="${imgUrl}" alt="${escHtml(a.name)}" loading="lazy" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.previousElementSibling.style.display='flex'">` : ''}
+      <div class="hc-overlay"></div>
+      <div class="hc-rank">${rank}</div>
+      <div class="hc-body">
+        <div class="hc-name">${escHtml(a.name)}</div>
+        <div class="hc-sub">${escHtml(artistNm)}</div>
+        <div class="hc-plays">${formatNum(a.playcount)} ${t('plays')}</div>
+      </div>
+      <div class="hc-actions">
+        <a class="mc-play-btn sp" href="spotify:search:${spQ}" onclick="event.stopPropagation()" title="Spotify"><i class="fab fa-spotify"></i></a>
+        <button class="mc-play-btn share" onclick="event.stopPropagation();shareAlbum(${JSON.stringify(a.name)},${JSON.stringify(artistNm)},${a.playcount},'${safeUrl}')" title="${t('share')}"><i class="fas fa-share-alt"></i></button>
+      </div>
+    </div>`;
+
+  const listHtml = `
     <div class="music-card" style="animation-delay:${delay}s" onclick="window.open('${safeUrl}','_blank')">
-      <div class="music-card-img" style="height:160px">
+      <div class="music-card-img">
         ${hasImg ? `<img src="${imgUrl}" alt="${escHtml(a.name)}" loading="lazy" class="img-fade" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
         <div class="spotify-cover" style="background:${bg};display:${hasImg ? 'none' : 'flex'}">
-          <span class="sc-letter">${letter}</span><span class="sc-name">${escHtml(a.name)}</span>
+          <span class="sc-letter">${letter}</span>
         </div>
         <div class="music-card-rank">${rank}</div>
         <div class="music-card-actions">
-          <a class="mc-play-btn sp" href="spotify:search:${spQ}" onclick="event.stopPropagation()" aria-label="Open in Spotify" title="Spotify"><i class="fab fa-spotify"></i></a>
-          <button class="mc-play-btn share" onclick="event.stopPropagation();shareAlbum(${JSON.stringify(a.name)},${JSON.stringify(artistNm)},${a.playcount},'${safeUrl}')" aria-label="${t('share')} ${escHtml(a.name)}" title="${t('share')}"><i class="fas fa-share-alt"></i></button>
+          <a class="mc-play-btn sp" href="spotify:search:${spQ}" onclick="event.stopPropagation()" title="Spotify"><i class="fab fa-spotify"></i></a>
+          <button class="mc-play-btn share" onclick="event.stopPropagation();shareAlbum(${JSON.stringify(a.name)},${JSON.stringify(artistNm)},${a.playcount},'${safeUrl}')" title="${t('share')}"><i class="fas fa-share-alt"></i></button>
         </div>
       </div>
       <div class="music-card-body">
@@ -1617,9 +1644,9 @@ function _buildAlbumCard(a, rank) {
 
   const compactHtml = `
     <div class="track-item" style="animation-delay:${delay}s" onclick="window.open('${safeUrl}','_blank')">
-      <div class="track-cover" style="flex-shrink:0;width:40px;height:40px;border-radius:6px;overflow:hidden">
+      <div class="track-cover" style="flex-shrink:0;width:40px;height:40px;border-radius:6px;overflow:hidden;position:relative">
         ${hasImg ? `<img src="${imgUrl}" alt="${escHtml(a.name)}" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.style.display='none'">` : ''}
-        <div style="width:100%;height:100%;background:${bg};display:${hasImg ? 'none' : 'flex'};align-items:center;justify-content:center;color:white;font-weight:700">${letter}</div>
+        <div style="position:absolute;inset:0;background:${bg};display:${hasImg ? 'none' : 'flex'};align-items:center;justify-content:center;color:white;font-weight:700">${letter}</div>
       </div>
       <div class="track-rank">${rank <= 3 ? ['🥇','🥈','🥉'][rank-1] : rank}</div>
       <div class="track-info">
@@ -1629,7 +1656,10 @@ function _buildAlbumCard(a, rank) {
       <div class="track-plays">${formatNum(a.playcount)}</div>
     </div>`;
 
-  return APP.albumsLayout === 'compact' ? compactHtml : gridHtml;
+  const layout = APP.albumsLayout || 'grid';
+  if (layout === 'compact') return compactHtml;
+  if (layout === 'list')    return listHtml;
+  return gridHtml;
 }
 
 async function loadTopAlbums(period) {
@@ -1643,7 +1673,7 @@ async function loadTopAlbums(period) {
   const sentinel = document.getElementById('albums-scroll-sentinel');
 
   if (grid) {
-    grid.className = `music-grid layout-${APP.albumsLayout}`;
+    grid.className = _albumsGridClass(APP.albumsLayout);
     grid.innerHTML = skeletonMusicCards(12);
   }
   if (loader) loader.classList.add('hidden');
@@ -1697,12 +1727,13 @@ function setTracksLayout(layout) {
   APP.tracksLayout = layout;
   localStorage.setItem('ls_tracks_layout', layout);
   const list = document.getElementById('tracks-list');
-  if (list) list.className = `tracks-list layout-${layout}`;
+  if (list) list.className = layout === 'grid' ? 'hero-grid' : `tracks-list layout-${layout}`;
   document.querySelectorAll('#tracks-layout-toggle .layout-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.layout === layout)
   );
   if (APP.topTracksData.length && list) {
     const maxPlay = APP.topTracksData.length > 0 ? parseInt(APP.topTracksData[0].playcount) : 1;
+    _injectAlbumImagesIntoTracks(APP.topTracksData.slice(0, APP.tracksPage * 50));
     list.innerHTML = APP.topTracksData.slice(0, APP.tracksPage * 50).map((tr,i) => _buildTrackItem(tr, i+1, maxPlay)).join('');
     _resolveTrackImages(APP.topTracksData.slice(0, APP.tracksPage * 50), 1);
   }
@@ -1713,16 +1744,42 @@ function _buildTrackItem(track, rank, maxPlay) {
   const medal      = rank <= 3 ? ['🥇','🥈','🥉'][rank-1] : rank;
   const spQ        = encodeURIComponent(`${track.name} ${track.artist?.name || ''}`);
   const ytQ        = encodeURIComponent(`${track.name} ${track.artist?.name || ''}`);
-  const imgUrl     = track.image?.find(im => im.size === 'medium')?.['#text'] || track.image?.find(im => im.size === 'small')?.['#text'] || '';
+  const imgUrl     = track.image?.find(im => im.size === 'extralarge')?.['#text'] || track.image?.find(im => im.size === 'large')?.['#text'] || track.image?.find(im => im.size === 'medium')?.['#text'] || '';
   const hasCover   = !isDefaultImg(imgUrl);
   const coverBg    = nameToGradient(track.name + (track.artist?.name || ''));
   const coverLtr   = (track.name || '?')[0].toUpperCase();
   const delay      = Math.min((rank-1) % 20, 10) * 0.025;
   const coverElId  = `track-cover-r${rank}`;
+  const safeUrl    = (track.url || '#').replace(/'/g,'%27');
 
+  // ── GRID : hero-card plein-image ──────────────────────────
+  if ((APP.tracksLayout || 'list') === 'grid') {
+    return `
+    <div class="hero-card" style="animation-delay:${delay}s" onclick="window.open('${safeUrl}','_blank')">
+      <div class="hc-fallback" style="background:${coverBg}${hasCover ? ';display:none' : ''}">${coverLtr}</div>
+      <img class="hc-img img-fade" id="${coverElId}-img" ${hasCover ? `src="${imgUrl}"` : 'src=""'} alt="${escHtml(track.name)}" loading="lazy"
+           style="${hasCover ? '' : 'display:none'}"
+           onload="this.classList.add('img-loaded');this.previousElementSibling.style.display='none';"
+           onerror="this.style.display='none';this.previousElementSibling.style.removeProperty('display');">
+      <div class="hc-overlay"></div>
+      <div class="hc-rank">${rank}</div>
+      <div class="hc-body">
+        <div class="hc-name">${escHtml(track.name)}</div>
+        <div class="hc-sub">${escHtml(track.artist?.name || '')}</div>
+        <div class="hc-plays">${formatNum(track.playcount)} ${t('plays')}</div>
+      </div>
+      <div class="hc-actions">
+        <a class="mc-play-btn sp" href="spotify:search:${spQ}" onclick="event.stopPropagation()" title="Spotify"><i class="fab fa-spotify"></i></a>
+        <a class="mc-play-btn yt" href="https://www.youtube.com/results?search_query=${ytQ}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="YouTube"><i class="fab fa-youtube"></i></a>
+        <button class="mc-play-btn share" onclick="event.stopPropagation();shareTrack(${JSON.stringify(track.name)},${JSON.stringify(track.artist?.name||'')},${track.playcount},'${safeUrl}')" title="${t('share')}"><i class="fas fa-share-alt"></i></button>
+      </div>
+    </div>`;
+  }
+
+  // ── LIST / COMPACT : track-item classique ────────────────
   return `
     <div class="track-item" style="animation-delay:${delay}s"
-         onclick="window.open('${(track.url || '#').replace(/'/g,'%27')}','_blank')">
+         onclick="window.open('${safeUrl}','_blank')">
       <div class="track-cover" id="${coverElId}">
         ${hasCover ? `<img src="${imgUrl}" alt="${escHtml(track.name)}" loading="lazy" class="img-fade" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
         <div style="width:100%;height:100%;background:${coverBg};display:${hasCover ? 'none' : 'flex'};align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:white">${coverLtr}</div>
@@ -1739,14 +1796,45 @@ function _buildTrackItem(track, rank, maxPlay) {
       <div class="track-play-btns">
         <a class="track-play-btn sp" href="spotify:search:${spQ}" aria-label="Open in Spotify" title="Spotify" onclick="event.stopPropagation()"><i class="fab fa-spotify"></i></a>
         <a class="track-play-btn yt" href="https://www.youtube.com/results?search_query=${ytQ}" target="_blank" rel="noopener" aria-label="Search on YouTube" title="YouTube" onclick="event.stopPropagation()"><i class="fab fa-youtube"></i></a>
-        <button class="track-play-btn share" aria-label="${t('share')} ${escHtml(track.name)}" title="${t('share')}" onclick="event.stopPropagation();shareTrack(${JSON.stringify(track.name)},${JSON.stringify(track.artist?.name||'')},${track.playcount},'${(track.url||'').replace(/'/g,'%27')}')"><i class="fas fa-share-alt"></i></button>
+        <button class="track-play-btn share" aria-label="${t('share')} ${escHtml(track.name)}" title="${t('share')}" onclick="event.stopPropagation();shareTrack(${JSON.stringify(track.name)},${JSON.stringify(track.artist?.name||'')},${track.playcount},'${safeUrl}')"><i class="fas fa-share-alt"></i></button>
       </div>
     </div>`;
 }
 
+
+/* ── Injection d'images album dans les tracks depuis APP.trackAlbumImgMap ──
+   Modifie les objets track en place pour que _buildTrackItem trouve les URLs.
+   Ne fait pas d'appel API — utilise uniquement la map déjà construite. */
+function _injectAlbumImagesIntoTracks(tracks) {
+  if (!APP.trackAlbumImgMap?.size) return;
+  tracks.forEach(tr => {
+    // Vérifier si le track a déjà une vraie image extralarge
+    const existing = tr.image?.find(i => i.size === 'extralarge')?.['#text'] || '';
+    if (existing && !isDefaultImg(existing)) return;
+
+    const albumName  = tr.album?.['#text'] || '';
+    const artistName = tr.artist?.name || '';
+    if (!albumName) return;
+
+    const key    = `${artistName.toLowerCase()}::${albumName.toLowerCase()}`;
+    const imgUrl = APP.trackAlbumImgMap.get(key);
+    if (!imgUrl) return;
+
+    // Injecter l'URL dans toutes les tailles pour que _buildTrackItem la trouve
+    if (!tr.image) tr.image = [];
+    ['extralarge','large','medium'].forEach(size => {
+      const entry = tr.image.find(i => i.size === size);
+      if (entry) entry['#text'] = imgUrl;
+      else tr.image.push({ size, '#text': imgUrl });
+    });
+  });
+}
+
 async function _resolveTrackImage(track, rank) {
-  const coverEl = document.getElementById(`track-cover-r${rank}`);
-  if (!coverEl) return;
+  // Supporte les deux modes : list/compact (track-cover div) et grid (hero-card img)
+  const coverEl  = document.getElementById(`track-cover-r${rank}`);
+  const heroImg  = document.getElementById(`track-cover-r${rank}-img`);
+  if (!coverEl && !heroImg) return;
 
   const existingImg = track.image?.find(im => im.size === 'medium')?.['#text'] || track.image?.find(im => im.size === 'small')?.['#text'] || '';
   if (!isDefaultImg(existingImg)) return;
@@ -1754,7 +1842,10 @@ async function _resolveTrackImage(track, rank) {
   const cacheKey = `${(track.artist?.name||'').toLowerCase()}::${(track.album?.['#text']||track.name||'').toLowerCase()}`;
   if (_trackImgCache.has(cacheKey)) {
     const cached = _trackImgCache.get(cacheKey);
-    if (cached) _injectTrackCoverImg(coverEl, cached);
+    if (cached) {
+      if (coverEl) _injectTrackCoverImg(coverEl, cached);
+      if (heroImg) _injectHeroImg(heroImg, cached);
+    }
     return;
   }
 
@@ -1776,8 +1867,34 @@ async function _resolveTrackImage(track, rank) {
       } catch {}
     }
     _trackImgCache.set(cacheKey, imgUrl || null);
-    if (imgUrl) _injectTrackCoverImg(coverEl, imgUrl);
+    if (imgUrl) {
+      if (coverEl) _injectTrackCoverImg(coverEl, imgUrl);
+      if (heroImg) _injectHeroImg(heroImg, imgUrl);
+    }
   } catch { _trackImgCache.set(cacheKey, null); }
+}
+
+// Injecte une image dans un élément img hero-card existant (mode grid)
+function _injectHeroImg(imgEl, imgUrl) {
+  if (!imgEl || !imgUrl) return;
+  const rawSrc = imgEl.getAttribute('src');
+  if (rawSrc && rawSrc.length > 0) return; // déjà une vraie URL
+  imgEl.src = imgUrl;
+  imgEl.style.display = '';
+  imgEl.classList.remove('img-loaded');
+  imgEl.onload = () => {
+    imgEl.classList.add('img-loaded');
+    // Masquer le fallback maintenant que l'image est chargée
+    const fallback = imgEl.closest('.hero-card')?.querySelector('.hc-fallback');
+    if (fallback) fallback.style.display = 'none';
+  };
+  imgEl.onerror = () => {
+    imgEl.remove();
+    // Afficher le fallback si l'image échoue
+    const card = imgEl.closest?.('.hero-card');
+    const fallback = card?.querySelector('.hc-fallback');
+    if (fallback) fallback.style.removeProperty('display');
+  };
 }
 
 function _injectTrackCoverImg(coverEl, imgUrl) {
@@ -1814,7 +1931,7 @@ async function loadTopTracks(period) {
   const sentinel = document.getElementById('tracks-scroll-sentinel');
 
   if (list) {
-    list.className = `tracks-list layout-${APP.tracksLayout}`;
+    list.className = APP.tracksLayout === 'grid' ? 'hero-grid' : `tracks-list layout-${APP.tracksLayout}`;
     list.innerHTML = skeletonTrackItems(12);
   }
   if (loader) loader.classList.add('hidden');
@@ -1825,12 +1942,34 @@ async function loadTopTracks(period) {
   );
 
   try {
-    const data   = await API.call('user.getTopTracks', { period, limit:50, page:1 });
-    const tracks = data.toptracks?.track || [];
+    // Fetch tracks + top albums (200) en parallèle pour résoudre les images
+    const [tracksResp, albumsResp] = await Promise.all([
+      API.call('user.getTopTracks',  { period, limit:50,  page:1 }),
+      API.call('user.getTopAlbums',  { period, limit:200, page:1 }),
+    ]);
+
+    const tracks = tracksResp.toptracks?.track || [];
+    const albums = albumsResp.topalbums?.album  || [];
+
+    // Construire la map artist::album → imageUrl depuis les albums
+    APP.trackAlbumImgMap = new Map();
+    albums.forEach(alb => {
+      const img = alb.image?.find(i => i.size === 'extralarge')?.['#text']
+               || alb.image?.find(i => i.size === 'large')?.['#text'] || '';
+      if (!isDefaultImg(img)) {
+        const k = `${(alb.artist?.name||'').toLowerCase()}::${(alb.name||'').toLowerCase()}`;
+        APP.trackAlbumImgMap.set(k, img);
+      }
+    });
+
+    // Injecter les images d'album dans les tracks avant le rendu
+    _injectAlbumImagesIntoTracks(tracks);
+
     APP.topTracksData    = tracks;
-    APP.tracksTotalPages = parseInt(data.toptracks?.['@attr']?.totalPages || 1);
+    APP.tracksTotalPages = parseInt(tracksResp.toptracks?.['@attr']?.totalPages || 1);
     const maxPlay        = tracks.length > 0 ? parseInt(tracks[0].playcount) : 1;
     if (list) list.innerHTML = tracks.map((tr,i) => _buildTrackItem(tr, i+1, maxPlay)).join('');
+    // Fallback async pour les tracks non couverts par la map albums
     _resolveTrackImages(tracks, 1);
 
     if (APP.tracksTotalPages > 1 && sentinel) {
@@ -1859,6 +1998,7 @@ async function _loadMoreTracks() {
     if (!tracks.length) { APP.tracksExhausted = true; return; }
     const maxPlay    = APP.topTracksData.length > 0 ? parseInt(APP.topTracksData[0].playcount) : 1;
     const startRank  = (APP.tracksPage - 1) * 50 + 1;
+    _injectAlbumImagesIntoTracks(tracks);
     tracks.forEach((tr,i) => list.insertAdjacentHTML('beforeend', _buildTrackItem(tr, startRank + i, maxPlay)));
     _resolveTrackImages(tracks, startRank);
     APP.topTracksData = [...APP.topTracksData, ...tracks];
@@ -3644,23 +3784,16 @@ const BadgeEngine = (() => {
     { id:'night_owl',      cat:'noctambule', icon:'🦉', get name(){return t('badge_night_owl_name');},    get desc(){return t('badge_night_owl_desc');},   thresholds:thresholds(50),   compute:(hist) => hist.filter(tr => { const h = new Date(parseInt(tr.date?.uts||0)*1000).getHours(); return h>=0&&h<5; }).length },
     { id:'early_bird',     cat:'noctambule', icon:'🐦', get name(){return t('badge_early_bird_name');},   get desc(){return t('badge_early_bird_desc');},  thresholds:thresholds(30),   compute:(hist) => hist.filter(tr => { const h = new Date(parseInt(tr.date?.uts||0)*1000).getHours(); return h>=5&&h<8; }).length },
     { id:'weekend_warrior',cat:'noctambule', icon:'🎉', get name(){return t('badge_weekend_name');},      get desc(){return t('badge_weekend_desc');},     thresholds:thresholds(200),  compute:(hist) => hist.filter(tr => { const d = new Date(parseInt(tr.date?.uts||0)*1000).getDay(); return d===0||d===6; }).length },
-    { id:'explorer',       cat:'exploration',icon:'🧭', get name(){return t('badge_explorer_name');},     get desc(){return t('badge_explorer_desc');},    thresholds:thresholds(50),   compute:(hist) => { if(!hist.length) return 0; const u=new Set(hist.map(tr=>(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase())).size; return Math.round((u/hist.length)*1000); } },
     { id:'discoverer',     cat:'exploration',icon:'🔭', get name(){return t('badge_discoverer_name');},   get desc(){return t('badge_discoverer_desc');},  thresholds:thresholds(50),   compute:(hist) => new Set(hist.map(tr=>(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase())).size },
     { id:'hidden_gems',    cat:'exploration',icon:'💎', get name(){return t('badge_hidden_gems_name');},  get desc(){return t('badge_hidden_gems_desc');}, thresholds:thresholds(10),   compute:(hist) => { const m=new Map(); hist.forEach(tr=>{const a=(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase();if(a)m.set(a,(m.get(a)||0)+1);}); return [...m.values()].filter(v=>v<=2).length; } },
-    { id:'loyal',          cat:'fidelite',   icon:'💖', get name(){return t('badge_loyal_name');},        get desc(){return t('badge_loyal_desc');},       thresholds:thresholds(20),   compute:(hist) => { if(!hist.length) return 0; const wm=new Map(); for(const tr of hist){const ts=parseInt(tr.date?.uts||0);if(!ts)continue;const d=new Date(ts*1000);const wk=`${d.getFullYear()}-W${Math.ceil((d.getDate()+6-(d.getDay()||7))/7)}`;const art=(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase();const k=`${wk}::${art}`;wm.set(k,(wm.get(k)||0)+1);}return Math.max(0,...[...wm.values()]); } },
     { id:'obsessed',       cat:'fidelite',   icon:'🔁', get name(){return t('badge_obsessed_name');},     get desc(){return t('badge_obsessed_desc');},    thresholds:thresholds(10),   compute:(hist) => { const dm=new Map(); for(const tr of hist){const ts=parseInt(tr.date?.uts||0);if(!ts)continue;const d=new Date(ts*1000);const k=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}::${(tr.artist?.['#text']||'').toLowerCase()}`;dm.set(k,(dm.get(k)||0)+1);} return Math.max(0,...[...dm.values()]); } },
     { id:'collector',      cat:'fidelite',   icon:'📀', get name(){return t('badge_collector_name');},    get desc(){return t('badge_collector_desc');},   thresholds:thresholds(20),   compute:(hist) => new Set(hist.map(tr=>{const alb=tr.album?.['#text']||'';const art=tr.artist?.['#text']||tr.artist?.name||'';return alb?`${art}::${alb}`.toLowerCase():null;}).filter(Boolean)).size },
     { id:'scrobbler',      cat:'volume',     icon:'🎵', get name(){return t('badge_scrobbler_name');},    get desc(){return t('badge_scrobbler_desc');},   thresholds:thresholds(1000), compute:(hist) => hist.length },
     { id:'binge',          cat:'volume',     icon:'🎧', get name(){return t('badge_binge_name');},        get desc(){return t('badge_binge_desc');},       thresholds:thresholds(50),   compute:(hist) => { const dm=new Map(); for(const tr of hist){const ts=parseInt(tr.date?.uts||0);if(!ts)continue;const d=new Date(ts*1000);const k=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;dm.set(k,(dm.get(k)||0)+1);} return Math.max(0,...[...dm.values()]); } },
     { id:'marathon',       cat:'volume',     icon:'🏃', get name(){return t('badge_marathon_name');},     get desc(){return t('badge_marathon_desc');},    thresholds:thresholds(7),    compute:() => APP.streakData?.best || 0 },
-    { id:'record_day',     cat:'volume',     icon:'📈', get name(){return t('badge_record_day_name');},   get desc(){return t('badge_record_day_desc');},  thresholds:thresholds(5),    compute:(hist) => { const dm=new Map(); for(const tr of hist){const ts=parseInt(tr.date?.uts||0);if(!ts)continue;const d=new Date(ts*1000);const k=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;dm.set(k,(dm.get(k)||0)+1);}return [...dm.values()].filter(v=>v>=50).length; } },
     { id:'listen_time',    cat:'volume',     icon:'⏳', get name(){return t('badge_listen_time_name');},  get desc(){return t('badge_listen_time_desc');}, thresholds:thresholds(100),  compute:(hist) => Math.round(hist.length*3.5/60) },
-    { id:'diversified',    cat:'diversite',  icon:'🌈', get name(){return t('badge_diversified_name');},  get desc(){return t('badge_diversified_desc');}, thresholds:thresholds(5),    compute:() => document.querySelectorAll('.mood-tag').length },
-    { id:'genre_curious',  cat:'diversite',  icon:'🎭', get name(){return t('badge_genre_curious_name');}, get desc(){return t('badge_genre_curious_desc');}, thresholds:thresholds(6), compute:(hist) => new Set(hist.map(tr=>{const ts=parseInt(tr.date?.uts||0);if(!ts)return null;const d=new Date(ts*1000);return `${d.getFullYear()}-${d.getMonth()}`;}).filter(Boolean)).size },
     { id:'multilingual',   cat:'diversite',  icon:'🌍', get name(){return t('badge_multilingual_name');}, get desc(){return t('badge_multilingual_desc');}, thresholds:thresholds(5),   compute:(hist) => { const nl=/[^\u0000-\u007F\u00C0-\u024F]/;return new Set(hist.filter(tr=>{const a=tr.artist?.['#text']||tr.artist?.name||'';return nl.test(a);}).map(tr=>(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase())).size; } },
     // ── Tempo (rythme d'écoute dans le temps) ──
-    { id:'crescendo',      cat:'tempo',      icon:'📈', get name(){return t('badge_crescendo_name');},    get desc(){return t('badge_crescendo_desc');},   thresholds:thresholds(3),    compute:(hist) => { if(hist.length<2)return 0; const byMonth=new Map(); for(const tr of hist){const ts=parseInt(tr.date?.uts||0);if(!ts)continue;const d=new Date(ts*1000);const k=`${d.getFullYear()}-${String(d.getMonth()).padStart(2,'0')}`;byMonth.set(k,(byMonth.get(k)||0)+1);} const months=[...byMonth.entries()].sort((a,b)=>a[0]<b[0]?-1:1); let runs=0,streak=0; for(let i=1;i<months.length;i++){if(months[i][1]>months[i-1][1]){streak++;if(streak>=2)runs++;} else streak=0;} return runs; } },
-    { id:'regular',        cat:'tempo',      icon:'📅', get name(){return t('badge_regular_name');},      get desc(){return t('badge_regular_desc');},     thresholds:thresholds(4),    compute:(hist) => { if(!hist.length)return 0; const days=new Set(hist.map(tr=>{const ts=parseInt(tr.date?.uts||0);if(!ts)return null;const d=new Date(ts*1000);return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;}).filter(Boolean)); return Math.round(days.size/Math.max(1,hist.length/50)); } },
     { id:'comeback',       cat:'tempo',      icon:'🔄', get name(){return t('badge_comeback_name');},     get desc(){return t('badge_comeback_desc');},    thresholds:thresholds(1),    compute:(hist) => { if(hist.length<2)return 0; let gaps=0; for(let i=1;i<hist.length;i++){const t1=parseInt(hist[i-1].date?.uts||0),t2=parseInt(hist[i].date?.uts||0);if(t1&&t2&&Math.abs(t1-t2)>30*86400)gaps++;} return gaps; } },
     // ── Social (partage & affinités) ──
     { id:'ambassador',     cat:'social',     icon:'📣', get name(){return t('badge_ambassador_name');},   get desc(){return t('badge_ambassador_desc');},  thresholds:thresholds(5),    compute:(hist) => { const am=new Map(); hist.forEach(tr=>{const a=(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase();if(a)am.set(a,(am.get(a)||0)+1);}); return [...am.values()].filter(v=>v>=100).length; } },
@@ -4289,9 +4422,27 @@ function _formatDayLabel(dateStr) {
 function histInit() {
   APP.histCurrentDate = _todayStr();
   APP.histCurrentView = 'timeline';
+  APP.histSortOrder   = 'desc'; // desc = recent first, asc = oldest first
   const input = document.getElementById('hist-date-input');
   if (input) input.value = APP.histCurrentDate;
   // Don't load until the section is opened
+}
+
+function histToggleSort() {
+  APP.histSortOrder = APP.histSortOrder === 'desc' ? 'asc' : 'desc';
+  const btn = document.getElementById('hist-sort-btn');
+  if (btn) {
+    const icon = btn.querySelector('i');
+    if (icon) {
+      icon.className = APP.histSortOrder === 'desc'
+        ? 'fas fa-sort-amount-down'
+        : 'fas fa-sort-amount-up';
+    }
+    btn.title = APP.histSortOrder === 'desc' ? 'Plus récent en premier' : 'Plus ancien en premier';
+    const span = btn.querySelector('span');
+    if (span) span.textContent = APP.histSortOrder === 'desc' ? 'Récent' : 'Ancien';
+  }
+  if (APP._histLastData) _renderHistView(APP.histCurrentView, APP._histLastData);
 }
 
 function histGoToday() {
@@ -4426,14 +4577,16 @@ function _renderHistTimeline(tracks) {
 
   // Group by hour
   const byHour = {};
-  [...tracks].reverse().forEach(tr => {
+  (APP.histSortOrder === 'asc' ? [...tracks] : [...tracks].reverse()).forEach(tr => {
     const ts = parseInt(tr.date?.uts || 0);
     const hr = ts ? new Date(ts * 1000).getHours() : -1;
     if (!byHour[hr]) byHour[hr] = [];
     byHour[hr].push(tr);
   });
 
-  const hours = Object.keys(byHour).sort((a,b) => Number(a) - Number(b));
+  const hours = Object.keys(byHour).sort((a,b) =>
+    APP.histSortOrder === 'asc' ? Number(a) - Number(b) : Number(b) - Number(a)
+  );
   wrap.innerHTML = hours.map(hr => {
     const label = hr < 0 ? '??' : `${String(hr).padStart(2,'0')}:00`;
     const items = byHour[hr].map(tr => _histTrackHTML(tr)).join('');
@@ -4492,7 +4645,8 @@ function _renderHistList(tracks) {
     <span></span>
   </div>`;
 
-  const rows = [...tracks].reverse().map((tr, i) => {
+  const ordered = APP.histSortOrder === 'asc' ? [...tracks] : [...tracks].reverse();
+  const rows = ordered.map((tr, i) => {
     const ts      = parseInt(tr.date?.uts || 0);
     const timeStr = ts ? new Date(ts * 1000).toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' }) : '—';
     const name    = escHtml(tr.name || '—');
