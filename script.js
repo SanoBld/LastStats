@@ -1,19 +1,5 @@
 'use strict';
 
-/* ============================================================
-   LASTSTATS — script.js v7
-   Vanilla JS · Material You M3 · PWA
-   ============================================================
-   Fixes v7 :
-   - i18n : applyI18n() appelé via setLanguage() + data-i18n dot→underscore
-   - Musical Profile : tag-legend toujours visible + chart corrigé
-   - Artist Modal : loading states gérés, bio/tracks/albums visibles
-   - Artist Cards : images lazies robustes + tags injectés correctement
-   - Obscurity : images artistes + score calculé correctement
-   - CSS : uniformité Artistes/Albums/Titres
-   ============================================================ */
-
-// ── Constants ──────────────────────────────────────────────────
 const LASTFM_URL  = 'https://ws.audioscrobbler.com/2.0/';
 const CACHE_TTL   = 30 * 60 * 1000;
 const TOP_LIMIT   = 50;
@@ -29,13 +15,9 @@ const MONTHS       = () => window.I18N?.arr('months')       || ['Janvier','Févr
 const MONTHS_SHORT = () => window.I18N?.arr('months_short') || ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
 const DAYS         = () => window.I18N?.arr('days')         || ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 
-// Fallback t() si i18n.js pas encore chargé
+// fallback t() if i18n.js hasn't loaded yet
 if (typeof window.t !== 'function') window.t = k => k;
 
-/* ============================================================
-   PATCH DES CLÉS i18n MANQUANTES
-   Injectées dans I18N_DATA avant toute utilisation
-   ============================================================ */
 (function _patchI18N() {
   if (typeof I18N_DATA === 'undefined') return;
 
@@ -43,14 +25,14 @@ if (typeof window.t !== 'function') window.t = k => k;
     share:              { fr:'Partager',      en:'Share',         es:'Compartir',   pt:'Partilhar',  de:'Teilen',      it:'Condividi',  ru:'Поделиться', ar:'مشاركة', ja:'シェア',  zh:'分享', ko:'공유', tr:'Paylaş'   },
     stat_diversity:     { fr:'Ratio de diversité', en:'Diversity ratio', es:'Ratio diversidad', pt:'Rácio diversidade', de:'Diversitätsrate', it:'Ratio diversità', ru:'Коэф. разнообразия', ar:'نسبة التنوع', ja:'多様性率', zh:'多样性比率', ko:'다양성 비율', tr:'Çeşitlilik oranı' },
     stat_diversity_sub: { fr:'(Artistes / Total) × 100', en:'(Artists / Total) × 100', es:'(Artistas / Total) × 100', pt:'(Artistas / Total) × 100', de:'(Künstler / Total) × 100', it:'(Artisti / Totale) × 100', ru:'(Исполнителей / Всего) × 100', ar:'(فنانون / إجمالي) × 100', ja:'(アーティスト / 合計) × 100', zh:'(艺术家 / 总计) × 100', ko:'(아티스트 / 전체) × 100', tr:'(Sanatçı / Toplam) × 100' },
-    // Nouveaux succès — Tempo
+    // new badges — tempo
     badge_crescendo_name: { fr:'Crescendo',         en:'Crescendo',         es:'Crescendo',     pt:'Crescendo',      de:'Crescendo',     it:'Crescendo',     ru:'Крещендо',       ar:'كريشيندو',  ja:'クレッシェンド',    zh:'渐强',     ko:'크레셴도',  tr:'Crescendo'    },
     badge_crescendo_desc: { fr:'Mois consécutifs en hausse (écoutes en progression)', en:'Consecutive months of growth (increasing plays)', es:'Meses consecutivos de crecimiento', pt:'Meses consecutivos de crescimento', de:'Aufeinanderfolgende Wachstumsmonate', it:'Mesi consecutivi di crescita', ru:'Последовательные месяцы роста', ar:'أشهر متتالية من النمو', ja:'連続成長月数', zh:'连续增长月份', ko:'연속 성장 월수', tr:'Ardışık büyüme ayları' },
     badge_regular_name:   { fr:'Régulier',           en:'Consistent',        es:'Constante',     pt:'Regular',        de:'Regelmäßig',    it:'Costante',      ru:'Постоянный',     ar:'منتظم',     ja:'コンスタント',     zh:'规律',     ko:'꾸준함',    tr:'Düzenli'      },
     badge_regular_desc:   { fr:'Jours d\'activité musicale répartis sur la durée', en:'Days of musical activity spread over time', es:'Días de actividad musical repartidos en el tiempo', pt:'Dias de atividade musical ao longo do tempo', de:'Musikalische Aktivitätstage über die Zeit', it:'Giorni di attività musicale nel tempo', ru:'Дни музыкальной активности за период', ar:'أيام النشاط الموسيقي على مدار الوقت', ja:'時間にわたる音楽活動日', zh:'随时间分布的音乐活动日', ko:'시간에 걸친 음악 활동 일수', tr:'Zamanla dağılmış müzik aktivite günleri' },
     badge_comeback_name:  { fr:'Come-back',          en:'Come-back',         es:'Come-back',     pt:'Come-back',      de:'Come-back',     it:'Come-back',     ru:'Камбэк',         ar:'عودة',      ja:'カムバック',       zh:'回归',     ko:'컴백',      tr:'Geri dönüş'   },
     badge_comeback_desc:  { fr:'Pauses de +30 jours puis reprise active', en:'Breaks of +30 days followed by active return', es:'Pausas de +30 días seguidas de regreso activo', pt:'Pausas de +30 dias seguidas de retorno ativo', de:'Pausen von +30 Tagen mit aktivem Comeback', it:'Pause di +30 giorni seguite da ritorno attivo', ru:'Перерывы >30 дней и активное возвращение', ar:'فترات راحة أكثر من 30 يومًا ثم عودة نشطة', ja:'30日超の休止後の復帰', zh:'超30天的休息后活跃回归', ko:'30일 이상 휴식 후 활발한 복귀', tr:'+30 günlük aranın ardından aktif geri dönüş' },
-    // Nouveaux succès — Social
+    // new badges — social
     badge_ambassador_name:  { fr:'Ambassadeur',      en:'Ambassador',        es:'Embajador',     pt:'Embaixador',     de:'Botschafter',   it:'Ambasciatore',  ru:'Посол',          ar:'سفير',      ja:'アンバサダー',     zh:'大使',     ko:'앰배서더',  tr:'Büyükelçi'    },
     badge_ambassador_desc:  { fr:'Artistes écoutés ≥ 100 fois (fidèles absolus)', en:'Artists played ≥ 100 times (absolute loyalists)', es:'Artistas escuchados ≥ 100 veces', pt:'Artistas ouvidos ≥ 100 vezes', de:'Künstler ≥ 100 Mal gespielt', it:'Artisti ascoltati ≥ 100 volte', ru:'Артисты прослушаны ≥ 100 раз', ar:'فنانون استُمع إليهم ≥ 100 مرة', ja:'100回以上再生したアーティスト数', zh:'播放次数≥100的艺术家数量', ko:'100회 이상 재생한 아티스트 수', tr:'≥100 kez çalınan sanatçılar' },
     badge_tastemaker_name:  { fr:'Prescripteur',     en:'Tastemaker',        es:'Prescriptor',   pt:'Influenciador',  de:'Trendsetter',   it:'Precursore',    ru:'Законодатель',   ar:'مؤثر',      ja:'テイストメーカー', zh:'品味引领者', ko:'트렌드세터', tr:'Trend belirleyici' },
@@ -98,7 +80,6 @@ if (typeof window.t !== 'function') window.t = k => k;
   });
 })();
 
-// ── Période label (i18n) ───────────────────────────────────────
 function getPeriodLabel(period) {
   const map = {
     '7day':   'period_7day',
@@ -111,7 +92,6 @@ function getPeriodLabel(period) {
   return t(map[period] || 'period_overall');
 }
 
-// ── Global Application State ───────────────────────────────────
 const APP = {
   apiKey:   '',
   username: '',
@@ -135,10 +115,10 @@ const APP = {
   albumsLayout:  'grid',
   tracksLayout:  'list',
 
-  // Nav visibility — which sections are shown (default all visible)
+  // nav visibility — which sections are shown (default: all)
   navVisibility: null, // loaded from localStorage
 
-  // History section state
+  // history section state
   histCurrentDate: null,   // YYYY-MM-DD string
   histCurrentView: 'timeline',
   histCache: {},           // keyed by YYYY-MM-DD
@@ -162,9 +142,6 @@ const APP = {
   tracksTotalPages:1,
 };
 
-/* ============================================================
-   CACHE  (localStorage TTL 30 min)
-   ============================================================ */
 const Cache = {
   prefix: 'ls3_',
 
@@ -201,9 +178,6 @@ const Cache = {
   },
 };
 
-/* ============================================================
-   API  (Last.fm REST · retry · cache)
-   ============================================================ */
 const API = {
   async call(method, params = {}, skipCache = false) {
     if (!skipCache) {
@@ -269,9 +243,6 @@ const API = {
   },
 };
 
-/* ============================================================
-   UTILITIES
-   ============================================================ */
 const sleep     = ms => new Promise(r => setTimeout(r, ms));
 const escHtml   = str => String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const formatNum = n   => (n === null || n === undefined || n === '') ? '—' : Number(n).toLocaleString();
@@ -326,7 +297,6 @@ function animateValue(el, from, to, duration = 900) {
   requestAnimationFrame(update);
 }
 
-// ── Toast ──────────────────────────────────────────────────────
 function showToast(msg, type = 'success') {
   const el  = document.getElementById('toast');
   const ico = document.getElementById('toast-icon');
@@ -350,7 +320,6 @@ function errMsg(e) {
   </p>`;
 }
 
-// ── Skeletons ──────────────────────────────────────────────────
 function skeletonMusicCards(n = 8) {
   return Array(n).fill(0).map((_,i) => `
     <div class="music-card sk" style="animation-delay:${i*0.04}s">
@@ -369,7 +338,6 @@ function skeletonTrackItems(n = 10) {
     </div>`).join('');
 }
 
-// ── Chart theme helpers ────────────────────────────────────────
 function getThemeColors() {
   const isDark = APP.currentTheme === 'dark'
     || (APP.currentTheme === 'auto' && window.matchMedia('(prefers-color-scheme:dark)').matches);
@@ -421,16 +389,10 @@ function updateAllChartThemes() {
   });
 }
 
-/* ============================================================
-   SESSION PERSISTENCE
-   ============================================================ */
 const saveSession  = () => { if (APP.username) localStorage.setItem('ls_username', APP.username); if (APP.apiKey) localStorage.setItem('ls_apikey', APP.apiKey); };
 const clearSession = () => { localStorage.removeItem('ls_username'); localStorage.removeItem('ls_apikey'); };
 const loadSavedCredentials = () => ({ username: localStorage.getItem('ls_username') || '', apiKey: localStorage.getItem('ls_apikey') || '' });
 
-/* ============================================================
-   THEME & ACCENT
-   ============================================================ */
 function setTheme(theme) {
   APP.currentTheme = theme;
   document.documentElement.dataset.theme = theme;
@@ -607,9 +569,6 @@ function setCustomAccent(hex) {
   updateAllChartThemes();
 }
 
-/* ============================================================
-   LANGUAGE  (délègue à i18n.js)
-   ============================================================ */
 const NAV_TITLE_KEYS = {
   dashboard:     'nav_dashboard',
   'top-artists': 'nav_top_artists',
@@ -627,45 +586,36 @@ const NAV_TITLE_KEYS = {
 function setLanguage(lang) {
   if (!window.I18N?.setLang) return;
 
-  // ── 0. Persister et synchroniser immédiatement ──────────────
-  localStorage.setItem('ls_lang', lang);
+    localStorage.setItem('ls_lang', lang);
   APP.language = lang;
   window.I18N.setLang(lang);
 
-  // ── 1. Boutons langue ───────────────────────────────────────
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
 
-  // ── 2. Appliquer TOUTES les traductions data-i18n ───────────
-  document.querySelectorAll('[data-i18n]').forEach(el => {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
     const raw = el.getAttribute('data-i18n');
     const key = raw.replace(/\./g, '_');
     const val = t(key) || t(raw);
     if (val && val !== key && val !== raw) el.textContent = val;
   });
 
-  // ── 3. Navigation labels (sidebar + bottom nav) ──────────────
-  document.querySelectorAll('.nav-lnk[data-s], .bn-item[data-s]').forEach(el => {
+    document.querySelectorAll('.nav-lnk[data-s], .bn-item[data-s]').forEach(el => {
     const key  = NAV_TITLE_KEYS[el.dataset.s];
     const span = el.querySelector('span:not(.nav-bdg)');
     if (key && span) span.textContent = t(key);
   });
 
-  // ── 4. Titre de la section active ───────────────────────────
-  const activeSection = document.querySelector('.app-sec.active')?.id?.replace('s-', '');
+    const activeSection = document.querySelector('.app-sec.active')?.id?.replace('s-', '');
   if (activeSection) {
     const key = NAV_TITLE_KEYS[activeSection];
     if (key) document.getElementById('hd-title').textContent = t(key);
   }
 
-  // ── 5. Titre page ────────────────────────────────────────────
-  document.title = 'LastStats — ' + (t('nav_dashboard') || 'Statistiques Last.fm');
+    document.title = 'LastStats — ' + (t('nav_dashboard') || 'Statistiques Last.fm');
 
   showToast(t('toast_lang_changed'));
 }
 
-/* ============================================================
-   MOBILE NAVIGATION
-   ============================================================ */
 function _updateNavMode() {
   const isMobile = window.innerWidth <= 768;
   document.body.classList.toggle('nav-mode-bottom', isMobile);
@@ -676,9 +626,6 @@ function _updateNavMode() {
   }
 }
 
-/* ============================================================
-   INITIALISATION
-   ============================================================ */
 async function initApp(usernameOverride, apiKeyOverride) {
   const username = (usernameOverride || document.getElementById('input-username')?.value || '').trim();
   const apiKey   = (apiKeyOverride   || document.getElementById('input-apikey')?.value   || '').trim();
@@ -731,14 +678,14 @@ async function initApp(usernameOverride, apiKeyOverride) {
     syncSettingsFields();
     restoreBadgesFromStorage();
 
-    // Nav visibility
+    // nav visibility
     loadNavVisibility();
     renderNavVisibilitySettings();
 
-    // History section — init to today
+    // history section — start on today
     histInit();
 
-    // Notification Wrapped Nouvel An
+    // New Year Wrapped notification
     setupNewYearNotification();
     _syncNotifBtn();
 
@@ -756,7 +703,7 @@ async function initApp(usernameOverride, apiKeyOverride) {
     setAlbumsLayout(APP.albumsLayout);
     setTracksLayout(APP.tracksLayout);
 
-    // Langue : priorité à la préférence sauvegardée, sinon i18n.js auto-detect
+    // language: saved preference first, then auto-detect
     const lang = localStorage.getItem('ls_lang') || window.I18N?.getLang?.() || 'fr';
     APP.language = lang;
     setLanguage(lang);
@@ -782,11 +729,8 @@ function _scheduleBackgroundHistoryFetch() {
   }, 4000);
 }
 
-/* ============================================================
-   DOMContentLoaded
-   ============================================================ */
 window.addEventListener('DOMContentLoaded', () => {
-  // Styles share buttons + layout fixes
+  // share button styles + layout fixes
   const shareStyle = document.createElement('style');
   shareStyle.textContent = `
     .track-play-btn.share,.mc-play-btn.share{background:var(--accent-lt)!important;color:var(--accent)!important;border:1px solid var(--border-glow)!important}
@@ -804,12 +748,12 @@ window.addEventListener('DOMContentLoaded', () => {
   document.documentElement.dataset.theme = theme;
   APP.currentTheme = theme;
 
-  // Langue : i18n.js auto-detect en premier
+  // language: auto-detect first
   const lang = localStorage.getItem('ls_lang') || window.I18N?.getLang?.() || 'fr';
   APP.language = lang;
   if (window.I18N?.setLang) window.I18N.setLang(lang);
 
-  // Traduire tous les éléments data-i18n dès le chargement
+  // translate all data-i18n elements on load
   requestAnimationFrame(() => {
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const raw = el.getAttribute('data-i18n');
@@ -817,7 +761,7 @@ window.addEventListener('DOMContentLoaded', () => {
       const val = t(key) || t(raw);
       if (val && val !== key && val !== raw) el.textContent = val;
     });
-    // Marquer les boutons de langue actifs
+    // mark active language buttons
     document.querySelectorAll('.lang-btn').forEach(b =>
       b.classList.toggle('active', b.dataset.lang === lang)
     );
@@ -839,9 +783,6 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('sw-update-btn')?.addEventListener('click', forceSwUpdate);
 });
 
-/* ============================================================
-   NAVIGATION
-   ============================================================ */
 function nav(section) {
   const doNav = () => {
     document.querySelectorAll('.nav-lnk, .bn-item').forEach(el =>
@@ -883,9 +824,6 @@ function closeSb() {
   document.body.style.overflow = '';
 }
 
-/* ============================================================
-   PROFILE UI
-   ============================================================ */
 function setupProfileUI() {
   const u = APP.userInfo;
   if (!u) return;
@@ -911,9 +849,6 @@ function setupProfileUI() {
   setText('hd-mini-user', '@' + (u.name || APP.username));
 }
 
-/* ============================================================
-   NOW PLAYING
-   ============================================================ */
 let _npTimer = null;
 
 async function pollNowPlaying() {
@@ -972,9 +907,6 @@ async function shareNowPlaying() {
   } catch { prompt(t('toast_link_copied') + ':', url); }
 }
 
-/* ============================================================
-   DASHBOARD — Heure de pointe (200 derniers scrobbles)
-   ============================================================ */
 async function getPeakHourData() {
   try {
     const data   = await API.call('user.getRecentTracks', { limit: 200 });
@@ -994,11 +926,6 @@ async function getPeakHourData() {
   } catch { return { label: '—', mood: '' }; }
 }
 
-/* ============================================================
-   DASHBOARD — grille unifiée 12 cartes
-   ① Volume · ② Fréquence · ③ Habitude · ④ Exploration
-   ⑤ Profondeur · ⑥ Diversité · + secondaires
-   ============================================================ */
 async function loadDashboard() {
   const u = APP.userInfo;
   if (!u) return;
@@ -1011,7 +938,7 @@ async function loadDashboard() {
   const listenHours= Math.round(totalPlay * 3.5 / 60);
   const currentYear= new Date().getFullYear();
 
-  // Parallel: top artists + albums total + tracks total + last scrobble
+  // fetch all dashboard data in parallel
   let uniqueArtistsRaw = 0, uniqueAlbums = '…', uniqueTracks = '…', lastScrobble = '—';
   try {
     const [aData, bData, cData, rData] = await Promise.all([
@@ -1024,7 +951,7 @@ async function loadDashboard() {
     ]);
 
     if (!APP.topArtistsData.length) {
-      // first time: we got TOP_LIMIT artists — re-request just for the total
+      // re-request just to get the real total count
       APP.topArtistsData = (await API.call('user.getTopArtists', { period:'overall', limit: TOP_LIMIT })).topartists?.artist || [];
     }
     uniqueArtistsRaw = parseInt(aData.topartists?.['@attr']?.total || APP.topArtistsData.length);
@@ -1048,23 +975,23 @@ async function loadDashboard() {
   const diversityPct = totalPlay > 0 && uniqueArtistsRaw > 0
     ? ((uniqueArtistsRaw / totalPlay) * 100).toFixed(2) : '0.00';
 
-  // Heure de pointe — chargée en parallèle
+  // peak hour — loaded in parallel
   const peakData = await getPeakHourData();
 
   const cards = [
-    // ① Volume
+    // ① volume
     { icon:'🎯', value:totalPlay,                      label:t('adv_total'),          sub:t('adv_total_sub'),                                color:'#6366f1' },
-    // ② Fréquence
+    // ② frequency
     { icon:'⚡', value:avgPerDay,                       label:t('adv_per_day'),        sub:t('adv_per_week', avgPerWeek),                     color:'#8b5cf6', noAnim:true },
-    // ③ Habitude — nouvelle carte Heure de pointe
+    // ③ habit — peak hour card
     { icon:'🕐', value:peakData.label,                  label:t('stat_peak_hour'),     sub:peakData.mood,                                     color:'#a78bfa', noAnim:true },
-    // ④ Exploration
+    // ④ exploration
     { icon:'🎤', value:formatNum(uniqueArtistsRaw),     label:t('stat_artists'),       sub:t('stat_since_start'),                             color:'#ec4899', noAnim:true },
-    // ⑤ Profondeur
+    // ⑤ depth
     { icon:'💿', value:uniqueAlbums,                    label:t('stat_albums'),        sub:t('stat_since_start'),                             color:'#d946ef', noAnim:true },
-    // ⑥ Diversité
+    // ⑥ diversity
     { icon:'📊', value:`${diversityPct}%`,               label:t('stat_diversity'),     sub:t('stat_diversity_sub'),                           color:'#14b8a6', noAnim:true },
-    // — Cartes secondaires —
+    // secondary stat cards
     { icon:'🎼', value:uniqueTracks,                    label:t('stat_tracks'),        sub:t('stat_since_start'),                             color:'#f43f5e', noAnim:true },
     { icon:'⏱️', value:lastScrobble,                    label:t('stat_last_scrobble'), sub:u.name ? `last.fm/user/${u.name}` : '',            color:'#f97316', noAnim:true },
     { icon:'📆', value:formatNum(daysSince),             label:t('adv_days'),           sub:t('adv_days_sub', formatDate(regTs)),              color:'#eab308', noAnim:true },
@@ -1140,9 +1067,6 @@ async function loadDashArtistsChart() {
   } catch (e) { console.warn('dash-artists chart:', e); }
 }
 
-/* ============================================================
-   VERSUS  (comparaison mois sur mois)
-   ============================================================ */
 async function loadVersus() {
   const vsBody = document.getElementById('vs-body');
   if (!vsBody) return;
@@ -1182,9 +1106,6 @@ async function loadVersus() {
   } catch { vsBody.innerHTML = `<p class="vs-na">${t('versus_unavailable')}</p>`; }
 }
 
-/* ============================================================
-   MOOD TAGS  (tags de genres depuis les top artistes)
-   ============================================================ */
 const _IGNORED_TAGS = new Set(['seen live','favorites','favourite','love','awesome','beautiful','epic','amazing','classic','favourite music','my favourite','all','featured','good','new','old','best','cool','hot','great','perfect']);
 
 async function loadMoodTags() {
@@ -1222,9 +1143,6 @@ async function loadMoodTags() {
   } catch (e) { console.warn('loadMoodTags:', e); if (tagsEl) tagsEl.innerHTML = `<p class="mood-na">${t('mood_error')}</p>`; }
 }
 
-/* ============================================================
-   LISTENING STREAK
-   ============================================================ */
 function calcStreak(tracks) {
   const daySet = new Set();
   for (const tr of tracks) {
@@ -1272,9 +1190,6 @@ function updateStreakUI(streakData) {
   }
 }
 
-/* ============================================================
-   HEATMAP
-   ============================================================ */
 function renderHeatmap(hourCounts) {
   const el = document.getElementById('heatmap-grid');
   if (!el) return;
@@ -1312,15 +1227,12 @@ function renderHeatmap(hourCounts) {
     </div>`;
 }
 
-/* ============================================================
-   ARTIST IMAGE CACHE
-   ============================================================ */
 const _imgCache = new Map();
 
 async function getArtistImage(artistName) {
   if (_imgCache.has(artistName)) return _imgCache.get(artistName);
   try {
-    // FIX: API.call (avec cache) au lieu de API._fetch (sans cache)
+    // use API.call (cached) instead of API._fetch
     const data   = await API.call('artist.getTopAlbums', { artist:artistName, limit:3, autocorrect:1 });
     const albums = data.topalbums?.album || [];
     for (const alb of albums) {
@@ -1337,7 +1249,7 @@ async function injectArtistImage(artistName, containerId, fallbackBg, fallbackLe
   if (!container) return;
   const img = await getArtistImage(artistName);
   if (img) {
-    // Overlay l'image sur le fallback existant via position:absolute
+    // overlay image on top of the fallback using position:absolute
     const imgEl = document.createElement('img');
     imgEl.src    = img;
     imgEl.alt    = escHtml(artistName);
@@ -1350,7 +1262,7 @@ async function injectArtistImage(artistName, containerId, fallbackBg, fallbackLe
   }
 }
 
-/** Injecte les tags d'un artiste dans un conteneur DOM */
+/** Injects artist tags into a DOM container */
 async function _injectArtistTags(artistName, containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -1370,9 +1282,6 @@ async function _injectArtistTags(artistName, containerId) {
   } catch {}
 }
 
-/* ============================================================
-   TOP ARTISTS  — layout unifié
-   ============================================================ */
 let _artistsObserver = null;
 
 function setArtistsLayout(layout) {
@@ -1401,8 +1310,7 @@ function _buildArtistCard(a, rank) {
   const delay  = Math.min(rank % 20, 10) * 0.04;
   const safeName = escHtml(a.name).replace(/'/g,"\\'");
 
-  // ── HERO (grid) ──
-  const heroHtml = `
+    const heroHtml = `
     <div class="artist-hero-card" style="animation-delay:${delay}s"
          onclick="openArtistModal('${safeName}','${safeUrl}',${plays})">
       <div class="artist-hero-fallback" id="${imgId}-fallback" style="background:${bg}">${letter}</div>
@@ -1421,8 +1329,7 @@ function _buildArtistCard(a, rank) {
       </div>
     </div>`;
 
-  // ── LIST (music-card) ──
-  const listTagsId = `artist-ltags-r${rank}`;
+    const listTagsId = `artist-ltags-r${rank}`;
   const listHtml = `
     <div class="music-card" style="animation-delay:${delay}s"
          onclick="openArtistModal('${safeName}','${safeUrl}',${plays})">
@@ -1445,8 +1352,7 @@ function _buildArtistCard(a, rank) {
       </div>
     </div>`;
 
-  // ── COMPACT ──
-  const compactHtml = `
+    const compactHtml = `
     <div class="track-item" style="animation-delay:${delay}s"
          onclick="openArtistModal('${safeName}','${safeUrl}',${plays})">
       <div class="track-cover" id="${imgId}-compact" style="background:${bg};display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:1rem;flex-shrink:0;width:40px;height:40px;border-radius:6px;overflow:hidden;position:relative">${letter}</div>
@@ -1465,7 +1371,7 @@ function _buildArtistCard(a, rank) {
   const layout = APP.artistsLayout || 'grid';
   const html   = layout === 'grid' ? heroHtml : layout === 'list' ? listHtml : compactHtml;
 
-  // Lazy-load image + tags — délai plafonné à 500ms max
+  // lazy-load image + tags — capped at 500ms
   const lazyDelay = Math.min(rank - 1, 12) * 40;
   setTimeout(() => {
     if (layout === 'grid') {
@@ -1489,7 +1395,7 @@ function _buildArtistCard(a, rank) {
       injectArtistImage(a.name, `${imgId}-cover`, bg, letter);
       _injectArtistTags(a.name, listTagsId);
     } else {
-      // compact : image en absolute dans le cover
+      // compact: image is absolute inside the cover div
       getArtistImage(a.name).then(imgUrl => {
         const coverEl = document.getElementById(`${imgId}-compact`);
         if (coverEl && imgUrl) {
@@ -1566,9 +1472,6 @@ async function _loadMoreArtists() {
   finally { APP.artistsLoading = false; if (loader) loader.classList.add('hidden'); }
 }
 
-/* ============================================================
-   TOP ALBUMS  — layout unifié
-   ============================================================ */
 let _albumsObserver = null;
 
 function _albumsGridClass(layout) {
@@ -1717,9 +1620,6 @@ async function _loadMoreAlbums() {
   finally { APP.albumsLoading = false; if (loader) loader.classList.add('hidden'); }
 }
 
-/* ============================================================
-   TOP TRACKS  — layout unifié
-   ============================================================ */
 let _tracksObserver = null;
 const _trackImgCache = new Map();
 
@@ -1752,8 +1652,7 @@ function _buildTrackItem(track, rank, maxPlay) {
   const coverElId  = `track-cover-r${rank}`;
   const safeUrl    = (track.url || '#').replace(/'/g,'%27');
 
-  // ── GRID : hero-card plein-image ──────────────────────────
-  if ((APP.tracksLayout || 'list') === 'grid') {
+    if ((APP.tracksLayout || 'list') === 'grid') {
     return `
     <div class="hero-card" style="animation-delay:${delay}s" onclick="window.open('${safeUrl}','_blank')">
       <div class="hc-fallback" style="background:${coverBg}${hasCover ? ';display:none' : ''}">${coverLtr}</div>
@@ -1776,8 +1675,7 @@ function _buildTrackItem(track, rank, maxPlay) {
     </div>`;
   }
 
-  // ── LIST / COMPACT : track-item classique ────────────────
-  return `
+    return `
     <div class="track-item" style="animation-delay:${delay}s"
          onclick="window.open('${safeUrl}','_blank')">
       <div class="track-cover" id="${coverElId}">
@@ -1801,14 +1699,13 @@ function _buildTrackItem(track, rank, maxPlay) {
     </div>`;
 }
 
-
 /* ── Injection d'images album dans les tracks depuis APP.trackAlbumImgMap ──
    Modifie les objets track en place pour que _buildTrackItem trouve les URLs.
    Ne fait pas d'appel API — utilise uniquement la map déjà construite. */
 function _injectAlbumImagesIntoTracks(tracks) {
   if (!APP.trackAlbumImgMap?.size) return;
   tracks.forEach(tr => {
-    // Vérifier si le track a déjà une vraie image extralarge
+    // check if track already has a real extralarge image
     const existing = tr.image?.find(i => i.size === 'extralarge')?.['#text'] || '';
     if (existing && !isDefaultImg(existing)) return;
 
@@ -1820,7 +1717,7 @@ function _injectAlbumImagesIntoTracks(tracks) {
     const imgUrl = APP.trackAlbumImgMap.get(key);
     if (!imgUrl) return;
 
-    // Injecter l'URL dans toutes les tailles pour que _buildTrackItem la trouve
+    // inject URL into all sizes so _buildTrackItem can pick it up
     if (!tr.image) tr.image = [];
     ['extralarge','large','medium'].forEach(size => {
       const entry = tr.image.find(i => i.size === size);
@@ -1831,7 +1728,7 @@ function _injectAlbumImagesIntoTracks(tracks) {
 }
 
 async function _resolveTrackImage(track, rank) {
-  // Supporte les deux modes : list/compact (track-cover div) et grid (hero-card img)
+  // supports list/compact (track-cover div) and grid (hero-card img)
   const coverEl  = document.getElementById(`track-cover-r${rank}`);
   const heroImg  = document.getElementById(`track-cover-r${rank}-img`);
   if (!coverEl && !heroImg) return;
@@ -1874,23 +1771,23 @@ async function _resolveTrackImage(track, rank) {
   } catch { _trackImgCache.set(cacheKey, null); }
 }
 
-// Injecte une image dans un élément img hero-card existant (mode grid)
+// inject image into an existing hero-card img (grid mode)
 function _injectHeroImg(imgEl, imgUrl) {
   if (!imgEl || !imgUrl) return;
   const rawSrc = imgEl.getAttribute('src');
-  if (rawSrc && rawSrc.length > 0) return; // déjà une vraie URL
+  if (rawSrc && rawSrc.length > 0) return; // already has a real URL
   imgEl.src = imgUrl;
   imgEl.style.display = '';
   imgEl.classList.remove('img-loaded');
   imgEl.onload = () => {
     imgEl.classList.add('img-loaded');
-    // Masquer le fallback maintenant que l'image est chargée
+    // hide fallback once image is loaded
     const fallback = imgEl.closest('.hero-card')?.querySelector('.hc-fallback');
     if (fallback) fallback.style.display = 'none';
   };
   imgEl.onerror = () => {
     imgEl.remove();
-    // Afficher le fallback si l'image échoue
+    // show fallback if image fails
     const card = imgEl.closest?.('.hero-card');
     const fallback = card?.querySelector('.hc-fallback');
     if (fallback) fallback.style.removeProperty('display');
@@ -1942,7 +1839,7 @@ async function loadTopTracks(period) {
   );
 
   try {
-    // Fetch tracks + top albums (200) en parallèle pour résoudre les images
+    // fetch tracks + top albums (200) in parallel to resolve images
     const [tracksResp, albumsResp] = await Promise.all([
       API.call('user.getTopTracks',  { period, limit:50,  page:1 }),
       API.call('user.getTopAlbums',  { period, limit:200, page:1 }),
@@ -1951,7 +1848,7 @@ async function loadTopTracks(period) {
     const tracks = tracksResp.toptracks?.track || [];
     const albums = albumsResp.topalbums?.album  || [];
 
-    // Construire la map artist::album → imageUrl depuis les albums
+    // build artist::album → imageUrl map from albums
     APP.trackAlbumImgMap = new Map();
     albums.forEach(alb => {
       const img = alb.image?.find(i => i.size === 'extralarge')?.['#text']
@@ -1962,14 +1859,14 @@ async function loadTopTracks(period) {
       }
     });
 
-    // Injecter les images d'album dans les tracks avant le rendu
+    // inject album images into tracks before rendering
     _injectAlbumImagesIntoTracks(tracks);
 
     APP.topTracksData    = tracks;
     APP.tracksTotalPages = parseInt(tracksResp.toptracks?.['@attr']?.totalPages || 1);
     const maxPlay        = tracks.length > 0 ? parseInt(tracks[0].playcount) : 1;
     if (list) list.innerHTML = tracks.map((tr,i) => _buildTrackItem(tr, i+1, maxPlay)).join('');
-    // Fallback async pour les tracks non couverts par la map albums
+    // async fallback for tracks not covered by the album map
     _resolveTrackImages(tracks, 1);
 
     if (APP.tracksTotalPages > 1 && sentinel) {
@@ -2006,7 +1903,7 @@ async function _loadMoreTracks() {
   finally { APP.tracksLoading = false; if (loader) loader.classList.add('hidden'); }
 }
 
-/* ── Sélecteurs de période ─────────────────────────────────── */
+// period selectors
 function initPeriodSelectors() {
   [
     { id:'prd-artists', fn:loadTopArtists },
@@ -2025,9 +1922,6 @@ function initPeriodSelectors() {
   });
 }
 
-/* ============================================================
-   CHARTS SECTION
-   ============================================================ */
 function setupChartsSection() {
   const currentYear = new Date().getFullYear();
   const sel = document.getElementById('yr-sel');
@@ -2040,7 +1934,7 @@ function setupChartsSection() {
   loadCumulativeChart();
   loadPieCharts();
 
-  // If full history already loaded, render hourly/weekday/OHW immediately
+  // if full history is loaded, render charts right away
   if (APP.fullHistory?.length) {
     const hourCounts = Array(24).fill(0);
     for (const tr of APP.fullHistory) {
@@ -2056,14 +1950,14 @@ function setupChartsSection() {
     if (weekdayHint) weekdayHint.textContent = '';
     document.getElementById('ohw-empty')?.style.setProperty('display', 'none');
   } else {
-    // Show empty placeholder for OHW
+    // show empty state for one-hit wonders
     const ohwEmpty = document.getElementById('ohw-empty');
     const ohwList  = document.getElementById('ohw-list');
     if (ohwEmpty) ohwEmpty.style.display = '';
     if (ohwList)  ohwList.innerHTML = '';
   }
 
-  // Auto-render all visualisations — no button needed
+  // auto-render all charts
   setTimeout(() => {
     loadVizPlus();
     loadMusicalProfile();
@@ -2176,9 +2070,6 @@ async function loadPieCharts() {
   } catch {}
 }
 
-/* ============================================================
-   PERIOD COMPARISON  — labels i18n
-   ============================================================ */
 function _prevPeriodKey(period) {
   return { '7day':'1month','1month':'3month','3month':'6month','6month':'12month','12month':'overall','overall':'overall' }[period] || 'overall';
 }
@@ -2245,9 +2136,6 @@ function _setCompareDelta(id, diff, pct) {
   el.classList.remove('hidden');
 }
 
-/* ============================================================
-   WRAPPED
-   ============================================================ */
 function setupWrappedSection() {
   const currentYear = new Date().getFullYear();
   const sel = document.getElementById('w-yr-sel');
@@ -2351,9 +2239,6 @@ async function exportWrapped() {
   } catch (e) { document.body.classList.remove('export-mode'); showToast(t('wrapped_export_error', e.message), 'error'); }
 }
 
-/* ============================================================
-   STORY / EXPORT
-   ============================================================ */
 async function generateStory(type) {
   showToast(t('story_preparing'));
   try {
@@ -2458,11 +2343,6 @@ function downloadCanvas(canvas, filename) {
   link.click();
 }
 
-/* ============================================================
-   SECTION CARD EXPORT — Story 9:16 (Canvas natif, crossOrigin)
-   Génère une image verticale 360×640 avec les 5 meilleurs items
-   de la section : Top Artistes, Top Albums ou Top Titres.
-   ============================================================ */
 async function exportSectionCard(section) {
   const W = 360, H = 640;
   const canvas  = document.createElement('canvas');
@@ -2479,14 +2359,14 @@ async function exportSectionCard(section) {
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, W, H);
 
-  /* Cercle décoratif haut-gauche */
+  
   const gCircle = ctx.createRadialGradient(0, 0, 0, 0, 0, 200);
   gCircle.addColorStop(0, 'rgba(99,102,241,0.18)');
   gCircle.addColorStop(1, 'transparent');
   ctx.fillStyle = gCircle;
   ctx.fillRect(0, 0, W, H);
 
-  /* ── Données selon la section ─────────────────────────────── */
+  
   let items = [], sectionLabel = '', filename = 'laststats-story.png';
 
   if (section === 'top-albums') {
@@ -2506,7 +2386,7 @@ async function exportSectionCard(section) {
   if (!items.length) { showToast(t('story_no_data'), 'error'); return; }
   showToast(t('story_preparing'));
 
-  /* ── Chargement des pochettes (crossOrigin anonymous) ─────── */
+  // preload cover images (crossOrigin anonymous)
   const loadImg = url => new Promise(res => {
     if (!url || isDefaultImg(url)) return res(null);
     const img = new Image();
@@ -2523,33 +2403,33 @@ async function exportSectionCard(section) {
   );
   const imgs = await Promise.all(imgUrls.map(loadImg));
 
-  /* ── Helper : texte tronqué ───────────────────────────────── */
+  
   const clampText = (text, maxW) => {
     let s = String(text || '—');
     while (ctx.measureText(s).width > maxW && s.length > 1) s = s.slice(0, -1);
     return s.length < String(text || '—').length ? s + '…' : s;
   };
 
-  /* ── Header ──────────────────────────────────────────────── */
-  // Logo
+  
+  // logo
   ctx.font = 'bold 20px system-ui, sans-serif';
   ctx.fillStyle = '#a78bfa';
   ctx.textAlign = 'left';
   ctx.fillText('LastStats', 24, 48);
 
-  // Pseudo
+  // username
   const username = '@' + (APP.userInfo?.name || APP.username || '');
   ctx.font = '12px system-ui, sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.45)';
   ctx.fillText(username, 24, 68);
 
-  // Titre de section
+  // section title
   ctx.font = 'bold 17px system-ui, sans-serif';
   ctx.fillStyle = '#ffffff';
   ctx.textAlign = 'right';
   ctx.fillText(sectionLabel, W - 24, 48);
 
-  // Période (si disponible)
+  // period label (if available)
   const prdEl = document.querySelector(`#prd-${section.replace('top-', '')} .prd.active`);
   const prdTxt = prdEl ? prdEl.textContent.trim() : '';
   if (prdTxt) {
@@ -2559,7 +2439,7 @@ async function exportSectionCard(section) {
     ctx.fillText(prdTxt, W - 24, 65);
   }
 
-  // Ligne séparatrice
+  // divider line
   const sepGrad = ctx.createLinearGradient(24, 0, W - 24, 0);
   sepGrad.addColorStop(0,   'transparent');
   sepGrad.addColorStop(0.3, 'rgba(167,139,250,0.5)');
@@ -2567,7 +2447,7 @@ async function exportSectionCard(section) {
   ctx.strokeStyle = sepGrad; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(24, 84); ctx.lineTo(W - 24, 84); ctx.stroke();
 
-  /* ── Cartes des items ─────────────────────────────────────── */
+  
   const CARD_H   = 84;
   const CARD_GAP = 8;
   const IMG_SIZE = 62;
@@ -2582,7 +2462,7 @@ async function exportSectionCard(section) {
   items.forEach((item, i) => {
     const cardY = START_Y + i * (CARD_H + CARD_GAP);
 
-    /* Fond carte */
+    
     const cGrad = ctx.createLinearGradient(CARD_X, cardY, CARD_X + CARD_W, cardY + CARD_H);
     cGrad.addColorStop(0, i === 0 ? 'rgba(167,139,250,0.14)' : 'rgba(255,255,255,0.06)');
     cGrad.addColorStop(1, 'rgba(255,255,255,0.02)');
@@ -2591,20 +2471,20 @@ async function exportSectionCard(section) {
     ctx.roundRect(CARD_X, cardY, CARD_W, CARD_H, 14);
     ctx.fill();
 
-    /* Bordure subtile */
+    
     ctx.strokeStyle = i === 0 ? 'rgba(167,139,250,0.35)' : 'rgba(255,255,255,0.07)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.roundRect(CARD_X, cardY, CARD_W, CARD_H, 14);
     ctx.stroke();
 
-    /* Numéro de rang */
+    
     ctx.font = `bold ${i < 3 ? 20 : 16}px system-ui, sans-serif`;
     ctx.fillStyle = rankColors[i];
     ctx.textAlign = 'center';
     ctx.fillText(`${i + 1}`, CARD_X + 22, cardY + CARD_H / 2 + 7);
 
-    /* Image pochette / avatar */
+    
     const imgX = CARD_X + 42;
     const imgY = cardY + (CARD_H - IMG_SIZE) / 2;
 
@@ -2620,7 +2500,7 @@ async function exportSectionCard(section) {
     if (imgs[i]) {
       ctx.drawImage(imgs[i], imgX, imgY, IMG_SIZE, IMG_SIZE);
     } else {
-      /* Fallback : dégradé coloré + initiale */
+      // fallback: colored gradient + initial
       const PALETTES = [
         ['#6366f1','#a855f7'],['#ec4899','#f43f5e'],['#06b6d4','#6366f1'],
         ['#22c55e','#14b8a6'],['#f97316','#eab308'],
@@ -2637,7 +2517,7 @@ async function exportSectionCard(section) {
     }
     ctx.restore();
 
-    /* Texte — titre */
+    
     const textX  = imgX + IMG_SIZE + 12;
     const maxTW  = CARD_X + CARD_W - textX - 10;
 
@@ -2646,7 +2526,7 @@ async function exportSectionCard(section) {
     ctx.textAlign = 'left';
     ctx.fillText(clampText(item.name, maxTW), textX, cardY + CARD_H / 2 - 6);
 
-    /* Texte — sous-titre */
+    
     let subTxt;
     if (isTrack)       subTxt = item.artist?.name || '';
     else if (isArtist) subTxt = `${formatNum(item.playcount)} ${t('plays')}`;
@@ -2656,7 +2536,7 @@ async function exportSectionCard(section) {
     ctx.fillStyle = 'rgba(255,255,255,0.48)';
     ctx.fillText(clampText(subTxt, maxTW), textX, cardY + CARD_H / 2 + 12);
 
-    /* Barre de popularité relative (uniquement pour items avec playcount) */
+    // relative popularity bar (items with playcount only)
     if (item.playcount && items[0]?.playcount) {
       const ratio  = parseInt(item.playcount) / parseInt(items[0].playcount);
       const barW   = maxTW * ratio;
@@ -2670,7 +2550,7 @@ async function exportSectionCard(section) {
     }
   });
 
-  /* ── Footer ───────────────────────────────────────────────── */
+  
   const footY = START_Y + 5 * (CARD_H + CARD_GAP) + 24;
 
   const footSep = ctx.createLinearGradient(40, 0, W - 40, 0);
@@ -2742,9 +2622,6 @@ function calcEddington(playcounts) {
   return e;
 }
 
-/* ============================================================
-   FULL HISTORY FETCH — overlay minimisable
-   ============================================================ */
 let _historyFetchMinimized = false;
 let _bgFetchInProgress     = false;
 
@@ -2821,13 +2698,13 @@ async function fetchFullHistory(backgroundMode = false) {
     _renderDayOfWeekChart(tracks);
     _renderOHWList(tracks);
 
-    // Clear "load history" hints from charts section
+    // clear "load history" hints from the charts section
     const hourlyHint  = document.getElementById('hourly-hint');
     const weekdayHint = document.getElementById('weekday-hint');
     if (hourlyHint)  hourlyHint.textContent  = '';
     if (weekdayHint) weekdayHint.textContent = '';
 
-    // Hide OHW empty state if it was showing
+    // hide the OHW empty state if shown
     document.getElementById('ohw-empty')?.style?.setProperty?.('display', 'none');
 
     if (backgroundMode) {
@@ -2980,9 +2857,6 @@ function logout() {
   if (document.getElementById('input-apikey'))   document.getElementById('input-apikey').value   = '';
 }
 
-/* ============================================================
-   ARTIST MODAL
-   ============================================================ */
 async function openArtistModal(artistName, artistUrl, userPlaycount) {
   const modal = document.getElementById('artist-modal');
   if (!modal) return;
@@ -2991,13 +2865,12 @@ async function openArtistModal(artistName, artistUrl, userPlaycount) {
 
   const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
 
-  // ── Reset état de chargement ─────────────────────────────────
-  setText('am-name', artistName);
+    setText('am-name', artistName);
   setText('am-user-plays', formatNum(userPlaycount) + ' ' + t('plays'));
   setText('am-listeners',   '—');
   setText('am-globalplays', '—');
 
-  // Bio: spinner visible, texte caché
+  // bio: show spinner, hide text
   const bioLoadEl   = document.getElementById('am-bio-loading');
   const bioTextEl   = document.getElementById('am-bio-text');
   const bioToggleEl = document.getElementById('am-bio-toggle');
@@ -3005,24 +2878,23 @@ async function openArtistModal(artistName, artistUrl, userPlaycount) {
   if (bioTextEl)   { bioTextEl.classList.add('hidden'); bioTextEl.textContent = ''; }
   if (bioToggleEl) { bioToggleEl.classList.add('hidden'); }
 
-  // Tracks: spinner visible, liste cachée
+  // tracks: show spinner, hide list
   const trkLoadEl  = document.getElementById('am-tracks-loading');
   const trkListEl  = document.getElementById('am-top-tracks-list');
   if (trkLoadEl) trkLoadEl.classList.remove('hidden');
   if (trkListEl) { trkListEl.classList.add('hidden'); trkListEl.innerHTML = ''; }
 
-  // Albums: spinner visible, grille cachée
+  // albums: show spinner, hide grid
   const albLoadEl  = document.getElementById('am-albums-loading');
   const albGridEl  = document.getElementById('am-albums-grid');
   if (albLoadEl) albLoadEl.classList.remove('hidden');
   if (albGridEl) { albGridEl.classList.add('hidden'); albGridEl.innerHTML = ''; }
 
-  // Tags reset
+  // reset tags
   const tagsEl = document.getElementById('am-tags');
   if (tagsEl) tagsEl.innerHTML = '';
 
-  // ── Image de l'artiste ───────────────────────────────────────
-  const imgEl     = document.getElementById('am-img-inner');
+    const imgEl     = document.getElementById('am-img-inner');
   const artistImg = await getArtistImage(artistName);
   if (imgEl) {
     imgEl.innerHTML = artistImg
@@ -3032,8 +2904,7 @@ async function openArtistModal(artistName, artistUrl, userPlaycount) {
       : `<div style="width:100%;height:100%;background:${nameToGradient(artistName)};display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:800;color:white">${escHtml(artistName[0].toUpperCase())}</div>`;
   }
 
-  // ── Liens externes ───────────────────────────────────────────
-  const lfmBtn = document.getElementById('am-lfm-link');
+    const lfmBtn = document.getElementById('am-lfm-link');
   const spBtn  = document.getElementById('am-sp-link');
   const ytBtn  = document.getElementById('am-yt-link');
   if (lfmBtn) lfmBtn.href = artistUrl || `https://www.last.fm/music/${encodeURIComponent(artistName)}`;
@@ -3051,8 +2922,7 @@ async function openArtistModal(artistName, artistUrl, userPlaycount) {
     setText('am-listeners',   formatNum(info?.stats?.listeners || 0));
     setText('am-globalplays', formatNum(info?.stats?.playcount  || 0));
 
-    // ── Bio ────────────────────────────────────────────────────
-    const bioRaw   = info?.bio?.summary || '';
+        const bioRaw   = info?.bio?.summary || '';
     const bioClean = bioRaw.replace(/<a[^>]*>.*?<\/a>/gi, '').replace(/<[^>]+>/g, '').trim();
     if (bioLoadEl) bioLoadEl.classList.add('hidden');
     if (bioTextEl) {
@@ -3074,16 +2944,14 @@ async function openArtistModal(artistName, artistUrl, userPlaycount) {
       }
     }
 
-    // ── Tags ───────────────────────────────────────────────────
-    if (tagsEl) {
+        if (tagsEl) {
       const tags = (info?.tags?.tag || [])
         .filter(tg => { const n = tg.name?.toLowerCase().trim(); return n && n.length >= 2 && !_IGNORED_TAGS.has(n); })
         .slice(0, 5);
       tagsEl.innerHTML = tags.map(tg => `<span class="am-tag">${escHtml(tg.name)}</span>`).join('');
     }
 
-    // ── Top Tracks ─────────────────────────────────────────────
-    if (trkLoadEl) trkLoadEl.classList.add('hidden');
+        if (trkLoadEl) trkLoadEl.classList.add('hidden');
     const tracks = trkData.toptracks?.track || [];
     if (trkListEl) {
       trkListEl.classList.remove('hidden');
@@ -3102,8 +2970,7 @@ async function openArtistModal(artistName, artistUrl, userPlaycount) {
       }
     }
 
-    // ── Albums ─────────────────────────────────────────────────
-    if (albLoadEl) albLoadEl.classList.add('hidden');
+        if (albLoadEl) albLoadEl.classList.add('hidden');
     const albums = albData.topalbums?.album || [];
     if (albGridEl) {
       albGridEl.classList.remove('hidden');
@@ -3140,9 +3007,6 @@ function closeArtistModal(e) {
   document.body.style.overflow = '';
 }
 
-/* ============================================================
-   SHARE HELPERS  — texte traduit
-   ============================================================ */
 async function _shareOrCopy(title, text, url) {
   if (navigator.share) {
     try { await navigator.share({ title, text, url }); return; } catch {}
@@ -3166,15 +3030,12 @@ function shareTrack(name, artist, plays, url) {
   _shareOrCopy(`${name} — ${artist}`, text, url || `https://www.last.fm/music/${encodeURIComponent(artist)}/_/${encodeURIComponent(name)}`);
 }
 
-/* ============================================================
-   VIZ PLUS  (Radar → Sunburst chaîné · Treemap · Sankey)
-   ============================================================ */
 let _vizPlusLoaded = false;
 
 async function loadVizPlus() {
   const statusEl  = document.getElementById('vizplus-status');
   const statusTxt = document.getElementById('vizplus-status-txt');
-  // Update status hint in charts section header (button removed)
+  // update the status hint in the charts header
   const radarHint = document.getElementById('radar-status-hint');
 
   if (statusEl) statusEl.classList.remove('hidden');
@@ -3446,10 +3307,6 @@ async function _buildSankey() {
     .text(d => d.name.length > 18 ? d.name.slice(0, 16) + '…' : d.name);
 }
 
-/* ============================================================
-   MUSICAL PROFILE  — Évolution tags par mois (données réelles)
-   FIX CRITIQUE : weekly charts par mois au lieu de global cache
-   ============================================================ */
 async function loadMusicalProfile() {
   const phEl   = document.getElementById('profile-placeholder');
   const wrapEl = document.getElementById('profile-chart-wrap');
@@ -3467,7 +3324,7 @@ async function loadMusicalProfile() {
     const labels  = [];
     const tagData = {};
 
-    // Récupération de la liste des charts hebdomadaires (pour accès aux données historiques)
+    // get weekly chart list for historical data access
     let weeklyChartList = null;
     try {
       const wclData    = await API.call('user.getWeeklyChartList', {});
@@ -3478,15 +3335,15 @@ async function loadMusicalProfile() {
       const targetDate  = new Date(now.getFullYear(), now.getMonth() - mBack, 1);
       const monthStart  = Math.floor(new Date(targetDate.getFullYear(), targetDate.getMonth(), 1).getTime() / 1000);
       const monthEnd    = Math.floor(new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0, 23, 59, 59).getTime() / 1000);
-      const monthIdx    = MONTHS_BACK - 1 - mBack; // index dans le tableau (0 = le plus ancien)
+      const monthIdx    = MONTHS_BACK - 1 - mBack; // index in array (0 = oldest)
 
       labels.push(MONTHS_SHORT()[targetDate.getMonth()] + ' ' + targetDate.getFullYear().toString().slice(-2));
 
-      // Stratégie : agréger les charts hebdomadaires couvrant ce mois
+      // aggregate weekly charts covering this month
       let monthArtists = [];
 
       if (weeklyChartList.length) {
-        // Trouver les semaines qui chevauchent ce mois
+        // find weeks overlapping this month
         const relevantWeeks = weeklyChartList.filter(w => {
           const wFrom = parseInt(w.from);
           const wTo   = parseInt(w.to);
@@ -3516,7 +3373,7 @@ async function loadMusicalProfile() {
         }
       }
 
-      // Fallback : user.getTopArtists avec la période rolling appropriée
+      // fallback: use user.getTopArtists with the appropriate rolling period
       if (!monthArtists.length) {
         const period = mBack <= 1 ? '1month' : mBack <= 3 ? '3month' : '6month';
         try {
@@ -3529,7 +3386,7 @@ async function loadMusicalProfile() {
         monthArtists = APP.topArtistsData.slice(0, 8);
       }
 
-      // Récupérer les tags de ces artistes
+      // fetch tags for these artists
       const tagResults = await Promise.allSettled(
         monthArtists.map(a => API.call('artist.getTopTags', { artist:a.name }))
       );
@@ -3554,7 +3411,7 @@ async function loadMusicalProfile() {
       await sleep(80);
     }
 
-    // Sélection des top 5 tags sur l'ensemble de la période
+    // pick the top 5 tags across the whole period
     const tagTotals = Object.entries(tagData)
       .map(([tag, scores]) => ({ tag, total:scores.reduce((a,b) => a+b, 0) }))
       .sort((a,b) => b.total - a.total)
@@ -3566,12 +3423,10 @@ async function loadMusicalProfile() {
       return;
     }
 
-    // ── Révéler le graphique ─────────────────────────────────
-    if (phEl)  phEl.classList.add('hidden');
+        if (phEl)  phEl.classList.add('hidden');
     if (wrapEl) { wrapEl.classList.remove('hidden'); wrapEl.style.display = ''; }
 
-    // ── Légende externe ──────────────────────────────────────
-    if (legEl) {
+        if (legEl) {
       legEl.classList.remove('hidden');
       legEl.style.display = '';
       legEl.innerHTML = tagTotals.map((item, i) => `
@@ -3600,7 +3455,7 @@ async function loadMusicalProfile() {
         ...baseChartOpts(),
         plugins:{
           ...baseChartOpts().plugins,
-          // FIX: légende visible pour identifier chaque tag
+          // legend is visible to identify each tag
           legend:{
             display:  true,
             position: 'bottom',
@@ -3623,9 +3478,6 @@ async function loadMusicalProfile() {
   }
 }
 
-/* ============================================================
-   OBSCURITY SCORE  — images + labels i18n
-   ============================================================ */
 let _obscurityScored = [];
 
 async function loadObscurityScore() {
@@ -3700,7 +3552,7 @@ async function loadObscurityScore() {
   }
 }
 
-/** Rendu des items d'obscurité — images lazies + labels i18n */
+/** Render obscurity items — lazy images + i18n labels */
 function _renderObscurityItems(container, scored, sortKey) {
   if (!container || !scored.length) return;
   const sorted = [...scored].sort((a, b) =>
@@ -3739,7 +3591,7 @@ function _renderObscurityItems(container, scored, sortKey) {
     </div>`;
   }).join('');
 
-  // Lazy-load des images — délai plafonné
+  // lazy-load images — capped delay
   sorted.forEach((a, idx) => {
     const delay = Math.min(idx, 15) * 60;
     setTimeout(() => {
@@ -3765,11 +3617,8 @@ function sortObscurity(sortKey) {
   );
 }
 
-/* ============================================================
-   BADGE ENGINE  — labels i18n complets
-   ============================================================ */
 const BadgeEngine = (() => {
-  // FIX: tiers labels en i18n (plus d'anglais hardcodé)
+  // tier labels use i18n (no more hardcoded English)
   const TIERS = [
     { key:'bronze',  get label(){ return t('tier_bronze');  }, icon:'🥉', xp:10  },
     { key:'argent',  get label(){ return t('tier_argent');  }, icon:'🥈', xp:25  },
@@ -3793,10 +3642,8 @@ const BadgeEngine = (() => {
     { id:'marathon',       cat:'volume',     icon:'🏃', get name(){return t('badge_marathon_name');},     get desc(){return t('badge_marathon_desc');},    thresholds:thresholds(7),    compute:() => APP.streakData?.best || 0 },
     { id:'listen_time',    cat:'volume',     icon:'⏳', get name(){return t('badge_listen_time_name');},  get desc(){return t('badge_listen_time_desc');}, thresholds:thresholds(100),  compute:(hist) => Math.round(hist.length*3.5/60) },
     { id:'multilingual',   cat:'diversite',  icon:'🌍', get name(){return t('badge_multilingual_name');}, get desc(){return t('badge_multilingual_desc');}, thresholds:thresholds(5),   compute:(hist) => { const nl=/[^\u0000-\u007F\u00C0-\u024F]/;return new Set(hist.filter(tr=>{const a=tr.artist?.['#text']||tr.artist?.name||'';return nl.test(a);}).map(tr=>(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase())).size; } },
-    // ── Tempo (rythme d'écoute dans le temps) ──
-    { id:'comeback',       cat:'tempo',      icon:'🔄', get name(){return t('badge_comeback_name');},     get desc(){return t('badge_comeback_desc');},    thresholds:thresholds(1),    compute:(hist) => { if(hist.length<2)return 0; let gaps=0; for(let i=1;i<hist.length;i++){const t1=parseInt(hist[i-1].date?.uts||0),t2=parseInt(hist[i].date?.uts||0);if(t1&&t2&&Math.abs(t1-t2)>30*86400)gaps++;} return gaps; } },
-    // ── Social (partage & affinités) ──
-    { id:'ambassador',     cat:'social',     icon:'📣', get name(){return t('badge_ambassador_name');},   get desc(){return t('badge_ambassador_desc');},  thresholds:thresholds(5),    compute:(hist) => { const am=new Map(); hist.forEach(tr=>{const a=(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase();if(a)am.set(a,(am.get(a)||0)+1);}); return [...am.values()].filter(v=>v>=100).length; } },
+        { id:'comeback',       cat:'tempo',      icon:'🔄', get name(){return t('badge_comeback_name');},     get desc(){return t('badge_comeback_desc');},    thresholds:thresholds(1),    compute:(hist) => { if(hist.length<2)return 0; let gaps=0; for(let i=1;i<hist.length;i++){const t1=parseInt(hist[i-1].date?.uts||0),t2=parseInt(hist[i].date?.uts||0);if(t1&&t2&&Math.abs(t1-t2)>30*86400)gaps++;} return gaps; } },
+        { id:'ambassador',     cat:'social',     icon:'📣', get name(){return t('badge_ambassador_name');},   get desc(){return t('badge_ambassador_desc');},  thresholds:thresholds(5),    compute:(hist) => { const am=new Map(); hist.forEach(tr=>{const a=(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase();if(a)am.set(a,(am.get(a)||0)+1);}); return [...am.values()].filter(v=>v>=100).length; } },
     { id:'tastemaker',     cat:'social',     icon:'🎯', get name(){return t('badge_tastemaker_name');},   get desc(){return t('badge_tastemaker_desc');},  thresholds:thresholds(2),    compute:(hist) => { const am=new Map(); hist.forEach(tr=>{const a=(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase();if(a)am.set(a,(am.get(a)||0)+1);}); const total=hist.length; return [...am.values()].filter(v=>v/total>0.1).length; } },
     { id:'nomad',          cat:'social',     icon:'✈️', get name(){return t('badge_nomad_name');},        get desc(){return t('badge_nomad_desc');},       thresholds:thresholds(5),    compute:(hist) => { const byMonth=new Map(); for(const tr of hist){const ts=parseInt(tr.date?.uts||0);if(!ts)continue;const d=new Date(ts*1000);const mk=`${d.getFullYear()}-${d.getMonth()}`;const ak=(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase();if(!byMonth.has(mk))byMonth.set(mk,new Set());byMonth.get(mk).add(ak);} let months=0; byMonth.forEach(s=>{if(s.size>=10)months++;}); return months; } },
   ];
@@ -3815,7 +3662,7 @@ const BadgeEngine = (() => {
     };
   }
 
-  // FIX: level_titles — gère à la fois array et string csv
+  // level_titles handles both array and CSV string
   function levelFromXP(xp) {
     let LEVEL_TITLES;
     const raw = I18N_DATA?.[window.I18N?.getLang?.() || 'fr']?.level_titles || I18N_DATA?.fr?.level_titles;
@@ -4092,9 +3939,6 @@ async function _captureBadgeAsImage(badgeId, mode) {
   }
 }
 
-/* ============================================================
-   SETTINGS
-   ============================================================ */
 function syncSettingsFields() {
   const uEl  = document.getElementById('settings-username');
   const aEl  = document.getElementById('settings-apikey');
@@ -4127,9 +3971,6 @@ function saveSettings() {
   }
 }
 
-/* ============================================================
-   EXPORT  (CSV / JSON)
-   ============================================================ */
 function exportData(format) {
   const sources = [
     { type:t('csv_artist_type'), items:APP.topArtistsData, name:d => d.name, artist:() => '',              plays:d => d.playcount, url:d => d.url },
@@ -4164,9 +4005,6 @@ function exportData(format) {
   }
 }
 
-/* ============================================================
-   ONE-HIT WONDERS TOOLTIP
-   ============================================================ */
 function toggleOhwTooltip(e) {
   if (e) e.stopPropagation();
   document.getElementById('ohw-tooltip')?.classList.toggle('ohw-tooltip--visible');
@@ -4183,9 +4021,6 @@ document.addEventListener('click', e => {
   if (!tooltip.contains(e.target) && !btn.contains(e.target)) tooltip.classList.remove('ohw-tooltip--visible');
 });
 
-/* ============================================================
-   PWA — Force Update
-   ============================================================ */
 async function forceSwUpdate() {
   const btn = document.getElementById('sw-update-btn') || document.getElementById('btn-force-update');
   if (btn) { btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${t('toast_updating')}`; }
@@ -4201,10 +4036,6 @@ async function forceSwUpdate() {
     showToast(t('toast_update_error'), 'error');
   }
 }
-
-/* ============================================================
-   NEW YEAR WRAPPED NOTIFICATION
-   ============================================================ */
 
 /**
  * Demande la permission de notifications puis active l'alerte Wrapped.
@@ -4260,11 +4091,11 @@ function setupNewYearNotification() {
 
   const now        = new Date();
   const nextYear   = now.getFullYear() + (now.getMonth() >= 0 && now.getDate() >= 1 ? 1 : 0);
-  // Wrapped de l'année écoulée (ex. Wrapped 2025 → notif le 1er jan 2026)
+  // Wrapped for the past year (e.g. Wrapped 2025 → notif on Jan 1 2026)
   const wrappedYear = nextYear - 1;
   const storageKey  = `ls_newyear_notif_${nextYear}`;
 
-  // Déjà envoyé pour ce Nouvel An → ne rien faire
+  // already sent for this New Year — skip
   if (localStorage.getItem(storageKey)) return;
 
   const fireNotif = () => {
@@ -4272,15 +4103,15 @@ function setupNewYearNotification() {
     _sendWrappedNotification(wrappedYear);
   };
 
-  // Date cible : 1er janvier nextYear à 00:01:00
+  // target: January 1st of next year at 00:01
   const target = new Date(nextYear, 0, 1, 0, 1, 0);
   const msUntilNewYear = target - now;
 
   if (msUntilNewYear > 0) {
-    // L'utilisateur est connecté avant minuit → on planifie
+    // user is online before midnight — schedule the notification
     setTimeout(fireNotif, msUntilNewYear);
   } else {
-    // L'utilisateur ouvre l'app après le 1er janvier sans avoir encore reçu la notif
+    // user opens the app after Jan 1 without having received the notif yet
     fireNotif();
   }
 }
@@ -4300,7 +4131,7 @@ function _sendWrappedNotification(wrappedYear) {
       tag: `laststats-wrapped-${wrappedYear}`,
     });
   } else {
-    // Fallback : notification directe si pas de SW actif
+    // fallback: direct notification if no active SW
     new Notification(title, {
       body,
       icon: './icons/icon-192.png',
@@ -4308,9 +4139,6 @@ function _sendWrappedNotification(wrappedYear) {
   }
 }
 
-/* ============================================================
-   CLEAR CACHE
-   ============================================================ */
 function clearCache() {
   Cache.clear();
   _imgCache.clear();
@@ -4319,11 +4147,7 @@ function clearCache() {
   showToast(t('toast_cache_cleared'));
 }
 
-/* ============================================================
-   NAV VISIBILITY
-   ============================================================ */
-
-// All toggleable sections (dashboard + settings always locked visible)
+// toggleable sections (dashboard + settings are always locked)
 const NAV_SECTIONS = [
   { key: 'top-artists', icon: 'fa-microphone-alt', i18nKey: 'nav_top_artists',  locked: false },
   { key: 'top-albums',  icon: 'fa-compact-disc',   i18nKey: 'nav_top_albums',   locked: false },
@@ -4349,7 +4173,7 @@ function saveNavVisibility() {
 function applyNavVisibility() {
   const vis = APP.navVisibility;
 
-  // 1. Show / hide individual items
+  // show / hide individual nav items
   NAV_SECTIONS.forEach(({ key, locked }) => {
     if (locked) return;
     const hidden = vis && vis[key] === false;
@@ -4358,7 +4182,7 @@ function applyNavVisibility() {
     });
   });
 
-  // 2. Switch between distributed layout (bn-fit) and carousel
+  // switch between distributed layout and scrollable carousel
   //    Count visible items: 2 always-locked (dashboard + settings) + visible optional sections
   const visibleOptional = NAV_SECTIONS.filter(({ key, locked }) => {
     if (locked) return true;
@@ -4368,7 +4192,7 @@ function applyNavVisibility() {
 
   const nav = document.querySelector('.bottom-nav');
   if (nav) {
-    // ≤5 items fit comfortably on any phone (≥320px) without scrolling
+    // ≤5 items fit on any phone without scrolling
     nav.classList.toggle('bn-fit', totalVisible <= 5);
   }
 }
@@ -4399,10 +4223,6 @@ function toggleNavVisibility(key, labelEl) {
   showToast(t('toast_settings_saved'));
 }
 
-/* ============================================================
-   HISTORY SECTION
-   ============================================================ */
-
 function _todayStr() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -4425,7 +4245,7 @@ function histInit() {
   APP.histSortOrder   = 'desc'; // desc = recent first, asc = oldest first
   const input = document.getElementById('hist-date-input');
   if (input) input.value = APP.histCurrentDate;
-  // Don't load until the section is opened
+  // don't load until the section is opened
 }
 
 function histToggleSort() {
@@ -4463,7 +4283,7 @@ function histNavDay(delta) {
   const d = _dateStrToObj(APP.histCurrentDate || _todayStr());
   d.setDate(d.getDate() + delta);
   const str = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  // Can't go into the future
+  // can't navigate into the future
   if (str > _todayStr()) return;
   APP.histCurrentDate = str;
   const input = document.getElementById('hist-date-input');
@@ -4479,7 +4299,7 @@ function histSetView(view) {
   document.querySelectorAll('.hist-view').forEach(el =>
     el.classList.toggle('active', el.id === `hist-view-${view}`)
   );
-  // Re-render current data into the newly active view
+  // re-render current data for the newly active tab
   if (APP._histLastData) {
     _renderHistView(view, APP._histLastData);
   }
@@ -4489,21 +4309,21 @@ async function histLoadDay(dateStr) {
   if (!dateStr) return;
   APP.histCurrentDate = dateStr;
 
-  // Update date input & label
+  // update date input and label
   const input = document.getElementById('hist-date-input');
   if (input) input.value = dateStr;
   const summaryDate = document.getElementById('hist-summary-date');
   if (summaryDate) summaryDate.textContent = _formatDayLabel(dateStr);
 
-  // Disable next-day button if today
+  // disable next-day button when on today
   const nextBtn = document.getElementById('hist-next-day');
   if (nextBtn) nextBtn.disabled = (dateStr >= _todayStr());
 
-  // Show loading in all views
+  // show loading state in all tabs
   _histShowLoading();
 
   try {
-    // Check in-memory cache first
+    // check in-memory cache first
     let tracks = APP.histCache[dateStr];
     if (!tracks) {
       const d    = _dateStrToObj(dateStr);
@@ -4575,7 +4395,7 @@ function _renderHistTimeline(tracks) {
     return;
   }
 
-  // Group by hour
+  // group tracks by hour
   const byHour = {};
   (APP.histSortOrder === 'asc' ? [...tracks] : [...tracks].reverse()).forEach(tr => {
     const ts = parseInt(tr.date?.uts || 0);
@@ -4682,7 +4502,7 @@ function _renderHistStats(tracks) {
     return;
   }
 
-  // Top artists
+  // top artists
   const artistMap = {};
   tracks.forEach(tr => {
     const a = tr.artist?.['#text'] || tr.artist?.name || '?';
@@ -4690,7 +4510,7 @@ function _renderHistStats(tracks) {
   });
   const topArtists = Object.entries(artistMap).sort((a,b) => b[1]-a[1]).slice(0, 7);
 
-  // Top tracks
+  // top tracks
   const trackMap = {};
   tracks.forEach(tr => {
     const k = `${tr.name || '?'} — ${tr.artist?.['#text'] || '?'}`;
@@ -4698,7 +4518,7 @@ function _renderHistStats(tracks) {
   });
   const topTracks = Object.entries(trackMap).sort((a,b) => b[1]-a[1]).slice(0, 7);
 
-  // Top albums
+  // top albums
   const albumMap = {};
   tracks.forEach(tr => {
     const al = tr.album?.['#text'];
@@ -4706,7 +4526,7 @@ function _renderHistStats(tracks) {
   });
   const topAlbums = Object.entries(albumMap).sort((a,b) => b[1]-a[1]).slice(0, 5);
 
-  // Hour distribution
+  // hour distribution
   const hourMap = Array(24).fill(0);
   tracks.forEach(tr => {
     const ts = parseInt(tr.date?.uts || 0);
@@ -4714,8 +4534,7 @@ function _renderHistStats(tracks) {
   });
   const maxH = Math.max(...hourMap, 1);
 
-  // ── Render cards ──
-  const listItems = arr => arr.map(([name, count], i) =>
+    const listItems = arr => arr.map(([name, count], i) =>
     `<li class="hist-top-item">
       <span class="hist-top-rank">${i+1}</span>
       <span class="hist-top-name">${escHtml(name)}</span>

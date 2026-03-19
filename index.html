@@ -4,16 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>LastStats — Statistiques Last.fm</title>
-<!-- ═══ Langue par défaut : FR (doit être avant i18n.js et script.js) ═══ -->
+
 <script>if(!localStorage.getItem('ls_lang'))localStorage.setItem('ls_lang','fr');</script>
 
-<!-- ═══ PWA — Material You ═══ -->
 <meta name="application-name" content="LastStats">
 <meta name="description" content="Your Last.fm music stats, reinvented.">
 <meta name="theme-color" content="#141218" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 
-<!-- iOS Standalone -->
+<!-- iOS standalone mode -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="LastStats">
@@ -26,43 +25,29 @@
 <link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
 
-<!-- Favicon -->
+<!-- favicon -->
 <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
 <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
 
-<!-- ═══ FONTS ═══ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-<!-- ═══ ICONS — Font Awesome 6 ═══ -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<!-- ═══ CHART.JS 4 ═══ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
-<!-- ═══ D3.js v7 ═══ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 
-<!-- ═══ COLOR THIEF ═══ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.4.0/color-thief.umd.js"></script>
 
-<!-- ═══ HTML2CANVAS (Wrapped export) ═══ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-<!-- ═══ STYLES ═══ -->
 <link rel="stylesheet" href="style.css">
 
-<!-- ═══ ANALYTICS ═══ -->
 <script defer src="https://cloud.umami.is/script.js" data-website-id="adc52595-b992-434a-8eaf-2a4880979675"></script>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════
-     SETUP SCREEN
-     Shown on first launch / after logout.
-     All user-facing text uses data-i18n attributes
-     so setLanguage() can swap them at runtime.
-═══════════════════════════════════════════ -->
 <div id="setup-screen">
   <div class="setup-bg">
     <div class="orb o1"></div>
@@ -78,7 +63,7 @@
     <div class="setup-card">
       <h2 data-i18n="setup.title">Analyse a profile</h2>
 
-      <!-- Username field -->
+      <!-- username field -->
       <div class="field">
         <label>
           <i class="fas fa-user"></i>
@@ -113,26 +98,26 @@
         </p>
       </div>
 
-      <!-- Remember me -->
+      <!-- remember me -->
       <label class="chk-label">
         <input type="checkbox" id="remember-me" checked>
         <span class="chk-box"></span>
         <span data-i18n="setup.remember">Remember me</span>
       </label>
 
-      <!-- Submit -->
+      <!-- submit -->
       <button class="btn-primary" id="load-btn" onclick="initApp()">
         <i class="fas fa-chart-bar"></i>
         <span data-i18n="setup.launch">Launch analysis</span>
       </button>
 
-      <!-- Error block -->
+      <!-- error block -->
       <div id="setup-err" class="err-block hidden">
         <i class="fas fa-exclamation-triangle"></i>
         <span id="setup-err-txt"></span>
       </div>
 
-      <!-- Help accordion -->
+      <!-- help accordion -->
       <details class="help-acc">
         <summary>
           <i class="fas fa-question-circle"></i>
@@ -153,7 +138,7 @@
         </div>
       </details>
 
-      <!-- PWA install button (shown by beforeinstallprompt) -->
+      <!-- PWA install button -->
       <button class="btn-install hidden" id="btn-install" onclick="installPWA()">
         <i class="fas fa-download"></i>
         <span data-i18n="setup.install">Install LastStats on this device</span>
@@ -162,16 +147,9 @@
   </div>
 </div>
 
-
-<!-- ═══════════════════════════════════════════
-     FETCH OVERLAY — Non-intrusive progress bar
-     · Normal state  : thin bar pinned to the top
-     · Minimized     : floating pill (bottom-right)
-     JS continues to target the same IDs — no regression.
-═══════════════════════════════════════════ -->
 <div id="fetch-overlay" class="hidden" role="status" aria-live="polite" aria-label="Loading">
 
-  <!-- Full bar (normal state) -->
+  <!-- full progress bar -->
   <div class="fetch-bar">
     <div class="fetch-bar-progress">
       <div class="fetch-prog-fill" id="fetch-fill"></div>
@@ -195,7 +173,7 @@
     </button>
   </div>
 
-  <!-- Minimised pill -->
+  <!-- minimised pill -->
   <div class="fetch-pill">
     <div class="fetch-pill-spinner"></div>
     <span class="fetch-pill-text"></span>
@@ -204,24 +182,15 @@
 
 </div>
 
-
-<!-- ═══════════════════════════════════════════
-     MAIN APPLICATION
-     Layout:
-       · Desktop  — sidebar (left) + main-wrap
-       · Mobile   — app header + main-wrap + bottom-nav
-═══════════════════════════════════════════ -->
 <div id="app" class="hidden">
 
-  <!-- Sidebar overlay (mobile tap-to-close) -->
+  <!-- sidebar overlay (mobile) -->
   <div class="sidebar-ov" id="sidebar-ov" onclick="closeSb()"></div>
 
-  <!-- ════════════════════════
-       SIDEBAR (desktop left / mobile drawer)
-  ════════════════════════ -->
+  
   <aside class="sidebar" id="sidebar">
 
-    <!-- Logo + close button -->
+    <!-- logo + close button -->
     <div class="sb-head">
       <div class="sb-logo">
         <i class="fas fa-headphones-alt"></i>
@@ -232,7 +201,7 @@
       </button>
     </div>
 
-    <!-- User profile summary -->
+    <!-- user profile summary -->
     <div class="sb-profile" id="sb-profile">
       <div class="sb-av" id="sb-av"></div>
       <div class="sb-info">
@@ -242,7 +211,7 @@
       </div>
     </div>
 
-    <!-- Primary navigation -->
+    <!-- primary navigation -->
     <nav class="sb-nav" role="navigation" aria-label="Main navigation">
       <a class="nav-lnk active" data-s="dashboard" onclick="nav('dashboard')">
         <i class="fas fa-home"></i>
@@ -285,7 +254,7 @@
       </a>
     </nav>
 
-    <!-- Sidebar footer — logout -->
+    <!-- sidebar footer -->
     <div class="sb-foot">
       <button class="btn-logout" onclick="logout()">
         <i class="fas fa-sign-out-alt"></i>
@@ -294,13 +263,10 @@
     </div>
   </aside>
 
-
-  <!-- ════════════════════════
-       MAIN CONTENT AREA
-  ════════════════════════ -->
+  
   <div class="main-wrap">
 
-    <!-- App header (mobile hamburger + title + actions) -->
+    <!-- app header -->
     <header class="app-hd">
       <button class="burger-btn" onclick="openSb()" aria-label="Open navigation">
         <i class="fas fa-bars"></i>
@@ -316,13 +282,7 @@
 
     <main class="main-content">
 
-      <!-- ══════════════════════════════════════════
-           DASHBOARD
-           Grid of stat cards (expanded set):
-           Row 1 — scrobbles, artists, albums, tracks
-           Row 2 — member since, last scrobble, listen time, avg/day
-           + comparison, insights, now-playing, charts
-      ══════════════════════════════════════════ -->
+      
       <section id="s-dashboard" class="app-sec active" style="view-transition-name:section-dashboard">
         <div class="sec-hd dash-sec-hd">
           <div>
@@ -335,7 +295,7 @@
           </button>
         </div>
 
-        <!-- ─── Quick Stats Grid (8 cards) ─── -->
+        
         <div class="stat-grid" id="stat-grid">
           <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
           <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
@@ -350,7 +310,7 @@
           <div class="stat-card sk"><div class="sk-ln w100"></div><div class="sk-ln w60 mt8"></div><div class="sk-ln w40 mt4"></div></div>
         </div>
 
-        <!-- ─── 3. Now Playing widget ─── -->
+        
         <div id="now-playing-wrap" class="hidden">
           <div class="now-playing-bar" id="now-playing-bar">
             <div class="np-pulse"></div>
@@ -379,7 +339,7 @@
           </div>
         </div>
 
-        <!-- ─── 4. Analyses Visuelles ─── -->
+        
         <div class="dash-visuals-hd">
           <i class="fas fa-chart-area"></i>
           <span data-i18n="dash.visualsTitle">Visual Analysis</span>
@@ -440,7 +400,7 @@
           </div>
         </div>
 
-        <!-- ─── 5. Period comparison ─── -->
+        
         <div class="compare-section">
           <div class="compare-hd">
             <div class="ic-hd">
@@ -530,11 +490,7 @@
 
       </section>
 
-
-      <!-- ══════════════════════════════════════════
-           TOP ARTISTS
-           Unified layout: period selector + 3-mode toggle (grid / list / compact)
-      ══════════════════════════════════════════ -->
+      
       <section id="s-top-artists" class="app-sec" style="view-transition-name:section-top-artists">
         <div class="sec-hd flex-bw">
           <div>
@@ -583,11 +539,7 @@
         </div>
       </section>
 
-
-      <!-- ══════════════════════════════════════════
-           TOP ALBUMS
-           Unified layout: identical structure to Top Artists & Top Tracks
-      ══════════════════════════════════════════ -->
+      
       <section id="s-top-albums" class="app-sec" style="view-transition-name:section-top-albums">
         <div class="sec-hd flex-bw">
           <div>
@@ -634,11 +586,7 @@
         </div>
       </section>
 
-
-      <!-- ══════════════════════════════════════════
-           TOP TRACKS
-           Unified layout: identical structure to Top Artists & Top Albums
-      ══════════════════════════════════════════ -->
+      
       <section id="s-top-tracks" class="app-sec" style="view-transition-name:section-top-tracks">
         <div class="sec-hd flex-bw">
           <div>
@@ -686,10 +634,7 @@
         </div>
       </section>
 
-
-      <!-- ══════════════════════════════════════════
-           CHARTS
-      ══════════════════════════════════════════ -->
+      
       <section id="s-charts" class="app-sec" style="view-transition-name:section-charts">
         <div class="sec-hd">
           <h2 data-i18n="charts.title">Charts</h2>
@@ -881,10 +826,7 @@
         </div>
       </section>
 
-
-      <!-- ══════════════════════════════════════════
-           ACHIEVEMENTS / BADGES
-      ══════════════════════════════════════════ -->
+      
       <section id="s-badges" class="app-sec" style="view-transition-name:section-badges">
         <div class="sec-hd flex-bw">
           <div>
@@ -1014,14 +956,14 @@
             <div class="badge-grid" id="badge-grid-genres"></div>
           </div>
 
-          <!-- ── Tempo ── -->
+          
           <div class="badge-category">
             <h3 class="badge-cat-title"><i class="fas fa-chart-line"></i> <span data-i18n="badge.cat.tempo">Rythme d'écoute</span></h3>
             <p class="badge-cat-desc" data-i18n="badge.cat.tempoDesc">Progression, régularité et come-back de vos écoutes</p>
             <div class="badge-grid" id="badge-grid-tempo"></div>
           </div>
 
-          <!-- ── Social ── -->
+          
           <div class="badge-category">
             <h3 class="badge-cat-title"><i class="fas fa-users"></i> <span data-i18n="badge.cat.social">Affinités</span></h3>
             <p class="badge-cat-desc" data-i18n="badge.cat.socialDesc">Vos liens avec vos artistes favoris</p>
@@ -1031,10 +973,7 @@
         </div>
       </section>
 
-
-      <!-- ══════════════════════════════════════════
-           MAINSTREAM vs GEMS (Obscurity Score)
-      ══════════════════════════════════════════ -->
+      
       <section id="s-obscurity" class="app-sec" style="view-transition-name:section-obscurity">
         <div class="sec-hd flex-bw">
           <div>
@@ -1107,11 +1046,7 @@
         </div>
       </section>
 
-
-
-      <!-- ══════════════════════════════════════════
-           HISTORY
-      ══════════════════════════════════════════ -->
+      
       <section id="s-history" class="app-sec" style="view-transition-name:section-history">
         <div class="sec-hd" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
           <div>
@@ -1126,7 +1061,7 @@
           </button>
         </div>
 
-        <!-- ── Day Navigator ── -->
+        
         <div class="history-nav-bar">
           <button class="hist-day-btn" id="hist-prev-day" onclick="histNavDay(-1)" aria-label="Previous day">
             <i class="fas fa-chevron-left"></i>
@@ -1143,7 +1078,7 @@
           </button>
         </div>
 
-        <!-- ── Day Summary Header ── -->
+        
         <div class="hist-day-summary" id="hist-day-summary">
           <div class="hist-summary-date" id="hist-summary-date">—</div>
           <div class="hist-summary-stats">
@@ -1159,7 +1094,7 @@
           </div>
         </div>
 
-        <!-- ── View Tabs ── -->
+        
         <div class="hist-view-tabs" id="hist-view-tabs">
           <button class="hist-tab active" data-view="timeline" onclick="histSetView('timeline')">
             <i class="fas fa-stream"></i>
@@ -1175,7 +1110,7 @@
           </button>
         </div>
 
-        <!-- ── Content Areas ── -->
+        
         <div id="hist-content" class="hist-content">
 
           <!-- Timeline view -->
@@ -1211,10 +1146,7 @@
         </div>
       </section>
 
-
-      <!-- ══════════════════════════════════════════
-           SETTINGS
-      ══════════════════════════════════════════ -->
+      
       <section id="s-settings" class="app-sec" style="view-transition-name:section-settings">
         <div class="sec-hd">
           <h2>
@@ -1226,7 +1158,7 @@
 
         <div class="settings-grid">
 
-          <!-- ─── Account ─── -->
+          
           <div class="settings-card">
             <div class="settings-card-hd">
               <i class="fas fa-user-circle"></i>
@@ -1272,7 +1204,7 @@
                   <span data-i18n="settings.apikeyHint">Stored locally. Never sent to any third party.</span>
                 </p>
               </div>
-              <!-- Remember me -->
+              <!-- remember me -->
               <div class="setting-row">
                 <label class="chk-label">
                   <input type="checkbox" id="settings-remember" checked>
@@ -1294,7 +1226,7 @@
             </div>
           </div>
 
-          <!-- ─── Appearance ─── -->
+          
           <div class="settings-card">
             <div class="settings-card-hd">
               <i class="fas fa-paint-brush"></i>
@@ -1358,7 +1290,7 @@
             </div>
           </div>
 
-          <!-- ─── Language / i18n ─── -->
+          
           <div class="settings-card">
             <div class="settings-card-hd">
               <i class="fas fa-globe"></i>
@@ -1414,7 +1346,7 @@
             </div>
           </div>
 
-          <!-- ─── Wrapped (external link) ─── -->
+          
           <div class="settings-card">
             <div class="settings-card-hd">
               <i class="fas fa-gift"></i>
@@ -1440,7 +1372,7 @@
             </div>
           </div>
 
-          <!-- ─── Data & Export ─── -->
+          
           <div class="settings-card">
             <div class="settings-card-hd">
               <i class="fas fa-database"></i>
@@ -1526,7 +1458,7 @@
             </div>
           </div>
 
-          <!-- ─── Navigation Visibility ─── -->
+          
           <div class="settings-card">
             <div class="settings-card-hd">
               <i class="fas fa-bars"></i>
@@ -1543,7 +1475,7 @@
             </div>
           </div>
 
-          <!-- ─── About ─── -->
+          
           <div class="settings-card settings-card--about">
             <div class="settings-card-hd">
               <i class="fas fa-info-circle"></i>
@@ -1575,14 +1507,7 @@
     </main>
   </div><!-- /.main-wrap -->
 
-
-  <!-- ════════════════════════
-       BOTTOM NAVIGATION BAR
-       Visible on mobile only (CSS: @media ≤768px).
-       Mirrors the 5 most-used sidebar links.
-       Active state is synced by nav() in script.js
-       via data-s attribute matching.
-  ════════════════════════ -->
+  
   <nav class="bottom-nav" role="navigation" aria-label="Mobile navigation">
     <a class="bn-item active" data-s="dashboard" onclick="nav('dashboard')">
       <i class="fas fa-home"></i>
@@ -1624,19 +1549,11 @@
 
 </div><!-- /#app -->
 
-
-<!-- ═══════════════════════════════════════════
-     TOAST NOTIFICATION
-═══════════════════════════════════════════ -->
 <div id="toast" class="toast" role="status" aria-live="polite">
   <i class="fas fa-check-circle" id="toast-icon"></i>
   <span id="toast-txt"></span>
 </div>
 
-
-<!-- ═══════════════════════════════════════════
-     ARTIST MODAL
-═══════════════════════════════════════════ -->
 <div id="artist-modal" class="artist-modal hidden"
      onclick="closeArtistModal(event)"
      role="dialog" aria-modal="true" aria-labelledby="am-name">
@@ -1731,10 +1648,6 @@
   </div>
 </div>
 
-
-<!-- ═══════════════════════════════════════════
-     BADGE DETAIL MODAL
-═══════════════════════════════════════════ -->
 <div id="badge-modal" class="badge-modal hidden"
      onclick="closeBadgeModal(event)">
   <div class="badge-modal-inner" role="dialog" aria-modal="true" aria-labelledby="bm-title">
@@ -1769,12 +1682,6 @@
     </div>
   </div>
 </div>
-
-
-<!-- ═══════════════════════════════════════════
-     HIDDEN STORY / WRAPPED EXPORT CARDS
-     Off-screen: html2canvas captures these for PNG export.
-═══════════════════════════════════════════ -->
 
 <!-- Story 9:16 (360×640) — Instagram / TikTok -->
 <div id="story-mini-wrap"
@@ -1893,11 +1800,6 @@
   </div>
 </div>
 
-
-<!-- ═══════════════════════════════════════════
-     WRAPPED CARD — off-screen, used by
-     generateStory() / exportWrapped()
-═══════════════════════════════════════════ -->
 <div id="wrapped-card-wrap"
      style="position:fixed;left:-9999px;top:0;z-index:-999;pointer-events:none;"
      aria-hidden="true">
@@ -1959,11 +1861,6 @@
   </div>
 </div>
 
-
-<!-- ═══════════════════════════════════════════
-     SERVICE WORKER + PWA INSTALL PROMPT
-     Inline script — must run before i18n.js / script.js
-═══════════════════════════════════════════ -->
 <script>
   /* ── Service Worker registration ── */
   if ('serviceWorker' in navigator) {
@@ -2040,11 +1937,6 @@
   });
 </script>
 
-<!-- ═══════════════════════════════════════════
-     SCRIPTS
-     i18n.js MUST load before script.js
-     so t() returns translations, not raw keys.
-═══════════════════════════════════════════ -->
 <script src="i18n.js"></script>
 <!-- ═══ Application automatique des traductions data-i18n ═══
      Convertit la notation dot (nav.dashboard) → underscore (nav_dashboard)

@@ -1,24 +1,14 @@
 'use strict';
 
-/* ============================================================
-   LASTSTATS — i18n.js
-   Fichier de traductions centralisé
-   Langues : FR · EN · ES · PT · DE · IT · RU · AR · JA · ZH · KO · TR
-   Détection automatique via navigator.language
-   ============================================================ */
-
 const I18N_DATA = {
 
-  /* ══════════════════════════════════════════════════════
-     FRANÇAIS
-  ══════════════════════════════════════════════════════ */
   fr: {
-    // ── Mois / Jours ──
+    // months & days
     months: ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'],
     months_short: ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'],
     days: ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'],
 
-    // ── Navigation ──
+    // navigation
     nav_dashboard:    'Dashboard',
     nav_top_artists:  'Top Artistes',
     nav_top_albums:   'Top Albums',
@@ -31,7 +21,7 @@ const I18N_DATA = {
     nav_advanced:     'Stats Avancées',
     nav_settings:     'Paramètres',
 
-    // ── Setup ──
+    // setup screen
     setup_title:      'Analyser un profil',
     setup_subtitle:   'Vos statistiques musicales Last.fm, réinventées.',
     setup_username_label: 'Nom d\'utilisateur Last.fm',
@@ -50,7 +40,7 @@ const I18N_DATA = {
     setup_err_invalid:   'Utilisateur introuvable ou clé API invalide.',
     setup_err_generic:   'Erreur : {0}',
 
-    // ── Dashboard ──
+    // dashboard
     stat_total_scrobbles: 'Total scrobbles',
     stat_avg_day:         '~{0} / jour en moyenne',
     stat_artists:         'Artistes écoutés',
@@ -71,7 +61,7 @@ const I18N_DATA = {
     stat_peak_mood_night:     '🌙 Nuit blanche',
     stat_share_section:   'Partager',
 
-    // ── Chargement historique ──
+    // history loading
     fetch_init:           'Connexion à l\'API…',
     fetch_loading:        'Récupération des données…',
     fetch_tracks_count:   '{0} scrobbles chargés',
@@ -87,7 +77,7 @@ const I18N_DATA = {
     fetch_title:          'Chargement de l\'historique…',
     fetch_auto_done:      'Historique actualisé en arrière-plan !',
 
-    // ── Stats avancées ──
+    // advanced stats
     adv_per_day:          'Scrobbles / jour',
     adv_per_week:         '~{0} par semaine',
     adv_eddington:        'Nombre d\'Eddington',
@@ -109,30 +99,30 @@ const I18N_DATA = {
     adv_streak_current:   'Actuel : {0} jour{1}',
     adv_real_avg:         'Calculé sur {0} scrobbles réels',
 
-    // ── Streak ──
+    // streak
     streak_on_record:     '🔥 Vous êtes sur votre record !',
     streak_ongoing:       '🔥 Streak en cours — record : {0} jours',
     streak_calc:          'Record calculé sur {0} scrobbles',
 
-    // ── Heatmap ──
+    // heatmap
     heatmap_calm:         'Calme',
     heatmap_intense:      'Intense',
 
-    // ── Versus ──
+    // comparison
     versus_unavailable:   'Données indisponibles',
     versus_stable:        '→ stable',
     versus_months:        '{0} vs {1}',
 
-    // ── Mood ──
+    // mood tags
     mood_none:            'Aucun genre trouvé',
     mood_error:           'Genres indisponibles',
 
-    // ── OHW ──
+    // one-hit wonders
     ohw_plays:            '{0} écoute{1}',
     ohw_none:             'Aucun one-hit wonder trouvé dans votre historique.',
     ohw_explain:          '💡 Un <strong>One-Hit Wonder</strong> est un artiste que vous n\'avez écouté qu\'une à trois fois en tout. Ces écoutes isolées révèlent vos découvertes musicales passagères.',
 
-    // ── Obscurité ──
+    // obscurity score
     obs_very_popular:     '🎤 Très populaire',
     obs_mainstream:       '🎵 Grand public',
     obs_eclectique:       '🎸 Goûts éclairés',
@@ -146,7 +136,7 @@ const I18N_DATA = {
     obs_recalc:           'Recalculer',
     obs_error:            'Erreur : {0}',
 
-    // ── Biographie ──
+    // biography
     bio_none:             'Aucune biographie disponible.',
     bio_unavailable:      'Biographie indisponible.',
     bio_read_more:        'Lire la suite',
@@ -154,7 +144,7 @@ const I18N_DATA = {
     tracks_none:          'Aucun titre trouvé.',
     tracks_unavailable:   'Indisponible.',
 
-    // ── Story / Export ──
+    // story export
     story_preparing:      'Préparation de la carte…',
     story_downloaded:     'Carte téléchargée !',
     story_error:          'Erreur génération : {0}',
@@ -171,16 +161,16 @@ const I18N_DATA = {
     story_your_year:      'Votre Année en Musique',
     story_artist_no1:     '<i class="fas fa-crown"></i> Artiste n°1',
 
-    // ── Wrapped ──
+    // wrapped
     wrapped_plays:        '{0} écoutes',
     wrapped_generating:   'Génération de l\'image…',
     wrapped_exported:     'Image téléchargée !',
     wrapped_export_error: 'Erreur export : {0}',
 
-    // ── Now Playing ──
+    // now playing
     np_share_text:        '🎵 J\'écoute « {0} » par {1} sur Last.fm',
 
-    // ── Toasts ──
+    // toasts
     toast_data_updated:   'Données actualisées !',
     toast_link_copied:    'Lien copié dans le presse-papiers !',
     toast_img_downloaded: 'Image téléchargée !',
@@ -203,11 +193,11 @@ const I18N_DATA = {
     toast_session_restored:'Session restaurée !',
     toast_history_cached: 'Historique restauré depuis le cache',
 
-    // ── Settings ──
+    // settings
     settings_username_invalid: 'Nom d\'utilisateur invalide.',
     settings_apikey_invalid:   'Clé API invalide (32 caractères requis).',
 
-    // ── Badges — Paliers ──
+    // badge tiers
     tier_bronze:  'Bronze',
     tier_argent:  'Argent',
     tier_or:      'Or',
@@ -220,7 +210,7 @@ const I18N_DATA = {
     badge_recalc: '<i class="fas fa-sync-alt"></i> Recalculer',
     badge_calc:   '<i class="fas fa-spinner fa-spin"></i> Calcul…',
 
-    // ── Badges — Noms & descriptions ──
+    // badge names & descriptions
     badge_night_owl_name:   'Oiseau de Nuit',
     badge_night_owl_desc:   'Nombre d\'écoutes entre 00h et 05h du matin',
     badge_early_bird_name:  'Lève-Tôt',
@@ -256,10 +246,10 @@ const I18N_DATA = {
     badge_multilingual_name: 'Globe-Trotter Musical',
     badge_multilingual_desc: 'Nombre d\'artistes avec des caractères non-latins dans le nom',
 
-    // ── Niveaux badges ──
+    // badge levels
     level_titles: ['Audiophile débutant','Mélomane','Scrobbleur','Curateur musical','Expert','Virtuose','Légende','Demi-dieu de la musique'],
 
-    // ── Temps relatif ──
+    // relative time
     time_few_min:   'il y a quelques minutes',
     time_hours:     'il y a {0}h',
     time_yesterday: 'hier',
@@ -267,17 +257,17 @@ const I18N_DATA = {
     time_months:    'il y a {0} mois',
     time_years:     'il y a {0} ans',
 
-    // ── Artiste n°1 ──
+    // top artist
     artist_plays:   'écoutes',
     track_plays_label: 'écoutes',
 
-    // ── Charts ──
+    // charts
     chart_scrobbles_tooltip: ' {0} scrobbles',
     chart_cumul_label:       'Scrobbles cumulés',
     chart_cumul_tooltip:     ' {0} scrobbles au total',
     chart_monthly_label:     'Scrobbles {0}',
 
-    // ── Génériques ──
+    // generic
     loading:            'Chargement…',
     error:              'Erreur',
     unavailable:        'Indisponible',
@@ -286,7 +276,7 @@ const I18N_DATA = {
     artists:            'artistes',
     now_playing_label:  '● EN COURS',
 
-    // ── CSV Export headers ──
+    // CSV export headers
     csv_type:   'Type',
     csv_name:   'Nom',
     csv_artist: 'Artiste',
@@ -296,9 +286,9 @@ const I18N_DATA = {
     csv_album_type:  'Album',
     csv_track_type:  'Titre',
 
-    // ── Auto-login ──
+    // auto-login
     auto_login_failed: 'Connexion automatique échouée. Veuillez vous connecter manuellement.',
-    // ── Clés HTML (dot-notation) — ajoutées automatiquement ──
+    // HTML keys (dot-notation)
     setup_tagline: 'Vos statistiques musicales Last.fm, réinventées.',
     setup_username: 'Nom d\'utilisateur Last.fm',
     setup_apikey: 'Clé API Last.fm',
@@ -490,7 +480,7 @@ const I18N_DATA = {
     settings_aboutDesc: 'Un projet Open Source développé avec passion par un développeur passioné. C’est une version Beta créée pour apprendre et s’améliorer, tout en vous offrant une nouvelle manière de découvrir vos statistiques Last.fm en toute simplicité.',
     loading_generic: 'Chargement…',
     loading_more: 'Chargement…',
-    /* ── History & Nav Visibility (added) ── */
+    // history & nav visibility
     nav_history: 'Historique',
     history_title: 'Historique',
     history_sub: 'Parcourez vos scrobbles jour par jour',
@@ -504,9 +494,6 @@ const I18N_DATA = {
     settings_navVisibilityHint: "Choisissez quelles sections apparaissent dans la barre de navigation. Dashboard et Paramètres sont toujours visibles.",
   },
 
-  /* ══════════════════════════════════════════════════════
-     ENGLISH
-  ══════════════════════════════════════════════════════ */
   en: {
     months: ['January','February','March','April','May','June','July','August','September','October','November','December'],
     months_short: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
@@ -631,7 +618,7 @@ const I18N_DATA = {
     csv_type: 'Type', csv_name: 'Name', csv_artist: 'Artist', csv_plays: 'Plays', csv_url: 'URL',
     csv_artist_type: 'Artist', csv_album_type: 'Album', csv_track_type: 'Track',
     auto_login_failed: 'Auto-login failed. Please connect manually.',
-    // ── Clés HTML (dot-notation) — ajoutées automatiquement ──
+    // HTML keys (dot-notation)
     setup_tagline: 'Your Last.fm music stats, reinvented.',
     setup_username: 'Last.fm username',
     setup_apikey: 'Last.fm API key',
@@ -823,7 +810,7 @@ const I18N_DATA = {
     settings_aboutDesc: 'An open-source project developed with passion by a beginner developer. This is a beta version created to learn and improve, while offering you a new and simple way to explore your Last.fm statistics.',
     loading_generic: 'Loading…',
     loading_more: 'Loading…',
-    /* ── History & Nav Visibility (added) ── */
+    // history & nav visibility
     nav_history: 'History',
     history_title: 'History',
     history_sub: 'Browse your scrobbles day by day',
@@ -837,9 +824,6 @@ const I18N_DATA = {
     settings_navVisibilityHint: 'Choose which sections appear in the navigation bar. Dashboard and Settings are always visible.',
   },
 
-  /* ══════════════════════════════════════════════════════
-     ESPAÑOL
-  ══════════════════════════════════════════════════════ */
   es: {
     months: ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
     months_short: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
@@ -1157,9 +1141,6 @@ const I18N_DATA = {
     badge_restored: 'Logros restaurados desde la caché (hace {0} día(s))',
   },
 
-  /* ══════════════════════════════════════════════════════
-     PORTUGUÊS
-  ══════════════════════════════════════════════════════ */
   pt: {
     months: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
     months_short: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
@@ -1477,9 +1458,6 @@ const I18N_DATA = {
     badge_restored: 'Conquistas restauradas da cache (há {0} dia(s))',
   },
 
-  /* ══════════════════════════════════════════════════════
-     DEUTSCH
-  ══════════════════════════════════════════════════════ */
   de: {
     months: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
     months_short: ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'],
@@ -1797,9 +1775,6 @@ const I18N_DATA = {
     badge_restored: 'Erfolge aus dem Cache wiederhergestellt (vor {0} Tag(en))',
   },
 
-  /* ══════════════════════════════════════════════════════
-     ITALIANO
-  ══════════════════════════════════════════════════════ */
   it: {
     months: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'],
     months_short: ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'],
@@ -2117,9 +2092,6 @@ const I18N_DATA = {
     badge_restored: 'Risultati ripristinati dalla cache ({0} giorno/i fa)',
   },
 
-  /* ══════════════════════════════════════════════════════
-     РУССКИЙ
-  ══════════════════════════════════════════════════════ */
   ru: {
     months: ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
     months_short: ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'],
@@ -2437,9 +2409,6 @@ const I18N_DATA = {
     badge_restored: 'Достижения восстановлены из кеша ({0} дн. назад)',
   },
 
-  /* ══════════════════════════════════════════════════════
-     日本語 (JAPANESE)
-  ══════════════════════════════════════════════════════ */
   ja: {
     months: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
     months_short: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
@@ -2756,9 +2725,6 @@ const I18N_DATA = {
     badge_restored: '実績をキャッシュから復元しました（{0}日前）',
   },
 
-  /* ══════════════════════════════════════════════════════
-     中文 (CHINESE SIMPLIFIED)
-  ══════════════════════════════════════════════════════ */
   zh: {
     months: ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'],
     months_short: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
@@ -3075,9 +3041,6 @@ const I18N_DATA = {
     badge_restored: '成就已从缓存恢复（{0}天前）',
   },
 
-  /* ══════════════════════════════════════════════════════
-     한국어 (KOREAN)
-  ══════════════════════════════════════════════════════ */
   ko: {
     months: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
     months_short: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
@@ -3394,9 +3357,6 @@ const I18N_DATA = {
     badge_restored: '캐시에서 업적 복원됨 ({0}일 전)',
   },
 
-  /* ══════════════════════════════════════════════════════
-     TÜRKÇE
-  ══════════════════════════════════════════════════════ */
   tr: {
     months: ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'],
     months_short: ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'],
@@ -3713,9 +3673,6 @@ const I18N_DATA = {
     badge_restored: 'Başarılar önbellekten geri yüklendi ({0} gün önce)',
   },
 
-  /* ══════════════════════════════════════════════════════
-     العربية (ARABIC)
-  ══════════════════════════════════════════════════════ */
   ar: {
     months: ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'],
     months_short: ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'],
@@ -4046,11 +4003,11 @@ function _detectLang() {
 
   const nav = (navigator.language || navigator.userLanguage || 'fr').toLowerCase();
 
-  // Correspondance exacte code-2
+  // exact language code match
   const code2 = nav.split('-')[0];
   if (I18N_DATA[code2]) return code2;
 
-  // Correspondances spéciales
+  // special cases
   if (nav.startsWith('zh')) return 'zh';
   if (nav.startsWith('pt')) return 'pt';
   if (nav.startsWith('ar')) return 'ar';
@@ -4076,27 +4033,27 @@ const I18N = (() => {
     return str.replace(/\{(\d+)\}/g, (_, i) => args[i] ?? '');
   }
 
-  /** Retourne un tableau traduit (months, days, etc.) */
+  /** Returns a translated array (months, days, etc.) */
   function arr(key) {
     return I18N_DATA[_lang]?.[key] ?? I18N_DATA.fr[key] ?? [];
   }
 
-  /** Change la langue active */
+  /** Switch the active language */
   function setLang(lang) {
     if (!I18N_DATA[lang]) return;
     _lang = lang;
     localStorage.setItem('ls_lang', lang);
   }
 
-  /** Langue courante */
+  /** Current language code */
   function getLang() { return _lang; }
 
-  /** Toutes les langues disponibles */
+  /** All available language codes */
   function getAvailable() { return Object.keys(I18N_DATA); }
 
   return { t, arr, setLang, getLang, getAvailable };
 })();
 
-/* Exposer globalement */
+// expose globally
 window.I18N = I18N;
 window.t    = I18N.t.bind(I18N);

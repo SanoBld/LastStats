@@ -1,10 +1,4 @@
-/* ============================================================
-   LastStats — Service Worker v8
-   Design System : Material You (M3)
-   Stratégies : 
-     - API & App : Network-First (Priorité données fraîches)
-     - Images & Libs : Cache-First (Performance & Data)
-   ============================================================ */
+'use strict';
 
 const CACHE_NAME = 'laststats-v8';
 const ASSETS_TO_CACHE = [
@@ -13,10 +7,10 @@ const ASSETS_TO_CACHE = [
   './style.css',
   './script.js',
   './manifest.json',
-  'https://cdn.jsdelivr.net/npm/chart.js' // On met en cache la lib des graphiques
+  'https://cdn.jsdelivr.net/npm/chart.js'
 ];
 
-// 1. INSTALLATION : Mise en cache initiale
+// Pre-cache critical assets on first install
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -26,7 +20,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// 2. ACTIVATION : Nettoyage des anciens caches
+// Clean up old cache versions on activate
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -38,7 +32,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 3. MESSAGES : Gestion des commandes forcées
+// Handle force-update and notification commands from the app
 self.addEventListener('message', (event) => {
   if (event.data === 'SKIP_WAITING') {
     self.skipWaiting();
@@ -49,7 +43,6 @@ self.addEventListener('message', (event) => {
     });
   }
 
-  // Commande d'affichage de notification Wrapped
   if (event.data?.type === 'SHOW_NOTIFICATION') {
     const { title, body, tag } = event.data;
     self.registration.showNotification(title, {
@@ -64,14 +57,13 @@ self.addEventListener('message', (event) => {
   }
 });
 
-// 3b. NOTIFICATION CLICK : Ouvre / focalise l'app sur la section Wrapped
+// Focus (or open) the Wrapped section when a notification is clicked
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const target = event.notification.data?.url || 'https://sanobld.github.io/LastStats/#s-wrapped';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
-      // Cherche un onglet déjà ouvert sur l'app
       for (const client of windowClients) {
         if (client.url.startsWith('https://sanobld.github.io/LastStats') && 'focus' in client) {
           client.focus();
@@ -79,18 +71,15 @@ self.addEventListener('notificationclick', (event) => {
           return;
         }
       }
-      // Aucun onglet ouvert → en ouvre un nouveau
       if (clients.openWindow) return clients.openWindow(target);
     })
   );
 });
 
-// 4. STRATÉGIES DE REQUÊTES (FETCH)
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // --- A. API LAST.FM (Données Live) ---
-  // Stratégie : Network Only (On ne cache jamais les stats qui changent tout le temps)
+  // Last.fm API — never cache, always fresh
   if (url.hostname === 'ws.audioscrobbler.com') {
     event.respondWith(
       fetch(event.request).catch(() => {
@@ -102,8 +91,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // --- B. IMAGES & COVERS (Pochettes d'albums) ---
-  // Stratégie : Cache-First (Une pochette d'album ne change jamais, on économise la data)
+  // Images / album art — cache-first, these never change
   if (event.request.destination === 'image' || url.hostname.includes('lastfm.freetls.fastly.net')) {
     event.respondWith(
       caches.match(event.request).then((cached) => {
@@ -119,18 +107,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // --- C. RESSOURCES LOCALES (HTML, CSS, JS) ---
-  // Stratégie : Network-First avec Fallback Cache
-  // On veut la version la plus récente du code, mais on affiche le cache si pas de réseau.
+  // App shell — network-first, fall back to cache when offline
   event.respondWith(
     fetch(event.request)
       .then((response) => {
         if (!response || response.status !== 200) return response;
-        
-        // Mise à jour du cache en arrière-plan
         const copy = response.clone();
         caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
-        
         return response;
       })
       .catch(() => caches.match(event.request))
