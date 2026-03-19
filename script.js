@@ -4139,6 +4139,8 @@ function saveNavVisibility() {
 
 function applyNavVisibility() {
   const vis = APP.navVisibility;
+
+  // 1. Show / hide individual items
   NAV_SECTIONS.forEach(({ key, locked }) => {
     if (locked) return;
     const hidden = vis && vis[key] === false;
@@ -4146,6 +4148,20 @@ function applyNavVisibility() {
       el.classList.toggle('nav-hidden', hidden);
     });
   });
+
+  // 2. Switch between distributed layout (bn-fit) and carousel
+  //    Count visible items: 2 always-locked (dashboard + settings) + visible optional sections
+  const visibleOptional = NAV_SECTIONS.filter(({ key, locked }) => {
+    if (locked) return true;
+    return !(vis && vis[key] === false);
+  }).length;
+  const totalVisible = 2 + visibleOptional; // +2 for dashboard & settings
+
+  const nav = document.querySelector('.bottom-nav');
+  if (nav) {
+    // ≤5 items fit comfortably on any phone (≥320px) without scrolling
+    nav.classList.toggle('bn-fit', totalVisible <= 5);
+  }
 }
 
 function renderNavVisibilitySettings() {

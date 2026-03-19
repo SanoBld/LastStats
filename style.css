@@ -870,7 +870,7 @@ canvas { max-width: 100%; }
 
 /* --- Main Content Wrapper --- */
 .main-wrap { flex: 1; margin-left: var(--sb-width); display: flex; flex-direction: column; min-width: 0; }
-.main-content { flex: 1; padding: 24px; isolation: isolate; }
+.main-content { flex: 1; padding: 24px; /* no isolation — bottom-nav z:1000 must stay above */ }
 
 /* ─────────────────────────────────────────────
    BOTTOM NAV — mobile navigation (≤1024px)
@@ -883,17 +883,19 @@ canvas { max-width: 100%; }
   height: var(--bn-height);
   background: var(--bg-sidebar);
   border-top: 1px solid var(--border);
-  z-index: 300;
+  /* Above sidebar (200), all content & view-transitions — below modals (9000) */
+  z-index: 1000;
   padding-bottom: env(safe-area-inset-bottom, 0px);
   box-shadow: 0 -2px 12px rgba(0,0,0,.20);
   view-transition-name: ls-bottom-nav;
-  isolation: isolate;
+  /* NO isolation:isolate — that traps z-index and lets animations paint over the nav */
   overflow-x: auto;
   overflow-y: hidden;
-  /* hide scrollbar but keep scroll behaviour */
-  scrollbar-width: none;
+  scrollbar-width: none; /* hide scrollbar but keep scroll */
 }
 .bottom-nav::-webkit-scrollbar { display: none; }
+
+/* ── Default: carousel (many items) ── */
 .bottom-nav-inner {
   display: flex; align-items: stretch; height: 100%;
 }
@@ -907,6 +909,18 @@ canvas { max-width: 100%; }
   position: relative;
   border: none; background: none; font-family: inherit;
   letter-spacing: .01em;
+}
+
+/* ── .bn-fit: few items → distribute evenly, no scroll ── */
+.bottom-nav.bn-fit {
+  overflow-x: visible;
+}
+.bottom-nav.bn-fit .bottom-nav-inner {
+  width: 100%;
+}
+.bottom-nav.bn-fit .bn-item {
+  flex: 1;
+  min-width: 0;
 }
 .bn-item i {
   font-size: 1.1rem;
