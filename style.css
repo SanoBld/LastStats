@@ -3790,3 +3790,15 @@ button.bn-item:focus-visible,
   .hist-list-header .hist-list-album,
   .hist-list-row   .hist-list-album { display: none; }
 }
+
+/* Custom Text Selection */
+::selection {
+  background-color: var(--accent);
+  color: var(--accent-on);
+}
+
+/* Pour Firefox */
+::-moz-selection {
+  background-color: var(--accent);
+  color: var(--accent-on);
+}
