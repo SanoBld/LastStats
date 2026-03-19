@@ -456,18 +456,18 @@ function toggleApiKey() {
 }
 
 const _ACCENT_DARK  = {
-  purple:{ accent:'#d0bcff', container:'#4f378b', on:'#381e72', onCont:'#eaddff', glow:'rgba(208,188,255,.18)', lt:'rgba(208,188,255,.12)' },
-  blue:  { accent:'#9ecaff', container:'#004a77', on:'#001d36', onCont:'#cde5ff', glow:'rgba(158,202,255,.18)', lt:'rgba(158,202,255,.12)' },
-  green: { accent:'#78dc77', container:'#1e5c1c', on:'#002105', onCont:'#94f990', glow:'rgba(120,220,119,.18)', lt:'rgba(120,220,119,.12)' },
-  red:   { accent:'#ffb4ab', container:'#93000a', on:'#690005', onCont:'#ffdad6', glow:'rgba(255,180,171,.18)', lt:'rgba(255,180,171,.12)' },
-  orange:{ accent:'#ffb77c', container:'#6d3400', on:'#3d1d00', onCont:'#ffdcc0', glow:'rgba(255,183,124,.18)', lt:'rgba(255,183,124,.12)' },
+  purple:{ accent:'#d0bcff', h:'#b89af7', a2:'#ccc2dc', container:'#4f378b', on:'#381e72', onCont:'#eaddff', glow:'rgba(208,188,255,.18)', lt:'rgba(208,188,255,.12)', strip:'rgba(208,188,255,.55)', borderGlow:'rgba(208,188,255,.35)' },
+  blue:  { accent:'#9ecaff', h:'#7bafef', a2:'#aab9cc', container:'#004a77', on:'#001d36', onCont:'#cde5ff', glow:'rgba(158,202,255,.18)', lt:'rgba(158,202,255,.12)', strip:'rgba(158,202,255,.55)', borderGlow:'rgba(158,202,255,.35)' },
+  green: { accent:'#78dc77', h:'#56bf55', a2:'#88bb88', container:'#1e5c1c', on:'#002105', onCont:'#94f990', glow:'rgba(120,220,119,.18)', lt:'rgba(120,220,119,.12)', strip:'rgba(120,220,119,.55)', borderGlow:'rgba(120,220,119,.35)' },
+  red:   { accent:'#ffb4ab', h:'#e08077', a2:'#c9b3b0', container:'#93000a', on:'#690005', onCont:'#ffdad6', glow:'rgba(255,180,171,.18)', lt:'rgba(255,180,171,.12)', strip:'rgba(255,180,171,.55)', borderGlow:'rgba(255,180,171,.35)' },
+  orange:{ accent:'#ffb77c', h:'#e09050', a2:'#c9aa90', container:'#6d3400', on:'#3d1d00', onCont:'#ffdcc0', glow:'rgba(255,183,124,.18)', lt:'rgba(255,183,124,.12)', strip:'rgba(255,183,124,.55)', borderGlow:'rgba(255,183,124,.35)' },
 };
 const _ACCENT_LIGHT = {
-  purple:{ accent:'#6750a4', container:'#eaddff', on:'#ffffff', onCont:'#21005d', glow:'rgba(103,80,164,.3)',   lt:'rgba(103,80,164,.1)'   },
-  blue:  { accent:'#0061a4', container:'#cde5ff', on:'#ffffff', onCont:'#001d36', glow:'rgba(0,97,164,.3)',     lt:'rgba(0,97,164,.1)'     },
-  green: { accent:'#006e1c', container:'#94f990', on:'#ffffff', onCont:'#002105', glow:'rgba(0,110,28,.3)',     lt:'rgba(0,110,28,.1)'     },
-  red:   { accent:'#ba1a1a', container:'#ffdad6', on:'#ffffff', onCont:'#410002', glow:'rgba(186,26,26,.3)',    lt:'rgba(186,26,26,.1)'    },
-  orange:{ accent:'#9c4e00', container:'#ffdcc0', on:'#ffffff', onCont:'#3d1d00', glow:'rgba(156,78,0,.3)',     lt:'rgba(156,78,0,.1)'     },
+  purple:{ accent:'#6750a4', h:'#4f378b', a2:'#625b71', container:'#eaddff', on:'#ffffff', onCont:'#21005d', glow:'rgba(103,80,164,.3)',  lt:'rgba(103,80,164,.1)',  strip:'rgba(103,80,164,.50)', borderGlow:'rgba(103,80,164,.30)' },
+  blue:  { accent:'#0061a4', h:'#004a77', a2:'#3a6f8f', container:'#cde5ff', on:'#ffffff', onCont:'#001d36', glow:'rgba(0,97,164,.3)',    lt:'rgba(0,97,164,.1)',    strip:'rgba(0,97,164,.50)',   borderGlow:'rgba(0,97,164,.30)'   },
+  green: { accent:'#006e1c', h:'#004c13', a2:'#396b3e', container:'#94f990', on:'#ffffff', onCont:'#002105', glow:'rgba(0,110,28,.3)',    lt:'rgba(0,110,28,.1)',    strip:'rgba(0,110,28,.50)',   borderGlow:'rgba(0,110,28,.30)'   },
+  red:   { accent:'#ba1a1a', h:'#930014', a2:'#8c3a3a', container:'#ffdad6', on:'#ffffff', onCont:'#410002', glow:'rgba(186,26,26,.3)',   lt:'rgba(186,26,26,.1)',   strip:'rgba(186,26,26,.50)',  borderGlow:'rgba(186,26,26,.30)'  },
+  orange:{ accent:'#9c4e00', h:'#6d3400', a2:'#7a5030', container:'#ffdcc0', on:'#ffffff', onCont:'#3d1d00', glow:'rgba(156,78,0,.3)',    lt:'rgba(156,78,0,.1)',    strip:'rgba(156,78,0,.50)',   borderGlow:'rgba(156,78,0,.30)'   },
 };
 
 function setAccent(colorKey) {
@@ -481,20 +481,35 @@ function setAccent(colorKey) {
     return;
   }
 
+  if (colorKey === 'custom') {
+    const hex = localStorage.getItem('ls_accent_custom') || '#d0bcff';
+    _syncCustomDotColor(hex);
+    const inp = document.getElementById('acc-custom-input');
+    if (inp) inp.value = hex;
+    const isDark = APP.currentTheme === 'dark' || (APP.currentTheme === 'auto' && window.matchMedia('(prefers-color-scheme:dark)').matches);
+    _applyCSSAccent(_hexToPalette(hex, isDark));
+    updateAllChartThemes();
+    return;
+  }
+
   const isDark = APP.currentTheme === 'dark' || (APP.currentTheme === 'auto' && window.matchMedia('(prefers-color-scheme:dark)').matches);
   const pal    = (isDark ? _ACCENT_DARK : _ACCENT_LIGHT)[colorKey] || _ACCENT_DARK.purple;
   _applyCSSAccent(pal);
   updateAllChartThemes();
 }
 
-function _applyCSSAccent({ accent, container, on, onCont, glow, lt }) {
+function _applyCSSAccent({ accent, h, a2, container, on, onCont, glow, lt, strip, borderGlow }) {
   const r = document.documentElement.style;
   r.setProperty('--accent',           accent);
+  r.setProperty('--accent-h',         h         || accent);
+  r.setProperty('--accent-2',         a2        || accent);
   r.setProperty('--accent-container', container);
   r.setProperty('--accent-on',        on);
   r.setProperty('--accent-on-cont',   onCont);
   r.setProperty('--accent-glow',      glow);
   r.setProperty('--accent-lt',        lt);
+  r.setProperty('--accent-strip',     strip     || glow);
+  r.setProperty('--border-glow',      borderGlow || glow);
 }
 
 const _colorThief = typeof ColorThief !== 'undefined' ? new ColorThief() : null;
@@ -511,12 +526,16 @@ function _applyColorThiefFromEl(imgEl) {
     const [r, g, b] = _colorThief.getColor(imgEl);
     const h = _rgbToHsl(r, g, b)[0];
     _applyCSSAccent({
-      accent:    `hsl(${h},65%,75%)`,
-      container: `hsl(${h},45%,28%)`,
-      on:        `hsl(${h},45%,14%)`,
-      onCont:    `hsl(${h},65%,90%)`,
-      glow:      `hsla(${h},65%,75%,.18)`,
-      lt:        `hsla(${h},65%,75%,.12)`,
+      accent:     `hsl(${h},65%,75%)`,
+      h:          `hsl(${h},60%,65%)`,
+      a2:         `hsl(${h},30%,72%)`,
+      container:  `hsl(${h},45%,28%)`,
+      on:         `hsl(${h},45%,14%)`,
+      onCont:     `hsl(${h},65%,90%)`,
+      glow:       `hsla(${h},65%,75%,.18)`,
+      lt:         `hsla(${h},65%,75%,.12)`,
+      strip:      `hsla(${h},65%,75%,.55)`,
+      borderGlow: `hsla(${h},65%,75%,.35)`,
     });
   } catch {}
 }
@@ -535,6 +554,57 @@ function _rgbToHsl(r, g, b) {
     }
   }
   return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+}
+
+function _hexToPalette(hex, isDark) {
+  const rv = parseInt(hex.slice(1,3),16);
+  const gv = parseInt(hex.slice(3,5),16);
+  const bv = parseInt(hex.slice(5,7),16);
+  const [h] = _rgbToHsl(rv, gv, bv);
+  if (isDark) {
+    return {
+      accent:     `hsl(${h},65%,75%)`,
+      h:          `hsl(${h},60%,65%)`,
+      a2:         `hsl(${h},30%,72%)`,
+      container:  `hsl(${h},45%,28%)`,
+      on:         `hsl(${h},45%,14%)`,
+      onCont:     `hsl(${h},65%,90%)`,
+      glow:       `hsla(${h},65%,75%,.18)`,
+      lt:         `hsla(${h},65%,75%,.12)`,
+      strip:      `hsla(${h},65%,75%,.55)`,
+      borderGlow: `hsla(${h},65%,75%,.35)`,
+    };
+  } else {
+    return {
+      accent:     `hsl(${h},50%,40%)`,
+      h:          `hsl(${h},55%,30%)`,
+      a2:         `hsl(${h},25%,45%)`,
+      container:  `hsl(${h},60%,88%)`,
+      on:         `#ffffff`,
+      onCont:     `hsl(${h},60%,12%)`,
+      glow:       `hsla(${h},50%,40%,.30)`,
+      lt:         `hsla(${h},50%,40%,.10)`,
+      strip:      `hsla(${h},50%,40%,.50)`,
+      borderGlow: `hsla(${h},50%,40%,.30)`,
+    };
+  }
+}
+
+function _syncCustomDotColor(hex) {
+  const dot = document.getElementById('acc-custom-wrap');
+  if (dot) dot.style.setProperty('--custom-dot-bg', hex);
+}
+
+function setCustomAccent(hex) {
+  if (!hex) return;
+  localStorage.setItem('ls_accent_custom', hex);
+  APP.currentAccent = 'custom';
+  localStorage.setItem('ls_accent', 'custom');
+  document.querySelectorAll('.acc-dot').forEach(b => b.classList.toggle('active', b.dataset.color === 'custom'));
+  _syncCustomDotColor(hex);
+  const isDark = APP.currentTheme === 'dark' || (APP.currentTheme === 'auto' && window.matchMedia('(prefers-color-scheme:dark)').matches);
+  _applyCSSAccent(_hexToPalette(hex, isDark));
+  updateAllChartThemes();
 }
 
 /* ============================================================
@@ -674,6 +744,12 @@ async function initApp(usernameOverride, apiKeyOverride) {
 
     const savedAccent = localStorage.getItem('ls_accent') || 'purple';
     APP.currentAccent = savedAccent;
+    if (savedAccent === 'custom') {
+      const customHex = localStorage.getItem('ls_accent_custom') || '#d0bcff';
+      _syncCustomDotColor(customHex);
+      const inp = document.getElementById('acc-custom-input');
+      if (inp) inp.value = customHex;
+    }
     if (savedAccent !== 'dynamic') setAccent(savedAccent);
 
     setArtistsLayout(APP.artistsLayout);

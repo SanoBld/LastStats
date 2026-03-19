@@ -2567,6 +2567,17 @@ canvas#w-mini { height: 60px !important; }
   animation: m3-spring-pop var(--dur-medium1) var(--ease-spring) both;
 }
 .acc-dot--dynamic { background: conic-gradient(#6750a4,#0061a4,#006e1c,#9c4e00,#ba1a1a,#6750a4) !important; display: flex; align-items: center; justify-content: center; }
+.acc-dot--custom  {
+  background: var(--custom-dot-bg, #888) !important;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; cursor: pointer;
+}
+.acc-dot--custom input[type=color] {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  opacity: 0; cursor: pointer;
+  border: none; padding: 0;
+}
 
 /* Export row */
 .export-row  { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }

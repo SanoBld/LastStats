@@ -1337,6 +1337,12 @@
                           onclick="setAccent('dynamic')" title="Dynamic (current album art)">
                     <i class="fas fa-magic" style="font-size:8px;color:#fff"></i>
                   </button>
+                  <label class="acc-dot acc-dot--custom" data-color="custom" id="acc-custom-wrap"
+                         title="Custom color" onclick="setAccent('custom')">
+                    <input type="color" id="acc-custom-input" value="#d0bcff"
+                           oninput="setCustomAccent(this.value)">
+                    <i class="fas fa-eyedropper" style="font-size:8px;color:#fff;pointer-events:none;position:relative;z-index:1"></i>
+                  </label>
                 </div>
               </div>
             </div>
