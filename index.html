@@ -273,6 +273,10 @@
         <i class="fas fa-gem"></i>
         <span data-i18n="nav.obscurity">Mainstream vs Gems</span>
       </a>
+      <a class="nav-lnk" data-s="history" onclick="nav('history')">
+        <i class="fas fa-history"></i>
+        <span data-i18n="nav.history">History</span>
+      </a>
 
       <div class="nav-sep"></div>
       <a class="nav-lnk" data-s="settings" onclick="nav('settings')">
@@ -1106,6 +1110,103 @@
 
 
       <!-- ══════════════════════════════════════════
+           HISTORY
+      ══════════════════════════════════════════ -->
+      <section id="s-history" class="app-sec" style="view-transition-name:section-history">
+        <div class="sec-hd">
+          <div>
+            <h2><i class="fas fa-history"></i> <span data-i18n="history.title">History</span></h2>
+            <p class="sec-sub" data-i18n="history.sub">Browse your scrobbles day by day</p>
+          </div>
+        </div>
+
+        <!-- ── Day Navigator ── -->
+        <div class="history-nav-bar">
+          <button class="hist-day-btn" id="hist-prev-day" onclick="histNavDay(-1)" aria-label="Previous day">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <div class="hist-date-wrap">
+            <input type="date" id="hist-date-input" class="hist-date-input" onchange="histGoToDate(this.value)">
+            <button class="hist-today-btn" onclick="histGoToday()">
+              <i class="fas fa-calendar-day"></i>
+              <span data-i18n="history.today">Today</span>
+            </button>
+          </div>
+          <button class="hist-day-btn" id="hist-next-day" onclick="histNavDay(1)" aria-label="Next day">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <!-- ── Day Summary Header ── -->
+        <div class="hist-day-summary" id="hist-day-summary">
+          <div class="hist-summary-date" id="hist-summary-date">—</div>
+          <div class="hist-summary-stats">
+            <span class="hist-stat-pill" id="hist-stat-count">
+              <i class="fas fa-headphones"></i> — scrobbles
+            </span>
+            <span class="hist-stat-pill" id="hist-stat-artists">
+              <i class="fas fa-microphone-alt"></i> — artists
+            </span>
+            <span class="hist-stat-pill" id="hist-stat-albums">
+              <i class="fas fa-compact-disc"></i> — albums
+            </span>
+          </div>
+        </div>
+
+        <!-- ── View Tabs ── -->
+        <div class="hist-view-tabs" id="hist-view-tabs">
+          <button class="hist-tab active" data-view="timeline" onclick="histSetView('timeline')">
+            <i class="fas fa-stream"></i>
+            <span data-i18n="history.viewTimeline">Timeline</span>
+          </button>
+          <button class="hist-tab" data-view="list" onclick="histSetView('list')">
+            <i class="fas fa-list"></i>
+            <span data-i18n="history.viewList">List</span>
+          </button>
+          <button class="hist-tab" data-view="stats" onclick="histSetView('stats')">
+            <i class="fas fa-chart-bar"></i>
+            <span data-i18n="history.viewStats">Stats</span>
+          </button>
+        </div>
+
+        <!-- ── Content Areas ── -->
+        <div id="hist-content" class="hist-content">
+
+          <!-- Timeline view -->
+          <div id="hist-view-timeline" class="hist-view active">
+            <div id="hist-timeline-list" class="hist-timeline-list">
+              <div class="hist-loading" id="hist-loading-timeline">
+                <div class="spinner-sm"></div>
+                <span data-i18n="history.loading">Loading…</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- List view -->
+          <div id="hist-view-list" class="hist-view">
+            <div id="hist-list-wrap" class="hist-list-wrap">
+              <div class="hist-loading" id="hist-loading-list">
+                <div class="spinner-sm"></div>
+                <span data-i18n="history.loading">Loading…</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats view -->
+          <div id="hist-view-stats" class="hist-view">
+            <div class="hist-stats-grid" id="hist-stats-grid">
+              <div class="hist-loading" id="hist-loading-stats">
+                <div class="spinner-sm"></div>
+                <span data-i18n="history.loading">Loading…</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ══════════════════════════════════════════
            SETTINGS
       ══════════════════════════════════════════ -->
       <section id="s-settings" class="app-sec" style="view-transition-name:section-settings">
@@ -1409,6 +1510,23 @@
             </div>
           </div>
 
+          <!-- ─── Navigation Visibility ─── -->
+          <div class="settings-card">
+            <div class="settings-card-hd">
+              <i class="fas fa-bars"></i>
+              <h3 data-i18n="settings.navVisibility">Navigation tabs</h3>
+            </div>
+            <div class="settings-card-body">
+              <p class="hint" style="margin-bottom:12px">
+                <i class="fas fa-info-circle"></i>
+                <span data-i18n="settings.navVisibilityHint">Choose which sections appear in the navigation bar. Dashboard and Settings are always visible.</span>
+              </p>
+              <div class="nav-visibility-grid" id="nav-visibility-grid">
+                <!-- Generated by JS -->
+              </div>
+            </div>
+          </div>
+
           <!-- ─── About ─── -->
           <div class="settings-card settings-card--about">
             <div class="settings-card-hd">
@@ -1473,6 +1591,10 @@
     <a class="bn-item" data-s="badges" onclick="nav('badges')">
       <i class="fas fa-medal"></i>
       <span data-i18n="nav.badges">Badges</span>
+    </a>
+    <a class="bn-item" data-s="history" onclick="nav('history')">
+      <i class="fas fa-history"></i>
+      <span data-i18n="nav.history">History</span>
     </a>
     <a class="bn-item" data-s="settings" onclick="nav('settings')">
       <i class="fas fa-cog"></i>

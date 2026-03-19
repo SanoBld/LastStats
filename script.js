@@ -59,6 +59,17 @@ if (typeof window.t !== 'function') window.t = k => k;
     badge_nomad_desc:       { fr:'Mois avec ≥10 artistes différents actifs', en:'Months with ≥10 different active artists', es:'Meses con ≥10 artistas diferentes activos', pt:'Meses com ≥10 artistas diferentes ativos', de:'Monate mit ≥10 verschiedenen aktiven Künstlern', it:'Mesi con ≥10 artisti diversi attivi', ru:'Месяцы с ≥10 разными активными артистами', ar:'أشهر مع ≥10 فنانين مختلفين نشطين', ja:'10人以上の異なるアーティストがいる月', zh:'有≥10位不同活跃艺术家的月份', ko:'≥10명의 다른 활성 아티스트가 있는 달', tr:'≥10 farklı aktif sanatçılı aylar' },
     profile_retry:      { fr:'Réessayer',     en:'Retry',         es:'Reintentar',  pt:'Tentar novamente', de:'Erneut versuchen', it:'Riprova', ru:'Повторить', ar:'إعادة المحاولة', ja:'再試行', zh:'重试', ko:'재시도', tr:'Tekrar dene' },
     profile_reload:     { fr:'Actualiser',    en:'Reload',        es:'Actualizar',  pt:'Recarregar', de:'Neu laden',   it:'Aggiorna',   ru:'Обновить',   ar:'تحديث',  ja:'更新',    zh:'刷新', ko:'새로고침', tr:'Yenile' },
+    nav_history:        { fr:'Historique',    en:'History',       es:'Historial',   pt:'Histórico',  de:'Verlauf',     it:'Cronologia', ru:'История',    ar:'التاريخ', ja:'履歴',   zh:'历史',  ko:'기록',     tr:'Geçmiş' },
+    history_title:      { fr:'Historique',    en:'History',       es:'Historial',   pt:'Histórico',  de:'Verlauf',     it:'Cronologia', ru:'История',    ar:'التاريخ', ja:'履歴',   zh:'历史',  ko:'기록',     tr:'Geçmiş' },
+    history_sub:        { fr:'Parcourez vos scrobbles jour par jour', en:'Browse your scrobbles day by day', es:'Explora tus scrobbles día a día', pt:'Explore os seus scrobbles dia a dia', de:'Scrobbles täglich durchsuchen', it:'Sfoglia i tuoi scrobbles giorno per giorno', ru:'Просматривайте свои скробблы день за днём', ar:'تصفح سجلاتك يوماً بيوم', ja:'日別にスクロブルを閲覧', zh:'按日浏览你的记录', ko:'일별 스크로블 탐색', tr:'Scrobble\'larına gün gün göz at' },
+    history_today:      { fr:'Aujourd\'hui',  en:'Today',         es:'Hoy',         pt:'Hoje',       de:'Heute',       it:'Oggi',       ru:'Сегодня',    ar:'اليوم',  ja:'今日',    zh:'今天',  ko:'오늘',     tr:'Bugün' },
+    history_loading:    { fr:'Chargement…',   en:'Loading…',      es:'Cargando…',   pt:'Carregando…',de:'Lädt…',       it:'Caricamento…',ru:'Загрузка…', ar:'جارٍ التحميل…', ja:'読み込み中…', zh:'加载中…', ko:'로딩 중…', tr:'Yükleniyor…' },
+    history_viewTimeline:{ fr:'Fil chronologique', en:'Timeline',  es:'Cronología',  pt:'Cronologia', de:'Zeitstrahl',  it:'Sequenza',   ru:'Хронология', ar:'الجدول الزمني', ja:'タイムライン', zh:'时间线', ko:'타임라인', tr:'Zaman çizelgesi' },
+    history_viewList:   { fr:'Liste',         en:'List',          es:'Lista',       pt:'Lista',      de:'Liste',       it:'Lista',      ru:'Список',     ar:'قائمة',  ja:'リスト',  zh:'列表',  ko:'목록',     tr:'Liste' },
+    history_viewStats:  { fr:'Statistiques',  en:'Stats',         es:'Estadísticas',pt:'Estatísticas',de:'Statistiken', it:'Statistiche',ru:'Статистика', ar:'إحصاءات', ja:'統計',   zh:'统计',  ko:'통계',     tr:'İstatistikler' },
+    history_noScrobbles:{ fr:'Aucun scrobble ce jour-là', en:'No scrobbles on this day', es:'Sin scrobbles este día', pt:'Sem scrobbles neste dia', de:'Keine Scrobbles an diesem Tag', it:'Nessun scrobble in questo giorno', ru:'Нет скробблов в этот день', ar:'لا يوجد تسجيل في هذا اليوم', ja:'この日のスクロブルなし', zh:'当天无记录', ko:'이 날 스크로블 없음', tr:'Bu günde scrobble yok' },
+    settings_navVisibility:    { fr:'Onglets de navigation', en:'Navigation tabs', es:'Pestañas de navegación', pt:'Abas de navegação', de:'Navigationsreiter', it:'Schede di navigazione', ru:'Вкладки навигации', ar:'علامات التبويب', ja:'ナビゲーションタブ', zh:'导航标签', ko:'내비게이션 탭', tr:'Gezinme sekmeleri' },
+    settings_navVisibilityHint:{ fr:'Choisissez quelles sections apparaissent dans la barre de navigation. Dashboard et Paramètres sont toujours visibles.', en:'Choose which sections appear in the navigation bar. Dashboard and Settings are always visible.', es:'Elige qué secciones aparecen en la barra de navegación. Dashboard y Configuración siempre son visibles.', pt:'Escolha quais seções aparecem na barra de navegação. Dashboard e Configurações são sempre visíveis.', de:'Wähle, welche Abschnitte in der Navigationsleiste angezeigt werden. Dashboard und Einstellungen sind immer sichtbar.', it:'Scegli quali sezioni appaiono nella barra di navigazione. Dashboard e Impostazioni sono sempre visibili.', ru:'Выберите, какие разделы отображаются на панели навигации. Панель управления и настройки всегда видны.', ar:'اختر الأقسام التي تظهر في شريط التنقل. لوحة التحكم والإعدادات دائمًا مرئية.', ja:'ナビゲーションバーに表示するセクションを選択してください。ダッシュボードと設定は常に表示されます。', zh:'选择导航栏中显示的部分。仪表板和设置始终可见。', ko:'탐색 바에 표시할 섹션을 선택하세요. 대시보드와 설정은 항상 표시됩니다.', tr:'Gezinme çubuğunda hangi bölümlerin görüneceğini seçin. Gösterge paneli ve Ayarlar her zaman görünür.' },
     toast_settings_saved:{ fr:'Paramètres sauvegardés !', en:'Settings saved!', es:'Ajustes guardados!', pt:'Definições guardadas!', de:'Einstellungen gespeichert!', it:'Impostazioni salvate!', ru:'Настройки сохранены!', ar:'تم حفظ الإعدادات!', ja:'設定を保存しました!', zh:'设置已保存!', ko:'설정이 저장되었습니다!', tr:'Ayarlar kaydedildi!' },
     period_7day:        { fr:'Cette semaine', en:'This week',     es:'Esta semana', pt:'Esta semana', de:'Diese Woche', it:'Questa settimana', ru:'Эта неделя', ar:'هذا الأسبوع', ja:'今週', zh:'本周', ko:'이번 주', tr:'Bu hafta' },
     period_1month:      { fr:'Ce mois',       en:'This month',    es:'Este mes',    pt:'Este mês',   de:'Dieser Monat', it:'Questo mese', ru:'Этот месяц', ar:'هذا الشهر', ja:'今月', zh:'本月', ko:'이번 달', tr:'Bu ay' },
@@ -123,6 +134,14 @@ const APP = {
   artistsLayout: 'grid',
   albumsLayout:  'grid',
   tracksLayout:  'list',
+
+  // Nav visibility — which sections are shown (default all visible)
+  navVisibility: null, // loaded from localStorage
+
+  // History section state
+  histCurrentDate: null,   // YYYY-MM-DD string
+  histCurrentView: 'timeline',
+  histCache: {},           // keyed by YYYY-MM-DD
 
   artistsPage:      1,
   artistsPeriod:    'overall',
@@ -530,6 +549,7 @@ const NAV_TITLE_KEYS = {
   vizplus:       'nav_vizplus',
   badges:        'nav_badges',
   obscurity:     'nav_obscurity',
+  history:       'nav_history',
   wrapped:       'nav_wrapped',
   settings:      'nav_settings',
 };
@@ -640,6 +660,13 @@ async function initApp(usernameOverride, apiKeyOverride) {
 
     syncSettingsFields();
     restoreBadgesFromStorage();
+
+    // Nav visibility
+    loadNavVisibility();
+    renderNavVisibilitySettings();
+
+    // History section — init to today
+    histInit();
 
     // Notification Wrapped Nouvel An
     setupNewYearNotification();
@@ -759,6 +786,7 @@ function nav(section) {
     if (section === 'charts')    setupChartsSection();
     if (section === 'vizplus')   loadVizPlus();
     if (section === 'obscurity') loadObscurityScore();
+    if (section === 'history')   histLoadDay(APP.histCurrentDate || _todayStr());
   };
 
   if (document.startViewTransition) {
@@ -4080,4 +4108,401 @@ function clearCache() {
   _trackImgCache.clear();
   _vizPlusLoaded = false;
   showToast(t('toast_cache_cleared'));
+}
+
+/* ============================================================
+   NAV VISIBILITY
+   ============================================================ */
+
+// All toggleable sections (dashboard + settings always locked visible)
+const NAV_SECTIONS = [
+  { key: 'top-artists', icon: 'fa-microphone-alt', i18nKey: 'nav_top_artists',  locked: false },
+  { key: 'top-albums',  icon: 'fa-compact-disc',   i18nKey: 'nav_top_albums',   locked: false },
+  { key: 'top-tracks',  icon: 'fa-music',          i18nKey: 'nav_top_tracks',   locked: false },
+  { key: 'charts',      icon: 'fa-chart-bar',      i18nKey: 'nav_charts',       locked: false },
+  { key: 'badges',      icon: 'fa-medal',          i18nKey: 'nav_badges',       locked: false },
+  { key: 'obscurity',   icon: 'fa-gem',            i18nKey: 'nav_obscurity',    locked: false },
+  { key: 'history',     icon: 'fa-history',        i18nKey: 'nav_history',      locked: false },
+];
+
+function loadNavVisibility() {
+  try {
+    const saved = localStorage.getItem('ls_nav_visibility');
+    APP.navVisibility = saved ? JSON.parse(saved) : null;
+  } catch { APP.navVisibility = null; }
+  applyNavVisibility();
+}
+
+function saveNavVisibility() {
+  localStorage.setItem('ls_nav_visibility', JSON.stringify(APP.navVisibility));
+}
+
+function applyNavVisibility() {
+  const vis = APP.navVisibility;
+  NAV_SECTIONS.forEach(({ key, locked }) => {
+    if (locked) return;
+    const hidden = vis && vis[key] === false;
+    document.querySelectorAll(`.nav-lnk[data-s="${key}"], .bn-item[data-s="${key}"]`).forEach(el => {
+      el.classList.toggle('nav-hidden', hidden);
+    });
+  });
+}
+
+function renderNavVisibilitySettings() {
+  const grid = document.getElementById('nav-visibility-grid');
+  if (!grid) return;
+  const vis = APP.navVisibility || {};
+  grid.innerHTML = NAV_SECTIONS.map(({ key, icon, i18nKey, locked }) => {
+    const isChecked = locked || (vis[key] !== false);
+    return `
+      <label class="nav-vis-item${isChecked ? ' checked' : ''}${locked ? ' disabled-item' : ''}"
+             data-navkey="${key}" ${locked ? '' : `onclick="toggleNavVisibility('${key}', this)"`}>
+        <span class="nav-vis-chk"><i class="fas fa-check"></i></span>
+        <span class="nav-vis-icon"><i class="fas ${icon}"></i></span>
+        <span class="nav-vis-label">${t(i18nKey) || key}</span>
+      </label>`;
+  }).join('');
+}
+
+function toggleNavVisibility(key, labelEl) {
+  if (!APP.navVisibility) APP.navVisibility = {};
+  const current = APP.navVisibility[key] !== false; // true = visible
+  APP.navVisibility[key] = !current;
+  labelEl.classList.toggle('checked', !current);
+  saveNavVisibility();
+  applyNavVisibility();
+  showToast(t('toast_settings_saved'));
+}
+
+/* ============================================================
+   HISTORY SECTION
+   ============================================================ */
+
+function _todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function _dateStrToObj(str) {
+  const [y, m, d] = str.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function _formatDayLabel(dateStr) {
+  const d = _dateStrToObj(dateStr);
+  const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  return d.toLocaleDateString(undefined, opts);
+}
+
+function histInit() {
+  APP.histCurrentDate = _todayStr();
+  APP.histCurrentView = 'timeline';
+  const input = document.getElementById('hist-date-input');
+  if (input) input.value = APP.histCurrentDate;
+  // Don't load until the section is opened
+}
+
+function histGoToday() {
+  const d = _todayStr();
+  APP.histCurrentDate = d;
+  const input = document.getElementById('hist-date-input');
+  if (input) input.value = d;
+  histLoadDay(d);
+}
+
+function histGoToDate(val) {
+  if (!val) return;
+  APP.histCurrentDate = val;
+  histLoadDay(val);
+}
+
+function histNavDay(delta) {
+  const d = _dateStrToObj(APP.histCurrentDate || _todayStr());
+  d.setDate(d.getDate() + delta);
+  const str = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  // Can't go into the future
+  if (str > _todayStr()) return;
+  APP.histCurrentDate = str;
+  const input = document.getElementById('hist-date-input');
+  if (input) input.value = str;
+  histLoadDay(str);
+}
+
+function histSetView(view) {
+  APP.histCurrentView = view;
+  document.querySelectorAll('.hist-tab').forEach(el =>
+    el.classList.toggle('active', el.dataset.view === view)
+  );
+  document.querySelectorAll('.hist-view').forEach(el =>
+    el.classList.toggle('active', el.id === `hist-view-${view}`)
+  );
+  // Re-render current data into the newly active view
+  if (APP._histLastData) {
+    _renderHistView(view, APP._histLastData);
+  }
+}
+
+async function histLoadDay(dateStr) {
+  if (!dateStr) return;
+  APP.histCurrentDate = dateStr;
+
+  // Update date input & label
+  const input = document.getElementById('hist-date-input');
+  if (input) input.value = dateStr;
+  const summaryDate = document.getElementById('hist-summary-date');
+  if (summaryDate) summaryDate.textContent = _formatDayLabel(dateStr);
+
+  // Disable next-day button if today
+  const nextBtn = document.getElementById('hist-next-day');
+  if (nextBtn) nextBtn.disabled = (dateStr >= _todayStr());
+
+  // Show loading in all views
+  _histShowLoading();
+
+  try {
+    // Check in-memory cache first
+    let tracks = APP.histCache[dateStr];
+    if (!tracks) {
+      const d    = _dateStrToObj(dateStr);
+      const from = Math.floor(new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0).getTime() / 1000);
+      const to   = Math.floor(new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59).getTime() / 1000);
+
+      const data = await API._fetch('user.getRecentTracks', { from, to, limit: 200 });
+      const raw  = data.recenttracks?.track || [];
+      tracks = (Array.isArray(raw) ? raw : [raw]).filter(tr => !tr['@attr']?.nowplaying);
+      APP.histCache[dateStr] = tracks;
+    }
+
+    APP._histLastData = tracks;
+    _updateHistSummary(tracks, dateStr);
+    _renderHistView(APP.histCurrentView, tracks);
+
+  } catch (e) {
+    _histShowError(e.message);
+  }
+}
+
+function _histShowLoading() {
+  ['timeline','list','stats'].forEach(v => {
+    const el = document.getElementById(`hist-loading-${v}`);
+    if (el) el.style.display = 'flex';
+  });
+  const tl = document.getElementById('hist-timeline-list');
+  if (tl) tl.innerHTML = `<div class="hist-loading"><div class="spinner-sm"></div><span>${t('history_loading') || 'Loading…'}</span></div>`;
+  const lw = document.getElementById('hist-list-wrap');
+  if (lw) lw.innerHTML = `<div class="hist-loading"><div class="spinner-sm"></div><span>${t('history_loading') || 'Loading…'}</span></div>`;
+  const sg = document.getElementById('hist-stats-grid');
+  if (sg) sg.innerHTML = `<div class="hist-loading"><div class="spinner-sm"></div><span>${t('history_loading') || 'Loading…'}</span></div>`;
+}
+
+function _histShowError(msg) {
+  const html = `<div class="hist-empty"><i class="fas fa-exclamation-triangle"></i><span>${escHtml(msg)}</span></div>`;
+  ['hist-timeline-list','hist-list-wrap','hist-stats-grid'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+  });
+}
+
+function _updateHistSummary(tracks, dateStr) {
+  const artists = new Set(tracks.map(tr => tr.artist?.['#text'] || tr.artist?.name || '')).size;
+  const albums  = new Set(tracks.map(tr => tr.album?.['#text'] || '')).size;
+
+  const countEl   = document.getElementById('hist-stat-count');
+  const artistsEl = document.getElementById('hist-stat-artists');
+  const albumsEl  = document.getElementById('hist-stat-albums');
+
+  if (countEl)   countEl.innerHTML   = `<i class="fas fa-headphones"></i> ${tracks.length} scrobbles`;
+  if (artistsEl) artistsEl.innerHTML = `<i class="fas fa-microphone-alt"></i> ${artists} artists`;
+  if (albumsEl)  albumsEl.innerHTML  = `<i class="fas fa-compact-disc"></i> ${albums} albums`;
+}
+
+function _renderHistView(view, tracks) {
+  if (view === 'timeline') _renderHistTimeline(tracks);
+  if (view === 'list')     _renderHistList(tracks);
+  if (view === 'stats')    _renderHistStats(tracks);
+}
+
+/* ── Timeline view ── */
+function _renderHistTimeline(tracks) {
+  const wrap = document.getElementById('hist-timeline-list');
+  if (!wrap) return;
+
+  if (!tracks.length) {
+    wrap.innerHTML = `<div class="hist-empty"><i class="fas fa-music"></i><span>${t('history_noScrobbles') || 'No scrobbles on this day'}</span></div>`;
+    return;
+  }
+
+  // Group by hour
+  const byHour = {};
+  [...tracks].reverse().forEach(tr => {
+    const ts = parseInt(tr.date?.uts || 0);
+    const hr = ts ? new Date(ts * 1000).getHours() : -1;
+    if (!byHour[hr]) byHour[hr] = [];
+    byHour[hr].push(tr);
+  });
+
+  const hours = Object.keys(byHour).sort((a,b) => Number(a) - Number(b));
+  wrap.innerHTML = hours.map(hr => {
+    const label = hr < 0 ? '??' : `${String(hr).padStart(2,'0')}:00`;
+    const items = byHour[hr].map(tr => _histTrackHTML(tr)).join('');
+    return `<div class="hist-hour-block">
+      <div class="hist-hour-label">${label}</div>
+      ${items}
+    </div>`;
+  }).join('');
+}
+
+function _histTrackHTML(tr) {
+  const ts      = parseInt(tr.date?.uts || 0);
+  const timeStr = ts ? new Date(ts * 1000).toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' }) : '—';
+  const name    = escHtml(tr.name || '—');
+  const artist  = escHtml(tr.artist?.['#text'] || tr.artist?.name || '—');
+  const album   = escHtml(tr.album?.['#text'] || '');
+  const imgUrl  = tr.image?.find(i => i.size === 'medium')?.['#text'] || '';
+  const hasImg  = imgUrl && !isDefaultImg(imgUrl);
+  const letter  = (tr.name || '?')[0].toUpperCase();
+  const q       = encodeURIComponent(`${tr.name || ''} ${tr.artist?.['#text'] || tr.artist?.name || ''}`);
+
+  const imgHTML = hasImg
+    ? `<img src="${escHtml(imgUrl)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+    : escHtml(letter);
+
+  return `<div class="hist-timeline-track">
+    <span class="hist-track-time">${timeStr}</span>
+    <div class="hist-track-img">${imgHTML}</div>
+    <div class="hist-track-info">
+      <div class="hist-track-name">${name}</div>
+      <div class="hist-track-artist">${artist}</div>
+      ${album ? `<div class="hist-track-album"><i class="fas fa-compact-disc" style="font-size:.6rem;opacity:.6"></i> ${album}</div>` : ''}
+    </div>
+    <div class="hist-track-ext">
+      <a href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener" title="YouTube"><i class="fab fa-youtube"></i></a>
+      <a href="spotify:search:${encodeURIComponent((tr.name||'') + ' ' + (tr.artist?.['#text']||''))}" target="_blank" rel="noopener" title="Spotify"><i class="fab fa-spotify"></i></a>
+    </div>
+  </div>`;
+}
+
+/* ── List view ── */
+function _renderHistList(tracks) {
+  const wrap = document.getElementById('hist-list-wrap');
+  if (!wrap) return;
+
+  if (!tracks.length) {
+    wrap.innerHTML = `<div class="hist-empty"><i class="fas fa-music"></i><span>${t('history_noScrobbles') || 'No scrobbles on this day'}</span></div>`;
+    return;
+  }
+
+  const header = `<div class="hist-list-header">
+    <span>#</span>
+    <span>Time</span>
+    <span>Track / Artist</span>
+    <span>Album</span>
+    <span></span>
+  </div>`;
+
+  const rows = [...tracks].reverse().map((tr, i) => {
+    const ts      = parseInt(tr.date?.uts || 0);
+    const timeStr = ts ? new Date(ts * 1000).toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' }) : '—';
+    const name    = escHtml(tr.name || '—');
+    const artist  = escHtml(tr.artist?.['#text'] || tr.artist?.name || '—');
+    const album   = escHtml(tr.album?.['#text'] || '—');
+    const q       = encodeURIComponent(`${tr.name || ''} ${tr.artist?.['#text'] || ''}`);
+    return `<div class="hist-list-row">
+      <span class="hist-list-num">${i + 1}</span>
+      <span class="hist-list-time">${timeStr}</span>
+      <span class="hist-list-track-cell"><strong>${name}</strong><span>${artist}</span></span>
+      <span class="hist-list-album">${album}</span>
+      <span class="hist-list-actions">
+        <a class="hist-track-ext" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener" title="YouTube"
+           style="width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.72rem;color:var(--text-muted);transition:background .15s;text-decoration:none"
+           onmouseover="this.style.background='var(--accent-lt)';this.style.color='var(--accent)'"
+           onmouseout="this.style.background='';this.style.color='var(--text-muted)'">
+          <i class="fab fa-youtube"></i>
+        </a>
+      </span>
+    </div>`;
+  }).join('');
+
+  wrap.innerHTML = header + rows;
+}
+
+/* ── Stats view ── */
+function _renderHistStats(tracks) {
+  const grid = document.getElementById('hist-stats-grid');
+  if (!grid) return;
+
+  if (!tracks.length) {
+    grid.innerHTML = `<div class="hist-empty"><i class="fas fa-music"></i><span>${t('history_noScrobbles') || 'No scrobbles on this day'}</span></div>`;
+    return;
+  }
+
+  // Top artists
+  const artistMap = {};
+  tracks.forEach(tr => {
+    const a = tr.artist?.['#text'] || tr.artist?.name || '?';
+    artistMap[a] = (artistMap[a] || 0) + 1;
+  });
+  const topArtists = Object.entries(artistMap).sort((a,b) => b[1]-a[1]).slice(0, 7);
+
+  // Top tracks
+  const trackMap = {};
+  tracks.forEach(tr => {
+    const k = `${tr.name || '?'} — ${tr.artist?.['#text'] || '?'}`;
+    trackMap[k] = (trackMap[k] || 0) + 1;
+  });
+  const topTracks = Object.entries(trackMap).sort((a,b) => b[1]-a[1]).slice(0, 7);
+
+  // Top albums
+  const albumMap = {};
+  tracks.forEach(tr => {
+    const al = tr.album?.['#text'];
+    if (al) albumMap[al] = (albumMap[al] || 0) + 1;
+  });
+  const topAlbums = Object.entries(albumMap).sort((a,b) => b[1]-a[1]).slice(0, 5);
+
+  // Hour distribution
+  const hourMap = Array(24).fill(0);
+  tracks.forEach(tr => {
+    const ts = parseInt(tr.date?.uts || 0);
+    if (ts) hourMap[new Date(ts * 1000).getHours()]++;
+  });
+  const maxH = Math.max(...hourMap, 1);
+
+  // ── Render cards ──
+  const listItems = arr => arr.map(([name, count], i) =>
+    `<li class="hist-top-item">
+      <span class="hist-top-rank">${i+1}</span>
+      <span class="hist-top-name">${escHtml(name)}</span>
+      <span class="hist-top-count">${count}×</span>
+    </li>`
+  ).join('');
+
+  const hourBars = hourMap.map((v, h) => `
+    <div class="hist-hour-bar-row">
+      <span class="hist-hour-bar-label">${String(h).padStart(2,'0')}h</span>
+      <div class="hist-hour-bar-track">
+        <div class="hist-hour-bar-fill" style="width:${Math.round((v/maxH)*100)}%"></div>
+      </div>
+      <span class="hist-hour-bar-val">${v || ''}</span>
+    </div>`
+  ).join('');
+
+  grid.innerHTML = `
+    <div class="hist-stat-card">
+      <div class="hist-stat-card-title"><i class="fas fa-microphone-alt"></i> Top Artists</div>
+      <ol class="hist-top-list">${listItems(topArtists)}</ol>
+    </div>
+    <div class="hist-stat-card">
+      <div class="hist-stat-card-title"><i class="fas fa-music"></i> Top Tracks</div>
+      <ol class="hist-top-list">${listItems(topTracks)}</ol>
+    </div>
+    ${topAlbums.length ? `
+    <div class="hist-stat-card">
+      <div class="hist-stat-card-title"><i class="fas fa-compact-disc"></i> Top Albums</div>
+      <ol class="hist-top-list">${listItems(topAlbums)}</ol>
+    </div>` : ''}
+    <div class="hist-stat-card" style="grid-column: 1 / -1">
+      <div class="hist-stat-card-title"><i class="fas fa-clock"></i> Activity by hour</div>
+      <div class="hist-hour-chart-wrap">${hourBars}</div>
+    </div>`;
 }
