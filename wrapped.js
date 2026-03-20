@@ -2,10 +2,10 @@
 
 'use strict';
 
-// which year we're showing
+// année en cours de're showing
 let WRAPPED_YEAR = new Date().getFullYear() - 1;
 
-// translations
+// traductions
 const TRANSLATIONS = {
   fr:{
     waitTitle:'Reviens le 1er janvier',
@@ -410,22 +410,22 @@ function autoDetectLang() {
   return Object.keys(TRANSLATIONS).includes(n) ? n : 'fr';
 }
 
-// access control — current year's Wrapped only available from Jan 1st
+// contrôle d'accès — année's Wrapped only available from Jan 1st
 function isYearAvailable(year) {
   const now = new Date();
   const currentYear = now.getFullYear();
-  // past years are always accessible
+  // les années passées sont toujours dispo
   if (year < currentYear - 1) return true;
   // last year is available once January starts
   if (year === currentYear - 1) return now.getMonth() >= 0; // always true but keeps intent clear
-  // current or future year — never available
+  // l'année en cours ou future : jamais dispo
   return false;
 }
 
 function isCurrentWrappedLocked() {
   // is the current year's Wrapped still locked?
   const now = new Date();
-  // unlocks on January 1st
+  // débloqué le 1er janvier
   return now.getMonth() === 11 && now.getDate() < 31;
 }
 
@@ -435,7 +435,7 @@ function isWrappedAvailable() {
   return now.getMonth() >= 0 && !(now.getMonth() === 11);
 }
 
-// locked only in December
+// bloqué en décembre
 function isCurrentYearWrappedLocked() {
   const now = new Date();
   return now.getMonth() === 11; // december means locked
@@ -464,7 +464,7 @@ function startCountdown() {
   _cdInterval = setInterval(tick, 1000);
 }
 
-// utils
+// petits utilitaires
 const DEF_HASH = '2a96cbd8b46e442fc41c2b86b821562f';
 const fmtNum = n => new Intl.NumberFormat(
   LANG_CODE === 'en' ? 'en-US' : LANG_CODE === 'de' ? 'de-DE' :
@@ -480,7 +480,7 @@ function getImg(arr, ...sizes) {
     const url = item?.['#text'] || '';
     if (url && url.length > 10 && !url.includes(DEF_HASH)) return url;
   }
-  // fallback: first non-empty URL
+  // fallback : première URL non vide
   for (const i of arr) {
     const u = i?.['#text'] || '';
     if (u && u.length > 10 && !u.includes(DEF_HASH)) return u;
@@ -498,7 +498,8 @@ function animCount(el, target, ms = 2200) {
   requestAnimationFrame(tick);
 }
 function avatarColor(str) {
-  const C = ['#7c3aed','#2563eb','#059669','#d97706','#db2777','#0891b2','#4f46e5','#dc2626','#0d9488','#9333ea'];
+  // Palette M3 cohérente avec le nouveau thème
+  const C = ['#4f378b','#2a4a7f','#1d6b52','#7b4f12','#8b2252','#0e5680','#6750a4','#b3261e','#205d5a','#6d3a8f'];
   let h = 0; for (let i = 0; i < str.length; i++) h = ((h << 5) - h) + str.charCodeAt(i);
   return C[Math.abs(h) % C.length];
 }
@@ -559,7 +560,7 @@ const LASTFM = {
   }
 };
 
-// global data store
+// store global
 const STORE = {
   username: '', apiKey: '',
   user: null, tracks: [], albums: [], artists: [], tags: [],
@@ -576,7 +577,7 @@ const STORE = {
   dayMap: null,
   isReadOnly: false,
   readOnlyData: null,
-  // Helpers
+  // getters pratiques
   get displayName() { return this.user?.name || this.username || '—'; },
   get regYear() { const ts = parseInt(this.user?.registered?.unixtime || 0); return ts ? new Date(ts*1000).getFullYear() : null; },
   get avatar() { return getImg(this.user?.image || [], 'extralarge','large','medium'); },
@@ -603,10 +604,10 @@ const STORE = {
   }
 };
 
-// tags we ignore — too generic to be meaningful
+// tags trop génériques, on les filtre
 const STOP_TAGS = new Set(['seen live','loved','favorites','favourite','all','good','best','cool','favorite','mellow','under 2000 listeners','american','british','female','male','singer-songwriter','albums i own','beautiful','catchy','sexy','awesome','chill','epic','amazing','great','love','top','nice','<br>','favourite music','american music','british music','canadian','french','german','japanese','male vocalists','female vocalists','acoustic']);
 
-// data loading
+// chargement des données
 async function loadAllData(onProgress) {
   const p = (msg, pct, step, stepState) => {
     onProgress?.(msg, pct);
@@ -622,7 +623,7 @@ async function loadAllData(onProgress) {
 
   p(T.loadStep1, 10, 'profile');
 
-  // profile + weekly charts
+  // profil + charts hebdo
   const [userRes, tracksRes, albumsRes, artistsRes] = await Promise.all([
     LASTFM.call('user.getInfo'),
     LASTFM.call('user.getWeeklyTrackChart',  { from, to }).catch(() => null),
@@ -655,7 +656,7 @@ async function loadAllData(onProgress) {
   setLoaderStep('top', 'done');
   p(T.loadStep7, 40, 'images');
 
-  // Round 2 : images + genres (parallèle)
+  // on récupère tout en parallèle : images, genres, durées
   const top5Art = STORE.artists.slice(0, 5);
   const top5Alb = STORE.albums.slice(0, 5);
   const top5Trk = STORE.tracks.slice(0, 5);
@@ -680,7 +681,7 @@ async function loadAllData(onProgress) {
   const results = await Promise.all(enrichJobs);
   let ri = 0;
 
-  // merge tags from top 3 artists
+  // fusionne les tags des 3 premiers artistes sans doublons
   const seenT = new Set(), merged = [];
   for (let i = 0; i < 3; i++) {
     for (const t of (results[ri+i]?.toptags?.tag || [])) {
@@ -693,7 +694,7 @@ async function loadAllData(onProgress) {
   STORE.tags = merged.slice(0, 10);
   ri += 3;
 
-  // grab artist images from their top albums
+  // image de l'artiste via son premier album qui en a une
   for (let i = 0; i < top5Art.length; i++) {
     const res = results[ri + i];
     for (const alb of (res?.topalbums?.album || [])) {
@@ -703,7 +704,7 @@ async function loadAllData(onProgress) {
   }
   ri += top5Art.length;
 
-  // global stats for artist #1
+  // stats globales de l'artiste #1 (listeners, plays, percentile)
   const artInfoRes = results[ri]; ri++;
   if (artInfoRes?.artist) {
     const ai = artInfoRes.artist;
@@ -731,12 +732,12 @@ async function loadAllData(onProgress) {
       STORE.artists[0]._userPlaycount = userPlaycount;
     }
   }
-  // similar artists for artist #1
+  // artistes similaires pour le slide comparaison
   const similarRes = results[ri]; ri++;
   if (similarRes?.similarartists?.artist) {
     STORE.globalStats.similar = (similarRes.similarartists.artist || []).slice(0,5).map(a=>a.name);
   }
-  // stats for artist #2
+  // pareil pour le #2, utile pour la comparaison
   const art2InfoRes = results[ri]; ri++;
   if (art2InfoRes?.artist && STORE.artists[1]) {
     const ai2 = art2InfoRes.artist;
@@ -745,7 +746,7 @@ async function loadAllData(onProgress) {
     STORE.artists[1]._userPlaycount = parseInt(ai2.stats?.userplaycount || STORE.artists[1]?.playcount || 0);
   }
 
-  // album artwork
+  // on récupère les pochettes
   for (let i = 0; i < top5Alb.length; i++) {
     const res = results[ri + i];
     if (res?.album?.image) {
@@ -755,7 +756,7 @@ async function loadAllData(onProgress) {
   }
   ri += top5Alb.length;
 
-  // track artwork and duration
+  // pochettes des titres + durée réelle
   let totalDurSec = 0, durCount = 0;
   for (let i = 0; i < top5Trk.length; i++) {
     const res = results[ri + i];
@@ -764,15 +765,15 @@ async function loadAllData(onProgress) {
       STORE.tracks[i].image = res.track.album.image;
     }
     const dur = parseInt(res.track.duration || 0);
-    if (dur > 30000) { totalDurSec += dur / 1000; durCount++; } // duration in ms
-    else if (dur > 30) { totalDurSec += dur; durCount++; } // duration in seconds
+    if (dur > 30000) { totalDurSec += dur / 1000; durCount++; } // durée en ms
+    else if (dur > 30) { totalDurSec += dur; durCount++; } // durée en secondes
     if (STORE.tracks[i]) {
       STORE.tracks[i]._globalListeners = parseInt(res.track.listeners || 0);
       STORE.tracks[i]._globalPlays = parseInt(res.track.playcount || 0);
       STORE.tracks[i]._userPlaycount = parseInt(res.track.userplaycount || 0);
     }
   }
-  // recalculate minutes using real track duration if we have enough data
+  // si on a assez de durées réelles, on recalcule les minutes (plus précis)
   if (durCount >= 2) {
     const avgDurSec = totalDurSec / durCount;
     STORE._realAvgDurSec = Math.round(avgDurSec);
@@ -793,7 +794,7 @@ async function loadAllData(onProgress) {
   p(T.loadStep8, 100);
 }
 
-// temporal data
+// données temporelles (habitudes, record, streak)
 async function loadTemporalData(from, to) {
   // load recent tracks for the year (up to 8 pages)
   STORE.habitHours = new Array(24).fill(0);
@@ -802,7 +803,7 @@ async function loadTemporalData(from, to) {
   const dayMap = {}; // date string → play count
   const artistFirstH = {}; // artist → {h1count, h2count}
 
-  // Process one track into all the aggregation maps
+  // traite un track dans les maps
   const processTrack = (t) => {
     const ts = t.date?.uts;
     if (!ts) return;
@@ -824,7 +825,7 @@ async function loadTemporalData(from, to) {
   };
 
   try {
-    // Page 1 first to know totalPages
+    // page 1 d'abord pour avoir le total
     const first = await LASTFM.call('user.getRecentTracks', {
       from, to, limit: 200, page: 1, extended: 0
     }).catch(() => null);
@@ -835,7 +836,7 @@ async function loadTemporalData(from, to) {
     const totalPages = Math.min(50, parseInt(first.recenttracks?.['@attr']?.totalPages || 1));
 
     if (totalPages > 1) {
-      // Remaining pages in batches of 5
+      // les pages restantes par lots de 5
       const BATCH = 5;
       for (let start = 2; start <= totalPages; start += BATCH) {
         const batchNums = [];
@@ -856,11 +857,11 @@ async function loadTemporalData(from, to) {
     }
   } catch {}
 
-  // best month
+  // mois le plus actif
   const peakMonth = monthPlays.indexOf(Math.max(...monthPlays));
   STORE.habitMonthPeak = { month: peakMonth, plays: monthPlays[peakMonth] };
 
-  // best single day
+  // meilleur jour de l'année
   const entries = Object.entries(dayMap).sort((a,b) => b[1]-a[1]);
   if (entries.length) {
     const [dateKey, plays] = entries[0];
@@ -868,7 +869,7 @@ async function loadTemporalData(from, to) {
     STORE.recordDay = { date: new Date(y, m-1, d), plays };
   }
 
-  // calculate longest streak
+  // calcul de la série consécutive la plus longue
   STORE.dayMap = dayMap;
   const sortedDays = Object.keys(dayMap).sort();
   let maxStreak = 0, curStreak = 0, curStart = null, bestStart = null, bestEnd = null;
@@ -895,7 +896,7 @@ async function loadTemporalData(from, to) {
   }
   STORE.streak = { days: maxStreak, startDate: bestStart, endDate: bestEnd };
 
-  // The One That Got Away — most played in H1 but nearly gone in H2
+  // l'artiste écouté à fond en début d'année puis abandonné
   const candidates = Object.entries(artistFirstH)
     .filter(([, v]) => v.h1 >= 5 && v.h2 <= Math.max(1, v.h1 * 0.15))
     .sort((a,b) => b[1].h1 - a[1].h1);
@@ -910,7 +911,7 @@ async function loadTemporalData(from, to) {
   }
 }
 
-// global stats for track #1
+// stats globales du titre #1
 async function loadGlobalTrackStats() {
   if (!STORE.tracks[0]) return;
   try {
@@ -924,7 +925,7 @@ async function loadGlobalTrackStats() {
   } catch {}
 }
 
-// share link — base64 encoded payload
+// lien de partage — payload base64
 function generateSharePayload() {
   return {
     v: 2,
@@ -996,7 +997,7 @@ function populateStoreFromShareData(data) {
   }));
   STORE.artist1Img = STORE.artists[0]?._img || '';
   STORE.globalStats = { percentile: data.pct || '—', similar: data.sim || [], listeners: 0, playcount: 0 };
-  // warm up image cache so screenshots work in read-only mode
+  // précache les images pour que les screenshots marchent en lecture seule
   STORE._shareImages = [
     ...STORE.artists.map(a => a._img).filter(Boolean),
     ...STORE.albums.map(a => a.image?.[0]?.['#text']).filter(Boolean),
@@ -1004,14 +1005,14 @@ function populateStoreFromShareData(data) {
   ];
 }
 
-// copy to clipboard
+// copie dans le presse-papier avec fallback pour les vieux browsers
 async function copyShareLink() {
   const url = generateShareLink();
   try {
     await navigator.clipboard.writeText(url);
     showToast(T.copiedOk);
   } catch {
-    // fallback for older browsers
+    // fallback vieux browsers
     const ta = document.createElement('textarea');
     ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
     document.body.appendChild(ta); ta.select();
@@ -1021,7 +1022,7 @@ async function copyShareLink() {
   }
 }
 
-// native share (mobile)
+// partage natif sur mobile, sinon on copie le lien
 async function nativeShare() {
   const url = generateShareLink();
   if (navigator.share) {
@@ -1031,26 +1032,26 @@ async function nativeShare() {
   await copyShareLink();
 }
 
-// ambient backgrounds per slide
+// ambiances par slide
 const AMBIENTS = {
-  purple:'radial-gradient(ellipse 80% 60% at 20% 30%,#3b0764 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 75% 70%,#1e1b4b 0%,transparent 65%),#060610',
-  gold:  'radial-gradient(ellipse 80% 60% at 15% 30%,#451a03 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 75% 70%,#1c1005 0%,transparent 65%),#060610',
-  blue:  'radial-gradient(ellipse 80% 60% at 15% 25%,#1e3a8a 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 75% 70%,#1e1b4b 0%,transparent 65%),#060610',
-  green: 'radial-gradient(ellipse 80% 60% at 20% 35%,#064e3b 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 70% 65%,#0d4a38 0%,transparent 65%),#060610',
-  pink:  'radial-gradient(ellipse 80% 60% at 20% 30%,#500724 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 75% 70%,#4a044e 0%,transparent 65%),#060610',
-  orange:'radial-gradient(ellipse 80% 60% at 18% 28%,#431407 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 74% 66%,#3b0a0a 0%,transparent 65%),#060610',
-  violet:'radial-gradient(ellipse 80% 60% at 18% 28%,#2e1065 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 74% 66%,#4c1d95 0%,transparent 65%),#060610',
-  teal:  'radial-gradient(ellipse 80% 60% at 18% 28%,#0c4a6e 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 74% 68%,#134e4a 0%,transparent 65%),#060610',
-  record:'radial-gradient(ellipse 80% 60% at 20% 25%,#451a03 0%,transparent 60%),radial-gradient(ellipse 60% 55% at 70% 70%,#1c0505 0%,transparent 65%),#060610',
-  gotAway:'radial-gradient(ellipse 80% 60% at 20% 30%,#1a0633 0%,transparent 65%),radial-gradient(ellipse 60% 55% at 70% 70%,#0d0426 0%,transparent 65%),#060610',
-  recap: 'radial-gradient(ellipse 80% 60% at 20% 20%,#3b0764 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 75% 75%,#451a03 0%,transparent 65%),radial-gradient(ellipse 50% 50% at 50% 50%,#3b0a3b 0%,transparent 65%),#060610',
+  purple: 'radial-gradient(ellipse 80% 60% at 20% 30%,#3b2070 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 75% 70%,#1e1b4b 0%,transparent 65%),#141218',
+  gold:   'radial-gradient(ellipse 80% 60% at 15% 30%,#3d1c04 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 75% 70%,#1c1005 0%,transparent 65%),#141218',
+  blue:   'radial-gradient(ellipse 80% 60% at 15% 25%,#1a2f6b 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 75% 70%,#1e1b4b 0%,transparent 65%),#141218',
+  green:  'radial-gradient(ellipse 80% 60% at 20% 35%,#054233 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 70% 65%,#0a3f30 0%,transparent 65%),#141218',
+  pink:   'radial-gradient(ellipse 80% 60% at 20% 30%,#450720 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 75% 70%,#400444 0%,transparent 65%),#141218',
+  orange: 'radial-gradient(ellipse 80% 60% at 18% 28%,#3a1006 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 74% 66%,#330808 0%,transparent 65%),#141218',
+  violet: 'radial-gradient(ellipse 80% 60% at 18% 28%,#270d58 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 74% 66%,#401880 0%,transparent 65%),#141218',
+  teal:   'radial-gradient(ellipse 80% 60% at 18% 28%,#0a3f5c 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 74% 68%,#10423e 0%,transparent 65%),#141218',
+  record: 'radial-gradient(ellipse 80% 60% at 20% 25%,#3d1c04 0%,transparent 60%),radial-gradient(ellipse 60% 55% at 70% 70%,#190404 0%,transparent 65%),#141218',
+  gotAway:'radial-gradient(ellipse 80% 60% at 20% 30%,#16052b 0%,transparent 65%),radial-gradient(ellipse 60% 55% at 70% 70%,#0a0320 0%,transparent 65%),#141218',
+  recap:  'radial-gradient(ellipse 80% 60% at 20% 20%,#3b2070 0%,transparent 65%),radial-gradient(ellipse 65% 55% at 75% 75%,#3d1c04 0%,transparent 65%),radial-gradient(ellipse 50% 50% at 50% 50%,#330832 0%,transparent 65%),#141218',
 };
 function setAmbient(theme) {
   const e = document.getElementById('ambient');
   if (e) e.style.background = AMBIENTS[theme] || AMBIENTS.purple;
 }
 
-// slide builders
+// — fonctions qui construisent chaque slide —
 function buildFallback(msg) {
   return `<div class="slide-content" style="align-items:center;justify-content:center;flex-direction:column;gap:14px;padding-top:60px">
     <div style="font-size:48px">🎵</div>
@@ -1089,8 +1090,8 @@ function buildNumbers() {
     : Math.round(STORE.annualPlays / Math.max(1,STORE.avgPerDay));
   return `
     <div style="position:absolute;inset:0;z-index:0">
-      <div style="position:absolute;border-radius:50%;background:#4338ca;left:15%;top:20%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.22;filter:blur(70px)"></div>
-      <div style="position:absolute;border-radius:50%;background:#7c3aed;left:78%;top:70%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.18;filter:blur(70px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#2a1a5e;left:15%;top:20%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.35;filter:blur(80px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#4f378b;left:78%;top:70%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.28;filter:blur(80px)"></div>
     </div>
     <div class="slide-header">
       <span class="slide-label" id="sl-numbers-eyebrow">${T.numbersEyebrow}</span>
@@ -1168,8 +1169,8 @@ function buildTopArtists() {
 
   return `
     <div style="position:absolute;inset:0;z-index:0">
-      <div style="position:absolute;border-radius:50%;background:#7c3aed;left:20%;top:30%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.28;filter:blur(80px)"></div>
-      <div style="position:absolute;border-radius:50%;background:#ec4899;left:75%;top:65%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.2;filter:blur(80px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#4f378b;left:20%;top:30%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.38;filter:blur(85px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#6d3a8f;left:75%;top:65%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.28;filter:blur(85px)"></div>
     </div>
     <div class="slide-header">
       <span class="slide-label">${T.artistsEyebrow}</span>
@@ -1198,8 +1199,8 @@ function buildTopAlbums() {
   }).join('');
   return `
     <div style="position:absolute;inset:0;z-index:0">
-      <div style="position:absolute;border-radius:50%;background:#059669;left:18%;top:30%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.22;filter:blur(80px)"></div>
-      <div style="position:absolute;border-radius:50%;background:#0d9488;left:75%;top:65%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.18;filter:blur(80px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#1d5e42;left:18%;top:30%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.32;filter:blur(85px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#0e4a44;left:75%;top:65%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.25;filter:blur(85px)"></div>
     </div>
     <div class="slide-header">
       <span class="slide-label">${T.albumsEyebrow}</span>
@@ -1231,8 +1232,8 @@ function buildTopTracks() {
   }).join('');
   return `
     <div style="position:absolute;inset:0;z-index:0">
-      <div style="position:absolute;border-radius:50%;background:#2563eb;left:15%;top:28%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.22;filter:blur(80px)"></div>
-      <div style="position:absolute;border-radius:50%;background:#4f46e5;left:78%;top:68%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.18;filter:blur(80px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#1a2f6b;left:15%;top:28%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.32;filter:blur(85px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#2e1060;left:78%;top:68%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.25;filter:blur(85px)"></div>
     </div>
     <div class="slide-header">
       <span class="slide-label">${T.tracksEyebrow}</span>
@@ -1249,7 +1250,7 @@ function buildGlobalCompare() {
   const img = STORE.artist1Img || '';
   const percentile = gs?.percentile || '—';
 
-  // uniqueness score based on niche tags and lesser-known artists
+  // score d'originalité estimé
   const nicheTags = STORE.tags.filter(t => {
     const t2 = t.toLowerCase();
     return t2.length > 4 && !['rock','pop','metal','rap','jazz','soul','folk','indie'].includes(t2);
@@ -1258,7 +1259,7 @@ function buildGlobalCompare() {
     ? Math.min(99, Math.round(52 + nicheTags * 4 + (STORE.artists.filter(a => !a._listeners || a._listeners < 100000).length * 4)))
     : '—';
 
-  // how many times the user listens vs world average
+  // ratio écoutes user vs moyenne mondiale
   const avgPL = gs.avgPlaysPerListener || 0;
   const userPC = gs.userPlaycount || 0;
   const vsAvgX = avgPL > 0 ? Math.round((userPC / avgPL) * 10) / 10 : '—';
@@ -1283,14 +1284,14 @@ function buildGlobalCompare() {
     <svg width="0" height="0" style="position:absolute">
       <defs>
         <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#7c3aed"/>
-          <stop offset="100%" stop-color="#a855f7"/>
+          <stop offset="0%" stop-color="#4f378b"/>
+          <stop offset="100%" stop-color="#d0bcff"/>
         </linearGradient>
       </defs>
     </svg>
     <div style="position:absolute;inset:0;z-index:0">
-      <div style="position:absolute;border-radius:50%;background:#7c3aed;left:20%;top:25%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.22;filter:blur(80px)"></div>
-      <div style="position:absolute;border-radius:50%;background:#4338ca;left:78%;top:68%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.18;filter:blur(80px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#4f378b;left:20%;top:25%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.32;filter:blur(85px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#2a1a5e;left:78%;top:68%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.25;filter:blur(85px)"></div>
     </div>
     <div class="slide-header">
       <span class="slide-label">${T.globalEyebrow}</span>
@@ -1410,7 +1411,7 @@ function buildHabits() {
 
   return `
     <div style="position:absolute;inset:0;z-index:0">
-      <div style="position:absolute;border-radius:50%;background:#7c3aed;left:18%;top:25%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.2;filter:blur(80px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#4f378b;left:18%;top:25%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.2;filter:blur(80px)"></div>
     </div>
     <div class="slide-header">
       <span class="slide-label">${T.habitsEyebrow}</span>
@@ -1480,7 +1481,7 @@ function buildRecord() {
   return `
     <div class="slide-bg-accent"></div>
     <div style="position:absolute;inset:0;z-index:0">
-      <div style="position:absolute;border-radius:50%;background:#b45309;left:60%;top:20%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.22;filter:blur(80px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#3d1c04;left:60%;top:20%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.35;filter:blur(85px)"></div>
     </div>
     <div class="slide-header">
       <span class="slide-label">${T.recordEyebrow}</span>
@@ -1551,8 +1552,8 @@ function buildStreak() {
 
   return `
     <div style="position:absolute;inset:0;z-index:0">
-      <div style="position:absolute;border-radius:50%;background:#f59e0b;left:50%;top:30%;width:60vmax;height:60vmax;transform:translate(-50%,-50%);opacity:.18;filter:blur(80px)"></div>
-      <div style="position:absolute;border-radius:50%;background:#ea580c;left:25%;top:65%;width:45vmax;height:45vmax;transform:translate(-50%,-50%);opacity:.14;filter:blur(80px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#3d1c04;left:50%;top:30%;width:60vmax;height:60vmax;transform:translate(-50%,-50%);opacity:.28;filter:blur(85px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#2d0c02;left:25%;top:65%;width:45vmax;height:45vmax;transform:translate(-50%,-50%);opacity:.22;filter:blur(85px)"></div>
     </div>
     <div class="slide-header">
       <span class="slide-label">${T.streakEyebrow||'Streak'}</span>
@@ -1594,8 +1595,8 @@ function buildVibe() {
 
   return `
     <div style="position:absolute;inset:0;z-index:0">
-      <div style="position:absolute;border-radius:50%;background:#4338ca;left:28%;top:24%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.22;filter:blur(80px)"></div>
-      <div style="position:absolute;border-radius:50%;background:#7c3aed;left:74%;top:68%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.18;filter:blur(80px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#2a1a5e;left:28%;top:24%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.32;filter:blur(85px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#4f378b;left:74%;top:68%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.28;filter:blur(85px)"></div>
     </div>
     <div class="slide-header">
       <span class="slide-label">${T.vibeEyebrow||'Profil'}</span>
@@ -1634,7 +1635,7 @@ function buildVibe() {
 
 /* slide 9 — genres */
 function buildGenres() {
-  const COLORS = ['#f43f5e','#a855f7','#3b82f6','#10b981','#f59e0b','#ec4899','#06b6d4','#8b5cf6','#d97706','#dc2626'];
+  const COLORS = ['#f43f5e','#d0bcff','#60a5fa','#34d399','#fbbf24','#f472b6','#38bdf8','#a78bfa','#fb923c','#e879f9'];
   if (!STORE.tags.length) return buildFallback('Aucun genre trouvé.');
 
   const tags = STORE.tags.slice(0, 8);
@@ -1651,8 +1652,8 @@ function buildGenres() {
 
   return `
     <div style="position:absolute;inset:0;z-index:0">
-      <div style="position:absolute;border-radius:50%;background:#db2777;left:18%;top:28%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.22;filter:blur(80px)"></div>
-      <div style="position:absolute;border-radius:50%;background:#9333ea;left:78%;top:65%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.18;filter:blur(80px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#45073a;left:18%;top:28%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.32;filter:blur(85px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#4f378b;left:78%;top:65%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.28;filter:blur(85px)"></div>
     </div>
     <div class="slide-header">
       <span class="slide-label">${T.genresEyebrow}</span>
@@ -1718,7 +1719,7 @@ function buildRecap() {
     </div>`;
 }
 
-// slide list
+// liste des slides + logique d'animation
 /* Slide Historique — calendrier annuel + barres mensuelles */
 function buildHistory() {
   const dayMap   = STORE.dayMap || {};
@@ -1789,7 +1790,7 @@ function buildHistory() {
 
   return `
     <div style="position:absolute;inset:0;z-index:0">
-      <div style="position:absolute;border-radius:50%;background:#7c3aed;left:20%;top:25%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.22;filter:blur(80px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#4f378b;left:20%;top:25%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.22;filter:blur(80px)"></div>
       <div style="position:absolute;border-radius:50%;background:#4338ca;left:78%;top:68%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.18;filter:blur(80px)"></div>
     </div>
     <div class="slide-header">
@@ -2173,7 +2174,7 @@ const Stories = {
   }
 };
 
-// radar chart (Chart.js)
+// radar des genres
 function buildRadarChart() {
   const canvas = document.getElementById('genres-radar-chart');
   if (!canvas) return;
@@ -2187,11 +2188,11 @@ function buildRadarChart() {
     document.head.appendChild(s);
   });
 
-  const COLORS = ['#f43f5e','#a855f7','#3b82f6','#10b981','#f59e0b','#ec4899','#06b6d4','#8b5cf6'];
+  const COLORS = ['#f43f5e','#d0bcff','#60a5fa','#34d399','#fbbf24','#f472b6','#38bdf8','#a78bfa'];
   const tags = STORE.tags.slice(0, 8);
   if (!tags.length) return;
 
-  // simulated decreasing values with some randomness
+  // valeurs simulées décroissantes avec un peu d'aléatoire, ça donne un look naturel
   const data = tags.map((_, i) => Math.max(10, Math.round(100 - i*11 + (Math.random()*12-6))));
 
   loadChartJs().then(() => {
@@ -2202,11 +2203,11 @@ function buildRadarChart() {
         labels: tags.map(t => t.length > 12 ? t.slice(0,10)+'…' : t),
         datasets: [{
           data,
-          backgroundColor: 'rgba(168,85,247,.15)',
-          borderColor: '#a855f7',
+          backgroundColor: 'rgba(208,188,255,.12)',
+          borderColor: '#d0bcff',
           borderWidth: 2,
           pointBackgroundColor: COLORS,
-          pointBorderColor: '#fff',
+          pointBorderColor: 'rgba(230,225,229,.6)',
           pointRadius: 4,
         }],
       },
@@ -2216,22 +2217,22 @@ function buildRadarChart() {
         scales: {
           r: {
             min: 0, max: 100,
-            grid: { color: 'rgba(255,255,255,.08)' },
-            angleLines: { color: 'rgba(255,255,255,.08)' },
+            grid:       { color: 'rgba(147,143,153,.15)' },
+            angleLines: { color: 'rgba(147,143,153,.15)' },
             ticks: { display: false, stepSize: 25 },
             pointLabels: {
-              color: 'rgba(255,255,255,.65)',
-              font: { family: "'Syne',sans-serif", size: 11, weight: '700' },
+              color: 'rgba(230,225,229,.6)',
+              font: { family: "'Inter',sans-serif", size: 11, weight: '600' },
             },
           },
         },
         plugins: { legend: { display: false }, tooltip: { enabled: false } },
       },
     });
-  }).catch(err => console.warn('Chart.js not loaded:', err));
+  }).catch(err => console.warn('Chart.js pas chargé :', err));
 }
 
-// export manager (html2canvas)
+// export image (html2canvas)
 // fetch image as base64 for CORS-safe export
 async function fetchDataUrl(src) {
   if (!src || src.startsWith('data:')) return src;
@@ -2324,7 +2325,7 @@ const ExportManager = {
 
     try {
       const canvas = await html2canvas(stage, {
-        backgroundColor: '#060610', scale: 2, useCORS: true, logging: false,
+        backgroundColor: '#141218', scale: 2, useCORS: true, logging: false,
         width: 360, height: 640,
         onclone: (doc) => this._fixClone(doc),
       });
@@ -2363,7 +2364,7 @@ const ExportManager = {
     await this._bakeImages(stage);
     try {
       const canvas = await html2canvas(stage, {
-        backgroundColor: '#060610', scale: 2, useCORS: true, logging: false,
+        backgroundColor: '#141218', scale: 2, useCORS: true, logging: false,
         width: 680, height: 860,
         onclone: (doc) => this._fixClone(doc),
       });
@@ -2383,7 +2384,7 @@ const ExportManager = {
       const storiesEl = document.getElementById('stories');
       if (storiesEl) await this._bakeImages(storiesEl);
       const canvas = await html2canvas(storiesEl || document.getElementById('stories'), {
-        backgroundColor: '#060610', scale: Math.min(window.devicePixelRatio || 2, 3),
+        backgroundColor: '#141218', scale: Math.min(window.devicePixelRatio || 2, 3),
         useCORS: true, logging: false,
         ignoreElements: el => ['screenshot-btn','hud','nav-prev','nav-next','modal-share'].includes(el.id),
         onclone: (doc) => {
@@ -2452,7 +2453,7 @@ const ExportManager = {
   }
 };
 
-// share modal
+// modal de partage
 function openShareModal() {
   const modal = document.getElementById('modal-share');
   if (!modal) return;
@@ -2463,7 +2464,7 @@ function closeShareModal() {
   if (modal) modal.classList.add('hidden');
 }
 
-// share preview overlay
+// overlay vue partagée
 function populateSharePreview(data) {
   const setT = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
   const setI = (id,s) => { const e=document.getElementById(id); if(e) e.src=s; };
@@ -2479,7 +2480,7 @@ function populateSharePreview(data) {
   }
 }
 
-// input handlers
+// raccourcis clavier
 document.addEventListener('keydown', e => {
   if (document.getElementById('stories')?.classList.contains('hidden')) return;
   if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); Stories.next(); }
@@ -2499,7 +2500,7 @@ document.getElementById('exit-btn')?.addEventListener('click', () => {
   document.getElementById('overlay-creds')?.classList.remove('hidden');
 });
 
-// share modal buttons
+// modal de partage buttons
 document.getElementById('modal-copy-link')?.addEventListener('click', async () => { closeShareModal(); await copyShareLink(); });
 document.getElementById('modal-web-share')?.addEventListener('click', async () => { closeShareModal(); await nativeShare(); });
 document.getElementById('modal-export-story')?.addEventListener('click', () => { closeShareModal(); ExportManager.story(); });
@@ -2528,7 +2529,7 @@ document.getElementById('toggle-pw')?.addEventListener('click', () => {
   inp.type = inp.type === 'password' ? 'text' : 'password';
 });
 
-// swipe gestures
+// swipe sur mobile
 let _tx = 0, _ty = 0, _tt = 0;
 document.addEventListener('touchstart', e => { _tx = e.touches[0].clientX; _ty = e.touches[0].clientY; _tt = Date.now(); }, { passive: true });
 document.addEventListener('touchend', e => {
@@ -2540,7 +2541,7 @@ document.addEventListener('touchend', e => {
   }
 }, { passive: true });
 
-// loader
+// mise à jour du loader
 function showLoader(msg, pct) {
   const lt = document.getElementById('loader-text'), lb = document.getElementById('loader-bar'), pt = document.getElementById('loader-pct');
   if (lt && msg) lt.textContent = msg;
@@ -2601,7 +2602,7 @@ document.getElementById('cred-submit')?.addEventListener('click', async () => {
   document.getElementById(id)?.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('cred-submit')?.click(); })
 );
 
-// language selection
+// choix de la langue
 document.querySelectorAll('.lang-btn').forEach(btn => btn.addEventListener('click', () => {
   setLang(btn.dataset.lang);
   document.getElementById('overlay-lang')?.classList.add('hidden');
@@ -2612,12 +2613,12 @@ document.getElementById('lang-change-btn')?.addEventListener('click', () => {
   document.getElementById('overlay-lang')?.classList.remove('hidden');
 });
 
-// init
+// démarrage
 document.addEventListener('DOMContentLoaded', () => {
   let savedLang; try { savedLang = localStorage.getItem('ls_lang'); } catch {}
   setLang(savedLang || autoDetectLang());
 
-  // share mode (?share=...)
+  // mode partage (?share= dans l'URL)
   const urlParams = new URLSearchParams(location.search);
   const shareParam = urlParams.get('share');
   if (shareParam) {
@@ -2633,23 +2634,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // normal mode
+  // mode normal
   const now = new Date();
   const isDecember = now.getMonth() === 11;
 
+  // --- peuple le sélecteur d'année (fait ça tout de suite, pas seulement hors-décembre)
+  const sel = document.getElementById('inp-year');
+  if (sel) {
+    const cur = now.getFullYear(), last = cur - 1;
+    sel.innerHTML = '';
+    for (let y = last; y >= 2003; y--) {
+      const o = document.createElement('option');
+      o.value = y; o.textContent = y;
+      if (y === last) o.selected = true;
+      sel.appendChild(o);
+    }
+    sel.addEventListener('change', () => {
+      WRAPPED_YEAR = parseInt(sel.value) || WRAPPED_YEAR;
+      const badge = document.getElementById('year-badge');
+      const hint  = document.getElementById('year-hint');
+      const selectedYear = parseInt(sel.value);
+      if (badge) badge.textContent = selectedYear === cur-1 ? '' : T.yearbadgeArchive||'Archive';
+      if (hint)  hint.textContent = '';
+    });
+    let saved; try { saved = parseInt(localStorage.getItem('ls_year')) || last; } catch { saved = last; }
+    sel.value = String(Math.min(saved, last));
+  }
+
   if (isDecember) {
-    // show countdown — Wrapped isn't out yet
+    // compte à rebours en décembre
     document.getElementById('overlay-lang')?.classList.add('hidden');
     document.getElementById('overlay-wait')?.classList.remove('hidden');
     applyLangToDOM();
     startCountdown();
 
-    // show previous years (always accessible)
+    // boutons années précédentes
     const archivesEl = document.getElementById('wait-archives');
     const archivesList = document.getElementById('wait-archives-list');
     if (archivesEl && archivesList) {
       const cur = now.getFullYear();
-      // show up to 5 past years
+      // 5 ans max
       for (let y = cur - 1; y >= Math.max(cur - 5, 2006); y--) {
         const btn = document.createElement('button');
         btn.className = 'archive-year-btn';
@@ -2667,38 +2691,13 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // populate the year selector
-  const sel = document.getElementById('inp-year');
-  if (sel) {
-    const cur = now.getFullYear(), last = cur - 1;
-    sel.innerHTML = '';
-    for (let y = last; y >= 2003; y--) {
-      const o = document.createElement('option');
-      o.value = y; o.textContent = y;
-      if (y === last) { o.selected = true; }
-      sel.appendChild(o);
-    }
-    // update badge and sync year
-    sel.addEventListener('change', () => {
-      WRAPPED_YEAR = parseInt(sel.value) || WRAPPED_YEAR;
-      const badge = document.getElementById('year-badge');
-      const hint  = document.getElementById('year-hint');
-      const selectedYear = parseInt(sel.value);
-      const curYear = now.getFullYear();
-      if (badge) badge.textContent = selectedYear === curYear-1 ? '' : T.yearbadgeArchive||'Archive';
-      if (hint) hint.textContent = '';
-    });
-    let saved; try { saved = parseInt(localStorage.getItem('ls_year')) || last; } catch { saved = last; }
-    sel.value = String(Math.min(saved, last));
-  }
-
-  // pre-fill saved credentials
+  // si l'utilisateur avait coché "se souvenir de moi"
   let savedUser = '', savedKey = '';
   try { savedUser = localStorage.getItem('ls_username') || ''; savedKey = localStorage.getItem('ls_apikey') || ''; } catch {}
   if (savedUser) { const e = document.getElementById('inp-user'); if (e) e.value = savedUser; }
   if (savedKey)  { const e = document.getElementById('inp-key');  if (e) e.value = savedKey; }
 
-  // skip language screen if we already have a language
+  // langue déjà choisie, on saute l'écran
   if (savedLang) {
     document.getElementById('overlay-lang')?.classList.add('hidden');
     document.getElementById('overlay-creds')?.classList.remove('hidden');
