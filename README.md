@@ -55,3 +55,56 @@ cd laststats
 npx serve . 
 # OR
 python3 -m http.server 8080
+```
+
+## 🛠️ Tech Stack
+
+The project is built on a **pure web** architecture, prioritizing native standards for longevity and performance.
+
+* **Logic & UI**: Vanilla JavaScript (ES6+), Web Components, HTML5, CSS3 (Custom Properties).
+* **Data Visualization**: [Chart.js](https://www.chartjs.org/) for trend graphs and [D3.js](https://d3js.org/) for complex data structures.
+* **API**: [Last.fm API](https://www.last.fm/api) (REST).
+* **PWA**: Service Workers (Workbox) for caching and offline support.
+* **Icons**: [Google Material Symbols](https://fonts.google.com/icons).
+
+---
+
+## 🔒 Privacy & Security
+
+Your privacy is at the core of LastStats. Unlike other analytics tools, no data passes through our servers.
+
+* **Client-Side Only**: All calculations and data rendering happen locally in your browser.
+* **No Database**: We do not store your credentials. Your API key (if provided) is stored only in your device's `localStorage`.
+* **Open Source**: The code is transparent and can be audited by anyone at any time.
+
+---
+
+## 📈 Key Features
+
+* **Dynamic Dashboard**: Visualize your top artists, albums, and tracks across various timeframes (7 days, 1 month, 3 months, overall).
+* **Time-Machine Reports**: Explore your past listening habits with filters by year and month.
+* **Data Export**: Generate elegant visuals ready to be shared on social media (Instagram, Twitter).
+* **Sankey Charts**: Track the transition of your musical tastes between genres over time.
+* **Live Scrobbling**: View your listening activity in real-time with smooth animations.
+
+---
+
+## 🤝 Contribution
+
+Contributions are what make the open-source community an amazing place. Any help is greatly appreciated!
+
+1.  **Fork** the project.
+2.  Create your feature branch (`git checkout -b feature/AmazingFeature`).
+3.  **Commit** your changes (`git commit -m 'Add some AmazingFeature'`).
+4.  **Push** to the branch (`git push origin feature/AmazingFeature`).
+5.  Open a **Pull Request**.
+
+---
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+*Developed with ❤️ by [Your Name/Username] for music lovers.*
