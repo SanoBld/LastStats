@@ -104,7 +104,3 @@ Contributions are what make the open-source community an amazing place. Any help
 ## 📄 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
----
-
-*Developed with ❤️ by [Your Name/Username] for music lovers.*
