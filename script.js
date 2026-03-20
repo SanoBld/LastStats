@@ -5,11 +5,76 @@ const CACHE_TTL   = 30 * 60 * 1000;
 const TOP_LIMIT   = 50;
 const DEFAULT_IMG = '2a96cbd8b46e442fc41c2b86b821562f';
 
-const CHART_PALETTE = [
-  '#6366f1','#8b5cf6','#a855f7','#d946ef','#ec4899',
-  '#f43f5e','#f97316','#eab308','#22c55e','#06b6d4',
-  '#3b82f6','#0ea5e9','#14b8a6','#84cc16','#78716c',
-];
+// Palette statique de fallback (utilisée uniquement si les CSS vars ne sont pas encore chargées)
+// Teintes de base par clé d'accent (correspond aux valeurs _ACCENT_DARK)
+const _ACCENT_HUES = { purple: 265, blue: 210, green: 135, red: 0, orange: 28 };
+
+// Cache palette pour éviter de recalculer à chaque accès
+let _palCache    = null;
+let _palCacheKey = null;
+
+/**
+ * Renvoie N couleurs basées sur la teinte de l'accent courant.
+ * Pas d'accès DOM — utilise APP.currentAccent ou la CSS var hsl() pour custom/dynamic.
+ */
+function getAccentPalette(n = 15) {
+  const key    = APP?.currentAccent || localStorage.getItem('ls_accent') || 'purple';
+  const isDark = APP?.currentTheme === 'dark'
+    || (APP?.currentTheme === 'auto' && window.matchMedia('(prefers-color-scheme:dark)').matches);
+  const cacheId = `${key}|${isDark}`;
+
+  if (_palCache && _palCacheKey === cacheId) {
+    return n >= _palCache.length ? _palCache : _palCache.slice(0, n);
+  }
+
+  let baseH = _ACCENT_HUES[key] ?? 265;
+
+  // Pour custom / dynamic : lire la CSS var hsl() si disponible
+  if (key === 'custom' || key === 'dynamic') {
+    try {
+      const raw  = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+      const hslM = raw.match(/hsl\(\s*(\d+)/);
+      if (hslM) baseH = parseInt(hslM[1]);
+    } catch {}
+  }
+
+  const s     = isDark ? 65 : 55;
+  const lBase = isDark ? 68 : 48;
+
+  _palCache    = Array.from({ length: 15 }, (_, i) => {
+    const h = (baseH + i * 28) % 360;
+    const l = lBase + (i % 3) * 6;
+    return `hsl(${h},${s}%,${l}%)`;
+  });
+  _palCacheKey = cacheId;
+
+  return n >= _palCache.length ? _palCache : _palCache.slice(0, n);
+}
+
+/** Invalide le cache palette (appelé par setAccent) */
+function _invalidatePalCache() { _palCache = null; _palCacheKey = null; }
+
+/**
+ * CHART_PALETTE — tableau vivant basé sur l'accent courant.
+ * Proxy Symbol-safe : tous les Symbol-props sont délégués au tableau réel,
+ * ce qui évite le "Cannot convert a Symbol value to a number" de Chart.js/D3.
+ */
+const CHART_PALETTE = new Proxy([], {
+  get(_, prop) {
+    const pal = getAccentPalette(15);
+    // ① Toujours déléguer les Symbol directement (Symbol.iterator, toPrimitive, etc.)
+    if (typeof prop === 'symbol') return pal[prop];
+    // ② Propriétés numériques
+    const idx = Number(prop);
+    if (!isNaN(idx) && idx >= 0) return pal[idx];
+    // ③ Toutes les méthodes array (map, slice, forEach, fill, reduce, indexOf…)
+    const val = pal[prop];
+    return typeof val === 'function' ? val.bind(pal) : val;
+  },
+  // Nécessaire pour Array.isArray() et les checks de type
+  getPrototypeOf() { return Array.prototype; },
+  has(_, prop)     { return prop in getAccentPalette(15); },
+});
 
 const MONTHS       = () => window.I18N?.arr('months')       || ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 const MONTHS_SHORT = () => window.I18N?.arr('months_short') || ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
@@ -220,26 +285,115 @@ const API = {
     } catch { return 0; }
   },
 
+  /**
+   * Fetch toutes les pages en parallèle (batch de 5 requêtes simultanées).
+   * 1. Fetch la page 1 pour connaître totalPages.
+   * 2. Fetch toutes les pages restantes en batches de BATCH_SIZE.
+   * Gain typique : 5-8× plus rapide qu'une boucle séquentielle.
+   */
   async fetchAllPages(onProgress, yearFrom = null, yearTo = null) {
-    const allTracks = [];
-    let page = 1, totalPages = 1;
-    const baseParams = { limit: 200, extended: 0 };
+    const BATCH_SIZE  = 5;
+    const baseParams  = { limit: 200, extended: 0 };
     if (yearFrom) baseParams.from = yearFrom;
     if (yearTo)   baseParams.to   = yearTo;
 
-    do {
-      const data = await this._fetch('user.getRecentTracks', { ...baseParams, page });
-      const attr  = data.recenttracks?.['@attr'] || {};
-      totalPages  = parseInt(attr.totalPages || 1);
-      const raw   = data.recenttracks?.track || [];
-      const tracks = Array.isArray(raw) ? raw : [raw];
-      for (const tr of tracks) { if (!tr['@attr']?.nowplaying) allTracks.push(tr); }
-      if (onProgress) onProgress(page, totalPages, allTracks.length);
-      page++;
-      if (page <= totalPages) await sleep(150);
-    } while (page <= totalPages);
+    // Étape 1 : page 1 pour obtenir totalPages
+    const firstData  = await this._fetch('user.getRecentTracks', { ...baseParams, page: 1 });
+    const attr       = firstData.recenttracks?.['@attr'] || {};
+    const totalPages = parseInt(attr.totalPages || 1);
+    const firstRaw   = firstData.recenttracks?.track || [];
+    const firstTracks= (Array.isArray(firstRaw) ? firstRaw : [firstRaw])
+                         .filter(tr => !tr['@attr']?.nowplaying);
 
-    return allTracks;
+    if (onProgress) onProgress(1, totalPages, firstTracks.length);
+
+    if (totalPages === 1) return firstTracks;
+
+    // Étape 2 : pages 2…N en batches parallèles
+    const allPages    = [firstTracks]; // index 0 = page 1
+    let   fetched     = 1;
+
+    for (let start = 2; start <= totalPages; start += BATCH_SIZE) {
+      const batchNums = [];
+      for (let p = start; p < start + BATCH_SIZE && p <= totalPages; p++) {
+        batchNums.push(p);
+      }
+
+      const batchResults = await Promise.all(
+        batchNums.map(p => this._fetch('user.getRecentTracks', { ...baseParams, page: p }))
+      );
+
+      for (let i = 0; i < batchResults.length; i++) {
+        const data   = batchResults[i];
+        const raw    = data.recenttracks?.track || [];
+        const tracks = (Array.isArray(raw) ? raw : [raw])
+                         .filter(tr => !tr['@attr']?.nowplaying);
+        allPages[batchNums[i] - 1] = tracks;
+        fetched++;
+        if (onProgress) {
+          const countSoFar = allPages.reduce((acc, p) => acc + (p?.length || 0), 0);
+          onProgress(fetched, totalPages, countSoFar);
+        }
+      }
+
+      // Pause légère entre les batches pour respecter le rate-limit Last.fm
+      if (start + BATCH_SIZE <= totalPages) await sleep(100);
+    }
+
+    // Aplatir dans l'ordre des pages
+    return allPages.flat();
+  },
+
+  /**
+   * Fetche uniquement les scrobbles plus récents que fromTs (Unix seconds).
+   * Utilisé pour la mise à jour incrémentale du cache historique.
+   * Même logique parallèle que fetchAllPages.
+   */
+  async fetchSince(fromTs, onProgress) {
+    const BATCH_SIZE = 5;
+    const baseParams = { limit: 200, extended: 0, from: fromTs + 1 };
+
+    // Page 1
+    const firstData  = await this._fetch('user.getRecentTracks', { ...baseParams, page: 1 });
+    const attr       = firstData.recenttracks?.['@attr'] || {};
+    const totalPages = parseInt(attr.totalPages || 1);
+    const firstRaw   = firstData.recenttracks?.track || [];
+    const firstTracks= (Array.isArray(firstRaw) ? firstRaw : [firstRaw])
+                         .filter(tr => !tr['@attr']?.nowplaying);
+
+    if (onProgress) onProgress(1, totalPages, firstTracks.length, true);
+    if (totalPages === 1) return firstTracks;
+
+    const allPages = [firstTracks];
+    let   fetched  = 1;
+
+    for (let start = 2; start <= totalPages; start += BATCH_SIZE) {
+      const batchNums = [];
+      for (let p = start; p < start + BATCH_SIZE && p <= totalPages; p++) {
+        batchNums.push(p);
+      }
+
+      const batchResults = await Promise.all(
+        batchNums.map(p => this._fetch('user.getRecentTracks', { ...baseParams, page: p }))
+      );
+
+      for (let i = 0; i < batchResults.length; i++) {
+        const data   = batchResults[i];
+        const raw    = data.recenttracks?.track || [];
+        const tracks = (Array.isArray(raw) ? raw : [raw])
+                         .filter(tr => !tr['@attr']?.nowplaying);
+        allPages[batchNums[i] - 1] = tracks;
+        fetched++;
+        if (onProgress) {
+          const countSoFar = allPages.reduce((acc, p) => acc + (p?.length || 0), 0);
+          onProgress(fetched, totalPages, countSoFar, true);
+        }
+      }
+
+      if (start + BATCH_SIZE <= totalPages) await sleep(100);
+    }
+
+    return allPages.flat();
   },
 };
 
@@ -283,7 +437,20 @@ function estimateListenTime(scrobbles) {
 }
 
 function destroyChart(id) {
-  if (APP.charts[id]) { APP.charts[id].destroy(); delete APP.charts[id]; }
+  // 1. Détruire via notre registre interne
+  if (APP.charts[id]) {
+    try { APP.charts[id].destroy(); } catch {}
+    delete APP.charts[id];
+  }
+  // 2. Vérifier aussi le registre interne de Chart.js (évite "Canvas is already in use")
+  //    Chart.getChart() est dispo depuis Chart.js v3.2
+  try {
+    const canvasEl = document.getElementById(id);
+    if (canvasEl && typeof Chart !== 'undefined') {
+      const existing = Chart.getChart(canvasEl);
+      if (existing) { existing.destroy(); }
+    }
+  } catch {}
 }
 
 function animateValue(el, from, to, duration = 900) {
@@ -373,18 +540,59 @@ function baseChartOpts(extras = {}) {
 }
 
 function updateAllChartThemes() {
+  _invalidatePalCache();
+  const c   = getThemeColors();
+  const pal = getAccentPalette(15);
+
   Object.values(APP.charts).forEach(chart => {
     if (!chart?.options) return;
-    const c = getThemeColors();
+
+    // Update grid + tick colors
     if (chart.options.scales) {
-      Object.values(chart.options.scales).forEach(s => {
-        if (s.grid)  s.grid.color  = c.grid;
-        if (s.ticks) s.ticks.color = c.text;
+      Object.values(chart.options.scales).forEach(sc => {
+        if (sc.grid)  sc.grid.color  = c.grid;
+        if (sc.ticks) sc.ticks.color = c.text;
+        if (sc.pointLabels) sc.pointLabels.color = c.text;
       });
     }
+
+    // Update tooltip background
     if (chart.options.plugins?.tooltip) {
       chart.options.plugins.tooltip.backgroundColor = c.isDark ? 'rgba(15,15,35,.95)' : 'rgba(255,255,255,.95)';
+      chart.options.plugins.tooltip.titleColor = c.isDark ? '#e2e8f0' : '#0f172a';
+      chart.options.plugins.tooltip.bodyColor  = c.isDark ? '#94a3b8' : '#475569';
     }
+
+    // Update legend label color
+    if (chart.options.plugins?.legend?.labels) {
+      chart.options.plugins.legend.labels.color = c.text;
+    }
+
+    // Rebuild dataset colors from current accent palette
+    (chart.data?.datasets || []).forEach((ds, di) => {
+      const base = pal[di % pal.length];
+      // Array backgroundColor (bar/donut charts) — rebuild from palette
+      if (Array.isArray(ds.backgroundColor) && ds.backgroundColor.length > 1) {
+        ds.backgroundColor = ds.backgroundColor.map((_, i) => {
+          const col = pal[i % pal.length];
+          // Preserve alpha suffix if original had one (e.g. "99", "aa", "bb", "22")
+          const alpha = /^hsl/.test(col) ? '' : '';
+          return col + (col.length <= 7 ? 'bb' : '');
+        });
+      }
+      if (Array.isArray(ds.borderColor) && ds.borderColor.length > 1) {
+        ds.borderColor = ds.borderColor.map((_, i) => pal[i % pal.length]);
+      }
+      // Single-value borderColor for line charts
+      if (typeof ds.borderColor === 'string' && ds._usesAccent) {
+        ds.borderColor = base;
+      }
+      // pointBackgroundColor (radar)
+      if (Array.isArray(ds.pointBackgroundColor) && ds.pointBackgroundColor.length > 1) {
+        ds.pointBackgroundColor = ds.pointBackgroundColor.map((_, i) => pal[i % pal.length]);
+      }
+    });
+
     chart.update('none');
   });
 }
@@ -417,6 +625,46 @@ function toggleApiKey() {
   ico.className = inp.type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
 }
 
+// Toggle clé API dans les paramètres
+function toggleSettingsApiKey() {
+  const inp = document.getElementById('settings-apikey');
+  const ico = document.getElementById('settings-eye-icon');
+  if (!inp) return;
+  inp.type      = inp.type === 'password' ? 'text' : 'password';
+  ico.className = inp.type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+}
+
+// Mise à jour du pseudo depuis les paramètres
+function updateUsername() {
+  const el  = document.getElementById('settings-username');
+  const val = (el?.value || '').trim();
+  if (!val) { showToast(t('setup_err_username'), 'error'); return; }
+  APP.username = val;
+  saveSession();
+  showToast(t('toast_settings_saved'));
+  setupProfileUI();
+}
+
+// Mise à jour de la clé API depuis les paramètres
+function updateApiKey() {
+  const el  = document.getElementById('settings-apikey');
+  const val = (el?.value || '').trim();
+  if (!val || val.length < 30) { showToast(t('setup_err_apikey'), 'error'); return; }
+  APP.apiKey = val;
+  saveSession();
+  showToast(t('toast_settings_saved'));
+}
+
+// Wrapper export (appelé par les boutons HTML)
+function exportStats(format) {
+  exportData(format);
+}
+
+// Wrapper clear cache (appelé par le bouton HTML)
+function clearAppCache() {
+  clearCache();
+}
+
 const _ACCENT_DARK  = {
   purple:{ accent:'#d0bcff', h:'#b89af7', a2:'#ccc2dc', container:'#4f378b', on:'#381e72', onCont:'#eaddff', glow:'rgba(208,188,255,.18)', lt:'rgba(208,188,255,.12)', strip:'rgba(208,188,255,.55)', borderGlow:'rgba(208,188,255,.35)' },
   blue:  { accent:'#9ecaff', h:'#7bafef', a2:'#aab9cc', container:'#004a77', on:'#001d36', onCont:'#cde5ff', glow:'rgba(158,202,255,.18)', lt:'rgba(158,202,255,.12)', strip:'rgba(158,202,255,.55)', borderGlow:'rgba(158,202,255,.35)' },
@@ -435,6 +683,7 @@ const _ACCENT_LIGHT = {
 function setAccent(colorKey) {
   APP.currentAccent = colorKey;
   localStorage.setItem('ls_accent', colorKey);
+  _invalidatePalCache(); // refrais la palette accent pour les graphiques
   document.querySelectorAll('.acc-dot').forEach(b => b.classList.toggle('active', b.dataset.color === colorKey));
 
   if (colorKey === 'dynamic') {
@@ -562,6 +811,7 @@ function setCustomAccent(hex) {
   localStorage.setItem('ls_accent_custom', hex);
   APP.currentAccent = 'custom';
   localStorage.setItem('ls_accent', 'custom');
+  _invalidatePalCache();
   document.querySelectorAll('.acc-dot').forEach(b => b.classList.toggle('active', b.dataset.color === 'custom'));
   _syncCustomDotColor(hex);
   const isDark = APP.currentTheme === 'dark' || (APP.currentTheme === 'auto' && window.matchMedia('(prefers-color-scheme:dark)').matches);
@@ -724,9 +974,28 @@ let _bgHistoryTimer = null;
 
 function _scheduleBackgroundHistoryFetch() {
   clearTimeout(_bgHistoryTimer);
-  _bgHistoryTimer = setTimeout(async () => {
-    if (!APP.fullHistory?.length) await fetchFullHistory(true);
-  }, 4000);
+
+  // Si un cache valide existe, on l'expose en mémoire immédiatement
+  // (sections Historique, Badges, Streaks en bénéficient sans attendre)
+  // mais on NE rend PAS les charts ici — _applyFullHistory sera appelé
+  // une seule fois par fetchFullHistory pour éviter "Canvas already in use"
+  const cached = _loadHistoryCache();
+  if (cached?.tracks?.length) {
+    APP.fullHistory = cached.tracks;
+    APP.streakData  = calcStreak(cached.tracks);
+    updateStreakUI(APP.streakData);
+    console.log(`[History] Cache pre-loaded: ${cached.tracks.length} tracks`);
+
+    // Mise à jour incrémentale légère en arrière-plan
+    _bgHistoryTimer = setTimeout(async () => {
+      await fetchFullHistory(true);
+    }, 2000);
+  } else {
+    // Pas de cache — chargement complet différé
+    _bgHistoryTimer = setTimeout(async () => {
+      if (!APP.fullHistory?.length) await fetchFullHistory(true);
+    }, 4000);
+  }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -1699,9 +1968,9 @@ function _buildTrackItem(track, rank, maxPlay) {
     </div>`;
 }
 
-/* ── Injection d'images album dans les tracks depuis APP.trackAlbumImgMap ──
-   Modifie les objets track en place pour que _buildTrackItem trouve les URLs.
-   Ne fait pas d'appel API — utilise uniquement la map déjà construite. */
+// Injecte les images d'album dans les tracks depuis APP.trackAlbumImgMap
+// Modifie les objets track en place pour que _buildTrackItem trouve les URLs.
+// Ne fait pas d'appel API — utilise uniquement la map déjà construite.
 function _injectAlbumImagesIntoTracks(tracks) {
   if (!APP.trackAlbumImgMap?.size) return;
   tracks.forEach(tr => {
@@ -2351,7 +2620,7 @@ async function exportSectionCard(section) {
   const ctx = canvas.getContext('2d');
   ctx.scale(2, 2);
 
-  /* ── Fond dégradé ─────────────────────────────────────────── */
+  // Fond dégradé
   const bgGrad = ctx.createLinearGradient(0, 0, W, H);
   bgGrad.addColorStop(0,   '#1a1025');
   bgGrad.addColorStop(0.45,'#0f172a');
@@ -2625,6 +2894,95 @@ function calcEddington(playcounts) {
 let _historyFetchMinimized = false;
 let _bgFetchInProgress     = false;
 
+/* Cache historique persistant — format compact en localStorage
+   Clé : ls_hist_v2_{username}
+   Structure : { v:2, savedAt:ts, lastTs:unixSeconds, tracks:[compact] }
+   ~200 B/scrobble, 4 000 scrobbles ≈ 800 KB */
+
+const HIST_STORAGE_KEY = 'ls_hist_v2_';
+
+/** Compresse un track API en objet minimal pour le localStorage */
+function _compactTrack(tr) {
+  return {
+    n:  tr.name   || '',
+    a:  tr.artist?.['#text'] || tr.artist?.name || '',
+    al: tr.album?.['#text']  || '',
+    u:  parseInt(tr.date?.uts || 0),
+    i:  tr.image?.find(i => i.size === 'medium')?.['#text'] || '',
+    ul: tr.url || '',
+  };
+}
+
+/** Reconstruit un track complet depuis le format compact */
+function _expandTrack(c) {
+  return {
+    name:   c.n,
+    artist: { '#text': c.a, name: c.a },
+    album:  { '#text': c.al },
+    date:   { uts: String(c.u) },
+    image:  [
+      { size: 'small',      '#text': c.i },
+      { size: 'medium',     '#text': c.i },
+      { size: 'large',      '#text': c.i },
+      { size: 'extralarge', '#text': c.i },
+    ],
+    url: c.ul,
+  };
+}
+
+/** Sauvegarde l'historique compressé dans localStorage */
+function _saveHistoryCache(tracks) {
+  if (!APP.username || !tracks?.length) return false;
+  try {
+    const sorted  = [...tracks].sort((a,b) =>
+      parseInt(b.date?.uts||0) - parseInt(a.date?.uts||0)
+    );
+    const lastTs  = parseInt(sorted[0].date?.uts || 0);
+    const payload = JSON.stringify({
+      v: 2,
+      savedAt: Date.now(),
+      lastTs,
+      tracks: sorted.map(_compactTrack),
+    });
+    localStorage.setItem(HIST_STORAGE_KEY + APP.username, payload);
+    console.log(`[History] Cache saved: ${tracks.length} tracks, lastTs=${lastTs}`);
+    return true;
+  } catch (e) {
+    // localStorage plein — on essaie de vider les vieux caches de l'API
+    console.warn('[History] Save failed (storage full?), clearing API cache…', e);
+    try {
+      Cache._purge();
+      localStorage.setItem(HIST_STORAGE_KEY + APP.username,
+        JSON.stringify({ v:2, savedAt:Date.now(), lastTs:0, tracks:[] }));
+    } catch {}
+    return false;
+  }
+}
+
+/** Charge l'historique depuis localStorage → { lastTs, tracks } | null */
+function _loadHistoryCache() {
+  if (!APP.username) return null;
+  try {
+    const raw = localStorage.getItem(HIST_STORAGE_KEY + APP.username);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (obj.v !== 2 || !Array.isArray(obj.tracks)) return null;
+    return {
+      lastTs: obj.lastTs || 0,
+      savedAt: obj.savedAt || 0,
+      tracks: obj.tracks.map(_expandTrack),
+    };
+  } catch { return null; }
+}
+
+/** Supprime le cache historique (appelé par logout + clearCache) */
+function _clearHistoryCache() {
+  if (!APP.username) return;
+  localStorage.removeItem(HIST_STORAGE_KEY + APP.username);
+}
+
+/* fetchFullHistory — charge l'historique avec mise à jour incrémentale */
+
 async function fetchFullHistory(backgroundMode = false) {
   if (_bgFetchInProgress) return;
   _bgFetchInProgress = true;
@@ -2641,80 +2999,112 @@ async function fetchFullHistory(backgroundMode = false) {
 
   if (btn) { btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${t('fetch_btn_loading')}`; }
 
-  if (!backgroundMode && overlay) {
-    _historyFetchMinimized = false;
-    overlay.classList.remove('hidden', 'fetch-overlay--minimized');
-    document.body.classList.add('fetch-active');
-    if (fillEl)   fillEl.style.width   = '0%';
-    if (pctEl)    pctEl.textContent    = '0%';
-    if (tracksEl) tracksEl.textContent = '0 ' + t('scrobbles');
-    if (msgEl)    msgEl.textContent    = t('fetch_init');
-    if (titleEl)  titleEl.textContent  = t('fetch_title');
-  } else if (backgroundMode && overlay) {
-    _historyFetchMinimized = true;
-    overlay.classList.remove('hidden');
-    overlay.classList.add('fetch-overlay--minimized');
-    document.body.classList.add('fetch-active');
-    _updatePillText(0);
-  }
+  // Vérifier si un cache existe
+  const cached    = _loadHistoryCache();
+  const hasCache  = cached && cached.tracks.length > 0;
+  const isIncremental = hasCache;
+
+  // Affichage overlay
+  const showOverlay = (mode) => {
+    if (!overlay) return;
+    if (mode === 'normal') {
+      _historyFetchMinimized = false;
+      overlay.classList.remove('hidden', 'fetch-overlay--minimized');
+      document.body.classList.add('fetch-active');
+      if (fillEl)   fillEl.style.width   = '0%';
+      if (pctEl)    pctEl.textContent    = '0%';
+      if (tracksEl) tracksEl.textContent = '0 ' + t('scrobbles');
+      if (msgEl)    msgEl.textContent    = t('fetch_init');
+      if (titleEl)  titleEl.textContent  = isIncremental
+        ? `${t('fetch_title')} — Mise à jour`
+        : t('fetch_title');
+    } else {
+      _historyFetchMinimized = true;
+      overlay.classList.remove('hidden');
+      overlay.classList.add('fetch-overlay--minimized');
+      document.body.classList.add('fetch-active');
+      _updatePillText(0);
+    }
+  };
+
+  if (!backgroundMode) showOverlay('normal');
+  else                  showOverlay('minimized');
 
   if (minBtn) minBtn.onclick = () => toggleFetchMinimize();
 
   const pillEl = overlay?.querySelector('.fetch-pill');
   if (pillEl) {
-    pillEl.onclick = () => { _historyFetchMinimized = false; overlay.classList.remove('fetch-overlay--minimized'); };
+    pillEl.onclick = () => {
+      _historyFetchMinimized = false;
+      overlay.classList.remove('fetch-overlay--minimized');
+    };
   }
 
+  const onProgress = (page, totalPages, count, incremental = false) => {
+    const pct = Math.round((page / Math.max(totalPages, 1)) * 100);
+    if (fillEl)   fillEl.style.width   = pct + '%';
+    if (pctEl)    pctEl.textContent    = pct + '%';
+    if (tracksEl) {
+      const base = incremental && hasCache ? cached.tracks.length : 0;
+      tracksEl.textContent = formatNum(base + count) + ' ' + t('scrobbles');
+    }
+    if (subEl)  subEl.textContent  = incremental
+      ? `+${formatNum(count)} nouveaux — Page ${page} / ${totalPages}`
+      : t('fetch_page', page, totalPages);
+    if (msgEl)  msgEl.textContent  = t('fetch_loading');
+    _updatePillText(pct);
+  };
+
   try {
-    const tracks = await API.fetchAllPages((page, totalPages, count) => {
-      const pct = Math.round((page / Math.max(totalPages, 1)) * 100);
-      if (fillEl)   fillEl.style.width   = pct + '%';
-      if (pctEl)    pctEl.textContent    = pct + '%';
-      if (tracksEl) tracksEl.textContent = formatNum(count) + ' ' + t('scrobbles');
-      if (subEl)    subEl.textContent    = t('fetch_page', page, totalPages);
-      if (msgEl)    msgEl.textContent    = t('fetch_loading');
-      _updatePillText(pct);
-    });
+    let tracks;
+
+    if (isIncremental) {
+      // Mode incrémental : charge uniquement les nouveaux scrobbles
+      const ageDays = Math.round((Date.now() - cached.savedAt) / 86400000);
+      console.log(`[History] Cache found: ${cached.tracks.length} tracks, age=${ageDays}d, lastTs=${cached.lastTs}`);
+
+      if (subEl)  subEl.textContent  = `Cache: ${formatNum(cached.tracks.length)} scrobbles`;
+      if (msgEl)  msgEl.textContent  = 'Récupération des nouveaux scrobbles…';
+      if (titleEl) titleEl.textContent = `Mise à jour (${formatNum(cached.tracks.length)} en cache)`;
+
+      // Le cache est disponible en mémoire immédiatement pour les autres sections
+      // (historique, badges…) mais on ne rend les charts qu'une seule fois
+      // à la fin pour éviter le "Canvas already in use" de Chart.js
+      APP.fullHistory = cached.tracks;
+
+      const newTracks = await API.fetchSince(cached.lastTs, onProgress);
+
+      if (newTracks.length > 0) {
+        // Merge : nouveaux + cache, triés par timestamp descendant
+        const merged = [...newTracks, ...cached.tracks].sort(
+          (a,b) => parseInt(b.date?.uts||0) - parseInt(a.date?.uts||0)
+        );
+        // Dédoublonnage sur (artist+name+uts)
+        const seen = new Set();
+        tracks = merged.filter(tr => {
+          const key = `${tr.artist?.['#text']||''}::${tr.name||''}::${tr.date?.uts||''}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+        console.log(`[History] Incremental: +${newTracks.length} new → ${tracks.length} total`);
+        showToast(`+${formatNum(newTracks.length)} nouveaux scrobbles`);
+      } else {
+        // Aucun nouveau scrobble — cache déjà à jour
+        tracks = cached.tracks;
+        console.log('[History] Already up to date');
+        showToast(t('fetch_auto_done'));
+      }
+    } else {
+      // Chargement complet (premier chargement)
+      tracks = await API.fetchAllPages(onProgress);
+    }
 
     APP.fullHistory = tracks;
-
-    const hourCounts = Array(24).fill(0);
-    for (const tr of tracks) {
-      const ts = parseInt(tr.date?.uts || 0);
-      if (ts) hourCounts[new Date(ts * 1000).getHours()]++;
-    }
-    renderHeatmap(hourCounts);
-    _renderHourlyChart(hourCounts);
-
-    APP.streakData = calcStreak(tracks);
-    updateStreakUI(APP.streakData);
-
-    const uniqueArtistsEl = document.getElementById('adv-unique');
-    if (uniqueArtistsEl) {
-      const unique = new Set(tracks.map(tr => (tr.artist?.['#text'] || tr.artist?.name || '').toLowerCase())).size;
-      uniqueArtistsEl.textContent = formatNum(unique);
-    }
-
-    _renderDayOfWeekChart(tracks);
-    _renderOHWList(tracks);
-
-    // clear "load history" hints from the charts section
-    const hourlyHint  = document.getElementById('hourly-hint');
-    const weekdayHint = document.getElementById('weekday-hint');
-    if (hourlyHint)  hourlyHint.textContent  = '';
-    if (weekdayHint) weekdayHint.textContent = '';
-
-    // hide the OHW empty state if shown
-    document.getElementById('ohw-empty')?.style?.setProperty?.('display', 'none');
-
-    if (backgroundMode) {
-      showToast(t('fetch_auto_done'));
-      overlay?.classList.add('hidden');
-      document.body.classList.remove('fetch-active');
-    }
+    _saveHistoryCache(tracks);
+    _applyFullHistory(tracks, true);
 
     if (btn) { btn.disabled = false; btn.innerHTML = `<i class="fas fa-check"></i> ${t('fetch_btn_done')}`; }
-
     return tracks;
 
   } catch (e) {
@@ -2728,6 +3118,71 @@ async function fetchFullHistory(backgroundMode = false) {
     }
   }
 }
+
+/**
+ * Applique un historique chargé à toute l'UI (charts, streaks, badges, calendrier…).
+ * @param {Array}   tracks
+ * @param {boolean} showDoneToast — affiche le toast "terminé" si true
+ */
+// Guard pour éviter deux appels _applyFullHistory simultanés
+let _applyHistoryPending = false;
+
+/**
+ * Applique un historique chargé à toute l'UI (charts, streaks, badges, calendrier…).
+ * @param {Array}   tracks
+ * @param {boolean} showDoneToast — masque l'overlay et affiche le toast "terminé" si true
+ */
+function _applyFullHistory(tracks, showDoneToast) {
+  // Si un render précédent tourne encore, on détruit les charts concernés proprement
+  if (_applyHistoryPending) {
+    destroyChart('chart-hourly');
+    destroyChart('chart-weekday');
+  }
+  _applyHistoryPending = true;
+  const hourCounts = Array(24).fill(0);
+  for (const tr of tracks) {
+    const ts = parseInt(tr.date?.uts || 0);
+    if (ts) hourCounts[new Date(ts * 1000).getHours()]++;
+  }
+  renderHeatmap(hourCounts);
+  _renderHourlyChart(hourCounts);
+
+  APP.streakData = calcStreak(tracks);
+  updateStreakUI(APP.streakData);
+
+  const uniqueArtistsEl = document.getElementById('adv-unique');
+  if (uniqueArtistsEl) {
+    const unique = new Set(
+      tracks.map(tr => (tr.artist?.['#text'] || tr.artist?.name || '').toLowerCase())
+    ).size;
+    uniqueArtistsEl.textContent = formatNum(unique);
+  }
+
+  _renderDayOfWeekChart(tracks);
+  _renderOHWList(tracks);
+
+  // Calendrier d'Écoute — dashboard + charts
+  _buildCalHeatmapYearSel('');
+  _buildCalHeatmapYearSel('charts');
+  renderListeningHeatmap(new Date().getFullYear(), '');
+  renderListeningHeatmap(new Date().getFullYear(), 'charts');
+
+  // Effacer les hints "load history"
+  const hourlyHint  = document.getElementById('hourly-hint');
+  const weekdayHint = document.getElementById('weekday-hint');
+  if (hourlyHint)  hourlyHint.textContent  = '';
+  if (weekdayHint) weekdayHint.textContent = '';
+  document.getElementById('ohw-empty')?.style?.setProperty?.('display', 'none');
+
+  if (showDoneToast) {
+    const overlay = document.getElementById('fetch-overlay');
+    overlay?.classList.add('hidden');
+    document.body.classList.remove('fetch-active');
+  }
+
+  _applyHistoryPending = false;
+}
+
 
 function toggleFetchMinimize() {
   const overlay = document.getElementById('fetch-overlay');
@@ -2782,6 +3237,178 @@ function _renderHourlyChart(hourCounts) {
   });
 }
 
+/* Calendrier d'Écoute — heatmap annuelle (inspiré GitHub) */
+
+/** Construit le <select> des années disponibles dans le calendrier */
+function _buildCalHeatmapYearSel(suffix = '') {
+  const id  = suffix ? `cal-heatmap-yr-sel-${suffix}` : 'cal-heatmap-yr-sel';
+  const sel = document.getElementById(id);
+  if (!sel || sel.options.length > 0) return;
+  const currentYear = new Date().getFullYear();
+  for (let y = currentYear; y >= APP.regYear; y--) {
+    const opt      = document.createElement('option');
+    opt.value      = y;
+    opt.textContent= y;
+    if (y === currentYear) opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+
+/**
+ * Construit et affiche la heatmap calendrier GitHub-style.
+ * @param {number} [year]   — année à afficher (défaut : année courante)
+ * @param {string} [suffix] — '' pour dashboard, 'charts' pour la section Charts
+ */
+function renderListeningHeatmap(year, suffix = '') {
+  const sfx     = suffix ? `-${suffix}` : '';
+  const history = APP.fullHistory;
+  const emptyEl = document.getElementById(`listening-heatmap-empty${sfx}`);
+  const wrapEl  = document.getElementById(`listening-heatmap-wrap${sfx}`);
+  if (!wrapEl) return;
+
+  if (!history?.length) {
+    emptyEl?.classList.remove('hidden');
+    wrapEl.classList.add('hidden');
+    return;
+  }
+
+  emptyEl?.classList.add('hidden');
+  wrapEl.classList.remove('hidden');
+
+  _buildCalHeatmapYearSel(suffix);
+
+  const targetYear = year || new Date().getFullYear();
+  const selId = suffix ? `cal-heatmap-yr-sel-${suffix}` : 'cal-heatmap-yr-sel';
+  const sel   = document.getElementById(selId);
+  if (sel) sel.value = targetYear;
+
+  // Agrégation des scrobbles par jour
+  const dayCounts = new Map();
+  for (const tr of history) {
+    const ts = parseInt(tr.date?.uts || 0);
+    if (!ts) continue;
+    const d = new Date(ts * 1000);
+    if (d.getFullYear() !== targetYear) continue;
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    dayCounts.set(key, (dayCounts.get(key) || 0) + 1);
+  }
+
+  // Seuils des 4 niveaux d'intensité
+  const vals       = dayCounts.size ? [...dayCounts.values()] : [1];
+  const maxCount   = Math.max(...vals);
+  const thresholds = [1, Math.ceil(maxCount * 0.25), Math.ceil(maxCount * 0.5), Math.ceil(maxCount * 0.75)];
+
+  const getLevel = (count) => {
+    if (!count)                  return 0;
+    if (count < thresholds[1])   return 1;
+    if (count < thresholds[2])   return 2;
+    if (count < thresholds[3])   return 3;
+    return 4;
+  };
+
+  // Construction des cellules (lun=0 … dim=6)
+  const jan1     = new Date(targetYear, 0, 1);
+  const startPad = (jan1.getDay() + 6) % 7;
+  const isLeap   = (targetYear % 4 === 0 && targetYear % 100 !== 0) || targetYear % 400 === 0;
+  const totalDays = isLeap ? 366 : 365;
+
+  const allCells = [];
+  for (let i = 0; i < startPad; i++) allCells.push(null);
+  for (let d = 0; d < totalDays; d++) {
+    const date = new Date(targetYear, 0, d + 1);
+    const key  = `${targetYear}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+    allCells.push({ date, key, count: dayCounts.get(key) || 0 });
+  }
+  while (allCells.length % 7 !== 0) allCells.push(null);
+  const numWeeks = allCells.length / 7;
+
+  // Positions pixel-parfaites des étiquettes de mois
+  // Chaque colonne = CELL_W + CELL_GAP = 11 + 2 = 13 px
+  const CELL_W = 11, CELL_GAP = 2, COL_W = CELL_W + CELL_GAP;
+  const WD_W   = 22, BODY_GAP = 4; // largeur labels jours + gap
+
+  const MONTHS_FR = MONTHS_SHORT();
+  const monthPositions = [];
+  let lastMonth = -1;
+  for (let w = 0; w < numWeeks; w++) {
+    const cell = allCells.slice(w * 7, w * 7 + 7).find(c => c !== null);
+    if (cell && cell.date.getMonth() !== lastMonth) {
+      monthPositions.push({ week: w, label: MONTHS_FR[cell.date.getMonth()] });
+      lastMonth = cell.date.getMonth();
+    }
+  }
+
+  // Labels jours de semaine (lun, mer, ven)
+  const wdLabels = DAYS?.() || ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  const wdHTML   = wdLabels.map((wd, i) =>
+    `<span class="cal-wd-lbl">${[0,2,4].includes(i) ? wd : ''}</span>`
+  ).join('');
+
+  // Étiquettes de mois absolues — left = semaine × 13px
+  const monthRowW = numWeeks * COL_W - CELL_GAP;
+  const monthHTML = monthPositions.map(({ week, label }) =>
+    `<span class="cal-month-label" style="left:${week * COL_W}px">${label}</span>`
+  ).join('');
+
+  // Colonnes de semaines — couleurs 100% CSS via data-level + --accent
+  const weeksHTML = Array(numWeeks).fill(0).map((_, wi) => {
+    const days = allCells.slice(wi * 7, wi * 7 + 7).map(cell => {
+      if (!cell) return `<div class="cal-day-cell cal-day-empty"></div>`;
+      const lv  = getLevel(cell.count);
+      const fmt = cell.date.toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric' });
+      const tip = cell.count > 0
+        ? `${fmt} — ${formatNum(cell.count)} ${t('scrobbles')}`
+        : `${fmt}`;
+      return `<div class="cal-day-cell" data-level="${lv}" title="${tip}"></div>`;
+    }).join('');
+    return `<div class="cal-week-col">${days}</div>`;
+  }).join('');
+
+  // Stats rapides
+  const totalYearScrobbles = [...dayCounts.values()].reduce((a,b) => a+b, 0);
+  const activeDays         = dayCounts.size;
+  const bestDay            = [...dayCounts.entries()].sort((a,b) => b[1]-a[1])[0];
+  const bestDayStr         = bestDay
+    ? new Date(bestDay[0]).toLocaleDateString(undefined, { month:'short', day:'numeric' })
+      + ` (${formatNum(bestDay[1])})`
+    : '—';
+
+  // Légende — utilise cal-day-cell pour hériter des mêmes règles CSS data-level
+  const legendCells = [0,1,2,3,4].map(lv =>
+    `<div class="cal-day-cell" data-level="${lv}"></div>`
+  ).join('');
+
+  wrapEl.innerHTML = `
+    <div class="cal-heatmap-inner">
+      <div class="cal-month-row" style="margin-left:${WD_W + BODY_GAP}px;width:${monthRowW}px">
+        ${monthHTML}
+      </div>
+      <div class="cal-body">
+        <div class="cal-weekday-labels">${wdHTML}</div>
+        <div class="cal-heatmap-grid">${weeksHTML}</div>
+      </div>
+      <div class="cal-heatmap-stats">
+        <div class="cal-heatmap-stat">
+          <i class="fas fa-headphones"></i>
+          <span><strong>${formatNum(totalYearScrobbles)}</strong> ${t('scrobbles')} ${targetYear}</span>
+        </div>
+        <div class="cal-heatmap-stat">
+          <i class="fas fa-calendar-check"></i>
+          <span><strong>${activeDays}</strong> ${t('cal_active_days')}</span>
+        </div>
+        <div class="cal-heatmap-stat">
+          <i class="fas fa-bolt"></i>
+          <span>${t('cal_record')}&nbsp;: <strong>${bestDayStr}</strong></span>
+        </div>
+      </div>
+      <div class="cal-heatmap-legend">
+        <span>${t('cal_legend_less')}</span>
+        <div class="cal-legend-cells">${legendCells}</div>
+        <span>${t('cal_legend_more')}</span>
+      </div>
+    </div>`;
+}
+
 function _renderOHWList(tracks) {
   const playcountByArtist = {};
   for (const tr of tracks) {
@@ -2807,7 +3434,7 @@ function _renderOHWList(tracks) {
     </div>`).join('');
 }
 
-/* ── Smart refresh ───────────────────────────────────────────── */
+// Smart refresh
 async function refreshData() {
   const refreshBtn = document.getElementById('refresh-btn');
   const icon       = refreshBtn?.querySelector('i');
@@ -2836,8 +3463,9 @@ async function refreshData() {
   _scheduleBackgroundHistoryFetch();
 }
 
-/* ── Logout ─────────────────────────────────────────────────── */
+// Logout
 function logout() {
+  _clearHistoryCache();
   Cache.clear();
   clearSession();
   localStorage.removeItem('ls_section');
@@ -3758,7 +4386,7 @@ const BadgeEngine = (() => {
   return { compute, BADGE_DEFS, TIERS, levelFromXP };
 })();
 
-/* ── Badge modal ─────────────────────────────────────────────── */
+// Badge modal
 function showBadgeModal(badgeId) {
   const results = window._badgeResults || [];
   const b = results.find(r => r.id === badgeId);
@@ -3806,7 +4434,7 @@ function closeBadgeModal(e) {
   document.getElementById('badge-modal')?.classList.add('hidden');
 }
 
-/* ── Badge persistence ───────────────────────────────────────── */
+// Badge persistence
 const BADGES_STORAGE_KEY = 'ls_badges_v2_';
 
 function saveBadgesToStorage(results) {
@@ -3895,7 +4523,7 @@ function restoreBadgesFromStorage() {
   } catch {}
 }
 
-/* ── Badge image export ─────────────────────────────────────── */
+// Badge image export
 async function shareBadgeAsImage(badgeId) { await _captureBadgeAsImage(badgeId, 'share'); }
 async function exportBadgeAsImage(badgeId) { await _captureBadgeAsImage(badgeId, 'download'); }
 
@@ -4141,6 +4769,7 @@ function _sendWrappedNotification(wrappedYear) {
 
 function clearCache() {
   Cache.clear();
+  _clearHistoryCache();
   _imgCache.clear();
   _trackImgCache.clear();
   _vizPlusLoaded = false;
@@ -4385,7 +5014,7 @@ function _renderHistView(view, tracks) {
   if (view === 'stats')    _renderHistStats(tracks);
 }
 
-/* ── Timeline view ── */
+// Timeline view
 function _renderHistTimeline(tracks) {
   const wrap = document.getElementById('hist-timeline-list');
   if (!wrap) return;
@@ -4395,19 +5024,24 @@ function _renderHistTimeline(tracks) {
     return;
   }
 
-  // group tracks by hour
-  const byHour = {};
-  (APP.histSortOrder === 'asc' ? [...tracks] : [...tracks].reverse()).forEach(tr => {
+  // Tri global par timestamp : desc = récent en premier, asc = ancien en premier
+  const sorted = [...tracks].sort((a, b) => {
+    const ta = parseInt(a.date?.uts || 0);
+    const tb = parseInt(b.date?.uts || 0);
+    return APP.histSortOrder === 'asc' ? ta - tb : tb - ta;
+  });
+
+  // Groupage par heure en préservant l'ordre de parcours (hourOrder garde l'ordre des blocs)
+  const byHour    = {};
+  const hourOrder = [];
+  sorted.forEach(tr => {
     const ts = parseInt(tr.date?.uts || 0);
     const hr = ts ? new Date(ts * 1000).getHours() : -1;
-    if (!byHour[hr]) byHour[hr] = [];
+    if (!byHour[hr]) { byHour[hr] = []; hourOrder.push(hr); }
     byHour[hr].push(tr);
   });
 
-  const hours = Object.keys(byHour).sort((a,b) =>
-    APP.histSortOrder === 'asc' ? Number(a) - Number(b) : Number(b) - Number(a)
-  );
-  wrap.innerHTML = hours.map(hr => {
+  wrap.innerHTML = hourOrder.map(hr => {
     const label = hr < 0 ? '??' : `${String(hr).padStart(2,'0')}:00`;
     const items = byHour[hr].map(tr => _histTrackHTML(tr)).join('');
     return `<div class="hist-hour-block">
@@ -4447,7 +5081,7 @@ function _histTrackHTML(tr) {
   </div>`;
 }
 
-/* ── List view ── */
+// List view
 function _renderHistList(tracks) {
   const wrap = document.getElementById('hist-list-wrap');
   if (!wrap) return;
@@ -4492,7 +5126,7 @@ function _renderHistList(tracks) {
   wrap.innerHTML = header + rows;
 }
 
-/* ── Stats view ── */
+// Stats view
 function _renderHistStats(tracks) {
   const grid = document.getElementById('hist-stats-grid');
   if (!grid) return;

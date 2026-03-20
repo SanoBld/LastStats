@@ -756,6 +756,11 @@ canvas { max-width: 100%; }
 }
 .th-btn:hover  { background: var(--bg-hover); color: var(--text); transform: scale(1.04); }
 .th-btn.active { background: var(--accent-lt); color: var(--accent); }
+/* ── Sidebar logout : masqué sur PC (disponible uniquement dans Paramètres) ── */
+@media (min-width: 1025px) {
+  .sb-foot { display: none; }
+}
+
 .btn-logout {
   width: 100%; padding: 10px 14px; border-radius: var(--radius-pill);
   display: flex; align-items: center; gap: 8px;
@@ -3299,40 +3304,47 @@ button.bn-item:focus-visible,
 .hist-timeline-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 6px;
 }
 
 .hist-hour-block {
-  margin-bottom: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: 0;
 }
 
 .hist-hour-label {
   display: flex; align-items: center; gap: 8px;
-  font-size: .78rem; font-weight: 700;
+  font-size: .74rem; font-weight: 700;
   color: var(--accent);
-  letter-spacing: .04em;
+  letter-spacing: .05em;
   text-transform: uppercase;
-  margin-bottom: 8px;
+  padding: 8px 14px 7px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card-hi);
 }
 .hist-hour-label::after {
   content: '';
   flex: 1;
   height: 1px;
   background: var(--border);
+  opacity: .5;
 }
 
 .hist-timeline-track {
   display: flex; align-items: center; gap: 12px;
-  padding: 9px 12px;
-  border-radius: var(--radius-xs);
+  padding: 8px 14px;
   cursor: default;
   transition: background var(--dur-short2) var(--ease-standard),
               transform  var(--dur-short2) var(--ease-spring);
-  position: relative;
+  border-bottom: 1px solid var(--border);
 }
+.hist-timeline-track:last-child { border-bottom: none; }
 .hist-timeline-track:hover {
   background: var(--bg-hover);
-  transform: translateX(3px);
+  transform: translateX(2px);
 }
 
 .hist-track-time {
@@ -3396,6 +3408,10 @@ button.bn-item:focus-visible,
 
 .hist-list-wrap {
   display: flex; flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
 }
 
 .hist-list-header {
@@ -3419,6 +3435,8 @@ button.bn-item:focus-visible,
   transition: background var(--dur-short2) var(--ease-standard);
   font-size: .84rem;
 }
+.hist-list-row { border-bottom: 1px solid var(--border); }
+.hist-list-row:last-child { border-bottom: none; }
 .hist-list-row:hover { background: var(--bg-hover); }
 
 .hist-list-num  { font-size: .78rem; color: var(--text-muted); font-weight: 600; text-align: center; }
@@ -3633,4 +3651,170 @@ button.bn-item:focus-visible,
 }
 .music-grid.layout-list .music-card-rank {
   top: 4px; left: 4px; width: 20px; height: 20px; font-size: .62rem;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Calendrier d'Écoute — heatmap annuelle (inspiré GitHub)
+   ══════════════════════════════════════════════════════════════ */
+
+/* Conteneur principal — scroll horizontal sur mobile */
+.listening-heatmap-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px 0 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.listening-heatmap-wrap::-webkit-scrollbar { height: 4px; }
+.listening-heatmap-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Grille principale — inline-flex pour shrink-to-content */
+.cal-heatmap-inner {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: min-content;
+}
+
+/* Ligne des mois — positionnement absolu pixel-parfait */
+.cal-month-row {
+  position: relative;
+  height: 16px;
+  /* margin-left et width définis en inline via JS */
+}
+
+.cal-month-label {
+  position: absolute;
+  top: 0;
+  font-size: .68rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+  line-height: 16px;
+  pointer-events: none;
+}
+
+/* Corps : labels jours + grille */
+.cal-body {
+  display: flex;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.cal-weekday-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+  width: 22px;
+  padding-top: 1px;
+}
+
+.cal-wd-lbl {
+  font-size: .62rem;
+  color: var(--text-muted);
+  height: 11px;
+  line-height: 11px;
+  text-align: right;
+  padding-right: 3px;
+}
+
+/* Grille semaines */
+.cal-heatmap-grid {
+  display: flex;
+  gap: 2px;
+}
+
+.cal-week-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Cellule individuelle */
+.cal-day-cell {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  background: var(--bg-card-hi);
+  cursor: default;
+  flex-shrink: 0;
+  transition: transform .1s ease;
+  position: relative;
+}
+
+.cal-day-cell:not(.cal-day-empty):hover {
+  transform: scale(1.5);
+  z-index: 10;
+}
+
+.cal-day-cell.cal-day-empty {
+  background: transparent !important;
+  pointer-events: none;
+}
+
+/* ── Niveaux d'intensité — suivent automatiquement --accent ── */
+.cal-day-cell[data-level="0"] {
+  background: var(--bg-card-hi);
+}
+.cal-day-cell[data-level="1"] {
+  background: var(--accent-container);
+  opacity: .75;
+}
+.cal-day-cell[data-level="2"] {
+  background: var(--accent);
+  opacity: .45;
+}
+.cal-day-cell[data-level="3"] {
+  background: var(--accent);
+  opacity: .72;
+}
+.cal-day-cell[data-level="4"] {
+  background: var(--accent);
+  opacity: 1;
+}
+
+/* Légende */
+.cal-heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: .68rem;
+  color: var(--text-muted);
+}
+
+.cal-legend-cells {
+  display: flex;
+  gap: 3px;
+}
+
+/* Stats rapides */
+.cal-heatmap-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  font-size: .78rem;
+  color: var(--text-muted);
+}
+
+.cal-heatmap-stat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cal-heatmap-stat strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ── Mobile : cellules plus petites ── */
+@media (max-width: 480px) {
+  .cal-day-cell       { width: 9px;  height: 9px;  }
+  .cal-wd-lbl         { height: 9px; line-height: 9px; font-size: .55rem; }
+  .cal-weekday-labels { width: 18px; }
+  .cal-month-label    { font-size: .58rem; }
 }

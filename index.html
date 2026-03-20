@@ -488,6 +488,26 @@
           </div>
         </div>
 
+        <!-- Calendrier d'Écoute — heatmap annuelle inspirée GitHub -->
+        <div class="chart-card full">
+          <div class="cc-hd">
+            <span>
+              <i class="fas fa-calendar-alt"></i>
+              <span data-i18n="dash.listeningCalendar">Calendrier d'Écoute</span>
+            </span>
+            <select id="cal-heatmap-yr-sel" class="yr-sel" onchange="renderListeningHeatmap(parseInt(this.value))"></select>
+          </div>
+          <div id="listening-heatmap-empty" class="heatmap-empty-state">
+            <i class="fas fa-database"></i>
+            <p data-i18n="charts.heatmapHint">Available after loading full history</p>
+            <button class="btn-fetch-sm" onclick="fetchFullHistory()">
+              <i class="fas fa-play"></i>
+              <span data-i18n="charts.loadHistory">Load history</span>
+            </button>
+          </div>
+          <div id="listening-heatmap-wrap" class="listening-heatmap-wrap hidden"></div>
+        </div>
+
       </section>
 
       
@@ -824,6 +844,27 @@
             </div>
           </div>
         </div>
+        <!-- Calendrier d'Écoute — heatmap annuelle dans les graphiques -->
+        <div class="chart-card full">
+          <div class="cc-hd">
+            <span>
+              <i class="fas fa-calendar-alt"></i>
+              <span data-i18n="dash.listeningCalendar">Calendrier d'Écoute</span>
+            </span>
+            <select id="cal-heatmap-yr-sel-charts" class="yr-sel"
+                    onchange="renderListeningHeatmap(parseInt(this.value), 'charts')"></select>
+          </div>
+          <div id="listening-heatmap-empty-charts" class="heatmap-empty-state">
+            <i class="fas fa-database"></i>
+            <p data-i18n="charts.heatmapHint">Available after loading full history</p>
+            <button class="btn-fetch-sm" onclick="fetchFullHistory()">
+              <i class="fas fa-play"></i>
+              <span data-i18n="charts.loadHistory">Load history</span>
+            </button>
+          </div>
+          <div id="listening-heatmap-wrap-charts" class="listening-heatmap-wrap hidden"></div>
+        </div>
+
       </section>
 
       
