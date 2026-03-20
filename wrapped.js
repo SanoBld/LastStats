@@ -802,38 +802,57 @@ async function loadTemporalData(from, to) {
   const dayMap = {}; // date string → play count
   const artistFirstH = {}; // artist → {h1count, h2count}
 
+  // Process one track into all the aggregation maps
+  const processTrack = (t) => {
+    const ts = t.date?.uts;
+    if (!ts) return;
+    const d = new Date(parseInt(ts) * 1000);
+    const h = d.getHours();
+    const dow = (d.getDay() + 6) % 7;
+    const month = d.getMonth();
+    const dateKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    STORE.habitHours[h]++;
+    STORE.habitDays[dow]++;
+    monthPlays[month]++;
+    dayMap[dateKey] = (dayMap[dateKey] || 0) + 1;
+    const artistName = t.artist?.['#text'] || t.artist?.name || '';
+    if (artistName) {
+      if (!artistFirstH[artistName]) artistFirstH[artistName] = { h1: 0, h2: 0 };
+      if (month < 6) artistFirstH[artistName].h1++;
+      else artistFirstH[artistName].h2++;
+    }
+  };
+
   try {
-    const limit = 200; let page = 1; let totalFetched = 0; const maxPages = 8;
-    while (page <= maxPages) {
-      const res = await LASTFM.call('user.getRecentTracks', {
-        from, to, limit, page, extended: 0
-      }).catch(() => null);
-      if (!res) break;
-      const tracks = res.recenttracks?.track || [];
-      const totalPages = parseInt(res.recenttracks?.['@attr']?.totalPages || 1);
-      for (const t of tracks) {
-        const ts = t.date?.uts;
-        if (!ts) continue;
-        const d = new Date(parseInt(ts) * 1000);
-        const h = d.getHours();
-        const dow = (d.getDay() + 6) % 7; // 0=lun
-        const month = d.getMonth();
-        const dateKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-        STORE.habitHours[h]++;
-        STORE.habitDays[dow]++;
-        monthPlays[month]++;
-        dayMap[dateKey] = (dayMap[dateKey] || 0) + 1;
-        // track plays per semester for "got away" logic
-        const artistName = t.artist?.['#text'] || t.artist?.name || '';
-        if (artistName) {
-          if (!artistFirstH[artistName]) artistFirstH[artistName] = { h1: 0, h2: 0 };
-          if (month < 6) artistFirstH[artistName].h1++;
-          else artistFirstH[artistName].h2++;
+    // Page 1 first to know totalPages
+    const first = await LASTFM.call('user.getRecentTracks', {
+      from, to, limit: 200, page: 1, extended: 0
+    }).catch(() => null);
+    if (!first) return;
+
+    (first.recenttracks?.track || []).forEach(processTrack);
+
+    const totalPages = Math.min(50, parseInt(first.recenttracks?.['@attr']?.totalPages || 1));
+
+    if (totalPages > 1) {
+      // Remaining pages in batches of 5
+      const BATCH = 5;
+      for (let start = 2; start <= totalPages; start += BATCH) {
+        const batchNums = [];
+        for (let p = start; p < start + BATCH && p <= totalPages; p++) batchNums.push(p);
+
+        const results = await Promise.all(
+          batchNums.map(p => LASTFM.call('user.getRecentTracks', {
+            from, to, limit: 200, page: p, extended: 0
+          }).catch(() => null))
+        );
+
+        for (const res of results) {
+          if (res) (res.recenttracks?.track || []).forEach(processTrack);
         }
+
+        if (start + BATCH <= totalPages) await new Promise(r => setTimeout(r, 80));
       }
-      totalFetched += tracks.length;
-      if (page >= totalPages || totalFetched >= 1200) break;
-      page++;
     }
   } catch {}
 
@@ -1700,6 +1719,115 @@ function buildRecap() {
 }
 
 // slide list
+/* Slide Historique — calendrier annuel + barres mensuelles */
+function buildHistory() {
+  const dayMap   = STORE.dayMap || {};
+  const months   = T.months || ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+
+  // Monthly counts from dayMap
+  const monthCounts = new Array(12).fill(0);
+  Object.entries(dayMap).forEach(([key, count]) => {
+    const [, , m] = key.split('-');
+    monthCounts[parseInt(m) - 1] += count;
+  });
+  const maxMonth = Math.max(1, ...monthCounts);
+
+  // Build the calendar grid (Mon=0…Sun=6)
+  const jan1     = new Date(WRAPPED_YEAR, 0, 1);
+  const startPad = (jan1.getDay() + 6) % 7;
+  const isLeap   = (WRAPPED_YEAR % 4 === 0 && WRAPPED_YEAR % 100 !== 0) || WRAPPED_YEAR % 400 === 0;
+  const totalDays = isLeap ? 366 : 365;
+
+  const allCells = [];
+  for (let i = 0; i < startPad; i++) allCells.push(null);
+  for (let d = 0; d < totalDays; d++) {
+    const date = new Date(WRAPPED_YEAR, 0, d + 1);
+    const key  = `${WRAPPED_YEAR}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+    allCells.push({ date, count: dayMap[key] || 0 });
+  }
+  while (allCells.length % 7 !== 0) allCells.push(null);
+  const numWeeks = allCells.length / 7;
+
+  // 4 intensity levels
+  const vals       = Object.values(dayMap);
+  const maxCount   = vals.length ? Math.max(...vals) : 1;
+  const t1 = Math.ceil(maxCount * 0.25);
+  const t2 = Math.ceil(maxCount * 0.5);
+  const t3 = Math.ceil(maxCount * 0.75);
+  const getLevel = c => !c ? 0 : c < t1 ? 1 : c < t2 ? 2 : c < t3 ? 3 : 4;
+
+  const weeksHTML = Array(numWeeks).fill(0).map((_, wi) =>
+    `<div class="wh-week">${allCells.slice(wi*7, wi*7+7).map(cell => {
+      if (!cell) return '<div class="wh-cell wh-cell--empty"></div>';
+      const lv = getLevel(cell.count);
+      const tip = cell.count > 0
+        ? `${cell.date.toLocaleDateString(undefined,{month:'short',day:'numeric'})} — ${cell.count}`
+        : '';
+      return `<div class="wh-cell" data-level="${lv}"${tip ? ` title="${tip}"` : ''}></div>`;
+    }).join('')}</div>`
+  ).join('');
+
+  // Monthly bar chart
+  const monthBars = monthCounts.map((count, i) => {
+    const pct   = Math.round((count / maxMonth) * 100);
+    const peak  = count === Math.max(...monthCounts);
+    return `<div class="wh-month-col">
+      <div class="wh-month-track">
+        <div class="wh-month-fill${peak ? ' wh-month-fill--peak' : ''}" data-pct="${pct}" style="height:0%"></div>
+      </div>
+      <span class="wh-month-lbl">${months[i][0]}</span>
+    </div>`;
+  }).join('');
+
+  // Quick stats
+  const activeDays  = Object.keys(dayMap).length;
+  const bestDayEntry= Object.entries(dayMap).sort((a,b)=>b[1]-a[1])[0];
+  const bestDayStr  = bestDayEntry ? fmtNum(bestDayEntry[1]) : '—';
+  const avgPerDay   = activeDays > 0
+    ? (Object.values(dayMap).reduce((s,v)=>s+v,0) / 365).toFixed(1)
+    : '—';
+
+  return `
+    <div style="position:absolute;inset:0;z-index:0">
+      <div style="position:absolute;border-radius:50%;background:#7c3aed;left:20%;top:25%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.22;filter:blur(80px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#4338ca;left:78%;top:68%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.18;filter:blur(80px)"></div>
+    </div>
+    <div class="slide-header">
+      <span class="slide-label">${LANG_CODE==='en'?'Activity':'Activité'}</span>
+      <h2 class="slide-title">${LANG_CODE==='en'?'Your year from above':'Ton année vue du ciel'}</h2>
+    </div>
+    <div class="history-layout">
+      <div class="wh-calendar-wrap" id="wh-calendar" style="opacity:0">
+        <div class="wh-grid">${weeksHTML}</div>
+        <div class="wh-legend">
+          <span>${LANG_CODE==='en'?'Less':'Moins'}</span>
+          <div class="wh-legend-cells">
+            ${[0,1,2,3,4].map(lv=>`<div class="wh-cell" data-level="${lv}"></div>`).join('')}
+          </div>
+          <span>${LANG_CODE==='en'?'More':'Plus'}</span>
+        </div>
+      </div>
+      <div class="wh-month-bars" id="wh-month-bars" style="opacity:0">${monthBars}</div>
+      <div class="wh-quick-stats" id="wh-quick-stats" style="opacity:0">
+        <div class="wh-stat">
+          <span class="wh-stat-icon">📅</span>
+          <span class="wh-stat-val">${activeDays}</span>
+          <span class="wh-stat-lbl">${LANG_CODE==='en'?'active days':'jours actifs'}</span>
+        </div>
+        <div class="wh-stat">
+          <span class="wh-stat-icon">🔥</span>
+          <span class="wh-stat-val">${bestDayStr}</span>
+          <span class="wh-stat-lbl">${LANG_CODE==='en'?'best day':'record du jour'}</span>
+        </div>
+        <div class="wh-stat">
+          <span class="wh-stat-icon">⚡</span>
+          <span class="wh-stat-val">${avgPerDay}</span>
+          <span class="wh-stat-lbl">${LANG_CODE==='en'?'avg/day':'moy/jour'}</span>
+        </div>
+      </div>
+    </div>`;
+}
+
 const SLIDES = [
   { id:'intro',      theme:'purple', duration:5000,    build:buildIntro },
   { id:'numbers',    theme:'blue',   duration:7000,    build:buildNumbers },
@@ -1708,6 +1836,7 @@ const SLIDES = [
   { id:'tracks',     theme:'blue',   duration:9000,    build:buildTopTracks },
   { id:'global',     theme:'violet', duration:8000,    build:buildGlobalCompare },
   { id:'habits',     theme:'teal',   duration:9000,    build:buildHabits },
+  { id:'history',   theme:'purple', duration:9000,    build:buildHistory },
   { id:'record',     theme:'record', duration:7000,    build:buildRecord },
   { id:'gotaway',    theme:'gotAway',duration:9000,    build:buildGotAway },
   { id:'streak',     theme:'record', duration:7000,    build:buildStreak },
@@ -1910,6 +2039,40 @@ const Stories = {
             });
           }, 400);
         }, 300);
+        break;
+
+      case 'history':
+        setTimeout(() => {
+          // Calendar grid
+          const cal = document.getElementById('wh-calendar');
+          if (cal) {
+            cal.style.transition = 'opacity .5s ease, transform .55s cubic-bezier(.22,1,.36,1)';
+            cal.style.opacity = '1'; cal.style.transform = 'translateY(0)';
+          }
+          // Monthly bars — stagger fill animation
+          setTimeout(() => {
+            const mb = document.getElementById('wh-month-bars');
+            if (mb) {
+              mb.style.transition = 'opacity .4s ease';
+              mb.style.opacity = '1';
+              mb.querySelectorAll('.wh-month-fill').forEach((el, i) => {
+                const pct = parseInt(el.dataset.pct || 0);
+                setTimeout(() => {
+                  el.style.transition = 'height .9s cubic-bezier(.22,1,.36,1)';
+                  el.style.height = `${pct}%`;
+                }, i * 40);
+              });
+            }
+          }, 350);
+          // Stats
+          setTimeout(() => {
+            const qs = document.getElementById('wh-quick-stats');
+            if (qs) {
+              qs.style.transition = 'opacity .45s ease, transform .5s cubic-bezier(.22,1,.36,1)';
+              qs.style.opacity = '1'; qs.style.transform = 'translateY(0)';
+            }
+          }, 700);
+        }, 200);
         break;
 
       case 'habits':

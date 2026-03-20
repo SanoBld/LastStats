@@ -2087,3 +2087,173 @@ a { color:inherit; text-decoration:none; }
   .slide { transition:opacity .3s ease !important; }
   .track-bar, .genre-bar-fill, .progress-fill { transition:none !important; }
 }
+
+
+/* Desktop — cadre téléphone centré (même expérience que mobile) */
+@media (min-width: 700px) {
+  html, body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #02020c;
+    overflow: hidden;
+    height: 100%;
+  }
+
+  #stories {
+    /* On sort de position:fixed pour le cadrer */
+    position: relative !important;
+    width: min(400px, calc(90vh * 9 / 16));
+    height: min(90vh, calc(400px * 16 / 9));
+    max-width: 400px;
+    max-height: 90vh;
+    border-radius: 28px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.08),
+      0 40px 100px rgba(0,0,0,.75),
+      0 0 80px rgba(124,58,237,.12);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  /* Overlays restent plein écran */
+  .overlay {
+    position: fixed !important;
+    inset: 0 !important;
+  }
+
+  /* Toast au-dessus du cadre */
+  .toast { z-index: 9999; }
+  .modal-share { position: fixed !important; }
+}
+
+@media (min-width: 700px) and (min-height: 600px) {
+  /* Légère lueur derrière le cadre, effet ambient */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 50%, rgba(124,58,237,.15), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+
+/* Slide Historique — calendrier + barres mensuelles */
+
+.history-layout {
+  display: flex; flex-direction: column;
+  gap: clamp(8px, 2.5vw, 12px);
+  padding: 0 clamp(12px, 4.5vw, 22px) clamp(10px, 4vw, 18px);
+  width: 100%; margin-top: 4px;
+  overflow-y: auto;
+  max-height: calc(100dvh - 100px);
+}
+
+/* Calendrier heatmap */
+.wh-calendar-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  opacity: 0;
+  transform: translateY(12px);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.12) transparent;
+}
+.wh-calendar-wrap::-webkit-scrollbar { height: 3px; }
+.wh-calendar-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 2px; }
+
+.wh-grid {
+  display: flex; gap: 2px;
+  min-width: min-content;
+}
+
+.wh-week {
+  display: flex; flex-direction: column; gap: 2px;
+}
+
+.wh-cell {
+  width: 9px; height: 9px; border-radius: 2px;
+  background: rgba(255,255,255,.06);
+  flex-shrink: 0;
+  transition: transform .12s ease;
+}
+.wh-cell:not(.wh-cell--empty):hover { transform: scale(1.5); z-index: 10; }
+.wh-cell--empty { background: transparent !important; pointer-events: none; }
+
+/* Niveaux de couleur basés sur le violet accent */
+.wh-cell[data-level="0"] { background: rgba(255,255,255,.06); }
+.wh-cell[data-level="1"] { background: rgba(124,58,237,.35); }
+.wh-cell[data-level="2"] { background: rgba(124,58,237,.62); }
+.wh-cell[data-level="3"] { background: rgba(168,85,247,.82); }
+.wh-cell[data-level="4"] { background: #a855f7; box-shadow: 0 0 6px rgba(168,85,247,.5); }
+
+.wh-legend {
+  display: flex; align-items: center; gap: 5px;
+  margin-top: 6px;
+  font-size: clamp(7px, 2vw, 9px); font-weight: 700;
+  color: rgba(255,255,255,.3);
+}
+.wh-legend-cells { display: flex; gap: 2px; }
+
+/* Barres mensuelles */
+.wh-month-bars {
+  display: flex; align-items: flex-end; gap: 3px;
+  height: clamp(40px, 10vw, 56px);
+  opacity: 0;
+  padding: 0 1px;
+}
+.wh-month-col {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+}
+.wh-month-track {
+  width: 100%; flex: 1;
+  background: rgba(255,255,255,.07); border-radius: 3px 3px 0 0;
+  display: flex; align-items: flex-end; overflow: hidden;
+}
+.wh-month-fill {
+  width: 100%; height: 0%;
+  background: rgba(124,58,237,.55); border-radius: 3px 3px 0 0;
+  transition: height 1s cubic-bezier(.22,1,.36,1);
+}
+.wh-month-fill--peak { background: #a855f7; }
+.wh-month-lbl {
+  font-size: clamp(7px, 1.8vw, 9px); font-weight: 800;
+  text-transform: uppercase; color: rgba(255,255,255,.28);
+  white-space: nowrap;
+}
+
+/* Stats rapides */
+.wh-quick-stats {
+  display: flex; gap: clamp(5px, 1.5vw, 8px);
+  opacity: 0; transform: translateY(10px);
+}
+.wh-stat {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center;
+  padding: clamp(7px, 2.2vw, 11px) clamp(5px, 1.5vw, 9px);
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  transition: background var(--transition);
+}
+.wh-stat:hover { background: rgba(255,255,255,.09); }
+.wh-stat-icon { font-size: clamp(14px, 4vw, 18px); line-height: 1; }
+.wh-stat-val {
+  font-family: 'Bebas Neue', cursive;
+  font-size: clamp(16px, 5vw, 22px); color: #fff; line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.wh-stat-lbl {
+  font-size: clamp(7px, 1.8vw, 9px); font-weight: 800;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: rgba(255,255,255,.35);
+}
+
+/* Extra animation : slide transitions plus fluides */
+.slide.enter-from-right { transform: translateX(100%) scale(.96); }
+.slide.enter-from-left  { transform: translateX(-100%) scale(.96); }
+.slide.exit-to-left     { transform: translateX(-38%) scale(.9); opacity: 0; }
+.slide.exit-to-right    { transform: translateX(38%)  scale(.9); opacity: 0; }
