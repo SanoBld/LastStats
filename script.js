@@ -5233,12 +5233,12 @@ const VS_HISTORY_KEY = () => `ls_vs_history_${APP.username || ''}`;
 const VS_HISTORY_MAX = 10;
 
 /* ── Persist & load search history ── */
-function _vsHistorySave(name) {
+function _vsHistorySave(name, imgUrl = '') {
   try {
     const raw  = localStorage.getItem(VS_HISTORY_KEY());
     const list = raw ? JSON.parse(raw) : [];
     const filtered = list.filter(h => h.name.toLowerCase() !== name.toLowerCase());
-    filtered.unshift({ name, ts: Date.now() });
+    filtered.unshift({ name, img: imgUrl || '', ts: Date.now() });
     localStorage.setItem(VS_HISTORY_KEY(), JSON.stringify(filtered.slice(0, VS_HISTORY_MAX)));
   } catch {}
 }
@@ -5278,6 +5278,7 @@ function _vsRenderHistory() {
         return `<button class="vs-chip vs-chip--history" onclick="runComparison('${name.replace(/'/g,"\\'")}')">
           <span class="vs-chip-av">
             <span class="vs-chip-fallback" style="background:${grad}">${letter}</span>
+            ${h.img ? `<img src="${h.img}" alt="${name}" class="vs-chip-img" onerror="this.remove()">` : ''}
           </span>
           <span class="vs-chip-name">${name}</span>
         </button>`;
@@ -5501,7 +5502,12 @@ async function runComparison(friendName) {
     clearInterval(VS._loadTimer);
 
     /* Save to search history */
-    _vsHistorySave(friendName);
+    const _frSaveImg = (() => {
+      const arr = frInfo?.user?.image;
+      const raw = Array.isArray(arr) ? arr.find(i => i.size === 'medium')?.['#text'] : '';
+      return (raw && !raw.includes(DEFAULT_IMG)) ? raw : '';
+    })();
+    _vsHistorySave(friendName, _frSaveImg);
     _vsRenderHistory();
 
     renderComparison({
@@ -5578,11 +5584,14 @@ function _buildSharedPlaylist(myData, frData) {
     .filter(k => frKeys.has(k))
     .map(k => {
       const ref = myArr.find(t => t.key === k);
+      const frRef = frArr.find(t => t.key === k);
+      const imgUrl = (ref?.imgUrl || frRef?.imgUrl || '');
       return {
         key:      k,
         display:  ref ? `${ref.artist} — ${ref.track}` : k,
         artist:   ref?.artist || '',
         track:    ref?.track  || '',
+        imgUrl,
         myCount:  myCounts[k],
         frCount:  frCounts[k],
         combined: myCounts[k] + frCounts[k],
@@ -5752,7 +5761,11 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
      <div class="vs-playlist">
        ${playlist.map((item, i) => `
          <div class="vs-playlist-row">
-           <span class="vs-playlist-num">${i + 1}</span>
+           <div class="vs-playlist-art">
+             ${item.imgUrl
+               ? `<img src="${escHtml(item.imgUrl)}" alt="" class="vs-playlist-art-img" onerror="this.parentNode.innerHTML='<span class=vs-playlist-art-num>${i+1}</span>'">`
+               : `<span class="vs-playlist-art-num">${i + 1}</span>`}
+           </div>
            <div class="vs-playlist-info">
              <span class="vs-playlist-track">${escHtml(item.track)}</span>
              <span class="vs-playlist-artist">${escHtml(item.artist)}</span>
@@ -5832,7 +5845,7 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
     `<div class="vs-metrics-grid">
        ${_metricCard('calendar-check', t('compare_consistency'),   t('compare_consistency_tip'),   myN, myMetrics.consistency,   frN, frMetrics.consistency,   '%', true)}
        ${_metricCard('compass',        t('compare_discovery'),     t('compare_discovery_tip'),     myN, myMetrics.discoveryRate,  frN, frMetrics.discoveryRate,  '%', true)}
-       ${_metricCard('tags',           t('compare_variance'),      t('compare_variance_tip'),      myN, myMetrics.variance,       frN, frMetrics.variance,       '', true)}
+       ${_metricCard('tags',           t('compare_variance'),      t('compare_variance_tip'),      myN, myMetrics.variance,       frN, frMetrics.variance,       ' '+t('compare_variance_unit'), true)}
        ${_metricCard('crosshairs',     t('compare_concentration'), t('compare_concentration_tip'), myN, myMetrics.concentration,  frN, frMetrics.concentration, '%', false)}
        ${_metricCard('repeat',         t('compare_replay'),        t('compare_replay_tip'),        myN, myMetrics.replayRate,     frN, frMetrics.replayRate,     '%', false)}
      </div>`);
@@ -6088,7 +6101,11 @@ function _metricCard(icon, title, tip, myName, myVal, frName, frVal, suffix = '%
       <div class="vs-metric-hd">
         <i class="fas fa-${icon}"></i>
         <span class="vs-metric-title">${title}</span>
-        <button class="vs-metric-tip" type="button" onclick="this.classList.toggle('vs-tip-open')" aria-label="Explication">
+        <button class="vs-metric-tip" type="button"
+                onmouseenter="_vsTipShow(this)"
+                onmouseleave="_vsTipHide()"
+                onclick="_vsTipToggle(this)"
+                aria-label="Explication">
           <i class="fas fa-circle-question"></i>
           <span class="vs-tip-bubble">${escHtml(tip)}</span>
         </button>
@@ -6097,12 +6114,12 @@ function _metricCard(icon, title, tip, myName, myVal, frName, frVal, suffix = '%
         <div class="vs-bar-row">
           <span class="vs-bar-name${myWins?' vs-bar-win':''}">${escHtml(myName)}</span>
           <div class="vs-bar-track"><div class="vs-bar-fill vs-bar-fill--me" style="width:0" data-w="${myPct}"></div></div>
-          <span class="vs-bar-num vs-animnum" data-to="${Math.round(myVal)}">${Math.round(myVal)}</span><span class="vs-bar-sfx">${suffix}</span>
+          <span class="vs-bar-valwrap"><span class="vs-bar-num vs-animnum" data-to="${Math.round(myVal)}">${Math.round(myVal)}</span><span class="vs-bar-sfx">${suffix}</span></span>
         </div>
         <div class="vs-bar-row">
           <span class="vs-bar-name${!myWins?' vs-bar-win':''}">${escHtml(frName)}</span>
           <div class="vs-bar-track"><div class="vs-bar-fill vs-bar-fill--fr" style="width:0" data-w="${frPct}"></div></div>
-          <span class="vs-bar-num vs-animnum" data-to="${Math.round(frVal)}">${Math.round(frVal)}</span><span class="vs-bar-sfx">${suffix}</span>
+          <span class="vs-bar-valwrap"><span class="vs-bar-num vs-animnum" data-to="${Math.round(frVal)}">${Math.round(frVal)}</span><span class="vs-bar-sfx">${suffix}</span></span>
         </div>
       </div>
       ${myWins
@@ -6124,7 +6141,10 @@ function _extractRecentTracksRaw(data) {
     .map(t => {
       const artist = t.artist?.['#text'] || '';
       const track  = t.name || '';
-      return { artist, track, key: `${artist.toLowerCase()}|||${track.toLowerCase()}` };
+      const imgs   = t.image || [];
+      const img    = (imgs.find(i => i.size === 'medium') || imgs.find(i => i.size === 'small') || imgs[0])?.['#text'] || '';
+      const imgUrl = (img && !img.includes('2a96cbd8b46e442fc41c2b86b821562f')) ? img : '';
+      return { artist, track, imgUrl, key: `${artist.toLowerCase()}|||${track.toLowerCase()}` };
     });
 }
 
@@ -6189,6 +6209,46 @@ async function _getMyTopArtists() {
   try{const c=sessionStorage.getItem(k);if(c)return JSON.parse(c);}catch{}
   return _apiFetchUser('user.getTopArtists',APP.username,{period:'overall',limit:50});
 }
+
+
+/* ── Tooltip helpers for metric cards ── */
+let _vsTipEl    = null;
+let _vsTipTimer = null;
+
+function _vsTipShow(btn) {
+  clearTimeout(_vsTipTimer);
+  const bubble = btn.querySelector('.vs-tip-bubble');
+  if (!bubble) return;
+  _vsTipHide();
+  _vsTipEl = bubble;
+  const r = btn.getBoundingClientRect();
+  bubble.style.display  = 'block';
+  // Position: above the button, right-aligned
+  const bw = bubble.offsetWidth  || 220;
+  const bh = bubble.offsetHeight || 80;
+  let top  = r.top  - bh - 10 + window.scrollY;
+  let left = r.right - bw + window.scrollX;
+  if (left < 8) left = 8;
+  if (top < 8)  top = r.bottom + 8 + window.scrollY;
+  bubble.style.top  = top  + 'px';
+  bubble.style.left = left + 'px';
+  requestAnimationFrame(() => { bubble.style.opacity = '1'; });
+}
+
+function _vsTipHide() {
+  if (_vsTipEl) { _vsTipEl.style.display = 'none'; _vsTipEl.style.opacity = '0'; _vsTipEl = null; }
+}
+
+function _vsTipToggle(btn) {
+  const bubble = btn.querySelector('.vs-tip-bubble');
+  if (!bubble) return;
+  if (bubble.style.display === 'block') { _vsTipHide(); }
+  else { _vsTipShow(btn); }
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.vs-metric-tip')) _vsTipHide();
+});
 
 /* ── Reset ── */
 function resetCompare() {

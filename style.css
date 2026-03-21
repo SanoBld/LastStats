@@ -4011,9 +4011,9 @@ button.bn-item:focus-visible,
 .vs-gauge-svg { width:110px; height:110px; transform:rotate(-90deg); }
 .vs-gauge-bg { fill:none; stroke:var(--border); stroke-width:8; }
 .vs-gauge-fill { fill:none; stroke-width:8; stroke-linecap:round; stroke-dasharray:0 314.159; }
-.vs-score-inner { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:1px; }
-.vs-score-num { font-size:1.8rem; font-weight:900; letter-spacing:-.04em; }
-.vs-score-sfx { font-size:.85rem; font-weight:700; color:var(--text-muted); align-self:flex-end; margin-bottom:6px; }
+.vs-score-inner { position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:center; padding-bottom:18px; gap:1px; }
+.vs-score-num { font-size:2rem; font-weight:900; letter-spacing:-.04em; line-height:1; }
+.vs-score-sfx { font-size:.95rem; font-weight:800; color:var(--text-muted); line-height:1; margin-bottom:2px; }
 .vs-score-label { font-size:.85rem; font-weight:700; text-align:center; }
 .vs-score-sub { font-size:.73rem; color:var(--text-muted); text-align:center; }
 .vs-score-wow {
@@ -4029,13 +4029,23 @@ button.bn-item:focus-visible,
 /* ── Playlist ── */
 .vs-playlist { display: flex; flex-direction: column; gap: 10px; }
 .vs-playlist-row {
-  display: grid; grid-template-columns: 24px 1fr auto;
+  display: grid; grid-template-columns: 40px 1fr auto;
   align-items: center; gap: 12px;
-  padding: 10px 14px; border-radius: 14px;
+  padding: 8px 14px 8px 8px; border-radius: 14px;
   background: var(--bg-card-hi); border: 1.5px solid var(--border);
   animation: cardIn var(--dur-medium2) var(--ease-spring) both;
+  transition: border-color var(--dur-short) var(--ease-standard),
+              box-shadow  var(--dur-short) var(--ease-standard);
 }
-.vs-playlist-num { font-size: .82rem; font-weight: 900; color: var(--accent); text-align: center; }
+.vs-playlist-row:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-lt); }
+/* Art thumbnail */
+.vs-playlist-art {
+  width: 40px; height: 40px; border-radius: 8px; overflow: hidden;
+  flex-shrink: 0; background: var(--bg-hover);
+  display: flex; align-items: center; justify-content: center;
+}
+.vs-playlist-art-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.vs-playlist-art-num { font-size: .82rem; font-weight: 900; color: var(--accent); }
 .vs-playlist-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .vs-playlist-track { font-size: .86rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .vs-playlist-artist { font-size: .75rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -4078,42 +4088,44 @@ button.bn-item:focus-visible,
 
 /* ── Metrics ── */
 .vs-metrics-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
-.vs-metric-card { background:var(--bg-card-hi); border:1.5px solid var(--border); border-radius:16px; overflow:hidden; animation:cardIn var(--dur-medium2) var(--ease-decel) both; }
+.vs-metric-card { background:var(--bg-card-hi); border:1.5px solid var(--border); border-radius:16px; animation:cardIn var(--dur-medium2) var(--ease-decel) both; }
+.vs-metric-card > .vs-metric-hd { border-radius:14px 14px 0 0; overflow:hidden; }
 .vs-metric-hd { display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--bg-hover); border-bottom:1px solid var(--border); font-size:.82rem; font-weight:700; }
 .vs-metric-hd i { color:var(--accent); width:14px; text-align:center; }
 .vs-metric-title { flex:1; }
 
 /* Tooltip — click-toggle (works on mobile too) */
 .vs-metric-tip {
-  position: relative; cursor: pointer;
-  background: transparent; border: none; padding: 0;
-  color: var(--text-muted); font-size: .78rem; line-height: 1; display: flex;
-  transition: color var(--dur-short);
+  position: static; cursor: pointer;
+  background: transparent; border: none; padding: 4px;
+  color: var(--text-muted); font-size: .82rem; line-height: 1; display: inline-flex;
+  align-items: center; border-radius: 50%;
+  transition: color var(--dur-short), background var(--dur-short);
 }
-.vs-metric-tip:hover { color: var(--accent); }
+.vs-metric-tip:hover { color: var(--accent); background: var(--accent-lt); }
+
 .vs-tip-bubble {
-  display: none; position: absolute; bottom: calc(100% + 8px); right: 0;
+  display: none; position: fixed;
   background: var(--bg-card); color: var(--text);
-  border: 1px solid var(--border); font-size: .74rem; font-weight: 400; line-height: 1.5;
-  padding: 8px 12px; border-radius: 12px;
-  white-space: normal; width: 200px; text-align: left; z-index: 20;
-  box-shadow: var(--shadow-md);
-  animation: fadeInUp var(--dur-medium1) var(--ease-decel) both;
+  border: 1px solid var(--border); font-size: .76rem; font-weight: 400; line-height: 1.5;
+  padding: 10px 14px; border-radius: 12px;
+  white-space: normal; max-width: 220px; text-align: left; z-index: 9999;
+  box-shadow: var(--shadow-lg); pointer-events: none;
 }
-.vs-metric-tip:hover .vs-tip-bubble,
-.vs-metric-tip.vs-tip-open .vs-tip-bubble { display: block; }
+/* tooltip show/hide handled by JS */
 
 /* Dual bars */
 .vs-metric-bars { padding:12px 14px; display:flex; flex-direction:column; gap:8px; }
-.vs-bar-row { display:grid; grid-template-columns:70px 1fr 36px 14px; gap:8px; align-items:center; }
+.vs-bar-row { display:grid; grid-template-columns:70px 1fr auto; gap:8px; align-items:center; }
 .vs-bar-name { font-size:.75rem; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text-muted); }
 .vs-bar-name.vs-bar-win { color:var(--text); font-weight:800; }
 .vs-bar-track { height:7px; background:var(--border); border-radius:100px; overflow:hidden; }
 .vs-bar-fill { height:100%; border-radius:100px; width:0; transition:width .9s cubic-bezier(.4,0,.2,1) .2s; }
 .vs-bar-fill--me { background:var(--accent); }
 .vs-bar-fill--fr { background:var(--vs-fr-color); }
-.vs-bar-num { font-size:.75rem; font-weight:700; text-align:right; }
-.vs-bar-sfx { font-size:.68rem; color:var(--text-muted); }
+.vs-bar-valwrap { display:inline-flex; align-items:baseline; gap:1px; justify-content:flex-end; }
+.vs-bar-num { font-size:.75rem; font-weight:700; text-align:right; white-space:nowrap; }
+.vs-bar-sfx { font-size:.68rem; color:var(--text-muted); white-space:nowrap; }
 .vs-metric-verdict { display:flex; align-items:center; gap:6px; padding:7px 14px; border-top:1px solid var(--border); font-size:.75rem; font-weight:700; }
 .vs-verdict--me { color:var(--accent); }
 .vs-verdict--me i { color:var(--accent); }
@@ -4190,7 +4202,7 @@ button.bn-item:focus-visible,
 @media (max-width:580px) {
   .vs-metrics-grid { grid-template-columns:1fr; }
   .vs-volume-grid  { grid-template-columns:1fr; }
-  .vs-bar-row      { grid-template-columns:56px 1fr 28px 10px; gap:5px; }
+  .vs-bar-row      { grid-template-columns:56px 1fr auto; gap:5px; }
   .vs-search-bar   { flex-direction:column; align-items:stretch; }
   .btn-compare-run { justify-content:center; }
   .vs-peak-grid    { grid-template-columns:1fr; }
