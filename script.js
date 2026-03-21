@@ -5845,7 +5845,6 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
     `<div class="vs-metrics-grid">
        ${_metricCard('calendar-check', t('compare_consistency'),   t('compare_consistency_tip'),   myN, myMetrics.consistency,   frN, frMetrics.consistency,   '%', true)}
        ${_metricCard('compass',        t('compare_discovery'),     t('compare_discovery_tip'),     myN, myMetrics.discoveryRate,  frN, frMetrics.discoveryRate,  '%', true)}
-       ${_metricCard('tags',           t('compare_variance'),      t('compare_variance_tip'),      myN, myMetrics.variance,       frN, frMetrics.variance,       ' '+t('compare_variance_unit'), true)}
        ${_metricCard('crosshairs',     t('compare_concentration'), t('compare_concentration_tip'), myN, myMetrics.concentration,  frN, frMetrics.concentration, '%', false)}
        ${_metricCard('repeat',         t('compare_replay'),        t('compare_replay_tip'),        myN, myMetrics.replayRate,     frN, frMetrics.replayRate,     '%', false)}
      </div>`);
@@ -5942,8 +5941,10 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
                     data-target="${score}"/>
           </svg>
           <div class="vs-score-inner">
-            <span class="vs-animnum vs-score-num" data-to="${score}" style="color:${scoreColor}">${score}</span>
-            <span class="vs-score-sfx">%</span>
+            <div class="vs-score-val">
+              <span class="vs-animnum vs-score-num" data-to="${score}" style="color:${scoreColor}">${score}</span>
+              <span class="vs-score-sfx">%</span>
+            </div>
           </div>
         </div>
         <div class="vs-score-label">${scoreEmoji} ${escHtml(scoreLabel)}</div>
@@ -6016,9 +6017,18 @@ function _animateVsResults(root) {
     el.classList.add('vs-section-in');
   });
 
-  /* Bind ripple to all VS buttons */
-  root.querySelectorAll('.vs-again-btn, .vs-chip').forEach(btn => {
+  /* Bind M3 ripple to all interactive VS elements */
+  root.querySelectorAll('.vs-again-btn, .vs-chip, .btn-compare-run').forEach(btn => {
+    btn.removeEventListener('click', _vsRipple);
     btn.addEventListener('click', _vsRipple);
+  });
+  /* Stagger playlist rows */
+  root.querySelectorAll('.vs-playlist-row').forEach((el, i) => {
+    el.style.animationDelay = `${i * 80}ms`;
+  });
+  /* Stagger metric cards */
+  root.querySelectorAll('.vs-metric-card').forEach((el, i) => {
+    el.style.animationDelay = `${i * 60}ms`;
   });
 }
 
@@ -6102,12 +6112,12 @@ function _metricCard(icon, title, tip, myName, myVal, frName, frVal, suffix = '%
         <i class="fas fa-${icon}"></i>
         <span class="vs-metric-title">${title}</span>
         <button class="vs-metric-tip" type="button"
+                data-tip="${escHtml(tip)}"
                 onmouseenter="_vsTipShow(this)"
                 onmouseleave="_vsTipHide()"
                 onclick="_vsTipToggle(this)"
-                aria-label="Explication">
+                aria-label="${escHtml(tip)}">
           <i class="fas fa-circle-question"></i>
-          <span class="vs-tip-bubble">${escHtml(tip)}</span>
         </button>
       </div>
       <div class="vs-metric-bars">
@@ -6212,43 +6222,55 @@ async function _getMyTopArtists() {
 
 
 /* ── Tooltip helpers for metric cards ── */
-let _vsTipEl    = null;
-let _vsTipTimer = null;
+/* Global floating tooltip — avoids stacking/clipping issues */
+let _vsGlobalTip = null;
+
+function _vsEnsureTip() {
+  if (_vsGlobalTip && document.body.contains(_vsGlobalTip)) return _vsGlobalTip;
+  _vsGlobalTip = document.createElement('div');
+  _vsGlobalTip.className = 'vs-global-tip';
+  _vsGlobalTip.setAttribute('role', 'tooltip');
+  document.body.appendChild(_vsGlobalTip);
+  return _vsGlobalTip;
+}
 
 function _vsTipShow(btn) {
-  clearTimeout(_vsTipTimer);
-  const bubble = btn.querySelector('.vs-tip-bubble');
-  if (!bubble) return;
-  _vsTipHide();
-  _vsTipEl = bubble;
-  const r = btn.getBoundingClientRect();
-  bubble.style.display  = 'block';
-  // Position: above the button, right-aligned
-  const bw = bubble.offsetWidth  || 220;
-  const bh = bubble.offsetHeight || 80;
-  let top  = r.top  - bh - 10 + window.scrollY;
-  let left = r.right - bw + window.scrollX;
-  if (left < 8) left = 8;
-  if (top < 8)  top = r.bottom + 8 + window.scrollY;
-  bubble.style.top  = top  + 'px';
-  bubble.style.left = left + 'px';
-  requestAnimationFrame(() => { bubble.style.opacity = '1'; });
+  const text = btn.dataset.tip || btn.querySelector('.vs-tip-bubble')?.textContent || '';
+  if (!text) return;
+  const tip = _vsEnsureTip();
+  tip.textContent = text;
+  tip.style.visibility = 'hidden';
+  tip.style.display = 'block';
+  const r  = btn.getBoundingClientRect();
+  const tw = tip.offsetWidth  || 220;
+  const th = tip.offsetHeight || 60;
+  let top  = r.top - th - 10;
+  let left = r.right - tw;
+  if (left < 8)                          left = 8;
+  if (left + tw > window.innerWidth - 8) left = window.innerWidth - tw - 8;
+  if (top < 8) top = r.bottom + 8;
+  tip.style.top        = top  + 'px';
+  tip.style.left       = left + 'px';
+  tip.style.visibility = 'visible';
+  tip.classList.add('vs-global-tip--visible');
 }
 
 function _vsTipHide() {
-  if (_vsTipEl) { _vsTipEl.style.display = 'none'; _vsTipEl.style.opacity = '0'; _vsTipEl = null; }
+  if (_vsGlobalTip) {
+    _vsGlobalTip.classList.remove('vs-global-tip--visible');
+    _vsGlobalTip.style.display = 'none';
+  }
 }
 
 function _vsTipToggle(btn) {
-  const bubble = btn.querySelector('.vs-tip-bubble');
-  if (!bubble) return;
-  if (bubble.style.display === 'block') { _vsTipHide(); }
+  if (_vsGlobalTip?.classList.contains('vs-global-tip--visible')) { _vsTipHide(); }
   else { _vsTipShow(btn); }
 }
 
 document.addEventListener('click', e => {
   if (!e.target.closest('.vs-metric-tip')) _vsTipHide();
-});
+}, true);
+document.addEventListener('scroll', _vsTipHide, { passive:true, capture:true });
 
 /* ── Reset ── */
 function resetCompare() {
