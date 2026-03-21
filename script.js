@@ -5217,34 +5217,87 @@ function _renderHistStats(tracks) {
 
 
 /* ═══════════════════════════════════════════════════════════════
-   COMPARE / VERSUS MODULE — v3
-   Genre Radar · Journey Chart · Temporal · Peak/Streak
-   Confetti · Haptic · Animated counters · Polished UX
+   COMPARE / VERSUS — v4
+   + Playlist commune · Historique recherches · Noms dans phrases
+   + Labels génériques · Tooltips explicites · Animations M3
 ═══════════════════════════════════════════════════════════════ */
 
 const VS = {
   initialized: false,
   running:     false,
-  charts:      [],          /* canvas IDs to clean up on reset */
+  charts:      [],
   _loadTimer:  null,
 };
 
-/* ── Destroy any previously created VS charts ── */
+const VS_HISTORY_KEY = () => `ls_vs_history_${APP.username || ''}`;
+const VS_HISTORY_MAX = 10;
+
+/* ── Persist & load search history ── */
+function _vsHistorySave(name) {
+  try {
+    const raw  = localStorage.getItem(VS_HISTORY_KEY());
+    const list = raw ? JSON.parse(raw) : [];
+    const filtered = list.filter(h => h.name.toLowerCase() !== name.toLowerCase());
+    filtered.unshift({ name, ts: Date.now() });
+    localStorage.setItem(VS_HISTORY_KEY(), JSON.stringify(filtered.slice(0, VS_HISTORY_MAX)));
+  } catch {}
+}
+
+function _vsHistoryLoad() {
+  try {
+    const raw = localStorage.getItem(VS_HISTORY_KEY());
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function _vsHistoryClear() {
+  try { localStorage.removeItem(VS_HISTORY_KEY()); } catch {}
+  const el = document.getElementById('vs-history-wrap');
+  if (el) el.innerHTML = '';
+}
+
+function _vsRenderHistory() {
+  const wrap = document.getElementById('vs-history-wrap');
+  if (!wrap) return;
+  const history = _vsHistoryLoad();
+  if (!history.length) { wrap.innerHTML = ''; return; }
+
+  wrap.innerHTML = `
+    <div class="vs-history-hd">
+      <i class="fas fa-clock-rotate-left"></i>
+      <span>${t('compare_history_title')}</span>
+      <button class="vs-history-clear" onclick="_vsHistoryClear()" title="${t('compare_history_clear')}">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="vs-history-chips">
+      ${history.map(h => {
+        const name = escHtml(h.name);
+        const grad = nameToGradient(h.name);
+        const letter = h.name[0].toUpperCase();
+        return `<button class="vs-chip vs-chip--history" onclick="runComparison('${name.replace(/'/g,"\\'")}')">
+          <span class="vs-chip-av">
+            <span class="vs-chip-fallback" style="background:${grad}">${letter}</span>
+          </span>
+          <span class="vs-chip-name">${name}</span>
+        </button>`;
+      }).join('')}
+    </div>`;
+}
+
+/* ── Destroy charts ── */
 function _vsDestroyCharts() {
   VS.charts.forEach(id => {
     try {
       const el = document.getElementById(id);
-      if (el && typeof Chart !== 'undefined') {
-        const ex = Chart.getChart(el);
-        if (ex) ex.destroy();
-      }
+      if (el && typeof Chart !== 'undefined') { const ex = Chart.getChart(el); if (ex) ex.destroy(); }
     } catch {}
     if (APP.charts[id]) { try { APP.charts[id].destroy(); } catch {}; delete APP.charts[id]; }
   });
   VS.charts = [];
 }
 
-/* ── Generic user fetch with sessionStorage cache ── */
+/* ── Generic API fetch with cache ── */
 async function _apiFetchUser(method, user, params = {}) {
   const url = new URL(LASTFM_URL);
   url.searchParams.set('method',  method);
@@ -5252,7 +5305,7 @@ async function _apiFetchUser(method, user, params = {}) {
   url.searchParams.set('user',    user);
   url.searchParams.set('format',  'json');
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, String(v)));
-  const cacheKey = `vs3_${method}_${user}_${JSON.stringify(params)}`;
+  const cacheKey = `vs4_${method}_${user}_${JSON.stringify(params)}`;
   try { const c = sessionStorage.getItem(cacheKey); if (c) return JSON.parse(c); } catch {}
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
@@ -5269,7 +5322,7 @@ async function _apiFetchUser(method, user, params = {}) {
   }
 }
 
-/* ── Animated loading UI ── */
+/* ── Animated loading ── */
 function _vsShowLoading(friendName) {
   const loadEl = document.getElementById('vs-loading');
   if (!loadEl) return;
@@ -5284,7 +5337,7 @@ function _vsShowLoading(friendName) {
       </div>
       <span class="vs-loading-msg" id="vs-load-msg">${t(msgs[0])}</span>
       <div class="vs-loading-steps">
-        ${msgs.map((m,i) => `<span class="vs-load-dot${i===0?' active':''}"></span>`).join('')}
+        ${msgs.map((_,i) => `<span class="vs-load-dot${i===0?' active':''}"></span>`).join('')}
       </div>
     </div>`;
   VS._loadTimer = setInterval(() => {
@@ -5295,27 +5348,22 @@ function _vsShowLoading(friendName) {
   }, 800);
 }
 
-/* ── Confetti (pure JS, no library) ── */
+/* ── Confetti ── */
 function _launchConfetti() {
   const canvas = document.createElement('canvas');
   canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999';
   document.body.appendChild(canvas);
   const ctx = canvas.getContext('2d');
-  canvas.width  = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
   const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#d0bcff';
   const colors = [accent, '#f97316', '#4caf80', '#38bdf8', '#fb7185', '#facc15', '#a78bfa'];
-  const pieces = Array.from({ length: 120 }, () => ({
-    x:    Math.random() * canvas.width,
-    y:    -20 - Math.random() * 80,
-    w:    6 + Math.random() * 10,
-    h:    3 + Math.random() * 6,
-    rot:  Math.random() * Math.PI * 2,
-    vx:   (Math.random() - 0.5) * 5,
-    vy:   1.5 + Math.random() * 3,
+  const pieces = Array.from({ length: 130 }, () => ({
+    x: Math.random() * canvas.width, y: -20 - Math.random() * 80,
+    w: 6 + Math.random() * 10, h: 3 + Math.random() * 6,
+    rot: Math.random() * Math.PI * 2,
+    vx: (Math.random() - 0.5) * 5, vy: 1.5 + Math.random() * 3,
     vrot: (Math.random() - 0.5) * 0.25,
-    color: colors[Math.floor(Math.random() * colors.length)],
-    alpha: 1,
+    color: colors[Math.floor(Math.random() * colors.length)], alpha: 1,
   }));
   let frame;
   const tick = () => {
@@ -5324,8 +5372,7 @@ function _launchConfetti() {
     pieces.forEach(p => {
       p.x += p.vx; p.y += p.vy; p.rot += p.vrot; p.vy += 0.08;
       if (p.y < canvas.height + 20) { alive = true; p.alpha = Math.max(0, 1 - (p.y / canvas.height) * 0.9); }
-      ctx.save();
-      ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
       ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color;
       ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
       ctx.restore();
@@ -5334,6 +5381,25 @@ function _launchConfetti() {
   };
   frame = requestAnimationFrame(tick);
   setTimeout(() => { cancelAnimationFrame(frame); canvas.remove(); }, 5000);
+}
+
+/* ── Ripple effect (M3) ── */
+function _vsRipple(e) {
+  const btn = e.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  const ripple = document.createElement('span');
+  const size   = Math.max(rect.width, rect.height) * 2;
+  ripple.style.cssText = `
+    position:absolute; border-radius:50%; pointer-events:none; transform:scale(0);
+    width:${size}px; height:${size}px;
+    top:${e.clientY - rect.top - size / 2}px;
+    left:${e.clientX - rect.left - size / 2}px;
+    background:rgba(255,255,255,0.25);
+    animation:m3-ripple 500ms var(--ease-decel) forwards;`;
+  btn.style.position = 'relative';
+  btn.style.overflow = 'hidden';
+  btn.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 600);
 }
 
 /* ── Friend chip builder ── */
@@ -5353,10 +5419,13 @@ function _buildChip(f) {
     </button>`;
 }
 
-/* ── Init: load friends ── */
+/* ── Init ── */
 async function initComparePage() {
   if (VS.initialized) return;
   VS.initialized = true;
+
+  _vsRenderHistory();
+
   const listEl = document.getElementById('vs-friends-list');
   if (!listEl) return;
   listEl.innerHTML = `<div class="vs-chip-skeleton"><i class="fas fa-spinner fa-spin"></i></div>`;
@@ -5397,9 +5466,9 @@ async function runComparison(friendName) {
   try {
     const [frInfo, myArtists, frArtists, myRecent200, frRecent200, myTags, frTags, frNow1] =
       await Promise.all([
-        _apiFetchUser('user.getInfo',        friendName, {}),
+        _apiFetchUser('user.getInfo',         friendName, {}),
         _getMyTopArtists(),
-        _apiFetchUser('user.getTopArtists',  friendName, { period:'overall', limit:50 }),
+        _apiFetchUser('user.getTopArtists',   friendName, { period:'overall', limit:50 }),
         _apiFetchUser('user.getRecentTracks', APP.username, { limit:200 }),
         _apiFetchUser('user.getRecentTracks', friendName,   { limit:200 }),
         _apiFetchUser('user.getTopTags',      APP.username, { limit:20 }),
@@ -5422,26 +5491,28 @@ async function runComparison(friendName) {
     const frNow = _extractNowPlaying(frNow1);
     const steal = _findStealArtist(myList, frList);
 
-    /* Advanced data */
     const radarData   = _buildRadarData(myTags, frTags);
     const journeyData = _buildJourneyData(myRecent200, frRecent200);
-    const temporal    = _buildTemporalData(APP.userInfo, frInfo?.user || {});
-    const peaks       = _buildPeakData(myRecent200, frRecent200, myMetrics, frMetrics);
+    const temporal    = _buildTemporalData(APP.userInfo, frInfo?.user || {}, APP.username, friendName);
+    const peaks       = _buildPeakData(myRecent200, frRecent200);
     const curiosities = _buildCuriosities(common, myList, frList);
+    const playlist    = _buildSharedPlaylist(myRecent200, frRecent200);
 
     clearInterval(VS._loadTimer);
+
+    /* Save to search history */
+    _vsHistorySave(friendName);
+    _vsRenderHistory();
+
     renderComparison({
       friendName, score, common, breaker, underground, sharedTags,
       myNow, frNow, myList, frList,
       myMetrics, frMetrics, steal,
       frUserInfo: frInfo?.user || null,
-      radarData, journeyData, temporal, peaks, curiosities,
+      radarData, journeyData, temporal, peaks, curiosities, playlist,
     });
 
-    /* Haptic on score reveal */
     if ('vibrate' in navigator) navigator.vibrate(score >= 70 ? [100, 50, 100] : [80]);
-
-    /* Confetti for perfect matches */
     if (score >= 90) setTimeout(_launchConfetti, 600);
 
   } catch (e) {
@@ -5472,7 +5543,7 @@ function _computeMetrics(userInfo, artistsData, recentData, tagsData) {
   const spanDays   = rawDates.length >= 2
     ? Math.max(1, Math.round((new Date(rawDates[0]) - new Date(rawDates[rawDates.length - 1])) / 86400000) + 1)
     : Math.max(1, uniqueDays);
-  const consistency    = Math.min(100, (uniqueDays / spanDays) * 100);
+  const consistency = Math.min(100, (uniqueDays / spanDays) * 100);
 
   const topSet        = new Set(artists.map(a => a.nameLow));
   const recentArtists = [...new Set(recentArr.map(t => t.artist).filter(Boolean))];
@@ -5484,67 +5555,82 @@ function _computeMetrics(userInfo, artistsData, recentData, tagsData) {
   const top5Pc        = artists.slice(0, 5).reduce((s, a) => s + a.playcount, 0);
   const concentration = totalPc > 0 ? Math.min(100, (top5Pc / totalPc) * 100) : 0;
 
-  const counts    = {};
-  recentArr.map(t => `${t.artist}|||${t.track}`).forEach(k => { counts[k] = (counts[k] || 0) + 1; });
+  const counts = {};
+  recentArr.map(t => `${t.artist}|||${t.trackLow}`).forEach(k => { counts[k] = (counts[k] || 0) + 1; });
   const uCount    = Object.keys(counts).length;
   const replayRate = uCount > 0 ? Math.min(100, (Object.values(counts).filter(c => c > 1).length / uCount) * 100) : 0;
 
   return { totalScrobbles, dailyAvg, listenMins, consistency, discoveryRate, variance, concentration, replayRate };
 }
 
-/* Radar: top shared genres with per-user counts */
+/* Build top 3 shared tracks (by combined play freq in recent 200) */
+function _buildSharedPlaylist(myData, frData) {
+  const myArr = _extractRecentTracksRaw(myData);
+  const frArr = _extractRecentTracksRaw(frData);
+
+  /* Count occurrences for each user keyed by "artist|||track" (lowercase) */
+  const myCounts = {}, frCounts = {};
+  myArr.forEach(t => { myCounts[t.key] = (myCounts[t.key] || 0) + 1; });
+  frArr.forEach(t => { frCounts[t.key] = (frCounts[t.key] || 0) + 1; });
+
+  const frKeys = new Set(Object.keys(frCounts));
+  const shared = Object.keys(myCounts)
+    .filter(k => frKeys.has(k))
+    .map(k => {
+      const ref = myArr.find(t => t.key === k);
+      return {
+        key:      k,
+        display:  ref ? `${ref.artist} — ${ref.track}` : k,
+        artist:   ref?.artist || '',
+        track:    ref?.track  || '',
+        myCount:  myCounts[k],
+        frCount:  frCounts[k],
+        combined: myCounts[k] + frCounts[k],
+      };
+    })
+    .sort((a, b) => b.combined - a.combined)
+    .slice(0, 3);
+
+  return shared.length > 0 ? shared : null;
+}
+
 function _buildRadarData(myTags, frTags) {
   const myArr = _getRawTags(myTags);
   const frArr = _getRawTags(frTags);
   if (!myArr.length || !frArr.length) return null;
-
   const myMap = new Map(myArr.map(t => [t.name.toLowerCase(), parseInt(t.count || 1)]));
   const frMap = new Map(frArr.map(t => [t.name.toLowerCase(), parseInt(t.count || 1)]));
   const myMax = Math.max(...myMap.values(), 1);
   const frMax = Math.max(...frMap.values(), 1);
-
   const candidates = [...myMap.entries()]
     .filter(([n]) => frMap.has(n))
     .map(([n, mc]) => ({ name: n, my: Math.round((mc / myMax) * 100), fr: Math.round(((frMap.get(n) || 0) / frMax) * 100) }))
     .sort((a, b) => (b.my + b.fr) - (a.my + a.fr))
     .slice(0, 6);
-
   return candidates.length >= 3 ? candidates : null;
 }
 
-/* Journey: daily scrobble counts for the last 7 days */
 function _buildJourneyData(myData, frData) {
   const myArr = _extractRecentTracks(myData);
   const frArr = _extractRecentTracks(frData);
-
-  const days = [];
-  const labels = [];
+  const days = [], labels = [];
   const now = new Date();
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(now);
-    d.setDate(d.getDate() - i);
-    const key = d.toISOString().slice(0, 10);
-    const label = d.toLocaleDateString(undefined, { weekday: 'short' });
-    days.push(key);
-    labels.push(label);
+    const d = new Date(now); d.setDate(d.getDate() - i);
+    days.push(d.toISOString().slice(0, 10));
+    labels.push(d.toLocaleDateString(undefined, { weekday: 'short' }));
   }
-
-  const _dayCount = (arr, dayKey) =>
-    arr.filter(t => _parseLfmDate(t.date)?.slice(0, 10) === dayKey).length;
-
+  const _dayCount = (arr, key) => arr.filter(t => _parseLfmDate(t.date)?.slice(0, 10) === key).length;
   const myCounts = days.map(d => _dayCount(myArr, d));
   const frCounts = days.map(d => _dayCount(frArr, d));
-
   if (myCounts.every(v => v === 0) && frCounts.every(v => v === 0)) return null;
   return { labels, myCounts, frCounts };
 }
 
-/* Parse Last.fm date string "15 Jun 2025, 14:32" → "2025-06-15" */
 function _parseLfmDate(str) {
   if (!str) return null;
   try {
-    const months = { jan:'01',feb:'02',mar:'03',apr:'04',may:'05',jun:'06',
-                     jul:'07',aug:'08',sep:'09',oct:'10',nov:'11',dec:'12' };
+    const months = { jan:'01',feb:'02',mar:'03',apr:'04',may:'05',jun:'06',jul:'07',aug:'08',sep:'09',oct:'10',nov:'11',dec:'12' };
     const m = str.trim().match(/^(\d{1,2})\s+(\w{3})\s+(\d{4})/);
     if (!m) return null;
     const mo = months[m[2].toLowerCase()];
@@ -5552,70 +5638,59 @@ function _parseLfmDate(str) {
   } catch { return null; }
 }
 
-/* Temporal: registration year + era label */
-function _buildTemporalData(myUserInfo, frUserInfo) {
-  const myReg  = parseInt(myUserInfo?.registered?.unixtime || 0);
-  const frReg  = parseInt(frUserInfo?.registered?.unixtime  || 0);
+/* Temporal — takes actual usernames as params */
+function _buildTemporalData(myUserInfo, frUserInfo, myUsername, frUsername) {
+  const myReg = parseInt(myUserInfo?.registered?.unixtime || 0);
+  const frReg = parseInt(frUserInfo?.registered?.unixtime  || 0);
   if (!myReg || !frReg) return null;
-
   const myYear = new Date(myReg * 1000).getFullYear();
   const frYear = new Date(frReg * 1000).getFullYear();
-
   const _era = y => {
     if (y <= 2008) return t('compare_temporal_veteran');
     if (y <= 2013) return t('compare_temporal_early');
     if (y <= 2018) return t('compare_temporal_mid');
     return t('compare_temporal_newcomer');
   };
-
   const diff = Math.abs(myYear - frYear);
   let phrase = '';
-  if (diff < 2)       phrase = t('compare_temporal_same');
-  else if (myYear < frYear) phrase = t('compare_temporal_phrase_me').replace('{0}', myYear).replace('{1}', frYear);
-  else               phrase = t('compare_temporal_phrase_fr').replace('{0}', frYear).replace('{1}', myYear);
-
+  if (diff < 2)
+    phrase = t('compare_temporal_same');
+  else if (myYear < frYear)
+    phrase = t('compare_temporal_phrase_me')
+      .replace('{myUser}', myUsername).replace('{frUser}', frUsername)
+      .replace('{myYear}', myYear).replace('{frYear}', frYear);
+  else
+    phrase = t('compare_temporal_phrase_fr')
+      .replace('{myUser}', myUsername).replace('{frUser}', frUsername)
+      .replace('{myYear}', myYear).replace('{frYear}', frYear);
   return { myYear, frYear, myEra: _era(myYear), frEra: _era(frYear), phrase };
 }
 
-/* Peak day + streak from recent 200 */
-function _buildPeakData(myData, frData, myMetrics, frMetrics) {
+function _buildPeakData(myData, frData) {
   const _process = (data) => {
     const arr = _extractRecentTracks(data);
     const byDay = {};
-    arr.forEach(t => {
-      const d = _parseLfmDate(t.date);
-      if (d) byDay[d] = (byDay[d] || 0) + 1;
-    });
+    arr.forEach(t => { const d = _parseLfmDate(t.date); if (d) byDay[d] = (byDay[d] || 0) + 1; });
     const peak = Math.max(...Object.values(byDay), 0);
-
-    /* Streak from sorted unique days */
     const sorted = Object.keys(byDay).sort().reverse();
     let streak = 0, prev = null;
     for (const d of sorted) {
       if (!prev) { streak = 1; prev = d; continue; }
-      const diff = Math.round((new Date(prev) - new Date(d)) / 86400000);
-      if (diff === 1) { streak++; prev = d; }
+      if (Math.round((new Date(prev) - new Date(d)) / 86400000) === 1) { streak++; prev = d; }
       else break;
     }
     return { peak, streak };
   };
-
-  const my = _process(myData);
-  const fr = _process(frData);
+  const my = _process(myData), fr = _process(frData);
   return { myPeak: my.peak, frPeak: fr.peak, myStreak: my.streak, frStreak: fr.streak };
 }
 
-/* Curiosities: guilty pleasure + neutral ground from common artists */
 function _buildCuriosities(common, myList, frList) {
   if (!common.length) return null;
   const frMap = new Map(frList.map(a => [a.nameLow, a]));
-
-  /* Guilty pleasure: highest combined playcount */
-  const guilty = [...common]
+  const topShared = [...common]
     .map(a => ({ ...a, combined: a.playcount + (frMap.get(a.nameLow)?.playcount || 0) }))
     .sort((a, b) => b.combined - a.combined)[0] || null;
-
-  /* Neutral ground: most balanced playcounts (lowest ratio) */
   const neutral = [...common]
     .filter(a => a.playcount > 0 && (frMap.get(a.nameLow)?.playcount || 0) > 0)
     .map(a => {
@@ -5624,8 +5699,7 @@ function _buildCuriosities(common, myList, frList) {
       return { ...a, balance: Math.max(mc, fc) / Math.min(mc, fc) };
     })
     .sort((a, b) => a.balance - b.balance)[0] || null;
-
-  return { guilty, neutral };
+  return { topShared, neutral };
 }
 
 /* ══════════════════════════════════════════════════════
@@ -5635,70 +5709,81 @@ function _buildCuriosities(common, myList, frList) {
 function renderComparison({ friendName, score, common, breaker, underground, sharedTags,
                              myNow, frNow, myList, frList,
                              myMetrics, frMetrics, steal, frUserInfo,
-                             radarData, journeyData, temporal, peaks, curiosities }) {
-
+                             radarData, journeyData, temporal, peaks, curiosities, playlist }) {
   clearInterval(VS._loadTimer);
   const loadEl    = document.getElementById('vs-loading');
   const displayEl = document.getElementById('vs-display');
   loadEl?.classList.add('hidden');
   VS.running = false;
 
-  /* Avatar helpers */
+  /* Avatars */
   const myUi     = APP.userInfo;
   const myImgRaw = myUi?.image?.find(i => i.size === 'large')?.['#text'] || '';
   const myImg    = myImgRaw && !isDefaultImg(myImgRaw) ? myImgRaw : '';
   const myGrad   = nameToGradient(APP.username);
   const myLetter = (APP.username || '?')[0].toUpperCase();
-
   const frImgArr = frUserInfo?.image;
   const frImgRaw = Array.isArray(frImgArr) ? frImgArr.find(i => i.size === 'large')?.['#text'] : '';
   const frImg    = frImgRaw && !isDefaultImg(frImgRaw) ? frImgRaw : '';
   const frGrad   = nameToGradient(friendName);
   const frLetter = friendName[0].toUpperCase();
 
-  const _av = (img, grad, letter, extra = '') =>
-    `<div class="vs-av${extra}">
+  const _av = (img, grad, letter, cls = '') =>
+    `<div class="vs-av${cls}">
        <span class="vs-av-fallback" style="background:${grad}">${letter}</span>
        ${img ? `<img src="${img}" alt="avatar" class="vs-av-img" onerror="this.remove()">` : ''}
      </div>`;
 
-  /* Score */
   const scoreColor = score >= 70 ? 'var(--score-high)' : score >= 40 ? 'var(--score-mid)' : 'var(--score-low)';
   const scoreLabel = score >= 70 ? t('compare_level_high') : score >= 40 ? t('compare_level_mid') : t('compare_level_low');
   const scoreEmoji = score >= 90 ? '🎆' : score >= 70 ? '🔥' : score >= 40 ? '🎵' : '🎲';
   const myN = escHtml(APP.username);
   const frN = escHtml(friendName);
 
-  /* Section builder helper */
-  const _section = (icon, title, content, extraClass = '') =>
-    `<div class="vs-section${extraClass ? ' '+extraClass : ''}" style="animation-delay:.05s">
+  const _section = (icon, title, content, xCls = '') =>
+    `<div class="vs-section${xCls?' '+xCls:''}" style="animation-delay:.05s">
        <div class="vs-section-title"><i class="fas fa-${icon}"></i> ${title}</div>
        ${content}
      </div>`;
 
-  /* ── Radar section ── */
+  /* ── PLAYLIST ── */
+  const playlistHTML = playlist ? _section('compact-disc', t('compare_playlist_title'),
+    `<p class="vs-section-hint">${t('compare_playlist_sub')}</p>
+     <div class="vs-playlist">
+       ${playlist.map((item, i) => `
+         <div class="vs-playlist-row">
+           <span class="vs-playlist-num">${i + 1}</span>
+           <div class="vs-playlist-info">
+             <span class="vs-playlist-track">${escHtml(item.track)}</span>
+             <span class="vs-playlist-artist">${escHtml(item.artist)}</span>
+           </div>
+           <div class="vs-playlist-counts">
+             <span class="vs-playlist-me" title="${myN}">${item.myCount}×</span>
+             <span class="vs-playlist-sep">·</span>
+             <span class="vs-playlist-fr" title="${frN}">${item.frCount}×</span>
+           </div>
+         </div>`).join('')}
+     </div>`) : '';
+
+  /* ── RADAR ── */
   const radarHTML = radarData ? _section('spider', t('compare_radar_title'),
     `<p class="vs-section-hint">${t('compare_radar_sub')}</p>
-     <div class="vs-chart-wrap vs-radar-wrap">
-       <canvas id="vs-radar-canvas"></canvas>
-     </div>
+     <div class="vs-chart-wrap vs-radar-wrap"><canvas id="vs-radar-canvas"></canvas></div>
      <div class="vs-radar-legend">
        <span class="vs-leg-dot" style="background:var(--accent)"></span><span>${myN}</span>
        <span class="vs-leg-dot" style="background:var(--vs-fr-color)"></span><span>${frN}</span>
      </div>`) : '';
 
-  /* ── Journey section ── */
+  /* ── JOURNEY ── */
   const journeyHTML = journeyData ? _section('route', t('compare_journey_title'),
-    `<p class="vs-section-hint">${t('compare_journey_sub')}</p>
-     <div class="vs-chart-wrap vs-journey-wrap">
-       <canvas id="vs-journey-canvas"></canvas>
-     </div>
+    `<p class="vs-section-hint">${t('compare_journey_sub').replace('{myUser}', myN).replace('{frUser}', frN)}</p>
+     <div class="vs-chart-wrap vs-journey-wrap"><canvas id="vs-journey-canvas"></canvas></div>
      <div class="vs-radar-legend">
        <span class="vs-leg-dot" style="background:var(--accent)"></span><span>${myN}</span>
        <span class="vs-leg-dot" style="background:var(--vs-fr-color)"></span><span>${frN}</span>
      </div>`) : '';
 
-  /* ── Temporal section ── */
+  /* ── TEMPORAL ── */
   const temporalHTML = temporal ? _section('clock-rotate-left', t('compare_temporal_title'),
     `<div class="vs-temporal-grid">
        <div class="vs-temporal-card">
@@ -5721,50 +5806,38 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
      </div>
      <p class="vs-temporal-phrase"><i class="fas fa-quote-left"></i> ${temporal.phrase}</p>`) : '';
 
-  /* ── Peak & streak section ── */
+  /* ── PEAK ── */
   const peakHTML = _section('trophy', t('compare_peak_title'),
     `<div class="vs-peak-grid">
        <div class="vs-peak-card">
          <div class="vs-peak-icon"><i class="fas fa-fire-flame-curved"></i></div>
          <div class="vs-peak-label">${t('compare_peak_record')}</div>
          <div class="vs-peak-row">
-           <div class="vs-peak-user">
-             <span class="vs-peak-who vs-peak-who--me">${myN}</span>
-             <span class="vs-animnum vs-peak-val" data-to="${peaks.myPeak}">${peaks.myPeak}</span>
-           </div>
-           <div class="vs-peak-user">
-             <span class="vs-peak-who vs-peak-who--fr">${frN}</span>
-             <span class="vs-animnum vs-peak-val" data-to="${peaks.frPeak}">${peaks.frPeak}</span>
-           </div>
+           <div class="vs-peak-user"><span class="vs-peak-who vs-peak-who--me">${myN}</span><span class="vs-animnum vs-peak-val" data-to="${peaks.myPeak}">${peaks.myPeak}</span></div>
+           <div class="vs-peak-user"><span class="vs-peak-who vs-peak-who--fr">${frN}</span><span class="vs-animnum vs-peak-val" data-to="${peaks.frPeak}">${peaks.frPeak}</span></div>
          </div>
        </div>
        <div class="vs-peak-card">
          <div class="vs-peak-icon"><i class="fas fa-calendar-check"></i></div>
          <div class="vs-peak-label">${t('compare_peak_streak')}</div>
          <div class="vs-peak-row">
-           <div class="vs-peak-user">
-             <span class="vs-peak-who vs-peak-who--me">${myN}</span>
-             <span class="vs-animnum vs-peak-val" data-to="${peaks.myStreak}">${peaks.myStreak}</span>
-           </div>
-           <div class="vs-peak-user">
-             <span class="vs-peak-who vs-peak-who--fr">${frN}</span>
-             <span class="vs-animnum vs-peak-val" data-to="${peaks.frStreak}">${peaks.frStreak}</span>
-           </div>
+           <div class="vs-peak-user"><span class="vs-peak-who vs-peak-who--me">${myN}</span><span class="vs-animnum vs-peak-val" data-to="${peaks.myStreak}">${peaks.myStreak}</span></div>
+           <div class="vs-peak-user"><span class="vs-peak-who vs-peak-who--fr">${frN}</span><span class="vs-animnum vs-peak-val" data-to="${peaks.frStreak}">${peaks.frStreak}</span></div>
          </div>
        </div>
      </div>`);
 
-  /* ── Metrics section ── */
+  /* ── METRICS ── */
   const metricsHTML = _section('chart-line', t('compare_report_title'),
     `<div class="vs-metrics-grid">
        ${_metricCard('calendar-check', t('compare_consistency'),   t('compare_consistency_tip'),   myN, myMetrics.consistency,   frN, frMetrics.consistency,   '%', true)}
        ${_metricCard('compass',        t('compare_discovery'),     t('compare_discovery_tip'),     myN, myMetrics.discoveryRate,  frN, frMetrics.discoveryRate,  '%', true)}
        ${_metricCard('tags',           t('compare_variance'),      t('compare_variance_tip'),      myN, myMetrics.variance,       frN, frMetrics.variance,       '', true)}
-       ${_metricCard('crosshairs',     t('compare_concentration'), t('compare_concentration_tip'), myN, myMetrics.concentration, frN, frMetrics.concentration, '%', false)}
+       ${_metricCard('crosshairs',     t('compare_concentration'), t('compare_concentration_tip'), myN, myMetrics.concentration,  frN, frMetrics.concentration, '%', false)}
        ${_metricCard('repeat',         t('compare_replay'),        t('compare_replay_tip'),        myN, myMetrics.replayRate,     frN, frMetrics.replayRate,     '%', false)}
      </div>`);
 
-  /* ── Volume section ── */
+  /* ── VOLUME ── */
   const volumeHTML = _section('database', t('compare_volume_title'),
     `<div class="vs-volume-grid">
        <div class="vs-vol-card">
@@ -5790,48 +5863,56 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
        </div>
      </div>`);
 
-  /* ── Live section ── */
+  /* ── LIVE ── */
   const liveHTML = (myNow || frNow) ? _section('signal', t('compare_live_section'),
     `<div class="vs-live-cards">
        ${myNow ? `<div class="vs-live-card vs-live-card--me"><span class="vs-live-dot"></span><div class="vs-live-info"><span class="vs-live-who">${myN}</span><span class="vs-live-track">${escHtml(myNow.artist)} — ${escHtml(myNow.track)}</span></div></div>` : ''}
        ${frNow ? `<div class="vs-live-card vs-live-card--fr"><span class="vs-live-dot vs-live-dot--fr"></span><div class="vs-live-info"><span class="vs-live-who vs-live-who--fr">${frN}</span><span class="vs-live-track">${escHtml(frNow.artist)} — ${escHtml(frNow.track)}</span></div></div>` : ''}
      </div>`) : '';
 
-  /* ── Common artists & curiosities ── */
+  /* ── COMMON / CURIOSITIES ── */
   const commonHTML = common.slice(0, 8).map(a => `<span class="vs-tag-pill">${escHtml(a.name)}</span>`).join('');
   const tagsHTML   = sharedTags.map(tg => `<span class="vs-tag-pill vs-tag-genre">${escHtml(tg)}</span>`).join('');
 
+  /* Dealbreaker — label cleaner: just show the artist, no username prefix */
   let breakerHTML = '';
-  if (breaker.mine)   breakerHTML += `<div class="vs-breaker-row"><span class="vs-breaker-badge">${myN}</span> <span class="vs-breaker-artist">${escHtml(breaker.mine.name)}</span> <span class="vs-breaker-hint">${t('compare_dealbreaker_hint')}</span></div>`;
-  if (breaker.theirs) breakerHTML += `<div class="vs-breaker-row"><span class="vs-breaker-badge vs-breaker-badge--fr">${frN}</span> <span class="vs-breaker-artist">${escHtml(breaker.theirs.name)}</span> <span class="vs-breaker-hint">${t('compare_dealbreaker_hint')}</span></div>`;
+  if (breaker.mine)   breakerHTML += `<div class="vs-breaker-row"><span class="vs-breaker-badge">${myN}</span><i class="fas fa-arrow-right vs-breaker-arrow"></i><span class="vs-breaker-artist">${escHtml(breaker.mine.name)}</span></div>`;
+  if (breaker.theirs) breakerHTML += `<div class="vs-breaker-row"><span class="vs-breaker-badge vs-breaker-badge--fr">${frN}</span><i class="fas fa-arrow-right vs-breaker-arrow"></i><span class="vs-breaker-artist">${escHtml(breaker.theirs.name)}</span></div>`;
 
-  let guiltHTML = '', neutralHTML = '';
-  if (curiosities?.guilty)  guiltHTML  = `<div class="vs-section-subtitle"><i class="fas fa-fire"></i> ${t('compare_guilty_pleasure')}</div><div class="vs-tags-wrap"><span class="vs-tag-pill vs-tag-fire">${escHtml(curiosities.guilty.name)}</span></div>`;
-  if (curiosities?.neutral) neutralHTML = `<div class="vs-section-subtitle"><i class="fas fa-handshake"></i> ${t('compare_neutral_ground')}</div><div class="vs-tags-wrap"><span class="vs-tag-pill vs-tag-neutral">${escHtml(curiosities.neutral.name)}</span></div>`;
+  let topSharedHTML = '', neutralHTML = '';
+  if (curiosities?.topShared) topSharedHTML = `
+    <div class="vs-section-subtitle"><i class="fas fa-fire"></i> ${t('compare_top_shared')}</div>
+    <div class="vs-tags-wrap"><span class="vs-tag-pill vs-tag-fire">${escHtml(curiosities.topShared.name)}</span></div>`;
+  if (curiosities?.neutral) neutralHTML = `
+    <div class="vs-section-subtitle"><i class="fas fa-handshake"></i> ${t('compare_neutral_ground')}</div>
+    <div class="vs-tags-wrap"><span class="vs-tag-pill vs-tag-neutral">${escHtml(curiosities.neutral.name)}</span></div>`;
 
   const crossHTML = _section('music', `${t('compare_common_artists')} (${common.length})`,
     `<div class="vs-tags-wrap">${commonHTML || `<p class="vs-empty">${t('compare_no_common')}</p>`}</div>
      ${sharedTags.length ? `<div class="vs-section-subtitle"><i class="fas fa-tags"></i> ${t('compare_shared_genres')}</div><div class="vs-tags-wrap">${tagsHTML}</div>` : ''}
-     ${breakerHTML ? `<div class="vs-section-subtitle vs-section-subtitle--warn"><i class="fas fa-bolt"></i> ${t('compare_dealbreaker')}</div><div class="vs-tags-wrap vs-tags-wrap--col">${breakerHTML}</div>` : ''}
+     ${breakerHTML ? `<div class="vs-section-subtitle vs-section-subtitle--warn"><i class="fas fa-bolt"></i> ${t('compare_dealbreaker')} <span class="vs-subtitle-tip">${t('compare_dealbreaker_explain')}</span></div><div class="vs-tags-wrap vs-tags-wrap--col">${breakerHTML}</div>` : ''}
      ${underground ? `<div class="vs-section-subtitle"><i class="fas fa-gem"></i> ${t('compare_underground')}</div><div class="vs-tags-wrap"><span class="vs-tag-pill vs-tag-gem">${underground === 'me' ? myN : frN}</span></div>` : ''}
-     ${guiltHTML}
+     ${topSharedHTML}
      ${neutralHTML}`);
 
-  /* ── Discovery steal ── */
+  /* ── STEAL ── */
   const stealHTML = steal
     ? `<div class="vs-section vs-steal-section">
          <div class="vs-steal-hd"><i class="fas fa-lightbulb"></i><span>${t('compare_steal_title')}</span></div>
          <p class="vs-steal-sub">${t('compare_steal_sub').replace('{0}', `<strong>${frN}</strong>`)}</p>
-         <div class="vs-steal-artist"><span class="vs-steal-rank">#${steal.rank}</span><span class="vs-steal-name">${escHtml(steal.name)}</span><span class="vs-steal-pc">${formatNum(steal.playcount)} ${t('scrobbles')}</span></div>
+         <div class="vs-steal-artist">
+           <span class="vs-steal-rank">#${steal.rank}</span>
+           <span class="vs-steal-name">${escHtml(steal.name)}</span>
+           <span class="vs-steal-pc">${formatNum(steal.playcount)} ${t('scrobbles')}</span>
+         </div>
        </div>`
     : `<div class="vs-section vs-steal-section">
          <div class="vs-steal-hd"><i class="fas fa-check-circle"></i></div>
          <p class="vs-steal-sub">${t('compare_steal_none').replace('{0}', `<strong>${frN}</strong>`)}</p>
        </div>`;
 
-  /* ── Assemble full display ── */
+  /* ── ASSEMBLE ── */
   displayEl.innerHTML = `
-    <!-- Header -->
     <div class="vs-header vs-section">
       <div class="vs-player">
         ${_av(myImg, myGrad, myLetter)}
@@ -5863,12 +5944,12 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
       </div>
     </div>
 
-    <!-- Gauge bar -->
     <div class="vs-gauge-bar-wrap">
       <div class="vs-gauge-bar"><div class="vs-gauge-bar-fill" style="width:0;background:${scoreColor}" data-w="${score}"></div></div>
     </div>
 
     ${liveHTML}
+    ${playlistHTML}
     ${radarHTML}
     ${journeyHTML}
     ${metricsHTML}
@@ -5879,29 +5960,23 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
     ${stealHTML}
 
     <div class="vs-again-wrap">
-      <button class="vs-again-btn" onclick="resetCompare()">
+      <button class="vs-again-btn" onclick="resetCompare(); _vsRipple(event)">
         <i class="fas fa-redo"></i> <span>${t('compare_again')}</span>
       </button>
     </div>
   `;
 
   displayEl.classList.remove('hidden');
-
-  /* Trigger all animations */
   _animateVsResults(displayEl);
 
-  /* Build charts after DOM paint */
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      if (radarData)   _buildRadarChart(radarData,   myN, frN);
-      if (journeyData) _buildJourneyChart(journeyData, myN, frN);
-    });
-  });
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (radarData)   _buildRadarChart(radarData,   myN, frN);
+    if (journeyData) _buildJourneyChart(journeyData, myN, frN);
+  }));
 }
 
-/* ── Animate bars, numbers, gauge ── */
+/* ── Animate bars + count-up + ring + stagger ── */
 function _animateVsResults(root) {
-  /* bars */
   requestAnimationFrame(() => {
     root.querySelectorAll('.vs-bar-fill[data-w]').forEach(el => {
       requestAnimationFrame(() => { el.style.width = el.dataset.w + '%'; });
@@ -5910,13 +5985,11 @@ function _animateVsResults(root) {
     if (fill) requestAnimationFrame(() => { fill.style.width = fill.dataset.w + '%'; });
   });
 
-  /* count-up numbers */
   root.querySelectorAll('.vs-animnum[data-to]').forEach((el, i) => {
     const to = parseInt(el.dataset.to);
     if (!isNaN(to) && to > 0) setTimeout(() => animateValue(el, 0, to, 1000), i * 30);
   });
 
-  /* score ring */
   const ring = root.querySelector('.vs-gauge-fill[data-target]');
   if (ring) {
     const target = parseFloat(ring.dataset.target);
@@ -5925,123 +5998,78 @@ function _animateVsResults(root) {
     }));
   }
 
-  /* staggered section entrance */
   root.querySelectorAll('.vs-section, .vs-steal-section').forEach((el, i) => {
     el.style.animationDelay = `${i * 60}ms`;
     el.classList.add('vs-section-in');
   });
+
+  /* Bind ripple to all VS buttons */
+  root.querySelectorAll('.vs-again-btn, .vs-chip').forEach(btn => {
+    btn.addEventListener('click', _vsRipple);
+  });
 }
 
-/* ── Radar chart (Chart.js) ── */
+/* ── Radar chart ── */
 function _buildRadarChart(data, myName, frName) {
   const canvas = document.getElementById('vs-radar-canvas');
   if (!canvas) return;
   const c = getThemeColors();
   const accent  = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()  || '#d0bcff';
   const accent2 = getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim() || '#ccc2dc';
-
+  const toRgba = (hex, a) => {
+    if (!hex || hex[0] !== '#') return `rgba(208,188,255,${a})`;
+    const n = parseInt(hex.slice(1), 16);
+    return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+  };
   const chart = new Chart(canvas, {
     type: 'radar',
     data: {
-      labels:   data.map(d => d.name.charAt(0).toUpperCase() + d.name.slice(1)),
+      labels: data.map(d => d.name.charAt(0).toUpperCase() + d.name.slice(1)),
       datasets: [
-        {
-          label:           myName,
-          data:            data.map(d => d.my),
-          borderColor:     accent,
-          backgroundColor: accent.replace(')', ', 0.15)').replace('rgb', 'rgba').replace('#', 'rgba(').padEnd(0),
-          pointBackgroundColor: accent,
-          pointRadius: 4,
-          borderWidth: 2,
-        },
-        {
-          label:           frName,
-          data:            data.map(d => d.fr),
-          borderColor:     accent2,
-          backgroundColor: accent2.replace(')', ', 0.10)').replace('rgb', 'rgba'),
-          pointBackgroundColor: accent2,
-          pointRadius: 4,
-          borderWidth: 2,
-        },
+        { label:myName, data:data.map(d=>d.my), borderColor:accent, backgroundColor:toRgba(accent,.15), pointBackgroundColor:accent, pointRadius:4, borderWidth:2 },
+        { label:frName, data:data.map(d=>d.fr), borderColor:accent2, backgroundColor:toRgba(accent2,.10), pointBackgroundColor:accent2, pointRadius:4, borderWidth:2 },
       ],
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      animation: { duration: 800, easing: 'easeOutQuart' },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: c.isDark ? 'rgba(15,15,35,.95)' : 'rgba(255,255,255,.95)',
-          titleColor: c.isDark ? '#e2e8f0' : '#0f172a',
-          bodyColor:  c.isDark ? '#94a3b8' : '#475569',
-          borderColor: 'rgba(99,102,241,.2)', borderWidth: 1,
-          cornerRadius: 8, padding: 10,
-        },
-      },
-      scales: {
-        r: {
-          angleLines:  { color: c.grid },
-          grid:        { color: c.grid },
-          pointLabels: { color: c.text, font: { size: 11, weight: '600' } },
-          ticks:       { display: false, stepSize: 25 },
-          min: 0, max: 100,
-          backgroundColor: 'transparent',
-        },
-      },
+      responsive:true, maintainAspectRatio:false,
+      animation:{ duration:800, easing:'easeOutQuart' },
+      plugins:{ legend:{display:false}, tooltip:{ backgroundColor:c.isDark?'rgba(15,15,35,.95)':'rgba(255,255,255,.95)', titleColor:c.isDark?'#e2e8f0':'#0f172a', bodyColor:c.isDark?'#94a3b8':'#475569', borderColor:'rgba(99,102,241,.2)', borderWidth:1, cornerRadius:8, padding:10 } },
+      scales:{ r:{ angleLines:{color:c.grid}, grid:{color:c.grid}, pointLabels:{color:c.text, font:{size:11, weight:'600'}}, ticks:{display:false}, min:0, max:100, backgroundColor:'transparent' } },
     },
   });
   APP.charts['vs-radar-canvas'] = chart;
   VS.charts.push('vs-radar-canvas');
 }
 
-/* ── Journey line chart (Chart.js) ── */
+/* ── Journey chart ── */
 function _buildJourneyChart(data, myName, frName) {
   const canvas = document.getElementById('vs-journey-canvas');
   if (!canvas) return;
   const c = getThemeColors();
   const accent  = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()  || '#d0bcff';
   const accent2 = getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim() || '#ccc2dc';
-
+  const toRgba = (hex, a) => {
+    if (!hex || hex[0] !== '#') return `rgba(208,188,255,${a})`;
+    const n = parseInt(hex.slice(1), 16);
+    return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+  };
   const chart = new Chart(canvas, {
-    type: 'line',
-    data: {
-      labels: data.labels,
-      datasets: [
-        {
-          label: myName,
-          data:  data.myCounts,
-          borderColor: accent, borderWidth: 2.5,
-          backgroundColor: accent.length > 0 ? `${accent}26` : 'rgba(208,188,255,.15)',
-          fill: true, tension: 0.4,
-          pointBackgroundColor: accent, pointRadius: 4, pointHoverRadius: 6,
-        },
-        {
-          label: frName,
-          data:  data.frCounts,
-          borderColor: accent2, borderWidth: 2.5,
-          backgroundColor: `${accent2}1a`,
-          fill: true, tension: 0.4,
-          pointBackgroundColor: accent2, pointRadius: 4, pointHoverRadius: 6,
-        },
+    type:'line',
+    data:{
+      labels:data.labels,
+      datasets:[
+        { label:myName, data:data.myCounts, borderColor:accent, borderWidth:2.5, backgroundColor:toRgba(accent,.12), fill:true, tension:.4, pointBackgroundColor:accent, pointRadius:4, pointHoverRadius:6 },
+        { label:frName, data:data.frCounts, borderColor:accent2, borderWidth:2.5, backgroundColor:toRgba(accent2,.08), fill:true, tension:.4, pointBackgroundColor:accent2, pointRadius:4, pointHoverRadius:6 },
       ],
     },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      animation: { duration: 900, easing: 'easeOutQuart' },
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: c.isDark ? 'rgba(15,15,35,.95)' : 'rgba(255,255,255,.95)',
-          titleColor: c.isDark ? '#e2e8f0' : '#0f172a',
-          bodyColor:  c.isDark ? '#94a3b8' : '#475569',
-          borderColor: 'rgba(99,102,241,.2)', borderWidth: 1,
-          cornerRadius: 8, padding: 10,
-        },
-      },
-      scales: {
-        x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 11 } } },
-        y: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 11 } }, min: 0 },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      animation:{ duration:900, easing:'easeOutQuart' },
+      interaction:{ mode:'index', intersect:false },
+      plugins:{ legend:{display:false}, tooltip:{ backgroundColor:c.isDark?'rgba(15,15,35,.95)':'rgba(255,255,255,.95)', titleColor:c.isDark?'#e2e8f0':'#0f172a', bodyColor:c.isDark?'#94a3b8':'#475569', borderColor:'rgba(99,102,241,.2)', borderWidth:1, cornerRadius:8, padding:10 } },
+      scales:{
+        x:{ grid:{color:c.grid}, ticks:{color:c.text, font:{size:11}} },
+        y:{ grid:{color:c.grid}, ticks:{color:c.text, font:{size:11}}, min:0 },
       },
     },
   });
@@ -6049,7 +6077,7 @@ function _buildJourneyChart(data, myName, frName) {
   VS.charts.push('vs-journey-canvas');
 }
 
-/* ── Metric card builder ── */
+/* ── Metric card ── */
 function _metricCard(icon, title, tip, myName, myVal, frName, frVal, suffix = '%', higherIsBetter = true) {
   const maxVal = Math.max(myVal, frVal, 0.01);
   const myPct  = Math.round((myVal / maxVal) * 100);
@@ -6060,7 +6088,10 @@ function _metricCard(icon, title, tip, myName, myVal, frName, frVal, suffix = '%
       <div class="vs-metric-hd">
         <i class="fas fa-${icon}"></i>
         <span class="vs-metric-title">${title}</span>
-        <span class="vs-metric-tip" data-tip="${escHtml(tip)}"><i class="fas fa-circle-question"></i></span>
+        <button class="vs-metric-tip" type="button" onclick="this.classList.toggle('vs-tip-open')" aria-label="Explication">
+          <i class="fas fa-circle-question"></i>
+          <span class="vs-tip-bubble">${escHtml(tip)}</span>
+        </button>
       </div>
       <div class="vs-metric-bars">
         <div class="vs-bar-row">
@@ -6084,12 +6115,30 @@ function _metricCard(icon, title, tip, myName, myVal, frName, frVal, suffix = '%
    HELPERS
 ══════════════════════════════════════════════════════ */
 
+/* Raw tracks WITH original casing for display + lowercase key */
+function _extractRecentTracksRaw(data) {
+  const raw = data?.recenttracks?.track;
+  if (!raw) return [];
+  return (Array.isArray(raw) ? raw : [raw])
+    .filter(t => !t['@attr']?.nowplaying)
+    .map(t => {
+      const artist = t.artist?.['#text'] || '';
+      const track  = t.name || '';
+      return { artist, track, key: `${artist.toLowerCase()}|||${track.toLowerCase()}` };
+    });
+}
+
 function _extractRecentTracks(data) {
   const raw = data?.recenttracks?.track;
   if (!raw) return [];
   return (Array.isArray(raw) ? raw : [raw])
     .filter(t => !t['@attr']?.nowplaying)
-    .map(t => ({ artist: (t.artist?.['#text']||'').toLowerCase(), track: t.name||'', date: t.date?.['#text']||'' }));
+    .map(t => ({
+      artist:   (t.artist?.['#text'] || '').toLowerCase(),
+      track:    t.name || '',
+      trackLow: (t.name || '').toLowerCase(),
+      date:     t.date?.['#text'] || '',
+    }));
 }
 function _getRawTags(td) { const r = td?.toptags?.tag; if (!r) return []; return Array.isArray(r) ? r : [r]; }
 function _extractArtists(data) {
@@ -6136,7 +6185,7 @@ function _formatListenTime(mins) {
   return d>0?`${d}d ${h}h`:`${h}h`;
 }
 async function _getMyTopArtists() {
-  const k=`vs3_user.getTopArtists_${APP.username}_overall_50`;
+  const k=`vs4_user.getTopArtists_${APP.username}_overall_50`;
   try{const c=sessionStorage.getItem(k);if(c)return JSON.parse(c);}catch{}
   return _apiFetchUser('user.getTopArtists',APP.username,{period:'overall',limit:50});
 }
