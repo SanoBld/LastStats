@@ -247,6 +247,11 @@
         <span data-i18n="nav.history">History</span>
       </a>
 
+      <a class="nav-lnk" data-s="compare" onclick="nav('compare')">
+        <i class="fas fa-users-rays"></i>
+        <span data-i18n="nav.compare">Comparer</span>
+      </a>
+
       <div class="nav-sep"></div>
       <a class="nav-lnk" data-s="settings" onclick="nav('settings')">
         <i class="fas fa-cog"></i>
@@ -1545,6 +1550,51 @@
         </div><!-- /.settings-grid -->
       </section>
 
+
+      <!-- ══════════════════════════════════════
+           COMPARE / VERSUS
+      ══════════════════════════════════════ -->
+      <section id="s-compare" class="app-sec" style="view-transition-name:section-compare">
+        <div class="sec-hd">
+          <h2 data-i18n="nav.compare">Comparer</h2>
+          <p class="sec-sub" data-i18n="compare_friend_sub">Analysez votre compatibilité musicale avec un ami Last.fm</p>
+        </div>
+
+        <!-- Search bar -->
+        <div class="vs-search-bar">
+          <div class="vs-search-input-wrap">
+            <i class="fas fa-search vs-search-icon"></i>
+            <input type="text" id="vs-search-input" class="vs-search-input"
+                   data-i18n-placeholder="compare_search_placeholder"
+                   placeholder="Nom d'utilisateur Last.fm…"
+                   onkeydown="if(event.key==='Enter') searchFriend()"
+                   autocomplete="off" spellcheck="false">
+          </div>
+          <button class="btn-compare-run" onclick="searchFriend()">
+            <i class="fas fa-bolt"></i>
+            <span data-i18n="compare_btn">Comparer</span>
+          </button>
+        </div>
+
+        <!-- Friends list chips -->
+        <div id="vs-friends-list" class="vs-friends-list">
+          <!-- populated by JS -->
+        </div>
+
+        <!-- Loading state -->
+        <div id="vs-loading" class="vs-loading hidden">
+          <div class="vs-loading-inner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span data-i18n="compare_running">Analyse en cours…</span>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div id="vs-display" class="vs-display hidden">
+          <!-- populated by renderComparison() -->
+        </div>
+      </section>
+
     </main>
   </div><!-- /.main-wrap -->
 
@@ -1581,6 +1631,10 @@
     <a class="bn-item" data-s="history" onclick="nav('history')">
       <i class="fas fa-history"></i>
       <span data-i18n="nav.history">History</span>
+    </a>
+    <a class="bn-item" data-s="compare" onclick="nav('compare')">
+      <i class="fas fa-users-rays"></i>
+      <span data-i18n="nav.compare">Comparer</span>
     </a>
     <a class="bn-item" data-s="settings" onclick="nav('settings')">
       <i class="fas fa-cog"></i>
