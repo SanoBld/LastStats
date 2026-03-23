@@ -837,35 +837,38 @@ const NAV_TITLE_KEYS = {
 
 function setLanguage(lang) {
   if (!window.I18N?.setLang) return;
-
-    localStorage.setItem('ls_lang', lang);
+  localStorage.setItem('ls_lang', lang);
   APP.language = lang;
   window.I18N.setLang(lang);
 
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  // Regroupe toutes les écritures DOM dans un seul frame pour éviter le thrashing
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.lang-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.lang === lang)
+    );
 
     document.querySelectorAll('[data-i18n]').forEach(el => {
-    const raw = el.getAttribute('data-i18n');
-    const key = raw.replace(/\./g, '_');
-    const val = t(key) || t(raw);
-    if (val && val !== key && val !== raw) el.textContent = val;
-  });
+      const raw = el.getAttribute('data-i18n');
+      const key = raw.replace(/\./g, '_');
+      const val = t(key) || t(raw);
+      if (val && val !== key && val !== raw) el.textContent = val;
+    });
 
     document.querySelectorAll('.nav-lnk[data-s], .bn-item[data-s]').forEach(el => {
-    const key  = NAV_TITLE_KEYS[el.dataset.s];
-    const span = el.querySelector('span:not(.nav-bdg)');
-    if (key && span) span.textContent = t(key);
-  });
+      const key  = NAV_TITLE_KEYS[el.dataset.s];
+      const span = el.querySelector('span:not(.nav-bdg)');
+      if (key && span) span.textContent = t(key);
+    });
 
     const activeSection = document.querySelector('.app-sec.active')?.id?.replace('s-', '');
-  if (activeSection) {
-    const key = NAV_TITLE_KEYS[activeSection];
-    if (key) document.getElementById('hd-title').textContent = t(key);
-  }
+    if (activeSection) {
+      const key = NAV_TITLE_KEYS[activeSection];
+      if (key) document.getElementById('hd-title').textContent = t(key);
+    }
 
     document.title = 'LastStats — ' + (t('nav_dashboard') || 'Statistiques Last.fm');
-
-  showToast(t('toast_lang_changed'));
+    showToast(t('toast_lang_changed'));
+  });
 }
 
 function _updateNavMode() {
@@ -1055,6 +1058,9 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function nav(section) {
+  if (section !== 'profile') {
+    document.querySelector('.main-content')?.classList.remove('profile-active');
+  }
   const doNav = () => {
     document.querySelectorAll('.nav-lnk, .bn-item').forEach(el =>
       el.classList.toggle('active', el.dataset.s === section)
@@ -1163,14 +1169,14 @@ let _profileUsername   = null;
 let _profileFriendInfo = null;
 let _profileCameFrom   = null; // section de retour
 
-function openProfilePage(username, friendInfoKey) {
+function openProfilePage(username, friendInfoKey, cameFrom) {
   closeProfileBubble();
   if (window.innerWidth <= 1024) closeSb();
 
   _profileUsername = username || null;
   // Si friendInfoKey est fourni, récupérer dans le cache global
   _profileFriendInfo = friendInfoKey ? (window._vsProfileCache?.[friendInfoKey] || null) : null;
-  _profileCameFrom   = username && username !== APP.username ? 'compare' : null;
+  _profileCameFrom   = cameFrom || (username && username !== APP.username ? 'compare' : null);
 
   const backBar   = document.getElementById('profile-back-bar');
   const backLabel = document.getElementById('profile-back-label');
@@ -1184,6 +1190,8 @@ function openProfilePage(username, friendInfoKey) {
   }
 
   nav('profile');
+  // Supprime le padding de .main-content pour que le hero colle au header
+  document.querySelector('.main-content')?.classList.add('profile-active');
   loadProfileSection(_profileUsername || APP.username, _profileFriendInfo);
 }
 
@@ -1247,11 +1255,12 @@ function _renderProfileHero(username, ui) {
               || ui?.image?.find(i => i.size === 'large')?.['#text']
               || ui?.image?.find(i => i.size === 'medium')?.['#text'] || '';
 
-  // Fond flou : photo de profil par défaut
+  // Fond initial = photo de profil (sera remplacé par pochette nowplaying ou dernier titre)
   const bgEl = document.getElementById('profile-hero-bg');
   if (bgEl) {
     if (imgUrl && !isDefaultImg(imgUrl)) {
       bgEl.style.backgroundImage = `url('${imgUrl}')`;
+      bgEl.style.background      = '';
     } else {
       bgEl.style.backgroundImage = '';
       bgEl.style.background      = grad;
@@ -1326,11 +1335,6 @@ async function _loadProfileTopData(username, period) {
     const rawTracks = tracksData?.toptracks?.track || [];
     const tracks    = Array.isArray(rawTracks) ? rawTracks : [rawTracks];
 
-    // Mettre à jour le fond avec l'image de l'artiste #1 (si disponible)
-    if (artist?.name) {
-      _loadArtistBg(artist);
-    }
-
     _renderProfileTopCard('ptop-artist', 'microphone-alt', 'Artiste #1',
       artist?.name, artist?.playcount, artist?.image);
     _renderProfileTopCard('ptop-album',  'compact-disc',   'Album #1',
@@ -1339,15 +1343,22 @@ async function _loadProfileTopData(username, period) {
     _renderProfileTopCard('ptop-track',  'music',          'Titre #1',
       t1?.name,     t1?.playcount,     t1?.image,    t1?.artist?.name);
 
+    // Résolution asynchrone des images manquantes sur les cartes
+    _resolveTopCardImg('ptop-artist', 'artist', artist?.name, null);
+    _resolveTopCardImg('ptop-album',  'album',  album?.name,  album?.artist?.name);
+    _resolveTopCardImg('ptop-track',  'track',  t1?.name,     t1?.artist?.name);
+
     if (trackList) {
-      trackList.innerHTML = tracks.slice(0, 5).map((tr, i) => {
-        const img  = tr?.image?.find(x => x.size === 'medium')?.['#text'] || '';
-        const imgH = img && !isDefaultImg(img)
-          ? `<img src="${escHtml(img)}" alt="" class="ptrack-img" onerror="this.style.display='none'">`
-          : `<div class="ptrack-img-fallback" style="background:${nameToGradient(tr?.name)}">${(tr?.name||'?')[0]}</div>`;
-        return `<div class="profile-track-row">
+      const top5 = tracks.slice(0, 5);
+      // Rendu initial avec fallback couleur (instantané)
+      trackList.innerHTML = top5.map((tr, i) => {
+        const grad   = nameToGradient(tr?.name);
+        const letter = (tr?.name || '?')[0];
+        const trackUrl = tr?.name ? `https://www.last.fm/music/${encodeURIComponent(tr?.artist?.name||'')}/_/${encodeURIComponent(tr?.name||'')}` : '';
+        return `<div class="profile-track-row" id="ptrack-row-${i}" role="link" tabindex="0"
+          ${trackUrl ? `onclick="window.open('${trackUrl}','_blank','noopener')" onkeydown="if(event.key==='Enter')window.open('${trackUrl}','_blank','noopener')"` : ''}>
           <span class="ptrack-rank">${i + 1}</span>
-          ${imgH}
+          <div class="ptrack-img-fallback" id="ptrack-thumb-${i}" style="background:${grad}">${letter}</div>
           <div class="ptrack-info">
             <span class="ptrack-name">${escHtml(tr?.name || '—')}</span>
             <span class="ptrack-artist">${escHtml(tr?.artist?.name || '—')}</span>
@@ -1355,10 +1366,74 @@ async function _loadProfileTopData(username, period) {
           <span class="ptrack-plays">${formatNum(tr?.playcount)}</span>
         </div>`;
       }).join('');
+      // Résolution asynchrone des vraies pochettes via track.getInfo
+      top5.forEach((tr, i) => _resolveProfileTrackImg(tr, i));
     }
   } catch (e) {
     console.warn('[Profile] _loadProfileTopData:', e);
   }
+}
+
+async function _resolveTopCardImg(cardId, type, name, artist) {
+  if (!name) return;
+  try {
+    const el = document.getElementById(cardId);
+    if (!el) return;
+    const bgEl = el.querySelector('.ptc-bg');
+    if (!bgEl) return;
+
+    // Already has a real image?
+    const current = bgEl.style.backgroundImage;
+    if (current && current !== 'none' && !current.includes('undefined')) return;
+
+    let img = '';
+    if (type === 'artist') {
+      const d = await _apiFetchUser('artist.getInfo', name, { artist: name, autocorrect: 1 });
+      img = d?.artist?.image?.find(x => x.size === 'extralarge')?.['#text']
+         || d?.artist?.image?.find(x => x.size === 'large')?.['#text'] || '';
+    } else if (type === 'album') {
+      const d = await _apiFetchUser('album.getInfo', artist || name, { album: name, artist: artist || name, autocorrect: 1 });
+      img = d?.album?.image?.find(x => x.size === 'extralarge')?.['#text']
+         || d?.album?.image?.find(x => x.size === 'large')?.['#text'] || '';
+    } else if (type === 'track') {
+      const d = await _apiFetchUser('track.getInfo', artist || name, { track: name, artist: artist || name, autocorrect: 1 });
+      img = d?.track?.album?.image?.find(x => x.size === 'extralarge')?.['#text']
+         || d?.track?.album?.image?.find(x => x.size === 'large')?.['#text'] || '';
+    }
+
+    if (img && !isDefaultImg(img)) {
+      bgEl.style.backgroundImage = `url('${escHtml(img)}')`;
+      bgEl.style.background = '';
+    }
+  } catch {}
+}
+
+async function _resolveProfileTrackImg(tr, index) {
+  try {
+    const thumbEl = document.getElementById(`ptrack-thumb-${index}`);
+    if (!thumbEl) return;
+
+    // 1. Essai avec l'image déjà dispo dans les données de l'API
+    let img = tr?.image?.find(x => x.size === 'extralarge')?.['#text']
+           || tr?.image?.find(x => x.size === 'large')?.['#text']
+           || tr?.image?.find(x => x.size === 'medium')?.['#text'] || '';
+
+    // 2. Si absente ou image par défaut → appel track.getInfo pour la vraie pochette
+    if (!img || isDefaultImg(img)) {
+      const artistName = tr?.artist?.name || tr?.artist?.['#text'] || '';
+      const d = await _apiFetchUser('track.getInfo', artistName, {
+        track: tr?.name || '', artist: artistName, autocorrect: 1
+      });
+      img = d?.track?.album?.image?.find(x => x.size === 'extralarge')?.['#text']
+         || d?.track?.album?.image?.find(x => x.size === 'large')?.['#text']
+         || d?.track?.album?.image?.find(x => x.size === 'medium')?.['#text'] || '';
+    }
+
+    if (img && !isDefaultImg(img)) {
+      // Remplace le fallback coloré par la vraie pochette
+      thumbEl.outerHTML = `<img src="${escHtml(img)}" alt="" class="ptrack-img" id="ptrack-thumb-${index}" onerror="this.style.display='none'">`;
+    }
+  } catch {}
 }
 
 async function _loadArtistBg(artist) {
@@ -1393,6 +1468,17 @@ function _renderProfileTopCard(id, icon, label, name, plays, imageArr, sub) {
   const grad   = nameToGradient(name || '?');
   const letter = (name || '?')[0].toUpperCase();
 
+  // Build Last.fm URL based on card type
+  let lfmUrl = '';
+  if (icon === 'microphone-alt') lfmUrl = `https://www.last.fm/music/${encodeURIComponent(name||'')}`;
+  else if (icon === 'compact-disc') lfmUrl = `https://www.last.fm/music/${encodeURIComponent(sub||'')}/${encodeURIComponent(name||'')}`;
+  else if (icon === 'music') lfmUrl = `https://www.last.fm/music/${encodeURIComponent(sub||'')}/_/${encodeURIComponent(name||'')}`;
+
+  el.setAttribute('role', 'link');
+  el.setAttribute('tabindex', '0');
+  el.onclick = lfmUrl ? () => window.open(lfmUrl, '_blank', 'noopener') : null;
+  el.onkeydown = lfmUrl ? (e) => { if (e.key === 'Enter') window.open(lfmUrl, '_blank', 'noopener'); } : null;
+
   el.innerHTML = `
     <div class="ptc-bg" style="${hasImg ? `background-image:url('${escHtml(imgRaw)}')` : `background:${grad}`}"></div>
     <div class="ptc-overlay"></div>
@@ -1401,6 +1487,7 @@ function _renderProfileTopCard(id, icon, label, name, plays, imageArr, sub) {
       <strong class="ptc-name">${escHtml(name || '—')}</strong>
       ${sub ? `<span class="ptc-sub">${escHtml(sub)}</span>` : ''}
       <span class="ptc-plays">${formatNum(plays)} écoutes</span>
+      ${lfmUrl ? '<span class="ptc-lfm-hint"><i class="fas fa-external-link-alt"></i></span>' : ''}
     </div>`;
 }
 
@@ -1411,6 +1498,19 @@ async function _loadProfileNowPlaying(username) {
     const last   = Array.isArray(tracks) ? tracks[0] : tracks;
     const wrap   = document.getElementById('profile-np-wrap');
     const dot    = document.getElementById('profile-now-dot');
+
+    // Priorité fond hero : 1) titre en cours  2) dernier titre  3) (photo profil déjà posée par _renderProfileHero)
+    if (last) {
+      const isNow = !!last?.['@attr']?.nowplaying;
+      const bgImg = last.image?.find(x => x.size === 'extralarge')?.['#text']
+                 || last.image?.find(x => x.size === 'large')?.['#text']
+                 || last.image?.find(x => x.size === 'medium')?.['#text'] || '';
+      if (bgImg && !isDefaultImg(bgImg)) {
+        const bgEl = document.getElementById('profile-hero-bg');
+        // Toujours mettre à jour : nowplaying a priorité max, sinon dernier titre
+        if (bgEl) bgEl.style.backgroundImage = `url('${bgImg}')`;
+      }
+    }
 
     if (last?.['@attr']?.nowplaying) {
       const img   = last.image?.find(x => x.size === 'medium')?.['#text'] || '';
@@ -6245,7 +6345,7 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
         ${_av(myImg, myGrad, myLetter)}
         <div class="vs-player-name">${myN}</div>
         <div class="vs-player-top3">${myList.slice(0,3).map(a=>`<span class="vs-top3-item">${escHtml(a.name)}</span>`).join('')}</div>
-        <button class="vs-profile-btn" onclick="openProfilePage(${JSON.stringify(APP.username)})">
+        <button class="vs-profile-btn" onclick="openProfilePage('${escHtml(APP.username||'')}', null, 'compare')">
           <i class="fas fa-user-circle"></i> Profil
         </button>
       </div>
@@ -6273,7 +6373,7 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
         ${_av(frImg, frGrad, frLetter, ' vs-av--fr')}
         <div class="vs-player-name">${frN}</div>
         <div class="vs-player-top3">${frList.slice(0,3).map(a=>`<span class="vs-top3-item">${escHtml(a.name)}</span>`).join('')}</div>
-        <button class="vs-profile-btn vs-profile-btn--fr" onclick="openProfilePage(${JSON.stringify(friendName)}, ${JSON.stringify(_frCacheKey)})">
+        <button class="vs-profile-btn vs-profile-btn--fr" onclick="openProfilePage('${escHtml(friendName)}', '${escHtml(_frCacheKey)}', 'compare')">
           <i class="fas fa-user-circle"></i> Profil
         </button>
       </div>

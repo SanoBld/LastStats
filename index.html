@@ -1210,18 +1210,18 @@
       <!-- ═══ PROFILE ═══ -->
       <section id="s-profile" class="app-sec" style="view-transition-name:section-profile">
 
-        <div class="profile-back-bar hidden" id="profile-back-bar">
-          <button class="profile-back-btn" onclick="profileGoBack()">
-            <i class="fas fa-arrow-left"></i>
-            <span>Retour</span>
-          </button>
-          <span class="profile-back-label" id="profile-back-label"></span>
-        </div>
-
         <!-- Hero : fond flou (photo de profil par défaut, artiste si dispo) + avatar centré -->
         <div class="profile-hero" id="profile-hero">
           <div class="profile-hero-bg" id="profile-hero-bg"></div>
           <div class="profile-hero-overlay"></div>
+          <!-- Back bar flotte sur le hero -->
+          <div class="profile-back-bar hidden" id="profile-back-bar">
+            <button class="profile-back-btn" onclick="profileGoBack()">
+              <i class="fas fa-arrow-left"></i>
+              <span>Retour</span>
+            </button>
+            <span class="profile-back-label" id="profile-back-label"></span>
+          </div>
           <div class="profile-hero-content">
             <div class="profile-av-wrap">
               <div class="profile-av" id="profile-av"></div>

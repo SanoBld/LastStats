@@ -4297,11 +4297,18 @@ button.bn-item:focus-visible,
 ═══════════════════════════════════════════════════ */
 
 #s-profile { padding: 0; }
+/* Profile section: remove main-content padding so hero bleeds to header */
+.main-content:has(#s-profile.active) { padding: 0; }
+/* Fallback via JS-added class */
+.main-content.profile-active { padding: 0; }
+
 
 /* Back bar */
 .profile-back-bar {
   display: flex; align-items: center; gap: 10px;
-  padding: 14px 24px 0;
+  padding: 10px 20px;
+  position: absolute; top: 0; left: 0; right: 0; z-index: 5;
+  background: linear-gradient(to bottom, rgba(0,0,0,.50) 0%, transparent 100%);
 }
 .profile-back-btn {
   display: flex; align-items: center; gap: 7px;
@@ -4317,35 +4324,40 @@ button.bn-item:focus-visible,
 
 /* Hero */
 .profile-hero {
-  position: relative; height: 300px; overflow: hidden;
+  position: relative; height: 340px; overflow: hidden;
   display: flex; align-items: flex-end;
+  /* Colle le hero sous le header sticky */
+  margin-top: calc(-1 * var(--header-h));
+  padding-top: var(--header-h);
 }
 .profile-hero-bg {
-  position: absolute; inset: -20px;
+  position: absolute; inset: 0;
   background: var(--bg-hover) center/cover no-repeat;
-  filter: blur(28px) brightness(.50) saturate(1.5);
-  transform: scale(1.06);
-  transition: background-image .5s var(--ease-standard);
+  filter: blur(6px) brightness(.55) saturate(1.5);
+  transform: scale(1.04);
+  transition: background-image .6s var(--ease-standard);
 }
 .profile-hero-overlay {
   position: absolute; inset: 0;
   background: linear-gradient(to top,
-    rgba(0,0,0,.90) 0%,
-    rgba(0,0,0,.40) 55%,
-    rgba(0,0,0,.15) 100%);
+    rgba(0,0,0,.96) 0%,
+    rgba(0,0,0,.60) 35%,
+    rgba(0,0,0,.20) 65%,
+    rgba(0,0,0,.00) 100%);
 }
 .profile-hero-content {
   position: relative; z-index: 2; width: 100%;
   display: flex; flex-direction: column; align-items: center;
   padding-bottom: 32px; gap: 8px;
+  margin-top: auto;
 }
 
 /* Avatar */
 .profile-av-wrap { position: relative; width: 96px; height: 96px; }
 .profile-av {
   width: 100%; height: 100%; border-radius: 50%; overflow: hidden;
-  border: 3px solid var(--accent);
-  box-shadow: 0 4px 20px rgba(0,0,0,.55);
+  border: 3px solid rgba(255,255,255,.85);
+  box-shadow: 0 4px 24px rgba(0,0,0,.65), 0 0 0 1px rgba(0,0,0,.3);
   background: var(--bg-hover);
 }
 .profile-now-dot {
@@ -4362,6 +4374,7 @@ button.bn-item:focus-visible,
 .profile-username {
   font-size: 1.45rem; font-weight: 800; color: #fff;
   letter-spacing: -.02em; margin: 0;
+  text-shadow: 0 2px 8px rgba(0,0,0,.6);
 }
 .profile-country { font-size: .78rem; color: rgba(255,255,255,.65); }
 .profile-since   { font-size: .72rem; color: rgba(255,255,255,.48); letter-spacing: .01em; }
@@ -4384,7 +4397,9 @@ button.bn-item:focus-visible,
 /* Period bar */
 .profile-period-bar {
   display: flex; align-items: center; gap: 12px;
-  padding: 16px 24px 0;
+  padding: 16px 24px 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
 }
 .profile-period-lbl { font-size: .8rem; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
 
@@ -4405,8 +4420,11 @@ button.bn-item:focus-visible,
 .profile-top-card {
   position: relative; border-radius: var(--radius-sm);
   overflow: hidden; min-height: 140px;
-  box-shadow: var(--shadow-card); cursor: default;
+  box-shadow: var(--shadow-card); cursor: pointer;
+  transition: transform .18s var(--ease-standard), box-shadow .18s var(--ease-standard);
 }
+.profile-top-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.profile-top-card:active { transform: translateY(0); }
 .ptc-bg {
   position: absolute; inset: 0;
   background: var(--bg-hover) center/cover no-repeat;
@@ -4417,6 +4435,12 @@ button.bn-item:focus-visible,
   position: absolute; inset: 0;
   background: linear-gradient(to top, rgba(0,0,0,.90) 0%, rgba(0,0,0,.28) 60%, transparent 100%);
 }
+.ptc-lfm-hint {
+  position: absolute; top: 8px; right: 8px;
+  font-size: .65rem; color: rgba(255,255,255,.45);
+  transition: color .15s; z-index: 3;
+}
+.profile-top-card:hover .ptc-lfm-hint { color: rgba(255,255,255,.9); }
 .ptc-content {
   position: relative; z-index: 2;
   display: flex; flex-direction: column; gap: 2px;
@@ -4444,6 +4468,7 @@ button.bn-item:focus-visible,
   background: var(--bg-card); border: 1px solid var(--border);
   transition: background var(--dur-short2) var(--ease-standard);
 }
+.profile-track-row { cursor: pointer; }
 .profile-track-row:hover { background: var(--bg-hover); }
 .profile-track-sk { height: 38px; border-radius: var(--radius-xs); padding: 9px 12px; }
 

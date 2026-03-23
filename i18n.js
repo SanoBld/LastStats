@@ -538,6 +538,7 @@ const I18N_DATA = {
     // history & nav visibility
     nav_history: 'Historique',
 
+    nav_profile: 'Profil',
     nav_compare: 'Comparer',
     compare_friend_sub: 'Analysez votre compatibilité musicale avec un ami Last.fm',
     compare_search_placeholder: 'Nom d\'utilisateur Last.fm…',
@@ -942,6 +943,7 @@ const I18N_DATA = {
     // history & nav visibility
     nav_history: 'History',
 
+    nav_profile: 'Profile',
     nav_compare: 'Compare',
     compare_friend_sub: 'Analyse your musical compatibility with a Last.fm friend',
     compare_search_placeholder: 'Last.fm username…',
@@ -1150,6 +1152,7 @@ const I18N_DATA = {
 
     nav_history: 'Historial',
 
+    nav_profile: 'Perfil',
     nav_compare: 'Comparar',
     compare_friend_sub: 'Analiza tu compatibilidad musical con un amigo de Last.fm',
     compare_search_placeholder: 'Usuario de Last.fm…',
@@ -1541,6 +1544,7 @@ const I18N_DATA = {
 
     nav_history: 'Histórico',
 
+    nav_profile: 'Perfil',
     nav_compare: 'Comparar',
     compare_friend_sub: 'Analisa a tua compatibilidade musical com um amigo do Last.fm',
     compare_search_placeholder: 'Utilizador Last.fm…',
@@ -1932,6 +1936,7 @@ const I18N_DATA = {
 
     nav_history: 'Verlauf',
 
+    nav_profile: 'Profil',
     nav_compare: 'Vergleichen',
     compare_friend_sub: 'Analysiere deine musikalische Kompatibilität mit einem Last.fm-Freund',
     compare_search_placeholder: 'Last.fm-Benutzername…',
@@ -2323,6 +2328,7 @@ const I18N_DATA = {
 
     nav_history: 'Cronologia',
 
+    nav_profile: 'Profilo',
     nav_compare: 'Confronta',
     compare_friend_sub: 'Analizza la tua compatibilità musicale con un amico di Last.fm',
     compare_search_placeholder: 'Nome utente Last.fm…',
@@ -2714,6 +2720,7 @@ const I18N_DATA = {
 
     nav_history: 'История',
 
+    nav_profile: 'Профиль',
     nav_compare: 'Сравнить',
     compare_friend_sub: 'Проверьте музыкальную совместимость с другом на Last.fm',
     compare_search_placeholder: 'Имя пользователя Last.fm…',
@@ -3104,6 +3111,7 @@ const I18N_DATA = {
 
     nav_history: '履歴',
 
+    nav_profile: 'プロフィール',
     nav_compare: '比較',
     compare_friend_sub: 'Last.fmフレンドと音楽の相性を分析しよう',
     compare_search_placeholder: 'Last.fmユーザー名…',
@@ -3494,6 +3502,7 @@ const I18N_DATA = {
 
     nav_history: '历史',
 
+    nav_profile: '个人资料',
     nav_compare: '对比',
     compare_friend_sub: '分析你与 Last.fm 好友的音乐契合度',
     compare_search_placeholder: 'Last.fm 用户名…',
@@ -3884,6 +3893,7 @@ const I18N_DATA = {
 
     nav_history: '기록',
 
+    nav_profile: '프로필',
     nav_compare: '비교',
     compare_friend_sub: 'Last.fm 친구와 음악 취향 궁합을 분석해보세요',
     compare_search_placeholder: 'Last.fm 사용자명…',
@@ -4274,6 +4284,7 @@ const I18N_DATA = {
 
     nav_history: 'Geçmiş',
 
+    nav_profile: 'Profil',
     nav_compare: 'Karşılaştır',
     compare_friend_sub: 'Bir Last.fm arkadaşınızla müzik uyumunuzu analiz edin',
     compare_search_placeholder: 'Last.fm kullanıcı adı…',
@@ -4664,6 +4675,7 @@ const I18N_DATA = {
 
     nav_history: 'التاريخ',
 
+    nav_profile: 'الملف الشخصي',
     nav_compare: 'مقارنة',
     compare_friend_sub: 'حلّل توافقك الموسيقي مع صديق على Last.fm',
     compare_search_placeholder: 'اسم مستخدم Last.fm…',
