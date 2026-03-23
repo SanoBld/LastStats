@@ -1,11 +1,8 @@
-// wrapped.js — LastStats Wrapped
-
+// wrapped.js — LastStats Wrapped · Liquid Adaptive Edition
 'use strict';
 
-// année en cours de're showing
 let WRAPPED_YEAR = new Date().getFullYear() - 1;
 
-// traductions
 const TRANSLATIONS = {
   fr:{
     waitTitle:'Reviens le 1er janvier',
@@ -398,11 +395,13 @@ function applyLangToDOM() {
   s('step-profile-lbl', T.stepProfile); s('step-top-lbl', T.stepTop);
   s('step-images-lbl', T.stepImages); s('step-history-lbl', T.stepHistory);
   s('step-compare-lbl', T.stepCompare);
+  s('step-social-lbl', T.stepSocial||'Contexte social');
   s('share-heading', T.shareViewTitle||'Wrapped partagé');
   s('share-sub', T.shareViewSub); s('share-enter-txt', T.shareEnter); s('share-own-link', T.shareOwnLink);
   s('modal-share-title', T.shareModal); s('modal-share-sub', T.shareModalSub);
   s('modal-copy-link-lbl', T.shareCopy); s('modal-web-share-lbl', T.shareVia);
-  s('modal-export-story-lbl', T.shareModalStory); s('modal-export-card-lbl', T.shareModalCard);
+  s('modal-export-card-lbl', T.shareModalCard);
+  s('modal-screenshot-lbl', T.screenshotSection||'Capture section');
   s('modal-share-close', T.shareClose);
 }
 function autoDetectLang() {
@@ -464,7 +463,6 @@ function startCountdown() {
   _cdInterval = setInterval(tick, 1000);
 }
 
-// petits utilitaires
 const DEF_HASH = '2a96cbd8b46e442fc41c2b86b821562f';
 const fmtNum = n => new Intl.NumberFormat(
   LANG_CODE === 'en' ? 'en-US' : LANG_CODE === 'de' ? 'de-DE' :
@@ -542,15 +540,19 @@ function setProgress(pct) {
   if (pt) pt.textContent = `${Math.round(pct)}%`;
 }
 
+
+
+
+
 // Last.fm API
 const LASTFM = {
   BASE: 'https://ws.audioscrobbler.com/2.0/',
-  async call(method, params = {}, customKey = null) {
+  async call(method, params = {}, customUser = null) {
     const url = new URL(this.BASE);
     url.searchParams.set('method', method);
-    url.searchParams.set('api_key', customKey || STORE.apiKey);
+    url.searchParams.set('api_key', STORE.apiKey);
     url.searchParams.set('format', 'json');
-    if (method.startsWith('user.')) url.searchParams.set('user', STORE.username);
+    if (method.startsWith('user.')) url.searchParams.set('user', customUser || STORE.username);
     Object.entries(params).forEach(([k, v]) => { if (v != null) url.searchParams.set(k, v); });
     const res = await fetch(url.toString());
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -577,6 +579,11 @@ const STORE = {
   dayMap: null,
   isReadOnly: false,
   readOnlyData: null,
+  // Social & global context
+  friendsData: [],
+  globalChart: [],
+  leaderboard: null,
+  _dynColor: null,
   // getters pratiques
   get displayName() { return this.user?.name || this.username || '—'; },
   get regYear() { const ts = parseInt(this.user?.registered?.unixtime || 0); return ts ? new Date(ts*1000).getFullYear() : null; },
@@ -607,7 +614,85 @@ const STORE = {
 // tags trop génériques, on les filtre
 const STOP_TAGS = new Set(['seen live','loved','favorites','favourite','all','good','best','cool','favorite','mellow','under 2000 listeners','american','british','female','male','singer-songwriter','albums i own','beautiful','catchy','sexy','awesome','chill','epic','amazing','great','love','top','nice','<br>','favourite music','american music','british music','canadian','french','german','japanese','male vocalists','female vocalists','acoustic']);
 
-// chargement des données
+/* ═══ PRELOAD IMAGES ═══ */
+function preloadImages(urls, max = 15) {
+  return Promise.allSettled(
+    urls.filter(Boolean).slice(0, max).map(url => new Promise((res, rej) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = res; img.onerror = rej;
+      img.src = url;
+    }))
+  );
+}
+
+/* ═══ LOAD FRIENDS DATA ═══ */
+async function loadFriendsData() {
+  try {
+    const res = await LASTFM.call('user.getFriends', { limit: 10 });
+    const friends = (res?.friends?.user || []).slice(0, 8);
+    if (!friends.length) return;
+    const from = Math.floor(new Date(WRAPPED_YEAR, 0, 1).getTime() / 1000);
+    const to   = Math.floor(new Date(WRAPPED_YEAR, 11, 31, 23, 59, 59).getTime() / 1000);
+    const jobs = friends.map(async f => {
+      const uname = f.name || f['#text'] || '';
+      if (!uname) return null;
+      try {
+        const artRes = await LASTFM.call('user.getWeeklyArtistChart', { from, to }, uname).catch(() => null); // uname = customUser
+        const artists = artRes?.weeklyartistchart?.artist || [];
+        const topArtists = artists.slice(0, 10).map(a => ({ name: a.name || '', plays: parseInt(a.playcount || 0) }));
+        const totalPlays = topArtists.reduce((s, a) => s + a.plays, 0);
+        return {
+          username: uname,
+          img: getImg(f.image || [], 'large', 'medium', 'small'),
+          topArtists, totalPlays,
+          uniqueArtists: topArtists.length,
+          topArtistPlays: topArtists[0]?.plays || 0,
+          topArtistName: topArtists[0]?.name || '',
+        };
+      } catch { return null; }
+    });
+    const results = (await Promise.allSettled(jobs)).filter(r => r.status === 'fulfilled' && r.value).map(r => r.value);
+    STORE.friendsData = results;
+  } catch {}
+}
+
+/* ═══ LOAD GLOBAL CHART ═══ */
+async function loadGlobalChartData() {
+  try {
+    const res = await LASTFM.call('chart.getTopArtists', { limit: 50 });
+    STORE.globalChart = (res?.artists?.artist || []).map((a, i) => ({
+      name: a.name || '', playcount: parseInt(a.playcount || 0),
+      listeners: parseInt(a.listeners || 0), rank: i + 1,
+    }));
+  } catch {}
+}
+
+/* ═══ COMPUTE LEADERBOARD ═══ */
+function computeLeaderboard() {
+  const userEntry = {
+    username: STORE.displayName, img: STORE.avatar, isUser: true,
+    volume: STORE.annualPlays,
+    uniqueArtists: STORE._uniqueArtists || STORE.artists.length,
+    loyaltyPct: STORE.artists[0] ? Math.round((STORE.artists[0].playcount / Math.max(1, STORE.annualPlays)) * 100) : 0,
+  };
+  const friendEntries = STORE.friendsData.map(f => ({
+    username: f.username, img: f.img, isUser: false,
+    volume: f.totalPlays, uniqueArtists: f.uniqueArtists,
+    loyaltyPct: f.totalPlays > 0 ? Math.round((f.topArtistPlays / Math.max(1, f.totalPlays)) * 100) : 0,
+  }));
+  const all = [userEntry, ...friendEntries];
+  const rank = (arr, key, desc = true) => {
+    const sorted = [...arr].sort((a, b) => desc ? b[key] - a[key] : a[key] - b[key]);
+    return sorted.map((item, i) => ({ ...item, rank: i + 1 }));
+  };
+  STORE.leaderboard = {
+    volume: rank(all, 'volume'),
+    curiosity: rank(all, 'uniqueArtists'),
+    loyalty: rank(all, 'loyaltyPct', false),
+  };
+}
+
 async function loadAllData(onProgress) {
   const p = (msg, pct, step, stepState) => {
     onProgress?.(msg, pct);
@@ -780,7 +865,13 @@ async function loadAllData(onProgress) {
     STORE.annualMins = Math.round(STORE.annualPlays * avgDurSec / 60);
   }
 
+  // ALBUM-FIRST: derive artist images from their top album covers
   setLoaderStep('images', 'done');
+  p(T.loadStep3, 46, 'social');
+
+  // Phase 3 — Social + Global context (parallel, non-blocking)
+  await Promise.allSettled([loadFriendsData(), loadGlobalChartData()]);
+  setLoaderStep('social', 'done');
   p(T.loadStep3, 62, 'history');
 
   // recent history for habits, record day, and "got away"
@@ -790,6 +881,18 @@ async function loadAllData(onProgress) {
 
   // community stats for track #1
   await loadGlobalTrackStats();
+  // Phase 6 — Leaderboard
+  computeLeaderboard();
+
+  // Phase 7 — Preload top 15 images (blocks until done = true full-block splash)
+  const imagesToPreload = [
+    STORE.artist1Img,
+    ...STORE.artists.slice(0,5).map(a => a._img).filter(Boolean),
+    ...STORE.albums.slice(0,5).map(a => getImg(a.image||[],'extralarge','large')).filter(Boolean),
+    ...STORE.tracks.slice(0,5).map(t => getImg(t.image||[],'extralarge','large')).filter(Boolean),
+  ].filter((v,i,a) => v && a.indexOf(v) === i);
+  await preloadImages(imagesToPreload, 15);
+
   setLoaderStep('compare', 'done');
   p(T.loadStep8, 100);
 }
@@ -922,10 +1025,10 @@ async function loadGlobalTrackStats() {
       STORE.tracks[0]._globalListeners = parseInt(res.track.listeners || 0);
       STORE.tracks[0]._globalPlays     = parseInt(res.track.playcount || 0);
     }
-  } catch {}
+
+  } catch(e) { console.warn('loadGlobalTrackStats:', e); }
 }
 
-// lien de partage — payload base64
 function generateSharePayload() {
   return {
     v: 2,
@@ -1051,6 +1154,66 @@ function setAmbient(theme) {
   if (e) e.style.background = AMBIENTS[theme] || AMBIENTS.purple;
 }
 
+/* ═══ COLOR THIEF — DYNAMIC BACKGROUND ═══ */
+let _colorThief = null;
+function getColorThief() {
+  if (_colorThief) return _colorThief;
+  if (window.ColorThief) { _colorThief = new ColorThief(); }
+  return _colorThief;
+}
+async function applyDynamicColor(imgSrc) {
+  const ct = getColorThief();
+  if (!ct || !imgSrc) return;
+  try {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = imgSrc; });
+    const [r, g, b] = ct.getColor(img);
+    STORE._dynColor = [r, g, b];
+    const root = document.documentElement;
+    root.style.setProperty('--dyn-r', r);
+    root.style.setProperty('--dyn-g', g);
+    root.style.setProperty('--dyn-b', b);
+    const dynBg = document.getElementById('dyn-bg');
+    if (dynBg) {
+      dynBg.style.backgroundColor = `rgb(${r},${g},${b})`;
+      dynBg.style.opacity = '0.22';
+    }
+  } catch {}
+}
+
+/* ═══ SOCIAL BOX ═══ */
+function buildSocialBox(slideId) {
+  const fd = STORE.friendsData;
+  let msg = '';
+  switch (slideId) {
+    case 'numbers': {
+      if (!fd.length) break;
+      const friendAvg = Math.round(fd.reduce((s,f) => s + f.totalPlays, 0) / fd.length);
+      if (friendAvg > 0) {
+        const ratio = Math.round((STORE.annualPlays / Math.max(1, friendAvg)) * 10) / 10;
+        if (ratio >= 1.2) msg = (T.socialVolumeLead||'Tu écoutes {x}× plus').replace('{x}', ratio.toFixed(1));
+      }
+      break;
+    }
+    case 'artists': {
+      const a1 = STORE.artists[0];
+      if (!a1 || !fd.length) break;
+      const also = fd.filter(f => f.topArtists.some(a => a.name.toLowerCase() === a1.name.toLowerCase())).length;
+      if (also > 0) msg = (T.socialFriendsAlso||'{n} ami(s) écoutent {artist}').replace('{n}', also).replace('{artist}', a1.name);
+      else if (fd.length >= 2) msg = (T.socialUnique||'Seul à écouter {artist}').replace('{artist}', a1.name);
+      break;
+    }
+    case 'tracks': {
+      const t1 = STORE.tracks[0];
+      if (!t1) break;
+      if (t1._globalListeners > 0) msg = `${fmtNum(t1._globalListeners)} ${LANG_CODE==='en'?'global listeners':'auditeurs mondiaux'}`;
+      break;
+    }
+  }
+  if (!msg) return '';
+  return `<div class="social-box"><span class="social-icon">👥</span><p>${esc(msg)}</p></div>`;
+}
 // — fonctions qui construisent chaque slide —
 function buildFallback(msg) {
   return `<div class="slide-content" style="align-items:center;justify-content:center;flex-direction:column;gap:14px;padding-top:60px">
@@ -1084,6 +1247,7 @@ function buildIntro() {
 }
 
 /* slide 1 — numbers */
+/* slide 1 */
 function buildNumbers() {
   const days = STORE.habitDays.reduce((s,v)=>s+v,0) > 0
     ? STORE.habitDays.filter(v=>v>0).length
@@ -1175,6 +1339,7 @@ function buildTopArtists() {
     <div class="slide-header">
       <span class="slide-label">${T.artistsEyebrow}</span>
       <h2 class="slide-title">${T.artistsTitle}</h2>
+      ${buildSocialBox('artists')}
     </div>
     <div class="podium-container" id="artists-podium">${podiumCols}</div>
     <div class="top-list" id="artists-list-4-5">${listItems}</div>`;
@@ -1185,7 +1350,13 @@ function buildTopAlbums() {
   const albums = STORE.albums.slice(0, 5);
   if (!albums.length) return buildFallback();
   const items = albums.map((a, i) => {
-    const img = getImg(a.image||[],'extralarge','large','medium');
+    // Image album depuis l'API, fallback sur l'artiste
+    let img = getImg(a.image||[],'extralarge','large','medium');
+    if (!img) {
+      const aName = (a.artist?.name || '').toLowerCase();
+      const found = STORE.artists.find(ar => ar.name.toLowerCase() === aName);
+      img = found?._img || STORE.artist1Img || '';
+    }
     const heroClass = i === 0 ? ' mosaic-item--hero' : '';
     return `
       <div class="mosaic-item${heroClass}" id="album-card-${i}" style="opacity:0">
@@ -1238,6 +1409,7 @@ function buildTopTracks() {
     <div class="slide-header">
       <span class="slide-label">${T.tracksEyebrow}</span>
       <h2 class="slide-title">${T.tracksTitle}</h2>
+      ${buildSocialBox('tracks')}
     </div>
     <ol class="tracks-list" id="tracks-list">${items}</ol>`;
 }
@@ -1379,39 +1551,17 @@ function buildGlobalCompare() {
     </div>`;
 }
 
-/* slide 6 — habits */
+/* slide 6 — habits (Polar Area + Bar charts) */
 function buildHabits() {
   const cat = STORE.habitTimeCategory;
-  const peakDay = STORE.habitPeakDay;
   const peakMonth = STORE.habitMonthPeak;
-  const timeEmoji = { night:'🌙', morning:'☀️', afternoon:'🌤', evening:'🌙' };
-  const weekDays = T.weekDays || ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  const timeEmoji = { night:'🌙', morning:'☀️', afternoon:'🌤', evening:'🌆' };
   const months = T.months || ['Janv','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sept','Oct','Nov','Déc'];
-
-  // clock SVG
-  const clockSvg = buildClockSvg(STORE.habitHours);
-
-  // weekday bars
-  const maxDay = Math.max(1, ...STORE.habitDays);
-  const weekBars = STORE.habitDays.length
-    ? STORE.habitDays.map((v,i) => {
-        const pct = Math.round(v/maxDay*100);
-        const isPeak = i === peakDay;
-        return `
-          <div class="week-bar-col">
-            <div class="week-bar-track">
-              <div class="week-bar-fill${isPeak?' peak':''}" id="week-bar-${i}" style="height:0%" data-pct="${pct}"></div>
-            </div>
-            <span class="week-bar-lbl">${weekDays[i]||i}</span>
-          </div>`;
-      }).join('')
-    : weekDays.map((d,i)=>`<div class="week-bar-col"><div class="week-bar-track"><div class="week-bar-fill" style="height:${Math.round(Math.random()*80+20)}%"></div></div><span class="week-bar-lbl">${d}</span></div>`).join('');
-
   const monthName = peakMonth.month >= 0 ? (months[peakMonth.month]||'') : '—';
 
   return `
     <div style="position:absolute;inset:0;z-index:0">
-      <div style="position:absolute;border-radius:50%;background:#4f378b;left:18%;top:25%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.2;filter:blur(80px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#0a3f5c;left:18%;top:25%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.25;filter:blur(80px)"></div>
     </div>
     <div class="slide-header">
       <span class="slide-label">${T.habitsEyebrow}</span>
@@ -1419,218 +1569,102 @@ function buildHabits() {
     </div>
     <div class="habits-layout">
       <div class="habit-hero" id="habit-hero" style="opacity:0">
-        <div class="habit-time-ring" id="habit-time-ring">${clockSvg}</div>
-        <div class="habit-time-info">
-          <span class="habit-time-emoji">${timeEmoji[cat]||'🎵'}</span>
-          <span class="habit-time-label">${(T.habitTimeLabels||{})[cat]||cat}</span>
-          <span class="habit-time-sub">${(T.habitTimeSubs||{})[cat]||''}</span>
+        <div class="habit-hero-emoji">${timeEmoji[cat]||'🎵'}</div>
+        <div class="habit-hero-body">
+          <span class="habit-hero-label">${T.habitsEyebrow}</span>
+          <div class="habit-hero-title">${(T.habitTimeLabels||{})[cat]||cat}</div>
+          <div class="habit-hero-sub">${(T.habitTimeSubs||{})[cat]||''}</div>
         </div>
       </div>
-      <div class="habit-week" id="habit-week" style="opacity:0">
-        <h3 class="habit-week-title">${T.habitWeekTitle}</h3>
-        <div class="week-bars" id="week-bars">${weekBars}</div>
-      </div>
-      <div class="habit-month" id="habit-month-card" style="opacity:0">
-        <span class="habit-month-icon">📅</span>
-        <div class="habit-month-info">
-          <span class="habit-month-label">${T.habitMonthLabel}</span>
-          <span class="habit-month-value">${monthName}</span>
-          <span class="habit-month-plays">${peakMonth.plays ? fmtNum(peakMonth.plays) + ' ' + (T.scrobbles||'écoutes') : '—'}</span>
+      <div class="habits-charts-row" id="habit-charts-row" style="opacity:0;min-height:140px">
+        <div class="habit-chart-card">
+          <span class="habit-chart-title">${T.habitsChartClock||'Horloge'}</span>
+          <div class="habit-chart-canvas-wrap">
+            <canvas id="chart-polar-hours"></canvas>
+          </div>
         </div>
-      </div>
-    </div>`;
-}
-
-function buildClockSvg(hours) {
-  if (!hours || !hours.length) return '';
-  const maxH = Math.max(1, ...hours);
-  const cx = 50, cy = 50, r = 36, innerR = 18;
-  const paths = hours.map((v, i) => {
-    const angle = (i / 24) * Math.PI * 2 - Math.PI / 2;
-    const nextAngle = ((i+1) / 24) * Math.PI * 2 - Math.PI / 2;
-    const barLen = innerR + (r - innerR) * (v / maxH);
-    const x1 = cx + innerR * Math.cos(angle), y1 = cy + innerR * Math.sin(angle);
-    const x2 = cx + barLen  * Math.cos(angle), y2 = cy + barLen  * Math.sin(angle);
-    const x3 = cx + barLen  * Math.cos(nextAngle), y3 = cy + barLen  * Math.sin(nextAngle);
-    const x4 = cx + innerR * Math.cos(nextAngle), y4 = cy + innerR * Math.sin(nextAngle);
-    const intensity = v / maxH;
-    const alpha = 0.15 + intensity * 0.85;
-    return `<path d="M${x1.toFixed(2)},${y1.toFixed(2)} L${x2.toFixed(2)},${y2.toFixed(2)} L${x3.toFixed(2)},${y3.toFixed(2)} L${x4.toFixed(2)},${y4.toFixed(2)} Z" fill="rgba(168,85,247,${alpha.toFixed(2)})"/>`;
-  });
-  return `<svg viewBox="0 0 100 100" width="100%" height="100%">
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.1)" stroke-width=".5"/>
-    <circle cx="${cx}" cy="${cy}" r="${innerR}" fill="rgba(6,6,16,.6)"/>
-    ${paths.join('')}
-    <circle cx="${cx}" cy="${cy}" r="${innerR-1}" fill="none" stroke="rgba(255,255,255,.08)" stroke-width=".5"/>
-  </svg>`;
-}
-
-/* slide 7 — record day */
-function buildRecord() {
-  const rec = STORE.recordDay;
-  const months = T.months || ['Jan','Fév','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Déc'];
-  const weekDaysFull = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
-
-  let dayStr = '—', monthYearStr = '—', plays = '—';
-  if (rec?.date) {
-    dayStr = String(rec.date.getDate());
-    monthYearStr = `${months[rec.date.getMonth()]} ${rec.date.getFullYear()}`;
-    plays = fmtNum(rec.plays);
-  }
-
-  return `
-    <div class="slide-bg-accent"></div>
-    <div style="position:absolute;inset:0;z-index:0">
-      <div style="position:absolute;border-radius:50%;background:#3d1c04;left:60%;top:20%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.35;filter:blur(85px)"></div>
-    </div>
-    <div class="slide-header">
-      <span class="slide-label">${T.recordEyebrow}</span>
-      <h2 class="slide-title">${T.recordTitle}</h2>
-    </div>
-    <div class="record-layout" id="record-layout">
-      <div class="record-date-wrap" id="record-date-wrap" style="opacity:0">
-        <div class="record-date">
-          <span class="record-day">${dayStr}</span>
-          <span class="record-month-year">${monthYearStr}</span>
-        </div>
-        <div class="record-badge">🏆</div>
-      </div>
-      <div class="record-stat-wrap" id="record-stat-wrap" style="opacity:0">
-        <span class="record-num" id="record-num">${plays}</span>
-        <span class="record-unit">${T.recordUnit}</span>
-      </div>
-    </div>`;
-}
-
-/* slide 8 — got away */
-function buildGotAway() {
-  const ga = STORE.gotAwayArtist;
-  if (!ga) return buildFallback('Données insuffisantes pour cette analyse.');
-  const maxVal = Math.max(ga.before, 1);
-  const beforePct = 100;
-  const afterPct  = Math.max(5, Math.round(ga.after / maxVal * 100));
-  return `
-    <div class="got-away-bg" style="background-image:url('${esc(ga.img||'')}')"></div>
-    <div class="got-away-content">
-      <span class="slide-label" id="sl-got-away-eyebrow">${T.gotAwayEyebrow}</span>
-      <h2 class="slide-title got-away-title">The One That<br>Got Away</h2>
-      <div class="got-away-card" id="got-away-card" style="opacity:0">
-        <div class="got-away-img-wrap">
-          ${imgOrInitials(ga.img, ga.name)}
-          <div class="got-away-img-fade"></div>
-        </div>
-        <div class="got-away-info">
-          <span class="got-away-artist">${esc(ga.name)}</span>
-          <p class="got-away-desc">${fmtNum(ga.before)} ${T.scrobbles||'écoutes'} → ${fmtNum(ga.after)} ${T.scrobbles||'écoutes'}</p>
-          <div class="got-away-timeline">
-            <div class="timeline-half">
-              <span class="timeline-label">${T.tlBeforeLbl}</span>
-              <span class="timeline-val">${fmtNum(ga.before)}</span>
-              <div class="timeline-bar timeline-bar--before" style="--w:0%"></div>
-            </div>
-            <div class="timeline-arrow">→</div>
-            <div class="timeline-half">
-              <span class="timeline-label">${T.tlAfterLbl}</span>
-              <span class="timeline-val">${fmtNum(ga.after)}</span>
-              <div class="timeline-bar timeline-bar--after" style="--w:0%"></div>
-            </div>
+        <div class="habit-chart-card">
+          <span class="habit-chart-title">${T.habitsChartWeek||'Semaine'}</span>
+          <div class="habit-chart-canvas-wrap">
+            <canvas id="chart-bar-week"></canvas>
           </div>
         </div>
       </div>
-      <p class="got-away-footnote" id="got-away-footnote">${T.gotAwayFootnote}</p>
-    </div>`;
-}
-
-/* slide A — streak */
-function buildStreak() {
-  const s = STORE.streak;
-  if (!s || !s.days) return buildFallback(T.streakNone || 'Données insuffisantes.');
-  const months = T.months || ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sept','Oct','Nov','Déc'];
-  const fmt = d => d ? `${d.getDate()} ${months[d.getMonth()]}` : '—';
-  const pct = Math.min(100, Math.round((s.days / 366) * 100));
-  const totalDays = STORE.dayMap ? Object.keys(STORE.dayMap).length : 0;
-
-  return `
-    <div style="position:absolute;inset:0;z-index:0">
-      <div style="position:absolute;border-radius:50%;background:#3d1c04;left:50%;top:30%;width:60vmax;height:60vmax;transform:translate(-50%,-50%);opacity:.28;filter:blur(85px)"></div>
-      <div style="position:absolute;border-radius:50%;background:#2d0c02;left:25%;top:65%;width:45vmax;height:45vmax;transform:translate(-50%,-50%);opacity:.22;filter:blur(85px)"></div>
-    </div>
-    <div class="slide-header">
-      <span class="slide-label">${T.streakEyebrow||'Streak'}</span>
-      <h2 class="slide-title">${T.streakTitle||'Ta flamme'}</h2>
-    </div>
-    <div class="streak-layout">
-      <div class="streak-fire-wrap" id="streak-fire-wrap" style="opacity:0">
-        <div class="streak-fire">🔥</div>
-        <div class="streak-num-wrap">
-          <span class="streak-num" id="streak-num">${fmtNum(s.days)}</span>
-          <span class="streak-unit">${T.streakUnit||'jours'}</span>
+      <div class="habit-month-card" id="habit-month-card" style="opacity:0">
+        <div>
+          <span class="habit-month-label">${T.habitMonthLabel}</span>
+          <span class="habit-month-name">${monthName}</span>
         </div>
-        <div class="streak-sub">${T.streakLabel||'consécutifs'}</div>
-      </div>
-      <div class="streak-period-card" id="streak-period-card" style="opacity:0">
-        <span class="streak-period-label">${T.streakPeriod||'Période'}</span>
-        <span class="streak-period-dates">${fmt(s.startDate)} → ${fmt(s.endDate)}</span>
-      </div>
-      <div class="streak-bar-wrap" id="streak-bar-wrap" style="opacity:0">
-        <div class="streak-bar-label">${pct}% de l'année</div>
-        <div class="streak-bar-track">
-          <div class="streak-bar-fill" id="streak-bar-fill" style="width:0%"></div>
-        </div>
+        <span class="habit-month-plays">${peakMonth.plays ? fmtNum(peakMonth.plays) + ' ' + T.scrobbles : '—'}</span>
       </div>
     </div>`;
 }
 
-/* slide B — vibe */
-function buildVibe() {
-  const type = STORE.listenerType;
-  const timecat = STORE.habitTimeCategory;
-  const topGenre = STORE.tags[0] || '—';
-  const diversity = STORE.tags.length;
-  const typeEmoji = { extreme:'🤘', passionate:'🎸', regular:'🎧', casual:'😌' };
-  const timeEmoji = { night:'🌙', morning:'☀️', afternoon:'🌤️', evening:'🌆' };
-  const typeLabel = (T.vibeTypes||{})[type] || type;
-  const timeLabel = (T.habitTimeLabels||{})[timecat] || timecat;
-  const scrobblePer = STORE.avgPerDay;
+let _polarChart = null, _barWeekChart = null;
 
-  return `
-    <div style="position:absolute;inset:0;z-index:0">
-      <div style="position:absolute;border-radius:50%;background:#2a1a5e;left:28%;top:24%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.32;filter:blur(85px)"></div>
-      <div style="position:absolute;border-radius:50%;background:#4f378b;left:74%;top:68%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.28;filter:blur(85px)"></div>
-    </div>
-    <div class="slide-header">
-      <span class="slide-label">${T.vibeEyebrow||'Profil'}</span>
-      <h2 class="slide-title">${T.vibeTitle||'Ton vibe'}</h2>
-    </div>
-    <div class="vibe-layout">
-      <div class="vibe-hero" id="vibe-hero" style="opacity:0">
-        <div class="vibe-emoji">${typeEmoji[type]||'🎵'} ${timeEmoji[timecat]||'🎵'}</div>
-        <div class="vibe-name">${esc(typeLabel)}</div>
-        <div class="vibe-time-name">${esc(timeLabel)}</div>
-      </div>
-      <div class="vibe-badges" id="vibe-badges" style="opacity:0">
-        <div class="vibe-badge">
-          <span class="vibe-badge-icon">⚡</span>
-          <span class="vibe-badge-label">${T.vibeIntensityLabel||'Intensité'}</span>
-          <span class="vibe-badge-value">${esc(typeLabel)}</span>
-        </div>
-        <div class="vibe-badge">
-          <span class="vibe-badge-icon">${timeEmoji[timecat]||'🕐'}</span>
-          <span class="vibe-badge-label">${T.vibeTimeLabel||'Moment'}</span>
-          <span class="vibe-badge-value">${esc(timeLabel)}</span>
-        </div>
-        <div class="vibe-badge">
-          <span class="vibe-badge-icon">🎨</span>
-          <span class="vibe-badge-label">${T.vibeGenreLabel||'Genres'}</span>
-          <span class="vibe-badge-value">${diversity}</span>
-        </div>
-        <div class="vibe-badge vibe-badge--wide">
-          <span class="vibe-badge-icon">🎵</span>
-          <span class="vibe-badge-label">${T.vibeTopGenreLabel||'Genre dominant'}</span>
-          <span class="vibe-badge-value">${esc(topGenre)}</span>
-        </div>
-      </div>
-    </div>`;
+function buildHabitsCharts() {
+  // Attendre le layout pour que canvas ait des dimensions
+  requestAnimationFrame(() => _buildHabitsChartsInner());
+}
+function _buildHabitsChartsInner() {
+  const hours = STORE.habitHours;
+  const days = STORE.habitDays;
+  const weekDays = T.weekDays || ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  if (!window.Chart) return;
+
+  // Polar area — hourly distribution
+  const polarCanvas = document.getElementById('chart-polar-hours');
+  if (polarCanvas && hours?.length) {
+    if (_polarChart) { try { _polarChart.destroy(); } catch {} _polarChart = null; }
+    _polarChart = new Chart(polarCanvas, {
+      type: 'polarArea',
+      data: {
+        labels: Array.from({length:24},(_,i)=>`${i}h`),
+        datasets: [{
+          data: hours,
+          backgroundColor: hours.map((v, i) => {
+            const alpha = 0.12 + (v / Math.max(1,...hours)) * 0.72;
+            return `hsla(${260 + Math.round(i/24*80)},70%,65%,${alpha.toFixed(2)})`;
+          }),
+          borderWidth: 0,
+        }],
+      },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        animation:{duration:Infinity,easing:'easeOutQuart'},
+        scales:{r:{ticks:{display:false},grid:{color:'rgba(147,143,153,.1)'},
+          pointLabels:{display:true,color:'rgba(230,225,229,.3)',font:{size:8},
+            callback:(val) => (val==='0h'||val==='6h'||val==='12h'||val==='18h') ? val : ''}}},
+        plugins:{legend:{display:false},tooltip:{enabled:false}},
+      },
+    });
+  }
+
+  // Bar chart — weekday
+  const barCanvas = document.getElementById('chart-bar-week');
+  if (barCanvas && days?.length) {
+    if (_barWeekChart) { try { _barWeekChart.destroy(); } catch {} _barWeekChart = null; }
+    _barWeekChart = new Chart(barCanvas, {
+      type: 'bar',
+      data: {
+        labels: weekDays,
+        datasets: [{
+          data: days,
+          backgroundColor: days.map((_,i) => i === STORE.habitPeakDay ? 'rgba(208,188,255,.85)' : 'rgba(208,188,255,.22)'),
+          borderRadius: 4, borderWidth: 0,
+        }],
+      },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        animation:{duration:Infinity,easing:'easeOutQuart'},
+        scales:{x:{grid:{display:false},ticks:{color:'rgba(230,225,229,.45)',font:{size:10}}},y:{display:false}},
+        plugins:{legend:{display:false},tooltip:{
+          callbacks:{label: ctx => `${fmtNum(ctx.raw)} ${T.scrobbles}`},
+          backgroundColor:'rgba(36,33,46,.9)',titleColor:'#e6e1e5',bodyColor:'#938f99',
+        }},
+      },
+    });
+  }
 }
 
 /* slide 9 — genres */
@@ -1661,7 +1695,7 @@ function buildGenres() {
     </div>
     <div class="genres-layout">
       <div class="genres-chart-wrap" id="genres-chart-wrap" style="opacity:0">
-        <canvas id="genres-radar-chart" aria-label="Graphique radar des genres"></canvas>
+        <canvas id="genres-radar-chart" aria-label="Graphique radar des genres" style="width:100%;height:100%"></canvas>
       </div>
       <div class="genres-legend" id="genres-legend" style="opacity:0" role="list">${legendItems}</div>
       <div class="genres-evolution" id="genres-evolution" style="opacity:0">
@@ -1676,6 +1710,59 @@ function buildGenres() {
             <ul class="genres-half-list">${s2Tags || '<li style="color:rgba(255,255,255,.25)">—</li>'}</ul>
           </div>
         </div>
+      </div>
+    </div>`;
+}
+
+/* slide 13 — leaderboard (NOUVEAU) */
+function buildLeaderboard() {
+  const lb = STORE.leaderboard;
+  if (!lb || STORE.friendsData.length === 0) {
+    return `
+      <div style="position:absolute;inset:0;z-index:0">
+        <div style="position:absolute;border-radius:50%;background:#0d3b26;left:50%;top:40%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.25;filter:blur(80px)"></div>
+      </div>
+      <div class="slide-header">
+        <span class="slide-label">${T.lbEyebrow||'Social'}</span>
+        <h2 class="slide-title">${T.lbTitle||'Ton classement'}</h2>
+      </div>
+      <div class="leaderboard-layout">
+        <div class="lb-no-friends">
+          <div class="lb-no-friends-icon">👥</div>
+          <p class="lb-no-friends-text">${T.lbNoFriends||'Ajoute des amis Last.fm pour débloquer.'}</p>
+        </div>
+      </div>`;
+  }
+  const buildList = (ranked) => ranked.map((e, idx) => {
+    const rCls = idx===0?'lb-item-rank--1':idx===1?'lb-item-rank--2':idx===2?'lb-item-rank--3':'';
+    const iCls = e.isUser?' lb-item--user':'';
+    const bw = Math.round(100/(ranked.length||1)*(ranked.length-idx));
+    return `<div class="lb-item${iCls}">
+      <div class="lb-item-bar" style="width:${bw}%"></div>
+      <span class="lb-item-rank ${rCls}">${e.rank}</span>
+      <span class="lb-item-name">${esc(e.isUser?(T.lbYou||'Toi'):e.username)}</span>
+      <span class="lb-item-val">${e.isUser&&e.rank===1?'🏆 ':''}${fmtNum(e.volume||e.uniqueArtists||e.loyaltyPct||0)}</span>
+    </div>`;
+  }).join('');
+  const desc = (T.lbDesc||'Classement sur {n} critères.').replace('{n}','3');
+  return `
+    <div style="position:absolute;inset:0;z-index:0">
+      <div style="position:absolute;border-radius:50%;background:#0d3b26;left:20%;top:25%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.28;filter:blur(80px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#1a2f6b;left:78%;top:70%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.22;filter:blur(80px)"></div>
+    </div>
+    <div class="slide-header">
+      <span class="slide-label">${T.lbEyebrow||'Social'}</span>
+      <h2 class="slide-title">${T.lbTitle||'Ton classement'}</h2>
+    </div>
+    <div class="leaderboard-layout" id="leaderboard-layout">
+      <p class="leaderboard-desc">${desc}</p>
+      <div class="lb-tabs" id="lb-tabs">
+        <button class="lb-tab active" data-metric="volume">${T.lbMetricVolume||'Volume'}</button>
+        <button class="lb-tab" data-metric="curiosity">${T.lbMetricCuriosity||'Curiosité'}</button>
+        <button class="lb-tab" data-metric="loyalty">${T.lbMetricLoyalty||'Fidélité'}</button>
+      </div>
+      <div class="lb-metric-group" id="lb-metric-group">
+        <div class="lb-list" id="lb-list">${buildList(lb.volume)}</div>
       </div>
     </div>`;
 }
@@ -1710,7 +1797,6 @@ function buildRecap() {
       <div class="recap-top3 anim-rise" style="animation-delay:.35s">${top3}</div>
       <div class="recap-actions anim-rise" style="animation-delay:.5s">
         ${!STORE.isReadOnly ? `<button class="btn-primary btn-share" id="recap-share-link" type="button"><span>${T.shareBtn}</span><span class="btn-shimmer"></span></button>
-        <button class="btn-secondary btn-export" id="recap-export-story" type="button">${T.exportStory}</button>
         <button class="btn-secondary btn-export" id="recap-export-card" type="button">${T.exportCard}</button>` :
         `<a href="./wrapped.html" class="btn-primary" style="text-align:center;display:block;padding:14px">${T.shareOwnLink}</a>`}
       </div>
@@ -1719,233 +1805,431 @@ function buildRecap() {
     </div>`;
 }
 
-// liste des slides + logique d'animation
-/* Slide Historique — calendrier annuel + barres mensuelles */
+/* ── slide: history ── */
 function buildHistory() {
-  const dayMap   = STORE.dayMap || {};
-  const months   = T.months || ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+  const dayMap = STORE.dayMap || {};
+  const months = T.months || ['Janv','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sept','Oct','Nov','Déc'];
 
-  // Monthly counts from dayMap
-  const monthCounts = new Array(12).fill(0);
-  Object.entries(dayMap).forEach(([key, count]) => {
-    const [, , m] = key.split('-');
-    monthCounts[parseInt(m) - 1] += count;
+  // Aggregate plays per month from dayMap
+  const monthPlays = new Array(12).fill(0);
+  Object.entries(dayMap).forEach(([key, plays]) => {
+    const m = parseInt(key.split('-')[1]) - 1;
+    if (m >= 0 && m < 12) monthPlays[m] += plays;
   });
-  const maxMonth = Math.max(1, ...monthCounts);
+  const maxPlays = Math.max(1, ...monthPlays);
+  const peakMonth = monthPlays.indexOf(Math.max(...monthPlays));
 
-  // Build the calendar grid (Mon=0…Sun=6)
-  const jan1     = new Date(WRAPPED_YEAR, 0, 1);
-  const startPad = (jan1.getDay() + 6) % 7;
-  const isLeap   = (WRAPPED_YEAR % 4 === 0 && WRAPPED_YEAR % 100 !== 0) || WRAPPED_YEAR % 400 === 0;
-  const totalDays = isLeap ? 366 : 365;
+  // H1 vs H2
+  const h1 = monthPlays.slice(0, 6).reduce((a, b) => a + b, 0);
+  const h2 = monthPlays.slice(6).reduce((a, b) => a + b, 0);
 
-  const allCells = [];
-  for (let i = 0; i < startPad; i++) allCells.push(null);
-  for (let d = 0; d < totalDays; d++) {
-    const date = new Date(WRAPPED_YEAR, 0, d + 1);
-    const key  = `${WRAPPED_YEAR}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
-    allCells.push({ date, count: dayMap[key] || 0 });
+  // Calendar heatmap — build weeks grid from dayMap
+  const allDays = Object.keys(dayMap).sort();
+  const firstDay = allDays[0] ? new Date(allDays[0] + 'T00:00:00') : new Date(WRAPPED_YEAR, 0, 1);
+  const lastDay  = allDays.length ? new Date(allDays[allDays.length-1] + 'T00:00:00') : new Date(WRAPPED_YEAR, 11, 31);
+  // Pad to start of week (Mon)
+  const startOffset = (firstDay.getDay() + 6) % 7;
+  const calStart = new Date(firstDay); calStart.setDate(calStart.getDate() - startOffset);
+  const totalDays = Math.ceil((lastDay - calStart) / 86400000) + 7;
+  const maxVal = Math.max(1, ...Object.values(dayMap));
+  let weeks = [], week = [];
+  for (let i = 0; i < totalDays; i++) {
+    const d = new Date(calStart); d.setDate(calStart.getDate() + i);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const v = dayMap[key] || 0;
+    const inRange = d >= firstDay && d <= lastDay;
+    const level = !inRange ? '' : v === 0 ? '0' : v < maxVal*0.25 ? '1' : v < maxVal*0.5 ? '2' : v < maxVal*0.75 ? '3' : '4';
+    week.push(`<div class="wh-cell${!inRange?' wh-cell--empty':''}" data-level="${level}" title="${key}: ${v}"></div>`);
+    if (week.length === 7) { weeks.push(`<div class="wh-week">${week.join('')}</div>`); week = []; }
   }
-  while (allCells.length % 7 !== 0) allCells.push(null);
-  const numWeeks = allCells.length / 7;
+  if (week.length) weeks.push(`<div class="wh-week">${week.join('')}</div>`);
 
-  // 4 intensity levels
-  const vals       = Object.values(dayMap);
-  const maxCount   = vals.length ? Math.max(...vals) : 1;
-  const t1 = Math.ceil(maxCount * 0.25);
-  const t2 = Math.ceil(maxCount * 0.5);
-  const t3 = Math.ceil(maxCount * 0.75);
-  const getLevel = c => !c ? 0 : c < t1 ? 1 : c < t2 ? 2 : c < t3 ? 3 : 4;
-
-  const weeksHTML = Array(numWeeks).fill(0).map((_, wi) =>
-    `<div class="wh-week">${allCells.slice(wi*7, wi*7+7).map(cell => {
-      if (!cell) return '<div class="wh-cell wh-cell--empty"></div>';
-      const lv = getLevel(cell.count);
-      const tip = cell.count > 0
-        ? `${cell.date.toLocaleDateString(undefined,{month:'short',day:'numeric'})} — ${cell.count}`
-        : '';
-      return `<div class="wh-cell" data-level="${lv}"${tip ? ` title="${tip}"` : ''}></div>`;
-    }).join('')}</div>`
-  ).join('');
-
-  // Monthly bar chart
-  const monthBars = monthCounts.map((count, i) => {
-    const pct   = Math.round((count / maxMonth) * 100);
-    const peak  = count === Math.max(...monthCounts);
+  const monthBars = monthPlays.map((v, i) => {
+    const pct = Math.round(v / maxPlays * 100);
+    const isPeak = i === peakMonth;
     return `<div class="wh-month-col">
       <div class="wh-month-track">
-        <div class="wh-month-fill${peak ? ' wh-month-fill--peak' : ''}" data-pct="${pct}" style="height:0%"></div>
+        <div class="wh-month-fill${isPeak?' wh-month-fill--peak':''}" data-pct="${pct}" style="height:0%"></div>
       </div>
-      <span class="wh-month-lbl">${months[i][0]}</span>
+      <span class="wh-month-lbl">${(months[i]||'').slice(0,3)}</span>
     </div>`;
   }).join('');
 
-  // Quick stats
-  const activeDays  = Object.keys(dayMap).length;
-  const bestDayEntry= Object.entries(dayMap).sort((a,b)=>b[1]-a[1])[0];
-  const bestDayStr  = bestDayEntry ? fmtNum(bestDayEntry[1]) : '—';
-  const avgPerDay   = activeDays > 0
-    ? (Object.values(dayMap).reduce((s,v)=>s+v,0) / 365).toFixed(1)
-    : '—';
-
   return `
     <div style="position:absolute;inset:0;z-index:0">
-      <div style="position:absolute;border-radius:50%;background:#4f378b;left:20%;top:25%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.22;filter:blur(80px)"></div>
-      <div style="position:absolute;border-radius:50%;background:#4338ca;left:78%;top:68%;width:48vmax;height:48vmax;transform:translate(-50%,-50%);opacity:.18;filter:blur(80px)"></div>
+      <div style="position:absolute;border-radius:50%;background:#1a3a5c;left:15%;top:20%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.28;filter:blur(85px)"></div>
     </div>
     <div class="slide-header">
-      <span class="slide-label">${LANG_CODE==='en'?'Activity':'Activité'}</span>
-      <h2 class="slide-title">${LANG_CODE==='en'?'Your year from above':'Ton année vue du ciel'}</h2>
+      <span class="slide-label">${T.historyEyebrow||'Activité'}</span>
+      <h2 class="slide-title">${T.historyTitle||'Ton année mois par mois'}</h2>
     </div>
-    <div class="history-layout">
-      <div class="wh-calendar-wrap" id="wh-calendar" style="opacity:0">
-        <div class="wh-grid">${weeksHTML}</div>
+    <div style="display:flex;flex-direction:column;gap:clamp(8px,2.5vw,14px);padding:0 clamp(12px,4vw,24px) clamp(12px,4vw,22px);flex:1;overflow-y:auto;max-height:calc(100dvh - 120px)">
+      <div id="wh-calendar" class="wh-calendar-wrap">
+        <div class="wh-grid">${weeks.join('')}</div>
         <div class="wh-legend">
-          <span>${LANG_CODE==='en'?'Less':'Moins'}</span>
+          <span>${T.tlBeforeLbl||'Moins'}</span>
           <div class="wh-legend-cells">
-            ${[0,1,2,3,4].map(lv=>`<div class="wh-cell" data-level="${lv}"></div>`).join('')}
+            <div class="wh-cell" data-level="0"></div>
+            <div class="wh-cell" data-level="1"></div>
+            <div class="wh-cell" data-level="2"></div>
+            <div class="wh-cell" data-level="3"></div>
+            <div class="wh-cell" data-level="4"></div>
           </div>
-          <span>${LANG_CODE==='en'?'More':'Plus'}</span>
+          <span>${T.tlAfterLbl||'Plus'}</span>
         </div>
       </div>
-      <div class="wh-month-bars" id="wh-month-bars" style="opacity:0">${monthBars}</div>
-      <div class="wh-quick-stats" id="wh-quick-stats" style="opacity:0">
+      <div id="wh-month-bars" class="wh-month-bars">${monthBars}</div>
+      <div id="wh-quick-stats" class="wh-quick-stats">
         <div class="wh-stat">
           <span class="wh-stat-icon">📅</span>
-          <span class="wh-stat-val">${activeDays}</span>
-          <span class="wh-stat-lbl">${LANG_CODE==='en'?'active days':'jours actifs'}</span>
+          <span class="wh-stat-val">${fmtNum(h1)}</span>
+          <span class="wh-stat-lbl">${T.tlBeforeLbl||'Jan – Juin'}</span>
         </div>
         <div class="wh-stat">
-          <span class="wh-stat-icon">🔥</span>
-          <span class="wh-stat-val">${bestDayStr}</span>
-          <span class="wh-stat-lbl">${LANG_CODE==='en'?'best day':'record du jour'}</span>
+          <span class="wh-stat-icon">🍂</span>
+          <span class="wh-stat-val">${fmtNum(h2)}</span>
+          <span class="wh-stat-lbl">${T.tlAfterLbl||'Juil – Déc'}</span>
         </div>
         <div class="wh-stat">
-          <span class="wh-stat-icon">⚡</span>
-          <span class="wh-stat-val">${avgPerDay}</span>
-          <span class="wh-stat-lbl">${LANG_CODE==='en'?'avg/day':'moy/jour'}</span>
+          <span class="wh-stat-icon">📆</span>
+          <span class="wh-stat-val">${Object.keys(dayMap).length}</span>
+          <span class="wh-stat-lbl">${T.lblDays||'Jours actifs'}</span>
         </div>
       </div>
     </div>`;
 }
 
+/* ── slide: record day ── */
+function buildRecord() {
+  const rd = STORE.recordDay;
+  const months = T.months || ['Janv','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sept','Oct','Nov','Déc'];
+  const dateStr = rd ? `${rd.date.getDate()} ${months[rd.date.getMonth()]||''} ${rd.date.getFullYear()}` : '—';
+  const topTrack = STORE.tracks[0];
+  const topImg   = topTrack ? getImg(topTrack.image||[], 'medium','small') : '';
+
+  return `
+    <div style="position:absolute;inset:0;z-index:0">
+      <div style="position:absolute;border-radius:50%;background:#7c2d12;left:70%;top:30%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.25;filter:blur(90px)"></div>
+    </div>
+    <div class="slide-header">
+      <span class="slide-label">${T.recordEyebrow||'Record'}</span>
+      <h2 class="slide-title">${T.recordTitle||'Ton jour légendaire'}</h2>
+    </div>
+    <div class="record-layout">
+      <div id="record-date-wrap" style="opacity:0">
+        <span class="record-date">📅 ${dateStr}</span>
+      </div>
+      <div id="record-stat-wrap" style="opacity:0">
+        <div class="record-plays-display">
+          <span class="record-num" id="record-num">${rd ? fmtNum(rd.plays) : '—'}</span>
+          <span class="record-unit">${T.recordUnit||'écoutes en 24h'}</span>
+        </div>
+        ${topTrack ? `
+        <div class="record-artist-row">
+          <div class="record-artist-img">${imgOrInitials(topImg, topTrack.name)}</div>
+          <div style="display:flex;flex-direction:column;gap:2px;text-align:left;min-width:0">
+            <span class="record-artist-label">${T.recordTopLabel||'Ce jour-là tu écoutais'}</span>
+            <span class="record-artist-name">${esc(topTrack.name)}</span>
+            <span class="record-artist-label">${esc(topTrack.artist?.name||topTrack.artist||'')}</span>
+          </div>
+        </div>` : ''}
+      </div>
+    </div>`;
+}
+
+/* ── slide: got away ── */
+function buildGotAway() {
+  const ga = STORE.gotAwayArtist;
+  const name   = ga?.name   || '—';
+  const img    = ga?.img    || '';
+  const before = ga?.before || 0;
+  const after  = ga?.after  || 0;
+  const maxVal = Math.max(1, before);
+  const beforePct = 100;
+  const afterPct  = Math.max(5, Math.round(after / maxVal * 100));
+
+  return `
+    <div style="position:absolute;inset:0;z-index:0">
+      <div style="position:absolute;border-radius:50%;background:#3b0764;left:25%;top:35%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.28;filter:blur(85px)"></div>
+    </div>
+    <div class="slide-header">
+      <span class="slide-label">${T.gotAwayEyebrow||'Nostalgie'}</span>
+      <h2 class="slide-title">${T.gotAwayTitle||'Celui qui t\'a échappé'}</h2>
+    </div>
+    <div class="gotaway-layout">
+      <div id="got-away-card" style="opacity:0">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:clamp(6px,2vw,10px)">
+          <div class="gotaway-img-wrap">${imgOrInitials(img, name)}</div>
+          <span class="gotaway-artist-name">${esc(name)}</span>
+        </div>
+        <div class="gotaway-timeline">
+          <div class="timeline-row">
+            <span class="timeline-label">${T.tlBeforeLbl||'Jan–Juin'}</span>
+            <div class="timeline-bar timeline-bar--before">
+              <div style="width:0%"></div>
+            </div>
+            <span class="timeline-count">${fmtNum(before)}</span>
+          </div>
+          <div class="timeline-row">
+            <span class="timeline-label">${T.tlAfterLbl||'Juil–Déc'}</span>
+            <div class="timeline-bar timeline-bar--after">
+              <div style="width:0%"></div>
+            </div>
+            <span class="timeline-count">${fmtNum(after)}</span>
+          </div>
+        </div>
+        <p class="gotaway-footnote">${T.gotAwayFootnote||"L'artiste que tu as abandonné·e en route…"}</p>
+      </div>
+    </div>`;
+}
+
+/* ── slide: streak ── */
+function buildStreak() {
+  const s = STORE.streak;
+  const months = T.months || ['Janv','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sept','Oct','Nov','Déc'];
+  const fmtDate = d => d ? `${d.getDate()} ${months[d.getMonth()]||''}` : '—';
+
+  return `
+    <div style="position:absolute;inset:0;z-index:0">
+      <div style="position:absolute;border-radius:50%;background:#7c2d12;left:50%;top:30%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.25;filter:blur(90px)"></div>
+    </div>
+    <div class="slide-header">
+      <span class="slide-label">${T.streakEyebrow||'Streak'}</span>
+      <h2 class="slide-title">${T.streakTitle||'Ta flamme'}</h2>
+    </div>
+    <div class="streak-layout">
+      <div id="streak-fire-wrap" style="opacity:0">
+        <span class="streak-fire">🔥</span>
+        <span class="streak-num" id="streak-num">${s?.days || 0}</span>
+        <span class="streak-unit">${T.streakUnit||'jours'} ${T.streakLabel||'consécutifs'}</span>
+      </div>
+      <div id="streak-bar-wrap" class="streak-bar-wrap" style="opacity:0">
+        <div id="streak-bar-fill" style="width:0%"></div>
+      </div>
+      <div id="streak-period-card" style="opacity:0">
+        ${s?.startDate
+          ? `<span class="streak-period">${T.streakPeriod||'Période'} : ${fmtDate(s.startDate)} → ${fmtDate(s.endDate)}</span>`
+          : `<span class="streak-period">${T.streakNone||'Données insuffisantes.'}</span>`}
+      </div>
+    </div>`;
+}
+
+/* ── slide: vibe ── */
+function buildVibe() {
+  const type = STORE.listenerType || 'regular';
+  const cat  = STORE.habitTimeCategory || 'evening';
+  const vibeTypes  = T.vibeTypes  || { extreme:'Acharné·e', passionate:'Passionné·e', regular:'Régulier·ère', casual:'Éclectique' };
+  const timeLabels = T.habitTimeLabels || { night:'Noctambule', morning:'Matinal·e', afternoon:'Après-midiste', evening:'Soirée' };
+  const timeEmoji  = { night:'🌙', morning:'☀️', afternoon:'🌤', evening:'🌆' };
+  const typeEmoji  = { extreme:'🔥', passionate:'❤️', regular:'🎵', casual:'🎲' };
+  const topGenre   = STORE.tags[0] || '—';
+  const topArtist  = STORE.artists[0]?.name || '—';
+
+  const badges = [
+    { icon: typeEmoji[type]||'🎵', label: T.vibeIntensityLabel||'Intensité',       val: vibeTypes[type]||type },
+    { icon: timeEmoji[cat]||'🕐',  label: T.vibeTimeLabel||'Moment',               val: timeLabels[cat]||cat  },
+    { icon: '🏷',                   label: T.vibeTopGenreLabel||'Genre dominant',   val: esc(topGenre)         },
+    { icon: '🎤',                   label: T.vibeGenreLabel||'Artiste #1',          val: esc(topArtist)        },
+  ].map(b => `
+    <div class="vibe-badge">
+      <span class="vibe-badge-icon">${b.icon}</span>
+      <span class="vibe-badge-label">${b.label}</span>
+      <span class="vibe-badge-value">${b.val}</span>
+    </div>`).join('');
+
+  return `
+    <div style="position:absolute;inset:0;z-index:0">
+      <div style="position:absolute;border-radius:50%;background:#0c4a6e;left:60%;top:25%;width:55vmax;height:55vmax;transform:translate(-50%,-50%);opacity:.28;filter:blur(85px)"></div>
+    </div>
+    <div class="slide-header">
+      <span class="slide-label">${T.vibeEyebrow||'Profil'}</span>
+      <h2 class="slide-title">${T.vibeTitle||'Ton vibe'}</h2>
+    </div>
+    <div class="vibe-layout">
+      <div id="vibe-hero" style="opacity:0">
+        <div class="vibe-main-card">
+          <span class="vibe-icon">${typeEmoji[type]||'🎵'}</span>
+          <span class="vibe-type">${vibeTypes[type]||type}</span>
+          <span class="vibe-sub">${STORE.avgPerDay} ${T.scrobbles||'écoutes'} / jour</span>
+        </div>
+      </div>
+      <div id="vibe-badges" style="opacity:0">
+        <div class="vibe-badges">${badges}</div>
+      </div>
+    </div>`;
+}
+
 const SLIDES = [
-  { id:'intro',      theme:'purple', duration:5000,    build:buildIntro },
-  { id:'numbers',    theme:'blue',   duration:7000,    build:buildNumbers },
-  { id:'artists',    theme:'purple', duration:9000,    build:buildTopArtists },
-  { id:'albums',     theme:'green',  duration:8000,    build:buildTopAlbums },
-  { id:'tracks',     theme:'blue',   duration:9000,    build:buildTopTracks },
-  { id:'global',     theme:'violet', duration:8000,    build:buildGlobalCompare },
-  { id:'habits',     theme:'teal',   duration:9000,    build:buildHabits },
-  { id:'history',   theme:'purple', duration:9000,    build:buildHistory },
-  { id:'record',     theme:'record', duration:7000,    build:buildRecord },
-  { id:'gotaway',    theme:'gotAway',duration:9000,    build:buildGotAway },
-  { id:'streak',     theme:'record', duration:7000,    build:buildStreak },
-  { id:'vibe',       theme:'blue',   duration:8000,    build:buildVibe },
-  { id:'genres',     theme:'pink',   duration:9000,    build:buildGenres },
-  { id:'recap',      theme:'recap',  duration:Infinity, build:buildRecap },
+  { id:'intro',       theme:'purple', duration:Infinity,     build:buildIntro },
+  { id:'numbers',     theme:'blue',   duration:Infinity,     build:buildNumbers },
+  { id:'artists',     theme:'purple', duration:Infinity,     build:buildTopArtists },
+  { id:'albums',      theme:'green',  duration:Infinity,     build:buildTopAlbums },
+  { id:'tracks',      theme:'blue',   duration:Infinity,     build:buildTopTracks },
+  { id:'global',      theme:'violet', duration:Infinity,     build:buildGlobalCompare },
+  { id:'habits',      theme:'teal',   duration:Infinity,     build:buildHabits },
+  { id:'history',     theme:'purple', duration:Infinity,     build:buildHistory },
+  { id:'record',      theme:'record', duration:Infinity,     build:buildRecord },
+  { id:'gotaway',     theme:'gotAway',duration:Infinity,     build:buildGotAway },
+  { id:'streak',      theme:'record', duration:Infinity,     build:buildStreak },
+  { id:'vibe',        theme:'blue',   duration:Infinity,     build:buildVibe },
+  { id:'genres',      theme:'pink',   duration:Infinity,     build:buildGenres },
+  { id:'leaderboard', theme:'social', duration:Infinity,    build:buildLeaderboard },
+  { id:'recap',       theme:'recap',  duration:Infinity, build:buildRecap },
 ];
 
 // stories engine
 let _radarChart = null;
+let _observerMap = new Map(); // slideId -> bool (animated already)
+let _intersectionObserver = null;
 
 const Stories = {
-  current: 0, _timer: null, _paused: false, _slideStart: 0, _pauseStart: 0, _totalPauseMs: 0,
+  current: 0,
 
   init() {
-    const container = document.getElementById('slides-container'), bars = document.getElementById('progress-bars');
-    if (!container || !bars) return;
-    container.innerHTML = ''; bars.innerHTML = '';
-    SLIDES.forEach((sl, i) => {
+    const container = document.getElementById('slides-container');
+    const scroll    = document.getElementById('slides-scroll');
+    if (!container) return;
+    container.innerHTML = '';
+    _observerMap.clear();
+    if (_intersectionObserver) { _intersectionObserver.disconnect(); _intersectionObserver = null; }
+
+    SLIDES.forEach((sl) => {
       const div = document.createElement('div');
       div.className = 'slide'; div.id = `slide-${sl.id}`;
-      div.innerHTML = sl.build(); container.appendChild(div);
-      const seg = document.createElement('div'); seg.className = 'prog-seg'; seg.id = `prog-${i}`;
-      seg.innerHTML = '<div class="prog-fill"></div>'; bars.appendChild(seg);
+      div.innerHTML = sl.build();
+      container.appendChild(div);
+      _observerMap.set(sl.id, false);
     });
+
     this._bindRecapButtons();
-    this.go(0);
+    this._bindLeaderboardTabs();
+    this._bindNavButtons();
+
+    // Reset scroll to top
+    if (scroll) { scroll.scrollTop = 0; }
+
+    // Set ambient for first slide and fire its enter
+    this.current = 0;
+    setAmbient(SLIDES[0].theme);
+    this._updateCounter(0);
+
+    // IntersectionObserver — trigger animations once per slide
+    _intersectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const id = entry.target.id.replace('slide-', '');
+        const idx = SLIDES.findIndex(s => s.id === id);
+        if (entry.isIntersecting) {
+          // update ambient + counter based on which slide is most visible
+          if (idx >= 0) {
+            this.current = idx;
+            setAmbient(SLIDES[idx].theme);
+            this._updateCounter(idx);
+          }
+          // trigger enter animations once
+          if (!_observerMap.get(id)) {
+            _observerMap.set(id, true);
+            this._onEnter(id);
+          }
+        }
+      });
+    }, { root: scroll || null, threshold: 0.25 });
+
+    SLIDES.forEach(sl => {
+      const el = document.getElementById(`slide-${sl.id}`);
+      if (el) _intersectionObserver.observe(el);
+    });
+
+    // Trigger intro immediately (it's already visible)
+    setTimeout(() => {
+      if (!_observerMap.get('intro')) { _observerMap.set('intro', true); this._onEnter('intro'); }
+    }, 100);
   },
 
+  _updateCounter(idx) {
+    const counter = document.getElementById('slide-counter');
+    if (counter) counter.textContent = `${idx + 1} / ${SLIDES.length}`;
+    const prevBtn = document.getElementById('nav-prev-btn');
+    const nextBtn = document.getElementById('nav-next-btn');
+    if (prevBtn) prevBtn.disabled = idx === 0;
+    if (nextBtn) nextBtn.disabled = idx === SLIDES.length - 1;
+  },
+
+  _bindNavButtons() {
+    const prev = document.getElementById('nav-prev-btn');
+    const next = document.getElementById('nav-next-btn');
+    if (prev) prev.addEventListener('click', () => this.prev());
+    if (next) next.addEventListener('click', () => this.next());
+
+    // Keyboard
+    document.addEventListener('keydown', e => {
+      if (document.getElementById('stories')?.classList.contains('hidden')) return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); this.next(); }
+      if (e.key === 'ArrowUp')   { e.preventDefault(); this.prev(); }
+      if (e.key === 'Escape') document.getElementById('exit-btn')?.click();
+    });
+  },
+
+  _bindLeaderboardTabs() {
+    setTimeout(() => {
+      document.querySelectorAll('.lb-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.lb-tab').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const lb = STORE.leaderboard;
+          const metric = btn.dataset.metric;
+          if (!lb || !lb[metric]) return;
+          const list = document.getElementById('lb-list');
+          if (!list) return;
+          const ranked = lb[metric];
+          list.innerHTML = ranked.map((e, idx) => {
+            const rCls = idx===0?'lb-item-rank--1':idx===1?'lb-item-rank--2':idx===2?'lb-item-rank--3':'';
+            const iCls = e.isUser?' lb-item--user':'';
+            const bw = Math.round(100/(ranked.length||1)*(ranked.length-idx));
+            const val = metric==='volume' ? fmtNum(e.volume)
+              : metric==='curiosity' ? `${fmtNum(e.uniqueArtists)} ${T.artists}`
+              : `${e.loyaltyPct}%`;
+            return `<div class="lb-item${iCls}">
+              <div class="lb-item-bar" style="width:${bw}%"></div>
+              <span class="lb-item-rank ${rCls}">${e.rank}</span>
+              <span class="lb-item-name">${esc(e.isUser?(T.lbYou||'Toi'):e.username)}</span>
+              <span class="lb-item-val">${e.isUser&&e.rank===1?'🏆 ':''}${val}</span>
+            </div>`;
+          }).join('');
+        });
+      });
+    }, 200);
+  },
+
+  _bindHoverPause() {},  // n/a
+
   _bindRecapButtons() {
-    // recap buttons get recreated on each init
     setTimeout(() => {
       document.getElementById('recap-share-link')?.addEventListener('click', () => openShareModal());
-      document.getElementById('recap-export-story')?.addEventListener('click', () => ExportManager.story());
       document.getElementById('recap-export-card')?.addEventListener('click', () => ExportManager.card());
     }, 200);
   },
 
   go(idx) {
     if (idx < 0 || idx >= SLIDES.length) return;
-    clearTimeout(this._timer);
-    const keepPaused = this._paused;
-    this._slideStart = Date.now(); this._totalPauseMs = 0; this._paused = false;
-
-    const prev = document.querySelector('.slide.active');
-    if (prev) {
-      prev.classList.remove('active');
-      prev.classList.add('exit');
-      setTimeout(() => prev.classList.remove('exit'), 550);
-    }
-
     this.current = idx;
-    const sl = SLIDES[idx], slideEl = document.getElementById(`slide-${sl.id}`);
-    if (!slideEl) return;
+    const sl = SLIDES[idx];
+    const slideEl = document.getElementById(`slide-${sl.id}`);
+    const scroll  = document.getElementById('slides-scroll');
+    if (!slideEl || !scroll) return;
     setAmbient(sl.theme);
-    requestAnimationFrame(() => requestAnimationFrame(() => slideEl.classList.add('active')));
-    this._updateBars(idx, sl.duration);
-    this._onEnter(sl.id);
-
-    if (isFinite(sl.duration)) {
-      if (keepPaused) {
-        this._paused = true; this._pauseStart = Date.now();
-        requestAnimationFrame(() => {
-          const fill = document.querySelector(`#prog-${idx} .prog-fill`);
-          if (fill) fill.style.animationPlayState = 'paused';
-          const btn = document.getElementById('pause-btn'); if (btn) { btn.textContent = '▶'; btn.classList.add('is-paused'); }
-        });
-      } else {
-        const btn = document.getElementById('pause-btn'); if (btn) { btn.textContent = '⏸'; btn.classList.remove('is-paused'); }
-        this._timer = setTimeout(() => this.go(idx + 1), sl.duration);
-      }
-    } else {
-      const btn = document.getElementById('pause-btn'); if (btn) { btn.textContent = '⏸'; btn.classList.remove('is-paused'); }
-    }
+    this._updateCounter(idx);
+    // Scroll smoothly to the target slide
+    const top = slideEl.offsetTop;
+    scroll.scrollTo({ top, behavior: 'smooth' });
   },
 
   next() { if (this.current < SLIDES.length - 1) this.go(this.current + 1); },
   prev() { this.go(Math.max(0, this.current - 1)); },
 
-  pause() {
-    if (this._paused || !isFinite(SLIDES[this.current].duration)) return;
-    this._paused = true; this._pauseStart = Date.now(); clearTimeout(this._timer);
-    const fill = document.querySelector(`#prog-${this.current} .prog-fill`); if (fill) fill.style.animationPlayState = 'paused';
-    const btn = document.getElementById('pause-btn'); if (btn) { btn.textContent = '▶'; btn.classList.add('is-paused'); }
-  },
-  resume() {
-    if (!this._paused) return;
-    this._totalPauseMs += Date.now() - this._pauseStart; this._paused = false;
-    const fill = document.querySelector(`#prog-${this.current} .prog-fill`); if (fill) fill.style.animationPlayState = 'running';
-    const btn = document.getElementById('pause-btn'); if (btn) { btn.textContent = '⏸'; btn.classList.remove('is-paused'); }
-    const sl = SLIDES[this.current];
-    if (isFinite(sl.duration)) {
-      const rem = Math.max(0, sl.duration - (Date.now() - this._slideStart - this._totalPauseMs));
-      this._timer = setTimeout(() => this.go(this.current + 1), rem);
-    }
-  },
-  togglePause() { this._paused ? this.resume() : this.pause(); },
-
-  _updateBars(active, duration) {
-    SLIDES.forEach((_, i) => {
-      const seg = document.getElementById(`prog-${i}`); if (!seg) return;
-      const fill = seg.querySelector('.prog-fill');
-      fill.style.animation = 'none'; fill.getBoundingClientRect();
-      if (i < active) { fill.style.width = '100%'; fill.style.animation = ''; }
-      else if (i === active && isFinite(duration)) { fill.style.width = '0%'; fill.style.animation = `progFill ${duration}ms linear forwards`; }
-      else { fill.style.width = '0%'; fill.style.animation = ''; }
-    });
-  },
+  pause()       { /* n/a */ },
+  resume()      { /* n/a */ },
+  togglePause() { /* n/a */ },
+  _updateBars() { /* n/a */ },
 
   _onEnter(id) {
     const fadeIn = (el, delay = 0) => {
@@ -1956,6 +2240,10 @@ const Stories = {
         el.style.opacity = '1'; el.style.transform = 'translateY(0)';
       }, delay);
     };
+
+    // Apply ColorThief dynamically per slide (seulement si image disponible)
+    const dynImg = STORE.artist1Img || getImg(STORE.albums[0]?.image||[],'extralarge') || '';
+    if (dynImg) applyDynamicColor(dynImg).catch(() => {});
 
     switch (id) {
       case 'numbers':
@@ -2080,13 +2368,19 @@ const Stories = {
         setTimeout(() => {
           fadeIn(document.getElementById('habit-hero'), 100);
           setTimeout(() => {
-            fadeIn(document.getElementById('habit-week'), 0);
-            document.querySelectorAll('[id^="week-bar-"]').forEach(el => {
-              const pct = parseInt(el.dataset.pct||0);
-              setTimeout(() => { el.style.transition='height 1s cubic-bezier(.22,1,.36,1)'; el.style.height=`${pct}%`; }, 200);
-            });
-          }, 350);
-          setTimeout(() => fadeIn(document.getElementById('habit-month-card'), 0), 600);
+            const row = document.getElementById('habit-charts-row');
+            if (row) {
+              row.style.transition = 'opacity .5s ease, transform .5s cubic-bezier(.22,1,.36,1)';
+              row.style.opacity = '1'; row.style.transform = 'translateY(0)';
+            }
+            buildHabitsCharts();
+          // Force resize après animation
+          setTimeout(() => {
+            if (_polarChart) { try { _polarChart.resize(); } catch {} }
+            if (_barWeekChart) { try { _barWeekChart.resize(); } catch {} }
+          }, 600);
+          }, 400);
+          setTimeout(() => fadeIn(document.getElementById('habit-month-card'), 0), 700);
         }, 200);
         break;
 
@@ -2164,7 +2458,20 @@ const Stories = {
           setTimeout(() => fadeIn(document.getElementById('genres-legend'), 0), 300);
           setTimeout(() => fadeIn(document.getElementById('genres-evolution'), 0), 500);
           buildRadarChart();
+          setTimeout(() => { if (_radarChart) { try { _radarChart.resize(); } catch {} } }, 400);
         }, 200);
+        break;
+
+      case 'leaderboard':
+        setTimeout(() => {
+          document.querySelectorAll('.lb-item').forEach((el, i) => {
+            el.style.opacity='0'; el.style.transform='translateX(-16px)';
+            setTimeout(() => {
+              el.style.transition='opacity .38s ease, transform .4s cubic-bezier(.22,1,.36,1)';
+              el.style.opacity='1'; el.style.transform='translateX(0)';
+            }, 200 + i * 80);
+          });
+        }, 300);
         break;
 
       case 'recap':
@@ -2174,7 +2481,7 @@ const Stories = {
   }
 };
 
-// radar des genres
+
 function buildRadarChart() {
   const canvas = document.getElementById('genres-radar-chart');
   if (!canvas) return;
@@ -2182,9 +2489,10 @@ function buildRadarChart() {
   // lazy-load Chart.js if not already there
   const loadChartJs = () => new Promise((resolve, reject) => {
     if (window.Chart) { resolve(); return; }
+    // Chart.js déjà chargé depuis le CDN en <head> — fallback si absent
     const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
-    s.onload = resolve; s.onerror = reject;
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+    s.onload = resolve; s.onerror = () => resolve(); // ne pas bloquer
     document.head.appendChild(s);
   });
 
@@ -2201,7 +2509,8 @@ function buildRadarChart() {
       type: 'radar',
       data: {
         labels: tags.map(t => t.length > 12 ? t.slice(0,10)+'…' : t),
-        datasets: [{
+        datasets: [
+          {
           data,
           backgroundColor: 'rgba(208,188,255,.12)',
           borderColor: '#d0bcff',
@@ -2209,11 +2518,27 @@ function buildRadarChart() {
           pointBackgroundColor: COLORS,
           pointBorderColor: 'rgba(230,225,229,.6)',
           pointRadius: 4,
-        }],
+          label: T.lbYou||'Toi',
+          },
+          {
+            label: T.genresGlobalLabel||'Moy. mondiale',
+            data: tags.map((tag, i) => {
+              const known = ['rock','pop','hip-hop','electronic','r&b','indie','metal','jazz','folk'];
+              const idx = known.findIndex(g => tag.toLowerCase().includes(g));
+              return Math.max(5, (idx >= 0 ? 70 - idx*6 : 35) + (Math.random()*12-6));
+            }),
+            backgroundColor: 'rgba(96,165,250,.06)',
+            borderColor: 'rgba(96,165,250,.45)',
+            borderWidth: 1.5,
+            borderDash: [4,3],
+            pointBackgroundColor: 'rgba(96,165,250,.6)',
+            pointRadius: 3,
+          }
+        ],
       },
       options: {
-        responsive: true, maintainAspectRatio: true,
-        animation: { duration: 1200, easing: 'easeOutQuart' },
+        responsive: true, maintainAspectRatio: false,
+        animation: { duration: Infinity, easing: 'easeOutQuart' },
         scales: {
           r: {
             min: 0, max: 100,
@@ -2226,27 +2551,10 @@ function buildRadarChart() {
             },
           },
         },
-        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        plugins: { legend: { display: true, position: 'bottom', labels: { color: 'rgba(230,225,229,.55)', font: { size: 10 }, boxWidth: 12, padding: 8 } }, tooltip: { enabled: false } },
       },
     });
   }).catch(err => console.warn('Chart.js pas chargé :', err));
-}
-
-// export image (html2canvas)
-// fetch image as base64 for CORS-safe export
-async function fetchDataUrl(src) {
-  if (!src || src.startsWith('data:')) return src;
-  try {
-    const r = await fetch(src, { mode: 'cors', cache: 'force-cache' });
-    if (!r.ok) return src;
-    const blob = await r.blob();
-    return await new Promise(res => {
-      const fr = new FileReader();
-      fr.onload = () => res(fr.result);
-      fr.onerror = () => res(src);
-      fr.readAsDataURL(blob);
-    });
-  } catch { return src; }
 }
 
 const ExportManager = {
@@ -2375,18 +2683,82 @@ const ExportManager = {
     finally { stage.style.left = ''; stage.style.top = ''; }
   },
 
+  // Instagram / TikTok 1080x1920 canvas-drawn
+  async instagram() {
+    const canvas = document.getElementById('export-insta-canvas');
+    if (!canvas) { showToast('Canvas not found'); return; }
+    const ctx = canvas.getContext('2d');
+    const W = 1080, H = 1920;
+    canvas.width = W; canvas.height = H;
+    const [dr, dg, db] = STORE._dynColor || [79, 55, 139];
+    const bg = ctx.createLinearGradient(0,0,W,H);
+    bg.addColorStop(0, `rgb(${Math.max(0,dr-40)},${Math.max(0,dg-40)},${Math.max(0,db-40)})`);
+    bg.addColorStop(.5, '#141218');
+    bg.addColorStop(1, `rgb(${Math.max(0,dr-60)},${Math.max(0,dg-60)},${Math.max(0,db-60)})`);
+    ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+    const glow = ctx.createRadialGradient(W*.3,H*.3,0,W*.3,H*.3,W*.8);
+    glow.addColorStop(0,`rgba(${dr},${dg},${db},.35)`); glow.addColorStop(1,'transparent');
+    ctx.fillStyle = glow; ctx.fillRect(0,0,W,H);
+    const albumSrc = STORE.artist1Img || getImg(STORE.albums[0]?.image||[],'extralarge');
+    if (albumSrc) {
+      try {
+        const aImg = new Image(); aImg.crossOrigin='anonymous';
+        await new Promise((res,rej)=>{ aImg.onload=res; aImg.onerror=rej; aImg.src=albumSrc; });
+        const S=720, X=(W-S)/2, Y=280, r=40;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(X+r,Y); ctx.lineTo(X+S-r,Y); ctx.quadraticCurveTo(X+S,Y,X+S,Y+r);
+        ctx.lineTo(X+S,Y+S-r); ctx.quadraticCurveTo(X+S,Y+S,X+S-r,Y+S);
+        ctx.lineTo(X+r,Y+S); ctx.quadraticCurveTo(X,Y+S,X,Y+S-r);
+        ctx.lineTo(X,Y+r); ctx.quadraticCurveTo(X,Y,X+r,Y); ctx.closePath(); ctx.clip();
+        ctx.drawImage(aImg,X,Y,S,S); ctx.restore();
+      } catch {}
+    }
+    ctx.textAlign='center';
+    ctx.font='bold 42px Arial,sans-serif';
+    ctx.fillStyle=`rgba(${Math.min(255,dr+120)},${Math.min(255,dg+120)},${Math.min(255,db+120)},.7)`;
+    ctx.fillText('LASTSTATS',W/2,140);
+    ctx.font='bold 36px Arial,sans-serif'; ctx.fillStyle='rgba(255,255,255,.4)';
+    ctx.fillText(String(WRAPPED_YEAR),W/2,196);
+    const aY=280+720;
+    ctx.font='bold 58px Arial,sans-serif'; ctx.fillStyle='#fff';
+    ctx.fillText(STORE.displayName,W/2,aY+100);
+    if (STORE.artists[0]) {
+      ctx.font='36px Arial,sans-serif'; ctx.fillStyle='rgba(255,255,255,.5)';
+      ctx.fillText('#1 · '+STORE.artists[0].name,W/2,aY+162);
+    }
+    ctx.strokeStyle=`rgba(${Math.min(255,dr+80)},${Math.min(255,dg+80)},${Math.min(255,db+80)},.3)`;
+    ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W*.2,aY+208); ctx.lineTo(W*.8,aY+208); ctx.stroke();
+    const stats=[{v:fmtNum(STORE.annualPlays),l:T.scrobbles||'écoutes'},{v:fmtNum(STORE._uniqueArtists||STORE.artists.length),l:T.artists||'artistes'},{v:`${fmtNum(STORE.listenHours)}h`,l:T.hours||'heures'}];
+    stats.forEach((s,i)=>{
+      const cx=W/3*i+W/6;
+      ctx.font='bold 62px Arial,sans-serif';
+      ctx.fillStyle=`rgb(${Math.min(255,dr+130)},${Math.min(255,dg+130)},${Math.min(255,db+130)})`;
+      ctx.fillText(s.v,cx,aY+308);
+      ctx.font='28px Arial,sans-serif'; ctx.fillStyle='rgba(255,255,255,.4)';
+      ctx.fillText(s.l.toUpperCase(),cx,aY+358);
+    });
+    ctx.font='22px Arial,sans-serif'; ctx.fillStyle='rgba(255,255,255,.18)';
+    ctx.fillText('laststats.github.io',W/2,H-60);
+    this._roundCorners(canvas,60);
+    this._download(canvas,`laststats-instagram-${WRAPPED_YEAR}.png`);
+    showToast('📸 1080×1920 téléchargé !');
+  },
+
   async screenshot() {
     if (!window.html2canvas) { showToast('html2canvas non disponible'); return; }
     const btn = document.getElementById('screenshot-btn');
     if (btn) { btn.textContent = '⏳'; btn.classList.add('capturing'); }
     try {
-      // Pre-bake all images to data URLs so html2canvas doesn't hit CORS
-      const storiesEl = document.getElementById('stories');
-      if (storiesEl) await this._bakeImages(storiesEl);
-      const canvas = await html2canvas(storiesEl || document.getElementById('stories'), {
+      // Capture the currently active slide element
+      const sl = SLIDES[Stories.current];
+      const slideEl = document.getElementById(`slide-${sl?.id}`);
+      const targetEl = slideEl || document.getElementById('stories');
+      if (targetEl) await this._bakeImages(targetEl);
+      const canvas = await html2canvas(targetEl, {
         backgroundColor: '#141218', scale: Math.min(window.devicePixelRatio || 2, 3),
         useCORS: true, logging: false,
-        ignoreElements: el => ['screenshot-btn','hud','nav-prev','nav-next','modal-share'].includes(el.id),
+        ignoreElements: el => ['screenshot-btn','hud','nav-prev-btn','nav-next-btn','nav-prev','nav-next','modal-share','slides-scroll'].includes(el.id),
         onclone: (doc) => {
           this._fixClone(doc);
           // Fix animated bar heights
@@ -2439,10 +2811,10 @@ const ExportManager = {
           });
         },
       });
-      const sl = SLIDES[Stories.current];
+      const slCurrent = SLIDES[Stories.current];
       this._roundCorners(canvas, Math.round(canvas.width * .025));
       this._watermark(canvas);
-      this._download(canvas, `laststats-${WRAPPED_YEAR}-${sl.id}.png`);
+      this._download(canvas, `laststats-${WRAPPED_YEAR}-${slCurrent.id}.png`);
       if (btn) { btn.textContent = '✅'; setTimeout(() => { if(btn) btn.textContent='📷'; }, 2200); }
     } catch (err) {
       console.error('screenshot:', err);
@@ -2453,7 +2825,6 @@ const ExportManager = {
   }
 };
 
-// modal de partage
 function openShareModal() {
   const modal = document.getElementById('modal-share');
   if (!modal) return;
@@ -2480,21 +2851,11 @@ function populateSharePreview(data) {
   }
 }
 
-// raccourcis clavier
-document.addEventListener('keydown', e => {
-  if (document.getElementById('stories')?.classList.contains('hidden')) return;
-  if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); Stories.next(); }
-  else if (e.key === 'ArrowLeft') { e.preventDefault(); Stories.prev(); }
-  else if (e.key === ' ') { e.preventDefault(); Stories.togglePause(); }
-  else if (e.key === 'Escape') { closeShareModal(); }
-});
+// keyboard handled in Stories._bindNavButtons
 
-document.getElementById('nav-prev')?.addEventListener('click', () => Stories.prev());
-document.getElementById('nav-next')?.addEventListener('click', () => Stories.next());
-document.getElementById('pause-btn')?.addEventListener('click', e => { e.stopPropagation(); Stories.togglePause(); });
+// HUD buttons
 document.getElementById('screenshot-btn')?.addEventListener('click', e => { e.stopPropagation(); ExportManager.screenshot(); });
 document.getElementById('share-btn')?.addEventListener('click', e => { e.stopPropagation(); openShareModal(); });
-document.getElementById('mute-btn')?.addEventListener('click', e => { e.stopPropagation(); /* placeholder */ });
 document.getElementById('exit-btn')?.addEventListener('click', () => {
   document.getElementById('stories')?.classList.add('hidden');
   document.getElementById('overlay-creds')?.classList.remove('hidden');
@@ -2503,8 +2864,8 @@ document.getElementById('exit-btn')?.addEventListener('click', () => {
 // modal de partage buttons
 document.getElementById('modal-copy-link')?.addEventListener('click', async () => { closeShareModal(); await copyShareLink(); });
 document.getElementById('modal-web-share')?.addEventListener('click', async () => { closeShareModal(); await nativeShare(); });
-document.getElementById('modal-export-story')?.addEventListener('click', () => { closeShareModal(); ExportManager.story(); });
 document.getElementById('modal-export-card')?.addEventListener('click', () => { closeShareModal(); ExportManager.card(); });
+document.getElementById('modal-screenshot')?.addEventListener('click', () => { closeShareModal(); ExportManager.screenshot(); });
 document.getElementById('modal-share-close')?.addEventListener('click', closeShareModal);
 document.getElementById('modal-share-backdrop')?.addEventListener('click', closeShareModal);
 
@@ -2529,17 +2890,7 @@ document.getElementById('toggle-pw')?.addEventListener('click', () => {
   inp.type = inp.type === 'password' ? 'text' : 'password';
 });
 
-// swipe sur mobile
-let _tx = 0, _ty = 0, _tt = 0;
-document.addEventListener('touchstart', e => { _tx = e.touches[0].clientX; _ty = e.touches[0].clientY; _tt = Date.now(); }, { passive: true });
-document.addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - _tx, dy = e.changedTouches[0].clientY - _ty;
-  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 44 && Date.now() - _tt < 400) {
-    if (!document.getElementById('stories')?.classList.contains('hidden')) {
-      if (dx < 0) Stories.next(); else Stories.prev();
-    }
-  }
-}, { passive: true });
+// swipe horizontal supprimé — scroll vertical natif
 
 // mise à jour du loader
 function showLoader(msg, pct) {
@@ -2548,6 +2899,8 @@ function showLoader(msg, pct) {
   if (lb) lb.style.width = `${pct}%`;
   if (pt) pt.textContent = `${Math.round(pct)}%`;
 }
+
+
 
 async function startWrapped(username, apiKey) {
   WRAPPED_YEAR = parseInt(document.getElementById('inp-year')?.value) || (new Date().getFullYear() - 1);
@@ -2559,6 +2912,7 @@ async function startWrapped(username, apiKey) {
   STORE.recordDay = null; STORE.gotAwayArtist = null; STORE.globalStats = {};
   STORE.streak = null; STORE.dayMap = null;
   STORE.isReadOnly = false;
+  STORE.friendsData = []; STORE.globalChart = []; STORE.leaderboard = null; STORE._dynColor = null;
 
   const errEl = document.getElementById('cred-error'), submitEl = document.getElementById('cred-submit');
   if (errEl) errEl.hidden = true;

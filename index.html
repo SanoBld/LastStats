@@ -202,12 +202,27 @@
     </div>
 
     <!-- user profile summary -->
-    <div class="sb-profile" id="sb-profile">
-      <div class="sb-av" id="sb-av"></div>
-      <div class="sb-info">
-        <strong id="sb-name">…</strong>
-        <span id="sb-plays"></span>
-        <span id="sb-country" class="sb-country"></span>
+    <div class="sb-profile-wrap" id="sb-profile-wrap">
+      <button class="sb-profile" id="sb-profile" onclick="toggleProfileBubble()" aria-haspopup="true" aria-expanded="false">
+        <div class="sb-av" id="sb-av"></div>
+        <div class="sb-info">
+          <strong id="sb-name">…</strong>
+          <span id="sb-plays"></span>
+          <span id="sb-country" class="sb-country"></span>
+        </div>
+        <i class="fas fa-chevron-right sb-profile-chevron" id="sb-profile-chevron"></i>
+      </button>
+      <!-- dropdown bubble -->
+      <div class="profile-bubble hidden" id="profile-bubble" role="menu">
+        <button class="pb-item" onclick="openProfilePage()" role="menuitem">
+          <i class="fas fa-user-circle"></i>
+          <span>Voir le profil</span>
+        </button>
+        <div class="pb-sep"></div>
+        <button class="pb-item" onclick="closeProfileBubble(); nav('settings')" role="menuitem">
+          <i class="fas fa-cog"></i>
+          <span>Paramètres</span>
+        </button>
       </div>
     </div>
 
@@ -1192,7 +1207,83 @@
         </div>
       </section>
 
-      
+      <!-- ═══ PROFILE ═══ -->
+      <section id="s-profile" class="app-sec" style="view-transition-name:section-profile">
+
+        <div class="profile-back-bar hidden" id="profile-back-bar">
+          <button class="profile-back-btn" onclick="profileGoBack()">
+            <i class="fas fa-arrow-left"></i>
+            <span>Retour</span>
+          </button>
+          <span class="profile-back-label" id="profile-back-label"></span>
+        </div>
+
+        <!-- Hero : fond flou (photo de profil par défaut, artiste si dispo) + avatar centré -->
+        <div class="profile-hero" id="profile-hero">
+          <div class="profile-hero-bg" id="profile-hero-bg"></div>
+          <div class="profile-hero-overlay"></div>
+          <div class="profile-hero-content">
+            <div class="profile-av-wrap">
+              <div class="profile-av" id="profile-av"></div>
+              <div class="profile-now-dot hidden" id="profile-now-dot" title="Now playing"></div>
+            </div>
+            <h2 class="profile-username" id="profile-username">—</h2>
+            <span class="profile-country" id="profile-country"></span>
+            <span class="profile-since" id="profile-since"></span>
+          </div>
+        </div>
+
+        <!-- Chips de stats -->
+        <div class="profile-stats-row" id="profile-stats-row">
+          <div class="profile-stat-chip sk" id="pstat-scrobbles"><div class="sk-ln w60"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="profile-stat-chip sk" id="pstat-avg">      <div class="sk-ln w60"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="profile-stat-chip sk" id="pstat-peryear">  <div class="sk-ln w60"></div><div class="sk-ln w40 mt4"></div></div>
+          <div class="profile-stat-chip sk" id="pstat-days">     <div class="sk-ln w60"></div><div class="sk-ln w40 mt4"></div></div>
+        </div>
+
+        <!-- Sélecteur de période -->
+        <div class="profile-period-bar">
+          <span class="profile-period-lbl">Période</span>
+          <div class="period-sel" id="prd-profile">
+            <button class="prd active" data-p="7day">7d</button>
+            <button class="prd" data-p="1month">1M</button>
+            <button class="prd" data-p="3month">3M</button>
+            <button class="prd" data-p="overall">All</button>
+          </div>
+        </div>
+
+        <!-- Now playing -->
+        <div id="profile-np-wrap" class="hidden">
+          <div class="profile-np-bar">
+            <div class="np-pulse"></div>
+            <div class="np-art" id="profile-np-art"></div>
+            <div class="np-info">
+              <span class="np-live">● NOW PLAYING</span>
+              <strong id="profile-np-track">—</strong>
+              <span id="profile-np-artist">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top 3 cartes -->
+        <div class="profile-top3-grid" id="profile-top3-grid">
+          <div class="profile-top-card sk" id="ptop-artist"><div class="sk-ln w80"></div><div class="sk-ln w50 mt8"></div></div>
+          <div class="profile-top-card sk" id="ptop-album"> <div class="sk-ln w80"></div><div class="sk-ln w50 mt8"></div></div>
+          <div class="profile-top-card sk" id="ptop-track"> <div class="sk-ln w80"></div><div class="sk-ln w50 mt8"></div></div>
+        </div>
+
+        <!-- Top 5 titres -->
+        <div class="profile-section-hd"><i class="fas fa-music"></i> Top 5 titres</div>
+        <div class="profile-tracks-list" id="profile-tracks-list">
+          <div class="profile-track-sk sk"><div class="sk-ln w100"></div></div>
+          <div class="profile-track-sk sk"><div class="sk-ln w90"></div></div>
+          <div class="profile-track-sk sk"><div class="sk-ln w80"></div></div>
+          <div class="profile-track-sk sk"><div class="sk-ln w85"></div></div>
+          <div class="profile-track-sk sk"><div class="sk-ln w70"></div></div>
+        </div>
+
+      </section>
+
       <section id="s-settings" class="app-sec" style="view-transition-name:section-settings">
         <div class="sec-hd">
           <h2>

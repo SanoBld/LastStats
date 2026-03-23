@@ -832,6 +832,7 @@ const NAV_TITLE_KEYS = {
   wrapped:       'nav_wrapped',
   compare:       'nav_compare',
   settings:      'nav_settings',
+  profile:       'nav_profile',
 };
 
 function setLanguage(lang) {
@@ -1075,6 +1076,7 @@ function nav(section) {
     if (section === 'obscurity') loadObscurityScore();
     if (section === 'history')   histLoadDay(APP.histCurrentDate || _todayStr());
     if (section === 'compare')   initComparePage();
+    if (section === 'profile')   _initProfilePeriodButtons();
   };
 
   if (document.startViewTransition) {
@@ -1118,6 +1120,314 @@ function setupProfileUI() {
   setText('sb-plays',   formatNum(u.playcount) + ' ' + t('scrobbles'));
   if (u.country) setText('sb-country', u.country);
   setText('hd-mini-user', '@' + (u.name || APP.username));
+}
+
+/* ─── Profile bubble (sidebar dropdown) ─── */
+
+let _profileBubbleOpen = false;
+
+function toggleProfileBubble() {
+  _profileBubbleOpen ? closeProfileBubble() : openProfileBubble();
+}
+
+function openProfileBubble() {
+  const bubble = document.getElementById('profile-bubble');
+  const btn    = document.getElementById('sb-profile');
+  if (!bubble) return;
+  bubble.classList.remove('hidden');
+  requestAnimationFrame(() => bubble.classList.add('pb-visible'));
+  btn?.setAttribute('aria-expanded', 'true');
+  _profileBubbleOpen = true;
+  setTimeout(() => document.addEventListener('click', _bubbleOutsideClick, { once: true }), 0);
+}
+
+function closeProfileBubble() {
+  const bubble = document.getElementById('profile-bubble');
+  const btn    = document.getElementById('sb-profile');
+  if (!bubble) return;
+  bubble.classList.remove('pb-visible');
+  setTimeout(() => bubble.classList.add('hidden'), 180);
+  btn?.setAttribute('aria-expanded', 'false');
+  _profileBubbleOpen = false;
+}
+
+function _bubbleOutsideClick(e) {
+  const wrap = document.getElementById('sb-profile-wrap');
+  if (wrap && !wrap.contains(e.target)) closeProfileBubble();
+}
+
+/* ─── Profile section ─── */
+
+// Stocke les données de l'ami en cours de consultation (évite JSON.stringify dans onclick)
+let _profileUsername   = null;
+let _profileFriendInfo = null;
+let _profileCameFrom   = null; // section de retour
+
+function openProfilePage(username, friendInfoKey) {
+  closeProfileBubble();
+  if (window.innerWidth <= 1024) closeSb();
+
+  _profileUsername = username || null;
+  // Si friendInfoKey est fourni, récupérer dans le cache global
+  _profileFriendInfo = friendInfoKey ? (window._vsProfileCache?.[friendInfoKey] || null) : null;
+  _profileCameFrom   = username && username !== APP.username ? 'compare' : null;
+
+  const backBar   = document.getElementById('profile-back-bar');
+  const backLabel = document.getElementById('profile-back-label');
+  if (backBar) {
+    if (_profileCameFrom) {
+      backBar.classList.remove('hidden');
+      if (backLabel) backLabel.textContent = username;
+    } else {
+      backBar.classList.add('hidden');
+    }
+  }
+
+  nav('profile');
+  loadProfileSection(_profileUsername || APP.username, _profileFriendInfo);
+}
+
+function profileGoBack() {
+  nav(_profileCameFrom || 'dashboard');
+}
+
+function _initProfilePeriodButtons() {
+  const sel = document.getElementById('prd-profile');
+  if (!sel || sel.dataset.bound === '1') return;
+  sel.dataset.bound = '1';
+  sel.querySelectorAll('.prd').forEach(btn => {
+    btn.addEventListener('click', () => {
+      sel.querySelectorAll('.prd').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      _loadProfileTopData(_profileUsername || APP.username, btn.dataset.p);
+    });
+  });
+}
+
+async function loadProfileSection(username, userInfoObj) {
+  _profileSkeletons();
+  const isOwn = !username || username === APP.username;
+
+  try {
+    const resolvedInfo = userInfoObj
+      || (isOwn ? APP.userInfo : null)
+      || await _apiFetchUser('user.getInfo', username, {}).then(d => d?.user || null);
+
+    _renderProfileHero(username, resolvedInfo);
+    _renderProfileStats(resolvedInfo);
+
+    await Promise.all([
+      _loadProfileTopData(username, '7day'),
+      _loadProfileNowPlaying(username),
+    ]);
+  } catch (e) {
+    showToast('Erreur profil : ' + e.message, 'error');
+  }
+}
+
+function _profileSkeletons() {
+  ['pstat-scrobbles','pstat-avg','pstat-peryear','pstat-days',
+   'ptop-artist','ptop-album','ptop-track'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.classList.add('sk'); el.innerHTML = '<div class="sk-ln w70"></div><div class="sk-ln w40 mt4"></div>'; }
+  });
+  const tl = document.getElementById('profile-tracks-list');
+  if (tl) tl.innerHTML = [1,2,3,4,5].map(() =>
+    '<div class="profile-track-sk sk"><div class="sk-ln w100"></div></div>'
+  ).join('');
+  document.getElementById('profile-np-wrap')?.classList.add('hidden');
+}
+
+function _renderProfileHero(username, ui) {
+  const letter = (username || '?')[0].toUpperCase();
+  const grad   = nameToGradient(username);
+
+  // Image de profil (priorité : extralarge > large > medium)
+  const imgUrl = ui?.image?.find(i => i.size === 'extralarge')?.['#text']
+              || ui?.image?.find(i => i.size === 'large')?.['#text']
+              || ui?.image?.find(i => i.size === 'medium')?.['#text'] || '';
+
+  // Fond flou : photo de profil par défaut
+  const bgEl = document.getElementById('profile-hero-bg');
+  if (bgEl) {
+    if (imgUrl && !isDefaultImg(imgUrl)) {
+      bgEl.style.backgroundImage = `url('${imgUrl}')`;
+    } else {
+      bgEl.style.backgroundImage = '';
+      bgEl.style.background      = grad;
+    }
+  }
+
+  // Avatar centré
+  const avEl = document.getElementById('profile-av');
+  if (avEl) {
+    if (imgUrl && !isDefaultImg(imgUrl)) {
+      avEl.innerHTML = `<img src="${imgUrl}" alt="${escHtml(username)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    } else {
+      avEl.innerHTML = `<div style="width:100%;height:100%;background:${grad};display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:2.2rem">${letter}</div>`;
+    }
+  }
+
+  const _set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  _set('profile-username', username || '—');
+  _set('profile-country',  ui?.country || '');
+
+  if (ui?.registered?.unixtime) {
+    const reg   = new Date(parseInt(ui.registered.unixtime) * 1000);
+    const years = ((Date.now() - reg) / (1000*60*60*24*365.25)).toFixed(1);
+    _set('profile-since', `Membre depuis ${reg.getFullYear()} · ${years} ans`);
+  }
+}
+
+function _renderProfileStats(ui) {
+  if (!ui) return;
+  const total     = parseInt(ui.playcount || 0);
+  const regTs     = parseInt(ui.registered?.unixtime || 0);
+  const days      = regTs ? Math.floor((Date.now()/1000 - regTs) / 86400) : 1;
+  const avgDay    = Math.round(total / Math.max(days, 1));
+  const years     = days / 365.25;
+  const perYear   = Math.round(total / Math.max(years, 0.1));
+
+  const _chip = (id, icon, val, lbl) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('sk');
+    el.innerHTML = `<i class="fas fa-${icon}"></i><strong>${val}</strong><span>${lbl}</span>`;
+  };
+  _chip('pstat-scrobbles', 'headphones',     formatNum(total),   'Scrobbles');
+  _chip('pstat-avg',       'chart-line',     '~' + avgDay,       'par jour');
+  _chip('pstat-peryear',   'calendar-check', formatNum(perYear), 'par an');
+  _chip('pstat-days',      'calendar-alt',   formatNum(days),    'jours actifs');
+}
+
+async function _loadProfileTopData(username, period) {
+  ['ptop-artist','ptop-album','ptop-track'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.classList.add('sk'); el.innerHTML = '<div class="sk-ln w80"></div><div class="sk-ln w50 mt8"></div>'; }
+  });
+  const trackList = document.getElementById('profile-tracks-list');
+  if (trackList) trackList.innerHTML = [1,2,3,4,5].map(() =>
+    '<div class="profile-track-sk sk"><div class="sk-ln w100"></div></div>'
+  ).join('');
+
+  try {
+    const [artistsData, albumsData, tracksData] = await Promise.all([
+      _apiFetchUser('user.getTopArtists', username, { period, limit: 1 }),
+      _apiFetchUser('user.getTopAlbums',  username, { period, limit: 1 }),
+      _apiFetchUser('user.getTopTracks',  username, { period, limit: 5 }),
+    ]);
+
+    const rawArtist = artistsData?.topartists?.artist;
+    const artist    = Array.isArray(rawArtist) ? rawArtist[0] : rawArtist;
+
+    const rawAlbum  = albumsData?.topalbums?.album;
+    const album     = Array.isArray(rawAlbum) ? rawAlbum[0] : rawAlbum;
+
+    const rawTracks = tracksData?.toptracks?.track || [];
+    const tracks    = Array.isArray(rawTracks) ? rawTracks : [rawTracks];
+
+    // Mettre à jour le fond avec l'image de l'artiste #1 (si disponible)
+    if (artist?.name) {
+      _loadArtistBg(artist);
+    }
+
+    _renderProfileTopCard('ptop-artist', 'microphone-alt', 'Artiste #1',
+      artist?.name, artist?.playcount, artist?.image);
+    _renderProfileTopCard('ptop-album',  'compact-disc',   'Album #1',
+      album?.name,  album?.playcount,  album?.image, album?.artist?.name);
+    const t1 = tracks[0];
+    _renderProfileTopCard('ptop-track',  'music',          'Titre #1',
+      t1?.name,     t1?.playcount,     t1?.image,    t1?.artist?.name);
+
+    if (trackList) {
+      trackList.innerHTML = tracks.slice(0, 5).map((tr, i) => {
+        const img  = tr?.image?.find(x => x.size === 'medium')?.['#text'] || '';
+        const imgH = img && !isDefaultImg(img)
+          ? `<img src="${escHtml(img)}" alt="" class="ptrack-img" onerror="this.style.display='none'">`
+          : `<div class="ptrack-img-fallback" style="background:${nameToGradient(tr?.name)}">${(tr?.name||'?')[0]}</div>`;
+        return `<div class="profile-track-row">
+          <span class="ptrack-rank">${i + 1}</span>
+          ${imgH}
+          <div class="ptrack-info">
+            <span class="ptrack-name">${escHtml(tr?.name || '—')}</span>
+            <span class="ptrack-artist">${escHtml(tr?.artist?.name || '—')}</span>
+          </div>
+          <span class="ptrack-plays">${formatNum(tr?.playcount)}</span>
+        </div>`;
+      }).join('');
+    }
+  } catch (e) {
+    console.warn('[Profile] _loadProfileTopData:', e);
+  }
+}
+
+async function _loadArtistBg(artist) {
+  try {
+    // Cherche d'abord dans les images déjà disponibles
+    const imgFromData = artist?.image?.find(x => x.size === 'extralarge')?.['#text']
+                     || artist?.image?.find(x => x.size === 'large')?.['#text'] || '';
+    if (imgFromData && !isDefaultImg(imgFromData)) {
+      const bgEl = document.getElementById('profile-hero-bg');
+      if (bgEl) bgEl.style.backgroundImage = `url('${imgFromData}')`;
+      return;
+    }
+    // Sinon appel artist.getInfo
+    const d   = await _apiFetchUser('artist.getInfo', artist.name, { artist: artist.name, autocorrect: 1 });
+    const img = d?.artist?.image?.find(x => x.size === 'extralarge')?.['#text'] || '';
+    if (img && !isDefaultImg(img)) {
+      const bgEl = document.getElementById('profile-hero-bg');
+      if (bgEl) bgEl.style.backgroundImage = `url('${img}')`;
+    }
+  } catch {}
+}
+
+function _renderProfileTopCard(id, icon, label, name, plays, imageArr, sub) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('sk');
+  const imgRaw = Array.isArray(imageArr)
+    ? imageArr.find(x => x.size === 'extralarge')?.['#text']
+   || imageArr.find(x => x.size === 'large')?.['#text'] || ''
+    : '';
+  const hasImg = imgRaw && !isDefaultImg(imgRaw);
+  const grad   = nameToGradient(name || '?');
+  const letter = (name || '?')[0].toUpperCase();
+
+  el.innerHTML = `
+    <div class="ptc-bg" style="${hasImg ? `background-image:url('${escHtml(imgRaw)}')` : `background:${grad}`}"></div>
+    <div class="ptc-overlay"></div>
+    <div class="ptc-content">
+      <span class="ptc-label"><i class="fas fa-${icon}"></i> ${label}</span>
+      <strong class="ptc-name">${escHtml(name || '—')}</strong>
+      ${sub ? `<span class="ptc-sub">${escHtml(sub)}</span>` : ''}
+      <span class="ptc-plays">${formatNum(plays)} écoutes</span>
+    </div>`;
+}
+
+async function _loadProfileNowPlaying(username) {
+  try {
+    const data   = await _apiFetchUser('user.getRecentTracks', username, { limit: 1 });
+    const tracks = data?.recenttracks?.track;
+    const last   = Array.isArray(tracks) ? tracks[0] : tracks;
+    const wrap   = document.getElementById('profile-np-wrap');
+    const dot    = document.getElementById('profile-now-dot');
+
+    if (last?.['@attr']?.nowplaying) {
+      const img   = last.image?.find(x => x.size === 'medium')?.['#text'] || '';
+      const artEl = document.getElementById('profile-np-art');
+      if (artEl) artEl.innerHTML = img && !isDefaultImg(img)
+        ? `<img src="${escHtml(img)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">`
+        : '';
+      const _set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+      _set('profile-np-track',  last.name || '—');
+      _set('profile-np-artist', last.artist?.['#text'] || last.artist?.name || '—');
+      wrap?.classList.remove('hidden');
+      dot?.classList.remove('hidden');
+    } else {
+      wrap?.classList.add('hidden');
+      dot?.classList.add('hidden');
+    }
+  } catch {}
 }
 
 let _npTimer = null;
@@ -5923,6 +6233,11 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
          <p class="vs-steal-sub">${t('compare_steal_none').replace('{0}', `<strong>${frN}</strong>`)}</p>
        </div>`;
 
+  /* ── Cache ami pour l'accès depuis openProfilePage ── */
+  window._vsProfileCache = window._vsProfileCache || {};
+  const _frCacheKey = 'fr_' + friendName;
+  window._vsProfileCache[_frCacheKey] = frUserInfo;
+
   /* ── ASSEMBLE ── */
   displayEl.innerHTML = `
     <div class="vs-header vs-section">
@@ -5930,6 +6245,9 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
         ${_av(myImg, myGrad, myLetter)}
         <div class="vs-player-name">${myN}</div>
         <div class="vs-player-top3">${myList.slice(0,3).map(a=>`<span class="vs-top3-item">${escHtml(a.name)}</span>`).join('')}</div>
+        <button class="vs-profile-btn" onclick="openProfilePage(${JSON.stringify(APP.username)})">
+          <i class="fas fa-user-circle"></i> Profil
+        </button>
       </div>
       <div class="vs-score-wrap">
         <div class="vs-score-circle">
@@ -5955,6 +6273,9 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
         ${_av(frImg, frGrad, frLetter, ' vs-av--fr')}
         <div class="vs-player-name">${frN}</div>
         <div class="vs-player-top3">${frList.slice(0,3).map(a=>`<span class="vs-top3-item">${escHtml(a.name)}</span>`).join('')}</div>
+        <button class="vs-profile-btn vs-profile-btn--fr" onclick="openProfilePage(${JSON.stringify(friendName)}, ${JSON.stringify(_frCacheKey)})">
+          <i class="fas fa-user-circle"></i> Profil
+        </button>
       </div>
     </div>
 

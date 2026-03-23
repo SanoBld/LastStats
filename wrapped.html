@@ -4,892 +4,242 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#141218">
-  <meta name="description" content="Votre Wrapped Last.fm – découvrez votre année en musique. BÊTA">
-
-  <!-- open graph -->
+  <meta name="description" content="Votre Wrapped Last.fm – découvrez votre année en musique.">
   <meta property="og:type"        content="website">
   <meta property="og:title"       content="Mon Wrapped LastStats">
   <meta property="og:description" content="Découvrez mes stats musicales de l'année !">
   <meta property="og:image"       content="icons/icon-512.png">
-
-  <title>LastStats · Votre Année en Musique BÊTA</title>
-
-  <!-- fonts -->
+  <title>LastStats · Votre Année en Musique</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-
-  <!-- styles -->
   <link rel="stylesheet" href="wrapped.css">
-
-  <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"
           integrity="sha512-ZwR1/gSZM3ai6vCdI+LVF1zSq/5HznD3oD+sCoJrzXJ+yKiralybjReQNVBtxbWI4kFGZOY1uJ/1HyLk3kCOA=="
           crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-  <!-- html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
           integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"
           crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
 
   <!-- overlay 0: language picker -->
   <div id="overlay-lang" class="overlay" role="dialog" aria-modal="true" aria-labelledby="lang-heading">
-    <div class="blob-field">
-      <div class="blob b1"></div>
-      <div class="blob b2"></div>
-      <div class="blob b3"></div>
-    </div>
+    <div class="blob-field"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
     <div class="glass-card lang-card">
       <div class="card-logo" aria-hidden="true">LastStats</div>
       <h1 id="lang-heading" class="card-title">Choose your language</h1>
       <p class="card-sub">Choisissez votre langue / Choose your language</p>
       <div class="lang-grid" role="group" aria-label="Sélection de langue">
-        <button class="lang-btn" data-lang="fr" aria-label="Français">🇫🇷 Français</button>
-        <button class="lang-btn" data-lang="en" aria-label="English">🇬🇧 English</button>
-        <button class="lang-btn" data-lang="es" aria-label="Español">🇪🇸 Español</button>
-        <button class="lang-btn" data-lang="de" aria-label="Deutsch">🇩🇪 Deutsch</button>
-        <button class="lang-btn" data-lang="pt" aria-label="Português">🇵🇹 Português</button>
-        <button class="lang-btn" data-lang="it" aria-label="Italiano">🇮🇹 Italiano</button>
-        <button class="lang-btn" data-lang="ja" aria-label="日本語">🇯🇵 日本語</button>
-        <button class="lang-btn" data-lang="zh" aria-label="中文">🇨🇳 中文</button>
+        <button class="lang-btn" data-lang="fr">🇫🇷 Français</button>
+        <button class="lang-btn" data-lang="en">🇬🇧 English</button>
+        <button class="lang-btn" data-lang="es">🇪🇸 Español</button>
+        <button class="lang-btn" data-lang="de">🇩🇪 Deutsch</button>
+        <button class="lang-btn" data-lang="pt">🇵🇹 Português</button>
+        <button class="lang-btn" data-lang="it">🇮🇹 Italiano</button>
+        <button class="lang-btn" data-lang="ja">🇯🇵 日本語</button>
+        <button class="lang-btn" data-lang="zh">🇨🇳 中文</button>
       </div>
     </div>
   </div>
 
-  <!-- overlay 1: countdown (Wrapped not available yet) -->
+  <!-- overlay 1: countdown -->
   <div id="overlay-wait" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="wait-heading">
-    <div class="blob-field">
-      <div class="blob b1"></div>
-      <div class="blob b2"></div>
-      <div class="blob b3"></div>
-    </div>
+    <div class="blob-field"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
     <div class="glass-card wait-card">
-      <div class="wait-vinyl" aria-hidden="true">
-        <div class="vinyl-disc">
-          <div class="vinyl-label">
-            <span class="vinyl-year" id="wait-target-year">2025</span>
-          </div>
-        </div>
-      </div>
-      <div class="card-logo" aria-hidden="true">LastStats</div>
+      <div class="wait-vinyl"><div class="vinyl-disc"><div class="vinyl-label"><span class="vinyl-year" id="wait-target-year">2025</span></div></div></div>
+      <div class="card-logo">LastStats</div>
       <h1 id="wait-heading" class="card-title">Reviens le 1er janvier</h1>
-      <p class="card-sub" id="wait-sub">
-        Ton Wrapped <span id="wait-year-label">2025</span> sera disponible dès le 1er janvier <span id="wait-next-year">2026</span>.
-      </p>
-
-      <!-- countdown -->
+      <p class="card-sub" id="wait-sub">Ton Wrapped <span id="wait-year-label">2025</span> sera disponible dès le 1er janvier <span id="wait-next-year">2026</span>.</p>
       <div class="countdown" role="timer" aria-live="polite" aria-atomic="true">
-        <div class="countdown-unit">
-          <span class="countdown-num" id="cd-days">--</span>
-          <span class="countdown-lbl" id="cd-days-lbl">Jours</span>
-        </div>
-        <div class="countdown-sep" aria-hidden="true">:</div>
-        <div class="countdown-unit">
-          <span class="countdown-num" id="cd-hours">--</span>
-          <span class="countdown-lbl" id="cd-hours-lbl">Heures</span>
-        </div>
-        <div class="countdown-sep" aria-hidden="true">:</div>
-        <div class="countdown-unit">
-          <span class="countdown-num" id="cd-mins">--</span>
-          <span class="countdown-lbl" id="cd-mins-lbl">Min</span>
-        </div>
-        <div class="countdown-sep" aria-hidden="true">:</div>
-        <div class="countdown-unit">
-          <span class="countdown-num" id="cd-secs">--</span>
-          <span class="countdown-lbl" id="cd-secs-lbl">Sec</span>
-        </div>
+        <div class="countdown-unit"><span class="countdown-num" id="cd-days">--</span><span class="countdown-lbl" id="cd-days-lbl">Jours</span></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-unit"><span class="countdown-num" id="cd-hours">--</span><span class="countdown-lbl" id="cd-hours-lbl">Heures</span></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-unit"><span class="countdown-num" id="cd-mins">--</span><span class="countdown-lbl" id="cd-mins-lbl">Min</span></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-unit"><span class="countdown-num" id="cd-secs">--</span><span class="countdown-lbl" id="cd-secs-lbl">Sec</span></div>
       </div>
-
-      <!-- past years -->
       <div class="wait-archives" id="wait-archives" hidden>
         <p class="wait-archives-label" id="wait-archives-label">Explorer les années précédentes ↓</p>
         <div class="wait-archives-grid" id="wait-archives-list"></div>
       </div>
-
       <a href="index.html" class="btn-ghost" id="wait-back">← Retour à LastStats</a>
     </div>
   </div>
 
-  <!-- overlay 2: login + year picker -->
+  <!-- overlay 2: login -->
   <div id="overlay-creds" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="cred-heading">
-    <div class="blob-field">
-      <div class="blob b1"></div>
-      <div class="blob b2"></div>
-      <div class="blob b3"></div>
-    </div>
+    <div class="blob-field"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
     <div class="glass-card cred-card">
-      <div class="card-logo" aria-hidden="true">LastStats</div>
+      <div class="card-logo">LastStats</div>
       <h1 id="cred-heading" class="card-title">Ton Année<br>en Musique</h1>
       <p class="card-sub" id="cred-desc">Connecte-toi pour générer ton Wrapped personnalisé.</p>
-
       <div class="cred-fields">
-        <!-- username -->
         <div class="field-group">
           <label for="inp-user" id="lbl-user" class="field-label">Nom d'utilisateur Last.fm</label>
           <div class="field-wrap">
-            <span class="field-icon" aria-hidden="true">♪</span>
-            <input id="inp-user" class="field-input" type="text"
-                   placeholder="votre_pseudo"
-                   autocomplete="username"
-                   autocorrect="off"
-                   autocapitalize="off"
-                   spellcheck="false">
+            <span class="field-icon">♪</span>
+            <input id="inp-user" class="field-input" type="text" placeholder="votre_pseudo" autocomplete="username" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
         </div>
-
-        <!-- API key -->
         <div class="field-group">
           <label for="inp-key" id="lbl-key" class="field-label">
             Clé API
-            <a href="https://www.last.fm/api/account/create"
-               target="_blank" rel="noopener noreferrer"
-               class="field-link" id="lbl-key-get"
-               aria-label="Obtenir une clé API Last.fm (ouvre une nouvelle fenêtre)">Obtenir ↗</a>
+            <a href="https://www.last.fm/api/account/create" target="_blank" rel="noopener noreferrer" class="field-link" id="lbl-key-get">Obtenir ↗</a>
           </label>
           <div class="field-wrap">
-            <span class="field-icon" aria-hidden="true">⚿</span>
-            <input id="inp-key" class="field-input" type="password"
-                   placeholder="32 caractères hex"
-                   autocomplete="off"
-                   spellcheck="false">
+            <span class="field-icon">⚿</span>
+            <input id="inp-key" class="field-input" type="password" placeholder="32 caractères hex" autocomplete="off" spellcheck="false">
             <button class="field-toggle-pw" id="toggle-pw" type="button" aria-label="Afficher/masquer la clé">👁</button>
           </div>
         </div>
-
-        <!-- Sélecteur d'année -->
         <div class="field-group">
           <label for="inp-year" id="lbl-year" class="field-label">Année</label>
           <div class="field-wrap year-wrap">
-            <span class="field-icon" aria-hidden="true">◷</span>
+            <span class="field-icon">◷</span>
             <select id="inp-year" class="field-select" aria-describedby="year-hint"></select>
-            <span class="year-badge" id="year-badge" aria-hidden="true"></span>
+            <span class="year-badge" id="year-badge"></span>
           </div>
           <p class="field-hint" id="year-hint"></p>
         </div>
       </div>
-
-      <!-- Remember me -->
       <label class="toggle-row">
         <input id="inp-remember" type="checkbox" checked>
-        <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+        <span class="toggle-track"><span class="toggle-thumb"></span></span>
         <span id="lbl-remember">Se souvenir de moi</span>
       </label>
-
-      <!-- CTA -->
       <button id="cred-submit" class="btn-primary" type="button">
         <span id="cred-submit-txt">Lancer mon Wrapped ✦</span>
-        <span class="btn-shimmer" aria-hidden="true"></span>
+        <span class="btn-shimmer"></span>
       </button>
-
-      <!-- Erreur -->
       <p id="cred-error" class="error-msg" role="alert" hidden></p>
-
-      <!-- Footer row -->
       <div class="cred-footer-row">
         <a href="index.html" class="btn-ghost" id="lbl-back">← Retour à LastStats</a>
-        <button class="btn-icon" id="lang-change-btn" type="button" aria-label="Changer de langue">🌐 Langue</button>
+        <button class="btn-icon" id="lang-change-btn" type="button">🌐 Langue</button>
       </div>
     </div>
   </div>
 
   <!-- overlay 3: loading -->
   <div id="overlay-loading" class="overlay hidden" role="status" aria-live="polite" aria-atomic="true">
-    <div class="blob-field">
-      <div class="blob b1"></div>
-      <div class="blob b2"></div>
-      <div class="blob b3"></div>
-    </div>
-    <div class="loader-content">
-      <div class="card-logo" aria-hidden="true">LastStats</div>
-
-      <!-- Visualiseur audio animé -->
-      <div class="audio-bars" aria-hidden="true">
-        <span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span>
+    <div class="blob-field"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+    <div class="glass-card load-card">
+      <div class="card-logo">LastStats</div>
+      <div class="load-vinyl-wrap" aria-hidden="true">
+        <div class="vinyl-disc load-vinyl"><div class="vinyl-label"></div></div>
       </div>
-
-      <p class="loader-text" id="loader-text">Connexion à Last.fm…</p>
-
-      <!-- Barre de progression -->
-      <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="loader-progressbar">
-        <div class="progress-fill" id="loader-bar"></div>
-        <span class="progress-pct" id="loader-pct">0%</span>
+      <p class="load-text" id="loader-text">Chargement…</p>
+      <div class="load-bar-track" role="progressbar" id="loader-progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="load-bar" id="loader-bar"></div>
       </div>
-
-      <!-- Étapes -->
-      <ol class="loader-steps" id="loader-steps" aria-label="Étapes de chargement">
-        <li class="step" data-step="profile" id="step-profile">
-          <span class="step-dot" aria-hidden="true"></span>
-          <span class="step-label" id="step-profile-lbl">Profil utilisateur</span>
-        </li>
-        <li class="step" data-step="top" id="step-top">
-          <span class="step-dot" aria-hidden="true"></span>
-          <span class="step-label" id="step-top-lbl">Top artistes &amp; titres</span>
-        </li>
-        <li class="step" data-step="images" id="step-images">
-          <span class="step-dot" aria-hidden="true"></span>
-          <span class="step-label" id="step-images-lbl">Pochettes &amp; visuels</span>
-        </li>
-        <li class="step" data-step="history" id="step-history">
-          <span class="step-dot" aria-hidden="true"></span>
-          <span class="step-label" id="step-history-lbl">Analyse temporelle</span>
-        </li>
-        <li class="step" data-step="compare" id="step-compare">
-          <span class="step-dot" aria-hidden="true"></span>
-          <span class="step-label" id="step-compare-lbl">Données communautaires</span>
-        </li>
+      <span class="load-pct" id="loader-pct">0%</span>
+      <ol class="load-steps" aria-label="Étapes de chargement">
+        <li class="step" id="step-profile"><span class="step-dot"></span><span class="step-label" id="step-profile-lbl">Profil utilisateur</span></li>
+        <li class="step" id="step-top"><span class="step-dot"></span><span class="step-label" id="step-top-lbl">Top artistes &amp; titres</span></li>
+        <li class="step" id="step-images"><span class="step-dot"></span><span class="step-label" id="step-images-lbl">Pochettes &amp; visuels</span></li>
+        <li class="step" id="step-social"><span class="step-dot"></span><span class="step-label" id="step-social-lbl">Contexte social &amp; mondial</span></li>
+        <li class="step" id="step-history"><span class="step-dot"></span><span class="step-label" id="step-history-lbl">Analyse temporelle</span></li>
+        <li class="step" id="step-compare"><span class="step-dot"></span><span class="step-label" id="step-compare-lbl">Finalisation visuelle</span></li>
       </ol>
     </div>
   </div>
 
-  <!-- overlay 4: shared view — shown when ?share= is in the URL -->
+  <!-- overlay 4: shared view -->
   <div id="overlay-share-view" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="share-heading">
-    <div class="blob-field">
-      <div class="blob b1"></div>
-      <div class="blob b2"></div>
-      <div class="blob b3"></div>
-    </div>
+    <div class="blob-field"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
     <div class="glass-card share-preview-card">
-      <div class="card-logo" aria-hidden="true">LastStats</div>
+      <div class="card-logo">LastStats</div>
       <h1 id="share-heading" class="card-title">Wrapped partagé</h1>
       <p class="card-sub" id="share-sub">Tu consultes le Wrapped d'un·e autre utilisateur·rice.</p>
-
       <div class="share-preview-info" id="share-preview-info">
-        <!-- Rempli par JS : avatar, nom, année, stats -->
         <div class="share-avatar-wrap">
           <img id="share-avatar" class="share-avatar" src="" alt="" loading="lazy">
-          <div class="share-avatar-ring" aria-hidden="true"></div>
+          <div class="share-avatar-ring"></div>
         </div>
         <div class="share-meta">
           <strong class="share-username" id="share-username">—</strong>
           <span class="share-year-tag" id="share-year-tag">—</span>
         </div>
-        <dl class="share-quick-stats" id="share-quick-stats">
-          <!-- Injecté par JS -->
-        </dl>
+        <dl class="share-quick-stats" id="share-quick-stats"></dl>
       </div>
-
       <button id="share-enter-btn" class="btn-primary" type="button">
         <span id="share-enter-txt">Voir le Wrapped ✦</span>
-        <span class="btn-shimmer" aria-hidden="true"></span>
+        <span class="btn-shimmer"></span>
       </button>
       <a href="./wrapped.html" class="btn-ghost" id="share-own-link">Créer mon Wrapped →</a>
     </div>
   </div>
 
-  <!-- STORIES : Conteneur principal des slides -->
+  <!-- MAIN WRAPPED — layout scrollable pleine largeur -->
   <main id="stories" class="hidden" role="main" aria-label="Wrapped annuel">
-
-    <!-- Ambiance et effets de fond -->
     <div id="ambient" aria-hidden="true"></div>
+    <div id="dyn-bg" aria-hidden="true"></div>
     <canvas id="particle-canvas" aria-hidden="true"></canvas>
     <div id="grain" aria-hidden="true"></div>
 
-    <!-- HUD : barre de progression + contrôles -->
-    <header id="hud" role="navigation" aria-label="Navigation stories">
-      <div id="progress-bars" role="progressbar" aria-label="Progression des slides" aria-valuemin="0" aria-valuemax="100"></div>
+    <header id="hud" role="navigation" aria-label="Navigation Wrapped">
+      <div class="hud-nav">
+        <button id="nav-prev-btn" class="hud-arrow" aria-label="Précédent">&#8249;</button>
+        <span id="slide-counter" class="hud-counter">1 / 15</span>
+        <button id="nav-next-btn" class="hud-arrow" aria-label="Suivant">&#8250;</button>
+      </div>
       <div class="hud-controls">
-        <button id="pause-btn"      class="hud-btn" aria-label="Pause / Lecture"  title="Espace">⏸</button>
-        <button id="mute-btn"       class="hud-btn" aria-label="Activer le son"   title="M" aria-pressed="true">🔇</button>
-        <button id="screenshot-btn" class="hud-btn screenshot-btn" aria-label="Capturer cette slide" title="S">📷</button>
-        <button id="share-btn"      class="hud-btn share-hud-btn"  aria-label="Partager mon Wrapped"  title="P">↗</button>
-        <button id="exit-btn"       class="hud-btn exit-btn"        aria-label="Quitter le Wrapped"   title="Échap">✕</button>
+        <button id="screenshot-btn" class="hud-btn" aria-label="Capturer">📷</button>
+        <button id="share-btn"      class="hud-btn" aria-label="Partager">↗</button>
+        <button id="exit-btn"       class="hud-btn" aria-label="Quitter">✕</button>
       </div>
     </header>
 
-    <!-- Navigation latérale -->
-    <button id="nav-prev" class="nav-zone" aria-label="Slide précédente"></button>
-    <button id="nav-next" class="nav-zone" aria-label="Slide suivante"></button>
+    <!-- Scroll container — all slides stacked vertically -->
+    <div id="slides-scroll">
+      <div id="slides-container" aria-live="polite"></div>
+    </div>
+  </main>
 
-    <!-- ─────────────────────────────────────────────
-         SLIDES
-    ───────────────────────────────────────────── -->
-    <div id="slides-container" aria-live="polite">
-      <!-- SLIDE 0 : Intro / Couverture -->
-      <section class="slide slide--intro" data-slide-id="intro" aria-label="Introduction">
-        <div class="slide-bg-art" aria-hidden="true">
-          <div class="intro-bg-img" id="intro-bg"></div>
-          <div class="intro-vignette"></div>
-        </div>
-        <div class="slide-content intro-content">
-          <div class="intro-eyebrow" id="intro-eyebrow">Votre Année en Musique</div>
-          <h2 class="intro-username" id="intro-username">—</h2>
-          <div class="intro-year-badge" id="intro-year">2024</div>
-          <div class="intro-divider" aria-hidden="true"></div>
-          <p class="intro-tagline" id="intro-tagline">
-            <span id="intro-scrobbles" class="highlight-num">0</span>
-            <span id="intro-tagline-suffix"> écoutes. Une histoire.</span>
-          </p>
-          <div class="intro-scroll-hint" aria-hidden="true">
-            <span></span><span></span><span></span>
-          </div>
-        </div>
-        <!-- Badge mode lecture seule -->
-        <div class="readonly-badge hidden" id="readonly-badge" aria-label="Mode lecture seule">
-          <span>👁 Vue partagée</span>
-        </div>
-      </section>
-      <!-- SLIDE 1 : En chiffres -->
-      <section class="slide slide--numbers" data-slide-id="numbers" aria-label="Stats globales">
-        <div class="slide-header">
-          <span class="slide-label" id="sl-numbers-eyebrow">En chiffres</span>
-          <h2 class="slide-title" id="sl-numbers-title">Ton année en stats</h2>
-        </div>
-        <div class="numbers-grid" id="numbers-grid">
-          <div class="stat-card stat-card--xl" id="stat-scrobbles">
-            <span class="stat-value" id="stat-scrobbles-val">—</span>
-            <span class="stat-label" id="stat-scrobbles-lbl">Écoutes</span>
-          </div>
-          <div class="stat-card" id="stat-artists">
-            <span class="stat-value" id="stat-artists-val">—</span>
-            <span class="stat-label" id="stat-artists-lbl">Artistes</span>
-          </div>
-          <div class="stat-card" id="stat-albums">
-            <span class="stat-value" id="stat-albums-val">—</span>
-            <span class="stat-label" id="stat-albums-lbl">Albums</span>
-          </div>
-          <div class="stat-card" id="stat-tracks">
-            <span class="stat-value" id="stat-tracks-val">—</span>
-            <span class="stat-label" id="stat-tracks-lbl">Titres distincts</span>
-          </div>
-          <div class="stat-card stat-card--wide" id="stat-minutes">
-            <span class="stat-value" id="stat-minutes-val">—</span>
-            <span class="stat-label" id="stat-minutes-lbl">Minutes d'écoute estimées</span>
-          </div>
-          <div class="stat-card stat-card--wide" id="stat-days">
-            <span class="stat-value" id="stat-days-val">—</span>
-            <span class="stat-label" id="stat-days-lbl">Jours d'activité</span>
-          </div>
-        </div>
-      </section>
-      <!-- SLIDE 2 : Top Artistes -->
-      <section class="slide slide--top-artists" data-slide-id="top-artists" aria-label="Top artistes">
-        <div class="slide-header">
-          <span class="slide-label" id="sl-artists-eyebrow">Classement</span>
-          <h2 class="slide-title" id="sl-artists-title">Tes artistes</h2>
-        </div>
-        <div class="podium-container" id="artists-podium">
-          <!-- #1 podium -->
-          <div class="podium-col podium-col--2nd" data-rank="2">
-            <div class="podium-card" id="artist-card-2">
-              <div class="podium-img-wrap">
-                <img class="podium-img" id="artist-img-2" src="" alt="" loading="lazy">
-                <div class="podium-img-overlay" aria-hidden="true"></div>
-              </div>
-              <span class="podium-rank" aria-hidden="true">②</span>
-              <span class="podium-name" id="artist-name-2">—</span>
-              <span class="podium-plays" id="artist-plays-2">— écoutes</span>
-              <div class="podium-global-badge" id="artist-global-2" hidden>
-                <span class="global-badge-text" id="artist-global-txt-2"></span>
-              </div>
-            </div>
-            <div class="podium-bar podium-bar--2nd" aria-hidden="true"><span>2</span></div>
-          </div>
-          <div class="podium-col podium-col--1st" data-rank="1">
-            <div class="podium-card podium-card--1st" id="artist-card-1">
-              <div class="podium-crown" aria-hidden="true">♛</div>
-              <div class="podium-img-wrap">
-                <img class="podium-img" id="artist-img-1" src="" alt="" loading="lazy">
-                <div class="podium-img-overlay" aria-hidden="true"></div>
-              </div>
-              <span class="podium-rank podium-rank--gold" aria-label="Numéro un">①</span>
-              <span class="podium-name" id="artist-name-1">—</span>
-              <span class="podium-plays" id="artist-plays-1">— écoutes</span>
-              <div class="podium-global-badge" id="artist-global-1" hidden>
-                <span class="global-badge-text" id="artist-global-txt-1"></span>
-              </div>
-            </div>
-            <div class="podium-bar podium-bar--1st" aria-hidden="true"><span>1</span></div>
-          </div>
-          <div class="podium-col podium-col--3rd" data-rank="3">
-            <div class="podium-card" id="artist-card-3">
-              <div class="podium-img-wrap">
-                <img class="podium-img" id="artist-img-3" src="" alt="" loading="lazy">
-                <div class="podium-img-overlay" aria-hidden="true"></div>
-              </div>
-              <span class="podium-rank" aria-hidden="true">③</span>
-              <span class="podium-name" id="artist-name-3">—</span>
-              <span class="podium-plays" id="artist-plays-3">— écoutes</span>
-              <div class="podium-global-badge" id="artist-global-3" hidden>
-                <span class="global-badge-text" id="artist-global-txt-3"></span>
-              </div>
-            </div>
-            <div class="podium-bar podium-bar--3rd" aria-hidden="true"><span>3</span></div>
-          </div>
-        </div>
-        <!-- Positions 4 et 5 -->
-        <div class="top-list" id="artists-list-4-5">
-          <div class="top-list-item" id="artist-item-4">
-            <span class="top-list-rank" aria-hidden="true">④</span>
-            <img class="top-list-img" id="artist-img-4" src="" alt="" loading="lazy">
-            <span class="top-list-name" id="artist-name-4">—</span>
-            <span class="top-list-plays" id="artist-plays-4">—</span>
-          </div>
-          <div class="top-list-item" id="artist-item-5">
-            <span class="top-list-rank" aria-hidden="true">⑤</span>
-            <img class="top-list-img" id="artist-img-5" src="" alt="" loading="lazy">
-            <span class="top-list-name" id="artist-name-5">—</span>
-            <span class="top-list-plays" id="artist-plays-5">—</span>
-          </div>
-        </div>
-      </section>
-      <!-- SLIDE 3 : Top Albums -->
-      <section class="slide slide--top-albums" data-slide-id="top-albums" aria-label="Top albums">
-        <div class="slide-header">
-          <span class="slide-label" id="sl-albums-eyebrow">Collection</span>
-          <h2 class="slide-title" id="sl-albums-title">Tes albums</h2>
-        </div>
-        <div class="albums-mosaic" id="albums-mosaic" aria-label="Mosaïque des top albums">
-          <!-- 5 cartes générées par JS -->
-          <div class="mosaic-item mosaic-item--hero" id="album-card-1">
-            <img class="mosaic-img" id="album-img-1" src="" alt="" loading="lazy">
-            <div class="mosaic-info">
-              <span class="mosaic-name" id="album-name-1">—</span>
-              <span class="mosaic-artist" id="album-artist-1">—</span>
-              <span class="mosaic-plays" id="album-plays-1">—</span>
-            </div>
-          </div>
-          <div class="mosaic-item" id="album-card-2">
-            <img class="mosaic-img" id="album-img-2" src="" alt="" loading="lazy">
-            <div class="mosaic-info">
-              <span class="mosaic-name" id="album-name-2">—</span>
-              <span class="mosaic-plays" id="album-plays-2">—</span>
-            </div>
-          </div>
-          <div class="mosaic-item" id="album-card-3">
-            <img class="mosaic-img" id="album-img-3" src="" alt="" loading="lazy">
-            <div class="mosaic-info">
-              <span class="mosaic-name" id="album-name-3">—</span>
-              <span class="mosaic-plays" id="album-plays-3">—</span>
-            </div>
-          </div>
-          <div class="mosaic-item" id="album-card-4">
-            <img class="mosaic-img" id="album-img-4" src="" alt="" loading="lazy">
-            <div class="mosaic-info">
-              <span class="mosaic-name" id="album-name-4">—</span>
-              <span class="mosaic-plays" id="album-plays-4">—</span>
-            </div>
-          </div>
-          <div class="mosaic-item" id="album-card-5">
-            <img class="mosaic-img" id="album-img-5" src="" alt="" loading="lazy">
-            <div class="mosaic-info">
-              <span class="mosaic-name" id="album-name-5">—</span>
-              <span class="mosaic-plays" id="album-plays-5">—</span>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!-- SLIDE 4 : Top Titres -->
-      <section class="slide slide--top-tracks" data-slide-id="top-tracks" aria-label="Top titres">
-        <div class="slide-header">
-          <span class="slide-label" id="sl-tracks-eyebrow">Obsessions</span>
-          <h2 class="slide-title" id="sl-tracks-title">Tes titres</h2>
-        </div>
-        <ol class="tracks-list" id="tracks-list" aria-label="Top 5 titres de l'année">
-          <!-- Rempli par JS : 5 items -->
-          <li class="track-item" id="track-1">
-            <span class="track-rank" aria-hidden="true">01</span>
-            <div class="track-img-wrap">
-              <img class="track-img" id="track-img-1" src="" alt="" loading="lazy">
-            </div>
-            <div class="track-info">
-              <span class="track-title" id="track-title-1">—</span>
-              <span class="track-artist" id="track-artist-1">—</span>
-            </div>
-            <div class="track-bar-wrap" aria-hidden="true">
-              <div class="track-bar" id="track-bar-1" style="--w:100%"></div>
-            </div>
-            <span class="track-plays" id="track-plays-1">—</span>
-          </li>
-          <li class="track-item" id="track-2">
-            <span class="track-rank" aria-hidden="true">02</span>
-            <div class="track-img-wrap">
-              <img class="track-img" id="track-img-2" src="" alt="" loading="lazy">
-            </div>
-            <div class="track-info">
-              <span class="track-title" id="track-title-2">—</span>
-              <span class="track-artist" id="track-artist-2">—</span>
-            </div>
-            <div class="track-bar-wrap" aria-hidden="true">
-              <div class="track-bar" id="track-bar-2" style="--w:80%"></div>
-            </div>
-            <span class="track-plays" id="track-plays-2">—</span>
-          </li>
-          <li class="track-item" id="track-3">
-            <span class="track-rank" aria-hidden="true">03</span>
-            <div class="track-img-wrap">
-              <img class="track-img" id="track-img-3" src="" alt="" loading="lazy">
-            </div>
-            <div class="track-info">
-              <span class="track-title" id="track-title-3">—</span>
-              <span class="track-artist" id="track-artist-3">—</span>
-            </div>
-            <div class="track-bar-wrap" aria-hidden="true">
-              <div class="track-bar" id="track-bar-3" style="--w:60%"></div>
-            </div>
-            <span class="track-plays" id="track-plays-3">—</span>
-          </li>
-          <li class="track-item" id="track-4">
-            <span class="track-rank" aria-hidden="true">04</span>
-            <div class="track-img-wrap">
-              <img class="track-img" id="track-img-4" src="" alt="" loading="lazy">
-            </div>
-            <div class="track-info">
-              <span class="track-title" id="track-title-4">—</span>
-              <span class="track-artist" id="track-artist-4">—</span>
-            </div>
-            <div class="track-bar-wrap" aria-hidden="true">
-              <div class="track-bar" id="track-bar-4" style="--w:45%"></div>
-            </div>
-            <span class="track-plays" id="track-plays-4">—</span>
-          </li>
-          <li class="track-item" id="track-5">
-            <span class="track-rank" aria-hidden="true">05</span>
-            <div class="track-img-wrap">
-              <img class="track-img" id="track-img-5" src="" alt="" loading="lazy">
-            </div>
-            <div class="track-info">
-              <span class="track-title" id="track-title-5">—</span>
-              <span class="track-artist" id="track-artist-5">—</span>
-            </div>
-            <div class="track-bar-wrap" aria-hidden="true">
-              <div class="track-bar" id="track-bar-5" style="--w:30%"></div>
-            </div>
-            <span class="track-plays" id="track-plays-5">—</span>
-          </li>
-        </ol>
-      </section>
-      <!-- SLIDE 5 : Statistiques Comparatives (Global) -->
-      <section class="slide slide--global-compare" data-slide-id="global-compare" aria-label="Comparaison mondiale">
-        <div class="slide-header">
-          <span class="slide-label" id="sl-global-eyebrow">Communauté</span>
-          <h2 class="slide-title" id="sl-global-title">Tu vs le monde</h2>
-        </div>
-        <div class="global-stats-container" id="global-stats-container">
-          <!-- Carte #1 artiste -->
-          <div class="global-card global-card--rank" id="global-rank-card">
-            <div class="global-card-img-wrap">
-              <img id="global-artist-img" class="global-card-img" src="" alt="" loading="lazy">
-            </div>
-            <div class="global-card-body">
-              <p class="global-card-label" id="gc-rank-label">Pour ton artiste #1</p>
-              <p class="global-card-artist" id="gc-artist-name">—</p>
-              <div class="percentile-gauge" id="percentile-gauge" aria-label="Percentile d'écoute">
-                <svg class="gauge-svg" viewBox="0 0 200 110" aria-hidden="true">
-                  <path class="gauge-bg" d="M10,100 A90,90 0 0,1 190,100"/>
-                  <path class="gauge-fill" id="gauge-fill" d="M10,100 A90,90 0 0,1 190,100" stroke-dasharray="0 283"/>
-                  <text class="gauge-pct-text" id="gauge-pct-text" x="100" y="90" text-anchor="middle">—%</text>
-                </svg>
-              </div>
-              <p class="global-card-desc" id="gc-rank-desc">—</p>
-            </div>
-          </div>
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true" hidden><span id="toast-msg"></span></div>
 
-          <!-- Grille de stats globales -->
-          <div class="global-mini-grid" id="global-mini-grid">
-            <div class="global-mini-card" id="gmc-listeners">
-              <span class="gmc-icon" aria-hidden="true">👥</span>
-              <span class="gmc-value" id="gmc-listeners-val">—</span>
-              <span class="gmc-label" id="gmc-listeners-lbl">Auditeurs mondiaux</span>
-            </div>
-            <div class="global-mini-card" id="gmc-scrobbles-global">
-              <span class="gmc-icon" aria-hidden="true">🌍</span>
-              <span class="gmc-value" id="gmc-scrobbles-global-val">—</span>
-              <span class="gmc-label" id="gmc-scrobbles-global-lbl">Écoutes mondiales</span>
-            </div>
-            <div class="global-mini-card" id="gmc-track-plays">
-              <span class="gmc-icon" aria-hidden="true">🎵</span>
-              <span class="gmc-value" id="gmc-track-plays-val">—</span>
-              <span class="gmc-label" id="gmc-track-plays-lbl">Écoutes de ton titre #1</span>
-            </div>
-            <div class="global-mini-card" id="gmc-uniqueness">
-              <span class="gmc-icon" aria-hidden="true">💎</span>
-              <span class="gmc-value" id="gmc-uniqueness-val">—</span>
-              <span class="gmc-label" id="gmc-uniqueness-lbl">Score d'originalité</span>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!-- SLIDE 6 : Habitudes temporelles -->
-      <section class="slide slide--habits" data-slide-id="habits" aria-label="Habitudes d'écoute">
-        <div class="slide-header">
-          <span class="slide-label" id="sl-habits-eyebrow">Rhythme</span>
-          <h2 class="slide-title" id="sl-habits-title">Quand tu écoutes</h2>
-        </div>
-        <div class="habits-layout">
-          <!-- Moment préféré de la journée -->
-          <div class="habit-hero" id="habit-time-hero">
-            <div class="habit-time-ring" aria-hidden="true" id="habit-time-ring">
-              <!-- SVG horloge animée injectée par JS -->
-            </div>
-            <div class="habit-time-info">
-              <span class="habit-time-emoji" id="habit-time-emoji">🌙</span>
-              <span class="habit-time-label" id="habit-time-label">Noctambule</span>
-              <span class="habit-time-sub" id="habit-time-sub">Tu écoutes surtout entre 22h et 2h</span>
-            </div>
-          </div>
-
-          <!-- Jour préféré de la semaine -->
-          <div class="habit-week" id="habit-week">
-            <h3 class="habit-week-title" id="habit-week-title">Jour favori</h3>
-            <div class="week-bars" id="week-bars" aria-label="Activité par jour de la semaine">
-              <!-- 7 barres injectées par JS -->
-            </div>
-          </div>
-
-          <!-- Mois record -->
-          <div class="habit-month" id="habit-month-card">
-            <span class="habit-month-icon" aria-hidden="true">📅</span>
-            <div class="habit-month-info">
-              <span class="habit-month-label" id="hm-label">Mois record</span>
-              <span class="habit-month-value" id="hm-month">—</span>
-              <span class="habit-month-plays" id="hm-plays">— écoutes</span>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!-- SLIDE 7 : Record du jour -->
-      <section class="slide slide--record" data-slide-id="record" aria-label="Record d'écoute">
-        <div class="slide-bg-accent" aria-hidden="true"></div>
-        <div class="slide-header">
-          <span class="slide-label" id="sl-record-eyebrow">Record</span>
-          <h2 class="slide-title" id="sl-record-title">Ton jour légendaire</h2>
-        </div>
-        <div class="record-layout">
-          <div class="record-date-wrap">
-            <div class="record-date" id="record-date">
-              <span class="record-day" id="record-day">—</span>
-              <span class="record-month-year" id="record-month-year">—</span>
-            </div>
-            <div class="record-badge" aria-hidden="true">🏆</div>
-          </div>
-          <div class="record-stat-wrap">
-            <span class="record-num" id="record-num">—</span>
-            <span class="record-unit" id="record-unit">écoutes en 24h</span>
-          </div>
-          <!-- Mini graphique intraday -->
-          <div class="record-mini-chart-wrap" id="record-mini-chart-wrap" aria-hidden="true">
-            <canvas id="record-mini-chart" width="320" height="80"></canvas>
-          </div>
-          <!-- Top 3 titres du jour record -->
-          <div class="record-top-tracks" id="record-top-tracks">
-            <h3 class="record-top-label" id="record-top-label">Ce jour-là tu écoutais</h3>
-            <ul class="record-track-list" id="record-track-list">
-  
-            </ul>
-          </div>
-        </div>
-      </section>
-      <!-- SLIDE 8 : The One That Got Away -->
-      <section class="slide slide--got-away" data-slide-id="got-away" aria-label="Artiste oublié">
-        <div class="got-away-bg" aria-hidden="true" id="got-away-bg"></div>
-        <div class="slide-content got-away-content">
-          <span class="slide-label" id="sl-got-away-eyebrow">Nostalgie</span>
-          <h2 class="slide-title got-away-title" id="sl-got-away-title">The One That<br>Got Away</h2>
-          <div class="got-away-card" id="got-away-card">
-            <div class="got-away-img-wrap">
-              <img id="got-away-img" class="got-away-img" src="" alt="" loading="lazy">
-              <div class="got-away-img-fade" aria-hidden="true"></div>
-            </div>
-            <div class="got-away-info">
-              <span class="got-away-artist" id="got-away-artist">—</span>
-              <p class="got-away-desc" id="got-away-desc">—</p>
-              <div class="got-away-timeline" id="got-away-timeline" aria-label="Évolution des écoutes">
-                <div class="timeline-half">
-                  <span class="timeline-label" id="tl-before-lbl">Jan – Juin</span>
-                  <span class="timeline-val" id="tl-before-val">— écoutes</span>
-                  <div class="timeline-bar timeline-bar--before" id="tl-before-bar"></div>
-                </div>
-                <div class="timeline-arrow" aria-hidden="true">→</div>
-                <div class="timeline-half">
-                  <span class="timeline-label" id="tl-after-lbl">Juil – Déc</span>
-                  <span class="timeline-val" id="tl-after-val">— écoutes</span>
-                  <div class="timeline-bar timeline-bar--after" id="tl-after-bar"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <p class="got-away-footnote" id="got-away-footnote">L'artiste que tu as abandonné·e en route…</p>
-        </div>
-      </section>
-      <!-- SLIDE 9 : Évolution des Genres -->
-      <section class="slide slide--genres" data-slide-id="genres" aria-label="Évolution des genres musicaux">
-        <div class="slide-header">
-          <span class="slide-label" id="sl-genres-eyebrow">Goûts musicaux</span>
-          <h2 class="slide-title" id="sl-genres-title">Tes genres de l'année</h2>
-        </div>
-        <div class="genres-layout">
-          <!-- Radar / Pie Chart -->
-          <div class="genres-chart-wrap" id="genres-chart-wrap">
-            <canvas id="genres-radar-chart" aria-label="Graphique radar des genres musicaux"></canvas>
-          </div>
-          <!-- Légende tags -->
-          <div class="genres-legend" id="genres-legend" role="list" aria-label="Légende des genres">
-
-          </div>
-          <!-- Évolution semestrielle -->
-          <div class="genres-evolution" id="genres-evolution">
-            <h3 class="genres-evo-title" id="genres-evo-title">Évolution semestrielle</h3>
-            <div class="genres-evo-comparison" id="genres-evo-comparison">
-              <div class="genres-half">
-                <span class="genres-half-label" id="genres-s1-lbl">1er semestre</span>
-                <ul class="genres-half-list" id="genres-s1-list"></ul>
-              </div>
-              <div class="genres-half">
-                <span class="genres-half-label" id="genres-s2-lbl">2e semestre</span>
-                <ul class="genres-half-list" id="genres-s2-list"></ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!-- slide 10: final recap -->
-      <section class="slide slide--recap" data-slide-id="recap" aria-label="Récapitulatif final">
-        <div class="recap-bg" aria-hidden="true" id="recap-bg"></div>
-        <div class="slide-content recap-content">
-          <div class="recap-logo" aria-hidden="true">LastStats</div>
-          <h2 class="recap-title" id="recap-title">
-            <span id="recap-year">2024</span> en un mot :
-            <br><em id="recap-word" class="recap-word">Passionné·e</em>
-          </h2>
-
-          <!-- quick summary -->
-          <div class="recap-summary" id="recap-summary">
-            <div class="recap-sum-item">
-              <span class="recap-sum-val" id="recap-sum-scrobbles">—</span>
-              <span class="recap-sum-lbl" id="recap-sum-scrobbles-lbl">écoutes</span>
-            </div>
-            <div class="recap-sum-sep" aria-hidden="true">·</div>
-            <div class="recap-sum-item">
-              <span class="recap-sum-val" id="recap-sum-artists">—</span>
-              <span class="recap-sum-lbl" id="recap-sum-artists-lbl">artistes</span>
-            </div>
-            <div class="recap-sum-sep" aria-hidden="true">·</div>
-            <div class="recap-sum-item">
-              <span class="recap-sum-val" id="recap-sum-minutes">—</span>
-              <span class="recap-sum-lbl" id="recap-sum-minutes-lbl">min</span>
-            </div>
-          </div>
-
-          <!-- top 3 artists (filled by JS) -->
-          <div class="recap-top3" id="recap-top3" aria-label="Top 3 artistes">
-
-          </div>
-
-          <!-- share buttons -->
-          <div class="recap-actions">
-            <button class="btn-primary btn-share" id="recap-share-link" type="button">
-              <span id="recap-share-link-txt">🔗 Copier le lien</span>
-            </button>
-            <button class="btn-secondary btn-export" id="recap-export-story" type="button">
-              <span id="recap-export-story-txt">📱 Story (9:16)</span>
-            </button>
-            <button class="btn-secondary btn-export" id="recap-export-card" type="button">
-              <span id="recap-export-card-txt">🖼 Carte complète</span>
-            </button>
-          </div>
-
-          <!-- copy link feedback -->
-          <p class="share-link-feedback" id="share-link-feedback" role="status" aria-live="polite" hidden></p>
-
-          <a href="index.html" class="btn-ghost recap-back" id="recap-back">← Retour à LastStats</a>
-        </div>
-      </section>
-
-    </div><!-- /slides-container -->
-
-  </main><!-- /stories -->
-
-  <!-- toast notification -->
-  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true" hidden>
-    <span id="toast-msg"></span>
-  </div>
-
-  <!-- share modal (bottom sheet) -->
+  <!-- Share modal (bottom sheet) -->
   <div id="modal-share" class="modal-share hidden" role="dialog" aria-modal="true" aria-labelledby="modal-share-title">
     <div class="modal-share-backdrop" id="modal-share-backdrop"></div>
     <div class="modal-share-sheet">
-      <div class="modal-share-handle" aria-hidden="true"></div>
+      <div class="modal-share-handle"></div>
       <h2 class="modal-share-title" id="modal-share-title">Partager mon Wrapped</h2>
-      <p class="modal-share-sub" id="modal-share-sub">Choisis comment partager ton Wrapped.</p>
+      <p class="modal-share-sub" id="modal-share-sub">Choisis comment partager.</p>
       <div class="modal-share-actions">
-        <button class="share-action-btn" id="modal-copy-link" type="button">
-          <span class="share-action-icon" aria-hidden="true">🔗</span>
-          <span id="modal-copy-link-lbl">Copier le lien</span>
-        </button>
-        <button class="share-action-btn" id="modal-web-share" type="button">
-          <span class="share-action-icon" aria-hidden="true">↗</span>
-          <span id="modal-web-share-lbl">Partager via…</span>
-        </button>
-        <button class="share-action-btn" id="modal-export-story" type="button">
-          <span class="share-action-icon" aria-hidden="true">📱</span>
-          <span id="modal-export-story-lbl">Story 9:16</span>
-        </button>
-        <button class="share-action-btn" id="modal-export-card" type="button">
-          <span class="share-action-icon" aria-hidden="true">🖼</span>
-          <span id="modal-export-card-lbl">Carte complète</span>
-        </button>
+        <button class="share-action-btn" id="modal-copy-link" type="button"><span class="share-action-icon">🔗</span><span id="modal-copy-link-lbl">Copier le lien</span></button>
+        <button class="share-action-btn" id="modal-web-share" type="button"><span class="share-action-icon">↗</span><span id="modal-web-share-lbl">Partager via…</span></button>
+        <button class="share-action-btn" id="modal-export-card" type="button"><span class="share-action-icon">🖼</span><span id="modal-export-card-lbl">Carte complète</span></button>
+        <button class="share-action-btn" id="modal-screenshot" type="button"><span class="share-action-icon">📷</span><span id="modal-screenshot-lbl">Capture section</span></button>
       </div>
       <button class="btn-ghost modal-share-close" id="modal-share-close" type="button">Fermer</button>
     </div>
   </div>
 
-  <!-- off-screen export stage (html2canvas) -->
+  <!-- Off-screen export stage (carte uniquement, pas de story 9:16) -->
   <div id="export-stage" aria-hidden="true" style="position:fixed;top:-9999px;left:-9999px;pointer-events:none;z-index:-1;">
-
-    <!-- story template 360×640 -->
-    <div id="export-story" class="export-story" style="width:360px;height:640px;">
-      <div class="export-story-bg" id="export-story-bg"></div>
-      <div class="export-story-grain" aria-hidden="true"></div>
-      <div class="export-story-logo">LastStats</div>
-      <div class="export-story-body">
-        <div class="export-story-user" id="export-story-user"></div>
-        <div class="export-story-year" id="export-story-year"></div>
-        <div class="export-story-artist-img-wrap">
-          <img id="export-story-artist-img" class="export-story-artist-img" crossorigin="anonymous" src="" alt="">
-        </div>
-        <div class="export-story-artist-name" id="export-story-artist-name"></div>
-        <div class="export-story-stats" id="export-story-stats">
-          <div class="es-stat"><span class="es-val" id="es-scrobbles">—</span><span class="es-lbl">écoutes</span></div>
-          <div class="es-stat"><span class="es-val" id="es-artists">—</span><span class="es-lbl">artistes</span></div>
-          <div class="es-stat"><span class="es-val" id="es-minutes">—</span><span class="es-lbl">min</span></div>
-        </div>
-        <div class="export-story-footer">laststats.github.io</div>
-      </div>
-    </div>
-
-    <!-- full card template 680×860 -->
     <div id="export-card" class="export-card" style="width:680px;height:860px;">
       <div class="export-card-bg" id="export-card-bg"></div>
-      <div class="export-card-grain" aria-hidden="true"></div>
+      <div class="export-card-grain"></div>
       <header class="export-card-header">
         <span class="export-card-logo">LastStats</span>
         <span class="export-card-year" id="export-card-year"></span>
         <span class="export-card-user" id="export-card-user"></span>
       </header>
-      <div class="export-card-podium" id="export-card-podium">
-        <!-- top 3 artists, filled by JS -->
-      </div>
+      <div class="export-card-podium" id="export-card-podium"></div>
       <div class="export-card-stats" id="export-card-stats">
         <div class="ec-stat"><span class="ec-val" id="ec-scrobbles">—</span><span class="ec-lbl">écoutes</span></div>
         <div class="ec-stat"><span class="ec-val" id="ec-artists">—</span><span class="ec-lbl">artistes</span></div>
         <div class="ec-stat"><span class="ec-val" id="ec-albums">—</span><span class="ec-lbl">albums</span></div>
         <div class="ec-stat"><span class="ec-val" id="ec-minutes">—</span><span class="ec-lbl">min</span></div>
       </div>
-      <div class="export-card-chart-wrap">
-        <canvas id="export-mini-chart" width="600" height="120"></canvas>
-      </div>
-      <footer class="export-card-footer">
-        <span>Généré avec LastStats · laststats.github.io</span>
-      </footer>
+      <div class="export-card-chart-wrap"><canvas id="export-mini-chart" width="600" height="120"></canvas></div>
+      <footer class="export-card-footer"><span>Généré avec LastStats · laststats.github.io</span></footer>
     </div>
+  </div>
 
-  </div><!-- /export-stage -->
-
-  <!-- main script -->
   <script src="wrapped.js"></script>
 </body>
 </html>
