@@ -240,6 +240,25 @@
           </button>
         </div>
 
+        <!-- ════════════════════
+             ACTIVITY FEED
+        ════════════════════ -->
+        <div class="fr-feed-section hidden" id="friends-feed-section">
+          <div class="fr-feed-hd">
+            <div class="fr-feed-hd-left">
+              <i class="fas fa-rss"></i>
+              <span>Flux d'activité</span>
+            </div>
+            <div class="fr-feed-live-pill" id="feed-live-pill">
+              <span class="live-dot sm"></span>
+              <span>EN DIRECT</span>
+            </div>
+          </div>
+          <div class="fr-feed-list" id="friends-feed-list">
+            <!-- populated by JS -->
+          </div>
+        </div>
+
       </section><!-- /friends tab -->
 
       <!-- ════════════════════
@@ -481,9 +500,9 @@
   </nav>
 
   <!-- ── Profile Modal ── -->
-  <div class="fr-modal-overlay hidden" id="profile-modal-overlay">
-    <div class="fr-modal" id="profile-modal">
-      <button class="fr-modal-close" id="profile-modal-close">
+  <div class="fr-modal-overlay" id="profile-modal-overlay" aria-hidden="true">
+    <div class="fr-modal" id="profile-modal" role="dialog" aria-modal="true" aria-label="Profil utilisateur">
+      <button class="fr-modal-close" id="profile-modal-close" title="Fermer">
         <i class="fas fa-times"></i>
       </button>
       <div id="profile-modal-body"></div>
@@ -491,7 +510,7 @@
   </div>
 
   <!-- ── Toast ── -->
-  <div class="fr-toast hidden" id="fr-toast"></div>
+  <div class="fr-toast hidden" id="fr-toast" role="status" aria-live="polite"></div>
 
 </div><!-- /app-shell -->
 

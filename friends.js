@@ -130,8 +130,8 @@ const API = {
   async getInfo(username) {
     return this.call('user.getInfo', { user: username });
   },
-  async getRecentTrack(username) {
-    return this.call('user.getRecentTracks', { user: username, limit: 1 });
+  async getRecentTrack(username, limit = 3) {
+    return this.call('user.getRecentTracks', { user: username, limit });
   },
   async getTopArtists(username, period = 'overall', limit = 5) {
     return this.call('user.getTopArtists', { user: username, period, limit });
@@ -150,12 +150,13 @@ const API = {
 const FR = window.FR = {
   username: '',
   friends: [],
-  liveStatuses: {},
+  liveStatuses: {},   // { lc_username: { nowPlaying, track, artist, album, art, ts, recentTracks[], userImage } }
   liveTimer: null,
   currentTab: 'friends',
   currentFilter: 'all',
   friendsQuery: '',
   favQuery: '',
+  currentSearchUser: null,   // { name, image } of last searched user
 
   /* ── Boot ── */
   async init() {
@@ -224,7 +225,6 @@ const FR = window.FR = {
         if (sbFb) sbFb.textContent = (u.name || '?').charAt(0).toUpperCase();
       }
     } catch {
-      // Silently fail; sidebar just shows defaults
       $('#sb-username').textContent  = this.username;
       $('#settings-username-display').textContent = this.username;
     }
@@ -290,9 +290,7 @@ const FR = window.FR = {
     $('#btn-refresh').addEventListener('click', async () => {
       const btn = $('#btn-refresh');
       btn.classList.add('spinning');
-      if (this.currentTab === 'friends') {
-        await this.refreshLiveStatuses();
-      }
+      await this.refreshLiveStatuses();
       await sleep(400);
       btn.classList.remove('spinning');
       this.showToast('Mis à jour !', 'success');
@@ -318,6 +316,7 @@ const FR = window.FR = {
     clearBtn.addEventListener('click', () => {
       searchIn.value = '';
       clearBtn.classList.add('hidden');
+      this.currentSearchUser = null;
       this.resetSearchUI();
     });
 
@@ -334,11 +333,17 @@ const FR = window.FR = {
       this.renderFavorites();
     });
 
-    // Modal close
-    $('#profile-modal-overlay').addEventListener('click', e => {
-      if (e.target === e.currentTarget) this.closeModal();
+    // Modal close — click overlay or close button
+    const overlay = $('#profile-modal-overlay');
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) this.closeModal();
     });
     $('#profile-modal-close').addEventListener('click', () => this.closeModal());
+
+    // Keyboard: Escape closes modal
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && overlay.classList.contains('open')) this.closeModal();
+    });
 
     // Settings: theme buttons
     $$('[data-theme-val]').forEach(btn => {
@@ -367,14 +372,10 @@ const FR = window.FR = {
   switchTab(name) {
     this.currentTab = name;
 
-    // Sidebar nav links
     $$('.fr-nav-lnk').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-    // Bottom nav items
     $$('.fr-bn-item').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-    // Tab sections
     $$('.tab-content').forEach(s => s.classList.toggle('active', s.id === `tab-content-${name}`));
 
-    // Header label
     const labels = { friends:'Amis', search:'Recherche', favorites:'Favoris', settings:'Paramètres' };
     $('#hd-tab-label').textContent = labels[name] || '';
 
@@ -389,12 +390,9 @@ const FR = window.FR = {
     const theme  = localStorage.getItem(LS_THEME)  || 'dark';
     const accent = localStorage.getItem(LS_ACCENT) || 'purple';
 
-    // Theme buttons
     $$('[data-theme-val]').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.themeVal === theme);
     });
-
-    // Accent swatches
     $$('[data-accent]').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.accent === accent);
     });
@@ -471,6 +469,8 @@ const FR = window.FR = {
       $('[data-action="view"]', card)?.addEventListener('click', e => { e.stopPropagation(); this.openProfileModal(f.name); });
       card.addEventListener('click', () => this.openProfileModal(f.name));
     });
+
+    this.renderActivityFeed();
   },
 
   _filteredFriends() {
@@ -497,11 +497,11 @@ const FR = window.FR = {
       npHtml = `
         <div class="fr-np-bar">
           ${live.art
-            ? `<img class="fr-np-art" src="${escHtml(live.art)}" alt="" loading="lazy">`
-            : `<div class="fr-np-art" style="background:${this._nameColor(live.artist)};display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#fff;">${(live.artist||'?').charAt(0)}</div>`}
+            ? `<img class="fr-np-art" src="${escHtml(live.art)}" alt="${escHtml(live.album||live.track)}" loading="lazy" onerror="this.style.display='none'">`
+            : `<div class="fr-np-art np-art-fallback" style="background:${this._nameColor(live.artist)}">${(live.artist||'?').charAt(0)}</div>`}
           <div class="fr-np-info">
             <div class="fr-np-track">${escHtml(live.track)}</div>
-            <div class="fr-np-artist">${escHtml(live.artist)}</div>
+            <div class="fr-np-artist">${escHtml(live.artist)}${live.album ? ` · <em style="opacity:.7">${escHtml(live.album)}</em>` : ''}</div>
           </div>
           <div class="fr-np-icon"><span></span><span></span><span></span><span></span></div>
         </div>`;
@@ -509,8 +509,8 @@ const FR = window.FR = {
       npHtml = `
         <div class="fr-last-played">
           ${live.art
-            ? `<img class="fr-last-art" src="${escHtml(live.art)}" alt="" loading="lazy">`
-            : `<div class="fr-last-art" style="background:${this._nameColor(live.artist)};display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;">${(live.artist||'?').charAt(0)}</div>`}
+            ? `<img class="fr-last-art" src="${escHtml(live.art)}" alt="${escHtml(live.track)}" loading="lazy" onerror="this.style.display='none'">`
+            : `<div class="fr-last-art np-art-fallback sm" style="background:${this._nameColor(live.artist)}">${(live.artist||'?').charAt(0)}</div>`}
           <div class="fr-last-info">
             <div class="fr-last-track">${escHtml(live.track)}</div>
             <div class="fr-last-artist">${escHtml(live.artist)}</div>
@@ -526,7 +526,7 @@ const FR = window.FR = {
         <div class="fr-card-header">
           <div class="fr-av-wrap">
             ${avHtml}
-            ${isLive ? '<div class="fr-av-dot"></div>' : ''}
+            ${isLive ? '<div class="fr-av-dot np-pulse"></div>' : ''}
           </div>
           <div class="fr-card-info">
             <div class="fr-card-name">
@@ -553,6 +553,115 @@ const FR = window.FR = {
       </div>`;
   },
 
+  /* ════════════════════════════════════════
+     ACTIVITY FEED — Flux d'activité
+  ════════════════════════════════════════ */
+  renderActivityFeed() {
+    const section  = $('#friends-feed-section');
+    const feedList = $('#friends-feed-list');
+    if (!section || !feedList) return;
+
+    // Gather all recent tracks from liveStatuses
+    const allItems = [];
+    const friendNames = new Set(this.friends.map(f => f.name.toLowerCase()));
+
+    for (const [lcName, status] of Object.entries(this.liveStatuses)) {
+      // Find the user info (could be friend or favorite)
+      const friend = this.friends.find(f => f.name.toLowerCase() === lcName)
+                  || Favs.all().find(f => f.name.toLowerCase() === lcName);
+      const username  = friend?.name || lcName;
+      const userImage = status.userImage || friend?.image || '';
+
+      if (status.nowPlaying && status.track) {
+        allItems.push({
+          username,
+          userImage,
+          track:  status.track,
+          artist: status.artist,
+          album:  status.album || '',
+          art:    status.art,
+          nowPlaying: true,
+          ts: Math.floor(Date.now() / 1000),
+        });
+      }
+
+      if (Array.isArray(status.recentTracks)) {
+        for (const rt of status.recentTracks) {
+          if (!rt.ts || rt.ts <= 0) continue;
+          allItems.push({ ...rt, username, userImage });
+        }
+      }
+    }
+
+    if (!allItems.length) {
+      section.classList.add('hidden');
+      return;
+    }
+
+    // Sort: nowPlaying first, then by timestamp desc
+    allItems.sort((a, b) => {
+      if (a.nowPlaying && !b.nowPlaying) return -1;
+      if (!a.nowPlaying && b.nowPlaying) return 1;
+      return (b.ts || 0) - (a.ts || 0);
+    });
+
+    // Deduplicate (same user + track + within 5 min)
+    const seen = new Set();
+    const unique = allItems.filter(item => {
+      const key = `${item.username.toLowerCase()}|${item.track.toLowerCase()}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    const top = unique.slice(0, 10);
+
+    section.classList.remove('hidden');
+    feedList.innerHTML = top.map((item, i) => this._buildFeedItem(item, i)).join('');
+
+    // Bind click on feed items to open modal
+    $$('.fr-feed-item', feedList).forEach(el => {
+      el.addEventListener('click', () => {
+        const u = el.dataset.username;
+        if (u) this.openProfileModal(u);
+      });
+    });
+  },
+
+  _buildFeedItem(item, delay = 0) {
+    const userAvHtml = item.userImage
+      ? `<img class="fr-feed-user-av" src="${escHtml(item.userImage)}" alt="${escHtml(item.username)}" loading="lazy" onerror="this.style.display='none'">`
+      : `<div class="fr-feed-user-av" style="background:${this._nameColor(item.username)};display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.75rem;">${item.username.charAt(0).toUpperCase()}</div>`;
+
+    const artHtml = item.art
+      ? `<img class="fr-feed-art" src="${escHtml(item.art)}" alt="${escHtml(item.track)}" loading="lazy" onerror="this.style.display='none'">`
+      : `<div class="fr-feed-art np-art-fallback" style="background:${this._nameColor(item.artist)}">${(item.artist||'?').charAt(0)}</div>`;
+
+    const timeHtml = item.nowPlaying
+      ? `<span class="fr-feed-now"><span class="live-dot sm"></span>En écoute</span>`
+      : `<span class="fr-feed-time">${item.ts ? timeAgo(item.ts) : ''}</span>`;
+
+    return `
+      <div class="fr-feed-item${item.nowPlaying?' is-live':''}" data-username="${escHtml(item.username)}"
+           style="animation-delay:${delay*30}ms" role="button" tabindex="0">
+        <div class="fr-feed-art-wrap">
+          ${artHtml}
+          ${item.nowPlaying ? '<div class="fr-feed-np-overlay"><div class="fr-np-icon sm"><span></span><span></span><span></span></div></div>' : ''}
+        </div>
+        <div class="fr-feed-body">
+          <div class="fr-feed-track">${escHtml(item.track)}</div>
+          <div class="fr-feed-artist">${escHtml(item.artist)}${item.album ? ` <span class="fr-feed-album">· ${escHtml(item.album)}</span>` : ''}</div>
+          <div class="fr-feed-meta">
+            <div class="fr-feed-user">
+              ${userAvHtml}
+              <span>${escHtml(item.username)}</span>
+            </div>
+            ${timeHtml}
+          </div>
+        </div>
+      </div>`;
+  },
+
   /* ── Live polling ── */
   startLivePolling() {
     clearInterval(this.liveTimer);
@@ -562,35 +671,73 @@ const FR = window.FR = {
   },
 
   async refreshLiveStatuses() {
-    if (!this.friends.length) return;
-    const BATCH = 8;
-    for (let i = 0; i < this.friends.length; i += BATCH) {
-      const batch = this.friends.slice(i, i + BATCH);
-      await Promise.all(batch.map(f => this._fetchLiveStatus(f)));
-      if (i + BATCH < this.friends.length) await sleep(300);
+    // Gather all users to poll: friends + favorites not already in friends
+    const friendNames = new Set(this.friends.map(f => f.name.toLowerCase()));
+    const favsExtra   = Favs.all().filter(f => !friendNames.has(f.name.toLowerCase()));
+
+    // Also include the current searched user if not covered
+    const searchExtra = [];
+    if (this.currentSearchUser && !friendNames.has(this.currentSearchUser.name.toLowerCase())) {
+      const alreadyFav = favsExtra.some(f => f.name.toLowerCase() === this.currentSearchUser.name.toLowerCase());
+      if (!alreadyFav) searchExtra.push(this.currentSearchUser);
     }
+
+    const allUsers = [...this.friends, ...favsExtra, ...searchExtra];
+    if (!allUsers.length) return;
+
+    const BATCH = 8;
+    for (let i = 0; i < allUsers.length; i += BATCH) {
+      const batch = allUsers.slice(i, i + BATCH);
+      await Promise.all(batch.map(f => this._fetchLiveStatus(f)));
+      if (i + BATCH < allUsers.length) await sleep(300);
+    }
+
     this._updateStatStrip();
-    this.renderFriendsGrid();
+    this.renderFriendsGrid();  // also calls renderActivityFeed()
+    this.renderFavorites();
+
+    // Update live indicator on current search result
+    if (this.currentSearchUser) {
+      this._patchSearchResultLive(this.currentSearchUser.name);
+    }
+
     const now = new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
-    $('#stat-updated').textContent  = `màj ${now}`;
+    $('#stat-updated').textContent    = `màj ${now}`;
     $('#sb-stat-updated').textContent = `màj ${now}`;
   },
 
   async _fetchLiveStatus(friend) {
     try {
-      const data   = await API.getRecentTrack(friend.name);
+      const data   = await API.getRecentTrack(friend.name, 3);
       const tracks = data.recenttracks?.track || [];
       const arr    = Array.isArray(tracks) ? tracks : [tracks];
-      const track  = arr[0];
-      if (!track) return;
+      if (!arr.length) return;
 
-      const nowPlaying = track['@attr']?.nowplaying === 'true';
+      const first      = arr[0];
+      const nowPlaying = first['@attr']?.nowplaying === 'true';
+
+      // Recent tracks = all non-nowplaying entries
+      const recentTracks = arr
+        .filter(t => t['@attr']?.nowplaying !== 'true')
+        .map(t => ({
+          track:  t.name || '',
+          artist: t.artist?.['#text'] || t.artist || '',
+          album:  t.album?.['#text'] || '',
+          art:    imgUrl(t.image),
+          ts:     parseInt(t.date?.uts || 0),
+          username:  friend.name,
+          userImage: friend.image || '',
+        }));
+
       this.liveStatuses[friend.name.toLowerCase()] = {
         nowPlaying,
-        track:  track.name || '',
-        artist: track.artist?.['#text'] || track.artist || '',
-        art:    imgUrl(track.image),
-        ts:     nowPlaying ? null : parseInt(track.date?.uts || 0),
+        track:  first.name || '',
+        artist: first.artist?.['#text'] || first.artist || '',
+        album:  first.album?.['#text'] || '',
+        art:    imgUrl(first.image),
+        ts:     nowPlaying ? null : parseInt(first.date?.uts || 0),
+        userImage: friend.image || '',
+        recentTracks,
       };
     } catch {
       // Keep old status on error
@@ -599,13 +746,12 @@ const FR = window.FR = {
 
   _updateStatStrip() {
     const total = this.friends.length;
-    const live  = Object.values(this.liveStatuses).filter(s => s.nowPlaying).length;
+    const live  = this.friends.filter(f => this.liveStatuses[f.name.toLowerCase()]?.nowPlaying).length;
     $('#stat-total').textContent     = total;
     $('#stat-live').textContent      = live;
     $('#sb-stat-total').textContent  = total;
     $('#sb-stat-live').textContent   = live;
 
-    // Sidebar live dot
     const sbLive = $('#sb-live-dot');
     if (sbLive) {
       sbLive.classList.toggle('hidden', live === 0);
@@ -668,13 +814,11 @@ const FR = window.FR = {
 
   updateFavBadge() {
     const n = Favs.count();
-    // Sidebar badge
     const sbBadge = $('#sb-fav-badge');
     if (sbBadge) {
       sbBadge.textContent = n;
       sbBadge.classList.toggle('hidden', n === 0);
     }
-    // Bottom nav badge
     const bnBadge = $('#bn-fav-badge');
     if (bnBadge) {
       bnBadge.textContent = n;
@@ -693,12 +837,13 @@ const FR = window.FR = {
     searchIn.value = query;
     $('#search-big-clear').classList.remove('hidden');
 
-    // Hide recent searches, show results section
     $('#recent-searches-section').classList.add('hidden');
     this._hideAllSearchStates();
     $('#search-results-section').classList.remove('hidden');
     $('#search-loading').classList.remove('hidden');
     $('#search-results-title').textContent = `Profil : ${query}`;
+
+    this.currentSearchUser = null;
 
     try {
       const data = await API.getInfo(query);
@@ -708,8 +853,23 @@ const FR = window.FR = {
       Recent.add(user.name);
       this.renderRecentSearches();
 
+      // Store current search user and fetch live status in parallel
+      this.currentSearchUser = {
+        name:  user.name,
+        image: imgUrl(user.image),
+      };
+
+      // Fetch live status for this user (don't await — renders first, then patches)
+      const livePromise = this._fetchLiveStatus(this.currentSearchUser).then(() => {
+        this._patchSearchResultLive(user.name);
+      });
+
       $('#search-loading').classList.add('hidden');
       this._renderSearchResult(user);
+
+      // Wait for live status to patch without blocking UI
+      livePromise.catch(() => {});
+
     } catch (e) {
       $('#search-loading').classList.add('hidden');
       if (e.message?.includes('User not found') || e.message?.includes('No user')) {
@@ -717,6 +877,46 @@ const FR = window.FR = {
       } else {
         $('#search-error').classList.remove('hidden');
         $('#search-error-msg').textContent = e.message || 'Erreur lors de la recherche.';
+      }
+    }
+  },
+
+  /* Patch the search result card with live status once it's fetched */
+  _patchSearchResultLive(username) {
+    const liveStatus = this.liveStatuses[username.toLowerCase()];
+    if (!liveStatus) return;
+
+    // Update live badge in search result card
+    const liveEl = $('#search-result-live-badge');
+    if (liveEl) {
+      if (liveStatus.nowPlaying) {
+        liveEl.classList.remove('hidden');
+      } else {
+        liveEl.classList.add('hidden');
+      }
+    }
+
+    // Update NP bar in search result
+    const npWrap = $('#search-result-np-wrap');
+    if (npWrap) {
+      if (liveStatus.nowPlaying && liveStatus.track) {
+        const artHtml = liveStatus.art
+          ? `<img class="fr-np-art" src="${escHtml(liveStatus.art)}" alt="${escHtml(liveStatus.track)}" loading="lazy" onerror="this.style.display='none'">`
+          : `<div class="fr-np-art np-art-fallback" style="background:${this._nameColor(liveStatus.artist)}">${(liveStatus.artist||'?').charAt(0)}</div>`;
+
+        npWrap.innerHTML = `
+          <div class="fr-np-bar" style="margin-top:10px">
+            ${artHtml}
+            <div class="fr-np-info">
+              <div class="fr-np-track">${escHtml(liveStatus.track)}</div>
+              <div class="fr-np-artist">${escHtml(liveStatus.artist)}${liveStatus.album ? ` · <em style="opacity:.7">${escHtml(liveStatus.album)}</em>` : ''}</div>
+            </div>
+            <div class="fr-np-icon"><span></span><span></span><span></span><span></span></div>
+          </div>`;
+        npWrap.classList.remove('hidden');
+      } else {
+        npWrap.innerHTML = '';
+        npWrap.classList.add('hidden');
       }
     }
   },
@@ -732,15 +932,20 @@ const FR = window.FR = {
       image:     av,
     };
 
+    const avHtml = av
+      ? `<img class="fr-profile-av" src="${escHtml(av)}" alt="${escHtml(user.name)}" loading="lazy">`
+      : `<div class="fr-profile-av" style="background:${this._nameColor(user.name)};display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;color:#fff">${user.name.charAt(0).toUpperCase()}</div>`;
+
     const html = `
       <div class="fr-result-cards">
         <div class="fr-profile-card" id="search-result-main" data-username="${escHtml(user.name)}">
-          ${av
-            ? `<img class="fr-profile-av" src="${escHtml(av)}" alt="${escHtml(user.name)}" loading="lazy">`
-            : `<div class="fr-profile-av" style="background:${this._nameColor(user.name)};display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;color:#fff">${user.name.charAt(0).toUpperCase()}</div>`}
+          ${avHtml}
           <div class="fr-profile-body">
             <div class="fr-profile-name">
               ${escHtml(user.name)}
+              <span class="fr-search-live-badge hidden" id="search-result-live-badge">
+                <span class="live-dot sm"></span>En écoute
+              </span>
               ${user.subscriber==='1'?'<i class="fas fa-crown" style="color:#f59e0b;font-size:.7rem" title="Subscriber"></i>':''}
             </div>
             ${user.realname ? `<div class="fr-profile-realname">${escHtml(user.realname)}</div>` : ''}
@@ -749,6 +954,8 @@ const FR = window.FR = {
               ${user.country ? `<span class="fr-profile-stat"><i class="fas fa-map-marker-alt"></i>${escHtml(user.country)}</span>` : ''}
               ${user.registered?.['#text'] ? `<span class="fr-profile-stat"><i class="fas fa-calendar-alt"></i>Depuis ${escHtml(String(user.registered['#text']).split(', ').pop() || String(user.registered['#text']))}</span>` : ''}
             </div>
+            <!-- Live NP bar (patched once live status is fetched) -->
+            <div id="search-result-np-wrap" class="hidden"></div>
             <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
               <button class="fr-expand-btn" id="search-expand-btn">
                 <i class="fas fa-chart-bar"></i> Stats détaillées
@@ -774,12 +981,10 @@ const FR = window.FR = {
 
     $('#search-results-list').innerHTML = html;
 
-    // Open full profile modal
     $('#search-open-full-btn')?.addEventListener('click', () => {
       this.openProfileModal(user.name);
     });
 
-    // Fav button
     $('#search-fav-btn')?.addEventListener('click', () => {
       const btn  = $('#search-fav-btn');
       const icon = $('i', btn);
@@ -791,7 +996,6 @@ const FR = window.FR = {
       this.showToast(added ? '⭐ Ajouté aux favoris' : 'Retiré des favoris', added ? 'success' : '');
     });
 
-    // Expand stats button
     let expanded = false;
     $('#search-expand-btn')?.addEventListener('click', async () => {
       if (expanded) return;
@@ -826,7 +1030,7 @@ const FR = window.FR = {
       return items.slice(0, 5).map((item, idx) => {
         const imgSrc = getImg(item);
         const imgEl  = imgSrc
-          ? `<img src="${escHtml(imgSrc)}" alt="" loading="lazy" style="width:36px;height:36px;border-radius:4px;object-fit:cover;flex-shrink:0">`
+          ? `<img src="${escHtml(imgSrc)}" alt="${escHtml(getName(item))}" loading="lazy" style="width:36px;height:36px;border-radius:4px;object-fit:cover;flex-shrink:0">`
           : `<div style="width:36px;height:36px;border-radius:4px;background:${this._nameColor(getName(item))};display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.8rem;flex-shrink:0">${getName(item).charAt(0)}</div>`;
         return `
           <div class="fm-top-row">
@@ -932,13 +1136,21 @@ const FR = window.FR = {
   async openProfileModal(username) {
     const overlay = $('#profile-modal-overlay');
     const body    = $('#profile-modal-body');
+    const modal   = $('#profile-modal');
+
+    // Reset scroll position
+    modal.scrollTop = 0;
 
     body.innerHTML = `
       <div style="padding:80px 24px;display:flex;align-items:center;justify-content:center;gap:12px;color:var(--text-muted)">
         <i class="fas fa-circle-notch fa-spin" style="color:var(--accent)"></i>
         Chargement du profil…
       </div>`;
-    overlay.classList.remove('hidden');
+
+    // Open with animation
+    overlay.removeAttribute('aria-hidden');
+    overlay.classList.remove('closing');
+    overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
 
     try {
@@ -969,7 +1181,7 @@ const FR = window.FR = {
         (Array.isArray(items) ? items : [items]).slice(0, limit).map((item, idx) => {
           const imgSrc = getImg(item);
           const imgEl  = imgSrc
-            ? `<img class="fm-top-img" src="${escHtml(imgSrc)}" alt="" loading="lazy">`
+            ? `<img class="fm-top-img" src="${escHtml(imgSrc)}" alt="${escHtml(getName(item))}" loading="lazy">`
             : `<div class="fm-top-img" style="background:${this._nameColor(getName(item))};display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.8rem">${getName(item).charAt(0)}</div>`;
           return `
             <div class="fm-top-row">
@@ -985,15 +1197,15 @@ const FR = window.FR = {
 
       body.innerHTML = `
         <div class="fm-hero">
-          <div class="fm-hero-bg" style="${av?`background-image:url('${escHtml(av)}')`:''}"></div>
-          <div class="fm-hero-overlay"></div>
+          <div class="fm-hero-bg" style="${av?`background-image:url('${escHtml(av)}')`:''}" aria-hidden="true"></div>
+          <div class="fm-hero-overlay" aria-hidden="true"></div>
           <div class="fm-hero-content">
             ${av
               ? `<img class="fm-av" src="${escHtml(av)}" alt="${escHtml(user.name)}">`
               : `<div class="fm-av" style="background:${this._nameColor(user.name)};display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:700;color:#fff">${user.name.charAt(0).toUpperCase()}</div>`}
-            <div style="display:flex;align-items:center;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center">
               <span class="fm-name">${escHtml(user.name)}</span>
-              ${isLive ? '<span style="background:rgba(34,197,94,.2);border:1px solid rgba(34,197,94,.4);color:#22c55e;font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:99px;letter-spacing:.06em">● LIVE</span>' : ''}
+              ${isLive ? '<span class="fm-live-badge"><span class="live-dot sm"></span>LIVE</span>' : ''}
               ${user.subscriber==='1'?'<i class="fas fa-crown" style="color:#f59e0b" title="Subscriber"></i>':''}
             </div>
             ${user.realname ? `<div style="font-size:.78rem;color:rgba(255,255,255,.65)">${escHtml(user.realname)}</div>` : ''}
@@ -1005,10 +1217,12 @@ const FR = window.FR = {
 
           ${isLive && liveStatus ? `
           <div class="fr-np-bar" style="margin-bottom:14px">
-            ${liveStatus.art ? `<img class="fr-np-art" src="${escHtml(liveStatus.art)}" alt="" loading="lazy">` : ''}
+            ${liveStatus.art
+              ? `<img class="fr-np-art" src="${escHtml(liveStatus.art)}" alt="${escHtml(liveStatus.track)}" loading="lazy" onerror="this.style.display='none'">`
+              : `<div class="fr-np-art np-art-fallback" style="background:${this._nameColor(liveStatus.artist)}">${(liveStatus.artist||'?').charAt(0)}</div>`}
             <div class="fr-np-info">
               <div class="fr-np-track">${escHtml(liveStatus.track)}</div>
-              <div class="fr-np-artist">${escHtml(liveStatus.artist)}</div>
+              <div class="fr-np-artist">${escHtml(liveStatus.artist)}${liveStatus.album ? ` · <em style="opacity:.7">${escHtml(liveStatus.album)}</em>` : ''}</div>
             </div>
             <div class="fr-np-icon"><span></span><span></span><span></span><span></span></div>
           </div>` : ''}
@@ -1031,14 +1245,14 @@ const FR = window.FR = {
             </div>
           </div>
 
-          <div style="font-size:.78rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+          <div class="fm-section-label">
             <i class="fas fa-microphone-alt"></i> Top Artistes (all time)
           </div>
           <div class="fm-tops" style="margin-bottom:16px">
             ${buildTop(artists, a=>imgUrl(a.image), a=>a.name, ()=>'', a=>a.playcount)}
           </div>
 
-          <div style="font-size:.78rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+          <div class="fm-section-label">
             <i class="fas fa-music"></i> Top Morceaux (all time)
           </div>
           <div class="fm-tops" style="margin-bottom:16px">
@@ -1051,7 +1265,7 @@ const FR = window.FR = {
               <i class="fas fa-chart-line"></i> Stats complètes
             </a>
             <button class="fm-btn fm-btn-outline${isFav?' fav-active':''}" id="modal-fav-btn">
-              <i class="fa${isFav?'s':'r'} fa-star"></i> ${isFav ? 'Favori' : 'Favori'}
+              <i class="fa${isFav?'s':'r'} fa-star"></i> ${isFav ? 'Favori ✓' : 'Favori'}
             </button>
             <a href="https://www.last.fm/user/${encodeURIComponent(user.name)}" target="_blank" rel="noopener"
                class="fm-btn fm-btn-outline" style="text-decoration:none;flex:0 0 auto">
@@ -1066,6 +1280,7 @@ const FR = window.FR = {
         btn.classList.toggle('fav-active', added);
         const icon = $('i', btn);
         if (icon) icon.className = added ? 'fas fa-star' : 'far fa-star';
+        btn.lastChild.textContent = added ? ' Favori ✓' : ' Favori';
         this.updateFavBadge();
         this.showToast(added ? '⭐ Ajouté aux favoris' : 'Retiré des favoris', added ? 'success' : '');
         this.renderFriendsGrid();
@@ -1078,12 +1293,23 @@ const FR = window.FR = {
           <i class="fas fa-exclamation-triangle" style="font-size:2rem;color:#f87171;margin-bottom:12px;display:block"></i>
           <p>Impossible de charger ce profil.</p>
           <p style="font-size:.8rem;margin-top:6px">${escHtml(e.message || '')}</p>
+          <button onclick="window.FR.closeModal()" style="margin-top:16px;padding:8px 20px;border-radius:99px;border:1px solid var(--border);font-size:.82rem;color:var(--text-muted);">Fermer</button>
         </div>`;
     }
   },
 
   closeModal() {
-    $('#profile-modal-overlay').classList.add('hidden');
+    const overlay = $('#profile-modal-overlay');
+    overlay.classList.add('closing');
+    overlay.setAttribute('aria-hidden', 'true');
+    // Wait for animation to complete before fully hiding
+    const onEnd = () => {
+      overlay.classList.remove('open', 'closing');
+      overlay.removeEventListener('animationend', onEnd);
+    };
+    overlay.addEventListener('animationend', onEnd, { once: true });
+    // Fallback if animation doesn't fire
+    setTimeout(() => overlay.classList.remove('open', 'closing'), 350);
     document.body.style.overflow = '';
   },
 
