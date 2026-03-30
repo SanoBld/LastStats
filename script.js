@@ -915,7 +915,12 @@ async function initApp(usernameOverride, apiKeyOverride) {
     await loadDashboard();
     const savedSection = localStorage.getItem('ls_section');
     if (savedSection && document.getElementById('s-' + savedSection)) {
-      nav(savedSection);
+      if (savedSection === 'profile') {
+        // Pour le profil, on doit charger les données, pas juste naviguer
+        openProfilePage();
+      } else {
+        nav(savedSection);
+      }
     }
 
     Promise.all([
@@ -1132,35 +1137,11 @@ function setupProfileUI() {
 
 let _profileBubbleOpen = false;
 
-function toggleProfileBubble() {
-  _profileBubbleOpen ? closeProfileBubble() : openProfileBubble();
-}
-
-function openProfileBubble() {
-  const bubble = document.getElementById('profile-bubble');
-  const btn    = document.getElementById('sb-profile');
-  if (!bubble) return;
-  bubble.classList.remove('hidden');
-  requestAnimationFrame(() => bubble.classList.add('pb-visible'));
-  btn?.setAttribute('aria-expanded', 'true');
-  _profileBubbleOpen = true;
-  setTimeout(() => document.addEventListener('click', _bubbleOutsideClick, { once: true }), 0);
-}
-
-function closeProfileBubble() {
-  const bubble = document.getElementById('profile-bubble');
-  const btn    = document.getElementById('sb-profile');
-  if (!bubble) return;
-  bubble.classList.remove('pb-visible');
-  setTimeout(() => bubble.classList.add('hidden'), 180);
-  btn?.setAttribute('aria-expanded', 'false');
-  _profileBubbleOpen = false;
-}
-
-function _bubbleOutsideClick(e) {
-  const wrap = document.getElementById('sb-profile-wrap');
-  if (wrap && !wrap.contains(e.target)) closeProfileBubble();
-}
+/* Dropdown profil supprimé — fonctions conservées pour compatibilité */
+function toggleProfileBubble() { openProfilePage(); }
+function openProfileBubble()   {}
+function closeProfileBubble()  { _profileBubbleOpen = false; }
+function _bubbleOutsideClick() {}
 
 /* ─── Profile section ─── */
 
@@ -1343,10 +1324,12 @@ async function _loadProfileTopData(username, period) {
     _renderProfileTopCard('ptop-track',  'music',          'Titre #1',
       t1?.name,     t1?.playcount,     t1?.image,    t1?.artist?.name);
 
-    // Résolution asynchrone des images manquantes sur les cartes
-    _resolveTopCardImg('ptop-artist', 'artist', artist?.name, null);
-    _resolveTopCardImg('ptop-album',  'album',  album?.name,  album?.artist?.name);
-    _resolveTopCardImg('ptop-track',  'track',  t1?.name,     t1?.artist?.name);
+    // Résolution asynchrone des images — toujours relancer après changement de période
+    setTimeout(() => {
+      _resolveTopCardImg('ptop-artist', 'artist', artist?.name, null);
+      _resolveTopCardImg('ptop-album',  'album',  album?.name,  album?.artist?.name);
+      _resolveTopCardImg('ptop-track',  'track',  t1?.name,     t1?.artist?.name);
+    }, 0);
 
     if (trackList) {
       const top5 = tracks.slice(0, 5);
@@ -1374,6 +1357,53 @@ async function _loadProfileTopData(username, period) {
   }
 }
 
+/**
+ * Récupère la pochette d'un album via l'API iTunes (CORS natif, gratuit).
+ * Retourne null si rien trouvé.
+ */
+async function _fetchAlbumImageiTunes(albumName, artistName) {
+  try {
+    const q = artistName ? `${artistName} ${albumName}` : albumName;
+    const r = await fetch(
+      `https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=5`,
+      { signal: AbortSignal.timeout(4000) }
+    );
+    if (!r.ok) return null;
+    const d = await r.json();
+    const exact = d.results?.find(x =>
+      x.collectionName?.toLowerCase().includes(albumName.toLowerCase()) ||
+      albumName.toLowerCase().includes(x.collectionName?.toLowerCase() || '')
+    );
+    const hit = exact || d.results?.[0];
+    return hit?.artworkUrl100
+      ? hit.artworkUrl100.replace('100x100bb', '600x600bb').replace('/100x100/', '/600x600/')
+      : null;
+  } catch { return null; }
+}
+
+/**
+ * Récupère la pochette d'un titre via iTunes (prend la pochette de l'album du titre).
+ */
+async function _fetchTrackImageiTunes(trackName, artistName) {
+  try {
+    const q = artistName ? `${artistName} ${trackName}` : trackName;
+    const r = await fetch(
+      `https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=5`,
+      { signal: AbortSignal.timeout(4000) }
+    );
+    if (!r.ok) return null;
+    const d = await r.json();
+    const exact = d.results?.find(x =>
+      x.trackName?.toLowerCase().includes(trackName.toLowerCase()) ||
+      trackName.toLowerCase().includes(x.trackName?.toLowerCase() || '')
+    );
+    const hit = exact || d.results?.[0];
+    return hit?.artworkUrl100
+      ? hit.artworkUrl100.replace('100x100bb', '600x600bb').replace('/100x100/', '/600x600/')
+      : null;
+  } catch { return null; }
+}
+
 async function _resolveTopCardImg(cardId, type, name, artist) {
   if (!name) return;
   try {
@@ -1382,28 +1412,59 @@ async function _resolveTopCardImg(cardId, type, name, artist) {
     const bgEl = el.querySelector('.ptc-bg');
     if (!bgEl) return;
 
-    // Already has a real image?
+    // Si déjà une vraie image chargée, ne pas remplacer
     const current = bgEl.style.backgroundImage;
-    if (current && current !== 'none' && !current.includes('undefined')) return;
+    if (current && current !== 'none' && !current.includes('undefined') && current !== 'url("")') return;
 
     let img = '';
+
     if (type === 'artist') {
-      const d = await _apiFetchUser('artist.getInfo', name, { artist: name, autocorrect: 1 });
-      img = d?.artist?.image?.find(x => x.size === 'extralarge')?.['#text']
-         || d?.artist?.image?.find(x => x.size === 'large')?.['#text'] || '';
+      /* Cascade multi-API : Wikipedia → iTunes → TheAudioDB */
+      img = await _resolveArtistImageExternal(name) || '';
+      /* Dernier recours : pochette du top album Last.fm */
+      if (!img || isDefaultImg(img)) {
+        try {
+          const d = await API.call('artist.getTopAlbums', { artist: name, limit: 3, autocorrect: 1 });
+          for (const alb of (d.topalbums?.album || [])) {
+            const u = alb.image?.find(x => x.size === 'extralarge')?.['#text']
+                   || alb.image?.find(x => x.size === 'large')?.['#text'] || '';
+            if (!isDefaultImg(u)) { img = u; break; }
+          }
+        } catch {}
+      }
+
     } else if (type === 'album') {
-      const d = await _apiFetchUser('album.getInfo', artist || name, { album: name, artist: artist || name, autocorrect: 1 });
-      img = d?.album?.image?.find(x => x.size === 'extralarge')?.['#text']
-         || d?.album?.image?.find(x => x.size === 'large')?.['#text'] || '';
+      /* 1. album.getInfo Last.fm via API.call (mis en cache, sans param user parasite) */
+      try {
+        const d = await API.call('album.getInfo', { album: name, artist: artist || '', autocorrect: 1 });
+        img = d?.album?.image?.find(x => x.size === 'extralarge')?.['#text']
+           || d?.album?.image?.find(x => x.size === 'large')?.['#text'] || '';
+      } catch {}
+      /* 2. Fallback iTunes */
+      if (!img || isDefaultImg(img)) img = await _fetchAlbumImageiTunes(name, artist) || '';
+
     } else if (type === 'track') {
-      const d = await _apiFetchUser('track.getInfo', artist || name, { track: name, artist: artist || name, autocorrect: 1 });
-      img = d?.track?.album?.image?.find(x => x.size === 'extralarge')?.['#text']
-         || d?.track?.album?.image?.find(x => x.size === 'large')?.['#text'] || '';
+      /* 1. track.getInfo Last.fm via API.call */
+      try {
+        const d = await API.call('track.getInfo', { track: name, artist: artist || '', autocorrect: 1 });
+        img = d?.track?.album?.image?.find(x => x.size === 'extralarge')?.['#text']
+           || d?.track?.album?.image?.find(x => x.size === 'large')?.['#text'] || '';
+      } catch {}
+      /* 2. Si pas de pochette → cherche l'album du titre sur iTunes */
+      if (!img || isDefaultImg(img)) img = await _fetchTrackImageiTunes(name, artist) || '';
+      /* 3. Dernier recours : pochette du top album de l'artiste */
+      if (!img || isDefaultImg(img) && artist) {
+        try {
+          const d = await API.call('artist.getTopAlbums', { artist, limit: 1, autocorrect: 1 });
+          const u = d?.topalbums?.album?.[0]?.image?.find(x => x.size === 'extralarge')?.['#text'] || '';
+          if (!isDefaultImg(u)) img = u;
+        } catch {}
+      }
     }
 
     if (img && !isDefaultImg(img)) {
       bgEl.style.backgroundImage = `url('${escHtml(img)}')`;
-      bgEl.style.background = '';
+      bgEl.style.removeProperty('background');
     }
   } catch {}
 }
@@ -1413,12 +1474,12 @@ async function _resolveProfileTrackImg(tr, index) {
     const thumbEl = document.getElementById(`ptrack-thumb-${index}`);
     if (!thumbEl) return;
 
-    // 1. Essai avec l'image déjà dispo dans les données de l'API
+    // 1. Image déjà dispo dans les données de l'API
     let img = tr?.image?.find(x => x.size === 'extralarge')?.['#text']
            || tr?.image?.find(x => x.size === 'large')?.['#text']
            || tr?.image?.find(x => x.size === 'medium')?.['#text'] || '';
 
-    // 2. Si absente ou image par défaut → appel track.getInfo pour la vraie pochette
+    // 2. Si absente → appel track.getInfo Last.fm
     if (!img || isDefaultImg(img)) {
       const artistName = tr?.artist?.name || tr?.artist?.['#text'] || '';
       const d = await _apiFetchUser('track.getInfo', artistName, {
@@ -1429,8 +1490,13 @@ async function _resolveProfileTrackImg(tr, index) {
          || d?.track?.album?.image?.find(x => x.size === 'medium')?.['#text'] || '';
     }
 
+    // 3. Fallback iTunes si toujours rien
+    if (!img || isDefaultImg(img)) {
+      const artistName = tr?.artist?.name || tr?.artist?.['#text'] || '';
+      img = await _fetchTrackImageiTunes(tr?.name || '', artistName) || '';
+    }
+
     if (img && !isDefaultImg(img)) {
-      // Remplace le fallback coloré par la vraie pochette
       thumbEl.outerHTML = `<img src="${escHtml(img)}" alt="" class="ptrack-img" id="ptrack-thumb-${index}" onerror="this.style.display='none'">`;
     }
   } catch {}
@@ -1438,7 +1504,7 @@ async function _resolveProfileTrackImg(tr, index) {
 
 async function _loadArtistBg(artist) {
   try {
-    // Cherche d'abord dans les images déjà disponibles
+    /* 1. Image déjà disponible dans les données */
     const imgFromData = artist?.image?.find(x => x.size === 'extralarge')?.['#text']
                      || artist?.image?.find(x => x.size === 'large')?.['#text'] || '';
     if (imgFromData && !isDefaultImg(imgFromData)) {
@@ -1446,7 +1512,16 @@ async function _loadArtistBg(artist) {
       if (bgEl) bgEl.style.backgroundImage = `url('${imgFromData}')`;
       return;
     }
-    // Sinon appel artist.getInfo
+
+    /* 2. Cascade multi-API pour vraie photo artiste */
+    const externalImg = await _resolveArtistImageExternal(artist.name);
+    if (externalImg) {
+      const bgEl = document.getElementById('profile-hero-bg');
+      if (bgEl) bgEl.style.backgroundImage = `url('${externalImg}')`;
+      return;
+    }
+
+    /* 3. Fallback Last.fm artist.getInfo */
     const d   = await _apiFetchUser('artist.getInfo', artist.name, { artist: artist.name, autocorrect: 1 });
     const img = d?.artist?.image?.find(x => x.size === 'extralarge')?.['#text'] || '';
     if (img && !isDefaultImg(img)) {
@@ -1908,20 +1983,80 @@ function renderHeatmap(hourCounts) {
     </div>`;
 }
 
-const _imgCache = new Map();
+const _imgCache    = new Map();
+const _imgInFlight = new Map(); // évite les requêtes parallèles pour le même artiste
 
 async function getArtistImage(artistName) {
   if (_imgCache.has(artistName)) return _imgCache.get(artistName);
+  if (_imgInFlight.has(artistName)) return _imgInFlight.get(artistName);
+
+  const promise = _resolveArtistImageExternal(artistName).then(url => {
+    _imgCache.set(artistName, url);
+    _imgInFlight.delete(artistName);
+    return url;
+  });
+  _imgInFlight.set(artistName, promise);
+  return promise;
+}
+
+/**
+ * Cascade multi-API pour récupérer une vraie photo d'artiste.
+ * Ordre de priorité : Wikipedia → iTunes → TheAudioDB → Last.fm album art (fallback)
+ */
+async function _resolveArtistImageExternal(artistName) {
+  /* 1. Wikipedia — photos de qualité pour artistes connus, CORS OK */
   try {
-    // use API.call (cached) instead of API._fetch
-    const data   = await API.call('artist.getTopAlbums', { artist:artistName, limit:3, autocorrect:1 });
-    const albums = data.topalbums?.album || [];
-    for (const alb of albums) {
-      const img = alb.image?.find(i => i.size === 'extralarge')?.['#text'] || alb.image?.find(i => i.size === 'large')?.['#text'] || '';
-      if (!isDefaultImg(img)) { _imgCache.set(artistName, img); return img; }
+    const r = await fetch(
+      `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(artistName)}&prop=pageimages&format=json&pithumbsize=600&origin=*`,
+      { signal: AbortSignal.timeout(4000) }
+    );
+    if (r.ok) {
+      const d = await r.json();
+      for (const page of Object.values(d.query?.pages || {})) {
+        if (page.thumbnail?.source && !page.missing) return page.thumbnail.source;
+      }
     }
   } catch {}
-  _imgCache.set(artistName, null);
+
+  /* 2. iTunes Search — très fiable, CORS natif */
+  try {
+    const r = await fetch(
+      `https://itunes.apple.com/search?term=${encodeURIComponent(artistName)}&entity=musicArtist&limit=5`,
+      { signal: AbortSignal.timeout(4000) }
+    );
+    if (r.ok) {
+      const d = await r.json();
+      const exact = d.results?.find(a => a.artistName?.toLowerCase() === artistName.toLowerCase());
+      const hit   = exact || d.results?.[0];
+      if (hit?.artworkUrl100) {
+        return hit.artworkUrl100.replace('100x100bb', '600x600bb').replace('/100x100/', '/600x600/');
+      }
+    }
+  } catch {}
+
+  /* 3. TheAudioDB — base dédiée, bonne couverture */
+  try {
+    const r = await fetch(
+      `https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(artistName)}`,
+      { signal: AbortSignal.timeout(4000) }
+    );
+    if (r.ok) {
+      const img = (await r.json()).artists?.[0]?.strArtistThumb;
+      if (img) return img;
+    }
+  } catch {}
+
+  /* 4. Last.fm artist.getTopAlbums — fallback : on prend la pochette du meilleur album */
+  try {
+    const data   = await API.call('artist.getTopAlbums', { artist: artistName, limit: 3, autocorrect: 1 });
+    const albums = data.topalbums?.album || [];
+    for (const alb of albums) {
+      const img = alb.image?.find(i => i.size === 'extralarge')?.['#text']
+               || alb.image?.find(i => i.size === 'large')?.['#text'] || '';
+      if (!isDefaultImg(img)) return img;
+    }
+  } catch {}
+
   return null;
 }
 

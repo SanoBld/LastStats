@@ -203,7 +203,7 @@
 
     <!-- user profile summary -->
     <div class="sb-profile-wrap" id="sb-profile-wrap">
-      <button class="sb-profile" id="sb-profile" onclick="toggleProfileBubble()" aria-haspopup="true" aria-expanded="false">
+      <button class="sb-profile" id="sb-profile" onclick="openProfilePage()" aria-label="Voir le profil">
         <div class="sb-av" id="sb-av"></div>
         <div class="sb-info">
           <strong id="sb-name">…</strong>
@@ -212,18 +212,6 @@
         </div>
         <i class="fas fa-chevron-right sb-profile-chevron" id="sb-profile-chevron"></i>
       </button>
-      <!-- dropdown bubble -->
-      <div class="profile-bubble hidden" id="profile-bubble" role="menu">
-        <button class="pb-item" onclick="openProfilePage()" role="menuitem">
-          <i class="fas fa-user-circle"></i>
-          <span>Voir le profil</span>
-        </button>
-        <div class="pb-sep"></div>
-        <button class="pb-item" onclick="closeProfileBubble(); nav('settings')" role="menuitem">
-          <i class="fas fa-cog"></i>
-          <span>Paramètres</span>
-        </button>
-      </div>
     </div>
 
     <!-- primary navigation -->
@@ -1694,7 +1682,7 @@
 
   
   <nav class="bottom-nav" role="navigation" aria-label="Mobile navigation">
-    <a class="bn-item active" data-s="dashboard" onclick="nav('dashboard')">
+    <a class="bn-item active" data-s="dashboard" onclick="nav('dashboard')">>
       <i class="fas fa-home"></i>
       <span data-i18n="nav.dashboard">Dashboard</span>
     </a>

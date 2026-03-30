@@ -4333,17 +4333,17 @@ button.bn-item:focus-visible,
 .profile-hero-bg {
   position: absolute; inset: 0;
   background: var(--bg-hover) center/cover no-repeat;
-  filter: blur(6px) brightness(.55) saturate(1.5);
-  transform: scale(1.04);
+  filter: blur(18px) brightness(.40) saturate(1.6);
+  transform: scale(1.08);
   transition: background-image .6s var(--ease-standard);
 }
 .profile-hero-overlay {
   position: absolute; inset: 0;
   background: linear-gradient(to top,
-    rgba(0,0,0,.96) 0%,
-    rgba(0,0,0,.60) 35%,
-    rgba(0,0,0,.20) 65%,
-    rgba(0,0,0,.00) 100%);
+    rgba(0,0,0,.98) 0%,
+    rgba(0,0,0,.72) 40%,
+    rgba(0,0,0,.30) 70%,
+    rgba(0,0,0,.05) 100%);
 }
 .profile-hero-content {
   position: relative; z-index: 2; width: 100%;
@@ -4356,8 +4356,8 @@ button.bn-item:focus-visible,
 .profile-av-wrap { position: relative; width: 96px; height: 96px; }
 .profile-av {
   width: 100%; height: 100%; border-radius: 50%; overflow: hidden;
-  border: 3px solid rgba(255,255,255,.85);
-  box-shadow: 0 4px 24px rgba(0,0,0,.65), 0 0 0 1px rgba(0,0,0,.3);
+  border: 3.5px solid rgba(255,255,255,.95);
+  box-shadow: 0 6px 32px rgba(0,0,0,.80), 0 0 0 1.5px rgba(0,0,0,.5);
   background: var(--bg-hover);
 }
 .profile-now-dot {
@@ -4372,12 +4372,12 @@ button.bn-item:focus-visible,
 }
 
 .profile-username {
-  font-size: 1.45rem; font-weight: 800; color: #fff;
+  font-size: 1.55rem; font-weight: 800; color: #fff;
   letter-spacing: -.02em; margin: 0;
-  text-shadow: 0 2px 8px rgba(0,0,0,.6);
+  text-shadow: 0 2px 16px rgba(0,0,0,.85), 0 1px 4px rgba(0,0,0,.6);
 }
-.profile-country { font-size: .78rem; color: rgba(255,255,255,.65); }
-.profile-since   { font-size: .72rem; color: rgba(255,255,255,.48); letter-spacing: .01em; }
+.profile-country { font-size: .82rem; color: rgba(255,255,255,.80); text-shadow: 0 1px 6px rgba(0,0,0,.7); }
+.profile-since   { font-size: .74rem; color: rgba(255,255,255,.60); letter-spacing: .01em; text-shadow: 0 1px 6px rgba(0,0,0,.7); }
 
 /* Stats row */
 .profile-stats-row {
@@ -4386,13 +4386,14 @@ button.bn-item:focus-visible,
 }
 .profile-stat-chip {
   background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); padding: 12px 10px;
+  border-radius: var(--radius-sm); padding: 14px 10px;
   display: flex; flex-direction: column; align-items: center;
-  gap: 3px; text-align: center;
+  gap: 4px; text-align: center;
+  box-shadow: var(--shadow-sm);
 }
-.profile-stat-chip i      { font-size: .85rem; color: var(--accent); margin-bottom: 1px; }
-.profile-stat-chip strong { font-size: 1rem; font-weight: 700; color: var(--text); line-height: 1; }
-.profile-stat-chip span   { font-size: .68rem; color: var(--text-muted); font-weight: 500; }
+.profile-stat-chip i      { font-size: .9rem; color: var(--accent); margin-bottom: 2px; }
+.profile-stat-chip strong { font-size: 1.05rem; font-weight: 800; color: var(--text); line-height: 1; }
+.profile-stat-chip span   { font-size: .7rem; color: var(--text-muted); font-weight: 600; letter-spacing: .02em; }
 
 /* Period bar */
 .profile-period-bar {
@@ -4433,23 +4434,23 @@ button.bn-item:focus-visible,
 .profile-top-card:hover .ptc-bg { transform: scale(1.06); }
 .ptc-overlay {
   position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,.90) 0%, rgba(0,0,0,.28) 60%, transparent 100%);
+  background: linear-gradient(to top, rgba(0,0,0,.96) 0%, rgba(0,0,0,.45) 55%, transparent 100%);
 }
 .ptc-lfm-hint {
   position: absolute; top: 8px; right: 8px;
-  font-size: .65rem; color: rgba(255,255,255,.45);
+  font-size: .65rem; color: rgba(255,255,255,.55);
   transition: color .15s; z-index: 3;
 }
-.profile-top-card:hover .ptc-lfm-hint { color: rgba(255,255,255,.9); }
+.profile-top-card:hover .ptc-lfm-hint { color: rgba(255,255,255,.95); }
 .ptc-content {
   position: relative; z-index: 2;
-  display: flex; flex-direction: column; gap: 2px;
-  padding: 11px; height: 100%; justify-content: flex-end;
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 12px; height: 100%; justify-content: flex-end;
 }
-.ptc-label  { font-size: .66rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .06em; }
-.ptc-name   { font-size: .88rem; font-weight: 700; color: #fff; line-height: 1.2; }
-.ptc-sub    { font-size: .7rem; color: rgba(255,255,255,.58); }
-.ptc-plays  { font-size: .68rem; color: rgba(255,255,255,.46); font-weight: 500; }
+.ptc-label  { font-size: .66rem; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: .08em; text-shadow: 0 1px 4px rgba(0,0,0,.8); }
+.ptc-name   { font-size: .92rem; font-weight: 800; color: #fff; line-height: 1.2; text-shadow: 0 1px 8px rgba(0,0,0,.9); }
+.ptc-sub    { font-size: .72rem; color: rgba(255,255,255,.72); text-shadow: 0 1px 4px rgba(0,0,0,.8); }
+.ptc-plays  { font-size: .68rem; color: rgba(255,255,255,.55); font-weight: 600; }
 
 /* Section heading */
 .profile-section-hd {
@@ -4508,10 +4509,22 @@ button.bn-item:focus-visible,
   .profile-top-card   { min-height: 100px; }
 }
 @media (max-width: 480px) {
-  .profile-hero       { height: 260px; }
+  .profile-hero       { height: 280px; }
   .profile-av-wrap    { width: 80px; height: 80px; }
-  .profile-username   { font-size: 1.2rem; }
+  .profile-username   { font-size: 1.25rem; }
   .profile-stats-row, .profile-top3-grid,
   .profile-tracks-list, .profile-period-bar,
   .profile-section-hd, .profile-back-bar { padding-left: 16px; padding-right: 16px; }
+}
+
+/* ─── Lien Profil dans la nav (sidebar + mobile) ─────────────────────────── */
+/* Le lien Profil n'a pas de section data-s matchée (c'est openProfilePage()),
+   on le style identiquement aux autres liens nav. */
+a.nav-lnk[data-s="profile"],
+a.bn-item[data-s="profile"] { cursor: pointer; }
+/* Quand le profil est actif (s-profile visible), on highlight le lien */
+a.nav-lnk[data-s="profile"].active,
+a.bn-item[data-s="profile"].active {
+  color: var(--accent);
+  background: var(--accent-lt);
 }
