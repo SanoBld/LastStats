@@ -1316,6 +1316,11 @@ async function _loadProfileTopData(username, period) {
     const rawTracks = tracksData?.toptracks?.track || [];
     const tracks    = Array.isArray(rawTracks) ? rawTracks : [rawTracks];
 
+    /* Stocker les MBIDs pour les futures requêtes Cover Art Archive */
+    _extractAndStoreMbids(artistsData);
+    _extractAndStoreMbids(albumsData);
+    _extractAndStoreMbids(tracksData);
+
     _renderProfileTopCard('ptop-artist', 'microphone-alt', 'Artiste #1',
       artist?.name, artist?.playcount, artist?.image);
     _renderProfileTopCard('ptop-album',  'compact-disc',   'Album #1',
@@ -1434,25 +1439,30 @@ async function _resolveTopCardImg(cardId, type, name, artist) {
       }
 
     } else if (type === 'album') {
-      /* 1. album.getInfo Last.fm via API.call (mis en cache, sans param user parasite) */
+      /* 1. album.getInfo Last.fm → stocke le MBID pour Cover Art Archive */
       try {
         const d = await API.call('album.getInfo', { album: name, artist: artist || '', autocorrect: 1 });
+        if (d?.album?.mbid) _storeMbid('album', name, d.album.mbid);
+        if (d?.album?.artist && d?.album?.mbid) _storeMbid('artist', d.album.artist, d.album.mbid);
         img = d?.album?.image?.find(x => x.size === 'extralarge')?.['#text']
            || d?.album?.image?.find(x => x.size === 'large')?.['#text'] || '';
       } catch {}
-      /* 2. Fallback iTunes */
-      if (!img || isDefaultImg(img)) img = await _fetchAlbumImageiTunes(name, artist) || '';
+      /* 2. Fallback Cover Art Archive (MBID) → iTunes */
+      if (!img || isDefaultImg(img)) img = await _fetchAlbumImageWithMbid(name, artist) || '';
 
     } else if (type === 'track') {
-      /* 1. track.getInfo Last.fm via API.call */
+      /* 1. track.getInfo Last.fm → stocke MBIDs */
       try {
         const d = await API.call('track.getInfo', { track: name, artist: artist || '', autocorrect: 1 });
+        if (d?.track?.mbid) _storeMbid('track', name, d.track.mbid);
+        if (d?.track?.artist?.mbid) _storeMbid('artist', artist || name, d.track.artist.mbid);
+        if (d?.track?.album?.mbid) _storeMbid('album', d.track.album.title || '', d.track.album.mbid);
         img = d?.track?.album?.image?.find(x => x.size === 'extralarge')?.['#text']
            || d?.track?.album?.image?.find(x => x.size === 'large')?.['#text'] || '';
       } catch {}
-      /* 2. Si pas de pochette → cherche l'album du titre sur iTunes */
+      /* 2. iTunes pour la pochette */
       if (!img || isDefaultImg(img)) img = await _fetchTrackImageiTunes(name, artist) || '';
-      /* 3. Dernier recours : pochette du top album de l'artiste */
+      /* 3. Dernier recours : top album de l'artiste */
       if (!img || isDefaultImg(img) && artist) {
         try {
           const d = await API.call('artist.getTopAlbums', { artist, limit: 1, autocorrect: 1 });
@@ -1606,17 +1616,19 @@ async function _loadProfileNowPlaying(username) {
 }
 
 let _npTimer = null;
+let _npIsPlaying = false; // état courant pour adapter la fréquence
 
 async function pollNowPlaying() {
   clearTimeout(_npTimer);
   try {
     const data  = await API._fetch('user.getRecentTracks', { limit: 1, extended: 1 });
     const tracks = data.recenttracks?.track;
-    if (!tracks) return;
+    if (!tracks) { _npTimer = setTimeout(pollNowPlaying, 15000); return; }
     const last = Array.isArray(tracks) ? tracks[0] : tracks;
     const wrap = document.getElementById('now-playing-wrap');
 
     if (last['@attr']?.nowplaying) {
+      _npIsPlaying = true;
       const trackName  = last.name || '—';
       const artistName = last.artist?.name || last.artist?.['#text'] || '—';
 
@@ -1640,12 +1652,18 @@ async function pollNowPlaying() {
       if (ytBtn) ytBtn.href = `https://www.youtube.com/results?search_query=${q}`;
 
       wrap?.classList.remove('hidden');
-      _npTimer = setTimeout(pollNowPlaying, 30000);
+      /* ── Rafraîchissement 2s pendant l'écoute pour rester en sync ── */
+      _npTimer = setTimeout(pollNowPlaying, 2000);
     } else {
+      _npIsPlaying = false;
       wrap?.classList.add('hidden');
-      _npTimer = setTimeout(pollNowPlaying, 60000);
+      /* Pas de lecture : on ralentit à 15s pour économiser les requêtes */
+      _npTimer = setTimeout(pollNowPlaying, 15000);
     }
-  } catch { _npTimer = setTimeout(pollNowPlaying, 120000); }
+  } catch {
+    _npIsPlaying = false;
+    _npTimer = setTimeout(pollNowPlaying, 30000);
+  }
 }
 
 async function shareNowPlaying() {
@@ -1986,6 +2004,21 @@ function renderHeatmap(hourCounts) {
 const _imgCache    = new Map();
 const _imgInFlight = new Map(); // évite les requêtes parallèles pour le même artiste
 
+/* ── Cache MBID — storé par nom d'artiste/album/titre ── */
+const _mbidCache = new Map();
+
+/**
+ * Retourne le MBID depuis Last.fm si disponible.
+ * Last.fm inclut souvent le champ `mbid` dans les réponses artist/album/track.
+ * On le stocke ici pour éviter les homonymes et enrichir les appels externes.
+ */
+function _storeMbid(type, name, mbid) {
+  if (mbid && mbid.length === 36) _mbidCache.set(`${type}:${name.toLowerCase()}`, mbid);
+}
+function _getMbid(type, name) {
+  return _mbidCache.get(`${type}:${name.toLowerCase()}`) || null;
+}
+
 async function getArtistImage(artistName) {
   if (_imgCache.has(artistName)) return _imgCache.get(artistName);
   if (_imgInFlight.has(artistName)) return _imgInFlight.get(artistName);
@@ -2001,9 +2034,26 @@ async function getArtistImage(artistName) {
 
 /**
  * Cascade multi-API pour récupérer une vraie photo d'artiste.
- * Ordre de priorité : Wikipedia → iTunes → TheAudioDB → Last.fm album art (fallback)
+ * Ordre : MusicBrainz (si MBID connu) → Wikipedia → iTunes → TheAudioDB → Last.fm album art
  */
 async function _resolveArtistImageExternal(artistName) {
+  /* 0. MusicBrainz → Cover Art Archive via MBID (précision maximale, pas d'homonymes) */
+  const mbid = _getMbid('artist', artistName);
+  if (mbid) {
+    try {
+      const r = await fetch(
+        `https://musicbrainz.org/ws/2/artist/${mbid}?inc=url-rels&fmt=json`,
+        { headers: { 'User-Agent': 'LastStats/1.0 (github.com/sanobld/LastStats)' },
+          signal: AbortSignal.timeout(4000) }
+      );
+      if (r.ok) {
+        const d = await r.json();
+        const imgRel = d.relations?.find(rel => rel.type === 'image');
+        if (imgRel?.url?.resource) return imgRel.url.resource;
+      }
+    } catch {}
+  }
+
   /* 1. Wikipedia — photos de qualité pour artistes connus, CORS OK */
   try {
     const r = await fetch(
@@ -2046,7 +2096,7 @@ async function _resolveArtistImageExternal(artistName) {
     }
   } catch {}
 
-  /* 4. Last.fm artist.getTopAlbums — fallback : on prend la pochette du meilleur album */
+  /* 4. Last.fm artist.getTopAlbums — fallback : pochette du meilleur album */
   try {
     const data   = await API.call('artist.getTopAlbums', { artist: artistName, limit: 3, autocorrect: 1 });
     const albums = data.topalbums?.album || [];
@@ -2058,6 +2108,51 @@ async function _resolveArtistImageExternal(artistName) {
   } catch {}
 
   return null;
+}
+
+/**
+ * Récupère la pochette d'un album via Cover Art Archive (MusicBrainz) si MBID disponible,
+ * sinon via iTunes. Retourne null si rien trouvé.
+ */
+async function _fetchAlbumImageWithMbid(albumName, artistName) {
+  /* Essai MBID album → Cover Art Archive (haute résolution, sans quota) */
+  const mbid = _getMbid('album', albumName);
+  if (mbid) {
+    try {
+      const r = await fetch(
+        `https://coverartarchive.org/release-group/${mbid}/front-500`,
+        { signal: AbortSignal.timeout(4000) }
+      );
+      if (r.ok && r.headers.get('content-type')?.startsWith('image/')) return r.url;
+    } catch {}
+  }
+  /* Fallback iTunes */
+  return _fetchAlbumImageiTunes(albumName, artistName);
+}
+
+/**
+ * Stocke les MBIDs trouvés dans les réponses Last.fm (artiste, album, titre).
+ * À appeler à chaque fois qu'on reçoit des données de l'API Last.fm.
+ */
+function _extractAndStoreMbids(data) {
+  try {
+    // Artiste
+    const artist = data?.artist || data?.topartists?.artist;
+    const artists = Array.isArray(artist) ? artist : (artist ? [artist] : []);
+    for (const a of artists) { if (a?.name && a?.mbid) _storeMbid('artist', a.name, a.mbid); }
+    // Album
+    const album = data?.album || data?.topalbums?.album;
+    const albums = Array.isArray(album) ? album : (album ? [album] : []);
+    for (const a of albums) { if (a?.name && a?.mbid) _storeMbid('album', a.name, a.mbid); }
+    // Track
+    const track = data?.track || data?.toptracks?.track || data?.recenttracks?.track;
+    const tracks = Array.isArray(track) ? track : (track ? [track] : []);
+    for (const tr of tracks) {
+      if (tr?.name && tr?.mbid) _storeMbid('track', tr.name, tr.mbid);
+      if (tr?.artist?.name && tr?.artist?.mbid) _storeMbid('artist', tr.artist.name, tr.artist.mbid);
+      if (tr?.album?.['#text'] && tr?.album?.mbid) _storeMbid('album', tr.album['#text'], tr.album.mbid);
+    }
+  } catch {}
 }
 
 async function injectArtistImage(artistName, containerId, fallbackBg, fallbackLetter) {
