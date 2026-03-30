@@ -26,7 +26,7 @@
 <body>
 
 <!-- ═══════════════════════════════════════════════════
-     SETUP SCREEN
+     SETUP SCREEN — shown when no credentials stored
 ═══════════════════════════════════════════════════ -->
 <div id="setup-screen" class="hidden">
   <div class="setup-bg">
@@ -53,11 +53,11 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════
-     MAIN APP
+     MAIN APP SHELL
 ═══════════════════════════════════════════════════ -->
 <div id="app-shell" class="hidden">
 
-  <!-- ── Sidebar Overlay (mobile) ── -->
+  <!-- Sidebar Overlay (mobile) -->
   <div class="fr-sidebar-ov" id="fr-sidebar-ov"></div>
 
   <!-- ════════════════════════════════════
@@ -65,18 +65,18 @@
   ════════════════════════════════════ -->
   <aside class="fr-sidebar" id="fr-sidebar">
 
-    <!-- Logo -->
+    <!-- Logo + close -->
     <div class="fr-sb-head">
       <div class="fr-sb-logo">
         <div class="fr-sb-logo-icon"><i class="fas fa-headphones-alt"></i></div>
         <span>LastStats</span>
       </div>
-      <button class="fr-sb-close" id="btn-sb-close" title="Fermer">
+      <button class="fr-sb-close" id="btn-sb-close" aria-label="Fermer la navigation">
         <i class="fas fa-times"></i>
       </button>
     </div>
 
-    <!-- User profile -->
+    <!-- User profile block -->
     <div class="fr-sb-profile" id="sb-user-block">
       <div class="fr-sb-av-wrap">
         <img class="fr-sb-av" id="sb-av" src="" alt="" onerror="this.style.display='none'">
@@ -86,7 +86,7 @@
         <strong id="sb-username">—</strong>
         <span id="sb-scrobbles" class="fr-sb-sub">— scrobbles</span>
       </div>
-      <a href="index.html" class="fr-sb-stats-link" title="Voir mes stats">
+      <a href="index.html" class="fr-sb-stats-link" title="Mes statistiques">
         <i class="fas fa-chart-line"></i>
       </a>
     </div>
@@ -117,7 +117,7 @@
       </button>
     </nav>
 
-    <!-- Sidebar footer: stats -->
+    <!-- Sidebar footer -->
     <div class="fr-sb-foot">
       <div class="fr-sb-stats">
         <div class="fr-sb-stat">
@@ -132,6 +132,22 @@
         </div>
       </div>
       <div class="fr-sb-updated" id="sb-stat-updated"></div>
+
+      <!-- Theme switcher (sidebar footer) -->
+      <div class="fr-sb-theme-row">
+        <span>Thème</span>
+        <div class="fr-sb-theme-btns">
+          <button class="fr-sb-th-btn" data-theme-val="dark" title="Sombre">
+            <i class="fas fa-moon"></i>
+          </button>
+          <button class="fr-sb-th-btn" data-theme-val="light" title="Clair">
+            <i class="fas fa-sun"></i>
+          </button>
+          <button class="fr-sb-th-btn" data-theme-val="auto" title="Auto">
+            <i class="fas fa-circle-half-stroke"></i>
+          </button>
+        </div>
+      </div>
     </div>
 
   </aside><!-- /sidebar -->
@@ -141,31 +157,34 @@
   ════════════════════════════════════ -->
   <div class="fr-main-wrap">
 
-    <!-- ── Header ── -->
+    <!-- Top App Bar — matches style.css .app-hd -->
     <header class="fr-header" id="app-header">
-      <button class="fr-burger-btn" id="btn-burger" title="Menu">
+
+      <!-- Burger (mobile) -->
+      <button class="fr-burger-btn" id="btn-burger" aria-label="Ouvrir le menu">
         <i class="fas fa-bars"></i>
       </button>
 
-      <div class="fr-header-title">
-        <span class="fr-header-logo"><i class="fas fa-headphones-alt"></i></span>
-        <span>LastStats</span>
-        <span class="fr-header-sep">/</span>
+      <!-- Title -->
+      <div class="fr-hd-title">
+        <div class="fr-hd-logo-icon" aria-hidden="true">
+          <i class="fas fa-headphones-alt"></i>
+        </div>
         <span id="hd-tab-label">Amis</span>
       </div>
 
-      <div class="fr-header-actions">
+      <!-- Right actions -->
+      <div class="fr-hd-right">
         <button class="fr-icon-btn" id="btn-refresh" title="Actualiser">
           <i class="fas fa-sync-alt"></i>
         </button>
-        <div class="fr-live-indicator hidden" id="live-indicator" title="Mise à jour en direct">
-          <span class="live-dot"></span>
-          <span>LIVE</span>
-        </div>
+        <a href="index.html" class="fr-icon-btn" title="Mes statistiques" aria-label="Mes statistiques">
+          <i class="fas fa-chart-line"></i>
+        </a>
       </div>
     </header>
 
-    <!-- ── Content ── -->
+    <!-- Content area -->
     <main class="fr-main" id="fr-main">
 
       <!-- ════════════════════
@@ -173,12 +192,18 @@
       ════════════════════ -->
       <section id="tab-content-friends" class="tab-content active">
 
+        <!-- Mon Statut (my own now-playing) -->
+        <div id="my-status-section" class="hidden"></div>
+
         <!-- Controls bar -->
         <div class="fr-controls-bar">
           <div class="fr-search-wrap">
             <i class="fas fa-search fr-search-icon"></i>
-            <input type="text" id="friends-search" class="fr-search-input" placeholder="Filtrer les amis…" autocomplete="off">
-            <button class="fr-search-clear hidden" id="friends-search-clear"><i class="fas fa-times"></i></button>
+            <input type="text" id="friends-search" class="fr-search-input"
+                   placeholder="Filtrer les amis…" autocomplete="off">
+            <button class="fr-search-clear hidden" id="friends-search-clear">
+              <i class="fas fa-times"></i>
+            </button>
           </div>
           <div class="fr-filter-chips">
             <button class="fr-chip active" data-filter="all">Tous</button>
@@ -204,7 +229,7 @@
             <span>en écoute</span>
           </div>
           <div class="fr-stat-sep"></div>
-          <div class="fr-stat-item">
+          <div class="fr-stat-item" style="margin-left:auto">
             <i class="fas fa-sync-alt" style="font-size:.65rem;color:var(--text-muted)"></i>
             <span id="stat-updated" style="color:var(--text-muted);font-size:.72rem">—</span>
           </div>
@@ -240,9 +265,7 @@
           </button>
         </div>
 
-        <!-- ════════════════════
-             ACTIVITY FEED
-        ════════════════════ -->
+        <!-- Activity Feed -->
         <div class="fr-feed-section hidden" id="friends-feed-section">
           <div class="fr-feed-hd">
             <div class="fr-feed-hd-left">
@@ -254,9 +277,7 @@
               <span>EN DIRECT</span>
             </div>
           </div>
-          <div class="fr-feed-list" id="friends-feed-list">
-            <!-- populated by JS -->
-          </div>
+          <div class="fr-feed-list" id="friends-feed-list"></div>
         </div>
 
       </section><!-- /friends tab -->
@@ -266,7 +287,6 @@
       ════════════════════ -->
       <section id="tab-content-search" class="tab-content">
 
-        <!-- Search hero -->
         <div class="fr-search-hero">
           <div class="fr-search-hero-inner">
             <div class="fr-search-big-wrap" id="search-big-wrap">
@@ -331,7 +351,8 @@
         <div class="fr-controls-bar" style="padding-bottom:0">
           <div class="fr-search-wrap">
             <i class="fas fa-search fr-search-icon"></i>
-            <input type="text" id="fav-search" class="fr-search-input" placeholder="Filtrer les favoris…" autocomplete="off">
+            <input type="text" id="fav-search" class="fr-search-input"
+                   placeholder="Filtrer les favoris…" autocomplete="off">
           </div>
         </div>
 
@@ -373,7 +394,7 @@
                   <i class="fas fa-sun"></i> Clair
                 </button>
                 <button class="fr-th-btn" data-theme-val="auto" title="Thème automatique">
-                  <i class="fas fa-magic"></i> Auto
+                  <i class="fas fa-circle-half-stroke"></i> Auto
                 </button>
               </div>
             </div>
@@ -384,24 +405,12 @@
                 <span>Couleur d'accent</span>
               </div>
               <div class="fr-accent-swatches" id="accent-swatches">
-                <button class="fr-accent-swatch" data-accent="purple" style="--sw-color:#d0bcff" title="Violet">
-                  <span class="sw-dot"></span>
-                </button>
-                <button class="fr-accent-swatch" data-accent="red" style="--sw-color:#f28b82" title="Rouge">
-                  <span class="sw-dot"></span>
-                </button>
-                <button class="fr-accent-swatch" data-accent="green" style="--sw-color:#81c995" title="Vert">
-                  <span class="sw-dot"></span>
-                </button>
-                <button class="fr-accent-swatch" data-accent="blue" style="--sw-color:#8ab4f8" title="Bleu">
-                  <span class="sw-dot"></span>
-                </button>
-                <button class="fr-accent-swatch" data-accent="orange" style="--sw-color:#fcad70" title="Orange">
-                  <span class="sw-dot"></span>
-                </button>
-                <button class="fr-accent-swatch" data-accent="pink" style="--sw-color:#f48fb1" title="Rose">
-                  <span class="sw-dot"></span>
-                </button>
+                <button class="fr-accent-swatch" data-accent="purple" style="--sw-color:#d0bcff" title="Violet"><span class="sw-dot"></span></button>
+                <button class="fr-accent-swatch" data-accent="red"    style="--sw-color:#f28b82" title="Rouge"><span class="sw-dot"></span></button>
+                <button class="fr-accent-swatch" data-accent="green"  style="--sw-color:#81c995" title="Vert"><span class="sw-dot"></span></button>
+                <button class="fr-accent-swatch" data-accent="blue"   style="--sw-color:#8ab4f8" title="Bleu"><span class="sw-dot"></span></button>
+                <button class="fr-accent-swatch" data-accent="orange" style="--sw-color:#fcad70" title="Orange"><span class="sw-dot"></span></button>
+                <button class="fr-accent-swatch" data-accent="pink"   style="--sw-color:#f48fb1" title="Rose"><span class="sw-dot"></span></button>
               </div>
             </div>
           </div>
@@ -470,13 +479,11 @@
         </div>
       </section><!-- /settings tab -->
 
-    </main><!-- /fr-main -->
+    </main>
 
   </div><!-- /fr-main-wrap -->
 
-  <!-- ════════════════════════════════════
-       BOTTOM NAV (mobile)
-  ════════════════════════════════════ -->
+  <!-- Bottom Nav (mobile only) -->
   <nav class="fr-bottom-nav" id="fr-bottom-nav">
     <div class="fr-bn-inner">
       <button class="fr-bn-item active" data-tab="friends">
@@ -494,12 +501,12 @@
       </button>
       <button class="fr-bn-item" data-tab="settings">
         <i class="fas fa-cog"></i>
-        <span>Paramètres</span>
+        <span>Réglages</span>
       </button>
     </div>
   </nav>
 
-  <!-- ── Profile Modal ── -->
+  <!-- Profile Modal -->
   <div class="fr-modal-overlay" id="profile-modal-overlay" aria-hidden="true">
     <div class="fr-modal" id="profile-modal" role="dialog" aria-modal="true" aria-label="Profil utilisateur">
       <button class="fr-modal-close" id="profile-modal-close" title="Fermer">
@@ -509,7 +516,7 @@
     </div>
   </div>
 
-  <!-- ── Toast ── -->
+  <!-- Toast -->
   <div class="fr-toast hidden" id="fr-toast" role="status" aria-live="polite"></div>
 
 </div><!-- /app-shell -->
