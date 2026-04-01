@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>LastStats — Amis &amp; Recherche</title>
-
 <meta name="application-name" content="LastStats">
 <meta name="description" content="Explore your Last.fm friends and discover profiles.">
 <meta name="theme-color" content="#141218" media="(prefers-color-scheme: dark)">
@@ -15,219 +14,201 @@
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="friends.css">
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════
-     SETUP SCREEN — shown when no credentials stored
-═══════════════════════════════════════════════════ -->
+<!-- SETUP SCREEN -->
 <div id="setup-screen" class="hidden">
   <div class="setup-bg">
-    <div class="orb o1"></div>
-    <div class="orb o2"></div>
-    <div class="orb o3"></div>
+    <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
   </div>
   <div class="setup-wrap">
     <div class="setup-logo">
       <div class="logo-icon"><i class="fas fa-headphones-alt"></i></div>
-      <h1>LastStats</h1>
-      <p>Amis &amp; Recherche</p>
+      <h1>LastStats</h1><p>Amis &amp; Recherche</p>
     </div>
     <div class="setup-card">
       <h2>Connexion requise</h2>
-      <p style="color:var(--text-muted);font-size:.875rem;margin-bottom:24px;">
-        Configurez votre profil Last.fm sur la page principale pour accéder à vos amis.
-      </p>
-      <a href="index.html" class="btn-primary" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;">
-        <i class="fas fa-arrow-left"></i> Aller à l'accueil
-      </a>
+      <p style="color:var(--text-muted);font-size:.875rem;margin-bottom:24px;">Configurez votre profil Last.fm sur la page principale pour accéder à vos amis.</p>
+      <a href="index.html" class="btn-primary" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;"><i class="fas fa-arrow-left"></i> Aller à l'accueil</a>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     MAIN APP SHELL
-═══════════════════════════════════════════════════ -->
+<!-- MAIN APP SHELL -->
 <div id="app-shell" class="hidden">
 
-  <!-- Sidebar Overlay (mobile) -->
   <div class="fr-sidebar-ov" id="fr-sidebar-ov"></div>
 
-  <!-- ════════════════════════════════════
-       SIDEBAR (desktop fixed, mobile drawer)
-  ════════════════════════════════════ -->
+  <!-- SIDEBAR -->
   <aside class="fr-sidebar" id="fr-sidebar">
-
-    <!-- Logo + close -->
     <div class="fr-sb-head">
       <div class="fr-sb-logo">
         <div class="fr-sb-logo-icon"><i class="fas fa-headphones-alt"></i></div>
         <span>LastStats</span>
       </div>
-      <button class="fr-sb-close" id="btn-sb-close" aria-label="Fermer la navigation">
-        <i class="fas fa-times"></i>
-      </button>
+      <button class="fr-sb-close" id="btn-sb-close" aria-label="Fermer la navigation"><i class="fas fa-times"></i></button>
     </div>
 
-    <!-- User profile block -->
     <div class="fr-sb-profile" id="sb-user-block">
       <div class="fr-sb-av-wrap">
-        <img class="fr-sb-av" id="sb-av" src="" alt="" onerror="this.style.display='none'">
+        <img class="fr-sb-av" id="sb-av" src="" alt="" onerror="this.style.display='none';document.getElementById('sb-av-fallback').style.zIndex='2'">
         <div class="fr-sb-av-fallback" id="sb-av-fallback">?</div>
       </div>
       <div class="fr-sb-user-info">
         <strong id="sb-username">—</strong>
         <span id="sb-scrobbles" class="fr-sb-sub">— scrobbles</span>
       </div>
-      <a href="index.html" class="fr-sb-stats-link" title="Mes statistiques">
-        <i class="fas fa-chart-line"></i>
-      </a>
+      <a href="index.html" class="fr-sb-stats-link" title="Mes statistiques"><i class="fas fa-chart-line"></i></a>
     </div>
 
-    <!-- Nav links -->
     <nav class="fr-sb-nav" id="fr-sb-nav">
+      <!-- Accueil — first -->
+      <button class="fr-nav-lnk" data-tab="home" id="snl-home">
+        <i class="fas fa-home"></i><span>Accueil</span>
+      </button>
       <button class="fr-nav-lnk active" data-tab="friends" id="snl-friends">
-        <i class="fas fa-user-friends"></i>
-        <span>Amis</span>
+        <i class="fas fa-user-friends"></i><span>Amis</span>
         <div class="fr-nav-lnk-live hidden" id="sb-live-dot">
-          <span class="live-dot sm"></span>
-          <span id="sb-live-count">0</span>
+          <span class="live-dot sm"></span><span id="sb-live-count">0</span>
         </div>
       </button>
       <button class="fr-nav-lnk" data-tab="search" id="snl-search">
-        <i class="fas fa-search"></i>
-        <span>Recherche</span>
+        <i class="fas fa-search"></i><span>Recherche</span>
       </button>
       <button class="fr-nav-lnk" data-tab="favorites" id="snl-favorites">
-        <i class="fas fa-star"></i>
-        <span>Favoris</span>
+        <i class="fas fa-star"></i><span>Favoris</span>
         <span class="fr-nav-badge hidden" id="sb-fav-badge">0</span>
       </button>
       <div class="fr-nav-sep"></div>
       <button class="fr-nav-lnk" data-tab="settings" id="snl-settings">
-        <i class="fas fa-cog"></i>
-        <span>Paramètres</span>
+        <i class="fas fa-cog"></i><span>Paramètres</span>
       </button>
-    </nav>
-
-    <!-- Sidebar footer -->
-    <div class="fr-sb-foot">
-      <div class="fr-sb-stats">
-        <div class="fr-sb-stat">
-          <strong id="sb-stat-total">—</strong>
-          <span>amis</span>
-        </div>
-        <div class="fr-sb-stat-sep"></div>
-        <div class="fr-sb-stat live">
-          <span class="live-dot sm"></span>
-          <strong id="sb-stat-live">—</strong>
-          <span>live</span>
-        </div>
-      </div>
-      <div class="fr-sb-updated" id="sb-stat-updated"></div>
-
-      <!-- Theme switcher (sidebar footer) -->
-      <div class="fr-sb-theme-row">
-        <span>Thème</span>
+      <!-- Inline theme mini-switcher (replaces old fr-sb-foot) -->
+      <div class="fr-sb-theme-mini">
+        <span class="fr-sb-theme-mini-label">Thème</span>
         <div class="fr-sb-theme-btns">
-          <button class="fr-sb-th-btn" data-theme-val="dark" title="Sombre">
-            <i class="fas fa-moon"></i>
-          </button>
-          <button class="fr-sb-th-btn" data-theme-val="light" title="Clair">
-            <i class="fas fa-sun"></i>
-          </button>
-          <button class="fr-sb-th-btn" data-theme-val="auto" title="Auto">
-            <i class="fas fa-circle-half-stroke"></i>
-          </button>
+          <button class="fr-sb-th-btn" data-theme-val="dark" title="Sombre"><i class="fas fa-moon"></i></button>
+          <button class="fr-sb-th-btn" data-theme-val="light" title="Clair"><i class="fas fa-sun"></i></button>
+          <button class="fr-sb-th-btn" data-theme-val="auto" title="Auto"><i class="fas fa-circle-half-stroke"></i></button>
         </div>
       </div>
-    </div>
+    </nav>
+  </aside>
 
-  </aside><!-- /sidebar -->
-
-  <!-- ════════════════════════════════════
-       MAIN WRAPPER
-  ════════════════════════════════════ -->
+  <!-- MAIN WRAPPER -->
   <div class="fr-main-wrap">
 
-    <!-- Top App Bar — matches style.css .app-hd -->
     <header class="fr-header" id="app-header">
-
-      <!-- Burger (mobile) -->
-      <button class="fr-burger-btn" id="btn-burger" aria-label="Ouvrir le menu">
-        <i class="fas fa-bars"></i>
-      </button>
-
-      <!-- Title -->
+      <button class="fr-burger-btn" id="btn-burger" aria-label="Ouvrir le menu"><i class="fas fa-bars"></i></button>
       <div class="fr-hd-title">
-        <div class="fr-hd-logo-icon" aria-hidden="true">
-          <i class="fas fa-headphones-alt"></i>
-        </div>
+        <div class="fr-hd-logo-icon" aria-hidden="true"><i class="fas fa-headphones-alt"></i></div>
         <span id="hd-tab-label">Amis</span>
       </div>
-
-      <!-- Right actions -->
       <div class="fr-hd-right">
-        <button class="fr-icon-btn" id="btn-refresh" title="Actualiser">
-          <i class="fas fa-sync-alt"></i>
-        </button>
-        <a href="index.html" class="fr-icon-btn" title="Mes statistiques" aria-label="Mes statistiques">
-          <i class="fas fa-chart-line"></i>
-        </a>
+        <button class="fr-icon-btn" id="btn-refresh" title="Actualiser"><i class="fas fa-sync-alt"></i></button>
+        <a href="index.html" class="fr-icon-btn" title="Mes statistiques" aria-label="Mes statistiques"><i class="fas fa-chart-line"></i></a>
       </div>
     </header>
 
-    <!-- Content area -->
     <main class="fr-main" id="fr-main">
 
-      <!-- ════════════════════
-           FRIENDS TAB
-      ════════════════════ -->
-      <section id="tab-content-friends" class="tab-content active">
+      <!-- ══════════ ACCUEIL TAB ══════════ -->
+      <section id="tab-content-home" class="tab-content">
 
-        <!-- Mon Statut (my own now-playing) -->
-        <div id="my-status-section" class="hidden"></div>
+        <!-- My status (mirrored for home) -->
+        <div id="home-my-status-section" class="hidden"></div>
 
-        <!-- Controls bar -->
-        <div class="fr-controls-bar">
-          <div class="fr-search-wrap">
-            <i class="fas fa-search fr-search-icon"></i>
-            <input type="text" id="friends-search" class="fr-search-input"
-                   placeholder="Filtrer les amis…" autocomplete="off">
-            <button class="fr-search-clear hidden" id="friends-search-clear">
-              <i class="fas fa-times"></i>
-            </button>
+        <!-- Global Stats Row -->
+        <div class="fr-home-stats-row" id="home-stats-row">
+          <div class="fr-home-stat-card">
+            <div class="fr-home-stat-icon"><i class="fas fa-user-friends"></i></div>
+            <strong id="home-total-count">—</strong>
+            <span>Amis</span>
           </div>
-          <div class="fr-filter-chips">
-            <button class="fr-chip active" data-filter="all">Tous</button>
-            <button class="fr-chip" data-filter="live">
-              <span class="chip-dot"></span>En écoute
-            </button>
-            <button class="fr-chip" data-filter="fav">
-              <i class="fas fa-star" style="font-size:.7rem"></i> Favoris
-            </button>
+          <div class="fr-home-stat-card live">
+            <div class="fr-home-stat-icon"><span class="live-dot"></span></div>
+            <strong id="home-live-count">—</strong>
+            <span>En écoute</span>
+          </div>
+          <div class="fr-home-stat-card">
+            <div class="fr-home-stat-icon"><i class="fas fa-star"></i></div>
+            <strong id="home-fav-count">—</strong>
+            <span>Favoris</span>
           </div>
         </div>
 
-        <!-- Stats strip -->
+        <!-- Group Stats Bar -->
+        <div class="fr-home-group-bar" id="home-group-bar">
+          <div class="fr-home-group-inner">
+            <i class="fas fa-fire" style="color:#f59e0b;flex-shrink:0"></i>
+            <span id="home-trending-text">Chargement des statistiques de groupe…</span>
+          </div>
+          <button class="fr-home-top5-btn" id="home-top5-btn">
+            <i class="fas fa-trophy"></i> Top 5
+          </button>
+        </div>
+
+        <!-- Quick Contacts (Favorites) -->
+        <div class="fr-home-section">
+          <div class="fr-section-hd">
+            <i class="fas fa-star"></i>
+            <span>Contacts rapides</span>
+            <button class="fr-section-action" onclick="window.FR.switchTab('favorites')">Voir tous</button>
+          </div>
+          <div class="fr-home-quick-row" id="home-quick-row"></div>
+          <div class="fr-empty hidden" id="home-quick-empty">
+            <i class="fas fa-star" style="color:var(--accent-container)"></i>
+            <p>Aucun favori pour l'instant.</p>
+            <p style="font-size:.8rem;color:var(--text-muted);margin-top:6px">Ajoutez des amis en favoris depuis l'onglet Amis.</p>
+          </div>
+        </div>
+
+        <!-- Mini Activity Feed -->
+        <div class="fr-home-section">
+          <div class="fr-section-hd">
+            <i class="fas fa-rss"></i>
+            <span>Flux d'activité</span>
+            <div class="fr-feed-live-pill hidden" id="home-live-pill">
+              <span class="live-dot sm"></span><span>EN DIRECT</span>
+            </div>
+          </div>
+          <div class="fr-feed-list" id="home-feed-list"></div>
+          <div class="fr-empty hidden" id="home-feed-empty">
+            <i class="fas fa-rss"></i>
+            <p>Aucune activité pour l'instant.</p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ══════════ FRIENDS TAB ══════════ -->
+      <section id="tab-content-friends" class="tab-content active">
+
+        <div id="my-status-section" class="hidden"></div>
+
+        <div class="fr-controls-bar">
+          <div class="fr-search-wrap">
+            <i class="fas fa-search fr-search-icon"></i>
+            <input type="text" id="friends-search" class="fr-search-input" placeholder="Filtrer les amis…" autocomplete="off">
+            <button class="fr-search-clear hidden" id="friends-search-clear"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="fr-filter-chips">
+            <button class="fr-chip active" data-filter="all">Tous</button>
+            <button class="fr-chip" data-filter="live"><span class="chip-dot"></span>En écoute</button>
+            <button class="fr-chip" data-filter="fav"><i class="fas fa-star" style="font-size:.7rem"></i> Favoris</button>
+          </div>
+        </div>
+
         <div class="fr-stats-strip" id="friends-stats-strip">
-          <div class="fr-stat-item">
-            <strong id="stat-total">—</strong>
-            <span>amis</span>
-          </div>
+          <div class="fr-stat-item"><strong id="stat-total">—</strong><span>amis</span></div>
           <div class="fr-stat-sep"></div>
-          <div class="fr-stat-item live">
-            <span class="live-dot sm"></span>
-            <strong id="stat-live">—</strong>
-            <span>en écoute</span>
-          </div>
+          <div class="fr-stat-item live"><span class="live-dot sm"></span><strong id="stat-live">—</strong><span>en écoute</span></div>
           <div class="fr-stat-sep"></div>
           <div class="fr-stat-item" style="margin-left:auto">
             <i class="fas fa-sync-alt" style="font-size:.65rem;color:var(--text-muted)"></i>
@@ -235,175 +216,95 @@
           </div>
         </div>
 
-        <!-- Friends grid -->
         <div class="fr-grid" id="friends-grid">
           <div class="fr-card sk-card" id="friends-skeleton">
             <div class="sk-av sk"></div>
             <div class="sk-body">
-              <div class="sk-ln w70 mt4"></div>
-              <div class="sk-ln w50 mt8"></div>
-              <div class="sk-ln w80 mt8"></div>
+              <div class="sk-ln w70 mt4"></div><div class="sk-ln w50 mt8"></div><div class="sk-ln w80 mt8"></div>
             </div>
           </div>
         </div>
 
-        <!-- Empty states -->
-        <div class="fr-empty hidden" id="friends-empty-filter">
-          <i class="fas fa-filter"></i>
-          <p>Aucun ami ne correspond à ce filtre.</p>
-        </div>
-        <div class="fr-empty hidden" id="friends-empty-none">
-          <i class="fas fa-user-slash"></i>
-          <p>Vous n'avez pas encore d'amis sur Last.fm.</p>
-          <p style="font-size:.8rem;color:var(--text-muted);margin-top:6px">Ajoutez des amis sur last.fm pour les retrouver ici.</p>
-        </div>
+        <div class="fr-empty hidden" id="friends-empty-filter"><i class="fas fa-filter"></i><p>Aucun ami ne correspond à ce filtre.</p></div>
+        <div class="fr-empty hidden" id="friends-empty-none"><i class="fas fa-user-slash"></i><p>Vous n'avez pas encore d'amis sur Last.fm.</p></div>
         <div class="fr-empty hidden" id="friends-error">
           <i class="fas fa-exclamation-triangle" style="color:#f87171"></i>
           <p id="friends-error-msg">Erreur lors du chargement.</p>
-          <button class="fr-retry-btn" onclick="window.FR.loadFriends()">
-            <i class="fas fa-redo"></i> Réessayer
-          </button>
+          <button class="fr-retry-btn" onclick="window.FR.loadFriends()"><i class="fas fa-redo"></i> Réessayer</button>
         </div>
 
-        <!-- Activity Feed -->
         <div class="fr-feed-section hidden" id="friends-feed-section">
           <div class="fr-feed-hd">
-            <div class="fr-feed-hd-left">
-              <i class="fas fa-rss"></i>
-              <span>Flux d'activité</span>
-            </div>
-            <div class="fr-feed-live-pill" id="feed-live-pill">
-              <span class="live-dot sm"></span>
-              <span>EN DIRECT</span>
-            </div>
+            <div class="fr-feed-hd-left"><i class="fas fa-rss"></i><span>Flux d'activité</span></div>
+            <div class="fr-feed-live-pill" id="feed-live-pill"><span class="live-dot sm"></span><span>EN DIRECT</span></div>
           </div>
           <div class="fr-feed-list" id="friends-feed-list"></div>
         </div>
 
-      </section><!-- /friends tab -->
+      </section>
 
-      <!-- ════════════════════
-           SEARCH TAB
-      ════════════════════ -->
+      <!-- ══════════ SEARCH TAB ══════════ -->
       <section id="tab-content-search" class="tab-content">
-
         <div class="fr-search-hero">
           <div class="fr-search-hero-inner">
             <div class="fr-search-big-wrap" id="search-big-wrap">
               <i class="fas fa-search fr-search-big-icon"></i>
-              <input type="text" id="search-username" class="fr-search-big-input"
-                     placeholder="Rechercher un profil Last.fm…"
-                     autocomplete="off" spellcheck="false" autocapitalize="none">
-              <button class="fr-search-big-clear hidden" id="search-big-clear">
-                <i class="fas fa-times"></i>
-              </button>
-              <button class="fr-search-big-btn" id="search-btn">
-                <i class="fas fa-arrow-right"></i>
-              </button>
+              <input type="text" id="search-username" class="fr-search-big-input" placeholder="Rechercher un profil Last.fm…" autocomplete="off" spellcheck="false" autocapitalize="none">
+              <button class="fr-search-big-clear hidden" id="search-big-clear"><i class="fas fa-times"></i></button>
+              <button class="fr-search-big-btn" id="search-btn"><i class="fas fa-arrow-right"></i></button>
             </div>
             <p class="fr-search-hint">Entrez un nom d'utilisateur Last.fm exact ou approximatif</p>
           </div>
         </div>
-
-        <!-- Recent searches -->
         <div id="recent-searches-section">
           <div class="fr-section-hd">
-            <i class="fas fa-history"></i>
-            <span>Recherches récentes</span>
+            <i class="fas fa-history"></i><span>Recherches récentes</span>
             <button class="fr-section-action" id="clear-recent-btn">Effacer</button>
           </div>
           <div class="fr-recent-list" id="recent-searches-list"></div>
-          <div class="fr-empty hidden" id="recent-empty">
-            <i class="fas fa-history"></i>
-            <p style="font-size:.85rem">Aucune recherche récente</p>
-          </div>
+          <div class="fr-empty hidden" id="recent-empty"><i class="fas fa-history"></i><p style="font-size:.85rem">Aucune recherche récente</p></div>
         </div>
-
-        <!-- Search results -->
         <div id="search-results-section" class="hidden">
-          <div class="fr-section-hd">
-            <i class="fas fa-user"></i>
-            <span id="search-results-title">Résultats</span>
-          </div>
+          <div class="fr-section-hd"><i class="fas fa-user"></i><span id="search-results-title">Résultats</span></div>
           <div id="search-results-list"></div>
-          <div class="fr-empty hidden" id="search-not-found">
-            <i class="fas fa-user-times"></i>
-            <p>Profil introuvable.</p>
-            <p style="font-size:.8rem;color:var(--text-muted);margin-top:6px">Vérifiez l'orthographe du nom d'utilisateur.</p>
-          </div>
-          <div class="fr-empty hidden" id="search-loading">
-            <i class="fas fa-circle-notch fa-spin" style="color:var(--accent)"></i>
-            <p>Recherche en cours…</p>
-          </div>
-          <div class="fr-empty hidden" id="search-error">
-            <i class="fas fa-exclamation-triangle" style="color:#f87171"></i>
-            <p id="search-error-msg">Erreur lors de la recherche.</p>
-          </div>
+          <div class="fr-empty hidden" id="search-not-found"><i class="fas fa-user-times"></i><p>Profil introuvable.</p><p style="font-size:.8rem;color:var(--text-muted);margin-top:6px">Vérifiez l'orthographe du nom d'utilisateur.</p></div>
+          <div class="fr-empty hidden" id="search-loading"><i class="fas fa-circle-notch fa-spin" style="color:var(--accent)"></i><p>Recherche en cours…</p></div>
+          <div class="fr-empty hidden" id="search-error"><i class="fas fa-exclamation-triangle" style="color:#f87171"></i><p id="search-error-msg">Erreur lors de la recherche.</p></div>
         </div>
+      </section>
 
-      </section><!-- /search tab -->
-
-      <!-- ════════════════════
-           FAVORITES TAB
-      ════════════════════ -->
+      <!-- ══════════ FAVORITES TAB ══════════ -->
       <section id="tab-content-favorites" class="tab-content">
-
         <div class="fr-controls-bar" style="padding-bottom:0">
           <div class="fr-search-wrap">
             <i class="fas fa-search fr-search-icon"></i>
-            <input type="text" id="fav-search" class="fr-search-input"
-                   placeholder="Filtrer les favoris…" autocomplete="off">
+            <input type="text" id="fav-search" class="fr-search-input" placeholder="Filtrer les favoris…" autocomplete="off">
           </div>
         </div>
-
         <div class="fr-grid" id="favorites-grid"></div>
-
         <div class="fr-empty hidden" id="fav-empty">
           <i class="fas fa-star" style="color:var(--accent-container)"></i>
           <p>Aucun favori enregistré.</p>
-          <p style="font-size:.8rem;color:var(--text-muted);margin-top:6px">
-            Ajoutez des profils en favoris depuis l'onglet Amis ou Recherche.
-          </p>
+          <p style="font-size:.8rem;color:var(--text-muted);margin-top:6px">Ajoutez des profils en favoris depuis l'onglet Amis ou Recherche.</p>
         </div>
+      </section>
 
-      </section><!-- /favorites tab -->
-
-      <!-- ════════════════════
-           SETTINGS TAB
-      ════════════════════ -->
+      <!-- ══════════ SETTINGS TAB ══════════ -->
       <section id="tab-content-settings" class="tab-content">
         <div class="fr-settings-wrap">
 
-          <!-- Apparence -->
           <div class="fr-settings-section">
-            <div class="fr-settings-section-title">
-              <i class="fas fa-palette"></i>
-              <span>Apparence</span>
-            </div>
-
+            <div class="fr-settings-section-title"><i class="fas fa-palette"></i><span>Apparence</span></div>
             <div class="fr-settings-row">
-              <div class="fr-settings-row-label">
-                <i class="fas fa-moon"></i>
-                <span>Thème</span>
-              </div>
+              <div class="fr-settings-row-label"><i class="fas fa-moon"></i><span>Thème</span></div>
               <div class="fr-theme-btns">
-                <button class="fr-th-btn" data-theme-val="dark" title="Thème sombre">
-                  <i class="fas fa-moon"></i> Sombre
-                </button>
-                <button class="fr-th-btn" data-theme-val="light" title="Thème clair">
-                  <i class="fas fa-sun"></i> Clair
-                </button>
-                <button class="fr-th-btn" data-theme-val="auto" title="Thème automatique">
-                  <i class="fas fa-circle-half-stroke"></i> Auto
-                </button>
+                <button class="fr-th-btn" data-theme-val="dark"><i class="fas fa-moon"></i> Sombre</button>
+                <button class="fr-th-btn" data-theme-val="light"><i class="fas fa-sun"></i> Clair</button>
+                <button class="fr-th-btn" data-theme-val="auto"><i class="fas fa-circle-half-stroke"></i> Auto</button>
               </div>
             </div>
-
             <div class="fr-settings-row">
-              <div class="fr-settings-row-label">
-                <i class="fas fa-circle" style="color:var(--accent)"></i>
-                <span>Couleur d'accent</span>
-              </div>
+              <div class="fr-settings-row-label"><i class="fas fa-circle" style="color:var(--accent)"></i><span>Couleur d'accent</span></div>
               <div class="fr-accent-swatches" id="accent-swatches">
                 <button class="fr-accent-swatch" data-accent="purple" style="--sw-color:#d0bcff" title="Violet"><span class="sw-dot"></span></button>
                 <button class="fr-accent-swatch" data-accent="red"    style="--sw-color:#f28b82" title="Rouge"><span class="sw-dot"></span></button>
@@ -413,32 +314,49 @@
                 <button class="fr-accent-swatch" data-accent="pink"   style="--sw-color:#f48fb1" title="Rose"><span class="sw-dot"></span></button>
               </div>
             </div>
+            <div class="fr-settings-row">
+              <div class="fr-settings-row-label">
+                <i class="fas fa-magic" style="color:var(--accent)"></i>
+                <div>
+                  <span>Color Sync</span>
+                  <div style="font-size:.72rem;color:var(--text-muted);font-weight:400;margin-top:1px">Extrait la couleur dominante de la pochette de "Mon statut"</div>
+                </div>
+              </div>
+              <label class="fr-toggle-wrap" for="color-sync-toggle">
+                <input type="checkbox" id="color-sync-toggle">
+                <span class="fr-toggle-track"><span class="fr-toggle-thumb"></span></span>
+              </label>
+            </div>
           </div>
 
-          <!-- Navigation -->
           <div class="fr-settings-section">
-            <div class="fr-settings-section-title">
-              <i class="fas fa-link"></i>
-              <span>Navigation</span>
+            <div class="fr-settings-section-title"><i class="fas fa-bell"></i><span>Notifications</span></div>
+            <div class="fr-settings-row">
+              <div class="fr-settings-row-label">
+                <i class="fas fa-bell"></i>
+                <div>
+                  <span>Notifications de bureau</span>
+                  <div style="font-size:.72rem;color:var(--text-muted);font-weight:400;margin-top:1px">Alertes quand un Favori commence à écouter</div>
+                </div>
+              </div>
+              <button class="fr-push-btn" id="btn-enable-push">
+                <i class="fas fa-bell" id="push-btn-icon"></i>
+                <span id="push-btn-label">Activer</span>
+              </button>
             </div>
+          </div>
+
+          <div class="fr-settings-section">
+            <div class="fr-settings-section-title"><i class="fas fa-link"></i><span>Navigation</span></div>
             <a href="index.html" class="fr-settings-link-card">
-              <div class="fr-settings-link-icon">
-                <i class="fas fa-chart-line"></i>
-              </div>
-              <div class="fr-settings-link-body">
-                <strong>Mes statistiques</strong>
-                <span>Retourner sur la page principale LastStats</span>
-              </div>
+              <div class="fr-settings-link-icon"><i class="fas fa-chart-line"></i></div>
+              <div class="fr-settings-link-body"><strong>Mes statistiques</strong><span>Retourner sur la page principale LastStats</span></div>
               <i class="fas fa-chevron-right fr-settings-link-arrow"></i>
             </a>
           </div>
 
-          <!-- Compte -->
           <div class="fr-settings-section">
-            <div class="fr-settings-section-title">
-              <i class="fas fa-user-circle"></i>
-              <span>Compte</span>
-            </div>
+            <div class="fr-settings-section-title"><i class="fas fa-user-circle"></i><span>Compte</span></div>
             <div class="fr-settings-info-row">
               <span class="fr-settings-info-label">Connecté en tant que</span>
               <strong id="settings-username-display">—</strong>
@@ -448,78 +366,68 @@
               <span class="fr-settings-info-val" id="settings-apikey-display">—</span>
             </div>
             <a href="index.html#settings" class="fr-settings-link-card" style="margin-top:8px">
-              <div class="fr-settings-link-icon" style="background:rgba(239,68,68,.12)">
-                <i class="fas fa-sliders-h" style="color:#f87171"></i>
-              </div>
-              <div class="fr-settings-link-body">
-                <strong>Modifier la configuration</strong>
-                <span>Changer de compte ou de clé API</span>
-              </div>
+              <div class="fr-settings-link-icon" style="background:rgba(239,68,68,.12)"><i class="fas fa-sliders-h" style="color:#f87171"></i></div>
+              <div class="fr-settings-link-body"><strong>Modifier la configuration</strong><span>Changer de compte ou de clé API</span></div>
               <i class="fas fa-chevron-right fr-settings-link-arrow"></i>
             </a>
           </div>
 
-          <!-- À propos -->
           <div class="fr-settings-section">
-            <div class="fr-settings-section-title">
-              <i class="fas fa-info-circle"></i>
-              <span>À propos</span>
-            </div>
+            <div class="fr-settings-section-title"><i class="fas fa-info-circle"></i><span>À propos</span></div>
             <div class="fr-settings-about-card">
-              <div class="fr-settings-about-logo">
-                <i class="fas fa-headphones-alt"></i>
-              </div>
-              <div>
-                <strong>LastStats — Amis</strong>
-                <p>Explorez vos amis Last.fm, découvrez ce qu'ils écoutent et accédez à leur profil complet.</p>
-              </div>
+              <div class="fr-settings-about-logo"><i class="fas fa-headphones-alt"></i></div>
+              <div><strong>LastStats — Amis</strong><p>Explorez vos amis Last.fm, découvrez ce qu'ils écoutent et accédez à leur profil complet.</p></div>
             </div>
           </div>
 
         </div>
-      </section><!-- /settings tab -->
+      </section>
 
     </main>
+  </div>
 
-  </div><!-- /fr-main-wrap -->
-
-  <!-- Bottom Nav (mobile only) -->
+  <!-- Bottom Nav (mobile) -->
   <nav class="fr-bottom-nav" id="fr-bottom-nav">
     <div class="fr-bn-inner">
-      <button class="fr-bn-item active" data-tab="friends">
-        <i class="fas fa-user-friends"></i>
-        <span>Amis</span>
-      </button>
-      <button class="fr-bn-item" data-tab="search">
-        <i class="fas fa-search"></i>
-        <span>Recherche</span>
-      </button>
+      <button class="fr-bn-item" data-tab="home"><i class="fas fa-home"></i><span>Accueil</span></button>
+      <button class="fr-bn-item active" data-tab="friends"><i class="fas fa-user-friends"></i><span>Amis</span></button>
+      <button class="fr-bn-item" data-tab="search"><i class="fas fa-search"></i><span>Recherche</span></button>
       <button class="fr-bn-item" data-tab="favorites">
-        <i class="fas fa-star"></i>
-        <span>Favoris</span>
+        <i class="fas fa-star"></i><span>Favoris</span>
         <span class="fr-bn-badge hidden" id="bn-fav-badge">0</span>
       </button>
-      <button class="fr-bn-item" data-tab="settings">
-        <i class="fas fa-cog"></i>
-        <span>Réglages</span>
-      </button>
+      <button class="fr-bn-item" data-tab="settings"><i class="fas fa-cog"></i><span>Réglages</span></button>
     </div>
   </nav>
 
   <!-- Profile Modal -->
   <div class="fr-modal-overlay" id="profile-modal-overlay" aria-hidden="true">
     <div class="fr-modal" id="profile-modal" role="dialog" aria-modal="true" aria-label="Profil utilisateur">
-      <button class="fr-modal-close" id="profile-modal-close" title="Fermer">
-        <i class="fas fa-times"></i>
-      </button>
+      <button class="fr-modal-close" id="profile-modal-close" title="Fermer"><i class="fas fa-times"></i></button>
       <div id="profile-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Top 5 Modal -->
+  <div class="fr-top5-overlay hidden" id="top5-overlay">
+    <div class="fr-top5-modal">
+      <div class="fr-top5-hd">
+        <div class="fr-top5-hd-left"><i class="fas fa-trophy" style="color:#f59e0b"></i><span>Top 5 — Scrobbles (7 jours)</span></div>
+        <button class="fr-top5-close" id="top5-close"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="fr-top5-body" id="top5-body">
+        <div style="padding:32px;text-align:center;color:var(--text-muted)">
+          <i class="fas fa-circle-notch fa-spin" style="color:var(--accent);font-size:1.2rem"></i>
+          <p style="margin-top:10px;font-size:.85rem">Chargement…</p>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Toast -->
   <div class="fr-toast hidden" id="fr-toast" role="status" aria-live="polite"></div>
 
-</div><!-- /app-shell -->
+</div>
 
 <script src="i18n.js" defer></script>
 <script src="friends.js" defer></script>
