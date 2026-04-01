@@ -17,6 +17,17 @@ html {
 
 body { overflow-x: hidden; }
 
+/* Apply color-sync transition universally to accent-coloured elements */
+.fr-card, .fr-home-stat-card, .fr-home-group-bar, .my-status-card,
+.fr-sb-av, .fr-hd-logo-icon, .fr-sb-logo-icon,
+.fr-nav-lnk.active, .fr-bn-item.active,
+.fr-action-btn.fav-active, .fr-home-top5-btn,
+[class*="fr-accent-"], [class*="fr-settings"] {
+  transition-property: background, border-color, color, box-shadow, transform;
+  transition-duration: var(--dur-medium2);
+  transition-timing-function: var(--ease-standard);
+}
+
 #app-shell {
   display: flex;
   min-height: 100dvh;
@@ -195,6 +206,9 @@ body { overflow-x: hidden; }
   flex: 1; margin-left: var(--sb-width);
   display: flex; flex-direction: column;
   min-width: 0; min-height: 100dvh;
+  /* Prevent overflow caused by sidebar margin */
+  width: calc(100% - var(--sb-width));
+  max-width: 100%;
 }
 
 .fr-header {
@@ -358,6 +372,22 @@ body { overflow-x: hidden; }
 .fr-home-section {
   margin: 0 0 16px;
   animation: fadeInUp var(--dur-medium2) var(--ease-decel) .1s both;
+}
+.fr-home-section:not(:empty) > :not(.fr-section-hd):first-of-type:last-of-type {
+  /* Single child content block gets card styling */
+}
+/* New sections (coincidences, discovery, flashback) share card shell */
+#home-coincidences-section > #home-coincidences-body,
+#home-discovery-section    > #home-discovery-body,
+#home-flashback-section    > #home-flashback-body {
+  margin: 0 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  overflow: hidden;
 }
 
 /* Quick contacts horizontal scroll */
@@ -743,6 +773,9 @@ body { overflow-x: hidden; }
 .fr-feed-time { font-size: .68rem; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
 .fr-feed-now { display: flex; align-items: center; gap: 4px; font-size: .68rem; font-weight: 700; color: #22c55e; white-space: nowrap; flex-shrink: 0; }
 .fr-feed-play-wrap { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
+.fr-feed-play-row {
+  display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;
+}
 .fr-feed-play-btn {
   width: 26px; height: 26px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
@@ -898,7 +931,8 @@ body { overflow-x: hidden; }
 ────────────────────────────────────────────── */
 .fr-modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,.65);
-  z-index: 300; display: none; align-items: flex-end; justify-content: center;
+  z-index: 300; /* Must exceed sidebar z-index (200) */
+  display: none; align-items: flex-end; justify-content: center;
   padding: 0; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
 }
 .fr-modal-overlay.open { display: flex; animation: overlayIn var(--dur-medium1) var(--ease-decel) both; }
@@ -1195,6 +1229,117 @@ body { overflow-x: hidden; }
   .fr-bn-item span { display: none; }
   .fr-bn-item { padding: 6px 4px; gap: 0; }
 }
+
+
+/* ──────────────────────────────────────────────
+   CONTEXT BADGES (feed items)
+────────────────────────────────────────────── */
+.fr-ctx-badge {
+  display: inline-flex; align-items: center;
+  font-size: .58rem; font-weight: 700;
+  padding: 1px 6px; border-radius: 99px;
+  margin-left: 6px; vertical-align: middle;
+  letter-spacing: .03em; white-space: nowrap;
+  animation: pop .3s var(--ease-spring) both;
+}
+.fr-badge-new     { background: rgba(34,197,94,.14); color: #22c55e; border: 1px solid rgba(34,197,94,.3); }
+.fr-badge-archive { background: rgba(148,163,184,.12); color: var(--text-muted); border: 1px solid rgba(148,163,184,.25); }
+
+/* ──────────────────────────────────────────────
+   COÏNCIDENCES MUSICALES section
+────────────────────────────────────────────── */
+.fr-coincidence-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  animation: fadeInUp var(--dur-medium1) var(--ease-decel) both;
+}
+.fr-coincidence-card:last-child { border-bottom: none; }
+.fr-coincidence-icon {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--accent-lt); font-size: .85rem; flex-shrink: 0;
+}
+.fr-coincidence-text {
+  font-size: .82rem; color: var(--text); line-height: 1.4;
+}
+.fr-coincidence-text strong { color: var(--text); font-weight: 700; }
+
+.fr-section-badge {
+  margin-left: auto; font-size: .62rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 99px;
+  background: rgba(34,197,94,.12); color: #22c55e;
+  border: 1px solid rgba(34,197,94,.28);
+  letter-spacing: .04em; display: flex; align-items: center; gap: 4px;
+}
+
+/* ──────────────────────────────────────────────
+   DISCOVERY section
+────────────────────────────────────────────── */
+.fr-discovery-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  animation: fadeInUp var(--dur-medium1) var(--ease-decel) both;
+}
+.fr-discovery-item:last-child { border-bottom: none; }
+.fr-discovery-icon {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--accent-lt); color: var(--accent); font-size: .82rem; flex-shrink: 0;
+}
+.fr-discovery-body { flex: 1; min-width: 0; }
+.fr-discovery-artist { font-size: .88rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fr-discovery-meta   { font-size: .72rem; color: var(--text-muted); margin-top: 2px; }
+.fr-discovery-listen-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(29,185,84,.10); color: #1db954;
+  border: 1.5px solid rgba(29,185,84,.3); font-size: .85rem;
+  flex-shrink: 0; text-decoration: none;
+  transition: background var(--dur-short2), transform var(--dur-short2) var(--ease-spring);
+}
+.fr-discovery-listen-btn:hover { background: #1db954; color: #fff; transform: scale(1.1); text-decoration: none; }
+.fr-discovery-empty  { padding: 14px 16px; font-size: .82rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+
+/* Classique du groupe card */
+.fr-discovery-classique {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  background: var(--surface-container-low);
+  border-top: 1px solid var(--border);
+  animation: fadeInUp var(--dur-medium1) var(--ease-decel) .05s both;
+}
+.fr-discovery-cl-label  { font-size: .65rem; font-weight: 700; color: #f59e0b; text-transform: uppercase; letter-spacing: .06em; }
+.fr-discovery-cl-artist { font-size: .88rem; font-weight: 700; color: var(--text); margin-top: 2px; }
+.fr-discovery-cl-meta   { font-size: .72rem; color: var(--text-muted); margin-top: 1px; }
+
+/* ──────────────────────────────────────────────
+   SOUVENIRS / FLASHBACK section
+────────────────────────────────────────────── */
+.fr-flashback-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px;
+  animation: fadeInUp var(--dur-medium1) var(--ease-decel) both;
+}
+.fr-flashback-icon {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(139,92,246,.12); color: #a78bfa; font-size: .9rem; flex-shrink: 0;
+}
+.fr-flashback-info { flex: 1; min-width: 0; }
+.fr-flashback-date {
+  font-size: .68rem; font-weight: 700; color: #a78bfa;
+  text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px;
+}
+.fr-flashback-top  { font-size: .88rem; color: var(--text); line-height: 1.3; }
+.fr-flashback-top strong { color: var(--text); font-weight: 700; }
+.fr-flashback-also { font-size: .72rem; color: var(--text-muted); margin-top: 3px; }
+.fr-flashback-loading {
+  padding: 20px; text-align: center; color: var(--accent);
+  animation: fadeInUp var(--dur-medium1) var(--ease-decel) both;
+}
+.fr-flashback-empty { padding: 14px 16px; font-size: .82rem; color: var(--text-muted); }
 
 /* ──────────────────────────────────────────────
    ACCENT COLOR PALETTE

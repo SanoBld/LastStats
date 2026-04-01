@@ -69,24 +69,24 @@
 
     <nav class="fr-sb-nav" id="fr-sb-nav">
       <!-- Accueil — first -->
-      <button class="fr-nav-lnk" data-tab="home" id="snl-home">
+      <button class="fr-nav-lnk" data-tab="home" role="tab" aria-selected="false" id="snl-home">
         <i class="fas fa-home"></i><span>Accueil</span>
       </button>
-      <button class="fr-nav-lnk active" data-tab="friends" id="snl-friends">
+      <button class="fr-nav-lnk active" data-tab="friends" role="tab" aria-selected="true" id="snl-friends">
         <i class="fas fa-user-friends"></i><span>Amis</span>
         <div class="fr-nav-lnk-live hidden" id="sb-live-dot">
           <span class="live-dot sm"></span><span id="sb-live-count">0</span>
         </div>
       </button>
-      <button class="fr-nav-lnk" data-tab="search" id="snl-search">
+      <button class="fr-nav-lnk" data-tab="search" role="tab" aria-selected="false" id="snl-search">
         <i class="fas fa-search"></i><span>Recherche</span>
       </button>
-      <button class="fr-nav-lnk" data-tab="favorites" id="snl-favorites">
+      <button class="fr-nav-lnk" data-tab="favorites" role="tab" aria-selected="false" id="snl-favorites">
         <i class="fas fa-star"></i><span>Favoris</span>
         <span class="fr-nav-badge hidden" id="sb-fav-badge">0</span>
       </button>
       <div class="fr-nav-sep"></div>
-      <button class="fr-nav-lnk" data-tab="settings" id="snl-settings">
+      <button class="fr-nav-lnk" data-tab="settings" role="tab" aria-selected="false" id="snl-settings">
         <i class="fas fa-cog"></i><span>Paramètres</span>
       </button>
       <!-- Inline theme mini-switcher (replaces old fr-sb-foot) -->
@@ -105,7 +105,7 @@
   <div class="fr-main-wrap">
 
     <header class="fr-header" id="app-header">
-      <button class="fr-burger-btn" id="btn-burger" aria-label="Ouvrir le menu"><i class="fas fa-bars"></i></button>
+      <button class="fr-burger-btn" id="btn-burger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="fr-sidebar"><i class="fas fa-bars"></i></button>
       <div class="fr-hd-title">
         <div class="fr-hd-logo-icon" aria-hidden="true"><i class="fas fa-headphones-alt"></i></div>
         <span id="hd-tab-label">Amis</span>
@@ -183,6 +183,34 @@
             <i class="fas fa-rss"></i>
             <p>Aucune activité pour l'instant.</p>
           </div>
+        </div>
+
+        <!-- Coïncidences Musicales -->
+        <div class="fr-home-section hidden" id="home-coincidences-section">
+          <div class="fr-section-hd">
+            <i class="fas fa-headphones"></i>
+            <span>Coïncidences Musicales</span>
+            <span class="fr-section-badge">En direct</span>
+          </div>
+          <div id="home-coincidences-body"></div>
+        </div>
+
+        <!-- À découvrir -->
+        <div class="fr-home-section hidden" id="home-discovery-section">
+          <div class="fr-section-hd">
+            <i class="fas fa-compass"></i>
+            <span>À découvrir</span>
+          </div>
+          <div id="home-discovery-body"></div>
+        </div>
+
+        <!-- Souvenirs / Flashback -->
+        <div class="fr-home-section hidden" id="home-flashback-section">
+          <div class="fr-section-hd">
+            <i class="fas fa-clock"></i>
+            <span>Souvenirs</span>
+          </div>
+          <div id="home-flashback-body"></div>
         </div>
 
       </section>
@@ -389,14 +417,14 @@
   <!-- Bottom Nav (mobile) -->
   <nav class="fr-bottom-nav" id="fr-bottom-nav">
     <div class="fr-bn-inner">
-      <button class="fr-bn-item" data-tab="home"><i class="fas fa-home"></i><span>Accueil</span></button>
-      <button class="fr-bn-item active" data-tab="friends"><i class="fas fa-user-friends"></i><span>Amis</span></button>
-      <button class="fr-bn-item" data-tab="search"><i class="fas fa-search"></i><span>Recherche</span></button>
-      <button class="fr-bn-item" data-tab="favorites">
+      <button class="fr-bn-item" data-tab="home" role="tab" aria-selected="false"><i class="fas fa-home"></i><span>Accueil</span></button>
+      <button class="fr-bn-item active" data-tab="friends" role="tab" aria-selected="true"><i class="fas fa-user-friends"></i><span>Amis</span></button>
+      <button class="fr-bn-item" data-tab="search" role="tab" aria-selected="false"><i class="fas fa-search"></i><span>Recherche</span></button>
+      <button class="fr-bn-item" data-tab="favorites" role="tab" aria-selected="false">
         <i class="fas fa-star"></i><span>Favoris</span>
         <span class="fr-bn-badge hidden" id="bn-fav-badge">0</span>
       </button>
-      <button class="fr-bn-item" data-tab="settings"><i class="fas fa-cog"></i><span>Réglages</span></button>
+      <button class="fr-bn-item" data-tab="settings" role="tab" aria-selected="false"><i class="fas fa-cog"></i><span>Réglages</span></button>
     </div>
   </nav>
 

@@ -18,7 +18,9 @@ const LS_USERNAME   = 'ls_username';
 const LS_THEME      = 'ls_theme';
 const LS_ACCENT     = 'ls_accent';
 const LS_COLOR_SYNC = 'ls_color_sync';
-const LS_PUSH       = 'ls_push_enabled';
+const LS_PUSH         = 'ls_push_enabled';
+const LS_TRACK_SEEN_KEY = 'ls_track_seen';
+const LS_FLASHBACK_KEY  = 'ls_flashback_cache';
 
 /* ─── Helpers ─── */
 const $  = (sel, ctx = document) => ctx.querySelector(sel);
@@ -100,6 +102,32 @@ const Recent = {
   },
   clear() { try { localStorage.removeItem(LS_RECENT_KEY); } catch {} },
 };
+/* ─── Track Seen Tracker (for context badges) ─── */
+const TrackSeen = {
+  _data: null,
+  load() {
+    if (this._data) return this._data;
+    try { this._data = JSON.parse(localStorage.getItem(LS_TRACK_SEEN_KEY) || '{}'); }
+    catch { this._data = {}; }
+    return this._data;
+  },
+  save() { try { localStorage.setItem(LS_TRACK_SEEN_KEY, JSON.stringify(this._data)); } catch {} },
+  mark(userKey, trackKey) {
+    const d = this.load();
+    if (!d[userKey]) d[userKey] = {};
+    d[userKey][trackKey] = Date.now();
+    // Prune entries older than 2 years to avoid localStorage bloat
+    const cutoff = Date.now() - 2 * 365 * 24 * 3600 * 1000;
+    for (const uk of Object.keys(d)) {
+      for (const tk of Object.keys(d[uk])) { if (d[uk][tk] < cutoff) delete d[uk][tk]; }
+      if (!Object.keys(d[uk]).length) delete d[uk];
+    }
+    this.save();
+  },
+  lastSeen(userKey, trackKey) { return this.load()[userKey]?.[trackKey] || 0; },
+};
+
+
 
 /* ─── API calls ─── */
 const API = {
@@ -131,7 +159,8 @@ const API = {
   async getTopArtists(username, period = 'overall', limit = 5) { return this.call('user.getTopArtists', { user: username, period, limit }); },
   async getTopTracks(username, period = 'overall', limit = 5)  { return this.call('user.getTopTracks',  { user: username, period, limit }); },
   async getTopAlbums(username, period = 'overall', limit = 3)  { return this.call('user.getTopAlbums',  { user: username, period, limit }); },
-  async getWeeklyArtists(username) { return this.call('user.getTopArtists', { user: username, period: '7day', limit: 1 }); },
+  async getWeeklyArtists(username)  { return this.call('user.getTopArtists',  { user: username, period: '7day', limit: 1 }); },
+  async getRecentTracksRange(username, from, to, limit = 10) { return this.call('user.getRecentTracks', { user: username, from, to, limit }); },
 };
 
 /* ═══════════════════════════════════════════════
@@ -217,8 +246,16 @@ const FR = window.FR = {
     }
   },
 
-  openSidebar()  { $('#fr-sidebar').classList.add('open'); $('#fr-sidebar-ov').classList.add('open'); document.body.style.overflow = 'hidden'; },
-  closeSidebar() { $('#fr-sidebar').classList.remove('open'); $('#fr-sidebar-ov').classList.remove('open'); document.body.style.overflow = ''; },
+  openSidebar()  {
+    const burger = $('#btn-burger');
+    if (burger) { burger.setAttribute('aria-expanded', 'true'); }
+    $('#fr-sidebar').classList.add('open'); $('#fr-sidebar-ov').classList.add('open'); document.body.style.overflow = 'hidden';
+  },
+  closeSidebar() {
+    const burger = $('#btn-burger');
+    if (burger) { burger.setAttribute('aria-expanded', 'false'); }
+    $('#fr-sidebar').classList.remove('open'); $('#fr-sidebar-ov').classList.remove('open'); document.body.style.overflow = '';
+  },
 
   /* ── Events ── */
   bindEvents() {
@@ -294,13 +331,6 @@ const FR = window.FR = {
       this.renderSettingsState();
       $$('.fr-sb-th-btn').forEach(b => b.classList.toggle('active', b.dataset.themeVal === t));
     }));
-    $$('.fr-sb-th-btn').forEach(btn => btn.addEventListener('click', () => {
-      const t = btn.dataset.themeVal;
-      localStorage.setItem(LS_THEME, t);
-      document.documentElement.setAttribute('data-theme', t);
-      this.renderSettingsState();
-      $$('.fr-sb-th-btn').forEach(b => b.classList.toggle('active', b.dataset.themeVal === t));
-    }));
 
     // Settings: accent swatches
     $$('[data-accent]').forEach(btn => btn.addEventListener('click', () => {
@@ -340,8 +370,14 @@ const FR = window.FR = {
   /* ── Tab switching ── */
   switchTab(name) {
     this.currentTab = name;
-    $$('.fr-nav-lnk').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-    $$('.fr-bn-item').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    $$('.fr-nav-lnk').forEach(t => {
+      t.classList.toggle('active', t.dataset.tab === name);
+      t.setAttribute('aria-selected', t.dataset.tab === name ? 'true' : 'false');
+    });
+    $$('.fr-bn-item').forEach(t => {
+      t.classList.toggle('active', t.dataset.tab === name);
+      t.setAttribute('aria-selected', t.dataset.tab === name ? 'true' : 'false');
+    });
     $$('.tab-content').forEach(s => s.classList.toggle('active', s.id === `tab-content-${name}`));
     const labels = { home:'Accueil', friends:'Amis', search:'Recherche', favorites:'Favoris', settings:'Paramètres' };
     const labelEl = $('#hd-tab-label');
@@ -806,6 +842,12 @@ const FR = window.FR = {
       homeStatus.innerHTML = mainStatus.innerHTML;
       homeStatus.classList.toggle('hidden', mainStatus.classList.contains('hidden'));
     }
+
+    // New sections: Coïncidences, Discovery, Flashback
+    this._renderHomeCoincidences();
+    this.renderHomeDiscovery();
+    // Flashback is async — call without await to avoid blocking
+    this.renderHomeFlashback().catch(() => {});
   },
 
   /* ════════════════════════════════════════
@@ -855,6 +897,23 @@ const FR = window.FR = {
   },
 
   _buildFeedItem(item, delay = 0) {
+    // Context badge computation
+    const ONE_YEAR  = 365 * 24 * 3600 * 1000;
+    const ONE_MONTH =  30 * 24 * 3600 * 1000;
+    const trackKey  = `${(item.artist||'').toLowerCase()}|${(item.track||'').toLowerCase()}`;
+    const userKey   = item.username.toLowerCase();
+    const lastSeen  = TrackSeen.lastSeen(userKey, trackKey);
+    const nowMs     = Date.now();
+    let badgeHtml   = '';
+    if (!item.nowPlaying) {
+      if (lastSeen && (nowMs - lastSeen) > ONE_YEAR) {
+        badgeHtml = `<span class="fr-ctx-badge fr-badge-archive" title="Non écouté depuis plus d'un an">📦 Archive</span>`;
+      } else if (!lastSeen && item.ts && (nowMs / 1000 - item.ts) < (30 * 86400)) {
+        badgeHtml = `<span class="fr-ctx-badge fr-badge-new" title="Piste récemment écoutée">✨ Nouveauté</span>`;
+      }
+    }
+    TrackSeen.mark(userKey, trackKey);
+
     const userAvHtml = item.userImage
       ? `<img class="fr-feed-user-av" src="${escHtml(item.userImage)}" alt="${escHtml(item.username)}"
              loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
@@ -889,7 +948,7 @@ const FR = window.FR = {
           ${item.nowPlaying ? '<div class="fr-feed-np-overlay"><div class="fr-np-icon sm"><span></span><span></span><span></span></div></div>' : ''}
         </div>
         <div class="fr-feed-body">
-          <div class="fr-feed-track">${escHtml(item.track)}</div>
+          <div class="fr-feed-track">${escHtml(item.track)}${badgeHtml}</div>
           <div class="fr-feed-artist">${escHtml(item.artist||'')}${item.album ? ` <span class="fr-feed-album">· ${escHtml(item.album)}</span>` : ''}</div>
           <div class="fr-feed-meta">
             <div class="fr-feed-user">
@@ -969,7 +1028,7 @@ const FR = window.FR = {
           userImage: friend.image || '',
         }));
 
-      this.liveStatuses[friend.name.toLowerCase()] = {
+      const status = {
         nowPlaying,
         track:      first.name || '',
         artist:     first.artist?.['#text'] || first.artist || '',
@@ -979,6 +1038,14 @@ const FR = window.FR = {
         userImage:  friend.image || '',
         recentTracks,
       };
+      this.liveStatuses[friend.name.toLowerCase()] = status;
+
+      // Mark recently-seen tracks (for Archive/Nouveauté badges)
+      const uKey = friend.name.toLowerCase();
+      if (status.track) TrackSeen.mark(uKey, `${(status.artist||'').toLowerCase()}|${status.track.toLowerCase()}`);
+      recentTracks.forEach(rt => {
+        if (rt.track) TrackSeen.mark(uKey, `${(rt.artist||'').toLowerCase()}|${rt.track.toLowerCase()}`);
+      });
     } catch {
       // Keep old status on error
     }
@@ -1725,6 +1792,223 @@ const FR = window.FR = {
     }, { once: true });
     setTimeout(() => overlay.classList.remove('open', 'closing'), 400);
     document.body.style.overflow = '';
+  },
+
+
+  /* ════════════════════════════════════════
+     COÏNCIDENCES MUSICALES — home section
+  ════════════════════════════════════════ */
+  _renderHomeCoincidences() {
+    const el      = $('#home-coincidences-body');
+    const section = $('#home-coincidences-section');
+    if (!el || !section) return;
+
+    const { coincidences } = this._computeGroupStats();
+    const myStatus  = this.liveStatuses[this.username.toLowerCase()];
+    const myArtistK = myStatus?.nowPlaying ? (myStatus.artist || '').toLowerCase() : null;
+
+    const items = [];
+
+    // Self ↔ friend coincidences
+    if (myArtistK) {
+      for (const [lcName, status] of Object.entries(this.liveStatuses)) {
+        if (lcName === this.username.toLowerCase()) continue;
+        if (status.nowPlaying && (status.artist || '').toLowerCase() === myArtistK) {
+          const friend = this.friends.find(f => f.name.toLowerCase() === lcName);
+          items.push({
+            icon: 'fa-headphones',
+            color: 'var(--accent)',
+            text: `Toi et <strong>${escHtml(friend?.name || lcName)}</strong> écoutez <strong>${escHtml(status.artist)}</strong> en ce moment !`,
+          });
+        }
+      }
+    }
+
+    // Friend-to-friend coincidences (2+ friends same artist simultaneously)
+    for (const artistKey of coincidences) {
+      const matches = Object.entries(this.liveStatuses)
+        .filter(([k]) => k !== this.username.toLowerCase())
+        .filter(([, s]) => s.nowPlaying && (s.artist || '').toLowerCase() === artistKey);
+      if (matches.length >= 2) {
+        const names = matches.slice(0, 3).map(([k]) => {
+          const fr = this.friends.find(f => f.name.toLowerCase() === k);
+          return escHtml(fr?.name || k);
+        });
+        const artistName = matches[0][1].artist || artistKey;
+        const namesList  = names.length === 2
+          ? `<strong>${names[0]}</strong> et <strong>${names[1]}</strong>`
+          : `<strong>${names[0]}</strong>, <strong>${names[1]}</strong> et ${matches.length - 2} autre(s)`;
+        items.push({
+          icon: 'fa-music',
+          color: '#f59e0b',
+          text: `${namesList} écoutent <strong>${escHtml(artistName)}</strong> simultanément`,
+        });
+      }
+    }
+
+    section.classList.toggle('hidden', items.length === 0);
+    el.innerHTML = items.map(item => `
+      <div class="fr-coincidence-card">
+        <div class="fr-coincidence-icon" style="color:${item.color}"><i class="fas ${item.icon}"></i></div>
+        <div class="fr-coincidence-text">${item.text}</div>
+      </div>`).join('');
+  },
+
+  /* ════════════════════════════════════════
+     DISCOVERY — "À découvrir" section
+  ════════════════════════════════════════ */
+  renderHomeDiscovery() {
+    const el      = $('#home-discovery-body');
+    const section = $('#home-discovery-section');
+    if (!el || !section) return;
+
+    // Collect my own recent artists from liveStatuses
+    const myRecentArtists = new Set();
+    const myStatus = this.liveStatuses[this.username.toLowerCase()];
+    if (myStatus) {
+      if (myStatus.artist) myRecentArtists.add(myStatus.artist.toLowerCase());
+      (myStatus.recentTracks || []).forEach(rt => { if (rt.artist) myRecentArtists.add(rt.artist.toLowerCase()); });
+    }
+
+    // Count per artist how many friends listened to it
+    const artistFriends = {};
+    for (const [lcName, status] of Object.entries(this.liveStatuses)) {
+      if (lcName === this.username.toLowerCase()) continue;
+      const friend = this.friends.find(f => f.name.toLowerCase() === lcName);
+      const friendName = friend?.name || lcName;
+      const seen = new Set();
+      const artists = [];
+      if (status.artist) artists.push(status.artist);
+      (status.recentTracks || []).forEach(rt => { if (rt.artist) artists.push(rt.artist); });
+      artists.forEach(a => {
+        const key = a.toLowerCase();
+        if (seen.has(key)) return; seen.add(key);
+        if (!artistFriends[key]) artistFriends[key] = { name: a, friends: [], count: 0 };
+        artistFriends[key].friends.push(friendName);
+        artistFriends[key].count++;
+      });
+    }
+
+    const discoveries = Object.values(artistFriends)
+      .filter(a => a.count >= 2 && !myRecentArtists.has(a.name.toLowerCase()))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3);
+
+    // "Classique du groupe" — most shared artist overall among friends
+    const classique = Object.values(artistFriends)
+      .filter(a => a.count >= 3)
+      .sort((a, b) => b.count - a.count)[0];
+
+    if (!discoveries.length && !classique) {
+      section.classList.add('hidden'); return;
+    }
+    section.classList.remove('hidden');
+
+    let html = '';
+    if (discoveries.length) {
+      html += discoveries.map(d => `
+        <div class="fr-discovery-item">
+          <div class="fr-discovery-icon"><i class="fas fa-users"></i></div>
+          <div class="fr-discovery-body">
+            <div class="fr-discovery-artist">${escHtml(d.name)}</div>
+            <div class="fr-discovery-meta">${d.count} ami${d.count > 1 ? 's' : ''} écoutent cet artiste cette semaine</div>
+          </div>
+          <a class="fr-discovery-listen-btn" href="https://open.spotify.com/search/${encodeURIComponent(d.name)}"
+             target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Écouter sur Spotify">
+            <i class="fab fa-spotify"></i>
+          </a>
+        </div>`).join('');
+    }
+    if (classique) {
+      html += `
+        <div class="fr-discovery-classique">
+          <i class="fas fa-trophy" style="color:#f59e0b;flex-shrink:0"></i>
+          <div>
+            <div class="fr-discovery-cl-label">Classique du groupe</div>
+            <div class="fr-discovery-cl-artist">${escHtml(classique.name)}</div>
+            <div class="fr-discovery-cl-meta">${classique.count} ami${classique.count > 1 ? 's' : ''} l'écoutent régulièrement</div>
+          </div>
+          <a class="fr-discovery-listen-btn" href="https://open.spotify.com/search/${encodeURIComponent(classique.name)}"
+             target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Écouter sur Spotify">
+            <i class="fab fa-spotify"></i>
+          </a>
+        </div>`;
+    }
+    el.innerHTML = html;
+  },
+
+  /* ════════════════════════════════════════
+     FLASHBACK — "Souvenirs" section
+  ════════════════════════════════════════ */
+  async renderHomeFlashback() {
+    const el      = $('#home-flashback-body');
+    const section = $('#home-flashback-section');
+    if (!el || !section) return;
+
+    // Check cache (6 h)
+    try {
+      const cached = localStorage.getItem(LS_FLASHBACK_KEY);
+      if (cached) {
+        const { html, ts } = JSON.parse(cached);
+        if (Date.now() - ts < 6 * 3600 * 1000) {
+          el.innerHTML = html; section.classList.remove('hidden'); return;
+        }
+      }
+    } catch {}
+
+    el.innerHTML = '<div class="fr-flashback-loading"><i class="fas fa-circle-notch fa-spin"></i></div>';
+    section.classList.remove('hidden');
+
+    const oneYearAgoSec = Math.floor(Date.now() / 1000) - 365 * 86400;
+    const windowEndSec  = oneYearAgoSec + 7 * 86400;
+
+    // Fetch from own user + up to 4 friends
+    const usersToCheck = [this.username, ...this.friends.slice(0, 4).map(f => f.name)];
+    const artistCount  = {};
+
+    for (const uname of usersToCheck) {
+      try {
+        const data   = await API.getRecentTracksRange(uname, oneYearAgoSec, windowEndSec, 15);
+        const tracks = data.recenttracks?.track || [];
+        const arr    = Array.isArray(tracks) ? tracks : [tracks];
+        arr.forEach(t => {
+          const artist = t.artist?.['#text'] || t.artist || '';
+          if (!artist || t['@attr']?.nowplaying === 'true') return;
+          const key = artist.toLowerCase();
+          if (!artistCount[key]) artistCount[key] = { name: artist, count: 0 };
+          artistCount[key].count++;
+        });
+      } catch { /* API might rate-limit — skip */ }
+      await sleep(200);
+    }
+
+    const sorted  = Object.values(artistCount).sort((a, b) => b.count - a.count);
+    const topArt  = sorted[0];
+    const oneYear = new Date(oneYearAgoSec * 1000);
+    const dateStr = oneYear.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    let html;
+    if (topArt && topArt.count >= 2) {
+      const others = sorted.slice(1, 3).map(a => escHtml(a.name));
+      html = `
+        <div class="fr-flashback-item">
+          <div class="fr-flashback-icon"><i class="fas fa-calendar-alt"></i></div>
+          <div class="fr-flashback-info">
+            <div class="fr-flashback-date">Il y a un an — ${escHtml(dateStr)}</div>
+            <div class="fr-flashback-top">Ton groupe écoutait surtout <strong>${escHtml(topArt.name)}</strong></div>
+            ${others.length ? `<div class="fr-flashback-also">Aussi : ${others.join(', ')}</div>` : ''}
+          </div>
+          <a class="fr-discovery-listen-btn" href="https://open.spotify.com/search/${encodeURIComponent(topArt.name)}"
+             target="_blank" rel="noopener" title="Écouter sur Spotify">
+            <i class="fab fa-spotify"></i>
+          </a>
+        </div>`;
+    } else {
+      html = '<div class="fr-flashback-empty">Pas assez de données pour cette période.</div>';
+    }
+
+    el.innerHTML = html;
+    try { localStorage.setItem(LS_FLASHBACK_KEY, JSON.stringify({ html, ts: Date.now() })); } catch {}
   },
 
   /* ═══════════════════════════════════════
