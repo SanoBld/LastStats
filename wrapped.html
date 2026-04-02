@@ -12,7 +12,7 @@
   <title>LastStats · Votre Année en Musique</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="wrapped.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"
           integrity="sha512-ZwR1/gSZM3ai6vCdI+LVF1zSq/5HznD3oD+sCoJrzXJ+yKiralybjReQNVBtxbWI4kFGZOY1uJ/1HyLk3kCOA=="
@@ -181,17 +181,25 @@
     <div id="grain" aria-hidden="true"></div>
 
     <header id="hud" role="navigation" aria-label="Navigation Wrapped">
-      <div class="hud-nav">
-        <button id="nav-prev-btn" class="hud-arrow" aria-label="Précédent">&#8249;</button>
-        <span id="slide-counter" class="hud-counter">1 / 15</span>
-        <button id="nav-next-btn" class="hud-arrow" aria-label="Suivant">&#8250;</button>
-      </div>
-      <div class="hud-controls">
-        <button id="screenshot-btn" class="hud-btn" aria-label="Capturer">📷</button>
-        <button id="share-btn"      class="hud-btn" aria-label="Partager">↗</button>
-        <button id="exit-btn"       class="hud-btn" aria-label="Quitter">✕</button>
+      <!-- Row 1 : progress dots -->
+      <div id="progress-bars" role="progressbar" aria-label="Progression"></div>
+      <!-- Row 2 : nav + controls -->
+      <div class="hud-bottom">
+        <div class="hud-nav">
+          <button id="nav-prev-btn" class="hud-arrow" aria-label="Précédent">&#8249;</button>
+          <span id="slide-counter" class="hud-counter sr-only" aria-live="polite">1 / 15</span>
+          <button id="nav-next-btn" class="hud-arrow" aria-label="Suivant">&#8250;</button>
+        </div>
+        <div class="hud-controls">
+          <button id="screenshot-btn" class="hud-btn" aria-label="Capturer">📷</button>
+          <button id="share-btn"      class="hud-btn" aria-label="Partager">↗</button>
+          <button id="exit-btn"       class="hud-btn" aria-label="Quitter">✕</button>
+        </div>
       </div>
     </header>
+    <!-- Tap zones (sides) for story-style navigation -->
+    <div id="tap-prev" class="slide-tap-zone slide-tap-prev" aria-hidden="true"></div>
+    <div id="tap-next" class="slide-tap-zone slide-tap-next" aria-hidden="true"></div>
 
     <!-- Scroll container — all slides stacked vertically -->
     <div id="slides-scroll">

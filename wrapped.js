@@ -2087,7 +2087,6 @@ const Stories = {
 
   init() {
     const container = document.getElementById('slides-container');
-    const scroll    = document.getElementById('slides-scroll');
     if (!container) return;
     container.innerHTML = '';
     _observerMap.clear();
@@ -2104,45 +2103,19 @@ const Stories = {
     this._bindRecapButtons();
     this._bindLeaderboardTabs();
     this._bindNavButtons();
+    this._buildProgress();
 
-    // Reset scroll to top
-    if (scroll) { scroll.scrollTop = 0; }
-
-    // Set ambient for first slide and fire its enter
+    // Show only the first slide
     this.current = 0;
+    const firstEl = document.getElementById(`slide-${SLIDES[0].id}`);
+    if (firstEl) firstEl.classList.add('is-active');
+
     setAmbient(SLIDES[0].theme);
     this._updateCounter(0);
 
-    // IntersectionObserver — trigger animations once per slide
-    _intersectionObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        const id = entry.target.id.replace('slide-', '');
-        const idx = SLIDES.findIndex(s => s.id === id);
-        if (entry.isIntersecting) {
-          // update ambient + counter based on which slide is most visible
-          if (idx >= 0) {
-            this.current = idx;
-            setAmbient(SLIDES[idx].theme);
-            this._updateCounter(idx);
-          }
-          // trigger enter animations once
-          if (!_observerMap.get(id)) {
-            _observerMap.set(id, true);
-            this._onEnter(id);
-          }
-        }
-      });
-    }, { root: scroll || null, threshold: 0.25 });
-
-    SLIDES.forEach(sl => {
-      const el = document.getElementById(`slide-${sl.id}`);
-      if (el) _intersectionObserver.observe(el);
-    });
-
-    // Trigger intro immediately (it's already visible)
-    setTimeout(() => {
-      if (!_observerMap.get('intro')) { _observerMap.set('intro', true); this._onEnter('intro'); }
-    }, 100);
+    // Trigger intro enter animations immediately
+    _observerMap.set('intro', true);
+    setTimeout(() => this._onEnter('intro'), 120);
   },
 
   _updateCounter(idx) {
@@ -2152,21 +2125,82 @@ const Stories = {
     const nextBtn = document.getElementById('nav-next-btn');
     if (prevBtn) prevBtn.disabled = idx === 0;
     if (nextBtn) nextBtn.disabled = idx === SLIDES.length - 1;
+    this._updateProgress(idx);
+  },
+
+  _buildProgress() {
+    const bar = document.getElementById('progress-bars');
+    if (!bar) return;
+    bar.innerHTML = SLIDES.map(() =>
+      `<div class="prog-seg" role="presentation"><span class="prog-fill"></span></div>`
+    ).join('');
+  },
+
+  _updateProgress(idx) {
+    const segs = document.querySelectorAll('#progress-bars .prog-seg');
+    segs.forEach((seg, i) => {
+      seg.classList.remove('prog-done', 'prog-active');
+      if (i < idx)       seg.classList.add('prog-done');
+      else if (i === idx) seg.classList.add('prog-active');
+    });
   },
 
   _bindNavButtons() {
     const prev = document.getElementById('nav-prev-btn');
     const next = document.getElementById('nav-next-btn');
-    if (prev) prev.addEventListener('click', () => this.prev());
-    if (next) next.addEventListener('click', () => this.next());
+    if (prev) prev.addEventListener('click', (e) => { e.stopPropagation(); this.prev(); });
+    if (next) next.addEventListener('click', (e) => { e.stopPropagation(); this.next(); });
 
-    // Keyboard
+    // Keyboard: arrows + spacebar
     document.addEventListener('keydown', e => {
       if (document.getElementById('stories')?.classList.contains('hidden')) return;
-      if (e.key === 'ArrowDown') { e.preventDefault(); this.next(); }
-      if (e.key === 'ArrowUp')   { e.preventDefault(); this.prev(); }
-      if (e.key === 'Escape') document.getElementById('exit-btn')?.click();
+      if (!document.getElementById('modal-share')?.classList.contains('hidden')) return;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+        e.preventDefault(); this.next();
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault(); this.prev();
+      } else if (e.key === 'Escape') {
+        document.getElementById('exit-btn')?.click();
+      }
     });
+
+    // Tap zones (side areas of screen)
+    document.getElementById('tap-prev')?.addEventListener('click', () => this.prev());
+    document.getElementById('tap-next')?.addEventListener('click', () => this.next());
+
+    // Touch swipe
+    this._bindSwipe();
+  },
+
+  _bindSwipe() {
+    const el = document.getElementById('slides-scroll');
+    if (!el) return;
+    let sx = 0, sy = 0, st = 0, locked = null;
+
+    el.addEventListener('touchstart', e => {
+      sx = e.touches[0].clientX;
+      sy = e.touches[0].clientY;
+      st = Date.now();
+      locked = null;
+    }, { passive: true });
+
+    el.addEventListener('touchmove', e => {
+      if (locked === null) {
+        const dx = Math.abs(e.touches[0].clientX - sx);
+        const dy = Math.abs(e.touches[0].clientY - sy);
+        locked = dx > dy ? 'h' : 'v';
+      }
+      if (locked === 'h') e.preventDefault();
+    }, { passive: false });
+
+    el.addEventListener('touchend', e => {
+      if (locked !== 'h') return;
+      const dx = e.changedTouches[0].clientX - sx;
+      const dt = Date.now() - st;
+      if (Math.abs(dx) > 48 && dt < 380) {
+        if (dx < 0) this.next(); else this.prev();
+      }
+    }, { passive: true });
   },
 
   _bindLeaderboardTabs() {
@@ -2211,16 +2245,49 @@ const Stories = {
 
   go(idx) {
     if (idx < 0 || idx >= SLIDES.length) return;
+    const direction = idx > this.current ? 1 : -1;
+    const prevIdx   = this.current;
+
+    if (prevIdx === idx) return;
     this.current = idx;
-    const sl = SLIDES[idx];
-    const slideEl = document.getElementById(`slide-${sl.id}`);
-    const scroll  = document.getElementById('slides-scroll');
-    if (!slideEl || !scroll) return;
-    setAmbient(sl.theme);
+
+    const prevEl = document.getElementById(`slide-${SLIDES[prevIdx].id}`);
+    const nextEl = document.getElementById(`slide-${SLIDES[idx].id}`);
+    if (!nextEl) return;
+
+    // ── Exit current slide ──
+    if (prevEl) {
+      prevEl.classList.remove('is-active');
+      prevEl.classList.add(direction > 0 ? 'slide-exit-back' : 'slide-exit-fwd');
+      setTimeout(() => {
+        prevEl.classList.remove('slide-exit-back', 'slide-exit-fwd');
+        prevEl.scrollTop = 0;
+      }, 520);
+    }
+
+    // ── Prepare incoming slide (no transition) ──
+    const prepClass = direction > 0 ? 'slide-prepare-fwd' : 'slide-prepare-back';
+    nextEl.classList.remove('slide-exit-back', 'slide-exit-fwd', 'is-active');
+    nextEl.classList.add(prepClass);
+
+    // Force reflow so the prepare transform is applied before transition kicks in
+    nextEl.getBoundingClientRect();
+
+    // ── Animate incoming slide in next frame ──
+    requestAnimationFrame(() => {
+      nextEl.classList.remove(prepClass);
+      nextEl.classList.add('is-active');
+    });
+
+    // Update UI
+    setAmbient(SLIDES[idx].theme);
     this._updateCounter(idx);
-    // Scroll smoothly to the target slide
-    const top = slideEl.offsetTop;
-    scroll.scrollTo({ top, behavior: 'smooth' });
+
+    // Trigger slide-specific enter animations (once per slide)
+    if (!_observerMap.get(SLIDES[idx].id)) {
+      _observerMap.set(SLIDES[idx].id, true);
+      setTimeout(() => this._onEnter(SLIDES[idx].id), 160);
+    }
   },
 
   next() { if (this.current < SLIDES.length - 1) this.go(this.current + 1); },
@@ -2890,7 +2957,7 @@ document.getElementById('toggle-pw')?.addEventListener('click', () => {
   inp.type = inp.type === 'password' ? 'text' : 'password';
 });
 
-// swipe horizontal supprimé — scroll vertical natif
+// navigation clavier + swipe gérés dans Stories._bindNavButtons / _bindSwipe
 
 // mise à jour du loader
 function showLoader(msg, pct) {

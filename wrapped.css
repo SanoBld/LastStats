@@ -83,7 +83,7 @@
 html, body {
   width: 100%; height: 100%; overflow: hidden;
   background: var(--bg);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   color: var(--text);
   max-width: 100vw;
@@ -168,9 +168,11 @@ a { color: inherit; text-decoration: none; }
   width: min(448px, 96vw);
   padding: clamp(22px,6vw,38px) clamp(18px,5vw,32px);
   border-radius: var(--radius-xl);
-  background: var(--surface-container-high);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-lg);
+  background: rgba(29, 27, 32, 0.72);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid rgba(147,143,153,.28);
+  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(208,188,255,.08) inset;
   margin: auto;
   display: flex; flex-direction: column; gap: clamp(14px,4vw,20px);
 }
@@ -708,14 +710,12 @@ a { color: inherit; text-decoration: none; }
   background: var(--bg);
 }
 
-/* Scroll inner wrapper — contenu défile, fond reste fixe */
+/* Story inner wrapper — slides are absolutely stacked */
 #slides-scroll {
   position: absolute; inset: 0;
-  overflow-y: auto; overflow-x: hidden;
-  scroll-behavior: smooth;
+  overflow: hidden;
   z-index: 5;
 }
-#slides-scroll::-webkit-scrollbar { display: none; }
 #ambient {
   position: fixed; inset: 0; z-index: 0;
   pointer-events: none;
@@ -732,13 +732,16 @@ a { color: inherit; text-decoration: none; }
   background-size: 200px; opacity: .55;
 }
 
-/* HUD — barre de navigation simple */
+/* HUD — barre de navigation */
 #hud {
   position: absolute; top: 0; left: 0; right: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  padding: max(clamp(10px,3vw,16px), env(safe-area-inset-top, 10px)) clamp(12px,3.5vw,20px) 8px;
-  background: linear-gradient(to bottom, rgba(14,12,18,.72) 0%, transparent 100%);
+  display: flex; flex-direction: column; gap: 7px;
+  padding: max(clamp(8px,2.8vw,14px), env(safe-area-inset-top, 8px)) clamp(12px,3.5vw,20px) 6px;
+  background: linear-gradient(to bottom, rgba(14,12,18,.80) 0%, transparent 100%);
   pointer-events: none;
+}
+.hud-bottom {
+  display: flex; align-items: center; justify-content: space-between;
 }
 .hud-nav {
   display: flex; align-items: center; gap: 8px;
@@ -777,26 +780,109 @@ a { color: inherit; text-decoration: none; }
   flex-shrink: 0; cursor: pointer; color: var(--text);
 }
 .hud-btn:hover { background: rgba(208,188,255,.18); border-color: var(--border-glow); }
-/* progress bars cachés (plus de format story) */
-#progress-bars { display: none !important; }
-.prog-seg, .prog-fill { display: none; }
+/* ── Story progress dots ── */
+#progress-bars {
+  display: flex !important;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+  pointer-events: none;
+}
+.prog-seg {
+  display: block;
+  flex: 1;
+  height: 3px;
+  border-radius: 99px;
+  background: rgba(230,225,229,.22);
+  overflow: hidden;
+  transition: background 300ms ease;
+}
+.prog-seg.prog-done {
+  background: rgba(230,225,229,.75);
+}
+.prog-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: 99px;
+  background: var(--accent);
+}
+.prog-seg.prog-active .prog-fill {
+  width: 100%;
+  animation: progActivePulse 2.4s ease-in-out infinite;
+}
+@keyframes progActivePulse {
+  0%, 100% { opacity: .65; }
+  50%       { opacity: 1;   }
+}
 @keyframes progFill { from{width:0%} to{width:100%} }
 
-/* Slides — base */
-#slides-container { position: relative; width: 100%; }
+/* Slides — story layout */
+#slides-container { position: relative; width: 100%; height: 100%; }
 
 .slide {
-  position: relative;
+  position: absolute;
+  inset: 0;
   width: 100%;
-  min-height: 100dvh;
-  opacity: 1;
-  pointer-events: auto;
-  overflow: visible;
+  height: 100%;
+  /* Internal scroll for tall content */
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
+  /* Hidden by default */
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(100%);
+  transition:
+    transform 520ms cubic-bezier(0.34, 1.08, 0.64, 1),
+    opacity   360ms cubic-bezier(0.2, 0, 0, 1);
+  will-change: transform, opacity;
 }
-/* active = slide actuellement dans la vue (pour l'ambient) */
-.slide.active { /* marqueur JS seulement */ }
+/* Active slide */
+.slide.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+  z-index: 2;
+}
+/* Exit going forward (current slide goes left) */
+.slide.slide-exit-back {
+  transform: translateX(-52px) scale(0.96);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  transition:
+    transform 400ms cubic-bezier(0.4, 0, 1, 1),
+    opacity   300ms cubic-bezier(0.4, 0, 1, 1);
+}
+/* Exit going backward (current slide goes right) */
+.slide.slide-exit-fwd {
+  transform: translateX(52px) scale(0.96);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  transition:
+    transform 400ms cubic-bezier(0.4, 0, 1, 1),
+    opacity   300ms cubic-bezier(0.4, 0, 1, 1);
+}
+/* Prepare-entry states (applied for one frame before adding is-active) */
+.slide.slide-prepare-fwd  { transform: translateX(100%);  opacity: 0; transition: none !important; }
+.slide.slide-prepare-back { transform: translateX(-60%);  opacity: 0; transition: none !important; }
+
+/* Tap zones for story-style navigation */
+.slide-tap-zone {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 18%;
+  z-index: 50;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.slide-tap-prev { left: 0;  }
+.slide-tap-next { right: 0; }
 
 /* Contenu slide */
 .slide-content {
@@ -807,7 +893,8 @@ a { color: inherit; text-decoration: none; }
   padding: clamp(70px,14vw,86px) clamp(12px,4.5vw,26px) clamp(32px,6vw,48px);
   padding-top: max(clamp(70px,14vw,86px), calc(58px + env(safe-area-inset-top, 0px)));
   gap: clamp(6px,2vw,14px);
-  min-height: 100dvh;
+  min-height: 100%;
+  box-sizing: border-box;
 }
 
 /* En-tête de slide */
@@ -2289,7 +2376,6 @@ a { color: inherit; text-decoration: none; }
   .audio-bars span, .intro-scroll-hint span {
     animation: none !important;
   }
-  .slide { transition: opacity .3s ease !important; }
   .track-bar, .genre-bar-fill, .progress-fill,
   .wh-month-fill, #streak-bar-fill {
     transition: none !important;
@@ -2708,14 +2794,9 @@ a { color: inherit; text-decoration: none; }
    SCROLL LAYOUT — ajustements pleine largeur
    ───────────────────────────────────────────── */
 
-/* Séparateur visuel entre sections */
-.slide + .slide {
-  border-top: 1px solid var(--border);
-}
-
 /* Récap — min-height enough to fill but not more */
 .slide--recap .recap-content {
-  min-height: 100dvh;
+  min-height: 100%;
   justify-content: center;
 }
 
@@ -2789,9 +2870,6 @@ a { color: inherit; text-decoration: none; }
   position: absolute !important;
 }
 
-/* Slide intro - full viewport min height */
-.slide--intro { min-height: 100dvh; }
-
 /* ─────────────────────────────────────────────
    OVERLAY 3 — Loader card (alias glass-card)
    ───────────────────────────────────────────── */
@@ -2819,4 +2897,82 @@ a { color: inherit; text-decoration: none; }
   list-style: none;
   display: flex; flex-direction: column; gap: 6px;
   width: 100%; max-width: 260px; align-self: flex-start;
+}
+
+/* ─────────────────────────────────────────────
+   STORY NAVIGATION ENHANCEMENTS
+   ───────────────────────────────────────────── */
+
+/* Spring micro-interaction on HUD arrows */
+.hud-arrow {
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    transform 200ms var(--ease-spring),
+    box-shadow var(--transition);
+}
+.hud-arrow:hover:not(:disabled) {
+  background: rgba(208,188,255,.26);
+  border-color: var(--border-glow);
+  transform: scale(1.12);
+  box-shadow: 0 0 14px rgba(208,188,255,.22);
+}
+.hud-arrow:active:not(:disabled) {
+  transform: scale(0.90);
+  transition-duration: 80ms;
+}
+
+/* Spring on lang buttons */
+.lang-btn {
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    transform 280ms var(--ease-spring),
+    box-shadow var(--transition);
+}
+.lang-btn:hover {
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 6px 18px rgba(208,188,255,.18);
+}
+.lang-btn:active { transform: scale(0.94); transition-duration: 80ms; }
+
+/* Spring on primary button */
+.btn-primary {
+  transition:
+    background var(--transition),
+    box-shadow var(--transition),
+    transform 280ms var(--ease-spring);
+}
+.btn-primary:hover  { transform: scale(1.03) translateY(-1px); }
+.btn-primary:active { transform: scale(0.97); transition-duration: 80ms; }
+
+/* HUD tap-zone visual feedback pulse on touch */
+.slide-tap-zone:active::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(208,188,255,.06);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Slide scroll indicator (bottom) for tall slides */
+.slide.is-active .slide-content::after {
+  content: '';
+  display: block;
+  flex-shrink: 0;
+  height: max(24px, env(safe-area-inset-bottom, 24px));
+}
+
+/* Desktop: constrain slides width nicely */
+@media (min-width: 1024px) {
+  #slides-scroll {
+    display: flex;
+    justify-content: center;
+  }
+  #slides-container {
+    width: min(680px, 100%);
+    position: relative;
+  }
+  .slide-tap-zone { display: none; }
 }
