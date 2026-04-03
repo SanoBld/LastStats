@@ -21,6 +21,10 @@ const LS_COLOR_SYNC = 'ls_color_sync';
 const LS_PUSH         = 'ls_push_enabled';
 const LS_TRACK_SEEN_KEY = 'ls_track_seen';
 const LS_FLASHBACK_KEY  = 'ls_flashback_cache';
+const LS_TRACK_PLAYS_CACHE = 'ls_track_plays_cache';  // track.getInfo userplaycount cache
+const LS_DAILY_SCROBBLES   = 'ls_daily_scrobbles';    // daily scrobble counts per friend
+const LS_DISCOVERY_CACHE   = 'ls_discovery_cache';    // artist.getInfo userplaycount for discovery wall
+const LS_GROUP_WEEKLY_KEY  = 'ls_group_weekly_top';   // cached group weekly top artists
 
 /* ─── Helpers ─── */
 const $  = (sel, ctx = document) => ctx.querySelector(sel);
@@ -57,13 +61,33 @@ function imgUrl(images) {
   return '';
 }
 
+/**
+ * Convertit un timestamp Unix (ex: 1617208730) en date lisible.
+ * L'API Last.fm renvoie registered['#text'] sous forme d'entier Unix.
+ */
+function formatRegDate(rawTs) {
+  if (!rawTs) return '—';
+  const n = parseInt(rawTs, 10);
+  if (!n || isNaN(n)) return '—';
+  // Valeur > 1e9 → c'est bien un timestamp Unix en secondes
+  const d = new Date(n > 1e9 ? n * 1000 : n);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
+}
+
 /* ─── Favorites ─── */
 const Favs = {
   _data: null,
   load() {
     if (this._data) return this._data;
-    try { this._data = JSON.parse(localStorage.getItem(LS_FAV_KEY) || '{}'); }
-    catch { this._data = {}; }
+    try {
+      const raw = localStorage.getItem(LS_FAV_KEY);
+      const parsed = raw ? JSON.parse(raw) : {};
+      // Validation : doit être un objet plat, sinon réinitialisation
+      this._data = (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) ? parsed : {};
+    } catch {
+      this._data = {};
+    }
     return this._data;
   },
   save() { try { localStorage.setItem(LS_FAV_KEY, JSON.stringify(this._data)); } catch {} },
@@ -141,9 +165,23 @@ const API = {
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
         const res  = await fetch(url.toString());
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) throw new Error(`Erreur réseau HTTP ${res.status}`);
         const data = await res.json();
-        if (data.error) throw new Error(data.message || `API error ${data.error}`);
+        // Gestion des erreurs API Last.fm avec messages lisibles
+        if (data.error) {
+          const errorMessages = {
+            2:  'Ce service est temporairement indisponible.',
+            4:  'Clé API invalide. Vérifiez vos paramètres.',
+            6:  'Paramètre invalide.',
+            8:  'Erreur de service temporaire. Réessayez.',
+            9:  'Clé API expirée ou suspendue.',
+            10: 'Clé API refusée — accès non autorisé.',
+            17: 'Connexion requise.',
+            26: 'Limite de requêtes dépassée. Patientez.',
+            29: 'Limite de requêtes dépassée. Patientez.',
+          };
+          throw new Error(errorMessages[data.error] || (data.message || `Erreur API Last.fm (code ${data.error})`));
+        }
         return data;
       } catch(e) {
         if (attempt === 2) throw e;
@@ -161,6 +199,12 @@ const API = {
   async getTopAlbums(username, period = 'overall', limit = 3)  { return this.call('user.getTopAlbums',  { user: username, period, limit }); },
   async getWeeklyArtists(username)  { return this.call('user.getTopArtists',  { user: username, period: '7day', limit: 1 }); },
   async getRecentTracksRange(username, from, to, limit = 10) { return this.call('user.getRecentTracks', { user: username, from, to, limit }); },
+  async getTrackInfo(artist, track, username) {
+    return this.call('track.getInfo', { artist, track, username, autocorrect: 1 });
+  },
+  async getArtistInfo(artist, username) {
+    return this.call('artist.getInfo', { artist, username, autocorrect: 1 });
+  },
 };
 
 /* ═══════════════════════════════════════════════
@@ -183,10 +227,12 @@ const FR = window.FR = {
   _colorSyncCanvas:  null,
   _colorSyncCtx:     null,
   _colorSyncActive:  false,
+  _visibilityBound:  false,
 
   /* ── Push notification state ── */
   _pushEnabled: false,
   _lastNotified: {},
+  _lastLiveTracks: {},   // { friendLcName: 'artist|track' } — detects track changes for badge refresh
 
   /* ── Boot ── */
   async init() {
@@ -216,7 +262,11 @@ const FR = window.FR = {
     await this.loadFriends();
   },
 
-  showSetup() { $('#setup-screen').classList.remove('hidden'); $('#app-shell').classList.add('hidden'); },
+  showSetup() {
+    this.stopLivePolling(); // Stopper le polling avant de quitter l'app
+    $('#setup-screen').classList.remove('hidden');
+    $('#app-shell').classList.add('hidden');
+  },
   showApp()   { $('#setup-screen').classList.add('hidden');    $('#app-shell').classList.remove('hidden'); },
 
   async _loadSidebarProfile() {
@@ -480,6 +530,7 @@ const FR = window.FR = {
     });
 
     this.renderActivityFeed();
+    this.renderDiscoveryWall().catch(() => {});
   },
 
   _filteredFriends() {
@@ -503,6 +554,15 @@ const FR = window.FR = {
       : '';
     const avFallback = `<div class="fr-av" style="background:${this._nameColor(f.name)};display:${av?'none':'flex'};align-items:center;justify-content:center;color:#fff;font-size:1.1rem;font-weight:800;">${escHtml(f.name.charAt(0).toUpperCase())}</div>`;
 
+    // ── Activity Aura Badges ─────────────────────────────
+    const todayScrob = live?.todayScrobbles ?? 0;
+    const daysSince  = live?.daysSinceLastScrobble ?? 0;
+    const isFlame    = todayScrob > 50;
+    const isMoon     = !isLive && daysSince > 3 && daysSince < 9999;
+    const auraHtml   = (isFlame || isMoon)
+      ? `<div class="fr-aura-wrap">${isFlame ? '<span class="fr-aura-badge fr-aura-flame" title="' + todayScrob + ' scrobbles aujourd\'hui">🔥</span>' : ''}${isMoon ? '<span class="fr-aura-badge fr-aura-moon" title="Absent depuis ' + Math.floor(daysSince) + ' jours">🌙</span>' : ''}</div>`
+      : '';
+
     // Musical coincidence: same artist as another friend
     const isSameArtist = isLive && live?.artist && coincidences.has(live.artist.toLowerCase());
 
@@ -510,16 +570,20 @@ const FR = window.FR = {
     if (isLive) {
       const spQuery = encodeURIComponent(`${live.artist} ${live.track}`);
       const ytQuery = encodeURIComponent(`${live.artist} ${live.track}`);
+      // La pochette d'album : image OU fallback (jamais les deux visibles en même temps)
+      const artBlock = live.art
+        ? `<img class="fr-np-art" src="${escHtml(live.art)}" alt="${escHtml(live.album||live.track)}" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+           <div class="fr-np-art np-art-fallback" style="display:none;background:${this._nameColor(live.artist||'')}">${(live.artist||'?').charAt(0)}</div>`
+        : `<div class="fr-np-art np-art-fallback" style="display:flex;background:${this._nameColor(live.artist||'')}">${(live.artist||'?').charAt(0)}</div>`;
+
       npHtml = `
         <div class="fr-np-bar">
-          ${live.art
-            ? `<img class="fr-np-art" src="${escHtml(live.art)}" alt="${escHtml(live.album||live.track)}" loading="lazy"
-                   onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-            : ''}
-          <div class="fr-np-art np-art-fallback" style="background:${this._nameColor(live.artist||'')};display:${live.art?'none':'flex'}">${(live.artist||'?').charAt(0)}</div>
+          ${artBlock}
           <div class="fr-np-info">
             <div class="fr-np-track">${escHtml(live.track)}</div>
             <div class="fr-np-artist">${escHtml(live.artist)}${live.album ? ` · <em style="opacity:.7">${escHtml(live.album)}</em>` : ''}</div>
+            ${(live.myPlayCount > 0) ? `<div class="fr-my-play-badge"><i class="fas fa-headphones"></i> Déjà écouté ${live.myPlayCount}×</div>` : ''}
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
             <div class="fr-np-icon"><span></span><span></span><span></span><span></span></div>
@@ -532,13 +596,16 @@ const FR = window.FR = {
           </div>
         </div>`;
     } else if (live?.track) {
+      // Dernier morceau écouté — même logique sans doublon
+      const lastArtBlock = live.art
+        ? `<img class="fr-last-art" src="${escHtml(live.art)}" alt="${escHtml(live.track)}" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+           <div class="fr-last-art np-art-fallback sm" style="display:none;background:${this._nameColor(live.artist||'')}">${(live.artist||'?').charAt(0)}</div>`
+        : `<div class="fr-last-art np-art-fallback sm" style="display:flex;background:${this._nameColor(live.artist||'')}">${(live.artist||'?').charAt(0)}</div>`;
+
       npHtml = `
         <div class="fr-last-played">
-          ${live.art
-            ? `<img class="fr-last-art" src="${escHtml(live.art)}" alt="${escHtml(live.track)}" loading="lazy"
-                   onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-            : ''}
-          <div class="fr-last-art np-art-fallback sm" style="background:${this._nameColor(live.artist||'')};display:${live.art?'none':'flex'}">${(live.artist||'?').charAt(0)}</div>
+          ${lastArtBlock}
           <div class="fr-last-info">
             <div class="fr-last-track">${escHtml(live.track)}</div>
             <div class="fr-last-artist">${escHtml(live.artist)}</div>
@@ -555,6 +622,7 @@ const FR = window.FR = {
           <div class="fr-av-wrap">
             ${avHtml}${avFallback}
             ${isLive ? '<div class="fr-av-dot np-pulse"></div>' : ''}
+          ${auraHtml}
           </div>
           <div class="fr-card-info">
             <div class="fr-card-name">
@@ -636,9 +704,27 @@ const FR = window.FR = {
   ════════════════════════════════════════ */
   _applyColorSync(imgSrc) {
     if (!imgSrc) return;
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
+
+    // Tentative avec crossOrigin=anonymous (nécessaire pour canvas getImageData)
+    const tryExtract = (src, withCors) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        if (withCors) img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('img load error'));
+        img.src = src + (withCors ? '' : '');
+      });
+    };
+
+    const extract = async () => {
+      let img;
+      try {
+        img = await tryExtract(imgSrc, true);
+      } catch {
+        // CORS refusé : on ne peut pas extraire la couleur
+        return;
+      }
+
       try {
         if (!this._colorSyncCanvas) {
           this._colorSyncCanvas = document.createElement('canvas');
@@ -648,41 +734,43 @@ const FR = window.FR = {
         const ctx    = this._colorSyncCtx;
         canvas.width = 32; canvas.height = 32;
         ctx.drawImage(img, 0, 0, 32, 32);
+
+        // Peut lancer SecurityError si canvas taint malgré crossOrigin
         const data = ctx.getImageData(0, 0, 32, 32).data;
 
-        // Collect vibrant pixels (skip near-gray)
+        // Collecter les pixels saturés (ignorer les quasi-gris)
         const samples = [];
         for (let i = 0; i < data.length; i += 4) {
           const pr = data[i], pg = data[i+1], pb = data[i+2], pa = data[i+3];
           if (pa < 128) continue;
           const max = Math.max(pr,pg,pb), min = Math.min(pr,pg,pb);
           const sat = max > 0 ? (max - min) / max : 0;
-          if (sat > 0.25 && max > 40 && max < 230) samples.push([pr, pg, pb]);
+          if (sat > 0.20 && max > 35 && max < 235) samples.push([pr, pg, pb]);
         }
-        if (samples.length < 8) return;
+        if (samples.length < 6) return; // Image trop terne → pas de color sync
 
-        // Average colorful pixels
+        // Moyenne des pixels colorés
         let r = 0, g = 0, b = 0;
         samples.forEach(([pr,pg,pb]) => { r += pr; g += pg; b += pb; });
         r = Math.round(r / samples.length);
         g = Math.round(g / samples.length);
         b = Math.round(b / samples.length);
 
-        // Boost saturation slightly
+        // Légère saturation supplémentaire
         const max = Math.max(r,g,b), min = Math.min(r,g,b);
         if (max !== min) {
           const sat   = (max - min) / max;
-          const boost = Math.min(1.6, 1 / sat * 0.8);
+          const boost = Math.min(1.7, 1 / sat * 0.85);
           const mid   = (max + min) / 2;
           r = Math.max(0, Math.min(255, Math.round(mid + (r - mid) * boost)));
           g = Math.max(0, Math.min(255, Math.round(mid + (g - mid) * boost)));
-          b = Math.max(0, Math.min(255, Math.round(b + (b - mid) * boost)));
+          b = Math.max(0, Math.min(255, Math.round(mid + (b - mid) * boost)));
         }
 
-        const hex    = '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
-        const hexLt  = `rgba(${r},${g},${b},0.14)`;
+        const hex     = '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+        const hexLt   = `rgba(${r},${g},${b},0.14)`;
         const hexCont = `rgba(${r},${g},${b},0.22)`;
-        const hexGlow = `rgba(${r},${g},${b},0.4)`;
+        const hexGlow = `rgba(${r},${g},${b},0.45)`;
         const el = document.documentElement;
         el.style.setProperty('--accent',           hex);
         el.style.setProperty('--accent-h',         hex);
@@ -691,21 +779,25 @@ const FR = window.FR = {
         el.style.setProperty('--accent-container', hexCont);
         el.style.setProperty('--border-glow',      hexGlow);
         const brightness = (r*299 + g*587 + b*114) / 1000;
-        el.style.setProperty('--accent-on', brightness > 128 ? '#000' : '#fff');
+        el.style.setProperty('--accent-on',        brightness > 145 ? '#000' : '#fff');
+        el.style.setProperty('--accent-on-cont',   brightness > 145 ? '#000' : '#fff');
+        document.documentElement.classList.add('color-sync-active');
         this._colorSyncActive = true;
-      } catch {
-        // CORS taint — silently ignore
+      } catch (secErr) {
+        // Canvas taint (SecurityError) malgré crossOrigin → CDN ne supporte pas CORS
+        // On passe silencieusement sans afficher d'erreur
       }
     };
-    img.onerror = () => {};
-    img.src = imgSrc;
+
+    extract().catch(() => {});
   },
 
   _resetColorSync() {
     if (!this._colorSyncActive) return;
-    ['--accent','--accent-h','--accent-2','--accent-lt','--accent-container','--border-glow','--accent-on'].forEach(v =>
+    ['--accent','--accent-h','--accent-2','--accent-lt','--accent-container','--border-glow','--accent-on','--accent-on-cont'].forEach(v =>
       document.documentElement.style.removeProperty(v)
     );
+    document.documentElement.classList.remove('color-sync-active');
     this._colorSyncActive = false;
   },
 
@@ -805,7 +897,7 @@ const FR = window.FR = {
         const username  = friend?.name || lcName;
         const userImage = status.userImage || friend?.image || '';
         if (status.nowPlaying && status.track) {
-          allItems.push({ username, userImage, track: status.track, artist: status.artist, album: status.album||'', art: status.art, nowPlaying: true, ts: Math.floor(Date.now()/1000) });
+          allItems.push({ username, userImage, track: status.track, artist: status.artist, album: status.album||'', art: status.art, nowPlaying: true, ts: Math.floor(Date.now()/1000), myPlayCount: status.myPlayCount || 0 });
         }
         if (Array.isArray(status.recentTracks)) {
           for (const rt of status.recentTracks) {
@@ -867,7 +959,7 @@ const FR = window.FR = {
       const userImage = status.userImage || friend?.image || '';
 
       if (status.nowPlaying && status.track) {
-        allItems.push({ username, userImage, track: status.track, artist: status.artist, album: status.album||'', art: status.art, nowPlaying: true, ts: Math.floor(Date.now()/1000) });
+        allItems.push({ username, userImage, track: status.track, artist: status.artist, album: status.album||'', art: status.art, nowPlaying: true, ts: Math.floor(Date.now()/1000), myPlayCount: status.myPlayCount || 0 });
       }
       if (Array.isArray(status.recentTracks)) {
         for (const rt of status.recentTracks) {
@@ -920,11 +1012,12 @@ const FR = window.FR = {
       : '';
     const userAvFallback = `<div class="fr-feed-user-av" style="background:${this._nameColor(item.username)};display:${item.userImage?'none':'flex'};align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.75rem;">${item.username.charAt(0).toUpperCase()}</div>`;
 
-    const artHtml = item.art
+    // Image de la pochette OU fallback coloré — jamais les deux visibles
+    const artBlock = item.art
       ? `<img class="fr-feed-art" src="${escHtml(item.art)}" alt="${escHtml(item.track)}"
-             loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-      : '';
-    const artFallback = `<div class="fr-feed-art np-art-fallback" style="background:${this._nameColor(item.artist||'')};display:${item.art?'none':'flex'}">${(item.artist||'?').charAt(0)}</div>`;
+             loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+         <div class="fr-feed-art np-art-fallback" style="display:none;background:${this._nameColor(item.artist||'')}">${(item.artist||'?').charAt(0)}</div>`
+      : `<div class="fr-feed-art np-art-fallback" style="display:flex;background:${this._nameColor(item.artist||'')}">${(item.artist||'?').charAt(0)}</div>`;
 
     const timeHtml = item.nowPlaying
       ? `<span class="fr-feed-now"><span class="live-dot sm"></span>En écoute</span>`
@@ -944,11 +1037,11 @@ const FR = window.FR = {
       <div class="fr-feed-item${item.nowPlaying?' is-live':''}" data-username="${escHtml(item.username)}"
            style="animation-delay:${delay*30}ms" role="button" tabindex="0">
         <div class="fr-feed-art-wrap">
-          ${artHtml}${artFallback}
+          ${artBlock}
           ${item.nowPlaying ? '<div class="fr-feed-np-overlay"><div class="fr-np-icon sm"><span></span><span></span><span></span></div></div>' : ''}
         </div>
         <div class="fr-feed-body">
-          <div class="fr-feed-track">${escHtml(item.track)}${badgeHtml}</div>
+          <div class="fr-feed-track">${escHtml(item.track)}${badgeHtml}${(item.nowPlaying && (item.myPlayCount||0) > 0) ? '<span class="fr-my-play-badge sm"><i class="fas fa-headphones"></i> ' + item.myPlayCount + '×</span>' : ''}</div>
           <div class="fr-feed-artist">${escHtml(item.artist||'')}${item.album ? ` <span class="fr-feed-album">· ${escHtml(item.album)}</span>` : ''}</div>
           <div class="fr-feed-meta">
             <div class="fr-feed-user">
@@ -966,7 +1059,26 @@ const FR = window.FR = {
   startLivePolling() {
     clearInterval(this.liveTimer);
     this.refreshLiveStatuses();
-    this.liveTimer = setInterval(() => this.refreshLiveStatuses(), LIVE_POLL_MS);
+    this.liveTimer = setInterval(() => {
+      // Ne pas poller si l'onglet est masqué (économie de batterie/réseau)
+      if (!document.hidden) this.refreshLiveStatuses();
+    }, LIVE_POLL_MS);
+
+    // Reprendre le polling immédiatement quand l'utilisateur revient sur l'onglet
+    if (!this._visibilityBound) {
+      this._visibilityBound = true;
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && this.liveTimer) {
+          // Rafraîchissement immédiat à la reprise de l'onglet
+          this.refreshLiveStatuses();
+        }
+      });
+    }
+  },
+
+  stopLivePolling() {
+    clearInterval(this.liveTimer);
+    this.liveTimer = null;
   },
 
   async refreshLiveStatuses() {
@@ -1028,6 +1140,22 @@ const FR = window.FR = {
           userImage: friend.image || '',
         }));
 
+      // ── Compute daysSinceLastScrobble for moon badge ──────────────
+      const lastNonLive = nowPlaying ? recentTracks[0] : null;
+      const lastTs = nowPlaying
+        ? (lastNonLive?.ts || 0)
+        : parseInt(first.date?.uts || 0);
+      const daysSinceLastScrobble = lastTs > 0
+        ? (Date.now() / 1000 - lastTs) / 86400
+        : 999;
+
+      // Preserve todayScrobbles & myPlayCount from previous poll if track unchanged
+      const prevStatus  = this.liveStatuses[friend.name.toLowerCase()];
+      const newTrackKey = nowPlaying
+        ? `${(first.artist?.['#text'] || '').toLowerCase()}|${(first.name || '').toLowerCase()}`
+        : '';
+      const prevTrackKey = this._lastLiveTracks[friend.name.toLowerCase()] || '';
+
       const status = {
         nowPlaying,
         track:      first.name || '',
@@ -1037,8 +1165,26 @@ const FR = window.FR = {
         ts:         nowPlaying ? null : parseInt(first.date?.uts || 0),
         userImage:  friend.image || '',
         recentTracks,
+        daysSinceLastScrobble,
+        todayScrobbles:  prevStatus?.todayScrobbles  ?? 0,
+        myPlayCount:     (nowPlaying && prevTrackKey === newTrackKey) ? (prevStatus?.myPlayCount ?? 0) : 0,
       };
       this.liveStatuses[friend.name.toLowerCase()] = status;
+
+      // ── Trigger background today-scrobbles fetch (non-blocking, daily cache) ──
+      this._fetchTodayScrobbles(friend.name).then(count => {
+        const s = this.liveStatuses[friend.name.toLowerCase()];
+        if (s) s.todayScrobbles = count;
+      }).catch(() => {});
+
+      // ── Trigger myPlayCount fetch when live track changes (non-blocking) ──
+      if (nowPlaying && status.track && status.artist && newTrackKey !== prevTrackKey) {
+        this._lastLiveTracks[friend.name.toLowerCase()] = newTrackKey;
+        this._getMyPlayCount(status.artist, status.track).then(count => {
+          const s = this.liveStatuses[friend.name.toLowerCase()];
+          if (s) s.myPlayCount = count;
+        }).catch(() => {});
+      }
 
       // Mark recently-seen tracks (for Archive/Nouveauté badges)
       const uKey = friend.name.toLowerCase();
@@ -1081,6 +1227,9 @@ const FR = window.FR = {
         <p style="margin-top:12px;font-size:.85rem">Chargement du classement…</p>
       </div>`;
 
+    // ── Group Weekly Top (parallel with individual data) ──
+    const groupWeeklyPromise = this._buildGroupWeeklyTop(this.friends);
+
     // Sort friends by overall playcount, take top 5
     const top5 = [...this.friends].sort((a,b) => b.playcount - a.playcount).slice(0, 5);
     if (!top5.length) {
@@ -1100,19 +1249,24 @@ const FR = window.FR = {
       const liveStatus = this.liveStatuses[f.name.toLowerCase()];
       const av = f.image || '';
 
+      // Médaille pour les 3 premiers
+      const medals = ['🥇','🥈','🥉'];
+      const rankDisplay = i < 3 ? medals[i] : (i + 1);
+
       return `
         <div class="top5-row" style="animation-delay:${i*70}ms" role="button" tabindex="0"
              data-username="${escHtml(f.name)}">
-          <span class="top5-rank">${i+1}</span>
+          <span class="top5-rank" title="Rang ${i+1}">${rankDisplay}</span>
           <div class="top5-av-wrap">
             ${av ? `<img src="${escHtml(av)}" alt="${escHtml(f.name)}"
-                        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
-            <div style="display:${av?'none':'flex'};background:${this._nameColor(f.name)}">${f.name.charAt(0).toUpperCase()}</div>
+                        onerror="this.style.display='none';this.nextElementSibling.style.removeProperty('display')">` : ''}
+            <div style="${av?'display:none;':''}background:${this._nameColor(f.name)}">${f.name.charAt(0).toUpperCase()}</div>
             ${isLive ? '<div class="top5-live-dot"></div>' : ''}
           </div>
           <div class="top5-info">
             <div class="top5-name">
               ${escHtml(f.name)}
+              ${f.subscriber ? '<i class="fas fa-crown" style="color:#f59e0b;font-size:.6rem" title="Subscriber"></i>' : ''}
               ${isLive ? '<span class="fm-live-badge" style="font-size:.6rem;padding:2px 6px"><span class="live-dot sm"></span>LIVE</span>' : ''}
             </div>
             <div class="top5-sub">
@@ -1123,7 +1277,7 @@ const FR = window.FR = {
           </div>
           <div class="top5-plays">
             <strong>${fmt(f.playcount)}</strong>
-            <span style="font-size:.7rem;color:var(--text-muted);display:block">scrobbles</span>
+            <span>scrobbles</span>
           </div>
         </div>`;
     }).join('');
@@ -1134,6 +1288,33 @@ const FR = window.FR = {
         this.openProfileModal(row.dataset.username);
       });
     });
+
+    // ── Append group weekly top ──────────────────────────────────────────────
+    try {
+      const weeklyTop = await groupWeeklyPromise;
+      if (weeklyTop?.length) {
+        const weeklySection = document.createElement('div');
+        weeklySection.className = 'top5-group-section';
+        weeklySection.innerHTML = `
+          <div class="top5-group-hd">
+            <i class="fas fa-globe" style="color:var(--accent)"></i>
+            <span>Artiste du groupe — 7 jours</span>
+          </div>
+          ${weeklyTop.map((a, i) => `
+            <div class="top5-group-row" style="animation-delay:${i*60}ms">
+              <span class="top5-group-rank">${i + 1}</span>
+              <div class="top5-group-info">
+                <span class="top5-group-name">${escHtml(a.name)}</span>
+                <span class="top5-group-meta">${a.friendCount} ami${a.friendCount > 1 ? 's' : ''} · ${fmt(a.plays)} écoutes</span>
+              </div>
+              <a class="fr-np-play-btn" href="https://open.spotify.com/search/${encodeURIComponent(a.name)}"
+                 target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Spotify">
+                <i class="fab fa-spotify"></i>
+              </a>
+            </div>`).join('')}`;
+        body.prepend(weeklySection);
+      }
+    } catch {}
   },
 
   closeTop5() {
@@ -1343,8 +1524,9 @@ const FR = window.FR = {
       if (liveStatus.nowPlaying && liveStatus.track) {
         const artHtml = liveStatus.art
           ? `<img class="fr-np-art" src="${escHtml(liveStatus.art)}" alt="${escHtml(liveStatus.track)}"
-                 loading="lazy" onerror="this.style.display='none'">`
-          : `<div class="fr-np-art np-art-fallback" style="background:${this._nameColor(liveStatus.artist||'')}">${(liveStatus.artist||'?').charAt(0)}</div>`;
+                 loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+             <div class="fr-np-art np-art-fallback" style="display:none;background:${this._nameColor(liveStatus.artist||'')};">${(liveStatus.artist||'?').charAt(0)}</div>`
+          : `<div class="fr-np-art np-art-fallback" style="display:flex;background:${this._nameColor(liveStatus.artist||'')};">${(liveStatus.artist||'?').charAt(0)}</div>`;
         const spQ = encodeURIComponent(`${liveStatus.artist} ${liveStatus.track}`);
         const ytQ = encodeURIComponent(`${liveStatus.artist} ${liveStatus.track}`);
         npWrap.innerHTML = `
@@ -1403,7 +1585,7 @@ const FR = window.FR = {
             <div class="fr-profile-stats">
               <span class="fr-profile-stat"><i class="fas fa-music"></i><strong>${fmt(user.playcount)}</strong> scrobbles</span>
               ${user.country ? `<span class="fr-profile-stat"><i class="fas fa-map-marker-alt"></i>${escHtml(user.country)}</span>` : ''}
-              ${user.registered?.['#text'] ? `<span class="fr-profile-stat"><i class="fas fa-calendar-alt"></i>Depuis ${escHtml(String(user.registered['#text']).split(', ').pop() || String(user.registered['#text']))}</span>` : ''}
+              ${user.registered?.['#text'] || user.registered?.unixtime ? `<span class="fr-profile-stat"><i class="fas fa-calendar-alt"></i>Depuis ${escHtml(formatRegDate(user.registered?.['#text'] || user.registered?.unixtime))}</span>` : ''}
             </div>
             <div id="search-result-np-wrap" class="hidden"></div>
             <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
@@ -1475,16 +1657,17 @@ const FR = window.FR = {
       if (!items.length) return '<p style="color:var(--text-muted);font-size:.8rem;padding:4px 0">Aucune donnée</p>';
       return items.slice(0, 5).map((item, idx) => {
         const imgSrc = getImg(item);
-        const imgEl  = imgSrc
+        // Image OU fallback, pas les deux
+        const mediaEl = imgSrc
           ? `<img src="${escHtml(imgSrc)}" alt="${escHtml(getName(item))}" loading="lazy"
                  style="width:36px;height:36px;border-radius:4px;object-fit:cover;flex-shrink:0"
-                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-          : '';
-        const fallback = `<div style="width:36px;height:36px;border-radius:4px;flex-shrink:0;background:${this._nameColor(getName(item))};display:${imgSrc?'none':'flex'};align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.8rem">${getName(item).charAt(0)}</div>`;
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+             <div style="width:36px;height:36px;border-radius:4px;flex-shrink:0;background:${this._nameColor(getName(item))};display:none;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.8rem">${getName(item).charAt(0)}</div>`
+          : `<div style="width:36px;height:36px;border-radius:4px;flex-shrink:0;background:${this._nameColor(getName(item))};display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.8rem">${getName(item).charAt(0)}</div>`;
         return `
           <div class="fm-top-row">
             <span class="fm-top-rank">${idx+1}</span>
-            ${imgEl}${fallback}
+            ${mediaEl}
             <div class="fm-top-info" style="min-width:0">
               <div class="fm-top-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(getName(item))}</div>
               ${getSub(item) ? `<div class="fm-top-sub">${escHtml(getSub(item))}</div>` : ''}
@@ -1624,15 +1807,16 @@ const FR = window.FR = {
       const buildTop = (items, getImg, getName, getSub, getPlays, limit = 5) =>
         (Array.isArray(items) ? items : [items]).slice(0, limit).map((item, idx) => {
           const imgSrc = getImg(item);
-          const imgEl  = imgSrc
+          // Image OU fallback, jamais les deux visibles
+          const mediaEl = imgSrc
             ? `<img class="fm-top-img" src="${escHtml(imgSrc)}" alt="${escHtml(getName(item))}" loading="lazy"
-                   onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-            : '';
-          const fallback = `<div class="fm-top-img" style="background:${this._nameColor(getName(item))};display:${imgSrc?'none':'flex'};align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.8rem">${getName(item).charAt(0)}</div>`;
+                   onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+               <div class="fm-top-img" style="display:none;background:${this._nameColor(getName(item))};align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.8rem">${getName(item).charAt(0)}</div>`
+            : `<div class="fm-top-img" style="display:flex;background:${this._nameColor(getName(item))};align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.8rem">${getName(item).charAt(0)}</div>`;
           return `
             <div class="fm-top-row">
               <span class="fm-top-rank">${idx+1}</span>
-              ${imgEl}${fallback}
+              ${mediaEl}
               <div class="fm-top-info">
                 <div class="fm-top-name">${escHtml(getName(item))}</div>
                 ${getSub(item) ? `<div class="fm-top-sub">${escHtml(getSub(item))}</div>` : ''}
@@ -1712,9 +1896,10 @@ const FR = window.FR = {
           <div class="fr-np-bar" style="margin-bottom:14px">
             ${liveStatus.art
               ? `<img class="fr-np-art" src="${escHtml(liveStatus.art)}" alt="${escHtml(liveStatus.track)}" loading="lazy"
-                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-              : ''}
-            <div class="fr-np-art np-art-fallback" style="background:${this._nameColor(liveStatus.artist||'')};display:${liveStatus.art?'none':'flex'}">${(liveStatus.artist||'?').charAt(0)}</div>
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                 <div class="fr-np-art np-art-fallback" style="display:none;background:${this._nameColor(liveStatus.artist||'')}">${(liveStatus.artist||'?').charAt(0)}</div>`
+              : `<div class="fr-np-art np-art-fallback" style="display:flex;background:${this._nameColor(liveStatus.artist||'')}">${(liveStatus.artist||'?').charAt(0)}</div>`
+            }
             <div class="fr-np-info">
               <div class="fr-np-track">${escHtml(liveStatus.track)}</div>
               <div class="fr-np-artist">${escHtml(liveStatus.artist||'')}${liveStatus.album ? ` · <em style="opacity:.7">${escHtml(liveStatus.album)}</em>` : ''}</div>
@@ -1727,7 +1912,7 @@ const FR = window.FR = {
           <div class="fm-stats-row">
             <div class="fm-stat-chip"><i class="fas fa-music"></i><strong>${fmt(user.playcount)}</strong><span>scrobbles</span></div>
             <div class="fm-stat-chip"><i class="fas fa-list"></i><strong>${fmt(user.playlists || 0)}</strong><span>playlists</span></div>
-            <div class="fm-stat-chip"><i class="fas fa-calendar-alt"></i><strong>${user.registered?.['#text'] ? String(user.registered['#text']).split(', ').pop() || '—' : '—'}</strong><span>inscrit</span></div>
+            <div class="fm-stat-chip"><i class="fas fa-calendar-alt"></i><strong>${formatRegDate(user.registered?.['#text'] || user.registered?.unixtime)}</strong><span>inscrit</span></div>
           </div>
 
           <div class="fm-section-label"><i class="fas fa-microphone-alt"></i> Top Artistes</div>
@@ -1790,7 +1975,8 @@ const FR = window.FR = {
     overlay.addEventListener('animationend', () => {
       overlay.classList.remove('open', 'closing');
     }, { once: true });
-    setTimeout(() => overlay.classList.remove('open', 'closing'), 400);
+    // Fallback safety — in case animationend never fires
+    setTimeout(() => { if (overlay.classList.contains('closing')) overlay.classList.remove('open', 'closing'); }, 450);
     document.body.style.overflow = '';
   },
 
@@ -1939,76 +2125,112 @@ const FR = window.FR = {
 
   /* ════════════════════════════════════════
      FLASHBACK — "Souvenirs" section
+     Affiche ce que l'utilisateur écoutait il y a 1 an, 2 ans et 5 ans.
   ════════════════════════════════════════ */
   async renderHomeFlashback() {
     const el      = $('#home-flashback-body');
     const section = $('#home-flashback-section');
     if (!el || !section) return;
 
-    // Check cache (6 h)
+    const now = Date.now();
+
+    // Cache 6 h
     try {
-      const cached = localStorage.getItem(LS_FLASHBACK_KEY);
-      if (cached) {
-        const { html, ts } = JSON.parse(cached);
-        if (Date.now() - ts < 6 * 3600 * 1000) {
-          el.innerHTML = html; section.classList.remove('hidden'); return;
-        }
+      const cached = JSON.parse(localStorage.getItem(LS_FLASHBACK_KEY) || 'null');
+      if (cached?.html && now - cached.ts < 6 * 3600 * 1000) {
+        el.innerHTML = cached.html; section.classList.remove('hidden'); return;
       }
     } catch {}
 
     el.innerHTML = '<div class="fr-flashback-loading"><i class="fas fa-circle-notch fa-spin"></i></div>';
     section.classList.remove('hidden');
 
-    const oneYearAgoSec = Math.floor(Date.now() / 1000) - 365 * 86400;
-    const windowEndSec  = oneYearAgoSec + 7 * 86400;
+    const periods = [
+      { label: 'Il y a 1 an',  years: 1 },
+      { label: 'Il y a 2 ans', years: 2 },
+      { label: 'Il y a 5 ans', years: 5 },
+    ];
 
-    // Fetch from own user + up to 4 friends
-    const usersToCheck = [this.username, ...this.friends.slice(0, 4).map(f => f.name)];
-    const artistCount  = {};
-
-    for (const uname of usersToCheck) {
+    const results = [];
+    for (const { label, years } of periods) {
+      const targetSec = Math.floor(now / 1000) - years * 365 * 86400;
+      const fromSec   = targetSec - 4 * 86400;
+      const toSec     = targetSec + 4 * 86400;
       try {
-        const data   = await API.getRecentTracksRange(uname, oneYearAgoSec, windowEndSec, 15);
+        const data   = await API.getRecentTracksRange(this.username, fromSec, toSec, 20);
         const tracks = data.recenttracks?.track || [];
         const arr    = Array.isArray(tracks) ? tracks : [tracks];
-        arr.forEach(t => {
-          const artist = t.artist?.['#text'] || t.artist || '';
-          if (!artist || t['@attr']?.nowplaying === 'true') return;
-          const key = artist.toLowerCase();
-          if (!artistCount[key]) artistCount[key] = { name: artist, count: 0 };
-          artistCount[key].count++;
+        const valid  = arr.filter(t => t['@attr']?.nowplaying !== 'true' && t.name);
+        if (!valid.length) { results.push({ label, empty: true }); await sleep(200); continue; }
+
+        // Most-played artist in window
+        const artistMap = {};
+        valid.forEach(t => {
+          const a = t.artist?.['#text'] || t.artist || '';
+          if (!a) return;
+          const k = a.toLowerCase();
+          if (!artistMap[k]) artistMap[k] = { name: a, count: 0, art: imgUrl(t.image) };
+          artistMap[k].count++;
+          if (imgUrl(t.image) && !artistMap[k].art) artistMap[k].art = imgUrl(t.image);
         });
-      } catch { /* API might rate-limit — skip */ }
+        const topArtist = Object.values(artistMap).sort((a,b) => b.count - a.count)[0];
+        // Most recent track overall in window
+        const topTrack  = valid[0];
+
+        results.push({
+          label,
+          artist:   topArtist?.name || topTrack.artist?.['#text'] || topTrack.artist || '',
+          track:    topTrack.name   || '',
+          art:      imgUrl(topTrack.image) || topArtist?.art || '',
+          month:    new Date(fromSec * 1000 + 4 * 86400000).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }),
+          plays:    topArtist?.count || 1,
+          empty:    false,
+        });
+      } catch {
+        results.push({ label, empty: true });
+      }
       await sleep(200);
     }
 
-    const sorted  = Object.values(artistCount).sort((a, b) => b.count - a.count);
-    const topArt  = sorted[0];
-    const oneYear = new Date(oneYearAgoSec * 1000);
-    const dateStr = oneYear.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-
+    const filled = results.filter(r => !r.empty);
     let html;
-    if (topArt && topArt.count >= 2) {
-      const others = sorted.slice(1, 3).map(a => escHtml(a.name));
-      html = `
-        <div class="fr-flashback-item">
-          <div class="fr-flashback-icon"><i class="fas fa-calendar-alt"></i></div>
-          <div class="fr-flashback-info">
-            <div class="fr-flashback-date">Il y a un an — ${escHtml(dateStr)}</div>
-            <div class="fr-flashback-top">Ton groupe écoutait surtout <strong>${escHtml(topArt.name)}</strong></div>
-            ${others.length ? `<div class="fr-flashback-also">Aussi : ${others.join(', ')}</div>` : ''}
-          </div>
-          <a class="fr-discovery-listen-btn" href="https://open.spotify.com/search/${encodeURIComponent(topArt.name)}"
-             target="_blank" rel="noopener" title="Écouter sur Spotify">
-            <i class="fab fa-spotify"></i>
-          </a>
-        </div>`;
+    if (!filled.length) {
+      html = '<div class="fr-flashback-empty"><i class="fas fa-clock" style="opacity:.3"></i><p>Pas assez de données pour les périodes passées.</p></div>';
     } else {
-      html = '<div class="fr-flashback-empty">Pas assez de données pour cette période.</div>';
+      html = `
+        <div class="fr-flashback-timeline">
+          ${filled.map((r, i) => {
+            const spQ = encodeURIComponent(`${r.artist} ${r.track}`);
+            const ytQ = encodeURIComponent(`${r.artist} ${r.track}`);
+            return `
+              <div class="fr-flashback-item" style="animation-delay:${i * 80}ms">
+                <div class="fr-flashback-line"></div>
+                <div class="fr-flashback-dot"></div>
+                <div class="fr-flashback-content">
+                  <div class="fr-flashback-period">${escHtml(r.label)}</div>
+                  <div class="fr-flashback-month">${escHtml(r.month)}</div>
+                  <div class="fr-flashback-track">${escHtml(r.track)}</div>
+                  <div class="fr-flashback-artist">
+                    <i class="fas fa-microphone-alt" style="font-size:.65rem;opacity:.6;margin-right:4px"></i>${escHtml(r.artist)}
+                    ${r.plays > 1 ? `<span class="fr-flashback-plays">${r.plays}× ce mois-là</span>` : ''}
+                  </div>
+                  <div class="fr-flashback-btns">
+                    <a class="fr-fb-btn fr-fb-spotify" href="https://open.spotify.com/search/${spQ}"
+                       target="_blank" rel="noopener" title="Écouter sur Spotify">
+                      <i class="fab fa-spotify"></i><span>Spotify</span>
+                    </a>
+                    <a class="fr-fb-btn fr-fb-yt" href="https://music.youtube.com/search?q=${ytQ}"
+                       target="_blank" rel="noopener" title="Écouter sur YouTube Music">
+                      <i class="fab fa-youtube"></i><span>YouTube</span>
+                    </a>
+                  </div>
+                </div>
+              </div>`;
+          }).join('')}
+        </div>`;
     }
-
     el.innerHTML = html;
-    try { localStorage.setItem(LS_FLASHBACK_KEY, JSON.stringify({ html, ts: Date.now() })); } catch {}
+    try { localStorage.setItem(LS_FLASHBACK_KEY, JSON.stringify({ html, ts: now })); } catch {}
   },
 
   /* ═══════════════════════════════════════
@@ -2056,6 +2278,199 @@ const FR = window.FR = {
       setTimeout(() => { el.classList.add('hidden'); el.classList.remove('hide'); }, 300);
     }, 2400);
   },
+
+  /* ════════════════════════════════════════
+     FEATURE 1 — Déjà écouté N× par vous
+     Récupère le userplaycount d'un titre via track.getInfo.
+     Cache localStorage 6h, purgé à 24h.
+  ════════════════════════════════════════ */
+  async _getMyPlayCount(artist, track) {
+    const key     = `${(artist||'').toLowerCase()}|${(track||'').toLowerCase()}`;
+    const now     = Date.now();
+    let   cache   = {};
+    try { cache = JSON.parse(localStorage.getItem(LS_TRACK_PLAYS_CACHE) || '{}'); } catch {}
+
+    // Return from cache if fresh (6 h)
+    if (cache[key] && now - cache[key].ts < 6 * 3600 * 1000) return cache[key].count;
+
+    try {
+      const data  = await API.getTrackInfo(artist, track, this.username);
+      const count = parseInt(data?.track?.userplaycount || 0);
+      cache[key]  = { count, ts: now };
+      // Prune entries older than 24 h
+      const cutoff = now - 24 * 3600 * 1000;
+      for (const k of Object.keys(cache)) { if (cache[k].ts < cutoff) delete cache[k]; }
+      try { localStorage.setItem(LS_TRACK_PLAYS_CACHE, JSON.stringify(cache)); } catch {}
+      return count;
+    } catch { return 0; }
+  },
+
+  /* ════════════════════════════════════════
+     FEATURE 4 — Scrobbles du jour (badge 🔥)
+     Récupère le total depuis minuit local.
+     Cache 2h par utilisateur, valeur remplacée au lendemain.
+  ════════════════════════════════════════ */
+  async _fetchTodayScrobbles(username) {
+    const today   = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const now     = Date.now();
+    let   cache   = {};
+    try { cache = JSON.parse(localStorage.getItem(LS_DAILY_SCROBBLES) || '{}'); } catch {}
+
+    const entry = cache[username.toLowerCase()];
+    // Fresh if same day AND fetched < 2 h ago
+    if (entry?.date === today && now - entry.ts < 2 * 3600 * 1000) return entry.count;
+
+    const midnight = new Date(); midnight.setHours(0, 0, 0, 0);
+    const fromSec  = Math.floor(midnight.getTime() / 1000);
+    try {
+      const data  = await API.call('user.getRecentTracks', { user: username, from: fromSec, limit: 1 });
+      const total = parseInt(data?.recenttracks?.['@attr']?.total || 0);
+      cache[username.toLowerCase()] = { count: total, date: today, ts: now };
+      try { localStorage.setItem(LS_DAILY_SCROBBLES, JSON.stringify(cache)); } catch {}
+      return total;
+    } catch { return entry?.count ?? 0; }
+  },
+
+  /* ════════════════════════════════════════
+     FEATURE 3 — Mur des Dernières Découvertes
+     Pour chaque ami en écoute live, vérifie si l'artiste
+     est "nouveau" pour lui (userplaycount ≤ 3).
+     Cache 12h par paire (ami, artiste).
+  ════════════════════════════════════════ */
+  async renderDiscoveryWall() {
+    const section = $('#friends-discovery-section');
+    const body    = $('#friends-discovery-list');
+    if (!section || !body) return;
+
+    const liveFriends = Object.entries(this.liveStatuses)
+      .filter(([k]) => k !== this.username.toLowerCase())
+      .filter(([, s]) => s.nowPlaying && s.artist && s.track)
+      .slice(0, 8); // Cap API calls
+
+    if (!liveFriends.length) { section.classList.add('hidden'); return; }
+
+    const now   = Date.now();
+    let   dcache = {};
+    try { dcache = JSON.parse(localStorage.getItem(LS_DISCOVERY_CACHE) || '{}'); } catch {}
+
+    const discoveries = [];
+    for (const [lcName, status] of liveFriends) {
+      const cacheKey = `${lcName}|${status.artist.toLowerCase()}`;
+      let   playcount;
+
+      if (dcache[cacheKey] && now - dcache[cacheKey].ts < 12 * 3600 * 1000) {
+        playcount = dcache[cacheKey].count;
+      } else {
+        try {
+          const data = await API.getArtistInfo(status.artist, lcName);
+          playcount  = parseInt(data?.artist?.stats?.userplaycount || 0);
+          dcache[cacheKey] = { count: playcount, ts: now };
+          // Prune old entries
+          const cutoff = now - 24 * 3600 * 1000;
+          for (const k of Object.keys(dcache)) { if (dcache[k].ts < cutoff) delete dcache[k]; }
+          try { localStorage.setItem(LS_DISCOVERY_CACHE, JSON.stringify(dcache)); } catch {}
+        } catch { continue; }
+        await sleep(120); // Rate-limit guard
+      }
+
+      if (playcount >= 0 && playcount <= 3) {
+        const friend = this.friends.find(f => f.name.toLowerCase() === lcName)
+                     || Favs.all().find(f => f.name.toLowerCase() === lcName);
+        discoveries.push({
+          username: friend?.name || lcName,
+          avatar:   status.userImage || friend?.image || '',
+          artist:   status.artist,
+          track:    status.track,
+          art:      status.art,
+          playcount,
+        });
+      }
+    }
+
+    if (!discoveries.length) { section.classList.add('hidden'); return; }
+    section.classList.remove('hidden');
+
+    body.innerHTML = discoveries.map(d => {
+      const spQ = encodeURIComponent(`${d.artist} ${d.track}`);
+      const ytQ = encodeURIComponent(`${d.artist} ${d.track}`);
+      return `
+        <div class="fr-disc-item" data-username="${escHtml(d.username)}" role="button" tabindex="0">
+          <div class="fr-disc-art-wrap">
+            ${d.art
+              ? `<img src="${escHtml(d.art)}" alt="${escHtml(d.artist)}" loading="lazy"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+              : ''}
+            <div class="fr-disc-art-fallback" style="background:${this._nameColor(d.artist)};display:${d.art?'none':'flex'}">${(d.artist||'?').charAt(0)}</div>
+          </div>
+          <div class="fr-disc-body">
+            <div class="fr-disc-user-row">
+              ${d.avatar ? `<img class="fr-disc-av" src="${escHtml(d.avatar)}" alt="${escHtml(d.username)}"
+                                loading="lazy" onerror="this.style.display='none'">` : ''}
+              <span class="fr-disc-username">${escHtml(d.username)}</span>
+              <span class="fr-disc-new-badge">✨ ${d.playcount === 0 ? '1ère écoute' : 'Découverte'}</span>
+            </div>
+            <div class="fr-disc-artist">${escHtml(d.artist)}</div>
+            <div class="fr-disc-track">${escHtml(d.track)}</div>
+          </div>
+          <div class="fr-disc-actions" onclick="event.stopPropagation()">
+            <a href="https://open.spotify.com/search/${spQ}" target="_blank" rel="noopener"
+               class="fr-np-play-btn" title="Spotify"><i class="fab fa-spotify"></i></a>
+            <a href="https://music.youtube.com/search?q=${ytQ}" target="_blank" rel="noopener"
+               class="fr-np-play-btn yt" title="YouTube"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>`;
+    }).join('');
+
+    $$('.fr-disc-item', body).forEach(el => {
+      el.addEventListener('click', () => this.openProfileModal(el.dataset.username));
+    });
+  },
+
+  /* ════════════════════════════════════════
+     FEATURE 5 — Top artiste du groupe (7j)
+     Récupère le top artiste hebdo de chaque ami (max 15),
+     calcule un score pondéré par rang et retourne le top 5.
+     Cache 2h dans localStorage.
+  ════════════════════════════════════════ */
+  async _buildGroupWeeklyTop(friends) {
+    const now = Date.now();
+    try {
+      const cached = JSON.parse(localStorage.getItem(LS_GROUP_WEEKLY_KEY) || 'null');
+      if (cached?.data && now - cached.ts < 2 * 3600 * 1000) return cached.data;
+    } catch {}
+
+    if (!friends?.length) return [];
+
+    const targets = [...friends].sort((a, b) => b.playcount - a.playcount).slice(0, 15);
+    const artistScore = {};
+
+    const results = await Promise.allSettled(
+      targets.map(f => API.getTopArtists(f.name, '7day', 5))
+    );
+
+    results.forEach((r) => {
+      if (r.status !== 'fulfilled') return;
+      const list = r.value?.topartists?.artist || [];
+      const arr  = Array.isArray(list) ? list : [list];
+      arr.forEach((a, rank) => {
+        if (!a?.name) return;
+        const key = a.name.toLowerCase();
+        if (!artistScore[key]) artistScore[key] = { name: a.name, score: 0, friendCount: 0, plays: 0 };
+        // Weighted score: 1st place = 5 pts … 5th = 1 pt
+        artistScore[key].score       += Math.max(1, 5 - rank);
+        artistScore[key].friendCount += 1;
+        artistScore[key].plays       += parseInt(a.playcount || 0);
+      });
+    });
+
+    const top5 = Object.values(artistScore)
+      .sort((a, b) => b.score - a.score || b.friendCount - a.friendCount)
+      .slice(0, 5);
+
+    try { localStorage.setItem(LS_GROUP_WEEKLY_KEY, JSON.stringify({ data: top5, ts: now })); } catch {}
+    return top5;
+  },
+
 };
 
 /* ── Boot ── */
