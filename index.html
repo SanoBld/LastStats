@@ -8,9 +8,23 @@
 <script>if(!localStorage.getItem('ls_lang'))localStorage.setItem('ls_lang','fr');</script>
 
 <meta name="application-name" content="LastStats">
-<meta name="description" content="Your Last.fm music stats, reinvented.">
+<meta name="description" content="Your Last.fm music stats, reinvented. Explore, analyze and share your listening history.">
 <meta name="theme-color" content="#141218" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+
+<!-- Open Graph -->
+<meta property="og:type"        content="website">
+<meta property="og:site_name"   content="LastStats">
+<meta property="og:title"       content="LastStats — Your Last.fm stats, reinvented">
+<meta property="og:description" content="Explore, analyze and share your Last.fm listening history with beautiful visualizations.">
+<meta property="og:image"       content="./icons/icon-512.png">
+<meta property="og:url"         content="https://sanobld.github.io/LastStats/">
+
+<!-- Twitter Card -->
+<meta name="twitter:card"        content="summary">
+<meta name="twitter:title"       content="LastStats — Your Last.fm stats, reinvented">
+<meta name="twitter:description" content="Explore, analyze and share your Last.fm listening history.">
+<meta name="twitter:image"       content="./icons/icon-512.png">
 
 <!-- iOS standalone mode -->
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -48,7 +62,16 @@
 </head>
 <body>
 
-<div id="setup-screen">
+<!-- Show setup only if no saved credentials -->
+<script>
+  (function() {
+    const u = localStorage.getItem('ls_username');
+    const k = localStorage.getItem('ls_apikey');
+    if (!u || !k) document.getElementById('setup-screen').classList.remove('hidden');
+    // If credentials exist, setup-screen stays hidden; initApp() handles the rest
+  })();
+</script>
+<div id="setup-screen" class="hidden">
   <div class="setup-bg">
     <div class="orb o1"></div>
     <div class="orb o2"></div>
@@ -813,12 +836,17 @@
               <i class="fas fa-spider"></i>
               <span data-i18n="charts.radar">Genre Radar</span>
             </span>
-            <span class="cc-hint" data-i18n="charts.radarHint">Based on your Last.fm mood tags</span>
-            <span class="cc-hint" id="radar-status-hint"></span>
+            <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
+              <span class="cc-hint" id="radar-status-hint"></span>
+              <button class="btn-generate" id="vizplus-gen-btn" onclick="generateVizPlus()">
+                <i class="fas fa-play"></i>
+                <span data-i18n="charts.generate">Générer</span>
+              </button>
+            </div>
           </div>
           <div class="chart-placeholder" id="vizplus-radar-ph">
             <i class="fas fa-spider fa-2x"></i>
-            <p data-i18n="charts.radarPh">Generating genre analysis…</p>
+            <p data-i18n="charts.radarPhIdle">Cliquez sur « Générer » pour analyser vos genres musicaux</p>
           </div>
           <div class="radar-wrap hidden" id="vizplus-radar-wrap">
             <canvas id="chart-radar" height="360"></canvas>
@@ -830,17 +858,17 @@
           <div class="cc-hd">
             <span>
               <i class="fas fa-circle-notch"></i>
-              <span data-i18n="charts.sunburst">Sunburst — Genre Breakdown</span>
+              <span data-i18n="charts.sunburst">Sunburst — Cartographie des genres</span>
             </span>
-            <span class="cc-hint" data-i18n="charts.sunburstHint">Genres and sub-genres of your favourite artists</span>
+            <span class="cc-hint" data-i18n="charts.sunburstHint">Genres et sous-genres de vos artistes favoris</span>
           </div>
           <div id="vizplus-status" class="vizplus-status hidden">
             <div class="spinner-sm"></div>
-            <span id="vizplus-status-txt" data-i18n="charts.computing">Computing…</span>
+            <span id="vizplus-status-txt" data-i18n="charts.computing">Calcul en cours…</span>
           </div>
           <div class="chart-placeholder" id="vizplus-sunburst-ph">
             <i class="fas fa-circle-notch fa-2x"></i>
-            <p data-i18n="charts.sunburstPh">Click "Generate" in the Radar above to reveal genre hierarchy</p>
+            <p data-i18n="charts.sunburstPhIdle">Générez le Radar ci-dessus pour révéler la hiérarchie des genres</p>
           </div>
           <div class="sunburst-wrap hidden" id="vizplus-sunburst-wrap">
             <svg id="chart-sunburst" width="100%" height="480"
@@ -848,7 +876,7 @@
             <div class="sunburst-breadcrumb" id="sunburst-breadcrumb" aria-live="polite"></div>
             <div class="sunburst-center-info hidden" id="sunburst-center-info">
               <span class="sb-center-name" id="sb-center-name"></span>
-              <span class="sb-center-pct" id="sb-center-pct"></span>
+              <span class="sb-center-pct"  id="sb-center-pct"></span>
             </div>
           </div>
         </div>

@@ -1043,6 +1043,7 @@ canvas { max-width: 100%; }
   margin-bottom: 20px; position: relative; overflow: hidden;
   animation: fadeInUp var(--dur-medium2) var(--ease-decel) both;
   transition: box-shadow var(--dur-medium1) var(--ease-standard);
+  will-change: opacity, transform;
 }
 .now-playing-bar:hover { box-shadow: 0 0 0 1px var(--border-glow), var(--shadow-md); }
 .np-pulse {
@@ -1054,6 +1055,7 @@ canvas { max-width: 100%; }
   width: 38px; height: 38px; border-radius: var(--radius-xs);
   overflow: hidden; flex-shrink: 0; background: var(--bg-hover);
   transition: transform var(--dur-medium1) var(--ease-spring);
+  will-change: transform;
 }
 .now-playing-bar:hover .np-art { transform: scale(1.06) rotate(-1deg); }
 .np-art img { width: 100%; height: 100%; object-fit: cover; }
@@ -1101,6 +1103,28 @@ canvas { max-width: 100%; }
 }
 .cc-hd i   { color: var(--accent); }
 .cc-hint   { font-size: .75rem; color: var(--text-muted); font-weight: 400; }
+
+/* VizPlus generate button */
+.btn-generate {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 99px;
+  border: 1px solid var(--border-glow);
+  background: var(--accent-lt);
+  color: var(--accent);
+  font-size: .78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--dur-medium1) var(--ease-standard),
+              transform  var(--dur-medium1) var(--ease-spring);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-generate:hover   { background: var(--accent); color: var(--accent-on); transform: scale(1.04); }
+.btn-generate:active  { transform: scale(.96); }
+.btn-generate:disabled{ opacity: .5; pointer-events: none; }
 .cc-btn {
   padding: 5px 14px; border-radius: var(--radius-pill);
   background: var(--accent-lt); color: var(--accent);
@@ -3665,20 +3689,24 @@ button.bn-item:focus-visible,
 .listening-heatmap-wrap {
   width: 100%;
   overflow-x: auto;
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   padding: 8px 0 16px;
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
+  /* GPU-composited scroll layer */
+  will-change: scroll-position;
 }
 .listening-heatmap-wrap::-webkit-scrollbar { height: 4px; }
 .listening-heatmap-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-/* Grille principale — inline-flex pour shrink-to-content */
 .cal-heatmap-inner {
   display: inline-flex;
   flex-direction: column;
   gap: 4px;
   min-width: min-content;
+  /* prevent the inner from collapsing the scroll container */
+  padding-right: 8px;
 }
 
 /* Ligne des mois — positionnement absolu pixel-parfait */
@@ -3815,12 +3843,31 @@ button.bn-item:focus-visible,
   font-weight: 600;
 }
 
-/* ── Mobile : cellules plus petites ── */
+/* Mobile responsive — dynamically sized cells, proper scroll alignment */
 @media (max-width: 480px) {
-  .cal-day-cell       { width: 9px;  height: 9px;  }
-  .cal-wd-lbl         { height: 9px; line-height: 9px; font-size: .55rem; }
-  .cal-weekday-labels { width: 18px; }
-  .cal-month-label    { font-size: .58rem; }
+  .listening-heatmap-wrap {
+    /* Negate card padding so the scroll bleeds edge-to-edge */
+    margin: 0 -16px;
+    padding: 8px 16px 16px;
+  }
+  .cal-heatmap-inner {
+    padding-bottom: 4px;
+  }
+  .cal-wd-lbl {
+    font-size: .52rem;
+    line-height: 1;
+  }
+  .cal-month-label {
+    font-size: .56rem;
+  }
+  .cal-heatmap-stats {
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 360px) {
+  .listening-heatmap-wrap { margin: 0 -12px; padding: 8px 12px 16px; }
 }
 
 /* ═══════════════════════════════════════════════════════════════

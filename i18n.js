@@ -4901,17 +4901,18 @@ function _detectLang() {
   const saved = localStorage.getItem('ls_lang');
   if (saved && I18N_DATA[saved]) return saved;
 
-  const nav = (navigator.language || navigator.userLanguage || 'fr').toLowerCase();
-
-  // exact language code match
+  const nav   = (navigator.language || navigator.userLanguage || 'fr').toLowerCase();
   const code2 = nav.split('-')[0];
+
+  // Exact match
   if (I18N_DATA[code2]) return code2;
 
-  // special cases
+  // Special multi-region codes
   if (nav.startsWith('zh')) return 'zh';
   if (nav.startsWith('pt')) return 'pt';
   if (nav.startsWith('ar')) return 'ar';
 
+  // Hard fallback — never undefined
   return 'fr';
 }
 
@@ -4930,7 +4931,16 @@ const I18N = (() => {
   function t(key, ...args) {
     const str = I18N_DATA[_lang]?.[key] ?? I18N_DATA.fr?.[key] ?? key;
     if (!args.length) return str;
-    return str.replace(/\{(\d+)\}/g, (_, i) => args[i] ?? '');
+    // Sanitize each arg before interpolation — args may contain user data
+    return str.replace(/\{(\d+)\}/g, (_, i) => {
+      const val = args[i] ?? '';
+      return String(val)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    });
   }
 
   /** Returns a translated array (months, days, etc.) */

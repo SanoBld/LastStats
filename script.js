@@ -840,32 +840,28 @@ function setLanguage(lang) {
   localStorage.setItem('ls_lang', lang);
   APP.language = lang;
   window.I18N.setLang(lang);
+  document.documentElement.lang = lang; // ← sync <html lang="">
 
-  // Regroupe toutes les écritures DOM dans un seul frame pour éviter le thrashing
   requestAnimationFrame(() => {
     document.querySelectorAll('.lang-btn').forEach(b =>
       b.classList.toggle('active', b.dataset.lang === lang)
     );
-
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const raw = el.getAttribute('data-i18n');
       const key = raw.replace(/\./g, '_');
       const val = t(key) || t(raw);
       if (val && val !== key && val !== raw) el.textContent = val;
     });
-
     document.querySelectorAll('.nav-lnk[data-s], .bn-item[data-s]').forEach(el => {
       const key  = NAV_TITLE_KEYS[el.dataset.s];
       const span = el.querySelector('span:not(.nav-bdg)');
       if (key && span) span.textContent = t(key);
     });
-
     const activeSection = document.querySelector('.app-sec.active')?.id?.replace('s-', '');
     if (activeSection) {
       const key = NAV_TITLE_KEYS[activeSection];
       if (key) document.getElementById('hd-title').textContent = t(key);
     }
-
     document.title = 'LastStats — ' + (t('nav_dashboard') || 'Statistiques Last.fm');
     showToast(t('toast_lang_changed'));
   });
@@ -1009,7 +1005,7 @@ function _scheduleBackgroundHistoryFetch() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  // share button styles + layout fixes
+  // Inject runtime styles
   const shareStyle = document.createElement('style');
   shareStyle.textContent = `
     .track-play-btn.share,.mc-play-btn.share{background:var(--accent-lt)!important;color:var(--accent)!important;border:1px solid var(--border-glow)!important}
@@ -1023,16 +1019,17 @@ window.addEventListener('DOMContentLoaded', () => {
   `;
   document.head.appendChild(shareStyle);
 
+  // Apply saved theme immediately
   const theme = localStorage.getItem('ls_theme') || 'dark';
   document.documentElement.dataset.theme = theme;
   APP.currentTheme = theme;
 
-  // language: auto-detect first
+  // Apply saved language
   const lang = localStorage.getItem('ls_lang') || window.I18N?.getLang?.() || 'fr';
   APP.language = lang;
+  document.documentElement.lang = lang;
   if (window.I18N?.setLang) window.I18N.setLang(lang);
 
-  // translate all data-i18n elements on load
   requestAnimationFrame(() => {
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const raw = el.getAttribute('data-i18n');
@@ -1040,7 +1037,6 @@ window.addEventListener('DOMContentLoaded', () => {
       const val = t(key) || t(raw);
       if (val && val !== key && val !== raw) el.textContent = val;
     });
-    // mark active language buttons
     document.querySelectorAll('.lang-btn').forEach(b =>
       b.classList.toggle('active', b.dataset.lang === lang)
     );
@@ -1051,14 +1047,22 @@ window.addEventListener('DOMContentLoaded', () => {
   APP.tracksLayout  = localStorage.getItem('ls_tracks_layout')  || 'list';
 
   const { username, apiKey } = loadSavedCredentials();
-  if (document.getElementById('input-username')) document.getElementById('input-username').value = username;
-  if (document.getElementById('input-apikey'))   document.getElementById('input-apikey').value   = apiKey;
+  const setupScreen = document.getElementById('setup-screen');
 
-  if (username && apiKey) setTimeout(() => initApp(username, apiKey), 150);
+  if (username && apiKey) {
+    // Credentials exist — keep setup hidden, boot directly
+    setupScreen?.classList.add('hidden');
+    document.getElementById('app')?.classList.remove('hidden');
+    setTimeout(() => initApp(username, apiKey), 0);
+  } else {
+    // No credentials — show setup, pre-fill any partial values
+    setupScreen?.classList.remove('hidden');
+    if (document.getElementById('input-username')) document.getElementById('input-username').value = username;
+    if (document.getElementById('input-apikey'))   document.getElementById('input-apikey').value   = apiKey;
+  }
 
   window.addEventListener('resize', _updateNavMode, { passive: true });
   _updateNavMode();
-
   document.getElementById('sw-update-btn')?.addEventListener('click', forceSwUpdate);
 });
 
@@ -1083,7 +1087,7 @@ function nav(section) {
     if (window.innerWidth <= 1024) closeSb();
 
     if (section === 'charts')    setupChartsSection();
-    if (section === 'vizplus')   loadVizPlus();
+    if (section === 'vizplus' && !_vizPlusLoaded) loadVizPlus();
     if (section === 'obscurity') loadObscurityScore();
     if (section === 'history')   histLoadDay(APP.histCurrentDate || _todayStr());
     if (section === 'compare')   initComparePage();
@@ -3964,10 +3968,14 @@ function renderListeningHeatmap(year, suffix = '') {
   while (allCells.length % 7 !== 0) allCells.push(null);
   const numWeeks = allCells.length / 7;
 
-  // Positions pixel-parfaites des étiquettes de mois
-  // Chaque colonne = CELL_W + CELL_GAP = 11 + 2 = 13 px
-  const CELL_W = 11, CELL_GAP = 2, COL_W = CELL_W + CELL_GAP;
-  const WD_W   = 22, BODY_GAP = 4; // largeur labels jours + gap
+  // Responsive cell size based on available container width
+  const containerW  = wrapEl.parentElement?.clientWidth || 600;
+  const isMobile    = containerW < 480;
+  const CELL_W      = isMobile ? 9 : 11;
+  const CELL_GAP    = 2;
+  const COL_W       = CELL_W + CELL_GAP;
+  const WD_W        = isMobile ? 18 : 22;
+  const BODY_GAP    = 4;
 
   const MONTHS_FR = MONTHS_SHORT();
   const monthPositions = [];
@@ -3980,33 +3988,30 @@ function renderListeningHeatmap(year, suffix = '') {
     }
   }
 
-  // Labels jours de semaine (lun, mer, ven)
   const wdLabels = DAYS?.() || ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
   const wdHTML   = wdLabels.map((wd, i) =>
     `<span class="cal-wd-lbl">${[0,2,4].includes(i) ? wd : ''}</span>`
   ).join('');
 
-  // Étiquettes de mois absolues — left = semaine × 13px
   const monthRowW = numWeeks * COL_W - CELL_GAP;
   const monthHTML = monthPositions.map(({ week, label }) =>
     `<span class="cal-month-label" style="left:${week * COL_W}px">${label}</span>`
   ).join('');
 
-  // Colonnes de semaines — couleurs 100% CSS via data-level + --accent
   const weeksHTML = Array(numWeeks).fill(0).map((_, wi) => {
     const days = allCells.slice(wi * 7, wi * 7 + 7).map(cell => {
-      if (!cell) return `<div class="cal-day-cell cal-day-empty"></div>`;
+      if (!cell) return `<div class="cal-day-cell cal-day-empty" style="width:${CELL_W}px;height:${CELL_W}px"></div>`;
       const lv  = getLevel(cell.count);
       const fmt = cell.date.toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric' });
       const tip = cell.count > 0
         ? `${fmt} — ${formatNum(cell.count)} ${t('scrobbles')}`
-        : `${fmt}`;
-      return `<div class="cal-day-cell" data-level="${lv}" title="${tip}"></div>`;
+        : fmt;
+      return `<div class="cal-day-cell" data-level="${lv}" title="${tip}" style="width:${CELL_W}px;height:${CELL_W}px"></div>`;
     }).join('');
     return `<div class="cal-week-col">${days}</div>`;
   }).join('');
 
-  // Stats rapides
+  // Quick stats
   const totalYearScrobbles = [...dayCounts.values()].reduce((a,b) => a+b, 0);
   const activeDays         = dayCounts.size;
   const bestDay            = [...dayCounts.entries()].sort((a,b) => b[1]-a[1])[0];
@@ -4015,18 +4020,17 @@ function renderListeningHeatmap(year, suffix = '') {
       + ` (${formatNum(bestDay[1])})`
     : '—';
 
-  // Légende — utilise cal-day-cell pour hériter des mêmes règles CSS data-level
   const legendCells = [0,1,2,3,4].map(lv =>
-    `<div class="cal-day-cell" data-level="${lv}"></div>`
+    `<div class="cal-day-cell" data-level="${lv}" style="width:${CELL_W}px;height:${CELL_W}px"></div>`
   ).join('');
 
   wrapEl.innerHTML = `
     <div class="cal-heatmap-inner">
-      <div class="cal-month-row" style="margin-left:${WD_W + BODY_GAP}px;width:${monthRowW}px">
+      <div class="cal-month-row" style="margin-left:${WD_W + BODY_GAP}px;width:${monthRowW}px;min-width:${monthRowW}px">
         ${monthHTML}
       </div>
       <div class="cal-body">
-        <div class="cal-weekday-labels">${wdHTML}</div>
+        <div class="cal-weekday-labels" style="width:${WD_W}px">${wdHTML}</div>
         <div class="cal-heatmap-grid">${weeksHTML}</div>
       </div>
       <div class="cal-heatmap-stats">
@@ -4303,28 +4307,48 @@ function shareTrack(name, artist, plays, url) {
 let _vizPlusLoaded = false;
 
 async function loadVizPlus() {
+  if (_vizPlusLoaded) return; // already computed — use generateVizPlus() to force reload
+
   const statusEl  = document.getElementById('vizplus-status');
   const statusTxt = document.getElementById('vizplus-status-txt');
-  // update the status hint in the charts header
   const radarHint = document.getElementById('radar-status-hint');
+  const genBtn    = document.getElementById('vizplus-gen-btn');
 
   if (statusEl) statusEl.classList.remove('hidden');
   if (radarHint) radarHint.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:.75rem;margin-right:4px"></i>';
+  if (genBtn) { genBtn.disabled = true; genBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
 
   try {
     if (statusTxt) statusTxt.textContent = t('loading');
-    await _buildRadarChart();
+    await _buildRadarChart();  // internally calls _buildSunburst()
     await _buildTreemap();
     await _buildSankey();
     if (statusEl) statusEl.classList.add('hidden');
     if (radarHint) radarHint.innerHTML = '<i class="fas fa-check" style="font-size:.75rem;margin-right:3px;color:#4ade80"></i>';
+    if (genBtn) { genBtn.disabled = false; genBtn.innerHTML = '<i class="fas fa-sync-alt"></i> <span>' + t('profile_reload') + '</span>'; }
     _vizPlusLoaded = true;
   } catch (e) {
     console.error('loadVizPlus:', e);
     if (statusTxt) statusTxt.textContent = t('obs_error', e.message);
     if (radarHint) radarHint.innerHTML = '';
+    if (genBtn) { genBtn.disabled = false; genBtn.innerHTML = '<i class="fas fa-play"></i> <span>' + t('charts_generate') + '</span>'; }
     setTimeout(() => statusEl?.classList.add('hidden'), 3500);
   }
+}
+
+/** Called by the "Générer" button — forces a full rebuild */
+function generateVizPlus() {
+  _vizPlusLoaded = false;
+
+  // Reset placeholders so the user sees loading state
+  ['vizplus-radar-wrap','vizplus-sunburst-wrap','vizplus-treemap-wrap','vizplus-sankey-wrap'].forEach(id => {
+    document.getElementById(id)?.classList.add('hidden');
+  });
+  ['vizplus-radar-ph','vizplus-sunburst-ph'].forEach(id => {
+    document.getElementById(id)?.classList.remove('hidden');
+  });
+
+  loadVizPlus();
 }
 
 async function _buildRadarChart() {
