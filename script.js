@@ -826,7 +826,6 @@ const NAV_TITLE_KEYS = {
   'top-tracks':  'nav_top_tracks',
   charts:        'nav_charts',
   vizplus:       'nav_vizplus',
-  badges:        'nav_badges',
   obscurity:     'nav_obscurity',
   history:       'nav_history',
   wrapped:       'nav_wrapped',
@@ -932,7 +931,6 @@ async function initApp(usernameOverride, apiKeyOverride) {
     loadVersus();
 
     syncSettingsFields();
-    restoreBadgesFromStorage();
 
     // nav visibility
     loadNavVisibility();
@@ -4356,34 +4354,73 @@ async function _buildRadarChart() {
   const wrap = document.getElementById('vizplus-radar-wrap');
 
   let topArtists = APP.topArtistsData.length
-    ? APP.topArtistsData.slice(0, 15)
-    : (await API.call('user.getTopArtists', { period:'overall', limit:15 })).topartists?.artist || [];
+    ? APP.topArtistsData.slice(0, 20)
+    : (await API.call('user.getTopArtists', { period:'overall', limit:20 })).topartists?.artist || [];
 
-  const TARGET_GENRES = ['rock','pop','electronic','hip-hop','metal','jazz','classical','indie','r&b','country'];
-  const scores = {};
-  TARGET_GENRES.forEach(g => { scores[g] = 0; });
+  // Broad genre taxonomy — maps any tag substring to a canonical category
+  const GENRE_MAP = {
+    'Rock':        ['rock','punk','grunge','post-rock','emo','hardcore','alternative','alt-rock','indie rock','garage','shoegaze','britpop'],
+    'Pop':         ['pop','dance pop','synth-pop','electropop','teen pop','k-pop','j-pop','bubblegum','mainstream'],
+    'Électro':     ['electronic','electronica','techno','house','trance','edm','dubstep','drum and bass','ambient','idm','synthwave','chillwave','downtempo','trip-hop','electro'],
+    'Hip-Hop':     ['hip-hop','hip hop','rap','trap','drill','grime','rnb','r&b','soul','neo soul','urban'],
+    'Metal':       ['metal','heavy metal','death metal','black metal','doom','thrash','metalcore','progressive metal','power metal'],
+    'Jazz':        ['jazz','blues','swing','bebop','fusion','soul jazz','acid jazz'],
+    'Classique':   ['classical','classic','baroque','romantic','opera','orchestra','chamber','piano','symphon'],
+    'Indie':       ['indie','lo-fi','lo fi','bedroom pop','dream pop','slowcore','math rock','post-punk'],
+    'Folk':        ['folk','country','bluegrass','americana','singer-songwriter','acoustic','roots'],
+    'Expérimental':['experimental','avant-garde','noise','post-modern','abstract','free jazz','art rock'],
+  };
 
-  const tagResults = await Promise.allSettled(topArtists.map(a => API.call('artist.getTopTags', { artist:a.name })));
-  const IGNORED    = new Set(['seen live','favorites','favourite','love','awesome','all','good','new','old']);
+  const categories = Object.keys(GENRE_MAP);
+  const scores = Object.fromEntries(categories.map(c => [c, 0]));
+  const IGNORED = new Set(['seen live','favorites','favourite','love','awesome','all','good','new','old','best','epic','spotify','youtube']);
+
+  const tagResults = await Promise.allSettled(topArtists.map(a => API.call('artist.getTopTags', { artist: a.name })));
 
   tagResults.forEach((res, i) => {
     if (res.status !== 'fulfilled') return;
     const tags   = res.value.toptags?.tag || [];
-    const weight = topArtists.length - i;
-    tags.slice(0, 10).forEach(tag => {
+    const weight = Math.max(1, topArtists.length - i);
+    tags.slice(0, 12).forEach(tag => {
       const name = (tag.name || '').toLowerCase().trim();
-      for (const genre of TARGET_GENRES) {
-        if (name.includes(genre) && !IGNORED.has(name)) scores[genre] += (parseInt(tag.count) || 30) * weight;
+      if (IGNORED.has(name) || name.length < 2) return;
+      const tagScore = (parseInt(tag.count) || 20) * weight;
+      for (const [cat, keywords] of Object.entries(GENRE_MAP)) {
+        if (keywords.some(kw => name.includes(kw) || kw.includes(name))) {
+          scores[cat] += tagScore;
+          break;
+        }
       }
     });
   });
 
-  const labels = TARGET_GENRES.map(g => g.charAt(0).toUpperCase() + g.slice(1));
-  const data   = TARGET_GENRES.map(g => scores[g]);
-
-  if (data.every(v => v === 0)) {
-    if (phEl) phEl.innerHTML = `<i class="fas fa-spider fa-2x"></i><p>${t('unavailable')}</p>`;
-    return;
+  // Fallback: if everything is 0, use raw top tags as radar axes
+  let labels, data;
+  if (Object.values(scores).every(v => v === 0)) {
+    const rawTagMap = new Map();
+    tagResults.forEach((res, i) => {
+      if (res.status !== 'fulfilled') return;
+      const tags   = res.value.toptags?.tag || [];
+      const weight = Math.max(1, topArtists.length - i);
+      tags.slice(0, 5).forEach(tag => {
+        const name = (tag.name || '').trim();
+        if (!name || IGNORED.has(name.toLowerCase()) || name.length < 2) return;
+        const normalized = name.charAt(0).toUpperCase() + name.slice(1);
+        rawTagMap.set(normalized, (rawTagMap.get(normalized) || 0) + (parseInt(tag.count) || 20) * weight);
+      });
+    });
+    const sorted = [...rawTagMap.entries()].sort((a,b) => b[1]-a[1]).slice(0, 10);
+    if (!sorted.length) {
+      if (phEl) { phEl.classList.remove('hidden'); phEl.innerHTML = `<i class="fas fa-spider fa-2x"></i><p>${t('unavailable')}</p>`; }
+      return;
+    }
+    labels = sorted.map(([l]) => l);
+    data   = sorted.map(([,v]) => v);
+  } else {
+    // Filter out zero-score categories for cleaner chart
+    const active = categories.filter(c => scores[c] > 0);
+    labels = active;
+    data   = active.map(c => scores[c]);
   }
 
   if (phEl) phEl.classList.add('hidden');
@@ -4392,15 +4429,37 @@ async function _buildRadarChart() {
   destroyChart('chart-radar');
   const c = getThemeColors();
   APP.charts['chart-radar'] = new Chart(document.getElementById('chart-radar'), {
-    type:'radar',
-    data:{
+    type: 'radar',
+    data: {
       labels,
-      datasets:[{ label:'Genres', data, backgroundColor:'rgba(99,102,241,.15)', borderColor:'#6366f1', pointBackgroundColor:CHART_PALETTE, pointBorderColor:'#fff', pointBorderWidth:2, pointRadius:5, borderWidth:2 }],
+      datasets: [{
+        label: 'Genres',
+        data,
+        backgroundColor: 'rgba(99,102,241,.18)',
+        borderColor: '#6366f1',
+        pointBackgroundColor: CHART_PALETTE,
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        borderWidth: 2,
+      }],
     },
-    options:{
-      responsive:true, maintainAspectRatio:false, animation:{ duration:800 },
-      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:ctx => ` ${ctx.raw}` } } },
-      scales:{ r:{ grid:{ color:c.grid }, ticks:{ color:c.text, font:{ size:10 }, backdropColor:'transparent' }, pointLabels:{ color:c.text, font:{ size:12 } }, beginAtZero:true } },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 900, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw.toLocaleString()}` } },
+      },
+      scales: {
+        r: {
+          grid:        { color: c.grid },
+          ticks:       { color: c.text, font: { size: 9 }, backdropColor: 'transparent', maxTicksLimit: 4 },
+          pointLabels: { color: c.text, font: { size: 11, weight: '600' } },
+          beginAtZero: true,
+        },
+      },
     },
   });
 
@@ -4911,328 +4970,6 @@ function sortObscurity(sortKey) {
   );
 }
 
-const BadgeEngine = (() => {
-  // tier labels use i18n (no more hardcoded English)
-  const TIERS = [
-    { key:'bronze',  get label(){ return t('tier_bronze');  }, icon:'🥉', xp:10  },
-    { key:'argent',  get label(){ return t('tier_argent');  }, icon:'🥈', xp:25  },
-    { key:'or',      get label(){ return t('tier_or');      }, icon:'🥇', xp:50  },
-    { key:'diamant', get label(){ return t('tier_diamant'); }, icon:'💎', xp:100 },
-    { key:'elite',   get label(){ return t('tier_elite');   }, icon:'👑', xp:200 },
-  ];
-
-  const thresholds = (base, count = 5) => Array(count).fill(0).map((_,i) => Math.round(base * Math.pow(2, i)));
-
-  const BADGE_DEFS = [
-    { id:'night_owl',      cat:'noctambule', icon:'🦉', get name(){return t('badge_night_owl_name');},    get desc(){return t('badge_night_owl_desc');},   thresholds:thresholds(50),   compute:(hist) => hist.filter(tr => { const h = new Date(parseInt(tr.date?.uts||0)*1000).getHours(); return h>=0&&h<5; }).length },
-    { id:'early_bird',     cat:'noctambule', icon:'🐦', get name(){return t('badge_early_bird_name');},   get desc(){return t('badge_early_bird_desc');},  thresholds:thresholds(30),   compute:(hist) => hist.filter(tr => { const h = new Date(parseInt(tr.date?.uts||0)*1000).getHours(); return h>=5&&h<8; }).length },
-    { id:'weekend_warrior',cat:'noctambule', icon:'🎉', get name(){return t('badge_weekend_name');},      get desc(){return t('badge_weekend_desc');},     thresholds:thresholds(200),  compute:(hist) => hist.filter(tr => { const d = new Date(parseInt(tr.date?.uts||0)*1000).getDay(); return d===0||d===6; }).length },
-    { id:'discoverer',     cat:'exploration',icon:'🔭', get name(){return t('badge_discoverer_name');},   get desc(){return t('badge_discoverer_desc');},  thresholds:thresholds(50),   compute:(hist) => new Set(hist.map(tr=>(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase())).size },
-    { id:'hidden_gems',    cat:'exploration',icon:'💎', get name(){return t('badge_hidden_gems_name');},  get desc(){return t('badge_hidden_gems_desc');}, thresholds:thresholds(10),   compute:(hist) => { const m=new Map(); hist.forEach(tr=>{const a=(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase();if(a)m.set(a,(m.get(a)||0)+1);}); return [...m.values()].filter(v=>v<=2).length; } },
-    { id:'obsessed',       cat:'fidelite',   icon:'🔁', get name(){return t('badge_obsessed_name');},     get desc(){return t('badge_obsessed_desc');},    thresholds:thresholds(10),   compute:(hist) => { const dm=new Map(); for(const tr of hist){const ts=parseInt(tr.date?.uts||0);if(!ts)continue;const d=new Date(ts*1000);const k=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}::${(tr.artist?.['#text']||'').toLowerCase()}`;dm.set(k,(dm.get(k)||0)+1);} return Math.max(0,...[...dm.values()]); } },
-    { id:'collector',      cat:'fidelite',   icon:'📀', get name(){return t('badge_collector_name');},    get desc(){return t('badge_collector_desc');},   thresholds:thresholds(20),   compute:(hist) => new Set(hist.map(tr=>{const alb=tr.album?.['#text']||'';const art=tr.artist?.['#text']||tr.artist?.name||'';return alb?`${art}::${alb}`.toLowerCase():null;}).filter(Boolean)).size },
-    { id:'scrobbler',      cat:'volume',     icon:'🎵', get name(){return t('badge_scrobbler_name');},    get desc(){return t('badge_scrobbler_desc');},   thresholds:thresholds(1000), compute:(hist) => hist.length },
-    { id:'binge',          cat:'volume',     icon:'🎧', get name(){return t('badge_binge_name');},        get desc(){return t('badge_binge_desc');},       thresholds:thresholds(50),   compute:(hist) => { const dm=new Map(); for(const tr of hist){const ts=parseInt(tr.date?.uts||0);if(!ts)continue;const d=new Date(ts*1000);const k=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;dm.set(k,(dm.get(k)||0)+1);} return Math.max(0,...[...dm.values()]); } },
-    { id:'marathon',       cat:'volume',     icon:'🏃', get name(){return t('badge_marathon_name');},     get desc(){return t('badge_marathon_desc');},    thresholds:thresholds(7),    compute:() => APP.streakData?.best || 0 },
-    { id:'listen_time',    cat:'volume',     icon:'⏳', get name(){return t('badge_listen_time_name');},  get desc(){return t('badge_listen_time_desc');}, thresholds:thresholds(100),  compute:(hist) => Math.round(hist.length*3.5/60) },
-    { id:'multilingual',   cat:'diversite',  icon:'🌍', get name(){return t('badge_multilingual_name');}, get desc(){return t('badge_multilingual_desc');}, thresholds:thresholds(5),   compute:(hist) => { const nl=/[^\u0000-\u007F\u00C0-\u024F]/;return new Set(hist.filter(tr=>{const a=tr.artist?.['#text']||tr.artist?.name||'';return nl.test(a);}).map(tr=>(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase())).size; } },
-        { id:'comeback',       cat:'tempo',      icon:'🔄', get name(){return t('badge_comeback_name');},     get desc(){return t('badge_comeback_desc');},    thresholds:thresholds(1),    compute:(hist) => { if(hist.length<2)return 0; let gaps=0; for(let i=1;i<hist.length;i++){const t1=parseInt(hist[i-1].date?.uts||0),t2=parseInt(hist[i].date?.uts||0);if(t1&&t2&&Math.abs(t1-t2)>30*86400)gaps++;} return gaps; } },
-        { id:'ambassador',     cat:'social',     icon:'📣', get name(){return t('badge_ambassador_name');},   get desc(){return t('badge_ambassador_desc');},  thresholds:thresholds(5),    compute:(hist) => { const am=new Map(); hist.forEach(tr=>{const a=(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase();if(a)am.set(a,(am.get(a)||0)+1);}); return [...am.values()].filter(v=>v>=100).length; } },
-    { id:'tastemaker',     cat:'social',     icon:'🎯', get name(){return t('badge_tastemaker_name');},   get desc(){return t('badge_tastemaker_desc');},  thresholds:thresholds(2),    compute:(hist) => { const am=new Map(); hist.forEach(tr=>{const a=(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase();if(a)am.set(a,(am.get(a)||0)+1);}); const total=hist.length; return [...am.values()].filter(v=>v/total>0.1).length; } },
-    { id:'nomad',          cat:'social',     icon:'✈️', get name(){return t('badge_nomad_name');},        get desc(){return t('badge_nomad_desc');},       thresholds:thresholds(5),    compute:(hist) => { const byMonth=new Map(); for(const tr of hist){const ts=parseInt(tr.date?.uts||0);if(!ts)continue;const d=new Date(ts*1000);const mk=`${d.getFullYear()}-${d.getMonth()}`;const ak=(tr.artist?.['#text']||tr.artist?.name||'').toLowerCase();if(!byMonth.has(mk))byMonth.set(mk,new Set());byMonth.get(mk).add(ak);} let months=0; byMonth.forEach(s=>{if(s.size>=10)months++;}); return months; } },
-  ];
-
-  function computeBadge(def, history) {
-    const value = def.compute(history);
-    let tierIdx = -1;
-    for (let i = def.thresholds.length - 1; i >= 0; i--) {
-      if (value >= def.thresholds[i]) { tierIdx = i; break; }
-    }
-    return {
-      ...def, value, tierIdx,
-      tier:          tierIdx >= 0 ? TIERS[tierIdx] : null,
-      unlocked:      tierIdx >= 0,
-      nextThreshold: tierIdx < def.thresholds.length - 1 ? def.thresholds[tierIdx + 1] : null,
-    };
-  }
-
-  // level_titles handles both array and CSV string
-  function levelFromXP(xp) {
-    let LEVEL_TITLES;
-    const raw = I18N_DATA?.[window.I18N?.getLang?.() || 'fr']?.level_titles || I18N_DATA?.fr?.level_titles;
-    if (Array.isArray(raw)) {
-      LEVEL_TITLES = raw;
-    } else if (typeof raw === 'string') {
-      LEVEL_TITLES = raw.split(',').map(s => s.trim());
-    } else {
-      LEVEL_TITLES = ['Débutant','Mélomane','Scrobbleur','Curateur','Expert','Pro','Légende','Demi-Dieu'];
-    }
-    if (xp <= 0) return { level:1, xpCurr:0, xpNext:100, pct:0, title:LEVEL_TITLES[0] };
-    const level    = Math.min(LEVEL_TITLES.length, Math.floor(Math.log2(xp/50+1))+1);
-    const xpForLvl = Math.round(50*(Math.pow(2,level-1)-1));
-    const xpForNxt = Math.round(50*(Math.pow(2,level)-1));
-    const pct      = Math.min(100, Math.round(((xp-xpForLvl)/Math.max(1,xpForNxt-xpForLvl))*100));
-    return { level, xpCurr:xp, xpNext:xpForNxt, pct, title:LEVEL_TITLES[level-1] || LEVEL_TITLES.at(-1) };
-  }
-
-  function compute() {
-    const history = APP.fullHistory;
-    if (!history?.length) {
-      document.getElementById('badges-empty')?.classList.remove('hidden');
-      document.getElementById('badges-container')?.classList.add('hidden');
-      showToast(t('toast_badges_need_hist'), 'error');
-      return;
-    }
-    document.getElementById('badges-empty')?.classList.add('hidden');
-    const loadBtn = document.getElementById('badges-load-btn');
-    if (loadBtn) loadBtn.innerHTML = t('badge_calc');
-
-    const results = [];
-    let i = 0;
-    const processNext = () => {
-      if (i >= BADGE_DEFS.length) {
-        _render(results);
-        saveBadgesToStorage(results);
-        showToast(t('toast_badges_saved'));
-        if (loadBtn) loadBtn.innerHTML = t('badge_recalc');
-        return;
-      }
-      results.push(computeBadge(BADGE_DEFS[i], history));
-      i++;
-      setTimeout(processNext, 0);
-    };
-    processNext();
-  }
-
-  function _badgeCard(b) {
-    const tierClass = b.unlocked ? `tier-${b.tier.key}` : 'tier-bronze';
-    const tierLabel = b.unlocked ? `${b.tier.icon} ${b.tier.label}` : t('badge_locked');
-    const nextInfo  = b.nextThreshold !== null ? `${b.value} / ${b.nextThreshold}` : b.unlocked ? t('badge_max') : '';
-    const delay     = b.unlocked ? `animation-delay:${(b.tierIdx||0)*0.08}s` : '';
-    return `
-      <div class="${b.unlocked ? 'badge-card unlocked' : 'badge-card locked'}" style="${delay}" onclick="showBadgeModal('${b.id}')">
-        <div class="badge-card-icon">${b.icon}</div>
-        <div class="badge-card-name">${escHtml(b.name)}</div>
-        <div class="badge-card-tier ${tierClass}">${tierLabel}</div>
-        ${nextInfo ? `<div class="badge-card-progress">${nextInfo}</div>` : ''}
-      </div>`;
-  }
-
-  function _render(results) {
-    document.getElementById('badges-container')?.classList.remove('hidden');
-    const totalXP  = results.reduce((acc, b) => acc + (b.unlocked ? TIERS[b.tierIdx].xp : 0), 0);
-    const unlocked = results.filter(b => b.unlocked).length;
-    const lvlData  = levelFromXP(totalXP);
-
-    const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-    setText('bsc-level',   lvlData.level);
-    setText('bsc-title',   lvlData.title);
-    setText('bsc-xp-val',  `${totalXP} XP`);
-    setText('bsc-unlocked',t('badge_unlocked_count', unlocked));
-    setText('bsc-total',   t('badge_total', results.length));
-
-    const xpFill = document.getElementById('bsc-xp-fill');
-    if (xpFill) setTimeout(() => { xpFill.style.width = lvlData.pct + '%'; }, 200);
-
-    const navBadge = document.getElementById('badges-count-badge');
-    if (navBadge) {
-      if (unlocked > 0) { navBadge.textContent = unlocked; navBadge.style.display = ''; }
-      else navBadge.style.display = 'none';
-    }
-
-    ['noctambule','exploration','fidelite','volume','diversite','tempo','social'].forEach(cat => {
-      const grid = document.getElementById(`badge-grid-${cat}`);
-      if (!grid) return;
-      grid.innerHTML = results.filter(b => b.cat === cat).map(b => _badgeCard(b)).join('');
-    });
-
-    window._badgeResults = results;
-  }
-
-  return { compute, BADGE_DEFS, TIERS, levelFromXP };
-})();
-
-// Badge modal
-function showBadgeModal(badgeId) {
-  const results = window._badgeResults || [];
-  const b = results.find(r => r.id === badgeId);
-  if (!b) return;
-
-  const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  setText('bm-icon',  b.icon);
-  setText('bm-title', b.name);
-  setText('bm-desc',  b.desc);
-
-  const tierEl = document.getElementById('bm-tier');
-  if (tierEl) {
-    if (b.unlocked) { tierEl.className = `bm-tier badge-card-tier tier-${b.tier.key}`; tierEl.textContent = `${b.tier.icon} ${b.tier.label}`; }
-    else            { tierEl.className = 'bm-tier'; tierEl.textContent = t('badge_locked'); }
-  }
-
-  const nextT  = b.nextThreshold !== null ? b.nextThreshold : b.thresholds.at(-1);
-  const pct    = nextT > 0 ? Math.min(100, Math.round((b.value/nextT)*100)) : 100;
-  const fillEl = document.getElementById('bm-progress-fill');
-  if (fillEl) setTimeout(() => { fillEl.style.width = pct + '%'; }, 150);
-  setText('bm-progress-cur',  `${b.value}`);
-  setText('bm-progress-next', b.nextThreshold ? `${b.nextThreshold}` : t('badge_max'));
-
-  const tiersRow = document.getElementById('bm-tiers-row');
-  if (tiersRow) {
-    tiersRow.innerHTML = b.thresholds.map((thresh, i) => {
-      const tier     = BadgeEngine.TIERS[i];
-      const achieved = b.value >= thresh;
-      const isCurr   = b.unlocked && b.tierIdx === i;
-      const cls      = isCurr ? 'bm-tier-chip current' : achieved ? 'bm-tier-chip achieved' : 'bm-tier-chip';
-      return `<span class="${cls}" title="${tier.label}: ${thresh}">${tier.icon} ${thresh}</span>`;
-    }).join('');
-  }
-
-  const shareBtn  = document.getElementById('bm-share-btn');
-  const exportBtn = document.getElementById('bm-export-btn');
-  if (shareBtn)  shareBtn.onclick  = () => shareBadgeAsImage(badgeId);
-  if (exportBtn) exportBtn.onclick = () => exportBadgeAsImage(badgeId);
-
-  document.getElementById('badge-modal')?.classList.remove('hidden');
-}
-
-function closeBadgeModal(e) {
-  if (e && e.target !== document.getElementById('badge-modal')) return;
-  document.getElementById('badge-modal')?.classList.add('hidden');
-}
-
-// Badge persistence
-const BADGES_STORAGE_KEY = 'ls_badges_v2_';
-
-function saveBadgesToStorage(results) {
-  if (!APP.username) return;
-  try {
-    const compact = results.map(b => ({ id:b.id, value:b.value, tierIdx:b.tierIdx, unlocked:b.unlocked }));
-    localStorage.setItem(BADGES_STORAGE_KEY + APP.username, JSON.stringify({ ts:Date.now(), badges:compact }));
-  } catch (e) { console.warn('saveBadges:', e); }
-}
-
-function restoreBadgesFromStorage() {
-  if (!APP.username) return;
-  try {
-    const raw = localStorage.getItem(BADGES_STORAGE_KEY + APP.username);
-    if (!raw) return;
-    const { badges, ts } = JSON.parse(raw);
-    if (!Array.isArray(badges)) return;
-
-    const unlocked = badges.filter(b => b.unlocked).length;
-
-    const navBadge = document.getElementById('badges-count-badge');
-    if (navBadge && unlocked > 0) { navBadge.textContent = String(unlocked); navBadge.style.display = ''; }
-
-    const ageMs = Date.now() - (ts || 0);
-    if (ageMs < 7 * 24 * 3600 * 1000) {
-      const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-      setText('bsc-unlocked', t('badge_unlocked_count', unlocked));
-      setText('bsc-total',    t('badge_total', badges.length));
-
-      const badgesSection = document.getElementById('s-badges');
-      if (badgesSection) {
-        const existing = document.getElementById('badge-persist-notice');
-        if (!existing) {
-          const notice       = document.createElement('p');
-          notice.id          = 'badge-persist-notice';
-          notice.className   = 'badge-persist-notice';
-          const ageDays      = Math.round(ageMs / 86400000);
-          notice.textContent = t('badge_restored', ageDays || 0);
-          const emptyEl = document.getElementById('badges-empty');
-          if (emptyEl) emptyEl.parentElement?.insertBefore(notice, emptyEl);
-        }
-      }
-
-      const BADGE_DEFS = BadgeEngine.BADGE_DEFS;
-      const TIERS      = BadgeEngine.TIERS;
-      window._badgeResults = badges.map(saved => {
-        const def = BADGE_DEFS.find(d => d.id === saved.id);
-        if (!def) return null;
-        return {
-          ...def,
-          value:     saved.value,
-          tierIdx:   saved.tierIdx,
-          unlocked:  saved.unlocked,
-          tier:      saved.tierIdx >= 0 ? TIERS[saved.tierIdx] : null,
-          nextThreshold: saved.tierIdx < (def.thresholds.length - 1) ? def.thresholds[saved.tierIdx + 1] : null,
-        };
-      }).filter(Boolean);
-
-      if (window._badgeResults.length) {
-        document.getElementById('badges-container')?.classList.remove('hidden');
-        const totalXP = window._badgeResults.reduce((acc, b) => acc + (b.unlocked ? TIERS[b.tierIdx]?.xp || 0 : 0), 0);
-        const lvlData = BadgeEngine.levelFromXP(totalXP);
-        setText('bsc-level', lvlData.level);
-        setText('bsc-title', lvlData.title);
-        setText('bsc-xp-val', `${totalXP} XP`);
-        const xpFill = document.getElementById('bsc-xp-fill');
-        if (xpFill) setTimeout(() => { xpFill.style.width = lvlData.pct + '%'; }, 300);
-
-        ['noctambule','exploration','fidelite','volume','diversite','tempo','social'].forEach(cat => {
-          const grid = document.getElementById(`badge-grid-${cat}`);
-          if (!grid) return;
-          grid.innerHTML = window._badgeResults.filter(b => b.cat === cat).map(b => {
-            const tierClass = b.unlocked ? `tier-${b.tier.key}` : 'tier-bronze';
-            const tierLabel = b.unlocked ? `${b.tier.icon} ${b.tier.label}` : t('badge_locked');
-            const nextInfo  = b.nextThreshold !== null ? `${b.value} / ${b.nextThreshold}` : b.unlocked ? t('badge_max') : '';
-            return `<div class="${b.unlocked ? 'badge-card unlocked' : 'badge-card locked'}" onclick="showBadgeModal('${b.id}')">
-              <div class="badge-card-icon">${b.icon}</div>
-              <div class="badge-card-name">${escHtml(b.name)}</div>
-              <div class="badge-card-tier ${tierClass}">${tierLabel}</div>
-              ${nextInfo ? `<div class="badge-card-progress">${nextInfo}</div>` : ''}
-            </div>`;
-          }).join('');
-        });
-      }
-    }
-  } catch {}
-}
-
-// Badge image export
-async function shareBadgeAsImage(badgeId) { await _captureBadgeAsImage(badgeId, 'share'); }
-async function exportBadgeAsImage(badgeId) { await _captureBadgeAsImage(badgeId, 'download'); }
-
-async function _captureBadgeAsImage(badgeId, mode) {
-  const results = window._badgeResults || [];
-  const b       = results.find(r => r.id === badgeId);
-  if (!b) { showToast(t('toast_badge_not_found'), 'error'); return; }
-
-  const cc = document.createElement('div');
-  cc.style.cssText = 'position:fixed;left:-9999px;top:0;width:360px;height:360px;background:linear-gradient(135deg,#1a1033,#0f0a1e);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;border-radius:24px;font-family:Inter,sans-serif;';
-  const accentColor = b.tier?.key==='elite'?'#a78bfa':b.tier?.key==='diamant'?'#60a5fa':b.tier?.key==='or'?'#fbbf24':b.tier?.key==='argent'?'#94a3b8':'#cd7f32';
-  const tierLabel   = b.unlocked&&b.tier ? `${b.tier.icon} ${b.tier.label}` : t('badge_locked');
-  cc.innerHTML = `
-    <div style="font-size:72px;line-height:1">${b.icon}</div>
-    <div style="color:#fff;font-size:22px;font-weight:700;text-align:center">${escHtml(b.name)}</div>
-    <div style="background:${accentColor}22;color:${accentColor};font-size:14px;font-weight:600;padding:6px 16px;border-radius:99px;border:1px solid ${accentColor}55">${tierLabel}</div>
-    <div style="color:rgba(255,255,255,.55);font-size:12px;text-align:center;max-width:240px">${escHtml(b.desc)}</div>
-    <div style="color:rgba(255,255,255,.35);font-size:11px;margin-top:12px">LastStats · last.fm</div>`;
-  document.body.appendChild(cc);
-
-  try {
-    if (document.fonts?.ready) await document.fonts.ready;
-    await sleep(120);
-    const canvas = await html2canvas(cc, { scale:2, useCORS:true, allowTaint:true, backgroundColor:null, logging:false, width:360, height:360 });
-    document.body.removeChild(cc);
-
-    if (mode === 'share' && navigator.share && navigator.canShare) {
-      canvas.toBlob(async blob => {
-        if (!blob) { downloadCanvas(canvas, `badge-${b.id}.png`); return; }
-        const file = new File([blob], `badge-${b.id}.png`, { type:'image/png' });
-        try { await navigator.share({ title:b.name, text:`${b.name} — LastStats`, files:[file] }); }
-        catch { downloadCanvas(canvas, `badge-${b.id}.png`); }
-      }, 'image/png');
-    } else {
-      downloadCanvas(canvas, `badge-${b.id}.png`);
-      showToast(t('toast_badge_downloaded'));
-    }
-  } catch (e) {
-    if (document.body.contains(cc)) document.body.removeChild(cc);
-    showToast(t('toast_badge_error', e.message), 'error');
-  }
-}
-
 function syncSettingsFields() {
   const uEl  = document.getElementById('settings-username');
   const aEl  = document.getElementById('settings-apikey');
@@ -5448,7 +5185,6 @@ const NAV_SECTIONS = [
   { key: 'top-albums',  icon: 'fa-compact-disc',   i18nKey: 'nav_top_albums',   locked: false },
   { key: 'top-tracks',  icon: 'fa-music',          i18nKey: 'nav_top_tracks',   locked: false },
   { key: 'charts',      icon: 'fa-chart-bar',      i18nKey: 'nav_charts',       locked: false },
-  { key: 'badges',      icon: 'fa-medal',          i18nKey: 'nav_badges',       locked: false },
   { key: 'obscurity',   icon: 'fa-gem',            i18nKey: 'nav_obscurity',    locked: false },
   { key: 'history',     icon: 'fa-history',        i18nKey: 'nav_history',      locked: false },
   { key: 'compare',     icon: 'fa-users-rays',     i18nKey: 'nav_compare',      locked: false },
@@ -6068,17 +5804,18 @@ function _vsRipple(e) {
 }
 
 /* ── Friend chip builder ── */
-function _buildChip(f) {
+function _buildChip(f, isLive) {
   const imgRaw = Array.isArray(f.image) ? f.image.find(i => i.size === 'medium')?.['#text'] : '';
   const imgUrl = imgRaw && !imgRaw.includes(DEFAULT_IMG) ? imgRaw : '';
   const name   = escHtml(f.name);
   const grad   = nameToGradient(f.name);
   const letter = f.name[0].toUpperCase();
   return `
-    <button class="vs-chip" onclick="runComparison('${name.replace(/'/g,"\\'")}')">
+    <button class="vs-chip${isLive ? ' vs-chip--live' : ''}" onclick="runComparison('${name.replace(/'/g,"\\'")}')">
       <span class="vs-chip-av">
         <span class="vs-chip-fallback" style="background:${grad}">${letter}</span>
         ${imgUrl ? `<img src="${imgUrl}" alt="${name}" class="vs-chip-img" onerror="this.remove()">` : ''}
+        ${isLive ? '<span class="vs-chip-live-dot" title="Écoute en cours"></span>' : ''}
       </span>
       <span class="vs-chip-name">${name}</span>
     </button>`;
@@ -6102,7 +5839,24 @@ async function initComparePage() {
       return;
     }
     const list = Array.isArray(friends) ? friends : [friends];
-    listEl.innerHTML = list.map(_buildChip).join('');
+
+    // Render chips immediately then check live status async
+    listEl.innerHTML = list.map(f => _buildChip(f, false)).join('');
+
+    // Check now-playing for all friends in parallel (silent failures)
+    const liveChecks = await Promise.allSettled(
+      list.map(f => _apiFetchUser('user.getRecentTracks', f.name, { limit: 1 }))
+    );
+    liveChecks.forEach((res, i) => {
+      if (res.status !== 'fulfilled') return;
+      const track = res.value?.recenttracks?.track;
+      const first = Array.isArray(track) ? track[0] : track;
+      const isLive = first?.['@attr']?.nowplaying === 'true';
+      if (!isLive) return;
+      // Replace chip with live version
+      const btn = listEl.querySelectorAll('.vs-chip')[i];
+      if (btn) btn.outerHTML = _buildChip(list[i], true);
+    });
   } catch (e) {
     listEl.innerHTML = `<p class="vs-no-friend"><i class="fas fa-wifi"></i> ${escHtml(e.message)}</p>`;
   }
