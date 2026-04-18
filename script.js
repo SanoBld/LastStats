@@ -996,6 +996,7 @@ async function initApp(usernameOverride, apiKeyOverride) {
     APP.regYear  = new Date(parseInt(info.user.registered?.unixtime || 0) * 1000).getFullYear() || new Date().getFullYear() - 5;
 
     saveSession();
+    checkMilestoneNotification();
 
     const theme = localStorage.getItem('ls_theme') || 'dark';
     applyTheme(theme);
@@ -4839,70 +4840,210 @@ function saveSettings() {
 /**
  * Exporte le calendrier d'écoute (heatmap) en image PNG via html2canvas.
  */
-async function exportHeatmapAsImage() {
+/* ─── Helpers partagés pour l'export ─────────────────────────────── */
+function _exportBg() {
+  return getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#141218';
+}
+function _exportAccent() {
+  return getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#d0bcff';
+}
+
+/* ─── Export graphique Chart.js ───────────────────────────────────── */
+async function exportChartAsImage(canvasId, filename) {
+  const src = document.getElementById(canvasId);
+  if (!src || !src.width) { showToast('Graphique non disponible.', 'error'); return; }
+
+  const PAD = 48, TITLE_H = 56, FOOTER_H = 28;
+  const W = src.width  + PAD * 2;
+  const H = src.height + TITLE_H + FOOTER_H + PAD;
+
+  const out = document.createElement('canvas');
+  out.width = W; out.height = H;
+  const ctx = out.getContext('2d');
+  const bg = _exportBg();
+  const accent = _exportAccent();
+
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = accent; ctx.fillRect(0, 0, W, 4);
+
+  const card  = src.closest('.chart-card');
+  const label = card?.querySelector('.cc-hd span span')?.textContent?.trim() || filename.replace(/-/g,' ');
+  ctx.fillStyle = accent;
+  ctx.font = `bold 22px Inter, system-ui, sans-serif`;
+  ctx.fillText('\uD83C\uDFB5  ' + label, PAD, TITLE_H - 8);
+
+  ctx.drawImage(src, PAD, TITLE_H, src.width, src.height);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.22)';
+  ctx.font = `11px Inter, system-ui, sans-serif`;
+  ctx.fillText('LastStats \u00B7 ' + (APP.username||'') + ' \u00B7 sanobld.github.io/LastStats', PAD, H - 10);
+
+  downloadCanvas(out, 'laststats-' + filename + '.png');
+  showToast('\uD83D\uDCCA Graphique export\u00E9 !');
+}
+
+/* ─── Export calendrier heatmap ──────────────────────────────────── */
+async function exportHeatmapAsImage(orientation) {
+  orientation = orientation || 'horizontal';
   const wrapEl = document.getElementById('listening-heatmap-wrap-charts');
   if (!wrapEl || wrapEl.classList.contains('hidden')) {
     showToast('Chargez l\'historique complet pour afficher le calendrier.', 'error');
     return;
   }
-
   const btn = document.getElementById('heatmap-export-btn');
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
-
   try {
-    const inner = wrapEl.querySelector('.cal-heatmap-inner') || wrapEl;
-    const year  = document.getElementById('cal-heatmap-yr-sel-charts')?.value || new Date().getFullYear();
-
-    // Compute exact dimensions
-    const rect = inner.getBoundingClientRect();
-    const pad  = 24;
-
-    const canvas = await html2canvas(inner, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#141218',
-      logging: false,
-      width:  rect.width  + pad * 2,
-      height: rect.height + pad * 2,
-      x: -pad,
-      y: -pad,
-    });
-
-    // Add a branded frame
-    const out    = document.createElement('canvas');
-    const fw     = canvas.width;
-    const fh     = canvas.height + 60; // space for title
-    out.width    = fw;
-    out.height   = fh;
-    const ctx    = out.getContext('2d');
-
-    const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#141218';
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, fw, fh);
-
-    // Title
-    const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#d0bcff';
-    ctx.fillStyle = accent;
-    ctx.font = `bold ${28}px Inter, system-ui, sans-serif`;
-    ctx.fillText(`🎵  Calendrier d'Écoute ${year}`, 32, 42);
-
-    // Heatmap
-    ctx.drawImage(canvas, 0, 60);
-
-    // Footer watermark
-    ctx.fillStyle = 'rgba(255,255,255,0.25)';
-    ctx.font = `12px Inter, system-ui, sans-serif`;
-    ctx.fillText('LastStats — sanobld.github.io/LastStats', fw - 300, fh - 14);
-
-    downloadCanvas(out, `laststats-calendrier-${year}.png`);
-    showToast('📅 Calendrier exporté !');
+    const year = parseInt(document.getElementById('cal-heatmap-yr-sel-charts')?.value) || new Date().getFullYear();
+    if (orientation === 'vertical') {
+      await _exportHeatmapVertical(year);
+    } else {
+      await _exportHeatmapHorizontal(year, wrapEl);
+    }
   } catch (e) {
     console.error('exportHeatmap:', e);
-    showToast('Erreur lors de l\'export : ' + e.message, 'error');
+    showToast('Erreur export : ' + e.message, 'error');
   } finally {
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-download"></i> <span>Exporter</span>'; }
   }
+}
+
+async function _exportHeatmapHorizontal(year, wrapEl) {
+  const inner = wrapEl.querySelector('.cal-heatmap-inner') || wrapEl;
+  const rect  = inner.getBoundingClientRect();
+  const PAD = 24, TITLE_H = 60, FOOTER_H = 28;
+  const bg = _exportBg(); const accent = _exportAccent();
+  const snap = await html2canvas(inner, {
+    scale: 2, useCORS: true, allowTaint: true,
+    backgroundColor: bg, logging: false,
+    width: rect.width + PAD*2, height: rect.height + PAD*2, x: -PAD, y: -PAD,
+  });
+  const out = document.createElement('canvas');
+  out.width  = snap.width;
+  out.height = snap.height + TITLE_H + FOOTER_H;
+  const ctx = out.getContext('2d');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, out.width, out.height);
+  ctx.fillStyle = accent;
+  ctx.font = 'bold 28px Inter, system-ui, sans-serif';
+  ctx.fillText('\uD83C\uDFB5  Calendrier d\u2019\u00C9coute ' + year, 32, 44);
+  ctx.drawImage(snap, 0, TITLE_H);
+  ctx.fillStyle = 'rgba(255,255,255,0.22)';
+  ctx.font = '11px Inter, system-ui, sans-serif';
+  ctx.fillText('LastStats \u00B7 sanobld.github.io/LastStats', 32, out.height - 10);
+  downloadCanvas(out, 'laststats-calendrier-' + year + '.png');
+  showToast('\uD83D\uDCC5 Calendrier export\u00E9 !');
+}
+
+async function _exportHeatmapVertical(year) {
+  const history = APP.fullHistory;
+  if (!history?.length) { showToast('Historique non charg\u00E9.', 'error'); return; }
+
+  const dayCounts = new Map();
+  for (const tr of history) {
+    const ts = parseInt(tr.date?.uts || 0);
+    if (!ts) continue;
+    const d = new Date(ts * 1000);
+    if (d.getFullYear() !== year) continue;
+    const key = year + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    dayCounts.set(key, (dayCounts.get(key) || 0) + 1);
+  }
+
+  const vals = dayCounts.size ? [...dayCounts.values()] : [1];
+  const maxC = Math.max(...vals);
+  const thr  = [1, Math.ceil(maxC*.25), Math.ceil(maxC*.5), Math.ceil(maxC*.75)];
+  const lvl  = c => !c ? 0 : c < thr[1] ? 1 : c < thr[2] ? 2 : c < thr[3] ? 3 : 4;
+
+  const bg     = _exportBg();
+  const accent = _exportAccent();
+  const isDark = APP.currentTheme === 'dark' || (APP.currentTheme === 'auto' && window.matchMedia('(prefers-color-scheme:dark)').matches);
+
+  // Parse accent to rgba helper
+  const tmpEl = document.createElement('div');
+  tmpEl.style.color = accent;
+  document.body.appendChild(tmpEl);
+  const rgb = getComputedStyle(tmpEl).color.match(/\d+/g)?.map(Number) || [208,188,255];
+  document.body.removeChild(tmpEl);
+  const alpha = a => 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + a + ')';
+
+  const LEVEL_COLORS = [
+    isDark ? '#1d1b20' : '#f0eff5',
+    alpha(.22), alpha(.45), alpha(.72), accent,
+  ];
+
+  const CELL = 14, GAP = 3, COL_W = CELL + GAP;
+  const LABEL_W = 36, LABEL_H = 18;
+  const MONTHS = ['Janv','F\u00E9vr','Mars','Avr','Mai','Juin','Juil','Ao\u00FBt','Sept','Oct','Nov','D\u00E9c'];
+  const DAYS_MAX = 31;
+  const PAD = 20, TITLE_H = 62, FOOTER_H = 38;
+
+  const gridW = LABEL_W + DAYS_MAX * COL_W;
+  const gridH = 12 * (CELL + GAP) - GAP;
+  const W = gridW + PAD * 2;
+  const H = gridH + TITLE_H + FOOTER_H + LABEL_H + PAD;
+
+  const out = document.createElement('canvas');
+  out.width  = W * 2; out.height = H * 2;
+  const ctx  = out.getContext('2d');
+  ctx.scale(2, 2);
+
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = accent; ctx.fillRect(0, 0, W, 3);
+
+  ctx.fillStyle = accent;
+  ctx.font = 'bold 20px Inter, system-ui, sans-serif';
+  ctx.fillText('\uD83C\uDFB5  Calendrier d\u2019\u00C9coute ' + year, PAD, TITLE_H - 12);
+
+  // Day numbers header
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)';
+  ctx.font = '8px Inter, system-ui, sans-serif';
+  for (let d = 1; d <= DAYS_MAX; d++) {
+    if (d === 1 || d % 5 === 0) {
+      ctx.fillText(String(d), PAD + LABEL_W + (d-1)*COL_W, TITLE_H + LABEL_H - 4);
+    }
+  }
+
+  // Month rows
+  for (let m = 0; m < 12; m++) {
+    const rowY = TITLE_H + LABEL_H + m * (CELL + GAP);
+    ctx.fillStyle = isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.55)';
+    ctx.font = 'bold 9px Inter, system-ui, sans-serif';
+    ctx.fillText(MONTHS[m], PAD, rowY + CELL - 3);
+
+    const daysInMonth = new Date(year, m+1, 0).getDate();
+    for (let d = 1; d <= DAYS_MAX; d++) {
+      const x = PAD + LABEL_W + (d-1)*COL_W;
+      if (d > daysInMonth) {
+        ctx.fillStyle = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
+      } else {
+        const key = year + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+        ctx.fillStyle = LEVEL_COLORS[lvl(dayCounts.get(key) || 0)];
+      }
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(x, rowY, CELL, CELL, 2); else ctx.rect(x, rowY, CELL, CELL);
+      ctx.fill();
+    }
+  }
+
+  // Legend
+  const legY = H - FOOTER_H + 10;
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)';
+  ctx.font = '9px Inter, system-ui, sans-serif';
+  ctx.fillText('Moins', PAD, legY + CELL - 3);
+  for (let i = 0; i <= 4; i++) {
+    ctx.fillStyle = LEVEL_COLORS[i];
+    ctx.beginPath();
+    const lx = PAD + 34 + i*(CELL+3);
+    if (ctx.roundRect) ctx.roundRect(lx, legY, CELL, CELL, 2); else ctx.rect(lx, legY, CELL, CELL);
+    ctx.fill();
+  }
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)';
+  ctx.fillText('Plus', PAD + 34 + 5*(CELL+3) + 3, legY + CELL - 3);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+  ctx.font = '9px Inter, system-ui, sans-serif';
+  ctx.fillText('LastStats \u00B7 sanobld.github.io/LastStats', W - 200, H - 8);
+
+  downloadCanvas(out, 'laststats-calendrier-vertical-' + year + '.png');
+  showToast('\uD83D\uDCC5 Calendrier vertical export\u00E9 !');
 }
 
 function exportData(format) {
@@ -4995,21 +5136,30 @@ async function requestNotificationAccess() {
 /**
  * Sauvegarde les préférences de notification cochées.
  */
+const MILESTONE_IDS = [500,1000,2500,5000,10000,25000,50000,100000,250000,500000,1000000];
+
 function saveNotifPrefs() {
   if (Notification?.permission !== 'granted') {
-    // Ask permission first if not granted
     requestNotificationAccess();
     return;
   }
+  const milestones = MILESTONE_IDS.filter(v => document.getElementById(`ms-${v}`)?.checked);
   const prefs = {
-    weekly:    document.getElementById('notif-weekly')?.checked    || false,
-    monthly:   document.getElementById('notif-monthly')?.checked   || false,
-    milestone: document.getElementById('notif-milestone')?.checked || false,
-    wrapped:   document.getElementById('notif-wrapped')?.checked   || false,
+    weekly:     document.getElementById('notif-weekly')?.checked    || false,
+    monthly:    document.getElementById('notif-monthly')?.checked   || false,
+    milestone:  document.getElementById('notif-milestone')?.checked || false,
+    milestones,
+    wrapped:    document.getElementById('notif-wrapped')?.checked   || false,
   };
   localStorage.setItem('ls_notif_prefs', JSON.stringify(prefs));
+  _syncMilestoneVisibility(prefs.milestone);
   _scheduleNotifications(prefs);
   showToast('Préférences de notifications sauvegardées.');
+}
+
+function _syncMilestoneVisibility(enabled) {
+  const grid = document.getElementById('notif-milestones');
+  if (grid) { grid.style.display = enabled ? '' : 'none'; }
 }
 
 /**
@@ -5018,13 +5168,42 @@ function saveNotifPrefs() {
 function loadNotifPrefs() {
   try {
     const raw = localStorage.getItem('ls_notif_prefs');
-    if (!raw) return;
-    const prefs = JSON.parse(raw);
+    const defaultMilestones = [1000,5000,10000,50000,100000];
+    const prefs = raw ? JSON.parse(raw) : { milestones: defaultMilestones };
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
     set('notif-weekly',    prefs.weekly);
     set('notif-monthly',   prefs.monthly);
     set('notif-milestone', prefs.milestone);
     set('notif-wrapped',   prefs.wrapped);
+    // Milestone thresholds
+    const activeMilestones = prefs.milestones ?? defaultMilestones;
+    MILESTONE_IDS.forEach(v => {
+      const el = document.getElementById(`ms-${v}`);
+      if (el) el.checked = activeMilestones.includes(v);
+    });
+    _syncMilestoneVisibility(prefs.milestone);
+  } catch {}
+}
+
+/**
+ * Vérifie si un jalon de scrobbles vient d'être atteint et notifie.
+ * À appeler depuis initApp après avoir chargé APP.userInfo.
+ */
+function checkMilestoneNotification() {
+  try {
+    if (Notification?.permission !== 'granted') return;
+    const prefs = JSON.parse(localStorage.getItem('ls_notif_prefs') || '{}');
+    if (!prefs.milestone) return;
+    const total = parseInt(APP.userInfo?.playcount || 0);
+    if (!total) return;
+    const milestones = prefs.milestones ?? [1000,5000,10000,50000,100000];
+    const lastNotified = parseInt(localStorage.getItem('ls_notif_last_milestone') || '0');
+    const reached = milestones.filter(m => total >= m && m > lastNotified);
+    if (!reached.length) return;
+    const highest = Math.max(...reached);
+    localStorage.setItem('ls_notif_last_milestone', String(highest));
+    const fmt = highest >= 1000000 ? `${highest/1000000}M` : highest >= 1000 ? `${highest/1000}k` : String(highest);
+    _sendNotif('🎯 Jalon atteint !', `Tu viens d'atteindre ${fmt} scrobbles sur Last.fm ! 🎉`);
   } catch {}
 }
 

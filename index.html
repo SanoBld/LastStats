@@ -695,7 +695,10 @@
               <i class="fas fa-calendar-alt"></i>
               <span data-i18n="charts.monthly">Scrobbles by month</span>
             </span>
-            <select id="yr-sel" class="yr-sel" onchange="loadMonthlyChart(this.value)"></select>
+            <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
+              <select id="yr-sel" class="yr-sel" onchange="loadMonthlyChart(this.value)"></select>
+              <button class="cc-export-btn" onclick="exportChartAsImage('chart-monthly','scrobbles-mensuels')" title="Exporter"><i class="fas fa-download"></i></button>
+            </div>
           </div>
           <div id="monthly-prog" class="prog-wrap hidden">
             <div class="prog-bar"><div class="prog-fill" id="monthly-fill"></div></div>
@@ -711,6 +714,7 @@
               <i class="fas fa-chart-line"></i>
               <span data-i18n="charts.cumulative">Cumulative scrobble evolution</span>
             </span>
+            <button class="cc-export-btn" onclick="exportChartAsImage('chart-cumul','evolution-cumulative')" title="Exporter"><i class="fas fa-download"></i></button>
           </div>
           <canvas id="chart-cumul" height="280"></canvas>
         </div>
@@ -723,6 +727,7 @@
               <span data-i18n="charts.profile">Musical Profile — Dominant tags evolution</span>
             </span>
             <span class="cc-hint" id="profile-status-hint" data-i18n="charts.profileAutoHint">Auto-generated</span>
+            <button class="cc-export-btn" onclick="exportChartAsImage('chart-profile','profil-musical')" title="Exporter"><i class="fas fa-download"></i></button>
           </div>
           <div class="chart-placeholder" id="profile-placeholder">
             <i class="fas fa-sliders-h fa-2x"></i>
@@ -761,6 +766,7 @@
             <div class="cc-hd">
               <span><i class="fas fa-clock"></i> <span data-i18n="advanced.hourly">Hourly distribution</span></span>
               <span class="cc-hint" id="hourly-hint" data-i18n="charts.heatmapHint">Available after loading full history</span>
+              <button class="cc-export-btn" onclick="exportChartAsImage('chart-hourly','repartition-horaire')" title="Exporter"><i class="fas fa-download"></i></button>
             </div>
             <canvas id="chart-hourly" height="220"></canvas>
           </div>
@@ -768,6 +774,7 @@
             <div class="cc-hd">
               <span><i class="fas fa-calendar-week"></i> <span data-i18n="advanced.weekday">Activity by day of week</span></span>
               <span class="cc-hint" id="weekday-hint" data-i18n="charts.heatmapHint">Available after loading full history</span>
+              <button class="cc-export-btn" onclick="exportChartAsImage('chart-weekday','activite-semaine')" title="Exporter"><i class="fas fa-download"></i></button>
             </div>
             <canvas id="chart-weekday" height="220"></canvas>
           </div>
@@ -811,6 +818,7 @@
                 <i class="fas fa-chart-pie"></i>
                 <span data-i18n="charts.artistPie">Artist distribution (top 10)</span>
               </span>
+              <button class="cc-export-btn" onclick="exportChartAsImage('chart-art-pie','top-artistes')" title="Exporter"><i class="fas fa-download"></i></button>
             </div>
             <canvas id="chart-art-pie" height="260"></canvas>
           </div>
@@ -820,6 +828,7 @@
                 <i class="fas fa-chart-pie"></i>
                 <span data-i18n="charts.albumPie">Album distribution (top 10)</span>
               </span>
+              <button class="cc-export-btn" onclick="exportChartAsImage('chart-alb-pie','top-albums')" title="Exporter"><i class="fas fa-download"></i></button>
             </div>
             <canvas id="chart-alb-pie" height="260"></canvas>
           </div>
@@ -835,9 +844,12 @@
             <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
               <select id="cal-heatmap-yr-sel-charts" class="yr-sel"
                       onchange="renderListeningHeatmap(parseInt(this.value), 'charts')"></select>
-              <button class="btn-generate" id="heatmap-export-btn" onclick="exportHeatmapAsImage()" title="Exporter en image">
+              <button class="btn-generate" id="heatmap-export-btn" onclick="exportHeatmapAsImage('horizontal')" title="Exporter en horizontal">
                 <i class="fas fa-download"></i>
                 <span>Exporter</span>
+              </button>
+              <button class="btn-generate" onclick="exportHeatmapAsImage('vertical')" title="Exporter en vertical" style="background:transparent;border-color:var(--border)">
+                <i class="fas fa-arrows-alt-v"></i>
               </button>
             </div>
           </div>
@@ -1421,7 +1433,7 @@
                   <span class="notif-opt-icon">🎯</span>
                   <span class="notif-opt-body">
                     <strong>Jalons d'écoute</strong>
-                    <small>10k, 50k, 100k scrobbles et plus</small>
+                    <small>Notifié à chaque palier atteint</small>
                   </span>
                 </label>
                 <label class="notif-opt">
@@ -1432,6 +1444,26 @@
                     <small>Fin décembre — rappel pour votre récap de l'année</small>
                   </span>
                 </label>
+              </div>
+              <!-- Milestone thresholds -->
+              <div class="notif-milestones" id="notif-milestones">
+                <div class="notif-milestones-hd">
+                  <i class="fas fa-sliders-h"></i>
+                  <span>Paliers de scrobbles</span>
+                </div>
+                <div class="notif-milestones-grid">
+                  <label class="milestone-chip"><input type="checkbox" id="ms-500"    value="500"    onchange="saveNotifPrefs()"><span>500</span></label>
+                  <label class="milestone-chip"><input type="checkbox" id="ms-1000"   value="1000"   onchange="saveNotifPrefs()" checked><span>1k</span></label>
+                  <label class="milestone-chip"><input type="checkbox" id="ms-2500"   value="2500"   onchange="saveNotifPrefs()"><span>2,5k</span></label>
+                  <label class="milestone-chip"><input type="checkbox" id="ms-5000"   value="5000"   onchange="saveNotifPrefs()" checked><span>5k</span></label>
+                  <label class="milestone-chip"><input type="checkbox" id="ms-10000"  value="10000"  onchange="saveNotifPrefs()" checked><span>10k</span></label>
+                  <label class="milestone-chip"><input type="checkbox" id="ms-25000"  value="25000"  onchange="saveNotifPrefs()"><span>25k</span></label>
+                  <label class="milestone-chip"><input type="checkbox" id="ms-50000"  value="50000"  onchange="saveNotifPrefs()" checked><span>50k</span></label>
+                  <label class="milestone-chip"><input type="checkbox" id="ms-100000" value="100000" onchange="saveNotifPrefs()" checked><span>100k</span></label>
+                  <label class="milestone-chip"><input type="checkbox" id="ms-250000" value="250000" onchange="saveNotifPrefs()"><span>250k</span></label>
+                  <label class="milestone-chip"><input type="checkbox" id="ms-500000" value="500000" onchange="saveNotifPrefs()"><span>500k</span></label>
+                  <label class="milestone-chip"><input type="checkbox" id="ms-1000000" value="1000000" onchange="saveNotifPrefs()"><span>1M</span></label>
+                </div>
               </div>
               <!-- Force update -->
               <div class="setting-row setting-row--highlight">

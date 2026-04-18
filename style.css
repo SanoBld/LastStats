@@ -3879,25 +3879,21 @@ button.bn-item:focus-visible,
   pointer-events: none;
 }
 
-/* ── Niveaux d'intensité — suivent automatiquement --accent ── */
+/* ── Niveaux d'intensité — progression uniforme quel que soit l'accent ── */
 .cal-day-cell[data-level="0"] {
   background: var(--bg-card-hi);
 }
 .cal-day-cell[data-level="1"] {
-  background: var(--accent-container);
-  opacity: .75;
+  background: color-mix(in srgb, var(--accent) 20%, var(--bg-card-hi));
 }
 .cal-day-cell[data-level="2"] {
-  background: var(--accent);
-  opacity: .45;
+  background: color-mix(in srgb, var(--accent) 45%, var(--bg-card-hi));
 }
 .cal-day-cell[data-level="3"] {
-  background: var(--accent);
-  opacity: .72;
+  background: color-mix(in srgb, var(--accent) 72%, var(--bg-card-hi));
 }
 .cal-day-cell[data-level="4"] {
   background: var(--accent);
-  opacity: 1;
 }
 
 /* Légende */
@@ -4799,3 +4795,57 @@ img { loading: lazy; }
 }
 button:focus:not(:focus-visible),
 a:focus:not(:focus-visible) { outline: none; }
+
+/* ─── Chart export button ──────────────────────────────────────────── */
+.cc-export-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-hover);
+  color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .72rem; cursor: pointer; flex-shrink: 0;
+  transition: background var(--dur-short) var(--ease-standard),
+              color      var(--dur-short) var(--ease-standard),
+              transform  var(--dur-short2) var(--ease-spring);
+  margin-left: auto;
+}
+.cc-export-btn:hover  { background: var(--accent-lt); color: var(--accent); border-color: var(--border-glow); transform: scale(1.1); }
+.cc-export-btn:active { transform: scale(.9); }
+
+/* ─── Milestone notification options ──────────────────────────────── */
+.notif-milestones {
+  margin-top: 10px; padding: 12px 14px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.notif-milestones-hd {
+  display: flex; align-items: center; gap: 7px;
+  font-size: .78rem; font-weight: 700; color: var(--text-dim);
+  margin-bottom: 10px;
+}
+.notif-milestones-hd i { color: var(--accent); }
+.notif-milestones-grid {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.milestone-chip {
+  display: flex; align-items: center;
+  cursor: pointer;
+}
+.milestone-chip input { display: none; }
+.milestone-chip span {
+  padding: 4px 10px; border-radius: 99px;
+  border: 1.5px solid var(--border);
+  font-size: .74rem; font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-hover);
+  transition: all var(--dur-short) var(--ease-standard);
+  white-space: nowrap;
+  user-select: none;
+}
+.milestone-chip:hover span { border-color: var(--accent); color: var(--accent); }
+.milestone-chip input:checked + span {
+  background: var(--accent-lt);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 800;
+}
