@@ -686,6 +686,7 @@
           <h2 data-i18n="charts.title">Charts</h2>
           <p class="sec-sub" data-i18n="charts.sub">Trends, evolution, and advanced listening visualisations</p>
         </div>
+        <div class="charts-stack">
 
         <!-- Monthly scrobbles -->
         <div class="chart-card full">
@@ -824,57 +825,6 @@
           </div>
         </div>
 
-        <!-- Genre Radar -->
-        <div class="chart-card full">
-          <div class="cc-hd">
-            <span>
-              <i class="fas fa-spider"></i>
-              <span data-i18n="charts.radar">Genre Radar</span>
-            </span>
-            <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
-              <span class="cc-hint" id="radar-status-hint"></span>
-              <button class="btn-generate" id="vizplus-gen-btn" onclick="generateVizPlus()">
-                <i class="fas fa-play"></i>
-                <span data-i18n="charts.generate">Générer</span>
-              </button>
-            </div>
-          </div>
-          <div class="chart-placeholder" id="vizplus-radar-ph">
-            <i class="fas fa-spider fa-2x"></i>
-            <p data-i18n="charts.radarPhIdle">Cliquez sur « Générer » pour analyser vos genres musicaux</p>
-          </div>
-          <div class="radar-wrap hidden" id="vizplus-radar-wrap">
-            <canvas id="chart-radar" height="360"></canvas>
-          </div>
-        </div>
-
-        <!-- Sunburst — genre hierarchy -->
-        <div class="chart-card full">
-          <div class="cc-hd">
-            <span>
-              <i class="fas fa-circle-notch"></i>
-              <span data-i18n="charts.sunburst">Sunburst — Cartographie des genres</span>
-            </span>
-            <span class="cc-hint" data-i18n="charts.sunburstHint">Genres et sous-genres de vos artistes favoris</span>
-          </div>
-          <div id="vizplus-status" class="vizplus-status hidden">
-            <div class="spinner-sm"></div>
-            <span id="vizplus-status-txt" data-i18n="charts.computing">Calcul en cours…</span>
-          </div>
-          <div class="chart-placeholder" id="vizplus-sunburst-ph">
-            <i class="fas fa-circle-notch fa-2x"></i>
-            <p data-i18n="charts.sunburstPhIdle">Générez le Radar ci-dessus pour révéler la hiérarchie des genres</p>
-          </div>
-          <div class="sunburst-wrap hidden" id="vizplus-sunburst-wrap">
-            <svg id="chart-sunburst" width="100%" height="480"
-                 aria-label="Sunburst genre chart"></svg>
-            <div class="sunburst-breadcrumb" id="sunburst-breadcrumb" aria-live="polite"></div>
-            <div class="sunburst-center-info hidden" id="sunburst-center-info">
-              <span class="sb-center-name" id="sb-center-name"></span>
-              <span class="sb-center-pct"  id="sb-center-pct"></span>
-            </div>
-          </div>
-        </div>
         <!-- Calendrier d'Écoute — heatmap annuelle dans les graphiques -->
         <div class="chart-card full">
           <div class="cc-hd">
@@ -882,8 +832,14 @@
               <i class="fas fa-calendar-alt"></i>
               <span data-i18n="dash.listeningCalendar">Calendrier d'Écoute</span>
             </span>
-            <select id="cal-heatmap-yr-sel-charts" class="yr-sel"
-                    onchange="renderListeningHeatmap(parseInt(this.value), 'charts')"></select>
+            <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
+              <select id="cal-heatmap-yr-sel-charts" class="yr-sel"
+                      onchange="renderListeningHeatmap(parseInt(this.value), 'charts')"></select>
+              <button class="btn-generate" id="heatmap-export-btn" onclick="exportHeatmapAsImage()" title="Exporter en image">
+                <i class="fas fa-download"></i>
+                <span>Exporter</span>
+              </button>
+            </div>
           </div>
           <div id="listening-heatmap-empty-charts" class="heatmap-empty-state">
             <i class="fas fa-database"></i>
@@ -896,6 +852,7 @@
           <div id="listening-heatmap-wrap-charts" class="listening-heatmap-wrap hidden"></div>
         </div>
 
+        </div><!-- /charts-stack -->
       </section>
 
       
@@ -1259,32 +1216,58 @@
               <div class="setting-row">
                 <span class="setting-lbl">
                   <i class="fas fa-palette"></i>
-                  <span data-i18n="settings.accent">Accent colour</span>
+                  <span data-i18n="settings.accent">Couleur d'accent</span>
                 </span>
                 <p class="hint hint--accent">
                   <i class="fas fa-info-circle"></i>
-                  <span data-i18n="settings.accentHint">Light accent tones are applied automatically in light mode for contrast.</span>
+                  <span>Les tons clairs / foncés s'ajustent automatiquement selon le thème.</span>
                 </p>
                 <div class="setting-ctrl accent-btns" id="accent-btns">
-                  <button class="acc-dot active" data-color="purple" style="background:#6750a4"
-                          onclick="setAccent('purple')" title="Purple"></button>
-                  <button class="acc-dot" data-color="blue" style="background:#0061a4"
-                          onclick="setAccent('blue')" title="Blue"></button>
-                  <button class="acc-dot" data-color="green" style="background:#006e1c"
-                          onclick="setAccent('green')" title="Green"></button>
-                  <button class="acc-dot" data-color="red" style="background:#ba1a1a"
-                          onclick="setAccent('red')" title="Red"></button>
-                  <button class="acc-dot" data-color="orange" style="background:#9c4e00"
+                  <button class="acc-dot active" data-color="purple" style="background:linear-gradient(135deg,#6750a4,#9c7fe0)"
+                          onclick="setAccent('purple')" title="Violet"></button>
+                  <button class="acc-dot" data-color="blue" style="background:linear-gradient(135deg,#0061a4,#5b9fd8)"
+                          onclick="setAccent('blue')" title="Bleu"></button>
+                  <button class="acc-dot" data-color="teal" style="background:linear-gradient(135deg,#006b66,#3aada8)"
+                          onclick="setAccent('teal')" title="Teal"></button>
+                  <button class="acc-dot" data-color="green" style="background:linear-gradient(135deg,#006e1c,#4caf50)"
+                          onclick="setAccent('green')" title="Vert"></button>
+                  <button class="acc-dot" data-color="yellow" style="background:linear-gradient(135deg,#6c5c00,#e8c84a)"
+                          onclick="setAccent('yellow')" title="Jaune"></button>
+                  <button class="acc-dot" data-color="orange" style="background:linear-gradient(135deg,#9c4e00,#ff8c42)"
                           onclick="setAccent('orange')" title="Orange"></button>
+                  <button class="acc-dot" data-color="red" style="background:linear-gradient(135deg,#ba1a1a,#ff5252)"
+                          onclick="setAccent('red')" title="Rouge"></button>
+                  <button class="acc-dot" data-color="pink" style="background:linear-gradient(135deg,#9c0057,#e91e8c)"
+                          onclick="setAccent('pink')" title="Rose"></button>
                   <button class="acc-dot acc-dot--dynamic" data-color="dynamic"
-                          onclick="setAccent('dynamic')" title="Dynamic (current album art)">
+                          onclick="setAccent('dynamic')" title="Dynamique (pochette en cours)">
                     <i class="fas fa-magic" style="font-size:8px;color:#fff"></i>
                   </button>
                   <label class="acc-dot acc-dot--custom" data-color="custom" id="acc-custom-wrap"
-                         title="Custom color" onclick="setAccent('custom')">
+                         title="Couleur personnalisée" onclick="setAccent('custom')">
                     <input type="color" id="acc-custom-input" value="#d0bcff"
                            oninput="setCustomAccent(this.value)">
                     <i class="fas fa-eyedropper" style="font-size:8px;color:#fff;pointer-events:none;position:relative;z-index:1"></i>
+                  </label>
+                </div>
+              </div>
+              <!-- Tinted background toggle -->
+              <div class="setting-row">
+                <span class="setting-lbl">
+                  <i class="fas fa-fill-drip"></i>
+                  <span>Fond teinté</span>
+                </span>
+                <p class="hint">
+                  <i class="fas fa-info-circle"></i>
+                  <span>Le fond de l'interface se teinte dans la couleur d'accent.</span>
+                </p>
+                <div class="setting-ctrl">
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="tint-bg-toggle" checked
+                           onchange="setTintedBackground(this.checked)">
+                    <span class="toggle-track">
+                      <span class="toggle-thumb"></span>
+                    </span>
                   </label>
                 </div>
               </div>
@@ -1350,32 +1333,6 @@
           
           <div class="settings-card">
             <div class="settings-card-hd">
-              <i class="fas fa-gift"></i>
-              <h3 data-i18n="settings.wrapped">Wrapped</h3>
-            </div>
-            <div class="settings-card-body">
-              <div class="setting-row">
-                <div class="setting-lbl-wrap">
-                  <span class="setting-lbl">
-                    <i class="fas fa-gift"></i>
-                    <span data-i18n="settings.wrappedTitle">Your annual music recap</span>
-                  </span>
-                  <p class="hint" data-i18n="settings.wrappedHint">Find your full Wrapped on the dedicated page: annual charts, podium, story, and shareable card.</p>
-                </div>
-                <div class="setting-ctrl">
-                  <a href="https://sanobld.github.io/LastStats/wrapped"
-                     target="_blank" rel="noopener" class="btn-wrapped-link">
-                    <i class="fas fa-external-link-alt"></i>
-                    <span data-i18n="settings.wrappedOpen">Open Wrapped</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          
-          <div class="settings-card">
-            <div class="settings-card-hd">
               <i class="fas fa-database"></i>
               <h3 data-i18n="settings.data">Data &amp; Export</h3>
             </div>
@@ -1425,20 +1382,56 @@
                   </span>
                 </div>
               </div>
-              <!-- New Year Wrapped Notification -->
-              <div class="setting-row">
-                <span class="setting-lbl">
-                  <i class="fas fa-bell"></i>
-                  New Year Wrapped Alert
-                </span>
-                <div class="setting-ctrl">
-                  <button class="btn-notif-wrapped" id="btn-notif-wrapped"
-                          onclick="requestNotificationAccess()"
-                          title="Enable Wrapped notification">
+              <!-- Notifications -->
+              <div class="setting-row setting-row--full">
+                <div class="setting-lbl-wrap">
+                  <span class="setting-lbl">
                     <i class="fas fa-bell"></i>
-                    <span>Enable Wrapped notification</span>
+                    <span>Notifications</span>
+                  </span>
+                  <p class="hint">Autorisez les notifications pour recevoir des rappels et récaps.</p>
+                </div>
+                <div class="setting-ctrl">
+                  <button class="btn-notif-wrapped" id="btn-notif-enable" onclick="requestNotificationAccess()">
+                    <i class="fas fa-bell"></i>
+                    <span id="btn-notif-label">Activer les notifications</span>
                   </button>
                 </div>
+              </div>
+              <!-- Notification options -->
+              <div class="notif-options-grid" id="notif-options-grid">
+                <label class="notif-opt">
+                  <input type="checkbox" id="notif-weekly" onchange="saveNotifPrefs()">
+                  <span class="notif-opt-icon">📊</span>
+                  <span class="notif-opt-body">
+                    <strong>Récap hebdomadaire</strong>
+                    <small>Chaque lundi — vos stats de la semaine passée</small>
+                  </span>
+                </label>
+                <label class="notif-opt">
+                  <input type="checkbox" id="notif-monthly" onchange="saveNotifPrefs()">
+                  <span class="notif-opt-icon">📅</span>
+                  <span class="notif-opt-body">
+                    <strong>Récap mensuel</strong>
+                    <small>Le 1er du mois — artistes et titres du mois</small>
+                  </span>
+                </label>
+                <label class="notif-opt">
+                  <input type="checkbox" id="notif-milestone" onchange="saveNotifPrefs()">
+                  <span class="notif-opt-icon">🎯</span>
+                  <span class="notif-opt-body">
+                    <strong>Jalons d'écoute</strong>
+                    <small>10k, 50k, 100k scrobbles et plus</small>
+                  </span>
+                </label>
+                <label class="notif-opt">
+                  <input type="checkbox" id="notif-wrapped" onchange="saveNotifPrefs()">
+                  <span class="notif-opt-icon">🎁</span>
+                  <span class="notif-opt-body">
+                    <strong>Wrapped annuel</strong>
+                    <small>Fin décembre — rappel pour votre récap de l'année</small>
+                  </span>
+                </label>
               </div>
               <!-- Force update -->
               <div class="setting-row setting-row--highlight">

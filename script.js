@@ -173,6 +173,7 @@ const APP = {
 
   currentTheme:  'dark',
   currentAccent: 'purple',
+  tintBg:        true,
   language:      window.I18N?.getLang?.() || 'fr',
   regYear:       new Date().getFullYear() - 5,
 
@@ -601,6 +602,49 @@ const saveSession  = () => { if (APP.username) localStorage.setItem('ls_username
 const clearSession = () => { localStorage.removeItem('ls_username'); localStorage.removeItem('ls_apikey'); };
 const loadSavedCredentials = () => ({ username: localStorage.getItem('ls_username') || '', apiKey: localStorage.getItem('ls_apikey') || '' });
 
+function setTintedBackground(enabled) {
+  localStorage.setItem('ls_tint_bg', enabled ? '1' : '0');
+  APP.tintBg = enabled;
+  const toggle = document.getElementById('tint-bg-toggle');
+  if (toggle) toggle.checked = enabled;
+
+  if (!enabled) {
+    // Restore plain backgrounds from CSS variable defaults
+    const r = document.documentElement.style;
+    const isDark = APP.currentTheme === 'dark' || (APP.currentTheme === 'auto' && window.matchMedia('(prefers-color-scheme:dark)').matches);
+    if (isDark) {
+      r.setProperty('--bg',                       '#141218');
+      r.setProperty('--bg-dim',                   '#0f0d13');
+      r.setProperty('--bg-card',                  '#1d1b20');
+      r.setProperty('--bg-card-hi',               '#211f26');
+      r.setProperty('--bg-sidebar',               '#1c1b1f');
+      r.setProperty('--bg-header',                '#1c1b1f');
+      r.setProperty('--bg-hover',                 '#2b2930');
+      r.setProperty('--bg-elevated',              '#36343b');
+      r.setProperty('--surface-container-low',    '#1d1b20');
+      r.setProperty('--surface-container',        '#211f26');
+      r.setProperty('--surface-container-high',   '#2b2930');
+      r.setProperty('--surface-container-highest','#36343b');
+    } else {
+      r.setProperty('--bg',                       '#f4f4f5');
+      r.setProperty('--bg-dim',                   '#e8e8ea');
+      r.setProperty('--bg-card',                  '#ffffff');
+      r.setProperty('--bg-card-hi',               '#ffffff');
+      r.setProperty('--bg-sidebar',               '#ffffff');
+      r.setProperty('--bg-header',                '#ffffff');
+      r.setProperty('--bg-hover',                 '#ececee');
+      r.setProperty('--bg-elevated',              '#e2e2e5');
+      r.setProperty('--surface-container-low',    '#f4f4f5');
+      r.setProperty('--surface-container',        '#eeeeef');
+      r.setProperty('--surface-container-high',   '#e8e8ea');
+      r.setProperty('--surface-container-highest','#e2e2e5');
+    }
+  } else {
+    // Re-apply hue tint
+    setAccent(APP.currentAccent || localStorage.getItem('ls_accent') || 'purple');
+  }
+}
+
 function setTheme(theme) {
   APP.currentTheme = theme;
   document.documentElement.dataset.theme = theme;
@@ -608,7 +652,13 @@ function setTheme(theme) {
   document.querySelectorAll('.th-btn').forEach(b => b.classList.toggle('active', b.dataset.t === theme));
   updateAllChartThemes();
   const accent = APP.currentAccent || localStorage.getItem('ls_accent') || 'purple';
-  if (accent && accent !== 'dynamic') setAccent(accent);
+  if (accent && accent !== 'dynamic') {
+    setAccent(accent); // re-applies palette + hue tint for new light/dark context
+  } else {
+    // dynamic: re-run colorThief with new darkness context
+    const npImg = document.querySelector('#np-art img');
+    if (npImg?.complete && npImg.naturalWidth > 0) _applyColorThiefFromEl(npImg);
+  }
 }
 
 function applyTheme(theme) {
@@ -666,18 +716,24 @@ function clearAppCache() {
 }
 
 const _ACCENT_DARK  = {
-  purple:{ accent:'#d0bcff', h:'#b89af7', a2:'#ccc2dc', container:'#4f378b', on:'#381e72', onCont:'#eaddff', glow:'rgba(208,188,255,.18)', lt:'rgba(208,188,255,.12)', strip:'rgba(208,188,255,.55)', borderGlow:'rgba(208,188,255,.35)' },
-  blue:  { accent:'#9ecaff', h:'#7bafef', a2:'#aab9cc', container:'#004a77', on:'#001d36', onCont:'#cde5ff', glow:'rgba(158,202,255,.18)', lt:'rgba(158,202,255,.12)', strip:'rgba(158,202,255,.55)', borderGlow:'rgba(158,202,255,.35)' },
-  green: { accent:'#78dc77', h:'#56bf55', a2:'#88bb88', container:'#1e5c1c', on:'#002105', onCont:'#94f990', glow:'rgba(120,220,119,.18)', lt:'rgba(120,220,119,.12)', strip:'rgba(120,220,119,.55)', borderGlow:'rgba(120,220,119,.35)' },
-  red:   { accent:'#ffb4ab', h:'#e08077', a2:'#c9b3b0', container:'#93000a', on:'#690005', onCont:'#ffdad6', glow:'rgba(255,180,171,.18)', lt:'rgba(255,180,171,.12)', strip:'rgba(255,180,171,.55)', borderGlow:'rgba(255,180,171,.35)' },
-  orange:{ accent:'#ffb77c', h:'#e09050', a2:'#c9aa90', container:'#6d3400', on:'#3d1d00', onCont:'#ffdcc0', glow:'rgba(255,183,124,.18)', lt:'rgba(255,183,124,.12)', strip:'rgba(255,183,124,.55)', borderGlow:'rgba(255,183,124,.35)' },
+  purple:{ hue:270, accent:'#d0bcff', h:'#b89af7', a2:'#ccc2dc', container:'#4f378b', on:'#381e72', onCont:'#eaddff', glow:'rgba(208,188,255,.18)', lt:'rgba(208,188,255,.12)', strip:'rgba(208,188,255,.55)', borderGlow:'rgba(208,188,255,.35)' },
+  blue:  { hue:210, accent:'#9ecaff', h:'#7bafef', a2:'#aab9cc', container:'#004a77', on:'#001d36', onCont:'#cde5ff', glow:'rgba(158,202,255,.18)', lt:'rgba(158,202,255,.12)', strip:'rgba(158,202,255,.55)', borderGlow:'rgba(158,202,255,.35)' },
+  green: { hue:130, accent:'#78dc77', h:'#56bf55', a2:'#88bb88', container:'#1e5c1c', on:'#002105', onCont:'#94f990', glow:'rgba(120,220,119,.18)', lt:'rgba(120,220,119,.12)', strip:'rgba(120,220,119,.55)', borderGlow:'rgba(120,220,119,.35)' },
+  red:   { hue:  4, accent:'#ffb4ab', h:'#e08077', a2:'#c9b3b0', container:'#93000a', on:'#690005', onCont:'#ffdad6', glow:'rgba(255,180,171,.18)', lt:'rgba(255,180,171,.12)', strip:'rgba(255,180,171,.55)', borderGlow:'rgba(255,180,171,.35)' },
+  orange:{ hue: 28, accent:'#ffb77c', h:'#e09050', a2:'#c9aa90', container:'#6d3400', on:'#3d1d00', onCont:'#ffdcc0', glow:'rgba(255,183,124,.18)', lt:'rgba(255,183,124,.12)', strip:'rgba(255,183,124,.55)', borderGlow:'rgba(255,183,124,.35)' },
+  pink:  { hue:330, accent:'#ffb2c8', h:'#e0809a', a2:'#ccb0bb', container:'#810042', on:'#520028', onCont:'#ffd9e3', glow:'rgba(255,178,200,.18)', lt:'rgba(255,178,200,.12)', strip:'rgba(255,178,200,.55)', borderGlow:'rgba(255,178,200,.35)' },
+  teal:  { hue:180, accent:'#80d8d0', h:'#55bdb5', a2:'#90c0bc', container:'#006060', on:'#003737', onCont:'#9ef1e8', glow:'rgba(128,216,208,.18)', lt:'rgba(128,216,208,.12)', strip:'rgba(128,216,208,.55)', borderGlow:'rgba(128,216,208,.35)' },
+  yellow:{ hue: 46, accent:'#e8c84a', h:'#c9a820', a2:'#c8b870', container:'#614400', on:'#3a2800', onCont:'#ffe08c', glow:'rgba(232,200,74,.18)',  lt:'rgba(232,200,74,.12)',  strip:'rgba(232,200,74,.55)',  borderGlow:'rgba(232,200,74,.35)'  },
 };
 const _ACCENT_LIGHT = {
-  purple:{ accent:'#6750a4', h:'#4f378b', a2:'#625b71', container:'#eaddff', on:'#ffffff', onCont:'#21005d', glow:'rgba(103,80,164,.3)',  lt:'rgba(103,80,164,.1)',  strip:'rgba(103,80,164,.50)', borderGlow:'rgba(103,80,164,.30)' },
-  blue:  { accent:'#0061a4', h:'#004a77', a2:'#3a6f8f', container:'#cde5ff', on:'#ffffff', onCont:'#001d36', glow:'rgba(0,97,164,.3)',    lt:'rgba(0,97,164,.1)',    strip:'rgba(0,97,164,.50)',   borderGlow:'rgba(0,97,164,.30)'   },
-  green: { accent:'#006e1c', h:'#004c13', a2:'#396b3e', container:'#94f990', on:'#ffffff', onCont:'#002105', glow:'rgba(0,110,28,.3)',    lt:'rgba(0,110,28,.1)',    strip:'rgba(0,110,28,.50)',   borderGlow:'rgba(0,110,28,.30)'   },
-  red:   { accent:'#ba1a1a', h:'#930014', a2:'#8c3a3a', container:'#ffdad6', on:'#ffffff', onCont:'#410002', glow:'rgba(186,26,26,.3)',   lt:'rgba(186,26,26,.1)',   strip:'rgba(186,26,26,.50)',  borderGlow:'rgba(186,26,26,.30)'  },
-  orange:{ accent:'#9c4e00', h:'#6d3400', a2:'#7a5030', container:'#ffdcc0', on:'#ffffff', onCont:'#3d1d00', glow:'rgba(156,78,0,.3)',    lt:'rgba(156,78,0,.1)',    strip:'rgba(156,78,0,.50)',   borderGlow:'rgba(156,78,0,.30)'   },
+  purple:{ hue:270, accent:'#6750a4', h:'#4f378b', a2:'#625b71', container:'#eaddff', on:'#ffffff', onCont:'#21005d', glow:'rgba(103,80,164,.3)',  lt:'rgba(103,80,164,.1)',  strip:'rgba(103,80,164,.50)', borderGlow:'rgba(103,80,164,.30)' },
+  blue:  { hue:210, accent:'#0061a4', h:'#004a77', a2:'#3a6f8f', container:'#cde5ff', on:'#ffffff', onCont:'#001d36', glow:'rgba(0,97,164,.3)',    lt:'rgba(0,97,164,.1)',    strip:'rgba(0,97,164,.50)',   borderGlow:'rgba(0,97,164,.30)'   },
+  green: { hue:130, accent:'#006e1c', h:'#004c13', a2:'#396b3e', container:'#94f990', on:'#ffffff', onCont:'#002105', glow:'rgba(0,110,28,.3)',    lt:'rgba(0,110,28,.1)',    strip:'rgba(0,110,28,.50)',   borderGlow:'rgba(0,110,28,.30)'   },
+  red:   { hue:  4, accent:'#ba1a1a', h:'#930014', a2:'#8c3a3a', container:'#ffdad6', on:'#ffffff', onCont:'#410002', glow:'rgba(186,26,26,.3)',   lt:'rgba(186,26,26,.1)',   strip:'rgba(186,26,26,.50)',  borderGlow:'rgba(186,26,26,.30)'  },
+  orange:{ hue: 28, accent:'#9c4e00', h:'#6d3400', a2:'#7a5030', container:'#ffdcc0', on:'#ffffff', onCont:'#3d1d00', glow:'rgba(156,78,0,.3)',    lt:'rgba(156,78,0,.1)',    strip:'rgba(156,78,0,.50)',   borderGlow:'rgba(156,78,0,.30)'   },
+  pink:  { hue:330, accent:'#9c0057', h:'#6e003b', a2:'#8c3b65', container:'#ffd9e3', on:'#ffffff', onCont:'#3e0022', glow:'rgba(156,0,87,.3)',    lt:'rgba(156,0,87,.1)',    strip:'rgba(156,0,87,.50)',   borderGlow:'rgba(156,0,87,.30)'   },
+  teal:  { hue:180, accent:'#006b66', h:'#004b47', a2:'#3a6b68', container:'#9ef1e8', on:'#ffffff', onCont:'#00201e', glow:'rgba(0,107,102,.3)',   lt:'rgba(0,107,102,.1)',   strip:'rgba(0,107,102,.50)',  borderGlow:'rgba(0,107,102,.30)'  },
+  yellow:{ hue: 46, accent:'#6c5c00', h:'#4a4000', a2:'#625e40', container:'#ffe08c', on:'#ffffff', onCont:'#201b00', glow:'rgba(108,92,0,.3)',    lt:'rgba(108,92,0,.1)',    strip:'rgba(108,92,0,.50)',   borderGlow:'rgba(108,92,0,.30)'   },
 };
 
 function setAccent(colorKey) {
@@ -709,7 +765,7 @@ function setAccent(colorKey) {
   updateAllChartThemes();
 }
 
-function _applyCSSAccent({ accent, h, a2, container, on, onCont, glow, lt, strip, borderGlow }) {
+function _applyCSSAccent({ accent, h, a2, container, on, onCont, glow, lt, strip, borderGlow, hue }) {
   const r = document.documentElement.style;
   r.setProperty('--accent',           accent);
   r.setProperty('--accent-h',         h         || accent);
@@ -721,6 +777,47 @@ function _applyCSSAccent({ accent, h, a2, container, on, onCont, glow, lt, strip
   r.setProperty('--accent-lt',        lt);
   r.setProperty('--accent-strip',     strip     || glow);
   r.setProperty('--border-glow',      borderGlow || glow);
+
+  // Tinted backgrounds based on hue angle
+  if (hue !== undefined && hue !== null) {
+    _applyHueTint(hue);
+  }
+}
+
+function _applyHueTint(hue) {
+  // Respect user toggle — default ON
+  if (APP.tintBg === false || localStorage.getItem('ls_tint_bg') === '0') return;
+  const isDark = APP.currentTheme === 'dark' || (APP.currentTheme === 'auto' && window.matchMedia('(prefers-color-scheme:dark)').matches);
+  const r = document.documentElement.style;
+  if (isDark) {
+    // Dark mode: very dark tinted surfaces
+    r.setProperty('--bg',                     `hsl(${hue},18%,7%)`);
+    r.setProperty('--bg-dim',                 `hsl(${hue},16%,5%)`);
+    r.setProperty('--bg-card',                `hsl(${hue},14%,11%)`);
+    r.setProperty('--bg-card-hi',             `hsl(${hue},13%,13%)`);
+    r.setProperty('--bg-sidebar',             `hsl(${hue},15%,10%)`);
+    r.setProperty('--bg-header',              `hsl(${hue},15%,10%)`);
+    r.setProperty('--bg-hover',               `hsl(${hue},14%,17%)`);
+    r.setProperty('--bg-elevated',            `hsl(${hue},13%,19%)`);
+    r.setProperty('--surface-container-low',  `hsl(${hue},14%,11%)`);
+    r.setProperty('--surface-container',      `hsl(${hue},14%,13%)`);
+    r.setProperty('--surface-container-high', `hsl(${hue},13%,17%)`);
+    r.setProperty('--surface-container-highest', `hsl(${hue},12%,21%)`);
+  } else {
+    // Light mode: very light tinted surfaces
+    r.setProperty('--bg',                     `hsl(${hue},30%,97%)`);
+    r.setProperty('--bg-dim',                 `hsl(${hue},25%,93%)`);
+    r.setProperty('--bg-card',                `hsl(${hue},20%,100%)`);
+    r.setProperty('--bg-card-hi',             `hsl(${hue},20%,100%)`);
+    r.setProperty('--bg-sidebar',             `hsl(${hue},20%,99%)`);
+    r.setProperty('--bg-header',              `hsl(${hue},20%,99%)`);
+    r.setProperty('--bg-hover',               `hsl(${hue},25%,92%)`);
+    r.setProperty('--bg-elevated',            `hsl(${hue},22%,88%)`);
+    r.setProperty('--surface-container-low',  `hsl(${hue},25%,96%)`);
+    r.setProperty('--surface-container',      `hsl(${hue},24%,93%)`);
+    r.setProperty('--surface-container-high', `hsl(${hue},23%,90%)`);
+    r.setProperty('--surface-container-highest', `hsl(${hue},22%,87%)`);
+  }
 }
 
 const _colorThief = typeof ColorThief !== 'undefined' ? new ColorThief() : null;
@@ -735,18 +832,19 @@ function _applyColorThiefFromEl(imgEl) {
   if (!_colorThief || !imgEl) return;
   try {
     const [r, g, b] = _colorThief.getColor(imgEl);
-    const h = _rgbToHsl(r, g, b)[0];
+    const hue = _rgbToHsl(r, g, b)[0];
     _applyCSSAccent({
-      accent:     `hsl(${h},65%,75%)`,
-      h:          `hsl(${h},60%,65%)`,
-      a2:         `hsl(${h},30%,72%)`,
-      container:  `hsl(${h},45%,28%)`,
-      on:         `hsl(${h},45%,14%)`,
-      onCont:     `hsl(${h},65%,90%)`,
-      glow:       `hsla(${h},65%,75%,.18)`,
-      lt:         `hsla(${h},65%,75%,.12)`,
-      strip:      `hsla(${h},65%,75%,.55)`,
-      borderGlow: `hsla(${h},65%,75%,.35)`,
+      hue,
+      accent:     `hsl(${hue},65%,75%)`,
+      h:          `hsl(${hue},60%,65%)`,
+      a2:         `hsl(${hue},30%,72%)`,
+      container:  `hsl(${hue},45%,28%)`,
+      on:         `hsl(${hue},45%,14%)`,
+      onCont:     `hsl(${hue},65%,90%)`,
+      glow:       `hsla(${hue},65%,75%,.18)`,
+      lt:         `hsla(${hue},65%,75%,.12)`,
+      strip:      `hsla(${hue},65%,75%,.55)`,
+      borderGlow: `hsla(${hue},65%,75%,.35)`,
     });
   } catch {}
 }
@@ -774,6 +872,7 @@ function _hexToPalette(hex, isDark) {
   const [h] = _rgbToHsl(rv, gv, bv);
   if (isDark) {
     return {
+      hue: h,
       accent:     `hsl(${h},65%,75%)`,
       h:          `hsl(${h},60%,65%)`,
       a2:         `hsl(${h},30%,72%)`,
@@ -787,6 +886,7 @@ function _hexToPalette(hex, isDark) {
     };
   } else {
     return {
+      hue: h,
       accent:     `hsl(${h},50%,40%)`,
       h:          `hsl(${h},55%,30%)`,
       a2:         `hsl(${h},25%,45%)`,
@@ -825,7 +925,6 @@ const NAV_TITLE_KEYS = {
   'top-albums':  'nav_top_albums',
   'top-tracks':  'nav_top_tracks',
   charts:        'nav_charts',
-  vizplus:       'nav_vizplus',
   obscurity:     'nav_obscurity',
   history:       'nav_history',
   wrapped:       'nav_wrapped',
@@ -1022,6 +1121,9 @@ window.addEventListener('DOMContentLoaded', () => {
   document.documentElement.dataset.theme = theme;
   APP.currentTheme = theme;
 
+  // Init tinted background setting
+  APP.tintBg = localStorage.getItem('ls_tint_bg') !== '0';
+
   // Apply saved language
   const lang = localStorage.getItem('ls_lang') || window.I18N?.getLang?.() || 'fr';
   APP.language = lang;
@@ -1085,7 +1187,6 @@ function nav(section) {
     if (window.innerWidth <= 1024) closeSb();
 
     if (section === 'charts')    setupChartsSection();
-    if (section === 'vizplus' && !_vizPlusLoaded) loadVizPlus();
     if (section === 'obscurity') loadObscurityScore();
     if (section === 'history')   histLoadDay(APP.histCurrentDate || _todayStr());
     if (section === 'compare')   initComparePage();
@@ -1418,69 +1519,143 @@ async function _resolveTopCardImg(cardId, type, name, artist) {
     if (!el) return;
     const bgEl = el.querySelector('.ptc-bg');
     if (!bgEl) return;
-
-    // Si déjà une vraie image chargée, ne pas remplacer
-    const current = bgEl.style.backgroundImage;
-    if (current && current !== 'none' && !current.includes('undefined') && current !== 'url("")') return;
-
     let img = '';
 
     if (type === 'artist') {
-      /* Cascade multi-API : Wikipedia → iTunes → TheAudioDB */
-      img = await _resolveArtistImageExternal(name) || '';
-      /* Dernier recours : pochette du top album Last.fm */
+      // 1. Wikipedia EN
+      try {
+        const r = await fetch(
+          `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(name)}&prop=pageimages&format=json&pithumbsize=800&origin=*`,
+          { signal: AbortSignal.timeout(5000) }
+        );
+        if (r.ok) {
+          const d = await r.json();
+          for (const page of Object.values(d.query?.pages || {})) {
+            if (page.thumbnail?.source && !page.missing) { img = page.thumbnail.source; break; }
+          }
+        }
+      } catch {}
+      // 2. Wikipedia FR
+      if (!img) {
+        try {
+          const r = await fetch(
+            `https://fr.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(name)}&prop=pageimages&format=json&pithumbsize=800&origin=*`,
+            { signal: AbortSignal.timeout(4000) }
+          );
+          if (r.ok) {
+            const d = await r.json();
+            for (const page of Object.values(d.query?.pages || {})) {
+              if (page.thumbnail?.source && !page.missing) { img = page.thumbnail.source; break; }
+            }
+          }
+        } catch {}
+      }
+      // 3. iTunes artist
+      if (!img) {
+        try {
+          const r = await fetch(
+            `https://itunes.apple.com/search?term=${encodeURIComponent(name)}&entity=musicArtist&limit=5`,
+            { signal: AbortSignal.timeout(5000) }
+          );
+          if (r.ok) {
+            const d = await r.json();
+            const exact = d.results?.find(a => a.artistName?.toLowerCase() === name.toLowerCase());
+            const hit   = exact || d.results?.[0];
+            if (hit?.artworkUrl100) img = hit.artworkUrl100.replace('100x100bb','600x600bb');
+          }
+        } catch {}
+      }
+      // 4. TheAudioDB
+      if (!img) {
+        try {
+          const r = await fetch(`https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(name)}`,
+            { signal: AbortSignal.timeout(4000) });
+          if (r.ok) img = (await r.json()).artists?.[0]?.strArtistThumb || '';
+        } catch {}
+      }
+      // 5. Last.fm top album cover
       if (!img || isDefaultImg(img)) {
         try {
-          const d = await API.call('artist.getTopAlbums', { artist: name, limit: 3, autocorrect: 1 });
+          const d = await API.call('artist.getTopAlbums', { artist: name, limit: 5, autocorrect: 1 });
           for (const alb of (d.topalbums?.album || [])) {
             const u = alb.image?.find(x => x.size === 'extralarge')?.['#text']
                    || alb.image?.find(x => x.size === 'large')?.['#text'] || '';
-            if (!isDefaultImg(u)) { img = u; break; }
+            if (u && !isDefaultImg(u)) { img = u; break; }
           }
         } catch {}
       }
 
     } else if (type === 'album') {
-      /* 1. album.getInfo Last.fm → stocke le MBID pour Cover Art Archive */
+      // 1. iTunes album (fast, CORS native)
       try {
-        const d = await API.call('album.getInfo', { album: name, artist: artist || '', autocorrect: 1 });
-        if (d?.album?.mbid) _storeMbid('album', name, d.album.mbid);
-        if (d?.album?.artist && d?.album?.mbid) _storeMbid('artist', d.album.artist, d.album.mbid);
-        img = d?.album?.image?.find(x => x.size === 'extralarge')?.['#text']
-           || d?.album?.image?.find(x => x.size === 'large')?.['#text'] || '';
+        const q = artist ? `${artist} ${name}` : name;
+        const r = await fetch(
+          `https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=8`,
+          { signal: AbortSignal.timeout(5000) }
+        );
+        if (r.ok) {
+          const d = await r.json();
+          const exact = d.results?.find(x =>
+            x.collectionName?.toLowerCase().includes(name.toLowerCase()) ||
+            name.toLowerCase().includes((x.collectionName || '').toLowerCase())
+          );
+          const hit = exact || d.results?.[0];
+          if (hit?.artworkUrl100) img = hit.artworkUrl100.replace('100x100bb','600x600bb').replace('/100x100/','/600x600/');
+        }
       } catch {}
-      /* 2. Fallback Cover Art Archive (MBID) → iTunes */
+      // 2. Last.fm album.getInfo
+      if (!img || isDefaultImg(img)) {
+        try {
+          const d = await API.call('album.getInfo', { album: name, artist: artist || '', autocorrect: 1 });
+          if (d?.album?.mbid) _storeMbid('album', name, d.album.mbid);
+          const u = d?.album?.image?.find(x => x.size === 'extralarge')?.['#text']
+                 || d?.album?.image?.find(x => x.size === 'large')?.['#text'] || '';
+          if (u && !isDefaultImg(u)) img = u;
+        } catch {}
+      }
+      // 3. Cover Art Archive via MBID
       if (!img || isDefaultImg(img)) img = await _fetchAlbumImageWithMbid(name, artist) || '';
 
     } else if (type === 'track') {
-      /* 1. track.getInfo Last.fm → stocke MBIDs */
+      // 1. iTunes track (fast)
       try {
-        const d = await API.call('track.getInfo', { track: name, artist: artist || '', autocorrect: 1 });
-        if (d?.track?.mbid) _storeMbid('track', name, d.track.mbid);
-        if (d?.track?.artist?.mbid) _storeMbid('artist', artist || name, d.track.artist.mbid);
-        if (d?.track?.album?.mbid) _storeMbid('album', d.track.album.title || '', d.track.album.mbid);
-        img = d?.track?.album?.image?.find(x => x.size === 'extralarge')?.['#text']
-           || d?.track?.album?.image?.find(x => x.size === 'large')?.['#text'] || '';
+        const q = artist ? `${artist} ${name}` : name;
+        const r = await fetch(
+          `https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=8`,
+          { signal: AbortSignal.timeout(5000) }
+        );
+        if (r.ok) {
+          const d = await r.json();
+          const exact = d.results?.find(x =>
+            x.trackName?.toLowerCase().includes(name.toLowerCase()) ||
+            name.toLowerCase().includes((x.trackName || '').toLowerCase())
+          );
+          const hit = exact || d.results?.[0];
+          if (hit?.artworkUrl100) img = hit.artworkUrl100.replace('100x100bb','600x600bb').replace('/100x100/','/600x600/');
+        }
       } catch {}
-      /* 2. iTunes pour la pochette */
-      if (!img || isDefaultImg(img)) img = await _fetchTrackImageiTunes(name, artist) || '';
-      /* 3. Dernier recours : top album de l'artiste */
-      if (!img || isDefaultImg(img) && artist) {
+      // 2. Last.fm track.getInfo
+      if (!img || isDefaultImg(img)) {
         try {
-          const d = await API.call('artist.getTopAlbums', { artist, limit: 1, autocorrect: 1 });
-          const u = d?.topalbums?.album?.[0]?.image?.find(x => x.size === 'extralarge')?.['#text'] || '';
-          if (!isDefaultImg(u)) img = u;
+          const d = await API.call('track.getInfo', { track: name, artist: artist || '', autocorrect: 1 });
+          const u = d?.track?.album?.image?.find(x => x.size === 'extralarge')?.['#text']
+                 || d?.track?.album?.image?.find(x => x.size === 'large')?.['#text'] || '';
+          if (u && !isDefaultImg(u)) img = u;
         } catch {}
+      }
+      // 3. Fallback: artist image via Wikipedia
+      if ((!img || isDefaultImg(img)) && artist) {
+        img = await _resolveArtistImageExternal(artist) || '';
       }
     }
 
     if (img && !isDefaultImg(img)) {
       bgEl.style.backgroundImage = `url('${escHtml(img)}')`;
-      bgEl.style.removeProperty('background');
+      bgEl.style.backgroundSize = 'cover';
+      bgEl.style.backgroundPosition = 'center';
     }
   } catch {}
 }
-
 async function _resolveProfileTrackImg(tr, index) {
   try {
     const thumbEl = document.getElementById(`ptrack-thumb-${index}`);
@@ -1567,7 +1742,7 @@ function _renderProfileTopCard(id, icon, label, name, plays, imageArr, sub) {
   el.onkeydown = lfmUrl ? (e) => { if (e.key === 'Enter') window.open(lfmUrl, '_blank', 'noopener'); } : null;
 
   el.innerHTML = `
-    <div class="ptc-bg" style="${hasImg ? `background-image:url('${escHtml(imgRaw)}')` : `background:${grad}`}"></div>
+    <div class="ptc-bg" style="${hasImg ? `background-image:url('${escHtml(imgRaw)}')` : `background-image:none;background:${grad}`}"></div>
     <div class="ptc-overlay"></div>
     <div class="ptc-content">
       <span class="ptc-label"><i class="fas fa-${icon}"></i> ${label}</span>
@@ -2862,6 +3037,10 @@ function setupChartsSection() {
     if (hourlyHint)  hourlyHint.textContent  = '';
     if (weekdayHint) weekdayHint.textContent = '';
     document.getElementById('ohw-empty')?.style.setProperty('display', 'none');
+
+    // ← Fix: render heatmap calendar in charts tab
+    _buildCalHeatmapYearSel('charts');
+    renderListeningHeatmap(currentYear, 'charts');
   } else {
     // show empty state for one-hit wonders
     const ohwEmpty = document.getElementById('ohw-empty');
@@ -2872,7 +3051,6 @@ function setupChartsSection() {
 
   // auto-render all charts
   setTimeout(() => {
-    loadVizPlus();
     loadMusicalProfile();
   }, 1200);
 }
@@ -3887,7 +4065,10 @@ function _renderHourlyChart(hourCounts) {
 function _buildCalHeatmapYearSel(suffix = '') {
   const id  = suffix ? `cal-heatmap-yr-sel-${suffix}` : 'cal-heatmap-yr-sel';
   const sel = document.getElementById(id);
-  if (!sel || sel.options.length > 0) return;
+  if (!sel) return;
+  // Always rebuild for 'charts' suffix to ensure it's in sync; skip rebuild only for dashboard if already done
+  if (suffix === '' && sel.options.length > 0) return;
+  sel.innerHTML = '';
   const currentYear = new Date().getFullYear();
   for (let y = currentYear; y >= APP.regYear; y--) {
     const opt      = document.createElement('option');
@@ -4096,8 +4277,7 @@ async function refreshData() {
     if (activeSection === 'top-artists') await loadTopArtists(APP.artistsPeriod || 'overall');
     if (activeSection === 'top-albums')  await loadTopAlbums(APP.albumsPeriod   || 'overall');
     if (activeSection === 'top-tracks')  await loadTopTracks(APP.tracksPeriod   || 'overall');
-    if (activeSection === 'charts')      { _vizPlusLoaded = false; setupChartsSection(); }
-    if (activeSection === 'vizplus')     { _vizPlusLoaded = false; loadVizPlus(); }
+    if (activeSection === 'charts'){ setupChartsSection(); }
     if (activeSection === 'obscurity')   loadObscurityScore();
 
     showToast(t('toast_data_updated'));
@@ -4302,363 +4482,6 @@ function shareTrack(name, artist, plays, url) {
   _shareOrCopy(`${name} — ${artist}`, text, url || `https://www.last.fm/music/${encodeURIComponent(artist)}/_/${encodeURIComponent(name)}`);
 }
 
-let _vizPlusLoaded = false;
-
-async function loadVizPlus() {
-  if (_vizPlusLoaded) return; // already computed — use generateVizPlus() to force reload
-
-  const statusEl  = document.getElementById('vizplus-status');
-  const statusTxt = document.getElementById('vizplus-status-txt');
-  const radarHint = document.getElementById('radar-status-hint');
-  const genBtn    = document.getElementById('vizplus-gen-btn');
-
-  if (statusEl) statusEl.classList.remove('hidden');
-  if (radarHint) radarHint.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:.75rem;margin-right:4px"></i>';
-  if (genBtn) { genBtn.disabled = true; genBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
-
-  try {
-    if (statusTxt) statusTxt.textContent = t('loading');
-    await _buildRadarChart();  // internally calls _buildSunburst()
-    await _buildTreemap();
-    await _buildSankey();
-    if (statusEl) statusEl.classList.add('hidden');
-    if (radarHint) radarHint.innerHTML = '<i class="fas fa-check" style="font-size:.75rem;margin-right:3px;color:#4ade80"></i>';
-    if (genBtn) { genBtn.disabled = false; genBtn.innerHTML = '<i class="fas fa-sync-alt"></i> <span>' + t('profile_reload') + '</span>'; }
-    _vizPlusLoaded = true;
-  } catch (e) {
-    console.error('loadVizPlus:', e);
-    if (statusTxt) statusTxt.textContent = t('obs_error', e.message);
-    if (radarHint) radarHint.innerHTML = '';
-    if (genBtn) { genBtn.disabled = false; genBtn.innerHTML = '<i class="fas fa-play"></i> <span>' + t('charts_generate') + '</span>'; }
-    setTimeout(() => statusEl?.classList.add('hidden'), 3500);
-  }
-}
-
-/** Called by the "Générer" button — forces a full rebuild */
-function generateVizPlus() {
-  _vizPlusLoaded = false;
-
-  // Reset placeholders so the user sees loading state
-  ['vizplus-radar-wrap','vizplus-sunburst-wrap','vizplus-treemap-wrap','vizplus-sankey-wrap'].forEach(id => {
-    document.getElementById(id)?.classList.add('hidden');
-  });
-  ['vizplus-radar-ph','vizplus-sunburst-ph'].forEach(id => {
-    document.getElementById(id)?.classList.remove('hidden');
-  });
-
-  loadVizPlus();
-}
-
-async function _buildRadarChart() {
-  const phEl = document.getElementById('vizplus-radar-ph');
-  const wrap = document.getElementById('vizplus-radar-wrap');
-
-  let topArtists = APP.topArtistsData.length
-    ? APP.topArtistsData.slice(0, 20)
-    : (await API.call('user.getTopArtists', { period:'overall', limit:20 })).topartists?.artist || [];
-
-  // Broad genre taxonomy — maps any tag substring to a canonical category
-  const GENRE_MAP = {
-    'Rock':        ['rock','punk','grunge','post-rock','emo','hardcore','alternative','alt-rock','indie rock','garage','shoegaze','britpop'],
-    'Pop':         ['pop','dance pop','synth-pop','electropop','teen pop','k-pop','j-pop','bubblegum','mainstream'],
-    'Électro':     ['electronic','electronica','techno','house','trance','edm','dubstep','drum and bass','ambient','idm','synthwave','chillwave','downtempo','trip-hop','electro'],
-    'Hip-Hop':     ['hip-hop','hip hop','rap','trap','drill','grime','rnb','r&b','soul','neo soul','urban'],
-    'Metal':       ['metal','heavy metal','death metal','black metal','doom','thrash','metalcore','progressive metal','power metal'],
-    'Jazz':        ['jazz','blues','swing','bebop','fusion','soul jazz','acid jazz'],
-    'Classique':   ['classical','classic','baroque','romantic','opera','orchestra','chamber','piano','symphon'],
-    'Indie':       ['indie','lo-fi','lo fi','bedroom pop','dream pop','slowcore','math rock','post-punk'],
-    'Folk':        ['folk','country','bluegrass','americana','singer-songwriter','acoustic','roots'],
-    'Expérimental':['experimental','avant-garde','noise','post-modern','abstract','free jazz','art rock'],
-  };
-
-  const categories = Object.keys(GENRE_MAP);
-  const scores = Object.fromEntries(categories.map(c => [c, 0]));
-  const IGNORED = new Set(['seen live','favorites','favourite','love','awesome','all','good','new','old','best','epic','spotify','youtube']);
-
-  const tagResults = await Promise.allSettled(topArtists.map(a => API.call('artist.getTopTags', { artist: a.name })));
-
-  tagResults.forEach((res, i) => {
-    if (res.status !== 'fulfilled') return;
-    const tags   = res.value.toptags?.tag || [];
-    const weight = Math.max(1, topArtists.length - i);
-    tags.slice(0, 12).forEach(tag => {
-      const name = (tag.name || '').toLowerCase().trim();
-      if (IGNORED.has(name) || name.length < 2) return;
-      const tagScore = (parseInt(tag.count) || 20) * weight;
-      for (const [cat, keywords] of Object.entries(GENRE_MAP)) {
-        if (keywords.some(kw => name.includes(kw) || kw.includes(name))) {
-          scores[cat] += tagScore;
-          break;
-        }
-      }
-    });
-  });
-
-  // Fallback: if everything is 0, use raw top tags as radar axes
-  let labels, data;
-  if (Object.values(scores).every(v => v === 0)) {
-    const rawTagMap = new Map();
-    tagResults.forEach((res, i) => {
-      if (res.status !== 'fulfilled') return;
-      const tags   = res.value.toptags?.tag || [];
-      const weight = Math.max(1, topArtists.length - i);
-      tags.slice(0, 5).forEach(tag => {
-        const name = (tag.name || '').trim();
-        if (!name || IGNORED.has(name.toLowerCase()) || name.length < 2) return;
-        const normalized = name.charAt(0).toUpperCase() + name.slice(1);
-        rawTagMap.set(normalized, (rawTagMap.get(normalized) || 0) + (parseInt(tag.count) || 20) * weight);
-      });
-    });
-    const sorted = [...rawTagMap.entries()].sort((a,b) => b[1]-a[1]).slice(0, 10);
-    if (!sorted.length) {
-      if (phEl) { phEl.classList.remove('hidden'); phEl.innerHTML = `<i class="fas fa-spider fa-2x"></i><p>${t('unavailable')}</p>`; }
-      return;
-    }
-    labels = sorted.map(([l]) => l);
-    data   = sorted.map(([,v]) => v);
-  } else {
-    // Filter out zero-score categories for cleaner chart
-    const active = categories.filter(c => scores[c] > 0);
-    labels = active;
-    data   = active.map(c => scores[c]);
-  }
-
-  if (phEl) phEl.classList.add('hidden');
-  if (wrap) wrap.classList.remove('hidden');
-
-  destroyChart('chart-radar');
-  const c = getThemeColors();
-  APP.charts['chart-radar'] = new Chart(document.getElementById('chart-radar'), {
-    type: 'radar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Genres',
-        data,
-        backgroundColor: 'rgba(99,102,241,.18)',
-        borderColor: '#6366f1',
-        pointBackgroundColor: CHART_PALETTE,
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2,
-        pointRadius: 5,
-        borderWidth: 2,
-      }],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: { duration: 900, easing: 'easeOutQuart' },
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw.toLocaleString()}` } },
-      },
-      scales: {
-        r: {
-          grid:        { color: c.grid },
-          ticks:       { color: c.text, font: { size: 9 }, backdropColor: 'transparent', maxTicksLimit: 4 },
-          pointLabels: { color: c.text, font: { size: 11, weight: '600' } },
-          beginAtZero: true,
-        },
-      },
-    },
-  });
-
-  await _buildSunburst();
-}
-
-async function _buildSunburst() {
-  const phEl   = document.getElementById('vizplus-sunburst-ph');
-  const wrapEl = document.getElementById('vizplus-sunburst-wrap');
-  const svgEl  = document.getElementById('chart-sunburst');
-  if (!svgEl) return;
-
-  const artists = APP.topArtistsData.length
-    ? APP.topArtistsData.slice(0, 20)
-    : (await API.call('user.getTopArtists', { period:'overall', limit:20 })).topartists?.artist || [];
-
-  const IGNORED  = new Set(['seen live','favorites','favourite','love','awesome','all','good','new','old','best','epic']);
-  const genreMap = new Map();
-
-  const tagResults = await Promise.allSettled(artists.map(a => API.call('artist.getTopTags', { artist:a.name })));
-  tagResults.forEach((res, i) => {
-    if (res.status !== 'fulfilled') return;
-    const tags  = (res.value.toptags?.tag || []).slice(0, 4);
-    const artist= artists[i];
-    const plays = parseInt(artist.playcount || 1);
-    tags.forEach(tag => {
-      const g = (tag.name || '').toLowerCase().trim();
-      if (!g || g.length < 2 || IGNORED.has(g)) return;
-      if (!genreMap.has(g)) genreMap.set(g, new Map());
-      const aMap = genreMap.get(g);
-      aMap.set(artist.name, (aMap.get(artist.name) || 0) + plays);
-    });
-  });
-
-  const topGenres = [...genreMap.entries()]
-    .map(([g, aMap]) => ({ g, total:[...aMap.values()].reduce((a,b) => a+b, 0) }))
-    .sort((a,b) => b.total - a.total).slice(0, 8).map(({ g }) => g);
-
-  if (!topGenres.length) {
-    if (phEl) { phEl.classList.remove('hidden'); const p = phEl.querySelector('p'); if (p) p.textContent = t('unavailable'); }
-    return;
-  }
-
-  const rootData = {
-    name: 'Genres',
-    children: topGenres.map((genre, gi) => ({
-      name: genre.charAt(0).toUpperCase() + genre.slice(1),
-      color: CHART_PALETTE[gi % CHART_PALETTE.length],
-      children: [...genreMap.get(genre).entries()].sort((a,b) => b[1]-a[1]).slice(0, 5).map(([artist, plays]) => ({ name:artist, value:plays })),
-    })),
-  };
-
-  if (phEl)   phEl.classList.add('hidden');
-  if (wrapEl) wrapEl.classList.remove('hidden');
-
-  if (typeof d3 === 'undefined') return;
-
-  const container = svgEl.parentElement;
-  const size      = Math.min(container?.clientWidth || 500, 500);
-  const radius    = size / 2;
-
-  d3.select(svgEl).selectAll('*').remove();
-  const svg = d3.select(svgEl).attr('width', size).attr('height', size);
-  const g   = svg.append('g').attr('transform', `translate(${radius},${radius})`);
-
-  const hierarchy = d3.hierarchy(rootData).sum(d => d.value || 0);
-  const partition = d3.partition().size([2 * Math.PI, radius]);
-  const root      = partition(hierarchy);
-
-  const arc = d3.arc()
-    .startAngle(d => d.x0).endAngle(d => d.x1)
-    .innerRadius(d => d.y0).outerRadius(d => d.y1 - 2);
-
-  const centerText = svg.append('text')
-    .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
-    .attr('transform', `translate(${radius},${radius})`)
-    .attr('fill', getThemeColors().text).attr('font-size', '11px').text('');
-
-  g.selectAll('path')
-    .data(root.descendants().filter(d => d.depth))
-    .join('path')
-    .attr('d', arc)
-    .attr('fill', d => { let node = d; while (node.depth > 1) node = node.parent; return node.data.color || '#6366f1'; })
-    .attr('opacity', d => 1 - d.depth * 0.15)
-    .attr('stroke', '#1a1033').attr('stroke-width', 1)
-    .style('cursor', 'pointer')
-    .on('mouseover', (_, d) => { centerText.text(d.data.name); })
-    .on('mouseout', () => { centerText.text(''); })
-    .append('title').text(d => `${d.data.name}: ${formatNum(d.value)}`);
-}
-
-async function _buildTreemap() {
-  const phEl = document.getElementById('vizplus-treemap-ph');
-  const wrap = document.getElementById('vizplus-treemap-wrap');
-
-  let artists = APP.topArtistsData;
-  if (artists.length < 20) {
-    const d = await API.call('user.getTopArtists', { period:'overall', limit:100 });
-    artists = d.topartists?.artist || [];
-    APP.topArtistsData = artists;
-  }
-  const top100 = artists.slice(0, 100);
-  if (!top100.length) return;
-
-  if (phEl) phEl.classList.add('hidden');
-  if (wrap) wrap.classList.remove('hidden');
-
-  const treeData = top100.map((a, i) => ({ label:a.name, value:parseInt(a.playcount) || 1, color:CHART_PALETTE[i % CHART_PALETTE.length] + 'cc' }));
-  destroyChart('chart-treemap');
-  APP.charts['chart-treemap'] = new Chart(document.getElementById('chart-treemap'), {
-    type:'treemap',
-    data:{ datasets:[{ tree:treeData, key:'value', labels:{ display:true, formatter:ctx => ctx.raw?.g?.label || '', color:'#fff', font:{ size:10 } }, backgroundColor:ctx => ctx.raw?.g?.color || '#6366f1cc', borderColor:'transparent', borderWidth:1, spacing:1 }] },
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:ctx => ` ${ctx.raw?.g?.label}: ${formatNum(ctx.raw?.g?.value)}` } } } },
-  });
-}
-
-async function _buildSankey() {
-  const phEl = document.getElementById('vizplus-sankey-ph');
-  const wrap = document.getElementById('vizplus-sankey-wrap');
-  const svgEl= document.getElementById('chart-sankey');
-  if (!svgEl) return;
-
-  const history = APP.fullHistory;
-  if (!history?.length) {
-    if (phEl) { phEl.classList.remove('hidden'); const p = phEl.querySelector('p'); if (p) p.textContent = t('fetch_btn_refresh') + ' required'; }
-    return;
-  }
-
-  const transitions = new Map();
-  let prevArtist = '', prevTs = 0;
-
-  for (const tr of history) {
-    const ts     = parseInt(tr.date?.uts || 0);
-    const artist = (tr.artist?.['#text'] || tr.artist?.name || '').trim();
-    if (!artist || !ts) { prevArtist = artist; prevTs = ts; continue; }
-    if (prevArtist && prevArtist !== artist && ts - prevTs < 3600) {
-      const key = `${prevArtist}→${artist}`;
-      transitions.set(key, (transitions.get(key) || 0) + 1);
-    }
-    prevArtist = artist; prevTs = ts;
-  }
-
-  const topLinks  = [...transitions.entries()].sort((a,b) => b[1]-a[1]).slice(0, 30);
-  if (!topLinks.length) {
-    if (phEl) { phEl.classList.remove('hidden'); const p = phEl.querySelector('p'); if (p) p.textContent = t('unavailable'); }
-    if (wrap) wrap.classList.add('hidden');
-    return;
-  }
-
-  const nodeNames = [...new Set(topLinks.flatMap(([k]) => k.split('→')))];
-  const nodeIdx   = Object.fromEntries(nodeNames.map((n,i) => [n,i]));
-  const nodes     = nodeNames.map(n => ({ name:n }));
-  const links     = topLinks.map(([k,v]) => {
-    const [src, tgt] = k.split('→');
-    if (nodeIdx[src] === undefined || nodeIdx[tgt] === undefined) return null;
-    return { source:nodeIdx[src], target:nodeIdx[tgt], value:v };
-  }).filter(Boolean);
-
-  const contSize  = Math.min(svgEl.parentElement?.clientWidth || 500, 500);
-
-  if (typeof d3 === 'undefined' || typeof d3.sankey === 'undefined') {
-    if (phEl) { phEl.classList.remove('hidden'); const p = phEl.querySelector('p'); if (p) p.textContent = 'D3 Sankey unavailable'; }
-    return;
-  }
-
-  if (phEl) phEl.classList.add('hidden');
-  if (wrap) wrap.classList.remove('hidden');
-
-  d3.select(svgEl).selectAll('*').remove();
-  const margin = { top:10, right:10, bottom:10, left:10 };
-  const width  = contSize - margin.left - margin.right;
-  const height = Math.min(contSize, 400) - margin.top - margin.bottom;
-
-  const gEl = d3.select(svgEl)
-    .attr('width', contSize).attr('height', Math.min(contSize, 400))
-    .append('g').attr('transform', `translate(${margin.left},${margin.top})`);
-
-  const sankey = d3.sankey().nodeWidth(15).nodePadding(10).size([width, height]);
-  const graph  = sankey({ nodes:nodes.map(d => ({...d})), links:links.map(d => ({...d})) });
-
-  gEl.append('g').selectAll('path').data(graph.links).join('path')
-    .attr('d', d3.sankeyLinkHorizontal())
-    .attr('stroke', (d,i) => CHART_PALETTE[i % CHART_PALETTE.length])
-    .attr('stroke-width', d => Math.max(1, d.width))
-    .attr('fill', 'none').attr('opacity', 0.45);
-
-  gEl.append('g').selectAll('rect').data(graph.nodes).join('rect')
-    .attr('x', d => d.x0).attr('y', d => d.y0)
-    .attr('height', d => d.y1 - d.y0).attr('width', d => d.x1 - d.x0)
-    .attr('fill', (_,i) => CHART_PALETTE[i % CHART_PALETTE.length])
-    .append('title').text(d => d.name);
-
-  gEl.append('g').selectAll('text').data(graph.nodes).join('text')
-    .attr('x', d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
-    .attr('y', d => (d.y1 + d.y0) / 2).attr('dy', '0.35em')
-    .attr('text-anchor', d => d.x0 < width / 2 ? 'start' : 'end')
-    .attr('font-size', '11px').attr('fill', getThemeColors().text)
-    .text(d => d.name.length > 18 ? d.name.slice(0, 16) + '…' : d.name);
-}
 
 async function loadMusicalProfile() {
   const phEl   = document.getElementById('profile-placeholder');
@@ -4979,6 +4802,17 @@ function syncSettingsFields() {
   document.querySelectorAll('.th-btn').forEach(b => b.classList.toggle('active', b.dataset.t === APP.currentTheme));
   document.querySelectorAll('.acc-dot').forEach(b => b.classList.toggle('active', b.dataset.color === APP.currentAccent));
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === APP.language));
+
+  // Tinted background toggle
+  APP.tintBg = localStorage.getItem('ls_tint_bg') !== '0';
+  const tintToggle = document.getElementById('tint-bg-toggle');
+  if (tintToggle) tintToggle.checked = APP.tintBg;
+
+  // Notifications
+  _syncNotifBtn();
+  _syncNotifOptions();
+  loadNotifPrefs();
+  _checkScheduledNotifs();
 }
 
 function saveSettings() {
@@ -4999,6 +4833,75 @@ function saveSettings() {
     initApp(newUser, newKey);
   } else {
     showToast(t('toast_settings_saved'));
+  }
+}
+
+/**
+ * Exporte le calendrier d'écoute (heatmap) en image PNG via html2canvas.
+ */
+async function exportHeatmapAsImage() {
+  const wrapEl = document.getElementById('listening-heatmap-wrap-charts');
+  if (!wrapEl || wrapEl.classList.contains('hidden')) {
+    showToast('Chargez l\'historique complet pour afficher le calendrier.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('heatmap-export-btn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
+
+  try {
+    const inner = wrapEl.querySelector('.cal-heatmap-inner') || wrapEl;
+    const year  = document.getElementById('cal-heatmap-yr-sel-charts')?.value || new Date().getFullYear();
+
+    // Compute exact dimensions
+    const rect = inner.getBoundingClientRect();
+    const pad  = 24;
+
+    const canvas = await html2canvas(inner, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#141218',
+      logging: false,
+      width:  rect.width  + pad * 2,
+      height: rect.height + pad * 2,
+      x: -pad,
+      y: -pad,
+    });
+
+    // Add a branded frame
+    const out    = document.createElement('canvas');
+    const fw     = canvas.width;
+    const fh     = canvas.height + 60; // space for title
+    out.width    = fw;
+    out.height   = fh;
+    const ctx    = out.getContext('2d');
+
+    const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#141218';
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, fw, fh);
+
+    // Title
+    const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#d0bcff';
+    ctx.fillStyle = accent;
+    ctx.font = `bold ${28}px Inter, system-ui, sans-serif`;
+    ctx.fillText(`🎵  Calendrier d'Écoute ${year}`, 32, 42);
+
+    // Heatmap
+    ctx.drawImage(canvas, 0, 60);
+
+    // Footer watermark
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.font = `12px Inter, system-ui, sans-serif`;
+    ctx.fillText('LastStats — sanobld.github.io/LastStats', fw - 300, fh - 14);
+
+    downloadCanvas(out, `laststats-calendrier-${year}.png`);
+    showToast('📅 Calendrier exporté !');
+  } catch (e) {
+    console.error('exportHeatmap:', e);
+    showToast('Erreur lors de l\'export : ' + e.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-download"></i> <span>Exporter</span>'; }
   }
 }
 
@@ -5069,105 +4972,161 @@ async function forceSwUpdate() {
 }
 
 /**
- * Demande la permission de notifications puis active l'alerte Wrapped.
- * Appelé par le bouton cloche dans les paramètres.
+ * Demande la permission de notifications et met à jour l'UI.
  */
 async function requestNotificationAccess() {
-  const btn = document.getElementById('btn-notif-wrapped');
   if (!('Notification' in window)) {
-    showToast('Notifications not supported on this browser.', 'error');
+    showToast('Notifications non supportées sur ce navigateur.', 'error');
     return;
   }
-
   const permission = await Notification.requestPermission();
   if (permission === 'granted') {
-    showToast('🔔 Wrapped notification enabled!');
+    showToast('🔔 Notifications activées !');
     setupNewYearNotification();
     _syncNotifBtn();
+    _syncNotifOptions();
+    loadNotifPrefs();
   } else {
-    showToast('Notification permission denied.', 'error');
+    showToast('Permission refusée.', 'error');
     _syncNotifBtn();
   }
 }
 
 /**
- * Met à jour l'état visuel du bouton cloche selon la permission actuelle.
+ * Sauvegarde les préférences de notification cochées.
  */
+function saveNotifPrefs() {
+  if (Notification?.permission !== 'granted') {
+    // Ask permission first if not granted
+    requestNotificationAccess();
+    return;
+  }
+  const prefs = {
+    weekly:    document.getElementById('notif-weekly')?.checked    || false,
+    monthly:   document.getElementById('notif-monthly')?.checked   || false,
+    milestone: document.getElementById('notif-milestone')?.checked || false,
+    wrapped:   document.getElementById('notif-wrapped')?.checked   || false,
+  };
+  localStorage.setItem('ls_notif_prefs', JSON.stringify(prefs));
+  _scheduleNotifications(prefs);
+  showToast('Préférences de notifications sauvegardées.');
+}
+
+/**
+ * Charge les préférences enregistrées et restitue les checkboxes.
+ */
+function loadNotifPrefs() {
+  try {
+    const raw = localStorage.getItem('ls_notif_prefs');
+    if (!raw) return;
+    const prefs = JSON.parse(raw);
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
+    set('notif-weekly',    prefs.weekly);
+    set('notif-monthly',   prefs.monthly);
+    set('notif-milestone', prefs.milestone);
+    set('notif-wrapped',   prefs.wrapped);
+  } catch {}
+}
+
+/**
+ * Planifie les notifications selon les préférences.
+ */
+function _scheduleNotifications(prefs) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  if (prefs.wrapped) setupNewYearNotification();
+  // Weekly / monthly scheduling done at next visit via _checkScheduledNotifs()
+  _checkScheduledNotifs(prefs);
+}
+
+function _checkScheduledNotifs(prefs) {
+  if (!prefs) {
+    try { prefs = JSON.parse(localStorage.getItem('ls_notif_prefs') || '{}'); } catch { return; }
+  }
+  if (Notification?.permission !== 'granted') return;
+  const now = Date.now();
+
+  if (prefs.weekly) {
+    const lastWeekly = parseInt(localStorage.getItem('ls_notif_last_weekly') || '0');
+    if (now - lastWeekly > 7 * 24 * 3600 * 1000) {
+      const today = new Date();
+      if (today.getDay() === 1) { // Monday
+        localStorage.setItem('ls_notif_last_weekly', String(now));
+        _sendNotif('📊 Récap de la semaine', `Bonjour ! Voici le moment de consulter vos stats Last.fm de la semaine passée.`);
+      }
+    }
+  }
+
+  if (prefs.monthly) {
+    const lastMonthly = parseInt(localStorage.getItem('ls_notif_last_monthly') || '0');
+    if (now - lastMonthly > 28 * 24 * 3600 * 1000) {
+      const today = new Date();
+      if (today.getDate() === 1) {
+        localStorage.setItem('ls_notif_last_monthly', String(now));
+        const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+        _sendNotif('📅 Récap du mois', `Votre récap de ${months[today.getMonth() === 0 ? 11 : today.getMonth() - 1]} est disponible !`);
+      }
+    }
+  }
+}
+
+function _sendNotif(title, body) {
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({ type: 'SHOW_NOTIFICATION', title, body });
+  } else {
+    new Notification(title, { body, icon: './icons/icon-192.png' });
+  }
+}
+
 function _syncNotifBtn() {
-  const btn = document.getElementById('btn-notif-wrapped');
-  if (!btn) return;
+  const btn   = document.getElementById('btn-notif-enable');
+  const label = document.getElementById('btn-notif-label');
+  if (!btn || !label) return;
   const perm = Notification?.permission;
   if (perm === 'granted') {
     btn.classList.add('active');
-    btn.title = 'New Year Wrapped notification: ON';
-    btn.querySelector('span').textContent = 'Notification enabled';
+    label.textContent = 'Notifications activées ✓';
   } else if (perm === 'denied') {
     btn.classList.add('disabled');
-    btn.title = 'Permission denied in browser settings';
-    btn.querySelector('span').textContent = 'Permission denied';
+    label.textContent = 'Permission refusée';
   } else {
     btn.classList.remove('active', 'disabled');
-    btn.querySelector('span').textContent = 'Enable Wrapped notification';
+    label.textContent = 'Activer les notifications';
   }
 }
 
+function _syncNotifOptions() {
+  const grid = document.getElementById('notif-options-grid');
+  if (!grid) return;
+  const enabled = Notification?.permission === 'granted';
+  grid.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.disabled = !enabled; });
+  grid.style.opacity = enabled ? '1' : '0.45';
+  grid.style.pointerEvents = enabled ? '' : 'none';
+}
+
 /**
- * Planifie (ou déclenche immédiatement) la notification Wrapped du Nouvel An.
- * - Si on est avant le 1er janvier → setTimeout jusqu'à 00:01:00.
- * - Si on est après le 1er janvier et la notif n'a pas encore été envoyée → envoi immédiat.
- * Utilise localStorage 'ls_newyear_notif_{YEAR}' pour n'envoyer qu'une seule fois.
+ * Planifie la notification Wrapped du Nouvel An.
  */
 function setupNewYearNotification() {
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
-
-  const now        = new Date();
-  const nextYear   = now.getFullYear() + (now.getMonth() >= 0 && now.getDate() >= 1 ? 1 : 0);
-  // Wrapped for the past year (e.g. Wrapped 2025 → notif on Jan 1 2026)
+  const now         = new Date();
+  const nextYear    = now.getFullYear() + 1;
   const wrappedYear = nextYear - 1;
   const storageKey  = `ls_newyear_notif_${nextYear}`;
-
-  // already sent for this New Year — skip
   if (localStorage.getItem(storageKey)) return;
-
   const fireNotif = () => {
     localStorage.setItem(storageKey, '1');
     _sendWrappedNotification(wrappedYear);
   };
-
-  // target: January 1st of next year at 00:01
   const target = new Date(nextYear, 0, 1, 0, 1, 0);
-  const msUntilNewYear = target - now;
-
-  if (msUntilNewYear > 0) {
-    // user is online before midnight — schedule the notification
-    setTimeout(fireNotif, msUntilNewYear);
-  } else {
-    // user opens the app after Jan 1 without having received the notif yet
-    fireNotif();
-  }
+  const ms = target - now;
+  if (ms > 0) setTimeout(fireNotif, ms);
+  else fireNotif();
 }
 
-/**
- * Envoie la notification via le Service Worker actif.
- */
 function _sendWrappedNotification(wrappedYear) {
-  const title = 'Happy New Year! 🎧';
-  const body  = `Your ${wrappedYear} Music Wrapped is officially ready. Discover your top artists and tracks of the past year now!`;
-
-  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-    navigator.serviceWorker.controller.postMessage({
-      type: 'SHOW_NOTIFICATION',
-      title,
-      body,
-      tag: `laststats-wrapped-${wrappedYear}`,
-    });
-  } else {
-    // fallback: direct notification if no active SW
-    new Notification(title, {
-      body,
-      icon: './icons/icon-192.png',
-    });
-  }
+  const title = 'Bonne année ! 🎧';
+  const body  = `Votre Wrapped ${wrappedYear} est prêt. Découvrez vos top artistes et titres de l'année !`;
+  _sendNotif(title, body);
 }
 
 function clearCache() {
@@ -5175,7 +5134,6 @@ function clearCache() {
   _clearHistoryCache();
   _imgCache.clear();
   _trackImgCache.clear();
-  _vizPlusLoaded = false;
   showToast(t('toast_cache_cleared'));
 }
 
