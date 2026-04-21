@@ -4483,11 +4483,29 @@ button.bn-item:focus-visible,
    PROFILE SECTION
 ═══════════════════════════════════════════════════ */
 
-#s-profile { padding: 0; }
-/* Profile section: remove main-content padding so hero bleeds to header */
-.main-content:has(#s-profile.active) { padding: 0; }
-/* Fallback via JS-added class */
-.main-content.profile-active { padding: 0; }
+/* ── Profile mobile scroll fix ── */
+@media (max-width: 768px) {
+  .main-content:has(#s-profile.active),
+  .main-content.profile-active {
+    /* On mobile the bottom-nav hides the last content — add the nav height as padding */
+    padding-bottom: calc(var(--bn-height) + env(safe-area-inset-bottom, 0px) + 16px) !important;
+  }
+  /* Profile section itself needs overflow scroll and enough bottom room */
+  #s-profile {
+    padding-bottom: calc(var(--bn-height) + env(safe-area-inset-bottom, 0px) + 24px);
+    min-height: 100%;
+  }
+  /* Tracks list – ensure last item is always visible */
+  .profile-tracks-list { padding-bottom: 8px; }
+}
+/* Desktop: zero padding so hero bleeds edge-to-edge */
+@media (min-width: 769px) {
+  #s-profile { padding: 0; }
+  .main-content:has(#s-profile.active) { padding: 0; }
+  .main-content.profile-active { padding: 0; }
+}
+
+
 
 
 /* Back bar */
@@ -5014,4 +5032,148 @@ a:focus:not(:focus-visible) { outline: none; }
   background: var(--accent-container);
   color: var(--accent-on-cont);
   border-left: 3px solid var(--accent);
+}
+
+/* ══════════════════════════════════════════════════════
+   SIDEBAR COLLAPSE (icônes seules, PC uniquement)
+══════════════════════════════════════════════════════ */
+:root { --sb-mini-width: 64px; }
+
+/* Bouton collapse — visible uniquement sur PC */
+.sb-collapse-btn {
+  display: none;
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-hover);
+  color: var(--text-muted);
+  align-items: center; justify-content: center;
+  font-size: .72rem; cursor: pointer; flex-shrink: 0;
+  transition: background var(--dur-short) var(--ease-standard),
+              color      var(--dur-short) var(--ease-standard),
+              transform  var(--dur-short2) var(--ease-spring);
+}
+.sb-collapse-btn:hover { background: var(--accent-lt); color: var(--accent); transform: scale(1.1); }
+
+@media (min-width: 1025px) {
+  .sb-collapse-btn { display: flex; }
+}
+
+/* État réduit */
+.sidebar.sb-collapsed {
+  width: var(--sb-mini-width);
+  overflow: visible; /* tooltips peuvent déborder */
+}
+
+/* Masquer les textes quand réduit */
+.sidebar.sb-collapsed .sb-logo-text,
+.sidebar.sb-collapsed .sb-info,
+.sidebar.sb-collapsed .sb-profile-chevron,
+.sidebar.sb-collapsed .nav-lnk span:not(.nav-bdg),
+.sidebar.sb-collapsed .nav-sep,
+.sidebar.sb-collapsed .sb-foot,
+.sidebar.sb-collapsed .nav-bdg {
+  display: none;
+}
+
+/* Logo réduit */
+.sidebar.sb-collapsed .sb-head {
+  padding: 16px 0;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+}
+.sidebar.sb-collapsed .sb-logo {
+  justify-content: center;
+}
+.sidebar.sb-collapsed .sb-collapse-btn {
+  width: 32px; height: 32px;
+}
+
+/* Profil réduit */
+.sidebar.sb-collapsed .sb-profile-wrap { padding: 0; }
+.sidebar.sb-collapsed .sb-profile {
+  justify-content: center;
+  padding: 12px 0;
+}
+.sidebar.sb-collapsed .sb-av { width: 36px; height: 36px; }
+
+/* Liens réduits — icône centrée + tooltip natif */
+.sidebar.sb-collapsed .sb-nav { padding: 4px 6px; }
+.sidebar.sb-collapsed .nav-lnk {
+  justify-content: center;
+  padding: 12px 0;
+  border-radius: var(--radius-sm);
+  margin-bottom: 4px;
+}
+.sidebar.sb-collapsed .nav-lnk i { width: auto; font-size: 1rem; }
+
+/* Tooltip au hover (title= sur les nav-lnk) */
+.sidebar.sb-collapsed .nav-lnk {
+  position: relative;
+}
+.sidebar.sb-collapsed .nav-lnk::before {
+  /* On ne change pas le before existant — le tooltip est via title= natif */
+}
+
+/* ══════════════════════════════════════════════════════
+   EXPORT FORMAT PICKER MENU
+══════════════════════════════════════════════════════ */
+.export-menu-ov {
+  position: fixed; inset: 0; z-index: 490;
+  background: transparent;
+}
+.export-menu {
+  position: fixed; z-index: 500;
+  min-width: 240px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.28), 0 2px 8px rgba(0,0,0,.14);
+  padding: 10px 8px 8px;
+  transform-origin: top right;
+  transform: scale(.88) translateY(-8px);
+  opacity: 0;
+  transition: transform var(--dur-medium1) var(--ease-spring),
+              opacity   var(--dur-medium1) var(--ease-standard);
+  pointer-events: none;
+}
+.export-menu.export-menu--open {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+  pointer-events: all;
+}
+.export-menu-title {
+  font-size: .72rem; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .06em;
+  padding: 2px 10px 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.export-menu-title i { color: var(--accent); }
+
+.export-menu-opt {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; padding: 10px 12px;
+  border-radius: 10px; cursor: pointer;
+  transition: background var(--dur-short) var(--ease-standard);
+  text-align: left;
+}
+.export-menu-opt:hover { background: var(--accent-lt); }
+.export-menu-opt:active { background: var(--accent-container); }
+
+.export-menu-icon { font-size: 1.3rem; line-height: 1; flex-shrink: 0; }
+.export-menu-label {
+  display: flex; flex-direction: column; gap: 1px;
+}
+.export-menu-label strong { font-size: .85rem; font-weight: 700; color: var(--text); }
+.export-menu-label small  { font-size: .72rem; color: var(--text-muted); }
+
+/* Mobile: menu plein bas */
+@media (max-width: 600px) {
+  .export-menu {
+    position: fixed; left: 12px !important; right: 12px !important;
+    bottom: calc(var(--bn-height) + 12px) !important;
+    top: auto !important; width: auto; min-width: unset;
+    transform-origin: bottom center;
+  }
+  .export-menu-ov { background: rgba(0,0,0,.35); }
 }

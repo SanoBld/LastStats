@@ -737,31 +737,48 @@ const _ACCENT_LIGHT = {
 };
 
 /**
- * Lit la couleur d'accent du navigateur / OS via la propriété CSS accent-color.
- * Retourne un hex (#rrggbb) ou null si non supporté / gris neutre.
+ * Lit la couleur d'accent du navigateur / OS.
+ * Stratégie multi-niveau pour une compatibilité maximale.
  */
 function _getSystemAccentColor() {
   try {
-    const el = document.createElement('div');
-    // accent-color:auto reflète la couleur système dans les navigateurs récents
-    el.style.cssText = 'position:absolute;width:0;height:0;accent-color:auto;color:AccentColor';
-    document.body.appendChild(el);
-    const computed = getComputedStyle(el);
-    // Essai 1 : CSS System Color "AccentColor" (Chrome 101+, Firefox 103+)
-    let raw = computed.color;
-    // Essai 2 : accent-color (moins universellement lisible en computed)
-    if (!raw || raw === 'rgba(0, 0, 0, 0)') raw = computed.accentColor;
-    document.body.removeChild(el);
+    // Stratégie 1 — CSS System Color "AccentColor" (Chrome 101+, Firefox 103+, Edge 101+)
+    // On force la couleur de texte avec ce keyword puis on lit la valeur calculée
+    const probe = document.createElement('div');
+    probe.setAttribute('style', 'position:fixed;opacity:0;pointer-events:none;color:AccentColor;background-color:AccentColor');
+    document.documentElement.appendChild(probe);
+    const bg = getComputedStyle(probe).backgroundColor;
+    const fg = getComputedStyle(probe).color;
+    document.documentElement.removeChild(probe);
 
-    if (!raw || raw === 'auto' || raw === 'rgba(0, 0, 0, 0)') return null;
+    for (const raw of [bg, fg]) {
+      if (!raw || raw === 'rgba(0, 0, 0, 0)' || raw === 'transparent') continue;
+      const m = raw.match(/(\d+),\s*(\d+),\s*(\d+)/);
+      if (!m) continue;
+      const [r, g, b] = [+m[1], +m[2], +m[3]];
+      const [, s] = _rgbToHsl(r, g, b);
+      if (s >= 8) return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+    }
 
-    const m = raw.match(/(\d+),\s*(\d+),\s*(\d+)/);
-    if (!m) return null;
-    const [r, g, b] = [+m[1], +m[2], +m[3]];
-    // Filtre les gris neutres (très peu saturés) — pas de teinte significative
-    const [, s] = _rgbToHsl(r, g, b);
-    if (s < 8) return null;
-    return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+    // Stratégie 2 — lire accent-color via une checkbox native (rendered avec accent-color OS)
+    const inp = document.createElement('input');
+    inp.type = 'checkbox';
+    inp.checked = true;
+    inp.setAttribute('style', 'position:fixed;opacity:0;pointer-events:none;accent-color:auto;width:20px;height:20px');
+    document.documentElement.appendChild(inp);
+    const ac = getComputedStyle(inp).accentColor;
+    document.documentElement.removeChild(inp);
+
+    if (ac && ac !== 'auto' && ac !== 'rgba(0, 0, 0, 0)') {
+      const m2 = ac.match(/(\d+),\s*(\d+),\s*(\d+)/);
+      if (m2) {
+        const [r, g, b] = [+m2[1], +m2[2], +m2[3]];
+        const [, s] = _rgbToHsl(r, g, b);
+        if (s >= 8) return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+      }
+    }
+
+    return null;
   } catch { return null; }
 }
 
@@ -1259,6 +1276,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('resize', _updateNavMode, { passive: true });
   _updateNavMode();
+  _applySbCollapsedState();
   document.getElementById('sw-update-btn')?.addEventListener('click', forceSwUpdate);
 });
 
@@ -1305,6 +1323,33 @@ function closeSb() {
   document.getElementById('sidebar')?.classList.remove('open');
   document.getElementById('sidebar-ov')?.classList.remove('open');
   document.body.style.overflow = '';
+}
+
+/* ── Sidebar collapse (icons-only mode, PC only) ── */
+function toggleSbCollapse() {
+  const sb   = document.getElementById('sidebar');
+  const icon = document.getElementById('sb-collapse-icon');
+  if (!sb) return;
+  const collapsed = sb.classList.toggle('sb-collapsed');
+  localStorage.setItem('ls_sb_collapsed', collapsed ? '1' : '0');
+  if (icon) {
+    icon.className = collapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left';
+  }
+  // Update main-wrap margin via CSS var override
+  document.documentElement.style.setProperty(
+    '--sb-width', collapsed ? 'var(--sb-mini-width)' : '260px'
+  );
+}
+
+function _applySbCollapsedState() {
+  if (window.innerWidth <= 1024) return; // mobile/tablet: no collapse
+  const collapsed = localStorage.getItem('ls_sb_collapsed') === '1';
+  if (!collapsed) return;
+  const sb   = document.getElementById('sidebar');
+  const icon = document.getElementById('sb-collapse-icon');
+  if (sb)   sb.classList.add('sb-collapsed');
+  if (icon) icon.className = 'fas fa-chevron-right';
+  document.documentElement.style.setProperty('--sb-width', 'var(--sb-mini-width)');
 }
 
 function setupProfileUI() {
@@ -4945,61 +4990,240 @@ function _exportAccent() {
 }
 
 /* ─── Export graphique Chart.js ───────────────────────────────────── */
-async function exportChartAsImage(canvasId, filename) {
+/* ─── Export format picker ────────────────────────────────────────── */
+let _exportCtx = null; // { canvasId, filename }
+
+function showExportMenu(canvasId, filename, btnEl) {
+  _exportCtx = { canvasId, filename };
+  const menu = document.getElementById('export-menu');
+  const ov   = document.getElementById('export-menu-ov');
+  if (!menu || !ov) return;
+
+  // Position near the button
+  if (btnEl) {
+    const r = btnEl.getBoundingClientRect();
+    const menuW = 240;
+    let left = r.right - menuW;
+    if (left < 8) left = r.left;
+    let top  = r.bottom + 6;
+    if (top + 200 > window.innerHeight) top = r.top - 200;
+    menu.style.left = Math.max(8, left) + 'px';
+    menu.style.top  = Math.max(8, top)  + 'px';
+  }
+
+  menu.classList.remove('hidden');
+  ov.classList.remove('hidden');
+  // Animate in
+  requestAnimationFrame(() => menu.classList.add('export-menu--open'));
+}
+
+function closeExportMenu() {
+  const menu = document.getElementById('export-menu');
+  const ov   = document.getElementById('export-menu-ov');
+  if (!menu) return;
+  menu.classList.remove('export-menu--open');
+  setTimeout(() => {
+    menu.classList.add('hidden');
+    ov?.classList.add('hidden');
+  }, 180);
+}
+
+/**
+ * formats:
+ *  landscape — 16:9, wide PC  (current chart canvas + padding)
+ *  portrait  — 4:5, tall post
+ *  mobile    — 9:16, story
+ */
+async function _doExport(format) {
+  closeExportMenu();
+  if (!_exportCtx) return;
+  const { canvasId, filename } = _exportCtx;
+
+  // Heatmap special case
+  if (canvasId === '__heatmap__') {
+    const btn = document.getElementById('heatmap-export-btn-vertical');
+    const ori = _exportCtx.filename;
+    const orig = btn?.innerHTML || '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
+    try {
+      const year = parseInt(document.getElementById('cal-heatmap-yr-sel-charts')?.value) || new Date().getFullYear();
+      if (format === 'mobile') await _exportHeatmapMobile(year);
+      else                     await _exportHeatmapVertical(year, format);
+    } catch (e) { showToast('Erreur export : ' + e.message, 'error'); }
+    finally { if (btn) { btn.disabled = false; btn.innerHTML = orig; } }
+    return;
+  }
+
+  await exportChartAsImage(canvasId, filename, format);
+}
+
+async function exportChartAsImage(canvasId, filename, format) {
+  format = format || 'landscape';
   const src = document.getElementById(canvasId);
   if (!src || !src.width) { showToast('Graphique non disponible.', 'error'); return; }
 
-  const PAD = 48, TITLE_H = 56, FOOTER_H = 28;
-  const W = src.width  + PAD * 2;
-  const H = src.height + TITLE_H + FOOTER_H + PAD;
-
-  const out = document.createElement('canvas');
-  out.width = W; out.height = H;
-  const ctx = out.getContext('2d');
-  const bg = _exportBg();
+  const bg     = _exportBg();
   const accent = _exportAccent();
 
-  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-  ctx.fillStyle = accent; ctx.fillRect(0, 0, W, 4);
-
   const card  = src.closest('.chart-card');
-  const label = card?.querySelector('.cc-hd span span')?.textContent?.trim() || filename.replace(/-/g,' ');
-  ctx.fillStyle = accent;
-  ctx.font = `bold 22px Inter, system-ui, sans-serif`;
-  ctx.fillText('\uD83C\uDFB5  ' + label, PAD, TITLE_H - 8);
+  const label = card?.querySelector('.cc-hd span span')?.textContent?.trim()
+                || filename.replace(/-/g,' ');
+  const footer = 'LastStats \u00B7 ' + (APP.username || '') + ' \u00B7 sanobld.github.io/LastStats';
 
-  ctx.drawImage(src, PAD, TITLE_H, src.width, src.height);
+  const out = document.createElement('canvas');
+  const ctx  = out.getContext('2d');
 
-  ctx.fillStyle = 'rgba(255,255,255,0.22)';
-  ctx.font = `11px Inter, system-ui, sans-serif`;
-  ctx.fillText('LastStats \u00B7 ' + (APP.username||'') + ' \u00B7 sanobld.github.io/LastStats', PAD, H - 10);
+  if (format === 'landscape') {
+    // ── Original wide format ──
+    const PAD = 48, TITLE_H = 56, FOOTER_H = 28;
+    out.width  = src.width  + PAD * 2;
+    out.height = src.height + TITLE_H + FOOTER_H + PAD;
+    ctx.fillStyle = bg;     ctx.fillRect(0, 0, out.width, out.height);
+    ctx.fillStyle = accent; ctx.fillRect(0, 0, out.width, 4);
+    ctx.fillStyle = accent; ctx.font = 'bold 22px Inter,system-ui,sans-serif';
+    ctx.fillText('\uD83C\uDFB5  ' + label, PAD, TITLE_H - 8);
+    ctx.drawImage(src, PAD, TITLE_H, src.width, src.height);
+    ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.font = '11px Inter,system-ui,sans-serif';
+    ctx.fillText(footer, PAD, out.height - 10);
 
-  downloadCanvas(out, 'laststats-' + filename + '.png');
+  } else if (format === 'portrait') {
+    // ── 4:5 portrait ──
+    const W = Math.max(src.width, 800);
+    const H = Math.round(W * 1.25); // 4:5
+    const PAD = 36, TITLE_H = 64, FOOTER_H = 32;
+    const chartScale = Math.min(1, (W - PAD * 2) / src.width);
+    const cW = src.width  * chartScale;
+    const cH = src.height * chartScale;
+    const cY = TITLE_H + (H - TITLE_H - FOOTER_H - cH) / 2;
+    out.width = W; out.height = H;
+    ctx.fillStyle = bg;     ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = accent; ctx.fillRect(0, 0, W, 4);
+    ctx.fillStyle = accent; ctx.font = 'bold 22px Inter,system-ui,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('\uD83C\uDFB5  ' + label, W / 2, TITLE_H - 10);
+    ctx.drawImage(src, (W - cW) / 2, cY, cW, cH);
+    ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.font = '11px Inter,system-ui,sans-serif';
+    ctx.fillText(footer, W / 2, H - 14);
+    ctx.textAlign = 'left';
+
+  } else if (format === 'mobile') {
+    // ── 9:16 story / mobile ──
+    const W = 1080, H = 1920;
+    const PAD = 60, TITLE_H = 120, FOOTER_H = 80;
+    const chartScale = Math.min(2, (W - PAD * 2) / src.width);
+    const cW = src.width  * chartScale;
+    const cH = src.height * chartScale;
+    const cY = TITLE_H + (H - TITLE_H - FOOTER_H - cH) / 2;
+    out.width = W; out.height = H;
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    // Decorative gradient stripe
+    const grad = ctx.createLinearGradient(0, 0, W, 0);
+    grad.addColorStop(0, accent); grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad; ctx.fillRect(0, 0, W, 6);
+    ctx.fillStyle = accent; ctx.font = 'bold 52px Inter,system-ui,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('\uD83C\uDFB5  ' + label, W / 2, TITLE_H - 14);
+    ctx.drawImage(src, (W - cW) / 2, cY, cW, cH);
+    ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.font = '28px Inter,system-ui,sans-serif';
+    ctx.fillText('LastStats \u00B7 sanobld.github.io/LastStats', W / 2, H - 36);
+    ctx.textAlign = 'left';
+  }
+
+  const suffix = format === 'portrait' ? '-portrait' : format === 'mobile' ? '-mobile' : '';
+  downloadCanvas(out, 'laststats-' + filename + suffix + '.png');
   showToast('\uD83D\uDCCA Graphique export\u00E9 !');
 }
 
 /* ─── Export calendrier heatmap ──────────────────────────────────── */
-async function exportHeatmapAsImage(orientation) {
-  orientation = orientation || 'vertical';
-  const wrapEl = document.getElementById('listening-heatmap-wrap-charts');
-  if (!wrapEl || wrapEl.classList.contains('hidden')) {
-    showToast('Chargez l\'historique complet pour afficher le calendrier.', 'error');
-    return;
+async function exportHeatmapAsImage() {
+  showExportMenu('__heatmap__', 'calendrier',
+    document.getElementById('heatmap-export-btn-vertical'));
+}
+
+async function _exportHeatmapMobile(year) {
+  // 9:16 story format for the calendar — draws the vertical grid scaled up
+  const history = APP.fullHistory;
+  if (!history?.length) { showToast('Historique non charg\u00E9.', 'error'); return; }
+
+  const dayCounts = new Map();
+  for (const tr of history) {
+    const ts = parseInt(tr.date?.uts || 0);
+    if (!ts) continue;
+    const d = new Date(ts * 1000);
+    if (d.getFullYear() !== year) continue;
+    const key = year + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    dayCounts.set(key, (dayCounts.get(key) || 0) + 1);
   }
 
-  const btn = document.getElementById('heatmap-export-btn-vertical');
-  const originalHTML = btn ? btn.innerHTML : '';
-  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
+  const vals = dayCounts.size ? [...dayCounts.values()] : [1];
+  const maxC = Math.max(...vals);
+  const thr  = [1, Math.ceil(maxC*.25), Math.ceil(maxC*.5), Math.ceil(maxC*.75)];
+  const lvl  = c => !c ? 0 : c < thr[1] ? 1 : c < thr[2] ? 2 : c < thr[3] ? 3 : 4;
 
-  try {
-    const year = parseInt(document.getElementById('cal-heatmap-yr-sel-charts')?.value) || new Date().getFullYear();
-    await _exportHeatmapVertical(year);
-  } catch (e) {
-    console.error('exportHeatmap:', e);
-    showToast('Erreur export : ' + e.message, 'error');
-  } finally {
-    if (btn) { btn.disabled = false; btn.innerHTML = originalHTML; }
+  const bg = _exportBg(); const accent = _exportAccent();
+  const isDark = APP.currentTheme === 'dark' || (APP.currentTheme === 'auto' && window.matchMedia('(prefers-color-scheme:dark)').matches);
+  const tmpEl = document.createElement('div');
+  tmpEl.style.color = accent; document.body.appendChild(tmpEl);
+  const rgb = getComputedStyle(tmpEl).color.match(/\d+/g)?.map(Number) || [208,188,255];
+  document.body.removeChild(tmpEl);
+  const alpha = a => `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${a})`;
+  const LEVEL_COLORS = [isDark ? '#1d1b20' : '#f0eff5', alpha(.22), alpha(.45), alpha(.72), accent];
+
+  const W = 1080, H = 1920;
+  const CELL = 26, GAP = 5, COL_W = CELL + GAP;
+  const MONTHS = ['Janv','F\u00E9vr','Mars','Avr','Mai','Juin','Juil','Ao\u00FBt','Sept','Oct','Nov','D\u00E9c'];
+  const DAYS_MAX = 31;
+  const LABEL_W = 72, LABEL_H = 40;
+  const gridW = LABEL_W + DAYS_MAX * COL_W;
+  const PAD   = (W - gridW) / 2;
+  const TITLE_H = 200, FOOTER_H = 100;
+  const gridH = 12 * (CELL + GAP) - GAP;
+
+  const out = document.createElement('canvas');
+  out.width = W; out.height = H;
+  const ctx = out.getContext('2d');
+
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  const grd = ctx.createLinearGradient(0,0,W,0);
+  grd.addColorStop(0, accent); grd.addColorStop(1, 'transparent');
+  ctx.fillStyle = grd; ctx.fillRect(0, 0, W, 7);
+
+  ctx.fillStyle = accent; ctx.font = 'bold 58px Inter,system-ui,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('\uD83D\uDCC5  Calendrier d\u2019\u00C9coute ' + year, W/2, 130);
+  ctx.textAlign = 'left';
+
+  const startY = TITLE_H;
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)';
+  ctx.font = '20px Inter,system-ui,sans-serif';
+  for (let d = 1; d <= DAYS_MAX; d++) {
+    if (d === 1 || d % 5 === 0)
+      ctx.fillText(String(d), PAD + LABEL_W + (d-1)*COL_W, startY + LABEL_H - 6);
   }
+  for (let m = 0; m < 12; m++) {
+    const rowY = startY + LABEL_H + m * (CELL + GAP);
+    ctx.fillStyle = isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)';
+    ctx.font = 'bold 20px Inter,system-ui,sans-serif';
+    ctx.fillText(MONTHS[m], PAD, rowY + CELL - 6);
+    const daysInMonth = new Date(year, m+1, 0).getDate();
+    for (let d = 1; d <= DAYS_MAX; d++) {
+      const x = PAD + LABEL_W + (d-1)*COL_W;
+      ctx.fillStyle = d > daysInMonth
+        ? (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)')
+        : LEVEL_COLORS[lvl(dayCounts.get(year+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0')) || 0)];
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(x, rowY, CELL, CELL, 3); else ctx.rect(x, rowY, CELL, CELL);
+      ctx.fill();
+    }
+  }
+
+  ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = '26px Inter,system-ui,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('LastStats \u00B7 sanobld.github.io/LastStats', W/2, H - 40);
+  ctx.textAlign = 'left';
+
+  downloadCanvas(out, 'laststats-calendrier-mobile-' + year + '.png');
+  showToast('\uD83D\uDCC5 Calendrier mobile export\u00E9 !');
 }
 
 async function _exportHeatmapHorizontal(year, wrapEl) {
@@ -5017,18 +5241,16 @@ async function _exportHeatmapHorizontal(year, wrapEl) {
   out.height = snap.height + TITLE_H + FOOTER_H;
   const ctx = out.getContext('2d');
   ctx.fillStyle = bg; ctx.fillRect(0, 0, out.width, out.height);
-  ctx.fillStyle = accent;
-  ctx.font = 'bold 28px Inter, system-ui, sans-serif';
+  ctx.fillStyle = accent; ctx.font = 'bold 28px Inter, system-ui, sans-serif';
   ctx.fillText('\uD83C\uDFB5  Calendrier d\u2019\u00C9coute ' + year, 32, 44);
   ctx.drawImage(snap, 0, TITLE_H);
-  ctx.fillStyle = 'rgba(255,255,255,0.22)';
-  ctx.font = '11px Inter, system-ui, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.22)'; ctx.font = '11px Inter, system-ui, sans-serif';
   ctx.fillText('LastStats \u00B7 sanobld.github.io/LastStats', 32, out.height - 10);
   downloadCanvas(out, 'laststats-calendrier-' + year + '.png');
   showToast('\uD83D\uDCC5 Calendrier export\u00E9 !');
 }
 
-async function _exportHeatmapVertical(year) {
+async function _exportHeatmapVertical(year, format) {
   const history = APP.fullHistory;
   if (!history?.length) { showToast('Historique non charg\u00E9.', 'error'); return; }
 
@@ -5137,8 +5359,8 @@ async function _exportHeatmapVertical(year) {
   ctx.font = '9px Inter, system-ui, sans-serif';
   ctx.fillText('LastStats \u00B7 sanobld.github.io/LastStats', W - 200, H - 8);
 
-  downloadCanvas(out, 'laststats-calendrier-vertical-' + year + '.png');
-  showToast('\uD83D\uDCC5 Calendrier vertical export\u00E9 !');
+  downloadCanvas(out, 'laststats-calendrier-' + (format === 'portrait' ? 'portrait' : 'vertical') + '-' + year + '.png');
+  showToast('\uD83D\uDCC5 Calendrier export\u00E9 !');
 }
 
 function exportData(format) {
