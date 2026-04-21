@@ -1970,18 +1970,73 @@ async function pollNowPlaying() {
       if (ytBtn) ytBtn.href = `https://www.youtube.com/results?search_query=${q}`;
 
       wrap?.classList.remove('hidden');
-      /* ── Rafraîchissement 2s pendant l'écoute pour rester en sync ── */
+
+      // ── Mise à jour synchronisée du profil si la section est visible ──
+      _syncProfileNowPlaying(last);
+
       _npTimer = setTimeout(pollNowPlaying, 2000);
     } else {
       _npIsPlaying = false;
       wrap?.classList.add('hidden');
-      /* Pas de lecture : on ralentit à 15s pour économiser les requêtes */
+
+      // Efface le NP du profil si plus en cours
+      _syncProfileNowPlaying(null);
+
       _npTimer = setTimeout(pollNowPlaying, 15000);
     }
   } catch {
     _npIsPlaying = false;
     _npTimer = setTimeout(pollNowPlaying, 30000);
   }
+}
+
+/**
+ * Met à jour la section profil (NP bar + hero bg + dot) en temps réel
+ * pendant que pollNowPlaying tourne, uniquement si le profil de l'utilisateur
+ * courant est affiché.
+ */
+function _syncProfileNowPlaying(last) {
+  // Seulement si on regarde notre propre profil
+  const isOwnProfile = document.getElementById('s-profile')?.classList.contains('active')
+    && (!_profileUsername || _profileUsername === APP.username);
+  if (!isOwnProfile) return;
+
+  const wrap = document.getElementById('profile-np-wrap');
+  const dot  = document.getElementById('profile-now-dot');
+
+  if (!last) {
+    wrap?.classList.add('hidden');
+    dot?.classList.add('hidden');
+    return;
+  }
+
+  // Hero background from album art
+  const bgImg = last.image?.find(x => x.size === 'extralarge')?.['#text']
+             || last.image?.find(x => x.size === 'large')?.['#text'] || '';
+  if (bgImg && !isDefaultImg(bgImg)) {
+    const bgEl = document.getElementById('profile-hero-bg');
+    if (bgEl && bgEl.style.backgroundImage !== `url('${bgImg}')`) {
+      bgEl.style.backgroundImage = `url('${bgImg}')`;
+    }
+  }
+
+  const img   = last.image?.find(x => x.size === 'medium')?.['#text'] || '';
+  const artEl = document.getElementById('profile-np-art');
+  if (artEl) {
+    const newSrc = img && !isDefaultImg(img) ? img : '';
+    const curImg = artEl.querySelector('img');
+    if (newSrc && curImg?.src !== newSrc) {
+      artEl.innerHTML = `<img src="${escHtml(newSrc)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">`;
+    } else if (!newSrc) {
+      artEl.innerHTML = '';
+    }
+  }
+
+  const _set = (id, v) => { const e = document.getElementById(id); if (e && e.textContent !== v) e.textContent = v; };
+  _set('profile-np-track',  last.name || '—');
+  _set('profile-np-artist', last.artist?.['#text'] || last.artist?.name || '—');
+  wrap?.classList.remove('hidden');
+  dot?.classList.remove('hidden');
 }
 
 async function shareNowPlaying() {
@@ -2027,23 +2082,23 @@ async function loadDashboard() {
   const totalPlay  = parseInt(u.playcount || 0);
   const avgPerDay  = daysSince > 0 ? (totalPlay / daysSince).toFixed(1) : 0;
   const avgPerWeek = (parseFloat(avgPerDay) * 7).toFixed(0);
-  const listenHours= Math.round(totalPlay * 3.5 / 60);
   const currentYear= new Date().getFullYear();
 
   // fetch all dashboard data in parallel
   let uniqueArtistsRaw = 0, uniqueAlbums = '…', uniqueTracks = '…', lastScrobble = '—';
+  let avgTrackSec = 210; // 3m30s fallback if API doesn't return durations
   try {
-    const [aData, bData, cData, rData] = await Promise.all([
+    const [aData, bData, cData, rData, tData] = await Promise.all([
       APP.topArtistsData.length
         ? API.call('user.getTopArtists', { period:'overall', limit:1 })
         : API.call('user.getTopArtists', { period:'overall', limit: TOP_LIMIT }),
       API.call('user.getTopAlbums',  { period:'overall', limit:1 }),
       API.call('user.getTopTracks',  { period:'overall', limit:1 }),
       API.call('user.getRecentTracks',{ limit:1 }),
+      API.call('user.getTopTracks',  { period:'overall', limit:200 }),
     ]);
 
     if (!APP.topArtistsData.length) {
-      // re-request just to get the real total count
       APP.topArtistsData = (await API.call('user.getTopArtists', { period:'overall', limit: TOP_LIMIT })).topartists?.artist || [];
     }
     uniqueArtistsRaw = parseInt(aData.topartists?.['@attr']?.total || APP.topArtistsData.length);
@@ -2057,7 +2112,44 @@ async function loadDashboard() {
         ? t('stat_now_playing')
         : timeAgo(parseInt(last.date?.uts || 0));
     }
+
+    // ── Calcul de la durée moyenne réelle via les top tracks ──
+    // Last.fm retourne un champ `duration` en secondes (0 si inconnu)
+    const topTracks = tData?.toptracks?.track || [];
+    const withDur = topTracks.filter(tr => parseInt(tr.duration) > 10);
+    if (withDur.length >= 5) {
+      // Moyenne pondérée par playcount pour refléter les vraies habitudes d'écoute
+      let totalWeightedSec = 0, totalWeight = 0;
+      withDur.forEach(tr => {
+        const dur = parseInt(tr.duration);
+        const pc  = parseInt(tr.playcount) || 1;
+        totalWeightedSec += dur * pc;
+        totalWeight      += pc;
+      });
+      avgTrackSec = totalWeight > 0 ? totalWeightedSec / totalWeight : 210;
+      // Clamp to realistic range: 30s – 15min
+      avgTrackSec = Math.max(30, Math.min(900, avgTrackSec));
+    }
   } catch {}
+
+  const totalListenSec  = totalPlay * avgTrackSec;
+  const totalListenMin  = Math.floor(totalListenSec / 60);
+  const listenDays      = Math.floor(totalListenMin / 1440);
+  const listenHoursRem  = Math.floor((totalListenMin % 1440) / 60);
+  const listenMinRem    = totalListenMin % 60;
+
+  // Display: always show at least 2 units for precision
+  let listenDisp;
+  if (listenDays >= 1) {
+    listenDisp = `${formatNum(listenDays)}j ${listenHoursRem}h`;
+  } else if (totalListenMin >= 60) {
+    listenDisp = `${listenHoursRem + listenDays * 24}h ${listenMinRem}min`;
+  } else {
+    listenDisp = `${totalListenMin}min`;
+  }
+  const avgMin    = Math.floor(avgTrackSec / 60);
+  const avgSec    = Math.round(avgTrackSec % 60);
+  const listenSub = `≈ ${avgMin}min${avgSec > 0 ? avgSec + 's' : ''} / titre`;
 
   const playcounts   = APP.topArtistsData.map(a => parseInt(a.playcount));
   const eddington    = calcEddington(playcounts);
@@ -2089,7 +2181,7 @@ async function loadDashboard() {
     { icon:'📆', value:formatNum(daysSince),             label:t('adv_days'),           sub:t('adv_days_sub', formatDate(regTs)),              color:'#eab308', noAnim:true },
     { icon:'🌟', value:maxArtist ? maxArtist.name:'—',  label:t('adv_top1_alltime'),   sub:t('adv_top1_pct', topPct),                        color:'#22c55e', noAnim:true },
     { icon:'🔢', value:eddington,                       label:t('adv_eddington'),      sub:t('adv_eddington_sub', eddington),                 color:'#a855f7', noAnim:true },
-    { icon:'🎧', value:`${formatNum(listenHours)}h`,    label:t('stat_listen_time'),   sub:t('stat_listen_estimate', formatNum(totalPlay)),   color:'#06b6d4', noAnim:true },
+    { icon:'🎧', value:listenDisp,                      label:t('stat_listen_time'),   sub:listenSub,                                         color:'#06b6d4', noAnim:true },
   ];
 
   const statGrid = document.getElementById('stat-grid');
@@ -5031,8 +5123,7 @@ function closeExportMenu() {
 /**
  * formats:
  *  landscape — 16:9, wide PC  (current chart canvas + padding)
- *  portrait  — 4:5, tall post
- *  mobile    — 9:16, story
+ *  portrait  — 9:16, full story (chart centred, stats row at bottom)
  */
 async function _doExport(format) {
   closeExportMenu();
@@ -5042,13 +5133,12 @@ async function _doExport(format) {
   // Heatmap special case
   if (canvasId === '__heatmap__') {
     const btn = document.getElementById('heatmap-export-btn-vertical');
-    const ori = _exportCtx.filename;
     const orig = btn?.innerHTML || '';
     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
     try {
       const year = parseInt(document.getElementById('cal-heatmap-yr-sel-charts')?.value) || new Date().getFullYear();
-      if (format === 'mobile') await _exportHeatmapMobile(year);
-      else                     await _exportHeatmapVertical(year, format);
+      if (format === 'portrait') await _exportHeatmapMobile(year);
+      else                       await _exportHeatmapVertical(year, format);
     } catch (e) { showToast('Erreur export : ' + e.message, 'error'); }
     finally { if (btn) { btn.disabled = false; btn.innerHTML = orig; } }
     return;
@@ -5064,17 +5154,16 @@ async function exportChartAsImage(canvasId, filename, format) {
 
   const bg     = _exportBg();
   const accent = _exportAccent();
-
-  const card  = src.closest('.chart-card');
-  const label = card?.querySelector('.cc-hd span span')?.textContent?.trim()
-                || filename.replace(/-/g,' ');
+  const card   = src.closest('.chart-card');
+  const label  = card?.querySelector('.cc-hd span span')?.textContent?.trim()
+                 || filename.replace(/-/g, ' ');
   const footer = 'LastStats \u00B7 ' + (APP.username || '') + ' \u00B7 sanobld.github.io/LastStats';
 
   const out = document.createElement('canvas');
-  const ctx  = out.getContext('2d');
+  const ctx = out.getContext('2d');
 
   if (format === 'landscape') {
-    // ── Original wide format ──
+    // ── 16:9 wide ──
     const PAD = 48, TITLE_H = 56, FOOTER_H = 28;
     out.width  = src.width  + PAD * 2;
     out.height = src.height + TITLE_H + FOOTER_H + PAD;
@@ -5087,49 +5176,105 @@ async function exportChartAsImage(canvasId, filename, format) {
     ctx.fillText(footer, PAD, out.height - 10);
 
   } else if (format === 'portrait') {
-    // ── 4:5 portrait ──
-    const W = Math.max(src.width, 800);
-    const H = Math.round(W * 1.25); // 4:5
-    const PAD = 36, TITLE_H = 64, FOOTER_H = 32;
-    const chartScale = Math.min(1, (W - PAD * 2) / src.width);
-    const cW = src.width  * chartScale;
-    const cH = src.height * chartScale;
-    const cY = TITLE_H + (H - TITLE_H - FOOTER_H - cH) / 2;
-    out.width = W; out.height = H;
-    ctx.fillStyle = bg;     ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = accent; ctx.fillRect(0, 0, W, 4);
-    ctx.fillStyle = accent; ctx.font = 'bold 22px Inter,system-ui,sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('\uD83C\uDFB5  ' + label, W / 2, TITLE_H - 10);
-    ctx.drawImage(src, (W - cW) / 2, cY, cW, cH);
-    ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.font = '11px Inter,system-ui,sans-serif';
-    ctx.fillText(footer, W / 2, H - 14);
-    ctx.textAlign = 'left';
-
-  } else if (format === 'mobile') {
-    // ── 9:16 story / mobile ──
+    // ── 9:16 story — chart centred, stat pills at bottom ──
     const W = 1080, H = 1920;
-    const PAD = 60, TITLE_H = 120, FOOTER_H = 80;
-    const chartScale = Math.min(2, (W - PAD * 2) / src.width);
-    const cW = src.width  * chartScale;
-    const cH = src.height * chartScale;
-    const cY = TITLE_H + (H - TITLE_H - FOOTER_H - cH) / 2;
+    const PAD = 60;
+    const TITLE_H  = 180;  // space for title at top
+    const FOOTER_H = 200;  // space for stats + branding at bottom
+    const CHART_AREA = H - TITLE_H - FOOTER_H;  // height available for chart
+
     out.width = W; out.height = H;
+
+    // Background
     ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-    // Decorative gradient stripe
-    const grad = ctx.createLinearGradient(0, 0, W, 0);
-    grad.addColorStop(0, accent); grad.addColorStop(1, 'transparent');
-    ctx.fillStyle = grad; ctx.fillRect(0, 0, W, 6);
-    ctx.fillStyle = accent; ctx.font = 'bold 52px Inter,system-ui,sans-serif';
+
+    // Top colour stripe
+    const topGrad = ctx.createLinearGradient(0, 0, W, 0);
+    topGrad.addColorStop(0, accent); topGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = topGrad; ctx.fillRect(0, 0, W, 7);
+
+    // App name (small, top)
+    ctx.fillStyle = 'rgba(255,255,255,.35)';
+    ctx.font = '34px Inter,system-ui,sans-serif';
     ctx.textAlign = 'center';
+    ctx.fillText('LastStats', W / 2, 72);
+
+    // Chart label
+    ctx.fillStyle = accent;
+    ctx.font = 'bold 60px Inter,system-ui,sans-serif';
     ctx.fillText('\uD83C\uDFB5  ' + label, W / 2, TITLE_H - 14);
-    ctx.drawImage(src, (W - cW) / 2, cY, cW, cH);
-    ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.font = '28px Inter,system-ui,sans-serif';
-    ctx.fillText('LastStats \u00B7 sanobld.github.io/LastStats', W / 2, H - 36);
+
+    // Chart — scale to fit width with aspect ratio preserved, max 80% of chart area
+    const maxChartW = W - PAD * 2;
+    const maxChartH = CHART_AREA * 0.82;
+    const scaleX = maxChartW / src.width;
+    const scaleY = maxChartH / src.height;
+    const scale  = Math.min(scaleX, scaleY);
+    const cW = src.width  * scale;
+    const cH = src.height * scale;
+    const cX = (W - cW) / 2;
+    const cY = TITLE_H + (CHART_AREA - cH) / 2;
+    ctx.drawImage(src, cX, cY, cW, cH);
+
+    // Stats pills row — pull from stat-grid cards
+    const statCards = document.querySelectorAll('.stat-card');
+    const stats = [];
+    statCards.forEach(c => {
+      const val   = c.querySelector('.stat-card-value')?.textContent?.trim();
+      const lbl   = c.querySelector('.stat-card-label')?.textContent?.trim();
+      const color = c.style.getPropertyValue('--card-accent') || accent;
+      if (val && lbl) stats.push({ val, lbl, color });
+    });
+
+    // Draw up to 4 stat pills at the bottom
+    const pills = stats.slice(0, 4);
+    if (pills.length) {
+      const pillH = 110, pillGap = 18;
+      const pillW = (W - PAD * 2 - pillGap * (pills.length - 1)) / pills.length;
+      const pillY = H - FOOTER_H + 14;
+      pills.forEach((s, i) => {
+        const px = PAD + i * (pillW + pillGap);
+        const r  = 16;
+
+        // pill background — subtle semi-transparent
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(px, pillY, pillW, pillH, r);
+        else ctx.rect(px, pillY, pillW, pillH);
+        ctx.fillStyle = 'rgba(255,255,255,.07)';
+        ctx.fill();
+
+        // accent top stripe (4px, only top corners rounded)
+        ctx.beginPath();
+        ctx.fillStyle = s.color;
+        ctx.fillRect(px + r, pillY, pillW - r * 2, 4);          // centre
+        ctx.fillRect(px,     pillY + r, r, 4 - r);               // left cap (negligible)
+        // simpler: just draw a small rect at the very top
+        ctx.fillRect(px + 4, pillY, pillW - 8, 4);
+
+        // value text
+        ctx.beginPath();
+        ctx.fillStyle = s.color;
+        ctx.font = 'bold 34px Inter,system-ui,sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(s.val, px + pillW / 2, pillY + 58);
+
+        // label text
+        ctx.fillStyle = 'rgba(255,255,255,.50)';
+        ctx.font = '20px Inter,system-ui,sans-serif';
+        const lblText = s.lbl.length > 14 ? s.lbl.slice(0, 13) + '\u2026' : s.lbl;
+        ctx.fillText(lblText, px + pillW / 2, pillY + 86);
+      });
+    }
+
+    // Branding footer
+    ctx.fillStyle = 'rgba(255,255,255,.18)';
+    ctx.font = '26px Inter,system-ui,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(footer, W / 2, H - 28);
     ctx.textAlign = 'left';
   }
 
-  const suffix = format === 'portrait' ? '-portrait' : format === 'mobile' ? '-mobile' : '';
+  const suffix = format === 'portrait' ? '-story' : '';
   downloadCanvas(out, 'laststats-' + filename + suffix + '.png');
   showToast('\uD83D\uDCCA Graphique export\u00E9 !');
 }
@@ -5362,6 +5507,150 @@ async function _exportHeatmapVertical(year, format) {
   downloadCanvas(out, 'laststats-calendrier-' + (format === 'portrait' ? 'portrait' : 'vertical') + '-' + year + '.png');
   showToast('\uD83D\uDCC5 Calendrier export\u00E9 !');
 }
+
+/* ════════════════════════════════════════════════════════════
+   DASHBOARD SEARCH
+   Searches artists / tracks / albums across loaded data + fullHistory
+════════════════════════════════════════════════════════════ */
+let _dashSearchTimer = null;
+
+function dashSearch(q) {
+  clearTimeout(_dashSearchTimer);
+  const clearBtn = document.getElementById('dash-search-clear');
+  const results  = document.getElementById('dash-search-results');
+  if (!results) return;
+
+  if (!q || q.trim().length < 2) {
+    results.classList.add('hidden');
+    clearBtn?.classList.add('hidden');
+    return;
+  }
+  clearBtn?.classList.remove('hidden');
+  _dashSearchTimer = setTimeout(() => _runDashSearch(q.trim()), 220);
+}
+
+function closeDashSearch() {
+  const inp = document.getElementById('dash-search-input');
+  const results = document.getElementById('dash-search-results');
+  const clearBtn = document.getElementById('dash-search-clear');
+  if (inp) inp.value = '';
+  results?.classList.add('hidden');
+  clearBtn?.classList.add('hidden');
+}
+
+function _runDashSearch(q) {
+  const ql  = q.toLowerCase();
+  const results = document.getElementById('dash-search-results');
+  if (!results) return;
+
+  const hits = [];
+  const seen = new Set();
+
+  const add = (type, name, sub, plays, url, img) => {
+    const key = type + '|' + name.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    hits.push({ type, name, sub, plays: parseInt(plays) || 0, url, img });
+  };
+
+  // 1) Top Artists
+  (APP.topArtistsData || []).forEach(a => {
+    if (a.name?.toLowerCase().includes(ql))
+      add('artist', a.name, '', a.playcount, a.url, '');
+  });
+
+  // 2) Top Albums
+  (APP.topAlbumsData || []).forEach(al => {
+    if (al.name?.toLowerCase().includes(ql) || al.artist?.name?.toLowerCase().includes(ql))
+      add('album', al.name, al.artist?.name || '', al.playcount, al.url,
+          al.image?.find(i => i.size === 'medium')?.['#text'] || '');
+  });
+
+  // 3) Top Tracks
+  (APP.topTracksData || []).forEach(tr => {
+    if (tr.name?.toLowerCase().includes(ql) || tr.artist?.name?.toLowerCase().includes(ql))
+      add('track', tr.name, tr.artist?.name || '', tr.playcount, tr.url,
+          tr.image?.find(i => i.size === 'medium')?.['#text'] || '');
+  });
+
+  // 4) Full history (if loaded) — count occurrences
+  if (APP.fullHistory?.length) {
+    const histCounts = {};
+    APP.fullHistory.forEach(tr => {
+      const name   = tr.name    || '';
+      const artist = tr.artist?.['#text'] || tr.artist?.name || '';
+      const album  = tr.album?.['#text']  || '';
+      if (name.toLowerCase().includes(ql) || artist.toLowerCase().includes(ql) || album.toLowerCase().includes(ql)) {
+        const k = 'hist|' + artist.toLowerCase() + '|' + name.toLowerCase();
+        if (!histCounts[k]) histCounts[k] = { name, artist, album, count: 0 };
+        histCounts[k].count++;
+      }
+    });
+    Object.values(histCounts)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 12)
+      .forEach(h => add('track', h.name, h.artist, h.count,
+          `https://www.last.fm/music/${encodeURIComponent(h.artist)}/_/${encodeURIComponent(h.name)}`, ''));
+  }
+
+  // Sort by plays desc, cap at 10
+  hits.sort((a, b) => b.plays - a.plays);
+  const top = hits.slice(0, 10);
+
+  if (!top.length) {
+    results.innerHTML = `<div class="dsr-empty"><i class="fas fa-search"></i> Aucun résultat pour « ${escHtml(q)} »</div>`;
+    results.classList.remove('hidden');
+    return;
+  }
+
+  const icons = { artist: 'microphone-alt', album: 'compact-disc', track: 'music' };
+  const labels = { artist: 'Artiste', album: 'Album', track: 'Titre' };
+
+  results.innerHTML = top.map(h => {
+    const ico   = icons[h.type] || 'music';
+    const lbl   = labels[h.type] || h.type;
+    const imgH  = h.img && !isDefaultImg(h.img)
+      ? `<img src="${escHtml(h.img)}" class="dsr-thumb" alt="">`
+      : `<span class="dsr-thumb dsr-thumb-ico"><i class="fas fa-${ico}"></i></span>`;
+    const spUrl = `spotify:search:${encodeURIComponent(h.name + (h.sub ? ' ' + h.sub : ''))}`;
+    const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(h.name + ' ' + h.sub)}`;
+    const lfUrl = h.url || (h.type === 'artist'
+      ? `https://www.last.fm/music/${encodeURIComponent(h.name)}`
+      : `https://www.last.fm/music/${encodeURIComponent(h.sub)}/_/${encodeURIComponent(h.name)}`);
+
+    return `
+    <div class="dsr-row" role="button" tabindex="0">
+      ${imgH}
+      <div class="dsr-info">
+        <span class="dsr-name">${escHtml(h.name)}</span>
+        <span class="dsr-meta">
+          <span class="dsr-type-badge">${lbl}</span>
+          ${h.sub ? `<span class="dsr-sub">${escHtml(h.sub)}</span>` : ''}
+          ${h.plays ? `<span class="dsr-plays"><i class="fas fa-headphones"></i> ${formatNum(h.plays)}</span>` : ''}
+        </span>
+      </div>
+      <div class="dsr-actions">
+        <a href="${escHtml(lfUrl)}" target="_blank" rel="noopener" class="dsr-btn dsr-btn--lfm" title="Last.fm">
+          <i class="fas fa-external-link-alt"></i>
+        </a>
+        <a href="${spUrl}" class="dsr-btn dsr-btn--sp" title="Spotify">
+          <i class="fab fa-spotify"></i>
+        </a>
+        <a href="${escHtml(ytUrl)}" target="_blank" rel="noopener" class="dsr-btn dsr-btn--yt" title="YouTube">
+          <i class="fab fa-youtube"></i>
+        </a>
+      </div>
+    </div>`;
+  }).join('');
+
+  results.classList.remove('hidden');
+}
+
+// Close search on outside click
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('dash-search-wrap');
+  if (wrap && !wrap.contains(e.target)) closeDashSearch();
+});
 
 function exportData(format) {
   const sources = [

@@ -322,6 +322,22 @@
             <h2 data-i18n="dashboard.title">Dashboard</h2>
             <p class="sec-sub" data-i18n="dashboard.sub">Overview of your musical activity</p>
           </div>
+          <!-- Search bar — searches history + top data -->
+          <div class="dash-search-wrap" id="dash-search-wrap">
+            <div class="dash-search-inner">
+              <i class="fas fa-search dash-search-ico"></i>
+              <input type="text" id="dash-search-input" class="dash-search-input"
+                     placeholder="Rechercher artiste, titre, album…"
+                     autocomplete="off" spellcheck="false"
+                     oninput="dashSearch(this.value)"
+                     onkeydown="if(event.key==='Escape'){closeDashSearch();}">
+              <button class="dash-search-clear hidden" id="dash-search-clear" onclick="closeDashSearch()">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <!-- Results dropdown -->
+            <div class="dash-search-results hidden" id="dash-search-results"></div>
+          </div>
           <button class="btn-fetch btn-fetch--sm" id="fetch-history-btn" onclick="fetchFullHistory()">
             <i class="fas fa-database"></i>
             <span data-i18n="advanced.loadHistory">Load full history</span>
@@ -2103,17 +2119,10 @@
       </span>
     </button>
     <button class="export-menu-opt" id="exp-opt-portrait" onclick="_doExport('portrait')">
-      <span class="export-menu-icon">📄</span>
-      <span class="export-menu-label">
-        <strong>Portrait</strong>
-        <small>4:5 — post ou partage</small>
-      </span>
-    </button>
-    <button class="export-menu-opt" id="exp-opt-mobile" onclick="_doExport('mobile')">
       <span class="export-menu-icon">📱</span>
       <span class="export-menu-label">
-        <strong>Mobile / Story</strong>
-        <small>9:16 — Instagram, TikTok…</small>
+        <strong>Portrait / Story</strong>
+        <small>9:16 — Instagram, TikTok, mobile…</small>
       </span>
     </button>
   </div>
