@@ -844,12 +844,8 @@
             <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
               <select id="cal-heatmap-yr-sel-charts" class="yr-sel"
                       onchange="renderListeningHeatmap(parseInt(this.value), 'charts')"></select>
-              <button class="btn-generate" id="heatmap-export-btn" onclick="exportHeatmapAsImage('horizontal')" title="Exporter en horizontal">
+              <button class="cc-export-btn" id="heatmap-export-btn-vertical" onclick="exportHeatmapAsImage('vertical')" title="Exporter le calendrier">
                 <i class="fas fa-download"></i>
-                <span>Exporter</span>
-              </button>
-              <button class="btn-generate" onclick="exportHeatmapAsImage('vertical')" title="Exporter en vertical" style="background:transparent;border-color:var(--border)">
-                <i class="fas fa-arrows-alt-v"></i>
               </button>
             </div>
           </div>
@@ -1255,6 +1251,11 @@
                           onclick="setAccent('dynamic')" title="Dynamique (pochette en cours)">
                     <i class="fas fa-magic" style="font-size:8px;color:#fff"></i>
                   </button>
+                  <button class="acc-dot acc-dot--system" data-color="system"
+                          onclick="setAccent('system')" title="Couleur du système / navigateur"
+                          style="background:conic-gradient(from 0deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);border:2px solid var(--border)">
+                    <i class="fas fa-desktop" style="font-size:8px;color:#fff;text-shadow:0 0 3px #000"></i>
+                  </button>
                   <label class="acc-dot acc-dot--custom" data-color="custom" id="acc-custom-wrap"
                          title="Couleur personnalisée" onclick="setAccent('custom')">
                     <input type="color" id="acc-custom-input" value="#d0bcff"
@@ -1281,6 +1282,54 @@
                       <span class="toggle-thumb"></span>
                     </span>
                   </label>
+                </div>
+              </div>
+              <!-- Page de démarrage -->
+              <div class="setting-row">
+                <span class="setting-lbl">
+                  <i class="fas fa-rocket"></i>
+                  <span>Page au démarrage</span>
+                </span>
+                <p class="hint">
+                  <i class="fas fa-info-circle"></i>
+                  <span>Section affichée à chaque ouverture de l'app.</span>
+                </p>
+                <div class="setting-ctrl" style="flex-wrap:wrap;gap:6px">
+                  <button class="startup-btn active" data-startup="last"
+                          onclick="setStartupSection('last')"
+                          title="Dernière page visitée">
+                    <i class="fas fa-history"></i> Dernière visitée
+                  </button>
+                  <button class="startup-btn" data-startup="dashboard"
+                          onclick="setStartupSection('dashboard')"
+                          title="Dashboard">
+                    <i class="fas fa-home"></i> Dashboard
+                  </button>
+                  <button class="startup-btn" data-startup="top-artists"
+                          onclick="setStartupSection('top-artists')"
+                          title="Top Artistes">
+                    <i class="fas fa-microphone-alt"></i> Artistes
+                  </button>
+                  <button class="startup-btn" data-startup="top-albums"
+                          onclick="setStartupSection('top-albums')"
+                          title="Top Albums">
+                    <i class="fas fa-compact-disc"></i> Albums
+                  </button>
+                  <button class="startup-btn" data-startup="top-tracks"
+                          onclick="setStartupSection('top-tracks')"
+                          title="Top Titres">
+                    <i class="fas fa-music"></i> Titres
+                  </button>
+                  <button class="startup-btn" data-startup="charts"
+                          onclick="setStartupSection('charts')"
+                          title="Graphiques">
+                    <i class="fas fa-chart-bar"></i> Graphiques
+                  </button>
+                  <button class="startup-btn" data-startup="history"
+                          onclick="setStartupSection('history')"
+                          title="Historique">
+                    <i class="fas fa-history"></i> Historique
+                  </button>
                 </div>
               </div>
             </div>

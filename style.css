@@ -2502,6 +2502,44 @@ canvas#w-mini { height: 60px !important; }
   opacity: 0; cursor: pointer;
   border: none; padding: 0;
 }
+.acc-dot--system {
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+
+/* ─── Startup page buttons ──────────────────────────────────────── */
+.startup-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-2);
+  font-size: .78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--dur-medium1) var(--ease-standard),
+              border-color var(--dur-medium1) var(--ease-standard),
+              color var(--dur-medium1) var(--ease-standard),
+              transform var(--dur-medium1) var(--ease-spring);
+  white-space: nowrap;
+}
+.startup-btn:hover {
+  background: var(--accent-lt);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+.startup-btn:active { transform: translateY(0) scale(.97); }
+.startup-btn.active {
+  background: var(--accent-lt);
+  border-color: var(--border-glow);
+  color: var(--accent);
+  font-weight: 700;
+  animation: m3-spring-pop var(--dur-medium1) var(--ease-spring) both;
+}
 
 /* Toggle switch */
 .toggle-switch { display: flex; align-items: center; cursor: pointer; }
@@ -4848,4 +4886,132 @@ a:focus:not(:focus-visible) { outline: none; }
   border-color: var(--accent);
   color: var(--accent);
   font-weight: 800;
+}
+
+/* ══════════════════════════════════════════════════════
+   COMPARE — LIENS MUSICAUX CLIQUABLES
+══════════════════════════════════════════════════════ */
+/* Playlist rows as links */
+.vs-playlist-row--link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+.vs-playlist-row--link:hover {
+  background: var(--accent-lt);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-lt);
+  transform: translateY(-1px);
+  transition: border-color var(--dur-short) var(--ease-standard),
+              background   var(--dur-short) var(--ease-standard),
+              transform    var(--dur-short2) var(--ease-spring);
+}
+.vs-playlist-ext {
+  font-size: .62em;
+  opacity: .45;
+  margin-left: 5px;
+  flex-shrink: 0;
+}
+
+/* Artist pills as links */
+.vs-tag-pill--link {
+  text-decoration: none;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: background var(--dur-short) var(--ease-standard),
+              color      var(--dur-short) var(--ease-standard),
+              border-color var(--dur-short) var(--ease-standard),
+              transform  var(--dur-short2) var(--ease-spring);
+}
+.vs-tag-pill--link:hover {
+  background: var(--accent);
+  color: var(--accent-on);
+  border-color: var(--accent);
+  transform: translateY(-2px) scale(1.04);
+}
+
+/* Dealbreaker artist links */
+.vs-breaker-artist--link {
+  text-decoration: none;
+  color: var(--accent);
+  font-weight: 700;
+  transition: opacity var(--dur-short) var(--ease-standard);
+}
+.vs-breaker-artist--link:hover { opacity: .75; text-decoration: underline; }
+
+/* ══════════════════════════════════════════════════════
+   OPTIMISATIONS GÉNÉRALES PC / MOBILE
+══════════════════════════════════════════════════════ */
+
+/* ── Amélioration touch targets sur mobile ── */
+@media (max-width: 768px) {
+  .cc-export-btn { width: 36px; height: 36px; font-size: .82rem; }
+  .startup-btn   { padding: 9px 16px; font-size: .82rem; }
+  .acc-dot       { width: 32px; height: 32px; }
+  .th-btn        { padding: 9px 14px; }
+  .lang-btn      { padding: 8px 12px; }
+  .setting-row   { padding: 12px 0; }
+  /* Playlist rows plus hautes sur mobile */
+  .vs-playlist-row { padding: 10px 12px 10px 10px; }
+  /* Évite que les vs-tags débordent sur petit écran */
+  .vs-tags-wrap  { gap: 6px; }
+  .vs-tag-pill   { font-size: .76rem; padding: 4px 10px; }
+}
+
+/* ── Corrections overflow horizontal ── */
+.main-content { overflow-x: hidden; }
+.app-sec      { max-width: 100%; overflow-x: hidden; }
+
+/* ── Better card hover effects on desktop ── */
+@media (hover: hover) and (pointer: fine) {
+  .chart-card:hover {
+    box-shadow: 0 4px 24px rgba(0,0,0,.18), 0 0 0 1px var(--border-glow);
+    transform: translateY(-2px);
+    transition: box-shadow var(--dur-medium1) var(--ease-standard),
+                transform  var(--dur-medium1) var(--ease-spring);
+  }
+  .music-card:hover, .hero-card:hover {
+    transform: translateY(-3px) scale(1.015);
+  }
+}
+
+/* ── Settings grid — 2 colonnes sur grand écran ── */
+@media (min-width: 1100px) {
+  .settings-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .settings-card--about {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ── Section headers — meilleur espacement PC ── */
+@media (min-width: 1025px) {
+  .sec-hd { padding-bottom: 20px; margin-bottom: 4px; }
+  .sec-hd h2 { font-size: 1.45rem; }
+  .sec-sub   { font-size: .92rem; }
+}
+
+/* ── Compare section — meilleure densité PC ── */
+@media (min-width: 769px) {
+  .vs-playlist { gap: 8px; }
+  .vs-metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .vs-volume-grid  { grid-template-columns: repeat(3, 1fr); }
+  .vs-peak-grid    { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── Focus visible amélioration accessibilité ── */
+.vs-playlist-row--link:focus-visible,
+.vs-tag-pill--link:focus-visible,
+.vs-breaker-artist--link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Mode basique — toast de bienvenue joli ── */
+.toast--info {
+  background: var(--accent-container);
+  color: var(--accent-on-cont);
+  border-left: 3px solid var(--accent);
 }

@@ -736,6 +736,35 @@ const _ACCENT_LIGHT = {
   yellow:{ hue: 46, accent:'#6c5c00', h:'#4a4000', a2:'#625e40', container:'#ffe08c', on:'#ffffff', onCont:'#201b00', glow:'rgba(108,92,0,.3)',    lt:'rgba(108,92,0,.1)',    strip:'rgba(108,92,0,.50)',   borderGlow:'rgba(108,92,0,.30)'   },
 };
 
+/**
+ * Lit la couleur d'accent du navigateur / OS via la propriété CSS accent-color.
+ * Retourne un hex (#rrggbb) ou null si non supporté / gris neutre.
+ */
+function _getSystemAccentColor() {
+  try {
+    const el = document.createElement('div');
+    // accent-color:auto reflète la couleur système dans les navigateurs récents
+    el.style.cssText = 'position:absolute;width:0;height:0;accent-color:auto;color:AccentColor';
+    document.body.appendChild(el);
+    const computed = getComputedStyle(el);
+    // Essai 1 : CSS System Color "AccentColor" (Chrome 101+, Firefox 103+)
+    let raw = computed.color;
+    // Essai 2 : accent-color (moins universellement lisible en computed)
+    if (!raw || raw === 'rgba(0, 0, 0, 0)') raw = computed.accentColor;
+    document.body.removeChild(el);
+
+    if (!raw || raw === 'auto' || raw === 'rgba(0, 0, 0, 0)') return null;
+
+    const m = raw.match(/(\d+),\s*(\d+),\s*(\d+)/);
+    if (!m) return null;
+    const [r, g, b] = [+m[1], +m[2], +m[3]];
+    // Filtre les gris neutres (très peu saturés) — pas de teinte significative
+    const [, s] = _rgbToHsl(r, g, b);
+    if (s < 8) return null;
+    return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+  } catch { return null; }
+}
+
 function setAccent(colorKey) {
   APP.currentAccent = colorKey;
   localStorage.setItem('ls_accent', colorKey);
@@ -745,6 +774,21 @@ function setAccent(colorKey) {
   if (colorKey === 'dynamic') {
     const npImg = document.querySelector('#np-art img');
     if (npImg?.complete && npImg.naturalWidth > 0) _applyColorThiefFromEl(npImg);
+    return;
+  }
+
+  if (colorKey === 'system') {
+    const hex    = _getSystemAccentColor();
+    const isDark = APP.currentTheme === 'dark' || (APP.currentTheme === 'auto' && window.matchMedia('(prefers-color-scheme:dark)').matches);
+    if (hex) {
+      _applyCSSAccent(_hexToPalette(hex, isDark));
+    } else {
+      // Fallback : violet si la couleur système est illisible
+      const pal = (isDark ? _ACCENT_DARK : _ACCENT_LIGHT).purple;
+      _applyCSSAccent(pal);
+      showToast('⚠️ Couleur système non détectée, violet appliqué.', 'info');
+    }
+    updateAllChartThemes();
     return;
   }
 
@@ -965,6 +1009,29 @@ function setLanguage(lang) {
   });
 }
 
+/* ─── Page de démarrage ──────────────────────────────────────────── */
+/**
+ * Définit la page affichée à chaque ouverture de l'app.
+ * 'last' = comportement par défaut (dernière page visitée).
+ * Toute autre valeur = section fixe (ex: 'top-tracks').
+ */
+function setStartupSection(section) {
+  localStorage.setItem('ls_startup_section', section);
+  APP.startupSection = section;
+  document.querySelectorAll('.startup-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.startup === section)
+  );
+  showToast('✅ Page de démarrage enregistrée !');
+}
+
+function _syncStartupSectionUI() {
+  const saved = localStorage.getItem('ls_startup_section') || 'last';
+  APP.startupSection = saved;
+  document.querySelectorAll('.startup-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.startup === saved)
+  );
+}
+
 function _updateNavMode() {
   const isMobile = window.innerWidth <= 768;
   document.body.classList.toggle('nav-mode-bottom', isMobile);
@@ -998,6 +1065,32 @@ async function initApp(usernameOverride, apiKeyOverride) {
     saveSession();
     checkMilestoneNotification();
 
+    /* ── Première ouverture : configuration automatique ── */
+    if (!localStorage.getItem('ls_first_seen')) {
+      localStorage.setItem('ls_first_seen', '1');
+      const isMobile = window.innerWidth <= 768;
+      // Thème auto si aucun thème enregistré
+      if (!localStorage.getItem('ls_theme')) {
+        localStorage.setItem('ls_theme', 'auto');
+      }
+      // Disposition adaptée à l'écran si non encore choisie
+      if (!localStorage.getItem('ls_artists_layout')) {
+        localStorage.setItem('ls_artists_layout', isMobile ? 'list' : 'grid');
+      }
+      if (!localStorage.getItem('ls_albums_layout')) {
+        localStorage.setItem('ls_albums_layout', isMobile ? 'list' : 'grid');
+      }
+      if (!localStorage.getItem('ls_tracks_layout')) {
+        localStorage.setItem('ls_tracks_layout', 'list');
+      }
+      // Re-lire les valeurs fraîchement définies
+      APP.artistsLayout = localStorage.getItem('ls_artists_layout') || (isMobile ? 'list' : 'grid');
+      APP.albumsLayout  = localStorage.getItem('ls_albums_layout')  || (isMobile ? 'list' : 'grid');
+      APP.tracksLayout  = localStorage.getItem('ls_tracks_layout')  || 'list';
+      // Afficher un toast de bienvenue discret
+      setTimeout(() => showToast('👋 Bienvenue sur LastStats ! Interface adaptée à ton écran.', 'info'), 2200);
+    }
+
     const theme = localStorage.getItem('ls_theme') || 'dark';
     applyTheme(theme);
 
@@ -1008,13 +1101,15 @@ async function initApp(usernameOverride, apiKeyOverride) {
     _updateNavMode();
 
     await loadDashboard();
-    const savedSection = localStorage.getItem('ls_section');
-    if (savedSection && document.getElementById('s-' + savedSection)) {
-      if (savedSection === 'profile') {
-        // Pour le profil, on doit charger les données, pas juste naviguer
+    const startupPref  = localStorage.getItem('ls_startup_section') || 'last';
+    const sectionToNav = startupPref === 'last'
+      ? (localStorage.getItem('ls_section') || null)
+      : startupPref;
+    if (sectionToNav && document.getElementById('s-' + sectionToNav)) {
+      if (sectionToNav === 'profile') {
         openProfilePage();
       } else {
-        nav(savedSection);
+        nav(sectionToNav);
       }
     }
 
@@ -4803,6 +4898,7 @@ function syncSettingsFields() {
   document.querySelectorAll('.th-btn').forEach(b => b.classList.toggle('active', b.dataset.t === APP.currentTheme));
   document.querySelectorAll('.acc-dot').forEach(b => b.classList.toggle('active', b.dataset.color === APP.currentAccent));
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === APP.language));
+  _syncStartupSectionUI();
 
   // Tinted background toggle
   APP.tintBg = localStorage.getItem('ls_tint_bg') !== '0';
@@ -4884,26 +4980,25 @@ async function exportChartAsImage(canvasId, filename) {
 
 /* ─── Export calendrier heatmap ──────────────────────────────────── */
 async function exportHeatmapAsImage(orientation) {
-  orientation = orientation || 'horizontal';
+  orientation = orientation || 'vertical';
   const wrapEl = document.getElementById('listening-heatmap-wrap-charts');
   if (!wrapEl || wrapEl.classList.contains('hidden')) {
     showToast('Chargez l\'historique complet pour afficher le calendrier.', 'error');
     return;
   }
-  const btn = document.getElementById('heatmap-export-btn');
+
+  const btn = document.getElementById('heatmap-export-btn-vertical');
+  const originalHTML = btn ? btn.innerHTML : '';
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
+
   try {
     const year = parseInt(document.getElementById('cal-heatmap-yr-sel-charts')?.value) || new Date().getFullYear();
-    if (orientation === 'vertical') {
-      await _exportHeatmapVertical(year);
-    } else {
-      await _exportHeatmapHorizontal(year, wrapEl);
-    }
+    await _exportHeatmapVertical(year);
   } catch (e) {
     console.error('exportHeatmap:', e);
     showToast('Erreur export : ' + e.message, 'error');
   } finally {
-    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-download"></i> <span>Exporter</span>'; }
+    if (btn) { btn.disabled = false; btn.innerHTML = originalHTML; }
   }
 }
 
@@ -6314,8 +6409,10 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
   const playlistHTML = playlist ? _section('compact-disc', t('compare_playlist_title'),
     `<p class="vs-section-hint">${t('compare_playlist_sub')}</p>
      <div class="vs-playlist">
-       ${playlist.map((item, i) => `
-         <div class="vs-playlist-row">
+       ${playlist.map((item, i) => {
+         const lfmUrl = `https://www.last.fm/music/${encodeURIComponent(item.artist)}/_/${encodeURIComponent(item.track)}`;
+         return `
+         <a class="vs-playlist-row vs-playlist-row--link" href="${lfmUrl}" target="_blank" rel="noopener" title="Ouvrir sur Last.fm">
            <div class="vs-playlist-art">
              ${item.imgUrl
                ? `<img src="${escHtml(item.imgUrl)}" alt="" class="vs-playlist-art-img" onerror="this.parentNode.innerHTML='<span class=vs-playlist-art-num>${i+1}</span>'">`
@@ -6329,8 +6426,10 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
              <span class="vs-playlist-me" title="${myN}">${item.myCount}×</span>
              <span class="vs-playlist-sep">·</span>
              <span class="vs-playlist-fr" title="${frN}">${item.frCount}×</span>
+             <i class="fas fa-external-link-alt vs-playlist-ext"></i>
            </div>
-         </div>`).join('')}
+         </a>`;
+       }).join('')}
      </div>`) : '';
 
   /* ── RADAR ── */
@@ -6438,13 +6537,22 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
      </div>`) : '';
 
   /* ── COMMON / CURIOSITIES ── */
-  const commonHTML = common.slice(0, 8).map(a => `<span class="vs-tag-pill">${escHtml(a.name)}</span>`).join('');
-  const tagsHTML   = sharedTags.map(tg => `<span class="vs-tag-pill vs-tag-genre">${escHtml(tg)}</span>`).join('');
+  const commonHTML = common.slice(0, 8).map(a => {
+    const url = `https://www.last.fm/music/${encodeURIComponent(a.name)}`;
+    return `<a class="vs-tag-pill vs-tag-pill--link" href="${url}" target="_blank" rel="noopener" title="Voir sur Last.fm">${escHtml(a.name)} <i class="fas fa-external-link-alt" style="font-size:.6em;opacity:.6"></i></a>`;
+  }).join('');
+  const tagsHTML = sharedTags.map(tg => `<span class="vs-tag-pill vs-tag-genre">${escHtml(tg)}</span>`).join('');
 
   /* Dealbreaker — label cleaner: just show the artist, no username prefix */
   let breakerHTML = '';
-  if (breaker.mine)   breakerHTML += `<div class="vs-breaker-row"><span class="vs-breaker-badge">${myN}</span><i class="fas fa-arrow-right vs-breaker-arrow"></i><span class="vs-breaker-artist">${escHtml(breaker.mine.name)}</span></div>`;
-  if (breaker.theirs) breakerHTML += `<div class="vs-breaker-row"><span class="vs-breaker-badge vs-breaker-badge--fr">${frN}</span><i class="fas fa-arrow-right vs-breaker-arrow"></i><span class="vs-breaker-artist">${escHtml(breaker.theirs.name)}</span></div>`;
+  if (breaker.mine) {
+    const bUrl = `https://www.last.fm/music/${encodeURIComponent(breaker.mine.name)}`;
+    breakerHTML += `<div class="vs-breaker-row"><span class="vs-breaker-badge">${myN}</span><i class="fas fa-arrow-right vs-breaker-arrow"></i><a class="vs-breaker-artist vs-breaker-artist--link" href="${bUrl}" target="_blank" rel="noopener">${escHtml(breaker.mine.name)} <i class="fas fa-external-link-alt" style="font-size:.6em;opacity:.6"></i></a></div>`;
+  }
+  if (breaker.theirs) {
+    const bUrl = `https://www.last.fm/music/${encodeURIComponent(breaker.theirs.name)}`;
+    breakerHTML += `<div class="vs-breaker-row"><span class="vs-breaker-badge vs-breaker-badge--fr">${frN}</span><i class="fas fa-arrow-right vs-breaker-arrow"></i><a class="vs-breaker-artist vs-breaker-artist--link" href="${bUrl}" target="_blank" rel="noopener">${escHtml(breaker.theirs.name)} <i class="fas fa-external-link-alt" style="font-size:.6em;opacity:.6"></i></a></div>`;
+  }
 
   let topSharedHTML = '', neutralHTML = '';
   if (curiosities?.topShared) topSharedHTML = `
