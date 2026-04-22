@@ -5294,3 +5294,178 @@ a:focus:not(:focus-visible) { outline: none; }
   .dsr-thumb { width: 36px; height: 36px; }
   .dsr-btn { width: 26px; height: 26px; font-size: .7rem; }
 }
+
+/* ══════════════════════════════════════════════════════
+   DASHBOARD HERO BANNER — full-bleed, fade into site
+══════════════════════════════════════════════════════ */
+
+/* Allow s-dashboard to let the hero overflow its own padding */
+#s-dashboard { overflow: visible; padding-top: 0; }
+
+.dash-hero {
+  position: relative;
+  /* Escape main-content's 24px padding on all 3 sides */
+  width: calc(100% + 48px);
+  margin-top: -24px;
+  margin-left: -24px;
+  margin-right: -24px;
+  margin-bottom: 0;           /* fade merges with content below */
+  height: 240px;
+  overflow: hidden;
+  border-radius: 0;           /* no border radius — true full bleed */
+}
+
+/* Background image layer */
+.dash-hero-bg {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center 30%;
+  transform: scale(1.06);
+  transition: background-image .7s var(--ease-standard),
+              background      .5s var(--ease-standard),
+              filter          .4s var(--ease-standard);
+  will-change: transform, filter;
+}
+
+/* Dark mode: dark blur */
+.dash-hero-bg {
+  filter: blur(20px) brightness(.35) saturate(1.8);
+}
+/* Light mode: lighter blur */
+[data-theme="light"] .dash-hero-bg {
+  filter: blur(20px) brightness(.72) saturate(1.3);
+}
+[data-theme="auto"] .dash-hero-bg {
+  filter: blur(20px) brightness(.35) saturate(1.8);
+}
+@media (prefers-color-scheme: light) {
+  [data-theme="auto"] .dash-hero-bg {
+    filter: blur(20px) brightness(.72) saturate(1.3);
+  }
+}
+
+/* Overlay: dark-to-transparent from top, then fade to --bg at bottom */
+.dash-hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,.08) 0%,
+    rgba(0,0,0,.38) 45%,
+    rgba(0,0,0,.62) 72%,
+    var(--bg)       100%
+  );
+  transition: background .4s var(--ease-standard);
+}
+/* Light mode overlay: lighter top, still fades to --bg */
+[data-theme="light"] .dash-hero-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,.04) 0%,
+    rgba(0,0,0,.18)       45%,
+    rgba(0,0,0,.38)       72%,
+    var(--bg)             100%
+  );
+}
+@media (prefers-color-scheme: light) {
+  [data-theme="auto"] .dash-hero-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(255,255,255,.04) 0%,
+      rgba(0,0,0,.18)       45%,
+      rgba(0,0,0,.38)       72%,
+      var(--bg)             100%
+    );
+  }
+}
+
+/* Content sits at bottom of hero */
+.dash-hero-content {
+  position: relative; z-index: 2;
+  height: 100%;
+  display: flex; align-items: flex-end;
+  padding: 20px 32px 28px;
+}
+
+/* ── Text visible / hidden toggle ── */
+.dash-hero--no-info .dash-hero-track,
+.dash-hero--no-info .dash-hero-accent-inner { display: none; }
+
+/* Track / Artist layout */
+.dash-hero-track {
+  display: flex; align-items: center; gap: 18px;
+  animation: sectionIn var(--dur-medium2) var(--ease-decel) both;
+}
+.dash-hero-art {
+  width: 84px; height: 84px;
+  border-radius: 12px; object-fit: cover; flex-shrink: 0;
+  box-shadow: 0 6px 28px rgba(0,0,0,.7);
+  border: 2px solid rgba(255,255,255,.18);
+}
+.dash-hero-art--round { border-radius: 50%; }
+.dash-hero-art--ico {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--accent-lt); color: var(--accent);
+  font-size: 1.8rem;
+}
+.dash-hero-track-info { display: flex; flex-direction: column; gap: 4px; }
+.dash-hero-label {
+  font-size: .72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--accent);
+  text-shadow: 0 1px 8px rgba(0,0,0,.9);
+}
+.dash-hero-name {
+  font-size: 1.4rem; font-weight: 900; color: #fff;
+  line-height: 1.15; letter-spacing: -.02em;
+  text-shadow: 0 2px 14px rgba(0,0,0,.95);
+  max-width: 520px; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.dash-hero-sub {
+  font-size: .85rem; color: rgba(255,255,255,.75);
+  font-weight: 500; text-shadow: 0 1px 8px rgba(0,0,0,.8);
+}
+
+/* Accent mode */
+.dash-hero-accent-inner {
+  display: flex; align-items: center; gap: 20px;
+  animation: sectionIn var(--dur-medium2) var(--ease-decel) both;
+}
+.dash-hero-accent-icon {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: rgba(255,255,255,.12);
+  border: 2px solid rgba(255,255,255,.22);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; color: #fff;
+}
+.dash-hero-accent-text { display: flex; flex-direction: column; gap: 5px; }
+.dash-hero-accent-text strong {
+  font-size: 1.3rem; font-weight: 900; color: #fff;
+  text-shadow: 0 2px 10px rgba(0,0,0,.7);
+}
+.dash-hero-accent-text span {
+  font-size: .84rem; color: rgba(255,255,255,.75);
+  text-shadow: 0 1px 6px rgba(0,0,0,.6);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .dash-hero {
+    width: calc(100% + 24px);
+    margin-top: -12px;
+    margin-left: -12px;
+    margin-right: -12px;
+    height: 180px;
+  }
+  .dash-hero-content { padding: 14px 16px 20px; }
+  .dash-hero-art { width: 62px; height: 62px; border-radius: 9px; }
+  .dash-hero-art--round { border-radius: 50%; }
+  .dash-hero-name { font-size: 1.05rem; max-width: calc(100vw - 120px); }
+  .dash-hero-sub  { font-size: .78rem; }
+  .dash-hero-track { gap: 12px; }
+  .dash-hero-accent-icon { width: 52px; height: 52px; font-size: 1.5rem; }
+  .dash-hero-accent-text strong { font-size: 1.05rem; }
+}
+
+/* sec-hd sits right after the hero with no extra gap */
+.dash-hero + .sec-hd,
+.dash-hero + .dash-sec-hd { margin-top: 16px; }

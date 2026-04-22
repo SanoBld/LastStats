@@ -317,6 +317,14 @@
 
       
       <section id="s-dashboard" class="app-sec active" style="view-transition-name:section-dashboard">
+
+        <!-- ═══ Hero Banner ═══ -->
+        <div class="dash-hero hidden" id="dash-hero">
+          <div class="dash-hero-bg"  id="dash-hero-bg"></div>
+          <div class="dash-hero-overlay"></div>
+          <div class="dash-hero-content" id="dash-hero-content"></div>
+        </div>
+
         <div class="sec-hd dash-sec-hd">
           <div>
             <h2 data-i18n="dashboard.title">Dashboard</h2>
@@ -1353,6 +1361,69 @@
                           title="Historique">
                     <i class="fas fa-history"></i> Historique
                   </button>
+                </div>
+              </div>
+
+              <!-- Bandeau Dashboard -->
+              <div class="setting-row setting-row--full">
+                <span class="setting-lbl">
+                  <i class="fas fa-image"></i>
+                  <span>Bandeau du Dashboard</span>
+                </span>
+                <p class="hint">
+                  <i class="fas fa-info-circle"></i>
+                  <span>Image affichée en haut du Dashboard. Nécessite l'historique chargé pour les modes Top.</span>
+                </p>
+                <!-- Mode selector -->
+                <div class="setting-ctrl" style="flex-wrap:wrap;gap:6px;width:100%">
+                  <button class="startup-btn hero-mode-btn active" data-hero="none"
+                          onclick="setDashHeroMode('none')">
+                    <i class="fas fa-ban"></i> Aucun
+                  </button>
+                  <button class="startup-btn hero-mode-btn" data-hero="accent"
+                          onclick="setDashHeroMode('accent')">
+                    <i class="fas fa-palette"></i> Accent
+                  </button>
+                  <button class="startup-btn hero-mode-btn" data-hero="nowplaying"
+                          onclick="setDashHeroMode('nowplaying')">
+                    <i class="fas fa-music"></i> En cours
+                  </button>
+                  <button class="startup-btn hero-mode-btn" data-hero="top-track-7day"
+                          onclick="setDashHeroMode('top-track-7day')">
+                    <i class="fas fa-fire"></i> Top Titre (sem.)
+                  </button>
+                  <button class="startup-btn hero-mode-btn" data-hero="top-track-1month"
+                          onclick="setDashHeroMode('top-track-1month')">
+                    <i class="fas fa-fire"></i> Top Titre (mois)
+                  </button>
+                  <button class="startup-btn hero-mode-btn" data-hero="top-track-12month"
+                          onclick="setDashHeroMode('top-track-12month')">
+                    <i class="fas fa-fire"></i> Top Titre (année)
+                  </button>
+                  <button class="startup-btn hero-mode-btn" data-hero="top-artist-7day"
+                          onclick="setDashHeroMode('top-artist-7day')">
+                    <i class="fas fa-microphone-alt"></i> Top Artiste (sem.)
+                  </button>
+                  <button class="startup-btn hero-mode-btn" data-hero="top-artist-1month"
+                          onclick="setDashHeroMode('top-artist-1month')">
+                    <i class="fas fa-microphone-alt"></i> Top Artiste (mois)
+                  </button>
+                  <button class="startup-btn hero-mode-btn" data-hero="top-artist-12month"
+                          onclick="setDashHeroMode('top-artist-12month')">
+                    <i class="fas fa-microphone-alt"></i> Top Artiste (année)
+                  </button>
+                </div>
+                <!-- Affichage du texte -->
+                <div style="display:flex;align-items:center;gap:12px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+                  <span style="font-size:.82rem;color:var(--text-muted);flex:1">
+                    <i class="fas fa-font" style="margin-right:6px;color:var(--accent)"></i>
+                    Afficher le texte (titre / artiste)
+                  </span>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="hero-info-toggle" checked
+                           onchange="setDashHeroInfo(this.checked)">
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                  </label>
                 </div>
               </div>
             </div>

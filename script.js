@@ -1049,6 +1049,204 @@ function _syncStartupSectionUI() {
   );
 }
 
+/* ════════════════════════════════════════════════════════
+   DASHBOARD HERO BANNER
+   Modes : none | accent | nowplaying | top-track-{period} | top-artist-{period}
+════════════════════════════════════════════════════════ */
+
+/** Save mode + refresh */
+function setDashHeroMode(mode) {
+  localStorage.setItem('ls_dash_hero', mode);
+  APP.dashHeroMode = mode;
+  document.querySelectorAll('.hero-mode-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.hero === mode)
+  );
+  refreshDashHero();
+  showToast('🎨 Bandeau mis à jour !');
+}
+
+/** Called on init + section nav + NP update */
+async function refreshDashHero() {
+  const mode   = localStorage.getItem('ls_dash_hero') || 'none';
+  const hero   = document.getElementById('dash-hero');
+  const bg     = document.getElementById('dash-hero-bg');
+  const cnt    = document.getElementById('dash-hero-content');
+  if (!hero) return;
+
+  // ── none ──────────────────────────────────────────
+  if (mode === 'none') {
+    hero.classList.add('hidden');
+    return;
+  }
+
+  hero.classList.remove('hidden');
+
+  // Apply text-visibility preference
+  const showInfo = localStorage.getItem('ls_dash_hero_info') !== '0';
+  hero.classList.toggle('dash-hero--no-info', !showInfo);
+
+  // ── accent ────────────────────────────────────────
+  if (mode === 'accent') {
+    bg.style.backgroundImage = 'none';
+    bg.style.background = `linear-gradient(135deg, var(--accent) 0%, var(--accent-container) 60%, var(--bg) 100%)`;
+    cnt.innerHTML = _heroAccentContent();
+    return;
+  }
+
+  // ── now playing ───────────────────────────────────
+  if (mode === 'nowplaying') {
+    const npTrack  = document.getElementById('np-track')?.textContent?.trim();
+    const npArtist = document.getElementById('np-artist')?.textContent?.trim();
+    const npImgEl  = document.querySelector('#np-art img');
+    const npImg    = npImgEl?.src || '';
+
+    if (npTrack && npTrack !== '—' && npImg) {
+      await _applyHeroBgImage(bg, npImg);
+      cnt.innerHTML = _heroTrackContent(npTrack, npArtist, npImg, '🎵 En cours');
+    } else {
+      // Fallback to accent when nothing is playing
+      bg.style.backgroundImage = 'none';
+      bg.style.background = `linear-gradient(135deg, var(--accent) 0%, var(--accent-container) 60%, var(--bg) 100%)`;
+      cnt.innerHTML = `<div class="dash-hero-label"><i class="fas fa-music"></i> En attente d'une lecture…</div>`;
+    }
+    return;
+  }
+
+  // ── top-track-{period} / top-artist-{period} ──────
+  const [kind, , period] = mode.split('-'); // 'top', 'track'/'artist', '7day'/'1month'/'12month'
+  const isTrack = mode.includes('-track-');
+  const perLabels = { '7day': 'cette semaine', '1month': 'ce mois', '12month': 'cette année' };
+  const perLabel  = perLabels[period] || period;
+
+  try {
+    let imgUrl = '', name = '', sub = '', label = '';
+
+    if (isTrack) {
+      const data   = await API.call('user.getTopTracks', { period, limit: 1 });
+      const track  = Array.isArray(data.toptracks?.track) ? data.toptracks.track[0] : data.toptracks?.track;
+      if (!track) throw new Error('no data');
+      name   = track.name || '';
+      sub    = track.artist?.name || '';
+      imgUrl = track.image?.find(i => i.size === 'extralarge')?.['#text']
+             || track.image?.find(i => i.size === 'large')?.['#text']
+             || track.image?.find(i => i.size === 'medium')?.['#text'] || '';
+      label  = `🎵 Top Titre — ${perLabel}`;
+      // If Last.fm returns no album art, try the album art via track.getInfo
+      if (!imgUrl || isDefaultImg(imgUrl)) {
+        try {
+          const ti = await API.call('track.getInfo', { artist: sub, track: name, username: APP.username });
+          imgUrl = ti.track?.album?.image?.find(i => i.size === 'extralarge')?.['#text'] || imgUrl;
+        } catch {}
+      }
+      cnt.innerHTML = _heroTrackContent(name, sub, imgUrl, label);
+    } else {
+      const data   = await API.call('user.getTopArtists', { period, limit: 1 });
+      const artist = Array.isArray(data.topartists?.artist) ? data.topartists.artist[0] : data.topartists?.artist;
+      if (!artist) throw new Error('no data');
+      name   = artist.name || '';
+      imgUrl = await _resolveArtistImageExternal(name).catch(() => '');
+      label  = `🎤 Top Artiste — ${perLabel}`;
+      cnt.innerHTML = _heroArtistContent(name, imgUrl, label);
+    }
+
+    if (imgUrl && !isDefaultImg(imgUrl)) {
+      await _applyHeroBgImage(bg, imgUrl);
+    } else {
+      bg.style.backgroundImage = 'none';
+      bg.style.background = `linear-gradient(135deg, var(--accent) 0%, var(--accent-container) 60%, var(--bg) 100%)`;
+    }
+  } catch {
+    hero.classList.add('hidden');
+  }
+}
+
+/** Cross-origin image → blurred hero bg + ColorThief tint */
+async function _applyHeroBgImage(bgEl, imgUrl) {
+  return new Promise(resolve => {
+    const img  = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      bgEl.style.background      = 'none';
+      bgEl.style.backgroundImage = `url('${imgUrl}')`;
+      // Extract dominant colour for subtle tint (if ColorThief available)
+      if (_colorThief && APP.dashHeroMode !== 'accent') {
+        try {
+          const [r, g, b] = _colorThief.getColor(img);
+          const hue = _rgbToHsl(r, g, b)[0];
+          bgEl.style.setProperty('--hero-hue', hue);
+        } catch {}
+      }
+      resolve();
+    };
+    img.onerror = () => resolve();
+    img.src = imgUrl;
+  });
+}
+
+function _heroAccentContent() {
+  const u = APP.userInfo;
+  return `<div class="dash-hero-accent-inner">
+    <div class="dash-hero-accent-icon"><i class="fas fa-headphones-alt"></i></div>
+    <div class="dash-hero-accent-text">
+      <strong>${u?.name || APP.username || 'LastStats'}</strong>
+      <span>${formatNum(u?.playcount || 0)} scrobbles</span>
+    </div>
+  </div>`;
+}
+
+function _heroTrackContent(name, artist, imgUrl, label) {
+  const imgH = imgUrl && !isDefaultImg(imgUrl)
+    ? `<img src="${escHtml(imgUrl)}" class="dash-hero-art" alt="">`
+    : `<div class="dash-hero-art dash-hero-art--ico"><i class="fas fa-music"></i></div>`;
+  return `
+  <div class="dash-hero-track">
+    ${imgH}
+    <div class="dash-hero-track-info">
+      <span class="dash-hero-label">${label}</span>
+      <strong class="dash-hero-name">${escHtml(name)}</strong>
+      <span class="dash-hero-sub">${escHtml(artist)}</span>
+    </div>
+  </div>`;
+}
+
+function _heroArtistContent(name, imgUrl, label) {
+  const imgH = imgUrl && !isDefaultImg(imgUrl)
+    ? `<img src="${escHtml(imgUrl)}" class="dash-hero-art dash-hero-art--round" alt="">`
+    : `<div class="dash-hero-art dash-hero-art--ico dash-hero-art--round"><i class="fas fa-microphone-alt"></i></div>`;
+  return `
+  <div class="dash-hero-track">
+    ${imgH}
+    <div class="dash-hero-track-info">
+      <span class="dash-hero-label">${label}</span>
+      <strong class="dash-hero-name">${escHtml(name)}</strong>
+    </div>
+  </div>`;
+}
+
+/** Toggle text info visibility on the hero */
+function setDashHeroInfo(show) {
+  localStorage.setItem('ls_dash_hero_info', show ? '1' : '0');
+  const hero = document.getElementById('dash-hero');
+  if (hero) hero.classList.toggle('dash-hero--no-info', !show);
+  const toggle = document.getElementById('hero-info-toggle');
+  if (toggle) toggle.checked = show;
+}
+
+/** Sync hero mode buttons on settings open */
+function _syncDashHeroUI() {
+  const saved = localStorage.getItem('ls_dash_hero') || 'none';
+  APP.dashHeroMode = saved;
+  document.querySelectorAll('.hero-mode-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.hero === saved)
+  );
+  // Sync info toggle
+  const showInfo = localStorage.getItem('ls_dash_hero_info') !== '0';
+  const toggle = document.getElementById('hero-info-toggle');
+  if (toggle) toggle.checked = showInfo;
+  const hero = document.getElementById('dash-hero');
+  if (hero) hero.classList.toggle('dash-hero--no-info', !showInfo);
+}
+
 function _updateNavMode() {
   const isMobile = window.innerWidth <= 768;
   document.body.classList.toggle('nav-mode-bottom', isMobile);
@@ -1118,6 +1316,7 @@ async function initApp(usernameOverride, apiKeyOverride) {
     _updateNavMode();
 
     await loadDashboard();
+    refreshDashHero(); // hero banner
     const startupPref  = localStorage.getItem('ls_startup_section') || 'last';
     const sectionToNav = startupPref === 'last'
       ? (localStorage.getItem('ls_section') || null)
@@ -1301,6 +1500,7 @@ function nav(section) {
     if (window.innerWidth <= 1024) closeSb();
 
     if (section === 'charts')    setupChartsSection();
+    if (section === 'dashboard') refreshDashHero();
     if (section === 'obscurity') loadObscurityScore();
     if (section === 'history')   histLoadDay(APP.histCurrentDate || _todayStr());
     if (section === 'compare')   initComparePage();
@@ -1973,6 +2173,12 @@ async function pollNowPlaying() {
 
       // ── Mise à jour synchronisée du profil si la section est visible ──
       _syncProfileNowPlaying(last);
+
+      // ── Rafraîchit le hero dashboard si mode nowplaying ──
+      if (localStorage.getItem('ls_dash_hero') === 'nowplaying') {
+        const dash = document.getElementById('s-dashboard');
+        if (dash?.classList.contains('active')) refreshDashHero();
+      }
 
       _npTimer = setTimeout(pollNowPlaying, 2000);
     } else {
@@ -5036,6 +5242,7 @@ function syncSettingsFields() {
   document.querySelectorAll('.acc-dot').forEach(b => b.classList.toggle('active', b.dataset.color === APP.currentAccent));
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === APP.language));
   _syncStartupSectionUI();
+  _syncDashHeroUI();
 
   // Tinted background toggle
   APP.tintBg = localStorage.getItem('ls_tint_bg') !== '0';
