@@ -5319,12 +5319,13 @@ a:focus:not(:focus-visible) { outline: none; }
 .dash-hero-bg {
   position: absolute; inset: 0;
   background-size: cover;
-  background-position: center 30%;
-  transform: scale(1.06);
+  background-position: center center;
+  background-repeat: no-repeat;
+  /* No transform: scale — avoids repeating pattern on small images */
   transition: background-image .7s var(--ease-standard),
               background      .5s var(--ease-standard),
               filter          .4s var(--ease-standard);
-  will-change: transform, filter;
+  will-change: filter;
 }
 
 /* Dark mode: dark blur */
@@ -5469,3 +5470,49 @@ a:focus:not(:focus-visible) { outline: none; }
 /* sec-hd sits right after the hero with no extra gap */
 .dash-hero + .sec-hd,
 .dash-hero + .dash-sec-hd { margin-top: 16px; }
+
+/* ── Hero head: Dashboard title overlaid on blur when info is hidden ── */
+.dash-hero-head {
+  position: absolute; z-index: 3;
+  top: 50%; left: 32px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.dash-hero-title-overlay {
+  display: flex; flex-direction: column; gap: 4px;
+  animation: sectionIn var(--dur-medium2) var(--ease-decel) both;
+}
+.dash-hero-title-overlay strong {
+  font-size: 1.6rem; font-weight: 900; color: #fff;
+  text-shadow: 0 2px 16px rgba(0,0,0,.95), 0 0 40px rgba(0,0,0,.6);
+  letter-spacing: -.025em; line-height: 1;
+}
+.dash-hero-title-overlay span {
+  font-size: .88rem; color: rgba(255,255,255,.75);
+  text-shadow: 0 1px 8px rgba(0,0,0,.9);
+  font-weight: 500;
+}
+
+/* sec-hd hides its own title row when it's shown on the hero */
+.dash-sec-hd--on-hero > div:first-child {
+  visibility: hidden;
+  height: 0; overflow: hidden; margin: 0; padding: 0;
+}
+
+/* Waiting label */
+.dash-hero-waiting {
+  display: flex; align-items: center; gap: 10px;
+  font-size: .88rem; font-weight: 600;
+  color: rgba(255,255,255,.6);
+  padding: 12px 16px; border-radius: 99px;
+  background: rgba(255,255,255,.08);
+  backdrop-filter: blur(4px);
+  animation: sectionIn var(--dur-medium2) var(--ease-decel) both;
+}
+.dash-hero-waiting i { color: var(--accent); }
+
+@media (max-width: 768px) {
+  .dash-hero-head { left: 16px; }
+  .dash-hero-title-overlay strong { font-size: 1.25rem; }
+  .dash-hero-title-overlay span   { font-size: .78rem; }
+}

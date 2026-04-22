@@ -1061,6 +1061,9 @@ function setDashHeroMode(mode) {
   document.querySelectorAll('.hero-mode-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.hero === mode)
   );
+  // Show fallback row only for nowplaying
+  const fbRow = document.getElementById('hero-fallback-row');
+  if (fbRow) fbRow.classList.toggle('hidden', mode !== 'nowplaying');
   refreshDashHero();
   showToast('🎨 Bandeau mis à jour !');
 }
@@ -1071,11 +1074,13 @@ async function refreshDashHero() {
   const hero   = document.getElementById('dash-hero');
   const bg     = document.getElementById('dash-hero-bg');
   const cnt    = document.getElementById('dash-hero-content');
+  const headEl = document.getElementById('dash-hero-head');
   if (!hero) return;
 
   // ── none ──────────────────────────────────────────
   if (mode === 'none') {
     hero.classList.add('hidden');
+    _heroShowNpWidget(true); // ensure NP widget visible
     return;
   }
 
@@ -1085,36 +1090,43 @@ async function refreshDashHero() {
   const showInfo = localStorage.getItem('ls_dash_hero_info') !== '0';
   hero.classList.toggle('dash-hero--no-info', !showInfo);
 
+  // When info is hidden, show Dashboard title overlaid on hero
+  if (headEl) {
+    headEl.innerHTML = !showInfo
+      ? `<div class="dash-hero-title-overlay">
+           <strong id="dash-hero-main-title">Dashboard</strong>
+           <span id="dash-hero-main-sub">Aperçu de votre activité musicale</span>
+         </div>`
+      : '';
+  }
+
+  // Hide the sec-hd title when hero is visible and no-info (it's shown on the hero)
+  const secHd = document.querySelector('#s-dashboard .dash-sec-hd');
+  if (secHd) secHd.classList.toggle('dash-sec-hd--on-hero', !showInfo && mode !== 'none');
+
   // ── accent ────────────────────────────────────────
   if (mode === 'accent') {
     bg.style.backgroundImage = 'none';
     bg.style.background = `linear-gradient(135deg, var(--accent) 0%, var(--accent-container) 60%, var(--bg) 100%)`;
-    cnt.innerHTML = _heroAccentContent();
+    _heroSetContent(cnt, _heroAccentContent());
+    _heroShowNpWidget(true);
     return;
   }
 
   // ── now playing ───────────────────────────────────
   if (mode === 'nowplaying') {
-    const npTrack  = document.getElementById('np-track')?.textContent?.trim();
-    const npArtist = document.getElementById('np-artist')?.textContent?.trim();
-    const npImgEl  = document.querySelector('#np-art img');
-    const npImg    = npImgEl?.src || '';
-
-    if (npTrack && npTrack !== '—' && npImg) {
-      await _applyHeroBgImage(bg, npImg);
-      cnt.innerHTML = _heroTrackContent(npTrack, npArtist, npImg, '🎵 En cours');
-    } else {
-      // Fallback to accent when nothing is playing
-      bg.style.backgroundImage = 'none';
-      bg.style.background = `linear-gradient(135deg, var(--accent) 0%, var(--accent-container) 60%, var(--bg) 100%)`;
-      cnt.innerHTML = `<div class="dash-hero-label"><i class="fas fa-music"></i> En attente d'une lecture…</div>`;
-    }
+    // Hide the dashboard NP bar to avoid duplicate
+    _heroShowNpWidget(false);
+    await _heroApplyNowPlaying(bg, cnt);
     return;
   }
 
-  // ── top-track-{period} / top-artist-{period} ──────
-  const [kind, , period] = mode.split('-'); // 'top', 'track'/'artist', '7day'/'1month'/'12month'
-  const isTrack = mode.includes('-track-');
+  // NP widget visible for non-nowplaying modes
+  _heroShowNpWidget(true);
+
+  // ── top-track / top-artist ────────────────────────
+  const isTrack  = mode.includes('-track-');
+  const period   = mode.split('-').pop(); // last segment: 7day / 1month / 12month
   const perLabels = { '7day': 'cette semaine', '1month': 'ce mois', '12month': 'cette année' };
   const perLabel  = perLabels[period] || period;
 
@@ -1122,8 +1134,8 @@ async function refreshDashHero() {
     let imgUrl = '', name = '', sub = '', label = '';
 
     if (isTrack) {
-      const data   = await API.call('user.getTopTracks', { period, limit: 1 });
-      const track  = Array.isArray(data.toptracks?.track) ? data.toptracks.track[0] : data.toptracks?.track;
+      const data  = await API.call('user.getTopTracks', { period, limit: 1 });
+      const track = Array.isArray(data.toptracks?.track) ? data.toptracks.track[0] : data.toptracks?.track;
       if (!track) throw new Error('no data');
       name   = track.name || '';
       sub    = track.artist?.name || '';
@@ -1131,14 +1143,13 @@ async function refreshDashHero() {
              || track.image?.find(i => i.size === 'large')?.['#text']
              || track.image?.find(i => i.size === 'medium')?.['#text'] || '';
       label  = `🎵 Top Titre — ${perLabel}`;
-      // If Last.fm returns no album art, try the album art via track.getInfo
       if (!imgUrl || isDefaultImg(imgUrl)) {
         try {
           const ti = await API.call('track.getInfo', { artist: sub, track: name, username: APP.username });
           imgUrl = ti.track?.album?.image?.find(i => i.size === 'extralarge')?.['#text'] || imgUrl;
         } catch {}
       }
-      cnt.innerHTML = _heroTrackContent(name, sub, imgUrl, label);
+      _heroSetContent(cnt, _heroTrackContent(name, sub, imgUrl, label));
     } else {
       const data   = await API.call('user.getTopArtists', { period, limit: 1 });
       const artist = Array.isArray(data.topartists?.artist) ? data.topartists.artist[0] : data.topartists?.artist;
@@ -1146,7 +1157,7 @@ async function refreshDashHero() {
       name   = artist.name || '';
       imgUrl = await _resolveArtistImageExternal(name).catch(() => '');
       label  = `🎤 Top Artiste — ${perLabel}`;
-      cnt.innerHTML = _heroArtistContent(name, imgUrl, label);
+      _heroSetContent(cnt, _heroArtistContent(name, imgUrl, label));
     }
 
     if (imgUrl && !isDefaultImg(imgUrl)) {
@@ -1157,6 +1168,81 @@ async function refreshDashHero() {
     }
   } catch {
     hero.classList.add('hidden');
+  }
+}
+
+/** Apply now-playing content without flickering — updates in-place if possible */
+async function _heroApplyNowPlaying(bg, cnt) {
+  const npTrack  = document.getElementById('np-track')?.textContent?.trim();
+  const npArtist = document.getElementById('np-artist')?.textContent?.trim();
+  const npImg    = document.querySelector('#np-art img')?.src || '';
+
+  if (npTrack && npTrack !== '—' && npImg) {
+    // Update in-place to avoid flicker: only change if values differ
+    const existingImg  = cnt.querySelector('.dash-hero-art');
+    const existingName = cnt.querySelector('.dash-hero-name');
+    const existingSub  = cnt.querySelector('.dash-hero-sub');
+
+    if (existingImg && existingName) {
+      // In-place update — no innerHTML replacement = no flicker
+      if (existingImg.tagName === 'IMG' && existingImg.src !== npImg) existingImg.src = npImg;
+      if (existingName.textContent !== npTrack) existingName.textContent = npTrack;
+      if (existingSub && existingSub.textContent !== npArtist) existingSub.textContent = npArtist;
+      // Only update bg if image changed
+      if (bg.dataset.lastSrc !== npImg) {
+        bg.dataset.lastSrc = npImg;
+        await _applyHeroBgImage(bg, npImg);
+      }
+    } else {
+      // First render
+      _heroSetContent(cnt, _heroTrackContent(npTrack, npArtist, npImg, '🎵 En cours'));
+      bg.dataset.lastSrc = npImg;
+      await _applyHeroBgImage(bg, npImg);
+    }
+  } else {
+    // Nothing playing — use fallback mode
+    const fallback = localStorage.getItem('ls_dash_hero_fallback') || 'accent';
+    if (fallback === 'none') {
+      const hero = document.getElementById('dash-hero');
+      hero?.classList.add('hidden');
+      return;
+    }
+    // Temporarily switch to fallback mode without saving
+    const savedMode = localStorage.getItem('ls_dash_hero');
+    localStorage.setItem('ls_dash_hero', fallback);
+    await refreshDashHero();
+    localStorage.setItem('ls_dash_hero', savedMode);
+    // Show a "waiting" hint
+    _heroSetContent(cnt, `<div class="dash-hero-waiting"><i class="fas fa-headphones"></i> En attente d'une lecture…</div>`);
+  }
+}
+
+/** Set hero content without animation if same structure is already there */
+function _heroSetContent(cnt, html) {
+  if (cnt.innerHTML.trim() === '') {
+    cnt.innerHTML = html;
+  } else {
+    // Avoid full reflow — compare type
+    const hasTrack = cnt.querySelector('.dash-hero-track');
+    const hasAccent = cnt.querySelector('.dash-hero-accent-inner');
+    const wantsTrack = html.includes('dash-hero-track');
+    const wantsAccent = html.includes('dash-hero-accent-inner');
+    if ((hasTrack && wantsTrack) || (hasAccent && wantsAccent)) return; // already right structure
+    cnt.innerHTML = html;
+  }
+}
+
+/** Show or hide the dashboard NP bar (avoid duplicate with hero) */
+function _heroShowNpWidget(show) {
+  const wrap = document.getElementById('now-playing-wrap');
+  if (!wrap) return;
+  // Mark with data attr to distinguish hero-hide from play-state-hide
+  wrap.dataset.heroHidden = show ? '0' : '1';
+  if (!show) {
+    wrap.classList.add('hidden');
+  } else if (_npIsPlaying) {
+    // Only show if something is actually playing
+    wrap.classList.remove('hidden');
   }
 }
 
@@ -1230,15 +1316,34 @@ function setDashHeroInfo(show) {
   if (hero) hero.classList.toggle('dash-hero--no-info', !show);
   const toggle = document.getElementById('hero-info-toggle');
   if (toggle) toggle.checked = show;
+  refreshDashHero();
+}
+
+/** Set fallback mode for nowplaying when nothing is playing */
+function setDashHeroFallback(fallback) {
+  localStorage.setItem('ls_dash_hero_fallback', fallback);
+  document.querySelectorAll('.hero-fallback-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.fallback === fallback)
+  );
+  showToast('✅ Mode de secours enregistré !');
 }
 
 /** Sync hero mode buttons on settings open */
 function _syncDashHeroUI() {
-  const saved = localStorage.getItem('ls_dash_hero') || 'none';
+  const saved     = localStorage.getItem('ls_dash_hero')          || 'none';
+  const fallback  = localStorage.getItem('ls_dash_hero_fallback') || 'accent';
   APP.dashHeroMode = saved;
+
   document.querySelectorAll('.hero-mode-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.hero === saved)
   );
+  document.querySelectorAll('.hero-fallback-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.fallback === fallback)
+  );
+  // Show fallback row only when mode is nowplaying
+  const fbRow = document.getElementById('hero-fallback-row');
+  if (fbRow) fbRow.classList.toggle('hidden', saved !== 'nowplaying');
+
   // Sync info toggle
   const showInfo = localStorage.getItem('ls_dash_hero_info') !== '0';
   const toggle = document.getElementById('hero-info-toggle');
@@ -2174,10 +2279,14 @@ async function pollNowPlaying() {
       // ── Mise à jour synchronisée du profil si la section est visible ──
       _syncProfileNowPlaying(last);
 
-      // ── Rafraîchit le hero dashboard si mode nowplaying ──
+      // ── Rafraîchit le hero dashboard si mode nowplaying (in-place, sans flicker) ──
       if (localStorage.getItem('ls_dash_hero') === 'nowplaying') {
         const dash = document.getElementById('s-dashboard');
-        if (dash?.classList.contains('active')) refreshDashHero();
+        if (dash?.classList.contains('active')) {
+          const bg  = document.getElementById('dash-hero-bg');
+          const cnt = document.getElementById('dash-hero-content');
+          if (bg && cnt) await _heroApplyNowPlaying(bg, cnt);
+        }
       }
 
       _npTimer = setTimeout(pollNowPlaying, 2000);
