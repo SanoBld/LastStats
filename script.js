@@ -1106,8 +1106,7 @@ async function refreshDashHero() {
 
   // ── accent ────────────────────────────────────────
   if (mode === 'accent') {
-    bg.style.backgroundImage = 'none';
-    bg.style.background = `linear-gradient(135deg, var(--accent) 0%, var(--accent-container) 60%, var(--bg) 100%)`;
+    bgEl_setGradient(bg);
     _heroSetContent(cnt, _heroAccentContent());
     _heroShowNpWidget(true);
     return;
@@ -1139,15 +1138,30 @@ async function refreshDashHero() {
       if (!track) throw new Error('no data');
       name   = track.name || '';
       sub    = track.artist?.name || '';
-      imgUrl = track.image?.find(i => i.size === 'extralarge')?.['#text']
-             || track.image?.find(i => i.size === 'large')?.['#text']
-             || track.image?.find(i => i.size === 'medium')?.['#text'] || '';
+      // Priorité : MusicBrainz Cover Art Archive → Last.fm album art
+      const albumName = track.album?.['#text'] || '';
+      imgUrl = '';
+      if (albumName || track.mbid || _getMbid('album', albumName)) {
+        try {
+          imgUrl = await _fetchAlbumImageWithMbid(albumName, sub) || '';
+        } catch {}
+      }
+      if (!imgUrl || isDefaultImg(imgUrl)) {
+        imgUrl = track.image?.find(i => i.size === 'extralarge')?.['#text']
+               || track.image?.find(i => i.size === 'large')?.['#text']
+               || track.image?.find(i => i.size === 'medium')?.['#text'] || '';
+      }
       label  = `🎵 Top Titre — ${perLabel}`;
       if (!imgUrl || isDefaultImg(imgUrl)) {
         try {
           const ti = await API.call('track.getInfo', { artist: sub, track: name, username: APP.username });
-          imgUrl = ti.track?.album?.image?.find(i => i.size === 'extralarge')?.['#text'] || imgUrl;
+          const lfmImg = ti.track?.album?.image?.find(i => i.size === 'extralarge')?.['#text'] || '';
+          if (lfmImg && !isDefaultImg(lfmImg)) imgUrl = lfmImg;
         } catch {}
+      }
+      // 4. iTunes as last resort
+      if (!imgUrl || isDefaultImg(imgUrl)) {
+        try { imgUrl = await _fetchTrackImageiTunes(name, sub) || ''; } catch {}
       }
       _heroSetContent(cnt, _heroTrackContent(name, sub, imgUrl, label));
     } else {
@@ -1163,12 +1177,20 @@ async function refreshDashHero() {
     if (imgUrl && !isDefaultImg(imgUrl)) {
       await _applyHeroBgImage(bg, imgUrl);
     } else {
-      bg.style.backgroundImage = 'none';
-      bg.style.background = `linear-gradient(135deg, var(--accent) 0%, var(--accent-container) 60%, var(--bg) 100%)`;
+      bgEl_setGradient(bg);
     }
   } catch {
     hero.classList.add('hidden');
   }
+}
+
+/** Set hero bg to gradient (accent fallback) without resetting background-size */
+function bgEl_setGradient(bgEl) {
+  bgEl.style.backgroundImage    = 'none';
+  bgEl.style.backgroundSize     = '';
+  bgEl.style.backgroundRepeat   = '';
+  bgEl.style.backgroundPosition = '';
+  bgEl.style.background = `linear-gradient(135deg, var(--accent) 0%, var(--accent-container) 60%, var(--bg) 100%)`;
 }
 
 /** Apply now-playing content without flickering — updates in-place if possible */
@@ -1252,8 +1274,14 @@ async function _applyHeroBgImage(bgEl, imgUrl) {
     const img  = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
-      bgEl.style.background      = 'none';
-      bgEl.style.backgroundImage = `url('${imgUrl}')`;
+      // Set all sub-properties explicitly — using the shorthand `background: none`
+      // resets background-size/repeat to defaults (auto/repeat) via the cascade,
+      // causing the image to tile on wide viewports with small album art.
+      bgEl.style.backgroundImage    = `url('${imgUrl}')`;
+      bgEl.style.backgroundSize     = 'cover';
+      bgEl.style.backgroundRepeat   = 'no-repeat';
+      bgEl.style.backgroundPosition = 'center center';
+      bgEl.style.backgroundAttachment = 'local';
       // Extract dominant colour for subtle tint (if ColorThief available)
       if (_colorThief && APP.dashHeroMode !== 'accent') {
         try {
@@ -1307,6 +1335,12 @@ function _heroArtistContent(name, imgUrl, label) {
       <strong class="dash-hero-name">${escHtml(name)}</strong>
     </div>
   </div>`;
+}
+
+function switchSettingsTab(tabId) {
+  document.querySelectorAll('.stg-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+  document.querySelectorAll('.stg-tab-panel').forEach(p => p.classList.toggle('active', p.id === tabId));
+  localStorage.setItem('ls_settings_tab', tabId);
 }
 
 /** Toggle text info visibility on the hero */
@@ -1533,6 +1567,10 @@ window.addEventListener('DOMContentLoaded', () => {
   `;
   document.head.appendChild(shareStyle);
 
+  // Restore last settings tab
+  const savedTab = localStorage.getItem('ls_settings_tab');
+  if (savedTab) switchSettingsTab(savedTab);
+
   // Apply saved theme immediately
   const theme = localStorage.getItem('ls_theme') || 'dark';
   document.documentElement.dataset.theme = theme;
@@ -1540,6 +1578,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Init tinted background setting
   APP.tintBg = localStorage.getItem('ls_tint_bg') !== '0';
+
+  // Restore saved settings tab
 
   // Apply saved language
   const lang = localStorage.getItem('ls_lang') || window.I18N?.getLang?.() || 'fr';
@@ -3224,6 +3264,8 @@ async function loadTopAlbums(period) {
     APP.topAlbumsData    = albums;
     APP.albumsTotalPages = parseInt(data.topalbums?.['@attr']?.totalPages || 1);
     if (grid) grid.innerHTML = albums.map((a,i) => _buildAlbumCard(a, i+1)).join('');
+    // Async image resolution with MusicBrainz priority
+    _resolveAlbumGridImages(albums, grid);
 
     if (APP.albumsTotalPages > 1 && sentinel) {
       _albumsObserver = new IntersectionObserver(
@@ -3444,6 +3486,68 @@ function _injectTrackCoverImg(coverEl, imgUrl) {
   };
   coverEl.style.position = 'relative';
   coverEl.prepend(img);
+}
+
+
+/**
+ * Résolution asynchrone des pochettes de la grille top albums.
+ * Priorité : MusicBrainz/Cover Art Archive → iTunes → Last.fm
+ */
+async function _resolveAlbumGridImages(albums, grid) {
+  if (!grid) return;
+  const layout = APP.albumsLayout || 'grid';
+  const imgSelector = layout === 'compact' ? 'img' : (layout === 'list' ? '.music-card-img img' : '.hc-img');
+  const fallbackSelector = layout === 'compact' ? null : (layout === 'list' ? '.spotify-cover' : '.hc-fallback');
+
+  for (let i = 0; i < Math.min(albums.length, 50); i++) {
+    const a = albums[i];
+    const lfmImg = a.image?.find(img => img.size === 'extralarge')?.['#text'] || '';
+    if (!isDefaultImg(lfmImg)) continue; // already has image, skip
+
+    (async (album, rank) => {
+      try {
+        // 1. MusicBrainz + Cover Art Archive
+        let img = await _fetchAlbumImageWithMbid(album.name, album.artist?.name || '').catch(() => '') || '';
+        // 2. Last.fm album.getInfo
+        if (!img || isDefaultImg(img)) {
+          const d = await API.call('album.getInfo', { album: album.name, artist: album.artist?.name || '', autocorrect: 1 }).catch(() => null);
+          if (d?.album?.mbid) _storeMbid('album', album.name, d.album.mbid);
+          const u = d?.album?.image?.find(x => x.size === 'extralarge')?.['#text']
+                 || d?.album?.image?.find(x => x.size === 'large')?.['#text'] || '';
+          if (u && !isDefaultImg(u)) img = u;
+        }
+        if (!img || isDefaultImg(img)) return;
+
+        // Inject into rendered card
+        const cards = grid.querySelectorAll('.hero-card, .music-card, .track-item');
+        const card = cards[rank - 1];
+        if (!card) return;
+
+        const existingImg = card.querySelector('img.hc-img, img.img-fade, img');
+        const fallback    = card.querySelector('.hc-fallback, .spotify-cover, .track-cover > div');
+
+        if (existingImg) {
+          existingImg.src = img;
+          existingImg.style.display = '';
+        } else {
+          const newImg = document.createElement('img');
+          newImg.src = img;
+          newImg.className = layout === 'grid' ? 'hc-img img-fade' : 'img-fade';
+          newImg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit';
+          newImg.onload = () => {
+            newImg.classList.add('img-loaded');
+            if (fallback) fallback.style.display = 'none';
+          };
+          newImg.onerror = () => newImg.remove();
+          const imgWrap = card.querySelector('.hc-fallback')?.parentElement || card.querySelector('.music-card-img') || card.querySelector('.track-cover');
+          if (imgWrap) imgWrap.appendChild(newImg);
+        }
+        if (fallback) fallback.style.display = 'none';
+      } catch {}
+    })(a, i + 1);
+
+    await new Promise(r => setTimeout(r, 80)); // stagger requests
+  }
 }
 
 function _resolveTrackImages(tracks, startRank = 1) {
@@ -5922,7 +6026,7 @@ function _runDashSearch(q) {
   const icons = { artist: 'microphone-alt', album: 'compact-disc', track: 'music' };
   const labels = { artist: 'Artiste', album: 'Album', track: 'Titre' };
 
-  results.innerHTML = top.map(h => {
+  results.innerHTML = top.map((h, idx) => {
     const ico   = icons[h.type] || 'music';
     const lbl   = labels[h.type] || h.type;
     const imgH  = h.img && !isDefaultImg(h.img)
@@ -5934,8 +6038,11 @@ function _runDashSearch(q) {
       ? `https://www.last.fm/music/${encodeURIComponent(h.name)}`
       : `https://www.last.fm/music/${encodeURIComponent(h.sub)}/_/${encodeURIComponent(h.name)}`);
 
+    const hitData = encodeURIComponent(JSON.stringify({ type: h.type, name: h.name, sub: h.sub, plays: h.plays, url: h.url, img: h.img }));
     return `
-    <div class="dsr-row" role="button" tabindex="0">
+    <div class="dsr-row" data-idx="${idx}" role="button" tabindex="0"
+         onclick="openSearchDetail(decodeURIComponent('${hitData}'))"
+         onkeydown="if(event.key==='Enter'||event.key===' ')this.click()">
       ${imgH}
       <div class="dsr-info">
         <span class="dsr-name">${escHtml(h.name)}</span>
@@ -5945,7 +6052,7 @@ function _runDashSearch(q) {
           ${h.plays ? `<span class="dsr-plays"><i class="fas fa-headphones"></i> ${formatNum(h.plays)}</span>` : ''}
         </span>
       </div>
-      <div class="dsr-actions">
+      <div class="dsr-actions" onclick="event.stopPropagation()">
         <a href="${escHtml(lfUrl)}" target="_blank" rel="noopener" class="dsr-btn dsr-btn--lfm" title="Last.fm">
           <i class="fas fa-external-link-alt"></i>
         </a>
@@ -5960,6 +6067,49 @@ function _runDashSearch(q) {
   }).join('');
 
   results.classList.remove('hidden');
+
+  // Async image resolution for items without img
+  _resolveSearchImages(top, results);
+}
+
+async function _resolveSearchImages(hits, container) {
+  hits.forEach((h, idx) => {
+    if (h.img && !isDefaultImg(h.img)) return;
+    (async () => {
+      try {
+        let img = '';
+        if (h.type === 'artist') {
+          img = await _resolveArtistImageExternal(h.name).catch(() => '') || '';
+        } else if (h.type === 'album') {
+          img = await _fetchAlbumImageWithMbid(h.name, h.sub).catch(() => '') || '';
+          if (!img || isDefaultImg(img)) {
+            const d = await API.call('album.getInfo', { album: h.name, artist: h.sub || '', autocorrect: 1 }).catch(() => null);
+            const u = d?.album?.image?.find(x => x.size === 'extralarge')?.['#text']
+                   || d?.album?.image?.find(x => x.size === 'large')?.['#text'] || '';
+            if (u && !isDefaultImg(u)) img = u;
+          }
+        } else {
+          img = await _fetchAlbumImageWithMbid(h.name, h.sub).catch(() => '') || '';
+          if (!img || isDefaultImg(img)) {
+            const d = await API.call('track.getInfo', { track: h.name, artist: h.sub || '', autocorrect: 1 }).catch(() => null);
+            const u = d?.track?.album?.image?.find(x => x.size === 'extralarge')?.['#text']
+                   || d?.track?.album?.image?.find(x => x.size === 'large')?.['#text'] || '';
+            if (u && !isDefaultImg(u)) img = u;
+          }
+          if (!img || isDefaultImg(img)) {
+            img = await _fetchTrackImageiTunes(h.name, h.sub).catch(() => '') || '';
+          }
+        }
+        if (img && !isDefaultImg(img)) {
+          const el = container.querySelector(`.dsr-row[data-idx="${idx}"] .dsr-thumb`);
+          if (el) {
+            const isRound = h.type === 'artist';
+            el.outerHTML = `<img src="${img.replace(/"/g,'%22')}" class="dsr-thumb${isRound ? ' dsr-thumb--round' : ''}" alt="" loading="lazy" onerror="this.style.display='none'">`;
+          }
+        }
+      } catch {}
+    })();
+  });
 }
 
 // Close search on outside click
@@ -5967,6 +6117,210 @@ document.addEventListener('click', e => {
   const wrap = document.getElementById('dash-search-wrap');
   if (wrap && !wrap.contains(e.target)) closeDashSearch();
 });
+
+/* ════════════════════════════════════════════════════════════
+   SEARCH DETAIL PANEL
+   Enriched panel with Last.fm + MusicBrainz info on click
+════════════════════════════════════════════════════════════ */
+async function openSearchDetail(rawData) {
+  const h = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
+  closeDashSearch();
+
+  const panel = document.getElementById('search-detail-panel');
+  const body  = document.getElementById('search-detail-body');
+  if (!panel || !body) return;
+
+  // Show skeleton
+  panel.classList.remove('hidden');
+  document.body.classList.add('search-detail-open');
+  const spQ = encodeURIComponent(h.name + (h.sub ? ' ' + h.sub : ''));
+  const lfUrl = h.url || (h.type === 'artist'
+    ? `https://www.last.fm/music/${encodeURIComponent(h.name)}`
+    : `https://www.last.fm/music/${encodeURIComponent(h.sub)}/_/${encodeURIComponent(h.name)}`);
+
+  body.innerHTML = `
+    <div class="sdp-header">
+      <div class="sdp-img-wrap">
+        ${h.img && !isDefaultImg(h.img)
+          ? `<img src="${escHtml(h.img)}" alt="" class="sdp-img ${h.type === 'artist' ? 'sdp-img--round' : ''}">`
+          : `<div class="sdp-img sdp-img--ico ${h.type === 'artist' ? 'sdp-img--round' : ''}"><i class="fas fa-${h.type === 'artist' ? 'microphone-alt' : h.type === 'album' ? 'compact-disc' : 'music'}"></i></div>`}
+        <div class="sdp-img-glow"></div>
+      </div>
+      <div class="sdp-header-info">
+        <span class="sdp-type-badge">${h.type === 'artist' ? 'Artiste' : h.type === 'album' ? 'Album' : 'Titre'}</span>
+        <h3 class="sdp-name">${escHtml(h.name)}</h3>
+        ${h.sub ? `<p class="sdp-sub">${escHtml(h.sub)}</p>` : ''}
+        <div class="sdp-ext-links">
+          <a href="${escHtml(lfUrl)}" target="_blank" rel="noopener" class="sdp-ext-btn sdp-ext-btn--lfm" title="Last.fm"><i class="fas fa-external-link-alt"></i> Last.fm</a>
+          <a href="spotify:search:${spQ}" class="sdp-ext-btn sdp-ext-btn--sp" title="Spotify"><i class="fab fa-spotify"></i> Spotify</a>
+          <a href="https://www.youtube.com/results?search_query=${spQ}" target="_blank" rel="noopener" class="sdp-ext-btn sdp-ext-btn--yt" title="YouTube"><i class="fab fa-youtube"></i> YouTube</a>
+        </div>
+      </div>
+    </div>
+    <div class="sdp-stats-grid" id="sdp-stats"></div>
+    <div class="sdp-mb-section" id="sdp-mb"></div>
+    <div class="sdp-loading" id="sdp-loading"><i class="fas fa-spinner fa-spin"></i> Chargement des détails…</div>`;
+
+  // Fetch Last.fm info in parallel with MusicBrainz
+  const [lfmData, mbData] = await Promise.allSettled([
+    _sdpFetchLastfm(h),
+    _sdpFetchMusicBrainz(h)
+  ]);
+
+  const statsEl = document.getElementById('sdp-stats');
+  const mbEl    = document.getElementById('sdp-mb');
+  const loadEl  = document.getElementById('sdp-loading');
+  if (loadEl) loadEl.remove();
+
+  // ── Last.fm stats ──
+  const lfm = lfmData.status === 'fulfilled' ? lfmData.value : null;
+  if (statsEl && lfm) {
+    const stats = [];
+    if (h.plays)            stats.push({ ico: 'headphones', val: formatNum(h.plays), lbl: 'Tes écoutes' });
+    if (lfm.listeners)      stats.push({ ico: 'users',      val: formatNum(lfm.listeners), lbl: 'Auditeurs' });
+    if (lfm.playcount)      stats.push({ ico: 'play-circle', val: formatNum(lfm.playcount), lbl: 'Scrobbles globaux' });
+    if (lfm.userplaycount)  stats.push({ ico: 'user',        val: formatNum(lfm.userplaycount), lbl: 'Tes écoutes (LFM)' });
+    if (lfm.duration)       stats.push({ ico: 'clock',       val: Math.round(lfm.duration / 60) + ' min', lbl: 'Durée' });
+    statsEl.innerHTML = stats.map(s => `
+      <div class="sdp-stat">
+        <i class="fas fa-${s.ico} sdp-stat-ico"></i>
+        <strong>${s.val}</strong>
+        <span>${s.lbl}</span>
+      </div>`).join('');
+
+    // Tags
+    if (lfm.tags?.length) {
+      statsEl.insertAdjacentHTML('afterend', `
+        <div class="sdp-tags">${lfm.tags.map(t => `<span class="sdp-tag">${escHtml(t)}</span>`).join('')}</div>`);
+    }
+    // Bio/Summary
+    if (lfm.summary) {
+      const cleanSummary = lfm.summary.replace(/<a[^>]*>.*?<\/a>/gi, '').replace(/<[^>]*>/g, '').trim().slice(0, 320);
+      const bioEl = document.getElementById('sdp-mb') || mbEl;
+      if (bioEl) bioEl.insertAdjacentHTML('beforebegin', `
+        <div class="sdp-bio"><p>${escHtml(cleanSummary)}${cleanSummary.length >= 320 ? '…' : ''}</p></div>`);
+    }
+  }
+
+  // ── MusicBrainz info ──
+  const mb = mbData.status === 'fulfilled' ? mbData.value : null;
+  if (mbEl && mb) {
+    const rows = [];
+    if (mb.country)     rows.push({ lbl: 'Pays',       val: mb.country });
+    if (mb.area)        rows.push({ lbl: 'Zone',        val: mb.area });
+    if (mb.formed)      rows.push({ lbl: 'Formé en',    val: mb.formed });
+    if (mb.disbanded)   rows.push({ lbl: 'Séparé en',   val: mb.disbanded });
+    if (mb.releaseDate) rows.push({ lbl: 'Sortie',      val: mb.releaseDate });
+    if (mb.label)       rows.push({ lbl: 'Label',       val: mb.label });
+    if (mb.type)        rows.push({ lbl: 'Type',        val: mb.type });
+    if (mb.genres?.length) rows.push({ lbl: 'Genres',  val: mb.genres.join(', ') });
+
+    if (rows.length || mb.mbid) {
+      mbEl.innerHTML = `
+        <div class="sdp-mb-hd">
+          <img src="https://musicbrainz.org/static/images/favicons/favicon-32x32.png" alt="MusicBrainz" class="sdp-mb-logo">
+          <strong>MusicBrainz</strong>
+          ${mb.mbid ? `<a href="https://musicbrainz.org/${h.type}/${mb.mbid}" target="_blank" rel="noopener" class="sdp-mb-link"><i class="fas fa-external-link-alt"></i></a>` : ''}
+        </div>
+        <div class="sdp-mb-rows">
+          ${rows.map(r => `<div class="sdp-mb-row"><span class="sdp-mb-lbl">${r.lbl}</span><span class="sdp-mb-val">${escHtml(r.val)}</span></div>`).join('')}
+        </div>`;
+    }
+  }
+
+  if (mbEl && !mbEl.innerHTML.trim()) mbEl.remove();
+}
+
+async function _sdpFetchLastfm(h) {
+  try {
+    let d;
+    if (h.type === 'artist') {
+      d = await API.call('artist.getInfo', { artist: h.name, username: APP.username, autocorrect: 1 });
+      const a = d?.artist;
+      return {
+        listeners:    parseInt(a?.stats?.listeners) || 0,
+        playcount:    parseInt(a?.stats?.playcount)  || 0,
+        userplaycount:parseInt(a?.stats?.userplaycount) || 0,
+        tags: a?.tags?.tag?.map(t => t.name).slice(0, 5) || [],
+        summary: a?.bio?.summary || ''
+      };
+    } else if (h.type === 'album') {
+      d = await API.call('album.getInfo', { artist: h.sub, album: h.name, username: APP.username, autocorrect: 1 });
+      const a = d?.album;
+      return {
+        listeners:    0,
+        playcount:    parseInt(a?.playcount) || 0,
+        userplaycount:parseInt(a?.userplaycount) || 0,
+        tags: a?.tags?.tag?.map(t => t.name).slice(0, 5) || [],
+        summary: a?.wiki?.summary || ''
+      };
+    } else {
+      d = await API.call('track.getInfo', { artist: h.sub, track: h.name, username: APP.username, autocorrect: 1 });
+      const tr = d?.track;
+      return {
+        listeners:    parseInt(tr?.listeners) || 0,
+        playcount:    parseInt(tr?.playcount)  || 0,
+        userplaycount:parseInt(tr?.userplaycount) || 0,
+        duration:     parseInt(tr?.duration)   || 0,
+        tags: tr?.toptags?.tag?.map(t => t.name).slice(0, 5) || [],
+        summary: tr?.wiki?.summary || ''
+      };
+    }
+  } catch { return null; }
+}
+
+async function _sdpFetchMusicBrainz(h) {
+  try {
+    const headers = { 'User-Agent': 'LastStats/5.0 (sanobld.github.io/LastStats)' };
+    const mbType = h.type === 'artist' ? 'artist' : h.type === 'album' ? 'release-group' : 'recording';
+    const query  = h.type === 'artist'
+      ? `artist:"${encodeURIComponent(h.name)}"`
+      : h.type === 'album'
+        ? `release:"${encodeURIComponent(h.name)}"${h.sub ? ` AND artist:"${encodeURIComponent(h.sub)}"` : ''}`
+        : `recording:"${encodeURIComponent(h.name)}"${h.sub ? ` AND artist:"${encodeURIComponent(h.sub)}"` : ''}`;
+    const url = `https://musicbrainz.org/ws/2/${mbType}?query=${query}&limit=1&fmt=json`;
+    const r = await fetch(url, { headers, signal: AbortSignal.timeout(5000) });
+    if (!r.ok) return null;
+    const data = await r.json();
+
+    if (h.type === 'artist') {
+      const a = data?.artists?.[0];
+      if (!a) return null;
+      return {
+        mbid:       a.id,
+        type:       a.type || '',
+        country:    a.country || a.area?.name || '',
+        area:       a.area?.name || '',
+        formed:     a['life-span']?.begin || '',
+        disbanded:  a['life-span']?.ended ? a['life-span']?.end || '' : '',
+        genres:     (a.genres || a.tags || []).slice(0, 4).map(g => g.name).filter(Boolean)
+      };
+    } else if (h.type === 'album') {
+      const rg = data?.['release-groups']?.[0];
+      if (!rg) return null;
+      return {
+        mbid:        rg.id,
+        type:        rg['primary-type'] || rg.type || '',
+        releaseDate: rg['first-release-date'] || '',
+        genres:      (rg.genres || rg.tags || []).slice(0, 4).map(g => g.name).filter(Boolean)
+      };
+    } else {
+      const rec = data?.recordings?.[0];
+      if (!rec) return null;
+      return {
+        mbid:        rec.id,
+        releaseDate: rec['first-release-date'] || '',
+        label:       rec.releases?.[0]?.['label-info']?.[0]?.label?.name || '',
+        genres:      (rec.genres || rec.tags || []).slice(0, 4).map(g => g.name).filter(Boolean)
+      };
+    }
+  } catch { return null; }
+}
+
+function closeSearchDetail() {
+  document.getElementById('search-detail-panel')?.classList.add('hidden');
+  document.body.classList.remove('search-detail-open');
+}
 
 function exportData(format) {
   const sources = [

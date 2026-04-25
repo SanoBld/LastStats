@@ -1155,557 +1155,477 @@
           <p class="sec-sub" data-i18n="settings.sub">Customise LastStats to your preferences</p>
         </div>
 
-        <div class="settings-grid">
+        <!-- ── Settings Tabs ── -->
+        <div class="stg-tabs-wrap">
 
-          
-          <div class="settings-card">
-            <div class="settings-card-hd">
+          <!-- Tab nav -->
+          <nav class="stg-tab-nav" role="tablist" aria-label="Paramètres">
+            <button class="stg-tab-btn active" data-tab="stg-account" role="tab" onclick="switchSettingsTab('stg-account')">
               <i class="fas fa-user-circle"></i>
-              <h3 data-i18n="settings.account">Account</h3>
-            </div>
-            <div class="settings-card-body">
-              <!-- Username -->
-              <div class="setting-row">
-                <label class="setting-lbl" for="settings-username">
-                  <i class="fas fa-user"></i>
-                  <span data-i18n="settings.username">Last.fm username</span>
-                </label>
-                <div class="setting-ctrl">
-                  <div class="input-group">
-                    <input type="text" id="settings-username" class="setting-input"
-                           placeholder="your_username" autocomplete="off" spellcheck="false">
-                    <button class="icon-btn" onclick="updateUsername()" aria-label="Enregistrer" title="Enregistrer">
-                      <i class="fas fa-check"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <!-- API key -->
-              <div class="setting-row">
-                <label class="setting-lbl" for="settings-apikey">
-                  <i class="fas fa-key"></i>
-                  <span data-i18n="settings.apikey">Last.fm API key</span>
-                </label>
-                <div class="setting-ctrl">
-                  <div class="input-group">
-                    <input type="password" id="settings-apikey" class="setting-input"
-                           placeholder="32 caractères hexadécimaux" autocomplete="off">
-                    <button class="icon-btn" onclick="toggleSettingsApiKey()" aria-label="Afficher/masquer la clé API" title="Afficher / masquer">
-                      <i class="fas fa-eye" id="settings-eye-icon"></i>
-                    </button>
-                    <button class="icon-btn" onclick="updateApiKey()" aria-label="Enregistrer la clé API" title="Enregistrer">
-                      <i class="fas fa-check"></i>
-                    </button>
-                  </div>
-                </div>
-                <p class="hint">
-                  <i class="fas fa-shield-alt"></i>
-                  <span data-i18n="settings.apikeyHint">Stored locally. Never sent to any third party.</span>
-                </p>
-              </div>
-              <!-- remember me -->
-              <div class="setting-row">
-                <label class="chk-label">
-                  <input type="checkbox" id="settings-remember" checked>
-                  <span class="chk-box"></span>
-                  <span data-i18n="settings.remember">Remember my credentials</span>
-                </label>
-              </div>
-              <!-- Logout -->
-              <div class="setting-actions">
-                <button class="btn-logout--settings" onclick="logout()">
-                  <i class="fas fa-sign-out-alt"></i>
-                  <span data-i18n="settings.logout">Log out</span>
-                </button>
-                <p class="hint" style="margin-top:8px">
-                  <i class="fas fa-info-circle"></i>
-                  <span data-i18n="settings.logoutHint">Clears your credentials and returns to the login screen.</span>
-                </p>
-              </div>
-            </div>
-          </div>
-
-          
-          <div class="settings-card">
-            <div class="settings-card-hd">
+              <span>Compte</span>
+            </button>
+            <button class="stg-tab-btn" data-tab="stg-appearance" role="tab" onclick="switchSettingsTab('stg-appearance')">
               <i class="fas fa-paint-brush"></i>
-              <h3 data-i18n="settings.appearance">Appearance</h3>
-            </div>
-            <div class="settings-card-body">
-              <!-- Theme -->
-              <div class="setting-row">
-                <span class="setting-lbl">
-                  <i class="fas fa-adjust"></i>
-                  <span data-i18n="settings.theme">Theme</span>
-                </span>
-                <div class="setting-ctrl theme-btns">
-                  <button class="th-btn" data-t="light" onclick="setTheme('light')" title="Light">
-                    <i class="fas fa-sun"></i>
-                    <span data-i18n="settings.themeLight">Light</span>
-                  </button>
-                  <button class="th-btn" data-t="auto" onclick="setTheme('auto')" title="Auto">
-                    <i class="fas fa-adjust"></i>
-                    <span data-i18n="settings.themeAuto">Auto</span>
-                  </button>
-                  <button class="th-btn active" data-t="dark" onclick="setTheme('dark')" title="Dark">
-                    <i class="fas fa-moon"></i>
-                    <span data-i18n="settings.themeDark">Dark</span>
-                  </button>
-                </div>
-              </div>
-              <!-- Accent colour -->
-              <div class="setting-row">
-                <span class="setting-lbl">
-                  <i class="fas fa-palette"></i>
-                  <span data-i18n="settings.accent">Couleur d'accent</span>
-                </span>
-                <p class="hint hint--accent">
-                  <i class="fas fa-info-circle"></i>
-                  <span>Les tons clairs / foncés s'ajustent automatiquement selon le thème.</span>
-                </p>
-                <div class="setting-ctrl accent-btns" id="accent-btns">
-                  <button class="acc-dot active" data-color="purple" style="background:linear-gradient(135deg,#6750a4,#9c7fe0)"
-                          onclick="setAccent('purple')" title="Violet"></button>
-                  <button class="acc-dot" data-color="blue" style="background:linear-gradient(135deg,#0061a4,#5b9fd8)"
-                          onclick="setAccent('blue')" title="Bleu"></button>
-                  <button class="acc-dot" data-color="teal" style="background:linear-gradient(135deg,#006b66,#3aada8)"
-                          onclick="setAccent('teal')" title="Teal"></button>
-                  <button class="acc-dot" data-color="green" style="background:linear-gradient(135deg,#006e1c,#4caf50)"
-                          onclick="setAccent('green')" title="Vert"></button>
-                  <button class="acc-dot" data-color="yellow" style="background:linear-gradient(135deg,#6c5c00,#e8c84a)"
-                          onclick="setAccent('yellow')" title="Jaune"></button>
-                  <button class="acc-dot" data-color="orange" style="background:linear-gradient(135deg,#9c4e00,#ff8c42)"
-                          onclick="setAccent('orange')" title="Orange"></button>
-                  <button class="acc-dot" data-color="red" style="background:linear-gradient(135deg,#ba1a1a,#ff5252)"
-                          onclick="setAccent('red')" title="Rouge"></button>
-                  <button class="acc-dot" data-color="pink" style="background:linear-gradient(135deg,#9c0057,#e91e8c)"
-                          onclick="setAccent('pink')" title="Rose"></button>
-                  <button class="acc-dot acc-dot--dynamic" data-color="dynamic"
-                          onclick="setAccent('dynamic')" title="Dynamique (pochette en cours)">
-                    <i class="fas fa-magic" style="font-size:8px;color:#fff"></i>
-                  </button>
-                  <button class="acc-dot acc-dot--system" data-color="system"
-                          onclick="setAccent('system')" title="Couleur du système / navigateur"
-                          style="background:conic-gradient(from 0deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);border:2px solid var(--border)">
-                    <i class="fas fa-desktop" style="font-size:8px;color:#fff;text-shadow:0 0 3px #000"></i>
-                  </button>
-                  <label class="acc-dot acc-dot--custom" data-color="custom" id="acc-custom-wrap"
-                         title="Couleur personnalisée" onclick="setAccent('custom')">
-                    <input type="color" id="acc-custom-input" value="#d0bcff"
-                           oninput="setCustomAccent(this.value)">
-                    <i class="fas fa-eyedropper" style="font-size:8px;color:#fff;pointer-events:none;position:relative;z-index:1"></i>
-                  </label>
-                </div>
-              </div>
-              <!-- Tinted background toggle -->
-              <div class="setting-row">
-                <span class="setting-lbl">
-                  <i class="fas fa-fill-drip"></i>
-                  <span>Fond teinté</span>
-                </span>
-                <p class="hint">
-                  <i class="fas fa-info-circle"></i>
-                  <span>Le fond de l'interface se teinte dans la couleur d'accent.</span>
-                </p>
-                <div class="setting-ctrl">
-                  <label class="toggle-switch">
-                    <input type="checkbox" id="tint-bg-toggle" checked
-                           onchange="setTintedBackground(this.checked)">
-                    <span class="toggle-track">
-                      <span class="toggle-thumb"></span>
-                    </span>
-                  </label>
-                </div>
-              </div>
-              <!-- Page de démarrage -->
-              <div class="setting-row">
-                <span class="setting-lbl">
-                  <i class="fas fa-rocket"></i>
-                  <span>Page au démarrage</span>
-                </span>
-                <p class="hint">
-                  <i class="fas fa-info-circle"></i>
-                  <span>Section affichée à chaque ouverture de l'app.</span>
-                </p>
-                <div class="setting-ctrl" style="flex-wrap:wrap;gap:6px">
-                  <button class="startup-btn active" data-startup="last"
-                          onclick="setStartupSection('last')"
-                          title="Dernière page visitée">
-                    <i class="fas fa-history"></i> Dernière visitée
-                  </button>
-                  <button class="startup-btn" data-startup="dashboard"
-                          onclick="setStartupSection('dashboard')"
-                          title="Dashboard">
-                    <i class="fas fa-home"></i> Dashboard
-                  </button>
-                  <button class="startup-btn" data-startup="top-artists"
-                          onclick="setStartupSection('top-artists')"
-                          title="Top Artistes">
-                    <i class="fas fa-microphone-alt"></i> Artistes
-                  </button>
-                  <button class="startup-btn" data-startup="top-albums"
-                          onclick="setStartupSection('top-albums')"
-                          title="Top Albums">
-                    <i class="fas fa-compact-disc"></i> Albums
-                  </button>
-                  <button class="startup-btn" data-startup="top-tracks"
-                          onclick="setStartupSection('top-tracks')"
-                          title="Top Titres">
-                    <i class="fas fa-music"></i> Titres
-                  </button>
-                  <button class="startup-btn" data-startup="charts"
-                          onclick="setStartupSection('charts')"
-                          title="Graphiques">
-                    <i class="fas fa-chart-bar"></i> Graphiques
-                  </button>
-                  <button class="startup-btn" data-startup="history"
-                          onclick="setStartupSection('history')"
-                          title="Historique">
-                    <i class="fas fa-history"></i> Historique
-                  </button>
-                </div>
-              </div>
-
-              <!-- Bandeau Dashboard -->
-              <div class="setting-row setting-row--full">
-                <span class="setting-lbl">
-                  <i class="fas fa-image"></i>
-                  <span>Bandeau du Dashboard</span>
-                </span>
-                <p class="hint">
-                  <i class="fas fa-info-circle"></i>
-                  <span>Image affichée en haut du Dashboard. Nécessite l'historique chargé pour les modes Top.</span>
-                </p>
-                <!-- Mode selector -->
-                <div class="setting-ctrl" style="flex-wrap:wrap;gap:6px;width:100%">
-                  <button class="startup-btn hero-mode-btn active" data-hero="none"
-                          onclick="setDashHeroMode('none')">
-                    <i class="fas fa-ban"></i> Aucun
-                  </button>
-                  <button class="startup-btn hero-mode-btn" data-hero="accent"
-                          onclick="setDashHeroMode('accent')">
-                    <i class="fas fa-palette"></i> Accent
-                  </button>
-                  <button class="startup-btn hero-mode-btn" data-hero="nowplaying"
-                          onclick="setDashHeroMode('nowplaying')">
-                    <i class="fas fa-music"></i> En cours
-                  </button>
-                  <button class="startup-btn hero-mode-btn" data-hero="top-track-7day"
-                          onclick="setDashHeroMode('top-track-7day')">
-                    <i class="fas fa-fire"></i> Top Titre (sem.)
-                  </button>
-                  <button class="startup-btn hero-mode-btn" data-hero="top-track-1month"
-                          onclick="setDashHeroMode('top-track-1month')">
-                    <i class="fas fa-fire"></i> Top Titre (mois)
-                  </button>
-                  <button class="startup-btn hero-mode-btn" data-hero="top-track-12month"
-                          onclick="setDashHeroMode('top-track-12month')">
-                    <i class="fas fa-fire"></i> Top Titre (année)
-                  </button>
-                  <button class="startup-btn hero-mode-btn" data-hero="top-artist-7day"
-                          onclick="setDashHeroMode('top-artist-7day')">
-                    <i class="fas fa-microphone-alt"></i> Top Artiste (sem.)
-                  </button>
-                  <button class="startup-btn hero-mode-btn" data-hero="top-artist-1month"
-                          onclick="setDashHeroMode('top-artist-1month')">
-                    <i class="fas fa-microphone-alt"></i> Top Artiste (mois)
-                  </button>
-                  <button class="startup-btn hero-mode-btn" data-hero="top-artist-12month"
-                          onclick="setDashHeroMode('top-artist-12month')">
-                    <i class="fas fa-microphone-alt"></i> Top Artiste (année)
-                  </button>
-                </div>
-                <!-- Affichage du texte -->
-                <div style="display:flex;align-items:center;gap:12px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
-                  <span style="font-size:.82rem;color:var(--text-muted);flex:1">
-                    <i class="fas fa-font" style="margin-right:6px;color:var(--accent)"></i>
-                    Afficher le texte (titre / artiste)
-                  </span>
-                  <label class="toggle-switch">
-                    <input type="checkbox" id="hero-info-toggle" checked
-                           onchange="setDashHeroInfo(this.checked)">
-                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
-                  </label>
-                </div>
-                <!-- Fallback (mode nowplaying seulement) -->
-                <div id="hero-fallback-row" class="hidden" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
-                  <span style="font-size:.82rem;color:var(--text-muted);display:block;margin-bottom:8px">
-                    <i class="fas fa-clock" style="margin-right:6px;color:var(--accent)"></i>
-                    Quand rien n'est en cours de lecture…
-                  </span>
-                  <div style="display:flex;flex-wrap:wrap;gap:6px">
-                    <button class="startup-btn hero-fallback-btn active" data-fallback="accent"
-                            onclick="setDashHeroFallback('accent')">
-                      <i class="fas fa-palette"></i> Accent
-                    </button>
-                    <button class="startup-btn hero-fallback-btn" data-fallback="top-track-7day"
-                            onclick="setDashHeroFallback('top-track-7day')">
-                      <i class="fas fa-fire"></i> Top Titre (sem.)
-                    </button>
-                    <button class="startup-btn hero-fallback-btn" data-fallback="top-track-1month"
-                            onclick="setDashHeroFallback('top-track-1month')">
-                      <i class="fas fa-fire"></i> Top Titre (mois)
-                    </button>
-                    <button class="startup-btn hero-fallback-btn" data-fallback="top-artist-7day"
-                            onclick="setDashHeroFallback('top-artist-7day')">
-                      <i class="fas fa-microphone-alt"></i> Top Artiste (sem.)
-                    </button>
-                    <button class="startup-btn hero-fallback-btn" data-fallback="top-artist-1month"
-                            onclick="setDashHeroFallback('top-artist-1month')">
-                      <i class="fas fa-microphone-alt"></i> Top Artiste (mois)
-                    </button>
-                    <button class="startup-btn hero-fallback-btn" data-fallback="none"
-                            onclick="setDashHeroFallback('none')">
-                      <i class="fas fa-ban"></i> Rien
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          
-          <div class="settings-card">
-            <div class="settings-card-hd">
+              <span>Apparence</span>
+            </button>
+            <button class="stg-tab-btn" data-tab="stg-language" role="tab" onclick="switchSettingsTab('stg-language')">
               <i class="fas fa-globe"></i>
-              <h3 data-i18n="settings.language">Language</h3>
+              <span>Langue</span>
+            </button>
+            <button class="stg-tab-btn" data-tab="stg-data" role="tab" onclick="switchSettingsTab('stg-data')">
+              <i class="fas fa-database"></i>
+              <span>Données</span>
+            </button>
+            <button class="stg-tab-btn" data-tab="stg-nav" role="tab" onclick="switchSettingsTab('stg-nav')">
+              <i class="fas fa-bars"></i>
+              <span>Navigation</span>
+            </button>
+            <button class="stg-tab-btn" data-tab="stg-about" role="tab" onclick="switchSettingsTab('stg-about')">
+              <i class="fas fa-info-circle"></i>
+              <span>À propos</span>
+            </button>
+          </nav>
+
+          <!-- ── Tab: Compte ── -->
+          <div class="stg-tab-panel active" id="stg-account" role="tabpanel">
+            <div class="stg-panel-inner">
+
+              <div class="stg-section">
+                <h4 class="stg-section-title"><i class="fas fa-key"></i> Identifiants</h4>
+                <!-- Username -->
+                <div class="setting-row">
+                  <label class="setting-lbl" for="settings-username">
+                    <i class="fas fa-user"></i>
+                    <span data-i18n="settings.username">Last.fm username</span>
+                  </label>
+                  <div class="setting-ctrl">
+                    <div class="input-group">
+                      <input type="text" id="settings-username" class="setting-input"
+                             placeholder="your_username" autocomplete="off" spellcheck="false">
+                      <button class="icon-btn" onclick="updateUsername()" aria-label="Enregistrer" title="Enregistrer">
+                        <i class="fas fa-check"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- API key -->
+                <div class="setting-row">
+                  <label class="setting-lbl" for="settings-apikey">
+                    <i class="fas fa-key"></i>
+                    <span data-i18n="settings.apikey">Last.fm API key</span>
+                  </label>
+                  <div class="setting-ctrl">
+                    <div class="input-group">
+                      <input type="password" id="settings-apikey" class="setting-input"
+                             placeholder="32 caractères hexadécimaux" autocomplete="off">
+                      <button class="icon-btn" onclick="toggleSettingsApiKey()" aria-label="Afficher/masquer" title="Afficher / masquer">
+                        <i class="fas fa-eye" id="settings-eye-icon"></i>
+                      </button>
+                      <button class="icon-btn" onclick="updateApiKey()" aria-label="Enregistrer" title="Enregistrer">
+                        <i class="fas fa-check"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <p class="hint">
+                    <i class="fas fa-shield-alt"></i>
+                    <span data-i18n="settings.apikeyHint">Stored locally. Never sent to any third party.</span>
+                  </p>
+                </div>
+                <!-- Remember me -->
+                <div class="setting-row">
+                  <label class="chk-label">
+                    <input type="checkbox" id="settings-remember" checked>
+                    <span class="chk-box"></span>
+                    <span data-i18n="settings.remember">Remember my credentials</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="stg-section stg-section--danger">
+                <h4 class="stg-section-title"><i class="fas fa-sign-out-alt"></i> Session</h4>
+                <div class="setting-actions">
+                  <button class="btn-logout--settings" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span data-i18n="settings.logout">Log out</span>
+                  </button>
+                  <p class="hint" style="margin-top:8px">
+                    <i class="fas fa-info-circle"></i>
+                    <span data-i18n="settings.logoutHint">Clears your credentials and returns to the login screen.</span>
+                  </p>
+                </div>
+              </div>
+
             </div>
-            <div class="settings-card-body">
-              <div class="setting-row">
-                <span class="setting-lbl">
-                  <i class="fas fa-language"></i>
-                  <span data-i18n="settings.interfaceLang">Interface language</span>
-                </span>
-                <div class="setting-ctrl">
-                  <div class="lang-btns" id="lang-btns">
-                    <button class="lang-btn" data-lang="fr" onclick="setLanguage('fr')">
-                      <span class="lang-flag">🇫🇷</span> Français
+          </div>
+
+          <!-- ── Tab: Apparence ── -->
+          <div class="stg-tab-panel" id="stg-appearance" role="tabpanel">
+            <div class="stg-panel-inner">
+
+              <div class="stg-section">
+                <h4 class="stg-section-title"><i class="fas fa-adjust"></i> Thème &amp; couleurs</h4>
+                <!-- Theme -->
+                <div class="setting-row">
+                  <span class="setting-lbl">
+                    <i class="fas fa-adjust"></i>
+                    <span data-i18n="settings.theme">Theme</span>
+                  </span>
+                  <div class="setting-ctrl theme-btns">
+                    <button class="th-btn" data-t="light" onclick="setTheme('light')" title="Light">
+                      <i class="fas fa-sun"></i>
+                      <span data-i18n="settings.themeLight">Light</span>
                     </button>
-                    <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">
-                      <span class="lang-flag">🇬🇧</span> English
+                    <button class="th-btn" data-t="auto" onclick="setTheme('auto')" title="Auto">
+                      <i class="fas fa-adjust"></i>
+                      <span data-i18n="settings.themeAuto">Auto</span>
                     </button>
-                    <button class="lang-btn" data-lang="es" onclick="setLanguage('es')">
-                      <span class="lang-flag">🇪🇸</span> Español
+                    <button class="th-btn active" data-t="dark" onclick="setTheme('dark')" title="Dark">
+                      <i class="fas fa-moon"></i>
+                      <span data-i18n="settings.themeDark">Dark</span>
                     </button>
-                    <button class="lang-btn" data-lang="pt" onclick="setLanguage('pt')">
-                      <span class="lang-flag">🇵🇹</span> Português
+                  </div>
+                </div>
+                <!-- Accent colour -->
+                <div class="setting-row">
+                  <span class="setting-lbl">
+                    <i class="fas fa-palette"></i>
+                    <span data-i18n="settings.accent">Couleur d'accent</span>
+                  </span>
+                  <p class="hint hint--accent">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Les tons clairs / foncés s'ajustent automatiquement selon le thème.</span>
+                  </p>
+                  <div class="setting-ctrl accent-btns" id="accent-btns">
+                    <button class="acc-dot active" data-color="purple" style="background:linear-gradient(135deg,#6750a4,#9c7fe0)" onclick="setAccent('purple')" title="Violet"></button>
+                    <button class="acc-dot" data-color="blue" style="background:linear-gradient(135deg,#0061a4,#5b9fd8)" onclick="setAccent('blue')" title="Bleu"></button>
+                    <button class="acc-dot" data-color="teal" style="background:linear-gradient(135deg,#006b66,#3aada8)" onclick="setAccent('teal')" title="Teal"></button>
+                    <button class="acc-dot" data-color="green" style="background:linear-gradient(135deg,#006e1c,#4caf50)" onclick="setAccent('green')" title="Vert"></button>
+                    <button class="acc-dot" data-color="yellow" style="background:linear-gradient(135deg,#6c5c00,#e8c84a)" onclick="setAccent('yellow')" title="Jaune"></button>
+                    <button class="acc-dot" data-color="orange" style="background:linear-gradient(135deg,#9c4e00,#ff8c42)" onclick="setAccent('orange')" title="Orange"></button>
+                    <button class="acc-dot" data-color="red" style="background:linear-gradient(135deg,#ba1a1a,#ff5252)" onclick="setAccent('red')" title="Rouge"></button>
+                    <button class="acc-dot" data-color="pink" style="background:linear-gradient(135deg,#9c0057,#e91e8c)" onclick="setAccent('pink')" title="Rose"></button>
+                    <button class="acc-dot acc-dot--dynamic" data-color="dynamic" onclick="setAccent('dynamic')" title="Dynamique (pochette en cours)">
+                      <i class="fas fa-magic" style="font-size:8px;color:#fff"></i>
                     </button>
-                    <button class="lang-btn" data-lang="de" onclick="setLanguage('de')">
-                      <span class="lang-flag">🇩🇪</span> Deutsch
+                    <button class="acc-dot acc-dot--system" data-color="system" onclick="setAccent('system')" title="Couleur du système / navigateur"
+                            style="background:conic-gradient(from 0deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);border:2px solid var(--border)">
+                      <i class="fas fa-desktop" style="font-size:8px;color:#fff;text-shadow:0 0 3px #000"></i>
                     </button>
-                    <button class="lang-btn" data-lang="it" onclick="setLanguage('it')">
-                      <span class="lang-flag">🇮🇹</span> Italiano
-                    </button>
-                    <button class="lang-btn" data-lang="ru" onclick="setLanguage('ru')">
-                      <span class="lang-flag">🇷🇺</span> Русский
-                    </button>
-                    <button class="lang-btn" data-lang="ja" onclick="setLanguage('ja')">
-                      <span class="lang-flag">🇯🇵</span> 日本語
-                    </button>
-                    <button class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">
-                      <span class="lang-flag">🇨🇳</span> 中文
-                    </button>
-                    <button class="lang-btn" data-lang="ko" onclick="setLanguage('ko')">
-                      <span class="lang-flag">🇰🇷</span> 한국어
-                    </button>
-                    <button class="lang-btn" data-lang="tr" onclick="setLanguage('tr')">
-                      <span class="lang-flag">🇹🇷</span> Türkçe
-                    </button>
-                    <button class="lang-btn" data-lang="ar" onclick="setLanguage('ar')">
-                      <span class="lang-flag">🇸🇦</span> العربية
-                    </button>
+                    <label class="acc-dot acc-dot--custom" data-color="custom" id="acc-custom-wrap" title="Couleur personnalisée" onclick="setAccent('custom')">
+                      <input type="color" id="acc-custom-input" value="#d0bcff" oninput="setCustomAccent(this.value)">
+                      <i class="fas fa-eyedropper" style="font-size:8px;color:#fff;pointer-events:none;position:relative;z-index:1"></i>
+                    </label>
+                  </div>
+                </div>
+                <!-- Tinted background -->
+                <div class="setting-row">
+                  <span class="setting-lbl">
+                    <i class="fas fa-fill-drip"></i>
+                    <span>Fond teinté</span>
+                  </span>
+                  <p class="hint">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Le fond de l'interface se teinte dans la couleur d'accent.</span>
+                  </p>
+                  <div class="setting-ctrl">
+                    <label class="toggle-switch">
+                      <input type="checkbox" id="tint-bg-toggle" checked onchange="setTintedBackground(this.checked)">
+                      <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="stg-section">
+                <h4 class="stg-section-title"><i class="fas fa-rocket"></i> Démarrage &amp; Dashboard</h4>
+                <!-- Page de démarrage -->
+                <div class="setting-row">
+                  <span class="setting-lbl">
+                    <i class="fas fa-rocket"></i>
+                    <span>Page au démarrage</span>
+                  </span>
+                  <p class="hint">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Section affichée à chaque ouverture de l'app.</span>
+                  </p>
+                  <div class="setting-ctrl" style="flex-wrap:wrap;gap:6px">
+                    <button class="startup-btn active" data-startup="last" onclick="setStartupSection('last')" title="Dernière page visitée"><i class="fas fa-history"></i> Dernière visitée</button>
+                    <button class="startup-btn" data-startup="dashboard" onclick="setStartupSection('dashboard')" title="Dashboard"><i class="fas fa-home"></i> Dashboard</button>
+                    <button class="startup-btn" data-startup="top-artists" onclick="setStartupSection('top-artists')" title="Top Artistes"><i class="fas fa-microphone-alt"></i> Artistes</button>
+                    <button class="startup-btn" data-startup="top-albums" onclick="setStartupSection('top-albums')" title="Top Albums"><i class="fas fa-compact-disc"></i> Albums</button>
+                    <button class="startup-btn" data-startup="top-tracks" onclick="setStartupSection('top-tracks')" title="Top Titres"><i class="fas fa-music"></i> Titres</button>
+                    <button class="startup-btn" data-startup="charts" onclick="setStartupSection('charts')" title="Graphiques"><i class="fas fa-chart-bar"></i> Graphiques</button>
+                    <button class="startup-btn" data-startup="history" onclick="setStartupSection('history')" title="Historique"><i class="fas fa-history"></i> Historique</button>
+                  </div>
+                </div>
+                <!-- Bandeau Dashboard -->
+                <div class="setting-row setting-row--full">
+                  <span class="setting-lbl">
+                    <i class="fas fa-image"></i>
+                    <span>Bandeau du Dashboard</span>
+                  </span>
+                  <p class="hint">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Image affichée en haut du Dashboard. Nécessite l'historique chargé pour les modes Top.</span>
+                  </p>
+                  <div class="setting-ctrl" style="flex-wrap:wrap;gap:6px;width:100%">
+                    <button class="startup-btn hero-mode-btn active" data-hero="none" onclick="setDashHeroMode('none')"><i class="fas fa-ban"></i> Aucun</button>
+                    <button class="startup-btn hero-mode-btn" data-hero="accent" onclick="setDashHeroMode('accent')"><i class="fas fa-palette"></i> Accent</button>
+                    <button class="startup-btn hero-mode-btn" data-hero="nowplaying" onclick="setDashHeroMode('nowplaying')"><i class="fas fa-music"></i> En cours</button>
+                    <button class="startup-btn hero-mode-btn" data-hero="top-track-7day" onclick="setDashHeroMode('top-track-7day')"><i class="fas fa-fire"></i> Top Titre (sem.)</button>
+                    <button class="startup-btn hero-mode-btn" data-hero="top-track-1month" onclick="setDashHeroMode('top-track-1month')"><i class="fas fa-fire"></i> Top Titre (mois)</button>
+                    <button class="startup-btn hero-mode-btn" data-hero="top-track-12month" onclick="setDashHeroMode('top-track-12month')"><i class="fas fa-fire"></i> Top Titre (année)</button>
+                    <button class="startup-btn hero-mode-btn" data-hero="top-artist-7day" onclick="setDashHeroMode('top-artist-7day')"><i class="fas fa-microphone-alt"></i> Top Artiste (sem.)</button>
+                    <button class="startup-btn hero-mode-btn" data-hero="top-artist-1month" onclick="setDashHeroMode('top-artist-1month')"><i class="fas fa-microphone-alt"></i> Top Artiste (mois)</button>
+                    <button class="startup-btn hero-mode-btn" data-hero="top-artist-12month" onclick="setDashHeroMode('top-artist-12month')"><i class="fas fa-microphone-alt"></i> Top Artiste (année)</button>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:12px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+                    <span style="font-size:.82rem;color:var(--text-muted);flex:1">
+                      <i class="fas fa-font" style="margin-right:6px;color:var(--accent)"></i>
+                      Afficher le texte (titre / artiste)
+                    </span>
+                    <label class="toggle-switch">
+                      <input type="checkbox" id="hero-info-toggle" checked onchange="setDashHeroInfo(this.checked)">
+                      <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                    </label>
+                  </div>
+                  <div id="hero-fallback-row" class="hidden" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+                    <span style="font-size:.82rem;color:var(--text-muted);display:block;margin-bottom:8px">
+                      <i class="fas fa-clock" style="margin-right:6px;color:var(--accent)"></i>
+                      Quand rien n'est en cours de lecture…
+                    </span>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px">
+                      <button class="startup-btn hero-fallback-btn active" data-fallback="accent" onclick="setDashHeroFallback('accent')"><i class="fas fa-palette"></i> Accent</button>
+                      <button class="startup-btn hero-fallback-btn" data-fallback="top-track-7day" onclick="setDashHeroFallback('top-track-7day')"><i class="fas fa-fire"></i> Top Titre (sem.)</button>
+                      <button class="startup-btn hero-fallback-btn" data-fallback="top-track-1month" onclick="setDashHeroFallback('top-track-1month')"><i class="fas fa-fire"></i> Top Titre (mois)</button>
+                      <button class="startup-btn hero-fallback-btn" data-fallback="top-artist-7day" onclick="setDashHeroFallback('top-artist-7day')"><i class="fas fa-microphone-alt"></i> Top Artiste (sem.)</button>
+                      <button class="startup-btn hero-fallback-btn" data-fallback="top-artist-1month" onclick="setDashHeroFallback('top-artist-1month')"><i class="fas fa-microphone-alt"></i> Top Artiste (mois)</button>
+                      <button class="startup-btn hero-fallback-btn" data-fallback="none" onclick="setDashHeroFallback('none')"><i class="fas fa-ban"></i> Rien</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- ── Tab: Langue ── -->
+          <div class="stg-tab-panel" id="stg-language" role="tabpanel">
+            <div class="stg-panel-inner">
+              <div class="stg-section">
+                <h4 class="stg-section-title"><i class="fas fa-language"></i> Langue de l'interface</h4>
+                <div class="setting-row">
+                  <div class="setting-ctrl">
+                    <div class="lang-btns" id="lang-btns">
+                      <button class="lang-btn" data-lang="fr" onclick="setLanguage('fr')"><span class="lang-flag">🇫🇷</span> Français</button>
+                      <button class="lang-btn" data-lang="en" onclick="setLanguage('en')"><span class="lang-flag">🇬🇧</span> English</button>
+                      <button class="lang-btn" data-lang="es" onclick="setLanguage('es')"><span class="lang-flag">🇪🇸</span> Español</button>
+                      <button class="lang-btn" data-lang="pt" onclick="setLanguage('pt')"><span class="lang-flag">🇵🇹</span> Português</button>
+                      <button class="lang-btn" data-lang="de" onclick="setLanguage('de')"><span class="lang-flag">🇩🇪</span> Deutsch</button>
+                      <button class="lang-btn" data-lang="it" onclick="setLanguage('it')"><span class="lang-flag">🇮🇹</span> Italiano</button>
+                      <button class="lang-btn" data-lang="ru" onclick="setLanguage('ru')"><span class="lang-flag">🇷🇺</span> Русский</button>
+                      <button class="lang-btn" data-lang="ja" onclick="setLanguage('ja')"><span class="lang-flag">🇯🇵</span> 日本語</button>
+                      <button class="lang-btn" data-lang="zh" onclick="setLanguage('zh')"><span class="lang-flag">🇨🇳</span> 中文</button>
+                      <button class="lang-btn" data-lang="ko" onclick="setLanguage('ko')"><span class="lang-flag">🇰🇷</span> 한국어</button>
+                      <button class="lang-btn" data-lang="tr" onclick="setLanguage('tr')"><span class="lang-flag">🇹🇷</span> Türkçe</button>
+                      <button class="lang-btn" data-lang="ar" onclick="setLanguage('ar')"><span class="lang-flag">🇸🇦</span> العربية</button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          
-          <div class="settings-card">
-            <div class="settings-card-hd">
-              <i class="fas fa-database"></i>
-              <h3 data-i18n="settings.data">Data &amp; Export</h3>
-            </div>
-            <div class="settings-card-body">
-              <!-- Export -->
-              <div class="setting-row">
-                <span class="setting-lbl">
-                  <i class="fas fa-file-export"></i>
-                  <span data-i18n="settings.export">Export my statistics</span>
-                </span>
-                <div class="setting-ctrl export-btns">
-                  <button class="btn-export-sm" onclick="exportStats('json')" title="Export as JSON">
-                    <i class="fas fa-file-code"></i> JSON
-                  </button>
-                  <button class="btn-export-sm" onclick="exportStats('csv')" title="Export as CSV">
-                    <i class="fas fa-file-csv"></i> CSV
-                  </button>
-                </div>
-              </div>
-              <!-- Clear cache -->
-              <div class="setting-row">
-                <span class="setting-lbl">
-                  <i class="fas fa-trash-alt"></i>
-                  <span data-i18n="settings.clearCache">Clear local cache</span>
-                </span>
-                <div class="setting-ctrl">
-                  <button class="btn-danger-sm" onclick="clearAppCache()">
-                    <i class="fas fa-broom"></i>
-                    <span data-i18n="settings.clearCacheBtn">Clear cache</span>
-                  </button>
-                </div>
-              </div>
-              <!-- Install PWA -->
-              <div class="setting-row">
-                <span class="setting-lbl">
-                  <i class="fas fa-download"></i>
-                  <span data-i18n="settings.installApp">Install application</span>
-                </span>
-                <div class="setting-ctrl">
-                  <button class="btn-install hidden" id="settings-btn-install" onclick="installPWA()">
-                    <i class="fas fa-mobile-alt"></i>
-                    <span data-i18n="settings.installBtn">Install LastStats</span>
-                  </button>
-                  <span class="setting-hint installed-hint hidden" id="settings-pwa-installed">
-                    <i class="fas fa-check-circle"></i>
-                    <span data-i18n="settings.installed">Application installed</span>
-                  </span>
-                </div>
-              </div>
-              <!-- Notifications -->
-              <div class="setting-row setting-row--full">
-                <div class="setting-lbl-wrap">
+          <!-- ── Tab: Données ── -->
+          <div class="stg-tab-panel" id="stg-data" role="tabpanel">
+            <div class="stg-panel-inner">
+
+              <div class="stg-section">
+                <h4 class="stg-section-title"><i class="fas fa-file-export"></i> Export</h4>
+                <div class="setting-row">
                   <span class="setting-lbl">
-                    <i class="fas fa-bell"></i>
-                    <span>Notifications</span>
+                    <i class="fas fa-file-export"></i>
+                    <span data-i18n="settings.export">Export my statistics</span>
                   </span>
+                  <div class="setting-ctrl export-btns">
+                    <button class="btn-export-sm" onclick="exportStats('json')" title="Export as JSON"><i class="fas fa-file-code"></i> JSON</button>
+                    <button class="btn-export-sm" onclick="exportStats('csv')" title="Export as CSV"><i class="fas fa-file-csv"></i> CSV</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="stg-section">
+                <h4 class="stg-section-title"><i class="fas fa-bell"></i> Notifications</h4>
+                <div class="setting-row">
                   <p class="hint">Autorisez les notifications pour recevoir des rappels et récaps.</p>
+                  <div class="setting-ctrl">
+                    <button class="btn-notif-wrapped" id="btn-notif-enable" onclick="requestNotificationAccess()">
+                      <i class="fas fa-bell"></i>
+                      <span id="btn-notif-label">Activer les notifications</span>
+                    </button>
+                  </div>
                 </div>
-                <div class="setting-ctrl">
-                  <button class="btn-notif-wrapped" id="btn-notif-enable" onclick="requestNotificationAccess()">
-                    <i class="fas fa-bell"></i>
-                    <span id="btn-notif-label">Activer les notifications</span>
-                  </button>
+                <div class="notif-options-grid" id="notif-options-grid">
+                  <label class="notif-opt">
+                    <input type="checkbox" id="notif-weekly" onchange="saveNotifPrefs()">
+                    <span class="notif-opt-icon">📊</span>
+                    <span class="notif-opt-body"><strong>Récap hebdomadaire</strong><small>Chaque lundi — vos stats de la semaine passée</small></span>
+                  </label>
+                  <label class="notif-opt">
+                    <input type="checkbox" id="notif-monthly" onchange="saveNotifPrefs()">
+                    <span class="notif-opt-icon">📅</span>
+                    <span class="notif-opt-body"><strong>Récap mensuel</strong><small>Le 1er du mois — artistes et titres du mois</small></span>
+                  </label>
+                  <label class="notif-opt">
+                    <input type="checkbox" id="notif-milestone" onchange="saveNotifPrefs()">
+                    <span class="notif-opt-icon">🎯</span>
+                    <span class="notif-opt-body"><strong>Jalons d'écoute</strong><small>Notifié à chaque palier atteint</small></span>
+                  </label>
+                  <label class="notif-opt">
+                    <input type="checkbox" id="notif-wrapped" onchange="saveNotifPrefs()">
+                    <span class="notif-opt-icon">🎁</span>
+                    <span class="notif-opt-body"><strong>Wrapped annuel</strong><small>Fin décembre — rappel pour votre récap de l'année</small></span>
+                  </label>
                 </div>
-              </div>
-              <!-- Notification options -->
-              <div class="notif-options-grid" id="notif-options-grid">
-                <label class="notif-opt">
-                  <input type="checkbox" id="notif-weekly" onchange="saveNotifPrefs()">
-                  <span class="notif-opt-icon">📊</span>
-                  <span class="notif-opt-body">
-                    <strong>Récap hebdomadaire</strong>
-                    <small>Chaque lundi — vos stats de la semaine passée</small>
-                  </span>
-                </label>
-                <label class="notif-opt">
-                  <input type="checkbox" id="notif-monthly" onchange="saveNotifPrefs()">
-                  <span class="notif-opt-icon">📅</span>
-                  <span class="notif-opt-body">
-                    <strong>Récap mensuel</strong>
-                    <small>Le 1er du mois — artistes et titres du mois</small>
-                  </span>
-                </label>
-                <label class="notif-opt">
-                  <input type="checkbox" id="notif-milestone" onchange="saveNotifPrefs()">
-                  <span class="notif-opt-icon">🎯</span>
-                  <span class="notif-opt-body">
-                    <strong>Jalons d'écoute</strong>
-                    <small>Notifié à chaque palier atteint</small>
-                  </span>
-                </label>
-                <label class="notif-opt">
-                  <input type="checkbox" id="notif-wrapped" onchange="saveNotifPrefs()">
-                  <span class="notif-opt-icon">🎁</span>
-                  <span class="notif-opt-body">
-                    <strong>Wrapped annuel</strong>
-                    <small>Fin décembre — rappel pour votre récap de l'année</small>
-                  </span>
-                </label>
-              </div>
-              <!-- Milestone thresholds -->
-              <div class="notif-milestones" id="notif-milestones">
-                <div class="notif-milestones-hd">
-                  <i class="fas fa-sliders-h"></i>
-                  <span>Paliers de scrobbles</span>
-                </div>
-                <div class="notif-milestones-grid">
-                  <label class="milestone-chip"><input type="checkbox" id="ms-500"    value="500"    onchange="saveNotifPrefs()"><span>500</span></label>
-                  <label class="milestone-chip"><input type="checkbox" id="ms-1000"   value="1000"   onchange="saveNotifPrefs()" checked><span>1k</span></label>
-                  <label class="milestone-chip"><input type="checkbox" id="ms-2500"   value="2500"   onchange="saveNotifPrefs()"><span>2,5k</span></label>
-                  <label class="milestone-chip"><input type="checkbox" id="ms-5000"   value="5000"   onchange="saveNotifPrefs()" checked><span>5k</span></label>
-                  <label class="milestone-chip"><input type="checkbox" id="ms-10000"  value="10000"  onchange="saveNotifPrefs()" checked><span>10k</span></label>
-                  <label class="milestone-chip"><input type="checkbox" id="ms-25000"  value="25000"  onchange="saveNotifPrefs()"><span>25k</span></label>
-                  <label class="milestone-chip"><input type="checkbox" id="ms-50000"  value="50000"  onchange="saveNotifPrefs()" checked><span>50k</span></label>
-                  <label class="milestone-chip"><input type="checkbox" id="ms-100000" value="100000" onchange="saveNotifPrefs()" checked><span>100k</span></label>
-                  <label class="milestone-chip"><input type="checkbox" id="ms-250000" value="250000" onchange="saveNotifPrefs()"><span>250k</span></label>
-                  <label class="milestone-chip"><input type="checkbox" id="ms-500000" value="500000" onchange="saveNotifPrefs()"><span>500k</span></label>
-                  <label class="milestone-chip"><input type="checkbox" id="ms-1000000" value="1000000" onchange="saveNotifPrefs()"><span>1M</span></label>
+                <div class="notif-milestones" id="notif-milestones">
+                  <div class="notif-milestones-hd"><i class="fas fa-sliders-h"></i><span>Paliers de scrobbles</span></div>
+                  <div class="notif-milestones-grid">
+                    <label class="milestone-chip"><input type="checkbox" id="ms-500"    value="500"    onchange="saveNotifPrefs()"><span>500</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-1000"   value="1000"   onchange="saveNotifPrefs()" checked><span>1k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-2500"   value="2500"   onchange="saveNotifPrefs()"><span>2,5k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-5000"   value="5000"   onchange="saveNotifPrefs()" checked><span>5k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-10000"  value="10000"  onchange="saveNotifPrefs()" checked><span>10k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-25000"  value="25000"  onchange="saveNotifPrefs()"><span>25k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-50000"  value="50000"  onchange="saveNotifPrefs()" checked><span>50k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-100000" value="100000" onchange="saveNotifPrefs()" checked><span>100k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-250000" value="250000" onchange="saveNotifPrefs()"><span>250k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-500000" value="500000" onchange="saveNotifPrefs()"><span>500k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-1000000" value="1000000" onchange="saveNotifPrefs()"><span>1M</span></label>
+                  </div>
                 </div>
               </div>
-              <!-- Force update -->
-              <div class="setting-row setting-row--highlight">
-                <div class="setting-lbl-wrap">
-                  <span class="setting-lbl">
-                    <i class="fas fa-redo-alt"></i>
-                    <span data-i18n="settings.forceUpdate">Force update</span>
-                  </span>
-                  <p class="hint" data-i18n="settings.forceUpdateHint">Clears the Service Worker cache and reloads the app to ensure you're on the latest version.</p>
+
+              <div class="stg-section stg-section--danger">
+                <h4 class="stg-section-title"><i class="fas fa-trash-alt"></i> Cache &amp; Mise à jour</h4>
+                <div class="setting-row">
+                  <span class="setting-lbl"><i class="fas fa-trash-alt"></i><span data-i18n="settings.clearCache">Clear local cache</span></span>
+                  <div class="setting-ctrl">
+                    <button class="btn-danger-sm" onclick="clearAppCache()">
+                      <i class="fas fa-broom"></i>
+                      <span data-i18n="settings.clearCacheBtn">Clear cache</span>
+                    </button>
+                  </div>
                 </div>
-                <div class="setting-ctrl">
-                  <button class="btn-update-sw" id="btn-force-update" onclick="forceSwUpdate()">
-                    <i class="fas fa-cloud-download-alt"></i>
-                    <span data-i18n="settings.forceUpdateBtn">Update now</span>
-                  </button>
+                <div class="setting-row setting-row--highlight">
+                  <div class="setting-lbl-wrap">
+                    <span class="setting-lbl"><i class="fas fa-redo-alt"></i><span data-i18n="settings.forceUpdate">Force update</span></span>
+                    <p class="hint" data-i18n="settings.forceUpdateHint">Clears the Service Worker cache and reloads the app to ensure you're on the latest version.</p>
+                  </div>
+                  <div class="setting-ctrl">
+                    <button class="btn-update-sw" id="btn-force-update" onclick="forceSwUpdate()">
+                      <i class="fas fa-cloud-download-alt"></i>
+                      <span data-i18n="settings.forceUpdateBtn">Update now</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="stg-section">
+                <h4 class="stg-section-title"><i class="fas fa-download"></i> Application</h4>
+                <div class="setting-row">
+                  <span class="setting-lbl"><i class="fas fa-download"></i><span data-i18n="settings.installApp">Install application</span></span>
+                  <div class="setting-ctrl">
+                    <button class="btn-install hidden" id="settings-btn-install" onclick="installPWA()">
+                      <i class="fas fa-mobile-alt"></i>
+                      <span data-i18n="settings.installBtn">Install LastStats</span>
+                    </button>
+                    <span class="setting-hint installed-hint hidden" id="settings-pwa-installed">
+                      <i class="fas fa-check-circle"></i>
+                      <span data-i18n="settings.installed">Application installed</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- ── Tab: Navigation ── -->
+          <div class="stg-tab-panel" id="stg-nav" role="tabpanel">
+            <div class="stg-panel-inner">
+              <div class="stg-section">
+                <h4 class="stg-section-title"><i class="fas fa-bars"></i> Onglets visibles</h4>
+                <p class="hint" style="margin-bottom:12px">
+                  <i class="fas fa-info-circle"></i>
+                  <span data-i18n="settings.navVisibilityHint">Choose which sections appear in the navigation bar. Dashboard and Settings are always visible.</span>
+                </p>
+                <div class="nav-visibility-grid" id="nav-visibility-grid">
+                  <!-- Generated by JS -->
                 </div>
               </div>
             </div>
           </div>
 
-          
-          <div class="settings-card">
-            <div class="settings-card-hd">
-              <i class="fas fa-bars"></i>
-              <h3 data-i18n="settings.navVisibility">Navigation tabs</h3>
-            </div>
-            <div class="settings-card-body">
-              <p class="hint" style="margin-bottom:12px">
-                <i class="fas fa-info-circle"></i>
-                <span data-i18n="settings.navVisibilityHint">Choose which sections appear in the navigation bar. Dashboard and Settings are always visible.</span>
-              </p>
-              <div class="nav-visibility-grid" id="nav-visibility-grid">
-                <!-- Generated by JS -->
-              </div>
-            </div>
-          </div>
-
-          
-          <div class="settings-card settings-card--about">
-            <div class="settings-card-hd">
-              <i class="fas fa-info-circle"></i>
-              <h3 data-i18n="settings.about">About</h3>
-            </div>
-            <div class="settings-card-body">
-              <div class="about-logo">
-                <div class="logo-icon logo-icon--sm"><i class="fas fa-headphones-alt"></i></div>
-                <div>
-                  <strong>LastStats</strong>
-                  <span class="about-version" id="about-version">v5.0.0</span>
+          <!-- ── Tab: À propos ── -->
+          <div class="stg-tab-panel" id="stg-about" role="tabpanel">
+            <div class="stg-panel-inner">
+              <div class="stg-section">
+                <div class="about-logo">
+                  <div class="logo-icon logo-icon--sm"><i class="fas fa-headphones-alt"></i></div>
+                  <div>
+                    <strong>LastStats</strong>
+                    <span class="about-version" id="about-version">v5.0.0</span>
+                  </div>
+                </div>
+                <p class="about-desc" data-i18n="settings.aboutDesc">Your Last.fm music stats, reinvented. Powered by the Last.fm API, Chart.js and D3.js.</p>
+                <div class="about-links">
+                  <a href="https://www.last.fm/api" target="_blank" rel="noopener" class="label-link"><i class="fas fa-external-link-alt"></i> Last.fm API</a>
+                  <a href="https://sanobld.github.io/Web/" target="_blank" rel="noopener" class="label-link"><i class="fab fa-github"></i> GitHub</a>
                 </div>
               </div>
-              <p class="about-desc" data-i18n="settings.aboutDesc">Your Last.fm music stats, reinvented. Powered by the Last.fm API, Chart.js and D3.js.</p>
-              <div class="about-links">
-                <a href="https://www.last.fm/api" target="_blank" rel="noopener" class="label-link">
-                  <i class="fas fa-external-link-alt"></i> Last.fm API
-                </a>
-                <a href="https://sanobld.github.io/Web/" target="_blank" rel="noopener" class="label-link">
-                  <i class="fab fa-github"></i> GitHub
-                </a>
+
+              <div class="stg-section">
+                <h4 class="stg-section-title" style="color:var(--accent)"><i class="fas fa-heart"></i> Sources &amp; Remerciements</h4>
+                <p class="about-credits-intro">LastStats est possible grâce à ces services. Un grand merci à eux.</p>
+                <div class="credits-grid">
+                  <a href="https://www.last.fm/api" target="_blank" rel="noopener" class="credit-card">
+                    <div class="credit-card-icon" style="background:rgba(208,0,0,.12);color:#d00"><i class="fas fa-headphones"></i></div>
+                    <div class="credit-card-body"><strong>Last.fm</strong><span>Données d'écoute, scrobbles, statistiques, artistes, albums</span></div>
+                  </a>
+                  <a href="https://musicbrainz.org" target="_blank" rel="noopener" class="credit-card">
+                    <div class="credit-card-icon" style="background:rgba(186,94,64,.12);color:#ba5e40"><i class="fas fa-database"></i></div>
+                    <div class="credit-card-body"><strong>MusicBrainz</strong><span>Base de données ouverte — métadonnées, genres, pays, dates</span></div>
+                  </a>
+                  <a href="https://coverartarchive.org" target="_blank" rel="noopener" class="credit-card">
+                    <div class="credit-card-icon" style="background:rgba(100,180,100,.12);color:#4a9850"><i class="fas fa-image"></i></div>
+                    <div class="credit-card-body"><strong>Cover Art Archive</strong><span>Pochettes d'albums haute résolution, géré par MusicBrainz</span></div>
+                  </a>
+                  <a href="https://www.theaudiodb.com" target="_blank" rel="noopener" class="credit-card">
+                    <div class="credit-card-icon" style="background:rgba(255,165,0,.12);color:#e08a00"><i class="fas fa-photo-video"></i></div>
+                    <div class="credit-card-body"><strong>TheAudioDB</strong><span>Images d'artistes, biographies et médias musicaux</span></div>
+                  </a>
+                  <a href="https://affiliate.itunes.apple.com/resources/documentation/itunes-store-web-service-search-api/" target="_blank" rel="noopener" class="credit-card">
+                    <div class="credit-card-icon" style="background:rgba(250,80,80,.12);color:#fa5050"><i class="fab fa-apple"></i></div>
+                    <div class="credit-card-body"><strong>iTunes / Apple Music</strong><span>Pochettes et données de catalogue en fallback</span></div>
+                  </a>
+                  <a href="https://www.chartjs.org" target="_blank" rel="noopener" class="credit-card">
+                    <div class="credit-card-icon" style="background:rgba(100,130,255,.12);color:#5570e8"><i class="fas fa-chart-bar"></i></div>
+                    <div class="credit-card-body"><strong>Chart.js</strong><span>Bibliothèque de graphiques interactifs</span></div>
+                  </a>
+                  <a href="https://d3js.org" target="_blank" rel="noopener" class="credit-card">
+                    <div class="credit-card-icon" style="background:rgba(255,130,80,.12);color:#e0622a"><i class="fas fa-project-diagram"></i></div>
+                    <div class="credit-card-body"><strong>D3.js</strong><span>Visualisation avancée — heatmaps, graphiques complexes</span></div>
+                  </a>
+                  <a href="https://fontawesome.com" target="_blank" rel="noopener" class="credit-card">
+                    <div class="credit-card-icon" style="background:rgba(83,138,230,.12);color:#538ae6"><i class="fas fa-icons"></i></div>
+                    <div class="credit-card-body"><strong>Font Awesome</strong><span>Icônes utilisées dans toute l'interface</span></div>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
 
-        </div><!-- /.settings-grid -->
+        </div><!-- /.stg-tabs-wrap -->
       </section>
 
 
@@ -2233,6 +2153,17 @@
     </button>
   </div>
   <div id="export-menu-ov" class="export-menu-ov hidden" onclick="closeExportMenu()"></div>
+
+  <!-- Search detail panel — fixed overlay, outside all layouts -->
+  <div class="search-detail-panel hidden" id="search-detail-panel">
+    <div class="sdp-backdrop" onclick="closeSearchDetail()"></div>
+    <div class="sdp-sheet">
+      <button class="sdp-close" onclick="closeSearchDetail()" aria-label="Fermer">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="sdp-body" id="search-detail-body"></div>
+    </div>
+  </div>
 
 </body>
 </html>
