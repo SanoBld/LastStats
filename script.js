@@ -3184,9 +3184,9 @@ function _buildAlbumCard(a, rank) {
   const delay    = Math.min((rank-1) % 20, 10) * 0.04;
   const spQ      = encodeURIComponent(`${a.name} ${artistNm}`);
 
-  const _sdAlbumData = encodeURIComponent(JSON.stringify({ type:'album', name:a.name, sub:artistNm, plays:a.playcount, url:safeUrl.replace(/%27/g,"'"), img:imgUrl }));
+  const _imAlbumCall = `openItemModal('album',${JSON.stringify(a.name)},${JSON.stringify(artistNm)},${a.playcount},'${safeUrl.replace(/'/g,"%27")}','${imgUrl.replace(/'/g,"%27")}')`.replace(/"/g, '&quot;');
   const gridHtml = `
-    <div class="hero-card" style="animation-delay:${delay}s" onclick="openSearchDetail(decodeURIComponent('${_sdAlbumData}'))">
+    <div class="hero-card" style="animation-delay:${delay}s" onclick="${_imAlbumCall}">
       <div class="hc-fallback" style="background:${bg}${hasImg ? ';display:none' : ''}">${letter}</div>
       ${hasImg ? `<img class="hc-img img-fade" src="${imgUrl}" alt="${escHtml(a.name)}" loading="lazy" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.previousElementSibling.style.display='flex'">` : ''}
       <div class="hc-overlay"></div>
@@ -3203,7 +3203,7 @@ function _buildAlbumCard(a, rank) {
     </div>`;
 
   const listHtml = `
-    <div class="music-card" style="animation-delay:${delay}s" onclick="openSearchDetail(decodeURIComponent('${_sdAlbumData}'))">
+    <div class="music-card" style="animation-delay:${delay}s" onclick="${_imAlbumCall}">
       <div class="music-card-img">
         ${hasImg ? `<img src="${imgUrl}" alt="${escHtml(a.name)}" loading="lazy" class="img-fade" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
         <div class="spotify-cover" style="background:${bg};display:${hasImg ? 'none' : 'flex'}">
@@ -3223,7 +3223,7 @@ function _buildAlbumCard(a, rank) {
     </div>`;
 
   const compactHtml = `
-    <div class="track-item" style="animation-delay:${delay}s" onclick="openSearchDetail(decodeURIComponent('${_sdAlbumData}'))">
+    <div class="track-item" style="animation-delay:${delay}s" onclick="${_imAlbumCall}">
       <div class="track-cover" style="flex-shrink:0;width:40px;height:40px;border-radius:6px;overflow:hidden;position:relative">
         ${hasImg ? `<img src="${imgUrl}" alt="${escHtml(a.name)}" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.style.display='none'">` : ''}
         <div style="position:absolute;inset:0;background:${bg};display:${hasImg ? 'none' : 'flex'};align-items:center;justify-content:center;color:white;font-weight:700">${letter}</div>
@@ -3321,7 +3321,7 @@ function setTracksLayout(layout) {
 function _buildTrackItem(track, rank, maxPlay) {
   const pct        = ((parseInt(track.playcount) / Math.max(maxPlay, 1)) * 100).toFixed(1);
   const _sdTrackImg = track.image?.find(im => im.size==='extralarge')?.['#text'] || track.image?.find(im => im.size==='large')?.['#text'] || '';
-  const _sdTrackData = encodeURIComponent(JSON.stringify({ type:'track', name:track.name, sub:track.artist?.name||'', plays:track.playcount, url:track.url||'', img:_sdTrackImg }));
+  const _imTrackCall = `openItemModal('track',${JSON.stringify(track.name)},${JSON.stringify(track.artist?.name||'')},${track.playcount},'${(track.url||'').replace(/'/g,"%27")}','${_sdTrackImg.replace(/'/g,"%27")}')`.replace(/"/g, '&quot;');
   const medal      = rank <= 3 ? ['🥇','🥈','🥉'][rank-1] : rank;
   const spQ        = encodeURIComponent(`${track.name} ${track.artist?.name || ''}`);
   const ytQ        = encodeURIComponent(`${track.name} ${track.artist?.name || ''}`);
@@ -3335,7 +3335,7 @@ function _buildTrackItem(track, rank, maxPlay) {
 
     if ((APP.tracksLayout || 'list') === 'grid') {
     return `
-    <div class="hero-card" style="animation-delay:${delay}s" onclick="openSearchDetail(decodeURIComponent('${_sdTrackData}'))">
+    <div class="hero-card" style="animation-delay:${delay}s" onclick="${_imTrackCall}">
       <div class="hc-fallback" style="background:${coverBg}${hasCover ? ';display:none' : ''}">${coverLtr}</div>
       <img class="hc-img img-fade" id="${coverElId}-img" ${hasCover ? `src="${imgUrl}"` : 'src=""'} alt="${escHtml(track.name)}" loading="lazy"
            style="${hasCover ? '' : 'display:none'}"
@@ -3358,7 +3358,7 @@ function _buildTrackItem(track, rank, maxPlay) {
 
     return `
     <div class="track-item" style="animation-delay:${delay}s"
-         onclick="openSearchDetail(decodeURIComponent('${_sdTrackData}'))">
+         onclick="${_imTrackCall}">
       <div class="track-cover" id="${coverElId}">
         ${hasCover ? `<img src="${imgUrl}" alt="${escHtml(track.name)}" loading="lazy" class="img-fade" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
         <div style="width:100%;height:100%;background:${coverBg};display:${hasCover ? 'none' : 'flex'};align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:white">${coverLtr}</div>
@@ -4964,6 +4964,298 @@ function logout() {
   if (document.getElementById('input-apikey'))   document.getElementById('input-apikey').value   = '';
 }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   ITEM MODAL — Album & Track detail (same design as artist modal)
+═══════════════════════════════════════════════════════════════ */
+async function openItemModal(type, name, artist, userPlaycount, itemUrl, knownImg) {
+  const modal = document.getElementById('item-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+
+  const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  const show    = (id, vis) => { const el = document.getElementById(id); if (el) el.style.display = vis ? '' : 'none'; };
+  const hide    = (id) => show(id, false);
+
+  // ── Reset UI ──
+  setText('im-name', name);
+  setText('im-sub', artist || '');
+  setText('im-type-badge', type === 'album' ? 'Album' : 'Titre');
+  setText('im-user-plays', userPlaycount ? formatNum(userPlaycount) + ' écoutes' : '—');
+  setText('im-globalplays', '—');
+  setText('im-listeners', '—');
+  setText('im-duration', '—');
+  setText('im-wiki-label', type === 'album' ? 'Description' : 'À propos');
+  setText('im-related-label', type === 'track' ? 'Titres similaires' : 'Albums similaires');
+  show('im-listeners-wrap', type === 'track');
+  show('im-duration-wrap', type === 'track');
+  hide('im-mb-section');
+  // MusicBrainz link — always visible with search fallback, updated with direct link if MBID found later
+  const mbLinkEl = document.getElementById('im-mb-link');
+  if (mbLinkEl) {
+    const mbSearchBase = type === 'album'
+      ? `https://musicbrainz.org/search?query=${encodeURIComponent(name)}+${encodeURIComponent(artist||'')}&type=release_group`
+      : `https://musicbrainz.org/search?query=${encodeURIComponent(name)}+${encodeURIComponent(artist||'')}&type=recording`;
+    mbLinkEl.href = mbSearchBase;
+    mbLinkEl.style.display = '';
+  }
+
+  // Links
+  const spQ = encodeURIComponent(name + (artist ? ' ' + artist : ''));
+  const el_lfm = document.getElementById('im-lfm-link');
+  const el_sp  = document.getElementById('im-sp-link');
+  const el_yt  = document.getElementById('im-yt-link');
+  if (el_lfm) el_lfm.href = itemUrl || (type === 'album'
+    ? `https://www.last.fm/music/${encodeURIComponent(artist)}/${encodeURIComponent(name)}`
+    : `https://www.last.fm/music/${encodeURIComponent(artist)}/_/${encodeURIComponent(name)}`);
+  if (el_sp)  el_sp.href  = `spotify:search:${spQ}`;
+  if (el_yt)  el_yt.href  = `https://www.youtube.com/results?search_query=${spQ}`;
+
+  // Bio
+  const bioLoadEl   = document.getElementById('im-bio-loading');
+  const bioTextEl   = document.getElementById('im-bio-text');
+  const bioToggleEl = document.getElementById('im-bio-toggle');
+  if (bioLoadEl)   bioLoadEl.classList.remove('hidden');
+  if (bioTextEl)   { bioTextEl.classList.add('hidden'); bioTextEl.textContent = ''; }
+  if (bioToggleEl) bioToggleEl.classList.add('hidden');
+
+  // Tracklist (album) / similar (track)
+  const tracklistSection = document.getElementById('im-tracklist-section');
+  const relatedSection   = document.getElementById('im-related-section');
+  const tracklistEl      = document.getElementById('im-tracklist');
+  const relatedGridEl    = document.getElementById('im-related-grid');
+  const trLoadEl         = document.getElementById('im-tracks-loading');
+  const relLoadEl        = document.getElementById('im-related-loading');
+
+  if (type === 'album') {
+    show('im-tracklist-section', true);
+    hide('im-related-section');
+    if (trLoadEl)   trLoadEl.classList.remove('hidden');
+    if (tracklistEl) { tracklistEl.classList.add('hidden'); tracklistEl.innerHTML = ''; }
+  } else {
+    hide('im-tracklist-section');
+    show('im-related-section', true);
+    if (relLoadEl)   relLoadEl.classList.remove('hidden');
+    if (relatedGridEl) { relatedGridEl.classList.add('hidden'); relatedGridEl.innerHTML = ''; }
+  }
+
+  // Tags
+  const tagsEl = document.getElementById('im-tags');
+  if (tagsEl) tagsEl.innerHTML = '';
+
+  // ── Image — MusicBrainz → Last.fm → iTunes ──
+  const imgInner = document.getElementById('im-img-inner');
+  const setImg = (src) => {
+    if (!imgInner) return;
+    imgInner.innerHTML = src
+      ? `<img src="${escHtml(src)}" alt="${escHtml(name)}" style="width:100%;height:100%;object-fit:cover;object-position:center" onerror="this.parentElement.innerHTML='<div class=\"im-img-placeholder\"><i class=\"fas fa-compact-disc\"></i></div>'">`
+      : `<div class="im-img-placeholder"><i class="fas fa-${type === 'album' ? 'compact-disc' : 'music'}"></i></div>`;
+  };
+  if (knownImg && !isDefaultImg(knownImg)) {
+    setImg(knownImg);
+  } else {
+    setImg(''); // placeholder
+    (async () => {
+      // 1. MusicBrainz Cover Art Archive
+      let img = await _fetchAlbumImageWithMbid(name, artist).catch(() => '') || '';
+      // 2. Last.fm
+      if (!img || isDefaultImg(img)) {
+        const method = type === 'album' ? 'album.getInfo' : 'track.getInfo';
+        const params = type === 'album'
+          ? { album: name, artist: artist || '', autocorrect: 1 }
+          : { track: name, artist: artist || '', autocorrect: 1 };
+        const d = await API.call(method, params).catch(() => null);
+        const arr = type === 'album' ? d?.album?.image : d?.track?.album?.image;
+        const u = arr?.find(x => x.size === 'extralarge')?.['#text'] || arr?.find(x => x.size === 'large')?.['#text'] || '';
+        if (u && !isDefaultImg(u)) img = u;
+      }
+      // 3. iTunes
+      if (!img || isDefaultImg(img)) {
+        img = type === 'album'
+          ? await _fetchAlbumImageiTunes(name, artist).catch(() => '') || ''
+          : await _fetchTrackImageiTunes(name, artist).catch(() => '') || '';
+      }
+      if (img && !isDefaultImg(img)) setImg(img);
+    })();
+  }
+
+  // ── API calls ──
+  try {
+    const calls = type === 'album'
+      ? [
+          API.call('album.getInfo', { album: name, artist: artist || '', username: APP.username, autocorrect: 1 }),
+          _sdpFetchMusicBrainz({ type: 'album', name, sub: artist })
+        ]
+      : [
+          API.call('track.getInfo', { track: name, artist: artist || '', username: APP.username, autocorrect: 1 }),
+          _sdpFetchMusicBrainz({ type: 'track', name, sub: artist }),
+          API.call('track.getSimilar', { track: name, artist: artist || '', limit: 6, autocorrect: 1 })
+        ];
+
+    const results = await Promise.allSettled(calls);
+    const mainData = results[0].status === 'fulfilled' ? results[0].value : null;
+    const mbData   = results[1].status === 'fulfilled' ? results[1].value : null;
+    const extraData = results[2]?.status === 'fulfilled' ? results[2].value : null;
+
+    // ── Stats ──
+    if (type === 'album') {
+      const a = mainData?.album;
+      setText('im-globalplays', formatNum(a?.playcount || 0));
+      const upc = a?.userplaycount || 0;
+      if (upc) setText('im-user-plays', formatNum(upc) + ' écoutes');
+      // Tags
+      if (tagsEl) {
+        const tags = (a?.tags?.tag || []).slice(0, 5);
+        tagsEl.innerHTML = tags.map(tg => `<span class="am-tag">${escHtml(tg.name)}</span>`).join('');
+      }
+      // Bio
+      const wiki = (a?.wiki?.summary || '').replace(/<a[^>]*>.*?<\/a>/gi, '').replace(/<[^>]+>/g, '').trim();
+      if (bioLoadEl) bioLoadEl.classList.add('hidden');
+      if (bioTextEl) {
+        bioTextEl.classList.remove('hidden');
+        if (wiki.length > 300) {
+          bioTextEl.textContent = wiki.slice(0, 300) + '…';
+          bioTextEl.classList.add('am-bio--collapsed');
+          if (bioToggleEl) {
+            bioToggleEl.classList.remove('hidden');
+            bioToggleEl.querySelector('span').textContent = 'Lire plus';
+            bioToggleEl.onclick = () => {
+              const c = bioTextEl.classList.toggle('am-bio--collapsed');
+              bioTextEl.textContent = c ? wiki.slice(0, 300) + '…' : wiki;
+              bioToggleEl.querySelector('span').textContent = c ? 'Lire plus' : 'Réduire';
+            };
+          }
+        } else {
+          bioTextEl.textContent = wiki || 'Pas de description disponible.';
+          bioTextEl.classList.remove('am-bio--collapsed');
+        }
+      }
+      // Tracklist
+      if (trLoadEl) trLoadEl.classList.add('hidden');
+      const tracks = mainData?.album?.tracks?.track || [];
+      const tArr = Array.isArray(tracks) ? tracks : [tracks];
+      if (tracklistEl) {
+        tracklistEl.classList.remove('hidden');
+        if (tArr.length) {
+          tracklistEl.innerHTML = tArr.map((tr, i) => `
+            <div class="track-item compact" style="animation-delay:${i*0.03}s"
+                 onclick="closeItemModal();openItemModal('track',${JSON.stringify(tr.name)},${JSON.stringify(artist)},0,'${(tr.url||'').replace(/'/g,'%27')}','')">
+              <div class="track-rank">${i + 1}</div>
+              <div class="track-info"><div class="track-name">${escHtml(tr.name)}</div></div>
+              <div class="track-plays">${tr.duration ? Math.round(tr.duration/60) + ' min' : ''}</div>
+            </div>`).join('');
+        } else {
+          tracklistEl.innerHTML = '<p style="color:var(--text-muted);padding:10px">Pas de tracklist disponible.</p>';
+        }
+      }
+    } else {
+      // Track
+      const tr = mainData?.track;
+      setText('im-globalplays', formatNum(tr?.playcount || 0));
+      setText('im-listeners', formatNum(tr?.listeners || 0));
+      const dur = parseInt(tr?.duration);
+      if (dur) setText('im-duration', Math.round(dur / 60) + ' min');
+      const upc = tr?.userplaycount || 0;
+      if (upc) setText('im-user-plays', formatNum(upc) + ' écoutes');
+      // Tags
+      if (tagsEl) {
+        const tags = (tr?.toptags?.tag || []).slice(0, 5);
+        tagsEl.innerHTML = tags.map(tg => `<span class="am-tag">${escHtml(tg.name)}</span>`).join('');
+      }
+      // Wiki
+      const wiki = (tr?.wiki?.summary || '').replace(/<a[^>]*>.*?<\/a>/gi, '').replace(/<[^>]+>/g, '').trim();
+      if (bioLoadEl) bioLoadEl.classList.add('hidden');
+      if (bioTextEl) {
+        bioTextEl.classList.remove('hidden');
+        bioTextEl.classList.remove('am-bio--collapsed');
+        if (wiki.length > 300) {
+          bioTextEl.textContent = wiki.slice(0, 300) + '…';
+          bioTextEl.classList.add('am-bio--collapsed');
+          if (bioToggleEl) {
+            bioToggleEl.classList.remove('hidden');
+            bioToggleEl.querySelector('span').textContent = 'Lire plus';
+            bioToggleEl.onclick = () => {
+              const c = bioTextEl.classList.toggle('am-bio--collapsed');
+              bioTextEl.textContent = c ? wiki.slice(0, 300) + '…' : wiki;
+              bioToggleEl.querySelector('span').textContent = c ? 'Lire plus' : 'Réduire';
+            };
+          }
+        } else {
+          bioTextEl.textContent = wiki || '';
+          if (wiki) bioTextEl.classList.remove('hidden');
+          else       document.getElementById('im-wiki-section')?.style.setProperty('display','none');
+        }
+      }
+      // Similar tracks
+      if (relLoadEl) relLoadEl.classList.add('hidden');
+      const similar = extraData?.similartracks?.track || [];
+      const simArr = Array.isArray(similar) ? similar.slice(0, 6) : [];
+      if (relatedGridEl) {
+        relatedGridEl.classList.remove('hidden');
+        if (simArr.length) {
+          relatedGridEl.innerHTML = simArr.map(s => {
+            const sImg = s.image?.find(i => i.size === 'extralarge')?.['#text'] || '';
+            const hasImg = sImg && !isDefaultImg(sImg);
+            return `<div class="music-card mini"
+              onclick="closeItemModal();openItemModal('track',${JSON.stringify(s.name)},${JSON.stringify(s.artist?.name||artist)},0,'${(s.url||'').replace(/'/g,'%27')}','${hasImg ? escHtml(sImg) : ''}')">
+              <div class="music-card-img" style="height:80px;aspect-ratio:1">
+                ${hasImg ? `<img src="${escHtml(sImg)}" alt="${escHtml(s.name)}" loading="lazy" style="width:100%;height:100%;object-fit:cover">` : ''}
+                <div class="spotify-cover" style="background:${nameToGradient(s.name)};display:${hasImg?'none':'flex'}">
+                  <span class="sc-letter">${escHtml((s.name||'?')[0].toUpperCase())}</span>
+                </div>
+              </div>
+              <div class="music-card-body">
+                <div class="music-card-name" title="${escHtml(s.name)}">${escHtml(s.name)}</div>
+                <div class="music-card-artist">${escHtml(s.artist?.name || '')}</div>
+              </div>
+            </div>`;
+          }).join('');
+        } else {
+          relatedGridEl.innerHTML = '<p style="color:var(--text-muted);padding:10px">Aucun titre similaire.</p>';
+        }
+      }
+    }
+
+    // ── MusicBrainz sidebar ──
+    if (mbData) {
+      const rows = [];
+      if (mbData.releaseDate) rows.push({ l: 'Sortie',     v: mbData.releaseDate });
+      if (mbData.label)       rows.push({ l: 'Label',      v: mbData.label });
+      if (mbData.type)        rows.push({ l: 'Type',       v: mbData.type });
+      if (mbData.country)     rows.push({ l: 'Pays',       v: mbData.country });
+      if (mbData.formed)      rows.push({ l: 'Formé en',   v: mbData.formed });
+      if (mbData.genres?.length) rows.push({ l: 'Genres',  v: mbData.genres.join(', ') });
+
+      const mbRowsEl = document.getElementById('im-mb-rows');
+      if (mbRowsEl && rows.length) {
+        show('im-mb-section', true);
+        mbRowsEl.innerHTML = rows.map(r => `
+          <div class="sdp-mb-row"><span class="sdp-mb-lbl">${r.l}</span><span class="sdp-mb-val">${escHtml(r.v)}</span></div>`).join('');
+      }
+      if (mbData.mbid) {
+        const mbLink = document.getElementById('im-mb-link');
+        if (mbLink) {
+          mbLink.href = `https://musicbrainz.org/${type === 'album' ? 'release-group' : 'recording'}/${mbData.mbid}`;
+          mbLink.style.display = '';
+          mbLink.title = 'Voir sur MusicBrainz (lien direct)';
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('openItemModal:', err);
+    if (bioLoadEl) bioLoadEl.classList.add('hidden');
+    if (trLoadEl)  trLoadEl?.classList.add('hidden');
+    if (relLoadEl) relLoadEl?.classList.add('hidden');
+  }
+}
+
+function closeItemModal(e) {
+  if (e && e.target !== document.getElementById('item-modal')) return;
+  document.getElementById('item-modal')?.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
 async function openArtistModal(artistName, artistUrl, userPlaycount) {
   const modal = document.getElementById('artist-modal');
   if (!modal) return;
@@ -6177,6 +6469,18 @@ document.addEventListener('click', e => {
 async function openSearchDetail(rawData) {
   const h = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
   closeDashSearch();
+
+  // Albums and tracks use the full-screen item modal (same design as artist modal)
+  if (h.type === 'album' || h.type === 'track') {
+    openItemModal(h.type, h.name, h.sub, h.plays, h.url, h.img);
+    return;
+  }
+
+  // Artists: open artist modal
+  if (h.type === 'artist') {
+    openArtistModal(h.name, h.url, h.plays);
+    return;
+  }
 
   const panel = document.getElementById('search-detail-panel');
   const body  = document.getElementById('search-detail-body');

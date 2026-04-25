@@ -1726,6 +1726,88 @@
   <span id="toast-txt"></span>
 </div>
 
+<!-- ══════════════════════════════════════════════
+     ITEM MODAL — Album / Track detail
+══════════════════════════════════════════════ -->
+<div id="item-modal" class="artist-modal hidden"
+     onclick="closeItemModal(event)"
+     role="dialog" aria-modal="true" aria-labelledby="im-name">
+  <div class="artist-modal-inner im-inner">
+    <button class="artist-modal-close" onclick="closeItemModal()" aria-label="Fermer">
+      <i class="fas fa-times"></i>
+    </button>
+    <div class="am-hero">
+      <div class="am-photo-wrap" id="im-img">
+        <div id="im-img-inner" style="width:100%;height:100%">
+          <div class="im-img-placeholder"><i class="fas fa-compact-disc"></i></div>
+        </div>
+        <div class="am-photo-overlay"></div>
+      </div>
+      <div class="am-hero-info">
+        <span class="im-type-badge" id="im-type-badge">Album</span>
+        <h2 class="am-artist-name" id="im-name">—</h2>
+        <p class="im-sub" id="im-sub"></p>
+        <div class="am-stats-row" id="im-stats-row">
+          <span class="am-stat am-stat--accent">
+            <i class="fas fa-headphones"></i>
+            <span id="im-user-plays">—</span>
+            <span>vos écoutes</span>
+          </span>
+          <span class="am-stat" id="im-listeners-wrap" style="display:none">
+            <i class="fas fa-users"></i>
+            <span id="im-listeners">—</span>
+            <span>auditeurs</span>
+          </span>
+          <span class="am-stat">
+            <i class="fas fa-play"></i>
+            <span id="im-globalplays">—</span>
+            <span>scrobbles globaux</span>
+          </span>
+          <span class="am-stat" id="im-duration-wrap" style="display:none">
+            <i class="fas fa-clock"></i>
+            <span id="im-duration">—</span>
+          </span>
+        </div>
+        <div class="am-tags" id="im-tags"></div>
+        <div class="am-ext-links">
+          <a id="im-lfm-link" href="#" target="_blank" rel="noopener" class="am-ext-btn am-lastfm"><i class="fab fa-lastfm"></i> Last.fm</a>
+          <a id="im-mb-link"  href="#" target="_blank" rel="noopener" class="am-ext-btn im-mb-btn">
+            <img src="https://musicbrainz.org/static/images/favicons/favicon-32x32.png" alt="" style="width:13px;height:13px;border-radius:3px"> MusicBrainz
+          </a>
+          <a id="im-sp-link"  href="#" class="am-ext-btn am-spotify"><i class="fab fa-spotify"></i> Spotify</a>
+          <a id="im-yt-link"  href="#" target="_blank" rel="noopener" class="am-ext-btn am-youtube"><i class="fab fa-youtube"></i> YouTube</a>
+        </div>
+      </div>
+    </div>
+    <div class="am-body">
+      <div class="am-bio-section" id="im-wiki-section">
+        <h3 class="am-section-title"><i class="fas fa-book-open"></i> <span id="im-wiki-label">Description</span></h3>
+        <div id="im-bio-loading" class="am-loading"><div class="spinner-sm"></div><span>Chargement…</span></div>
+        <div id="im-bio-text" class="am-bio am-bio--collapsed hidden"></div>
+        <button id="im-bio-toggle" class="am-bio-toggle hidden">
+          <span>Lire plus</span><i class="fas fa-chevron-down"></i>
+        </button>
+      </div>
+      <div class="am-tracks-section" id="im-tracklist-section" style="display:none">
+        <h3 class="am-section-title"><i class="fas fa-list-ol"></i> Titres de l'album</h3>
+        <div id="im-tracks-loading" class="am-loading"><div class="spinner-sm"></div><span>Chargement…</span></div>
+        <ol id="im-tracklist" class="am-top-tracks hidden"></ol>
+      </div>
+      <div class="am-albums-section" id="im-related-section" style="display:none">
+        <h3 class="am-section-title"><i class="fas fa-music"></i> <span id="im-related-label">Titres similaires</span></h3>
+        <div id="im-related-loading" class="am-loading"><div class="spinner-sm"></div><span>Chargement…</span></div>
+        <div id="im-related-grid" class="am-albums hidden"></div>
+      </div>
+      <div class="am-albums-section" id="im-mb-section" style="display:none">
+        <h3 class="am-section-title">
+          <img src="https://musicbrainz.org/static/images/favicons/favicon-32x32.png" alt="" style="width:14px;height:14px;border-radius:3px;margin-right:4px"> MusicBrainz
+        </h3>
+        <div id="im-mb-rows" class="im-mb-rows"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="artist-modal" class="artist-modal hidden"
      onclick="closeArtistModal(event)"
      role="dialog" aria-modal="true" aria-labelledby="am-name">

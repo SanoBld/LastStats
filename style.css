@@ -5987,3 +5987,43 @@ a:focus:not(:focus-visible) { outline: none; }
 .sdp-img-wrap img {
   animation: fadeIn .35s ease both;
 }
+
+/* ══════════════════════════════════════════════════════
+   ITEM MODAL (Album / Track) — extends artist-modal CSS
+══════════════════════════════════════════════════════ */
+.im-inner { max-width: 680px; }
+
+.im-img-placeholder {
+  width: 100%; height: 100%;
+  background: var(--bg-elevated);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 4rem; color: var(--text-muted);
+}
+
+.im-type-badge {
+  display: inline-block;
+  font-size: .65rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .08em;
+  padding: 3px 10px; border-radius: 99px;
+  background: rgba(255,255,255,.18); color: #fff;
+  margin-bottom: 8px;
+  backdrop-filter: blur(4px);
+}
+
+.im-sub {
+  font-size: .95rem; font-weight: 600;
+  color: rgba(255,255,255,.75);
+  margin: 0 0 10px;
+}
+
+.im-mb-btn {
+  background: rgba(186,94,64,.18) !important;
+  color: #e07a52 !important;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.im-mb-btn:hover { background: rgba(186,94,64,.32) !important; color: #fff !important; }
+
+.im-mb-rows {
+  display: flex; flex-direction: column; gap: 8px;
+  font-size: .84rem;
+}
