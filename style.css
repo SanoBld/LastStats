@@ -5968,3 +5968,22 @@ a:focus:not(:focus-visible) { outline: none; }
   .sdp-close       { width: 40px; height: 40px; }
   .dsr-row         { padding: 12px 14px; }
 }
+
+/* ══════════════════════════════════════════════════════
+   SEARCH — USER PROFILE ROW
+══════════════════════════════════════════════════════ */
+.dsr-user-row {
+  background: linear-gradient(90deg, var(--accent-lt) 0%, transparent 100%);
+  border-top: 1px solid var(--border);
+}
+.dsr-user-row + .dsr-row { border-top: none; }
+
+.dsr-type-badge--user {
+  background: var(--accent-lt);
+  color: var(--accent);
+}
+
+/* SDP image resolution animation */
+.sdp-img-wrap img {
+  animation: fadeIn .35s ease both;
+}

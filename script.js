@@ -3184,8 +3184,9 @@ function _buildAlbumCard(a, rank) {
   const delay    = Math.min((rank-1) % 20, 10) * 0.04;
   const spQ      = encodeURIComponent(`${a.name} ${artistNm}`);
 
+  const _sdAlbumData = encodeURIComponent(JSON.stringify({ type:'album', name:a.name, sub:artistNm, plays:a.playcount, url:safeUrl.replace(/%27/g,"'"), img:imgUrl }));
   const gridHtml = `
-    <div class="hero-card" style="animation-delay:${delay}s" onclick="window.open('${safeUrl}','_blank')">
+    <div class="hero-card" style="animation-delay:${delay}s" onclick="openSearchDetail(decodeURIComponent('${_sdAlbumData}'))">
       <div class="hc-fallback" style="background:${bg}${hasImg ? ';display:none' : ''}">${letter}</div>
       ${hasImg ? `<img class="hc-img img-fade" src="${imgUrl}" alt="${escHtml(a.name)}" loading="lazy" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.previousElementSibling.style.display='flex'">` : ''}
       <div class="hc-overlay"></div>
@@ -3202,7 +3203,7 @@ function _buildAlbumCard(a, rank) {
     </div>`;
 
   const listHtml = `
-    <div class="music-card" style="animation-delay:${delay}s" onclick="window.open('${safeUrl}','_blank')">
+    <div class="music-card" style="animation-delay:${delay}s" onclick="openSearchDetail(decodeURIComponent('${_sdAlbumData}'))">
       <div class="music-card-img">
         ${hasImg ? `<img src="${imgUrl}" alt="${escHtml(a.name)}" loading="lazy" class="img-fade" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
         <div class="spotify-cover" style="background:${bg};display:${hasImg ? 'none' : 'flex'}">
@@ -3222,7 +3223,7 @@ function _buildAlbumCard(a, rank) {
     </div>`;
 
   const compactHtml = `
-    <div class="track-item" style="animation-delay:${delay}s" onclick="window.open('${safeUrl}','_blank')">
+    <div class="track-item" style="animation-delay:${delay}s" onclick="openSearchDetail(decodeURIComponent('${_sdAlbumData}'))">
       <div class="track-cover" style="flex-shrink:0;width:40px;height:40px;border-radius:6px;overflow:hidden;position:relative">
         ${hasImg ? `<img src="${imgUrl}" alt="${escHtml(a.name)}" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.style.display='none'">` : ''}
         <div style="position:absolute;inset:0;background:${bg};display:${hasImg ? 'none' : 'flex'};align-items:center;justify-content:center;color:white;font-weight:700">${letter}</div>
@@ -3319,6 +3320,8 @@ function setTracksLayout(layout) {
 
 function _buildTrackItem(track, rank, maxPlay) {
   const pct        = ((parseInt(track.playcount) / Math.max(maxPlay, 1)) * 100).toFixed(1);
+  const _sdTrackImg = track.image?.find(im => im.size==='extralarge')?.['#text'] || track.image?.find(im => im.size==='large')?.['#text'] || '';
+  const _sdTrackData = encodeURIComponent(JSON.stringify({ type:'track', name:track.name, sub:track.artist?.name||'', plays:track.playcount, url:track.url||'', img:_sdTrackImg }));
   const medal      = rank <= 3 ? ['🥇','🥈','🥉'][rank-1] : rank;
   const spQ        = encodeURIComponent(`${track.name} ${track.artist?.name || ''}`);
   const ytQ        = encodeURIComponent(`${track.name} ${track.artist?.name || ''}`);
@@ -3332,7 +3335,7 @@ function _buildTrackItem(track, rank, maxPlay) {
 
     if ((APP.tracksLayout || 'list') === 'grid') {
     return `
-    <div class="hero-card" style="animation-delay:${delay}s" onclick="window.open('${safeUrl}','_blank')">
+    <div class="hero-card" style="animation-delay:${delay}s" onclick="openSearchDetail(decodeURIComponent('${_sdTrackData}'))">
       <div class="hc-fallback" style="background:${coverBg}${hasCover ? ';display:none' : ''}">${coverLtr}</div>
       <img class="hc-img img-fade" id="${coverElId}-img" ${hasCover ? `src="${imgUrl}"` : 'src=""'} alt="${escHtml(track.name)}" loading="lazy"
            style="${hasCover ? '' : 'display:none'}"
@@ -3355,7 +3358,7 @@ function _buildTrackItem(track, rank, maxPlay) {
 
     return `
     <div class="track-item" style="animation-delay:${delay}s"
-         onclick="window.open('${safeUrl}','_blank')">
+         onclick="openSearchDetail(decodeURIComponent('${_sdTrackData}'))">
       <div class="track-cover" id="${coverElId}">
         ${hasCover ? `<img src="${imgUrl}" alt="${escHtml(track.name)}" loading="lazy" class="img-fade" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
         <div style="width:100%;height:100%;background:${coverBg};display:${hasCover ? 'none' : 'flex'};align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:white">${coverLtr}</div>
@@ -6013,6 +6016,55 @@ function _runDashSearch(q) {
           `https://www.last.fm/music/${encodeURIComponent(h.artist)}/_/${encodeURIComponent(h.name)}`, ''));
   }
 
+  // 5) Last.fm user profiles — search by username prefix if query looks like a username
+  const profileHits = [];
+  if (/^[a-zA-Z0-9_-]{2,}$/.test(q)) {
+    // Non-blocking: fire user search in background, update results if still same query
+    const searchQ = q;
+    (async () => {
+      try {
+        const r = await fetch(
+          `https://ws.audioscrobbler.com/2.0/?method=user.getInfo&user=${encodeURIComponent(searchQ)}&api_key=${APP.apiKey}&format=json`,
+          { signal: AbortSignal.timeout(3000) }
+        );
+        const d = await r.json();
+        if (d?.user?.name) {
+          const u = d.user;
+          const profileImg = u.image?.find(i => i.size === 'extralarge')?.['#text']
+                          || u.image?.find(i => i.size === 'large')?.['#text'] || '';
+          const profileData = encodeURIComponent(JSON.stringify({
+            type: 'user', name: u.name, sub: `${u.playcount} scrobbles`, plays: parseInt(u.playcount)||0,
+            url: u.url, img: profileImg, realname: u.realname || ''
+          }));
+          const resultsEl = document.getElementById('dash-search-results');
+          if (resultsEl && !resultsEl.classList.contains('hidden')) {
+            const existing = resultsEl.querySelector('.dsr-user-row');
+            if (!existing) {
+              const profileHtml = `<div class="dsr-row dsr-user-row" role="button" tabindex="0"
+                onclick="openUserProfile('${escHtml(u.name)}')"
+                onkeydown="if(event.key==='Enter'||event.key===' ')this.click()">
+                ${profileImg && !isDefaultImg(profileImg)
+                  ? `<img src="${escHtml(profileImg)}" class="dsr-thumb dsr-thumb--round" alt="">`
+                  : `<span class="dsr-thumb dsr-thumb-ico" style="border-radius:50%"><i class="fas fa-user"></i></span>`}
+                <div class="dsr-info">
+                  <span class="dsr-name">${escHtml(u.name)}${u.realname ? ` <span style="font-weight:400;opacity:.6;font-size:.8em">(${escHtml(u.realname)})</span>` : ''}</span>
+                  <span class="dsr-meta">
+                    <span class="dsr-type-badge dsr-type-badge--user">Profil</span>
+                    <span class="dsr-plays"><i class="fas fa-headphones"></i> ${formatNum(u.playcount)} scrobbles</span>
+                  </span>
+                </div>
+                <div class="dsr-actions" onclick="event.stopPropagation()">
+                  <a href="${escHtml(u.url)}" target="_blank" rel="noopener" class="dsr-btn dsr-btn--lfm" title="Last.fm"><i class="fas fa-external-link-alt"></i></a>
+                </div>
+              </div>`;
+              resultsEl.insertAdjacentHTML('afterbegin', profileHtml);
+            }
+          }
+        }
+      } catch {}
+    })();
+  }
+
   // Sort by plays desc, cap at 10
   hits.sort((a, b) => b.plays - a.plays);
   const top = hits.slice(0, 10);
@@ -6160,6 +6212,44 @@ async function openSearchDetail(rawData) {
     <div class="sdp-stats-grid" id="sdp-stats"></div>
     <div class="sdp-mb-section" id="sdp-mb"></div>
     <div class="sdp-loading" id="sdp-loading"><i class="fas fa-spinner fa-spin"></i> Chargement des détails…</div>`;
+
+  // Resolve image async if not provided (MusicBrainz → iTunes → Last.fm)
+  if (!h.img || isDefaultImg(h.img)) {
+    (async () => {
+      try {
+        let img = '';
+        if (h.type === 'artist') {
+          img = await _resolveArtistImageExternal(h.name).catch(() => '') || '';
+        } else {
+          img = await _fetchAlbumImageWithMbid(h.name, h.sub || '').catch(() => '') || '';
+          if (!img || isDefaultImg(img)) {
+            const method = h.type === 'album' ? 'album.getInfo' : 'track.getInfo';
+            const params = h.type === 'album'
+              ? { album: h.name, artist: h.sub || '', autocorrect: 1 }
+              : { track: h.name, artist: h.sub || '', autocorrect: 1 };
+            const d = await API.call(method, params).catch(() => null);
+            const imgArr = h.type === 'album' ? d?.album?.image : d?.track?.album?.image;
+            const u = imgArr?.find(x => x.size === 'extralarge')?.['#text']
+                   || imgArr?.find(x => x.size === 'large')?.['#text'] || '';
+            if (u && !isDefaultImg(u)) img = u;
+          }
+          if (!img || isDefaultImg(img)) {
+            img = h.type === 'album'
+              ? await _fetchAlbumImageiTunes(h.name, h.sub).catch(() => '') || ''
+              : await _fetchTrackImageiTunes(h.name, h.sub).catch(() => '') || '';
+          }
+        }
+        if (img && !isDefaultImg(img)) {
+          const imgWrap = document.querySelector('#search-detail-body .sdp-img-wrap');
+          if (imgWrap) {
+            const isRound = h.type === 'artist';
+            imgWrap.innerHTML = `<img src="${img.replace(/"/g,'%22')}" alt="" class="sdp-img${isRound ? ' sdp-img--round' : ''}">
+              <div class="sdp-img-glow"></div>`;
+          }
+        }
+      } catch {}
+    })();
+  }
 
   // Fetch Last.fm info in parallel with MusicBrainz
   const [lfmData, mbData] = await Promise.allSettled([
@@ -6320,6 +6410,18 @@ async function _sdpFetchMusicBrainz(h) {
 function closeSearchDetail() {
   document.getElementById('search-detail-panel')?.classList.add('hidden');
   document.body.classList.remove('search-detail-open');
+}
+
+/** Open a Last.fm user profile from search results */
+function openUserProfile(username) {
+  closeSearchDetail();
+  closeDashSearch();
+  // Use existing profile page if available
+  if (typeof openProfilePage === 'function') {
+    openProfilePage(username, null, 'search');
+  } else {
+    window.open(`https://www.last.fm/user/${encodeURIComponent(username)}`, '_blank', 'noopener');
+  }
 }
 
 function exportData(format) {
