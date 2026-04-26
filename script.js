@@ -5441,14 +5441,17 @@ async function openArtistModal(artistName, artistUrl, userPlaycount) {
       trkListEl.classList.remove('hidden');
       if (tracks.length) {
         const maxPlay = parseInt(tracks[0].playcount || 1);
-        trkListEl.innerHTML = tracks.map((tr, i) => `
-          <div class="track-item compact" style="animation-delay:${i*0.04}s"
-               onclick="window.open('${(tr.url||'#').replace(/'/g,'%27')}','_blank')">
+        trkListEl.innerHTML = tracks.map((tr, i) => {
+          if (!window._imRegistry) window._imRegistry = [];
+          const regIdx = window._imRegistry.push({ type:'track', name:tr.name, sub:artistName, plays:parseInt(tr.playcount||0), url:(tr.url||''), img:'' }) - 1;
+          return `<div class="track-item compact" style="animation-delay:${i*0.04}s"
+               onclick="closeArtistModal();openItemFromRegistry(${regIdx})">
             <div class="track-rank">${i+1}</div>
             <div class="track-info"><div class="track-name">${escHtml(tr.name)}</div></div>
             <div class="track-bar-wrap"><div class="track-bar" style="width:${((parseInt(tr.playcount)/maxPlay)*100).toFixed(0)}%"></div></div>
             <div class="track-plays">${formatNum(tr.playcount)}</div>
-          </div>`).join('');
+          </div>`;
+        }).join('');
       } else {
         trkListEl.innerHTML = `<p style="color:var(--text-muted);padding:10px">${t('tracks_none')}</p>`;
       }
@@ -5462,7 +5465,9 @@ async function openArtistModal(artistName, artistUrl, userPlaycount) {
         const aImg = alb.image?.find(i => i.size === 'extralarge')?.['#text'] || '';
         const hasA = !isDefaultImg(aImg);
         const albName = alb.name || '?';
-        return `<div class="music-card mini" onclick="window.open('${(alb.url||'#').replace(/'/g,'%27')}','_blank')">
+        if (!window._imRegistry) window._imRegistry = [];
+        const regIdx = window._imRegistry.push({ type:'album', name:albName, sub:artistName, plays:0, url:(alb.url||''), img:aImg }) - 1;
+        return `<div class="music-card mini" onclick="closeArtistModal();openItemFromRegistry(${regIdx})">
           <div class="music-card-img" style="height:100px;aspect-ratio:1">
             ${hasA ? `<img src="${aImg}" alt="${escHtml(albName)}" loading="lazy" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
             <div class="spotify-cover" style="background:${nameToGradient(albName)};display:${hasA?'none':'flex'}">

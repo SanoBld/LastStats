@@ -6084,13 +6084,14 @@ a:focus:not(:focus-visible) { outline: none; }
 ══════════════════════════════════════════════════════ */
 .im-inner { max-width: 680px; }
 
-/* ── Mobile: hero shrinks, info stacks below ── */
+/* ── Mobile: hero overlaid like artist modal ── */
 @media (max-width: 639px) {
-  .im-inner .am-photo-wrap { height: 200px; }
+  .im-inner .am-photo-wrap { height: 280px; }
   .im-inner .am-hero-info {
-    position: relative;
-    background: linear-gradient(to bottom, var(--bg-elevated), var(--bg-elevated));
-    padding: 14px 16px 16px;
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 0 16px 16px;
+    background: none;
   }
   .im-inner .am-artist-name { font-size: clamp(1.2rem, 5vw, 1.6rem); margin-bottom: 8px; }
   .im-inner .am-stats-row { gap: 5px; }
