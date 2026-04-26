@@ -2260,6 +2260,15 @@ canvas#w-mini { height: 60px !important; }
 }
 .am-tag:hover  { transform: scale(1.08) translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,.3); }
 .am-tag:active { transform: scale(.95); transition-duration: .07s; }
+/* ── am-below-hero : tags + liens ext sous la photo ── */
+.am-below-hero {
+  padding: 12px 20px 4px;
+  display: flex; flex-direction: column; gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.am-below-hero .am-tags   { margin-bottom: 0; }
+.am-below-hero .am-ext-links { flex-wrap: wrap; gap: 6px; }
+
 
 .am-ext-links { display: flex; flex-wrap: wrap; gap: 6px; }
 .am-ext-btn {
@@ -6087,95 +6096,102 @@ a:focus:not(:focus-visible) { outline: none; }
 ══════════════════════════════════════════════════════ */
 .im-inner { max-width: 680px; }
 
-/* ── Mobile: hero overlaid like artist modal ── */
+/* ── Mobile: hero overlaid, tags+liens sous la photo ── */
 @media (max-width: 639px) {
-  .im-inner .am-photo-wrap { height: 300px; }
-
-  /* Gradient renforcé pour lisibilité */
-  .im-inner .am-photo-wrap .am-photo-overlay {
+  /* ── Photo ── */
+  .im-inner .am-photo-wrap,
+  .artist-modal-inner:not(.im-inner) .am-photo-wrap {
+    height: 240px;
+  }
+  .im-inner .am-photo-wrap .am-photo-overlay,
+  .artist-modal-inner:not(.im-inner) .am-photo-wrap .am-photo-overlay {
     background: linear-gradient(
       to bottom,
       rgba(0,0,0,0)      0%,
-      rgba(0,0,0,.05)   20%,
-      rgba(0,0,0,.62)   62%,
-      var(--bg-elevated) 100%
+      rgba(0,0,0,.05)   25%,
+      rgba(0,0,0,.72)   75%,
+      rgba(0,0,0,.88)  100%
     ) !important;
   }
 
-  /* Hero toujours sur la photo */
-  .im-inner .am-hero-info {
+  /* ── Hero info : juste le titre + stats sur la photo ── */
+  .im-inner .am-hero-info,
+  .artist-modal-inner:not(.im-inner) .am-hero-info {
     position: absolute;
     bottom: 0; left: 0; right: 0;
-    padding: 0 16px 14px 16px;
+    padding: 0 16px 12px 16px;
     background: none;
   }
 
-  /* Badge TITRE/ALBUM : laisse de l'espace pour le ✕ */
-  .im-inner .im-type-badge {
+  /* Badge */
+  .im-type-badge {
     font-size: .58rem; padding: 2px 9px;
-    margin-bottom: 5px; display: inline-block;
+    margin-bottom: 4px; display: inline-block;
     max-width: calc(100% - 52px);
   }
 
-  /* Titre : padding-right pour ne pas passer sous le ✕ */
-  .im-inner .am-artist-name {
-    font-size: clamp(1rem, 4.5vw, 1.4rem);
-    margin-bottom: 4px; line-height: 1.15;
+  /* Titre : espace pour le ✕ */
+  .im-inner .am-artist-name,
+  .artist-modal-inner:not(.im-inner) .am-artist-name {
+    font-size: clamp(1.1rem, 5vw, 1.5rem);
+    margin-bottom: 5px; line-height: 1.15;
     padding-right: 52px;
   }
 
-  .im-inner .im-sub { font-size: .8rem; margin-bottom: 6px; }
+  .im-sub { font-size: .82rem; margin-bottom: 6px; }
 
-  /* Stats — scroll horizontal, une ligne */
-  .im-inner .am-stats-row {
+  /* Stats — scroll horizontal, une seule ligne */
+  .im-inner .am-stats-row,
+  .artist-modal-inner:not(.im-inner) .am-stats-row {
     display: flex; flex-wrap: nowrap;
     overflow-x: auto; -webkit-overflow-scrolling: touch;
-    gap: 5px; margin-bottom: 7px;
-    margin-left: -16px; margin-right: -16px;
-    padding-left: 16px; padding-right: 16px;
-    padding-bottom: 2px; scrollbar-width: none;
+    gap: 5px; scrollbar-width: none;
   }
-  .im-inner .am-stats-row::-webkit-scrollbar { display: none; }
-  .im-inner .am-stat {
+  .im-inner .am-stats-row::-webkit-scrollbar,
+  .artist-modal-inner:not(.im-inner) .am-stats-row::-webkit-scrollbar { display: none; }
+  .im-inner .am-stat,
+  .artist-modal-inner:not(.im-inner) .am-stat {
     font-size: .63rem; padding: 3px 8px;
     white-space: nowrap; flex-shrink: 0;
     display: inline-flex; align-items: center; gap: 4px;
   }
 
-  /* Tags genre — scroll horizontal */
-  .im-inner .am-tags {
-    flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
-    gap: 5px; margin-bottom: 7px;
-    margin-left: -16px; margin-right: -16px;
-    padding-left: 16px; padding-right: 16px;
-    scrollbar-width: none;
-  }
-  .im-inner .am-tags::-webkit-scrollbar { display: none; }
-  .im-inner .am-tag {
-    font-size: .63rem; padding: 3px 9px;
-    white-space: nowrap; flex-shrink: 0;
+  /* ── Below-hero : tags + liens sous la photo, sans débordement ── */
+  .am-below-hero {
+    padding: 12px 16px 10px;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
   }
 
-  /* Boutons ext — scroll horizontal full-width */
-  .im-inner .am-ext-links {
+  /* Tags : wrap normal (pas de scroll — ils ont de la place) */
+  .am-below-hero .am-tags {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 0;
+  }
+  .am-below-hero .am-tag {
+    font-size: .7rem; padding: 4px 11px;
+  }
+
+  /* Liens ext : scroll horizontal */
+  .am-below-hero .am-ext-links {
     display: flex; flex-wrap: nowrap;
     overflow-x: auto; -webkit-overflow-scrolling: touch;
-    gap: 5px;
+    gap: 6px; scrollbar-width: none;
     margin-left: -16px; margin-right: -16px;
     padding-left: 16px; padding-right: 16px;
-    scrollbar-width: none;
   }
-  .im-inner .am-ext-links::-webkit-scrollbar { display: none; }
-  .im-inner .am-ext-btn {
-    font-size: .63rem; padding: 4px 11px;
+  .am-below-hero .am-ext-links::-webkit-scrollbar { display: none; }
+  .am-below-hero .am-ext-btn {
+    font-size: .68rem; padding: 5px 13px;
     white-space: nowrap; flex-shrink: 0;
     border-radius: 99px; gap: 4px;
     display: inline-flex; align-items: center; justify-content: center;
   }
 
-  .im-inner .am-body { padding: 4px 16px 24px; gap: 16px; }
+  /* Corps */
+  .im-inner .am-body,
+  .artist-modal-inner:not(.im-inner) .am-body { padding: 4px 16px 24px; gap: 16px; }
+
   #im-related-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .im-type-badge { font-size: .6rem; }
 }
 
 .im-img-placeholder {
