@@ -2255,7 +2255,8 @@ canvas#w-mini { height: 60px !important; }
               box-shadow var(--dur-medium1) var(--ease-standard);
   animation: m3-spring-pop var(--dur-medium1) var(--ease-spring) both;
 }
-.am-tag:hover { transform: scale(1.08) translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+.am-tag:hover  { transform: scale(1.08) translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+.am-tag:active { transform: scale(.95); transition-duration: .07s; }
 
 .am-ext-links { display: flex; flex-wrap: wrap; gap: 6px; }
 .am-ext-btn {
@@ -2269,7 +2270,8 @@ canvas#w-mini { height: 60px !important; }
               color        var(--dur-medium1) var(--ease-standard),
               transform    var(--dur-medium1) var(--ease-spring);
 }
-.am-ext-btn:hover { text-decoration: none; transform: translateY(-2px) scale(1.04); color: #fff; }
+.am-ext-btn:hover  { text-decoration: none; transform: translateY(-2px) scale(1.04); color: #fff; }
+.am-ext-btn:active { transform: scale(.95); transition-duration: .07s; }
 .am-lastfm:hover  { background: rgba(197,33,42,.55); border-color: #e8454d; }
 .am-spotify:hover { background: rgba(29,185,84,.45);  border-color: #1db954; }
 .am-youtube:hover { background: rgba(255,0,0,.40);    border-color: #f55;   }
@@ -2955,6 +2957,95 @@ canvas#w-mini { height: 60px !important; }
 
   /* Track bar hidden on mobile (save space) */
   .track-bar-wrap { display: none; }
+
+  /* ── Tracks layout list sur mobile : texte sur l'image (style hero artist) ── */
+  .tracks-list.layout-list .track-item {
+    position: relative;
+    height: 72px;
+    padding: 0;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--bg-card);
+    transform: none !important;
+  }
+  .tracks-list.layout-list .track-item:active { opacity: .85; }
+
+  /* Pochette = fond plein format */
+  .tracks-list.layout-list .track-cover {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    flex-shrink: unset;
+  }
+  .tracks-list.layout-list .track-cover img {
+    width: 100%; height: 100%; object-fit: cover;
+    border-radius: inherit;
+  }
+
+  /* Dégradé sombre pour lisibilité du texte */
+  .tracks-list.layout-list .track-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+      rgba(0,0,0,.78) 0%,
+      rgba(0,0,0,.55) 55%,
+      rgba(0,0,0,.15) 100%);
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Rang, infos, plays au-dessus du dégradé */
+  .tracks-list.layout-list .track-rank {
+    position: relative;
+    z-index: 2;
+    color: rgba(255,255,255,.85);
+    padding: 0 10px;
+    font-size: .95rem;
+    text-shadow: 0 1px 4px rgba(0,0,0,.6);
+    flex-shrink: 0;
+  }
+  .tracks-list.layout-list .track-info {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    padding: 8px 0;
+  }
+  .tracks-list.layout-list .track-name {
+    color: #fff;
+    font-size: .87rem;
+    text-shadow: 0 1px 4px rgba(0,0,0,.55);
+  }
+  .tracks-list.layout-list .track-artist {
+    color: rgba(255,255,255,.72);
+    font-size: .73rem;
+    text-shadow: 0 1px 3px rgba(0,0,0,.5);
+  }
+  .tracks-list.layout-list .track-plays {
+    position: relative;
+    z-index: 2;
+    color: rgba(255,255,255,.9);
+    font-size: .76rem;
+    padding-right: 10px;
+    text-shadow: 0 1px 3px rgba(0,0,0,.5);
+  }
+  .tracks-list.layout-list .track-play-btns {
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    padding-right: 6px;
+  }
+  .tracks-list.layout-list .track-item:active .track-play-btns { opacity: 1; }
+  .tracks-list.layout-list .track-play-btn { color: rgba(255,255,255,.9); }
 
   /* Section controls row */
   .section-controls { flex-direction: row; gap: 8px; }
@@ -5993,6 +6084,25 @@ a:focus:not(:focus-visible) { outline: none; }
 ══════════════════════════════════════════════════════ */
 .im-inner { max-width: 680px; }
 
+/* ── Mobile: hero shrinks, info stacks below ── */
+@media (max-width: 639px) {
+  .im-inner .am-photo-wrap { height: 200px; }
+  .im-inner .am-hero-info {
+    position: relative;
+    background: linear-gradient(to bottom, var(--bg-elevated), var(--bg-elevated));
+    padding: 14px 16px 16px;
+  }
+  .im-inner .am-artist-name { font-size: clamp(1.2rem, 5vw, 1.6rem); margin-bottom: 8px; }
+  .im-inner .am-stats-row { gap: 5px; }
+  .im-inner .am-stat { font-size: .7rem; padding: 3px 8px; }
+  .im-inner .am-ext-links { gap: 5px; }
+  .im-inner .am-ext-btn { font-size: .7rem; padding: 4px 10px; }
+  .im-inner .am-body { padding: 4px 16px 24px; gap: 16px; }
+  #im-related-grid { grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .im-type-badge { font-size: .6rem; }
+  .im-sub { font-size: .88rem; }
+}
+
 .im-img-placeholder {
   width: 100%; height: 100%;
   background: var(--bg-elevated);
@@ -6058,6 +6168,7 @@ a:focus:not(:focus-visible) { outline: none; }
   transform: translateY(-3px) scale(1.02);
   box-shadow: 0 8px 24px rgba(0,0,0,.28);
 }
+.sim-card:active { transform: scale(.96); transition-duration: .08s; }
 
 .sim-card-img {
   width: 100%;
@@ -6095,10 +6206,13 @@ a:focus:not(:focus-visible) { outline: none; }
 }
 
 /* ── Clickable elements in item modal ── */
-.im-sub--clickable:hover {
-  text-decoration: underline;
-  color: rgba(255,255,255,.95);
+.im-sub--clickable {
+  transition: color var(--dur-short) var(--ease-standard),
+              transform var(--dur-short2) var(--ease-spring);
+  display: inline-block;
 }
+.im-sub--clickable:hover  { text-decoration: underline; color: rgba(255,255,255,1); transform: translateX(2px); }
+.im-sub--clickable:active { transform: scale(.97); transition-duration: .07s; }
 
 .am-stats-row .am-stat[onclick],
 .am-stats-row .am-stat[style*="cursor: pointer"] {
@@ -6108,6 +6222,7 @@ a:focus:not(:focus-visible) { outline: none; }
   background: rgba(255,255,255,.12);
   transform: translateY(-1px);
 }
+.am-stats-row .am-stat[style*="cursor: pointer"]:active { transform: scale(.94); transition-duration: .07s; }
 
 .am-tag--link {
   text-decoration: none;
@@ -6120,6 +6235,7 @@ a:focus:not(:focus-visible) { outline: none; }
   color: var(--on-accent, #fff);
   border-color: var(--accent);
 }
+.am-tag--link:active { transform: scale(.93); transition-duration: .07s; }
 
 @media (max-width: 480px) {
   #im-related-grid {

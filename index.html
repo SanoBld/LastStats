@@ -1849,6 +1849,10 @@
              class="am-ext-btn am-lastfm" aria-label="View on Last.fm" title="Voir sur Last.fm">
             <i class="fab fa-lastfm"></i> Last.fm
           </a>
+          <a id="am-mb-link" href="#" target="_blank" rel="noopener"
+             class="am-ext-btn im-mb-btn" aria-label="View on MusicBrainz" title="Voir sur MusicBrainz">
+            <img src="https://musicbrainz.org/static/images/favicons/favicon-32x32.png" alt="" style="width:13px;height:13px;border-radius:3px"> MusicBrainz
+          </a>
           <a id="am-sp-link" href="#" target="_blank" rel="noopener"
              class="am-ext-btn am-spotify" aria-label="Search on Spotify" title="Rechercher sur Spotify">
             <i class="fab fa-spotify"></i> Spotify
@@ -1897,6 +1901,12 @@
           <span data-i18n="artist.albumsLoading">Loading albums…</span>
         </div>
         <div id="am-albums-grid" class="am-albums hidden"></div>
+      </div>
+      <div class="am-albums-section" id="am-mb-section" style="display:none">
+        <h3 class="am-section-title">
+          <img src="https://musicbrainz.org/static/images/favicons/favicon-32x32.png" alt="" style="width:14px;height:14px;border-radius:3px;margin-right:4px"> MusicBrainz
+        </h3>
+        <div id="am-mb-rows" class="im-mb-rows"></div>
       </div>
     </div>
   </div>

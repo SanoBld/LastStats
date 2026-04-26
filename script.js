@@ -3184,9 +3184,10 @@ function _buildAlbumCard(a, rank) {
   const delay    = Math.min((rank-1) % 20, 10) * 0.04;
   const spQ      = encodeURIComponent(`${a.name} ${artistNm}`);
 
-  const _imAlbumCall = `openItemModal('album',${JSON.stringify(a.name)},${JSON.stringify(artistNm)},${a.playcount},'${safeUrl.replace(/'/g,"%27")}','${imgUrl.replace(/'/g,"%27")}')`.replace(/"/g, '&quot;');
+  if (!window._imRegistry) window._imRegistry = [];
+  const _imAlbumIdx = window._imRegistry.push({ type:'album', name:a.name, sub:artistNm, plays:a.playcount, url:(a.url||''), img:imgUrl }) - 1;
   const gridHtml = `
-    <div class="hero-card" style="animation-delay:${delay}s" onclick="${_imAlbumCall}">
+    <div class="hero-card" style="animation-delay:${delay}s" onclick="openItemFromRegistry(${_imAlbumIdx})">
       <div class="hc-fallback" style="background:${bg}${hasImg ? ';display:none' : ''}">${letter}</div>
       ${hasImg ? `<img class="hc-img img-fade" src="${imgUrl}" alt="${escHtml(a.name)}" loading="lazy" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.previousElementSibling.style.display='flex'">` : ''}
       <div class="hc-overlay"></div>
@@ -3203,7 +3204,7 @@ function _buildAlbumCard(a, rank) {
     </div>`;
 
   const listHtml = `
-    <div class="music-card" style="animation-delay:${delay}s" onclick="${_imAlbumCall}">
+    <div class="music-card" style="animation-delay:${delay}s" onclick="openItemFromRegistry(${_imAlbumIdx})">
       <div class="music-card-img">
         ${hasImg ? `<img src="${imgUrl}" alt="${escHtml(a.name)}" loading="lazy" class="img-fade" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
         <div class="spotify-cover" style="background:${bg};display:${hasImg ? 'none' : 'flex'}">
@@ -3223,7 +3224,7 @@ function _buildAlbumCard(a, rank) {
     </div>`;
 
   const compactHtml = `
-    <div class="track-item" style="animation-delay:${delay}s" onclick="${_imAlbumCall}">
+    <div class="track-item" style="animation-delay:${delay}s" onclick="openItemFromRegistry(${_imAlbumIdx})">
       <div class="track-cover" style="flex-shrink:0;width:40px;height:40px;border-radius:6px;overflow:hidden;position:relative">
         ${hasImg ? `<img src="${imgUrl}" alt="${escHtml(a.name)}" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.style.display='none'">` : ''}
         <div style="position:absolute;inset:0;background:${bg};display:${hasImg ? 'none' : 'flex'};align-items:center;justify-content:center;color:white;font-weight:700">${letter}</div>
@@ -3321,7 +3322,8 @@ function setTracksLayout(layout) {
 function _buildTrackItem(track, rank, maxPlay) {
   const pct        = ((parseInt(track.playcount) / Math.max(maxPlay, 1)) * 100).toFixed(1);
   const _sdTrackImg = track.image?.find(im => im.size==='extralarge')?.['#text'] || track.image?.find(im => im.size==='large')?.['#text'] || '';
-  const _imTrackCall = `openItemModal('track',${JSON.stringify(track.name)},${JSON.stringify(track.artist?.name||'')},${track.playcount},'${(track.url||'').replace(/'/g,"%27")}','${_sdTrackImg.replace(/'/g,"%27")}')`.replace(/"/g, '&quot;');
+  if (!window._imRegistry) window._imRegistry = [];
+  const _imTrackIdx = window._imRegistry.push({ type:'track', name:track.name, sub:track.artist?.name||'', plays:track.playcount, url:(track.url||''), img:_sdTrackImg }) - 1;
   const medal      = rank <= 3 ? ['🥇','🥈','🥉'][rank-1] : rank;
   const spQ        = encodeURIComponent(`${track.name} ${track.artist?.name || ''}`);
   const ytQ        = encodeURIComponent(`${track.name} ${track.artist?.name || ''}`);
@@ -3335,7 +3337,7 @@ function _buildTrackItem(track, rank, maxPlay) {
 
     if ((APP.tracksLayout || 'list') === 'grid') {
     return `
-    <div class="hero-card" style="animation-delay:${delay}s" onclick="${_imTrackCall}">
+    <div class="hero-card" style="animation-delay:${delay}s" onclick="openItemFromRegistry(${_imTrackIdx})">
       <div class="hc-fallback" style="background:${coverBg}${hasCover ? ';display:none' : ''}">${coverLtr}</div>
       <img class="hc-img img-fade" id="${coverElId}-img" ${hasCover ? `src="${imgUrl}"` : 'src=""'} alt="${escHtml(track.name)}" loading="lazy"
            style="${hasCover ? '' : 'display:none'}"
@@ -3358,7 +3360,7 @@ function _buildTrackItem(track, rank, maxPlay) {
 
     return `
     <div class="track-item" style="animation-delay:${delay}s"
-         onclick="${_imTrackCall}">
+         onclick="openItemFromRegistry(${_imTrackIdx})">
       <div class="track-cover" id="${coverElId}">
         ${hasCover ? `<img src="${imgUrl}" alt="${escHtml(track.name)}" loading="lazy" class="img-fade" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
         <div style="width:100%;height:100%;background:${coverBg};display:${hasCover ? 'none' : 'flex'};align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:white">${coverLtr}</div>
@@ -3415,7 +3417,8 @@ async function _resolveTrackImage(track, rank) {
   if (!coverEl && !heroImg) return;
 
   const existingImg = track.image?.find(im => im.size === 'medium')?.['#text'] || track.image?.find(im => im.size === 'small')?.['#text'] || '';
-  if (!isDefaultImg(existingImg)) return;
+  // Skip uniquement si l'image est déjà depuis mzstatic (Apple CDN) — qualité maximale
+  if (existingImg && existingImg.includes('mzstatic.com')) return;
 
   const cacheKey = `${(track.artist?.name||'').toLowerCase()}::${(track.album?.['#text']||track.name||'').toLowerCase()}`;
   if (_trackImgCache.has(cacheKey)) {
@@ -3429,14 +3432,24 @@ async function _resolveTrackImage(track, rank) {
 
   try {
     let imgUrl = null;
-    const albumTitle = track.album?.['#text'] || '';
-    if (albumTitle) {
-      try {
-        const d = await API.call('album.getInfo', { artist:track.artist?.name||'', album:albumTitle, autocorrect:1 });
-        imgUrl = d.album?.image?.find(i => i.size === 'extralarge')?.['#text'] || d.album?.image?.find(i => i.size === 'large')?.['#text'] || '';
-        if (isDefaultImg(imgUrl)) imgUrl = null;
-      } catch {}
+
+    // 0. iTunes / is1-ssl.mzstatic.com — priorité maximale (haute résolution, CORS natif)
+    try {
+      imgUrl = await _fetchTrackImageiTunes(track.name, track.artist?.name || '') || null;
+    } catch {}
+
+    // 1. Last.fm album.getInfo — fallback si iTunes rien trouvé
+    if (!imgUrl) {
+      const albumTitle = track.album?.['#text'] || '';
+      if (albumTitle) {
+        try {
+          const d = await API.call('album.getInfo', { artist:track.artist?.name||'', album:albumTitle, autocorrect:1 });
+          imgUrl = d.album?.image?.find(i => i.size === 'extralarge')?.['#text'] || d.album?.image?.find(i => i.size === 'large')?.['#text'] || '';
+          if (isDefaultImg(imgUrl)) imgUrl = null;
+        } catch {}
+      }
     }
+    // 2. Last.fm track.getInfo — dernier recours
     if (!imgUrl) {
       try {
         const d = await API.call('track.getInfo', { artist:track.artist?.name||'', track:track.name||'', autocorrect:1 });
@@ -3555,8 +3568,10 @@ async function _resolveAlbumGridImages(albums, grid) {
 
 function _resolveTrackImages(tracks, startRank = 1) {
   tracks.forEach((track, i) => {
-    const img = track.image?.find(im => im.size === 'medium')?.['#text'] || '';
-    if (isDefaultImg(img)) setTimeout(() => _resolveTrackImage(track, startRank + i), i * 120);
+    const img = track.image?.find(im => im.size === 'medium')?.['#text'] || track.image?.find(im => im.size === 'extralarge')?.['#text'] || '';
+    // Toujours lancer la résolution si pas de mzstatic — priorité iTunes > Last.fm
+    const needsResolve = !img || isDefaultImg(img) || !img.includes('mzstatic.com');
+    if (needsResolve) setTimeout(() => _resolveTrackImage(track, startRank + i), i * 120);
   });
 }
 
@@ -5305,6 +5320,13 @@ async function openItemModal(type, name, artist, userPlaycount, itemUrl, knownIm
   }
 }
 
+/** Opens item modal from the global _imRegistry (avoids HTML escaping issues) */
+function openItemFromRegistry(idx) {
+  const d = window._imRegistry?.[idx];
+  if (!d) return;
+  openItemModal(d.type, d.name, d.sub, d.plays, d.url, d.img);
+}
+
 function closeItemModal(e) {
   if (e && e.target !== document.getElementById('item-modal')) return;
   document.getElementById('item-modal')?.classList.add('hidden');
@@ -5359,11 +5381,19 @@ async function openArtistModal(artistName, artistUrl, userPlaycount) {
   }
 
     const lfmBtn = document.getElementById('am-lfm-link');
+  const mbBtn  = document.getElementById('am-mb-link');
   const spBtn  = document.getElementById('am-sp-link');
   const ytBtn  = document.getElementById('am-yt-link');
   if (lfmBtn) lfmBtn.href = artistUrl || `https://www.last.fm/music/${encodeURIComponent(artistName)}`;
+  if (mbBtn)  mbBtn.href  = `https://musicbrainz.org/search?query=${encodeURIComponent(artistName)}&type=artist`;
   if (spBtn)  spBtn.href  = `spotify:search:${encodeURIComponent(artistName)}`;
   if (ytBtn)  ytBtn.href  = `https://www.youtube.com/results?search_query=${encodeURIComponent(artistName)}`;
+
+  // Reset MusicBrainz section
+  const mbSection = document.getElementById('am-mb-section');
+  const mbRows    = document.getElementById('am-mb-rows');
+  if (mbSection) mbSection.style.display = 'none';
+  if (mbRows)    mbRows.innerHTML = '';
 
   try {
     const [infoData, trkData, albData] = await Promise.all([
@@ -5445,6 +5475,52 @@ async function openArtistModal(artistName, artistUrl, userPlaycount) {
         </div>`;
       }).join('');
     }
+
+    // ── MusicBrainz data ──
+    (async () => {
+      try {
+        const mbid = _getMbid('artist', artistName);
+        const mbUrl = mbid
+          ? `https://musicbrainz.org/ws/2/artist/${mbid}?inc=url-rels+tags&fmt=json`
+          : `https://musicbrainz.org/ws/2/artist?query=${encodeURIComponent(artistName)}&limit=1&fmt=json`;
+        const mbR = await fetch(mbUrl, {
+          headers: { 'User-Agent': 'LastStats/1.0 (github.com/sanobld/LastStats)' },
+          signal: AbortSignal.timeout(5000)
+        });
+        if (!mbR.ok) return;
+        const mbRaw = await mbR.json();
+        const mbArt  = mbid ? mbRaw : mbRaw.artists?.[0];
+        if (!mbArt) return;
+
+        // Mise à jour du lien MusicBrainz avec MBID direct
+        const resolvedMbid = mbid || mbArt.id;
+        if (resolvedMbid) {
+          _storeMbid('artist', artistName, resolvedMbid);
+          const mbLinkEl = document.getElementById('am-mb-link');
+          if (mbLinkEl) mbLinkEl.href = `https://musicbrainz.org/artist/${resolvedMbid}`;
+        }
+
+        const rows = [];
+        if (mbArt.country)                    rows.push({ lbl: 'Pays',       val: mbArt.country });
+        if (mbArt.area?.name)                 rows.push({ lbl: 'Zone',        val: mbArt.area.name });
+        const formed = mbArt['life-span']?.begin; if (formed) rows.push({ lbl: 'Formé en',  val: formed });
+        const ended  = mbArt['life-span']?.end;   if (ended)  rows.push({ lbl: 'Séparé en', val: ended });
+        if (mbArt.type)                       rows.push({ lbl: 'Type',        val: mbArt.type });
+        const genres = (mbArt.genres || mbArt.tags || []).slice(0, 5).map(g => g.name).filter(Boolean);
+        if (genres.length)                    rows.push({ lbl: 'Genres',      val: genres.join(', ') });
+
+        if (rows.length) {
+          const mbSec  = document.getElementById('am-mb-section');
+          const mbRowsEl = document.getElementById('am-mb-rows');
+          if (mbSec && mbRowsEl) {
+            mbRowsEl.innerHTML = rows.map(r =>
+              `<div class="sdp-mb-row"><span class="sdp-mb-lbl">${r.lbl}</span><span class="sdp-mb-val">${escHtml(r.val)}</span></div>`
+            ).join('');
+            mbSec.style.display = '';
+          }
+        }
+      } catch {}
+    })();
 
   } catch (e) {
     console.warn('openArtistModal:', e);
