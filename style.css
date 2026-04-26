@@ -2322,9 +2322,10 @@ canvas#w-mini { height: 60px !important; }
 }
 .am-ext-btn:hover  { text-decoration: none; transform: translateY(-2px) scale(1.04); color: #fff; }
 .am-ext-btn:active { transform: scale(.95); transition-duration: .07s; }
-.am-lastfm:hover  { background: rgba(197,33,42,.55); border-color: #e8454d; }
+.am-lastfm:hover  { background: rgba(197,33,42,.55);  border-color: #e8454d; }
 .am-spotify:hover { background: rgba(29,185,84,.45);  border-color: #1db954; }
 .am-youtube:hover { background: rgba(255,0,0,.40);    border-color: #f55;   }
+.im-mb-btn:hover  { background: rgba(186,93,46,.50);  border-color: #e07a52; }
 
 /* Boutons dans am-below-hero : style thème clair/sombre */
 .am-below-hero .am-ext-btn {
@@ -6278,17 +6279,7 @@ a:focus:not(:focus-visible) { outline: none; }
   margin: 0 0 10px;
 }
 
-.im-mb-btn {
-  background: rgba(0,0,0,.28) !important;
-  color: rgba(255,255,255,.85) !important;
-  display: inline-flex; align-items: center; gap: 5px;
-  border: 1.5px solid rgba(255,255,255,.22) !important;
-}
-.im-mb-btn:hover {
-  background: rgba(186,94,64,.45) !important;
-  border-color: #e07a52 !important;
-  color: #fff !important;
-}
+
 
 .im-mb-rows { }
 

@@ -1075,8 +1075,8 @@ function setDashHeroMode(mode) {
 }
 
 /** Called on init + section nav + NP update */
-async function refreshDashHero() {
-  const mode   = localStorage.getItem('ls_dash_hero') || 'none';
+async function refreshDashHero(modeOverride = null) {
+  const mode   = modeOverride || localStorage.getItem('ls_dash_hero') || 'none';
   const hero   = document.getElementById('dash-hero');
   const bg     = document.getElementById('dash-hero-bg');
   const cnt    = document.getElementById('dash-hero-content');
@@ -1235,13 +1235,8 @@ async function _heroApplyNowPlaying(bg, cnt) {
       hero?.classList.add('hidden');
       return;
     }
-    // Temporarily switch to fallback mode without saving
-    const savedMode = localStorage.getItem('ls_dash_hero');
-    localStorage.setItem('ls_dash_hero', fallback);
-    await refreshDashHero();
-    localStorage.setItem('ls_dash_hero', savedMode);
-    // Show a "waiting" hint
-    _heroSetContent(cnt, `<div class="dash-hero-waiting"><i class="fas fa-headphones"></i> En attente d'une lecture…</div>`);
+    // Render with fallback mode without touching localStorage
+    await refreshDashHero(fallback);
   }
 }
 
