@@ -5168,13 +5168,17 @@ async function openItemModal(type, name, artist, userPlaycount, itemUrl, knownIm
       if (tracklistEl) {
         tracklistEl.classList.remove('hidden');
         if (tArr.length) {
-          tracklistEl.innerHTML = tArr.map((tr, i) => `
-            <div class="track-item compact" style="animation-delay:${i*0.03}s"
-                 onclick="closeItemModal();openItemModal('track',${JSON.stringify(tr.name)},${JSON.stringify(artist)},0,'${(tr.url||'').replace(/'/g,'%27')}','')">
+          tracklistEl.innerHTML = tArr.map((tr, i) => {
+            if (!window._imRegistry) window._imRegistry = [];
+            const _trIdx = window._imRegistry.push({ type:'track', name:tr.name, sub:artist, plays:0, url:(tr.url||''), img:'' }) - 1;
+            return `<div class="track-item compact im-tracklist-item" style="animation-delay:${i*0.03}s"
+                 onclick="openItemFromRegistry(${_trIdx})">
               <div class="track-rank">${i + 1}</div>
               <div class="track-info"><div class="track-name">${escHtml(tr.name)}</div></div>
               <div class="track-plays">${tr.duration ? Math.round(tr.duration/60) + ' min' : ''}</div>
-            </div>`).join('');
+              <i class="fas fa-chevron-right" style="font-size:.6rem;opacity:.4;margin-left:4px;flex-shrink:0"></i>
+            </div>`;
+          }).join('');
         } else {
           tracklistEl.innerHTML = '<p style="color:var(--text-muted);padding:10px">Pas de tracklist disponible.</p>';
         }
@@ -5247,7 +5251,9 @@ async function openItemModal(type, name, artist, userPlaycount, itemUrl, knownIm
             return `<div class="sim-card" data-simidx="${si}" onclick="openItemFromRegistry(${regIdx})">
               <div class="sim-card-img" id="simimg-${si}">
                 ${hasImg
-                  ? `<img src="${escHtml(sImg)}" alt="${escHtml(s.name)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\"sim-card-placeholder\"><i class=\"fas fa-music\"></i></div>'">`
+                  ? `<img src="${escHtml(sImg)}" alt="" loading="lazy" style="display:block"
+                       onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                     <div class="sim-card-placeholder" style="display:none"><i class="fas fa-music"></i></div>`
                   : `<div class="sim-card-placeholder"><i class="fas fa-music"></i></div>`}
               </div>
               <div class="sim-card-info">
@@ -5272,8 +5278,11 @@ async function openItemModal(type, name, artist, userPlaycount, itemUrl, knownIm
               if (!img || isDefaultImg(img)) img = await _fetchTrackImageiTunes(s.name, sArtist).catch(()=>'') || '';
               if (img && !isDefaultImg(img)) {
                 const el = document.getElementById(`simimg-${si}`);
-                if (el) el.innerHTML = `<img src="${img}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\"sim-card-placeholder\"><i class=\"fas fa-music\"></i></div>'">`;
-                // Update registry img too
+                if (el) {
+                  el.innerHTML = `<img src="${img}" alt="" loading="lazy" style="display:block"
+                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                    <div class="sim-card-placeholder" style="display:none"><i class="fas fa-music"></i></div>`;
+                }
                 if (window._imRegistry) {
                   const entry = window._imRegistry.find(e=>e.type==='track'&&e.name===s.name&&e.sub===sArtist);
                   if (entry) entry.img = img;

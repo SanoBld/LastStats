@@ -2246,6 +2246,7 @@ canvas#w-mini { height: 60px !important; }
 
 .am-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
 .am-tag {
+  display: inline-flex; align-items: center; justify-content: center;
   font-size: .72rem; font-weight: 600; padding: 3px 10px;
   border-radius: var(--radius-pill);
   background: rgba(255,255,255,.12); color: rgba(255,255,255,.9);
@@ -2254,6 +2255,8 @@ canvas#w-mini { height: 60px !important; }
   transition: transform  var(--dur-medium1) var(--ease-spring),
               box-shadow var(--dur-medium1) var(--ease-standard);
   animation: m3-spring-pop var(--dur-medium1) var(--ease-spring) both;
+  text-align: center;
+  white-space: nowrap;
 }
 .am-tag:hover  { transform: scale(1.08) translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,.3); }
 .am-tag:active { transform: scale(.95); transition-duration: .07s; }
@@ -6086,22 +6089,93 @@ a:focus:not(:focus-visible) { outline: none; }
 
 /* ── Mobile: hero overlaid like artist modal ── */
 @media (max-width: 639px) {
-  .im-inner .am-photo-wrap { height: 280px; }
+  .im-inner .am-photo-wrap { height: 300px; }
+
+  /* Gradient renforcé pour lisibilité */
+  .im-inner .am-photo-wrap .am-photo-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(0,0,0,0)      0%,
+      rgba(0,0,0,.05)   20%,
+      rgba(0,0,0,.62)   62%,
+      var(--bg-elevated) 100%
+    ) !important;
+  }
+
+  /* Hero toujours sur la photo */
   .im-inner .am-hero-info {
     position: absolute;
     bottom: 0; left: 0; right: 0;
-    padding: 0 16px 16px;
+    padding: 0 16px 14px 16px;
     background: none;
   }
-  .im-inner .am-artist-name { font-size: clamp(1.2rem, 5vw, 1.6rem); margin-bottom: 8px; }
-  .im-inner .am-stats-row { gap: 5px; }
-  .im-inner .am-stat { font-size: .7rem; padding: 3px 8px; }
-  .im-inner .am-ext-links { gap: 5px; }
-  .im-inner .am-ext-btn { font-size: .7rem; padding: 4px 10px; }
+
+  /* Badge TITRE/ALBUM : laisse de l'espace pour le ✕ */
+  .im-inner .im-type-badge {
+    font-size: .58rem; padding: 2px 9px;
+    margin-bottom: 5px; display: inline-block;
+    max-width: calc(100% - 52px);
+  }
+
+  /* Titre : padding-right pour ne pas passer sous le ✕ */
+  .im-inner .am-artist-name {
+    font-size: clamp(1rem, 4.5vw, 1.4rem);
+    margin-bottom: 4px; line-height: 1.15;
+    padding-right: 52px;
+  }
+
+  .im-inner .im-sub { font-size: .8rem; margin-bottom: 6px; }
+
+  /* Stats — scroll horizontal, une ligne */
+  .im-inner .am-stats-row {
+    display: flex; flex-wrap: nowrap;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    gap: 5px; margin-bottom: 7px;
+    margin-left: -16px; margin-right: -16px;
+    padding-left: 16px; padding-right: 16px;
+    padding-bottom: 2px; scrollbar-width: none;
+  }
+  .im-inner .am-stats-row::-webkit-scrollbar { display: none; }
+  .im-inner .am-stat {
+    font-size: .63rem; padding: 3px 8px;
+    white-space: nowrap; flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+
+  /* Tags genre — scroll horizontal */
+  .im-inner .am-tags {
+    flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    gap: 5px; margin-bottom: 7px;
+    margin-left: -16px; margin-right: -16px;
+    padding-left: 16px; padding-right: 16px;
+    scrollbar-width: none;
+  }
+  .im-inner .am-tags::-webkit-scrollbar { display: none; }
+  .im-inner .am-tag {
+    font-size: .63rem; padding: 3px 9px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+
+  /* Boutons ext — scroll horizontal full-width */
+  .im-inner .am-ext-links {
+    display: flex; flex-wrap: nowrap;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    gap: 5px;
+    margin-left: -16px; margin-right: -16px;
+    padding-left: 16px; padding-right: 16px;
+    scrollbar-width: none;
+  }
+  .im-inner .am-ext-links::-webkit-scrollbar { display: none; }
+  .im-inner .am-ext-btn {
+    font-size: .63rem; padding: 4px 11px;
+    white-space: nowrap; flex-shrink: 0;
+    border-radius: 99px; gap: 4px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+
   .im-inner .am-body { padding: 4px 16px 24px; gap: 16px; }
-  #im-related-grid { grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  #im-related-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .im-type-badge { font-size: .6rem; }
-  .im-sub { font-size: .88rem; }
 }
 
 .im-img-placeholder {
@@ -6149,62 +6223,89 @@ a:focus:not(:focus-visible) { outline: none; }
 ══════════════════════════════════════════════════════ */
 #im-related-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
   padding: 4px 0;
 }
 
 .sim-card {
-  display: flex;
-  flex-direction: column;
-  border-radius: 12px;
-  overflow: hidden;
+  display: flex; flex-direction: column;
+  border-radius: 14px; overflow: hidden;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   cursor: pointer;
   transition: transform var(--dur-short2) var(--ease-spring),
-              box-shadow var(--dur-short2) var(--ease-standard);
+              box-shadow var(--dur-short2) var(--ease-standard),
+              border-color var(--dur-short2) var(--ease-standard);
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
 }
 .sim-card:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 8px 24px rgba(0,0,0,.28);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 28px rgba(0,0,0,.22);
+  border-color: var(--accent);
 }
-.sim-card:active { transform: scale(.96); transition-duration: .08s; }
+.sim-card:active { transform: scale(.96); transition-duration: .07s; }
 
+/* Carré image – padding-bottom fiable (évite la dépendance circulaire aspect-ratio) */
 .sim-card-img {
   width: 100%;
-  aspect-ratio: 1;
-  overflow: hidden;
   position: relative;
+  padding-bottom: 100%;
+  overflow: hidden;
   background: var(--bg-hover);
+  flex-shrink: 0;
 }
-.sim-card-img img {
+.sim-card-img > img,
+.sim-card-img > .sim-card-placeholder {
+  position: absolute; inset: 0;
   width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform .4s var(--ease-standard);
 }
-.sim-card:hover .sim-card-img img { transform: scale(1.06); }
+.sim-card-img > img {
+  object-fit: cover; display: block;
+  transition: transform .35s var(--ease-standard);
+}
+.sim-card:hover .sim-card-img > img { transform: scale(1.07); }
 
+/* Overlay gradient au hover */
+.sim-card-img::after {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,.42) 100%);
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--dur-short2) var(--ease-standard);
+}
+.sim-card:hover .sim-card-img::after { opacity: 1; }
+
+/* Placeholder */
 .sim-card-placeholder {
-  width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center;
   font-size: 2rem; color: var(--text-muted);
-  background: var(--bg-elevated);
+  background: linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-hover) 100%);
 }
 
 .sim-card-info {
-  padding: 8px 10px 10px;
+  padding: 9px 10px 11px; flex: 1;
+  display: flex; flex-direction: column; justify-content: center;
+  min-width: 0;
 }
 .sim-card-name {
   font-size: .78rem; font-weight: 700; color: var(--text);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  line-height: 1.3;
 }
 .sim-card-artist {
-  font-size: .68rem; color: var(--text-muted);
+  font-size: .66rem; color: var(--text-muted); font-weight: 500;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  margin-top: 2px;
+  margin-top: 3px;
 }
+
+/* Titres de l'album — cliquables */
+.im-tracklist-item {
+  cursor: pointer;
+  transition: background var(--dur-short) var(--ease-standard),
+              transform  var(--dur-short2) var(--ease-spring);
+}
+.im-tracklist-item:hover  { background: var(--bg-hover); transform: translateX(3px); }
+.im-tracklist-item:active { transform: translateX(1px) scale(.98); transition-duration: .07s; }
 
 /* ── Clickable elements in item modal ── */
 .im-sub--clickable {
