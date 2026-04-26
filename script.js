@@ -1425,16 +1425,15 @@ function toggleCardChip(el, id) {
 
   if (el.classList.contains('stg-card-chip--on')) {
     el.classList.remove('stg-card-chip--on');
-    el.querySelector('input').checked = false;
   } else {
     if (totalOn >= 12) {
       showToast('⚠️ Maximum 12 blocs. Désélectionnez-en un d\'abord.');
       return;
     }
     el.classList.add('stg-card-chip--on');
-    el.querySelector('input').checked = true;
   }
   _updateCardCountBadge();
+  _buildOrderList();
 }
 
 function _updateCardCountBadge() {
