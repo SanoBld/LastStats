@@ -903,51 +903,309 @@ canvas { max-width: 100%; }
 
 .stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(178px, 1fr));
   gap: 16px; margin-bottom: 24px;
 }
 .stat-grid .stat-card:nth-child(-n+6) {
-  border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 22%, var(--border));
+  border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 28%, var(--border));
 }
+
+/* ── Base card ── */
 .stat-card {
   background: var(--surface-container-low, var(--bg-card-hi));
   border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 20px;
+  border-radius: var(--radius);
+  padding: 20px 20px 20px;
+  min-height: 138px;
+  display: flex; flex-direction: column;
   box-shadow: var(--shadow-card);
   transition: border-color var(--dur-medium1) var(--ease-standard),
-              transform    var(--dur-medium1) var(--ease-spring);
+              transform    var(--dur-medium1) var(--ease-spring),
+              box-shadow   var(--dur-medium1) var(--ease-standard);
   cursor: default; position: relative; overflow: hidden;
   contain: layout style;
 }
-/* Colored accent strip on top — morphs in */
+
+/* Accent strip */
 .stat-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
   background: var(--card-accent, var(--accent));
-  border-radius: var(--radius) var(--radius) 0 0; opacity: .85;
+  border-radius: var(--radius) var(--radius) 0 0; opacity: .9;
   transform-origin: left center;
   animation: m3-strip-in var(--dur-medium2) var(--ease-decel) both;
+  z-index: 3;
 }
-/* Subtle tonal overlay on hover (M3 state layer) */
+/* Tonal hover overlay */
 .stat-card::after {
   content: '';
   position: absolute; inset: 0;
-  background: var(--accent);
+  background: var(--card-accent, var(--accent));
   opacity: 0;
   border-radius: inherit;
   transition: opacity var(--dur-medium1) var(--ease-standard);
   pointer-events: none;
+  z-index: 1;
 }
-.stat-card:hover {
-  background: var(--surface-container-high, var(--bg-card-hi));
-  border-color: var(--border-glow);
-  box-shadow: 0 0 0 1px var(--border-glow), var(--shadow-md);
-  transform: translateY(-3px);
+
+/* ── Background image layer — désactivé (remplacé par milestone bar) ── */
+.stat-card-bg {
+  display: none;
 }
-.stat-card:hover::after { opacity: .03; }
+
+/* ── Large ghost decorative icon ── */
+.stat-card-deco {
+  position: absolute;
+  bottom: -10px; right: -6px;
+  font-size: 5.2rem;
+  line-height: 1;
+  opacity: 0.055;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity .4s ease, transform .5s var(--ease-spring);
+  user-select: none;
+  filter: blur(.5px);
+}
+
+/* Content sits above backgrounds */
+.stat-card-icon,
+.stat-card-value,
+.stat-card-label,
+.stat-card-sub {
+  position: relative; z-index: 2;
+}
+
 .stat-card-icon  { font-size: 1.3rem; margin-bottom: 10px; }
 .stat-card-value { font-size: 1.55rem; font-weight: 800; letter-spacing: -.04em; line-height: 1; margin-bottom: 4px; }
 .stat-card-label { font-size: .78rem; color: var(--text-muted); font-weight: 500; margin-bottom: 3px; }
-.stat-card-sub   { font-size: .72rem; color: var(--text-muted); }
+.stat-card-sub   { font-size: .72rem; color: var(--text-muted); margin-top: auto; }
+
+/* ── Hover ── */
+.stat-card:hover {
+  background: var(--surface-container-high, var(--bg-card-hi));
+  border-color: var(--border-glow);
+  box-shadow: 0 0 0 1px var(--border-glow), 0 12px 28px rgba(0,0,0,.13), var(--shadow-md);
+  transform: translateY(-4px);
+}
+.stat-card:hover::after { opacity: .035; }
+.stat-card:hover .stat-card-deco {
+  opacity: 0.13;
+  transform: scale(1.08) rotate(-6deg) translateY(-4px);
+}
+.stat-card:active { transform: translateY(-1px) scale(.985); }
+
+/* ── Cards with action (pointer cursor) ── */
+.stat-card--action { cursor: pointer; }
+
+/* ── Ripple ── */
+.stat-card-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--card-accent, var(--accent));
+  opacity: 0.22;
+  transform: scale(0);
+  animation: sc-ripple .55s ease-out forwards;
+  pointer-events: none;
+  z-index: 1;
+}
+@keyframes sc-ripple {
+  to { transform: scale(5); opacity: 0; }
+}
+
+/* ── Milestone progress bar ──────────────────────────────────────────────── */
+.stat-card-milestone {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  background: color-mix(in srgb, var(--card-accent, var(--accent)) 15%, transparent);
+  border-radius: 0 0 var(--radius) var(--radius);
+  overflow: hidden; z-index: 3; pointer-events: none;
+}
+.stat-card-milestone-fill {
+  height: 100%;
+  background: var(--card-accent, var(--accent));
+  border-radius: inherit;
+  transition: width 1.4s cubic-bezier(.22,1,.36,1);
+  opacity: .85;
+}
+.stat-card-milestone-label {
+  font-size: .63rem; color: var(--text-muted);
+  position: relative; z-index: 2;
+  margin-top: 3px; opacity: .8;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ── Milestone reached badge ─────────────────────────────────────────────── */
+@keyframes sc-milestone-pop {
+  0%   { transform: scale(0) rotate(-15deg); opacity: 0; }
+  65%  { transform: scale(1.15) rotate(4deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.stat-card-milestone-badge {
+  position: absolute; top: 9px; right: 9px;
+  font-size: .58rem; font-weight: 700; letter-spacing: .02em;
+  background: var(--card-accent, var(--accent));
+  color: #fff; padding: 2px 7px; border-radius: 20px;
+  z-index: 5;
+  animation: sc-milestone-pop .55s cubic-bezier(.34,1.56,.64,1) .25s both;
+  white-space: nowrap; line-height: 1.6;
+}
+
+/* ── Live "now playing" pulse dot ────────────────────────────────────────── */
+@keyframes sc-live-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,.5); transform: scale(1); }
+  50%      { box-shadow: 0 0 0 5px rgba(34,197,94,0); transform: scale(1.15); }
+}
+.stat-card-live {
+  position: absolute; top: 11px; left: 11px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #22c55e; z-index: 5;
+  animation: sc-live-pulse 1.6s ease-in-out infinite;
+}
+
+/* ── Value change flash animation ────────────────────────────────────────── */
+@keyframes sc-value-flash {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.14); filter: brightness(1.3); }
+  55%  { transform: scale(.95); filter: brightness(1.05); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+.stat-card-value--changed {
+  animation: sc-value-flash .52s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+/* ── Recently changed card — pulsing accent strip ────────────────────────── */
+@keyframes sc-strip-pulse {
+  0%,100% { opacity: .9; height: 3px; }
+  50%      { opacity: .5; height: 5px; }
+}
+.stat-card--recently-changed::before {
+  animation: sc-strip-pulse 1.8s ease-in-out 4;
+}
+
+/* ── Card swap-in (when algorithm rotates a new card in) ─────────────────── */
+@keyframes sc-swap-in {
+  from { opacity: 0; transform: translateY(10px) scale(.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.stat-card--swap-in {
+  animation: sc-swap-in .38s cubic-bezier(.22,1,.36,1) both;
+}
+
+/* ── Hidden stats hint text ──────────────────────────────────────────────── */
+#stat-grid-more {
+  font-size: .7rem; color: var(--text-muted);
+  text-align: center; padding: 2px 0 6px;
+  letter-spacing: .025em; opacity: .75;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DASHBOARD SETTINGS — Mode buttons · Toggle · Card picker
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Mode buttons (Auto / Manuel) */
+.stg-card-mode-btns {
+  display: flex; gap: 12px;
+}
+.stg-mode-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  gap: 4px; padding: 14px 12px; border-radius: var(--radius);
+  border: 2px solid var(--border);
+  background: var(--bg-card); color: var(--text-muted);
+  cursor: pointer; transition: all .22s var(--ease-standard);
+  font-family: inherit;
+}
+.stg-mode-btn i    { font-size: 1.1rem; }
+.stg-mode-btn span { font-size: .85rem; font-weight: 700; color: var(--text); }
+.stg-mode-btn small{ font-size: .7rem;  color: var(--text-muted); }
+.stg-mode-btn:hover {
+  border-color: var(--border-glow);
+  background: var(--bg-card-hi);
+}
+.stg-mode-btn.active {
+  border-color: var(--accent);
+  background: var(--accent-lt, rgba(99,102,241,.1));
+  color: var(--accent);
+}
+.stg-mode-btn.active i    { color: var(--accent); }
+.stg-mode-btn.active span { color: var(--accent); }
+
+/* Toggle switch */
+.stg-toggle {
+  position: relative; display: inline-flex; align-items: center;
+  cursor: pointer; flex-shrink: 0;
+}
+.stg-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.stg-toggle-track {
+  width: 46px; height: 26px; border-radius: 13px;
+  background: var(--border);
+  transition: background .22s var(--ease-standard);
+  display: flex; align-items: center; padding: 0 3px;
+  box-sizing: border-box;
+}
+.stg-toggle input:checked ~ .stg-toggle-track { background: var(--accent); }
+.stg-toggle-thumb {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.3);
+  transition: transform .22s var(--ease-spring);
+}
+.stg-toggle input:checked ~ .stg-toggle-track .stg-toggle-thumb {
+  transform: translateX(20px);
+}
+
+/* Card picker grid */
+.stg-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 8px; margin-bottom: 16px;
+}
+.stg-card-chip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg-card); cursor: pointer;
+  transition: all .2s var(--ease-standard);
+  user-select: none; position: relative;
+}
+.stg-card-chip:hover { border-color: var(--border-glow); background: var(--bg-card-hi); }
+.stg-card-chip--on {
+  border-color: var(--accent);
+  background: var(--accent-lt, rgba(99,102,241,.09));
+}
+.stg-card-chip--locked {
+  cursor: default; opacity: .75;
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+  background: var(--accent-lt, rgba(99,102,241,.06));
+}
+.stg-card-chip-icon  { font-size: 1.05rem; line-height: 1; flex-shrink: 0; }
+.stg-card-chip-label { font-size: .75rem; font-weight: 500; color: var(--text); flex: 1; line-height: 1.3; }
+.stg-card-chip-lock  { font-size: .55rem; color: var(--accent); opacity: .7; flex-shrink: 0; }
+
+/* Count badge */
+.stg-count-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 2px 9px; border-radius: 20px; font-size: .68rem; font-weight: 700;
+  background: var(--border); color: var(--text-muted);
+  margin-left: 8px; vertical-align: middle;
+  transition: background .2s, color .2s;
+}
+.stg-count-badge--ok   { background: var(--accent); color: #fff; }
+.stg-count-badge--over { background: #ef4444;       color: #fff; }
+
+/* Apply/Reset buttons */
+.stg-card-picker-actions {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.btn-sm {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: var(--radius-sm); border: none;
+  background: var(--accent); color: #fff; font-size: .8rem; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  transition: opacity .18s, transform .15s;
+}
+.btn-sm:hover  { opacity: .88; transform: translateY(-1px); }
+.btn-sm:active { transform: translateY(0) scale(.97); }
+.btn-sm--secondary {
+  background: var(--bg-card-hi); color: var(--text);
+  border: 1.5px solid var(--border);
+}
 
 /* Listen time card — slightly smaller value for long strings */
 #stat-card-listen-time { --card-accent: var(--accent); }
@@ -2817,7 +3075,6 @@ canvas#w-mini { height: 60px !important; }
 [data-theme="light"] .insight-card,
 [data-theme="light"] .chart-card,
 [data-theme="light"] .adv-card,
-[data-theme="light"] .compare-section,
 [data-theme="light"] .obscurity-hero,
 [data-theme="light"] .settings-card {
   border-color: rgba(73,69,79,0.16);
@@ -2832,8 +3089,12 @@ canvas#w-mini { height: 60px !important; }
 [data-theme="light"] .track-item,
 [data-theme="light"] .obscurity-item,
 [data-theme="light"] .badge-card,
-[data-theme="light"] .compare-section,
 [data-theme="light"] .badge-score-card { background: var(--bg-card); }
+
+/* Light mode: bg image more visible against white, deco slightly stronger */
+[data-theme="light"] .stat-card-bg { opacity: 0.12; }
+[data-theme="light"] .stat-card:hover .stat-card-bg { opacity: 0.26; }
+[data-theme="light"] .stat-card-deco { opacity: 0.07; }
 
 /* ── Hover states: use bg-card-hi (not surface-container-high which is dark) ── */
 [data-theme="light"] .stat-card:hover   { background: var(--bg-card-hi); border-color: var(--border-glow); }
@@ -3121,7 +3382,8 @@ canvas#w-mini { height: 60px !important; }
 
   /* Typography */
   .stat-card-value { font-size: 1.3rem; }
-  .stat-card { padding: 14px; }
+  .stat-card { padding: 14px; min-height: 120px; }
+  .stat-card-deco { font-size: 4rem; }
   .period-sel { gap: 3px; }
   .prd { padding: 5px 8px; font-size: .72rem; }
   .sec-hd.flex-bw { gap: 10px; }
@@ -6116,7 +6378,8 @@ a:focus:not(:focus-visible) { outline: none; }
 /* ── Dashboard stat grid mobile ── */
 @media (max-width: 480px) {
   .stat-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
-  .stat-card { padding: 14px 12px; }
+  .stat-card { padding: 14px 12px; min-height: 118px; }
+  .stat-card-deco { font-size: 3.8rem; }
 }
 
 /* ── Hero section mobile ── */

@@ -1342,6 +1342,141 @@ function switchSettingsTab(tabId) {
   document.querySelectorAll('.stg-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
   document.querySelectorAll('.stg-tab-panel').forEach(p => p.classList.toggle('active', p.id === tabId));
   localStorage.setItem('ls_settings_tab', tabId);
+  if (tabId === 'stg-dashboard') _initDashboardSettings();
+}
+
+// ── Dashboard settings ──────────────────────────────────────────────────────
+
+/** All card definitions (labels + icons) used in the settings picker */
+const _ALL_CARD_DEFS = [
+  { id:'total',     icon:'🎯', label:'Scrobbles total',         locked:true  },
+  { id:'avg',       icon:'⚡', label:'Scrobbles / jour',         locked:false },
+  { id:'peak',      icon:'🕐', label:'Heure de pointe',         locked:false },
+  { id:'artists',   icon:'🎤', label:'Artistes écoutés',         locked:true  },
+  { id:'albums',    icon:'💿', label:'Albums explorés',          locked:false },
+  { id:'diversity', icon:'📊', label:'Ratio de diversité',       locked:false },
+  { id:'tracks',    icon:'🎼', label:'Titres différents',        locked:false },
+  { id:'last',      icon:'⏱️', label:'Dernier scrobble',         locked:true  },
+  { id:'days',      icon:'📆', label:'Jours d\'activité',        locked:true  },
+  { id:'top1',      icon:'🌟', label:'Artiste n°1',              locked:true  },
+  { id:'eddington', icon:'🔢', label:'Nombre d\'Eddington',      locked:false },
+  { id:'listen',    icon:'🎧', label:'Temps d\'écoute estimé',   locked:true  },
+  { id:'repeat',    icon:'🔁', label:'Taux de répétition',       locked:false },
+  { id:'albumrate', icon:'📀', label:'Albums / artiste',         locked:false },
+  { id:'weekly',    icon:'📅', label:'Scrobbles / semaine',      locked:false },
+  { id:'topplay',   icon:'🏆', label:'Plays artiste n°1',        locked:false },
+  { id:'intensity', icon:'🔥', label:'Intensité moyenne',        locked:false },
+  { id:'regdays',   icon:'🗓️', label:'Ancienneté du compte',     locked:false },
+];
+
+function _initDashboardSettings() {
+  // Sync mode buttons
+  const mode = localStorage.getItem('ls_statcards_mode') || 'auto';
+  document.querySelectorAll('.stg-mode-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.mode === mode)
+  );
+
+  // Sync milestone toggle
+  const ms = localStorage.getItem('ls_statcards_milestones') !== 'false';
+  const chk = document.getElementById('chk-milestones');
+  if (chk) chk.checked = ms;
+
+  // Show/hide picker
+  const pickerSection = document.getElementById('stg-card-picker-section');
+  if (pickerSection) pickerSection.style.display = mode === 'manual' ? 'block' : 'none';
+
+  // Build picker grid
+  if (mode === 'manual') _buildCardPickerGrid();
+}
+
+function _buildCardPickerGrid() {
+  const grid = document.getElementById('stg-card-picker-grid');
+  if (!grid) return;
+
+  let chosen = [];
+  try { chosen = JSON.parse(localStorage.getItem('ls_statcards_manual') || '[]'); } catch {}
+  if (!chosen.length) chosen = _ALL_CARD_DEFS.filter(c => c.locked).map(c => c.id);
+
+  const lockedIds = _ALL_CARD_DEFS.filter(c => c.locked).map(c => c.id);
+  const selected  = new Set([...lockedIds, ...chosen].slice(0, 12));
+
+  grid.innerHTML = _ALL_CARD_DEFS.map(c => {
+    const isLocked  = c.locked;
+    const isChecked = selected.has(c.id) || isLocked;
+    return `
+    <label class="stg-card-chip${isLocked ? ' stg-card-chip--locked' : ''}${isChecked ? ' stg-card-chip--on' : ''}"
+           data-id="${c.id}" ${isLocked ? '' : `onclick="toggleCardChip(this,'${c.id}')"`}>
+      <span class="stg-card-chip-icon">${c.icon}</span>
+      <span class="stg-card-chip-label">${c.label}</span>
+      ${isLocked ? '<i class="fas fa-lock stg-card-chip-lock"></i>' : ''}
+      <input type="checkbox" hidden ${isChecked ? 'checked' : ''} ${isLocked ? 'disabled' : ''}>
+    </label>`;
+  }).join('');
+
+  _updateCardCountBadge();
+}
+
+function toggleCardChip(el, id) {
+  const lockedIds = _ALL_CARD_DEFS.filter(c => c.locked).map(c => c.id);
+  const current   = [...document.querySelectorAll('.stg-card-chip--on:not(.stg-card-chip--locked)')].map(e => e.dataset.id);
+  const totalOn   = lockedIds.length + current.length;
+
+  if (el.classList.contains('stg-card-chip--on')) {
+    el.classList.remove('stg-card-chip--on');
+    el.querySelector('input').checked = false;
+  } else {
+    if (totalOn >= 12) {
+      showToast('⚠️ Maximum 12 blocs. Désélectionnez-en un d\'abord.');
+      return;
+    }
+    el.classList.add('stg-card-chip--on');
+    el.querySelector('input').checked = true;
+  }
+  _updateCardCountBadge();
+}
+
+function _updateCardCountBadge() {
+  const lockedCount = _ALL_CARD_DEFS.filter(c => c.locked).length;
+  const userCount   = document.querySelectorAll('.stg-card-chip--on:not(.stg-card-chip--locked)').length;
+  const total       = lockedCount + userCount;
+  const badge       = document.getElementById('stg-card-count-badge');
+  if (badge) {
+    badge.textContent = `${total} / 12`;
+    badge.className   = 'stg-count-badge' + (total === 12 ? ' stg-count-badge--ok' : total > 12 ? ' stg-count-badge--over' : '');
+  }
+}
+
+function applyManualCards() {
+  const lockedIds = _ALL_CARD_DEFS.filter(c => c.locked).map(c => c.id);
+  const userIds   = [...document.querySelectorAll('.stg-card-chip--on:not(.stg-card-chip--locked)')].map(e => e.dataset.id);
+  const all       = [...new Set([...lockedIds, ...userIds])].slice(0, 12);
+  localStorage.setItem('ls_statcards_manual', JSON.stringify(all));
+  showToast('✅ Blocs personnalisés appliqués !');
+  if (APP.userInfo) loadDashboard();
+}
+
+function resetManualCards() {
+  localStorage.removeItem('ls_statcards_manual');
+  _buildCardPickerGrid();
+  showToast('🔄 Sélection réinitialisée');
+}
+
+function setStatCardMode(mode) {
+  localStorage.setItem('ls_statcards_mode', mode);
+  document.querySelectorAll('.stg-mode-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.mode === mode)
+  );
+  const pickerSection = document.getElementById('stg-card-picker-section');
+  if (pickerSection) pickerSection.style.display = mode === 'manual' ? 'block' : 'none';
+  if (mode === 'manual') _buildCardPickerGrid();
+  if (APP.userInfo) loadDashboard();
+  showToast(mode === 'auto' ? '✨ Mode automatique activé' : '✏️ Mode manuel activé');
+}
+
+function setMilestonesEnabled(enabled) {
+  localStorage.setItem('ls_statcards_milestones', enabled ? 'true' : 'false');
+  if (APP.userInfo) loadDashboard();
+  showToast(enabled ? '🏆 Succès activés' : '🚫 Succès masqués');
 }
 
 /** Toggle text info visibility on the hero */
@@ -2429,6 +2564,92 @@ async function getPeakHourData() {
   } catch { return { label: '—', mood: '' }; }
 }
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// STAT CARD SYSTEM — Milestones · Smart selection · Live animations
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const STAT_MILESTONES = {
+  scrobbles:  [100,500,1000,2500,5000,10000,25000,50000,100000,250000,500000,1000000],
+  avgPerDay:  [1,5,10,20,30,50,75,100,150,200],
+  artists:    [10,50,100,250,500,1000,2500,5000,10000],
+  albums:     [10,50,100,250,500,1000,2500,5000],
+  tracks:     [10,50,100,250,500,1000,2500,5000,10000],
+  days:       [7,14,30,60,100,200,365,500,730,1000,1500,2000,3650],
+  eddington:  [5,10,15,20,30,40,50,75,100,150,200],
+  listenDays: [1,3,7,14,30,60,100,180,365,500,730,1000],
+  diversity:  [1,5,10,15,20,30,40,50,75,100],
+  repeatRate: [1.5,2,3,5,10,20,50],
+  albumRate:  [0.5,1,2,3,5,8,10,15],
+};
+
+/** Returns { nextM, prevM, pct, justReached } for a given milestone type + value */
+function _getMilestoneInfo(type, rawVal) {
+  const val  = parseFloat(String(rawVal).replace(/[^\d.]/g, '')) || 0;
+  const list = STAT_MILESTONES[type];
+  if (!list || val <= 0) return null;
+  const nextM = list.find(m => m > val) || null;
+  const prevM = [...list].reverse().find(m => m <= val) || null;
+  if (!nextM && !prevM) return null;
+  const pct         = (prevM && nextM) ? Math.round(((val - prevM) / (nextM - prevM)) * 100) : (nextM ? 0 : 100);
+  const justReached = !!(prevM && (val / prevM) >= 1 && (val / prevM) < 1.025);
+  return { nextM, prevM, pct: Math.max(0, Math.min(100, pct)), justReached };
+}
+
+function _fmtMs(n) {
+  if (!n) return '';
+  if (n >= 1000000) return (n / 1000000 % 1 === 0 ? n/1000000 : (n/1000000).toFixed(1)) + 'M';
+  if (n >= 1000)    return (n / 1000 % 1 === 0     ? n/1000    : (n/1000).toFixed(1))    + 'k';
+  return String(n);
+}
+
+/**
+ * Select exactly maxCards from allCards.
+ * - In 'auto' mode: ranked by relevance + recency boost
+ * - In 'manual' mode: user-defined ordered list from ls_statcards_manual
+ * Cards that changed in the last 60 s are sorted to the front.
+ */
+function _selectStatCards(allCards, maxCards = 12) {
+  const now         = Date.now();
+  const changeTimes = window._statCardChangeTimes || {};
+  const mode        = localStorage.getItem('ls_statcards_mode') || 'auto';
+
+  if (mode === 'manual') {
+    let chosen = [];
+    try { chosen = JSON.parse(localStorage.getItem('ls_statcards_manual') || '[]'); } catch {}
+    // Always include alwaysShow cards; merge with user selection up to maxCards
+    const alwaysIds = allCards.filter(c => c.alwaysShow).map(c => c.id);
+    const merged = [...new Set([...alwaysIds, ...chosen])].slice(0, maxCards);
+    // Fill up to maxCards if user list is short
+    if (merged.length < maxCards) {
+      for (const c of allCards) {
+        if (!merged.includes(c.id)) merged.push(c.id);
+        if (merged.length >= maxCards) break;
+      }
+    }
+    return merged.map(id => allCards.find(c => c.id === id)).filter(Boolean);
+  }
+
+  // AUTO mode
+  const scored = allCards.map(c => {
+    const ageMs = now - (changeTimes[c.id] || 0);
+    const boost = ageMs < 300_000 ? Math.round(60 * (1 - ageMs / 300_000)) : 0;
+    return { ...c, _score: (c.relevance || 50) + boost + (c.alwaysShow ? 200 : 0) };
+  });
+
+  const selected = scored
+    .sort((a, b) => b._score - a._score)
+    .slice(0, maxCards);
+
+  selected.sort((a, b) => {
+    const aAge = now - (changeTimes[a.id] || 0);
+    const bAge = now - (changeTimes[b.id] || 0);
+    if (aAge < 60_000 || bAge < 60_000) return aAge - bAge;
+    return (allCards.findIndex(c => c.id === a.id)) - (allCards.findIndex(c => c.id === b.id));
+  });
+
+  return selected;
+}
+
 async function loadDashboard() {
   const u = APP.userInfo;
   if (!u) return;
@@ -2468,6 +2689,22 @@ async function loadDashboard() {
         ? t('stat_now_playing')
         : timeAgo(parseInt(last.date?.uts || 0));
     }
+
+    // ── Extraire les images pour les fonds de cartes ──
+    // Filtre la miniature vide de Last.fm (hash connu)
+    const _lfmImg = (obj, sizes = ['extralarge','large','medium']) => {
+      for (const s of sizes) {
+        const u = obj?.find?.(i => i.size === s)?.['#text'] || '';
+        if (u && !u.includes('2a96cbd8b46e442fc41c2b86b821562f')) return u;
+      }
+      return '';
+    };
+    const recentTracks = rData.recenttracks?.track;
+    const lastTrack    = Array.isArray(recentTracks) ? recentTracks[0] : recentTracks;
+    window._statCardImgs = {
+      recent:    _lfmImg(lastTrack?.image),
+      topAlbum:  _lfmImg((Array.isArray(bData.topalbums?.album) ? bData.topalbums.album[0] : bData.topalbums?.album)?.image),
+    };
 
     // ── Calcul de la durée moyenne réelle via les top tracks ──
     // Last.fm retourne un champ `duration` en secondes (0 si inconnu)
@@ -2518,40 +2755,224 @@ async function loadDashboard() {
   // peak hour — loaded in parallel
   const peakData = await getPeakHourData();
 
-  const cards = [
-    // ① volume
-    { icon:'🎯', value:totalPlay,                      label:t('adv_total'),          sub:t('adv_total_sub'),                                color:'#6366f1' },
-    // ② frequency
-    { icon:'⚡', value:avgPerDay,                       label:t('adv_per_day'),        sub:t('adv_per_week', avgPerWeek),                     color:'#8b5cf6', noAnim:true },
-    // ③ habit — peak hour card
-    { icon:'🕐', value:peakData.label,                  label:t('stat_peak_hour'),     sub:peakData.mood,                                     color:'#a78bfa', noAnim:true },
-    // ④ exploration
-    { icon:'🎤', value:formatNum(uniqueArtistsRaw),     label:t('stat_artists'),       sub:t('stat_since_start'),                             color:'#ec4899', noAnim:true },
-    // ⑤ depth
-    { icon:'💿', value:uniqueAlbums,                    label:t('stat_albums'),        sub:t('stat_since_start'),                             color:'#d946ef', noAnim:true },
-    // ⑥ diversity
-    { icon:'📊', value:`${diversityPct}%`,               label:t('stat_diversity'),     sub:t('stat_diversity_sub'),                           color:'#14b8a6', noAnim:true },
-    // secondary stat cards
-    { icon:'🎼', value:uniqueTracks,                    label:t('stat_tracks'),        sub:t('stat_since_start'),                             color:'#f43f5e', noAnim:true },
-    { icon:'⏱️', value:lastScrobble,                    label:t('stat_last_scrobble'), sub:u.name ? `last.fm/user/${u.name}` : '',            color:'#f97316', noAnim:true },
-    { icon:'📆', value:formatNum(daysSince),             label:t('adv_days'),           sub:t('adv_days_sub', formatDate(regTs)),              color:'#eab308', noAnim:true },
-    { icon:'🌟', value:maxArtist ? maxArtist.name:'—',  label:t('adv_top1_alltime'),   sub:t('adv_top1_pct', topPct),                        color:'#22c55e', noAnim:true },
-    { icon:'🔢', value:eddington,                       label:t('adv_eddington'),      sub:t('adv_eddington_sub', eddington),                 color:'#a855f7', noAnim:true },
-    { icon:'🎧', value:listenDisp,                      label:t('stat_listen_time'),   sub:listenSub,                                         color:'#06b6d4', noAnim:true },
+  // Images pour les fonds de cartes (depuis le cache qu'on vient de remplir)
+  const _imgs   = window._statCardImgs || {};
+  const _lfmArt = img => img?.find?.(i => i.size === 'extralarge')?.['#text']
+                       || img?.find?.(i => i.size === 'large')?.['#text'] || '';
+  const artistBgImg = (() => {
+    const u = _lfmArt(maxArtist?.image);
+    return (u && !u.includes('2a96cbd8b46e442fc41c2b86b821562f')) ? u : (_imgs.recent || '');
+  })();
+
+  // ── Change detection (persists across renders via window globals) ──────────
+  const _prev        = window._statCardPrevValues  || {};
+  const _changeTimes = window._statCardChangeTimes || {};
+  const _now         = {};
+
+  // ── Derived stats for new cards ────────────────────────────────────────────
+  const _numTracks = parseInt(String(uniqueTracks).replace(/\D/g, '')) || 0;
+  const _numAlbums = parseInt(String(uniqueAlbums).replace(/\D/g, '')) || 0;
+  const repeatRate  = _numTracks > 0 ? (totalPlay / _numTracks).toFixed(1) : '—';
+  const albumRate   = uniqueArtistsRaw > 0 ? (_numAlbums / uniqueArtistsRaw).toFixed(2) : '—';
+  const weeklyEst   = Math.round(parseFloat(avgPerDay) * 7);
+  // Activity score: scrobbles per active-day ratio (how intense when active)
+  const actScore    = daysSince > 0 ? Math.round(totalPlay / Math.max(1, daysSince) * 10) / 10 : 0;
+
+  // ── Full card pool (>12 — algorithm picks the best 12) ────────────────────
+  const allCards = [
+    // ── CORE (alwaysShow → always in top 12) ──────────────────────────────
+    { id:'total',    icon:'🎯', value:totalPlay,             rawVal:totalPlay,
+      label:t('adv_total'),          sub:t('adv_total_sub'),
+      color:'#6366f1', milestoneType:'scrobbles', alwaysShow:true, relevance:100 },
+
+    { id:'avg',      icon:'⚡', value:avgPerDay,              rawVal:parseFloat(avgPerDay),
+      label:t('adv_per_day'),        sub:t('adv_per_week', avgPerWeek),
+      color:'#8b5cf6', noAnim:true,
+      relevance: parseFloat(avgPerDay) >= 1 ? 82 : 45 },
+
+    { id:'peak',     icon:'🕐', value:peakData.label,        rawVal:0,
+      label:t('stat_peak_hour'),     sub:peakData.mood,
+      color:'#a78bfa', noAnim:true, action:'charts', relevance:68 },
+
+    { id:'artists',  icon:'🎤', value:formatNum(uniqueArtistsRaw), rawVal:uniqueArtistsRaw,
+      label:t('stat_artists'),       sub:t('stat_since_start'),
+      color:'#ec4899', noAnim:true, action:'top-artists', milestoneType:'artists',
+      alwaysShow:true, relevance:90 },
+
+    { id:'albums',   icon:'💿', value:uniqueAlbums,          rawVal:_numAlbums,
+      label:t('stat_albums'),        sub:t('stat_since_start'),
+      color:'#d946ef', noAnim:true, action:'top-albums', milestoneType:'albums',
+      relevance:78 },
+
+    { id:'diversity',icon:'📊', value:`${diversityPct}%`,    rawVal:parseFloat(diversityPct),
+      label:t('stat_diversity'),     sub:t('stat_diversity_sub'),
+      color:'#14b8a6', noAnim:true, action:'charts', milestoneType:'diversity',
+      relevance: parseFloat(diversityPct) > 3 ? 62 : 35 },
+
+    { id:'tracks',   icon:'🎼', value:uniqueTracks,          rawVal:_numTracks,
+      label:t('stat_tracks'),        sub:t('stat_since_start'),
+      color:'#f43f5e', noAnim:true, action:'top-tracks', milestoneType:'tracks',
+      relevance:75 },
+
+    { id:'last',     icon:'⏱️', value:lastScrobble,          rawVal:0,
+      label:t('stat_last_scrobble'), sub:u.name ? `last.fm/user/${u.name}` : '',
+      color:'#f97316', noAnim:true, action:'history',
+      isLive: lastScrobble === t('stat_now_playing'),
+      alwaysShow:true, relevance:95 },
+
+    { id:'days',     icon:'📆', value:formatNum(daysSince),  rawVal:daysSince,
+      label:t('adv_days'),           sub:t('adv_days_sub', formatDate(regTs)),
+      color:'#eab308', noAnim:true, milestoneType:'days',
+      alwaysShow:true, relevance:85 },
+
+    { id:'top1',     icon:'🌟', value:maxArtist ? maxArtist.name : '—', rawVal:maxArtist ? parseInt(maxArtist.playcount) : 0,
+      label:t('adv_top1_alltime'),   sub:t('adv_top1_pct', topPct),
+      color:'#22c55e', noAnim:true,
+      actionFn: maxArtist ? () => openArtistModal(maxArtist.name, maxArtist.url, parseInt(maxArtist.playcount)) : null,
+      alwaysShow:true, relevance:92 },
+
+    { id:'eddington',icon:'🔢', value:eddington,             rawVal:eddington,
+      label:t('adv_eddington'),      sub:t('adv_eddington_sub', eddington),
+      color:'#a855f7', noAnim:true, milestoneType:'eddington',
+      relevance: eddington > 5 ? 73 : 28 },
+
+    { id:'listen',   icon:'🎧', value:listenDisp,            rawVal:listenDays,
+      label:t('stat_listen_time'),   sub:listenSub,
+      color:'#06b6d4', noAnim:true,
+      alwaysShow:true, relevance:88 },
+
+    // ── EXTENDED pool (rotated by smart algorithm) ─────────────────────────
+    { id:'repeat',   icon:'🔁',
+      value: repeatRate !== '—' ? `${repeatRate}×` : '—',
+      rawVal: parseFloat(repeatRate) || 0,
+      label: 'Taux de répétition',   sub: 'Écoutes / titres uniques',
+      color:'#fb923c', noAnim:true, milestoneType:'repeatRate',
+      relevance: parseFloat(repeatRate) > 2 ? 58 : 30 },
+
+    { id:'albumrate',icon:'📀',
+      value: albumRate !== '—' ? `${albumRate}` : '—',
+      rawVal: parseFloat(albumRate) || 0,
+      label: 'Albums / artiste',     sub: 'Profondeur d\'exploration',
+      color:'#84cc16', noAnim:true, milestoneType:'albumRate',
+      relevance: parseFloat(albumRate) > 0.5 ? 52 : 20 },
+
+    { id:'weekly',   icon:'📅',
+      value: weeklyEst > 0 ? formatNum(weeklyEst) : '—',
+      rawVal: weeklyEst,
+      label: 'Scrobbles / semaine',  sub: `≈ ${avgPerDay} par jour`,
+      color:'#0ea5e9', noAnim:true,
+      relevance: weeklyEst > 0 ? 55 : 15 },
+
+    { id:'topplay',  icon:'🏆',
+      value: maxArtist ? formatNum(parseInt(maxArtist.playcount)) : '—',
+      rawVal: maxArtist ? parseInt(maxArtist.playcount) : 0,
+      label: 'Plays – artiste n°1',  sub: maxArtist ? maxArtist.name : '',
+      color:'#f59e0b', noAnim:true, milestoneType:'scrobbles',
+      actionFn: maxArtist ? () => openArtistModal(maxArtist.name, maxArtist.url, parseInt(maxArtist.playcount)) : null,
+      relevance: maxArtist ? 60 : 10 },
+
+    { id:'intensity',icon:'🔥',
+      value: actScore > 0 ? `${actScore}` : '—',
+      rawVal: actScore,
+      label: 'Intensité moyenne',    sub: 'Écoutes/jour (tous temps)',
+      color:'#ef4444', noAnim:true,
+      relevance: actScore > 5 ? 50 : 25 },
+
+    { id:'regdays',  icon:'🗓️',
+      value: daysSince > 0 ? `${formatNum(daysSince)} j` : '—',
+      rawVal: daysSince,
+      label: 'Ancienneté compte',    sub: formatDate(regTs) ? `Inscrit le ${formatDate(regTs)}` : '',
+      color:'#64748b', noAnim:true, milestoneType:'days',
+      relevance: daysSince > 365 ? 48 : 38 },
   ];
 
+  // ── Smart selection: always 12 shown ─────────────────────────────────────
+  const selected = _selectStatCards(allCards, 12);
+
+  // ── Build change map & update timestamps ──────────────────────────────────
+  const changedIds = new Set();
+  selected.forEach(c => {
+    _now[c.id] = String(c.value);
+    if (_prev[c.id] !== undefined && _prev[c.id] !== _now[c.id]) {
+      changedIds.add(c.id);
+      _changeTimes[c.id] = Date.now();
+    }
+  });
+  window._statCardPrevValues  = { ..._prev, ..._now };
+  window._statCardChangeTimes = _changeTimes;
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  const milestonesOn = localStorage.getItem('ls_statcards_milestones') !== 'false';
   const statGrid = document.getElementById('stat-grid');
   if (statGrid) {
-    statGrid.innerHTML = cards.map((c, i) => `
-      <div class="stat-card" style="--card-accent:${c.color};animation-delay:${i * 0.05}s">
+    const wasEmpty = !statGrid.querySelector('.stat-card');
+    statGrid.innerHTML = selected.map((c, i) => {
+      const ms = (c.milestoneType && milestonesOn) ? _getMilestoneInfo(c.milestoneType, c.rawVal) : null;
+      const isChanged = changedIds.has(c.id);
+      const isLive    = c.isLive;
+      const msLabel   = ms?.nextM
+        ? `→ ${_fmtMs(ms.nextM)}`
+        : ms?.prevM ? `✓ ${_fmtMs(ms.prevM)} atteint` : '';
+
+      return `
+      <div class="stat-card${c.action || c.actionFn ? ' stat-card--action' : ''}${isChanged ? ' stat-card--recently-changed' : ''}${wasEmpty ? '' : ' stat-card--swap-in'}"
+           data-card-id="${c.id}" style="--card-accent:${c.color};animation-delay:${i * 0.05}s">
+        ${isLive ? '<span class="stat-card-live" aria-label="En direct"></span>' : ''}
+        ${ms?.justReached ? `<span class="stat-card-milestone-badge">🏆 ${_fmtMs(ms.prevM)}</span>` : ''}
+        <div class="stat-card-deco" aria-hidden="true">${c.icon}</div>
         <div class="stat-card-icon">${c.icon}</div>
-        <div class="stat-card-value" id="sv-${i}" style="color:${c.color}">${c.noAnim ? c.value : '0'}</div>
+        <div class="stat-card-value${isChanged ? ' stat-card-value--changed' : ''}" id="sv-${c.id}" style="color:${c.color}">${c.noAnim ? c.value : '0'}</div>
         <div class="stat-card-label">${c.label}</div>
         <div class="stat-card-sub">${c.sub}</div>
-      </div>`).join('');
+        ${ms ? `
+        <div class="stat-card-milestone-label">${msLabel}</div>
+        <div class="stat-card-milestone" aria-hidden="true">
+          <div class="stat-card-milestone-fill" style="width:0%" data-target="${ms.pct}"></div>
+        </div>` : ''}
+      </div>`;
+    }).join('');
 
-    const scEl = document.getElementById('sv-0');
-    if (scEl) animateValue(scEl, 0, totalPlay, 1000);
+    // Animate total scrobbles counter
+    const scEl = document.getElementById('sv-total');
+    if (scEl && !changedIds.has('total')) animateValue(scEl, 0, totalPlay, 1000);
+    if (scEl && changedIds.has('total'))  animateValue(scEl, parseInt(_prev['total'] || 0), totalPlay, 600);
+
+    // Animate milestone bars (deferred so CSS transition fires)
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      statGrid.querySelectorAll('.stat-card-milestone-fill[data-target]').forEach(el => {
+        el.style.width = el.dataset.target + '%';
+      });
+    }));
+
+    // ── Ripple + action handlers ──────────────────────────────────────────
+    statGrid.querySelectorAll('.stat-card').forEach(card => {
+      const id = card.dataset.cardId;
+      const c  = selected.find(x => x.id === id);
+      if (!c) return;
+
+      card.addEventListener('click', e => {
+        const rect   = card.getBoundingClientRect();
+        const size   = Math.max(rect.width, rect.height);
+        const ripple = document.createElement('div');
+        ripple.className = 'stat-card-ripple';
+        ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px`;
+        card.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 650);
+        if (c.actionFn) c.actionFn();
+        else if (c.action) nav(c.action);
+      });
+    });
+
+    // Show hidden card count hint
+    const hiddenCount = allCards.length - 12;
+    let moreEl = document.getElementById('stat-grid-more');
+    if (!moreEl && hiddenCount > 0) {
+      moreEl = document.createElement('p');
+      moreEl.id = 'stat-grid-more';
+      statGrid.after(moreEl);
+    }
+    if (moreEl) moreEl.textContent = hiddenCount > 0
+      ? `+ ${hiddenCount} stats masquées · affichage adaptatif activé` : '';
   }
 
   loadDashMonthlyChart(currentYear);
