@@ -5309,8 +5309,16 @@ async function openItemModal(type, name, artist, userPlaycount, itemUrl, knownIm
       const mbRowsEl = document.getElementById('im-mb-rows');
       if (mbRowsEl && rows.length) {
         show('im-mb-section', true);
-        mbRowsEl.innerHTML = rows.map(r => `
-          <div class="sdp-mb-row"><span class="sdp-mb-lbl">${r.l}</span><span class="sdp-mb-val">${escHtml(r.v)}</span></div>`).join('');
+        mbRowsEl.innerHTML = `<table class="mb-table">` +
+          rows.map(r => {
+            // Genres : badges colorés
+            if (r.l === 'Genres') {
+              const badges = r.v.split(',').map(g => `<span class="mb-genre-badge">${escHtml(g.trim())}</span>`).join('');
+              return `<tr><td class="mb-td-lbl">${r.l}</td><td class="mb-td-val mb-td-genres">${badges}</td></tr>`;
+            }
+            return `<tr><td class="mb-td-lbl">${r.l}</td><td class="mb-td-val">${escHtml(r.v)}</td></tr>`;
+          }).join('') +
+          `</table>`;
       }
       if (mbData.mbid) {
         const mbLink = document.getElementById('im-mb-link');
