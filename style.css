@@ -668,7 +668,7 @@ canvas { max-width: 100%; }
   border-right: 1px solid var(--border);
   display: flex; flex-direction: column;
   position: fixed; top: 0; left: 0; bottom: 0;
-  z-index: 200; transition: transform .3s cubic-bezier(.4,0,.2,1);
+  z-index: 200; transition: width .28s cubic-bezier(.4,0,.2,1), transform .3s cubic-bezier(.4,0,.2,1);
   box-shadow: var(--shadow-md);
 }
 .sb-head {
@@ -806,7 +806,7 @@ canvas { max-width: 100%; }
 .icon-btn:active { transform: scale(.92); }
 
 /* Main Content Wrapper */
-.main-wrap { flex: 1; margin-left: var(--sb-width); display: flex; flex-direction: column; min-width: 0; }
+.main-wrap { flex: 1; margin-left: var(--sb-width); display: flex; flex-direction: column; min-width: 0; transition: margin-left .28s cubic-bezier(.4,0,.2,1); }
 .main-content {
   flex: 1; padding: 24px;
   overflow-x: hidden;
@@ -5525,6 +5525,14 @@ a:focus:not(:focus-visible) { outline: none; }
 .sidebar.sb-collapsed {
   width: var(--sb-mini-width);
   overflow: visible; /* tooltips peuvent déborder */
+}
+
+/* ── Main-wrap: ajuste automatiquement le margin quand la sidebar est réduite ──
+   Évite le gap noir sans dépendre du JS. Compatible avec autohide modes.    */
+@media (min-width: 1025px) {
+  #app:has(.sidebar.sb-collapsed:not(.sb--autohide-slim):not(.sb--autohide-full)) .main-wrap {
+    margin-left: var(--sb-mini-width);
+  }
 }
 
 /* Masquer les textes quand réduit */

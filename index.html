@@ -6,6 +6,21 @@
 <title>LastStats — Statistiques Last.fm</title>
 
 <script>if(!localStorage.getItem('ls_lang'))localStorage.setItem('ls_lang','fr');</script>
+<script>
+/* ── Sidebar state: apply --sb-width synchronously before first render ── */
+(function() {
+  var autohide  = localStorage.getItem('ls_sb_autohide') || 'off';
+  var collapsed = localStorage.getItem('ls_sb_collapsed') === '1';
+  var isMobile  = window.innerWidth <= 1024;
+  if (!isMobile) {
+    if (autohide === 'full') {
+      document.documentElement.style.setProperty('--sb-width', '0px');
+    } else if (autohide === 'slim' || (autohide === 'off' && collapsed)) {
+      document.documentElement.style.setProperty('--sb-width', '64px');
+    }
+  }
+})();
+</script>
 
 <meta name="application-name" content="LastStats">
 <meta name="description" content="Your Last.fm music stats, reinvented. Explore, analyze and share your listening history.">
@@ -1493,6 +1508,21 @@
                     <span>Caché</span>
                     <small>Invisible → survol</small>
                   </button>
+                </div>
+              </div>
+
+              <!-- Sidebar collapsed state (only shown when autohide = off) -->
+              <div class="stg-section" id="stg-sb-collapsed-section">
+                <h4 class="stg-section-title"><i class="fas fa-chevron-left"></i> État de la barre latérale</h4>
+                <div class="setting-row setting-row--highlight">
+                  <div>
+                    <strong>Barre réduite (mode icônes)</strong>
+                    <p class="hint" style="margin-top:4px">Mémorise si la barre est réduite ou étendue entre les sessions.</p>
+                  </div>
+                  <label class="stg-toggle">
+                    <input type="checkbox" id="chk-sb-collapsed" onchange="setSbCollapsed(this.checked)">
+                    <span class="stg-toggle-track"><span class="stg-toggle-thumb"></span></span>
+                  </label>
                 </div>
               </div>
 

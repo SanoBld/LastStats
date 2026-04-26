@@ -1351,6 +1351,11 @@ function _syncSbAutohideUI() {
   document.querySelectorAll('.sb-autohide-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.mode === mode)
   );
+  // Collapsed toggle: sync checkbox and show/hide section
+  const chk         = document.getElementById('chk-sb-collapsed');
+  const collSection = document.getElementById('stg-sb-collapsed-section');
+  if (chk) chk.checked = localStorage.getItem('ls_sb_collapsed') === '1';
+  if (collSection) collSection.style.display = mode === 'off' ? '' : 'none';
 }
 
 // ── Dashboard settings ──────────────────────────────────────────────────────
@@ -1425,15 +1430,16 @@ function toggleCardChip(el, id) {
 
   if (el.classList.contains('stg-card-chip--on')) {
     el.classList.remove('stg-card-chip--on');
+    el.querySelector('input').checked = false;
   } else {
     if (totalOn >= 12) {
       showToast('⚠️ Maximum 12 blocs. Désélectionnez-en un d\'abord.');
       return;
     }
     el.classList.add('stg-card-chip--on');
+    el.querySelector('input').checked = true;
   }
   _updateCardCountBadge();
-  _buildOrderList();
 }
 
 function _updateCardCountBadge() {
@@ -1823,6 +1829,7 @@ window.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('resize', _updateNavMode, { passive: true });
   _updateNavMode();
   _applySbAutohide();
+  _applySbCollapsedState();
   document.getElementById('sw-update-btn')?.addEventListener('click', forceSwUpdate);
 });
 
@@ -1873,30 +1880,36 @@ function closeSb() {
 }
 
 /* ── Sidebar collapse (icons-only mode, PC only) ── */
-function toggleSbCollapse() {
+/* ── Sidebar collapsed state (PC only, incompatible with autohide slim/full) ── */
+function setSbCollapsed(collapsed) {
+  if (window.innerWidth <= 1024) return;
   const sb   = document.getElementById('sidebar');
   const icon = document.getElementById('sb-collapse-icon');
   if (!sb) return;
-  const collapsed = sb.classList.toggle('sb-collapsed');
+  sb.classList.toggle('sb-collapsed', collapsed);
   localStorage.setItem('ls_sb_collapsed', collapsed ? '1' : '0');
-  if (icon) {
-    icon.className = collapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left';
-  }
-  // Update main-wrap margin via CSS var override
+  if (icon) icon.className = collapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left';
+  // CSS :has() handles the main-wrap margin automatically.
+  // Keep --sb-width in sync for other consumers (e.g. search bar padding).
   document.documentElement.style.setProperty(
     '--sb-width', collapsed ? 'var(--sb-mini-width)' : '260px'
   );
+  const chk = document.getElementById('chk-sb-collapsed');
+  if (chk) chk.checked = collapsed;
+}
+
+function toggleSbCollapse() {
+  const sb = document.getElementById('sidebar');
+  if (!sb) return;
+  setSbCollapsed(!sb.classList.contains('sb-collapsed'));
 }
 
 function _applySbCollapsedState() {
-  if (window.innerWidth <= 1024) return; // mobile/tablet: no collapse
+  if (window.innerWidth <= 1024) return;
+  const autohide = localStorage.getItem('ls_sb_autohide') || 'off';
+  if (autohide !== 'off') return; // autohide modes manage their own width
   const collapsed = localStorage.getItem('ls_sb_collapsed') === '1';
-  if (!collapsed) return;
-  const sb   = document.getElementById('sidebar');
-  const icon = document.getElementById('sb-collapse-icon');
-  if (sb)   sb.classList.add('sb-collapsed');
-  if (icon) icon.className = 'fas fa-chevron-right';
-  document.documentElement.style.setProperty('--sb-width', 'var(--sb-mini-width)');
+  setSbCollapsed(collapsed);
 }
 
 /* ── Sidebar auto-hide ──────────────────────────────────────────────────── */
@@ -1913,7 +1926,6 @@ function _applySbAutohide() {
   if (mode === 'off') {
     if (wrap) wrap.style.marginLeft = '';
     document.documentElement.style.removeProperty('--sb-width');
-    _applySbAutohide();
     return;
   }
 
@@ -1945,9 +1957,26 @@ function setSbAutohide(mode) {
   document.querySelectorAll('.sb-autohide-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.mode === mode)
   );
-  // If autohide is on, disable the manual collapse button
   const collBtn = document.getElementById('sb-collapse-btn');
   if (collBtn) collBtn.style.display = (mode !== 'off') ? 'none' : '';
+
+  // Compatibility: autohide slim/full are incompatible with manual collapse
+  const sb = document.getElementById('sidebar');
+  if (sb) {
+    if (mode !== 'off') {
+      // Remove collapsed class — autohide manages width itself
+      sb.classList.remove('sb-collapsed');
+      document.documentElement.style.removeProperty('--sb-width');
+    } else {
+      // Restore collapsed state when coming back to 'off'
+      _applySbCollapsedState();
+    }
+  }
+
+  // Show/hide the collapsed toggle: only relevant in 'off' mode
+  const collSection = document.getElementById('stg-sb-collapsed-section');
+  if (collSection) collSection.style.display = mode === 'off' ? '' : 'none';
+
   _applySbAutohide();
   showToast(mode === 'off' ? '📌 Barre fixe' : mode === 'slim' ? '👁 Mode discret activé' : '✨ Mode caché activé');
 }
