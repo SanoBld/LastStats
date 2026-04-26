@@ -2276,14 +2276,19 @@ canvas#w-mini { height: 60px !important; }
   font-size: .75rem; font-weight: 600;
   padding: 5px 12px; border-radius: 99px;
   background: var(--bg-hover); color: var(--text);
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   white-space: nowrap;
 }
-.am-below-hero .am-stat--accent {
-  background: rgba(var(--accent-rgb, 99,102,241),.15);
-  border-color: rgba(var(--accent-rgb, 99,102,241),.35);
-  color: var(--accent);
+.am-below-hero .am-stat i {
+  font-size: .7rem; opacity: .7;
 }
+/* Stat accent : fond accent visible + texte blanc/clair */
+.am-below-hero .am-stat--accent {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.am-below-hero .am-stat--accent i { opacity: .9; }
 .am-below-hero .am-tags   { margin-bottom: 0; }
 .am-below-hero .am-ext-links { flex-wrap: wrap; gap: 6px; }
 

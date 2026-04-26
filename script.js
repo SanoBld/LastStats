@@ -5535,9 +5535,15 @@ async function openArtistModal(artistName, artistUrl, userPlaycount) {
           const mbSec  = document.getElementById('am-mb-section');
           const mbRowsEl = document.getElementById('am-mb-rows');
           if (mbSec && mbRowsEl) {
-            mbRowsEl.innerHTML = rows.map(r =>
-              `<div class="sdp-mb-row"><span class="sdp-mb-lbl">${r.lbl}</span><span class="sdp-mb-val">${escHtml(r.val)}</span></div>`
-            ).join('');
+            mbRowsEl.innerHTML = `<table class="mb-table">` +
+              rows.map(r => {
+                if (r.lbl === 'Genres') {
+                  const badges = r.val.split(',').map(g => `<span class="mb-genre-badge">${escHtml(g.trim())}</span>`).join('');
+                  return `<tr><td class="mb-td-lbl">${r.lbl}</td><td class="mb-td-val mb-td-genres">${badges}</td></tr>`;
+                }
+                return `<tr><td class="mb-td-lbl">${r.lbl}</td><td class="mb-td-val">${escHtml(r.val)}</td></tr>`;
+              }).join('') +
+              `</table>`;
             mbSec.style.display = '';
           }
         }
