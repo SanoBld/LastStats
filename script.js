@@ -402,6 +402,12 @@ const sleep     = ms => new Promise(r => setTimeout(r, ms));
 const escHtml   = str => String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const formatNum = n   => (n === null || n === undefined || n === '') ? '—' : Number(n).toLocaleString();
 const isDefaultImg = url => !url || url.includes(DEFAULT_IMG) || url.length < 10;
+/** Upscale any Last.fm CDN image to the highest available resolution (770x0) */
+const lfmUpscale = url => {
+  if (!url) return url;
+  // Replace any size segment like /300x300/ or /64s/ or /174s/ etc.
+  return url.replace(/\/i\/u\/[^/]+\//, '/i/u/770x0/');
+};
 
 function formatDate(unixTs) {
   if (!unixTs) return '—';
@@ -886,7 +892,7 @@ const _colorThief = typeof ColorThief !== 'undefined' ? new ColorThief() : null;
 function _applyColorThiefFromUrl(imgUrl) {
   if (!_colorThief) return;
   const img = new Image(); img.crossOrigin = 'anonymous';
-  img.onload = () => _applyColorThiefFromEl(img); img.src = imgUrl;
+  img.onload = () => _applyColorThiefFromEl(img); img.src = lfmUpscale(imgUrl);
 }
 
 function _applyColorThiefFromEl(imgEl) {
@@ -1293,7 +1299,7 @@ async function _applyHeroBgImage(bgEl, imgUrl) {
       resolve();
     };
     img.onerror = () => resolve();
-    img.src = imgUrl;
+    img.src = lfmUpscale(imgUrl);
   });
 }
 
@@ -1709,7 +1715,7 @@ function setupProfileUI() {
   if (sbAv) {
     if (imgUrl && !isDefaultImg(imgUrl)) {
       const fallbackHTML = `<div style="width:100%;height:100%;background:${grad};display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:1.1rem">${letter}</div>`;
-      sbAv.innerHTML = `<img src="${imgUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover" onerror="this.outerHTML=${JSON.stringify(fallbackHTML)}">`;
+      sbAv.innerHTML = `<img src="${lfmUpscale(imgUrl)}" alt="Avatar" style="width:100%;height:100%;object-fit:cover" onerror="this.outerHTML=${JSON.stringify(fallbackHTML)}">`;
     } else {
       sbAv.innerHTML = `<div style="width:100%;height:100%;background:${grad};display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:1.1rem">${letter}</div>`;
     }
@@ -1841,7 +1847,7 @@ function _renderProfileHero(username, ui) {
   const avEl = document.getElementById('profile-av');
   if (avEl) {
     if (imgUrl && !isDefaultImg(imgUrl)) {
-      avEl.innerHTML = `<img src="${imgUrl}" alt="${escHtml(username)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+      avEl.innerHTML = `<img src="${lfmUpscale(imgUrl)}" alt="${escHtml(username)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
     } else {
       avEl.innerHTML = `<div style="width:100%;height:100%;background:${grad};display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:2.2rem">${letter}</div>`;
     }
@@ -2303,7 +2309,7 @@ async function pollNowPlaying() {
       const img   = last.image?.find(i => i.size === 'medium')?.['#text'];
       if (artEl) {
         artEl.innerHTML = (img && !isDefaultImg(img))
-          ? `<img src="${img}" alt="" style="width:100%;height:100%;object-fit:cover">`
+          ? `<img src="${lfmUpscale(img)}" alt="" style="width:100%;height:100%;object-fit:cover">`
           : '';
         if (img && APP.currentAccent === 'dynamic') _applyColorThiefFromUrl(img);
       }
@@ -3189,7 +3195,7 @@ function _buildAlbumCard(a, rank) {
   const gridHtml = `
     <div class="hero-card" style="animation-delay:${delay}s" onclick="openItemFromRegistry(${_imAlbumIdx})">
       <div class="hc-fallback" style="background:${bg}${hasImg ? ';display:none' : ''}">${letter}</div>
-      ${hasImg ? `<img class="hc-img img-fade" src="${imgUrl}" alt="${escHtml(a.name)}" loading="lazy" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.previousElementSibling.style.display='flex'">` : ''}
+      ${hasImg ? `<img class="hc-img img-fade" src="${lfmUpscale(imgUrl)}" alt="${escHtml(a.name)}" loading="lazy" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.previousElementSibling.style.display='flex'">` : ''}
       <div class="hc-overlay"></div>
       <div class="hc-rank">${rank}</div>
       <div class="hc-body">
@@ -3206,7 +3212,7 @@ function _buildAlbumCard(a, rank) {
   const listHtml = `
     <div class="music-card" style="animation-delay:${delay}s" onclick="openItemFromRegistry(${_imAlbumIdx})">
       <div class="music-card-img">
-        ${hasImg ? `<img src="${imgUrl}" alt="${escHtml(a.name)}" loading="lazy" class="img-fade" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
+        ${hasImg ? `<img src="${lfmUpscale(imgUrl)}" alt="${escHtml(a.name)}" loading="lazy" class="img-fade" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
         <div class="spotify-cover" style="background:${bg};display:${hasImg ? 'none' : 'flex'}">
           <span class="sc-letter">${letter}</span>
         </div>
@@ -3226,7 +3232,7 @@ function _buildAlbumCard(a, rank) {
   const compactHtml = `
     <div class="track-item" style="animation-delay:${delay}s" onclick="openItemFromRegistry(${_imAlbumIdx})">
       <div class="track-cover" style="flex-shrink:0;width:40px;height:40px;border-radius:6px;overflow:hidden;position:relative">
-        ${hasImg ? `<img src="${imgUrl}" alt="${escHtml(a.name)}" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.style.display='none'">` : ''}
+        ${hasImg ? `<img src="${lfmUpscale(imgUrl)}" alt="${escHtml(a.name)}" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.style.display='none'">` : ''}
         <div style="position:absolute;inset:0;background:${bg};display:${hasImg ? 'none' : 'flex'};align-items:center;justify-content:center;color:white;font-weight:700">${letter}</div>
       </div>
       <div class="track-rank">${rank <= 3 ? ['🥇','🥈','🥉'][rank-1] : rank}</div>
@@ -3339,7 +3345,7 @@ function _buildTrackItem(track, rank, maxPlay) {
     return `
     <div class="hero-card" style="animation-delay:${delay}s" onclick="openItemFromRegistry(${_imTrackIdx})">
       <div class="hc-fallback" style="background:${coverBg}${hasCover ? ';display:none' : ''}">${coverLtr}</div>
-      <img class="hc-img img-fade" id="${coverElId}-img" ${hasCover ? `src="${imgUrl}"` : 'src=""'} alt="${escHtml(track.name)}" loading="lazy"
+      <img class="hc-img img-fade" id="${coverElId}-img" ${hasCover ? `src="${lfmUpscale(imgUrl)}"` : 'src=""'} alt="${escHtml(track.name)}" loading="lazy"
            style="${hasCover ? '' : 'display:none'}"
            onload="this.classList.add('img-loaded');this.previousElementSibling.style.display='none';"
            onerror="this.style.display='none';this.previousElementSibling.style.removeProperty('display');">
@@ -3362,7 +3368,7 @@ function _buildTrackItem(track, rank, maxPlay) {
     <div class="track-item" style="animation-delay:${delay}s"
          onclick="openItemFromRegistry(${_imTrackIdx})">
       <div class="track-cover" id="${coverElId}">
-        ${hasCover ? `<img src="${imgUrl}" alt="${escHtml(track.name)}" loading="lazy" class="img-fade" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
+        ${hasCover ? `<img src="${lfmUpscale(imgUrl)}" alt="${escHtml(track.name)}" loading="lazy" class="img-fade" onload="this.classList.add('img-loaded')" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
         <div style="width:100%;height:100%;background:${coverBg};display:${hasCover ? 'none' : 'flex'};align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:white">${coverLtr}</div>
       </div>
       <div class="track-rank">${medal}</div>
@@ -3491,7 +3497,7 @@ function _injectHeroImg(imgEl, imgUrl) {
 function _injectTrackCoverImg(coverEl, imgUrl) {
   if (!coverEl || !imgUrl || coverEl.querySelector('img[src]')) return;
   const img     = document.createElement('img');
-  img.src       = imgUrl; img.alt = ''; img.loading = 'lazy';
+  img.src       = lfmUpscale(imgUrl); img.alt = ''; img.loading = 'lazy';
   img.className = 'img-fade';
   img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:inherit;position:absolute;inset:0';
   img.onerror   = () => img.remove();
@@ -3977,7 +3983,7 @@ function _fillWrappedPod(prefix, name, playcount, imgUrl, fallbackSeed) {
     imgEl.style.background = nameToGradient(seed);
     if (imgUrl && !isDefaultImg(imgUrl)) {
       const img = document.createElement('img');
-      img.src   = imgUrl; img.alt = escHtml(name);
+      img.src   = lfmUpscale(imgUrl); img.alt = escHtml(name);
       img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
       img.onerror = () => img.remove();
       imgEl.innerHTML = '';
@@ -4031,7 +4037,7 @@ async function generateStory(type) {
       if (artImgEl) {
         artImgEl.style.background = nameToGradient(art0.name);
         if (artImgUrl) {
-          const img = document.createElement('img'); img.src = artImgUrl;
+          const img = document.createElement('img'); img.src = lfmUpscale(artImgUrl);
           img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
           img.onerror = () => img.remove();
           artImgEl.innerHTML = ''; artImgEl.appendChild(img);
@@ -4052,7 +4058,7 @@ async function generateStory(type) {
       if (fullArtImg) {
         fullArtImg.style.background = nameToGradient(art0.name);
         if (artImgUrl) {
-          const img = document.createElement('img'); img.src = artImgUrl;
+          const img = document.createElement('img'); img.src = lfmUpscale(artImgUrl);
           img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
           img.onerror = () => img.remove();
           fullArtImg.innerHTML = ''; fullArtImg.appendChild(img);
@@ -4074,7 +4080,7 @@ async function generateStory(type) {
           albImgEl.style.background = nameToGradient(alb0.name);
           const albImgUrl = alb0.image?.find(i => i.size === 'medium')?.['#text'];
           if (albImgUrl && !isDefaultImg(albImgUrl)) {
-            const img = document.createElement('img'); img.src = albImgUrl;
+            const img = document.createElement('img'); img.src = lfmUpscale(albImgUrl);
             img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
             img.onerror = () => img.remove();
             albImgEl.innerHTML = ''; albImgEl.appendChild(img);
@@ -4154,7 +4160,7 @@ async function exportSectionCard(section) {
     img.crossOrigin = 'anonymous';
     img.onload  = () => res(img);
     img.onerror = () => res(null);
-    img.src     = url + (url.includes('?') ? '&' : '?') + '_nc=' + Date.now();
+    img.src     = lfmUpscale(url + (url.includes('?') ? '&' : '?') + '_nc=' + Date.now());
   });
 
   const imgUrls = items.map(item =>
@@ -5251,7 +5257,7 @@ async function openItemModal(type, name, artist, userPlaycount, itemUrl, knownIm
             return `<div class="sim-card" data-simidx="${si}" onclick="openItemFromRegistry(${regIdx})">
               <div class="sim-card-img" id="simimg-${si}">
                 ${hasImg
-                  ? `<img src="${escHtml(sImg)}" alt="" loading="lazy" style="display:block"
+                  ? `<img src="${escHtml(lfmUpscale(sImg))}" alt="" loading="lazy" style="display:block"
                        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
                      <div class="sim-card-placeholder" style="display:none"><i class="fas fa-music"></i></div>`
                   : `<div class="sim-card-placeholder"><i class="fas fa-music"></i></div>`}
@@ -5279,7 +5285,7 @@ async function openItemModal(type, name, artist, userPlaycount, itemUrl, knownIm
               if (img && !isDefaultImg(img)) {
                 const el = document.getElementById(`simimg-${si}`);
                 if (el) {
-                  el.innerHTML = `<img src="${img}" alt="" loading="lazy" style="display:block"
+                  el.innerHTML = `<img src="${lfmUpscale(img)}" alt="" loading="lazy" style="display:block"
                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
                     <div class="sim-card-placeholder" style="display:none"><i class="fas fa-music"></i></div>`;
                 }
@@ -5486,7 +5492,7 @@ async function openArtistModal(artistName, artistUrl, userPlaycount) {
         const regIdx = window._imRegistry.push({ type:'album', name:albName, sub:artistName, plays:0, url:(alb.url||''), img:aImg }) - 1;
         return `<div class="music-card mini" onclick="closeArtistModal();openItemFromRegistry(${regIdx})">
           <div class="music-card-img" style="height:100px;aspect-ratio:1">
-            ${hasA ? `<img src="${aImg}" alt="${escHtml(albName)}" loading="lazy" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
+            ${hasA ? `<img src="${lfmUpscale(aImg)}" alt="${escHtml(albName)}" loading="lazy" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
             <div class="spotify-cover" style="background:${nameToGradient(albName)};display:${hasA?'none':'flex'}">
               <span class="sc-letter">${escHtml(albName[0].toUpperCase())}</span>
             </div>
@@ -6771,7 +6777,7 @@ async function openSearchDetail(rawData) {
     if (rows.length || mb.mbid) {
       mbEl.innerHTML = `
         <div class="sdp-mb-hd">
-          <img src="https://musicbrainz.org/static/images/favicons/favicon-32x32.png" alt="MusicBrainz" class="sdp-mb-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" class="sdp-mb-logo" style="flex-shrink:0"><path fill="#BA5D2E" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 1.5a8.5 8.5 0 1 1 0 17 8.5 8.5 0 0 1 0-17zm-3.5 4v9h1.5V9.5l2 2.5 2-2.5V16.5H15.5v-9l-3.5 4.5-3.5-4.5z"/></svg>
           <strong>MusicBrainz</strong>
           ${mb.mbid ? `<a href="https://musicbrainz.org/${h.type}/${mb.mbid}" target="_blank" rel="noopener" class="sdp-mb-link"><i class="fas fa-external-link-alt"></i></a>` : ''}
         </div>
@@ -7792,7 +7798,7 @@ function _buildChip(f, isLive) {
     <button class="vs-chip${isLive ? ' vs-chip--live' : ''}" onclick="runComparison('${name.replace(/'/g,"\\'")}')">
       <span class="vs-chip-av">
         <span class="vs-chip-fallback" style="background:${grad}">${letter}</span>
-        ${imgUrl ? `<img src="${imgUrl}" alt="${name}" class="vs-chip-img" onerror="this.remove()">` : ''}
+        ${imgUrl ? `<img src="${lfmUpscale(imgUrl)}" alt="${name}" class="vs-chip-img" onerror="this.remove()">` : ''}
         ${isLive ? '<span class="vs-chip-live-dot" title="Écoute en cours"></span>' : ''}
       </span>
       <span class="vs-chip-name">${name}</span>
@@ -8136,7 +8142,7 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
   const _av = (img, grad, letter, cls = '') =>
     `<div class="vs-av${cls}">
        <span class="vs-av-fallback" style="background:${grad}">${letter}</span>
-       ${img ? `<img src="${img}" alt="avatar" class="vs-av-img" onerror="this.remove()">` : ''}
+       ${img ? `<img src="${lfmUpscale(img)}" alt="avatar" class="vs-av-img" onerror="this.remove()">` : ''}
      </div>`;
 
   const scoreColor = score >= 70 ? 'var(--score-high)' : score >= 40 ? 'var(--score-mid)' : 'var(--score-low)';

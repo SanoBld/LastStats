@@ -2249,14 +2249,29 @@ canvas#w-mini { height: 60px !important; }
   display: inline-flex; align-items: center; justify-content: center;
   font-size: .72rem; font-weight: 600; padding: 3px 10px;
   border-radius: var(--radius-pill);
-  background: rgba(255,255,255,.12); color: rgba(255,255,255,.9);
-  border: 1px solid rgba(255,255,255,.2);
+  /* Photo context (sur le hero) : fond blanc semi-transparent, texte blanc */
+  background: rgba(255,255,255,.18); color: rgba(255,255,255,.95);
+  border: 1px solid rgba(255,255,255,.28);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
   transition: transform  var(--dur-medium1) var(--ease-spring),
               box-shadow var(--dur-medium1) var(--ease-standard);
   animation: m3-spring-pop var(--dur-medium1) var(--ease-spring) both;
   text-align: center;
   white-space: nowrap;
+}
+/* Quand dans am-below-hero : adapté au thème (clair/sombre) */
+.am-below-hero .am-tag {
+  background: var(--bg-card, var(--bg-elevated));
+  color: var(--text);
+  border-color: var(--border);
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+  font-weight: 600;
+}
+.am-below-hero .am-tag:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.06) translateY(-1px);
 }
 .am-tag:hover  { transform: scale(1.08) translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,.3); }
 .am-tag:active { transform: scale(.95); transition-duration: .07s; }
@@ -2310,6 +2325,23 @@ canvas#w-mini { height: 60px !important; }
 .am-lastfm:hover  { background: rgba(197,33,42,.55); border-color: #e8454d; }
 .am-spotify:hover { background: rgba(29,185,84,.45);  border-color: #1db954; }
 .am-youtube:hover { background: rgba(255,0,0,.40);    border-color: #f55;   }
+
+/* Boutons dans am-below-hero : style thème clair/sombre */
+.am-below-hero .am-ext-btn {
+  background: var(--bg-card, var(--bg-elevated));
+  color: var(--text);
+  border-color: var(--border);
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+.am-below-hero .am-ext-btn:hover { color: var(--text); }
+.am-below-hero .am-lastfm  { color: #d51007; border-color: rgba(213,16,7,.3);  background: rgba(213,16,7,.08);  }
+.am-below-hero .am-spotify { color: #1db954; border-color: rgba(29,185,84,.3); background: rgba(29,185,84,.08); }
+.am-below-hero .am-youtube { color: #ff0000; border-color: rgba(255,0,0,.3);   background: rgba(255,0,0,.08);   }
+.am-below-hero .im-mb-btn  { color: #ba5d2e; border-color: rgba(186,93,46,.3); background: rgba(186,93,46,.08); }
+.am-below-hero .am-lastfm:hover  { background: rgba(213,16,7,.18);  border-color: #d51007; color: #d51007; }
+.am-below-hero .am-spotify:hover { background: rgba(29,185,84,.18); border-color: #1db954; color: #1db954; }
+.am-below-hero .am-youtube:hover { background: rgba(255,0,0,.18);   border-color: #f00;    color: #f00; }
+.am-below-hero .im-mb-btn:hover  { background: rgba(186,93,46,.18); border-color: #ba5d2e; color: #ba5d2e; }
 
 .am-body {
   padding: 4px 20px 28px; /* pas de border-top — continuité avec le hero */
