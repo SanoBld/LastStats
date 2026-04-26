@@ -1343,30 +1343,38 @@ function switchSettingsTab(tabId) {
   document.querySelectorAll('.stg-tab-panel').forEach(p => p.classList.toggle('active', p.id === tabId));
   localStorage.setItem('ls_settings_tab', tabId);
   if (tabId === 'stg-dashboard') _initDashboardSettings();
+  if (tabId === 'stg-nav') _syncSbAutohideUI();
+}
+
+function _syncSbAutohideUI() {
+  const mode = localStorage.getItem('ls_sb_autohide') || 'off';
+  document.querySelectorAll('.sb-autohide-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.mode === mode)
+  );
 }
 
 // ── Dashboard settings ──────────────────────────────────────────────────────
 
 /** All card definitions (labels + icons) used in the settings picker */
 const _ALL_CARD_DEFS = [
-  { id:'total',     icon:'🎯', label:'Scrobbles total',         locked:true  },
-  { id:'avg',       icon:'⚡', label:'Scrobbles / jour',         locked:false },
-  { id:'peak',      icon:'🕐', label:'Heure de pointe',         locked:false },
-  { id:'artists',   icon:'🎤', label:'Artistes écoutés',         locked:true  },
-  { id:'albums',    icon:'💿', label:'Albums explorés',          locked:false },
-  { id:'diversity', icon:'📊', label:'Ratio de diversité',       locked:false },
-  { id:'tracks',    icon:'🎼', label:'Titres différents',        locked:false },
-  { id:'last',      icon:'⏱️', label:'Dernier scrobble',         locked:true  },
-  { id:'days',      icon:'📆', label:'Jours d\'activité',        locked:true  },
-  { id:'top1',      icon:'🌟', label:'Artiste n°1',              locked:true  },
-  { id:'eddington', icon:'🔢', label:'Nombre d\'Eddington',      locked:false },
-  { id:'listen',    icon:'🎧', label:'Temps d\'écoute estimé',   locked:true  },
-  { id:'repeat',    icon:'🔁', label:'Taux de répétition',       locked:false },
-  { id:'albumrate', icon:'📀', label:'Albums / artiste',         locked:false },
-  { id:'weekly',    icon:'📅', label:'Scrobbles / semaine',      locked:false },
-  { id:'topplay',   icon:'🏆', label:'Plays artiste n°1',        locked:false },
-  { id:'intensity', icon:'🔥', label:'Intensité moyenne',        locked:false },
-  { id:'regdays',   icon:'🗓️', label:'Ancienneté du compte',     locked:false },
+  { id:'total',     icon:'🎯', label:'Scrobbles total'         },
+  { id:'avg',       icon:'⚡', label:'Scrobbles / jour'         },
+  { id:'peak',      icon:'🕐', label:'Heure de pointe'         },
+  { id:'artists',   icon:'🎤', label:'Artistes écoutés'         },
+  { id:'albums',    icon:'💿', label:'Albums explorés'          },
+  { id:'diversity', icon:'📊', label:'Ratio de diversité'       },
+  { id:'tracks',    icon:'🎼', label:'Titres différents'        },
+  { id:'last',      icon:'⏱️', label:'Dernier scrobble'         },
+  { id:'days',      icon:'📆', label:'Jours d\'activité'        },
+  { id:'top1',      icon:'🌟', label:'Artiste n°1'              },
+  { id:'eddington', icon:'🔢', label:'Nombre d\'Eddington'      },
+  { id:'listen',    icon:'🎧', label:'Temps d\'écoute estimé'   },
+  { id:'repeat',    icon:'🔁', label:'Taux de répétition'       },
+  { id:'albumrate', icon:'📀', label:'Albums / artiste'         },
+  { id:'weekly',    icon:'📅', label:'Scrobbles / semaine'      },
+  { id:'topplay',   icon:'🏆', label:'Plays artiste n°1'        },
+  { id:'intensity', icon:'🔥', label:'Intensité moyenne'        },
+  { id:'regdays',   icon:'🗓️', label:'Ancienneté du compte'     },
 ];
 
 function _initDashboardSettings() {
@@ -1395,25 +1403,19 @@ function _buildCardPickerGrid() {
 
   let chosen = [];
   try { chosen = JSON.parse(localStorage.getItem('ls_statcards_manual') || '[]'); } catch {}
-  if (!chosen.length) chosen = _ALL_CARD_DEFS.filter(c => c.locked).map(c => c.id);
-
-  const lockedIds = _ALL_CARD_DEFS.filter(c => c.locked).map(c => c.id);
-  const selected  = new Set([...lockedIds, ...chosen].slice(0, 12));
+  const selected = new Set(chosen);
 
   grid.innerHTML = _ALL_CARD_DEFS.map(c => {
-    const isLocked  = c.locked;
-    const isChecked = selected.has(c.id) || isLocked;
-    return `
-    <label class="stg-card-chip${isLocked ? ' stg-card-chip--locked' : ''}${isChecked ? ' stg-card-chip--on' : ''}"
-           data-id="${c.id}" ${isLocked ? '' : `onclick="toggleCardChip(this,'${c.id}')"`}>
+    const isChecked = selected.has(c.id);
+    return `<div class="stg-card-chip${isChecked ? ' stg-card-chip--on' : ''}"
+         data-id="${c.id}" onclick="toggleCardChip(this,'${c.id}')">
       <span class="stg-card-chip-icon">${c.icon}</span>
       <span class="stg-card-chip-label">${c.label}</span>
-      ${isLocked ? '<i class="fas fa-lock stg-card-chip-lock"></i>' : ''}
-      <input type="checkbox" hidden ${isChecked ? 'checked' : ''} ${isLocked ? 'disabled' : ''}>
-    </label>`;
+    </div>`;
   }).join('');
 
   _updateCardCountBadge();
+  _buildOrderList();
 }
 
 function toggleCardChip(el, id) {
@@ -1436,20 +1438,22 @@ function toggleCardChip(el, id) {
 }
 
 function _updateCardCountBadge() {
-  const lockedCount = _ALL_CARD_DEFS.filter(c => c.locked).length;
-  const userCount   = document.querySelectorAll('.stg-card-chip--on:not(.stg-card-chip--locked)').length;
-  const total       = lockedCount + userCount;
-  const badge       = document.getElementById('stg-card-count-badge');
+  const total = document.querySelectorAll('.stg-card-chip--on').length;
+  const badge = document.getElementById('stg-card-count-badge');
   if (badge) {
     badge.textContent = `${total} / 12`;
-    badge.className   = 'stg-count-badge' + (total === 12 ? ' stg-count-badge--ok' : total > 12 ? ' stg-count-badge--over' : '');
+    badge.className   = 'stg-count-badge' + (total > 12 ? ' stg-count-badge--over' : total > 0 ? ' stg-count-badge--ok' : '');
   }
 }
 
 function applyManualCards() {
-  const lockedIds = _ALL_CARD_DEFS.filter(c => c.locked).map(c => c.id);
-  const userIds   = [...document.querySelectorAll('.stg-card-chip--on:not(.stg-card-chip--locked)')].map(e => e.dataset.id);
-  const all       = [...new Set([...lockedIds, ...userIds])].slice(0, 12);
+  // Use order from drag list; fallback to chips order
+  const orderItems = [...document.querySelectorAll('#stg-card-order-list .stg-order-item')];
+  let ordered = orderItems.map(el => el.dataset.id);
+  if (!ordered.length) {
+    ordered = [...document.querySelectorAll('.stg-card-chip--on')].map(el => el.dataset.id);
+  }
+  const all = [...new Set(ordered)].slice(0, 12);
   localStorage.setItem('ls_statcards_manual', JSON.stringify(all));
   showToast('✅ Blocs personnalisés appliqués !');
   if (APP.userInfo) loadDashboard();
@@ -1459,6 +1463,69 @@ function resetManualCards() {
   localStorage.removeItem('ls_statcards_manual');
   _buildCardPickerGrid();
   showToast('🔄 Sélection réinitialisée');
+}
+
+/* ── Order list (drag & drop) ──────────────────────────────────────────── */
+let _orderDragSrc = null; // global to avoid closure bugs
+
+function _buildOrderList() {
+  const wrap = document.getElementById('stg-card-order-list');
+  if (!wrap) return;
+
+  // Get currently selected chips
+  const onIds = [...document.querySelectorAll('#stg-card-picker-grid .stg-card-chip--on')].map(el => el.dataset.id);
+
+  // Preserve existing drag order; add newly selected; drop deselected
+  const existingOrder = [...wrap.querySelectorAll('.stg-order-item')].map(el => el.dataset.id);
+  const ordered = existingOrder.filter(id => onIds.includes(id));
+  onIds.forEach(id => { if (!ordered.includes(id)) ordered.push(id); });
+
+  if (!ordered.length) {
+    wrap.innerHTML = '<p class="stg-order-empty"><i class="fas fa-info-circle"></i> Aucun bloc sélectionné</p>';
+    return;
+  }
+
+  wrap.innerHTML = ordered.map((id, i) => {
+    const def = _ALL_CARD_DEFS.find(c => c.id === id);
+    if (!def) return '';
+    return `<div class="stg-order-item" data-id="${id}" draggable="true">
+      <span class="stg-order-handle"><i class="fas fa-grip-vertical"></i></span>
+      <span class="stg-order-icon">${def.icon}</span>
+      <span class="stg-order-label">${def.label}</span>
+      <span class="stg-order-num">${i + 1}</span>
+    </div>`;
+  }).join('');
+
+  _attachOrderDrag(wrap);
+}
+
+function _attachOrderDrag(wrap) {
+  wrap.querySelectorAll('.stg-order-item').forEach(item => {
+    item.addEventListener('dragstart', e => {
+      _orderDragSrc = item;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => item.classList.add('dragging'), 0);
+    });
+    item.addEventListener('dragend', () => {
+      _orderDragSrc = null;
+      wrap.querySelectorAll('.stg-order-item').forEach((el, idx) => {
+        el.classList.remove('dragging', 'drag-over');
+        el.querySelector('.stg-order-num').textContent = idx + 1;
+      });
+    });
+    item.addEventListener('dragover', e => {
+      e.preventDefault();
+      if (!_orderDragSrc || item === _orderDragSrc) return;
+      const rect = item.getBoundingClientRect();
+      const after = e.clientY > rect.top + rect.height / 2;
+      wrap.querySelectorAll('.stg-order-item').forEach(el => el.classList.remove('drag-over'));
+      item.classList.add('drag-over');
+      if (after) item.after(_orderDragSrc);
+      else wrap.insertBefore(_orderDragSrc, item);
+    });
+    item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
+    item.addEventListener('drop',      e => { e.preventDefault(); item.classList.remove('drag-over'); });
+  });
 }
 
 function setStatCardMode(mode) {
@@ -1756,7 +1823,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('resize', _updateNavMode, { passive: true });
   _updateNavMode();
-  _applySbCollapsedState();
+  _applySbAutohide();
   document.getElementById('sw-update-btn')?.addEventListener('click', forceSwUpdate);
 });
 
@@ -1831,6 +1898,59 @@ function _applySbCollapsedState() {
   if (sb)   sb.classList.add('sb-collapsed');
   if (icon) icon.className = 'fas fa-chevron-right';
   document.documentElement.style.setProperty('--sb-width', 'var(--sb-mini-width)');
+}
+
+/* ── Sidebar auto-hide ──────────────────────────────────────────────────── */
+function _applySbAutohide() {
+  const mode = localStorage.getItem('ls_sb_autohide') || 'off';
+  const sb   = document.getElementById('sidebar');
+  const wrap = document.querySelector('.main-wrap');
+  if (!sb) return;
+
+  // Remove previous state classes
+  sb.classList.remove('sb--autohide-slim', 'sb--autohide-full');
+  document.getElementById('sb-autohide-trigger')?.remove();
+
+  if (mode === 'off') {
+    if (wrap) wrap.style.marginLeft = '';
+    document.documentElement.style.removeProperty('--sb-width');
+    _applySbAutohide();
+    return;
+  }
+
+  if (mode === 'slim') {
+    sb.classList.add('sb--autohide-slim');
+    document.documentElement.style.setProperty('--sb-width', 'var(--sb-mini-width)');
+  } else if (mode === 'full') {
+    sb.classList.add('sb--autohide-full');
+    document.documentElement.style.setProperty('--sb-width', '0px');
+    // Trigger strip
+    const trigger = document.createElement('div');
+    trigger.id = 'sb-autohide-trigger';
+    document.body.appendChild(trigger);
+    trigger.addEventListener('mouseenter', () => sb.classList.add('sb-hover'));
+  }
+
+  let _sbLeaveTimer = null;
+  sb.addEventListener('mouseenter', () => {
+    clearTimeout(_sbLeaveTimer);
+    sb.classList.add('sb-hover');
+  });
+  sb.addEventListener('mouseleave', () => {
+    _sbLeaveTimer = setTimeout(() => sb.classList.remove('sb-hover'), 300);
+  });
+}
+
+function setSbAutohide(mode) {
+  localStorage.setItem('ls_sb_autohide', mode);
+  document.querySelectorAll('.sb-autohide-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.mode === mode)
+  );
+  // If autohide is on, disable the manual collapse button
+  const collBtn = document.getElementById('sb-collapse-btn');
+  if (collBtn) collBtn.style.display = (mode !== 'off') ? 'none' : '';
+  _applySbAutohide();
+  showToast(mode === 'off' ? '📌 Barre fixe' : mode === 'slim' ? '👁 Mode discret activé' : '✨ Mode caché activé');
 }
 
 function setupProfileUI() {
@@ -2616,17 +2736,8 @@ function _selectStatCards(allCards, maxCards = 12) {
   if (mode === 'manual') {
     let chosen = [];
     try { chosen = JSON.parse(localStorage.getItem('ls_statcards_manual') || '[]'); } catch {}
-    // Always include alwaysShow cards; merge with user selection up to maxCards
-    const alwaysIds = allCards.filter(c => c.alwaysShow).map(c => c.id);
-    const merged = [...new Set([...alwaysIds, ...chosen])].slice(0, maxCards);
-    // Fill up to maxCards if user list is short
-    if (merged.length < maxCards) {
-      for (const c of allCards) {
-        if (!merged.includes(c.id)) merged.push(c.id);
-        if (merged.length >= maxCards) break;
-      }
-    }
-    return merged.map(id => allCards.find(c => c.id === id)).filter(Boolean);
+    // Strict: show only what the user selected (0-12), in their chosen order
+    return chosen.slice(0, maxCards).map(id => allCards.find(c => c.id === id)).filter(Boolean);
   }
 
   // AUTO mode
@@ -2963,16 +3074,9 @@ async function loadDashboard() {
       });
     });
 
-    // Show hidden card count hint
-    const hiddenCount = allCards.length - 12;
-    let moreEl = document.getElementById('stat-grid-more');
-    if (!moreEl && hiddenCount > 0) {
-      moreEl = document.createElement('p');
-      moreEl.id = 'stat-grid-more';
-      statGrid.after(moreEl);
-    }
-    if (moreEl) moreEl.textContent = hiddenCount > 0
-      ? `+ ${hiddenCount} stats masquées · affichage adaptatif activé` : '';
+    // Remove any leftover "stat-grid-more" hint
+    const moreEl = document.getElementById('stat-grid-more');
+    if (moreEl) moreEl.remove();
   }
 
   loadDashMonthlyChart(currentYear);

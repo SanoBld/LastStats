@@ -6749,3 +6749,127 @@ a:focus:not(:focus-visible) { outline: none; }
   .sim-card-info { padding: 6px 8px 8px; }
   .sim-card-name { font-size: .72rem; }
 }
+
+/* ── Dashboard settings: Order list ─────────────────────────────────────── */
+.stg-order-section {
+  margin: 16px 0 12px;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+}
+.stg-order-title {
+  font-size: .78rem; font-weight: 700; color: var(--text);
+  margin: 0 0 10px; display: flex; align-items: center; gap: 7px;
+}
+.stg-order-title i { color: var(--accent); }
+.stg-card-order-list {
+  display: flex; flex-direction: column; gap: 5px;
+}
+.stg-order-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg-card-hi);
+  cursor: grab; user-select: none;
+  transition: background .15s, border-color .15s, opacity .15s;
+}
+.stg-order-item:hover { border-color: var(--border-glow); background: var(--bg-hover); }
+.stg-order-item.dragging { opacity: .4; cursor: grabbing; }
+.stg-order-item.drag-over { border-color: var(--accent); background: var(--accent-lt, rgba(99,102,241,.09)); }
+.stg-order-handle {
+  color: var(--text-muted); font-size: .75rem; flex-shrink: 0; cursor: grab;
+}
+.stg-order-icon  { font-size: .95rem; flex-shrink: 0; }
+.stg-order-label { font-size: .75rem; font-weight: 500; color: var(--text); flex: 1; }
+.stg-order-num   {
+  font-size: .68rem; font-weight: 700; color: var(--accent);
+  background: var(--accent-lt, rgba(99,102,241,.12));
+  padding: 2px 7px; border-radius: 20px; flex-shrink: 0;
+}
+.stg-order-empty {
+  font-size: .78rem; color: var(--text-muted);
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 4px;
+}
+
+/* ══════════════════════════════════════════════════════
+   SIDEBAR AUTO-HIDE MODES
+══════════════════════════════════════════════════════ */
+
+/* ── Trigger strip (full-hidden mode) ── */
+#sb-autohide-trigger {
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  width: 6px;
+  z-index: 201;
+  cursor: pointer;
+  /* subtle gradient hint */
+  background: linear-gradient(to right, rgba(var(--accent-rgb, 103, 80, 164), .18), transparent);
+  opacity: 0;
+  transition: opacity .3s;
+}
+#sb-autohide-trigger:hover { opacity: 1; }
+
+/* ── Slim mode: always shows icon strip, expands on hover ── */
+@media (min-width: 1025px) {
+  .sidebar.sb--autohide-slim {
+    width: var(--sb-mini-width);
+    overflow: hidden;
+    transition: width .28s var(--ease-standard);
+  }
+  .sidebar.sb--autohide-slim.sb-hover,
+  .sidebar.sb--autohide-slim:hover {
+    width: 260px;
+    overflow: visible;
+  }
+
+  /* Icon-only state (same rules as sb-collapsed) */
+  .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .sb-logo-text,
+  .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .sb-info,
+  .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .sb-profile-chevron,
+  .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .nav-lnk span:not(.nav-bdg),
+  .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .nav-sep,
+  .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .sb-foot,
+  .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .nav-bdg {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .sidebar.sb--autohide-slim .sb-logo-text,
+  .sidebar.sb--autohide-slim .sb-info,
+  .sidebar.sb--autohide-slim .sb-profile-chevron,
+  .sidebar.sb--autohide-slim .nav-lnk span:not(.nav-bdg),
+  .sidebar.sb--autohide-slim .nav-sep,
+  .sidebar.sb--autohide-slim .sb-foot,
+  .sidebar.sb--autohide-slim .nav-bdg {
+    transition: opacity .2s, width .2s;
+  }
+  .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .sb-head {
+    justify-content: center;
+  }
+  .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .sb-collapse-btn { display: none; }
+  .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .sb-profile {
+    justify-content: center; padding: 12px 0;
+  }
+  .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .nav-lnk {
+    justify-content: center; padding: 12px 0;
+  }
+
+  /* ── Full-hidden mode: sidebar floats as overlay ── */
+  .sidebar.sb--autohide-full {
+    position: fixed;
+    transform: translateX(calc(-100% - 2px));
+    transition: transform .3s var(--ease-standard),
+                box-shadow .3s;
+    z-index: 200;
+    height: 100%;
+    box-shadow: none;
+  }
+  .sidebar.sb--autohide-full.sb-hover {
+    transform: translateX(0);
+    box-shadow: 4px 0 32px rgba(0,0,0,.35);
+  }
+}
+
