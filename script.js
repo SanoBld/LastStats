@@ -4980,9 +4980,17 @@ async function openItemModal(type, name, artist, userPlaycount, itemUrl, knownIm
 
   // ── Reset UI ──
   setText('im-name', name);
-  setText('im-sub', artist || '');
+  // Artist name clickable
+  const subEl = document.getElementById('im-sub');
+  if (subEl) {
+    subEl.textContent = artist || '';
+    subEl.style.cursor = artist ? 'pointer' : '';
+    subEl.title = artist ? `Voir ${artist}` : '';
+    subEl.onclick = artist ? () => { closeItemModal(); openArtistModal(artist, '', 0); } : null;
+    subEl.classList.toggle('im-sub--clickable', !!artist);
+  }
   setText('im-type-badge', type === 'album' ? 'Album' : 'Titre');
-  setText('im-user-plays', userPlaycount ? formatNum(userPlaycount) + ' écoutes' : '—');
+  setText('im-user-plays', userPlaycount ? formatNum(userPlaycount) + ' fois' : '—');
   setText('im-globalplays', '—');
   setText('im-listeners', '—');
   setText('im-duration', '—');
@@ -5103,11 +5111,18 @@ async function openItemModal(type, name, artist, userPlaycount, itemUrl, knownIm
       const a = mainData?.album;
       setText('im-globalplays', formatNum(a?.playcount || 0));
       const upc = a?.userplaycount || 0;
-      if (upc) setText('im-user-plays', formatNum(upc) + ' écoutes');
+      if (upc) setText('im-user-plays', formatNum(upc) + ' fois');
+      // Make global plays & listeners clickable → Last.fm
+      const gpEl = document.getElementById('im-globalplays');
+      if (gpEl && a?.url) {
+        gpEl.parentElement.style.cursor = 'pointer';
+        gpEl.parentElement.title = 'Voir sur Last.fm';
+        gpEl.parentElement.onclick = () => window.open(a.url, '_blank', 'noopener');
+      }
       // Tags
       if (tagsEl) {
         const tags = (a?.tags?.tag || []).slice(0, 5);
-        tagsEl.innerHTML = tags.map(tg => `<span class="am-tag">${escHtml(tg.name)}</span>`).join('');
+        tagsEl.innerHTML = tags.map(tg => `<a class="am-tag am-tag--link" href="https://www.last.fm/tag/${encodeURIComponent(tg.name)}" target="_blank" rel="noopener">${escHtml(tg.name)}</a>`).join('');
       }
       // Bio
       const wiki = (a?.wiki?.summary || '').replace(/<a[^>]*>.*?<\/a>/gi, '').replace(/<[^>]+>/g, '').trim();
@@ -5157,11 +5172,25 @@ async function openItemModal(type, name, artist, userPlaycount, itemUrl, knownIm
       const dur = parseInt(tr?.duration);
       if (dur) setText('im-duration', Math.round(dur / 60) + ' min');
       const upc = tr?.userplaycount || 0;
-      if (upc) setText('im-user-plays', formatNum(upc) + ' écoutes');
+      if (upc) setText('im-user-plays', formatNum(upc) + ' fois');
+      // Make global plays & listeners clickable → Last.fm
+      const gpEl2 = document.getElementById('im-globalplays');
+      const liEl  = document.getElementById('im-listeners');
+      const lfmUrl = tr?.url || itemUrl;
+      if (gpEl2 && lfmUrl) {
+        gpEl2.parentElement.style.cursor = 'pointer';
+        gpEl2.parentElement.title = 'Voir sur Last.fm';
+        gpEl2.parentElement.onclick = () => window.open(lfmUrl, '_blank', 'noopener');
+      }
+      if (liEl && lfmUrl) {
+        liEl.parentElement.style.cursor = 'pointer';
+        liEl.parentElement.title = 'Voir sur Last.fm';
+        liEl.parentElement.onclick = () => window.open(lfmUrl, '_blank', 'noopener');
+      }
       // Tags
       if (tagsEl) {
         const tags = (tr?.toptags?.tag || []).slice(0, 5);
-        tagsEl.innerHTML = tags.map(tg => `<span class="am-tag">${escHtml(tg.name)}</span>`).join('');
+        tagsEl.innerHTML = tags.map(tg => `<a class="am-tag am-tag--link" href="https://www.last.fm/tag/${encodeURIComponent(tg.name)}" target="_blank" rel="noopener">${escHtml(tg.name)}</a>`).join('');
       }
       // Wiki
       const wiki = (tr?.wiki?.summary || '').replace(/<a[^>]*>.*?<\/a>/gi, '').replace(/<[^>]+>/g, '').trim();
@@ -5194,23 +5223,49 @@ async function openItemModal(type, name, artist, userPlaycount, itemUrl, knownIm
       if (relatedGridEl) {
         relatedGridEl.classList.remove('hidden');
         if (simArr.length) {
-          relatedGridEl.innerHTML = simArr.map(s => {
-            const sImg = s.image?.find(i => i.size === 'extralarge')?.['#text'] || '';
+          relatedGridEl.innerHTML = simArr.map((s, si) => {
+            const sImg   = s.image?.find(i => i.size === 'extralarge')?.['#text'] || s.image?.find(i => i.size === 'large')?.['#text'] || '';
             const hasImg = sImg && !isDefaultImg(sImg);
-            return `<div class="music-card mini"
-              onclick="closeItemModal();openItemModal('track',${JSON.stringify(s.name)},${JSON.stringify(s.artist?.name||artist)},0,'${(s.url||'').replace(/'/g,'%27')}','${hasImg ? escHtml(sImg) : ''}')">
-              <div class="music-card-img" style="height:80px;aspect-ratio:1">
-                ${hasImg ? `<img src="${escHtml(sImg)}" alt="${escHtml(s.name)}" loading="lazy" style="width:100%;height:100%;object-fit:cover">` : ''}
-                <div class="spotify-cover" style="background:${nameToGradient(s.name)};display:${hasImg?'none':'flex'}">
-                  <span class="sc-letter">${escHtml((s.name||'?')[0].toUpperCase())}</span>
-                </div>
+            const sArtist = s.artist?.name || artist;
+            if (!window._imRegistry) window._imRegistry = [];
+            const regIdx = window._imRegistry.push({ type:'track', name:s.name, sub:sArtist, plays:0, url:(s.url||''), img:sImg }) - 1;
+            return `<div class="sim-card" data-simidx="${si}" onclick="openItemFromRegistry(${regIdx})">
+              <div class="sim-card-img" id="simimg-${si}">
+                ${hasImg
+                  ? `<img src="${escHtml(sImg)}" alt="${escHtml(s.name)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\"sim-card-placeholder\"><i class=\"fas fa-music\"></i></div>'">`
+                  : `<div class="sim-card-placeholder"><i class="fas fa-music"></i></div>`}
               </div>
-              <div class="music-card-body">
-                <div class="music-card-name" title="${escHtml(s.name)}">${escHtml(s.name)}</div>
-                <div class="music-card-artist">${escHtml(s.artist?.name || '')}</div>
+              <div class="sim-card-info">
+                <div class="sim-card-name" title="${escHtml(s.name)}">${escHtml(s.name)}</div>
+                <div class="sim-card-artist">${escHtml(sArtist)}</div>
               </div>
             </div>`;
           }).join('');
+          // Async resolve missing images
+          simArr.forEach((s, si) => {
+            const sImg = s.image?.find(i => i.size === 'extralarge')?.['#text'] || '';
+            if (sImg && !isDefaultImg(sImg)) return;
+            const sArtist = s.artist?.name || artist;
+            (async () => {
+              let img = await _fetchAlbumImageWithMbid(s.name, sArtist).catch(()=>'') || '';
+              if (!img || isDefaultImg(img)) {
+                const d = await API.call('track.getInfo',{track:s.name,artist:sArtist,autocorrect:1}).catch(()=>null);
+                const arr = d?.track?.album?.image;
+                const u = arr?.find(x=>x.size==='extralarge')?.['#text'] || arr?.find(x=>x.size==='large')?.['#text'] || '';
+                if (u && !isDefaultImg(u)) img = u;
+              }
+              if (!img || isDefaultImg(img)) img = await _fetchTrackImageiTunes(s.name, sArtist).catch(()=>'') || '';
+              if (img && !isDefaultImg(img)) {
+                const el = document.getElementById(`simimg-${si}`);
+                if (el) el.innerHTML = `<img src="${img}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\"sim-card-placeholder\"><i class=\"fas fa-music\"></i></div>'">`;
+                // Update registry img too
+                if (window._imRegistry) {
+                  const entry = window._imRegistry.find(e=>e.type==='track'&&e.name===s.name&&e.sub===sArtist);
+                  if (entry) entry.img = img;
+                }
+              }
+            })();
+          });
         } else {
           relatedGridEl.innerHTML = '<p style="color:var(--text-muted);padding:10px">Aucun titre similaire.</p>';
         }
