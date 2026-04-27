@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_VERSION = 'v9';
+const CACHE_VERSION = 'v10';
 const CACHE_NAME    = `laststats-${CACHE_VERSION}`;
 const IMG_CACHE     = `laststats-img-${CACHE_VERSION}`;
 const IMG_MAX       = 100;
@@ -12,7 +12,13 @@ const ASSETS_TO_CACHE = [
   './script.js',
   './i18n.js',
   './manifest.json',
-  'https://cdn.jsdelivr.net/npm/chart.js',
+  // CDN assets — must match exactly the URLs loaded in index.html
+  'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.4.0/color-thief.umd.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css',
+  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap',
 ];
 
 self.addEventListener('install', event => {
@@ -84,6 +90,24 @@ async function _trimImgCache() {
 
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
+
+  // Google Fonts files — cache-first
+  if (url.hostname === 'fonts.gstatic.com' || url.hostname === 'fonts.googleapis.com') {
+    event.respondWith(
+      caches.open(CACHE_NAME).then(async cache => {
+        const cached = await cache.match(event.request);
+        if (cached) return cached;
+        try {
+          const response = await fetch(event.request);
+          if (response.ok) cache.put(event.request, response.clone());
+          return response;
+        } catch {
+          return new Response(null, { status: 503 });
+        }
+      })
+    );
+    return;
+  }
 
   // Last.fm API — always fresh, graceful offline fallback
   if (url.hostname === 'ws.audioscrobbler.com') {

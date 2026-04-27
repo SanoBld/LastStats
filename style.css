@@ -369,9 +369,8 @@ canvas { max-width: 100%; }
   ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
 
-/* Bottom nav + header stay stable (no animation) during page transitions */
-::view-transition-old(ls-bottom-nav), ::view-transition-new(ls-bottom-nav),
-::view-transition-old(ls-app-hd),    ::view-transition-new(ls-app-hd) {
+/* Bottom nav stays stable (no animation) during page transitions */
+::view-transition-old(ls-bottom-nav), ::view-transition-new(ls-bottom-nav) {
   animation: none;
   mix-blend-mode: normal;
 }
@@ -784,7 +783,6 @@ canvas { max-width: 100%; }
   background: var(--bg-header); border-bottom: 1px solid var(--border);
   position: sticky; top: 0; z-index: 50;
   box-shadow: var(--shadow-sm);
-  view-transition-name: ls-app-hd;
   backdrop-filter: blur(12px) saturate(1.2);
   -webkit-backdrop-filter: blur(12px) saturate(1.2);
   will-change: transform;
@@ -3198,8 +3196,22 @@ canvas#w-mini { height: 60px !important; }
 
 @media (max-width: 1024px) {
   /* Sidebar hidden by default, slides in when .open */
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
+  .sidebar {
+    transform: translateX(-100%);
+    /* visibility hidden AFTER the slide-out, instantly visible when opening
+       — prevents sidebar text from bleeding into view-transition snapshots */
+    visibility: hidden;
+    transition: width .28s cubic-bezier(.4,0,.2,1),
+                transform .3s cubic-bezier(.4,0,.2,1),
+                visibility 0s .31s;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+    visibility: visible;
+    transition: width .28s cubic-bezier(.4,0,.2,1),
+                transform .3s cubic-bezier(.4,0,.2,1),
+                visibility 0s 0s;
+  }
   .sidebar-ov.open { display: block; }
   .sb-close-btn { display: flex; }
 
@@ -6204,7 +6216,7 @@ a:focus:not(:focus-visible) { outline: none; }
   background: var(--bg-card);
   border: 1.5px solid var(--border);
   border-radius: 20px;
-  overflow: hidden;
+  overflow: clip; /* clips visually for border-radius but doesn't block child overflow-y scroll */
   box-shadow: var(--shadow-card);
 }
 
@@ -6313,7 +6325,6 @@ a:focus:not(:focus-visible) { outline: none; }
     gap: 4px;
     scrollbar-width: none;
   }
-  .stg-tab-btn span { display: none; }
   .stg-tab-btn { padding: 10px; justify-content: center; min-width: 40px; }
   .stg-tab-btn i { width: auto; margin: 0; font-size: .9rem; }
   .stg-section { padding: 16px; }
@@ -6825,6 +6836,9 @@ a:focus:not(:focus-visible) { outline: none; }
     width: var(--sb-mini-width);
     overflow: hidden;
     transition: width .28s var(--ease-standard);
+    /* slim sidebar must not cover the header */
+    top: var(--header-h, 56px);
+    height: calc(100% - var(--header-h, 56px));
   }
   .sidebar.sb--autohide-slim.sb-hover,
   .sidebar.sb--autohide-slim:hover {
@@ -6871,13 +6885,20 @@ a:focus:not(:focus-visible) { outline: none; }
     transform: translateX(calc(-100% - 2px));
     transition: transform .3s var(--ease-standard),
                 box-shadow .3s;
-    z-index: 200;
+    z-index: 199; /* stays below the sticky header (z-index 50 + isolation) */
     height: 100%;
     box-shadow: none;
+    /* start below header so it never overlaps the title area */
+    top: var(--header-h, 56px);
+    border-radius: 0 0 0 0;
   }
   .sidebar.sb--autohide-full.sb-hover {
     transform: translateX(0);
     box-shadow: 4px 0 32px rgba(0,0,0,.35);
+  }
+  /* Header stays above everything in autohide-full mode */
+  body.sb--autohide-full .app-hd {
+    z-index: 250;
   }
 }
 
