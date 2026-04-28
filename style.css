@@ -1125,8 +1125,36 @@ canvas { max-width: 100%; }
 .stg-mode-btn.active i    { color: var(--accent); }
 .stg-mode-btn.active span { color: var(--accent); }
 
-/* Toggle switch */
-.stg-toggle {
+/* ── Light theme: neutralise purple tints on settings mode buttons ─────── */
+[data-theme="light"] .stg-mode-btn,
+[data-theme="auto"] .stg-mode-btn {
+  border-color: rgba(0,0,0,0.14);
+  background: #f7f7f8;
+}
+[data-theme="light"] .stg-mode-btn:hover,
+[data-theme="auto"] .stg-mode-btn:hover {
+  border-color: rgba(0,0,0,0.26);
+  background: #efefef;
+}
+[data-theme="light"] .stg-mode-btn.active,
+[data-theme="auto"] .stg-mode-btn.active {
+  border-color: var(--accent);
+  background: #ededf0; /* neutral gray, no lavender */
+}
+[data-theme="light"] .stg-tabs-wrap,
+[data-theme="auto"] .stg-tabs-wrap {
+  border-color: rgba(0,0,0,0.12);
+}
+[data-theme="light"] .stg-tab-nav,
+[data-theme="auto"] .stg-tab-nav {
+  background: #f0f0f2;
+  border-right-color: rgba(0,0,0,0.10);
+}
+[data-theme="light"] .stg-tab-btn.active,
+[data-theme="auto"] .stg-tab-btn.active {
+  background: rgba(0,0,0,0.08);
+  color: var(--accent);
+}
   position: relative; display: inline-flex; align-items: center;
   cursor: pointer; flex-shrink: 0;
 }
@@ -6817,18 +6845,7 @@ a:focus:not(:focus-visible) { outline: none; }
 ══════════════════════════════════════════════════════ */
 
 /* ── Trigger strip (full-hidden mode) ── */
-#sb-autohide-trigger {
-  position: fixed;
-  left: 0; top: 0; bottom: 0;
-  width: 6px;
-  z-index: 201;
-  cursor: pointer;
-  /* subtle gradient hint */
-  background: linear-gradient(to right, rgba(var(--accent-rgb, 103, 80, 164), .18), transparent);
-  opacity: 0;
-  transition: opacity .3s;
-}
-#sb-autohide-trigger:hover { opacity: 1; }
+/* Autohide full mode removed — slim only */
 
 /* ── Slim mode: always shows icon strip, expands on hover ── */
 @media (min-width: 1025px) {
@@ -6836,69 +6853,36 @@ a:focus:not(:focus-visible) { outline: none; }
     width: var(--sb-mini-width);
     overflow: hidden;
     transition: width .28s var(--ease-standard);
-    /* slim sidebar must not cover the header */
-    top: var(--header-h, 56px);
-    height: calc(100% - var(--header-h, 56px));
+    position: fixed;
+    top: 0; left: 0; height: 100%;
+    z-index: 49; /* below sticky header */
   }
   .sidebar.sb--autohide-slim.sb-hover,
   .sidebar.sb--autohide-slim:hover {
     width: 260px;
     overflow: visible;
+    box-shadow: 4px 0 24px rgba(0,0,0,.18);
+    z-index: 49;
   }
-
-  /* Icon-only state (same rules as sb-collapsed) */
+  /* Icon-only state: hide text, labels, footer */
   .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .sb-logo-text,
   .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .sb-info,
   .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .sb-profile-chevron,
   .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .nav-lnk span:not(.nav-bdg),
   .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .nav-sep,
   .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .sb-foot,
-  .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .nav-bdg {
-    opacity: 0;
-    width: 0;
-    overflow: hidden;
-    pointer-events: none;
-  }
-  .sidebar.sb--autohide-slim .sb-logo-text,
-  .sidebar.sb--autohide-slim .sb-info,
-  .sidebar.sb--autohide-slim .sb-profile-chevron,
-  .sidebar.sb--autohide-slim .nav-lnk span:not(.nav-bdg),
-  .sidebar.sb--autohide-slim .nav-sep,
-  .sidebar.sb--autohide-slim .sb-foot,
-  .sidebar.sb--autohide-slim .nav-bdg {
-    transition: opacity .2s, width .2s;
+  .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .sb-collapse-btn {
+    opacity: 0; pointer-events: none;
+    transition: opacity .15s;
   }
   .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .sb-head {
     justify-content: center;
   }
-  .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .sb-collapse-btn { display: none; }
   .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .sb-profile {
     justify-content: center; padding: 12px 0;
   }
   .sidebar.sb--autohide-slim:not(.sb-hover):not(:hover) .nav-lnk {
     justify-content: center; padding: 12px 0;
-  }
-
-  /* ── Full-hidden mode: sidebar floats as overlay ── */
-  .sidebar.sb--autohide-full {
-    position: fixed;
-    transform: translateX(calc(-100% - 2px));
-    transition: transform .3s var(--ease-standard),
-                box-shadow .3s;
-    z-index: 199; /* stays below the sticky header (z-index 50 + isolation) */
-    height: 100%;
-    box-shadow: none;
-    /* start below header so it never overlaps the title area */
-    top: var(--header-h, 56px);
-    border-radius: 0 0 0 0;
-  }
-  .sidebar.sb--autohide-full.sb-hover {
-    transform: translateX(0);
-    box-shadow: 4px 0 32px rgba(0,0,0,.35);
-  }
-  /* Header stays above everything in autohide-full mode */
-  body.sb--autohide-full .app-hd {
-    z-index: 250;
   }
 }
 

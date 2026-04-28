@@ -9,15 +9,10 @@
 <script>
 /* ── Sidebar state: apply --sb-width synchronously before first render ── */
 (function() {
-  var autohide  = localStorage.getItem('ls_sb_autohide') || 'off';
   var collapsed = localStorage.getItem('ls_sb_collapsed') === '1';
   var isMobile  = window.innerWidth <= 1024;
-  if (!isMobile) {
-    if (autohide === 'full') {
-      document.documentElement.style.setProperty('--sb-width', '0px');
-    } else if (autohide === 'slim' || (autohide === 'off' && collapsed)) {
-      document.documentElement.style.setProperty('--sb-width', '64px');
-    }
+  if (!isMobile && collapsed) {
+    document.documentElement.style.setProperty('--sb-width', '64px');
   }
 })();
 </script>
@@ -1485,46 +1480,6 @@
           <div class="stg-tab-panel" id="stg-nav" role="tabpanel">
             <div class="stg-panel-inner">
 
-              <!-- Sidebar behaviour -->
-              <div class="stg-section">
-                <h4 class="stg-section-title"><i class="fas fa-sidebar"></i> Comportement de la barre latérale</h4>
-                <p class="hint" style="margin-bottom:14px">
-                  <i class="fas fa-info-circle"></i>
-                  Sur PC, choisissez si la barre latérale reste fixe, se réduit ou se cache complètement et réapparaît au survol.
-                </p>
-                <div class="stg-card-mode-btns" id="stg-sb-autohide-btns">
-                  <button class="stg-mode-btn sb-autohide-btn active" data-mode="off" onclick="setSbAutohide('off')">
-                    <i class="fas fa-thumbtack"></i>
-                    <span>Fixe</span>
-                    <small>Toujours visible</small>
-                  </button>
-                  <button class="stg-mode-btn sb-autohide-btn" data-mode="slim" onclick="setSbAutohide('slim')">
-                    <i class="fas fa-compress-alt"></i>
-                    <span>Discret</span>
-                    <small>Icônes → survol</small>
-                  </button>
-                  <button class="stg-mode-btn sb-autohide-btn" data-mode="full" onclick="setSbAutohide('full')">
-                    <i class="fas fa-eye-slash"></i>
-                    <span>Caché</span>
-                    <small>Invisible → survol</small>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Sidebar collapsed state (only shown when autohide = off) -->
-              <div class="stg-section" id="stg-sb-collapsed-section">
-                <h4 class="stg-section-title"><i class="fas fa-chevron-left"></i> État de la barre latérale</h4>
-                <div class="setting-row setting-row--highlight">
-                  <div>
-                    <strong>Barre réduite (mode icônes)</strong>
-                    <p class="hint" style="margin-top:4px">Mémorise si la barre est réduite ou étendue entre les sessions.</p>
-                  </div>
-                  <label class="stg-toggle">
-                    <input type="checkbox" id="chk-sb-collapsed" onchange="setSbCollapsed(this.checked)">
-                    <span class="stg-toggle-track"><span class="stg-toggle-thumb"></span></span>
-                  </label>
-                </div>
-              </div>
 
               <div class="stg-section">
                 <h4 class="stg-section-title"><i class="fas fa-bars"></i> Onglets visibles</h4>

@@ -1343,19 +1343,7 @@ function switchSettingsTab(tabId) {
   document.querySelectorAll('.stg-tab-panel').forEach(p => p.classList.toggle('active', p.id === tabId));
   localStorage.setItem('ls_settings_tab', tabId);
   if (tabId === 'stg-dashboard') _initDashboardSettings();
-  if (tabId === 'stg-nav') _syncSbAutohideUI();
-}
 
-function _syncSbAutohideUI() {
-  const mode = localStorage.getItem('ls_sb_autohide') || 'off';
-  document.querySelectorAll('.sb-autohide-btn').forEach(b =>
-    b.classList.toggle('active', b.dataset.mode === mode)
-  );
-  // Collapsed toggle: sync checkbox and show/hide section
-  const chk         = document.getElementById('chk-sb-collapsed');
-  const collSection = document.getElementById('stg-sb-collapsed-section');
-  if (chk) chk.checked = localStorage.getItem('ls_sb_collapsed') === '1';
-  if (collSection) collSection.style.display = mode === 'off' ? '' : 'none';
 }
 
 // ── Dashboard settings ──────────────────────────────────────────────────────
@@ -1828,7 +1816,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('resize', _updateNavMode, { passive: true });
   _updateNavMode();
-  _applySbAutohide();
   _applySbCollapsedState();
   document.getElementById('sw-update-btn')?.addEventListener('click', forceSwUpdate);
 });
@@ -1880,7 +1867,7 @@ function closeSb() {
 }
 
 /* ── Sidebar collapse (icons-only mode, PC only) ── */
-/* ── Sidebar collapsed state (PC only, incompatible with autohide slim/full) ── */
+/* ── Sidebar collapsed state (PC only) ── */
 function setSbCollapsed(collapsed) {
   if (window.innerWidth <= 1024) return;
   const sb   = document.getElementById('sidebar');
@@ -1906,80 +1893,10 @@ function toggleSbCollapse() {
 
 function _applySbCollapsedState() {
   if (window.innerWidth <= 1024) return;
-  const autohide = localStorage.getItem('ls_sb_autohide') || 'off';
-  if (autohide !== 'off') return; // autohide modes manage their own width
   const collapsed = localStorage.getItem('ls_sb_collapsed') === '1';
   setSbCollapsed(collapsed);
 }
 
-/* ── Sidebar auto-hide ──────────────────────────────────────────────────── */
-function _applySbAutohide() {
-  const mode = localStorage.getItem('ls_sb_autohide') || 'off';
-  const sb   = document.getElementById('sidebar');
-  const wrap = document.querySelector('.main-wrap');
-  if (!sb) return;
-
-  // Remove previous state classes
-  sb.classList.remove('sb--autohide-slim', 'sb--autohide-full');
-  document.getElementById('sb-autohide-trigger')?.remove();
-
-  if (mode === 'off') {
-    if (wrap) wrap.style.marginLeft = '';
-    document.documentElement.style.removeProperty('--sb-width');
-    return;
-  }
-
-  if (mode === 'slim') {
-    sb.classList.add('sb--autohide-slim');
-    document.documentElement.style.setProperty('--sb-width', 'var(--sb-mini-width)');
-  } else if (mode === 'full') {
-    sb.classList.add('sb--autohide-full');
-    document.documentElement.style.setProperty('--sb-width', '0px');
-    // Trigger strip
-    const trigger = document.createElement('div');
-    trigger.id = 'sb-autohide-trigger';
-    document.body.appendChild(trigger);
-    trigger.addEventListener('mouseenter', () => sb.classList.add('sb-hover'));
-  }
-
-  let _sbLeaveTimer = null;
-  sb.addEventListener('mouseenter', () => {
-    clearTimeout(_sbLeaveTimer);
-    sb.classList.add('sb-hover');
-  });
-  sb.addEventListener('mouseleave', () => {
-    _sbLeaveTimer = setTimeout(() => sb.classList.remove('sb-hover'), 300);
-  });
-}
-
-function setSbAutohide(mode) {
-  localStorage.setItem('ls_sb_autohide', mode);
-  document.querySelectorAll('.sb-autohide-btn').forEach(b =>
-    b.classList.toggle('active', b.dataset.mode === mode)
-  );
-  const collBtn = document.getElementById('sb-collapse-btn');
-  if (collBtn) collBtn.style.display = (mode !== 'off') ? 'none' : '';
-
-  // Compatibility: autohide slim/full are incompatible with manual collapse
-  const sb = document.getElementById('sidebar');
-  if (sb) {
-    if (mode !== 'off') {
-      // Remove collapsed class — autohide manages width itself
-      sb.classList.remove('sb-collapsed');
-      document.documentElement.style.removeProperty('--sb-width');
-    } else {
-      // Restore collapsed state when coming back to 'off'
-      _applySbCollapsedState();
-    }
-  }
-
-  // Show/hide the collapsed toggle: only relevant in 'off' mode
-  const collSection = document.getElementById('stg-sb-collapsed-section');
-  if (collSection) collSection.style.display = mode === 'off' ? '' : 'none';
-
-  _applySbAutohide();
-  showToast(mode === 'off' ? '📌 Barre fixe' : mode === 'slim' ? '👁 Mode discret activé' : '✨ Mode caché activé');
-}
 
 function setupProfileUI() {
   const u = APP.userInfo;
