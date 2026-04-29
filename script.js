@@ -471,7 +471,19 @@ function animateValue(el, from, to, duration = 900) {
   requestAnimationFrame(update);
 }
 
-function showToast(msg, type = 'success') {
+/* ── Notification categories stored in localStorage ──
+   ls_notif_scrobble : '0' = silent  (default: show)
+   ls_notif_system   : '0' = silent  (default: show)
+   ls_notif_actions  : '0' = silent  (default: show)  — saves, exports, copies
+   ls_notif_errors   : always shown regardless
+   ─────────────────────────────────────────────────── */
+function _notifAllowed(category) {
+  return localStorage.getItem('ls_notif_' + category) !== '0';
+}
+
+function showToast(msg, type = 'success', category = 'system') {
+  // Errors are always shown; other categories respect the setting
+  if (type !== 'error' && !_notifAllowed(category)) return;
   const el  = document.getElementById('toast');
   const ico = document.getElementById('toast-icon');
   if (!el) return;
@@ -481,6 +493,13 @@ function showToast(msg, type = 'success') {
   el.classList.add('show');
   clearTimeout(el._t);
   el._t = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+function dismissToast() {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  clearTimeout(el._t);
+  el.classList.remove('show');
 }
 
 function showSetupError(msg) {
@@ -697,7 +716,7 @@ function updateUsername() {
   if (!val) { showToast(t('setup_err_username'), 'error'); return; }
   APP.username = val;
   saveSession();
-  showToast(t('toast_settings_saved'));
+  showToast(t('toast_settings_saved'), 'success', 'actions');
   setupProfileUI();
 }
 
@@ -708,7 +727,7 @@ function updateApiKey() {
   if (!val || val.length < 30) { showToast(t('setup_err_apikey'), 'error'); return; }
   APP.apiKey = val;
   saveSession();
-  showToast(t('toast_settings_saved'));
+  showToast(t('toast_settings_saved'), 'success', 'actions');
 }
 
 // Wrapper export (appelé par les boutons HTML)
@@ -844,6 +863,14 @@ function _applyCSSAccent({ accent, h, a2, container, on, onCont, glow, lt, strip
   r.setProperty('--accent-lt',        lt);
   r.setProperty('--accent-strip',     strip     || glow);
   r.setProperty('--border-glow',      borderGlow || glow);
+
+  // Persist resolved vars for zero-flash reload
+  try {
+    localStorage.setItem('ls_accent_vars', JSON.stringify({
+      accent, h: h||accent, a2: a2||accent, container, on, onCont,
+      glow, lt, strip: strip||glow, borderGlow: borderGlow||glow
+    }));
+  } catch {}
 
   // Tinted backgrounds based on hue angle
   if (hue !== undefined && hue !== null) {
@@ -1028,7 +1055,7 @@ function setLanguage(lang) {
       if (key) document.getElementById('hd-title').textContent = t(key);
     }
     document.title = 'LastStats — ' + (t('nav_dashboard') || 'Statistiques Last.fm');
-    showToast(t('toast_lang_changed'));
+    showToast(t('toast_lang_changed'), 'success', 'system');
   });
 }
 
@@ -1044,7 +1071,7 @@ function setStartupSection(section) {
   document.querySelectorAll('.startup-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.startup === section)
   );
-  showToast('✅ Page de démarrage enregistrée !');
+  showToast('✅ Page de démarrage enregistrée !', 'success', 'actions');
 }
 
 function _syncStartupSectionUI() {
@@ -1071,7 +1098,7 @@ function setDashHeroMode(mode) {
   const fbRow = document.getElementById('hero-fallback-row');
   if (fbRow) fbRow.classList.toggle('hidden', mode !== 'nowplaying');
   refreshDashHero();
-  showToast('🎨 Bandeau mis à jour !');
+  showToast('🎨 Bandeau mis à jour !', 'success', 'actions');
 }
 
 /** Called on init + section nav + NP update */
@@ -1343,7 +1370,24 @@ function switchSettingsTab(tabId) {
   document.querySelectorAll('.stg-tab-panel').forEach(p => p.classList.toggle('active', p.id === tabId));
   localStorage.setItem('ls_settings_tab', tabId);
   if (tabId === 'stg-dashboard') _initDashboardSettings();
+  if (tabId === 'stg-nav') _initNotifToggles();
+}
 
+/** Sync notification toggle checkboxes to localStorage values */
+function _initNotifToggles() {
+  ['scrobble', 'system', 'actions'].forEach(cat => {
+    const el = document.getElementById('chk-notif-' + cat);
+    if (el) el.checked = localStorage.getItem('ls_notif_' + cat) !== '0';
+  });
+  // Sync sidebar autohide buttons
+  const mode = localStorage.getItem('ls_sb_autohide') || 'off';
+  document.querySelectorAll('.sb-autohide-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.mode === mode)
+  );
+}
+
+function toggleNotif(category, enabled) {
+  localStorage.setItem('ls_notif_' + category, enabled ? '1' : '0');
 }
 
 // ── Dashboard settings ──────────────────────────────────────────────────────
@@ -1448,14 +1492,14 @@ function applyManualCards() {
   }
   const all = [...new Set(ordered)].slice(0, 12);
   localStorage.setItem('ls_statcards_manual', JSON.stringify(all));
-  showToast('✅ Blocs personnalisés appliqués !');
+  showToast('✅ Blocs personnalisés appliqués !', 'success', 'actions');
   if (APP.userInfo) loadDashboard();
 }
 
 function resetManualCards() {
   localStorage.removeItem('ls_statcards_manual');
   _buildCardPickerGrid();
-  showToast('🔄 Sélection réinitialisée');
+  showToast('🔄 Sélection réinitialisée', 'success', 'actions');
 }
 
 /* ── Order list (drag & drop) ──────────────────────────────────────────── */
@@ -1530,13 +1574,13 @@ function setStatCardMode(mode) {
   if (pickerSection) pickerSection.style.display = mode === 'manual' ? 'block' : 'none';
   if (mode === 'manual') _buildCardPickerGrid();
   if (APP.userInfo) loadDashboard();
-  showToast(mode === 'auto' ? '✨ Mode automatique activé' : '✏️ Mode manuel activé');
+  showToast(mode === 'auto' ? '✨ Mode automatique activé' : '✏️ Mode manuel activé', 'success', 'system');
 }
 
 function setMilestonesEnabled(enabled) {
   localStorage.setItem('ls_statcards_milestones', enabled ? 'true' : 'false');
   if (APP.userInfo) loadDashboard();
-  showToast(enabled ? '🏆 Succès activés' : '🚫 Succès masqués');
+  showToast(enabled ? '🏆 Succès activés' : '🚫 Succès masqués', 'success', 'system');
 }
 
 /** Toggle text info visibility on the hero */
@@ -1555,7 +1599,7 @@ function setDashHeroFallback(fallback) {
   document.querySelectorAll('.hero-fallback-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.fallback === fallback)
   );
-  showToast('✅ Mode de secours enregistré !');
+  showToast('✅ Mode de secours enregistré !', 'success', 'actions');
 }
 
 /** Sync hero mode buttons on settings open */
@@ -1817,6 +1861,7 @@ window.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('resize', _updateNavMode, { passive: true });
   _updateNavMode();
   _applySbCollapsedState();
+  _applySbAutohide();
   document.getElementById('sw-update-btn')?.addEventListener('click', forceSwUpdate);
 });
 
@@ -1895,6 +1940,44 @@ function _applySbCollapsedState() {
   if (window.innerWidth <= 1024) return;
   const collapsed = localStorage.getItem('ls_sb_collapsed') === '1';
   setSbCollapsed(collapsed);
+}
+
+/* ── Sidebar autohide: 'off' (fixe) | 'slim' (icônes → survol) ── */
+function _applySbAutohide() {
+  const mode = localStorage.getItem('ls_sb_autohide') || 'off';
+  const sb   = document.getElementById('sidebar');
+  if (!sb) return;
+  sb.classList.remove('sb--autohide-slim');
+  if (mode === 'slim') {
+    sb.classList.add('sb--autohide-slim');
+    document.documentElement.style.setProperty('--sb-width', 'var(--sb-mini-width)');
+    let _leaveTimer = null;
+    // Prevent duplicate listeners by using a named handler stored on the element
+    if (!sb._slimHover) {
+      sb._slimHover = true;
+      sb.addEventListener('mouseenter', () => { clearTimeout(_leaveTimer); sb.classList.add('sb-hover'); });
+      sb.addEventListener('mouseleave', () => { _leaveTimer = setTimeout(() => sb.classList.remove('sb-hover'), 300); });
+    }
+  } else {
+    document.documentElement.style.removeProperty('--sb-width');
+    _applySbCollapsedState();
+  }
+}
+
+function setSbAutohide(mode) {
+  if (mode !== 'slim') mode = 'off';
+  localStorage.setItem('ls_sb_autohide', mode);
+  document.querySelectorAll('.sb-autohide-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.mode === mode)
+  );
+  const collBtn = document.getElementById('sb-collapse-btn');
+  if (collBtn) collBtn.style.display = mode === 'slim' ? 'none' : '';
+  const collSection = document.getElementById('stg-sb-collapsed-section');
+  if (collSection) collSection.style.display = mode === 'slim' ? 'none' : '';
+  const sb = document.getElementById('sidebar');
+  if (sb && mode === 'slim') sb.classList.remove('sb-collapsed');
+  _applySbAutohide();
+  showToast(mode === 'slim' ? '👁 Mode discret activé' : '📌 Barre latérale fixe', 'success', 'system');
 }
 
 
@@ -2606,7 +2689,7 @@ async function shareNowPlaying() {
   }
   try {
     await navigator.clipboard.writeText(`${text}\n${url}`);
-    showToast(t('toast_link_copied'));
+    showToast(t('toast_link_copied'), 'success', 'actions');
   } catch { prompt(t('toast_link_copied') + ':', url); }
 }
 
@@ -4460,19 +4543,19 @@ function _fillWrappedPod(prefix, name, playcount, imgUrl, fallbackSeed) {
 async function exportWrapped() {
   const card = document.getElementById('wrapped-card');
   try {
-    showToast(t('wrapped_generating'));
+    showToast(t('wrapped_generating'), 'success', 'actions');
     document.body.classList.add('export-mode');
     if (document.fonts?.ready) await document.fonts.ready;
     await sleep(80);
     const canvas = await html2canvas(card, { scale:2, useCORS:true, allowTaint:true, backgroundColor:null, logging:false });
     document.body.classList.remove('export-mode');
     downloadCanvas(canvas, `laststats-wrapped-${document.getElementById('w-yr-sel').value}.png`);
-    showToast(t('wrapped_exported'));
+    showToast(t('wrapped_exported'), 'success', 'actions');
   } catch (e) { document.body.classList.remove('export-mode'); showToast(t('wrapped_export_error', e.message), 'error'); }
 }
 
 async function generateStory(type) {
-  showToast(t('story_preparing'));
+  showToast(t('story_preparing'), 'success', 'actions');
   try {
     const u       = APP.userInfo;
     const year    = document.getElementById('w-yr-sel')?.value || new Date().getFullYear() - 1;
@@ -4554,7 +4637,7 @@ async function generateStory(type) {
       }
       await _captureStory('story-full-card', 680, 860, `laststats-full-${year}.png`);
     }
-    showToast(t('story_downloaded'));
+    showToast(t('story_downloaded'), 'success', 'actions');
   } catch (e) { document.body.classList.remove('export-mode'); showToast(t('story_error', e.message), 'error'); }
 }
 
@@ -4616,7 +4699,7 @@ async function exportSectionCard(section) {
   }
 
   if (!items.length) { showToast(t('story_no_data'), 'error'); return; }
-  showToast(t('story_preparing'));
+  showToast(t('story_preparing'), 'success', 'actions');
 
   // preload cover images (crossOrigin anonymous)
   const loadImg = url => new Promise(res => {
@@ -4798,7 +4881,7 @@ async function exportSectionCard(section) {
   ctx.fillText('laststats.app  ·  powered by last.fm', W / 2, footY + 18);
 
   downloadCanvas(canvas, filename);
-  showToast(t('story_downloaded'));
+  showToast(t('story_downloaded'), 'success', 'actions');
 }
 async function loadAdvancedStats() {
   const u        = APP.userInfo;
@@ -5051,12 +5134,12 @@ async function fetchFullHistory(backgroundMode = false) {
           return true;
         });
         console.log(`[History] Incremental: +${newTracks.length} new → ${tracks.length} total`);
-        showToast(`+${formatNum(newTracks.length)} nouveaux scrobbles`);
+        showToast(`+${formatNum(newTracks.length)} nouveaux scrobbles`, 'success', 'scrobble');
       } else {
         // Aucun nouveau scrobble — cache déjà à jour
         tracks = cached.tracks;
         console.log('[History] Already up to date');
-        showToast(t('fetch_auto_done'));
+        showToast(t('fetch_auto_done'), 'success', 'scrobble');
       }
     } else {
       // Chargement complet (premier chargement)
@@ -5421,7 +5504,7 @@ async function refreshData() {
     if (activeSection === 'charts'){ setupChartsSection(); }
     if (activeSection === 'obscurity')   loadObscurityScore();
 
-    showToast(t('toast_data_updated'));
+    showToast(t('toast_data_updated'), 'success', 'actions');
   } catch (e) { showToast(e.message, 'error'); }
   finally { if (icon) icon.classList.remove('fa-spin'); }
 
@@ -6040,7 +6123,7 @@ async function _shareOrCopy(title, text, url) {
   if (navigator.share) {
     try { await navigator.share({ title, text, url }); return; } catch {}
   }
-  try { await navigator.clipboard.writeText(`${text}\n${url}`); showToast(t('toast_link_copied')); }
+  try { await navigator.clipboard.writeText(`${text}\n${url}`); showToast(t('toast_link_copied'), 'success', 'actions'); }
   catch { prompt(t('toast_link_copied') + ':', url); }
 }
 
@@ -6411,7 +6494,7 @@ function saveSettings() {
     saveSession();
     initApp(newUser, newKey);
   } else {
-    showToast(t('toast_settings_saved'));
+    showToast(t('toast_settings_saved'), 'success', 'actions');
   }
 }
 
@@ -6621,7 +6704,7 @@ async function exportChartAsImage(canvasId, filename, format) {
 
   const suffix = format === 'portrait' ? '-story' : '';
   downloadCanvas(out, 'laststats-' + filename + suffix + '.png');
-  showToast('\uD83D\uDCCA Graphique export\u00E9 !');
+  showToast('📊 Graphique exporté !', 'success', 'actions');
 }
 
 /* ─── Export calendrier heatmap ──────────────────────────────────── */
@@ -6713,7 +6796,7 @@ async function _exportHeatmapMobile(year) {
   ctx.textAlign = 'left';
 
   downloadCanvas(out, 'laststats-calendrier-mobile-' + year + '.png');
-  showToast('\uD83D\uDCC5 Calendrier mobile export\u00E9 !');
+  showToast('📅 Calendrier mobile exporté !', 'success', 'actions');
 }
 
 async function _exportHeatmapHorizontal(year, wrapEl) {
@@ -6737,7 +6820,7 @@ async function _exportHeatmapHorizontal(year, wrapEl) {
   ctx.fillStyle = 'rgba(255,255,255,0.22)'; ctx.font = '11px Inter, system-ui, sans-serif';
   ctx.fillText('LastStats \u00B7 sanobld.github.io/LastStats', 32, out.height - 10);
   downloadCanvas(out, 'laststats-calendrier-' + year + '.png');
-  showToast('\uD83D\uDCC5 Calendrier export\u00E9 !');
+  showToast('📅 Calendrier exporté !', 'success', 'actions');
 }
 
 async function _exportHeatmapVertical(year, format) {
@@ -6850,7 +6933,7 @@ async function _exportHeatmapVertical(year, format) {
   ctx.fillText('LastStats \u00B7 sanobld.github.io/LastStats', W - 200, H - 8);
 
   downloadCanvas(out, 'laststats-calendrier-' + (format === 'portrait' ? 'portrait' : 'vertical') + '-' + year + '.png');
-  showToast('\uD83D\uDCC5 Calendrier export\u00E9 !');
+  showToast('📅 Calendrier exporté !', 'success', 'actions');
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -7379,7 +7462,7 @@ function exportData(format) {
     a.href     = URL.createObjectURL(blob);
     a.download = `laststats-${APP.username}.json`;
     a.click();
-    showToast(t('toast_export_json'));
+    showToast(t('toast_export_json'), 'success', 'actions');
   } else {
     const headers = Object.keys(allRows[0] || {});
     const csv     = [headers.join(','), ...allRows.map(r => headers.map(h => `"${String(r[h]||'').replace(/"/g,'""')}"`).join(','))].join('\n');
@@ -7388,7 +7471,7 @@ function exportData(format) {
     a.href        = URL.createObjectURL(blob);
     a.download    = `laststats-${APP.username}.csv`;
     a.click();
-    showToast(t('toast_export_csv'));
+    showToast(t('toast_export_csv'), 'success', 'actions');
   }
 }
 
@@ -7415,7 +7498,7 @@ async function forceSwUpdate() {
     if ('caches' in window) { const keys = await caches.keys(); await Promise.all(keys.map(k => caches.delete(k))); }
     if ('serviceWorker' in navigator) { const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r => r.unregister())); }
     Cache.clear();
-    showToast(t('toast_updating'));
+    showToast(t('toast_updating'), 'success', 'system');
     await sleep(800);
     window.location.reload(true);
   } catch {
@@ -7434,7 +7517,7 @@ async function requestNotificationAccess() {
   }
   const permission = await Notification.requestPermission();
   if (permission === 'granted') {
-    showToast('🔔 Notifications activées !');
+    showToast('🔔 Notifications activées !', 'success', 'system');
     setupNewYearNotification();
     _syncNotifBtn();
     _syncNotifOptions();
@@ -7625,7 +7708,7 @@ function clearCache() {
   _clearHistoryCache();
   _imgCache.clear();
   _trackImgCache.clear();
-  showToast(t('toast_cache_cleared'));
+  showToast(t('toast_cache_cleared'), 'success', 'actions');
 }
 
 // toggleable sections (dashboard + settings are always locked)
@@ -7701,7 +7784,7 @@ function toggleNavVisibility(key, labelEl) {
   labelEl.classList.toggle('checked', !current);
   saveNavVisibility();
   applyNavVisibility();
-  showToast(t('toast_settings_saved'));
+  showToast(t('toast_settings_saved'), 'success', 'actions');
 }
 
 function _todayStr() {

@@ -7,13 +7,34 @@
 
 <script>if(!localStorage.getItem('ls_lang'))localStorage.setItem('ls_lang','fr');</script>
 <script>
-/* ── Sidebar state: apply --sb-width synchronously before first render ── */
+/* ── Apply saved state synchronously before first render (zero FOUC) ── */
 (function() {
+  // 1. Sidebar width
+  var autohide  = localStorage.getItem('ls_sb_autohide') || 'off';
+  if (autohide === 'full') { autohide = 'off'; localStorage.setItem('ls_sb_autohide','off'); }
   var collapsed = localStorage.getItem('ls_sb_collapsed') === '1';
   var isMobile  = window.innerWidth <= 1024;
-  if (!isMobile && collapsed) {
-    document.documentElement.style.setProperty('--sb-width', '64px');
+  if (!isMobile) {
+    if (autohide === 'slim' || (autohide === 'off' && collapsed))
+      document.documentElement.style.setProperty('--sb-width', '64px');
   }
+  // 2. Accent color — re-apply from saved palette vars (no flash)
+  try {
+    var v = JSON.parse(localStorage.getItem('ls_accent_vars') || 'null');
+    if (v) {
+      var r = document.documentElement.style;
+      r.setProperty('--accent',           v.accent);
+      r.setProperty('--accent-h',         v.h);
+      r.setProperty('--accent-2',         v.a2);
+      r.setProperty('--accent-container', v.container);
+      r.setProperty('--accent-on',        v.on);
+      r.setProperty('--accent-on-cont',   v.onCont);
+      r.setProperty('--accent-glow',      v.glow);
+      r.setProperty('--accent-lt',        v.lt);
+      r.setProperty('--accent-strip',     v.strip);
+      r.setProperty('--border-glow',      v.borderGlow);
+    }
+  } catch(e) {}
 })();
 </script>
 
@@ -1380,57 +1401,6 @@
                 </div>
               </div>
 
-              <div class="stg-section">
-                <h4 class="stg-section-title"><i class="fas fa-bell"></i> Notifications</h4>
-                <div class="setting-row">
-                  <p class="hint">Autorisez les notifications pour recevoir des rappels et récaps.</p>
-                  <div class="setting-ctrl">
-                    <button class="btn-notif-wrapped" id="btn-notif-enable" onclick="requestNotificationAccess()">
-                      <i class="fas fa-bell"></i>
-                      <span id="btn-notif-label">Activer les notifications</span>
-                    </button>
-                  </div>
-                </div>
-                <div class="notif-options-grid" id="notif-options-grid">
-                  <label class="notif-opt">
-                    <input type="checkbox" id="notif-weekly" onchange="saveNotifPrefs()">
-                    <span class="notif-opt-icon">📊</span>
-                    <span class="notif-opt-body"><strong>Récap hebdomadaire</strong><small>Chaque lundi — vos stats de la semaine passée</small></span>
-                  </label>
-                  <label class="notif-opt">
-                    <input type="checkbox" id="notif-monthly" onchange="saveNotifPrefs()">
-                    <span class="notif-opt-icon">📅</span>
-                    <span class="notif-opt-body"><strong>Récap mensuel</strong><small>Le 1er du mois — artistes et titres du mois</small></span>
-                  </label>
-                  <label class="notif-opt">
-                    <input type="checkbox" id="notif-milestone" onchange="saveNotifPrefs()">
-                    <span class="notif-opt-icon">🎯</span>
-                    <span class="notif-opt-body"><strong>Jalons d'écoute</strong><small>Notifié à chaque palier atteint</small></span>
-                  </label>
-                  <label class="notif-opt">
-                    <input type="checkbox" id="notif-wrapped" onchange="saveNotifPrefs()">
-                    <span class="notif-opt-icon">🎁</span>
-                    <span class="notif-opt-body"><strong>Wrapped annuel</strong><small>Fin décembre — rappel pour votre récap de l'année</small></span>
-                  </label>
-                </div>
-                <div class="notif-milestones" id="notif-milestones">
-                  <div class="notif-milestones-hd"><i class="fas fa-sliders-h"></i><span>Paliers de scrobbles</span></div>
-                  <div class="notif-milestones-grid">
-                    <label class="milestone-chip"><input type="checkbox" id="ms-500"    value="500"    onchange="saveNotifPrefs()"><span>500</span></label>
-                    <label class="milestone-chip"><input type="checkbox" id="ms-1000"   value="1000"   onchange="saveNotifPrefs()" checked><span>1k</span></label>
-                    <label class="milestone-chip"><input type="checkbox" id="ms-2500"   value="2500"   onchange="saveNotifPrefs()"><span>2,5k</span></label>
-                    <label class="milestone-chip"><input type="checkbox" id="ms-5000"   value="5000"   onchange="saveNotifPrefs()" checked><span>5k</span></label>
-                    <label class="milestone-chip"><input type="checkbox" id="ms-10000"  value="10000"  onchange="saveNotifPrefs()" checked><span>10k</span></label>
-                    <label class="milestone-chip"><input type="checkbox" id="ms-25000"  value="25000"  onchange="saveNotifPrefs()"><span>25k</span></label>
-                    <label class="milestone-chip"><input type="checkbox" id="ms-50000"  value="50000"  onchange="saveNotifPrefs()" checked><span>50k</span></label>
-                    <label class="milestone-chip"><input type="checkbox" id="ms-100000" value="100000" onchange="saveNotifPrefs()" checked><span>100k</span></label>
-                    <label class="milestone-chip"><input type="checkbox" id="ms-250000" value="250000" onchange="saveNotifPrefs()"><span>250k</span></label>
-                    <label class="milestone-chip"><input type="checkbox" id="ms-500000" value="500000" onchange="saveNotifPrefs()"><span>500k</span></label>
-                    <label class="milestone-chip"><input type="checkbox" id="ms-1000000" value="1000000" onchange="saveNotifPrefs()"><span>1M</span></label>
-                  </div>
-                </div>
-              </div>
-
               <div class="stg-section stg-section--danger">
                 <h4 class="stg-section-title"><i class="fas fa-trash-alt"></i> Cache &amp; Mise à jour</h4>
                 <div class="setting-row">
@@ -1480,7 +1450,7 @@
           <div class="stg-tab-panel" id="stg-nav" role="tabpanel">
             <div class="stg-panel-inner">
 
-
+              <!-- ── Onglets visibles ── -->
               <div class="stg-section">
                 <h4 class="stg-section-title"><i class="fas fa-bars"></i> Onglets visibles</h4>
                 <p class="hint" style="margin-bottom:12px">
@@ -1491,6 +1461,98 @@
                   <!-- Generated by JS -->
                 </div>
               </div>
+
+              <!-- ── Notifications ── -->
+              <div class="stg-section">
+                <h4 class="stg-section-title"><i class="fas fa-bell"></i> Notifications</h4>
+
+                <!-- Notifications push (anciennement dans Données) -->
+                <div class="setting-row">
+                  <p class="hint">Autorisez les notifications pour recevoir des rappels et récaps.</p>
+                  <div class="setting-ctrl">
+                    <button class="btn-notif-wrapped" id="btn-notif-enable" onclick="requestNotificationAccess()">
+                      <i class="fas fa-bell"></i>
+                      <span id="btn-notif-label">Activer les notifications</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="notif-options-grid" id="notif-options-grid">
+                  <label class="notif-opt">
+                    <input type="checkbox" id="notif-weekly" onchange="saveNotifPrefs()">
+                    <span class="notif-opt-icon">📊</span>
+                    <span class="notif-opt-body"><strong>Récap hebdomadaire</strong><small>Chaque lundi — vos stats de la semaine passée</small></span>
+                  </label>
+                  <label class="notif-opt">
+                    <input type="checkbox" id="notif-monthly" onchange="saveNotifPrefs()">
+                    <span class="notif-opt-icon">📅</span>
+                    <span class="notif-opt-body"><strong>Récap mensuel</strong><small>Le 1er du mois — artistes et titres du mois</small></span>
+                  </label>
+                  <label class="notif-opt">
+                    <input type="checkbox" id="notif-milestone" onchange="saveNotifPrefs()">
+                    <span class="notif-opt-icon">🎯</span>
+                    <span class="notif-opt-body"><strong>Jalons d'écoute</strong><small>Notifié à chaque palier atteint</small></span>
+                  </label>
+                  <label class="notif-opt">
+                    <input type="checkbox" id="notif-wrapped" onchange="saveNotifPrefs()">
+                    <span class="notif-opt-icon">🎁</span>
+                    <span class="notif-opt-body"><strong>Wrapped annuel</strong><small>Fin décembre — rappel pour votre récap de l'année</small></span>
+                  </label>
+                </div>
+                <div class="notif-milestones" id="notif-milestones">
+                  <div class="notif-milestones-hd"><i class="fas fa-sliders-h"></i><span>Paliers de scrobbles</span></div>
+                  <div class="notif-milestones-grid">
+                    <label class="milestone-chip"><input type="checkbox" id="ms-500"    value="500"    onchange="saveNotifPrefs()"><span>500</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-1000"   value="1000"   onchange="saveNotifPrefs()" checked><span>1k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-2500"   value="2500"   onchange="saveNotifPrefs()"><span>2,5k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-5000"   value="5000"   onchange="saveNotifPrefs()" checked><span>5k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-10000"  value="10000"  onchange="saveNotifPrefs()" checked><span>10k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-25000"  value="25000"  onchange="saveNotifPrefs()"><span>25k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-50000"  value="50000"  onchange="saveNotifPrefs()" checked><span>50k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-100000" value="100000" onchange="saveNotifPrefs()" checked><span>100k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-250000" value="250000" onchange="saveNotifPrefs()"><span>250k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-500000" value="500000" onchange="saveNotifPrefs()"><span>500k</span></label>
+                    <label class="milestone-chip"><input type="checkbox" id="ms-1000000" value="1000000" onchange="saveNotifPrefs()"><span>1M</span></label>
+                  </div>
+                </div>
+
+                <!-- Notifications in-app -->
+                <div class="setting-row" style="margin-top:16px">
+                  <div>
+                    <strong>Nouveaux scrobbles</strong>
+                    <p class="hint">Affiche « +N nouveaux scrobbles » lors du rechargement automatique.</p>
+                  </div>
+                  <label class="stg-toggle">
+                    <input type="checkbox" id="chk-notif-scrobble" checked
+                           onchange="toggleNotif('scrobble', this.checked)">
+                    <span class="stg-toggle-track"><span class="stg-toggle-thumb"></span></span>
+                  </label>
+                </div>
+
+                <div class="setting-row" style="margin-top:10px">
+                  <div>
+                    <strong>Notifications système</strong>
+                    <p class="hint">Changements de thème, langue, couleur, barre latérale…</p>
+                  </div>
+                  <label class="stg-toggle">
+                    <input type="checkbox" id="chk-notif-system" checked
+                           onchange="toggleNotif('system', this.checked)">
+                    <span class="stg-toggle-track"><span class="stg-toggle-thumb"></span></span>
+                  </label>
+                </div>
+
+                <div class="setting-row" style="margin-top:10px">
+                  <div>
+                    <strong>Actions &amp; exports</strong>
+                    <p class="hint">Confirmations de sauvegarde, copie de lien, export de données…</p>
+                  </div>
+                  <label class="stg-toggle">
+                    <input type="checkbox" id="chk-notif-actions" checked
+                           onchange="toggleNotif('actions', this.checked)">
+                    <span class="stg-toggle-track"><span class="stg-toggle-thumb"></span></span>
+                  </label>
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -1723,6 +1785,7 @@
 <div id="toast" class="toast" role="status" aria-live="polite">
   <i class="fas fa-check-circle" id="toast-icon"></i>
   <span id="toast-txt"></span>
+  <button class="toast-close" onclick="dismissToast()" aria-label="Fermer">✕</button>
 </div>
 
 <!-- ══════════════════════════════════════════════
