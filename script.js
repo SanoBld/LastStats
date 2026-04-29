@@ -2727,6 +2727,7 @@ const STAT_MILESTONES = {
   diversity:  [1,5,10,15,20,30,40,50,75,100],
   repeatRate: [1.5,2,3,5,10,20,50],
   albumRate:  [0.5,1,2,3,5,8,10,15],
+  top1Plays:  [50,100,200,500,1000,2500,5000,10000],
 };
 
 /** Returns { nextM, prevM, pct, justReached } for a given milestone type + value */
@@ -2976,50 +2977,50 @@ async function loadDashboard() {
 
     { id:'listen',   icon:'🎧', value:listenDisp,            rawVal:listenDays,
       label:t('stat_listen_time'),   sub:listenSub,
-      color:'#06b6d4', noAnim:true,
+      color:'#06b6d4', noAnim:true, milestoneType:'listenDays',
       alwaysShow:true, relevance:88 },
 
     // ── EXTENDED pool (rotated by smart algorithm) ─────────────────────────
     { id:'repeat',   icon:'🔁',
       value: repeatRate !== '—' ? `${repeatRate}×` : '—',
       rawVal: parseFloat(repeatRate) || 0,
-      label: 'Taux de répétition',   sub: 'Écoutes / titres uniques',
+      label: t('stat_repeat_rate'),   sub: t('stat_repeat_rate_sub'),
       color:'#fb923c', noAnim:true, milestoneType:'repeatRate',
       relevance: parseFloat(repeatRate) > 2 ? 58 : 30 },
 
     { id:'albumrate',icon:'📀',
       value: albumRate !== '—' ? `${albumRate}` : '—',
       rawVal: parseFloat(albumRate) || 0,
-      label: 'Albums / artiste',     sub: 'Profondeur d\'exploration',
+      label: t('stat_album_rate'),     sub: t('stat_album_rate_sub'),
       color:'#84cc16', noAnim:true, milestoneType:'albumRate',
       relevance: parseFloat(albumRate) > 0.5 ? 52 : 20 },
 
     { id:'weekly',   icon:'📅',
       value: weeklyEst > 0 ? formatNum(weeklyEst) : '—',
       rawVal: weeklyEst,
-      label: 'Scrobbles / semaine',  sub: `≈ ${avgPerDay} par jour`,
+      label: t('stat_weekly'),  sub: t('stat_weekly_sub', avgPerDay),
       color:'#0ea5e9', noAnim:true,
       relevance: weeklyEst > 0 ? 55 : 15 },
 
     { id:'topplay',  icon:'🏆',
       value: maxArtist ? formatNum(parseInt(maxArtist.playcount)) : '—',
       rawVal: maxArtist ? parseInt(maxArtist.playcount) : 0,
-      label: 'Plays – artiste n°1',  sub: maxArtist ? maxArtist.name : '',
-      color:'#f59e0b', noAnim:true, milestoneType:'scrobbles',
+      label: t('stat_top1_plays'),  sub: maxArtist ? maxArtist.name : '',
+      color:'#f59e0b', noAnim:true, milestoneType:'top1Plays',
       actionFn: maxArtist ? () => openArtistModal(maxArtist.name, maxArtist.url, parseInt(maxArtist.playcount)) : null,
       relevance: maxArtist ? 60 : 10 },
 
     { id:'intensity',icon:'🔥',
       value: actScore > 0 ? `${actScore}` : '—',
       rawVal: actScore,
-      label: 'Intensité moyenne',    sub: 'Écoutes/jour (tous temps)',
+      label: t('stat_intensity'),    sub: t('stat_intensity_sub'),
       color:'#ef4444', noAnim:true,
       relevance: actScore > 5 ? 50 : 25 },
 
     { id:'regdays',  icon:'🗓️',
       value: daysSince > 0 ? `${formatNum(daysSince)} j` : '—',
       rawVal: daysSince,
-      label: 'Ancienneté compte',    sub: formatDate(regTs) ? `Inscrit le ${formatDate(regTs)}` : '',
+      label: t('stat_account_age'),    sub: formatDate(regTs) ? t('adv_days_sub', formatDate(regTs)) : '',
       color:'#64748b', noAnim:true, milestoneType:'days',
       relevance: daysSince > 365 ? 48 : 38 },
   ];
