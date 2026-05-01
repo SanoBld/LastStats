@@ -1444,7 +1444,7 @@ const _ALL_CARD_DEFS = [
   { id:'diversity', icon:'📊', get label(){ return t('stat_diversity')   } },
   { id:'tracks',    icon:'🎼', get label(){ return t('stat_tracks')      } },
   { id:'last',      icon:'⏱️', get label(){ return t('stat_last')        } },
-  { id:'days',      icon:'📆', get label(){ return t('stat_days')        } },
+  { id:'days',      icon:'📆', get label(){ return t('stat_streak')       } },
   { id:'top1',      icon:'🌟', get label(){ return t('stat_top1')        } },
   { id:'eddington', icon:'🔢', get label(){ return t('stat_eddington')   } },
   { id:'listen',    icon:'🎧', get label(){ return t('stat_listen_time') } },
@@ -1471,6 +1471,9 @@ function _initDashboardSettings() {
   // Show/hide picker
   const pickerSection = document.getElementById('stg-card-picker-section');
   if (pickerSection) pickerSection.style.display = mode === 'manual' ? 'block' : 'none';
+
+  // Init auto-count slider
+  _initAutoCountSlider();
 
   // Build picker grid
   if (mode === 'manual') _buildCardPickerGrid();
@@ -1505,7 +1508,7 @@ function toggleCardChip(el, id) {
   if (el.classList.contains('stg-card-chip--on')) {
     el.classList.remove('stg-card-chip--on');
   } else {
-    if (totalOn >= 12) {
+    if (totalOn >= 18) {
       showToast(t('toast_cards_max'));
       return;
     }
@@ -1519,8 +1522,8 @@ function _updateCardCountBadge() {
   const total = document.querySelectorAll('.stg-card-chip--on').length;
   const badge = document.getElementById('stg-card-count-badge');
   if (badge) {
-    badge.textContent = `${total} / 12`;
-    badge.className   = 'stg-count-badge' + (total > 12 ? ' stg-count-badge--over' : total > 0 ? ' stg-count-badge--ok' : '');
+    badge.textContent = `${total} / 18`;
+    badge.className   = 'stg-count-badge' + (total > 18 ? ' stg-count-badge--over' : total > 0 ? ' stg-count-badge--ok' : '');
   }
 }
 
@@ -1613,9 +1616,53 @@ function setStatCardMode(mode) {
   );
   const pickerSection = document.getElementById('stg-card-picker-section');
   if (pickerSection) pickerSection.style.display = mode === 'manual' ? 'block' : 'none';
+  const autoCountRow = document.getElementById('stg-auto-count-row');
+  if (autoCountRow) autoCountRow.style.display = mode === 'auto' ? 'flex' : 'none';
   if (mode === 'manual') _buildCardPickerGrid();
   if (APP.userInfo) loadDashboard();
   showToast(mode === 'auto' ? t('toast_mode_auto') : t('toast_mode_manual'), 'success', 'system');
+}
+
+/** Called when the auto count slider changes */
+function setAutoCardCount(n) {
+  const clamped = Math.max(1, Math.min(18, n));
+  localStorage.setItem('ls_statcards_auto_count', String(clamped));
+  _syncAutoCountSlider();
+  if (APP.userInfo) loadDashboard();
+}
+
+/** Sync slider UI to saved value */
+function _syncAutoCountSlider() {
+  const saved = parseInt(localStorage.getItem('ls_statcards_auto_count')) || 12;
+  const slider = document.getElementById('stg-auto-count-slider');
+  const valEl  = document.getElementById('stg-auto-count-val');
+  if (slider) {
+    slider.value = saved;
+    // Update the gradient fill via CSS custom property
+    const pct = ((saved - 1) / 17 * 100).toFixed(1);
+    slider.style.setProperty('--pct', pct + '%');
+    slider.style.background =
+      `linear-gradient(to right, var(--accent) 0%, var(--accent) ${pct}%, var(--surface3,#444) ${pct}%)`;
+  }
+  if (valEl) valEl.textContent = saved;
+}
+
+/** Initialise the auto-count slider on page load */
+function _initAutoCountSlider() {
+  _syncAutoCountSlider();
+  const slider = document.getElementById('stg-auto-count-slider');
+  if (slider) {
+    slider.addEventListener('input', () => {
+      const pct = ((parseInt(slider.value) - 1) / 17 * 100).toFixed(1);
+      slider.style.background =
+        `linear-gradient(to right, var(--accent) 0%, var(--accent) ${pct}%, var(--surface3,#444) ${pct}%)`;
+      document.getElementById('stg-auto-count-val').textContent = slider.value;
+    });
+  }
+  // Show/hide the row based on current mode
+  const mode = localStorage.getItem('ls_statcards_mode') || 'auto';
+  const row = document.getElementById('stg-auto-count-row');
+  if (row) row.style.display = mode === 'auto' ? 'flex' : 'none';
 }
 
 function setMilestonesEnabled(enabled) {
@@ -1818,6 +1865,12 @@ function _scheduleBackgroundHistoryFetch() {
   if (cached?.tracks?.length) {
     APP.fullHistory = cached.tracks;
     APP.streakData  = calcStreak(cached.tracks);
+    APP.cachedActiveDays = new Set(
+      cached.tracks.filter(tr => tr.date?.uts).map(tr => {
+        const d = new Date(parseInt(tr.date.uts) * 1000);
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      })
+    ).size;
     updateStreakUI(APP.streakData);
     console.log(`[History] Cache pre-loaded: ${cached.tracks.length} tracks`);
 
@@ -2552,18 +2605,25 @@ function _renderProfileTopCard(id, icon, label, name, plays, imageArr, sub) {
     : '';
   const hasImg = imgRaw && !isDefaultImg(imgRaw);
   const grad   = nameToGradient(name || '?');
-  const letter = (name || '?')[0].toUpperCase();
 
-  // Build Last.fm URL based on card type
-  let lfmUrl = '';
-  if (icon === 'microphone-alt') lfmUrl = `https://www.last.fm/music/${encodeURIComponent(name||'')}`;
-  else if (icon === 'compact-disc') lfmUrl = `https://www.last.fm/music/${encodeURIComponent(sub||'')}/${encodeURIComponent(name||'')}`;
-  else if (icon === 'music') lfmUrl = `https://www.last.fm/music/${encodeURIComponent(sub||'')}/_/${encodeURIComponent(name||'')}`;
+  // Determine modal type and action
+  let modalType = null;
+  if (icon === 'microphone-alt') modalType = 'artist';
+  else if (icon === 'compact-disc') modalType = 'album';
+  else if (icon === 'music') modalType = 'track';
 
-  el.setAttribute('role', 'link');
+  el.setAttribute('role', 'button');
   el.setAttribute('tabindex', '0');
-  el.onclick = lfmUrl ? () => window.open(lfmUrl, '_blank', 'noopener') : null;
-  el.onkeydown = lfmUrl ? (e) => { if (e.key === 'Enter') window.open(lfmUrl, '_blank', 'noopener'); } : null;
+  el.style.cursor = name ? 'pointer' : '';
+
+  el.onclick = name ? () => {
+    if (modalType === 'artist') {
+      openArtistModal(name, '', parseInt(plays) || 0);
+    } else {
+      openItemModal(modalType, name, sub || '', parseInt(plays) || 0, '', imgRaw);
+    }
+  } : null;
+  el.onkeydown = el.onclick ? (e) => { if (e.key === 'Enter' || e.key === ' ') el.onclick(); } : null;
 
   el.innerHTML = `
     <div class="ptc-bg" style="${hasImg ? `background-image:url('${escHtml(imgRaw)}')` : `background-image:none;background:${grad}`}"></div>
@@ -2573,7 +2633,7 @@ function _renderProfileTopCard(id, icon, label, name, plays, imageArr, sub) {
       <strong class="ptc-name">${escHtml(name || '—')}</strong>
       ${sub ? `<span class="ptc-sub">${escHtml(sub)}</span>` : ''}
       <span class="ptc-plays">${formatNum(plays)} ${t('plays')}</span>
-      ${lfmUrl ? '<span class="ptc-lfm-hint"><i class="fas fa-external-link-alt"></i></span>' : ''}
+      ${name ? '<span class="ptc-lfm-hint"><i class="fas fa-chevron-right"></i></span>' : ''}
     </div>`;
 }
 
@@ -2823,7 +2883,9 @@ function _selectStatCards(allCards, maxCards = 12) {
     return chosen.slice(0, maxCards).map(id => allCards.find(c => c.id === id)).filter(Boolean);
   }
 
-  // AUTO mode
+  // AUTO mode — use user-configured count
+  const autoCount = Math.max(1, Math.min(18, parseInt(localStorage.getItem('ls_statcards_auto_count')) || maxCards));
+
   const scored = allCards.map(c => {
     const ageMs = now - (changeTimes[c.id] || 0);
     const boost = ageMs < 300_000 ? Math.round(60 * (1 - ageMs / 300_000)) : 0;
@@ -2832,7 +2894,7 @@ function _selectStatCards(allCards, maxCards = 12) {
 
   const selected = scored
     .sort((a, b) => b._score - a._score)
-    .slice(0, maxCards);
+    .slice(0, autoCount);
 
   selected.sort((a, b) => {
     const aAge = now - (changeTimes[a.id] || 0);
@@ -3014,10 +3076,17 @@ async function loadDashboard() {
       isLive: lastScrobble === t('stat_now_playing'),
       alwaysShow:true, relevance:95 },
 
-    { id:'days',     icon:'📆', value:formatNum(daysSince),  rawVal:daysSince,
-      label:t('adv_days'),           sub:t('adv_days_sub', formatDate(regTs)),
-      color:'#eab308', noAnim:true, milestoneType:'days',
-      alwaysShow:true, relevance:85 },
+    { id:'days',     icon:'📆',
+      value: APP.streakData ? formatNum(APP.streakData.current) + ' / ' + formatNum(APP.streakData.best) : '—',
+      rawVal: APP.streakData ? APP.streakData.current : 0,
+      label: t('stat_streak'),
+      sub: APP.streakData
+        ? (APP.streakData.current > 0
+          ? t('streak_current_record', APP.streakData.current, APP.streakData.best)
+          : t('streak_record_only', APP.streakData.best))
+        : '—',
+      color:'#eab308', noAnim:true, milestoneType:'listenDays',
+      alwaysShow: APP.streakData?.current > 0, relevance: APP.streakData?.current > 3 ? 80 : 55 },
 
     { id:'top1',     icon:'🌟', value:maxArtist ? maxArtist.name : '—', rawVal:maxArtist ? parseInt(maxArtist.playcount) : 0,
       label:t('adv_top1_alltime'),   sub:t('adv_top1_pct', topPct),
@@ -3073,9 +3142,18 @@ async function loadDashboard() {
       relevance: actScore > 5 ? 50 : 25 },
 
     { id:'regdays',  icon:'🗓️',
-      value: daysSince > 0 ? `${formatNum(daysSince)} ${t('unit_days')}` : '—',
+      value: daysSince > 0 ? formatNum(daysSince) + ' ' + t('unit_days') : '—',
       rawVal: daysSince,
-      label: t('stat_account_age'),    sub: formatDate(regTs) ? t('adv_days_sub', formatDate(regTs)) : '',
+      label: t('stat_account_age'),
+      sub: (() => {
+        const parts = [];
+        if (formatDate(regTs)) parts.push(t('adv_days_sub', formatDate(regTs)));
+        const activeDaysCount = APP.streakData && APP.cachedActiveDays > 0
+          ? t('stat_active_days_count', formatNum(APP.cachedActiveDays))
+          : '';
+        if (activeDaysCount) parts.push(activeDaysCount);
+        return parts.join(' · ');
+      })(),
       color:'#64748b', noAnim:true, milestoneType:'days',
       relevance: daysSince > 365 ? 48 : 38 },
   ];
@@ -5248,7 +5326,12 @@ function _applyFullHistory(tracks, showDoneToast) {
   _renderHourlyChart(hourCounts);
 
   APP.streakData = calcStreak(tracks);
-  updateStreakUI(APP.streakData);
+  APP.cachedActiveDays = new Set(
+    tracks.filter(tr => tr.date?.uts).map(tr => {
+      const d = new Date(parseInt(tr.date.uts) * 1000);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    })
+  ).size;
 
   const uniqueArtistsEl = document.getElementById('adv-unique');
   if (uniqueArtistsEl) {

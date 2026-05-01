@@ -680,7 +680,7 @@ const I18N_DATA = {
 
     color_system: 'Couleur du système / navigateur', 
     color_custom: 'Couleur personnalisée', 
-    stg_blocks_hint: 'Sélectionnez entre 0 et 12 blocs.', 
+    stg_blocks_hint: 'Sélectionnez entre 0 et 18 blocs.',  
     compare_username_placeholder: 'Nom d\'utilisateur Last.fm…', 
     btn_close: 'Fermer', 
     nav_settings: 'Paramètres', 
@@ -710,6 +710,15 @@ const I18N_DATA = {
     fetch_title_update: 'Mise à jour', 
     view_on_lastfm: 'Voir sur Last.fm', 
     view_on_musicbrainz: 'Voir sur MusicBrainz', 
+
+    stg_auto_count_label: 'Blocs à afficher', 
+    stg_mode_manual_label: 'Manuel', 
+
+    stat_streak: '🔥 Série d\'écoute', 
+    streak_current_record: '{0} j en cours · record {1} j', 
+    streak_record_only: 'Record : {0} j', 
+    stat_active_days_count: '{0} j actifs', 
+    toast_cards_max: '⚠️ Maximum 18 blocs. Désélectionnez-en un d\'abord.', 
 
   },
 
@@ -1229,7 +1238,7 @@ const I18N_DATA = {
 
     color_system: 'System / browser colour', 
     color_custom: 'Custom colour', 
-    stg_blocks_hint: 'Select between 0 and 12 blocks.', 
+    stg_blocks_hint: 'Select between 0 and 18 blocks.',  
     compare_username_placeholder: 'Last.fm username…', 
     btn_close: 'Close', 
     nav_settings: 'Settings', 
@@ -1259,6 +1268,15 @@ const I18N_DATA = {
     fetch_title_update: 'Update', 
     view_on_lastfm: 'View on Last.fm', 
     view_on_musicbrainz: 'View on MusicBrainz', 
+
+    stg_auto_count_label: 'Blocks to display', 
+    stg_mode_manual_label: 'Manual', 
+
+    stat_streak: '🔥 Listening streak', 
+    streak_current_record: '{0}d current · record {1}d', 
+    streak_record_only: 'Record: {0}d', 
+    stat_active_days_count: '{0} active days', 
+    toast_cards_max: '⚠️ Maximum 18 blocks. Deselect one first.', 
 
   },
 
@@ -1765,7 +1783,7 @@ const I18N_DATA = {
 
     color_system: 'Color del sistema / navegador', 
     color_custom: 'Color personalizado', 
-    stg_blocks_hint: 'Selecciona entre 0 y 12 bloques.', 
+    stg_blocks_hint: 'Selecciona entre 0 y 18 bloques.',  
     compare_username_placeholder: 'Nombre de usuario de Last.fm…', 
     btn_close: 'Cerrar', 
     nav_settings: 'Configuración', 
@@ -1795,6 +1813,15 @@ const I18N_DATA = {
     fetch_title_update: 'Actualización', 
     view_on_lastfm: 'Ver en Last.fm', 
     view_on_musicbrainz: 'Ver en MusicBrainz', 
+
+    stg_auto_count_label: 'Bloques a mostrar', 
+    stg_mode_manual_label: 'Manual', 
+
+    stat_streak: '🔥 Racha de escucha', 
+    streak_current_record: '{0}d actual · récord {1}d', 
+    streak_record_only: 'Récord: {0}d', 
+    stat_active_days_count: '{0} días activos', 
+    toast_cards_max: '⚠️ Máximo 18 bloques. Deselecciona uno primero.', 
 
   },
 
@@ -2301,7 +2328,7 @@ const I18N_DATA = {
 
     color_system: 'Cor do sistema / navegador', 
     color_custom: 'Cor personalizada', 
-    stg_blocks_hint: 'Seleciona entre 0 e 12 blocos.', 
+    stg_blocks_hint: 'Seleciona entre 0 e 18 blocos.',  
     compare_username_placeholder: 'Nome de utilizador Last.fm…', 
     btn_close: 'Fechar', 
     nav_settings: 'Definições', 
@@ -2331,6 +2358,15 @@ const I18N_DATA = {
     fetch_title_update: 'Atualização', 
     view_on_lastfm: 'Ver no Last.fm', 
     view_on_musicbrainz: 'Ver no MusicBrainz', 
+
+    stg_auto_count_label: 'Blocos a exibir', 
+    stg_mode_manual_label: 'Manual', 
+
+    stat_streak: '🔥 Série de escuta', 
+    streak_current_record: '{0}d atual · recorde {1}d', 
+    streak_record_only: 'Recorde: {0}d', 
+    stat_active_days_count: '{0} dias ativos', 
+    toast_cards_max: '⚠️ Máximo 18 blocos. Desselecione um primeiro.', 
 
   },
 
@@ -2837,7 +2873,7 @@ const I18N_DATA = {
 
     color_system: 'System- / Browserfarbe', 
     color_custom: 'Benutzerdefinierte Farbe', 
-    stg_blocks_hint: 'Wähle zwischen 0 und 12 Blöcken.', 
+    stg_blocks_hint: 'Wähle zwischen 0 und 18 Blöcken.',  
     compare_username_placeholder: 'Last.fm-Benutzername…', 
     btn_close: 'Schließen', 
     nav_settings: 'Einstellungen', 
@@ -2867,6 +2903,15 @@ const I18N_DATA = {
     fetch_title_update: 'Aktualisierung', 
     view_on_lastfm: 'Auf Last.fm ansehen', 
     view_on_musicbrainz: 'Auf MusicBrainz ansehen', 
+
+    stg_auto_count_label: 'Anzuzeigende Blöcke', 
+    stg_mode_manual_label: 'Manuell', 
+
+    stat_streak: '🔥 Hör-Serie', 
+    streak_current_record: '{0}T aktuell · Rekord {1}T', 
+    streak_record_only: 'Rekord: {0}T', 
+    stat_active_days_count: '{0} aktive Tage', 
+    toast_cards_max: '⚠️ Maximal 18 Blöcke. Hebe zuerst die Auswahl eines ab.', 
 
   },
 
@@ -3373,7 +3418,7 @@ const I18N_DATA = {
 
     color_system: 'Colore sistema / browser', 
     color_custom: 'Colore personalizzato', 
-    stg_blocks_hint: 'Seleziona tra 0 e 12 blocchi.', 
+    stg_blocks_hint: 'Seleziona tra 0 e 18 blocchi.',  
     compare_username_placeholder: 'Nome utente Last.fm…', 
     btn_close: 'Chiudi', 
     nav_settings: 'Impostazioni', 
@@ -3403,6 +3448,15 @@ const I18N_DATA = {
     fetch_title_update: 'Aggiornamento', 
     view_on_lastfm: 'Vedi su Last.fm', 
     view_on_musicbrainz: 'Vedi su MusicBrainz', 
+
+    stg_auto_count_label: 'Blocchi da visualizzare', 
+    stg_mode_manual_label: 'Manuale', 
+
+    stat_streak: '🔥 Serie di ascolto', 
+    streak_current_record: '{0}g in corso · record {1}g', 
+    streak_record_only: 'Record: {0}g', 
+    stat_active_days_count: '{0} giorni attivi', 
+    toast_cards_max: '⚠️ Massimo 18 blocchi. Deseleziona prima uno.', 
 
   },
 
@@ -3909,7 +3963,7 @@ const I18N_DATA = {
 
     color_system: 'Системный / браузерный цвет', 
     color_custom: 'Пользовательский цвет', 
-    stg_blocks_hint: 'Выберите от 0 до 12 блоков.', 
+    stg_blocks_hint: 'Выберите от 0 до 18 блоков.',  
     compare_username_placeholder: 'Имя пользователя Last.fm…', 
     btn_close: 'Закрыть', 
     nav_settings: 'Настройки', 
@@ -3939,6 +3993,15 @@ const I18N_DATA = {
     fetch_title_update: 'Обновление', 
     view_on_lastfm: 'Открыть на Last.fm', 
     view_on_musicbrainz: 'Открыть на MusicBrainz', 
+
+    stg_auto_count_label: 'Блоков для отображения', 
+    stg_mode_manual_label: 'Вручную', 
+
+    stat_streak: '🔥 Серия прослушиваний', 
+    streak_current_record: '{0}д текущая · рекорд {1}д', 
+    streak_record_only: 'Рекорд: {0}д', 
+    stat_active_days_count: '{0} активных дней', 
+    toast_cards_max: '⚠️ Максимум 18 блоков. Сначала отмените один.', 
 
   },
 
@@ -4444,7 +4507,7 @@ const I18N_DATA = {
 
     color_system: 'システム / ブラウザカラー', 
     color_custom: 'カスタムカラー', 
-    stg_blocks_hint: '0〜12個のブロックを選択してください。', 
+    stg_blocks_hint: '0〜18個のブロックを選択してください。',  
     compare_username_placeholder: 'Last.fmユーザー名…', 
     btn_close: '閉じる', 
     nav_settings: '設定', 
@@ -4474,6 +4537,15 @@ const I18N_DATA = {
     fetch_title_update: '更新', 
     view_on_lastfm: 'Last.fmで見る', 
     view_on_musicbrainz: 'MusicBrainzで見る', 
+
+    stg_auto_count_label: '表示ブロック数', 
+    stg_mode_manual_label: '手動', 
+
+    stat_streak: '🔥 連続再生', 
+    streak_current_record: '現在{0}日 · 記録{1}日', 
+    streak_record_only: '記録: {0}日', 
+    stat_active_days_count: '{0}日アクティブ', 
+    toast_cards_max: '⚠️ 最大18ブロック。先に1つ解除してください。', 
 
   },
 
@@ -4979,7 +5051,7 @@ const I18N_DATA = {
 
     color_system: '系统 / 浏览器颜色', 
     color_custom: '自定义颜色', 
-    stg_blocks_hint: '选择0到12个块。', 
+    stg_blocks_hint: '选择0到18个块。',  
     compare_username_placeholder: 'Last.fm 用户名…', 
     btn_close: '关闭', 
     nav_settings: '设置', 
@@ -5009,6 +5081,15 @@ const I18N_DATA = {
     fetch_title_update: '更新', 
     view_on_lastfm: '在Last.fm上查看', 
     view_on_musicbrainz: '在MusicBrainz上查看', 
+
+    stg_auto_count_label: '显示的块数', 
+    stg_mode_manual_label: '手动', 
+
+    stat_streak: '🔥 连续收听', 
+    streak_current_record: '当前{0}天 · 记录{1}天', 
+    streak_record_only: '记录: {0}天', 
+    stat_active_days_count: '{0}个活跃天', 
+    toast_cards_max: '⚠️ 最多18个块。请先取消选择一个。', 
 
   },
 
@@ -5514,7 +5595,7 @@ const I18N_DATA = {
 
     color_system: '시스템 / 브라우저 색상', 
     color_custom: '사용자 지정 색상', 
-    stg_blocks_hint: '0에서 12개의 블록을 선택하세요.', 
+    stg_blocks_hint: '0에서 18개의 블록을 선택하세요.',  
     compare_username_placeholder: 'Last.fm 사용자명…', 
     btn_close: '닫기', 
     nav_settings: '설정', 
@@ -5544,6 +5625,15 @@ const I18N_DATA = {
     fetch_title_update: '업데이트', 
     view_on_lastfm: 'Last.fm에서 보기', 
     view_on_musicbrainz: 'MusicBrainz에서 보기', 
+
+    stg_auto_count_label: '표시할 블록 수', 
+    stg_mode_manual_label: '수동', 
+
+    stat_streak: '🔥 연속 청취', 
+    streak_current_record: '현재 {0}일 · 기록 {1}일', 
+    streak_record_only: '기록: {0}일', 
+    stat_active_days_count: '{0}일 활성', 
+    toast_cards_max: '⚠️ 최대 18개 블록. 먼저 하나를 해제하세요.', 
 
   },
 
@@ -6049,7 +6139,7 @@ const I18N_DATA = {
 
     color_system: 'Sistem / tarayıcı rengi', 
     color_custom: 'Özel renk', 
-    stg_blocks_hint: '0 ile 12 blok arasında seçin.', 
+    stg_blocks_hint: '0 ile 18 blok arasında seçin.',  
     compare_username_placeholder: 'Last.fm kullanıcı adı…', 
     btn_close: 'Kapat', 
     nav_settings: 'Ayarlar', 
@@ -6079,6 +6169,15 @@ const I18N_DATA = {
     fetch_title_update: 'Güncelleme', 
     view_on_lastfm: 'Last.fm\'de görüntüle', 
     view_on_musicbrainz: 'MusicBrainz\'de görüntüle', 
+
+    stg_auto_count_label: 'Gösterilecek blok sayısı', 
+    stg_mode_manual_label: 'Manuel', 
+
+    stat_streak: '🔥 Dinleme serisi', 
+    streak_current_record: '{0}g mevcut · rekor {1}g', 
+    streak_record_only: 'Rekor: {0}g', 
+    stat_active_days_count: '{0} aktif gün', 
+    toast_cards_max: '⚠️ Maksimum 18 blok. Önce birini kaldırın.', 
 
   },
 
@@ -6584,7 +6683,7 @@ const I18N_DATA = {
 
     color_system: 'لون النظام / المتصفح', 
     color_custom: 'لون مخصص', 
-    stg_blocks_hint: 'اختر بين 0 و12 بلوكًا.', 
+    stg_blocks_hint: 'اختر بين 0 و18 بلوكًا.',  
     compare_username_placeholder: 'اسم مستخدم Last.fm…', 
     btn_close: 'إغلاق', 
     nav_settings: 'الإعدادات', 
@@ -6614,6 +6713,15 @@ const I18N_DATA = {
     fetch_title_update: 'تحديث', 
     view_on_lastfm: 'عرض على Last.fm', 
     view_on_musicbrainz: 'عرض على MusicBrainz', 
+
+    stg_auto_count_label: 'عدد البلوكات للعرض', 
+    stg_mode_manual_label: 'يدوي', 
+
+    stat_streak: '🔥 سلسلة الاستماع', 
+    streak_current_record: '{0}ي الحالية · سجل {1}ي', 
+    streak_record_only: 'السجل: {0} يوم', 
+    stat_active_days_count: '{0} يوم نشط', 
+    toast_cards_max: '⚠️ الحد الأقصى 18 بلوك. قم بإلغاء تحديد أحدها أولاً.', 
 
   },
 };
