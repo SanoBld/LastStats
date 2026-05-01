@@ -703,6 +703,14 @@ const I18N_DATA = {
     sdp_global_scrobbles: 'scrobbles globaux', 
     wrap_album1: 'Album n°1', 
 
+    tab_language: 'Langue', 
+    tab_navigation: 'Navigation', 
+    tab_dashboard: 'Dashboard', 
+    stg_language_title: 'Langue de l\'interface', 
+    fetch_title_update: 'Mise à jour', 
+    view_on_lastfm: 'Voir sur Last.fm', 
+    view_on_musicbrainz: 'Voir sur MusicBrainz', 
+
   },
 
   en: {
@@ -1244,6 +1252,14 @@ const I18N_DATA = {
     sdp_global_scrobbles: 'global scrobbles', 
     wrap_album1: 'Album #1', 
 
+    tab_language: 'Language', 
+    tab_navigation: 'Navigation', 
+    tab_dashboard: 'Dashboard', 
+    stg_language_title: 'Interface language', 
+    fetch_title_update: 'Update', 
+    view_on_lastfm: 'View on Last.fm', 
+    view_on_musicbrainz: 'View on MusicBrainz', 
+
   },
 
   es: {
@@ -1771,6 +1787,14 @@ const I18N_DATA = {
     sdp_played_by_you: '× escuchado por ti', 
     sdp_global_scrobbles: 'scrobbles globales', 
     wrap_album1: 'Álbum n°1', 
+
+    tab_language: 'Idioma', 
+    tab_navigation: 'Navegación', 
+    tab_dashboard: 'Panel', 
+    stg_language_title: 'Idioma de la interfaz', 
+    fetch_title_update: 'Actualización', 
+    view_on_lastfm: 'Ver en Last.fm', 
+    view_on_musicbrainz: 'Ver en MusicBrainz', 
 
   },
 
@@ -2300,6 +2324,14 @@ const I18N_DATA = {
     sdp_global_scrobbles: 'scrobbles globais', 
     wrap_album1: 'Álbum n°1', 
 
+    tab_language: 'Idioma', 
+    tab_navigation: 'Navegação', 
+    tab_dashboard: 'Painel', 
+    stg_language_title: 'Idioma da interface', 
+    fetch_title_update: 'Atualização', 
+    view_on_lastfm: 'Ver no Last.fm', 
+    view_on_musicbrainz: 'Ver no MusicBrainz', 
+
   },
 
   de: {
@@ -2827,6 +2859,14 @@ const I18N_DATA = {
     sdp_played_by_you: '× von dir gehört', 
     sdp_global_scrobbles: 'globale Scrobbles', 
     wrap_album1: 'Album Nr. 1', 
+
+    tab_language: 'Sprache', 
+    tab_navigation: 'Navigation', 
+    tab_dashboard: 'Dashboard', 
+    stg_language_title: 'Oberflächensprache', 
+    fetch_title_update: 'Aktualisierung', 
+    view_on_lastfm: 'Auf Last.fm ansehen', 
+    view_on_musicbrainz: 'Auf MusicBrainz ansehen', 
 
   },
 
@@ -3356,6 +3396,14 @@ const I18N_DATA = {
     sdp_global_scrobbles: 'scrobbles globali', 
     wrap_album1: 'Album n°1', 
 
+    tab_language: 'Lingua', 
+    tab_navigation: 'Navigazione', 
+    tab_dashboard: 'Dashboard', 
+    stg_language_title: 'Lingua dell\'interfaccia', 
+    fetch_title_update: 'Aggiornamento', 
+    view_on_lastfm: 'Vedi su Last.fm', 
+    view_on_musicbrainz: 'Vedi su MusicBrainz', 
+
   },
 
   ru: {
@@ -3884,6 +3932,14 @@ const I18N_DATA = {
     sdp_global_scrobbles: 'глобальных скробблов', 
     wrap_album1: 'Альбом №1', 
 
+    tab_language: 'Язык', 
+    tab_navigation: 'Навигация', 
+    tab_dashboard: 'Панель', 
+    stg_language_title: 'Язык интерфейса', 
+    fetch_title_update: 'Обновление', 
+    view_on_lastfm: 'Открыть на Last.fm', 
+    view_on_musicbrainz: 'Открыть на MusicBrainz', 
+
   },
 
   ja: {
@@ -4410,6 +4466,14 @@ const I18N_DATA = {
     sdp_played_by_you: '× あなたの再生', 
     sdp_global_scrobbles: 'グローバルスクロブル', 
     wrap_album1: 'アルバム1位', 
+
+    tab_language: '言語', 
+    tab_navigation: 'ナビゲーション', 
+    tab_dashboard: 'ダッシュボード', 
+    stg_language_title: 'インターフェース言語', 
+    fetch_title_update: '更新', 
+    view_on_lastfm: 'Last.fmで見る', 
+    view_on_musicbrainz: 'MusicBrainzで見る', 
 
   },
 
@@ -4938,6 +5002,14 @@ const I18N_DATA = {
     sdp_global_scrobbles: '全球scrobble数', 
     wrap_album1: '专辑第1', 
 
+    tab_language: '语言', 
+    tab_navigation: '导航', 
+    tab_dashboard: '仪表板', 
+    stg_language_title: '界面语言', 
+    fetch_title_update: '更新', 
+    view_on_lastfm: '在Last.fm上查看', 
+    view_on_musicbrainz: '在MusicBrainz上查看', 
+
   },
 
   ko: {
@@ -5464,6 +5536,14 @@ const I18N_DATA = {
     sdp_played_by_you: '× 내 재생', 
     sdp_global_scrobbles: '전체 스크로블', 
     wrap_album1: '앨범 1위', 
+
+    tab_language: '언어', 
+    tab_navigation: '탐색', 
+    tab_dashboard: '대시보드', 
+    stg_language_title: '인터페이스 언어', 
+    fetch_title_update: '업데이트', 
+    view_on_lastfm: 'Last.fm에서 보기', 
+    view_on_musicbrainz: 'MusicBrainz에서 보기', 
 
   },
 
@@ -5992,6 +6072,14 @@ const I18N_DATA = {
     sdp_global_scrobbles: 'global scrobble', 
     wrap_album1: 'Albüm 1.', 
 
+    tab_language: 'Dil', 
+    tab_navigation: 'Gezinti', 
+    tab_dashboard: 'Gösterge Paneli', 
+    stg_language_title: 'Arayüz dili', 
+    fetch_title_update: 'Güncelleme', 
+    view_on_lastfm: 'Last.fm\'de görüntüle', 
+    view_on_musicbrainz: 'MusicBrainz\'de görüntüle', 
+
   },
 
   ar: {
@@ -6518,6 +6606,14 @@ const I18N_DATA = {
     sdp_played_by_you: '× استمعت إليه', 
     sdp_global_scrobbles: 'سكروبلات عالمية', 
     wrap_album1: 'الألبوم الأول', 
+
+    tab_language: 'اللغة', 
+    tab_navigation: 'التنقل', 
+    tab_dashboard: 'لوحة القيادة', 
+    stg_language_title: 'لغة الواجهة', 
+    fetch_title_update: 'تحديث', 
+    view_on_lastfm: 'عرض على Last.fm', 
+    view_on_musicbrainz: 'عرض على MusicBrainz', 
 
   },
 };

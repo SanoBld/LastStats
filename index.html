@@ -949,13 +949,13 @@
           <div class="hist-summary-date" id="hist-summary-date">—</div>
           <div class="hist-summary-stats">
             <span class="hist-stat-pill" id="hist-stat-count">
-              <i class="fas fa-headphones"></i> — scrobbles
+              <i class="fas fa-headphones"></i> — <span data-i18n="scrobbles">scrobbles</span>
             </span>
             <span class="hist-stat-pill" id="hist-stat-artists">
-              <i class="fas fa-microphone-alt"></i> — artists
+              <i class="fas fa-microphone-alt"></i> — <span data-i18n="stat_artists">artists</span>
             </span>
             <span class="hist-stat-pill" id="hist-stat-albums">
-              <i class="fas fa-compact-disc"></i> — albums
+              <i class="fas fa-compact-disc"></i> — <span data-i18n="stat_albums">albums</span>
             </span>
           </div>
         </div>
@@ -1063,7 +1063,7 @@
             <div class="np-pulse"></div>
             <div class="np-art" id="profile-np-art"></div>
             <div class="np-info">
-              <span class="np-live">● NOW PLAYING</span>
+              <span class="np-live" data-i18n="now_listening">● Now listening</span>
               <strong id="profile-np-track">—</strong>
               <span id="profile-np-artist">—</span>
             </div>
@@ -1113,7 +1113,7 @@
             </button>
             <button class="stg-tab-btn" data-tab="stg-language" role="tab" onclick="switchSettingsTab('stg-language')">
               <i class="fas fa-globe"></i>
-              <span>Langue</span>
+              <span data-i18n="tab_language">Language</span>
             </button>
             <button class="stg-tab-btn" data-tab="stg-data" role="tab" onclick="switchSettingsTab('stg-data')">
               <i class="fas fa-database"></i>
@@ -1121,11 +1121,11 @@
             </button>
             <button class="stg-tab-btn" data-tab="stg-nav" role="tab" onclick="switchSettingsTab('stg-nav')">
               <i class="fas fa-bars"></i>
-              <span>Navigation</span>
+              <span data-i18n="tab_navigation">Navigation</span>
             </button>
             <button class="stg-tab-btn" data-tab="stg-dashboard" role="tab" onclick="switchSettingsTab('stg-dashboard')">
               <i class="fas fa-th-large"></i>
-              <span>Dashboard</span>
+              <span data-i18n="tab_dashboard">Dashboard</span>
             </button>
             <button class="stg-tab-btn" data-tab="stg-about" role="tab" onclick="switchSettingsTab('stg-about')">
               <i class="fas fa-info-circle"></i>
@@ -1360,7 +1360,7 @@
           <div class="stg-tab-panel" id="stg-language" role="tabpanel">
             <div class="stg-panel-inner">
               <div class="stg-section">
-                <h4 class="stg-section-title"><i class="fas fa-language"></i> Langue de l'interface</h4>
+                <h4 class="stg-section-title"><i class="fas fa-language"></i> <span data-i18n="stg_language_title">Interface language</span></h4>
                 <div class="setting-row">
                   <div class="setting-ctrl">
                     <div class="lang-btns" id="lang-btns">
@@ -1822,7 +1822,7 @@
         <span class="am-stat" id="im-listeners-wrap" style="display:none">
           <i class="fas fa-users"></i>
           <span id="im-listeners">—</span>
-          <span>auditeurs</span>
+          <span data-i18n="sdp_listeners">listeners</span>
         </span>
         <span class="am-stat">
           <i class="fas fa-play"></i>
@@ -1900,12 +1900,12 @@
         <span class="am-stat">
           <i class="fas fa-users"></i>
           <span id="am-listeners">—</span>
-          <span>auditeurs</span>
+          <span data-i18n="sdp_listeners">listeners</span>
         </span>
         <span class="am-stat">
           <i class="fas fa-play"></i>
           <span id="am-globalplays">—</span>
-          <span>écoutes globales</span>
+          <span data-i18n="sdp_global_scrobbles">global scrobbles</span>
         </span>
         <span class="am-stat am-stat--accent">
           <i class="fas fa-headphones"></i>
@@ -1916,11 +1916,11 @@
       <div class="am-tags" id="am-tags"></div>
       <div class="am-ext-links">
         <a id="am-lfm-link" href="#" target="_blank" rel="noopener"
-           class="am-ext-btn am-lastfm" aria-label="View on Last.fm" title="Voir sur Last.fm">
+           class="am-ext-btn am-lastfm" aria-label="View on Last.fm" data-i18n-title="view_on_lastfm" title="View on Last.fm">
           <i class="fab fa-lastfm"></i> Last.fm
         </a>
         <a id="am-mb-link" href="#" target="_blank" rel="noopener"
-           class="am-ext-btn im-mb-btn" aria-label="View on MusicBrainz" title="Voir sur MusicBrainz">
+           class="am-ext-btn im-mb-btn" aria-label="View on MusicBrainz" data-i18n-title="view_on_musicbrainz" title="View on MusicBrainz">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" style="flex-shrink:0"><path fill="#BA5D2E" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 1.5a8.5 8.5 0 1 1 0 17 8.5 8.5 0 0 1 0-17zm-3.5 4v9h1.5V9.5l2 2.5 2-2.5V16.5H15.5v-9l-3.5 4.5-3.5-4.5z"/></svg> MusicBrainz
         </a>
         <a id="am-sp-link" href="#" target="_blank" rel="noopener"

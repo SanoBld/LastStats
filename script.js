@@ -1081,6 +1081,19 @@ function setLanguage(lang) {
       _buildCalHeatmapYearSel('');
       _buildCalHeatmapYearSel('charts');
     }
+    // Refresh hero label
+    if (typeof _updateDashHero === 'function') _updateDashHero();
+    // Refresh fetch-history button text
+    const fetchBtn = document.getElementById('fetch-history-btn');
+    if (fetchBtn && !fetchBtn.disabled) {
+      const hasHistory = fetchBtn.classList.contains('btn-fetch--done') ||
+                         fetchBtn.querySelector('.fa-check');
+      if (hasHistory) {
+        fetchBtn.innerHTML = `<i class="fas fa-check"></i> ${t('fetch_btn_done')}`;
+      }
+    }
+    // Refresh _ALL_CARD_DEFS labels (they use getters, so chips need re-render)
+    _buildCardPicker?.();
   });
 }
 
@@ -5103,7 +5116,7 @@ async function fetchFullHistory(backgroundMode = false) {
       if (tracksEl) tracksEl.textContent = '0 ' + t('scrobbles');
       if (msgEl)    msgEl.textContent    = t('fetch_init');
       if (titleEl)  titleEl.textContent  = isIncremental
-        ? `${t('fetch_title')} — Mise à jour`
+        ? `${t('fetch_title')} — ${t('fetch_title_update')}`
         : t('fetch_title');
     } else {
       _historyFetchMinimized = true;
