@@ -828,7 +828,7 @@ function setAccent(colorKey) {
       // Fallback : violet si la couleur système est illisible
       const pal = (isDark ? _ACCENT_DARK : _ACCENT_LIGHT).purple;
       _applyCSSAccent(pal);
-      showToast('⚠️ Couleur système non détectée, violet appliqué.', 'info');
+      showToast(t('toast_color_fallback'), 'info');
     }
     updateAllChartThemes();
     return;
@@ -1044,6 +1044,19 @@ function setLanguage(lang) {
       const val = t(key) || t(raw);
       if (val && val !== key && val !== raw) el.textContent = val;
     });
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+      const val = t(el.getAttribute('data-i18n-title'));
+      if (val) el.title = val;
+    });
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+      const val = t(el.getAttribute('data-i18n-aria'));
+      if (val) el.setAttribute('aria-label', val);
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const val = t(el.getAttribute('data-i18n-placeholder'));
+      if (val) el.placeholder = val;
+    });
+
     document.querySelectorAll('.nav-lnk[data-s], .bn-item[data-s]').forEach(el => {
       const key  = NAV_TITLE_KEYS[el.dataset.s];
       const span = el.querySelector('span:not(.nav-bdg)');
@@ -1071,7 +1084,7 @@ function setStartupSection(section) {
   document.querySelectorAll('.startup-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.startup === section)
   );
-  showToast('✅ Page de démarrage enregistrée !', 'success', 'actions');
+  showToast(t('toast_startpage_saved'), 'success', 'actions');
 }
 
 function _syncStartupSectionUI() {
@@ -1098,7 +1111,7 @@ function setDashHeroMode(mode) {
   const fbRow = document.getElementById('hero-fallback-row');
   if (fbRow) fbRow.classList.toggle('hidden', mode !== 'nowplaying');
   refreshDashHero();
-  showToast('🎨 Bandeau mis à jour !', 'success', 'actions');
+  showToast(t('toast_banner_updated'), 'success', 'actions');
 }
 
 /** Called on init + section nav + NP update */
@@ -1128,7 +1141,7 @@ async function refreshDashHero(modeOverride = null) {
     headEl.innerHTML = !showInfo
       ? `<div class="dash-hero-title-overlay">
            <strong id="dash-hero-main-title">Dashboard</strong>
-           <span id="dash-hero-main-sub">Aperçu de votre activité musicale</span>
+           <span id="dash-hero-main-sub">${t('dash_hero_sub')}</span>
          </div>`
       : '';
   }
@@ -1159,7 +1172,11 @@ async function refreshDashHero(modeOverride = null) {
   // ── top-track / top-artist ────────────────────────
   const isTrack  = mode.includes('-track-');
   const period   = mode.split('-').pop(); // last segment: 7day / 1month / 12month
-  const perLabels = { '7day': 'cette semaine', '1month': 'ce mois', '12month': 'cette année' };
+  const perLabels = {
+    '7day':    t('period_7day'),
+    '1month':  t('period_1month'),
+    '12month': t('period_12month'),
+  };
   const perLabel  = perLabels[period] || period;
 
   try {
@@ -1184,7 +1201,7 @@ async function refreshDashHero(modeOverride = null) {
                || track.image?.find(i => i.size === 'large')?.['#text']
                || track.image?.find(i => i.size === 'medium')?.['#text'] || '';
       }
-      label  = `🎵 Top Titre — ${perLabel}`;
+      label  = t('hero_top_track', perLabel);
       if (!imgUrl || isDefaultImg(imgUrl)) {
         try {
           const ti = await API.call('track.getInfo', { artist: sub, track: name, username: APP.username });
@@ -1203,7 +1220,7 @@ async function refreshDashHero(modeOverride = null) {
       if (!artist) throw new Error('no data');
       name   = artist.name || '';
       imgUrl = await _resolveArtistImageExternal(name).catch(() => '');
-      label  = `🎤 Top Artiste — ${perLabel}`;
+      label  = t('hero_top_artist', perLabel);
       _heroSetContent(cnt, _heroArtistContent(name, imgUrl, label));
     }
 
@@ -1250,7 +1267,7 @@ async function _heroApplyNowPlaying(bg, cnt) {
       }
     } else {
       // First render
-      _heroSetContent(cnt, _heroTrackContent(npTrack, npArtist, npImg, '🎵 En cours'));
+      _heroSetContent(cnt, _heroTrackContent(npTrack, npArtist, npImg, t('hero_now_playing')));
       bg.dataset.lastSrc = npImg;
       await _applyHeroBgImage(bg, npImg);
     }
@@ -1394,24 +1411,24 @@ function toggleNotif(category, enabled) {
 
 /** All card definitions (labels + icons) used in the settings picker */
 const _ALL_CARD_DEFS = [
-  { id:'total',     icon:'🎯', label:'Scrobbles total'         },
-  { id:'avg',       icon:'⚡', label:'Scrobbles / jour'         },
-  { id:'peak',      icon:'🕐', label:'Heure de pointe'         },
-  { id:'artists',   icon:'🎤', label:'Artistes écoutés'         },
-  { id:'albums',    icon:'💿', label:'Albums explorés'          },
-  { id:'diversity', icon:'📊', label:'Ratio de diversité'       },
-  { id:'tracks',    icon:'🎼', label:'Titres différents'        },
-  { id:'last',      icon:'⏱️', label:'Dernier scrobble'         },
-  { id:'days',      icon:'📆', label:'Jours d\'activité'        },
-  { id:'top1',      icon:'🌟', label:'Artiste n°1'              },
-  { id:'eddington', icon:'🔢', label:'Nombre d\'Eddington'      },
-  { id:'listen',    icon:'🎧', label:'Temps d\'écoute estimé'   },
-  { id:'repeat',    icon:'🔁', label:'Taux de répétition'       },
-  { id:'albumrate', icon:'📀', label:'Albums / artiste'         },
-  { id:'weekly',    icon:'📅', label:'Scrobbles / semaine'      },
-  { id:'topplay',   icon:'🏆', label:'Plays artiste n°1'        },
-  { id:'intensity', icon:'🔥', label:'Intensité moyenne'        },
-  { id:'regdays',   icon:'🗓️', label:'Ancienneté du compte'     },
+  { id:'total',     icon:'🎯', get label(){ return t('stat_total')       } },
+  { id:'avg',       icon:'⚡', get label(){ return t('stat_avgday')      } },
+  { id:'peak',      icon:'🕐', get label(){ return t('stat_peak')        } },
+  { id:'artists',   icon:'🎤', get label(){ return t('stat_artists')     } },
+  { id:'albums',    icon:'💿', get label(){ return t('stat_albums')      } },
+  { id:'diversity', icon:'📊', get label(){ return t('stat_diversity')   } },
+  { id:'tracks',    icon:'🎼', get label(){ return t('stat_tracks')      } },
+  { id:'last',      icon:'⏱️', get label(){ return t('stat_last')        } },
+  { id:'days',      icon:'📆', get label(){ return t('stat_days')        } },
+  { id:'top1',      icon:'🌟', get label(){ return t('stat_top1')        } },
+  { id:'eddington', icon:'🔢', get label(){ return t('stat_eddington')   } },
+  { id:'listen',    icon:'🎧', get label(){ return t('stat_listen_time') } },
+  { id:'repeat',    icon:'🔁', get label(){ return t('stat_repeat_rate') } },
+  { id:'albumrate', icon:'📀', get label(){ return t('stat_album_rate')  } },
+  { id:'weekly',    icon:'📅', get label(){ return t('stat_weekly')      } },
+  { id:'topplay',   icon:'🏆', get label(){ return t('stat_top1_plays')  } },
+  { id:'intensity', icon:'🔥', get label(){ return t('stat_intensity')   } },
+  { id:'regdays',   icon:'🗓️', get label(){ return t('stat_account_age') } },
 ];
 
 function _initDashboardSettings() {
@@ -1464,7 +1481,7 @@ function toggleCardChip(el, id) {
     el.classList.remove('stg-card-chip--on');
   } else {
     if (totalOn >= 12) {
-      showToast('⚠️ Maximum 12 blocs. Désélectionnez-en un d\'abord.');
+      showToast(t('toast_cards_max'));
       return;
     }
     el.classList.add('stg-card-chip--on');
@@ -1491,14 +1508,14 @@ function applyManualCards() {
   }
   const all = [...new Set(ordered)].slice(0, 12);
   localStorage.setItem('ls_statcards_manual', JSON.stringify(all));
-  showToast('✅ Blocs personnalisés appliqués !', 'success', 'actions');
+  showToast(t('toast_cards_applied'), 'success', 'actions');
   if (APP.userInfo) loadDashboard();
 }
 
 function resetManualCards() {
   localStorage.removeItem('ls_statcards_manual');
   _buildCardPickerGrid();
-  showToast('🔄 Sélection réinitialisée', 'success', 'actions');
+  showToast(t('toast_cards_reset'), 'success', 'actions');
 }
 
 /* ── Order list (drag & drop) ──────────────────────────────────────────── */
@@ -1517,7 +1534,7 @@ function _buildOrderList() {
   onIds.forEach(id => { if (!ordered.includes(id)) ordered.push(id); });
 
   if (!ordered.length) {
-    wrap.innerHTML = '<p class="stg-order-empty"><i class="fas fa-info-circle"></i> Aucun bloc sélectionné</p>';
+    wrap.innerHTML = `<p class="stg-order-empty"><i class="fas fa-info-circle"></i> ${t('card_no_blocks')}</p>`;
     return;
   }
 
@@ -1573,13 +1590,13 @@ function setStatCardMode(mode) {
   if (pickerSection) pickerSection.style.display = mode === 'manual' ? 'block' : 'none';
   if (mode === 'manual') _buildCardPickerGrid();
   if (APP.userInfo) loadDashboard();
-  showToast(mode === 'auto' ? '✨ Mode automatique activé' : '✏️ Mode manuel activé', 'success', 'system');
+  showToast(mode === 'auto' ? t('toast_mode_auto') : t('toast_mode_manual'), 'success', 'system');
 }
 
 function setMilestonesEnabled(enabled) {
   localStorage.setItem('ls_statcards_milestones', enabled ? 'true' : 'false');
   if (APP.userInfo) loadDashboard();
-  showToast(enabled ? '🏆 Succès activés' : '🚫 Succès masqués', 'success', 'system');
+  showToast(enabled ? t('toast_milestones_on') : t('toast_milestones_off'), 'success', 'system');
 }
 
 /** Toggle text info visibility on the hero */
@@ -1598,7 +1615,7 @@ function setDashHeroFallback(fallback) {
   document.querySelectorAll('.hero-fallback-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.fallback === fallback)
   );
-  showToast('✅ Mode de secours enregistré !', 'success', 'actions');
+  showToast(t('toast_fallback_saved'), 'success', 'actions');
 }
 
 /** Sync hero mode buttons on settings open */
@@ -1681,7 +1698,7 @@ async function initApp(usernameOverride, apiKeyOverride) {
       APP.albumsLayout  = localStorage.getItem('ls_albums_layout')  || (isMobile ? 'list' : 'grid');
       APP.tracksLayout  = localStorage.getItem('ls_tracks_layout')  || 'list';
       // Afficher un toast de bienvenue discret
-      setTimeout(() => showToast('👋 Bienvenue sur LastStats ! Interface adaptée à ton écran.', 'info'), 2200);
+      setTimeout(() => showToast(t('toast_welcome'), 'info'), 2200);
     }
 
     const theme = localStorage.getItem('ls_theme') || 'dark';
@@ -1833,6 +1850,19 @@ window.addEventListener('DOMContentLoaded', () => {
       const val = t(key) || t(raw);
       if (val && val !== key && val !== raw) el.textContent = val;
     });
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+      const val = t(el.getAttribute('data-i18n-title'));
+      if (val) el.title = val;
+    });
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+      const val = t(el.getAttribute('data-i18n-aria'));
+      if (val) el.setAttribute('aria-label', val);
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const val = t(el.getAttribute('data-i18n-placeholder'));
+      if (val) el.placeholder = val;
+    });
+
     document.querySelectorAll('.lang-btn').forEach(b =>
       b.classList.toggle('active', b.dataset.lang === lang)
     );
@@ -1976,7 +2006,7 @@ function setSbAutohide(mode) {
   const sb = document.getElementById('sidebar');
   if (sb && mode === 'slim') sb.classList.remove('sb-collapsed');
   _applySbAutohide();
-  showToast(mode === 'slim' ? '👁 Mode discret activé' : '📌 Barre latérale fixe', 'success', 'system');
+  showToast(mode === 'slim' ? t('toast_sidebar_slim') : t('toast_sidebar_fixed'), 'success', 'system');
 }
 
 
@@ -2517,7 +2547,7 @@ function _renderProfileTopCard(id, icon, label, name, plays, imageArr, sub) {
       <span class="ptc-label"><i class="fas fa-${icon}"></i> ${label}</span>
       <strong class="ptc-name">${escHtml(name || '—')}</strong>
       ${sub ? `<span class="ptc-sub">${escHtml(sub)}</span>` : ''}
-      <span class="ptc-plays">${formatNum(plays)} écoutes</span>
+      <span class="ptc-plays">${formatNum(plays)} ${t('plays')}</span>
       ${lfmUrl ? '<span class="ptc-lfm-hint"><i class="fas fa-external-link-alt"></i></span>' : ''}
     </div>`;
 }
@@ -2881,7 +2911,7 @@ async function loadDashboard() {
   }
   const avgMin    = Math.floor(avgTrackSec / 60);
   const avgSec    = Math.round(avgTrackSec % 60);
-  const listenSub = `≈ ${avgMin}min${avgSec > 0 ? avgSec + 's' : ''} / titre`;
+  const listenSub = `≈ ${avgMin}min${avgSec > 0 ? avgSec + 's' : ''} / ${t('unit_track')}`;
 
   const playcounts   = APP.topArtistsData.map(a => parseInt(a.playcount));
   const eddington    = calcEddington(playcounts);
@@ -3018,7 +3048,7 @@ async function loadDashboard() {
       relevance: actScore > 5 ? 50 : 25 },
 
     { id:'regdays',  icon:'🗓️',
-      value: daysSince > 0 ? `${formatNum(daysSince)} j` : '—',
+      value: daysSince > 0 ? `${formatNum(daysSince)} ${t('unit_days')}` : '—',
       rawVal: daysSince,
       label: t('stat_account_age'),    sub: formatDate(regTs) ? t('adv_days_sub', formatDate(regTs)) : '',
       color:'#64748b', noAnim:true, milestoneType:'days',
@@ -3051,13 +3081,12 @@ async function loadDashboard() {
       const isLive    = c.isLive;
       const msLabel   = ms?.nextM
         ? `→ ${_fmtMs(ms.nextM)}`
-        : ms?.prevM ? `✓ ${_fmtMs(ms.prevM)} atteint` : '';
+        : ms?.prevM ? `✓ ${_fmtMs(ms.prevM)} ${t('milestone_reached')}` : '';
 
       return `
       <div class="stat-card${c.action || c.actionFn ? ' stat-card--action' : ''}${isChanged ? ' stat-card--recently-changed' : ''}${wasEmpty ? '' : ' stat-card--swap-in'}"
            data-card-id="${c.id}" style="--card-accent:${c.color};animation-delay:${i * 0.05}s">
-        ${isLive ? '<span class="stat-card-live" aria-label="En direct"></span>' : ''}
-        ${ms?.justReached ? `<span class="stat-card-milestone-badge">🏆 ${_fmtMs(ms.prevM)}</span>` : ''}
+        ${isLive ? `<span class="stat-card-live" aria-label="${t('now_live')}"></span>` : ''}
         <div class="stat-card-deco" aria-hidden="true">${c.icon}</div>
         <div class="stat-card-icon">${c.icon}</div>
         <div class="stat-card-value${isChanged ? ' stat-card-value--changed' : ''}" id="sv-${c.id}" style="color:${c.color}">${c.noAnim ? c.value : '0'}</div>
@@ -5095,7 +5124,7 @@ async function fetchFullHistory(backgroundMode = false) {
       tracksEl.textContent = formatNum(base + count) + ' ' + t('scrobbles');
     }
     if (subEl)  subEl.textContent  = incremental
-      ? `+${formatNum(count)} nouveaux — Page ${page} / ${totalPages}`
+      ? t('fetch_incr_sub', formatNum(count), page, totalPages)
       : t('fetch_page', page, totalPages);
     if (msgEl)  msgEl.textContent  = t('fetch_loading');
     _updatePillText(pct);
@@ -5110,8 +5139,8 @@ async function fetchFullHistory(backgroundMode = false) {
       console.log(`[History] Cache found: ${cached.tracks.length} tracks, age=${ageDays}d, lastTs=${cached.lastTs}`);
 
       if (subEl)  subEl.textContent  = `Cache: ${formatNum(cached.tracks.length)} scrobbles`;
-      if (msgEl)  msgEl.textContent  = 'Récupération des nouveaux scrobbles…';
-      if (titleEl) titleEl.textContent = `Mise à jour (${formatNum(cached.tracks.length)} en cache)`;
+      if (msgEl)  msgEl.textContent  = t('fetch_incr_msg');
+      if (titleEl) titleEl.textContent = t('fetch_incr_title', formatNum(cached.tracks.length));
 
       // Le cache est disponible en mémoire immédiatement pour les autres sections
       // (historique, badges…) mais on ne rend les charts qu'une seule fois
@@ -5134,7 +5163,7 @@ async function fetchFullHistory(backgroundMode = false) {
           return true;
         });
         console.log(`[History] Incremental: +${newTracks.length} new → ${tracks.length} total`);
-        showToast(`+${formatNum(newTracks.length)} nouveaux scrobbles`, 'success', 'scrobble');
+        showToast(t('toast_new_scrobbles', formatNum(newTracks.length)), 'success', 'scrobble');
       } else {
         // Aucun nouveau scrobble — cache déjà à jour
         tracks = cached.tracks;
@@ -5563,7 +5592,7 @@ async function openItemModal(type, name, artist, userPlaycount, itemUrl, knownIm
   setText('im-globalplays', '—');
   setText('im-listeners', '—');
   setText('im-duration', '—');
-  setText('im-wiki-label', type === 'album' ? 'Description' : 'À propos');
+  setText('im-wiki-label', type === 'album' ? t('label_description') : t('label_about'));
   setText('im-related-label', type === 'track' ? 'Titres similaires' : 'Albums similaires');
   show('im-listeners-wrap', type === 'track');
   show('im-duration-wrap', type === 'track');
@@ -5703,15 +5732,15 @@ async function openItemModal(type, name, artist, userPlaycount, itemUrl, knownIm
           bioTextEl.classList.add('am-bio--collapsed');
           if (bioToggleEl) {
             bioToggleEl.classList.remove('hidden');
-            bioToggleEl.querySelector('span').textContent = 'Lire plus';
+            bioToggleEl.querySelector('span').textContent = t('bio_read_more');
             bioToggleEl.onclick = () => {
               const c = bioTextEl.classList.toggle('am-bio--collapsed');
               bioTextEl.textContent = c ? wiki.slice(0, 300) + '…' : wiki;
-              bioToggleEl.querySelector('span').textContent = c ? 'Lire plus' : 'Réduire';
+              bioToggleEl.querySelector('span').textContent = c ? t('bio_read_more') : t('bio_collapse');
             };
           }
         } else {
-          bioTextEl.textContent = wiki || 'Pas de description disponible.';
+          bioTextEl.textContent = wiki || t('bio_none');
           bioTextEl.classList.remove('am-bio--collapsed');
         }
       }
@@ -5776,11 +5805,11 @@ async function openItemModal(type, name, artist, userPlaycount, itemUrl, knownIm
           bioTextEl.classList.add('am-bio--collapsed');
           if (bioToggleEl) {
             bioToggleEl.classList.remove('hidden');
-            bioToggleEl.querySelector('span').textContent = 'Lire plus';
+            bioToggleEl.querySelector('span').textContent = t('bio_read_more');
             bioToggleEl.onclick = () => {
               const c = bioTextEl.classList.toggle('am-bio--collapsed');
               bioTextEl.textContent = c ? wiki.slice(0, 300) + '…' : wiki;
-              bioToggleEl.querySelector('span').textContent = c ? 'Lire plus' : 'Réduire';
+              bioToggleEl.querySelector('span').textContent = c ? t('bio_read_more') : t('bio_collapse');
             };
           }
         } else {
@@ -5857,7 +5886,7 @@ async function openItemModal(type, name, artist, userPlaycount, itemUrl, knownIm
       if (mbData.label)       rows.push({ l: 'Label',      v: mbData.label });
       if (mbData.type)        rows.push({ l: 'Type',       v: mbData.type });
       if (mbData.country)     rows.push({ l: 'Pays',       v: mbData.country });
-      if (mbData.formed)      rows.push({ l: 'Formé en',   v: mbData.formed });
+      if (mbData.formed)      rows.push({ l: t('label_formed'),   v: mbData.formed });
       if (mbData.genres?.length) rows.push({ l: 'Genres',  v: mbData.genres.join(', ') });
 
       const mbRowsEl = document.getElementById('im-mb-rows');
@@ -6079,8 +6108,8 @@ async function openArtistModal(artistName, artistUrl, userPlaycount) {
         const rows = [];
         if (mbArt.country)                    rows.push({ lbl: 'Pays',       val: mbArt.country });
         if (mbArt.area?.name)                 rows.push({ lbl: 'Zone',        val: mbArt.area.name });
-        const formed = mbArt['life-span']?.begin; if (formed) rows.push({ lbl: 'Formé en',  val: formed });
-        const ended  = mbArt['life-span']?.end;   if (ended)  rows.push({ lbl: 'Séparé en', val: ended });
+        const formed = mbArt['life-span']?.begin; if (formed) rows.push({ lbl: t('label_formed'),  val: formed });
+        const ended  = mbArt['life-span']?.end;   if (ended)  rows.push({ lbl: t('label_disbanded'), val: ended });
         if (mbArt.type)                       rows.push({ lbl: 'Type',        val: mbArt.type });
         const genres = (mbArt.genres || mbArt.tags || []).slice(0, 5).map(g => g.name).filter(Boolean);
         if (genres.length)                    rows.push({ lbl: 'Genres',      val: genres.join(', ') });
@@ -7075,7 +7104,7 @@ function _runDashSearch(q) {
   const top = hits.slice(0, 10);
 
   if (!top.length) {
-    results.innerHTML = `<div class="dsr-empty"><i class="fas fa-search"></i> Aucun résultat pour « ${escHtml(q)} »</div>`;
+    results.innerHTML = `<div class="dsr-empty"><i class="fas fa-search"></i> ${t('search_no_results', escHtml(q))}</div>`;
     results.classList.remove('hidden');
     return;
   }
@@ -7228,7 +7257,7 @@ async function openSearchDetail(rawData) {
     </div>
     <div class="sdp-stats-grid" id="sdp-stats"></div>
     <div class="sdp-mb-section" id="sdp-mb"></div>
-    <div class="sdp-loading" id="sdp-loading"><i class="fas fa-spinner fa-spin"></i> Chargement des détails…</div>`;
+    <div class="sdp-loading" id="sdp-loading"><i class="fas fa-spinner fa-spin"></i> ${t('loading_details')}</div>`;
 
   // Resolve image async if not provided (MusicBrainz → iTunes → Last.fm)
   if (!h.img || isDefaultImg(h.img)) {
@@ -7283,11 +7312,11 @@ async function openSearchDetail(rawData) {
   const lfm = lfmData.status === 'fulfilled' ? lfmData.value : null;
   if (statsEl && lfm) {
     const stats = [];
-    if (h.plays)            stats.push({ ico: 'headphones', val: formatNum(h.plays), lbl: 'Tes écoutes' });
-    if (lfm.listeners)      stats.push({ ico: 'users',      val: formatNum(lfm.listeners), lbl: 'Auditeurs' });
-    if (lfm.playcount)      stats.push({ ico: 'play-circle', val: formatNum(lfm.playcount), lbl: 'Scrobbles globaux' });
-    if (lfm.userplaycount)  stats.push({ ico: 'user',        val: formatNum(lfm.userplaycount), lbl: 'Tes écoutes (LFM)' });
-    if (lfm.duration)       stats.push({ ico: 'clock',       val: Math.round(lfm.duration / 60) + ' min', lbl: 'Durée' });
+    if (h.plays)            stats.push({ ico: 'headphones', val: formatNum(h.plays), lbl: t('sdp_my_plays') });
+    if (lfm.listeners)      stats.push({ ico: 'users',      val: formatNum(lfm.listeners), lbl: t('sdp_listeners') });
+    if (lfm.playcount)      stats.push({ ico: 'play-circle', val: formatNum(lfm.playcount), lbl: t('sdp_global_plays') });
+    if (lfm.userplaycount)  stats.push({ ico: 'user',        val: formatNum(lfm.userplaycount), lbl: t('sdp_my_plays_lfm') });
+    if (lfm.duration)       stats.push({ ico: 'clock',       val: Math.round(lfm.duration / 60) + ' min', lbl: t('sdp_duration') });
     statsEl.innerHTML = stats.map(s => `
       <div class="sdp-stat">
         <i class="fas fa-${s.ico} sdp-stat-ico"></i>
@@ -7315,8 +7344,8 @@ async function openSearchDetail(rawData) {
     const rows = [];
     if (mb.country)     rows.push({ lbl: 'Pays',       val: mb.country });
     if (mb.area)        rows.push({ lbl: 'Zone',        val: mb.area });
-    if (mb.formed)      rows.push({ lbl: 'Formé en',    val: mb.formed });
-    if (mb.disbanded)   rows.push({ lbl: 'Séparé en',   val: mb.disbanded });
+    if (mb.formed)      rows.push({ lbl: t('label_formed'),    val: mb.formed });
+    if (mb.disbanded)   rows.push({ lbl: t('label_disbanded'),   val: mb.disbanded });
     if (mb.releaseDate) rows.push({ lbl: 'Sortie',      val: mb.releaseDate });
     if (mb.label)       rows.push({ lbl: 'Label',       val: mb.label });
     if (mb.type)        rows.push({ lbl: 'Type',        val: mb.type });
@@ -7598,7 +7627,7 @@ function checkMilestoneNotification() {
     const highest = Math.max(...reached);
     localStorage.setItem('ls_notif_last_milestone', String(highest));
     const fmt = highest >= 1000000 ? `${highest/1000000}M` : highest >= 1000 ? `${highest/1000}k` : String(highest);
-    _sendNotif('🎯 Jalon atteint !', `Tu viens d'atteindre ${fmt} scrobbles sur Last.fm ! 🎉`);
+    _sendNotif(t('notif_milestone_title'), t('notif_milestone_body', fmt));
   } catch {}
 }
 
@@ -7625,7 +7654,7 @@ function _checkScheduledNotifs(prefs) {
       const today = new Date();
       if (today.getDay() === 1) { // Monday
         localStorage.setItem('ls_notif_last_weekly', String(now));
-        _sendNotif('📊 Récap de la semaine', `Bonjour ! Voici le moment de consulter vos stats Last.fm de la semaine passée.`);
+        _sendNotif(t('notif_weekly_title'), t('notif_weekly_body'));
       }
     }
   }
@@ -7636,8 +7665,8 @@ function _checkScheduledNotifs(prefs) {
       const today = new Date();
       if (today.getDate() === 1) {
         localStorage.setItem('ls_notif_last_monthly', String(now));
-        const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-        _sendNotif('📅 Récap du mois', `Votre récap de ${months[today.getMonth() === 0 ? 11 : today.getMonth() - 1]} est disponible !`);
+        const months = window.I18N?.arr('months') || ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        _sendNotif(t('notif_monthly_title'), t('notif_monthly_body', months[today.getMonth() === 0 ? 11 : today.getMonth() - 1]));
       }
     }
   }
@@ -7658,10 +7687,10 @@ function _syncNotifBtn() {
   const perm = Notification?.permission;
   if (perm === 'granted') {
     btn.classList.add('active');
-    label.textContent = 'Notifications activées ✓';
+    label.textContent = t('notif_enabled');
   } else if (perm === 'denied') {
     btn.classList.add('disabled');
-    label.textContent = 'Permission refusée';
+    label.textContent = t('notif_denied');
   } else {
     btn.classList.remove('active', 'disabled');
     label.textContent = 'Activer les notifications';
@@ -7698,8 +7727,8 @@ function setupNewYearNotification() {
 }
 
 function _sendWrappedNotification(wrappedYear) {
-  const title = 'Bonne année ! 🎧';
-  const body  = `Votre Wrapped ${wrappedYear} est prêt. Découvrez vos top artistes et titres de l'année !`;
+  const title = t('notif_newyear_title');
+  const body  = t('notif_newyear_body', wrappedYear);
   _sendNotif(title, body);
 }
 
@@ -7822,9 +7851,9 @@ function histToggleSort() {
         ? 'fas fa-sort-amount-down'
         : 'fas fa-sort-amount-up';
     }
-    btn.title = APP.histSortOrder === 'desc' ? 'Plus récent en premier' : 'Plus ancien en premier';
+    btn.title = APP.histSortOrder === 'desc' ? t('sort_recent_first') : t('sort_oldest_first');
     const span = btn.querySelector('span');
-    if (span) span.textContent = APP.histSortOrder === 'desc' ? 'Récent' : 'Ancien';
+    if (span) span.textContent = APP.histSortOrder === 'desc' ? t('sort_recent') : t('sort_oldest');
   }
   if (APP._histLastData) _renderHistView(APP.histCurrentView, APP._histLastData);
 }
@@ -8347,7 +8376,7 @@ function _buildChip(f, isLive) {
       <span class="vs-chip-av">
         <span class="vs-chip-fallback" style="background:${grad}">${letter}</span>
         ${imgUrl ? `<img src="${lfmUpscale(imgUrl)}" alt="${name}" class="vs-chip-img" onerror="this.remove()">` : ''}
-        ${isLive ? '<span class="vs-chip-live-dot" title="Écoute en cours"></span>' : ''}
+        ${isLive ? `<span class="vs-chip-live-dot" title="${t('now_listening')}"></span>` : ''}
       </span>
       <span class="vs-chip-name">${name}</span>
     </button>`;
