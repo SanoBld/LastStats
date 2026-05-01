@@ -1078,7 +1078,7 @@
         </div>
 
         <!-- Top 5 titres -->
-        <div class="profile-section-hd"><i class="fas fa-music"></i> Top 5 titres</div>
+        <div class="profile-section-hd"><i class="fas fa-music"></i> <span data-i18n="profile_top5_tracks">Top 5 tracks</span></div>
         <div class="profile-tracks-list" id="profile-tracks-list">
           <div class="profile-track-sk sk"><div class="sk-ln w100"></div></div>
           <div class="profile-track-sk sk"><div class="sk-ln w90"></div></div>
@@ -1562,7 +1562,7 @@
 
               <!-- Mode sélection -->
               <div class="stg-section">
-                <h4 class="stg-section-title"><i class="fas fa-sliders-h"></i> Mode d'affichage des blocs</h4>
+                <h4 class="stg-section-title"><i class="fas fa-sliders-h"></i> <span data-i18n="stg_block_display_mode">Mode d'affichage des blocs</span></h4>
                 <p class="hint" style="margin-bottom:14px">
                   <i class="fas fa-info-circle"></i>
                   <span data-i18n="stg_blocks_auto_hint">In <strong>Auto</strong> mode, the 12 most relevant blocks are selected dynamically.</span>
@@ -1572,7 +1572,7 @@
                   <button class="stg-mode-btn active" data-mode="auto" onclick="setStatCardMode('auto')">
                     <i class="fas fa-magic"></i>
                     <span>Auto</span>
-                    <small>Adaptatif</small>
+                    <small data-i18n="stg_mode_adaptive">Adaptive</small>
                   </button>
                   <button class="stg-mode-btn" data-mode="manual" onclick="setStatCardMode('manual')">
                     <i class="fas fa-hand-pointer"></i>
@@ -1587,8 +1587,8 @@
                 <h4 class="stg-section-title"><i class="fas fa-trophy"></i> <span data-i18n="stg_badges_milestones">Achievements &amp; Milestones</span></h4>
                 <div class="setting-row setting-row--highlight">
                   <div>
-                    <strong>Afficher les barres de progression</strong>
-                    <p class="hint" style="margin-top:4px">Barre de progression vers le prochain palier et badge quand un palier est atteint.</p>
+                    <strong data-i18n="stg_show_progress">Show progress bars</strong>
+                    <p class="hint" style="margin-top:4px" data-i18n="stg_progress_hint">Progress bar to the next milestone.</p>
                   </div>
                   <label class="stg-toggle" id="stg-milestone-toggle">
                     <input type="checkbox" id="chk-milestones" onchange="setMilestonesEnabled(this.checked)" checked>
@@ -1609,14 +1609,14 @@
                 </div>
                 <!-- Order section -->
                 <div class="stg-order-section">
-                  <h5 class="stg-order-title"><i class="fas fa-sort"></i> Ordre d'affichage</h5>
-                  <p class="hint" style="margin-bottom:10px"><i class="fas fa-info-circle"></i> Glissez les blocs pour changer l'ordre sur le Dashboard.</p>
+                  <h5 class="stg-order-title"><i class="fas fa-sort"></i> <span data-i18n="stg_display_order">Display order</span></h5>
+                  <p class="hint" style="margin-bottom:10px"><i class="fas fa-info-circle"></i> <span data-i18n="stg_drag_hint">Drag blocks to change the order on the Dashboard.</span></p>
                   <div class="stg-card-order-list" id="stg-card-order-list"></div>
                 </div>
 
                 <div class="stg-card-picker-actions">
                   <button class="btn-sm" onclick="applyManualCards()">
-                    <i class="fas fa-check"></i> Appliquer
+                    <i class="fas fa-check"></i> <span data-i18n="btn_apply">Apply</span>
                   </button>
                   <button class="btn-sm btn-sm--secondary" onclick="resetManualCards()">
                     <i class="fas fa-undo"></i> <span data-i18n="btn_reset">Reset</span>
@@ -1817,7 +1817,7 @@
         <span class="am-stat am-stat--accent">
           <i class="fas fa-headphones"></i>
           <span id="im-user-plays">—</span>
-          <span>× écouté par vous</span>
+          <span data-i18n="sdp_played_by_you">× played by you</span>
         </span>
         <span class="am-stat" id="im-listeners-wrap" style="display:none">
           <i class="fas fa-users"></i>
@@ -1827,7 +1827,7 @@
         <span class="am-stat">
           <i class="fas fa-play"></i>
           <span id="im-globalplays">—</span>
-          <span>scrobbles globaux</span>
+          <span data-i18n="sdp_global_scrobbles">global scrobbles</span>
         </span>
         <span class="am-stat" id="im-duration-wrap" style="display:none">
           <i class="fas fa-clock"></i>
@@ -1910,7 +1910,7 @@
         <span class="am-stat am-stat--accent">
           <i class="fas fa-headphones"></i>
           <span id="am-user-plays">—</span>
-          <span>× écouté par vous</span>
+          <span data-i18n="sdp_played_by_you">× played by you</span>
         </span>
       </div>
       <div class="am-tags" id="am-tags"></div>
@@ -2173,7 +2173,7 @@
           <div class="w-pod-plays" id="w-trk-plays"></div>
         </div>
         <div class="w-pod w-pod--cell">
-          <div class="w-pod-lbl"><i class="fas fa-compact-disc"></i> Album #1</div>
+          <div class="w-pod-lbl"><i class="fas fa-compact-disc"></i> <span data-i18n="wrap_album1">Album #1</span></div>
           <div class="w-pod-img" id="w-alb-img"><span id="w-alb-lt">?</span></div>
           <div class="w-pod-name" id="w-alb-name">—</div>
           <div class="w-pod-plays" id="w-alb-plays"></div>

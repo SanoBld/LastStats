@@ -1067,8 +1067,20 @@ function setLanguage(lang) {
       const key = NAV_TITLE_KEYS[activeSection];
       if (key) document.getElementById('hd-title').textContent = t(key);
     }
-    document.title = 'LastStats — ' + (t('nav_dashboard') || 'Statistiques Last.fm');
+    document.title = 'LastStats — ' + (t('nav_dashboard') || 'LastStats');
     showToast(t('toast_lang_changed'), 'success', 'system');
+
+    // Re-render dynamic sections that have hardcoded labels
+    if (APP._lastHeatmapData)  renderHeatmap(APP._lastHeatmapData);
+    if (APP.topArtistsData?.length) {
+      buildStatCards();
+      _renderProfileStats();
+    }
+    // Re-render calendar heatmaps (month/day labels)
+    if (APP.allTracks?.length) {
+      _buildCalHeatmapYearSel('');
+      _buildCalHeatmapYearSel('charts');
+    }
   });
 }
 
@@ -2167,7 +2179,7 @@ function _renderProfileHero(username, ui) {
   if (ui?.registered?.unixtime) {
     const reg   = new Date(parseInt(ui.registered.unixtime) * 1000);
     const years = ((Date.now() - reg) / (1000*60*60*24*365.25)).toFixed(1);
-    _set('profile-since', `Membre depuis ${reg.getFullYear()} · ${years} ans`);
+    _set('profile-since', t('profile_member_since', reg.getFullYear(), years));
   }
 }
 
@@ -2187,9 +2199,9 @@ function _renderProfileStats(ui) {
     el.innerHTML = `<i class="fas fa-${icon}"></i><strong>${val}</strong><span>${lbl}</span>`;
   };
   _chip('pstat-scrobbles', 'headphones',     formatNum(total),   'Scrobbles');
-  _chip('pstat-avg',       'chart-line',     '~' + avgDay,       'par jour');
-  _chip('pstat-peryear',   'calendar-check', formatNum(perYear), 'par an');
-  _chip('pstat-days',      'calendar-alt',   formatNum(days),    'jours actifs');
+  _chip('pstat-avg',       'chart-line',     '~' + avgDay,       t('stat_per_day'));
+  _chip('pstat-peryear',   'calendar-check', formatNum(perYear), t('stat_per_year'));
+  _chip('pstat-days',      'calendar-alt',   formatNum(days),    t('cal_active_days'));
 }
 
 async function _loadProfileTopData(username, period) {
@@ -2223,12 +2235,12 @@ async function _loadProfileTopData(username, period) {
     _extractAndStoreMbids(albumsData);
     _extractAndStoreMbids(tracksData);
 
-    _renderProfileTopCard('ptop-artist', 'microphone-alt', 'Artiste #1',
+    _renderProfileTopCard('ptop-artist', 'microphone-alt', t('profile_top_artist'),
       artist?.name, artist?.playcount, artist?.image);
-    _renderProfileTopCard('ptop-album',  'compact-disc',   'Album #1',
+    _renderProfileTopCard('ptop-album',  'compact-disc',   t('profile_top_album'),
       album?.name,  album?.playcount,  album?.image, album?.artist?.name);
     const t1 = tracks[0];
-    _renderProfileTopCard('ptop-track',  'music',          'Titre #1',
+    _renderProfileTopCard('ptop-track',  'music',          t('profile_top_track'),
       t1?.name,     t1?.playcount,     t1?.image,    t1?.artist?.name);
 
     // Résolution asynchrone des images — toujours relancer après changement de période
@@ -6946,7 +6958,7 @@ async function _exportHeatmapVertical(year, format) {
   const legY = H - FOOTER_H + 10;
   ctx.fillStyle = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)';
   ctx.font = '9px Inter, system-ui, sans-serif';
-  ctx.fillText('Moins', PAD, legY + CELL - 3);
+  ctx.fillText(t('cal_legend_less'), PAD, legY + CELL - 3);
   for (let i = 0; i <= 4; i++) {
     ctx.fillStyle = LEVEL_COLORS[i];
     ctx.beginPath();
@@ -6955,7 +6967,7 @@ async function _exportHeatmapVertical(year, format) {
     ctx.fill();
   }
   ctx.fillStyle = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)';
-  ctx.fillText('Plus', PAD + 34 + 5*(CELL+3) + 3, legY + CELL - 3);
+  ctx.fillText(t('cal_legend_more'), PAD + 34 + 5*(CELL+3) + 3, legY + CELL - 3);
 
   ctx.fillStyle = 'rgba(255,255,255,0.2)';
   ctx.font = '9px Inter, system-ui, sans-serif';
