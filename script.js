@@ -7578,39 +7578,127 @@ function openUserProfile(username) {
   }
 }
 
-function exportData(format) {
-  const sources = [
-    { type:t('csv_artist_type'), items:APP.topArtistsData, name:d => d.name, artist:() => '',              plays:d => d.playcount, url:d => d.url },
-    { type:t('csv_album_type'),  items:APP.topAlbumsData,  name:d => d.name, artist:d => d.artist?.name||'', plays:d => d.playcount, url:d => d.url },
-    { type:t('csv_track_type'),  items:APP.topTracksData,  name:d => d.name, artist:d => d.artist?.name||'', plays:d => d.playcount, url:d => d.url },
-  ];
+async function exportData(format) {
+  if (window._exportRunning) { showToast('Export déjà en cours…', 'info'); return; }
+  window._exportRunning = true;
 
-  const allRows = sources.flatMap(s => s.items.map(d => ({
-    [t('csv_type')]:   s.type,
-    [t('csv_name')]:   s.name(d),
-    [t('csv_artist')]: s.artist(d),
-    [t('csv_plays')]:  s.plays(d),
-    [t('csv_url')]:    s.url(d),
-  })));
+  /* ── Progress overlay ── */
+  const overlay  = document.getElementById('fetch-overlay');
+  const fillEl   = document.getElementById('fetch-fill');
+  const pctEl    = document.getElementById('fetch-pct');
+  const tracksEl = document.getElementById('fetch-tracks');
+  const titleEl  = document.getElementById('fetch-title');
+  const msgEl    = document.getElementById('fetch-msg');
+  const subEl    = document.getElementById('fetch-sub');
 
-  if (format === 'json') {
-    const blob = new Blob([JSON.stringify(allRows, null, 2)], { type:'application/json' });
-    const a    = document.createElement('a');
-    a.href     = URL.createObjectURL(blob);
-    a.download = `laststats-${APP.username}.json`;
-    a.click();
-    showToast(t('toast_export_json'), 'success', 'actions');
-  } else {
-    const headers = Object.keys(allRows[0] || {});
-    const csv     = [headers.join(','), ...allRows.map(r => headers.map(h => `"${String(r[h]||'').replace(/"/g,'""')}"`).join(','))].join('\n');
-    const blob    = new Blob([csv], { type:'text/csv;charset=utf-8;' });
-    const a       = document.createElement('a');
-    a.href        = URL.createObjectURL(blob);
-    a.download    = `laststats-${APP.username}.csv`;
-    a.click();
-    showToast(t('toast_export_csv'), 'success', 'actions');
+  const _showOverlay = () => {
+    if (!overlay) return;
+    overlay.classList.remove('hidden', 'fetch-overlay--minimized');
+    document.body.classList.add('fetch-active');
+    if (fillEl)   fillEl.style.width   = '0%';
+    if (pctEl)    pctEl.textContent    = '0%';
+    if (tracksEl) tracksEl.textContent = '0 scrobbles';
+    if (titleEl)  titleEl.textContent  = '📤 Export en cours…';
+    if (msgEl)    msgEl.textContent    = 'Initialisation…';
+    if (subEl)    subEl.textContent    = '';
+  };
+
+  const _updateOverlay = (page, totalPages, count) => {
+    const pct = totalPages > 0 ? Math.round((page / totalPages) * 100) : 0;
+    if (fillEl)   fillEl.style.width   = pct + '%';
+    if (pctEl)    pctEl.textContent    = pct + '%';
+    if (tracksEl) tracksEl.textContent = formatNum(count) + ' scrobbles';
+    if (msgEl)    msgEl.textContent    = `Page ${page} / ${totalPages}`;
+    if (subEl)    subEl.textContent    = "Récupération de l'historique complet…";
+  };
+
+  const _hideOverlay = () => {
+    if (!overlay) return;
+    overlay.classList.add('hidden');
+    document.body.classList.remove('fetch-active');
+  };
+
+  const btns = document.querySelectorAll('[onclick*="exportStats"]');
+  btns.forEach(b => { b._origHTML = b.innerHTML; b.disabled = true; b.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; });
+  _showOverlay();
+
+  try {
+    /* ── Fetch ALL scrobbles via user.getRecentTracks (paginé, batches de 5) ── */
+    const LIMIT      = 200;
+    const BATCH_SIZE = 5;
+    const allTracks  = [];
+
+    // Page 1 — connaître le total
+    const first      = await API._fetch('user.getRecentTracks', { limit: LIMIT, page: 1, extended: 0 });
+    const attr       = first?.recenttracks?.['@attr'] || {};
+    const totalPages = parseInt(attr.totalPages || 1);
+    const totalItems = parseInt(attr.total || 0);
+
+    if (titleEl) titleEl.textContent = `📤 Export — ${formatNum(totalItems)} scrobbles`;
+
+    const p1raw = first?.recenttracks?.track;
+    const p1arr = Array.isArray(p1raw) ? p1raw : (p1raw ? [p1raw] : []);
+    p1arr.filter(tr => !tr['@attr']?.nowplaying).forEach(tr => allTracks.push(tr));
+    _updateOverlay(1, totalPages, allTracks.length);
+
+    // Pages restantes par batch
+    const remaining = Array.from({ length: totalPages - 1 }, (_, i) => i + 2);
+    for (let i = 0; i < remaining.length; i += BATCH_SIZE) {
+      const batch   = remaining.slice(i, i + BATCH_SIZE);
+      const results = await Promise.all(
+        batch.map(p => API._fetch('user.getRecentTracks', { limit: LIMIT, page: p, extended: 0 }))
+      );
+      for (const res of results) {
+        const raw = res?.recenttracks?.track;
+        const arr = Array.isArray(raw) ? raw : (raw ? [raw] : []);
+        arr.filter(tr => !tr['@attr']?.nowplaying).forEach(tr => allTracks.push(tr));
+      }
+      _updateOverlay(Math.min(i + BATCH_SIZE + 1, totalPages), totalPages, allTracks.length);
+      if (i + BATCH_SIZE < remaining.length) await sleep(120);
+    }
+
+    if (!allTracks.length) { showToast('Aucun scrobble trouvé.', 'error'); return; }
+
+    /* ── Construire les lignes ── */
+    const rows = allTracks.map(tr => ({
+      'Titre':   tr.name || '',
+      'Artiste': tr.artist?.['#text'] || tr.artist?.name || '',
+      'Album':   tr.album?.['#text'] || '',
+      'Date':    tr.date?.['#text'] || '',
+      'URL':     tr.url || '',
+    }));
+
+    /* ── Télécharger ── */
+    if (format === 'json') {
+      const blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
+      const a    = document.createElement('a');
+      a.href     = URL.createObjectURL(blob);
+      a.download = `laststats-${APP.username}-scrobbles.json`;
+      a.click();
+      showToast(`Export JSON — ${formatNum(rows.length)} scrobbles`, 'success', 'actions');
+    } else {
+      const headers = Object.keys(rows[0]);
+      const csv = [
+        headers.join(','),
+        ...rows.map(r => headers.map(h => `"${String(r[h] || '').replace(/"/g, '""')}"`).join(',')),
+      ].join('\n');
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const a    = document.createElement('a');
+      a.href     = URL.createObjectURL(blob);
+      a.download = `laststats-${APP.username}-scrobbles.csv`;
+      a.click();
+      showToast(`Export CSV — ${formatNum(rows.length)} scrobbles`, 'success', 'actions');
+    }
+
+  } catch (e) {
+    showToast(`Erreur export: ${e.message}`, 'error');
+  } finally {
+    window._exportRunning = false;
+    btns.forEach(b => { b.disabled = false; if (b._origHTML) b.innerHTML = b._origHTML; });
+    _hideOverlay();
   }
 }
+
 
 function toggleOhwTooltip(e) {
   if (e) e.stopPropagation();
@@ -8552,16 +8640,18 @@ async function runComparison(friendName) {
   _vsShowLoading(friendName);
 
   try {
-    const [frInfo, myArtists, frArtists, myRecent200, frRecent200, myTags, frTags, frNow1] =
+    const [frInfo, myArtists, frArtists, myRecent200, frRecent200, myTags, frTags, frNow1, myTracks, frTracks] =
       await Promise.all([
         _apiFetchUser('user.getInfo',         friendName, {}),
         _getMyTopArtists(),
-        _apiFetchUser('user.getTopArtists',   friendName, { period:'overall', limit:50 }),
+        _apiFetchUser('user.getTopArtists',   friendName, { period:'overall', limit:500 }),
         _apiFetchUser('user.getRecentTracks', APP.username, { limit:200 }),
         _apiFetchUser('user.getRecentTracks', friendName,   { limit:200 }),
         _apiFetchUser('user.getTopTags',      APP.username, { limit:20 }),
         _apiFetchUser('user.getTopTags',      friendName,   { limit:20 }),
         _apiFetchUser('user.getRecentTracks', friendName,   { limit:1  }),
+        _apiFetchUser('user.getTopTracks',    APP.username, { period:'overall', limit:200 }),
+        _apiFetchUser('user.getTopTracks',    friendName,   { period:'overall', limit:200 }),
       ]);
 
     const myList  = _extractArtists(myArtists);
@@ -8597,12 +8687,15 @@ async function runComparison(friendName) {
     _vsHistorySave(friendName, _frSaveImg);
     _vsRenderHistory();
 
+    const myTrackList = _extractTopTracks(myTracks);
+    const frTrackList = _extractTopTracks(frTracks);
     renderComparison({
       friendName, score, common, breaker, underground, sharedTags,
       myNow, frNow, myList, frList,
       myMetrics, frMetrics, steal,
       frUserInfo: frInfo?.user || null,
       radarData, journeyData, temporal, peaks, curiosities, playlist,
+      myTrackList, frTrackList,
     });
 
     if ('vibrate' in navigator) navigator.vibrate(score >= 70 ? [100, 50, 100] : [80]);
@@ -8805,7 +8898,8 @@ function _buildCuriosities(common, myList, frList) {
 function renderComparison({ friendName, score, common, breaker, underground, sharedTags,
                              myNow, frNow, myList, frList,
                              myMetrics, frMetrics, steal, frUserInfo,
-                             radarData, journeyData, temporal, peaks, curiosities, playlist }) {
+                             radarData, journeyData, temporal, peaks, curiosities, playlist,
+                             myTrackList = [], frTrackList = [] }) {
   clearInterval(VS._loadTimer);
   const loadEl    = document.getElementById('vs-loading');
   const displayEl = document.getElementById('vs-display');
@@ -9028,6 +9122,66 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
   const _frCacheKey = 'fr_' + friendName;
   window._vsProfileCache[_frCacheKey] = frUserInfo;
 
+  /* ── SIDE-BY-SIDE ARTISTS (Last.fm style) ── */
+  const frArtistSet = new Set(frList.map(a => a.nameLow));
+  const myArtistSet = new Set(myList.map(a => a.nameLow));
+  const commonSet   = new Set(common.map(a => a.nameLow));
+
+  const _artistRow = (a, isCommon) => {
+    const url = `https://www.last.fm/music/${encodeURIComponent(a.name)}`;
+    return `<a class="vs-sbs-row${isCommon ? ' vs-sbs-row--common' : ''}" href="${url}" target="_blank" rel="noopener">
+      ${isCommon ? '<i class="fas fa-link vs-sbs-link-icon"></i>' : ''}
+      <span class="vs-sbs-name">${escHtml(a.name)}</span>
+      <span class="vs-sbs-pc">${formatNum(a.playcount)}</span>
+    </a>`;
+  };
+
+  const myArtistsHTML = myList.slice(0, 50).map(a => _artistRow(a, commonSet.has(a.nameLow))).join('');
+  const frArtistsHTML = frList.slice(0, 50).map(a => _artistRow(a, commonSet.has(a.nameLow))).join('');
+
+  const sideBySideArtistsHTML = _section('users', t('compare_sbs_artists') || 'Top artistes',
+    `<p class="vs-section-hint">${common.length} ${t('compare_sbs_common') || 'artistes en commun'} &mdash; <span class="vs-sbs-legend"><span class="vs-sbs-legend-dot"></span>${t('compare_sbs_legend') || 'commun'}</span></p>
+     <div class="vs-sbs-grid">
+       <div class="vs-sbs-col">
+         <div class="vs-sbs-col-hd">${myN}</div>
+         <div class="vs-sbs-list">${myArtistsHTML || '<p class=\"vs-empty\">Aucun</p>'}</div>
+       </div>
+       <div class="vs-sbs-col">
+         <div class="vs-sbs-col-hd">${frN}</div>
+         <div class="vs-sbs-list">${frArtistsHTML || '<p class=\"vs-empty\">Aucun</p>'}</div>
+       </div>
+     </div>`);
+
+  /* ── SIDE-BY-SIDE TRACKS ── */
+  const frTrackSet     = new Set(frTrackList.map(tr => `${tr.artistLow}|||${tr.nameLow}`));
+  const commonTrackSet = new Set(myTrackList.filter(tr => frTrackSet.has(`${tr.artistLow}|||${tr.nameLow}`)).map(tr => `${tr.artistLow}|||${tr.nameLow}`));
+
+  const _trackRow = (tr, isCommon) => {
+    const url = `https://www.last.fm/music/${encodeURIComponent(tr.artist)}/_/${encodeURIComponent(tr.name)}`;
+    return `<a class="vs-sbs-row${isCommon ? ' vs-sbs-row--common' : ''}" href="${url}" target="_blank" rel="noopener">
+      ${isCommon ? '<i class="fas fa-link vs-sbs-link-icon"></i>' : ''}
+      <span class="vs-sbs-name">${escHtml(tr.name)}<span class="vs-sbs-artist">${escHtml(tr.artist)}</span></span>
+      <span class="vs-sbs-pc">${formatNum(tr.playcount)}</span>
+    </a>`;
+  };
+
+  const myTracksHTML      = myTrackList.slice(0, 30).map(tr => _trackRow(tr, commonTrackSet.has(`${tr.artistLow}|||${tr.nameLow}`))).join('');
+  const frTracksHTML      = frTrackList.slice(0, 30).map(tr => _trackRow(tr, commonTrackSet.has(`${tr.artistLow}|||${tr.nameLow}`))).join('');
+  const commonTracksCount = commonTrackSet.size;
+
+  const sideBySideTracksHTML = (myTracksHTML || frTracksHTML) ? _section('music-note', t('compare_sbs_tracks') || 'Top titres',
+    `<p class="vs-section-hint">${commonTracksCount} ${t('compare_sbs_tracks_common') || 'titres en commun'}</p>
+     <div class="vs-sbs-grid">
+       <div class="vs-sbs-col">
+         <div class="vs-sbs-col-hd">${myN}</div>
+         <div class="vs-sbs-list">${myTracksHTML || '<p class=\"vs-empty\">Aucun</p>'}</div>
+       </div>
+       <div class="vs-sbs-col">
+         <div class="vs-sbs-col-hd">${frN}</div>
+         <div class="vs-sbs-list">${frTracksHTML || '<p class=\"vs-empty\">Aucun</p>'}</div>
+       </div>
+     </div>`) : '';
+
   /* ── ASSEMBLE ── */
   displayEl.innerHTML = `
     <div class="vs-header vs-section">
@@ -9074,6 +9228,8 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
     </div>
 
     ${liveHTML}
+    ${sideBySideArtistsHTML}
+    ${sideBySideTracksHTML}
     ${playlistHTML}
     ${radarHTML}
     ${journeyHTML}
@@ -9286,6 +9442,10 @@ function _extractArtists(data) {
   const raw = data?.topartists?.artist; if (!raw) return [];
   return (Array.isArray(raw)?raw:[raw]).map(a=>({ name:a.name, nameLow:a.name.toLowerCase(), playcount:parseInt(a.playcount||0), rank:parseInt(a['@attr']?.rank||999) }));
 }
+function _extractTopTracks(data) {
+  const raw = data?.toptracks?.track; if (!raw) return [];
+  return (Array.isArray(raw)?raw:[raw]).map(t=>({ name:t.name, nameLow:t.name.toLowerCase(), artist:t.artist?.name||'', artistLow:(t.artist?.name||'').toLowerCase(), playcount:parseInt(t.playcount||0), rank:parseInt(t['@attr']?.rank||999) }));
+}
 function _commonArtists(myList, frList) { const s=new Set(frList.map(a=>a.nameLow)); return myList.filter(a=>s.has(a.nameLow)); }
 function _calcMatchScore(myList, frList) {
   const mS=new Set(myList.map(a=>a.nameLow)), fS=new Set(frList.map(a=>a.nameLow));
@@ -9326,9 +9486,11 @@ function _formatListenTime(mins) {
   return d>0?`${d}d ${h}h`:`${h}h`;
 }
 async function _getMyTopArtists() {
-  const k=`vs4_user.getTopArtists_${APP.username}_overall_50`;
+  const k=`vs4_user.getTopArtists_${APP.username}_overall_500`;
   try{const c=sessionStorage.getItem(k);if(c)return JSON.parse(c);}catch{}
-  return _apiFetchUser('user.getTopArtists',APP.username,{period:'overall',limit:50});
+  const data = await _apiFetchUser('user.getTopArtists',APP.username,{period:'overall',limit:500});
+  try{sessionStorage.setItem(k,JSON.stringify(data));}catch{}
+  return data;
 }
 
 
