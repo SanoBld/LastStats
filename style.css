@@ -5385,13 +5385,61 @@ button.bn-item:focus-visible,
 .ptrack-artist { font-size: .73rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ptrack-plays  { font-size: .72rem; color: var(--text-muted); font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
 
+/* ── Compare: Score info tooltip ── */
+.vs-score-sub {
+  position: relative; display: inline-flex; align-items: center; gap: 5px;
+}
+.vs-score-info-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 17px; height: 17px; border-radius: 50%;
+  font-size: .7rem; color: var(--text-muted);
+  border: 1px solid var(--border); background: var(--bg-hover);
+  cursor: pointer; flex-shrink: 0;
+  transition: color var(--dur-short2) var(--ease-standard),
+              background var(--dur-short2) var(--ease-standard);
+}
+.vs-score-info-btn:hover { color: var(--accent); background: var(--accent-lt); border-color: var(--accent); }
+.vs-score-info-panel {
+  position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px; z-index: 200;
+  width: 290px; box-shadow: var(--shadow-md);
+  text-align: left;
+}
+.vs-score-info-panel::before {
+  content: ''; position: absolute; top: -6px; left: 50%;
+  width: 10px; height: 10px; background: var(--bg-elevated);
+  border-top: 1px solid var(--border); border-left: 1px solid var(--border);
+  transform: translateX(-50%) rotate(45deg);
+}
+.vs-score-info-close {
+  position: absolute; top: 8px; right: 10px; font-size: .75rem;
+  color: var(--text-muted); cursor: pointer; padding: 2px 6px;
+  border-radius: 6px;
+}
+.vs-score-info-close:hover { background: var(--bg-hover); color: var(--text); }
+.vs-score-info-title {
+  font-size: .8rem; font-weight: 700; color: var(--text);
+  margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+}
+.vs-score-info-list {
+  margin: 0 0 10px 16px; padding: 0;
+  font-size: .75rem; color: var(--text-secondary); line-height: 1.55;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.vs-score-info-list strong { color: var(--text); }
+.vs-score-info-foot {
+  font-size: .7rem; color: var(--text-muted);
+  border-top: 1px solid var(--border); padding-top: 8px; margin: 0; line-height: 1.4;
+}
+
 /* Compare profile buttons */
 .vs-profile-btn {
-  margin-top: 6px;
   display: inline-flex; align-items: center; gap: 5px;
   font-size: .72rem; font-weight: 600; color: var(--accent);
   padding: 4px 10px; border-radius: var(--radius-pill);
-  border: 1.5px solid var(--accent); background: var(--accent-lt);
+  border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: transparent;
   cursor: pointer;
   transition: background var(--dur-short2) var(--ease-standard),
               color      var(--dur-short2) var(--ease-standard),
@@ -5399,7 +5447,7 @@ button.bn-item:focus-visible,
 }
 .vs-profile-btn:hover  { background: var(--accent); color: var(--accent-on); transform: scale(1.04); }
 .vs-profile-btn:active { transform: scale(.96); }
-.vs-profile-btn--fr { color: var(--vs-fr-color); border-color: var(--vs-fr-color); background: rgba(33,150,243,.12); }
+.vs-profile-btn--fr { color: var(--vs-fr-color); border-color: color-mix(in srgb, var(--vs-fr-color) 40%, transparent); background: transparent; }
 .vs-profile-btn--fr:hover { background: var(--vs-fr-color); color: #fff; }
 
 /* Responsive */
@@ -6450,7 +6498,7 @@ a:focus:not(:focus-visible) { outline: none; }
   color: var(--text);
 }
 .stg-tab-btn.active {
-  background: var(--accent-lt);
+  background: var(--bg-hover);
   color: var(--accent);
   font-weight: 700;
 }

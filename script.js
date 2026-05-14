@@ -7660,12 +7660,42 @@ async function exportData(format) {
     if (!allTracks.length) { showToast('Aucun scrobble trouvé.', 'error'); return; }
 
     /* ── Construire les lignes ── */
+<<<<<<< Updated upstream
     const rows = allTracks.map(tr => ({
       'Titre':   tr.name || '',
       'Artiste': tr.artist?.['#text'] || tr.artist?.name || '',
       'Album':   tr.album?.['#text'] || '',
       'Date':    tr.date?.['#text'] || '',
       'URL':     tr.url || '',
+=======
+    const _parseLfmDateToISO = (str) => {
+      if (!str) return '';
+      try {
+        const months = { jan:'01',feb:'02',mar:'03',apr:'04',may:'05',jun:'06',
+                         jul:'07',aug:'08',sep:'09',oct:'10',nov:'11',dec:'12' };
+        // "25 Apr 2024, 14:32"
+        const m = str.trim().match(/^(\d{1,2})\s+(\w{3})\s+(\d{4}),?\s+(\d{2}:\d{2})/);
+        if (!m) return str;
+        const mo = months[m[2].toLowerCase()];
+        return mo ? `${m[3]}-${mo}-${m[1].padStart(2,'0')} ${m[4]}:00` : str;
+      } catch { return str; }
+    };
+    const _parseLfmDateToUnix = (str) => {
+      const iso = _parseLfmDateToISO(str);
+      if (!iso || iso === str) return '';
+      try { const ts = new Date(iso.replace(' ', 'T') + 'Z'); return isNaN(ts) ? '' : Math.floor(ts.getTime() / 1000); }
+      catch { return ''; }
+    };
+    const rows = allTracks.map((tr, i) => ({
+      '#':             allTracks.length - i,
+      'Titre':         tr.name || '',
+      'Artiste':       tr.artist?.['#text'] || tr.artist?.name || '',
+      'Album':         tr.album?.['#text'] || '',
+      'Date':          _parseLfmDateToISO(tr.date?.['#text'] || ''),
+      'Date_brute':    tr.date?.['#text'] || '',
+      'Horodatage':    tr.date?.uts || _parseLfmDateToUnix(tr.date?.['#text'] || '') || '',
+      'URL':           tr.url || '',
+>>>>>>> Stashed changes
     }));
 
     /* ── Télécharger ── */
@@ -7678,10 +7708,20 @@ async function exportData(format) {
       showToast(`Export JSON — ${formatNum(rows.length)} scrobbles`, 'success', 'actions');
     } else {
       const headers = Object.keys(rows[0]);
+<<<<<<< Updated upstream
       const csv = [
         headers.join(','),
         ...rows.map(r => headers.map(h => `"${String(r[h] || '').replace(/"/g, '""')}"`).join(',')),
       ].join('\n');
+=======
+      /* Séparateur point-virgule (compatibilité Excel FR) + guillemets sur toutes les cellules */
+      const SEP = ';';
+      const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+      const csv = [
+        headers.map(h => esc(h)).join(SEP),
+        ...rows.map(r => headers.map(h => esc(r[h])).join(SEP)),
+      ].join('\r\n');
+>>>>>>> Stashed changes
       const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
       const a    = document.createElement('a');
       a.href     = URL.createObjectURL(blob);
@@ -9210,7 +9250,22 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
           </div>
         </div>
         <div class="vs-score-label">${scoreEmoji} ${escHtml(scoreLabel)}</div>
-        <div class="vs-score-sub">${t('compare_match_score')}</div>
+        <div class="vs-score-sub">
+          ${t('compare_match_score')}
+          <button class="vs-score-info-btn" id="vs-score-info-btn" onclick="toggleVsScoreInfo(event)" aria-label="Comment ce score est calculé" title="Comment ce score est calculé">
+            <i class="fas fa-question-circle"></i>
+          </button>
+        </div>
+        <div class="vs-score-info-panel hidden" id="vs-score-info-panel">
+          <div class="vs-score-info-close" onclick="document.getElementById('vs-score-info-panel').classList.add('hidden')"><i class="fas fa-times"></i></div>
+          <p class="vs-score-info-title"><i class="fas fa-calculator"></i> Comment ce score est calculé</p>
+          <ul class="vs-score-info-list">
+            <li><strong>Jaccard (50 %)</strong> — artistes en commun ÷ total artistes uniques entre vous deux.</li>
+            <li><strong>Rang pondéré (50 %)</strong> — les artistes communs classés en tête de votre top comptent davantage.</li>
+            <li>Basé sur vos <strong>500 artistes</strong> les plus écoutés de tous les temps.</li>
+          </ul>
+          <p class="vs-score-info-foot">Score de 0 % = aucun artiste en commun · 100 % = tops identiques</p>
+        </div>
         ${score >= 90 ? `<div class="vs-score-wow">${t('compare_score_wow')}</div>` : ''}
       </div>
       <div class="vs-player vs-player--fr">
@@ -9466,6 +9521,20 @@ function _undergroundWinner(myList, frList, common) {
   common.forEach(a=>{ms+=a.playcount; fs+=(fm.get(a.nameLow)?.playcount||0);});
   if(ms===fs)return null; return ms<fs?'me':'friend';
 }
+function toggleVsScoreInfo(e) {
+  if (e) e.stopPropagation();
+  const panel = document.getElementById('vs-score-info-panel');
+  if (!panel) return;
+  panel.classList.toggle('hidden');
+}
+document.addEventListener('click', (e) => {
+  const panel = document.getElementById('vs-score-info-panel');
+  if (!panel || panel.classList.contains('hidden')) return;
+  if (!panel.contains(e.target) && !e.target.closest('#vs-score-info-btn')) {
+    panel.classList.add('hidden');
+  }
+});
+
 function _commonTags(myT, frT) {
   const ma=_getRawTags(myT), fa=_getRawTags(frT); if(!ma.length||!fa.length)return[];
   const mS=new Set(ma.map(t=>t.name.toLowerCase()));
