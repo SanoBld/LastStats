@@ -7660,14 +7660,6 @@ async function exportData(format) {
     if (!allTracks.length) { showToast('Aucun scrobble trouvé.', 'error'); return; }
 
     /* ── Construire les lignes ── */
-<<<<<<< Updated upstream
-    const rows = allTracks.map(tr => ({
-      'Titre':   tr.name || '',
-      'Artiste': tr.artist?.['#text'] || tr.artist?.name || '',
-      'Album':   tr.album?.['#text'] || '',
-      'Date':    tr.date?.['#text'] || '',
-      'URL':     tr.url || '',
-=======
     const _parseLfmDateToISO = (str) => {
       if (!str) return '';
       try {
@@ -7695,7 +7687,6 @@ async function exportData(format) {
       'Date_brute':    tr.date?.['#text'] || '',
       'Horodatage':    tr.date?.uts || _parseLfmDateToUnix(tr.date?.['#text'] || '') || '',
       'URL':           tr.url || '',
->>>>>>> Stashed changes
     }));
 
     /* ── Télécharger ── */
@@ -7708,12 +7699,6 @@ async function exportData(format) {
       showToast(`Export JSON — ${formatNum(rows.length)} scrobbles`, 'success', 'actions');
     } else {
       const headers = Object.keys(rows[0]);
-<<<<<<< Updated upstream
-      const csv = [
-        headers.join(','),
-        ...rows.map(r => headers.map(h => `"${String(r[h] || '').replace(/"/g, '""')}"`).join(',')),
-      ].join('\n');
-=======
       /* Séparateur point-virgule (compatibilité Excel FR) + guillemets sur toutes les cellules */
       const SEP = ';';
       const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
@@ -7721,7 +7706,6 @@ async function exportData(format) {
         headers.map(h => esc(h)).join(SEP),
         ...rows.map(r => headers.map(h => esc(r[h])).join(SEP)),
       ].join('\r\n');
->>>>>>> Stashed changes
       const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
       const a    = document.createElement('a');
       a.href     = URL.createObjectURL(blob);
