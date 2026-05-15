@@ -2324,8 +2324,11 @@ async function _loadProfileTopData(username, period) {
         const grad   = nameToGradient(tr?.name);
         const letter = (tr?.name || '?')[0];
         const trackUrl = tr?.name ? `https://www.last.fm/music/${encodeURIComponent(tr?.artist?.name||'')}/_/${encodeURIComponent(tr?.name||'')}` : '';
+        // Register in _imRegistry for the popup
+        if (!window._imRegistry) window._imRegistry = [];
+        const regIdx = window._imRegistry.push({ type:'track', name:tr?.name||'', sub:tr?.artist?.name||'', plays:tr?.playcount||0, url:trackUrl, img:'' }) - 1;
         return `<div class="profile-track-row" id="ptrack-row-${i}" role="link" tabindex="0"
-          ${trackUrl ? `onclick="window.open('${trackUrl}','_blank','noopener')" onkeydown="if(event.key==='Enter')window.open('${trackUrl}','_blank','noopener')"` : ''}>
+          onclick="openItemFromRegistry(${regIdx})" onkeydown="if(event.key==='Enter')openItemFromRegistry(${regIdx})">
           <span class="ptrack-rank">${i + 1}</span>
           <div class="ptrack-img-fallback" id="ptrack-thumb-${i}" style="background:${grad}">${letter}</div>
           <div class="ptrack-info">
@@ -2563,6 +2566,16 @@ async function _resolveProfileTrackImg(tr, index) {
 
     if (img && !isDefaultImg(img)) {
       thumbEl.outerHTML = `<img src="${escHtml(img)}" alt="" class="ptrack-img" id="ptrack-thumb-${index}" onerror="this.style.display='none'">`;
+      // Also update registry entry so popup shows the resolved image
+      const row = document.getElementById(`ptrack-row-${index}`);
+      if (row) {
+        const onclickStr = row.getAttribute('onclick') || '';
+        const match = onclickStr.match(/openItemFromRegistry\((\d+)\)/);
+        if (match) {
+          const regIdx = parseInt(match[1]);
+          if (window._imRegistry?.[regIdx]) window._imRegistry[regIdx].img = img;
+        }
+      }
     }
   } catch {}
 }
@@ -8271,12 +8284,16 @@ function _histTrackHTML(tr) {
   const hasImg  = imgUrl && !isDefaultImg(imgUrl);
   const letter  = (tr.name || '?')[0].toUpperCase();
   const q       = encodeURIComponent(`${tr.name || ''} ${tr.artist?.['#text'] || tr.artist?.name || ''}`);
+  const trackUrl = tr.url || `https://www.last.fm/music/${encodeURIComponent(tr.artist?.['#text']||'')}/_/${encodeURIComponent(tr.name||'')}`;
+
+  if (!window._imRegistry) window._imRegistry = [];
+  const regIdx = window._imRegistry.push({ type:'track', name:tr.name||'', sub:tr.artist?.['#text']||tr.artist?.name||'', plays:0, url:trackUrl, img: hasImg ? imgUrl : '' }) - 1;
 
   const imgHTML = hasImg
     ? `<img src="${escHtml(imgUrl)}" alt="" loading="lazy" onerror="this.style.display='none'">`
     : escHtml(letter);
 
-  return `<div class="hist-timeline-track">
+  return `<div class="hist-timeline-track" onclick="openItemFromRegistry(${regIdx})" style="cursor:pointer">
     <span class="hist-track-time">${timeStr}</span>
     <div class="hist-track-img">${imgHTML}</div>
     <div class="hist-track-info">
@@ -8284,7 +8301,7 @@ function _histTrackHTML(tr) {
       <div class="hist-track-artist">${artist}</div>
       ${album ? `<div class="hist-track-album"><i class="fas fa-compact-disc" style="font-size:.6rem;opacity:.6"></i> ${album}</div>` : ''}
     </div>
-    <div class="hist-track-ext">
+    <div class="hist-track-ext" onclick="event.stopPropagation()">
       <a href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener" title="YouTube"><i class="fab fa-youtube"></i></a>
       <a href="spotify:search:${encodeURIComponent((tr.name||'') + ' ' + (tr.artist?.['#text']||''))}" target="_blank" rel="noopener" title="Spotify"><i class="fab fa-spotify"></i></a>
     </div>
@@ -8317,12 +8334,17 @@ function _renderHistList(tracks) {
     const artist  = escHtml(tr.artist?.['#text'] || tr.artist?.name || '—');
     const album   = escHtml(tr.album?.['#text'] || '—');
     const q       = encodeURIComponent(`${tr.name || ''} ${tr.artist?.['#text'] || ''}`);
-    return `<div class="hist-list-row">
+    const trackUrl = tr.url || `https://www.last.fm/music/${encodeURIComponent(tr.artist?.['#text']||'')}/_/${encodeURIComponent(tr.name||'')}`;
+    const imgUrl  = tr.image?.find(im => im.size === 'medium')?.['#text'] || '';
+    const hasImg  = imgUrl && !isDefaultImg(imgUrl);
+    if (!window._imRegistry) window._imRegistry = [];
+    const regIdx = window._imRegistry.push({ type:'track', name:tr.name||'', sub:tr.artist?.['#text']||tr.artist?.name||'', plays:0, url:trackUrl, img: hasImg ? imgUrl : '' }) - 1;
+    return `<div class="hist-list-row" onclick="openItemFromRegistry(${regIdx})" style="cursor:pointer">
       <span class="hist-list-num">${i + 1}</span>
       <span class="hist-list-time">${timeStr}</span>
       <span class="hist-list-track-cell"><strong>${name}</strong><span>${artist}</span></span>
       <span class="hist-list-album">${album}</span>
-      <span class="hist-list-actions">
+      <span class="hist-list-actions" onclick="event.stopPropagation()">
         <a class="hist-track-ext" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener" title="YouTube"
            style="width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.72rem;color:var(--text-muted);transition:background .15s;text-decoration:none"
            onmouseover="this.style.background='var(--accent-lt)';this.style.color='var(--accent)'"
@@ -9215,11 +9237,13 @@ function renderComparison({ friendName, score, common, breaker, underground, sha
 
   const _trackRow = (tr, isCommon) => {
     const url = `https://www.last.fm/music/${encodeURIComponent(tr.artist)}/_/${encodeURIComponent(tr.name)}`;
-    return `<a class="vs-sbs-row${isCommon ? ' vs-sbs-row--common' : ''}" href="${url}" target="_blank" rel="noopener">
+    if (!window._imRegistry) window._imRegistry = [];
+    const regIdx = window._imRegistry.push({ type:'track', name:tr.name||'', sub:tr.artist||'', plays:tr.playcount||0, url, img:'' }) - 1;
+    return `<div class="vs-sbs-row${isCommon ? ' vs-sbs-row--common' : ''}" onclick="openItemFromRegistry(${regIdx})" style="cursor:pointer">
       ${isCommon ? '<i class="fas fa-link vs-sbs-link-icon"></i>' : ''}
       <span class="vs-sbs-name">${escHtml(tr.name)}<span class="vs-sbs-artist">${escHtml(tr.artist)}</span></span>
       <span class="vs-sbs-pc">${formatNum(tr.playcount)}</span>
-    </a>`;
+    </div>`;
   };
 
   const myTracksHTML      = myTrackList.slice(0, 30).map(tr => _trackRow(tr, commonTrackSet.has(`${tr.artistLow}|||${tr.nameLow}`))).join('');
