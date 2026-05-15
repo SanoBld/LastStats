@@ -7120,3 +7120,48 @@ a:focus:not(:focus-visible) { outline: none; }
   }
 }
 
+
+/* ── Export section cards ── */
+.stg-export-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 4px;
+}
+.stg-export-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color var(--dur-short) var(--ease-standard),
+              box-shadow   var(--dur-short) var(--ease-standard);
+}
+.stg-export-card:hover { border-color: var(--border-glow); box-shadow: var(--shadow-sm); }
+.stg-export-card-hd {
+  display: flex; align-items: center; gap: 8px;
+  font-size: .82rem; font-weight: 700; color: var(--text);
+}
+.stg-export-card-hd i { color: var(--accent); font-size: .85rem; width: 16px; text-align: center; flex-shrink: 0; }
+.stg-export-card-desc { font-size: .72rem; color: var(--text-muted); margin: 0; line-height: 1.4; }
+.stg-export-card-btns { display: flex; gap: 6px; margin-top: 2px; }
+.stg-export-card-btns .btn-export-sm { flex: 1; justify-content: center; }
+@media (max-width: 480px) { .stg-export-grid { grid-template-columns: 1fr; } }
+
+/* ── Export ALL card ── */
+.stg-export-card--all {
+  grid-column: 1 / -1;
+  border-color: var(--accent);
+  background: linear-gradient(135deg, var(--bg-card) 0%, color-mix(in srgb, var(--accent) 8%, var(--bg-card)) 100%);
+}
+.stg-export-card--all:hover { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 20%, transparent); }
+.stg-export-card--all .stg-export-card-hd i { font-size: 1rem; }
+.btn-export-sm--all {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border-color: var(--accent) !important;
+  font-weight: 700;
+}
+.btn-export-sm--all:hover { opacity: .85; transform: scale(1.05); }

@@ -1389,15 +1389,69 @@
 
               <div class="stg-section">
                 <h4 class="stg-section-title"><i class="fas fa-file-export"></i> Export</h4>
-                <div class="setting-row">
-                  <span class="setting-lbl">
-                    <i class="fas fa-file-export"></i>
-                    <span data-i18n="settings.export">Export my statistics</span>
-                  </span>
-                  <div class="setting-ctrl export-btns">
-                    <button class="btn-export-sm" onclick="exportStats('json')" title="Export as JSON"><i class="fas fa-file-code"></i> JSON</button>
-                    <button class="btn-export-sm" onclick="exportStats('csv')" title="Export as CSV"><i class="fas fa-file-csv"></i> CSV</button>
+
+                <div class="stg-export-grid">
+
+                  <div class="stg-export-card">
+                    <div class="stg-export-card-hd">
+                      <i class="fas fa-headphones"></i>
+                      <span>Scrobble History</span>
+                    </div>
+                    <p class="stg-export-card-desc">All your plays, with date &amp; time</p>
+                    <div class="stg-export-card-btns">
+                      <button class="btn-export-sm" onclick="exportStats('csv','history')" title="CSV"><i class="fas fa-file-csv"></i> CSV</button>
+                      <button class="btn-export-sm" onclick="exportStats('json','history')" title="JSON"><i class="fas fa-file-code"></i> JSON</button>
+                    </div>
                   </div>
+
+                  <div class="stg-export-card">
+                    <div class="stg-export-card-hd">
+                      <i class="fas fa-microphone"></i>
+                      <span>Top Artists</span>
+                    </div>
+                    <p class="stg-export-card-desc">Your most-played artists, ranked</p>
+                    <div class="stg-export-card-btns">
+                      <button class="btn-export-sm" onclick="exportStats('csv','artists')" title="CSV"><i class="fas fa-file-csv"></i> CSV</button>
+                      <button class="btn-export-sm" onclick="exportStats('json','artists')" title="JSON"><i class="fas fa-file-code"></i> JSON</button>
+                    </div>
+                  </div>
+
+                  <div class="stg-export-card">
+                    <div class="stg-export-card-hd">
+                      <i class="fas fa-compact-disc"></i>
+                      <span>Top Albums</span>
+                    </div>
+                    <p class="stg-export-card-desc">Your most-played albums, ranked</p>
+                    <div class="stg-export-card-btns">
+                      <button class="btn-export-sm" onclick="exportStats('csv','albums')" title="CSV"><i class="fas fa-file-csv"></i> CSV</button>
+                      <button class="btn-export-sm" onclick="exportStats('json','albums')" title="JSON"><i class="fas fa-file-code"></i> JSON</button>
+                    </div>
+                  </div>
+
+                  <div class="stg-export-card">
+                    <div class="stg-export-card-hd">
+                      <i class="fas fa-music"></i>
+                      <span>Top Tracks</span>
+                    </div>
+                    <p class="stg-export-card-desc">Your most-played tracks, ranked</p>
+                    <div class="stg-export-card-btns">
+                      <button class="btn-export-sm" onclick="exportStats('csv','tracks')" title="CSV"><i class="fas fa-file-csv"></i> CSV</button>
+                      <button class="btn-export-sm" onclick="exportStats('json','tracks')" title="JSON"><i class="fas fa-file-code"></i> JSON</button>
+                    </div>
+                  </div>
+
+                  <div class="stg-export-card stg-export-card--all">
+                    <div class="stg-export-card-hd">
+                      <i class="fas fa-archive"></i>
+                      <span data-i18n="export_all_title">Download Everything</span>
+                    </div>
+                    <p class="stg-export-card-desc" data-i18n="export_all_desc">History + Artists + Albums + Tracks in one click</p>
+                    <div class="stg-export-card-btns">
+                      <button class="btn-export-sm btn-export-sm--all" onclick="exportStats('csv','all')" title="CSV"><i class="fas fa-file-csv"></i> CSV</button>
+                      <button class="btn-export-sm btn-export-sm--all" onclick="exportStats('json','all')" title="JSON"><i class="fas fa-file-code"></i> JSON</button>
+                    </div>
+                  </div>
+
                 </div>
               </div>
 

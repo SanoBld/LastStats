@@ -508,6 +508,9 @@ const I18N_DATA = {
     csv_album_type:  'Album',
     csv_track_type:  'Titre',
 
+    export_all_title: 'Tout télécharger',
+    export_all_desc:  'Historique + Artistes + Albums + Titres en un clic',
+
     auto_login_failed: 'Connexion automatique échouée. Veuillez vous connecter manuellement.',
 
     nav_topArtists: 'Artistes',
@@ -968,6 +971,8 @@ const I18N_DATA = {
     error:'Error', unavailable:'Unavailable',
     csv_type:'Type', csv_name:'Name', csv_artist:'Artist', csv_plays:'Plays', csv_url:'URL',
     csv_artist_type:'Artist', csv_album_type:'Album', csv_track_type:'Track',
+    export_all_title: 'Download Everything',
+    export_all_desc:  'History + Artists + Albums + Tracks in one click',
     auto_login_failed:'Auto-login failed. Please log in manually.',
     nav_topArtists:'Artists', nav_topAlbums:'Albums', nav_topTracks:'Tracks', nav_logout:'Log out',
     dashboard_title:'Home', dashboard_sub:'Overview of your musical activity',
@@ -1327,6 +1332,8 @@ const I18N_DATA = {
     error:'Error', unavailable:'No disponible',
     csv_type:'Tipo', csv_name:'Nombre', csv_artist:'Artista', csv_plays:'Reproducciones', csv_url:'URL',
     csv_artist_type:'Artista', csv_album_type:'Álbum', csv_track_type:'Canción',
+    export_all_title: 'Descargar todo',
+    export_all_desc:  'Historial + Artistas + Álbumes + Canciones en un clic',
     auto_login_failed:'Inicio de sesión automático fallido. Por favor, inicia sesión manualmente.',
     nav_topArtists:'Artistas', nav_topAlbums:'Álbumes', nav_topTracks:'Canciones', nav_logout:'Cerrar sesión',
     dashboard_title:'Inicio', dashboard_sub:'Resumen de tu actividad musical',
@@ -1564,6 +1571,8 @@ const I18N_DATA = {
     csv_artist_type: 'Artista',
     csv_album_type: 'Álbum',
     csv_track_type: 'Música',
+    export_all_title: 'Baixar tudo',
+    export_all_desc:  'Histórico + Artistas + Álbuns + Músicas em um clique',
   },
 
   de: {
@@ -1704,6 +1713,8 @@ const I18N_DATA = {
     csv_artist_type: 'Künstler',
     csv_album_type: 'Album',
     csv_track_type: 'Titel',
+    export_all_title: 'Alles herunterladen',
+    export_all_desc:  'Verlauf + Künstler + Alben + Titel mit einem Klick',
   },
 
   it: {
@@ -1844,6 +1855,8 @@ const I18N_DATA = {
     csv_artist_type: 'Artista',
     csv_album_type: 'Album',
     csv_track_type: 'Brano',
+    export_all_title: 'Scarica tutto',
+    export_all_desc:  'Cronologia + Artisti + Album + Brani in un clic',
   },
 
   ru: {
@@ -1984,6 +1997,8 @@ const I18N_DATA = {
     csv_artist_type: 'Исполнитель',
     csv_album_type: 'Альбом',
     csv_track_type: 'Трек',
+    export_all_title: 'Скачать всё',
+    export_all_desc:  'История + Исполнители + Альбомы + Треки в один клик',
   },
 
   ja: {
@@ -2119,6 +2134,8 @@ const I18N_DATA = {
     csv_artist_type: 'アーティスト',
     csv_album_type: 'アルバム',
     csv_track_type: '曲',
+    export_all_title: 'すべてダウンロード',
+    export_all_desc:  '履歴 + アーティスト + アルバム + 曲をワンクリックで',
   },
 
   zh: {
@@ -2254,6 +2271,8 @@ const I18N_DATA = {
     csv_artist_type: '艺术家',
     csv_album_type: '专辑',
     csv_track_type: '歌曲',
+    export_all_title: '下载全部',
+    export_all_desc:  '历史 + 艺术家 + 专辑 + 歌曲一键下载',
   },
 
   ko: {
@@ -2389,6 +2408,8 @@ const I18N_DATA = {
     csv_artist_type: '아티스트',
     csv_album_type: '앨범',
     csv_track_type: '곡',
+    export_all_title: '전체 다운로드',
+    export_all_desc:  '기록 + 아티스트 + 앨범 + 곡을 한 번에',
   },
 
   tr: {
@@ -2524,6 +2545,8 @@ const I18N_DATA = {
     csv_artist_type: 'Sanatçı',
     csv_album_type: 'Albüm',
     csv_track_type: 'Şarkı',
+    export_all_title: 'Hepsini indir',
+    export_all_desc:  'Geçmiş + Sanatçılar + Albümler + Şarkılar tek tıkla',
   },
 
   ar: {
@@ -2659,50 +2682,69 @@ const I18N_DATA = {
     csv_artist_type: 'فنان',
     csv_album_type: 'ألبوم',
     csv_track_type: 'أغنية',
+    export_all_title: 'تحميل الكل',
+    export_all_desc:  'السجل + الفنانون + الألبومات + الأغاني بنقرة واحدة',
   },
 
 };
 
-/* ── Fallback: every non-FR/EN lang inherits missing keys from EN ── */
+/* ── Fallback: every lang inherits missing keys from EN then FR ── */
 (function _applyFallbacks() {
-  const base = I18N_DATA.en;
+  const en = I18N_DATA.en, fr = I18N_DATA.fr;
   for (const code of Object.keys(I18N_DATA)) {
     if (code === 'en') continue;
     const lang = I18N_DATA[code];
-    for (const key of Object.keys(base)) {
-      if (!(key in lang)) lang[key] = base[key];
+    for (const key of Object.keys(en)) {
+      if (!(key in lang)) lang[key] = en[key] ?? fr[key];
     }
   }
 })();
 
-/* ── Public API ── */
-function t(key, ...args) {
-  const lang  = (typeof APP !== 'undefined' && APP.lang) ? APP.lang : (navigator.language || 'fr').slice(0, 2);
-  const block = I18N_DATA[lang] || I18N_DATA['fr'] || I18N_DATA['en'] || {};
-  let   str   = (key in block) ? block[key] : ((I18N_DATA['en'] || {})[key] ?? key);
-  args.forEach((val, i) => { str = str.replaceAll(`{${i}}`, val); });
-  return str;
+/* ── Language detection ── */
+function _detectLang() {
+  const saved = localStorage.getItem('ls_lang');
+  if (saved && I18N_DATA[saved]) return saved;
+  const nav   = (navigator.language || navigator.userLanguage || 'fr').toLowerCase();
+  const code2 = nav.split('-')[0];
+  if (I18N_DATA[code2]) return code2;
+  if (nav.startsWith('zh')) return 'zh';
+  if (nav.startsWith('pt')) return 'pt';
+  if (nav.startsWith('ar')) return 'ar';
+  return 'fr';
 }
 
-function tArr(key) {
-  const lang  = (typeof APP !== 'undefined' && APP.lang) ? APP.lang : (navigator.language || 'fr').slice(0, 2);
-  const block = I18N_DATA[lang] || I18N_DATA['fr'] || I18N_DATA['en'] || {};
-  return block[key] || I18N_DATA['en']?.[key] || [];
-}
+/* ── Public API — matches the interface script.js expects ── */
+const I18N = (() => {
+  let _lang = _detectLang();
 
-function getAvailableLanguages() {
-  return [
-    { code: 'fr', label: 'Français',   flag: '🇫🇷' },
-    { code: 'en', label: 'English',    flag: '🇬🇧' },
-    { code: 'es', label: 'Español',    flag: '🇪🇸' },
-    { code: 'pt', label: 'Português',  flag: '🇧🇷' },
-    { code: 'de', label: 'Deutsch',    flag: '🇩🇪' },
-    { code: 'it', label: 'Italiano',   flag: '🇮🇹' },
-    { code: 'ru', label: 'Русский',    flag: '🇷🇺' },
-    { code: 'ja', label: '日本語',      flag: '🇯🇵' },
-    { code: 'zh', label: '中文',        flag: '🇨🇳' },
-    { code: 'ko', label: '한국어',      flag: '🇰🇷' },
-    { code: 'tr', label: 'Türkçe',     flag: '🇹🇷' },
-    { code: 'ar', label: 'العربية',    flag: '🇸🇦' },
-  ];
-}
+  function t(key, ...args) {
+    const str = I18N_DATA[_lang]?.[key] ?? I18N_DATA.fr?.[key] ?? I18N_DATA.en?.[key] ?? key;
+    if (!args.length) return str;
+    return str.replace(/\{(\d+)\}/g, (_, i) => {
+      const val = args[i] ?? '';
+      return String(val)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    });
+  }
+
+  function arr(key) {
+    return I18N_DATA[_lang]?.[key] ?? I18N_DATA.fr?.[key] ?? I18N_DATA.en?.[key] ?? [];
+  }
+
+  function setLang(lang) {
+    if (!I18N_DATA[lang]) return;
+    _lang = lang;
+    localStorage.setItem('ls_lang', lang);
+  }
+
+  function getLang() { return _lang; }
+
+  function getAvailable() { return Object.keys(I18N_DATA); }
+
+  return { t, arr, setLang, getLang, getAvailable };
+})();
+
+// Expose globally — matches what script.js calls
+window.I18N = I18N;
+window.t    = I18N.t.bind(I18N);

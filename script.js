@@ -731,8 +731,9 @@ function updateApiKey() {
 }
 
 // Wrapper export (appelé par les boutons HTML)
-function exportStats(format) {
-  exportData(format);
+function exportStats(format, type) {
+  if (type === 'all') { exportAll(format); return; }
+  exportData(format, type || 'history');
 }
 
 // Wrapper clear cache (appelé par le bouton HTML)
@@ -7578,11 +7579,11 @@ function openUserProfile(username) {
   }
 }
 
-async function exportData(format) {
+async function exportData(format, type = 'history') {
   if (window._exportRunning) { showToast('Export déjà en cours…', 'info'); return; }
   window._exportRunning = true;
 
-  /* ── Progress overlay ── */
+  /* ── Overlay helpers ── */
   const overlay  = document.getElementById('fetch-overlay');
   const fillEl   = document.getElementById('fetch-fill');
   const pctEl    = document.getElementById('fetch-pct');
@@ -7591,27 +7592,23 @@ async function exportData(format) {
   const msgEl    = document.getElementById('fetch-msg');
   const subEl    = document.getElementById('fetch-sub');
 
-  const _showOverlay = () => {
+  const _showOverlay = (title, sub) => {
     if (!overlay) return;
     overlay.classList.remove('hidden', 'fetch-overlay--minimized');
     document.body.classList.add('fetch-active');
     if (fillEl)   fillEl.style.width   = '0%';
     if (pctEl)    pctEl.textContent    = '0%';
-    if (tracksEl) tracksEl.textContent = '0 scrobbles';
-    if (titleEl)  titleEl.textContent  = '📤 Export en cours…';
-    if (msgEl)    msgEl.textContent    = 'Initialisation…';
+    if (tracksEl) tracksEl.textContent = '';
+    if (titleEl)  titleEl.textContent  = title;
+    if (msgEl)    msgEl.textContent    = sub || '';
     if (subEl)    subEl.textContent    = '';
   };
-
-  const _updateOverlay = (page, totalPages, count) => {
-    const pct = totalPages > 0 ? Math.round((page / totalPages) * 100) : 0;
+  const _updateOverlay = (pct, label, detail) => {
     if (fillEl)   fillEl.style.width   = pct + '%';
     if (pctEl)    pctEl.textContent    = pct + '%';
-    if (tracksEl) tracksEl.textContent = formatNum(count) + ' scrobbles';
-    if (msgEl)    msgEl.textContent    = `Page ${page} / ${totalPages}`;
-    if (subEl)    subEl.textContent    = "Récupération de l'historique complet…";
+    if (tracksEl) tracksEl.textContent = label || '';
+    if (msgEl)    msgEl.textContent    = detail || '';
   };
-
   const _hideOverlay = () => {
     if (!overlay) return;
     overlay.classList.add('hidden');
@@ -7619,98 +7616,136 @@ async function exportData(format) {
   };
 
   const btns = document.querySelectorAll('[onclick*="exportStats"]');
-  btns.forEach(b => { b._origHTML = b.innerHTML; b.disabled = true; b.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; });
-  _showOverlay();
+  btns.forEach(b => { b._orig = b.innerHTML; b.disabled = true; b.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; });
 
   try {
-    /* ── Fetch ALL scrobbles via user.getRecentTracks (paginé, batches de 5) ── */
-    const LIMIT      = 200;
-    const BATCH_SIZE = 5;
-    const allTracks  = [];
 
-    // Page 1 — connaître le total
-    const first      = await API._fetch('user.getRecentTracks', { limit: LIMIT, page: 1, extended: 0 });
-    const attr       = first?.recenttracks?.['@attr'] || {};
-    const totalPages = parseInt(attr.totalPages || 1);
-    const totalItems = parseInt(attr.total || 0);
+    /* ══════════════════════════════════════════════
+       TYPE: 'history' — ALL scrobbles paginated
+    ══════════════════════════════════════════════ */
+    if (type === 'history') {
+      _showOverlay('📤 Exporting scrobble history…', 'Fetching all your plays from Last.fm');
+      const LIMIT = 200, BATCH = 5;
+      const allTracks = [];
+      const first = await API._fetch('user.getRecentTracks', { limit: LIMIT, page: 1, extended: 0 });
+      const attr  = first?.recenttracks?.['@attr'] || {};
+      const total = parseInt(attr.total || 0);
+      const pages = parseInt(attr.totalPages || 1);
+      if (titleEl) titleEl.textContent = `📤 Exporting — ${formatNum(total)} plays`;
 
-    if (titleEl) titleEl.textContent = `📤 Export — ${formatNum(totalItems)} scrobbles`;
+      const p1 = first?.recenttracks?.track;
+      (Array.isArray(p1) ? p1 : (p1 ? [p1] : [])).filter(tr => !tr['@attr']?.nowplaying).forEach(tr => allTracks.push(tr));
+      _updateOverlay(Math.round(1/pages*100), `${formatNum(allTracks.length)} plays`, `Page 1 / ${pages}`);
 
-    const p1raw = first?.recenttracks?.track;
-    const p1arr = Array.isArray(p1raw) ? p1raw : (p1raw ? [p1raw] : []);
-    p1arr.filter(tr => !tr['@attr']?.nowplaying).forEach(tr => allTracks.push(tr));
-    _updateOverlay(1, totalPages, allTracks.length);
-
-    // Pages restantes par batch
-    const remaining = Array.from({ length: totalPages - 1 }, (_, i) => i + 2);
-    for (let i = 0; i < remaining.length; i += BATCH_SIZE) {
-      const batch   = remaining.slice(i, i + BATCH_SIZE);
-      const results = await Promise.all(
-        batch.map(p => API._fetch('user.getRecentTracks', { limit: LIMIT, page: p, extended: 0 }))
-      );
-      for (const res of results) {
-        const raw = res?.recenttracks?.track;
-        const arr = Array.isArray(raw) ? raw : (raw ? [raw] : []);
-        arr.filter(tr => !tr['@attr']?.nowplaying).forEach(tr => allTracks.push(tr));
+      const remaining = Array.from({ length: pages - 1 }, (_, i) => i + 2);
+      for (let i = 0; i < remaining.length; i += BATCH) {
+        const batch   = remaining.slice(i, i + BATCH);
+        const results = await Promise.all(batch.map(p => API._fetch('user.getRecentTracks', { limit: LIMIT, page: p, extended: 0 })));
+        for (const r of results) {
+          const arr = r?.recenttracks?.track;
+          (Array.isArray(arr) ? arr : (arr ? [arr] : [])).filter(tr => !tr['@attr']?.nowplaying).forEach(tr => allTracks.push(tr));
+        }
+        const done = Math.min(i + BATCH + 1, pages);
+        _updateOverlay(Math.round(done/pages*100), `${formatNum(allTracks.length)} plays`, `Page ${done} / ${pages}`);
+        if (i + BATCH < remaining.length) await sleep(120);
       }
-      _updateOverlay(Math.min(i + BATCH_SIZE + 1, totalPages), totalPages, allTracks.length);
-      if (i + BATCH_SIZE < remaining.length) await sleep(120);
+
+      const rows = allTracks.map((tr, i) => {
+        const raw = tr.date?.['#text'] || '';
+        let dt = raw;
+        try { if (raw) { const d = new Date(raw.replace(',','')); if (!isNaN(d)) { const p = n => String(n).padStart(2,'0'); dt = `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; } } } catch {}
+        return { '#': i+1, Date: dt, Title: tr.name||'', Artist: tr.artist?.['#text']||tr.artist?.name||'', Album: tr.album?.['#text']||'', URL: tr.url||'' };
+      });
+
+      _download(format, rows, `laststats-${APP.username}-history`, '🎵 Scrobble History', pages);
+      showToast(`Export — ${formatNum(rows.length)} plays`, 'success', 'actions');
     }
 
-    if (!allTracks.length) { showToast('Aucun scrobble trouvé.', 'error'); return; }
+    /* ══════════════════════════════════════════════
+       TYPE: 'artists' / 'albums' / 'tracks' — top lists fully paginated
+    ══════════════════════════════════════════════ */
+    else if (['artists','albums','tracks'].includes(type)) {
+      const cfg = {
+        artists: { method:'user.getTopArtists', dataKey:'topartists', itemKey:'artist', label:'Top Artists',   file:'artists', icon:'🎤' },
+        albums:  { method:'user.getTopAlbums',  dataKey:'topalbums',  itemKey:'album',  label:'Top Albums',    file:'albums',  icon:'💿' },
+        tracks:  { method:'user.getTopTracks',  dataKey:'toptracks',  itemKey:'track',  label:'Top Tracks',    file:'tracks',  icon:'🎵' },
+      }[type];
 
-    /* ── Construire les lignes ── */
-    const rows = allTracks.map((tr, i) => {
-      const rawDate = tr.date?.['#text'] || '';
-      // Reformatter "15 May 2026, 11:44" -> "2026-05-15 11:44"
-      let dateFormatted = rawDate;
-      try {
-        if (rawDate) {
-          const d = new Date(rawDate.replace(',', ''));
-          if (!isNaN(d)) {
-            const pad = n => String(n).padStart(2,'0');
-            dateFormatted = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-          }
+      _showOverlay(`📤 Exporting ${cfg.label}…`, 'Fetching all data from Last.fm');
+      const LIMIT = 1000, BATCH = 5;
+      const first = await API._fetch(cfg.method, { limit: LIMIT, page: 1 });
+      const attr  = first[cfg.dataKey]?.['@attr'] || {};
+      const pages = parseInt(attr.totalPages || 1);
+      const raw0  = first[cfg.dataKey]?.[cfg.itemKey];
+      const items = Array.isArray(raw0) ? [...raw0] : (raw0 ? [raw0] : []);
+      _updateOverlay(Math.round(1/pages*100), `${items.length} items`, `Page 1 / ${pages}`);
+
+      const remaining = Array.from({ length: pages - 1 }, (_, i) => i + 2);
+      for (let i = 0; i < remaining.length; i += BATCH) {
+        const batch   = remaining.slice(i, i + BATCH);
+        const results = await Promise.all(batch.map(p => API._fetch(cfg.method, { limit: LIMIT, page: p })));
+        for (const r of results) {
+          const arr = r[cfg.dataKey]?.[cfg.itemKey];
+          if (Array.isArray(arr)) items.push(...arr); else if (arr) items.push(arr);
         }
-      } catch {}
-      return {
-        '#':        i + 1,
-        'Date':     dateFormatted,
-        'Titre':    tr.name || '',
-        'Artiste':  tr.artist?.['#text'] || tr.artist?.name || '',
-        'Album':    tr.album?.['#text'] || '',
-        'URL':      tr.url || '',
-      };
-    });
+        const done = Math.min(i + BATCH + 1, pages);
+        _updateOverlay(Math.round(done/pages*100), `${items.length} items`, `Page ${done} / ${pages}`);
+        if (i + BATCH < remaining.length) await sleep(120);
+      }
 
-    /* ── Télécharger ── */
-    if (format === 'json') {
-      const blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
-      const a    = document.createElement('a');
-      a.href     = URL.createObjectURL(blob);
-      a.download = `laststats-${APP.username}-scrobbles.json`;
-      a.click();
-      showToast(`Export JSON — ${formatNum(rows.length)} scrobbles`, 'success', 'actions');
-    } else {
-      const headers = Object.keys(rows[0]);
-      const csv = [
-        headers.join(','),
-        ...rows.map(r => headers.map(h => `"${String(r[h] || '').replace(/"/g, '""')}"`).join(',')),
-      ].join('\n');
-      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-      const a    = document.createElement('a');
-      a.href     = URL.createObjectURL(blob);
-      a.download = `laststats-${APP.username}-scrobbles.csv`;
-      a.click();
-      showToast(`Export CSV — ${formatNum(rows.length)} scrobbles`, 'success', 'actions');
+      let rows;
+      if (type === 'artists') {
+        rows = items.map((d,i) => ({ Rank: d['@attr']?.rank || i+1, Artist: d.name||'', Plays: parseInt(d.playcount||0), URL: d.url||'' }));
+      } else if (type === 'albums') {
+        rows = items.map((d,i) => ({ Rank: d['@attr']?.rank || i+1, Album: d.name||'', Artist: d.artist?.name||'', Plays: parseInt(d.playcount||0), URL: d.url||'' }));
+      } else {
+        rows = items.map((d,i) => ({ Rank: d['@attr']?.rank || i+1, Track: d.name||'', Artist: d.artist?.name||'', Duration_s: parseInt(d.duration||0), Plays: parseInt(d.playcount||0), URL: d.url||'' }));
+      }
+
+      _download(format, rows, `laststats-${APP.username}-${cfg.file}`, `${cfg.icon} ${cfg.label}`, pages);
+      showToast(`Export ${cfg.label} — ${formatNum(rows.length)} items`, 'success', 'actions');
     }
 
   } catch (e) {
-    showToast(`Erreur export: ${e.message}`, 'error');
+    showToast(`Export error: ${e.message}`, 'error');
   } finally {
     window._exportRunning = false;
-    btns.forEach(b => { b.disabled = false; if (b._origHTML) b.innerHTML = b._origHTML; });
+    btns.forEach(b => { b.disabled = false; if (b._orig) b.innerHTML = b._orig; });
     _hideOverlay();
+  }
+}
+
+/* ── Download helper: CSV with section title header / JSON ── */
+function _download(format, rows, filename, sectionTitle, _pages) {
+  if (!rows.length) { showToast('No data to export.', 'error'); return; }
+  if (format === 'json') {
+    const payload = { section: sectionTitle, count: rows.length, exported_at: new Date().toISOString(), data: rows };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename+'.json'; a.click();
+  } else {
+    const SEP = ';'; // semicolon = standard European / Excel separator
+    const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const headers = Object.keys(rows[0]);
+    // ── Section title row + metadata, each in its own cell ──
+    const csv = [
+      [esc(sectionTitle), esc(`Exported: ${new Date().toLocaleDateString('fr-FR')}`), esc(`Total: ${rows.length} rows`)].join(SEP),
+      '',
+      headers.map(h => esc(h)).join(SEP),
+      ...rows.map(r => headers.map(h => esc(r[h])).join(SEP)),
+    ].join('\n');
+    const blob = new Blob(['\uFEFF'+csv], { type:'text/csv;charset=utf-8;' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename+'.csv'; a.click();
+  }
+}
+
+/* ── Export ALL: downloads history + artists + albums + tracks sequentially ── */
+async function exportAll(format) {
+  if (window._exportRunning) { showToast('Export déjà en cours…', 'info'); return; }
+  const types = ['history', 'artists', 'albums', 'tracks'];
+  for (const type of types) {
+    await exportData(format, type);
+    // small pause between downloads
+    await sleep(400);
   }
 }
 
