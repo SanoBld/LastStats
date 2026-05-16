@@ -1,0 +1,32 @@
+name: Deploy LastStats
+
+on:
+  push:
+    branches:
+      - main # Déclenche l'action à chaque push sur la branche main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Requis pour déployer sur gh-pages
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Injecter le hash du commit dans le Service Worker
+        run: |
+          # Récupère les 7 premiers caractères du commit SHA
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          
+          # Remplace automatiquement la version du cache par v10-SHA du commit
+          sed -i "s/const CACHE_VERSION = ['\"].*['\"]/const CACHE_VERSION = 'v10-$COMMIT_HASH'/g" sw.js
+          
+          echo "Nouvelle version du cache injectée : v10-$COMMIT_HASH"
+
+      - name: Déploiement sur GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: . # Déploie la racine du projet
+          branch: gh-pages # La branche où GitHub Pages va lire le site
