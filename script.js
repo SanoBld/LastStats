@@ -7813,7 +7813,7 @@ function _notifyDownloadDone(icon, label, count, format) {
     new Notification('📥 Export terminé — LastStats', {
       body: `${icon} ${label} — ${formatNum(count)} éléments téléchargés (${format.toUpperCase()})`,
       icon: './icons/icon-192.png',
-      tag:  'ls-export-done',
+      tag:  `ls-export-done-${Date.now()}`,
       silent: false,
     });
   } catch (_) {}
