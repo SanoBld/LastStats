@@ -799,18 +799,14 @@ canvas { max-width: 100%; }
 .btn-logout:hover { background: rgba(239,68,68,.10); color: #f87171; }
 
 /* M3 Top App Bar (Header) */
-/* ── Mobile topbar: burger only, no title ── */
+/* ── Mobile: floating burger button only, no bar ── */
 .mobile-topbar {
-  display: none; /* hidden on desktop */
-  align-items: center;
-  padding: 8px 12px;
-  position: sticky; top: 0; z-index: 50;
-  background: color-mix(in srgb, var(--bg-header) 60%, transparent);
-  backdrop-filter: blur(16px) saturate(1.4);
-  -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 45%, transparent);
+  display: none;
 }
-.burger-btn { color: var(--text-muted); padding: 6px; border-radius: var(--radius-xs); }
+.burger-btn {
+  display: none; /* hidden on desktop, fixed floating on mobile */
+  color: var(--text-muted); padding: 6px; border-radius: var(--radius-xs);
+}
 .burger-btn:hover { background: var(--bg-hover); color: var(--text); }
 .main-wrap { flex: 1; margin-left: var(--sb-width); display: flex; flex-direction: column; min-width: 0; transition: margin-left .28s cubic-bezier(.4,0,.2,1); }
 .icon-btn {
@@ -3324,8 +3320,31 @@ canvas#w-mini { height: 60px !important; }
 
   /* Main content stretches to full width */
   .main-wrap { margin-left: 0; }
-  .mobile-topbar { display: flex; }
-  .burger-btn { display: flex; }
+  .mobile-topbar { display: none; }
+  .burger-btn {
+    display: flex;
+    position: absolute;
+    top: 12px; right: 12px; left: auto;
+    z-index: 120;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--bg-card) 55%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
+    box-shadow: none;
+    align-items: center; justify-content: center;
+    font-size: .78rem;
+    color: color-mix(in srgb, var(--text-muted) 70%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: background .2s, color .2s, transform .15s;
+  }
+  .burger-btn:hover, .burger-btn:active {
+    background: color-mix(in srgb, var(--bg-hover) 80%, transparent);
+    color: var(--text);
+    transform: scale(1.06);
+  }
+  .main-wrap { position: relative; }
+  .main-content { padding-top: 52px; }
 
   /* Charts stack to single column */
   .dash-charts  { grid-template-columns: 1fr; gap: 20px; }
