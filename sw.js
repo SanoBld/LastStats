@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_VERSION = 'v10-7e606ae';
+const CACHE_VERSION = 'v10-055b8bd';
 const CACHE_NAME    = `laststats-${CACHE_VERSION}`;
 const IMG_CACHE     = `laststats-img-${CACHE_VERSION}`;
 const IMG_MAX       = 100;
@@ -11,6 +11,7 @@ const ASSETS_TO_CACHE = [
   './style.css',
   './script.js',
   './i18n.js',
+  './version.js',
   './manifest.json',
   // CDN assets — must match exactly the URLs loaded in index.html
   'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js',
