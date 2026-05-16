@@ -7791,6 +7791,19 @@ async function exportData(format, type = 'history') {
 
       _download(format, rows, `laststats-${APP.username}-${cfg.file}`, `${cfg.icon} ${cfg.label}`, pages);
       showToast(`Export ${cfg.label} — ${formatNum(rows.length)} items`, 'success', 'actions');
+
+      // Push notification "téléchargement terminé" si activée
+      try {
+        const _prefs = JSON.parse(localStorage.getItem('ls_notif_prefs') || '{}');
+        if (_prefs.download && Notification?.permission === 'granted') {
+          new Notification('📥 Export terminé — LastStats', {
+            body: `${cfg.icon} ${cfg.label} — ${formatNum(rows.length)} éléments téléchargés (${format.toUpperCase()})`,
+            icon: './icons/icon-192.png',
+            tag:  'ls-export-done',
+            silent: false,
+          });
+        }
+      } catch (_) {}
     }
 
   } catch (e) {
@@ -7907,6 +7920,7 @@ function saveNotifPrefs() {
     milestone:  document.getElementById('notif-milestone')?.checked || false,
     milestones,
     wrapped:    document.getElementById('notif-wrapped')?.checked   || false,
+    download:   document.getElementById('notif-download')?.checked  || false,
   };
   localStorage.setItem('ls_notif_prefs', JSON.stringify(prefs));
   _syncMilestoneVisibility(prefs.milestone);
@@ -7932,6 +7946,7 @@ function loadNotifPrefs() {
     set('notif-monthly',   prefs.monthly);
     set('notif-milestone', prefs.milestone);
     set('notif-wrapped',   prefs.wrapped);
+    set('notif-download',  prefs.download);
     // Milestone thresholds
     const activeMilestones = prefs.milestones ?? defaultMilestones;
     MILESTONE_IDS.forEach(v => {
