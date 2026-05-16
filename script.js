@@ -1978,6 +1978,12 @@ window.addEventListener('DOMContentLoaded', () => {
   const savedTab = localStorage.getItem('ls_settings_tab');
   if (savedTab) switchSettingsTab(savedTab);
 
+  // Affiche la version dans l'onglet "À propos" (injectée par GitHub Actions via version.js)
+  const _versionEl = document.getElementById('about-version');
+  if (_versionEl && typeof APP_VERSION !== 'undefined' && APP_VERSION !== '__APP_VERSION__') {
+    _versionEl.textContent = APP_VERSION;
+  }
+
   // Apply saved theme immediately
   const theme = localStorage.getItem('ls_theme') || 'dark';
   document.documentElement.dataset.theme = theme;
