@@ -1,0 +1,29 @@
+name: Build macOS
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - run: flutter pub get
+
+      - run: flutter build macos --release
+
+      - name: Upload macOS App
+        uses: actions/upload-artifact@v4
+        with:
+          name: laststats-macos-app
+          path: build/macos/Build/Products/Release/

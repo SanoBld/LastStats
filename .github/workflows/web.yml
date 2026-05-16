@@ -1,0 +1,29 @@
+name: Build Web
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - run: flutter pub get
+
+      - run: flutter build web --release
+
+      - name: Upload Web App
+        uses: actions/upload-artifact@v4
+        with:
+          name: laststats-web-app
+          path: build/web/
