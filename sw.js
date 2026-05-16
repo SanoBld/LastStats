@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_VERSION = 'v10-055b8bd';
+const CACHE_VERSION = 'v10-86c2ba7';
 const CACHE_NAME    = `laststats-${CACHE_VERSION}`;
 const IMG_CACHE     = `laststats-img-${CACHE_VERSION}`;
 const IMG_MAX       = 100;
