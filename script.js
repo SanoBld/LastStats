@@ -1066,9 +1066,8 @@ function setLanguage(lang) {
     const activeSection = document.querySelector('.app-sec.active')?.id?.replace('s-', '');
     if (activeSection) {
       const key = NAV_TITLE_KEYS[activeSection];
-      if (key) document.getElementById('hd-title').textContent = t(key);
+      if (key) document.title = `LastStats — ${t(key)}`;
     }
-    document.title = 'LastStats — ' + (t('nav_dashboard') || 'LastStats');
     showToast(t('toast_lang_changed'), 'success', 'system');
 
     // Re-render dynamic sections that have hardcoded labels
@@ -1887,7 +1886,80 @@ function _scheduleBackgroundHistoryFetch() {
   }
 }
 
+/* ── Easter egg tab titles: multilingual ── */
+const _EGG_AWAY = {
+  fr: ['👀 Reviens, on s\'ennuie !','🎵 Ta musique te manque ?','📊 Tes stats t\'attendent…','🎤 L\'artiste te regarde !','💿 Un album tourne sans toi','🌙 LastStats veille pour toi','🔮 Retour mystérieux prévu ?','🎧 On garde ta playlist au chaud'],
+  en: ['👀 Come back, we miss you!','🎵 Missing your music?','📊 Your stats are waiting…','🎤 Your artists need you!','💿 An album is spinning alone','🌙 LastStats is watching over','🔮 Mysterious return incoming?','🎧 Keeping your playlist warm'],
+  es: ['👀 ¡Vuelve, te echamos de menos!','🎵 ¿Extrañas tu música?','📊 Tus estadísticas te esperan…','🎤 ¡Tus artistas te necesitan!','💿 Un álbum suena sin ti','🎧 Guardamos tu playlist'],
+  pt: ['👀 Volta, sentimos tua falta!','🎵 Saudades da tua música?','📊 Tuas estatísticas esperam…','🎤 Seus artistas precisam de ti!','💿 Um álbum toca sem você'],
+  de: ['👀 Komm zurück, wir vermissen dich!','🎵 Vermisst du deine Musik?','📊 Deine Stats warten…','🎤 Deine Künstler brauchen dich!','💿 Ein Album dreht allein','🎧 Playlist wird warm gehalten'],
+  it: ['👀 Torna, ci manchi!','🎵 Ti manca la tua musica?','📊 Le tue stats aspettano…','🎤 I tuoi artisti hanno bisogno di te!','💿 Un album gira da solo'],
+  ru: ['👀 Вернись, нам скучно!','🎵 Скучаешь по музыке?','📊 Твоя статистика ждёт…','🎤 Артисты смотрят на тебя!','💿 Альбом крутится без тебя'],
+  ja: ['👀 戻って！寂しいよ！','🎵 音楽が恋しくない？','📊 あなたの統計が待ってる…','🎤 アーティストがあなたを見てる！','💿 アルバムが一人で回ってる'],
+  zh: ['👀 回来吧，我们想你！','🎵 想念你的音乐了吗？','📊 你的统计在等你…','🎤 艺术家在看着你！','💿 专辑在独自转动'],
+  ko: ['👀 돌아와요, 보고 싶어요!','🎵 음악이 그립지 않나요?','📊 당신의 통계가 기다려요…','🎤 아티스트가 당신을 보고 있어요!','💿 앨범이 혼자 돌아가고 있어요'],
+  tr: ['👀 Geri dön, özledik!','🎵 Müziğini özlüyor musun?','📊 İstatistiklerin bekliyor…','🎤 Sanatçılar seni bekliyor!','💿 Bir albüm yalnız çalıyor'],
+  ar: ['👀 عودوا، نشتاق إليكم!','🎵 هل تشتاق لموسيقاك؟','📊 إحصاءاتك في انتظارك…','🎤 الفنانون يراقبونك!','💿 ألبوم يعزف وحده'],
+};
+const _EGG_BACK = {
+  fr: ['🎉 Te revoilà !','🎵 Bienvenue de retour !','🔥 Le retour du champion !','✨ On savait que tu reviendrais','🎤 Les stats t\'ont attendu !'],
+  en: ['🎉 Welcome back!','🎵 You\'re back!','🔥 The champion returns!','✨ We knew you\'d come back','🎤 Your stats missed you!'],
+  es: ['🎉 ¡Bienvenido de vuelta!','🎵 ¡Estás de vuelta!','🔥 ¡El campeón ha vuelto!','✨ Sabíamos que volverías'],
+  pt: ['🎉 Bem-vindo de volta!','🎵 Você voltou!','🔥 O campeão voltou!','✨ Sabíamos que voltaria'],
+  de: ['🎉 Willkommen zurück!','🎵 Du bist zurück!','🔥 Der Champion kehrt zurück!','✨ Wir wussten, du kommst wieder'],
+  it: ['🎉 Bentornato!','🎵 Sei tornato!','🔥 Il campione è tornato!','✨ Sapevamo che saresti tornato'],
+  ru: ['🎉 С возвращением!','🎵 Ты вернулся!','🔥 Чемпион вернулся!','✨ Мы знали, что ты вернёшься'],
+  ja: ['🎉 おかえり！','🎵 戻ってきた！','🔥 チャンピオンが戻った！','✨ 戻ってくると思ってた'],
+  zh: ['🎉 欢迎回来！','🎵 你回来了！','🔥 冠军归来！','✨ 我们就知道你会回来'],
+  ko: ['🎉 돌아오셨군요!','🎵 돌아왔어요!','🔥 챔피언이 돌아왔다!','✨ 돌아올 줄 알았어요'],
+  tr: ['🎉 Hoş geldin!','🎵 Döndün!','🔥 Şampiyon geri döndü!','✨ Döneceğini biliyorduk'],
+  ar: ['🎉 مرحباً بعودتك!','🎵 عدت!','🔥 البطل عاد!','✨ كنا نعلم أنك ستعود'],
+};
+function _eggTitles(type, lang) {
+  const pool = type === 'away' ? _EGG_AWAY : _EGG_BACK;
+  return pool[lang] || pool.en;
+}
+
 window.addEventListener('DOMContentLoaded', () => {
+
+  /* ── Easter egg : tab title changes when user leaves ── */
+  const EASTER_EGGS_AWAY = [
+    '👀 Reviens, on s\'ennuie !',
+    '🎵 Ta musique te manque ?',
+    '📊 Tes stats t\'attendent…',
+    '🎤 L\'artiste te regarde !',
+    '💿 Un album tourne sans toi',
+    '🌙 LastStats veille pour toi',
+    '🔮 Retour mystérieux prévu ?',
+    '🎁 Un easter egg t\'attend !',
+    '⚡ Ne laisse pas tes stats seules',
+    '🎧 On garde ta playlist au chaud',
+  ];
+  const EASTER_EGGS_BACK = [
+    '🎉 Te revoilà !',
+    '🎵 Bienvenue de retour !',
+    '🔥 Le retour du champion !',
+    '✨ On savait que tu reviendrais',
+    '🎤 Les stats t\'ont attendu !',
+  ];
+  let _eggTimer = null;
+  document.addEventListener('visibilitychange', () => {
+    const lang = APP.language || localStorage.getItem('ls_lang') || 'fr';
+    const away = _eggTitles('away', lang);
+    const back  = _eggTitles('back',  lang);
+    if (document.hidden) {
+      document.title = away[Math.floor(Math.random() * away.length)];
+    } else {
+      document.title = back[Math.floor(Math.random() * back.length)];
+      clearTimeout(_eggTimer);
+      _eggTimer = setTimeout(() => {
+        const sec = document.querySelector('.app-sec.active')?.id?.replace('s-','') || 'dashboard';
+        const key = NAV_TITLE_KEYS[sec];
+        document.title = `LastStats — ${key ? t(key) : sec}`;
+      }, 2200);
+    }
+  });
+
   // Inject runtime styles
   const shareStyle = document.createElement('style');
   shareStyle.textContent = `
@@ -1985,9 +2057,10 @@ function nav(section) {
     document.getElementById('s-' + section)?.classList.add('active');
     document.querySelector('.main-content')?.scrollTo({ top:0, behavior:'instant' });
 
+    /* ── Section title for document tab ── */
     const titleKey = NAV_TITLE_KEYS[section];
-    const titleEl  = document.getElementById('hd-title');
-    if (titleEl) titleEl.textContent = titleKey ? t(titleKey) : section;
+    const label = titleKey ? t(titleKey) : section;
+    document.title = `LastStats — ${label}`;
 
     localStorage.setItem('ls_section', section);
 
@@ -2111,7 +2184,7 @@ function setupProfileUI() {
   setText('sb-name',    u.name || APP.username);
   setText('sb-plays',   formatNum(u.playcount) + ' ' + t('scrobbles'));
   if (u.country) setText('sb-country', u.country);
-  setText('hd-mini-user', '@' + (u.name || APP.username));
+  // hd-mini-user removed (header removed)
 }
 
 /* ─── Profile bubble (sidebar dropdown) ─── */
@@ -5639,6 +5712,7 @@ async function refreshData() {
   const refreshBtn = document.getElementById('refresh-btn');
   const icon       = refreshBtn?.querySelector('i');
   if (icon) icon.classList.add('fa-spin');
+  if (refreshBtn) refreshBtn.classList.add('spinning');
 
   try {
     const info = await API.call('user.getInfo', {}, true);
@@ -5657,7 +5731,7 @@ async function refreshData() {
 
     showToast(t('toast_data_updated'), 'success', 'actions');
   } catch (e) { showToast(e.message, 'error'); }
-  finally { if (icon) icon.classList.remove('fa-spin'); }
+  finally { if (icon) icon.classList.remove('fa-spin'); if (refreshBtn) refreshBtn.classList.remove('spinning'); }
 
   _scheduleBackgroundHistoryFetch();
 }

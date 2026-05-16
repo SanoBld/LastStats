@@ -244,13 +244,15 @@
   
   <aside class="sidebar" id="sidebar">
 
-    <!-- logo + close button -->
+    <!-- logo replaced by refresh button -->
     <div class="sb-head">
-      <div class="sb-logo">
-        <i class="fas fa-headphones-alt"></i>
-        <span class="sb-logo-text">LastStats</span>
+      <div class="sb-head-left">
+        <button class="sb-refresh-btn icon-btn" id="refresh-btn" onclick="refreshData()" aria-label="Refresh data" title="Refresh">
+          <i class="fas fa-sync-alt" id="refresh-icon"></i>
+        </button>
+        <span class="sb-brand-text">LastStats</span>
       </div>
-      <div style="display:flex;align-items:center;gap:4px">
+      <div class="sb-head-actions">
         <!-- Collapse toggle (PC only) -->
         <button class="sb-collapse-btn" id="sb-collapse-btn" onclick="toggleSbCollapse()"
                 data-i18n-aria="sidebar_collapse" aria-label="Collapse sidebar" title="Collapse / expand">
@@ -330,19 +332,12 @@
   
   <div class="main-wrap">
 
-    <!-- app header -->
-    <header class="app-hd">
+    <!-- mobile top bar: burger only, no title -->
+    <div class="mobile-topbar" id="mobile-topbar">
       <button class="burger-btn" onclick="openSb()" aria-label="Open navigation">
         <i class="fas fa-bars"></i>
       </button>
-      <h1 class="hd-title" id="hd-title">Dashboard</h1>
-      <div class="hd-right">
-        <div class="hd-mini-user" id="hd-mini-user"></div>
-        <button class="icon-btn" id="refresh-btn" onclick="refreshData()" aria-label="Refresh data" title="Refresh">
-          <i class="fas fa-sync-alt" id="refresh-icon"></i>
-        </button>
-      </div>
-    </header>
+    </div>
 
     <main class="main-content">
 
@@ -844,7 +839,6 @@
         <div class="sec-hd flex-bw">
           <div>
             <h2>
-              <i class="fas fa-gem"></i>
               <span data-i18n="obscurity.title">Mainstream vs Gems</span>
             </h2>
             <p class="sec-sub" data-i18n="obscurity.sub">Measure the originality of your musical tastes</p>
@@ -916,7 +910,7 @@
       <section id="s-history" class="app-sec" style="view-transition-name:section-history">
         <div class="sec-hd" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
           <div>
-            <h2><i class="fas fa-history"></i> <span data-i18n="history.title">History</span></h2>
+            <h2><span data-i18n="history.title">History</span></h2>
             <p class="sec-sub" data-i18n="history.sub">Browse your scrobbles day by day</p>
           </div>
           <button id="hist-sort-btn" onclick="histToggleSort()"
@@ -1437,18 +1431,6 @@
                     <div class="stg-export-card-btns">
                       <button class="btn-export-sm" onclick="exportStats('csv','tracks')" title="CSV"><i class="fas fa-file-csv"></i> CSV</button>
                       <button class="btn-export-sm" onclick="exportStats('json','tracks')" title="JSON"><i class="fas fa-file-code"></i> JSON</button>
-                    </div>
-                  </div>
-
-                  <div class="stg-export-card stg-export-card--all">
-                    <div class="stg-export-card-hd">
-                      <i class="fas fa-archive"></i>
-                      <span data-i18n="export_all_title">Download Everything</span>
-                    </div>
-                    <p class="stg-export-card-desc" data-i18n="export_all_desc">History + Artists + Albums + Tracks in one click</p>
-                    <div class="stg-export-card-btns">
-                      <button class="btn-export-sm btn-export-sm--all" onclick="exportStats('csv','all')" title="CSV"><i class="fas fa-file-csv"></i> CSV</button>
-                      <button class="btn-export-sm btn-export-sm--all" onclick="exportStats('json','all')" title="JSON"><i class="fas fa-file-code"></i> JSON</button>
                     </div>
                   </div>
 

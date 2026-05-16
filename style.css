@@ -671,12 +671,34 @@ canvas { max-width: 100%; }
   box-shadow: var(--shadow-md);
 }
 .sb-head {
-  padding: 20px 20px 16px;
+  padding: 12px 14px;
   display: flex; align-items: center; justify-content: space-between;
   border-bottom: 1px solid var(--border);
+  gap: 8px;
 }
-.sb-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.05rem; color: var(--text); }
-.sb-logo i { color: var(--accent); font-size: 1.2rem; }
+.sb-head-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.sb-head-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.sb-brand-text {
+  font-size: .95rem; font-weight: 800; color: var(--text);
+  letter-spacing: -.02em; white-space: nowrap;
+  overflow: hidden; max-width: 120px;
+  transition: max-width .25s cubic-bezier(.4,0,.2,1),
+              opacity .2s ease;
+}
+/* Hide brand text when sidebar is collapsed */
+.sidebar.sb-collapsed .sb-brand-text { max-width: 0; opacity: 0; pointer-events: none; }
+/* Refresh button in sidebar head */
+.sb-refresh-btn {
+  width: 36px; height: 36px; border-radius: var(--radius-xs);
+  color: var(--text-muted); font-size: .9rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--dur-medium1) var(--ease-standard),
+              color      var(--dur-medium1) var(--ease-standard),
+              transform  .3s var(--ease-spring);
+  flex-shrink: 0;
+}
+.sb-refresh-btn:hover { background: var(--bg-hover); color: var(--accent); }
+.sb-refresh-btn.spinning i { animation: spin .7s linear infinite; }
 .sb-close-btn { display: none; color: var(--text-muted); padding: 6px; border-radius: var(--radius-xs); }
 .sb-close-btn:hover { background: var(--bg-hover); color: var(--text); }
 
@@ -777,22 +799,20 @@ canvas { max-width: 100%; }
 .btn-logout:hover { background: rgba(239,68,68,.10); color: #f87171; }
 
 /* M3 Top App Bar (Header) */
-.app-hd {
-  height: var(--header-h); padding: 0 20px;
-  display: flex; align-items: center; gap: 14px;
-  background: var(--bg-header); border-bottom: 1px solid var(--border);
+/* ── Mobile topbar: burger only, no title ── */
+.mobile-topbar {
+  display: none; /* hidden on desktop */
+  align-items: center;
+  padding: 8px 12px;
   position: sticky; top: 0; z-index: 50;
-  box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(12px) saturate(1.2);
-  -webkit-backdrop-filter: blur(12px) saturate(1.2);
-  will-change: transform;
+  background: color-mix(in srgb, var(--bg-header) 60%, transparent);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 45%, transparent);
 }
-.burger-btn { color: var(--text-muted); padding: 8px; border-radius: var(--radius-xs); display: none; }
+.burger-btn { color: var(--text-muted); padding: 6px; border-radius: var(--radius-xs); }
 .burger-btn:hover { background: var(--bg-hover); color: var(--text); }
-.hd-title   { font-size: 1.1rem; font-weight: 700; flex: 1; letter-spacing: -.01em; }
-.hd-right   { display: flex; align-items: center; gap: 8px; }
-.hd-mini-user { font-size: .82rem; color: var(--text-muted); font-weight: 500; }
-.hd-mini-user img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--accent); }
+.main-wrap { flex: 1; margin-left: var(--sb-width); display: flex; flex-direction: column; min-width: 0; transition: margin-left .28s cubic-bezier(.4,0,.2,1); }
 .icon-btn {
   width: 36px; height: 36px; border-radius: var(--radius-xs); color: var(--text-muted);
   display: flex; align-items: center; justify-content: center; font-size: .9rem;
@@ -3304,6 +3324,7 @@ canvas#w-mini { height: 60px !important; }
 
   /* Main content stretches to full width */
   .main-wrap { margin-left: 0; }
+  .mobile-topbar { display: flex; }
   .burger-btn { display: flex; }
 
   /* Charts stack to single column */
@@ -3331,7 +3352,6 @@ canvas#w-mini { height: 60px !important; }
 
 @media (max-width: 768px) {
   .sidebar { max-width: 300px; }
-  .hd-title { font-size: .95rem; }
   .sec-hd h2 { font-size: 1.2rem; }
 
   /* Canvas heights reduced */

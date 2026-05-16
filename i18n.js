@@ -111,6 +111,8 @@ const I18N_DATA = {
 
     adv_per_day:          'Écoutes par jour',
     adv_per_week:         '~{0} par semaine',
+    stat_per_day:         'écoutes/jour en moy.',
+    stat_per_year:        'écoutes estimées/an',
     adv_eddington:        'Score d\'intensité',
     adv_eddington_sub:    '{0} artistes écoutés au moins {0} fois',
     adv_top1_alltime:     'Artiste n°1 (de tous les temps)',
@@ -774,6 +776,7 @@ const I18N_DATA = {
     fetch_incr_msg:'Fetching new plays…', fetch_incr_title:'Updating ({0} cached)',
     fetch_title_update:'Update',
     adv_per_day:'Plays per day', adv_per_week:'~{0} per week',
+    stat_per_day:'plays/day avg.', stat_per_year:'estimated plays/year',
     adv_eddington:'Intensity score', adv_eddington_sub:'{0} artists played ≥ {0} times',
     adv_top1_alltime:'All-time #1 artist', adv_top1_pct:'{0}% of your plays',
     adv_top1_detail:'{0} plays · {1}% of total',
@@ -1130,6 +1133,7 @@ const I18N_DATA = {
     fetch_incr_msg:'Obteniendo nuevas reproducciones…', fetch_incr_title:'Actualizando ({0} en caché)',
     fetch_title_update:'Actualización',
     adv_per_day:'Reproducciones por día', adv_per_week:'~{0} por semana',
+    stat_per_day:'repr./día prom.', stat_per_year:'repr. estimadas/año',
     adv_eddington:'Puntuación de intensidad', adv_eddington_sub:'{0} artistas escuchados ≥ {0} veces',
     adv_top1_alltime:'Artista nº1 (de siempre)', adv_top1_pct:'{0}% de tus reproducciones',
     adv_top1_detail:'{0} reproducciones · {1}% del total',
@@ -1573,6 +1577,7 @@ const I18N_DATA = {
     csv_track_type: 'Música',
     export_all_title: 'Baixar tudo',
     export_all_desc:  'Histórico + Artistas + Álbuns + Músicas em um clique',
+    stat_per_day: 'repr./dia méd.', stat_per_year: 'repr. estimadas/ano',
   },
 
   de: {
@@ -1715,6 +1720,7 @@ const I18N_DATA = {
     csv_track_type: 'Titel',
     export_all_title: 'Alles herunterladen',
     export_all_desc:  'Verlauf + Künstler + Alben + Titel mit einem Klick',
+    stat_per_day: 'Plays/Tag Ø', stat_per_year: 'geschätzte Plays/Jahr',
   },
 
   it: {
@@ -1857,6 +1863,7 @@ const I18N_DATA = {
     csv_track_type: 'Brano',
     export_all_title: 'Scarica tutto',
     export_all_desc:  'Cronologia + Artisti + Album + Brani in un clic',
+    stat_per_day: 'ripr./giorno med.', stat_per_year: 'ripr. stimate/anno',
   },
 
   ru: {
@@ -1999,6 +2006,7 @@ const I18N_DATA = {
     csv_track_type: 'Трек',
     export_all_title: 'Скачать всё',
     export_all_desc:  'История + Исполнители + Альбомы + Треки в один клик',
+    stat_per_day: 'воспр./день ср.', stat_per_year: 'воспр. в год (оценка)',
   },
 
   ja: {
@@ -2136,6 +2144,7 @@ const I18N_DATA = {
     csv_track_type: '曲',
     export_all_title: 'すべてダウンロード',
     export_all_desc:  '履歴 + アーティスト + アルバム + 曲をワンクリックで',
+    stat_per_day: '1日平均再生', stat_per_year: '年間推定再生数',
   },
 
   zh: {
@@ -2273,6 +2282,7 @@ const I18N_DATA = {
     csv_track_type: '歌曲',
     export_all_title: '下载全部',
     export_all_desc:  '历史 + 艺术家 + 专辑 + 歌曲一键下载',
+    stat_per_day: '日均收听', stat_per_year: '预计年收听',
   },
 
   ko: {
@@ -2410,6 +2420,7 @@ const I18N_DATA = {
     csv_track_type: '곡',
     export_all_title: '전체 다운로드',
     export_all_desc:  '기록 + 아티스트 + 앨범 + 곡을 한 번에',
+    stat_per_day: '일 평균 재생', stat_per_year: '연간 예상 재생',
   },
 
   tr: {
@@ -2547,6 +2558,7 @@ const I18N_DATA = {
     csv_track_type: 'Şarkı',
     export_all_title: 'Hepsini indir',
     export_all_desc:  'Geçmiş + Sanatçılar + Albümler + Şarkılar tek tıkla',
+    stat_per_day: 'oynatma/gün ort.', stat_per_year: 'tahmini oynatma/yıl',
   },
 
   ar: {
@@ -2684,6 +2696,7 @@ const I18N_DATA = {
     csv_track_type: 'أغنية',
     export_all_title: 'تحميل الكل',
     export_all_desc:  'السجل + الفنانون + الألبومات + الأغاني بنقرة واحدة',
+    stat_per_day: 'تشغيل/يوم متوسط', stat_per_year: 'تشغيل تقديري/سنة',
   },
 
 };
