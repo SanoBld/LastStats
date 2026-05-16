@@ -7746,6 +7746,7 @@ async function exportData(format, type = 'history') {
 
       _download(format, rows, `laststats-${APP.username}-history`, '🎵 Scrobble History', pages);
       showToast(`Export — ${formatNum(rows.length)} plays`, 'success', 'actions');
+      _notifyDownloadDone('🎵', 'Scrobble History', rows.length, format);
     }
 
     /* ══════════════════════════════════════════════
@@ -7791,19 +7792,7 @@ async function exportData(format, type = 'history') {
 
       _download(format, rows, `laststats-${APP.username}-${cfg.file}`, `${cfg.icon} ${cfg.label}`, pages);
       showToast(`Export ${cfg.label} — ${formatNum(rows.length)} items`, 'success', 'actions');
-
-      // Push notification "téléchargement terminé" si activée
-      try {
-        const _prefs = JSON.parse(localStorage.getItem('ls_notif_prefs') || '{}');
-        if (_prefs.download && Notification?.permission === 'granted') {
-          new Notification('📥 Export terminé — LastStats', {
-            body: `${cfg.icon} ${cfg.label} — ${formatNum(rows.length)} éléments téléchargés (${format.toUpperCase()})`,
-            icon: './icons/icon-192.png',
-            tag:  'ls-export-done',
-            silent: false,
-          });
-        }
-      } catch (_) {}
+      _notifyDownloadDone(cfg.icon, cfg.label, rows.length, format);
     }
 
   } catch (e) {
@@ -7813,6 +7802,21 @@ async function exportData(format, type = 'history') {
     btns.forEach(b => { b.disabled = false; if (b._orig) b.innerHTML = b._orig; });
     _hideOverlay();
   }
+}
+
+/* ── Notification push "export terminé" ── */
+function _notifyDownloadDone(icon, label, count, format) {
+  try {
+    const prefs = JSON.parse(localStorage.getItem('ls_notif_prefs') || '{}');
+    if (!prefs.download) return;
+    if (Notification?.permission !== 'granted') return;
+    new Notification('📥 Export terminé — LastStats', {
+      body: `${icon} ${label} — ${formatNum(count)} éléments téléchargés (${format.toUpperCase()})`,
+      icon: './icons/icon-192.png',
+      tag:  'ls-export-done',
+      silent: false,
+    });
+  } catch (_) {}
 }
 
 /* ── Download helper: CSV with section title header / JSON ── */
