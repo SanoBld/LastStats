@@ -1978,10 +1978,16 @@ window.addEventListener('DOMContentLoaded', () => {
   const savedTab = localStorage.getItem('ls_settings_tab');
   if (savedTab) switchSettingsTab(savedTab);
 
-  // Affiche la version dans l'onglet "À propos" (injectée par GitHub Actions via version.js)
-  const _versionEl = document.getElementById('about-version');
-  if (_versionEl && typeof APP_VERSION !== 'undefined' && APP_VERSION !== '__APP_VERSION__') {
-    _versionEl.textContent = APP_VERSION;
+  // Affiche la version depuis le nom du cache Service Worker (ex: laststats-v10-4c55c1e)
+  if ('caches' in window) {
+    caches.keys().then(keys => {
+      const appCache = keys.find(k => k.startsWith('laststats-') && !k.includes('-img-'));
+      if (appCache) {
+        const version = appCache.replace('laststats-', '');
+        const el = document.getElementById('about-version');
+        if (el) el.textContent = version;
+      }
+    });
   }
 
   // Apply saved theme immediately
