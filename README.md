@@ -1,17 +1,42 @@
-# laststats_mobile
+# LastStats 🎵
 
-A new Flutter project.
+A modern, multiplatform application built with **Flutter** and **Material You (M3)** to visualize, track, and analyze your listening statistics in real-time using the **Last.fm** API.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## ✨ Features
 
-A few resources to get you started if this is your first Flutter project:
+* **Minimalist & Modern Design:** Clean interface inspired by technical aesthetics, optimized for quick and efficient data reading.
+* **Material You Integration:** Dynamic theme that automatically adapts to your system colors (Dynamic Color) with full native dark mode support.
+* **Real Data:** Direct and seamless connection with the Last.fm API to fetch your actual scrobbles, top artists, albums, and tracks.
+* **Zero Simulated Data:** The application only processes live, functional API data streams.
+* **Multiplatform:** A single codebase to build versions for Android, Windows, macOS, Linux, and Web.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🚀 Downloads & Automated Builds (CI/CD)
+
+This project uses automated pipelines powered by **GitHub Actions**. Every time the code is updated, the executables are built independently.
+
+You can download the latest builds directly from the **Actions** tab of this repository:
+* 🤖 **Android:** `laststats-android-apk`
+* 🪟 **Windows:** `laststats-windows-app`
+* 🌐 **Web:** `laststats-web-app`
+* 🍏 **macOS:** `laststats-macos-app`
+* 🐧 **Linux:** `laststats-linux-app`
+
+---
+
+## 📦 Technologies Used
+
+* **Framework:** Flutter (Dart)
+* **Design System:** Material Design 3 (Material You)
+* **Key Packages:** `dynamic_color` for dynamic palette extraction and system adaptation, `url_launcher` for external links.
+* **API:** Last.fm REST API
+* **Automation:** GitHub Actions (Isolated workflow files for each platform)
+
+---
+
+## 📝 License
+
+This project is open-source. Feel free to use, modify, or contribute to it.
