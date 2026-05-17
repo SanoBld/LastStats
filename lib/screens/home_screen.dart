@@ -22,12 +22,29 @@ const _kPeriods = [
   ('overall', 'Tout'),
 ];
 
-const _kGreetingOptions = [
-  'Bonjour', 'Bonsoir', 'Salut', 'Hey', 'Coucou', 'Bienvenue',
-];
-
 const _kMonths = ['', 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
     'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+
+// ─── Cartes du dashboard ─────────────────────────────────────────────────────
+// (id, label, icône)  — ordre = ordre par défaut
+const _kDashCards = [
+  ('nowplaying',      'En cours de lecture',    Icons.play_circle_outline_rounded),
+  ('total_scrobbles', 'Total scrobbles',         Icons.headphones_rounded),
+  ('avg_day',         'Moyenne / jour',          Icons.bolt_rounded),
+  ('weekly_est',      'Semaine (estimé)',        Icons.calendar_today_rounded),
+  ('avg_week',        'Moyenne / semaine',       Icons.date_range_rounded),
+  ('account_age',     'Âge du compte',           Icons.schedule_rounded),
+  ('loved_count',     'Titres aimés',            Icons.favorite_rounded),
+  ('top_artist',      'Artiste #1',              Icons.mic_rounded),
+  ('top_album',       'Album #1',                Icons.album_rounded),
+  ('top_track',       'Titre #1',                Icons.music_note_rounded),
+  ('last_played',     'Dernière écoute',         Icons.history_rounded),
+  ('artists_list',    'Top Artistes (liste)',    Icons.people_rounded),
+  ('tracks_list',     'Top Titres (liste)',      Icons.queue_music_rounded),
+];
+
+List<String> _defaultCardOrder() => _kDashCards.map((c) => c.$1).toList();
+
 
 // ═══════════════════════════════════════════════════════════════════════════
 // HOME SCREEN
@@ -133,18 +150,24 @@ class _DashboardPageState extends State<_DashboardPage> {
   Timer? _npTimer;
 
   // ── Prefs ──────────────────────────────────────────────
-  String _greeting     = 'Bonjour';
-  bool   _showNowPlay  = true;
-  bool   _showStats    = true;
-  bool   _showArtists  = true;
-  bool   _showTracks   = true;
+  List<String> _cardOrder  = _defaultCardOrder();
+  Set<String>  _hiddenCards = {};
+  int          _lovedCount  = 0;
+  int          _npRefreshSec = 30;  // piloté par les paramètres
 
   @override
   void initState() {
     super.initState();
     _loadPrefs().then((_) => _load());
-    _npTimer = Timer.periodic(
-        const Duration(seconds: 30), (_) => _refreshNowPlaying());
+    _scheduleNpTimer();
+  }
+
+  void _scheduleNpTimer() {
+    _npTimer?.cancel();
+    if (_npRefreshSec > 0) {
+      _npTimer = Timer.periodic(
+          Duration(seconds: _npRefreshSec), (_) => _refreshNowPlaying());
+    }
   }
 
   @override
@@ -156,13 +179,20 @@ class _DashboardPageState extends State<_DashboardPage> {
   Future<void> _loadPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     if (!mounted) return;
+    final orderStr  = prefs.getString('ls_card_order')  ?? '';
+    final hiddenStr = prefs.getString('ls_card_hidden') ?? '';
+    final npSec     = prefs.getInt('ls_np_refresh_sec') ?? 30;
     setState(() {
-      _greeting    = prefs.getString('ls_greeting')       ?? 'Bonjour';
-      _showNowPlay = prefs.getBool('ls_show_nowplay')     ?? true;
-      _showStats   = prefs.getBool('ls_show_stats')       ?? true;
-      _showArtists = prefs.getBool('ls_show_artists')     ?? true;
-      _showTracks  = prefs.getBool('ls_show_tracks')      ?? true;
+      _npRefreshSec = npSec;
+      _hiddenCards  = hiddenStr.isEmpty ? {} : hiddenStr.split(',').toSet();
+      if (orderStr.isNotEmpty) {
+        final saved   = orderStr.split(',');
+        // Ajouter les nouvelles cartes non encore sauvegardées
+        final missing = _defaultCardOrder().where((id) => !saved.contains(id));
+        _cardOrder    = [...saved, ...missing];
+      }
     });
+    _scheduleNpTimer();
   }
 
   Future<void> _load() async {
@@ -175,6 +205,7 @@ class _DashboardPageState extends State<_DashboardPage> {
         widget.service.getTopTracks (period: 'overall', limit: 50),
         widget.service.getRecentTracks(limit: 10),
         widget.service.getNowPlaying(),
+        widget.service.getLovedTracks(limit: 1),
       ]);
 
       final recentData = results[4] as Map<String, dynamic>;
@@ -192,13 +223,28 @@ class _DashboardPageState extends State<_DashboardPage> {
         }
       }
 
+      // Loved count depuis userInfo
+      final userInfoMap = results[0] as Map<String, dynamic>?;
+      final lovedRaw    = userInfoMap?['playlists'];   // fallback
+      // On essaie de récupérer le vrai total depuis getLovedTracks attr
+      int lovedCount = 0;
+      try {
+        final lovedSvc = results[6] as List<dynamic>;
+        // lovedTracks ne retourne pas d'attr total facilement via la liste
+        // on lit depuis userInfo['playlists'] sinon on garde 0
+        lovedCount = int.tryParse(
+            userInfoMap?['loved_count']?.toString() ?? '') ?? 0;
+        if (lovedCount == 0) lovedCount = lovedSvc.isNotEmpty ? -1 : 0;
+      } catch (_) {}
+
       setState(() {
-        _userInfo     = results[0] as Map<String, dynamic>?;
+        _userInfo     = userInfoMap;
         _topArtists   = results[1] as List<dynamic>;
         _topAlbums    = results[2] as List<dynamic>;
         _topTracks    = results[3] as List<dynamic>;
         _recentTracks = recentFiltered;
         _nowPlaying   = np ?? results[5] as Map<String, dynamic>?;
+        _lovedCount   = lovedCount;
         _loading      = false;
       });
 
@@ -210,6 +256,7 @@ class _DashboardPageState extends State<_DashboardPage> {
       });
     }
   }
+
 
   Future<void> _refreshNowPlaying() async {
     try {
@@ -293,8 +340,15 @@ class _DashboardPageState extends State<_DashboardPage> {
 
           // ── AppBar profil ──────────────────────────────
           SliverAppBar(
-            expandedHeight: 190,
+            expandedHeight: 170,
             pinned: true,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.refresh_rounded),
+                tooltip: 'Rafraîchir',
+                onPressed: _load,
+              ),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(
@@ -306,231 +360,250 @@ class _DashboardPageState extends State<_DashboardPage> {
                 ),
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('$_greeting, $name 👋',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(color: scheme.primary,
-                                           fontWeight: FontWeight.w700)),
-                        const SizedBox(height: 8),
-                        Row(children: [
-                          CircleAvatar(
-                            radius: 36,
-                            backgroundColor: scheme.primary.withValues(alpha: 0.2),
-                            backgroundImage: avatarUrl.isNotEmpty
-                                ? NetworkImage(avatarUrl) : null,
-                            child: avatarUrl.isEmpty
-                                ? Icon(Icons.person_rounded, size: 36,
-                                    color: scheme.onPrimaryContainer)
-                                : null,
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(name,
-                                  style: Theme.of(context).textTheme.titleLarge
-                                      ?.copyWith(fontWeight: FontWeight.w800)),
-                              if (realName.isNotEmpty)
-                                Text(realName,
-                                    style: Theme.of(context).textTheme.bodyMedium
-                                        ?.copyWith(color: scheme.onSurfaceVariant)),
-                              if (country.isNotEmpty && country != 'None')
-                                Text(country,
-                                    style: Theme.of(context).textTheme.bodySmall
-                                        ?.copyWith(color: scheme.onSurfaceVariant)),
-                            ],
-                          )),
-                        ]),
-                      ],
-                    ),
+                    padding: const EdgeInsets.fromLTRB(20, 16, 80, 0),
+                    child: Row(children: [
+                      CircleAvatar(
+                        radius: 36,
+                        backgroundColor: scheme.primary.withValues(alpha: 0.2),
+                        backgroundImage: avatarUrl.isNotEmpty
+                            ? NetworkImage(avatarUrl) : null,
+                        child: avatarUrl.isEmpty
+                            ? Icon(Icons.person_rounded, size: 36,
+                                color: scheme.onPrimaryContainer)
+                            : null,
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(name,
+                              style: Theme.of(context).textTheme.titleLarge
+                                  ?.copyWith(fontWeight: FontWeight.w800)),
+                          if (realName.isNotEmpty)
+                            Text(realName,
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(color: scheme.onSurfaceVariant)),
+                          if (country.isNotEmpty && country != 'None')
+                            Text(country,
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: scheme.onSurfaceVariant)),
+                          if (regStr.isNotEmpty)
+                            Text('Depuis $regStr',
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: scheme.onSurfaceVariant)),
+                        ],
+                      )),
+                    ]),
                   ),
                 ),
               ),
-              title: Text('@$name',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
             ),
           ),
 
           SliverPadding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
             sliver: SliverList(
-              delegate: SliverChildListDelegate([
-
-                // ── Now Playing ──
-                if (_showNowPlay && _nowPlaying != null) ...[
-                  _NowPlayingCard(track: _nowPlaying!),
-                  const SizedBox(height: 16),
-                ],
-
-                // ── Stat cards grid ──
-                if (_showStats) ...[
-                  _SectionHeader(title: 'Statistiques', icon: Icons.bar_chart_rounded),
-                  const SizedBox(height: 10),
-
-                  // Ligne 1 : total + avg/jour
-                  Row(children: [
-                    Expanded(child: _DashStatCard(
-                      emoji: '🎯',
-                      value: _formatNumber(total),
-                      label: 'Scrobbles',
-                      sub:   regStr.isNotEmpty ? 'Depuis $regStr' : null,
-                      color: scheme.primaryContainer,
-                      onColor: scheme.onPrimaryContainer,
-                    )),
-                    const SizedBox(width: 10),
-                    Expanded(child: _DashStatCard(
-                      emoji: '⚡',
-                      value: '~${_formatNumber(avg.round())}',
-                      label: 'Par jour',
-                      sub:   days > 0 ? '$days jours d\'activité' : null,
-                      color: scheme.secondaryContainer,
-                      onColor: scheme.onSecondaryContainer,
-                    )),
-                  ]),
-
-                  const SizedBox(height: 10),
-
-                  // Ligne 2 : semaine estimée + age compte
-                  Row(children: [
-                    Expanded(child: _DashStatCard(
-                      emoji: '📅',
-                      value: '~${_formatNumber(weekly)}',
-                      label: 'Cette semaine',
-                      sub:   'Estimé sur 7 jours',
-                      color: scheme.tertiaryContainer,
-                      onColor: scheme.onTertiaryContainer,
-                    )),
-                    const SizedBox(width: 10),
-                    Expanded(child: _DashStatCard(
-                      emoji: '🗓️',
-                      value: '${_formatNumber(days)} j',
-                      label: 'Âge du compte',
-                      sub:   regStr.isNotEmpty ? regStr : null,
-                      color: scheme.surfaceContainerHighest,
-                      onColor: scheme.onSurface,
-                    )),
-                  ]),
-
-                  const SizedBox(height: 10),
-
-                  // Ligne 3 : #1 artiste + #1 album
-                  Row(children: [
-                    Expanded(child: _DashStatCard(
-                      emoji: '🎤',
-                      value: topArtist != null
-                          ? (topArtist['name'] ?? '—').toString()
-                          : '—',
-                      label: 'Artiste #1',
-                      sub: topArtist != null
-                          ? '${_formatNumber(int.tryParse((topArtist['playcount'] ?? '0').toString()) ?? 0)} écoutes'
-                          : null,
-                      color: scheme.primaryContainer,
-                      onColor: scheme.onPrimaryContainer,
-                      compact: true,
-                    )),
-                    const SizedBox(width: 10),
-                    Expanded(child: _DashStatCard(
-                      emoji: '💿',
-                      value: topAlbum != null
-                          ? (topAlbum['name'] ?? '—').toString()
-                          : '—',
-                      label: 'Album #1',
-                      sub: topAlbum != null
-                          ? (topAlbum['artist']?['name'] ?? '').toString()
-                          : null,
-                      color: scheme.secondaryContainer,
-                      onColor: scheme.onSecondaryContainer,
-                      compact: true,
-                    )),
-                  ]),
-
-                  const SizedBox(height: 10),
-
-                  // Ligne 4 : #1 titre + dernière écoute
-                  Row(children: [
-                    Expanded(child: _DashStatCard(
-                      emoji: '🎵',
-                      value: topTrack != null
-                          ? (topTrack['name'] ?? '—').toString()
-                          : '—',
-                      label: 'Titre #1',
-                      sub: topTrack != null
-                          ? '${_formatNumber(int.tryParse((topTrack['playcount'] ?? '0').toString()) ?? 0)} écoutes'
-                          : null,
-                      color: scheme.tertiaryContainer,
-                      onColor: scheme.onTertiaryContainer,
-                      compact: true,
-                    )),
-                    const SizedBox(width: 10),
-                    Expanded(child: _DashStatCard(
-                      emoji: '⏱️',
-                      value: lastTrack != null
-                          ? (lastTrack['name'] ?? '—').toString()
-                          : '—',
-                      label: 'Dernière écoute',
-                      sub: lastDate.isNotEmpty ? _formatDate(lastDate) : null,
-                      color: scheme.surfaceContainerHighest,
-                      onColor: scheme.onSurface,
-                      compact: true,
-                    )),
-                  ]),
-
-                  const SizedBox(height: 20),
-                ],
-
-                // ── Top Artistes (mini liste) ──
-                if (_showArtists && _topArtists.isNotEmpty) ...[
-                  _SectionHeader(title: 'Top Artistes', icon: Icons.mic_rounded),
-                  const SizedBox(height: 8),
-                  ..._topArtists.take(5).toList().asMap().entries.map((e) {
-                    final a = e.value;
-                    return _ItemTile(
-                      name:     (a['name'] ?? '').toString(),
-                      sub:      '${_formatNumber(int.tryParse((a['playcount'] ?? '0').toString()) ?? 0)} écoutes',
-                      imageUrl: _extractImage(a['image']),
-                      imageFuture: ImageService.resolveArtist(
-                        (a['name'] ?? '').toString(),
-                        lastfmUrl: _extractImage(a['image']),
-                      ),
-                      rank: '${e.key + 1}',
-                    );
-                  }),
-                  const SizedBox(height: 20),
-                ],
-
-                // ── Top Titres (mini liste) ──
-                if (_showTracks && _topTracks.isNotEmpty) ...[
-                  _SectionHeader(title: 'Top Titres', icon: Icons.music_note_rounded),
-                  const SizedBox(height: 8),
-                  ..._topTracks.take(5).toList().asMap().entries.map((e) {
-                    final t = e.value;
-                    final trackName = (t['name'] ?? '').toString();
-                    final artist    = (t['artist']?['name'] ?? '').toString();
-                    return _ItemTile(
-                      name:     trackName,
-                      sub:      artist,
-                      imageUrl: _extractImage(t['image']),
-                      imageFuture: ImageService.resolveTrack(trackName, artist,
-                          lastfmUrl: _extractImage(t['image'])),
-                      rank:  '${e.key + 1}',
-                      plays: _formatNumber(int.tryParse((t['playcount'] ?? '0').toString()) ?? 0),
-                    );
-                  }),
-                  const SizedBox(height: 20),
-                ],
-
-              ]),
+              delegate: SliverChildListDelegate(
+                _buildCards(scheme, name, total, days, avg, weekly,
+                    regStr, topArtist, topAlbum, topTrack, lastTrack, lastDate),
+              ),
             ),
           ),
         ],
       ),
     );
   }
-}
+
+  List<Widget> _buildCards(
+    ColorScheme scheme,
+    String name, int total, int days, double avg, int weekly,
+    String regStr, dynamic topArtist, dynamic topAlbum, dynamic topTrack,
+    Map? lastTrack, String lastDate,
+  ) {
+    final widgets = <Widget>[];
+
+    for (final id in _cardOrder) {
+      if (_hiddenCards.contains(id)) continue;
+
+      switch (id) {
+        case 'nowplaying':
+          if (_nowPlaying != null) {
+            widgets.add(_NowPlayingCard(track: _nowPlaying!));
+            widgets.add(const SizedBox(height: 14));
+          }
+
+        case 'total_scrobbles':
+          widgets.add(_DashStatCard(
+            emoji: '🎯',
+            value: _formatFull(total),
+            label: 'Scrobbles au total',
+            sub: regStr.isNotEmpty ? 'Depuis $regStr' : null,
+            color: scheme.primaryContainer,
+            onColor: scheme.onPrimaryContainer,
+          ));
+          widgets.add(const SizedBox(height: 10));
+
+        case 'avg_day':
+          widgets.add(_DashStatCard(
+            emoji: '⚡',
+            value: _formatFull(avg.round()),
+            label: 'Moyenne par jour',
+            sub: days > 0 ? '$days jours d\'activité' : null,
+            color: scheme.secondaryContainer,
+            onColor: scheme.onSecondaryContainer,
+          ));
+          widgets.add(const SizedBox(height: 10));
+
+        case 'weekly_est':
+          widgets.add(_DashStatCard(
+            emoji: '📅',
+            value: '~${_formatFull(weekly)}',
+            label: 'Cette semaine (estimé)',
+            sub: 'Basé sur ta moyenne quotidienne',
+            color: scheme.tertiaryContainer,
+            onColor: scheme.onTertiaryContainer,
+          ));
+          widgets.add(const SizedBox(height: 10));
+
+        case 'avg_week':
+          widgets.add(_DashStatCard(
+            emoji: '📊',
+            value: _formatFull((_avgPerDay() * 7).round()),
+            label: 'Moyenne par semaine',
+            sub: days > 0 ? 'Sur $days jours d\'historique' : null,
+            color: scheme.surfaceContainerHighest,
+            onColor: scheme.onSurface,
+          ));
+          widgets.add(const SizedBox(height: 10));
+
+        case 'account_age':
+          widgets.add(_DashStatCard(
+            emoji: '🗓️',
+            value: '${_formatFull(days)} jours',
+            label: 'Âge du compte',
+            sub: regStr.isNotEmpty ? regStr : null,
+            color: scheme.surfaceContainerHighest,
+            onColor: scheme.onSurface,
+          ));
+          widgets.add(const SizedBox(height: 10));
+
+        case 'loved_count':
+          if (_lovedCount > 0) {
+            widgets.add(_DashStatCard(
+              emoji: '❤️',
+              value: _lovedCount > 0 ? _formatFull(_lovedCount) : '—',
+              label: 'Titres aimés (loved)',
+              sub: null,
+              color: const Color(0xFFFFEBEE),
+              onColor: const Color(0xFFB71C1C),
+            ));
+            widgets.add(const SizedBox(height: 10));
+          }
+
+        case 'top_artist':
+          if (topArtist != null) {
+            widgets.add(_DashStatCard(
+              emoji: '🎤',
+              value: (topArtist['name'] ?? '—').toString(),
+              label: 'Artiste #1 — Tout le temps',
+              sub: '${_formatFull(int.tryParse((topArtist['playcount'] ?? '0').toString()) ?? 0)} écoutes',
+              color: scheme.primaryContainer,
+              onColor: scheme.onPrimaryContainer,
+              compact: true,
+            ));
+            widgets.add(const SizedBox(height: 10));
+          }
+
+        case 'top_album':
+          if (topAlbum != null) {
+            widgets.add(_DashStatCard(
+              emoji: '💿',
+              value: (topAlbum['name'] ?? '—').toString(),
+              label: 'Album #1 — Tout le temps',
+              sub: (topAlbum['artist']?['name'] ?? '').toString(),
+              color: scheme.secondaryContainer,
+              onColor: scheme.onSecondaryContainer,
+              compact: true,
+            ));
+            widgets.add(const SizedBox(height: 10));
+          }
+
+        case 'top_track':
+          if (topTrack != null) {
+            widgets.add(_DashStatCard(
+              emoji: '🎵',
+              value: (topTrack['name'] ?? '—').toString(),
+              label: 'Titre #1 — Tout le temps',
+              sub: '${_formatFull(int.tryParse((topTrack['playcount'] ?? '0').toString()) ?? 0)} écoutes',
+              color: scheme.tertiaryContainer,
+              onColor: scheme.onTertiaryContainer,
+              compact: true,
+            ));
+            widgets.add(const SizedBox(height: 10));
+          }
+
+        case 'last_played':
+          if (lastTrack != null) {
+            widgets.add(_DashStatCard(
+              emoji: '⏱️',
+              value: (lastTrack['name'] ?? '—').toString(),
+              label: 'Dernière écoute',
+              sub: lastDate.isNotEmpty ? _formatDate(lastDate) : null,
+              color: scheme.surfaceContainerHighest,
+              onColor: scheme.onSurface,
+              compact: true,
+            ));
+            widgets.add(const SizedBox(height: 10));
+          }
+
+        case 'artists_list':
+          if (_topArtists.isNotEmpty) {
+            widgets.add(_SectionHeader(
+                title: 'Top Artistes', icon: Icons.mic_rounded));
+            widgets.add(const SizedBox(height: 8));
+            for (var i = 0; i < _topArtists.take(5).length; i++) {
+              final a = _topArtists[i];
+              widgets.add(_ItemTile(
+                name:     (a['name'] ?? '').toString(),
+                sub:      '${_formatFull(int.tryParse((a['playcount'] ?? '0').toString()) ?? 0)} écoutes',
+                imageUrl: _extractImage(a['image']),
+                imageFuture: ImageService.resolveArtist(
+                    (a['name'] ?? '').toString(),
+                    lastfmUrl: _extractImage(a['image'])),
+                rank: '${i + 1}',
+              ));
+            }
+            widgets.add(const SizedBox(height: 20));
+          }
+
+        case 'tracks_list':
+          if (_topTracks.isNotEmpty) {
+            widgets.add(_SectionHeader(
+                title: 'Top Titres', icon: Icons.music_note_rounded));
+            widgets.add(const SizedBox(height: 8));
+            for (var i = 0; i < _topTracks.take(5).length; i++) {
+              final t      = _topTracks[i];
+              final tn     = (t['name'] ?? '').toString();
+              final artist = (t['artist']?['name'] ?? '').toString();
+              widgets.add(_ItemTile(
+                name:     tn,
+                sub:      artist,
+                imageUrl: _extractImage(t['image']),
+                imageFuture: ImageService.resolveTrack(tn, artist,
+                    lastfmUrl: _extractImage(t['image'])),
+                rank:  '${i + 1}',
+                plays: _formatFull(int.tryParse((t['playcount'] ?? '0').toString()) ?? 0),
+              ));
+            }
+            widgets.add(const SizedBox(height: 20));
+          }
+      }
+    }
+    return widgets;
+  }
+} // end _DashboardPageState
+
 
 // ─── Stat card du dashboard ───────────────────────────────────────────────────
 class _DashStatCard extends StatelessWidget {
@@ -1821,22 +1894,19 @@ class _SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<_SettingsPage> {
-  String _theme              = 'system';
-  String _accent             = 'purple';
-  bool   _useDynamicColor    = false;
-  bool   _useNowPlayingColor = false;
-  int    _startupTab         = 0;
-  String _greeting           = 'Bonjour';
-  bool   _showNowPlay        = true;
-  bool   _showStats          = true;
-  bool   _showArtists        = true;
-  bool   _showTracks         = true;
-  String _artistPeriod       = 'overall';
-  String _trackPeriod        = '7day';
-  bool   _autoUpdate         = true;
-  UpdateInfo? _updateInfo;
-  bool   _checkingUpdate     = false;
-  String? _updateError;
+  String       _theme              = 'system';
+  String       _accent             = 'purple';
+  bool         _useDynamicColor    = false;
+  bool         _useNowPlayingColor = false;
+  int          _startupTab         = 0;
+  bool         _autoUpdate         = true;
+  int          _npRefreshSec       = 30;
+  int          _cacheAutoExpiry    = 0;
+  List<String> _cardOrder          = _defaultCardOrder();
+  Set<String>  _hiddenCards        = {};
+  UpdateInfo?  _updateInfo;
+  bool         _checkingUpdate     = false;
+  String?      _updateError;
 
   @override
   void initState() {
@@ -1848,21 +1918,27 @@ class _SettingsPageState extends State<_SettingsPage> {
     final prefs = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
-      _theme             = prefs.getString('ls_theme')               ?? 'system';
-      _accent            = prefs.getString('ls_accent')              ?? 'purple';
-      _useDynamicColor   = prefs.getBool('ls_use_dynamic_color')     ?? false;
-      _useNowPlayingColor = prefs.getBool('ls_use_nowplaying_color') ?? false;
-      _startupTab        = prefs.getInt('ls_startup_tab')            ?? 0;
-      _greeting          = prefs.getString('ls_greeting')            ?? 'Bonjour';
-      _showNowPlay       = prefs.getBool('ls_show_nowplay')          ?? true;
-      _showStats         = prefs.getBool('ls_show_stats')            ?? true;
-      _showArtists       = prefs.getBool('ls_show_artists')          ?? true;
-      _showTracks        = prefs.getBool('ls_show_tracks')           ?? true;
-      _artistPeriod      = prefs.getString('ls_dash_artist_period')  ?? 'overall';
-      _trackPeriod       = prefs.getString('ls_dash_track_period')   ?? '7day';
-      _autoUpdate        = prefs.getBool('ls_auto_update_check')     ?? true;
+      _theme              = prefs.getString('ls_theme')               ?? 'system';
+      _accent             = prefs.getString('ls_accent')              ?? 'purple';
+      _useDynamicColor    = prefs.getBool('ls_use_dynamic_color')     ?? false;
+      _useNowPlayingColor = prefs.getBool('ls_use_nowplaying_color')  ?? false;
+      _startupTab         = prefs.getInt('ls_startup_tab')            ?? 0;
+      _autoUpdate         = prefs.getBool('ls_auto_update_check')     ?? true;
+      _npRefreshSec       = prefs.getInt('ls_np_refresh_sec')         ?? 30;
+      _cacheAutoExpiry    = prefs.getInt('ls_cache_auto_expiry')      ?? 0;
+      final orderStr  = prefs.getString('ls_card_order')  ?? '';
+      final hiddenStr = prefs.getString('ls_card_hidden') ?? '';
+      _hiddenCards = hiddenStr.isEmpty ? {} : hiddenStr.split(',').toSet();
+      if (orderStr.isNotEmpty) {
+        final saved   = orderStr.split(',');
+        final missing = _defaultCardOrder().where((id) => !saved.contains(id));
+        _cardOrder    = [...saved, ...missing];
+      } else {
+        _cardOrder = _defaultCardOrder();
+      }
     });
   }
+
 
   Future<void> _maybeCheckUpdate() async {
     if (!_autoUpdate) return;
@@ -1906,35 +1982,104 @@ class _SettingsPageState extends State<_SettingsPage> {
     if (!_useDynamicColor && !_useNowPlayingColor) accentNotifier.value = color;
   }
 
-  void _pickGreeting() {
-    final ctrl = TextEditingController(text: _greeting);
-    showDialog<void>(
+  void _openCardEditor() {
+    // Copie locale pour l'édition
+    var order  = List<String>.from(_cardOrder);
+    var hidden = Set<String>.from(_hiddenCards);
+
+    showModalBottomSheet<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Salutation'),
-        content: Column(mainAxisSize: MainAxisSize.min, children: [
-          Wrap(spacing: 8, runSpacing: 8,
-            children: _kGreetingOptions.map((g) => ActionChip(
-                label: Text(g), onPressed: () { ctrl.text = g; })).toList()),
-          const SizedBox(height: 12),
-          TextField(controller: ctrl,
-              decoration: const InputDecoration(
-                  labelText: 'Ou saisir librement', border: OutlineInputBorder())),
-        ]),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Annuler')),
-          FilledButton(
-            onPressed: () async {
-              final v = ctrl.text.trim();
-              if (v.isNotEmpty) { await _setPref('ls_greeting', v); setState(() => _greeting = v); }
-              if (ctx.mounted) Navigator.pop(ctx);
-            },
-            child: const Text('Valider'),
-          ),
-        ],
-      ),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) {
+        return StatefulBuilder(builder: (ctx, setLocal) {
+          return DraggableScrollableSheet(
+            expand: false,
+            initialChildSize: 0.85,
+            maxChildSize: 0.95,
+            builder: (_, ctrl) => Column(children: [
+              const SizedBox(height: 8),
+              Container(width: 40, height: 4,
+                  decoration: BoxDecoration(color: Colors.grey.shade400,
+                      borderRadius: BorderRadius.circular(2))),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
+                child: Row(children: [
+                  Expanded(child: Text('Cartes du Dashboard',
+                      style: Theme.of(ctx).textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700))),
+                  TextButton(
+                    onPressed: () async {
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.setString('ls_card_order',  order.join(','));
+                      await prefs.setString('ls_card_hidden', hidden.join(','));
+                      if (!mounted) return;
+                      setState(() { _cardOrder = order; _hiddenCards = hidden; });
+                      if (ctx.mounted) Navigator.pop(ctx);
+                    },
+                    child: const Text('Enregistrer'),
+                  ),
+                ]),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text('Appuyez sur ☰ pour réordonner, sur la case pour afficher/masquer.',
+                    style: Theme.of(ctx).textTheme.bodySmall
+                        ?.copyWith(color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
+              ),
+              const SizedBox(height: 8),
+              Expanded(
+                child: ReorderableListView(
+                  scrollController: ctrl,
+                  onReorder: (old, nw) {
+                    setLocal(() {
+                      if (nw > old) nw--;
+                      final item = order.removeAt(old);
+                      order.insert(nw, item);
+                    });
+                  },
+                  children: order.map((id) {
+                    final meta = _kDashCards.firstWhere(
+                        (c) => c.$1 == id,
+                        orElse: () => (id, id, Icons.widgets_rounded));
+                    final isHidden = hidden.contains(id);
+                    return ListTile(
+                      key: ValueKey(id),
+                      leading: Icon(meta.$3,
+                          color: isHidden
+                              ? Theme.of(ctx).colorScheme.onSurfaceVariant
+                              : Theme.of(ctx).colorScheme.primary),
+                      title: Text(meta.$2,
+                          style: TextStyle(
+                              color: isHidden
+                                  ? Theme.of(ctx).colorScheme.onSurfaceVariant
+                                  : null)),
+                      trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Checkbox(
+                          value: !isHidden,
+                          onChanged: (v) => setLocal(() {
+                            if (v == true) hidden.remove(id);
+                            else hidden.add(id);
+                          }),
+                        ),
+                        const SizedBox(width: 4),
+                        ReorderableDragStartListener(
+                          index: order.indexOf(id),
+                          child: const Icon(Icons.drag_handle_rounded),
+                        ),
+                      ]),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ]),
+          );
+        });
+      },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -2136,41 +2281,201 @@ class _SettingsPageState extends State<_SettingsPage> {
           // DASHBOARD
           _SettingsSection(label: 'Dashboard', children: [
             ListTile(
-              leading: Icon(Icons.waving_hand_rounded, color: scheme.primary, size: 22),
-              title: const Text('Salutation'),
-              subtitle: Text(_greeting),
+              leading: Icon(Icons.view_list_rounded, color: scheme.primary, size: 22),
+              title: const Text('Personnaliser les cartes'),
+              subtitle: const Text('Ordre, visibilité de chaque section'),
               trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: _pickGreeting,
+              onTap: () => _openCardEditor(),
             ),
-            const Divider(height: 1, indent: 16, endIndent: 16),
+          ]),
+
+
+          const SizedBox(height: 16),
+
+          // TECHNIQUE
+          _SettingsSection(label: 'Technique', children: [
+
+            // Intervalle Now Playing
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-              child: Text('Sections visibles', style: text.bodySmall?.copyWith(
-                  color: scheme.primary, fontWeight: FontWeight.w700)),
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Icon(Icons.timer_outlined, size: 18, color: scheme.primary),
+                  const SizedBox(width: 8),
+                  Text('Rafraîchissement "En cours"',
+                      style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                ]),
+                const SizedBox(height: 10),
+                Wrap(spacing: 8, runSpacing: 8,
+                  children: const [
+                    (0,  'Désactivé'),
+                    (15, '15 s'),
+                    (30, '30 s'),
+                    (60, '1 min'),
+                    (120,'2 min'),
+                  ].map((opt) {
+                    final (secs, label) = opt;
+                    return FilterChip(
+                      label: Text(label),
+                      selected: _npRefreshSec == secs,
+                      showCheckmark: false,
+                      onSelected: (_) async {
+                        await _setPref('ls_np_refresh_sec', secs);
+                        setState(() => _npRefreshSec = secs);
+                      },
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 8),
+              ]),
             ),
-            SwitchListTile(
-              secondary: const Icon(Icons.play_circle_outline_rounded),
-              title: const Text('En cours de lecture'),
-              value: _showNowPlay,
-              onChanged: (v) async { await _setPref('ls_show_nowplay', v); setState(() => _showNowPlay = v); },
+
+            const Divider(height: 1, indent: 16, endIndent: 16),
+
+            // Cache images
+            ListTile(
+              leading: Icon(Icons.image_outlined, color: scheme.primary),
+              title: const Text('Cache images'),
+              subtitle: Text('${ImageService.cacheSize} entrées en mémoire'),
+              trailing: TextButton(
+                onPressed: () {
+                  ImageService.clearCache();
+                  setState(() {});
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Cache images vidé.')));
+                },
+                child: const Text('Vider'),
+              ),
             ),
-            SwitchListTile(
-              secondary: const Icon(Icons.bar_chart_rounded),
-              title: const Text('Statistiques'),
-              value: _showStats,
-              onChanged: (v) async { await _setPref('ls_show_stats', v); setState(() => _showStats = v); },
+
+            const Divider(height: 1, indent: 16, endIndent: 16),
+
+            // Vider cache auto
+            ListTile(
+              leading: Icon(Icons.auto_delete_outlined, color: scheme.primary),
+              title: const Text('Vider le cache automatiquement'),
+              subtitle: Text(_cacheAutoExpiry == 0
+                  ? 'Jamais'
+                  : _cacheAutoExpiry == 1
+                      ? 'Au démarrage'
+                      : 'Toutes les $_cacheAutoExpiry heures'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => showDialog<void>(
+                context: context,
+                builder: (ctx) => SimpleDialog(
+                  title: const Text('Vider le cache auto'),
+                  children: const [
+                    (0,   'Jamais'),
+                    (1,   'Au démarrage'),
+                    (6,   'Toutes les 6 h'),
+                    (24,  'Toutes les 24 h'),
+                    (168, 'Toutes les 7 j'),
+                  ].map((opt) {
+                    final (h, label) = opt;
+                    return SimpleDialogOption(
+                      onPressed: () async {
+                        await _setPref('ls_cache_auto_expiry', h);
+                        setState(() => _cacheAutoExpiry = h);
+                        if (ctx.mounted) Navigator.pop(ctx);
+                      },
+                      child: Text(label,
+                          style: TextStyle(
+                              fontWeight: _cacheAutoExpiry == h
+                                  ? FontWeight.w700 : FontWeight.normal)),
+                    );
+                  }).toList(),
+                ),
+              ),
             ),
-            SwitchListTile(
-              secondary: const Icon(Icons.mic_rounded),
-              title: const Text('Top Artistes'),
-              value: _showArtists,
-              onChanged: (v) async { await _setPref('ls_show_artists', v); setState(() => _showArtists = v); },
+
+            const Divider(height: 1, indent: 16, endIndent: 16),
+
+            // Exporter préférences
+            ListTile(
+              leading: Icon(Icons.download_rounded, color: scheme.primary),
+              title: const Text('Exporter mes préférences'),
+              subtitle: const Text('Résumé JSON de tous tes réglages'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () async {
+                final prefs = await SharedPreferences.getInstance();
+                final keys  = prefs.getKeys()
+                    .where((k) => k.startsWith('ls_'))
+                    .toList()..sort();
+                final json  = '{\n${keys.map((k) {
+                  final v = prefs.get(k);
+                  return '  "$k": ${v is String ? '"$v"' : v}';
+                }).join(',\n')}\n}';
+                if (!context.mounted) return;
+                showDialog<void>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Préférences LastStats'),
+                    content: SingleChildScrollView(
+                      child: SelectableText(json,
+                          style: Theme.of(ctx).textTheme.bodySmall
+                              ?.copyWith(fontFamily: 'monospace'))),
+                    actions: [TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: const Text('Fermer'))],
+                  ),
+                );
+              },
             ),
-            SwitchListTile(
-              secondary: const Icon(Icons.music_note_rounded),
-              title: const Text('Top Titres'),
-              value: _showTracks,
-              onChanged: (v) async { await _setPref('ls_show_tracks', v); setState(() => _showTracks = v); },
+
+            const Divider(height: 1, indent: 16, endIndent: 16),
+
+            // Réinitialiser
+            ListTile(
+              leading: Icon(Icons.delete_sweep_rounded, color: scheme.error),
+              title: Text('Réinitialiser les préférences',
+                  style: TextStyle(color: scheme.error)),
+              subtitle: const Text('Remet tous les réglages par défaut'),
+              onTap: () async {
+                final ok = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Réinitialiser ?'),
+                    content: const Text(
+                        'Tous tes réglages seront remis à zéro. '
+                        'Ton compte ne sera pas déconnecté.'),
+                    actions: [
+                      TextButton(onPressed: () => Navigator.pop(ctx, false),
+                          child: const Text('Annuler')),
+                      FilledButton(
+                          style: FilledButton.styleFrom(
+                              backgroundColor: scheme.error,
+                              foregroundColor: scheme.onError),
+                          onPressed: () => Navigator.pop(ctx, true),
+                          child: const Text('Réinitialiser')),
+                    ],
+                  ),
+                );
+                if (ok == true) {
+                  final prefs = await SharedPreferences.getInstance();
+                  for (final k in prefs.getKeys()
+                      .where((k) => k.startsWith('ls_') &&
+                          k != 'ls_username' && k != 'ls_apikey')
+                      .toList()) {
+                    await prefs.remove(k);
+                  }
+                  ImageService.clearCache();
+                  themeModeNotifier.value          = ThemeMode.system;
+                  accentNotifier.value             = const Color(0xFF7C3AED);
+                  useDynamicColorNotifier.value    = false;
+                  useNowPlayingColorNotifier.value = false;
+                  if (!mounted) return;
+                  setState(() {
+                    _theme               = 'system';
+                    _accent              = 'purple';
+                    _useDynamicColor     = false;
+                    _useNowPlayingColor  = false;
+                    _npRefreshSec        = 30;
+                    _cacheAutoExpiry     = 0;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Préférences réinitialisées.')));
+                }
+              },
             ),
           ]),
 
@@ -2207,10 +2512,9 @@ class _SettingsPageState extends State<_SettingsPage> {
                   final prefs = await SharedPreferences.getInstance();
                   await prefs.remove('ls_username');
                   await prefs.remove('ls_apikey');
-                  if (mounted) {
-                    Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(builder: (_) => const SetupScreen()), (_) => false);
-                  }
+                  if (!mounted) return;
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const SetupScreen()), (_) => false);
                 }
               },
             ),
@@ -2494,6 +2798,18 @@ String _formatNumber(int n) {
   if (n >= 1000)    return '${(n / 1000).toStringAsFixed(1)}k';
   return n.toString();
 }
+
+/// Nombre complet avec séparateur millier (espace insécable).
+String _formatFull(int n) {
+  final s = n.toString();
+  final buf = StringBuffer();
+  for (var i = 0; i < s.length; i++) {
+    if (i > 0 && (s.length - i) % 3 == 0) buf.write('\u202F'); // espace fine
+    buf.write(s[i]);
+  }
+  return buf.toString();
+}
+
 
 String _formatDate(String raw) {
   if (raw.isEmpty) return '';
