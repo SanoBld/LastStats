@@ -9,7 +9,7 @@ import '../services/image_service.dart';
 import '../services/update_service.dart';
 import 'setup_screen.dart';
 
-// ─── Constantes ────────────────────────────────────────
+// ─── Constantes ──────────────────────────────────────────────────────────────
 const _kDefaultImg =
     'https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png';
 
@@ -26,9 +26,12 @@ const _kGreetingOptions = [
   'Bonjour', 'Bonsoir', 'Salut', 'Hey', 'Coucou', 'Bienvenue',
 ];
 
-// ═══════════════════════════════════════════════════════
-// HOME SCREEN — navigation principale
-// ═══════════════════════════════════════════════════════
+const _kMonths = ['', 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
+    'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HOME SCREEN
+// ═══════════════════════════════════════════════════════════════════════════
 class HomeScreen extends StatefulWidget {
   final String username;
   final String apiKey;
@@ -72,27 +75,29 @@ class _HomeScreenState extends State<HomeScreen> {
         onDestinationSelected: (i) => setState(() => _idx = i),
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.dashboard_outlined),
+            icon:         Icon(Icons.dashboard_outlined),
             selectedIcon: Icon(Icons.dashboard_rounded),
             label: 'Dashboard',
           ),
+          // Classements → trophée (distinct du graphique)
           NavigationDestination(
-            icon: Icon(Icons.leaderboard_outlined),
-            selectedIcon: Icon(Icons.leaderboard_rounded),
+            icon:         Icon(Icons.emoji_events_outlined),
+            selectedIcon: Icon(Icons.emoji_events_rounded),
             label: 'Classements',
           ),
+          // Graphiques → courbe analytique (distinct du classement)
           NavigationDestination(
-            icon: Icon(Icons.bar_chart_outlined),
-            selectedIcon: Icon(Icons.bar_chart_rounded),
+            icon:         Icon(Icons.auto_graph_outlined),
+            selectedIcon: Icon(Icons.auto_graph_rounded),
             label: 'Graphiques',
           ),
           NavigationDestination(
-            icon: Icon(Icons.history_outlined),
+            icon:         Icon(Icons.history_outlined),
             selectedIcon: Icon(Icons.history_rounded),
             label: 'Historique',
           ),
           NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
+            icon:         Icon(Icons.settings_outlined),
             selectedIcon: Icon(Icons.settings_rounded),
             label: 'Paramètres',
           ),
@@ -102,9 +107,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// ═══════════════════════════════════════════════════════
-// DASHBOARD v2 — Podium · Now Playing · Recherche · Partage
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+// DASHBOARD — stat cards + now playing + recents
+// ═══════════════════════════════════════════════════════════════════════════
 class _DashboardPage extends StatefulWidget {
   final LastFmService service;
   final String username;
@@ -114,48 +119,50 @@ class _DashboardPage extends StatefulWidget {
   State<_DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<_DashboardPage>
-    with SingleTickerProviderStateMixin {
-  // ── Data ────────────────────────────────────────────
+class _DashboardPageState extends State<_DashboardPage> {
+  // ── Données API ────────────────────────────────────────
   Map<String, dynamic>? _userInfo;
-  List<dynamic> _artists  = [];
-  List<dynamic> _tracks   = [];
-  List<dynamic> _albums   = [];
+  List<dynamic> _topArtists = [];
+  List<dynamic> _topAlbums  = [];
+  List<dynamic> _topTracks  = [];
+  List<dynamic> _recentTracks = [];
   Map<String, dynamic>? _nowPlaying;
-  bool    _loading = true;
-  String? _error;
-  Timer?  _npTimer;
 
-  // ── UI ──────────────────────────────────────────────
-  String _period = 'overall';
-  late final TabController _tabCtrl;
-  bool   _searching   = false;
-  final  _searchCtrl  = TextEditingController();
-  String _searchQuery = '';
+  bool _loading = true;
+  String? _error;
+  Timer? _npTimer;
+
+  // ── Prefs ──────────────────────────────────────────────
+  String _greeting     = 'Bonjour';
+  bool   _showNowPlay  = true;
+  bool   _showStats    = true;
+  bool   _showArtists  = true;
+  bool   _showTracks   = true;
 
   @override
   void initState() {
     super.initState();
-    _tabCtrl = TabController(length: 3, vsync: this);
     _loadPrefs().then((_) => _load());
     _npTimer = Timer.periodic(
         const Duration(seconds: 30), (_) => _refreshNowPlaying());
-    _searchCtrl.addListener(
-        () => setState(() => _searchQuery = _searchCtrl.text.toLowerCase()));
   }
 
   @override
   void dispose() {
     _npTimer?.cancel();
-    _tabCtrl.dispose();
-    _searchCtrl.dispose();
     super.dispose();
   }
 
   Future<void> _loadPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     if (!mounted) return;
-    setState(() => _period = prefs.getString('ls_dash_period') ?? 'overall');
+    setState(() {
+      _greeting    = prefs.getString('ls_greeting')       ?? 'Bonjour';
+      _showNowPlay = prefs.getBool('ls_show_nowplay')     ?? true;
+      _showStats   = prefs.getBool('ls_show_stats')       ?? true;
+      _showArtists = prefs.getBool('ls_show_artists')     ?? true;
+      _showTracks  = prefs.getBool('ls_show_tracks')      ?? true;
+    });
   }
 
   Future<void> _load() async {
@@ -163,21 +170,39 @@ class _DashboardPageState extends State<_DashboardPage>
     try {
       final results = await Future.wait([
         widget.service.getUserInfo(),
-        widget.service.getTopArtists(period: _period, limit: 10),
-        widget.service.getTopTracks(period: _period, limit: 10),
-        widget.service.getTopAlbums(period: _period, limit: 10),
+        widget.service.getTopArtists(period: 'overall', limit: 50),
+        widget.service.getTopAlbums (period: 'overall', limit: 50),
+        widget.service.getTopTracks (period: 'overall', limit: 50),
+        widget.service.getRecentTracks(limit: 10),
         widget.service.getNowPlaying(),
       ]);
-      final np = results[4] as Map<String, dynamic>?;
+
+      final recentData = results[4] as Map<String, dynamic>;
+      final rawTracks  = recentData['track'];
+      final allRecent  = rawTracks is List ? rawTracks
+          : (rawTracks != null ? [rawTracks] : <dynamic>[]);
+
+      Map<String, dynamic>? np;
+      final recentFiltered = <dynamic>[];
+      for (final t in allRecent) {
+        if ((t as Map?)?['@attr']?['nowplaying'] == 'true') {
+          np = t as Map<String, dynamic>;
+        } else {
+          recentFiltered.add(t);
+        }
+      }
+
       setState(() {
-        _userInfo   = results[0] as Map<String, dynamic>?;
-        _artists    = results[1] as List<dynamic>;
-        _tracks     = results[2] as List<dynamic>;
-        _albums     = results[3] as List<dynamic>;
-        _nowPlaying = np;
-        _loading    = false;
+        _userInfo     = results[0] as Map<String, dynamic>?;
+        _topArtists   = results[1] as List<dynamic>;
+        _topAlbums    = results[2] as List<dynamic>;
+        _topTracks    = results[3] as List<dynamic>;
+        _recentTracks = recentFiltered;
+        _nowPlaying   = np ?? results[5] as Map<String, dynamic>?;
+        _loading      = false;
       });
-      if (np != null) _extractColorFromNowPlaying(np);
+
+      if (_nowPlaying != null) _extractColorFromNowPlaying(_nowPlaying!);
     } catch (e) {
       setState(() {
         _error   = e.toString().replaceFirst('Exception: ', '');
@@ -211,166 +236,66 @@ class _DashboardPageState extends State<_DashboardPage>
     } catch (_) {}
   }
 
-  Future<void> _onPeriodChanged(String p) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('ls_dash_period', p);
-    setState(() => _period = p);
-    _load();
+  // ── Stats calculées ───────────────────────────────────
+  int _totalScrobbles()  => int.tryParse((_userInfo?['playcount'] ?? '0').toString()) ?? 0;
+  int _accountDays()     {
+    final raw = _userInfo?['registered'];
+    if (raw == null) return 0;
+    int ts = 0;
+    if (raw is Map) ts = int.tryParse((raw['#text'] ?? raw['unixtime'] ?? '0').toString()) ?? 0;
+    else ts = int.tryParse(raw.toString()) ?? 0;
+    if (ts <= 0) return 0;
+    return ((DateTime.now().millisecondsSinceEpoch / 1000 - ts) / 86400).floor();
   }
-
-  List<dynamic> _filtered(List<dynamic> list) {
-    if (_searchQuery.isEmpty) return list;
-    return list.where((item) {
-      final name   = (item['name'] ?? '').toString().toLowerCase();
-      final artist = (item['artist'] is Map
-              ? item['artist']['name']
-              : item['artist'] ?? '')
-          .toString().toLowerCase();
-      return name.contains(_searchQuery) || artist.contains(_searchQuery);
-    }).toList();
-  }
-
-  void _showShare() {
-    if (_userInfo == null) return;
-    final name      = (_userInfo!['name'] ?? widget.username).toString();
-    final scrobbles = (_userInfo!['playcount'] ?? '0').toString();
-    final periodLabel = _kPeriods
-        .firstWhere((p) => p.$1 == _period, orElse: () => (_period, _period)).$2;
-
-    final sb = StringBuffer();
-    sb.writeln('🎧 LastStats — @$name');
-    sb.writeln('📊 ${_formatNumber(int.tryParse(scrobbles) ?? 0)} scrobbles\n');
-    sb.writeln('🎙️ Top Artistes ($periodLabel) :');
-    for (var i = 0; i < _artists.take(5).length; i++) {
-      sb.writeln('  ${i + 1}. ${_artists[i]['name']} — ${_artists[i]['playcount']} écoutes');
-    }
-    sb.writeln('\n🎵 Top Titres ($periodLabel) :');
-    for (var i = 0; i < _tracks.take(5).length; i++) {
-      final t = _tracks[i];
-      sb.writeln('  ${i + 1}. ${t['name']} (${t['artist']?['name'] ?? ''}) — ${t['playcount']} écoutes');
-    }
-    sb.writeln('\n✨ Via LastStats · sanobld.github.io/LastStats');
-
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) {
-        final s = Theme.of(ctx).colorScheme;
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Partager mes stats',
-                  style: Theme.of(ctx).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 16),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(color: s.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(12)),
-                child: Text(sb.toString(),
-                    style: Theme.of(ctx).textTheme.bodySmall?.copyWith(height: 1.6)),
-              ),
-              const SizedBox(height: 16),
-              Row(children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () { Navigator.pop(ctx);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Résumé copié !'))); },
-                    icon: const Icon(Icons.copy_rounded),
-                    label: const Text('Copier'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: () async {
-                      final uri = Uri.parse('https://sanobld.github.io/LastStats');
-                      if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
-                      if (ctx.mounted) Navigator.pop(ctx);
-                    },
-                    icon: const Icon(Icons.open_in_new_rounded),
-                    label: const Text('Version web'),
-                  ),
-                ),
-              ]),
-            ]),
-          ),
-        );
-      },
-    );
+  double _avgPerDay()    { final d = _accountDays(); return d > 0 ? _totalScrobbles() / d : 0; }
+  int    _weeklyEst()    => (_avgPerDay() * 7).round();
+  String _registeredStr() {
+    final raw = _userInfo?['registered'];
+    if (raw == null) return '';
+    int ts = 0;
+    if (raw is Map) ts = int.tryParse((raw['#text'] ?? raw['unixtime'] ?? '0').toString()) ?? 0;
+    else ts = int.tryParse(raw.toString()) ?? 0;
+    if (ts <= 0) return '';
+    final d = DateTime.fromMillisecondsSinceEpoch(ts * 1000);
+    return '${d.day} ${_kMonths[d.month]} ${d.year}';
   }
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
 
     if (_loading) return const Center(child: CircularProgressIndicator());
     if (_error != null) return _ErrorView(message: _error!, onRetry: _load);
 
-    final info       = _userInfo!;
-    final name       = (info['name']      ?? widget.username).toString();
-    final realName   = (info['realname']  ?? '').toString();
-    final country    = (info['country']   ?? '').toString();
-    final scrobbles  = (info['playcount'] ?? '0').toString();
-    final registered = _parseRegistered(info['registered']);
-    final avatarUrl  = _extractImage(info['image']);
+    final info     = _userInfo!;
+    final name     = (info['name']     ?? widget.username).toString();
+    final realName = (info['realname'] ?? '').toString();
+    final country  = (info['country']  ?? '').toString();
+    final avatarUrl = _extractImage(info['image']);
 
-    return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: (ctx, innerScrolled) => [
-          // ── AppBar ────────────────────────────────
+    final total   = _totalScrobbles();
+    final days    = _accountDays();
+    final avg     = _avgPerDay();
+    final weekly  = _weeklyEst();
+    final regStr  = _registeredStr();
+
+    final topArtist = _topArtists.isNotEmpty ? _topArtists[0] : null;
+    final topAlbum  = _topAlbums.isNotEmpty  ? _topAlbums[0]  : null;
+    final topTrack  = _topTracks.isNotEmpty  ? _topTracks[0]  : null;
+
+    final lastTrack = _recentTracks.isNotEmpty ? _recentTracks[0] as Map : null;
+    final lastDate  = lastTrack?['date']?['#text'] ?? '';
+
+    return RefreshIndicator(
+      onRefresh: _load,
+      child: CustomScrollView(
+        slivers: [
+
+          // ── AppBar profil ──────────────────────────────
           SliverAppBar(
-            expandedHeight: 210,
+            expandedHeight: 190,
             pinned: true,
-            forceElevated: innerScrolled,
-            actions: [
-              if (_searching)
-                IconButton(
-                  icon: const Icon(Icons.close_rounded),
-                  onPressed: () => setState(() { _searching = false; _searchCtrl.clear(); }),
-                )
-              else ...[
-                IconButton(
-                  icon: const Icon(Icons.search_rounded),
-                  tooltip: 'Rechercher',
-                  onPressed: () => setState(() => _searching = true),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.ios_share_rounded),
-                  tooltip: 'Partager',
-                  onPressed: _showShare,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.refresh_rounded),
-                  tooltip: 'Rafraîchir',
-                  onPressed: _load,
-                ),
-              ],
-            ],
             flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-              title: _searching
-                  ? SizedBox(
-                      height: 36,
-                      child: TextField(
-                        controller: _searchCtrl,
-                        autofocus: true,
-                        style: const TextStyle(fontSize: 13),
-                        decoration: InputDecoration(
-                          hintText: 'Artiste, titre, album…',
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-                          filled: true, isDense: true,
-                        ),
-                      ),
-                    )
-                  : Text('@$name',
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
               background: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -381,329 +306,307 @@ class _DashboardPageState extends State<_DashboardPage>
                 ),
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 12, 100, 50),
-                    child: Row(children: [
-                      CircleAvatar(
-                        radius: 38,
-                        backgroundColor: scheme.primary.withValues(alpha: 0.2),
-                        backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-                        child: avatarUrl.isEmpty
-                            ? Icon(Icons.person_rounded, size: 38, color: scheme.onPrimaryContainer)
-                            : null,
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                              style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
-                          if (realName.isNotEmpty)
-                            Text(realName, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                          if (country.isNotEmpty && country != 'None')
-                            Row(children: [
-                              Icon(Icons.location_on_outlined, size: 12, color: scheme.onSurfaceVariant),
-                              const SizedBox(width: 2),
-                              Text(country, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                            ]),
-                          if (registered.isNotEmpty)
-                            Row(children: [
-                              Icon(Icons.calendar_today_outlined, size: 12, color: scheme.onSurfaceVariant),
-                              const SizedBox(width: 2),
-                              Text('Depuis $registered',
-                                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                            ]),
-                          const SizedBox(height: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: scheme.primary,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              '${_formatNumber(int.tryParse(scrobbles) ?? 0)} scrobbles',
-                              style: text.labelSmall?.copyWith(
-                                  color: scheme.onPrimary, fontWeight: FontWeight.w700),
-                            ),
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('$_greeting, $name 👋',
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(color: scheme.primary,
+                                           fontWeight: FontWeight.w700)),
+                        const SizedBox(height: 8),
+                        Row(children: [
+                          CircleAvatar(
+                            radius: 36,
+                            backgroundColor: scheme.primary.withValues(alpha: 0.2),
+                            backgroundImage: avatarUrl.isNotEmpty
+                                ? NetworkImage(avatarUrl) : null,
+                            child: avatarUrl.isEmpty
+                                ? Icon(Icons.person_rounded, size: 36,
+                                    color: scheme.onPrimaryContainer)
+                                : null,
                           ),
+                          const SizedBox(width: 14),
+                          Expanded(child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(name,
+                                  style: Theme.of(context).textTheme.titleLarge
+                                      ?.copyWith(fontWeight: FontWeight.w800)),
+                              if (realName.isNotEmpty)
+                                Text(realName,
+                                    style: Theme.of(context).textTheme.bodyMedium
+                                        ?.copyWith(color: scheme.onSurfaceVariant)),
+                              if (country.isNotEmpty && country != 'None')
+                                Text(country,
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(color: scheme.onSurfaceVariant)),
+                            ],
+                          )),
                         ]),
-                      ),
-                    ]),
+                      ],
+                    ),
                   ),
                 ),
               ),
+              title: Text('@$name',
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
             ),
           ),
 
-          // ── Période sticky ──────────────────────────
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: _PeriodHeaderDelegate(period: _period, onChanged: _onPeriodChanged),
-          ),
-        ],
+          SliverPadding(
+            padding: const EdgeInsets.all(16),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
 
-        body: Column(children: [
-          if (_nowPlaying != null)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
-              child: _NowPlayingCard(track: _nowPlaying!),
-            ),
-          TabBar(
-            controller: _tabCtrl,
-            tabs: const [Tab(text: 'Artistes'), Tab(text: 'Titres'), Tab(text: 'Albums')],
-          ),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: _load,
-              child: TabBarView(
-                controller: _tabCtrl,
-                children: [
-                  _DashTab(items: _filtered(_artists), type: 'artists'),
-                  _DashTab(items: _filtered(_tracks),  type: 'tracks'),
-                  _DashTab(items: _filtered(_albums),  type: 'albums'),
+                // ── Now Playing ──
+                if (_showNowPlay && _nowPlaying != null) ...[
+                  _NowPlayingCard(track: _nowPlaying!),
+                  const SizedBox(height: 16),
                 ],
-              ),
+
+                // ── Stat cards grid ──
+                if (_showStats) ...[
+                  _SectionHeader(title: 'Statistiques', icon: Icons.bar_chart_rounded),
+                  const SizedBox(height: 10),
+
+                  // Ligne 1 : total + avg/jour
+                  Row(children: [
+                    Expanded(child: _DashStatCard(
+                      emoji: '🎯',
+                      value: _formatNumber(total),
+                      label: 'Scrobbles',
+                      sub:   regStr.isNotEmpty ? 'Depuis $regStr' : null,
+                      color: scheme.primaryContainer,
+                      onColor: scheme.onPrimaryContainer,
+                    )),
+                    const SizedBox(width: 10),
+                    Expanded(child: _DashStatCard(
+                      emoji: '⚡',
+                      value: '~${_formatNumber(avg.round())}',
+                      label: 'Par jour',
+                      sub:   days > 0 ? '$days jours d\'activité' : null,
+                      color: scheme.secondaryContainer,
+                      onColor: scheme.onSecondaryContainer,
+                    )),
+                  ]),
+
+                  const SizedBox(height: 10),
+
+                  // Ligne 2 : semaine estimée + age compte
+                  Row(children: [
+                    Expanded(child: _DashStatCard(
+                      emoji: '📅',
+                      value: '~${_formatNumber(weekly)}',
+                      label: 'Cette semaine',
+                      sub:   'Estimé sur 7 jours',
+                      color: scheme.tertiaryContainer,
+                      onColor: scheme.onTertiaryContainer,
+                    )),
+                    const SizedBox(width: 10),
+                    Expanded(child: _DashStatCard(
+                      emoji: '🗓️',
+                      value: '${_formatNumber(days)} j',
+                      label: 'Âge du compte',
+                      sub:   regStr.isNotEmpty ? regStr : null,
+                      color: scheme.surfaceContainerHighest,
+                      onColor: scheme.onSurface,
+                    )),
+                  ]),
+
+                  const SizedBox(height: 10),
+
+                  // Ligne 3 : #1 artiste + #1 album
+                  Row(children: [
+                    Expanded(child: _DashStatCard(
+                      emoji: '🎤',
+                      value: topArtist != null
+                          ? (topArtist['name'] ?? '—').toString()
+                          : '—',
+                      label: 'Artiste #1',
+                      sub: topArtist != null
+                          ? '${_formatNumber(int.tryParse((topArtist['playcount'] ?? '0').toString()) ?? 0)} écoutes'
+                          : null,
+                      color: scheme.primaryContainer,
+                      onColor: scheme.onPrimaryContainer,
+                      compact: true,
+                    )),
+                    const SizedBox(width: 10),
+                    Expanded(child: _DashStatCard(
+                      emoji: '💿',
+                      value: topAlbum != null
+                          ? (topAlbum['name'] ?? '—').toString()
+                          : '—',
+                      label: 'Album #1',
+                      sub: topAlbum != null
+                          ? (topAlbum['artist']?['name'] ?? '').toString()
+                          : null,
+                      color: scheme.secondaryContainer,
+                      onColor: scheme.onSecondaryContainer,
+                      compact: true,
+                    )),
+                  ]),
+
+                  const SizedBox(height: 10),
+
+                  // Ligne 4 : #1 titre + dernière écoute
+                  Row(children: [
+                    Expanded(child: _DashStatCard(
+                      emoji: '🎵',
+                      value: topTrack != null
+                          ? (topTrack['name'] ?? '—').toString()
+                          : '—',
+                      label: 'Titre #1',
+                      sub: topTrack != null
+                          ? '${_formatNumber(int.tryParse((topTrack['playcount'] ?? '0').toString()) ?? 0)} écoutes'
+                          : null,
+                      color: scheme.tertiaryContainer,
+                      onColor: scheme.onTertiaryContainer,
+                      compact: true,
+                    )),
+                    const SizedBox(width: 10),
+                    Expanded(child: _DashStatCard(
+                      emoji: '⏱️',
+                      value: lastTrack != null
+                          ? (lastTrack['name'] ?? '—').toString()
+                          : '—',
+                      label: 'Dernière écoute',
+                      sub: lastDate.isNotEmpty ? _formatDate(lastDate) : null,
+                      color: scheme.surfaceContainerHighest,
+                      onColor: scheme.onSurface,
+                      compact: true,
+                    )),
+                  ]),
+
+                  const SizedBox(height: 20),
+                ],
+
+                // ── Top Artistes (mini liste) ──
+                if (_showArtists && _topArtists.isNotEmpty) ...[
+                  _SectionHeader(title: 'Top Artistes', icon: Icons.mic_rounded),
+                  const SizedBox(height: 8),
+                  ..._topArtists.take(5).toList().asMap().entries.map((e) {
+                    final a = e.value;
+                    return _ItemTile(
+                      name:     (a['name'] ?? '').toString(),
+                      sub:      '${_formatNumber(int.tryParse((a['playcount'] ?? '0').toString()) ?? 0)} écoutes',
+                      imageUrl: _extractImage(a['image']),
+                      imageFuture: ImageService.resolveArtist(
+                        (a['name'] ?? '').toString(),
+                        lastfmUrl: _extractImage(a['image']),
+                      ),
+                      rank: '${e.key + 1}',
+                    );
+                  }),
+                  const SizedBox(height: 20),
+                ],
+
+                // ── Top Titres (mini liste) ──
+                if (_showTracks && _topTracks.isNotEmpty) ...[
+                  _SectionHeader(title: 'Top Titres', icon: Icons.music_note_rounded),
+                  const SizedBox(height: 8),
+                  ..._topTracks.take(5).toList().asMap().entries.map((e) {
+                    final t = e.value;
+                    final trackName = (t['name'] ?? '').toString();
+                    final artist    = (t['artist']?['name'] ?? '').toString();
+                    return _ItemTile(
+                      name:     trackName,
+                      sub:      artist,
+                      imageUrl: _extractImage(t['image']),
+                      imageFuture: ImageService.resolveTrack(trackName, artist,
+                          lastfmUrl: _extractImage(t['image'])),
+                      rank:  '${e.key + 1}',
+                      plays: _formatNumber(int.tryParse((t['playcount'] ?? '0').toString()) ?? 0),
+                    );
+                  }),
+                  const SizedBox(height: 20),
+                ],
+
+              ]),
             ),
           ),
-        ]),
-      ),
-    );
-  }
-}
-
-// ─── Barre de période sticky ───────────────────────────────────────
-class _PeriodHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final String period;
-  final Future<void> Function(String) onChanged;
-  const _PeriodHeaderDelegate({required this.period, required this.onChanged});
-
-  @override double get minExtent => 48;
-  @override double get maxExtent => 48;
-
-  @override
-  Widget build(BuildContext ctx, double shrink, bool overlaps) {
-    final scheme = Theme.of(ctx).colorScheme;
-    return Material(
-      elevation: overlaps ? 1 : 0,
-      color: scheme.surface,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        children: _kPeriods.map((p) {
-          final sel = p.$1 == period;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: FilterChip(
-              label: Text(p.$2), selected: sel, showCheckmark: false,
-              onSelected: (_) { if (!sel) onChanged(p.$1); },
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  @override
-  bool shouldRebuild(_PeriodHeaderDelegate old) => old.period != period;
-}
-
-// ─── Tab dashboard : podium + liste ───────────────────────────────
-class _DashTab extends StatelessWidget {
-  final List<dynamic> items;
-  final String type;
-  const _DashTab({required this.items, required this.type});
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    if (items.isEmpty) {
-      return Center(
-          child: Text('Aucun résultat',
-              style: TextStyle(color: scheme.onSurfaceVariant)));
-    }
-    final top3 = items.take(3).toList();
-    final rest = items.skip(3).take(7).toList();
-
-    return ListView(
-      padding: const EdgeInsets.all(12),
-      children: [
-        _Podium(items: top3, type: type),
-        if (rest.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          ...rest.asMap().entries.map((e) {
-            final item      = e.value;
-            final name      = (item['name'] ?? '').toString();
-            final plays     = _formatNumber(
-                int.tryParse((item['playcount'] ?? '0').toString()) ?? 0);
-            final artistStr = (item['artist'] is Map
-                    ? item['artist']['name']
-                    : item['artist'] ?? '')
-                .toString();
-            final sub = type == 'artists' ? '$plays écoutes' : artistStr;
-
-            Future<String> resolver() {
-              switch (type) {
-                case 'artists': return ImageService.resolveArtist(name, lastfmUrl: _extractImage(item['image']));
-                case 'albums':  return ImageService.resolveAlbum(name, artistStr, lastfmUrl: _extractImage(item['image']));
-                default:        return ImageService.resolveTrack(name, artistStr, lastfmUrl: _extractImage(item['image']));
-              }
-            }
-
-            return _ItemTile(
-              name: name, sub: sub,
-              imageUrl: _extractImage(item['image']),
-              imageFuture: resolver(),
-              rank: '${e.key + 4}',
-              plays: type != 'artists' ? plays : null,
-            );
-          }),
         ],
-        const SizedBox(height: 8),
-      ],
+      ),
     );
   }
 }
 
-// ─── Podium Top 3 ─────────────────────────────────────────────────
-class _Podium extends StatelessWidget {
-  final List<dynamic> items;
-  final String type;
-  const _Podium({required this.items, required this.type});
+// ─── Stat card du dashboard ───────────────────────────────────────────────────
+class _DashStatCard extends StatelessWidget {
+  final String  emoji;
+  final String  value;
+  final String  label;
+  final String? sub;
+  final Color   color;
+  final Color   onColor;
+  final bool    compact;
+
+  const _DashStatCard({
+    required this.emoji,
+    required this.value,
+    required this.label,
+    this.sub,
+    required this.color,
+    required this.onColor,
+    this.compact = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
-    if (items.isEmpty) return const SizedBox.shrink();
-
-    final order = items.length == 1 ? [0]
-        : items.length == 2 ? [1, 0]
-        : [1, 0, 2];
-
-    Widget slot(int rank0) {
-      final item      = items[rank0];
-      final name      = (item['name'] ?? '').toString();
-      final plays     = _formatNumber(int.tryParse((item['playcount'] ?? '0').toString()) ?? 0);
-      final rawUrl    = _extractImage(item['image']);
-      final rank      = rank0 + 1;
-      final isFirst   = rank == 1;
-      final imgSize   = isFirst ? 72.0 : 56.0;
-      final baseH     = rank == 1 ? 68.0 : rank == 2 ? 50.0 : 34.0;
-      final artistStr = (item['artist'] is Map ? item['artist']['name'] : item['artist'] ?? '').toString();
-
-      Future<String> resolver() {
-        switch (type) {
-          case 'artists': return ImageService.resolveArtist(name, lastfmUrl: rawUrl);
-          case 'albums':  return ImageService.resolveAlbum(name, artistStr, lastfmUrl: rawUrl);
-          default:        return ImageService.resolveTrack(name, artistStr, lastfmUrl: rawUrl);
-        }
-      }
-
-      final medalColor = rank == 1 ? const Color(0xFFFFD700)
-          : rank == 2 ? const Color(0xFFC0C0C0)
-          : const Color(0xFFCD7F32);
-
-      return Expanded(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-            Container(
-              width: 22, height: 22,
-              decoration: BoxDecoration(color: medalColor, shape: BoxShape.circle),
-              child: Center(child: Text('$rank',
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Colors.white))),
-            ),
-            const SizedBox(height: 6),
-            _SmartImage(
-              size: imgSize,
-              borderRadius: type == 'artists' ? imgSize / 2 : 10,
-              initialUrl: rawUrl,
-              resolver: resolver,
-            ),
-            const SizedBox(height: 5),
-            Text(name, maxLines: 2, textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                style: text.bodySmall?.copyWith(fontWeight: FontWeight.w700, fontSize: 11)),
-            if (type != 'artists' && artistStr.isNotEmpty)
-              Text(artistStr, maxLines: 1, textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  style: text.labelSmall?.copyWith(fontSize: 9, color: scheme.onSurfaceVariant)),
-            Text(plays, style: text.labelSmall?.copyWith(
-                color: scheme.primary, fontWeight: FontWeight.w700, fontSize: 10)),
-            const SizedBox(height: 4),
-            Container(
-              height: baseH,
-              decoration: BoxDecoration(
-                color: isFirst ? scheme.primaryContainer : scheme.surfaceContainerHighest,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-              ),
-            ),
-          ]),
-        ),
-      );
-    }
-
+    final text = Theme.of(context).textTheme;
     return Card(
       elevation: 0,
-      color: scheme.surfaceContainerLowest,
+      color: color,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      clipBehavior: Clip.hardEdge,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(6, 16, 6, 0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: order.map(slot).toList(),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 22)),
+            const SizedBox(height: 6),
+            Text(
+              value,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: compact
+                  ? text.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w800, color: onColor)
+                  : text.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w800, color: onColor),
+            ),
+            Text(label,
+                style: text.bodySmall?.copyWith(
+                    color: onColor.withValues(alpha: 0.75),
+                    fontWeight: FontWeight.w600)),
+            if (sub != null)
+              Text(sub!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: text.bodySmall?.copyWith(
+                      color: onColor.withValues(alpha: 0.55))),
+          ],
         ),
       ),
     );
   }
 }
 
-
-// ═══════════════════════════════════════════════════════
-// NOW PLAYING CARD — barres animées
-// ═══════════════════════════════════════════════════════
-class _NowPlayingCard extends StatefulWidget {
+// ═══════════════════════════════════════════════════════════════════════════
+// NOW PLAYING CARD
+// ═══════════════════════════════════════════════════════════════════════════
+class _NowPlayingCard extends StatelessWidget {
   final Map<String, dynamic> track;
   const _NowPlayingCard({required this.track});
 
   @override
-  State<_NowPlayingCard> createState() => _NowPlayingCardState();
-}
-
-class _NowPlayingCardState extends State<_NowPlayingCard>
-    with TickerProviderStateMixin {
-  late final List<AnimationController> _ctrlList;
-  late final List<Animation<double>>   _anims;
-
-  static const _barCount = 4;
-  static const _heights  = [0.6, 1.0, 0.7, 0.85];
-  static const _durations = [420, 560, 480, 510];
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrlList = List.generate(_barCount, (i) => AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: _durations[i]),
-    )..repeat(reverse: true));
-    _anims = List.generate(_barCount, (i) =>
-        Tween<double>(begin: 0.25, end: _heights[i]).animate(
-            CurvedAnimation(parent: _ctrlList[i], curve: Curves.easeInOut)));
-  }
-
-  @override
-  void dispose() {
-    for (final c in _ctrlList) c.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final title  = (widget.track['name']             ?? '').toString();
-    final artist = (widget.track['artist']?['#text'] ?? '').toString();
-    final rawUrl = _extractImage(widget.track['image']);
+    final title  = (track['name']             ?? '').toString();
+    final artist = (track['artist']?['#text'] ?? '').toString();
+    final rawUrl = _extractImage(track['image']);
 
     return Card(
       elevation: 0,
@@ -713,41 +616,22 @@ class _NowPlayingCardState extends State<_NowPlayingCard>
         padding: const EdgeInsets.all(14),
         child: Row(children: [
           _SmartImage(
-            size: 56, borderRadius: 10,
-            initialUrl: rawUrl,
+            size: 56, borderRadius: 10, initialUrl: rawUrl,
             resolver: () => ImageService.resolveTrack(title, artist,
                 lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null),
           ),
           const SizedBox(width: 12),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Expanded(child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Row(children: [
-                // ── Barres animées ──
-                SizedBox(
-                  width: 20, height: 14,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: List.generate(_barCount, (i) => Padding(
-                      padding: const EdgeInsets.only(right: 2),
-                      child: AnimatedBuilder(
-                        animation: _anims[i],
-                        builder: (_, __) => Container(
-                          width: 3,
-                          height: 14 * _anims[i].value,
-                          decoration: BoxDecoration(
-                            color: scheme.secondary,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                      ),
-                    )),
-                  ),
-                ),
+                Container(width: 8, height: 8,
+                    decoration: BoxDecoration(color: scheme.secondary,
+                        shape: BoxShape.circle)),
                 const SizedBox(width: 6),
                 Text('EN COURS',
                     style: text.labelSmall?.copyWith(
-                        color: scheme.secondary,
-                        fontWeight: FontWeight.w700,
+                        color: scheme.secondary, fontWeight: FontWeight.w700,
                         letterSpacing: 1.2)),
               ]),
               const SizedBox(height: 2),
@@ -756,18 +640,17 @@ class _NowPlayingCardState extends State<_NowPlayingCard>
               Text(artist, maxLines: 1, overflow: TextOverflow.ellipsis,
                   style: text.bodySmall?.copyWith(
                       color: scheme.onSecondaryContainer.withValues(alpha: 0.75))),
-            ]),
-          ),
+            ],
+          )),
         ]),
       ),
     );
   }
 }
 
-
-// ═══════════════════════════════════════════════════════
-// CLASSEMENTS (Artists + Albums + Tracks)
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+// CLASSEMENTS — podium + liste infinie
+// ═══════════════════════════════════════════════════════════════════════════
 class _RankingsPage extends StatefulWidget {
   final LastFmService service;
   const _RankingsPage({required this.service});
@@ -803,18 +686,16 @@ class _RankingsPageState extends State<_RankingsPage>
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
               child: Text('Classements',
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineSmall
+                  style: Theme.of(context).textTheme.headlineSmall
                       ?.copyWith(fontWeight: FontWeight.w800)),
             ),
+
             // ── Pillules de période ──
             SizedBox(
               height: 44,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
                 children: _kPeriods.map((p) {
                   final sel = p.$1 == _period;
                   return Padding(
@@ -830,6 +711,7 @@ class _RankingsPageState extends State<_RankingsPage>
                 }).toList(),
               ),
             ),
+
             TabBar(
               controller: _tabs,
               tabs: const [
@@ -838,22 +720,14 @@ class _RankingsPageState extends State<_RankingsPage>
                 Tab(text: 'Titres'),
               ],
             ),
+
             Expanded(
               child: TabBarView(
                 controller: _tabs,
                 children: [
-                  _TopListBody(
-                      service: widget.service,
-                      type: 'artists',
-                      period: _period),
-                  _TopListBody(
-                      service: widget.service,
-                      type: 'albums',
-                      period: _period),
-                  _TopListBody(
-                      service: widget.service,
-                      type: 'tracks',
-                      period: _period),
+                  _TopListBody(service: widget.service, type: 'artists', period: _period),
+                  _TopListBody(service: widget.service, type: 'albums',  period: _period),
+                  _TopListBody(service: widget.service, type: 'tracks',  period: _period),
                 ],
               ),
             ),
@@ -864,12 +738,12 @@ class _RankingsPageState extends State<_RankingsPage>
   }
 }
 
+// ─── Corps de la liste avec podium ───────────────────────────────────────────
 class _TopListBody extends StatefulWidget {
   final LastFmService service;
   final String type;
   final String period;
-  const _TopListBody(
-      {required this.service, required this.type, required this.period});
+  const _TopListBody({required this.service, required this.type, required this.period});
 
   @override
   State<_TopListBody> createState() => _TopListBodyState();
@@ -896,68 +770,50 @@ class _TopListBodyState extends State<_TopListBody>
   @override
   void didUpdateWidget(_TopListBody old) {
     super.didUpdateWidget(old);
-    if (old.period != widget.period) _load(reset: true);
+    if (old.period != widget.period || old.type != widget.type) _load(reset: true);
   }
 
   Future<void> _load({bool reset = false}) async {
     if (reset) {
-      setState(() {
-        _loading   = true;
-        _error     = null;
-        _page      = 1;
-        _exhausted = false;
-        _items     = [];
-      });
+      setState(() { _loading = true; _error = null; _page = 1; _exhausted = false; _items = []; });
     } else {
       if (_loadingMore || _exhausted) return;
       setState(() => _loadingMore = true);
     }
-
     try {
       List<dynamic> fresh;
       switch (widget.type) {
         case 'artists':
-          fresh = await widget.service
-              .getTopArtists(period: widget.period, limit: 50, page: _page);
+          fresh = await widget.service.getTopArtists(period: widget.period, limit: 50, page: _page);
           break;
         case 'albums':
-          fresh = await widget.service
-              .getTopAlbums(period: widget.period, limit: 50, page: _page);
+          fresh = await widget.service.getTopAlbums(period: widget.period,  limit: 50, page: _page);
           break;
         default:
-          fresh = await widget.service
-              .getTopTracks(period: widget.period, limit: 50, page: _page);
+          fresh = await widget.service.getTopTracks(period: widget.period,  limit: 50, page: _page);
       }
-      if (mounted) {
-        setState(() {
-          _items.addAll(fresh);
-          _exhausted   = fresh.length < 50;
-          _loading     = false;
-          _loadingMore = false;
-        });
-      }
+      if (mounted) setState(() {
+        _items.addAll(fresh);
+        _exhausted   = fresh.length < 50;
+        _loading     = false;
+        _loadingMore = false;
+      });
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _error       = e.toString().replaceFirst('Exception: ', '');
-          _loading     = false;
-          _loadingMore = false;
-        });
-      }
+      if (mounted) setState(() {
+        _error       = e.toString().replaceFirst('Exception: ', '');
+        _loading     = false;
+        _loadingMore = false;
+      });
     }
   }
 
-  /// Affiche le bottom sheet de détail pour un item.
   void _showDetail(BuildContext ctx, Map<String, dynamic> item) {
     showModalBottomSheet(
       context: ctx,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => _ItemDetailSheet(
-        item:    item,
-        type:    widget.type,
-        service: widget.service,
-      ),
+          item: item, type: widget.type, service: widget.service),
     );
   }
 
@@ -967,79 +823,245 @@ class _TopListBodyState extends State<_TopListBody>
     final scheme = Theme.of(context).colorScheme;
 
     if (_loading) return const Center(child: CircularProgressIndicator());
-    if (_error != null) {
-      return _ErrorView(message: _error!, onRetry: () => _load(reset: true));
-    }
+    if (_error != null) return _ErrorView(message: _error!, onRetry: () => _load(reset: true));
     if (_items.isEmpty) {
-      return Center(
-          child: Text('Aucun résultat',
-              style: TextStyle(color: scheme.onSurfaceVariant)));
+      return Center(child: Text('Aucun résultat',
+          style: TextStyle(color: scheme.onSurfaceVariant)));
     }
 
     return NotificationListener<ScrollNotification>(
       onNotification: (n) {
-        if (!_exhausted &&
-            !_loadingMore &&
+        if (!_exhausted && !_loadingMore &&
             n.metrics.pixels >= n.metrics.maxScrollExtent - 200) {
           _page++;
           _load();
         }
         return false;
       },
-      child: ListView.builder(
-        itemCount: _items.length + (_loadingMore ? 1 : 0),
-        itemBuilder: (ctx, i) {
-          if (i == _items.length) {
-            return const Padding(
-                padding: EdgeInsets.all(16),
-                child: Center(child: CircularProgressIndicator()));
-          }
-          final item   = _items[i] as Map<String, dynamic>;
-          final name   = (item['name'] ?? '').toString();
-          final plays  = _formatNumber(
-              int.tryParse((item['playcount'] ?? '0').toString()) ?? 0);
-          final artist = (item['artist']?['name'] ?? '').toString();
-          final rawUrl = _extractImage(item['image']);
-
-          Future<String> imgFuture;
-          switch (widget.type) {
-            case 'artists':
-              imgFuture = ImageService.resolveArtist(name,
-                  lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null);
-              break;
-            case 'albums':
-              imgFuture = ImageService.resolveAlbum(name, artist,
-                  lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null);
-              break;
-            default:
-              imgFuture = ImageService.resolveTrack(name, artist,
-                  lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null);
-          }
-
-          // ── Tap → detail sheet ──
-          return InkWell(
-            onTap: () => _showDetail(ctx, item),
-            borderRadius: BorderRadius.circular(8),
-            child: _ItemTile(
-              name:        name,
-              sub:         widget.type != 'artists'
-                  ? '$artist · $plays écoutes'
-                  : '$plays écoutes',
-              imageUrl:    rawUrl,
-              imageFuture: imgFuture,
-              rank:        '${i + 1}',
-              plays:       widget.type != 'artists' ? plays : null,
+      child: CustomScrollView(
+        slivers: [
+          // ── Podium top 3 ──
+          if (_items.length >= 3)
+            SliverToBoxAdapter(
+              child: _PodiumWidget(
+                items: _items.take(3).toList(),
+                type:  widget.type,
+                onTap: (item) => _showDetail(context, item as Map<String, dynamic>),
+              ),
             ),
-          );
-        },
+
+          // ── Liste à partir du #4 ──
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (ctx, i) {
+                final offset = _items.length >= 3 ? 3 : 0;
+                final idx    = i + offset;
+
+                if (idx >= _items.length) {
+                  return _loadingMore
+                      ? const Padding(padding: EdgeInsets.all(16),
+                          child: Center(child: CircularProgressIndicator()))
+                      : const SizedBox.shrink();
+                }
+
+                final item   = _items[idx] as Map<String, dynamic>;
+                final name   = (item['name'] ?? '').toString();
+                final plays  = _formatNumber(int.tryParse((item['playcount'] ?? '0').toString()) ?? 0);
+                final artist = (item['artist']?['name'] ?? '').toString();
+                final rawUrl = _extractImage(item['image']);
+
+                Future<String> imgFuture;
+                switch (widget.type) {
+                  case 'artists':
+                    imgFuture = ImageService.resolveArtist(name, lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null);
+                    break;
+                  case 'albums':
+                    imgFuture = ImageService.resolveAlbum(name, artist, lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null);
+                    break;
+                  default:
+                    imgFuture = ImageService.resolveTrack(name, artist, lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null);
+                }
+
+                return InkWell(
+                  onTap: () => _showDetail(ctx, item),
+                  borderRadius: BorderRadius.circular(8),
+                  child: _ItemTile(
+                    name:        name,
+                    sub:         widget.type != 'artists' ? '$artist · $plays écoutes' : '$plays écoutes',
+                    imageUrl:    rawUrl,
+                    imageFuture: imgFuture,
+                    rank:        '${idx + 1}',
+                    plays:       widget.type != 'artists' ? plays : null,
+                  ),
+                );
+              },
+              childCount: (_items.length >= 3 ? _items.length - 3 : _items.length) + 1,
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-// ═══════════════════════════════════════════════════════
-// ITEM DETAIL SHEET  — bottom sheet avec pillules de période
-// ═══════════════════════════════════════════════════════
+// ─── Podium visuel ─────────────────────────────────────────────────────────────
+class _PodiumWidget extends StatelessWidget {
+  final List<dynamic> items;   // exactly 3 items: [0]=#1 [1]=#2 [2]=#3
+  final String type;
+  final void Function(dynamic item) onTap;
+
+  const _PodiumWidget({required this.items, required this.type, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+
+    // Ordre d'affichage visuel : #2 (gauche), #1 (centre), #3 (droite)
+    const order    = [1, 0, 2];
+    const heights  = [100.0, 130.0, 80.0]; // hauteur de la base du podium
+    const medals   = ['🥈', '🥇', '🥉'];
+    const imgSizes = [56.0, 72.0, 48.0];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionHeader(title: 'Podium', icon: Icons.emoji_events_rounded),
+          const SizedBox(height: 12),
+
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: List.generate(3, (col) {
+              final dataIdx = order[col];
+              final item    = items[dataIdx] as Map<String, dynamic>;
+              final name    = (item['name'] ?? '').toString();
+              final artist  = type != 'artists'
+                  ? (item['artist']?['name'] ?? '').toString() : '';
+              final plays   = _formatNumber(int.tryParse(
+                  (item['playcount'] ?? '0').toString()) ?? 0);
+              final rawUrl  = _extractImage(item['image']);
+
+              Future<String> imgFuture;
+              switch (type) {
+                case 'artists':
+                  imgFuture = ImageService.resolveArtist(name, lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null);
+                  break;
+                case 'albums':
+                  imgFuture = ImageService.resolveAlbum(name, artist, lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null);
+                  break;
+                default:
+                  imgFuture = ImageService.resolveTrack(name, artist, lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null);
+              }
+
+              final podiumColor = dataIdx == 0
+                  ? scheme.primaryContainer
+                  : dataIdx == 1
+                      ? scheme.secondaryContainer
+                      : scheme.tertiaryContainer;
+              final podiumOnColor = dataIdx == 0
+                  ? scheme.onPrimaryContainer
+                  : dataIdx == 1
+                      ? scheme.onSecondaryContainer
+                      : scheme.onTertiaryContainer;
+
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () => onTap(item),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      // Image
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(imgSizes[col] / 4),
+                        child: _SmartImage(
+                          size: imgSizes[col],
+                          borderRadius: imgSizes[col] / 4,
+                          initialUrl: rawUrl,
+                          resolver: () => imgFuture,
+                        ),
+                      ),
+
+                      const SizedBox(height: 6),
+
+                      // Médaille
+                      Text(medals[col],
+                          style: TextStyle(fontSize: imgSizes[col] == 72.0 ? 22 : 18)),
+
+                      const SizedBox(height: 4),
+
+                      // Base du podium
+                      Container(
+                        width: double.infinity,
+                        height: heights[col],
+                        decoration: BoxDecoration(
+                          color: podiumColor,
+                          borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(12)),
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Rang
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: podiumOnColor.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text('#${dataIdx + 1}',
+                                  style: text.labelSmall?.copyWith(
+                                      color: podiumOnColor,
+                                      fontWeight: FontWeight.w800)),
+                            ),
+                            const SizedBox(height: 4),
+                            // Nom
+                            Text(
+                              name,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              style: text.bodySmall?.copyWith(
+                                  color: podiumOnColor,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: dataIdx == 0 ? 11 : 10),
+                            ),
+                            if (heights[col] >= 100) ...[
+                              const SizedBox(height: 2),
+                              Text(plays,
+                                  style: text.bodySmall?.copyWith(
+                                      color: podiumOnColor.withValues(alpha: 0.7),
+                                      fontSize: 9)),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
+
+          const SizedBox(height: 12),
+          Divider(color: scheme.outlineVariant.withValues(alpha: 0.5)),
+          Padding(
+            padding: const EdgeInsets.only(left: 4, top: 4, bottom: 4),
+            child: Text('Suite du classement',
+                style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DETAIL SHEET
+// ═══════════════════════════════════════════════════════════════════════════
 class _PeriodStats {
   final int rank;
   final int playcount;
@@ -1048,14 +1070,9 @@ class _PeriodStats {
 
 class _ItemDetailSheet extends StatefulWidget {
   final Map<String, dynamic> item;
-  final String type;      // 'artists' | 'albums' | 'tracks'
+  final String type;
   final LastFmService service;
-
-  const _ItemDetailSheet({
-    required this.item,
-    required this.type,
-    required this.service,
-  });
+  const _ItemDetailSheet({required this.item, required this.type, required this.service});
 
   @override
   State<_ItemDetailSheet> createState() => _ItemDetailSheetState();
@@ -1081,48 +1098,32 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
     final name       = (widget.item['name'] ?? '').toString();
     final artistName = widget.type != 'artists'
-        ? (widget.item['artist']?['name'] ?? '').toString()
-        : '';
+        ? (widget.item['artist']?['name'] ?? '').toString() : '';
 
     try {
       List<dynamic> items;
       if (widget.type == 'artists') {
-        items = await widget.service
-            .getTopArtists(period: period, limit: 200);
+        items = await widget.service.getTopArtists(period: period, limit: 200);
       } else if (widget.type == 'albums') {
-        items = await widget.service
-            .getTopAlbums(period: period, limit: 200);
+        items = await widget.service.getTopAlbums(period: period, limit: 200);
       } else {
-        items = await widget.service
-            .getTopTracks(period: period, limit: 200);
+        items = await widget.service.getTopTracks(period: period, limit: 200);
       }
 
-      int rank = -1;
-      int playcount = 0;
+      int rank = -1, playcount = 0;
       for (var i = 0; i < items.length; i++) {
         final n = (items[i]['name'] ?? '').toString();
         final a = widget.type != 'artists'
-            ? (items[i]['artist']?['name'] ?? '').toString()
-            : '';
-        final nameMatch = n == name;
-        final artistMatch = widget.type == 'artists' || a == artistName;
-        if (nameMatch && artistMatch) {
-          rank = i + 1;
-          playcount =
-              int.tryParse((items[i]['playcount'] ?? '0').toString()) ?? 0;
+            ? (items[i]['artist']?['name'] ?? '').toString() : '';
+        if (n == name && (widget.type == 'artists' || a == artistName)) {
+          rank     = i + 1;
+          playcount = int.tryParse((items[i]['playcount'] ?? '0').toString()) ?? 0;
           break;
         }
       }
-
-      setState(() {
-        _cache[period] = _PeriodStats(rank: rank, playcount: playcount);
-        _loading = false;
-      });
+      setState(() { _cache[period] = _PeriodStats(rank: rank, playcount: playcount); _loading = false; });
     } catch (_) {
-      setState(() {
-        _cache[period] = _PeriodStats(rank: -1, playcount: 0);
-        _loading = false;
-      });
+      setState(() { _cache[period] = _PeriodStats(rank: -1, playcount: 0); _loading = false; });
     }
   }
 
@@ -1130,174 +1131,128 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   Widget build(BuildContext context) {
     final scheme     = Theme.of(context).colorScheme;
     final text       = Theme.of(context).textTheme;
-    final item       = widget.item;
-    final name       = (item['name'] ?? '').toString();
+    final name       = (widget.item['name'] ?? '').toString();
     final artistName = widget.type != 'artists'
-        ? (item['artist']?['name'] ?? '').toString()
-        : '';
-    final rawUrl     = _extractImage(item['image']);
+        ? (widget.item['artist']?['name'] ?? '').toString() : '';
+    final rawUrl     = _extractImage(widget.item['image']);
     final stats      = _cache[_period];
-    final periodLabel =
-        _kPeriods.firstWhere((p) => p.$1 == _period, orElse: () => (_period, _period)).$2;
+    final periodLabel = _kPeriods.firstWhere(
+        (p) => p.$1 == _period, orElse: () => (_period, _period)).$2;
 
     Future<String> imgFuture;
     switch (widget.type) {
       case 'artists':
-        imgFuture = ImageService.resolveArtist(name,
-            lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null);
+        imgFuture = ImageService.resolveArtist(name, lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null);
         break;
       case 'albums':
-        imgFuture = ImageService.resolveAlbum(name, artistName,
-            lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null);
+        imgFuture = ImageService.resolveAlbum(name, artistName, lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null);
         break;
       default:
-        imgFuture = ImageService.resolveTrack(name, artistName,
-            lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null);
+        imgFuture = ImageService.resolveTrack(name, artistName, lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null);
     }
 
     return DraggableScrollableSheet(
-      initialChildSize: 0.55,
-      minChildSize:     0.35,
-      maxChildSize:     0.85,
+      initialChildSize: 0.55, minChildSize: 0.35, maxChildSize: 0.85,
       expand: false,
       builder: (_, scrollCtrl) => Container(
         decoration: BoxDecoration(
-          color:        scheme.surface,
+          color: scheme.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        child: Column(
-          children: [
-            // ── Handle ──
-            Padding(
-              padding: const EdgeInsets.only(top: 12, bottom: 4),
-              child: Container(
-                width: 36, height: 4,
-                decoration: BoxDecoration(
-                  color: scheme.onSurfaceVariant.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
+        child: Column(children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 12, bottom: 4),
+            child: Container(width: 36, height: 4,
+              decoration: BoxDecoration(
+                color: scheme.onSurfaceVariant.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2))),
+          ),
 
-            // ── Header : image + nom ──
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
-              child: Row(children: [
-                _SmartImage(
-                  size: 72,
-                  borderRadius: 12,
-                  initialUrl: rawUrl,
-                  resolver: () => imgFuture,
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(name,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: text.titleLarge
-                              ?.copyWith(fontWeight: FontWeight.w800)),
-                      if (artistName.isNotEmpty)
-                        Text(artistName,
-                            style: text.bodyMedium
-                                ?.copyWith(color: scheme.onSurfaceVariant)),
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: scheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          switch (widget.type) {
-                            'artists' => 'Artiste',
-                            'albums'  => 'Album',
-                            _         => 'Titre',
-                          },
-                          style: text.labelSmall?.copyWith(
-                              color: scheme.onPrimaryContainer,
-                              fontWeight: FontWeight.w700),
-                        ),
-                      ),
-                    ],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
+            child: Row(children: [
+              _SmartImage(size: 72, borderRadius: 12, initialUrl: rawUrl,
+                  resolver: () => imgFuture),
+              const SizedBox(width: 16),
+              Expanded(child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, maxLines: 2, overflow: TextOverflow.ellipsis,
+                      style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+                  if (artistName.isNotEmpty)
+                    Text(artistName, style: text.bodyMedium
+                        ?.copyWith(color: scheme.onSurfaceVariant)),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(color: scheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Text(switch (widget.type) {
+                      'artists' => 'Artiste', 'albums' => 'Album', _ => 'Titre' },
+                      style: text.labelSmall?.copyWith(
+                          color: scheme.onPrimaryContainer,
+                          fontWeight: FontWeight.w700)),
                   ),
+                ],
+              )),
+            ]),
+          ),
+
+          const Divider(height: 24),
+
+          SizedBox(
+            height: 44,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+              children: _kPeriods.map((p) => Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: FilterChip(
+                  label: Text(p.$2),
+                  selected: p.$1 == _period,
+                  showCheckmark: false,
+                  onSelected: (_) => _loadPeriod(p.$1),
                 ),
-              ]),
+              )).toList(),
             ),
+          ),
 
-            const Divider(height: 24),
+          const SizedBox(height: 16),
 
-            // ── Pillules de période ──
-            SizedBox(
-              height: 44,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
-                children: _kPeriods.map((p) {
-                  final sel = p.$1 == _period;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      label: Text(p.$2),
-                      selected: sel,
-                      showCheckmark: false,
-                      onSelected: (_) => _loadPeriod(p.$1),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // ── Stats pour la période sélectionnée ──
-            Expanded(
-              child: _loading
-                  ? const Center(child: CircularProgressIndicator())
-                  : SingleChildScrollView(
-                      controller: scrollCtrl,
-                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
-                      child: stats == null
-                          ? const SizedBox.shrink()
-                          : Column(children: [
-                              // Rang
-                              if (stats.rank > 0 && stats.rank <= 200)
-                                _DetailStatCard(
-                                  icon:  Icons.leaderboard_rounded,
-                                  value: '#${stats.rank}',
-                                  label: 'Classement · $periodLabel',
-                                  color: scheme.primaryContainer,
-                                  onColor: scheme.onPrimaryContainer,
-                                ),
-                              const SizedBox(height: 12),
-                              // Écoutes
-                              _DetailStatCard(
-                                icon:  Icons.headphones_rounded,
-                                value: _formatNumber(stats.playcount),
-                                label: 'Écoutes · $periodLabel',
-                                color: scheme.secondaryContainer,
-                                onColor: scheme.onSecondaryContainer,
-                              ),
-                              // Non classé
-                              if (stats.rank == -1 || stats.rank > 200)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 16),
-                                  child: Text(
-                                    'Non classé dans le top 200 pour cette période.',
-                                    textAlign: TextAlign.center,
-                                    style: text.bodySmall?.copyWith(
-                                        color: scheme.onSurfaceVariant),
-                                  ),
-                                ),
-                            ]),
-                    ),
-            ),
-          ],
-        ),
+          Expanded(child: _loading
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                  controller: scrollCtrl,
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+                  child: stats == null ? const SizedBox.shrink()
+                      : Column(children: [
+                          if (stats.rank > 0 && stats.rank <= 200)
+                            _DetailStatCard(
+                              icon: Icons.leaderboard_rounded,
+                              value: '#${stats.rank}',
+                              label: 'Classement · $periodLabel',
+                              color: scheme.primaryContainer,
+                              onColor: scheme.onPrimaryContainer,
+                            ),
+                          const SizedBox(height: 12),
+                          _DetailStatCard(
+                            icon: Icons.headphones_rounded,
+                            value: _formatNumber(stats.playcount),
+                            label: 'Écoutes · $periodLabel',
+                            color: scheme.secondaryContainer,
+                            onColor: scheme.onSecondaryContainer,
+                          ),
+                          if (stats.rank == -1 || stats.rank > 200)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16),
+                              child: Text('Non classé dans le top 200 pour cette période.',
+                                  textAlign: TextAlign.center,
+                                  style: text.bodySmall?.copyWith(
+                                      color: scheme.onSurfaceVariant)),
+                            ),
+                        ]),
+                )),
+        ]),
       ),
     );
   }
@@ -1309,20 +1264,14 @@ class _DetailStatCard extends StatelessWidget {
   final String label;
   final Color color;
   final Color onColor;
-  const _DetailStatCard({
-    required this.icon,
-    required this.value,
-    required this.label,
-    required this.color,
-    required this.onColor,
-  });
+  const _DetailStatCard({required this.icon, required this.value,
+      required this.label, required this.color, required this.onColor});
 
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     return Card(
-      elevation: 0,
-      color: color,
+      elevation: 0, color: color,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -1330,12 +1279,10 @@ class _DetailStatCard extends StatelessWidget {
           Icon(icon, color: onColor, size: 32),
           const SizedBox(width: 16),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(value,
-                style: text.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800, color: onColor)),
-            Text(label,
-                style: text.bodySmall
-                    ?.copyWith(color: onColor.withValues(alpha: 0.8))),
+            Text(value, style: text.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w800, color: onColor)),
+            Text(label, style: text.bodySmall
+                ?.copyWith(color: onColor.withValues(alpha: 0.8))),
           ]),
         ]),
       ),
@@ -1343,9 +1290,9 @@ class _DetailStatCard extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
 // GRAPHIQUES
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
 class _ChartsPage extends StatefulWidget {
   final LastFmService service;
   const _ChartsPage({required this.service});
@@ -1358,7 +1305,7 @@ class _ChartsPageState extends State<_ChartsPage>
     with AutomaticKeepAliveClientMixin {
   Map<String, int>? _monthly;
   List<dynamic>     _topArtists = [];
-  bool _loading     = true;
+  bool _loading   = true;
   String? _error;
   bool _gemsLoading = false;
   List<_GemEntry> _gems = [];
@@ -1385,10 +1332,7 @@ class _ChartsPageState extends State<_ChartsPage>
         _loading    = false;
       });
     } catch (e) {
-      setState(() {
-        _error   = e.toString().replaceFirst('Exception: ', '');
-        _loading = false;
-      });
+      setState(() { _error = e.toString().replaceFirst('Exception: ', ''); _loading = false; });
     }
   }
 
@@ -1399,7 +1343,6 @@ class _ChartsPageState extends State<_ChartsPage>
     final futures  = artists.map(
         (a) => widget.service.getArtistListeners((a['name'] ?? '').toString()));
     final listeners = await Future.wait(futures);
-
     final entries = <_GemEntry>[];
     for (var i = 0; i < artists.length; i++) {
       entries.add(_GemEntry(
@@ -1433,131 +1376,100 @@ class _ChartsPageState extends State<_ChartsPage>
               style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 20),
 
-          _SectionHeader(
-              title: 'Scrobbles — 12 derniers mois',
+          _SectionHeader(title: 'Scrobbles — 12 derniers mois',
               icon: Icons.calendar_month_rounded),
           const SizedBox(height: 16),
           Card(
-            elevation: 0,
-            color: scheme.surfaceContainerHighest,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16)),
+            elevation: 0, color: scheme.surfaceContainerHighest,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
-              child: Column(children: [
-                SizedBox(
-                  height: 160,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: monthly.entries.map((e) {
-                      final ratio = maxVal > 0 ? e.value / maxVal : 0.0;
-                      final month = e.key.substring(5);
-                      return Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 2),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              if (ratio > 0)
-                                Text(_formatNumber(e.value),
-                                    style: text.labelSmall?.copyWith(
-                                        fontSize: 8,
-                                        color: scheme.onSurfaceVariant)),
-                              const SizedBox(height: 2),
-                              Flexible(
-                                fit: FlexFit.loose,
-                                child: FractionallySizedBox(
-                                  heightFactor: ratio.clamp(0.02, 1.0),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: scheme.primary
-                                          .withValues(alpha: 0.5 + ratio * 0.5),
-                                      borderRadius: const BorderRadius.vertical(
-                                          top: Radius.circular(4)),
-                                    ),
+              child: SizedBox(
+                height: 160,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: monthly.entries.map((e) {
+                    final ratio = maxVal > 0 ? e.value / maxVal : 0.0;
+                    final month = e.key.substring(5);
+                    return Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            if (ratio > 0)
+                              Text(_formatNumber(e.value),
+                                  style: text.labelSmall?.copyWith(
+                                      fontSize: 8, color: scheme.onSurfaceVariant)),
+                            const SizedBox(height: 2),
+                            Flexible(
+                              fit: FlexFit.loose,
+                              child: FractionallySizedBox(
+                                heightFactor: ratio.clamp(0.02, 1.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: scheme.primary.withValues(alpha: 0.5 + ratio * 0.5),
+                                    borderRadius: const BorderRadius.vertical(
+                                        top: Radius.circular(4)),
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              Text(month,
-                                  style: text.labelSmall
-                                      ?.copyWith(fontSize: 9)),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(month, style: text.labelSmall?.copyWith(fontSize: 9)),
+                          ],
                         ),
-                      );
-                    }).toList(),
-                  ),
+                      ),
+                    );
+                  }).toList(),
                 ),
-              ]),
+              ),
             ),
           ),
 
           const SizedBox(height: 24),
 
-          _SectionHeader(
-              title: 'Top artistes — distribution',
-              icon: Icons.mic_rounded),
+          _SectionHeader(title: 'Top artistes — distribution', icon: Icons.mic_rounded),
           const SizedBox(height: 12),
           if (_topArtists.isNotEmpty) ...[
             () {
               final maxPlays = _topArtists
-                  .map((a) =>
-                      int.tryParse((a['playcount'] ?? '0').toString()) ?? 0)
+                  .map((a) => int.tryParse((a['playcount'] ?? '0').toString()) ?? 0)
                   .fold(0, (a, b) => a > b ? a : b);
               return Card(
-                elevation: 0,
-                color: scheme.surfaceContainerHighest,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
+                elevation: 0, color: scheme.surfaceContainerHighest,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: _topArtists.asMap().entries.map((e) {
-                      final plays = int.tryParse(
-                              (e.value['playcount'] ?? '0').toString()) ?? 0;
+                      final plays = int.tryParse((e.value['playcount'] ?? '0').toString()) ?? 0;
                       final ratio = maxPlays > 0 ? plays / maxPlays : 0.0;
-                      final name  = (e.value['name'] ?? '').toString();
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: Row(children: [
-                          SizedBox(
-                            width: 24,
-                            child: Text('${e.key + 1}',
-                                textAlign: TextAlign.center,
-                                style: text.bodySmall?.copyWith(
-                                    color: scheme.onSurfaceVariant,
-                                    fontWeight: FontWeight.w700)),
-                          ),
+                          SizedBox(width: 24, child: Text('${e.key + 1}',
+                              textAlign: TextAlign.center,
+                              style: text.bodySmall?.copyWith(
+                                  color: scheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w700))),
                           const SizedBox(width: 8),
-                          Expanded(
-                            flex: 3,
-                            child: Text(name,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: text.bodySmall
-                                    ?.copyWith(fontWeight: FontWeight.w600)),
-                          ),
+                          Expanded(flex: 3, child: Text(
+                              (e.value['name'] ?? '').toString(),
+                              maxLines: 1, overflow: TextOverflow.ellipsis,
+                              style: text.bodySmall?.copyWith(fontWeight: FontWeight.w600))),
                           const SizedBox(width: 8),
-                          Expanded(
-                            flex: 5,
-                            child: ClipRRect(
+                          Expanded(flex: 5, child: ClipRRect(
                               borderRadius: BorderRadius.circular(4),
                               child: LinearProgressIndicator(
-                                value: ratio,
-                                minHeight: 8,
-                                backgroundColor:
-                                    scheme.primary.withValues(alpha: 0.15),
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    scheme.primary),
-                              ),
-                            ),
-                          ),
+                                value: ratio, minHeight: 8,
+                                backgroundColor: scheme.primary.withValues(alpha: 0.15),
+                                valueColor: AlwaysStoppedAnimation<Color>(scheme.primary),
+                              ))),
                           const SizedBox(width: 8),
                           Text(_formatNumber(plays),
                               style: text.bodySmall?.copyWith(
-                                  color: scheme.primary,
-                                  fontWeight: FontWeight.w600)),
+                                  color: scheme.primary, fontWeight: FontWeight.w600)),
                         ]),
                       );
                     }).toList(),
@@ -1569,14 +1481,10 @@ class _ChartsPageState extends State<_ChartsPage>
 
           const SizedBox(height: 24),
 
-          _SectionHeader(
-              title: 'Mainstream vs Pépites',
-              icon: Icons.diamond_outlined),
+          _SectionHeader(title: 'Mainstream vs Pépites', icon: Icons.diamond_outlined),
           const SizedBox(height: 8),
-          Text(
-            'Compare tes artistes favoris à leur popularité mondiale sur Last.fm.',
-            style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-          ),
+          Text('Compare tes artistes favoris à leur popularité mondiale.',
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           const SizedBox(height: 12),
 
           if (_gems.isEmpty && !_gemsLoading)
@@ -1586,30 +1494,23 @@ class _ChartsPageState extends State<_ChartsPage>
               label: const Text('Calculer mon score'),
             )
           else if (_gemsLoading)
-            const Center(
-                child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: CircularProgressIndicator()))
+            const Center(child: Padding(padding: EdgeInsets.all(16),
+                child: CircularProgressIndicator()))
           else ...[
             ..._gems.asMap().entries.map((e) {
               final gem   = e.value;
               final isGem = gem.listeners < 500000;
               return Card(
-                elevation: 0,
-                color: scheme.surfaceContainerHighest,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                elevation: 0, color: scheme.surfaceContainerHighest,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 margin: const EdgeInsets.only(bottom: 6),
                 child: ListTile(
                   leading: Text(isGem ? '💎' : '🎤',
                       style: const TextStyle(fontSize: 24)),
                   title: Text(gem.name,
-                      style: text.bodyMedium
-                          ?.copyWith(fontWeight: FontWeight.w600)),
-                  subtitle: Text(
-                      '${_formatNumber(gem.listeners)} auditeurs mondiaux',
-                      style: text.bodySmall
-                          ?.copyWith(color: scheme.onSurfaceVariant)),
+                      style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                  subtitle: Text('${_formatNumber(gem.listeners)} auditeurs mondiaux',
+                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                   trailing: Text(isGem ? 'Pépite' : 'Mainstream',
                       style: text.labelSmall?.copyWith(
                           color: isGem ? scheme.tertiary : scheme.primary,
@@ -1617,11 +1518,8 @@ class _ChartsPageState extends State<_ChartsPage>
                 ),
               );
             }),
-            const SizedBox(height: 8),
-            Center(
-              child: TextButton(
-                  onPressed: _computeGems, child: const Text('Recalculer')),
-            ),
+            Center(child: TextButton(
+                onPressed: _computeGems, child: const Text('Recalculer'))),
           ],
 
           const SizedBox(height: 20),
@@ -1638,9 +1536,9 @@ class _GemEntry {
   const _GemEntry({required this.name, required this.plays, required this.listeners});
 }
 
-// ═══════════════════════════════════════════════════════
-// HISTORIQUE  —  avec filtres de dates
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+// HISTORIQUE
+// ═══════════════════════════════════════════════════════════════════════════
 class _HistoryPage extends StatefulWidget {
   final LastFmService service;
   const _HistoryPage({required this.service});
@@ -1651,26 +1549,16 @@ class _HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<_HistoryPage>
     with AutomaticKeepAliveClientMixin {
-  List<dynamic> _tracks    = [];
-  bool _loading            = true;
-  bool _loadingMore        = false;
-  bool _exhausted          = false;
+  List<dynamic> _tracks = [];
+  bool _loading         = true;
+  bool _loadingMore     = false;
+  bool _exhausted       = false;
   String? _error;
-  int _page                = 1;
+  int _page             = 1;
   Map<String, dynamic>? _nowPlaying;
 
-  // ── Filtre de dates ────────────────────────────────
-  String          _preset      = 'all';   // 'all' | 'today' | '7d' | '30d' | 'month' | 'custom'
-  DateTimeRange?  _customRange;
-
-  static const _presets = [
-    ('all',    'Tout',        null),
-    ('today',  "Aujourd'hui", null),
-    ('7d',     '7 jours',     null),
-    ('30d',    '30 jours',    null),
-    ('month',  'Ce mois',     null),
-    ('custom', 'Personnalisé', null),
-  ];
+  String         _preset      = 'all';
+  DateTimeRange? _customRange;
 
   @override
   bool get wantKeepAlive => true;
@@ -1681,14 +1569,12 @@ class _HistoryPageState extends State<_HistoryPage>
     _load(reset: true);
   }
 
-  /// Calcule from/to en Unix timestamp selon le preset sélectionné.
   (int?, int?) _getRange() {
     final now = DateTime.now();
     switch (_preset) {
       case 'today':
-        final start = DateTime(now.year, now.month, now.day);
-        return (start.millisecondsSinceEpoch ~/ 1000,
-                now.millisecondsSinceEpoch   ~/ 1000);
+        final s = DateTime(now.year, now.month, now.day);
+        return (s.millisecondsSinceEpoch ~/ 1000, now.millisecondsSinceEpoch ~/ 1000);
       case '7d':
         return (now.subtract(const Duration(days: 7)).millisecondsSinceEpoch ~/ 1000,
                 now.millisecondsSinceEpoch ~/ 1000);
@@ -1696,16 +1582,13 @@ class _HistoryPageState extends State<_HistoryPage>
         return (now.subtract(const Duration(days: 30)).millisecondsSinceEpoch ~/ 1000,
                 now.millisecondsSinceEpoch ~/ 1000);
       case 'month':
-        final start = DateTime(now.year, now.month, 1);
-        return (start.millisecondsSinceEpoch ~/ 1000,
-                now.millisecondsSinceEpoch   ~/ 1000);
+        final s = DateTime(now.year, now.month, 1);
+        return (s.millisecondsSinceEpoch ~/ 1000, now.millisecondsSinceEpoch ~/ 1000);
       case 'custom':
         if (_customRange != null) {
           return (
             _customRange!.start.millisecondsSinceEpoch ~/ 1000,
-            _customRange!.end
-                .add(const Duration(days: 1))
-                .millisecondsSinceEpoch ~/ 1000,
+            _customRange!.end.add(const Duration(days: 1)).millisecondsSinceEpoch ~/ 1000,
           );
         }
         return (null, null);
@@ -1716,31 +1599,18 @@ class _HistoryPageState extends State<_HistoryPage>
 
   Future<void> _load({bool reset = false}) async {
     if (reset) {
-      setState(() {
-        _loading    = true;
-        _error      = null;
-        _page       = 1;
-        _exhausted  = false;
-        _tracks     = [];
-      });
+      setState(() { _loading = true; _error = null; _page = 1; _exhausted = false; _tracks = []; });
     } else {
       if (_loadingMore || _exhausted) return;
       setState(() => _loadingMore = true);
     }
-
     try {
       final (from, to) = _getRange();
-      final data  = await widget.service.getRecentTracks(
-        limit: 50,
-        page:  _page,
-        from:  from,
-        to:    to,
-      );
+      final data  = await widget.service.getRecentTracks(limit: 50, page: _page, from: from, to: to);
       final raw   = data['track'];
       final fresh = raw is List ? raw : (raw != null ? [raw] : <dynamic>[]);
       final attr  = data['@attr'] as Map?;
-      final totalP =
-          int.tryParse(attr?['totalPages']?.toString() ?? '1') ?? 1;
+      final totalP = int.tryParse(attr?['totalPages']?.toString() ?? '1') ?? 1;
 
       Map<String, dynamic>? np;
       final list = <dynamic>[];
@@ -1751,24 +1621,15 @@ class _HistoryPageState extends State<_HistoryPage>
           list.add(t);
         }
       }
-
       setState(() {
-        if (reset) {
-          _tracks = list;
-        } else {
-          _tracks.addAll(list);
-        }
+        if (reset) _tracks = list; else _tracks.addAll(list);
         _nowPlaying  = reset ? np : (_nowPlaying ?? np);
         _exhausted   = _page >= totalP;
         _loading     = false;
         _loadingMore = false;
       });
     } catch (e) {
-      setState(() {
-        _error       = e.toString().replaceFirst('Exception: ', '');
-        _loading     = false;
-        _loadingMore = false;
-      });
+      setState(() { _error = e.toString().replaceFirst('Exception: ', ''); _loading = false; _loadingMore = false; });
     }
   }
 
@@ -1778,33 +1639,20 @@ class _HistoryPageState extends State<_HistoryPage>
       context: context,
       firstDate: DateTime(now.year - 5),
       lastDate:  now,
-      initialDateRange: _customRange ??
-          DateTimeRange(
-            start: now.subtract(const Duration(days: 7)),
-            end:   now,
-          ),
-      helpText:        'Sélectionner une plage',
-      cancelText:      'Annuler',
-      confirmText:     'Valider',
-      saveText:        'Valider',
-      fieldStartHintText: 'Début',
-      fieldEndHintText:   'Fin',
+      initialDateRange: _customRange ?? DateTimeRange(
+          start: now.subtract(const Duration(days: 7)), end: now),
+      helpText: 'Sélectionner une plage',
+      cancelText: 'Annuler',
+      confirmText: 'Valider',
     );
-
     if (range != null) {
-      setState(() {
-        _customRange = range;
-        _preset      = 'custom';
-      });
+      setState(() { _customRange = range; _preset = 'custom'; });
       _load(reset: true);
     }
   }
 
   void _selectPreset(String preset) {
-    if (preset == 'custom') {
-      _pickCustomRange();
-      return;
-    }
+    if (preset == 'custom') { _pickCustomRange(); return; }
     if (_preset == preset) return;
     setState(() => _preset = preset);
     _load(reset: true);
@@ -1828,133 +1676,86 @@ class _HistoryPageState extends State<_HistoryPage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── En-tête ──
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text('Historique',
-                        style: text.headlineSmall
-                            ?.copyWith(fontWeight: FontWeight.w800)),
-                  ),
-                  if (_preset != 'all')
-                    IconButton(
-                      icon: const Icon(Icons.filter_alt_off_rounded),
-                      tooltip: 'Réinitialiser le filtre',
-                      onPressed: () => _selectPreset('all'),
-                    ),
-                  IconButton(
-                    icon: const Icon(Icons.refresh_rounded),
-                    onPressed: () => _load(reset: true),
-                    tooltip: 'Rafraîchir',
-                  ),
-                ],
-              ),
+              child: Row(children: [
+                Expanded(child: Text('Historique',
+                    style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800))),
+                if (_preset != 'all')
+                  IconButton(icon: const Icon(Icons.filter_alt_off_rounded),
+                      tooltip: 'Réinitialiser', onPressed: () => _selectPreset('all')),
+                IconButton(icon: const Icon(Icons.refresh_rounded),
+                    onPressed: () => _load(reset: true)),
+              ]),
             ),
 
-            // ── Pillules de date ──
             SizedBox(
               height: 44,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
                 children: [
-                  // Presets standard
-                  for (final p in _presets.take(5))
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: FilterChip(
-                        label: Text(p.$1 == 'all' ? 'Tout' : p.$2),
-                        selected: _preset == p.$1,
-                        onSelected: (_) => _selectPreset(p.$1),
-                        showCheckmark: false,
-                      ),
-                    ),
-                  // Personnalisé (avec icône calendrier)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
+                  for (final (k, l) in const [
+                    ('all',   'Tout'),
+                    ('today', "Aujourd'hui"),
+                    ('7d',    '7 jours'),
+                    ('30d',   '30 jours'),
+                    ('month', 'Ce mois'),
+                  ])
+                    Padding(padding: const EdgeInsets.only(right: 8),
+                        child: FilterChip(label: Text(l), selected: _preset == k,
+                            onSelected: (_) => _selectPreset(k), showCheckmark: false)),
+                  Padding(padding: const EdgeInsets.only(right: 8),
                     child: FilterChip(
-                      label: Text(_preset == 'custom'
-                          ? _customLabel
-                          : 'Personnalisé'),
+                      label: Text(_preset == 'custom' ? _customLabel : 'Personnalisé'),
                       selected: _preset == 'custom',
-                      avatar: Icon(Icons.date_range_rounded,
-                          size: 16,
+                      avatar: Icon(Icons.date_range_rounded, size: 16,
                           color: _preset == 'custom'
-                              ? scheme.onSecondaryContainer
-                              : scheme.onSurfaceVariant),
+                              ? scheme.onSecondaryContainer : scheme.onSurfaceVariant),
                       onSelected: (_) => _pickCustomRange(),
                       showCheckmark: false,
-                    ),
-                  ),
+                    )),
                 ],
               ),
             ),
 
-            // ── Résumé de la plage active ──
-            if (_preset != 'all')
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
-                child: Text(
-                  _presetDescription(),
-                  style: text.bodySmall
-                      ?.copyWith(color: scheme.onSurfaceVariant),
-                ),
-              ),
-
             const Divider(height: 12),
 
-            // ── Liste ──
             if (_loading)
-              const Expanded(
-                  child: Center(child: CircularProgressIndicator()))
+              const Expanded(child: Center(child: CircularProgressIndicator()))
             else if (_error != null)
-              Expanded(
-                  child: _ErrorView(
-                      message: _error!,
-                      onRetry: () => _load(reset: true)))
+              Expanded(child: _ErrorView(message: _error!, onRetry: () => _load(reset: true)))
             else
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () => _load(reset: true),
                   child: NotificationListener<ScrollNotification>(
                     onNotification: (n) {
-                      if (!_exhausted &&
-                          !_loadingMore &&
-                          n.metrics.pixels >=
-                              n.metrics.maxScrollExtent - 300) {
+                      if (!_exhausted && !_loadingMore &&
+                          n.metrics.pixels >= n.metrics.maxScrollExtent - 300) {
                         _page++;
                         _load();
                       }
                       return false;
                     },
                     child: _tracks.isEmpty
-                        ? Center(
-                            child: Text('Aucune écoute sur cette période.',
-                                style: TextStyle(
-                                    color: scheme.onSurfaceVariant)))
+                        ? Center(child: Text('Aucune écoute sur cette période.',
+                            style: TextStyle(color: scheme.onSurfaceVariant)))
                         : ListView.builder(
-                            itemCount:
-                                (_nowPlaying != null ? 1 : 0) +
-                                    _tracks.length +
-                                    (_loadingMore ? 1 : 0),
+                            itemCount: (_nowPlaying != null ? 1 : 0)
+                                + _tracks.length
+                                + (_loadingMore ? 1 : 0),
                             itemBuilder: (_, i) {
                               if (_nowPlaying != null && i == 0) {
                                 return Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(12, 4, 12, 8),
+                                  padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
                                   child: _NowPlayingCard(track: _nowPlaying!),
                                 );
                               }
-                              final idx =
-                                  _nowPlaying != null ? i - 1 : i;
+                              final idx = _nowPlaying != null ? i - 1 : i;
                               if (idx == _tracks.length) {
-                                return const Padding(
-                                    padding: EdgeInsets.all(16),
-                                    child: Center(
-                                        child: CircularProgressIndicator()));
+                                return const Padding(padding: EdgeInsets.all(16),
+                                    child: Center(child: CircularProgressIndicator()));
                               }
                               final t      = _tracks[idx] as Map;
                               final title  = (t['name']             ?? '').toString();
@@ -1967,30 +1768,17 @@ class _HistoryPageState extends State<_HistoryPage>
                                 contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 2),
                                 leading: _SmartImage(
-                                  size: 46,
-                                  borderRadius: 6,
-                                  initialUrl: rawUrl,
-                                  resolver: () => ImageService.resolveTrack(
-                                      title, artist,
-                                      lastfmUrl:
-                                          rawUrl.isNotEmpty ? rawUrl : null),
+                                  size: 46, borderRadius: 6, initialUrl: rawUrl,
+                                  resolver: () => ImageService.resolveTrack(title, artist,
+                                      lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null),
                                 ),
-                                title: Text(title,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: text.bodyMedium
-                                        ?.copyWith(fontWeight: FontWeight.w600)),
-                                subtitle: Text(
-                                    album.isNotEmpty
-                                        ? '$artist · $album'
-                                        : artist,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: text.bodySmall?.copyWith(
-                                        color: scheme.onSurfaceVariant)),
+                                title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis,
+                                    style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                                subtitle: Text(album.isNotEmpty ? '$artist · $album' : artist,
+                                    maxLines: 1, overflow: TextOverflow.ellipsis,
+                                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                                 trailing: Text(_formatDate(dateRaw),
-                                    style: text.labelSmall?.copyWith(
-                                        color: scheme.onSurfaceVariant)),
+                                    style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
                               );
                             },
                           ),
@@ -2002,36 +1790,11 @@ class _HistoryPageState extends State<_HistoryPage>
       ),
     );
   }
-
-  String _presetDescription() {
-    final now = DateTime.now();
-    switch (_preset) {
-      case 'today':
-        return "Aujourd'hui (${now.day}/${now.month}/${now.year})";
-      case '7d':
-        final from = now.subtract(const Duration(days: 7));
-        return 'Du ${from.day}/${from.month} au ${now.day}/${now.month}';
-      case '30d':
-        final from = now.subtract(const Duration(days: 30));
-        return 'Du ${from.day}/${from.month} au ${now.day}/${now.month}';
-      case 'month':
-        return 'Ce mois-ci (${now.month}/${now.year})';
-      case 'custom':
-        if (_customRange != null) {
-          final s = _customRange!.start;
-          final e = _customRange!.end;
-          return 'Du ${s.day}/${s.month}/${s.year} au ${e.day}/${e.month}/${e.year}';
-        }
-        return 'Plage personnalisée';
-      default:
-        return '';
-    }
-  }
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
 // PARAMÈTRES
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
 
 const _kAccentOptions = [
   (Color(0xFF7C3AED), 'purple', 'Violet'),
@@ -2043,10 +1806,10 @@ const _kAccentOptions = [
 ];
 
 const _kStartupLabels = [
-  (Icons.dashboard_rounded,   'Dashboard'),
-  (Icons.leaderboard_rounded, 'Classements'),
-  (Icons.bar_chart_rounded,   'Graphiques'),
-  (Icons.history_rounded,     'Historique'),
+  (Icons.dashboard_rounded,    'Dashboard'),
+  (Icons.emoji_events_rounded, 'Classements'),
+  (Icons.auto_graph_rounded,   'Graphiques'),
+  (Icons.history_rounded,      'Historique'),
 ];
 
 class _SettingsPage extends StatefulWidget {
@@ -2058,27 +1821,22 @@ class _SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<_SettingsPage> {
-  // Apparence
-  String _theme           = 'system';
-  String _accent          = 'purple';
-  bool   _useDynamicColor = false;
+  String _theme              = 'system';
+  String _accent             = 'purple';
+  bool   _useDynamicColor    = false;
   bool   _useNowPlayingColor = false;
-  int    _startupTab      = 0;
-
-  // Dashboard
-  String _greeting        = 'Bonjour';
-  bool   _showNowPlay     = true;
-  bool   _showStats       = true;
-  bool   _showArtists     = true;
-  bool   _showTracks      = true;
-  String _artistPeriod    = 'overall';
-  String _trackPeriod     = '7day';
-
-  // Mises à jour
-  bool        _autoUpdate     = true;
+  int    _startupTab         = 0;
+  String _greeting           = 'Bonjour';
+  bool   _showNowPlay        = true;
+  bool   _showStats          = true;
+  bool   _showArtists        = true;
+  bool   _showTracks         = true;
+  String _artistPeriod       = 'overall';
+  String _trackPeriod        = '7day';
+  bool   _autoUpdate         = true;
   UpdateInfo? _updateInfo;
-  bool        _checkingUpdate = false;
-  String?     _updateError;
+  bool   _checkingUpdate     = false;
+  String? _updateError;
 
   @override
   void initState() {
@@ -2110,8 +1868,8 @@ class _SettingsPageState extends State<_SettingsPage> {
     if (!_autoUpdate) return;
     final prefs     = await SharedPreferences.getInstance();
     final lastCheck = prefs.getInt('ls_last_update_check') ?? 0;
-    final now       = DateTime.now().millisecondsSinceEpoch;
-    if (now - lastCheck < const Duration(days: 1).inMilliseconds) return;
+    if (DateTime.now().millisecondsSinceEpoch - lastCheck <
+        const Duration(days: 1).inMilliseconds) return;
     await _checkUpdate(auto: true);
   }
 
@@ -2122,17 +1880,10 @@ class _SettingsPageState extends State<_SettingsPage> {
       final info = await UpdateService.checkForUpdate();
       if (!mounted) return;
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('ls_last_update_check',
-          DateTime.now().millisecondsSinceEpoch);
-      setState(() {
-        _updateInfo     = info;
-        _checkingUpdate = false;
-      });
+      await prefs.setInt('ls_last_update_check', DateTime.now().millisecondsSinceEpoch);
+      setState(() { _updateInfo = info; _checkingUpdate = false; });
     } catch (_) {
-      if (mounted) setState(() {
-        _updateError    = 'Vérification impossible.';
-        _checkingUpdate = false;
-      });
+      if (mounted) setState(() { _updateError = 'Vérification impossible.'; _checkingUpdate = false; });
     }
   }
 
@@ -2143,23 +1894,16 @@ class _SettingsPageState extends State<_SettingsPage> {
     if (value is int)    await prefs.setInt(key, value);
   }
 
-  Future<void> _setTheme(String value) async {
-    await _setPref('ls_theme', value);
-    setState(() => _theme = value);
-    themeModeNotifier.value = themeFromString(value);
+  Future<void> _setTheme(String v) async {
+    await _setPref('ls_theme', v);
+    setState(() => _theme = v);
+    themeModeNotifier.value = themeFromString(v);
   }
 
   Future<void> _setAccent(String key, Color color) async {
     await _setPref('ls_accent', key);
     setState(() => _accent = key);
-    if (!_useDynamicColor && !_useNowPlayingColor) {
-      accentNotifier.value = color;
-    }
-  }
-
-  Future<void> _setStartupTab(int idx) async {
-    await _setPref('ls_startup_tab', idx);
-    setState(() => _startupTab = idx);
+    if (!_useDynamicColor && !_useNowPlayingColor) accentNotifier.value = color;
   }
 
   void _pickGreeting() {
@@ -2168,37 +1912,21 @@ class _SettingsPageState extends State<_SettingsPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Salutation'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Wrap(
-              spacing: 8, runSpacing: 8,
-              children: _kGreetingOptions.map((g) => ActionChip(
-                label: Text(g),
-                onPressed: () { ctrl.text = g; },
-              )).toList(),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: ctrl,
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          Wrap(spacing: 8, runSpacing: 8,
+            children: _kGreetingOptions.map((g) => ActionChip(
+                label: Text(g), onPressed: () { ctrl.text = g; })).toList()),
+          const SizedBox(height: 12),
+          TextField(controller: ctrl,
               decoration: const InputDecoration(
-                labelText: 'Ou saisir librement',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ],
-        ),
+                  labelText: 'Ou saisir librement', border: OutlineInputBorder())),
+        ]),
         actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Annuler')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Annuler')),
           FilledButton(
             onPressed: () async {
               final v = ctrl.text.trim();
-              if (v.isNotEmpty) {
-                await _setPref('ls_greeting', v);
-                setState(() => _greeting = v);
-              }
+              if (v.isNotEmpty) { await _setPref('ls_greeting', v); setState(() => _greeting = v); }
               if (ctx.mounted) Navigator.pop(ctx);
             },
             child: const Text('Valider'),
@@ -2217,197 +1945,125 @@ class _SettingsPageState extends State<_SettingsPage> {
       child: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          Text('Paramètres',
-              style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
+          Text('Paramètres', style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 20),
 
-          // ── Bannière mise à jour ──
           if (_updateInfo != null) ...[
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: scheme.tertiaryContainer,
-                borderRadius: BorderRadius.circular(16),
-              ),
+              decoration: BoxDecoration(color: scheme.tertiaryContainer,
+                  borderRadius: BorderRadius.circular(16)),
               child: Row(children: [
-                Icon(Icons.system_update_rounded,
-                    color: scheme.onTertiaryContainer, size: 28),
+                Icon(Icons.system_update_rounded, color: scheme.onTertiaryContainer, size: 28),
                 const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Mise à jour — v${_updateInfo!.version}',
-                          style: text.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: scheme.onTertiaryContainer)),
-                      if (_updateInfo!.notes.isNotEmpty)
-                        Text(
-                          _updateInfo!.notes.length > 120
-                              ? '${_updateInfo!.notes.substring(0, 120)}…'
-                              : _updateInfo!.notes,
-                          style: text.bodySmall?.copyWith(
-                              color: scheme.onTertiaryContainer
-                                  .withValues(alpha: 0.8)),
-                        ),
-                    ],
-                  ),
-                ),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('Mise à jour — v${_updateInfo!.version}',
+                      style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w700,
+                          color: scheme.onTertiaryContainer)),
+                  if (_updateInfo!.notes.isNotEmpty)
+                    Text(_updateInfo!.notes.length > 120
+                        ? '${_updateInfo!.notes.substring(0, 120)}…' : _updateInfo!.notes,
+                        style: text.bodySmall?.copyWith(
+                            color: scheme.onTertiaryContainer.withValues(alpha: 0.8))),
+                ])),
                 const SizedBox(width: 8),
                 FilledButton(
                   onPressed: () async {
                     final url = Uri.parse(_updateInfo!.hasApk
-                        ? _updateInfo!.apkUrl!
-                        : _updateInfo!.releaseUrl);
+                        ? _updateInfo!.apkUrl! : _updateInfo!.releaseUrl);
                     if (await canLaunchUrl(url)) {
-                      await launchUrl(url,
-                          mode: LaunchMode.externalApplication);
+                      await launchUrl(url, mode: LaunchMode.externalApplication);
                     }
                   },
                   style: FilledButton.styleFrom(
-                    backgroundColor: scheme.tertiary,
-                    foregroundColor: scheme.onTertiary,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 8),
-                    textStyle: text.labelMedium,
-                  ),
-                  child:
-                      Text(_updateInfo!.hasApk ? 'Télécharger' : 'Voir'),
+                      backgroundColor: scheme.tertiary, foregroundColor: scheme.onTertiary,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      textStyle: text.labelMedium),
+                  child: Text(_updateInfo!.hasApk ? 'Télécharger' : 'Voir'),
                 ),
               ]),
             ),
             const SizedBox(height: 16),
           ],
 
-          // ════════════════════
-          // APPARENCE — THÈME
-          // ════════════════════
+          // APPARENCE
           _SettingsSection(label: 'Apparence', children: [
-
-            // Thème
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(children: [
-                    Icon(Icons.contrast_rounded, size: 18, color: scheme.primary),
-                    const SizedBox(width: 8),
-                    Text('Thème',
-                        style: text.bodyMedium
-                            ?.copyWith(fontWeight: FontWeight.w600)),
-                  ]),
-                  const SizedBox(height: 10),
-                  SegmentedButton<String>(
-                    segments: const [
-                      ButtonSegment(
-                          value: 'system',
-                          icon: Icon(Icons.brightness_auto_rounded),
-                          label: Text('Auto')),
-                      ButtonSegment(
-                          value: 'light',
-                          icon: Icon(Icons.light_mode_rounded),
-                          label: Text('Clair')),
-                      ButtonSegment(
-                          value: 'dark',
-                          icon: Icon(Icons.dark_mode_rounded),
-                          label: Text('Sombre')),
-                    ],
-                    selected: {_theme},
-                    onSelectionChanged: (s) => _setTheme(s.first),
-                    style: const ButtonStyle(
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                  ),
-                ],
-              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Icon(Icons.contrast_rounded, size: 18, color: scheme.primary),
+                  const SizedBox(width: 8),
+                  Text('Thème', style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                ]),
+                const SizedBox(height: 10),
+                SegmentedButton<String>(
+                  segments: const [
+                    ButtonSegment(value: 'system', icon: Icon(Icons.brightness_auto_rounded), label: Text('Auto')),
+                    ButtonSegment(value: 'light',  icon: Icon(Icons.light_mode_rounded),       label: Text('Clair')),
+                    ButtonSegment(value: 'dark',   icon: Icon(Icons.dark_mode_rounded),        label: Text('Sombre')),
+                  ],
+                  selected: {_theme},
+                  onSelectionChanged: (s) => _setTheme(s.first),
+                  style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                ),
+              ]),
             ),
-
             const Divider(height: 1, indent: 16, endIndent: 16),
-
-            // Couleur d'accent (désactivée si dynamic color actif)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(children: [
-                    Icon(Icons.palette_rounded, size: 18, color: scheme.primary),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Icon(Icons.palette_rounded, size: 18, color: scheme.primary),
+                  const SizedBox(width: 8),
+                  Text("Couleur d'accent", style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                  if (_useDynamicColor || _useNowPlayingColor) ...[
                     const SizedBox(width: 8),
-                    Text("Couleur d'accent",
-                        style: text.bodyMedium
-                            ?.copyWith(fontWeight: FontWeight.w600)),
-                    if (_useDynamicColor || _useNowPlayingColor) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: scheme.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text('Auto',
-                            style: text.labelSmall
-                                ?.copyWith(color: scheme.onSurfaceVariant)),
-                      ),
-                    ],
-                  ]),
-                  const SizedBox(height: 12),
-                  Opacity(
-                    opacity: (_useDynamicColor || _useNowPlayingColor) ? 0.35 : 1.0,
-                    child: Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: _kAccentOptions.map((opt) {
-                        final (color, key, label) = opt;
-                        final selected = _accent == key;
-                        return GestureDetector(
-                          onTap: (_useDynamicColor || _useNowPlayingColor)
-                              ? null
-                              : () => _setAccent(key, color),
-                          child: Tooltip(
-                            message: label,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              width: 36, height: 36,
-                              decoration: BoxDecoration(
-                                color: color,
-                                shape: BoxShape.circle,
-                                border: selected
-                                    ? Border.all(
-                                        color: scheme.onSurface, width: 3)
-                                    : Border.all(
-                                        color: Colors.transparent, width: 3),
-                                boxShadow: selected
-                                    ? [
-                                        BoxShadow(
-                                            color: color.withValues(alpha: 0.5),
-                                            blurRadius: 8)
-                                      ]
-                                    : [],
-                              ),
-                              child: selected
-                                  ? const Icon(Icons.check_rounded,
-                                      color: Colors.white, size: 18)
-                                  : null,
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(color: scheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(8)),
+                      child: Text('Auto', style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
                     ),
+                  ],
+                ]),
+                const SizedBox(height: 12),
+                Opacity(
+                  opacity: (_useDynamicColor || _useNowPlayingColor) ? 0.35 : 1.0,
+                  child: Wrap(spacing: 10, runSpacing: 10,
+                    children: _kAccentOptions.map((opt) {
+                      final (color, key, label) = opt;
+                      final sel = _accent == key;
+                      return GestureDetector(
+                        onTap: (_useDynamicColor || _useNowPlayingColor) ? null : () => _setAccent(key, color),
+                        child: Tooltip(message: label,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: 36, height: 36,
+                            decoration: BoxDecoration(
+                              color: color, shape: BoxShape.circle,
+                              border: sel
+                                  ? Border.all(color: scheme.onSurface, width: 3)
+                                  : Border.all(color: Colors.transparent, width: 3),
+                              boxShadow: sel
+                                  ? [BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 8)]
+                                  : [],
+                            ),
+                            child: sel ? const Icon(Icons.check_rounded, color: Colors.white, size: 18) : null,
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
-                ],
-              ),
+                ),
+              ]),
             ),
           ]),
 
           const SizedBox(height: 16),
 
-          // ════════════════════
           // COULEUR DYNAMIQUE
-          // ════════════════════
           _SettingsSection(label: 'Couleur dynamique', children: [
-
-            // Material You
             SwitchListTile(
               secondary: Icon(Icons.colorize_rounded, color: scheme.primary),
               title: const Text('Material You'),
@@ -2415,237 +2071,135 @@ class _SettingsPageState extends State<_SettingsPage> {
               value: _useDynamicColor,
               onChanged: (v) async {
                 await _setPref('ls_use_dynamic_color', v);
-                setState(() {
-                  _useDynamicColor = v;
-                  if (v) _useNowPlayingColor = false;
-                });
-                useDynamicColorNotifier.value  = v;
+                setState(() { _useDynamicColor = v; if (v) _useNowPlayingColor = false; });
+                useDynamicColorNotifier.value    = v;
                 useNowPlayingColorNotifier.value = false;
                 if (!v) accentNotifier.value = accentFromString(_accent);
               },
             ),
-
             const Divider(height: 1, indent: 16, endIndent: 16),
-
-            // Couleur depuis la musique
             SwitchListTile(
               secondary: Icon(Icons.album_rounded,
-                  color: _useDynamicColor
-                      ? scheme.onSurfaceVariant
-                      : scheme.primary),
+                  color: _useDynamicColor ? scheme.onSurfaceVariant : scheme.primary),
               title: const Text('Couleur depuis la musique'),
-              subtitle: Text(
-                _useDynamicColor
-                    ? 'Désactiver Material You d\'abord'
-                    : 'Extrait la couleur de la pochette en cours',
-              ),
+              subtitle: Text(_useDynamicColor
+                  ? 'Désactiver Material You d\'abord'
+                  : 'Extrait la couleur de la pochette en cours'),
               value: _useNowPlayingColor,
-              onChanged: _useDynamicColor
-                  ? null
-                  : (v) async {
-                      await _setPref('ls_use_nowplaying_color', v);
-                      setState(() => _useNowPlayingColor = v);
-                      useNowPlayingColorNotifier.value = v;
-                      if (!v) accentNotifier.value = accentFromString(_accent);
-                    },
+              onChanged: _useDynamicColor ? null : (v) async {
+                await _setPref('ls_use_nowplaying_color', v);
+                setState(() => _useNowPlayingColor = v);
+                useNowPlayingColorNotifier.value = v;
+                if (!v) accentNotifier.value = accentFromString(_accent);
+              },
             ),
-
-            // Explication
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-              child: Text(
-                'Quand une musique est en lecture, sa couleur dominante remplace la couleur d\'accent.',
-                style: text.bodySmall
-                    ?.copyWith(color: scheme.onSurfaceVariant),
-              ),
+              child: Text('Quand une musique est en lecture, sa couleur dominante remplace la couleur d\'accent.',
+                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             ),
           ]),
 
           const SizedBox(height: 16),
 
-          // ════════════════════
           // PAGE DE DÉMARRAGE
-          // ════════════════════
           _SettingsSection(label: 'Page de démarrage', children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(children: [
-                    Icon(Icons.rocket_launch_rounded,
-                        size: 18, color: scheme.primary),
-                    const SizedBox(width: 8),
-                    Text("Onglet à l'ouverture",
-                        style: text.bodyMedium
-                            ?.copyWith(fontWeight: FontWeight.w600)),
-                  ]),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8, runSpacing: 8,
-                    children: _kStartupLabels.asMap().entries.map((e) {
-                      final sel = _startupTab == e.key;
-                      return FilterChip(
-                        avatar: Icon(e.value.$1, size: 16),
-                        label: Text(e.value.$2),
-                        selected: sel,
-                        onSelected: (_) => _setStartupTab(e.key),
-                        showCheckmark: false,
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Icon(Icons.rocket_launch_rounded, size: 18, color: scheme.primary),
+                  const SizedBox(width: 8),
+                  Text("Onglet à l'ouverture",
+                      style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                ]),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8, runSpacing: 8,
+                  children: _kStartupLabels.asMap().entries.map((e) => FilterChip(
+                    avatar: Icon(e.value.$1, size: 16),
+                    label: Text(e.value.$2),
+                    selected: _startupTab == e.key,
+                    onSelected: (_) async {
+                      await _setPref('ls_startup_tab', e.key);
+                      setState(() => _startupTab = e.key);
+                    },
+                    showCheckmark: false,
+                  )).toList(),
+                ),
+              ]),
             ),
           ]),
 
           const SizedBox(height: 16),
 
-          // ════════════════════
           // DASHBOARD
-          // ════════════════════
           _SettingsSection(label: 'Dashboard', children: [
-
             ListTile(
-              leading: Icon(Icons.waving_hand_rounded,
-                  color: scheme.primary, size: 22),
+              leading: Icon(Icons.waving_hand_rounded, color: scheme.primary, size: 22),
               title: const Text('Salutation'),
               subtitle: Text(_greeting),
               trailing: const Icon(Icons.chevron_right_rounded),
               onTap: _pickGreeting,
             ),
             const Divider(height: 1, indent: 16, endIndent: 16),
-
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-              child: Text('Sections visibles',
-                  style: text.bodySmall?.copyWith(
-                      color: scheme.primary, fontWeight: FontWeight.w700)),
+              child: Text('Sections visibles', style: text.bodySmall?.copyWith(
+                  color: scheme.primary, fontWeight: FontWeight.w700)),
             ),
             SwitchListTile(
               secondary: const Icon(Icons.play_circle_outline_rounded),
               title: const Text('En cours de lecture'),
               value: _showNowPlay,
-              onChanged: (v) async {
-                await _setPref('ls_show_nowplay', v);
-                setState(() => _showNowPlay = v);
-              },
+              onChanged: (v) async { await _setPref('ls_show_nowplay', v); setState(() => _showNowPlay = v); },
             ),
             SwitchListTile(
               secondary: const Icon(Icons.bar_chart_rounded),
               title: const Text('Statistiques'),
               value: _showStats,
-              onChanged: (v) async {
-                await _setPref('ls_show_stats', v);
-                setState(() => _showStats = v);
-              },
+              onChanged: (v) async { await _setPref('ls_show_stats', v); setState(() => _showStats = v); },
             ),
             SwitchListTile(
               secondary: const Icon(Icons.mic_rounded),
               title: const Text('Top Artistes'),
               value: _showArtists,
-              onChanged: (v) async {
-                await _setPref('ls_show_artists', v);
-                setState(() => _showArtists = v);
-              },
+              onChanged: (v) async { await _setPref('ls_show_artists', v); setState(() => _showArtists = v); },
             ),
             SwitchListTile(
               secondary: const Icon(Icons.music_note_rounded),
               title: const Text('Top Titres'),
               value: _showTracks,
-              onChanged: (v) async {
-                await _setPref('ls_show_tracks', v);
-                setState(() => _showTracks = v);
-              },
-            ),
-
-            const Divider(height: 1, indent: 16, endIndent: 16),
-
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-              child: Text('Périodes par défaut',
-                  style: text.bodySmall?.copyWith(
-                      color: scheme.primary, fontWeight: FontWeight.w700)),
-            ),
-            ListTile(
-              leading:
-                  Icon(Icons.mic_rounded, size: 20, color: scheme.secondary),
-              title: const Text('Artistes'),
-              trailing: Text(
-                _kPeriods.firstWhere((p) => p.$1 == _artistPeriod,
-                    orElse: () => (_artistPeriod, _artistPeriod)).$2,
-                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-              ),
-              onTap: () => _showPeriodSheet(
-                title: 'Période — Artistes',
-                current: _artistPeriod,
-                onPick: (p) async {
-                  await _setPref('ls_dash_artist_period', p);
-                  setState(() => _artistPeriod = p);
-                },
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.music_note_rounded,
-                  size: 20, color: scheme.secondary),
-              title: const Text('Titres'),
-              trailing: Text(
-                _kPeriods.firstWhere((p) => p.$1 == _trackPeriod,
-                    orElse: () => (_trackPeriod, _trackPeriod)).$2,
-                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-              ),
-              onTap: () => _showPeriodSheet(
-                title: 'Période — Titres',
-                current: _trackPeriod,
-                onPick: (p) async {
-                  await _setPref('ls_dash_track_period', p);
-                  setState(() => _trackPeriod = p);
-                },
-              ),
+              onChanged: (v) async { await _setPref('ls_show_tracks', v); setState(() => _showTracks = v); },
             ),
           ]),
 
           const SizedBox(height: 16),
 
-          // ════════════════════
           // COMPTE
-          // ════════════════════
           _SettingsSection(label: 'Compte', children: [
             ListTile(
               leading: CircleAvatar(
                 backgroundColor: scheme.primaryContainer,
-                child: Text(
-                  widget.username.isNotEmpty
-                      ? widget.username[0].toUpperCase() : '?',
-                  style: TextStyle(
-                    color: scheme.onPrimaryContainer,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
+                child: Text(widget.username.isNotEmpty ? widget.username[0].toUpperCase() : '?',
+                    style: TextStyle(color: scheme.onPrimaryContainer, fontWeight: FontWeight.w700)),
               ),
-              title: Text(widget.username,
-                  style: const TextStyle(fontWeight: FontWeight.w600)),
+              title: Text(widget.username, style: const TextStyle(fontWeight: FontWeight.w600)),
               subtitle: const Text('Profil Last.fm connecté'),
             ),
             const Divider(height: 1, indent: 16, endIndent: 16),
             ListTile(
               leading: Icon(Icons.logout_rounded, color: scheme.error),
-              title: Text('Se déconnecter',
-                  style: TextStyle(color: scheme.error)),
+              title: Text('Se déconnecter', style: TextStyle(color: scheme.error)),
               onTap: () async {
                 final ok = await showDialog<bool>(
                   context: context,
                   builder: (ctx) => AlertDialog(
                     title: const Text('Se déconnecter ?'),
-                    content: const Text(
-                        'Tes identifiants seront supprimés de l\'appareil.'),
+                    content: const Text('Tes identifiants seront supprimés de l\'appareil.'),
                     actions: [
-                      TextButton(
-                          onPressed: () => Navigator.pop(ctx, false),
-                          child: const Text('Annuler')),
-                      FilledButton(
-                          onPressed: () => Navigator.pop(ctx, true),
-                          child: const Text('Déconnecter')),
+                      TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Annuler')),
+                      FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Déconnecter')),
                     ],
                   ),
                 );
@@ -2655,10 +2209,7 @@ class _SettingsPageState extends State<_SettingsPage> {
                   await prefs.remove('ls_apikey');
                   if (mounted) {
                     Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                          builder: (_) => const SetupScreen()),
-                      (_) => false,
-                    );
+                        MaterialPageRoute(builder: (_) => const SetupScreen()), (_) => false);
                   }
                 }
               },
@@ -2667,33 +2218,25 @@ class _SettingsPageState extends State<_SettingsPage> {
 
           const SizedBox(height: 16),
 
-          // ════════════════════
           // MISES À JOUR
-          // ════════════════════
           _SettingsSection(label: 'Mises à jour', children: [
             SwitchListTile(
               secondary: const Icon(Icons.notifications_outlined),
               title: const Text('Vérification automatique'),
               subtitle: const Text('1 fois par jour'),
               value: _autoUpdate,
-              onChanged: (v) async {
-                await _setPref('ls_auto_update_check', v);
-                setState(() => _autoUpdate = v);
-              },
+              onChanged: (v) async { await _setPref('ls_auto_update_check', v); setState(() => _autoUpdate = v); },
             ),
             const Divider(height: 1, indent: 16, endIndent: 16),
             ListTile(
               leading: _checkingUpdate
-                  ? const SizedBox(
-                      width: 24, height: 24,
+                  ? const SizedBox(width: 24, height: 24,
                       child: CircularProgressIndicator(strokeWidth: 2))
                   : const Icon(Icons.system_update_outlined),
               title: const Text('Vérifier maintenant'),
               subtitle: _updateError != null
-                  ? Text(_updateError!,
-                      style: TextStyle(color: scheme.error))
-                  : (_updateInfo == null
-                      ? const Text("À jour")
+                  ? Text(_updateError!, style: TextStyle(color: scheme.error))
+                  : (_updateInfo == null ? const Text('À jour')
                       : Text('v${_updateInfo!.version} disponible')),
               onTap: _checkingUpdate ? null : () => _checkUpdate(),
             ),
@@ -2701,123 +2244,13 @@ class _SettingsPageState extends State<_SettingsPage> {
 
           const SizedBox(height: 16),
 
-          // ════════════════════
-          // TECHNIQUE
-          // ════════════════════
-          _SettingsSection(label: 'Technique', children: [
-
-            // Cache images
-            ListTile(
-              leading: Icon(Icons.image_outlined, color: scheme.primary),
-              title: const Text('Cache images'),
-              subtitle: Text('${ImageService.cacheSize} entrées en mémoire'),
-              trailing: TextButton(
-                onPressed: () {
-                  ImageService.clearCache();
-                  setState(() {});
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Cache images vidé.')));
-                },
-                child: const Text('Vider'),
-              ),
-            ),
-
-            const Divider(height: 1, indent: 16, endIndent: 16),
-
-            // Exporter données
-            ListTile(
-              leading: Icon(Icons.download_rounded, color: scheme.primary),
-              title: const Text('Exporter mes préférences'),
-              subtitle: const Text('Copie un résumé JSON de tes réglages'),
-              trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () async {
-                final prefs = await SharedPreferences.getInstance();
-                final keys = prefs.getKeys().where((k) => k.startsWith('ls_')).toList()..sort();
-                final map = { for (final k in keys) k: prefs.get(k) };
-                final json = map.entries.map((e) => '  "${e.key}": ${e.value is String ? '"${e.value}"' : e.value}').join(',\n');
-                final out = '{\n$json\n}';
-                // ignore: use_build_context_synchronously
-                showDialog<void>(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text('Préférences LastStats'),
-                    content: SingleChildScrollView(
-                      child: SelectableText(out,
-                          style: Theme.of(ctx).textTheme.bodySmall
-                              ?.copyWith(fontFamily: 'monospace')),
-                    ),
-                    actions: [
-                      TextButton(
-                          onPressed: () => Navigator.pop(ctx),
-                          child: const Text('Fermer')),
-                    ],
-                  ),
-                );
-              },
-            ),
-
-            const Divider(height: 1, indent: 16, endIndent: 16),
-
-            // Réinitialiser préférences
-            ListTile(
-              leading: Icon(Icons.delete_sweep_rounded, color: scheme.error),
-              title: Text('Réinitialiser les préférences',
-                  style: TextStyle(color: scheme.error)),
-              subtitle: const Text('Remet tous les réglages par défaut'),
-              onTap: () async {
-                final ok = await showDialog<bool>(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text('Réinitialiser ?'),
-                    content: const Text(
-                        'Tous tes réglages (thème, accent, dashbord…) seront remis à zéro. Ton compte ne sera pas déconnecté.'),
-                    actions: [
-                      TextButton(
-                          onPressed: () => Navigator.pop(ctx, false),
-                          child: const Text('Annuler')),
-                      FilledButton(
-                          style: FilledButton.styleFrom(
-                              backgroundColor: scheme.error,
-                              foregroundColor: scheme.onError),
-                          onPressed: () => Navigator.pop(ctx, true),
-                          child: const Text('Réinitialiser')),
-                    ],
-                  ),
-                );
-                if (ok == true) {
-                  final prefs = await SharedPreferences.getInstance();
-                  final toRemove = prefs.getKeys()
-                      .where((k) => k.startsWith('ls_') && k != 'ls_username' && k != 'ls_apikey')
-                      .toList();
-                  for (final k in toRemove) await prefs.remove(k);
-                  ImageService.clearCache();
-                  // Réappliquer les valeurs par défaut
-                  themeModeNotifier.value        = ThemeMode.system;
-                  accentNotifier.value           = const Color(0xFF7C3AED);
-                  useDynamicColorNotifier.value  = false;
-                  useNowPlayingColorNotifier.value = false;
-                  if (mounted) {
-                    setState(() {});
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Préférences réinitialisées.')));
-                  }
-                }
-              },
-            ),
-          ]),
-
-          const SizedBox(height: 16),
-
-          // ════════════════════
           // À PROPOS
-          // ════════════════════
           _SettingsSection(label: 'À propos', children: [
             ListTile(
               leading: const Icon(Icons.info_outline_rounded),
               title: const Text('Version'),
               trailing: Text(UpdateService.currentVersion,
-                  style: text.bodySmall
-                      ?.copyWith(color: scheme.onSurfaceVariant)),
+                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             ),
             const Divider(height: 1, indent: 16, endIndent: 16),
             ListTile(
@@ -2827,9 +2260,7 @@ class _SettingsPageState extends State<_SettingsPage> {
               trailing: const Icon(Icons.open_in_new_rounded, size: 16),
               onTap: () async {
                 final uri = Uri.parse('https://sanobld.github.io/LastStats');
-                if (await canLaunchUrl(uri)) {
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                }
+                if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
               },
             ),
             const Divider(height: 1, indent: 16, endIndent: 16),
@@ -2839,79 +2270,25 @@ class _SettingsPageState extends State<_SettingsPage> {
               subtitle: const Text('github.com/sanobld/LastStats'),
               trailing: const Icon(Icons.open_in_new_rounded, size: 16),
               onTap: () async {
-                final uri =
-                    Uri.parse('https://github.com/sanobld/LastStats');
-                if (await canLaunchUrl(uri)) {
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                }
+                final uri = Uri.parse('https://github.com/sanobld/LastStats');
+                if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
               },
             ),
           ]),
 
           const SizedBox(height: 24),
-          Center(
-            child: Text('LastStats Mobile v${UpdateService.currentVersion}',
-                style: text.bodySmall
-                    ?.copyWith(color: scheme.onSurfaceVariant)),
-          ),
+          Center(child: Text('LastStats Mobile v${UpdateService.currentVersion}',
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant))),
           const SizedBox(height: 8),
         ],
       ),
     );
   }
-
-  void _showPeriodSheet({
-    required String title,
-    required String current,
-    required void Function(String) onPick,
-  }) {
-    showModalBottomSheet<void>(
-      context: context,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 12),
-            Container(
-              width: 36, height: 4,
-              decoration: BoxDecoration(
-                  color: Theme.of(ctx)
-                      .colorScheme
-                      .onSurfaceVariant
-                      .withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(2)),
-            ),
-            const SizedBox(height: 12),
-            Text(title,
-                style: Theme.of(ctx)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 4),
-            ..._kPeriods.map((p) => ListTile(
-                  title: Text(p.$2),
-                  trailing: current == p.$1
-                      ? Icon(Icons.check_rounded,
-                          color: Theme.of(ctx).colorScheme.primary)
-                      : null,
-                  onTap: () {
-                    onPick(p.$1);
-                    Navigator.pop(ctx);
-                  },
-                )),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
 // WIDGETS RÉUTILISABLES
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
 
 class _SettingsSection extends StatelessWidget {
   final String label;
@@ -2922,103 +2299,69 @@ class _SettingsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 6),
-          child: Text(label.toUpperCase(),
-              style: text.labelSmall?.copyWith(
-                color:         scheme.primary,
-                fontWeight:    FontWeight.w700,
-                letterSpacing: 1.2,
-              )),
-        ),
-        Card(
-          elevation: 0,
-          color: scheme.surfaceContainerHighest,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16)),
-          child: Column(children: children),
-        ),
-      ],
-    );
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(
+        padding: const EdgeInsets.only(left: 4, bottom: 6),
+        child: Text(label.toUpperCase(),
+            style: text.labelSmall?.copyWith(
+                color: scheme.primary, fontWeight: FontWeight.w700, letterSpacing: 1.2)),
+      ),
+      Card(
+        elevation: 0, color: scheme.surfaceContainerHighest,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Column(children: children),
+      ),
+    ]);
   }
 }
 
-/// Image résolvable multi-sources via ImageService.
 class _SmartImage extends StatelessWidget {
   final String? initialUrl;
   final Future<String> Function() resolver;
   final double size;
   final double borderRadius;
 
-  const _SmartImage({
-    required this.resolver,
-    required this.size,
-    required this.borderRadius,
-    this.initialUrl,
-  });
+  const _SmartImage({required this.resolver, required this.size,
+      required this.borderRadius, this.initialUrl});
 
-  static const _placeholder = '2a96cbd8b46e442fc41c2b86b821562f';
-
+  static const _ph = '2a96cbd8b46e442fc41c2b86b821562f';
   bool get _needsResolve =>
-      initialUrl == null ||
-      initialUrl!.isEmpty ||
-      initialUrl!.contains(_placeholder);
+      initialUrl == null || initialUrl!.isEmpty || initialUrl!.contains(_ph);
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    if (!_needsResolve) return _buildImage(context, initialUrl!, scheme);
+    if (!_needsResolve) return _buildImage(initialUrl!, scheme);
     return FutureBuilder<String>(
       future: resolver(),
-      builder: (ctx, snap) {
-        if (snap.connectionState != ConnectionState.done) {
-          return _loadingBox(scheme);
-        }
+      builder: (_, snap) {
+        if (snap.connectionState != ConnectionState.done) return _loadingBox(scheme);
         final url = snap.data ?? '';
-        if (url.isEmpty) return _fallbackBox(scheme);
-        return _buildImage(context, url, scheme);
+        return url.isEmpty ? _fallbackBox(scheme) : _buildImage(url, scheme);
       },
     );
   }
 
-  Widget _buildImage(BuildContext ctx, String url, ColorScheme scheme) =>
-      ClipRRect(
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: Image.network(url,
-            width: size,
-            height: size,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => _fallbackBox(scheme)),
-      );
+  Widget _buildImage(String url, ColorScheme scheme) => ClipRRect(
+    borderRadius: BorderRadius.circular(borderRadius),
+    child: Image.network(url, width: size, height: size, fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _fallbackBox(scheme)),
+  );
 
   Widget _loadingBox(ColorScheme scheme) => ClipRRect(
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: Container(
-          width: size, height: size,
-          color: scheme.surfaceContainerHighest,
-          child: Center(
-            child: SizedBox(
-              width: size * 0.4, height: size * 0.4,
-              child: CircularProgressIndicator(
-                  strokeWidth: 1.5,
-                  color: scheme.primary.withValues(alpha: 0.5)),
-            ),
-          ),
-        ),
-      );
+    borderRadius: BorderRadius.circular(borderRadius),
+    child: Container(width: size, height: size, color: scheme.surfaceContainerHighest,
+      child: Center(child: SizedBox(width: size * 0.4, height: size * 0.4,
+          child: CircularProgressIndicator(strokeWidth: 1.5,
+              color: scheme.primary.withValues(alpha: 0.5))))),
+  );
 
   Widget _fallbackBox(ColorScheme scheme) => ClipRRect(
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: Container(
-          width: size, height: size,
-          color: scheme.surfaceContainerHighest,
-          child: Icon(Icons.music_note_rounded,
-              color: scheme.onSurfaceVariant, size: size * 0.5),
-        ),
-      );
+    borderRadius: BorderRadius.circular(borderRadius),
+    child: Container(width: size, height: size, color: scheme.surfaceContainerHighest,
+      child: Icon(Icons.music_note_rounded,
+          color: scheme.onSurfaceVariant, size: size * 0.5)),
+  );
 }
 
 class _StatCard extends StatelessWidget {
@@ -3026,35 +2369,27 @@ class _StatCard extends StatelessWidget {
   final String value;
   final String label;
   final String? sub;
-  const _StatCard(
-      {required this.icon, required this.value, required this.label, this.sub});
+  const _StatCard({required this.icon, required this.value, required this.label, this.sub});
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
     return Card(
-      elevation: 0,
-      color: scheme.primaryContainer,
+      elevation: 0, color: scheme.primaryContainer,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
+      child: Padding(padding: const EdgeInsets.all(20),
         child: Row(children: [
           Icon(icon, color: scheme.onPrimaryContainer, size: 36),
           const SizedBox(width: 16),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(value,
-                style: text.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: scheme.onPrimaryContainer)),
-            Text(label,
-                style: text.bodySmall?.copyWith(
-                    color: scheme.onPrimaryContainer.withValues(alpha: 0.8))),
+            Text(value, style: text.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w800, color: scheme.onPrimaryContainer)),
+            Text(label, style: text.bodySmall?.copyWith(
+                color: scheme.onPrimaryContainer.withValues(alpha: 0.8))),
             if (sub != null)
-              Text(sub!,
-                  style: text.bodySmall?.copyWith(
-                      color: scheme.onPrimaryContainer
-                          .withValues(alpha: 0.65))),
+              Text(sub!, style: text.bodySmall?.copyWith(
+                  color: scheme.onPrimaryContainer.withValues(alpha: 0.65))),
           ]),
         ]),
       ),
@@ -3073,47 +2408,9 @@ class _SectionHeader extends StatelessWidget {
     return Row(children: [
       Icon(icon, color: scheme.primary, size: 20),
       const SizedBox(width: 8),
-      Text(title,
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium
-              ?.copyWith(fontWeight: FontWeight.w700)),
+      Text(title, style: Theme.of(context).textTheme.titleMedium
+          ?.copyWith(fontWeight: FontWeight.w700)),
     ]);
-  }
-}
-
-class _PeriodBadge extends StatelessWidget {
-  final String label;
-  final VoidCallback onTap;
-  const _PeriodBadge({required this.label, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(
-          color: scheme.primaryContainer,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(label,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: scheme.onPrimaryContainer,
-                      fontWeight: FontWeight.w600,
-                    )),
-            const SizedBox(width: 2),
-            Icon(Icons.expand_more_rounded,
-                size: 14, color: scheme.onPrimaryContainer),
-          ],
-        ),
-      ),
-    );
   }
 }
 
@@ -3125,14 +2422,8 @@ class _ItemTile extends StatelessWidget {
   final String  rank;
   final String? plays;
 
-  const _ItemTile({
-    required this.name,
-    required this.sub,
-    required this.imageUrl,
-    required this.rank,
-    this.imageFuture,
-    this.plays,
-  });
+  const _ItemTile({required this.name, required this.sub, required this.imageUrl,
+      required this.rank, this.imageFuture, this.plays});
 
   @override
   Widget build(BuildContext context) {
@@ -3142,46 +2433,23 @@ class _ItemTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
       child: Row(children: [
-        SizedBox(
-          width: 28,
-          child: Text(rank,
-              textAlign: TextAlign.center,
-              style: text.bodySmall?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w700)),
-        ),
+        SizedBox(width: 28, child: Text(rank, textAlign: TextAlign.center,
+            style: text.bodySmall?.copyWith(
+                color: scheme.onSurfaceVariant, fontWeight: FontWeight.w700))),
         const SizedBox(width: 8),
-        _SmartImage(
-          size: 48,
-          borderRadius: 8,
-          initialUrl: imageUrl,
-          resolver: imageFuture != null
-              ? () => imageFuture!
-              : () => Future.value(''),
-        ),
+        _SmartImage(size: 48, borderRadius: 8, initialUrl: imageUrl,
+            resolver: imageFuture != null ? () => imageFuture! : () => Future.value('')),
         const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-              Text(sub,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-            ],
-          ),
-        ),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+          Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+        ])),
         if (plays != null)
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: Text(plays!,
-                style: text.bodySmall?.copyWith(
-                    color: scheme.primary, fontWeight: FontWeight.w600)),
-          ),
+          Padding(padding: const EdgeInsets.only(left: 8),
+            child: Text(plays!, style: text.bodySmall?.copyWith(
+                color: scheme.primary, fontWeight: FontWeight.w600))),
       ]),
     );
   }
@@ -3195,28 +2463,20 @@ class _ErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Icon(Icons.error_outline_rounded, size: 48, color: scheme.error),
-          const SizedBox(height: 12),
-          Text(message,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium),
-          const SizedBox(height: 16),
-          FilledButton.icon(
-            onPressed: onRetry,
-            icon: const Icon(Icons.refresh_rounded),
-            label: const Text('Réessayer'),
-          ),
-        ]),
-      ),
-    );
+    return Center(child: Padding(padding: const EdgeInsets.all(32),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Icon(Icons.error_outline_rounded, size: 48, color: scheme.error),
+        const SizedBox(height: 12),
+        Text(message, textAlign: TextAlign.center),
+        const SizedBox(height: 16),
+        FilledButton.icon(onPressed: onRetry,
+            icon: const Icon(Icons.refresh_rounded), label: const Text('Réessayer')),
+      ]),
+    ));
   }
 }
 
-// ─── Helpers ──────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 String _extractImage(dynamic images) {
   if (images == null) return '';
@@ -3224,9 +2484,7 @@ String _extractImage(dynamic images) {
   if (list.isEmpty) return '';
   try {
     final large = list.lastWhere(
-      (i) => i is Map && i['size'] == 'extralarge',
-      orElse: () => list.last,
-    );
+        (i) => i is Map && i['size'] == 'extralarge', orElse: () => list.last);
     return (large is Map ? large['#text'] ?? '' : '').toString();
   } catch (_) { return ''; }
 }
@@ -3244,23 +2502,4 @@ String _formatDate(String raw) {
     if (parts.length == 2) return '${parts[0]} · ${parts[1]}';
   } catch (_) {}
   return raw;
-}
-
-/// Gère les deux formats Last.fm pour `registered` :
-/// `#text` = date lisible ou timestamp Unix.
-String _parseRegistered(dynamic raw) {
-  if (raw == null) return '';
-  if (raw is Map) {
-    final txt = raw['#text'];
-    if (txt == null) return '';
-    final ts = int.tryParse(txt.toString());
-    if (ts != null && ts > 0) {
-      final d = DateTime.fromMillisecondsSinceEpoch(ts * 1000);
-      const months = ['', 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
-          'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
-      return '${d.day} ${months[d.month]} ${d.year}';
-    }
-    return txt.toString();
-  }
-  return raw.toString();
 }
