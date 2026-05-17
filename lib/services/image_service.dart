@@ -38,7 +38,7 @@ class ImageService {
     if (_cache.containsKey(key)) return _cache[key]!;
 
     // 1 — iTunes
-    final itunes = await _itunesSearch('$artist', 'musicArtist', 'artistTerm');
+    final itunes = await _itunesSearch(artist, 'musicArtist', 'artistTerm');
     if (itunes.isNotEmpty) return _put(key, itunes);
 
     // 2 — Deezer

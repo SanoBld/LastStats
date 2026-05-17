@@ -1,0 +1,149 @@
+name: Build LastStats (All Platforms)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  # ─── COMPILATION WINDOWS ───────────────────────────────────────────
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Build Windows avec Version Dynamique
+        shell: bash
+        run: |
+          VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //g' | cut -d'+' -f1)
+          flutter build windows --release --dart-define=APP_VERSION="$VERSION+${{ github.run_number }}"
+
+      - name: Upload Windows App
+        uses: actions/upload-artifact@v4
+        with:
+          name: laststats-windows-app
+          path: build/windows/x64/runner/Release/
+
+  # ─── COMPILATION MACOS ─────────────────────────────────────────────
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Build macOS avec Version Dynamique
+        shell: bash
+        run: |
+          VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //g' | cut -d'+' -f1)
+          flutter build macos --release --dart-define=APP_VERSION="$VERSION+${{ github.run_number }}"
+
+      - name: Upload macOS App
+        uses: actions/upload-artifact@v4
+        with:
+          name: laststats-macos-app
+          path: build/macos/Build/Products/Release/
+
+  # ─── COMPILATION LINUX ─────────────────────────────────────────────
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++6
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Build Linux avec Version Dynamique
+        shell: bash
+        run: |
+          VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //g' | cut -d'+' -f1)
+          flutter build linux --release --dart-define=APP_VERSION="$VERSION+${{ github.run_number }}"
+
+      - name: Upload Linux App
+        uses: actions/upload-artifact@v4
+        with:
+          name: laststats-linux-app
+          path: build/linux/x64/release/bundle/
+
+  # ─── COMPILATION ANDROID (APK) ─────────────────────────────────────
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - run: flutter pub get
+      
+      - name: Build APK avec Version Dynamique
+        shell: bash
+        run: |
+          VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //g' | cut -d'+' -f1)
+          flutter build apk --release --dart-define=APP_VERSION="$VERSION+${{ github.run_number }}"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: laststats-android-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  # ─── COMPILATION WEB ───────────────────────────────────────────────
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Build Web avec Version Dynamique
+        shell: bash
+        run: |
+          VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //g' | cut -d'+' -f1)
+          flutter build web --release --dart-define=APP_VERSION="$VERSION+${{ github.run_number }}"
+
+      - name: Upload Web App
+        uses: actions/upload-artifact@v4
+        with:
+          name: laststats-web-app
+          path: build/web/
