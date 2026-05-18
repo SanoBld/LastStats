@@ -1,5 +1,11 @@
 # LastStats 🎵
 
+<p align="center">
+  <img src="https://img.shields.io/github/v/release/SanoBld/LastStats-App?style=flat-square&color=7C3AED&label=Version" alt="Latest Release">
+  <img src="https://img.shields.io/github/actions/workflow/status/SanoBld/LastStats-App/build-all.yml?branch=main&style=flat-square&label=Builds" alt="Build Status">
+  <img src="https://img.shields.io/github/license/SanoBld/LastStats-App?style=flat-square&color=555555" alt="License">
+</p>
+
 A modern, multiplatform application built with **Flutter** and **Material You (M3)** to visualize, track, and analyze your listening statistics in real-time using the **Last.fm** API.
 
 ---
@@ -27,6 +33,7 @@ A modern, multiplatform application built with **Flutter** and **Material You (M
 This project uses an automated multi-platform pipeline powered by **GitHub Actions**. Every update pushed to the repository simultaneously triggers release compilations for all target environments.
 
 You can download the latest builds directly from the **Actions** tab of this repository:
+
 * 🤖 **Android:** `laststats-android-apk` (Features native adaptive icons)
 * 🪟 **Windows:** `laststats-windows-app`
 * 🌐 **Web:** `laststats-web-app`
@@ -49,7 +56,7 @@ You can download the latest builds directly from the **Actions** tab of this rep
   * `http` – Concurrent network management for REST requests.
   * `url_launcher` – External web redirection management.
 * **API Integration:** Last.fm REST API, iTunes Search API, Deezer API, and Cover Art Archive.
-* **Automation:** GitHub Actions (Unified multi-platform workflow with dynamic build-number injection)
+* **Automation:** GitHub Actions (Unified multi-platform workflow with dynamic build-number injection via `build-all.yml`)
 
 ---
 
