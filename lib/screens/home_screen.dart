@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,13 +23,29 @@ const _kPeriods = [
 const _kMonths = ['', 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
     'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
 
-// Source de l'image d'en-tête : 'none' | 'top_artist' | 'top_album' | 'top_track' | 'nowplaying'
+// Source de l'image d'en-tête
 const _kHeaderSources = [
   ('nowplaying',  'Musique en cours',  Icons.play_circle_rounded),
   ('top_track',   'Titre #1',          Icons.music_note_rounded),
   ('top_album',   'Album #1',          Icons.album_rounded),
   ('top_artist',  'Artiste #1',        Icons.mic_rounded),
+  ('custom',      'Image perso.',      Icons.image_rounded),
   ('none',        'Couleur du thème',  Icons.palette_rounded),
+];
+
+// Animations de transition pour l'en-tête
+const _kHeaderAnimations = [
+  ('none',  'Aucune',     Icons.block_rounded),
+  ('fade',  'Fondu',      Icons.opacity_rounded),
+  ('slide', 'Glissement', Icons.swap_horiz_rounded),
+  ('zoom',  'Zoom',       Icons.zoom_in_rounded),
+];
+
+// Périodes disponibles pour les sources "top_*"
+const _kHeaderPeriods = [
+  ('7day',    'Semaine'),
+  ('1month',  'Mois'),
+  ('overall', 'Tout temps'),
 ];
 
 
@@ -148,6 +165,12 @@ class _DashboardPageState extends State<_DashboardPage> {
 
   String _headerSource = 'nowplaying'; // nouvelle pref
   String _headerImageUrl = '';         // URL résolue pour le header
+  double _headerBlur = 0.0;            // intensité du flou (0–20)
+  String _headerAnimation = 'fade';   // type d'animation de transition
+  String _headerCustomUrl = '';        // URL image personnalisée
+  String _headerFallbackUrl = '';      // URL fallback si rien ne joue
+  bool   _headerFallbackEnabled = false;
+  String _headerPeriod = 'overall';   // période pour les sources top_*
   bool   _showNowPlay = true;
   bool   _showStats   = true;
   bool   _showArtists = true;
@@ -167,11 +190,17 @@ class _DashboardPageState extends State<_DashboardPage> {
     final p = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
-      _headerSource = p.getString('ls_header_source') ?? 'nowplaying';
-      _showNowPlay  = p.getBool('ls_show_nowplay')    ?? true;
-      _showStats    = p.getBool('ls_show_stats')      ?? true;
-      _showArtists  = p.getBool('ls_show_artists')    ?? true;
-      _showTracks   = p.getBool('ls_show_tracks')     ?? true;
+      _headerSource            = p.getString('ls_header_source')          ?? 'nowplaying';
+      _headerBlur              = p.getDouble('ls_header_blur')             ?? 0.0;
+      _headerAnimation         = p.getString('ls_header_animation')        ?? 'fade';
+      _headerCustomUrl         = p.getString('ls_header_custom_url')       ?? '';
+      _headerFallbackUrl       = p.getString('ls_header_fallback_url')     ?? '';
+      _headerFallbackEnabled   = p.getBool('ls_header_fallback_enabled')   ?? false;
+      _headerPeriod            = p.getString('ls_header_period')           ?? 'overall';
+      _showNowPlay             = p.getBool('ls_show_nowplay')              ?? true;
+      _showStats               = p.getBool('ls_show_stats')               ?? true;
+      _showArtists             = p.getBool('ls_show_artists')             ?? true;
+      _showTracks              = p.getBool('ls_show_tracks')              ?? true;
     });
   }
 
@@ -225,6 +254,8 @@ class _DashboardPageState extends State<_DashboardPage> {
   Future<void> _resolveHeaderImage() async {
     String url = '';
     switch (_headerSource) {
+      case 'custom':
+        url = _headerCustomUrl;
       case 'nowplaying':
         if (_nowPlaying != null) {
           final raw = _extractImage(_nowPlaying!['image']);
@@ -234,9 +265,16 @@ class _DashboardPageState extends State<_DashboardPage> {
             lastfmUrl: raw,
           );
         }
+        // Fallback quand rien ne joue
+        if (url.isEmpty && _headerFallbackEnabled && _headerFallbackUrl.isNotEmpty) {
+          url = _headerFallbackUrl;
+        }
       case 'top_track':
-        if (_topTracks.isNotEmpty) {
-          final t = _topTracks[0] as Map;
+        final tracks = _headerPeriod == 'overall'
+            ? _topTracks
+            : await widget.service.getTopTracks(period: _headerPeriod, limit: 1);
+        if (tracks.isNotEmpty) {
+          final t = tracks[0] as Map;
           url = await ImageService.resolveTrack(
             (t['name'] ?? '').toString(),
             (t['artist']?['name'] ?? '').toString(),
@@ -244,8 +282,11 @@ class _DashboardPageState extends State<_DashboardPage> {
           );
         }
       case 'top_album':
-        if (_topAlbums.isNotEmpty) {
-          final a = _topAlbums[0] as Map;
+        final albums = _headerPeriod == 'overall'
+            ? _topAlbums
+            : await widget.service.getTopAlbums(period: _headerPeriod, limit: 1);
+        if (albums.isNotEmpty) {
+          final a = albums[0] as Map;
           url = await ImageService.resolveAlbum(
             (a['name'] ?? '').toString(),
             (a['artist']?['name'] ?? '').toString(),
@@ -253,8 +294,11 @@ class _DashboardPageState extends State<_DashboardPage> {
           );
         }
       case 'top_artist':
-        if (_topArtists.isNotEmpty) {
-          final a = _topArtists[0] as Map;
+        final artists = _headerPeriod == 'overall'
+            ? _topArtists
+            : await widget.service.getTopArtists(period: _headerPeriod, limit: 1);
+        if (artists.isNotEmpty) {
+          final a = artists[0] as Map;
           url = await ImageService.resolveArtist(
             (a['name'] ?? '').toString(),
             lastfmUrl: _extractImage(a['image']),
@@ -350,15 +394,40 @@ class _DashboardPageState extends State<_DashboardPage> {
             background: Stack(
               fit: StackFit.expand,
               children: [
-                // ── Image de fond (pochette ou dégradé) ──
-                if (_headerImageUrl.isNotEmpty)
-                  Image.network(
-                    _headerImageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => _GradientHeader(scheme: scheme),
-                  )
-                else
-                  _GradientHeader(scheme: scheme),
+                // ── Image de fond (pochette ou dégradé, avec animation) ──
+                AnimatedSwitcher(
+                  duration: _headerAnimation == 'none'
+                      ? Duration.zero
+                      : const Duration(milliseconds: 700),
+                  transitionBuilder: (child, anim) {
+                    switch (_headerAnimation) {
+                      case 'slide':
+                        return SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0.06, 0),
+                            end: Offset.zero,
+                          ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
+                          child: FadeTransition(opacity: anim, child: child),
+                        );
+                      case 'zoom':
+                        return ScaleTransition(
+                          scale: Tween<double>(begin: 1.10, end: 1.0)
+                              .animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
+                          child: FadeTransition(opacity: anim, child: child),
+                        );
+                      default: // 'fade' ou autres
+                        return FadeTransition(opacity: anim, child: child);
+                    }
+                  },
+                  child: _headerImageUrl.isNotEmpty
+                      ? _BlurredHeaderImage(
+                          key: ValueKey(_headerImageUrl),
+                          url: _headerImageUrl,
+                          blur: _headerBlur,
+                          scheme: scheme,
+                        )
+                      : _GradientHeader(key: const ValueKey('gradient'), scheme: scheme),
+                ),
 
                 // ── Overlay foncé en bas pour lisibilité ──
                 Positioned(
@@ -612,7 +681,7 @@ class _DashboardPageState extends State<_DashboardPage> {
 // ─── Dégradé de fallback pour le header ──────────────────────────────────────
 class _GradientHeader extends StatelessWidget {
   final ColorScheme scheme;
-  const _GradientHeader({required this.scheme});
+  const _GradientHeader({super.key, required this.scheme});
 
   @override
   Widget build(BuildContext context) {
@@ -629,6 +698,41 @@ class _GradientHeader extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+// ─── Image d'en-tête avec flou optionnel ─────────────────────────────────────
+class _BlurredHeaderImage extends StatelessWidget {
+  final String url;
+  final double blur;
+  final ColorScheme scheme;
+  const _BlurredHeaderImage({
+    super.key,
+    required this.url,
+    required this.blur,
+    required this.scheme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Widget img = Image.network(
+      url,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      errorBuilder: (_, __, ___) => _GradientHeader(scheme: scheme),
+    );
+    if (blur > 0.5) {
+      img = ImageFiltered(
+        imageFilter: ImageFilter.blur(
+          sigmaX: blur,
+          sigmaY: blur,
+          tileMode: TileMode.clamp,
+        ),
+        child: img,
+      );
+    }
+    return img;
   }
 }
 
@@ -2321,13 +2425,29 @@ class _SettingsPageState extends State<_SettingsPage> {
   bool   _useDynamicColor = false, _useNowPlayingColor = false;
   int    _startupTab = 0;
   String _headerSource = 'nowplaying';
+  double _headerBlur = 0.0;
+  String _headerAnimation = 'fade';
+  String _headerCustomUrl = '';
+  String _headerFallbackUrl = '';
+  bool   _headerFallbackEnabled = false;
+  String _headerPeriod = 'overall';
   bool   _showNowPlay = true, _showStats = true, _showArtists = true, _showTracks = true;
   bool   _autoUpdate = true;
   UpdateInfo? _updateInfo; bool _checkingUpdate = false; String? _updateError;
 
+  final _customUrlCtrl  = TextEditingController();
+  final _fallbackUrlCtrl = TextEditingController();
+
   bool get _isCustomAccent =>
       _accent.startsWith('#') ||
       !_kAccentOptions.any((o) => o.$2 == _accent);
+
+  @override
+  void dispose() {
+    _customUrlCtrl.dispose();
+    _fallbackUrlCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() { super.initState(); _loadPrefs().then((_) => _maybeCheckUpdate()); }
@@ -2336,18 +2456,26 @@ class _SettingsPageState extends State<_SettingsPage> {
     final p = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
-      _theme             = p.getString('ls_theme')               ?? 'system';
-      _accent            = p.getString('ls_accent')              ?? 'purple';
-      _useDynamicColor   = p.getBool('ls_use_dynamic_color')     ?? false;
-      _useNowPlayingColor = p.getBool('ls_use_nowplaying_color') ?? false;
-      _startupTab         = p.getInt('ls_startup_tab')            ?? 0;
-      _headerSource       = p.getString('ls_header_source')       ?? 'nowplaying';
-      _showNowPlay        = p.getBool('ls_show_nowplay')          ?? true;
-      _showStats         = p.getBool('ls_show_stats')            ?? true;
-      _showArtists       = p.getBool('ls_show_artists')          ?? true;
-      _showTracks        = p.getBool('ls_show_tracks')           ?? true;
-      _autoUpdate        = p.getBool('ls_auto_update_check')     ?? true;
+      _theme               = p.getString('ls_theme')                    ?? 'system';
+      _accent              = p.getString('ls_accent')                   ?? 'purple';
+      _useDynamicColor     = p.getBool('ls_use_dynamic_color')          ?? false;
+      _useNowPlayingColor  = p.getBool('ls_use_nowplaying_color')       ?? false;
+      _startupTab          = p.getInt('ls_startup_tab')                 ?? 0;
+      _headerSource        = p.getString('ls_header_source')            ?? 'nowplaying';
+      _headerBlur          = p.getDouble('ls_header_blur')              ?? 0.0;
+      _headerAnimation     = p.getString('ls_header_animation')         ?? 'fade';
+      _headerCustomUrl     = p.getString('ls_header_custom_url')        ?? '';
+      _headerFallbackUrl   = p.getString('ls_header_fallback_url')      ?? '';
+      _headerFallbackEnabled = p.getBool('ls_header_fallback_enabled')  ?? false;
+      _headerPeriod        = p.getString('ls_header_period')            ?? 'overall';
+      _showNowPlay         = p.getBool('ls_show_nowplay')               ?? true;
+      _showStats           = p.getBool('ls_show_stats')                 ?? true;
+      _showArtists         = p.getBool('ls_show_artists')               ?? true;
+      _showTracks          = p.getBool('ls_show_tracks')                ?? true;
+      _autoUpdate          = p.getBool('ls_auto_update_check')          ?? true;
     });
+    _customUrlCtrl.text  = _headerCustomUrl;
+    _fallbackUrlCtrl.text = _headerFallbackUrl;
   }
 
   Future<void> _maybeCheckUpdate() async {
@@ -2646,6 +2774,11 @@ class _SettingsPageState extends State<_SettingsPage> {
               Text('La pochette choisie s\'affiche en fond de l\'accueil.',
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               const SizedBox(height: 12),
+
+              // ── Sélecteur de source ──
+              Text('Source', style: text.labelSmall?.copyWith(
+                  color: scheme.primary, fontWeight: FontWeight.w700, letterSpacing: 0.8)),
+              const SizedBox(height: 8),
               Wrap(spacing: 8, runSpacing: 8,
                 children: _kHeaderSources.map((opt) {
                   final (key, label, icon) = opt;
@@ -2662,6 +2795,183 @@ class _SettingsPageState extends State<_SettingsPage> {
                     },
                   );
                 }).toList()),
+
+              // ── URL personnalisée (si source == 'custom') ──
+              if (_headerSource == 'custom') ...[
+                const SizedBox(height: 14),
+                Text('URL de l\'image', style: text.labelSmall?.copyWith(
+                    color: scheme.primary, fontWeight: FontWeight.w700, letterSpacing: 0.8)),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _customUrlCtrl,
+                  autocorrect: false,
+                  keyboardType: TextInputType.url,
+                  textInputAction: TextInputAction.done,
+                  decoration: InputDecoration(
+                    hintText: 'https://exemple.com/image.jpg',
+                    prefixIcon: const Icon(Icons.link_rounded),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.check_circle_outline_rounded),
+                      tooltip: 'Appliquer',
+                      onPressed: () async {
+                        final url = _customUrlCtrl.text.trim();
+                        final p = await SharedPreferences.getInstance();
+                        await p.setString('ls_header_custom_url', url);
+                        setState(() => _headerCustomUrl = url);
+                      },
+                    ),
+                  ),
+                  onSubmitted: (url) async {
+                    final u = url.trim();
+                    final p = await SharedPreferences.getInstance();
+                    await p.setString('ls_header_custom_url', u);
+                    setState(() => _headerCustomUrl = u);
+                  },
+                ),
+                const SizedBox(height: 6),
+                Text('Colle l\'URL directe d\'une image (jpg, png, webp…).',
+                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              ],
+
+              // ── Période (si source top_*) ──
+              if (['top_track', 'top_album', 'top_artist'].contains(_headerSource)) ...[
+                const SizedBox(height: 14),
+                Text('Période', style: text.labelSmall?.copyWith(
+                    color: scheme.primary, fontWeight: FontWeight.w700, letterSpacing: 0.8)),
+                const SizedBox(height: 8),
+                Wrap(spacing: 8, runSpacing: 8,
+                  children: _kHeaderPeriods.map((opt) {
+                    final (key, label) = opt;
+                    return FilterChip(
+                      label: Text(label),
+                      selected: _headerPeriod == key,
+                      showCheckmark: false,
+                      onSelected: (_) async {
+                        final p = await SharedPreferences.getInstance();
+                        await p.setString('ls_header_period', key);
+                        setState(() => _headerPeriod = key);
+                      },
+                    );
+                  }).toList()),
+              ],
+
+              // ── Fallback (si source == 'nowplaying') ──
+              if (_headerSource == 'nowplaying') ...[
+                const SizedBox(height: 14),
+                Row(children: [
+                  Switch(
+                    value: _headerFallbackEnabled,
+                    onChanged: (v) async {
+                      final p = await SharedPreferences.getInstance();
+                      await p.setBool('ls_header_fallback_enabled', v);
+                      setState(() => _headerFallbackEnabled = v);
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('Image de secours', style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                    Text('Affichée si aucune musique n\'est en cours.',
+                        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                  ])),
+                ]),
+                if (_headerFallbackEnabled) ...[
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _fallbackUrlCtrl,
+                    autocorrect: false,
+                    keyboardType: TextInputType.url,
+                    textInputAction: TextInputAction.done,
+                    decoration: InputDecoration(
+                      labelText: 'URL de l\'image de secours',
+                      hintText: 'https://exemple.com/image.jpg',
+                      prefixIcon: const Icon(Icons.image_outlined),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.check_circle_outline_rounded),
+                        tooltip: 'Appliquer',
+                        onPressed: () async {
+                          final url = _fallbackUrlCtrl.text.trim();
+                          final p = await SharedPreferences.getInstance();
+                          await p.setString('ls_header_fallback_url', url);
+                          setState(() => _headerFallbackUrl = url);
+                        },
+                      ),
+                    ),
+                    onSubmitted: (url) async {
+                      final u = url.trim();
+                      final p = await SharedPreferences.getInstance();
+                      await p.setString('ls_header_fallback_url', u);
+                      setState(() => _headerFallbackUrl = u);
+                    },
+                  ),
+                ],
+              ],
+
+              const SizedBox(height: 16),
+              Divider(color: scheme.outlineVariant.withValues(alpha: 0.5)),
+              const SizedBox(height: 12),
+
+              // ── Animation de transition ──
+              Row(children: [
+                Icon(Icons.animation_rounded, size: 18, color: scheme.primary),
+                const SizedBox(width: 8),
+                Text('Transition', style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+              ]),
+              const SizedBox(height: 8),
+              Text('Animation lors du changement de pochette.',
+                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              const SizedBox(height: 10),
+              Wrap(spacing: 8, runSpacing: 8,
+                children: _kHeaderAnimations.map((opt) {
+                  final (key, label, icon) = opt;
+                  return FilterChip(
+                    avatar: Icon(icon, size: 16),
+                    label: Text(label),
+                    selected: _headerAnimation == key,
+                    showCheckmark: false,
+                    onSelected: (_) async {
+                      final p = await SharedPreferences.getInstance();
+                      await p.setString('ls_header_animation', key);
+                      setState(() => _headerAnimation = key);
+                    },
+                  );
+                }).toList()),
+
+              const SizedBox(height: 16),
+
+              // ── Flou ──
+              Row(children: [
+                Icon(Icons.blur_on_rounded, size: 18, color: scheme.primary),
+                const SizedBox(width: 8),
+                Text('Flou', style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: scheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: scheme.outlineVariant),
+                  ),
+                  child: Text(
+                    _headerBlur < 1 ? 'Aucun' : '${_headerBlur.round()}',
+                    style: text.labelMedium?.copyWith(fontFamily: 'monospace'),
+                  ),
+                ),
+              ]),
+              const SizedBox(height: 4),
+              Slider(
+                value: _headerBlur,
+                min: 0,
+                max: 20,
+                divisions: 20,
+                label: _headerBlur < 1 ? 'Aucun' : '${_headerBlur.round()}',
+                onChanged: (v) => setState(() => _headerBlur = v),
+                onChangeEnd: (v) async {
+                  final p = await SharedPreferences.getInstance();
+                  await p.setDouble('ls_header_blur', v);
+                },
+              ),
               const SizedBox(height: 10),
             ],
           )),
