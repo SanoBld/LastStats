@@ -3431,7 +3431,7 @@ class _ErrorView extends StatelessWidget {
   }
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Helper ──────────────────────────────────────────────────────────────────
 
 String _extractImage(dynamic images) {
   if (images == null) return '';
