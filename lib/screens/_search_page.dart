@@ -114,7 +114,12 @@ class _SearchPageState extends State<_SearchPage> {
       isScrollControlled: true,
       backgroundColor:    Colors.transparent,
       useSafeArea:        true,
-      builder: (_) => _FullProfileSheet(username: username, service: widget.service),
+      builder: (_) => _FullProfileSheet(
+        username:     username,
+        service:      widget.service,
+        isFav:        _favProfiles.contains(username),
+        onToggleFav:  () => _toggleFavProfile(username, !_favProfiles.contains(username)),
+      ),
     );
   }
 
@@ -399,6 +404,7 @@ class _SearchUserCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Avatar — only show the star badge if the profile is already a favourite
             SizedBox(width: 56, height: 56,
               child: Stack(children: [
                 CircleAvatar(
@@ -411,19 +417,12 @@ class _SearchUserCard extends StatelessWidget {
                         color: scheme.primary, fontWeight: FontWeight.w800),
                   ),
                 ),
-                Positioned(
-                  left: 0, top: 0,
-                  child: GestureDetector(
-                    onTap: onToggleFav,
-                    behavior: HitTestBehavior.opaque,
-                    child: Icon(
-                      isFav ? Icons.star_rounded : Icons.star_outline_rounded,
-                      size: 16,
-                      color: isFav ? Colors.amber.shade600
-                          : scheme.onSurfaceVariant.withValues(alpha: 0.55),
-                    ),
+                // Only show filled star when profile is a saved favourite (badge, no tap)
+                if (isFav)
+                  Positioned(
+                    left: 0, top: 0,
+                    child: Icon(Icons.star_rounded, size: 16, color: Colors.amber.shade600),
                   ),
-                ),
               ]),
             ),
             const SizedBox(height: 6),
@@ -453,7 +452,14 @@ class _SearchUserCard extends StatelessWidget {
 class _FullProfileSheet extends StatefulWidget {
   final String        username;
   final LastFmService service;
-  const _FullProfileSheet({required this.username, required this.service});
+  final bool          isFav;
+  final VoidCallback  onToggleFav;
+  const _FullProfileSheet({
+    required this.username,
+    required this.service,
+    required this.isFav,
+    required this.onToggleFav,
+  });
 
   @override
   State<_FullProfileSheet> createState() => _FullProfileSheetState();
@@ -464,11 +470,13 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
   List<dynamic>         _topArtists = [];
   List<dynamic>         _recent     = [];
   bool                  _loading    = true;
+  bool                  _isNowPlaying = false;   // ← green dot
+  late bool             _localIsFav;             // ← star toggle (local copy)
 
   static const _ph = '2a96cbd8b46e442fc41c2b86b821562f';
 
   @override
-  void initState() { super.initState(); _load(); }
+  void initState() { super.initState(); _localIsFav = widget.isFav; _load(); }
 
   Future<void> _load() async {
     try {
@@ -480,11 +488,15 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
       final recentRaw  = (res[2] as Map<String, dynamic>)['track'];
       final recentList = recentRaw is List ? recentRaw
           : (recentRaw != null ? [recentRaw] : <dynamic>[]);
+      // Detect now-playing: first track has @attr.nowplaying == 'true'
+      final firstTrack = recentList.isNotEmpty ? recentList.first as Map : null;
+      final isNp = firstTrack?['@attr']?['nowplaying'] == 'true';
       if (mounted) setState(() {
-        _info       = res[0] as Map<String, dynamic>?;
-        _topArtists = res[1] as List<dynamic>;
-        _recent     = recentList;
-        _loading    = false;
+        _info         = res[0] as Map<String, dynamic>?;
+        _topArtists   = res[1] as List<dynamic>;
+        _recent       = recentList;
+        _isNowPlaying = isNp;
+        _loading      = false;
       });
     } catch (_) {
       if (mounted) setState(() => _loading = false);
@@ -590,7 +602,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                       final isNp    = tMap['@attr']?['nowplaying'] == 'true';
                       final tName   = (tMap['name'] ?? '').toString();
                       final tArtist = (tMap['artist']?['#text'] ?? '').toString();
-                      final tDate   = (tMap['date']?['#text'] ?? '').toString();
+                      final tDate   = (tMap['date']?['#text'] ?? '').toString(); // kept for reference only
                       final rawUrl  = _extractImage(tMap['image']);
                       final hasImg  = rawUrl.isNotEmpty && !rawUrl.contains(_ph);
 
@@ -623,7 +635,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                         trailing: isNp
                             ? Text('EN COURS', style: text.labelSmall?.copyWith(
                                 color: Colors.green, fontWeight: FontWeight.w700))
-                            : Text(_fmtDate(tDate),
+                            : Text(_localTimeString(tMap),
                                 style: text.labelSmall?.copyWith(
                                     color: scheme.onSurfaceVariant, fontSize: 9)),
                         dense: true,
@@ -656,20 +668,63 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
       }
     }
 
-    return Row(children: [
-      CircleAvatar(
-        radius: 34,
-        backgroundColor: scheme.primaryContainer,
-        backgroundImage: _hasAvatar(avatarUrl) ? NetworkImage(avatarUrl) : null,
-        child: _hasAvatar(avatarUrl) ? null : Text(
-          name.isNotEmpty ? name[0].toUpperCase() : '?',
-          style: text.titleLarge?.copyWith(
-              color: scheme.onPrimaryContainer, fontWeight: FontWeight.w800),
+    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      // Avatar with green dot when now-playing
+      Stack(children: [
+        CircleAvatar(
+          radius: 34,
+          backgroundColor: scheme.primaryContainer,
+          backgroundImage: _hasAvatar(avatarUrl) ? NetworkImage(avatarUrl) : null,
+          child: _hasAvatar(avatarUrl) ? null : Text(
+            name.isNotEmpty ? name[0].toUpperCase() : '?',
+            style: text.titleLarge?.copyWith(
+                color: scheme.onPrimaryContainer, fontWeight: FontWeight.w800),
+          ),
         ),
-      ),
+        if (_isNowPlaying)
+          Positioned(
+            right: 2, bottom: 2,
+            child: Container(
+              width: 14, height: 14,
+              decoration: BoxDecoration(
+                color: Colors.green,
+                shape: BoxShape.circle,
+                border: Border.all(color: scheme.surface, width: 2),
+              ),
+            ),
+          ),
+      ]),
       const SizedBox(width: 16),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(name, style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+        Row(children: [
+          Expanded(
+            child: Text(name, style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+          ),
+          // ── Favourite star (only visible here, not on the search card) ──
+          GestureDetector(
+            onTap: () {
+              setState(() => _localIsFav = !_localIsFav);
+              widget.onToggleFav();
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Icon(
+                _localIsFav ? Icons.star_rounded : Icons.star_outline_rounded,
+                size: 22,
+                color: _localIsFav ? Colors.amber.shade600 : scheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ]),
+        if (_isNowPlaying) ...[ // "En cours d'écoute" badge
+          const SizedBox(height: 2),
+          Row(children: [
+            const Icon(Icons.graphic_eq_rounded, size: 12, color: Colors.green),
+            const SizedBox(width: 4),
+            Text('En cours d\'écoute',
+              style: text.bodySmall?.copyWith(color: Colors.green, fontWeight: FontWeight.w700)),
+          ]),
+        ],
         if (realName.isNotEmpty)
           Text(realName, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
         const SizedBox(height: 4),

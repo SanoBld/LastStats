@@ -133,3 +133,21 @@ String _fmtDate(String raw) {
     return parts.length == 2 ? '${parts[0]} · ${parts[1]}' : raw;
   } catch (_) { return raw; }
 }
+
+/// Converts a track's Unix timestamp (date['uts']) to the device's local time
+/// and returns "DD Mmm · HH:MM".  Falls back to _fmtDate if uts is absent.
+String _fmtTrackDateLocal(Map t) {
+  final uts = t['date']?['uts']?.toString() ?? '';
+  if (uts.isNotEmpty) {
+    final sec = int.tryParse(uts);
+    if (sec != null) {
+      final dt  = DateTime.fromMillisecondsSinceEpoch(sec * 1000); // → local
+      final mon = _kMonths[dt.month];
+      final h   = dt.hour.toString().padLeft(2, '0');
+      final m   = dt.minute.toString().padLeft(2, '0');
+      return '${dt.day} $mon · $h:$m';
+    }
+  }
+  // Fallback: reformat the raw '#text' string (UTC, kept for compatibility)
+  return _fmtDate((t['date']?['#text'] ?? '').toString());
+}

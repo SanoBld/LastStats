@@ -67,6 +67,7 @@ class _DashboardPageState extends State<_DashboardPage> {
   bool             _showFriends   = true;
   List<_FriendData> _friends      = [];
   Set<String>      _favFriends    = {};
+  Set<String>      _favProfiles   = {};  // profiles starred in search
   bool             _friendsLoading = false;
 
   @override
@@ -97,6 +98,7 @@ class _DashboardPageState extends State<_DashboardPage> {
       // Friends prefs
       _showFriends           = p.getBool('ls_show_friends')            ?? true;
       _favFriends            = Set<String>.from(p.getStringList('ls_fav_friends') ?? []);
+      _favProfiles           = Set<String>.from(p.getStringList('ls_fav_profiles') ?? []);
     });
   }
 
@@ -189,10 +191,50 @@ class _DashboardPageState extends State<_DashboardPage> {
         ));
       }
 
+      // Merge favorite profiles from search (ls_fav_profiles) that aren't
+      // already in the friends list — fetch their info and add them.
+      final existingNames = friends.map((f) => f.username.toLowerCase()).toSet();
+      for (final favUsername in _favProfiles) {
+        if (existingNames.contains(favUsername.toLowerCase())) continue;
+        try {
+          final info = await widget.service.getUserInfo(user: favUsername);
+          if (info == null) continue;
+          final uname = (info['name'] ?? favUsername).toString();
+          // Try to get most recent track for this user
+          String lastTrack = '', lastArtist = '';
+          try {
+            final recent = await widget.service.getRecentTracks(limit: 1, user: uname);
+            final tracks = recent['track'];
+            final tList  = tracks is List ? tracks : (tracks != null ? [tracks] : []);
+            if (tList.isNotEmpty) {
+              final t = tList.first as Map;
+              if (t['@attr']?['nowplaying'] != 'true') {
+                lastTrack  = (t['name'] ?? '').toString();
+                final ra   = t['artist'];
+                lastArtist = ra is Map
+                    ? (ra['#text'] ?? ra['name'] ?? '').toString()
+                    : (ra?.toString() ?? '');
+              }
+            }
+          } catch (_) {}
+          friends.add(_FriendData(
+            username:  uname,
+            realName:  (info['realname'] ?? '').toString(),
+            avatarUrl: _extractImage(info['image']),
+            isOnline:  false,
+            lastTrack:  lastTrack,
+            lastArtist: lastArtist,
+          ));
+          existingNames.add(uname.toLowerCase());
+        } catch (_) {}
+      }
+
       // Sort priority score: online+fav (3) > online (2) > offline+fav (1) > offline (0)
       friends.sort((a, b) {
-        final aScore = (a.isOnline ? 2 : 0) + (_favFriends.contains(a.username) ? 1 : 0);
-        final bScore = (b.isOnline ? 2 : 0) + (_favFriends.contains(b.username) ? 1 : 0);
+        final aFav   = _favFriends.contains(a.username) || _favProfiles.contains(a.username);
+        final bFav   = _favFriends.contains(b.username) || _favProfiles.contains(b.username);
+        final aScore = (a.isOnline ? 2 : 0) + (aFav ? 1 : 0);
+        final bScore = (b.isOnline ? 2 : 0) + (bFav ? 1 : 0);
         if (aScore != bScore) return bScore.compareTo(aScore);
         return a.username.toLowerCase().compareTo(b.username.toLowerCase());
       });
@@ -576,7 +618,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                     emoji: '⏱️',
                     value: lastTrack != null ? (lastTrack['name'] ?? '—').toString() : '—',
                     label: 'Dernière écoute',
-                    sub:   lastTrack != null ? _fmtDate(lastTrack['date']?['#text'] ?? '') : null,
+                    sub:   lastTrack != null ? _fmtTrackDateLocal(lastTrack) : null,
                   ),
                 ]),
 
@@ -588,6 +630,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                 _FriendsSection(
                   friends:     _friends,
                   favorites:   _favFriends,
+                  favProfiles: _favProfiles,
                   service:     widget.service,
                   isLoading:   _friendsLoading,
                   onToggleFav: _toggleFav,
@@ -646,6 +689,7 @@ class _DashboardPageState extends State<_DashboardPage> {
 class _FriendsSection extends StatelessWidget {
   final List<_FriendData>   friends;
   final Set<String>         favorites;
+  final Set<String>         favProfiles;   // profiles starred from search
   final LastFmService       service;
   final bool                isLoading;
   final void Function(String username, bool nowFav) onToggleFav;
@@ -654,6 +698,7 @@ class _FriendsSection extends StatelessWidget {
   const _FriendsSection({
     required this.friends,
     required this.favorites,
+    required this.favProfiles,
     required this.service,
     required this.isLoading,
     required this.onToggleFav,
@@ -732,7 +777,8 @@ class _FriendsSection extends StatelessWidget {
                     padding: EdgeInsets.zero,
                     itemBuilder: (ctx, i) {
                       final f      = friends[i];
-                      final isFav  = favorites.contains(f.username);
+                      final isFav  = favorites.contains(f.username)
+                                  || favProfiles.contains(f.username);
                       return _FriendCard(
                         friend:      f,
                         isFav:       isFav,
@@ -1232,7 +1278,7 @@ class _FriendProfileSheetState extends State<_FriendProfileSheet> {
                               color: Colors.green,
                               fontWeight: FontWeight.w700))
                       : Text(
-                          _fmtDate(tDate),
+                          _localTimeString(tMap),
                           style: text.labelSmall?.copyWith(
                               color: scheme.onSurfaceVariant,
                               fontSize: 9),

@@ -161,10 +161,27 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       int.tryParse((_info?['stats']?['playcount']  ?? _info?['playcount']  ?? '0').toString()) ?? 0;
 
   List<Map<String, dynamic>> _tags() {
-    final raw = _info?['tags']?['tag'];
-    if (raw == null) return [];
+    // Last.fm uses 'tags' for albums, 'toptags' for artists/tracks.
+    // The value can be a Map {"tag": [...]}, a direct List, or null/String.
+    final tagsField = _info?['tags'] ?? _info?['toptags'];
+    if (tagsField == null) return [];
+
+    dynamic raw;
+    if (tagsField is List) {
+      raw = tagsField; // already a flat list, no wrapper key
+    } else if (tagsField is Map) {
+      raw = tagsField['tag'];
+    } else {
+      return [];
+    }
+
+    if (raw == null || raw is String) return [];
     final list = raw is List ? raw : [raw];
-    return list.take(5).map((t) => Map<String, dynamic>.from(t as Map)).toList();
+    return list
+        .whereType<Map>()
+        .take(5)
+        .map((t) => Map<String, dynamic>.from(t))
+        .toList();
   }
 
   // Build

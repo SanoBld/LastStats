@@ -288,20 +288,49 @@ class LastFmService {
 
   // ── Global search ────────────────────────────────────────
 
-  /// Searches Last.fm users by username prefix.
-  /// Returns a list of user objects with name, image, playcount.
+  /// Searches Last.fm users by username.
+  /// Tries user.search first; falls back to user.getInfo for exact matching
+  /// (user.search is notoriously unreliable and often returns empty).
   Future<List<dynamic>> searchUsers(
     String query, {
     int limit = 15,
     int page  = 1,
   }) async {
-    final d = await _call({
-      'method': 'user.search',
-      'user':   query,
-      'limit':  '$limit',
-      'page':   '$page',
-    });
-    return _asList(d['results']?['usermatches']?['user']);
+    try {
+      final d = await _call({
+        'method': 'user.search',
+        'user':   query,
+        'limit':  '$limit',
+        'page':   '$page',
+      });
+      final raw = d['results']?['usermatches']?['user'];
+      // Last.fm returns "" (empty string) when there are no results
+      if (raw == null || raw is String) return await _searchUserFallback(query);
+      final list = _asList(raw);
+      final results = list.where((e) => e is Map).toList();
+      // If search returned nothing, try exact match via user.getInfo
+      if (results.isEmpty) return await _searchUserFallback(query);
+      return results;
+    } on Exception catch (e) {
+      final msg = e.toString().toLowerCase();
+      if (msg.contains('no user') || msg.contains('not found') ||
+          msg.contains('http 400') || msg.contains('http 403')) {
+        return await _searchUserFallback(query);
+      }
+      rethrow;
+    }
+  }
+
+  /// Fallback: looks up a user by exact username via user.getInfo.
+  /// Returns a single-element list on success, or [] if not found.
+  Future<List<dynamic>> _searchUserFallback(String query) async {
+    try {
+      final info = await getUserInfo(user: query);
+      if (info == null) return [];
+      return [info];
+    } catch (_) {
+      return [];
+    }
   }
 
   /// Searches artists globally via artist.search.
