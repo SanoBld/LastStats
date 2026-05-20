@@ -215,7 +215,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                     fit: BoxFit.cover,
                     color: Colors.black.withValues(alpha: 0.55),
                     colorBlendMode: BlendMode.darken,
-                    alignment: Alignment.topCenter,
+                    alignment: Alignment.center,
                     errorBuilder: (_, __, ___) => _DetailGradientBg(scheme: scheme),
                   )
                 : _DetailGradientBg(scheme: scheme),

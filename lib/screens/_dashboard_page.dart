@@ -247,21 +247,28 @@ class _DashboardPageState extends State<_DashboardPage> {
 
   // ── Toggle a friend's favourite status ──────────────────
   Future<void> _toggleFav(String username, bool nowFav) async {
-    final updated = Set<String>.from(_favFriends);
+    final updatedFriends  = Set<String>.from(_favFriends);
+    final updatedProfiles = Set<String>.from(_favProfiles);
     if (nowFav) {
-      updated.add(username);
+      updatedFriends.add(username);
     } else {
-      updated.remove(username);
+      // Remove from both sets so a profile starred via Search is also unstarred
+      updatedFriends.remove(username);
+      updatedProfiles.remove(username);
     }
     final p = await SharedPreferences.getInstance();
-    await p.setStringList('ls_fav_friends', updated.toList());
+    await p.setStringList('ls_fav_friends',  updatedFriends.toList());
+    await p.setStringList('ls_fav_profiles', updatedProfiles.toList());
     if (!mounted) return;
     setState(() {
-      _favFriends = updated;
+      _favFriends  = updatedFriends;
+      _favProfiles = updatedProfiles;
       // Re-sort list to reflect new favourite order
       _friends.sort((a, b) {
-        final aScore = (a.isOnline ? 2 : 0) + (updated.contains(a.username) ? 1 : 0);
-        final bScore = (b.isOnline ? 2 : 0) + (updated.contains(b.username) ? 1 : 0);
+        final aFav   = updatedFriends.contains(a.username) || updatedProfiles.contains(a.username);
+        final bFav   = updatedFriends.contains(b.username) || updatedProfiles.contains(b.username);
+        final aScore = (a.isOnline ? 2 : 0) + (aFav ? 1 : 0);
+        final bScore = (b.isOnline ? 2 : 0) + (bFav ? 1 : 0);
         if (aScore != bScore) return bScore.compareTo(aScore);
         return a.username.toLowerCase().compareTo(b.username.toLowerCase());
       });
