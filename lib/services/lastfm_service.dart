@@ -242,6 +242,25 @@ class LastFmService {
     }
   }
 
+  // ── Friends ─────────────────────────────────────────────
+  /// Returns the friend list of [username].
+  /// Pass [withRecentTrack] = true to include each friend's most recent
+  /// (or currently playing) track in the response — saves extra requests.
+  Future<List<dynamic>> getFriends({
+    int  limit          = 50,
+    int  page           = 1,
+    bool withRecentTrack = true,
+  }) async {
+    final d = await _call({
+      'method':       'user.getFriends',
+      'user':         username,
+      'limit':        '$limit',
+      'page':         '$page',
+      'recenttracks': withRecentTrack ? '1' : '0',
+    });
+    return _asList(d['friends']?['user']);
+  }
+
   // ── User rank for an item over a period ─────────────────
   /// Returns (rank, playcount) for an artist/album/track in user's top-200.
   Future<({int rank, int plays})> getUserItemStats({

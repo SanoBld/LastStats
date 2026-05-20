@@ -20,6 +20,7 @@ class _SettingsPageState extends State<_SettingsPage> {
   bool   _headerFallbackEnabled = false;
   String _headerPeriod = 'overall';
   bool   _showNowPlay = true, _showStats = true, _showArtists = true, _showTracks = true;
+  bool   _showFriends = true;
   bool   _autoUpdate = true;
   UpdateInfo? _updateInfo; bool _checkingUpdate = false; String? _updateError;
 
@@ -60,6 +61,7 @@ class _SettingsPageState extends State<_SettingsPage> {
       _showStats           = p.getBool('ls_show_stats')                 ?? true;
       _showArtists         = p.getBool('ls_show_artists')               ?? true;
       _showTracks          = p.getBool('ls_show_tracks')                ?? true;
+      _showFriends         = p.getBool('ls_show_friends')               ?? true;
       _autoUpdate          = p.getBool('ls_auto_update_check')          ?? true;
     });
     _customUrlCtrl.text  = _headerCustomUrl;
@@ -582,6 +584,11 @@ class _SettingsPageState extends State<_SettingsPage> {
           SwitchListTile(secondary: const Icon(Icons.music_note_rounded),
             title: const Text('Top Titres'), value: _showTracks,
             onChanged: (v) async { await _set('ls_show_tracks', v); setState(() => _showTracks = v); }),
+          SwitchListTile(secondary: const Icon(Icons.people_rounded),
+            title: const Text('Amis'),
+            subtitle: const Text('Activité de tes amis Last.fm'),
+            value: _showFriends,
+            onChanged: (v) async { await _set('ls_show_friends', v); setState(() => _showFriends = v); }),
         ]),
 
 
@@ -900,4 +907,3 @@ class _SettingsSection extends StatelessWidget {
     ]);
   }
 }
-

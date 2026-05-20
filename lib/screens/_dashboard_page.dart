@@ -2,6 +2,31 @@
 part of 'home_screen.dart';
 
 
+// ── Data model for a single friend entry ────────────────────────────────────
+
+class _FriendData {
+  final String username;
+  final String realName;
+  final String avatarUrl;
+  final bool   isOnline;            // true  → currently scrobbling
+  final String nowPlayingTrack;
+  final String nowPlayingArtist;
+  final String lastTrack;           // most recent track when offline
+  final String lastArtist;
+
+  const _FriendData({
+    required this.username,
+    required this.realName,
+    required this.avatarUrl,
+    required this.isOnline,
+    this.nowPlayingTrack  = '',
+    this.nowPlayingArtist = '',
+    this.lastTrack        = '',
+    this.lastArtist       = '',
+  });
+}
+
+
 // Dashboard
 
 class _DashboardPage extends StatefulWidget {
@@ -25,18 +50,24 @@ class _DashboardPageState extends State<_DashboardPage> {
   String? _error;
   Timer? _npTimer;
 
-  String _headerSource = 'nowplaying'; // header source pref
-  String _headerImageUrl = '';         // resolved header URL
-  double _headerBlur = 0.0;            // blur intensity (0–20)
-  String _headerAnimation = 'fade';   // transition animation type
-  String _headerCustomUrl = '';        // custom image URL
-  String _headerFallbackUrl = '';      // URL fallback si rien ne joue
+  String _headerSource          = 'nowplaying';
+  String _headerImageUrl        = '';
+  double _headerBlur            = 0.0;
+  String _headerAnimation       = 'fade';
+  String _headerCustomUrl       = '';
+  String _headerFallbackUrl     = '';
   bool   _headerFallbackEnabled = false;
-  String _headerPeriod = 'overall';   // period for top_* sources
-  bool   _showNowPlay = true;
-  bool   _showStats   = true;
-  bool   _showArtists = true;
-  bool   _showTracks  = true;
+  String _headerPeriod          = 'overall';
+  bool   _showNowPlay           = true;
+  bool   _showStats             = true;
+  bool   _showArtists           = true;
+  bool   _showTracks            = true;
+
+  // ── Friends state ───────────────────────────────────────
+  bool             _showFriends   = true;
+  List<_FriendData> _friends      = [];
+  Set<String>      _favFriends    = {};
+  bool             _friendsLoading = false;
 
   @override
   void initState() {
@@ -52,17 +83,20 @@ class _DashboardPageState extends State<_DashboardPage> {
     final p = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
-      _headerSource            = p.getString('ls_header_source')          ?? 'nowplaying';
-      _headerBlur              = p.getDouble('ls_header_blur')             ?? 0.0;
-      _headerAnimation         = p.getString('ls_header_animation')        ?? 'fade';
-      _headerCustomUrl         = p.getString('ls_header_custom_url')       ?? '';
-      _headerFallbackUrl       = p.getString('ls_header_fallback_url')     ?? '';
-      _headerFallbackEnabled   = p.getBool('ls_header_fallback_enabled')   ?? false;
-      _headerPeriod            = p.getString('ls_header_period')           ?? 'overall';
-      _showNowPlay             = p.getBool('ls_show_nowplay')              ?? true;
-      _showStats               = p.getBool('ls_show_stats')               ?? true;
-      _showArtists             = p.getBool('ls_show_artists')             ?? true;
-      _showTracks              = p.getBool('ls_show_tracks')              ?? true;
+      _headerSource          = p.getString('ls_header_source')         ?? 'nowplaying';
+      _headerBlur            = p.getDouble('ls_header_blur')            ?? 0.0;
+      _headerAnimation       = p.getString('ls_header_animation')      ?? 'fade';
+      _headerCustomUrl       = p.getString('ls_header_custom_url')     ?? '';
+      _headerFallbackUrl     = p.getString('ls_header_fallback_url')   ?? '';
+      _headerFallbackEnabled = p.getBool('ls_header_fallback_enabled') ?? false;
+      _headerPeriod          = p.getString('ls_header_period')         ?? 'overall';
+      _showNowPlay           = p.getBool('ls_show_nowplay')            ?? true;
+      _showStats             = p.getBool('ls_show_stats')              ?? true;
+      _showArtists           = p.getBool('ls_show_artists')            ?? true;
+      _showTracks            = p.getBool('ls_show_tracks')             ?? true;
+      // Friends prefs
+      _showFriends           = p.getBool('ls_show_friends')            ?? true;
+      _favFriends            = Set<String>.from(p.getStringList('ls_fav_friends') ?? []);
     });
   }
 
@@ -97,6 +131,8 @@ class _DashboardPageState extends State<_DashboardPage> {
       });
       if (_nowPlaying != null) _extractColor(_nowPlaying!);
       _resolveHeaderImage();
+      // Load friends asynchronously — does not block the main page
+      if (_showFriends) _loadFriends();
     } catch (e) {
       setState(() { _error = e.toString().replaceFirst('Exception: ', ''); _loading = false; });
     }
@@ -113,6 +149,83 @@ class _DashboardPageState extends State<_DashboardPage> {
     } catch (_) {}
   }
 
+  // ── Friends loader ───────────────────────────────────────
+  Future<void> _loadFriends() async {
+    if (!mounted) return;
+    setState(() => _friendsLoading = true);
+    try {
+      final raw = await widget.service.getFriends(limit: 50, withRecentTrack: true);
+      final friends = <_FriendData>[];
+
+      for (final u in raw) {
+        final uname      = (u['name'] ?? '').toString();
+        final rawRecent  = u['recenttrack'];
+        final isMap      = rawRecent is Map;
+        final isOnline   = isMap &&
+            (rawRecent['@attr']?['nowplaying'] == 'true');
+
+        String trackName  = '';
+        String artistName = '';
+        if (isMap) {
+          trackName  = (rawRecent['name'] ?? '').toString();
+          // artist field varies: '#text' in recenttrack, plain string otherwise
+          final rawArtist = rawRecent['artist'];
+          if (rawArtist is Map) {
+            artistName = (rawArtist['#text'] ?? rawArtist['name'] ?? '').toString();
+          } else {
+            artistName = rawArtist?.toString() ?? '';
+          }
+        }
+
+        friends.add(_FriendData(
+          username:         uname,
+          realName:         (u['realname'] ?? '').toString(),
+          avatarUrl:        _extractImage(u['image']),
+          isOnline:         isOnline,
+          nowPlayingTrack:  isOnline  ? trackName  : '',
+          nowPlayingArtist: isOnline  ? artistName : '',
+          lastTrack:        !isOnline ? trackName  : '',
+          lastArtist:       !isOnline ? artistName : '',
+        ));
+      }
+
+      // Sort priority score: online+fav (3) > online (2) > offline+fav (1) > offline (0)
+      friends.sort((a, b) {
+        final aScore = (a.isOnline ? 2 : 0) + (_favFriends.contains(a.username) ? 1 : 0);
+        final bScore = (b.isOnline ? 2 : 0) + (_favFriends.contains(b.username) ? 1 : 0);
+        if (aScore != bScore) return bScore.compareTo(aScore);
+        return a.username.toLowerCase().compareTo(b.username.toLowerCase());
+      });
+
+      if (mounted) setState(() { _friends = friends; _friendsLoading = false; });
+    } catch (_) {
+      if (mounted) setState(() => _friendsLoading = false);
+    }
+  }
+
+  // ── Toggle a friend's favourite status ──────────────────
+  Future<void> _toggleFav(String username, bool nowFav) async {
+    final updated = Set<String>.from(_favFriends);
+    if (nowFav) {
+      updated.add(username);
+    } else {
+      updated.remove(username);
+    }
+    final p = await SharedPreferences.getInstance();
+    await p.setStringList('ls_fav_friends', updated.toList());
+    if (!mounted) return;
+    setState(() {
+      _favFriends = updated;
+      // Re-sort list to reflect new favourite order
+      _friends.sort((a, b) {
+        final aScore = (a.isOnline ? 2 : 0) + (updated.contains(a.username) ? 1 : 0);
+        final bScore = (b.isOnline ? 2 : 0) + (updated.contains(b.username) ? 1 : 0);
+        if (aScore != bScore) return bScore.compareTo(aScore);
+        return a.username.toLowerCase().compareTo(b.username.toLowerCase());
+      });
+    });
+  }
+
   Future<void> _resolveHeaderImage() async {
     String url = '';
     switch (_headerSource) {
@@ -127,7 +240,6 @@ class _DashboardPageState extends State<_DashboardPage> {
             lastfmUrl: raw,
           );
         }
-        // Fallback when nothing is playing
         if (url.isEmpty && _headerFallbackEnabled && _headerFallbackUrl.isNotEmpty) {
           url = _headerFallbackUrl;
         }
@@ -185,8 +297,8 @@ class _DashboardPageState extends State<_DashboardPage> {
   }
 
   // Stats calculations
-  int    _total()    => int.tryParse((_userInfo?['playcount'] ?? '0').toString()) ?? 0;
-  int    _days()     {
+  int    _total()  => int.tryParse((_userInfo?['playcount'] ?? '0').toString()) ?? 0;
+  int    _days()   {
     final raw = _userInfo?['registered'];
     if (raw == null) return 0;
     int ts = 0;
@@ -195,9 +307,9 @@ class _DashboardPageState extends State<_DashboardPage> {
     if (ts <= 0) return 0;
     return ((DateTime.now().millisecondsSinceEpoch / 1000 - ts) / 86400).floor();
   }
-  double _avg()      { final d = _days(); return d > 0 ? _total() / d : 0; }
-  int    _weekly()   => (_avg() * 7).round();
-  String _regDate()  {
+  double _avg()    { final d = _days(); return d > 0 ? _total() / d : 0; }
+  int    _weekly() => (_avg() * 7).round();
+  String _regDate() {
     final raw = _userInfo?['registered'];
     if (raw == null) return '';
     int ts = 0;
@@ -277,7 +389,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                               .animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
                           child: FadeTransition(opacity: anim, child: child),
                         );
-                      default: // 'fade' ou autres
+                      default: // 'fade' or others
                         return FadeTransition(opacity: anim, child: child);
                     }
                   },
@@ -398,7 +510,6 @@ class _DashboardPageState extends State<_DashboardPage> {
                             ],
                           )),
                         ]),
-
                       ],
                     ),
                   ),
@@ -472,6 +583,19 @@ class _DashboardPageState extends State<_DashboardPage> {
                 const SizedBox(height: 20),
               ],
 
+              // ── Friends horizontal scroll ──────────────────────────
+              if (_showFriends) ...[
+                _FriendsSection(
+                  friends:     _friends,
+                  favorites:   _favFriends,
+                  service:     widget.service,
+                  isLoading:   _friendsLoading,
+                  onToggleFav: _toggleFav,
+                  onRefresh:   _loadFriends,
+                ),
+                const SizedBox(height: 20),
+              ],
+
               // Top artists (mini)
               if (_showArtists && _topArtists.isNotEmpty) ...[
                 _SectionHeader(title: 'Top Artistes', icon: Icons.mic_rounded),
@@ -515,6 +639,616 @@ class _DashboardPageState extends State<_DashboardPage> {
     );
   }
 }
+
+
+// ── Friends section widget ───────────────────────────────────────────────────
+
+class _FriendsSection extends StatelessWidget {
+  final List<_FriendData>   friends;
+  final Set<String>         favorites;
+  final LastFmService       service;
+  final bool                isLoading;
+  final void Function(String username, bool nowFav) onToggleFav;
+  final VoidCallback        onRefresh;
+
+  const _FriendsSection({
+    required this.friends,
+    required this.favorites,
+    required this.service,
+    required this.isLoading,
+    required this.onToggleFav,
+    required this.onRefresh,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme      = Theme.of(context).colorScheme;
+    final text        = Theme.of(context).textTheme;
+    final onlineCount = friends.where((f) => f.isOnline).length;
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+
+      // Section header row
+      Row(children: [
+        _SectionHeader(title: 'Amis', icon: Icons.people_rounded),
+        const Spacer(),
+        // Online badge
+        if (!isLoading && onlineCount > 0)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.green.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Container(
+                width: 6, height: 6,
+                decoration: const BoxDecoration(
+                    color: Colors.green, shape: BoxShape.circle),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '$onlineCount en ligne',
+                style: text.labelSmall?.copyWith(
+                    color: Colors.green.shade700, fontWeight: FontWeight.w700),
+              ),
+            ]),
+          ),
+        // Refresh icon
+        if (!isLoading)
+          IconButton(
+            icon: const Icon(Icons.refresh_rounded, size: 18),
+            visualDensity: VisualDensity.compact,
+            onPressed: onRefresh,
+            tooltip: 'Actualiser les amis',
+          ),
+      ]),
+
+      const SizedBox(height: 10),
+
+      // Scrollable list
+      SizedBox(
+        height: 152,
+        child: isLoading
+            // Loading shimmer row
+            ? ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: 5,
+                padding: EdgeInsets.zero,
+                itemBuilder: (_, __) => _FriendCardSkeleton(scheme: scheme),
+              )
+            : friends.isEmpty
+                // Empty state
+                ? Center(
+                    child: Text(
+                      'Aucun ami trouvé',
+                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                    ),
+                  )
+                // Friend cards
+                : ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: friends.length,
+                    padding: EdgeInsets.zero,
+                    itemBuilder: (ctx, i) {
+                      final f      = friends[i];
+                      final isFav  = favorites.contains(f.username);
+                      return _FriendCard(
+                        friend:      f,
+                        isFav:       isFav,
+                        service:     service,
+                        onToggleFav: () => onToggleFav(f.username, !isFav),
+                      );
+                    },
+                  ),
+      ),
+    ]);
+  }
+}
+
+
+// ── Single friend card ───────────────────────────────────────────────────────
+
+class _FriendCard extends StatelessWidget {
+  final _FriendData  friend;
+  final bool         isFav;
+  final LastFmService service;
+  final VoidCallback onToggleFav;
+
+  static const _ph = '2a96cbd8b46e442fc41c2b86b821562f';
+
+  const _FriendCard({
+    required this.friend,
+    required this.isFav,
+    required this.service,
+    required this.onToggleFav,
+  });
+
+  bool get _hasAvatar =>
+      friend.avatarUrl.isNotEmpty && !friend.avatarUrl.contains(_ph);
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme   = Theme.of(context).colorScheme;
+    final text     = Theme.of(context).textTheme;
+
+    // Subtitle: now-playing track or last track name
+    final subtitle = friend.isOnline
+        ? (friend.nowPlayingTrack.isNotEmpty ? friend.nowPlayingTrack : 'En écoute')
+        : (friend.lastTrack.isNotEmpty       ? friend.lastTrack       : 'Hors ligne');
+
+    final subtitleArtist = friend.isOnline
+        ? friend.nowPlayingArtist
+        : friend.lastArtist;
+
+    return GestureDetector(
+      onTap: () => _openProfile(context),
+      child: Container(
+        width: 116,
+        margin: const EdgeInsets.only(right: 10),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: friend.isOnline
+              ? scheme.primaryContainer.withValues(alpha: 0.45)
+              : scheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: friend.isOnline
+                ? scheme.primary.withValues(alpha: 0.28)
+                : scheme.outlineVariant.withValues(alpha: 0.45),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+
+            // ── Avatar with status dot + fav star ─────────────
+            SizedBox(
+              width: 60, height: 60,
+              child: Stack(children: [
+
+                // Avatar circle
+                CircleAvatar(
+                  radius: 30,
+                  backgroundColor: scheme.primary.withValues(alpha: 0.2),
+                  backgroundImage: _hasAvatar ? NetworkImage(friend.avatarUrl) : null,
+                  child: _hasAvatar
+                      ? null
+                      : Text(
+                          friend.username.isNotEmpty
+                              ? friend.username[0].toUpperCase()
+                              : '?',
+                          style: text.titleMedium?.copyWith(
+                              color: scheme.primary, fontWeight: FontWeight.w800),
+                        ),
+                ),
+
+                // Online / offline dot (bottom-right)
+                Positioned(
+                  right: 0, bottom: 0,
+                  child: Container(
+                    width: 14, height: 14,
+                    decoration: BoxDecoration(
+                      color:  friend.isOnline ? Colors.green : scheme.outline,
+                      shape:  BoxShape.circle,
+                      border: Border.all(color: scheme.surface, width: 2),
+                    ),
+                  ),
+                ),
+
+                // Favourite star (top-left) — tappable independently
+                Positioned(
+                  left: 0, top: 0,
+                  child: GestureDetector(
+                    onTap: onToggleFav,
+                    behavior: HitTestBehavior.opaque,
+                    child: Icon(
+                      isFav ? Icons.star_rounded : Icons.star_outline_rounded,
+                      size:  16,
+                      color: isFav
+                          ? Colors.amber.shade600
+                          : scheme.onSurfaceVariant.withValues(alpha: 0.55),
+                    ),
+                  ),
+                ),
+              ]),
+            ),
+
+            const SizedBox(height: 6),
+
+            // Username
+            Text(
+              friend.username,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: text.bodySmall?.copyWith(fontWeight: FontWeight.w700),
+            ),
+
+            const SizedBox(height: 2),
+
+            // Status line (track name)
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              if (friend.isOnline) ...[
+                Container(
+                  width: 5, height: 5,
+                  decoration: const BoxDecoration(
+                      color: Colors.green, shape: BoxShape.circle),
+                ),
+                const SizedBox(width: 3),
+              ],
+              Flexible(
+                child: Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: text.labelSmall?.copyWith(
+                    color: friend.isOnline
+                        ? Colors.green.shade700
+                        : scheme.onSurfaceVariant,
+                    fontWeight:
+                        friend.isOnline ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
+              ),
+            ]),
+
+            // Artist name (second line, only when something is available)
+            if (subtitleArtist.isNotEmpty) ...[
+              const SizedBox(height: 1),
+              Text(
+                subtitleArtist,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: text.labelSmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                    fontSize: 9),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _openProfile(BuildContext context) {
+    showModalBottomSheet(
+      context:           context,
+      isScrollControlled: true,
+      backgroundColor:   Colors.transparent,
+      useSafeArea:       true,
+      builder: (_) => _FriendProfileSheet(friend: friend, service: service),
+    );
+  }
+}
+
+
+// ── Skeleton placeholder card shown while friends load ──────────────────────
+
+class _FriendCardSkeleton extends StatelessWidget {
+  final ColorScheme scheme;
+  const _FriendCardSkeleton({required this.scheme});
+
+  @override
+  Widget build(BuildContext context) {
+    final base = scheme.surfaceContainerHighest;
+    return Container(
+      width: 116,
+      margin: const EdgeInsets.only(right: 10),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: base,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45)),
+      ),
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Container(
+          width: 56, height: 56,
+          decoration: BoxDecoration(
+            color: scheme.outline.withValues(alpha: 0.15),
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(height: 10, width: 60,
+            decoration: BoxDecoration(
+                color: scheme.outline.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(4))),
+        const SizedBox(height: 5),
+        Container(height: 8, width: 80,
+            decoration: BoxDecoration(
+                color: scheme.outline.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(4))),
+      ]),
+    );
+  }
+}
+
+
+// ── Friend profile bottom sheet ──────────────────────────────────────────────
+
+class _FriendProfileSheet extends StatefulWidget {
+  final _FriendData   friend;
+  final LastFmService service;
+  const _FriendProfileSheet({required this.friend, required this.service});
+
+  @override
+  State<_FriendProfileSheet> createState() => _FriendProfileSheetState();
+}
+
+class _FriendProfileSheetState extends State<_FriendProfileSheet> {
+  List<dynamic> _recent  = [];
+  bool          _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final d = await widget.service.getRecentTracks(
+          user: widget.friend.username, limit: 10);
+      final raw    = d['track'];
+      final tracks = raw is List ? raw : (raw != null ? [raw] : <dynamic>[]);
+      if (mounted) setState(() { _recent = tracks; _loading = false; });
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  static const _ph = '2a96cbd8b46e442fc41c2b86b821562f';
+
+  bool _hasAvatar(String url) => url.isNotEmpty && !url.contains(_ph);
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+    final f      = widget.friend;
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.58,
+      minChildSize:     0.38,
+      maxChildSize:     0.88,
+      expand: false,
+      builder: (ctx, ctrl) => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        child: Container(
+          color: scheme.surface,
+          child: ListView(controller: ctrl, children: [
+
+            // Drag handle
+            Center(
+              child: Container(
+                margin: const EdgeInsets.only(top: 10, bottom: 8),
+                width: 36, height: 4,
+                decoration: BoxDecoration(
+                    color: scheme.outlineVariant,
+                    borderRadius: BorderRadius.circular(2)),
+              ),
+            ),
+
+            // ── Profile header ────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Row(children: [
+
+                // Avatar + status dot
+                SizedBox(
+                  width: 68, height: 68,
+                  child: Stack(children: [
+                    CircleAvatar(
+                      radius: 34,
+                      backgroundColor: scheme.primaryContainer,
+                      backgroundImage: _hasAvatar(f.avatarUrl)
+                          ? NetworkImage(f.avatarUrl) : null,
+                      child: _hasAvatar(f.avatarUrl)
+                          ? null
+                          : Text(
+                              f.username.isNotEmpty
+                                  ? f.username[0].toUpperCase()
+                                  : '?',
+                              style: text.titleLarge?.copyWith(
+                                  color: scheme.onPrimaryContainer,
+                                  fontWeight: FontWeight.w800),
+                            ),
+                    ),
+                    Positioned(
+                      right: 2, bottom: 2,
+                      child: Container(
+                        width: 16, height: 16,
+                        decoration: BoxDecoration(
+                          color:  f.isOnline ? Colors.green : scheme.outline,
+                          shape:  BoxShape.circle,
+                          border: Border.all(color: scheme.surface, width: 2),
+                        ),
+                      ),
+                    ),
+                  ]),
+                ),
+
+                const SizedBox(width: 16),
+
+                Expanded(child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(f.username,
+                        style: text.titleLarge
+                            ?.copyWith(fontWeight: FontWeight.w800)),
+                    if (f.realName.isNotEmpty)
+                      Text(f.realName,
+                          style: text.bodySmall
+                              ?.copyWith(color: scheme.onSurfaceVariant)),
+                    const SizedBox(height: 6),
+                    // Online / offline badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: f.isOnline
+                            ? Colors.green.withValues(alpha: 0.12)
+                            : scheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Container(
+                          width: 6, height: 6,
+                          decoration: BoxDecoration(
+                            color: f.isOnline
+                                ? Colors.green
+                                : scheme.outlineVariant,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          f.isOnline ? 'En écoute' : 'Hors ligne',
+                          style: text.labelSmall?.copyWith(
+                            color: f.isOnline
+                                ? Colors.green.shade700
+                                : scheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ]),
+                    ),
+                  ],
+                )),
+              ]),
+            ),
+
+            // ── Now playing card (if active) ──────────────────
+            if (f.isOnline && f.nowPlayingTrack.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+                child: Card(
+                  elevation: 0,
+                  color: scheme.secondaryContainer,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: _cardBorder(scheme)),
+                  child: ListTile(
+                    leading: Icon(Icons.music_note_rounded,
+                        color: scheme.secondary),
+                    title: Text(f.nowPlayingTrack,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: text.bodyMedium
+                            ?.copyWith(fontWeight: FontWeight.w700)),
+                    subtitle: f.nowPlayingArtist.isNotEmpty
+                        ? Text(f.nowPlayingArtist,
+                            maxLines: 1, overflow: TextOverflow.ellipsis)
+                        : null,
+                    trailing: Container(
+                      width: 8, height: 8,
+                      decoration: const BoxDecoration(
+                          color: Colors.green, shape: BoxShape.circle),
+                    ),
+                  ),
+                ),
+              ),
+
+            const Divider(indent: 16, endIndent: 16, height: 20),
+
+            // ── Recent tracks ─────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text('Écoutes récentes',
+                  style: text.titleSmall
+                      ?.copyWith(fontWeight: FontWeight.w700)),
+            ),
+            const SizedBox(height: 4),
+
+            if (_loading)
+              const Center(
+                  child: Padding(
+                      padding: EdgeInsets.all(24),
+                      child: CircularProgressIndicator()))
+            else if (_recent.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Center(
+                    child: Text('Aucune écoute récente',
+                        style: text.bodySmall
+                            ?.copyWith(color: scheme.onSurfaceVariant))),
+              )
+            else
+              ..._recent.map((t) {
+                final tMap    = t as Map<String, dynamic>;
+                final isNp    = tMap['@attr']?['nowplaying'] == 'true';
+                final tName   = (tMap['name'] ?? '').toString();
+                final tArtist =
+                    (tMap['artist']?['#text'] ?? '').toString();
+                final tDate   =
+                    (tMap['date']?['#text'] ?? '').toString();
+                final rawUrl  = _extractImage(tMap['image']);
+                final hasImg  = rawUrl.isNotEmpty && !rawUrl.contains(_ph);
+
+                return ListTile(
+                  leading: Stack(children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: hasImg
+                          ? Image.network(rawUrl,
+                              width: 40, height: 40, fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Container(
+                                  width: 40, height: 40,
+                                  color: scheme.surfaceContainerHighest,
+                                  child: Icon(Icons.music_note_rounded,
+                                      color: scheme.onSurfaceVariant)))
+                          : Container(
+                              width: 40, height: 40,
+                              color: scheme.surfaceContainerHighest,
+                              child: Icon(Icons.music_note_rounded,
+                                  color: scheme.onSurfaceVariant)),
+                    ),
+                    if (isNp)
+                      Positioned(
+                        right: 0, bottom: 0,
+                        child: Container(
+                          width: 8, height: 8,
+                          decoration: const BoxDecoration(
+                              color: Colors.green, shape: BoxShape.circle),
+                        ),
+                      ),
+                  ]),
+                  title: Text(tName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: text.bodySmall
+                          ?.copyWith(fontWeight: FontWeight.w600)),
+                  subtitle: Text(tArtist,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: text.labelSmall
+                          ?.copyWith(color: scheme.onSurfaceVariant)),
+                  trailing: isNp
+                      ? Text('EN COURS',
+                          style: text.labelSmall?.copyWith(
+                              color: Colors.green,
+                              fontWeight: FontWeight.w700))
+                      : Text(
+                          _fmtDate(tDate),
+                          style: text.labelSmall?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                              fontSize: 9),
+                        ),
+                  dense: true,
+                );
+              }),
+
+            const SizedBox(height: 24),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
 
 // Fallback gradient for header
 class _GradientHeader extends StatelessWidget {
@@ -711,7 +1445,7 @@ class _DashStatCard extends StatelessWidget {
       color: scheme.surfaceContainerHighest,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: _cardBorder(scheme),           // ← contour toujours visible
+        side: _cardBorder(scheme),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -782,4 +1516,3 @@ class _NowPlayingCard extends StatelessWidget {
     );
   }
 }
-
