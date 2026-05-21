@@ -35,5 +35,9 @@ Color accentFromString(String? s) {
 }
 
 /// Convertit une [Color] en chaîne '#RRGGBB' majuscule.
-String colorToHex(Color c) =>
-    '#${c.red.toRadixString(16).padLeft(2, '0')}${c.green.toRadixString(16).padLeft(2, '0')}${c.blue.toRadixString(16).padLeft(2, '0')}'.toUpperCase();
+String colorToHex(Color c) {
+  final r = (c.r * 255).round().clamp(0, 255).toRadixString(16).padLeft(2, '0');
+  final g = (c.g * 255).round().clamp(0, 255).toRadixString(16).padLeft(2, '0');
+  final b = (c.b * 255).round().clamp(0, 255).toRadixString(16).padLeft(2, '0');
+  return '#$r$g$b'.toUpperCase();
+}

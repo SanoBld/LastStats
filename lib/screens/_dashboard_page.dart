@@ -119,8 +119,8 @@ class _DashboardPageState extends State<_DashboardPage> {
       Map<String, dynamic>? np;
       final recentF = <dynamic>[];
       for (final t in allRecent) {
-        if ((t as Map?)?['@attr']?['nowplaying'] == 'true') np = t as Map<String, dynamic>;
-        else recentF.add(t);
+        if ((t as Map?)?['@attr']?['nowplaying'] == 'true') { np = t as Map<String, dynamic>; }
+        else { recentF.add(t); }
       }
       setState(() {
         _userInfo     = res[0] as Map<String, dynamic>?;
@@ -252,7 +252,6 @@ class _DashboardPageState extends State<_DashboardPage> {
     if (nowFav) {
       updatedFriends.add(username);
     } else {
-      // Remove from both sets so a profile starred via Search is also unstarred
       updatedFriends.remove(username);
       updatedProfiles.remove(username);
     }
@@ -263,7 +262,6 @@ class _DashboardPageState extends State<_DashboardPage> {
     setState(() {
       _favFriends  = updatedFriends;
       _favProfiles = updatedProfiles;
-      // Re-sort list to reflect new favourite order
       _friends.sort((a, b) {
         final aFav   = updatedFriends.contains(a.username) || updatedProfiles.contains(a.username);
         final bFav   = updatedFriends.contains(b.username) || updatedProfiles.contains(b.username);
@@ -351,8 +349,8 @@ class _DashboardPageState extends State<_DashboardPage> {
     final raw = _userInfo?['registered'];
     if (raw == null) return 0;
     int ts = 0;
-    if (raw is Map) ts = int.tryParse((raw['#text'] ?? raw['unixtime'] ?? '0').toString()) ?? 0;
-    else ts = int.tryParse(raw.toString()) ?? 0;
+    if (raw is Map) { ts = int.tryParse((raw['#text'] ?? raw['unixtime'] ?? '0').toString()) ?? 0; }
+    else { ts = int.tryParse(raw.toString()) ?? 0; }
     if (ts <= 0) return 0;
     return ((DateTime.now().millisecondsSinceEpoch / 1000 - ts) / 86400).floor();
   }
@@ -362,8 +360,8 @@ class _DashboardPageState extends State<_DashboardPage> {
     final raw = _userInfo?['registered'];
     if (raw == null) return '';
     int ts = 0;
-    if (raw is Map) ts = int.tryParse((raw['#text'] ?? raw['unixtime'] ?? '0').toString()) ?? 0;
-    else ts = int.tryParse(raw.toString()) ?? 0;
+    if (raw is Map) { ts = int.tryParse((raw['#text'] ?? raw['unixtime'] ?? '0').toString()) ?? 0; }
+    else { ts = int.tryParse(raw.toString()) ?? 0; }
     if (ts <= 0) return '';
     final d = DateTime.fromMillisecondsSinceEpoch(ts * 1000);
     return '${d.day} ${_kMonths[d.month]} ${d.year}';
@@ -767,7 +765,7 @@ class _FriendsSection extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 itemCount: 5,
                 padding: EdgeInsets.zero,
-                itemBuilder: (_, __) => _FriendCardSkeleton(scheme: scheme),
+                itemBuilder: (_, _) => _FriendCardSkeleton(scheme: scheme),
               )
             : friends.isEmpty
                 // Empty state
@@ -1236,8 +1234,6 @@ class _FriendProfileSheetState extends State<_FriendProfileSheet> {
                 final tName   = (tMap['name'] ?? '').toString();
                 final tArtist =
                     (tMap['artist']?['#text'] ?? '').toString();
-                final tDate   =
-                    (tMap['date']?['#text'] ?? '').toString();
                 final rawUrl  = _extractImage(tMap['image']);
                 final hasImg  = rawUrl.isNotEmpty && !rawUrl.contains(_ph);
 
@@ -1248,7 +1244,7 @@ class _FriendProfileSheetState extends State<_FriendProfileSheet> {
                       child: hasImg
                           ? Image.network(rawUrl,
                               width: 40, height: 40, fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
+                              errorBuilder: (_, _, _) => Container(
                                   width: 40, height: 40,
                                   color: scheme.surfaceContainerHighest,
                                   child: Icon(Icons.music_note_rounded,
@@ -1345,7 +1341,7 @@ class _BlurredHeaderImage extends StatelessWidget {
       fit: BoxFit.cover,
       width: double.infinity,
       height: double.infinity,
-      errorBuilder: (_, __, ___) => _GradientHeader(scheme: scheme),
+      errorBuilder: (_, _, _) => _GradientHeader(scheme: scheme),
     );
     if (blur > 0.5) {
       img = ImageFiltered(

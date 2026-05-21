@@ -61,7 +61,7 @@ class _SearchPageState extends State<_SearchPage> {
 
   Future<void> _toggleFavProfile(String username, bool nowFav) async {
     final updated = Set<String>.from(_favProfiles);
-    if (nowFav) updated.add(username); else updated.remove(username);
+    if (nowFav) { updated.add(username); } else { updated.remove(username); }
     final p = await SharedPreferences.getInstance();
     await p.setStringList('ls_fav_profiles', updated.toList());
     if (!mounted) return;
@@ -91,10 +91,12 @@ class _SearchPageState extends State<_SearchPage> {
       }
       if (mounted) setState(() { _results = res; _searching = false; });
     } catch (e) {
-      if (mounted) setState(() {
-        _error = e.toString().replaceFirst('Exception: ', '');
-        _searching = false;
-      });
+      if (mounted) {
+        setState(() {
+          _error = e.toString().replaceFirst('Exception: ', '');
+          _searching = false;
+        });
+      }
     }
   }
 
@@ -491,13 +493,15 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
       // Detect now-playing: first track has @attr.nowplaying == 'true'
       final firstTrack = recentList.isNotEmpty ? recentList.first as Map : null;
       final isNp = firstTrack?['@attr']?['nowplaying'] == 'true';
-      if (mounted) setState(() {
-        _info         = res[0] as Map<String, dynamic>?;
-        _topArtists   = res[1] as List<dynamic>;
-        _recent       = recentList;
-        _isNowPlaying = isNp;
-        _loading      = false;
-      });
+      if (mounted) {
+        setState(() {
+          _info         = res[0] as Map<String, dynamic>?;
+          _topArtists   = res[1] as List<dynamic>;
+          _recent       = recentList;
+          _isNowPlaying = isNp;
+          _loading      = false;
+        });
+      }
     } catch (_) {
       if (mounted) setState(() => _loading = false);
     }
@@ -508,8 +512,8 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     final raw = _info?['registered'];
     if (raw == null) return 0;
     int ts = 0;
-    if (raw is Map) ts = int.tryParse((raw['#text'] ?? raw['unixtime'] ?? '0').toString()) ?? 0;
-    else ts = int.tryParse(raw.toString()) ?? 0;
+    if (raw is Map) { ts = int.tryParse((raw['#text'] ?? raw['unixtime'] ?? '0').toString()) ?? 0; }
+    else { ts = int.tryParse(raw.toString()) ?? 0; }
     if (ts <= 0) return 0;
     return ((DateTime.now().millisecondsSinceEpoch / 1000 - ts) / 86400).floor();
   }
@@ -602,7 +606,6 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                       final isNp    = tMap['@attr']?['nowplaying'] == 'true';
                       final tName   = (tMap['name'] ?? '').toString();
                       final tArtist = (tMap['artist']?['#text'] ?? '').toString();
-                      final tDate   = (tMap['date']?['#text'] ?? '').toString(); // kept for reference only
                       final rawUrl  = _extractImage(tMap['image']);
                       final hasImg  = rawUrl.isNotEmpty && !rawUrl.contains(_ph);
 
@@ -613,7 +616,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                             child: hasImg
                                 ? Image.network(rawUrl, width: 40, height: 40,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => Container(
+                                    errorBuilder: (_, _, _) => Container(
                                         width: 40, height: 40,
                                         color: scheme.surfaceContainerHighest,
                                         child: Icon(Icons.music_note_rounded,
@@ -660,8 +663,8 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     final raw = info['registered'];
     if (raw != null) {
       int ts = 0;
-      if (raw is Map) ts = int.tryParse((raw['#text'] ?? raw['unixtime'] ?? '0').toString()) ?? 0;
-      else ts = int.tryParse(raw.toString()) ?? 0;
+      if (raw is Map) { ts = int.tryParse((raw['#text'] ?? raw['unixtime'] ?? '0').toString()) ?? 0; }
+      else { ts = int.tryParse(raw.toString()) ?? 0; }
       if (ts > 0) {
         final d = DateTime.fromMillisecondsSinceEpoch(ts * 1000);
         regStr = '${d.day} ${_kMonths[d.month]} ${d.year}';

@@ -270,9 +270,13 @@ class LastFmService {
     String period    = 'overall',
   }) async {
     final List<dynamic> items;
-    if (type == 'artists')     items = await getTopArtists(period: period, limit: 200);
-    else if (type == 'albums') items = await getTopAlbums(period: period,  limit: 200);
-    else                       items = await getTopTracks(period: period,   limit: 200);
+    if (type == 'artists') {
+      items = await getTopArtists(period: period, limit: 200);
+    } else if (type == 'albums') {
+      items = await getTopAlbums(period: period, limit: 200);
+    } else {
+      items = await getTopTracks(period: period, limit: 200);
+    }
 
     for (var i = 0; i < items.length; i++) {
       final n = (items[i]['name'] ?? '').toString();
@@ -305,11 +309,11 @@ class LastFmService {
       });
       final raw = d['results']?['usermatches']?['user'];
       // Last.fm returns "" (empty string) when there are no results
-      if (raw == null || raw is String) return await _searchUserFallback(query);
+      if (raw == null || raw is String) { return await _searchUserFallback(query); }
       final list = _asList(raw);
-      final results = list.where((e) => e is Map).toList();
+      final results = list.whereType<Map>().toList();
       // If search returned nothing, try exact match via user.getInfo
-      if (results.isEmpty) return await _searchUserFallback(query);
+      if (results.isEmpty) { return await _searchUserFallback(query); }
       return results;
     } on Exception catch (e) {
       final msg = e.toString().toLowerCase();

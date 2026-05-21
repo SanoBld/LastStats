@@ -72,7 +72,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     if (!_autoUpdate) return;
     final p = await SharedPreferences.getInstance();
     if (DateTime.now().millisecondsSinceEpoch - (p.getInt('ls_last_update_check') ?? 0) <
-        const Duration(days: 1).inMilliseconds) return;
+        const Duration(days: 1).inMilliseconds) { return; }
     await _checkUpdate(auto: true);
   }
 
@@ -86,15 +86,144 @@ class _SettingsPageState extends State<_SettingsPage> {
       await p.setInt('ls_last_update_check', DateTime.now().millisecondsSinceEpoch);
       setState(() { _updateInfo = info; _checkingUpdate = false; });
     } catch (_) {
-      if (mounted) setState(() { _updateError = 'Vérification impossible.'; _checkingUpdate = false; });
+      if (mounted) {
+        setState(() { _updateError = 'Vérification impossible.'; _checkingUpdate = false; });
+      }
     }
   }
 
   Future<void> _set<T>(String key, T v) async {
     final p = await SharedPreferences.getInstance();
-    if (v is bool)   await p.setBool(key, v);
-    if (v is String) await p.setString(key, v);
-    if (v is int)    await p.setInt(key, v);
+    if (v is bool) { await p.setBool(key, v); }
+    if (v is String) { await p.setString(key, v); }
+    if (v is int) { await p.setInt(key, v); }
+  }
+
+  // ── Backup / Restore ─────────────────────────────────────────────────────
+
+  static const _kBackupKeys = [
+    'ls_username', 'ls_apikey',
+    'ls_theme', 'ls_accent', 'ls_use_dynamic_color', 'ls_use_nowplaying_color',
+    'ls_header_source', 'ls_header_period', 'ls_header_animation',
+    'ls_header_blur', 'ls_header_custom_url',
+    'ls_header_fallback_enabled', 'ls_header_fallback_url',
+    'ls_show_nowplay', 'ls_show_stats', 'ls_show_artists', 'ls_show_tracks', 'ls_show_friends',
+    'ls_startup_tab', 'ls_auto_update_check',
+    'ls_fav_friends', 'ls_fav_profiles',
+  ];
+
+  Future<void> _exportBackup() async {
+    final p   = await SharedPreferences.getInstance();
+    final map = <String, dynamic>{};
+    for (final key in _kBackupKeys) {
+      final v = p.get(key);
+      if (v != null) { map[key] = v; }
+    }
+    final now     = DateTime.now();
+    final payload = jsonEncode({
+      'app':         'LastStats',
+      'version':     '1',
+      'exported_at': now.toIso8601String(),
+      'prefs':       map,
+    });
+
+    // Default filename suggestion
+    final dateStr =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final defaultName = 'laststats_backup_$dateStr.json';
+
+    if (!mounted) return;
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _ExportSheet(payload: payload, defaultName: defaultName),
+    );
+  }
+
+  Future<void> _showImportDialog() async {
+    final ctrl = TextEditingController();
+    await showDialog(
+      context: context,
+      builder: (ctx) {
+        String? err;
+        return StatefulBuilder(builder: (ctx, setDlg) {
+          return AlertDialog(
+            title: const Text('Restaurer une sauvegarde'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Collez ici votre sauvegarde LastStats.',
+                    style: TextStyle(fontSize: 13)),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: ctrl,
+                  maxLines: 5,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: '{"app":"LastStats",...}',
+                    border: const OutlineInputBorder(),
+                    errorText: err,
+                  ),
+                  onChanged: (_) { if (err != null) { setDlg(() => err = null); } },
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Annuler'),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  final text = ctrl.text.trim();
+                  if (text.isEmpty) { setDlg(() => err = 'Champ vide.'); return; }
+                  Map<String, dynamic> parsed;
+                  try {
+                    parsed = jsonDecode(text) as Map<String, dynamic>;
+                  } catch (_) { setDlg(() => err = 'JSON invalide.'); return; }
+                  if (parsed['app'] != 'LastStats') {
+                    setDlg(() => err = 'Fichier non reconnu.'); return;
+                  }
+                  final prefs = parsed['prefs'];
+                  if (prefs is! Map) { setDlg(() => err = 'Format invalide.'); return; }
+                  if (ctx.mounted) { Navigator.pop(ctx); }
+                  await _applyBackup(Map<String, dynamic>.from(prefs));
+                },
+                child: const Text('Restaurer'),
+              ),
+            ],
+          );
+        });
+      },
+    );
+    ctrl.dispose();
+  }
+
+  Future<void> _applyBackup(Map<String, dynamic> prefs) async {
+    final p = await SharedPreferences.getInstance();
+    for (final entry in prefs.entries) {
+      final k = entry.key;
+      final v = entry.value;
+      if (!k.startsWith('ls_')) { continue; }
+      if (v is bool) { await p.setBool(k, v); }
+      else if (v is int) { await p.setInt(k, v); }
+      else if (v is double) { await p.setDouble(k, v); }
+      else if (v is String) { await p.setString(k, v); }
+      else if (v is List) { await p.setStringList(k, List<String>.from(v)); }
+    }
+    themeModeNotifier.value          = themeFromString(p.getString('ls_theme'));
+    accentNotifier.value             = accentFromString(p.getString('ls_accent'));
+    useDynamicColorNotifier.value    = p.getBool('ls_use_dynamic_color')    ?? false;
+    useNowPlayingColorNotifier.value = p.getBool('ls_use_nowplaying_color') ?? false;
+    await _loadPrefs();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text('Paramètres restaurés avec succès ✓'),
+      behavior: SnackBarBehavior.floating,
+    ));
   }
 
   Future<void> _setTheme(String v) async {
@@ -618,12 +747,45 @@ class _SettingsPageState extends State<_SettingsPage> {
                   ],
                 ));
               if (ok == true && mounted) {
+                final nav = Navigator.of(context);
                 final p = await SharedPreferences.getInstance();
                 await p.remove('ls_username'); await p.remove('ls_apikey');
-                if (mounted) Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (_) => const SetupScreen()), (_) => false);
+                if (mounted) { nav.pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const SetupScreen()), (_) => false); }
               }
             }),
+        ]),
+
+        const SizedBox(height: 16),
+
+        // Sauvegarde
+        _SettingsSection(label: 'Sauvegarde & restauration', children: [
+          ListTile(
+            leading: Icon(Icons.upload_rounded, color: scheme.primary),
+            title: const Text('Exporter les paramètres'),
+            subtitle: const Text('Copie un JSON dans le presse-papier'),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: _exportBackup,
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          ListTile(
+            leading: Icon(Icons.download_rounded, color: scheme.primary),
+            title: const Text('Restaurer une sauvegarde'),
+            subtitle: const Text('Collez un JSON précédemment exporté'),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: _showImportDialog,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+            child: Row(children: [
+              Icon(Icons.info_outline_rounded, size: 14, color: scheme.onSurfaceVariant),
+              const SizedBox(width: 6),
+              Expanded(child: Text(
+                'Inclut : thème, couleurs, clé API, pseudo, en-tête, favoris. Compatible entre versions.',
+                style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant),
+              )),
+            ]),
+          ),
         ]),
 
         const SizedBox(height: 16),
@@ -905,5 +1067,175 @@ class _SettingsSection extends StatelessWidget {
         ),
         child: Column(children: children)),
     ]);
+  }
+}
+
+// ── Export sheet ─────────────────────────────────────────────────────────────
+
+class _ExportSheet extends StatefulWidget {
+  final String payload;
+  final String defaultName;
+  const _ExportSheet({required this.payload, required this.defaultName});
+
+  @override
+  State<_ExportSheet> createState() => _ExportSheetState();
+}
+
+class _ExportSheetState extends State<_ExportSheet> {
+  late final TextEditingController _nameCtrl;
+  bool _copied = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameCtrl = TextEditingController(text: widget.defaultName);
+  }
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _copy() async {
+    await Clipboard.setData(ClipboardData(text: widget.payload));
+    if (!mounted) return;
+    setState(() => _copied = true);
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) { setState(() => _copied = false); }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.75,
+      minChildSize:     0.4,
+      maxChildSize:     0.95,
+      expand: false,
+      builder: (ctx, sc) => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        child: Scaffold(
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Handle + title
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 8, 4),
+                child: Row(children: [
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Center(
+                        child: Container(
+                          width: 40, height: 4,
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: scheme.onSurfaceVariant.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
+                      Row(children: [
+                        Icon(Icons.upload_rounded, color: scheme.primary, size: 20),
+                        const SizedBox(width: 8),
+                        Text('Exporter les paramètres',
+                            style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+                      ]),
+                    ]),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
+                ]),
+              ),
+
+              const Divider(height: 1),
+
+              Expanded(
+                child: ListView(
+                  controller: sc,
+                  padding: const EdgeInsets.all(20),
+                  children: [
+                    // Filename field
+                    Text('Nom du fichier',
+                        style: text.labelMedium?.copyWith(
+                            color: scheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: _nameCtrl,
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.insert_drive_file_outlined),
+                        suffixText: '.json',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // JSON preview
+                    Text('Contenu JSON',
+                        style: text.labelMedium?.copyWith(
+                            color: scheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 6),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: scheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.5)),
+                      ),
+                      constraints: const BoxConstraints(maxHeight: 220),
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(12),
+                        child: SelectableText(
+                          widget.payload,
+                          style: TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 11,
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    // Info
+                    Row(children: [
+                      Icon(Icons.info_outline_rounded, size: 13, color: scheme.onSurfaceVariant),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'Copiez ce JSON, collez-le dans un fichier texte et nommez-le avec .json',
+                          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                        ),
+                      ),
+                    ]),
+
+                    const SizedBox(height: 20),
+
+                    // Copy button
+                    FilledButton.icon(
+                      onPressed: _copy,
+                      icon: Icon(_copied ? Icons.check_rounded : Icons.copy_rounded),
+                      label: Text(_copied ? 'Copié !' : 'Copier le JSON'),
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        backgroundColor: _copied ? Colors.green.shade600 : null,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

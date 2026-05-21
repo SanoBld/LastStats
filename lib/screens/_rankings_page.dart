@@ -108,15 +108,19 @@ class _TopListBodyState extends State<_TopListBody>
         default:
           fresh = await widget.service.getTopTracks(period: widget.period,  limit: 50, page: _page);
       }
-      if (mounted) setState(() {
+      if (mounted) {
+        setState(() {
         _items.addAll(fresh); _exhausted = fresh.length < 50;
         _loading = false; _loadingMore = false;
       });
+      }
     } catch (e) {
-      if (mounted) setState(() {
+      if (mounted) {
+        setState(() {
         _error = e.toString().replaceFirst('Exception: ', '');
         _loading = false; _loadingMore = false;
       });
+      }
     }
   }
 
@@ -128,10 +132,12 @@ class _TopListBodyState extends State<_TopListBody>
     super.build(context);
     final scheme = Theme.of(context).colorScheme;
 
-    if (_loading)    return const Center(child: CircularProgressIndicator());
-    if (_error != null) return _ErrorView(message: _error!, onRetry: () => _load(reset: true));
-    if (_items.isEmpty) return Center(child: Text('Aucun résultat',
+    if (_loading) { return const Center(child: CircularProgressIndicator()); }
+    if (_error != null) { return _ErrorView(message: _error!, onRetry: () => _load(reset: true)); }
+    if (_items.isEmpty) {
+      return Center(child: Text('Aucun résultat',
         style: TextStyle(color: scheme.onSurfaceVariant)));
+    }
 
     return NotificationListener<ScrollNotification>(
       onNotification: (n) {

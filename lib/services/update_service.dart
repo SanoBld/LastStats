@@ -13,7 +13,7 @@ class UpdateService {
 
   // ─── À adapter à votre dépôt ───────────────────────────────────────────
   static const _repo           = 'sanobld/LastStats';        // owner/repo
-  static const currentVersion  = '1.2.0';                   // version actuelle
+  static const currentVersion  = '2.5.0';                   // version actuelle
   // ───────────────────────────────────────────────────────────────────────
 
   static const _timeout = Duration(seconds: 10);

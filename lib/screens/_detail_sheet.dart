@@ -35,7 +35,6 @@ class _ItemDetailSheet extends StatefulWidget {
 class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   // State
-  bool _loadingMeta   = true;
   bool _loadingUser   = true;
   bool _bioExpanded   = false;
   String _period      = 'overall';
@@ -80,7 +79,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       default:
         url = await ImageService.resolveTrack(_name, _artist, lastfmUrl: raw.isNotEmpty ? raw : null);
     }
-    if (mounted) setState(() => _resolvedImage = url);
+    if (mounted) { setState(() => _resolvedImage = url); }
   }
 
   // Fetch Last.fm metadata (bio, global stats, top tracks, top albums, tracklist)
@@ -93,27 +92,30 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             widget.service.getArtistTopTracks(_name, limit: 5),
             widget.service.getArtistTopAlbums(_name, limit: 8),
           ]);
-          if (mounted) setState(() {
+          if (mounted) {
+            setState(() {
             _info       = results[0] as Map<String, dynamic>?;
             _topTracks  = results[1] as List<dynamic>;
             _topAlbums  = results[2] as List<dynamic>;
           });
+          }
 
         case 'albums':
           final info = await widget.service.getAlbumInfo(_name, _artist);
-          if (mounted) setState(() {
+          if (mounted) {
+            setState(() {
             _info      = info;
             _tracklist = _asList(info?['tracks']?['track']);
           });
+          }
 
         case 'tracks':
           final info = await widget.service.getTrackInfo(_name, _artist);
-          if (mounted) setState(() => _info = info);
+          if (mounted) { setState(() => _info = info); }
       }
     } catch (_) {
       // Silent fail — show what we have
     } finally {
-      if (mounted) setState(() => _loadingMeta = false);
     }
   }
 
@@ -126,13 +128,15 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         artistName: _artist,
         period:     _period,
       );
-      if (mounted) setState(() {
+      if (mounted) {
+        setState(() {
         _userPlays = stats.plays;
         _userRank  = stats.rank;
         _loadingUser = false;
       });
+      }
     } catch (_) {
-      if (mounted) setState(() => _loadingUser = false);
+      if (mounted) { setState(() => _loadingUser = false); }
     }
   }
 
@@ -216,7 +220,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                     color: Colors.black.withValues(alpha: 0.55),
                     colorBlendMode: BlendMode.darken,
                     alignment: Alignment.center,
-                    errorBuilder: (_, __, ___) => _DetailGradientBg(scheme: scheme),
+                    errorBuilder: (_, _, _) => _DetailGradientBg(scheme: scheme),
                   )
                 : _DetailGradientBg(scheme: scheme),
           ),
@@ -422,7 +426,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   // ── Stats row ──────────────────────────────────────────────────────────────
   Widget _buildStatsRow(ColorScheme scheme) {
-    final text   = Theme.of(context).textTheme;
     final gl     = _globalListeners();
     final gp     = _globalPlaycount();
 
@@ -601,7 +604,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                             tween: Tween(begin: 0, end: frac.clamp(0.0, 1.0)),
                             duration: Duration(milliseconds: 600 + i * 80),
                             curve:    Curves.easeOut,
-                            builder: (_, v, __) => LinearProgressIndicator(
+                            builder: (_, v, _) => LinearProgressIndicator(
                               value:            v,
                               minHeight:        5,
                               color:            scheme.primary,

@@ -25,7 +25,7 @@ class _SmartImage extends StatelessWidget {
 
   Widget _img(String url, ColorScheme s) => ClipRRect(borderRadius: BorderRadius.circular(borderRadius),
     child: Image.network(url, width: size, height: size, fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _fallback(s)));
+        errorBuilder: (_, _, _) => _fallback(s)));
 
   Widget _loading(ColorScheme s) => ClipRRect(borderRadius: BorderRadius.circular(borderRadius),
     child: Container(width: size, height: size, color: s.surfaceContainerHighest,
