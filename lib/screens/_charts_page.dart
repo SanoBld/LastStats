@@ -67,9 +67,11 @@ class _ChartsPageState extends State<_ChartsPage> with AutomaticKeepAliveClientM
     return RefreshIndicator(
       onRefresh: _load,
       child: ListView(padding: const EdgeInsets.all(16), children: [
-        Text('Graphiques', style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
+        Text(L.chartsTitle, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
         const SizedBox(height: 20),
-        _SectionHeader(title: 'Scrobbles — 12 mois', icon: Icons.calendar_month_rounded),
+
+        // ── Monthly bar chart ─────────────────────────────────────────────
+        _SectionHeader(title: L.chartsMonthly, icon: Icons.calendar_month_rounded),
         const SizedBox(height: 12),
         Card(
           elevation: 0, color: scheme.surfaceContainerHighest,
@@ -100,7 +102,9 @@ class _ChartsPageState extends State<_ChartsPage> with AutomaticKeepAliveClientM
           ),
         ),
         const SizedBox(height: 24),
-        _SectionHeader(title: 'Top artistes — distribution', icon: Icons.mic_rounded),
+
+        // ── Artist distribution ───────────────────────────────────────────
+        _SectionHeader(title: L.chartsArtistDist, icon: Icons.mic_rounded),
         const SizedBox(height: 12),
         if (_topArtists.isNotEmpty) () {
           final mx = _topArtists.map((a) => int.tryParse((a['playcount'] ?? '0').toString()) ?? 0).fold(0, (a,b) => a>b?a:b);
@@ -137,14 +141,16 @@ class _ChartsPageState extends State<_ChartsPage> with AutomaticKeepAliveClientM
           );
         }(),
         const SizedBox(height: 24),
-        _SectionHeader(title: 'Mainstream vs Pépites', icon: Icons.diamond_outlined),
+
+        // ── Mainstream vs gems ────────────────────────────────────────────
+        _SectionHeader(title: L.chartsMainstreamTitle, icon: Icons.diamond_outlined),
         const SizedBox(height: 8),
-        Text('Popularité mondiale de tes artistes favoris.',
+        Text(L.chartsMainstreamSubtitle,
             style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
         const SizedBox(height: 12),
         if (_gems.isEmpty && !_gemsLoading)
           FilledButton.icon(onPressed: _computeGems,
-              icon: const Icon(Icons.calculate_rounded), label: const Text('Calculer'))
+              icon: const Icon(Icons.calculate_rounded), label: Text(L.chartsCompute))
         else if (_gemsLoading)
           const Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator()))
         else ...[
@@ -157,21 +163,18 @@ class _ChartsPageState extends State<_ChartsPage> with AutomaticKeepAliveClientM
               child: ListTile(
                 leading: Text(isGem ? '💎' : '🎤', style: const TextStyle(fontSize: 24)),
                 title: Text(gem.name, style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-                subtitle: Text('${_fmt(gem.listeners)} auditeurs mondiaux',
+                subtitle: Text(L.globalListeners(_fmt(gem.listeners)),
                     style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                trailing: Text(isGem ? 'Pépite' : 'Mainstream',
+                trailing: Text(isGem ? L.chartsGem : L.chartsMainstream,
                     style: text.labelSmall?.copyWith(
                         color: isGem ? scheme.tertiary : scheme.primary, fontWeight: FontWeight.w700)),
                 onTap: () => showDetailSheet(
-                  context,
-                  {'name': gem.name},
-                  'artists',
-                  widget.service,
+                  context, {'name': gem.name}, 'artists', widget.service,
                 ),
               ),
             );
           }),
-          Center(child: TextButton(onPressed: _computeGems, child: const Text('Recalculer'))),
+          Center(child: TextButton(onPressed: _computeGems, child: Text(L.chartsRecompute))),
         ],
         const SizedBox(height: 20),
       ]),
@@ -181,7 +184,3 @@ class _ChartsPageState extends State<_ChartsPage> with AutomaticKeepAliveClientM
 
 class _GemEntry { final String name; final int plays, listeners;
   const _GemEntry({required this.name, required this.plays, required this.listeners}); }
-
-
-// History
-

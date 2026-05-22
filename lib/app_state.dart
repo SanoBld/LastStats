@@ -5,6 +5,7 @@ final themeModeNotifier          = ValueNotifier<ThemeMode>(ThemeMode.system);
 final accentNotifier             = ValueNotifier<Color>(const Color(0xFF7C3AED));
 final useDynamicColorNotifier    = ValueNotifier<bool>(false);
 final useNowPlayingColorNotifier = ValueNotifier<bool>(false);
+final localeNotifier             = ValueNotifier<String>('fr'); // 'fr' | 'en'
 
 ThemeMode themeFromString(String? s) {
   switch (s) {
@@ -17,7 +18,6 @@ ThemeMode themeFromString(String? s) {
 /// Accepte une clé nommée ('purple', 'blue'…) ou un code hex '#RRGGBB'.
 Color accentFromString(String? s) {
   if (s == null) return const Color(0xFF7C3AED);
-  // Couleur hex personnalisée
   if (s.startsWith('#') && s.length == 7) {
     try {
       return Color(0xFF000000 | int.parse(s.substring(1), radix: 16));
@@ -30,7 +30,7 @@ Color accentFromString(String? s) {
     case 'orange': return const Color(0xFFD97706);
     case 'pink':   return const Color(0xFFDB2777);
     case 'teal':   return const Color(0xFF0F766E);
-    default:       return const Color(0xFF7C3AED); // purple
+    default:       return const Color(0xFF7C3AED);
   }
 }
 

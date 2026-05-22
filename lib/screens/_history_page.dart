@@ -68,7 +68,7 @@ class _HistoryPageState extends State<_HistoryPage>
     final picked = await showDatePicker(
       context: context, initialDate: _selectedDate,
       firstDate: DateTime(2000), lastDate: DateTime.now(),
-      helpText: 'Sélectionner une date', cancelText: 'Annuler', confirmText: 'OK',
+      helpText: L.historySelectDate, cancelText: L.commonCancel, confirmText: 'OK',
     );
     if (picked != null && mounted) { setState(() => _selectedDate = picked); _load(); }
   }
@@ -77,8 +77,6 @@ class _HistoryPageState extends State<_HistoryPage>
   int get _uniqueAlbums  => _tracks.map((t) => (t as Map)['album']?['#text']  ?? '')
       .where((a) => (a as String).isNotEmpty).toSet().length;
 
-  // Group by LOCAL hour descending.
-  // Last.fm returns a Unix timestamp in date['uts'] — we convert to device-local time.
   List<MapEntry<String, List<dynamic>>> get _byHour {
     final map = <String, List<dynamic>>{};
     for (final t in _tracks) {
@@ -98,13 +96,6 @@ class _HistoryPageState extends State<_HistoryPage>
     return sorted;
   }
 
-  String _dayLabel() {
-    const jours = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
-    const mois  = ['','janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-    final d = _selectedDate;
-    return '${jours[d.weekday - 1]} ${d.day} ${mois[d.month]} ${d.year}';
-  }
-
   String _dateFmt() {
     final d = _selectedDate;
     return '${d.day.toString().padLeft(2,'0')}/${d.month.toString().padLeft(2,'0')}/${d.year}';
@@ -121,13 +112,12 @@ class _HistoryPageState extends State<_HistoryPage>
       body: SafeArea(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-          // Title
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 16, 4),
             child: Row(children: [
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Historique', style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
-                Text('Vos écoutes, jour par jour',
+                Text(L.historyTitle, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
+                Text(L.historySubtitle,
                     style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               ])),
               IconButton(icon: const Icon(Icons.refresh_rounded), onPressed: _load),
@@ -173,7 +163,7 @@ class _HistoryPageState extends State<_HistoryPage>
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
                       Icon(Icons.today_rounded, size: 15, color: scheme.onPrimaryContainer),
                       const SizedBox(width: 5),
-                      Text("Aujourd'hui", style: text.labelMedium?.copyWith(
+                      Text(L.historyToday, style: text.labelMedium?.copyWith(
                           color: scheme.onPrimaryContainer, fontWeight: FontWeight.w600)),
                     ]),
                   ),
@@ -190,11 +180,10 @@ class _HistoryPageState extends State<_HistoryPage>
 
           const SizedBox(height: 12),
 
-          // Day summary + tabs
           if (hasData) ...[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(_dayLabel(),
+              child: Text(L.dayLabel(_selectedDate),
                   style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
             ),
             const SizedBox(height: 8),
@@ -203,13 +192,13 @@ class _HistoryPageState extends State<_HistoryPage>
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
                 _HistStatPill(icon: Icons.headphones_rounded,
-                    label: '${_tracks.length} scrobbles', scheme: scheme),
+                    label: L.historyScrobbles(_tracks.length), scheme: scheme),
                 const SizedBox(width: 8),
                 _HistStatPill(icon: Icons.mic_rounded,
-                    label: '$_uniqueArtists artistes', scheme: scheme),
+                    label: L.historyArtistsCount(_uniqueArtists), scheme: scheme),
                 const SizedBox(width: 8),
                 _HistStatPill(icon: Icons.album_rounded,
-                    label: '$_uniqueAlbums albums', scheme: scheme),
+                    label: L.historyAlbumsCount(_uniqueAlbums), scheme: scheme),
               ],
             )),
             const SizedBox(height: 10),
@@ -222,15 +211,14 @@ class _HistoryPageState extends State<_HistoryPage>
               indicatorColor: scheme.primary,
               indicatorSize: TabBarIndicatorSize.label,
               dividerColor: scheme.outlineVariant.withValues(alpha: 0.3),
-              tabs: const [
-                Tab(text: 'Chronologique'),
-                Tab(text: 'Liste'),
-                Tab(text: 'Statistiques'),
+              tabs: [
+                Tab(text: L.historyChronological),
+                Tab(text: L.historyList),
+                Tab(text: L.historyStats),
               ],
             ),
           ],
 
-          // Content
           if (_loading)
             const Expanded(child: Center(child: CircularProgressIndicator()))
           else if (_error != null)
@@ -240,7 +228,7 @@ class _HistoryPageState extends State<_HistoryPage>
               Icon(Icons.music_off_rounded, size: 48,
                   color: scheme.onSurfaceVariant.withValues(alpha: 0.35)),
               const SizedBox(height: 12),
-              Text('Aucune écoute ce jour-là',
+              Text(L.historyNoTracks,
                   style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
             ])))
           else
@@ -258,7 +246,7 @@ class _HistoryPageState extends State<_HistoryPage>
   }
 }
 
-// Navigation button
+// ── Navigation button ────────────────────────────────────────────────────────
 class _HistNavBtn extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onTap;
@@ -280,7 +268,7 @@ class _HistNavBtn extends StatelessWidget {
   );
 }
 
-// Stat pill
+// ── Stat pill ────────────────────────────────────────────────────────────────
 class _HistStatPill extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -302,10 +290,7 @@ class _HistStatPill extends StatelessWidget {
   );
 }
 
-// ── Helper: parse a Last.fm track's Unix timestamp (UTC) to local DateTime ──
-// Last.fm always returns UTC in date['#text'], but the Unix timestamp
-// in date['uts'] is timezone-agnostic — DateTime.fromMillisecondsSinceEpoch
-// converts it to the device's local timezone automatically.
+// ── Timestamp helpers ────────────────────────────────────────────────────────
 DateTime? _localDateTimeFromTrack(Map t) {
   final uts = t['date']?['uts']?.toString() ?? '';
   if (uts.isEmpty) return null;
@@ -320,7 +305,7 @@ String _localTimeString(Map t) {
   return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
 }
 
-// Chronological view
+// ── Chronological view ───────────────────────────────────────────────────────
 class _HistChronView extends StatelessWidget {
   final List<dynamic> tracks;
   final List<MapEntry<String, List<dynamic>>> byHour;
@@ -341,46 +326,28 @@ class _HistChronView extends StatelessWidget {
           final entry   = byHour[i];
           final hour    = entry.key;
           final hTracks = entry.value;
+          final n = hTracks.length;
+          final trackWord = L.historyHourTracks;
           return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // Hour separator
             if (i > 0) const Divider(height: 1, thickness: 1),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
               child: Row(children: [
-                Container(
-                  width: 3, height: 18,
-                  decoration: BoxDecoration(
-                    color: scheme.primary,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
+                Container(width: 3, height: 18,
+                  decoration: BoxDecoration(color: scheme.primary, borderRadius: BorderRadius.circular(2))),
                 const SizedBox(width: 10),
                 Text(hour, style: text.titleSmall?.copyWith(
-                  color: scheme.primary,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.5,
-                )),
+                  color: scheme.primary, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
                 const SizedBox(width: 10),
-                Expanded(child: Container(
-                  height: 1,
-                  color: scheme.primary.withValues(alpha: 0.15),
-                )),
+                Expanded(child: Container(height: 1, color: scheme.primary.withValues(alpha: 0.15))),
                 const SizedBox(width: 8),
-                Text(
-                  '${hTracks.length} titre${hTracks.length > 1 ? "s" : ""}',
+                Text('$n $trackWord${n > 1 ? 's' : ''}',
                   style: text.labelSmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
+                    color: scheme.onSurfaceVariant, fontStyle: FontStyle.italic)),
               ]),
             ),
             for (final t in hTracks)
-              _HistTrackRow(
-                track: t as Map,
-                time: _localTimeString(t),
-                service: service,
-              ),
+              _HistTrackRow(track: t as Map, time: _localTimeString(t), service: service),
             const SizedBox(height: 6),
           ]);
         },
@@ -389,7 +356,7 @@ class _HistChronView extends StatelessWidget {
   }
 }
 
-// Track row (chronological view)
+// ── Track row ────────────────────────────────────────────────────────────────
 class _HistTrackRow extends StatelessWidget {
   final Map track;
   final String time;
@@ -412,16 +379,13 @@ class _HistTrackRow extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
         child: Row(children: [
-          // Local time
           SizedBox(width: 40,
             child: Text(time, style: text.labelSmall?.copyWith(
                 color: scheme.onSurfaceVariant, fontWeight: FontWeight.w500))),
           const SizedBox(width: 8),
-          // Cover art
           _SmartImage(size: 42, borderRadius: 6, initialUrl: raw,
               resolver: () => ImageService.resolveTrack(tit, art, lastfmUrl: raw.isNotEmpty ? raw : null)),
           const SizedBox(width: 12),
-          // Info
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(tit, maxLines: 1, overflow: TextOverflow.ellipsis,
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
@@ -441,7 +405,7 @@ class _HistTrackRow extends StatelessWidget {
   }
 }
 
-// List view
+// ── List view ─────────────────────────────────────────────────────────────────
 class _HistListeView extends StatelessWidget {
   final List<dynamic> tracks;
   final LastFmService service;
@@ -460,7 +424,6 @@ class _HistListeView extends StatelessWidget {
         final art = (t['artist']?['#text'] ?? '').toString();
         final alb = (t['album']?['#text']  ?? '').toString();
         final raw = _extractImage(t['image']);
-        // Use local time via Unix timestamp instead of the UTC #text field
         final timeOnly = _localTimeString(t);
         return ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
@@ -482,7 +445,7 @@ class _HistListeView extends StatelessWidget {
   }
 }
 
-// Stats view
+// ── Stats view ────────────────────────────────────────────────────────────────
 class _HistStatsView extends StatelessWidget {
   final List<dynamic> tracks;
   const _HistStatsView({required this.tracks});
@@ -505,13 +468,13 @@ class _HistStatsView extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       children: [
-        _HistStatSection(title: 'Top artistes', icon: Icons.mic_rounded,
+        _HistStatSection(title: L.historyTopArtists, icon: Icons.mic_rounded,
             data: artists, scheme: scheme, text: text),
         const SizedBox(height: 20),
-        _HistStatSection(title: 'Top albums', icon: Icons.album_rounded,
+        _HistStatSection(title: L.historyTopAlbums, icon: Icons.album_rounded,
             data: albums, scheme: scheme, text: text),
         const SizedBox(height: 20),
-        _HistStatSection(title: 'Top titres', icon: Icons.music_note_rounded,
+        _HistStatSection(title: L.historyTopTracks, icon: Icons.music_note_rounded,
             data: tTracks, scheme: scheme, text: text),
       ],
     );
@@ -570,11 +533,12 @@ class _HistStatSection extends StatelessWidget {
 }
 
 
-// Settings
+// Settings — startup tab labels (must stay in sync with HomeScreen pages order)
 
-const _kStartupLabels = [
-  (Icons.dashboard_rounded,    'Dashboard'),
-  (Icons.emoji_events_rounded, 'Classements'),
-  (Icons.auto_graph_rounded,   'Graphiques'),
-  (Icons.history_rounded,      'Historique'),
+List<(IconData, String)> _localizedStartupLabels() => [
+  (Icons.dashboard_rounded,    L.navDashboard),
+  (Icons.search_rounded,       L.navSearch),
+  (Icons.emoji_events_rounded, L.navRankings),
+  (Icons.auto_graph_rounded,   L.navCharts),
+  (Icons.history_rounded,      L.navHistory),
 ];

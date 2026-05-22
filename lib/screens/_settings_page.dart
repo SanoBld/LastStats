@@ -22,9 +22,10 @@ class _SettingsPageState extends State<_SettingsPage> {
   bool   _showNowPlay = true, _showStats = true, _showArtists = true, _showTracks = true;
   bool   _showFriends = true;
   bool   _autoUpdate = true;
+  String _locale = 'fr';
   UpdateInfo? _updateInfo; bool _checkingUpdate = false; String? _updateError;
 
-  final _customUrlCtrl  = TextEditingController();
+  final _customUrlCtrl   = TextEditingController();
   final _fallbackUrlCtrl = TextEditingController();
 
   bool get _isCustomAccent =>
@@ -45,26 +46,27 @@ class _SettingsPageState extends State<_SettingsPage> {
     final p = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
-      _theme               = p.getString('ls_theme')                    ?? 'system';
-      _accent              = p.getString('ls_accent')                   ?? 'purple';
-      _useDynamicColor     = p.getBool('ls_use_dynamic_color')          ?? false;
-      _useNowPlayingColor  = p.getBool('ls_use_nowplaying_color')       ?? false;
-      _startupTab          = p.getInt('ls_startup_tab')                 ?? 0;
-      _headerSource        = p.getString('ls_header_source')            ?? 'nowplaying';
-      _headerBlur          = p.getDouble('ls_header_blur')              ?? 0.0;
-      _headerAnimation     = p.getString('ls_header_animation')         ?? 'fade';
-      _headerCustomUrl     = p.getString('ls_header_custom_url')        ?? '';
-      _headerFallbackUrl   = p.getString('ls_header_fallback_url')      ?? '';
-      _headerFallbackEnabled = p.getBool('ls_header_fallback_enabled')  ?? false;
-      _headerPeriod        = p.getString('ls_header_period')            ?? 'overall';
-      _showNowPlay         = p.getBool('ls_show_nowplay')               ?? true;
-      _showStats           = p.getBool('ls_show_stats')                 ?? true;
-      _showArtists         = p.getBool('ls_show_artists')               ?? true;
-      _showTracks          = p.getBool('ls_show_tracks')                ?? true;
-      _showFriends         = p.getBool('ls_show_friends')               ?? true;
-      _autoUpdate          = p.getBool('ls_auto_update_check')          ?? true;
+      _theme                = p.getString('ls_theme')                    ?? 'system';
+      _accent               = p.getString('ls_accent')                   ?? 'purple';
+      _useDynamicColor      = p.getBool('ls_use_dynamic_color')          ?? false;
+      _useNowPlayingColor   = p.getBool('ls_use_nowplaying_color')       ?? false;
+      _startupTab           = p.getInt('ls_startup_tab')                 ?? 0;
+      _headerSource         = p.getString('ls_header_source')            ?? 'nowplaying';
+      _headerBlur           = p.getDouble('ls_header_blur')              ?? 0.0;
+      _headerAnimation      = p.getString('ls_header_animation')         ?? 'fade';
+      _headerCustomUrl      = p.getString('ls_header_custom_url')        ?? '';
+      _headerFallbackUrl    = p.getString('ls_header_fallback_url')      ?? '';
+      _headerFallbackEnabled = p.getBool('ls_header_fallback_enabled')   ?? false;
+      _headerPeriod         = p.getString('ls_header_period')            ?? 'overall';
+      _showNowPlay          = p.getBool('ls_show_nowplay')               ?? true;
+      _showStats            = p.getBool('ls_show_stats')                 ?? true;
+      _showArtists          = p.getBool('ls_show_artists')               ?? true;
+      _showTracks           = p.getBool('ls_show_tracks')                ?? true;
+      _showFriends          = p.getBool('ls_show_friends')               ?? true;
+      _autoUpdate           = p.getBool('ls_auto_update_check')          ?? true;
+      _locale               = p.getString('ls_locale')                   ?? 'fr';
     });
-    _customUrlCtrl.text  = _headerCustomUrl;
+    _customUrlCtrl.text   = _headerCustomUrl;
     _fallbackUrlCtrl.text = _headerFallbackUrl;
   }
 
@@ -86,20 +88,26 @@ class _SettingsPageState extends State<_SettingsPage> {
       await p.setInt('ls_last_update_check', DateTime.now().millisecondsSinceEpoch);
       setState(() { _updateInfo = info; _checkingUpdate = false; });
     } catch (_) {
-      if (mounted) {
-        setState(() { _updateError = 'Vérification impossible.'; _checkingUpdate = false; });
-      }
+      if (mounted) setState(() { _updateError = L.settingsCheckFailed; _checkingUpdate = false; });
     }
   }
 
   Future<void> _set<T>(String key, T v) async {
     final p = await SharedPreferences.getInstance();
-    if (v is bool) { await p.setBool(key, v); }
+    if (v is bool)   { await p.setBool(key, v); }
     if (v is String) { await p.setString(key, v); }
-    if (v is int) { await p.setInt(key, v); }
+    if (v is int)    { await p.setInt(key, v); }
   }
 
-  // ── Backup / Restore ─────────────────────────────────────────────────────
+  // ── Language ──────────────────────────────────────────────────────────────
+
+  Future<void> _setLocale(String code) async {
+    await _set('ls_locale', code);
+    setState(() => _locale = code);
+    localeNotifier.value = code;
+  }
+
+  // ── Backup / Restore ──────────────────────────────────────────────────────
 
   static const _kBackupKeys = [
     'ls_username', 'ls_apikey',
@@ -109,7 +117,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     'ls_header_fallback_enabled', 'ls_header_fallback_url',
     'ls_show_nowplay', 'ls_show_stats', 'ls_show_artists', 'ls_show_tracks', 'ls_show_friends',
     'ls_startup_tab', 'ls_auto_update_check',
-    'ls_fav_friends', 'ls_fav_profiles',
+    'ls_fav_friends', 'ls_fav_profiles', 'ls_locale',
   ];
 
   Future<void> _exportBackup() async {
@@ -126,18 +134,12 @@ class _SettingsPageState extends State<_SettingsPage> {
       'exported_at': now.toIso8601String(),
       'prefs':       map,
     });
-
-    // Default filename suggestion
-    final dateStr =
-        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final dateStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
     final defaultName = 'laststats_backup_$dateStr.json';
-
     if (!mounted) return;
     await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: Colors.transparent,
+      context: context, isScrollControlled: true,
+      useSafeArea: true, backgroundColor: Colors.transparent,
       builder: (ctx) => _ExportSheet(payload: payload, defaultName: defaultName),
     );
   }
@@ -150,18 +152,13 @@ class _SettingsPageState extends State<_SettingsPage> {
         String? err;
         return StatefulBuilder(builder: (ctx, setDlg) {
           return AlertDialog(
-            title: const Text('Restaurer une sauvegarde'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+            title: Text(L.importTitle),
+            content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Collez ici votre sauvegarde LastStats.',
-                    style: TextStyle(fontSize: 13)),
+                Text(L.importHintLabel, style: const TextStyle(fontSize: 13)),
                 const SizedBox(height: 12),
                 TextField(
-                  controller: ctrl,
-                  maxLines: 5,
-                  autofocus: true,
+                  controller: ctrl, maxLines: 5, autofocus: true,
                   decoration: InputDecoration(
                     hintText: '{"app":"LastStats",...}',
                     border: const OutlineInputBorder(),
@@ -172,27 +169,21 @@ class _SettingsPageState extends State<_SettingsPage> {
               ],
             ),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Annuler'),
-              ),
+              TextButton(onPressed: () => Navigator.pop(ctx), child: Text(L.commonCancel)),
               FilledButton(
                 onPressed: () async {
-                  final text = ctrl.text.trim();
-                  if (text.isEmpty) { setDlg(() => err = 'Champ vide.'); return; }
+                  final raw = ctrl.text.trim();
+                  if (raw.isEmpty) { setDlg(() => err = L.importEmpty); return; }
                   Map<String, dynamic> parsed;
-                  try {
-                    parsed = jsonDecode(text) as Map<String, dynamic>;
-                  } catch (_) { setDlg(() => err = 'JSON invalide.'); return; }
-                  if (parsed['app'] != 'LastStats') {
-                    setDlg(() => err = 'Fichier non reconnu.'); return;
-                  }
+                  try { parsed = jsonDecode(raw) as Map<String, dynamic>; }
+                  catch (_) { setDlg(() => err = L.importInvalidJson); return; }
+                  if (parsed['app'] != 'LastStats') { setDlg(() => err = L.importUnknownFile); return; }
                   final prefs = parsed['prefs'];
-                  if (prefs is! Map) { setDlg(() => err = 'Format invalide.'); return; }
+                  if (prefs is! Map) { setDlg(() => err = L.importInvalidFormat); return; }
                   if (ctx.mounted) { Navigator.pop(ctx); }
                   await _applyBackup(Map<String, dynamic>.from(prefs));
                 },
-                child: const Text('Restaurer'),
+                child: Text(L.importRestore),
               ),
             ],
           );
@@ -205,24 +196,23 @@ class _SettingsPageState extends State<_SettingsPage> {
   Future<void> _applyBackup(Map<String, dynamic> prefs) async {
     final p = await SharedPreferences.getInstance();
     for (final entry in prefs.entries) {
-      final k = entry.key;
-      final v = entry.value;
+      final k = entry.key; final v = entry.value;
       if (!k.startsWith('ls_')) { continue; }
-      if (v is bool) { await p.setBool(k, v); }
-      else if (v is int) { await p.setInt(k, v); }
+      if (v is bool)   { await p.setBool(k, v); }
+      else if (v is int)    { await p.setInt(k, v); }
       else if (v is double) { await p.setDouble(k, v); }
       else if (v is String) { await p.setString(k, v); }
-      else if (v is List) { await p.setStringList(k, List<String>.from(v)); }
+      else if (v is List)   { await p.setStringList(k, List<String>.from(v)); }
     }
     themeModeNotifier.value          = themeFromString(p.getString('ls_theme'));
     accentNotifier.value             = accentFromString(p.getString('ls_accent'));
     useDynamicColorNotifier.value    = p.getBool('ls_use_dynamic_color')    ?? false;
     useNowPlayingColorNotifier.value = p.getBool('ls_use_nowplaying_color') ?? false;
+    localeNotifier.value             = p.getString('ls_locale')             ?? 'fr';
     await _loadPrefs();
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Paramètres restaurés avec succès ✓'),
-      behavior: SnackBarBehavior.floating,
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(L.importSuccess), behavior: SnackBarBehavior.floating,
     ));
   }
 
@@ -257,12 +247,17 @@ class _SettingsPageState extends State<_SettingsPage> {
     final text   = Theme.of(context).textTheme;
     final currentAccent = accentNotifier.value;
 
+    final headerSources   = _localizedHeaderSources();
+    final headerAnims     = _localizedHeaderAnimations();
+    final headerPeriods   = _localizedHeaderPeriods();
+    final startupLabels   = _localizedStartupLabels();
+
     return SafeArea(
       child: ListView(padding: const EdgeInsets.all(20), children: [
-        Text('Paramètres', style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
+        Text(L.settingsTitle, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
         const SizedBox(height: 20),
 
-        // Update banner
+        // ── Update banner ────────────────────────────────────────────────
         if (_updateInfo != null) ...[
           Container(
             padding: const EdgeInsets.all(16),
@@ -273,7 +268,7 @@ class _SettingsPageState extends State<_SettingsPage> {
               Icon(Icons.system_update_rounded, color: scheme.onTertiaryContainer, size: 28),
               const SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Mise à jour — v${_updateInfo!.version}',
+                Text(L.settingsUpdateBanner(_updateInfo!.version),
                     style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w700,
                         color: scheme.onTertiaryContainer)),
                 if (_updateInfo!.notes.isNotEmpty)
@@ -291,15 +286,40 @@ class _SettingsPageState extends State<_SettingsPage> {
                     backgroundColor: scheme.tertiary, foregroundColor: scheme.onTertiary,
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     textStyle: text.labelMedium),
-                child: Text(_updateInfo!.hasApk ? 'Télécharger' : 'Voir'),
+                child: Text(_updateInfo!.hasApk ? L.settingsDownload : L.settingsViewRelease),
               ),
             ]),
           ),
           const SizedBox(height: 16),
         ],
 
-        // Appearance
-        _SettingsSection(label: 'Apparence', children: [
+        // ── Language ────────────────────────────────────────────────────
+        _SettingsSection(label: L.settingsLanguage, children: [
+          Padding(padding: const EdgeInsets.fromLTRB(16, 14, 16, 14), child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Icon(Icons.translate_rounded, size: 18, color: scheme.primary),
+                const SizedBox(width: 8),
+                Text(L.settingsLanguage, style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+              ]),
+              const SizedBox(height: 12),
+              SegmentedButton<String>(
+                segments: const [
+                  ButtonSegment(value: 'fr', label: Text('Français'), icon: Text('🇫🇷')),
+                  ButtonSegment(value: 'en', label: Text('English'),  icon: Text('🇬🇧')),
+                ],
+                selected: {_locale},
+                onSelectionChanged: (s) => _setLocale(s.first),
+                style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+              ),
+            ],
+          )),
+        ]),
+
+        const SizedBox(height: 16),
+
+        // ── Appearance ───────────────────────────────────────────────────
+        _SettingsSection(label: L.settingsAppearance, children: [
 
           // Theme
           Padding(padding: const EdgeInsets.fromLTRB(16, 14, 16, 10), child: Column(
@@ -307,14 +327,14 @@ class _SettingsPageState extends State<_SettingsPage> {
               Row(children: [
                 Icon(Icons.contrast_rounded, size: 18, color: scheme.primary),
                 const SizedBox(width: 8),
-                Text('Thème', style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                Text(L.settingsTheme, style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
               ]),
               const SizedBox(height: 10),
               SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(value: 'system', icon: Icon(Icons.brightness_auto_rounded), label: Text('Auto')),
-                  ButtonSegment(value: 'light',  icon: Icon(Icons.light_mode_rounded),       label: Text('Clair')),
-                  ButtonSegment(value: 'dark',   icon: Icon(Icons.dark_mode_rounded),        label: Text('Sombre')),
+                segments: [
+                  ButtonSegment(value: 'system', icon: const Icon(Icons.brightness_auto_rounded), label: Text(L.settingsThemeAuto)),
+                  ButtonSegment(value: 'light',  icon: const Icon(Icons.light_mode_rounded),       label: Text(L.settingsThemeLight)),
+                  ButtonSegment(value: 'dark',   icon: const Icon(Icons.dark_mode_rounded),        label: Text(L.settingsThemeDark)),
                 ],
                 selected: {_theme},
                 onSelectionChanged: (s) => _setTheme(s.first),
@@ -331,7 +351,7 @@ class _SettingsPageState extends State<_SettingsPage> {
               Row(children: [
                 Icon(Icons.palette_rounded, size: 18, color: scheme.primary),
                 const SizedBox(width: 8),
-                Text("Couleur d'accent", style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                Text(L.settingsAccentColor, style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
                 if (_useDynamicColor || _useNowPlayingColor) ...[
                   const SizedBox(width: 8),
                   Container(
@@ -339,14 +359,13 @@ class _SettingsPageState extends State<_SettingsPage> {
                     decoration: BoxDecoration(color: scheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: scheme.outlineVariant)),
-                    child: Text('Auto', style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant))),
+                    child: Text(L.settingsAccentAuto, style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant))),
                 ],
               ]),
               const SizedBox(height: 12),
               Opacity(
                 opacity: (_useDynamicColor || _useNowPlayingColor) ? 0.35 : 1.0,
                 child: Wrap(spacing: 10, runSpacing: 10, children: [
-                  // Named presets
                   ..._kAccentOptions.map((opt) {
                     final (color, key, label) = opt;
                     final sel = _accent == key;
@@ -365,22 +384,19 @@ class _SettingsPageState extends State<_SettingsPage> {
                       )),
                     );
                   }),
-                  // Custom color button (color wheel)
                   GestureDetector(
                     onTap: (_useDynamicColor || _useNowPlayingColor) ? null : _pickCustomColor,
                     child: Tooltip(
-                      message: 'Personnalisé',
+                      message: L.colorCustomTooltip,
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         width: 36, height: 36,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          gradient: _isCustomAccent
-                              ? null
-                              : const SweepGradient(colors: [
-                                  Color(0xFFFF0000), Color(0xFFFFFF00), Color(0xFF00FF00),
-                                  Color(0xFF00FFFF), Color(0xFF0000FF), Color(0xFFFF00FF), Color(0xFFFF0000),
-                                ]),
+                          gradient: _isCustomAccent ? null : const SweepGradient(colors: [
+                            Color(0xFFFF0000), Color(0xFFFFFF00), Color(0xFF00FF00),
+                            Color(0xFF00FFFF), Color(0xFF0000FF), Color(0xFFFF00FF), Color(0xFFFF0000),
+                          ]),
                           color: _isCustomAccent ? currentAccent : null,
                           border: _isCustomAccent
                               ? Border.all(color: scheme.onSurface, width: 3)
@@ -396,7 +412,6 @@ class _SettingsPageState extends State<_SettingsPage> {
                   ),
                 ]),
               ),
-              // Show selected custom color
               if (_isCustomAccent && !_useDynamicColor && !_useNowPlayingColor) ...[
                 const SizedBox(height: 10),
                 Row(children: [
@@ -405,11 +420,9 @@ class _SettingsPageState extends State<_SettingsPage> {
                         border: Border.all(color: scheme.outlineVariant))),
                   const SizedBox(width: 8),
                   Text(colorToHex(currentAccent),
-                      style: text.bodySmall?.copyWith(
-                          fontFamily: 'monospace', color: scheme.onSurfaceVariant)),
+                      style: text.bodySmall?.copyWith(fontFamily: 'monospace', color: scheme.onSurfaceVariant)),
                   const SizedBox(width: 8),
-                  TextButton(onPressed: _pickCustomColor,
-                      child: const Text('Modifier')),
+                  TextButton(onPressed: _pickCustomColor, child: Text(L.settingsCustomColorEdit)),
                 ]),
               ],
             ],
@@ -418,12 +431,12 @@ class _SettingsPageState extends State<_SettingsPage> {
 
         const SizedBox(height: 16),
 
-        // Dynamic color
-        _SettingsSection(label: 'Couleur dynamique', children: [
+        // ── Dynamic color ────────────────────────────────────────────────
+        _SettingsSection(label: L.settingsDynamicColor, children: [
           SwitchListTile(
             secondary: Icon(Icons.colorize_rounded, color: scheme.primary),
-            title: const Text('Material You'),
-            subtitle: const Text('Utilise la couleur du thème Android'),
+            title: Text(L.settingsMaterialYou),
+            subtitle: Text(L.settingsMaterialYouSub),
             value: _useDynamicColor,
             onChanged: (v) async {
               await _set('ls_use_dynamic_color', v);
@@ -437,10 +450,8 @@ class _SettingsPageState extends State<_SettingsPage> {
           SwitchListTile(
             secondary: Icon(Icons.album_rounded,
                 color: _useDynamicColor ? scheme.onSurfaceVariant : scheme.primary),
-            title: const Text('Couleur depuis la musique'),
-            subtitle: Text(_useDynamicColor
-                ? 'Désactiver Material You d\'abord'
-                : 'Extrait la couleur de la pochette en cours'),
+            title: Text(L.settingsMusicColor),
+            subtitle: Text(_useDynamicColor ? L.settingsMusicColorLocked : L.settingsMusicColorSub),
             value: _useNowPlayingColor,
             onChanged: _useDynamicColor ? null : (v) async {
               await _set('ls_use_nowplaying_color', v);
@@ -450,24 +461,24 @@ class _SettingsPageState extends State<_SettingsPage> {
             },
           ),
           Padding(padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-            child: Text('La couleur dominante de la pochette en cours remplace l\'accent.',
+            child: Text(L.settingsMusicColorNote,
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant))),
         ]),
 
         const SizedBox(height: 16),
 
-        // Startup page
-        _SettingsSection(label: 'Page de démarrage', children: [
+        // ── Startup page ──────────────────────────────────────────────────
+        _SettingsSection(label: L.settingsStartupPage, children: [
           Padding(padding: const EdgeInsets.fromLTRB(16, 14, 16, 14), child: Column(
             crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Icon(Icons.rocket_launch_rounded, size: 18, color: scheme.primary),
                 const SizedBox(width: 8),
-                Text("Onglet à l'ouverture", style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                Text(L.settingsStartupTab, style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
               ]),
               const SizedBox(height: 12),
               Wrap(spacing: 8, runSpacing: 8,
-                children: _kStartupLabels.asMap().entries.map((e) => FilterChip(
+                children: startupLabels.asMap().entries.map((e) => FilterChip(
                   avatar: Icon(e.value.$1, size: 16), label: Text(e.value.$2),
                   selected: _startupTab == e.key, showCheckmark: false,
                   onSelected: (_) async { await _set('ls_startup_tab', e.key); setState(() => _startupTab = e.key); },
@@ -478,8 +489,8 @@ class _SettingsPageState extends State<_SettingsPage> {
 
         const SizedBox(height: 16),
 
-        // Dashboard
-        _SettingsSection(label: 'Dashboard', children: [
+        // ── Dashboard ─────────────────────────────────────────────────────
+        _SettingsSection(label: L.settingsDashboardSection, children: [
 
           // Header image
           Padding(padding: const EdgeInsets.fromLTRB(16, 14, 16, 4), child: Column(
@@ -487,26 +498,23 @@ class _SettingsPageState extends State<_SettingsPage> {
               Row(children: [
                 Icon(Icons.wallpaper_rounded, size: 18, color: scheme.primary),
                 const SizedBox(width: 8),
-                Text("Image d'en-tête", style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                Text(L.settingsHeaderImage, style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
               ]),
               const SizedBox(height: 4),
-              Text('La pochette choisie s\'affiche en fond de l\'accueil.',
+              Text(L.settingsHeaderImageSub,
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               const SizedBox(height: 12),
 
-              // Source selector
-              Text('Source', style: text.labelSmall?.copyWith(
+              Text(L.settingsHeaderSource, style: text.labelSmall?.copyWith(
                   color: scheme.primary, fontWeight: FontWeight.w700, letterSpacing: 0.8)),
               const SizedBox(height: 8),
               Wrap(spacing: 8, runSpacing: 8,
-                children: _kHeaderSources.map((opt) {
+                children: headerSources.map((opt) {
                   final (key, label, icon) = opt;
                   final sel = _headerSource == key;
                   return FilterChip(
-                    avatar: Icon(icon, size: 16),
-                    label: Text(label),
-                    selected: sel,
-                    showCheckmark: false,
+                    avatar: Icon(icon, size: 16), label: Text(label),
+                    selected: sel, showCheckmark: false,
                     onSelected: (_) async {
                       final p = await SharedPreferences.getInstance();
                       await p.setString('ls_header_source', key);
@@ -515,24 +523,21 @@ class _SettingsPageState extends State<_SettingsPage> {
                   );
                 }).toList()),
 
-              // Custom URL (when source is custom)
               if (_headerSource == 'custom') ...[
                 const SizedBox(height: 14),
-                Text('URL de l\'image', style: text.labelSmall?.copyWith(
+                Text(L.settingsHeaderCustomUrl, style: text.labelSmall?.copyWith(
                     color: scheme.primary, fontWeight: FontWeight.w700, letterSpacing: 0.8)),
                 const SizedBox(height: 8),
                 TextField(
-                  controller: _customUrlCtrl,
-                  autocorrect: false,
-                  keyboardType: TextInputType.url,
-                  textInputAction: TextInputAction.done,
+                  controller: _customUrlCtrl, autocorrect: false,
+                  keyboardType: TextInputType.url, textInputAction: TextInputAction.done,
                   decoration: InputDecoration(
-                    hintText: 'https://exemple.com/image.jpg',
+                    hintText: L.settingsHeaderCustomUrlHint,
                     prefixIcon: const Icon(Icons.link_rounded),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.check_circle_outline_rounded),
-                      tooltip: 'Appliquer',
+                      tooltip: L.settingsHeaderApply,
                       onPressed: () async {
                         final url = _customUrlCtrl.text.trim();
                         final p = await SharedPreferences.getInstance();
@@ -549,23 +554,20 @@ class _SettingsPageState extends State<_SettingsPage> {
                   },
                 ),
                 const SizedBox(height: 6),
-                Text('Colle l\'URL directe d\'une image (jpg, png, webp…).',
+                Text(L.settingsHeaderCustomUrlSub,
                     style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               ],
 
-              // Period (for top_* sources)
               if (['top_track', 'top_album', 'top_artist'].contains(_headerSource)) ...[
                 const SizedBox(height: 14),
-                Text('Période', style: text.labelSmall?.copyWith(
+                Text(L.settingsHeaderPeriod, style: text.labelSmall?.copyWith(
                     color: scheme.primary, fontWeight: FontWeight.w700, letterSpacing: 0.8)),
                 const SizedBox(height: 8),
                 Wrap(spacing: 8, runSpacing: 8,
-                  children: _kHeaderPeriods.map((opt) {
+                  children: headerPeriods.map((opt) {
                     final (key, label) = opt;
                     return FilterChip(
-                      label: Text(label),
-                      selected: _headerPeriod == key,
-                      showCheckmark: false,
+                      label: Text(label), selected: _headerPeriod == key, showCheckmark: false,
                       onSelected: (_) async {
                         final p = await SharedPreferences.getInstance();
                         await p.setString('ls_header_period', key);
@@ -575,7 +577,6 @@ class _SettingsPageState extends State<_SettingsPage> {
                   }).toList()),
               ],
 
-              // Fallback (when source is nowplaying)
               if (_headerSource == 'nowplaying') ...[
                 const SizedBox(height: 14),
                 Row(children: [
@@ -589,26 +590,24 @@ class _SettingsPageState extends State<_SettingsPage> {
                   ),
                   const SizedBox(width: 8),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('Image par défaut', style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-                    Text('Affichée si aucune musique n\'est en cours.',
+                    Text(L.settingsHeaderFallback, style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                    Text(L.settingsHeaderFallbackSub,
                         style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                   ])),
                 ]),
                 if (_headerFallbackEnabled) ...[
                   const SizedBox(height: 10),
                   TextField(
-                    controller: _fallbackUrlCtrl,
-                    autocorrect: false,
-                    keyboardType: TextInputType.url,
-                    textInputAction: TextInputAction.done,
+                    controller: _fallbackUrlCtrl, autocorrect: false,
+                    keyboardType: TextInputType.url, textInputAction: TextInputAction.done,
                     decoration: InputDecoration(
-                      labelText: 'URL de l\'image par défaut',
-                      hintText: 'https://exemple.com/image.jpg',
+                      labelText: L.settingsHeaderFallbackUrlLabel,
+                      hintText: L.settingsHeaderCustomUrlHint,
                       prefixIcon: const Icon(Icons.image_outlined),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.check_circle_outline_rounded),
-                        tooltip: 'Appliquer',
+                        tooltip: L.settingsHeaderApply,
                         onPressed: () async {
                           final url = _fallbackUrlCtrl.text.trim();
                           final p = await SharedPreferences.getInstance();
@@ -631,24 +630,21 @@ class _SettingsPageState extends State<_SettingsPage> {
               Divider(color: scheme.outlineVariant.withValues(alpha: 0.5)),
               const SizedBox(height: 12),
 
-              // Transition animation
               Row(children: [
                 Icon(Icons.animation_rounded, size: 18, color: scheme.primary),
                 const SizedBox(width: 8),
-                Text('Transition', style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                Text(L.settingsHeaderAnimation, style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
               ]),
               const SizedBox(height: 8),
-              Text('Animation lors du changement de pochette.',
+              Text(L.settingsHeaderAnimationSub,
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               const SizedBox(height: 10),
               Wrap(spacing: 8, runSpacing: 8,
-                children: _kHeaderAnimations.map((opt) {
+                children: headerAnims.map((opt) {
                   final (key, label, icon) = opt;
                   return FilterChip(
-                    avatar: Icon(icon, size: 16),
-                    label: Text(label),
-                    selected: _headerAnimation == key,
-                    showCheckmark: false,
+                    avatar: Icon(icon, size: 16), label: Text(label),
+                    selected: _headerAnimation == key, showCheckmark: false,
                     onSelected: (_) async {
                       final p = await SharedPreferences.getInstance();
                       await p.setString('ls_header_animation', key);
@@ -659,32 +655,23 @@ class _SettingsPageState extends State<_SettingsPage> {
 
               const SizedBox(height: 16),
 
-              // Blur
               Row(children: [
                 Icon(Icons.blur_on_rounded, size: 18, color: scheme.primary),
                 const SizedBox(width: 8),
-                Text('Flou', style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                Text(L.settingsHeaderBlur, style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: scheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: scheme.outlineVariant),
-                  ),
-                  child: Text(
-                    _headerBlur < 1 ? 'Aucun' : '${_headerBlur.round()}',
-                    style: text.labelMedium?.copyWith(fontFamily: 'monospace'),
-                  ),
+                  decoration: BoxDecoration(color: scheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(8), border: Border.all(color: scheme.outlineVariant)),
+                  child: Text(_headerBlur < 1 ? L.settingsHeaderBlurNone : '${_headerBlur.round()}',
+                      style: text.labelMedium?.copyWith(fontFamily: 'monospace')),
                 ),
               ]),
               const SizedBox(height: 4),
               Slider(
-                value: _headerBlur,
-                min: 0,
-                max: 20,
-                divisions: 20,
-                label: _headerBlur < 1 ? 'Aucun' : '${_headerBlur.round()}',
+                value: _headerBlur, min: 0, max: 20, divisions: 20,
+                label: _headerBlur < 1 ? L.settingsHeaderBlurNone : '${_headerBlur.round()}',
                 onChanged: (v) => setState(() => _headerBlur = v),
                 onChangeEnd: (v) async {
                   final p = await SharedPreferences.getInstance();
@@ -697,81 +684,82 @@ class _SettingsPageState extends State<_SettingsPage> {
 
           const Divider(height: 1, indent: 16, endIndent: 16),
 
-          // Visible sections
           Padding(padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-            child: Text('Sections visibles', style: text.bodySmall
+            child: Text(L.settingsVisibleSections, style: text.bodySmall
                 ?.copyWith(color: scheme.primary, fontWeight: FontWeight.w700))),
           SwitchListTile(secondary: const Icon(Icons.play_circle_outline_rounded),
-            title: const Text('En cours de lecture'), value: _showNowPlay,
+            title: Text(L.settingsNowPlayingSection), value: _showNowPlay,
             onChanged: (v) async { await _set('ls_show_nowplay', v); setState(() => _showNowPlay = v); }),
           SwitchListTile(secondary: const Icon(Icons.bar_chart_rounded),
-            title: const Text('Statistiques'), value: _showStats,
+            title: Text(L.settingsStatsSection), value: _showStats,
             onChanged: (v) async { await _set('ls_show_stats', v); setState(() => _showStats = v); }),
           SwitchListTile(secondary: const Icon(Icons.mic_rounded),
-            title: const Text('Top Artistes'), value: _showArtists,
+            title: Text(L.settingsTopArtistsSection), value: _showArtists,
             onChanged: (v) async { await _set('ls_show_artists', v); setState(() => _showArtists = v); }),
           SwitchListTile(secondary: const Icon(Icons.music_note_rounded),
-            title: const Text('Top Titres'), value: _showTracks,
+            title: Text(L.settingsTopTracksSection), value: _showTracks,
             onChanged: (v) async { await _set('ls_show_tracks', v); setState(() => _showTracks = v); }),
           SwitchListTile(secondary: const Icon(Icons.people_rounded),
-            title: const Text('Amis'),
-            subtitle: const Text('Activité de tes amis Last.fm'),
+            title: Text(L.settingsFriendsSection),
+            subtitle: Text(L.settingsFriendsSectionSub),
             value: _showFriends,
             onChanged: (v) async { await _set('ls_show_friends', v); setState(() => _showFriends = v); }),
         ]),
 
-
         const SizedBox(height: 16),
 
-        // Account
-        _SettingsSection(label: 'Compte', children: [
+        // ── Account ───────────────────────────────────────────────────────
+        _SettingsSection(label: L.settingsAccount, children: [
           ListTile(
             leading: CircleAvatar(
               backgroundColor: scheme.primaryContainer,
               child: Text(widget.username.isNotEmpty ? widget.username[0].toUpperCase() : '?',
                   style: TextStyle(color: scheme.onPrimaryContainer, fontWeight: FontWeight.w700))),
             title: Text(widget.username, style: const TextStyle(fontWeight: FontWeight.w600)),
-            subtitle: const Text('Profil Last.fm connecté')),
+            subtitle: Text(L.settingsConnectedProfile)),
           const Divider(height: 1, indent: 16, endIndent: 16),
           ListTile(
             leading: Icon(Icons.logout_rounded, color: scheme.error),
-            title: Text('Se déconnecter', style: TextStyle(color: scheme.error)),
+            title: Text(L.settingsLogout, style: TextStyle(color: scheme.error)),
             onTap: () async {
               final ok = await showDialog<bool>(context: context,
                 builder: (ctx) => AlertDialog(
-                  title: const Text('Se déconnecter ?'),
-                  content: const Text('Tes identifiants seront supprimés.'),
+                  title: Text(L.settingsLogoutTitle),
+                  content: Text(L.settingsLogoutContent),
                   actions: [
-                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Annuler')),
-                    FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Déconnecter')),
+                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(L.commonCancel)),
+                    FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(L.settingsLogoutConfirm)),
                   ],
                 ));
               if (ok == true && mounted) {
+                // Capture navigator before any async gap
                 final nav = Navigator.of(context);
                 final p = await SharedPreferences.getInstance();
-                await p.remove('ls_username'); await p.remove('ls_apikey');
-                if (mounted) { nav.pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (_) => const SetupScreen()), (_) => false); }
+                await p.remove('ls_username');
+                await p.remove('ls_apikey');
+                // Use the pre-captured navigator — no BuildContext used after await
+                nav.pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const SetupScreen()), (_) => false);
               }
             }),
         ]),
 
         const SizedBox(height: 16),
 
-        // Sauvegarde
-        _SettingsSection(label: 'Sauvegarde & restauration', children: [
+        // ── Backup ────────────────────────────────────────────────────────
+        _SettingsSection(label: L.settingsBackup, children: [
           ListTile(
             leading: Icon(Icons.upload_rounded, color: scheme.primary),
-            title: const Text('Exporter les paramètres'),
-            subtitle: const Text('Copie un JSON dans le presse-papier'),
+            title: Text(L.settingsExport),
+            subtitle: Text(L.settingsExportSub),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: _exportBackup,
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           ListTile(
             leading: Icon(Icons.download_rounded, color: scheme.primary),
-            title: const Text('Restaurer une sauvegarde'),
-            subtitle: const Text('Collez un JSON précédemment exporté'),
+            title: Text(L.settingsImport),
+            subtitle: Text(L.settingsImportSub),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: _showImportDialog,
           ),
@@ -780,50 +768,59 @@ class _SettingsPageState extends State<_SettingsPage> {
             child: Row(children: [
               Icon(Icons.info_outline_rounded, size: 14, color: scheme.onSurfaceVariant),
               const SizedBox(width: 6),
-              Expanded(child: Text(
-                'Inclut : thème, couleurs, clé API, pseudo, en-tête, favoris. Compatible entre versions.',
-                style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant),
-              )),
+              Expanded(child: Text(L.settingsBackupInfo,
+                style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant))),
             ]),
           ),
         ]),
 
         const SizedBox(height: 16),
 
-        // Updates
-        _SettingsSection(label: 'Mises à jour', children: [
+        // ── Updates ───────────────────────────────────────────────────────
+        _SettingsSection(label: L.settingsUpdates, children: [
           SwitchListTile(secondary: const Icon(Icons.notifications_outlined),
-            title: const Text('Vérification automatique'),
-            subtitle: const Text('1 fois par jour'), value: _autoUpdate,
+            title: Text(L.settingsAutoUpdate),
+            subtitle: Text(L.settingsAutoUpdateSub),
+            value: _autoUpdate,
             onChanged: (v) async { await _set('ls_auto_update_check', v); setState(() => _autoUpdate = v); }),
           const Divider(height: 1, indent: 16, endIndent: 16),
           ListTile(
-            leading: _checkingUpdate ? const SizedBox(width: 24, height: 24,
-                child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.system_update_outlined),
-            title: const Text('Vérifier maintenant'),
-            subtitle: _updateError != null ? Text(_updateError!, style: TextStyle(color: scheme.error))
-                : (_updateInfo == null ? const Text('À jour') : Text('v${_updateInfo!.version} disponible')),
+            leading: _checkingUpdate
+                ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
+                : const Icon(Icons.system_update_outlined),
+            title: Text(L.settingsCheckNow),
+            subtitle: _updateError != null
+                ? Text(_updateError!, style: TextStyle(color: scheme.error))
+                : (_updateInfo == null
+                    ? Text(L.settingsUpToDate)
+                    : Text(L.settingsUpdateAvailable(_updateInfo!.version))),
             onTap: _checkingUpdate ? null : () => _checkUpdate()),
         ]),
 
         const SizedBox(height: 16),
 
-        // About
-        _SettingsSection(label: 'À propos', children: [
-          ListTile(leading: const Icon(Icons.info_outline_rounded), title: const Text('Version'),
+        // ── About ─────────────────────────────────────────────────────────
+        _SettingsSection(label: L.settingsAbout, children: [
+          ListTile(
+            leading: const Icon(Icons.info_outline_rounded),
+            title: Text(L.settingsVersion),
             trailing: Text(UpdateService.currentVersion,
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant))),
           const Divider(height: 1, indent: 16, endIndent: 16),
-          ListTile(leading: const Icon(Icons.web_rounded), title: const Text('Version web'),
-            subtitle: const Text('sanobld.github.io/LastStats'),
+          ListTile(
+            leading: const Icon(Icons.web_rounded),
+            title: Text(L.settingsWebVersion),
+            subtitle: Text(L.settingsWebVersionSub),
             trailing: const Icon(Icons.open_in_new_rounded, size: 16),
             onTap: () async {
               final u = Uri.parse('https://sanobld.github.io/LastStats');
               if (await canLaunchUrl(u)) await launchUrl(u, mode: LaunchMode.externalApplication);
             }),
           const Divider(height: 1, indent: 16, endIndent: 16),
-          ListTile(leading: const Icon(Icons.code_rounded), title: const Text('Code source'),
-            subtitle: const Text('github.com/sanobld/LastStats'),
+          ListTile(
+            leading: const Icon(Icons.code_rounded),
+            title: Text(L.settingsSourceCode),
+            subtitle: Text(L.settingsSourceCodeSub),
             trailing: const Icon(Icons.open_in_new_rounded, size: 16),
             onTap: () async {
               final u = Uri.parse('https://github.com/sanobld/LastStats');
@@ -841,7 +838,7 @@ class _SettingsPageState extends State<_SettingsPage> {
 }
 
 
-// Color picker dialog (full HSL)
+// ── Color picker dialog ───────────────────────────────────────────────────────
 
 class _ColorPickerDialog extends StatefulWidget {
   final Color initialColor;
@@ -884,30 +881,26 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
       final c = Color(0xFF000000 | int.parse(hex, radix: 16));
       final hsl = HSLColor.fromColor(c);
       setState(() {
-        _hsl = hsl
-            .withSaturation(_clamp01(hsl.saturation, 0.0, 1.0))
-            .withLightness(_clamp01(hsl.lightness, 0.0, 1.0));
+        _hsl = hsl.withSaturation(_clamp01(hsl.saturation, 0.0, 1.0))
+                  .withLightness(_clamp01(hsl.lightness, 0.0, 1.0));
         _hexError = false;
       });
     } catch (_) { setState(() => _hexError = true); }
   }
 
-  // Custom hue slider
   Widget _buildHueSlider(BuildContext ctx) {
     return LayoutBuilder(builder: (_, constraints) {
       final w = constraints.maxWidth;
       return GestureDetector(
-        onTapDown:  (d) => setState(() { _hsl = _hsl.withHue((d.localPosition.dx / w).clamp(0, 1) * 360); _syncHex(); }),
-        onPanUpdate:(d) => setState(() { _hsl = _hsl.withHue((d.localPosition.dx / w).clamp(0, 1) * 360); _syncHex(); }),
+        onTapDown:   (d) => setState(() { _hsl = _hsl.withHue((d.localPosition.dx / w).clamp(0, 1) * 360); _syncHex(); }),
+        onPanUpdate: (d) => setState(() { _hsl = _hsl.withHue((d.localPosition.dx / w).clamp(0, 1) * 360); _syncHex(); }),
         child: SizedBox(height: 36, child: Stack(alignment: Alignment.centerLeft, children: [
-          // Rainbow gradient
           ClipRRect(borderRadius: BorderRadius.circular(8),
             child: Container(height: 24, decoration: const BoxDecoration(gradient: LinearGradient(colors: [
               Color(0xFFFF0000), Color(0xFFFF8000), Color(0xFFFFFF00),
               Color(0xFF00FF00), Color(0xFF00FFFF), Color(0xFF0000FF),
               Color(0xFFFF00FF), Color(0xFFFF0000),
             ])))),
-          // Slider
           Positioned(
             left: ((_hsl.hue / 360) * w - 12).clamp(0, w - 24),
             child: Container(width: 24, height: 36,
@@ -926,8 +919,8 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
   Widget _buildSliderRow(String label, double value, double min, double max,
       List<Color> gradientColors, void Function(double) onChanged) {
     return LayoutBuilder(builder: (_, c) => GestureDetector(
-      onTapDown:  (d) => setState(() { onChanged(((d.localPosition.dx / c.maxWidth) * (max - min) + min).clamp(min, max)); _syncHex(); }),
-      onPanUpdate:(d) => setState(() { onChanged(((d.localPosition.dx / c.maxWidth) * (max - min) + min).clamp(min, max)); _syncHex(); }),
+      onTapDown:   (d) => setState(() { onChanged(((d.localPosition.dx / c.maxWidth) * (max - min) + min).clamp(min, max)); _syncHex(); }),
+      onPanUpdate: (d) => setState(() { onChanged(((d.localPosition.dx / c.maxWidth) * (max - min) + min).clamp(min, max)); _syncHex(); }),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(label, style: Theme.of(context).textTheme.labelSmall
             ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
@@ -952,38 +945,32 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
     final text   = Theme.of(context).textTheme;
     final pure   = _hsl.withSaturation(1.0).withLightness(0.5).toColor();
 
-    // Quick presets
     const quickPresets = [
       Color(0xFF7C3AED), Color(0xFF1D4ED8), Color(0xFF059669),
       Color(0xFFDC2626), Color(0xFFD97706), Color(0xFFDB2777),
-      Color(0xFF0F766E), Color(0xFFEA580C), Color(0xFF7C3AED),
-      Color(0xFF0284C7), Color(0xFF16A34A), Color(0xFF9333EA),
+      Color(0xFF0F766E), Color(0xFFEA580C), Color(0xFF0284C7),
+      Color(0xFF16A34A),
     ];
 
     return AlertDialog(
-      title: const Text('Couleur personnalisée'),
+      title: Text(L.colorPickerTitle),
       contentPadding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       content: SizedBox(
         width: 340,
         child: SingleChildScrollView(child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Preview
             Row(children: [
               Expanded(child: Container(height: 52,
                 decoration: BoxDecoration(color: _color,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: scheme.outlineVariant)))),
               const SizedBox(width: 10),
-              // Hex input
               Expanded(child: TextField(
-                controller: _hexCtrl,
-                onChanged: _onHexInput,
+                controller: _hexCtrl, onChanged: _onHexInput,
                 decoration: InputDecoration(
                   labelText: 'HEX',
-                  prefixText: '',
-                  errorText: _hexError ? 'Format invalide' : null,
+                  errorText: _hexError ? L.colorPickerInvalid : null,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -992,38 +979,24 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
               )),
             ]),
             const SizedBox(height: 16),
-
-            // Hue
-            Text('Teinte', style: text.labelMedium?.copyWith(
+            Text(L.colorPickerHue, style: text.labelMedium?.copyWith(
                 color: scheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
             const SizedBox(height: 6),
             _buildHueSlider(context),
             const SizedBox(height: 14),
-
-            // Saturation
-            _buildSliderRow('Saturation',
-              _hsl.saturation, 0.0, 1.0,
-              [Colors.grey.shade400, pure],
-              (v) => _hsl = _hsl.withSaturation(v)),
+            _buildSliderRow(L.colorPickerSaturation, _hsl.saturation, 0.0, 1.0,
+              [Colors.grey.shade400, pure], (v) => _hsl = _hsl.withSaturation(v)),
             const SizedBox(height: 14),
-
-            // Brightness
-            _buildSliderRow('Luminosité',
-              _hsl.lightness, 0.15, 0.85,
+            _buildSliderRow(L.colorPickerBrightness, _hsl.lightness, 0.15, 0.85,
               [Colors.black, _hsl.withSaturation(1.0).withLightness(0.5).toColor(), Colors.white],
               (v) => _hsl = _hsl.withLightness(v)),
             const SizedBox(height: 16),
-
-            // Quick presets
-            Text('Couleurs rapides', style: text.labelMedium?.copyWith(
+            Text(L.colorPickerQuickColors, style: text.labelMedium?.copyWith(
                 color: scheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             Wrap(spacing: 8, runSpacing: 8,
-              children: quickPresets.toSet().toList().take(10).map((c) => GestureDetector(
-                onTap: () => setState(() {
-                  _hsl = HSLColor.fromColor(c);
-                  _syncHex();
-                }),
+              children: quickPresets.map((c) => GestureDetector(
+                onTap: () => setState(() { _hsl = HSLColor.fromColor(c); _syncHex(); }),
                 child: Container(width: 28, height: 28,
                   decoration: BoxDecoration(color: c, shape: BoxShape.circle,
                       border: Border.all(color: scheme.outlineVariant, width: 1))),
@@ -1033,19 +1006,15 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
         )),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
-        FilledButton(
-          onPressed: () => Navigator.pop(context, _color),
-          child: const Text('Appliquer'),
-        ),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(L.commonCancel)),
+        FilledButton(onPressed: () => Navigator.pop(context, _color), child: Text(L.commonApply)),
       ],
     );
   }
 }
 
 
-// Shared widgets
-
+// ── Settings section wrapper ──────────────────────────────────────────────────
 
 class _SettingsSection extends StatelessWidget {
   final String label; final List<Widget> children;
@@ -1061,20 +1030,16 @@ class _SettingsSection extends StatelessWidget {
             color: scheme.primary, fontWeight: FontWeight.w700, letterSpacing: 1.2))),
       Card(
         elevation: 0, color: scheme.surfaceContainerHighest,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: _cardBorder(scheme),           
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: _cardBorder(scheme)),
         child: Column(children: children)),
     ]);
   }
 }
 
-// ── Export sheet ─────────────────────────────────────────────────────────────
+// ── Export sheet ──────────────────────────────────────────────────────────────
 
 class _ExportSheet extends StatefulWidget {
-  final String payload;
-  final String defaultName;
+  final String payload, defaultName;
   const _ExportSheet({required this.payload, required this.defaultName});
 
   @override
@@ -1086,24 +1051,16 @@ class _ExportSheetState extends State<_ExportSheet> {
   bool _copied = false;
 
   @override
-  void initState() {
-    super.initState();
-    _nameCtrl = TextEditingController(text: widget.defaultName);
-  }
+  void initState() { super.initState(); _nameCtrl = TextEditingController(text: widget.defaultName); }
 
   @override
-  void dispose() {
-    _nameCtrl.dispose();
-    super.dispose();
-  }
+  void dispose() { _nameCtrl.dispose(); super.dispose(); }
 
   Future<void> _copy() async {
     await Clipboard.setData(ClipboardData(text: widget.payload));
     if (!mounted) return;
     setState(() => _copied = true);
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) { setState(() => _copied = false); }
-    });
+    Future.delayed(const Duration(seconds: 2), () { if (mounted) setState(() => _copied = false); });
   }
 
   @override
@@ -1112,128 +1069,76 @@ class _ExportSheetState extends State<_ExportSheet> {
     final text   = Theme.of(context).textTheme;
 
     return DraggableScrollableSheet(
-      initialChildSize: 0.75,
-      minChildSize:     0.4,
-      maxChildSize:     0.95,
-      expand: false,
+      initialChildSize: 0.75, minChildSize: 0.4, maxChildSize: 0.95, expand: false,
       builder: (ctx, sc) => ClipRRect(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         child: Scaffold(
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Handle + title
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 8, 4),
-                child: Row(children: [
-                  Expanded(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Center(
-                        child: Container(
-                          width: 40, height: 4,
-                          margin: const EdgeInsets.only(bottom: 12),
-                          decoration: BoxDecoration(
-                            color: scheme.onSurfaceVariant.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                      ),
-                      Row(children: [
-                        Icon(Icons.upload_rounded, color: scheme.primary, size: 20),
-                        const SizedBox(width: 8),
-                        Text('Exporter les paramètres',
-                            style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
-                      ]),
-                    ]),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded),
-                    onPressed: () => Navigator.pop(ctx),
-                  ),
-                ]),
-              ),
-
-              const Divider(height: 1),
-
-              Expanded(
-                child: ListView(
-                  controller: sc,
-                  padding: const EdgeInsets.all(20),
-                  children: [
-                    // Filename field
-                    Text('Nom du fichier',
-                        style: text.labelMedium?.copyWith(
-                            color: scheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 6),
-                    TextField(
-                      controller: _nameCtrl,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.insert_drive_file_outlined),
-                        suffixText: '.json',
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                      ),
+          body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 8, 4),
+              child: Row(children: [
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Center(child: Container(
+                    width: 40, height: 4, margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: scheme.onSurfaceVariant.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(2),
                     ),
-
-                    const SizedBox(height: 20),
-
-                    // JSON preview
-                    Text('Contenu JSON',
-                        style: text.labelMedium?.copyWith(
-                            color: scheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 6),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: scheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.5)),
-                      ),
-                      constraints: const BoxConstraints(maxHeight: 220),
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(12),
-                        child: SelectableText(
-                          widget.payload,
-                          style: TextStyle(
-                            fontFamily: 'monospace',
-                            fontSize: 11,
-                            color: scheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    // Info
-                    Row(children: [
-                      Icon(Icons.info_outline_rounded, size: 13, color: scheme.onSurfaceVariant),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          'Copiez ce JSON, collez-le dans un fichier texte et nommez-le avec .json',
-                          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-                        ),
-                      ),
-                    ]),
-
-                    const SizedBox(height: 20),
-
-                    // Copy button
-                    FilledButton.icon(
-                      onPressed: _copy,
-                      icon: Icon(_copied ? Icons.check_rounded : Icons.copy_rounded),
-                      label: Text(_copied ? 'Copié !' : 'Copier le JSON'),
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        backgroundColor: _copied ? Colors.green.shade600 : null,
-                      ),
-                    ),
-                  ],
+                  )),
+                  Row(children: [
+                    Icon(Icons.upload_rounded, color: scheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(L.exportTitle, style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+                  ]),
+                ])),
+                IconButton(icon: const Icon(Icons.close_rounded), onPressed: () => Navigator.pop(ctx)),
+              ]),
+            ),
+            const Divider(height: 1),
+            Expanded(child: ListView(controller: sc, padding: const EdgeInsets.all(20), children: [
+              Text(L.exportFilename,
+                  style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 6),
+              TextField(
+                controller: _nameCtrl,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.insert_drive_file_outlined), suffixText: '.json',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                 ),
               ),
-            ],
-          ),
+              const SizedBox(height: 20),
+              Text(L.exportJsonContent,
+                  style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 6),
+              Container(
+                decoration: BoxDecoration(color: scheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.5))),
+                constraints: const BoxConstraints(maxHeight: 220),
+                child: SingleChildScrollView(padding: const EdgeInsets.all(12),
+                  child: SelectableText(widget.payload,
+                    style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: scheme.onSurfaceVariant))),
+              ),
+              const SizedBox(height: 8),
+              Row(children: [
+                Icon(Icons.info_outline_rounded, size: 13, color: scheme.onSurfaceVariant),
+                const SizedBox(width: 6),
+                Expanded(child: Text(L.exportInfo, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant))),
+              ]),
+              const SizedBox(height: 20),
+              FilledButton.icon(
+                onPressed: _copy,
+                icon: Icon(_copied ? Icons.check_rounded : Icons.copy_rounded),
+                label: Text(_copied ? L.exportCopied : L.exportCopy),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  backgroundColor: _copied ? Colors.green.shade600 : null,
+                ),
+              ),
+            ])),
+          ]),
         ),
       ),
     );

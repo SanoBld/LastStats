@@ -411,7 +411,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        children: _kPeriods.map((p) => Padding(
+        children: _localizedPeriods().map((p) => Padding(
           padding: const EdgeInsets.only(right: 8),
           child: FilterChip(
             label: Text(p.$2),
@@ -439,7 +439,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             _StatChip(
               icon:  Icons.people_rounded,
               value: _fmt(gl),
-              label: 'Auditeurs',
+              label: L.detailGlobalListeners,
               scheme: scheme,
             ),
 
@@ -448,7 +448,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             _StatChip(
               icon:  Icons.play_circle_rounded,
               value: _fmt(gp),
-              label: 'Écoutes mondiales',
+              label: L.commonPlays,
               scheme: scheme,
             ),
 
@@ -461,7 +461,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               : _StatChip(
                   icon:  Icons.headphones_rounded,
                   value: _userPlays > 0 ? _fmt(_userPlays) : '—',
-                  label: 'Tes écoutes',
+                  label: L.detailUserPlays,
                   scheme: scheme,
                   highlight: true,
                 ),
@@ -471,7 +471,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             _StatChip(
               icon:  Icons.leaderboard_rounded,
               value: '#$_userRank',
-              label: 'Ton classement',
+              label: L.detailUserRank,
               scheme: scheme,
               highlight: true,
             ),
@@ -522,7 +522,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Biographie',
+          Text(L.detailBiography,
             style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 8),
           Text(shown,
@@ -536,7 +536,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             GestureDetector(
               onTap: () => setState(() => _bioExpanded = !_bioExpanded),
               child: Text(
-                _bioExpanded ? 'Réduire ▲' : 'Lire la suite ▼',
+                _bioExpanded ? '${L.detailBioReadLess} ▲' : '${L.detailBioReadMore} ▼',
                 style: TextStyle(
                   color:      scheme.primary,
                   fontWeight: FontWeight.w600,
@@ -566,7 +566,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Vos 5 titres préférés',
+          Text(L.detailTopTracks,
             style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           ...tracks.asMap().entries.map((e) {
@@ -642,7 +642,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Albums populaires',
+          Text(L.detailTopAlbums,
             style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           GridView.builder(
@@ -700,7 +700,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Titres',
+          Text(L.detailTracklist,
             style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 8),
           ...tracks.asMap().entries.map((e) {
@@ -747,13 +747,13 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (album.isNotEmpty) ...[
-            Text('Album', style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
+            Text(L.detailAlbumLabel, style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
             const SizedBox(height: 2),
             Text(album, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
             const SizedBox(height: 12),
           ],
           if (durStr.isNotEmpty) ...[
-            Text('Durée', style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
+            Text(L.detailDuration, style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
             const SizedBox(height: 2),
             Text(durStr, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
           ],

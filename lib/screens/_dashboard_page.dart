@@ -416,7 +416,7 @@ class _DashboardPageState extends State<_DashboardPage> {
             IconButton(
               icon: const Icon(Icons.refresh_rounded),
               onPressed: _load,
-              tooltip: 'Actualiser',
+              tooltip: L.dashRefresh,
             ),
           ],
           flexibleSpace: FlexibleSpaceBar(
@@ -557,7 +557,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                                       size: 11,
                                       color: Colors.white.withValues(alpha: 0.75)),
                                   const SizedBox(width: 2),
-                                  Text('Depuis $regStr',
+                                  Text(L.memberSince(regStr),
                                     style: TextStyle(
                                       color: Colors.white.withValues(alpha: 0.75),
                                       fontSize: 12,
@@ -591,7 +591,7 @@ class _DashboardPageState extends State<_DashboardPage> {
 
               // Stats block
               if (_showStats) ...[
-                _SectionHeader(title: 'Statistiques', icon: Icons.bar_chart_rounded),
+                _SectionHeader(title: L.dashStats, icon: Icons.bar_chart_rounded),
                 const SizedBox(height: 10),
 
                 // Total scrobbles — full width
@@ -610,7 +610,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                   _DashStatCard(
                     emoji: '🎤',
                     value: topArtist != null ? (topArtist['name'] ?? '—').toString() : '—',
-                    label: 'Artiste #1',
+                    label: L.dashArtist1,
                     sub:   topArtist != null
                         ? '${_fmt(int.tryParse((topArtist['playcount'] ?? '0').toString()) ?? 0)} écoutes'
                         : null,
@@ -618,7 +618,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                   _DashStatCard(
                     emoji: '💿',
                     value: topAlbum != null ? (topAlbum['name'] ?? '—').toString() : '—',
-                    label: 'Album #1',
+                    label: L.dashAlbum1,
                     sub:   topAlbum != null
                         ? (topAlbum['artist']?['name'] ?? '').toString()
                         : null,
@@ -626,7 +626,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                   _DashStatCard(
                     emoji: '🎵',
                     value: topTrack != null ? (topTrack['name'] ?? '—').toString() : '—',
-                    label: 'Titre #1',
+                    label: L.dashTrack1,
                     sub:   topTrack != null
                         ? '${_fmt(int.tryParse((topTrack['playcount'] ?? '0').toString()) ?? 0)} écoutes'
                         : null,
@@ -634,7 +634,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                   _DashStatCard(
                     emoji: '⏱️',
                     value: lastTrack != null ? (lastTrack['name'] ?? '—').toString() : '—',
-                    label: 'Dernière écoute',
+                    label: L.dashLastTrack,
                     sub:   lastTrack != null ? _fmtTrackDateLocal(lastTrack) : null,
                   ),
                 ]),
@@ -658,11 +658,11 @@ class _DashboardPageState extends State<_DashboardPage> {
 
               // Top artists (mini)
               if (_showArtists && _topArtists.isNotEmpty) ...[
-                _SectionHeader(title: 'Top Artistes', icon: Icons.mic_rounded),
+                _SectionHeader(title: L.commonTopArtists, icon: Icons.mic_rounded),
                 const SizedBox(height: 8),
                 ..._topArtists.take(5).toList().asMap().entries.map((e) => _ItemTile(
                   name:     (e.value['name'] ?? '').toString(),
-                  sub:      '${_fmt(int.tryParse((e.value['playcount'] ?? '0').toString()) ?? 0)} écoutes',
+                  sub:      '${_fmt(int.tryParse((e.value['playcount'] ?? '0').toString()) ?? 0)} ${L.commonPlays}',
                   imageUrl: _extractImage(e.value['image']),
                   imageFuture: ImageService.resolveArtist((e.value['name'] ?? '').toString(),
                       lastfmUrl: _extractImage(e.value['image'])),
@@ -674,7 +674,7 @@ class _DashboardPageState extends State<_DashboardPage> {
 
               // Top tracks (mini)
               if (_showTracks && _topTracks.isNotEmpty) ...[
-                _SectionHeader(title: 'Top Titres', icon: Icons.music_note_rounded),
+                _SectionHeader(title: L.dashTopTracks, icon: Icons.music_note_rounded),
                 const SizedBox(height: 8),
                 ..._topTracks.take(5).toList().asMap().entries.map((e) {
                   final tName  = (e.value['name'] ?? '').toString();
@@ -732,7 +732,7 @@ class _FriendsSection extends StatelessWidget {
 
       // Section header row
       Row(children: [
-        _SectionHeader(title: 'Amis', icon: Icons.people_rounded),
+        _SectionHeader(title: L.dashFriends, icon: Icons.people_rounded),
         const Spacer(),
         // Online badge
         if (!isLoading && onlineCount > 0)
@@ -750,7 +750,7 @@ class _FriendsSection extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                '$onlineCount en ligne',
+                '$onlineCount online',
                 style: text.labelSmall?.copyWith(
                     color: Colors.green.shade700, fontWeight: FontWeight.w700),
               ),
@@ -762,7 +762,7 @@ class _FriendsSection extends StatelessWidget {
             icon: const Icon(Icons.refresh_rounded, size: 18),
             visualDensity: VisualDensity.compact,
             onPressed: onRefresh,
-            tooltip: 'Actualiser les amis',
+            tooltip: L.dashRefreshFriends,
           ),
       ]),
 
@@ -783,7 +783,7 @@ class _FriendsSection extends StatelessWidget {
                 // Empty state
                 ? Center(
                     child: Text(
-                      'Aucun ami trouvé',
+                      L.dashNoFriends,
                       style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                     ),
                   )
@@ -1220,7 +1220,7 @@ class _FriendProfileSheetState extends State<_FriendProfileSheet> {
             // ── Recent tracks ─────────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text('Écoutes récentes',
+              child: Text(L.commonRecentTracks,
                   style: text.titleSmall
                       ?.copyWith(fontWeight: FontWeight.w700)),
             ),
@@ -1235,7 +1235,7 @@ class _FriendProfileSheetState extends State<_FriendProfileSheet> {
               Padding(
                 padding: const EdgeInsets.all(24),
                 child: Center(
-                    child: Text('Aucune écoute récente',
+                    child: Text(L.commonNoRecentTracks,
                         style: text.bodySmall
                             ?.copyWith(color: scheme.onSurfaceVariant))),
               )
@@ -1288,7 +1288,7 @@ class _FriendProfileSheetState extends State<_FriendProfileSheet> {
                       style: text.labelSmall
                           ?.copyWith(color: scheme.onSurfaceVariant)),
                   trailing: isNp
-                      ? Text('EN COURS',
+                      ? Text(L.commonNowPlayingBadge,
                           style: text.labelSmall?.copyWith(
                               color: Colors.green,
                               fontWeight: FontWeight.w700))
@@ -1415,7 +1415,7 @@ class _HeroStatCard extends StatelessWidget {
             const SizedBox(width: 8),
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
-              child: Text('scrobbles',
+              child: Text(L.dashScrobbles,
                   style: text.bodyMedium?.copyWith(
                       color: scheme.onPrimaryContainer.withValues(alpha: 0.7),
                       fontWeight: FontWeight.w500)),
@@ -1432,11 +1432,11 @@ class _HeroStatCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _MiniMetric('⚡', '~${_fmt(avg)}', 'par jour', scheme.onPrimaryContainer),
+                _MiniMetric('⚡', '~${_fmt(avg)}', L.dashScrobblesPerDay, scheme.onPrimaryContainer),
                 _vDivider(scheme.onPrimaryContainer),
-                _MiniMetric('📅', '~${_fmt(weekly)}', 'par semaine', scheme.onPrimaryContainer),
+                _MiniMetric('📅', '~${_fmt(weekly)}', L.dashPerWeek, scheme.onPrimaryContainer),
                 _vDivider(scheme.onPrimaryContainer),
-                _MiniMetric('🗓️', '$days j', 'd\'activité', scheme.onPrimaryContainer),
+                _MiniMetric('🗓️', '$days j', L.dashDaysActive, scheme.onPrimaryContainer),
               ],
             ),
           ),
@@ -1562,7 +1562,7 @@ class _NowPlayingCard extends StatelessWidget {
               Container(width: 7, height: 7,
                   decoration: BoxDecoration(color: scheme.secondary, shape: BoxShape.circle)),
               const SizedBox(width: 6),
-              Text('EN COURS', style: text.labelSmall?.copyWith(
+              Text(L.commonNowPlayingBadge, style: text.labelSmall?.copyWith(
                   color: scheme.secondary, fontWeight: FontWeight.w700, letterSpacing: 1.1)),
             ]),
             const SizedBox(height: 2),

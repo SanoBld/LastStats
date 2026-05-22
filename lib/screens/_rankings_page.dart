@@ -2,8 +2,6 @@
 part of 'home_screen.dart';
 
 
-// Rankings
-
 class _RankingsPage extends StatefulWidget {
   final LastFmService service;
   const _RankingsPage({required this.service});
@@ -21,19 +19,23 @@ class _RankingsPageState extends State<_RankingsPage>
   void initState() {
     super.initState();
     _tabs = TabController(length: 3, vsync: this);
+    localeNotifier.addListener(_rebuild);
   }
 
   @override
-  void dispose() { _tabs.dispose(); super.dispose(); }
+  void dispose() { localeNotifier.removeListener(_rebuild); _tabs.dispose(); super.dispose(); }
+
+  void _rebuild() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
+    final periods = _localizedPeriods();
     return Scaffold(
       body: SafeArea(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
-            child: Text('Classements', style: Theme.of(context).textTheme.headlineSmall
+            child: Text(L.rankingsTitle, style: Theme.of(context).textTheme.headlineSmall
                 ?.copyWith(fontWeight: FontWeight.w800)),
           ),
           SizedBox(
@@ -41,7 +43,7 @@ class _RankingsPageState extends State<_RankingsPage>
             child: ListView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-              children: _kPeriods.map((p) {
+              children: periods.map((p) {
                 final sel = p.$1 == _period;
                 return Padding(padding: const EdgeInsets.only(right: 8),
                   child: FilterChip(label: Text(p.$2), selected: sel,
@@ -49,8 +51,10 @@ class _RankingsPageState extends State<_RankingsPage>
               }).toList(),
             ),
           ),
-          TabBar(controller: _tabs, tabs: const [
-            Tab(text: 'Artistes'), Tab(text: 'Albums'), Tab(text: 'Titres'),
+          TabBar(controller: _tabs, tabs: [
+            Tab(text: L.commonArtists),
+            Tab(text: L.commonAlbums),
+            Tab(text: L.commonTracks),
           ]),
           Expanded(child: TabBarView(controller: _tabs, children: [
             _TopListBody(service: widget.service, type: 'artists', period: _period),
@@ -110,16 +114,16 @@ class _TopListBodyState extends State<_TopListBody>
       }
       if (mounted) {
         setState(() {
-        _items.addAll(fresh); _exhausted = fresh.length < 50;
-        _loading = false; _loadingMore = false;
-      });
+          _items.addAll(fresh); _exhausted = fresh.length < 50;
+          _loading = false; _loadingMore = false;
+        });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
-        _error = e.toString().replaceFirst('Exception: ', '');
-        _loading = false; _loadingMore = false;
-      });
+          _error = e.toString().replaceFirst('Exception: ', '');
+          _loading = false; _loadingMore = false;
+        });
       }
     }
   }
@@ -135,7 +139,7 @@ class _TopListBodyState extends State<_TopListBody>
     if (_loading) { return const Center(child: CircularProgressIndicator()); }
     if (_error != null) { return _ErrorView(message: _error!, onRetry: () => _load(reset: true)); }
     if (_items.isEmpty) {
-      return Center(child: Text('Aucun résultat',
+      return Center(child: Text(L.commonNoResults,
         style: TextStyle(color: scheme.onSurfaceVariant)));
     }
 
@@ -176,7 +180,7 @@ class _TopListBodyState extends State<_TopListBody>
               borderRadius: BorderRadius.circular(8),
               child: _ItemTile(
                 name: name, imageUrl: raw, imageFuture: imgF, rank: '${idx + 1}',
-                sub:   widget.type != 'artists' ? '$artist · $plays écoutes' : '$plays écoutes',
+                sub:   widget.type != 'artists' ? '$artist · $plays ${L.commonPlays}' : '$plays ${L.commonPlays}',
                 plays: widget.type != 'artists' ? plays : null,
               ),
             );
@@ -188,7 +192,8 @@ class _TopListBodyState extends State<_TopListBody>
   }
 }
 
-// Podium
+// ── Podium ───────────────────────────────────────────────────────────────────
+
 class _PodiumWidget extends StatelessWidget {
   final List<dynamic> items;
   final String type;
@@ -214,7 +219,7 @@ class _PodiumWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _SectionHeader(title: 'Podium', icon: Icons.emoji_events_rounded),
+        _SectionHeader(title: L.rankingsPodium, icon: Icons.emoji_events_rounded),
         const SizedBox(height: 12),
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -236,7 +241,6 @@ class _PodiumWidget extends StatelessWidget {
             return Expanded(child: GestureDetector(
               onTap: () => onTap(item),
               child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-                // Image
                 ClipRRect(
                   borderRadius: BorderRadius.circular(imgSz[col] / 4),
                   child: _SmartImage(size: imgSz[col], borderRadius: imgSz[col] / 4,
@@ -245,7 +249,6 @@ class _PodiumWidget extends StatelessWidget {
                 const SizedBox(height: 5),
                 Text(medals[col], style: TextStyle(fontSize: di == 0 ? 22 : 18)),
                 const SizedBox(height: 3),
-                // Base
                 Container(
                   width: double.infinity,
                   height: heights[col],
@@ -289,20 +292,10 @@ class _PodiumWidget extends StatelessWidget {
         Divider(color: scheme.outlineVariant.withValues(alpha: 0.4)),
         Padding(
           padding: const EdgeInsets.only(left: 4, top: 4, bottom: 4),
-          child: Text('Suite du classement',
+          child: Text(L.rankingsContinued,
               style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
         ),
       ]),
     );
   }
 }
-
-
-// Detail sheet
-
-
-
-// Detail sheet
-
-
-/// Opens the rich detail sheet from anywhere in the app.

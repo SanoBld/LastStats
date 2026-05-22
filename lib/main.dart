@@ -13,10 +13,11 @@ void main() async {
   final apiKey     = prefs.getString('ls_apikey')   ?? '';
   final startupTab = prefs.getInt('ls_startup_tab') ?? 0;
 
-  themeModeNotifier.value       = themeFromString(prefs.getString('ls_theme'));
-  accentNotifier.value          = accentFromString(prefs.getString('ls_accent'));
-  useDynamicColorNotifier.value = prefs.getBool('ls_use_dynamic_color') ?? false;
+  themeModeNotifier.value          = themeFromString(prefs.getString('ls_theme'));
+  accentNotifier.value             = accentFromString(prefs.getString('ls_accent'));
+  useDynamicColorNotifier.value    = prefs.getBool('ls_use_dynamic_color')    ?? false;
   useNowPlayingColorNotifier.value = prefs.getBool('ls_use_nowplaying_color') ?? false;
+  localeNotifier.value             = prefs.getString('ls_locale') ?? 'fr';
 
   runApp(LastStatsApp(
     username:   username,
@@ -50,40 +51,45 @@ class LastStatsApp extends StatelessWidget {
                 return ValueListenableBuilder<ThemeMode>(
                   valueListenable: themeModeNotifier,
                   builder: (_, mode, _) {
-                    // ── Schémas de couleur ──────────────────────
-                    final ColorScheme lightScheme = (useDynamic && lightDynamic != null)
-                        ? lightDynamic.harmonized()
-                        : ColorScheme.fromSeed(
-                            seedColor:  accent,
-                            brightness: Brightness.light,
-                          );
+                    // Rebuild when language changes so navigation labels update
+                    return ValueListenableBuilder<String>(
+                      valueListenable: localeNotifier,
+                      builder: (_, _, _) {
+                        final ColorScheme lightScheme = (useDynamic && lightDynamic != null)
+                            ? lightDynamic.harmonized()
+                            : ColorScheme.fromSeed(
+                                seedColor:  accent,
+                                brightness: Brightness.light,
+                              );
 
-                    final ColorScheme darkScheme = (useDynamic && darkDynamic != null)
-                        ? darkDynamic.harmonized()
-                        : ColorScheme.fromSeed(
-                            seedColor:  accent,
-                            brightness: Brightness.dark,
-                          );
+                        final ColorScheme darkScheme = (useDynamic && darkDynamic != null)
+                            ? darkDynamic.harmonized()
+                            : ColorScheme.fromSeed(
+                                seedColor:  accent,
+                                brightness: Brightness.dark,
+                              );
 
-                    return MaterialApp(
-                      title: 'LastStats',
-                      debugShowCheckedModeBanner: false,
-                      theme: ThemeData(
-                        colorScheme: lightScheme,
-                        useMaterial3: true,
-                      ),
-                      darkTheme: ThemeData(
-                        colorScheme: darkScheme,
-                        useMaterial3: true,
-                      ),
-                      themeMode: mode,
-                      home: (username.isNotEmpty && apiKey.isNotEmpty)
-                          ? HomeScreen(
-                              username:   username,
-                              apiKey:     apiKey,
-                              startupTab: startupTab,
-                            )
-                          : const SetupScreen(),
+                        return MaterialApp(
+                          title: 'LastStats',
+                          debugShowCheckedModeBanner: false,
+                          theme: ThemeData(
+                            colorScheme: lightScheme,
+                            useMaterial3: true,
+                          ),
+                          darkTheme: ThemeData(
+                            colorScheme: darkScheme,
+                            useMaterial3: true,
+                          ),
+                          themeMode: mode,
+                          home: (username.isNotEmpty && apiKey.isNotEmpty)
+                              ? HomeScreen(
+                                  username:   username,
+                                  apiKey:     apiKey,
+                                  startupTab: startupTab,
+                                )
+                              : const SetupScreen(),
+                        );
+                      },
                     );
                   },
                 );

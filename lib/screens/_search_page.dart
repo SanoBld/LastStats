@@ -1,13 +1,10 @@
 // ignore_for_file: unused_import
 part of 'home_screen.dart';
 
-// ── Tab constants ────────────────────────────────────────────────────────────
 const int _kSearchProfiles = 0;
 const int _kSearchArtists  = 1;
 const int _kSearchAlbums   = 2;
 const int _kSearchTracks   = 3;
-
-// ── Search page ──────────────────────────────────────────────────────────────
 
 class _SearchPage extends StatefulWidget {
   final LastFmService service;
@@ -27,14 +24,13 @@ class _SearchPageState extends State<_SearchPage> {
   String?       _error;
   Timer?        _debounce;
 
-  // Favourite profiles stored locally
   Set<String> _favProfiles = {};
 
-  static const _kTabs = [
-    (_kSearchProfiles, 'Profils',  Icons.person_rounded),
-    (_kSearchArtists,  'Artistes', Icons.mic_rounded),
-    (_kSearchAlbums,   'Albums',   Icons.album_rounded),
-    (_kSearchTracks,   'Titres',   Icons.music_note_rounded),
+  List<(int, String, IconData)> get _kTabs => [
+    (_kSearchProfiles, L.searchProfiles,   Icons.person_rounded),
+    (_kSearchArtists,  L.commonArtists,    Icons.mic_rounded),
+    (_kSearchAlbums,   L.commonAlbums,     Icons.album_rounded),
+    (_kSearchTracks,   L.commonTracks,     Icons.music_note_rounded),
   ];
 
   @override
@@ -128,25 +124,19 @@ class _SearchPageState extends State<_SearchPage> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
 
     return Scaffold(
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            // ── Header ─────────────────────────────────────────
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-              child: Text(
-                'Recherche',
+              child: Text(L.searchTitle,
                 style: Theme.of(context).textTheme.headlineSmall
-                    ?.copyWith(fontWeight: FontWeight.w800),
-              ),
+                    ?.copyWith(fontWeight: FontWeight.w800)),
             ),
 
-            // ── Search bar ──────────────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: TextField(
@@ -156,7 +146,7 @@ class _SearchPageState extends State<_SearchPage> {
                 textInputAction: TextInputAction.search,
                 onSubmitted: (v) { if (v.trim().isNotEmpty) _search(v.trim()); },
                 decoration: InputDecoration(
-                  hintText:  'Artiste, album, titre ou profil…',
+                  hintText:  L.searchHintBar,
                   prefixIcon: const Icon(Icons.search_rounded),
                   suffixIcon: _ctrl.text.isNotEmpty
                       ? IconButton(
@@ -173,15 +163,13 @@ class _SearchPageState extends State<_SearchPage> {
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 12),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
               ),
             ),
 
             const SizedBox(height: 10),
 
-            // ── Tab chips ───────────────────────────────────────
             SizedBox(
               height: 36,
               child: ListView(
@@ -193,9 +181,7 @@ class _SearchPageState extends State<_SearchPage> {
                     padding: const EdgeInsets.only(right: 8),
                     child: FilterChip(
                       avatar: Icon(t.$3, size: 14,
-                          color: sel
-                              ? scheme.onSecondaryContainer
-                              : scheme.onSurfaceVariant),
+                          color: sel ? scheme.onSecondaryContainer : scheme.onSurfaceVariant),
                       label:  Text(t.$2),
                       selected: sel,
                       showCheckmark: false,
@@ -209,10 +195,7 @@ class _SearchPageState extends State<_SearchPage> {
 
             const SizedBox(height: 8),
 
-            // ── Results ─────────────────────────────────────────
-            Expanded(
-              child: _buildResults(context, scheme, text),
-            ),
+            Expanded(child: _buildResults(context, scheme, Theme.of(context).textTheme)),
           ],
         ),
       ),
@@ -220,48 +203,36 @@ class _SearchPageState extends State<_SearchPage> {
   }
 
   Widget _buildResults(BuildContext context, ColorScheme scheme, TextTheme text) {
-    if (_searching) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    if (_searching) return const Center(child: CircularProgressIndicator());
 
     if (_error != null) {
-      return _ErrorView(
-          message: _error!,
-          onRetry: () => _search(_ctrl.text.trim()));
+      return _ErrorView(message: _error!, onRetry: () => _search(_ctrl.text.trim()));
     }
 
-    if (_ctrl.text.trim().isEmpty) {
-      return _SearchEmptyState(tab: _tab);
-    }
+    if (_ctrl.text.trim().isEmpty) return _SearchEmptyState(tab: _tab);
 
     if (_results.isEmpty) {
-      return Center(
-        child: Text('Aucun résultat',
-            style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-      );
+      return Center(child: Text(L.commonNoResults,
+          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)));
     }
 
     if (_tab == _kSearchProfiles) {
-      // Horizontal card grid for profiles
       return ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: (_results.length / 2).ceil(),
         itemBuilder: (ctx, row) {
-          final left  = _results[row * 2] as Map<String, dynamic>;
+          final left     = _results[row * 2] as Map<String, dynamic>;
           final hasRight = row * 2 + 1 < _results.length;
-          final right = hasRight ? _results[row * 2 + 1] as Map<String, dynamic> : null;
+          final right    = hasRight ? _results[row * 2 + 1] as Map<String, dynamic> : null;
           return Row(children: [
             Expanded(child: _buildUserCard(ctx, left)),
             const SizedBox(width: 10),
-            Expanded(child: right != null
-                ? _buildUserCard(ctx, right)
-                : const SizedBox()),
+            Expanded(child: right != null ? _buildUserCard(ctx, right) : const SizedBox()),
           ]);
         },
       );
     }
 
-    // Music results — vertical list
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       itemCount: _results.length,
@@ -274,39 +245,28 @@ class _SearchPageState extends State<_SearchPage> {
         Future<String> imgF;
         String sub;
         String type;
-        // Search API returns artist as a plain String; the detail sheet expects
-        // {'name': '...'} — normalize here so taps on albums/tracks never crash.
         final normalized = Map<String, dynamic>.from(m);
-        if (m['artist'] is String) {
-          normalized['artist'] = {'name': artist};
-        }
+        if (m['artist'] is String) normalized['artist'] = {'name': artist};
 
         switch (_tab) {
           case _kSearchArtists:
             type = 'artists';
-            sub  = '${_fmt(int.tryParse((m['listeners'] ?? '0').toString()) ?? 0)} auditeurs';
-            imgF = ImageService.resolveArtist(name,
-                lastfmUrl: imgRaw.isNotEmpty ? imgRaw : null);
+            sub  = '${_fmt(int.tryParse((m['listeners'] ?? '0').toString()) ?? 0)} ${L.commonListeners}';
+            imgF = ImageService.resolveArtist(name, lastfmUrl: imgRaw.isNotEmpty ? imgRaw : null);
           case _kSearchAlbums:
             type = 'albums';
             sub  = artist;
-            imgF = ImageService.resolveAlbum(name, artist,
-                lastfmUrl: imgRaw.isNotEmpty ? imgRaw : null);
+            imgF = ImageService.resolveAlbum(name, artist, lastfmUrl: imgRaw.isNotEmpty ? imgRaw : null);
           default:
             type = 'tracks';
             sub  = artist;
-            imgF = ImageService.resolveTrack(name, artist,
-                lastfmUrl: imgRaw.isNotEmpty ? imgRaw : null);
+            imgF = ImageService.resolveTrack(name, artist, lastfmUrl: imgRaw.isNotEmpty ? imgRaw : null);
         }
 
         return InkWell(
           onTap: () => _openMusicDetail(context, normalized, type),
           borderRadius: BorderRadius.circular(8),
-          child: _ItemTile(
-            name: name, sub: sub,
-            imageUrl: imgRaw, imageFuture: imgF,
-            rank: '${i + 1}',
-          ),
+          child: _ItemTile(name: name, sub: sub, imageUrl: imgRaw, imageFuture: imgF, rank: '${i + 1}'),
         );
       },
     );
@@ -327,43 +287,38 @@ class _SearchPageState extends State<_SearchPage> {
   }
 }
 
-// ── Empty state hint ─────────────────────────────────────────────────────────
+// ── Empty state ───────────────────────────────────────────────────────────────
 
 class _SearchEmptyState extends StatelessWidget {
   final int tab;
   const _SearchEmptyState({required this.tab});
 
-  static const _hints = [
-    ('Profils', Icons.person_rounded,      'Recherche un utilisateur Last.fm'),
-    ('Artistes', Icons.mic_rounded,         'Recherche un artiste'),
-    ('Albums',   Icons.album_rounded,       'Recherche un album'),
-    ('Titres',   Icons.music_note_rounded,  'Recherche une chanson'),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final t = _hints[tab.clamp(0, 3)];
+
+    final hints = [
+      (Icons.person_rounded,     L.searchHintProfiles),
+      (Icons.mic_rounded,        L.searchHintArtists),
+      (Icons.album_rounded,      L.searchHintAlbums),
+      (Icons.music_note_rounded, L.searchHintTracks),
+    ];
+    final t = hints[tab.clamp(0, 3)];
 
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(t.$2, size: 56, color: scheme.outlineVariant),
-          const SizedBox(height: 12),
-          Text(t.$3,
-              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
-          const SizedBox(height: 4),
-          Text('Tape dans la barre ci-dessus',
-              style: text.bodySmall?.copyWith(color: scheme.outlineVariant)),
-        ],
-      ),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Icon(t.$1, size: 56, color: scheme.outlineVariant),
+        const SizedBox(height: 12),
+        Text(t.$2, style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
+        const SizedBox(height: 4),
+        Text(L.searchTypePrompt, style: text.bodySmall?.copyWith(color: scheme.outlineVariant)),
+      ]),
     );
   }
 }
 
-// ── Search user card ─────────────────────────────────────────────────────────
+// ── User card ─────────────────────────────────────────────────────────────────
 
 class _SearchUserCard extends StatelessWidget {
   final Map<String, dynamic> user;
@@ -374,16 +329,11 @@ class _SearchUserCard extends StatelessWidget {
   static const _ph = '2a96cbd8b46e442fc41c2b86b821562f';
 
   const _SearchUserCard({
-    required this.user,
-    required this.isFav,
-    required this.onTap,
-    required this.onToggleFav,
+    required this.user, required this.isFav,
+    required this.onTap, required this.onToggleFav,
   });
 
-  bool get _hasAvatar {
-    final url = _extractImage(user['image']);
-    return url.isNotEmpty && !url.contains(_ph);
-  }
+  bool   get _hasAvatar => _extractImage(user['image']).isNotEmpty && !_extractImage(user['image']).contains(_ph);
   String get _avatarUrl => _extractImage(user['image']);
 
   @override
@@ -400,56 +350,43 @@ class _SearchUserCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: scheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-              color: scheme.outlineVariant.withValues(alpha: 0.45)),
+          border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45)),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Avatar — only show the star badge if the profile is already a favourite
-            SizedBox(width: 56, height: 56,
-              child: Stack(children: [
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: scheme.primary.withValues(alpha: 0.2),
-                  backgroundImage: _hasAvatar ? NetworkImage(_avatarUrl) : null,
-                  child: _hasAvatar ? null : Text(
-                    username.isNotEmpty ? username[0].toUpperCase() : '?',
-                    style: text.titleMedium?.copyWith(
-                        color: scheme.primary, fontWeight: FontWeight.w800),
-                  ),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          SizedBox(width: 56, height: 56,
+            child: Stack(children: [
+              CircleAvatar(
+                radius: 28,
+                backgroundColor: scheme.primary.withValues(alpha: 0.2),
+                backgroundImage: _hasAvatar ? NetworkImage(_avatarUrl) : null,
+                child: _hasAvatar ? null : Text(
+                  username.isNotEmpty ? username[0].toUpperCase() : '?',
+                  style: text.titleMedium?.copyWith(
+                      color: scheme.primary, fontWeight: FontWeight.w800),
                 ),
-                // Only show filled star when profile is a saved favourite (badge, no tap)
-                if (isFav)
-                  Positioned(
-                    left: 0, top: 0,
-                    child: Icon(Icons.star_rounded, size: 16, color: Colors.amber.shade600),
-                  ),
-              ]),
-            ),
-            const SizedBox(height: 6),
-            Text(username,
-              maxLines: 1, overflow: TextOverflow.ellipsis,
+              ),
+              if (isFav)
+                Positioned(left: 0, top: 0,
+                  child: Icon(Icons.star_rounded, size: 16, color: Colors.amber.shade600)),
+            ]),
+          ),
+          const SizedBox(height: 6),
+          Text(username, maxLines: 1, overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: text.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
-            if (plays.isNotEmpty && plays != '0') ...[
-              const SizedBox(height: 2),
-              Text(
-                '${_fmt(int.tryParse(plays) ?? 0)} écoutes',
-                maxLines: 1, overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: text.labelSmall?.copyWith(
-                    color: scheme.onSurfaceVariant),
-              ),
-            ],
+          if (plays.isNotEmpty && plays != '0') ...[
+            const SizedBox(height: 2),
+            Text('${_fmt(int.tryParse(plays) ?? 0)} ${L.commonPlays}',
+              maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center,
+              style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
           ],
-        ),
+        ]),
       ),
     );
   }
 }
 
-// ── Full profile sheet ───────────────────────────────────────────────────────
+// ── Full profile sheet ────────────────────────────────────────────────────────
 
 class _FullProfileSheet extends StatefulWidget {
   final String        username;
@@ -457,10 +394,8 @@ class _FullProfileSheet extends StatefulWidget {
   final bool          isFav;
   final VoidCallback  onToggleFav;
   const _FullProfileSheet({
-    required this.username,
-    required this.service,
-    required this.isFav,
-    required this.onToggleFav,
+    required this.username, required this.service,
+    required this.isFav, required this.onToggleFav,
   });
 
   @override
@@ -472,8 +407,8 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
   List<dynamic>         _topArtists = [];
   List<dynamic>         _recent     = [];
   bool                  _loading    = true;
-  bool                  _isNowPlaying = false;   // ← green dot
-  late bool             _localIsFav;             // ← star toggle (local copy)
+  bool                  _isNowPlaying = false;
+  late bool             _localIsFav;
 
   static const _ph = '2a96cbd8b46e442fc41c2b86b821562f';
 
@@ -490,7 +425,6 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
       final recentRaw  = (res[2] as Map<String, dynamic>)['track'];
       final recentList = recentRaw is List ? recentRaw
           : (recentRaw != null ? [recentRaw] : <dynamic>[]);
-      // Detect now-playing: first track has @attr.nowplaying == 'true'
       final firstTrack = recentList.isNotEmpty ? recentList.first as Map : null;
       final isNp = firstTrack?['@attr']?['nowplaying'] == 'true';
       if (mounted) {
@@ -526,10 +460,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     final text   = Theme.of(context).textTheme;
 
     return DraggableScrollableSheet(
-      initialChildSize: 0.88,
-      minChildSize:     0.4,
-      maxChildSize:     1.0,
-      expand: false,
+      initialChildSize: 0.88, minChildSize: 0.4, maxChildSize: 1.0, expand: false,
       builder: (ctx, ctrl) => ClipRRect(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         child: Container(
@@ -537,32 +468,21 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           child: _loading
               ? const Center(child: CircularProgressIndicator())
               : ListView(controller: ctrl, children: [
-
-                  // Drag handle
                   Center(child: Container(
                     margin: const EdgeInsets.only(top: 10, bottom: 8),
                     width: 36, height: 4,
-                    decoration: BoxDecoration(
-                        color: scheme.outlineVariant,
-                        borderRadius: BorderRadius.circular(2)),
+                    decoration: BoxDecoration(color: scheme.outlineVariant, borderRadius: BorderRadius.circular(2)),
                   )),
-
-                  // Header
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                     child: _buildHeader(ctx, scheme, text),
                   ),
-
-                  // Stats
                   if (_info != null) _buildStatsRow(scheme, text),
-
                   const Divider(indent: 16, endIndent: 16, height: 20),
-
-                  // Top artists
                   if (_topArtists.isNotEmpty) ...[
                     Padding(
                       padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-                      child: Text('Top Artistes',
+                      child: Text(L.commonTopArtists,
                           style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
                     ),
                     ..._topArtists.asMap().entries.map((e) {
@@ -573,31 +493,27 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: InkWell(
-                          onTap: () => showDetailSheet(ctx,
-                              Map<String, dynamic>.from(a), 'artists', widget.service),
+                          onTap: () => showDetailSheet(ctx, Map<String, dynamic>.from(a), 'artists', widget.service),
                           borderRadius: BorderRadius.circular(8),
                           child: _ItemTile(
-                            name: aName, sub: '$plays écoutes',
+                            name: aName, sub: '$plays ${L.commonPlays}',
                             imageUrl: imgRaw, rank: '${e.key + 1}',
-                            imageFuture: ImageService.resolveArtist(aName,
-                                lastfmUrl: imgRaw.isNotEmpty ? imgRaw : null),
+                            imageFuture: ImageService.resolveArtist(aName, lastfmUrl: imgRaw.isNotEmpty ? imgRaw : null),
                           ),
                         ),
                       );
                     }),
                     const Divider(indent: 16, endIndent: 16, height: 20),
                   ],
-
-                  // Recent tracks
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-                    child: Text('Écoutes récentes',
+                    child: Text(L.commonRecentTracks,
                         style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
                   ),
                   if (_recent.isEmpty)
                     Padding(
                       padding: const EdgeInsets.all(24),
-                      child: Center(child: Text('Aucune écoute récente',
+                      child: Center(child: Text(L.commonNoRecentTracks,
                           style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant))),
                     )
                   else
@@ -614,37 +530,30 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(6),
                             child: hasImg
-                                ? Image.network(rawUrl, width: 40, height: 40,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, _, _) => Container(
-                                        width: 40, height: 40,
+                                ? Image.network(rawUrl, width: 40, height: 40, fit: BoxFit.cover,
+                                    errorBuilder: (_, _, _) => Container(width: 40, height: 40,
                                         color: scheme.surfaceContainerHighest,
-                                        child: Icon(Icons.music_note_rounded,
-                                            color: scheme.onSurfaceVariant)))
+                                        child: Icon(Icons.music_note_rounded, color: scheme.onSurfaceVariant)))
                                 : Container(width: 40, height: 40,
                                     color: scheme.surfaceContainerHighest,
-                                    child: Icon(Icons.music_note_rounded,
-                                        color: scheme.onSurfaceVariant)),
+                                    child: Icon(Icons.music_note_rounded, color: scheme.onSurfaceVariant)),
                           ),
                           if (isNp) Positioned(right: 0, bottom: 0,
                             child: Container(width: 8, height: 8,
-                                decoration: const BoxDecoration(
-                                    color: Colors.green, shape: BoxShape.circle))),
+                                decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle))),
                         ]),
                         title: Text(tName, maxLines: 1, overflow: TextOverflow.ellipsis,
                             style: text.bodySmall?.copyWith(fontWeight: FontWeight.w600)),
                         subtitle: Text(tArtist, maxLines: 1, overflow: TextOverflow.ellipsis,
                             style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
                         trailing: isNp
-                            ? Text('EN COURS', style: text.labelSmall?.copyWith(
+                            ? Text(L.commonNowPlayingBadge, style: text.labelSmall?.copyWith(
                                 color: Colors.green, fontWeight: FontWeight.w700))
                             : Text(_localTimeString(tMap),
-                                style: text.labelSmall?.copyWith(
-                                    color: scheme.onSurfaceVariant, fontSize: 9)),
+                                style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant, fontSize: 9)),
                         dense: true,
                       );
                     }),
-
                   const SizedBox(height: 32),
                 ]),
         ),
@@ -667,12 +576,11 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
       else { ts = int.tryParse(raw.toString()) ?? 0; }
       if (ts > 0) {
         final d = DateTime.fromMillisecondsSinceEpoch(ts * 1000);
-        regStr = '${d.day} ${_kMonths[d.month]} ${d.year}';
+        regStr = '${d.day} ${L.months[d.month]} ${d.year}';
       }
     }
 
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      // Avatar with green dot when now-playing
       Stack(children: [
         CircleAvatar(
           radius: 34,
@@ -685,46 +593,31 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           ),
         ),
         if (_isNowPlaying)
-          Positioned(
-            right: 2, bottom: 2,
-            child: Container(
-              width: 14, height: 14,
-              decoration: BoxDecoration(
-                color: Colors.green,
-                shape: BoxShape.circle,
-                border: Border.all(color: scheme.surface, width: 2),
-              ),
-            ),
-          ),
+          Positioned(right: 2, bottom: 2,
+            child: Container(width: 14, height: 14,
+              decoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle,
+                  border: Border.all(color: scheme.surface, width: 2)))),
       ]),
       const SizedBox(width: 16),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Expanded(
-            child: Text(name, style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
-          ),
-          // ── Favourite star (only visible here, not on the search card) ──
+          Expanded(child: Text(name, style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800))),
           GestureDetector(
-            onTap: () {
-              setState(() => _localIsFav = !_localIsFav);
-              widget.onToggleFav();
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(4),
+            onTap: () { setState(() => _localIsFav = !_localIsFav); widget.onToggleFav(); },
+            child: Padding(padding: const EdgeInsets.all(4),
               child: Icon(
                 _localIsFav ? Icons.star_rounded : Icons.star_outline_rounded,
                 size: 22,
                 color: _localIsFav ? Colors.amber.shade600 : scheme.onSurfaceVariant,
-              ),
-            ),
+              )),
           ),
         ]),
-        if (_isNowPlaying) ...[ // "En cours d'écoute" badge
+        if (_isNowPlaying) ...[
           const SizedBox(height: 2),
           Row(children: [
             const Icon(Icons.graphic_eq_rounded, size: 12, color: Colors.green),
             const SizedBox(width: 4),
-            Text('En cours d\'écoute',
+            Text(L.commonNowPlayingLong,
               style: text.bodySmall?.copyWith(color: Colors.green, fontWeight: FontWeight.w700)),
           ]),
         ],
@@ -742,7 +635,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
             Row(mainAxisSize: MainAxisSize.min, children: [
               Icon(Icons.calendar_today_outlined, size: 11, color: scheme.onSurfaceVariant),
               const SizedBox(width: 2),
-              Text('Depuis $regStr',
+              Text(L.memberSince(regStr),
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             ]),
         ]),
@@ -764,13 +657,11 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
         border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.25)),
       ),
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-        _MiniMetric('🎯', _fmtFull(total),        'scrobbles', scheme.onPrimaryContainer),
-        Container(width: 1, height: 32,
-            color: scheme.onPrimaryContainer.withValues(alpha: 0.15)),
-        _MiniMetric('⚡', '~${_fmt(avg.round())}', 'par jour',  scheme.onPrimaryContainer),
-        Container(width: 1, height: 32,
-            color: scheme.onPrimaryContainer.withValues(alpha: 0.15)),
-        _MiniMetric('🗓️', '$days j',               'd\'activité', scheme.onPrimaryContainer),
+        _MiniMetric('🎯', _fmtFull(total),        L.dashScrobbles,    scheme.onPrimaryContainer),
+        Container(width: 1, height: 32, color: scheme.onPrimaryContainer.withValues(alpha: 0.15)),
+        _MiniMetric('⚡', '~${_fmt(avg.round())}', L.perDay,           scheme.onPrimaryContainer),
+        Container(width: 1, height: 32, color: scheme.onPrimaryContainer.withValues(alpha: 0.15)),
+        _MiniMetric('🗓️', '$days j',               L.activityDays,     scheme.onPrimaryContainer),
       ]),
     );
   }

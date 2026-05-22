@@ -7,6 +7,7 @@ import 'package:palette_generator/palette_generator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app_state.dart';
+import '../l10n.dart';
 import '../services/lastfm_service.dart';
 import '../services/image_service.dart';
 import '../services/update_service.dart';
@@ -23,63 +24,66 @@ part '_settings_page.dart';
 part '_shared_widgets.dart';
 
 
-// Constants
-const _kPeriods = [
-  ('7day',    'Semaine'),
-  ('1month',  'Mois'),
-  ('3month',  '3 mois'),
-  ('6month',  '6 mois'),
-  ('12month', 'Année'),
-  ('overall', 'Tout'),
+// ── Period API keys (labels come from L) ──────────────────────────────────
+const _kPeriodKeys = [
+  '7day', '1month', '3month', '6month', '12month', 'overall',
 ];
 
-const _kMonths = ['', 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
-    'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
-
-// Header image source
-const _kHeaderSources = [
-  ('nowplaying',  'Musique en cours',  Icons.play_circle_rounded),
-  ('top_track',   'Titre #1',          Icons.music_note_rounded),
-  ('top_album',   'Album #1',          Icons.album_rounded),
-  ('top_artist',  'Artiste #1',        Icons.mic_rounded),
-  ('custom',      'Image perso.',      Icons.image_rounded),
-  ('none',        'Couleur du thème',  Icons.palette_rounded),
-];
-
-// Header transition animations
-const _kHeaderAnimations = [
-  ('none',  'Aucune',     Icons.block_rounded),
-  ('fade',  'Fondu',      Icons.opacity_rounded),
-  ('slide', 'Glissement', Icons.swap_horiz_rounded),
-  ('zoom',  'Zoom',       Icons.zoom_in_rounded),
-];
-
-// Periods for top_* sources
-const _kHeaderPeriods = [
-  ('7day',    'Semaine'),
-  ('1month',  'Mois'),
-  ('overall', 'Tout temps'),
+/// Returns the localized (key, label) pairs for period filter chips.
+List<(String, String)> _localizedPeriods() => [
+  ('7day',    L.period7day),
+  ('1month',  L.period1month),
+  ('3month',  L.period3month),
+  ('6month',  L.period6month),
+  ('12month', L.period12month),
+  ('overall', L.periodOverall),
 ];
 
 
-// Accent presets (Color, key, label)
+List<(String, String, IconData)> _localizedHeaderSources() => [
+  ('nowplaying',  L.headerNowPlaying,  Icons.play_circle_rounded),
+  ('top_track',   L.headerTopTrack,    Icons.music_note_rounded),
+  ('top_album',   L.headerTopAlbum,    Icons.album_rounded),
+  ('top_artist',  L.headerTopArtist,   Icons.mic_rounded),
+  ('custom',      L.headerCustomImage, Icons.image_rounded),
+  ('none',        L.headerThemeColor,  Icons.palette_rounded),
+];
+
+// ── Header animations ─────────────────────────────────────────────────────
+List<(String, String, IconData)> _localizedHeaderAnimations() => [
+  ('none',  L.headerAnimNone,  Icons.block_rounded),
+  ('fade',  L.headerAnimFade,  Icons.opacity_rounded),
+  ('slide', L.headerAnimSlide, Icons.swap_horiz_rounded),
+  ('zoom',  L.headerAnimZoom,  Icons.zoom_in_rounded),
+];
+
+// ── Header periods ────────────────────────────────────────────────────────
+List<(String, String)> _localizedHeaderPeriods() => [
+  ('7day',    L.headerPeriodWeek),
+  ('1month',  L.headerPeriodMonth),
+  ('overall', L.headerPeriodAllTime),
+];
+
+// ── Accent presets ────────────────────────────────────────────────────────
 const _kAccentOptions = [
-  (Color(0xFF7C3AED), 'purple', 'Violet'),
-  (Color(0xFF1D4ED8), 'blue',   'Bleu'),
-  (Color(0xFF059669), 'green',  'Vert'),
-  (Color(0xFFDC2626), 'red',    'Rouge'),
+  (Color(0xFF7C3AED), 'purple', 'Violet / Purple'),
+  (Color(0xFF1D4ED8), 'blue',   'Bleu / Blue'),
+  (Color(0xFF059669), 'green',  'Vert / Green'),
+  (Color(0xFFDC2626), 'red',    'Rouge / Red'),
   (Color(0xFFD97706), 'orange', 'Orange'),
-  (Color(0xFFDB2777), 'pink',   'Rose'),
-  (Color(0xFF0F766E), 'teal',   'Sarcelle'),
+  (Color(0xFFDB2777), 'pink',   'Rose / Pink'),
+  (Color(0xFF0F766E), 'teal',   'Sarcelle / Teal'),
 ];
 
-// Card border helper — fixes invisible cards in Material You
-// Fixes invisible cards in Material You
+// ── Month abbreviations (from L, for shared_widgets) ─────────────────────
+List<String> get _kMonths => L.months;
+
+// ── Card border helper ────────────────────────────────────────────────────
 BorderSide _cardBorder(ColorScheme s, {double alpha = 0.45}) =>
     BorderSide(color: s.outlineVariant.withValues(alpha: alpha), width: 1);
 
 
-// Home screen
+// ── Home screen ───────────────────────────────────────────────────────────
 
 class HomeScreen extends StatefulWidget {
   final String username;
@@ -105,7 +109,17 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _idx     = widget.startupTab.clamp(0, 5);
     _service = LastFmService(apiKey: widget.apiKey, username: widget.username);
+    // Rebuild nav labels when language changes
+    localeNotifier.addListener(_onLocaleChange);
   }
+
+  @override
+  void dispose() {
+    localeNotifier.removeListener(_onLocaleChange);
+    super.dispose();
+  }
+
+  void _onLocaleChange() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
@@ -133,36 +147,36 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _idx,
         onDestinationSelected: (i) => setState(() => _idx = i),
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon:         Icon(Icons.dashboard_outlined),
-            selectedIcon: Icon(Icons.dashboard_rounded),
-            label: 'Dashboard',
+            icon:         const Icon(Icons.dashboard_outlined),
+            selectedIcon: const Icon(Icons.dashboard_rounded),
+            label: L.navDashboard,
           ),
           NavigationDestination(
-            icon:         Icon(Icons.search_outlined),
-            selectedIcon: Icon(Icons.search_rounded),
-            label: 'Recherche',
+            icon:         const Icon(Icons.search_outlined),
+            selectedIcon: const Icon(Icons.search_rounded),
+            label: L.navSearch,
           ),
           NavigationDestination(
-            icon:         Icon(Icons.emoji_events_outlined),
-            selectedIcon: Icon(Icons.emoji_events_rounded),
-            label: 'Classements',
+            icon:         const Icon(Icons.emoji_events_outlined),
+            selectedIcon: const Icon(Icons.emoji_events_rounded),
+            label: L.navRankings,
           ),
           NavigationDestination(
-            icon:         Icon(Icons.auto_graph_outlined),
-            selectedIcon: Icon(Icons.auto_graph_rounded),
-            label: 'Graphiques',
+            icon:         const Icon(Icons.auto_graph_outlined),
+            selectedIcon: const Icon(Icons.auto_graph_rounded),
+            label: L.navCharts,
           ),
           NavigationDestination(
-            icon:         Icon(Icons.history_outlined),
-            selectedIcon: Icon(Icons.history_rounded),
-            label: 'Historique',
+            icon:         const Icon(Icons.history_outlined),
+            selectedIcon: const Icon(Icons.history_rounded),
+            label: L.navHistory,
           ),
           NavigationDestination(
-            icon:         Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings_rounded),
-            label: 'Paramètres',
+            icon:         const Icon(Icons.settings_outlined),
+            selectedIcon: const Icon(Icons.settings_rounded),
+            label: L.navSettings,
           ),
         ],
       ),
