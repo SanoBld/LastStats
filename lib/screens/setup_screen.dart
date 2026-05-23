@@ -31,11 +31,26 @@ class _SetupScreenState extends State<SetupScreen> {
   String? _errorMessage;
 
   @override
+  void initState() {
+    super.initState();
+    localeNotifier.addListener(_onLocale);
+  }
+
+  @override
   void dispose() {
+    localeNotifier.removeListener(_onLocale);
     _usernameCtrl.dispose();
     _apikeyCtrl.dispose();
     _jsonCtrl.dispose();
     super.dispose();
+  }
+
+  void _onLocale() => setState(() {});
+
+  Future<void> _setLocale(String code) async {
+    localeNotifier.value = code;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('ls_locale', code);
   }
 
   // ── Parse JSON inline → remplit les champs ────────────────────────────
@@ -67,11 +82,13 @@ class _SetupScreenState extends State<SetupScreen> {
     final apiKey   = _apikeyCtrl.text.trim();
 
     if (username.isEmpty || apiKey.isEmpty) {
-      setState(() => _errorMessage = 'Remplis les deux champs.');
+      setState(() => _errorMessage = localeNotifier.value == 'en'
+          ? 'Please fill both fields.' : 'Remplis les deux champs.');
       return;
     }
     if (apiKey.length != 32) {
-      setState(() => _errorMessage = 'La clé API doit faire 32 caractères.');
+      setState(() => _errorMessage = localeNotifier.value == 'en'
+          ? 'API key must be 32 characters.' : 'La clé API doit faire 32 caractères.');
       return;
     }
 
@@ -81,7 +98,8 @@ class _SetupScreenState extends State<SetupScreen> {
       final service  = LastFmService(apiKey: apiKey, username: username);
       final userInfo = await service.getUserInfo();
 
-      if (userInfo == null) throw Exception('Profil introuvable.');
+      if (userInfo == null) throw Exception(
+          localeNotifier.value == 'en' ? 'Profile not found.' : 'Profil introuvable.');
 
       if (_rememberMe) {
         final prefs = await SharedPreferences.getInstance();
@@ -94,13 +112,18 @@ class _SetupScreenState extends State<SetupScreen> {
 
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => _FirstLoadScreen(
-            username:        username,
-            apiKey:          apiKey,
-            service:         service,
-            totalScrobbles:  totalScrobbles,
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) => _FirstLoadScreen(
+            username:       username,
+            apiKey:         apiKey,
+            service:        service,
+            totalScrobbles: totalScrobbles,
           ),
+          transitionsBuilder: (_, anim, __, child) => FadeTransition(
+            opacity: CurvedAnimation(parent: anim, curve: Curves.easeOut),
+            child: child,
+          ),
+          transitionDuration: const Duration(milliseconds: 350),
         ),
       );
     } catch (e) {
@@ -114,6 +137,7 @@ class _SetupScreenState extends State<SetupScreen> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
+    final isEn   = localeNotifier.value == 'en';
 
     return Scaffold(
       body: SafeArea(
@@ -125,6 +149,27 @@ class _SetupScreenState extends State<SetupScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+
+                  // ── Language toggle ───────────────────────────
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _LangChip(
+                        flag: '🇫🇷', label: 'Français',
+                        selected: !isEn,
+                        onTap: () => _setLocale('fr'),
+                        scheme: scheme, text: text,
+                      ),
+                      const SizedBox(width: 10),
+                      _LangChip(
+                        flag: '🇬🇧', label: 'English',
+                        selected: isEn,
+                        onTap: () => _setLocale('en'),
+                        scheme: scheme, text: text,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
 
                   // ── Logo ──────────────────────────────────────
                   Column(children: [
@@ -149,8 +194,11 @@ class _SetupScreenState extends State<SetupScreen> {
                         style: text.headlineMedium?.copyWith(
                             fontWeight: FontWeight.w800, color: scheme.primary)),
                     const SizedBox(height: 4),
-                    Text('Tes stats Last.fm, réinventées.',
-                        style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
+                    Text(
+                      isEn ? 'Your Last.fm stats, reinvented.'
+                           : 'Tes stats Last.fm, réinventées.',
+                      style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+                    ),
                   ]),
 
                   const SizedBox(height: 40),
@@ -163,8 +211,10 @@ class _SetupScreenState extends State<SetupScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(24),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                        Text('Analyser un profil',
-                            style: text.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+                        Text(
+                          isEn ? 'Analyse a profile' : 'Analyser un profil',
+                          style: text.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                        ),
                         const SizedBox(height: 24),
 
                         // Username
@@ -173,7 +223,7 @@ class _SetupScreenState extends State<SetupScreen> {
                           textInputAction: TextInputAction.next,
                           autocorrect:     false,
                           decoration: InputDecoration(
-                            labelText:  'Pseudo Last.fm',
+                            labelText:  isEn ? 'Last.fm username' : 'Pseudo Last.fm',
                             prefixIcon: const Icon(Icons.person_outline_rounded),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           ),
@@ -189,8 +239,8 @@ class _SetupScreenState extends State<SetupScreen> {
                           enableSuggestions: false,
                           onSubmitted:       (_) => _launch(),
                           decoration: InputDecoration(
-                            labelText: 'Clé API Last.fm',
-                            hintText:  'Clé hexadécimale de 32 caractères',
+                            labelText: isEn ? 'Last.fm API key' : 'Clé API Last.fm',
+                            hintText:  isEn ? '32-character hex key' : 'Clé hexadécimale de 32 caractères',
                             prefixIcon: const Icon(Icons.key_rounded),
                             suffixIcon: IconButton(
                               icon: Icon(_obscureApiKey
@@ -209,7 +259,8 @@ class _SetupScreenState extends State<SetupScreen> {
                           Icon(Icons.shield_outlined, size: 14, color: scheme.onSurfaceVariant),
                           const SizedBox(width: 6),
                           Expanded(child: Text(
-                            'Stockée localement. Jamais envoyée à un tiers.',
+                            isEn ? 'Stored locally. Never sent to a third party.'
+                                 : 'Stockée localement. Jamais envoyée à un tiers.',
                             style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                           )),
                         ]),
@@ -224,7 +275,7 @@ class _SetupScreenState extends State<SetupScreen> {
                           ),
                           GestureDetector(
                             onTap: () => setState(() => _rememberMe = !_rememberMe),
-                            child: const Text('Se souvenir de moi'),
+                            child: Text(isEn ? 'Remember me' : 'Se souvenir de moi'),
                           ),
                         ]),
                         const SizedBox(height: 20),
@@ -238,7 +289,9 @@ class _SetupScreenState extends State<SetupScreen> {
                                   child: CircularProgressIndicator(
                                       strokeWidth: 2, color: scheme.onPrimary))
                               : const Icon(Icons.bar_chart_rounded),
-                          label: Text(_isLoading ? 'Connexion…' : "Lancer l'analyse"),
+                          label: Text(_isLoading
+                              ? (isEn ? 'Connecting…' : 'Connexion…')
+                              : (isEn ? 'Start analysis' : "Lancer l'analyse")),
                           style: FilledButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -275,7 +328,7 @@ class _SetupScreenState extends State<SetupScreen> {
                     Expanded(child: Divider(color: scheme.outlineVariant)),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Text('ou',
+                      child: Text(isEn ? 'or' : 'ou',
                           style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                     ),
                     Expanded(child: Divider(color: scheme.outlineVariant)),
@@ -347,7 +400,9 @@ class _SetupScreenState extends State<SetupScreen> {
                         }
                       },
                       icon:  const Icon(Icons.open_in_new_rounded, size: 16),
-                      label: const Text('Obtenir une clé API gratuitement'),
+                      label: Text(isEn
+                          ? 'Get a free API key'
+                          : 'Obtenir une clé API gratuitement'),
                     ),
                   ),
 
@@ -356,6 +411,61 @@ class _SetupScreenState extends State<SetupScreen> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Language chip ─────────────────────────────────────────────────────────────
+
+class _LangChip extends StatelessWidget {
+  final String flag, label;
+  final bool selected;
+  final VoidCallback onTap;
+  final ColorScheme scheme;
+  final TextTheme text;
+
+  const _LangChip({
+    required this.flag,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    required this.scheme,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+      decoration: BoxDecoration(
+        color: selected ? scheme.primaryContainer : scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: selected
+              ? scheme.primary.withValues(alpha: 0.6)
+              : scheme.outlineVariant,
+          width: selected ? 1.5 : 1,
+        ),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text(flag, style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 7),
+            Text(
+              label,
+              style: text.labelMedium?.copyWith(
+                color: selected ? scheme.onPrimaryContainer : scheme.onSurfaceVariant,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
+          ]),
         ),
       ),
     );
@@ -384,22 +494,34 @@ class _FirstLoadScreen extends StatefulWidget {
 }
 
 class _FirstLoadScreenState extends State<_FirstLoadScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
 
   late final AnimationController _pulseCtrl;
   late final Animation<double>   _pulse;
+  late final AnimationController _fadeCtrl;
+  late final Animation<double>   _fade;
 
-  // Steps shown to the user while loading
-  static const _steps = [
-    ('🎵', 'Chargement de ton profil…'),
-    ('📊', 'Récupération de tes top artistes…'),
-    ('💿', 'Récupération de tes top albums…'),
-    ('🎶', 'Récupération de tes top tracks…'),
-    ('🕐', 'Analyse des écoutes récentes…'),
-    ('📅', 'Construction du calendrier musical…'),
-    ('🏆', 'Calcul des classements…'),
-    ('✨', 'Finalisation…'),
-  ];
+  static List<(String, String)> get _steps => localeNotifier.value == 'en'
+      ? [
+          ('🎵', 'Loading your profile…'),
+          ('📊', 'Fetching your top artists…'),
+          ('💿', 'Fetching your top albums…'),
+          ('🎶', 'Fetching your top tracks…'),
+          ('🕐', 'Analysing recent plays…'),
+          ('📅', 'Building your music calendar…'),
+          ('🏆', 'Computing rankings…'),
+          ('✨', 'Finishing up…'),
+        ]
+      : [
+          ('🎵', 'Chargement de ton profil…'),
+          ('📊', 'Récupération de tes top artistes…'),
+          ('💿', 'Récupération de tes top albums…'),
+          ('🎶', 'Récupération de tes top tracks…'),
+          ('🕐', 'Analyse des écoutes récentes…'),
+          ('📅', 'Construction du calendrier musical…'),
+          ('🏆', 'Calcul des classements…'),
+          ('✨', 'Finalisation…'),
+        ];
 
   int    _stepIndex   = 0;
   double _progress    = 0.0;
@@ -408,59 +530,74 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
   @override
   void initState() {
     super.initState();
+
     _pulseCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1400),
     )..repeat(reverse: true);
-    _pulse = Tween<double>(begin: 0.85, end: 1.0).animate(
+    _pulse = Tween<double>(begin: 0.88, end: 1.0).animate(
       CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
     );
+
+    _fadeCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _fade = CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeOut);
+    _fadeCtrl.forward();
+
     _startPrefetch();
   }
 
   @override
   void dispose() {
     _pulseCtrl.dispose();
+    _fadeCtrl.dispose();
     super.dispose();
   }
 
   Future<void> _startPrefetch() async {
-    // Animate steps while the real prefetch runs in background
-    final stepDuration = Duration(
-      milliseconds: (_steps.length > 0) ? 600 : 500,
-    );
+    final steps = _steps;
+    final stepDuration = Duration(milliseconds: 650);
 
-    // Kick off the actual data loading
+    // Real prefetch runs concurrently
     final prefetchFuture = _runPrefetch();
 
-    // Cycle through visual steps at a steady pace
-    for (var i = 0; i < _steps.length; i++) {
+    for (var i = 0; i < steps.length; i++) {
       if (!mounted) return;
       setState(() {
         _stepIndex = i;
-        _progress  = (i + 1) / _steps.length;
+        _progress  = (i + 1) / steps.length;
       });
       await Future.delayed(stepDuration);
     }
 
-    // Wait for the real fetch to finish before navigating
     await prefetchFuture;
 
     if (!mounted) return;
     setState(() { _done = true; _progress = 1.0; });
 
-    await Future.delayed(const Duration(milliseconds: 400));
+    // Brief pause to show "done" state, then fade+slide to HomeScreen
+    await Future.delayed(const Duration(milliseconds: 500));
     if (!mounted) return;
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (_, anim, __) => HomeScreen(
+        pageBuilder: (_, __, ___) => HomeScreen(
           username: widget.username,
           apiKey:   widget.apiKey,
         ),
-        transitionsBuilder: (_, anim, __, child) =>
-            FadeTransition(opacity: anim, child: child),
-        transitionDuration: const Duration(milliseconds: 500),
+        transitionsBuilder: (_, anim, __, child) {
+          final curved = CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0.0, 0.06),
+              end:   Offset.zero,
+            ).animate(curved),
+            child: FadeTransition(opacity: curved, child: child),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 550),
       ),
     );
   }
@@ -469,120 +606,146 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
     try {
       await DataCache.init();
       await PrefetchService.prefetchAll(widget.service, force: true);
-    } catch (_) {
-      // Non-blocking: app works fine without prefetch
-    }
+    } catch (_) {}
   }
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final step   = _steps[_stepIndex.clamp(0, _steps.length - 1)];
+    final steps  = _steps;
+    final step   = steps[_stepIndex.clamp(0, steps.length - 1)];
+    final isEn   = localeNotifier.value == 'en';
 
     return Scaffold(
       backgroundColor: scheme.surface,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+      body: FadeTransition(
+        opacity: _fade,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
 
-              // ── Pulsing icon ──────────────────────────────────────────
-              ScaleTransition(
-                scale: _pulse,
-                child: Container(
-                  width: 96, height: 96,
-                  decoration: BoxDecoration(
-                    color: scheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: [
-                      BoxShadow(
-                        color:  scheme.primary.withValues(alpha: 0.25),
-                        blurRadius: 24,
-                        spreadRadius: 4,
+                // ── Pulsing icon ──────────────────────────────────────────
+                ScaleTransition(
+                  scale: _pulse,
+                  child: Container(
+                    width: 96, height: 96,
+                    decoration: BoxDecoration(
+                      color: scheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [
+                        BoxShadow(
+                          color:  scheme.primary.withValues(alpha: 0.25),
+                          blurRadius: 24,
+                          spreadRadius: 4,
+                        ),
+                      ],
+                    ),
+                    child: Icon(Icons.headphones_rounded,
+                        size: 48, color: scheme.onPrimaryContainer),
+                  ),
+                ),
+                const SizedBox(height: 36),
+
+                // ── Title ─────────────────────────────────────────────────
+                Text('LastStats',
+                    style: text.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w800, color: scheme.primary)),
+                const SizedBox(height: 8),
+                Text(
+                  isEn ? 'Welcome, ${widget.username}!'
+                       : 'Bienvenue, ${widget.username}\u00a0!',
+                  style: text.titleMedium?.copyWith(color: scheme.onSurface),
+                ),
+                if (widget.totalScrobbles > 0) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    isEn
+                        ? '${_fmtLarge(widget.totalScrobbles)} scrobbles to analyse'
+                        : '${_fmtLarge(widget.totalScrobbles)} scrobbles à analyser',
+                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                  ),
+                ],
+                const SizedBox(height: 48),
+
+                // ── Progress bar ──────────────────────────────────────────
+                TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0, end: _progress),
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeOutCubic,
+                  builder: (_, v, __) => ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: LinearProgressIndicator(
+                      value: v,
+                      minHeight: 8,
+                      backgroundColor: scheme.surfaceContainerHighest,
+                      valueColor: AlwaysStoppedAnimation<Color>(scheme.primary),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // ── Current step ──────────────────────────────────────────
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, anim) => FadeTransition(
+                    opacity: anim,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, 0.3),
+                        end:   Offset.zero,
+                      ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOut)),
+                      child: child,
+                    ),
+                  ),
+                  child: Row(
+                    key: ValueKey(_done ? 'done' : _stepIndex),
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(_done ? '✅' : step.$1,
+                          style: const TextStyle(fontSize: 18)),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: Text(
+                          _done
+                              ? (isEn ? 'All set!' : 'Tout est prêt\u00a0!')
+                              : step.$2,
+                          style: text.bodyMedium?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w500),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ],
                   ),
-                  child: Icon(Icons.headphones_rounded,
-                      size: 48, color: scheme.onPrimaryContainer),
                 ),
-              ),
-              const SizedBox(height: 36),
 
-              // ── Title ─────────────────────────────────────────────────
-              Text('LastStats',
-                  style: text.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w800, color: scheme.primary)),
-              const SizedBox(height: 8),
-              Text(
-                'Bienvenue, ${widget.username} !',
-                style: text.titleMedium?.copyWith(color: scheme.onSurface),
-              ),
-              if (widget.totalScrobbles > 0) ...[
-                const SizedBox(height: 4),
-                Text(
-                  '${_fmtLarge(widget.totalScrobbles)} scrobbles à analyser',
-                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                const SizedBox(height: 48),
+
+                // ── Tip ───────────────────────────────────────────────────
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: scheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(children: [
+                    Icon(Icons.lightbulb_outline_rounded,
+                        size: 16, color: scheme.primary),
+                    const SizedBox(width: 10),
+                    Expanded(child: Text(
+                      isEn
+                          ? 'One-time load — your data will be cached for an instant experience next time.'
+                          : 'Chargement unique — tes données seront mises en cache pour une expérience instantanée.',
+                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                    )),
+                  ]),
                 ),
               ],
-              const SizedBox(height: 48),
-
-              // ── Progress bar ──────────────────────────────────────────
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: LinearProgressIndicator(
-                  value: _progress,
-                  minHeight: 8,
-                  backgroundColor: scheme.surfaceContainerHighest,
-                  valueColor: AlwaysStoppedAnimation<Color>(scheme.primary),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // ── Current step ──────────────────────────────────────────
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: Row(
-                  key: ValueKey(_stepIndex),
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(step.$1, style: const TextStyle(fontSize: 18)),
-                    const SizedBox(width: 10),
-                    Flexible(
-                      child: Text(
-                        _done ? '✅ Tout est prêt !' : step.$2,
-                        style: text.bodyMedium?.copyWith(
-                            color: scheme.onSurfaceVariant,
-                            fontWeight: FontWeight.w500),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 48),
-
-              // ── Tip ───────────────────────────────────────────────────
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: scheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(children: [
-                  Icon(Icons.lightbulb_outline_rounded,
-                      size: 16, color: scheme.primary),
-                  const SizedBox(width: 10),
-                  Expanded(child: Text(
-                    'Chargement unique — tes données seront mises en cache pour une expérience instantanée.',
-                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-                  )),
-                ]),
-              ),
-            ],
+            ),
           ),
         ),
       ),
