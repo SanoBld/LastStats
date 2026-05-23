@@ -6,6 +6,13 @@ import 'package:flutter/services.dart';
 import '../../app_state.dart';
 import '../../l10n.dart';
 
+// ── Clés SharedPreferences (référence) ───────────────────────────────────────
+// ls_header_fallback_type   : 'none' | 'top_track' | 'top_album' | 'top_artist' | 'custom_url'
+// ls_header_fallback_period : '7day' | '1month' | 'overall'
+// ls_header_fallback_url    : URL string (fallback custom image)
+// ls_header_fallback_enabled: bool (rétrocompatibilité)
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ── Constantes ────────────────────────────────────────────────────────────────
 
 const kSettingsAccentOptions = [

@@ -19,8 +19,15 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   String _headerPeriod          = 'overall';
   double _headerBlur            = 0.0;
   String _headerCustomUrl       = '';
-  String _headerFallbackUrl     = '';
+  // ── Fallback "musique en cours" ──────────────────────────────────────
+  // 'none' | 'top_track' | 'top_album' | 'top_artist' | 'custom_url'
+  String _fallbackType          = 'none';
+  String _fallbackPeriod        = 'overall';   // '7day' | '1month' | 'overall'
+  String _fallbackCustomUrl     = '';
+  // (conservé pour compatibilité avec l'ancien booléen)
   bool   _headerFallbackEnabled = false;
+  String _headerFallbackUrl     = '';
+  // ── Sections visibles ────────────────────────────────────────────────
   bool   _showNowPlay           = true;
   bool   _showStats             = true;
   bool   _showArtists           = true;
@@ -28,8 +35,8 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   bool   _showFriends           = true;
   List<String> _statCards       = List.from(kDefaultStatCards);
 
-  final _customUrlCtrl   = TextEditingController();
-  final _fallbackUrlCtrl = TextEditingController();
+  final _customUrlCtrl         = TextEditingController();
+  final _fallbackCustomUrlCtrl = TextEditingController();
 
   @override
   void initState() {
@@ -42,7 +49,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   void dispose() {
     localeNotifier.removeListener(_rebuild);
     _customUrlCtrl.dispose();
-    _fallbackUrlCtrl.dispose();
+    _fallbackCustomUrlCtrl.dispose();
     super.dispose();
   }
 
@@ -52,23 +59,26 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
     final p = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
-      _headerSource          = p.getString('ls_header_source')          ?? 'nowplaying';
-      _headerAnimation       = p.getString('ls_header_animation')       ?? 'fade';
-      _headerPeriod          = p.getString('ls_header_period')          ?? 'overall';
-      _headerBlur            = p.getDouble('ls_header_blur')            ?? 0.0;
-      _headerCustomUrl       = p.getString('ls_header_custom_url')      ?? '';
-      _headerFallbackUrl     = p.getString('ls_header_fallback_url')    ?? '';
-      _headerFallbackEnabled = p.getBool('ls_header_fallback_enabled')  ?? false;
-      _showNowPlay           = p.getBool('ls_show_nowplay')             ?? true;
-      _showStats             = p.getBool('ls_show_stats')               ?? true;
-      _showArtists           = p.getBool('ls_show_artists')             ?? true;
-      _showTracks            = p.getBool('ls_show_tracks')              ?? true;
-      _showFriends           = p.getBool('ls_show_friends')             ?? true;
+      _headerSource          = p.getString('ls_header_source')           ?? 'nowplaying';
+      _headerAnimation       = p.getString('ls_header_animation')        ?? 'fade';
+      _headerPeriod          = p.getString('ls_header_period')           ?? 'overall';
+      _headerBlur            = p.getDouble('ls_header_blur')             ?? 0.0;
+      _headerCustomUrl       = p.getString('ls_header_custom_url')       ?? '';
+      _fallbackType          = p.getString('ls_header_fallback_type')    ?? 'none';
+      _fallbackPeriod        = p.getString('ls_header_fallback_period')  ?? 'overall';
+      _fallbackCustomUrl     = p.getString('ls_header_fallback_url')     ?? '';
+      _headerFallbackEnabled = p.getBool('ls_header_fallback_enabled')   ?? false;
+      _headerFallbackUrl     = p.getString('ls_header_fallback_url')     ?? '';
+      _showNowPlay           = p.getBool('ls_show_nowplay')              ?? true;
+      _showStats             = p.getBool('ls_show_stats')                ?? true;
+      _showArtists           = p.getBool('ls_show_artists')              ?? true;
+      _showTracks            = p.getBool('ls_show_tracks')               ?? true;
+      _showFriends           = p.getBool('ls_show_friends')              ?? true;
       final raw = p.getStringList('ls_stat_cards');
       _statCards = raw != null && raw.isNotEmpty ? raw : List.from(kDefaultStatCards);
     });
-    _customUrlCtrl.text   = _headerCustomUrl;
-    _fallbackUrlCtrl.text = _headerFallbackUrl;
+    _customUrlCtrl.text         = _headerCustomUrl;
+    _fallbackCustomUrlCtrl.text = _fallbackCustomUrl;
   }
 
   Future<void> _set<T>(String key, T v) async {
@@ -85,12 +95,12 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme    = Theme.of(context).colorScheme;
-    final text      = Theme.of(context).textTheme;
-    final isEn      = localeNotifier.value == 'en';
-    final sources   = buildHeaderSources();
-    final anims     = buildHeaderAnimations();
-    final periods   = buildHeaderPeriods();
+    final scheme  = Theme.of(context).colorScheme;
+    final text    = Theme.of(context).textTheme;
+    final isEn    = localeNotifier.value == 'en';
+    final sources = buildHeaderSources();
+    final anims   = buildHeaderAnimations();
+    final periods = buildHeaderPeriods();
 
     return Scaffold(
       appBar: AppBar(
@@ -99,7 +109,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
       ),
       body: ListView(padding: const EdgeInsets.all(20), children: [
 
-        // ── En-tête (image de fond) ────────────────────────────────────────
+        // ── Image d'en-tête ───────────────────────────────────────────────
         SettingsSection(label: L.settingsHeaderImage, children: [
           Padding(padding: const EdgeInsets.fromLTRB(16, 14, 16, 14), child: Column(
             crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -108,7 +118,8 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
               Row(children: [
                 Icon(Icons.wallpaper_rounded, size: 18, color: scheme.primary),
                 const SizedBox(width: 8),
-                Text(L.settingsHeaderSource, style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                Text(L.settingsHeaderSource,
+                    style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
               ]),
               const SizedBox(height: 4),
               Text(L.settingsHeaderImageSub,
@@ -127,7 +138,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                 );
               }).toList()),
 
-              // URL personnalisée (si source = custom)
+              // ── URL personnalisée (source = custom) ───────────────────
               if (_headerSource == 'custom') ...[
                 const SizedBox(height: 16),
                 Divider(color: scheme.outlineVariant.withValues(alpha: 0.4)),
@@ -166,7 +177,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                     style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               ],
 
-              // Période (si source = top_*)
+              // ── Période (source = top_*) ───────────────────────────────
               if (['top_track', 'top_album', 'top_artist'].contains(_headerSource)) ...[
                 const SizedBox(height: 16),
                 Divider(color: scheme.outlineVariant.withValues(alpha: 0.4)),
@@ -190,31 +201,91 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                 }).toList()),
               ],
 
-              // Image de secours (si source = nowplaying)
+              // ── Fallback "Aucune musique en cours" (source = nowplaying) ─
               if (_headerSource == 'nowplaying') ...[
                 const SizedBox(height: 16),
                 Divider(color: scheme.outlineVariant.withValues(alpha: 0.4)),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 Row(children: [
-                  Switch(
-                    value: _headerFallbackEnabled,
-                    onChanged: (v) async {
-                      await _set('ls_header_fallback_enabled', v);
-                      setState(() => _headerFallbackEnabled = v);
-                    },
-                  ),
+                  Icon(Icons.music_off_rounded, size: 18, color: scheme.primary),
                   const SizedBox(width: 8),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(L.settingsHeaderFallback,
-                        style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-                    Text(L.settingsHeaderFallbackSub,
-                        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                    Text(
+                      isEn ? 'When no music is playing' : 'Quand aucune musique n\'est en cours',
+                      style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      isEn ? 'Choose what to display as background instead'
+                           : 'Choisissez ce qui s\'affiche en arrière-plan à la place',
+                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                    ),
                   ])),
                 ]),
-                if (_headerFallbackEnabled) ...[
-                  const SizedBox(height: 10),
+                const SizedBox(height: 12),
+
+                // Choix du type de fallback
+                _FallbackTypeSelector(
+                  value: _fallbackType,
+                  isEn: isEn,
+                  scheme: scheme,
+                  text: text,
+                  onChanged: (val) async {
+                    await _set('ls_header_fallback_type', val);
+                    // Rétrocompatibilité : met à jour l'ancien booléen
+                    await _set('ls_header_fallback_enabled', val != 'none');
+                    setState(() => _fallbackType = val);
+                  },
+                ),
+
+                // Période (si fallback = top_track / top_album / top_artist)
+                if (['top_track', 'top_album', 'top_artist'].contains(_fallbackType)) ...[
+                  const SizedBox(height: 14),
+                  Row(children: [
+                    Icon(Icons.date_range_rounded, size: 16, color: scheme.primary),
+                    const SizedBox(width: 8),
+                    Text(
+                      isEn ? 'Fallback period' : 'Période du fallback',
+                      style: text.labelMedium?.copyWith(
+                          color: scheme.primary, fontWeight: FontWeight.w700),
+                    ),
+                  ]),
+                  const SizedBox(height: 8),
+                  Wrap(spacing: 8, runSpacing: 8, children: [
+                    _FallbackPeriodChip(
+                      label: isEn ? '1 week' : '1 semaine',
+                      value: '7day',
+                      selected: _fallbackPeriod,
+                      onTap: (v) async {
+                        await _set('ls_header_fallback_period', v);
+                        setState(() => _fallbackPeriod = v);
+                      },
+                    ),
+                    _FallbackPeriodChip(
+                      label: isEn ? '1 month' : '1 mois',
+                      value: '1month',
+                      selected: _fallbackPeriod,
+                      onTap: (v) async {
+                        await _set('ls_header_fallback_period', v);
+                        setState(() => _fallbackPeriod = v);
+                      },
+                    ),
+                    _FallbackPeriodChip(
+                      label: isEn ? 'All time' : 'Tout le temps',
+                      value: 'overall',
+                      selected: _fallbackPeriod,
+                      onTap: (v) async {
+                        await _set('ls_header_fallback_period', v);
+                        setState(() => _fallbackPeriod = v);
+                      },
+                    ),
+                  ]),
+                ],
+
+                // URL personnalisée de fallback
+                if (_fallbackType == 'custom_url') ...[
+                  const SizedBox(height: 14),
                   TextField(
-                    controller: _fallbackUrlCtrl, autocorrect: false,
+                    controller: _fallbackCustomUrlCtrl, autocorrect: false,
                     keyboardType: TextInputType.url, textInputAction: TextInputAction.done,
                     decoration: InputDecoration(
                       labelText: L.settingsHeaderFallbackUrlLabel,
@@ -225,17 +296,23 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                         icon: const Icon(Icons.check_circle_outline_rounded),
                         tooltip: L.settingsHeaderApply,
                         onPressed: () async {
-                          final url = _fallbackUrlCtrl.text.trim();
+                          final url = _fallbackCustomUrlCtrl.text.trim();
                           await _set('ls_header_fallback_url', url);
-                          setState(() => _headerFallbackUrl = url);
+                          setState(() => _fallbackCustomUrl = url);
                         },
                       ),
                     ),
                     onSubmitted: (url) async {
                       await _set('ls_header_fallback_url', url.trim());
-                      setState(() => _headerFallbackUrl = url.trim());
+                      setState(() => _fallbackCustomUrl = url.trim());
                     },
                   ),
+                ],
+
+                // Aperçu du fallback actif
+                if (_fallbackType != 'none') ...[
+                  const SizedBox(height: 12),
+                  _FallbackSummary(type: _fallbackType, period: _fallbackPeriod, isEn: isEn),
                 ],
               ],
             ],
@@ -248,7 +325,6 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
         SettingsSection(label: isEn ? 'Animation & Blur' : 'Animation & Flou', children: [
           Padding(padding: const EdgeInsets.fromLTRB(16, 14, 16, 4), child: Column(
             crossAxisAlignment: CrossAxisAlignment.start, children: [
-
               Row(children: [
                 Icon(Icons.animation_rounded, size: 18, color: scheme.primary),
                 const SizedBox(width: 8),
@@ -369,11 +445,8 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                 dense: true,
                 onChanged: (v) async {
                   final updated = List<String>.from(_statCards);
-                  if (v == true) {
-                    if (!updated.contains(id)) updated.add(id);
-                  } else {
-                    updated.remove(id);
-                  }
+                  if (v == true) { if (!updated.contains(id)) updated.add(id); }
+                  else { updated.remove(id); }
                   await _saveList('ls_stat_cards', updated);
                   setState(() => _statCards = updated);
                 },
@@ -384,10 +457,8 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
               label: Text(isEn ? 'Reorder cards' : 'Réordonner les cartes'),
               onPressed: () async {
                 final result = await showModalBottomSheet<List<String>>(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  useSafeArea: true,
+                  context: context, isScrollControlled: true,
+                  backgroundColor: Colors.transparent, useSafeArea: true,
                   builder: (_) => CardReorderSheet(cards: List.from(_statCards)),
                 );
                 if (result != null && mounted) {
@@ -402,6 +473,160 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
         const SizedBox(height: 20),
         const RestartBanner(),
         const SizedBox(height: 20),
+      ]),
+    );
+  }
+}
+
+// ── Widget sélecteur de type de fallback ──────────────────────────────────────
+
+class _FallbackTypeSelector extends StatelessWidget {
+  final String value;
+  final bool isEn;
+  final ColorScheme scheme;
+  final TextTheme text;
+  final void Function(String) onChanged;
+
+  const _FallbackTypeSelector({
+    required this.value,
+    required this.isEn,
+    required this.scheme,
+    required this.text,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final options = [
+      ('none',        Icons.hide_image_outlined,   isEn ? 'Nothing'       : 'Rien'),
+      ('top_track',   Icons.music_note_rounded,    isEn ? 'Top Track'     : 'Titre #1'),
+      ('top_album',   Icons.album_rounded,         isEn ? 'Top Album'     : 'Album #1'),
+      ('top_artist',  Icons.mic_rounded,           isEn ? 'Top Artist'    : 'Artiste #1'),
+      ('custom_url',  Icons.image_outlined,        isEn ? 'Custom image'  : 'Image perso.'),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: options.map((opt) {
+        final (key, icon, label) = opt;
+        final sel = value == key;
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () => onChanged(key),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+              decoration: BoxDecoration(
+                color: sel
+                    ? scheme.primaryContainer.withValues(alpha: 0.7)
+                    : scheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: sel
+                      ? scheme.primary.withValues(alpha: 0.55)
+                      : scheme.outlineVariant.withValues(alpha: 0.4),
+                  width: sel ? 1.5 : 1,
+                ),
+              ),
+              child: Row(children: [
+                Icon(icon,
+                    size: 18,
+                    color: sel ? scheme.onPrimaryContainer : scheme.onSurfaceVariant),
+                const SizedBox(width: 10),
+                Text(label, style: text.bodyMedium?.copyWith(
+                  fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
+                  color: sel ? scheme.onPrimaryContainer : scheme.onSurface,
+                )),
+                const Spacer(),
+                if (sel)
+                  Icon(Icons.check_circle_rounded, size: 18, color: scheme.primary)
+                else
+                  Icon(Icons.radio_button_unchecked_rounded,
+                      size: 18, color: scheme.outlineVariant),
+              ]),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+// ── Chip de période pour le fallback ─────────────────────────────────────────
+
+class _FallbackPeriodChip extends StatelessWidget {
+  final String label, value, selected;
+  final void Function(String) onTap;
+  const _FallbackPeriodChip({
+    required this.label, required this.value,
+    required this.selected, required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final sel = value == selected;
+    return FilterChip(
+      label: Text(label),
+      selected: sel,
+      showCheckmark: false,
+      onSelected: (_) => onTap(value),
+    );
+  }
+}
+
+// ── Résumé du fallback actif ──────────────────────────────────────────────────
+
+class _FallbackSummary extends StatelessWidget {
+  final String type, period;
+  final bool isEn;
+  const _FallbackSummary({required this.type, required this.period, required this.isEn});
+
+  String _typeLabel() {
+    switch (type) {
+      case 'top_track':  return isEn ? 'Top Track'  : 'Titre #1';
+      case 'top_album':  return isEn ? 'Top Album'  : 'Album #1';
+      case 'top_artist': return isEn ? 'Top Artist' : 'Artiste #1';
+      case 'custom_url': return isEn ? 'Custom image' : 'Image personnalisée';
+      default: return '';
+    }
+  }
+
+  String _periodLabel() {
+    switch (period) {
+      case '7day':   return isEn ? '1 week'    : '1 semaine';
+      case '1month': return isEn ? '1 month'   : '1 mois';
+      default:       return isEn ? 'all time'  : 'tout le temps';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+
+    final showPeriod = ['top_track', 'top_album', 'top_artist'].contains(type);
+    final summary = showPeriod
+        ? (isEn
+            ? 'Will show: $_typeLabel() · $_periodLabel()'
+            : 'Affichera : ${_typeLabel()} · ${_periodLabel()}')
+        : (type == 'custom_url'
+            ? (isEn ? 'Will show: custom image URL' : 'Affichera : URL d\'image personnalisée')
+            : '');
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
+      ),
+      child: Row(children: [
+        Icon(Icons.info_outline_rounded, size: 14, color: scheme.onSurfaceVariant),
+        const SizedBox(width: 8),
+        Expanded(child: Text(summary,
+            style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant))),
       ]),
     );
   }
