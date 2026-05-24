@@ -54,13 +54,55 @@ class _SetupScreenState extends State<SetupScreen> {
   }
 
   // ── Parse JSON inline → remplit les champs ────────────────────────────
+  // Accepte deux formats :
+  //   • Format simple   : {"username":"…","api_key":"…"}
+  //   • Format backup   : {"app":"LastStats","prefs":{"ls_username":"…","ls_apikey":"…",…}}
   void _applyJson() {
     final raw = _jsonCtrl.text.trim();
     if (raw.isEmpty) return;
     try {
       final Map<String, dynamic> data = jsonDecode(raw) as Map<String, dynamic>;
-      final username = (data['username'] ?? '').toString().trim();
-      final apiKey   = (data['api_key'] ?? data['apiKey'] ?? data['api-key'] ?? '').toString().trim();
+
+      String username = '';
+      String apiKey   = '';
+
+      // ── Format backup LastStats ──────────────────────────────────────
+      if (data['app'] == 'LastStats' && data['prefs'] is Map) {
+        final prefs = data['prefs'] as Map<String, dynamic>;
+        // Préférer le compte actif via ls_accounts si disponible
+        final accountsRaw = prefs['ls_accounts'];
+        final activeIdx   = (prefs['ls_active_account'] as num?)?.toInt() ?? 0;
+        if (accountsRaw != null) {
+          try {
+            final accounts = jsonDecode(accountsRaw.toString()) as List;
+            if (accounts.isNotEmpty) {
+              final acc = accounts[activeIdx.clamp(0, accounts.length - 1)]
+                  as Map<String, dynamic>;
+              username = (acc['username'] ?? '').toString().trim();
+              apiKey   = (acc['apiKey']   ?? '').toString().trim();
+            }
+          } catch (_) {}
+        }
+        // Fallback sur ls_username / ls_apikey (mono-compte ou ancienne version)
+        if (username.isEmpty) {
+          username = (prefs['ls_username'] ?? '').toString().trim();
+        }
+        if (apiKey.isEmpty) {
+          apiKey = (prefs['ls_apikey'] ?? '').toString().trim();
+        }
+        // Fallback sur les champs racine du backup (username / api_key)
+        if (username.isEmpty) {
+          username = (data['username'] ?? '').toString().trim();
+        }
+        if (apiKey.isEmpty) {
+          apiKey = (data['api_key'] ?? data['apiKey'] ?? '').toString().trim();
+        }
+      } else {
+        // ── Format simple ──────────────────────────────────────────────
+        username = (data['username'] ?? '').toString().trim();
+        apiKey   = (data['api_key'] ?? data['apiKey'] ?? data['api-key'] ?? '').toString().trim();
+      }
+
       if (username.isEmpty || apiKey.isEmpty) {
         setState(() => _errorMessage = L.setupInvalidFields);
         return;
@@ -853,7 +895,7 @@ class _FirstLoadChecklist extends StatelessWidget {
   }
 }
 
-// ── Ligne d'étape ─────────────────────────────────────────────────────────────
+
 
 enum _RowStatus { done, active }
 

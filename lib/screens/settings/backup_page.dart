@@ -16,17 +16,46 @@ class BackupPage extends StatefulWidget {
 
 class _BackupPageState extends State<BackupPage> {
 
+  // Toutes les clés SharedPreferences à inclure dans la sauvegarde.
+  // Ordre : compte(s) → apparence → dashboard → démarrage → langue → favoris → mises à jour.
   static const _kBackupKeys = [
-    'ls_username', 'ls_apikey',
-    'ls_theme', 'ls_accent', 'ls_use_dynamic_color', 'ls_use_nowplaying_color',
-    'ls_header_source', 'ls_header_period', 'ls_header_animation',
-    'ls_header_blur', 'ls_header_custom_url',
-    'ls_header_fallback_enabled', 'ls_header_fallback_url',
-    'ls_header_fallback_type', 'ls_header_fallback_period',
-    'ls_show_nowplay', 'ls_show_stats', 'ls_show_artists', 'ls_show_tracks', 'ls_show_friends',
+    // ── Compte(s) ─────────────────────────────────────────────────────
+    'ls_username',        // compte principal (rétrocompat mono-compte)
+    'ls_apikey',          // clé API principale
+    'ls_accounts',        // JSON multi-comptes (AccountManager)
+    'ls_active_account',  // index du compte actif
+    // ── Apparence ─────────────────────────────────────────────────────
+    'ls_theme',
+    'ls_accent',
+    'ls_use_dynamic_color',
+    'ls_use_nowplaying_color',
+    // ── Dashboard — en-tête ───────────────────────────────────────────
+    'ls_header_source',
+    'ls_header_period',
+    'ls_header_animation',
+    'ls_header_blur',
+    'ls_header_custom_url',
+    'ls_header_fallback_enabled',
+    'ls_header_fallback_url',
+    'ls_header_fallback_type',
+    'ls_header_fallback_period',
+    // ── Dashboard — sections & cartes ─────────────────────────────────
+    'ls_show_nowplay',
+    'ls_show_stats',
+    'ls_show_artists',
+    'ls_show_tracks',
+    'ls_show_friends',
     'ls_stat_cards',
-    'ls_startup_tab', 'ls_auto_update_check',
-    'ls_fav_friends', 'ls_fav_profiles', 'ls_locale',
+    // ── Démarrage ─────────────────────────────────────────────────────
+    'ls_startup_tab',
+    // ── Langue ────────────────────────────────────────────────────────
+    'ls_locale',
+    // ── Favoris ───────────────────────────────────────────────────────
+    'ls_fav_friends',
+    'ls_fav_profiles',
+    // ── Mises à jour ──────────────────────────────────────────────────
+    'ls_auto_update_check',
+    // ls_last_update_check intentionnellement exclu (timestamp runtime)
   ];
 
   Future<void> _export() async {
@@ -36,11 +65,47 @@ class _BackupPageState extends State<BackupPage> {
       final v = p.get(key);
       if (v != null) map[key] = v;
     }
-    final now      = DateTime.now();
-    final payload  = jsonEncode({'app': 'LastStats', 'version': '1',
-        'exported_at': now.toIso8601String(), 'prefs': map});
-    final dateStr  = '${now.year}-${now.month.toString().padLeft(2,'0')}-${now.day.toString().padLeft(2,'0')}';
-    final defName  = 'laststats_backup_$dateStr.json';
+
+    // ── Résoudre le compte actif pour les champs de compatibilité ─────
+    String activeUsername = '';
+    String activeApiKey   = '';
+
+    // Priorité 1 : multi-comptes (AccountManager)
+    final accountsRaw = map['ls_accounts'];
+    if (accountsRaw != null) {
+      try {
+        final accounts  = jsonDecode(accountsRaw.toString()) as List;
+        final activeIdx = (map['ls_active_account'] as num?)?.toInt() ?? 0;
+        if (accounts.isNotEmpty) {
+          final acc       = accounts[activeIdx.clamp(0, accounts.length - 1)]
+              as Map<String, dynamic>;
+          activeUsername  = (acc['username'] ?? '').toString();
+          activeApiKey    = (acc['apiKey']   ?? '').toString();
+        }
+      } catch (_) {}
+    }
+    // Priorité 2 : mono-compte legacy
+    if (activeUsername.isEmpty) activeUsername = (map['ls_username'] ?? '').toString();
+    if (activeApiKey.isEmpty)   activeApiKey   = (map['ls_apikey']   ?? '').toString();
+
+    final now     = DateTime.now();
+    final payload = jsonEncode({
+      // ── Champs racine ────────────────────────────────────────────────
+      // Compatibles avec le champ JSON de l'écran de connexion :
+      //   username / api_key sont reconnus directement par _applyJson().
+      'app':         'LastStats',
+      'version':     '2',
+      'exported_at': now.toIso8601String(),
+      'username':    activeUsername,    // ← raccourci connexion rapide
+      'api_key':     activeApiKey,      // ← raccourci connexion rapide
+      // ── Toutes les préférences ───────────────────────────────────────
+      'prefs': map,
+    });
+
+    final dateStr = '${now.year}-'
+        '${now.month.toString().padLeft(2,'0')}-'
+        '${now.day.toString().padLeft(2,'0')}';
+    final defName = 'laststats_backup_$dateStr.json';
     if (!mounted) return;
     await showModalBottomSheet(
       context: context, isScrollControlled: true,
@@ -80,11 +145,27 @@ class _BackupPageState extends State<BackupPage> {
                 Map<String, dynamic> parsed;
                 try { parsed = jsonDecode(raw) as Map<String, dynamic>; }
                 catch (_) { setDlg(() => err = L.importInvalidJson); return; }
-                if (parsed['app'] != 'LastStats') { setDlg(() => err = L.importUnknownFile); return; }
-                final prefs = parsed['prefs'];
-                if (prefs is! Map) { setDlg(() => err = L.importInvalidFormat); return; }
-                if (ctx.mounted) Navigator.pop(ctx);
-                await _applyBackup(Map<String, dynamic>.from(prefs));
+
+                // ── Accepte le format backup LastStats (version 1 ou 2) ─
+                if (parsed['app'] == 'LastStats') {
+                  final prefs = parsed['prefs'];
+                  if (prefs is! Map) { setDlg(() => err = L.importInvalidFormat); return; }
+                  if (ctx.mounted) Navigator.pop(ctx);
+                  await _applyBackup(Map<String, dynamic>.from(prefs));
+                  return;
+                }
+
+                // ── Accepte le format simple {"username":"…","api_key":"…"} ─
+                // (par exemple un export depuis un autre outil)
+                final u = (parsed['username'] ?? '').toString().trim();
+                final k = (parsed['api_key'] ?? parsed['apiKey'] ?? parsed['api-key'] ?? '').toString().trim();
+                if (u.isNotEmpty && k.isNotEmpty) {
+                  if (ctx.mounted) Navigator.pop(ctx);
+                  await _applyBackup({'ls_username': u, 'ls_apikey': k});
+                  return;
+                }
+
+                setDlg(() => err = L.importUnknownFile);
               },
               child: Text(L.importRestore),
             ),
@@ -100,17 +181,40 @@ class _BackupPageState extends State<BackupPage> {
     for (final e in prefs.entries) {
       if (!e.key.startsWith('ls_')) continue;
       final v = e.value;
-      if (v is bool)   await p.setBool(e.key, v);
+      if (v is bool)        await p.setBool(e.key, v);
       else if (v is int)    await p.setInt(e.key, v);
       else if (v is double) await p.setDouble(e.key, v);
       else if (v is String) await p.setString(e.key, v);
       else if (v is List)   await p.setStringList(e.key, List<String>.from(v));
     }
+
+    // ── Synchroniser ls_username / ls_apikey depuis le compte actif ───
+    // Si ls_accounts est restauré, s'assurer que ls_username / ls_apikey
+    // correspondent bien au compte actif (AccountManager.switchTo() fait
+    // la même chose mais on évite l'import circulaire ici).
+    final accountsRaw = p.getString('ls_accounts');
+    if (accountsRaw != null && accountsRaw.isNotEmpty) {
+      try {
+        final accounts  = jsonDecode(accountsRaw) as List;
+        final activeIdx = p.getInt('ls_active_account') ?? 0;
+        if (accounts.isNotEmpty) {
+          final acc = accounts[activeIdx.clamp(0, accounts.length - 1)]
+              as Map<String, dynamic>;
+          final u = (acc['username'] ?? '').toString();
+          final k = (acc['apiKey']   ?? '').toString();
+          if (u.isNotEmpty) await p.setString('ls_username', u);
+          if (k.isNotEmpty) await p.setString('ls_apikey',   k);
+        }
+      } catch (_) {}
+    }
+
+    // ── Mettre à jour les notifiers en mémoire ────────────────────────
     themeModeNotifier.value          = themeFromString(p.getString('ls_theme'));
     accentNotifier.value             = accentFromString(p.getString('ls_accent'));
     useDynamicColorNotifier.value    = p.getBool('ls_use_dynamic_color')    ?? false;
     useNowPlayingColorNotifier.value = p.getBool('ls_use_nowplaying_color') ?? false;
     localeNotifier.value             = p.getString('ls_locale')             ?? 'fr';
+
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(L.importSuccess), behavior: SnackBarBehavior.floating));
