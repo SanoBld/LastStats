@@ -176,6 +176,9 @@ abstract class AppStrings {
   String get settingsSourceCode;
   String get settingsSourceCodeSub;
   String get settingsLanguage;
+  String get settingsAboutProjectDesc;
+  String get settingsAboutSupport;
+  String get settingsAboutSupportSub;
 
   // ── Header source / animation labels ─────────────────────────────────────
   String get headerNowPlaying;
@@ -417,8 +420,11 @@ class _AppStringsFr implements AppStrings {
   @override String get settingsWebVersion        => 'Version web';
   @override String get settingsWebVersionSub     => 'sanobld.github.io/LastStats';
   @override String get settingsSourceCode        => 'Code source';
-  @override String get settingsSourceCodeSub     => 'github.com/sanobld/LastStats';
+  @override String get settingsSourceCodeSub     => 'github.com/SanoBld/LastStats-App';
   @override String get settingsLanguage          => 'Langue';
+  @override String get settingsAboutProjectDesc  => 'LastStats est un projet personnel open-source. Il peut contenir des bugs — merci de votre compréhension.';
+  @override String get settingsAboutSupport      => 'Soutenir le projet';
+  @override String get settingsAboutSupportSub   => '⭐ Laisser une étoile sur GitHub';
 
   @override String get headerNowPlaying  => 'Musique en cours';
   @override String get headerTopTrack    => 'Titre #1';
@@ -653,8 +659,11 @@ class _AppStringsEn implements AppStrings {
   @override String get settingsWebVersion        => 'Web version';
   @override String get settingsWebVersionSub     => 'sanobld.github.io/LastStats';
   @override String get settingsSourceCode        => 'Source code';
-  @override String get settingsSourceCodeSub     => 'github.com/sanobld/LastStats';
+  @override String get settingsSourceCodeSub     => 'github.com/SanoBld/LastStats-App';
   @override String get settingsLanguage          => 'Language';
+  @override String get settingsAboutProjectDesc  => 'LastStats is a personal open-source project. It may contain bugs — thanks for your understanding.';
+  @override String get settingsAboutSupport      => 'Support the project';
+  @override String get settingsAboutSupportSub   => '⭐ Leave a star on GitHub';
 
   @override String get headerNowPlaying  => 'Now playing';
   @override String get headerTopTrack    => 'Track #1';

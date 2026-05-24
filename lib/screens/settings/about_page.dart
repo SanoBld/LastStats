@@ -50,7 +50,26 @@ class AboutPage extends StatelessWidget {
           const SizedBox(height: 24),
         ])),
 
-        // ── Infos ─────────────────────────────────────────────────────────
+        // ── Project description ───────────────────────────────────────────
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: scheme.secondaryContainer.withValues(alpha: 0.45),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.3)),
+            ),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Icon(Icons.info_outline_rounded, size: 18, color: scheme.secondary),
+              const SizedBox(width: 10),
+              Expanded(child: Text(L.settingsAboutProjectDesc,
+                  style: text.bodySmall?.copyWith(color: scheme.onSecondaryContainer))),
+            ]),
+          ),
+        ),
+
+        // ── App info ──────────────────────────────────────────────────────
         SettingsSection(label: isEn ? 'App info' : 'Infos', children: [
           ListTile(
             leading: const Icon(Icons.info_outline_rounded),
@@ -77,13 +96,28 @@ class AboutPage extends StatelessWidget {
             subtitle: Text(L.settingsSourceCodeSub,
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             trailing: const Icon(Icons.open_in_new_rounded, size: 16),
-            onTap: () => _open('https://github.com/sanobld/LastStats'),
+            onTap: () => _open('https://github.com/SanoBld/LastStats-App'),
           ),
         ]),
 
         const SizedBox(height: 16),
 
-        // ── Remerciements ─────────────────────────────────────────────────
+        // ── Support ───────────────────────────────────────────────────────
+        SettingsSection(label: L.settingsAboutSupport, children: [
+          ListTile(
+            leading: const Icon(Icons.star_rounded),
+            title: Text(L.settingsAboutSupport,
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            subtitle: Text(L.settingsAboutSupportSub,
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            trailing: const Icon(Icons.open_in_new_rounded, size: 16),
+            onTap: () => _open('https://github.com/SanoBld/LastStats-App'),
+          ),
+        ]),
+
+        const SizedBox(height: 16),
+
+        // ── Powered by ────────────────────────────────────────────────────
         SettingsSection(label: isEn ? 'Powered by' : 'Propulsé par', children: [
           _PoweredByTile(
             icon: Icons.music_note_rounded,

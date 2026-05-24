@@ -86,7 +86,7 @@ class _HistoryPageState extends State<_HistoryPage>
         final seconds = int.tryParse(uts);
         if (seconds != null) {
           final local = DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
-          hour = '${local.hour.toString().padLeft(2, '0')}:00';
+          hour = '${((local.hour + 1) % 24).toString().padLeft(2, '0')}:00';
         }
       }
       map.putIfAbsent(hour, () => []).add(t);
