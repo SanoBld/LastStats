@@ -176,7 +176,7 @@ class _SetupScreenState extends State<SetupScreen> {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(24),
                       child: Image.asset(
-                        'assets/images/icon.png',
+                        'assets/images/icon-512.png',
                         width: 80, height: 80, fit: BoxFit.cover,
                         errorBuilder: (_, _, _) => Container(
                           width: 80, height: 80,

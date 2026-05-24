@@ -30,14 +30,14 @@ class AboutPage extends StatelessWidget {
 
         // ── Logo / En-tête ────────────────────────────────────────────────
         Center(child: Column(children: [
-          Container(
-            width: 80, height: 80,
-            decoration: BoxDecoration(
-              color: scheme.primaryContainer,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Image.asset(
+              'assets/images/icon-512.png',
+              width: 80,
+              height: 80,
+              fit: BoxFit.cover,
             ),
-            child: Icon(Icons.graphic_eq_rounded, size: 44, color: scheme.primary),
           ),
           const SizedBox(height: 14),
           Text('LastStats', style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
