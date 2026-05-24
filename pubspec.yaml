@@ -14,6 +14,7 @@ dependencies:
   http: ^1.6.0
   dynamic_color: ^1.8.1
   shared_preferences: ^2.2.3
+  path_provider: ^2.1.5
   url_launcher: ^6.3.0
   palette_generator: ^0.3.3   # Extraction couleur depuis pochette
 

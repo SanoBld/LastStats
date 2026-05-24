@@ -31,10 +31,7 @@ class DataCache {
     'loved':             60,        // pistes aimées : 1 h
     'friends':            5,        // amis : 5 min
     'search':            10,        // résultats de recherche : 10 min
-    // ── Historique complet (AllScrobblesService) ──────────────────────────
-    'allscrobbles_cur':  60,        // année en cours : 1 h
-    'allscrobbles_meta': 60 * 24,   // méta (années chargées) : 24 h
-    'allscrobbles':      60 * 24 * 90, // années passées : 90 jours
+    // Les données allscrobbles_* sont migrées vers ScrobblesFileCache (fichiers disque)
   };
 
   // Cache en mémoire (évite les lectures disque répétées)

@@ -547,7 +547,8 @@ class _ChartsPageState extends State<_ChartsPage>
                 'Analysing your last ~200 scrobbles',
               );
 
-    return RefreshIndicator(
+    return SafeArea(
+      child: RefreshIndicator(
       onRefresh: _load,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
@@ -719,6 +720,7 @@ class _ChartsPageState extends State<_ChartsPage>
           const SizedBox(height: 20),
         ],
       ),
+    ),
     );
   }
 }

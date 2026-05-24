@@ -17,6 +17,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'data_cache.dart';
+import 'scrobbles_file_cache.dart';
 import 'lastfm_service.dart';
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -103,41 +104,30 @@ class AllScrobblesService {
   static bool _running = false;
   static bool get isRunning => _running;
 
+  /// Verrou de concurrence : empêche deux appels simultanés à loadYear()
+  /// pour la même année (évite de doubler les requêtes API).
+  static final Set<int> _yearsInLoading = {};
+
   static final progressNotifier =
       ValueNotifier<AllScrobblesProgress>(AllScrobblesProgress.idle());
-
-  // ── Clés cache ────────────────────────────────────────────────────────────
-
-  static String _yearKey(int year) {
-    final isCurrent = year == DateTime.now().year;
-    return isCurrent ? 'allscrobbles_cur_$year' : 'allscrobbles_$year';
-  }
-
-  static const _metaKey = 'allscrobbles_meta';
 
   // ── Lectures publiques ────────────────────────────────────────────────────
 
   /// `true` si aucun chargement n'a jamais été fait (première connexion).
-  static bool get isFirstLoad => DataCache.getSync(_metaKey) == null;
+  static bool get isFirstLoad => ScrobblesFileCache.getMeta() == null;
 
   /// `true` si les données de [year] sont en cache et non expirées.
   static bool isYearCached(int year) =>
-      DataCache.getSync(_yearKey(year)) != null;
+      ScrobblesFileCache.isYearCached(year);
 
   /// Timestamps Unix (secondes) pour [year], ou null si absent du cache.
-  static List<int>? getTimestampsForYear(int year) {
-    final raw = DataCache.getSync(_yearKey(year));
-    if (raw == null) return null;
-    if (raw is List) {
-      return raw.map((e) => (e as num).toInt()).toList();
-    }
-    return null;
-  }
+  static List<int>? getTimestampsForYear(int year) =>
+      ScrobblesFileCache.getTimestamps(year);
 
   /// Années dont les données sont en cache.
   static List<int> getCachedYears() {
-    final meta = DataCache.getSync(_metaKey);
-    if (meta is Map) {
+    final meta = ScrobblesFileCache.getMeta();
+    if (meta != null) {
       final years = (meta['loaded_years'] as List?)
           ?.map((e) => (e as num).toInt())
           .toList() ?? [];
@@ -193,6 +183,10 @@ class AllScrobblesService {
       return getTimestampsForYear(year) ?? [];
     }
 
+    // ── Verrou de concurrence : évite les doubles-requêtes ─────────────────
+    if (_yearsInLoading.contains(year)) return [];
+    _yearsInLoading.add(year);
+
     final now       = DateTime.now();
     final isCurrent = year == now.year;
     final from      = DateTime(year, 1, 1);
@@ -202,47 +196,52 @@ class AllScrobblesService {
     int page       = 1;
     int totalPages = 1;
 
-    do {
-      try {
-        final data = await service.getRecentTracks(
-          limit: 200,
-          page:  page,
-          from:  from.millisecondsSinceEpoch ~/ 1000,
-          to:    to.millisecondsSinceEpoch   ~/ 1000,
-        );
+    try {
+      do {
+        try {
+          final data = await service.getRecentTracks(
+            limit: 200,
+            page:  page,
+            from:  from.millisecondsSinceEpoch ~/ 1000,
+            to:    to.millisecondsSinceEpoch   ~/ 1000,
+          );
 
-        final attr = data['@attr'] as Map?;
-        if (attr != null) {
-          totalPages = int.tryParse(
-              attr['totalPages']?.toString() ?? '1') ?? 1;
-          final ttl = int.tryParse(
-              attr['total']?.toString() ?? '0') ?? 0;
-          onProgress?.call(timestamps.length, ttl);
+          final attr = data['@attr'] as Map?;
+          if (attr != null) {
+            totalPages = int.tryParse(
+                attr['totalPages']?.toString() ?? '1') ?? 1;
+            final ttl = int.tryParse(
+                attr['total']?.toString() ?? '0') ?? 0;
+            onProgress?.call(timestamps.length, ttl);
+          }
+
+          final raw  = data['track'];
+          final list = raw is List ? raw : (raw != null ? [raw] : <dynamic>[]);
+          for (final t in list) {
+            final m = t as Map?;
+            if (m == null) continue;
+            if (m['@attr']?['nowplaying'] == 'true') continue;
+            final uts = m['date']?['uts']?.toString() ?? '';
+            if (uts.isEmpty) continue;
+            final sec = int.tryParse(uts);
+            if (sec != null) timestamps.add(sec);
+          }
+
+          page++;
+          if (page <= totalPages) await Future.delayed(_delay);
+        } catch (e) {
+          debugPrint('[AllScrobbles] Erreur année=$year page=$page : $e');
+          break;
         }
+      } while (page <= totalPages);
 
-        final raw  = data['track'];
-        final list = raw is List ? raw : (raw != null ? [raw] : <dynamic>[]);
-        for (final t in list) {
-          final m = t as Map?;
-          if (m == null) continue;
-          if (m['@attr']?['nowplaying'] == 'true') continue;
-          final uts = m['date']?['uts']?.toString() ?? '';
-          if (uts.isEmpty) continue;
-          final sec = int.tryParse(uts);
-          if (sec != null) timestamps.add(sec);
-        }
-
-        page++;
-        if (page <= totalPages) await Future.delayed(_delay);
-      } catch (e) {
-        debugPrint('[AllScrobbles] Erreur année=$year page=$page : $e');
-        break;
-      }
-    } while (page <= totalPages);
-
-    await DataCache.set(_yearKey(year), timestamps);
-    await _updateMeta(year);
-    return timestamps;
+      timestamps.sort();
+      await ScrobblesFileCache.setYear(year, timestamps);
+      await _updateMeta(year);
+      return timestamps;
+    } finally {
+      _yearsInLoading.remove(year);
+    }
   }
 
   // ── Chargement complet (première connexion) ───────────────────────────────
@@ -387,7 +386,7 @@ class AllScrobblesService {
           final existing = getTimestampsForYear(year) ?? [];
           // Merge + déduplique + trie croissant
           final merged   = ({...existing, ...entry.value}.toList()..sort());
-          await DataCache.set(_yearKey(year), merged);
+          await ScrobblesFileCache.setYear(year, merged);
           await _updateMeta(year);
         }
 
@@ -396,7 +395,7 @@ class AllScrobblesService {
           // Pas de nouveaux scrobbles cette année : rafraîchir le TTL quand même
           final cur = getTimestampsForYear(now.year);
           if (cur != null) {
-            await DataCache.set(_yearKey(now.year), cur);
+            await ScrobblesFileCache.setYear(now.year, cur);
           }
         }
       }
@@ -483,16 +482,16 @@ class AllScrobblesService {
   // ── Helpers privés ────────────────────────────────────────────────────────
 
   static Future<void> _updateMeta(int year) async {
-    final meta   = DataCache.getSync(_metaKey);
+    final meta   = ScrobblesFileCache.getMeta();
     final loaded = <int>{};
-    if (meta is Map) {
+    if (meta != null) {
       loaded.addAll(
           ((meta['loaded_years'] as List?)
                   ?.map((e) => (e as num).toInt())) ??
               []);
     }
     loaded.add(year);
-    await DataCache.set(_metaKey, {
+    await ScrobblesFileCache.setMeta({
       'loaded_years':   (loaded.toList()..sort()),
       'last_sync_ts':   DateTime.now().millisecondsSinceEpoch,
     });

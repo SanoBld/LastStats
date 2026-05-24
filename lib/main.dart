@@ -17,6 +17,7 @@ import 'screens/setup_screen.dart';
 import 'screens/home_screen.dart';
 import 'services/data_cache.dart';
 import 'services/image_service.dart';
+import 'services/scrobbles_file_cache.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,6 +37,10 @@ void main() async {
   // ── Cache de données scrobble ────────────────────────────────────────────
   await DataCache.init();
   await DataCache.clearExpired();
+
+  // ── Cache fichier historique (ScrobblesFileCache) ────────────────────────
+  await ScrobblesFileCache.init();
+  ScrobblesFileCache.pruneExpired(); // non-bloquant
 
   // ── Cache d'images (nettoyage non-bloquant) ──────────────────────────────
   ImageService.pruneExpired();
