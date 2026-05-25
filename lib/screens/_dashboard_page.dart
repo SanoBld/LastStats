@@ -84,6 +84,7 @@ class _DashboardPageState extends State<_DashboardPage> {
   String _fallbackType          = 'none';    // 'none'|'top_track'|'top_album'|'top_artist'|'custom_url'
   String _fallbackPeriod        = 'overall'; // '7day'|'1month'|'overall'
   String _headerPeriod          = 'overall';
+  bool   _headerMusicAnim       = false;     // equalizer bars animation when music is playing
   bool   _showNowPlay           = true;
   bool   _showStats             = true;
   bool   _showArtists           = true;
@@ -197,6 +198,7 @@ class _DashboardPageState extends State<_DashboardPage> {
       _fallbackType          = p.getString('ls_header_fallback_type')   ?? 'none';
       _fallbackPeriod        = p.getString('ls_header_fallback_period') ?? 'overall';
       _headerPeriod          = p.getString('ls_header_period')         ?? 'overall';
+      _headerMusicAnim       = p.getBool('ls_header_music_anim')       ?? false;
       _showNowPlay           = p.getBool('ls_show_nowplay')            ?? true;
       _showStats             = p.getBool('ls_show_stats')              ?? true;
       _showArtists           = p.getBool('ls_show_artists')            ?? true;
@@ -876,14 +878,21 @@ class _DashboardPageState extends State<_DashboardPage> {
                         return FadeTransition(opacity: anim, child: child);
                     }
                   },
-                  child: _headerImageUrl.isNotEmpty
-                      ? _BlurredHeaderImage(
-                          key: ValueKey(_headerImageUrl),
+                  child: (_headerMusicAnim && _nowPlaying != null)
+                      // Apple Music-style: blurred image slowly breathing + drifting
+                      ? _AmbientHeader(
+                          key: ValueKey('ambient_${_headerImageUrl}'),
                           url: _headerImageUrl,
-                          blur: _headerBlur,
                           scheme: scheme,
                         )
-                      : _GradientHeader(key: const ValueKey('gradient'), scheme: scheme),
+                      : _headerImageUrl.isNotEmpty
+                          ? _BlurredHeaderImage(
+                              key: ValueKey(_headerImageUrl),
+                              url: _headerImageUrl,
+                              blur: _headerBlur,
+                              scheme: scheme,
+                            )
+                          : _GradientHeader(key: const ValueKey('gradient'), scheme: scheme),
                 ),
 
                 // Dark overlay for readability
@@ -2629,6 +2638,98 @@ class _SyncProgressChip extends StatelessWidget {
             ),
           ),
         ]),
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  _AmbientHeader — Apple Music-style animated background
+//
+//  When music is playing and the setting is on, the header image (or the
+//  gradient when there is no image) slowly breathes and drifts:
+//    • scale: 1.0 → 1.08 over ~8 s, reversing smoothly
+//    • shift: slight diagonal drift, out of phase with the scale
+//    • blur:  forced to at least 16 so the motion looks soft and ambient
+//
+//  Works on any header source (now playing, top track, custom, gradient).
+// ══════════════════════════════════════════════════════════════════════════
+
+class _AmbientHeader extends StatefulWidget {
+  final String      url;
+  final ColorScheme scheme;
+  const _AmbientHeader({super.key, required this.url, required this.scheme});
+
+  @override
+  State<_AmbientHeader> createState() => _AmbientHeaderState();
+}
+
+class _AmbientHeaderState extends State<_AmbientHeader>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _scale;
+  late final Animation<double> _dx;
+  late final Animation<double> _dy;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 8),
+    )..repeat(reverse: true);
+
+    // Slow breathing scale
+    _scale = Tween<double>(begin: 1.0, end: 1.08)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+
+    // Slight diagonal drift — different curve so it feels independent
+    _dx = Tween<double>(begin: -8.0, end: 8.0)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutSine));
+    _dy = Tween<double>(begin: -5.0, end: 5.0)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutCubic));
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Force blur to at least 16 — the motion looks odd without blur
+    const double ambientBlur = 18.0;
+
+    return ClipRect(
+      child: AnimatedBuilder(
+        animation: _ctrl,
+        builder: (_, child) => Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..scale(_scale.value)
+            ..translate(_dx.value, _dy.value),
+          child: child,
+        ),
+        child: widget.url.isNotEmpty
+            // Image available: blur + stretch to fill
+            ? ImageFiltered(
+                imageFilter: ImageFilter.blur(
+                  sigmaX: ambientBlur,
+                  sigmaY: ambientBlur,
+                  tileMode: TileMode.mirror,
+                ),
+                child: Image.network(
+                  widget.url,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                  errorBuilder: (_, __, ___) =>
+                      _GradientHeader(scheme: widget.scheme),
+                ),
+              )
+            // No image: animate the gradient itself
+            : _GradientHeader(scheme: widget.scheme),
       ),
     );
   }

@@ -33,6 +33,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   bool   _showArtists           = true;
   bool   _showTracks            = true;
   bool   _showFriends           = true;
+  bool   _headerMusicAnim       = false; // equalizer animation when music is playing
   List<String> _statCards       = List.from(kDefaultStatCards);
 
   final _customUrlCtrl         = TextEditingController();
@@ -74,6 +75,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
       _showArtists           = p.getBool('ls_show_artists')              ?? true;
       _showTracks            = p.getBool('ls_show_tracks')               ?? true;
       _showFriends           = p.getBool('ls_show_friends')              ?? true;
+      _headerMusicAnim       = p.getBool('ls_header_music_anim')         ?? false;
       final raw = p.getStringList('ls_stat_cards');
       _statCards = raw != null && raw.isNotEmpty ? raw : List.from(kDefaultStatCards);
     });
@@ -376,6 +378,57 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                 onChangeEnd: (v) async => await _set('ls_header_blur', v),
               ),
               const SizedBox(height: 8),
+
+              // ── Music playback animation ──────────────────────────────
+              const SizedBox(height: 16),
+              Divider(color: scheme.outlineVariant.withValues(alpha: 0.4)),
+              const SizedBox(height: 4),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.blur_on_rounded, color: scheme.primary),
+                title: Text(
+                  isEn ? 'Music animation' : 'Animation musique',
+                  style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  isEn
+                      ? 'When music is playing, the header image slowly blurs and drifts — like Apple Music.'
+                      : 'Quand une musique joue, l\'image se floute et bouge doucement, comme dans Apple Music.',
+                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                ),
+                value: _headerMusicAnim,
+                onChanged: (v) async {
+                  final p = await SharedPreferences.getInstance();
+                  await p.setBool('ls_header_music_anim', v);
+                  setState(() => _headerMusicAnim = v);
+                },
+              ),
+              // Info: blur is forced to 18 when the animation is active,
+              // overriding the manual blur slider value.
+              if (_headerMusicAnim) ...[
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: scheme.primaryContainer.withValues(alpha: 0.35),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                        color: scheme.primary.withValues(alpha: 0.25)),
+                  ),
+                  child: Row(children: [
+                    Icon(Icons.info_outline_rounded,
+                        size: 14, color: scheme.primary),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(
+                      isEn
+                          ? 'Blur is set automatically when this mode is active. The blur slider above has no effect while music is playing.'
+                          : 'Le flou est appliqué automatiquement dans ce mode. Le curseur de flou ci-dessus n\'a aucun effet pendant la lecture.',
+                      style: text.bodySmall?.copyWith(
+                          color: scheme.onPrimaryContainer),
+                    )),
+                  ]),
+                ),
+              ],
             ],
           )),
         ]),
