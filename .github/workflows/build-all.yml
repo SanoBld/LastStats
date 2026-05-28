@@ -98,7 +98,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'   # ← fix: était 'zulu' (erreur 520)
           java-version: '17'
       - uses: subosito/flutter-action@v2
         with:
@@ -131,7 +131,6 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "tag=v${{ inputs.version }}"    >> $GITHUB_OUTPUT
             echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
-            # Auto prerelease if version contains - (e.g. 2.0.0-beta)
             if [[ "${{ inputs.version }}" == *"-"* ]] || [ "${{ inputs.prerelease }}" = "true" ]; then
               echo "prerelease=true"  >> $GITHUB_OUTPUT
             else
@@ -142,7 +141,6 @@ jobs:
             VER="${TAG#v}"
             echo "tag=$TAG"    >> $GITHUB_OUTPUT
             echo "version=$VER" >> $GITHUB_OUTPUT
-            # Auto prerelease if tag contains - (e.g. v2.0.0-beta)
             if [[ "$TAG" == *"-"* ]]; then
               echo "prerelease=true"  >> $GITHUB_OUTPUT
             else
