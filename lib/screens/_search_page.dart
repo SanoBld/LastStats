@@ -6,6 +6,39 @@ const int _kSearchArtists  = 1;
 const int _kSearchAlbums   = 2;
 const int _kSearchTracks   = 3;
 
+// Placeholder hash used by Last.fm when there is no image
+const String _ph = '2a96cbd8b46e442fc41c2b86b821562f';
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  showProfileSheet — open a user profile from any screen.
+//  Use this instead of building _FullProfileSheet directly.
+// ══════════════════════════════════════════════════════════════════════════════
+
+void showProfileSheet(
+  BuildContext context,
+  String username,
+  LastFmService service, {
+  bool isFav = false,
+  VoidCallback? onToggleFav,
+}) {
+  showModalBottomSheet(
+    context:            context,
+    isScrollControlled: true,
+    backgroundColor:    Colors.transparent,
+    useSafeArea:        true,
+    builder: (_) => _FullProfileSheet(
+      username:    username,
+      service:     service,
+      isFav:       isFav,
+      onToggleFav: onToggleFav ?? () {},
+    ),
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  Search page
+// ══════════════════════════════════════════════════════════════════════════════
+
 class _SearchPage extends StatefulWidget {
   final LastFmService service;
   const _SearchPage({required this.service});
@@ -106,18 +139,14 @@ class _SearchPageState extends State<_SearchPage> {
   void _openMusicDetail(BuildContext ctx, Map<String, dynamic> item, String type) =>
       showDetailSheet(ctx, item, type, widget.service);
 
+  // Open a profile using the shared showProfileSheet function
   void _openProfile(BuildContext ctx, String username) {
-    showModalBottomSheet(
-      context:            ctx,
-      isScrollControlled: true,
-      backgroundColor:    Colors.transparent,
-      useSafeArea:        true,
-      builder: (_) => _FullProfileSheet(
-        username:     username,
-        service:      widget.service,
-        isFav:        _favProfiles.contains(username),
-        onToggleFav:  () => _toggleFavProfile(username, !_favProfiles.contains(username)),
-      ),
+    showProfileSheet(
+      ctx,
+      username,
+      widget.service,
+      isFav:       _favProfiles.contains(username),
+      onToggleFav: () => _toggleFavProfile(username, !_favProfiles.contains(username)),
     );
   }
 
@@ -318,7 +347,7 @@ class _SearchEmptyState extends StatelessWidget {
   }
 }
 
-// ── User card ─────────────────────────────────────────────────────────────────
+// ── User card in the 2-column search grid ─────────────────────────────────────
 
 class _SearchUserCard extends StatelessWidget {
   final Map<String, dynamic> user;
@@ -326,76 +355,121 @@ class _SearchUserCard extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onToggleFav;
 
-  static const _ph = '2a96cbd8b46e442fc41c2b86b821562f';
-
   const _SearchUserCard({
     required this.user, required this.isFav,
     required this.onTap, required this.onToggleFav,
   });
 
-  bool   get _hasAvatar => _extractImage(user['image']).isNotEmpty && !_extractImage(user['image']).contains(_ph);
+  bool   _hasAvatar(String url) => url.isNotEmpty && !url.contains(_ph);
   String get _avatarUrl => _extractImage(user['image']);
 
   @override
   Widget build(BuildContext context) {
-    final scheme   = Theme.of(context).colorScheme;
-    final text     = Theme.of(context).textTheme;
-    final username = (user['name']       ?? '').toString();
-    final plays    = (user['playcount']  ?? '').toString();
+    final scheme    = Theme.of(context).colorScheme;
+    final text      = Theme.of(context).textTheme;
+    final username  = (user['name']      ?? '').toString();
+    final plays     = (user['playcount'] ?? '').toString();
+    final country   = (user['country']   ?? '').toString();
+    final hasAvatar = _hasAvatar(_avatarUrl);
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: scheme.surfaceContainerHighest,
+          color:        scheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45)),
         ),
+        clipBehavior: Clip.hardEdge,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          SizedBox(width: 56, height: 56,
+
+          // Gradient banner with avatar
+          Container(
+            height: 68,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  scheme.primary.withValues(alpha: 0.75),
+                  scheme.tertiary.withValues(alpha: 0.55),
+                ],
+              ),
+            ),
             child: Stack(children: [
-              CircleAvatar(
-                radius: 28,
-                backgroundColor: scheme.primary.withValues(alpha: 0.2),
-                backgroundImage: _hasAvatar ? NetworkImage(_avatarUrl) : null,
-                child: _hasAvatar ? null : Text(
-                  username.isNotEmpty ? username[0].toUpperCase() : '?',
-                  style: text.titleMedium?.copyWith(
-                      color: scheme.primary, fontWeight: FontWeight.w800),
+              // Favourite star (top-right)
+              Positioned(
+                top: 6, right: 6,
+                child: GestureDetector(
+                  onTap: onToggleFav,
+                  child: Icon(
+                    isFav ? Icons.star_rounded : Icons.star_outline_rounded,
+                    size: 18,
+                    color: isFav ? Colors.amber.shade400 : Colors.white.withValues(alpha: 0.7),
+                  ),
                 ),
               ),
-              if (isFav)
-                Positioned(left: 0, top: 0,
-                  child: Icon(Icons.star_rounded, size: 16, color: Colors.amber.shade600)),
+              // Centred avatar
+              Center(
+                child: CircleAvatar(
+                  radius: 26,
+                  backgroundColor: Colors.white.withValues(alpha: 0.25),
+                  backgroundImage: hasAvatar ? NetworkImage(_avatarUrl) : null,
+                  child: hasAvatar ? null : Text(
+                    username.isNotEmpty ? username[0].toUpperCase() : '?',
+                    style: const TextStyle(
+                        color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
+                  ),
+                ),
+              ),
             ]),
           ),
-          const SizedBox(height: 6),
-          Text(username, maxLines: 1, overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: text.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
-          if (plays.isNotEmpty && plays != '0') ...[
-            const SizedBox(height: 2),
-            Text('${_fmt(int.tryParse(plays) ?? 0)} ${L.commonPlays}',
-              maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center,
-              style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
-          ],
+
+          // Username + stats below banner
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Text(username, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: text.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
+
+              if (plays.isNotEmpty && plays != '0') ...[
+                const SizedBox(height: 2),
+                Text('${_fmt(int.tryParse(plays) ?? 0)} ${L.commonPlays}',
+                  maxLines: 1, textAlign: TextAlign.center,
+                  style: text.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant, fontSize: 10)),
+              ],
+
+              if (country.isNotEmpty && country != 'None') ...[
+                const SizedBox(height: 3),
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Icon(Icons.location_on_outlined, size: 10, color: scheme.onSurfaceVariant),
+                  const SizedBox(width: 2),
+                  Flexible(child: Text(country, maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: text.labelSmall?.copyWith(
+                        color: scheme.onSurfaceVariant, fontSize: 9))),
+                ]),
+              ],
+            ]),
+          ),
         ]),
       ),
     );
   }
 }
 
-// ── Full profile sheet ────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+//  Full profile sheet — opened by showProfileSheet() from any screen
+// ══════════════════════════════════════════════════════════════════════════════
 
 class _FullProfileSheet extends StatefulWidget {
   final String        username;
   final LastFmService service;
   final bool          isFav;
   final VoidCallback  onToggleFav;
+
   const _FullProfileSheet({
     required this.username, required this.service,
-    required this.isFav, required this.onToggleFav,
+    required this.isFav,    required this.onToggleFav,
   });
 
   @override
@@ -403,34 +477,46 @@ class _FullProfileSheet extends StatefulWidget {
 }
 
 class _FullProfileSheetState extends State<_FullProfileSheet> {
-  Map<String, dynamic>? _info;
-  List<dynamic>         _topArtists = [];
-  List<dynamic>         _recent     = [];
-  bool                  _loading    = true;
-  bool                  _isNowPlaying = false;
-  late bool             _localIsFav;
 
-  static const _ph = '2a96cbd8b46e442fc41c2b86b821562f';
+  // -- Data loaded from API --
+  Map<String, dynamic>? _info;
+  List<dynamic> _topArtists = [];
+  List<dynamic> _topAlbums  = [];
+  List<dynamic> _recent     = [];
+
+  // -- UI state --
+  bool      _loading      = true;
+  bool      _isNowPlaying = false;
+  late bool _localIsFav;
 
   @override
-  void initState() { super.initState(); _localIsFav = widget.isFav; _load(); }
+  void initState() {
+    super.initState();
+    _localIsFav = widget.isFav;
+    _load();
+  }
 
   Future<void> _load() async {
     try {
+      // All requests run at the same time for speed
       final res = await Future.wait([
         widget.service.getUserInfo(user: widget.username),
-        widget.service.getTopArtists(user: widget.username, period: 'overall', limit: 5),
-        widget.service.getRecentTracks(user: widget.username, limit: 10),
+        widget.service.getTopArtists(user: widget.username, period: 'overall', limit: 6),
+        widget.service.getTopAlbums( user: widget.username, period: 'overall', limit: 6),
+        widget.service.getRecentTracks(user: widget.username, limit: 8),
       ]);
-      final recentRaw  = (res[2] as Map<String, dynamic>)['track'];
+
+      final recentRaw  = (res[3] as Map<String, dynamic>)['track'];
       final recentList = recentRaw is List ? recentRaw
           : (recentRaw != null ? [recentRaw] : <dynamic>[]);
       final firstTrack = recentList.isNotEmpty ? recentList.first as Map : null;
       final isNp = firstTrack?['@attr']?['nowplaying'] == 'true';
+
       if (mounted) {
         setState(() {
           _info         = res[0] as Map<String, dynamic>?;
           _topArtists   = res[1] as List<dynamic>;
+          _topAlbums    = res[2] as List<dynamic>;
           _recent       = recentList;
           _isNowPlaying = isNp;
           _loading      = false;
@@ -441,233 +527,649 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     }
   }
 
-  int    _total() => int.tryParse((_info?['playcount'] ?? '0').toString()) ?? 0;
-  int    _days() {
+  // -- Computed values --
+
+  int _total() => int.tryParse((_info?['playcount'] ?? '0').toString()) ?? 0;
+
+  int _days() {
     final raw = _info?['registered'];
     if (raw == null) return 0;
     int ts = 0;
-    if (raw is Map) { ts = int.tryParse((raw['#text'] ?? raw['unixtime'] ?? '0').toString()) ?? 0; }
-    else { ts = int.tryParse(raw.toString()) ?? 0; }
+    if (raw is Map) {
+      ts = int.tryParse((raw['#text'] ?? raw['unixtime'] ?? '0').toString()) ?? 0;
+    } else {
+      ts = int.tryParse(raw.toString()) ?? 0;
+    }
     if (ts <= 0) return 0;
     return ((DateTime.now().millisecondsSinceEpoch / 1000 - ts) / 86400).floor();
   }
-  double _avg() { final d = _days(); return d > 0 ? _total() / d : 0; }
+
+  double _avg() {
+    final d = _days();
+    return d > 0 ? _total() / d : 0;
+  }
+
+  // True when the avatar URL is a real image (not Last.fm placeholder)
   bool _hasAvatar(String url) => url.isNotEmpty && !url.contains(_ph);
+
+  // Human-readable time since a scrobble (e.g. "2h", "3d")
+  String _timeAgo(Map t) {
+    final raw = t['date']?['uts'] ?? '';
+    final ts  = int.tryParse(raw.toString()) ?? 0;
+    if (ts == 0) return '';
+    final diff = DateTime.now()
+        .difference(DateTime.fromMillisecondsSinceEpoch(ts * 1000));
+    if (diff.inMinutes < 60) return '${diff.inMinutes}min';
+    if (diff.inHours   < 24) return '${diff.inHours}h';
+    if (diff.inDays    < 30) return '${diff.inDays}d';
+    return '${diff.inDays ~/ 30}mo';
+  }
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
 
     return DraggableScrollableSheet(
-      initialChildSize: 0.88, minChildSize: 0.4, maxChildSize: 1.0, expand: false,
+      initialChildSize: 0.92,
+      minChildSize:     0.4,
+      maxChildSize:     1.0,
+      expand: false,
       builder: (ctx, ctrl) => ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         child: Container(
           color: scheme.surface,
           child: _loading
               ? const Center(child: CircularProgressIndicator())
-              : ListView(controller: ctrl, children: [
-                  Center(child: Container(
-                    margin: const EdgeInsets.only(top: 10, bottom: 8),
-                    width: 36, height: 4,
-                    decoration: BoxDecoration(color: scheme.outlineVariant, borderRadius: BorderRadius.circular(2)),
-                  )),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    child: _buildHeader(ctx, scheme, text),
-                  ),
-                  if (_info != null) _buildStatsRow(scheme, text),
-                  const Divider(indent: 16, endIndent: 16, height: 20),
-                  if (_topArtists.isNotEmpty) ...[
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-                      child: Text(L.commonTopArtists,
-                          style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
-                    ),
-                    ..._topArtists.asMap().entries.map((e) {
-                      final a      = e.value as Map<String, dynamic>;
-                      final aName  = (a['name'] ?? '').toString();
-                      final plays  = _fmt(int.tryParse((a['playcount'] ?? '0').toString()) ?? 0);
-                      final imgRaw = _extractImage(a['image']);
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: InkWell(
-                          onTap: () => showDetailSheet(ctx, Map<String, dynamic>.from(a), 'artists', widget.service),
-                          borderRadius: BorderRadius.circular(8),
-                          child: _ItemTile(
-                            name: aName, sub: '$plays ${L.commonPlays}',
-                            imageUrl: imgRaw, rank: '${e.key + 1}',
-                            imageFuture: ImageService.resolveArtist(aName, lastfmUrl: imgRaw.isNotEmpty ? imgRaw : null),
-                          ),
-                        ),
-                      );
-                    }),
-                    const Divider(indent: 16, endIndent: 16, height: 20),
-                  ],
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-                    child: Text(L.commonRecentTracks,
-                        style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
-                  ),
-                  if (_recent.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Center(child: Text(L.commonNoRecentTracks,
-                          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant))),
-                    )
-                  else
-                    ..._recent.map((t) {
-                      final tMap    = t as Map<String, dynamic>;
-                      final isNp    = tMap['@attr']?['nowplaying'] == 'true';
-                      final tName   = (tMap['name'] ?? '').toString();
-                      final tArtist = (tMap['artist']?['#text'] ?? '').toString();
-                      final rawUrl  = _extractImage(tMap['image']);
-                      final hasImg  = rawUrl.isNotEmpty && !rawUrl.contains(_ph);
-
-                      return ListTile(
-                        leading: Stack(children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(6),
-                            child: hasImg
-                                ? Image.network(rawUrl, width: 40, height: 40, fit: BoxFit.cover,
-                                    errorBuilder: (_, _, _) => Container(width: 40, height: 40,
-                                        color: scheme.surfaceContainerHighest,
-                                        child: Icon(Icons.music_note_rounded, color: scheme.onSurfaceVariant)))
-                                : Container(width: 40, height: 40,
-                                    color: scheme.surfaceContainerHighest,
-                                    child: Icon(Icons.music_note_rounded, color: scheme.onSurfaceVariant)),
-                          ),
-                          if (isNp) Positioned(right: 0, bottom: 0,
-                            child: Container(width: 8, height: 8,
-                                decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle))),
-                        ]),
-                        title: Text(tName, maxLines: 1, overflow: TextOverflow.ellipsis,
-                            style: text.bodySmall?.copyWith(fontWeight: FontWeight.w600)),
-                        subtitle: Text(tArtist, maxLines: 1, overflow: TextOverflow.ellipsis,
-                            style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
-                        trailing: isNp
-                            ? Text(L.commonNowPlayingBadge, style: text.labelSmall?.copyWith(
-                                color: Colors.green, fontWeight: FontWeight.w700))
-                            : Text(_localTimeString(tMap),
-                                style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant, fontSize: 9)),
-                        dense: true,
-                      );
-                    }),
-                  const SizedBox(height: 32),
-                ]),
+              : _buildBody(ctx, ctrl, scheme),
         ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext ctx, ColorScheme scheme, TextTheme text) {
-    final info      = _info ?? {};
-    final name      = (info['name']     ?? widget.username).toString();
-    final realName  = (info['realname'] ?? '').toString();
-    final country   = (info['country']  ?? '').toString();
-    final avatarUrl = _extractImage(info['image']);
+  Widget _buildBody(BuildContext ctx, ScrollController ctrl, ColorScheme scheme) {
+    return CustomScrollView(
+      controller: ctrl,
+      slivers: [
 
-    String regStr = '';
-    final raw = info['registered'];
-    if (raw != null) {
+        // Hero banner (gradient + big avatar + name)
+        SliverToBoxAdapter(child: _buildBanner(ctx, scheme)),
+
+        // 3 stat cards: total plays, per day, active days
+        SliverToBoxAdapter(child: _buildStatsRow(scheme)),
+
+        // Now playing card (visible only when the user is live)
+        if (_isNowPlaying)
+          SliverToBoxAdapter(child: _buildNowPlayingCard(scheme)),
+
+        // Top Artists section
+        if (_topArtists.isNotEmpty) ...[
+          SliverToBoxAdapter(child: _sectionHeader(L.commonTopArtists, scheme)),
+          SliverList(delegate: SliverChildBuilderDelegate(
+            (_, i) => _buildArtistRow(ctx, _topArtists[i], i, scheme),
+            childCount: _topArtists.length,
+          )),
+        ],
+
+        // Top Albums section (new)
+        if (_topAlbums.isNotEmpty) ...[
+          SliverToBoxAdapter(child: _sectionHeader(L.commonAlbums, scheme)),
+          SliverToBoxAdapter(child: _buildAlbumsGrid(ctx, scheme)),
+        ],
+
+        // Recent tracks section
+        if (_recent.isNotEmpty) ...[
+          SliverToBoxAdapter(child: _sectionHeader(L.commonRecentTracks, scheme)),
+          SliverList(delegate: SliverChildBuilderDelegate(
+            (_, i) => _buildRecentRow(_recent[i], scheme),
+            childCount: _recent.length,
+          )),
+        ],
+
+        const SliverToBoxAdapter(child: SizedBox(height: 48)),
+      ],
+    );
+  }
+
+  // ── Banner: gradient + big avatar + name + meta ───────────────────────────
+
+  Widget _buildBanner(BuildContext ctx, ColorScheme scheme) {
+    final info     = _info ?? {};
+    final name     = (info['name']     ?? widget.username).toString();
+    final realName = (info['realname'] ?? '').toString();
+    final country  = (info['country']  ?? '').toString();
+    final avatarUrl = _extractImage(info['image']);
+    final hasAv    = _hasAvatar(avatarUrl);
+
+    // Build "since YYYY" string from registration timestamp
+    String since = '';
+    final rawReg = info['registered'];
+    if (rawReg != null) {
       int ts = 0;
-      if (raw is Map) { ts = int.tryParse((raw['#text'] ?? raw['unixtime'] ?? '0').toString()) ?? 0; }
-      else { ts = int.tryParse(raw.toString()) ?? 0; }
+      if (rawReg is Map) {
+        ts = int.tryParse((rawReg['#text'] ?? rawReg['unixtime'] ?? '0').toString()) ?? 0;
+      } else {
+        ts = int.tryParse(rawReg.toString()) ?? 0;
+      }
       if (ts > 0) {
-        final d = DateTime.fromMillisecondsSinceEpoch(ts * 1000);
-        regStr = '${d.day} ${L.months[d.month]} ${d.year}';
+        since = '${DateTime.fromMillisecondsSinceEpoch(ts * 1000).year}';
       }
     }
 
-    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Stack(children: [
-        CircleAvatar(
-          radius: 34,
-          backgroundColor: scheme.primaryContainer,
-          backgroundImage: _hasAvatar(avatarUrl) ? NetworkImage(avatarUrl) : null,
-          child: _hasAvatar(avatarUrl) ? null : Text(
-            name.isNotEmpty ? name[0].toUpperCase() : '?',
-            style: text.titleLarge?.copyWith(
-                color: scheme.onPrimaryContainer, fontWeight: FontWeight.w800),
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end:   Alignment.bottomRight,
+          colors: [
+            scheme.primary.withValues(alpha: 0.88),
+            scheme.tertiary.withValues(alpha: 0.65),
+          ],
         ),
-        if (_isNowPlaying)
-          Positioned(right: 2, bottom: 2,
-            child: Container(width: 14, height: 14,
-              decoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle,
-                  border: Border.all(color: scheme.surface, width: 2)))),
-      ]),
-      const SizedBox(width: 16),
-      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Expanded(child: Text(name, style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800))),
-          GestureDetector(
-            onTap: () { setState(() => _localIsFav = !_localIsFav); widget.onToggleFav(); },
-            child: Padding(padding: const EdgeInsets.all(4),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Column(children: [
+
+          // Top row: drag handle + close button
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            child: Row(children: [
+              const Spacer(),
+              Container(
+                width: 36, height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: () => Navigator.pop(ctx),
+                child: Container(
+                  width: 30, height: 30,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.25),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close_rounded, color: Colors.white, size: 16),
+                ),
+              ),
+            ]),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Big avatar — green ring when now playing
+          Stack(alignment: Alignment.center, children: [
+            if (_isNowPlaying)
+              Container(
+                width: 106, height: 106,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.greenAccent.shade400, width: 3),
+                ),
+              ),
+            CircleAvatar(
+              radius: 48,
+              backgroundColor: Colors.white.withValues(alpha: 0.25),
+              backgroundImage: hasAv ? NetworkImage(avatarUrl) : null,
+              child: hasAv ? null : Text(
+                name.isNotEmpty ? name[0].toUpperCase() : '?',
+                style: const TextStyle(
+                    color: Colors.white, fontSize: 38, fontWeight: FontWeight.w900),
+              ),
+            ),
+            // Small green dot overlay when live
+            if (_isNowPlaying)
+              Positioned(
+                right: 4, bottom: 4,
+                child: Container(
+                  width: 16, height: 16,
+                  decoration: BoxDecoration(
+                    color:  Colors.greenAccent.shade400,
+                    shape:  BoxShape.circle,
+                    border: Border.all(color: scheme.primary, width: 2),
+                  ),
+                ),
+              ),
+          ]),
+
+          const SizedBox(height: 12),
+
+          // Username row + favourite star
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Flexible(
+              child: Text(name,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900,
+                  shadows: [Shadow(blurRadius: 8, color: Colors.black38)],
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () {
+                setState(() => _localIsFav = !_localIsFav);
+                widget.onToggleFav();
+              },
               child: Icon(
                 _localIsFav ? Icons.star_rounded : Icons.star_outline_rounded,
                 size: 22,
-                color: _localIsFav ? Colors.amber.shade600 : scheme.onSurfaceVariant,
-              )),
-          ),
-        ]),
-        if (_isNowPlaying) ...[
-          const SizedBox(height: 2),
-          Row(children: [
-            const Icon(Icons.graphic_eq_rounded, size: 12, color: Colors.green),
-            const SizedBox(width: 4),
-            Text(L.commonNowPlayingLong,
-              style: text.bodySmall?.copyWith(color: Colors.green, fontWeight: FontWeight.w700)),
+                color: _localIsFav
+                    ? Colors.amber.shade400
+                    : Colors.white.withValues(alpha: 0.7),
+              ),
+            ),
           ]),
-        ],
-        if (realName.isNotEmpty)
-          Text(realName, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-        const SizedBox(height: 4),
-        Wrap(spacing: 10, children: [
-          if (country.isNotEmpty && country != 'None')
-            Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(Icons.location_on_outlined, size: 12, color: scheme.onSurfaceVariant),
-              const SizedBox(width: 2),
-              Text(country, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-            ]),
-          if (regStr.isNotEmpty)
-            Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(Icons.calendar_today_outlined, size: 11, color: scheme.onSurfaceVariant),
-              const SizedBox(width: 2),
-              Text(L.memberSince(regStr),
-                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-            ]),
+
+          // Real name (if the user set one)
+          if (realName.isNotEmpty) ...[
+            const SizedBox(height: 3),
+            Text(realName,
+              style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.75), fontSize: 13)),
+          ],
+
+          // "Now listening" badge
+          if (_isNowPlaying) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color:        Colors.greenAccent.shade400.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(20),
+                border:       Border.all(color: Colors.greenAccent.shade400),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.graphic_eq_rounded, size: 12,
+                    color: Colors.greenAccent.shade400),
+                const SizedBox(width: 4),
+                Text(L.commonNowPlayingLong,
+                  style: TextStyle(
+                    color: Colors.greenAccent.shade400,
+                    fontSize: 11, fontWeight: FontWeight.w700)),
+              ]),
+            ),
+          ],
+
+          const SizedBox(height: 10),
+
+          // Country + join year
+          if (country.isNotEmpty || since.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Wrap(
+                spacing: 16,
+                alignment: WrapAlignment.center,
+                children: [
+                  if (country.isNotEmpty && country != 'None')
+                    _BannerMeta(icon: Icons.location_on_outlined, label: country),
+                  if (since.isNotEmpty)
+                    _BannerMeta(
+                        icon: Icons.calendar_today_outlined,
+                        label: L.memberSince(since)),
+                ],
+              ),
+            ),
+
+          const SizedBox(height: 20),
         ]),
-      ])),
-    ]);
+      ),
+    );
   }
 
-  Widget _buildStatsRow(ColorScheme scheme, TextTheme text) {
+  // ── 3 stat cards ──────────────────────────────────────────────────────────
+
+  Widget _buildStatsRow(ColorScheme scheme) {
     final total = _total();
     final avg   = _avg();
     final days  = _days();
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: scheme.primaryContainer,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.25)),
-      ),
-      // Use staticValue so _MiniMetric shows pre-formatted strings here.
-      // The rolling animation is only for the main dashboard tab.
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-        _MiniMetric('🎯', L.dashScrobbles, scheme.onPrimaryContainer,
-            staticValue: _fmtFull(total)),
-        Container(width: 1, height: 32, color: scheme.onPrimaryContainer.withValues(alpha: 0.15)),
-        _MiniMetric('⚡', L.perDay, scheme.onPrimaryContainer,
-            staticValue: '~${_fmt(avg.round())}'),
-        Container(width: 1, height: 32, color: scheme.onPrimaryContainer.withValues(alpha: 0.15)),
-        _MiniMetric('🗓️', L.activityDays, scheme.onPrimaryContainer,
-            staticValue: '$days j'),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: Row(children: [
+        Expanded(child: _ProfileStatCard(
+          icon:    Icons.headphones_rounded,
+          value:   _fmtLarge(total),
+          label:   L.dashScrobbles,
+          scheme:  scheme,
+          primary: true,
+        )),
+        const SizedBox(width: 10),
+        Expanded(child: _ProfileStatCard(
+          icon:   Icons.trending_up_rounded,
+          value:  '~${_fmt(avg.round())}',
+          label:  L.perDay,
+          scheme: scheme,
+        )),
+        const SizedBox(width: 10),
+        Expanded(child: _ProfileStatCard(
+          icon:   Icons.calendar_month_rounded,
+          value:  _fmt(days),
+          label:  L.activityDays,
+          scheme: scheme,
+        )),
       ]),
     );
   }
+
+  // ── Now playing highlighted card ──────────────────────────────────────────
+
+  Widget _buildNowPlayingCard(ColorScheme scheme) {
+    // The first item in _recent is always the now-playing track
+    final np = _recent.isNotEmpty ? _recent.first as Map<String, dynamic> : null;
+    if (np == null) return const SizedBox.shrink();
+
+    final track   = (np['name']                        ?? '').toString();
+    final artist  = (np['artist']?['#text']
+                  ?? np['artist']?['name'] ?? '').toString();
+    final rawUrl  = _extractImage(np['image']);
+    final hasImg  = rawUrl.isNotEmpty && !rawUrl.contains(_ph);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color:        Colors.greenAccent.shade400.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(16),
+          border:       Border.all(
+              color: Colors.greenAccent.shade400.withValues(alpha: 0.5)),
+        ),
+        child: Row(children: [
+          // Album art
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: hasImg
+                ? Image.network(rawUrl, width: 46, height: 46, fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => _artBox(46, scheme))
+                : _artBox(46, scheme),
+          ),
+          const SizedBox(width: 12),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              Icon(Icons.graphic_eq_rounded, size: 12,
+                  color: Colors.greenAccent.shade700),
+              const SizedBox(width: 4),
+              Text(L.commonNowPlayingBadge,
+                style: TextStyle(
+                    color: Colors.greenAccent.shade700,
+                    fontSize: 10, fontWeight: FontWeight.w800)),
+            ]),
+            const SizedBox(height: 3),
+            Text(track, maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(fontWeight: FontWeight.w700)),
+            Text(artist, maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: scheme.onSurfaceVariant)),
+          ])),
+        ]),
+      ),
+    );
+  }
+
+  // ── Section title bar ─────────────────────────────────────────────────────
+
+  Widget _sectionHeader(String title, ColorScheme scheme) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+      child: Row(children: [
+        Text(title,
+          style: Theme.of(context).textTheme.titleSmall
+              ?.copyWith(fontWeight: FontWeight.w800)),
+        const SizedBox(width: 10),
+        Expanded(child: Divider(color: scheme.outlineVariant, height: 1)),
+      ]),
+    );
+  }
+
+  // ── Artist row: rank + circle avatar + name + plays ───────────────────────
+
+  Widget _buildArtistRow(
+      BuildContext ctx, dynamic raw, int idx, ColorScheme scheme) {
+    final a      = raw as Map<String, dynamic>;
+    final name   = (a['name']      ?? '').toString();
+    final plays  = int.tryParse((a['playcount'] ?? '0').toString()) ?? 0;
+    final imgUrl = _extractImage(a['image']);
+
+    return InkWell(
+      onTap: () {
+        Navigator.pop(ctx); // close profile sheet first
+        showDetailSheet(ctx, a, 'artists', widget.service);
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+        child: Row(children: [
+          // Rank number
+          SizedBox(
+            width: 24,
+            child: Text('${idx + 1}',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: scheme.onSurfaceVariant, fontWeight: FontWeight.w700)),
+          ),
+          const SizedBox(width: 10),
+
+          // Circular artist image
+          _SmartImage(
+            size: 44, borderRadius: 22,
+            initialUrl: imgUrl,
+            resolver: () => ImageService.resolveArtist(name,
+                lastfmUrl: imgUrl.isNotEmpty ? imgUrl : null),
+          ),
+          const SizedBox(width: 12),
+
+          // Name and play count
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(fontWeight: FontWeight.w600)),
+            Text('${_fmt(plays)} ${L.commonPlays}',
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: scheme.onSurfaceVariant)),
+          ])),
+
+          Icon(Icons.chevron_right_rounded, size: 18, color: scheme.outlineVariant),
+        ]),
+      ),
+    );
+  }
+
+  // ── Albums: 3-column grid with cover art ─────────────────────────────────
+
+  Widget _buildAlbumsGrid(BuildContext ctx, ColorScheme scheme) {
+    final albums = _topAlbums.take(6).toList();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount:   3,
+          mainAxisSpacing:  10,
+          crossAxisSpacing: 10,
+          childAspectRatio: 0.78,
+        ),
+        itemCount: albums.length,
+        itemBuilder: (_, i) {
+          final al       = albums[i] as Map<String, dynamic>;
+          final name     = (al['name']              ?? '').toString();
+          final plays    = int.tryParse((al['playcount'] ?? '0').toString()) ?? 0;
+          final imgUrl   = _extractImage(al['image']);
+          final artName  = (al['artist']?['name']   ?? '').toString();
+
+          return GestureDetector(
+            onTap: () {
+              Navigator.pop(ctx);
+              showDetailSheet(ctx, al, 'albums', widget.service);
+            },
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              // Cover art square
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: _SmartImage(
+                    size: 100, borderRadius: 10,
+                    initialUrl: imgUrl,
+                    resolver: () => ImageService.resolveAlbum(name, artName,
+                        lastfmUrl: imgUrl.isNotEmpty ? imgUrl : null),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(name, maxLines: 2, overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelSmall
+                    ?.copyWith(fontWeight: FontWeight.w700, fontSize: 11)),
+              Text('${_fmt(plays)} ${L.commonPlays}',
+                style: Theme.of(context).textTheme.labelSmall
+                    ?.copyWith(color: scheme.onSurfaceVariant, fontSize: 9)),
+            ]),
+          );
+        },
+      ),
+    );
+  }
+
+  // ── Recent track row ──────────────────────────────────────────────────────
+
+  Widget _buildRecentRow(dynamic raw, ColorScheme scheme) {
+    final t      = raw as Map<String, dynamic>;
+    final isNp   = t['@attr']?['nowplaying'] == 'true';
+    final track  = (t['name']                        ?? '').toString();
+    final artist = (t['artist']?['#text']
+                 ?? t['artist']?['name'] ?? '').toString();
+    final rawUrl = _extractImage(t['image']);
+    final hasImg = rawUrl.isNotEmpty && !rawUrl.contains(_ph);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+      child: Row(children: [
+        // Track artwork with green dot for live track
+        Stack(children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: hasImg
+                ? Image.network(rawUrl, width: 44, height: 44, fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => _artBox(44, scheme))
+                : _artBox(44, scheme),
+          ),
+          if (isNp)
+            Positioned(right: 0, bottom: 0,
+              child: Container(
+                width: 10, height: 10,
+                decoration: BoxDecoration(
+                  color:  Colors.greenAccent.shade400,
+                  shape:  BoxShape.circle,
+                  border: Border.all(color: scheme.surface, width: 1.5),
+                ),
+              )),
+        ]),
+        const SizedBox(width: 12),
+
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(track, maxLines: 1, overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(fontWeight: FontWeight.w600)),
+          Text(artist, maxLines: 1, overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.labelSmall
+                ?.copyWith(color: scheme.onSurfaceVariant)),
+        ])),
+
+        // "LIVE" label or relative time
+        isNp
+            ? Text(L.commonNowPlayingBadge,
+                style: TextStyle(
+                    color: Colors.greenAccent.shade700,
+                    fontSize: 10, fontWeight: FontWeight.w800))
+            : Text(_timeAgo(t),
+                style: Theme.of(context).textTheme.labelSmall
+                    ?.copyWith(color: scheme.onSurfaceVariant, fontSize: 10)),
+      ]),
+    );
+  }
+
+  // ── Small placeholder box when artwork is missing ─────────────────────────
+
+  Widget _artBox(double size, ColorScheme scheme) {
+    return Container(
+      width: size, height: size,
+      color: scheme.surfaceContainerHighest,
+      child: Icon(Icons.music_note_rounded,
+        size: size * 0.45,
+        color: scheme.onSurfaceVariant.withValues(alpha: 0.5)),
+    );
+  }
+}
+
+// ── Gradient banner icon+text row ─────────────────────────────────────────────
+
+class _BannerMeta extends StatelessWidget {
+  final IconData icon;
+  final String   label;
+  const _BannerMeta({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      Icon(icon, size: 12, color: Colors.white.withValues(alpha: 0.75)),
+      const SizedBox(width: 4),
+      Text(label,
+        style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 12)),
+    ]);
+  }
+}
+
+// ── Stat card for the profile stats row ──────────────────────────────────────
+
+class _ProfileStatCard extends StatelessWidget {
+  final IconData    icon;
+  final String      value;
+  final String      label;
+  final ColorScheme scheme;
+  final bool        primary;
+
+  const _ProfileStatCard({
+    required this.icon,
+    required this.value,
+    required this.label,
+    required this.scheme,
+    this.primary = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = primary ? scheme.primaryContainer : scheme.surfaceContainerHighest;
+    final fg = primary ? scheme.onPrimaryContainer : scheme.onSurfaceVariant;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      decoration: BoxDecoration(
+        color: bg, borderRadius: BorderRadius.circular(14)),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Icon(icon, size: 18, color: fg.withValues(alpha: 0.8)),
+        const SizedBox(height: 5),
+        Text(value,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800, color: fg, fontSize: 13)),
+        const SizedBox(height: 2),
+        Text(label,
+          textAlign: TextAlign.center, maxLines: 1,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: fg.withValues(alpha: 0.7), fontSize: 9)),
+      ]),
+    );
+  }
+}
+
+// ── Format large numbers compactly (1 200 000 → "1.2M") ─────────────────────
+
+String _fmtLarge(int n) {
+  if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
+  if (n >= 1000)    return '${(n / 1000).toStringAsFixed(1)}k';
+  return '$n';
 }
