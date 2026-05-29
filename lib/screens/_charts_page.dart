@@ -2290,7 +2290,7 @@ class _YearFullHeatmapCard extends StatelessWidget {
   const _YearFullHeatmapCard({required this.data, required this.year});
 
   static const _cell = 11.0;
-  static const _gap  = 0.0;  // no gap — cells fully touching
+  static const _gap  = 2.0;
   static const _step = _cell + _gap;
 
   @override
@@ -2337,7 +2337,7 @@ class _YearFullHeatmapCard extends StatelessWidget {
                 final col  = entry.key;
                 final days = entry.value;
                 return Padding(
-                  padding: const EdgeInsets.only(right: 0),
+                  padding: const EdgeInsets.only(right: _gap),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -2376,7 +2376,7 @@ class _YearFullHeatmapCard extends StatelessWidget {
                                 s.primaryContainer, s.primary,
                                 (scaled * 0.85 + 0.15).clamp(0.0, 1.0))!;
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 0),
+                          padding: const EdgeInsets.only(bottom: _gap),
                           child: Tooltip(
                             message: count > 0
                                 ? '${d.day}/${d.month} — $count scrobbles'
@@ -2386,7 +2386,7 @@ class _YearFullHeatmapCard extends StatelessWidget {
                               height: _cell,
                               decoration: BoxDecoration(
                                 color: color,
-                                borderRadius: BorderRadius.circular(1),
+                                borderRadius: BorderRadius.circular(2),
                               ),
                             ),
                           ),
