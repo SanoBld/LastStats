@@ -1,4 +1,5 @@
 // lib/main.dart
+import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -15,6 +16,9 @@ import 'services/notification_worker.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Catch unhandled Flutter errors before the window opens
+  FlutterError.onError = (details) => debugPrint('Flutter error: ${details.exception}');
 
   final prefs      = await SharedPreferences.getInstance();
   final username   = prefs.getString('ls_username') ?? '';
@@ -37,14 +41,19 @@ void main() async {
   await ScrobblesFileCache.init();
   ImageService.pruneExpired();
 
-  // ── Notifications & WorkManager (natif uniquement, pas supporté sur web) ──
+  // ── Notifications & WorkManager ──────────────────────────────────────────
+  // workmanager only supports Android & iOS — calling it on desktop/web
+  // throws MissingPluginException before runApp(), killing the window.
   if (!kIsWeb) {
+    final isMobile = Platform.isAndroid || Platform.isIOS;
     await NotificationService.init();
-    await Workmanager().initialize(
-      callbackDispatcher,
-      isInDebugMode: false,
-    );
-    await NotificationWorker.scheduleAll();
+    if (isMobile) {
+      await Workmanager().initialize(
+        callbackDispatcher,
+        isInDebugMode: false,
+      );
+      await NotificationWorker.scheduleAll();
+    }
   }
 
   runApp(LastStatsApp(
