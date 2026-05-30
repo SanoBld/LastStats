@@ -2436,66 +2436,6 @@ class _SyncProgressChip extends StatelessWidget {
 }
 
 
-// ── Section header (icon + title + divider) ───────────────────────────────────
-
-class _SectionHeader extends StatelessWidget {
-  final String   title;
-  final IconData icon;
-  const _SectionHeader({required this.title, required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
-
-    return Row(children: [
-      Icon(icon, size: 18, color: scheme.primary),
-      const SizedBox(width: 8),
-      Text(title,
-          style: text.titleSmall?.copyWith(
-              fontWeight: FontWeight.w800, color: scheme.onSurface)),
-      const SizedBox(width: 10),
-      Expanded(
-        child: Divider(
-          color: scheme.outlineVariant.withValues(alpha: 0.5),
-          thickness: 1,
-        ),
-      ),
-    ]);
-  }
-}
-
-
-// ── Error view with retry button ──────────────────────────────────────────────
-
-class _ErrorView extends StatelessWidget {
-  final String       message;
-  final VoidCallback onRetry;
-  const _ErrorView({required this.message, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Icon(Icons.wifi_off_rounded, size: 48, color: scheme.error),
-          const SizedBox(height: 16),
-          Text(message,
-              textAlign: TextAlign.center,
-              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
-          const SizedBox(height: 20),
-          FilledButton.tonal(onPressed: onRetry, child: const Text('Retry')),
-        ]),
-      ),
-    );
-  }
-}
-
-
 // ── Apple Music-style ambient header animation ────────────────────────────────
 // When music is playing and the setting is on, the header slowly breathes:
 //   • scale: 1.0 → 1.08 over ~8 s, reversing smoothly

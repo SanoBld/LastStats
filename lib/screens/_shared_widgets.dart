@@ -223,9 +223,20 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
     return Row(children: [
-      Icon(icon, color: scheme.primary, size: 20), const SizedBox(width: 8),
-      Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+      Icon(icon, size: 18, color: scheme.primary),
+      const SizedBox(width: 8),
+      Text(title,
+          style: text.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800, color: scheme.onSurface)),
+      const SizedBox(width: 10),
+      Expanded(
+        child: Divider(
+          color: scheme.outlineVariant.withValues(alpha: 0.5),
+          thickness: 1,
+        ),
+      ),
     ]);
   }
 }
@@ -271,14 +282,17 @@ class _ErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
     return Center(child: Padding(padding: const EdgeInsets.all(32),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         Icon(Icons.error_outline_rounded, size: 48, color: scheme.error),
-        const SizedBox(height: 12),
-        Text(message, textAlign: TextAlign.center),
         const SizedBox(height: 16),
-        FilledButton.icon(onPressed: onRetry,
-            icon: const Icon(Icons.refresh_rounded), label: Text(L.commonRetry)),
+        Text(message,
+            textAlign: TextAlign.center,
+            style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
+        const SizedBox(height: 20),
+        FilledButton.tonal(onPressed: onRetry,
+            child: Text(L.commonRetry)),
       ])));
   }
 }
