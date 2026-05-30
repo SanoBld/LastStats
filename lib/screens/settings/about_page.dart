@@ -11,8 +11,9 @@ class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
 
   Future<void> _open(String url) async {
-    final u = Uri.parse(url);
-    if (await canLaunchUrl(u)) await launchUrl(u, mode: LaunchMode.externalApplication);
+    // canLaunchUrl is unreliable on Android 11+ without <queries> in the
+    // manifest — just call launchUrl directly with externalApplication.
+    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
   }
 
   @override
@@ -172,10 +173,7 @@ class _PoweredByTile extends StatelessWidget {
       title: Text(label,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
       trailing: const Icon(Icons.open_in_new_rounded, size: 16),
-      onTap: () async {
-        final u = Uri.parse(url);
-        if (await canLaunchUrl(u)) await launchUrl(u, mode: LaunchMode.externalApplication);
-      },
+      onTap: () => launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
     );
   }
 }

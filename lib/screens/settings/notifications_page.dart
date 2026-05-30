@@ -1,13 +1,15 @@
 // lib/screens/settings/notifications_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app_state.dart';
 import '../../services/notification_service.dart';
 import '../../services/notification_worker.dart';
 
-// ── Prefs keys (mirrors notification_worker.dart) ────────────────────────────
+// ── Prefs keys (must match notification_worker.dart exactly) ─────────────────
 const _kMilestoneEnabled  = 'ls_notif_milestone_enabled';
 const _kMilestoneInterval = 'ls_notif_milestone_interval';
+const _kGrandEnabled      = 'ls_notif_grand_enabled';
 const _kDailyEnabled      = 'ls_notif_daily_enabled';
 const _kDailyHour         = 'ls_notif_daily_hour';
 const _kDailyMin          = 'ls_notif_daily_min';
@@ -24,14 +26,17 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-  // Permission
+  // Permission state
   bool _hasPermission = false;
   bool _checkingPerm  = true;
 
-  // Milestone
+  // Interval milestone
   bool _milestoneOn       = false;
   int  _milestoneInterval = 500;
   final _intervalCtrl     = TextEditingController();
+
+  // Grand milestone (1K / 5K / 10K / … / 1M)
+  bool _grandOn = true;
 
   // Daily recap
   bool _dailyOn   = false;
@@ -40,9 +45,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   // Weekly recap
   bool _weeklyOn   = false;
-  int  _weeklyDay  = 1; // 1=Mon
+  int  _weeklyDay  = 1; // 1 = Monday
   int  _weeklyHour = 20;
   int  _weeklyMin  = 0;
+
+  // Test-notification feedback
+  bool _testSent = false;
 
   @override
   void initState() {
@@ -56,10 +64,11 @@ class _NotificationsPageState extends State<NotificationsPage> {
     super.dispose();
   }
 
+  // ── Load / save ──────────────────────────────────────────────────────────
+
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     final perm  = await NotificationService.hasPermission();
-
     if (!mounted) return;
     setState(() {
       _hasPermission     = perm;
@@ -67,6 +76,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
       _milestoneOn       = prefs.getBool(_kMilestoneEnabled)  ?? false;
       _milestoneInterval = prefs.getInt(_kMilestoneInterval)  ?? 500;
+      _grandOn           = prefs.getBool(_kGrandEnabled)      ?? true;
 
       _dailyOn   = prefs.getBool(_kDailyEnabled) ?? false;
       _dailyHour = prefs.getInt(_kDailyHour)     ?? 21;
@@ -85,6 +95,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_kMilestoneEnabled,  _milestoneOn);
     await prefs.setInt(_kMilestoneInterval,  _milestoneInterval);
+    await prefs.setBool(_kGrandEnabled,      _grandOn);
     await prefs.setBool(_kDailyEnabled,      _dailyOn);
     await prefs.setInt(_kDailyHour,          _dailyHour);
     await prefs.setInt(_kDailyMin,           _dailyMin);
@@ -92,9 +103,11 @@ class _NotificationsPageState extends State<NotificationsPage> {
     await prefs.setInt(_kWeeklyDay,          _weeklyDay);
     await prefs.setInt(_kWeeklyHour,         _weeklyHour);
     await prefs.setInt(_kWeeklyMin,          _weeklyMin);
-    // Re-schedule WorkManager tasks to reflect new settings
+    // Re-register WorkManager tasks to reflect new settings
     await NotificationWorker.scheduleAll();
   }
+
+  // ── Permission ───────────────────────────────────────────────────────────
 
   Future<void> _requestPermission() async {
     final granted = await NotificationService.requestPermission();
@@ -109,6 +122,11 @@ class _NotificationsPageState extends State<NotificationsPage> {
     _save();
   }
 
+  void _setGrand(bool v) {
+    setState(() => _grandOn = v);
+    _save();
+  }
+
   void _setDaily(bool v) {
     setState(() => _dailyOn = v);
     _save();
@@ -118,6 +136,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
     setState(() => _weeklyOn = v);
     _save();
   }
+
+  // ── Time picker ──────────────────────────────────────────────────────────
 
   Future<void> _pickTime({
     required int hour,
@@ -134,6 +154,18 @@ class _NotificationsPageState extends State<NotificationsPage> {
     }
   }
 
+  // ── Test notification ────────────────────────────────────────────────────
+
+  Future<void> _sendTest() async {
+    await NotificationService.showTest();
+    if (!mounted) return;
+    setState(() => _testSent = true);
+    // Reset the feedback label after 3 s
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) setState(() => _testSent = false);
+    });
+  }
+
   // ── Build ────────────────────────────────────────────────────────────────
 
   @override
@@ -144,47 +176,69 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEn ? 'Notifications' : 'Notifications'),
+        title: const Text('Notifications'),
         centerTitle: false,
       ),
       body: _checkingPerm
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               children: [
-                // ── Permission banner ─────────────────────────────────
+
+                // ── Permission banner ──────────────────────────────────────
                 if (!_hasPermission) ...[
                   _PermissionBanner(isEn: isEn, onRequest: _requestPermission),
                   const SizedBox(height: 16),
                 ],
 
-                // ── How it works note ──────────────────────────────────
+                // ── WorkManager info note ──────────────────────────────────
                 _InfoNote(
-                  isEn: isEn,
                   icon: Icons.info_outline_rounded,
                   text: isEn
                       ? 'Notifications run in the background via WorkManager. '
                         'The app does not need to be open. '
-                        'An internet connection is required to fetch scrobble data.'
+                        'An internet connection is required.'
                       : 'Les notifications tournent en arrière-plan via WorkManager. '
                         "L'app n'a pas besoin d'être ouverte. "
-                        'Une connexion internet est nécessaire pour récupérer les données.',
+                        'Une connexion internet est nécessaire.',
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 28),
 
-                // ── Milestone ─────────────────────────────────────────
+                // ── Section: Milestones ────────────────────────────────────
                 _SectionLabel(
-                    isEn ? 'Scrobble milestones' : 'Jalons de scrobbles', scheme),
-                const SizedBox(height: 8),
+                  isEn ? 'Scrobble milestones' : 'Jalons de scrobbles',
+                  scheme,
+                ),
+                const SizedBox(height: 10),
+
+                // Grand milestones card
+                _NotifCard(
+                  scheme:   scheme,
+                  icon:     Icons.emoji_events_rounded,
+                  iconBg:   const Color(0xFFFFECB3),
+                  iconFg:   const Color(0xFFE65100),
+                  title:    isEn ? 'Grand milestones' : 'Grands jalons',
+                  subtitle: isEn
+                      ? '1K · 5K · 10K · 25K · 50K · 100K · 250K · 500K · 1M'
+                      : '1K · 5K · 10K · 25K · 50K · 100K · 250K · 500K · 1M',
+                  enabled:  _grandOn,
+                  onToggle: _hasPermission ? _setGrand : null,
+                  child: _grandOn
+                      ? _GrandMilestoneInfo(isEn: isEn, scheme: scheme, text: text)
+                      : null,
+                ),
+                const SizedBox(height: 10),
+
+                // Interval milestone card
                 _NotifCard(
                   scheme:   scheme,
                   icon:     Icons.flag_rounded,
                   iconBg:   scheme.primaryContainer,
                   iconFg:   scheme.onPrimaryContainer,
-                  title:    isEn ? 'Milestone reached' : 'Jalon atteint',
+                  title:    isEn ? 'Every X scrobbles' : 'Tous les X scrobbles',
                   subtitle: isEn
-                      ? 'Get notified every X scrobbles'
-                      : 'Notification tous les X scrobbles',
+                      ? 'Get notified at regular intervals'
+                      : 'Notification à intervalle régulier',
                   enabled:  _milestoneOn,
                   onToggle: _hasPermission ? _setMilestone : null,
                   child: _milestoneOn
@@ -196,20 +250,23 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           text:     text,
                           onChange: (v) {
                             setState(() => _milestoneInterval = v);
+                            // Reset so the new interval is detected fresh
                             NotificationWorker.resetMilestoneCount();
                             _save();
                           },
                         )
                       : null,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 28),
 
-                // ── Recaps ────────────────────────────────────────────
+                // ── Section: Recaps ────────────────────────────────────────
                 _SectionLabel(
-                    isEn ? 'Listening recaps' : 'Récapitulatifs', scheme),
-                const SizedBox(height: 8),
+                  isEn ? 'Listening recaps' : 'Récapitulatifs',
+                  scheme,
+                ),
+                const SizedBox(height: 10),
 
-                // Daily
+                // Daily recap
                 _NotifCard(
                   scheme:   scheme,
                   icon:     Icons.today_rounded,
@@ -217,7 +274,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   iconFg:   scheme.onSecondaryContainer,
                   title:    isEn ? 'Daily recap' : 'Récap quotidien',
                   subtitle: isEn
-                      ? 'Daily scrobble count + top artist'
+                      ? 'Scrobble count + top artist for the day'
                       : 'Scrobbles du jour + artiste favori',
                   enabled:  _dailyOn,
                   onToggle: _hasPermission ? _setDaily : null,
@@ -228,9 +285,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           minute: _dailyMin,
                           scheme: scheme,
                           text:   text,
-                          onTap: () => _pickTime(
-                            hour:    _dailyHour,
-                            minute:  _dailyMin,
+                          onTap:  () => _pickTime(
+                            hour:     _dailyHour,
+                            minute:   _dailyMin,
                             onPicked: (h, m) {
                               _dailyHour = h;
                               _dailyMin  = m;
@@ -239,9 +296,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         )
                       : null,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
 
-                // Weekly
+                // Weekly recap
                 _NotifCard(
                   scheme:   scheme,
                   icon:     Icons.date_range_rounded,
@@ -249,25 +306,25 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   iconFg:   scheme.onTertiaryContainer,
                   title:    isEn ? 'Weekly recap' : 'Récap hebdomadaire',
                   subtitle: isEn
-                      ? 'Weekly scrobble count + top artist'
+                      ? 'Scrobble count + top artist for the week'
                       : 'Scrobbles de la semaine + artiste favori',
                   enabled:  _weeklyOn,
                   onToggle: _hasPermission ? _setWeekly : null,
                   child: _weeklyOn
                       ? _WeeklyConfig(
-                          isEn:   isEn,
-                          day:    _weeklyDay,
-                          hour:   _weeklyHour,
-                          minute: _weeklyMin,
-                          scheme: scheme,
-                          text:   text,
+                          isEn:        isEn,
+                          day:         _weeklyDay,
+                          hour:        _weeklyHour,
+                          minute:      _weeklyMin,
+                          scheme:      scheme,
+                          text:        text,
                           onDayChanged: (d) {
                             setState(() => _weeklyDay = d);
                             _save();
                           },
                           onTimeTap: () => _pickTime(
-                            hour:    _weeklyHour,
-                            minute:  _weeklyMin,
+                            hour:     _weeklyHour,
+                            minute:   _weeklyMin,
                             onPicked: (h, m) {
                               _weeklyHour = h;
                               _weeklyMin  = m;
@@ -276,6 +333,23 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         )
                       : null,
                 ),
+                const SizedBox(height: 28),
+
+                // ── Test button ────────────────────────────────────────────
+                if (_hasPermission) ...[
+                  _SectionLabel(
+                    isEn ? 'Test' : 'Test',
+                    scheme,
+                  ),
+                  const SizedBox(height: 10),
+                  _TestButton(
+                    isEn:    isEn,
+                    sent:    _testSent,
+                    scheme:  scheme,
+                    onTap:   _sendTest,
+                  ),
+                ],
+
                 const SizedBox(height: 32),
               ],
             ),
@@ -300,38 +374,39 @@ class _PermissionBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color:        scheme.errorContainer,
+        color: scheme.errorContainer,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Icon(Icons.notifications_off_rounded,
             color: scheme.onErrorContainer, size: 24),
         const SizedBox(width: 12),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-          Text(
-            isEn ? 'Notifications disabled' : 'Notifications désactivées',
-            style: TextStyle(
-                color: scheme.onErrorContainer, fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            isEn
-                ? 'Grant permission so LastStats can send you alerts.'
-                : "Accordez la permission pour que LastStats puisse vous envoyer des alertes.",
-            style: TextStyle(color: scheme.onErrorContainer, fontSize: 13),
-          ),
-          const SizedBox(height: 10),
-          FilledButton.tonal(
-            onPressed: onRequest,
-            style: FilledButton.styleFrom(
-              backgroundColor: scheme.onErrorContainer,
-              foregroundColor: scheme.errorContainer,
-              visualDensity: VisualDensity.compact,
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(
+              isEn ? 'Notifications disabled' : 'Notifications désactivées',
+              style: TextStyle(
+                  color: scheme.onErrorContainer, fontWeight: FontWeight.w700),
             ),
-            child: Text(isEn ? 'Grant permission' : 'Autoriser'),
-          ),
-        ])),
+            const SizedBox(height: 4),
+            Text(
+              isEn
+                  ? 'Grant permission so LastStats can send you alerts.'
+                  : 'Accordez la permission pour recevoir les alertes.',
+              style: TextStyle(color: scheme.onErrorContainer, fontSize: 13),
+            ),
+            const SizedBox(height: 10),
+            FilledButton.tonal(
+              onPressed: onRequest,
+              style: FilledButton.styleFrom(
+                backgroundColor: scheme.onErrorContainer,
+                foregroundColor: scheme.errorContainer,
+                visualDensity: VisualDensity.compact,
+              ),
+              child: Text(isEn ? 'Grant permission' : 'Autoriser'),
+            ),
+          ]),
+        ),
       ]),
     );
   }
@@ -340,10 +415,9 @@ class _PermissionBanner extends StatelessWidget {
 // ── Info note ─────────────────────────────────────────────────────────────────
 
 class _InfoNote extends StatelessWidget {
-  final bool isEn;
   final IconData icon;
-  final String text;
-  const _InfoNote({required this.isEn, required this.icon, required this.text});
+  final String   text;
+  const _InfoNote({required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -358,9 +432,13 @@ class _InfoNote extends StatelessWidget {
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Icon(icon, size: 16, color: scheme.onSurfaceVariant),
         const SizedBox(width: 10),
-        Expanded(child: Text(text,
+        Expanded(
+          child: Text(
+            text,
             style: TextStyle(
-                fontSize: 13, color: scheme.onSurfaceVariant, height: 1.4))),
+                fontSize: 13, color: scheme.onSurfaceVariant, height: 1.4),
+          ),
+        ),
       ]),
     );
   }
@@ -369,7 +447,7 @@ class _InfoNote extends StatelessWidget {
 // ── Section label ─────────────────────────────────────────────────────────────
 
 class _SectionLabel extends StatelessWidget {
-  final String label;
+  final String      label;
   final ColorScheme scheme;
   const _SectionLabel(this.label, this.scheme);
 
@@ -377,9 +455,9 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) => Text(
     label,
     style: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w700,
-        color: scheme.primary,
+        fontSize:    12,
+        fontWeight:  FontWeight.w700,
+        color:       scheme.primary,
         letterSpacing: 0.6),
   );
 }
@@ -388,12 +466,12 @@ class _SectionLabel extends StatelessWidget {
 
 class _NotifCard extends StatelessWidget {
   final ColorScheme scheme;
-  final IconData   icon;
-  final Color      iconBg, iconFg;
-  final String     title, subtitle;
-  final bool       enabled;
+  final IconData    icon;
+  final Color       iconBg, iconFg;
+  final String      title, subtitle;
+  final bool        enabled;
   final void Function(bool)? onToggle;
-  final Widget? child; // expanded config section
+  final Widget? child;
 
   const _NotifCard({
     required this.scheme,
@@ -434,25 +512,26 @@ class _NotifCard extends StatelessWidget {
               child: Icon(icon, color: iconFg, size: 22),
             ),
             const SizedBox(width: 14),
-            Expanded(child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title,
-                  style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
-              Text(subtitle,
-                  style: text.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant, height: 1.3)),
-            ])),
-            Switch(
-              value:    enabled,
-              onChanged: onToggle,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: text.bodyMedium
+                          ?.copyWith(fontWeight: FontWeight.w700)),
+                  Text(subtitle,
+                      style: text.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant, height: 1.3)),
+                ],
+              ),
             ),
+            Switch(value: enabled, onChanged: onToggle),
           ]),
         ),
 
-        // Config section (animated expand)
+        // Expanded config section (animated)
         if (child != null) ...[
-          Divider(
-              height: 1,
+          Divider(height: 1,
               color: scheme.outlineVariant.withValues(alpha: 0.4)),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
@@ -464,7 +543,125 @@ class _NotifCard extends StatelessWidget {
   }
 }
 
-// ── Milestone config: interval input ─────────────────────────────────────────
+// ── Grand milestone info box ──────────────────────────────────────────────────
+
+class _GrandMilestoneInfo extends StatelessWidget {
+  final bool        isEn;
+  final ColorScheme scheme;
+  final TextTheme   text;
+  const _GrandMilestoneInfo({
+    required this.isEn,
+    required this.scheme,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Show what each threshold message looks like
+    final examples = [
+      ('1,000',    isEn ? 'Your first 1,000 scrobbles. The journey begins. 🎵'
+                        : 'Tes 1 000 premiers scrobbles. L\'aventure commence. 🎵'),
+      ('10,000',   isEn ? 'You hit five figures! 🎉'
+                        : 'Tu passes les cinq chiffres ! 🎉'),
+      ('100,000',  isEn ? 'You\'re a true music addict. 🔥'
+                        : 'Tu es un vrai accro à la musique. 🔥'),
+      ('1,000,000',isEn ? 'One million scrobbles. That\'s legendary. 🎸'
+                        : 'Un million de scrobbles. C\'est légendaire. 🎸'),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          isEn
+              ? 'You\'ll get a special notification at each of these thresholds:'
+              : 'Une notification spéciale à chacun de ces paliers :',
+          style: text.bodySmall
+              ?.copyWith(color: scheme.onSurfaceVariant, height: 1.4),
+        ),
+        const SizedBox(height: 10),
+        // Threshold chips
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: [
+            for (final t in ['1K', '5K', '10K', '25K', '50K',
+                             '100K', '250K', '500K', '1M'])
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color:        const Color(0xFFE65100).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                      color: const Color(0xFFE65100).withValues(alpha: 0.3)),
+                ),
+                child: Text(
+                  t,
+                  style: TextStyle(
+                    fontSize:   12,
+                    fontWeight: FontWeight.w700,
+                    color:      const Color(0xFFE65100),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // Preview examples
+        for (final e in examples) ...[
+          _ExampleRow(count: e.$1, msg: e.$2, scheme: scheme, text: text),
+          const SizedBox(height: 6),
+        ],
+      ],
+    );
+  }
+}
+
+// ── Single example row inside grand milestone info ────────────────────────────
+
+class _ExampleRow extends StatelessWidget {
+  final String      count, msg;
+  final ColorScheme scheme;
+  final TextTheme   text;
+  const _ExampleRow({
+    required this.count,
+    required this.msg,
+    required this.scheme,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text(
+          count,
+          style: TextStyle(
+            fontSize:   11,
+            fontWeight: FontWeight.w700,
+            color:      scheme.onSurfaceVariant,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+      ),
+      const SizedBox(width: 8),
+      Expanded(
+        child: Text(
+          msg,
+          style: text.bodySmall?.copyWith(
+              color: scheme.onSurfaceVariant, height: 1.3),
+        ),
+      ),
+    ]);
+  }
+}
+
+// ── Interval milestone config: quick chips + custom text field ────────────────
 
 class _MilestoneConfig extends StatelessWidget {
   final bool isEn;
@@ -486,27 +683,29 @@ class _MilestoneConfig extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
-        isEn ? 'Notify every X scrobbles' : 'Notifier tous les X scrobbles',
+        isEn
+            ? 'Fire a notification every X scrobbles'
+            : 'Envoyer une notification tous les X scrobbles',
         style: text.bodySmall
             ?.copyWith(color: scheme.onSurfaceVariant, height: 1.3),
       ),
       const SizedBox(height: 10),
-      Row(children: [
-        // Quick-pick chips
-        for (final v in [100, 250, 500, 1000])
-          Padding(
-            padding: const EdgeInsets.only(right: 6),
-            child: FilterChip(
-              label:      Text('$v'),
-              selected:   interval == v,
+      // Quick-pick chips
+      Wrap(
+        spacing: 6,
+        children: [
+          for (final v in [100, 250, 500, 1000])
+            FilterChip(
+              label:         Text('$v'),
+              selected:      interval == v,
               visualDensity: VisualDensity.compact,
-              onSelected: (_) {
+              onSelected:    (_) {
                 ctrl.text = '$v';
                 onChange(v);
               },
             ),
-          ),
-      ]),
+        ],
+      ),
       const SizedBox(height: 10),
       // Custom value field
       SizedBox(
@@ -518,7 +717,7 @@ class _MilestoneConfig extends StatelessWidget {
             labelText:     isEn ? 'Custom value' : 'Valeur personnalisée',
             border:        const OutlineInputBorder(),
             isDense:       true,
-            suffixText:    isEn ? 'scrobbles' : 'scrobbles',
+            suffixText:    'scrobbles',
             contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12, vertical: 10),
           ),
@@ -565,21 +764,25 @@ class _TimePicker extends StatelessWidget {
           visualDensity: VisualDensity.compact,
           padding: const EdgeInsets.symmetric(horizontal: 16),
         ),
-        child: Text('$hh:$mm',
-            style: const TextStyle(
-                fontWeight: FontWeight.w700, fontFeatures: [FontFeature.tabularFigures()])),
+        child: Text(
+          '$hh:$mm',
+          style: const TextStyle(
+            fontWeight:   FontWeight.w700,
+            fontFeatures: [FontFeature.tabularFigures()],
+          ),
+        ),
       ),
     ]);
   }
 }
 
-// ── Weekly config: day picker + time ─────────────────────────────────────────
+// ── Weekly config: day chips + time picker ────────────────────────────────────
 
 class _WeeklyConfig extends StatelessWidget {
   final bool isEn;
   final int  day, hour, minute;
-  final ColorScheme scheme;
-  final TextTheme   text;
+  final ColorScheme  scheme;
+  final TextTheme    text;
   final void Function(int) onDayChanged;
   final VoidCallback onTimeTap;
   const _WeeklyConfig({
@@ -607,15 +810,18 @@ class _WeeklyConfig extends StatelessWidget {
         style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
       ),
       const SizedBox(height: 8),
-      Wrap(spacing: 6, children: List.generate(7, (i) {
-        final dayNum = i + 1;
-        return FilterChip(
-          label:       Text(days[i]),
-          selected:    day == dayNum,
-          visualDensity: VisualDensity.compact,
-          onSelected: (_) => onDayChanged(dayNum),
-        );
-      })),
+      Wrap(
+        spacing: 6,
+        children: List.generate(7, (i) {
+          final dayNum = i + 1;
+          return FilterChip(
+            label:         Text(days[i]),
+            selected:      day == dayNum,
+            visualDensity: VisualDensity.compact,
+            onSelected:    (_) => onDayChanged(dayNum),
+          );
+        }),
+      ),
       const SizedBox(height: 12),
       Row(children: [
         Text(
@@ -629,10 +835,96 @@ class _WeeklyConfig extends StatelessWidget {
             visualDensity: VisualDensity.compact,
             padding: const EdgeInsets.symmetric(horizontal: 16),
           ),
-          child: Text('$hh:$mm',
-              style: const TextStyle(fontWeight: FontWeight.w700)),
+          child: Text(
+            '$hh:$mm',
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
         ),
       ]),
     ]);
+  }
+}
+
+// ── Test notification button ──────────────────────────────────────────────────
+
+class _TestButton extends StatelessWidget {
+  final bool         isEn, sent;
+  final ColorScheme  scheme;
+  final VoidCallback onTap;
+  const _TestButton({
+    required this.isEn,
+    required this.sent,
+    required this.scheme,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+            color: scheme.outlineVariant.withValues(alpha: 0.4)),
+      ),
+      child: Row(children: [
+        Container(
+          width: 42, height: 42,
+          decoration: BoxDecoration(
+            color: scheme.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(11),
+          ),
+          child: Icon(
+            sent
+                ? Icons.check_circle_rounded
+                : Icons.notifications_active_rounded,
+            color: sent ? Colors.green : scheme.onSurfaceVariant,
+            size: 22,
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(
+              isEn ? 'Send a test notification' : 'Envoyer une notification test',
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+            Text(
+              sent
+                  ? (isEn ? 'Check your notification bar!' : 'Vérifiez la barre de notifs !')
+                  : (isEn ? 'Make sure everything works.' : 'Vérifiez que tout fonctionne.'),
+              style: TextStyle(
+                  fontSize: 13, color: scheme.onSurfaceVariant),
+            ),
+          ]),
+        ),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          child: sent
+              ? Padding(
+                  key: const ValueKey('done'),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    isEn ? 'Sent!' : 'Envoyé !',
+                    style: TextStyle(
+                      color:      Colors.green,
+                      fontWeight: FontWeight.w700,
+                      fontSize:   13,
+                    ),
+                  ),
+                )
+              : FilledButton.tonal(
+                  key:       const ValueKey('btn'),
+                  onPressed: onTap,
+                  style: FilledButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                  ),
+                  child: Text(isEn ? 'Send' : 'Envoyer'),
+                ),
+        ),
+      ]),
+    );
   }
 }
