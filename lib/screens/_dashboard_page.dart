@@ -2,16 +2,16 @@
 part of 'home_screen.dart';
 
 
-// ── Data model for a single friend entry ────────────────────────────────────
+// ── Friend data model ─────────────────────────────────────────────────────────
 
 class _FriendData {
   final String username;
   final String realName;
   final String avatarUrl;
-  final bool   isOnline;            // true  → currently scrobbling
+  final bool   isOnline;          // true = currently scrobbling
   final String nowPlayingTrack;
   final String nowPlayingArtist;
-  final String lastTrack;           // most recent track when offline
+  final String lastTrack;         // most recent track when offline
   final String lastArtist;
 
   const _FriendData({
@@ -27,8 +27,8 @@ class _FriendData {
 }
 
 
-// ── Configurable stat cards ──────────────────────────────────────────────────
-// Each entry: (id, emoji, labelFr, labelEn)
+// ── All available stat card definitions ──────────────────────────────────────
+// Format: (id, emoji, French label, English label)
 const _kAllStatCards = [
   ('top_artist',      '🎤', 'Artiste #1',           'Artist #1'),
   ('top_album',       '💿', 'Album #1',              'Album #1'),
@@ -46,7 +46,8 @@ const _kAllStatCards = [
 ];
 const _kDefaultStatCards = ['top_artist', 'top_album', 'top_track', 'last_track'];
 
-// Dashboard
+
+// ── Dashboard page ────────────────────────────────────────────────────────────
 
 class _DashboardPage extends StatefulWidget {
   final LastFmService service;
@@ -59,21 +60,22 @@ class _DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<_DashboardPage> {
   Map<String, dynamic>? _userInfo;
-  List<dynamic> _topArtists   = [];
-  List<dynamic> _topAlbums    = [];
-  List<dynamic> _topTracks    = [];
-  List<dynamic> _recentTracks = [];
+  List<dynamic> _topArtists    = [];
+  List<dynamic> _topAlbums     = [];
+  List<dynamic> _topTracks     = [];
+  List<dynamic> _recentTracks  = [];
   Map<String, dynamic>? _nowPlaying;
   List<dynamic> _topArtistsWeek = [];
   List<dynamic> _topAlbumsWeek  = [];
   List<dynamic> _topTracksWeek  = [];
   List<String>  _statCards      = List.from(_kDefaultStatCards);
 
-  bool _loading = true;
+  bool    _loading = true;
   String? _error;
-  Timer? _npTimer;
-  Timer? _topTimer;   // rafraîchissement top artistes / top titres (3 min)
+  Timer?  _npTimer;
+  Timer?  _topTimer;  // silently refresh top lists every 3 min
 
+  // Header display settings
   String _headerSource          = 'nowplaying';
   String _headerImageUrl        = '';
   double _headerBlur            = 0.0;
@@ -84,28 +86,29 @@ class _DashboardPageState extends State<_DashboardPage> {
   String _fallbackType          = 'none';    // 'none'|'top_track'|'top_album'|'top_artist'|'custom_url'
   String _fallbackPeriod        = 'overall'; // '7day'|'1month'|'overall'
   String _headerPeriod          = 'overall';
-  bool   _headerMusicAnim       = false;     // equalizer bars animation when music is playing
-  bool   _showNowPlay           = true;
-  bool   _showStats             = true;
-  bool   _showArtists           = true;
-  bool   _showTracks            = true;
+  bool   _headerMusicAnim       = false;     // ambient animation when music plays
 
-  // ── Friends state ───────────────────────────────────────
+  // Section visibility flags
+  bool _showNowPlay  = true;
+  bool _showStats    = true;
+  bool _showArtists  = true;
+  bool _showTracks   = true;
 
-  bool             _showFriends   = true;
-  List<_FriendData> _friends      = [];
-  Set<String>      _favFriends    = {};
-  Set<String>      _favProfiles   = {};  // profiles starred in search
-  bool             _friendsLoading = false;
+  // Friends state
+  bool              _showFriends    = true;
+  List<_FriendData> _friends        = [];
+  Set<String>       _favFriends     = {};
+  Set<String>       _favProfiles    = {};  // profiles starred from Search
+  bool              _friendsLoading = false;
 
   @override
   void initState() {
     super.initState();
-    // Charge prefs + cache en parallèle → affichage immédiat
+    // Load prefs + cache in parallel for instant display
     _initWithCache();
-    // Refresh now playing toutes les 10 s (ne reconstruit que si la piste change)
+    // Poll now playing every 10 s — rebuild only when track changes
     _npTimer  = Timer.periodic(const Duration(seconds: 10), (_) => _refreshLive());
-    // Refresh top artistes & top titres toutes les 3 min (silencieux, sans skeleton)
+    // Silent top-list refresh every 3 min
     _topTimer = Timer.periodic(const Duration(minutes: 3),  (_) => _refreshTopLists());
   }
 
@@ -116,46 +119,41 @@ class _DashboardPageState extends State<_DashboardPage> {
     super.dispose();
   }
 
-  // ── Initialisation avec cache en mémoire ─────────────────
-  /// Charge les préférences et le cache simultanément.
-  /// Si le cache contient des données valides, les affiche immédiatement
-  /// puis lance un refresh réseau en arrière-plan (silencieux).
+  // Load prefs and cache at the same time.
+  // If cache has valid data, show it immediately then refresh quietly in background.
   Future<void> _initWithCache() async {
     await _loadPrefs();
     if (!mounted) return;
 
-    // Tenter un affichage instantané depuis le cache
     final gotCache = _loadFromCache();
     if (gotCache) {
-      // Données affichées → refresh silencieux en arrière-plan
       _resolveHeaderImage();
       if (_showFriends) _loadFriends();
       _load(silent: true);
     } else {
-      // Pas de cache → chargement normal avec indicateur
       _load();
     }
   }
 
-  /// Lit les données du cache mémoire (synchrone et instantané).
-  /// Retourne true si des données utilisables ont été trouvées.
+  // Read data from in-memory cache (synchronous, instant).
+  // Returns true if usable data was found.
   bool _loadFromCache() {
     final userInfo = DataCache.getSync(DataCache.keyUserInfo());
-    if (userInfo == null) return false; // pas de cache → bail out
+    if (userInfo == null) return false;
 
-    final topArtists    = DataCache.getSync(DataCache.keyTopArtists('overall')) as List?;
-    final topAlbums     = DataCache.getSync(DataCache.keyTopAlbums('overall'))  as List?;
-    final topTracks     = DataCache.getSync(DataCache.keyTopTracks('overall'))  as List?;
-    final recentRaw     = DataCache.getSync(DataCache.keyRecentTracks(limit: 10));
-    final topArtW       = DataCache.getSync(DataCache.keyTopArtists('7day'))    as List?;
-    final topAlbW       = DataCache.getSync(DataCache.keyTopAlbums('7day'))     as List?;
-    final topTrkW       = DataCache.getSync(DataCache.keyTopTracks('7day'))     as List?;
+    final topArtists = DataCache.getSync(DataCache.keyTopArtists('overall')) as List?;
+    final topAlbums  = DataCache.getSync(DataCache.keyTopAlbums('overall'))  as List?;
+    final topTracks  = DataCache.getSync(DataCache.keyTopTracks('overall'))  as List?;
+    final recentRaw  = DataCache.getSync(DataCache.keyRecentTracks(limit: 10));
+    final topArtW    = DataCache.getSync(DataCache.keyTopArtists('7day'))    as List?;
+    final topAlbW    = DataCache.getSync(DataCache.keyTopAlbums('7day'))     as List?;
+    final topTrkW    = DataCache.getSync(DataCache.keyTopTracks('7day'))     as List?;
 
-    // Séparer nowplaying des pistes récentes
+    // Separate now-playing from the recent tracks list
     Map<String, dynamic>? np;
     final recentF = <dynamic>[];
     if (recentRaw is Map) {
-      final trackRaw = recentRaw['track'];
+      final trackRaw  = recentRaw['track'];
       final allRecent = trackRaw is List
           ? trackRaw
           : (trackRaw != null ? [trackRaw] : <dynamic>[]);
@@ -169,16 +167,16 @@ class _DashboardPageState extends State<_DashboardPage> {
     }
 
     setState(() {
-      _userInfo        = userInfo as Map<String, dynamic>;
-      _topArtists      = topArtists  ?? [];
-      _topAlbums       = topAlbums   ?? [];
-      _topTracks       = topTracks   ?? [];
-      _recentTracks    = recentF;
-      _nowPlaying      = np;
-      _topArtistsWeek  = topArtW     ?? [];
-      _topAlbumsWeek   = topAlbW     ?? [];
-      _topTracksWeek   = topTrkW     ?? [];
-      _loading         = false;
+      _userInfo       = userInfo as Map<String, dynamic>;
+      _topArtists     = topArtists ?? [];
+      _topAlbums      = topAlbums  ?? [];
+      _topTracks      = topTracks  ?? [];
+      _recentTracks   = recentF;
+      _nowPlaying     = np;
+      _topArtistsWeek = topArtW    ?? [];
+      _topAlbumsWeek  = topAlbW    ?? [];
+      _topTracksWeek  = topTrkW    ?? [];
+      _loading        = false;
     });
 
     if (np != null) _extractColor(np);
@@ -189,31 +187,30 @@ class _DashboardPageState extends State<_DashboardPage> {
     final p = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
-      _headerSource          = p.getString('ls_header_source')         ?? 'nowplaying';
-      _headerBlur            = p.getDouble('ls_header_blur')            ?? 0.0;
-      _headerAnimation       = p.getString('ls_header_animation')      ?? 'fade';
-      _headerCustomUrl       = p.getString('ls_header_custom_url')     ?? '';
-      _headerFallbackUrl     = p.getString('ls_header_fallback_url')     ?? '';
-      _headerFallbackEnabled = p.getBool('ls_header_fallback_enabled')   ?? false;
+      _headerSource          = p.getString('ls_header_source')          ?? 'nowplaying';
+      _headerBlur            = p.getDouble('ls_header_blur')             ?? 0.0;
+      _headerAnimation       = p.getString('ls_header_animation')       ?? 'fade';
+      _headerCustomUrl       = p.getString('ls_header_custom_url')      ?? '';
+      _headerFallbackUrl     = p.getString('ls_header_fallback_url')    ?? '';
+      _headerFallbackEnabled = p.getBool('ls_header_fallback_enabled')  ?? false;
       _fallbackType          = p.getString('ls_header_fallback_type')   ?? 'none';
       _fallbackPeriod        = p.getString('ls_header_fallback_period') ?? 'overall';
-      _headerPeriod          = p.getString('ls_header_period')         ?? 'overall';
-      _headerMusicAnim       = p.getBool('ls_header_music_anim')       ?? false;
-      _showNowPlay           = p.getBool('ls_show_nowplay')            ?? true;
-      _showStats             = p.getBool('ls_show_stats')              ?? true;
-      _showArtists           = p.getBool('ls_show_artists')            ?? true;
-      _showTracks            = p.getBool('ls_show_tracks')             ?? true;
-      // Friends prefs
-      _showFriends           = p.getBool('ls_show_friends')            ?? true;
+      _headerPeriod          = p.getString('ls_header_period')          ?? 'overall';
+      _headerMusicAnim       = p.getBool('ls_header_music_anim')        ?? false;
+      _showNowPlay           = p.getBool('ls_show_nowplay')             ?? true;
+      _showStats             = p.getBool('ls_show_stats')               ?? true;
+      _showArtists           = p.getBool('ls_show_artists')             ?? true;
+      _showTracks            = p.getBool('ls_show_tracks')              ?? true;
+      _showFriends           = p.getBool('ls_show_friends')             ?? true;
       final rawCards = p.getStringList('ls_stat_cards');
-      _statCards = rawCards != null && rawCards.isNotEmpty
+      _statCards   = rawCards != null && rawCards.isNotEmpty
           ? rawCards : List.from(_kDefaultStatCards);
-      _favFriends            = Set<String>.from(p.getStringList('ls_fav_friends') ?? []);
-      _favProfiles           = Set<String>.from(p.getStringList('ls_fav_profiles') ?? []);
+      _favFriends  = Set<String>.from(p.getStringList('ls_fav_friends')  ?? []);
+      _favProfiles = Set<String>.from(p.getStringList('ls_fav_profiles') ?? []);
     });
   }
 
-  /// [silent] = true → pas de skeleton, mise à jour discrète en arrière-plan.
+  // silent = true → no skeleton, quiet background update
   Future<void> _load({bool silent = false}) async {
     if (!silent) setState(() { _loading = true; _error = null; });
     try {
@@ -224,7 +221,7 @@ class _DashboardPageState extends State<_DashboardPage> {
         widget.service.getTopTracks (period: 'overall', limit: 50),
         widget.service.getRecentTracks(limit: 10),
         widget.service.getNowPlaying(),
-        // Week top lists — fetched only if a week card is enabled
+        // Week top lists — only fetched when the matching card is enabled
         if (_statCards.contains('top_artist_week'))
           widget.service.getTopArtists(period: '7day', limit: 1)
         else
@@ -238,6 +235,7 @@ class _DashboardPageState extends State<_DashboardPage> {
         else
           Future.value(<dynamic>[]),
       ]);
+
       final recentRaw = (res[4] as Map<String, dynamic>)['track'];
       final allRecent = recentRaw is List ? recentRaw
           : (recentRaw != null ? [recentRaw] : <dynamic>[]);
@@ -247,56 +245,51 @@ class _DashboardPageState extends State<_DashboardPage> {
         if ((t as Map?)?['@attr']?['nowplaying'] == 'true') { np = t as Map<String, dynamic>; }
         else { recentF.add(t); }
       }
+
       if (!mounted) return;
       setState(() {
-        _userInfo     = res[0] as Map<String, dynamic>?;
-        _topArtists   = res[1] as List<dynamic>;
-        _topAlbums    = res[2] as List<dynamic>;
-        _topTracks    = res[3] as List<dynamic>;
-        _recentTracks = recentF;
-        _nowPlaying      = np ?? res[5] as Map<String, dynamic>?;
-        _topArtistsWeek  = res.length > 6 ? res[6] as List<dynamic> : [];
-        _topAlbumsWeek   = res.length > 7 ? res[7] as List<dynamic> : [];
-        _topTracksWeek   = res.length > 8 ? res[8] as List<dynamic> : [];
-        _loading         = false;
+        _userInfo       = res[0] as Map<String, dynamic>?;
+        _topArtists     = res[1] as List<dynamic>;
+        _topAlbums      = res[2] as List<dynamic>;
+        _topTracks      = res[3] as List<dynamic>;
+        _recentTracks   = recentF;
+        _nowPlaying     = np ?? res[5] as Map<String, dynamic>?;
+        _topArtistsWeek = res.length > 6 ? res[6] as List<dynamic> : [];
+        _topAlbumsWeek  = res.length > 7 ? res[7] as List<dynamic> : [];
+        _topTracksWeek  = res.length > 8 ? res[8] as List<dynamic> : [];
+        _loading        = false;
       });
+
       if (_nowPlaying != null) _extractColor(_nowPlaying!);
       _resolveHeaderImage();
-      // Persister en cache
       _saveToCache(res);
-      // Load friends asynchronously — does not block the main page
+      // Load friends without blocking the main page
       if (_showFriends) _loadFriends();
     } catch (e) {
       if (!mounted) return;
       if (!silent) {
         setState(() { _error = e.toString().replaceFirst('Exception: ', ''); _loading = false; });
       }
-      // En mode silencieux, on garde les données en cache sans afficher d'erreur
     }
   }
 
-  /// Persiste les résultats API dans le cache pour les prochains démarrages.
+  // Save API results to cache for next startup
   void _saveToCache(List<dynamic> res) {
-    // Fire-and-forget
     DataCache.set(DataCache.keyUserInfo(),            res[0]);
     DataCache.set(DataCache.keyTopArtists('overall'), res[1]);
     DataCache.set(DataCache.keyTopAlbums('overall'),  res[2]);
     DataCache.set(DataCache.keyTopTracks('overall'),  res[3]);
     DataCache.set(DataCache.keyRecentTracks(limit: 10), res[4]);
-    if (res.length > 6 && (res[6] as List).isNotEmpty) {
+    if (res.length > 6 && (res[6] as List).isNotEmpty)
       DataCache.set(DataCache.keyTopArtists('7day'), res[6]);
-    }
-    if (res.length > 7 && (res[7] as List).isNotEmpty) {
+    if (res.length > 7 && (res[7] as List).isNotEmpty)
       DataCache.set(DataCache.keyTopAlbums('7day'),  res[7]);
-    }
-    if (res.length > 8 && (res[8] as List).isNotEmpty) {
+    if (res.length > 8 && (res[8] as List).isNotEmpty)
       DataCache.set(DataCache.keyTopTracks('7day'),  res[8]);
-    }
   }
 
-  /// Refresh silencieux du "now playing" (toutes les 10 s).
-  /// Ne reconstruit la page que si la piste a réellement changé → évite les
-  /// clignotements des carousels top artistes / top titres.
+  // Silent now-playing poll (every 10 s).
+  // Rebuilds UI only when the track actually changes — avoids carousel flicker.
   Future<void> _refreshLive() async {
     try {
       final np = await widget.service.getNowPlaying();
@@ -309,7 +302,7 @@ class _DashboardPageState extends State<_DashboardPage> {
       final changed    = prevName != newName || prevArtist != newArtist;
 
       if (changed) {
-        // Piste différente → mise à jour UI + couleur + image header
+        // Different track → update UI, accent color, and header image
         setState(() => _nowPlaying = np);
         if (np != null) {
           _extractColor(np);
@@ -317,16 +310,15 @@ class _DashboardPageState extends State<_DashboardPage> {
         }
         _resolveHeaderImage();
       } else if (np != null) {
-        // Même piste → cache silencieux, aucun rebuild
+        // Same track → silent cache update, no rebuild
         DataCache.set(DataCache.keyNowPlaying(), np);
       }
     } catch (_) {}
-    // Refresh friends status silently (no skeleton)
+    // Also refresh friends status silently
     if (_showFriends && mounted) _loadFriends(silent: true);
   }
 
-  /// Refresh silencieux des tops artistes & titres (toutes les 3 min).
-  /// Met à jour les listes en arrière-plan sans afficher de skeleton.
+  // Silently refresh top artists and tracks every 3 min
   Future<void> _refreshTopLists() async {
     if (!mounted) return;
     try {
@@ -344,12 +336,11 @@ class _DashboardPageState extends State<_DashboardPage> {
       ]);
       if (!mounted) return;
       setState(() {
-        _topArtists     = results[0] as List<dynamic>;
-        _topTracks      = results[1] as List<dynamic>;
+        _topArtists    = results[0] as List<dynamic>;
+        _topTracks     = results[1] as List<dynamic>;
         if (results.length > 2) _topArtistsWeek = results[2] as List<dynamic>;
         if (results.length > 3) _topTracksWeek  = results[3] as List<dynamic>;
       });
-      // Mise à jour du cache
       DataCache.set(DataCache.keyTopArtists('overall'), results[0]);
       DataCache.set(DataCache.keyTopTracks('overall'),  results[1]);
       if (results.length > 2 && (results[2] as List).isNotEmpty)
@@ -359,16 +350,15 @@ class _DashboardPageState extends State<_DashboardPage> {
     } catch (_) {}
   }
 
-  // [silent] = true → refresh in background without showing skeleton
+  // Load friends. silent = true skips the loading skeleton.
   Future<void> _loadFriends({bool silent = false}) async {
     if (!mounted) return;
     if (!silent) setState(() => _friendsLoading = true);
     try {
       final raw = await widget.service.getFriends(limit: 50, withRecentTrack: false);
 
-      // getFriends ne retourne pas fiablement nowplaying — on appelle
-      // getRecentTracks(limit:1) pour chaque ami en parallèle, exactement
-      // comme sur la page de profil individuelle.
+      // getFriends doesn't reliably include now-playing info,
+      // so we call getRecentTracks(limit:1) for each friend in parallel.
       final usernames = raw.map((u) => (u['name'] ?? '').toString()).toList();
 
       final recentResults = await Future.wait(
@@ -417,8 +407,7 @@ class _DashboardPageState extends State<_DashboardPage> {
         ));
       }
 
-      // Merge favorite profiles from search (ls_fav_profiles) that aren't
-      // already in the friends list — fetch their info and add them.
+      // Also include starred profiles from Search that aren't already in the list
       final existingNames = friends.map((f) => f.username.toLowerCase()).toSet();
       for (final favUsername in _favProfiles) {
         if (existingNames.contains(favUsername.toLowerCase())) continue;
@@ -426,7 +415,7 @@ class _DashboardPageState extends State<_DashboardPage> {
           final info = await widget.service.getUserInfo(user: favUsername);
           if (info == null) continue;
           final uname = (info['name'] ?? favUsername).toString();
-          // Detect now playing or last track for fav profiles from search
+
           bool   isOnline  = false;
           String npTrack   = '', npArtist   = '';
           String lastTrack = '', lastArtist = '';
@@ -452,6 +441,7 @@ class _DashboardPageState extends State<_DashboardPage> {
               }
             }
           } catch (_) {}
+
           friends.add(_FriendData(
             username:         uname,
             realName:         (info['realname'] ?? '').toString(),
@@ -466,7 +456,7 @@ class _DashboardPageState extends State<_DashboardPage> {
         } catch (_) {}
       }
 
-      // Sort priority score: online+fav (3) > online (2) > offline+fav (1) > offline (0)
+      // Sort: online+fav (3) > online (2) > offline+fav (1) > offline (0)
       friends.sort((a, b) {
         final aFav   = _favFriends.contains(a.username) || _favProfiles.contains(a.username);
         final bFav   = _favFriends.contains(b.username) || _favProfiles.contains(b.username);
@@ -482,7 +472,7 @@ class _DashboardPageState extends State<_DashboardPage> {
     }
   }
 
-  // ── Toggle a friend's favourite status ──────────────────
+  // Toggle a friend's favourite status and persist it
   Future<void> _toggleFav(String username, bool nowFav) async {
     final updatedFriends  = Set<String>.from(_favFriends);
     final updatedProfiles = Set<String>.from(_favProfiles);
@@ -510,13 +500,13 @@ class _DashboardPageState extends State<_DashboardPage> {
     });
   }
 
+  // Pick the header image based on the user's chosen source
   Future<void> _resolveHeaderImage() async {
     String url = '';
     switch (_headerSource) {
       case 'custom':
         url = _headerCustomUrl;
       case 'nowplaying':
-        // Résoudre l'image de la piste en cours si disponible
         if (_nowPlaying != null) {
           final raw = _extractImage(_nowPlaying!['image']);
           url = await ImageService.resolveTrack(
@@ -525,7 +515,7 @@ class _DashboardPageState extends State<_DashboardPage> {
             lastfmUrl: raw,
           );
         }
-        // Si pas de musique en cours (ou image introuvable), appliquer le fallback
+        // No music playing (or image missing) → apply fallback
         if (url.isEmpty && _fallbackType != 'none') {
           url = await _resolveFallbackImage();
         }
@@ -570,9 +560,8 @@ class _DashboardPageState extends State<_DashboardPage> {
     if (mounted) setState(() => _headerImageUrl = url);
   }
 
-  /// Résout l'image de fallback selon le type choisi dans les paramètres Dashboard.
-  /// Appelé uniquement quand la source principale est "nowplaying" et qu'aucune
-  /// musique n'est en cours (ou que son image est introuvable).
+  // Resolve the fallback header image when nowplaying source has no image.
+  // Only called when fallbackType != 'none'.
   Future<String> _resolveFallbackImage() async {
     try {
       switch (_fallbackType) {
@@ -618,6 +607,7 @@ class _DashboardPageState extends State<_DashboardPage> {
     return '';
   }
 
+  // Extract a dominant color from the now-playing artwork and update the accent
   Future<void> _extractColor(Map<String, dynamic> track) async {
     if (!useNowPlayingColorNotifier.value) return;
     final url = _extractImage(track['image']);
@@ -630,14 +620,15 @@ class _DashboardPageState extends State<_DashboardPage> {
     } catch (_) {}
   }
 
-  // Stats calculations
+  // ── Stat helpers ──────────────────────────────────────────────────────────
+
   int    _total()  => int.tryParse((_userInfo?['playcount'] ?? '0').toString()) ?? 0;
   int    _days()   {
     final raw = _userInfo?['registered'];
     if (raw == null) return 0;
     int ts = 0;
     if (raw is Map) { ts = int.tryParse((raw['#text'] ?? raw['unixtime'] ?? '0').toString()) ?? 0; }
-    else { ts = int.tryParse(raw.toString()) ?? 0; }
+    else            { ts = int.tryParse(raw.toString()) ?? 0; }
     if (ts <= 0) return 0;
     return ((DateTime.now().millisecondsSinceEpoch / 1000 - ts) / 86400).floor();
   }
@@ -648,12 +639,13 @@ class _DashboardPageState extends State<_DashboardPage> {
     if (raw == null) return '';
     int ts = 0;
     if (raw is Map) { ts = int.tryParse((raw['#text'] ?? raw['unixtime'] ?? '0').toString()) ?? 0; }
-    else { ts = int.tryParse(raw.toString()) ?? 0; }
+    else            { ts = int.tryParse(raw.toString()) ?? 0; }
     if (ts <= 0) return '';
     final d = DateTime.fromMillisecondsSinceEpoch(ts * 1000);
     return '${d.day} ${_kMonths[d.month]} ${d.year}';
   }
 
+  // Build a single stat card widget by id
   Widget? _buildStatCard(
     String id, {
     Map? topArtist, Map? topAlbum, Map? topTrack, Map? lastTrack,
@@ -696,53 +688,53 @@ class _DashboardPageState extends State<_DashboardPage> {
         );
       case 'total':
         return _DashStatCard(
-          emoji:       '🎯',
-          value:       _fmtFull(total),
-          label: localeNotifier.value == 'en' ? 'Total scrobbles' : 'Total scrobbles',
-          sub:         null,
-          rawInt:      total,
-          rollPrefix:  '',
+          emoji:      '🎯',
+          value:      _fmtFull(total),
+          label:      localeNotifier.value == 'en' ? 'Total scrobbles' : 'Total scrobbles',
+          sub:        null,
+          rawInt:     total,
+          rollPrefix: '',
         );
       case 'avg_day':
         return _DashStatCard(
-          emoji:       '⚡',
-          value:       '~${_fmt(avg.round())}',
-          label:       L.dashScrobblesPerDay,
-          sub:         null,
-          rawInt:      avg.round(),
-          rollPrefix:  '~',
+          emoji:      '⚡',
+          value:      '~${_fmt(avg.round())}',
+          label:      L.dashScrobblesPerDay,
+          sub:        null,
+          rawInt:     avg.round(),
+          rollPrefix: '~',
         );
       case 'avg_week':
         return _DashStatCard(
-          emoji:       '📅',
-          value:       '~${_fmt(weekly)}',
-          label:       L.dashPerWeek,
-          sub:         null,
-          rawInt:      weekly,
-          rollPrefix:  '~',
+          emoji:      '📅',
+          value:      '~${_fmt(weekly)}',
+          label:      L.dashPerWeek,
+          sub:        null,
+          rawInt:     weekly,
+          rollPrefix: '~',
         );
       case 'days_active':
         return _DashStatCard(
-          emoji:       '🗓️',
-          value:       '$days j',
-          label:       L.dashDaysActive,
-          sub:         null,
-          rawInt:      days,
-          rollSuffix:  ' j',
+          emoji:      '🗓️',
+          value:      '$days j',
+          label:      L.dashDaysActive,
+          sub:        null,
+          rawInt:     days,
+          rollSuffix: ' j',
         );
       case 'since':
         return _DashStatCard(
           emoji: '📆',
           value: regStr.isNotEmpty ? regStr : '—',
           label: localeNotifier.value == 'en' ? 'Member since' : 'Membre depuis',
-          sub: null,
+          sub:   null,
         );
       case 'country':
         return _DashStatCard(
           emoji: '🌍',
           value: (country.isNotEmpty && country != 'None') ? country : '—',
           label: localeNotifier.value == 'en' ? 'Country' : 'Pays',
-          sub: null,
+          sub:   null,
         );
       case 'top_artist_week':
         return _DashStatCard(
@@ -779,7 +771,7 @@ class _DashboardPageState extends State<_DashboardPage> {
     final scheme = Theme.of(context).colorScheme;
 
     if (_loading) return _DashboardSkeleton(scheme: Theme.of(context).colorScheme);
-    if (_error   != null) return _ErrorView(message: _error!, onRetry: _load);
+    if (_error != null) return _ErrorView(message: _error!, onRetry: _load);
 
     final info      = _userInfo!;
     final name      = (info['name']     ?? widget.username).toString();
@@ -802,13 +794,13 @@ class _DashboardPageState extends State<_DashboardPage> {
       onRefresh: _load,
       child: CustomScrollView(slivers: [
 
-        // Profile appbar — full screen cover
+        // ── Profile app bar ────────────────────────────────────────────────
         SliverAppBar(
           expandedHeight: 230,
           pinned: true,
           stretch: true,
           actions: [
-            // ── Bouton refresh + indicateur sync scrobbles ───────────
+            // Refresh button + scrobble-sync progress chip
             ValueListenableBuilder<AllScrobblesProgress>(
               valueListenable: AllScrobblesService.progressNotifier,
               builder: (_, progress, _) {
@@ -820,9 +812,9 @@ class _DashboardPageState extends State<_DashboardPage> {
                       child: _SyncProgressChip(progress: progress),
                     ),
                   _SyncRefreshButton(
-                    isSyncing:  isSyncing,
-                    onPressed:  isSyncing ? null : _load,
-                    tooltip:    L.dashRefresh,
+                    isSyncing: isSyncing,
+                    onPressed: isSyncing ? null : _load,
+                    tooltip:   L.dashRefresh,
                   ),
                 ]);
               },
@@ -830,7 +822,7 @@ class _DashboardPageState extends State<_DashboardPage> {
             IconButton(
               icon: const Icon(Icons.settings_outlined),
               onPressed: () async {
-                // Ouvre le hub de paramètres
+                // Open the settings hub
                 await Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => Scaffold(
@@ -842,8 +834,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                     ),
                   ),
                 );
-                // Au retour, recharger les préférences du dashboard pour que
-                // tout changement (source image, blur, sections…) soit appliqué.
+                // Reload prefs on return so any changes are applied immediately
                 if (mounted) {
                   await _loadPrefs();
                   _resolveHeaderImage();
@@ -861,7 +852,7 @@ class _DashboardPageState extends State<_DashboardPage> {
             background: Stack(
               fit: StackFit.expand,
               children: [
-                // Background image (cover or gradient, animated)
+                // Background image or gradient with animated transition
                 AnimatedSwitcher(
                   duration: _headerAnimation == 'none'
                       ? Duration.zero
@@ -872,7 +863,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                         return SlideTransition(
                           position: Tween<Offset>(
                             begin: const Offset(0.06, 0),
-                            end: Offset.zero,
+                            end:   Offset.zero,
                           ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
                           child: FadeTransition(opacity: anim, child: child),
                         );
@@ -882,12 +873,12 @@ class _DashboardPageState extends State<_DashboardPage> {
                               .animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
                           child: FadeTransition(opacity: anim, child: child),
                         );
-                      default: // 'fade' or others
+                      default:
                         return FadeTransition(opacity: anim, child: child);
                     }
                   },
                   child: (_headerMusicAnim && _nowPlaying != null)
-                      // Apple Music-style: blurred image slowly breathing + drifting
+                      // Apple Music-style: blurred image breathing + drifting
                       ? _AmbientHeader(
                           key: ValueKey('ambient_${_headerImageUrl}'),
                           url: _headerImageUrl,
@@ -903,7 +894,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                           : _GradientHeader(key: const ValueKey('gradient'), scheme: scheme),
                 ),
 
-                // Dark overlay for readability
+                // Dark gradient overlay for text readability
                 Positioned(
                   left: 0, right: 0, bottom: 0,
                   child: Container(
@@ -911,7 +902,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
+                        end:   Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
                           Colors.black.withValues(alpha: 0.72),
@@ -921,7 +912,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                   ),
                 ),
 
-                // Profile content
+                // Profile info (avatar + name + country + since)
                 SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 8, 70, 12),
@@ -962,21 +953,17 @@ class _DashboardPageState extends State<_DashboardPage> {
                             children: [
                               Text(name,
                                 style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
+                                  color:      Colors.white,
+                                  fontSize:   20,
                                   fontWeight: FontWeight.w800,
-                                  shadows: [Shadow(
-                                    color: Colors.black54,
-                                    blurRadius: 4,
-                                  )],
+                                  shadows: [Shadow(color: Colors.black54, blurRadius: 4)],
                                 )),
                               if (realName.isNotEmpty)
                                 Text(realName,
                                   style: TextStyle(
                                     color: Colors.white.withValues(alpha: 0.85),
                                     fontSize: 13,
-                                    shadows: const [Shadow(
-                                      color: Colors.black45, blurRadius: 4)],
+                                    shadows: const [Shadow(color: Colors.black45, blurRadius: 4)],
                                   )),
                               Row(children: [
                                 if (country.isNotEmpty && country != 'None') ...[
@@ -988,8 +975,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                                     style: TextStyle(
                                       color: Colors.white.withValues(alpha: 0.75),
                                       fontSize: 12,
-                                      shadows: const [Shadow(
-                                        color: Colors.black45, blurRadius: 4)],
+                                      shadows: const [Shadow(color: Colors.black45, blurRadius: 4)],
                                     )),
                                   const SizedBox(width: 8),
                                 ],
@@ -1002,8 +988,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                                     style: TextStyle(
                                       color: Colors.white.withValues(alpha: 0.75),
                                       fontSize: 12,
-                                      shadows: const [Shadow(
-                                        color: Colors.black45, blurRadius: 4)],
+                                      shadows: const [Shadow(color: Colors.black45, blurRadius: 4)],
                                     )),
                                 ],
                               ]),
@@ -1024,7 +1009,7 @@ class _DashboardPageState extends State<_DashboardPage> {
           sliver: SliverList(
             delegate: SliverChildListDelegate([
 
-              // Now playing
+              // Now playing card
               if (_showNowPlay && _nowPlaying != null) ...[
                 _NowPlayingCard(track: _nowPlaying!),
                 const SizedBox(height: 14),
@@ -1034,19 +1019,14 @@ class _DashboardPageState extends State<_DashboardPage> {
               if (_showStats) ...[
                 _SectionHeader(title: L.dashStats, icon: Icons.bar_chart_rounded),
                 const SizedBox(height: 10),
-
-                // Total scrobbles — full width
                 _HeroStatCard(
-                  total: total,
-                  avg: avg.round(),
-                  days: days,
+                  total:  total,
+                  avg:    avg.round(),
+                  days:   days,
                   weekly: weekly,
                   regStr: regStr,
                 ),
-
                 const SizedBox(height: 10),
-
-                // Dynamic stat cards grid
                 _StatGrid(children: _statCards.map((id) {
                   return _buildStatCard(
                     id,
@@ -1059,11 +1039,10 @@ class _DashboardPageState extends State<_DashboardPage> {
                     topTrackWeek:  _topTracksWeek.isNotEmpty  ? _topTracksWeek[0]  as Map : null,
                   );
                 }).whereType<Widget>().toList()),
-
                 const SizedBox(height: 20),
               ],
 
-              // ── Friends horizontal scroll ──────────────────────────
+              // Friends horizontal scroll
               if (_showFriends) ...[
                 _FriendsSection(
                   friends:     _friends,
@@ -1077,25 +1056,25 @@ class _DashboardPageState extends State<_DashboardPage> {
                 const SizedBox(height: 20),
               ],
 
-              // Top artists — carousel style
+              // Top artists carousel
               if (_showArtists && _topArtists.isNotEmpty) ...[
                 _SectionHeader(title: L.commonTopArtists, icon: Icons.mic_rounded),
                 const SizedBox(height: 10),
                 _HorizontalCarousel(
-                  items: _topArtists.take(10).toList(),
-                  type: 'artists',
+                  items:   _topArtists.take(10).toList(),
+                  type:    'artists',
                   service: widget.service,
                 ),
                 const SizedBox(height: 20),
               ],
 
-              // Top tracks — carousel style
+              // Top tracks carousel
               if (_showTracks && _topTracks.isNotEmpty) ...[
                 _SectionHeader(title: L.dashTopTracks, icon: Icons.music_note_rounded),
                 const SizedBox(height: 10),
                 _HorizontalCarousel(
-                  items: _topTracks.take(10).toList(),
-                  type: 'tracks',
+                  items:   _topTracks.take(10).toList(),
+                  type:    'tracks',
                   service: widget.service,
                 ),
                 const SizedBox(height: 20),
@@ -1109,7 +1088,7 @@ class _DashboardPageState extends State<_DashboardPage> {
 }
 
 
-// ── Horizontal carousel (style Spotify/Apple Music) ─────────────────────────
+// ── Horizontal Spotify/Apple Music-style carousel ─────────────────────────────
 
 class _HorizontalCarousel extends StatelessWidget {
   final List<dynamic>  items;
@@ -1124,9 +1103,9 @@ class _HorizontalCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Hauteur de la carte : ~55 % de la largeur de l'écran, max 220
+    // Card width ~52 % of screen width, capped at 220
     final cardW = (MediaQuery.of(context).size.width * 0.52).clamp(160.0, 220.0);
-    final cardH = cardW * 1.10; // ratio légèrement portrait
+    final cardH = cardW * 1.10; // slightly portrait ratio
 
     return SizedBox(
       height: cardH,
@@ -1156,13 +1135,13 @@ class _HorizontalCarousel extends StatelessWidget {
           return Padding(
             padding: EdgeInsets.only(left: i == 0 ? 0 : 10),
             child: _CarouselCard(
-              width:  cardW,
-              height: cardH,
-              name:   name,
-              sub:    type != 'artists' ? artist : '',
-              plays:  _fmt(plays),
-              rank:   '${i + 1}',
-              initialUrl: raw,
+              width:       cardW,
+              height:      cardH,
+              name:        name,
+              sub:         type != 'artists' ? artist : '',
+              plays:       _fmt(plays),
+              rank:        '${i + 1}',
+              initialUrl:  raw,
               imageFuture: imgFuture,
               onTap: () => showDetailSheet(
                 ctx,
@@ -1178,8 +1157,8 @@ class _HorizontalCarousel extends StatelessWidget {
   }
 }
 
-// ── Individual card in the horizontal carousel ────────────────────────────────
-// StatefulWidget so we can track the pressed state for a scale-down feedback.
+
+// ── Single carousel card (StatefulWidget for press-scale feedback) ─────────────
 
 class _CarouselCard extends StatefulWidget {
   final double  width, height;
@@ -1217,7 +1196,6 @@ class _CarouselCardState extends State<_CarouselCard> {
       onTapUp:     (_) => setState(() => _pressed = false),
       onTapCancel: ()  => setState(() => _pressed = false),
       child: AnimatedScale(
-        // Subtle press-down feedback
         scale:    _pressed ? 0.96 : 1.0,
         duration: const Duration(milliseconds: 120),
         curve:    Curves.easeOut,
@@ -1227,109 +1205,108 @@ class _CarouselCardState extends State<_CarouselCard> {
             width: widget.width, height: widget.height,
             child: Stack(fit: StackFit.expand, children: [
 
-            // ── Background image (full bleed) ────────────────────────────
-            _CarouselImage(
-              initialUrl: widget.initialUrl,
-              resolver:   () => widget.imageFuture,
-              width:  widget.width,
-              height: widget.height,
-            ),
+              // Full-bleed background image
+              _CarouselImage(
+                initialUrl: widget.initialUrl,
+                resolver:   () => widget.imageFuture,
+                width:      widget.width,
+                height:     widget.height,
+              ),
 
-            // ── Dégradé bas → opaque ─────────────────────────────────
-            DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end:   Alignment.bottomCenter,
-                  stops: const [0.35, 0.72, 1.0],
-                  colors: [
-                    Colors.transparent,
-                    Colors.black.withValues(alpha: 0.55),
-                    Colors.black.withValues(alpha: 0.85),
+              // Bottom gradient for text readability
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin:  Alignment.topCenter,
+                    end:    Alignment.bottomCenter,
+                    stops:  const [0.35, 0.72, 1.0],
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.55),
+                      Colors.black.withValues(alpha: 0.85),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Text content at the bottom
+              Positioned(
+                left: 10, right: 10, bottom: 10,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: text.bodyMedium?.copyWith(
+                        color:      Colors.white,
+                        fontWeight: FontWeight.w800,
+                        height:     1.2,
+                        shadows: [
+                          Shadow(color: Colors.black.withValues(alpha: 0.6), blurRadius: 8),
+                        ],
+                      ),
+                    ),
+                    if (widget.sub.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        widget.sub,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: text.bodySmall?.copyWith(
+                          color:  Colors.white.withValues(alpha: 0.75),
+                          height: 1.2,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 6),
+                    // Plays pill + rank badge
+                    Row(children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        decoration: BoxDecoration(
+                          color:        Colors.white.withValues(alpha: 0.18),
+                          borderRadius: BorderRadius.circular(20),
+                          border:       Border.all(
+                              color: Colors.white.withValues(alpha: 0.25), width: 0.8),
+                        ),
+                        child: Text(
+                          '${widget.plays} ${L.commonPlays}',
+                          style: text.labelSmall?.copyWith(
+                              color: Colors.white, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        width: 26, height: 26,
+                        decoration: BoxDecoration(
+                          color:  Colors.white.withValues(alpha: 0.15),
+                          shape:  BoxShape.circle,
+                          border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.35), width: 1),
+                        ),
+                        child: Center(
+                          child: Text(
+                            widget.rank,
+                            style: text.labelSmall?.copyWith(
+                                color: Colors.white, fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                      ),
+                    ]),
                   ],
                 ),
               ),
-            ),
-
-            // ── Contenu texte bas ─────────────────────────────────────
-            Positioned(
-              left: 10, right: 10, bottom: 10,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    widget.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: text.bodyMedium?.copyWith(
-                      color:      Colors.white,
-                      fontWeight: FontWeight.w800,
-                      height:     1.2,
-                      shadows: [
-                        Shadow(color: Colors.black.withValues(alpha: 0.6),
-                            blurRadius: 8),
-                      ],
-                    ),
-                  ),
-                  if (widget.sub.isNotEmpty) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      widget.sub,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: text.bodySmall?.copyWith(
-                        color:  Colors.white.withValues(alpha: 0.75),
-                        height: 1.2,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 6),
-                  // Plays pill + rank badge
-                  Row(children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                      decoration: BoxDecoration(
-                        color:        Colors.white.withValues(alpha: 0.18),
-                        borderRadius: BorderRadius.circular(20),
-                        border:       Border.all(
-                            color: Colors.white.withValues(alpha: 0.25), width: 0.8),
-                      ),
-                      child: Text(
-                        '${widget.plays} ${L.commonPlays}',
-                        style: text.labelSmall?.copyWith(
-                            color: Colors.white, fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    const Spacer(),
-                    // Rank badge
-                    Container(
-                      width: 26, height: 26,
-                      decoration: BoxDecoration(
-                        color:        Colors.white.withValues(alpha: 0.15),
-                        shape:        BoxShape.circle,
-                        border:       Border.all(
-                            color: Colors.white.withValues(alpha: 0.35), width: 1),
-                      ),
-                      child: Center(
-                        child: Text(
-                          widget.rank,
-                          style: text.labelSmall?.copyWith(
-                              color: Colors.white, fontWeight: FontWeight.w800),
-                        ),
-                      ),
-                    ),
-                  ]),
-                ],
-              ),
-            ),
-          ]),
+            ]),
+          ),
         ),
       ),
-    ),  // AnimatedScale
-  );
+    );
   }
 }
+
 
 // ── Full-bleed background image for carousel cards ────────────────────────────
 
@@ -1388,14 +1365,16 @@ class _CarouselImage extends StatelessWidget {
 }
 
 
+// ── Friends section (header + horizontal scroll) ──────────────────────────────
+
 class _FriendsSection extends StatelessWidget {
-  final List<_FriendData>   friends;
-  final Set<String>         favorites;
-  final Set<String>         favProfiles;   // profiles starred from search
-  final LastFmService       service;
-  final bool                isLoading;
+  final List<_FriendData>                           friends;
+  final Set<String>                                 favorites;
+  final Set<String>                                 favProfiles;
+  final LastFmService                               service;
+  final bool                                        isLoading;
   final void Function(String username, bool nowFav) onToggleFav;
-  final VoidCallback        onRefresh;
+  final VoidCallback                                onRefresh;
 
   const _FriendsSection({
     required this.friends,
@@ -1409,17 +1388,15 @@ class _FriendsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme      = Theme.of(context).colorScheme;
-    final text        = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-      // Section header row
+      // Section header + manual refresh button
       Row(children: [
         _SectionHeader(title: L.dashFriends, icon: Icons.people_rounded),
         const Spacer(),
-
-        // Refresh icon
         if (!isLoading)
           IconButton(
             icon: const Icon(Icons.refresh_rounded, size: 18),
@@ -1431,11 +1408,10 @@ class _FriendsSection extends StatelessWidget {
 
       const SizedBox(height: 10),
 
-      // Scrollable list
       SizedBox(
         height: 152,
         child: isLoading
-            // Loading shimmer row
+            // Shimmer placeholders while loading
             ? ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: 5,
@@ -1443,22 +1419,20 @@ class _FriendsSection extends StatelessWidget {
                 itemBuilder: (_, _) => _FriendCardSkeleton(scheme: scheme),
               )
             : friends.isEmpty
-                // Empty state
                 ? Center(
                     child: Text(
                       L.dashNoFriends,
                       style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                     ),
                   )
-                // Friend cards
                 : ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: friends.length,
                     padding: EdgeInsets.zero,
                     itemBuilder: (ctx, i) {
-                      final f      = friends[i];
-                      final isFav  = favorites.contains(f.username)
-                                  || favProfiles.contains(f.username);
+                      final f     = friends[i];
+                      final isFav = favorites.contains(f.username)
+                                 || favProfiles.contains(f.username);
                       return _FriendCard(
                         friend:      f,
                         isFav:       isFav,
@@ -1473,7 +1447,7 @@ class _FriendsSection extends StatelessWidget {
 }
 
 
-// ── Single friend card ───────────────────────────────────────────────────────
+// ── Single friend card ────────────────────────────────────────────────────────
 
 class _FriendCard extends StatefulWidget {
   final _FriendData   friend;
@@ -1495,11 +1469,11 @@ class _FriendCard extends StatefulWidget {
 class _FriendCardState extends State<_FriendCard> {
   static const _ph = '2a96cbd8b46e442fc41c2b86b821562f';
   String _bgUrl   = '';
-  bool   _pressed = false;   // tracks tap-down for scale feedback
+  bool   _pressed = false;
 
-  _FriendData  get friend      => widget.friend;
-  bool         get isFav       => widget.isFav;
-  LastFmService get service    => widget.service;
+  _FriendData   get friend      => widget.friend;
+  bool          get isFav       => widget.isFav;
+  LastFmService get service     => widget.service;
   VoidCallback  get onToggleFav => widget.onToggleFav;
 
   bool get _hasAvatar =>
@@ -1508,6 +1482,7 @@ class _FriendCardState extends State<_FriendCard> {
   @override
   void initState() {
     super.initState();
+    // Prefetch now-playing artwork for the card background
     if (friend.isOnline && friend.nowPlayingTrack.isNotEmpty) {
       _resolveBg();
     }
@@ -1523,8 +1498,8 @@ class _FriendCardState extends State<_FriendCard> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme   = Theme.of(context).colorScheme;
-    final text     = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
 
     final subtitle = friend.isOnline
         ? (friend.nowPlayingTrack.isNotEmpty ? friend.nowPlayingTrack : 'En écoute')
@@ -1543,184 +1518,180 @@ class _FriendCardState extends State<_FriendCard> {
         scale:    _pressed ? 0.95 : 1.0,
         duration: const Duration(milliseconds: 130),
         curve:    Curves.easeOut,
-      child: Container(
-        width: 116,
-        margin: const EdgeInsets.only(right: 10),
-        decoration: BoxDecoration(
-          color: friend.isOnline
-              ? scheme.primaryContainer.withValues(alpha: 0.45)
-              : scheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
+        child: Container(
+          width: 116,
+          margin: const EdgeInsets.only(right: 10),
+          decoration: BoxDecoration(
             color: friend.isOnline
-                ? scheme.primary.withValues(alpha: 0.28)
-                : scheme.outlineVariant.withValues(alpha: 0.45),
+                ? scheme.primaryContainer.withValues(alpha: 0.45)
+                : scheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: friend.isOnline
+                  ? scheme.primary.withValues(alpha: 0.28)
+                  : scheme.outlineVariant.withValues(alpha: 0.45),
+            ),
           ),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Stack(children: [
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Stack(children: [
 
-            // ── Blurred album art background (online only) ─────
-            if (_bgUrl.isNotEmpty)
-              Positioned.fill(
-                child: Opacity(
-                  opacity: 0.35,
-                  child: ImageFiltered(
-                    imageFilter: ImageFilter.blur(
-                        sigmaX: 14, sigmaY: 14, tileMode: TileMode.clamp),
-                    child: Image.network(
-                      _bgUrl,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                    ),
-                  ),
-                ),
-              ),
-
-            // ── Subtle overlay so text stays readable ──────────
-            if (friend.isOnline)
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        scheme.primaryContainer.withValues(alpha: 0.25),
-                        scheme.primaryContainer.withValues(alpha: 0.45),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-            // ── Card content ───────────────────────────────────
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-
-                  // Avatar + status dot
-                  SizedBox(
-                    width: 60, height: 60,
-                    child: Stack(children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundColor: scheme.primary.withValues(alpha: 0.2),
-                        backgroundImage: _hasAvatar ? NetworkImage(friend.avatarUrl) : null,
-                        child: _hasAvatar
-                            ? null
-                            : Text(
-                                friend.username.isNotEmpty
-                                    ? friend.username[0].toUpperCase()
-                                    : '?',
-                                style: text.titleMedium?.copyWith(
-                                    color: scheme.primary, fontWeight: FontWeight.w800),
-                              ),
+              // Blurred album art background (online only)
+              if (_bgUrl.isNotEmpty)
+                Positioned.fill(
+                  child: Opacity(
+                    opacity: 0.35,
+                    child: ImageFiltered(
+                      imageFilter: ImageFilter.blur(
+                          sigmaX: 14, sigmaY: 14, tileMode: TileMode.clamp),
+                      child: Image.network(
+                        _bgUrl,
+                        fit: BoxFit.cover,
+                        width:  double.infinity,
+                        height: double.infinity,
+                        errorBuilder: (_, _, _) => const SizedBox.shrink(),
                       ),
-                      Positioned(
-                        right: 0, bottom: 0,
-                        child: Container(
-                          width: 14, height: 14,
-                          decoration: BoxDecoration(
-                            color:  friend.isOnline ? Colors.green : scheme.outline,
-                            shape:  BoxShape.circle,
-                            border: Border.all(color: scheme.surface, width: 2),
+                    ),
+                  ),
+                ),
+
+              // Subtle tint so text stays readable over blurred art
+              if (friend.isOnline)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end:   Alignment.bottomCenter,
+                        colors: [
+                          scheme.primaryContainer.withValues(alpha: 0.25),
+                          scheme.primaryContainer.withValues(alpha: 0.45),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+              // Card content
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+
+                    // Avatar + online/offline status dot
+                    SizedBox(
+                      width: 60, height: 60,
+                      child: Stack(children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundColor: scheme.primary.withValues(alpha: 0.2),
+                          backgroundImage: _hasAvatar ? NetworkImage(friend.avatarUrl) : null,
+                          child: _hasAvatar
+                              ? null
+                              : Text(
+                                  friend.username.isNotEmpty
+                                      ? friend.username[0].toUpperCase()
+                                      : '?',
+                                  style: text.titleMedium?.copyWith(
+                                      color: scheme.primary, fontWeight: FontWeight.w800),
+                                ),
+                        ),
+                        Positioned(
+                          right: 0, bottom: 0,
+                          child: Container(
+                            width: 14, height: 14,
+                            decoration: BoxDecoration(
+                              color:  friend.isOnline ? Colors.green : scheme.outline,
+                              shape:  BoxShape.circle,
+                              border: Border.all(color: scheme.surface, width: 2),
+                            ),
+                          ),
+                        ),
+                      ]),
+                    ),
+
+                    const SizedBox(height: 6),
+
+                    // Username
+                    Text(
+                      friend.username,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: text.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        shadows: friend.isOnline
+                            ? [const Shadow(color: Colors.black26, blurRadius: 4)]
+                            : null,
+                      ),
+                    ),
+
+                    const SizedBox(height: 2),
+
+                    // Track or status line
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Flexible(
+                        child: Text(
+                          subtitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: text.labelSmall?.copyWith(
+                            color: friend.isOnline
+                                ? Colors.green.shade700
+                                : scheme.onSurfaceVariant,
+                            fontWeight: friend.isOnline ? FontWeight.w600 : FontWeight.normal,
+                            shadows: friend.isOnline
+                                ? [const Shadow(color: Colors.black26, blurRadius: 3)]
+                                : null,
                           ),
                         ),
                       ),
                     ]),
-                  ),
 
-                  const SizedBox(height: 6),
-
-                  // Username
-                  Text(
-                    friend.username,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: text.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      shadows: friend.isOnline
-                          ? [const Shadow(color: Colors.black26, blurRadius: 4)]
-                          : null,
-                    ),
-                  ),
-
-                  const SizedBox(height: 2),
-
-                  // Status line
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Flexible(
-                      child: Text(
-                        subtitle,
+                    // Artist name (second line)
+                    if (subtitleArtist.isNotEmpty) ...[
+                      const SizedBox(height: 1),
+                      Text(
+                        subtitleArtist,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.center,
                         style: text.labelSmall?.copyWith(
-                          color: friend.isOnline
-                              ? Colors.green.shade700
-                              : scheme.onSurfaceVariant,
-                          fontWeight: friend.isOnline ? FontWeight.w600 : FontWeight.normal,
+                          color: scheme.onSurfaceVariant,
+                          fontSize: 9,
                           shadows: friend.isOnline
                               ? [const Shadow(color: Colors.black26, blurRadius: 3)]
                               : null,
                         ),
                       ),
-                    ),
-                  ]),
-
-                  // Artist name
-                  if (subtitleArtist.isNotEmpty) ...[
-                    const SizedBox(height: 1),
-                    Text(
-                      subtitleArtist,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: text.labelSmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                        fontSize: 9,
-                        shadows: friend.isOnline
-                            ? [const Shadow(color: Colors.black26, blurRadius: 3)]
-                            : null,
-                      ),
-                    ),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
 
-          ]),
+            ]),
+          ),
         ),
       ),
-      ), // AnimatedScale
     );
   }
 
+  // Open the full profile sheet — same widget used in Search for consistency
   void _openProfile(BuildContext context) {
-    showModalBottomSheet(
-      context:           context,
-      isScrollControlled: true,
-      backgroundColor:   Colors.transparent,
-      useSafeArea:       true,
-      builder: (_) => _FriendProfileSheet(
-        friend:      friend,
-        service:     service,
-        isFav:       isFav,
-        onToggleFav: onToggleFav,
-      ),
+    showProfileSheet(
+      context,
+      friend.username,
+      service,
+      isFav:       isFav,
+      onToggleFav: onToggleFav,
     );
   }
 }
 
 
-// ── Skeleton placeholder card shown while friends load ──────────────────────
+// ── Skeleton placeholder while friends load ───────────────────────────────────
 
 class _FriendCardSkeleton extends StatelessWidget {
   final ColorScheme scheme;
@@ -1728,13 +1699,12 @@ class _FriendCardSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final base = scheme.surfaceContainerHighest;
     return Container(
       width: 116,
       margin: const EdgeInsets.only(right: 10),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: base,
+        color: scheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45)),
       ),
@@ -1762,329 +1732,8 @@ class _FriendCardSkeleton extends StatelessWidget {
 }
 
 
-// ── Friend profile bottom sheet ──────────────────────────────────────────────
+// ── Fallback gradient header ──────────────────────────────────────────────────
 
-class _FriendProfileSheet extends StatefulWidget {
-  final _FriendData   friend;
-  final LastFmService service;
-  final bool          isFav;
-  final VoidCallback  onToggleFav;
-  const _FriendProfileSheet({
-    required this.friend,
-    required this.service,
-    required this.isFav,
-    required this.onToggleFav,
-  });
-
-  @override
-  State<_FriendProfileSheet> createState() => _FriendProfileSheetState();
-}
-
-class _FriendProfileSheetState extends State<_FriendProfileSheet> {
-  List<dynamic> _recent  = [];
-  bool          _loading = true;
-  late bool     _isFav;
-
-  @override
-  void initState() {
-    super.initState();
-    _isFav = widget.isFav;
-    _load();
-  }
-
-  Future<void> _load() async {
-    try {
-      final d = await widget.service.getRecentTracks(
-          user: widget.friend.username, limit: 10);
-      final raw    = d['track'];
-      final tracks = raw is List ? raw : (raw != null ? [raw] : <dynamic>[]);
-      if (mounted) setState(() { _recent = tracks; _loading = false; });
-    } catch (_) {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  static const _ph = '2a96cbd8b46e442fc41c2b86b821562f';
-
-  bool _hasAvatar(String url) => url.isNotEmpty && !url.contains(_ph);
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
-    final f      = widget.friend;
-
-    return DraggableScrollableSheet(
-      initialChildSize: 0.58,
-      minChildSize:     0.38,
-      maxChildSize:     0.88,
-      expand: false,
-      builder: (ctx, ctrl) => ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        child: Container(
-          color: scheme.surface,
-          child: ListView(controller: ctrl, children: [
-
-            // Drag handle
-            Center(
-              child: Container(
-                margin: const EdgeInsets.only(top: 10, bottom: 8),
-                width: 36, height: 4,
-                decoration: BoxDecoration(
-                    color: scheme.outlineVariant,
-                    borderRadius: BorderRadius.circular(2)),
-              ),
-            ),
-
-            // ── Profile header ────────────────────────────────
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              child: Row(children: [
-
-                // Avatar + status dot
-                SizedBox(
-                  width: 68, height: 68,
-                  child: Stack(children: [
-                    CircleAvatar(
-                      radius: 34,
-                      backgroundColor: scheme.primaryContainer,
-                      backgroundImage: _hasAvatar(f.avatarUrl)
-                          ? NetworkImage(f.avatarUrl) : null,
-                      child: _hasAvatar(f.avatarUrl)
-                          ? null
-                          : Text(
-                              f.username.isNotEmpty
-                                  ? f.username[0].toUpperCase()
-                                  : '?',
-                              style: text.titleLarge?.copyWith(
-                                  color: scheme.onPrimaryContainer,
-                                  fontWeight: FontWeight.w800),
-                            ),
-                    ),
-                    Positioned(
-                      right: 2, bottom: 2,
-                      child: Container(
-                        width: 16, height: 16,
-                        decoration: BoxDecoration(
-                          color:  f.isOnline ? Colors.green : scheme.outline,
-                          shape:  BoxShape.circle,
-                          border: Border.all(color: scheme.surface, width: 2),
-                        ),
-                      ),
-                    ),
-                  ]),
-                ),
-
-                const SizedBox(width: 16),
-
-                Expanded(child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(f.username,
-                        style: text.titleLarge
-                            ?.copyWith(fontWeight: FontWeight.w800)),
-                    if (f.realName.isNotEmpty)
-                      Text(f.realName,
-                          style: text.bodySmall
-                              ?.copyWith(color: scheme.onSurfaceVariant)),
-                    const SizedBox(height: 6),
-                    // Online / offline badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: f.isOnline
-                            ? Colors.green.withValues(alpha: 0.12)
-                            : scheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(mainAxisSize: MainAxisSize.min, children: [
-                        Container(
-                          width: 6, height: 6,
-                          decoration: BoxDecoration(
-                            color: f.isOnline
-                                ? Colors.green
-                                : scheme.outlineVariant,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          f.isOnline ? 'En écoute' : 'Hors ligne',
-                          style: text.labelSmall?.copyWith(
-                            color: f.isOnline
-                                ? Colors.green.shade700
-                                : scheme.onSurfaceVariant,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ]),
-                    ),
-                  ],
-                )),
-
-                // ── Favourite star (profile only) ─────────────
-                IconButton(
-                  icon: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 250),
-                    transitionBuilder: (child, anim) => ScaleTransition(
-                        scale: Tween<double>(begin: 0.7, end: 1.0).animate(
-                            CurvedAnimation(parent: anim, curve: Curves.easeOutBack)),
-                        child: child),
-                    child: Icon(
-                      _isFav ? Icons.star_rounded : Icons.star_outline_rounded,
-                      key: ValueKey(_isFav),
-                      color: _isFav
-                          ? Colors.amber.shade600
-                          : scheme.onSurfaceVariant,
-                      size: 26,
-                    ),
-                  ),
-                  tooltip: _isFav ? 'Retirer des favoris' : 'Ajouter aux favoris',
-                  onPressed: () {
-                    widget.onToggleFav();
-                    setState(() => _isFav = !_isFav);
-                  },
-                ),
-              ]),
-            ),
-
-            // ── Now playing card (if active) ──────────────────
-            if (f.isOnline && f.nowPlayingTrack.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-                child: Card(
-                  elevation: 0,
-                  color: scheme.secondaryContainer,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: _cardBorder(scheme)),
-                  child: ListTile(
-                    leading: Icon(Icons.music_note_rounded,
-                        color: scheme.secondary),
-                    title: Text(f.nowPlayingTrack,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: text.bodyMedium
-                            ?.copyWith(fontWeight: FontWeight.w700)),
-                    subtitle: f.nowPlayingArtist.isNotEmpty
-                        ? Text(f.nowPlayingArtist,
-                            maxLines: 1, overflow: TextOverflow.ellipsis)
-                        : null,
-                    trailing: Container(
-                      width: 8, height: 8,
-                      decoration: const BoxDecoration(
-                          color: Colors.green, shape: BoxShape.circle),
-                    ),
-                  ),
-                ),
-              ),
-
-            const Divider(indent: 16, endIndent: 16, height: 20),
-
-            // ── Recent tracks ─────────────────────────────────
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(L.commonRecentTracks,
-                  style: text.titleSmall
-                      ?.copyWith(fontWeight: FontWeight.w700)),
-            ),
-            const SizedBox(height: 4),
-
-            if (_loading)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 32),
-                child: Center(
-                  child: SizedBox(
-                    width: 24, height: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-                    ),
-                  ),
-                ),
-              )
-            else if (_recent.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Center(
-                    child: Text(L.commonNoRecentTracks,
-                        style: text.bodySmall
-                            ?.copyWith(color: scheme.onSurfaceVariant))),
-              )
-            else
-              ..._recent.map((t) {
-                final tMap    = t as Map<String, dynamic>;
-                final isNp    = tMap['@attr']?['nowplaying'] == 'true';
-                final tName   = (tMap['name'] ?? '').toString();
-                final tArtist =
-                    (tMap['artist']?['#text'] ?? '').toString();
-                final rawUrl  = _extractImage(tMap['image']);
-                final hasImg  = rawUrl.isNotEmpty && !rawUrl.contains(_ph);
-
-                return ListTile(
-                  leading: Stack(children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(6),
-                      child: hasImg
-                          ? Image.network(rawUrl,
-                              width: 40, height: 40, fit: BoxFit.cover,
-                              errorBuilder: (_, _, _) => Container(
-                                  width: 40, height: 40,
-                                  color: scheme.surfaceContainerHighest,
-                                  child: Icon(Icons.music_note_rounded,
-                                      color: scheme.onSurfaceVariant)))
-                          : Container(
-                              width: 40, height: 40,
-                              color: scheme.surfaceContainerHighest,
-                              child: Icon(Icons.music_note_rounded,
-                                  color: scheme.onSurfaceVariant)),
-                    ),
-                    if (isNp)
-                      Positioned(
-                        right: 0, bottom: 0,
-                        child: Container(
-                          width: 8, height: 8,
-                          decoration: const BoxDecoration(
-                              color: Colors.green, shape: BoxShape.circle),
-                        ),
-                      ),
-                  ]),
-                  title: Text(tName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: text.bodySmall
-                          ?.copyWith(fontWeight: FontWeight.w600)),
-                  subtitle: Text(tArtist,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: text.labelSmall
-                          ?.copyWith(color: scheme.onSurfaceVariant)),
-                  trailing: isNp
-                      ? Text(L.commonNowPlayingBadge,
-                          style: text.labelSmall?.copyWith(
-                              color: Colors.green,
-                              fontWeight: FontWeight.w700))
-                      : Text(
-                          _localTimeString(tMap),
-                          style: text.labelSmall?.copyWith(
-                              color: scheme.onSurfaceVariant,
-                              fontSize: 9),
-                        ),
-                  dense: true,
-                );
-              }),
-
-            const SizedBox(height: 24),
-          ]),
-        ),
-      ),
-    );
-  }
-}
-
-
-// Fallback gradient for header
 class _GradientHeader extends StatelessWidget {
   final ColorScheme scheme;
   const _GradientHeader({super.key, required this.scheme});
@@ -2095,23 +1744,22 @@ class _GradientHeader extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            scheme.primary,
-            scheme.secondary,
-            scheme.tertiary,
-          ],
+          end:   Alignment.bottomRight,
+          colors: [scheme.primary, scheme.secondary, scheme.tertiary],
         ),
       ),
     );
   }
 }
 
-// Header image with optional blur
+
+// ── Header image with optional blur ──────────────────────────────────────────
+
 class _BlurredHeaderImage extends StatelessWidget {
-  final String url;
-  final double blur;
+  final String      url;
+  final double      blur;
   final ColorScheme scheme;
+
   const _BlurredHeaderImage({
     super.key,
     required this.url,
@@ -2131,10 +1779,7 @@ class _BlurredHeaderImage extends StatelessWidget {
     if (blur > 0.5) {
       img = ImageFiltered(
         imageFilter: ImageFilter.blur(
-          sigmaX: blur,
-          sigmaY: blur,
-          tileMode: TileMode.clamp,
-        ),
+          sigmaX: blur, sigmaY: blur, tileMode: TileMode.clamp),
         child: img,
       );
     }
@@ -2142,7 +1787,8 @@ class _BlurredHeaderImage extends StatelessWidget {
   }
 }
 
-// ── Dashboard skeleton (Material You 3) ─────────────────────────────────────
+
+// ── Dashboard loading skeleton ────────────────────────────────────────────────
 
 class _DashboardSkeleton extends StatelessWidget {
   final ColorScheme scheme;
@@ -2169,7 +1815,7 @@ class _DashboardSkeleton extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                  end:   Alignment.bottomRight,
                   colors: [
                     scheme.primaryContainer.withValues(alpha: 0.55),
                     scheme.secondaryContainer.withValues(alpha: 0.45),
@@ -2197,7 +1843,7 @@ class _DashboardSkeleton extends StatelessWidget {
                           children: [
                             _bone(w: 120, h: 16, r: 8),
                             const SizedBox(height: 6),
-                            _bone(w: 80, h: 11, r: 6),
+                            _bone(w: 80,  h: 11, r: 6),
                             const SizedBox(height: 6),
                             _bone(w: 100, h: 10, r: 6),
                           ],
@@ -2277,7 +1923,7 @@ class _DashboardSkeleton extends StatelessWidget {
                     children: [
                       _bone(w: 140, h: 13, r: 6),
                       const SizedBox(height: 5),
-                      _bone(w: 80, h: 10, r: 5),
+                      _bone(w: 80,  h: 10, r: 5),
                     ],
                   )),
                 ]),
@@ -2290,10 +1936,13 @@ class _DashboardSkeleton extends StatelessWidget {
   }
 }
 
+
+// ── Generic skeleton card ─────────────────────────────────────────────────────
+
 class _SkeletonCard extends StatelessWidget {
   final ColorScheme scheme;
-  final double height;
-  final Color? color;
+  final double      height;
+  final Color?      color;
   const _SkeletonCard({required this.scheme, required this.height, this.color});
 
   @override
@@ -2307,24 +1956,26 @@ class _SkeletonCard extends StatelessWidget {
   );
 }
 
-// ── Casino-style rolling number ──────────────────────────────────────────────
+
+// ── Casino-style rolling number ───────────────────────────────────────────────
 // Counts from 0 to [target] once when first shown.
 // Use key: ValueKey(target) at call sites so it replays after a refresh.
+
 class _RollingNumber extends StatefulWidget {
-  final int      target;
+  final int        target;
   final TextStyle? style;
-  final String   prefix;
-  final String   suffix;
-  final Duration duration;
-  final bool     fullFormat; // true → _fmtFull, false → _fmt
+  final String     prefix;
+  final String     suffix;
+  final Duration   duration;
+  final bool       fullFormat; // true = _fmtFull, false = _fmt
 
   const _RollingNumber({
     super.key,
     required this.target,
     this.style,
-    this.prefix    = '',
-    this.suffix    = '',
-    this.duration  = const Duration(milliseconds: 1100),
+    this.prefix     = '',
+    this.suffix     = '',
+    this.duration   = const Duration(milliseconds: 1100),
     this.fullFormat = false,
   });
 
@@ -2341,7 +1992,7 @@ class _RollingNumberState extends State<_RollingNumber>
   void initState() {
     super.initState();
     _ctrl = AnimationController(vsync: this, duration: widget.duration);
-    // Ease out so it slows down at the end — classic slot machine feel
+    // Ease out so it slows down at the end — slot machine feel
     _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
     _ctrl.forward();
   }
@@ -2357,7 +2008,7 @@ class _RollingNumberState extends State<_RollingNumber>
     return AnimatedBuilder(
       animation: _anim,
       builder: (_, __) {
-        final current  = (_anim.value * widget.target).round();
+        final current   = (_anim.value * widget.target).round();
         final formatted = widget.fullFormat ? _fmtFull(current) : _fmt(current);
         return Text(
           '${widget.prefix}$formatted${widget.suffix}',
@@ -2368,9 +2019,12 @@ class _RollingNumberState extends State<_RollingNumber>
   }
 }
 
-// Full number with thousand separator
+
+// ── Number formatters ─────────────────────────────────────────────────────────
+
+// Full number with narrow no-break space as thousands separator
 String _fmtFull(int n) {
-  final s = n.toString();
+  final s   = n.toString();
   final buf = StringBuffer();
   for (var i = 0; i < s.length; i++) {
     if (i > 0 && (s.length - i) % 3 == 0) buf.write('\u202F');
@@ -2379,13 +2033,20 @@ String _fmtFull(int n) {
   return buf.toString();
 }
 
-// Full-width hero stat card
+
+// ── Full-width hero stat card (total + avg + weekly + active days) ────────────
 
 class _HeroStatCard extends StatelessWidget {
-  final int total, avg, days, weekly;
+  final int    total, avg, days, weekly;
   final String regStr;
-  const _HeroStatCard({required this.total, required this.avg, required this.days,
-      required this.weekly, required this.regStr});
+
+  const _HeroStatCard({
+    required this.total,
+    required this.avg,
+    required this.days,
+    required this.weekly,
+    required this.regStr,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -2402,13 +2063,12 @@ class _HeroStatCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // Main row
+          // Total scrobbles with rolling animation
           Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
             const Text('🎯', style: TextStyle(fontSize: 26)),
             const SizedBox(width: 12),
-            // Casino roll: counts up from 0 to total on first view
             _RollingNumber(
-              key: ValueKey(total),
+              key:        ValueKey(total),
               target:     total,
               fullFormat: true,
               duration:   const Duration(milliseconds: 1300),
@@ -2427,7 +2087,7 @@ class _HeroStatCard extends StatelessWidget {
             ),
           ]),
           const SizedBox(height: 14),
-          // Sub-metrics
+          // Sub-metrics row
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -2453,16 +2113,17 @@ class _HeroStatCard extends StatelessWidget {
     );
   }
 
-  Widget _vDivider(Color c) => Container(
-      width: 1, height: 32,
-      color: c.withValues(alpha: 0.15));
+  Widget _vDivider(Color c) =>
+      Container(width: 1, height: 32, color: c.withValues(alpha: 0.15));
 }
+
+
+// ── Small metric item inside the hero card ────────────────────────────────────
 
 class _MiniMetric extends StatelessWidget {
   final String  emoji, label;
   final Color   color;
-  // Optional raw int — when set, the value rolls up from 0.
-  // When null, [staticValue] is shown as-is.
+  // When set, the value rolls up from 0. Otherwise [staticValue] is shown as-is.
   final int?    rawInt;
   final String  prefix;
   final String  suffix;
@@ -2480,14 +2141,13 @@ class _MiniMetric extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
+    final text       = Theme.of(context).textTheme;
     final valueStyle = text.bodyMedium?.copyWith(
         fontWeight: FontWeight.w800, color: color);
 
     return Column(mainAxisSize: MainAxisSize.min, children: [
       Text(emoji, style: const TextStyle(fontSize: 16)),
       const SizedBox(height: 2),
-      // Use rolling animation when a raw int is provided
       if (rawInt != null)
         _RollingNumber(
           key:      ValueKey('mini_${rawInt}_$prefix$suffix'),
@@ -2498,14 +2158,18 @@ class _MiniMetric extends StatelessWidget {
           style:    valueStyle,
         )
       else
-        Text(staticValue ?? '', style: valueStyle),
-      Text(label, style: text.labelSmall?.copyWith(
-          color: color.withValues(alpha: 0.65))),
+        Text(staticValue ?? '—', style: valueStyle),
+      const SizedBox(height: 1),
+      Text(label,
+          style: text.labelSmall?.copyWith(
+              color: color.withValues(alpha: 0.65), fontSize: 9)),
     ]);
   }
 }
 
-// 2-column grid
+
+// ── 2-column grid for stat cards ──────────────────────────────────────────────
+
 class _StatGrid extends StatelessWidget {
   final List<Widget> children;
   const _StatGrid({required this.children});
@@ -2526,11 +2190,13 @@ class _StatGrid extends StatelessWidget {
   }
 }
 
-// Secondary stat card
+
+// ── Secondary stat card ───────────────────────────────────────────────────────
+
 class _DashStatCard extends StatelessWidget {
   final String  emoji, value, label;
   final String? sub;
-  // When set, the value text rolls up from 0 instead of appearing instantly
+  // When set, the value rolls up from 0 instead of appearing instantly
   final int?    rawInt;
   final String  rollPrefix;
   final String  rollSuffix;
@@ -2547,8 +2213,8 @@ class _DashStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
+    final scheme     = Theme.of(context).colorScheme;
+    final text       = Theme.of(context).textTheme;
     final valueStyle = text.bodyLarge?.copyWith(
         fontWeight: FontWeight.w800, color: scheme.onSurface);
 
@@ -2564,7 +2230,7 @@ class _DashStatCard extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(emoji, style: const TextStyle(fontSize: 22)),
           const SizedBox(height: 6),
-          // Roll up from 0 if rawInt is provided, otherwise cross-fade on change
+          // Roll up from 0 if rawInt is given, otherwise cross-fade on change
           if (rawInt != null)
             _RollingNumber(
               key:      ValueKey('dash_${rawInt}_$rollPrefix$rollSuffix'),
@@ -2590,8 +2256,7 @@ class _DashStatCard extends StatelessWidget {
               color: scheme.primary, fontWeight: FontWeight.w600)),
           if (sub != null)
             Text(sub!, maxLines: 1, overflow: TextOverflow.ellipsis,
-                style: text.bodySmall?.copyWith(
-                    color: scheme.onSurfaceVariant)),
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
         ]),
       ),
     );
@@ -2599,7 +2264,7 @@ class _DashStatCard extends StatelessWidget {
 }
 
 
-// Now playing card
+// ── Now playing card ──────────────────────────────────────────────────────────
 
 class _NowPlayingCard extends StatelessWidget {
   final Map<String, dynamic> track;
@@ -2623,9 +2288,10 @@ class _NowPlayingCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Row(children: [
-          _SmartImage(size: 52, borderRadius: 10, initialUrl: rawUrl,
-              resolver: () => ImageService.resolveTrack(title, artist,
-                  lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null)),
+          _SmartImage(
+            size: 52, borderRadius: 10, initialUrl: rawUrl,
+            resolver: () => ImageService.resolveTrack(title, artist,
+                lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null)),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
@@ -2648,14 +2314,13 @@ class _NowPlayingCard extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════════════════════════════════
-//  _SyncRefreshButton — bouton refresh avec animation de rotation
-// ══════════════════════════════════════════════════════════════════════════
+
+// ── Refresh button with rotation animation ────────────────────────────────────
 
 class _SyncRefreshButton extends StatefulWidget {
-  final bool     isSyncing;
+  final bool          isSyncing;
   final VoidCallback? onPressed;
-  final String   tooltip;
+  final String        tooltip;
 
   const _SyncRefreshButton({
     required this.isSyncing,
@@ -2706,14 +2371,13 @@ class _SyncRefreshButtonState extends State<_SyncRefreshButton>
         child: const Icon(Icons.refresh_rounded),
       ),
       onPressed: widget.onPressed,
-      tooltip: widget.tooltip,
+      tooltip:   widget.tooltip,
     );
   }
 }
 
-// ══════════════════════════════════════════════════════════════════════════
-//  _SyncProgressChip — indicateur discret de progression à côté du bouton
-// ══════════════════════════════════════════════════════════════════════════
+
+// ── Sync progress chip next to the refresh button ────────────────────────────
 
 class _SyncProgressChip extends StatelessWidget {
   final AllScrobblesProgress progress;
@@ -2727,31 +2391,29 @@ class _SyncProgressChip extends StatelessWidget {
     final frac   = progress.fraction;
 
     return AnimatedOpacity(
-      opacity: 1.0,
+      opacity:  1.0,
       duration: const Duration(milliseconds: 300),
       child: Container(
         height: 26,
         constraints: const BoxConstraints(minWidth: 52, maxWidth: 96),
         decoration: BoxDecoration(
-          color:  scheme.surfaceContainerHighest.withValues(alpha: 0.85),
+          color:        scheme.surfaceContainerHighest.withValues(alpha: 0.85),
           borderRadius: BorderRadius.circular(13),
-          border: Border.all(
+          border:       Border.all(
               color: scheme.outlineVariant.withValues(alpha: 0.5), width: 0.8),
         ),
         clipBehavior: Clip.antiAlias,
         child: Stack(children: [
-          // Barre de progression en fond
+          // Background progress bar
           if (frac > 0)
             Positioned.fill(
               child: FractionallySizedBox(
                 widthFactor: frac,
                 alignment: Alignment.centerLeft,
-                child: Container(
-                  color: scheme.primary.withValues(alpha: 0.15),
-                ),
+                child: Container(color: scheme.primary.withValues(alpha: 0.15)),
               ),
             ),
-          // Texte
+          // Label on top
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -2773,17 +2435,72 @@ class _SyncProgressChip extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════════════════════════════════
-//  _AmbientHeader — Apple Music-style animated background
-//
-//  When music is playing and the setting is on, the header image (or the
-//  gradient when there is no image) slowly breathes and drifts:
-//    • scale: 1.0 → 1.08 over ~8 s, reversing smoothly
-//    • shift: slight diagonal drift, out of phase with the scale
-//    • blur:  forced to at least 16 so the motion looks soft and ambient
-//
-//  Works on any header source (now playing, top track, custom, gradient).
-// ══════════════════════════════════════════════════════════════════════════
+
+// ── Section header (icon + title + divider) ───────────────────────────────────
+
+class _SectionHeader extends StatelessWidget {
+  final String   title;
+  final IconData icon;
+  const _SectionHeader({required this.title, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+
+    return Row(children: [
+      Icon(icon, size: 18, color: scheme.primary),
+      const SizedBox(width: 8),
+      Text(title,
+          style: text.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800, color: scheme.onSurface)),
+      const SizedBox(width: 10),
+      Expanded(
+        child: Divider(
+          color: scheme.outlineVariant.withValues(alpha: 0.5),
+          thickness: 1,
+        ),
+      ),
+    ]);
+  }
+}
+
+
+// ── Error view with retry button ──────────────────────────────────────────────
+
+class _ErrorView extends StatelessWidget {
+  final String       message;
+  final VoidCallback onRetry;
+  const _ErrorView({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Icon(Icons.wifi_off_rounded, size: 48, color: scheme.error),
+          const SizedBox(height: 16),
+          Text(message,
+              textAlign: TextAlign.center,
+              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
+          const SizedBox(height: 20),
+          FilledButton.tonal(onPressed: onRetry, child: const Text('Retry')),
+        ]),
+      ),
+    );
+  }
+}
+
+
+// ── Apple Music-style ambient header animation ────────────────────────────────
+// When music is playing and the setting is on, the header slowly breathes:
+//   • scale: 1.0 → 1.08 over ~8 s, reversing smoothly
+//   • shift: slight diagonal drift, out of phase with scale
+//   • blur: forced to at least 18 so the motion looks soft
 
 class _AmbientHeader extends StatefulWidget {
   final String      url;
@@ -2797,9 +2514,9 @@ class _AmbientHeader extends StatefulWidget {
 class _AmbientHeaderState extends State<_AmbientHeader>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
-  late final Animation<double> _scale;
-  late final Animation<double> _dx;
-  late final Animation<double> _dy;
+  late final Animation<double>   _scale;
+  late final Animation<double>   _dx;
+  late final Animation<double>   _dy;
 
   @override
   void initState() {
@@ -2813,7 +2530,7 @@ class _AmbientHeaderState extends State<_AmbientHeader>
     _scale = Tween<double>(begin: 1.0, end: 1.08)
         .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
 
-    // Slight diagonal drift — different curve so it feels independent
+    // Slight diagonal drift with a different curve so it feels independent
     _dx = Tween<double>(begin: -8.0, end: 8.0)
         .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutSine));
     _dy = Tween<double>(begin: -5.0, end: 5.0)
@@ -2828,7 +2545,6 @@ class _AmbientHeaderState extends State<_AmbientHeader>
 
   @override
   Widget build(BuildContext context) {
-    // Force blur to at least 16 — the motion looks odd without blur
     const double ambientBlur = 18.0;
 
     return ClipRect(
@@ -2852,7 +2568,7 @@ class _AmbientHeaderState extends State<_AmbientHeader>
                 child: Image.network(
                   widget.url,
                   fit: BoxFit.cover,
-                  width: double.infinity,
+                  width:  double.infinity,
                   height: double.infinity,
                   errorBuilder: (_, __, ___) =>
                       _GradientHeader(scheme: widget.scheme),
