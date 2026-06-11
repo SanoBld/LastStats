@@ -862,55 +862,89 @@ class _MonthlyCardState extends State<_MonthlyCard> {
                 physics: const BouncingScrollPhysics(),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
-                  children: sorted.map((e) {
-                    final ratio = maxVal > 0 ? e.value / maxVal : 0.0;
-                    final barH  = (_barMaxH * ratio).clamp(2.0, _barMaxH);
-                    final isMax = e.value == maxVal;
-                    final color = isMax
-                        ? s.primary
-                        : Color.lerp(s.primaryContainer, s.primary, ratio * 0.75)!;
-                    return SizedBox(
-                      width: _colW,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            ratio > 0.12 ? _fmtExact(e.value) : '',
-                            textAlign: TextAlign.center,
-                            style: t.labelSmall?.copyWith(
-                              fontSize: 8,
-                              color: isMax ? s.primary : s.onSurfaceVariant,
-                              fontWeight: isMax ? FontWeight.w800 : FontWeight.normal,
-                            ),
+                  children: () {
+                    final widgets = <Widget>[];
+                    String? prevYear;
+                    for (final e in sorted) {
+                      final year  = e.key.substring(0, 4);
+                      final ratio = maxVal > 0 ? e.value / maxVal : 0.0;
+                      final barH  = (_barMaxH * ratio).clamp(2.0, _barMaxH);
+                      final isMax = e.value == maxVal;
+                      final color = isMax
+                          ? s.primary
+                          : Color.lerp(s.primaryContainer, s.primary, ratio * 0.75)!;
+
+                      // Year separator: vertical line + label when year changes
+                      if (prevYear != null && year != prevYear) {
+                        widgets.add(SizedBox(
+                          width: 24,
+                          height: _barMaxH + 14,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(year,
+                                  style: t.labelSmall?.copyWith(
+                                      fontSize: 8,
+                                      color: s.primary,
+                                      fontWeight: FontWeight.w700)),
+                              const SizedBox(height: 4),
+                              SizedBox(
+                                height: _barMaxH,
+                                child: VerticalDivider(
+                                  width: 1,
+                                  thickness: 1,
+                                  color: s.primary.withValues(alpha: 0.4),
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 2),
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Container(
-                              width: _colW - 10,
-                              height: barH,
-                              decoration: BoxDecoration(
-                                color: color,
-                                borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(5)),
+                        ));
+                      }
+                      prevYear = year;
+
+                      widgets.add(SizedBox(
+                        width: _colW,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              ratio > 0.12 ? _fmtExact(e.value) : '',
+                              textAlign: TextAlign.center,
+                              style: t.labelSmall?.copyWith(
+                                fontSize: 8,
+                                color: isMax ? s.primary : s.onSurfaceVariant,
+                                fontWeight: isMax ? FontWeight.w800 : FontWeight.normal,
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            // Parse "YYYY-MM" → localised month abbreviation
-                            L.months[int.tryParse(e.key.substring(5)) ?? 1],
-                            textAlign: TextAlign.center,
-                            style: t.labelSmall?.copyWith(
-                              fontSize: 9,
-                              color: isMax ? s.primary : s.onSurfaceVariant,
+                            const SizedBox(height: 2),
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                width: _colW - 10,
+                                height: barH,
+                                decoration: BoxDecoration(
+                                  color: color,
+                                  borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(5)),
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
+                            const SizedBox(height: 4),
+                            Text(
+                              L.months[int.tryParse(e.key.substring(5)) ?? 1],
+                              textAlign: TextAlign.center,
+                              style: t.labelSmall?.copyWith(
+                                fontSize: 9,
+                                color: isMax ? s.primary : s.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ));
+                    }
+                    return widgets;
+                  }(),
                 ),
               ),
             ),

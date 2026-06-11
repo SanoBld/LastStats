@@ -11,7 +11,6 @@ void showDetailSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    useSafeArea: true,
     builder: (_) => _ItemDetailSheet(item: item, type: type, service: service),
   );
 }

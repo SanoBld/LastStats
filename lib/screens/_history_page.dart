@@ -113,18 +113,16 @@ class _HistoryPageState extends State<_HistoryPage>
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 16, 4),
+            padding: const EdgeInsets.fromLTRB(20, 12, 16, 2),
             child: Row(children: [
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(L.historyTitle, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
-                Text(L.historySubtitle,
-                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-              ])),
+              Expanded(child:
+                Text(L.historyTitle, style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+              ),
               IconButton(icon: const Icon(Icons.refresh_rounded), onPressed: _load),
             ]),
           ),
 
-          const SizedBox(height: 10),
+          const SizedBox(height: 6),
 
           // Date navigation
           Padding(
@@ -186,16 +184,16 @@ class _HistoryPageState extends State<_HistoryPage>
             ]),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
 
           if (hasData) ...[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(L.dayLabel(_selectedDate),
-                  style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                  style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
             ),
-            const SizedBox(height: 8),
-            SizedBox(height: 34, child: ListView(
+            const SizedBox(height: 6),
+            SizedBox(height: 32, child: ListView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [

@@ -54,17 +54,18 @@ String colorToHex(Color c) {
 
 /// Returns the seed color to pass to ColorScheme.fromSeed.
 ///
-/// Black (#000000) and white (#FFFFFF) are valid choices — they produce a
-/// neutral/monochromatic theme. Pure black gets a tiny gray shift so
-/// Material You can still generate a distinguishable primary color.
+/// Near-black and near-white have essentially zero chroma in HCT space.
+/// Material 3 can't extract a hue from them and may fall back to an arbitrary
+/// default (often teal). We map these extremes to a Blue Grey seed that has
+/// just enough chroma to produce a reliable neutral scheme.
 Color seedColorForScheme(Color c) {
   final luminance = c.computeLuminance();
 
-  // Near-black: add a tiny gray lift so the scheme isn't totally invisible
-  if (luminance < 0.005) return const Color(0xFF1A1A1A);
+  // Near-black → Blue Grey 700: neutral dark slate scheme
+  if (luminance < 0.03) return const Color(0xFF455A64);
 
-  // Near-white: pull down slightly so the scheme has a visible surface tint
-  if (luminance > 0.995) return const Color(0xFFE8E8E8);
+  // Near-white → Blue Grey 300: neutral light scheme
+  if (luminance > 0.97) return const Color(0xFF90A4AE);
 
   return c;
 }

@@ -143,8 +143,22 @@ class _TopListBodyState extends State<_TopListBody>
         old.year   != widget.year) _load(reset: true);
   }
 
-  // Decode common HTML entities returned by Last.fm's API.
-  static String _decode(String s) => s
+  // Decode HTML entities AND extract text from Dart Map.toString() artifacts.
+  // Last.fm stores artist as {"#text":"name","mbid":"..."}.
+  // If AllScrobblesService stores it via .toString(), it becomes "{#text: name, mbid: ...}".
+  static String _cleanName(String s) {
+    final trimmed = s.trim();
+    if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+      // Extract value after "#text:" (ends at comma or closing brace)
+      final m = RegExp(r'#text:\s*([^,}]+)').firstMatch(trimmed);
+      final text = m?.group(1)?.trim() ?? '';
+      if (text.isNotEmpty) return _decodeHtml(text);
+      return ''; // only MBID, no readable name
+    }
+    return _decodeHtml(trimmed);
+  }
+
+  static String _decodeHtml(String s) => s
       .replaceAll('&amp;',  '&')
       .replaceAll('&apos;', "'")
       .replaceAll('&#39;',  "'")
@@ -163,10 +177,10 @@ class _TopListBodyState extends State<_TopListBody>
     final artistOf = <String, String>{}; // key → artist name
 
     for (final r in records) {
-      // Decode HTML entities so names display correctly and image lookups work
-      final artist = _decode(r.artist);
-      final album  = _decode(r.album);
-      final track  = _decode(r.track);
+      // Clean names: handles HTML entities + Dart Map.toString() artifacts
+      final artist = _cleanName(r.artist);
+      final album  = _cleanName(r.album);
+      final track  = _cleanName(r.track);
 
       final String key;
       switch (widget.type) {
