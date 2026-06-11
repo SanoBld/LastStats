@@ -751,27 +751,37 @@ BoxDecoration _chartCardDecoration(ColorScheme s) => BoxDecoration(
 
 
 
-/// Palette M3 : interpole entre [base] et [second] puis HSL pour les suivants.
+/// M3 palette: interpolates between [base] and [second] via HSL.
+/// When both colors are near-monochrome (dynamic color "black & white" mode),
+/// avoids clamping saturation upward, which would incorrectly produce red (hue 0°).
 List<Color> _buildPalette(Color base, Color second, int count) {
   if (count == 0) return [];
   if (count == 1) return [base];
 
+  final hslA = HSLColor.fromColor(base);
+  final hslB = HSLColor.fromColor(second);
+  final avgSat = (hslA.saturation + hslB.saturation) / 2;
+
+  // Near-monochrome: distribute using lightness only — no hue trickery
+  if (avgSat < 0.08) {
+    return List.generate(count, (i) {
+      final t       = count > 1 ? i / (count - 1) : 0.0;
+      final light   = (0.30 + t * 0.35).clamp(0.25, 0.75);
+      return HSLColor.fromAHSL(1.0, hslA.hue, hslA.saturation, light).toColor();
+    });
+  }
+
   return List.generate(count, (i) {
-    final t = i / (count - 1);
-    if (t <= 1.0) {
-      final hslA = HSLColor.fromColor(base);
-      final hslB = HSLColor.fromColor(second);
-      double hueDiff = (hslB.hue - hslA.hue + 540) % 360 - 180;
-      return HSLColor.fromAHSL(
-        1.0,
-        (hslA.hue + hueDiff * t + 360) % 360,
-        (hslA.saturation + (hslB.saturation - hslA.saturation) * t)
-            .clamp(0.40, 0.90),
-        (hslA.lightness  + (hslB.lightness  - hslA.lightness)  * t)
-            .clamp(0.35, 0.65),
-      ).toColor();
-    }
-    return base;
+    final t       = i / (count - 1);
+    final hueDiff = (hslB.hue - hslA.hue + 540) % 360 - 180;
+    return HSLColor.fromAHSL(
+      1.0,
+      (hslA.hue + hueDiff * t + 360) % 360,
+      (hslA.saturation + (hslB.saturation - hslA.saturation) * t)
+          .clamp(0.40, 0.90),
+      (hslA.lightness  + (hslB.lightness  - hslA.lightness)  * t)
+          .clamp(0.35, 0.65),
+    ).toColor();
   });
 }
 
@@ -889,7 +899,8 @@ class _MonthlyCardState extends State<_MonthlyCard> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            e.key.substring(5),
+                            // Parse "YYYY-MM" → localised month abbreviation
+                            L.months[int.tryParse(e.key.substring(5)) ?? 1],
                             textAlign: TextAlign.center,
                             style: t.labelSmall?.copyWith(
                               fontSize: 9,
@@ -1035,7 +1046,8 @@ class _CumulativeLineCardState extends State<_CumulativeLineCard> {
                             width: _ptW,
                             child: show
                                 ? Text(
-                                    e.value.substring(5),
+                                    // "YYYY-MM" → localised abbreviation
+                                    L.months[int.tryParse(e.value.substring(5)) ?? 1],
                                     textAlign: TextAlign.center,
                                     style: t.labelSmall?.copyWith(
                                         fontSize: 8, color: s.onSurfaceVariant),

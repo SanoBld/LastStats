@@ -43,6 +43,7 @@ abstract class AppStrings {
   String get rankingsTitle;
   String get rankingsPodium;
   String get rankingsContinued;
+  String get rankingsAllYears;
 
   // ── Charts ───────────────────────────────────────────────────────────────
   String get chartsTitle;
@@ -84,6 +85,7 @@ abstract class AppStrings {
   String get searchHintAlbums;
   String get searchHintTracks;
   String get searchTypePrompt;
+  String get searchAll;
   String memberSince(String date);
   String get perDay;
   String get activityDays;
@@ -286,6 +288,7 @@ class _AppStringsFr implements AppStrings {
   @override String get rankingsTitle     => 'Classements';
   @override String get rankingsPodium    => 'Podium';
   @override String get rankingsContinued => 'Suite du classement';
+  @override String get rankingsAllYears  => 'Toutes les années';
 
   @override String get chartsTitle             => 'Graphiques';
   @override String get chartsMonthly           => 'Scrobbles — 12 mois';
@@ -332,6 +335,7 @@ class _AppStringsFr implements AppStrings {
   @override String get searchHintAlbums   => 'Recherche un album';
   @override String get searchHintTracks   => 'Recherche une chanson';
   @override String get searchTypePrompt   => 'Tape dans la barre ci-dessus';
+  @override String get searchAll          => 'Tout';
   @override String memberSince(String date) => 'Depuis $date';
   @override String get perDay             => 'par jour';
   @override String get activityDays       => "d'activité";
@@ -525,6 +529,7 @@ class _AppStringsEn implements AppStrings {
   @override String get rankingsTitle     => 'Rankings';
   @override String get rankingsPodium    => 'Podium';
   @override String get rankingsContinued => 'Rest of ranking';
+  @override String get rankingsAllYears  => 'All years';
 
   @override String get chartsTitle              => 'Charts';
   @override String get chartsMonthly            => 'Scrobbles — 12 months';
@@ -571,6 +576,7 @@ class _AppStringsEn implements AppStrings {
   @override String get searchHintAlbums   => 'Find an album';
   @override String get searchHintTracks   => 'Find a song';
   @override String get searchTypePrompt   => 'Type in the search bar above';
+  @override String get searchAll          => 'All';
   @override String memberSince(String date) => 'Since $date';
   @override String get perDay             => 'per day';
   @override String get activityDays       => 'of activity';

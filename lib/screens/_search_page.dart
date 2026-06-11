@@ -1,6 +1,9 @@
 // ignore_for_file: unused_import
 part of 'home_screen.dart';
 
+// dart:ui is available via the part-of import from home_screen.dart
+
+const int _kSearchAll      = -1; // all types
 const int _kSearchProfiles = 0;
 const int _kSearchArtists  = 1;
 const int _kSearchAlbums   = 2;
@@ -51,8 +54,10 @@ class _SearchPageState extends State<_SearchPage> {
   final _ctrl      = TextEditingController();
   final _focusNode = FocusNode();
 
-  int           _tab       = _kSearchArtists;
+  int           _tab       = _kSearchAll;  // default: no filter
   List<dynamic> _results   = [];
+  // Per-type results used in "All" mode
+  Map<int, List<dynamic>> _allResults = {};
   bool          _searching = false;
   String?       _error;
   Timer?        _debounce;
@@ -60,10 +65,11 @@ class _SearchPageState extends State<_SearchPage> {
   Set<String> _favProfiles = {};
 
   List<(int, String, IconData)> get _kTabs => [
-    (_kSearchProfiles, L.searchProfiles,   Icons.person_rounded),
-    (_kSearchArtists,  L.commonArtists,    Icons.mic_rounded),
-    (_kSearchAlbums,   L.commonAlbums,     Icons.album_rounded),
-    (_kSearchTracks,   L.commonTracks,     Icons.music_note_rounded),
+    (_kSearchAll,      L.searchAll,       Icons.apps_rounded),
+    (_kSearchProfiles, L.searchProfiles,  Icons.person_rounded),
+    (_kSearchArtists,  L.commonArtists,   Icons.mic_rounded),
+    (_kSearchAlbums,   L.commonAlbums,    Icons.album_rounded),
+    (_kSearchTracks,   L.commonTracks,    Icons.music_note_rounded),
   ];
 
   @override
@@ -111,14 +117,32 @@ class _SearchPageState extends State<_SearchPage> {
     if (q.isEmpty) return;
     setState(() { _searching = true; _error = null; });
     try {
-      List<dynamic> res;
-      switch (_tab) {
-        case _kSearchProfiles: res = await widget.service.searchUsers(q,   limit: 15); break;
-        case _kSearchArtists:  res = await widget.service.searchArtists(q, limit: 15); break;
-        case _kSearchAlbums:   res = await widget.service.searchAlbums(q,  limit: 15); break;
-        default:               res = await widget.service.searchTracks(q,  limit: 15);
+      if (_tab == _kSearchAll) {
+        // Search artists, albums, tracks in parallel; profiles omitted from "all"
+        final res = await Future.wait([
+          widget.service.searchArtists(q, limit: 10),
+          widget.service.searchAlbums(q,  limit: 10),
+          widget.service.searchTracks(q,  limit: 10),
+        ]);
+        if (mounted) setState(() {
+          _allResults = {
+            _kSearchArtists: res[0],
+            _kSearchAlbums:  res[1],
+            _kSearchTracks:  res[2],
+          };
+          _results   = [];
+          _searching = false;
+        });
+      } else {
+        List<dynamic> res;
+        switch (_tab) {
+          case _kSearchProfiles: res = await widget.service.searchUsers(q,   limit: 15); break;
+          case _kSearchArtists:  res = await widget.service.searchArtists(q, limit: 15); break;
+          case _kSearchAlbums:   res = await widget.service.searchAlbums(q,  limit: 15); break;
+          default:               res = await widget.service.searchTracks(q,  limit: 15);
+        }
+        if (mounted) setState(() { _results = res; _allResults = {}; _searching = false; });
       }
-      if (mounted) setState(() { _results = res; _searching = false; });
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -131,7 +155,7 @@ class _SearchPageState extends State<_SearchPage> {
 
   void _switchTab(int tab) {
     if (_tab == tab) return;
-    setState(() { _tab = tab; _results = []; _error = null; });
+    setState(() { _tab = tab; _results = []; _allResults = {}; _error = null; });
     final q = _ctrl.text.trim();
     if (q.isNotEmpty) _search(q);
   }
@@ -239,6 +263,71 @@ class _SearchPageState extends State<_SearchPage> {
     }
 
     if (_ctrl.text.trim().isEmpty) return _SearchEmptyState(tab: _tab);
+
+    // "All" mode: sectioned results
+    if (_tab == _kSearchAll) {
+      final artists = _allResults[_kSearchArtists] ?? [];
+      final albums  = _allResults[_kSearchAlbums]  ?? [];
+      final tracks  = _allResults[_kSearchTracks]  ?? [];
+      if (artists.isEmpty && albums.isEmpty && tracks.isEmpty) {
+        return Center(child: Text(L.commonNoResults,
+            style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)));
+      }
+      return ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        children: [
+          if (artists.isNotEmpty) ...[
+            _SearchSectionHeader(label: L.commonArtists, icon: Icons.mic_rounded, scheme: scheme, text: text),
+            ...artists.map((m) {
+              final item = m as Map<String, dynamic>;
+              final name = (item['name'] ?? '').toString();
+              final raw  = _extractImage(item['image']);
+              return InkWell(
+                borderRadius: BorderRadius.circular(10),
+                onTap: () => _openMusicDetail(context, item, 'artists'),
+                child: _ItemTile(name: name, sub: '', imageUrl: raw, rank: '',
+                  imageFuture: ImageService.resolveArtist(name, lastfmUrl: raw.isNotEmpty ? raw : null)),
+              );
+            }),
+          ],
+          if (albums.isNotEmpty) ...[
+            _SearchSectionHeader(label: L.commonAlbums, icon: Icons.album_rounded, scheme: scheme, text: text),
+            ...albums.map((m) {
+              final item   = m as Map<String, dynamic>;
+              final name   = (item['name'] ?? '').toString();
+              final artist = (item['artist'] ?? '').toString();
+              final raw    = _extractImage(item['image']);
+              final norm   = Map<String, dynamic>.from(item);
+              if (item['artist'] is String) norm['artist'] = {'name': artist};
+              return InkWell(
+                borderRadius: BorderRadius.circular(10),
+                onTap: () => _openMusicDetail(context, norm, 'albums'),
+                child: _ItemTile(name: name, sub: artist, imageUrl: raw, rank: '',
+                  imageFuture: ImageService.resolveAlbum(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null)),
+              );
+            }),
+          ],
+          if (tracks.isNotEmpty) ...[
+            _SearchSectionHeader(label: L.commonTracks, icon: Icons.music_note_rounded, scheme: scheme, text: text),
+            ...tracks.map((m) {
+              final item   = m as Map<String, dynamic>;
+              final name   = (item['name'] ?? '').toString();
+              final artist = (item['artist'] ?? '').toString();
+              final raw    = _extractImage(item['image']);
+              final norm   = Map<String, dynamic>.from(item);
+              if (item['artist'] is String) norm['artist'] = {'name': artist};
+              return InkWell(
+                borderRadius: BorderRadius.circular(10),
+                onTap: () => _openMusicDetail(context, norm, 'tracks'),
+                child: _ItemTile(name: name, sub: artist, imageUrl: raw, rank: '',
+                  imageFuture: ImageService.resolveTrack(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null)),
+              );
+            }),
+          ],
+          const SizedBox(height: 32),
+        ],
+      );
+    }
 
     if (_results.isEmpty) {
       return Center(child: Text(L.commonNoResults,
@@ -487,6 +576,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
   // -- UI state --
   bool      _loading      = true;
   bool      _isNowPlaying = false;
+  String    _bannerUrl    = '';   // artwork used as blurred banner background
   late bool _localIsFav;
 
   @override
@@ -521,10 +611,33 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           _isNowPlaying = isNp;
           _loading      = false;
         });
+        // Resolve banner artwork: now-playing track first, then top artist
+        _resolveBannerUrl(recentList, isNp);
       }
     } catch (_) {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  // Resolve the blurred background URL for the profile banner.
+  // Prefers the now-playing track artwork; falls back to top artist.
+  Future<void> _resolveBannerUrl(List<dynamic> recentList, bool isNp) async {
+    try {
+      String url = '';
+      if (isNp && recentList.isNotEmpty) {
+        final t      = recentList.first as Map;
+        final track  = (t['name'] ?? '').toString();
+        final artist = (t['artist']?['name'] ?? t['artist'] ?? '').toString();
+        url = await ImageService.resolveTrack(track, artist);
+      }
+      if (url.isEmpty && _topArtists.isNotEmpty) {
+        final a = _topArtists[0] as Map;
+        url = await ImageService.resolveArtist(
+            (a['name'] ?? '').toString(),
+            lastfmUrl: _extractImage(a['image']));
+      }
+      if (mounted && url.isNotEmpty) setState(() => _bannerUrl = url);
+    } catch (_) {}
   }
 
   // -- Computed values --
@@ -666,35 +779,77 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           ],
         ),
       ),
-      child: SafeArea(
-        bottom: false,
-        child: Column(children: [
+      child: Stack(
+        fit: StackFit.passthrough,
+        children: [
+          // Blurred artwork in the background when available
+          if (_bannerUrl.isNotEmpty)
+            Positioned.fill(
+              child: ClipRect(
+                child: ImageFiltered(
+                  imageFilter: ImageFilter.blur(sigmaX: 22, sigmaY: 22,
+                      tileMode: TileMode.mirror),
+                  child: Image.network(
+                    _bannerUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                  ),
+                ),
+              ),
+            ),
+          // Dark overlay so text stays readable
+          if (_bannerUrl.isNotEmpty)
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end:   Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.30),
+                      Colors.black.withValues(alpha: 0.55),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          SafeArea(
+            bottom: false,
+            child: Column(children: [
 
-          // Top row: drag handle + close button
+          // Top row: drag handle (centred) + close button (right)
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-            child: Row(children: [
-              const Spacer(),
-              Container(
-                width: 36, height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.4),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const Spacer(),
-              GestureDetector(
-                onTap: () => Navigator.pop(ctx),
-                child: Container(
-                  width: 30, height: 30,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.25),
-                    shape: BoxShape.circle,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Handle truly centred relative to full width
+                Center(
+                  child: Container(
+                    width: 36, height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
-                  child: const Icon(Icons.close_rounded, color: Colors.white, size: 16),
                 ),
-              ),
-            ]),
+                // Close button pinned to the right
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(ctx),
+                    child: Container(
+                      width: 30, height: 30,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.25),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.close_rounded, color: Colors.white, size: 16),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
 
           const SizedBox(height: 20),
@@ -815,7 +970,9 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
 
           const SizedBox(height: 20),
         ]),
-      ),
+        ),   // SafeArea
+        ],   // Stack children
+      ),     // Stack
     );
   }
 
@@ -1172,4 +1329,31 @@ String _fmtLarge(int n) {
   if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
   if (n >= 1000)    return '${(n / 1000).toStringAsFixed(1)}k';
   return '$n';
+}
+
+// ── Section header for "All" mode search results ─────────────────────────────
+
+class _SearchSectionHeader extends StatelessWidget {
+  final String      label;
+  final IconData    icon;
+  final ColorScheme scheme;
+  final TextTheme   text;
+  const _SearchSectionHeader({
+    required this.label, required this.icon,
+    required this.scheme, required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(4, 16, 4, 6),
+    child: Row(children: [
+      Icon(icon, size: 16, color: scheme.primary),
+      const SizedBox(width: 6),
+      Text(label, style: text.titleSmall?.copyWith(
+          fontWeight: FontWeight.w800, color: scheme.onSurface)),
+      const SizedBox(width: 8),
+      Expanded(child: Divider(
+          color: scheme.outlineVariant.withValues(alpha: 0.5), thickness: 1)),
+    ]),
+  );
 }

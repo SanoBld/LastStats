@@ -108,8 +108,8 @@ class _DashboardPageState extends State<_DashboardPage> {
     _initWithCache();
     // Poll now playing every 10 s — rebuild only when track changes
     _npTimer  = Timer.periodic(const Duration(seconds: 10), (_) => _refreshLive());
-    // Silent top-list refresh every 3 min
-    _topTimer = Timer.periodic(const Duration(minutes: 3),  (_) => _refreshTopLists());
+    // Silent top-list refresh every 10 min
+    _topTimer = Timer.periodic(const Duration(minutes: 10),  (_) => _refreshTopLists());
   }
 
   @override
@@ -318,7 +318,8 @@ class _DashboardPageState extends State<_DashboardPage> {
     if (_showFriends && mounted) _loadFriends(silent: true);
   }
 
-  // Silently refresh top artists and tracks every 3 min
+  // Silently refresh top artists and tracks every 10 min.
+  // Only rebuilds the UI when data actually changed to prevent carousel flicker.
   Future<void> _refreshTopLists() async {
     if (!mounted) return;
     try {
@@ -335,12 +336,32 @@ class _DashboardPageState extends State<_DashboardPage> {
           Future.value(<dynamic>[]),
       ]);
       if (!mounted) return;
-      setState(() {
-        _topArtists    = results[0] as List<dynamic>;
-        _topTracks     = results[1] as List<dynamic>;
-        if (results.length > 2) _topArtistsWeek = results[2] as List<dynamic>;
-        if (results.length > 3) _topTracksWeek  = results[3] as List<dynamic>;
-      });
+
+      // Compare first items to detect meaningful changes before rebuilding
+      bool changed = false;
+      final newArtists = results[0] as List<dynamic>;
+      final newTracks  = results[1] as List<dynamic>;
+      if (newArtists.isNotEmpty && _topArtists.isNotEmpty) {
+        if ((newArtists[0] as Map)['name'] != (_topArtists[0] as Map)['name']) changed = true;
+      } else if (newArtists.length != _topArtists.length) {
+        changed = true;
+      }
+      if (!changed) {
+        if (newTracks.isNotEmpty && _topTracks.isNotEmpty) {
+          if ((newTracks[0] as Map)['name'] != (_topTracks[0] as Map)['name']) changed = true;
+        } else if (newTracks.length != _topTracks.length) {
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        setState(() {
+          _topArtists    = newArtists;
+          _topTracks     = newTracks;
+          if (results.length > 2) _topArtistsWeek = results[2] as List<dynamic>;
+          if (results.length > 3) _topTracksWeek  = results[3] as List<dynamic>;
+        });
+      }
       DataCache.set(DataCache.keyTopArtists('overall'), results[0]);
       DataCache.set(DataCache.keyTopTracks('overall'),  results[1]);
       if (results.length > 2 && (results[2] as List).isNotEmpty)
@@ -508,11 +529,10 @@ class _DashboardPageState extends State<_DashboardPage> {
         url = _headerCustomUrl;
       case 'nowplaying':
         if (_nowPlaying != null) {
-          final raw = _extractImage(_nowPlaying!['image']);
+          // Skip lastfmUrl (300 px) — always resolve via iTunes for max quality
           url = await ImageService.resolveTrack(
             (_nowPlaying!['name'] ?? '').toString(),
             (_nowPlaying!['artist']?['#text'] ?? '').toString(),
-            lastfmUrl: raw,
           );
         }
         // No music playing (or image missing) → apply fallback
@@ -525,10 +545,10 @@ class _DashboardPageState extends State<_DashboardPage> {
             : await widget.service.getTopTracks(period: _headerPeriod, limit: 1);
         if (tracks.isNotEmpty) {
           final t = tracks[0] as Map;
+          // Skip lastfmUrl for max quality
           url = await ImageService.resolveTrack(
             (t['name'] ?? '').toString(),
             (t['artist']?['name'] ?? '').toString(),
-            lastfmUrl: _extractImage(t['image']),
           );
         }
       case 'top_album':
@@ -537,10 +557,10 @@ class _DashboardPageState extends State<_DashboardPage> {
             : await widget.service.getTopAlbums(period: _headerPeriod, limit: 1);
         if (albums.isNotEmpty) {
           final a = albums[0] as Map;
+          // Skip lastfmUrl for max quality
           url = await ImageService.resolveAlbum(
             (a['name'] ?? '').toString(),
             (a['artist']?['name'] ?? '').toString(),
-            lastfmUrl: _extractImage(a['image']),
           );
         }
       case 'top_artist':
@@ -549,9 +569,9 @@ class _DashboardPageState extends State<_DashboardPage> {
             : await widget.service.getTopArtists(period: _headerPeriod, limit: 1);
         if (artists.isNotEmpty) {
           final a = artists[0] as Map;
+          // Skip lastfmUrl for max quality
           url = await ImageService.resolveArtist(
             (a['name'] ?? '').toString(),
-            lastfmUrl: _extractImage(a['image']),
           );
         }
       default:

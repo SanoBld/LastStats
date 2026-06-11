@@ -265,12 +265,12 @@ class ImageService {
       final results = data['results'] as List?;
       if (results == null || results.isEmpty) return '';
 
-      // artworkUrl100 → upscale à 600×600
+      // artworkUrl100 → upscale to max iTunes resolution (3000×3000)
       final raw = (results.first['artworkUrl100'] ?? '').toString();
       return raw.isNotEmpty
           ? raw
-              .replaceAll('100x100bb', '600x600bb')
-              .replaceAll('100x100',   '600x600')
+              .replaceAll('100x100bb', '3000x3000bb')
+              .replaceAll('100x100',   '3000x3000')
           : '';
     } catch (_) {
       return '';

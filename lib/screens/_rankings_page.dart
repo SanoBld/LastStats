@@ -13,53 +13,97 @@ class _RankingsPage extends StatefulWidget {
 class _RankingsPageState extends State<_RankingsPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabs;
-  String _period = 'overall';
+  String _period       = 'overall';
+  int?   _selectedYear;          // null = use period chips; int = year filter
+  List<int> _availableYears = [];
 
   @override
   void initState() {
     super.initState();
     _tabs = TabController(length: 3, vsync: this);
     localeNotifier.addListener(_rebuild);
+    AllScrobblesService.progressNotifier.addListener(_onHistoryProgress);
+    _refreshAvailableYears();
   }
 
   @override
-  void dispose() { localeNotifier.removeListener(_rebuild); _tabs.dispose(); super.dispose(); }
+  void dispose() {
+    localeNotifier.removeListener(_rebuild);
+    AllScrobblesService.progressNotifier.removeListener(_onHistoryProgress);
+    _tabs.dispose();
+    super.dispose();
+  }
 
   void _rebuild() => setState(() {});
 
+  void _onHistoryProgress() {
+    if (!mounted) return;
+    _refreshAvailableYears();
+  }
+
+  void _refreshAvailableYears() {
+    final years = AllScrobblesService.getCachedYears().toList()..sort((a, b) => b.compareTo(a));
+    if (mounted) setState(() => _availableYears = years);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final scheme  = Theme.of(context).colorScheme;
+    final text    = Theme.of(context).textTheme;
     final periods = _localizedPeriods();
+
     return Scaffold(
       body: SafeArea(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
-            child: Text(L.rankingsTitle, style: Theme.of(context).textTheme.headlineSmall
-                ?.copyWith(fontWeight: FontWeight.w800)),
+            child: Row(children: [
+              Expanded(
+                child: Text(L.rankingsTitle,
+                    style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
+              ),
+              // Year dropdown — only shown when cached years exist
+              if (_availableYears.isNotEmpty)
+                _YearDropdown(
+                  years:        _availableYears,
+                  selectedYear: _selectedYear,
+                  scheme:       scheme,
+                  text:         text,
+                  onChanged: (y) => setState(() {
+                    _selectedYear = y;
+                  }),
+                ),
+            ]),
           ),
-          SizedBox(
-            height: 44,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-              children: periods.map((p) {
-                final sel = p.$1 == _period;
-                return Padding(padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(label: Text(p.$2), selected: sel,
-                      onSelected: (_) { if (!sel) setState(() => _period = p.$1); }));
-              }).toList(),
+
+          // Period chips — hidden when a year is selected (local data used instead)
+          if (_selectedYear == null)
+            SizedBox(
+              height: 44,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                children: periods.map((p) {
+                  final sel = p.$1 == _period;
+                  return Padding(padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(label: Text(p.$2), selected: sel,
+                        onSelected: (_) { if (!sel) setState(() => _period = p.$1); }));
+                }).toList(),
+              ),
             ),
-          ),
+
           TabBar(controller: _tabs, tabs: [
             Tab(text: L.commonArtists),
             Tab(text: L.commonAlbums),
             Tab(text: L.commonTracks),
           ]),
           Expanded(child: TabBarView(controller: _tabs, children: [
-            _TopListBody(service: widget.service, type: 'artists', period: _period),
-            _TopListBody(service: widget.service, type: 'albums',  period: _period),
-            _TopListBody(service: widget.service, type: 'tracks',  period: _period),
+            _TopListBody(service: widget.service, type: 'artists',
+                period: _period, year: _selectedYear),
+            _TopListBody(service: widget.service, type: 'albums',
+                period: _period, year: _selectedYear),
+            _TopListBody(service: widget.service, type: 'tracks',
+                period: _period, year: _selectedYear),
           ])),
         ]),
       ),
@@ -70,7 +114,9 @@ class _RankingsPageState extends State<_RankingsPage>
 class _TopListBody extends StatefulWidget {
   final LastFmService service;
   final String type, period;
-  const _TopListBody({required this.service, required this.type, required this.period});
+  final int?   year;           // null = API; int = local cached scrobbles
+  const _TopListBody({required this.service, required this.type,
+      required this.period, this.year});
 
   @override
   State<_TopListBody> createState() => _TopListBodyState();
@@ -92,29 +138,90 @@ class _TopListBodyState extends State<_TopListBody>
   @override
   void didUpdateWidget(_TopListBody old) {
     super.didUpdateWidget(old);
-    if (old.period != widget.period || old.type != widget.type) _load(reset: true);
+    if (old.period != widget.period ||
+        old.type   != widget.type   ||
+        old.year   != widget.year) _load(reset: true);
+  }
+
+  // Compute top items from locally-cached scrobbles for a given year.
+  Future<List<Map<String, dynamic>>> _computeLocalTop(int year) async {
+    final records = AllScrobblesService.getRecordsForYear(year) ?? [];
+    if (records.isEmpty) {
+      return [];
+    }
+
+    final counts   = <String, int>{};
+    final artistOf = <String, String>{}; // key → artist name
+
+    for (final r in records) {
+      final String key;
+      switch (widget.type) {
+        case 'artists':
+          key = r.artist;
+        case 'albums':
+          key = '${r.album}|||${r.artist}';
+          artistOf[key] = r.artist;
+        default: // tracks
+          key = '${r.track}|||${r.artist}';
+          artistOf[key] = r.artist;
+      }
+      if (key.isEmpty || key.startsWith('|||')) continue;
+      counts[key] = (counts[key] ?? 0) + 1;
+    }
+
+    final sorted = counts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    return sorted.map((e) {
+      final playcount = e.value.toString();
+      if (widget.type == 'artists') {
+        return {'name': e.key, 'playcount': playcount, 'image': <dynamic>[]};
+      }
+      final parts  = e.key.split('|||');
+      final name   = parts[0];
+      final artist = parts.length > 1 ? parts[1] : '';
+      return {
+        'name':      name,
+        'playcount': playcount,
+        'image':     <dynamic>[],
+        'artist':    {'name': artist},
+      };
+    }).toList();
   }
 
   Future<void> _load({bool reset = false}) async {
     if (reset) {
-      setState(() { _loading = true; _error = null; _page = 1; _exhausted = false; _items = []; });
+      setState(() {
+        _loading = true; _error = null;
+        _page = 1; _exhausted = false; _items = [];
+      });
     } else {
       if (_loadingMore || _exhausted) return;
       setState(() => _loadingMore = true);
     }
     try {
       List<dynamic> fresh;
-      switch (widget.type) {
-        case 'artists':
-          fresh = await widget.service.getTopArtists(period: widget.period, limit: 50, page: _page); break;
-        case 'albums':
-          fresh = await widget.service.getTopAlbums(period: widget.period,  limit: 50, page: _page); break;
-        default:
-          fresh = await widget.service.getTopTracks(period: widget.period,  limit: 50, page: _page);
+      if (widget.year != null) {
+        // Year mode: compute locally (all at once, no pagination)
+        fresh      = await _computeLocalTop(widget.year!);
+        _exhausted = true;
+      } else {
+        switch (widget.type) {
+          case 'artists':
+            fresh = await widget.service.getTopArtists(
+                period: widget.period, limit: 50, page: _page); break;
+          case 'albums':
+            fresh = await widget.service.getTopAlbums(
+                period: widget.period, limit: 50, page: _page); break;
+          default:
+            fresh = await widget.service.getTopTracks(
+                period: widget.period, limit: 50, page: _page);
+        }
       }
       if (mounted) {
         setState(() {
-          _items.addAll(fresh); _exhausted = fresh.length < 50;
+          _items.addAll(fresh);
+          if (widget.year == null) _exhausted = fresh.length < 50;
           _loading = false; _loadingMore = false;
         });
       }
@@ -306,6 +413,71 @@ class _PodiumWidget extends StatelessWidget {
               style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
         ),
       ]),
+    );
+  }
+}
+
+// ── Year selector dropdown ─────────────────────────────────────────────────────
+
+class _YearDropdown extends StatelessWidget {
+  final List<int>   years;
+  final int?        selectedYear;
+  final ColorScheme scheme;
+  final TextTheme   text;
+  final void Function(int?) onChanged;
+
+  const _YearDropdown({
+    required this.years,
+    required this.selectedYear,
+    required this.scheme,
+    required this.text,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: selectedYear != null
+            ? scheme.primaryContainer
+            : scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: scheme.outlineVariant.withValues(alpha: 0.4),
+        ),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<int?>(
+          value:       selectedYear,
+          isDense:     true,
+          icon: Icon(Icons.arrow_drop_down_rounded,
+              size: 18, color: scheme.onSurfaceVariant),
+          style: text.labelMedium?.copyWith(
+            color:      selectedYear != null
+                ? scheme.onPrimaryContainer
+                : scheme.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+          ),
+          hint: Text(L.rankingsAllYears,
+              style: text.labelMedium?.copyWith(
+                  color: scheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
+          onChanged: onChanged,
+          items: [
+            // "All years" option resets to null (period chips)
+            DropdownMenuItem<int?>(
+              value: null,
+              child: Text(L.rankingsAllYears,
+                  style: text.labelMedium?.copyWith(fontWeight: FontWeight.w600)),
+            ),
+            ...years.map((y) => DropdownMenuItem<int?>(
+              value: y,
+              child: Text('$y',
+                  style: text.labelMedium?.copyWith(fontWeight: FontWeight.w600)),
+            )),
+          ],
+        ),
+      ),
     );
   }
 }
