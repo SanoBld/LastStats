@@ -299,14 +299,22 @@ class _ErrorView extends StatelessWidget {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-String _extractImage(dynamic images) {
+String _extractImage(dynamic images, {bool large = false}) {
   if (images == null) return '';
   final list = images is List ? images : [];
   if (list.isEmpty) return '';
   try {
-    final large = list.lastWhere(
+    final entry = list.lastWhere(
         (i) => i is Map && i['size'] == 'extralarge', orElse: () => list.last);
-    return (large is Map ? large['#text'] ?? '' : '').toString();
+    var url = (entry is Map ? entry['#text'] ?? '' : '').toString();
+    if (url.isEmpty) return '';
+    // Upsample Last.fm CDN: replace the size segment in the path.
+    // /300x300/ → /500x500/  (CDN supports at least up to 500)
+    if (large && url.contains('lastfm.freetls.fastly.net')) {
+      url = url.replaceFirstMapped(
+        RegExp(r'/\d+x\d+/'), (_) => '/500x500/');
+    }
+    return url;
   } catch (_) { return ''; }
 }
 

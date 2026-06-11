@@ -307,6 +307,9 @@ class _DashboardPageState extends State<_DashboardPage> {
         if (np != null) {
           _extractColor(np);
           DataCache.set(DataCache.keyNowPlaying(), np);
+        } else if (useNowPlayingColorNotifier.value) {
+          // Track stopped → restore fallback accent
+          accentNotifier.value = nowPlayingFallbackColorNotifier.value;
         }
         _resolveHeaderImage();
       } else if (np != null) {
@@ -627,17 +630,35 @@ class _DashboardPageState extends State<_DashboardPage> {
     return '';
   }
 
-  // Extract a dominant color from the now-playing artwork and update the accent
+  // Extract a dominant color from the now-playing artwork and update the accent.
+  // Falls back to nowPlayingFallbackColorNotifier when art is missing or b&w.
   Future<void> _extractColor(Map<String, dynamic> track) async {
     if (!useNowPlayingColorNotifier.value) return;
     final url = _extractImage(track['image']);
-    if (url.isEmpty || url.contains('2a96cbd8b46e442fc41c2b86b821562f')) return;
+    if (url.isEmpty || url.contains('2a96cbd8b46e442fc41c2b86b821562f')) {
+      if (mounted) accentNotifier.value = nowPlayingFallbackColorNotifier.value;
+      return;
+    }
     try {
       final pal = await PaletteGenerator.fromImageProvider(
-        NetworkImage(url), size: const Size(160, 160), maximumColorCount: 16);
-      final c = pal.vibrantColor?.color ?? pal.dominantColor?.color;
-      if (c != null && mounted) accentNotifier.value = c;
-    } catch (_) {}
+        NetworkImage(url), size: const Size(200, 200), maximumColorCount: 24);
+      // Prefer vibrant variants; fall back through muted → dominant
+      final c = pal.vibrantColor?.color
+             ?? pal.lightVibrantColor?.color
+             ?? pal.darkVibrantColor?.color
+             ?? pal.lightMutedColor?.color
+             ?? pal.mutedColor?.color
+             ?? pal.dominantColor?.color;
+      if (!mounted) return;
+      if (c != null) {
+        // seedColorForScheme prevents pure black/white from breaking the theme
+        accentNotifier.value = seedColorForScheme(c);
+      } else {
+        accentNotifier.value = nowPlayingFallbackColorNotifier.value;
+      }
+    } catch (_) {
+      if (mounted) accentNotifier.value = nowPlayingFallbackColorNotifier.value;
+    }
   }
 
   // ── Stat helpers ──────────────────────────────────────────────────────────

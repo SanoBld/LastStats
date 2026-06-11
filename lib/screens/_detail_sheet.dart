@@ -69,7 +69,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   // Resolve best image URL
   Future<void> _resolveImage() async {
-    final raw = _extractImage(widget.item['image']);
+    final raw = _extractImage(widget.item['image'], large: true);
     final String url;
     switch (widget.type) {
       case 'artists':
