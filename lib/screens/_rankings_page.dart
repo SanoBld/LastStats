@@ -291,7 +291,7 @@ class _TopListBodyState extends State<_TopListBody>
                 child: _ItemTile(
                 name: name, imageUrl: raw, imageFuture: imgF, rank: '${idx + 1}',
                 sub:   widget.type != 'artists' ? '$artist · $plays ${L.commonPlays}' : '$plays ${L.commonPlays}',
-                plays: widget.type != 'artists' ? plays : null,
+                plays: null,
               ),
               ), // _FadeSlideIn
             );
@@ -393,11 +393,9 @@ class _PodiumWidget extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: text.bodySmall?.copyWith(
                               color: podOn, fontWeight: FontWeight.w700, fontSize: di == 0 ? 11 : 10)),
-                      if (heights[col] >= 100) ...[
-                        const SizedBox(height: 2),
-                        Text(plays, style: text.bodySmall
-                            ?.copyWith(color: podOn.withValues(alpha: 0.65), fontSize: 9)),
-                      ],
+                      const SizedBox(height: 2),
+                      Text(plays, style: text.bodySmall
+                          ?.copyWith(color: podOn.withValues(alpha: 0.65), fontSize: 9)),
                     ]),
                   ),
                 ),
