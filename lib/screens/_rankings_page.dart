@@ -143,29 +143,6 @@ class _TopListBodyState extends State<_TopListBody>
         old.year   != widget.year) _load(reset: true);
   }
 
-  // Decode HTML entities AND extract text from Dart Map.toString() artifacts.
-  // Last.fm stores artist as {"#text":"name","mbid":"..."}.
-  // If AllScrobblesService stores it via .toString(), it becomes "{#text: name, mbid: ...}".
-  static String _cleanName(String s) {
-    final trimmed = s.trim();
-    if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
-      // Extract value after "#text:" (ends at comma or closing brace)
-      final m = RegExp(r'#text:\s*([^,}]+)').firstMatch(trimmed);
-      final text = m?.group(1)?.trim() ?? '';
-      if (text.isNotEmpty) return _decodeHtml(text);
-      return ''; // only MBID, no readable name
-    }
-    return _decodeHtml(trimmed);
-  }
-
-  static String _decodeHtml(String s) => s
-      .replaceAll('&amp;',  '&')
-      .replaceAll('&apos;', "'")
-      .replaceAll('&#39;',  "'")
-      .replaceAll('&quot;', '"')
-      .replaceAll('&lt;',   '<')
-      .replaceAll('&gt;',   '>');
-
   // Compute top items from locally-cached scrobbles for a given year.
   Future<List<Map<String, dynamic>>> _computeLocalTop(int year) async {
     final records = AllScrobblesService.getRecordsForYear(year) ?? [];
@@ -177,21 +154,16 @@ class _TopListBodyState extends State<_TopListBody>
     final artistOf = <String, String>{}; // key → artist name
 
     for (final r in records) {
-      // Clean names: handles HTML entities + Dart Map.toString() artifacts
-      final artist = _cleanName(r.artist);
-      final album  = _cleanName(r.album);
-      final track  = _cleanName(r.track);
-
       final String key;
       switch (widget.type) {
         case 'artists':
-          key = artist;
+          key = r.artist;
         case 'albums':
-          key = '$album|||$artist';
-          artistOf[key] = artist;
+          key = '${r.album}|||${r.artist}';
+          artistOf[key] = r.artist;
         default: // tracks
-          key = '$track|||$artist';
-          artistOf[key] = artist;
+          key = '${r.track}|||${r.artist}';
+          artistOf[key] = r.artist;
       }
       if (key.isEmpty || key.startsWith('|||')) continue;
       counts[key] = (counts[key] ?? 0) + 1;
@@ -368,7 +340,7 @@ class _PodiumWidget extends StatelessWidget {
             final name = (item['name'] ?? '').toString();
             final art  = type != 'artists' ? (item['artist']?['name'] ?? '').toString() : '';
             final plays = _fmt(int.tryParse((item['playcount'] ?? '0').toString()) ?? 0);
-            final raw  = _extractImage(item['image'], large: true);
+            final raw  = _extractImage(item['image']);
             Future<String> imgF;
             switch (type) {
               case 'artists': imgF = ImageService.resolveArtist(name, lastfmUrl: raw.isNotEmpty ? raw : null); break;
