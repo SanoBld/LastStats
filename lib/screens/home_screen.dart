@@ -12,6 +12,7 @@ import 'dart:async';
 import 'dart:math' show sqrt;
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:palette_generator/palette_generator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../app_state.dart';

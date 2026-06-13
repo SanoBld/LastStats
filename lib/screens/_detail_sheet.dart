@@ -60,6 +60,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   // Lyrics (tracks)
   bool   _loadingLyrics = false;
   String _lyrics        = '';
+  bool   _lyricsExpanded = false;
 
   // Helpers
   String get _name   => (widget.item['name']             ?? '').toString();
@@ -109,6 +110,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             _topAlbums  = results[2] as List<dynamic>;
           });
           }
+          // Auto-translate the bio to the app's language
+          if (_bio().isNotEmpty) _translateTo(localeNotifier.value);
 
         case 'albums':
           final info = await widget.service.getAlbumInfo(_name, _artist);
@@ -347,12 +350,10 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       // Stats row
                       _buildStatsRow(scheme),
 
-                      const Divider(height: 1),
 
                       // Tags
                       if (_tags().isNotEmpty) ...[
                         _buildTags(scheme),
-                        const Divider(height: 1),
                       ],
 
                       // Bio
@@ -662,7 +663,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ),
           ],
           const SizedBox(height: 16),
-          Divider(color: scheme.outlineVariant),
+          const SizedBox(height: 8),
         ],
       ),
     );
@@ -751,7 +752,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               ),
             );
           }),
-          Divider(color: scheme.outlineVariant),
+          const SizedBox(height: 8),
         ],
       ),
     );
@@ -817,7 +818,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             },
           ),
           const SizedBox(height: 16),
-          Divider(color: scheme.outlineVariant),
+          const SizedBox(height: 8),
         ],
       ),
     );
@@ -865,7 +866,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               },
             );
           }),
-          Divider(color: scheme.outlineVariant),
+          const SizedBox(height: 8),
         ],
       ),
     );
@@ -896,7 +897,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             const SizedBox(height: 2),
             Text(durStr, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
           ],
-          Divider(color: scheme.outlineVariant),
+          const SizedBox(height: 8),
         ],
       ),
     );
@@ -905,14 +906,34 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   // ── Lyrics ──────────────────────────────────────────────────────────────────
   Widget _buildLyrics(ColorScheme scheme) {
     final text = Theme.of(context).textTheme;
+    const maxChars = 320;
+    final truncated = !_lyricsExpanded && _lyrics.length > maxChars;
+    final shown = truncated ? '${_lyrics.substring(0, maxChars)}…' : _lyrics;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(L.detailLyrics,
-            style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(L.detailLyrics,
+                style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+              if (_lyrics.isNotEmpty)
+                IconButton(
+                  icon: const Icon(Icons.copy_rounded, size: 18),
+                  tooltip: L.detailCopyLyrics,
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: _lyrics));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(L.detailLyricsCopied)),
+                    );
+                  },
+                ),
+            ],
+          ),
           const SizedBox(height: 8),
           if (_loadingLyrics)
             const Center(child: Padding(
@@ -922,15 +943,29 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           else if (_lyrics.isEmpty)
             Text(L.detailLyricsNotFound,
               style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant))
-          else
-            Text(_lyrics,
+          else ...[
+            Text(shown,
               style: text.bodyMedium?.copyWith(
                 color: scheme.onSurfaceVariant,
                 height: 1.6,
               ),
             ),
-          const SizedBox(height: 16),
-          Divider(color: scheme.outlineVariant),
+            if (_lyrics.length > maxChars) ...[
+              const SizedBox(height: 6),
+              GestureDetector(
+                onTap: () => setState(() => _lyricsExpanded = !_lyricsExpanded),
+                child: Text(
+                  _lyricsExpanded ? '${L.detailBioReadLess} ▲' : '${L.detailBioReadMore} ▼',
+                  style: TextStyle(
+                    color:      scheme.primary,
+                    fontWeight: FontWeight.w600,
+                    fontSize:   13,
+                  ),
+                ),
+              ),
+            ],
+          ],
+          const SizedBox(height: 8),
         ],
       ),
     );

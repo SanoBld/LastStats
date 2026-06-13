@@ -248,6 +248,8 @@ abstract class AppStrings {
   String get detailShowOriginal;
   String get detailLyrics;
   String get detailLyricsNotFound;
+  String get detailCopyLyrics;
+  String get detailLyricsCopied;
 
   // ── Dashboard extra ─────────────────────────────────────────────────────────
   String get dashPerWeek;
@@ -495,6 +497,8 @@ class _AppStringsFr implements AppStrings {
   @override String get detailShowOriginal    => 'Voir l\'original';
   @override String get detailLyrics          => 'Paroles';
   @override String get detailLyricsNotFound  => 'Paroles non disponibles';
+  @override String get detailCopyLyrics      => 'Copier les paroles';
+  @override String get detailLyricsCopied    => 'Paroles copiées';
   @override String get dashPerWeek           => 'par semaine';
 }
 
@@ -740,6 +744,8 @@ class _AppStringsEn implements AppStrings {
   @override String get detailShowOriginal    => 'Show original';
   @override String get detailLyrics          => 'Lyrics';
   @override String get detailLyricsNotFound  => 'Lyrics not available';
+  @override String get detailCopyLyrics      => 'Copy lyrics';
+  @override String get detailLyricsCopied    => 'Lyrics copied';
   @override String get dashPerWeek           => 'per week';
 }
 
