@@ -55,6 +55,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   bool   _translating    = false;
   bool   _showTranslated = false;
   String _translatedBio  = '';
+  String _translatedLang = '';
 
   // Lyrics (tracks)
   bool   _loadingLyrics = false;
@@ -174,21 +175,52 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       setState(() => _showTranslated = false);
       return;
     }
-    if (_translatedBio.isNotEmpty) {
-      setState(() => _showTranslated = true);
+    await _translateTo(localeNotifier.value);
+  }
+
+  // Translate bio to a specific [lang] code and show it
+  Future<void> _translateTo(String lang) async {
+    if (_showTranslated && _translatedLang == lang && _translatedBio.isNotEmpty) {
       return;
     }
     setState(() => _translating = true);
-    final result = await TranslationService.translate(_bio(), localeNotifier.value);
+    final result = await TranslationService.translate(_bio(), lang);
     if (mounted) {
       setState(() {
         _translating = false;
         if (result.isNotEmpty) {
           _translatedBio  = result;
+          _translatedLang = lang;
           _showTranslated = true;
         }
       });
     }
+  }
+
+  // Long-press: pick a target language from a bottom-sheet list
+  void _pickTranslationLanguage() {
+    const langs = <String, String>{
+      'fr': 'Français', 'en': 'English', 'es': 'Español',
+      'de': 'Deutsch',  'it': 'Italiano', 'pt': 'Português',
+      'ja': '日本語',     'ko': '한국어',    'ar': 'العربية',
+    };
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      builder: (ctx) => SafeArea(
+        child: Wrap(
+          children: langs.entries.map((e) => ListTile(
+            title: Text(e.value),
+            trailing: _translatedLang == e.key && _showTranslated
+                ? const Icon(Icons.check_rounded) : null,
+            onTap: () {
+              Navigator.pop(ctx);
+              _translateTo(e.key);
+            },
+          )).toList(),
+        ),
+      ),
+    );
   }
 
   // Helpers
@@ -343,7 +375,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       // Track: lyrics
                       if (widget.type == 'tracks') _buildLyrics(scheme),
 
-                      const SizedBox(height: 48),
+                      const SizedBox(height: 16),
                     ],
                   ),
                 ),
@@ -581,16 +613,29 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       width: 16, height: 16,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : TextButton.icon(
-                      onPressed: _toggleTranslate,
-                      icon: const Icon(Icons.translate_rounded, size: 16),
-                      label: Text(
-                        _showTranslated ? L.detailShowOriginal : L.detailTranslate,
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: const Size(0, 0),
+                  : GestureDetector(
+                      onLongPress: _pickTranslationLanguage,
+                      child: TextButton.icon(
+                        onPressed: _toggleTranslate,
+                        icon: Icon(
+                          _showTranslated
+                              ? Icons.undo_rounded
+                              : Icons.translate_rounded,
+                          size: 16,
+                        ),
+                        label: Text(
+                          _showTranslated ? L.detailShowOriginal : L.detailTranslate,
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                        ),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          minimumSize: const Size(0, 0),
+                          backgroundColor: scheme.surfaceContainerHighest,
+                          foregroundColor: scheme.onSurfaceVariant,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
                       ),
                     ),
             ],
@@ -647,7 +692,15 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             final plays = int.tryParse((t['playcount'] ?? t['listeners'] ?? '0').toString()) ?? 0;
             final frac  = maxPlay > 0 ? plays / maxPlay : 0.0;
 
-            return Padding(
+            return InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () {
+                final item = Map<String, dynamic>.from(t);
+                item['artist'] ??= {'name': _name};
+                Navigator.pop(context);
+                showDetailSheet(context, item, 'tracks', widget.service);
+              },
+              child: Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: Row(
                 children: [
@@ -695,6 +748,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                   ),
                 ],
               ),
+              ),
             );
           }),
           Divider(color: scheme.outlineVariant),
@@ -731,7 +785,14 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               final aName = (a['name'] ?? '').toString();
               final imgUrl = _extractImage(a['image']);
 
-              return Column(
+              return GestureDetector(
+                onTap: () {
+                  final item = Map<String, dynamic>.from(a);
+                  item['artist'] ??= {'name': _name};
+                  Navigator.pop(context);
+                  showDetailSheet(context, item, 'albums', widget.service);
+                },
+                child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ClipRRect(
@@ -751,6 +812,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                     maxLines: 2, overflow: TextOverflow.ellipsis,
                     style: text.labelSmall?.copyWith(fontWeight: FontWeight.w600)),
                 ],
+              ),
               );
             },
           ),
