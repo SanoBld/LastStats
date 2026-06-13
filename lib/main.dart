@@ -13,6 +13,7 @@ import 'services/image_service.dart';
 import 'services/scrobbles_file_cache.dart';
 import 'services/notification_service.dart';
 import 'services/notification_worker.dart';
+import 'services/storage_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,11 +42,16 @@ void main() async {
   // ── Navigation layout ('auto' | 'on' | 'off') ───────────────────────────
   pcModeNotifier.value = prefs.getString('ls_pc_mode') ?? 'auto';
 
-  // ── Data caches ─────────────────────────────────────────────────────────
+  // ── Data caches & storage ────────────────────────────────────────────────
   await DataCache.init();
   await DataCache.clearExpired();
   await ScrobblesFileCache.init();
+  await StorageManager.init();
   ImageService.pruneExpired();
+  
+  // Restore offline-mode preference.
+  DataCache.offlineMode = prefs.getBool('ls_cache_serve_stale') ?? true;
+  
 
   // ── Notifications & WorkManager ──────────────────────────────────────────
   // workmanager only supports Android & iOS — calling it on desktop/web
