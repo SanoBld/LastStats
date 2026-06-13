@@ -952,8 +952,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 // ── Background image with blur-to-clear fade-in ───────────────────────────────
 
 class _BlurFadeImage extends StatefulWidget {
-  final String  url;
-  final Widget  fallback;
+  final String url;
+  final Widget fallback;
   const _BlurFadeImage({super.key, required this.url, required this.fallback});
 
   @override
@@ -977,30 +977,46 @@ class _BlurFadeImageState extends State<_BlurFadeImage>
   void dispose() { _ctrl.dispose(); super.dispose(); }
 
   @override
-  Widget build(BuildContext context) => Image.network(
-    widget.url,
-    fit: BoxFit.cover,
-    color: Colors.black.withValues(alpha: 0.55),
-    colorBlendMode: BlendMode.darken,
-    alignment: Alignment.center,
-    loadingBuilder: (_, child, progress) {
-      if (progress == null) {
-        // Image fully loaded → start blur animation
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted && !_ctrl.isCompleted) _ctrl.forward();
-        });
-        return AnimatedBuilder(
+  Widget build(BuildContext context) => SizedBox.expand(
+    child: Stack(
+      fit: StackFit.expand,
+      children: [
+        // Fallback always underneath
+        widget.fallback,
+        // Image fades + unblurs on top once loaded
+        AnimatedBuilder(
           animation: _blur,
-          builder: (_, c) => ImageFiltered(
-            imageFilter: ImageFilter.blur(sigmaX: _blur.value, sigmaY: _blur.value),
-            child: c,
+          builder: (_, child) => ImageFiltered(
+            imageFilter: ImageFilter.blur(
+              sigmaX: _blur.value, sigmaY: _blur.value,
+              tileMode: TileMode.decal,
+            ),
+            child: child,
           ),
-          child: child,
-        );
-      }
-      return widget.fallback;
-    },
-    errorBuilder: (_, __, ___) => widget.fallback,
+          child: Image.network(
+            widget.url,
+            fit: BoxFit.cover,
+            width:  double.infinity,
+            height: double.infinity,
+            color:         Colors.black.withValues(alpha: 0.55),
+            colorBlendMode: BlendMode.darken,
+            frameBuilder: (_, child, frame, __) {
+              if (frame != null) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted && !_ctrl.isCompleted) _ctrl.forward();
+                });
+              }
+              return AnimatedOpacity(
+                opacity:  frame != null ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 400),
+                child: child,
+              );
+            },
+            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+          ),
+        ),
+      ],
+    ),
   );
 }
 
