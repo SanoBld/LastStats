@@ -1,6 +1,7 @@
 // ignore_for_file: unused_import
 part of 'home_screen.dart';
 
+
 void showDetailSheet(
   BuildContext context,
   Map<String, dynamic> item,
@@ -49,6 +50,15 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   // User-specific
   int _userPlays = 0;
   int _userRank  = -1;
+
+  // Translation (bio)
+  bool   _translating    = false;
+  bool   _showTranslated = false;
+  String _translatedBio  = '';
+
+  // Lyrics (tracks)
+  bool   _loadingLyrics = false;
+  String _lyrics        = '';
 
   // Helpers
   String get _name   => (widget.item['name']             ?? '').toString();
@@ -111,6 +121,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         case 'tracks':
           final info = await widget.service.getTrackInfo(_name, _artist);
           if (mounted) { setState(() => _info = info); }
+          _fetchLyrics();
       }
     } catch (_) {
       // Silent fail — show what we have
@@ -143,6 +154,41 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     if (p == _period) return;
     setState(() { _period = p; _loadingUser = true; _userPlays = 0; _userRank = -1; });
     await _fetchUserStats();
+  }
+
+  // Fetch lyrics from lyrics.ovh (tracks only)
+  Future<void> _fetchLyrics() async {
+    setState(() => _loadingLyrics = true);
+    final lyrics = await LyricsService.getLyrics(_artist, _name);
+    if (mounted) {
+      setState(() {
+        _lyrics = lyrics;
+        _loadingLyrics = false;
+      });
+    }
+  }
+
+  // Translate bio to the app's current language (toggle on/off)
+  Future<void> _toggleTranslate() async {
+    if (_showTranslated) {
+      setState(() => _showTranslated = false);
+      return;
+    }
+    if (_translatedBio.isNotEmpty) {
+      setState(() => _showTranslated = true);
+      return;
+    }
+    setState(() => _translating = true);
+    final result = await TranslationService.translate(_bio(), localeNotifier.value);
+    if (mounted) {
+      setState(() {
+        _translating = false;
+        if (result.isNotEmpty) {
+          _translatedBio  = result;
+          _showTranslated = true;
+        }
+      });
+    }
   }
 
   // Helpers
@@ -293,6 +339,9 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
                       // Track: album link
                       if (widget.type == 'tracks') _buildTrackExtra(scheme),
+
+                      // Track: lyrics
+                      if (widget.type == 'tracks') _buildLyrics(scheme),
 
                       const SizedBox(height: 48),
                     ],
@@ -511,7 +560,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   // ── Bio ────────────────────────────────────────────────────────────────────
   Widget _buildBio(ColorScheme scheme) {
     final text = Theme.of(context).textTheme;
-    final bio  = _bio();
+    final bio  = _showTranslated && _translatedBio.isNotEmpty ? _translatedBio : _bio();
     const maxChars = 280;
     final truncated = !_bioExpanded && bio.length > maxChars;
     final shown     = truncated ? '${bio.substring(0, maxChars)}…' : bio;
@@ -521,8 +570,31 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(L.detailBiography,
-            style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(L.detailBiography,
+                style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+              // Translate / show-original toggle button
+              _translating
+                  ? const SizedBox(
+                      width: 16, height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : TextButton.icon(
+                      onPressed: _toggleTranslate,
+                      icon: const Icon(Icons.translate_rounded, size: 16),
+                      label: Text(
+                        _showTranslated ? L.detailShowOriginal : L.detailTranslate,
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(0, 0),
+                      ),
+                    ),
+            ],
+          ),
           const SizedBox(height: 8),
           Text(shown,
             style: text.bodyMedium?.copyWith(
@@ -723,6 +795,12 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               trailing: Text(durStr, style: text.bodySmall
                   ?.copyWith(color: scheme.onSurfaceVariant)),
               dense: true,
+              onTap: () {
+                final trackItem = Map<String, dynamic>.from(t);
+                trackItem['artist'] ??= {'name': _name};
+                Navigator.pop(context);
+                showDetailSheet(context, trackItem, 'tracks', widget.service);
+              },
             );
           }),
           Divider(color: scheme.outlineVariant),
@@ -756,6 +834,40 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             const SizedBox(height: 2),
             Text(durStr, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
           ],
+          Divider(color: scheme.outlineVariant),
+        ],
+      ),
+    );
+  }
+
+  // ── Lyrics ──────────────────────────────────────────────────────────────────
+  Widget _buildLyrics(ColorScheme scheme) {
+    final text = Theme.of(context).textTheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(L.detailLyrics,
+            style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+          const SizedBox(height: 8),
+          if (_loadingLyrics)
+            const Center(child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ))
+          else if (_lyrics.isEmpty)
+            Text(L.detailLyricsNotFound,
+              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant))
+          else
+            Text(_lyrics,
+              style: text.bodyMedium?.copyWith(
+                color: scheme.onSurfaceVariant,
+                height: 1.6,
+              ),
+            ),
+          const SizedBox(height: 16),
           Divider(color: scheme.outlineVariant),
         ],
       ),

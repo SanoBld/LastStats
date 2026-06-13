@@ -244,6 +244,10 @@ abstract class AppStrings {
   String get detailPeriod;
   String get detailBiography;
   String get detailGlobalListenersLabel; // "Auditeurs" / "Listeners"
+  String get detailTranslate;
+  String get detailShowOriginal;
+  String get detailLyrics;
+  String get detailLyricsNotFound;
 
   // ── Dashboard extra ─────────────────────────────────────────────────────────
   String get dashPerWeek;
@@ -487,6 +491,10 @@ class _AppStringsFr implements AppStrings {
   @override String get detailPeriod          => 'Période';
   @override String get detailBiography       => 'Biographie';
   @override String get detailGlobalListenersLabel => 'Auditeurs';
+  @override String get detailTranslate       => 'Traduire';
+  @override String get detailShowOriginal    => 'Voir l\'original';
+  @override String get detailLyrics          => 'Paroles';
+  @override String get detailLyricsNotFound  => 'Paroles non disponibles';
   @override String get dashPerWeek           => 'par semaine';
 }
 
@@ -728,6 +736,10 @@ class _AppStringsEn implements AppStrings {
   @override String get detailPeriod          => 'Period';
   @override String get detailBiography       => 'Biography';
   @override String get detailGlobalListenersLabel => 'Listeners';
+  @override String get detailTranslate       => 'Translate';
+  @override String get detailShowOriginal    => 'Show original';
+  @override String get detailLyrics          => 'Lyrics';
+  @override String get detailLyricsNotFound  => 'Lyrics not available';
   @override String get dashPerWeek           => 'per week';
 }
 

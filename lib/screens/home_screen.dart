@@ -22,6 +22,8 @@ import '../services/update_service.dart';
 import '../services/data_cache.dart';
 import '../services/prefetch_service.dart';
 import '../services/all_scrobbles_service.dart';
+import '../services/translation_service.dart';
+import '../services/lyrics_service.dart';
 
 // ── Settings sub-pages ────────────────────────────────────────────────────────
 import 'settings/appearance_page.dart';

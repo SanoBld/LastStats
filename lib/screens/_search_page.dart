@@ -1024,9 +1024,15 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     final rawUrl  = _extractImage(np['image']);
     final hasImg  = rawUrl.isNotEmpty && !rawUrl.contains(_ph);
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-      child: Container(
+    return GestureDetector(
+      onTap: () {
+        final item = Map<String, dynamic>.from(np);
+        item['artist'] ??= {'name': artist};
+        showDetailSheet(context, item, 'tracks', widget.service);
+      },
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color:        Colors.greenAccent.shade400.withValues(alpha: 0.08),
@@ -1063,12 +1069,12 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                   ?.copyWith(color: scheme.onSurfaceVariant)),
           ])),
         ]),
+        ),
       ),
     );
   }
 
   // ── Section title bar ─────────────────────────────────────────────────────
-
   Widget _sectionHeader(String title, ColorScheme scheme) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
@@ -1202,7 +1208,13 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     final rawUrl = _extractImage(t['image']);
     final hasImg = rawUrl.isNotEmpty && !rawUrl.contains(_ph);
 
-    return Padding(
+    return GestureDetector(
+      onTap: () {
+        final item = Map<String, dynamic>.from(t);
+        item['artist'] ??= {'name': artist};
+        showDetailSheet(context, item, 'tracks', widget.service);
+      },
+      child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
       child: Row(children: [
         // Track artwork with green dot for live track
@@ -1246,6 +1258,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                 style: Theme.of(context).textTheme.labelSmall
                     ?.copyWith(color: scheme.onSurfaceVariant, fontSize: 10)),
       ]),
+      ),
     );
   }
 
