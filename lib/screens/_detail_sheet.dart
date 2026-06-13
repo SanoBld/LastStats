@@ -1,5 +1,9 @@
+
 // ignore_for_file: unused_import
 part of 'home_screen.dart';
+
+// url_launcher is used for music app deep links
+// Add 'url_launcher: ^6.0.0' to pubspec.yaml if not already present
 
 
 void showDetailSheet(
@@ -8,12 +12,18 @@ void showDetailSheet(
   String type,          // 'artists' | 'albums' | 'tracks'
   LastFmService service,
 ) {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (_) => _ItemDetailSheet(item: item, type: type, service: service),
-  );
+  Navigator.of(context).push(PageRouteBuilder(
+    opaque: false,
+    fullscreenDialog: true,
+    pageBuilder:        (_, __, ___) => _ItemDetailSheet(item: item, type: type, service: service),
+    transitionsBuilder: (_, anim, __, child) => SlideTransition(
+      position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+          .animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
+      child: child,
+    ),
+    transitionDuration:        const Duration(milliseconds: 380),
+    reverseTransitionDuration: const Duration(milliseconds: 300),
+  ));
 }
 
 
@@ -230,146 +240,110 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return DraggableScrollableSheet(
-      initialChildSize: 0.92,
-      minChildSize:     0.5,
-      maxChildSize:     1.0,
-      expand: false,
-      builder: (ctx, scrollCtrl) => _buildContent(ctx, scrollCtrl, scheme),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: scheme.surface,
+        body: _buildContent(context, scheme),
+      ),
     );
   }
 
-  Widget _buildContent(BuildContext ctx, ScrollController scrollCtrl, ColorScheme scheme) {
-    final mediaH    = MediaQuery.of(ctx).size.height;
-    final topPad    = MediaQuery.of(ctx).padding.top;
-    final imgH      = mediaH * 0.38;
-    final hasImage  = _resolvedImage.isNotEmpty;
+  Widget _buildContent(BuildContext ctx, ColorScheme scheme) {
+    final mediaH   = MediaQuery.of(ctx).size.height;
+    final topPad   = MediaQuery.of(ctx).padding.top;
+    final imgH     = mediaH * 0.44;
+    final hasImage = _resolvedImage.isNotEmpty;
 
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      child: Stack(
-        children: [
+    return Stack(
+      children: [
 
-          // ── Background image with fade-in blur animation ──────────────────
-          Positioned.fill(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 500),
-              transitionBuilder: (child, anim) => FadeTransition(
-                opacity: anim,
-                child: child,
+        // ── Background image (fullscreen, covers status bar) ──────────────
+        Positioned.fill(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 500),
+            transitionBuilder: (child, anim) =>
+                FadeTransition(opacity: anim, child: child),
+            child: hasImage
+                ? _BlurFadeImage(
+                    key: ValueKey(_resolvedImage),
+                    url: _resolvedImage,
+                    fallback: _DetailGradientBg(scheme: scheme),
+                  )
+                : _DetailGradientBg(key: const ValueKey('fallback'), scheme: scheme),
+          ),
+        ),
+
+        // ── Gradient: dark top band + fade to surface at bottom ───────────
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin:  Alignment.topCenter,
+                end:    Alignment.bottomCenter,
+                stops:  const [0.0, 0.28, 0.52, 1.0],
+                colors: [
+                  Colors.black.withValues(alpha: 0.55),
+                  Colors.transparent,
+                  scheme.surface.withValues(alpha: 0.82),
+                  scheme.surface,
+                ],
               ),
-              child: hasImage
-                  ? _BlurFadeImage(
-                      key: ValueKey(_resolvedImage),
-                      url: _resolvedImage,
-                      fallback: _DetailGradientBg(scheme: scheme),
-                    )
-                  : _DetailGradientBg(key: const ValueKey('fallback'), scheme: scheme),
             ),
           ),
+        ),
 
-          // ── Dark overlay (darken image + fade to surface at bottom) ───────
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin:  Alignment.topCenter,
-                  end:    Alignment.bottomCenter,
-                  stops:  const [0.0, 0.30, 0.55, 1.0],
-                  colors: [
-                    Colors.black.withValues(alpha: 0.45),
-                    Colors.transparent,
-                    scheme.surface.withValues(alpha: 0.85),
-                    scheme.surface,
+        // ── Scrollable body ───────────────────────────────────────────────
+        SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: imgH - 90),
+              _buildHeader(ctx, scheme, imgH, hasImage),
+              Container(
+                color: scheme.surface,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildPeriodSelector(scheme),
+                    Divider(height: 1,
+                        color: scheme.outlineVariant.withValues(alpha: 0.4)),
+                    _buildStatsRow(scheme),
+                    if (_tags().isNotEmpty) _buildTags(scheme),
+                    if (_bio().isNotEmpty)  _buildBio(scheme),
+                    if (widget.type == 'artists' && _topTracks.isNotEmpty)
+                      _buildTopTracks(scheme),
+                    if (widget.type == 'artists' && _topAlbums.isNotEmpty)
+                      _buildTopAlbums(scheme),
+                    if (widget.type == 'albums' && _tracklist.isNotEmpty)
+                      _buildTracklist(scheme),
+                    if (widget.type == 'tracks') _buildTrackExtra(scheme),
+                    if (widget.type == 'tracks') _buildLyrics(scheme),
+                    const SizedBox(height: 48),
                   ],
                 ),
               ),
-            ),
+            ],
           ),
+        ),
 
-          // ── Status bar safe overlay (always visible at top) ───────────────
-          Positioned(
-            top: 0, left: 0, right: 0,
+        // ── Back button ───────────────────────────────────────────────────
+        Positioned(
+          top: topPad + 8, left: 12,
+          child: GestureDetector(
+            onTap: () => Navigator.pop(ctx),
             child: Container(
-              height: topPad + 52,
+              width: 36, height: 36,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin:  Alignment.topCenter,
-                  end:    Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withValues(alpha: 0.60),
-                    Colors.transparent,
-                  ],
-                ),
+                color: Colors.black.withValues(alpha: 0.45),
+                shape: BoxShape.circle,
               ),
+              child: const Icon(Icons.arrow_back_ios_new_rounded,
+                  color: Colors.white, size: 16),
             ),
           ),
-
-          // ── Scrollable content ────────────────────────────────────────────
-          SingleChildScrollView(
-            controller: scrollCtrl,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: imgH - 80),
-                _buildHeader(ctx, scheme, imgH, hasImage),
-                Container(
-                  color: scheme.surface,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildPeriodSelector(scheme),
-                      Divider(height: 1, color: scheme.outlineVariant.withValues(alpha: 0.4)),
-                      _buildStatsRow(scheme),
-                      if (_tags().isNotEmpty) _buildTags(scheme),
-                      if (_bio().isNotEmpty)  _buildBio(scheme),
-                      if (widget.type == 'artists' && _topTracks.isNotEmpty)
-                        _buildTopTracks(scheme),
-                      if (widget.type == 'artists' && _topAlbums.isNotEmpty)
-                        _buildTopAlbums(scheme),
-                      if (widget.type == 'albums' && _tracklist.isNotEmpty)
-                        _buildTracklist(scheme),
-                      if (widget.type == 'tracks') _buildTrackExtra(scheme),
-                      if (widget.type == 'tracks') _buildLyrics(scheme),
-                      const SizedBox(height: 32),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // ── Close button ──────────────────────────────────────────────────
-          Positioned(
-            top: topPad + 10, right: 16,
-            child: GestureDetector(
-              onTap: () => Navigator.pop(ctx),
-              child: Container(
-                width: 34, height: 34,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.50),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.close_rounded, color: Colors.white, size: 18),
-              ),
-            ),
-          ),
-
-          // ── Drag handle ───────────────────────────────────────────────────
-          Positioned(
-            top: topPad + 10, left: 0, right: 0,
-            child: Center(
-              child: Container(
-                width: 36, height: 4,
-                decoration: BoxDecoration(
-                  color:        Colors.white.withValues(alpha: 0.55),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -420,15 +394,85 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                     ? Colors.white.withValues(alpha: 0.85)
                     : scheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
-                shadows:    hasImage
+                shadows: hasImage
                     ? [Shadow(blurRadius: 6, color: Colors.black.withValues(alpha: 0.5))]
                     : null,
               ),
             ),
           ],
-          const SizedBox(height: 20),
+          const SizedBox(height: 14),
+          // Music app link buttons
+          _buildMusicLinks(hasImage),
+          const SizedBox(height: 16),
         ],
       ),
+    );
+  }
+
+  // ── Music app links ─────────────────────────────────────────────────────────
+
+  Widget _buildMusicLinks(bool hasImage) {
+    // Build search query depending on type
+    final q = switch (widget.type) {
+      'artists' => _name,
+      'albums'  => '$_name $_artist',
+      _         => '$_name $_artist',
+    };
+    final encoded = Uri.encodeComponent(q);
+
+    final buttons = [
+      (
+        label: 'Spotify',
+        color: const Color(0xFF1DB954),
+        icon:  Icons.spatial_audio_off_rounded,
+        url:   'https://open.spotify.com/search/$encoded',
+      ),
+      (
+        label: 'YT Music',
+        color: const Color(0xFFFF0033),
+        icon:  Icons.music_video_rounded,
+        url:   'https://music.youtube.com/search?q=$encoded',
+      ),
+      (
+        label: 'Web',
+        color: Colors.white.withValues(alpha: 0.85),
+        icon:  Icons.language_rounded,
+        url:   'https://www.google.com/search?q=${Uri.encodeComponent(q + " music")}',
+      ),
+    ];
+
+    return Row(
+      children: buttons.map((b) => Padding(
+        padding: const EdgeInsets.only(right: 8),
+        child: GestureDetector(
+          onTap: () async {
+            final uri = Uri.parse(b.url);
+            try { await launchUrl(uri, mode: LaunchMode.externalApplication); }
+            catch (_) { await launchUrl(uri, mode: LaunchMode.platformDefault); }
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: hasImage ? 0.38 : 0.10),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: (hasImage ? Colors.white : Colors.black)
+                    .withValues(alpha: 0.18),
+                width: 1,
+              ),
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(b.icon, size: 14,
+                  color: hasImage ? Colors.white.withValues(alpha: 0.90) : b.color),
+              const SizedBox(width: 5),
+              Text(b.label, style: TextStyle(
+                color: hasImage ? Colors.white.withValues(alpha: 0.90) : b.color,
+                fontSize: 11, fontWeight: FontWeight.w600,
+              )),
+            ]),
+          ),
+        ),
+      )).toList(),
     );
   }
 

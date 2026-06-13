@@ -15,6 +15,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:palette_generator/palette_generator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/services.dart' show SystemUiOverlayStyle;
+import 'package:url_launcher/url_launcher.dart';
 import '../app_state.dart';
 import '../l10n.dart';
 import '../services/lastfm_service.dart';

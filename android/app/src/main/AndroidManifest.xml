@@ -14,8 +14,9 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <!-- Required on Android 11+ so canLaunchUrl/launchUrl can see the browser -->
+    <!-- Required on Android 11+ so canLaunchUrl/launchUrl can see target apps -->
     <queries>
+        <!-- Generic HTTP/HTTPS (browser fallback) -->
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" />
@@ -24,6 +25,15 @@
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="http" />
         </intent>
+        <!-- Spotify native app -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="spotify" />
+        </intent>
+        <!-- YouTube Music native app -->
+        <package android:name="com.google.android.apps.youtube.music" />
+        <!-- YouTube (fallback) -->
+        <package android:name="com.google.android.youtube" />
     </queries>
 
     <application
