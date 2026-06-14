@@ -1,4 +1,3 @@
-
 // ignore_for_file: unused_import
 part of 'home_screen.dart';
 
@@ -49,7 +48,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   String _period       = 'overall';
 
   String _resolvedImage = '';
-  bool   _imageLoaded   = false;   // triggers fade-in animation
 
   Map<String, dynamic>? _info;
   List<dynamic>         _topTracks = [];
@@ -235,6 +233,18 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         .map((t) => Map<String, dynamic>.from(t)).toList();
   }
 
+  void _openFullscreen(BuildContext ctx, String url) {
+    Navigator.of(ctx).push(PageRouteBuilder(
+      opaque: false,
+      barrierColor: Colors.black,
+      barrierDismissible: true,
+      pageBuilder: (_, __, ___) => _FullscreenImageViewer(url: url),
+      transitionsBuilder: (_, anim, __, child) =>
+          FadeTransition(opacity: anim, child: child),
+      transitionDuration: const Duration(milliseconds: 220),
+    ));
+  }
+
   // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
@@ -326,6 +336,20 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ],
           ),
         ),
+
+        // ── Image zone: tap = fullscreen, swipe down = dismiss ───────────
+        if (hasImage)
+          Positioned(
+            top: 0, left: 0, right: 0,
+            height: imgH - 80,
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () => _openFullscreen(ctx, _resolvedImage),
+              onVerticalDragEnd: (d) {
+                if ((d.primaryVelocity ?? 0) > 300) Navigator.pop(ctx);
+              },
+            ),
+          ),
 
         // ── Back button ───────────────────────────────────────────────────
         Positioned(
@@ -993,71 +1017,32 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   }
 }
 
-// ── Background image with blur-to-clear fade-in ───────────────────────────────
+// ── Background image with fade-in ────────────────────────────────────────────
 
-class _BlurFadeImage extends StatefulWidget {
+class _BlurFadeImage extends StatelessWidget {
   final String url;
   final Widget fallback;
   const _BlurFadeImage({super.key, required this.url, required this.fallback});
-
-  @override
-  State<_BlurFadeImage> createState() => _BlurFadeImageState();
-}
-
-class _BlurFadeImageState extends State<_BlurFadeImage>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-  late final Animation<double>   _blur;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 700));
-    _blur = Tween<double>(begin: 18.0, end: 0.0)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
-  }
-
-  @override
-  void dispose() { _ctrl.dispose(); super.dispose(); }
 
   @override
   Widget build(BuildContext context) => SizedBox.expand(
     child: Stack(
       fit: StackFit.expand,
       children: [
-        // Fallback always underneath
-        widget.fallback,
-        // Image fades + unblurs on top once loaded
-        AnimatedBuilder(
-          animation: _blur,
-          builder: (_, child) => ImageFiltered(
-            imageFilter: ImageFilter.blur(
-              sigmaX: _blur.value, sigmaY: _blur.value,
-              tileMode: TileMode.decal,
-            ),
+        fallback,
+        Image.network(
+          url,
+          fit: BoxFit.cover,
+          width:  double.infinity,
+          height: double.infinity,
+          color:          Colors.black.withValues(alpha: 0.55),
+          colorBlendMode: BlendMode.darken,
+          frameBuilder: (_, child, frame, __) => AnimatedOpacity(
+            opacity:  frame != null ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 300),
             child: child,
           ),
-          child: Image.network(
-            widget.url,
-            fit: BoxFit.cover,
-            width:  double.infinity,
-            height: double.infinity,
-            color:         Colors.black.withValues(alpha: 0.55),
-            colorBlendMode: BlendMode.darken,
-            frameBuilder: (_, child, frame, __) {
-              if (frame != null) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted && !_ctrl.isCompleted) _ctrl.forward();
-                });
-              }
-              return AnimatedOpacity(
-                opacity:  frame != null ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 400),
-                child: child,
-              );
-            },
-            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-          ),
+          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
         ),
       ],
     ),
@@ -1080,7 +1065,37 @@ class _DetailGradientBg extends StatelessWidget {
   );
 }
 
-// ── Stat chip ─────────────────────────────────────────────────────────────────
+// ── Fullscreen image viewer ───────────────────────────────────────────────────
+
+class _FullscreenImageViewer extends StatelessWidget {
+  final String url;
+  const _FullscreenImageViewer({required this.url});
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: Colors.black,
+    body: GestureDetector(
+      onTap: () => Navigator.pop(context),
+      onVerticalDragEnd: (d) {
+        if ((d.primaryVelocity?.abs() ?? 0) > 200) Navigator.pop(context);
+      },
+      child: Center(
+        child: InteractiveViewer(
+          minScale: 0.5,
+          maxScale: 5.0,
+          child: Image.network(
+            url,
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) => const Icon(
+              Icons.broken_image_rounded,
+              color: Colors.white54, size: 64,
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
 
 class _StatChip extends StatelessWidget {
   final IconData    icon;
