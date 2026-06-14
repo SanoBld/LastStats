@@ -1,9 +1,19 @@
 // ignore_for_file: unused_import
 part of 'home_screen.dart';
 
-// url_launcher is used for music app deep links
-// Add 'url_launcher: ^6.0.0' to pubspec.yaml if not already present
+// ── Fullscreen image helper (used by detail sheet and profile sheet) ──────────
 
+void _pushFullscreen(BuildContext ctx, String url) {
+  Navigator.of(ctx).push(PageRouteBuilder(
+    opaque: false,
+    barrierColor: Colors.black,
+    barrierDismissible: true,
+    pageBuilder: (_, _, _) => _FullscreenImageViewer(url: url),
+    transitionsBuilder: (_, anim, _, child) =>
+        FadeTransition(opacity: anim, child: child),
+    transitionDuration: const Duration(milliseconds: 220),
+  ));
+}
 
 void showDetailSheet(
   BuildContext context,
@@ -14,8 +24,8 @@ void showDetailSheet(
   Navigator.of(context).push(PageRouteBuilder(
     opaque: false,
     fullscreenDialog: true,
-    pageBuilder:        (_, __, ___) => _ItemDetailSheet(item: item, type: type, service: service),
-    transitionsBuilder: (_, anim, __, child) => SlideTransition(
+    pageBuilder:        (_, _, _) => _ItemDetailSheet(item: item, type: type, service: service),
+    transitionsBuilder: (_, anim, _, child) => SlideTransition(
       position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
           .animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
       child: child,
@@ -233,18 +243,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         .map((t) => Map<String, dynamic>.from(t)).toList();
   }
 
-  void _openFullscreen(BuildContext ctx, String url) {
-    Navigator.of(ctx).push(PageRouteBuilder(
-      opaque: false,
-      barrierColor: Colors.black,
-      barrierDismissible: true,
-      pageBuilder: (_, __, ___) => _FullscreenImageViewer(url: url),
-      transitionsBuilder: (_, anim, __, child) =>
-          FadeTransition(opacity: anim, child: child),
-      transitionDuration: const Duration(milliseconds: 220),
-    ));
-  }
-
   // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
@@ -344,7 +342,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             height: imgH - 80,
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
-              onTap: () => _openFullscreen(ctx, _resolvedImage),
+              onTap: () => _pushFullscreen(ctx, _resolvedImage),
               onVerticalDragEnd: (d) {
                 if ((d.primaryVelocity ?? 0) > 300) Navigator.pop(ctx);
               },
@@ -448,9 +446,9 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     final encoded = Uri.encodeComponent(q);
 
     final buttons = [
-      (label: 'Last.fm',  color: const Color(0xFFD51007), icon: Icons.bar_chart_rounded,      url: lfmUrl),
-      (label: 'Spotify',  color: const Color(0xFF1DB954), icon: Icons.spatial_audio_off_rounded, url: 'https://open.spotify.com/search/$encoded'),
-      (label: 'YT Music', color: const Color(0xFFFF0033), icon: Icons.music_video_rounded,     url: 'https://music.youtube.com/search?q=$encoded'),
+      (label: 'Last.fm',  color: const Color(0xFFD51007), icon: Icons.bar_chart_rounded,         url: lfmUrl),
+      (label: 'Spotify',  color: const Color(0xFF1DB954), icon: Icons.spatial_audio_off_rounded,  url: 'https://open.spotify.com/search/$encoded'),
+      (label: 'YT Music', color: const Color(0xFFFF0033), icon: Icons.music_video_rounded,        url: 'https://music.youtube.com/search?q=$encoded'),
       (label: 'Web',      color: Colors.white.withValues(alpha: 0.85), icon: Icons.language_rounded, url: 'https://www.google.com/search?q=${Uri.encodeComponent('$q music')}'),
     ];
 
@@ -485,7 +483,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       ),
     );
 
-    // center when they fit, left-align when they wrap
     return Wrap(
       alignment: WrapAlignment.center,
       runAlignment: WrapAlignment.center,
@@ -1010,7 +1007,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   }
 }
 
-// ── Background image with blur-to-clear fade-in ──────────────────────────────
+// ── Background image with blur-to-clear fade-in ───────────────────────────────
 
 class _BlurFadeImage extends StatefulWidget {
   final String url;
@@ -1030,6 +1027,7 @@ class _BlurFadeImageState extends State<_BlurFadeImage>
   @override
   void initState() {
     super.initState();
+    // Skip animation if already in Flutter's image cache
     final cached = PaintingBinding.instance.imageCache
         .containsKey(NetworkImage(widget.url));
     _imageLoaded = cached;
@@ -1059,6 +1057,7 @@ class _BlurFadeImageState extends State<_BlurFadeImage>
           builder: (_, child) => ImageFiltered(
             imageFilter: ImageFilter.blur(
               sigmaX: _blur.value, sigmaY: _blur.value,
+              // mirror avoids edge clipping (dezoom visual bug)
               tileMode: TileMode.mirror,
             ),
             child: child,
@@ -1073,35 +1072,19 @@ class _BlurFadeImageState extends State<_BlurFadeImage>
               height: double.infinity,
               color:          Colors.black.withValues(alpha: 0.55),
               colorBlendMode: BlendMode.darken,
-              // loadingBuilder: image stays hidden (opacity 0) until fully loaded
-              // avoids the intrinsic-size → BoxFit.cover jump
+              // loadingBuilder: image stays hidden until fully loaded,
+              // preventing the intrinsic-size → BoxFit.cover jump
               loadingBuilder: (_, child, progress) {
                 if (progress == null) {
                   WidgetsBinding.instance.addPostFrameCallback((_) => _onLoaded());
                 }
                 return child;
               },
-              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              errorBuilder: (_, _, _) => const SizedBox.shrink(),
             ),
           ),
         ),
       ],
-    ),
-  );
-}
-
-// ── Gradient fallback when no image is available ──────────────────────────────
-
-class _DetailGradientBg extends StatelessWidget {
-  final ColorScheme scheme;
-  const _DetailGradientBg({super.key, required this.scheme});
-
-  @override
-  Widget build(BuildContext context) => Container(
-    color: scheme.surfaceContainerHighest,
-    child: Center(
-      child: Icon(Icons.music_note_rounded, size: 96,
-          color: scheme.onSurfaceVariant.withValues(alpha: 0.35)),
     ),
   );
 }
@@ -1125,18 +1108,33 @@ class _FullscreenImageViewer extends StatelessWidget {
           minScale: 0.5,
           maxScale: 5.0,
           child: Image.network(
-            url,
-            fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) => const Icon(
-              Icons.broken_image_rounded,
-              color: Colors.white54, size: 64,
-            ),
+            url, fit: BoxFit.contain,
+            errorBuilder: (_, _, _) => const Icon(
+              Icons.broken_image_rounded, color: Colors.white54, size: 64),
           ),
         ),
       ),
     ),
   );
 }
+
+// ── Gradient fallback when no image is available ──────────────────────────────
+
+class _DetailGradientBg extends StatelessWidget {
+  final ColorScheme scheme;
+  const _DetailGradientBg({super.key, required this.scheme});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    color: scheme.surfaceContainerHighest,
+    child: Center(
+      child: Icon(Icons.music_note_rounded, size: 96,
+          color: scheme.onSurfaceVariant.withValues(alpha: 0.35)),
+    ),
+  );
+}
+
+// ── Stat chip ─────────────────────────────────────────────────────────────────
 
 class _StatChip extends StatelessWidget {
   final IconData    icon;
@@ -1153,9 +1151,8 @@ class _StatChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text    = Theme.of(context).textTheme;
-    final bg      = highlight ? scheme.primaryContainer : scheme.surfaceContainerHighest;
-    final fg      = highlight ? scheme.onPrimaryContainer : scheme.onSurfaceVariant;
+    final text = Theme.of(context).textTheme;
+    final fg   = highlight ? scheme.onPrimaryContainer : scheme.onSurfaceVariant;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
@@ -1176,4 +1173,747 @@ class _StatChip extends StatelessWidget {
       ),
     );
   }
+}
+// ══════════════════════════════════════════════════════════════════════════════
+//  showProfileSheet — open a user profile from any screen
+// ══════════════════════════════════════════════════════════════════════════════
+
+void showProfileSheet(
+  BuildContext context,
+  String username,
+  LastFmService service, {
+  bool isFav = false,
+  VoidCallback? onToggleFav,
+}) {
+  showModalBottomSheet(
+    context:            context,
+    isScrollControlled: true,
+    backgroundColor:    Colors.transparent,
+    useSafeArea:        true,
+    builder: (_) => _FullProfileSheet(
+      username:    username,
+      service:     service,
+      isFav:       isFav,
+      onToggleFav: onToggleFav ?? () {},
+    ),
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  Full profile sheet
+// ══════════════════════════════════════════════════════════════════════════════
+
+class _FullProfileSheet extends StatefulWidget {
+  final String        username;
+  final LastFmService service;
+  final bool          isFav;
+  final VoidCallback  onToggleFav;
+
+  const _FullProfileSheet({
+    required this.username, required this.service,
+    required this.isFav,    required this.onToggleFav,
+  });
+
+  @override
+  State<_FullProfileSheet> createState() => _FullProfileSheetState();
+}
+
+class _FullProfileSheetState extends State<_FullProfileSheet> {
+
+  Map<String, dynamic>? _info;
+  List<dynamic> _topArtists = [];
+  List<dynamic> _topAlbums  = [];
+  List<dynamic> _recent     = [];
+
+  bool      _loading      = true;
+  bool      _isNowPlaying = false;
+  String    _bannerUrl    = '';
+  late bool _localIsFav;
+
+  @override
+  void initState() {
+    super.initState();
+    _localIsFav = widget.isFav;
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final res = await Future.wait([
+        widget.service.getUserInfo(user: widget.username),
+        widget.service.getTopArtists(user: widget.username, period: 'overall', limit: 6),
+        widget.service.getTopAlbums( user: widget.username, period: 'overall', limit: 6),
+        widget.service.getRecentTracks(user: widget.username, limit: 8),
+      ]);
+
+      final recentRaw  = (res[3] as Map<String, dynamic>)['track'];
+      final recentList = recentRaw is List ? recentRaw
+          : (recentRaw != null ? [recentRaw] : <dynamic>[]);
+      final firstTrack = recentList.isNotEmpty ? recentList.first as Map : null;
+      final isNp = firstTrack?['@attr']?['nowplaying'] == 'true';
+
+      if (mounted) {
+        setState(() {
+          _info         = res[0] as Map<String, dynamic>?;
+          _topArtists   = res[1] as List<dynamic>;
+          _topAlbums    = res[2] as List<dynamic>;
+          _recent       = recentList;
+          _isNowPlaying = isNp;
+          _loading      = false;
+        });
+        _resolveBannerUrl(recentList, isNp);
+      }
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _resolveBannerUrl(List<dynamic> recentList, bool isNp) async {
+    try {
+      String url = '';
+      if (isNp && recentList.isNotEmpty) {
+        final t      = recentList.first as Map;
+        final track  = (t['name'] ?? '').toString();
+        final artist = (t['artist']?['name'] ?? t['artist'] ?? '').toString();
+        url = await ImageService.resolveTrack(track, artist);
+      }
+      if (url.isEmpty && _topArtists.isNotEmpty) {
+        final a = _topArtists[0] as Map;
+        url = await ImageService.resolveArtist(
+            (a['name'] ?? '').toString(),
+            lastfmUrl: _extractImage(a['image']));
+      }
+      if (mounted && url.isNotEmpty) setState(() => _bannerUrl = url);
+    } catch (_) {}
+  }
+
+  int _total() => int.tryParse((_info?['playcount'] ?? '0').toString()) ?? 0;
+
+  int _days() {
+    final raw = _info?['registered'];
+    if (raw == null) return 0;
+    int ts = 0;
+    if (raw is Map) {
+      ts = int.tryParse((raw['#text'] ?? raw['unixtime'] ?? '0').toString()) ?? 0;
+    } else {
+      ts = int.tryParse(raw.toString()) ?? 0;
+    }
+    if (ts <= 0) return 0;
+    return ((DateTime.now().millisecondsSinceEpoch / 1000 - ts) / 86400).floor();
+  }
+
+  double _avg() {
+    final d = _days();
+    return d > 0 ? _total() / d : 0;
+  }
+
+  bool _hasAvatar(String url) => url.isNotEmpty && !url.contains(_ph);
+
+  String _timeAgo(Map t) {
+    final raw = t['date']?['uts'] ?? '';
+    final ts  = int.tryParse(raw.toString()) ?? 0;
+    if (ts == 0) return '';
+    final diff = DateTime.now()
+        .difference(DateTime.fromMillisecondsSinceEpoch(ts * 1000));
+    if (diff.inMinutes < 60) return '${diff.inMinutes}min';
+    if (diff.inHours   < 24) return '${diff.inHours}h';
+    if (diff.inDays    < 30) return '${diff.inDays}d';
+    return '${diff.inDays ~/ 30}mo';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.92,
+      minChildSize:     0.4,
+      maxChildSize:     1.0,
+      expand: false,
+      builder: (ctx, ctrl) => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        child: Container(
+          color: scheme.surface,
+          child: _loading
+              ? const Center(child: CircularProgressIndicator())
+              : _buildBody(ctx, ctrl, scheme),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBody(BuildContext ctx, ScrollController ctrl, ColorScheme scheme) {
+    return CustomScrollView(
+      controller: ctrl,
+      slivers: [
+        SliverToBoxAdapter(child: _buildBanner(ctx, scheme)),
+        SliverToBoxAdapter(child: _buildStatsRow(scheme)),
+        if (_isNowPlaying)
+          SliverToBoxAdapter(child: _buildNowPlayingCard(scheme)),
+        if (_topArtists.isNotEmpty) ...[
+          SliverToBoxAdapter(child: _sectionHeader(L.commonTopArtists, scheme)),
+          SliverList(delegate: SliverChildBuilderDelegate(
+            (_, i) => _buildArtistRow(ctx, _topArtists[i], i, scheme),
+            childCount: _topArtists.length,
+          )),
+        ],
+        if (_topAlbums.isNotEmpty) ...[
+          SliverToBoxAdapter(child: _sectionHeader(L.commonAlbums, scheme)),
+          SliverToBoxAdapter(child: _buildAlbumsGrid(ctx, scheme)),
+        ],
+        if (_recent.isNotEmpty) ...[
+          SliverToBoxAdapter(child: _sectionHeader(L.commonRecentTracks, scheme)),
+          SliverList(delegate: SliverChildBuilderDelegate(
+            (_, i) => _buildRecentRow(_recent[i], scheme),
+            childCount: _recent.length,
+          )),
+        ],
+        const SliverToBoxAdapter(child: SizedBox(height: 48)),
+      ],
+    );
+  }
+
+  Widget _buildBanner(BuildContext ctx, ColorScheme scheme) {
+    final info      = _info ?? {};
+    final name      = (info['name']     ?? widget.username).toString();
+    final realName  = (info['realname'] ?? '').toString();
+    final country   = (info['country']  ?? '').toString();
+    final avatarUrl = _extractImage(info['image']);
+    final hasAv     = _hasAvatar(avatarUrl);
+
+    String since = '';
+    final rawReg = info['registered'];
+    if (rawReg != null) {
+      int ts = 0;
+      if (rawReg is Map) {
+        ts = int.tryParse((rawReg['#text'] ?? rawReg['unixtime'] ?? '0').toString()) ?? 0;
+      } else {
+        ts = int.tryParse(rawReg.toString()) ?? 0;
+      }
+      if (ts > 0) since = '${DateTime.fromMillisecondsSinceEpoch(ts * 1000).year}';
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft, end: Alignment.bottomRight,
+          colors: [
+            scheme.primary.withValues(alpha: 0.88),
+            scheme.tertiary.withValues(alpha: 0.65),
+          ],
+        ),
+      ),
+      child: Stack(
+        fit: StackFit.passthrough,
+        children: [
+          if (_bannerUrl.isNotEmpty)
+            Positioned.fill(
+              child: ClipRect(
+                child: ImageFiltered(
+                  imageFilter: ImageFilter.blur(sigmaX: 22, sigmaY: 22,
+                      tileMode: TileMode.mirror),
+                  child: Image.network(
+                    _bannerUrl, fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                  ),
+                ),
+              ),
+            ),
+          if (_bannerUrl.isNotEmpty)
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.30),
+                      Colors.black.withValues(alpha: 0.55),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          SafeArea(
+            bottom: false,
+            child: Column(children: [
+
+              // Top row: back arrow left + drag handle centre
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 36, height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.4),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    // Back arrow (same style as detail sheets)
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: GestureDetector(
+                        onTap: () => Navigator.pop(ctx),
+                        child: Container(
+                          width: 36, height: 36,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.45),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.arrow_back_ios_new_rounded,
+                              color: Colors.white, size: 16),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Avatar — tappable for fullscreen when a real image exists
+              GestureDetector(
+                onTap: hasAv ? () => _pushFullscreen(ctx, avatarUrl) : null,
+                child: Stack(alignment: Alignment.center, children: [
+                  if (_isNowPlaying)
+                    Container(
+                      width: 106, height: 106,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                            color: Colors.greenAccent.shade400, width: 3),
+                      ),
+                    ),
+                  CircleAvatar(
+                    radius: 48,
+                    backgroundColor: Colors.white.withValues(alpha: 0.25),
+                    backgroundImage: hasAv ? NetworkImage(avatarUrl) : null,
+                    child: hasAv ? null : Text(
+                      name.isNotEmpty ? name[0].toUpperCase() : '?',
+                      style: const TextStyle(
+                          color: Colors.white, fontSize: 38,
+                          fontWeight: FontWeight.w900),
+                    ),
+                  ),
+                  if (_isNowPlaying)
+                    Positioned(
+                      right: 4, bottom: 4,
+                      child: Container(
+                        width: 16, height: 16,
+                        decoration: BoxDecoration(
+                          color:  Colors.greenAccent.shade400,
+                          shape:  BoxShape.circle,
+                          border: Border.all(color: scheme.primary, width: 2),
+                        ),
+                      ),
+                    ),
+                ]),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Username + favourite star
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Flexible(
+                  child: Text(name,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900,
+                      shadows: [Shadow(blurRadius: 8, color: Colors.black38)],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () {
+                    setState(() => _localIsFav = !_localIsFav);
+                    widget.onToggleFav();
+                  },
+                  child: Icon(
+                    _localIsFav ? Icons.star_rounded : Icons.star_outline_rounded,
+                    size: 22,
+                    color: _localIsFav
+                        ? Colors.amber.shade400
+                        : Colors.white.withValues(alpha: 0.7),
+                  ),
+                ),
+              ]),
+
+              if (realName.isNotEmpty) ...[
+                const SizedBox(height: 3),
+                Text(realName,
+                  style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.75), fontSize: 13)),
+              ],
+
+              if (_isNowPlaying) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color:        Colors.greenAccent.shade400.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(20),
+                    border:       Border.all(color: Colors.greenAccent.shade400),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Icon(Icons.graphic_eq_rounded, size: 12,
+                        color: Colors.greenAccent.shade400),
+                    const SizedBox(width: 4),
+                    Text(L.commonNowPlayingLong,
+                      style: TextStyle(
+                        color: Colors.greenAccent.shade400,
+                        fontSize: 11, fontWeight: FontWeight.w700)),
+                  ]),
+                ),
+              ],
+
+              const SizedBox(height: 10),
+
+              if (country.isNotEmpty || since.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Wrap(
+                    spacing: 16, alignment: WrapAlignment.center,
+                    children: [
+                      if (country.isNotEmpty && country != 'None')
+                        _BannerMeta(icon: Icons.location_on_outlined, label: country),
+                      if (since.isNotEmpty)
+                        _BannerMeta(
+                            icon: Icons.calendar_today_outlined,
+                            label: L.memberSince(since)),
+                    ],
+                  ),
+                ),
+
+              const SizedBox(height: 20),
+            ]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatsRow(ColorScheme scheme) {
+    final total = _total();
+    final avg   = _avg();
+    final days  = _days();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: Row(children: [
+        Expanded(child: _ProfileStatCard(
+          icon: Icons.headphones_rounded, value: _fmtLarge(total),
+          label: L.dashScrobbles, scheme: scheme, primary: true,
+        )),
+        const SizedBox(width: 10),
+        Expanded(child: _ProfileStatCard(
+          icon: Icons.trending_up_rounded, value: '~${_fmt(avg.round())}',
+          label: L.perDay, scheme: scheme,
+        )),
+        const SizedBox(width: 10),
+        Expanded(child: _ProfileStatCard(
+          icon: Icons.calendar_month_rounded, value: _fmt(days),
+          label: L.activityDays, scheme: scheme,
+        )),
+      ]),
+    );
+  }
+
+  Widget _buildNowPlayingCard(ColorScheme scheme) {
+    final np = _recent.isNotEmpty ? _recent.first as Map<String, dynamic> : null;
+    if (np == null) return const SizedBox.shrink();
+    final track  = (np['name'] ?? '').toString();
+    final artist = (np['artist']?['#text'] ?? np['artist']?['name'] ?? '').toString();
+    final rawUrl = _extractImage(np['image']);
+    final hasImg = rawUrl.isNotEmpty && !rawUrl.contains(_ph);
+
+    return GestureDetector(
+      onTap: () {
+        final item = Map<String, dynamic>.from(np);
+        item['artist'] ??= {'name': artist};
+        showDetailSheet(context, item, 'tracks', widget.service);
+      },
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color:  Colors.greenAccent.shade400.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+                color: Colors.greenAccent.shade400.withValues(alpha: 0.5)),
+          ),
+          child: Row(children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: hasImg
+                  ? Image.network(rawUrl, width: 46, height: 46, fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => _artBox(46, scheme))
+                  : _artBox(46, scheme),
+            ),
+            const SizedBox(width: 12),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Icon(Icons.graphic_eq_rounded, size: 12,
+                    color: Colors.greenAccent.shade700),
+                const SizedBox(width: 4),
+                Text(L.commonNowPlayingBadge,
+                  style: TextStyle(
+                      color: Colors.greenAccent.shade700,
+                      fontSize: 10, fontWeight: FontWeight.w800)),
+              ]),
+              const SizedBox(height: 3),
+              Text(track, maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(fontWeight: FontWeight.w700)),
+              Text(artist, maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodySmall
+                    ?.copyWith(color: scheme.onSurfaceVariant)),
+            ])),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _sectionHeader(String title, ColorScheme scheme) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+      child: Row(children: [
+        Text(title,
+          style: Theme.of(context).textTheme.titleSmall
+              ?.copyWith(fontWeight: FontWeight.w800)),
+        const SizedBox(width: 10),
+        Expanded(child: Divider(color: scheme.outlineVariant, height: 1)),
+      ]),
+    );
+  }
+
+  Widget _buildArtistRow(
+      BuildContext ctx, dynamic raw, int idx, ColorScheme scheme) {
+    final a      = raw as Map<String, dynamic>;
+    final name   = (a['name']      ?? '').toString();
+    final plays  = int.tryParse((a['playcount'] ?? '0').toString()) ?? 0;
+    final imgUrl = _extractImage(a['image']);
+
+    return InkWell(
+      onTap: () {
+        Navigator.pop(ctx);
+        showDetailSheet(ctx, a, 'artists', widget.service);
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+        child: Row(children: [
+          SizedBox(
+            width: 24,
+            child: Text('${idx + 1}',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: scheme.onSurfaceVariant, fontWeight: FontWeight.w700)),
+          ),
+          const SizedBox(width: 10),
+          _SmartImage(
+            size: 44, borderRadius: 22, initialUrl: imgUrl,
+            resolver: () => ImageService.resolveArtist(name,
+                lastfmUrl: imgUrl.isNotEmpty ? imgUrl : null),
+          ),
+          const SizedBox(width: 12),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(fontWeight: FontWeight.w600)),
+            Text('${_fmt(plays)} ${L.commonPlays}',
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: scheme.onSurfaceVariant)),
+          ])),
+          Icon(Icons.chevron_right_rounded, size: 18, color: scheme.outlineVariant),
+        ]),
+      ),
+    );
+  }
+
+  Widget _buildAlbumsGrid(BuildContext ctx, ColorScheme scheme) {
+    final albums = _topAlbums.take(6).toList();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3, mainAxisSpacing: 10,
+          crossAxisSpacing: 10, childAspectRatio: 0.78,
+        ),
+        itemCount: albums.length,
+        itemBuilder: (_, i) {
+          final al      = albums[i] as Map<String, dynamic>;
+          final name    = (al['name'] ?? '').toString();
+          final plays   = int.tryParse((al['playcount'] ?? '0').toString()) ?? 0;
+          final imgUrl  = _extractImage(al['image']);
+          final artName = (al['artist']?['name'] ?? '').toString();
+
+          return GestureDetector(
+            onTap: () {
+              Navigator.pop(ctx);
+              showDetailSheet(ctx, al, 'albums', widget.service);
+            },
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: _SmartImage(
+                    size: 100, borderRadius: 10, initialUrl: imgUrl,
+                    resolver: () => ImageService.resolveAlbum(name, artName,
+                        lastfmUrl: imgUrl.isNotEmpty ? imgUrl : null),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(name, maxLines: 2, overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelSmall
+                    ?.copyWith(fontWeight: FontWeight.w700, fontSize: 11)),
+              Text('${_fmt(plays)} ${L.commonPlays}',
+                style: Theme.of(context).textTheme.labelSmall
+                    ?.copyWith(color: scheme.onSurfaceVariant, fontSize: 9)),
+            ]),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildRecentRow(dynamic raw, ColorScheme scheme) {
+    final t      = raw as Map<String, dynamic>;
+    final isNp   = t['@attr']?['nowplaying'] == 'true';
+    final track  = (t['name'] ?? '').toString();
+    final artist = (t['artist']?['#text'] ?? t['artist']?['name'] ?? '').toString();
+    final rawUrl = _extractImage(t['image']);
+    final hasImg = rawUrl.isNotEmpty && !rawUrl.contains(_ph);
+
+    return GestureDetector(
+      onTap: () {
+        final item = Map<String, dynamic>.from(t);
+        item['artist'] ??= {'name': artist};
+        showDetailSheet(context, item, 'tracks', widget.service);
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+        child: Row(children: [
+          Stack(children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: hasImg
+                  ? Image.network(rawUrl, width: 44, height: 44, fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => _artBox(44, scheme))
+                  : _artBox(44, scheme),
+            ),
+            if (isNp)
+              Positioned(right: 0, bottom: 0,
+                child: Container(
+                  width: 10, height: 10,
+                  decoration: BoxDecoration(
+                    color:  Colors.greenAccent.shade400,
+                    shape:  BoxShape.circle,
+                    border: Border.all(color: scheme.surface, width: 1.5),
+                  ),
+                )),
+          ]),
+          const SizedBox(width: 12),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(track, maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(fontWeight: FontWeight.w600)),
+            Text(artist, maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelSmall
+                  ?.copyWith(color: scheme.onSurfaceVariant)),
+          ])),
+          isNp
+              ? Text(L.commonNowPlayingBadge,
+                  style: TextStyle(
+                      color: Colors.greenAccent.shade700,
+                      fontSize: 10, fontWeight: FontWeight.w800))
+              : Text(_timeAgo(t),
+                  style: Theme.of(context).textTheme.labelSmall
+                      ?.copyWith(color: scheme.onSurfaceVariant, fontSize: 10)),
+        ]),
+      ),
+    );
+  }
+
+  Widget _artBox(double size, ColorScheme scheme) => Container(
+    width: size, height: size,
+    color: scheme.surfaceContainerHighest,
+    child: Icon(Icons.music_note_rounded,
+      size: size * 0.45,
+      color: scheme.onSurfaceVariant.withValues(alpha: 0.5)),
+  );
+}
+
+// ── Banner meta row ───────────────────────────────────────────────────────────
+
+class _BannerMeta extends StatelessWidget {
+  final IconData icon;
+  final String   label;
+  const _BannerMeta({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
+    Icon(icon, size: 12, color: Colors.white.withValues(alpha: 0.75)),
+    const SizedBox(width: 4),
+    Text(label,
+      style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 12)),
+  ]);
+}
+
+// ── Profile stat card ─────────────────────────────────────────────────────────
+
+class _ProfileStatCard extends StatelessWidget {
+  final IconData    icon;
+  final String      value;
+  final String      label;
+  final ColorScheme scheme;
+  final bool        primary;
+
+  const _ProfileStatCard({
+    required this.icon, required this.value,
+    required this.label, required this.scheme,
+    this.primary = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = primary ? scheme.primaryContainer : scheme.surfaceContainerHighest;
+    final fg = primary ? scheme.onPrimaryContainer : scheme.onSurfaceVariant;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      decoration: BoxDecoration(
+          color: bg, borderRadius: BorderRadius.circular(14)),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Icon(icon, size: 18, color: fg.withValues(alpha: 0.8)),
+        const SizedBox(height: 5),
+        Text(value,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800, color: fg, fontSize: 13)),
+        const SizedBox(height: 2),
+        Text(label,
+          textAlign: TextAlign.center, maxLines: 1,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: fg.withValues(alpha: 0.7), fontSize: 9)),
+      ]),
+    );
+  }
+}
+
+// ── Compact large-number formatter ────────────────────────────────────────────
+
+String _fmtLarge(int n) {
+  if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
+  if (n >= 1000)    return '${(n / 1000).toStringAsFixed(1)}k';
+  return '$n';
 }
