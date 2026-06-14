@@ -16,6 +16,24 @@ String _fmtExact(int n) {
   return n.toString();
 }
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/// Decode common HTML entities from Last.fm API responses.
+String _sanitizeName(String s) => s
+    .replaceAll('&amp;', '&')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&#039;', "'")
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>');
+
+/// Filter out MBIDs, [Unknown Album] style tags, and empty strings.
+bool _isValidLabel(String s) {
+  if (s.isEmpty) return false;
+  if (s.startsWith('[') && s.endsWith(']')) return false;
+  if (RegExp(r'^[0-9a-f\-]{36}$', caseSensitive: false).hasMatch(s)) return false;
+  return true;
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 class _ChartsPage extends StatefulWidget {
@@ -54,8 +72,11 @@ class _ChartsPageState extends State<_ChartsPage>
   List<_TagEntry> _tags = [];
 
   // ── Year selection ────────────────────────────────────────────────────────
+  // _selectedYear == 0 means "All time"
   int        _selectedYear   = DateTime.now().year;
   List<int>  _availableYears = [DateTime.now().year];
+
+  bool get _isAllTime => _selectedYear == 0;
 
   // ── History loading progress ──────────────────────────────────────────────
   AllScrobblesProgress _historyProgress = AllScrobblesProgress.idle();
@@ -81,7 +102,7 @@ class _ChartsPageState extends State<_ChartsPage>
     final p = AllScrobblesService.progressNotifier.value;
     setState(() => _historyProgress = p);
     _refreshAvailableYears();
-    if (!_hasFullYearData && AllScrobblesService.isYearCached(_selectedYear)) {
+    if (!_isAllTime && !_hasFullYearData && AllScrobblesService.isYearCached(_selectedYear)) {
       _hasFullYearData = true;
       _loadYearData(_selectedYear);
     }
@@ -127,6 +148,18 @@ class _ChartsPageState extends State<_ChartsPage>
   }
 
   Future<void> _loadYearData(int year) async {
+    // All time: aggregate all cached years for habits, use API tops
+    if (year == 0) {
+      _loadAllTimeHabits();
+      setState(() {
+        _topArtistsYear = [];
+        _topAlbumsYear  = [];
+        _calendarData   = null;
+        _calendarLoading = false;
+      });
+      return;
+    }
+
     final records = AllScrobblesService.getRecordsForYear(year);
     if (records != null) {
       if (!mounted) return;
@@ -135,10 +168,10 @@ class _ChartsPageState extends State<_ChartsPage>
       final albumCounts  = <String, int>{};
       try {
         for (final r in records) {
-          final a = _recField(r, 'artist');
-          final b = _recField(r, 'album');
-          if (a.isNotEmpty) artistCounts[a] = (artistCounts[a] ?? 0) + 1;
-          if (b.isNotEmpty) albumCounts[b]  = (albumCounts[b]  ?? 0) + 1;
+          final a = _sanitizeName(_recField(r, 'artist'));
+          final b = _sanitizeName(_recField(r, 'album'));
+          if (_isValidLabel(a)) artistCounts[a] = (artistCounts[a] ?? 0) + 1;
+          if (_isValidLabel(b)) albumCounts[b]  = (albumCounts[b]  ?? 0) + 1;
         }
       } catch (_) {}
       List<Map<String, dynamic>> rankTop(Map<String, int> counts) =>
@@ -165,6 +198,32 @@ class _ChartsPageState extends State<_ChartsPage>
       _loadHourlyFallback(),
       _loadCalendarFallback(year),
     ]);
+  }
+
+  /// Aggregate hourly & weekday data across ALL cached years.
+  Future<void> _loadAllTimeHabits() async {
+    setState(() { _hourlyLoading = true; _hourlyData = null; _weekdayData = null; });
+    final hours    = <int, int>{for (var i = 0; i < 24; i++) i: 0};
+    final weekdays = <int, int>{for (var i = 1; i <= 7; i++) i: 0};
+    int count = 0;
+    for (final year in AllScrobblesService.getCachedYears()) {
+      final records = AllScrobblesService.getRecordsForYear(year);
+      if (records == null) continue;
+      final h = AllScrobblesService.computeHourly(records);
+      final w = AllScrobblesService.computeWeekday(records);
+      h.forEach((k, v) => hours[k]    = (hours[k]    ?? 0) + v);
+      w.forEach((k, v) => weekdays[k] = (weekdays[k] ?? 0) + v);
+      count += records.length;
+    }
+    if (!mounted) return;
+    // Fallback to recent scrobbles if nothing cached
+    if (count == 0) { await _loadHourlyFallback(); return; }
+    setState(() {
+      _hourlyData    = hours;
+      _weekdayData   = weekdays;
+      _hourlyCount   = count;
+      _hourlyLoading = false;
+    });
   }
 
   Future<void> _loadMonthlyFallback() async {
@@ -339,12 +398,14 @@ class _ChartsPageState extends State<_ChartsPage>
     if (year == _selectedYear) return;
     setState(() {
       _selectedYear      = year;
-      _hasFullYearData   = AllScrobblesService.isYearCached(year);
+      _hasFullYearData   = year == 0
+          ? AllScrobblesService.getCachedYears().isNotEmpty
+          : AllScrobblesService.isYearCached(year);
       _hourlyData        = null;
       _weekdayData       = null;
       _calendarData      = null;
       _hourlyLoading     = true;
-      _calendarLoading   = true;
+      _calendarLoading   = year != 0;
       _topArtistsYear    = [];
       _topAlbumsYear     = [];
     });
@@ -354,13 +415,15 @@ class _ChartsPageState extends State<_ChartsPage>
   // ── Year chips ────────────────────────────────────────────────────────────
 
   Widget _buildYearChips(ColorScheme s, TextTheme t) {
-    final years = _availableYears.isNotEmpty ? _availableYears : [_selectedYear];
+    // 0 = sentinel for "All time"
+    final years = [0, ...(_availableYears.isNotEmpty ? _availableYears : [_selectedYear])];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
       child: Row(
         children: years.map((year) {
           final selected = year == _selectedYear;
+          final label    = year == 0 ? _ct('Tout le temps', 'All time') : '$year';
           return Padding(
             padding: const EdgeInsets.only(right: 8),
             child: GestureDetector(
@@ -383,7 +446,7 @@ class _ChartsPageState extends State<_ChartsPage>
                       : null,
                 ),
                 child: Text(
-                  '$year',
+                  label,
                   style: t.labelMedium?.copyWith(
                     color: selected ? s.onPrimary : s.onSurfaceVariant,
                     fontWeight: FontWeight.w700,
@@ -512,16 +575,34 @@ class _ChartsPageState extends State<_ChartsPage>
     final allTimeMonthly = _buildAllTimeMonthly();
     final cumulData      = _buildAllTimeCumulative(allTimeMonthly);
 
-    final cachedTs    = AllScrobblesService.getTimestampsForYear(_selectedYear);
-    final hasFullData = cachedTs != null;
-    final habitsSubtitle = hasFullData
-        ? _ct('Basé sur $_hourlyCount scrobbles de $_selectedYear',
-              'Based on $_hourlyCount scrobbles from $_selectedYear')
-        : _hourlyCount > 0
-            ? _ct('Basé sur $_hourlyCount scrobbles récents',
-                  'Based on $_hourlyCount recent scrobbles')
-            : _ct('Analyse vos ~200 derniers scrobbles',
-                  'Analysing your last ~200 scrobbles');
+    final cachedTs    = _isAllTime ? null : AllScrobblesService.getTimestampsForYear(_selectedYear);
+    final hasFullData = _isAllTime
+        ? AllScrobblesService.getCachedYears().isNotEmpty
+        : cachedTs != null;
+
+    final habitsSubtitle = _isAllTime
+        ? (_hourlyCount > 0
+            ? _ct('Basé sur $_hourlyCount scrobbles (toutes les années)',
+                  'Based on $_hourlyCount scrobbles (all years)')
+            : _ct('Toutes les années disponibles', 'All available years'))
+        : hasFullData
+            ? _ct('Basé sur $_hourlyCount scrobbles de $_selectedYear',
+                  'Based on $_hourlyCount scrobbles from $_selectedYear')
+            : _hourlyCount > 0
+                ? _ct('Basé sur $_hourlyCount scrobbles récents',
+                      'Based on $_hourlyCount recent scrobbles')
+                : _ct('Analyse vos ~200 derniers scrobbles',
+                      'Analysing your last ~200 scrobbles');
+
+    // Top items to display: year-specific if available, else all-time API
+    final artistItems = _topArtistsYear.isNotEmpty ? _topArtistsYear : _topArtists;
+    final albumItems  = _topAlbumsYear.isNotEmpty  ? _topAlbumsYear  : _topAlbums;
+    final topLabel    = _isAllTime
+        ? _ct('All-time', 'All-time')
+        : (_topArtistsYear.isNotEmpty ? '$_selectedYear' : _ct('All-time', 'All-time'));
+    final albumLabel  = _isAllTime
+        ? _ct('All-time', 'All-time')
+        : (_topAlbumsYear.isNotEmpty ? '$_selectedYear' : _ct('All-time', 'All-time'));
 
     return SafeArea(
       child: Column(
@@ -556,7 +637,7 @@ class _ChartsPageState extends State<_ChartsPage>
 
                   _buildHistoryBanner(context),
 
-                  // 1. Monthly bars (all-time)
+                  // 1. Monthly bars (all-time, all months)
                   _SectionHeader(title: L.chartsMonthly, icon: Icons.calendar_month_rounded),
                   const SizedBox(height: 12),
                   if (allTimeMonthly.isNotEmpty) _MonthlyCard(monthly: allTimeMonthly),
@@ -617,96 +698,86 @@ class _ChartsPageState extends State<_ChartsPage>
                   const SizedBox(height: 28),
 
                   // 5. Artist distribution
-                  ...() {
-                    final items = _topArtistsYear.isNotEmpty ? _topArtistsYear : _topArtists;
-                    final label = _topArtistsYear.isNotEmpty
-                        ? '$_selectedYear'
-                        : _ct('All-time', 'All-time');
-                    if (items.isNotEmpty) return <Widget>[
-                      _SectionHeader(title: L.chartsArtistDist, icon: Icons.mic_rounded),
-                      const SizedBox(height: 4),
-                      Text(label, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                      const SizedBox(height: 12),
-                      _SwipeDistributionCard(
-                        items:       items,
-                        getLabel:    (e) => (e['name'] ?? '').toString(),
-                        getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
-                        baseColor:   scheme.primary,
-                        secondColor: scheme.tertiary,
-                        onTap: (e) => showDetailSheet(context,
-                            Map<String, dynamic>.from(e as Map), 'artists', widget.service),
-                      ),
-                      const SizedBox(height: 28),
-                    ];
-                    return <Widget>[];
-                  }(),
+                  if (artistItems.isNotEmpty) ...[
+                    _SectionHeader(title: L.chartsArtistDist, icon: Icons.mic_rounded),
+                    const SizedBox(height: 4),
+                    Text(topLabel,
+                        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                    const SizedBox(height: 12),
+                    _SwipeDistributionCard(
+                      items:       artistItems,
+                      getLabel:    (e) => _sanitizeName((e['name'] ?? '').toString()),
+                      getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
+                      baseColor:   scheme.primary,
+                      secondColor: scheme.tertiary,
+                      onTap: (e) => showDetailSheet(context,
+                          Map<String, dynamic>.from(e as Map), 'artists', widget.service),
+                    ),
+                    const SizedBox(height: 28),
+                  ],
 
                   // 6. Album distribution
-                  ...() {
-                    final items = _topAlbumsYear.isNotEmpty ? _topAlbumsYear : _topAlbums;
-                    final label = _topAlbumsYear.isNotEmpty
-                        ? '$_selectedYear'
-                        : _ct('All-time', 'All-time');
-                    if (items.isNotEmpty) return <Widget>[
-                      _SectionHeader(
-                        title: _ct('Répartition par album', 'Album distribution'),
-                        icon: Icons.album_rounded,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(label, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                      const SizedBox(height: 12),
-                      _SwipeDistributionCard(
-                        items:       items,
-                        getLabel:    (e) => (e['name'] ?? '').toString(),
-                        getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
-                        baseColor:   scheme.secondary,
-                        secondColor: scheme.primary,
-                        onTap: (e) => showDetailSheet(context,
-                            Map<String, dynamic>.from(e as Map), 'albums', widget.service),
-                      ),
-                      const SizedBox(height: 28),
-                    ];
-                    return <Widget>[];
-                  }(),
-
-                  // 7. Listening calendar (GitHub heatmap only)
-                  _SectionHeader(
-                    title: _ct('Calendrier musical', 'Listening calendar'),
-                    icon: Icons.grid_on_rounded,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    hasFullData
-                        ? _ct('Activité journalière — $_selectedYear',
-                              'Daily activity — $_selectedYear')
-                        : _selectedYear != DateTime.now().year
-                            ? _ct('Chargez l\'historique pour voir $_selectedYear',
-                                  'Load history to see $_selectedYear')
-                            : _ct('Activité journalière — 12 mois',
-                                  'Daily activity — last 12 months'),
-                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-                  ),
-                  const SizedBox(height: 12),
-                  if (_calendarLoading)
-                    const Center(child: Padding(
-                      padding: EdgeInsets.all(24),
-                      child: CircularProgressIndicator(),
-                    ))
-                  else if (_calendarData != null)
-                    _YearFullHeatmapCard(data: _calendarData!, year: _selectedYear)
-                  else if (!hasFullData && _selectedYear != DateTime.now().year)
-                    _NoDataCard(year: _selectedYear, onLoad: () => AllScrobblesService.loadAll(widget.service)),
-                  const SizedBox(height: 28),
-
-                  // 8. Listening streaks
-                  if (_calendarData != null && _calendarData!.isNotEmpty) ...[
+                  if (albumItems.isNotEmpty) ...[
                     _SectionHeader(
-                      title: _ct('Séries d\'écoute', 'Listening streaks'),
-                      icon: Icons.local_fire_department_rounded,
+                      title: _ct('Répartition par album', 'Album distribution'),
+                      icon: Icons.album_rounded,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(albumLabel,
+                        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                    const SizedBox(height: 12),
+                    _SwipeDistributionCard(
+                      items:       albumItems,
+                      getLabel:    (e) => _sanitizeName((e['name'] ?? '').toString()),
+                      getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
+                      baseColor:   scheme.secondary,
+                      secondColor: scheme.primary,
+                      onTap: (e) => showDetailSheet(context,
+                          Map<String, dynamic>.from(e as Map), 'albums', widget.service),
+                    ),
+                    const SizedBox(height: 28),
+                  ],
+
+                  // 7. Listening calendar — hidden in all-time mode
+                  if (!_isAllTime) ...[
+                    _SectionHeader(
+                      title: _ct('Calendrier musical', 'Listening calendar'),
+                      icon: Icons.grid_on_rounded,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      hasFullData
+                          ? _ct('Activité journalière — $_selectedYear',
+                                'Daily activity — $_selectedYear')
+                          : _selectedYear != DateTime.now().year
+                              ? _ct('Chargez l\'historique pour voir $_selectedYear',
+                                    'Load history to see $_selectedYear')
+                              : _ct('Activité journalière — 12 mois',
+                                    'Daily activity — last 12 months'),
+                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                     ),
                     const SizedBox(height: 12),
-                    _StreakCard(data: _calendarData!),
-                    const SizedBox(height: 20),
+                    if (_calendarLoading)
+                      const Center(child: Padding(
+                        padding: EdgeInsets.all(24),
+                        child: CircularProgressIndicator(),
+                      ))
+                    else if (_calendarData != null)
+                      _YearFullHeatmapCard(data: _calendarData!, year: _selectedYear)
+                    else if (!hasFullData && _selectedYear != DateTime.now().year)
+                      _NoDataCard(year: _selectedYear, onLoad: () => AllScrobblesService.loadAll(widget.service)),
+                    const SizedBox(height: 28),
+
+                    // 8. Listening streaks
+                    if (_calendarData != null && _calendarData!.isNotEmpty) ...[
+                      _SectionHeader(
+                        title: _ct('Séries d\'écoute', 'Listening streaks'),
+                        icon: Icons.local_fire_department_rounded,
+                      ),
+                      const SizedBox(height: 12),
+                      _StreakCard(data: _calendarData!),
+                      const SizedBox(height: 20),
+                    ],
                   ],
                 ],
               ),
@@ -1880,7 +1951,7 @@ class _TopHorizontalBarCard extends StatelessWidget {
           return GestureDetector(
             onTap: () => onTap(e.value),
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.only(bottom: 10),
               child: Row(
                 children: [
                   SizedBox(
@@ -1925,7 +1996,7 @@ class _TopHorizontalBarCard extends StatelessWidget {
                                     fontSize: 9)),
                           ],
                         ]),
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 4),
                         Stack(children: [
                           Container(
                             height: 6,
@@ -1989,12 +2060,14 @@ class _SwipeDistributionCardState extends State<_SwipeDistributionCard> {
   @override
   void dispose() { _ctrl.dispose(); super.dispose(); }
 
+  // Each legend row ≈ 26px tall + container padding 36
   double _donutHeight() {
-    final legendH = widget.items.length * 22.0;
-    return (legendH > 130 ? legendH : 130) + 36;
+    final legendH = widget.items.length * 26.0;
+    return (legendH > 130 ? legendH : 130) + 40;
   }
 
-  double _barsHeight() => widget.items.length * 34.0 + 36;
+  // Each bar row ≈ 38px (label + gap + bar + bottom padding) + container padding 36
+  double _barsHeight() => widget.items.length * 38.0 + 48;
 
   @override
   Widget build(BuildContext context) {
