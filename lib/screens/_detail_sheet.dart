@@ -1017,32 +1017,76 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   }
 }
 
-// ── Background image with fade-in ────────────────────────────────────────────
+// ── Background image with blur-to-clear fade-in ──────────────────────────────
 
-class _BlurFadeImage extends StatelessWidget {
+class _BlurFadeImage extends StatefulWidget {
   final String url;
   final Widget fallback;
   const _BlurFadeImage({super.key, required this.url, required this.fallback});
+
+  @override
+  State<_BlurFadeImage> createState() => _BlurFadeImageState();
+}
+
+class _BlurFadeImageState extends State<_BlurFadeImage>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double>   _blur;
+  bool _imageLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
+    _blur = Tween<double>(begin: 16.0, end: 0.0)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+  }
+
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
+
+  void _onLoaded() {
+    if (!mounted || _imageLoaded) return;
+    setState(() => _imageLoaded = true);
+    _ctrl.forward();
+  }
 
   @override
   Widget build(BuildContext context) => SizedBox.expand(
     child: Stack(
       fit: StackFit.expand,
       children: [
-        fallback,
-        Image.network(
-          url,
-          fit: BoxFit.cover,
-          width:  double.infinity,
-          height: double.infinity,
-          color:          Colors.black.withValues(alpha: 0.55),
-          colorBlendMode: BlendMode.darken,
-          frameBuilder: (_, child, frame, __) => AnimatedOpacity(
-            opacity:  frame != null ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 300),
+        widget.fallback,
+        AnimatedBuilder(
+          animation: _blur,
+          builder: (_, child) => ImageFiltered(
+            imageFilter: ImageFilter.blur(
+              sigmaX: _blur.value, sigmaY: _blur.value,
+              tileMode: TileMode.mirror,
+            ),
             child: child,
           ),
-          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+          child: AnimatedOpacity(
+            opacity:  _imageLoaded ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 300),
+            child: Image.network(
+              widget.url,
+              fit: BoxFit.cover,
+              width:  double.infinity,
+              height: double.infinity,
+              color:          Colors.black.withValues(alpha: 0.55),
+              colorBlendMode: BlendMode.darken,
+              // loadingBuilder: image stays hidden (opacity 0) until fully loaded
+              // avoids the intrinsic-size → BoxFit.cover jump
+              loadingBuilder: (_, child, progress) {
+                if (progress == null) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) => _onLoaded());
+                }
+                return child;
+              },
+              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+            ),
+          ),
         ),
       ],
     ),
