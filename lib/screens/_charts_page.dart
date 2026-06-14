@@ -45,6 +45,10 @@ class _ChartsPageState extends State<_ChartsPage>
   Map<String, int>? _calendarData;
   bool _hasFullYearData  = false;
 
+  // Year-specific top lists (computed from cached records)
+  List<dynamic> _topArtistsYear = [];
+  List<dynamic> _topAlbumsYear  = [];
+
   // ── Genres (derived from all-time top artists) ────────────────────────────
   bool _tagsLoading = false;
   List<_TagEntry> _tags = [];
@@ -112,21 +116,50 @@ class _ChartsPageState extends State<_ChartsPage>
     }
   }
 
+  // Safe field access for records (Map or typed object)
+  String _recField(dynamic r, String field) {
+    try { return ((r as Map)[field] as String?) ?? ''; } catch (_) {}
+    try {
+      if (field == 'artist') return (r.artist as String?) ?? '';
+      if (field == 'album')  return (r.album  as String?) ?? '';
+    } catch (_) {}
+    return '';
+  }
+
   Future<void> _loadYearData(int year) async {
     final records = AllScrobblesService.getRecordsForYear(year);
     if (records != null) {
       if (!mounted) return;
+      // Compute top artists and albums from records
+      final artistCounts = <String, int>{};
+      final albumCounts  = <String, int>{};
+      try {
+        for (final r in records) {
+          final a = _recField(r, 'artist');
+          final b = _recField(r, 'album');
+          if (a.isNotEmpty) artistCounts[a] = (artistCounts[a] ?? 0) + 1;
+          if (b.isNotEmpty) albumCounts[b]  = (albumCounts[b]  ?? 0) + 1;
+        }
+      } catch (_) {}
+      List<Map<String, dynamic>> rankTop(Map<String, int> counts) =>
+          (counts.entries.toList()..sort((a, b) => b.value.compareTo(a.value)))
+              .take(10)
+              .map((e) => <String, dynamic>{'name': e.key, 'playcount': '${e.value}'})
+              .toList();
       setState(() {
-        _monthly      = AllScrobblesService.computeMonthly(records);
-        _hourlyData   = AllScrobblesService.computeHourly(records);
-        _weekdayData  = AllScrobblesService.computeWeekday(records);
-        _hourlyCount  = records.length;
-        _calendarData = AllScrobblesService.computeCalendar(records);
+        _monthly         = AllScrobblesService.computeMonthly(records);
+        _hourlyData      = AllScrobblesService.computeHourly(records);
+        _weekdayData     = AllScrobblesService.computeWeekday(records);
+        _hourlyCount     = records.length;
+        _calendarData    = AllScrobblesService.computeCalendar(records);
         _hourlyLoading   = false;
         _calendarLoading = false;
+        _topArtistsYear  = artistCounts.isNotEmpty ? rankTop(artistCounts) : [];
+        _topAlbumsYear   = albumCounts.isNotEmpty  ? rankTop(albumCounts)  : [];
       });
       return;
     }
+    setState(() { _topArtistsYear = []; _topAlbumsYear = []; });
     await Future.wait([
       _loadMonthlyFallback(),
       _loadHourlyFallback(),
@@ -305,13 +338,15 @@ class _ChartsPageState extends State<_ChartsPage>
   void _onYearChanged(int year) {
     if (year == _selectedYear) return;
     setState(() {
-      _selectedYear    = year;
-      _hasFullYearData = AllScrobblesService.isYearCached(year);
-      _hourlyData      = null;
-      _weekdayData     = null;
-      _calendarData    = null;
-      _hourlyLoading   = true;
-      _calendarLoading = true;
+      _selectedYear      = year;
+      _hasFullYearData   = AllScrobblesService.isYearCached(year);
+      _hourlyData        = null;
+      _weekdayData       = null;
+      _calendarData      = null;
+      _hourlyLoading     = true;
+      _calendarLoading   = true;
+      _topArtistsYear    = [];
+      _topAlbumsYear     = [];
     });
     _loadYearData(year);
   }
@@ -581,48 +616,60 @@ class _ChartsPageState extends State<_ChartsPage>
                   ],
                   const SizedBox(height: 28),
 
-                  // 5. Artist distribution (all-time)
-                  if (_topArtists.isNotEmpty) ...[
-                    _SectionHeader(title: L.chartsArtistDist, icon: Icons.mic_rounded),
-                    const SizedBox(height: 4),
-                    Text(_ct('All-time', 'All-time'),
-                        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                    const SizedBox(height: 12),
-                    _SwipeDistributionCard(
-                      items:       _topArtists,
-                      getLabel:    (e) => (e['name'] ?? '').toString(),
-                      getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
-                      baseColor:   scheme.primary,
-                      secondColor: scheme.tertiary,
-                      onTap: (e) => showDetailSheet(context,
-                          Map<String, dynamic>.from(e as Map), 'artists', widget.service),
-                    ),
-                    const SizedBox(height: 28),
-                  ],
+                  // 5. Artist distribution
+                  ...() {
+                    final items = _topArtistsYear.isNotEmpty ? _topArtistsYear : _topArtists;
+                    final label = _topArtistsYear.isNotEmpty
+                        ? '$_selectedYear'
+                        : _ct('All-time', 'All-time');
+                    if (items.isNotEmpty) return <Widget>[
+                      _SectionHeader(title: L.chartsArtistDist, icon: Icons.mic_rounded),
+                      const SizedBox(height: 4),
+                      Text(label, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                      const SizedBox(height: 12),
+                      _SwipeDistributionCard(
+                        items:       items,
+                        getLabel:    (e) => (e['name'] ?? '').toString(),
+                        getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
+                        baseColor:   scheme.primary,
+                        secondColor: scheme.tertiary,
+                        onTap: (e) => showDetailSheet(context,
+                            Map<String, dynamic>.from(e as Map), 'artists', widget.service),
+                      ),
+                      const SizedBox(height: 28),
+                    ];
+                    return <Widget>[];
+                  }(),
 
-                  // 6. Album distribution (all-time)
-                  if (_topAlbums.isNotEmpty) ...[
-                    _SectionHeader(
-                      title: _ct('Répartition par album', 'Album distribution'),
-                      icon: Icons.album_rounded,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(_ct('All-time', 'All-time'),
-                        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                    const SizedBox(height: 12),
-                    _SwipeDistributionCard(
-                      items:       _topAlbums,
-                      getLabel:    (e) => (e['name'] ?? '').toString(),
-                      getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
-                      baseColor:   scheme.secondary,
-                      secondColor: scheme.primary,
-                      onTap: (e) => showDetailSheet(context,
-                          Map<String, dynamic>.from(e as Map), 'albums', widget.service),
-                    ),
-                    const SizedBox(height: 28),
-                  ],
+                  // 6. Album distribution
+                  ...() {
+                    final items = _topAlbumsYear.isNotEmpty ? _topAlbumsYear : _topAlbums;
+                    final label = _topAlbumsYear.isNotEmpty
+                        ? '$_selectedYear'
+                        : _ct('All-time', 'All-time');
+                    if (items.isNotEmpty) return <Widget>[
+                      _SectionHeader(
+                        title: _ct('Répartition par album', 'Album distribution'),
+                        icon: Icons.album_rounded,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(label, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                      const SizedBox(height: 12),
+                      _SwipeDistributionCard(
+                        items:       items,
+                        getLabel:    (e) => (e['name'] ?? '').toString(),
+                        getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
+                        baseColor:   scheme.secondary,
+                        secondColor: scheme.primary,
+                        onTap: (e) => showDetailSheet(context,
+                            Map<String, dynamic>.from(e as Map), 'albums', widget.service),
+                      ),
+                      const SizedBox(height: 28),
+                    ];
+                    return <Widget>[];
+                  }(),
 
-                  // 7. Listening calendar
+                  // 7. Listening calendar (GitHub heatmap only)
                   _SectionHeader(
                     title: _ct('Calendrier musical', 'Listening calendar'),
                     icon: Icons.grid_on_rounded,
@@ -632,8 +679,11 @@ class _ChartsPageState extends State<_ChartsPage>
                     hasFullData
                         ? _ct('Activité journalière — $_selectedYear',
                               'Daily activity — $_selectedYear')
-                        : _ct('Activité journalière sur 12 mois',
-                              'Daily activity over 12 months'),
+                        : _selectedYear != DateTime.now().year
+                            ? _ct('Chargez l\'historique pour voir $_selectedYear',
+                                  'Load history to see $_selectedYear')
+                            : _ct('Activité journalière — 12 mois',
+                                  'Daily activity — last 12 months'),
                     style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                   ),
                   const SizedBox(height: 12),
@@ -643,11 +693,9 @@ class _ChartsPageState extends State<_ChartsPage>
                       child: CircularProgressIndicator(),
                     ))
                   else if (_calendarData != null)
-                    _SwipeCalendarCard(
-                      data: _calendarData!,
-                      year: _selectedYear,
-                      fullYear: hasFullData,
-                    ),
+                    _YearFullHeatmapCard(data: _calendarData!, year: _selectedYear)
+                  else if (!hasFullData && _selectedYear != DateTime.now().year)
+                    _NoDataCard(year: _selectedYear, onLoad: () => AllScrobblesService.loadAll(widget.service)),
                   const SizedBox(height: 28),
 
                   // 8. Listening streaks
@@ -1613,185 +1661,6 @@ class _DonutPainter extends CustomPainter {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-//  _CalendarCard — annual heatmap with statistics
-// ══════════════════════════════════════════════════════════════════════════
-
-class _CalendarCard extends StatefulWidget {
-  final Map<String, int> data;
-  final int  year;
-  final bool fullYear;
-  const _CalendarCard({
-    required this.data,
-    required this.year,
-    this.fullYear = false,
-  });
-
-  @override
-  State<_CalendarCard> createState() => _CalendarCardState();
-}
-
-class _CalendarCardState extends State<_CalendarCard> {
-  final _sc = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_sc.hasClients) return;
-      // Find last month that has data and scroll to it
-      final keys = widget.data.keys.where((k) => (widget.data[k] ?? 0) > 0).toList()..sort();
-      if (keys.isEmpty) { _sc.jumpTo(_sc.position.maxScrollExtent); return; }
-      final lastKey  = keys.last;
-      final lastMonth = int.tryParse(lastKey.substring(5, 7)) ?? 12;
-      // Each month column is 7*(18+3)-3 + 14 = 158px wide approx
-      const colW = 158.0;
-      final target = ((lastMonth - 1) * colW - 60).clamp(0.0, _sc.position.maxScrollExtent);
-      _sc.jumpTo(target);
-    });
-  }
-
-  @override
-  void dispose() { _sc.dispose(); super.dispose(); }
-
-  @override
-  Widget build(BuildContext context) {
-    final s      = Theme.of(context).colorScheme;
-    final t      = Theme.of(context).textTheme;
-    final months = List.generate(12, (i) => DateTime(widget.year, i + 1, 1));
-    final maxVal = widget.data.values.fold(0, (a, b) => a > b ? a : b);
-
-    final totalAll   = widget.data.values.fold(0, (a, b) => a + b);
-    final activeDays = widget.data.entries.where((e) => e.value > 0).length;
-    String bestDay = ''; int bestCount = 0;
-    for (final e in widget.data.entries) {
-      if (e.value > bestCount) { bestCount = e.value; bestDay = e.key; }
-    }
-
-    return Container(
-      decoration: _chartCardDecoration(s),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Wrap(spacing: 8, runSpacing: 6, children: [
-            _ChipStat(
-              label: widget.fullYear ? '${widget.year}' : _ct('12 mois', '12 months'),
-              value: _fmt(totalAll), s: s, t: t,
-            ),
-            _ChipStat(
-              label: _ct('Jours actifs', 'Active days'),
-              value: '$activeDays', s: s, t: t,
-            ),
-            if (bestDay.isNotEmpty)
-              _ChipStat(
-                label: _ct('Record', 'Record'),
-                value: '${bestDay.substring(5)} ($bestCount)',
-                s: s, t: t,
-              ),
-          ]),
-          const SizedBox(height: 16),
-          SingleChildScrollView(
-            controller: _sc,
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: months.map((m) => Padding(
-                padding: const EdgeInsets.only(right: 14),
-                child: _MonthHeatGrid(
-                    month: m, data: widget.data, maxVal: maxVal, s: s, t: t),
-              )).toList(),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(children: [
-            const Spacer(),
-            Text(_ct('Moins', 'Less'),
-                style: t.labelSmall?.copyWith(fontSize: 9, color: s.onSurfaceVariant)),
-            const SizedBox(width: 4),
-            ...List.generate(5, (i) => Container(
-              width: 11, height: 11,
-              margin: const EdgeInsets.only(right: 2),
-              decoration: BoxDecoration(
-                color: i == 0
-                    ? s.surfaceContainerHigh
-                    : Color.lerp(s.primaryContainer, s.primary, (i / 4).clamp(0.0, 1.0)),
-                borderRadius: BorderRadius.circular(3),
-              ),
-            )),
-            const SizedBox(width: 4),
-            Text(_ct('Plus', 'More'),
-                style: t.labelSmall?.copyWith(fontSize: 9, color: s.onSurfaceVariant)),
-          ]),
-        ],
-      ),
-    );
-  }
-}
-
-class _MonthHeatGrid extends StatelessWidget {
-  final DateTime         month;
-  final Map<String, int> data;
-  final int              maxVal;
-  final ColorScheme      s;
-  final TextTheme        t;
-  const _MonthHeatGrid({
-    required this.month, required this.data,
-    required this.maxVal, required this.s, required this.t,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final daysInMonth = DateUtils.getDaysInMonth(month.year, month.month);
-    final firstWd     = DateTime(month.year, month.month, 1).weekday;
-    final label       = L.months[month.month];
-    const cellSz      = 18.0;
-    const gap         = 3.0;
-    const cols        = 7;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('$label ${month.year}',
-            style: t.labelSmall?.copyWith(
-                color: s.onSurfaceVariant, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 6),
-        SizedBox(
-          width: cols * (cellSz + gap) - gap,
-          child: Wrap(
-            spacing: gap, runSpacing: gap,
-            children: [
-              ...List.generate(firstWd - 1, (_) => SizedBox(width: cellSz, height: cellSz)),
-              ...List.generate(daysInMonth, (d) {
-                final day   = d + 1;
-                final key   = '${month.year}-'
-                    '${month.month.toString().padLeft(2, '0')}-'
-                    '${day.toString().padLeft(2, '0')}';
-                final count = data[key] ?? 0;
-                final ratio       = (maxVal > 0 && count > 0) ? count / maxVal : 0.0;
-                final scaledRatio = ratio > 0 ? sqrt(ratio).clamp(0.0, 1.0) : 0.0;
-                final color       = count == 0
-                    ? s.surfaceContainerHigh
-                    : Color.lerp(s.primaryContainer, s.primary,
-                                 (scaledRatio * 0.85 + 0.15).clamp(0.0, 1.0))!;
-                return Tooltip(
-                  message: count > 0 ? '$day — $count scrobbles' : '',
-                  child: Container(
-                    width: cellSz, height: cellSz,
-                    decoration: BoxDecoration(
-                        color: color, borderRadius: BorderRadius.circular(4)),
-                  ),
-                );
-              }),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// ══════════════════════════════════════════════════════════════════════════
 //  _StreakCard — current & best listening streaks from calendar data
 // ══════════════════════════════════════════════════════════════════════════
 
@@ -1814,7 +1683,7 @@ class _MonthHeatGrid extends StatelessWidget {
   DateTime? prev;
   for (final k in active) {
     final d = DateTime.parse(k);
-    if (prev != null && d.difference(prev!).inDays == 1) {
+    if (prev != null && d.difference(prev).inDays == 1) {
       run++;
     } else {
       run = 1;
@@ -2185,77 +2054,43 @@ class _SwipeDistributionCardState extends State<_SwipeDistributionCard> {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-//  _SwipeCalendarCard — swipe between month grid and GitHub heatmap
+//  _NoDataCard — shown when year isn't cached
 // ══════════════════════════════════════════════════════════════════════════
 
-class _SwipeCalendarCard extends StatefulWidget {
-  final Map<String, int> data;
-  final int  year;
-  final bool fullYear;
-  const _SwipeCalendarCard({
-    required this.data, required this.year, this.fullYear = false,
-  });
-
-  @override
-  State<_SwipeCalendarCard> createState() => _SwipeCalendarCardState();
-}
-
-class _SwipeCalendarCardState extends State<_SwipeCalendarCard> {
-  final _ctrl = PageController();
-  int _page = 0;
-
-  // Estimated heights; month grid is taller than the heatmap strip
-  static const _monthGridH  = 290.0;
-  static const _heatmapH    = 170.0;
-
-  @override
-  void dispose() { _ctrl.dispose(); super.dispose(); }
+class _NoDataCard extends StatelessWidget {
+  final int year;
+  final VoidCallback onLoad;
+  const _NoDataCard({required this.year, required this.onLoad});
 
   @override
   Widget build(BuildContext context) {
-    final s      = Theme.of(context).colorScheme;
-    final height = _page == 0 ? _monthGridH : _heatmapH;
-    return Column(
-      children: [
-        AnimatedSize(
-          duration: const Duration(milliseconds: 260),
-          curve: Curves.easeInOutCubic,
-          child: SizedBox(
-            height: height,
-            child: PageView(
-              controller: _ctrl,
-              onPageChanged: (i) => setState(() => _page = i),
-              children: [
-                _CalendarCard(
-                  data: widget.data,
-                  year: widget.year,
-                  fullYear: widget.fullYear,
-                ),
-                _YearFullHeatmapCard(
-                  data: widget.data,
-                  year: widget.year,
-                ),
-              ],
-            ),
+    final s = Theme.of(context).colorScheme;
+    final t = Theme.of(context).textTheme;
+    return Container(
+      decoration: _chartCardDecoration(s),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: Row(children: [
+        Icon(Icons.cloud_download_outlined, color: s.primary, size: 22),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Text(
+            _ct('Chargez l\'historique pour afficher $year',
+                'Load history to display $year'),
+            style: t.bodySmall?.copyWith(color: s.onSurfaceVariant),
           ),
         ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(2, (i) => AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width:  _page == i ? 18 : 6,
-            height: 6,
-            margin: const EdgeInsets.symmetric(horizontal: 3),
-            decoration: BoxDecoration(
-              color: _page == i
-                  ? s.primary
-                  : s.outlineVariant.withValues(alpha: 0.6),
-              borderRadius: BorderRadius.circular(3),
-            ),
-          )),
+        const SizedBox(width: 12),
+        FilledButton(
+          onPressed: onLoad,
+          style: FilledButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Text(_ct('Charger', 'Load'),
+              style: t.labelSmall?.copyWith(fontWeight: FontWeight.w700)),
         ),
-      ],
+      ]),
     );
   }
 }
@@ -2271,7 +2106,6 @@ class _YearFullHeatmapCard extends StatelessWidget {
 
   static const _cell = 10.0;
   static const _gap  = 1.5;
-  static const _step = _cell + _gap;
 
   @override
   Widget build(BuildContext context) {
