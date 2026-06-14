@@ -436,67 +436,60 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   // ── Music app links ─────────────────────────────────────────────────────────
 
   Widget _buildMusicLinks(bool hasImage) {
-    // Build search query depending on type
-    final q = switch (widget.type) {
-      'artists' => _name,
-      'albums'  => '$_name $_artist',
-      _         => '$_name $_artist',
+    final encodedName   = Uri.encodeComponent(_name);
+    final encodedArtist = Uri.encodeComponent(_artist);
+
+    final lfmUrl = switch (widget.type) {
+      'artists' => 'https://www.last.fm/music/$encodedName',
+      'albums'  => 'https://www.last.fm/music/$encodedArtist/$encodedName',
+      _         => 'https://www.last.fm/music/$encodedArtist/_/$encodedName',
     };
+    final q       = widget.type == 'artists' ? _name : '$_name $_artist';
     final encoded = Uri.encodeComponent(q);
 
     final buttons = [
-      (
-        label: 'Spotify',
-        color: const Color(0xFF1DB954),
-        icon:  Icons.spatial_audio_off_rounded,
-        url:   'https://open.spotify.com/search/$encoded',
-      ),
-      (
-        label: 'YT Music',
-        color: const Color(0xFFFF0033),
-        icon:  Icons.music_video_rounded,
-        url:   'https://music.youtube.com/search?q=$encoded',
-      ),
-      (
-        label: 'Web',
-        color: Colors.white.withValues(alpha: 0.85),
-        icon:  Icons.language_rounded,
-        url:   'https://www.google.com/search?q=${Uri.encodeComponent(q + " music")}',
-      ),
+      (label: 'Last.fm',  color: const Color(0xFFD51007), icon: Icons.bar_chart_rounded,      url: lfmUrl),
+      (label: 'Spotify',  color: const Color(0xFF1DB954), icon: Icons.spatial_audio_off_rounded, url: 'https://open.spotify.com/search/$encoded'),
+      (label: 'YT Music', color: const Color(0xFFFF0033), icon: Icons.music_video_rounded,     url: 'https://music.youtube.com/search?q=$encoded'),
+      (label: 'Web',      color: Colors.white.withValues(alpha: 0.85), icon: Icons.language_rounded, url: 'https://www.google.com/search?q=${Uri.encodeComponent('$q music')}'),
     ];
 
-    return Row(
-      children: buttons.map((b) => Padding(
-        padding: const EdgeInsets.only(right: 8),
-        child: GestureDetector(
-          onTap: () async {
-            final uri = Uri.parse(b.url);
-            try { await launchUrl(uri, mode: LaunchMode.externalApplication); }
-            catch (_) { await launchUrl(uri, mode: LaunchMode.platformDefault); }
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: hasImage ? 0.38 : 0.10),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: (hasImage ? Colors.white : Colors.black)
-                    .withValues(alpha: 0.18),
-                width: 1,
-              ),
+    Widget chip(({String label, Color color, IconData icon, String url}) b) => Padding(
+      padding: const EdgeInsets.only(right: 8, bottom: 4),
+      child: GestureDetector(
+        onTap: () async {
+          final uri = Uri.parse(b.url);
+          try { await launchUrl(uri, mode: LaunchMode.externalApplication); }
+          catch (_) { await launchUrl(uri, mode: LaunchMode.platformDefault); }
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: hasImage ? 0.38 : 0.10),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: (hasImage ? Colors.white : Colors.black).withValues(alpha: 0.18),
+              width: 1,
             ),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(b.icon, size: 14,
-                  color: hasImage ? Colors.white.withValues(alpha: 0.90) : b.color),
-              const SizedBox(width: 5),
-              Text(b.label, style: TextStyle(
-                color: hasImage ? Colors.white.withValues(alpha: 0.90) : b.color,
-                fontSize: 11, fontWeight: FontWeight.w600,
-              )),
-            ]),
           ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Icon(b.icon, size: 14,
+                color: hasImage ? Colors.white.withValues(alpha: 0.90) : b.color),
+            const SizedBox(width: 5),
+            Text(b.label, style: TextStyle(
+              color: hasImage ? Colors.white.withValues(alpha: 0.90) : b.color,
+              fontSize: 11, fontWeight: FontWeight.w600,
+            )),
+          ]),
         ),
-      )).toList(),
+      ),
+    );
+
+    // center when they fit, left-align when they wrap
+    return Wrap(
+      alignment: WrapAlignment.center,
+      runAlignment: WrapAlignment.center,
+      children: buttons.map(chip).toList(),
     );
   }
 
@@ -1037,9 +1030,13 @@ class _BlurFadeImageState extends State<_BlurFadeImage>
   @override
   void initState() {
     super.initState();
+    final cached = PaintingBinding.instance.imageCache
+        .containsKey(NetworkImage(widget.url));
+    _imageLoaded = cached;
     _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
-    _blur = Tween<double>(begin: 16.0, end: 0.0)
+    _blur = Tween<double>(begin: cached ? 0.0 : 16.0, end: 0.0)
         .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+    if (cached) _ctrl.value = 1.0;
   }
 
   @override
