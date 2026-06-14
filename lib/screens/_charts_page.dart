@@ -643,11 +643,11 @@ class _ChartsPageState extends State<_ChartsPage>
                       child: CircularProgressIndicator(),
                     ))
                   else if (_calendarData != null)
-                    _CalendarCard(data: _calendarData!, year: _selectedYear,
-                        fullYear: hasFullData),
-                  const SizedBox(height: 12),
-                  if (!_calendarLoading && _calendarData != null)
-                    _YearFullHeatmapCard(data: _calendarData!, year: _selectedYear),
+                    _SwipeCalendarCard(
+                      data: _calendarData!,
+                      year: _selectedYear,
+                      fullYear: hasFullData,
+                    ),
                   const SizedBox(height: 28),
 
                   // 8. Listening streaks
@@ -1086,6 +1086,28 @@ class _LinePainter extends CustomPainter {
     canvas.drawPath(line, Paint()
       ..color = color ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke ..strokeCap = StrokeCap.round);
+
+    // Year separators
+    for (var i = 1; i < n; i++) {
+      if (keys[i].substring(0, 4) != keys[i - 1].substring(0, 4)) {
+        final x = i * w / (n - 1);
+        canvas.drawLine(
+          Offset(x, 0), Offset(x, h),
+          Paint()..color = color.withValues(alpha: 0.40)..strokeWidth = 1.2,
+        );
+        final tp = TextPainter(
+          text: TextSpan(
+            text: keys[i].substring(0, 4),
+            style: TextStyle(
+              color: color, fontSize: 8,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        tp.paint(canvas, Offset(x + 3, 2));
+      }
+    }
 
     // Terminal dot
     canvas.drawCircle(pts.last, 7, Paint()..color = color.withValues(alpha: 0.15));
@@ -1615,11 +1637,16 @@ class _CalendarCardState extends State<_CalendarCard> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_sc.hasClients) {
-        if (widget.year == DateTime.now().year) {
-          _sc.jumpTo(_sc.position.maxScrollExtent);
-        }
-      }
+      if (!_sc.hasClients) return;
+      // Find last month that has data and scroll to it
+      final keys = widget.data.keys.where((k) => (widget.data[k] ?? 0) > 0).toList()..sort();
+      if (keys.isEmpty) { _sc.jumpTo(_sc.position.maxScrollExtent); return; }
+      final lastKey  = keys.last;
+      final lastMonth = int.tryParse(lastKey.substring(5, 7)) ?? 12;
+      // Each month column is 7*(18+3)-3 + 14 = 158px wide approx
+      const colW = 158.0;
+      final target = ((lastMonth - 1) * colW - 60).clamp(0.0, _sc.position.maxScrollExtent);
+      _sc.jumpTo(target);
     });
   }
 
@@ -2158,6 +2185,82 @@ class _SwipeDistributionCardState extends State<_SwipeDistributionCard> {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
+//  _SwipeCalendarCard — swipe between month grid and GitHub heatmap
+// ══════════════════════════════════════════════════════════════════════════
+
+class _SwipeCalendarCard extends StatefulWidget {
+  final Map<String, int> data;
+  final int  year;
+  final bool fullYear;
+  const _SwipeCalendarCard({
+    required this.data, required this.year, this.fullYear = false,
+  });
+
+  @override
+  State<_SwipeCalendarCard> createState() => _SwipeCalendarCardState();
+}
+
+class _SwipeCalendarCardState extends State<_SwipeCalendarCard> {
+  final _ctrl = PageController();
+  int _page = 0;
+
+  // Estimated heights; month grid is taller than the heatmap strip
+  static const _monthGridH  = 290.0;
+  static const _heatmapH    = 170.0;
+
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    final s      = Theme.of(context).colorScheme;
+    final height = _page == 0 ? _monthGridH : _heatmapH;
+    return Column(
+      children: [
+        AnimatedSize(
+          duration: const Duration(milliseconds: 260),
+          curve: Curves.easeInOutCubic,
+          child: SizedBox(
+            height: height,
+            child: PageView(
+              controller: _ctrl,
+              onPageChanged: (i) => setState(() => _page = i),
+              children: [
+                _CalendarCard(
+                  data: widget.data,
+                  year: widget.year,
+                  fullYear: widget.fullYear,
+                ),
+                _YearFullHeatmapCard(
+                  data: widget.data,
+                  year: widget.year,
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(2, (i) => AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width:  _page == i ? 18 : 6,
+            height: 6,
+            margin: const EdgeInsets.symmetric(horizontal: 3),
+            decoration: BoxDecoration(
+              color: _page == i
+                  ? s.primary
+                  : s.outlineVariant.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(3),
+            ),
+          )),
+        ),
+      ],
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
 //  _YearFullHeatmapCard — continuous GitHub-style year heatmap
 // ══════════════════════════════════════════════════════════════════════════
 
@@ -2166,8 +2269,8 @@ class _YearFullHeatmapCard extends StatelessWidget {
   final int              year;
   const _YearFullHeatmapCard({required this.data, required this.year});
 
-  static const _cell = 11.0;
-  static const _gap  = 2.0;
+  static const _cell = 10.0;
+  static const _gap  = 1.5;
   static const _step = _cell + _gap;
 
   @override
