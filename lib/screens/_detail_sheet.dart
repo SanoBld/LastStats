@@ -15,6 +15,58 @@ void _pushFullscreen(BuildContext ctx, String url) {
   ));
 }
 
+// ── Pull-down-to-dismiss wrapper ───────────────────────────────────────────
+// Tracks accumulated overscroll instead of raw scroll pixels, since
+// ClampingScrollPhysics keeps pixels at 0 at the boundary (unlike the iOS
+// bounce, which reports negative pixels during overscroll).
+class _DismissOnOverscroll extends StatefulWidget {
+  final Widget       child;
+  final VoidCallback onDismiss;
+  const _DismissOnOverscroll({required this.child, required this.onDismiss});
+
+  @override
+  State<_DismissOnOverscroll> createState() => _DismissOnOverscrollState();
+}
+
+class _DismissOnOverscrollState extends State<_DismissOnOverscroll> {
+  double _pulled = 0;
+
+  @override
+  Widget build(BuildContext context) => NotificationListener<ScrollNotification>(
+    onNotification: (n) {
+      if (n is ScrollStartNotification || n is ScrollEndNotification) {
+        _pulled = 0;
+      } else if (n is OverscrollNotification && n.overscroll < 0) {
+        _pulled += n.overscroll;
+        if (_pulled < -60) widget.onDismiss();
+      }
+      return false;
+    },
+    child: widget.child,
+  );
+}
+
+// ── Status bar scrim ────────────────────────────────────────────────────────
+// Keeps system status bar icons (time, battery, wifi) legible above the
+// scrolling content, regardless of scroll position.
+class _StatusBarScrim extends StatelessWidget {
+  final double height;
+  const _StatusBarScrim({required this.height});
+
+  @override
+  Widget build(BuildContext context) => Positioned(
+    top: 0, left: 0, right: 0, height: height,
+    child: IgnorePointer(
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(color: Colors.black.withValues(alpha: 0.22)),
+        ),
+      ),
+    ),
+  );
+}
+
 void showDetailSheet(
   BuildContext context,
   Map<String, dynamic> item,
@@ -302,17 +354,14 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         ),
 
         // Scrollable body — pull-down overscroll dismisses the sheet.
+        // ClampingScrollPhysics lets the native Android stretch overscroll
+        // show through instead of forcing the iOS-style bounce.
         // Image tap is inline in the scroll so the hitbox follows content
         // and never overlaps underlying items when the user scrolls down.
-        NotificationListener<ScrollUpdateNotification>(
-          onNotification: (n) {
-            if (n.metrics.pixels < -60 && n.dragDetails != null) {
-              Navigator.pop(ctx);
-            }
-            return false;
-          },
+        _DismissOnOverscroll(
+          onDismiss: () => Navigator.pop(ctx),
           child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(
+            physics: const ClampingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics()),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -351,6 +400,9 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ),
           ),
         ),
+
+        // Status bar scrim — always above the scroll content
+        _StatusBarScrim(height: topPad),
 
         // Back button
         Positioned(
@@ -1432,16 +1484,13 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           ),
         ),
 
-        // Scrollable content — pull-down-to-dismiss via overscroll
-        NotificationListener<ScrollUpdateNotification>(
-          onNotification: (n) {
-            if (n.metrics.pixels < -60 && n.dragDetails != null) {
-              Navigator.pop(ctx);
-            }
-            return false;
-          },
+        // Scrollable content — pull-down-to-dismiss via overscroll.
+        // ClampingScrollPhysics lets the native Android stretch overscroll
+        // show through instead of forcing the iOS-style bounce.
+        _DismissOnOverscroll(
+          onDismiss: () => Navigator.pop(ctx),
           child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(
+            physics: const ClampingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics()),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1481,6 +1530,9 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
             ),
           ),
         ),
+
+        // Status bar scrim — always above the scroll content
+        _StatusBarScrim(height: topPad),
 
         // Back button — same style as detail sheets
         Positioned(
@@ -1555,24 +1607,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Badge chip — same pattern as detail sheets
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-            decoration: BoxDecoration(
-              color: scheme.primary,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Text(
-              'Profil',
-              style: TextStyle(
-                color: Colors.white, fontSize: 11,
-                fontWeight: FontWeight.w700, letterSpacing: 0.8,
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // Avatar (centred below badge)
+          // Avatar — sits right under the image zone
           Center(
             child: Stack(alignment: Alignment.center, children: [
               if (_isNowPlaying)
@@ -1609,69 +1644,77 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                 ),
             ]),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
+
+          // Badge chip — moved right above the username, same pattern as
+          // the badge-above-title layout used by the item detail sheets
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+            decoration: BoxDecoration(
+              color: scheme.primary,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Text(
+              'Profil',
+              style: TextStyle(
+                color: Colors.white, fontSize: 11,
+                fontWeight: FontWeight.w700, letterSpacing: 0.8,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
 
           // Username
-          Center(
-            child: Text(
-              name,
-              textAlign: TextAlign.center,
-              style: text.headlineMedium?.copyWith(
-                fontWeight: FontWeight.w900,
-                color: Colors.white,
-                shadows: [Shadow(blurRadius: 8,
-                    color: Colors.black.withValues(alpha: 0.5))],
-              ),
+          Text(
+            name,
+            style: text.headlineMedium?.copyWith(
+              fontWeight: FontWeight.w900,
+              color: Colors.white,
+              shadows: [Shadow(blurRadius: 8,
+                  color: Colors.black.withValues(alpha: 0.5))],
             ),
           ),
 
           if (realName.isNotEmpty) ...[
             const SizedBox(height: 3),
-            Center(
-              child: Text(realName,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.75), fontSize: 13)),
-            ),
+            Text(realName,
+              style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.75), fontSize: 13)),
           ],
 
           if (_isNowPlaying) ...[
             const SizedBox(height: 8),
-            Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color:        Colors.greenAccent.shade400.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(20),
-                  border:       Border.all(color: Colors.greenAccent.shade400),
-                ),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Icon(Icons.graphic_eq_rounded,
-                      size: 12, color: Colors.greenAccent.shade400),
-                  const SizedBox(width: 4),
-                  Text(L.commonNowPlayingLong,
-                    style: TextStyle(
-                      color: Colors.greenAccent.shade400,
-                      fontSize: 11, fontWeight: FontWeight.w700)),
-                ]),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color:        Colors.greenAccent.shade400.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(20),
+                border:       Border.all(color: Colors.greenAccent.shade400),
               ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.graphic_eq_rounded,
+                    size: 12, color: Colors.greenAccent.shade400),
+                const SizedBox(width: 4),
+                Text(L.commonNowPlayingLong,
+                  style: TextStyle(
+                    color: Colors.greenAccent.shade400,
+                    fontSize: 11, fontWeight: FontWeight.w700)),
+              ]),
             ),
           ],
 
           if (country.isNotEmpty || since.isNotEmpty) ...[
             const SizedBox(height: 8),
-            Center(
-              child: Wrap(
-                spacing: 16, alignment: WrapAlignment.center,
-                children: [
-                  if (country.isNotEmpty && country != 'None')
-                    _BannerMeta(icon: Icons.location_on_outlined, label: country),
-                  if (since.isNotEmpty)
-                    _BannerMeta(
-                        icon: Icons.calendar_today_outlined,
-                        label: L.memberSince(since)),
-                ],
-              ),
+            Wrap(
+              spacing: 16,
+              children: [
+                if (country.isNotEmpty && country != 'None')
+                  _BannerMeta(icon: Icons.location_on_outlined, label: country),
+                if (since.isNotEmpty)
+                  _BannerMeta(
+                      icon: Icons.calendar_today_outlined,
+                      label: L.memberSince(since)),
+              ],
             ),
           ],
 
