@@ -18,18 +18,32 @@ String _fmtExact(int n) {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-/// Decode common HTML entities from Last.fm API responses.
-String _sanitizeName(String s) => s
-    .replaceAll('&amp;', '&')
-    .replaceAll('&quot;', '"')
-    .replaceAll('&#039;', "'")
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>');
+/// Decode HTML entities from Last.fm API responses (named + numeric/hex refs).
+/// Last.fm's recenttracks endpoint leaves apostrophes/accents HTML-encoded
+/// (e.g. "&#039;" or "&#x27;"), which otherwise leak into the UI as raw markup.
+String _sanitizeName(String s) {
+  var out = s
+      .replaceAll('&amp;', '&')
+      .replaceAll('&quot;', '"')
+      .replaceAll('&apos;', "'")
+      .replaceAll('&lt;', '<')
+      .replaceAll('&gt;', '>')
+      .replaceAll('&nbsp;', ' ');
+  out = out.replaceAllMapped(
+      RegExp(r'&#x([0-9a-fA-F]+);'),
+      (m) => String.fromCharCode(int.parse(m.group(1)!, radix: 16)));
+  out = out.replaceAllMapped(
+      RegExp(r'&#(\d+);'), (m) => String.fromCharCode(int.parse(m.group(1)!)));
+  return out.trim();
+}
 
-/// Filter out MBIDs, [Unknown Album] style tags, and empty strings.
+/// Filter out MBIDs, [Unknown Album] tags, empty strings, and raw
+/// map/object dumps that should never reach the UI as a label.
 bool _isValidLabel(String s) {
   if (s.isEmpty) return false;
   if (s.startsWith('[') && s.endsWith(']')) return false;
+  if (s.startsWith('{') && s.endsWith('}')) return false;
+  if (s.startsWith('Instance of')) return false;
   if (RegExp(r'^[0-9a-f\-]{36}$', caseSensitive: false).hasMatch(s)) return false;
   return true;
 }
@@ -137,14 +151,19 @@ class _ChartsPageState extends State<_ChartsPage>
     }
   }
 
-  // Safe field access for records (Map or typed object)
+  // Safe field access for records (Map or typed object). Last.fm sometimes
+  // nests names as {'#text': 'Name', 'mbid': '...'}; unwrap that shape too.
   String _recField(dynamic r, String field) {
-    try { return ((r as Map)[field] as String?) ?? ''; } catch (_) {}
-    try {
-      if (field == 'artist') return (r.artist as String?) ?? '';
-      if (field == 'album')  return (r.album  as String?) ?? '';
-    } catch (_) {}
-    return '';
+    dynamic raw;
+    try { raw = (r as Map)[field]; } catch (_) {}
+    if (raw == null) {
+      try {
+        if (field == 'artist') raw = r.artist;
+        if (field == 'album')  raw = r.album;
+      } catch (_) {}
+    }
+    if (raw is Map) raw = raw['#text'] ?? raw['name'];
+    return raw is String ? raw : '';
   }
 
   Future<void> _loadYearData(int year) async {
@@ -364,6 +383,23 @@ class _ChartsPageState extends State<_ChartsPage>
     cached.add(currentYear);
     final sorted = cached.toList()..sort();
     setState(() => _availableYears = sorted);
+    _scrollToSelectedChip();
+  }
+
+  // ── Year chips ergonomics: keep the selected chip visible ──────────────────
+  final Map<int, GlobalKey> _chipKeys = {};
+  GlobalKey _chipKey(int year) => _chipKeys.putIfAbsent(year, () => GlobalKey());
+
+  void _scrollToSelectedChip() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ctx = _chipKeys[_selectedYear]?.currentContext;
+      if (ctx != null) {
+        Scrollable.ensureVisible(ctx,
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutCubic,
+            alignment: 0.5);
+      }
+    });
   }
 
   Map<String, int> _buildAllTimeMonthly() {
@@ -379,7 +415,9 @@ class _ChartsPageState extends State<_ChartsPage>
     return result;
   }
 
-  Map<String, int> _buildAllTimeCumulative(Map<String, int> monthly) {
+  /// Cumulative scrobbles across [monthly], chronologically — works for a
+  /// single year or for the merged all-time series.
+  Map<String, int> _buildCumulative(Map<String, int> monthly) {
     final now    = DateTime.now();
     final cutoff = '${now.year}-${now.month.toString().padLeft(2, '0')}';
     final keys   = monthly.keys
@@ -391,6 +429,21 @@ class _ChartsPageState extends State<_ChartsPage>
       cum += monthly[k]!;
       result[k] = cum;
     }
+    return result;
+  }
+
+  /// Merge daily calendar data across every cached year into one continuous
+  /// map, used by the "All time" heatmap.
+  Map<String, int> _buildAllTimeCalendar() {
+    final result = <String, int>{};
+    for (final year in _availableYears) {
+      final ts = AllScrobblesService.getRecordsForYear(year);
+      if (ts != null) {
+        AllScrobblesService.computeCalendar(ts)
+            .forEach((k, v) => result[k] = (result[k] ?? 0) + v);
+      }
+    }
+    if (result.isEmpty && _calendarData != null) result.addAll(_calendarData!);
     return result;
   }
 
@@ -410,6 +463,7 @@ class _ChartsPageState extends State<_ChartsPage>
       _topAlbumsYear     = [];
     });
     _loadYearData(year);
+    _scrollToSelectedChip();
   }
 
   // ── Year chips ────────────────────────────────────────────────────────────
@@ -425,6 +479,7 @@ class _ChartsPageState extends State<_ChartsPage>
           final selected = year == _selectedYear;
           final label    = year == 0 ? _ct('Tout le temps', 'All time') : '$year';
           return Padding(
+            key: _chipKey(year),
             padding: const EdgeInsets.only(right: 8),
             child: GestureDetector(
               onTap: () => _onYearChanged(year),
@@ -573,12 +628,27 @@ class _ChartsPageState extends State<_ChartsPage>
     if (_error != null) return _ErrorView(message: _error!, onRetry: _load);
 
     final allTimeMonthly = _buildAllTimeMonthly();
-    final cumulData      = _buildAllTimeCumulative(allTimeMonthly);
+    // Charts 1 & 2 show only the selected period: that year's months, or
+    // every month from start to end when "All time" is selected.
+    final periodMonthly    = _isAllTime ? allTimeMonthly : (_monthly ?? const <String, int>{});
+    final periodCumulative = _buildCumulative(periodMonthly);
+    final periodLabel      = _isAllTime ? _ct('Tout le temps', 'All time') : '$_selectedYear';
 
     final cachedTs    = _isAllTime ? null : AllScrobblesService.getTimestampsForYear(_selectedYear);
     final hasFullData = _isAllTime
         ? AllScrobblesService.getCachedYears().isNotEmpty
         : cachedTs != null;
+
+    // Calendar + streaks: merged across all years for "All time", else the
+    // currently-loaded year.
+    final calendarForView = _isAllTime ? _buildAllTimeCalendar() : _calendarData;
+    final heatmapYears = _isAllTime
+        ? (_availableYears.isNotEmpty ? _availableYears : [DateTime.now().year])
+        : [_selectedYear];
+    final heatmapStart = DateTime(heatmapYears.first, 1, 1);
+    final heatmapEnd   = heatmapYears.last == DateTime.now().year
+        ? DateTime.now()
+        : DateTime(heatmapYears.last, 12, 31);
 
     final habitsSubtitle = _isAllTime
         ? (_hourlyCount > 0
@@ -637,21 +707,26 @@ class _ChartsPageState extends State<_ChartsPage>
 
                   _buildHistoryBanner(context),
 
-                  // 1. Monthly bars (all-time, all months)
+                  // 1. Monthly bars — scoped to the selected period
                   _SectionHeader(title: L.chartsMonthly, icon: Icons.calendar_month_rounded),
+                  const SizedBox(height: 4),
+                  Text(periodLabel,
+                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                   const SizedBox(height: 12),
-                  if (allTimeMonthly.isNotEmpty) _MonthlyCard(monthly: allTimeMonthly),
+                  if (periodMonthly.isNotEmpty) _MonthlyCard(monthly: periodMonthly),
                   const SizedBox(height: 28),
 
-                  // 2. Cumulative line (all-time)
-                  if (cumulData.length >= 2) ...[
+                  // 2. Cumulative line — scoped to the selected period
+                  if (periodCumulative.length >= 2) ...[
                     _SectionHeader(
-                      title: _ct('Progression totale des scrobbles',
-                                 'All-time scrobble progression'),
+                      title: _ct('Progression des scrobbles', 'Scrobble progression'),
                       icon: Icons.trending_up_rounded,
                     ),
+                    const SizedBox(height: 4),
+                    Text(periodLabel,
+                        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                     const SizedBox(height: 12),
-                    _CumulativeLineCard(data: cumulData),
+                    _CumulativeLineCard(data: periodCumulative),
                     const SizedBox(height: 28),
                   ],
 
@@ -738,46 +813,62 @@ class _ChartsPageState extends State<_ChartsPage>
                     const SizedBox(height: 28),
                   ],
 
-                  // 7. Listening calendar — hidden in all-time mode
-                  if (!_isAllTime) ...[
+                  // 7. Listening calendar — single year, or every year glued
+                  // together (separated by a marker) for "All time"
+                  _SectionHeader(
+                    title: _ct('Calendrier musical', 'Listening calendar'),
+                    icon: Icons.grid_on_rounded,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    _isAllTime
+                        ? (heatmapYears.length > 1
+                            ? _ct(
+                                'Activité journalière — ${heatmapYears.first} à ${heatmapYears.last}',
+                                'Daily activity — ${heatmapYears.first} to ${heatmapYears.last}')
+                            : _ct('Activité journalière — toutes les années',
+                                  'Daily activity — all years'))
+                        : hasFullData
+                            ? _ct('Activité journalière — $_selectedYear',
+                                  'Daily activity — $_selectedYear')
+                            : _selectedYear != DateTime.now().year
+                                ? _ct('Chargez l\'historique pour voir $_selectedYear',
+                                      'Load history to see $_selectedYear')
+                                : _ct('Activité journalière — 12 mois',
+                                      'Daily activity — last 12 months'),
+                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                  ),
+                  const SizedBox(height: 12),
+                  if (_isAllTime)
+                    (calendarForView != null && calendarForView.isNotEmpty)
+                        ? _HeatmapCard(
+                            data: calendarForView, start: heatmapStart, end: heatmapEnd)
+                        : _NoDataCard(
+                            year: 0,
+                            label: _ct('toutes les années', 'all years'),
+                            onLoad: () => AllScrobblesService.loadAll(widget.service),
+                          )
+                  else if (_calendarLoading)
+                    const Center(child: Padding(
+                      padding: EdgeInsets.all(24),
+                      child: CircularProgressIndicator(),
+                    ))
+                  else if (calendarForView != null)
+                    _HeatmapCard(
+                        data: calendarForView, start: heatmapStart, end: heatmapEnd)
+                  else if (!hasFullData && _selectedYear != DateTime.now().year)
+                    _NoDataCard(year: _selectedYear, onLoad: () => AllScrobblesService.loadAll(widget.service)),
+                  const SizedBox(height: 28),
+
+                  // 8. Listening streaks
+                  if (calendarForView != null && calendarForView.isNotEmpty) ...[
                     _SectionHeader(
-                      title: _ct('Calendrier musical', 'Listening calendar'),
-                      icon: Icons.grid_on_rounded,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      hasFullData
-                          ? _ct('Activité journalière — $_selectedYear',
-                                'Daily activity — $_selectedYear')
-                          : _selectedYear != DateTime.now().year
-                              ? _ct('Chargez l\'historique pour voir $_selectedYear',
-                                    'Load history to see $_selectedYear')
-                              : _ct('Activité journalière — 12 mois',
-                                    'Daily activity — last 12 months'),
-                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                      title: _ct('Séries d\'écoute', 'Listening streaks'),
+                      icon: Icons.local_fire_department_rounded,
                     ),
                     const SizedBox(height: 12),
-                    if (_calendarLoading)
-                      const Center(child: Padding(
-                        padding: EdgeInsets.all(24),
-                        child: CircularProgressIndicator(),
-                      ))
-                    else if (_calendarData != null)
-                      _YearFullHeatmapCard(data: _calendarData!, year: _selectedYear)
-                    else if (!hasFullData && _selectedYear != DateTime.now().year)
-                      _NoDataCard(year: _selectedYear, onLoad: () => AllScrobblesService.loadAll(widget.service)),
-                    const SizedBox(height: 28),
-
-                    // 8. Listening streaks
-                    if (_calendarData != null && _calendarData!.isNotEmpty) ...[
-                      _SectionHeader(
-                        title: _ct('Séries d\'écoute', 'Listening streaks'),
-                        icon: Icons.local_fire_department_rounded,
-                      ),
-                      const SizedBox(height: 12),
-                      _StreakCard(data: _calendarData!),
-                      const SizedBox(height: 20),
-                    ],
+                    _StreakCard(data: calendarForView),
+                    const SizedBox(height: 20),
                   ],
                 ],
               ),
@@ -2133,12 +2224,14 @@ class _SwipeDistributionCardState extends State<_SwipeDistributionCard> {
 class _NoDataCard extends StatelessWidget {
   final int year;
   final VoidCallback onLoad;
-  const _NoDataCard({required this.year, required this.onLoad});
+  final String? label;
+  const _NoDataCard({required this.year, required this.onLoad, this.label});
 
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
     final t = Theme.of(context).textTheme;
+    final what = label ?? '$year';
     return Container(
       decoration: _chartCardDecoration(s),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -2147,8 +2240,8 @@ class _NoDataCard extends StatelessWidget {
         const SizedBox(width: 14),
         Expanded(
           child: Text(
-            _ct('Chargez l\'historique pour afficher $year',
-                'Load history to display $year'),
+            _ct('Chargez l\'historique pour afficher $what',
+                'Load history to display $what'),
             style: t.bodySmall?.copyWith(color: s.onSurfaceVariant),
           ),
         ),
@@ -2169,13 +2262,14 @@ class _NoDataCard extends StatelessWidget {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-//  _YearFullHeatmapCard — continuous GitHub-style year heatmap
+//  _HeatmapCard — continuous GitHub-style heatmap over [start, end]
 // ══════════════════════════════════════════════════════════════════════════
 
-class _YearFullHeatmapCard extends StatelessWidget {
+class _HeatmapCard extends StatelessWidget {
   final Map<String, int> data;
-  final int              year;
-  const _YearFullHeatmapCard({required this.data, required this.year});
+  final DateTime          start;
+  final DateTime          end;
+  const _HeatmapCard({required this.data, required this.start, required this.end});
 
   static const _cell = 10.0;
   static const _gap  = 1.5;
@@ -2186,11 +2280,13 @@ class _YearFullHeatmapCard extends StatelessWidget {
     final t      = Theme.of(context).textTheme;
     final maxVal = data.values.fold(0, (a, b) => a > b ? a : b);
 
-    final jan1      = DateTime(year, 1, 1);
-    final startWd   = jan1.weekday;
-    final totalDays = DateTime(year, 12, 31).difference(jan1).inDays + 1;
+    final startDay   = DateTime(start.year, start.month, start.day);
+    final endDay     = DateTime(end.year, end.month, end.day);
+    final startWd    = startDay.weekday;
+    final totalDays  = endDay.difference(startDay).inDays + 1;
     final totalCells = (startWd - 1) + totalDays;
     final weeks      = (totalCells / 7).ceil();
+    final spansYears = endDay.year != startDay.year;
 
     final weekColumns = List.generate(weeks, (col) {
       return List.generate(7, (row) {
@@ -2200,12 +2296,23 @@ class _YearFullHeatmapCard extends StatelessWidget {
       });
     });
 
-    // Month label: first week index where each month starts
+    // Month label for the week column where each month begins. January
+    // also carries the year so multi-year spans stay readable.
     final monthStarts = <int, String>{};
-    for (var m = 1; m <= 12; m++) {
-      final d   = DateTime(year, m, 1);
-      final off = d.difference(jan1).inDays + (startWd - 1);
-      monthStarts[off ~/ 7] = L.months[m];
+    final yearBoundaryCols = <int>{};
+    var cursor = DateTime(startDay.year, startDay.month, 1);
+    while (!cursor.isAfter(endDay)) {
+      final off = cursor.difference(startDay).inDays + (startWd - 1);
+      if (off >= 0) {
+        final col = off ~/ 7;
+        monthStarts[col] = spansYears && cursor.month == 1
+            ? '${L.months[cursor.month]} ${cursor.year}'
+            : L.months[cursor.month];
+        if (cursor.month == 1 && cursor.year != startDay.year) {
+          yearBoundaryCols.add(col);
+        }
+      }
+      cursor = DateTime(cursor.year, cursor.month + 1, 1);
     }
 
     return Container(
@@ -2222,61 +2329,81 @@ class _YearFullHeatmapCard extends StatelessWidget {
               children: weekColumns.asMap().entries.map((entry) {
                 final col  = entry.key;
                 final days = entry.value;
-                return Padding(
-                  padding: const EdgeInsets.only(right: _gap),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Month label or empty placeholder
-                      SizedBox(
-                        height: 14,
-                        child: monthStarts.containsKey(col)
-                            ? Text(
-                                monthStarts[col]!,
-                                style: t.labelSmall?.copyWith(
-                                  fontSize: 8,
-                                  color: s.onSurfaceVariant.withValues(alpha: 0.65),
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              )
-                            : null,
-                      ),
-                      const SizedBox(height: 2),
-                      ...days.map((offset) {
-                        if (offset == null) {
-                          return SizedBox(width: _cell, height: _cell + _gap);
-                        }
-                        final d   = jan1.add(Duration(days: offset));
-                        final key = '${d.year}-'
-                            '${d.month.toString().padLeft(2, '0')}-'
-                            '${d.day.toString().padLeft(2, '0')}';
-                        final count = data[key] ?? 0;
-                        final ratio = (maxVal > 0 && count > 0)
-                            ? count / maxVal : 0.0;
-                        final scaled = ratio > 0
-                            ? sqrt(ratio).clamp(0.0, 1.0) : 0.0;
-                        final color = count == 0
-                            ? s.surfaceContainerHigh
-                            : Color.lerp(
-                                s.primaryContainer, s.primary,
-                                (scaled * 0.85 + 0.15).clamp(0.0, 1.0))!;
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: _gap),
-                          child: Tooltip(
-                            message: count > 0
-                                ? '${d.day}/${d.month} — $count scrobbles' : '',
-                            child: Container(
-                              width: _cell, height: _cell,
-                              decoration: BoxDecoration(
-                                color: color,
-                                borderRadius: BorderRadius.circular(2.5),
-                              ),
-                            ),
+                final isYearStart = yearBoundaryCols.contains(col);
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Thin separator before a new year, columns stay glued
+                    if (isYearStart)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 4),
+                        child: SizedBox(
+                          height: _cell + 16,
+                          child: VerticalDivider(
+                            width: 1, thickness: 1,
+                            color: s.primary.withValues(alpha: 0.35),
                           ),
-                        );
-                      }),
-                    ],
-                  ),
+                        ),
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: _gap),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Month label or empty placeholder
+                          SizedBox(
+                            height: 14,
+                            child: monthStarts.containsKey(col)
+                                ? Text(
+                                    monthStarts[col]!,
+                                    style: t.labelSmall?.copyWith(
+                                      fontSize: 8,
+                                      color: isYearStart
+                                          ? s.primary
+                                          : s.onSurfaceVariant.withValues(alpha: 0.65),
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  )
+                                : null,
+                          ),
+                          const SizedBox(height: 2),
+                          ...days.map((offset) {
+                            if (offset == null) {
+                              return SizedBox(width: _cell, height: _cell + _gap);
+                            }
+                            final d   = startDay.add(Duration(days: offset));
+                            final key = '${d.year}-'
+                                '${d.month.toString().padLeft(2, '0')}-'
+                                '${d.day.toString().padLeft(2, '0')}';
+                            final count = data[key] ?? 0;
+                            final ratio = (maxVal > 0 && count > 0)
+                                ? count / maxVal : 0.0;
+                            final scaled = ratio > 0
+                                ? sqrt(ratio).clamp(0.0, 1.0) : 0.0;
+                            final color = count == 0
+                                ? s.surfaceContainerHigh
+                                : Color.lerp(
+                                    s.primaryContainer, s.primary,
+                                    (scaled * 0.85 + 0.15).clamp(0.0, 1.0))!;
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: _gap),
+                              child: Tooltip(
+                                message: count > 0
+                                    ? '${d.day}/${d.month}/${d.year} — $count scrobbles' : '',
+                                child: Container(
+                                  width: _cell, height: _cell,
+                                  decoration: BoxDecoration(
+                                    color: color,
+                                    borderRadius: BorderRadius.circular(2.5),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
+                    ),
+                  ],
                 );
               }).toList(),
             ),
