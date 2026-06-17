@@ -266,7 +266,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     return Stack(
       children: [
 
-        // ── Background image (fullscreen, covers status bar) ──────────────
+        // Background image (fullscreen, covers status bar)
         Positioned.fill(
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 500),
@@ -282,7 +282,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           ),
         ),
 
-        // ── Gradient: dark top band + fade to surface at bottom ───────────
+        // Gradient: dark top → surface at bottom
         Positioned.fill(
           child: Container(
             decoration: BoxDecoration(
@@ -301,55 +301,58 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           ),
         ),
 
-        // ── Scrollable body ───────────────────────────────────────────────
-        SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: imgH - 90),
-              _buildHeader(ctx, scheme, imgH, hasImage),
-              Container(
-                color: scheme.surface,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildPeriodSelector(scheme),
-                    Divider(height: 1,
-                        color: scheme.outlineVariant.withValues(alpha: 0.4)),
-                    _buildStatsRow(scheme),
-                    if (_tags().isNotEmpty) _buildTags(scheme),
-                    if (_bio().isNotEmpty)  _buildBio(scheme),
-                    if (widget.type == 'artists' && _topTracks.isNotEmpty)
-                      _buildTopTracks(scheme),
-                    if (widget.type == 'artists' && _topAlbums.isNotEmpty)
-                      _buildTopAlbums(scheme),
-                    if (widget.type == 'albums' && _tracklist.isNotEmpty)
-                      _buildTracklist(scheme),
-                    if (widget.type == 'tracks') _buildTrackExtra(scheme),
-                    if (widget.type == 'tracks') _buildLyrics(scheme),
-                    const SizedBox(height: 48),
-                  ],
+        // Scrollable body — pull-down overscroll dismisses the sheet.
+        // Image tap is inline in the scroll so the hitbox follows content
+        // and never overlaps underlying items when the user scrolls down.
+        NotificationListener<ScrollUpdateNotification>(
+          onNotification: (n) {
+            if (n.metrics.pixels < -60 && n.dragDetails != null) {
+              Navigator.pop(ctx);
+            }
+            return false;
+          },
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics()),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Tappable image zone — moves with scroll, no hitbox drift
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: hasImage ? () => _pushFullscreen(ctx, _resolvedImage) : null,
+                  child: SizedBox(height: imgH - 90, width: double.infinity),
                 ),
-              ),
-            ],
+                _buildHeader(ctx, scheme, imgH, hasImage),
+                Container(
+                  color: scheme.surface,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildPeriodSelector(scheme),
+                      Divider(height: 1,
+                          color: scheme.outlineVariant.withValues(alpha: 0.4)),
+                      _buildStatsRow(scheme),
+                      if (_tags().isNotEmpty) _buildTags(scheme),
+                      if (_bio().isNotEmpty)  _buildBio(scheme),
+                      if (widget.type == 'artists' && _topTracks.isNotEmpty)
+                        _buildTopTracks(scheme),
+                      if (widget.type == 'artists' && _topAlbums.isNotEmpty)
+                        _buildTopAlbums(scheme),
+                      if (widget.type == 'albums' && _tracklist.isNotEmpty)
+                        _buildTracklist(scheme),
+                      if (widget.type == 'tracks') _buildTrackExtra(scheme),
+                      if (widget.type == 'tracks') _buildLyrics(scheme),
+                      const SizedBox(height: 48),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
 
-        // ── Image zone: tap = fullscreen, swipe down = dismiss ───────────
-        if (hasImage)
-          Positioned(
-            top: 0, left: 0, right: 0,
-            height: imgH - 80,
-            child: GestureDetector(
-              behavior: HitTestBehavior.translucent,
-              onTap: () => _pushFullscreen(ctx, _resolvedImage),
-              onVerticalDragEnd: (d) {
-                if ((d.primaryVelocity ?? 0) > 300) Navigator.pop(ctx);
-              },
-            ),
-          ),
-
-        // ── Back button ───────────────────────────────────────────────────
+        // Back button
         Positioned(
           top: topPad + 8, left: 12,
           child: GestureDetector(
@@ -1091,31 +1094,72 @@ class _BlurFadeImageState extends State<_BlurFadeImage>
 
 // ── Fullscreen image viewer ───────────────────────────────────────────────────
 
-class _FullscreenImageViewer extends StatelessWidget {
+// Fullscreen image viewer — supports pinch zoom, close button, tap to dismiss
+class _FullscreenImageViewer extends StatefulWidget {
   final String url;
   const _FullscreenImageViewer({required this.url});
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: Colors.black,
-    body: GestureDetector(
-      onTap: () => Navigator.pop(context),
-      onVerticalDragEnd: (d) {
-        if ((d.primaryVelocity?.abs() ?? 0) > 200) Navigator.pop(context);
-      },
-      child: Center(
-        child: InteractiveViewer(
-          minScale: 0.5,
-          maxScale: 5.0,
-          child: Image.network(
-            url, fit: BoxFit.contain,
-            errorBuilder: (_, _, _) => const Icon(
-              Icons.broken_image_rounded, color: Colors.white54, size: 64),
+  State<_FullscreenImageViewer> createState() => _FullscreenImageViewerState();
+}
+
+class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
+  final _tc     = TransformationController();
+  bool _isZoomed = false;
+
+  @override
+  void dispose() { _tc.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    final topPad = MediaQuery.of(context).padding.top;
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // InteractiveViewer handles pinch-zoom and pan.
+          // Inner GestureDetector handles tap-to-dismiss (only when not zoomed).
+          InteractiveViewer(
+            transformationController: _tc,
+            minScale: 0.8,
+            maxScale: 6.0,
+            onInteractionEnd: (_) => setState(() {
+              _isZoomed = _tc.value != Matrix4.identity();
+            }),
+            child: GestureDetector(
+              onTap: () { if (!_isZoomed) Navigator.pop(context); },
+              child: Center(
+                child: Image.network(
+                  widget.url, fit: BoxFit.contain,
+                  errorBuilder: (_, _, _) => const Icon(
+                      Icons.broken_image_rounded,
+                      color: Colors.white54, size: 64),
+                ),
+              ),
+            ),
           ),
-        ),
+
+          // Close button — always visible, resets zoom then dismisses
+          Positioned(
+            top: topPad + 8, right: 12,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                width: 36, height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.55),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.close_rounded,
+                    color: Colors.white, size: 20),
+              ),
+            ),
+          ),
+        ],
       ),
-    ),
-  );
+    );
+  }
 }
 
 // ── Gradient fallback when no image is available ──────────────────────────────
@@ -1185,18 +1229,23 @@ void showProfileSheet(
   bool isFav = false,
   VoidCallback? onToggleFav,
 }) {
-  showModalBottomSheet(
-    context:            context,
-    isScrollControlled: true,
-    backgroundColor:    Colors.transparent,
-    useSafeArea:        true,
-    builder: (_) => _FullProfileSheet(
+  Navigator.of(context).push(PageRouteBuilder(
+    opaque: false,
+    fullscreenDialog: true,
+    pageBuilder: (_, _, _) => _FullProfileSheet(
       username:    username,
       service:     service,
       isFav:       isFav,
       onToggleFav: onToggleFav ?? () {},
     ),
-  );
+    transitionsBuilder: (_, anim, _, child) => SlideTransition(
+      position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+          .animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
+      child: child,
+    ),
+    transitionDuration:        const Duration(milliseconds: 380),
+    reverseTransitionDuration: const Duration(milliseconds: 300),
+  ));
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1324,273 +1373,309 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-
-    return DraggableScrollableSheet(
-      initialChildSize: 0.92,
-      minChildSize:     0.4,
-      maxChildSize:     1.0,
-      expand: false,
-      builder: (ctx, ctrl) => ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        child: Container(
-          color: scheme.surface,
-          child: _loading
-              ? const Center(child: CircularProgressIndicator())
-              : _buildBody(ctx, ctrl, scheme),
-        ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: scheme.surface,
+        body: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : _buildContent(context, scheme),
       ),
     );
   }
 
-  Widget _buildBody(BuildContext ctx, ScrollController ctrl, ColorScheme scheme) {
-    return CustomScrollView(
-      controller: ctrl,
-      slivers: [
-        SliverToBoxAdapter(child: _buildBanner(ctx, scheme)),
-        SliverToBoxAdapter(child: _buildStatsRow(scheme)),
-        if (_isNowPlaying)
-          SliverToBoxAdapter(child: _buildNowPlayingCard(scheme)),
-        if (_topArtists.isNotEmpty) ...[
-          SliverToBoxAdapter(child: _sectionHeader(L.commonTopArtists, scheme)),
-          SliverList(delegate: SliverChildBuilderDelegate(
-            (_, i) => _buildArtistRow(ctx, _topArtists[i], i, scheme),
-            childCount: _topArtists.length,
-          )),
-        ],
-        if (_topAlbums.isNotEmpty) ...[
-          SliverToBoxAdapter(child: _sectionHeader(L.commonAlbums, scheme)),
-          SliverToBoxAdapter(child: _buildAlbumsGrid(ctx, scheme)),
-        ],
-        if (_recent.isNotEmpty) ...[
-          SliverToBoxAdapter(child: _sectionHeader(L.commonRecentTracks, scheme)),
-          SliverList(delegate: SliverChildBuilderDelegate(
-            (_, i) => _buildRecentRow(_recent[i], scheme),
-            childCount: _recent.length,
-          )),
-        ],
-        const SliverToBoxAdapter(child: SizedBox(height: 48)),
+  // Full-screen layout matching _ItemDetailSheet: blurred banner + scroll
+  Widget _buildContent(BuildContext ctx, ColorScheme scheme) {
+    final mediaH    = MediaQuery.of(ctx).size.height;
+    final topPad    = MediaQuery.of(ctx).padding.top;
+    final imgH      = mediaH * 0.42;
+    final hasImage  = _bannerUrl.isNotEmpty;
+    final info      = _info ?? {};
+    final avatarUrl = _extractImage(info['image']);
+    final hasAv     = _hasAvatar(avatarUrl);
+
+    return Stack(
+      children: [
+        // Background: blurred banner image or gradient fallback
+        Positioned.fill(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 500),
+            transitionBuilder: (child, anim) =>
+                FadeTransition(opacity: anim, child: child),
+            child: hasImage
+                ? _BlurFadeImage(
+                    key: ValueKey(_bannerUrl),
+                    url: _bannerUrl,
+                    fallback: _DetailGradientBg(scheme: scheme),
+                  )
+                : _DetailGradientBg(
+                    key: const ValueKey('fallback'), scheme: scheme),
+          ),
+        ),
+
+        // Gradient overlay: dark top → surface at bottom
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin:  Alignment.topCenter,
+                end:    Alignment.bottomCenter,
+                stops:  const [0.0, 0.28, 0.52, 1.0],
+                colors: [
+                  Colors.black.withValues(alpha: 0.55),
+                  Colors.transparent,
+                  scheme.surface.withValues(alpha: 0.82),
+                  scheme.surface,
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        // Scrollable content — pull-down-to-dismiss via overscroll
+        NotificationListener<ScrollUpdateNotification>(
+          onNotification: (n) {
+            if (n.metrics.pixels < -60 && n.dragDetails != null) {
+              Navigator.pop(ctx);
+            }
+            return false;
+          },
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics()),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Avatar tap zone — inline so hitbox moves with scroll
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: hasAv ? () => _pushFullscreen(ctx, avatarUrl) : null,
+                  child: SizedBox(height: imgH - 90, width: double.infinity),
+                ),
+                _buildProfileHeader(ctx, scheme, hasAv, avatarUrl),
+                Container(
+                  color: scheme.surface,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildStatsRow(scheme),
+                      if (_isNowPlaying) _buildNowPlayingCard(scheme),
+                      if (_topArtists.isNotEmpty) ...[
+                        _sectionHeader(L.commonTopArtists, scheme),
+                        ..._topArtists.asMap().entries.map(
+                            (e) => _buildArtistRow(ctx, e.value, e.key, scheme)),
+                      ],
+                      if (_topAlbums.isNotEmpty) ...[
+                        _sectionHeader(L.commonAlbums, scheme),
+                        _buildAlbumsGrid(ctx, scheme),
+                      ],
+                      if (_recent.isNotEmpty) ...[
+                        _sectionHeader(L.commonRecentTracks, scheme),
+                        ..._recent.map((r) => _buildRecentRow(r, scheme)),
+                      ],
+                      const SizedBox(height: 48),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // Back button — same style as detail sheets
+        Positioned(
+          top: topPad + 8, left: 12,
+          child: GestureDetector(
+            onTap: () => Navigator.pop(ctx),
+            child: Container(
+              width: 36, height: 36,
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.45),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.arrow_back_ios_new_rounded,
+                  color: Colors.white, size: 16),
+            ),
+          ),
+        ),
+
+        // Favourite button top-right
+        Positioned(
+          top: topPad + 8, right: 12,
+          child: GestureDetector(
+            onTap: () {
+              setState(() => _localIsFav = !_localIsFav);
+              widget.onToggleFav();
+            },
+            child: Container(
+              width: 36, height: 36,
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.45),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _localIsFav ? Icons.star_rounded : Icons.star_outline_rounded,
+                size: 20,
+                color: _localIsFav ? Colors.amber.shade400 : Colors.white,
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildBanner(BuildContext ctx, ColorScheme scheme) {
-    final info      = _info ?? {};
-    final name      = (info['name']     ?? widget.username).toString();
-    final realName  = (info['realname'] ?? '').toString();
-    final country   = (info['country']  ?? '').toString();
-    final avatarUrl = _extractImage(info['image']);
-    final hasAv     = _hasAvatar(avatarUrl);
+  // Profile header (replaces _buildBanner) — same layout as _buildHeader
+  // in _ItemDetailSheet: badge chip + avatar + username + meta
+  Widget _buildProfileHeader(
+      BuildContext ctx, ColorScheme scheme, bool hasAv, String avatarUrl) {
+    final info     = _info ?? {};
+    final name     = (info['name']     ?? widget.username).toString();
+    final realName = (info['realname'] ?? '').toString();
+    final country  = (info['country']  ?? '').toString();
+    final text     = Theme.of(ctx).textTheme;
 
     String since = '';
     final rawReg = info['registered'];
     if (rawReg != null) {
       int ts = 0;
       if (rawReg is Map) {
-        ts = int.tryParse((rawReg['#text'] ?? rawReg['unixtime'] ?? '0').toString()) ?? 0;
+        ts = int.tryParse(
+                (rawReg['#text'] ?? rawReg['unixtime'] ?? '0').toString()) ?? 0;
       } else {
         ts = int.tryParse(rawReg.toString()) ?? 0;
       }
-      if (ts > 0) since = '${DateTime.fromMillisecondsSinceEpoch(ts * 1000).year}';
+      if (ts > 0) {
+        since = '${DateTime.fromMillisecondsSinceEpoch(ts * 1000).year}';
+      }
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft, end: Alignment.bottomRight,
-          colors: [
-            scheme.primary.withValues(alpha: 0.88),
-            scheme.tertiary.withValues(alpha: 0.65),
-          ],
-        ),
-      ),
-      child: Stack(
-        fit: StackFit.passthrough,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (_bannerUrl.isNotEmpty)
-            Positioned.fill(
-              child: ClipRect(
-                child: ImageFiltered(
-                  imageFilter: ImageFilter.blur(sigmaX: 22, sigmaY: 22,
-                      tileMode: TileMode.mirror),
-                  child: Image.network(
-                    _bannerUrl, fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                  ),
-                ),
+          // Badge chip — same pattern as detail sheets
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+            decoration: BoxDecoration(
+              color: scheme.primary,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Text(
+              'Profil',
+              style: TextStyle(
+                color: Colors.white, fontSize: 11,
+                fontWeight: FontWeight.w700, letterSpacing: 0.8,
               ),
             ),
-          if (_bannerUrl.isNotEmpty)
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.black.withValues(alpha: 0.30),
-                      Colors.black.withValues(alpha: 0.55),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          SafeArea(
-            bottom: false,
-            child: Column(children: [
+          ),
+          const SizedBox(height: 12),
 
-              // Top row: back arrow left + drag handle centre
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 36, height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.4),
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ),
-                    // Back arrow (same style as detail sheets)
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: GestureDetector(
-                        onTap: () => Navigator.pop(ctx),
-                        child: Container(
-                          width: 36, height: 36,
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.45),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.arrow_back_ios_new_rounded,
-                              color: Colors.white, size: 16),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Avatar — tappable for fullscreen when a real image exists
-              GestureDetector(
-                onTap: hasAv ? () => _pushFullscreen(ctx, avatarUrl) : null,
-                child: Stack(alignment: Alignment.center, children: [
-                  if (_isNowPlaying)
-                    Container(
-                      width: 106, height: 106,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                            color: Colors.greenAccent.shade400, width: 3),
-                      ),
-                    ),
-                  CircleAvatar(
-                    radius: 48,
-                    backgroundColor: Colors.white.withValues(alpha: 0.25),
-                    backgroundImage: hasAv ? NetworkImage(avatarUrl) : null,
-                    child: hasAv ? null : Text(
-                      name.isNotEmpty ? name[0].toUpperCase() : '?',
-                      style: const TextStyle(
-                          color: Colors.white, fontSize: 38,
-                          fontWeight: FontWeight.w900),
-                    ),
-                  ),
-                  if (_isNowPlaying)
-                    Positioned(
-                      right: 4, bottom: 4,
-                      child: Container(
-                        width: 16, height: 16,
-                        decoration: BoxDecoration(
-                          color:  Colors.greenAccent.shade400,
-                          shape:  BoxShape.circle,
-                          border: Border.all(color: scheme.primary, width: 2),
-                        ),
-                      ),
-                    ),
-                ]),
-              ),
-
-              const SizedBox(height: 12),
-
-              // Username + favourite star
-              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Flexible(
-                  child: Text(name,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900,
-                      shadows: [Shadow(blurRadius: 8, color: Colors.black38)],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () {
-                    setState(() => _localIsFav = !_localIsFav);
-                    widget.onToggleFav();
-                  },
-                  child: Icon(
-                    _localIsFav ? Icons.star_rounded : Icons.star_outline_rounded,
-                    size: 22,
-                    color: _localIsFav
-                        ? Colors.amber.shade400
-                        : Colors.white.withValues(alpha: 0.7),
-                  ),
-                ),
-              ]),
-
-              if (realName.isNotEmpty) ...[
-                const SizedBox(height: 3),
-                Text(realName,
-                  style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.75), fontSize: 13)),
-              ],
-
-              if (_isNowPlaying) ...[
-                const SizedBox(height: 8),
+          // Avatar (centred below badge)
+          Center(
+            child: Stack(alignment: Alignment.center, children: [
+              if (_isNowPlaying)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  width: 106, height: 106,
                   decoration: BoxDecoration(
-                    color:        Colors.greenAccent.shade400.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(20),
-                    border:       Border.all(color: Colors.greenAccent.shade400),
-                  ),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(Icons.graphic_eq_rounded, size: 12,
-                        color: Colors.greenAccent.shade400),
-                    const SizedBox(width: 4),
-                    Text(L.commonNowPlayingLong,
-                      style: TextStyle(
-                        color: Colors.greenAccent.shade400,
-                        fontSize: 11, fontWeight: FontWeight.w700)),
-                  ]),
-                ),
-              ],
-
-              const SizedBox(height: 10),
-
-              if (country.isNotEmpty || since.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Wrap(
-                    spacing: 16, alignment: WrapAlignment.center,
-                    children: [
-                      if (country.isNotEmpty && country != 'None')
-                        _BannerMeta(icon: Icons.location_on_outlined, label: country),
-                      if (since.isNotEmpty)
-                        _BannerMeta(
-                            icon: Icons.calendar_today_outlined,
-                            label: L.memberSince(since)),
-                    ],
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                        color: Colors.greenAccent.shade400, width: 3),
                   ),
                 ),
-
-              const SizedBox(height: 20),
+              CircleAvatar(
+                radius: 48,
+                backgroundColor: scheme.primaryContainer,
+                backgroundImage: hasAv ? NetworkImage(avatarUrl) : null,
+                child: hasAv ? null : Text(
+                  name.isNotEmpty ? name[0].toUpperCase() : '?',
+                  style: const TextStyle(
+                      color: Colors.white, fontSize: 38,
+                      fontWeight: FontWeight.w900),
+                ),
+              ),
+              if (_isNowPlaying)
+                Positioned(
+                  right: 4, bottom: 4,
+                  child: Container(
+                    width: 16, height: 16,
+                    decoration: BoxDecoration(
+                      color:  Colors.greenAccent.shade400,
+                      shape:  BoxShape.circle,
+                      border: Border.all(color: Colors.black38, width: 2),
+                    ),
+                  ),
+                ),
             ]),
           ),
+          const SizedBox(height: 12),
+
+          // Username
+          Center(
+            child: Text(
+              name,
+              textAlign: TextAlign.center,
+              style: text.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: Colors.white,
+                shadows: [Shadow(blurRadius: 8,
+                    color: Colors.black.withValues(alpha: 0.5))],
+              ),
+            ),
+          ),
+
+          if (realName.isNotEmpty) ...[
+            const SizedBox(height: 3),
+            Center(
+              child: Text(realName,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.75), fontSize: 13)),
+            ),
+          ],
+
+          if (_isNowPlaying) ...[
+            const SizedBox(height: 8),
+            Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color:        Colors.greenAccent.shade400.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(20),
+                  border:       Border.all(color: Colors.greenAccent.shade400),
+                ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(Icons.graphic_eq_rounded,
+                      size: 12, color: Colors.greenAccent.shade400),
+                  const SizedBox(width: 4),
+                  Text(L.commonNowPlayingLong,
+                    style: TextStyle(
+                      color: Colors.greenAccent.shade400,
+                      fontSize: 11, fontWeight: FontWeight.w700)),
+                ]),
+              ),
+            ),
+          ],
+
+          if (country.isNotEmpty || since.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Center(
+              child: Wrap(
+                spacing: 16, alignment: WrapAlignment.center,
+                children: [
+                  if (country.isNotEmpty && country != 'None')
+                    _BannerMeta(icon: Icons.location_on_outlined, label: country),
+                  if (since.isNotEmpty)
+                    _BannerMeta(
+                        icon: Icons.calendar_today_outlined,
+                        label: L.memberSince(since)),
+                ],
+              ),
+            ),
+          ],
+
+          const SizedBox(height: 20),
         ],
       ),
     );
