@@ -253,14 +253,22 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     showModalBottomSheet(
       context: context,
       showDragHandle: true,
+      isScrollControlled: true,
       builder: (ctx) => SafeArea(
-        child: Wrap(
-          children: langs.entries.map((e) => ListTile(
-            title: Text(e.value),
-            trailing: _translatedLang == e.key && _showTranslated
-                ? const Icon(Icons.check_rounded) : null,
-            onTap: () { Navigator.pop(ctx); _translateTo(e.key); },
-          )).toList(),
+        child: ConstrainedBox(
+          // Bounded height so the list scrolls instead of being clipped
+          // on screens too short to fit every language.
+          constraints:
+              BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.6),
+          child: ListView(
+            shrinkWrap: true,
+            children: langs.entries.map((e) => ListTile(
+              title: Text(e.value),
+              trailing: _translatedLang == e.key && _showTranslated
+                  ? const Icon(Icons.check_rounded) : null,
+              onTap: () { Navigator.pop(ctx); _translateTo(e.key); },
+            )).toList(),
+          ),
         ),
       ),
     );
@@ -1602,127 +1610,136 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
       }
     }
 
+    // Text block: badge, username, realname, now-playing chip, meta —
+    // all left-aligned, same as the artist/album/track header.
+    final textColumn = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+          decoration: BoxDecoration(
+            color: scheme.primary,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: const Text(
+            'Profil',
+            style: TextStyle(
+              color: Colors.white, fontSize: 11,
+              fontWeight: FontWeight.w700, letterSpacing: 0.8,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        Text(
+          name,
+          style: text.headlineMedium?.copyWith(
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+            shadows: [Shadow(blurRadius: 8,
+                color: Colors.black.withValues(alpha: 0.5))],
+          ),
+        ),
+
+        if (realName.isNotEmpty) ...[
+          const SizedBox(height: 3),
+          Text(realName,
+            style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.75), fontSize: 13)),
+        ],
+
+        if (_isNowPlaying) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color:        Colors.greenAccent.shade400.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(20),
+              border:       Border.all(color: Colors.greenAccent.shade400),
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(Icons.graphic_eq_rounded,
+                  size: 12, color: Colors.greenAccent.shade400),
+              const SizedBox(width: 4),
+              Text(L.commonNowPlayingLong,
+                style: TextStyle(
+                  color: Colors.greenAccent.shade400,
+                  fontSize: 11, fontWeight: FontWeight.w700)),
+            ]),
+          ),
+        ],
+
+        if (country.isNotEmpty || since.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 16,
+            children: [
+              if (country.isNotEmpty && country != 'None')
+                _BannerMeta(icon: Icons.location_on_outlined, label: country),
+              if (since.isNotEmpty)
+                _BannerMeta(
+                    icon: Icons.calendar_today_outlined,
+                    label: L.memberSince(since)),
+            ],
+          ),
+        ],
+      ],
+    );
+
+    // Avatar — anchored bottom-right, next to the text block
+    final avatar = Stack(alignment: Alignment.center, children: [
+      if (_isNowPlaying)
+        Container(
+          width: 96, height: 96,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.greenAccent.shade400, width: 3),
+          ),
+        ),
+      CircleAvatar(
+        radius: 42,
+        backgroundColor: scheme.primaryContainer,
+        backgroundImage: hasAv ? NetworkImage(avatarUrl) : null,
+        child: hasAv ? null : Text(
+          name.isNotEmpty ? name[0].toUpperCase() : '?',
+          style: const TextStyle(
+              color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900),
+        ),
+      ),
+      if (_isNowPlaying)
+        Positioned(
+          right: 2, bottom: 2,
+          child: Container(
+            width: 16, height: 16,
+            decoration: BoxDecoration(
+              color:  Colors.greenAccent.shade400,
+              shape:  BoxShape.circle,
+              border: Border.all(color: Colors.black38, width: 2),
+            ),
+          ),
+        ),
+    ]);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Avatar — sits right under the image zone
-          Center(
-            child: Stack(alignment: Alignment.center, children: [
-              if (_isNowPlaying)
-                Container(
-                  width: 106, height: 106,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                        color: Colors.greenAccent.shade400, width: 3),
-                  ),
-                ),
-              CircleAvatar(
-                radius: 48,
-                backgroundColor: scheme.primaryContainer,
-                backgroundImage: hasAv ? NetworkImage(avatarUrl) : null,
-                child: hasAv ? null : Text(
-                  name.isNotEmpty ? name[0].toUpperCase() : '?',
-                  style: const TextStyle(
-                      color: Colors.white, fontSize: 38,
-                      fontWeight: FontWeight.w900),
-                ),
-              ),
-              if (_isNowPlaying)
-                Positioned(
-                  right: 4, bottom: 4,
-                  child: Container(
-                    width: 16, height: 16,
-                    decoration: BoxDecoration(
-                      color:  Colors.greenAccent.shade400,
-                      shape:  BoxShape.circle,
-                      border: Border.all(color: Colors.black38, width: 2),
-                    ),
-                  ),
-                ),
-            ]),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(child: textColumn),
+              const SizedBox(width: 14),
+              avatar,
+            ],
           ),
-          const SizedBox(height: 14),
-
-          // Badge chip — moved right above the username, same pattern as
-          // the badge-above-title layout used by the item detail sheets
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-            decoration: BoxDecoration(
-              color: scheme.primary,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Text(
-              'Profil',
-              style: TextStyle(
-                color: Colors.white, fontSize: 11,
-                fontWeight: FontWeight.w700, letterSpacing: 0.8,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          // Username
-          Text(
-            name,
-            style: text.headlineMedium?.copyWith(
-              fontWeight: FontWeight.w900,
-              color: Colors.white,
-              shadows: [Shadow(blurRadius: 8,
-                  color: Colors.black.withValues(alpha: 0.5))],
-            ),
-          ),
-
-          if (realName.isNotEmpty) ...[
-            const SizedBox(height: 3),
-            Text(realName,
-              style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.75), fontSize: 13)),
-          ],
-
-          if (_isNowPlaying) ...[
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color:        Colors.greenAccent.shade400.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(20),
-                border:       Border.all(color: Colors.greenAccent.shade400),
-              ),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(Icons.graphic_eq_rounded,
-                    size: 12, color: Colors.greenAccent.shade400),
-                const SizedBox(width: 4),
-                Text(L.commonNowPlayingLong,
-                  style: TextStyle(
-                    color: Colors.greenAccent.shade400,
-                    fontSize: 11, fontWeight: FontWeight.w700)),
-              ]),
-            ),
-          ],
-
-          if (country.isNotEmpty || since.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 16,
-              children: [
-                if (country.isNotEmpty && country != 'None')
-                  _BannerMeta(icon: Icons.location_on_outlined, label: country),
-                if (since.isNotEmpty)
-                  _BannerMeta(
-                      icon: Icons.calendar_today_outlined,
-                      label: L.memberSince(since)),
-              ],
-            ),
-          ],
-
           const SizedBox(height: 20),
         ],
       ),
     );
   }
+
 
   Widget _buildStatsRow(ColorScheme scheme) {
     final total = _total();
