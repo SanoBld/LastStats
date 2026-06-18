@@ -1,0 +1,41 @@
+name: Generate Technical Documentation
+
+# Runs every time you push code to the main branch
+on:
+  push:
+    branches: [ main, master ]
+
+permissions:
+  contents: write # Needed to deploy the documentation to gh-pages
+
+jobs:
+  build-and-deploy-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: stable
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Generate HTML documentation
+        # This builds the static website inside the 'doc/api/' folder
+        run: dart doc .
+
+      - name: Deploy documentation to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Points to the generated documentation directory
+          publish_dir: ./doc/api
+          # Puts the documentation in a 'docs' subfolder on your gh-pages site
+          destination_dir: docs
+          # Crucial: prevents overwriting your update.json files
+          keep_files: true
