@@ -14,6 +14,11 @@ import 'services/scrobbles_file_cache.dart';
 import 'services/notification_service.dart';
 import 'services/notification_worker.dart';
 import 'services/storage_manager.dart';
+import 'services/update_startup.dart';
+
+// Global navigator key — lets us show the update dialog from outside
+// the widget tree (no BuildContext needed).
+final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -73,6 +78,12 @@ void main() async {
     apiKey:     apiKey,
     startupTab: startupTab,
   ));
+
+  // Check for app updates right after the UI is up, then show a dialog
+  // immediately if a new version is found.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    UpdateStartupChecker.run(navigatorKey);
+  });
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -124,6 +135,7 @@ class LastStatsApp extends StatelessWidget {
                                   );
 
                         return MaterialApp(
+                          navigatorKey:              navigatorKey,
                           title:                     'LastStats',
                           debugShowCheckedModeBanner: false,
                           theme:     ThemeData(colorScheme: lightScheme, useMaterial3: true),

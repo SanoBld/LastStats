@@ -2,62 +2,47 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 // ══════════════════════════════════════════════════════════════════════════
-//  UpdateService — checks for new versions via GitHub Releases
-//
-//  👉 Set [_repo] to your GitHub repository.
-//     Releases must be tagged as "v1.2.3".
+//  UpdateService — reads update info from a static JSON file hosted on
+//  GitHub Pages (gh-pages branch). No GitHub API call, no auth, no rate limit.
 // ══════════════════════════════════════════════════════════════════════════
+
+enum UpdateChannel { stable, beta }
 
 class UpdateService {
   UpdateService._();
 
-  // ─── Set to your own repository ───────────────────────────────────────
-  static const _repo           = 'sanobld/LastStats';        // owner/repo
-  static const currentVersion  = '2.6.0';                   // current version
-  // ───────────────────────────────────────────────────────────────────────
+  // ─── Set to your own GitHub Pages base URL ────────────────────────────
+  static const _pagesBase     = 'https://sanobld.github.io/LastStats';
+  static const currentVersion = '2.6.0';
+  // ────────────────────────────────────────────────────────────────────────
 
   static const _timeout = Duration(seconds: 10);
 
-  /// Returns an [UpdateInfo] if a newer version exists,
-  /// or `null` if the app is up to date (or on network error).
-  static Future<UpdateInfo?> checkForUpdate() async {
+  /// Returns an [UpdateInfo] if a newer version exists, or `null` if up to
+  /// date / on network error. [channel] picks stable or beta metadata file.
+  static Future<UpdateInfo?> checkForUpdate({
+    UpdateChannel channel = UpdateChannel.stable,
+  }) async {
+    final filename = channel == UpdateChannel.beta ? 'update_beta.json' : 'update.json';
     try {
-      final uri = Uri.https(
-        'api.github.com',
-        '/repos/$_repo/releases/latest',
-      );
-      final res = await http.get(uri, headers: {
-        'Accept': 'application/vnd.github.v3+json',
-      }).timeout(_timeout);
-
+      final uri = Uri.parse('$_pagesBase/$filename');
+      final res = await http.get(uri).timeout(_timeout);
       if (res.statusCode != 200) return null;
 
-      final data   = jsonDecode(utf8.decode(res.bodyBytes));
-      final tag    = (data['tag_name'] ?? '').toString();
-      final latest = tag.startsWith('v') ? tag.substring(1) : tag;
+      final data = jsonDecode(utf8.decode(res.bodyBytes));
+      final rawTag = (data['version'] ?? data['tag'] ?? '').toString();
+      final latest = rawTag.startsWith('v') ? rawTag.substring(1) : rawTag;
 
       if (latest.isEmpty) return null;
       if (!_isNewer(latest, currentVersion)) return null;
 
-      // Get the URL of the first .apk asset if it exists
-      String? apkUrl;
-      final assets = data['assets'] as List?;
-      if (assets != null) {
-        for (final asset in assets) {
-          final name = (asset['name'] ?? '').toString().toLowerCase();
-          if (name.endsWith('.apk')) {
-            apkUrl = (asset['browser_download_url'] ?? '').toString();
-            break;
-          }
-        }
-      }
-
       return UpdateInfo(
-        version:    latest,
-        releaseUrl: (data['html_url']  ?? '').toString(),
-        apkUrl:     apkUrl,
-        notes:      (data['body']      ?? '').toString(),
+        version:     latest,
+        releaseUrl:  (data['release_url'] ?? '').toString(),
+        apkUrl:      (data['apk_url'] ?? '').toString(),
+        notes:       (data['notes'] ?? '').toString(),
         publishedAt: _parseDate(data['published_at']?.toString()),
+        isBeta:      channel == UpdateChannel.beta,
       );
     } catch (_) {
       return null;
@@ -94,6 +79,7 @@ class UpdateInfo {
   final String?   apkUrl;
   final String    notes;
   final DateTime? publishedAt;
+  final bool      isBeta;
 
   const UpdateInfo({
     required this.version,
@@ -101,6 +87,7 @@ class UpdateInfo {
     this.apkUrl,
     required this.notes,
     this.publishedAt,
+    this.isBeta = false,
   });
 
   bool get hasApk => apkUrl != null && apkUrl!.isNotEmpty;
