@@ -1,0 +1,30 @@
+name: Build macOS
+
+on:
+  workflow_call: {}
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+      - run: flutter pub get
+      - run: dart run flutter_launcher_icons
+      - name: Build macOS
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
+          flutter build macos --release --build-name="$VERSION" --build-number=${{ github.run_number }}
+      # cd into the actual app folder first, so the zip does not
+      # contain the long "build/macos/Build/Products/Release/" path inside it.
+      - name: Zip macOS build
+        run: |
+          cd build/macos/Build/Products/Release
+          zip -r "$GITHUB_WORKSPACE/laststats-macos.zip" .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: laststats-macos
+          path: laststats-macos.zip

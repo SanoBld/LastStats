@@ -1,0 +1,31 @@
+name: Build Windows
+
+# Reusable workflow — only runs when called from another workflow (release.yml)
+on:
+  workflow_call: {}
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+      - run: flutter pub get
+      - run: dart run flutter_launcher_icons
+      - name: Build Windows
+        shell: bash
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
+          flutter build windows --release --build-name="$VERSION" --build-number=${{ github.run_number }}
+      # The /* makes sure the zip contains the files directly,
+      # not a wrapping "Release" folder.
+      - name: Zip Windows build
+        shell: pwsh
+        run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath laststats-windows.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: laststats-windows
+          path: laststats-windows.zip

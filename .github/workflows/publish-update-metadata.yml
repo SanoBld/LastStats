@@ -1,0 +1,69 @@
+name: Publish update metadata (app auto-update)
+
+# Runs automatically whenever a GitHub Release gets published — whether it
+# was created by release.yml or manually. Completely separate from the
+# build/release process: this only feeds the in-app update checker.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  publish-metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The release event already includes the list of attached files
+      # (assets), so we can read the APK download URLs directly from it —
+      # no need to rebuild or re-download anything.
+      - name: Extract APK URLs from the release assets
+        id: assets
+        run: |
+          echo '${{ toJson(github.event.release.assets) }}' > assets.json
+          UNIVERSAL=$(jq -r '.[] | select(.name=="app-universal-release.apk")   | .browser_download_url' assets.json)
+          ARM64=$(jq -r       '.[] | select(.name=="app-arm64-v8a-release.apk")   | .browser_download_url' assets.json)
+          ARMEABI=$(jq -r     '.[] | select(.name=="app-armeabi-v7a-release.apk") | .browser_download_url' assets.json)
+          X86_64=$(jq -r      '.[] | select(.name=="app-x86_64-release.apk")      | .browser_download_url' assets.json)
+          echo "universal=$UNIVERSAL" >> "$GITHUB_OUTPUT"
+          echo "arm64=$ARM64"         >> "$GITHUB_OUTPUT"
+          echo "armeabi=$ARMEABI"     >> "$GITHUB_OUTPUT"
+          echo "x86_64=$X86_64"       >> "$GITHUB_OUTPUT"
+
+      # Stable releases -> update.json, pre-releases -> update_beta.json
+      - name: Pick metadata filename
+        id: file
+        run: |
+          if [ "${{ github.event.release.prerelease }}" = "true" ]; then
+            echo "filename=update_beta.json" >> "$GITHUB_OUTPUT"
+          else
+            echo "filename=update.json" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Write the metadata JSON file
+        run: |
+          mkdir -p public
+          cat > public/${{ steps.file.outputs.filename }} << EOF
+          {
+            "tag": "${{ github.event.release.tag_name }}",
+            "version": "${{ github.event.release.tag_name }}",
+            "apk_url": "${{ steps.assets.outputs.universal }}",
+            "apk_arm64_url": "${{ steps.assets.outputs.arm64 }}",
+            "apk_armeabi_url": "${{ steps.assets.outputs.armeabi }}",
+            "apk_x86_64_url": "${{ steps.assets.outputs.x86_64 }}",
+            "release_url": "${{ github.event.release.html_url }}",
+            "notes": $(jq -Rs . <<< "${{ github.event.release.body }}"),
+            "published_at": "${{ github.event.release.published_at }}",
+            "prerelease": ${{ github.event.release.prerelease }}
+          }
+          EOF
+
+      # Push only this one file to gh-pages, keep the other channel's file.
+      - name: Publish metadata to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          keep_files: true
