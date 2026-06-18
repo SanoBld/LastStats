@@ -185,14 +185,21 @@ class _ChartsPageState extends State<_ChartsPage>
       return;
     }
 
-    final records = AllScrobblesService.getRecordsForYear(year);
+    var records = AllScrobblesService.getRecordsForYear(year);
+    // If records not in memory but timestamps exist, try loading from service
+    if (records == null && AllScrobblesService.isYearCached(year)) {
+      await AllScrobblesService.loadAll(widget.service);
+      if (!mounted) return;
+      records = AllScrobblesService.getRecordsForYear(year);
+    }
     if (records != null) {
+      final recs = records!;
       if (!mounted) return;
       // Compute top artists and albums from records
       final artistCounts = <String, int>{};
       final albumCounts  = <String, int>{};
       try {
-        for (final r in records) {
+        for (final r in recs) {
           final a = _sanitizeName(_recField(r, 'artist'));
           final b = _sanitizeName(_recField(r, 'album'));
           if (_isValidLabel(a)) artistCounts[a] = (artistCounts[a] ?? 0) + 1;
@@ -205,11 +212,11 @@ class _ChartsPageState extends State<_ChartsPage>
               .map((e) => <String, dynamic>{'name': e.key, 'playcount': '${e.value}'})
               .toList();
       setState(() {
-        _monthly         = AllScrobblesService.computeMonthly(records);
-        _hourlyData      = AllScrobblesService.computeHourly(records);
-        _weekdayData     = AllScrobblesService.computeWeekday(records);
-        _hourlyCount     = records.length;
-        _calendarData    = AllScrobblesService.computeCalendar(records);
+        _monthly         = AllScrobblesService.computeMonthly(recs);
+        _hourlyData      = AllScrobblesService.computeHourly(recs);
+        _weekdayData     = AllScrobblesService.computeWeekday(recs);
+        _hourlyCount     = recs.length;
+        _calendarData    = AllScrobblesService.computeCalendar(recs);
         _hourlyLoading   = false;
         _calendarLoading = false;
         _yearDataLoading = false;
@@ -686,13 +693,19 @@ class _ChartsPageState extends State<_ChartsPage>
                 : _ct('Analyse vos ~200 derniers scrobbles',
                       'Analysing your last ~200 scrobbles');
 
-    // Top items to display: year-specific if available, else all-time API
-    // Top items: real all-time data in "All time" mode, real per-year data
-    // when the year is cached. No silent fallback — that's what made the
-    // distribution look frozen when switching to an uncached year.
-    final artistItems = _isAllTime ? _topArtists : _topArtistsYear;
-    final albumItems  = _isAllTime ? _topAlbums  : _topAlbumsYear;
-    final topLabel    = _isAllTime ? _ct('All-time', 'All-time') : '$_selectedYear';
+    // Top items: year-specific when cached, fallback to all-time API tops
+    // with a note when year records aren't available in memory.
+    final yearHasRecords = _availableYears.contains(_selectedYear);
+    final artistItems = _isAllTime
+        ? _topArtists
+        : (_topArtistsYear.isNotEmpty ? _topArtistsYear
+           : (yearHasRecords ? _topArtists : <dynamic>[]));
+    final albumItems = _isAllTime
+        ? _topAlbums
+        : (_topAlbumsYear.isNotEmpty ? _topAlbumsYear
+           : (yearHasRecords ? _topAlbums : <dynamic>[]));
+    final usingFallback = !_isAllTime && _topArtistsYear.isEmpty && yearHasRecords && _topArtists.isNotEmpty;
+    final topLabel    = usingFallback ? _ct('All-time (données $_selectedYear en cours)', 'All-time ($_selectedYear loading)') : (_isAllTime ? _ct('All-time', 'All-time') : '$_selectedYear');
     final albumLabel  = topLabel;
 
     return SafeArea(
