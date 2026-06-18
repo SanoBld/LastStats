@@ -1,0 +1,4 @@
+dartdoc:
+  header:
+    - tool/doc/header.html
+  favicon: assets/images/icon-512.png
