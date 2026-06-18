@@ -421,6 +421,26 @@ class _ChartsPageState extends State<_ChartsPage>
   final Map<int, GlobalKey> _chipKeys = {};
   GlobalKey _chipKey(int year) => _chipKeys.putIfAbsent(year, () => GlobalKey());
 
+  // ── Export: RepaintBoundary keys for each chart section ──────────────────
+  // Add to home_screen.dart if missing:
+  //   import 'dart:ui' as ui;
+  //   import 'dart:io';
+  //   import 'package:share_plus/share_plus.dart';
+  //   import 'package:path_provider/path_provider.dart';
+  static const _kCharts = [
+    ('monthly',  'Barres mensuelles',   'Monthly bars',        Icons.calendar_month_rounded),
+    ('cumul',    'Progression',         'Progression',         Icons.trending_up_rounded),
+    ('genres',   'Genres musicaux',     'Musical genres',      Icons.equalizer_rounded),
+    ('habits',   "Habitudes d'écoute",  'Listening habits',    Icons.access_time_rounded),
+    ('artists',  'Top artistes',        'Artist distribution', Icons.mic_rounded),
+    ('albums',   'Top albums',          'Album distribution',  Icons.album_rounded),
+    ('calendar', 'Calendrier musical',  'Listening calendar',  Icons.grid_on_rounded),
+    ('streaks',  "Séries d'écoute",     'Listening streaks',   Icons.local_fire_department_rounded),
+  ];
+  late final Map<String, GlobalKey> _xkeys = {
+    for (final c in _kCharts) c.$1: GlobalKey(),
+  };
+
   void _scrollToSelectedChip() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final ctx = _chipKeys[_selectedYear]?.currentContext;
@@ -499,6 +519,167 @@ class _ChartsPageState extends State<_ChartsPage>
       AllScrobblesService.loadAll(widget.service);
     }
     _scrollToSelectedChip();
+  }
+
+  // ── Export ────────────────────────────────────────────────────────────────
+
+  Future<void> _exportFlow(BuildContext ctx) async {
+    final scheme = Theme.of(ctx).colorScheme;
+    final txt    = Theme.of(ctx).textTheme;
+
+    // Step 1: choose chart
+    final chartId = await showModalBottomSheet<String>(
+      context: ctx,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (sh) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const SizedBox(height: 12),
+          Container(width: 36, height: 4,
+              decoration: BoxDecoration(color: scheme.outlineVariant,
+                  borderRadius: BorderRadius.circular(2))),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+            child: Align(alignment: Alignment.centerLeft,
+              child: Text(_ct('Quel graphique ?', 'Which chart?'),
+                  style: txt.titleMedium?.copyWith(fontWeight: FontWeight.w700))),
+          ),
+          ..._kCharts.map((c) => ListTile(
+            leading: Icon(c.$4, color: scheme.primary),
+            title: Text(_ct(c.$2, c.$3)),
+            onTap: () => Navigator.pop(sh, c.$1),
+          )),
+          const SizedBox(height: 8),
+        ]),
+      ),
+    );
+    if (chartId == null || !ctx.mounted) return;
+
+    // Step 2: choose year
+    final years = [0, ..._availableYears];
+    final targetYear = await showModalBottomSheet<int>(
+      context: ctx,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (sh) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const SizedBox(height: 12),
+          Container(width: 36, height: 4,
+              decoration: BoxDecoration(color: scheme.outlineVariant,
+                  borderRadius: BorderRadius.circular(2))),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+            child: Align(alignment: Alignment.centerLeft,
+              child: Text(_ct('Quelle période ?', 'Which period?'),
+                  style: txt.titleMedium?.copyWith(fontWeight: FontWeight.w700))),
+          ),
+          ...years.map((y) => ListTile(
+            title: Text(y == 0 ? _ct('Tout le temps', 'All time') : '$y'),
+            onTap: () => Navigator.pop(sh, y),
+          )),
+          const SizedBox(height: 8),
+        ]),
+      ),
+    );
+    if (targetYear == null || !ctx.mounted) return;
+
+    await _captureAndShare(ctx, chartId, targetYear);
+  }
+
+  Future<void> _captureAndShare(BuildContext ctx, String chartId, int year) async {
+    final saved    = _selectedYear;
+    final switched = year != saved;
+
+    // Show loading overlay
+    showDialog(
+      context: ctx,
+      barrierDismissible: false,
+      builder: (_) => PopScope(
+        canPop: false,
+        child: Center(
+          child: Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text(_ct('Export en cours…', 'Exporting…')),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    void closeDialog() {
+      if (ctx.mounted && Navigator.of(ctx).canPop()) Navigator.of(ctx).pop();
+    }
+
+    try {
+      if (switched) {
+        // Silently load data for the target year (dialog covers the screen)
+        if (mounted) setState(() {
+          _selectedYear    = year;
+          _yearDataLoading = true;
+          _monthly         = null;
+          _calendarData    = null;
+          _topArtistsYear  = [];
+          _topAlbumsYear   = [];
+        });
+        await _loadYearData(year);
+        if (mounted) setState(() { _yearDataLoading = false; });
+
+        // Wait one frame for widgets to rebuild with new data
+        final ready = Completer<void>();
+        WidgetsBinding.instance.addPostFrameCallback((_) => ready.complete());
+        await ready.future;
+      }
+
+      final rb = _xkeys[chartId]?.currentContext?.findRenderObject()
+          as RenderRepaintBoundary?;
+      if (rb == null || rb.size.isEmpty) {
+        closeDialog();
+        if (ctx.mounted) {
+          ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(
+              _ct('Graphique non disponible pour cette période',
+                  'Chart not available for this period'))));
+        }
+        return;
+      }
+
+      final img   = await rb.toImage(pixelRatio: 3.0);
+      final bd    = await img.toByteData(format: ui.ImageByteFormat.png);
+      final bytes = bd!.buffer.asUint8List();
+
+      final tmp     = await getTemporaryDirectory();
+      final yearStr = year == 0 ? 'alltime' : '$year';
+      final file    = File('${tmp.path}/laststats_${chartId}_$yearStr.png');
+      await file.writeAsBytes(bytes);
+
+      closeDialog();
+      await Share.shareXFiles([XFile(file.path)]);
+    } catch (e) {
+      closeDialog();
+      if (ctx.mounted) {
+        ScaffoldMessenger.of(ctx).showSnackBar(
+            SnackBar(content: Text('${_ct('Erreur', 'Error')}: $e')));
+      }
+    } finally {
+      // Restore original year
+      if (switched && mounted) {
+        setState(() {
+          _selectedYear    = saved;
+          _yearDataLoading = true;
+          _monthly         = null;
+          _calendarData    = null;
+          _topArtistsYear  = [];
+          _topAlbumsYear   = [];
+        });
+        await _loadYearData(saved);
+        if (mounted) setState(() { _yearDataLoading = false; });
+      }
+    }
   }
 
   // ── Year chips ────────────────────────────────────────────────────────────
@@ -721,13 +902,18 @@ class _ChartsPageState extends State<_ChartsPage>
 
           // ── Fixed header ──────────────────────────────────────────────────
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            padding: const EdgeInsets.fromLTRB(20, 20, 8, 0),
             child: Row(children: [
-              Icon(Icons.auto_graph_rounded, color: scheme.primary, size: 22),
-              const SizedBox(width: 10),
-              Text(L.chartsTitle,
-                  style: text.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+              Expanded(
+                child: Text(L.chartsTitle,
+                    style: text.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+              ),
+              IconButton(
+                icon: const Icon(Icons.ios_share_rounded),
+                tooltip: _ct('Exporter un graphique', 'Export a chart'),
+                onPressed: () => _exportFlow(context),
+              ),
             ]),
           ),
           const SizedBox(height: 14),
@@ -757,7 +943,12 @@ class _ChartsPageState extends State<_ChartsPage>
                   Text(periodLabel,
                       style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                   const SizedBox(height: 12),
-                  if (periodMonthly.isNotEmpty) _MonthlyCard(monthly: periodMonthly),
+                  RepaintBoundary(
+                    key: _xkeys['monthly'],
+                    child: periodMonthly.isNotEmpty
+                        ? _MonthlyCard(monthly: periodMonthly)
+                        : const SizedBox.shrink(),
+                  ),
                   const SizedBox(height: 28),
 
                   // 2. Cumulative line — scoped to the selected period
@@ -770,7 +961,10 @@ class _ChartsPageState extends State<_ChartsPage>
                     Text(periodLabel,
                         style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                     const SizedBox(height: 12),
-                    _CumulativeLineCard(data: periodCumulative),
+                    RepaintBoundary(
+                      key: _xkeys['cumul'],
+                      child: _CumulativeLineCard(data: periodCumulative),
+                    ),
                     const SizedBox(height: 28),
                   ],
 
@@ -792,7 +986,7 @@ class _ChartsPageState extends State<_ChartsPage>
                       child: CircularProgressIndicator(),
                     ))
                   else if (_tags.isNotEmpty)
-                    _TagsCard(tags: _tags),
+                    RepaintBoundary(key: _xkeys['genres'], child: _TagsCard(tags: _tags)),
                   const SizedBox(height: 28),
 
                   // 4. Listening habits
@@ -810,9 +1004,14 @@ class _ChartsPageState extends State<_ChartsPage>
                       child: CircularProgressIndicator(),
                     ))
                   else if (_hourlyData != null) ...[
-                    _HourlyBarCard(data: _hourlyData!),
-                    const SizedBox(height: 12),
-                    _WeekdayBarCard(data: _weekdayData!),
+                    RepaintBoundary(
+                      key: _xkeys['habits'],
+                      child: Column(children: [
+                        _HourlyBarCard(data: _hourlyData!),
+                        const SizedBox(height: 12),
+                        _WeekdayBarCard(data: _weekdayData!),
+                      ]),
+                    ),
                   ],
                   const SizedBox(height: 28),
 
@@ -828,14 +1027,17 @@ class _ChartsPageState extends State<_ChartsPage>
                       child: CircularProgressIndicator(),
                     ))
                   else if (artistItems.isNotEmpty)
-                    _SwipeDistributionCard(
-                      items:       artistItems,
-                      getLabel:    (e) => _sanitizeName((e['name'] ?? '').toString()),
-                      getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
-                      baseColor:   scheme.primary,
-                      secondColor: scheme.tertiary,
-                      onTap: (e) => showDetailSheet(context,
-                          Map<String, dynamic>.from(e as Map), 'artists', widget.service),
+                    RepaintBoundary(
+                      key: _xkeys['artists'],
+                      child: _SwipeDistributionCard(
+                        items:       artistItems,
+                        getLabel:    (e) => _sanitizeName((e['name'] ?? '').toString()),
+                        getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
+                        baseColor:   scheme.primary,
+                        secondColor: scheme.tertiary,
+                        onTap: (e) => showDetailSheet(context,
+                            Map<String, dynamic>.from(e as Map), 'artists', widget.service),
+                      ),
                     )
                   else
                     _EmptyYearCard(),
@@ -856,14 +1058,17 @@ class _ChartsPageState extends State<_ChartsPage>
                       child: CircularProgressIndicator(),
                     ))
                   else if (albumItems.isNotEmpty)
-                    _SwipeDistributionCard(
-                      items:       albumItems,
-                      getLabel:    (e) => _sanitizeName((e['name'] ?? '').toString()),
-                      getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
-                      baseColor:   scheme.secondary,
-                      secondColor: scheme.primary,
-                      onTap: (e) => showDetailSheet(context,
-                          Map<String, dynamic>.from(e as Map), 'albums', widget.service),
+                    RepaintBoundary(
+                      key: _xkeys['albums'],
+                      child: _SwipeDistributionCard(
+                        items:       albumItems,
+                        getLabel:    (e) => _sanitizeName((e['name'] ?? '').toString()),
+                        getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
+                        baseColor:   scheme.secondary,
+                        secondColor: scheme.primary,
+                        onTap: (e) => showDetailSheet(context,
+                            Map<String, dynamic>.from(e as Map), 'albums', widget.service),
+                      ),
                     )
                   else
                     _EmptyYearCard(),
@@ -897,8 +1102,10 @@ class _ChartsPageState extends State<_ChartsPage>
                   const SizedBox(height: 12),
                   if (_isAllTime)
                     (calendarForView != null && calendarForView.isNotEmpty)
-                        ? _HeatmapCard(
-                            data: calendarForView, start: heatmapStart, end: heatmapEnd)
+                        ? RepaintBoundary(
+                            key: _xkeys['calendar'],
+                            child: _HeatmapCard(
+                                data: calendarForView, start: heatmapStart, end: heatmapEnd))
                         : _NoDataCard(
                             year: 0,
                             label: _ct('toutes les années', 'all years'),
@@ -910,8 +1117,10 @@ class _ChartsPageState extends State<_ChartsPage>
                       child: CircularProgressIndicator(),
                     ))
                   else if (calendarForView != null)
-                    _HeatmapCard(
-                        data: calendarForView, start: heatmapStart, end: heatmapEnd)
+                    RepaintBoundary(
+                      key: _xkeys['calendar'],
+                      child: _HeatmapCard(
+                          data: calendarForView, start: heatmapStart, end: heatmapEnd))
                   else if (!hasFullData && _selectedYear != DateTime.now().year)
                     _NoDataCard(year: _selectedYear, onLoad: () => AllScrobblesService.loadAll(widget.service)),
                   const SizedBox(height: 28),
@@ -923,7 +1132,7 @@ class _ChartsPageState extends State<_ChartsPage>
                       icon: Icons.local_fire_department_rounded,
                     ),
                     const SizedBox(height: 12),
-                    _StreakCard(data: calendarForView),
+                    RepaintBoundary(key: _xkeys['streaks'], child: _StreakCard(data: calendarForView)),
                     const SizedBox(height: 20),
                   ],
                 ],

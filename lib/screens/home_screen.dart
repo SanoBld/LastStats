@@ -9,11 +9,14 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'dart:async';
+import 'dart:io';
 import 'dart:math' show sqrt;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:palette_generator/palette_generator.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:url_launcher/url_launcher.dart';
