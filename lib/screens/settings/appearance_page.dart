@@ -397,7 +397,7 @@ class _AppearancePageState extends State<AppearancePage> {
 
         // ── PC / responsive layout mode ───────────────────────────────────
         // Lets the user force the side-rail or bottom-bar layout regardless
-        // of screen size. PcModeSection handles its own state + persistence.
+        // of screen size. PcModeSection handles its own state + persistence
         const PcModeSection(),
 
         const SizedBox(height: 20),
