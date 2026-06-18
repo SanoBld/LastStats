@@ -649,7 +649,7 @@ class _ChartsPageState extends State<_ChartsPage>
       }
 
       final img   = await rb.toImage(pixelRatio: 3.0);
-      final bd    = await img.toByteData(format: ui.ImageByteFormat.png);
+      final bd    = await img.toByteData(format: ImageByteFormat.png);
       final bytes = bd!.buffer.asUint8List();
 
       final tmp     = await getTemporaryDirectory();
