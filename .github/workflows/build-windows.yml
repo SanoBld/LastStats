@@ -1,8 +1,9 @@
 name: Build Windows
 
-# Reusable workflow — only runs when called from another workflow (release.yml)
+# Reusable: called by build-all.yml / release.yml — also runnable manually.
 on:
   workflow_call: {}
+  workflow_dispatch: {}
 
 jobs:
   build:
