@@ -16,7 +16,8 @@ class UpdatesPage extends StatefulWidget {
 }
 
 class _UpdatesPageState extends State<UpdatesPage> {
-  bool        _autoUpdate    = true;
+  bool        _autoUpdate     = true;
+  bool        _betaChannel    = false;
   bool        _checkingUpdate = false;
   UpdateInfo? _updateInfo;
   String?     _updateError;
@@ -36,7 +37,10 @@ class _UpdatesPageState extends State<UpdatesPage> {
   Future<void> _load() async {
     final p = await SharedPreferences.getInstance();
     if (!mounted) return;
-    setState(() => _autoUpdate = p.getBool('ls_auto_update_check') ?? true);
+    setState(() {
+      _autoUpdate  = p.getBool('ls_auto_update_check') ?? true;
+      _betaChannel = p.getBool('ls_beta_channel')       ?? false;
+    });
   }
 
   Future<void> _maybeCheckUpdate() async {
@@ -51,7 +55,9 @@ class _UpdatesPageState extends State<UpdatesPage> {
     if (!mounted) return;
     setState(() { _checkingUpdate = true; _updateError = null; });
     try {
-      final info = await UpdateService.checkForUpdate();
+      final info = await UpdateService.checkForUpdate(
+        channel: _betaChannel ? UpdateChannel.beta : UpdateChannel.stable,
+      );
       if (!mounted) return;
       final p = await SharedPreferences.getInstance();
       await p.setInt('ls_last_update_check', DateTime.now().millisecondsSinceEpoch);
@@ -88,9 +94,24 @@ class _UpdatesPageState extends State<UpdatesPage> {
                 Icon(Icons.system_update_rounded, color: scheme.onTertiaryContainer, size: 28),
                 const SizedBox(width: 12),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(L.settingsUpdateBanner(_updateInfo!.version),
-                      style: text.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700, color: scheme.onTertiaryContainer)),
+                  Row(children: [
+                    Expanded(child: Text(L.settingsUpdateBanner(_updateInfo!.version),
+                        style: text.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700, color: scheme.onTertiaryContainer))),
+                    if (_updateInfo!.isBeta) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: scheme.onTertiaryContainer.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text('BETA',
+                            style: text.labelSmall?.copyWith(
+                                fontWeight: FontWeight.w700, color: scheme.onTertiaryContainer)),
+                      ),
+                    ],
+                  ]),
                   if (_updateInfo!.publishedAt != null)
                     Text(
                       isEn ? 'Published on ${_fmtDate(_updateInfo!.publishedAt!)}' : 'Publié le ${_fmtDate(_updateInfo!.publishedAt!)}',
@@ -181,6 +202,33 @@ class _UpdatesPageState extends State<UpdatesPage> {
               final p = await SharedPreferences.getInstance();
               await p.setBool('ls_auto_update_check', v);
               setState(() => _autoUpdate = v);
+            },
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          // Beta channel toggle — when ON, update checks look at the
+          // pre-release metadata file instead of the stable one.
+          SwitchListTile(
+            secondary: Icon(Icons.science_outlined, color: scheme.primary),
+            title: Text(isEn ? 'Beta updates' : 'Mises à jour bêta',
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            subtitle: Text(
+              isEn
+                  ? 'Get early access to pre-release versions'
+                  : 'Recevoir les versions pré-publiées en avant-première',
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+            value: _betaChannel,
+            onChanged: (v) async {
+              final p = await SharedPreferences.getInstance();
+              await p.setBool('ls_beta_channel', v);
+              setState(() {
+                _betaChannel = v;
+                // Clear any previous result, the channel just changed
+                _updateInfo  = null;
+                _updateError = null;
+              });
+              // Re-check right away against the new channel
+              await _checkUpdate();
             },
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),

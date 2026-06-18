@@ -1,5 +1,6 @@
 // lib/services/update_startup.dart
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'update_service.dart';
 
@@ -11,7 +12,12 @@ class UpdateStartupChecker {
     // Small delay so the dialog doesn't pop up before the first frame is drawn
     await Future.delayed(const Duration(milliseconds: 800));
 
-    final info = await UpdateService.checkForUpdate();
+    // Respect the user's beta-channel choice from Settings
+    final prefs    = await SharedPreferences.getInstance();
+    final wantsBeta = prefs.getBool('ls_beta_channel') ?? false;
+    final channel   = wantsBeta ? UpdateChannel.beta : UpdateChannel.stable;
+
+    final info = await UpdateService.checkForUpdate(channel: channel);
     if (info == null) return;
 
     final ctx = navigatorKey.currentContext;
@@ -20,7 +26,11 @@ class UpdateStartupChecker {
     showDialog(
       context: ctx,
       builder: (dialogCtx) => AlertDialog(
-        title: Text('Update available — v${info.version}'),
+        title: Text(
+          info.isBeta
+              ? 'Beta update available — v${info.version}'
+              : 'Update available — v${info.version}',
+        ),
         content: Text(
           info.notes.isNotEmpty
               ? (info.notes.length > 200 ? '${info.notes.substring(0, 200)}…' : info.notes)
