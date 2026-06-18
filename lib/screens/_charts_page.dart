@@ -156,8 +156,7 @@ class _ChartsPageState extends State<_ChartsPage>
     }
   }
 
-  // Safe field access for records (Map or typed object). Last.fm sometimes
-  // nests names as {'#text': 'Name', 'mbid': '...'}; unwrap that shape too.
+  // Safe field access for records (Map or typed ScrobbleRecord).
   String _recField(dynamic r, String field) {
     dynamic raw;
     try { raw = (r as Map)[field]; } catch (_) {}
@@ -167,8 +166,15 @@ class _ChartsPageState extends State<_ChartsPage>
         if (field == 'album')  raw = r.album;
       } catch (_) {}
     }
-    if (raw is Map) raw = raw['#text'] ?? raw['name'];
-    return raw is String ? raw : '';
+    if (raw is Map)    raw = raw['#text'] ?? raw['name'];
+    if (raw is String) return raw;
+    // Typed object (e.g. ScrobbleArtist): try .name then .toString()
+    if (raw != null) {
+      try { final n = raw.name; if (n is String && n.isNotEmpty) return n; } catch (_) {}
+      final s = raw.toString();
+      if (!s.startsWith('Instance of')) return s;
+    }
+    return '';
   }
 
   Future<void> _loadYearData(int year) async {
