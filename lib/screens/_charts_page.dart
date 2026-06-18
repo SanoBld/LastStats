@@ -80,6 +80,7 @@ class _ChartsPageState extends State<_ChartsPage>
   // Year-specific top lists (computed from cached records)
   List<dynamic> _topArtistsYear = [];
   List<dynamic> _topAlbumsYear  = [];
+  bool _yearDataLoading = false;
 
   // ── Genres (derived from all-time top artists) ────────────────────────────
   bool _tagsLoading = false;
@@ -206,12 +207,13 @@ class _ChartsPageState extends State<_ChartsPage>
         _calendarData    = AllScrobblesService.computeCalendar(records);
         _hourlyLoading   = false;
         _calendarLoading = false;
+        _yearDataLoading = false;
         _topArtistsYear  = artistCounts.isNotEmpty ? rankTop(artistCounts) : [];
         _topAlbumsYear   = albumCounts.isNotEmpty  ? rankTop(albumCounts)  : [];
       });
       return;
     }
-    setState(() { _topArtistsYear = []; _topAlbumsYear = []; });
+    setState(() { _topArtistsYear = []; _topAlbumsYear = []; _yearDataLoading = false; });
     await Future.wait([
       _loadMonthlyFallback(),
       _loadHourlyFallback(),
@@ -378,9 +380,14 @@ class _ChartsPageState extends State<_ChartsPage>
 
   void _refreshAvailableYears() {
     if (!mounted) return;
-    final cached      = AllScrobblesService.getCachedYears().toSet();
-    final currentYear = DateTime.now().year;
-    cached.add(currentYear);
+    // Only include years that actually have records
+    final cached = AllScrobblesService.getCachedYears()
+        .where((y) {
+          final recs = AllScrobblesService.getRecordsForYear(y);
+          return recs != null && recs.isNotEmpty;
+        })
+        .toSet();
+    cached.add(DateTime.now().year);
     final sorted = cached.toList()..sort();
     setState(() => _availableYears = sorted);
     _scrollToSelectedChip();
@@ -451,6 +458,7 @@ class _ChartsPageState extends State<_ChartsPage>
     if (year == _selectedYear) return;
     setState(() {
       _selectedYear      = year;
+      _yearDataLoading   = true;
       _hasFullYearData   = year == 0
           ? AllScrobblesService.getCachedYears().isNotEmpty
           : AllScrobblesService.isYearCached(year);
@@ -698,9 +706,13 @@ class _ChartsPageState extends State<_ChartsPage>
 
           // ── Scrollable content ────────────────────────────────────────────
           Expanded(
-            child: RefreshIndicator(
-              onRefresh: _load,
-              child: ListView(
+            child: AnimatedOpacity(
+              opacity: _yearDataLoading ? 0.5 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              child: RefreshIndicator(
+                onRefresh: _load,
+                child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 48),
                 children: [
 
@@ -771,52 +783,58 @@ class _ChartsPageState extends State<_ChartsPage>
                   ],
                   const SizedBox(height: 28),
 
-                  // 5. Artist distribution
-                  if (artistItems.isNotEmpty || (!_isAllTime && !hasFullData)) ...[
-                    _SectionHeader(title: L.chartsArtistDist, icon: Icons.mic_rounded),
-                    const SizedBox(height: 4),
-                    Text(topLabel,
-                        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                    const SizedBox(height: 12),
-                    if (artistItems.isNotEmpty)
-                      _SwipeDistributionCard(
-                        items:       artistItems,
-                        getLabel:    (e) => _sanitizeName((e['name'] ?? '').toString()),
-                        getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
-                        baseColor:   scheme.primary,
-                        secondColor: scheme.tertiary,
-                        onTap: (e) => showDetailSheet(context,
-                            Map<String, dynamic>.from(e as Map), 'artists', widget.service),
-                      )
-                    else if (_selectedYear != DateTime.now().year)
-                      _NoDataCard(year: _selectedYear, onLoad: () => AllScrobblesService.loadAll(widget.service)),
-                    const SizedBox(height: 28),
-                  ],
+                  // 5. Artist distribution — always shown, loader inside while year loads
+                  _SectionHeader(title: L.chartsArtistDist, icon: Icons.mic_rounded),
+                  const SizedBox(height: 4),
+                  Text(topLabel,
+                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                  const SizedBox(height: 12),
+                  if (_yearDataLoading)
+                    const Center(child: Padding(
+                      padding: EdgeInsets.all(24),
+                      child: CircularProgressIndicator(),
+                    ))
+                  else if (artistItems.isNotEmpty)
+                    _SwipeDistributionCard(
+                      items:       artistItems,
+                      getLabel:    (e) => _sanitizeName((e['name'] ?? '').toString()),
+                      getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
+                      baseColor:   scheme.primary,
+                      secondColor: scheme.tertiary,
+                      onTap: (e) => showDetailSheet(context,
+                          Map<String, dynamic>.from(e as Map), 'artists', widget.service),
+                    )
+                  else
+                    _NoDataCard(year: _selectedYear, onLoad: () => AllScrobblesService.loadAll(widget.service)),
+                  const SizedBox(height: 28),
 
-                  // 6. Album distribution
-                  if (albumItems.isNotEmpty || (!_isAllTime && !hasFullData)) ...[
-                    _SectionHeader(
-                      title: _ct('Répartition par album', 'Album distribution'),
-                      icon: Icons.album_rounded,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(albumLabel,
-                        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                    const SizedBox(height: 12),
-                    if (albumItems.isNotEmpty)
-                      _SwipeDistributionCard(
-                        items:       albumItems,
-                        getLabel:    (e) => _sanitizeName((e['name'] ?? '').toString()),
-                        getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
-                        baseColor:   scheme.secondary,
-                        secondColor: scheme.primary,
-                        onTap: (e) => showDetailSheet(context,
-                            Map<String, dynamic>.from(e as Map), 'albums', widget.service),
-                      )
-                    else if (_selectedYear != DateTime.now().year)
-                      _NoDataCard(year: _selectedYear, onLoad: () => AllScrobblesService.loadAll(widget.service)),
-                    const SizedBox(height: 28),
-                  ],
+                  // 6. Album distribution — always shown, loader inside while year loads
+                  _SectionHeader(
+                    title: _ct('Répartition par album', 'Album distribution'),
+                    icon: Icons.album_rounded,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(albumLabel,
+                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                  const SizedBox(height: 12),
+                  if (_yearDataLoading)
+                    const Center(child: Padding(
+                      padding: EdgeInsets.all(24),
+                      child: CircularProgressIndicator(),
+                    ))
+                  else if (albumItems.isNotEmpty)
+                    _SwipeDistributionCard(
+                      items:       albumItems,
+                      getLabel:    (e) => _sanitizeName((e['name'] ?? '').toString()),
+                      getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
+                      baseColor:   scheme.secondary,
+                      secondColor: scheme.primary,
+                      onTap: (e) => showDetailSheet(context,
+                          Map<String, dynamic>.from(e as Map), 'albums', widget.service),
+                    )
+                  else
+                    _NoDataCard(year: _selectedYear, onLoad: () => AllScrobblesService.loadAll(widget.service)),
+                  const SizedBox(height: 28),
 
                   // 7. Listening calendar — single year, or every year glued
                   // together (separated by a marker) for "All time"
@@ -879,10 +897,11 @@ class _ChartsPageState extends State<_ChartsPage>
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 }
 
 // ══════════════════════════════════════════════════════════════════════════
