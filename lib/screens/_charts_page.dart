@@ -199,7 +199,7 @@ class _ChartsPageState extends State<_ChartsPage>
       records = AllScrobblesService.getRecordsForYear(year);
     }
     if (records != null) {
-      final recs = records!;
+      final recs = records;
       if (!mounted) return;
       // Compute top artists and albums from records
       final artistCounts = <String, int>{};
@@ -530,27 +530,52 @@ class _ChartsPageState extends State<_ChartsPage>
     // Step 1: choose chart
     final chartId = await showModalBottomSheet<String>(
       context: ctx,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (sh) => SafeArea(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const SizedBox(height: 12),
-          Container(width: 36, height: 4,
-              decoration: BoxDecoration(color: scheme.outlineVariant,
-                  borderRadius: BorderRadius.circular(2))),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-            child: Align(alignment: Alignment.centerLeft,
-              child: Text(_ct('Quel graphique ?', 'Which chart?'),
-                  style: txt.titleMedium?.copyWith(fontWeight: FontWeight.w700))),
-          ),
-          ..._kCharts.map((c) => ListTile(
-            leading: Icon(c.$4, color: scheme.primary),
-            title: Text(_ct(c.$2, c.$3)),
-            onTap: () => Navigator.pop(sh, c.$1),
-          )),
-          const SizedBox(height: 8),
-        ]),
+      builder: (sh) => DraggableScrollableSheet(
+        initialChildSize: 0.55,
+        minChildSize: 0.35,
+        maxChildSize: 0.85,
+        expand: false,
+        builder: (_, sc) => SafeArea(
+          child: Column(children: [
+            const SizedBox(height: 12),
+            Container(width: 36, height: 4,
+                decoration: BoxDecoration(color: scheme.outlineVariant,
+                    borderRadius: BorderRadius.circular(2))),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+              child: Row(children: [
+                Expanded(
+                  child: Text(_ct('Quel graphique ?', 'Which chart?'),
+                      style: txt.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: scheme.tertiaryContainer,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text('Beta',
+                      style: txt.labelSmall?.copyWith(
+                          color: scheme.onTertiaryContainer,
+                          fontWeight: FontWeight.w700)),
+                ),
+              ]),
+            ),
+            Expanded(
+              child: ListView(controller: sc, children: [
+                ..._kCharts.map((c) => ListTile(
+                  leading: Icon(c.$4, color: scheme.primary),
+                  title: Text(_ct(c.$2, c.$3)),
+                  onTap: () => Navigator.pop(sh, c.$1),
+                )),
+                const SizedBox(height: 8),
+              ]),
+            ),
+          ]),
+        ),
       ),
     );
     if (chartId == null || !ctx.mounted) return;
@@ -619,14 +644,16 @@ class _ChartsPageState extends State<_ChartsPage>
     try {
       if (switched) {
         // Silently load data for the target year (dialog covers the screen)
-        if (mounted) setState(() {
-          _selectedYear    = year;
-          _yearDataLoading = true;
-          _monthly         = null;
-          _calendarData    = null;
-          _topArtistsYear  = [];
-          _topAlbumsYear   = [];
-        });
+        if (mounted) {
+          setState(() {
+            _selectedYear    = year;
+            _yearDataLoading = true;
+            _monthly         = null;
+            _calendarData    = null;
+            _topArtistsYear  = [];
+            _topAlbumsYear   = [];
+          });
+        }
         await _loadYearData(year);
         if (mounted) setState(() { _yearDataLoading = false; });
 
