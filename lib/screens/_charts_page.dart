@@ -121,6 +121,10 @@ class _ChartsPageState extends State<_ChartsPage>
       _hasFullYearData = true;
       _loadYearData(_selectedYear);
     }
+    // If sync finished and year still not cached, stop the loader
+    if (!AllScrobblesService.isRunning && _yearDataLoading) {
+      setState(() => _yearDataLoading = false);
+    }
   }
 
   Future<void> _load() async {
@@ -172,9 +176,10 @@ class _ChartsPageState extends State<_ChartsPage>
     if (year == 0) {
       _loadAllTimeHabits();
       setState(() {
-        _topArtistsYear = [];
-        _topAlbumsYear  = [];
-        _calendarData   = null;
+        _yearDataLoading = false;
+        _topArtistsYear  = [];
+        _topAlbumsYear   = [];
+        _calendarData    = null;
         _calendarLoading = false;
       });
       return;
@@ -213,7 +218,13 @@ class _ChartsPageState extends State<_ChartsPage>
       });
       return;
     }
-    setState(() { _topArtistsYear = []; _topAlbumsYear = []; _yearDataLoading = false; });
+    // Records not cached yet: reset tops but keep yearDataLoading if sync is running
+    // so sections 5/6 keep showing a loader until _onHistoryProgress fires.
+    setState(() {
+      _topArtistsYear  = [];
+      _topAlbumsYear   = [];
+      _yearDataLoading = AllScrobblesService.isRunning;
+    });
     await Future.wait([
       _loadMonthlyFallback(),
       _loadHourlyFallback(),
@@ -471,6 +482,9 @@ class _ChartsPageState extends State<_ChartsPage>
       _topAlbumsYear     = [];
     });
     _loadYearData(year);
+    if (!AllScrobblesService.isRunning && !AllScrobblesService.isYearCached(year) && year != 0) {
+      AllScrobblesService.loadAll(widget.service);
+    }
     _scrollToSelectedChip();
   }
 
@@ -805,7 +819,7 @@ class _ChartsPageState extends State<_ChartsPage>
                           Map<String, dynamic>.from(e as Map), 'artists', widget.service),
                     )
                   else
-                    _NoDataCard(year: _selectedYear, onLoad: () => AllScrobblesService.loadAll(widget.service)),
+                    _EmptyYearCard(),
                   const SizedBox(height: 28),
 
                   // 6. Album distribution — always shown, loader inside while year loads
@@ -833,7 +847,7 @@ class _ChartsPageState extends State<_ChartsPage>
                           Map<String, dynamic>.from(e as Map), 'albums', widget.service),
                     )
                   else
-                    _NoDataCard(year: _selectedYear, onLoad: () => AllScrobblesService.loadAll(widget.service)),
+                    _EmptyYearCard(),
                   const SizedBox(height: 28),
 
                   // 7. Listening calendar — single year, or every year glued
@@ -2237,6 +2251,32 @@ class _SwipeDistributionCardState extends State<_SwipeDistributionCard> {
           )),
         ),
       ],
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  _EmptyYearCard — no data, no button
+// ══════════════════════════════════════════════════════════════════════════
+
+class _EmptyYearCard extends StatelessWidget {
+  const _EmptyYearCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    final t = Theme.of(context).textTheme;
+    return Container(
+      decoration: _chartCardDecoration(s),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Row(children: [
+        Icon(Icons.bar_chart_outlined, color: s.onSurfaceVariant.withValues(alpha: 0.45), size: 20),
+        const SizedBox(width: 12),
+        Text(
+          _ct('Aucune donnée pour cette période', 'No data for this period'),
+          style: t.bodySmall?.copyWith(color: s.onSurfaceVariant.withValues(alpha: 0.65)),
+        ),
+      ]),
     );
   }
 }
