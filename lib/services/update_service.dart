@@ -12,7 +12,7 @@ class UpdateService {
   UpdateService._();
 
   // ─── Set to your own GitHub Pages base URL ────────────────────────────
-  static const _pagesBase     = 'https://sanobld.github.io/LastStats';
+  static const _pagesBase     = 'https://sanobld.github.io/LastStats-App';
   static const currentVersion = '2.6.0';
   // ────────────────────────────────────────────────────────────────────────
 
