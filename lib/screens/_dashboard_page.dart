@@ -8,10 +8,10 @@ class _FriendData {
   final String username;
   final String realName;
   final String avatarUrl;
-  final bool   isOnline;          // true = currently scrobbling
+  final bool   isOnline;
   final String nowPlayingTrack;
   final String nowPlayingArtist;
-  final String lastTrack;         // most recent track when offline
+  final String lastTrack;
   final String lastArtist;
 
   const _FriendData({
@@ -28,7 +28,6 @@ class _FriendData {
 
 
 // ── All available stat card definitions ──────────────────────────────────────
-// Format: (id, emoji, French label, English label)
 const _kAllStatCards = [
   ('top_artist',      '🎤', 'Artiste #1',           'Artist #1'),
   ('top_album',       '💿', 'Album #1',              'Album #1'),
@@ -73,9 +72,9 @@ class _DashboardPageState extends State<_DashboardPage> {
   bool    _loading = true;
   String? _error;
   Timer?  _npTimer;
-  Timer?  _topTimer;  // silently refresh top lists every 3 min
+  Timer?  _topTimer;
 
-  // Header display settings
+  // Header settings
   String _headerSource          = 'nowplaying';
   String _headerImageUrl        = '';
   double _headerBlur            = 0.0;
@@ -83,33 +82,32 @@ class _DashboardPageState extends State<_DashboardPage> {
   String _headerCustomUrl       = '';
   String _headerFallbackUrl     = '';
   bool   _headerFallbackEnabled = false;
-  String _fallbackType          = 'none';    // 'none'|'top_track'|'top_album'|'top_artist'|'custom_url'
-  String _fallbackPeriod        = 'overall'; // '7day'|'1month'|'overall'
+  String _fallbackType          = 'none';
+  String _fallbackPeriod        = 'overall';
   String _headerPeriod          = 'overall';
-  bool   _headerMusicAnim       = false;     // ambient animation when music plays
+  bool   _headerMusicAnim       = false;
 
-  // Section visibility flags
+  // Section visibility
   bool _showNowPlay  = true;
   bool _showStats    = true;
   bool _showArtists  = true;
+  bool _showAlbums   = true;  // new
   bool _showTracks   = true;
+  bool _showRecent   = true;  // new
 
-  // Friends state
+  // Friends
   bool              _showFriends    = true;
   List<_FriendData> _friends        = [];
   Set<String>       _favFriends     = {};
-  Set<String>       _favProfiles    = {};  // profiles starred from Search
+  Set<String>       _favProfiles    = {};
   bool              _friendsLoading = false;
 
   @override
   void initState() {
     super.initState();
-    // Load prefs + cache in parallel for instant display
     _initWithCache();
-    // Poll now playing every 10 s — rebuild only when track changes
     _npTimer  = Timer.periodic(const Duration(seconds: 10), (_) => _refreshLive());
-    // Silent top-list refresh every 10 min
-    _topTimer = Timer.periodic(const Duration(minutes: 10),  (_) => _refreshTopLists());
+    _topTimer = Timer.periodic(const Duration(minutes: 10), (_) => _refreshTopLists());
   }
 
   @override
@@ -119,12 +117,9 @@ class _DashboardPageState extends State<_DashboardPage> {
     super.dispose();
   }
 
-  // Load prefs and cache at the same time.
-  // If cache has valid data, show it immediately then refresh quietly in background.
   Future<void> _initWithCache() async {
     await _loadPrefs();
     if (!mounted) return;
-
     final gotCache = _loadFromCache();
     if (gotCache) {
       _resolveHeaderImage();
@@ -135,8 +130,6 @@ class _DashboardPageState extends State<_DashboardPage> {
     }
   }
 
-  // Read data from in-memory cache (synchronous, instant).
-  // Returns true if usable data was found.
   bool _loadFromCache() {
     final userInfo = DataCache.getSync(DataCache.keyUserInfo());
     if (userInfo == null) return false;
@@ -149,7 +142,6 @@ class _DashboardPageState extends State<_DashboardPage> {
     final topAlbW    = DataCache.getSync(DataCache.keyTopAlbums('7day'))     as List?;
     final topTrkW    = DataCache.getSync(DataCache.keyTopTracks('7day'))     as List?;
 
-    // Separate now-playing from the recent tracks list
     Map<String, dynamic>? np;
     final recentF = <dynamic>[];
     if (recentRaw is Map) {
@@ -200,7 +192,9 @@ class _DashboardPageState extends State<_DashboardPage> {
       _showNowPlay           = p.getBool('ls_show_nowplay')             ?? true;
       _showStats             = p.getBool('ls_show_stats')               ?? true;
       _showArtists           = p.getBool('ls_show_artists')             ?? true;
+      _showAlbums            = p.getBool('ls_show_albums')              ?? true;
       _showTracks            = p.getBool('ls_show_tracks')              ?? true;
+      _showRecent            = p.getBool('ls_show_recent')              ?? true;
       _showFriends           = p.getBool('ls_show_friends')             ?? true;
       final rawCards = p.getStringList('ls_stat_cards');
       _statCards   = rawCards != null && rawCards.isNotEmpty
@@ -210,7 +204,6 @@ class _DashboardPageState extends State<_DashboardPage> {
     });
   }
 
-  // silent = true → no skeleton, quiet background update
   Future<void> _load({bool silent = false}) async {
     if (!silent) setState(() { _loading = true; _error = null; });
     try {
@@ -221,7 +214,6 @@ class _DashboardPageState extends State<_DashboardPage> {
         widget.service.getTopTracks (period: 'overall', limit: 50),
         widget.service.getRecentTracks(limit: 10),
         widget.service.getNowPlaying(),
-        // Week top lists — only fetched when the matching card is enabled
         if (_statCards.contains('top_artist_week'))
           widget.service.getTopArtists(period: '7day', limit: 1)
         else
@@ -234,6 +226,9 @@ class _DashboardPageState extends State<_DashboardPage> {
           widget.service.getTopTracks(period: '7day', limit: 1)
         else
           Future.value(<dynamic>[]),
+        // Always fetch week top lists for the highlights strip
+        widget.service.getTopArtists(period: '7day', limit: 3),
+        widget.service.getTopTracks (period: '7day', limit: 3),
       ]);
 
       final recentRaw = (res[4] as Map<String, dynamic>)['track'];
@@ -254,16 +249,17 @@ class _DashboardPageState extends State<_DashboardPage> {
         _topTracks      = res[3] as List<dynamic>;
         _recentTracks   = recentF;
         _nowPlaying     = np ?? res[5] as Map<String, dynamic>?;
-        _topArtistsWeek = res.length > 6 ? res[6] as List<dynamic> : [];
-        _topAlbumsWeek  = res.length > 7 ? res[7] as List<dynamic> : [];
-        _topTracksWeek  = res.length > 8 ? res[8] as List<dynamic> : [];
-        _loading        = false;
+        _topArtistsWeek = res.length > 9 ? res[9] as List<dynamic> : [];
+        _topTracksWeek  = res.length > 10 ? res[10] as List<dynamic> : [];
+        if (res.length > 6 && (res[6] as List).isNotEmpty) _topArtistsWeek = res[6] as List<dynamic>;
+        if (res.length > 7 && (res[7] as List).isNotEmpty) _topAlbumsWeek  = res[7] as List<dynamic>;
+        if (res.length > 8 && (res[8] as List).isNotEmpty) _topTracksWeek  = res[8] as List<dynamic>;
+        _loading = false;
       });
 
       if (_nowPlaying != null) _extractColor(_nowPlaying!);
       _resolveHeaderImage();
       _saveToCache(res);
-      // Load friends without blocking the main page
       if (_showFriends) _loadFriends();
     } catch (e) {
       if (!mounted) return;
@@ -273,7 +269,6 @@ class _DashboardPageState extends State<_DashboardPage> {
     }
   }
 
-  // Save API results to cache for next startup
   void _saveToCache(List<dynamic> res) {
     DataCache.set(DataCache.keyUserInfo(),            res[0]);
     DataCache.set(DataCache.keyTopArtists('overall'), res[1]);
@@ -288,8 +283,6 @@ class _DashboardPageState extends State<_DashboardPage> {
       DataCache.set(DataCache.keyTopTracks('7day'),  res[8]);
   }
 
-  // Silent now-playing poll (every 10 s).
-  // Rebuilds UI only when the track actually changes — avoids carousel flicker.
   Future<void> _refreshLive() async {
     try {
       final np = await widget.service.getNowPlaying();
@@ -302,27 +295,21 @@ class _DashboardPageState extends State<_DashboardPage> {
       final changed    = prevName != newName || prevArtist != newArtist;
 
       if (changed) {
-        // Different track → update UI, accent color, and header image
         setState(() => _nowPlaying = np);
         if (np != null) {
           _extractColor(np);
           DataCache.set(DataCache.keyNowPlaying(), np);
         } else if (useNowPlayingColorNotifier.value) {
-          // Track stopped → restore fallback accent
           accentNotifier.value = nowPlayingFallbackColorNotifier.value;
         }
         _resolveHeaderImage();
       } else if (np != null) {
-        // Same track → silent cache update, no rebuild
         DataCache.set(DataCache.keyNowPlaying(), np);
       }
     } catch (_) {}
-    // Also refresh friends status silently
     if (_showFriends && mounted) _loadFriends(silent: true);
   }
 
-  // Silently refresh top artists and tracks every 10 min.
-  // Only rebuilds the UI when data actually changed to prevent carousel flicker.
   Future<void> _refreshTopLists() async {
     if (!mounted) return;
     try {
@@ -340,7 +327,6 @@ class _DashboardPageState extends State<_DashboardPage> {
       ]);
       if (!mounted) return;
 
-      // Compare first items to detect meaningful changes before rebuilding
       bool changed = false;
       final newArtists = results[0] as List<dynamic>;
       final newTracks  = results[1] as List<dynamic>;
@@ -374,15 +360,11 @@ class _DashboardPageState extends State<_DashboardPage> {
     } catch (_) {}
   }
 
-  // Load friends. silent = true skips the loading skeleton.
   Future<void> _loadFriends({bool silent = false}) async {
     if (!mounted) return;
     if (!silent) setState(() => _friendsLoading = true);
     try {
       final raw = await widget.service.getFriends(limit: 50, withRecentTrack: false);
-
-      // getFriends doesn't reliably include now-playing info,
-      // so we call getRecentTracks(limit:1) for each friend in parallel.
       final usernames = raw.map((u) => (u['name'] ?? '').toString()).toList();
 
       final recentResults = await Future.wait(
@@ -396,7 +378,6 @@ class _DashboardPageState extends State<_DashboardPage> {
       for (var i = 0; i < raw.length; i++) {
         final u     = raw[i];
         final uname = usernames[i];
-
         final recentData = recentResults[i];
         final trackRaw   = recentData['track'];
         final tList      = trackRaw is List
@@ -431,7 +412,7 @@ class _DashboardPageState extends State<_DashboardPage> {
         ));
       }
 
-      // Also include starred profiles from Search that aren't already in the list
+      // Include starred profiles from Search not already in the list
       final existingNames = friends.map((f) => f.username.toLowerCase()).toSet();
       for (final favUsername in _favProfiles) {
         if (existingNames.contains(favUsername.toLowerCase())) continue;
@@ -480,7 +461,7 @@ class _DashboardPageState extends State<_DashboardPage> {
         } catch (_) {}
       }
 
-      // Sort: online+fav (3) > online (2) > offline+fav (1) > offline (0)
+      // Sort: online+fav first, then online, then fav, then alphabetical
       friends.sort((a, b) {
         final aFav   = _favFriends.contains(a.username) || _favProfiles.contains(a.username);
         final bFav   = _favFriends.contains(b.username) || _favProfiles.contains(b.username);
@@ -496,7 +477,6 @@ class _DashboardPageState extends State<_DashboardPage> {
     }
   }
 
-  // Toggle a friend's favourite status and persist it
   Future<void> _toggleFav(String username, bool nowFav) async {
     final updatedFriends  = Set<String>.from(_favFriends);
     final updatedProfiles = Set<String>.from(_favProfiles);
@@ -524,7 +504,6 @@ class _DashboardPageState extends State<_DashboardPage> {
     });
   }
 
-  // Pick the header image based on the user's chosen source
   Future<void> _resolveHeaderImage() async {
     String url = '';
     switch (_headerSource) {
@@ -532,13 +511,11 @@ class _DashboardPageState extends State<_DashboardPage> {
         url = _headerCustomUrl;
       case 'nowplaying':
         if (_nowPlaying != null) {
-          // Skip lastfmUrl (300 px) — always resolve via iTunes for max quality
           url = await ImageService.resolveTrack(
             (_nowPlaying!['name'] ?? '').toString(),
             (_nowPlaying!['artist']?['#text'] ?? '').toString(),
           );
         }
-        // No music playing (or image missing) → apply fallback
         if (url.isEmpty && _fallbackType != 'none') {
           url = await _resolveFallbackImage();
         }
@@ -548,7 +525,6 @@ class _DashboardPageState extends State<_DashboardPage> {
             : await widget.service.getTopTracks(period: _headerPeriod, limit: 1);
         if (tracks.isNotEmpty) {
           final t = tracks[0] as Map;
-          // Skip lastfmUrl for max quality
           url = await ImageService.resolveTrack(
             (t['name'] ?? '').toString(),
             (t['artist']?['name'] ?? '').toString(),
@@ -560,7 +536,6 @@ class _DashboardPageState extends State<_DashboardPage> {
             : await widget.service.getTopAlbums(period: _headerPeriod, limit: 1);
         if (albums.isNotEmpty) {
           final a = albums[0] as Map;
-          // Skip lastfmUrl for max quality
           url = await ImageService.resolveAlbum(
             (a['name'] ?? '').toString(),
             (a['artist']?['name'] ?? '').toString(),
@@ -572,7 +547,6 @@ class _DashboardPageState extends State<_DashboardPage> {
             : await widget.service.getTopArtists(period: _headerPeriod, limit: 1);
         if (artists.isNotEmpty) {
           final a = artists[0] as Map;
-          // Skip lastfmUrl for max quality
           url = await ImageService.resolveArtist(
             (a['name'] ?? '').toString(),
           );
@@ -583,8 +557,6 @@ class _DashboardPageState extends State<_DashboardPage> {
     if (mounted) setState(() => _headerImageUrl = url);
   }
 
-  // Resolve the fallback header image when nowplaying source has no image.
-  // Only called when fallbackType != 'none'.
   Future<String> _resolveFallbackImage() async {
     try {
       switch (_fallbackType) {
@@ -630,8 +602,6 @@ class _DashboardPageState extends State<_DashboardPage> {
     return '';
   }
 
-  // Extract a dominant color from the now-playing artwork and update the accent.
-  // Falls back to nowPlayingFallbackColorNotifier when art is missing or b&w.
   Future<void> _extractColor(Map<String, dynamic> track) async {
     if (!useNowPlayingColorNotifier.value) return;
     final url = _extractImage(track['image']);
@@ -642,7 +612,6 @@ class _DashboardPageState extends State<_DashboardPage> {
     try {
       final pal = await PaletteGenerator.fromImageProvider(
         NetworkImage(url), size: const Size(200, 200), maximumColorCount: 24);
-      // Prefer vibrant variants; fall back through muted → dominant
       final c = pal.vibrantColor?.color
              ?? pal.lightVibrantColor?.color
              ?? pal.darkVibrantColor?.color
@@ -651,7 +620,6 @@ class _DashboardPageState extends State<_DashboardPage> {
              ?? pal.dominantColor?.color;
       if (!mounted) return;
       if (c != null) {
-        // seedColorForScheme prevents pure black/white from breaking the theme
         accentNotifier.value = seedColorForScheme(c);
       } else {
         accentNotifier.value = nowPlayingFallbackColorNotifier.value;
@@ -686,7 +654,6 @@ class _DashboardPageState extends State<_DashboardPage> {
     return '${d.day} ${_kMonths[d.month]} ${d.year}';
   }
 
-  // Build a single stat card widget by id
   Widget? _buildStatCard(
     String id, {
     Map? topArtist, Map? topAlbum, Map? topTrack, Map? lastTrack,
@@ -811,7 +778,7 @@ class _DashboardPageState extends State<_DashboardPage> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
-    if (_loading) return _DashboardSkeleton(scheme: Theme.of(context).colorScheme);
+    if (_loading) return _DashboardSkeleton(scheme: scheme);
     if (_error != null) return _ErrorView(message: _error!, onRetry: _load);
 
     final info      = _userInfo!;
@@ -831,17 +798,18 @@ class _DashboardPageState extends State<_DashboardPage> {
     final topTrack  = _topTracks.isNotEmpty  ? _topTracks[0]  as Map : null;
     final lastTrack = _recentTracks.isNotEmpty ? _recentTracks[0] as Map : null;
 
+    final hasWeekData = _topArtistsWeek.isNotEmpty || _topTracksWeek.isNotEmpty;
+
     return RefreshIndicator(
       onRefresh: _load,
       child: CustomScrollView(slivers: [
 
-        // ── Profile app bar ────────────────────────────────────────────────
+        // ── Profile app bar ──────────────────────────────────────────────────
         SliverAppBar(
           expandedHeight: 230,
           pinned: true,
           stretch: true,
           actions: [
-            // Refresh button + scrobble-sync progress chip
             ValueListenableBuilder<AllScrobblesProgress>(
               valueListenable: AllScrobblesService.progressNotifier,
               builder: (_, progress, _) {
@@ -863,7 +831,6 @@ class _DashboardPageState extends State<_DashboardPage> {
             IconButton(
               icon: const Icon(Icons.settings_outlined),
               onPressed: () async {
-                // Open the settings hub
                 await Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => Scaffold(
@@ -875,7 +842,6 @@ class _DashboardPageState extends State<_DashboardPage> {
                     ),
                   ),
                 );
-                // Reload prefs on return so any changes are applied immediately
                 if (mounted) {
                   await _loadPrefs();
                   _resolveHeaderImage();
@@ -893,7 +859,7 @@ class _DashboardPageState extends State<_DashboardPage> {
             background: Stack(
               fit: StackFit.expand,
               children: [
-                // Background image or gradient with animated transition
+                // Background: ambient / blurred image / gradient
                 AnimatedSwitcher(
                   duration: _headerAnimation == 'none'
                       ? Duration.zero
@@ -919,7 +885,6 @@ class _DashboardPageState extends State<_DashboardPage> {
                     }
                   },
                   child: (_headerMusicAnim && _nowPlaying != null)
-                      // Apple Music-style: blurred image breathing + drifting
                       ? _AmbientHeader(
                           key: ValueKey('ambient_${_headerImageUrl}'),
                           url: _headerImageUrl,
@@ -935,7 +900,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                           : _GradientHeader(key: const ValueKey('gradient'), scheme: scheme),
                 ),
 
-                // Dark gradient overlay for text readability
+                // Bottom gradient for text readability
                 Positioned(
                   left: 0, right: 0, bottom: 0,
                   child: Container(
@@ -953,7 +918,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                   ),
                 ),
 
-                // Profile info (avatar + name + country + since)
+                // Profile info overlay
                 SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 8, 70, 12),
@@ -1046,17 +1011,28 @@ class _DashboardPageState extends State<_DashboardPage> {
         ),
 
         SliverPadding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
           sliver: SliverList(
             delegate: SliverChildListDelegate([
 
-              // Now playing card
+              // ── Now playing ─────────────────────────────────────────────
               if (_showNowPlay && _nowPlaying != null) ...[
                 _NowPlayingCard(track: _nowPlaying!),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
               ],
 
-              // Stats block
+              // ── This week highlights strip ───────────────────────────────
+              if (hasWeekData) ...[
+                _WeekHighlightStrip(
+                  topArtist:  _topArtistsWeek.isNotEmpty ? _topArtistsWeek[0] as Map : null,
+                  topTrack:   _topTracksWeek.isNotEmpty  ? _topTracksWeek[0]  as Map : null,
+                  weeklyEst:  weekly,
+                  service:    widget.service,
+                ),
+                const SizedBox(height: 20),
+              ],
+
+              // ── Stats ────────────────────────────────────────────────────
               if (_showStats) ...[
                 _SectionHeader(title: L.dashStats, icon: Icons.bar_chart_rounded),
                 const SizedBox(height: 10),
@@ -1083,7 +1059,21 @@ class _DashboardPageState extends State<_DashboardPage> {
                 const SizedBox(height: 20),
               ],
 
-              // Friends horizontal scroll
+              // ── Recent plays ─────────────────────────────────────────────
+              if (_showRecent && _recentTracks.isNotEmpty) ...[
+                _SectionHeader(
+                  title: localeNotifier.value == 'en' ? 'Recent plays' : 'Écoutes récentes',
+                  icon: Icons.history_rounded,
+                ),
+                const SizedBox(height: 10),
+                _RecentTracksList(
+                  tracks:  _recentTracks.take(5).toList(),
+                  service: widget.service,
+                ),
+                const SizedBox(height: 20),
+              ],
+
+              // ── Friends ──────────────────────────────────────────────────
               if (_showFriends) ...[
                 _FriendsSection(
                   friends:     _friends,
@@ -1097,7 +1087,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                 const SizedBox(height: 20),
               ],
 
-              // Top artists carousel
+              // ── Top artists carousel ─────────────────────────────────────
               if (_showArtists && _topArtists.isNotEmpty) ...[
                 _SectionHeader(title: L.commonTopArtists, icon: Icons.mic_rounded),
                 const SizedBox(height: 10),
@@ -1109,7 +1099,22 @@ class _DashboardPageState extends State<_DashboardPage> {
                 const SizedBox(height: 20),
               ],
 
-              // Top tracks carousel
+              // ── Top albums carousel (new) ────────────────────────────────
+              if (_showAlbums && _topAlbums.isNotEmpty) ...[
+                _SectionHeader(
+                  title: localeNotifier.value == 'en' ? 'Top Albums' : 'Top Albums',
+                  icon: Icons.album_rounded,
+                ),
+                const SizedBox(height: 10),
+                _HorizontalCarousel(
+                  items:   _topAlbums.take(10).toList(),
+                  type:    'albums',
+                  service: widget.service,
+                ),
+                const SizedBox(height: 20),
+              ],
+
+              // ── Top tracks carousel ──────────────────────────────────────
               if (_showTracks && _topTracks.isNotEmpty) ...[
                 _SectionHeader(title: L.dashTopTracks, icon: Icons.music_note_rounded),
                 const SizedBox(height: 10),
@@ -1120,6 +1125,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                 ),
                 const SizedBox(height: 20),
               ],
+
             ]),
           ),
         ),
@@ -1133,7 +1139,7 @@ class _DashboardPageState extends State<_DashboardPage> {
 
 class _HorizontalCarousel extends StatelessWidget {
   final List<dynamic>  items;
-  final String         type;    // 'artists' | 'tracks'
+  final String         type;    // 'artists' | 'tracks' | 'albums'
   final LastFmService  service;
 
   const _HorizontalCarousel({
@@ -1144,9 +1150,8 @@ class _HorizontalCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Card width ~52 % of screen width, capped at 220
     final cardW = (MediaQuery.of(context).size.width * 0.52).clamp(160.0, 220.0);
-    final cardH = cardW * 1.10; // slightly portrait ratio
+    final cardH = cardW * 1.10;
 
     return SizedBox(
       height: cardH,
@@ -1199,7 +1204,7 @@ class _HorizontalCarousel extends StatelessWidget {
 }
 
 
-// ── Single carousel card (StatefulWidget for press-scale feedback) ─────────────
+// ── Single carousel card ──────────────────────────────────────────────────────
 
 class _CarouselCard extends StatefulWidget {
   final double  width, height;
@@ -1246,7 +1251,6 @@ class _CarouselCardState extends State<_CarouselCard> {
             width: widget.width, height: widget.height,
             child: Stack(fit: StackFit.expand, children: [
 
-              // Full-bleed background image
               _CarouselImage(
                 initialUrl: widget.initialUrl,
                 resolver:   () => widget.imageFuture,
@@ -1254,7 +1258,7 @@ class _CarouselCardState extends State<_CarouselCard> {
                 height:     widget.height,
               ),
 
-              // Bottom gradient for text readability
+              // Gradient for text readability
               DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -1270,7 +1274,6 @@ class _CarouselCardState extends State<_CarouselCard> {
                 ),
               ),
 
-              // Text content at the bottom
               Positioned(
                 left: 10, right: 10, bottom: 10,
                 child: Column(
@@ -1303,7 +1306,6 @@ class _CarouselCardState extends State<_CarouselCard> {
                       ),
                     ],
                     const SizedBox(height: 6),
-                    // Plays pill + rank badge
                     Row(children: [
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
@@ -1406,7 +1408,7 @@ class _CarouselImage extends StatelessWidget {
 }
 
 
-// ── Friends section (header + horizontal scroll) ──────────────────────────────
+// ── Friends section ───────────────────────────────────────────────────────────
 
 class _FriendsSection extends StatelessWidget {
   final List<_FriendData>                           friends;
@@ -1434,7 +1436,6 @@ class _FriendsSection extends StatelessWidget {
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-      // Section header + manual refresh button
       Row(children: [
         _SectionHeader(title: L.dashFriends, icon: Icons.people_rounded),
         const Spacer(),
@@ -1452,7 +1453,6 @@ class _FriendsSection extends StatelessWidget {
       SizedBox(
         height: 152,
         child: isLoading
-            // Shimmer placeholders while loading
             ? ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: 5,
@@ -1523,7 +1523,6 @@ class _FriendCardState extends State<_FriendCard> {
   @override
   void initState() {
     super.initState();
-    // Prefetch now-playing artwork for the card background
     if (friend.isOnline && friend.nowPlayingTrack.isNotEmpty) {
       _resolveBg();
     }
@@ -1577,7 +1576,7 @@ class _FriendCardState extends State<_FriendCard> {
             borderRadius: BorderRadius.circular(15),
             child: Stack(children: [
 
-              // Blurred album art background (online only)
+              // Blurred album art background (online friends)
               if (_bgUrl.isNotEmpty)
                 Positioned.fill(
                   child: Opacity(
@@ -1596,7 +1595,6 @@ class _FriendCardState extends State<_FriendCard> {
                   ),
                 ),
 
-              // Subtle tint so text stays readable over blurred art
               if (friend.isOnline)
                 Positioned.fill(
                   child: Container(
@@ -1613,14 +1611,13 @@ class _FriendCardState extends State<_FriendCard> {
                   ),
                 ),
 
-              // Card content
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
 
-                    // Avatar + online/offline status dot
+                    // Avatar + online dot
                     SizedBox(
                       width: 60, height: 60,
                       child: Stack(children: [
@@ -1654,7 +1651,6 @@ class _FriendCardState extends State<_FriendCard> {
 
                     const SizedBox(height: 6),
 
-                    // Username
                     Text(
                       friend.username,
                       maxLines: 1,
@@ -1670,7 +1666,6 @@ class _FriendCardState extends State<_FriendCard> {
 
                     const SizedBox(height: 2),
 
-                    // Track or status line
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                       Flexible(
                         child: Text(
@@ -1691,7 +1686,6 @@ class _FriendCardState extends State<_FriendCard> {
                       ),
                     ]),
 
-                    // Artist name (second line)
                     if (subtitleArtist.isNotEmpty) ...[
                       const SizedBox(height: 1),
                       Text(
@@ -1719,7 +1713,6 @@ class _FriendCardState extends State<_FriendCard> {
     );
   }
 
-  // Open the full profile sheet — same widget used in Search for consistency
   void _openProfile(BuildContext context) {
     showProfileSheet(
       context,
@@ -1732,7 +1725,7 @@ class _FriendCardState extends State<_FriendCard> {
 }
 
 
-// ── Skeleton placeholder while friends load ───────────────────────────────────
+// ── Friend card skeleton ──────────────────────────────────────────────────────
 
 class _FriendCardSkeleton extends StatelessWidget {
   final ColorScheme scheme;
@@ -1902,7 +1895,10 @@ class _DashboardSkeleton extends StatelessWidget {
           sliver: SliverList(
             delegate: SliverChildListDelegate([
               _SkeletonCard(scheme: scheme, height: 80),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
+              _SkeletonCard(scheme: scheme, height: 64,
+                  color: scheme.secondaryContainer.withValues(alpha: 0.4)),
+              const SizedBox(height: 20),
               Row(children: [
                 _bone(w: 20, h: 20, r: 10),
                 const SizedBox(width: 8),
@@ -1927,35 +1923,17 @@ class _DashboardSkeleton extends StatelessWidget {
               Row(children: [
                 _bone(w: 20, h: 20, r: 10),
                 const SizedBox(width: 8),
-                _bone(w: 70, h: 14, r: 7),
-              ]),
-              const SizedBox(height: 12),
-              SizedBox(
-                height: 152,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: 4,
-                  padding: EdgeInsets.zero,
-                  itemBuilder: (_, _) => _FriendCardSkeleton(scheme: scheme),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(children: [
-                _bone(w: 20, h: 20, r: 10),
-                const SizedBox(width: 8),
                 _bone(w: 110, h: 14, r: 7),
               ]),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               ...List.generate(3, (_) => Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Row(children: [
-                  const SizedBox(width: 28),
                   Container(
-                    width: 48, height: 48,
+                    width: 44, height: 44,
                     decoration: BoxDecoration(
                       color: scheme.onSurface.withValues(alpha: 0.07),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -1999,8 +1977,6 @@ class _SkeletonCard extends StatelessWidget {
 
 
 // ── Casino-style rolling number ───────────────────────────────────────────────
-// Counts from 0 to [target] once when first shown.
-// Use key: ValueKey(target) at call sites so it replays after a refresh.
 
 class _RollingNumber extends StatefulWidget {
   final int        target;
@@ -2008,7 +1984,7 @@ class _RollingNumber extends StatefulWidget {
   final String     prefix;
   final String     suffix;
   final Duration   duration;
-  final bool       fullFormat; // true = _fmtFull, false = _fmt
+  final bool       fullFormat;
 
   const _RollingNumber({
     super.key,
@@ -2033,7 +2009,6 @@ class _RollingNumberState extends State<_RollingNumber>
   void initState() {
     super.initState();
     _ctrl = AnimationController(vsync: this, duration: widget.duration);
-    // Ease out so it slows down at the end — slot machine feel
     _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
     _ctrl.forward();
   }
@@ -2063,7 +2038,6 @@ class _RollingNumberState extends State<_RollingNumber>
 
 // ── Number formatters ─────────────────────────────────────────────────────────
 
-// Full number with narrow no-break space as thousands separator
 String _fmtFull(int n) {
   final s   = n.toString();
   final buf = StringBuffer();
@@ -2075,7 +2049,8 @@ String _fmtFull(int n) {
 }
 
 
-// ── Full-width hero stat card (total + avg + weekly + active days) ────────────
+// ── Hero stat card — total scrobbles + sub-metrics ───────────────────────────
+// Cleaner layout: big rolling number on the left, 3 mini metrics on the right.
 
 class _HeroStatCard extends StatelessWidget {
   final int    total, avg, days, weekly;
@@ -2094,86 +2069,139 @@ class _HeroStatCard extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
 
-    return Card(
-      elevation: 0,
-      color: scheme.primaryContainer,
-      shape: RoundedRectangleBorder(
+    return Container(
+      decoration: BoxDecoration(
+        color: scheme.primaryContainer,
         borderRadius: BorderRadius.circular(20),
-        side: _cardBorder(scheme, alpha: 0.25),
+        border: Border.all(
+          color: scheme.primary.withValues(alpha: 0.18),
+          width: 1,
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // Total scrobbles with rolling animation
-          Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            const Text('🎯', style: TextStyle(fontSize: 26)),
-            const SizedBox(width: 12),
-            _RollingNumber(
-              key:        ValueKey(total),
-              target:     total,
-              fullFormat: true,
-              duration:   const Duration(milliseconds: 1300),
-              style: text.displaySmall?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: scheme.onPrimaryContainer,
-                  height: 1),
-            ),
-            const SizedBox(width: 8),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Text(L.dashScrobbles,
-                  style: text.bodyMedium?.copyWith(
-                      color: scheme.onPrimaryContainer.withValues(alpha: 0.7),
-                      fontWeight: FontWeight.w500)),
+
+          // Label row
+          Row(children: [
+            Icon(Icons.equalizer_rounded,
+                size: 15, color: scheme.onPrimaryContainer.withValues(alpha: 0.6)),
+            const SizedBox(width: 5),
+            Text(
+              L.dashScrobbles.toUpperCase(),
+              style: text.labelSmall?.copyWith(
+                color:         scheme.onPrimaryContainer.withValues(alpha: 0.6),
+                fontWeight:    FontWeight.w700,
+                letterSpacing: 1.2,
+                fontSize:      10,
+              ),
             ),
           ]),
-          const SizedBox(height: 14),
-          // Sub-metrics row
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: scheme.onPrimaryContainer.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _MiniMetric('⚡', L.dashScrobblesPerDay, scheme.onPrimaryContainer,
-                    rawInt: avg, prefix: '~'),
-                _vDivider(scheme.onPrimaryContainer),
-                _MiniMetric('📅', L.dashPerWeek, scheme.onPrimaryContainer,
-                    rawInt: weekly, prefix: '~'),
-                _vDivider(scheme.onPrimaryContainer),
-                _MiniMetric('🗓️', L.dashDaysActive, scheme.onPrimaryContainer,
-                    rawInt: days, suffix: ' j'),
-              ],
-            ),
+
+          const SizedBox(height: 8),
+
+          // Big rolling total
+          _RollingNumber(
+            key:        ValueKey(total),
+            target:     total,
+            fullFormat: true,
+            duration:   const Duration(milliseconds: 1300),
+            style: text.displaySmall?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: scheme.onPrimaryContainer,
+                height: 1),
           ),
+
+          const SizedBox(height: 16),
+
+          // Divider
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: scheme.onPrimaryContainer.withValues(alpha: 0.1),
+          ),
+
+          const SizedBox(height: 14),
+
+          // Sub-metrics row — no background container, just even columns
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _MiniMetric(
+                icon: Icons.bolt_rounded,
+                label: L.dashScrobblesPerDay,
+                color: scheme.onPrimaryContainer,
+                rawInt: avg, prefix: '~',
+              ),
+              _VertDivider(color: scheme.onPrimaryContainer),
+              _MiniMetric(
+                icon: Icons.calendar_view_week_rounded,
+                label: L.dashPerWeek,
+                color: scheme.onPrimaryContainer,
+                rawInt: weekly, prefix: '~',
+              ),
+              _VertDivider(color: scheme.onPrimaryContainer),
+              _MiniMetric(
+                icon: Icons.today_rounded,
+                label: L.dashDaysActive,
+                color: scheme.onPrimaryContainer,
+                rawInt: days,
+                suffix: localeNotifier.value == 'en' ? ' d' : ' j',
+              ),
+            ],
+          ),
+
+          // Member since — subtle line at the bottom
+          if (regStr.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Row(children: [
+              Icon(Icons.calendar_month_outlined,
+                  size: 12, color: scheme.onPrimaryContainer.withValues(alpha: 0.5)),
+              const SizedBox(width: 5),
+              Text(
+                L.memberSince(regStr),
+                style: text.labelSmall?.copyWith(
+                  color: scheme.onPrimaryContainer.withValues(alpha: 0.55),
+                  fontSize: 11,
+                ),
+              ),
+            ]),
+          ],
+
         ]),
       ),
     );
   }
+}
 
-  Widget _vDivider(Color c) =>
-      Container(width: 1, height: 32, color: c.withValues(alpha: 0.15));
+
+// ── Thin vertical divider for metric rows ─────────────────────────────────────
+
+class _VertDivider extends StatelessWidget {
+  final Color color;
+  const _VertDivider({required this.color});
+
+  @override
+  Widget build(BuildContext context) =>
+      Container(width: 1, height: 32, color: color.withValues(alpha: 0.15));
 }
 
 
 // ── Small metric item inside the hero card ────────────────────────────────────
 
 class _MiniMetric extends StatelessWidget {
-  final String  emoji, label;
-  final Color   color;
-  // When set, the value rolls up from 0. Otherwise [staticValue] is shown as-is.
-  final int?    rawInt;
-  final String  prefix;
-  final String  suffix;
-  final String? staticValue;
+  final IconData icon;
+  final String   label;
+  final Color    color;
+  final int?     rawInt;
+  final String   prefix;
+  final String   suffix;
+  final String?  staticValue;
 
-  const _MiniMetric(
-    this.emoji,
-    this.label,
-    this.color, {
+  const _MiniMetric({
+    required this.icon,
+    required this.label,
+    required this.color,
     this.rawInt,
     this.prefix      = '',
     this.suffix      = '',
@@ -2187,8 +2215,8 @@ class _MiniMetric extends StatelessWidget {
         fontWeight: FontWeight.w800, color: color);
 
     return Column(mainAxisSize: MainAxisSize.min, children: [
-      Text(emoji, style: const TextStyle(fontSize: 16)),
-      const SizedBox(height: 2),
+      Icon(icon, size: 16, color: color.withValues(alpha: 0.7)),
+      const SizedBox(height: 3),
       if (rawInt != null)
         _RollingNumber(
           key:      ValueKey('mini_${rawInt}_$prefix$suffix'),
@@ -2200,10 +2228,10 @@ class _MiniMetric extends StatelessWidget {
         )
       else
         Text(staticValue ?? '—', style: valueStyle),
-      const SizedBox(height: 1),
+      const SizedBox(height: 2),
       Text(label,
           style: text.labelSmall?.copyWith(
-              color: color.withValues(alpha: 0.65), fontSize: 9)),
+              color: color.withValues(alpha: 0.6), fontSize: 9)),
     ]);
   }
 }
@@ -2237,7 +2265,6 @@ class _StatGrid extends StatelessWidget {
 class _DashStatCard extends StatelessWidget {
   final String  emoji, value, label;
   final String? sub;
-  // When set, the value rolls up from 0 instead of appearing instantly
   final int?    rawInt;
   final String  rollPrefix;
   final String  rollSuffix;
@@ -2271,7 +2298,6 @@ class _DashStatCard extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(emoji, style: const TextStyle(fontSize: 22)),
           const SizedBox(height: 6),
-          // Roll up from 0 if rawInt is given, otherwise cross-fade on change
           if (rawInt != null)
             _RollingNumber(
               key:      ValueKey('dash_${rawInt}_$rollPrefix$rollSuffix'),
@@ -2306,6 +2332,7 @@ class _DashStatCard extends StatelessWidget {
 
 
 // ── Now playing card ──────────────────────────────────────────────────────────
+// Larger, cleaner layout with album name if available.
 
 class _NowPlayingCard extends StatelessWidget {
   final Map<String, dynamic> track;
@@ -2317,39 +2344,415 @@ class _NowPlayingCard extends StatelessWidget {
     final text   = Theme.of(context).textTheme;
     final title  = (track['name']             ?? '').toString();
     final artist = (track['artist']?['#text'] ?? '').toString();
+    final album  = (track['album']?['#text']  ?? '').toString();
     final rawUrl = _extractImage(track['image']);
 
-    return Card(
-      elevation: 0,
-      color: scheme.secondaryContainer,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: _cardBorder(scheme),
+    return Container(
+      decoration: BoxDecoration(
+        color: scheme.secondaryContainer,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: scheme.secondary.withValues(alpha: 0.25),
+          width: 1,
+        ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         child: Row(children: [
+
+          // Artwork — slightly larger
           _SmartImage(
-            size: 52, borderRadius: 10, initialUrl: rawUrl,
+            size: 64,
+            borderRadius: 12,
+            initialUrl: rawUrl,
             resolver: () => ImageService.resolveTrack(title, artist,
-                lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null)),
-          const SizedBox(width: 12),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              // Animated pulsing dot — signals live playback
-              _PulsingDot(color: scheme.secondary, size: 7),
-              const SizedBox(width: 6),
-              Text(L.commonNowPlayingBadge, style: text.labelSmall?.copyWith(
-                  color: scheme.secondary, fontWeight: FontWeight.w700, letterSpacing: 1.1)),
-            ]),
-            const SizedBox(height: 2),
-            Text(title, maxLines: 1, overflow: TextOverflow.ellipsis,
-                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
-            Text(artist, maxLines: 1, overflow: TextOverflow.ellipsis,
-                style: text.bodySmall?.copyWith(
-                    color: scheme.onSecondaryContainer.withValues(alpha: 0.7))),
-          ])),
+                lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null),
+          ),
+
+          const SizedBox(width: 14),
+
+          Expanded(child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              // Live badge
+              Row(children: [
+                _PulsingDot(color: scheme.secondary, size: 7),
+                const SizedBox(width: 6),
+                Text(
+                  L.commonNowPlayingBadge,
+                  style: text.labelSmall?.copyWith(
+                    color:         scheme.secondary,
+                    fontWeight:    FontWeight.w700,
+                    letterSpacing: 1.1,
+                  ),
+                ),
+              ]),
+
+              const SizedBox(height: 5),
+
+              // Track title
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: text.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: scheme.onSecondaryContainer,
+                ),
+              ),
+
+              // Artist
+              Text(
+                artist,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: text.bodyMedium?.copyWith(
+                  color: scheme.onSecondaryContainer.withValues(alpha: 0.75),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+
+              // Album (if present, shown small)
+              if (album.isNotEmpty && album != title) ...[
+                const SizedBox(height: 2),
+                Text(
+                  album,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: text.bodySmall?.copyWith(
+                    color: scheme.onSecondaryContainer.withValues(alpha: 0.5),
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+
+            ],
+          )),
         ]),
+      ),
+    );
+  }
+}
+
+
+// ── This week highlights strip ────────────────────────────────────────────────
+// Compact card: top artist this week | top track this week | estimated weekly plays
+
+class _WeekHighlightStrip extends StatelessWidget {
+  final Map?          topArtist;
+  final Map?          topTrack;
+  final int           weeklyEst;
+  final LastFmService service;
+
+  const _WeekHighlightStrip({
+    required this.topArtist,
+    required this.topTrack,
+    required this.weeklyEst,
+    required this.service,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+    final isEn   = localeNotifier.value == 'en';
+
+    return Container(
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: scheme.outlineVariant.withValues(alpha: 0.4),
+          width: 1,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+
+          // Header label
+          Row(children: [
+            Icon(Icons.trending_up_rounded,
+                size: 13, color: scheme.primary),
+            const SizedBox(width: 5),
+            Text(
+              (isEn ? 'THIS WEEK' : 'CETTE SEMAINE'),
+              style: text.labelSmall?.copyWith(
+                color:         scheme.primary,
+                fontWeight:    FontWeight.w700,
+                letterSpacing: 1.1,
+                fontSize:      10,
+              ),
+            ),
+          ]),
+
+          const SizedBox(height: 12),
+
+          // Three tiles side by side
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+
+                // Top artist
+                Expanded(child: _WeekTile(
+                  icon:  Icons.mic_rounded,
+                  label: isEn ? 'Top artist' : 'Artiste top',
+                  value: topArtist != null
+                      ? (topArtist!['name'] ?? '—').toString()
+                      : '—',
+                  plays: topArtist != null
+                      ? int.tryParse((topArtist!['playcount'] ?? '0').toString()) ?? 0
+                      : null,
+                )),
+
+                Container(
+                  width: 1, margin: const EdgeInsets.symmetric(horizontal: 10),
+                  color: scheme.outlineVariant.withValues(alpha: 0.35),
+                ),
+
+                // Top track
+                Expanded(child: _WeekTile(
+                  icon:  Icons.music_note_rounded,
+                  label: isEn ? 'Top track' : 'Titre top',
+                  value: topTrack != null
+                      ? (topTrack!['name'] ?? '—').toString()
+                      : '—',
+                  plays: topTrack != null
+                      ? int.tryParse((topTrack!['playcount'] ?? '0').toString()) ?? 0
+                      : null,
+                )),
+
+                Container(
+                  width: 1, margin: const EdgeInsets.symmetric(horizontal: 10),
+                  color: scheme.outlineVariant.withValues(alpha: 0.35),
+                ),
+
+                // Estimated plays this week
+                Expanded(child: _WeekTile(
+                  icon:   Icons.headphones_rounded,
+                  label:  isEn ? 'Est. plays' : 'Écoutes est.',
+                  value:  '~${_fmt(weeklyEst)}',
+                  plays:  null,
+                )),
+
+              ],
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+
+// ── Single tile in the week strip ─────────────────────────────────────────────
+
+class _WeekTile extends StatelessWidget {
+  final IconData icon;
+  final String   label;
+  final String   value;
+  final int?     plays;
+
+  const _WeekTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.plays,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(children: [
+          Icon(icon, size: 12, color: scheme.primary),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: text.labelSmall?.copyWith(
+              color:    scheme.onSurfaceVariant,
+              fontSize: 9,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ]),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: text.bodySmall?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: scheme.onSurface,
+            height: 1.2,
+          ),
+        ),
+        if (plays != null && plays! > 0) ...[
+          const SizedBox(height: 2),
+          Text(
+            '${_fmt(plays!)} ${L.commonPlays}',
+            style: text.labelSmall?.copyWith(
+              color:    scheme.onSurfaceVariant,
+              fontSize: 9,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+
+// ── Recent plays compact list ─────────────────────────────────────────────────
+
+class _RecentTracksList extends StatelessWidget {
+  final List<dynamic>  tracks;
+  final LastFmService  service;
+
+  const _RecentTracksList({
+    required this.tracks,
+    required this.service,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: scheme.outlineVariant.withValues(alpha: 0.4),
+          width: 1,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: tracks.asMap().entries.map((e) {
+          return _RecentTrackRow(
+            track:   e.value as Map<String, dynamic>,
+            isLast:  e.key == tracks.length - 1,
+            service: service,
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+
+// ── Single recent track row ───────────────────────────────────────────────────
+
+class _RecentTrackRow extends StatefulWidget {
+  final Map<String, dynamic> track;
+  final bool                 isLast;
+  final LastFmService        service;
+
+  const _RecentTrackRow({
+    required this.track,
+    required this.isLast,
+    required this.service,
+  });
+
+  @override
+  State<_RecentTrackRow> createState() => _RecentTrackRowState();
+}
+
+class _RecentTrackRowState extends State<_RecentTrackRow> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme  = Theme.of(context).colorScheme;
+    final text    = Theme.of(context).textTheme;
+    final track   = widget.track;
+    final title   = (track['name']             ?? '').toString();
+    final artist  = (track['artist']?['#text'] ?? '').toString();
+    final album   = (track['album']?['#text']  ?? '').toString();
+    final rawUrl  = _extractImage(track['image']);
+    final dateStr = _fmtTrackDateLocal(track);
+
+    return GestureDetector(
+      onTap: () => showDetailSheet(
+        context,
+        Map<String, dynamic>.from(track),
+        'tracks',
+        widget.service,
+      ),
+      onTapDown:   (_) => setState(() => _pressed = true),
+      onTapUp:     (_) => setState(() => _pressed = false),
+      onTapCancel: ()  => setState(() => _pressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        color: _pressed
+            ? scheme.onSurface.withValues(alpha: 0.05)
+            : Colors.transparent,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              child: Row(children: [
+
+                // Artwork
+                _SmartImage(
+                  size: 44,
+                  borderRadius: 8,
+                  initialUrl: rawUrl,
+                  resolver: () => ImageService.resolveTrack(title, artist,
+                      lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null),
+                ),
+
+                const SizedBox(width: 12),
+
+                // Track + artist
+                Expanded(child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      artist,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: text.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant),
+                    ),
+                  ],
+                )),
+
+                const SizedBox(width: 8),
+
+                // Time
+                Text(
+                  dateStr,
+                  style: text.labelSmall?.copyWith(
+                    color:    scheme.onSurfaceVariant,
+                    fontSize: 10,
+                  ),
+                ),
+
+              ]),
+            ),
+            if (!widget.isLast)
+              Divider(
+                height: 1, thickness: 1, indent: 70, endIndent: 0,
+                color: scheme.outlineVariant.withValues(alpha: 0.3),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -2418,7 +2821,7 @@ class _SyncRefreshButtonState extends State<_SyncRefreshButton>
 }
 
 
-// ── Sync progress chip next to the refresh button ────────────────────────────
+// ── Sync progress chip ────────────────────────────────────────────────────────
 
 class _SyncProgressChip extends StatelessWidget {
   final AllScrobblesProgress progress;
@@ -2445,7 +2848,6 @@ class _SyncProgressChip extends StatelessWidget {
         ),
         clipBehavior: Clip.antiAlias,
         child: Stack(children: [
-          // Background progress bar
           if (frac > 0)
             Positioned.fill(
               child: FractionallySizedBox(
@@ -2454,7 +2856,6 @@ class _SyncProgressChip extends StatelessWidget {
                 child: Container(color: scheme.primary.withValues(alpha: 0.15)),
               ),
             ),
-          // Label on top
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -2477,11 +2878,7 @@ class _SyncProgressChip extends StatelessWidget {
 }
 
 
-// ── Apple Music-style ambient header animation ────────────────────────────────
-// When music is playing and the setting is on, the header slowly breathes:
-//   • scale: 1.0 → 1.08 over ~8 s, reversing smoothly
-//   • shift: slight diagonal drift, out of phase with scale
-//   • blur: forced to at least 18 so the motion looks soft
+// ── Ambient header (Apple Music-style breathing animation) ────────────────────
 
 class _AmbientHeader extends StatefulWidget {
   final String      url;
@@ -2507,11 +2904,9 @@ class _AmbientHeaderState extends State<_AmbientHeader>
       duration: const Duration(seconds: 8),
     )..repeat(reverse: true);
 
-    // Slow breathing scale
     _scale = Tween<double>(begin: 1.0, end: 1.08)
         .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
 
-    // Slight diagonal drift with a different curve so it feels independent
     _dx = Tween<double>(begin: -8.0, end: 8.0)
         .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutSine));
     _dy = Tween<double>(begin: -5.0, end: 5.0)
@@ -2539,7 +2934,6 @@ class _AmbientHeaderState extends State<_AmbientHeader>
           child: child,
         ),
         child: widget.url.isNotEmpty
-            // Image available: blur + stretch to fill
             ? ImageFiltered(
                 imageFilter: ImageFilter.blur(
                   sigmaX: ambientBlur,
@@ -2555,7 +2949,6 @@ class _AmbientHeaderState extends State<_AmbientHeader>
                       _GradientHeader(scheme: widget.scheme),
                 ),
               )
-            // No image: animate the gradient itself
             : _GradientHeader(scheme: widget.scheme),
       ),
     );
