@@ -2712,7 +2712,7 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
 
           // Swipeable pages
           SizedBox(
-            height: 72,
+            height: 88,
             child: PageView(
               controller: _ctrl,
               onPageChanged: (p) => setState(() => _page = p),
@@ -2835,24 +2835,24 @@ class _WeekTile extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(children: [
-          Icon(icon, size: 12, color: scheme.primary),
+          Icon(icon, size: 13, color: scheme.primary),
           const SizedBox(width: 4),
           Text(
             label,
             style: text.labelSmall?.copyWith(
               color:      scheme.onSurfaceVariant,
-              fontSize:   9,
+              fontSize:   11,
               fontWeight: FontWeight.w600,
             ),
           ),
         ]),
-        const SizedBox(height: 4),
+        const SizedBox(height: 5),
         Text(
           value,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: text.bodySmall?.copyWith(
-            fontWeight: FontWeight.w700,
+          style: text.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w800,
             color: scheme.onSurface,
             height: 1.2,
           ),
@@ -2863,7 +2863,7 @@ class _WeekTile extends StatelessWidget {
             '${_fmt(plays!)} ${L.commonPlays}',
             style: text.labelSmall?.copyWith(
               color:    scheme.onSurfaceVariant,
-              fontSize: 9,
+              fontSize: 10,
             ),
           ),
         ],
