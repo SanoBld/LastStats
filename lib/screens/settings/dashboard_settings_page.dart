@@ -32,6 +32,8 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   bool   _showStats             = true;
   bool   _showArtists           = true;
   bool   _showTracks            = true;
+  bool   _showAlbums            = true;
+  bool   _showRecent            = true;
   bool   _showFriends           = true;
   bool   _headerMusicAnim       = false; // equalizer animation when music is playing
   List<String> _statCards       = List.from(kDefaultStatCards);
@@ -73,7 +75,9 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
       _showNowPlay           = p.getBool('ls_show_nowplay')              ?? true;
       _showStats             = p.getBool('ls_show_stats')                ?? true;
       _showArtists           = p.getBool('ls_show_artists')              ?? true;
+      _showAlbums            = p.getBool('ls_show_albums')               ?? true;
       _showTracks            = p.getBool('ls_show_tracks')               ?? true;
+      _showRecent            = p.getBool('ls_show_recent')               ?? true;
       _showFriends           = p.getBool('ls_show_friends')              ?? true;
       _headerMusicAnim       = p.getBool('ls_header_music_anim')         ?? false;
       final raw = p.getStringList('ls_stat_cards');
@@ -453,9 +457,19 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
             onChanged: (v) async { await _set('ls_show_artists', v); setState(() => _showArtists = v); }),
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
+            secondary: const Icon(Icons.album_rounded),
+            title: Text(isEn ? 'Top Albums' : 'Top Albums'), value: _showAlbums,
+            onChanged: (v) async { await _set('ls_show_albums', v); setState(() => _showAlbums = v); }),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          SwitchListTile(
             secondary: const Icon(Icons.music_note_rounded),
             title: Text(L.settingsTopTracksSection), value: _showTracks,
             onChanged: (v) async { await _set('ls_show_tracks', v); setState(() => _showTracks = v); }),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          SwitchListTile(
+            secondary: const Icon(Icons.history_rounded),
+            title: Text(isEn ? 'Recent plays' : 'Écoutes récentes'), value: _showRecent,
+            onChanged: (v) async { await _set('ls_show_recent', v); setState(() => _showRecent = v); }),
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
             secondary: const Icon(Icons.people_rounded),

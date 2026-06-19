@@ -42,6 +42,10 @@ const _kAllStatCards = [
   ('top_artist_week', '🎤', 'Artiste #1 (semaine)',   'Artist #1 (week)'),
   ('top_album_week',  '💿', 'Album #1 (semaine)',     'Album #1 (week)'),
   ('top_track_week',  '🎵', 'Titre #1 (semaine)',     'Track #1 (week)'),
+  ('artist_count',    '🎸', 'Artistes uniques',       'Unique artists'),
+  ('track_count',     '🎼', 'Titres uniques',         'Unique tracks'),
+  ('album_count',     '💽', 'Albums uniques',         'Unique albums'),
+  ('scrobbles_week',  '📊', 'Scrobbles semaine',      'Scrobbles week'),
 ];
 const _kDefaultStatCards = ['top_artist', 'top_album', 'top_track', 'last_track'];
 
@@ -68,6 +72,8 @@ class _DashboardPageState extends State<_DashboardPage> {
   List<dynamic> _topAlbumsWeek  = [];
   List<dynamic> _topTracksWeek  = [];
   List<String>  _statCards      = List.from(_kDefaultStatCards);
+  int _thisWeekCount = 0; // scrobbles réels cette semaine
+  int _lastWeekCount = 0; // scrobbles réels la semaine passée
 
   bool    _loading = true;
   String? _error;
@@ -261,6 +267,7 @@ class _DashboardPageState extends State<_DashboardPage> {
       _resolveHeaderImage();
       _saveToCache(res);
       if (_showFriends) _loadFriends();
+      _fetchWeekComparison();
     } catch (e) {
       if (!mounted) return;
       if (!silent) {
@@ -360,8 +367,33 @@ class _DashboardPageState extends State<_DashboardPage> {
     } catch (_) {}
   }
 
-  Future<void> _loadFriends({bool silent = false}) async {
-    if (!mounted) return;
+  // Compare les scrobbles de cette semaine vs la semaine passée via l'API
+  Future<void> _fetchWeekComparison() async {
+    try {
+      final now         = DateTime.now();
+      final tsNow       = (now.millisecondsSinceEpoch / 1000).round();
+      final tsWeekAgo   = (now.subtract(const Duration(days: 7)).millisecondsSinceEpoch / 1000).round();
+      final ts2WeeksAgo = (now.subtract(const Duration(days: 14)).millisecondsSinceEpoch / 1000).round();
+
+      final results = await Future.wait([
+        widget.service.getRecentTracks(limit: 1, from: tsWeekAgo,   to: tsNow),
+        widget.service.getRecentTracks(limit: 1, from: ts2WeeksAgo, to: tsWeekAgo),
+      ]);
+
+      final thisW = int.tryParse((results[0]['@attr']?['total'] ?? '0').toString()) ?? 0;
+      final lastW = int.tryParse((results[1]['@attr']?['total'] ?? '0').toString()) ?? 0;
+      if (mounted) setState(() { _thisWeekCount = thisW; _lastWeekCount = lastW; });
+    } catch (_) {}
+  }
+
+  // Retourne "+8%" ou "-10%" pour comparer deux valeurs
+  String _weekDeltaStr(int current, int previous) {
+    if (previous == 0) return '';
+    final delta = ((current - previous) / previous * 100).round();
+    return delta >= 0 ? '+$delta%' : '$delta%';
+  }
+
+  Future<void> _loadFriends({bool silent = false}) async {    if (!mounted) return;
     if (!silent) setState(() => _friendsLoading = true);
     try {
       final raw = await widget.service.getFriends(limit: 50, withRecentTrack: false);
@@ -769,6 +801,42 @@ class _DashboardPageState extends State<_DashboardPage> {
               ? '${_fmt(int.tryParse((topTrackWeek['playcount'] ?? '0').toString()) ?? 0)} ${L.commonPlays}'
               : null,
         );
+      // ── Nouvelles cartes ──────────────────────────────────────────────
+      case 'artist_count':
+        final n = int.tryParse((_userInfo?['artist_count'] ?? '0').toString()) ?? 0;
+        return _DashStatCard(
+          emoji: '🎸', rawInt: n > 0 ? n : null,
+          value: n > 0 ? _fmtFull(n) : '—',
+          label: localeNotifier.value == 'en' ? 'Unique artists' : 'Artistes uniques',
+          sub: null,
+        );
+      case 'track_count':
+        final n = int.tryParse((_userInfo?['track_count'] ?? '0').toString()) ?? 0;
+        return _DashStatCard(
+          emoji: '🎼', rawInt: n > 0 ? n : null,
+          value: n > 0 ? _fmtFull(n) : '—',
+          label: localeNotifier.value == 'en' ? 'Unique tracks' : 'Titres uniques',
+          sub: null,
+        );
+      case 'album_count':
+        final n = int.tryParse((_userInfo?['album_count'] ?? '0').toString()) ?? 0;
+        return _DashStatCard(
+          emoji: '💽', rawInt: n > 0 ? n : null,
+          value: n > 0 ? _fmtFull(n) : '—',
+          label: localeNotifier.value == 'en' ? 'Unique albums' : 'Albums uniques',
+          sub: null,
+        );
+      case 'scrobbles_week':
+        // Réel si chargé, sinon estimation lifetime × 7
+        final val = _thisWeekCount > 0 ? _thisWeekCount : weekly;
+        return _DashStatCard(
+          emoji: '📊', rawInt: val,
+          value: _thisWeekCount > 0 ? _fmtFull(_thisWeekCount) : '~${_fmt(weekly)}',
+          label: localeNotifier.value == 'en' ? 'This week' : 'Cette semaine',
+          sub: _thisWeekCount > 0 && _lastWeekCount > 0
+              ? _weekDeltaStr(_thisWeekCount, _lastWeekCount)
+              : null,
+        );
       default:
         return null;
     }
@@ -1024,10 +1092,12 @@ class _DashboardPageState extends State<_DashboardPage> {
               // ── This week highlights strip ───────────────────────────────
               if (hasWeekData) ...[
                 _WeekHighlightStrip(
-                  topArtist:  _topArtistsWeek.isNotEmpty ? _topArtistsWeek[0] as Map : null,
-                  topTrack:   _topTracksWeek.isNotEmpty  ? _topTracksWeek[0]  as Map : null,
-                  weeklyEst:  weekly,
-                  service:    widget.service,
+                  topArtist:     _topArtistsWeek.isNotEmpty ? _topArtistsWeek[0] as Map : null,
+                  topTrack:      _topTracksWeek.isNotEmpty  ? _topTracksWeek[0]  as Map : null,
+                  weeklyEst:     weekly,
+                  thisWeekCount: _thisWeekCount,
+                  lastWeekCount: _lastWeekCount,
+                  service:       widget.service,
                 ),
                 const SizedBox(height: 20),
               ],
@@ -2443,6 +2513,8 @@ class _WeekHighlightStrip extends StatelessWidget {
   final Map?          topArtist;
   final Map?          topTrack;
   final int           weeklyEst;
+  final int           thisWeekCount; // scrobbles réels cette semaine (0 = pas encore chargé)
+  final int           lastWeekCount; // scrobbles réels la semaine passée
   final LastFmService service;
 
   const _WeekHighlightStrip({
@@ -2450,6 +2522,8 @@ class _WeekHighlightStrip extends StatelessWidget {
     required this.topTrack,
     required this.weeklyEst,
     required this.service,
+    this.thisWeekCount = 0,
+    this.lastWeekCount = 0,
   });
 
   @override
@@ -2529,12 +2603,17 @@ class _WeekHighlightStrip extends StatelessWidget {
                   color: scheme.outlineVariant.withValues(alpha: 0.35),
                 ),
 
-                // Estimated plays this week
+                // Scrobbles réels cette semaine (ou estimation si pas encore chargé)
                 Expanded(child: _WeekTile(
-                  icon:   Icons.headphones_rounded,
-                  label:  isEn ? 'Est. plays' : 'Écoutes est.',
-                  value:  '~${_fmt(weeklyEst)}',
-                  plays:  null,
+                  icon:    Icons.headphones_rounded,
+                  label:   isEn ? 'This week' : 'Cette semaine',
+                  value:   thisWeekCount > 0
+                      ? _fmt(thisWeekCount)
+                      : '~${_fmt(weeklyEst)}',
+                  plays:   null,
+                  percent: thisWeekCount > 0 && lastWeekCount > 0
+                      ? (thisWeekCount - lastWeekCount) / lastWeekCount * 100
+                      : null,
                 )),
 
               ],
@@ -2554,12 +2633,14 @@ class _WeekTile extends StatelessWidget {
   final String   label;
   final String   value;
   final int?     plays;
+  final double?  percent; // % vs semaine précédente, null si non disponible
 
   const _WeekTile({
     required this.icon,
     required this.label,
     required this.value,
     this.plays,
+    this.percent,
   });
 
   @override
@@ -2603,6 +2684,26 @@ class _WeekTile extends StatelessWidget {
               fontSize: 9,
             ),
           ),
+        ],
+        // Pourcentage vs semaine passée avec icône tendance
+        if (percent != null) ...[
+          const SizedBox(height: 2),
+          Row(mainAxisSize: MainAxisSize.min, children: [
+            Icon(
+              percent! >= 0 ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+              size:  10,
+              color: percent! >= 0 ? Colors.green.shade400 : Colors.red.shade400,
+            ),
+            const SizedBox(width: 2),
+            Text(
+              '${percent! >= 0 ? '+' : ''}${percent!.round()}%',
+              style: text.labelSmall?.copyWith(
+                color:      percent! >= 0 ? Colors.green.shade400 : Colors.red.shade400,
+                fontSize:   9,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ]),
         ],
       ],
     );
@@ -2681,12 +2782,18 @@ class _RecentTrackRowState extends State<_RecentTrackRow> {
     final dateStr = _fmtTrackDateLocal(track);
 
     return GestureDetector(
-      onTap: () => showDetailSheet(
-        context,
-        Map<String, dynamic>.from(track),
-        'tracks',
-        widget.service,
-      ),
+      onTap: () {
+        // Les tracks récents ont artist['#text'], la detail sheet attend artist['name']
+        final normalized = Map<String, dynamic>.from(track);
+        final ra = track['artist'];
+        if (ra is Map && ra['name'] == null) {
+          normalized['artist'] = {
+            ...Map<String, dynamic>.from(ra as Map<String, dynamic>),
+            'name': ra['#text'] ?? '',
+          };
+        }
+        showDetailSheet(context, normalized, 'tracks', widget.service);
+      },
       onTapDown:   (_) => setState(() => _pressed = true),
       onTapUp:     (_) => setState(() => _pressed = false),
       onTapCancel: ()  => setState(() => _pressed = false),

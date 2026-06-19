@@ -40,6 +40,10 @@ const kAllStatCards = [
   ('top_artist_week', '🎤', 'Artiste #1 (semaine)',   'Artist #1 (week)'),
   ('top_album_week',  '💿', 'Album #1 (semaine)',     'Album #1 (week)'),
   ('top_track_week',  '🎵', 'Titre #1 (semaine)',     'Track #1 (week)'),
+  ('artist_count',    '🎸', 'Artistes uniques',       'Unique artists'),
+  ('track_count',     '🎼', 'Titres uniques',         'Unique tracks'),
+  ('album_count',     '💽', 'Albums uniques',         'Unique albums'),
+  ('scrobbles_week',  '📊', 'Scrobbles semaine',      'Scrobbles week'),
 ];
 const kDefaultStatCards = ['top_artist', 'top_album', 'top_track', 'last_track'];
 
