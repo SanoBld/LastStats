@@ -68,12 +68,22 @@ class _DashboardPageState extends State<_DashboardPage> {
   List<dynamic> _topTracks     = [];
   List<dynamic> _recentTracks  = [];
   Map<String, dynamic>? _nowPlaying;
-  List<dynamic> _topArtistsWeek = [];
-  List<dynamic> _topAlbumsWeek  = [];
-  List<dynamic> _topTracksWeek  = [];
-  List<String>  _statCards      = List.from(_kDefaultStatCards);
-  int _thisWeekCount = 0; // scrobbles réels cette semaine
-  int _lastWeekCount = 0; // scrobbles réels la semaine passée
+  List<dynamic> _topArtistsWeek  = [];
+  List<dynamic> _topAlbumsWeek   = [];
+  List<dynamic> _topTracksWeek   = [];
+  // Month and year top lists for the swipeable strip
+  List<dynamic> _topArtistsMonth = [];
+  List<dynamic> _topTracksMonth  = [];
+  List<dynamic> _topArtistsYear  = [];
+  List<dynamic> _topTracksYear   = [];
+  List<String>  _statCards       = List.from(_kDefaultStatCards);
+
+  int _thisWeekCount  = 0;
+  int _lastWeekCount  = 0;
+  int _thisMonthCount = 0;
+  int _lastMonthCount = 0;
+  int _thisYearCount  = 0;
+  int _lastYearCount  = 0;
 
   bool    _loading = true;
   String? _error;
@@ -97,9 +107,9 @@ class _DashboardPageState extends State<_DashboardPage> {
   bool _showNowPlay  = true;
   bool _showStats    = true;
   bool _showArtists  = true;
-  bool _showAlbums   = true;  // new
+  bool _showAlbums   = true;
   bool _showTracks   = true;
-  bool _showRecent   = true;  // new
+  bool _showRecent   = true;
 
   // Friends
   bool              _showFriends    = true;
@@ -113,7 +123,8 @@ class _DashboardPageState extends State<_DashboardPage> {
     super.initState();
     _initWithCache();
     _npTimer  = Timer.periodic(const Duration(seconds: 10), (_) => _refreshLive());
-    _topTimer = Timer.periodic(const Duration(minutes: 10), (_) => _refreshTopLists());
+    // Refresh top lists every 1 minute to reduce flicker from stale data
+    _topTimer = Timer.periodic(const Duration(minutes: 1), (_) => _refreshTopLists());
   }
 
   @override
@@ -147,6 +158,11 @@ class _DashboardPageState extends State<_DashboardPage> {
     final topArtW    = DataCache.getSync(DataCache.keyTopArtists('7day'))    as List?;
     final topAlbW    = DataCache.getSync(DataCache.keyTopAlbums('7day'))     as List?;
     final topTrkW    = DataCache.getSync(DataCache.keyTopTracks('7day'))     as List?;
+    // Load cached month/year lists
+    final topArtM    = DataCache.getSync(DataCache.keyTopArtists('1month'))  as List?;
+    final topTrkM    = DataCache.getSync(DataCache.keyTopTracks('1month'))   as List?;
+    final topArtY    = DataCache.getSync(DataCache.keyTopArtists('12month')) as List?;
+    final topTrkY    = DataCache.getSync(DataCache.keyTopTracks('12month'))  as List?;
 
     Map<String, dynamic>? np;
     final recentF = <dynamic>[];
@@ -165,16 +181,20 @@ class _DashboardPageState extends State<_DashboardPage> {
     }
 
     setState(() {
-      _userInfo       = userInfo as Map<String, dynamic>;
-      _topArtists     = topArtists ?? [];
-      _topAlbums      = topAlbums  ?? [];
-      _topTracks      = topTracks  ?? [];
-      _recentTracks   = recentF;
-      _nowPlaying     = np;
-      _topArtistsWeek = topArtW    ?? [];
-      _topAlbumsWeek  = topAlbW    ?? [];
-      _topTracksWeek  = topTrkW    ?? [];
-      _loading        = false;
+      _userInfo        = userInfo as Map<String, dynamic>;
+      _topArtists      = topArtists ?? [];
+      _topAlbums       = topAlbums  ?? [];
+      _topTracks       = topTracks  ?? [];
+      _recentTracks    = recentF;
+      _nowPlaying      = np;
+      _topArtistsWeek  = topArtW    ?? [];
+      _topAlbumsWeek   = topAlbW    ?? [];
+      _topTracksWeek   = topTrkW    ?? [];
+      _topArtistsMonth = topArtM    ?? [];
+      _topTracksMonth  = topTrkM    ?? [];
+      _topArtistsYear  = topArtY    ?? [];
+      _topTracksYear   = topTrkY    ?? [];
+      _loading         = false;
     });
 
     if (np != null) _extractColor(np);
@@ -214,27 +234,33 @@ class _DashboardPageState extends State<_DashboardPage> {
     if (!silent) setState(() { _loading = true; _error = null; });
     try {
       final res = await Future.wait([
-        widget.service.getUserInfo(),
-        widget.service.getTopArtists(period: 'overall', limit: 50),
-        widget.service.getTopAlbums (period: 'overall', limit: 50),
-        widget.service.getTopTracks (period: 'overall', limit: 50),
-        widget.service.getRecentTracks(limit: 10),
-        widget.service.getNowPlaying(),
-        if (_statCards.contains('top_artist_week'))
+        widget.service.getUserInfo(),                                         // [0]
+        widget.service.getTopArtists(period: 'overall', limit: 50),          // [1]
+        widget.service.getTopAlbums (period: 'overall', limit: 50),          // [2]
+        widget.service.getTopTracks (period: 'overall', limit: 50),          // [3]
+        widget.service.getRecentTracks(limit: 10),                           // [4]
+        widget.service.getNowPlaying(),                                       // [5]
+        if (_statCards.contains('top_artist_week'))                           // [6]
           widget.service.getTopArtists(period: '7day', limit: 1)
         else
           Future.value(<dynamic>[]),
-        if (_statCards.contains('top_album_week'))
+        if (_statCards.contains('top_album_week'))                            // [7]
           widget.service.getTopAlbums(period: '7day', limit: 1)
         else
           Future.value(<dynamic>[]),
-        if (_statCards.contains('top_track_week'))
+        if (_statCards.contains('top_track_week'))                            // [8]
           widget.service.getTopTracks(period: '7day', limit: 1)
         else
           Future.value(<dynamic>[]),
-        // Always fetch week top lists for the highlights strip
-        widget.service.getTopArtists(period: '7day', limit: 3),
-        widget.service.getTopTracks (period: '7day', limit: 3),
+        // Strip data – week
+        widget.service.getTopArtists(period: '7day',    limit: 3),           // [9]
+        widget.service.getTopTracks (period: '7day',    limit: 3),           // [10]
+        // Strip data – month
+        widget.service.getTopArtists(period: '1month',  limit: 3),           // [11]
+        widget.service.getTopTracks (period: '1month',  limit: 3),           // [12]
+        // Strip data – year
+        widget.service.getTopArtists(period: '12month', limit: 3),           // [13]
+        widget.service.getTopTracks (period: '12month', limit: 3),           // [14]
       ]);
 
       final recentRaw = (res[4] as Map<String, dynamic>)['track'];
@@ -249,14 +275,19 @@ class _DashboardPageState extends State<_DashboardPage> {
 
       if (!mounted) return;
       setState(() {
-        _userInfo       = res[0] as Map<String, dynamic>?;
-        _topArtists     = res[1] as List<dynamic>;
-        _topAlbums      = res[2] as List<dynamic>;
-        _topTracks      = res[3] as List<dynamic>;
-        _recentTracks   = recentF;
-        _nowPlaying     = np ?? res[5] as Map<String, dynamic>?;
-        _topArtistsWeek = res.length > 9 ? res[9] as List<dynamic> : [];
-        _topTracksWeek  = res.length > 10 ? res[10] as List<dynamic> : [];
+        _userInfo        = res[0] as Map<String, dynamic>?;
+        _topArtists      = res[1] as List<dynamic>;
+        _topAlbums       = res[2] as List<dynamic>;
+        _topTracks       = res[3] as List<dynamic>;
+        _recentTracks    = recentF;
+        _nowPlaying      = np ?? res[5] as Map<String, dynamic>?;
+        _topArtistsWeek  = res.length > 9  ? res[9]  as List<dynamic> : [];
+        _topTracksWeek   = res.length > 10 ? res[10] as List<dynamic> : [];
+        _topArtistsMonth = res.length > 11 ? res[11] as List<dynamic> : [];
+        _topTracksMonth  = res.length > 12 ? res[12] as List<dynamic> : [];
+        _topArtistsYear  = res.length > 13 ? res[13] as List<dynamic> : [];
+        _topTracksYear   = res.length > 14 ? res[14] as List<dynamic> : [];
+        // Stat-card week overrides (limit 1 fetches)
         if (res.length > 6 && (res[6] as List).isNotEmpty) _topArtistsWeek = res[6] as List<dynamic>;
         if (res.length > 7 && (res[7] as List).isNotEmpty) _topAlbumsWeek  = res[7] as List<dynamic>;
         if (res.length > 8 && (res[8] as List).isNotEmpty) _topTracksWeek  = res[8] as List<dynamic>;
@@ -267,7 +298,7 @@ class _DashboardPageState extends State<_DashboardPage> {
       _resolveHeaderImage();
       _saveToCache(res);
       if (_showFriends) _loadFriends();
-      _fetchWeekComparison();
+      _fetchPeriodComparisons();
     } catch (e) {
       if (!mounted) return;
       if (!silent) {
@@ -282,12 +313,20 @@ class _DashboardPageState extends State<_DashboardPage> {
     DataCache.set(DataCache.keyTopAlbums('overall'),  res[2]);
     DataCache.set(DataCache.keyTopTracks('overall'),  res[3]);
     DataCache.set(DataCache.keyRecentTracks(limit: 10), res[4]);
-    if (res.length > 6 && (res[6] as List).isNotEmpty)
-      DataCache.set(DataCache.keyTopArtists('7day'), res[6]);
-    if (res.length > 7 && (res[7] as List).isNotEmpty)
-      DataCache.set(DataCache.keyTopAlbums('7day'),  res[7]);
-    if (res.length > 8 && (res[8] as List).isNotEmpty)
-      DataCache.set(DataCache.keyTopTracks('7day'),  res[8]);
+    if (res.length > 6  && (res[6]  as List).isNotEmpty)
+      DataCache.set(DataCache.keyTopArtists('7day'),    res[6]);
+    if (res.length > 7  && (res[7]  as List).isNotEmpty)
+      DataCache.set(DataCache.keyTopAlbums('7day'),     res[7]);
+    if (res.length > 8  && (res[8]  as List).isNotEmpty)
+      DataCache.set(DataCache.keyTopTracks('7day'),     res[8]);
+    if (res.length > 11 && (res[11] as List).isNotEmpty)
+      DataCache.set(DataCache.keyTopArtists('1month'),  res[11]);
+    if (res.length > 12 && (res[12] as List).isNotEmpty)
+      DataCache.set(DataCache.keyTopTracks('1month'),   res[12]);
+    if (res.length > 13 && (res[13] as List).isNotEmpty)
+      DataCache.set(DataCache.keyTopArtists('12month'), res[13]);
+    if (res.length > 14 && (res[14] as List).isNotEmpty)
+      DataCache.set(DataCache.keyTopTracks('12month'),  res[14]);
   }
 
   Future<void> _refreshLive() async {
@@ -334,6 +373,7 @@ class _DashboardPageState extends State<_DashboardPage> {
       ]);
       if (!mounted) return;
 
+      // Only setState if the top item actually changed to avoid rebuilding the carousel
       bool changed = false;
       final newArtists = results[0] as List<dynamic>;
       final newTracks  = results[1] as List<dynamic>;
@@ -352,8 +392,8 @@ class _DashboardPageState extends State<_DashboardPage> {
 
       if (changed) {
         setState(() {
-          _topArtists    = newArtists;
-          _topTracks     = newTracks;
+          _topArtists   = newArtists;
+          _topTracks    = newTracks;
           if (results.length > 2) _topArtistsWeek = results[2] as List<dynamic>;
           if (results.length > 3) _topTracksWeek  = results[3] as List<dynamic>;
         });
@@ -367,33 +407,62 @@ class _DashboardPageState extends State<_DashboardPage> {
     } catch (_) {}
   }
 
-  // Compare les scrobbles de cette semaine vs la semaine passée via l'API
-  Future<void> _fetchWeekComparison() async {
+  // Fetch scrobble counts for week, month and year vs previous period
+  Future<void> _fetchPeriodComparisons() async {
     try {
-      final now         = DateTime.now();
-      final tsNow       = (now.millisecondsSinceEpoch / 1000).round();
-      final tsWeekAgo   = (now.subtract(const Duration(days: 7)).millisecondsSinceEpoch / 1000).round();
-      final ts2WeeksAgo = (now.subtract(const Duration(days: 14)).millisecondsSinceEpoch / 1000).round();
+      final now = DateTime.now();
+
+      // Week timestamps
+      final tsNow        = (now.millisecondsSinceEpoch / 1000).round();
+      final tsWeekAgo    = (now.subtract(const Duration(days: 7)).millisecondsSinceEpoch / 1000).round();
+      final ts2WeeksAgo  = (now.subtract(const Duration(days: 14)).millisecondsSinceEpoch / 1000).round();
+
+      // Month timestamps (start of current vs start of previous month)
+      final tsMonthStart     = DateTime(now.year, now.month, 1);
+      final tsLastMonthStart = DateTime(now.year, now.month - 1, 1);
+      final tsMonthStartU    = (tsMonthStart.millisecondsSinceEpoch     / 1000).round();
+      final tsLastMonthU     = (tsLastMonthStart.millisecondsSinceEpoch / 1000).round();
+
+      // Year timestamps (start of current vs start of previous year)
+      final tsYearStart      = DateTime(now.year,     1, 1);
+      final tsLastYearStart  = DateTime(now.year - 1, 1, 1);
+      final tsYearStartU     = (tsYearStart.millisecondsSinceEpoch      / 1000).round();
+      final tsLastYearStartU = (tsLastYearStart.millisecondsSinceEpoch  / 1000).round();
 
       final results = await Future.wait([
-        widget.service.getRecentTracks(limit: 1, from: tsWeekAgo,   to: tsNow),
-        widget.service.getRecentTracks(limit: 1, from: ts2WeeksAgo, to: tsWeekAgo),
+        widget.service.getRecentTracks(limit: 1, from: tsWeekAgo,    to: tsNow),        // this week
+        widget.service.getRecentTracks(limit: 1, from: ts2WeeksAgo,  to: tsWeekAgo),    // last week
+        widget.service.getRecentTracks(limit: 1, from: tsMonthStartU, to: tsNow),       // this month
+        widget.service.getRecentTracks(limit: 1, from: tsLastMonthU,  to: tsMonthStartU), // last month
+        widget.service.getRecentTracks(limit: 1, from: tsYearStartU,  to: tsNow),       // this year
+        widget.service.getRecentTracks(limit: 1, from: tsLastYearStartU, to: tsYearStartU), // last year
       ]);
 
-      final thisW = int.tryParse((results[0]['@attr']?['total'] ?? '0').toString()) ?? 0;
-      final lastW = int.tryParse((results[1]['@attr']?['total'] ?? '0').toString()) ?? 0;
-      if (mounted) setState(() { _thisWeekCount = thisW; _lastWeekCount = lastW; });
+      int parse(dynamic r) =>
+          int.tryParse((r['@attr']?['total'] ?? '0').toString()) ?? 0;
+
+      if (mounted) {
+        setState(() {
+          _thisWeekCount  = parse(results[0]);
+          _lastWeekCount  = parse(results[1]);
+          _thisMonthCount = parse(results[2]);
+          _lastMonthCount = parse(results[3]);
+          _thisYearCount  = parse(results[4]);
+          _lastYearCount  = parse(results[5]);
+        });
+      }
     } catch (_) {}
   }
 
-  // Retourne "+8%" ou "-10%" pour comparer deux valeurs
+  // Returns "+8%" or "-10%" comparing two values
   String _weekDeltaStr(int current, int previous) {
     if (previous == 0) return '';
     final delta = ((current - previous) / previous * 100).round();
     return delta >= 0 ? '+$delta%' : '$delta%';
   }
 
-  Future<void> _loadFriends({bool silent = false}) async {    if (!mounted) return;
+  Future<void> _loadFriends({bool silent = false}) async {
+    if (!mounted) return;
     if (!silent) setState(() => _friendsLoading = true);
     try {
       final raw = await widget.service.getFriends(limit: 50, withRecentTrack: false);
@@ -801,7 +870,6 @@ class _DashboardPageState extends State<_DashboardPage> {
               ? '${_fmt(int.tryParse((topTrackWeek['playcount'] ?? '0').toString()) ?? 0)} ${L.commonPlays}'
               : null,
         );
-      // ── Nouvelles cartes ──────────────────────────────────────────────
       case 'artist_count':
         final n = int.tryParse((_userInfo?['artist_count'] ?? '0').toString()) ?? 0;
         return _DashStatCard(
@@ -827,7 +895,6 @@ class _DashboardPageState extends State<_DashboardPage> {
           sub: null,
         );
       case 'scrobbles_week':
-        // Réel si chargé, sinon estimation lifetime × 7
         final val = _thisWeekCount > 0 ? _thisWeekCount : weekly;
         return _DashStatCard(
           emoji: '📊', rawInt: val,
@@ -866,7 +933,10 @@ class _DashboardPageState extends State<_DashboardPage> {
     final topTrack  = _topTracks.isNotEmpty  ? _topTracks[0]  as Map : null;
     final lastTrack = _recentTracks.isNotEmpty ? _recentTracks[0] as Map : null;
 
-    final hasWeekData = _topArtistsWeek.isNotEmpty || _topTracksWeek.isNotEmpty;
+    // Show the strip if we have data for at least one period
+    final hasStripData = _topArtistsWeek.isNotEmpty  || _topTracksWeek.isNotEmpty
+                      || _topArtistsMonth.isNotEmpty || _topTracksMonth.isNotEmpty
+                      || _topArtistsYear.isNotEmpty  || _topTracksYear.isNotEmpty;
 
     return RefreshIndicator(
       onRefresh: _load,
@@ -927,7 +997,6 @@ class _DashboardPageState extends State<_DashboardPage> {
             background: Stack(
               fit: StackFit.expand,
               children: [
-                // Background: ambient / blurred image / gradient
                 AnimatedSwitcher(
                   duration: _headerAnimation == 'none'
                       ? Duration.zero
@@ -968,7 +1037,6 @@ class _DashboardPageState extends State<_DashboardPage> {
                           : _GradientHeader(key: const ValueKey('gradient'), scheme: scheme),
                 ),
 
-                // Bottom gradient for text readability
                 Positioned(
                   left: 0, right: 0, bottom: 0,
                   child: Container(
@@ -986,7 +1054,6 @@ class _DashboardPageState extends State<_DashboardPage> {
                   ),
                 ),
 
-                // Profile info overlay
                 SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 8, 70, 12),
@@ -995,7 +1062,6 @@ class _DashboardPageState extends State<_DashboardPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(children: [
-                          // Avatar
                           Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
@@ -1089,15 +1155,23 @@ class _DashboardPageState extends State<_DashboardPage> {
                 const SizedBox(height: 12),
               ],
 
-              // ── This week highlights strip ───────────────────────────────
-              if (hasWeekData) ...[
+              // ── Swipeable week/month/year highlights strip ───────────────
+              if (hasStripData) ...[
                 _WeekHighlightStrip(
-                  topArtist:     _topArtistsWeek.isNotEmpty ? _topArtistsWeek[0] as Map : null,
-                  topTrack:      _topTracksWeek.isNotEmpty  ? _topTracksWeek[0]  as Map : null,
-                  weeklyEst:     weekly,
-                  thisWeekCount: _thisWeekCount,
-                  lastWeekCount: _lastWeekCount,
-                  service:       widget.service,
+                  topArtistWeek:  _topArtistsWeek.isNotEmpty  ? _topArtistsWeek[0]  as Map : null,
+                  topTrackWeek:   _topTracksWeek.isNotEmpty   ? _topTracksWeek[0]   as Map : null,
+                  topArtistMonth: _topArtistsMonth.isNotEmpty ? _topArtistsMonth[0] as Map : null,
+                  topTrackMonth:  _topTracksMonth.isNotEmpty  ? _topTracksMonth[0]  as Map : null,
+                  topArtistYear:  _topArtistsYear.isNotEmpty  ? _topArtistsYear[0]  as Map : null,
+                  topTrackYear:   _topTracksYear.isNotEmpty   ? _topTracksYear[0]   as Map : null,
+                  weeklyEst:      weekly,
+                  thisWeekCount:  _thisWeekCount,
+                  lastWeekCount:  _lastWeekCount,
+                  thisMonthCount: _thisMonthCount,
+                  lastMonthCount: _lastMonthCount,
+                  thisYearCount:  _thisYearCount,
+                  lastYearCount:  _lastYearCount,
+                  service:        widget.service,
                 ),
                 const SizedBox(height: 20),
               ],
@@ -1169,7 +1243,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                 const SizedBox(height: 20),
               ],
 
-              // ── Top albums carousel (new) ────────────────────────────────
+              // ── Top albums carousel ──────────────────────────────────────
               if (_showAlbums && _topAlbums.isNotEmpty) ...[
                 _SectionHeader(
                   title: localeNotifier.value == 'en' ? 'Top Albums' : 'Top Albums',
@@ -1238,27 +1312,31 @@ class _HorizontalCarousel extends StatelessWidget {
           final plays  = int.tryParse((item['playcount'] ?? '0').toString()) ?? 0;
           final raw    = _extractImage(item['image']);
 
-          final Future<String> imgFuture;
+          // Pass a factory function so the future is only created inside the
+          // card's initState – prevents re-creating it on every parent rebuild
+          Future<String> Function() imgFactory;
           switch (type) {
             case 'artists':
-              imgFuture = ImageService.resolveArtist(name, lastfmUrl: raw.isNotEmpty ? raw : null);
+              imgFactory = () => ImageService.resolveArtist(name, lastfmUrl: raw.isNotEmpty ? raw : null);
             case 'tracks':
-              imgFuture = ImageService.resolveTrack(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null);
+              imgFactory = () => ImageService.resolveTrack(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null);
             default:
-              imgFuture = ImageService.resolveAlbum(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null);
+              imgFactory = () => ImageService.resolveAlbum(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null);
           }
 
           return Padding(
             padding: EdgeInsets.only(left: i == 0 ? 0 : 10),
             child: _CarouselCard(
-              width:       cardW,
-              height:      cardH,
-              name:        name,
-              sub:         type != 'artists' ? artist : '',
-              plays:       _fmt(plays),
-              rank:        '${i + 1}',
-              initialUrl:  raw,
-              imageFuture: imgFuture,
+              // Key ensures state is tied to this specific item
+              key:          ValueKey('${type}_$name'),
+              width:        cardW,
+              height:       cardH,
+              name:         name,
+              sub:          type != 'artists' ? artist : '',
+              plays:        _fmt(plays),
+              rank:         '${i + 1}',
+              initialUrl:   raw,
+              imageFactory: imgFactory,
               onTap: () => showDetailSheet(
                 ctx,
                 Map<String, dynamic>.from(item),
@@ -1280,17 +1358,19 @@ class _CarouselCard extends StatefulWidget {
   final double  width, height;
   final String  name, sub, plays, rank;
   final String? initialUrl;
-  final Future<String> imageFuture;
-  final VoidCallback   onTap;
+  // Factory so the future is created once in initState, not on every rebuild
+  final Future<String> Function() imageFactory;
+  final VoidCallback onTap;
 
   const _CarouselCard({
+    super.key,
     required this.width,
     required this.height,
     required this.name,
     required this.sub,
     required this.plays,
     required this.rank,
-    required this.imageFuture,
+    required this.imageFactory,
     required this.onTap,
     this.initialUrl,
   });
@@ -1301,6 +1381,14 @@ class _CarouselCard extends StatefulWidget {
 
 class _CarouselCardState extends State<_CarouselCard> {
   bool _pressed = false;
+  // Cached future so it survives parent rebuilds without restarting
+  late final Future<String> _imgFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _imgFuture = widget.imageFactory();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1323,12 +1411,11 @@ class _CarouselCardState extends State<_CarouselCard> {
 
               _CarouselImage(
                 initialUrl: widget.initialUrl,
-                resolver:   () => widget.imageFuture,
+                imgFuture:  _imgFuture,
                 width:      widget.width,
                 height:     widget.height,
               ),
 
-              // Gradient for text readability
               DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -1423,10 +1510,10 @@ class _CarouselCardState extends State<_CarouselCard> {
 
 // ── Full-bleed background image for carousel cards ────────────────────────────
 
-class _CarouselImage extends StatelessWidget {
-  final String? initialUrl;
-  final Future<String> Function() resolver;
-  final double width, height;
+class _CarouselImage extends StatefulWidget {
+  final String?        initialUrl;
+  final Future<String> imgFuture;   // pre-cached future from the card's state
+  final double         width, height;
 
   static const _ph = '2a96cbd8b46e442fc41c2b86b821562f';
 
@@ -1434,18 +1521,24 @@ class _CarouselImage extends StatelessWidget {
       initialUrl == null || initialUrl!.isEmpty || initialUrl!.contains(_ph);
 
   const _CarouselImage({
-    required this.resolver,
+    required this.imgFuture,
     required this.width,
     required this.height,
     this.initialUrl,
   });
 
   @override
+  State<_CarouselImage> createState() => _CarouselImageState();
+}
+
+class _CarouselImageState extends State<_CarouselImage> {
+  @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    if (!_needsResolve) return _img(initialUrl!, scheme);
+    if (!widget._needsResolve) return _img(widget.initialUrl!, scheme);
+    // Use the pre-cached future – FutureBuilder never restarts unnecessarily
     return FutureBuilder<String>(
-      future: resolver(),
+      future: widget.imgFuture,
       builder: (_, snap) {
         if (snap.connectionState != ConnectionState.done) return _skeleton(scheme);
         final url = snap.data ?? '';
@@ -1455,12 +1548,12 @@ class _CarouselImage extends StatelessWidget {
   }
 
   Widget _img(String url, ColorScheme s) => Image.network(
-    url, width: width, height: height, fit: BoxFit.cover,
+    url, width: widget.width, height: widget.height, fit: BoxFit.cover,
     errorBuilder: (_, _, _) => _fallback(s),
   );
 
   Widget _skeleton(ColorScheme s) => Container(
-    width: width, height: height,
+    width: widget.width, height: widget.height,
     color: s.surfaceContainerHighest,
     child: Center(child: SizedBox(
       width: 28, height: 28,
@@ -1470,10 +1563,10 @@ class _CarouselImage extends StatelessWidget {
   );
 
   Widget _fallback(ColorScheme s) => Container(
-    width: width, height: height,
+    width: widget.width, height: widget.height,
     color: s.surfaceContainerHighest,
     child: Icon(Icons.music_note_rounded,
-        color: s.onSurfaceVariant, size: width * 0.35),
+        color: s.onSurfaceVariant, size: widget.width * 0.35),
   );
 }
 
@@ -1646,7 +1739,6 @@ class _FriendCardState extends State<_FriendCard> {
             borderRadius: BorderRadius.circular(15),
             child: Stack(children: [
 
-              // Blurred album art background (online friends)
               if (_bgUrl.isNotEmpty)
                 Positioned.fill(
                   child: Opacity(
@@ -1687,7 +1779,6 @@ class _FriendCardState extends State<_FriendCard> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
 
-                    // Avatar + online dot
                     SizedBox(
                       width: 60, height: 60,
                       child: Stack(children: [
@@ -2119,8 +2210,7 @@ String _fmtFull(int n) {
 }
 
 
-// ── Hero stat card — total scrobbles + sub-metrics ───────────────────────────
-// Cleaner layout: big rolling number on the left, 3 mini metrics on the right.
+// ── Hero stat card ────────────────────────────────────────────────────────────
 
 class _HeroStatCard extends StatelessWidget {
   final int    total, avg, days, weekly;
@@ -2152,7 +2242,6 @@ class _HeroStatCard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-          // Label row
           Row(children: [
             Icon(Icons.equalizer_rounded,
                 size: 15, color: scheme.onPrimaryContainer.withValues(alpha: 0.6)),
@@ -2170,7 +2259,6 @@ class _HeroStatCard extends StatelessWidget {
 
           const SizedBox(height: 8),
 
-          // Big rolling total
           _RollingNumber(
             key:        ValueKey(total),
             target:     total,
@@ -2184,16 +2272,13 @@ class _HeroStatCard extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // Divider
           Divider(
-            height: 1,
-            thickness: 1,
+            height: 1, thickness: 1,
             color: scheme.onPrimaryContainer.withValues(alpha: 0.1),
           ),
 
           const SizedBox(height: 14),
 
-          // Sub-metrics row — no background container, just even columns
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -2221,7 +2306,6 @@ class _HeroStatCard extends StatelessWidget {
             ],
           ),
 
-          // Member since — subtle line at the bottom
           if (regStr.isNotEmpty) ...[
             const SizedBox(height: 14),
             Row(children: [
@@ -2318,11 +2402,13 @@ class _StatGrid extends StatelessWidget {
     final pairs = <Widget>[];
     for (var i = 0; i < children.length; i += 2) {
       final hasRight = i + 1 < children.length;
-      pairs.add(Row(children: [
-        Expanded(child: children[i]),
-        const SizedBox(width: 10),
-        Expanded(child: hasRight ? children[i + 1] : const SizedBox()),
-      ]));
+      pairs.add(IntrinsicHeight(
+        child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Expanded(child: children[i]),
+          const SizedBox(width: 10),
+          Expanded(child: hasRight ? children[i + 1] : const SizedBox()),
+        ]),
+      ));
       if (i + 2 < children.length) pairs.add(const SizedBox(height: 10));
     }
     return Column(children: pairs);
@@ -2330,7 +2416,7 @@ class _StatGrid extends StatelessWidget {
 }
 
 
-// ── Secondary stat card ───────────────────────────────────────────────────────
+// ── Secondary stat card (uniform height via IntrinsicHeight in _StatGrid) ─────
 
 class _DashStatCard extends StatelessWidget {
   final String  emoji, value, label;
@@ -2356,45 +2442,49 @@ class _DashStatCard extends StatelessWidget {
     final valueStyle = text.bodyLarge?.copyWith(
         fontWeight: FontWeight.w800, color: scheme.onSurface);
 
-    return Card(
-      elevation: 0,
-      color: scheme.surfaceContainerHighest,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: _cardBorder(scheme),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(emoji, style: const TextStyle(fontSize: 22)),
-          const SizedBox(height: 6),
-          if (rawInt != null)
-            _RollingNumber(
-              key:      ValueKey('dash_${rawInt}_$rollPrefix$rollSuffix'),
-              target:   rawInt!,
-              prefix:   rollPrefix,
-              suffix:   rollSuffix,
-              duration: const Duration(milliseconds: 1000),
-              style:    valueStyle,
-            )
-          else
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (c, a) => FadeTransition(opacity: a, child: c),
-              child: Text(
-                value,
-                key: ValueKey(value),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: valueStyle,
+    // SizedBox.expand fills the height provided by IntrinsicHeight in _StatGrid,
+    // making all cards the same height regardless of content length
+    return SizedBox.expand(
+      child: Card(
+        elevation: 0,
+        color: scheme.surfaceContainerHighest,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: _cardBorder(scheme),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(emoji, style: const TextStyle(fontSize: 22)),
+            const SizedBox(height: 6),
+            if (rawInt != null)
+              _RollingNumber(
+                key:      ValueKey('dash_${rawInt}_$rollPrefix$rollSuffix'),
+                target:   rawInt!,
+                prefix:   rollPrefix,
+                suffix:   rollSuffix,
+                duration: const Duration(milliseconds: 1000),
+                style:    valueStyle,
+              )
+            else
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (c, a) => FadeTransition(opacity: a, child: c),
+                child: Text(
+                  value,
+                  key: ValueKey(value),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: valueStyle,
+                ),
               ),
-            ),
-          Text(label, style: text.bodySmall?.copyWith(
-              color: scheme.primary, fontWeight: FontWeight.w600)),
-          if (sub != null)
-            Text(sub!, maxLines: 1, overflow: TextOverflow.ellipsis,
-                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-        ]),
+            Text(label, style: text.bodySmall?.copyWith(
+                color: scheme.primary, fontWeight: FontWeight.w600)),
+            if (sub != null)
+              Text(sub!, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+          ]),
+        ),
       ),
     );
   }
@@ -2402,7 +2492,6 @@ class _DashStatCard extends StatelessWidget {
 
 
 // ── Now playing card ──────────────────────────────────────────────────────────
-// Larger, cleaner layout with album name if available.
 
 class _NowPlayingCard extends StatelessWidget {
   final Map<String, dynamic> track;
@@ -2430,7 +2519,6 @@ class _NowPlayingCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Row(children: [
 
-          // Artwork — slightly larger
           _SmartImage(
             size: 64,
             borderRadius: 12,
@@ -2445,7 +2533,6 @@ class _NowPlayingCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-              // Live badge
               Row(children: [
                 _PulsingDot(color: scheme.secondary, size: 7),
                 const SizedBox(width: 6),
@@ -2461,7 +2548,6 @@ class _NowPlayingCard extends StatelessWidget {
 
               const SizedBox(height: 5),
 
-              // Track title
               Text(
                 title,
                 maxLines: 1,
@@ -2472,7 +2558,6 @@ class _NowPlayingCard extends StatelessWidget {
                 ),
               ),
 
-              // Artist
               Text(
                 artist,
                 maxLines: 1,
@@ -2483,7 +2568,6 @@ class _NowPlayingCard extends StatelessWidget {
                 ),
               ),
 
-              // Album (if present, shown small)
               if (album.isNotEmpty && album != title) ...[
                 const SizedBox(height: 2),
                 Text(
@@ -2506,31 +2590,68 @@ class _NowPlayingCard extends StatelessWidget {
 }
 
 
-// ── This week highlights strip ────────────────────────────────────────────────
-// Compact card: top artist this week | top track this week | estimated weekly plays
+// ── Swipeable week / month / year highlights strip ────────────────────────────
 
-class _WeekHighlightStrip extends StatelessWidget {
-  final Map?          topArtist;
-  final Map?          topTrack;
-  final int           weeklyEst;
-  final int           thisWeekCount; // scrobbles réels cette semaine (0 = pas encore chargé)
-  final int           lastWeekCount; // scrobbles réels la semaine passée
+class _WeekHighlightStrip extends StatefulWidget {
+  // Week
+  final Map? topArtistWeek;
+  final Map? topTrackWeek;
+  final int  thisWeekCount;
+  final int  lastWeekCount;
+  final int  weeklyEst;
+  // Month
+  final Map? topArtistMonth;
+  final Map? topTrackMonth;
+  final int  thisMonthCount;
+  final int  lastMonthCount;
+  // Year
+  final Map? topArtistYear;
+  final Map? topTrackYear;
+  final int  thisYearCount;
+  final int  lastYearCount;
+
   final LastFmService service;
 
   const _WeekHighlightStrip({
-    required this.topArtist,
-    required this.topTrack,
+    required this.topArtistWeek,
+    required this.topTrackWeek,
     required this.weeklyEst,
     required this.service,
-    this.thisWeekCount = 0,
-    this.lastWeekCount = 0,
+    this.thisWeekCount  = 0,
+    this.lastWeekCount  = 0,
+    this.topArtistMonth,
+    this.topTrackMonth,
+    this.thisMonthCount = 0,
+    this.lastMonthCount = 0,
+    this.topArtistYear,
+    this.topTrackYear,
+    this.thisYearCount  = 0,
+    this.lastYearCount  = 0,
   });
+
+  @override
+  State<_WeekHighlightStrip> createState() => _WeekHighlightStripState();
+}
+
+class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
+  final _ctrl = PageController();
+  int _page = 0;
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
     final isEn   = localeNotifier.value == 'en';
+
+    final labels = isEn
+        ? ['THIS WEEK', 'THIS MONTH', 'THIS YEAR']
+        : ['CETTE SEMAINE', 'CE MOIS', 'CETTE ANNÉE'];
 
     return Container(
       decoration: BoxDecoration(
@@ -2542,80 +2663,86 @@ class _WeekHighlightStrip extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-          // Header label
+          // Header row – period label (bigger) + swipe dots
           Row(children: [
-            Icon(Icons.trending_up_rounded,
-                size: 13, color: scheme.primary),
-            const SizedBox(width: 5),
-            Text(
-              (isEn ? 'THIS WEEK' : 'CETTE SEMAINE'),
-              style: text.labelSmall?.copyWith(
-                color:         scheme.primary,
-                fontWeight:    FontWeight.w700,
-                letterSpacing: 1.1,
-                fontSize:      10,
+            Icon(Icons.trending_up_rounded, size: 16, color: scheme.primary),
+            const SizedBox(width: 6),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: Text(
+                labels[_page],
+                key: ValueKey(_page),
+                style: text.labelMedium?.copyWith(
+                  color:         scheme.primary,
+                  fontWeight:    FontWeight.w800,
+                  letterSpacing: 1.1,
+                  fontSize:      13,   // bigger than before
+                ),
               ),
             ),
+            const Spacer(),
+            // Page indicator dots
+            Row(mainAxisSize: MainAxisSize.min, children: List.generate(3, (i) =>
+              GestureDetector(
+                onTap: () => _ctrl.animateToPage(
+                  i,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                ),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  width:  _page == i ? 18 : 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: _page == i
+                        ? scheme.primary
+                        : scheme.primary.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              ),
+            )),
           ]),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
-          // Three tiles side by side
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+          // Swipeable pages
+          SizedBox(
+            height: 72,
+            child: PageView(
+              controller: _ctrl,
+              onPageChanged: (p) => setState(() => _page = p),
               children: [
-
-                // Top artist
-                Expanded(child: _WeekTile(
-                  icon:  Icons.mic_rounded,
-                  label: isEn ? 'Top artist' : 'Artiste top',
-                  value: topArtist != null
-                      ? (topArtist!['name'] ?? '—').toString()
-                      : '—',
-                  plays: topArtist != null
-                      ? int.tryParse((topArtist!['playcount'] ?? '0').toString()) ?? 0
-                      : null,
-                )),
-
-                Container(
-                  width: 1, margin: const EdgeInsets.symmetric(horizontal: 10),
-                  color: scheme.outlineVariant.withValues(alpha: 0.35),
+                _periodRow(
+                  isEn:          isEn,
+                  topArtist:     widget.topArtistWeek,
+                  topTrack:      widget.topTrackWeek,
+                  scrobbles:     widget.thisWeekCount > 0
+                      ? widget.thisWeekCount
+                      : widget.weeklyEst,
+                  isEstimate:    widget.thisWeekCount == 0,
+                  prevScrobbles: widget.lastWeekCount,
                 ),
-
-                // Top track
-                Expanded(child: _WeekTile(
-                  icon:  Icons.music_note_rounded,
-                  label: isEn ? 'Top track' : 'Titre top',
-                  value: topTrack != null
-                      ? (topTrack!['name'] ?? '—').toString()
-                      : '—',
-                  plays: topTrack != null
-                      ? int.tryParse((topTrack!['playcount'] ?? '0').toString()) ?? 0
-                      : null,
-                )),
-
-                Container(
-                  width: 1, margin: const EdgeInsets.symmetric(horizontal: 10),
-                  color: scheme.outlineVariant.withValues(alpha: 0.35),
+                _periodRow(
+                  isEn:          isEn,
+                  topArtist:     widget.topArtistMonth,
+                  topTrack:      widget.topTrackMonth,
+                  scrobbles:     widget.thisMonthCount,
+                  isEstimate:    false,
+                  prevScrobbles: widget.lastMonthCount,
                 ),
-
-                // Scrobbles réels cette semaine (ou estimation si pas encore chargé)
-                Expanded(child: _WeekTile(
-                  icon:    Icons.headphones_rounded,
-                  label:   isEn ? 'This week' : 'Cette semaine',
-                  value:   thisWeekCount > 0
-                      ? _fmt(thisWeekCount)
-                      : '~${_fmt(weeklyEst)}',
-                  plays:   null,
-                  percent: thisWeekCount > 0 && lastWeekCount > 0
-                      ? (thisWeekCount - lastWeekCount) / lastWeekCount * 100
-                      : null,
-                )),
-
+                _periodRow(
+                  isEn:          isEn,
+                  topArtist:     widget.topArtistYear,
+                  topTrack:      widget.topTrackYear,
+                  scrobbles:     widget.thisYearCount,
+                  isEstimate:    false,
+                  prevScrobbles: widget.lastYearCount,
+                ),
               ],
             ),
           ),
@@ -2623,17 +2750,72 @@ class _WeekHighlightStrip extends StatelessWidget {
       ),
     );
   }
+
+  // Builds one page (3 tiles: top artist | top track | scrobbles)
+  Widget _periodRow({
+    required bool isEn,
+    Map?  topArtist,
+    Map?  topTrack,
+    int   scrobbles     = 0,
+    bool  isEstimate    = false,
+    int   prevScrobbles = 0,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+    final double? pct = scrobbles > 0 && prevScrobbles > 0
+        ? (scrobbles - prevScrobbles) / prevScrobbles * 100
+        : null;
+    final countStr = isEstimate ? '~${_fmt(scrobbles)}' : _fmt(scrobbles);
+
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(child: _WeekTile(
+            icon:  Icons.mic_rounded,
+            label: isEn ? 'Top artist' : 'Artiste top',
+            value: topArtist != null ? (topArtist['name'] ?? '—').toString() : '—',
+            plays: topArtist != null
+                ? int.tryParse((topArtist['playcount'] ?? '0').toString()) ?? 0
+                : null,
+          )),
+          Container(
+            width: 1, margin: const EdgeInsets.symmetric(horizontal: 10),
+            color: scheme.outlineVariant.withValues(alpha: 0.35),
+          ),
+          Expanded(child: _WeekTile(
+            icon:  Icons.music_note_rounded,
+            label: isEn ? 'Top track' : 'Titre top',
+            value: topTrack != null ? (topTrack['name'] ?? '—').toString() : '—',
+            plays: topTrack != null
+                ? int.tryParse((topTrack['playcount'] ?? '0').toString()) ?? 0
+                : null,
+          )),
+          Container(
+            width: 1, margin: const EdgeInsets.symmetric(horizontal: 10),
+            color: scheme.outlineVariant.withValues(alpha: 0.35),
+          ),
+          Expanded(child: _WeekTile(
+            icon:    Icons.headphones_rounded,
+            label:   isEn ? 'Scrobbles' : 'Scrobbles',
+            value:   scrobbles > 0 ? countStr : '—',
+            plays:   null,
+            percent: pct,
+          )),
+        ],
+      ),
+    );
+  }
 }
 
 
-// ── Single tile in the week strip ─────────────────────────────────────────────
+// ── Single tile in the highlights strip ──────────────────────────────────────
 
 class _WeekTile extends StatelessWidget {
   final IconData icon;
   final String   label;
   final String   value;
   final int?     plays;
-  final double?  percent; // % vs semaine précédente, null si non disponible
+  final double?  percent;
 
   const _WeekTile({
     required this.icon,
@@ -2658,8 +2840,8 @@ class _WeekTile extends StatelessWidget {
           Text(
             label,
             style: text.labelSmall?.copyWith(
-              color:    scheme.onSurfaceVariant,
-              fontSize: 9,
+              color:      scheme.onSurfaceVariant,
+              fontSize:   9,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -2685,7 +2867,6 @@ class _WeekTile extends StatelessWidget {
             ),
           ),
         ],
-        // Pourcentage vs semaine passée avec icône tendance
         if (percent != null) ...[
           const SizedBox(height: 2),
           Row(mainAxisSize: MainAxisSize.min, children: [
@@ -2783,7 +2964,6 @@ class _RecentTrackRowState extends State<_RecentTrackRow> {
 
     return GestureDetector(
       onTap: () {
-        // Les tracks récents ont artist['#text'], la detail sheet attend artist['name']
         final normalized = Map<String, dynamic>.from(track);
         final ra = track['artist'];
         if (ra is Map && ra['name'] == null) {
@@ -2809,7 +2989,6 @@ class _RecentTrackRowState extends State<_RecentTrackRow> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               child: Row(children: [
 
-                // Artwork
                 _SmartImage(
                   size: 44,
                   borderRadius: 8,
@@ -2820,7 +2999,6 @@ class _RecentTrackRowState extends State<_RecentTrackRow> {
 
                 const SizedBox(width: 12),
 
-                // Track + artist
                 Expanded(child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -2842,7 +3020,6 @@ class _RecentTrackRowState extends State<_RecentTrackRow> {
 
                 const SizedBox(width: 8),
 
-                // Time
                 Text(
                   dateStr,
                   style: text.labelSmall?.copyWith(
