@@ -1,0 +1,35 @@
+name: Deploy Flutter Web to gh-pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Get the repo code
+      - uses: actions/checkout@v4
+
+      # Install Flutter SDK
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      # Get dependencies
+      - run: flutter pub get
+
+      # Build web app, base-href must match the /app/ subfolder
+      - run: flutter build web --release --base-href /LastStats-App/app/
+
+      # Publish only to /app subfolder. keep_files protects the existing /docs folder
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web
+          destination_dir: app
+          keep_files: true
