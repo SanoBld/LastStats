@@ -95,6 +95,15 @@ class ImageService {
     final deezer = await _deezerArtist(artist);
     if (deezer.isNotEmpty) return _persistUrl(key, deezer);
 
+    final audioDb = await _audioDbArtist(artist);
+    if (audioDb.isNotEmpty) return _persistUrl(key, audioDb);
+
+    final mb = await _mbArtistImage(artist);
+    if (mb.isNotEmpty) return _persistUrl(key, mb);
+
+    final wiki = await _wikipediaImage(artist);
+    if (wiki.isNotEmpty) return _persistUrl(key, wiki);
+
     return _persistUrl(key, '');
   }
 
@@ -110,6 +119,9 @@ class ImageService {
 
     final mb = await _mbAlbum(album, artist);
     if (mb.isNotEmpty) return _persistUrl(key, mb);
+
+    final wiki = await _wikipediaImage('$artist $album album');
+    if (wiki.isNotEmpty) return _persistUrl(key, wiki);
 
     return _persistUrl(key, '');
   }
@@ -223,6 +235,82 @@ class ImageService {
       final items = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
       if (items.isEmpty) return '';
       return (items.first['picture_xl'] ?? items.first['picture_big'] ?? '').toString();
+    } catch (_) { return ''; }
+  }
+
+  // TheAudioDB — keyless public test key. No CORS support, so this only
+  // works on native builds (skipped silently on web, caught by try/catch).
+  static Future<String> _audioDbArtist(String artist) async {
+    try {
+      final res = await http
+          .get(Uri.https('www.theaudiodb.com', '/api/v1/json/123/search.php', {'s': artist}))
+          .timeout(_timeout);
+      if (res.statusCode != 200) return '';
+      final artists = (jsonDecode(utf8.decode(res.bodyBytes))['artists'] as List?) ?? [];
+      if (artists.isEmpty) return '';
+      final a = artists.first;
+      return (a['strArtistThumb'] ?? a['strArtistFanart'] ?? '').toString();
+    } catch (_) { return ''; }
+  }
+
+  // MusicBrainz curated "image" relation → resolved to a direct file URL via
+  // Wikimedia Commons. Freely licensed and CORS-safe (works on web too).
+  static Future<String> _mbArtistImage(String artist) async {
+    try {
+      final searchRes = await http.get(
+        Uri.https('musicbrainz.org', '/ws/2/artist/', {
+          'query': 'artist:"$artist"', 'limit': '1', 'fmt': 'json',
+        }),
+        headers: {'User-Agent': 'LastStatsMobile/2.0 (contact@laststats.app)'},
+      ).timeout(_timeout);
+      if (searchRes.statusCode != 200) return '';
+      final found = (jsonDecode(utf8.decode(searchRes.bodyBytes))['artists'] as List?) ?? [];
+      if (found.isEmpty) return '';
+      final mbid = (found.first['id'] ?? '').toString();
+      if (mbid.isEmpty) return '';
+
+      final relRes = await http.get(
+        Uri.https('musicbrainz.org', '/ws/2/artist/$mbid', {'inc': 'url-rels', 'fmt': 'json'}),
+        headers: {'User-Agent': 'LastStatsMobile/2.0 (contact@laststats.app)'},
+      ).timeout(_timeout);
+      if (relRes.statusCode != 200) return '';
+      final rels = (jsonDecode(utf8.decode(relRes.bodyBytes))['relations'] as List?) ?? [];
+      final imgRel = rels.firstWhere((r) => r['type'] == 'image', orElse: () => null);
+      final pageUrl = (imgRel?['url']?['resource'] ?? '').toString();
+      if (pageUrl.isEmpty) return '';
+
+      // pageUrl is a Commons "File:" page — resolve to the actual image URL.
+      final title = Uri.decodeFull(pageUrl.split('/wiki/').last);
+      final fileRes = await http.get(Uri.https('commons.wikimedia.org', '/w/api.php', {
+        'action': 'query', 'titles': title, 'prop': 'imageinfo',
+        'iiprop': 'url', 'format': 'json', 'origin': '*',
+      })).timeout(_timeout);
+      if (fileRes.statusCode != 200) return '';
+      final pages = (jsonDecode(utf8.decode(fileRes.bodyBytes))['query']?['pages'] as Map?) ?? {};
+      for (final p in pages.values) {
+        final info = (p['imageinfo'] as List?) ?? [];
+        if (info.isNotEmpty) return (info.first['url'] ?? '').toString();
+      }
+      return '';
+    } catch (_) { return ''; }
+  }
+
+  // Wikipedia full-text search → page thumbnail. Broad coverage, CORS-safe
+  // (origin=* param) — usable from native and web builds alike.
+  static Future<String> _wikipediaImage(String query) async {
+    try {
+      final res = await http.get(Uri.https('en.wikipedia.org', '/w/api.php', {
+        'action': 'query', 'generator': 'search', 'gsrsearch': query,
+        'gsrlimit': '1', 'prop': 'pageimages', 'piprop': 'thumbnail',
+        'pithumbsize': '600', 'format': 'json', 'origin': '*',
+      })).timeout(_timeout);
+      if (res.statusCode != 200) return '';
+      final pages = (jsonDecode(utf8.decode(res.bodyBytes))['query']?['pages'] as Map?) ?? {};
+      for (final p in pages.values) {
+        final thumb = p['thumbnail']?['source'];
+        if (thumb != null) return thumb.toString();
+      }
+      return '';
     } catch (_) { return ''; }
   }
 
