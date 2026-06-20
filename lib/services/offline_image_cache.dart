@@ -16,6 +16,10 @@ import 'image_cache_backend_stub.dart'
     if (dart.library.io)   'image_cache_backend_native.dart'
     if (dart.library.html) 'image_cache_backend_web.dart';
 
+// Web-only CORS bypass for image display (no-op stub on native).
+import 'web_img_stub.dart'
+    if (dart.library.html) 'web_img_web.dart';
+
 import 'package:http/http.dart' as http;
 
 // ── Entry in the LRU metadata map ────────────────────────────────────────────
@@ -223,6 +227,15 @@ class OfflineImageCache {
     Widget? errorWidget,
   }) {
     if (url.isEmpty) return placeholder ?? const SizedBox.shrink();
+
+    // Web: bypasses CanvasKit/skwasm's CORS requirement by rendering a raw
+    // <img> tag. Returns null (no-op) on native, where Image.network is
+    // unaffected by CORS and works as usual.
+    final webImg = buildCorsBypassImage(url, width: width, height: height, fit: fit);
+    if (webImg != null) {
+      _downloadAndCache(url).ignore(); // best-effort offline cache, may fail on non-CORS hosts
+      return webImg;
+    }
 
     return FutureBuilder<ImageProvider>(
       future: imageProvider(url),
