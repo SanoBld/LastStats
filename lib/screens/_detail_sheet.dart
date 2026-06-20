@@ -1516,6 +1516,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildStatsRow(scheme),
+                      _buildCompareButton(context),
                       if (_isNowPlaying) _buildNowPlayingCard(scheme),
                       if (_topArtists.isNotEmpty) ...[
                         _sectionHeader(L.commonTopArtists, scheme),
@@ -1764,6 +1765,33 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           label: L.activityDays, scheme: scheme,
         )),
       ]),
+    );
+  }
+
+  Widget _buildCompareButton(BuildContext ctx) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: SizedBox(
+        width: double.infinity,
+        child: FilledButton.tonal(
+          onPressed: () => showTasteCompareSheet(ctx, widget.username, widget.service),
+          style: FilledButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.graphic_eq_rounded, size: 16),
+              const SizedBox(width: 8),
+              Text(
+                _ct('Comparer les goûts musicaux', 'Compare Music Taste'),
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
