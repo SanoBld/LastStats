@@ -39,6 +39,9 @@ typedef _TasteAnalysis = ({
   List<_SharedMatch> sharedTracks,
   List<_SharedMatch> sharedAlbums,
   String dataLabel,
+  int totalSharedArtists,
+  int totalSharedTracks,
+  int totalSharedAlbums,
 });
 
 // ── Weight helpers ────────────────────────────────────────────────────────────
@@ -57,16 +60,24 @@ Map<String, double> _rankWeights(List<dynamic> items, String Function(dynamic) k
   return {for (var i = 0; i < n; i++) key(items[i]): 1.0 - (i / n)};
 }
 
-// Weighted Jaccard: sum(min) / sum(max) over the union of keys.
-double _weightedJaccard(Map<String, double> a, Map<String, double> b) {
-  double num = 0, den = 0;
-  for (final k in {...a.keys, ...b.keys}) {
-    final wa = a[k] ?? 0.0;
-    final wb = b[k] ?? 0.0;
-    num += wa < wb ? wa : wb;
-    den += wa > wb ? wa : wb;
+// Overlap score: avg recall from each side, then x*(2-x) curve.
+// 50% shared artists → ~75%, 25% → ~44%. More intuitive than Jaccard.
+double _overlapScore(Map<String, double> a, Map<String, double> b) {
+  if (a.isEmpty || b.isEmpty) return 0.0;
+  double shared = 0, sumA = 0, sumB = 0;
+  for (final wa in a.values) sumA += wa;
+  for (final wb in b.values) sumB += wb;
+  for (final k in a.keys) {
+    final wb = b[k];
+    if (wb != null) {
+      final wa = a[k]!;
+      shared += wa < wb ? wa : wb;
+    }
   }
-  return den == 0 ? 0.0 : (num / den).clamp(0.0, 1.0);
+  final recA = sumA > 0 ? (shared / sumA).clamp(0.0, 1.0) : 0.0;
+  final recB = sumB > 0 ? (shared / sumB).clamp(0.0, 1.0) : 0.0;
+  final raw  = (recA + recB) / 2.0;
+  return raw * (2.0 - raw);
 }
 
 // ── Compatibility logic ────────────────────────────────────────────────────────
@@ -98,9 +109,9 @@ _TasteAnalysis _analyzeTaste({
 
   // Score: artists carry the most long-term signal.
   final score = (
-    _weightedJaccard(myArtistW, theirArtistW) * 0.55 +
-    _weightedJaccard(myTrackW,  theirTrackW)  * 0.25 +
-    _weightedJaccard(myAlbumW,  theirAlbumW)  * 0.20
+    _overlapScore(myArtistW, theirArtistW) * 0.55 +
+    _overlapScore(myTrackW,  theirTrackW)  * 0.25 +
+    _overlapScore(myAlbumW,  theirAlbumW)  * 0.20
   ).clamp(0.0, 1.0);
 
   // Top match: prefer a shared track (most specific), fall back to artist.
@@ -156,7 +167,8 @@ _TasteAnalysis _analyzeTaste({
     rawTracks.add((my * (theirTrackW[k] ?? 0), t));
   }
   rawTracks.sort((a, b) => b.$1.compareTo(a.$1));
-  final sharedTracks = rawTracks.take(8).map((c) {
+  final totalSharedTracks = rawTracks.length + (topMatchTrackKey != null ? 1 : 0);
+  final sharedTracks = rawTracks.take(12).map((c) {
     final t = c.$2;
     return _SharedMatch(
       type:     'track',
@@ -176,7 +188,8 @@ _TasteAnalysis _analyzeTaste({
     rawArtists.add((my * (theirArtistW[k] ?? 0), a));
   }
   rawArtists.sort((a, b) => b.$1.compareTo(a.$1));
-  final sharedArtists = rawArtists.take(16).map((c) {
+  final totalSharedArtists = rawArtists.length + (topMatchArtistKey != null ? 1 : 0);
+  final sharedArtists = rawArtists.take(20).map((c) {
     final a = c.$2;
     return _SharedMatch(
       type:     'artist',
@@ -195,7 +208,8 @@ _TasteAnalysis _analyzeTaste({
     rawAlbums.add((my * (theirAlbumW[k] ?? 0), a));
   }
   rawAlbums.sort((a, b) => b.$1.compareTo(a.$1));
-  final sharedAlbums = rawAlbums.take(8).map((c) {
+  final totalSharedAlbums = rawAlbums.length;
+  final sharedAlbums = rawAlbums.take(12).map((c) {
     final a = c.$2;
     return _SharedMatch(
       type:     'album',
@@ -206,12 +220,15 @@ _TasteAnalysis _analyzeTaste({
   }).toList();
 
   return (
-    score:         score,
-    topMatch:      topMatch,
-    sharedArtists: sharedArtists,
-    sharedTracks:  sharedTracks,
-    sharedAlbums:  sharedAlbums,
-    dataLabel:     dataLabel,
+    score:               score,
+    topMatch:            topMatch,
+    sharedArtists:       sharedArtists,
+    sharedTracks:        sharedTracks,
+    sharedAlbums:        sharedAlbums,
+    dataLabel:           dataLabel,
+    totalSharedArtists:  totalSharedArtists,
+    totalSharedTracks:   totalSharedTracks,
+    totalSharedAlbums:   totalSharedAlbums,
   );
 }
 
@@ -252,6 +269,9 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
   List<_SharedMatch> _sharedTracks  = [];
   List<_SharedMatch> _sharedAlbums  = [];
   String             _dataLabel     = '';
+  int                _totalArtists  = 0;
+  int                _totalTracks   = 0;
+  int                _totalAlbums   = 0;
 
   @override
   void initState() {
@@ -297,10 +317,14 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
       var myTrackW  = hasCached ? _countWeights(trackCounts)  : <String, double>{};
       var myAlbumW  = hasCached ? _countWeights(albumCounts)  : <String, double>{};
 
+      // Bug fix: if cache exists but records have no artist metadata (v1 format),
+      // myArtistW will be empty. Fall back to API in that case.
+      final hasMeaningfulData = myArtistW.isNotEmpty;
+
       // ── API fetches ───────────────────────────────────────────────────────
       // Always: my avatar + their avatar.
       // Not-self: their top 200 artists/tracks/albums.
-      // No cache: my top 200 from API as fallback.
+      // No meaningful cache: my top 200 from API as fallback.
       final futs = <Future>[
         widget.service.getUserInfo(user: _myUsername),
         widget.service.getUserInfo(user: widget.targetUser),
@@ -309,13 +333,13 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
           widget.service.getTopTracks( user: widget.targetUser, period: 'overall', limit: 200),
           widget.service.getTopAlbums( user: widget.targetUser, period: 'overall', limit: 200),
         ],
-        if (!hasCached && !isSelf) ...[
+        if (!hasMeaningfulData && !isSelf) ...[
           widget.service.getTopArtists(user: _myUsername, period: 'overall', limit: 200),
           widget.service.getTopTracks( user: _myUsername, period: 'overall', limit: 200),
           widget.service.getTopAlbums( user: _myUsername, period: 'overall', limit: 200),
         ],
         // isSelf with no cache: fetch a few for display
-        if (isSelf && !hasCached) ...[
+        if (isSelf && !hasMeaningfulData) ...[
           widget.service.getTopArtists(user: _myUsername, period: 'overall', limit: 16),
           widget.service.getTopTracks( user: _myUsername, period: 'overall', limit: 1),
         ],
@@ -331,7 +355,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
       final theirTracks  = !isSelf ? res[i++] as List<dynamic> : <dynamic>[];
       final theirAlbums  = !isSelf ? res[i++] as List<dynamic> : <dynamic>[];
 
-      if (!hasCached && !isSelf) {
+      if (!hasMeaningfulData && !isSelf) {
         final myArtistsFb = res[i++] as List<dynamic>;
         final myTracksFb  = res[i++] as List<dynamic>;
         final myAlbumsFb  = res[i++] as List<dynamic>;
@@ -351,7 +375,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
         List<_SharedMatch> selfArtists = [];
         _SharedMatch? selfTrack;
 
-        if (hasCached) {
+        if (hasMeaningfulData) {
           final sorted = artistCounts.entries.toList()
             ..sort((a, b) => b.value.compareTo(a.value));
           selfArtists = sorted.take(16).map((e) => _SharedMatch(
@@ -391,7 +415,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
 
       // ── Data source label ─────────────────────────────────────────────────
       final uniqueArtists = myArtistW.length;
-      final dataLabel = hasCached
+      final dataLabel = hasMeaningfulData
           ? _ct(
               '$uniqueArtists artistes de votre historique · top 200 de ${widget.targetUser}',
               '$uniqueArtists artists from your history · ${widget.targetUser}\'s top 200',
@@ -421,6 +445,9 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
         _sharedTracks  = analysis.sharedTracks;
         _sharedAlbums  = analysis.sharedAlbums;
         _dataLabel     = analysis.dataLabel;
+        _totalArtists  = analysis.totalSharedArtists;
+        _totalTracks   = analysis.totalSharedTracks;
+        _totalAlbums   = analysis.totalSharedAlbums;
         _loading       = false;
       });
     } catch (_) {
@@ -522,9 +549,42 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
             ),
           ),
         ),
-        const SizedBox(height: 26),
+        const SizedBox(height: 12),
 
-        // Top match card
+        // Shared counts summary row
+        if (_totalArtists > 0 || _totalTracks > 0 || _totalAlbums > 0)
+          _FadeSlideIn(
+            delay: const Duration(milliseconds: 140),
+            child: Center(
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                alignment: WrapAlignment.center,
+                children: [
+                  if (_totalArtists > 0) _CountPill(
+                    icon: Icons.mic_rounded,
+                    label: _ct('$_totalArtists artiste${_totalArtists > 1 ? "s" : ""}',
+                               '$_totalArtists artist${_totalArtists > 1 ? "s" : ""}'),
+                    scheme: scheme, text: text,
+                  ),
+                  if (_totalTracks > 0) _CountPill(
+                    icon: Icons.music_note_rounded,
+                    label: _ct('$_totalTracks titre${_totalTracks > 1 ? "s" : ""}',
+                               '$_totalTracks track${_totalTracks > 1 ? "s" : ""}'),
+                    scheme: scheme, text: text,
+                  ),
+                  if (_totalAlbums > 0) _CountPill(
+                    icon: Icons.album_rounded,
+                    label: _ct('$_totalAlbums album${_totalAlbums > 1 ? "s" : ""}',
+                               '$_totalAlbums album${_totalAlbums > 1 ? "s" : ""}'),
+                    scheme: scheme, text: text,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+        const SizedBox(height: 20),
         if (_topMatch != null) ...[
           _FadeSlideIn(
             delay: const Duration(milliseconds: 160),
@@ -538,7 +598,9 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
           _FadeSlideIn(
             delay: const Duration(milliseconds: 200),
             child: _SharedSection(
-              label: _ct('Titres en commun', 'Shared tracks'),
+              label: _totalTracks > _sharedTracks.length
+                  ? _ct('Titres en commun ($_totalTracks)', 'Shared tracks ($_totalTracks)')
+                  : _ct('Titres en commun', 'Shared tracks'),
               icon: Icons.music_note_rounded,
               matches: _sharedTracks,
               scheme: scheme,
@@ -552,7 +614,9 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
         _FadeSlideIn(
           delay: const Duration(milliseconds: 240),
           child: _SharedSection(
-            label: _ct('Artistes en commun', 'Shared artists'),
+            label: _totalArtists > _sharedArtists.length
+                ? _ct('Artistes en commun ($_totalArtists)', 'Shared artists ($_totalArtists)')
+                : _ct('Artistes en commun', 'Shared artists'),
             icon: Icons.mic_rounded,
             matches: _sharedArtists,
             emptyText: _ct('Aucun artiste en commun trouvé.', 'No shared artists found.'),
@@ -567,7 +631,9 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
           _FadeSlideIn(
             delay: const Duration(milliseconds: 280),
             child: _SharedSection(
-              label: _ct('Albums en commun', 'Shared albums'),
+              label: _totalAlbums > _sharedAlbums.length
+                  ? _ct('Albums en commun ($_totalAlbums)', 'Shared albums ($_totalAlbums)')
+                  : _ct('Albums en commun', 'Shared albums'),
               icon: Icons.album_rounded,
               matches: _sharedAlbums,
               scheme: scheme,
@@ -890,6 +956,47 @@ class _TasteChip extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: text.labelMedium?.copyWith(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Small pill showing a shared count (artists / tracks / albums) ─────────────
+
+class _CountPill extends StatelessWidget {
+  final IconData    icon;
+  final String      label;
+  final ColorScheme scheme;
+  final TextTheme   text;
+
+  const _CountPill({
+    required this.icon,
+    required this.label,
+    required this.scheme,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color:        scheme.secondaryContainer,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: scheme.onSecondaryContainer),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: text.labelSmall?.copyWith(
+              color:      scheme.onSecondaryContainer,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],
