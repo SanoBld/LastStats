@@ -4,8 +4,13 @@
 //
 //  Layout modes (controlled by pcModeNotifier in app_state.dart):
 //    'auto'  → NavigationRail when width ≥ 720 dp, BottomBar otherwise
-//    'on'    → always NavigationRail (side rail, extended above 1200 dp)
+//    'on'    → always NavigationRail (side rail)
 //    'off'   → always bottom NavigationBar
+//
+//  Wide layout extras:
+//    • Rail is collapsible: icons-only (56 dp) ↔ icons+labels (200 dp)
+//    • Settings is a proper tab (#5) instead of a pushed route
+//    • Rail destinations are scrollable when they overflow
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'dart:async';
@@ -34,7 +39,7 @@ import '../services/lyrics_service.dart';
 
 // ── Settings sub-pages ────────────────────────────────────────────────────────
 import 'settings/appearance_page.dart';
-import 'settings/notifications_page.dart';      // notification preferences
+import 'settings/notifications_page.dart';
 import 'settings/dashboard_settings_page.dart';
 import 'settings/startup_page.dart';
 import 'settings/language_page.dart';
@@ -57,10 +62,15 @@ part '_taste_compare_sheet.dart';
 
 
 // ── Breakpoints ───────────────────────────────────────────────────────────────
-/// Minimum width (dp) to automatically activate the side-rail layout.
-const double _kWideBreakpoint     = 720.0;
-/// Minimum width (dp) to expand the rail and show destination labels inline.
-const double _kExtendedBreakpoint = 1200.0;
+const double _kWideBreakpoint = 720.0;
+
+// ── Tab indices ───────────────────────────────────────────────────────────────
+const int _kTabDashboard = 0;
+const int _kTabSearch    = 1;
+const int _kTabRankings  = 2;
+const int _kTabCharts    = 3;
+const int _kTabHistory   = 4;
+const int _kTabSettings  = 5; // wide mode only
 
 
 /// Returns localised (key, label) pairs for period filter chips.
@@ -73,10 +83,8 @@ List<(String, String)> _localizedPeriods() => [
   ('overall', L.periodOverall),
 ];
 
-// ── Month abbreviations (from L, for shared_widgets) ─────────────────────────
 List<String> get _kMonths => L.months;
 
-// ── Card border helper ────────────────────────────────────────────────────────
 BorderSide _cardBorder(ColorScheme s, {double alpha = 0.45}) =>
     BorderSide(color: s.outlineVariant.withValues(alpha: alpha), width: 1);
 
@@ -104,18 +112,20 @@ class _HomeScreenState extends State<HomeScreen> {
   late int _idx;
   late final LastFmService _service;
 
+  /// Whether the side rail is collapsed (icons only).
+  bool _railCollapsed = false;
+
   @override
   void initState() {
     super.initState();
-    _idx     = widget.startupTab.clamp(0, 4);
+    _idx     = widget.startupTab.clamp(0, _kTabHistory);
     _service = LastFmService(apiKey: widget.apiKey, username: widget.username);
 
     localeNotifier.addListener(_onLocaleChange);
-    pcModeNotifier.addListener(_onLocaleChange); // reacts to layout changes
+    pcModeNotifier.addListener(_onLocaleChange);
 
     DataCache.init().then((_) {
       PrefetchService.prefetchAll(_service);
-
       if (AllScrobblesService.isFirstLoad) {
         AllScrobblesService.loadAll(_service);
       } else {
@@ -135,74 +145,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ── Layout decision ─────────────────────────────────────────────────────────
 
-  /// Returns true when the wide (side-rail) layout should be used.
   bool _useWideLayout(BuildContext context) {
-    final mode  = pcModeNotifier.value;
+    final mode = pcModeNotifier.value;
     if (mode == 'on')  return true;
     if (mode == 'off') return false;
-    // 'auto' → screen-width based
     return MediaQuery.of(context).size.width >= _kWideBreakpoint;
   }
 
-  // ── Navigation destinations (shared by both layouts) ───────────────────────
-
-  List<NavigationDestination> get _navDestinations => [
-    NavigationDestination(
-      icon:         const Icon(Icons.dashboard_outlined),
-      selectedIcon: const Icon(Icons.dashboard_rounded),
-      label: L.navDashboard,
-    ),
-    NavigationDestination(
-      icon:         const Icon(Icons.search_outlined),
-      selectedIcon: const Icon(Icons.search_rounded),
-      label: L.navSearch,
-    ),
-    NavigationDestination(
-      icon:         const Icon(Icons.emoji_events_outlined),
-      selectedIcon: const Icon(Icons.emoji_events_rounded),
-      label: L.navRankings,
-    ),
-    NavigationDestination(
-      icon:         const Icon(Icons.auto_graph_outlined),
-      selectedIcon: const Icon(Icons.auto_graph_rounded),
-      label: L.navCharts,
-    ),
-    NavigationDestination(
-      icon:         const Icon(Icons.history_outlined),
-      selectedIcon: const Icon(Icons.history_rounded),
-      label: L.navHistory,
-    ),
-  ];
-
-  List<NavigationRailDestination> get _railDestinations => [
-    NavigationRailDestination(
-      icon:         const Icon(Icons.dashboard_outlined),
-      selectedIcon: const Icon(Icons.dashboard_rounded),
-      label: Text(L.navDashboard),
-    ),
-    NavigationRailDestination(
-      icon:         const Icon(Icons.search_outlined),
-      selectedIcon: const Icon(Icons.search_rounded),
-      label: Text(L.navSearch),
-    ),
-    NavigationRailDestination(
-      icon:         const Icon(Icons.emoji_events_outlined),
-      selectedIcon: const Icon(Icons.emoji_events_rounded),
-      label: Text(L.navRankings),
-    ),
-    NavigationRailDestination(
-      icon:         const Icon(Icons.auto_graph_outlined),
-      selectedIcon: const Icon(Icons.auto_graph_rounded),
-      label: Text(L.navCharts),
-    ),
-    NavigationRailDestination(
-      icon:         const Icon(Icons.history_outlined),
-      selectedIcon: const Icon(Icons.history_rounded),
-      label: Text(L.navHistory),
-    ),
-  ];
-
-  // ── Page stack (kept alive via AnimatedOpacity + IgnorePointer) ────────────
+  // ── Pages (index 5 = Settings, only shown in wide mode) ────────────────────
 
   List<Widget> _buildPages() => [
     _DashboardPage(service: _service, username: widget.username),
@@ -210,13 +160,12 @@ class _HomeScreenState extends State<HomeScreen> {
     _RankingsPage(service: _service),
     _ChartsPage(service: _service),
     _HistoryPage(service: _service),
+    _SettingsPage(username: widget.username), // index 5 – wide only
   ];
 
-  /// Every page stays in the tree (preserving state/scroll/data).
-  /// Only the selected one is visible via AnimatedOpacity.
-  Widget _pageStack(List<Widget> pages) {
+  Widget _pageStack(List<Widget> pages, int count) {
     return Stack(
-      children: List.generate(pages.length, (i) => IgnorePointer(
+      children: List.generate(count, (i) => IgnorePointer(
         ignoring: _idx != i,
         child: AnimatedOpacity(
           opacity: _idx == i ? 1.0 : 0.0,
@@ -228,99 +177,157 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ── Narrow layout (bottom NavigationBar) ───────────────────────────────────
+  // ── Narrow layout ───────────────────────────────────────────────────────────
+
+  List<NavigationDestination> get _narrowDestinations => [
+    NavigationDestination(
+      icon: const Icon(Icons.dashboard_outlined),
+      selectedIcon: const Icon(Icons.dashboard_rounded),
+      label: L.navDashboard,
+    ),
+    NavigationDestination(
+      icon: const Icon(Icons.search_outlined),
+      selectedIcon: const Icon(Icons.search_rounded),
+      label: L.navSearch,
+    ),
+    NavigationDestination(
+      icon: const Icon(Icons.emoji_events_outlined),
+      selectedIcon: const Icon(Icons.emoji_events_rounded),
+      label: L.navRankings,
+    ),
+    NavigationDestination(
+      icon: const Icon(Icons.auto_graph_outlined),
+      selectedIcon: const Icon(Icons.auto_graph_rounded),
+      label: L.navCharts,
+    ),
+    NavigationDestination(
+      icon: const Icon(Icons.history_outlined),
+      selectedIcon: const Icon(Icons.history_rounded),
+      label: L.navHistory,
+    ),
+  ];
 
   Widget _buildNarrowLayout(List<Widget> pages) {
+    // Clamp index to 0-4 if it was on settings in wide mode
+    final narrowIdx = _idx.clamp(0, _kTabHistory);
+    if (_idx != narrowIdx) _idx = narrowIdx;
+
     return Scaffold(
-      body: _pageStack(pages),
+      body: _pageStack(pages, _kTabHistory + 1),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _idx,
         onDestinationSelected: (i) => setState(() => _idx = i),
-        destinations: _navDestinations,
+        destinations: _narrowDestinations,
       ),
     );
   }
 
-  // ── Open settings page ────────────────────────────────────────────────────
+  // ── Wide layout ─────────────────────────────────────────────────────────────
 
-  Future<void> _openSettings(BuildContext context) async {
-    await Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => Scaffold(
-        appBar: AppBar(title: Text(L.navSettings), scrolledUnderElevation: 0),
-        body: _SettingsPage(username: widget.username),
-      ),
-    ));
-  }
-
-  // ── Wide layout (side NavigationRail) ──────────────────────────────────────
+  /// All rail destinations including Settings at position 5.
+  List<NavigationRailDestination> get _wideDestinations => [
+    NavigationRailDestination(
+      icon: const Icon(Icons.dashboard_outlined),
+      selectedIcon: const Icon(Icons.dashboard_rounded),
+      label: Text(L.navDashboard),
+    ),
+    NavigationRailDestination(
+      icon: const Icon(Icons.search_outlined),
+      selectedIcon: const Icon(Icons.search_rounded),
+      label: Text(L.navSearch),
+    ),
+    NavigationRailDestination(
+      icon: const Icon(Icons.emoji_events_outlined),
+      selectedIcon: const Icon(Icons.emoji_events_rounded),
+      label: Text(L.navRankings),
+    ),
+    NavigationRailDestination(
+      icon: const Icon(Icons.auto_graph_outlined),
+      selectedIcon: const Icon(Icons.auto_graph_rounded),
+      label: Text(L.navCharts),
+    ),
+    NavigationRailDestination(
+      icon: const Icon(Icons.history_outlined),
+      selectedIcon: const Icon(Icons.history_rounded),
+      label: Text(L.navHistory),
+    ),
+    NavigationRailDestination(
+      icon: const Icon(Icons.settings_outlined),
+      selectedIcon: const Icon(Icons.settings_rounded),
+      label: Text(L.navSettings),
+    ),
+  ];
 
   Widget _buildWideLayout(BuildContext context, List<Widget> pages) {
-    final scheme   = Theme.of(context).colorScheme;
-    final width    = MediaQuery.of(context).size.width;
-    final extended = width >= _kExtendedBreakpoint;
+    final scheme    = Theme.of(context).colorScheme;
+    final text      = Theme.of(context).textTheme;
+    final collapsed = _railCollapsed;
+    final railWidth = collapsed ? 56.0 : 200.0;
 
     return Scaffold(
       body: SafeArea(
         child: Row(
           children: [
-            // ── Side rail ─────────────────────────────────────────────────
-            // Wrap in Column so the settings button stays pinned at the bottom
+            // ── Side rail ────────────────────────────────────────────────
             SizedBox(
-              width: extended ? 200 : 72,
+              width: railWidth,
               child: Column(
                 children: [
-                  Expanded(
-                    child: NavigationRail(
-                      selectedIndex:         _idx,
-                      onDestinationSelected: (i) => setState(() => _idx = i),
-                      extended: extended,
-                      labelType: extended
-                          ? NavigationRailLabelType.none
-                          : NavigationRailLabelType.all,
-                      minWidth:         72,
-                      minExtendedWidth: 200,
-                      leading: extended
-                          ? Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                              child: Row(children: [
-                                Icon(Icons.equalizer_rounded,
-                                    color: scheme.primary, size: 22),
-                                const SizedBox(width: 10),
-                                Text('LastStats',
-                                    style: TextStyle(
-                                      color:         scheme.primary,
-                                      fontSize:      16,
-                                      fontWeight:    FontWeight.w800,
-                                      letterSpacing: 0.2,
-                                    )),
-                              ]),
-                            )
-                          : Padding(
-                              padding: const EdgeInsets.only(top: 12, bottom: 4),
-                              child: Icon(Icons.equalizer_rounded,
+                  // Logo / app name header
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: collapsed
+                        ? Icon(Icons.equalizer_rounded,
+                              color: scheme.primary, size: 22)
+                        : Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Row(children: [
+                              Icon(Icons.equalizer_rounded,
                                   color: scheme.primary, size: 22),
-                            ),
-                      destinations: _railDestinations,
+                              const SizedBox(width: 10),
+                              Text(
+                                'LastStats',
+                                style: text.titleMedium?.copyWith(
+                                  color:      scheme.primary,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ]),
+                          ),
+                  ),
+
+                  // Scrollable destinations
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: IntrinsicHeight(
+                        child: NavigationRail(
+                          selectedIndex:         _idx,
+                          onDestinationSelected: (i) => setState(() => _idx = i),
+                          extended:              !collapsed,
+                          labelType: collapsed
+                              ? NavigationRailLabelType.none
+                              : NavigationRailLabelType.none, // labels inline when extended
+                          minWidth:         56,
+                          minExtendedWidth: 200,
+                          destinations:    _wideDestinations,
+                        ),
+                      ),
                     ),
                   ),
-                  // Settings button pinned at the bottom
+
+                  // Collapse / expand toggle
                   Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: extended
-                        ? ListTile(
-                            leading: const Icon(Icons.settings_outlined),
-                            title: Text(L.navSettings),
-                            onTap: () => _openSettings(context),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
-                            contentPadding:
-                                const EdgeInsets.symmetric(horizontal: 16),
-                          )
-                        : IconButton(
-                            icon: const Icon(Icons.settings_outlined),
-                            tooltip: L.navSettings,
-                            onPressed: () => _openSettings(context),
-                          ),
+                    child: IconButton(
+                      icon: Icon(
+                        collapsed
+                            ? Icons.chevron_right_rounded
+                            : Icons.chevron_left_rounded,
+                      ),
+                      tooltip: collapsed ? 'Expand rail' : 'Collapse rail',
+                      onPressed: () =>
+                          setState(() => _railCollapsed = !_railCollapsed),
+                    ),
                   ),
                 ],
               ),
@@ -334,7 +341,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
 
             // ── Content area ─────────────────────────────────────────────
-            Expanded(child: _pageStack(pages)),
+            Expanded(child: _pageStack(pages, pages.length)),
           ],
         ),
       ),
