@@ -53,6 +53,7 @@ part '_charts_page.dart';
 part '_history_page.dart';
 part '_settings_page.dart';
 part '_shared_widgets.dart';
+part '_taste_compare_sheet.dart';
 
 
 // ── Breakpoints ───────────────────────────────────────────────────────────────
