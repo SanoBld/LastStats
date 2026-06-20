@@ -82,6 +82,15 @@
 }) {
   if (url.isEmpty) return placeholder ?? const SizedBox.shrink();
 
+  &#47;&#47; Web: bypasses CanvasKit&#47;skwasm&#39;s CORS requirement by rendering a raw
+  &#47;&#47; &lt;img&gt; tag. Returns null (no-op) on native, where Image.network is
+  &#47;&#47; unaffected by CORS and works as usual.
+  final webImg = buildCorsBypassImage(url, width: width, height: height, fit: fit);
+  if (webImg != null) {
+    _downloadAndCache(url).ignore(); &#47;&#47; best-effort offline cache, may fail on non-CORS hosts
+    return webImg;
+  }
+
   return FutureBuilder&lt;ImageProvider&gt;(
     future: imageProvider(url),
     builder: (context, snap) {
