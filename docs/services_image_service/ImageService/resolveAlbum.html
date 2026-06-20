@@ -79,6 +79,12 @@
   final itunes = await _itunesSearch(&#39;$artist $album&#39;, &#39;album&#39;);
   if (itunes.isNotEmpty) return _persistUrl(key, itunes);
 
+  final deezer = await _deezerAlbum(album, artist);
+  if (deezer.isNotEmpty) return _persistUrl(key, deezer);
+
+  final audioDb = await _audioDbAlbum(album, artist);
+  if (audioDb.isNotEmpty) return _persistUrl(key, audioDb);
+
   final mb = await _mbAlbum(album, artist);
   if (mb.isNotEmpty) return _persistUrl(key, mb);
 
