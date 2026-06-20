@@ -2290,7 +2290,7 @@ class _HeroStatCard extends StatelessWidget {
               ),
               _VertDivider(color: scheme.onPrimaryContainer),
               _MiniMetric(
-                icon: Icons.calendar_view_week_rounded,
+                icon: Icons.date_range_rounded,
                 label: L.dashPerWeek,
                 color: scheme.onPrimaryContainer,
                 rawInt: weekly, prefix: '~',
@@ -2365,7 +2365,7 @@ class _MiniMetric extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text       = Theme.of(context).textTheme;
-    final valueStyle = text.bodyMedium?.copyWith(
+    final valueStyle = text.bodyLarge?.copyWith(
         fontWeight: FontWeight.w800, color: color);
 
     return Column(mainAxisSize: MainAxisSize.min, children: [
@@ -2385,7 +2385,7 @@ class _MiniMetric extends StatelessWidget {
       const SizedBox(height: 2),
       Text(label,
           style: text.labelSmall?.copyWith(
-              color: color.withValues(alpha: 0.6), fontSize: 9)),
+              color: color.withValues(alpha: 0.6), fontSize: 10)),
     ]);
   }
 }
@@ -2712,7 +2712,7 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
 
           // Swipeable pages
           SizedBox(
-            height: 88,
+            height: 100,
             child: PageView(
               controller: _ctrl,
               onPageChanged: (p) => setState(() => _page = p),
@@ -2831,10 +2831,11 @@ class _WeekTile extends StatelessWidget {
     final text   = Theme.of(context).textTheme;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Row(children: [
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Icon(icon, size: 13, color: scheme.primary),
           const SizedBox(width: 4),
           Text(
@@ -2846,33 +2847,35 @@ class _WeekTile extends StatelessWidget {
             ),
           ),
         ]),
-        const SizedBox(height: 5),
+        const SizedBox(height: 6),
         Text(
           value,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: text.bodyMedium?.copyWith(
+          textAlign: TextAlign.center,
+          style: text.bodyLarge?.copyWith(
             fontWeight: FontWeight.w800,
             color: scheme.onSurface,
             height: 1.2,
           ),
         ),
         if (plays != null && plays! > 0) ...[
-          const SizedBox(height: 2),
+          const SizedBox(height: 3),
           Text(
             '${_fmt(plays!)} ${L.commonPlays}',
+            textAlign: TextAlign.center,
             style: text.labelSmall?.copyWith(
               color:    scheme.onSurfaceVariant,
-              fontSize: 10,
+              fontSize: 11,
             ),
           ),
         ],
         if (percent != null) ...[
-          const SizedBox(height: 2),
-          Row(mainAxisSize: MainAxisSize.min, children: [
+          const SizedBox(height: 3),
+          Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
             Icon(
               percent! >= 0 ? Icons.trending_up_rounded : Icons.trending_down_rounded,
-              size:  10,
+              size:  12,
               color: percent! >= 0 ? Colors.green.shade400 : Colors.red.shade400,
             ),
             const SizedBox(width: 2),
@@ -2880,7 +2883,7 @@ class _WeekTile extends StatelessWidget {
               '${percent! >= 0 ? '+' : ''}${percent!.round()}%',
               style: text.labelSmall?.copyWith(
                 color:      percent! >= 0 ? Colors.green.shade400 : Colors.red.shade400,
-                fontSize:   9,
+                fontSize:   11,
                 fontWeight: FontWeight.w700,
               ),
             ),
