@@ -704,6 +704,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
         match:         match,
         myUsername:    _myUsername,
         theirUsername: widget.targetUser,
+        service:       widget.service,
       ),
     );
   }
@@ -850,21 +851,12 @@ class _RankedListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasImage = match.imageUrl.isNotEmpty && !match.imageUrl.contains(_ph);
     final isArtist = match.type == 'artist';
     final fallbackIcon = switch (match.type) {
       'track' => Icons.music_note_rounded,
       'album' => Icons.album_rounded,
       _       => Icons.mic_rounded,
     };
-
-    final avatar = hasImage
-        ? Image.network(match.imageUrl, fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => Icon(fallbackIcon, size: 18, color: scheme.onSurfaceVariant))
-        : Container(
-            color: scheme.surfaceContainerHighest,
-            child: Icon(fallbackIcon, size: 18, color: scheme.onSurfaceVariant),
-          );
 
     return InkWell(
       borderRadius: BorderRadius.circular(12),
@@ -885,7 +877,10 @@ class _RankedListTile extends StatelessWidget {
             const SizedBox(width: 8),
             ClipRRect(
               borderRadius: BorderRadius.circular(isArtist ? 20 : 8),
-              child: SizedBox(width: 40, height: 40, child: avatar),
+              child: SizedBox(
+                width: 40, height: 40,
+                child: _ResolvedImage(match: match, fallbackIcon: fallbackIcon, iconSize: 18),
+              ),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -917,24 +912,79 @@ class _RankedListTile extends StatelessWidget {
   }
 }
 
+// ── Resolves real art via ImageService — Last.fm rarely has artist/track art ────
+
+class _ResolvedImage extends StatelessWidget {
+  final _SharedMatch match;
+  final IconData     fallbackIcon;
+  final double       iconSize;
+
+  const _ResolvedImage({
+    required this.match,
+    required this.fallbackIcon,
+    required this.iconSize,
+  });
+
+  Future<String> _resolve() {
+    final hint = match.imageUrl.isNotEmpty ? match.imageUrl : null;
+    return switch (match.type) {
+      'artist' => ImageService.resolveArtist(match.name, lastfmUrl: hint),
+      'album'  => ImageService.resolveAlbum(match.name, match.artist, lastfmUrl: hint),
+      _        => ImageService.resolveTrack(match.name, match.artist, lastfmUrl: hint),
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    Widget fallback() => Container(
+      color: scheme.surfaceContainerHighest,
+      child: Icon(fallbackIcon, size: iconSize, color: scheme.onSurfaceVariant),
+    );
+
+    return FutureBuilder<String>(
+      future: _resolve(),
+      builder: (context, snap) {
+        final url = snap.data ?? '';
+        if (url.isEmpty) return fallback();
+        return Image.network(url, fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => fallback());
+      },
+    );
+  }
+}
+
 // ── Item comparison detail sheet (my plays vs their plays) ──────────────────────
 
 class _ItemCompareSheet extends StatelessWidget {
-  final _SharedMatch match;
-  final String       myUsername;
-  final String       theirUsername;
+  final _SharedMatch   match;
+  final String         myUsername;
+  final String         theirUsername;
+  final LastFmService  service;
 
   const _ItemCompareSheet({
     required this.match,
     required this.myUsername,
     required this.theirUsername,
+    required this.service,
   });
+
+  // Maps our internal singular type to the app's plural detail-sheet type.
+  String get _detailType => switch (match.type) {
+    'artist' => 'artists',
+    'album'  => 'albums',
+    _        => 'tracks',
+  };
+
+  Map<String, dynamic> get _asLastFmItem => {
+    'name': match.name,
+    if (match.artist.isNotEmpty) 'artist': {'name': match.artist},
+  };
 
   @override
   Widget build(BuildContext context) {
     final scheme   = Theme.of(context).colorScheme;
     final text     = Theme.of(context).textTheme;
-    final hasImage = match.imageUrl.isNotEmpty && !match.imageUrl.contains(_ph);
     final isArtist = match.type == 'artist';
     final fallbackIcon = switch (match.type) {
       'track' => Icons.music_note_rounded,
@@ -950,32 +1000,49 @@ class _ItemCompareSheet extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(isArtist ? 48 : 16),
-              child: SizedBox(
-                width: 88, height: 88,
-                child: hasImage
-                    ? Image.network(match.imageUrl, fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => _fallbackBox(scheme, fallbackIcon))
-                    : _fallbackBox(scheme, fallbackIcon),
-              ),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              match.name,
-              textAlign: TextAlign.center,
-              style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-            ),
-            if (match.artist.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 2),
-                child: Text(
-                  match.artist,
-                  textAlign: TextAlign.center,
-                  style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+            // Tap the header again to open the full item page (bio, top tracks, etc).
+            InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () => showDetailSheet(context, _asLastFmItem, _detailType, service),
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(isArtist ? 48 : 16),
+                      child: SizedBox(
+                        width: 88, height: 88,
+                        child: _ResolvedImage(
+                            match: match, fallbackIcon: fallbackIcon, iconSize: 32),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          match.name,
+                          textAlign: TextAlign.center,
+                          style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(Icons.chevron_right_rounded, size: 20, color: scheme.outline),
+                      ],
+                    ),
+                    if (match.artist.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(
+                          match.artist,
+                          textAlign: TextAlign.center,
+                          style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+                        ),
+                      ),
+                  ],
                 ),
               ),
-            const SizedBox(height: 24),
+            ),
+            const SizedBox(height: 10),
             _CompareBar(
               label: myUsername, plays: match.myPlays, maxPlays: maxPlays,
               color: scheme.primary, scheme: scheme, text: text,
@@ -996,11 +1063,6 @@ class _ItemCompareSheet extends StatelessWidget {
       ),
     );
   }
-
-  Widget _fallbackBox(ColorScheme scheme, IconData icon) => Container(
-    color: scheme.primary.withValues(alpha: 0.12),
-    child: Icon(icon, color: scheme.primary, size: 32),
-  );
 
   // Quick textual takeaway from the two play counts.
   String _insight() {
@@ -1226,10 +1288,9 @@ class _TopMatchCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme   = Theme.of(context).colorScheme;
-    final text     = Theme.of(context).textTheme;
-    final hasImage = match.imageUrl.isNotEmpty && !match.imageUrl.contains(_ph);
-    final isTrack  = match.type == 'track';
+    final scheme  = Theme.of(context).colorScheme;
+    final text    = Theme.of(context).textTheme;
+    final isTrack = match.type == 'track';
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -1244,10 +1305,11 @@ class _TopMatchCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             child: SizedBox(
               width: 52, height: 52,
-              child: hasImage
-                  ? Image.network(match.imageUrl, fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => _fallback(scheme, isTrack))
-                  : _fallback(scheme, isTrack),
+              child: _ResolvedImage(
+                match: match,
+                fallbackIcon: isTrack ? Icons.music_note_rounded : Icons.mic_rounded,
+                iconSize: 22,
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -1291,14 +1353,6 @@ class _TopMatchCard extends StatelessWidget {
       ),
     );
   }
-
-  Widget _fallback(ColorScheme scheme, bool isTrack) => Container(
-    color: scheme.primary.withValues(alpha: 0.12),
-    child: Icon(
-      isTrack ? Icons.music_note_rounded : Icons.mic_rounded,
-      color: scheme.primary,
-    ),
-  );
 }
 
 // ── Small pill showing a shared count (artists / tracks / albums) ─────────────
