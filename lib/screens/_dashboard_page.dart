@@ -1143,27 +1143,30 @@ class _DashboardPageState extends State<_DashboardPage> {
             delegate: SliverChildListDelegate([
 
               // ── Now playing ─────────────────────────────────────────────
-              // AnimatedSwitcher gives a smooth fade+slide when track changes
+              // Key changes when track changes → animation triggers only then
               AnimatedSwitcher(
-                duration: const Duration(milliseconds: 450),
+                duration: const Duration(milliseconds: 400),
                 switchInCurve:  Curves.easeOutCubic,
                 switchOutCurve: Curves.easeIn,
                 transitionBuilder: (child, anim) => FadeTransition(
                   opacity: anim,
                   child: SlideTransition(
                     position: Tween<Offset>(
-                      begin: const Offset(0, 0.05),
+                      begin: const Offset(0, 0.08),
                       end:   Offset.zero,
-                    ).animate(anim),
+                    ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
                     child: child,
                   ),
                 ),
                 child: (_showNowPlay && _nowPlaying != null)
-                    ? _FadeSlideIn(
-                        child: Column(children: [
+                    ? Column(
+                        key: ValueKey(
+                          '${_nowPlaying!['name']}_${_nowPlaying!['artist']?['#text']}',
+                        ),
+                        children: [
                           _NowPlayingCard(track: _nowPlaying!),
                           const SizedBox(height: 12),
-                        ]),
+                        ],
                       )
                     : const SizedBox.shrink(key: ValueKey('nowplaying_empty')),
               ),
