@@ -69,6 +69,9 @@ class _SearchPageState extends State<_SearchPage> {
     setState(() => _favProfiles = updated);
   }
 
+  /// Dismiss keyboard before opening any result detail
+  void _dismissKeyboard() => _focusNode.unfocus();
+
   void _onChanged(String q) {
     _debounce?.cancel();
     if (q.trim().isEmpty) {
@@ -84,16 +87,19 @@ class _SearchPageState extends State<_SearchPage> {
     setState(() { _searching = true; _error = null; });
     try {
       if (_tab == _kSearchAll) {
+        // Include profiles in "All" tab search
         final res = await Future.wait([
+          widget.service.searchUsers(q,   limit: 6),
           widget.service.searchArtists(q, limit: 10),
           widget.service.searchAlbums(q,  limit: 10),
           widget.service.searchTracks(q,  limit: 10),
         ]);
         if (mounted) setState(() {
           _allResults = {
-            _kSearchArtists: res[0],
-            _kSearchAlbums:  res[1],
-            _kSearchTracks:  res[2],
+            _kSearchProfiles: res[0],
+            _kSearchArtists:  res[1],
+            _kSearchAlbums:   res[2],
+            _kSearchTracks:   res[3],
           };
           _results   = [];
           _searching = false;
@@ -101,7 +107,8 @@ class _SearchPageState extends State<_SearchPage> {
       } else {
         List<dynamic> res;
         switch (_tab) {
-          case _kSearchProfiles: res = await widget.service.searchUsers(q,   limit: 15); break;
+          // searchUsers returns multiple similar usernames — natural suggestion list
+          case _kSearchProfiles: res = await widget.service.searchUsers(q,   limit: 20); break;
           case _kSearchArtists:  res = await widget.service.searchArtists(q, limit: 15); break;
           case _kSearchAlbums:   res = await widget.service.searchAlbums(q,  limit: 15); break;
           default:               res = await widget.service.searchTracks(q,  limit: 15);
@@ -125,10 +132,15 @@ class _SearchPageState extends State<_SearchPage> {
     if (q.isNotEmpty) _search(q);
   }
 
-  void _openMusicDetail(BuildContext ctx, Map<String, dynamic> item, String type) =>
-      showDetailSheet(ctx, item, type, widget.service);
+  void _openMusicDetail(BuildContext ctx, Map<String, dynamic> item, String type) {
+    // Dismiss keyboard before opening detail sheet
+    _dismissKeyboard();
+    showDetailSheet(ctx, item, type, widget.service);
+  }
 
   void _openProfile(BuildContext ctx, String username) {
+    // Dismiss keyboard before opening profile sheet
+    _dismissKeyboard();
     showProfileSheet(
       ctx, username, widget.service,
       isFav:       _favProfiles.contains(username),
@@ -159,7 +171,11 @@ class _SearchPageState extends State<_SearchPage> {
                 focusNode:       _focusNode,
                 onChanged:       _onChanged,
                 textInputAction: TextInputAction.search,
-                onSubmitted: (v) { if (v.trim().isNotEmpty) _search(v.trim()); },
+                onSubmitted: (v) {
+                  if (v.trim().isNotEmpty) _search(v.trim());
+                  // Dismiss keyboard on submit
+                  _dismissKeyboard();
+                },
                 decoration: InputDecoration(
                   hintText:  L.searchHintBar,
                   prefixIcon: const Icon(Icons.search_rounded),
@@ -168,6 +184,7 @@ class _SearchPageState extends State<_SearchPage> {
                           icon: const Icon(Icons.clear_rounded),
                           onPressed: () {
                             _ctrl.clear();
+                            _dismissKeyboard();
                             setState(() { _results = []; _error = null; _searching = false; });
                           },
                         )
@@ -227,16 +244,50 @@ class _SearchPageState extends State<_SearchPage> {
     if (_ctrl.text.trim().isEmpty) return _SearchEmptyState(tab: _tab);
 
     if (_tab == _kSearchAll) {
-      final artists = _allResults[_kSearchArtists] ?? [];
-      final albums  = _allResults[_kSearchAlbums]  ?? [];
-      final tracks  = _allResults[_kSearchTracks]  ?? [];
-      if (artists.isEmpty && albums.isEmpty && tracks.isEmpty) {
+      final profiles = _allResults[_kSearchProfiles] ?? [];
+      final artists  = _allResults[_kSearchArtists]  ?? [];
+      final albums   = _allResults[_kSearchAlbums]   ?? [];
+      final tracks   = _allResults[_kSearchTracks]   ?? [];
+
+      if (profiles.isEmpty && artists.isEmpty && albums.isEmpty && tracks.isEmpty) {
         return Center(child: Text(L.commonNoResults,
             style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)));
       }
+
       return ListView(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         children: [
+          // Profiles section in "All" tab — horizontal scrollable row of user cards
+          if (profiles.isNotEmpty) ...[
+            _SearchSectionHeader(
+              label: L.searchProfiles, icon: Icons.person_rounded,
+              scheme: scheme, text: text,
+            ),
+            SizedBox(
+              height: 160,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                itemCount: profiles.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 10),
+                itemBuilder: (ctx, i) {
+                  final u     = profiles[i] as Map<String, dynamic>;
+                  final uname = (u['name'] ?? '').toString();
+                  final isFav = _favProfiles.contains(uname);
+                  return SizedBox(
+                    width: 120,
+                    child: _SearchUserCard(
+                      user:        u,
+                      isFav:       isFav,
+                      onTap:       () => _openProfile(ctx, uname),
+                      onToggleFav: () => _toggleFavProfile(uname, !isFav),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 4),
+          ],
           if (artists.isNotEmpty) ...[
             _SearchSectionHeader(label: L.commonArtists, icon: Icons.mic_rounded, scheme: scheme, text: text),
             ...artists.map((m) {
@@ -296,18 +347,27 @@ class _SearchPageState extends State<_SearchPage> {
     }
 
     if (_tab == _kSearchProfiles) {
-      return ListView.builder(
+      // Grid of user cards — tapping one unfocuses the search field automatically
+      // via _openProfile which calls _dismissKeyboard()
+      return GridView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: (_results.length / 2).ceil(),
-        itemBuilder: (ctx, row) {
-          final left     = _results[row * 2] as Map<String, dynamic>;
-          final hasRight = row * 2 + 1 < _results.length;
-          final right    = hasRight ? _results[row * 2 + 1] as Map<String, dynamic> : null;
-          return Row(children: [
-            Expanded(child: _buildUserCard(ctx, left)),
-            const SizedBox(width: 10),
-            Expanded(child: right != null ? _buildUserCard(ctx, right) : const SizedBox()),
-          ]);
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio: 1.0,
+        ),
+        itemCount: _results.length,
+        itemBuilder: (ctx, i) {
+          final u     = _results[i] as Map<String, dynamic>;
+          final uname = (u['name'] ?? '').toString();
+          final isFav = _favProfiles.contains(uname);
+          return _SearchUserCard(
+            user:        u,
+            isFav:       isFav,
+            onTap:       () => _openProfile(ctx, uname),
+            onToggleFav: () => _toggleFavProfile(uname, !isFav),
+          );
         },
       );
     }
@@ -397,7 +457,7 @@ class _SearchEmptyState extends StatelessWidget {
   }
 }
 
-// ── User card (2-column search grid) ─────────────────────────────────────────
+// ── User card (search grid) ───────────────────────────────────────────────────
 
 class _SearchUserCard extends StatelessWidget {
   final Map<String, dynamic> user;
