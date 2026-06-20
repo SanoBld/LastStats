@@ -24,11 +24,15 @@ class _SharedMatch {
   final String name;
   final String artist;
   final String imageUrl;
+  final int    myPlays;
+  final int    theirPlays;
   const _SharedMatch({
     required this.type,
     required this.name,
     required this.artist,
     required this.imageUrl,
+    this.myPlays    = 0,
+    this.theirPlays = 0,
   });
 }
 
@@ -45,6 +49,9 @@ typedef _TasteAnalysis = ({
 });
 
 // ── Weight helpers ────────────────────────────────────────────────────────────
+
+// Extract integer playcount from a Last.fm item map.
+int _playcount(dynamic m) => int.tryParse((m['playcount'] ?? '0').toString()) ?? 0;
 
 // Normalize a count map to [0..1] weights (most played = 1.0).
 Map<String, double> _countWeights(Map<String, int> counts) {
@@ -86,6 +93,9 @@ _TasteAnalysis _analyzeTaste({
   required Map<String, double> myArtistW,
   required Map<String, double> myTrackW,
   required Map<String, double> myAlbumW,
+  required Map<String, int>    myArtistCounts,
+  required Map<String, int>    myTrackCounts,
+  required Map<String, int>    myAlbumCounts,
   required List<dynamic> theirArtists,
   required List<dynamic> theirTracks,
   required List<dynamic> theirAlbums,
@@ -128,10 +138,12 @@ _TasteAnalysis _analyzeTaste({
       bestW = w;
       topMatchTrackKey = k;
       topMatch = _SharedMatch(
-        type:     'track',
-        name:     (t['name'] ?? '').toString(),
-        artist:   (t['artist']?['name'] ?? t['artist'] ?? '').toString(),
-        imageUrl: _extractImage(t['image']),
+        type:       'track',
+        name:       (t['name'] ?? '').toString(),
+        artist:     (t['artist']?['name'] ?? t['artist'] ?? '').toString(),
+        imageUrl:   _extractImage(t['image']),
+        myPlays:    myTrackCounts[k] ?? 0,
+        theirPlays: _playcount(t),
       );
     }
   }
@@ -145,10 +157,12 @@ _TasteAnalysis _analyzeTaste({
       if (w > bestW) {
         bestW = w;
         topMatch = _SharedMatch(
-          type:     'artist',
-          name:     (a['name'] ?? '').toString(),
-          artist:   '',
-          imageUrl: _extractImage(a['image']),
+          type:       'artist',
+          name:       (a['name'] ?? '').toString(),
+          artist:     '',
+          imageUrl:   _extractImage(a['image']),
+          myPlays:    myArtistCounts[k] ?? 0,
+          theirPlays: _playcount(a),
         );
       }
     }
@@ -170,11 +184,14 @@ _TasteAnalysis _analyzeTaste({
   final totalSharedTracks = rawTracks.length + (topMatchTrackKey != null ? 1 : 0);
   final sharedTracks = rawTracks.take(12).map((c) {
     final t = c.$2;
+    final k = trackKey(t);
     return _SharedMatch(
-      type:     'track',
-      name:     (t['name'] ?? '').toString(),
-      artist:   (t['artist']?['name'] ?? t['artist'] ?? '').toString(),
-      imageUrl: _extractImage(t['image']),
+      type:       'track',
+      name:       (t['name'] ?? '').toString(),
+      artist:     (t['artist']?['name'] ?? t['artist'] ?? '').toString(),
+      imageUrl:   _extractImage(t['image']),
+      myPlays:    myTrackCounts[k] ?? 0,
+      theirPlays: _playcount(t),
     );
   }).toList();
 
@@ -191,11 +208,14 @@ _TasteAnalysis _analyzeTaste({
   final totalSharedArtists = rawArtists.length + (topMatchArtistKey != null ? 1 : 0);
   final sharedArtists = rawArtists.take(20).map((c) {
     final a = c.$2;
+    final k = artistKey(a);
     return _SharedMatch(
-      type:     'artist',
-      name:     (a['name'] ?? '').toString(),
-      artist:   '',
-      imageUrl: _extractImage(a['image']),
+      type:       'artist',
+      name:       (a['name'] ?? '').toString(),
+      artist:     '',
+      imageUrl:   _extractImage(a['image']),
+      myPlays:    myArtistCounts[k] ?? 0,
+      theirPlays: _playcount(a),
     );
   }).toList();
 
@@ -211,11 +231,14 @@ _TasteAnalysis _analyzeTaste({
   final totalSharedAlbums = rawAlbums.length;
   final sharedAlbums = rawAlbums.take(12).map((c) {
     final a = c.$2;
+    final k = albumKey(a);
     return _SharedMatch(
-      type:     'album',
-      name:     (a['name'] ?? '').toString(),
-      artist:   (a['artist']?['name'] ?? '').toString(),
-      imageUrl: _extractImage(a['image']),
+      type:       'album',
+      name:       (a['name'] ?? '').toString(),
+      artist:     (a['artist']?['name'] ?? '').toString(),
+      imageUrl:   _extractImage(a['image']),
+      myPlays:    myAlbumCounts[k] ?? 0,
+      theirPlays: _playcount(a),
     );
   }).toList();
 
@@ -368,6 +391,18 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
           final ar = (a['artist']?['name'] ?? '').toString().toLowerCase();
           return '$ar::${(a['name'] ?? '').toString().toLowerCase()}';
         });
+        // Real playcounts from the API fallback, for display in detail view.
+        for (final a in myArtistsFb) {
+          artistCounts[(a['name'] ?? '').toString().toLowerCase()] = _playcount(a);
+        }
+        for (final t in myTracksFb) {
+          final ar = (t['artist']?['name'] ?? '').toString().toLowerCase();
+          trackCounts['$ar::${(t['name'] ?? '').toString().toLowerCase()}'] = _playcount(t);
+        }
+        for (final a in myAlbumsFb) {
+          final ar = (a['artist']?['name'] ?? '').toString().toLowerCase();
+          albumCounts['$ar::${(a['name'] ?? '').toString().toLowerCase()}'] = _playcount(a);
+        }
       }
 
       // ── isSelf path ───────────────────────────────────────────────────────
@@ -426,13 +461,16 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
             );
 
       final analysis = _analyzeTaste(
-        myArtistW:    myArtistW,
-        myTrackW:     myTrackW,
-        myAlbumW:     myAlbumW,
-        theirArtists: theirArtists,
-        theirTracks:  theirTracks,
-        theirAlbums:  theirAlbums,
-        dataLabel:    dataLabel,
+        myArtistW:       myArtistW,
+        myTrackW:        myTrackW,
+        myAlbumW:        myAlbumW,
+        myArtistCounts:  artistCounts,
+        myTrackCounts:   trackCounts,
+        myAlbumCounts:   albumCounts,
+        theirArtists:    theirArtists,
+        theirTracks:     theirTracks,
+        theirAlbums:     theirAlbums,
+        dataLabel:       dataLabel,
       );
 
       if (!mounted) return;
@@ -588,7 +626,15 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
         if (_topMatch != null) ...[
           _FadeSlideIn(
             delay: const Duration(milliseconds: 160),
-            child: _TopMatchCard(match: _topMatch!),
+            child: Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(18),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(18),
+                onTap: () => _openItemDetail(context, _topMatch!),
+                child: _TopMatchCard(match: _topMatch!),
+              ),
+            ),
           ),
           const SizedBox(height: 22),
         ],
@@ -597,12 +643,12 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
         if (_sharedTracks.isNotEmpty) ...[
           _FadeSlideIn(
             delay: const Duration(milliseconds: 200),
-            child: _SharedSection(
-              label: _totalTracks > _sharedTracks.length
-                  ? _ct('Titres en commun ($_totalTracks)', 'Shared tracks ($_totalTracks)')
-                  : _ct('Titres en commun', 'Shared tracks'),
+            child: _ExpandableSection(
+              label: _ct('Titres en commun', 'Shared tracks'),
               icon: Icons.music_note_rounded,
+              totalCount: _totalTracks,
               matches: _sharedTracks,
+              onItemTap: (m) => _openItemDetail(context, m),
               scheme: scheme,
               text: text,
             ),
@@ -613,12 +659,12 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
         // Shared artists
         _FadeSlideIn(
           delay: const Duration(milliseconds: 240),
-          child: _SharedSection(
-            label: _totalArtists > _sharedArtists.length
-                ? _ct('Artistes en commun ($_totalArtists)', 'Shared artists ($_totalArtists)')
-                : _ct('Artistes en commun', 'Shared artists'),
+          child: _ExpandableSection(
+            label: _ct('Artistes en commun', 'Shared artists'),
             icon: Icons.mic_rounded,
+            totalCount: _totalArtists,
             matches: _sharedArtists,
+            onItemTap: (m) => _openItemDetail(context, m),
             emptyText: _ct('Aucun artiste en commun trouvé.', 'No shared artists found.'),
             scheme: scheme,
             text: text,
@@ -630,12 +676,12 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
           const SizedBox(height: 18),
           _FadeSlideIn(
             delay: const Duration(milliseconds: 280),
-            child: _SharedSection(
-              label: _totalAlbums > _sharedAlbums.length
-                  ? _ct('Albums en commun ($_totalAlbums)', 'Shared albums ($_totalAlbums)')
-                  : _ct('Albums en commun', 'Shared albums'),
+            child: _ExpandableSection(
+              label: _ct('Albums en commun', 'Shared albums'),
               icon: Icons.album_rounded,
+              totalCount: _totalAlbums,
               matches: _sharedAlbums,
+              onItemTap: (m) => _openItemDetail(context, m),
               scheme: scheme,
               text: text,
             ),
@@ -644,52 +690,397 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
       ],
     );
   }
+
+  // Opens the detail sheet comparing my plays vs theirs for one item.
+  void _openItemDetail(BuildContext context, _SharedMatch match) {
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => _ItemCompareSheet(
+        match:         match,
+        myUsername:    _myUsername,
+        theirUsername: widget.targetUser,
+      ),
+    );
+  }
 }
 
-// ── Shared section with label + chip wrap ──────────────────────────────────────
+// ── Expandable ranked list section ──────────────────────────────────────────────
 
-class _SharedSection extends StatelessWidget {
-  final String             label;
-  final IconData           icon;
-  final List<_SharedMatch> matches;
-  final String?            emptyText;
-  final ColorScheme        scheme;
-  final TextTheme          text;
+class _ExpandableSection extends StatefulWidget {
+  final String                      label;
+  final IconData                    icon;
+  final int                         totalCount;
+  final List<_SharedMatch>          matches;
+  final void Function(_SharedMatch) onItemTap;
+  final String?                     emptyText;
+  final ColorScheme                 scheme;
+  final TextTheme                   text;
 
-  const _SharedSection({
+  const _ExpandableSection({
     required this.label,
     required this.icon,
+    required this.totalCount,
     required this.matches,
+    required this.onItemTap,
     required this.scheme,
     required this.text,
     this.emptyText,
   });
 
   @override
+  State<_ExpandableSection> createState() => _ExpandableSectionState();
+}
+
+class _ExpandableSectionState extends State<_ExpandableSection> {
+  bool _expanded = false;
+
+  @override
   Widget build(BuildContext context) {
+    final scheme = widget.scheme;
+    final text   = widget.text;
+    final empty  = widget.matches.isEmpty;
+
+    return Container(
+      decoration: BoxDecoration(
+        color:        scheme.surfaceContainerHighest.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: empty ? null : () => setState(() => _expanded = !_expanded),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Row(
+                children: [
+                  Icon(widget.icon, size: 16, color: scheme.primary),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      widget.label,
+                      style: text.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w700, color: scheme.onSurfaceVariant),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                    decoration: BoxDecoration(
+                      color:        scheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      '${widget.totalCount}',
+                      style: text.labelSmall?.copyWith(
+                          fontWeight: FontWeight.w800, color: scheme.onPrimaryContainer),
+                    ),
+                  ),
+                  if (!empty) ...[
+                    const SizedBox(width: 6),
+                    AnimatedRotation(
+                      turns:    _expanded ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Icon(Icons.expand_more_rounded,
+                          size: 20, color: scheme.onSurfaceVariant),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 220),
+            curve:    Curves.easeOutCubic,
+            child: empty
+                ? Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        widget.emptyText ?? '',
+                        style: text.bodySmall?.copyWith(color: scheme.outlineVariant),
+                      ),
+                    ),
+                  )
+                : (_expanded
+                    ? Padding(
+                        padding: const EdgeInsets.fromLTRB(6, 0, 6, 6),
+                        child: Column(
+                          children: [
+                            for (var i = 0; i < widget.matches.length; i++)
+                              _RankedListTile(
+                                rank:   i + 1,
+                                match:  widget.matches[i],
+                                onTap:  () => widget.onItemTap(widget.matches[i]),
+                                scheme: scheme,
+                                text:   text,
+                              ),
+                          ],
+                        ),
+                      )
+                    : const SizedBox(width: double.infinity)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Single row in an expanded list (rank + image + name + chevron) ──────────────
+
+class _RankedListTile extends StatelessWidget {
+  final int          rank;
+  final _SharedMatch match;
+  final VoidCallback onTap;
+  final ColorScheme  scheme;
+  final TextTheme    text;
+
+  const _RankedListTile({
+    required this.rank,
+    required this.match,
+    required this.onTap,
+    required this.scheme,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hasImage = match.imageUrl.isNotEmpty && !match.imageUrl.contains(_ph);
+    final isArtist = match.type == 'artist';
+    final fallbackIcon = switch (match.type) {
+      'track' => Icons.music_note_rounded,
+      'album' => Icons.album_rounded,
+      _       => Icons.mic_rounded,
+    };
+
+    final avatar = hasImage
+        ? Image.network(match.imageUrl, fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => Icon(fallbackIcon, size: 18, color: scheme.onSurfaceVariant))
+        : Container(
+            color: scheme.surfaceContainerHighest,
+            child: Icon(fallbackIcon, size: 18, color: scheme.onSurfaceVariant),
+          );
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 20,
+              child: Text(
+                '$rank',
+                textAlign: TextAlign.center,
+                style: text.labelSmall?.copyWith(
+                    color: scheme.outline, fontWeight: FontWeight.w700),
+              ),
+            ),
+            const SizedBox(width: 8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(isArtist ? 20 : 8),
+              child: SizedBox(width: 40, height: 40, child: avatar),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    match.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  if (match.artist.isNotEmpty)
+                    Text(
+                      match.artist,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                    ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded, size: 18, color: scheme.outlineVariant),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Item comparison detail sheet (my plays vs their plays) ──────────────────────
+
+class _ItemCompareSheet extends StatelessWidget {
+  final _SharedMatch match;
+  final String       myUsername;
+  final String       theirUsername;
+
+  const _ItemCompareSheet({
+    required this.match,
+    required this.myUsername,
+    required this.theirUsername,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme   = Theme.of(context).colorScheme;
+    final text     = Theme.of(context).textTheme;
+    final hasImage = match.imageUrl.isNotEmpty && !match.imageUrl.contains(_ph);
+    final isArtist = match.type == 'artist';
+    final fallbackIcon = switch (match.type) {
+      'track' => Icons.music_note_rounded,
+      'album' => Icons.album_rounded,
+      _       => Icons.mic_rounded,
+    };
+    final maxPlays = [match.myPlays, match.theirPlays, 1].reduce((a, b) => a > b ? a : b);
+
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(isArtist ? 48 : 16),
+              child: SizedBox(
+                width: 88, height: 88,
+                child: hasImage
+                    ? Image.network(match.imageUrl, fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) => _fallbackBox(scheme, fallbackIcon))
+                    : _fallbackBox(scheme, fallbackIcon),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              match.name,
+              textAlign: TextAlign.center,
+              style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+            ),
+            if (match.artist.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text(
+                  match.artist,
+                  textAlign: TextAlign.center,
+                  style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+                ),
+              ),
+            const SizedBox(height: 24),
+            _CompareBar(
+              label: myUsername, plays: match.myPlays, maxPlays: maxPlays,
+              color: scheme.primary, scheme: scheme, text: text,
+            ),
+            const SizedBox(height: 12),
+            _CompareBar(
+              label: theirUsername, plays: match.theirPlays, maxPlays: maxPlays,
+              color: scheme.tertiary, scheme: scheme, text: text,
+            ),
+            const SizedBox(height: 18),
+            Text(
+              _insight(),
+              textAlign: TextAlign.center,
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _fallbackBox(ColorScheme scheme, IconData icon) => Container(
+    color: scheme.primary.withValues(alpha: 0.12),
+    child: Icon(icon, color: scheme.primary, size: 32),
+  );
+
+  // Quick textual takeaway from the two play counts.
+  String _insight() {
+    final my = match.myPlays, their = match.theirPlays;
+    if (my == 0 || their == 0) {
+      return _ct("Décompte d'écoutes indisponible pour l'un des deux.",
+                  'Play count unavailable for one of you.');
+    }
+    if (my / their > 1.3) {
+      final x = (my / their).toStringAsFixed(1);
+      return _ct('Tu écoutes ça ${x}x plus que $theirUsername.',
+                  'You listen to this ${x}x more than $theirUsername.');
+    }
+    if (their / my > 1.3) {
+      final x = (their / my).toStringAsFixed(1);
+      return _ct('$theirUsername écoute ça ${x}x plus que toi.',
+                  '$theirUsername listens to this ${x}x more than you.');
+    }
+    return _ct("Vous l'écoutez à peu près autant tous les deux.",
+                'You both listen to this about equally.');
+  }
+}
+
+// ── Horizontal bar comparing one person's play count ─────────────────────────────
+
+class _CompareBar extends StatelessWidget {
+  final String      label;
+  final int         plays;
+  final int         maxPlays;
+  final Color       color;
+  final ColorScheme scheme;
+  final TextTheme   text;
+
+  const _CompareBar({
+    required this.label,
+    required this.plays,
+    required this.maxPlays,
+    required this.color,
+    required this.scheme,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final ratio = maxPlays > 0 ? (plays / maxPlays).clamp(0.0, 1.0) : 0.0;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(children: [
-          Icon(icon, size: 14, color: scheme.primary),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: text.labelLarge?.copyWith(
-                fontWeight: FontWeight.w700, color: scheme.onSurfaceVariant),
-          ),
-        ]),
-        const SizedBox(height: 10),
-        matches.isEmpty
-            ? Text(
-                emptyText ?? '',
-                style: text.bodySmall?.copyWith(color: scheme.outlineVariant),
-              )
-            : Wrap(
-                spacing:    8,
-                runSpacing: 8,
-                children: matches.map((m) => _TasteChip(match: m)).toList(),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: text.labelMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
+            ),
+            Text(
+              _ct('$plays écoutes', '$plays plays'),
+              style: text.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w700, color: scheme.onSurfaceVariant),
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: TweenAnimationBuilder<double>(
+            tween:    Tween(begin: 0, end: ratio),
+            duration: const Duration(milliseconds: 700),
+            curve:    Curves.easeOutCubic,
+            builder: (context, value, _) => LinearProgressIndicator(
+              value:           value,
+              minHeight:       10,
+              backgroundColor: scheme.surfaceContainerHighest,
+              valueColor:      AlwaysStoppedAnimation(color),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -908,60 +1299,6 @@ class _TopMatchCard extends StatelessWidget {
       color: scheme.primary,
     ),
   );
-}
-
-// ── Chip for shared items ─────────────────────────────────────────────────────
-
-class _TasteChip extends StatelessWidget {
-  final _SharedMatch match;
-  const _TasteChip({required this.match});
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme   = Theme.of(context).colorScheme;
-    final text     = Theme.of(context).textTheme;
-    final hasImage = match.imageUrl.isNotEmpty && !match.imageUrl.contains(_ph);
-
-    final icon = switch (match.type) {
-      'track' => Icons.music_note_rounded,
-      'album' => Icons.album_rounded,
-      _       => Icons.mic_rounded,
-    };
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color:        scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.5)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ClipOval(
-            child: SizedBox(
-              width: 20, height: 20,
-              child: hasImage
-                  ? Image.network(match.imageUrl, fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) =>
-                          Icon(icon, size: 12, color: scheme.onSurfaceVariant))
-                  : Icon(icon, size: 12, color: scheme.onSurfaceVariant),
-            ),
-          ),
-          const SizedBox(width: 6),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 120),
-            child: Text(
-              match.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: text.labelMedium?.copyWith(fontWeight: FontWeight.w600),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 // ── Small pill showing a shared count (artists / tracks / albums) ─────────────
