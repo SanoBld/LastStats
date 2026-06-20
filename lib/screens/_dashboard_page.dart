@@ -605,9 +605,11 @@ class _DashboardPageState extends State<_DashboardPage> {
         url = _headerCustomUrl;
       case 'nowplaying':
         if (_nowPlaying != null) {
+          final rawNpUrl = _extractImage(_nowPlaying!['image']);
           url = await ImageService.resolveTrack(
             (_nowPlaying!['name'] ?? '').toString(),
             (_nowPlaying!['artist']?['#text'] ?? '').toString(),
+            lastfmUrl: rawNpUrl.isNotEmpty ? rawNpUrl : null,
           );
         }
         if (url.isEmpty && _fallbackType != 'none') {
