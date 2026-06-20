@@ -67,13 +67,15 @@
     </section>
     
 <section class="desc markdown">
-  <p>Vrai si les métadonnées (track, artist) sont présentes.</p>
+  <p>True if metadata present and not corrupted (old bug stored Map.toString()
+as artist, e.g. "{#text: Radiohead, mbid: ...}").</p>
 </section>
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">bool get hasMetadata =&gt; track.isNotEmpty &amp;&amp; artist.isNotEmpty;</code></pre>
+  <pre class="language-dart"><code class="language-dart">bool get hasMetadata =&gt;
+    track.isNotEmpty &amp;&amp; artist.isNotEmpty &amp;&amp; !artist.startsWith(&#39;{&#39;);</code></pre>
 </section>
 
   </section>

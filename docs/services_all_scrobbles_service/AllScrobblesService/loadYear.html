@@ -134,7 +134,8 @@ Stocke les records complets (ts + track + artist + album).</p>
           records.add(ScrobbleRecord(
             ts:     sec,
             track:  (m[&#39;name&#39;]           ?? &#39;&#39;).toString(),
-            artist: (m[&#39;artist&#39;]?[&#39;name&#39;] ?? (m[&#39;artist&#39;] ?? &#39;&#39;)).toString(),
+            &#47;&#47; recentTracks artist shape is {#text, mbid}, not {name}
+            artist: (m[&#39;artist&#39;]?[&#39;#text&#39;] ?? m[&#39;artist&#39;]?[&#39;name&#39;] ?? &#39;&#39;).toString(),
             album:  (m[&#39;album&#39;]?[&#39;#text&#39;] ?? &#39;&#39;).toString(),
           ));
         }
