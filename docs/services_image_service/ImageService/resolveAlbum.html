@@ -82,6 +82,9 @@
   final mb = await _mbAlbum(album, artist);
   if (mb.isNotEmpty) return _persistUrl(key, mb);
 
+  final wiki = await _wikipediaImage(&#39;$artist $album album&#39;);
+  if (wiki.isNotEmpty) return _persistUrl(key, wiki);
+
   return _persistUrl(key, &#39;&#39;);
 }</code></pre>
 </section>

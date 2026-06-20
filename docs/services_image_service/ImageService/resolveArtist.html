@@ -81,6 +81,15 @@
   final deezer = await _deezerArtist(artist);
   if (deezer.isNotEmpty) return _persistUrl(key, deezer);
 
+  final audioDb = await _audioDbArtist(artist);
+  if (audioDb.isNotEmpty) return _persistUrl(key, audioDb);
+
+  final mb = await _mbArtistImage(artist);
+  if (mb.isNotEmpty) return _persistUrl(key, mb);
+
+  final wiki = await _wikipediaImage(artist);
+  if (wiki.isNotEmpty) return _persistUrl(key, wiki);
+
   return _persistUrl(key, &#39;&#39;);
 }</code></pre>
 </section>
