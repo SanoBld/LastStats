@@ -117,6 +117,12 @@ class ImageService {
     final itunes = await _itunesSearch('$artist $album', 'album');
     if (itunes.isNotEmpty) return _persistUrl(key, itunes);
 
+    final deezer = await _deezerAlbum(album, artist);
+    if (deezer.isNotEmpty) return _persistUrl(key, deezer);
+
+    final audioDb = await _audioDbAlbum(album, artist);
+    if (audioDb.isNotEmpty) return _persistUrl(key, audioDb);
+
     final mb = await _mbAlbum(album, artist);
     if (mb.isNotEmpty) return _persistUrl(key, mb);
 
@@ -126,7 +132,8 @@ class ImageService {
     return _persistUrl(key, '');
   }
 
-  static Future<String> resolveTrack(String track, String artist, {String? lastfmUrl}) async {
+  static Future<String> resolveTrack(String track, String artist,
+      {String? lastfmUrl, String album = ''}) async {
     if (_ok(lastfmUrl)) { _cacheBytes(lastfmUrl!); return lastfmUrl; }
     await _ensureDiskCache();
     final key = 'track|$artist|$track';
@@ -135,6 +142,21 @@ class ImageService {
 
     final itunes = await _itunesSearch('$artist $track', 'song');
     if (itunes.isNotEmpty) return _persistUrl(key, itunes);
+
+    final deezer = await _deezerTrack(track, artist);
+    if (deezer.isNotEmpty) return _persistUrl(key, deezer);
+
+    final audioDb = await _audioDbTrack(track, artist);
+    if (audioDb.isNotEmpty) return _persistUrl(key, audioDb);
+
+    // Reuses album cover art if the caller knows the parent album.
+    if (album.isNotEmpty) {
+      final mb = await _mbAlbum(album, artist);
+      if (mb.isNotEmpty) return _persistUrl(key, mb);
+    }
+
+    final wiki = await _wikipediaImage('$artist $track song');
+    if (wiki.isNotEmpty) return _persistUrl(key, wiki);
 
     return _persistUrl(key, '');
   }
@@ -235,6 +257,56 @@ class ImageService {
       final items = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
       if (items.isEmpty) return '';
       return (items.first['picture_xl'] ?? items.first['picture_big'] ?? '').toString();
+    } catch (_) { return ''; }
+  }
+
+  static Future<String> _deezerAlbum(String album, String artist) async {
+    try {
+      final res = await http.get(Uri.https('api.deezer.com', '/search/album', {'q': '$artist $album', 'limit': '1'}))
+          .timeout(_timeout);
+      if (res.statusCode != 200) return '';
+      final items = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
+      if (items.isEmpty) return '';
+      return (items.first['cover_xl'] ?? items.first['cover_big'] ?? '').toString();
+    } catch (_) { return ''; }
+  }
+
+  // Track search response embeds the parent album object with cover URLs.
+  static Future<String> _deezerTrack(String track, String artist) async {
+    try {
+      final res = await http.get(Uri.https('api.deezer.com', '/search/track', {'q': '$artist $track', 'limit': '1'}))
+          .timeout(_timeout);
+      if (res.statusCode != 200) return '';
+      final items = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
+      if (items.isEmpty) return '';
+      final album = items.first['album'] as Map<String, dynamic>?;
+      return (album?['cover_xl'] ?? album?['cover_big'] ?? '').toString();
+    } catch (_) { return ''; }
+  }
+
+  static Future<String> _audioDbAlbum(String album, String artist) async {
+    try {
+      final res = await http
+          .get(Uri.https('www.theaudiodb.com', '/api/v1/json/123/searchalbum.php', {'s': artist, 'a': album}))
+          .timeout(_timeout);
+      if (res.statusCode != 200) return '';
+      final albums = (jsonDecode(utf8.decode(res.bodyBytes))['album'] as List?) ?? [];
+      if (albums.isEmpty) return '';
+      return (albums.first['strAlbumThumb'] ?? '').toString();
+    } catch (_) { return ''; }
+  }
+
+  // Track-level art is rare on TheAudioDB (mostly filled for music videos),
+  // best-effort only — empty result just falls through to the next source.
+  static Future<String> _audioDbTrack(String track, String artist) async {
+    try {
+      final res = await http
+          .get(Uri.https('www.theaudiodb.com', '/api/v1/json/123/searchtrack.php', {'s': artist, 't': track}))
+          .timeout(_timeout);
+      if (res.statusCode != 200) return '';
+      final tracks = (jsonDecode(utf8.decode(res.bodyBytes))['track'] as List?) ?? [];
+      if (tracks.isEmpty) return '';
+      return (tracks.first['strTrackThumb'] ?? '').toString();
     } catch (_) { return ''; }
   }
 
