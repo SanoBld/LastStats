@@ -28,6 +28,7 @@ class _FriendData {
 
 
 // ── All available stat card definitions ──────────────────────────────────────
+// ignore: unused_element
 const _kAllStatCards = [
   ('top_artist',      '🎤', 'Artiste #1',           'Artist #1'),
   ('top_album',       '💿', 'Album #1',              'Album #1'),
@@ -97,6 +98,7 @@ class _DashboardPageState extends State<_DashboardPage> {
   String _headerAnimation       = 'fade';
   String _headerCustomUrl       = '';
   String _headerFallbackUrl     = '';
+  // ignore: unused_field
   bool   _headerFallbackEnabled = false;
   String _fallbackType          = 'none';
   String _fallbackPeriod        = 'overall';
@@ -313,20 +315,13 @@ class _DashboardPageState extends State<_DashboardPage> {
     DataCache.set(DataCache.keyTopAlbums('overall'),  res[2]);
     DataCache.set(DataCache.keyTopTracks('overall'),  res[3]);
     DataCache.set(DataCache.keyRecentTracks(limit: 10), res[4]);
-    if (res.length > 6  && (res[6]  as List).isNotEmpty)
-      DataCache.set(DataCache.keyTopArtists('7day'),    res[6]);
-    if (res.length > 7  && (res[7]  as List).isNotEmpty)
-      DataCache.set(DataCache.keyTopAlbums('7day'),     res[7]);
-    if (res.length > 8  && (res[8]  as List).isNotEmpty)
-      DataCache.set(DataCache.keyTopTracks('7day'),     res[8]);
-    if (res.length > 11 && (res[11] as List).isNotEmpty)
-      DataCache.set(DataCache.keyTopArtists('1month'),  res[11]);
-    if (res.length > 12 && (res[12] as List).isNotEmpty)
-      DataCache.set(DataCache.keyTopTracks('1month'),   res[12]);
-    if (res.length > 13 && (res[13] as List).isNotEmpty)
-      DataCache.set(DataCache.keyTopArtists('12month'), res[13]);
-    if (res.length > 14 && (res[14] as List).isNotEmpty)
-      DataCache.set(DataCache.keyTopTracks('12month'),  res[14]);
+    if (res.length > 6  && (res[6]  as List).isNotEmpty) { DataCache.set(DataCache.keyTopArtists('7day'),    res[6]); }
+    if (res.length > 7  && (res[7]  as List).isNotEmpty) { DataCache.set(DataCache.keyTopAlbums('7day'),     res[7]); }
+    if (res.length > 8  && (res[8]  as List).isNotEmpty) { DataCache.set(DataCache.keyTopTracks('7day'),     res[8]); }
+    if (res.length > 11 && (res[11] as List).isNotEmpty) { DataCache.set(DataCache.keyTopArtists('1month'),  res[11]); }
+    if (res.length > 12 && (res[12] as List).isNotEmpty) { DataCache.set(DataCache.keyTopTracks('1month'),   res[12]); }
+    if (res.length > 13 && (res[13] as List).isNotEmpty) { DataCache.set(DataCache.keyTopArtists('12month'), res[13]); }
+    if (res.length > 14 && (res[14] as List).isNotEmpty) { DataCache.set(DataCache.keyTopTracks('12month'),  res[14]); }
   }
 
   Future<void> _refreshLive() async {
@@ -375,16 +370,16 @@ class _DashboardPageState extends State<_DashboardPage> {
 
       // Only setState if the top item actually changed to avoid rebuilding the carousel
       bool changed = false;
-      final newArtists = results[0] as List<dynamic>;
-      final newTracks  = results[1] as List<dynamic>;
-      if (newArtists.isNotEmpty && _topArtists.isNotEmpty) {
-        if ((newArtists[0] as Map)['name'] != (_topArtists[0] as Map)['name']) changed = true;
+      final newArtists = results[0];
+      final newTracks  = results[1];
+      if ((newArtists as List).isNotEmpty && _topArtists.isNotEmpty) {
+        if ((newArtists[0] as Map)['name'] != (_topArtists[0] as Map)['name']) { changed = true; }
       } else if (newArtists.length != _topArtists.length) {
         changed = true;
       }
       if (!changed) {
-        if (newTracks.isNotEmpty && _topTracks.isNotEmpty) {
-          if ((newTracks[0] as Map)['name'] != (_topTracks[0] as Map)['name']) changed = true;
+        if ((newTracks as List).isNotEmpty && _topTracks.isNotEmpty) {
+          if ((newTracks[0] as Map)['name'] != (_topTracks[0] as Map)['name']) { changed = true; }
         } else if (newTracks.length != _topTracks.length) {
           changed = true;
         }
@@ -394,16 +389,14 @@ class _DashboardPageState extends State<_DashboardPage> {
         setState(() {
           _topArtists   = newArtists;
           _topTracks    = newTracks;
-          if (results.length > 2) _topArtistsWeek = results[2] as List<dynamic>;
-          if (results.length > 3) _topTracksWeek  = results[3] as List<dynamic>;
+          if (results.length > 2) { _topArtistsWeek = results[2] as List; }
+          if (results.length > 3) { _topTracksWeek  = results[3] as List; }
         });
       }
       DataCache.set(DataCache.keyTopArtists('overall'), results[0]);
       DataCache.set(DataCache.keyTopTracks('overall'),  results[1]);
-      if (results.length > 2 && (results[2] as List).isNotEmpty)
-        DataCache.set(DataCache.keyTopArtists('7day'), results[2]);
-      if (results.length > 3 && (results[3] as List).isNotEmpty)
-        DataCache.set(DataCache.keyTopTracks('7day'),  results[3]);
+      if (results.length > 2 && (results[2] as List).isNotEmpty) { DataCache.set(DataCache.keyTopArtists('7day'), results[2]); }
+      if (results.length > 3 && (results[3] as List).isNotEmpty) { DataCache.set(DataCache.keyTopTracks('7day'),  results[3]); }
     } catch (_) {}
   }
 
@@ -1023,7 +1016,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                   },
                   child: (_headerMusicAnim && _nowPlaying != null)
                       ? _AmbientHeader(
-                          key: ValueKey('ambient_${_headerImageUrl}'),
+                          key: ValueKey('ambient_$_headerImageUrl'),
                           url: _headerImageUrl,
                           scheme: scheme,
                         )
@@ -1150,14 +1143,36 @@ class _DashboardPageState extends State<_DashboardPage> {
             delegate: SliverChildListDelegate([
 
               // ── Now playing ─────────────────────────────────────────────
-              if (_showNowPlay && _nowPlaying != null) ...[
-                _NowPlayingCard(track: _nowPlaying!),
-                const SizedBox(height: 12),
-              ],
+              // AnimatedSwitcher gives a smooth fade+slide when track changes
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 450),
+                switchInCurve:  Curves.easeOutCubic,
+                switchOutCurve: Curves.easeIn,
+                transitionBuilder: (child, anim) => FadeTransition(
+                  opacity: anim,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 0.05),
+                      end:   Offset.zero,
+                    ).animate(anim),
+                    child: child,
+                  ),
+                ),
+                child: (_showNowPlay && _nowPlaying != null)
+                    ? _FadeSlideIn(
+                        child: Column(children: [
+                          _NowPlayingCard(track: _nowPlaying!),
+                          const SizedBox(height: 12),
+                        ]),
+                      )
+                    : const SizedBox.shrink(key: ValueKey('nowplaying_empty')),
+              ),
 
               // ── Swipeable week/month/year highlights strip ───────────────
               if (hasStripData) ...[
-                _WeekHighlightStrip(
+                _FadeSlideIn(
+                  delay: const Duration(milliseconds: 60),
+                  child: _WeekHighlightStrip(
                   topArtistWeek:  _topArtistsWeek.isNotEmpty  ? _topArtistsWeek[0]  as Map : null,
                   topTrackWeek:   _topTracksWeek.isNotEmpty   ? _topTracksWeek[0]   as Map : null,
                   topArtistMonth: _topArtistsMonth.isNotEmpty ? _topArtistsMonth[0] as Map : null,
@@ -1173,99 +1188,128 @@ class _DashboardPageState extends State<_DashboardPage> {
                   lastYearCount:  _lastYearCount,
                   service:        widget.service,
                 ),
+                ),
                 const SizedBox(height: 20),
               ],
 
               // ── Stats ────────────────────────────────────────────────────
               if (_showStats) ...[
-                _SectionHeader(title: L.dashStats, icon: Icons.bar_chart_rounded),
-                const SizedBox(height: 10),
-                _HeroStatCard(
-                  total:  total,
-                  avg:    avg.round(),
-                  days:   days,
-                  weekly: weekly,
-                  regStr: regStr,
+                _FadeSlideIn(
+                  delay: const Duration(milliseconds: 120),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    _SectionHeader(title: L.dashStats, icon: Icons.bar_chart_rounded),
+                    const SizedBox(height: 10),
+                    _HeroStatCard(
+                      total:  total,
+                      avg:    avg.round(),
+                      days:   days,
+                      weekly: weekly,
+                      regStr: regStr,
+                    ),
+                    const SizedBox(height: 10),
+                    _StatGrid(children: _statCards.map((id) {
+                      return _buildStatCard(
+                        id,
+                        total: total, avg: avg, weekly: weekly,
+                        days: days, regStr: regStr, country: country,
+                        topArtist: topArtist, topAlbum: topAlbum,
+                        topTrack: topTrack, lastTrack: lastTrack,
+                        topArtistWeek: _topArtistsWeek.isNotEmpty ? _topArtistsWeek[0] as Map : null,
+                        topAlbumWeek:  _topAlbumsWeek.isNotEmpty  ? _topAlbumsWeek[0]  as Map : null,
+                        topTrackWeek:  _topTracksWeek.isNotEmpty  ? _topTracksWeek[0]  as Map : null,
+                      );
+                    }).whereType<Widget>().toList()),
+                  ]),
                 ),
-                const SizedBox(height: 10),
-                _StatGrid(children: _statCards.map((id) {
-                  return _buildStatCard(
-                    id,
-                    total: total, avg: avg, weekly: weekly,
-                    days: days, regStr: regStr, country: country,
-                    topArtist: topArtist, topAlbum: topAlbum,
-                    topTrack: topTrack, lastTrack: lastTrack,
-                    topArtistWeek: _topArtistsWeek.isNotEmpty ? _topArtistsWeek[0] as Map : null,
-                    topAlbumWeek:  _topAlbumsWeek.isNotEmpty  ? _topAlbumsWeek[0]  as Map : null,
-                    topTrackWeek:  _topTracksWeek.isNotEmpty  ? _topTracksWeek[0]  as Map : null,
-                  );
-                }).whereType<Widget>().toList()),
                 const SizedBox(height: 20),
               ],
 
               // ── Recent plays ─────────────────────────────────────────────
               if (_showRecent && _recentTracks.isNotEmpty) ...[
-                _SectionHeader(
-                  title: localeNotifier.value == 'en' ? 'Recent plays' : 'Écoutes récentes',
-                  icon: Icons.history_rounded,
-                ),
-                const SizedBox(height: 10),
-                _RecentTracksList(
-                  tracks:  _recentTracks.take(5).toList(),
-                  service: widget.service,
+                _FadeSlideIn(
+                  delay: const Duration(milliseconds: 180),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    _SectionHeader(
+                      title: localeNotifier.value == 'en' ? 'Recent plays' : 'Écoutes récentes',
+                      icon: Icons.history_rounded,
+                    ),
+                    const SizedBox(height: 10),
+                    _RecentTracksList(
+                      tracks:  _recentTracks.take(5).toList(),
+                      service: widget.service,
+                    ),
+                  ]),
                 ),
                 const SizedBox(height: 20),
               ],
 
               // ── Friends ──────────────────────────────────────────────────
               if (_showFriends) ...[
-                _FriendsSection(
-                  friends:     _friends,
-                  favorites:   _favFriends,
-                  favProfiles: _favProfiles,
-                  service:     widget.service,
-                  isLoading:   _friendsLoading,
-                  onToggleFav: _toggleFav,
-                  onRefresh:   _loadFriends,
+                _FadeSlideIn(
+                  delay: const Duration(milliseconds: 240),
+                  child: _FriendsSection(
+                    friends:     _friends,
+                    favorites:   _favFriends,
+                    favProfiles: _favProfiles,
+                    service:     widget.service,
+                    isLoading:   _friendsLoading,
+                    onToggleFav: _toggleFav,
+                    onRefresh:   _loadFriends,
+                  ),
                 ),
                 const SizedBox(height: 20),
               ],
 
               // ── Top artists carousel ─────────────────────────────────────
               if (_showArtists && _topArtists.isNotEmpty) ...[
-                _SectionHeader(title: L.commonTopArtists, icon: Icons.mic_rounded),
-                const SizedBox(height: 10),
-                _HorizontalCarousel(
-                  items:   _topArtists.take(10).toList(),
-                  type:    'artists',
-                  service: widget.service,
+                _FadeSlideIn(
+                  delay: const Duration(milliseconds: 300),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    _SectionHeader(title: L.commonTopArtists, icon: Icons.mic_rounded),
+                    const SizedBox(height: 10),
+                    _HorizontalCarousel(
+                      items:   _topArtists.take(10).toList(),
+                      type:    'artists',
+                      service: widget.service,
+                    ),
+                  ]),
                 ),
                 const SizedBox(height: 20),
               ],
 
               // ── Top albums carousel ──────────────────────────────────────
               if (_showAlbums && _topAlbums.isNotEmpty) ...[
-                _SectionHeader(
-                  title: localeNotifier.value == 'en' ? 'Top Albums' : 'Top Albums',
-                  icon: Icons.album_rounded,
-                ),
-                const SizedBox(height: 10),
-                _HorizontalCarousel(
-                  items:   _topAlbums.take(10).toList(),
-                  type:    'albums',
-                  service: widget.service,
+                _FadeSlideIn(
+                  delay: const Duration(milliseconds: 360),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    _SectionHeader(
+                      title: localeNotifier.value == 'en' ? 'Top Albums' : 'Top Albums',
+                      icon: Icons.album_rounded,
+                    ),
+                    const SizedBox(height: 10),
+                    _HorizontalCarousel(
+                      items:   _topAlbums.take(10).toList(),
+                      type:    'albums',
+                      service: widget.service,
+                    ),
+                  ]),
                 ),
                 const SizedBox(height: 20),
               ],
 
               // ── Top tracks carousel ──────────────────────────────────────
               if (_showTracks && _topTracks.isNotEmpty) ...[
-                _SectionHeader(title: L.dashTopTracks, icon: Icons.music_note_rounded),
-                const SizedBox(height: 10),
-                _HorizontalCarousel(
-                  items:   _topTracks.take(10).toList(),
-                  type:    'tracks',
-                  service: widget.service,
+                _FadeSlideIn(
+                  delay: const Duration(milliseconds: 420),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    _SectionHeader(title: L.dashTopTracks, icon: Icons.music_note_rounded),
+                    const SizedBox(height: 10),
+                    _HorizontalCarousel(
+                      items:   _topTracks.take(10).toList(),
+                      type:    'tracks',
+                      service: widget.service,
+                    ),
+                  ]),
                 ),
                 const SizedBox(height: 20),
               ],
@@ -2184,7 +2228,7 @@ class _RollingNumberState extends State<_RollingNumber>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _anim,
-      builder: (_, __) {
+      builder: (_, _) {
         final current   = (_anim.value * widget.target).round();
         final formatted = widget.fullFormat ? _fmtFull(current) : _fmt(current);
         return Text(
@@ -2350,16 +2394,14 @@ class _MiniMetric extends StatelessWidget {
   final int?     rawInt;
   final String   prefix;
   final String   suffix;
-  final String?  staticValue;
 
   const _MiniMetric({
     required this.icon,
     required this.label,
     required this.color,
     this.rawInt,
-    this.prefix      = '',
-    this.suffix      = '',
-    this.staticValue,
+    this.prefix = '',
+    this.suffix = '',
   });
 
   @override
@@ -2381,7 +2423,7 @@ class _MiniMetric extends StatelessWidget {
           style:    valueStyle,
         )
       else
-        Text(staticValue ?? '—', style: valueStyle),
+        Text('—', style: valueStyle),
       const SizedBox(height: 2),
       Text(label,
           style: text.labelSmall?.copyWith(
@@ -2777,6 +2819,9 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
             plays: topArtist != null
                 ? int.tryParse((topArtist['playcount'] ?? '0').toString()) ?? 0
                 : null,
+            onTap: topArtist != null
+                ? () => showDetailSheet(context, Map<String, dynamic>.from(topArtist), 'artists', widget.service)
+                : null,
           )),
           Container(
             width: 1, margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -2788,6 +2833,9 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
             value: topTrack != null ? (topTrack['name'] ?? '—').toString() : '—',
             plays: topTrack != null
                 ? int.tryParse((topTrack['playcount'] ?? '0').toString()) ?? 0
+                : null,
+            onTap: topTrack != null
+                ? () => showDetailSheet(context, Map<String, dynamic>.from(topTrack), 'tracks', widget.service)
                 : null,
           )),
           Container(
@@ -2811,11 +2859,12 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
 // ── Single tile in the highlights strip ──────────────────────────────────────
 
 class _WeekTile extends StatelessWidget {
-  final IconData icon;
-  final String   label;
-  final String   value;
-  final int?     plays;
-  final double?  percent;
+  final IconData      icon;
+  final String        label;
+  final String        value;
+  final int?          plays;
+  final double?       percent;
+  final VoidCallback? onTap;
 
   const _WeekTile({
     required this.icon,
@@ -2823,6 +2872,7 @@ class _WeekTile extends StatelessWidget {
     required this.value,
     this.plays,
     this.percent,
+    this.onTap,
   });
 
   @override
@@ -2830,7 +2880,10 @@ class _WeekTile extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
 
-    return Column(
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
@@ -2890,7 +2943,8 @@ class _WeekTile extends StatelessWidget {
           ]),
         ],
       ],
-    );
+      ), // Column
+    ); // GestureDetector
   }
 }
 
@@ -2961,7 +3015,6 @@ class _RecentTrackRowState extends State<_RecentTrackRow> {
     final track   = widget.track;
     final title   = (track['name']             ?? '').toString();
     final artist  = (track['artist']?['#text'] ?? '').toString();
-    final album   = (track['album']?['#text']  ?? '').toString();
     final rawUrl  = _extractImage(track['image']);
     final dateStr = _fmtTrackDateLocal(track);
 
@@ -3216,7 +3269,9 @@ class _AmbientHeaderState extends State<_AmbientHeader>
         builder: (_, child) => Transform(
           alignment: Alignment.center,
           transform: Matrix4.identity()
+            // ignore: deprecated_member_use
             ..scale(_scale.value)
+            // ignore: deprecated_member_use
             ..translate(_dx.value, _dy.value),
           child: child,
         ),
@@ -3232,7 +3287,7 @@ class _AmbientHeaderState extends State<_AmbientHeader>
                   fit: BoxFit.cover,
                   width:  double.infinity,
                   height: double.infinity,
-                  errorBuilder: (_, __, ___) =>
+                  errorBuilder: (_, _, _) =>
                       _GradientHeader(scheme: widget.scheme),
                 ),
               )
