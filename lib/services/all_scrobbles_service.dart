@@ -217,7 +217,8 @@ class AllScrobblesService {
             records.add(ScrobbleRecord(
               ts:     sec,
               track:  (m['name']           ?? '').toString(),
-              artist: (m['artist']?['name'] ?? (m['artist'] ?? '')).toString(),
+              // recentTracks artist shape is {#text, mbid}, not {name}
+              artist: (m['artist']?['#text'] ?? m['artist']?['name'] ?? '').toString(),
               album:  (m['album']?['#text'] ?? '').toString(),
             ));
           }
@@ -369,7 +370,7 @@ class AllScrobblesService {
             newRecords.add(ScrobbleRecord(
               ts:     sec,
               track:  (m['name']            ?? '').toString(),
-              artist: (m['artist']?['name']  ?? (m['artist'] ?? '')).toString(),
+              artist: (m['artist']?['#text']  ?? m['artist']?['name'] ?? '').toString(),
               album:  (m['album']?['#text']  ?? '').toString(),
             ));
           }

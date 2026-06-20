@@ -77,8 +77,10 @@ class ScrobbleRecord {
   factory ScrobbleRecord.fromTimestamp(int ts) =>
       ScrobbleRecord(ts: ts, track: '', artist: '', album: '');
 
-  /// Vrai si les métadonnées (track, artist) sont présentes.
-  bool get hasMetadata => track.isNotEmpty && artist.isNotEmpty;
+  /// True if metadata present and not corrupted (old bug stored Map.toString()
+  /// as artist, e.g. "{#text: Radiohead, mbid: ...}").
+  bool get hasMetadata =>
+      track.isNotEmpty && artist.isNotEmpty && !artist.startsWith('{');
 
   @override
   String toString() => '$ts · $artist — $track';
