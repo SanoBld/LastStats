@@ -945,6 +945,13 @@ class _DashboardPageState extends State<_DashboardPage> {
           expandedHeight: 230,
           pinned: true,
           stretch: true,
+          // Pas de bar Material opaque qui claque au scroll : on garde le
+          // fond (image floutée + dégradé) visible en continu, ça glisse.
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          scrolledUnderElevation: 0,
+          elevation: 0,
+          forceMaterialTransparency: true,
           actions: [
             ValueListenableBuilder<AllScrobblesProgress>(
               valueListenable: AllScrobblesService.progressNotifier,
@@ -953,39 +960,44 @@ class _DashboardPageState extends State<_DashboardPage> {
                 return Row(mainAxisSize: MainAxisSize.min, children: [
                   if (isSyncing)
                     Padding(
-                      padding: const EdgeInsets.only(right: 2),
+                      padding: const EdgeInsets.only(right: 6),
                       child: _SyncProgressChip(progress: progress),
                     ),
-                  _SyncRefreshButton(
-                    isSyncing: isSyncing,
-                    onPressed: isSyncing ? null : _load,
-                    tooltip:   L.dashRefresh,
+                  _HeaderGlassButton(
+                    child: _SyncRefreshButton(
+                      isSyncing: isSyncing,
+                      onPressed: isSyncing ? null : _load,
+                      tooltip:   L.dashRefresh,
+                    ),
                   ),
                 ]);
               },
             ),
-            IconButton(
-              icon: const Icon(Icons.settings_outlined),
-              onPressed: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => Scaffold(
-                      appBar: AppBar(
-                        title: Text(L.navSettings),
-                        scrolledUnderElevation: 0,
+            const SizedBox(width: 8),
+            _HeaderGlassButton(
+              child: IconButton(
+                icon: const Icon(Icons.settings_outlined),
+                onPressed: () async {
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => Scaffold(
+                        appBar: AppBar(
+                          title: Text(L.navSettings),
+                          scrolledUnderElevation: 0,
+                        ),
+                        body: _SettingsPage(username: widget.username),
                       ),
-                      body: _SettingsPage(username: widget.username),
                     ),
-                  ),
-                );
-                if (mounted) {
-                  await _loadPrefs();
-                  _resolveHeaderImage();
-                }
-              },
-              tooltip: L.navSettings,
+                  );
+                  if (mounted) {
+                    await _loadPrefs();
+                    _resolveHeaderImage();
+                  }
+                },
+                tooltip: L.navSettings,
+              ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 12),
           ],
           flexibleSpace: FlexibleSpaceBar(
             stretchModes: const [
@@ -1047,6 +1059,28 @@ class _DashboardPageState extends State<_DashboardPage> {
                           Colors.transparent,
                           Colors.black.withValues(alpha: 0.72),
                         ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Fondu doux en haut : lisibilité des boutons sur tout fond,
+                // et transition continue (au lieu d'une barre qui claque)
+                // quand l'appbar se replie au scroll.
+                Positioned(
+                  top: 0, left: 0, right: 0,
+                  child: IgnorePointer(
+                    child: Container(
+                      height: MediaQuery.of(context).padding.top + 90,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end:   Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.40),
+                            Colors.transparent,
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -3100,6 +3134,37 @@ class _RecentTrackRowState extends State<_RecentTrackRow> {
                 color: scheme.outlineVariant.withValues(alpha: 0.3),
               ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+
+// ── Glass circle wrapper for header action buttons (visibility on any bg) ────
+
+class _HeaderGlassButton extends StatelessWidget {
+  final Widget child;
+  const _HeaderGlassButton({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipOval(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+        child: Container(
+          decoration: BoxDecoration(
+            shape:  BoxShape.circle,
+            color:  Colors.black.withValues(alpha: 0.30),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.18),
+              width: 0.8,
+            ),
+          ),
+          child: IconTheme.merge(
+            data: const IconThemeData(color: Colors.white),
+            child: child,
+          ),
         ),
       ),
     );
