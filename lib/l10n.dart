@@ -105,6 +105,8 @@ abstract class AppStrings {
   String get dashTrack1;
   String get dashNoFriends;
   String get dashFriendsActivity;
+  String get dashResetCache;
+  String get dashResetCacheConfirm;
 
   // ── Settings ─────────────────────────────────────────────────────────────
   String get settingsTitle;
@@ -360,6 +362,9 @@ class _AppStringsFr implements AppStrings {
   @override String get dashAlbum1          => 'Album #1';
   @override String get dashTrack1          => 'Titre #1';
   @override String get dashNoFriends       => 'Aucun ami trouvé';
+  @override String get dashResetCache      => 'Réinitialiser le cache';
+  @override String get dashResetCacheConfirm => 'Toutes les données scrobbles mises en cache seront supprimées et retéléchargées depuis Last.fm.';
+
   @override String get dashFriendsActivity => "Activité de tes amis Last.fm";
 
   @override String get settingsTitle             => 'Paramètres';
@@ -608,6 +613,9 @@ class _AppStringsEn implements AppStrings {
   @override String get dashAlbum1          => 'Album #1';
   @override String get dashTrack1          => 'Track #1';
   @override String get dashNoFriends       => 'No friends found';
+  @override String get dashResetCache      => 'Reset cache';
+  @override String get dashResetCacheConfirm => 'All locally cached scrobble data will be deleted and re-downloaded from Last.fm.';
+
   @override String get dashFriendsActivity => "Your Last.fm friends' activity";
 
   @override String get settingsTitle             => 'Settings';

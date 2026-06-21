@@ -491,7 +491,7 @@ class _DashboardPageState extends State<_DashboardPage> {
             return Row(children: [
               Icon(Icons.delete_sweep_outlined, size: 20, color: color),
               const SizedBox(width: 10),
-              Text('Reset cache', style: TextStyle(color: color)),
+              Text(L.dashResetCache, style: TextStyle(color: color)),
             ]);
           }),
         ),
@@ -528,10 +528,8 @@ class _DashboardPageState extends State<_DashboardPage> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Reset cache'),
-        content: const Text(
-          'This will delete all locally cached scrobbles and re-download everything from Last.fm.',
-        ),
+        title: Text(L.dashResetCache),
+        content: Text(L.dashResetCacheConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -542,7 +540,7 @@ class _DashboardPageState extends State<_DashboardPage> {
               backgroundColor: Theme.of(ctx).colorScheme.error,
             ),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Reset'),
+            child: Text(L.dashResetCache),
           ),
         ],
       ),
@@ -1047,21 +1045,11 @@ class _DashboardPageState extends State<_DashboardPage> {
 
         // ── Profile app bar ──────────────────────────────────────────────────
         SliverAppBar(
-          expandedHeight: 230,
+          expandedHeight: 170,
           pinned: true,
           stretch: true,
+          toolbarHeight: 0,
           automaticallyImplyLeading: false,
-          leading: ValueListenableBuilder<AllScrobblesProgress>(
-            valueListenable: AllScrobblesService.progressNotifier,
-            builder: (_, progress, _) {
-              if (!progress.isLoading) return const SizedBox.shrink();
-              return Padding(
-                padding: const EdgeInsets.only(left: 8, top: 10, bottom: 10),
-                child: _SyncProgressChip(progress: progress),
-              );
-            },
-          ),
-          leadingWidth: 120,
           flexibleSpace: FlexibleSpaceBar(
             stretchModes: const [
               StretchMode.zoomBackground,
@@ -1215,6 +1203,18 @@ class _DashboardPageState extends State<_DashboardPage> {
                       ],
                     ),
                   ),
+                ),
+                // Sync chip top-left when syncing
+                ValueListenableBuilder<AllScrobblesProgress>(
+                  valueListenable: AllScrobblesService.progressNotifier,
+                  builder: (_, progress, _) {
+                    if (!progress.isLoading) return const SizedBox.shrink();
+                    return Positioned(
+                      top: MediaQuery.of(context).padding.top + 6,
+                      left: 8,
+                      child: _SyncProgressChip(progress: progress),
+                    );
+                  },
                 ),
               ],
             ),
