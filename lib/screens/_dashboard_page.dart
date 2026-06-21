@@ -447,6 +447,111 @@ class _DashboardPageState extends State<_DashboardPage> {
     } catch (_) {}
   }
 
+  // Key on the profile tap target so we can find its position
+  final _profileKey = GlobalKey();
+
+  // Show popup bubble near the profile row
+  Future<void> _showProfileMenu() async {
+    final box = _profileKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null || !mounted) return;
+    final pos    = box.localToGlobal(Offset.zero);
+    final size   = box.size;
+    final screen = MediaQuery.of(context).size;
+
+    final result = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        pos.dx,
+        pos.dy + size.height + 4,
+        screen.width - pos.dx - size.width,
+        0,
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      items: [
+        PopupMenuItem(
+          value: 'refresh',
+          child: Row(children: [
+            const Icon(Icons.refresh_rounded, size: 20),
+            const SizedBox(width: 10),
+            Text(L.dashRefresh),
+          ]),
+        ),
+        PopupMenuItem(
+          value: 'settings',
+          child: Row(children: [
+            const Icon(Icons.settings_outlined, size: 20),
+            const SizedBox(width: 10),
+            Text(L.navSettings),
+          ]),
+        ),
+        PopupMenuItem(
+          value: 'reset',
+          child: Builder(builder: (ctx) {
+            final color = Theme.of(ctx).colorScheme.error;
+            return Row(children: [
+              Icon(Icons.delete_sweep_outlined, size: 20, color: color),
+              const SizedBox(width: 10),
+              Text('Reset cache', style: TextStyle(color: color)),
+            ]);
+          }),
+        ),
+      ],
+    );
+
+    if (!mounted) return;
+    switch (result) {
+      case 'refresh':
+        _load();
+      case 'settings':
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => Scaffold(
+              appBar: AppBar(
+                title: Text(L.navSettings),
+                scrolledUnderElevation: 0,
+              ),
+              body: _SettingsPage(username: widget.username),
+            ),
+          ),
+        );
+        if (mounted) {
+          await _loadPrefs();
+          _resolveHeaderImage();
+        }
+      case 'reset':
+        _confirmResetCache();
+    }
+  }
+
+  // Confirmation dialog then full cache wipe + reload
+  Future<void> _confirmResetCache() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Reset cache'),
+        content: const Text(
+          'This will delete all locally cached scrobbles and re-download everything from Last.fm.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(MaterialLocalizations.of(ctx).cancelButtonLabel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(ctx).colorScheme.error,
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Reset'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    await AllScrobblesService.forceReload(widget.service);
+    _load();
+  }
+
   // Returns "+8%" or "-10%" comparing two values
   String _weekDeltaStr(int current, int previous) {
     if (previous == 0) return '';
@@ -945,48 +1050,18 @@ class _DashboardPageState extends State<_DashboardPage> {
           expandedHeight: 230,
           pinned: true,
           stretch: true,
-          actions: [
-            ValueListenableBuilder<AllScrobblesProgress>(
-              valueListenable: AllScrobblesService.progressNotifier,
-              builder: (_, progress, _) {
-                final isSyncing = progress.isLoading;
-                return Row(mainAxisSize: MainAxisSize.min, children: [
-                  if (isSyncing)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 2),
-                      child: _SyncProgressChip(progress: progress),
-                    ),
-                  _SyncRefreshButton(
-                    isSyncing: isSyncing,
-                    onPressed: isSyncing ? null : _load,
-                    tooltip:   L.dashRefresh,
-                  ),
-                ]);
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.settings_outlined),
-              onPressed: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => Scaffold(
-                      appBar: AppBar(
-                        title: Text(L.navSettings),
-                        scrolledUnderElevation: 0,
-                      ),
-                      body: _SettingsPage(username: widget.username),
-                    ),
-                  ),
-                );
-                if (mounted) {
-                  await _loadPrefs();
-                  _resolveHeaderImage();
-                }
-              },
-              tooltip: L.navSettings,
-            ),
-            const SizedBox(width: 4),
-          ],
+          automaticallyImplyLeading: false,
+          leading: ValueListenableBuilder<AllScrobblesProgress>(
+            valueListenable: AllScrobblesService.progressNotifier,
+            builder: (_, progress, _) {
+              if (!progress.isLoading) return const SizedBox.shrink();
+              return Padding(
+                padding: const EdgeInsets.only(left: 8, top: 10, bottom: 10),
+                child: _SyncProgressChip(progress: progress),
+              );
+            },
+          ),
+          leadingWidth: 120,
           flexibleSpace: FlexibleSpaceBar(
             stretchModes: const [
               StretchMode.zoomBackground,
@@ -1059,7 +1134,10 @@ class _DashboardPageState extends State<_DashboardPage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(children: [
+                        GestureDetector(
+                          key: _profileKey,
+                          onTap: _showProfileMenu,
+                          child: Row(children: [
                           Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
@@ -1133,6 +1211,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                             ],
                           )),
                         ]),
+                        ),  // GestureDetector
                       ],
                     ),
                   ),
