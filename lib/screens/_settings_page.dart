@@ -190,8 +190,23 @@ class _SettingsPageState extends State<_SettingsPage> {
     final cards   = _buildCards();
     final initial = widget.username.isNotEmpty ? widget.username[0].toUpperCase() : '?';
 
+    // ── Mise en page adaptative ───────────────────────────────────────────
+    // Mobile / écran étroit (< 720dp, même seuil que le mode PC dans
+    // PcModeSection) : grille 2 colonnes inchangée, taille d'origine.
+    // Grand écran ou format paysage (≥ 720dp) : plus de colonnes, icônes
+    // et textes plus grands, largeur de contenu plafonnée pour rester
+    // lisible sur les très grands écrans (desktop, tablette).
+    final screenWidth      = MediaQuery.sizeOf(context).width;
+    final isWide           = screenWidth >= 720;
+    final crossAxisCount   = !isWide ? 2 : (screenWidth >= 1200 ? 4 : 3);
+    final maxContentWidth  = isWide ? 1100.0 : double.infinity;
+    final gridAspectRatio  = isWide ? 1.35 : 1.1;
+    final gridSpacing      = isWide ? 16.0 : 12.0;
+
     return SafeArea(
-      child: CustomScrollView(
+      child: Center(child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxContentWidth),
+        child: CustomScrollView(
         slivers: [
           // ── Header ─────────────────────────────────────────────────────
           SliverToBoxAdapter(child: Padding(
@@ -253,17 +268,18 @@ class _SettingsPageState extends State<_SettingsPage> {
                 (ctx, i) => _CategoryCard(
                   data:     cards[i],
                   username: widget.username,
+                  compact:  !isWide,
                   // Badge on Updates card (index 8)
                   badge: (i == 8 && _updateInfo != null) ? '!' : null,
                   onTap: () => _push(ctx, cards[i].pageBuilder(widget.username)),
                 ),
                 childCount: cards.length,
               ),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount:   2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing:  12,
-                childAspectRatio: 1.1,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount:   crossAxisCount,
+                crossAxisSpacing: gridSpacing,
+                mainAxisSpacing:  gridSpacing,
+                childAspectRatio: gridAspectRatio,
               ),
             ),
           ),
@@ -291,6 +307,7 @@ class _SettingsPageState extends State<_SettingsPage> {
           )),
         ],
       ),
+      )),
     );
   }
 
@@ -304,6 +321,7 @@ class _CategoryCard extends StatelessWidget {
   final _SettingsCardData data;
   final String username;
   final String? badge;
+  final bool compact;
   final VoidCallback onTap;
 
   const _CategoryCard({
@@ -311,12 +329,23 @@ class _CategoryCard extends StatelessWidget {
     required this.username,
     required this.onTap,
     this.badge,
+    this.compact = true,
   });
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
+
+    // En mode "large" (grand écran / paysage) : icônes et textes agrandis.
+    // En mode compact (mobile, comportement d'origine inchangé).
+    final iconBox     = compact ? 44.0 : 56.0;
+    final iconGlyph   = compact ? 24.0 : 28.0;
+    final iconRadius  = compact ? 12.0 : 14.0;
+    final cardPad     = compact ? 16.0 : 20.0;
+    final titleStyle  = compact ? text.bodyMedium : text.titleSmall;
+    final chevronSize = compact ? 14.0 : 17.0;
+    final badgeSize   = compact ? 18.0 : 20.0;
 
     return Material(
       color: scheme.surfaceContainerHighest,
@@ -329,21 +358,21 @@ class _CategoryCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45)),
           ),
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(cardPad),
           child: Stack(children: [
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Container(
-                width: 44, height: 44,
+                width: iconBox, height: iconBox,
                 decoration: BoxDecoration(
                   color: data.iconBgColor(scheme),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(iconRadius),
                 ),
-                child: Icon(data.icon, color: data.iconFgColor(scheme), size: 24),
+                child: Icon(data.icon, color: data.iconFgColor(scheme), size: iconGlyph),
               ),
               const Spacer(),
               Text(data.title(),
                   maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+                  style: titleStyle?.copyWith(fontWeight: FontWeight.w700)),
               const SizedBox(height: 2),
               Text(data.subtitle(),
                   maxLines: 2, overflow: TextOverflow.ellipsis,
@@ -355,19 +384,19 @@ class _CategoryCard extends StatelessWidget {
               Positioned(
                 top: 0, right: 0,
                 child: Container(
-                  width: 18, height: 18,
+                  width: badgeSize, height: badgeSize,
                   decoration: BoxDecoration(
                       color: scheme.tertiary, shape: BoxShape.circle),
                   child: Center(child: Text(badge!,
                       style: TextStyle(color: scheme.onTertiary,
-                          fontSize: 11, fontWeight: FontWeight.w800))),
+                          fontSize: compact ? 11 : 12, fontWeight: FontWeight.w800))),
                 ),
               ),
 
             Positioned(
               bottom: 0, right: 0,
               child: Icon(Icons.arrow_forward_ios_rounded,
-                  size: 14, color: scheme.onSurfaceVariant.withValues(alpha: 0.5)),
+                  size: chevronSize, color: scheme.onSurfaceVariant.withValues(alpha: 0.5)),
             ),
           ]),
         ),
