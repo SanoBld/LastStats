@@ -75,7 +75,7 @@
   final mem = _getUrl(key);
   if (mem != null) return mem;
 
-  final itunes = await _itunesSearch(artist, &#39;musicArtist&#39;, &#39;artistTerm&#39;);
+  final itunes = await _itunesSearch(artist, &#39;musicArtist&#39;, &#39;artistTerm&#39;, artist);
   if (itunes.isNotEmpty) return _persistUrl(key, itunes);
 
   final deezer = await _deezerArtist(artist);
@@ -87,7 +87,7 @@
   final mb = await _mbArtistImage(artist);
   if (mb.isNotEmpty) return _persistUrl(key, mb);
 
-  final wiki = await _wikipediaImage(artist);
+  final wiki = await _wikipediaImage(artist, expectName: artist);
   if (wiki.isNotEmpty) return _persistUrl(key, wiki);
 
   return _persistUrl(key, &#39;&#39;);
