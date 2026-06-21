@@ -30,7 +30,7 @@ const Rows = {
 
 // Save rows as a file the browser downloads: csv | xlsx | json | pdf
 // ctx = { title, type, pdfStyle } — type/pdfStyle only matter for pdf
-function downloadRows(rows, filename, format, ctx) {
+async function downloadRows(rows, filename, format, ctx) {
   if (!rows.length) throw new Error('empty');
   const sheetTitle = ctx.title;
 
@@ -45,7 +45,7 @@ function downloadRows(rows, filename, format, ctx) {
     XLSX.writeFile(wb, filename + '.xlsx');
 
   } else if (format === 'pdf') {
-    downloadPdf(rows, filename, sheetTitle, ctx.type, ctx.pdfStyle);
+    await downloadPdf(rows, filename, sheetTitle, ctx.type, ctx.pdfStyle, ctx.includeImages);
 
   } else {
     const SEP = ';'; // semicolon = Excel-friendly separator in most locales

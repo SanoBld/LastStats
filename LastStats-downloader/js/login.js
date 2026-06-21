@@ -13,6 +13,7 @@ function initLoginForm() {
 
     const username = document.getElementById('input-username').value.trim();
     const apiKey   = document.getElementById('input-apikey').value.trim();
+    const imagesKey = document.getElementById('input-imageskey').value.trim();
 
     if (!username || apiKey.length < 30) { errEl.textContent = t('err_required'); return; }
 
@@ -20,7 +21,7 @@ function initLoginForm() {
     btn.textContent = t('btn_connecting');
     try {
       await LastFM.testLogin(username, apiKey);
-      Auth.save(username, apiKey);
+      Auth.save(username, apiKey, imagesKey);
       location.href = 'download.html';
     } catch {
       errEl.textContent = t('err_invalid');

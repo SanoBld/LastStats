@@ -12,7 +12,14 @@ const TYPES = {
 
 let currentFormat = 'csv';
 let currentPdfStyle = 'simple';
+let includeImages = true;
 let exportRunning = false;
+
+function updatePdfSubRows() {
+  const isPdf = currentFormat === 'pdf';
+  document.getElementById('pdf-style-row').classList.toggle('hidden', !isPdf);
+  document.getElementById('pdf-images-row').classList.toggle('hidden', !(isPdf && currentPdfStyle === 'pretty'));
+}
 
 function initDownloadPage() {
   document.getElementById('hello-username').textContent = Auth.username;
@@ -27,7 +34,7 @@ function initDownloadPage() {
     b.addEventListener('click', () => {
       currentFormat = b.dataset.format;
       document.querySelectorAll('.format-btn').forEach(x => x.classList.toggle('is-active', x === b));
-      document.getElementById('pdf-style-row').classList.toggle('hidden', currentFormat !== 'pdf');
+      updatePdfSubRows();
     });
   });
 
@@ -36,7 +43,12 @@ function initDownloadPage() {
     b.addEventListener('click', () => {
       currentPdfStyle = b.dataset.pdfstyle;
       document.querySelectorAll('.pdfstyle-btn').forEach(x => x.classList.toggle('is-active', x === b));
+      updatePdfSubRows();
     });
+  });
+
+  document.getElementById('chk-include-images').addEventListener('change', (e) => {
+    includeImages = e.target.checked;
   });
 
   // One download button per dataset card
@@ -55,7 +67,7 @@ async function runExport(type) {
   try {
     const items = await LastFM.fetchAll(cfg.method, cfg.dataKey, cfg.itemKey, { ...cfg.params, limit: cfg.limit }, updateProgress);
     const rows  = cfg.build(items);
-    downloadRows(rows, `laststat-${Auth.username}-${type}`, currentFormat, { title: t(cfg.labelKey), type, pdfStyle: currentPdfStyle });
+    await downloadRows(rows, `laststat-${Auth.username}-${type}`, currentFormat, { title: t(cfg.labelKey), type, pdfStyle: currentPdfStyle, includeImages });
     showToast(t('toast_done'));
   } catch {
     showToast(t('toast_error'), true);
