@@ -300,7 +300,9 @@ class _SettingsPageState extends State<_SettingsPage> {
             child: Column(children: [
               const Divider(),
               const SizedBox(height: 10),
-              Text('LastStats Mobile v${UpdateService.currentVersion}',
+              Text(UpdateService.currentVersion == '2.6.0'
+                      ? 'LastStats Mobile · In development'
+                      : 'LastStats Mobile v${UpdateService.currentVersion}',
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               if (_checkingUpdate) ...[
                 const SizedBox(height: 6),

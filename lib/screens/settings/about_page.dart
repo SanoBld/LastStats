@@ -43,7 +43,9 @@ class AboutPage extends StatelessWidget {
           const SizedBox(height: 14),
           Text('LastStats', style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 4),
-          Text('v${UpdateService.currentVersion}',
+          Text(UpdateService.currentVersion == '2.6.0'
+                  ? 'In development'
+                  : 'v${UpdateService.currentVersion}',
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           const SizedBox(height: 4),
           Text(isEn ? 'Your Last.fm stats companion' : 'Votre compagnon de stats Last.fm',
@@ -76,7 +78,9 @@ class AboutPage extends StatelessWidget {
             leading: const Icon(Icons.info_outline_rounded),
             title: Text(L.settingsVersion,
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-            trailing: Text('v${UpdateService.currentVersion}',
+            trailing: Text(UpdateService.currentVersion == '2.6.0'
+                    ? 'In development'
+                    : 'v${UpdateService.currentVersion}',
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
