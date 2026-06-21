@@ -48,6 +48,7 @@ import 'settings/backup_page.dart';
 import 'settings/cache_page.dart';
 import 'settings/updates_page.dart';
 import 'settings/about_page.dart';
+import 'settings/faq_page.dart';
 
 // Parts
 part '_dashboard_page.dart';

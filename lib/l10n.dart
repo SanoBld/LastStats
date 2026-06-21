@@ -181,6 +181,7 @@ abstract class AppStrings {
   String get settingsAboutProjectDesc;
   String get settingsAboutSupport;
   String get settingsAboutSupportSub;
+  String get settingsFaq;
 
   // ── Header source / animation labels ─────────────────────────────────────
   String get headerNowPlaying;
@@ -435,6 +436,7 @@ class _AppStringsFr implements AppStrings {
   @override String get settingsAboutProjectDesc  => 'LastStats est un projet personnel open-source. Il peut contenir des bugs.';
   @override String get settingsAboutSupport      => 'Soutenir le projet';
   @override String get settingsAboutSupportSub   => '⭐ Laisser une étoile sur GitHub';
+  @override String get settingsFaq               => 'FAQ';
 
   @override String get headerNowPlaying  => 'Musique en cours';
   @override String get headerTopTrack    => 'Titre #1';
@@ -682,6 +684,7 @@ class _AppStringsEn implements AppStrings {
   @override String get settingsAboutProjectDesc  => 'LastStats is a personal open-source project. It may contain bugs.';
   @override String get settingsAboutSupport      => 'Support the project';
   @override String get settingsAboutSupportSub   => '⭐ Leave a star on GitHub';
+  @override String get settingsFaq               => 'FAQ';
 
   @override String get headerNowPlaying  => 'Now playing';
   @override String get headerTopTrack    => 'Track #1';

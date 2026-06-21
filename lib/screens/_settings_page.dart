@@ -1,4 +1,3 @@
-// ignore_for_file: unused_import
 // lib/screens/_settings_page.dart
 // ══════════════════════════════════════════════════════════════════════════
 //  Settings tab — navigation hub to sub-pages.
@@ -179,6 +178,17 @@ class _SettingsPageState extends State<_SettingsPage> {
           ? 'Version, source code, credits'
           : 'Version, code source, crédits',
       pageBuilder: (_) => const AboutPage(),
+    ),
+    // 10 — FAQ
+    _SettingsCardData(
+      icon: Icons.help_outline_rounded,
+      iconBgColor: (s) => Color.lerp(s.secondaryContainer, s.tertiaryContainer, 0.5)!,
+      iconFgColor: (s) => s.onSecondaryContainer,
+      title:    () => L.settingsFaq,
+      subtitle: () => localeNotifier.value == 'en'
+          ? 'Scrobbling, platforms, open source'
+          : 'Scrobbling, plateformes, open source',
+      pageBuilder: (_) => const FaqPage(),
     ),
   ];
 
