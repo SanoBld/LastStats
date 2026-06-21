@@ -46,6 +46,7 @@ typedef _TasteAnalysis = ({
   int totalSharedArtists,
   int totalSharedTracks,
   int totalSharedAlbums,
+  List<String> sharedGenres,
 });
 
 // ── Weight helpers ────────────────────────────────────────────────────────────
@@ -65,6 +66,37 @@ Map<String, double> _rankWeights(List<dynamic> items, String Function(dynamic) k
   final n = items.length;
   if (n == 0) return {};
   return {for (var i = 0; i < n; i++) key(items[i]): 1.0 - (i / n)};
+}
+
+// Normalize an arbitrary double-weight map to [0..1] (max = 1.0).
+Map<String, double> _normalizeWeights(Map<String, double> raw) {
+  if (raw.isEmpty) return {};
+  final max = raw.values.reduce((a, b) => a > b ? a : b);
+  if (max <= 0) return {};
+  return {for (final e in raw.entries) e.key: e.value / max};
+}
+
+// Build a genre/tag weight map from a list of artists: each artist spreads
+// its own weight (how much it matters to that listener) across its top tags.
+// Lets two people who share zero artists still match if they both listen to
+// e.g. "indie rock" / "synthpop".
+Map<String, double> _buildGenreWeights(
+  List<String> artistNames,
+  Map<String, double> artistWeight,
+  Map<String, List<dynamic>> tagsByArtist,
+) {
+  final raw = <String, double>{};
+  for (final name in artistNames) {
+    final tags = tagsByArtist[name];
+    if (tags == null || tags.isEmpty) continue;
+    final aw = artistWeight[name] ?? 0.3;
+    for (final t in tags.take(5)) {
+      final tag = (t['name'] ?? '').toString().toLowerCase();
+      if (tag.isEmpty) continue;
+      raw[tag] = (raw[tag] ?? 0) + aw;
+    }
+  }
+  return _normalizeWeights(raw);
 }
 
 // Overlap score: avg recall from each side, then x*(2-x) curve.
@@ -99,6 +131,8 @@ _TasteAnalysis _analyzeTaste({
   required List<dynamic> theirArtists,
   required List<dynamic> theirTracks,
   required List<dynamic> theirAlbums,
+  required Map<String, double> myGenreW,
+  required Map<String, double> theirGenreW,
   required String dataLabel,
 }) {
   String artistKey(dynamic a) => (a['name'] ?? '').toString().toLowerCase();
@@ -117,12 +151,34 @@ _TasteAnalysis _analyzeTaste({
   final theirTrackW  = _rankWeights(theirTracks,  trackKey);
   final theirAlbumW  = _rankWeights(theirAlbums,  albumKey);
 
-  // Score: artists carry the most long-term signal.
-  final score = (
-    _overlapScore(myArtistW, theirArtistW) * 0.55 +
-    _overlapScore(myTrackW,  theirTrackW)  * 0.25 +
-    _overlapScore(myAlbumW,  theirAlbumW)  * 0.20
-  ).clamp(0.0, 1.0);
+  // Score: artists carry the most long-term signal, but genres catch the
+  // case where two people share zero exact artists/tracks yet listen to
+  // the same kind of music — that used to drag the score down unfairly.
+  final artistScore = _overlapScore(myArtistW, theirArtistW);
+  final trackScore  = _overlapScore(myTrackW,  theirTrackW);
+  final albumScore  = _overlapScore(myAlbumW,  theirAlbumW);
+  final hasGenreData = myGenreW.isNotEmpty && theirGenreW.isNotEmpty;
+  final genreScore  = hasGenreData ? _overlapScore(myGenreW, theirGenreW) : 0.0;
+
+  final base = artistScore * 0.45 + trackScore * 0.20 + albumScore * 0.15;
+  final score = (hasGenreData
+          ? base + genreScore * 0.20   // 0.45+0.20+0.15+0.20 = 1.0
+          : base / 0.80)               // rescale to 0..1 when no genre data
+      .clamp(0.0, 1.0);
+
+  // Top shared genres (by combined weight), for display.
+  final genreOverlap = <(double, String)>[];
+  for (final entry in myGenreW.entries) {
+    final theirW = theirGenreW[entry.key];
+    if (theirW == null) continue;
+    final w = entry.value < theirW ? entry.value : theirW;
+    genreOverlap.add((w, entry.key));
+  }
+  genreOverlap.sort((a, b) => b.$1.compareTo(a.$1));
+  final sharedGenres = genreOverlap.take(6).map((e) {
+    final g = e.$2;
+    return g.isEmpty ? g : g[0].toUpperCase() + g.substring(1);
+  }).toList();
 
   // Top match: prefer a shared track (most specific), fall back to artist.
   _SharedMatch? topMatch;
@@ -252,6 +308,7 @@ _TasteAnalysis _analyzeTaste({
     totalSharedArtists:  totalSharedArtists,
     totalSharedTracks:   totalSharedTracks,
     totalSharedAlbums:   totalSharedAlbums,
+    sharedGenres:        sharedGenres,
   );
 }
 
@@ -295,6 +352,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
   int                _totalArtists  = 0;
   int                _totalTracks   = 0;
   int                _totalAlbums   = 0;
+  List<String>       _sharedGenres  = [];
 
   @override
   void initState() {
@@ -405,6 +463,44 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
         }
       }
 
+      // ── Genre signal ─────────────────────────────────────────────────────
+      // Pull tags for each side's top artists so two listeners who share
+      // few/no exact artists can still match on the kind of music they like.
+      var myGenreW    = <String, double>{};
+      var theirGenreW = <String, double>{};
+      if (!isSelf && myArtistW.isNotEmpty && theirArtists.isNotEmpty) {
+        try {
+          final myTopNames = (myArtistW.entries.toList()
+                ..sort((a, b) => b.value.compareTo(a.value)))
+              .take(12)
+              .map((e) => e.key)
+              .toList();
+          final theirTopNames = theirArtists
+              .take(12)
+              .map((a) => (a['name'] ?? '').toString().toLowerCase())
+              .where((n) => n.isNotEmpty)
+              .toList();
+          final theirTopW = {
+            for (var idx = 0; idx < theirTopNames.length; idx++)
+              theirTopNames[idx]: 1.0 - (idx / theirTopNames.length),
+          };
+
+          final names = {...myTopNames, ...theirTopNames}.toList();
+          final tagLists = await Future.wait(
+            names.map((n) => widget.service.getArtistTopTags(n)),
+          );
+          final tagsByArtist = {
+            for (var idx = 0; idx < names.length; idx++) names[idx]: tagLists[idx],
+          };
+
+          myGenreW    = _buildGenreWeights(myTopNames,    myArtistW, tagsByArtist);
+          theirGenreW = _buildGenreWeights(theirTopNames, theirTopW, tagsByArtist);
+        } catch (_) {
+          // Tags unavailable (offline / rate-limited) — score falls back
+          // gracefully to the artist/track/album-only formula.
+        }
+      }
+
       // ── isSelf path ───────────────────────────────────────────────────────
       if (isSelf) {
         List<_SharedMatch> selfArtists = [];
@@ -470,6 +566,8 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
         theirArtists:    theirArtists,
         theirTracks:     theirTracks,
         theirAlbums:     theirAlbums,
+        myGenreW:        myGenreW,
+        theirGenreW:     theirGenreW,
         dataLabel:       dataLabel,
       );
 
@@ -486,6 +584,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
         _totalArtists  = analysis.totalSharedArtists;
         _totalTracks   = analysis.totalSharedTracks;
         _totalAlbums   = analysis.totalSharedAlbums;
+        _sharedGenres  = analysis.sharedGenres;
         _loading       = false;
       });
     } catch (_) {
@@ -618,6 +717,35 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
                     scheme: scheme, text: text,
                   ),
                 ],
+              ),
+            ),
+          ),
+
+        // Shared genres row
+        if (_sharedGenres.isNotEmpty)
+          _FadeSlideIn(
+            delay: const Duration(milliseconds: 150),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Center(
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  alignment: WrapAlignment.center,
+                  children: _sharedGenres.map((g) => Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: scheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: scheme.outlineVariant),
+                    ),
+                    child: Text(
+                      g,
+                      style: text.labelSmall?.copyWith(
+                          color: scheme.onSurfaceVariant, fontWeight: FontWeight.w600),
+                    ),
+                  )).toList(),
+                ),
               ),
             ),
           ),
