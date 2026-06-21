@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:workmanager/workmanager.dart';
 import 'app_state.dart';
 import 'screens/setup_screen.dart';
@@ -16,14 +17,11 @@ import 'services/notification_worker.dart';
 import 'services/storage_manager.dart';
 import 'services/update_startup.dart';
 
-// Global navigator key — lets us show the update dialog from outside
-// the widget tree (no BuildContext needed).
 final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Catch unhandled Flutter errors before the window opens
   FlutterError.onError = (details) => debugPrint('Flutter error: ${details.exception}');
 
   final prefs      = await SharedPreferences.getInstance();
@@ -38,13 +36,10 @@ void main() async {
   useNowPlayingColorNotifier.value = prefs.getBool('ls_use_nowplaying_color') ?? false;
   localeNotifier.value             = prefs.getString('ls_locale') ?? 'fr';
 
-  // Fallback accent used when music-color mode is on but nothing is playing.
-  // Defaults to the normal accent color if never set.
   final fallbackHex = prefs.getString('ls_nowplaying_fallback_color');
   nowPlayingFallbackColorNotifier.value =
       fallbackHex != null ? accentFromString(fallbackHex) : accentNotifier.value;
 
-  // ── Navigation layout ('auto' | 'on' | 'off') ───────────────────────────
   pcModeNotifier.value = prefs.getString('ls_pc_mode') ?? 'auto';
 
   // ── Data caches & storage ────────────────────────────────────────────────
@@ -53,17 +48,20 @@ void main() async {
   await ScrobblesFileCache.init();
   await StorageManager.init();
   ImageService.pruneExpired();
-  
-  // Restore offline-mode preference.
+
   DataCache.offlineMode = prefs.getBool('ls_cache_serve_stale') ?? true;
-  
 
   // ── Notifications & WorkManager ──────────────────────────────────────────
-  // workmanager only supports Android & iOS — calling it on desktop/web
-  // throws MissingPluginException before runApp(), killing the window.
+  String? notifLaunchPayload;
+
   if (!kIsWeb) {
     final isMobile = Platform.isAndroid || Platform.isIOS;
     await NotificationService.init();
+
+    // Check if the app was cold-launched by tapping a notification.
+    // If so, capture the payload (a download URL) and handle it after runApp.
+    notifLaunchPayload = await NotificationService.getLaunchPayload();
+
     if (isMobile) {
       await Workmanager().initialize(
         callbackDispatcher,
@@ -79,10 +77,18 @@ void main() async {
     startupTab: startupTab,
   ));
 
-  // Check for app updates right after the UI is up, then show a dialog
-  // immediately if a new version is found.
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    UpdateStartupChecker.run(navigatorKey);
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    // If the app was launched from a notification tap, open the download URL
+    // immediately (skipping the in-app update dialog).
+    if (notifLaunchPayload != null && notifLaunchPayload!.isNotEmpty) {
+      final url = Uri.tryParse(notifLaunchPayload!);
+      if (url != null && await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      }
+    } else {
+      // Normal startup: show in-app dialog if an update is available.
+      UpdateStartupChecker.run(navigatorKey);
+    }
   });
 }
 
@@ -122,7 +128,6 @@ class LastStatsApp extends StatelessWidget {
                             (useDynamic && lightDynamic != null)
                                 ? lightDynamic.harmonized()
                                 : ColorScheme.fromSeed(
-                                    // seedColorForScheme handles pure black/white edge cases
                                     seedColor:  seedColorForScheme(accent),
                                     brightness: Brightness.light,
                                   );

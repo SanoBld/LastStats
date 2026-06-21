@@ -2,8 +2,8 @@
 
 import 'package:flutter/painting.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-// Last.fm brand red — shown as the accent color on Android notifications
 const _kLastFmRed = Color(0xFFD51007);
 
 class NotificationService {
@@ -12,25 +12,23 @@ class NotificationService {
   // ── Channel IDs ──────────────────────────────────────────────────────────
   static const _chMilestoneId   = 'ls_milestone';
   static const _chMilestoneName = 'Scrobble milestones';
-
-  // Grand milestones get their own high-importance channel (heads-up popup)
-  static const _chGrandId   = 'ls_grand_milestone';
-  static const _chGrandName = 'Grand milestones';
-
-  static const _chRecapId   = 'ls_recap';
-  static const _chRecapName = 'Listening recaps';
+  static const _chGrandId       = 'ls_grand_milestone';
+  static const _chGrandName     = 'Grand milestones';
+  static const _chRecapId       = 'ls_recap';
+  static const _chRecapName     = 'Listening recaps';
+  static const _chUpdateId      = 'ls_update';
+  static const _chUpdateName    = 'App updates';
 
   // ── Notification IDs ─────────────────────────────────────────────────────
-  // Stable IDs so we never stack duplicate notifications
   static const _idMilestone   = 1;
   static const _idDailyRecap  = 2;
   static const _idWeeklyRecap = 3;
   static const _idGrand       = 4;
+  static const _idUpdate      = 5;
   static const _idTest        = 99;
 
   // ── Init ─────────────────────────────────────────────────────────────────
 
-  /// Call once at app startup (and at the top of the WorkManager callback).
   static Future<void> init() async {
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
     const ios = DarwinInitializationSettings(
@@ -38,16 +36,23 @@ class NotificationService {
       requestBadgePermission: false,
       requestSoundPermission: false,
     );
-    await _plugin.initialize(const InitializationSettings(
-      android: android,
-      iOS:     ios,
-    ));
+    await _plugin.initialize(
+      const InitializationSettings(android: android, iOS: ios),
+      // Tap handler when app is in foreground or background.
+      // The payload is the download URL set in showUpdateAvailable().
+      onDidReceiveNotificationResponse: (details) async {
+        final payload = details.payload;
+        if (payload == null || payload.isEmpty) return;
+        final url = Uri.tryParse(payload);
+        if (url != null && await canLaunchUrl(url)) {
+          await launchUrl(url, mode: LaunchMode.externalApplication);
+        }
+      },
+    );
 
-    final androidImpl = _plugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+    final androidImpl = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
 
-    // Regular milestone — default importance (no heads-up)
     await androidImpl?.createNotificationChannel(
       const AndroidNotificationChannel(
         _chMilestoneId, _chMilestoneName,
@@ -56,7 +61,6 @@ class NotificationService {
       ),
     );
 
-    // Grand milestone — high importance so Android shows a heads-up popup
     await androidImpl?.createNotificationChannel(
       const AndroidNotificationChannel(
         _chGrandId, _chGrandName,
@@ -65,7 +69,6 @@ class NotificationService {
       ),
     );
 
-    // Recap — low importance, no sound, just sits in the drawer
     await androidImpl?.createNotificationChannel(
       const AndroidNotificationChannel(
         _chRecapId, _chRecapName,
@@ -73,36 +76,49 @@ class NotificationService {
         importance:  Importance.low,
       ),
     );
+
+    await androidImpl?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        _chUpdateId, _chUpdateName,
+        description: 'Notifies when a new version of LastStats is available',
+        importance:  Importance.high,
+      ),
+    );
   }
 
   // ── Permissions ──────────────────────────────────────────────────────────
 
-  /// Ask for permission (Android 13+, iOS). Returns true if granted.
   static Future<bool> requestPermission() async {
-    final android = _plugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
-    final ios = _plugin
-        .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>();
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    final ios = _plugin.resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>();
 
     final a = await android?.requestNotificationsPermission() ?? true;
-    final i = await ios?.requestPermissions(
-        alert: true, badge: true, sound: true) ?? true;
+    final i = await ios?.requestPermissions(alert: true, badge: true, sound: true) ?? true;
     return a && i;
   }
 
-  /// Check whether the app already has notification permission.
   static Future<bool> hasPermission() async {
-    final android = _plugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
     return await android?.areNotificationsEnabled() ?? true;
+  }
+
+  // ── Launch payload (terminated-state tap) ─────────────────────────────────
+  // Call this in main() after init(). Returns the payload URL if the app was
+  // launched by tapping a notification (e.g. the update notification).
+
+  static Future<String?> getLaunchPayload() async {
+    final details = await _plugin.getNotificationAppLaunchDetails();
+    if (details?.didNotificationLaunchApp == true) {
+      return details?.notificationResponse?.payload;
+    }
+    return null;
   }
 
   // ── Show helpers ─────────────────────────────────────────────────────────
 
-  /// Regular milestone — fired every X scrobbles set by the user.
   static Future<void> showMilestone(int count) {
     final body = 'You just hit ${_fmt(count)} scrobbles on Last.fm 🎶';
     return _plugin.show(
@@ -112,11 +128,9 @@ class NotificationService {
       NotificationDetails(
         android: AndroidNotificationDetails(
           _chMilestoneId, _chMilestoneName,
-          icon:     '@mipmap/ic_launcher',
-          color:    _kLastFmRed,
-          subText:  'LastStats',
-          // BUG FIX: BigTextStyleInformation must receive the body text,
-          // not an empty string — otherwise the expanded view was blank.
+          icon:    '@mipmap/ic_launcher',
+          color:   _kLastFmRed,
+          subText: 'LastStats',
           styleInformation: BigTextStyleInformation(
             body,
             contentTitle: '🎵 Milestone: ${_fmt(count)} scrobbles',
@@ -127,9 +141,6 @@ class NotificationService {
     );
   }
 
-  /// Grand milestone — fires once at 1K / 5K / 10K / 25K / 50K /
-  /// 100K / 250K / 500K / 1M. Uses a high-importance channel so Android
-  /// shows a heads-up banner with a custom message.
   static Future<void> showGrandMilestone(int count) {
     final title = '🏆 ${_grandTitle(count)}';
     final body  = _grandBody(count);
@@ -155,7 +166,6 @@ class NotificationService {
     );
   }
 
-  /// Daily recap — inbox style so each line is clearly readable.
   static Future<void> showDailyRecap({
     required int    count,
     required String topArtist,
@@ -180,7 +190,6 @@ class NotificationService {
         ),
       );
 
-  /// Weekly recap.
   static Future<void> showWeeklyRecap({
     required int    count,
     required String topArtist,
@@ -208,24 +217,51 @@ class NotificationService {
         ),
       );
 
-  /// Test notification — lets the user verify that everything works.
-  static Future<void> showTest() => _plugin.show(
-    _idTest,
-    '🔔 Test notification',
-    'LastStats notifications are working!',
-    NotificationDetails(
-      android: AndroidNotificationDetails(
-        _chMilestoneId, _chMilestoneName,
-        icon:    '@mipmap/ic_launcher',
-        color:   _kLastFmRed,
-        subText: 'LastStats',
+  /// Fires a high-importance notification when a new version is available.
+  /// [downloadUrl] is stored as the payload so tapping it launches the download
+  /// directly — no extra step needed.
+  static Future<void> showUpdateAvailable(String version, String downloadUrl) {
+    const title = '🆕 Update available';
+    final body  = 'LastStats $version is ready — tap to download.';
+    return _plugin.show(
+      _idUpdate,
+      title,
+      body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          _chUpdateId, _chUpdateName,
+          icon:       '@mipmap/ic_launcher',
+          color:      _kLastFmRed,
+          subText:    'LastStats',
+          importance: Importance.high,
+          priority:   Priority.high,
+          styleInformation: BigTextStyleInformation(
+            body,
+            contentTitle: title,
+            summaryText:  'LastStats',
+          ),
+        ),
       ),
-    ),
-  );
+      payload: downloadUrl,
+    );
+  }
+
+  static Future<void> showTest() => _plugin.show(
+        _idTest,
+        '🔔 Test notification',
+        'LastStats notifications are working!',
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            _chMilestoneId, _chMilestoneName,
+            icon:    '@mipmap/ic_launcher',
+            color:   _kLastFmRed,
+            subText: 'LastStats',
+          ),
+        ),
+      );
 
   // ── Formatting helpers ───────────────────────────────────────────────────
 
-  /// Format a number with commas: 1000000 → "1,000,000"
   static String _fmt(int n) {
     final s   = n.toString();
     final buf = StringBuffer();
@@ -238,14 +274,12 @@ class NotificationService {
     return buf.toString();
   }
 
-  /// Short title for a grand milestone: 1000000 → "1M scrobbles!"
   static String _grandTitle(int count) {
     if (count >= 1000000) return '${count ~/ 1000000}M scrobbles!';
     if (count >= 1000)    return '${count ~/ 1000}K scrobbles!';
     return '${_fmt(count)} scrobbles!';
   }
 
-  /// Personal message shown in the expanded grand milestone notification.
   static String _grandBody(int count) {
     switch (count) {
       case 1000000: return "One million scrobbles. That's legendary. 🎸";

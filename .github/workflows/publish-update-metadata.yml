@@ -42,9 +42,17 @@ jobs:
             echo "filename=update.json" >> "$GITHUB_OUTPUT"
           fi
 
+      # FIX: pass the release body through an env var so that special
+      # characters (backticks, quotes, $, newlines) don't break the shell.
+      # Previously, ${{ github.event.release.body }} was expanded inline
+      # inside the heredoc, causing jq / the shell to choke on release notes
+      # that contain markdown formatting.
       - name: Write the metadata JSON file
+        env:
+          RELEASE_BODY: ${{ github.event.release.body }}
         run: |
           mkdir -p public
+          NOTES=$(jq -Rs . <<< "$RELEASE_BODY")
           cat > public/${{ steps.file.outputs.filename }} << EOF
           {
             "tag": "${{ github.event.release.tag_name }}",
@@ -54,7 +62,7 @@ jobs:
             "apk_armeabi_url": "${{ steps.assets.outputs.armeabi }}",
             "apk_x86_64_url": "${{ steps.assets.outputs.x86_64 }}",
             "release_url": "${{ github.event.release.html_url }}",
-            "notes": $(jq -Rs . <<< "${{ github.event.release.body }}"),
+            "notes": $NOTES,
             "published_at": "${{ github.event.release.published_at }}",
             "prerelease": ${{ github.event.release.prerelease }}
           }
