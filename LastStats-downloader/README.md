@@ -7,11 +7,11 @@ A small, static site to download your Last.fm listening data (history, top artis
 index.html        login page (username + API key)
 download.html      download page (pick dataset + format)
 css/style.css      shared styles
-js/i18n.js          FR/EN translations
+js/i18n.js          FR/EN translations + PDF column header translations
 js/auth.js          credential storage (localStorage)
 js/lastfm-api.js    Last.fm API calls + pagination
 js/images.js         artist photo + album/track art lookups (with graceful fallback)
-js/export.js        CSV / Excel / JSON file builders + PDF dispatch
+js/export.js        CSV / Excel / JSON file builders + PDF dispatch (track durations are formatted as m:ss)
 js/pdf-export.js    PDF builders: "Simple" (plain table) and "Beautiful" (branded report with cover stats + photos)
 js/login.js         login page logic
 js/app.js           download page logic

@@ -1,5 +1,14 @@
 'use strict';
 // Map raw Last.fm API items into flat row objects, ready for any export format.
+
+// "245" -> "4:05" — much easier to read than raw seconds.
+function formatDuration(sec) {
+  sec = parseInt(sec || 0, 10);
+  if (!sec) return '';
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+
 const Rows = {
   history(tracks) {
     return tracks.filter(tr => !tr['@attr']?.nowplaying).map((tr, i) => {
@@ -24,7 +33,7 @@ const Rows = {
     return items.map((d, i) => ({ Rank: d['@attr']?.rank || i + 1, Album: d.name || '', Artist: d.artist?.name || '', Plays: parseInt(d.playcount || 0), URL: d.url || '' }));
   },
   tracks(items) {
-    return items.map((d, i) => ({ Rank: d['@attr']?.rank || i + 1, Track: d.name || '', Artist: d.artist?.name || '', Duration_s: parseInt(d.duration || 0), Plays: parseInt(d.playcount || 0), URL: d.url || '' }));
+    return items.map((d, i) => ({ Rank: d['@attr']?.rank || i + 1, Track: d.name || '', Artist: d.artist?.name || '', Duration: formatDuration(d.duration), Plays: parseInt(d.playcount || 0), URL: d.url || '' }));
   },
 };
 

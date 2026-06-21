@@ -108,6 +108,16 @@ if (!I18N[LANG]) LANG = 'en';
 
 function t(key) { return I18N[LANG][key] || key; }
 
+// Column header labels shown in the PDF table — translated, unlike the raw data keys.
+const HEADER_LABELS = {
+  fr: { '#': '#', Date: 'Date', Title: 'Titre', Artist: 'Artiste', Album: 'Album', Rank: 'Rang', Plays: 'Écoutes', Track: 'Morceau', Duration: 'Durée' },
+  en: { '#': '#', Date: 'Date', Title: 'Title', Artist: 'Artist', Album: 'Album', Rank: 'Rank', Plays: 'Plays', Track: 'Track', Duration: 'Duration' },
+};
+function translateHeaders(headers) {
+  const map = HEADER_LABELS[LANG] || HEADER_LABELS.en;
+  return headers.map(h => map[h] || h);
+}
+
 // Push translations into the DOM ([data-i18n] = text, [data-i18n-ph] = placeholder)
 function applyI18n() {
   document.documentElement.lang = LANG;

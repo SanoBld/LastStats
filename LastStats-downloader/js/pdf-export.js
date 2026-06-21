@@ -3,13 +3,14 @@
 async function downloadPdf(rows, filename, title, type, style, includeImages) {
   const headers = Object.keys(rows[0]).filter(h => h !== 'URL'); // URL clutters a printed page
   const body = rows.map(r => headers.map(h => String(r[h] ?? '')));
+  const displayHeaders = translateHeaders(headers); // table needs to show translated column names
   const subtitle = `${new Date().toLocaleDateString()} \u00b7 ${rows.length} ${type === 'history' ? t('pdf_plays') : t('pdf_items')}`;
 
   if (style === 'pretty') {
     const highlights = await buildHighlights(type, rows, includeImages);
-    buildPrettyPdf(headers, body, title, subtitle, highlights, filename);
+    buildPrettyPdf(displayHeaders, body, title, subtitle, highlights, filename);
   } else {
-    buildSimplePdf(headers, body, title, subtitle, filename);
+    buildSimplePdf(displayHeaders, body, title, subtitle, filename);
   }
 }
 
@@ -130,16 +131,21 @@ function drawHighlightRow(doc, highlights, W, y, colors) {
       return;
     }
 
-    const avSize = 16, avX = x + boxW / 2 - avSize / 2, avY = y + 4;
-    doc.setDrawColor(...PRIMARY); doc.setLineWidth(0.5);
+    const avSize = 16, avX = x + boxW / 2 - avSize / 2, avY = y + 4, cx = x + boxW / 2, cy = avY + avSize / 2;
     if (h.avatar) {
       doc.addImage(h.avatar.dataUrl, h.avatar.format, avX, avY, avSize, avSize);
-      doc.roundedRect(avX, avY, avSize, avSize, 2, 2, 'S'); // frame on top of the photo
+      // Radius kept smaller than the image's own rounded clip, so the frame
+      // always sits just inside the photo — no square corner can ever poke out.
+      doc.setDrawColor(...PRIMARY); doc.setLineWidth(0.5);
+      doc.roundedRect(avX, avY, avSize, avSize, 1.5, 1.5, 'S');
     } else {
-      doc.setFillColor(255, 255, 255);
-      doc.circle(x + boxW / 2, avY + avSize / 2, avSize / 2, 'FD'); // fill + matching round border
-      doc.setTextColor(80, 90, 85); doc.setFontSize(13);
-      doc.text(h.monogram || '?', x + boxW / 2, avY + avSize / 2 + 4.5, { align: 'center' });
+      // No photo: a bold, high-contrast monogram instead of a faint placeholder.
+      doc.setFillColor(...PRIMARY);
+      doc.circle(cx, cy, avSize / 2, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
+      doc.text(h.monogram || '?', cx, cy + 5.5, { align: 'center' });
+      doc.setFont('helvetica', 'normal');
     }
 
     doc.setTextColor(...TEXT); doc.setFontSize(7.5);
