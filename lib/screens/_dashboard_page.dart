@@ -624,6 +624,7 @@ class _DashboardPageState extends State<_DashboardPage> {
           url = await ImageService.resolveTrack(
             (t['name'] ?? '').toString(),
             (t['artist']?['name'] ?? '').toString(),
+            lastfmUrl: _extractImage(t['image']),
           );
         }
       case 'top_album':
@@ -635,6 +636,7 @@ class _DashboardPageState extends State<_DashboardPage> {
           url = await ImageService.resolveAlbum(
             (a['name'] ?? '').toString(),
             (a['artist']?['name'] ?? '').toString(),
+            lastfmUrl: _extractImage(a['image']),
           );
         }
       case 'top_artist':
@@ -645,6 +647,7 @@ class _DashboardPageState extends State<_DashboardPage> {
           final a = artists[0] as Map;
           url = await ImageService.resolveArtist(
             (a['name'] ?? '').toString(),
+            lastfmUrl: _extractImage(a['image']),
           );
         }
       default:
