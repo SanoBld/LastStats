@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LastStat Downloader</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="login">
+
+<div class="center-page">
+  <div class="card login-card">
+
+    <div class="brand" style="margin-bottom:18px;">
+      <svg class="reel-mark" viewBox="0 0 48 24" width="40" height="20" aria-hidden="true">
+        <circle cx="14" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.5"/>
+        <circle cx="14" cy="12" r="2.5" fill="currentColor"/>
+        <circle cx="34" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.5"/>
+        <circle cx="34" cy="12" r="2.5" fill="currentColor"/>
+      </svg>
+      <h1 data-i18n="app_name">LastStat Downloader</h1>
+    </div>
+
+    <div class="lang-switch" style="margin-bottom:18px; width:max-content;">
+      <button class="lang-btn" data-lang="fr" onclick="setLang('fr')">FR</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    </div>
+
+    <h2 data-i18n="login_title">Connexion</h2>
+    <p data-i18n="login_sub">Entrez votre pseudo Last.fm et votre clé API pour continuer.</p>
+
+    <form id="login-form">
+      <div class="field">
+        <label for="input-username" data-i18n="label_username">Pseudo Last.fm</label>
+        <input id="input-username" type="text" autocomplete="username" data-i18n-ph="placeholder_username" placeholder="ex : musiclover42">
+      </div>
+      <div class="field">
+        <label for="input-apikey" data-i18n="label_apikey">Clé API Last.fm</label>
+        <input id="input-apikey" type="text" autocomplete="off" data-i18n-ph="placeholder_apikey" placeholder="Votre clé API (32 caractères)">
+        <p class="help" data-i18n="help_apikey">Pas de clé ? Créez-en une gratuitement sur last.fm/api</p>
+      </div>
+      <p class="error-text" id="login-error"></p>
+      <button type="submit" class="btn btn-filled" id="btn-connect" data-i18n="btn_connect">Se connecter</button>
+    </form>
+
+  </div>
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/lastfm-api.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>

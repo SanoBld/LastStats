@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LastStat Downloader</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="download">
+
+<div class="topbar">
+  <div class="brand">
+    <svg class="reel-mark" viewBox="0 0 48 24" width="32" height="16" aria-hidden="true">
+      <circle cx="14" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.5"/>
+      <circle cx="14" cy="12" r="2.5" fill="currentColor"/>
+      <circle cx="34" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.5"/>
+      <circle cx="34" cy="12" r="2.5" fill="currentColor"/>
+    </svg>
+    <h1 data-i18n="app_name">LastStat Downloader</h1>
+  </div>
+  <div style="display:flex; align-items:center; gap:10px;">
+    <div class="lang-switch">
+      <button class="lang-btn" data-lang="fr" onclick="setLang('fr')">FR</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    </div>
+    <button class="btn btn-text" id="btn-logout" data-i18n="nav_logout">Déconnexion</button>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="hello-row">
+    <p><span data-i18n="hello">Connecté en tant que</span> <strong id="hello-username"></strong></p>
+  </div>
+
+  <p class="section-title" data-i18n="section_format">Format de fichier</p>
+  <div class="format-row">
+    <button class="pill-btn format-btn is-active" data-format="csv" data-i18n="fmt_csv">CSV</button>
+    <button class="pill-btn format-btn" data-format="xlsx" data-i18n="fmt_xlsx">Excel</button>
+    <button class="pill-btn format-btn" data-format="json" data-i18n="fmt_json">JSON</button>
+    <button class="pill-btn format-btn" data-format="pdf" data-i18n="fmt_pdf">PDF</button>
+  </div>
+
+  <div class="sub-row hidden" id="pdf-style-row">
+    <p class="section-title" data-i18n="section_pdf_style">Style du PDF</p>
+    <div class="format-row">
+      <button class="pill-btn pdfstyle-btn is-active" data-pdfstyle="simple" data-i18n="pdf_style_simple">Simple</button>
+      <button class="pill-btn pdfstyle-btn" data-pdfstyle="pretty" data-i18n="pdf_style_pretty">Esthétique</button>
+    </div>
+  </div>
+
+  <p class="section-title" data-i18n="section_data">Données à télécharger</p>
+  <div class="grid">
+
+    <div class="data-card">
+      <span class="icon">🎵</span>
+      <h3 data-i18n="card_history">Historique complet</h3>
+      <p class="desc" data-i18n="card_history_desc">Tous vos morceaux écoutés (scrobbles)</p>
+      <button class="btn btn-tonal" data-type="history" data-i18n="btn_download">Télécharger</button>
+    </div>
+
+    <div class="data-card">
+      <span class="icon">🎤</span>
+      <h3 data-i18n="card_artists">Top artistes</h3>
+      <p class="desc" data-i18n="card_artists_desc">Classement complet de vos artistes</p>
+      <button class="btn btn-tonal" data-type="artists" data-i18n="btn_download">Télécharger</button>
+    </div>
+
+    <div class="data-card">
+      <span class="icon">💿</span>
+      <h3 data-i18n="card_albums">Top albums</h3>
+      <p class="desc" data-i18n="card_albums_desc">Classement complet de vos albums</p>
+      <button class="btn btn-tonal" data-type="albums" data-i18n="btn_download">Télécharger</button>
+    </div>
+
+    <div class="data-card">
+      <span class="icon">🎧</span>
+      <h3 data-i18n="card_tracks">Top morceaux</h3>
+      <p class="desc" data-i18n="card_tracks_desc">Classement complet de vos morceaux</p>
+      <button class="btn btn-tonal" data-type="tracks" data-i18n="btn_download">Télécharger</button>
+    </div>
+
+  </div>
+
+  <div class="all-row">
+    <button class="btn btn-filled" id="btn-download-all" data-i18n="btn_download_all">Tout télécharger</button>
+  </div>
+
+  <p class="footer-note" data-i18n="footer_note">Vos données restent sur votre appareil — rien n'est envoyé à un serveur tiers.</p>
+
+</div>
+
+<!-- Progress overlay -->
+<div class="overlay hidden" id="progress-overlay">
+  <div class="overlay-card">
+    <svg class="reel-mark spin" viewBox="0 0 48 24" width="48" height="24" aria-hidden="true">
+      <circle cx="14" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.5"/>
+      <circle cx="14" cy="12" r="2.5" fill="currentColor"/>
+      <circle cx="34" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.5"/>
+      <circle cx="34" cy="12" r="2.5" fill="currentColor"/>
+    </svg>
+    <p class="overlay-title" id="overlay-title">Téléchargement…</p>
+    <p class="overlay-sub" id="overlay-sub"></p>
+    <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
+    <p class="overlay-pct" id="overlay-pct">0%</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/lastfm-api.js"></script>
+<script src="js/export.js"></script>
+<script src="js/pdf-export.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
