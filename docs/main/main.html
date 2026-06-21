@@ -69,7 +69,6 @@
   <pre class="language-dart"><code class="language-dart">void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  &#47;&#47; Catch unhandled Flutter errors before the window opens
   FlutterError.onError = (details) =&gt; debugPrint(&#39;Flutter error: ${details.exception}&#39;);
 
   final prefs      = await SharedPreferences.getInstance();
@@ -84,13 +83,10 @@
   useNowPlayingColorNotifier.value = prefs.getBool(&#39;ls_use_nowplaying_color&#39;) ?? false;
   localeNotifier.value             = prefs.getString(&#39;ls_locale&#39;) ?? &#39;fr&#39;;
 
-  &#47;&#47; Fallback accent used when music-color mode is on but nothing is playing.
-  &#47;&#47; Defaults to the normal accent color if never set.
   final fallbackHex = prefs.getString(&#39;ls_nowplaying_fallback_color&#39;);
   nowPlayingFallbackColorNotifier.value =
       fallbackHex != null ? accentFromString(fallbackHex) : accentNotifier.value;
 
-  &#47;&#47; ── Navigation layout (&#39;auto&#39; | &#39;on&#39; | &#39;off&#39;) ───────────────────────────
   pcModeNotifier.value = prefs.getString(&#39;ls_pc_mode&#39;) ?? &#39;auto&#39;;
 
   &#47;&#47; ── Data caches &amp; storage ────────────────────────────────────────────────
@@ -100,16 +96,19 @@
   await StorageManager.init();
   ImageService.pruneExpired();
 
-  &#47;&#47; Restore offline-mode preference.
   DataCache.offlineMode = prefs.getBool(&#39;ls_cache_serve_stale&#39;) ?? true;
 
-
   &#47;&#47; ── Notifications &amp; WorkManager ──────────────────────────────────────────
-  &#47;&#47; workmanager only supports Android &amp; iOS — calling it on desktop&#47;web
-  &#47;&#47; throws MissingPluginException before runApp(), killing the window.
+  String? notifLaunchPayload;
+
   if (!kIsWeb) {
     final isMobile = Platform.isAndroid || Platform.isIOS;
     await NotificationService.init();
+
+    &#47;&#47; Check if the app was cold-launched by tapping a notification.
+    &#47;&#47; If so, capture the payload (a download URL) and handle it after runApp.
+    notifLaunchPayload = await NotificationService.getLaunchPayload();
+
     if (isMobile) {
       await Workmanager().initialize(
         callbackDispatcher,
@@ -125,10 +124,18 @@
     startupTab: startupTab,
   ));
 
-  &#47;&#47; Check for app updates right after the UI is up, then show a dialog
-  &#47;&#47; immediately if a new version is found.
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    UpdateStartupChecker.run(navigatorKey);
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    &#47;&#47; If the app was launched from a notification tap, open the download URL
+    &#47;&#47; immediately (skipping the in-app update dialog).
+    if (notifLaunchPayload != null &amp;&amp; notifLaunchPayload!.isNotEmpty) {
+      final url = Uri.tryParse(notifLaunchPayload!);
+      if (url != null &amp;&amp; await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      }
+    } else {
+      &#47;&#47; Normal startup: show in-app dialog if an update is available.
+      UpdateStartupChecker.run(navigatorKey);
+    }
   });
 }</code></pre>
 </section>

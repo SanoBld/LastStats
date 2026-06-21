@@ -62,9 +62,6 @@
 
     </section>
     
-<section class="desc markdown">
-  <p>Regular milestone — fired every X scrobbles set by the user.</p>
-</section>
 
 
     
@@ -79,11 +76,9 @@
     NotificationDetails(
       android: AndroidNotificationDetails(
         _chMilestoneId, _chMilestoneName,
-        icon:     &#39;@mipmap&#47;ic_launcher&#39;,
-        color:    _kLastFmRed,
-        subText:  &#39;LastStats&#39;,
-        &#47;&#47; BUG FIX: BigTextStyleInformation must receive the body text,
-        &#47;&#47; not an empty string — otherwise the expanded view was blank.
+        icon:    &#39;@mipmap&#47;ic_launcher&#39;,
+        color:   _kLastFmRed,
+        subText: &#39;LastStats&#39;,
         styleInformation: BigTextStyleInformation(
           body,
           contentTitle: &#39;🎵 Milestone: ${_fmt(count)} scrobbles&#39;,

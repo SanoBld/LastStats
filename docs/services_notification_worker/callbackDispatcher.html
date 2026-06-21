@@ -69,7 +69,6 @@
   <pre class="language-dart"><code class="language-dart">@pragma(&#39;vm:entry-point&#39;)
 void callbackDispatcher() {
   Workmanager().executeTask((taskName, _) async {
-    &#47;&#47; Background isolate needs its own binding + notification init
     WidgetsFlutterBinding.ensureInitialized();
     await NotificationService.init();
 
@@ -80,6 +79,9 @@ void callbackDispatcher() {
           break;
         case _kTaskRecap:
           await _runRecapCheck();
+          break;
+        case _kTaskUpdate:
+          await _runUpdateCheck();
           break;
       }
     } catch (_) {

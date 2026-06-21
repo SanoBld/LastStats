@@ -61,18 +61,14 @@
 
     </section>
     
-<section class="desc markdown">
-  <p>Check whether the app already has notification permission.</p>
-</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;bool&gt; hasPermission() async {
-  final android = _plugin
-      .resolvePlatformSpecificImplementation&lt;
-          AndroidFlutterLocalNotificationsPlugin&gt;();
+  final android = _plugin.resolvePlatformSpecificImplementation&lt;
+      AndroidFlutterLocalNotificationsPlugin&gt;();
   return await android?.areNotificationsEnabled() ?? true;
 }</code></pre>
 </section>

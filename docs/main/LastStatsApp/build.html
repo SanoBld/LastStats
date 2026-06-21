@@ -127,7 +127,6 @@ Widget build(BuildContext context) {
                           (useDynamic &amp;&amp; lightDynamic != null)
                               ? lightDynamic.harmonized()
                               : ColorScheme.fromSeed(
-                                  &#47;&#47; seedColorForScheme handles pure black&#47;white edge cases
                                   seedColor:  seedColorForScheme(accent),
                                   brightness: Brightness.light,
                                 );

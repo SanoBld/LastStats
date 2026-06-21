@@ -61,10 +61,6 @@
 
     </section>
     
-<section class="desc markdown">
-  <p>Re-register (or cancel) all WorkManager tasks based on current prefs.
-Call after changing any notification setting.</p>
-</section>
 
 
     
@@ -74,8 +70,6 @@ Call after changing any notification setting.</p>
   final prefs = await SharedPreferences.getInstance();
 
   &#47;&#47; ── Milestone task ───────────────────────────────────────────────────
-  &#47;&#47; Register if either interval OR grand milestones are enabled,
-  &#47;&#47; since both run inside the same periodic task.
   await Workmanager().cancelByUniqueName(_kTaskMilestone);
   final intervalOn = prefs.getBool(_kMilestoneEnabled) ?? false;
   final grandOn    = prefs.getBool(_kGrandEnabled)     ?? true;
@@ -84,7 +78,6 @@ Call after changing any notification setting.</p>
     await Workmanager().registerPeriodicTask(
       _kTaskMilestone,
       _kTaskMilestone,
-      &#47;&#47; 15 min is the Android minimum; good balance between freshness and battery
       frequency:          const Duration(minutes: 15),
       existingWorkPolicy: ExistingWorkPolicy.replace,
       constraints: Constraints(networkType: NetworkType.connected),
@@ -99,12 +92,23 @@ Call after changing any notification setting.</p>
     await Workmanager().registerPeriodicTask(
       _kTaskRecap,
       _kTaskRecap,
-      &#47;&#47; Fires every hour; the worker checks the ±30 min time window
       frequency:          const Duration(hours: 1),
       existingWorkPolicy: ExistingWorkPolicy.replace,
       constraints: Constraints(networkType: NetworkType.connected),
     );
   }
+
+  &#47;&#47; ── Update check task ────────────────────────────────────────────────
+  &#47;&#47; Always registered — runs every 6 hours in the background.
+  &#47;&#47; Only fires a notification when a new version is found AND not yet notified.
+  await Workmanager().cancelByUniqueName(_kTaskUpdate);
+  await Workmanager().registerPeriodicTask(
+    _kTaskUpdate,
+    _kTaskUpdate,
+    frequency:          const Duration(hours: 6),
+    existingWorkPolicy: ExistingWorkPolicy.keep,
+    constraints: Constraints(networkType: NetworkType.connected),
+  );
 }</code></pre>
 </section>
 

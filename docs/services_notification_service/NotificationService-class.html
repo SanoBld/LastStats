@@ -161,6 +161,19 @@
   <section class="summary offset-anchor" id="static-methods">
     <h2>Static Methods</h2>
     <dl class="callables">
+        <dt id="getLaunchPayload" class="callable">
+  <span class="name"><a href="../services_notification_service/NotificationService/getLaunchPayload.html">getLaunchPayload</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
         <dt id="hasPermission" class="callable">
   <span class="name"><a href="../services_notification_service/NotificationService/hasPermission.html">hasPermission</a></span><span class="signature">(<wbr>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
@@ -169,7 +182,7 @@
 
 </dt>
 <dd>
-  Check whether the app already has notification permission.
+  
   
 
 </dd>
@@ -182,7 +195,7 @@
 
 </dt>
 <dd>
-  Call once at app startup (and at the top of the WorkManager callback).
+  
   
 
 </dd>
@@ -195,7 +208,7 @@
 
 </dt>
 <dd>
-  Ask for permission (Android 13+, iOS). Returns true if granted.
+  
   
 
 </dd>
@@ -208,7 +221,7 @@
 
 </dt>
 <dd>
-  Daily recap — inbox style so each line is clearly readable.
+  
   
 
 </dd>
@@ -221,9 +234,7 @@
 
 </dt>
 <dd>
-  Grand milestone — fires once at 1K / 5K / 10K / 25K / 50K /
-100K / 250K / 500K / 1M. Uses a high-importance channel so Android
-shows a heads-up banner with a custom message.
+  
   
 
 </dd>
@@ -236,7 +247,7 @@ shows a heads-up banner with a custom message.
 
 </dt>
 <dd>
-  Regular milestone — fired every X scrobbles set by the user.
+  
   
 
 </dd>
@@ -249,7 +260,22 @@ shows a heads-up banner with a custom message.
 
 </dt>
 <dd>
-  Test notification — lets the user verify that everything works.
+  
+  
+
+</dd>
+
+        <dt id="showUpdateAvailable" class="callable">
+  <span class="name"><a href="../services_notification_service/NotificationService/showUpdateAvailable.html">showUpdateAvailable</a></span><span class="signature">(<wbr><span class="parameter" id="showUpdateAvailable-param-version"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">version</span>, </span><span class="parameter" id="showUpdateAvailable-param-downloadUrl"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">downloadUrl</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Fires a high-importance notification when a new version is available.
+<code>downloadUrl</code> is stored as the payload so tapping it launches the download
+directly — no extra step needed.
   
 
 </dd>
@@ -262,7 +288,7 @@ shows a heads-up banner with a custom message.
 
 </dt>
 <dd>
-  Weekly recap.
+  
   
 
 </dd>

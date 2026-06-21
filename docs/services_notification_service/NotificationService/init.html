@@ -61,9 +61,6 @@
 
     </section>
     
-<section class="desc markdown">
-  <p>Call once at app startup (and at the top of the WorkManager callback).</p>
-</section>
 
 
     
@@ -76,16 +73,23 @@
     requestBadgePermission: false,
     requestSoundPermission: false,
   );
-  await _plugin.initialize(const InitializationSettings(
-    android: android,
-    iOS:     ios,
-  ));
+  await _plugin.initialize(
+    const InitializationSettings(android: android, iOS: ios),
+    &#47;&#47; Tap handler when app is in foreground or background.
+    &#47;&#47; The payload is the download URL set in showUpdateAvailable().
+    onDidReceiveNotificationResponse: (details) async {
+      final payload = details.payload;
+      if (payload == null || payload.isEmpty) return;
+      final url = Uri.tryParse(payload);
+      if (url != null &amp;&amp; await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      }
+    },
+  );
 
-  final androidImpl = _plugin
-      .resolvePlatformSpecificImplementation&lt;
-          AndroidFlutterLocalNotificationsPlugin&gt;();
+  final androidImpl = _plugin.resolvePlatformSpecificImplementation&lt;
+      AndroidFlutterLocalNotificationsPlugin&gt;();
 
-  &#47;&#47; Regular milestone — default importance (no heads-up)
   await androidImpl?.createNotificationChannel(
     const AndroidNotificationChannel(
       _chMilestoneId, _chMilestoneName,
@@ -94,7 +98,6 @@
     ),
   );
 
-  &#47;&#47; Grand milestone — high importance so Android shows a heads-up popup
   await androidImpl?.createNotificationChannel(
     const AndroidNotificationChannel(
       _chGrandId, _chGrandName,
@@ -103,12 +106,19 @@
     ),
   );
 
-  &#47;&#47; Recap — low importance, no sound, just sits in the drawer
   await androidImpl?.createNotificationChannel(
     const AndroidNotificationChannel(
       _chRecapId, _chRecapName,
       description: &#39;Daily and weekly listening summaries&#39;,
       importance:  Importance.low,
+    ),
+  );
+
+  await androidImpl?.createNotificationChannel(
+    const AndroidNotificationChannel(
+      _chUpdateId, _chUpdateName,
+      description: &#39;Notifies when a new version of LastStats is available&#39;,
+      importance:  Importance.high,
     ),
   );
 }</code></pre>

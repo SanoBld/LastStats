@@ -61,25 +61,19 @@
 
     </section>
     
-<section class="desc markdown">
-  <p>Ask for permission (Android 13+, iOS). Returns true if granted.</p>
-</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;bool&gt; requestPermission() async {
-  final android = _plugin
-      .resolvePlatformSpecificImplementation&lt;
-          AndroidFlutterLocalNotificationsPlugin&gt;();
-  final ios = _plugin
-      .resolvePlatformSpecificImplementation&lt;
-          IOSFlutterLocalNotificationsPlugin&gt;();
+  final android = _plugin.resolvePlatformSpecificImplementation&lt;
+      AndroidFlutterLocalNotificationsPlugin&gt;();
+  final ios = _plugin.resolvePlatformSpecificImplementation&lt;
+      IOSFlutterLocalNotificationsPlugin&gt;();
 
   final a = await android?.requestNotificationsPermission() ?? true;
-  final i = await ios?.requestPermissions(
-      alert: true, badge: true, sound: true) ?? true;
+  final i = await ios?.requestPermissions(alert: true, badge: true, sound: true) ?? true;
   return a &amp;&amp; i;
 }</code></pre>
 </section>

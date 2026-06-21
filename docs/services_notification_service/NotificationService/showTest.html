@@ -61,27 +61,24 @@
 
     </section>
     
-<section class="desc markdown">
-  <p>Test notification — lets the user verify that everything works.</p>
-</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; showTest() =&gt; _plugin.show(
-  _idTest,
-  &#39;🔔 Test notification&#39;,
-  &#39;LastStats notifications are working!&#39;,
-  NotificationDetails(
-    android: AndroidNotificationDetails(
-      _chMilestoneId, _chMilestoneName,
-      icon:    &#39;@mipmap&#47;ic_launcher&#39;,
-      color:   _kLastFmRed,
-      subText: &#39;LastStats&#39;,
-    ),
-  ),
-);</code></pre>
+      _idTest,
+      &#39;🔔 Test notification&#39;,
+      &#39;LastStats notifications are working!&#39;,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          _chMilestoneId, _chMilestoneName,
+          icon:    &#39;@mipmap&#47;ic_launcher&#39;,
+          color:   _kLastFmRed,
+          subText: &#39;LastStats&#39;,
+        ),
+      ),
+    );</code></pre>
 </section>
 
 
