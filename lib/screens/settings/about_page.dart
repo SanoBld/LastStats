@@ -133,9 +133,33 @@ class AboutPage extends StatelessWidget {
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           _PoweredByTile(
+            icon: Icons.graphic_eq_rounded,
+            label: 'Deezer API',
+            url: 'https://developers.deezer.com',
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _PoweredByTile(
+            icon: Icons.storage_rounded,
+            label: 'TheAudioDB',
+            url: 'https://www.theaudiodb.com',
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _PoweredByTile(
             icon: Icons.album_rounded,
             label: 'MusicBrainz',
             url: 'https://musicbrainz.org',
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _PoweredByTile(
+            icon: Icons.image_rounded,
+            label: 'Cover Art Archive',
+            url: 'https://coverartarchive.org',
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _PoweredByTile(
+            icon: Icons.menu_book_rounded,
+            label: 'Wikipedia / Wikimedia Commons',
+            url: 'https://www.wikipedia.org',
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           _PoweredByTile(
@@ -144,6 +168,28 @@ class AboutPage extends StatelessWidget {
             url: 'https://flutter.dev',
           ),
         ]),
+
+        const SizedBox(height: 16),
+
+        // ── Image disclaimer ─────────────────────────────────────────────
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: scheme.secondaryContainer.withValues(alpha: 0.45),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.3)),
+          ),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Icon(Icons.image_not_supported_outlined, size: 18, color: scheme.secondary),
+            const SizedBox(width: 10),
+            Expanded(child: Text(
+              isEn
+                  ? 'Artist, album and track images are fetched automatically from these sources and may sometimes be incorrect or not match the actual content.'
+                  : 'Les images des artistes, albums et titres sont récupérées automatiquement depuis ces sources et peuvent parfois être incorrectes ou ne pas correspondre au contenu réel.',
+              style: text.bodySmall?.copyWith(color: scheme.onSecondaryContainer),
+            )),
+          ]),
+        ),
 
         const SizedBox(height: 20),
 
