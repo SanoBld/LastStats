@@ -89,7 +89,7 @@ class ImageService {
     final mem = _getUrl(key);
     if (mem != null) return mem;
 
-    final itunes = await _itunesSearch(artist, 'musicArtist', 'artistTerm');
+    final itunes = await _itunesSearch(artist, 'musicArtist', 'artistTerm', artist);
     if (itunes.isNotEmpty) return _persistUrl(key, itunes);
 
     final deezer = await _deezerArtist(artist);
@@ -101,7 +101,7 @@ class ImageService {
     final mb = await _mbArtistImage(artist);
     if (mb.isNotEmpty) return _persistUrl(key, mb);
 
-    final wiki = await _wikipediaImage(artist);
+    final wiki = await _wikipediaImage(artist, expectName: artist);
     if (wiki.isNotEmpty) return _persistUrl(key, wiki);
 
     return _persistUrl(key, '');
@@ -114,7 +114,7 @@ class ImageService {
     final mem = _getUrl(key);
     if (mem != null) return mem;
 
-    final itunes = await _itunesSearch('$artist $album', 'album');
+    final itunes = await _itunesSearch('$artist $album', 'album', null, artist, album);
     if (itunes.isNotEmpty) return _persistUrl(key, itunes);
 
     final deezer = await _deezerAlbum(album, artist);
@@ -126,7 +126,7 @@ class ImageService {
     final mb = await _mbAlbum(album, artist);
     if (mb.isNotEmpty) return _persistUrl(key, mb);
 
-    final wiki = await _wikipediaImage('$artist $album album');
+    final wiki = await _wikipediaImage('$artist $album album', expectName: album);
     if (wiki.isNotEmpty) return _persistUrl(key, wiki);
 
     return _persistUrl(key, '');
@@ -140,7 +140,7 @@ class ImageService {
     final mem = _getUrl(key);
     if (mem != null) return mem;
 
-    final itunes = await _itunesSearch('$artist $track', 'song');
+    final itunes = await _itunesSearch('$artist $track', 'song', null, artist, track);
     if (itunes.isNotEmpty) return _persistUrl(key, itunes);
 
     final deezer = await _deezerTrack(track, artist);
@@ -155,7 +155,7 @@ class ImageService {
       if (mb.isNotEmpty) return _persistUrl(key, mb);
     }
 
-    final wiki = await _wikipediaImage('$artist $track song');
+    final wiki = await _wikipediaImage('$artist $track song', expectName: track);
     if (wiki.isNotEmpty) return _persistUrl(key, wiki);
 
     return _persistUrl(key, '');
@@ -234,7 +234,44 @@ class ImageService {
   static bool _ok(String? url) =>
       url != null && url.isNotEmpty && !url.contains(_placeholder);
 
-  static Future<String> _itunesSearch(String term, String entity, [String? attribute]) async {
+  // Normalizes a name for loose comparison: lowercase, strips diacritics,
+  // drops a leading "the/a/le/la/les", keeps only letters/digits.
+  static String _normalize(String s) {
+    var n = s.toLowerCase().trim();
+    const accents = 'àâäáãåèêëéìîïíòôöóõùûüúñçÀÂÄÁÃÅÈÊËÉÌÎÏÍÒÔÖÓÕÙÛÜÚÑÇ';
+    const plain   = 'aaaaaaeeeeiiiiooooouuuuncAAAAAAEEEEIIIIOOOOOUUUUNC';
+    for (var i = 0; i < accents.length; i++) {
+      n = n.replaceAll(accents[i], plain[i]);
+    }
+    n = n.replaceFirst(RegExp(r'^(the|a|le|la|les)\s+'), '');
+    return n.replaceAll(RegExp(r'[^a-z0-9]'), '');
+  }
+
+  // Loose "is this actually about what we searched for" check — used to
+  // reject mismatched results from third-party sources (the cause of
+  // unrelated images showing up) rather than blindly trusting whatever
+  // each API returns first.
+  static bool _similar(String expected, String candidate) {
+    final a = _normalize(expected);
+    final b = _normalize(candidate);
+    if (a.isEmpty || b.isEmpty) return false;
+    if (a == b) return true;
+    final shorter = a.length <= b.length ? a : b;
+    final longer  = a.length <= b.length ? b : a;
+    if (shorter.length >= 4 && longer.contains(shorter)) return true;
+    return false;
+  }
+
+  // Searches iTunes and only returns artwork if the result actually matches
+  // who/what we asked for (expectArtist / expectTitle) — avoids grabbing the
+  // first loosely-related hit when the catalog has an ambiguous match.
+  static Future<String> _itunesSearch(
+    String term,
+    String entity, [
+    String? attribute,
+    String? expectArtist,
+    String? expectTitle,
+  ]) async {
     try {
       final params = <String, String>{'term': term, 'entity': entity, 'limit': '1', 'media': 'music'};
       if (attribute != null) params['attribute'] = attribute;
@@ -242,7 +279,15 @@ class ImageService {
       if (res.statusCode != 200) return '';
       final results = (jsonDecode(utf8.decode(res.bodyBytes))['results'] as List?) ?? [];
       if (results.isEmpty) return '';
-      final raw = (results.first['artworkUrl100'] ?? '').toString();
+      final item = results.first as Map<String, dynamic>;
+
+      if (expectArtist != null && !_similar(expectArtist, (item['artistName'] ?? '').toString())) return '';
+      if (expectTitle != null) {
+        final titleField = entity == 'song' ? 'trackName' : 'collectionName';
+        if (!_similar(expectTitle, (item[titleField] ?? '').toString())) return '';
+      }
+
+      final raw = (item['artworkUrl100'] ?? '').toString();
       return raw.isEmpty ? '' : raw
           .replaceAll('100x100bb', '3000x3000bb')
           .replaceAll('100x100',   '3000x3000');
@@ -256,7 +301,9 @@ class ImageService {
       if (res.statusCode != 200) return '';
       final items = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
       if (items.isEmpty) return '';
-      return (items.first['picture_xl'] ?? items.first['picture_big'] ?? '').toString();
+      final item = items.first;
+      if (!_similar(artist, (item['name'] ?? '').toString())) return '';
+      return (item['picture_xl'] ?? item['picture_big'] ?? '').toString();
     } catch (_) { return ''; }
   }
 
@@ -267,7 +314,9 @@ class ImageService {
       if (res.statusCode != 200) return '';
       final items = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
       if (items.isEmpty) return '';
-      return (items.first['cover_xl'] ?? items.first['cover_big'] ?? '').toString();
+      final item = items.first;
+      if (!_similar(album, (item['title'] ?? '').toString())) return '';
+      return (item['cover_xl'] ?? item['cover_big'] ?? '').toString();
     } catch (_) { return ''; }
   }
 
@@ -279,7 +328,9 @@ class ImageService {
       if (res.statusCode != 200) return '';
       final items = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
       if (items.isEmpty) return '';
-      final album = items.first['album'] as Map<String, dynamic>?;
+      final item = items.first;
+      if (!_similar(track, (item['title'] ?? '').toString())) return '';
+      final album = item['album'] as Map<String, dynamic>?;
       return (album?['cover_xl'] ?? album?['cover_big'] ?? '').toString();
     } catch (_) { return ''; }
   }
@@ -292,7 +343,9 @@ class ImageService {
       if (res.statusCode != 200) return '';
       final albums = (jsonDecode(utf8.decode(res.bodyBytes))['album'] as List?) ?? [];
       if (albums.isEmpty) return '';
-      return (albums.first['strAlbumThumb'] ?? '').toString();
+      final item = albums.first;
+      if (!_similar(album, (item['strAlbum'] ?? '').toString())) return '';
+      return (item['strAlbumThumb'] ?? '').toString();
     } catch (_) { return ''; }
   }
 
@@ -306,7 +359,9 @@ class ImageService {
       if (res.statusCode != 200) return '';
       final tracks = (jsonDecode(utf8.decode(res.bodyBytes))['track'] as List?) ?? [];
       if (tracks.isEmpty) return '';
-      return (tracks.first['strTrackThumb'] ?? '').toString();
+      final item = tracks.first;
+      if (!_similar(track, (item['strTrack'] ?? '').toString())) return '';
+      return (item['strTrackThumb'] ?? '').toString();
     } catch (_) { return ''; }
   }
 
@@ -321,6 +376,7 @@ class ImageService {
       final artists = (jsonDecode(utf8.decode(res.bodyBytes))['artists'] as List?) ?? [];
       if (artists.isEmpty) return '';
       final a = artists.first;
+      if (!_similar(artist, (a['strArtist'] ?? '').toString())) return '';
       return (a['strArtistThumb'] ?? a['strArtistFanart'] ?? '').toString();
     } catch (_) { return ''; }
   }
@@ -338,7 +394,9 @@ class ImageService {
       if (searchRes.statusCode != 200) return '';
       final found = (jsonDecode(utf8.decode(searchRes.bodyBytes))['artists'] as List?) ?? [];
       if (found.isEmpty) return '';
-      final mbid = (found.first['id'] ?? '').toString();
+      final candidate = found.first;
+      if (!_similar(artist, (candidate['name'] ?? '').toString())) return '';
+      final mbid = (candidate['id'] ?? '').toString();
       if (mbid.isEmpty) return '';
 
       final relRes = await http.get(
@@ -367,20 +425,38 @@ class ImageService {
     } catch (_) { return ''; }
   }
 
-  // Wikipedia full-text search → page thumbnail. Broad coverage, CORS-safe
-  // (origin=* param) — usable from native and web builds alike.
-  static Future<String> _wikipediaImage(String query) async {
+  // Wikipedia full-text search → page thumbnail. Broad coverage but the
+  // riskiest source for false positives (a plain text search can land on a
+  // totally unrelated page) — validated against the page title and, when
+  // available, its short description before the thumbnail is trusted.
+  static Future<String> _wikipediaImage(String query, {required String expectName}) async {
     try {
       final res = await http.get(Uri.https('en.wikipedia.org', '/w/api.php', {
         'action': 'query', 'generator': 'search', 'gsrsearch': query,
-        'gsrlimit': '1', 'prop': 'pageimages', 'piprop': 'thumbnail',
-        'pithumbsize': '600', 'format': 'json', 'origin': '*',
+        'gsrlimit': '1', 'prop': 'pageimages|pageterms', 'piprop': 'thumbnail',
+        'pithumbsize': '600', 'wbptterms': 'description',
+        'format': 'json', 'origin': '*',
       })).timeout(_timeout);
       if (res.statusCode != 200) return '';
       final pages = (jsonDecode(utf8.decode(res.bodyBytes))['query']?['pages'] as Map?) ?? {};
       for (final p in pages.values) {
         final thumb = p['thumbnail']?['source'];
-        if (thumb != null) return thumb.toString();
+        if (thumb == null) continue;
+
+        final title = (p['title'] ?? '').toString();
+        if (!_similar(expectName, title)) continue; // page isn't about what we searched
+
+        final descriptions = (p['terms']?['description'] as List?) ?? [];
+        final description  = descriptions.isNotEmpty ? descriptions.first.toString().toLowerCase() : '';
+        const musicHints = [
+          'singer', 'musician', 'band', 'rapper', 'songwriter', 'composer',
+          'dj', 'record producer', 'music group', 'vocalist', 'guitarist',
+          'drummer', 'rock band', 'pop group', 'album', 'song by', 'music duo',
+          'hip hop group', 'girl group', 'boy band', 'instrumentalist', 'orchestra',
+        ];
+        if (description.isNotEmpty && !musicHints.any(description.contains)) continue;
+
+        return thumb.toString();
       }
       return '';
     } catch (_) { return ''; }
@@ -398,7 +474,9 @@ class ImageService {
       if (searchRes.statusCode != 200) return '';
       final releases = (jsonDecode(utf8.decode(searchRes.bodyBytes))['releases'] as List?) ?? [];
       if (releases.isEmpty) return '';
-      final mbid = (releases.first['id'] ?? '').toString();
+      final candidate = releases.first;
+      if (!_similar(album, (candidate['title'] ?? '').toString())) return '';
+      final mbid = (candidate['id'] ?? '').toString();
       if (mbid.isEmpty) return '';
       final coverRes = await http.get(Uri.https('coverartarchive.org', '/release/$mbid/front')).timeout(_timeout);
       if (coverRes.statusCode == 200 || coverRes.statusCode == 307) {
