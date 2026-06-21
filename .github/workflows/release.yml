@@ -18,25 +18,17 @@ on:
         required: true
 
 jobs:
-  # Each platform builds in its own separate workflow file.
-  windows:
-    uses: ./.github/workflows/build-windows.yml
-
-  macos:
-    uses: ./.github/workflows/build-macos.yml
-
-  linux:
-    uses: ./.github/workflows/build-linux.yml
-
-  android:
-    uses: ./.github/workflows/build-android.yml
-
-  # Once all 4 builds are done, gather everything and publish the release.
-  publish-release:
-    needs: [ windows, macos, linux, android ]
+  # Resolves tag/version/prerelease BEFORE the builds so it can be passed
+  # down to them as an input (each build job does its own checkout, so it
+  # can never see a commit made by a later step in this same run).
+  resolve:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      tag:        ${{ steps.meta.outputs.tag }}
+      version:    ${{ steps.meta.outputs.version }}
+      prerelease: ${{ steps.meta.outputs.prerelease }}
     steps:
       - uses: actions/checkout@v4
 
@@ -73,6 +65,41 @@ jobs:
           git tag ${{ steps.meta.outputs.tag }} || true
           git push origin ${{ steps.meta.outputs.tag }} || true
 
+  # Each platform builds in its own separate workflow file, receiving the
+  # resolved version so the compiled app shows/compares against it.
+  windows:
+    needs: resolve
+    uses: ./.github/workflows/build-windows.yml
+    with:
+      version: ${{ needs.resolve.outputs.version }}
+
+  macos:
+    needs: resolve
+    uses: ./.github/workflows/build-macos.yml
+    with:
+      version: ${{ needs.resolve.outputs.version }}
+
+  linux:
+    needs: resolve
+    uses: ./.github/workflows/build-linux.yml
+    with:
+      version: ${{ needs.resolve.outputs.version }}
+
+  android:
+    needs: resolve
+    uses: ./.github/workflows/build-android.yml
+    with:
+      version: ${{ needs.resolve.outputs.version }}
+
+  # Once all 4 builds are done, gather everything and publish the release.
+  publish-release:
+    needs: [ resolve, windows, macos, linux, android ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
       - name: Download all build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -90,15 +117,15 @@ jobs:
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          tag:                  ${{ steps.meta.outputs.tag }}
-          name:                 "LastStats v${{ steps.meta.outputs.version }}"
+          tag:                  ${{ needs.resolve.outputs.tag }}
+          name:                 "LastStats v${{ needs.resolve.outputs.version }}"
           artifacts:            "flat-assets/*"
           generateReleaseNotes: true
-          prerelease:           ${{ steps.meta.outputs.prerelease }}
-          makeLatest:           ${{ steps.meta.outputs.prerelease == 'false' }}
+          prerelease:           ${{ needs.resolve.outputs.prerelease }}
+          makeLatest:           ${{ needs.resolve.outputs.prerelease == 'false' }}
           token:                ${{ secrets.GITHUB_TOKEN }}
           body: |
-            ## LastStats v${{ steps.meta.outputs.version }}
+            ## LastStats v${{ needs.resolve.outputs.version }}
 
             ### Android
             | File | Use case |

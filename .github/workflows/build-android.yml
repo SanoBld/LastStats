@@ -1,8 +1,20 @@
 name: Build Android
 
 on:
-  workflow_call: {}
-  workflow_dispatch: {}
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version to build (e.g. 2.7.0). Empty = read from pubspec.yaml'
+        required: false
+        type: string
+        default: ''
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g. 2.7.0). Empty = read from pubspec.yaml'
+        required: false
+        type: string
+        default: ''
 
 jobs:
   build:
@@ -20,18 +32,27 @@ jobs:
       - run: flutter pub get
       - run: dart run flutter_launcher_icons
 
+      - name: Resolve version
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Inject version into app
+        run: sed -i "s/currentVersion = '.*'/currentVersion = '$VERSION'/" lib/services/update_service.dart
+
       # Universal APK — works on every phone, biggest file size.
       - name: Build universal APK
         run: |
-          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
           flutter build apk --release --build-name="$VERSION" --build-number=${{ github.run_number }}
           cp build/app/outputs/flutter-apk/app-release.apk app-universal-release.apk
 
       # Per-CPU-architecture APKs — smaller, faster to install.
       - name: Build per-architecture APKs
-        run: |
-          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
-          flutter build apk --release --split-per-abi --build-name="$VERSION" --build-number=${{ github.run_number }}
+        run: flutter build apk --release --split-per-abi --build-name="$VERSION" --build-number=${{ github.run_number }}
 
       # Put every APK in one flat folder so the upload step is simple.
       - name: Collect all APKs

@@ -1,8 +1,20 @@
 name: Build Linux
 
 on:
-  workflow_call: {}
-  workflow_dispatch: {}
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version to build (e.g. 2.7.0). Empty = read from pubspec.yaml'
+        required: false
+        type: string
+        default: ''
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g. 2.7.0). Empty = read from pubspec.yaml'
+        required: false
+        type: string
+        default: ''
 
 jobs:
   build:
@@ -19,10 +31,22 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: dart run flutter_launcher_icons
-      - name: Build Linux
+
+      - name: Resolve version
         run: |
-          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
-          flutter build linux --release --build-name="$VERSION" --build-number=${{ github.run_number }}
+          if [ -n "${{ inputs.version }}" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Inject version into app
+        run: sed -i "s/currentVersion = '.*'/currentVersion = '$VERSION'/" lib/services/update_service.dart
+
+      - name: Build Linux
+        run: flutter build linux --release --build-name="$VERSION" --build-number=${{ github.run_number }}
+
       # cd into the bundle folder before zipping, same fix as macOS.
       - name: Zip Linux build
         run: |

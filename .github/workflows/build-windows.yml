@@ -1,9 +1,23 @@
 name: Build Windows
 
 # Reusable: called by build-all.yml / release.yml — also runnable manually.
+# If "version" is provided (release.yml), it's used and injected into the
+# app. Otherwise (build-all.yml's automatic checks), falls back to pubspec.yaml.
 on:
-  workflow_call: {}
-  workflow_dispatch: {}
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version to build (e.g. 2.7.0). Empty = read from pubspec.yaml'
+        required: false
+        type: string
+        default: ''
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g. 2.7.0). Empty = read from pubspec.yaml'
+        required: false
+        type: string
+        default: ''
 
 jobs:
   build:
@@ -16,11 +30,25 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: dart run flutter_launcher_icons
-      - name: Build Windows
+
+      - name: Resolve version
         shell: bash
         run: |
-          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
-          flutter build windows --release --build-name="$VERSION" --build-number=${{ github.run_number }}
+          if [ -n "${{ inputs.version }}" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Inject version into app
+        shell: bash
+        run: sed -i "s/currentVersion = '.*'/currentVersion = '$VERSION'/" lib/services/update_service.dart
+
+      - name: Build Windows
+        shell: bash
+        run: flutter build windows --release --build-name="$VERSION" --build-number=${{ github.run_number }}
+
       # The /* makes sure the zip contains the files directly,
       # not a wrapping "Release" folder.
       - name: Zip Windows build

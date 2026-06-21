@@ -1,8 +1,20 @@
 name: Build macOS
 
 on:
-  workflow_call: {}
-  workflow_dispatch: {}
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version to build (e.g. 2.7.0). Empty = read from pubspec.yaml'
+        required: false
+        type: string
+        default: ''
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g. 2.7.0). Empty = read from pubspec.yaml'
+        required: false
+        type: string
+        default: ''
 
 jobs:
   build:
@@ -15,10 +27,23 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: dart run flutter_launcher_icons
-      - name: Build macOS
+
+      - name: Resolve version
         run: |
-          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
-          flutter build macos --release --build-name="$VERSION" --build-number=${{ github.run_number }}
+          if [ -n "${{ inputs.version }}" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      # macOS ships BSD sed: -i needs an explicit (empty) backup suffix arg.
+      - name: Inject version into app
+        run: sed -i '' "s/currentVersion = '.*'/currentVersion = '$VERSION'/" lib/services/update_service.dart
+
+      - name: Build macOS
+        run: flutter build macos --release --build-name="$VERSION" --build-number=${{ github.run_number }}
+
       # cd into the actual app folder first, so the zip does not
       # contain the long "build/macos/Build/Products/Release/" path inside it.
       - name: Zip macOS build
