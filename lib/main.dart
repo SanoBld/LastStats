@@ -34,6 +34,7 @@ void main() async {
   accentNotifier.value             = accentFromString(prefs.getString('ls_accent'));
   useDynamicColorNotifier.value    = prefs.getBool('ls_use_dynamic_color')    ?? false;
   useNowPlayingColorNotifier.value = prefs.getBool('ls_use_nowplaying_color') ?? false;
+  artworkColorThemeNotifier.value  = prefs.getBool('ls_artwork_color_theme')  ?? false;
   localeNotifier.value             = prefs.getString('ls_locale') ?? 'fr';
 
   final fallbackHex = prefs.getString('ls_nowplaying_fallback_color');

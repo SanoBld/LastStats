@@ -11,6 +11,10 @@ final localeNotifier             = ValueNotifier<String>('fr'); // 'fr' | 'en'
 // Saved as 'ls_nowplaying_fallback_color' in SharedPreferences.
 final nowPlayingFallbackColorNotifier = ValueNotifier<Color>(const Color(0xFF7C3AED));
 
+// Tint detail sheet backgrounds with the dominant color from the artwork.
+// Saved as 'ls_artwork_color_theme' in SharedPreferences.
+final artworkColorThemeNotifier = ValueNotifier<bool>(false);
+
 /// Controls the navigation layout:
 ///   'auto' → wide rail when screen width ≥ 720 dp (default)
 ///   'on'   → always use the side rail (even on narrow screens)

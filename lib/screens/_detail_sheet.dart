@@ -110,6 +110,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   String _period       = 'overall';
 
   String _resolvedImage = '';
+  Color? _artworkColor;  // dominant color extracted from artwork
 
   Map<String, dynamic>? _info;
   List<dynamic>         _topTracks = [];
@@ -153,7 +154,23 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       default:
         url = await ImageService.resolveTrack(_name, _artist, lastfmUrl: raw.isNotEmpty ? raw : null);
     }
-    if (mounted) setState(() => _resolvedImage = url);
+    if (!mounted) return;
+    setState(() => _resolvedImage = url);
+    // Extract dominant color when the option is enabled
+    if (url.isNotEmpty && artworkColorThemeNotifier.value) {
+      _extractArtworkColor(url);
+    }
+  }
+
+  Future<void> _extractArtworkColor(String url) async {
+    try {
+      final generator = await PaletteGenerator.fromImageProvider(
+        NetworkImage(url),
+        size: const Size(200, 200),
+      );
+      final color = generator.dominantColor?.color ?? generator.vibrantColor?.color;
+      if (color != null && mounted) setState(() => _artworkColor = color);
+    } catch (_) {}
   }
 
   Future<void> _fetchMeta() async {
@@ -308,16 +325,20 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    // Tint surface with dominant artwork color at 18% when option is enabled
+    final surface = (artworkColorThemeNotifier.value && _artworkColor != null)
+        ? Color.lerp(scheme.surface, _artworkColor!, 0.18)!
+        : scheme.surface;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        backgroundColor: scheme.surface,
-        body: _buildContent(context, scheme),
+        backgroundColor: surface,
+        body: _buildContent(context, scheme, surface),
       ),
     );
   }
 
-  Widget _buildContent(BuildContext ctx, ColorScheme scheme) {
+  Widget _buildContent(BuildContext ctx, ColorScheme scheme, Color surface) {
     final mediaH   = MediaQuery.of(ctx).size.height;
     final topPad   = MediaQuery.of(ctx).padding.top;
     final imgH     = mediaH * 0.44;
@@ -353,8 +374,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                 colors: [
                   Colors.black.withValues(alpha: 0.55),
                   Colors.transparent,
-                  scheme.surface.withValues(alpha: 0.82),
-                  scheme.surface,
+                  surface.withValues(alpha: 0.82),
+                  surface,
                 ],
               ),
             ),
@@ -382,7 +403,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                 ),
                 _buildHeader(ctx, scheme, imgH, hasImage),
                 Container(
-                  color: scheme.surface,
+                  color: surface,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1337,6 +1358,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
   bool      _loading      = true;
   bool      _isNowPlaying = false;
   String    _bannerUrl    = '';
+  Color?    _artworkColor;  // dominant color extracted from banner image
   late bool _localIsFav;
 
   @override
@@ -1392,7 +1414,21 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
             (a['name'] ?? '').toString(),
             lastfmUrl: _extractImage(a['image']));
       }
-      if (mounted && url.isNotEmpty) setState(() => _bannerUrl = url);
+      if (mounted && url.isNotEmpty) {
+        setState(() => _bannerUrl = url);
+        if (artworkColorThemeNotifier.value) _extractArtworkColor(url);
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _extractArtworkColor(String url) async {
+    try {
+      final generator = await PaletteGenerator.fromImageProvider(
+        NetworkImage(url),
+        size: const Size(200, 200),
+      );
+      final color = generator.dominantColor?.color ?? generator.vibrantColor?.color;
+      if (color != null && mounted) setState(() => _artworkColor = color);
     } catch (_) {}
   }
 
@@ -1433,19 +1469,22 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final surface = (artworkColorThemeNotifier.value && _artworkColor != null)
+        ? Color.lerp(scheme.surface, _artworkColor!, 0.18)!
+        : scheme.surface;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        backgroundColor: scheme.surface,
+        backgroundColor: surface,
         body: _loading
             ? const Center(child: CircularProgressIndicator())
-            : _buildContent(context, scheme),
+            : _buildContent(context, scheme, surface),
       ),
     );
   }
 
   // Full-screen layout matching _ItemDetailSheet: blurred banner + scroll
-  Widget _buildContent(BuildContext ctx, ColorScheme scheme) {
+  Widget _buildContent(BuildContext ctx, ColorScheme scheme, Color surface) {
     final mediaH    = MediaQuery.of(ctx).size.height;
     final topPad    = MediaQuery.of(ctx).padding.top;
     final imgH      = mediaH * 0.42;
@@ -1484,8 +1523,8 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                 colors: [
                   Colors.black.withValues(alpha: 0.55),
                   Colors.transparent,
-                  scheme.surface.withValues(alpha: 0.82),
-                  scheme.surface,
+                  surface.withValues(alpha: 0.82),
+                  surface,
                 ],
               ),
             ),
@@ -1511,7 +1550,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                 ),
                 _buildProfileHeader(ctx, scheme, hasAv, avatarUrl),
                 Container(
-                  color: scheme.surface,
+                  color: surface,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

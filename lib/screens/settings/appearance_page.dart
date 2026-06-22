@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../app_state.dart';
 import '../../l10n.dart';
 import 'settings_helpers.dart';
-import 'pc_mode_section.dart';   // PC / responsive layout toggle
+import 'pc_mode_section.dart';
 
 class AppearancePage extends StatefulWidget {
   const AppearancePage({super.key});
@@ -19,7 +19,7 @@ class _AppearancePageState extends State<AppearancePage> {
   String _accent             = 'purple';
   bool   _useDynamicColor    = false;
   bool   _useNowPlayingColor = false;
-  // The accent color shown when music-color mode is on but nothing is playing
+  bool   _artworkColorTheme  = false; // tint detail sheets with artwork color
   Color  _fallbackAccent     = const Color(0xFF7C3AED);
 
   @override
@@ -41,11 +41,11 @@ class _AppearancePageState extends State<AppearancePage> {
     final p = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
-      _theme              = p.getString('ls_theme')              ?? 'system';
-      _accent             = p.getString('ls_accent')             ?? 'purple';
-      _useDynamicColor    = p.getBool('ls_use_dynamic_color')    ?? false;
-      _useNowPlayingColor = p.getBool('ls_use_nowplaying_color') ?? false;
-      // Load the fallback color; default to the regular accent if never set
+      _theme              = p.getString('ls_theme')               ?? 'system';
+      _accent             = p.getString('ls_accent')              ?? 'purple';
+      _useDynamicColor    = p.getBool('ls_use_dynamic_color')     ?? false;
+      _useNowPlayingColor = p.getBool('ls_use_nowplaying_color')  ?? false;
+      _artworkColorTheme  = p.getBool('ls_artwork_color_theme')   ?? false;
       final fbHex = p.getString('ls_nowplaying_fallback_color');
       _fallbackAccent = fbHex != null
           ? accentFromString(fbHex)
@@ -71,7 +71,8 @@ class _AppearancePageState extends State<AppearancePage> {
     if (!_useDynamicColor && !_useNowPlayingColor) accentNotifier.value = color;
   }
 
-  Future<void> _pickCustomColor() async {    if (_useDynamicColor || _useNowPlayingColor) return;
+  Future<void> _pickCustomColor() async {
+    if (_useDynamicColor || _useNowPlayingColor) return;
     final result = await showDialog<Color>(
       context: context,
       builder: (_) => ColorPickerDialog(initialColor: accentNotifier.value),
@@ -84,8 +85,6 @@ class _AppearancePageState extends State<AppearancePage> {
     }
   }
 
-  // Opens the picker to choose the fallback accent.
-  // This color is shown when music-color mode is ON but nothing is playing.
   Future<void> _pickFallbackColor() async {
     final result = await showDialog<Color>(
       context: context,
@@ -96,7 +95,6 @@ class _AppearancePageState extends State<AppearancePage> {
       await _set('ls_nowplaying_fallback_color', hex);
       setState(() => _fallbackAccent = result);
       nowPlayingFallbackColorNotifier.value = result;
-      // Apply right away so the user sees the change if no track is playing
       accentNotifier.value = result;
     }
   }
@@ -110,6 +108,7 @@ class _AppearancePageState extends State<AppearancePage> {
     final scheme        = Theme.of(context).colorScheme;
     final text          = Theme.of(context).textTheme;
     final currentAccent = accentNotifier.value;
+    final isEn          = localeNotifier.value == 'en';
 
     return Scaffold(
       appBar: AppBar(
@@ -181,7 +180,6 @@ class _AppearancePageState extends State<AppearancePage> {
               Opacity(
                 opacity: (_useDynamicColor || _useNowPlayingColor) ? 0.35 : 1.0,
                 child: Wrap(spacing: 10, runSpacing: 10, children: [
-                  // Preset swatches
                   ...kSettingsAccentOptions.map((opt) {
                     final (color, key, label) = opt;
                     final sel = _accent == key;
@@ -213,7 +211,6 @@ class _AppearancePageState extends State<AppearancePage> {
                           )),
                     );
                   }),
-                  // Custom colour picker swatch
                   GestureDetector(
                     onTap: (_useDynamicColor || _useNowPlayingColor)
                         ? null
@@ -254,7 +251,6 @@ class _AppearancePageState extends State<AppearancePage> {
                   ),
                 ]),
               ),
-              // Hex display when a custom colour is active
               if (_isCustomAccent &&
                   !_useDynamicColor &&
                   !_useNowPlayingColor) ...[
@@ -327,20 +323,15 @@ class _AppearancePageState extends State<AppearancePage> {
                 style: text.bodySmall
                     ?.copyWith(color: scheme.onSurfaceVariant)),
           ),
-
-          // Fallback color: shown when music-color mode is ON but nothing plays.
-          // Only visible when the toggle above is active.
           if (_useNowPlayingColor && !_useDynamicColor) ...[
             const Divider(height: 1, indent: 16, endIndent: 16),
             ListTile(
               leading: Icon(Icons.music_off_rounded, color: scheme.primary),
               title: Text(
-                localeNotifier.value == 'en'
-                    ? 'Color when nothing plays'
-                    : 'Couleur quand rien ne joue',
+                isEn ? 'Color when nothing plays' : 'Couleur quand rien ne joue',
               ),
               subtitle: Text(
-                localeNotifier.value == 'en'
+                isEn
                     ? 'Accent used while no track is scrobbling'
                     : "Accent utilisé quand aucune piste n'est en cours",
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
@@ -348,9 +339,7 @@ class _AppearancePageState extends State<AppearancePage> {
               trailing: GestureDetector(
                 onTap: _pickFallbackColor,
                 child: Tooltip(
-                  message: localeNotifier.value == 'en'
-                      ? 'Pick fallback color'
-                      : 'Choisir la couleur de secours',
+                  message: isEn ? 'Pick fallback color' : 'Choisir la couleur de secours',
                   child: Container(
                     width: 32, height: 32,
                     decoration: BoxDecoration(
@@ -366,7 +355,6 @@ class _AppearancePageState extends State<AppearancePage> {
             Padding(
               padding: const EdgeInsets.fromLTRB(56, 0, 16, 10),
               child: Row(children: [
-                // Small swatch showing the current fallback color
                 Container(
                   width: 14, height: 14,
                   decoration: BoxDecoration(
@@ -391,13 +379,29 @@ class _AppearancePageState extends State<AppearancePage> {
               ]),
             ),
           ],
+
+          // ── Artwork color theme ────────────────────────────────────────
+          // When enabled, detail sheets (artists/albums/tracks/profiles) tint
+          // their background with the dominant color extracted from the artwork.
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          SwitchListTile(
+            secondary: Icon(Icons.style_rounded, color: scheme.primary),
+            title: Text(isEn ? 'Artwork color theme' : 'Thème couleur de l\'affiche'),
+            subtitle: Text(isEn
+                ? 'Detail pages adapt their background to the artwork\'s dominant color'
+                : 'Les fiches adaptent leur fond à la couleur dominante de l\'affiche'),
+            value: _artworkColorTheme,
+            onChanged: (v) async {
+              await _set('ls_artwork_color_theme', v);
+              setState(() => _artworkColorTheme = v);
+              artworkColorThemeNotifier.value = v;
+            },
+          ),
         ]),
 
         const SizedBox(height: 16),
 
         // ── PC / responsive layout mode ───────────────────────────────────
-        // Lets the user force the side-rail or bottom-bar layout regardless
-        // of screen size. PcModeSection handles its own state + persistence
         const PcModeSection(),
 
         const SizedBox(height: 20),
