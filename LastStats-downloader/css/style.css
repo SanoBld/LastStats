@@ -62,9 +62,11 @@ h1,h2,h3{ font-family: var(--font-display); margin:0; letter-spacing:-.01em; }
 .topbar{
   display:flex; align-items:center; justify-content:space-between;
   padding: 16px 20px; max-width: 880px; margin: 0 auto;
+  flex-wrap: wrap; row-gap: 10px;
 }
-.brand{ display:flex; align-items:center; gap:10px; }
-.brand h1{ font-size: 1.15rem; }
+.brand{ display:flex; align-items:center; gap:10px; min-width:0; }
+.brand h1{ font-size: 1.15rem; white-space:nowrap; }
+.topbar-actions{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
 .reel-mark{ color: var(--md-primary); flex-shrink:0; }
 .reel-mark.spin{ animation: spin 1.1s linear infinite; transform-origin: 24px 12px; }
 @keyframes spin{ to{ transform: rotate(360deg); } }
@@ -143,7 +145,7 @@ h1,h2,h3{ font-family: var(--font-display); margin:0; letter-spacing:-.01em; }
 
 .section-title{ font-size: .85rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color: var(--md-on-surface-variant); margin: 28px 0 12px; }
 
-.format-row{ display:flex; gap:8px; background: var(--md-surface-container); border-radius:999px; padding:4px; width:max-content; }
+.format-row{ display:flex; gap:8px; background: var(--md-surface-container); border-radius: var(--radius-m); padding:4px; width:max-content; max-width:100%; flex-wrap:wrap; }
 .pill-btn{ border:0; background:transparent; padding:9px 16px; border-radius:999px; font-family:var(--font-body); font-weight:600; font-size:.85rem; color: var(--md-on-surface-variant); cursor:pointer; transition: transform .15s ease, background-color .2s ease, color .2s ease; }
 .pill-btn:hover{ background: var(--md-surface-container-high); }
 .pill-btn:active{ transform: scale(.95); }
@@ -214,7 +216,7 @@ h1,h2,h3{ font-family: var(--font-display); margin:0; letter-spacing:-.01em; }
 .overlay.hidden{ display:none; }
 .overlay-card{
   background: var(--md-surface-container-high); border-radius: var(--radius-l);
-  padding: 28px 30px; width: 320px; box-shadow: var(--elev-2);
+  padding: 28px 30px; width: 320px; max-width: 88vw; box-shadow: var(--elev-2);
   display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center;
 }
 .overlay-card .reel-mark{ width:48px; height:24px; }
@@ -229,7 +231,18 @@ h1,h2,h3{ font-family: var(--font-display); margin:0; letter-spacing:-.01em; }
   position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px);
   background: var(--md-on-surface); color: var(--md-surface);
   padding: 12px 20px; border-radius: var(--radius-s); font-size:.88rem;
+  max-width: 90vw; text-align:center;
   opacity:0; transition: opacity .2s, transform .2s; z-index:60; pointer-events:none;
 }
 .toast.is-error{ background: var(--md-error); color: var(--md-error-container); }
 .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ── Small screens ── */
+@media (max-width: 480px){
+  .page{ padding: 0 16px 48px; }
+  .card{ padding: 24px; }
+  .brand h1{ font-size: 1rem; }
+  .topbar{ padding: 14px 16px; }
+  .all-row .btn{ width:100%; }
+  .chart-bar{ flex:1 0 26px; min-width:26px; }
+}
