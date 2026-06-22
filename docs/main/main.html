@@ -81,6 +81,7 @@
   accentNotifier.value             = accentFromString(prefs.getString(&#39;ls_accent&#39;));
   useDynamicColorNotifier.value    = prefs.getBool(&#39;ls_use_dynamic_color&#39;)    ?? false;
   useNowPlayingColorNotifier.value = prefs.getBool(&#39;ls_use_nowplaying_color&#39;) ?? false;
+  artworkColorThemeNotifier.value  = prefs.getBool(&#39;ls_artwork_color_theme&#39;)  ?? false;
   localeNotifier.value             = prefs.getString(&#39;ls_locale&#39;) ?? &#39;fr&#39;;
 
   final fallbackHex = prefs.getString(&#39;ls_nowplaying_fallback_color&#39;);
