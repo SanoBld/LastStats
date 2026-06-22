@@ -20,8 +20,8 @@ function initLoginForm() {
     btn.disabled = true;
     btn.textContent = t('btn_connecting');
     try {
-      await LastFM.testLogin(username, apiKey);
-      Auth.save(username, apiKey, imagesKey);
+      const user = await LastFM.testLogin(username, apiKey);
+      Auth.save(username, apiKey, imagesKey, pickAvatarUrl(user));
       location.href = 'download.html';
     } catch {
       errEl.textContent = t('err_invalid');
@@ -30,6 +30,15 @@ function initLoginForm() {
       btn.textContent = t('btn_connect');
     }
   });
+}
+
+// Last.fm returns an array of avatar sizes; take the largest one that actually has a URL.
+function pickAvatarUrl(user) {
+  const imgs = user?.image || [];
+  for (let i = imgs.length - 1; i >= 0; i--) {
+    if (imgs[i]['#text']) return imgs[i]['#text'];
+  }
+  return '';
 }
 
 document.addEventListener('DOMContentLoaded', initLoginForm);

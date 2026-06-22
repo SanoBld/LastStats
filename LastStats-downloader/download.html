@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LastStat Downloader</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="download">
@@ -25,6 +25,7 @@
       <button class="lang-btn" data-lang="fr" onclick="setLang('fr')">FR</button>
       <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
     </div>
+    <a class="btn btn-text" href="recap.html" data-i18n="nav_recap">Récap</a>
     <button class="btn btn-text" id="btn-logout" data-i18n="nav_logout">Déconnexion</button>
   </div>
 </div>
@@ -32,7 +33,10 @@
 <div class="page">
 
   <div class="hello-row">
-    <p><span data-i18n="hello">Connecté en tant que</span> <strong id="hello-username"></strong></p>
+    <div class="hello-user">
+      <div class="avatar" id="user-avatar"></div>
+      <p><span data-i18n="hello">Connecté en tant que</span> <strong id="hello-username"></strong></p>
+    </div>
   </div>
 
   <p class="section-title" data-i18n="section_format">Format de fichier</p>
@@ -56,6 +60,14 @@
       <input type="checkbox" id="chk-include-images" checked>
       <span data-i18n="pdf_include_images">Inclure les photos (artistes/albums)</span>
     </label>
+  </div>
+
+  <div class="sub-row" id="sort-row">
+    <p class="section-title" data-i18n="section_sort">Ordre de tri</p>
+    <div class="format-row">
+      <button class="pill-btn sort-btn is-active" data-sort="desc" data-i18n="sort_desc">Décroissant</button>
+      <button class="pill-btn sort-btn" data-sort="asc" data-i18n="sort_asc">Croissant</button>
+    </div>
   </div>
 
   <p class="section-title" data-i18n="section_data">Données à télécharger</p>

@@ -13,6 +13,7 @@ const TYPES = {
 let currentFormat = 'csv';
 let currentPdfStyle = 'simple';
 let includeImages = true;
+let currentSortOrder = 'desc';
 let exportRunning = false;
 
 function updatePdfSubRows() {
@@ -23,6 +24,13 @@ function updatePdfSubRows() {
 
 function initDownloadPage() {
   document.getElementById('hello-username').textContent = Auth.username;
+
+  const avatarEl = document.getElementById('user-avatar');
+  if (Auth.avatarUrl) {
+    avatarEl.innerHTML = `<img src="${Auth.avatarUrl}" alt="">`;
+  } else {
+    avatarEl.textContent = (Auth.username[0] || '?').toUpperCase();
+  }
 
   document.getElementById('btn-logout').addEventListener('click', () => {
     Auth.clear();
@@ -51,6 +59,14 @@ function initDownloadPage() {
     includeImages = e.target.checked;
   });
 
+  // Sort order: descending (default, matches Last.fm's own order) or ascending (reversed)
+  document.querySelectorAll('.sort-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      currentSortOrder = b.dataset.sort;
+      document.querySelectorAll('.sort-btn').forEach(x => x.classList.toggle('is-active', x === b));
+    });
+  });
+
   // One download button per dataset card
   document.querySelectorAll('[data-type]').forEach(btn => {
     btn.addEventListener('click', () => runExport(btn.dataset.type));
@@ -67,6 +83,10 @@ async function runExport(type) {
   try {
     const items = await LastFM.fetchAll(cfg.method, cfg.dataKey, cfg.itemKey, { ...cfg.params, limit: cfg.limit }, updateProgress);
     const rows  = cfg.build(items);
+    if (currentSortOrder === 'asc') {
+      rows.reverse();
+      if (type === 'history') rows.forEach((r, i) => { r['#'] = i + 1; }); // keep the row counter sequential
+    }
     await downloadRows(rows, `laststat-${Auth.username}-${type}`, currentFormat, { title: t(cfg.labelKey), type, pdfStyle: currentPdfStyle, includeImages });
     showToast(t('toast_done'));
   } catch {

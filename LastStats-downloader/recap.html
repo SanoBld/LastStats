@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LastStat Downloader</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="recap">
+
+<div class="topbar">
+  <div class="brand">
+    <svg class="reel-mark" viewBox="0 0 48 24" width="32" height="16" aria-hidden="true">
+      <circle cx="14" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.5"/>
+      <circle cx="14" cy="12" r="2.5" fill="currentColor"/>
+      <circle cx="34" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.5"/>
+      <circle cx="34" cy="12" r="2.5" fill="currentColor"/>
+    </svg>
+    <h1 data-i18n="app_name">LastStat Downloader</h1>
+  </div>
+  <div style="display:flex; align-items:center; gap:10px;">
+    <div class="lang-switch">
+      <button class="lang-btn" data-lang="fr" onclick="setLang('fr')">FR</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    </div>
+    <a class="btn btn-text" href="download.html" data-i18n="nav_back">Télécharger</a>
+    <button class="btn btn-text" id="btn-logout" data-i18n="nav_logout">Déconnexion</button>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="hello-row">
+    <div class="hello-user">
+      <div class="avatar" id="user-avatar"></div>
+      <p><span data-i18n="hello">Connecté en tant que</span> <strong id="hello-username"></strong></p>
+    </div>
+  </div>
+
+  <h2 data-i18n="recap_title">Récapitulatif de vos musiques</h2>
+  <p class="recap-sub" data-i18n="recap_sub">Importez un fichier exporté depuis ce site (CSV, Excel ou JSON) pour voir un résumé.</p>
+
+  <div class="dropzone" id="dropzone">
+    <input type="file" id="file-input" accept=".csv,.xlsx,.xls,.json" hidden>
+    <p data-i18n="recap_drop">Glissez un fichier ici, ou cliquez pour le choisir</p>
+    <button type="button" class="btn btn-tonal" id="btn-choose" data-i18n="recap_choose">Choisir un fichier</button>
+  </div>
+
+  <p class="error-text" id="recap-error"></p>
+
+  <div id="recap-results" class="hidden"></div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/recap.js"></script>
+</body>
+</html>
