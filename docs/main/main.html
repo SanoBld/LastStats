@@ -99,22 +99,17 @@
 
   DataCache.offlineMode = prefs.getBool(&#39;ls_cache_serve_stale&#39;) ?? true;
 
-  &#47;&#47; ── Notifications &amp; WorkManager ──────────────────────────────────────────
+  &#47;&#47; ── Notifications &amp; WorkManager (mobile only) ────────────────────────────
   String? notifLaunchPayload;
 
   if (!kIsWeb) {
     final isMobile = Platform.isAndroid || Platform.isIOS;
-    await NotificationService.init();
 
-    &#47;&#47; Check if the app was cold-launched by tapping a notification.
-    &#47;&#47; If so, capture the payload (a download URL) and handle it after runApp.
-    notifLaunchPayload = await NotificationService.getLaunchPayload();
-
+    &#47;&#47; flutter_local_notifications and workmanager are not supported on desktop
     if (isMobile) {
-      await Workmanager().initialize(
-        callbackDispatcher,
-        isInDebugMode: false,
-      );
+      await NotificationService.init();
+      notifLaunchPayload = await NotificationService.getLaunchPayload();
+      await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
       await NotificationWorker.scheduleAll();
     }
   }
@@ -126,15 +121,12 @@
   ));
 
   WidgetsBinding.instance.addPostFrameCallback((_) async {
-    &#47;&#47; If the app was launched from a notification tap, open the download URL
-    &#47;&#47; immediately (skipping the in-app update dialog).
     if (notifLaunchPayload != null &amp;&amp; notifLaunchPayload!.isNotEmpty) {
       final url = Uri.tryParse(notifLaunchPayload!);
       if (url != null &amp;&amp; await canLaunchUrl(url)) {
         await launchUrl(url, mode: LaunchMode.externalApplication);
       }
     } else {
-      &#47;&#47; Normal startup: show in-app dialog if an update is available.
       UpdateStartupChecker.run(navigatorKey);
     }
   });
