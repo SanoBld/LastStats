@@ -804,6 +804,10 @@ class _DashboardPageState extends State<_DashboardPage> {
     return '';
   }
 
+  // Fetch bytes ourselves (catchable errors) and extract the color via
+  // compute(), off the main isolate — PaletteGenerator.fromImageProvider was
+  // running this synchronously on the UI thread and freezing the app every
+  // ~10s when the now-playing track changed.
   Future<void> _extractColor(Map<String, dynamic> track) async {
     if (!useNowPlayingColorNotifier.value) return;
     final url = _extractImage(track['image']);
@@ -812,20 +816,17 @@ class _DashboardPageState extends State<_DashboardPage> {
       return;
     }
     try {
-      final pal = await PaletteGenerator.fromImageProvider(
-        NetworkImage(url), size: const Size(200, 200), maximumColorCount: 24);
-      final c = pal.vibrantColor?.color
-             ?? pal.lightVibrantColor?.color
-             ?? pal.darkVibrantColor?.color
-             ?? pal.lightMutedColor?.color
-             ?? pal.mutedColor?.color
-             ?? pal.dominantColor?.color;
+      final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 6));
       if (!mounted) return;
-      if (c != null) {
-        accentNotifier.value = seedColorForScheme(c);
-      } else {
+      if (response.statusCode != 200 || response.bodyBytes.isEmpty) {
         accentNotifier.value = nowPlayingFallbackColorNotifier.value;
+        return;
       }
+      final argb = await compute(_extractDominantColorArgb, response.bodyBytes);
+      if (!mounted) return;
+      accentNotifier.value = argb != null
+          ? seedColorForScheme(Color(argb))
+          : nowPlayingFallbackColorNotifier.value;
     } catch (_) {
       if (mounted) accentNotifier.value = nowPlayingFallbackColorNotifier.value;
     }

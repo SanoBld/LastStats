@@ -18,7 +18,9 @@ void _pushFullscreen(BuildContext ctx, String url) {
 // ── Artwork color theme blending (beta) ────────────────────────────────────
 // Blends the artwork-derived accent into [base] by factor [t]:
 //   t = 0 → untouched base theme (e.g. before the color is extracted)
-//   t = 1 → fully artwork-themed (surface tint + matching primary accent)
+//   t = 1 → fully artwork-themed (surface tint + matching primary/secondary
+//           accent — secondary/secondaryContainer matter because that's what
+//           Material 3's FilterChip uses for its selected state by default)
 // Animating [t] with a TweenAnimationBuilder gives a smooth fade instead of
 // the accent snapping in the instant the extraction finishes.
 ({ColorScheme scheme, Color surface}) _artworkBlend(
@@ -28,20 +30,68 @@ void _pushFullscreen(BuildContext ctx, String url) {
     return (scheme: base, surface: base.surface);
   }
 
-  // Seed a full scheme from the artwork color so primary/onPrimary stay
-  // properly contrasted, then fade each role in from the base value.
+  // Seed a full scheme from the artwork color so every role stays properly
+  // contrasted, then fade each one in from the base value.
   final seeded = ColorScheme.fromSeed(
     seedColor:  seedColorForScheme(artworkColor),
     brightness: base.brightness,
   );
   final scheme = base.copyWith(
-    primary:            Color.lerp(base.primary,            seeded.primary,            t)!,
-    onPrimary:          Color.lerp(base.onPrimary,          seeded.onPrimary,          t)!,
-    primaryContainer:   Color.lerp(base.primaryContainer,   seeded.primaryContainer,   t)!,
-    onPrimaryContainer: Color.lerp(base.onPrimaryContainer, seeded.onPrimaryContainer, t)!,
+    primary:              Color.lerp(base.primary,              seeded.primary,              t)!,
+    onPrimary:            Color.lerp(base.onPrimary,            seeded.onPrimary,            t)!,
+    primaryContainer:     Color.lerp(base.primaryContainer,     seeded.primaryContainer,     t)!,
+    onPrimaryContainer:   Color.lerp(base.onPrimaryContainer,   seeded.onPrimaryContainer,   t)!,
+    secondary:            Color.lerp(base.secondary,            seeded.secondary,            t)!,
+    onSecondary:          Color.lerp(base.onSecondary,          seeded.onSecondary,          t)!,
+    secondaryContainer:   Color.lerp(base.secondaryContainer,   seeded.secondaryContainer,   t)!,
+    onSecondaryContainer: Color.lerp(base.onSecondaryContainer, seeded.onSecondaryContainer, t)!,
   );
   final surface = Color.lerp(base.surface, artworkColor, 0.18 * t)!;
   return (scheme: scheme, surface: surface);
+}
+
+// ── Dominant color extraction (off the main isolate) ───────────────────────
+// PaletteGenerator.fromImageProvider quantizes colors synchronously on the
+// calling isolate — a known Flutter freeze (flutter/flutter#140325), even on
+// small images. This replacement decodes at a tiny target size and buckets
+// pixels into a histogram, favoring saturated tones over washed-out ones,
+// then the whole thing runs inside compute() so it never blocks the UI.
+// Must stay a top-level function with no captured state: compute() ships it
+// to a background isolate as-is.
+Future<int?> _extractDominantColorArgb(Uint8List bytes) async {
+  try {
+    final codec = await ui.instantiateImageCodec(
+      bytes, targetWidth: 48, targetHeight: 48,
+    );
+    final frame = await codec.getNextFrame();
+    final raw = await frame.image.toByteData(format: ui.ImageByteFormat.rawRgba);
+    frame.image.dispose();
+    if (raw == null) return null;
+
+    final pixels = raw.buffer.asUint8List();
+    final counts = <int, int>{};
+    for (int i = 0; i < pixels.length; i += 4) {
+      if (pixels[i + 3] < 200) continue; // skip near-transparent pixels
+      final r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
+      final maxc = r > g ? (r > b ? r : b) : (g > b ? g : b);
+      final minc = r < g ? (r < b ? r : b) : (g < b ? g : b);
+      final sat  = maxc == 0 ? 0.0 : (maxc - minc) / maxc;
+      // Group close colors (5 bits/channel) and weight saturated pixels
+      // higher so a vibrant accent wins over a dull/grey background.
+      final key    = ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3);
+      final weight = 1 + (sat * 4).round();
+      counts[key]  = (counts[key] ?? 0) + weight;
+    }
+    if (counts.isEmpty) return null;
+
+    final best = counts.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
+    final r = ((best >> 10) & 0x1F) << 3;
+    final g = ((best >> 5)  & 0x1F) << 3;
+    final b = (best & 0x1F) << 3;
+    return 0xFF000000 | (r << 16) | (g << 8) | b;
+  } catch (_) {
+    return null;
+  }
 }
 
 // ── Pull-down-to-dismiss wrapper ───────────────────────────────────────────
@@ -191,23 +241,17 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     }
   }
 
-  // Downloads the bytes ourselves first (instead of handing the URL straight
-  // to PaletteGenerator via NetworkImage). NetworkImage errors are delivered
-  // through Flutter's image-stream error channel, which a normal try/catch
-  // around fromImageProvider does NOT catch — on Windows this was escaping
-  // as an unhandled error and taking the app down. Fetching with http.get
-  // keeps every failure (network, timeout, bad bytes) inside this try/catch.
+  // Downloads the bytes ourselves (instead of handing the URL straight to an
+  // ImageProvider) so every failure — network, timeout, decode — stays
+  // inside this try/catch. The actual color extraction runs via compute(),
+  // off the main isolate, to avoid the freeze PaletteGenerator caused.
   Future<void> _extractArtworkColor(String url) async {
     try {
       final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 6));
       if (!mounted || response.statusCode != 200 || response.bodyBytes.isEmpty) return;
 
-      final generator = await PaletteGenerator.fromImageProvider(
-        MemoryImage(response.bodyBytes),
-        size: const Size(200, 200),
-      );
-      final color = generator.dominantColor?.color ?? generator.vibrantColor?.color;
-      if (color != null && mounted) setState(() => _artworkColor = color);
+      final argb = await compute(_extractDominantColorArgb, response.bodyBytes);
+      if (argb != null && mounted) setState(() => _artworkColor = Color(argb));
     } catch (_) {
       // Network error, timeout, or decode failure: skip the tint silently.
     }
@@ -364,7 +408,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final baseScheme = Theme.of(context).colorScheme;
+    final baseTheme  = Theme.of(context);
+    final baseScheme = baseTheme.colorScheme;
     final artworkOn  = artworkColorThemeNotifier.value && _artworkColor != null;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -375,9 +420,15 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         curve: Curves.easeOut,
         builder: (_, t, _) {
           final blend = _artworkBlend(baseScheme, _artworkColor, t);
-          return Scaffold(
-            backgroundColor: blend.surface,
-            body: _buildContent(context, blend.scheme, blend.surface),
+          // Theme() makes default Material widgets (e.g. FilterChip, which
+          // reads colorScheme.secondaryContainer ambiently) follow the
+          // artwork accent too, not just the widgets we color explicitly.
+          return Theme(
+            data: baseTheme.copyWith(colorScheme: blend.scheme),
+            child: Scaffold(
+              backgroundColor: blend.surface,
+              body: _buildContent(context, blend.scheme, blend.surface),
+            ),
           );
         },
       ),
@@ -1467,20 +1518,15 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     } catch (_) {}
   }
 
-  // Same fix as in _ItemDetailSheetState: fetch bytes ourselves so any
-  // failure stays inside this try/catch instead of escaping through
-  // Flutter's image-stream error channel.
+  // Same approach as _ItemDetailSheetState: fetch bytes ourselves, then run
+  // the color extraction off the main isolate via compute().
   Future<void> _extractArtworkColor(String url) async {
     try {
       final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 6));
       if (!mounted || response.statusCode != 200 || response.bodyBytes.isEmpty) return;
 
-      final generator = await PaletteGenerator.fromImageProvider(
-        MemoryImage(response.bodyBytes),
-        size: const Size(200, 200),
-      );
-      final color = generator.dominantColor?.color ?? generator.vibrantColor?.color;
-      if (color != null && mounted) setState(() => _artworkColor = color);
+      final argb = await compute(_extractDominantColorArgb, response.bodyBytes);
+      if (argb != null && mounted) setState(() => _artworkColor = Color(argb));
     } catch (_) {
       // Network error, timeout, or decode failure: skip the tint silently.
     }
@@ -1522,7 +1568,8 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final baseScheme = Theme.of(context).colorScheme;
+    final baseTheme  = Theme.of(context);
+    final baseScheme = baseTheme.colorScheme;
     final artworkOn  = artworkColorThemeNotifier.value && _artworkColor != null;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -1533,11 +1580,14 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
         curve: Curves.easeOut,
         builder: (_, t, _) {
           final blend = _artworkBlend(baseScheme, _artworkColor, t);
-          return Scaffold(
-            backgroundColor: blend.surface,
-            body: _loading
-                ? const Center(child: CircularProgressIndicator())
-                : _buildContent(context, blend.scheme, blend.surface),
+          return Theme(
+            data: baseTheme.copyWith(colorScheme: blend.scheme),
+            child: Scaffold(
+              backgroundColor: blend.surface,
+              body: _loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _buildContent(context, blend.scheme, blend.surface),
+            ),
           );
         },
       ),
