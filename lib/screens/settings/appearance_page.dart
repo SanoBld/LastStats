@@ -380,16 +380,33 @@ class _AppearancePageState extends State<AppearancePage> {
             ),
           ],
 
-          // ── Artwork color theme ────────────────────────────────────────
+          // ── Artwork color theme (beta) ──────────────────────────────────
           // When enabled, detail sheets (artists/albums/tracks/profiles) tint
-          // their background with the dominant color extracted from the artwork.
+          // their background AND accent colors (chips, icons) with the
+          // dominant color extracted from the artwork. Marked beta: color
+          // extraction quality and contrast can vary a lot between images.
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
             secondary: Icon(Icons.style_rounded, color: scheme.primary),
-            title: Text(isEn ? 'Artwork color theme' : 'Thème couleur de l\'affiche'),
+            title: Row(children: [
+              Flexible(
+                child: Text(isEn ? 'Artwork color theme' : "Thème couleur de l'affiche"),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                    color: scheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: scheme.outlineVariant)),
+                child: Text(isEn ? 'BETA' : 'BÊTA',
+                    style: text.labelSmall
+                        ?.copyWith(color: scheme.onSurfaceVariant)),
+              ),
+            ]),
             subtitle: Text(isEn
-                ? 'Detail pages adapt their background to the artwork\'s dominant color'
-                : 'Les fiches adaptent leur fond à la couleur dominante de l\'affiche'),
+                ? "Detail pages adapt their background and accent colors to the artwork's dominant color"
+                : "Les fiches adaptent leur fond et leurs couleurs d'accent à la couleur dominante de l'affiche"),
             value: _artworkColorTheme,
             onChanged: (v) async {
               await _set('ls_artwork_color_theme', v);

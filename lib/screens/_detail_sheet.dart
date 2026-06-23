@@ -15,6 +15,35 @@ void _pushFullscreen(BuildContext ctx, String url) {
   ));
 }
 
+// ── Artwork color theme blending (beta) ────────────────────────────────────
+// Blends the artwork-derived accent into [base] by factor [t]:
+//   t = 0 → untouched base theme (e.g. before the color is extracted)
+//   t = 1 → fully artwork-themed (surface tint + matching primary accent)
+// Animating [t] with a TweenAnimationBuilder gives a smooth fade instead of
+// the accent snapping in the instant the extraction finishes.
+({ColorScheme scheme, Color surface}) _artworkBlend(
+  ColorScheme base, Color? artworkColor, double t,
+) {
+  if (artworkColor == null || t == 0) {
+    return (scheme: base, surface: base.surface);
+  }
+
+  // Seed a full scheme from the artwork color so primary/onPrimary stay
+  // properly contrasted, then fade each role in from the base value.
+  final seeded = ColorScheme.fromSeed(
+    seedColor:  seedColorForScheme(artworkColor),
+    brightness: base.brightness,
+  );
+  final scheme = base.copyWith(
+    primary:            Color.lerp(base.primary,            seeded.primary,            t)!,
+    onPrimary:          Color.lerp(base.onPrimary,          seeded.onPrimary,          t)!,
+    primaryContainer:   Color.lerp(base.primaryContainer,   seeded.primaryContainer,   t)!,
+    onPrimaryContainer: Color.lerp(base.onPrimaryContainer, seeded.onPrimaryContainer, t)!,
+  );
+  final surface = Color.lerp(base.surface, artworkColor, 0.18 * t)!;
+  return (scheme: scheme, surface: surface);
+}
+
 // ── Pull-down-to-dismiss wrapper ───────────────────────────────────────────
 // Tracks accumulated overscroll instead of raw scroll pixels, since
 // ClampingScrollPhysics keeps pixels at 0 at the boundary (unlike the iOS
@@ -335,16 +364,22 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    // Tint surface with dominant artwork color at 18% when option is enabled
-    final surface = (artworkColorThemeNotifier.value && _artworkColor != null)
-        ? Color.lerp(scheme.surface, _artworkColor!, 0.18)!
-        : scheme.surface;
+    final baseScheme = Theme.of(context).colorScheme;
+    final artworkOn  = artworkColorThemeNotifier.value && _artworkColor != null;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
-      child: Scaffold(
-        backgroundColor: surface,
-        body: _buildContent(context, scheme, surface),
+      child: TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: 0, end: artworkOn ? 1.0 : 0.0),
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.easeOut,
+        builder: (_, t, _) {
+          final blend = _artworkBlend(baseScheme, _artworkColor, t);
+          return Scaffold(
+            backgroundColor: blend.surface,
+            body: _buildContent(context, blend.scheme, blend.surface),
+          );
+        },
       ),
     );
   }
@@ -1487,17 +1522,24 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final surface = (artworkColorThemeNotifier.value && _artworkColor != null)
-        ? Color.lerp(scheme.surface, _artworkColor!, 0.18)!
-        : scheme.surface;
+    final baseScheme = Theme.of(context).colorScheme;
+    final artworkOn  = artworkColorThemeNotifier.value && _artworkColor != null;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
-      child: Scaffold(
-        backgroundColor: surface,
-        body: _loading
-            ? const Center(child: CircularProgressIndicator())
-            : _buildContent(context, scheme, surface),
+      child: TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: 0, end: artworkOn ? 1.0 : 0.0),
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.easeOut,
+        builder: (_, t, _) {
+          final blend = _artworkBlend(baseScheme, _artworkColor, t);
+          return Scaffold(
+            backgroundColor: blend.surface,
+            body: _loading
+                ? const Center(child: CircularProgressIndicator())
+                : _buildContent(context, blend.scheme, blend.surface),
+          );
+        },
       ),
     );
   }
