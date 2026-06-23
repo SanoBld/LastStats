@@ -15,38 +15,35 @@ void _pushFullscreen(BuildContext ctx, String url) {
   ));
 }
 
-// ── Artwork color theme blending (beta) ────────────────────────────────────
-// Blends the artwork-derived accent into [base] by factor [t]:
-//   t = 0 → untouched base theme (e.g. before the color is extracted)
-//   t = 1 → fully artwork-themed (surface tint + matching primary/secondary
-//           accent — secondary/secondaryContainer matter because that's what
-//           Material 3's FilterChip uses for its selected state by default)
-// Animating [t] with a TweenAnimationBuilder gives a smooth fade instead of
-// the accent snapping in the instant the extraction finishes.
-({ColorScheme scheme, Color surface}) _artworkBlend(
-  ColorScheme base, Color? artworkColor, double t,
+// ── Artwork color theme (beta) ──────────────────────────────────────────────
+// Builds the fully artwork-themed variant of [base]. We only need the two
+// endpoints (base vs. themed) — AnimatedTheme cross-fades between them on
+// its own, so no manual interpolation is needed here.
+// Covers outline/outlineVariant too (not just primary/secondary): those
+// drive FilterChip's unselected border and card outlines, and leaving them
+// on the old theme is what made the previous accent look unfinished.
+({ColorScheme scheme, Color surface}) _artworkScheme(
+  ColorScheme base, Color artworkColor,
 ) {
-  if (artworkColor == null || t == 0) {
-    return (scheme: base, surface: base.surface);
-  }
-
-  // Seed a full scheme from the artwork color so every role stays properly
-  // contrasted, then fade each one in from the base value.
   final seeded = ColorScheme.fromSeed(
     seedColor:  seedColorForScheme(artworkColor),
     brightness: base.brightness,
   );
   final scheme = base.copyWith(
-    primary:              Color.lerp(base.primary,              seeded.primary,              t)!,
-    onPrimary:            Color.lerp(base.onPrimary,            seeded.onPrimary,            t)!,
-    primaryContainer:     Color.lerp(base.primaryContainer,     seeded.primaryContainer,     t)!,
-    onPrimaryContainer:   Color.lerp(base.onPrimaryContainer,   seeded.onPrimaryContainer,   t)!,
-    secondary:            Color.lerp(base.secondary,            seeded.secondary,            t)!,
-    onSecondary:          Color.lerp(base.onSecondary,          seeded.onSecondary,          t)!,
-    secondaryContainer:   Color.lerp(base.secondaryContainer,   seeded.secondaryContainer,   t)!,
-    onSecondaryContainer: Color.lerp(base.onSecondaryContainer, seeded.onSecondaryContainer, t)!,
+    primary:                 seeded.primary,
+    onPrimary:               seeded.onPrimary,
+    primaryContainer:        seeded.primaryContainer,
+    onPrimaryContainer:      seeded.onPrimaryContainer,
+    secondary:               seeded.secondary,
+    onSecondary:             seeded.onSecondary,
+    secondaryContainer:      seeded.secondaryContainer,
+    onSecondaryContainer:    seeded.onSecondaryContainer,
+    outline:                 seeded.outline,
+    outlineVariant:          seeded.outlineVariant,
+    surfaceContainerHighest: seeded.surfaceContainerHighest,
+    onSurfaceVariant:        seeded.onSurfaceVariant,
   );
-  final surface = Color.lerp(base.surface, artworkColor, 0.18 * t)!;
+  final surface = Color.lerp(base.surface, artworkColor, 0.18)!;
   return (scheme: scheme, surface: surface);
 }
 
@@ -414,25 +411,32 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     final baseScheme = baseTheme.colorScheme;
     final artworkOn  = artworkColorThemeNotifier.value && _artworkColor != null;
 
+    final targetTheme = artworkOn
+        ? () {
+            final themed = _artworkScheme(baseScheme, _artworkColor!);
+            return baseTheme.copyWith(
+              colorScheme:             themed.scheme,
+              scaffoldBackgroundColor: themed.surface,
+            );
+          }()
+        : baseTheme.copyWith(scaffoldBackgroundColor: baseScheme.surface);
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
-      child: TweenAnimationBuilder<double>(
-        tween: Tween<double>(begin: 0, end: artworkOn ? 1.0 : 0.0),
+      // AnimatedTheme cross-fades ThemeData on its own — far safer than a
+      // hand-rolled TweenAnimationBuilder that rebuilds Theme+Scaffold every
+      // frame, which could show a blank/black frame during page transitions.
+      child: AnimatedTheme(
         duration: const Duration(milliseconds: 450),
         curve: Curves.easeOut,
-        builder: (_, t, _) {
-          final blend = _artworkBlend(baseScheme, _artworkColor, t);
-          // Theme() makes default Material widgets (e.g. FilterChip, which
-          // reads colorScheme.secondaryContainer ambiently) follow the
-          // artwork accent too, not just the widgets we color explicitly.
-          return Theme(
-            data: baseTheme.copyWith(colorScheme: blend.scheme),
-            child: Scaffold(
-              backgroundColor: blend.surface,
-              body: _buildContent(context, blend.scheme, blend.surface),
-            ),
+        data: targetTheme,
+        child: Builder(builder: (innerContext) {
+          final scheme  = Theme.of(innerContext).colorScheme;
+          final surface = Theme.of(innerContext).scaffoldBackgroundColor;
+          return Scaffold(
+            body: _buildContent(innerContext, scheme, surface),
           );
-        },
+        }),
       ),
     );
   }
@@ -1574,24 +1578,31 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     final baseScheme = baseTheme.colorScheme;
     final artworkOn  = artworkColorThemeNotifier.value && _artworkColor != null;
 
+    final targetTheme = artworkOn
+        ? () {
+            final themed = _artworkScheme(baseScheme, _artworkColor!);
+            return baseTheme.copyWith(
+              colorScheme:             themed.scheme,
+              scaffoldBackgroundColor: themed.surface,
+            );
+          }()
+        : baseTheme.copyWith(scaffoldBackgroundColor: baseScheme.surface);
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
-      child: TweenAnimationBuilder<double>(
-        tween: Tween<double>(begin: 0, end: artworkOn ? 1.0 : 0.0),
+      child: AnimatedTheme(
         duration: const Duration(milliseconds: 450),
         curve: Curves.easeOut,
-        builder: (_, t, _) {
-          final blend = _artworkBlend(baseScheme, _artworkColor, t);
-          return Theme(
-            data: baseTheme.copyWith(colorScheme: blend.scheme),
-            child: Scaffold(
-              backgroundColor: blend.surface,
-              body: _loading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _buildContent(context, blend.scheme, blend.surface),
-            ),
+        data: targetTheme,
+        child: Builder(builder: (innerContext) {
+          final scheme  = Theme.of(innerContext).colorScheme;
+          final surface = Theme.of(innerContext).scaffoldBackgroundColor;
+          return Scaffold(
+            body: _loading
+                ? const Center(child: CircularProgressIndicator())
+                : _buildContent(innerContext, scheme, surface),
           );
-        },
+        }),
       ),
     );
   }
