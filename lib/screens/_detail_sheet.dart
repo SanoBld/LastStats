@@ -106,7 +106,8 @@ class _DismissOnOverscroll extends StatefulWidget {
 }
 
 class _DismissOnOverscrollState extends State<_DismissOnOverscroll> {
-  double _pulled = 0;
+  double _pulled    = 0;
+  bool   _dismissed = false; // guards against popping more than once per pull
 
   @override
   Widget build(BuildContext context) => NotificationListener<ScrollNotification>(
@@ -115,7 +116,14 @@ class _DismissOnOverscrollState extends State<_DismissOnOverscroll> {
         _pulled = 0;
       } else if (n is OverscrollNotification && n.overscroll < 0) {
         _pulled += n.overscroll;
-        if (_pulled < -60) widget.onDismiss();
+        // Every overscroll tick past -60 used to call onDismiss() again,
+        // so a single sustained pull could call Navigator.pop() several
+        // times on a route already mid-close — that's what produced the
+        // black screen. Firing it once per gesture fixes it for good.
+        if (_pulled < -60 && !_dismissed) {
+          _dismissed = true;
+          widget.onDismiss();
+        }
       }
       return false;
     },
