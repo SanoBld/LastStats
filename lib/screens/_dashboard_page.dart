@@ -804,10 +804,10 @@ class _DashboardPageState extends State<_DashboardPage> {
     return '';
   }
 
-  // Fetch bytes ourselves (catchable errors) and extract the color via
-  // compute(), off the main isolate — PaletteGenerator.fromImageProvider was
-  // running this synchronously on the UI thread and freezing the app every
-  // ~10s when the now-playing track changed.
+  // Fetch bytes ourselves (catchable errors) and run the cheap histogram
+  // color extraction (_extractDominantColorArgb in _detail_sheet.dart) —
+  // PaletteGenerator.fromImageProvider was running a heavy quantization on
+  // the UI thread and freezing the app every ~10s when the track changed.
   Future<void> _extractColor(Map<String, dynamic> track) async {
     if (!useNowPlayingColorNotifier.value) return;
     final url = _extractImage(track['image']);
@@ -822,7 +822,7 @@ class _DashboardPageState extends State<_DashboardPage> {
         accentNotifier.value = nowPlayingFallbackColorNotifier.value;
         return;
       }
-      final argb = await compute(_extractDominantColorArgb, response.bodyBytes);
+      final argb = await _extractDominantColorArgb(response.bodyBytes);
       if (!mounted) return;
       accentNotifier.value = argb != null
           ? seedColorForScheme(Color(argb))

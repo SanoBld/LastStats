@@ -19,7 +19,6 @@ import 'dart:math' show sqrt;
 import 'dart:typed_data';
 import 'dart:ui';
 import 'dart:ui' as ui;
-import 'package:flutter/foundation.dart' show compute;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;

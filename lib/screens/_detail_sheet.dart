@@ -50,14 +50,15 @@ void _pushFullscreen(BuildContext ctx, String url) {
   return (scheme: scheme, surface: surface);
 }
 
-// ── Dominant color extraction (off the main isolate) ───────────────────────
-// PaletteGenerator.fromImageProvider quantizes colors synchronously on the
-// calling isolate — a known Flutter freeze (flutter/flutter#140325), even on
-// small images. This replacement decodes at a tiny target size and buckets
-// pixels into a histogram, favoring saturated tones over washed-out ones,
-// then the whole thing runs inside compute() so it never blocks the UI.
-// Must stay a top-level function with no captured state: compute() ships it
-// to a background isolate as-is.
+// ── Dominant color extraction ───────────────────────────────────────────────
+// PaletteGenerator.fromImageProvider quantizes colors with a heavy algorithm
+// that freezes the UI (flutter/flutter#140325). This replacement decodes at
+// a tiny 48×48 target (a true decode-time downscale, unlike palette_generator's
+// `size` hint) and buckets pixels into a histogram, favoring saturated tones
+// over washed-out ones — cheap enough to run inline without jank.
+// Note: this can NOT be moved into compute() — dart:ui's image codec isn't
+// available in background isolates ("Failed to access the internal image
+// decoder registry on this isolate", flutter/flutter#109701/#95311).
 Future<int?> _extractDominantColorArgb(Uint8List bytes) async {
   try {
     final codec = await ui.instantiateImageCodec(
@@ -243,14 +244,15 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   // Downloads the bytes ourselves (instead of handing the URL straight to an
   // ImageProvider) so every failure — network, timeout, decode — stays
-  // inside this try/catch. The actual color extraction runs via compute(),
-  // off the main isolate, to avoid the freeze PaletteGenerator caused.
+  // inside this try/catch. _extractDominantColorArgb decodes a tiny 48×48
+  // version and runs a cheap histogram, fast enough to stay on the main
+  // isolate (PaletteGenerator's heavier quantization is what froze the UI).
   Future<void> _extractArtworkColor(String url) async {
     try {
       final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 6));
       if (!mounted || response.statusCode != 200 || response.bodyBytes.isEmpty) return;
 
-      final argb = await compute(_extractDominantColorArgb, response.bodyBytes);
+      final argb = await _extractDominantColorArgb(response.bodyBytes);
       if (argb != null && mounted) setState(() => _artworkColor = Color(argb));
     } catch (_) {
       // Network error, timeout, or decode failure: skip the tint silently.
@@ -1519,13 +1521,13 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
   }
 
   // Same approach as _ItemDetailSheetState: fetch bytes ourselves, then run
-  // the color extraction off the main isolate via compute().
+  // the cheap histogram-based color extraction (see _extractDominantColorArgb).
   Future<void> _extractArtworkColor(String url) async {
     try {
       final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 6));
       if (!mounted || response.statusCode != 200 || response.bodyBytes.isEmpty) return;
 
-      final argb = await compute(_extractDominantColorArgb, response.bodyBytes);
+      final argb = await _extractDominantColorArgb(response.bodyBytes);
       if (argb != null && mounted) setState(() => _artworkColor = Color(argb));
     } catch (_) {
       // Network error, timeout, or decode failure: skip the tint silently.
