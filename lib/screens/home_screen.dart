@@ -20,6 +20,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
+import 'package:http/http.dart' as http;
 import 'package:palette_generator/palette_generator.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -36,6 +37,7 @@ import '../services/prefetch_service.dart';
 import '../services/all_scrobbles_service.dart';
 import '../services/translation_service.dart';
 import '../services/lyrics_service.dart';
+
 
 // ── Settings sub-pages ────────────────────────────────────────────────────────
 import 'settings/appearance_page.dart';

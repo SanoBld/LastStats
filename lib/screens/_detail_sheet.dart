@@ -162,15 +162,26 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     }
   }
 
+  // Downloads the bytes ourselves first (instead of handing the URL straight
+  // to PaletteGenerator via NetworkImage). NetworkImage errors are delivered
+  // through Flutter's image-stream error channel, which a normal try/catch
+  // around fromImageProvider does NOT catch — on Windows this was escaping
+  // as an unhandled error and taking the app down. Fetching with http.get
+  // keeps every failure (network, timeout, bad bytes) inside this try/catch.
   Future<void> _extractArtworkColor(String url) async {
     try {
+      final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 6));
+      if (!mounted || response.statusCode != 200 || response.bodyBytes.isEmpty) return;
+
       final generator = await PaletteGenerator.fromImageProvider(
-        NetworkImage(url),
+        MemoryImage(response.bodyBytes),
         size: const Size(200, 200),
       );
       final color = generator.dominantColor?.color ?? generator.vibrantColor?.color;
       if (color != null && mounted) setState(() => _artworkColor = color);
-    } catch (_) {}
+    } catch (_) {
+      // Network error, timeout, or decode failure: skip the tint silently.
+    }
   }
 
   Future<void> _fetchMeta() async {
@@ -1421,15 +1432,23 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     } catch (_) {}
   }
 
+  // Same fix as in _ItemDetailSheetState: fetch bytes ourselves so any
+  // failure stays inside this try/catch instead of escaping through
+  // Flutter's image-stream error channel.
   Future<void> _extractArtworkColor(String url) async {
     try {
+      final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 6));
+      if (!mounted || response.statusCode != 200 || response.bodyBytes.isEmpty) return;
+
       final generator = await PaletteGenerator.fromImageProvider(
-        NetworkImage(url),
+        MemoryImage(response.bodyBytes),
         size: const Size(200, 200),
       );
       final color = generator.dominantColor?.color ?? generator.vibrantColor?.color;
       if (color != null && mounted) setState(() => _artworkColor = color);
-    } catch (_) {}
+    } catch (_) {
+      // Network error, timeout, or decode failure: skip the tint silently.
+    }
   }
 
   int _total() => int.tryParse((_info?['playcount'] ?? '0').toString()) ?? 0;
