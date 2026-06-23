@@ -146,3 +146,29 @@ jobs:
       # app's auto-update check is handled by a separate workflow:
       # publish-update-metadata.yml — it triggers automatically once this
       # release is published, no action needed here.
+
+      # If the release is a pre-release (beta)
+      - name: Send Discord Beta Notification
+        if: needs.resolve.outputs.prerelease == 'true' || needs.resolve.outputs.prerelease == true
+        env:
+          DISCORD_PRE_RELEASE_WEBHOOK: ${{ secrets.DISCORD_PRE_RELEASE_WEBHOOK }}
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d '{
+                 "content": "Hey <@&1518721692736688402>! A new pre-release build is available for testing! 🧪\n\n📦 **Version:** ${{ needs.resolve.outputs.tag }}\n📝 **Changelog:** https://github.com/${{ github.repository }}/releases/tag/${{ needs.resolve.outputs.tag }}"
+               }' \
+               $DISCORD_PRE_RELEASE_WEBHOOK
+
+      # If the release is a stable release
+      - name: Send Discord Stable Notification
+        if: needs.resolve.outputs.prerelease == 'false' || needs.resolve.outputs.prerelease == false
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d '{
+                 "content": "Hey <@&1518721608158679100>! A new update is officially live! 🚀\n\n📦 **Version:** ${{ needs.resolve.outputs.tag }}\n📝 **Changelog:** https://github.com/${{ github.repository }}/releases/tag/${{ needs.resolve.outputs.tag }}"
+               }' \
+               $DISCORD_WEBHOOK
