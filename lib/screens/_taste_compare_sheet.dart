@@ -1320,7 +1320,8 @@ class _DuoAvatars extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Stack(
-          alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          alignment: Alignment.topLeft,
           children: [
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -1332,17 +1333,26 @@ class _DuoAvatars extends StatelessWidget {
                 ),
               ],
             ),
-            Container(
-              width: 26, height: 26,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: scheme.primary,
-                border: Border.all(color: scheme.surface, width: 2),
+            // Badge sits at the bottom-center overlap of the two avatars
+            Positioned(
+              bottom: -8,
+              left: 0,
+              right: -18, // compensate for the -18 translate on the second avatar
+              child: Center(
+                child: Container(
+                  width: 26, height: 26,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: scheme.primary,
+                    border: Border.all(color: scheme.surface, width: 2),
+                  ),
+                  child: Icon(Icons.graphic_eq_rounded, size: 13, color: scheme.onPrimary),
+                ),
               ),
-              child: Icon(Icons.graphic_eq_rounded, size: 13, color: scheme.onPrimary),
             ),
           ],
         ),
+        const SizedBox(height: 8), // extra space for the overflowing badge
         const SizedBox(height: 10),
         Text(
           '$myUsername  •  $theirUsername',
