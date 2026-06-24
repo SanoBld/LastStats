@@ -934,7 +934,7 @@ class _ChartsPageState extends State<_ChartsPage>
               Expanded(
                 child: Text(L.chartsTitle,
                     style: text.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+                        fontWeight: FontWeight.w800)),
               ),
               IconButton(
                 icon: const Icon(Icons.ios_share_rounded),
