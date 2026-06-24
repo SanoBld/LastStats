@@ -91,6 +91,8 @@ class _DashboardPageState extends State<_DashboardPage> {
   Timer?  _npTimer;
   Timer?  _topTimer;
 
+  String _lastExtractedUrl = ''; // dedup: skip re-fetch if same artwork URL
+
   // Header settings
   String _headerSource          = 'nowplaying';
   String _headerImageUrl        = '';
@@ -335,17 +337,19 @@ class _DashboardPageState extends State<_DashboardPage> {
       final newArtist  = (np?['artist']?['#text'] ?? '').toString();
       final changed    = prevName != newName || prevArtist != newArtist;
 
+      // Always attempt color extraction — URL dedup prevents redundant HTTP calls.
+      // This ensures color is applied on first open even if _load()'s attempt failed.
+      if (np != null) {
+        _extractColor(np);
+        DataCache.set(DataCache.keyNowPlaying(), np);
+      } else if (useNowPlayingColorNotifier.value) {
+        _lastExtractedUrl = ''; // reset so next now-playing triggers a fresh fetch
+        accentNotifier.value = _lastFallback();
+      }
+
       if (changed) {
         setState(() => _nowPlaying = np);
-        if (np != null) {
-          _extractColor(np);
-          DataCache.set(DataCache.keyNowPlaying(), np);
-        } else if (useNowPlayingColorNotifier.value) {
-          accentNotifier.value = nowPlayingFallbackColorNotifier.value;
-        }
         _resolveHeaderImage();
-      } else if (np != null) {
-        DataCache.set(DataCache.keyNowPlaying(), np);
       }
     } catch (_) {}
     if (_showFriends && mounted) _loadFriends(silent: true);
@@ -804,32 +808,49 @@ class _DashboardPageState extends State<_DashboardPage> {
     return '';
   }
 
-  // Fetch bytes ourselves (catchable errors) and run the cheap histogram
-  // color extraction (_extractDominantColorArgb in _detail_sheet.dart) —
-  // PaletteGenerator.fromImageProvider was running a heavy quantization on
-  // the UI thread and freezing the app every ~10s when the track changed.
+  // Fetch bytes ourselves and run histogram color extraction.
+  // URL-based dedup prevents redundant HTTP calls when the same track
+  // is still playing on the next timer tick.
   Future<void> _extractColor(Map<String, dynamic> track) async {
     if (!useNowPlayingColorNotifier.value) return;
     final url = _extractImage(track['image']);
     if (url.isEmpty || url.contains('2a96cbd8b46e442fc41c2b86b821562f')) {
-      if (mounted) accentNotifier.value = nowPlayingFallbackColorNotifier.value;
+      if (mounted) accentNotifier.value = _lastFallback();
       return;
     }
+    // Same URL already extracted — skip HTTP fetch
+    if (url == _lastExtractedUrl) return;
+    _lastExtractedUrl = url;
     try {
       final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 6));
       if (!mounted) return;
       if (response.statusCode != 200 || response.bodyBytes.isEmpty) {
-        accentNotifier.value = nowPlayingFallbackColorNotifier.value;
+        _lastExtractedUrl = ''; // allow retry next tick
+        accentNotifier.value = _lastFallback();
         return;
       }
       final argb = await _extractDominantColorArgb(response.bodyBytes);
       if (!mounted) return;
-      accentNotifier.value = argb != null
-          ? seedColorForScheme(Color(argb))
-          : nowPlayingFallbackColorNotifier.value;
+      if (argb != null) {
+        final color = seedColorForScheme(Color(argb));
+        accentNotifier.value = color;
+        // Persist so we can restore it when nothing plays
+        final p = await SharedPreferences.getInstance();
+        await p.setString('ls_last_artwork_color', colorToHex(color));
+      } else {
+        accentNotifier.value = _lastFallback();
+      }
     } catch (_) {
-      if (mounted) accentNotifier.value = nowPlayingFallbackColorNotifier.value;
+      _lastExtractedUrl = ''; // allow retry
+      if (mounted) accentNotifier.value = _lastFallback();
     }
+  }
+
+  // Color to use when no artwork is available.
+  // If keepLastArtworkColorNotifier is on, keeps the current accent (last artwork color).
+  Color _lastFallback() {
+    if (keepLastArtworkColorNotifier.value) return accentNotifier.value;
+    return nowPlayingFallbackColorNotifier.value;
   }
 
   // ── Stat helpers ──────────────────────────────────────────────────────────

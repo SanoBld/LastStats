@@ -20,6 +20,7 @@ class _AppearancePageState extends State<AppearancePage> {
   bool   _useDynamicColor    = false;
   bool   _useNowPlayingColor = false;
   bool   _artworkColorTheme  = false; // tint detail sheets with artwork color
+  bool   _keepLastArtworkColor = false; // keep last artwork color when nothing plays
   Color  _fallbackAccent     = const Color(0xFF7C3AED);
 
   @override
@@ -46,6 +47,7 @@ class _AppearancePageState extends State<AppearancePage> {
       _useDynamicColor    = p.getBool('ls_use_dynamic_color')     ?? false;
       _useNowPlayingColor = p.getBool('ls_use_nowplaying_color')  ?? false;
       _artworkColorTheme  = p.getBool('ls_artwork_color_theme')   ?? false;
+      _keepLastArtworkColor = p.getBool('ls_keep_last_artwork_color') ?? false;
       final fbHex = p.getString('ls_nowplaying_fallback_color');
       _fallbackAccent = fbHex != null
           ? accentFromString(fbHex)
@@ -379,6 +381,26 @@ class _AppearancePageState extends State<AppearancePage> {
               ]),
             ),
           ],
+
+          // ── Keep last artwork color ────────────────────────────────────
+          // When enabled, the accent stays on the last extracted color
+          // instead of falling back to the fallback color when nothing plays.
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          SwitchListTile(
+            secondary: Icon(Icons.palette_outlined, color: scheme.primary),
+            title: Text(isEn ? 'Keep last artwork color' : 'Garder la dernière couleur'),
+            subtitle: Text(isEn
+                ? 'When nothing is playing, keep the last artwork color instead of resetting'
+                : 'Quand rien ne joue, conserver la couleur de la dernière pochette au lieu du fallback'),
+            value: _keepLastArtworkColor,
+            onChanged: _useNowPlayingColor && !_useDynamicColor
+                ? (v) async {
+                    await _set('ls_keep_last_artwork_color', v);
+                    setState(() => _keepLastArtworkColor = v);
+                    keepLastArtworkColorNotifier.value = v;
+                  }
+                : null,
+          ),
 
           // ── Artwork color theme (beta) ──────────────────────────────────
           // When enabled, detail sheets (artists/albums/tracks/profiles) tint

@@ -15,6 +15,10 @@ final nowPlayingFallbackColorNotifier = ValueNotifier<Color>(const Color(0xFF7C3
 // Saved as 'ls_artwork_color_theme' in SharedPreferences.
 final artworkColorThemeNotifier = ValueNotifier<bool>(false);
 
+// Keep the last extracted artwork color when nothing is playing.
+// Saved as 'ls_keep_last_artwork_color' in SharedPreferences.
+final keepLastArtworkColorNotifier = ValueNotifier<bool>(false);
+
 /// Controls the navigation layout:
 ///   'auto' → wide rail when screen width ≥ 720 dp (default)
 ///   'on'   → always use the side rail (even on narrow screens)
