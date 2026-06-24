@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the accentFromString function from the app_state library, for the Dart programming language.">
-  <title>accentFromString function - app_state library - Dart API</title>
+  <meta name="description" content="API docs for the oledModeNotifier property from the app_state library, for the Dart programming language.">
+  <title>oledModeNotifier property - app_state library - Dart API</title>
 
 
   
@@ -26,9 +26,9 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">laststats_mobile</a></li>
     <li><a href="../app_state/">app_state.dart</a></li>
-    <li class="self-crumb">accentFromString function</li>
+    <li class="self-crumb">oledModeNotifier property</li>
   </ol>
-  <div class="self-name">accentFromString</div>
+  <div class="self-name">oledModeNotifier</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -48,48 +48,25 @@
       data-above-sidebar="app_state&#47;app_state-library-sidebar.html"
       data-below-sidebar="">
       <div>
-<h1><span class="kind-function">accentFromString</span> function 
+<h1><span class="kind-top-level-property">oledModeNotifier</span> top-level property 
  
 </h1></div>
 
-    <section class="multi-line-signature">
+        <section class="multi-line-signature">
+          
+          <a href="https://api.flutter.dev/flutter/foundation/ValueNotifier-class.html">ValueNotifier</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>&gt;</span>
+          <span class="name ">oledModeNotifier</span>
+          <div class="features"><span class="feature">final</span></div>
+
+        </section>
         
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-ui/Color-class.html">Color</a></span>
-<span class="name ">accentFromString</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="accentFromString-param-s"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">s</span></span></li>
-</ol>)
 
         
-
-    </section>
-    
-<section class="desc markdown">
-  <p>Accepts a named key ('purple', 'blue'…) or a hex code '#RRGGBB'.</p>
-</section>
-
-
-    
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Color accentFromString(String? s) {
-  if (s == null) return const Color(0xFF7C3AED);
-  if (s.startsWith(&#39;#&#39;) &amp;&amp; s.length == 7) {
-    try {
-      return Color(0xFF000000 | int.parse(s.substring(1), radix: 16));
-    } catch (_) {}
-  }
-  switch (s) {
-    case &#39;blue&#39;:    return const Color(0xFF1D4ED8);
-    case &#39;green&#39;:   return const Color(0xFF059669);
-    case &#39;red&#39;:     return const Color(0xFFDC2626);
-    case &#39;orange&#39;:  return const Color(0xFFD97706);
-    case &#39;pink&#39;:    return const Color(0xFFDB2777);
-    case &#39;teal&#39;:    return const Color(0xFF0F766E);
-    &#47;&#47; Neutral: Blue Grey 500 — enough chroma for a reliable near-monochrome M3 scheme.
-    case &#39;neutral&#39;: return const Color(0xFF607D8B);
-    default:        return const Color(0xFF7C3AED);
-  }
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">final oledModeNotifier = ValueNotifier&lt;bool&gt;(false);</code></pre>
 </section>
+
 
 
   </div> <!-- /.main-content -->
@@ -103,7 +80,7 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">laststats_mobile</a></li>
     <li><a href="../app_state/">app_state</a></li>
-    <li class="self-crumb">accentFromString function</li>
+    <li class="self-crumb">oledModeNotifier property</li>
 </ol>
 
     <h5>app_state library</h5>
