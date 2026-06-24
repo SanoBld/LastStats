@@ -68,6 +68,9 @@
 Material 3 can't extract a hue from them and may fall back to an arbitrary
 default (often teal). We map these extremes to a Blue Grey seed that has
 just enough chroma to produce a reliable neutral scheme.</p>
+<p>The threshold is intentionally tight (&lt; 0.008 / &gt; 0.97) so that dark
+saturated colors like deep red (#8B0000, luminance ≈ 0.018) are NOT
+replaced — only absolute black and white trigger the fallback.</p>
 </section>
 
 
@@ -77,10 +80,10 @@ just enough chroma to produce a reliable neutral scheme.</p>
   <pre class="language-dart"><code class="language-dart">Color seedColorForScheme(Color c) {
   final luminance = c.computeLuminance();
 
-  &#47;&#47; Near-black → Blue Grey 700: neutral dark slate scheme
-  if (luminance &lt; 0.03) return const Color(0xFF455A64);
+  &#47;&#47; Absolute black → Blue Grey 700: neutral dark slate scheme
+  if (luminance &lt; 0.008) return const Color(0xFF455A64);
 
-  &#47;&#47; Near-white → Blue Grey 300: neutral light scheme
+  &#47;&#47; Absolute white → Blue Grey 300: neutral light scheme
   if (luminance &gt; 0.97) return const Color(0xFF90A4AE);
 
   return c;
