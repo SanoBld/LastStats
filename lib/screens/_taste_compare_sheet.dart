@@ -1323,15 +1323,17 @@ class _DuoAvatars extends StatelessWidget {
           clipBehavior: Clip.none,
           alignment: Alignment.center, // badge inherits horizontal centering
           children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _avatar(context, myAvatar),
-                Transform.translate(
-                  offset: const Offset(-18, 0),
-                  child: _avatar(context, theirAvatar),
-                ),
-              ],
+            // Visual width = 64 + 64 - 18 = 110 px; layout matches visual so centering is correct
+            SizedBox(
+              width: 110,
+              height: 64,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned(left: 0,  child: _avatar(context, myAvatar)),
+                  Positioned(left: 46, child: _avatar(context, theirAvatar)),
+                ],
+              ),
             ),
             // bottom: -8 overflows below avatars; horizontal axis uses Stack center
             Positioned(
