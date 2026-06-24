@@ -1513,18 +1513,29 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
   Future<void> _resolveBannerUrl(List<dynamic> recentList, bool isNp) async {
     try {
       String url = '';
+
       if (isNp && recentList.isNotEmpty) {
         final t      = recentList.first as Map;
         final track  = (t['name'] ?? '').toString();
         final artist = (t['artist']?['name'] ?? t['artist'] ?? '').toString();
+
+        // 1. High-quality lookup (MusicBrainz / Fanart.tv)
         url = await ImageService.resolveTrack(track, artist);
+
+        // 2. Last.fm image embedded in the recent-tracks response
+        if (url.isEmpty) url = _extractImage(t['image']);
+
+        // When live, stop here — don't replace with the top-artist image.
       }
-      if (url.isEmpty && _topArtists.isNotEmpty) {
+
+      // Not live (or no track image found): use the top artist as banner.
+      if (url.isEmpty && !isNp && _topArtists.isNotEmpty) {
         final a = _topArtists[0] as Map;
         url = await ImageService.resolveArtist(
             (a['name'] ?? '').toString(),
             lastfmUrl: _extractImage(a['image']));
       }
+
       if (mounted && url.isNotEmpty) {
         setState(() => _bannerUrl = url);
         if (artworkColorThemeNotifier.value) _extractArtworkColor(url);
