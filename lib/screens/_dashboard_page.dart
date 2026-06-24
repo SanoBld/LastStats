@@ -337,13 +337,14 @@ class _DashboardPageState extends State<_DashboardPage> {
       final newArtist  = (np?['artist']?['#text'] ?? '').toString();
       final changed    = prevName != newName || prevArtist != newArtist;
 
-      // Always attempt color extraction — URL dedup prevents redundant HTTP calls.
-      // This ensures color is applied on first open even if _load()'s attempt failed.
       if (np != null) {
+        // Always attempt extraction — URL dedup avoids redundant HTTP calls.
+        // Fixes: color not applied on first open when _load()'s attempt fails.
         _extractColor(np);
         DataCache.set(DataCache.keyNowPlaying(), np);
-      } else if (useNowPlayingColorNotifier.value) {
-        _lastExtractedUrl = ''; // reset so next now-playing triggers a fresh fetch
+      } else if (changed && useNowPlayingColorNotifier.value) {
+        // Track just stopped — apply fallback only once on change, not every tick.
+        _lastExtractedUrl = '';
         accentNotifier.value = _lastFallback();
       }
 
