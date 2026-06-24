@@ -16,13 +16,14 @@ import '../../l10n.dart';
 // ── Constantes ────────────────────────────────────────────────────────────────
 
 const kSettingsAccentOptions = [
-  (Color(0xFF7C3AED), 'purple', 'Violet / Purple'),
-  (Color(0xFF1D4ED8), 'blue',   'Bleu / Blue'),
-  (Color(0xFF059669), 'green',  'Vert / Green'),
-  (Color(0xFFDC2626), 'red',    'Rouge / Red'),
-  (Color(0xFFD97706), 'orange', 'Orange'),
-  (Color(0xFFDB2777), 'pink',   'Rose / Pink'),
-  (Color(0xFF0F766E), 'teal',   'Sarcelle / Teal'),
+  (Color(0xFF7C3AED), 'purple',  'Violet / Purple'),
+  (Color(0xFF1D4ED8), 'blue',    'Bleu / Blue'),
+  (Color(0xFF059669), 'green',   'Vert / Green'),
+  (Color(0xFFDC2626), 'red',     'Rouge / Red'),
+  (Color(0xFFD97706), 'orange',  'Orange'),
+  (Color(0xFFDB2777), 'pink',    'Rose / Pink'),
+  (Color(0xFF0F766E), 'teal',    'Sarcelle / Teal'),
+  (Color(0xFF607D8B), 'neutral', 'Neutre / Neutral'),
 ];
 
 /// Cartes de statistiques — dupliqué ici pour être accessible hors du part-of.

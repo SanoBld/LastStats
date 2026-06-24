@@ -47,8 +47,11 @@ Color accentFromString(String? s) {
     case 'red':    return const Color(0xFFDC2626);
     case 'orange': return const Color(0xFFD97706);
     case 'pink':   return const Color(0xFFDB2777);
-    case 'teal':   return const Color(0xFF0F766E);
-    default:       return const Color(0xFF7C3AED);
+    case 'teal':    return const Color(0xFF0F766E);
+    // Neutral preset: Blue Grey 500 — just enough chroma for a reliable
+    // near-monochrome M3 scheme without the HCT zero-chroma fallback problem.
+    case 'neutral': return const Color(0xFF607D8B);
+    default:        return const Color(0xFF7C3AED);
   }
 }
 
@@ -66,13 +69,17 @@ String colorToHex(Color c) {
 /// Material 3 can't extract a hue from them and may fall back to an arbitrary
 /// default (often teal). We map these extremes to a Blue Grey seed that has
 /// just enough chroma to produce a reliable neutral scheme.
+///
+/// The threshold is intentionally tight (< 0.008 / > 0.97) so that dark
+/// saturated colors like deep red (#8B0000, luminance ≈ 0.018) are NOT
+/// replaced — only absolute black and white trigger the fallback.
 Color seedColorForScheme(Color c) {
   final luminance = c.computeLuminance();
 
-  // Near-black → Blue Grey 700: neutral dark slate scheme
-  if (luminance < 0.03) return const Color(0xFF455A64);
+  // Absolute black → Blue Grey 700: neutral dark slate scheme
+  if (luminance < 0.008) return const Color(0xFF455A64);
 
-  // Near-white → Blue Grey 300: neutral light scheme
+  // Absolute white → Blue Grey 300: neutral light scheme
   if (luminance > 0.97) return const Color(0xFF90A4AE);
 
   return c;

@@ -67,26 +67,37 @@ Future<int?> _extractDominantColorArgb(Uint8List bytes) async {
     if (raw == null) return null;
 
     final pixels = raw.buffer.asUint8List();
-    final counts = <int, int>{};
-    for (int i = 0; i < pixels.length; i += 4) {
-      if (pixels[i + 3] < 200) continue; // skip near-transparent pixels
-      final r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
-      final maxc = r > g ? (r > b ? r : b) : (g > b ? g : b);
-      final minc = r < g ? (r < b ? r : b) : (g < b ? g : b);
-      final sat  = maxc == 0 ? 0.0 : (maxc - minc) / maxc;
-      // Group close colors (5 bits/channel) and weight saturated pixels
-      // higher so a vibrant accent wins over a dull/grey background.
-      final key    = ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3);
-      final weight = 1 + (sat * 4).round();
-      counts[key]  = (counts[key] ?? 0) + weight;
-    }
-    if (counts.isEmpty) return null;
 
-    final best = counts.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
-    final r = ((best >> 10) & 0x1F) << 3;
-    final g = ((best >> 5)  & 0x1F) << 3;
-    final b = (best & 0x1F) << 3;
-    return 0xFF000000 | (r << 16) | (g << 8) | b;
+    int? _dominant(bool saturatedOnly) {
+      final counts = <int, int>{};
+      for (int i = 0; i < pixels.length; i += 4) {
+        if (pixels[i + 3] < 200) continue; // skip near-transparent pixels
+        final r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
+        final maxc = r > g ? (r > b ? r : b) : (g > b ? g : b);
+        final minc = r < g ? (r < b ? r : b) : (g < b ? g : b);
+        final sat  = maxc == 0 ? 0.0 : (maxc - minc) / maxc;
+        // First pass: skip near-grey and near-black pixels so a vivid
+        // foreground color wins over a uniform background even when
+        // outnumbered by a ratio of many-to-one.
+        if (saturatedOnly && (sat < 0.20 || maxc < 40)) continue;
+        // Group close colors (5 bits/channel) and weight saturated pixels
+        // higher so a vibrant accent wins over a dull/grey background.
+        // Increased multiplier (6 vs old 4) for a stronger saturation bias.
+        final key    = ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3);
+        final weight = saturatedOnly ? 1 + (sat * 6).round() : 1;
+        counts[key]  = (counts[key] ?? 0) + weight;
+      }
+      if (counts.isEmpty) return null;
+      final best = counts.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
+      final r = ((best >> 10) & 0x1F) << 3;
+      final g = ((best >> 5)  & 0x1F) << 3;
+      final b = (best & 0x1F) << 3;
+      return 0xFF000000 | (r << 16) | (g << 8) | b;
+    }
+
+    // Prefer the saturated-only pass; fall back to unfiltered for
+    // monochrome or very desaturated images (album art in B&W, etc.).
+    return _dominant(true) ?? _dominant(false);
   } catch (_) {
     return null;
   }
