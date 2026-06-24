@@ -7,7 +7,7 @@ final useDynamicColorNotifier    = ValueNotifier<bool>(false);
 final useNowPlayingColorNotifier = ValueNotifier<bool>(false);
 final localeNotifier             = ValueNotifier<String>('fr'); // 'fr' | 'en'
 
-// Color shown when music-color mode is ON but nothing is currently playing.
+// Color used when music-color mode is on but nothing is playing.
 // Saved as 'ls_nowplaying_fallback_color' in SharedPreferences.
 final nowPlayingFallbackColorNotifier = ValueNotifier<Color>(const Color(0xFF7C3AED));
 
@@ -18,6 +18,10 @@ final artworkColorThemeNotifier = ValueNotifier<bool>(false);
 // Keep the last extracted artwork color when nothing is playing.
 // Saved as 'ls_keep_last_artwork_color' in SharedPreferences.
 final keepLastArtworkColorNotifier = ValueNotifier<bool>(false);
+
+// Pure black dark theme for OLED screens.
+// Saved as 'ls_oled_mode' in SharedPreferences.
+final oledModeNotifier = ValueNotifier<bool>(false);
 
 /// Controls the navigation layout:
 ///   'auto' → wide rail when screen width ≥ 720 dp (default)
@@ -42,14 +46,13 @@ Color accentFromString(String? s) {
     } catch (_) {}
   }
   switch (s) {
-    case 'blue':   return const Color(0xFF1D4ED8);
-    case 'green':  return const Color(0xFF059669);
-    case 'red':    return const Color(0xFFDC2626);
-    case 'orange': return const Color(0xFFD97706);
-    case 'pink':   return const Color(0xFFDB2777);
+    case 'blue':    return const Color(0xFF1D4ED8);
+    case 'green':   return const Color(0xFF059669);
+    case 'red':     return const Color(0xFFDC2626);
+    case 'orange':  return const Color(0xFFD97706);
+    case 'pink':    return const Color(0xFFDB2777);
     case 'teal':    return const Color(0xFF0F766E);
-    // Neutral preset: Blue Grey 500 — just enough chroma for a reliable
-    // near-monochrome M3 scheme without the HCT zero-chroma fallback problem.
+    // Neutral: Blue Grey 500 — enough chroma for a reliable near-monochrome M3 scheme.
     case 'neutral': return const Color(0xFF607D8B);
     default:        return const Color(0xFF7C3AED);
   }

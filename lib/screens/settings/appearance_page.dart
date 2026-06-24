@@ -15,13 +15,14 @@ class AppearancePage extends StatefulWidget {
 }
 
 class _AppearancePageState extends State<AppearancePage> {
-  String _theme              = 'system';
-  String _accent             = 'purple';
-  bool   _useDynamicColor    = false;
-  bool   _useNowPlayingColor = false;
-  bool   _artworkColorTheme  = false; // tint detail sheets with artwork color
+  String _theme               = 'system';
+  String _accent              = 'purple';
+  bool   _useDynamicColor     = false;
+  bool   _useNowPlayingColor  = false;
+  bool   _artworkColorTheme   = false; // tint detail sheets with artwork color
   bool   _keepLastArtworkColor = false; // keep last artwork color when nothing plays
-  Color  _fallbackAccent     = const Color(0xFF7C3AED);
+  bool   _oledMode            = false; // pure black dark theme for OLED
+  Color  _fallbackAccent      = const Color(0xFF7C3AED);
 
   @override
   void initState() {
@@ -42,12 +43,13 @@ class _AppearancePageState extends State<AppearancePage> {
     final p = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
-      _theme              = p.getString('ls_theme')               ?? 'system';
-      _accent             = p.getString('ls_accent')              ?? 'purple';
-      _useDynamicColor    = p.getBool('ls_use_dynamic_color')     ?? false;
-      _useNowPlayingColor = p.getBool('ls_use_nowplaying_color')  ?? false;
-      _artworkColorTheme  = p.getBool('ls_artwork_color_theme')   ?? false;
+      _theme               = p.getString('ls_theme')               ?? 'system';
+      _accent              = p.getString('ls_accent')              ?? 'purple';
+      _useDynamicColor     = p.getBool('ls_use_dynamic_color')     ?? false;
+      _useNowPlayingColor  = p.getBool('ls_use_nowplaying_color')  ?? false;
+      _artworkColorTheme   = p.getBool('ls_artwork_color_theme')   ?? false;
       _keepLastArtworkColor = p.getBool('ls_keep_last_artwork_color') ?? false;
+      _oledMode            = p.getBool('ls_oled_mode')             ?? false;
       final fbHex = p.getString('ls_nowplaying_fallback_color');
       _fallbackAccent = fbHex != null
           ? accentFromString(fbHex)
@@ -105,6 +107,9 @@ class _AppearancePageState extends State<AppearancePage> {
       _accent.startsWith('#') ||
       !kSettingsAccentOptions.any((o) => o.$2 == _accent);
 
+  // OLED is only relevant when dark mode is active (dark or system).
+  bool get _oledEnabled => _theme != 'light';
+
   @override
   Widget build(BuildContext context) {
     final scheme        = Theme.of(context).colorScheme;
@@ -152,6 +157,27 @@ class _AppearancePageState extends State<AppearancePage> {
               ),
             ],
           )),
+
+          // OLED mode: replaces all dark surfaces with pure black.
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          SwitchListTile(
+            secondary: Icon(
+              Icons.phone_android_rounded,
+              color: _oledEnabled ? scheme.primary : scheme.onSurfaceVariant,
+            ),
+            title: Text(isEn ? 'OLED black theme' : 'Thème noir OLED'),
+            subtitle: Text(isEn
+                ? 'Pure black backgrounds when dark mode is active'
+                : 'Fonds noirs purs quand le mode sombre est actif'),
+            value: _oledMode,
+            onChanged: _oledEnabled
+                ? (v) async {
+                    await _set('ls_oled_mode', v);
+                    setState(() => _oledMode = v);
+                    oledModeNotifier.value = v;
+                  }
+                : null,
+          ),
         ]),
 
         const SizedBox(height: 16),
@@ -195,67 +221,67 @@ class _AppearancePageState extends State<AppearancePage> {
                             duration: const Duration(milliseconds: 200),
                             width: 36, height: 36,
                             decoration: BoxDecoration(
-                              color: color, shape: BoxShape.circle,
-                              border: sel
-                                  ? Border.all(color: scheme.onSurface, width: 3)
-                                  : Border.all(
-                                      color: scheme.outlineVariant, width: 1.5),
+                              color: color,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: sel
+                                    ? scheme.onSurface
+                                    : Colors.transparent,
+                                width: 2.5,
+                              ),
                               boxShadow: sel
                                   ? [BoxShadow(
                                       color: color.withValues(alpha: 0.5),
-                                      blurRadius: 8)]
-                                  : [],
+                                      blurRadius: 6)]
+                                  : null,
                             ),
                             child: sel
-                                ? const Icon(Icons.check_rounded,
-                                    color: Colors.white, size: 18)
+                                ? Icon(Icons.check_rounded,
+                                    size: 18,
+                                    color: ThemeData.estimateBrightnessForColor(color) ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black)
                                 : null,
                           )),
                     );
                   }),
+                  // Custom color swatch
                   GestureDetector(
                     onTap: (_useDynamicColor || _useNowPlayingColor)
                         ? null
                         : _pickCustomColor,
                     child: Tooltip(
-                      message: L.colorCustomTooltip,
+                      message: isEn ? 'Custom color' : 'Couleur personnalisée',
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         width: 36, height: 36,
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: _isCustomAccent
-                              ? null
-                              : const SweepGradient(colors: [
-                                  Color(0xFFFF0000), Color(0xFFFFFF00),
-                                  Color(0xFF00FF00), Color(0xFF00FFFF),
-                                  Color(0xFF0000FF), Color(0xFFFF00FF),
-                                  Color(0xFFFF0000),
-                                ]),
                           color: _isCustomAccent ? currentAccent : null,
-                          border: _isCustomAccent
-                              ? Border.all(color: scheme.onSurface, width: 3)
-                              : Border.all(
-                                  color: scheme.outlineVariant, width: 1.5),
-                          boxShadow: _isCustomAccent
-                              ? [BoxShadow(
-                                  color: currentAccent.withValues(alpha: 0.5),
-                                  blurRadius: 8)]
-                              : [],
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: _isCustomAccent
+                                ? scheme.onSurface
+                                : scheme.outlineVariant,
+                            width: _isCustomAccent ? 2.5 : 1.5,
+                          ),
                         ),
-                        child: _isCustomAccent
-                            ? const Icon(Icons.check_rounded,
-                                color: Colors.white, size: 18)
-                            : const Icon(Icons.add_rounded,
-                                color: Colors.white, size: 18),
+                        child: Icon(
+                          Icons.colorize_rounded,
+                          size: 18,
+                          color: _isCustomAccent
+                              ? (ThemeData.estimateBrightnessForColor(currentAccent) ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black)
+                              : scheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
                   ),
                 ]),
               ),
-              if (_isCustomAccent &&
-                  !_useDynamicColor &&
-                  !_useNowPlayingColor) ...[
+              if (_isCustomAccent && !_useDynamicColor && !_useNowPlayingColor) ...[
                 const SizedBox(height: 10),
                 Row(children: [
                   Container(
@@ -382,9 +408,7 @@ class _AppearancePageState extends State<AppearancePage> {
             ),
           ],
 
-          // ── Keep last artwork color ────────────────────────────────────
-          // When enabled, the accent stays on the last extracted color
-          // instead of falling back to the fallback color when nothing plays.
+          // Keep last artwork color instead of resetting to fallback.
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
             secondary: Icon(Icons.palette_outlined, color: scheme.primary),
@@ -402,11 +426,7 @@ class _AppearancePageState extends State<AppearancePage> {
                 : null,
           ),
 
-          // ── Artwork color theme (beta) ──────────────────────────────────
-          // When enabled, detail sheets (artists/albums/tracks/profiles) tint
-          // their background AND accent colors (chips, icons) with the
-          // dominant color extracted from the artwork. Marked beta: color
-          // extraction quality and contrast can vary a lot between images.
+          // Artwork color theme: tints detail sheet backgrounds and accents.
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
             secondary: Icon(Icons.style_rounded, color: scheme.primary),

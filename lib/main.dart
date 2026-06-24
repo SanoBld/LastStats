@@ -36,6 +36,7 @@ void main() async {
   useNowPlayingColorNotifier.value = prefs.getBool('ls_use_nowplaying_color') ?? false;
   artworkColorThemeNotifier.value      = prefs.getBool('ls_artwork_color_theme')       ?? false;
   keepLastArtworkColorNotifier.value   = prefs.getBool('ls_keep_last_artwork_color')   ?? false;
+  oledModeNotifier.value               = prefs.getBool('ls_oled_mode')                 ?? false;
   localeNotifier.value                 = prefs.getString('ls_locale') ?? 'fr';
 
   final fallbackHex = prefs.getString('ls_nowplaying_fallback_color');
@@ -115,38 +116,58 @@ class LastStatsApp extends StatelessWidget {
                 return ValueListenableBuilder<ThemeMode>(
                   valueListenable: themeModeNotifier,
                   builder: (_, mode, _) {
-                    return ValueListenableBuilder<String>(
-                      valueListenable: localeNotifier,
-                      builder: (_, _, _) {
-                        final ColorScheme lightScheme =
-                            (useDynamic && lightDynamic != null)
-                                ? lightDynamic.harmonized()
-                                : ColorScheme.fromSeed(
-                                    seedColor:  seedColorForScheme(accent),
-                                    brightness: Brightness.light,
-                                  );
-                        final ColorScheme darkScheme =
-                            (useDynamic && darkDynamic != null)
-                                ? darkDynamic.harmonized()
-                                : ColorScheme.fromSeed(
-                                    seedColor:  seedColorForScheme(accent),
-                                    brightness: Brightness.dark,
-                                  );
+                    return ValueListenableBuilder<bool>(
+                      valueListenable: oledModeNotifier,
+                      builder: (_, oled, _) {
+                        return ValueListenableBuilder<String>(
+                          valueListenable: localeNotifier,
+                          builder: (_, _, _) {
+                            final ColorScheme lightScheme =
+                                (useDynamic && lightDynamic != null)
+                                    ? lightDynamic.harmonized()
+                                    : ColorScheme.fromSeed(
+                                        seedColor:  seedColorForScheme(accent),
+                                        brightness: Brightness.light,
+                                      );
 
-                        return MaterialApp(
-                          navigatorKey:              navigatorKey,
-                          title:                     'LastStats',
-                          debugShowCheckedModeBanner: false,
-                          theme:     ThemeData(colorScheme: lightScheme, useMaterial3: true),
-                          darkTheme: ThemeData(colorScheme: darkScheme,  useMaterial3: true),
-                          themeMode: mode,
-                          home: (username.isNotEmpty && apiKey.isNotEmpty)
-                              ? HomeScreen(
-                                  username:   username,
-                                  apiKey:     apiKey,
-                                  startupTab: startupTab,
-                                )
-                              : const SetupScreen(),
+                            final ColorScheme darkSchemeBase =
+                                (useDynamic && darkDynamic != null)
+                                    ? darkDynamic.harmonized()
+                                    : ColorScheme.fromSeed(
+                                        seedColor:  seedColorForScheme(accent),
+                                        brightness: Brightness.dark,
+                                      );
+
+                            // OLED: override all surface colors to pure black.
+                            final ColorScheme darkScheme = oled
+                                ? darkSchemeBase.copyWith(
+                                    surface:                  Colors.black,
+                                    surfaceDim:               Colors.black,
+                                    surfaceBright:            const Color(0xFF1C1C1C),
+                                    surfaceContainerLowest:   Colors.black,
+                                    surfaceContainerLow:      const Color(0xFF080808),
+                                    surfaceContainer:         const Color(0xFF0D0D0D),
+                                    surfaceContainerHigh:     const Color(0xFF141414),
+                                    surfaceContainerHighest:  const Color(0xFF1C1C1C),
+                                  )
+                                : darkSchemeBase;
+
+                            return MaterialApp(
+                              navigatorKey:              navigatorKey,
+                              title:                     'LastStats',
+                              debugShowCheckedModeBanner: false,
+                              theme:     ThemeData(colorScheme: lightScheme, useMaterial3: true),
+                              darkTheme: ThemeData(colorScheme: darkScheme,  useMaterial3: true),
+                              themeMode: mode,
+                              home: (username.isNotEmpty && apiKey.isNotEmpty)
+                                  ? HomeScreen(
+                                      username:   username,
+                                      apiKey:     apiKey,
+                                      startupTab: startupTab,
+                                    )
+                                  : const SetupScreen(),
+                            );
+                          },
                         );
                       },
                     );
