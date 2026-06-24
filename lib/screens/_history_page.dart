@@ -16,6 +16,7 @@ class _HistoryPageState extends State<_HistoryPage>
   bool   _loading = true;
   String? _error;
   late TabController _tabController;
+  int _navDirection = 0; // -1 prev, 1 next, 0 neutral
 
   @override bool get wantKeepAlive => true;
 
@@ -60,9 +61,9 @@ class _HistoryPageState extends State<_HistoryPage>
     return _selectedDate.year == n.year && _selectedDate.month == n.month && _selectedDate.day == n.day;
   }
 
-  void _prev()    { setState(() => _selectedDate = _selectedDate.subtract(const Duration(days: 1))); _load(); }
-  void _next()    { if (!_isToday) { setState(() => _selectedDate = _selectedDate.add(const Duration(days: 1))); _load(); } }
-  void _goToday() { final n = DateTime.now(); setState(() => _selectedDate = DateTime(n.year, n.month, n.day)); _load(); }
+  void _prev()    { setState(() { _navDirection = -1; _selectedDate = _selectedDate.subtract(const Duration(days: 1)); }); _load(); }
+  void _next()    { if (!_isToday) { setState(() { _navDirection = 1; _selectedDate = _selectedDate.add(const Duration(days: 1)); }); _load(); } }
+  void _goToday() { final n = DateTime.now(); setState(() { _navDirection = 1; _selectedDate = DateTime(n.year, n.month, n.day); }); _load(); }
 
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
@@ -128,59 +129,62 @@ class _HistoryPageState extends State<_HistoryPage>
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(children: [
-              _HistNavBtn(icon: Icons.chevron_left_rounded, onTap: _prev, scheme: scheme),
+              _TapScale(child: _HistNavBtn(icon: Icons.chevron_left_rounded, onTap: _prev, scheme: scheme)),
               const SizedBox(width: 8),
               Expanded(
-                child: GestureDetector(
-                  onTap: _pickDate,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-                    decoration: BoxDecoration(
-                      color:  scheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
-                    ),
-                    child: Row(children: [
-                    // Cross-fades when the user navigates to a different day
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 220),
-                      transitionBuilder: (c, a) => FadeTransition(opacity: a, child: c),
-                      child: Text(
-                        _dateFmt(),
-                        key: ValueKey(_dateFmt()),
-                        style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+                child: _TapScale(
+                  child: GestureDetector(
+                    onTap: _pickDate,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                      decoration: BoxDecoration(
+                        color:  scheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
                       ),
+                      child: Row(children: [
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 220),
+                        transitionBuilder: (c, a) => FadeTransition(opacity: a, child: c),
+                        child: Text(
+                          _dateFmt(),
+                          key: ValueKey(_dateFmt()),
+                          style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                        Icon(Icons.calendar_month_rounded, size: 16, color: scheme.onSurfaceVariant),
+                      ]),
                     ),
-                      Icon(Icons.calendar_month_rounded, size: 16, color: scheme.onSurfaceVariant),
-                    ]),
                   ),
                 ),
               ),
               if (!_isToday) ...[
                 const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: _goToday,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-                    decoration: BoxDecoration(
-                      color: scheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(12),
+                _TapScale(
+                  child: GestureDetector(
+                    onTap: _goToday,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+                      decoration: BoxDecoration(
+                        color: scheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(Icons.today_rounded, size: 15, color: scheme.onPrimaryContainer),
+                        const SizedBox(width: 5),
+                        Text(L.historyToday, style: text.labelMedium?.copyWith(
+                            color: scheme.onPrimaryContainer, fontWeight: FontWeight.w600)),
+                      ]),
                     ),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(Icons.today_rounded, size: 15, color: scheme.onPrimaryContainer),
-                      const SizedBox(width: 5),
-                      Text(L.historyToday, style: text.labelMedium?.copyWith(
-                          color: scheme.onPrimaryContainer, fontWeight: FontWeight.w600)),
-                    ]),
                   ),
                 ),
               ],
               const SizedBox(width: 8),
-              _HistNavBtn(
+              _TapScale(child: _HistNavBtn(
                 icon: Icons.chevron_right_rounded,
                 onTap: _isToday ? null : _next,
                 scheme: scheme,
-              ),
+              )),
             ]),
           ),
 
@@ -225,31 +229,72 @@ class _HistoryPageState extends State<_HistoryPage>
             ),
           ],
 
-          if (_loading)
-            const Expanded(child: Center(child: CircularProgressIndicator()))
-          else if (_error != null)
-            Expanded(child: _ErrorView(message: _error!, onRetry: _load))
-          else if (_tracks.isEmpty)
-            Expanded(child: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Icon(Icons.music_off_rounded, size: 48,
-                  color: scheme.onSurfaceVariant.withValues(alpha: 0.35)),
-              const SizedBox(height: 12),
-              Text(L.historyNoTracks,
-                  style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
-            ])))
-          else
-            Expanded(child: TabBarView(
-              controller: _tabController,
-              children: [
-                _HistChronView(tracks: _tracks, byHour: _byHour, service: widget.service),
-                _HistListeView(tracks: _tracks, service: widget.service),
-                _HistStatsView(tracks: _tracks),
-              ],
-            )),
+          Expanded(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              switchInCurve:  Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              transitionBuilder: (child, anim) {
+                final dir = _navDirection;
+                final slideIn = Tween<Offset>(
+                  begin: Offset(dir == 0 ? 0.0 : dir < 0 ? -0.06 : 0.06, 0),
+                  end:   Offset.zero,
+                ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic));
+                return SlideTransition(position: slideIn,
+                    child: FadeTransition(opacity: anim, child: child));
+              },
+              child: _loading
+                ? const Center(key: ValueKey('hist_load'), child: CircularProgressIndicator())
+                : _error != null
+                  ? _ErrorView(message: _error!, onRetry: _load)
+                  : _tracks.isEmpty
+                    ? Center(
+                        key: ValueKey('hist_empty_$_selectedDate'),
+                        child: Column(mainAxisSize: MainAxisSize.min, children: [
+                          Icon(Icons.music_off_rounded, size: 48,
+                              color: scheme.onSurfaceVariant.withValues(alpha: 0.35)),
+                          const SizedBox(height: 12),
+                          Text(L.historyNoTracks,
+                              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
+                        ]))
+                    : TabBarView(
+                        key: ValueKey('hist_tabs_$_selectedDate'),
+                        controller: _tabController,
+                        children: [
+                          _HistChronView(tracks: _tracks, byHour: _byHour, service: widget.service),
+                          _HistListeView(tracks: _tracks, service: widget.service),
+                          _HistStatsView(tracks: _tracks),
+                        ],
+                      ),
+            ),
+          ),
         ]),
       ),
     );
   }
+}
+
+// ── Tap-scale feedback (press animation) ────────────────────────────────────
+class _TapScale extends StatefulWidget {
+  final Widget child;
+  final double scale;
+  const _TapScale({required this.child, this.scale = 0.92});
+  @override State<_TapScale> createState() => _TapScaleState();
+}
+class _TapScaleState extends State<_TapScale> {
+  bool _down = false;
+  @override
+  Widget build(BuildContext context) => Listener(
+    onPointerDown:   (_) => setState(() => _down = true),
+    onPointerUp:     (_) => setState(() => _down = false),
+    onPointerCancel: (_) => setState(() => _down = false),
+    child: AnimatedScale(
+      scale:           _down ? widget.scale : 1.0,
+      duration:        const Duration(milliseconds: 80),
+      curve:           Curves.easeOut,
+      child:           widget.child,
+    ),
+  );
 }
 
 // ── Navigation button ────────────────────────────────────────────────────────
@@ -531,7 +576,7 @@ class _HistStatSection extends StatelessWidget {
                 tween:    Tween(begin: 0.0, end: max > 0 ? e.value / max : 0),
                 duration: const Duration(milliseconds: 500),
                 curve:    Curves.easeOutCubic,
-                builder: (_, v, __) => LinearProgressIndicator(
+                builder: (_, v, _) => LinearProgressIndicator(
                   value:           v,
                   minHeight:       4,
                   backgroundColor: scheme.surfaceContainerHighest,

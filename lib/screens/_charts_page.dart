@@ -615,11 +615,18 @@ class _ChartsPageState extends State<_ChartsPage>
     final saved    = _selectedYear;
     final switched = year != saved;
 
-    // Show loading overlay
-    showDialog(
+    // Show loading overlay with fade (no blocking popup)
+    showGeneralDialog(
       context: ctx,
       barrierDismissible: false,
-      builder: (_) => PopScope(
+      barrierLabel: '',
+      barrierColor: Colors.black45,
+      transitionDuration: const Duration(milliseconds: 220),
+      transitionBuilder: (_, anim, _, child) => FadeTransition(
+        opacity: CurvedAnimation(parent: anim, curve: Curves.easeOut),
+        child: child,
+      ),
+      pageBuilder: (_, _, _)  => PopScope(
         canPop: false,
         child: Center(
           child: Card(
@@ -724,9 +731,11 @@ class _ChartsPageState extends State<_ChartsPage>
           return Padding(
             key: _chipKey(year),
             padding: const EdgeInsets.only(right: 8),
-            child: GestureDetector(
-              onTap: () => _onYearChanged(year),
-              child: AnimatedContainer(
+            child: _TapScale(
+              scale: 0.93,
+              child: GestureDetector(
+                onTap: () => _onYearChanged(year),
+                child: AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
                 curve: Curves.easeOutCubic,
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
@@ -753,6 +762,7 @@ class _ChartsPageState extends State<_ChartsPage>
                 ),
               ),
             ),
+          ), // _TapScale
           );
         }).toList(),
       ),
@@ -867,8 +877,14 @@ class _ChartsPageState extends State<_ChartsPage>
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
 
-    if (_loading)       return const Center(child: CircularProgressIndicator());
-    if (_error != null) return _ErrorView(message: _error!, onRetry: _load);
+    if (_loading || _error != null) {
+      return AnimatedSwitcher(
+        duration: const Duration(milliseconds: 350),
+        child: _loading
+          ? const Center(key: ValueKey('chart_load'), child: CircularProgressIndicator())
+          : _ErrorView(message: _error!, onRetry: _load),
+      );
+    }
 
     final allTimeMonthly = _buildAllTimeMonthly();
     // Charts 1 & 2 show only the selected period: that year's months, or

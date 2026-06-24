@@ -235,8 +235,15 @@ class _SearchPageState extends State<_SearchPage> {
   }
 
   Widget _buildResults(BuildContext context, ColorScheme scheme, TextTheme text) {
-    if (_searching) return const Center(child: CircularProgressIndicator());
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 280),
+      child: _searching
+        ? const Center(key: ValueKey('search_load'), child: CircularProgressIndicator())
+        : _buildResultsContent(context, scheme, text),
+    );
+  }
 
+  Widget _buildResultsContent(BuildContext context, ColorScheme scheme, TextTheme text) {
     if (_error != null) {
       return _ErrorView(message: _error!, onRetry: () => _search(_ctrl.text.trim()));
     }

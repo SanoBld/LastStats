@@ -243,14 +243,21 @@ class _TopListBodyState extends State<_TopListBody>
     super.build(context);
     final scheme = Theme.of(context).colorScheme;
 
-    if (_loading) { return const Center(child: CircularProgressIndicator()); }
-    if (_error != null) { return _ErrorView(message: _error!, onRetry: () => _load(reset: true)); }
-    if (_items.isEmpty) {
-      return Center(child: Text(L.commonNoResults,
-        style: TextStyle(color: scheme.onSurfaceVariant)));
+    if (_loading || _error != null || _items.isEmpty) {
+      return AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        child: _loading
+          ? const Center(key: ValueKey('rank_load'), child: CircularProgressIndicator())
+          : _error != null
+            ? _ErrorView(message: _error!, onRetry: () => _load(reset: true))
+            : Center(key: const ValueKey('rank_empty'), child: Text(L.commonNoResults,
+                style: TextStyle(color: scheme.onSurfaceVariant))),
+      );
     }
 
-    return NotificationListener<ScrollNotification>(
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: NotificationListener<ScrollNotification>(
       onNotification: (n) {
         if (!_exhausted && !_loadingMore && n.metrics.pixels >= n.metrics.maxScrollExtent - 200) {
           _page++; _load();
@@ -268,8 +275,13 @@ class _TopListBodyState extends State<_TopListBody>
             final off = _items.length >= 3 ? 3 : 0;
             final idx = i + off;
             if (idx >= _items.length) {
-              return _loadingMore ? const Padding(padding: EdgeInsets.all(16),
-                  child: Center(child: CircularProgressIndicator())) : const SizedBox.shrink();
+              return AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                child: _loadingMore
+                  ? const Padding(key: ValueKey('more'), padding: EdgeInsets.all(16),
+                      child: Center(child: CircularProgressIndicator()))
+                  : const SizedBox.shrink(),
+              );
             }
             final item   = _items[idx] as Map<String, dynamic>;
             final name   = (item['name'] ?? '').toString();
@@ -299,7 +311,8 @@ class _TopListBodyState extends State<_TopListBody>
           childCount: (_items.length >= 3 ? _items.length - 3 : _items.length) + 1,
         )),
       ]),
-    );
+    ),  // NotificationListener
+    ); // AnimatedSwitcher
   }
 }
 
