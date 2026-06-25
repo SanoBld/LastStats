@@ -5,7 +5,11 @@ final themeModeNotifier          = ValueNotifier<ThemeMode>(ThemeMode.system);
 final accentNotifier             = ValueNotifier<Color>(const Color(0xFF7C3AED));
 final useDynamicColorNotifier    = ValueNotifier<bool>(false);
 final useNowPlayingColorNotifier = ValueNotifier<bool>(false);
-final localeNotifier             = ValueNotifier<String>('fr'); // 'fr' | 'en'
+final localeNotifier             = ValueNotifier<String>('fr');
+
+// Visual style preset: 'default' | 'nothing'
+// Saved as 'ls_theme_style' in SharedPreferences.
+final themeStyleNotifier = ValueNotifier<String>('default');
 
 // Color used when music-color mode is on but nothing is playing.
 // Saved as 'ls_nowplaying_fallback_color' in SharedPreferences.
@@ -19,13 +23,13 @@ final artworkColorThemeNotifier = ValueNotifier<bool>(false);
 // Saved as 'ls_keep_last_artwork_color' in SharedPreferences.
 final keepLastArtworkColorNotifier = ValueNotifier<bool>(false);
 
-// Pure black dark theme for OLED screens.
+// Pure black dark theme for OLED screens (default style only).
 // Saved as 'ls_oled_mode' in SharedPreferences.
 final oledModeNotifier = ValueNotifier<bool>(false);
 
 /// Controls the navigation layout:
 ///   'auto' → wide rail when screen width ≥ 720 dp (default)
-///   'on'   → always use the side rail (even on narrow screens)
+///   'on'   → always use the side rail
 ///   'off'  → always use the bottom navigation bar
 final pcModeNotifier = ValueNotifier<String>('auto');
 
@@ -52,7 +56,6 @@ Color accentFromString(String? s) {
     case 'orange':  return const Color(0xFFD97706);
     case 'pink':    return const Color(0xFFDB2777);
     case 'teal':    return const Color(0xFF0F766E);
-    // Neutral: Blue Grey 500 — enough chroma for a reliable near-monochrome M3 scheme.
     case 'neutral': return const Color(0xFF607D8B);
     default:        return const Color(0xFF7C3AED);
   }
@@ -67,23 +70,10 @@ String colorToHex(Color c) {
 }
 
 /// Returns the seed color to pass to ColorScheme.fromSeed.
-///
-/// Near-black and near-white have essentially zero chroma in HCT space.
-/// Material 3 can't extract a hue from them and may fall back to an arbitrary
-/// default (often teal). We map these extremes to a Blue Grey seed that has
-/// just enough chroma to produce a reliable neutral scheme.
-///
-/// The threshold is intentionally tight (< 0.008 / > 0.97) so that dark
-/// saturated colors like deep red (#8B0000, luminance ≈ 0.018) are NOT
-/// replaced — only absolute black and white trigger the fallback.
+/// Maps near-black / near-white to a Blue Grey fallback seed.
 Color seedColorForScheme(Color c) {
   final luminance = c.computeLuminance();
-
-  // Absolute black → Blue Grey 700: neutral dark slate scheme
   if (luminance < 0.008) return const Color(0xFF455A64);
-
-  // Absolute white → Blue Grey 300: neutral light scheme
-  if (luminance > 0.97) return const Color(0xFF90A4AE);
-
+  if (luminance > 0.97)  return const Color(0xFF90A4AE);
   return c;
 }

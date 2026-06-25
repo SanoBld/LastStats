@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:workmanager/workmanager.dart';
 import 'app_state.dart';
+import 'nothing_theme.dart';
 import 'screens/setup_screen.dart';
 import 'screens/home_screen.dart';
 import 'services/data_cache.dart';
@@ -30,14 +31,15 @@ void main() async {
   final startupTab = prefs.getInt('ls_startup_tab') ?? 0;
 
   // ── Appearance ──────────────────────────────────────────────────────────
-  themeModeNotifier.value          = themeFromString(prefs.getString('ls_theme'));
-  accentNotifier.value             = accentFromString(prefs.getString('ls_accent'));
-  useDynamicColorNotifier.value    = prefs.getBool('ls_use_dynamic_color')    ?? false;
-  useNowPlayingColorNotifier.value = prefs.getBool('ls_use_nowplaying_color') ?? false;
+  themeStyleNotifier.value             = prefs.getString('ls_theme_style')             ?? 'default';
+  themeModeNotifier.value              = themeFromString(prefs.getString('ls_theme'));
+  accentNotifier.value                 = accentFromString(prefs.getString('ls_accent'));
+  useDynamicColorNotifier.value        = prefs.getBool('ls_use_dynamic_color')         ?? false;
+  useNowPlayingColorNotifier.value     = prefs.getBool('ls_use_nowplaying_color')      ?? false;
   artworkColorThemeNotifier.value      = prefs.getBool('ls_artwork_color_theme')       ?? false;
   keepLastArtworkColorNotifier.value   = prefs.getBool('ls_keep_last_artwork_color')   ?? false;
   oledModeNotifier.value               = prefs.getBool('ls_oled_mode')                 ?? false;
-  localeNotifier.value                 = prefs.getString('ls_locale') ?? 'fr';
+  localeNotifier.value                 = prefs.getString('ls_locale')                  ?? 'fr';
 
   final fallbackHex = prefs.getString('ls_nowplaying_fallback_color');
   nowPlayingFallbackColorNotifier.value =
@@ -59,8 +61,6 @@ void main() async {
 
   if (!kIsWeb) {
     final isMobile = Platform.isAndroid || Platform.isIOS;
-
-    // flutter_local_notifications and workmanager are not supported on desktop
     if (isMobile) {
       await NotificationService.init();
       notifLaunchPayload = await NotificationService.getLaunchPayload();
@@ -107,65 +107,89 @@ class LastStatsApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return DynamicColorBuilder(
       builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-        return ValueListenableBuilder<bool>(
-          valueListenable: useDynamicColorNotifier,
-          builder: (_, useDynamic, _) {
-            return ValueListenableBuilder<Color>(
-              valueListenable: accentNotifier,
-              builder: (_, accent, _) {
-                return ValueListenableBuilder<ThemeMode>(
-                  valueListenable: themeModeNotifier,
-                  builder: (_, mode, _) {
-                    return ValueListenableBuilder<bool>(
-                      valueListenable: oledModeNotifier,
-                      builder: (_, oled, _) {
-                        return ValueListenableBuilder<String>(
-                          valueListenable: localeNotifier,
-                          builder: (_, _, _) {
-                            final ColorScheme lightScheme =
-                                (useDynamic && lightDynamic != null)
-                                    ? lightDynamic.harmonized()
-                                    : ColorScheme.fromSeed(
-                                        seedColor:  seedColorForScheme(accent),
-                                        brightness: Brightness.light,
-                                      );
+        return ValueListenableBuilder<String>(
+          valueListenable: themeStyleNotifier,
+          builder: (_, style, _) {
 
-                            final ColorScheme darkSchemeBase =
-                                (useDynamic && darkDynamic != null)
-                                    ? darkDynamic.harmonized()
-                                    : ColorScheme.fromSeed(
-                                        seedColor:  seedColorForScheme(accent),
-                                        brightness: Brightness.dark,
-                                      );
+            // ── Nothing OS style: completely custom theme, always dark ──────
+            if (style == 'nothing') {
+              return ValueListenableBuilder<String>(
+                valueListenable: localeNotifier,
+                builder: (_, _, _) {
+                  final nTheme = NothingTheme.build();
+                  return MaterialApp(
+                    navigatorKey:               navigatorKey,
+                    title:                      'LastStats',
+                    debugShowCheckedModeBanner: false,
+                    theme:      nTheme,
+                    darkTheme:  nTheme,
+                    themeMode:  ThemeMode.dark,
+                    home: (username.isNotEmpty && apiKey.isNotEmpty)
+                        ? HomeScreen(username: username, apiKey: apiKey, startupTab: startupTab)
+                        : const SetupScreen(),
+                  );
+                },
+              );
+            }
 
-                            // OLED: override all surface colors to pure black.
-                            final ColorScheme darkScheme = oled
-                                ? darkSchemeBase.copyWith(
-                                    surface:                  Colors.black,
-                                    surfaceDim:               Colors.black,
-                                    surfaceBright:            const Color(0xFF1C1C1C),
-                                    surfaceContainerLowest:   Colors.black,
-                                    surfaceContainerLow:      const Color(0xFF080808),
-                                    surfaceContainer:         const Color(0xFF0D0D0D),
-                                    surfaceContainerHigh:     const Color(0xFF141414),
-                                    surfaceContainerHighest:  const Color(0xFF1C1C1C),
-                                  )
-                                : darkSchemeBase;
+            // ── Default style: Material You + accent + OLED ─────────────────
+            return ValueListenableBuilder<bool>(
+              valueListenable: useDynamicColorNotifier,
+              builder: (_, useDynamic, _) {
+                return ValueListenableBuilder<Color>(
+                  valueListenable: accentNotifier,
+                  builder: (_, accent, _) {
+                    return ValueListenableBuilder<ThemeMode>(
+                      valueListenable: themeModeNotifier,
+                      builder: (_, mode, _) {
+                        return ValueListenableBuilder<bool>(
+                          valueListenable: oledModeNotifier,
+                          builder: (_, oled, _) {
+                            return ValueListenableBuilder<String>(
+                              valueListenable: localeNotifier,
+                              builder: (_, _, _) {
+                                final ColorScheme lightScheme =
+                                    (useDynamic && lightDynamic != null)
+                                        ? lightDynamic.harmonized()
+                                        : ColorScheme.fromSeed(
+                                            seedColor:  seedColorForScheme(accent),
+                                            brightness: Brightness.light,
+                                          );
 
-                            return MaterialApp(
-                              navigatorKey:              navigatorKey,
-                              title:                     'LastStats',
-                              debugShowCheckedModeBanner: false,
-                              theme:     ThemeData(colorScheme: lightScheme, useMaterial3: true),
-                              darkTheme: ThemeData(colorScheme: darkScheme,  useMaterial3: true),
-                              themeMode: mode,
-                              home: (username.isNotEmpty && apiKey.isNotEmpty)
-                                  ? HomeScreen(
-                                      username:   username,
-                                      apiKey:     apiKey,
-                                      startupTab: startupTab,
-                                    )
-                                  : const SetupScreen(),
+                                final ColorScheme darkSchemeBase =
+                                    (useDynamic && darkDynamic != null)
+                                        ? darkDynamic.harmonized()
+                                        : ColorScheme.fromSeed(
+                                            seedColor:  seedColorForScheme(accent),
+                                            brightness: Brightness.dark,
+                                          );
+
+                                // OLED: override all surface colors to pure black.
+                                final ColorScheme darkScheme = oled
+                                    ? darkSchemeBase.copyWith(
+                                        surface:                 Colors.black,
+                                        surfaceDim:              Colors.black,
+                                        surfaceBright:           const Color(0xFF1C1C1C),
+                                        surfaceContainerLowest:  Colors.black,
+                                        surfaceContainerLow:     const Color(0xFF080808),
+                                        surfaceContainer:        const Color(0xFF0D0D0D),
+                                        surfaceContainerHigh:    const Color(0xFF141414),
+                                        surfaceContainerHighest: const Color(0xFF1C1C1C),
+                                      )
+                                    : darkSchemeBase;
+
+                                return MaterialApp(
+                                  navigatorKey:               navigatorKey,
+                                  title:                      'LastStats',
+                                  debugShowCheckedModeBanner: false,
+                                  theme:     ThemeData(colorScheme: lightScheme, useMaterial3: true),
+                                  darkTheme: ThemeData(colorScheme: darkScheme,  useMaterial3: true),
+                                  themeMode: mode,
+                                  home: (username.isNotEmpty && apiKey.isNotEmpty)
+                                      ? HomeScreen(username: username, apiKey: apiKey, startupTab: startupTab)
+                                      : const SetupScreen(),
+                                );
+                              },
                             );
                           },
                         );

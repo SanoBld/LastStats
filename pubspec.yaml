@@ -18,9 +18,9 @@ dependencies:
   share_plus: ^10.1.4
   url_launcher: ^6.3.0
   palette_generator: ^0.3.3
-  flutter_local_notifications: ^18.0.0   
-  workmanager: ^0.6.0                    
-  web: ^1.1.0                            
+  flutter_local_notifications: ^18.0.0
+  workmanager: ^0.6.0
+  web: ^1.1.0
 
 dev_dependencies:
   flutter_test:
@@ -49,3 +49,71 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/fonts/
+
+  fonts:
+    # ── Nothing OS fonts ───────────────────────────────────────────────────
+    - family: Ndot57
+      fonts:
+        - asset: assets/fonts/Ndot57-Regular.otf
+
+    - family: Ndot57Caps
+      fonts:
+        - asset: assets/fonts/Ndot57Caps-Regular.otf
+
+    - family: Ndot55
+      fonts:
+        - asset: assets/fonts/Ndot55-Regular.otf
+
+    - family: Ndot55Caps
+      fonts:
+        - asset: assets/fonts/Ndot55Caps-Regular.otf
+
+    - family: Ndot77
+      fonts:
+        - asset: assets/fonts/Ndot77JPExtended.ttf
+
+    - family: NType82
+      fonts:
+        - asset: assets/fonts/NType82-Regular.otf
+        - asset: assets/fonts/NType82-Headline.otf
+          weight: 700
+
+    - family: NType82Mono
+      fonts:
+        - asset: assets/fonts/NType82Mono-Regular.otf
+
+    - family: LetteraMonoLL
+      fonts:
+        - asset: assets/fonts/LetteraMonoLL-Regular.otf
+        - asset: assets/fonts/LetteraMonoLL-Light.otf
+          weight: 300
+        - asset: assets/fonts/LetteraMonoLL-Medium.otf
+          weight: 500
+        - asset: assets/fonts/LetteraMonoLL-Italic.otf
+          style: italic
+        - asset: assets/fonts/LetteraMonoLL-LightItalic.otf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/LetteraMonoLL-MediumItalic.otf
+          weight: 500
+          style: italic
+
+    # ── Utility fonts ──────────────────────────────────────────────────────
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Light.otf
+          weight: 300
+        - asset: assets/fonts/Inter-Medium.otf
+          weight: 500
+        - asset: assets/fonts/InterVariable-Italic.ttf
+          style: italic
+
+    - family: SpaceGrotesk
+      fonts:
+        - asset: assets/fonts/SpaceGrotesk-Regular.otf
+
+    - family: SpaceMono
+      fonts:
+        - asset: assets/fonts/SpaceMono-Regular.otf
