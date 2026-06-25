@@ -11,8 +11,6 @@ class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
 
   Future<void> _open(String url) async {
-    // canLaunchUrl is unreliable on Android 11+ without <queries> in the
-    // manifest — just call launchUrl directly with externalApplication.
     await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
   }
 
@@ -29,19 +27,18 @@ class AboutPage extends StatelessWidget {
       ),
       body: ListView(padding: const EdgeInsets.all(20), children: [
 
-        // ── Logo / En-tête ────────────────────────────────────────────────
+        // ── Logo / header ─────────────────────────────────────────────────
         Center(child: Column(children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: Image.asset(
               'assets/images/icon-512.png',
-              width: 80,
-              height: 80,
-              fit: BoxFit.cover,
+              width: 80, height: 80, fit: BoxFit.cover,
             ),
           ),
           const SizedBox(height: 14),
-          Text('LastStats', style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
+          Text('LastStats',
+              style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 4),
           Text(UpdateService.currentVersion == '2.6.0'
                   ? 'In development'
@@ -91,7 +88,23 @@ class AboutPage extends StatelessWidget {
             subtitle: Text(L.settingsWebVersionSub,
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             trailing: const Icon(Icons.open_in_new_rounded, size: 16),
-            onTap: () => _open('https://sanobld.github.io/LastStats'),
+            onTap: () => _open('https://sanobld.github.io/LastStats-Web/'),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          ListTile(
+            leading: const Icon(Icons.download_rounded),
+            title: Text(
+              isEn ? 'Scrobble downloader' : 'Téléchargeur de scrobbles',
+              style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+            ),
+            subtitle: Text(
+              isEn
+                  ? 'Export all your scrobbles to a file'
+                  : 'Exporter tous vos scrobbles dans un fichier',
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+            trailing: const Icon(Icons.open_in_new_rounded, size: 16),
+            onTap: () => _open('https://sanobld.github.io/LastStats/LastStats-downloader/'),
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           ListTile(
@@ -101,7 +114,7 @@ class AboutPage extends StatelessWidget {
             subtitle: Text(L.settingsSourceCodeSub,
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             trailing: const Icon(Icons.open_in_new_rounded, size: 16),
-            onTap: () => _open('https://github.com/SanoBld/LastStats-App'),
+            onTap: () => _open('https://github.com/SanoBld/LastStats'),
           ),
         ]),
 
@@ -116,7 +129,7 @@ class AboutPage extends StatelessWidget {
             subtitle: Text(L.settingsAboutSupportSub,
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             trailing: const Icon(Icons.open_in_new_rounded, size: 16),
-            onTap: () => _open('https://github.com/SanoBld/LastStats-App'),
+            onTap: () => _open('https://github.com/SanoBld/LastStats'),
           ),
         ]),
 
@@ -175,7 +188,7 @@ class AboutPage extends StatelessWidget {
 
         const SizedBox(height: 16),
 
-        // ── Image disclaimer ─────────────────────────────────────────────
+        // ── Image disclaimer ──────────────────────────────────────────────
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(

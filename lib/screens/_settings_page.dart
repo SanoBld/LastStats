@@ -34,11 +34,13 @@ class _SettingsPageState extends State<_SettingsPage> {
   UpdateInfo? _updateInfo;
   bool        _checkingUpdate = false;
   bool        _autoUpdate     = true;
+  String?     _avatarUrl;
 
   @override
   void initState() {
     super.initState();
     _loadAndCheck();
+    _fetchAvatar();
     localeNotifier.addListener(_rebuild);
   }
 
@@ -49,6 +51,37 @@ class _SettingsPageState extends State<_SettingsPage> {
   }
 
   void _rebuild() => setState(() {});
+
+  // Fetch the Last.fm profile picture URL.
+  Future<void> _fetchAvatar() async {
+    try {
+      final p      = await SharedPreferences.getInstance();
+      final apiKey = p.getString('ls_apikey') ?? '';
+      if (apiKey.isEmpty) return;
+
+      final uri = Uri.parse(
+        'https://ws.audioscrobbler.com/2.0/'
+        '?method=user.getInfo'
+        '&user=${widget.username}'
+        '&api_key=$apiKey'
+        '&format=json',
+      );
+      final res = await http.get(uri);
+      if (res.statusCode != 200) return;
+
+      final data   = jsonDecode(res.body) as Map<String, dynamic>;
+      final images = (data['user']?['image'] as List?)?.cast<Map<String, dynamic>>();
+      if (images == null || images.isEmpty) return;
+
+      // Pick the largest available non-empty image.
+      String? url;
+      for (final img in images.reversed) {
+        final t = img['#text'] as String? ?? '';
+        if (t.isNotEmpty) { url = t; break; }
+      }
+      if (url != null && mounted) setState(() => _avatarUrl = url);
+    } catch (_) {}
+  }
 
   Future<void> _loadAndCheck() async {
     final p = await SharedPreferences.getInstance();
@@ -102,12 +135,12 @@ class _SettingsPageState extends State<_SettingsPage> {
           : 'Onglet affiché au démarrage',
       pageBuilder: (_) => const StartupPage(),
     ),
-    // 3 — Notifications (NEW)
+    // 3 — Notifications
     _SettingsCardData(
       icon: Icons.notifications_rounded,
       iconBgColor: (s) => Color.lerp(s.primaryContainer, s.tertiaryContainer, 0.5)!,
       iconFgColor: (s) => s.onPrimaryContainer,
-      title:    () => localeNotifier.value == 'en' ? 'Notifications' : 'Notifications',
+      title:    () => 'Notifications',
       subtitle: () => localeNotifier.value == 'en'
           ? 'Milestones, daily & weekly recaps'
           : 'Jalons, récaps quotidiens & hebdo',
@@ -140,7 +173,7 @@ class _SettingsPageState extends State<_SettingsPage> {
       icon: Icons.storage_rounded,
       iconBgColor: (s) => Color.lerp(s.primaryContainer, s.tertiaryContainer, 0.5)!,
       iconFgColor: (s) => s.onPrimaryContainer,
-      title:    () => localeNotifier.value == 'en' ? 'Cache' : 'Cache',
+      title:    () => 'Cache',
       subtitle: () => localeNotifier.value == 'en'
           ? 'History, images, API data'
           : 'Historique, images, données API',
@@ -200,12 +233,6 @@ class _SettingsPageState extends State<_SettingsPage> {
     final cards   = _buildCards();
     final initial = widget.username.isNotEmpty ? widget.username[0].toUpperCase() : '?';
 
-    // ── Mise en page adaptative ───────────────────────────────────────────
-    // Mobile / écran étroit (< 720dp, même seuil que le mode PC dans
-    // PcModeSection) : grille 2 colonnes inchangée, taille d'origine.
-    // Grand écran ou format paysage (≥ 720dp) : plus de colonnes, icônes
-    // et textes plus grands, largeur de contenu plafonnée pour rester
-    // lisible sur les très grands écrans (desktop, tablette).
     final screenWidth      = MediaQuery.sizeOf(context).width;
     final isWide           = screenWidth >= 720;
     final crossAxisCount   = !isWide ? 2 : (screenWidth >= 1200 ? 4 : 3);
@@ -240,8 +267,15 @@ class _SettingsPageState extends State<_SettingsPage> {
                     CircleAvatar(
                       radius: 26,
                       backgroundColor: scheme.primary,
-                      child: Text(initial, style: TextStyle(
-                          fontSize: 20, color: scheme.onPrimary, fontWeight: FontWeight.w700)),
+                      backgroundImage: _avatarUrl != null
+                          ? NetworkImage(_avatarUrl!)
+                          : null,
+                      child: _avatarUrl == null
+                          ? Text(initial, style: TextStyle(
+                              fontSize: 20,
+                              color: scheme.onPrimary,
+                              fontWeight: FontWeight.w700))
+                          : null,
                     ),
                     const SizedBox(width: 14),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -349,8 +383,6 @@ class _CategoryCard extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
 
-    // En mode "large" (grand écran / paysage) : icônes et textes agrandis.
-    // En mode compact (mobile, comportement d'origine inchangé).
     final iconBox     = compact ? 44.0 : 56.0;
     final iconGlyph   = compact ? 24.0 : 28.0;
     final iconRadius  = compact ? 12.0 : 14.0;
