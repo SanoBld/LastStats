@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the build method from the NothingTheme class, for the Dart programming language.">
+  <title>build method - NothingTheme class - nothing_theme library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">laststats_mobile</a></li>
+    <li><a href="../../nothing_theme/">nothing_theme.dart</a></li>
+    <li><a href="../../nothing_theme/NothingTheme-class.html">NothingTheme</a></li>
+    <li class="self-crumb">build static method</li>
+  </ol>
+  <div class="self-name">build</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+<div
+    id="dartdoc-main-content"
+    class="main-content"
+    data-above-sidebar="nothing_theme&#47;NothingTheme-class-sidebar.html"
+    data-below-sidebar="">
+    <div>
+<h1><span class="kind-method">build</span> static method 
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+<span class="returntype"><a href="https://api.flutter.dev/flutter/material/ThemeData-class.html">ThemeData</a></span>
+<span class="name ">build</span>(<wbr>)
+
+      
+
+    </section>
+    
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">static ThemeData build() {
+  final scheme = ColorScheme(
+    brightness:  Brightness.dark,
+    &#47;&#47; Primary = Nothing red
+    primary:              kNothingRed,
+    onPrimary:            kNothingBlack,
+    primaryContainer:     const Color(0xFF3D0000),
+    onPrimaryContainer:   kNothingWhite,
+    &#47;&#47; Secondary = subtle red
+    secondary:            kNothingRed,
+    onSecondary:          kNothingBlack,
+    secondaryContainer:   const Color(0xFF1F0000),
+    onSecondaryContainer: kNothingWhite,
+    &#47;&#47; Tertiary = neutral grey
+    tertiary:              kNothingGrey,
+    onTertiary:            kNothingBlack,
+    tertiaryContainer:     _kSurface3,
+    onTertiaryContainer:   kNothingWhite,
+    &#47;&#47; Error
+    error:              kNothingRed,
+    onError:            kNothingBlack,
+    errorContainer:     const Color(0xFF3D0000),
+    onErrorContainer:   kNothingWhite,
+    &#47;&#47; Surfaces — OLED black hierarchy
+    surface:                   _kSurface1,
+    onSurface:                 kNothingWhite,
+    surfaceDim:                kNothingBlack,
+    surfaceBright:             _kSurface3,
+    surfaceContainerLowest:    kNothingBlack,
+    surfaceContainerLow:       const Color(0xFF080808),
+    surfaceContainer:          _kSurface2,
+    surfaceContainerHigh:      _kSurface3,
+    surfaceContainerHighest:   _kSurface4,
+    &#47;&#47; Misc
+    outline:         const Color(0xFF333333),
+    outlineVariant:  _kBorder,
+    inverseSurface:  kNothingWhite,
+    onInverseSurface: kNothingBlack,
+    inversePrimary:  kNothingRed,
+    shadow:          kNothingBlack,
+    scrim:           kNothingBlack,
+    onSurfaceVariant: kNothingGrey,
+  );
+
+  final textTheme = TextTheme(
+    &#47;&#47; Dot-matrix display style for big numbers &#47; titles
+    displayLarge:  _ts(_kDisplay, 57, weight: FontWeight.w400, spacing: -0.25),
+    displayMedium: _ts(_kDisplay, 45, weight: FontWeight.w400),
+    displaySmall:  _ts(_kDisplay, 36, weight: FontWeight.w400),
+    &#47;&#47; NType82 headline variants
+    headlineLarge:  _ts(_kBody, 32, weight: FontWeight.w700),
+    headlineMedium: _ts(_kBody, 28, weight: FontWeight.w700),
+    headlineSmall:  _ts(_kBody, 24, weight: FontWeight.w700),
+    &#47;&#47; Titles
+    titleLarge:  _ts(_kBody, 22, weight: FontWeight.w600),
+    titleMedium: _ts(_kBody, 16, weight: FontWeight.w600, spacing: 0.15),
+    titleSmall:  _ts(_kBody, 14, weight: FontWeight.w600, spacing: 0.1),
+    &#47;&#47; Body
+    bodyLarge:   _ts(_kBody, 16, spacing: 0.5),
+    bodyMedium:  _ts(_kBody, 14, spacing: 0.25),
+    bodySmall:   _ts(_kBody, 12, spacing: 0.4, color: kNothingGrey),
+    &#47;&#47; Labels
+    labelLarge:  _ts(_kBody, 14, weight: FontWeight.w500, spacing: 0.1),
+    labelMedium: _ts(_kBody, 12, weight: FontWeight.w500, spacing: 0.5),
+    labelSmall:  _ts(_kMono,  11, weight: FontWeight.w500, spacing: 0.5, color: kNothingGrey),
+  );
+
+  return ThemeData(
+    colorScheme:        scheme,
+    useMaterial3:       true,
+    fontFamily:         _kBody,
+    textTheme:          textTheme,
+    scaffoldBackgroundColor: kNothingBlack,
+
+    &#47;&#47; ── AppBar ──────────────────────────────────────────────────────────
+    appBarTheme: AppBarTheme(
+      backgroundColor:    kNothingBlack,
+      foregroundColor:    kNothingWhite,
+      elevation:          0,
+      surfaceTintColor:   Colors.transparent,
+      shadowColor:        Colors.transparent,
+      titleTextStyle: _ts(_kBody, 20, weight: FontWeight.w700),
+      iconTheme:          const IconThemeData(color: kNothingWhite),
+      actionsIconTheme:   const IconThemeData(color: kNothingWhite),
+    ),
+
+    &#47;&#47; ── Cards ───────────────────────────────────────────────────────────
+    cardTheme: CardThemeData(
+      color:            _kSurface2,
+      surfaceTintColor: Colors.transparent,
+      elevation:        0,
+      shape: RoundedRectangleBorder(
+        borderRadius: _kBorderR,
+        side: const BorderSide(color: _kBorder),
+      ),
+      margin: EdgeInsets.zero,
+    ),
+
+    &#47;&#47; ── Navigation bar ──────────────────────────────────────────────────
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor:   kNothingBlack,
+      surfaceTintColor:  Colors.transparent,
+      indicatorColor:    kNothingRed.withValues(alpha: 0.15),
+      labelBehavior:     NavigationDestinationLabelBehavior.alwaysShow,
+      iconTheme: WidgetStateProperty.resolveWith((s) =&gt; IconThemeData(
+        color: s.contains(WidgetState.selected)
+            ? kNothingRed
+            : kNothingWhite.withValues(alpha: 0.45),
+      )),
+      labelTextStyle: WidgetStateProperty.resolveWith((s) {
+        final c = s.contains(WidgetState.selected)
+            ? kNothingRed
+            : kNothingWhite.withValues(alpha: 0.45);
+        return TextStyle(fontFamily: _kBody, fontSize: 12,
+            fontWeight: FontWeight.w500, color: c);
+      }),
+    ),
+
+    &#47;&#47; ── Navigation rail ─────────────────────────────────────────────────
+    navigationRailTheme: NavigationRailThemeData(
+      backgroundColor:        kNothingBlack,
+      indicatorColor:         kNothingRed.withValues(alpha: 0.12),
+      selectedIconTheme:      const IconThemeData(color: kNothingRed),
+      unselectedIconTheme:    IconThemeData(color: kNothingWhite.withValues(alpha: 0.35)),
+      selectedLabelTextStyle: _ts(_kBody, 12, weight: FontWeight.w600, color: kNothingRed),
+      unselectedLabelTextStyle: _ts(_kBody, 12, color: kNothingWhite.withValues(alpha: 0.35)),
+    ),
+
+    &#47;&#47; ── Dividers ─────────────────────────────────────────────────────────
+    dividerTheme: const DividerThemeData(
+      color:     _kBorder,
+      thickness: 1,
+      space:     1,
+    ),
+
+    &#47;&#47; ── List tiles ───────────────────────────────────────────────────────
+    listTileTheme: ListTileThemeData(
+      tileColor:         Colors.transparent,
+      iconColor:         kNothingWhite.withValues(alpha: 0.6),
+      textColor:         kNothingWhite,
+      subtitleTextStyle: _ts(_kBody, 12, color: kNothingGrey),
+      shape:             _kShape,
+    ),
+
+    &#47;&#47; ── Input fields ─────────────────────────────────────────────────────
+    inputDecorationTheme: InputDecorationTheme(
+      filled:    true,
+      fillColor: _kSurface2,
+      border: OutlineInputBorder(
+          borderRadius: _kBorderR,
+          borderSide:   const BorderSide(color: _kBorder)),
+      enabledBorder: OutlineInputBorder(
+          borderRadius: _kBorderR,
+          borderSide:   const BorderSide(color: _kBorder)),
+      focusedBorder: OutlineInputBorder(
+          borderRadius: _kBorderR,
+          borderSide:   const BorderSide(color: kNothingRed, width: 1.5)),
+      errorBorder: OutlineInputBorder(
+          borderRadius: _kBorderR,
+          borderSide:   const BorderSide(color: kNothingRed)),
+      labelStyle: _ts(_kBody, 14, color: kNothingGrey),
+      hintStyle:  _ts(_kBody, 14, color: kNothingGrey),
+    ),
+
+    &#47;&#47; ── Segmented button ─────────────────────────────────────────────────
+    segmentedButtonTheme: SegmentedButtonThemeData(
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith((s) =&gt;
+            s.contains(WidgetState.selected) ? kNothingRed : _kSurface2),
+        foregroundColor: WidgetStateProperty.resolveWith((s) =&gt;
+            s.contains(WidgetState.selected) ? kNothingBlack : kNothingWhite),
+        side: WidgetStateProperty.all(const BorderSide(color: _kBorder)),
+        textStyle: WidgetStateProperty.all(
+            _ts(_kBody, 13, weight: FontWeight.w500)),
+      ),
+    ),
+
+    &#47;&#47; ── Chips ────────────────────────────────────────────────────────────
+    chipTheme: ChipThemeData(
+      backgroundColor:  _kSurface2,
+      selectedColor:    kNothingRed,
+      disabledColor:    _kSurface2,
+      labelStyle:       _ts(_kBody, 13),
+      side:             const BorderSide(color: _kBorder),
+      shape:            const RoundedRectangleBorder(borderRadius: _kBorderR),
+      checkmarkColor:   kNothingBlack,
+    ),
+
+    &#47;&#47; ── Buttons ──────────────────────────────────────────────────────────
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: kNothingRed,
+        foregroundColor: kNothingBlack,
+        shape:           _kShape,
+        textStyle:       _ts(_kBody, 14, weight: FontWeight.w600),
+      ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: kNothingRed,
+        foregroundColor: kNothingBlack,
+        shape:           _kShape,
+        elevation:       0,
+        textStyle:       _ts(_kBody, 14, weight: FontWeight.w600),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: kNothingRed,
+        side:            const BorderSide(color: kNothingRed),
+        shape:           _kShape,
+        textStyle:       _ts(_kBody, 14),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: kNothingRed,
+        textStyle:       _ts(_kBody, 14),
+      ),
+    ),
+
+    &#47;&#47; ── Switch ───────────────────────────────────────────────────────────
+    switchTheme: SwitchThemeData(
+      thumbColor: WidgetStateProperty.resolveWith((s) =&gt;
+          s.contains(WidgetState.selected) ? kNothingBlack : kNothingGrey),
+      trackColor: WidgetStateProperty.resolveWith((s) =&gt;
+          s.contains(WidgetState.selected) ? kNothingRed : _kSurface4),
+      trackOutlineColor: WidgetStateProperty.resolveWith((s) =&gt;
+          s.contains(WidgetState.selected) ? kNothingRed : _kBorder),
+    ),
+
+    &#47;&#47; ── FAB ──────────────────────────────────────────────────────────────
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      backgroundColor: kNothingRed,
+      foregroundColor: kNothingBlack,
+      shape:           _kShape,
+      elevation:       0,
+    ),
+
+    &#47;&#47; ── Dialog ───────────────────────────────────────────────────────────
+    dialogTheme: DialogThemeData(
+      backgroundColor:  _kSurface2,
+      surfaceTintColor: Colors.transparent,
+      elevation:        0,
+      shape:            RoundedRectangleBorder(
+        borderRadius: _kBorderR,
+        side:         const BorderSide(color: _kBorder),
+      ),
+      titleTextStyle:   _ts(_kBody, 20, weight: FontWeight.w700),
+      contentTextStyle: _ts(_kBody, 14, color: kNothingGrey),
+    ),
+
+    &#47;&#47; ── Bottom sheet ─────────────────────────────────────────────────────
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor:  _kSurface1,
+      surfaceTintColor: Colors.transparent,
+      shape:            const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(0)),
+        side:         BorderSide(color: _kBorder),
+      ),
+      dragHandleColor: kNothingGrey,
+    ),
+
+    &#47;&#47; ── Snackbar ─────────────────────────────────────────────────────────
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor:   _kSurface3,
+      contentTextStyle:  _ts(_kBody, 14),
+      actionTextColor:   kNothingRed,
+      shape:             _kShape,
+      behavior:          SnackBarBehavior.floating,
+    ),
+
+    &#47;&#47; ── Progress ─────────────────────────────────────────────────────────
+    progressIndicatorTheme: const ProgressIndicatorThemeData(
+      color:             kNothingRed,
+      linearTrackColor:  _kSurface4,
+      circularTrackColor: _kSurface4,
+    ),
+
+    &#47;&#47; ── Tooltip ──────────────────────────────────────────────────────────
+    tooltipTheme: TooltipThemeData(
+      decoration: BoxDecoration(
+        color: _kSurface3,
+        borderRadius: _kBorderR,
+        border: Border.all(color: _kBorder),
+      ),
+      textStyle: _ts(_kBody, 12),
+    ),
+
+    &#47;&#47; ── Icon ─────────────────────────────────────────────────────────────
+    iconTheme: const IconThemeData(color: kNothingWhite),
+    primaryIconTheme: const IconThemeData(color: kNothingRed),
+  );
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../../index.html">laststats_mobile</a></li>
+    <li><a href="../../nothing_theme/">nothing_theme</a></li>
+    <li><a href="../../nothing_theme/NothingTheme-class.html">NothingTheme</a></li>
+    <li class="self-crumb">build static method</li>
+</ol>
+
+    <h5>NothingTheme class</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div><!--/.sidebar-offcanvas-->
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+</div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    laststats_mobile
+      2.6.0+1
+  </span>
+  
+</footer>
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

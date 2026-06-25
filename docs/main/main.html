@@ -77,14 +77,15 @@
   final startupTab = prefs.getInt(&#39;ls_startup_tab&#39;) ?? 0;
 
   &#47;&#47; ── Appearance ──────────────────────────────────────────────────────────
-  themeModeNotifier.value          = themeFromString(prefs.getString(&#39;ls_theme&#39;));
-  accentNotifier.value             = accentFromString(prefs.getString(&#39;ls_accent&#39;));
-  useDynamicColorNotifier.value    = prefs.getBool(&#39;ls_use_dynamic_color&#39;)    ?? false;
-  useNowPlayingColorNotifier.value = prefs.getBool(&#39;ls_use_nowplaying_color&#39;) ?? false;
+  themeStyleNotifier.value             = prefs.getString(&#39;ls_theme_style&#39;)             ?? &#39;default&#39;;
+  themeModeNotifier.value              = themeFromString(prefs.getString(&#39;ls_theme&#39;));
+  accentNotifier.value                 = accentFromString(prefs.getString(&#39;ls_accent&#39;));
+  useDynamicColorNotifier.value        = prefs.getBool(&#39;ls_use_dynamic_color&#39;)         ?? false;
+  useNowPlayingColorNotifier.value     = prefs.getBool(&#39;ls_use_nowplaying_color&#39;)      ?? false;
   artworkColorThemeNotifier.value      = prefs.getBool(&#39;ls_artwork_color_theme&#39;)       ?? false;
   keepLastArtworkColorNotifier.value   = prefs.getBool(&#39;ls_keep_last_artwork_color&#39;)   ?? false;
   oledModeNotifier.value               = prefs.getBool(&#39;ls_oled_mode&#39;)                 ?? false;
-  localeNotifier.value                 = prefs.getString(&#39;ls_locale&#39;) ?? &#39;fr&#39;;
+  localeNotifier.value                 = prefs.getString(&#39;ls_locale&#39;)                  ?? &#39;fr&#39;;
 
   final fallbackHex = prefs.getString(&#39;ls_nowplaying_fallback_color&#39;);
   nowPlayingFallbackColorNotifier.value =
@@ -106,8 +107,6 @@
 
   if (!kIsWeb) {
     final isMobile = Platform.isAndroid || Platform.isIOS;
-
-    &#47;&#47; flutter_local_notifications and workmanager are not supported on desktop
     if (isMobile) {
       await NotificationService.init();
       notifLaunchPayload = await NotificationService.getLaunchPayload();
