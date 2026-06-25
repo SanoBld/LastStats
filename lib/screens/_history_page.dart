@@ -50,9 +50,9 @@ class _HistoryPageState extends State<_HistoryPage>
         if (page >= totalP) break;
         page++;
       }
-      setState(() { _tracks = all; _loading = false; });
+      setState(() { _tracks = all; _loading = false; _navDirection = 0; });
     } catch (e) {
-      setState(() { _error = e.toString().replaceFirst('Exception: ', ''); _loading = false; });
+      setState(() { _error = e.toString().replaceFirst('Exception: ', ''); _loading = false; _navDirection = 0; });
     }
   }
 
@@ -158,27 +158,36 @@ class _HistoryPageState extends State<_HistoryPage>
                   ),
                 ),
               ),
-              if (!_isToday) ...[
-                const SizedBox(width: 8),
-                _TapScale(
-                  child: GestureDetector(
-                    onTap: _goToday,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-                      decoration: BoxDecoration(
-                        color: scheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(12),
+              if (!_isToday) const SizedBox(width: 8),
+              // AnimatedSize makes the date picker shrink/grow smoothly
+              AnimatedSize(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                child: !_isToday
+                  ? AnimatedOpacity(
+                      opacity: 1.0,
+                      duration: const Duration(milliseconds: 180),
+                      child: _TapScale(
+                        child: GestureDetector(
+                          onTap: _goToday,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+                            decoration: BoxDecoration(
+                              color: scheme.primaryContainer,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(mainAxisSize: MainAxisSize.min, children: [
+                              Icon(Icons.today_rounded, size: 15, color: scheme.onPrimaryContainer),
+                              const SizedBox(width: 5),
+                              Text(L.historyToday, style: text.labelMedium?.copyWith(
+                                  color: scheme.onPrimaryContainer, fontWeight: FontWeight.w600)),
+                            ]),
+                          ),
+                        ),
                       ),
-                      child: Row(mainAxisSize: MainAxisSize.min, children: [
-                        Icon(Icons.today_rounded, size: 15, color: scheme.onPrimaryContainer),
-                        const SizedBox(width: 5),
-                        Text(L.historyToday, style: text.labelMedium?.copyWith(
-                            color: scheme.onPrimaryContainer, fontWeight: FontWeight.w600)),
-                      ]),
-                    ),
-                  ),
-                ),
-              ],
+                    )
+                  : const SizedBox.shrink(),
+              ),
               const SizedBox(width: 8),
               _TapScale(child: _HistNavBtn(
                 icon: Icons.chevron_right_rounded,
@@ -237,7 +246,7 @@ class _HistoryPageState extends State<_HistoryPage>
               transitionBuilder: (child, anim) {
                 final dir = _navDirection;
                 final slideIn = Tween<Offset>(
-                  begin: Offset(dir == 0 ? 0.0 : dir < 0 ? -0.06 : 0.06, 0),
+                  begin: Offset(dir == 0 ? 0.0 : dir < 0 ? -0.22 : 0.22, 0),
                   end:   Offset.zero,
                 ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic));
                 return SlideTransition(position: slideIn,
