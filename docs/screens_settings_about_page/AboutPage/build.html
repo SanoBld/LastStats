@@ -120,19 +120,18 @@ Widget build(BuildContext context) {
     ),
     body: ListView(padding: const EdgeInsets.all(20), children: [
 
-      &#47;&#47; ── Logo &#47; En-tête ────────────────────────────────────────────────
+      &#47;&#47; ── Logo &#47; header ─────────────────────────────────────────────────
       Center(child: Column(children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: Image.asset(
             &#39;assets&#47;images&#47;icon-512.png&#39;,
-            width: 80,
-            height: 80,
-            fit: BoxFit.cover,
+            width: 80, height: 80, fit: BoxFit.cover,
           ),
         ),
         const SizedBox(height: 14),
-        Text(&#39;LastStats&#39;, style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
+        Text(&#39;LastStats&#39;,
+            style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
         const SizedBox(height: 4),
         Text(UpdateService.currentVersion == &#39;2.6.0&#39;
                 ? &#39;In development&#39;
@@ -182,7 +181,23 @@ Widget build(BuildContext context) {
           subtitle: Text(L.settingsWebVersionSub,
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           trailing: const Icon(Icons.open_in_new_rounded, size: 16),
-          onTap: () =&gt; _open(&#39;https:&#47;&#47;sanobld.github.io&#47;LastStats&#39;),
+          onTap: () =&gt; _open(&#39;https:&#47;&#47;sanobld.github.io&#47;LastStats-Web&#47;&#39;),
+        ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        ListTile(
+          leading: const Icon(Icons.download_rounded),
+          title: Text(
+            isEn ? &#39;Scrobble downloader&#39; : &#39;Téléchargeur de scrobbles&#39;,
+            style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+          ),
+          subtitle: Text(
+            isEn
+                ? &#39;Export all your scrobbles to a file&#39;
+                : &#39;Exporter tous vos scrobbles dans un fichier&#39;,
+            style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+          ),
+          trailing: const Icon(Icons.open_in_new_rounded, size: 16),
+          onTap: () =&gt; _open(&#39;https:&#47;&#47;sanobld.github.io&#47;LastStats&#47;LastStats-downloader&#47;&#39;),
         ),
         const Divider(height: 1, indent: 16, endIndent: 16),
         ListTile(
@@ -192,7 +207,7 @@ Widget build(BuildContext context) {
           subtitle: Text(L.settingsSourceCodeSub,
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           trailing: const Icon(Icons.open_in_new_rounded, size: 16),
-          onTap: () =&gt; _open(&#39;https:&#47;&#47;github.com&#47;SanoBld&#47;LastStats-App&#39;),
+          onTap: () =&gt; _open(&#39;https:&#47;&#47;github.com&#47;SanoBld&#47;LastStats&#39;),
         ),
       ]),
 
@@ -207,7 +222,7 @@ Widget build(BuildContext context) {
           subtitle: Text(L.settingsAboutSupportSub,
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           trailing: const Icon(Icons.open_in_new_rounded, size: 16),
-          onTap: () =&gt; _open(&#39;https:&#47;&#47;github.com&#47;SanoBld&#47;LastStats-App&#39;),
+          onTap: () =&gt; _open(&#39;https:&#47;&#47;github.com&#47;SanoBld&#47;LastStats&#39;),
         ),
       ]),
 
@@ -266,7 +281,7 @@ Widget build(BuildContext context) {
 
       const SizedBox(height: 16),
 
-      &#47;&#47; ── Image disclaimer ─────────────────────────────────────────────
+      &#47;&#47; ── Image disclaimer ──────────────────────────────────────────────
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
