@@ -37,9 +37,18 @@ jobs:
         id: meta
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "tag=v${{ inputs.version }}"    >> $GITHUB_OUTPUT
-            echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
-            if [[ "${{ inputs.version }}" == *"-"* ]] || [ "${{ inputs.prerelease }}" = "true" ]; then
+            VERSION="${{ inputs.version }}"
+
+            # If the "prerelease" checkbox is ticked and the version doesn't
+            # already have a suffix (e.g. "-beta", "-rc1"), append "-beta"
+            # automatically so the tag/app version reflects it too.
+            if [ "${{ inputs.prerelease }}" = "true" ] && [[ "$VERSION" != *"-"* ]]; then
+              VERSION="${VERSION}-beta"
+            fi
+
+            echo "tag=v$VERSION"    >> $GITHUB_OUTPUT
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            if [[ "$VERSION" == *"-"* ]]; then
               echo "prerelease=true"  >> $GITHUB_OUTPUT
             else
               echo "prerelease=false" >> $GITHUB_OUTPUT
