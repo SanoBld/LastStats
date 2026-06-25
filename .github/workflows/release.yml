@@ -29,6 +29,7 @@ jobs:
       tag:        ${{ steps.meta.outputs.tag }}
       version:    ${{ steps.meta.outputs.version }}
       prerelease: ${{ steps.meta.outputs.prerelease }}
+      notes:      ${{ steps.changelog.outputs.notes }}
     steps:
       - uses: actions/checkout@v4
 
@@ -54,6 +55,33 @@ jobs:
               echo "prerelease=false" >> $GITHUB_OUTPUT
             fi
           fi
+
+      # Reads CHANGELOG.md and grabs only the section for this version
+      # (the lines between "## vX.Y.Z" and the next "## " heading).
+      # This is what lets you write the human-readable release notes
+      # yourself, instead of relying only on the auto-generated ones.
+      - name: Extract changelog entry for this version
+        id: changelog
+        run: |
+          TAG="${{ steps.meta.outputs.tag }}"
+          NOTES=$(awk -v heading="## $TAG" '
+            $0 == heading { found=1; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md 2>/dev/null)
+
+          # Trim leading/trailing blank lines so we don't get extra gaps in the body
+          NOTES=$(printf '%s' "$NOTES" | sed -e '/./,$!d' -e :a -e '/^\n*$/{$d;N;ba' -e '}')
+
+          if [ -z "$NOTES" ]; then
+            NOTES="_(Pas d'\''entrée trouvée dans CHANGELOG.md pour $TAG — ajoute une section \"## $TAG\" avant de créer le tag)_"
+          fi
+
+          {
+            echo "notes<<CHANGELOG_EOF"
+            echo "$NOTES"
+            echo "CHANGELOG_EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Create tag (manual dispatch only)
         if: github.event_name == 'workflow_dispatch'
@@ -126,6 +154,8 @@ jobs:
           token:                ${{ secrets.GITHUB_TOKEN }}
           body: |
             ## LastStats v${{ needs.resolve.outputs.version }}
+
+            ${{ needs.resolve.outputs.notes }}
 
             ### Android
             | File | Use case |
