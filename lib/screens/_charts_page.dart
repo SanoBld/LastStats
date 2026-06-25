@@ -877,15 +877,6 @@ class _ChartsPageState extends State<_ChartsPage>
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
 
-    if (_loading || _error != null) {
-      return AnimatedSwitcher(
-        duration: const Duration(milliseconds: 350),
-        child: _loading
-          ? const Center(key: ValueKey('chart_load'), child: CircularProgressIndicator())
-          : _ErrorView(message: _error!, onRetry: _load),
-      );
-    }
-
     final allTimeMonthly = _buildAllTimeMonthly();
     // Charts 1 & 2 show only the selected period: that year's months, or
     // every month from start to end when "All time" is selected.
@@ -938,21 +929,28 @@ class _ChartsPageState extends State<_ChartsPage>
     final topLabel    = usingFallback ? _ct('All-time (données $_selectedYear en cours)', 'All-time ($_selectedYear loading)') : (_isAllTime ? _ct('All-time', 'All-time') : '$_selectedYear');
     final albumLabel  = topLabel;
 
-    return SafeArea(
-      child: Column(
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: _loading
+        ? const Center(key: ValueKey('c_l'), child: CircularProgressIndicator())
+        : _error != null
+          ? KeyedSubtree(key: const ValueKey('c_e'), child: _ErrorView(message: _error!, onRetry: _load))
+          : SafeArea(key: const ValueKey('c_ok'), child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
 
           // ── Fixed header ──────────────────────────────────────────────────
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 8, 0),
-            child: Row(children: [
+            padding: const EdgeInsets.fromLTRB(20, 14, 8, 0),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
               Expanded(
                 child: Text(L.chartsTitle,
                     style: text.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w800)),
               ),
               IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 40, minHeight: 32),
                 icon: const Icon(Icons.ios_share_rounded),
                 tooltip: _ct('Exporter un graphique', 'Export a chart'),
                 onPressed: () => _exportFlow(context),
@@ -1185,7 +1183,8 @@ class _ChartsPageState extends State<_ChartsPage>
         ),
       ],
     ),
-  );
+    ), // SafeArea
+    ); // AnimatedSwitcher
 }
 }
 

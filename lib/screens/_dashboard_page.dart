@@ -1037,8 +1037,14 @@ class _DashboardPageState extends State<_DashboardPage> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
-    if (_loading) return _DashboardSkeleton(scheme: scheme);
-    if (_error != null) return _ErrorView(message: _error!, onRetry: _load);
+    if (_loading || _error != null) {
+      return AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        child: _loading
+          ? _DashboardSkeleton(scheme: scheme)
+          : _ErrorView(message: _error!, onRetry: _load),
+      );
+    }
 
     final info      = _userInfo!;
     final name      = (info['name']     ?? widget.username).toString();
@@ -1062,7 +1068,10 @@ class _DashboardPageState extends State<_DashboardPage> {
                       || _topArtistsMonth.isNotEmpty || _topTracksMonth.isNotEmpty
                       || _topArtistsYear.isNotEmpty  || _topTracksYear.isNotEmpty;
 
-    return RefreshIndicator(
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: RefreshIndicator(
+      key: const ValueKey('dash_ok'),
       onRefresh: _load,
       child: CustomScrollView(slivers: [
 
@@ -1428,7 +1437,8 @@ class _DashboardPageState extends State<_DashboardPage> {
           ),
         ),
       ]),
-    );
+    ),   // RefreshIndicator
+    );   // AnimatedSwitcher
   }
 }
 
