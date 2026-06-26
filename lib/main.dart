@@ -31,16 +31,16 @@ void main() async {
   final startupTab = prefs.getInt('ls_startup_tab') ?? 0;
 
   // ── Appearance ──────────────────────────────────────────────────────────
-  themeStyleNotifier.value             = prefs.getString('ls_theme_style')             ?? 'default';
-  nothingAccentNotifier.value          = prefs.getString('ls_nothing_accent')          ?? 'red';
+  themeStyleNotifier.value             = prefs.getString('ls_theme_style')           ?? 'default';
+  nothingAccentNotifier.value          = prefs.getString('ls_nothing_accent')        ?? 'classic';
   themeModeNotifier.value              = themeFromString(prefs.getString('ls_theme'));
   accentNotifier.value                 = accentFromString(prefs.getString('ls_accent'));
-  useDynamicColorNotifier.value        = prefs.getBool('ls_use_dynamic_color')         ?? false;
-  useNowPlayingColorNotifier.value     = prefs.getBool('ls_use_nowplaying_color')      ?? false;
-  artworkColorThemeNotifier.value      = prefs.getBool('ls_artwork_color_theme')       ?? false;
-  keepLastArtworkColorNotifier.value   = prefs.getBool('ls_keep_last_artwork_color')   ?? false;
-  oledModeNotifier.value               = prefs.getBool('ls_oled_mode')                 ?? false;
-  localeNotifier.value                 = prefs.getString('ls_locale')                  ?? 'fr';
+  useDynamicColorNotifier.value        = prefs.getBool('ls_use_dynamic_color')       ?? false;
+  useNowPlayingColorNotifier.value     = prefs.getBool('ls_use_nowplaying_color')    ?? false;
+  artworkColorThemeNotifier.value      = prefs.getBool('ls_artwork_color_theme')     ?? false;
+  keepLastArtworkColorNotifier.value   = prefs.getBool('ls_keep_last_artwork_color') ?? false;
+  oledModeNotifier.value               = prefs.getBool('ls_oled_mode')               ?? false;
+  localeNotifier.value                 = prefs.getString('ls_locale')                ?? 'fr';
 
   final fallbackHex = prefs.getString('ls_nowplaying_fallback_color');
   nowPlayingFallbackColorNotifier.value =
@@ -112,28 +112,40 @@ class LastStatsApp extends StatelessWidget {
           valueListenable: themeStyleNotifier,
           builder: (_, style, _) {
 
-            // ── Nothing OS style ───────────────────────────────────────────
-            // Respects the user's light/dark/auto preference; both variants
-            // share the same red+yellow palette, only surfaces change.
+            // ── Nothing OS style ─────────────────────────────────────────
             if (style == 'nothing') {
-              return ValueListenableBuilder<ThemeMode>(
-                valueListenable: themeModeNotifier,
-                builder: (_, mode, _) {
-                  return ValueListenableBuilder<String>(
-                    valueListenable: localeNotifier,
-                    builder: (_, _, _) {
-                      final nLight = NothingTheme.build(brightness: Brightness.light);
-                      final nDark  = NothingTheme.build(brightness: Brightness.dark);
-                      return MaterialApp(
-                        navigatorKey:               navigatorKey,
-                        title:                      'LastStats',
-                        debugShowCheckedModeBanner: false,
-                        theme:     nLight,
-                        darkTheme: nDark,
-                        themeMode: mode,
-                        home: (username.isNotEmpty && apiKey.isNotEmpty)
-                            ? HomeScreen(username: username, apiKey: apiKey, startupTab: startupTab)
-                            : const SetupScreen(),
+              return ValueListenableBuilder<String>(
+                valueListenable: nothingAccentNotifier,
+                builder: (_, nAccent, _) {
+                  return ValueListenableBuilder<ThemeMode>(
+                    valueListenable: themeModeNotifier,
+                    builder: (_, mode, _) {
+                      return ValueListenableBuilder<String>(
+                        valueListenable: localeNotifier,
+                        builder: (_, _, _) {
+                          // Build both light and dark variants — Flutter picks
+                          // the right one automatically based on themeMode.
+                          final nLight = NothingTheme.build(
+                            accent:     nAccent,
+                            brightness: Brightness.light,
+                          );
+                          final nDark = NothingTheme.build(
+                            accent:     nAccent,
+                            brightness: Brightness.dark,
+                          );
+                          return MaterialApp(
+                            navigatorKey:               navigatorKey,
+                            title:                      'LastStats',
+                            debugShowCheckedModeBanner: false,
+                            theme:     nLight,
+                            darkTheme: nDark,
+                            themeMode: mode, // respects light/dark/system
+                            home: (username.isNotEmpty && apiKey.isNotEmpty)
+                                ? HomeScreen(username: username, apiKey: apiKey,
+                                    startupTab: startupTab)
+                                : const SetupScreen(),
+                          );
+                        },
                       );
                     },
                   );
@@ -141,7 +153,7 @@ class LastStatsApp extends StatelessWidget {
               );
             }
 
-            // ── Default style: Material You + accent + OLED ────────────────
+            // ── Default style: Material You + accent + OLED ──────────────
             return ValueListenableBuilder<bool>(
               valueListenable: useDynamicColorNotifier,
               builder: (_, useDynamic, _) {
@@ -164,7 +176,6 @@ class LastStatsApp extends StatelessWidget {
                                             seedColor:  seedColorForScheme(accent),
                                             brightness: Brightness.light,
                                           );
-
                                 final ColorScheme darkSchemeBase =
                                     (useDynamic && darkDynamic != null)
                                         ? darkDynamic.harmonized()
@@ -172,7 +183,6 @@ class LastStatsApp extends StatelessWidget {
                                             seedColor:  seedColorForScheme(accent),
                                             brightness: Brightness.dark,
                                           );
-
                                 final ColorScheme darkScheme = oled
                                     ? darkSchemeBase.copyWith(
                                         surface:                 Colors.black,
@@ -194,7 +204,8 @@ class LastStatsApp extends StatelessWidget {
                                   darkTheme: ThemeData(colorScheme: darkScheme,  useMaterial3: true),
                                   themeMode: mode,
                                   home: (username.isNotEmpty && apiKey.isNotEmpty)
-                                      ? HomeScreen(username: username, apiKey: apiKey, startupTab: startupTab)
+                                      ? HomeScreen(username: username, apiKey: apiKey,
+                                          startupTab: startupTab)
                                       : const SetupScreen(),
                                 );
                               },

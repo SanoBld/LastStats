@@ -11,9 +11,9 @@ final localeNotifier             = ValueNotifier<String>('fr');
 // Saved as 'ls_theme_style' in SharedPreferences.
 final themeStyleNotifier = ValueNotifier<String>('default');
 
-// Nothing OS accent variant: 'red' (#FF2020) | 'yellow' (#FFC700)
+// Nothing OS accent variant: 'classic' (red only) | 'mixed' (red + yellow touches)
 // Saved as 'ls_nothing_accent' in SharedPreferences.
-final nothingAccentNotifier = ValueNotifier<String>('red');
+final nothingAccentNotifier = ValueNotifier<String>('classic');
 
 // Color used when music-color mode is on but nothing is playing.
 // Saved as 'ls_nowplaying_fallback_color' in SharedPreferences.
@@ -80,7 +80,3 @@ Color seedColorForScheme(Color c) {
   if (luminance > 0.97)  return const Color(0xFF90A4AE);
   return c;
 }
-
-/// Returns the Nothing OS accent color from the saved variant key.
-Color nothingAccentColor(String variant) =>
-    variant == 'yellow' ? const Color(0xFFFFC700) : const Color(0xFFFF2020);
