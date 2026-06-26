@@ -182,8 +182,9 @@ class _AppearancePageState extends State<AppearancePage> {
 
         Row(children: [
           Expanded(child: _StyleCard(
-            selected: !_isNothing,
-            onTap:    () => _setStyle('default'),
+            selected:  !_isNothing,
+            onTap:     () => _setStyle('default'),
+            showDark:  false, // uses scheme surfaceContainerHighest
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -209,30 +210,38 @@ class _AppearancePageState extends State<AppearancePage> {
           Expanded(child: _StyleCard(
             selected:    _isNothing,
             onTap:       () => _setStyle('nothing'),
-            darkForced:  true,
+            showDark:    _theme != 'light', // light preview when light mode chosen
             accentColor: kNothingRed,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(children: [
-                  _dot(kNothingRed),
-                  const SizedBox(width: 4),
-                  if (_nothingAccent == 'mixed') ...[
-                    _dot(kNothingYellow),
+            child: Builder(builder: (ctx) {
+              final cardDark  = _theme != 'light';
+              final textCol   = cardDark ? kNothingWhite      : kNothingDarkText;
+              final metaCol   = cardDark ? kNothingGrey       : const Color(0xFF6B6560);
+              final dotFaded  = cardDark
+                  ? kNothingWhite.withValues(alpha: 0.15)
+                  : kNothingDarkText.withValues(alpha: 0.12);
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(children: [
+                    _dot(kNothingRed),
                     const SizedBox(width: 4),
-                  ],
-                  _dot(kNothingWhite.withValues(alpha: 0.15)),
-                ]),
-                const Spacer(),
-                const Text('nothing.',
-                    style: TextStyle(fontFamily: 'NType82', fontSize: 10,
-                        color: kNothingGrey, letterSpacing: 0.3)),
-                const SizedBox(height: 2),
-                const Text('Nothing OS',
-                    style: TextStyle(fontFamily: 'NType82', fontSize: 14,
-                        fontWeight: FontWeight.w700, color: kNothingWhite)),
-              ],
-            ),
+                    if (_nothingAccent == 'mixed') ...[
+                      _dot(kNothingYellow),
+                      const SizedBox(width: 4),
+                    ],
+                    _dot(dotFaded),
+                  ]),
+                  const Spacer(),
+                  Text('nothing.',
+                      style: TextStyle(fontFamily: 'NType82', fontSize: 10,
+                          color: metaCol, letterSpacing: 0.3)),
+                  const SizedBox(height: 2),
+                  Text('Nothing OS',
+                      style: TextStyle(fontFamily: 'NType82', fontSize: 14,
+                          fontWeight: FontWeight.w700, color: textCol)),
+                ],
+              );
+            }),
           )),
         ]),
 
@@ -789,7 +798,7 @@ class _NothingAccentTile extends StatelessWidget {
 
 class _StyleCard extends StatelessWidget {
   final bool         selected;
-  final bool         darkForced;
+  final bool         showDark;  // true = dark preview card background
   final Color?       accentColor;
   final VoidCallback onTap;
   final Widget       child;
@@ -798,7 +807,7 @@ class _StyleCard extends StatelessWidget {
     required this.selected,
     required this.onTap,
     required this.child,
-    this.darkForced  = false,
+    this.showDark    = true,
     this.accentColor,
   });
 
@@ -806,9 +815,12 @@ class _StyleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final ac     = accentColor ?? scheme.primary;
-    final bg     = darkForced
-        ? const Color(0xFF0D0D0D)
-        : scheme.surfaceContainerHighest;
+    // showDark=true → Nothing dark card preview (#0D0D0D)
+    // showDark=false → uses current theme's surface (adapts to light/dark app theme)
+    // For Nothing card in light mode: warm off-white (#F0EDE8)
+    final bg = !showDark
+        ? scheme.surfaceContainerHighest
+        : const Color(0xFF0D0D0D);
     final border = selected
         ? ac
         : scheme.outlineVariant.withValues(alpha: 0.4);
