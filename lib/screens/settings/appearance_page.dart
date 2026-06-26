@@ -17,7 +17,6 @@ class AppearancePage extends StatefulWidget {
 
 class _AppearancePageState extends State<AppearancePage> {
   String _themeStyle          = 'default';
-  String _nothingAccent       = 'red';
   String _theme               = 'system';
   String _accent              = 'purple';
   bool   _useDynamicColor     = false;
@@ -46,15 +45,14 @@ class _AppearancePageState extends State<AppearancePage> {
     final p = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
-      _themeStyle          = p.getString('ls_theme_style')             ?? 'default';
-      _nothingAccent       = p.getString('ls_nothing_accent')          ?? 'red';
-      _theme               = p.getString('ls_theme')                   ?? 'system';
-      _accent              = p.getString('ls_accent')                  ?? 'purple';
-      _useDynamicColor     = p.getBool('ls_use_dynamic_color')         ?? false;
-      _useNowPlayingColor  = p.getBool('ls_use_nowplaying_color')      ?? false;
-      _artworkColorTheme   = p.getBool('ls_artwork_color_theme')       ?? false;
-      _keepLastArtworkColor = p.getBool('ls_keep_last_artwork_color')  ?? false;
-      _oledMode            = p.getBool('ls_oled_mode')                 ?? false;
+      _themeStyle           = p.getString('ls_theme_style')             ?? 'default';
+      _theme                = p.getString('ls_theme')                   ?? 'system';
+      _accent               = p.getString('ls_accent')                  ?? 'purple';
+      _useDynamicColor      = p.getBool('ls_use_dynamic_color')         ?? false;
+      _useNowPlayingColor   = p.getBool('ls_use_nowplaying_color')      ?? false;
+      _artworkColorTheme    = p.getBool('ls_artwork_color_theme')       ?? false;
+      _keepLastArtworkColor = p.getBool('ls_keep_last_artwork_color')   ?? false;
+      _oledMode             = p.getBool('ls_oled_mode')                 ?? false;
       final fbHex = p.getString('ls_nowplaying_fallback_color');
       _fallbackAccent = fbHex != null
           ? accentFromString(fbHex)
@@ -69,14 +67,13 @@ class _AppearancePageState extends State<AppearancePage> {
   }
 
   // Switch visual style.
-  // When activating Nothing: disable dynamic color and now-playing color
-  // so they don't silently stay "on" in the background.
+  // When activating Nothing: disable dynamic color and now-playing color.
+  // Theme (light/dark/auto) remains user-controlled.
   Future<void> _setStyle(String v) async {
     final p = await SharedPreferences.getInstance();
     await p.setString('ls_theme_style', v);
 
     if (v == 'nothing') {
-      // Disable conflicting color features
       await p.setBool('ls_use_dynamic_color',    false);
       await p.setBool('ls_use_nowplaying_color', false);
       setState(() {
@@ -86,19 +83,12 @@ class _AppearancePageState extends State<AppearancePage> {
       });
       useDynamicColorNotifier.value    = false;
       useNowPlayingColorNotifier.value = false;
-      // Restore base accent notifier so switching back works cleanly
       accentNotifier.value = accentFromString(_accent);
     } else {
       setState(() => _themeStyle = v);
     }
 
     themeStyleNotifier.value = v;
-  }
-
-  Future<void> _setNothingAccent(String v) async {
-    await _set('ls_nothing_accent', v);
-    setState(() => _nothingAccent = v);
-    nothingAccentNotifier.value = v;
   }
 
   Future<void> _setTheme(String v) async {
@@ -145,7 +135,9 @@ class _AppearancePageState extends State<AppearancePage> {
       _accent.startsWith('#') ||
       !kSettingsAccentOptions.any((o) => o.$2 == _accent);
 
-  bool get _isNothing  => _themeStyle == 'nothing';
+  bool get _isNothing => _themeStyle == 'nothing';
+
+  // OLED only available in default style when not in light mode.
   bool get _oledEnabled => _theme != 'light' && !_isNothing;
 
   @override
@@ -206,16 +198,16 @@ class _AppearancePageState extends State<AppearancePage> {
             selected: _isNothing,
             onTap:    () => _setStyle('nothing'),
             darkMode: true,
-            accentColor: _nothingAccent == 'yellow' ? kNothingYellow : kNothingRed,
+            accentColor: kNothingRed,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(children: [
-                  _dot(_nothingAccent == 'yellow' ? kNothingYellow : kNothingRed),
+                  _dot(kNothingRed),
                   const SizedBox(width: 4),
-                  _dot(kNothingWhite.withValues(alpha: 0.2)),
+                  _dot(kNothingYellow),
                   const SizedBox(width: 4),
-                  _dot(kNothingWhite.withValues(alpha: 0.08)),
+                  _dot(kNothingWhite.withValues(alpha: 0.12)),
                 ]),
                 const Spacer(),
                 const Text('nothing.',
@@ -230,76 +222,25 @@ class _AppearancePageState extends State<AppearancePage> {
           )),
         ]),
 
-        // ── Nothing accent variant (shown only when Nothing is active) ──
-        if (_isNothing) ...[
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color:  const Color(0xFF0D0D0D),
-              border: Border.all(color: const Color(0xFF2A2A2A)),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
-                const Icon(Icons.circle, size: 8, color: kNothingGrey),
-                const SizedBox(width: 8),
-                Text(
-                  isEn ? 'Accent color' : 'Couleur accent',
-                  style: const TextStyle(
-                      fontFamily: 'NType82', fontSize: 12,
-                      color: kNothingGrey, letterSpacing: 0.5),
-                ),
-              ]),
-              const SizedBox(height: 12),
-              Row(children: [
-                // Classic red
-                Expanded(child: _NothingAccentTile(
-                  color:    kNothingRed,
-                  label:    isEn ? 'Classic red' : 'Rouge classique',
-                  sublabel: '#FF2020',
-                  selected: _nothingAccent == 'red',
-                  onTap:    () => _setNothingAccent('red'),
-                )),
-                const SizedBox(width: 10),
-                // CMF yellow
-                Expanded(child: _NothingAccentTile(
-                  color:    kNothingYellow,
-                  label:    isEn ? 'CMF yellow' : 'Jaune CMF',
-                  sublabel: '#FFC700',
-                  selected: _nothingAccent == 'yellow',
-                  onTap:    () => _setNothingAccent('yellow'),
-                )),
-              ]),
-            ]),
-          ),
-        ],
-
         // Nothing active info banner
         if (_isNothing) ...[
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
             decoration: BoxDecoration(
-              color: (_nothingAccent == 'yellow' ? kNothingYellow : kNothingRed)
-                  .withValues(alpha: 0.07),
+              color: kNothingRed.withValues(alpha: 0.07),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: (_nothingAccent == 'yellow' ? kNothingYellow : kNothingRed)
-                    .withValues(alpha: 0.3),
-              ),
+              border: Border.all(color: kNothingRed.withValues(alpha: 0.3)),
             ),
             child: Row(children: [
-              Icon(Icons.info_outline_rounded, size: 14,
-                  color: _nothingAccent == 'yellow' ? kNothingYellow : kNothingRed),
+              const Icon(Icons.info_outline_rounded, size: 14, color: kNothingRed),
               const SizedBox(width: 8),
               Expanded(child: Text(
                 isEn
-                    ? 'Nothing OS style active. Theme, accent and dynamic color are overridden.'
-                    : 'Style Nothing OS actif. Thème, accent et couleur dynamique sont ignorés.',
-                style: TextStyle(
-                  fontFamily: 'NType82', fontSize: 12,
-                  color: _nothingAccent == 'yellow' ? kNothingYellow : kNothingRed,
+                    ? 'Nothing OS style active — red & yellow palette. Accent and dynamic color are overridden.'
+                    : 'Style Nothing OS actif — palette rouge & jaune. Accent et couleur dynamique sont ignorés.',
+                style: const TextStyle(
+                  fontFamily: 'NType82', fontSize: 12, color: kNothingRed,
                 ),
               )),
             ]),
@@ -309,66 +250,67 @@ class _AppearancePageState extends State<AppearancePage> {
         const SizedBox(height: 20),
 
         // ══════════════════════════════════════════════════════════════════
-        //  Theme (disabled when Nothing is active)
+        //  Theme — always active, even in Nothing style.
+        //  OLED toggle inside is still disabled under Nothing (redundant).
         // ══════════════════════════════════════════════════════════════════
-        Opacity(
-          opacity: _isNothing ? 0.3 : 1.0,
-          child: IgnorePointer(
-            ignoring: _isNothing,
-            child: SettingsSection(label: L.settingsTheme, children: [
-              Padding(padding: const EdgeInsets.fromLTRB(16, 14, 16, 14), child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
-                    Icon(Icons.contrast_rounded, size: 18, color: scheme.primary),
-                    const SizedBox(width: 8),
-                    Text(L.settingsTheme,
-                        style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-                  ]),
-                  const SizedBox(height: 12),
-                  SegmentedButton<String>(
-                    segments: [
-                      ButtonSegment(value: 'system',
-                          icon: const Icon(Icons.brightness_auto_rounded),
-                          label: Text(L.settingsThemeAuto)),
-                      ButtonSegment(value: 'light',
-                          icon: const Icon(Icons.light_mode_rounded),
-                          label: Text(L.settingsThemeLight)),
-                      ButtonSegment(value: 'dark',
-                          icon: const Icon(Icons.dark_mode_rounded),
-                          label: Text(L.settingsThemeDark)),
-                    ],
-                    selected: {_theme},
-                    onSelectionChanged: (s) => _setTheme(s.first),
-                    style: const ButtonStyle(
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                  ),
+        SettingsSection(label: L.settingsTheme, children: [
+          Padding(padding: const EdgeInsets.fromLTRB(16, 14, 16, 14), child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Icon(Icons.contrast_rounded, size: 18, color: scheme.primary),
+                const SizedBox(width: 8),
+                Text(L.settingsTheme,
+                    style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+              ]),
+              const SizedBox(height: 12),
+              SegmentedButton<String>(
+                segments: [
+                  ButtonSegment(value: 'system',
+                      icon: const Icon(Icons.brightness_auto_rounded),
+                      label: Text(L.settingsThemeAuto)),
+                  ButtonSegment(value: 'light',
+                      icon: const Icon(Icons.light_mode_rounded),
+                      label: Text(L.settingsThemeLight)),
+                  ButtonSegment(value: 'dark',
+                      icon: const Icon(Icons.dark_mode_rounded),
+                      label: Text(L.settingsThemeDark)),
                 ],
-              )),
-              const Divider(height: 1, indent: 16, endIndent: 16),
-              SwitchListTile(
-                secondary: Icon(Icons.phone_android_rounded,
-                    color: _oledEnabled ? scheme.primary : scheme.onSurfaceVariant),
-                title: Text(isEn ? 'OLED black theme' : 'Thème noir OLED'),
-                subtitle: Text(isEn
-                    ? 'Pure black backgrounds when dark mode is active'
-                    : 'Fonds noirs purs quand le mode sombre est actif'),
-                value: _oledMode,
-                onChanged: _oledEnabled
-                    ? (v) async {
-                        await _set('ls_oled_mode', v);
-                        setState(() => _oledMode = v);
-                        oledModeNotifier.value = v;
-                      }
-                    : null,
+                selected: {_theme},
+                onSelectionChanged: (s) => _setTheme(s.first),
+                style: const ButtonStyle(
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap),
               ),
-            ]),
+            ],
+          )),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          // OLED: disabled under Nothing (already pure black) or in light mode.
+          Opacity(
+            opacity: _oledEnabled ? 1.0 : 0.4,
+            child: SwitchListTile(
+              secondary: Icon(Icons.phone_android_rounded,
+                  color: _oledEnabled ? scheme.primary : scheme.onSurfaceVariant),
+              title: Text(isEn ? 'OLED black theme' : 'Thème noir OLED'),
+              subtitle: Text(_isNothing
+                  ? (isEn ? 'Not available in Nothing OS style' : 'Non disponible avec le style Nothing OS')
+                  : (isEn
+                      ? 'Pure black backgrounds when dark mode is active'
+                      : 'Fonds noirs purs quand le mode sombre est actif')),
+              value: _oledMode,
+              onChanged: _oledEnabled
+                  ? (v) async {
+                      await _set('ls_oled_mode', v);
+                      setState(() => _oledMode = v);
+                      oledModeNotifier.value = v;
+                    }
+                  : null,
+            ),
           ),
-        ),
+        ]),
 
         const SizedBox(height: 16),
 
         // ══════════════════════════════════════════════════════════════════
-        //  Accent color (disabled when Nothing is active)
+        //  Accent color — disabled when Nothing is active
         // ══════════════════════════════════════════════════════════════════
         Opacity(
           opacity: _isNothing ? 0.3 : 1.0,
@@ -481,7 +423,7 @@ class _AppearancePageState extends State<AppearancePage> {
         const SizedBox(height: 16),
 
         // ══════════════════════════════════════════════════════════════════
-        //  Dynamic color / Material You (disabled when Nothing is active)
+        //  Dynamic color / Material You — disabled when Nothing is active
         // ══════════════════════════════════════════════════════════════════
         Opacity(
           opacity: _isNothing ? 0.3 : 1.0,
@@ -632,69 +574,6 @@ Widget _dot(Color c) => Container(
 );
 
 // ══════════════════════════════════════════════════════════════════════════
-//  Nothing accent color tile
-// ══════════════════════════════════════════════════════════════════════════
-
-class _NothingAccentTile extends StatelessWidget {
-  final Color  color;
-  final String label;
-  final String sublabel;
-  final bool   selected;
-  final VoidCallback onTap;
-
-  const _NothingAccentTile({
-    required this.color,
-    required this.label,
-    required this.sublabel,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: selected ? color.withValues(alpha: 0.1) : const Color(0xFF111111),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: selected ? color : const Color(0xFF2A2A2A),
-            width: selected ? 1.5 : 1,
-          ),
-        ),
-        child: Row(children: [
-          Container(
-            width: 22, height: 22,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            child: selected
-                ? const Icon(Icons.check_rounded, size: 13, color: Colors.black)
-                : null,
-          ),
-          const SizedBox(width: 10),
-          Expanded(child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label,
-                  style: TextStyle(
-                      fontFamily: 'NType82', fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: selected ? color : kNothingWhite)),
-              Text(sublabel,
-                  style: const TextStyle(
-                      fontFamily: 'NType82Mono', fontSize: 10,
-                      color: kNothingGrey, letterSpacing: 0.5)),
-            ],
-          )),
-        ]),
-      ),
-    );
-  }
-}
-
-// ══════════════════════════════════════════════════════════════════════════
 //  Style selector card
 // ══════════════════════════════════════════════════════════════════════════
 
@@ -741,8 +620,7 @@ class _StyleCard extends StatelessWidget {
           if (selected)
             Positioned(
               top: 0, right: 0,
-              child: Icon(Icons.check_circle_rounded,
-                  size: 16, color: ac),
+              child: Icon(Icons.check_circle_rounded, size: 16, color: ac),
             ),
         ]),
       ),

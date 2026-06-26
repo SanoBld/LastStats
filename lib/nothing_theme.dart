@@ -1,110 +1,127 @@
 // lib/nothing_theme.dart
 // ══════════════════════════════════════════════════════════════════════════
 //  Nothing OS visual theme for LastStats.
-//  Always dark. Pure black surfaces, Nothing accent, NType82 body font,
-//  Ndot57 for display/numeric contexts.
+//  Supports light and dark modes.
+//  Red (#FF2020) primary — yellow (#FFC700) secondary touches.
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // ── Nothing palette ────────────────────────────────────────────────────────
-const Color kNothingRed    = Color(0xFFFF2020); // classic red
-const Color kNothingYellow = Color(0xFFFFC700); // CMF / new era yellow
+const Color kNothingRed    = Color(0xFFFF2020);
+const Color kNothingYellow = Color(0xFFFFC700);
 const Color kNothingBlack  = Color(0xFF000000);
 const Color kNothingWhite  = Color(0xFFF5F5F5);
 const Color kNothingGrey   = Color(0xFF888888);
 const Color kNothingGrey2  = Color(0xFF444444);
 
-// ── Surface hierarchy (OLED) ───────────────────────────────────────────────
-const Color _s0 = Color(0xFF000000); // scaffold, nav bars
-const Color _s1 = Color(0xFF0D0D0D); // default surface
-const Color _s2 = Color(0xFF111111); // cards, list tiles
-const Color _s3 = Color(0xFF181818); // elevated surfaces
-const Color _s4 = Color(0xFF222222); // highest surfaces
-const Color _sBorder = Color(0xFF2A2A2A);
+// ── Dark surface hierarchy (OLED) ─────────────────────────────────────────
+const Color _ds0 = Color(0xFF000000);
+const Color _ds1 = Color(0xFF0D0D0D);
+const Color _ds2 = Color(0xFF111111);
+const Color _ds3 = Color(0xFF181818);
+const Color _ds4 = Color(0xFF222222);
+const Color _dBorder = Color(0xFF2A2A2A);
+
+// ── Light surface hierarchy (warm off-white — Nothing OS 3 light mode) ────
+const Color _ls0    = Color(0xFFF5F0EB); // scaffold / nav
+const Color _ls1    = Color(0xFFFFFFFF); // default surface
+const Color _ls2    = Color(0xFFF0EBE5); // cards / list tiles
+const Color _ls3    = Color(0xFFE8E2DC); // elevated surfaces
+const Color _ls4    = Color(0xFFDDD8D2); // highest surfaces
+const Color _lBorder = Color(0xFFD0CAC3);
+const Color _lText   = Color(0xFF0A0A0A);
+const Color _lSubtext = Color(0xFF666666);
 
 // ── Fonts ──────────────────────────────────────────────────────────────────
-const String _kBody    = 'NType82';      // main UI font
-const String _kDisplay = 'Ndot57';      // dot-matrix display / numbers
-const String _kMono    = 'NType82Mono'; // monospace labels
-const String _kCaps    = 'Ndot57Caps';  // dot-matrix all-caps
+const String _kBody    = 'NType82';
+const String _kDisplay = 'Ndot57';
+const String _kMono    = 'NType82Mono';
 
 // ── Shape ──────────────────────────────────────────────────────────────────
-const _kR      = Radius.circular(6);
-const _kBR     = BorderRadius.all(_kR);
-const _kShape  = RoundedRectangleBorder(borderRadius: _kBR);
-const _kShape0 = RoundedRectangleBorder(); // sharp — bottom sheets, etc.
+const _kR     = Radius.circular(6);
+const _kBR    = BorderRadius.all(_kR);
+const _kShape = RoundedRectangleBorder(borderRadius: _kBR);
 
 class NothingTheme {
   NothingTheme._();
 
-  static ThemeData build({String accent = 'red'}) {
-    final primary = accent == 'yellow' ? kNothingYellow : kNothingRed;
-    // Yellow needs black text on it; red also needs black text.
+  // Returns a light or dark ThemeData.
+  // Red is always primary; yellow is secondary for subtle accent touches.
+  static ThemeData build({Brightness brightness = Brightness.dark}) {
+    final isDark = brightness == Brightness.dark;
+
+    // ── Accent colors (same in both modes) ────────────────────────────────
+    const primary   = kNothingRed;
+    const secondary = kNothingYellow;
     const onPrimary = kNothingBlack;
 
-    // Slightly tinted container colors
-    final primaryContainer = Color.lerp(primary, _s0, 0.75)!;
+    // ── Surface tokens per mode ────────────────────────────────────────────
+    final s0     = isDark ? _ds0     : _ls0;
+    final s1     = isDark ? _ds1     : _ls1;
+    final s2     = isDark ? _ds2     : _ls2;
+    final s3     = isDark ? _ds3     : _ls3;
+    final s4     = isDark ? _ds4     : _ls4;
+    final sBorder = isDark ? _dBorder : _lBorder;
+    final onSurf  = isDark ? kNothingWhite : _lText;
+    final onSurfV = isDark ? kNothingGrey  : _lSubtext;
 
     final scheme = ColorScheme(
-      brightness:  Brightness.dark,
+      brightness:           brightness,
       primary:              primary,
       onPrimary:            onPrimary,
-      primaryContainer:     primaryContainer,
-      onPrimaryContainer:   kNothingWhite,
-      secondary:            primary,
-      onSecondary:          onPrimary,
-      secondaryContainer:   Color.lerp(primary, _s0, 0.88)!,
-      onSecondaryContainer: kNothingWhite,
-      tertiary:              kNothingGrey,
-      onTertiary:            kNothingBlack,
-      tertiaryContainer:     _s3,
-      onTertiaryContainer:   kNothingWhite,
-      error:              primary,
-      onError:            onPrimary,
-      errorContainer:     Color.lerp(primary, _s0, 0.8)!,
-      onErrorContainer:   kNothingWhite,
-      // OLED surface stack
-      surface:                    _s1,
-      onSurface:                  kNothingWhite,
-      onSurfaceVariant:           kNothingGrey,
-      surfaceDim:                 _s0,
-      surfaceBright:              _s3,
-      surfaceContainerLowest:     _s0,
-      surfaceContainerLow:        const Color(0xFF080808),
-      surfaceContainer:           _s2,
-      surfaceContainerHigh:       _s3,
-      surfaceContainerHighest:    _s4,
-      outline:         const Color(0xFF333333),
-      outlineVariant:  _sBorder,
-      inverseSurface:  kNothingWhite,
-      onInverseSurface: kNothingBlack,
+      primaryContainer:     Color.lerp(primary, isDark ? _ds0 : _ls1, 0.80)!,
+      onPrimaryContainer:   onSurf,
+      // Yellow as secondary — appears on chips, tabs, selected elements
+      secondary:            secondary,
+      onSecondary:          kNothingBlack,
+      secondaryContainer:   Color.lerp(secondary, isDark ? _ds0 : _ls1, 0.82)!,
+      onSecondaryContainer: onSurf,
+      tertiary:             isDark ? kNothingGrey : _lSubtext,
+      onTertiary:           isDark ? kNothingBlack : _ls1,
+      tertiaryContainer:    s3,
+      onTertiaryContainer:  onSurf,
+      error:                primary,
+      onError:              onPrimary,
+      errorContainer:       Color.lerp(primary, isDark ? _ds0 : _ls1, 0.82)!,
+      onErrorContainer:     onSurf,
+      surface:              s1,
+      onSurface:            onSurf,
+      onSurfaceVariant:     onSurfV,
+      surfaceDim:           s0,
+      surfaceBright:        s3,
+      surfaceContainerLowest:  s0,
+      surfaceContainerLow:     isDark ? const Color(0xFF080808) : _ls2,
+      surfaceContainer:        s2,
+      surfaceContainerHigh:    s3,
+      surfaceContainerHighest: s4,
+      outline:         isDark ? const Color(0xFF333333) : const Color(0xFFBBB5AE),
+      outlineVariant:  sBorder,
+      inverseSurface:  isDark ? kNothingWhite : kNothingBlack,
+      onInverseSurface: isDark ? kNothingBlack : kNothingWhite,
       inversePrimary:  primary,
       shadow:          kNothingBlack,
       scrim:           kNothingBlack,
     );
 
     // ── Typography ─────────────────────────────────────────────────────────
-    // Ndot57 for large display numbers/titles (the iconic dot-matrix look).
-    // NType82 for all UI text.
-    // NType82Mono / Ndot57Caps for tags and monospace labels.
     final textTheme = TextTheme(
-      displayLarge:  _ts(_kDisplay, 57, weight: FontWeight.w400, spacing: -0.5),
-      displayMedium: _ts(_kDisplay, 45, weight: FontWeight.w400, spacing: -0.25),
-      displaySmall:  _ts(_kDisplay, 36, weight: FontWeight.w400),
-      headlineLarge:  _ts(_kBody, 32, weight: FontWeight.w700, spacing: -0.5),
-      headlineMedium: _ts(_kBody, 28, weight: FontWeight.w700, spacing: -0.25),
-      headlineSmall:  _ts(_kBody, 24, weight: FontWeight.w700),
-      titleLarge:  _ts(_kBody, 20, weight: FontWeight.w700, spacing: 0.1),
-      titleMedium: _ts(_kBody, 16, weight: FontWeight.w600, spacing: 0.15),
-      titleSmall:  _ts(_kBody, 14, weight: FontWeight.w600, spacing: 0.1),
-      bodyLarge:   _ts(_kBody, 16, spacing: 0.15),
-      bodyMedium:  _ts(_kBody, 14, spacing: 0.1),
-      bodySmall:   _ts(_kBody, 12, spacing: 0.2, color: kNothingGrey),
-      labelLarge:  _ts(_kBody, 14, weight: FontWeight.w500, spacing: 0.5),
-      labelMedium: _ts(_kMono,  12, weight: FontWeight.w500, spacing: 0.8),
-      labelSmall:  _ts(_kMono,  11, weight: FontWeight.w400, spacing: 1.0, color: kNothingGrey),
+      displayLarge:  _ts(_kDisplay, 57, weight: FontWeight.w400, spacing: -0.5, color: onSurf),
+      displayMedium: _ts(_kDisplay, 45, weight: FontWeight.w400, spacing: -0.25, color: onSurf),
+      displaySmall:  _ts(_kDisplay, 36, weight: FontWeight.w400, color: onSurf),
+      headlineLarge:  _ts(_kBody, 32, weight: FontWeight.w700, spacing: -0.5, color: onSurf),
+      headlineMedium: _ts(_kBody, 28, weight: FontWeight.w700, spacing: -0.25, color: onSurf),
+      headlineSmall:  _ts(_kBody, 24, weight: FontWeight.w700, color: onSurf),
+      titleLarge:  _ts(_kBody, 20, weight: FontWeight.w700, spacing: 0.1, color: onSurf),
+      titleMedium: _ts(_kBody, 16, weight: FontWeight.w600, spacing: 0.15, color: onSurf),
+      titleSmall:  _ts(_kBody, 14, weight: FontWeight.w600, spacing: 0.1, color: onSurf),
+      bodyLarge:   _ts(_kBody, 16, spacing: 0.15, color: onSurf),
+      bodyMedium:  _ts(_kBody, 14, spacing: 0.1, color: onSurf),
+      bodySmall:   _ts(_kBody, 12, spacing: 0.2, color: onSurfV),
+      labelLarge:  _ts(_kBody, 14, weight: FontWeight.w500, spacing: 0.5, color: onSurf),
+      labelMedium: _ts(_kMono, 12, weight: FontWeight.w500, spacing: 0.8, color: onSurf),
+      labelSmall:  _ts(_kMono, 11, weight: FontWeight.w400, spacing: 1.0, color: onSurfV),
     );
 
     return ThemeData(
@@ -112,30 +129,32 @@ class NothingTheme {
       useMaterial3:            true,
       fontFamily:              _kBody,
       textTheme:               textTheme,
-      scaffoldBackgroundColor: _s0,
+      scaffoldBackgroundColor: s0,
 
-      // ── System UI overlay: status bar icons are white ─────────────────
+      // ── System UI overlay ─────────────────────────────────────────────
       appBarTheme: AppBarTheme(
-        backgroundColor:   _s0,
-        foregroundColor:   kNothingWhite,
+        backgroundColor:   s0,
+        foregroundColor:   onSurf,
         elevation:         0,
         scrolledUnderElevation: 0,
         surfaceTintColor:  Colors.transparent,
         shadowColor:       Colors.transparent,
-        systemOverlayStyle: SystemUiOverlayStyle.light,
-        titleTextStyle: _ts(_kBody, 19, weight: FontWeight.w700, spacing: 0.2),
-        iconTheme:        const IconThemeData(color: kNothingWhite, size: 22),
-        actionsIconTheme: const IconThemeData(color: kNothingWhite, size: 22),
+        systemOverlayStyle: isDark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
+        titleTextStyle: _ts(_kBody, 19, weight: FontWeight.w700, spacing: 0.2, color: onSurf),
+        iconTheme:        IconThemeData(color: onSurf, size: 22),
+        actionsIconTheme: IconThemeData(color: onSurf, size: 22),
       ),
 
       // ── Cards ─────────────────────────────────────────────────────────
       cardTheme: CardThemeData(
-        color:            _s2,
+        color:            s2,
         surfaceTintColor: Colors.transparent,
         elevation:        0,
         shape: RoundedRectangleBorder(
           borderRadius: _kBR,
-          side: const BorderSide(color: _sBorder, width: 1),
+          side: BorderSide(color: sBorder, width: 1),
         ),
         margin: EdgeInsets.zero,
         clipBehavior: Clip.antiAlias,
@@ -143,7 +162,7 @@ class NothingTheme {
 
       // ── Navigation bar ────────────────────────────────────────────────
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor:    _s0,
+        backgroundColor:    s0,
         surfaceTintColor:   Colors.transparent,
         indicatorColor:     primary.withValues(alpha: 0.12),
         indicatorShape:     const RoundedRectangleBorder(borderRadius: _kBR),
@@ -152,36 +171,36 @@ class NothingTheme {
         iconTheme: WidgetStateProperty.resolveWith((s) => IconThemeData(
           color: s.contains(WidgetState.selected)
               ? primary
-              : kNothingWhite.withValues(alpha: 0.35),
+              : onSurf.withValues(alpha: isDark ? 0.35 : 0.4),
           size: 22,
         )),
         labelTextStyle: WidgetStateProperty.resolveWith((s) {
           final c = s.contains(WidgetState.selected)
               ? primary
-              : kNothingWhite.withValues(alpha: 0.35);
+              : onSurf.withValues(alpha: isDark ? 0.35 : 0.4);
           return _ts(_kBody, 11, weight: FontWeight.w500, spacing: 0.3, color: c);
         }),
       ),
 
       // ── Navigation rail ───────────────────────────────────────────────
       navigationRailTheme: NavigationRailThemeData(
-        backgroundColor:          _s0,
+        backgroundColor:          s0,
         indicatorColor:           primary.withValues(alpha: 0.12),
         indicatorShape:           const RoundedRectangleBorder(borderRadius: _kBR),
-        selectedIconTheme:        IconThemeData(color: primary, size: 22),
+        selectedIconTheme:        const IconThemeData(color: primary, size: 22),
         unselectedIconTheme:      IconThemeData(
-            color: kNothingWhite.withValues(alpha: 0.3), size: 22),
+            color: onSurf.withValues(alpha: isDark ? 0.3 : 0.4), size: 22),
         selectedLabelTextStyle:   _ts(_kBody, 12, weight: FontWeight.w600, color: primary),
         unselectedLabelTextStyle: _ts(_kBody, 12,
-            color: kNothingWhite.withValues(alpha: 0.3)),
+            color: onSurf.withValues(alpha: isDark ? 0.3 : 0.4)),
         useIndicator: true,
         minWidth:        56,
         minExtendedWidth: 200,
       ),
 
       // ── Dividers ──────────────────────────────────────────────────────
-      dividerTheme: const DividerThemeData(
-        color:     _sBorder,
+      dividerTheme: DividerThemeData(
+        color:     sBorder,
         thickness: 1,
         space:     1,
       ),
@@ -190,10 +209,10 @@ class NothingTheme {
       listTileTheme: ListTileThemeData(
         tileColor:         Colors.transparent,
         selectedTileColor: primary.withValues(alpha: 0.08),
-        iconColor:         kNothingWhite.withValues(alpha: 0.55),
-        textColor:         kNothingWhite,
-        subtitleTextStyle: _ts(_kBody, 12, spacing: 0.1, color: kNothingGrey),
-        leadingAndTrailingTextStyle: _ts(_kMono, 12, color: kNothingGrey),
+        iconColor:         onSurf.withValues(alpha: isDark ? 0.55 : 0.6),
+        textColor:         onSurf,
+        subtitleTextStyle: _ts(_kBody, 12, spacing: 0.1, color: onSurfV),
+        leadingAndTrailingTextStyle: _ts(_kMono, 12, color: onSurfV),
         shape:             _kShape,
         dense:             false,
       ),
@@ -201,42 +220,42 @@ class NothingTheme {
       // ── Input fields ──────────────────────────────────────────────────
       inputDecorationTheme: InputDecorationTheme(
         filled:     true,
-        fillColor:  _s2,
+        fillColor:  s2,
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         border: OutlineInputBorder(
             borderRadius: _kBR,
-            borderSide: const BorderSide(color: _sBorder)),
+            borderSide: BorderSide(color: sBorder)),
         enabledBorder: OutlineInputBorder(
             borderRadius: _kBR,
-            borderSide: const BorderSide(color: _sBorder)),
+            borderSide: BorderSide(color: sBorder)),
         focusedBorder: OutlineInputBorder(
             borderRadius: _kBR,
-            borderSide: BorderSide(color: primary, width: 1.5)),
+            borderSide: const BorderSide(color: primary, width: 1.5)),
         errorBorder: OutlineInputBorder(
             borderRadius: _kBR,
-            borderSide: BorderSide(color: primary)),
+            borderSide: const BorderSide(color: primary)),
         focusedErrorBorder: OutlineInputBorder(
             borderRadius: _kBR,
-            borderSide: BorderSide(color: primary, width: 1.5)),
-        labelStyle: _ts(_kBody, 14, color: kNothingGrey),
-        hintStyle:  _ts(_kBody, 14, color: kNothingGrey2),
-        prefixIconColor: kNothingGrey,
-        suffixIconColor: kNothingGrey,
+            borderSide: const BorderSide(color: primary, width: 1.5)),
+        labelStyle: _ts(_kBody, 14, color: onSurfV),
+        hintStyle:  _ts(_kBody, 14, color: isDark ? kNothingGrey2 : _lSubtext),
+        prefixIconColor: onSurfV,
+        suffixIconColor: onSurfV,
       ),
 
       // ── Segmented button ──────────────────────────────────────────────
       segmentedButtonTheme: SegmentedButtonThemeData(
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.resolveWith((s) =>
-              s.contains(WidgetState.selected) ? primary : _s2),
+              s.contains(WidgetState.selected) ? primary : s2),
           foregroundColor: WidgetStateProperty.resolveWith((s) =>
-              s.contains(WidgetState.selected) ? kNothingBlack : kNothingWhite),
+              s.contains(WidgetState.selected) ? kNothingBlack : onSurf),
           overlayColor: WidgetStateProperty.all(
-              kNothingWhite.withValues(alpha: 0.05)),
-          side: WidgetStateProperty.all(const BorderSide(color: _sBorder)),
+              onSurf.withValues(alpha: 0.05)),
+          side: WidgetStateProperty.all(BorderSide(color: sBorder)),
           shape: WidgetStateProperty.all(_kShape),
           textStyle: WidgetStateProperty.all(
-              _ts(_kBody, 13, weight: FontWeight.w500)),
+              _ts(_kBody, 13, weight: FontWeight.w500, color: onSurf)),
           padding: WidgetStateProperty.all(
               const EdgeInsets.symmetric(horizontal: 14)),
         ),
@@ -244,13 +263,13 @@ class NothingTheme {
 
       // ── Chips ─────────────────────────────────────────────────────────
       chipTheme: ChipThemeData(
-        backgroundColor:  _s2,
+        backgroundColor:  s2,
         selectedColor:    primary,
-        disabledColor:    _s2,
-        deleteIconColor:  kNothingGrey,
-        labelStyle:       _ts(_kBody, 13),
+        disabledColor:    s2,
+        deleteIconColor:  onSurfV,
+        labelStyle:       _ts(_kBody, 13, color: onSurf),
         secondaryLabelStyle: _ts(_kBody, 13, color: kNothingBlack),
-        side:             const BorderSide(color: _sBorder),
+        side:             BorderSide(color: sBorder),
         shape:            const RoundedRectangleBorder(borderRadius: _kBR),
         checkmarkColor:   kNothingBlack,
         padding:          const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -261,12 +280,13 @@ class NothingTheme {
         style: FilledButton.styleFrom(
           backgroundColor: primary,
           foregroundColor: kNothingBlack,
-          disabledBackgroundColor: _s3,
-          disabledForegroundColor: kNothingGrey,
+          disabledBackgroundColor: s3,
+          disabledForegroundColor: onSurfV,
           shape:     _kShape,
           elevation: 0,
-          textStyle: _ts(_kBody, 14, weight: FontWeight.w700, spacing: 0.5),
-          padding:   const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          textStyle: _ts(_kBody, 14, weight: FontWeight.w700, spacing: 0.5,
+              color: kNothingBlack),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -275,32 +295,33 @@ class NothingTheme {
           foregroundColor: kNothingBlack,
           shape:     _kShape,
           elevation: 0,
-          textStyle: _ts(_kBody, 14, weight: FontWeight.w700, spacing: 0.5),
+          textStyle: _ts(_kBody, 14, weight: FontWeight.w700, spacing: 0.5,
+              color: kNothingBlack),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: primary,
-          side:      BorderSide(color: primary),
+          side:      const BorderSide(color: primary),
           shape:     _kShape,
-          textStyle: _ts(_kBody, 14, weight: FontWeight.w500),
+          textStyle: _ts(_kBody, 14, weight: FontWeight.w500, color: primary),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: primary,
-          textStyle: _ts(_kBody, 14, weight: FontWeight.w500),
+          textStyle: _ts(_kBody, 14, weight: FontWeight.w500, color: primary),
         ),
       ),
 
       // ── Switch ────────────────────────────────────────────────────────
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((s) =>
-            s.contains(WidgetState.selected) ? kNothingBlack : kNothingGrey),
+            s.contains(WidgetState.selected) ? kNothingBlack : onSurfV),
         trackColor: WidgetStateProperty.resolveWith((s) =>
-            s.contains(WidgetState.selected) ? primary : _s3),
+            s.contains(WidgetState.selected) ? primary : s3),
         trackOutlineColor: WidgetStateProperty.resolveWith((s) =>
-            s.contains(WidgetState.selected) ? primary : _sBorder),
+            s.contains(WidgetState.selected) ? primary : sBorder),
         trackOutlineWidth: WidgetStateProperty.all(1.5),
       ),
 
@@ -309,7 +330,7 @@ class NothingTheme {
         fillColor: WidgetStateProperty.resolveWith((s) =>
             s.contains(WidgetState.selected) ? primary : Colors.transparent),
         checkColor: WidgetStateProperty.all(kNothingBlack),
-        side: const BorderSide(color: _sBorder, width: 1.5),
+        side: BorderSide(color: sBorder, width: 1.5),
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(3))),
       ),
@@ -317,13 +338,13 @@ class NothingTheme {
       // ── Radio ─────────────────────────────────────────────────────────
       radioTheme: RadioThemeData(
         fillColor: WidgetStateProperty.resolveWith((s) =>
-            s.contains(WidgetState.selected) ? primary : kNothingGrey),
+            s.contains(WidgetState.selected) ? primary : onSurfV),
       ),
 
       // ── Slider ────────────────────────────────────────────────────────
       sliderTheme: SliderThemeData(
         activeTrackColor:   primary,
-        inactiveTrackColor: _s4,
+        inactiveTrackColor: s4,
         thumbColor:         primary,
         overlayColor:       primary.withValues(alpha: 0.12),
         trackHeight:        2,
@@ -342,36 +363,35 @@ class NothingTheme {
 
       // ── Dialog ────────────────────────────────────────────────────────
       dialogTheme: DialogThemeData(
-        backgroundColor:  _s2,
+        backgroundColor:  s2,
         surfaceTintColor: Colors.transparent,
         elevation:        0,
         shape: RoundedRectangleBorder(
           borderRadius: _kBR,
-          side: const BorderSide(color: _sBorder),
+          side: BorderSide(color: sBorder),
         ),
-        titleTextStyle:   _ts(_kBody, 20, weight: FontWeight.w700, spacing: 0.1),
-        contentTextStyle: _ts(_kBody, 14, spacing: 0.1, color: kNothingGrey),
+        titleTextStyle:   _ts(_kBody, 20, weight: FontWeight.w700, spacing: 0.1, color: onSurf),
+        contentTextStyle: _ts(_kBody, 14, spacing: 0.1, color: onSurfV),
       ),
 
       // ── Bottom sheet ──────────────────────────────────────────────────
       bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor:  _s1,
+        backgroundColor:  s1,
         surfaceTintColor: Colors.transparent,
         elevation:        0,
-        // Sharp top edge — Nothing OS doesn't round bottom sheets
-        shape: const RoundedRectangleBorder(
-          side: BorderSide(color: _sBorder),
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: sBorder),
         ),
-        dragHandleColor: kNothingGrey2,
+        dragHandleColor: isDark ? kNothingGrey2 : _lBorder,
         dragHandleSize:  const Size(32, 3),
       ),
 
       // ── Snackbar ──────────────────────────────────────────────────────
       snackBarTheme: SnackBarThemeData(
-        backgroundColor:   _s3,
-        contentTextStyle:  _ts(_kBody, 14, spacing: 0.1),
+        backgroundColor:   s3,
+        contentTextStyle:  _ts(_kBody, 14, spacing: 0.1, color: onSurf),
         actionTextColor:   primary,
-        disabledActionTextColor: kNothingGrey,
+        disabledActionTextColor: onSurfV,
         shape:             _kShape,
         behavior:          SnackBarBehavior.floating,
         elevation:         0,
@@ -379,66 +399,66 @@ class NothingTheme {
 
       // ── Progress indicators ───────────────────────────────────────────
       progressIndicatorTheme: ProgressIndicatorThemeData(
-        color:             primary,
-        linearTrackColor:  _s4,
-        circularTrackColor: _s4,
-        linearMinHeight:   2,
+        color:              primary,
+        linearTrackColor:   s4,
+        circularTrackColor: s4,
+        linearMinHeight:    2,
       ),
 
       // ── Tooltip ───────────────────────────────────────────────────────
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: _s3,
+          color: s3,
           borderRadius: _kBR,
-          border: Border.all(color: _sBorder),
+          border: Border.all(color: sBorder),
         ),
-        textStyle: _ts(_kBody, 12, spacing: 0.1),
+        textStyle: _ts(_kBody, 12, spacing: 0.1, color: onSurf),
         padding:   const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       ),
 
       // ── Tab bar ───────────────────────────────────────────────────────
       tabBarTheme: TabBarThemeData(
-        labelColor:         primary,
-        unselectedLabelColor: kNothingGrey,
-        indicatorColor:     primary,
-        indicatorSize:      TabBarIndicatorSize.label,
-        labelStyle:         _ts(_kBody, 14, weight: FontWeight.w600),
-        unselectedLabelStyle: _ts(_kBody, 14),
-        dividerColor:       _sBorder,
+        labelColor:           primary,
+        unselectedLabelColor: onSurfV,
+        indicatorColor:       primary,
+        indicatorSize:        TabBarIndicatorSize.label,
+        labelStyle:           _ts(_kBody, 14, weight: FontWeight.w600, color: primary),
+        unselectedLabelStyle: _ts(_kBody, 14, color: onSurfV),
+        dividerColor:         sBorder,
       ),
 
       // ── Pop-up menu ───────────────────────────────────────────────────
       popupMenuTheme: PopupMenuThemeData(
-        color:            _s2,
+        color:            s2,
         surfaceTintColor: Colors.transparent,
         elevation:        0,
         shape: RoundedRectangleBorder(
           borderRadius: _kBR,
-          side: const BorderSide(color: _sBorder),
+          side: BorderSide(color: sBorder),
         ),
-        textStyle: _ts(_kBody, 14, spacing: 0.1),
-        labelTextStyle: WidgetStateProperty.all(_ts(_kBody, 14, spacing: 0.1)),
+        textStyle: _ts(_kBody, 14, spacing: 0.1, color: onSurf),
+        labelTextStyle: WidgetStateProperty.all(_ts(_kBody, 14, spacing: 0.1, color: onSurf)),
       ),
 
       // ── Search bar ────────────────────────────────────────────────────
       searchBarTheme: SearchBarThemeData(
-        backgroundColor: WidgetStateProperty.all(_s2),
+        backgroundColor: WidgetStateProperty.all(s2),
         surfaceTintColor: WidgetStateProperty.all(Colors.transparent),
         elevation: WidgetStateProperty.all(0),
-        side: WidgetStateProperty.all(const BorderSide(color: _sBorder)),
+        side: WidgetStateProperty.all(BorderSide(color: sBorder)),
         shape: WidgetStateProperty.all(_kShape),
-        textStyle: WidgetStateProperty.all(_ts(_kBody, 14, spacing: 0.1)),
-        hintStyle: WidgetStateProperty.all(_ts(_kBody, 14, color: kNothingGrey)),
+        textStyle: WidgetStateProperty.all(_ts(_kBody, 14, spacing: 0.1, color: onSurf)),
+        hintStyle: WidgetStateProperty.all(_ts(_kBody, 14, color: onSurfV)),
       ),
 
       // ── Icons ─────────────────────────────────────────────────────────
-      iconTheme:        const IconThemeData(color: kNothingWhite, size: 22),
-      primaryIconTheme: IconThemeData(color: primary, size: 22),
+      iconTheme:        IconThemeData(color: onSurf, size: 22),
+      primaryIconTheme: const IconThemeData(color: primary, size: 22),
     );
   }
 }
 
-// Build a TextStyle helper with Nothing palette defaults.
+// Helper — builds a TextStyle with Nothing defaults.
 TextStyle _ts(
   String family,
   double size, {

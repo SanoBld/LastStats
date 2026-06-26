@@ -113,21 +113,24 @@ class LastStatsApp extends StatelessWidget {
           builder: (_, style, _) {
 
             // ── Nothing OS style ───────────────────────────────────────────
+            // Respects the user's light/dark/auto preference; both variants
+            // share the same red+yellow palette, only surfaces change.
             if (style == 'nothing') {
-              return ValueListenableBuilder<String>(
-                valueListenable: nothingAccentNotifier,
-                builder: (_, nAccent, _) {
+              return ValueListenableBuilder<ThemeMode>(
+                valueListenable: themeModeNotifier,
+                builder: (_, mode, _) {
                   return ValueListenableBuilder<String>(
                     valueListenable: localeNotifier,
                     builder: (_, _, _) {
-                      final nTheme = NothingTheme.build(accent: nAccent);
+                      final nLight = NothingTheme.build(brightness: Brightness.light);
+                      final nDark  = NothingTheme.build(brightness: Brightness.dark);
                       return MaterialApp(
                         navigatorKey:               navigatorKey,
                         title:                      'LastStats',
                         debugShowCheckedModeBanner: false,
-                        theme:     nTheme,
-                        darkTheme: nTheme,
-                        themeMode: ThemeMode.dark, // Nothing is always dark
+                        theme:     nLight,
+                        darkTheme: nDark,
+                        themeMode: mode,
                         home: (username.isNotEmpty && apiKey.isNotEmpty)
                             ? HomeScreen(username: username, apiKey: apiKey, startupTab: startupTab)
                             : const SetupScreen(),
