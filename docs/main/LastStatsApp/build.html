@@ -115,28 +115,33 @@ Widget build(BuildContext context) {
         valueListenable: themeStyleNotifier,
         builder: (_, style, _) {
 
-          &#47;&#47; ── Nothing OS style: completely custom theme, always dark ──────
+          &#47;&#47; ── Nothing OS style ───────────────────────────────────────────
           if (style == &#39;nothing&#39;) {
             return ValueListenableBuilder&lt;String&gt;(
-              valueListenable: localeNotifier,
-              builder: (_, _, _) {
-                final nTheme = NothingTheme.build();
-                return MaterialApp(
-                  navigatorKey:               navigatorKey,
-                  title:                      &#39;LastStats&#39;,
-                  debugShowCheckedModeBanner: false,
-                  theme:      nTheme,
-                  darkTheme:  nTheme,
-                  themeMode:  ThemeMode.dark,
-                  home: (username.isNotEmpty &amp;&amp; apiKey.isNotEmpty)
-                      ? HomeScreen(username: username, apiKey: apiKey, startupTab: startupTab)
-                      : const SetupScreen(),
+              valueListenable: nothingAccentNotifier,
+              builder: (_, nAccent, _) {
+                return ValueListenableBuilder&lt;String&gt;(
+                  valueListenable: localeNotifier,
+                  builder: (_, _, _) {
+                    final nTheme = NothingTheme.build(accent: nAccent);
+                    return MaterialApp(
+                      navigatorKey:               navigatorKey,
+                      title:                      &#39;LastStats&#39;,
+                      debugShowCheckedModeBanner: false,
+                      theme:     nTheme,
+                      darkTheme: nTheme,
+                      themeMode: ThemeMode.dark, &#47;&#47; Nothing is always dark
+                      home: (username.isNotEmpty &amp;&amp; apiKey.isNotEmpty)
+                          ? HomeScreen(username: username, apiKey: apiKey, startupTab: startupTab)
+                          : const SetupScreen(),
+                    );
+                  },
                 );
               },
             );
           }
 
-          &#47;&#47; ── Default style: Material You + accent + OLED ─────────────────
+          &#47;&#47; ── Default style: Material You + accent + OLED ────────────────
           return ValueListenableBuilder&lt;bool&gt;(
             valueListenable: useDynamicColorNotifier,
             builder: (_, useDynamic, _) {
@@ -168,7 +173,6 @@ Widget build(BuildContext context) {
                                           brightness: Brightness.dark,
                                         );
 
-                              &#47;&#47; OLED: override all surface colors to pure black.
                               final ColorScheme darkScheme = oled
                                   ? darkSchemeBase.copyWith(
                                       surface:                 Colors.black,

@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the seedColorForScheme function from the app_state library, for the Dart programming language.">
-  <title>seedColorForScheme function - app_state library - Dart API</title>
+  <meta name="description" content="API docs for the nothingAccentNotifier property from the app_state library, for the Dart programming language.">
+  <title>nothingAccentNotifier property - app_state library - Dart API</title>
 
 
   
@@ -26,9 +26,9 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">laststats_mobile</a></li>
     <li><a href="../app_state/">app_state.dart</a></li>
-    <li class="self-crumb">seedColorForScheme function</li>
+    <li class="self-crumb">nothingAccentNotifier property</li>
   </ol>
-  <div class="self-name">seedColorForScheme</div>
+  <div class="self-name">nothingAccentNotifier</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -48,35 +48,25 @@
       data-above-sidebar="app_state&#47;app_state-library-sidebar.html"
       data-below-sidebar="">
       <div>
-<h1><span class="kind-function">seedColorForScheme</span> function 
+<h1><span class="kind-top-level-property">nothingAccentNotifier</span> top-level property 
  
 </h1></div>
 
-    <section class="multi-line-signature">
+        <section class="multi-line-signature">
+          
+          <a href="https://api.flutter.dev/flutter/foundation/ValueNotifier-class.html">ValueNotifier</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span>
+          <span class="name ">nothingAccentNotifier</span>
+          <div class="features"><span class="feature">final</span></div>
+
+        </section>
         
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-ui/Color-class.html">Color</a></span>
-<span class="name ">seedColorForScheme</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="seedColorForScheme-param-c"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Color-class.html">Color</a></span> <span class="parameter-name">c</span></span></li>
-</ol>)
 
         
-
-    </section>
-    
-<section class="desc markdown">
-  <p>Returns the seed color to pass to ColorScheme.fromSeed.</p>
-</section>
-
-
-    
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Color seedColorForScheme(Color c) {
-  final luminance = c.computeLuminance();
-  if (luminance &lt; 0.008) return const Color(0xFF455A64);
-  if (luminance &gt; 0.97)  return const Color(0xFF90A4AE);
-  return c;
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">final nothingAccentNotifier = ValueNotifier&lt;String&gt;(&#39;red&#39;);</code></pre>
 </section>
+
 
 
   </div> <!-- /.main-content -->
@@ -90,7 +80,7 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">laststats_mobile</a></li>
     <li><a href="../app_state/">app_state</a></li>
-    <li class="self-crumb">seedColorForScheme function</li>
+    <li class="self-crumb">nothingAccentNotifier property</li>
 </ol>
 
     <h5>app_state library</h5>

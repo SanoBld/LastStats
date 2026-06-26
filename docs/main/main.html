@@ -78,6 +78,7 @@
 
   &#47;&#47; ── Appearance ──────────────────────────────────────────────────────────
   themeStyleNotifier.value             = prefs.getString(&#39;ls_theme_style&#39;)             ?? &#39;default&#39;;
+  nothingAccentNotifier.value          = prefs.getString(&#39;ls_nothing_accent&#39;)          ?? &#39;red&#39;;
   themeModeNotifier.value              = themeFromString(prefs.getString(&#39;ls_theme&#39;));
   accentNotifier.value                 = accentFromString(prefs.getString(&#39;ls_accent&#39;));
   useDynamicColorNotifier.value        = prefs.getBool(&#39;ls_use_dynamic_color&#39;)         ?? false;
