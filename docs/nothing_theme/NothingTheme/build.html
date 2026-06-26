@@ -74,12 +74,11 @@
 }) {
   final isDark = brightness == Brightness.dark;
 
-  &#47;&#47; Red is always primary. Yellow is secondary only in &#39;mixed&#39;.
   const primary   = kNothingRed;
-  const onPrimary = kNothingBlack; &#47;&#47; red is bright enough → black text on it
+  const onPrimary = kNothingBlack;
 
-  final secondary   = accent == &#39;mixed&#39; ? kNothingYellow  : kNothingRed;
-  final onSecondary = accent == &#39;mixed&#39; ? kNothingBlack   : kNothingBlack;
+  final secondary   = accent == &#39;mixed&#39; ? kNothingYellow : kNothingRed;
+  final onSecondary = kNothingBlack;
 
   &#47;&#47; Surface hierarchy
   final s0 = isDark ? _d0 : _l0;
@@ -90,49 +89,44 @@
   final sBorder = isDark ? _dBorder : _lBorder;
 
   final onSurface        = isDark ? kNothingWhite   : kNothingDarkText;
-  final onSurfaceVariant = isDark ? kNothingGrey    : const Color(0xFF666058);
+  final onSurfaceVariant = isDark ? kNothingGrey    : const Color(0xFF6B6560);
   final scaffoldBg       = s0;
 
   final scheme = ColorScheme(
-    brightness:  brightness,
-    &#47;&#47; ── Primary (red) ──────────────────────────────────────────────────
+    brightness: brightness,
     primary:             primary,
     onPrimary:           onPrimary,
     primaryContainer:    isDark
         ? const Color(0xFF3D0000)
-        : const Color(0xFFFFE0E0),
+        : const Color(0xFFFFE8E8),
     onPrimaryContainer:  isDark ? kNothingWhite : kNothingDarkText,
-    &#47;&#47; ── Secondary (red or yellow in mixed) ────────────────────────────
     secondary:           secondary,
     onSecondary:         onSecondary,
     secondaryContainer:  isDark
         ? Color.lerp(secondary, _d0, 0.82)!
-        : Color.lerp(secondary, _l1, 0.70)!,
+        : Color.lerp(secondary, _l1, 0.72)!,
     onSecondaryContainer: isDark ? kNothingWhite : kNothingDarkText,
-    &#47;&#47; ── Tertiary (yellow touches if mixed, grey otherwise) ────────────
     tertiary:            accent == &#39;mixed&#39; ? kNothingYellow : kNothingGrey,
     onTertiary:          kNothingBlack,
     tertiaryContainer:   isDark ? _d3 : _l3,
     onTertiaryContainer: isDark ? kNothingWhite : kNothingDarkText,
-    &#47;&#47; ── Error (always red) ────────────────────────────────────────────
-    error:              primary,
-    onError:            onPrimary,
-    errorContainer:     isDark ? const Color(0xFF3D0000) : const Color(0xFFFFE0E0),
-    onErrorContainer:   isDark ? kNothingWhite : kNothingDarkText,
-    &#47;&#47; ── Surfaces ──────────────────────────────────────────────────────
+    error:               primary,
+    onError:             onPrimary,
+    errorContainer:      isDark ? const Color(0xFF3D0000) : const Color(0xFFFFE8E8),
+    onErrorContainer:    isDark ? kNothingWhite : kNothingDarkText,
+    &#47;&#47; Surfaces
     surface:                    s1,
     onSurface:                  onSurface,
     onSurfaceVariant:           onSurfaceVariant,
     surfaceDim:                 s0,
     surfaceBright:              s3,
     surfaceContainerLowest:     s0,
-    surfaceContainerLow:        isDark ? const Color(0xFF080808) : const Color(0xFFF8F4EF),
+    surfaceContainerLow:        isDark ? const Color(0xFF080808) : const Color(0xFFFBF9F7),
     surfaceContainer:           s2,
     surfaceContainerHigh:       s3,
     surfaceContainerHighest:    s4,
-    &#47;&#47; ── Misc ──────────────────────────────────────────────────────────
-    outline:         isDark ? const Color(0xFF333333) : const Color(0xFFBBB6AF),
-    outlineVariant:  sBorder,
+    outline:        isDark ? const Color(0xFF333333) : const Color(0xFFB8B4AE),
+    outlineVariant: sBorder,
     inverseSurface:  isDark ? kNothingWhite : kNothingDarkText,
     onInverseSurface: isDark ? kNothingBlack : kNothingWhite,
     inversePrimary:  primary,
@@ -140,34 +134,30 @@
     scrim:           kNothingBlack,
   );
 
-  &#47;&#47; ── Typography ─────────────────────────────────────────────────────────
-  &#47;&#47; Layer 1 (display)  → Ndot57 — dot-matrix, iconic
-  &#47;&#47; Layer 2 (body)     → NType82 — clean UI text
-  &#47;&#47; Layer 3 (metadata) → NType82Mono &#47; Ndot57Caps — labels, tags, captions
-  final textColor   = onSurface;
-  final metaColor   = onSurfaceVariant;
+  final textColor = onSurface;
+  final metaColor = onSurfaceVariant;
 
   final textTheme = TextTheme(
-    &#47;&#47; Display — Ndot57 for numbers, stats, big titles
-    displayLarge:  _ts(_kDisplay, 57, weight: FontWeight.w400, spacing: -0.5,  color: textColor),
-    displayMedium: _ts(_kDisplay, 45, weight: FontWeight.w400, spacing: -0.25, color: textColor),
-    displaySmall:  _ts(_kDisplay, 36, weight: FontWeight.w400,                 color: textColor),
+    &#47;&#47; Display — Ndot57 dot-matrix for big numbers&#47;stats
+    displayLarge:  _ts(_kDisplay, 57, w: FontWeight.w400, s: -0.5,  c: textColor),
+    displayMedium: _ts(_kDisplay, 45, w: FontWeight.w400, s: -0.25, c: textColor),
+    displaySmall:  _ts(_kDisplay, 36, w: FontWeight.w400,            c: textColor),
     &#47;&#47; Headlines — NType82 Bold
-    headlineLarge:  _ts(_kBody, 32, weight: FontWeight.w700, spacing: -0.5, color: textColor),
-    headlineMedium: _ts(_kBody, 28, weight: FontWeight.w700, spacing: -0.25, color: textColor),
-    headlineSmall:  _ts(_kBody, 24, weight: FontWeight.w700, color: textColor),
-    &#47;&#47; Titles — NType82
-    titleLarge:  _ts(_kBody, 20, weight: FontWeight.w700, spacing: 0.1,  color: textColor),
-    titleMedium: _ts(_kBody, 16, weight: FontWeight.w600, spacing: 0.15, color: textColor),
-    titleSmall:  _ts(_kBody, 14, weight: FontWeight.w600, spacing: 0.1,  color: textColor),
-    &#47;&#47; Body — NType82
-    bodyLarge:   _ts(_kBody, 16, spacing: 0.15, color: textColor),
-    bodyMedium:  _ts(_kBody, 14, spacing: 0.1,  color: textColor),
-    bodySmall:   _ts(_kBody, 12, spacing: 0.2,  color: metaColor),
-    &#47;&#47; Labels — mono for metadata layer
-    labelLarge:  _ts(_kBody,  14, weight: FontWeight.w500, spacing: 0.5,  color: textColor),
-    labelMedium: _ts(_kMono,  12, weight: FontWeight.w500, spacing: 0.8,  color: metaColor),
-    labelSmall:  _ts(_kMono,  11, weight: FontWeight.w400, spacing: 1.0,  color: metaColor),
+    headlineLarge:  _ts(_kBody, 32, w: FontWeight.w700, s: -0.5,  c: textColor),
+    headlineMedium: _ts(_kBody, 28, w: FontWeight.w700, s: -0.25, c: textColor),
+    headlineSmall:  _ts(_kBody, 24, w: FontWeight.w700,            c: textColor),
+    &#47;&#47; Titles
+    titleLarge:  _ts(_kBody, 20, w: FontWeight.w700, s: 0.1,  c: textColor),
+    titleMedium: _ts(_kBody, 16, w: FontWeight.w600, s: 0.15, c: textColor),
+    titleSmall:  _ts(_kBody, 14, w: FontWeight.w600, s: 0.1,  c: textColor),
+    &#47;&#47; Body
+    bodyLarge:   _ts(_kBody, 16, s: 0.15, c: textColor),
+    bodyMedium:  _ts(_kBody, 14, s: 0.1,  c: textColor),
+    bodySmall:   _ts(_kBody, 12, s: 0.2,  c: metaColor),
+    &#47;&#47; Labels — mono for metadata
+    labelLarge:  _ts(_kBody,  14, w: FontWeight.w500, s: 0.5,  c: textColor),
+    labelMedium: _ts(_kMono,  12, w: FontWeight.w500, s: 0.8,  c: metaColor),
+    labelSmall:  _ts(_kMono,  11, w: FontWeight.w400, s: 1.0,  c: metaColor),
   );
 
   return ThemeData(
@@ -179,31 +169,33 @@
 
     &#47;&#47; ── AppBar ────────────────────────────────────────────────────────
     appBarTheme: AppBarTheme(
-      backgroundColor:          s0,
-      foregroundColor:          onSurface,
-      elevation:                0,
-      scrolledUnderElevation:   0,
-      surfaceTintColor:         Colors.transparent,
-      shadowColor:              Colors.transparent,
+      backgroundColor:         s0,
+      foregroundColor:         onSurface,
+      elevation:               0,
+      scrolledUnderElevation:  0,
+      surfaceTintColor:        Colors.transparent,
+      shadowColor:             Colors.transparent,
       systemOverlayStyle: isDark
           ? SystemUiOverlayStyle.light
           : SystemUiOverlayStyle.dark,
-      titleTextStyle: _ts(_kBody, 19, weight: FontWeight.w700,
-          spacing: 0.2, color: onSurface),
+      titleTextStyle: _ts(_kBody, 19, w: FontWeight.w700, s: 0.2, c: onSurface),
       iconTheme:        IconThemeData(color: onSurface, size: 22),
       actionsIconTheme: IconThemeData(color: onSurface, size: 22),
     ),
 
-    &#47;&#47; ── Cards — technical corners, no shadow, border ──────────────────
+    &#47;&#47; ── Cards — 16 px radius (content containers) ─────────────────────
     cardTheme: CardThemeData(
-      color:            s2,
+      color:            s1,
       surfaceTintColor: Colors.transparent,
       elevation:        0,
       shape: RoundedRectangleBorder(
-        borderRadius: _kBR6,
-        side: BorderSide(color: sBorder),
+        borderRadius: _kBR16,
+        &#47;&#47; Light: very subtle border. Dark: slightly more visible.
+        side: BorderSide(
+            color: sBorder,
+            width: isDark ? 1.0 : 0.8),
       ),
-      margin:      EdgeInsets.zero,
+      margin:       EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
     ),
 
@@ -223,7 +215,7 @@
       labelTextStyle: WidgetStateProperty.resolveWith((s) {
         final c = s.contains(WidgetState.selected)
             ? primary : onSurface.withValues(alpha: 0.35);
-        return _ts(_kBody, 11, weight: FontWeight.w500, spacing: 0.3, color: c);
+        return _ts(_kBody, 11, w: FontWeight.w500, s: 0.3, c: c);
       }),
     ),
 
@@ -235,16 +227,15 @@
       selectedIconTheme:        IconThemeData(color: primary, size: 22),
       unselectedIconTheme:      IconThemeData(
           color: onSurface.withValues(alpha: 0.3), size: 22),
-      selectedLabelTextStyle:   _ts(_kBody, 12,
-          weight: FontWeight.w600, color: primary),
+      selectedLabelTextStyle:   _ts(_kBody, 12, w: FontWeight.w600, c: primary),
       unselectedLabelTextStyle: _ts(_kBody, 12,
-          color: onSurface.withValues(alpha: 0.3)),
-      useIndicator:    true,
-      minWidth:        56,
+          c: onSurface.withValues(alpha: 0.3)),
+      useIndicator:     true,
+      minWidth:         56,
       minExtendedWidth: 200,
     ),
 
-    &#47;&#47; ── Dividers — single-pixel rule ──────────────────────────────────
+    &#47;&#47; ── Dividers ──────────────────────────────────────────────────────
     dividerTheme: DividerThemeData(
       color:     sBorder,
       thickness: 1,
@@ -257,12 +248,12 @@
       selectedTileColor: primary.withValues(alpha: 0.08),
       iconColor:         onSurface.withValues(alpha: 0.55),
       textColor:         onSurface,
-      subtitleTextStyle: _ts(_kBody, 12, spacing: 0.1, color: metaColor),
-      leadingAndTrailingTextStyle: _ts(_kMono, 12, color: metaColor),
+      subtitleTextStyle: _ts(_kBody, 12, s: 0.1, c: metaColor),
+      leadingAndTrailingTextStyle: _ts(_kMono, 12, c: metaColor),
       shape: _shape6,
     ),
 
-    &#47;&#47; ── Input fields ──────────────────────────────────────────────────
+    &#47;&#47; ── Input fields — 6 px technical ────────────────────────────────
     inputDecorationTheme: InputDecorationTheme(
       filled:     true,
       fillColor:  s2,
@@ -280,13 +271,13 @@
       focusedErrorBorder: OutlineInputBorder(
           borderRadius: _kBR6,
           borderSide: const BorderSide(color: primary, width: 1.5)),
-      labelStyle: _ts(_kBody, 14, color: metaColor),
-      hintStyle:  _ts(_kBody, 14, color: onSurface.withValues(alpha: 0.3)),
-      prefixIconColor: metaColor,
-      suffixIconColor: metaColor,
+      labelStyle:       _ts(_kBody, 14, c: metaColor),
+      hintStyle:        _ts(_kBody, 14, c: onSurface.withValues(alpha: 0.3)),
+      prefixIconColor:  metaColor,
+      suffixIconColor:  metaColor,
     ),
 
-    &#47;&#47; ── Segmented button — technical corners ──────────────────────────
+    &#47;&#47; ── Segmented button — 6 px technical ─────────────────────────────
     segmentedButtonTheme: SegmentedButtonThemeData(
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.resolveWith((s) =&gt;
@@ -298,7 +289,7 @@
         side: WidgetStateProperty.all(BorderSide(color: sBorder)),
         shape: WidgetStateProperty.all(_shape6),
         textStyle: WidgetStateProperty.all(
-            _ts(_kBody, 13, weight: FontWeight.w500, color: onSurface)),
+            _ts(_kBody, 13, w: FontWeight.w500, c: onSurface)),
         padding: WidgetStateProperty.all(
             const EdgeInsets.symmetric(horizontal: 14)),
       ),
@@ -310,8 +301,8 @@
       selectedColor:       primary,
       disabledColor:       s2,
       deleteIconColor:     metaColor,
-      labelStyle:          _ts(_kBody, 13, color: onSurface),
-      secondaryLabelStyle: _ts(_kBody, 13, color: kNothingBlack),
+      labelStyle:          _ts(_kBody, 13, c: onSurface),
+      secondaryLabelStyle: _ts(_kBody, 13, c: kNothingBlack),
       side:    BorderSide(color: sBorder),
       shape:   const RoundedRectangleBorder(borderRadius: _kBRPill),
       checkmarkColor: kNothingBlack,
@@ -319,7 +310,7 @@
     ),
 
     &#47;&#47; ── Buttons ───────────────────────────────────────────────────────
-    &#47;&#47; Primary action = pill shape (999px) — dominant, confident
+    &#47;&#47; Primary → pill (confident, dominant)
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
         backgroundColor:         primary,
@@ -328,9 +319,8 @@
         disabledForegroundColor: metaColor,
         shape:     _shapePill,
         elevation: 0,
-        textStyle: _ts(_kBody, 14, weight: FontWeight.w700, spacing: 0.5,
-            color: kNothingBlack),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 13),
+        textStyle: _ts(_kBody, 14, w: FontWeight.w700, s: 0.5, c: kNothingBlack),
+        padding:   const EdgeInsets.symmetric(horizontal: 24, vertical: 13),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
@@ -339,23 +329,22 @@
         foregroundColor: kNothingBlack,
         shape:     _shapePill,
         elevation: 0,
-        textStyle: _ts(_kBody, 14, weight: FontWeight.w700, spacing: 0.5,
-            color: kNothingBlack),
+        textStyle: _ts(_kBody, 14, w: FontWeight.w700, s: 0.5, c: kNothingBlack),
       ),
     ),
-    &#47;&#47; Secondary action = technical corners (6px)
+    &#47;&#47; Secondary → technical (6 px)
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: primary,
         side:      const BorderSide(color: primary),
         shape:     _shape6,
-        textStyle: _ts(_kBody, 14, weight: FontWeight.w500, color: primary),
+        textStyle: _ts(_kBody, 14, w: FontWeight.w500, c: primary),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: primary,
-        textStyle: _ts(_kBody, 14, weight: FontWeight.w500, color: primary),
+        textStyle: _ts(_kBody, 14, w: FontWeight.w500, c: primary),
       ),
     ),
 
@@ -396,9 +385,10 @@
       thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
     ),
 
-    &#47;&#47; ── FAB — pill shape ──────────────────────────────────────────────
+    &#47;&#47; ── FAB — pill ────────────────────────────────────────────────────
     floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: primary,
+      &#47;&#47; In &#39;mixed&#39; mode yellow FAB mimics Nothing Key&#39;s yellow action button
+      backgroundColor: accent == &#39;mixed&#39; ? kNothingYellow : primary,
       foregroundColor: kNothingBlack,
       shape:           _shapePill,
       elevation:       0,
@@ -406,18 +396,17 @@
       hoverElevation:  0,
     ),
 
-    &#47;&#47; ── Dialog — technical corners ────────────────────────────────────
+    &#47;&#47; ── Dialog — 6 px technical ───────────────────────────────────────
     dialogTheme: DialogThemeData(
-      backgroundColor:  s2,
+      backgroundColor:  s1,
       surfaceTintColor: Colors.transparent,
       elevation:        0,
       shape: RoundedRectangleBorder(
         borderRadius: _kBR6,
         side: BorderSide(color: sBorder),
       ),
-      titleTextStyle:   _ts(_kBody, 20, weight: FontWeight.w700,
-          spacing: 0.1, color: onSurface),
-      contentTextStyle: _ts(_kBody, 14, spacing: 0.1, color: metaColor),
+      titleTextStyle:   _ts(_kBody, 20, w: FontWeight.w700, s: 0.1, c: onSurface),
+      contentTextStyle: _ts(_kBody, 14, s: 0.1, c: metaColor),
     ),
 
     &#47;&#47; ── Bottom sheet — sharp top edge ─────────────────────────────────
@@ -432,17 +421,17 @@
       dragHandleSize:  const Size(32, 3),
     ),
 
-    &#47;&#47; ── Snackbar ──────────────────────────────────────────────────────
+    &#47;&#47; ── Snackbar — 6 px technical ─────────────────────────────────────
     snackBarTheme: SnackBarThemeData(
       backgroundColor:   s3,
-      contentTextStyle:  _ts(_kBody, 14, spacing: 0.1, color: onSurface),
+      contentTextStyle:  _ts(_kBody, 14, s: 0.1, c: onSurface),
       actionTextColor:   primary,
       shape:             _shape6,
       behavior:          SnackBarBehavior.floating,
       elevation:         0,
     ),
 
-    &#47;&#47; ── Progress indicators ───────────────────────────────────────────
+    &#47;&#47; ── Progress ──────────────────────────────────────────────────────
     progressIndicatorTheme: ProgressIndicatorThemeData(
       color:              primary,
       linearTrackColor:   s4,
@@ -456,19 +445,19 @@
         color: s3, borderRadius: _kBR6,
         border: Border.all(color: sBorder),
       ),
-      textStyle: _ts(_kBody, 12, spacing: 0.1, color: onSurface),
+      textStyle: _ts(_kBody, 12, s: 0.1, c: onSurface),
       padding:   const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
     ),
 
     &#47;&#47; ── Tab bar ───────────────────────────────────────────────────────
     tabBarTheme: TabBarThemeData(
-      labelColor:              primary,
-      unselectedLabelColor:    metaColor,
-      indicatorColor:          primary,
-      indicatorSize:           TabBarIndicatorSize.label,
-      labelStyle:              _ts(_kBody, 14, weight: FontWeight.w600, color: primary),
-      unselectedLabelStyle:    _ts(_kBody, 14, color: metaColor),
-      dividerColor:            sBorder,
+      labelColor:           primary,
+      unselectedLabelColor: metaColor,
+      indicatorColor:       primary,
+      indicatorSize:        TabBarIndicatorSize.label,
+      labelStyle:           _ts(_kBody, 14, w: FontWeight.w600, c: primary),
+      unselectedLabelStyle: _ts(_kBody, 14, c: metaColor),
+      dividerColor:         sBorder,
     ),
 
     &#47;&#47; ── Pop-up menu ───────────────────────────────────────────────────
@@ -478,22 +467,20 @@
       elevation:        0,
       shape: RoundedRectangleBorder(
         borderRadius: _kBR6, side: BorderSide(color: sBorder)),
-      textStyle:      _ts(_kBody, 14, spacing: 0.1, color: onSurface),
+      textStyle:      _ts(_kBody, 14, s: 0.1, c: onSurface),
       labelTextStyle: WidgetStateProperty.all(
-          _ts(_kBody, 14, spacing: 0.1, color: onSurface)),
+          _ts(_kBody, 14, s: 0.1, c: onSurface)),
     ),
 
-    &#47;&#47; ── Search bar ────────────────────────────────────────────────────
+    &#47;&#47; ── Search bar — 6 px ─────────────────────────────────────────────
     searchBarTheme: SearchBarThemeData(
       backgroundColor: WidgetStateProperty.all(s2),
       surfaceTintColor: WidgetStateProperty.all(Colors.transparent),
       elevation: WidgetStateProperty.all(0),
       side: WidgetStateProperty.all(BorderSide(color: sBorder)),
       shape: WidgetStateProperty.all(_shape6),
-      textStyle: WidgetStateProperty.all(
-          _ts(_kBody, 14, spacing: 0.1, color: onSurface)),
-      hintStyle: WidgetStateProperty.all(
-          _ts(_kBody, 14, color: metaColor)),
+      textStyle: WidgetStateProperty.all(_ts(_kBody, 14, s: 0.1, c: onSurface)),
+      hintStyle: WidgetStateProperty.all(_ts(_kBody, 14, c: metaColor)),
     ),
 
     &#47;&#47; ── Icons ─────────────────────────────────────────────────────────
