@@ -32,6 +32,7 @@ void main() async {
 
   // ── Appearance ──────────────────────────────────────────────────────────
   themeStyleNotifier.value             = prefs.getString('ls_theme_style')             ?? 'default';
+  nothingAccentNotifier.value          = prefs.getString('ls_nothing_accent')          ?? 'red';
   themeModeNotifier.value              = themeFromString(prefs.getString('ls_theme'));
   accentNotifier.value                 = accentFromString(prefs.getString('ls_accent'));
   useDynamicColorNotifier.value        = prefs.getBool('ls_use_dynamic_color')         ?? false;
@@ -111,28 +112,33 @@ class LastStatsApp extends StatelessWidget {
           valueListenable: themeStyleNotifier,
           builder: (_, style, _) {
 
-            // ── Nothing OS style: completely custom theme, always dark ──────
+            // ── Nothing OS style ───────────────────────────────────────────
             if (style == 'nothing') {
               return ValueListenableBuilder<String>(
-                valueListenable: localeNotifier,
-                builder: (_, _, _) {
-                  final nTheme = NothingTheme.build();
-                  return MaterialApp(
-                    navigatorKey:               navigatorKey,
-                    title:                      'LastStats',
-                    debugShowCheckedModeBanner: false,
-                    theme:      nTheme,
-                    darkTheme:  nTheme,
-                    themeMode:  ThemeMode.dark,
-                    home: (username.isNotEmpty && apiKey.isNotEmpty)
-                        ? HomeScreen(username: username, apiKey: apiKey, startupTab: startupTab)
-                        : const SetupScreen(),
+                valueListenable: nothingAccentNotifier,
+                builder: (_, nAccent, _) {
+                  return ValueListenableBuilder<String>(
+                    valueListenable: localeNotifier,
+                    builder: (_, _, _) {
+                      final nTheme = NothingTheme.build(accent: nAccent);
+                      return MaterialApp(
+                        navigatorKey:               navigatorKey,
+                        title:                      'LastStats',
+                        debugShowCheckedModeBanner: false,
+                        theme:     nTheme,
+                        darkTheme: nTheme,
+                        themeMode: ThemeMode.dark, // Nothing is always dark
+                        home: (username.isNotEmpty && apiKey.isNotEmpty)
+                            ? HomeScreen(username: username, apiKey: apiKey, startupTab: startupTab)
+                            : const SetupScreen(),
+                      );
+                    },
                   );
                 },
               );
             }
 
-            // ── Default style: Material You + accent + OLED ─────────────────
+            // ── Default style: Material You + accent + OLED ────────────────
             return ValueListenableBuilder<bool>(
               valueListenable: useDynamicColorNotifier,
               builder: (_, useDynamic, _) {
@@ -164,7 +170,6 @@ class LastStatsApp extends StatelessWidget {
                                             brightness: Brightness.dark,
                                           );
 
-                                // OLED: override all surface colors to pure black.
                                 final ColorScheme darkScheme = oled
                                     ? darkSchemeBase.copyWith(
                                         surface:                 Colors.black,
