@@ -251,6 +251,7 @@ class _AppearancePageState extends State<AppearancePage> {
 
           // Accent variant picker
           _NothingPanel(
+            isDark: _theme != 'light',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -263,6 +264,7 @@ class _AppearancePageState extends State<AppearancePage> {
                     sublabel: 'Red #FF2020',
                     desc:     isEn ? 'Red only' : 'Rouge uniquement',
                     selected: _nothingAccent == 'classic',
+                    isDark:   _theme != 'light',
                     onTap:    () => _setNothingAccent('classic'),
                   )),
                   const SizedBox(width: 10),
@@ -273,6 +275,7 @@ class _AppearancePageState extends State<AppearancePage> {
                     sublabel: '+ Yellow #FFC700',
                     desc:     isEn ? 'Red + yellow touches' : 'Rouge + touches jaunes',
                     selected: _nothingAccent == 'mixed',
+                    isDark:   _theme != 'light',
                     onTap:    () => _setNothingAccent('mixed'),
                   )),
                 ]),
@@ -665,18 +668,23 @@ Widget _dot(Color c) => Container(
 
 class _NothingPanel extends StatelessWidget {
   final Widget child;
-  const _NothingPanel({required this.child});
+  final bool   isDark;
+  const _NothingPanel({required this.child, this.isDark = true});
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(
-      color:        const Color(0xFF0D0D0D),
-      border:       Border.all(color: const Color(0xFF2A2A2A)),
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: child,
-  );
+  Widget build(BuildContext context) {
+    final bg     = isDark ? const Color(0xFF0D0D0D) : const Color(0xFFFFFFFF);
+    final border = isDark ? const Color(0xFF2A2A2A) : const Color(0xFFE0DDD8);
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color:        bg,
+        border:       Border.all(color: border),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: child,
+    );
+  }
 }
 
 class _NothingLabel extends StatelessWidget {
@@ -724,11 +732,12 @@ class _NothingInfoBanner extends StatelessWidget {
 
 class _NothingAccentTile extends StatelessWidget {
   final Color   color;
-  final Color?  color2;   // optional second dot (for mixed)
+  final Color?  color2;
   final String  label;
   final String  sublabel;
   final String  desc;
   final bool    selected;
+  final bool    isDark;   // adapts bg to light/dark Nothing mode
   final VoidCallback onTap;
 
   const _NothingAccentTile({
@@ -739,59 +748,62 @@ class _NothingAccentTile extends StatelessWidget {
     required this.selected,
     required this.onTap,
     this.color2,
+    this.isDark = true,
   });
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    child: AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
-      padding: const EdgeInsets.all(11),
-      decoration: BoxDecoration(
-        color:        selected
-            ? color.withValues(alpha: 0.08)
-            : const Color(0xFF111111),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-            color: selected ? color : const Color(0xFF2A2A2A),
-            width: selected ? 1.5 : 1),
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Container(
-            width: 18, height: 18,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            child: selected
-                ? const Icon(Icons.check_rounded, size: 11,
-                    color: Colors.black)
-                : null,
-          ),
-          if (color2 != null) ...[
-            const SizedBox(width: 4),
-            Container(width: 10, height: 10,
-                decoration: BoxDecoration(
-                    color: color2, shape: BoxShape.circle)),
-          ],
+  Widget build(BuildContext context) {
+    final bg        = isDark ? const Color(0xFF111111) : const Color(0xFFFFFFFF);
+    final bgSel     = color.withValues(alpha: isDark ? 0.08 : 0.06);
+    final borderOff = isDark ? const Color(0xFF2A2A2A) : const Color(0xFFE0DDD8);
+    final textCol   = isDark ? kNothingWhite : kNothingDarkText;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.all(11),
+        decoration: BoxDecoration(
+          color:        selected ? bgSel : bg,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(
+              color: selected ? color : borderOff,
+              width: selected ? 1.5 : 1),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Container(
+              width: 18, height: 18,
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              child: selected
+                  ? const Icon(Icons.check_rounded, size: 11, color: Colors.black)
+                  : null,
+            ),
+            if (color2 != null) ...[
+              const SizedBox(width: 4),
+              Container(width: 10, height: 10,
+                  decoration: BoxDecoration(color: color2, shape: BoxShape.circle)),
+            ],
+          ]),
+          const SizedBox(height: 8),
+          Text(label,
+              style: TextStyle(
+                  fontFamily: 'NType82', fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: selected ? color : textCol)),
+          const SizedBox(height: 2),
+          Text(sublabel,
+              style: TextStyle(
+                  fontFamily: 'NType82Mono', fontSize: 9,
+                  color: kNothingGrey, letterSpacing: 0.5)),
+          const SizedBox(height: 3),
+          Text(desc,
+              style: TextStyle(
+                  fontFamily: 'NType82', fontSize: 10, color: kNothingGrey)),
         ]),
-        const SizedBox(height: 8),
-        Text(label,
-            style: TextStyle(
-                fontFamily: 'NType82', fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: selected ? color : kNothingWhite)),
-        const SizedBox(height: 2),
-        Text(sublabel,
-            style: const TextStyle(
-                fontFamily: 'NType82Mono', fontSize: 9,
-                color: kNothingGrey, letterSpacing: 0.5)),
-        const SizedBox(height: 3),
-        Text(desc,
-            style: const TextStyle(
-                fontFamily: 'NType82', fontSize: 10,
-                color: kNothingGrey)),
-      ]),
-    ),
-  );
+      ),
+    );
+  }
 }
 
 // ── Style selector card ───────────────────────────────────────────────────────
