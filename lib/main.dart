@@ -46,7 +46,8 @@ void main() async {
   nowPlayingFallbackColorNotifier.value =
       fallbackHex != null ? accentFromString(fallbackHex) : accentNotifier.value;
 
-  pcModeNotifier.value = prefs.getString('ls_pc_mode') ?? 'auto';
+  pcModeNotifier.value   = prefs.getString('ls_pc_mode') ?? 'auto';
+  navLabelNotifier.value = prefs.getBool('ls_nav_labels') ?? true;
 
   // ── Data caches & storage ────────────────────────────────────────────────
   await DataCache.init();

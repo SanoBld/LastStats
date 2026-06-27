@@ -646,6 +646,11 @@ class _AppearancePageState extends State<AppearancePage> {
 
         const SizedBox(height: 16),
 
+        // ── Navigation bar labels — always active ────────────────────────
+        _NavLabelSection(),
+
+        const SizedBox(height: 16),
+
         // ── PC / responsive layout mode — always active ───────────────────
         const PcModeSection(),
 
@@ -862,6 +867,51 @@ class _StyleCard extends StatelessWidget {
             ),
         ]),
       ),
+    );
+  }
+}
+
+// ── Nav label toggle ──────────────────────────────────────────────────────────
+
+class _NavLabelSection extends StatefulWidget {
+  const _NavLabelSection();
+  @override
+  State<_NavLabelSection> createState() => _NavLabelSectionState();
+}
+
+class _NavLabelSectionState extends State<_NavLabelSection> {
+  bool _labels = true;
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((p) {
+      if (mounted) setState(() => _labels = p.getBool('ls_nav_labels') ?? true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isEn   = localeNotifier.value == 'en';
+    return SettingsSection(
+      label: isEn ? 'Navigation bar' : 'Barre de navigation',
+      children: [
+        SwitchListTile(
+          secondary: Icon(Icons.label_outline_rounded, color: scheme.primary),
+          title: Text(isEn ? 'Show tab labels' : 'Afficher les libellés'),
+          subtitle: Text(isEn
+              ? 'Display tab names below icons in the bottom bar'
+              : 'Afficher les noms des onglets sous les icônes'),
+          value: _labels,
+          onChanged: (v) async {
+            final p = await SharedPreferences.getInstance();
+            await p.setBool('ls_nav_labels', v);
+            setState(() => _labels = v);
+            navLabelNotifier.value = v;
+          },
+        ),
+      ],
     );
   }
 }

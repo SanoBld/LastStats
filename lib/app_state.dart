@@ -37,6 +37,9 @@ final oledModeNotifier = ValueNotifier<bool>(false);
 ///   'off'  → always use the bottom navigation bar
 final pcModeNotifier = ValueNotifier<String>('auto');
 
+// Show labels under nav bar icons. Saved as 'ls_nav_labels'.
+final navLabelNotifier = ValueNotifier<bool>(true);
+
 ThemeMode themeFromString(String? s) {
   switch (s) {
     case 'light':  return ThemeMode.light;

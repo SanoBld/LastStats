@@ -207,7 +207,7 @@ class NothingTheme {
         // Pill-shaped red indicator behind selected icon
         indicatorColor:    primary.withValues(alpha: isDark ? 0.14 : 0.10),
         indicatorShape:    const RoundedRectangleBorder(borderRadius: _kBRPill),
-        labelBehavior:     NavigationDestinationLabelBehavior.alwaysHide,
+        // labelBehavior handled at widget level via navLabelNotifier
         height:            60,
         iconTheme: WidgetStateProperty.resolveWith((s) => IconThemeData(
           color: s.contains(WidgetState.selected)
@@ -215,8 +215,11 @@ class NothingTheme {
               : onSurface.withValues(alpha: isDark ? 0.38 : 0.45),
           size: 24,
         )),
-        labelTextStyle: WidgetStateProperty.all(
-            _ts(_kBody, 0, c: Colors.transparent)), // hidden
+        labelTextStyle: WidgetStateProperty.resolveWith((s) {
+          final col = s.contains(WidgetState.selected)
+              ? primary : onSurface.withValues(alpha: isDark ? 0.38 : 0.45);
+          return _ts(_kBody, 11, w: FontWeight.w500, s: 0.3, c: col);
+        }),
       ),
 
       // ── Navigation rail ───────────────────────────────────────────────
