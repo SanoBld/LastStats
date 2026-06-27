@@ -207,7 +207,7 @@
       &#47;&#47; Pill-shaped red indicator behind selected icon
       indicatorColor:    primary.withValues(alpha: isDark ? 0.14 : 0.10),
       indicatorShape:    const RoundedRectangleBorder(borderRadius: _kBRPill),
-      labelBehavior:     NavigationDestinationLabelBehavior.alwaysHide,
+      &#47;&#47; labelBehavior handled at widget level via navLabelNotifier
       height:            60,
       iconTheme: WidgetStateProperty.resolveWith((s) =&gt; IconThemeData(
         color: s.contains(WidgetState.selected)
@@ -215,8 +215,11 @@
             : onSurface.withValues(alpha: isDark ? 0.38 : 0.45),
         size: 24,
       )),
-      labelTextStyle: WidgetStateProperty.all(
-          _ts(_kBody, 0, c: Colors.transparent)), &#47;&#47; hidden
+      labelTextStyle: WidgetStateProperty.resolveWith((s) {
+        final col = s.contains(WidgetState.selected)
+            ? primary : onSurface.withValues(alpha: isDark ? 0.38 : 0.45);
+        return _ts(_kBody, 11, w: FontWeight.w500, s: 0.3, c: col);
+      }),
     ),
 
     &#47;&#47; ── Navigation rail ───────────────────────────────────────────────
