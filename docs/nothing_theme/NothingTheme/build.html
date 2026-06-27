@@ -199,24 +199,24 @@
       clipBehavior: Clip.antiAlias,
     ),
 
-    &#47;&#47; ── Navigation bar ────────────────────────────────────────────────
+    &#47;&#47; ── Navigation bar — Nothing OS style ──────────────────────────────
+    &#47;&#47; No labels. Red pill indicator. Icons only. Border top separates from content.
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor:   s0,
       surfaceTintColor:  Colors.transparent,
-      indicatorColor:    primary.withValues(alpha: isDark ? 0.12 : 0.10),
-      indicatorShape:    const RoundedRectangleBorder(borderRadius: _kBR6),
-      labelBehavior:     NavigationDestinationLabelBehavior.alwaysShow,
-      height:            64,
+      &#47;&#47; Pill-shaped red indicator behind selected icon
+      indicatorColor:    primary.withValues(alpha: isDark ? 0.14 : 0.10),
+      indicatorShape:    const RoundedRectangleBorder(borderRadius: _kBRPill),
+      labelBehavior:     NavigationDestinationLabelBehavior.alwaysHide,
+      height:            60,
       iconTheme: WidgetStateProperty.resolveWith((s) =&gt; IconThemeData(
         color: s.contains(WidgetState.selected)
-            ? primary : onSurface.withValues(alpha: 0.35),
-        size: 22,
+            ? primary
+            : onSurface.withValues(alpha: isDark ? 0.38 : 0.45),
+        size: 24,
       )),
-      labelTextStyle: WidgetStateProperty.resolveWith((s) {
-        final c = s.contains(WidgetState.selected)
-            ? primary : onSurface.withValues(alpha: 0.35);
-        return _ts(_kBody, 11, w: FontWeight.w500, s: 0.3, c: c);
-      }),
+      labelTextStyle: WidgetStateProperty.all(
+          _ts(_kBody, 0, c: Colors.transparent)), &#47;&#47; hidden
     ),
 
     &#47;&#47; ── Navigation rail ───────────────────────────────────────────────
