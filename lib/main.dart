@@ -134,17 +134,34 @@ class LastStatsApp extends StatelessWidget {
                             accent:     nAccent,
                             brightness: Brightness.dark,
                           );
-                          return MaterialApp(
-                            navigatorKey:               navigatorKey,
-                            title:                      'LastStats',
-                            debugShowCheckedModeBanner: false,
-                            theme:     nLight,
-                            darkTheme: nDark,
-                            themeMode: mode, // respects light/dark/system
-                            home: (username.isNotEmpty && apiKey.isNotEmpty)
-                                ? HomeScreen(username: username, apiKey: apiKey,
-                                    startupTab: startupTab)
-                                : const SetupScreen(),
+                          return ValueListenableBuilder<bool>(
+                            valueListenable: navLabelNotifier,
+                            builder: (_, showLabels, _) {
+                              final navBehavior = showLabels
+                                  ? NavigationDestinationLabelBehavior.alwaysShow
+                                  : NavigationDestinationLabelBehavior.alwaysHide;
+                              // Merge label behavior into Nothing themes
+                              final nLightWithNav = nLight.copyWith(
+                                navigationBarTheme: nLight.navigationBarTheme
+                                    .copyWith(labelBehavior: navBehavior),
+                              );
+                              final nDarkWithNav = nDark.copyWith(
+                                navigationBarTheme: nDark.navigationBarTheme
+                                    .copyWith(labelBehavior: navBehavior),
+                              );
+                              return MaterialApp(
+                                navigatorKey:               navigatorKey,
+                                title:                      'LastStats',
+                                debugShowCheckedModeBanner: false,
+                                theme:     nLightWithNav,
+                                darkTheme: nDarkWithNav,
+                                themeMode: mode,
+                                home: (username.isNotEmpty && apiKey.isNotEmpty)
+                                    ? HomeScreen(username: username, apiKey: apiKey,
+                                        startupTab: startupTab)
+                                    : const SetupScreen(),
+                              );
+                            },
                           );
                         },
                       );
@@ -197,17 +214,39 @@ class LastStatsApp extends StatelessWidget {
                                       )
                                     : darkSchemeBase;
 
-                                return MaterialApp(
-                                  navigatorKey:               navigatorKey,
-                                  title:                      'LastStats',
-                                  debugShowCheckedModeBanner: false,
-                                  theme:     ThemeData(colorScheme: lightScheme, useMaterial3: true),
-                                  darkTheme: ThemeData(colorScheme: darkScheme,  useMaterial3: true),
-                                  themeMode: mode,
-                                  home: (username.isNotEmpty && apiKey.isNotEmpty)
-                                      ? HomeScreen(username: username, apiKey: apiKey,
-                                          startupTab: startupTab)
-                                      : const SetupScreen(),
+                                return ValueListenableBuilder<bool>(
+                                  valueListenable: navLabelNotifier,
+                                  builder: (_, showLabels, _) {
+                                    final navBehavior = showLabels
+                                        ? NavigationDestinationLabelBehavior.alwaysShow
+                                        : NavigationDestinationLabelBehavior.alwaysHide;
+                                    // Inject labelBehavior into both themes so it
+                                    // takes effect regardless of widget-level override.
+                                    final lTheme = ThemeData(
+                                      colorScheme: lightScheme,
+                                      useMaterial3: true,
+                                      navigationBarTheme: NavigationBarThemeData(
+                                          labelBehavior: navBehavior),
+                                    );
+                                    final dTheme = ThemeData(
+                                      colorScheme: darkScheme,
+                                      useMaterial3: true,
+                                      navigationBarTheme: NavigationBarThemeData(
+                                          labelBehavior: navBehavior),
+                                    );
+                                    return MaterialApp(
+                                      navigatorKey:               navigatorKey,
+                                      title:                      'LastStats',
+                                      debugShowCheckedModeBanner: false,
+                                      theme:     lTheme,
+                                      darkTheme: dTheme,
+                                      themeMode: mode,
+                                      home: (username.isNotEmpty && apiKey.isNotEmpty)
+                                          ? HomeScreen(username: username, apiKey: apiKey,
+                                              startupTab: startupTab)
+                                          : const SetupScreen(),
+                                    );
+                                  },
                                 );
                               },
                             );
