@@ -225,9 +225,13 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   String _lyrics         = '';
   bool   _lyricsExpanded = false;
 
-  // Deezer 30s preview
-  String? _previewUrl;
-  bool    _previewLoading = false;
+  // Deezer 30s preview player
+  String?      _previewUrl;
+  bool         _previewLoading = false;
+  bool         _isPlaying      = false;
+  double       _previewPos     = 0.0;   // 0.0 → 1.0
+  Duration     _previewDur     = const Duration(seconds: 30);
+  AudioPlayer? _audioPlayer;
 
   String get _name   => (widget.item['name']            ?? '').toString();
   String get _artist => (widget.item['artist']?['name'] ?? '').toString();
@@ -241,6 +245,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   @override
   void dispose() {
+    _audioPlayer?.stop();
+    _audioPlayer?.dispose();
     super.dispose();
   }
 
@@ -849,17 +855,46 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   }
 
 
-  // Opens the Deezer 30s preview in the system audio/browser player.
-  // Works on all platforms with no native audio dependency.
-  Future<void> _openPreview() async {
+  // Toggle play / pause for the Deezer 30s preview clip.
+  Future<void> _togglePreview() async {
     if (_previewUrl == null) return;
-    final uri = Uri.parse(_previewUrl!);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+    if (_isPlaying) {
+      await _audioPlayer?.pause();
+      if (mounted) setState(() => _isPlaying = false);
+      return;
     }
+
+    // Create player once, reuse afterwards.
+    if (_audioPlayer == null) {
+      _audioPlayer = AudioPlayer();
+
+      _audioPlayer!.onDurationChanged.listen((d) {
+        if (mounted) setState(() => _previewDur = d);
+      });
+      _audioPlayer!.onPositionChanged.listen((pos) {
+        if (mounted) setState(() {
+          final total = _previewDur.inMilliseconds;
+          _previewPos = total > 0 ? pos.inMilliseconds / total : 0.0;
+        });
+      });
+      _audioPlayer!.onPlayerComplete.listen((_) {
+        if (mounted) setState(() { _isPlaying = false; _previewPos = 0; });
+      });
+    }
+
+    await _audioPlayer!.play(UrlSource(_previewUrl!));
+    if (mounted) setState(() => _isPlaying = true);
   }
 
-  // Preview button — shown just above the biography for tracks.
+  String _fmtDur(double fraction) {
+    final secs = (fraction * _previewDur.inSeconds).floor();
+    final m    = secs ~/ 60;
+    final s    = (secs % 60).toString().padLeft(2, '0');
+    return '$m:$s';
+  }
+
+  // In-app 30s preview player — shown just above the biography for tracks.
   Widget _buildPreviewPlayer(ColorScheme scheme) {
     if (_previewUrl == null && !_previewLoading) return const SizedBox.shrink();
 
@@ -867,64 +902,122 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Material(
-        color:        scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(14),
-        child: InkWell(
-          onTap:        _previewLoading ? null : _openPreview,
-          borderRadius: BorderRadius.circular(14),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                  color: scheme.outlineVariant.withValues(alpha: 0.45)),
-            ),
-            child: Row(children: [
-              // Icon
-              Container(
-                width: 38, height: 38,
-                decoration: BoxDecoration(
-                  color:  _previewLoading
-                      ? scheme.surfaceContainerHighest
-                      : scheme.primary,
-                  shape:  BoxShape.circle,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color:        scheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+              color: scheme.outlineVariant.withValues(alpha: 0.45)),
+        ),
+        child: _previewLoading
+            ? Row(children: [
+                SizedBox(width: 18, height: 18,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: scheme.primary)),
+                const SizedBox(width: 12),
+                Text(
+                  isEn ? 'Looking for a preview…' : "Recherche d'un extrait…",
+                  style: Theme.of(context).textTheme.bodySmall
+                      ?.copyWith(color: scheme.onSurfaceVariant),
                 ),
-                child: _previewLoading
-                    ? Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: CircularProgressIndicator(
-                            strokeWidth: 2, color: scheme.primary),
-                      )
-                    : const Icon(Icons.play_arrow_rounded,
-                        color: Colors.white, size: 22),
-              ),
-              const SizedBox(width: 12),
-              // Labels
-              Expanded(child: Column(
+              ])
+            : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    _previewLoading
-                        ? (isEn ? 'Searching preview…' : 'Recherche un extrait…')
-                        : (isEn ? 'Listen to preview · 30s' : "Écouter l'extrait · 30s"),
-                    style: Theme.of(context).textTheme.bodyMedium
-                        ?.copyWith(fontWeight: FontWeight.w600),
+                  // Row: play button + labels + Deezer badge
+                  Row(children: [
+                    // Play / Pause button
+                    GestureDetector(
+                      onTap: _togglePreview,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        width: 48, height: 48,
+                        decoration: BoxDecoration(
+                          color:  scheme.primary,
+                          shape:  BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color:      scheme.primary.withValues(alpha: 0.35),
+                              blurRadius: 12,
+                              offset:     const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          _isPlaying
+                              ? Icons.pause_rounded
+                              : Icons.play_arrow_rounded,
+                          color: scheme.onPrimary,
+                          size:  26,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isEn ? 'Preview · 30 sec' : 'Extrait · 30 sec',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 2),
+                        Row(children: [
+                          Icon(Icons.music_note_rounded,
+                              size: 11, color: scheme.onSurfaceVariant),
+                          const SizedBox(width: 3),
+                          Text('Deezer',
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                      color: scheme.onSurfaceVariant,
+                                      fontSize: 11)),
+                        ]),
+                      ],
+                    )),
+                    // Time counter
+                    Text(
+                      _fmtDur(_previewPos),
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color:      scheme.onSurfaceVariant,
+                            fontFamily: 'monospace',
+                            fontSize:   12,
+                          ),
+                    ),
+                  ]),
+
+                  const SizedBox(height: 12),
+
+                  // Progress bar
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: LinearProgressIndicator(
+                      value:           _previewPos.clamp(0.0, 1.0),
+                      minHeight:       5,
+                      backgroundColor: scheme.outlineVariant
+                          .withValues(alpha: 0.5),
+                      valueColor: AlwaysStoppedAnimation<Color>(scheme.primary),
+                    ),
                   ),
-                  Text(
-                    'Deezer',
-                    style: Theme.of(context).textTheme.bodySmall
-                        ?.copyWith(color: scheme.onSurfaceVariant),
+
+                  const SizedBox(height: 6),
+
+                  // 0:00 ─────────────────── 0:30
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('0:00',
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(color: scheme.onSurfaceVariant
+                                  .withValues(alpha: 0.6), fontSize: 10)),
+                      Text('0:30',
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(color: scheme.onSurfaceVariant
+                                  .withValues(alpha: 0.6), fontSize: 10)),
+                    ],
                   ),
                 ],
-              )),
-              // Arrow
-              if (!_previewLoading)
-                Icon(Icons.open_in_new_rounded,
-                    size: 16, color: scheme.onSurfaceVariant),
-            ]),
-          ),
-        ),
+              ),
       ),
     );
   }
