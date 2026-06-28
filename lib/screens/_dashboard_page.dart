@@ -453,85 +453,11 @@ class _DashboardPageState extends State<_DashboardPage> {
   }
 
   // Key on the profile tap target so we can find its position
-  final _profileKey    = GlobalKey();
   final _settingsBtnKey = GlobalKey();
 
   // Show settings popup anchored to the bottom-right header button
   Future<void> _showSettingsMenu() async {
     final box = _settingsBtnKey.currentContext?.findRenderObject() as RenderBox?;
-    if (box == null || !mounted) return;
-    final pos    = box.localToGlobal(Offset.zero);
-    final size   = box.size;
-    final screen = MediaQuery.of(context).size;
-
-    final result = await showMenu<String>(
-      context: context,
-      position: RelativeRect.fromLTRB(
-        pos.dx,
-        pos.dy + size.height + 4,
-        screen.width - pos.dx - size.width,
-        0,
-      ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      items: [
-        PopupMenuItem(
-          value: 'refresh',
-          child: Row(children: [
-            const Icon(Icons.refresh_rounded, size: 20),
-            const SizedBox(width: 10),
-            Text(L.dashRefresh),
-          ]),
-        ),
-        PopupMenuItem(
-          value: 'settings',
-          child: Row(children: [
-            const Icon(Icons.settings_outlined, size: 20),
-            const SizedBox(width: 10),
-            Text(L.navSettings),
-          ]),
-        ),
-        PopupMenuItem(
-          value: 'reset',
-          child: Builder(builder: (ctx) {
-            final color = Theme.of(ctx).colorScheme.error;
-            return Row(children: [
-              Icon(Icons.delete_sweep_outlined, size: 20, color: color),
-              const SizedBox(width: 10),
-              Text(L.dashResetCache, style: TextStyle(color: color)),
-            ]);
-          }),
-        ),
-      ],
-    );
-
-    if (!mounted) return;
-    switch (result) {
-      case 'refresh':
-        _load();
-      case 'settings':
-        await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => Scaffold(
-              appBar: AppBar(
-                title: Text(L.navSettings),
-                scrolledUnderElevation: 0,
-              ),
-              body: _SettingsPage(username: widget.username),
-            ),
-          ),
-        );
-        if (mounted) {
-          await _loadPrefs();
-          _resolveHeaderImage();
-        }
-      case 'reset':
-        _confirmResetCache();
-    }
-  }
-
-  // Show popup bubble near the profile row
-  Future<void> _showProfileMenu() async {
-    final box = _profileKey.currentContext?.findRenderObject() as RenderBox?;
     if (box == null || !mounted) return;
     final pos    = box.localToGlobal(Offset.zero);
     final size   = box.size;
@@ -1228,10 +1154,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        GestureDetector(
-                          key: _profileKey,
-                          onTap: _showProfileMenu,
-                          child: Row(children: [
+                        Row(children: [
                           Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
@@ -1305,7 +1228,6 @@ class _DashboardPageState extends State<_DashboardPage> {
                             ],
                           )),
                         ]),
-                        ),  // GestureDetector
                       ],
                     ),
                   ),

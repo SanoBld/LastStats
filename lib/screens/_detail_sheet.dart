@@ -225,6 +225,13 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   String _lyrics         = '';
   bool   _lyricsExpanded = false;
 
+  // Deezer 30s preview player
+  String?     _previewUrl;
+  bool        _previewLoading = false;
+  bool        _previewPlaying = false;
+  double      _previewPos     = 0.0;   // 0.0 → 1.0 progress
+  AudioPlayer? _audioPlayer;
+
   String get _name   => (widget.item['name']            ?? '').toString();
   String get _artist => (widget.item['artist']?['name'] ?? '').toString();
 
@@ -232,6 +239,14 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   void initState() {
     super.initState();
     _fetchAll();
+    if (widget.type == 'tracks') _fetchDeezerPreview();
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer?.stop();
+    _audioPlayer?.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchAll() async {
@@ -534,6 +549,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                           color: scheme.outlineVariant.withValues(alpha: 0.4)),
                       _buildStatsRow(scheme),
                       if (_tags().isNotEmpty) _buildTags(scheme),
+                      if (widget.type == 'tracks') _buildPreviewPlayer(scheme),
                       if (_bio().isNotEmpty)  _buildBio(scheme),
                       if (widget.type == 'artists' && _topTracks.isNotEmpty)
                         _buildTopTracks(scheme),
@@ -811,6 +827,145 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   }
 
   // ── Bio ─────────────────────────────────────────────────────────────────────
+
+  // Fetch a 30s Deezer preview URL for the current track.
+  Future<void> _fetchDeezerPreview() async {
+    if (_name.isEmpty) return;
+    if (mounted) setState(() => _previewLoading = true);
+    try {
+      final q   = Uri.encodeComponent('$_name $_artist');
+      final uri = Uri.parse('https://api.deezer.com/search?q=$q&limit=5');
+      final res = await http.get(uri).timeout(const Duration(seconds: 6));
+      if (res.statusCode == 200) {
+        final data   = jsonDecode(res.body) as Map<String, dynamic>;
+        final tracks = (data['data'] as List?)?.cast<Map<String, dynamic>>();
+        if (tracks != null) {
+          for (final t in tracks) {
+            final url = t['preview'] as String? ?? '';
+            if (url.isNotEmpty) {
+              if (mounted) setState(() { _previewUrl = url; _previewLoading = false; });
+              return;
+            }
+          }
+        }
+      }
+    } catch (_) {}
+    if (mounted) setState(() => _previewLoading = false);
+  }
+
+  // Toggle play/pause for the Deezer 30s preview.
+  Future<void> _togglePreview() async {
+    if (_previewUrl == null) return;
+
+    if (_previewPlaying) {
+      await _audioPlayer?.pause();
+      if (mounted) setState(() => _previewPlaying = false);
+      return;
+    }
+
+    _audioPlayer ??= AudioPlayer();
+
+    _audioPlayer!.onPositionChanged.listen((pos) {
+      if (mounted) setState(() => _previewPos = pos.inMilliseconds / 30000.0);
+    });
+    _audioPlayer!.onPlayerComplete.listen((_) {
+      if (mounted) setState(() { _previewPlaying = false; _previewPos = 0; });
+    });
+
+    await _audioPlayer!.play(UrlSource(_previewUrl!));
+    if (mounted) setState(() => _previewPlaying = true);
+  }
+
+  // Preview player widget — shown just above the biography for tracks.
+  Widget _buildPreviewPlayer(ColorScheme scheme) {
+    if (_previewUrl == null && !_previewLoading) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color:        scheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+              color: scheme.outlineVariant.withValues(alpha: 0.45)),
+        ),
+        child: _previewLoading
+            ? Row(children: [
+                SizedBox(
+                  width: 16, height: 16,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: scheme.primary),
+                ),
+                const SizedBox(width: 10),
+                Text('Recherche un extrait…',
+                    style: Theme.of(context).textTheme.bodySmall
+                        ?.copyWith(color: scheme.onSurfaceVariant)),
+              ])
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(children: [
+                    // Play / pause button
+                    GestureDetector(
+                      onTap: _togglePreview,
+                      child: Container(
+                        width: 38, height: 38,
+                        decoration: BoxDecoration(
+                          color:  scheme.primary,
+                          shape:  BoxShape.circle,
+                        ),
+                        child: Icon(
+                          _previewPlaying
+                              ? Icons.pause_rounded
+                              : Icons.play_arrow_rounded,
+                          color: scheme.onPrimary,
+                          size:  22,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          localeNotifier.value == 'en'
+                              ? 'Preview · 30s'
+                              : 'Extrait · 30s',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(fontWeight: FontWeight.w600),
+                        ),
+                        Text(
+                          'Deezer',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: scheme.onSurfaceVariant),
+                        ),
+                      ],
+                    )),
+                    // Duration counter
+                    Text(
+                      '${(_previewPos * 30).floor()}s',
+                      style: Theme.of(context).textTheme.labelSmall
+                          ?.copyWith(color: scheme.onSurfaceVariant,
+                              fontFamily: 'monospace'),
+                    ),
+                  ]),
+                  const SizedBox(height: 8),
+                  // Progress bar
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value:            _previewPos.clamp(0.0, 1.0),
+                      minHeight:        3,
+                      backgroundColor:  scheme.outlineVariant,
+                      valueColor: AlwaysStoppedAnimation<Color>(scheme.primary),
+                    ),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
 
   Widget _buildBio(ColorScheme scheme) {
     final text = Theme.of(context).textTheme;

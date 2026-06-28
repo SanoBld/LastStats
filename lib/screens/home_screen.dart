@@ -30,6 +30,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:audioplayers/audioplayers.dart';
 import '../app_state.dart';
 import '../l10n.dart';
 import '../services/lastfm_service.dart';
@@ -312,7 +313,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           extended:              !collapsed,
                           labelType: collapsed
                               ? NavigationRailLabelType.none
-                              : NavigationRailLabelType.none, // labels inline when extended
+                              : NavigationRailLabelType.none,
                           minWidth:         56,
                           minExtendedWidth: 200,
                           destinations:    _wideDestinations,
