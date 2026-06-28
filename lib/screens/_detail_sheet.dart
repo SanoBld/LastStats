@@ -225,12 +225,9 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   String _lyrics         = '';
   bool   _lyricsExpanded = false;
 
-  // Deezer 30s preview player
-  String?     _previewUrl;
-  bool        _previewLoading = false;
-  bool        _previewPlaying = false;
-  double      _previewPos     = 0.0;   // 0.0 → 1.0 progress
-  AudioPlayer? _audioPlayer;
+  // Deezer 30s preview
+  String? _previewUrl;
+  bool    _previewLoading = false;
 
   String get _name   => (widget.item['name']            ?? '').toString();
   String get _artist => (widget.item['artist']?['name'] ?? '').toString();
@@ -244,8 +241,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   @override
   void dispose() {
-    _audioPlayer?.stop();
-    _audioPlayer?.dispose();
     super.dispose();
   }
 
@@ -853,120 +848,88 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     if (mounted) setState(() => _previewLoading = false);
   }
 
-  // Toggle play/pause for the Deezer 30s preview.
-  Future<void> _togglePreview() async {
+
+  // Opens the Deezer 30s preview in the system audio/browser player.
+  // Works on all platforms with no native audio dependency.
+  Future<void> _openPreview() async {
     if (_previewUrl == null) return;
-
-    if (_previewPlaying) {
-      await _audioPlayer?.pause();
-      if (mounted) setState(() => _previewPlaying = false);
-      return;
+    final uri = Uri.parse(_previewUrl!);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
-
-    _audioPlayer ??= AudioPlayer();
-
-    _audioPlayer!.onPositionChanged.listen((pos) {
-      if (mounted) setState(() => _previewPos = pos.inMilliseconds / 30000.0);
-    });
-    _audioPlayer!.onPlayerComplete.listen((_) {
-      if (mounted) setState(() { _previewPlaying = false; _previewPos = 0; });
-    });
-
-    await _audioPlayer!.play(UrlSource(_previewUrl!));
-    if (mounted) setState(() => _previewPlaying = true);
   }
 
-  // Preview player widget — shown just above the biography for tracks.
+  // Preview button — shown just above the biography for tracks.
   Widget _buildPreviewPlayer(ColorScheme scheme) {
     if (_previewUrl == null && !_previewLoading) return const SizedBox.shrink();
 
+    final isEn = localeNotifier.value == 'en';
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color:        scheme.surfaceContainerHighest,
+      child: Material(
+        color:        scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          onTap:        _previewLoading ? null : _openPreview,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-              color: scheme.outlineVariant.withValues(alpha: 0.45)),
-        ),
-        child: _previewLoading
-            ? Row(children: [
-                SizedBox(
-                  width: 16, height: 16,
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2, color: scheme.primary),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                  color: scheme.outlineVariant.withValues(alpha: 0.45)),
+            ),
+            child: Row(children: [
+              // Icon
+              Container(
+                width: 38, height: 38,
+                decoration: BoxDecoration(
+                  color:  _previewLoading
+                      ? scheme.surfaceContainerHighest
+                      : scheme.primary,
+                  shape:  BoxShape.circle,
                 ),
-                const SizedBox(width: 10),
-                Text('Recherche un extrait…',
-                    style: Theme.of(context).textTheme.bodySmall
-                        ?.copyWith(color: scheme.onSurfaceVariant)),
-              ])
-            : Column(
+                child: _previewLoading
+                    ? Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: scheme.primary),
+                      )
+                    : const Icon(Icons.play_arrow_rounded,
+                        color: Colors.white, size: 22),
+              ),
+              const SizedBox(width: 12),
+              // Labels
+              Expanded(child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(children: [
-                    // Play / pause button
-                    GestureDetector(
-                      onTap: _togglePreview,
-                      child: Container(
-                        width: 38, height: 38,
-                        decoration: BoxDecoration(
-                          color:  scheme.primary,
-                          shape:  BoxShape.circle,
-                        ),
-                        child: Icon(
-                          _previewPlaying
-                              ? Icons.pause_rounded
-                              : Icons.play_arrow_rounded,
-                          color: scheme.onPrimary,
-                          size:  22,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          localeNotifier.value == 'en'
-                              ? 'Preview · 30s'
-                              : 'Extrait · 30s',
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.w600),
-                        ),
-                        Text(
-                          'Deezer',
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: scheme.onSurfaceVariant),
-                        ),
-                      ],
-                    )),
-                    // Duration counter
-                    Text(
-                      '${(_previewPos * 30).floor()}s',
-                      style: Theme.of(context).textTheme.labelSmall
-                          ?.copyWith(color: scheme.onSurfaceVariant,
-                              fontFamily: 'monospace'),
-                    ),
-                  ]),
-                  const SizedBox(height: 8),
-                  // Progress bar
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value:            _previewPos.clamp(0.0, 1.0),
-                      minHeight:        3,
-                      backgroundColor:  scheme.outlineVariant,
-                      valueColor: AlwaysStoppedAnimation<Color>(scheme.primary),
-                    ),
+                  Text(
+                    _previewLoading
+                        ? (isEn ? 'Searching preview…' : 'Recherche un extrait…')
+                        : (isEn ? 'Listen to preview · 30s' : "Écouter l'extrait · 30s"),
+                    style: Theme.of(context).textTheme.bodyMedium
+                        ?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  Text(
+                    'Deezer',
+                    style: Theme.of(context).textTheme.bodySmall
+                        ?.copyWith(color: scheme.onSurfaceVariant),
                   ),
                 ],
-              ),
+              )),
+              // Arrow
+              if (!_previewLoading)
+                Icon(Icons.open_in_new_rounded,
+                    size: 16, color: scheme.onSurfaceVariant),
+            ]),
+          ),
+        ),
       ),
     );
   }
 
+  
   Widget _buildBio(ColorScheme scheme) {
     final text = Theme.of(context).textTheme;
     final bio  = _showTranslated && _translatedBio.isNotEmpty ? _translatedBio : _bio();

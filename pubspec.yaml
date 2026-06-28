@@ -21,7 +21,6 @@ dependencies:
   flutter_local_notifications: ^18.0.0
   workmanager: ^0.6.0
   web: ^1.1.0
-  audioplayers: ^6.1.0          # 30s Deezer track preview
 
 dev_dependencies:
   flutter_test:
