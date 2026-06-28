@@ -136,17 +136,34 @@ Widget build(BuildContext context) {
                           accent:     nAccent,
                           brightness: Brightness.dark,
                         );
-                        return MaterialApp(
-                          navigatorKey:               navigatorKey,
-                          title:                      &#39;LastStats&#39;,
-                          debugShowCheckedModeBanner: false,
-                          theme:     nLight,
-                          darkTheme: nDark,
-                          themeMode: mode, &#47;&#47; respects light&#47;dark&#47;system
-                          home: (username.isNotEmpty &amp;&amp; apiKey.isNotEmpty)
-                              ? HomeScreen(username: username, apiKey: apiKey,
-                                  startupTab: startupTab)
-                              : const SetupScreen(),
+                        return ValueListenableBuilder&lt;bool&gt;(
+                          valueListenable: navLabelNotifier,
+                          builder: (_, showLabels, _) {
+                            final navBehavior = showLabels
+                                ? NavigationDestinationLabelBehavior.alwaysShow
+                                : NavigationDestinationLabelBehavior.alwaysHide;
+                            &#47;&#47; Merge label behavior into Nothing themes
+                            final nLightWithNav = nLight.copyWith(
+                              navigationBarTheme: nLight.navigationBarTheme
+                                  .copyWith(labelBehavior: navBehavior),
+                            );
+                            final nDarkWithNav = nDark.copyWith(
+                              navigationBarTheme: nDark.navigationBarTheme
+                                  .copyWith(labelBehavior: navBehavior),
+                            );
+                            return MaterialApp(
+                              navigatorKey:               navigatorKey,
+                              title:                      &#39;LastStats&#39;,
+                              debugShowCheckedModeBanner: false,
+                              theme:     nLightWithNav,
+                              darkTheme: nDarkWithNav,
+                              themeMode: mode,
+                              home: (username.isNotEmpty &amp;&amp; apiKey.isNotEmpty)
+                                  ? HomeScreen(username: username, apiKey: apiKey,
+                                      startupTab: startupTab)
+                                  : const SetupScreen(),
+                            );
+                          },
                         );
                       },
                     );
@@ -199,17 +216,39 @@ Widget build(BuildContext context) {
                                     )
                                   : darkSchemeBase;
 
-                              return MaterialApp(
-                                navigatorKey:               navigatorKey,
-                                title:                      &#39;LastStats&#39;,
-                                debugShowCheckedModeBanner: false,
-                                theme:     ThemeData(colorScheme: lightScheme, useMaterial3: true),
-                                darkTheme: ThemeData(colorScheme: darkScheme,  useMaterial3: true),
-                                themeMode: mode,
-                                home: (username.isNotEmpty &amp;&amp; apiKey.isNotEmpty)
-                                    ? HomeScreen(username: username, apiKey: apiKey,
-                                        startupTab: startupTab)
-                                    : const SetupScreen(),
+                              return ValueListenableBuilder&lt;bool&gt;(
+                                valueListenable: navLabelNotifier,
+                                builder: (_, showLabels, _) {
+                                  final navBehavior = showLabels
+                                      ? NavigationDestinationLabelBehavior.alwaysShow
+                                      : NavigationDestinationLabelBehavior.alwaysHide;
+                                  &#47;&#47; Inject labelBehavior into both themes so it
+                                  &#47;&#47; takes effect regardless of widget-level override.
+                                  final lTheme = ThemeData(
+                                    colorScheme: lightScheme,
+                                    useMaterial3: true,
+                                    navigationBarTheme: NavigationBarThemeData(
+                                        labelBehavior: navBehavior),
+                                  );
+                                  final dTheme = ThemeData(
+                                    colorScheme: darkScheme,
+                                    useMaterial3: true,
+                                    navigationBarTheme: NavigationBarThemeData(
+                                        labelBehavior: navBehavior),
+                                  );
+                                  return MaterialApp(
+                                    navigatorKey:               navigatorKey,
+                                    title:                      &#39;LastStats&#39;,
+                                    debugShowCheckedModeBanner: false,
+                                    theme:     lTheme,
+                                    darkTheme: dTheme,
+                                    themeMode: mode,
+                                    home: (username.isNotEmpty &amp;&amp; apiKey.isNotEmpty)
+                                        ? HomeScreen(username: username, apiKey: apiKey,
+                                            startupTab: startupTab)
+                                        : const SetupScreen(),
+                                  );
+                                },
                               );
                             },
                           );
