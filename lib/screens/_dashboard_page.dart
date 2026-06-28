@@ -1324,33 +1324,45 @@ class _DashboardPageState extends State<_DashboardPage> {
                 ),
 
                 // Settings button — bottom-right of header image
+                // Tap → settings page. Long press → options popup.
                 Positioned(
-                  right: 14,
-                  bottom: 14,
+                  right: 12,
+                  bottom: 12,
                   child: GestureDetector(
                     key: _settingsBtnKey,
-                    onTap: _showSettingsMenu,
+                    onTap: () async {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => Scaffold(
+                            appBar: AppBar(
+                              title: Text(L.navSettings),
+                              scrolledUnderElevation: 0,
+                            ),
+                            body: _SettingsPage(username: widget.username),
+                          ),
+                        ),
+                      );
+                      if (mounted) {
+                        await _loadPrefs();
+                        _resolveHeaderImage();
+                      }
+                    },
+                    onLongPress: _showSettingsMenu,
                     child: Container(
-                      width: 38,
-                      height: 38,
+                      width: 30,
+                      height: 30,
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.45),
+                        color: Colors.black.withValues(alpha: 0.28),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.25),
-                          width: 1,
+                          color: Colors.white.withValues(alpha: 0.15),
+                          width: 0.8,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.3),
-                            blurRadius: 8,
-                          ),
-                        ],
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.settings_rounded,
-                        color: Colors.white,
-                        size: 18,
+                        color: Colors.white.withValues(alpha: 0.75),
+                        size: 15,
                       ),
                     ),
                   ),
