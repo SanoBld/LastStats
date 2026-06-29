@@ -680,6 +680,7 @@ class _DashboardPageState extends State<_DashboardPage> {
   }
 
   Future<void> _toggleFav(String username, bool nowFav) async {
+    _haptic(_HapticImpact.heavy);
     final updatedFriends  = Set<String>.from(_favFriends);
     final updatedProfiles = Set<String>.from(_favProfiles);
     if (nowFav) {
@@ -1253,6 +1254,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                   child: GestureDetector(
                     key: _settingsBtnKey,
                     onTap: () async {
+                      _haptic(_HapticImpact.light);
                       await Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => Scaffold(
@@ -1269,7 +1271,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                         _resolveHeaderImage();
                       }
                     },
-                    onLongPress: _showSettingsMenu,
+                    onLongPress: () { _haptic(_HapticImpact.medium); _showSettingsMenu(); },
                     child: Container(
                       width: 30,
                       height: 30,
@@ -1600,7 +1602,7 @@ class _CarouselCardState extends State<_CarouselCard> {
     final text = Theme.of(context).textTheme;
 
     return GestureDetector(
-      onTap:       widget.onTap,
+      onTap: () { _haptic(_HapticImpact.light); widget.onTap(); },
       onTapDown:   (_) => setState(() => _pressed = true),
       onTapUp:     (_) => setState(() => _pressed = false),
       onTapCancel: ()  => setState(() => _pressed = false),
@@ -1918,7 +1920,7 @@ class _FriendCardState extends State<_FriendCard> {
         : friend.lastArtist;
 
     return GestureDetector(
-      onTap:       () => _openProfile(context),
+      onTap:       () { _haptic(_HapticImpact.light); _openProfile(context); },
       onTapDown:   (_) => setState(() => _pressed = true),
       onTapUp:     (_) => setState(() => _pressed = false),
       onTapCancel: ()  => setState(() => _pressed = false),
@@ -2890,11 +2892,11 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
             // Page indicator dots
             Row(mainAxisSize: MainAxisSize.min, children: List.generate(3, (i) =>
               GestureDetector(
-                onTap: () => _ctrl.animateToPage(
+                onTap: () { _haptic(_HapticImpact.selection); _ctrl.animateToPage(
                   i,
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
-                ),
+                ); },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   margin: const EdgeInsets.symmetric(horizontal: 3),
@@ -3042,7 +3044,7 @@ class _WeekTile extends StatelessWidget {
     final text   = Theme.of(context).textTheme;
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: onTap != null ? () { _haptic(_HapticImpact.selection); onTap!(); } : null,
       behavior: HitTestBehavior.opaque,
       child: Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -3181,6 +3183,7 @@ class _RecentTrackRowState extends State<_RecentTrackRow> {
 
     return GestureDetector(
       onTap: () {
+        _haptic(_HapticImpact.light);
         final normalized = Map<String, dynamic>.from(track);
         final ra = track['artist'];
         if (ra is Map && ra['name'] == null) {

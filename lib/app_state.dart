@@ -37,6 +37,10 @@ final oledModeNotifier = ValueNotifier<bool>(false);
 ///   'off'  → always use the bottom navigation bar
 final pcModeNotifier = ValueNotifier<String>('auto');
 
+// Haptic feedback on key interactions.
+// Saved as 'ls_haptic_feedback' in SharedPreferences.
+final hapticFeedbackNotifier = ValueNotifier<bool>(true);
+
 // Show labels under nav bar icons. Saved as 'ls_nav_labels'.
 final navLabelNotifier = ValueNotifier<bool>(true);
 

@@ -22,7 +22,7 @@ import 'dart:ui' as ui;
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart' show Clipboard, ClipboardData;
+import 'package:flutter/services.dart' show Clipboard, ClipboardData, HapticFeedback;
 import 'package:http/http.dart' as http;
 import 'package:palette_generator/palette_generator.dart';
 import 'package:path_provider/path_provider.dart';
@@ -94,6 +94,19 @@ List<String> get _kMonths => L.months;
 
 BorderSide _cardBorder(ColorScheme s, {double alpha = 0.45}) =>
     BorderSide(color: s.outlineVariant.withValues(alpha: alpha), width: 1);
+
+// ── Haptic feedback ───────────────────────────────────────────────────────────
+enum _HapticImpact { selection, light, medium, heavy }
+
+void _haptic([_HapticImpact impact = _HapticImpact.light]) {
+  if (!hapticFeedbackNotifier.value) return;
+  switch (impact) {
+    case _HapticImpact.selection: HapticFeedback.selectionClick();
+    case _HapticImpact.light:     HapticFeedback.lightImpact();
+    case _HapticImpact.medium:    HapticFeedback.mediumImpact();
+    case _HapticImpact.heavy:     HapticFeedback.heavyImpact();
+  }
+}
 
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -223,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: _pageStack(pages, _kTabHistory + 1),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _idx,
-        onDestinationSelected: (i) => setState(() => _idx = i),
+        onDestinationSelected: (i) { _haptic(_HapticImpact.selection); setState(() => _idx = i); },
         destinations: _narrowDestinations,
       ),
     );
@@ -309,7 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: IntrinsicHeight(
                         child: NavigationRail(
                           selectedIndex:         _idx,
-                          onDestinationSelected: (i) => setState(() => _idx = i),
+                          onDestinationSelected: (i) { _haptic(_HapticImpact.selection); setState(() => _idx = i); },
                           extended:              !collapsed,
                           labelType: collapsed
                               ? NavigationRailLabelType.none

@@ -133,6 +133,7 @@ class _DismissOnOverscrollState extends State<_DismissOnOverscroll> {
         // black screen. Firing it once per gesture fixes it for good.
         if (_pulled < -60 && !_dismissed) {
           _dismissed = true;
+          _haptic(_HapticImpact.medium);
           widget.onDismiss();
         }
       }
@@ -348,6 +349,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   Future<void> _changePeriod(String p) async {
     if (p == _period) return;
+    _haptic(_HapticImpact.selection);
     setState(() { _period = p; _loadingUser = true; _userPlays = 0; _userRank = -1; });
     await _fetchUserStats();
   }
@@ -858,6 +860,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   // Toggle play / pause for the Deezer 30s preview clip.
   Future<void> _togglePreview() async {
     if (_previewUrl == null) return;
+    _haptic(_HapticImpact.medium);
 
     if (_isPlaying) {
       await _audioPlayer?.pause();
@@ -1969,6 +1972,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           top: topPad + 8, right: 12,
           child: GestureDetector(
             onTap: () {
+              _haptic(_HapticImpact.heavy);
               setState(() => _localIsFav = !_localIsFav);
               widget.onToggleFav();
             },

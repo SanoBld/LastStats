@@ -1,12 +1,18 @@
 // lib/screens/settings/appearance_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app_state.dart';
 import '../../nothing_theme.dart';
 import '../../l10n.dart';
 import 'settings_helpers.dart';
 import 'pc_mode_section.dart';
+
+// Local haptic helper for appearance page.
+void _ap_haptic() {
+  if (hapticFeedbackNotifier.value) HapticFeedback.lightImpact();
+}
 
 class AppearancePage extends StatefulWidget {
   const AppearancePage({super.key});
@@ -209,7 +215,7 @@ class _AppearancePageState extends State<AppearancePage> {
           const SizedBox(width: 12),
           Expanded(child: _StyleCard(
             selected:    _isNothing,
-            onTap:       () => _setStyle('nothing'),
+            onTap:       () { _ap_haptic(); _setStyle('nothing'); },
             showDark:    _theme != 'light', // light preview when light mode chosen
             accentColor: kNothingRed,
             child: Builder(builder: (ctx) {
@@ -265,7 +271,7 @@ class _AppearancePageState extends State<AppearancePage> {
                     desc:     isEn ? 'Red only' : 'Rouge uniquement',
                     selected: _nothingAccent == 'classic',
                     isDark:   _theme != 'light',
-                    onTap:    () => _setNothingAccent('classic'),
+                    onTap:    () { _ap_haptic(); _setNothingAccent('classic'); },
                   )),
                   const SizedBox(width: 10),
                   Expanded(child: _NothingAccentTile(
@@ -276,7 +282,7 @@ class _AppearancePageState extends State<AppearancePage> {
                     desc:     isEn ? 'Red + yellow touches' : 'Rouge + touches jaunes',
                     selected: _nothingAccent == 'mixed',
                     isDark:   _theme != 'light',
-                    onTap:    () => _setNothingAccent('mixed'),
+                    onTap:    () { _ap_haptic(); _setNothingAccent('mixed'); },
                   )),
                 ]),
               ],
@@ -654,6 +660,9 @@ class _AppearancePageState extends State<AppearancePage> {
         // ── PC / responsive layout mode — always active ───────────────────
         const PcModeSection(),
 
+        const SizedBox(height: 16),
+        const _HapticSection(),
+
         const SizedBox(height: 20),
         const RestartBanner(),
         const SizedBox(height: 20),
@@ -909,6 +918,52 @@ class _NavLabelSectionState extends State<_NavLabelSection> {
             await p.setBool('ls_nav_labels', v);
             setState(() => _labels = v);
             navLabelNotifier.value = v;
+          },
+        ),
+      ],
+    );
+  }
+}
+
+// ── Haptic feedback toggle ────────────────────────────────────────────────────
+
+class _HapticSection extends StatefulWidget {
+  const _HapticSection();
+  @override
+  State<_HapticSection> createState() => _HapticSectionState();
+}
+
+class _HapticSectionState extends State<_HapticSection> {
+  bool _haptic = true;
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((p) {
+      if (mounted) setState(() => _haptic = p.getBool('ls_haptic_feedback') ?? true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isEn   = localeNotifier.value == 'en';
+    return SettingsSection(
+      label: isEn ? 'Interactions' : 'Interactions',
+      children: [
+        SwitchListTile(
+          secondary: Icon(Icons.vibration_rounded, color: scheme.primary),
+          title: Text(isEn ? 'Haptic feedback' : 'Retour haptique'),
+          subtitle: Text(isEn
+              ? 'Vibrations on taps, selections and gestures'
+              : 'Vibrations sur les appuis, sélections et gestes'),
+          value: _haptic,
+          onChanged: (v) async {
+            final p = await SharedPreferences.getInstance();
+            await p.setBool('ls_haptic_feedback', v);
+            setState(() => _haptic = v);
+            hapticFeedbackNotifier.value = v;
+            if (v) HapticFeedback.mediumImpact(); // confirm it works
           },
         ),
       ],
