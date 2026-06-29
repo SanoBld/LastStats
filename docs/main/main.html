@@ -93,7 +93,8 @@
       fallbackHex != null ? accentFromString(fallbackHex) : accentNotifier.value;
 
   pcModeNotifier.value   = prefs.getString(&#39;ls_pc_mode&#39;) ?? &#39;auto&#39;;
-  navLabelNotifier.value = prefs.getBool(&#39;ls_nav_labels&#39;) ?? true;
+  navLabelNotifier.value     = prefs.getBool(&#39;ls_nav_labels&#39;)      ?? true;
+  hapticFeedbackNotifier.value = prefs.getBool(&#39;ls_haptic_feedback&#39;) ?? true;
 
   &#47;&#47; ── Data caches &amp; storage ────────────────────────────────────────────────
   await DataCache.init();
