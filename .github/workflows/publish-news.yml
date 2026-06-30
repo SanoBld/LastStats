@@ -1,0 +1,79 @@
+name: Publish app news
+
+# Manually triggered: fill in the form in the Actions tab to push a new
+# announcement to all app instances. Appends to news.json on gh-pages,
+# read by the dashboard's news bell at startup.
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: 'Title (short)'
+        required: true
+      body:
+        description: 'Message body'
+        required: false
+        default: ''
+      type:
+        description: 'Type'
+        required: true
+        type: choice
+        options:
+          - feature
+          - fix
+          - update
+          - alert
+          - info
+        default: info
+      emoji:
+        description: 'Emoji (optional, overrides type icon)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  publish-news:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Fetch the current news.json from gh-pages (if it exists) so we can
+      # prepend the new item instead of overwriting the whole file.
+      - name: Fetch existing news.json
+        run: |
+          curl -fsSL https://sanobld.github.io/LastStats/news.json -o existing.json || echo '{"items":[]}' > existing.json
+
+      - name: Build new news.json
+        env:
+          TITLE: ${{ inputs.title }}
+          BODY:  ${{ inputs.body }}
+          TYPE:  ${{ inputs.type }}
+          EMOJI: ${{ inputs.emoji }}
+        run: |
+          mkdir -p public
+          ID="news_$(date +%s)"
+          DATE=$(date +%d/%m)
+
+          NEW_ITEM=$(jq -n \
+            --arg id "$ID" \
+            --arg title "$TITLE" \
+            --arg body "$BODY" \
+            --arg type "$TYPE" \
+            --arg emoji "$EMOJI" \
+            --arg date "$DATE" \
+            '{id:$id, title:$title, body:$body, type:$type, emoji:$emoji, date:$date}')
+
+          # Prepend the new item, keep only the last 30 to avoid unbounded growth
+          jq --argjson newitem "$NEW_ITEM" \
+            '.items = ([$newitem] + .items) | .items |= .[:30]' \
+            existing.json > public/news.json
+
+          cat public/news.json
+
+      - name: Publish news.json to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          keep_files: true

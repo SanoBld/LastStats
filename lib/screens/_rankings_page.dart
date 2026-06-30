@@ -87,7 +87,7 @@ class _RankingsPageState extends State<_RankingsPage>
                   final sel = p.$1 == _period;
                   return Padding(padding: const EdgeInsets.only(right: 8),
                     child: FilterChip(label: Text(p.$2), selected: sel,
-                        onSelected: (_) { if (!sel) setState(() => _period = p.$1); }));
+                        onSelected: (_) { if (!sel) { _haptic(_HapticImpact.selection); setState(() => _period = p.$1); } }));
                 }).toList(),
               ),
             ),
@@ -268,7 +268,7 @@ class _TopListBodyState extends State<_TopListBody>
         if (_items.length >= 3)
           SliverToBoxAdapter(child: _PodiumWidget(
               items: _items.take(3).toList(), type: widget.type,
-              onTap: (item) => _showDetail(context, item as Map<String, dynamic>))),
+              onTap: (item) { _haptic(_HapticImpact.light); _showDetail(context, item as Map<String, dynamic>); })),
 
         SliverList(delegate: SliverChildBuilderDelegate(
           (ctx, i) {
@@ -295,7 +295,7 @@ class _TopListBodyState extends State<_TopListBody>
               default:        imgF = ImageService.resolveTrack(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null);
             }
             return InkWell(
-              onTap: () => _showDetail(ctx, item),
+              onTap: () { _haptic(_HapticImpact.light); _showDetail(ctx, item); },
               borderRadius: BorderRadius.circular(8),
               child: _FadeSlideIn(
                 // Stagger each item slightly for a cascade effect
@@ -363,7 +363,7 @@ class _PodiumWidget extends StatelessWidget {
             final (podC, podOn) = podiumColors[di];
 
             return Expanded(child: GestureDetector(
-              onTap: () => onTap(item),
+              onTap: () { _haptic(_HapticImpact.light); onTap(item); },
               child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(imgSz[col] / 4),

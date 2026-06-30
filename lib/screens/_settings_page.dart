@@ -255,7 +255,7 @@ class _SettingsPageState extends State<_SettingsPage> {
 
               // Profile card
               GestureDetector(
-                onTap: () => _push(context, AccountPage(username: widget.username)),
+                onTap: () { _haptic(_HapticImpact.light); _push(context, AccountPage(username: widget.username)); },
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -294,7 +294,7 @@ class _SettingsPageState extends State<_SettingsPage> {
               if (_updateInfo != null)
                 _UpdateBanner(
                   info: _updateInfo!,
-                  onTap: () => _push(context, const UpdatesPage()),
+                  onTap: () { _haptic(_HapticImpact.light); _push(context, const UpdatesPage()); },
                 ),
               if (_updateInfo != null) const SizedBox(height: 16),
 
@@ -315,7 +315,7 @@ class _SettingsPageState extends State<_SettingsPage> {
                   compact:  !isWide,
                   // Badge on Updates card (index 8)
                   badge: (i == 8 && _updateInfo != null) ? '!' : null,
-                  onTap: () => _push(ctx, cards[i].pageBuilder(widget.username)),
+                  onTap: () { _haptic(_HapticImpact.light); _push(ctx, cards[i].pageBuilder(widget.username)); },
                 ),
                 childCount: cards.length,
               ),

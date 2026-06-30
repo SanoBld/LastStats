@@ -569,7 +569,7 @@ class _ChartsPageState extends State<_ChartsPage>
                 ..._kCharts.map((c) => ListTile(
                   leading: Icon(c.$4, color: scheme.primary),
                   title: Text(_ct(c.$2, c.$3)),
-                  onTap: () => Navigator.pop(sh, c.$1),
+                  onTap: () { _haptic(_HapticImpact.selection); Navigator.pop(sh, c.$1); },
                 )),
                 const SizedBox(height: 8),
               ]),
@@ -600,7 +600,7 @@ class _ChartsPageState extends State<_ChartsPage>
           ),
           ...years.map((y) => ListTile(
             title: Text(y == 0 ? _ct('Tout le temps', 'All time') : '$y'),
-            onTap: () => Navigator.pop(sh, y),
+            onTap: () { _haptic(_HapticImpact.selection); Navigator.pop(sh, y); },
           )),
           const SizedBox(height: 8),
         ]),

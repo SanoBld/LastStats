@@ -115,6 +115,10 @@ class _DashboardPageState extends State<_DashboardPage> {
   bool _showTracks   = true;
   bool _showRecent   = true;
 
+  // In-app news feed
+  List<Map<String, dynamic>> _newsItems   = [];
+  int                        _unreadCount = 0;
+
   // Friends
   bool              _showFriends    = true;
   List<_FriendData> _friends        = [];
@@ -303,6 +307,7 @@ class _DashboardPageState extends State<_DashboardPage> {
       _saveToCache(res);
       if (_showFriends) _loadFriends();
       _fetchPeriodComparisons();
+      _fetchNews();
     } catch (e) {
       if (!mounted) return;
       if (!silent) {
@@ -453,11 +458,11 @@ class _DashboardPageState extends State<_DashboardPage> {
   }
 
   // Key on the profile tap target so we can find its position
-  final _settingsBtnKey = GlobalKey();
+  final _profileKey = GlobalKey();
 
-  // Show settings popup anchored to the bottom-right header button
-  Future<void> _showSettingsMenu() async {
-    final box = _settingsBtnKey.currentContext?.findRenderObject() as RenderBox?;
+  // Show popup bubble near the profile row
+  Future<void> _showProfileMenu() async {
+    final box = _profileKey.currentContext?.findRenderObject() as RenderBox?;
     if (box == null || !mounted) return;
     final pos    = box.localToGlobal(Offset.zero);
     final size   = box.size;
@@ -705,6 +710,37 @@ class _DashboardPageState extends State<_DashboardPage> {
         return a.username.toLowerCase().compareTo(b.username.toLowerCase());
       });
     });
+  }
+
+  // Fetch in-app news from gh-pages JSON.
+  // URL: https://sanobld.github.io/LastStats/news.json
+  Future<void> _fetchNews() async {
+    try {
+      final res = await http.get(
+        Uri.parse('https://sanobld.github.io/LastStats/news.json'),
+      ).timeout(const Duration(seconds: 6));
+      if (res.statusCode != 200 || !mounted) return;
+
+      final data  = jsonDecode(res.body) as Map<String, dynamic>;
+      final items = (data['items'] as List?)
+              ?.cast<Map<String, dynamic>>() ?? [];
+
+      // Load IDs already seen by the user
+      final p    = await SharedPreferences.getInstance();
+      final seen = Set<String>.from(p.getStringList('ls_news_seen') ?? []);
+      final unread = items.where((i) => !seen.contains(i['id'] ?? '')).length;
+
+      if (mounted) setState(() { _newsItems = items; _unreadCount = unread; });
+    } catch (_) {}
+  }
+
+  // Mark all news as read and persist.
+  Future<void> _markNewsRead() async {
+    if (_newsItems.isEmpty) return;
+    final p   = await SharedPreferences.getInstance();
+    final ids = _newsItems.map((i) => (i['id'] ?? '').toString()).toList();
+    await p.setStringList('ls_news_seen', ids);
+    if (mounted) setState(() => _unreadCount = 0);
   }
 
   Future<void> _resolveHeaderImage() async {
@@ -1155,7 +1191,10 @@ class _DashboardPageState extends State<_DashboardPage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(children: [
+                        GestureDetector(
+                          key: _profileKey,
+                          onTap: _showProfileMenu,
+                          child: Row(children: [
                           Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
@@ -1229,6 +1268,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                             ],
                           )),
                         ]),
+                        ),  // GestureDetector
                       ],
                     ),
                   ),
@@ -1244,52 +1284,6 @@ class _DashboardPageState extends State<_DashboardPage> {
                       child: _SyncProgressChip(progress: progress),
                     );
                   },
-                ),
-
-                // Settings button — bottom-right of header image
-                // Tap → settings page. Long press → options popup.
-                Positioned(
-                  right: 12,
-                  bottom: 12,
-                  child: GestureDetector(
-                    key: _settingsBtnKey,
-                    onTap: () async {
-                      _haptic(_HapticImpact.light);
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => Scaffold(
-                            appBar: AppBar(
-                              title: Text(L.navSettings),
-                              scrolledUnderElevation: 0,
-                            ),
-                            body: _SettingsPage(username: widget.username),
-                          ),
-                        ),
-                      );
-                      if (mounted) {
-                        await _loadPrefs();
-                        _resolveHeaderImage();
-                      }
-                    },
-                    onLongPress: () { _haptic(_HapticImpact.medium); _showSettingsMenu(); },
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.28),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.15),
-                          width: 0.8,
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.settings_rounded,
-                        color: Colors.white.withValues(alpha: 0.75),
-                        size: 15,
-                      ),
-                    ),
-                  ),
                 ),
               ],
             ),
@@ -3457,6 +3451,163 @@ class _AmbientHeaderState extends State<_AmbientHeader>
               )
             : _GradientHeader(scheme: widget.scheme),
       ),
+    );
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  In-app news sheet
+// ══════════════════════════════════════════════════════════════════════════════
+
+class _NewsSheet extends StatelessWidget {
+  final List<Map<String, dynamic>> items;
+  const _NewsSheet({required this.items});
+
+  // Map type key to icon + color
+  static (IconData, Color) _typeStyle(String type) => switch (type) {
+    'feature' => (Icons.auto_awesome_rounded,    Color(0xFF7C3AED)),
+    'fix'     => (Icons.build_circle_outlined,   Color(0xFFD97706)),
+    'update'  => (Icons.system_update_rounded,   Color(0xFF059669)),
+    'alert'   => (Icons.warning_amber_rounded,   Color(0xFFDC2626)),
+    _         => (Icons.info_outline_rounded,    Color(0xFF1D4ED8)),
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+    final isEn   = localeNotifier.value == 'en';
+
+    return DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.55,
+      minChildSize:     0.35,
+      maxChildSize:     0.90,
+      builder: (ctx, scroll) => Column(children: [
+        // Header
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+          child: Row(children: [
+            Icon(Icons.notifications_rounded,
+                size: 20, color: scheme.primary),
+            const SizedBox(width: 10),
+            Text(
+              isEn ? "What's new" : 'Actualités',
+              style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+            ),
+          ]),
+        ),
+        const Divider(height: 1),
+
+        // List
+        Expanded(
+          child: items.isEmpty
+              ? Center(child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.notifications_off_outlined,
+                        size: 40, color: scheme.onSurfaceVariant),
+                    const SizedBox(height: 12),
+                    Text(
+                      isEn ? 'No news yet' : "Pas d'actualité pour le moment",
+                      style: text.bodyMedium?.copyWith(
+                          color: scheme.onSurfaceVariant),
+                    ),
+                  ],
+                ))
+              : ListView.separated(
+                  controller:  scroll,
+                  padding:     const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                  itemCount:   items.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemBuilder: (_, i) {
+                    final item  = items[i];
+                    final title = (item['title'] ?? '').toString();
+                    final body  = (item['body']  ?? '').toString();
+                    final type  = (item['type']  ?? 'info').toString();
+                    final date  = (item['date']  ?? '').toString();
+                    final emoji = (item['emoji'] ?? '').toString();
+                    final (icon, color) = _typeStyle(type);
+
+                    return Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color:        scheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: color.withValues(alpha: 0.25),
+                        ),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Icon / emoji
+                          Container(
+                            width: 36, height: 36,
+                            decoration: BoxDecoration(
+                              color:        color.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: emoji.isNotEmpty
+                                  ? Text(emoji,
+                                      style: const TextStyle(fontSize: 18))
+                                  : Icon(icon, size: 18, color: color),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // Content
+                          Expanded(child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(children: [
+                                Expanded(
+                                  child: Text(title,
+                                    style: text.bodyMedium?.copyWith(
+                                        fontWeight: FontWeight.w700)),
+                                ),
+                                if (date.isNotEmpty)
+                                  Text(date,
+                                    style: text.labelSmall?.copyWith(
+                                        color: scheme.onSurfaceVariant,
+                                        fontSize: 10)),
+                              ]),
+                              if (body.isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                Text(body,
+                                  style: text.bodySmall?.copyWith(
+                                      color: scheme.onSurfaceVariant,
+                                      height: 1.4)),
+                              ],
+                              // Type badge
+                              const SizedBox(height: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 7, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color:        color.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  type.toUpperCase(),
+                                  style: TextStyle(
+                                    color:         color,
+                                    fontSize:      9,
+                                    fontWeight:    FontWeight.w700,
+                                    letterSpacing: 0.8,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ]),
     );
   }
 }

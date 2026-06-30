@@ -129,12 +129,12 @@ class _HistoryPageState extends State<_HistoryPage>
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(children: [
-              _TapScale(child: _HistNavBtn(icon: Icons.chevron_left_rounded, onTap: _prev, scheme: scheme)),
+              _TapScale(child: _HistNavBtn(icon: Icons.chevron_left_rounded, onTap: () { _haptic(_HapticImpact.selection); _prev(); }, scheme: scheme)),
               const SizedBox(width: 8),
               Expanded(
                 child: _TapScale(
                   child: GestureDetector(
-                    onTap: _pickDate,
+                    onTap: () { _haptic(_HapticImpact.selection); _pickDate(); },
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
                       decoration: BoxDecoration(
@@ -436,9 +436,15 @@ class _HistTrackRow extends StatelessWidget {
     final raw    = _extractImage(track['image']);
 
     return InkWell(
-      onTap: () => showDetailSheet(context,
-        {'name': tit, 'artist': {'name': art}, 'album': {'title': alb}, 'image': track['image']},
-        'tracks', service),
+      onTap: () {
+        _haptic(_HapticImpact.light);
+        showDetailSheet(
+          context,
+          {'name': tit, 'artist': {'name': art}, 'album': {'title': alb}, 'image': track['image']},
+          'tracks',
+          service,
+        );
+      },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
         child: Row(children: [
@@ -499,9 +505,15 @@ class _HistListeView extends StatelessWidget {
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           trailing: Text(timeOnly,
               style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
-          onTap: () => showDetailSheet(context,
-            {'name': tit, 'artist': {'name': art}, 'album': {'title': alb}, 'image': t['image']},
-            'tracks', service),
+          onTap: () {
+            _haptic(_HapticImpact.light);
+            showDetailSheet(
+              context,
+              {'name': tit, 'artist': {'name': art}, 'album': {'title': alb}, 'image': t['image']},
+              'tracks',
+              service,
+            );
+          },
         );
       },
     );

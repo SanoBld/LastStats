@@ -759,7 +759,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
               borderRadius: BorderRadius.circular(18),
               child: InkWell(
                 borderRadius: BorderRadius.circular(18),
-                onTap: () => _openItemDetail(context, _topMatch!),
+                onTap: () { _haptic(_HapticImpact.light); _openItemDetail(context, _topMatch!); },
                 child: _TopMatchCard(match: _topMatch!),
               ),
             ),
@@ -883,7 +883,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
         children: [
           InkWell(
             borderRadius: BorderRadius.circular(16),
-            onTap: empty ? null : () => setState(() => _expanded = !_expanded),
+            onTap: empty ? null : () { _haptic(_HapticImpact.selection); setState(() => _expanded = !_expanded); },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               child: Row(
@@ -945,7 +945,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
                               _RankedListTile(
                                 rank:   i + 1,
                                 match:  widget.matches[i],
-                                onTap:  () => widget.onItemTap(widget.matches[i]),
+                                onTap:  () { _haptic(_HapticImpact.light); widget.onItemTap(widget.matches[i]); },
                                 scheme: scheme,
                                 text:   text,
                               ),
@@ -1131,7 +1131,7 @@ class _ItemCompareSheet extends StatelessWidget {
             // Tap the header again to open the full item page (bio, top tracks, etc).
             InkWell(
               borderRadius: BorderRadius.circular(20),
-              onTap: () => showDetailSheet(context, _asLastFmItem, _detailType, service),
+              onTap: () { _haptic(_HapticImpact.light); showDetailSheet(context, _asLastFmItem, _detailType, service); },
               child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: Column(

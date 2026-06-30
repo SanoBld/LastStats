@@ -217,7 +217,7 @@ class _SearchPageState extends State<_SearchPage> {
                       label:  Text(t.$2),
                       selected: sel,
                       showCheckmark: false,
-                      onSelected: (_) => _switchTab(t.$1),
+                      onSelected: (_) { _haptic(_HapticImpact.selection); _switchTab(t.$1); },
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                     ),
                   );
@@ -286,7 +286,7 @@ class _SearchPageState extends State<_SearchPage> {
                     child: _SearchUserCard(
                       user:        u,
                       isFav:       isFav,
-                      onTap:       () => _openProfile(ctx, uname),
+                      onTap:       () { _haptic(_HapticImpact.light); _openProfile(ctx, uname); },
                       onToggleFav: () => _toggleFavProfile(uname, !isFav),
                     ),
                   );
@@ -303,7 +303,7 @@ class _SearchPageState extends State<_SearchPage> {
               final raw  = _extractImage(item['image']);
               return InkWell(
                 borderRadius: BorderRadius.circular(10),
-                onTap: () => _openMusicDetail(context, item, 'artists'),
+                onTap: () { _haptic(_HapticImpact.light); _openMusicDetail(context, item, 'artists'); },
                 child: _ItemTile(name: name, sub: '', imageUrl: raw, rank: '',
                   imageFuture: ImageService.resolveArtist(name, lastfmUrl: raw.isNotEmpty ? raw : null)),
               );
@@ -320,7 +320,7 @@ class _SearchPageState extends State<_SearchPage> {
               if (item['artist'] is String) norm['artist'] = {'name': artist};
               return InkWell(
                 borderRadius: BorderRadius.circular(10),
-                onTap: () => _openMusicDetail(context, norm, 'albums'),
+                onTap: () { _haptic(_HapticImpact.light); _openMusicDetail(context, norm, 'albums'); },
                 child: _ItemTile(name: name, sub: artist, imageUrl: raw, rank: '',
                   imageFuture: ImageService.resolveAlbum(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null)),
               );
@@ -337,7 +337,7 @@ class _SearchPageState extends State<_SearchPage> {
               if (item['artist'] is String) norm['artist'] = {'name': artist};
               return InkWell(
                 borderRadius: BorderRadius.circular(10),
-                onTap: () => _openMusicDetail(context, norm, 'tracks'),
+                onTap: () { _haptic(_HapticImpact.light); _openMusicDetail(context, norm, 'tracks'); },
                 child: _ItemTile(name: name, sub: artist, imageUrl: raw, rank: '',
                   imageFuture: ImageService.resolveTrack(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null)),
               );
@@ -372,7 +372,7 @@ class _SearchPageState extends State<_SearchPage> {
           return _SearchUserCard(
             user:        u,
             isFav:       isFav,
-            onTap:       () => _openProfile(ctx, uname),
+            onTap:       () { _haptic(_HapticImpact.light); _openProfile(ctx, uname); },
             onToggleFav: () => _toggleFavProfile(uname, !isFav),
           );
         },
@@ -426,7 +426,7 @@ class _SearchPageState extends State<_SearchPage> {
       child: _SearchUserCard(
         user:        u,
         isFav:       isFav,
-        onTap:       () => _openProfile(ctx, uname),
+        onTap:       () { _haptic(_HapticImpact.light); _openProfile(ctx, uname); },
         onToggleFav: () => _toggleFavProfile(uname, !isFav),
       ),
     );
