@@ -459,6 +459,10 @@ class _DashboardPageState extends State<_DashboardPage> {
 
   // Key on the profile tap target so we can find its position
   final _profileKey = GlobalKey();
+  // Key on the discrete settings button (bottom-right of header)
+  final _settingsBtnKey = GlobalKey();
+  // Key on the news bell button (left of settings button)
+  final _newsBtnKey = GlobalKey();
 
   // Show popup bubble near the profile row
   Future<void> _showProfileMenu() async {
@@ -531,6 +535,99 @@ class _DashboardPageState extends State<_DashboardPage> {
       case 'reset':
         _confirmResetCache();
     }
+  }
+
+  // Open the settings page directly (short tap on the discrete button)
+  Future<void> _openSettings() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          appBar: AppBar(
+            title: Text(L.navSettings),
+            scrolledUnderElevation: 0,
+          ),
+          body: _SettingsPage(username: widget.username),
+        ),
+      ),
+    );
+    if (mounted) {
+      await _loadPrefs();
+      _resolveHeaderImage();
+    }
+  }
+
+  // Show popup bubble near the settings button (long press = more options)
+  Future<void> _showSettingsMenu() async {
+    final box = _settingsBtnKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null || !mounted) return;
+    final pos    = box.localToGlobal(Offset.zero);
+    final size   = box.size;
+    final screen = MediaQuery.of(context).size;
+
+    final result = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        screen.width - pos.dx - size.width,
+        pos.dy + size.height + 4,
+        pos.dx,
+        0,
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      items: [
+        PopupMenuItem(
+          value: 'refresh',
+          child: Row(children: [
+            const Icon(Icons.refresh_rounded, size: 20),
+            const SizedBox(width: 10),
+            Text(L.dashRefresh),
+          ]),
+        ),
+        PopupMenuItem(
+          value: 'settings',
+          child: Row(children: [
+            const Icon(Icons.settings_outlined, size: 20),
+            const SizedBox(width: 10),
+            Text(L.navSettings),
+          ]),
+        ),
+        PopupMenuItem(
+          value: 'reset',
+          child: Builder(builder: (ctx) {
+            final color = Theme.of(ctx).colorScheme.error;
+            return Row(children: [
+              Icon(Icons.delete_sweep_outlined, size: 20, color: color),
+              const SizedBox(width: 10),
+              Text(L.dashResetCache, style: TextStyle(color: color)),
+            ]);
+          }),
+        ),
+      ],
+    );
+
+    if (!mounted) return;
+    switch (result) {
+      case 'refresh':
+        _load();
+      case 'settings':
+        await _openSettings();
+      case 'reset':
+        _confirmResetCache();
+    }
+  }
+
+  // Open the news bell bottom sheet, anchored from the bell button
+  void _openNewsSheet() {
+    _haptic(_HapticImpact.light);
+    _markNewsRead();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _NewsSheet(items: _newsItems),
+    );
   }
 
   // Confirmation dialog then full cache wipe + reload
@@ -1193,7 +1290,6 @@ class _DashboardPageState extends State<_DashboardPage> {
                       children: [
                         GestureDetector(
                           key: _profileKey,
-                          onTap: _showProfileMenu,
                           child: Row(children: [
                           Container(
                             decoration: BoxDecoration(
@@ -1273,6 +1369,90 @@ class _DashboardPageState extends State<_DashboardPage> {
                     ),
                   ),
                 ),
+                // Discrete bell (news) + settings buttons, bottom-right of header
+                Positioned(
+                  right: 14,
+                  bottom: 14,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // News bell with unread badge
+                      GestureDetector(
+                        key: _newsBtnKey,
+                        onTap: _openNewsSheet,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              width: 30, height: 30,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black.withValues(alpha: 0.28),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.15),
+                                  width: 0.8,
+                                ),
+                              ),
+                              child: Icon(Icons.notifications_rounded,
+                                  size: 15,
+                                  color: Colors.white.withValues(alpha: 0.75)),
+                            ),
+                            if (_unreadCount > 0)
+                              Positioned(
+                                right: -2, top: -2,
+                                child: Container(
+                                  padding: const EdgeInsets.all(2.5),
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(0xFFE53935),
+                                  ),
+                                  constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+                                  child: Text(
+                                    _unreadCount > 9 ? '9+' : '$_unreadCount',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 8,
+                                      fontWeight: FontWeight.w800,
+                                      height: 1,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // Settings: tap → open settings, long press → bubble menu
+                      GestureDetector(
+                        key: _settingsBtnKey,
+                        onTap: () {
+                          _haptic(_HapticImpact.light);
+                          _openSettings();
+                        },
+                        onLongPress: () {
+                          _haptic(_HapticImpact.medium);
+                          _showSettingsMenu();
+                        },
+                        child: Container(
+                          width: 30, height: 30,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.black.withValues(alpha: 0.28),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              width: 0.8,
+                            ),
+                          ),
+                          child: Icon(Icons.settings_rounded,
+                              size: 15,
+                              color: Colors.white.withValues(alpha: 0.75)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
                 // Sync chip top-left when syncing
                 ValueListenableBuilder<AllScrobblesProgress>(
                   valueListenable: AllScrobblesService.progressNotifier,
