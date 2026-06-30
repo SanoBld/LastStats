@@ -812,6 +812,17 @@ class _DashboardPageState extends State<_DashboardPage> {
   // Fetch in-app news from gh-pages JSON.
   // URL: https://sanobld.github.io/LastStats/news.json
   Future<void> _fetchNews() async {
+    // Pending app update, stored locally by the background worker — merged
+    // in so it also shows up in this bell, not just as a push notification.
+    Map<String, dynamic>? localUpdate;
+    try {
+      final p   = await SharedPreferences.getInstance();
+      final raw = p.getString('ls_local_update_news');
+      if (raw != null && raw.isNotEmpty) {
+        localUpdate = Map<String, dynamic>.from(jsonDecode(raw) as Map);
+      }
+    } catch (_) {}
+
     try {
       final res = await http.get(
         Uri.parse('https://sanobld.github.io/LastStats/news.json'),
@@ -819,8 +830,10 @@ class _DashboardPageState extends State<_DashboardPage> {
       if (res.statusCode != 200 || !mounted) return;
 
       final data  = jsonDecode(res.body) as Map<String, dynamic>;
-      final items = (data['items'] as List?)
+      var items = (data['items'] as List?)
               ?.cast<Map<String, dynamic>>() ?? [];
+
+      if (localUpdate != null) items = [localUpdate, ...items];
 
       // Load IDs already seen by the user
       final p    = await SharedPreferences.getInstance();
@@ -828,7 +841,12 @@ class _DashboardPageState extends State<_DashboardPage> {
       final unread = items.where((i) => !seen.contains(i['id'] ?? '')).length;
 
       if (mounted) setState(() { _newsItems = items; _unreadCount = unread; });
-    } catch (_) {}
+    } catch (_) {
+      // Even if the network fetch fails, still show the local update item.
+      if (localUpdate != null && mounted) {
+        setState(() { _newsItems = [localUpdate!]; _unreadCount = 1; });
+      }
+    }
   }
 
   // Mark all news as read and persist.
@@ -1397,28 +1415,35 @@ class _DashboardPageState extends State<_DashboardPage> {
                                   size: 15,
                                   color: Colors.white.withValues(alpha: 0.75)),
                             ),
-                            if (_unreadCount > 0)
-                              Positioned(
-                                right: -2, top: -2,
-                                child: Container(
-                                  padding: const EdgeInsets.all(2.5),
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Color(0xFFE53935),
-                                  ),
-                                  constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
-                                  child: Text(
-                                    _unreadCount > 9 ? '9+' : '$_unreadCount',
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 8,
-                                      fontWeight: FontWeight.w800,
-                                      height: 1,
+                            ValueListenableBuilder<bool>(
+                              valueListenable: showNewsBadgeNotifier,
+                              builder: (_, showBadge, _) {
+                                if (!showBadge || _unreadCount <= 0) {
+                                  return const SizedBox.shrink();
+                                }
+                                return Positioned(
+                                  right: -2, top: -2,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(2.5),
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Color(0xFFE53935),
+                                    ),
+                                    constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+                                    child: Text(
+                                      _unreadCount > 9 ? '9+' : '$_unreadCount',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.w800,
+                                        height: 1,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
+                                );
+                              },
+                            ),
                           ],
                         ),
                       ),
@@ -3728,10 +3753,30 @@ class _NewsSheet extends StatelessWidget {
                     final emoji = (item['emoji'] ?? '').toString();
                     final (icon, color) = _typeStyle(type);
 
-                    return Container(
+                    final url = (item['url'] ?? '').toString();
+
+                    return Material(
+                      color:        scheme.surfaceContainerHigh,
+                      borderRadius: BorderRadius.circular(16),
+                      clipBehavior: Clip.antiAlias,
+                      child: InkWell(
+                        onTap: () {
+                          _haptic(_HapticImpact.light);
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => NotificationDetailPage(data: {
+                              'type':     'news',
+                              'title':    title,
+                              'body':     body,
+                              'newsType': type,
+                              'date':     date,
+                              'emoji':    emoji,
+                              if (url.isNotEmpty) 'url': url,
+                            }),
+                          ));
+                        },
+                        child: Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color:        scheme.surfaceContainerHigh,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: scheme.outlineVariant.withValues(alpha: 0.35),
@@ -3807,6 +3852,8 @@ class _NewsSheet extends StatelessWidget {
                             ],
                           )),
                         ],
+                      ),
+                        ),
                       ),
                     );
                   },

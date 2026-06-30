@@ -1,10 +1,17 @@
 // lib/services/notification_service.dart
 
-import 'package:flutter/painting.dart';
+import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../screens/notification_detail_page.dart';
 
 const _kLastFmRed = Color(0xFFD51007);
+
+// Global navigator key — lets us push a screen (the notification detail page)
+// from outside the widget tree, e.g. when a notification is tapped while the
+// app is running in the background. main.dart wires this into MaterialApp.
+final navigatorKey = GlobalKey<NavigatorState>();
 
 class NotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
@@ -18,6 +25,8 @@ class NotificationService {
   static const _chRecapName     = 'Listening recaps';
   static const _chUpdateId      = 'ls_update';
   static const _chUpdateName    = 'App updates';
+  static const _chNewsId        = 'ls_news';
+  static const _chNewsName      = 'News & announcements';
 
   // ── Notification IDs ─────────────────────────────────────────────────────
   static const _idMilestone   = 1;
@@ -26,6 +35,10 @@ class NotificationService {
   static const _idGrand       = 4;
   static const _idUpdate      = 5;
   static const _idTest        = 99;
+
+  // News notifications use a stable id derived from the item's own id so
+  // re-showing the same item (shouldn't happen) doesn't duplicate it.
+  static int _idNews(String newsId) => 1000 + (newsId.hashCode & 0x7FFFFFF);
 
   // ── Init ─────────────────────────────────────────────────────────────────
 
@@ -39,14 +52,10 @@ class NotificationService {
     await _plugin.initialize(
       const InitializationSettings(android: android, iOS: ios),
       // Tap handler when app is in foreground or background.
-      // The payload is the download URL set in showUpdateAvailable().
+      // Opens the in-app detail page so the user sees the full notification
+      // (title + body, larger) and can follow a link if there is one.
       onDidReceiveNotificationResponse: (details) async {
-        final payload = details.payload;
-        if (payload == null || payload.isEmpty) return;
-        final url = Uri.tryParse(payload);
-        if (url != null && await canLaunchUrl(url)) {
-          await launchUrl(url, mode: LaunchMode.externalApplication);
-        }
+        await _handleTap(details.payload);
       },
     );
 
@@ -84,6 +93,14 @@ class NotificationService {
         importance:  Importance.high,
       ),
     );
+
+    await androidImpl?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        _chNewsId, _chNewsName,
+        description: 'New features, fixes and announcements about LastStats',
+        importance:  Importance.defaultImportance,
+      ),
+    );
   }
 
   // ── Permissions ──────────────────────────────────────────────────────────
@@ -105,25 +122,80 @@ class NotificationService {
     return await android?.areNotificationsEnabled() ?? true;
   }
 
-  // ── Launch payload (terminated-state tap) ─────────────────────────────────
-  // Call this in main() after init(). Returns the payload URL if the app was
-  // launched by tapping a notification (e.g. the update notification).
+  // ── Tap handling ─────────────────────────────────────────────────────────
 
-  static Future<String?> getLaunchPayload() async {
+  // Pushes the detail page using the global navigatorKey. Safe to call even
+  // if there's no navigator ready yet (e.g. super-early background tap) —
+  // it simply does nothing in that case.
+  static Future<void> _handleTap(String? payload) async {
+    final data = decodePayload(payload);
+    if (data == null) return;
+    final nav = navigatorKey.currentState;
+    if (nav == null) return;
+    nav.push(MaterialPageRoute(
+      builder: (_) => NotificationDetailPage(data: data),
+    ));
+  }
+
+  /// Call this once in main() right after init(). If the app was launched
+  /// (cold start) by tapping a notification, returns its decoded payload so
+  /// the caller can navigate to the detail page once the app is ready.
+  static Future<Map<String, dynamic>?> getLaunchPayloadData() async {
     final details = await _plugin.getNotificationAppLaunchDetails();
     if (details?.didNotificationLaunchApp == true) {
-      return details?.notificationResponse?.payload;
+      return decodePayload(details?.notificationResponse?.payload);
     }
     return null;
   }
 
+  /// Decodes a notification payload into a structured map.
+  /// Accepts both the new JSON format and the old plain-URL format used by
+  /// earlier app versions, so updates from old installs still work.
+  static Map<String, dynamic>? decodePayload(String? raw) {
+    if (raw == null || raw.isEmpty) return null;
+    if (!raw.trim().startsWith('{')) {
+      // Legacy payload: a bare download URL from showUpdateAvailable().
+      return {
+        'type':  'update',
+        'title': '🆕 Update available',
+        'body':  '',
+        'url':   raw,
+      };
+    }
+    try {
+      return Map<String, dynamic>.from(jsonDecode(raw) as Map);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static String _payload({
+    required String type,
+    required String title,
+    required String body,
+    String? url,
+    String? date,
+    String? newsType,
+    String? emoji,
+  }) =>
+      jsonEncode({
+        'type':  type,
+        'title': title,
+        'body':  body,
+        if (url      != null && url.isNotEmpty)      'url':      url,
+        if (date     != null && date.isNotEmpty)     'date':     date,
+        if (newsType != null && newsType.isNotEmpty) 'newsType': newsType,
+        if (emoji    != null && emoji.isNotEmpty)    'emoji':    emoji,
+      });
+
   // ── Show helpers ─────────────────────────────────────────────────────────
 
   static Future<void> showMilestone(int count) {
-    final body = 'You just hit ${_fmt(count)} scrobbles on Last.fm 🎶';
+    final title = '🎵 Milestone: ${_fmt(count)} scrobbles';
+    final body  = 'You just hit ${_fmt(count)} scrobbles on Last.fm 🎶';
     return _plugin.show(
       _idMilestone,
-      '🎵 Milestone: ${_fmt(count)} scrobbles',
+      title,
       body,
       NotificationDetails(
         android: AndroidNotificationDetails(
@@ -133,11 +205,12 @@ class NotificationService {
           subText: 'LastStats',
           styleInformation: BigTextStyleInformation(
             body,
-            contentTitle: '🎵 Milestone: ${_fmt(count)} scrobbles',
+            contentTitle: title,
             summaryText:  'LastStats',
           ),
         ),
       ),
+      payload: _payload(type: 'milestone', title: title, body: body),
     );
   }
 
@@ -163,6 +236,7 @@ class NotificationService {
           ),
         ),
       ),
+      payload: _payload(type: 'grand', title: title, body: body),
     );
   }
 
@@ -170,59 +244,67 @@ class NotificationService {
     required int    count,
     required String topArtist,
     required String date,
-  }) =>
-      _plugin.show(
-        _idDailyRecap,
-        '📊 Daily recap · $date',
-        '${_fmt(count)} scrobbles · Top: $topArtist',
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            _chRecapId, _chRecapName,
-            icon:    '@mipmap/ic_launcher',
-            color:   _kLastFmRed,
-            subText: 'LastStats',
-            styleInformation: InboxStyleInformation(
-              ['${_fmt(count)} scrobbles today', 'Top artist: $topArtist'],
-              contentTitle: '📊 Daily recap · $date',
-              summaryText:  'LastStats',
-            ),
+  }) {
+    final title = '📊 Daily recap · $date';
+    final body  = '${_fmt(count)} scrobbles · Top: $topArtist';
+    return _plugin.show(
+      _idDailyRecap,
+      title,
+      body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          _chRecapId, _chRecapName,
+          icon:    '@mipmap/ic_launcher',
+          color:   _kLastFmRed,
+          subText: 'LastStats',
+          styleInformation: InboxStyleInformation(
+            ['${_fmt(count)} scrobbles today', 'Top artist: $topArtist'],
+            contentTitle: title,
+            summaryText:  'LastStats',
           ),
         ),
-      );
+      ),
+      payload: _payload(type: 'daily', title: title, body: body, date: date),
+    );
+  }
 
   static Future<void> showWeeklyRecap({
     required int    count,
     required String topArtist,
     required String weekLabel,
-  }) =>
-      _plugin.show(
-        _idWeeklyRecap,
-        '📅 Weekly recap · $weekLabel',
-        '${_fmt(count)} scrobbles · Top: $topArtist',
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            _chRecapId, _chRecapName,
-            icon:    '@mipmap/ic_launcher',
-            color:   _kLastFmRed,
-            subText: 'LastStats',
-            styleInformation: InboxStyleInformation(
-              [
-                '${_fmt(count)} scrobbles this week',
-                'Top artist: $topArtist',
-              ],
-              contentTitle: '📅 Weekly recap · $weekLabel',
-              summaryText:  'LastStats',
-            ),
+  }) {
+    final title = '📅 Weekly recap · $weekLabel';
+    final body  = '${_fmt(count)} scrobbles · Top: $topArtist';
+    return _plugin.show(
+      _idWeeklyRecap,
+      title,
+      body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          _chRecapId, _chRecapName,
+          icon:    '@mipmap/ic_launcher',
+          color:   _kLastFmRed,
+          subText: 'LastStats',
+          styleInformation: InboxStyleInformation(
+            [
+              '${_fmt(count)} scrobbles this week',
+              'Top artist: $topArtist',
+            ],
+            contentTitle: title,
+            summaryText:  'LastStats',
           ),
         ),
-      );
+      ),
+      payload: _payload(type: 'weekly', title: title, body: body, date: weekLabel),
+    );
+  }
 
   /// Fires a high-importance notification when a new version is available.
-  /// [downloadUrl] is stored as the payload so tapping it launches the download
-  /// directly — no extra step needed.
+  /// Tapping it opens the in-app detail page with an "Open" button that
+  /// launches [downloadUrl] — it's no longer launched automatically.
   static Future<void> showUpdateAvailable(String version, String downloadUrl) {
     const title = '🆕 Update available';
-    final body  = 'LastStats $version is ready — tap to download.';
+    final body  = 'LastStats $version is ready — tap to view.';
     return _plugin.show(
       _idUpdate,
       title,
@@ -242,9 +324,56 @@ class NotificationService {
           ),
         ),
       ),
-      payload: downloadUrl,
+      payload: _payload(
+        type: 'update', title: title, body: body, url: downloadUrl,
+      ),
     );
   }
+
+  /// Fires a notification for a new in-app "actualité" (news) item.
+  /// [type] mirrors the dashboard's news types: feature, fix, update, alert, info.
+  /// Colors match the in-app news sheet so the experience is consistent.
+  static Future<void> showNews({
+    required String id,
+    required String title,
+    required String body,
+    required String type,
+    String emoji = '',
+    String date  = '',
+  }) {
+    final color    = _newsColor(type);
+    final fullTitle = emoji.isNotEmpty ? '$emoji $title' : title;
+    return _plugin.show(
+      _idNews(id),
+      fullTitle,
+      body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          _chNewsId, _chNewsName,
+          icon:    '@mipmap/ic_launcher',
+          color:   color,
+          subText: 'LastStats',
+          styleInformation: BigTextStyleInformation(
+            body,
+            contentTitle: fullTitle,
+            summaryText:  'LastStats',
+          ),
+        ),
+      ),
+      payload: _payload(
+        type: 'news', title: title, body: body,
+        date: date, newsType: type, emoji: emoji,
+      ),
+    );
+  }
+
+  static Color _newsColor(String type) => switch (type) {
+    'feature' => const Color(0xFF7C3AED),
+    'fix'     => const Color(0xFFD97706),
+    'update'  => const Color(0xFF059669),
+    'alert'   => const Color(0xFFDC2626),
+    _         => const Color(0xFF1D4ED8),
+  };
 
   static Future<void> showTest() => _plugin.show(
         _idTest,
@@ -257,6 +386,11 @@ class NotificationService {
             color:   _kLastFmRed,
             subText: 'LastStats',
           ),
+        ),
+        payload: _payload(
+          type:  'test',
+          title: '🔔 Test notification',
+          body:  'LastStats notifications are working!',
         ),
       );
 

@@ -17,6 +17,8 @@ const _kWeeklyEnabled     = 'ls_notif_weekly_enabled';
 const _kWeeklyDay         = 'ls_notif_weekly_day';
 const _kWeeklyHour        = 'ls_notif_weekly_hour';
 const _kWeeklyMin         = 'ls_notif_weekly_min';
+const _kNewsEnabled       = 'ls_notif_news_enabled';
+const _kShowNewsBadge     = 'ls_show_news_badge';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -48,6 +50,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
   int  _weeklyDay  = 1; // 1 = Monday
   int  _weeklyHour = 20;
   int  _weeklyMin  = 0;
+
+  // News (actualités) push notifications + home badge visibility
+  bool _newsOn      = false;
+  bool _showBadge   = true;
 
   // Test-notification feedback
   bool _testSent = false;
@@ -87,6 +93,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
       _weeklyHour = prefs.getInt(_kWeeklyHour)     ?? 20;
       _weeklyMin  = prefs.getInt(_kWeeklyMin)      ?? 0;
 
+      _newsOn    = prefs.getBool(_kNewsEnabled)   ?? false;
+      _showBadge = prefs.getBool(_kShowNewsBadge) ?? true;
+
       _intervalCtrl.text = _milestoneInterval.toString();
     });
   }
@@ -103,8 +112,24 @@ class _NotificationsPageState extends State<NotificationsPage> {
     await prefs.setInt(_kWeeklyDay,          _weeklyDay);
     await prefs.setInt(_kWeeklyHour,         _weeklyHour);
     await prefs.setInt(_kWeeklyMin,          _weeklyMin);
+    await prefs.setBool(_kNewsEnabled,       _newsOn);
+    notifNewsEnabledNotifier.value = _newsOn;
     // Re-register WorkManager tasks to reflect new settings
     await NotificationWorker.scheduleAll();
+  }
+
+  // ── Badge visibility (not a push notification, just a display toggle) ────
+
+  Future<void> _setShowBadge(bool v) async {
+    setState(() => _showBadge = v);
+    showNewsBadgeNotifier.value = v;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_kShowNewsBadge, v);
+  }
+
+  void _setNews(bool v) {
+    setState(() => _newsOn = v);
+    _save();
   }
 
   // ── Permission ───────────────────────────────────────────────────────────
@@ -333,6 +358,68 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         )
                       : null,
                 ),
+                const SizedBox(height: 28),
+
+                // ── Section: News (actualités) ─────────────────────────────
+                _SectionLabel(
+                  isEn ? 'News' : 'Actualités',
+                  scheme,
+                ),
+                const SizedBox(height: 10),
+
+                _NotifCard(
+                  scheme:   scheme,
+                  icon:     Icons.campaign_rounded,
+                  iconBg:   const Color(0xFF1D4ED8).withValues(alpha: 0.14),
+                  iconFg:   const Color(0xFF1D4ED8),
+                  title:    isEn ? 'News notifications' : 'Notifications d\'actualités',
+                  subtitle: isEn
+                      ? 'Get notified for new features, fixes and announcements'
+                      : 'Soyez notifié des nouveautés, correctifs et annonces',
+                  enabled:  _newsOn,
+                  onToggle: _hasPermission ? _setNews : null,
+                ),
+                const SizedBox(height: 10),
+
+                // Badge toggle — pure display setting, no permission needed
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: scheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                        color: scheme.outlineVariant.withValues(alpha: 0.4)),
+                  ),
+                  child: Row(children: [
+                    Container(
+                      width: 42, height: 42,
+                      decoration: BoxDecoration(
+                        color: scheme.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(11),
+                      ),
+                      child: Icon(Icons.circle_notifications_rounded,
+                          color: scheme.onSurfaceVariant, size: 22),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(
+                          isEn ? 'Badge on the dashboard' : "Pastille sur l'accueil",
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        Text(
+                          isEn
+                              ? 'Show the unread dot on the news bell icon'
+                              : "Afficher le point rouge sur la cloche d'actualités",
+                          style: TextStyle(
+                              fontSize: 13, color: scheme.onSurfaceVariant),
+                        ),
+                      ]),
+                    ),
+                    Switch(value: _showBadge, onChanged: _setShowBadge),
+                  ]),
+                ),
+
                 const SizedBox(height: 28),
 
                 // ── Test button ────────────────────────────────────────────

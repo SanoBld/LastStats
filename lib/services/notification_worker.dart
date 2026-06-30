@@ -16,6 +16,7 @@ import 'update_service.dart';
 const _kTaskMilestone = 'ls_milestone_check';
 const _kTaskRecap     = 'ls_recap_check';
 const _kTaskUpdate    = 'ls_update_check';
+const _kTaskNews      = 'ls_news_check';
 
 // ── Milestone prefs ──────────────────────────────────────────────────────────
 const _kMilestoneEnabled   = 'ls_notif_milestone_enabled';
@@ -48,6 +49,14 @@ const _kWeeklyLastWeek = 'ls_notif_weekly_last_week';
 // to avoid re-notifying every 6 hours for the same release.
 const _kUpdateLastNotified = 'ls_last_notified_update_version';
 const _kBetaChannel        = 'ls_beta_channel';
+// Stores the latest pending update as a local "news" item so it also shows
+// up in the dashboard's news bell, merged with the remote news.json feed.
+const _kLocalUpdateNews    = 'ls_local_update_news';
+
+// ── News prefs ───────────────────────────────────────────────────────────────
+const _kNotifNewsEnabled  = 'ls_notif_news_enabled';
+const _kNewsLastNotified  = 'ls_notif_news_last_id';
+const _kNewsUrl = 'https://sanobld.github.io/LastStats/news.json';
 
 // ── Last.fm account prefs ────────────────────────────────────────────────────
 const _kUsername = 'ls_username';
@@ -74,6 +83,9 @@ void callbackDispatcher() {
         case _kTaskUpdate:
           await _runUpdateCheck();
           break;
+        case _kTaskNews:
+          await _runNewsCheck();
+          break;
       }
     } catch (_) {
       // Never throw from the worker — WorkManager would retry and spam
@@ -92,14 +104,79 @@ Future<void> _runUpdateCheck() async {
   final info = await UpdateService.checkForUpdate(channel: channel);
   if (info == null) return; // up to date or offline
 
-  // Skip if we already notified for this exact version
+  // Always keep the latest pending update as a local "news" item so it
+  // shows up in the dashboard's news bell, even if we don't re-notify.
+  final downloadUrl = info.hasApk ? info.apkUrl! : info.releaseUrl;
+  final localItem = jsonEncode({
+    'id':    'local_update_${info.version}',
+    'title': 'LastStats ${info.version} disponible',
+    'body':  'Une nouvelle version est prête à être téléchargée.',
+    'type':  'update',
+    'emoji': '🆕',
+    'date':  _shortDate(DateTime.now()),
+    'url':   downloadUrl,
+  });
+  await prefs.setString(_kLocalUpdateNews, localItem);
+
+  // Skip the push notification if we already notified for this exact version
   final lastNotified = prefs.getString(_kUpdateLastNotified) ?? '';
   if (lastNotified == info.version) return;
 
-  final downloadUrl = info.hasApk ? info.apkUrl! : info.releaseUrl;
   await NotificationService.showUpdateAvailable(info.version, downloadUrl);
   await prefs.setString(_kUpdateLastNotified, info.version);
 }
+
+// ── News check ────────────────────────────────────────────────────────────
+// Fetches news.json and fires a local notification for any item published
+// since the last check. Only runs when the user enabled it in the
+// notifications settings page.
+
+Future<void> _runNewsCheck() async {
+  final prefs = await SharedPreferences.getInstance();
+  if (!(prefs.getBool(_kNotifNewsEnabled) ?? false)) return;
+
+  try {
+    final res = await http
+        .get(Uri.parse(_kNewsUrl))
+        .timeout(const Duration(seconds: 10));
+    if (res.statusCode != 200) return;
+
+    final json  = jsonDecode(res.body) as Map;
+    final items = (json['items'] as List? ?? []).cast<Map>();
+    if (items.isEmpty) return;
+
+    // items are newest-first (publish-news.yml prepends new entries)
+    final lastId   = prefs.getString(_kNewsLastNotified) ?? '';
+    final newestId = (items.first['id'] ?? '').toString();
+    if (newestId.isEmpty || newestId == lastId) return;
+
+    // Collect every item published since the last check.
+    final unseen = <Map>[];
+    for (final it in items) {
+      if ((it['id'] ?? '').toString() == lastId) break;
+      unseen.add(it);
+    }
+    // First run (no lastId yet): just notify the newest one, not the backlog.
+    final toNotify = lastId.isEmpty
+        ? [items.first]
+        : unseen.reversed.take(5).toList(); // oldest unseen first, capped
+
+    for (final it in toNotify) {
+      await NotificationService.showNews(
+        id:    (it['id']    ?? '').toString(),
+        title: (it['title'] ?? '').toString(),
+        body:  (it['body']  ?? '').toString(),
+        type:  (it['type']  ?? 'info').toString(),
+        emoji: (it['emoji'] ?? '').toString(),
+        date:  (it['date']  ?? '').toString(),
+      );
+    }
+    await prefs.setString(_kNewsLastNotified, newestId);
+  } catch (_) {}
+}
+
+String _shortDate(DateTime d) =>
+    '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}';
 
 // ── Milestone check ──────────────────────────────────────────────────────────
 
@@ -331,6 +408,20 @@ class NotificationWorker {
       existingWorkPolicy: ExistingWorkPolicy.keep,
       constraints: Constraints(networkType: NetworkType.connected),
     );
+
+    // ── News check task ──────────────────────────────────────────────────
+    // Only registered when the user enabled "news notifications" in settings.
+    await Workmanager().cancelByUniqueName(_kTaskNews);
+    final newsOn = prefs.getBool(_kNotifNewsEnabled) ?? false;
+    if (newsOn) {
+      await Workmanager().registerPeriodicTask(
+        _kTaskNews,
+        _kTaskNews,
+        frequency:          const Duration(hours: 1),
+        existingWorkPolicy: ExistingWorkPolicy.replace,
+        constraints: Constraints(networkType: NetworkType.connected),
+      );
+    }
   }
 
   static Future<void> cancelAll() async {

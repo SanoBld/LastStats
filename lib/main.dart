@@ -4,12 +4,12 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:workmanager/workmanager.dart';
 import 'app_state.dart';
 import 'nothing_theme.dart';
 import 'screens/setup_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/notification_detail_page.dart';
 import 'services/data_cache.dart';
 import 'services/image_service.dart';
 import 'services/scrobbles_file_cache.dart';
@@ -18,7 +18,8 @@ import 'services/notification_worker.dart';
 import 'services/storage_manager.dart';
 import 'services/update_startup.dart';
 
-final navigatorKey = GlobalKey<NavigatorState>();
+// navigatorKey now lives in notification_service.dart so the notification
+// tap handler can push screens without importing main.dart (would be circular).
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,13 +61,13 @@ void main() async {
   DataCache.offlineMode = prefs.getBool('ls_cache_serve_stale') ?? true;
 
   // ── Notifications & WorkManager (mobile only) ────────────────────────────
-  String? notifLaunchPayload;
+  Map<String, dynamic>? notifLaunchData;
 
   if (!kIsWeb) {
     final isMobile = Platform.isAndroid || Platform.isIOS;
     if (isMobile) {
       await NotificationService.init();
-      notifLaunchPayload = await NotificationService.getLaunchPayload();
+      notifLaunchData = await NotificationService.getLaunchPayloadData();
       await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
       await NotificationWorker.scheduleAll();
     }
@@ -79,11 +80,12 @@ void main() async {
   ));
 
   WidgetsBinding.instance.addPostFrameCallback((_) async {
-    if (notifLaunchPayload != null && notifLaunchPayload!.isNotEmpty) {
-      final url = Uri.tryParse(notifLaunchPayload!);
-      if (url != null && await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-      }
+    if (notifLaunchData != null) {
+      // App was launched (cold start) by tapping a notification — open the
+      // detail page directly instead of silently launching a URL.
+      navigatorKey.currentState?.push(MaterialPageRoute(
+        builder: (_) => NotificationDetailPage(data: notifLaunchData!),
+      ));
     } else {
       UpdateStartupChecker.run(navigatorKey);
     }

@@ -44,6 +44,14 @@ final hapticFeedbackNotifier = ValueNotifier<bool>(true);
 // Show labels under nav bar icons. Saved as 'ls_nav_labels'.
 final navLabelNotifier = ValueNotifier<bool>(true);
 
+// Push a local notification when a new "actualité" (news) item is published.
+// Saved as 'ls_notif_news_enabled' in SharedPreferences.
+final notifNewsEnabledNotifier = ValueNotifier<bool>(false);
+
+// Show/hide the unread badge (red dot) on the news bell on the dashboard.
+// Saved as 'ls_show_news_badge' in SharedPreferences.
+final showNewsBadgeNotifier = ValueNotifier<bool>(true);
+
 ThemeMode themeFromString(String? s) {
   switch (s) {
     case 'light':  return ThemeMode.light;
