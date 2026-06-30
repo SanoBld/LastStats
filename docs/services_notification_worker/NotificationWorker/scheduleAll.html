@@ -109,6 +109,20 @@
     existingWorkPolicy: ExistingWorkPolicy.keep,
     constraints: Constraints(networkType: NetworkType.connected),
   );
+
+  &#47;&#47; ── News check task ──────────────────────────────────────────────────
+  &#47;&#47; Only registered when the user enabled &quot;news notifications&quot; in settings.
+  await Workmanager().cancelByUniqueName(_kTaskNews);
+  final newsOn = prefs.getBool(_kNotifNewsEnabled) ?? false;
+  if (newsOn) {
+    await Workmanager().registerPeriodicTask(
+      _kTaskNews,
+      _kTaskNews,
+      frequency:          const Duration(hours: 1),
+      existingWorkPolicy: ExistingWorkPolicy.replace,
+      constraints: Constraints(networkType: NetworkType.connected),
+    );
+  }
 }</code></pre>
 </section>
 

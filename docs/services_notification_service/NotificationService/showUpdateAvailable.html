@@ -65,8 +65,8 @@
     
 <section class="desc markdown">
   <p>Fires a high-importance notification when a new version is available.
-<code>downloadUrl</code> is stored as the payload so tapping it launches the download
-directly — no extra step needed.</p>
+Tapping it opens the in-app detail page with an "Open" button that
+launches <code>downloadUrl</code> — it's no longer launched automatically.</p>
 </section>
 
 
@@ -75,7 +75,7 @@ directly — no extra step needed.</p>
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; showUpdateAvailable(String version, String downloadUrl) {
   const title = &#39;🆕 Update available&#39;;
-  final body  = &#39;LastStats $version is ready — tap to download.&#39;;
+  final body  = &#39;LastStats $version is ready — tap to view.&#39;;
   return _plugin.show(
     _idUpdate,
     title,
@@ -95,7 +95,9 @@ directly — no extra step needed.</p>
         ),
       ),
     ),
-    payload: downloadUrl,
+    payload: _payload(
+      type: &#39;update&#39;, title: title, body: body, url: downloadUrl,
+    ),
   );
 }</code></pre>
 </section>

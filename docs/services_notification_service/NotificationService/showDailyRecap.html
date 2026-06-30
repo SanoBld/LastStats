@@ -73,25 +73,29 @@
   required int    count,
   required String topArtist,
   required String date,
-}) =&gt;
-    _plugin.show(
-      _idDailyRecap,
-      &#39;📊 Daily recap · $date&#39;,
-      &#39;${_fmt(count)} scrobbles · Top: $topArtist&#39;,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          _chRecapId, _chRecapName,
-          icon:    &#39;@mipmap&#47;ic_launcher&#39;,
-          color:   _kLastFmRed,
-          subText: &#39;LastStats&#39;,
-          styleInformation: InboxStyleInformation(
-            [&#39;${_fmt(count)} scrobbles today&#39;, &#39;Top artist: $topArtist&#39;],
-            contentTitle: &#39;📊 Daily recap · $date&#39;,
-            summaryText:  &#39;LastStats&#39;,
-          ),
+}) {
+  final title = &#39;📊 Daily recap · $date&#39;;
+  final body  = &#39;${_fmt(count)} scrobbles · Top: $topArtist&#39;;
+  return _plugin.show(
+    _idDailyRecap,
+    title,
+    body,
+    NotificationDetails(
+      android: AndroidNotificationDetails(
+        _chRecapId, _chRecapName,
+        icon:    &#39;@mipmap&#47;ic_launcher&#39;,
+        color:   _kLastFmRed,
+        subText: &#39;LastStats&#39;,
+        styleInformation: InboxStyleInformation(
+          [&#39;${_fmt(count)} scrobbles today&#39;, &#39;Top artist: $topArtist&#39;],
+          contentTitle: title,
+          summaryText:  &#39;LastStats&#39;,
         ),
       ),
-    );</code></pre>
+    ),
+    payload: _payload(type: &#39;daily&#39;, title: title, body: body, date: date),
+  );
+}</code></pre>
 </section>
 
 

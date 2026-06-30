@@ -106,13 +106,13 @@
   DataCache.offlineMode = prefs.getBool(&#39;ls_cache_serve_stale&#39;) ?? true;
 
   &#47;&#47; ── Notifications &amp; WorkManager (mobile only) ────────────────────────────
-  String? notifLaunchPayload;
+  Map&lt;String, dynamic&gt;? notifLaunchData;
 
   if (!kIsWeb) {
     final isMobile = Platform.isAndroid || Platform.isIOS;
     if (isMobile) {
       await NotificationService.init();
-      notifLaunchPayload = await NotificationService.getLaunchPayload();
+      notifLaunchData = await NotificationService.getLaunchPayloadData();
       await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
       await NotificationWorker.scheduleAll();
     }
@@ -125,11 +125,12 @@
   ));
 
   WidgetsBinding.instance.addPostFrameCallback((_) async {
-    if (notifLaunchPayload != null &amp;&amp; notifLaunchPayload!.isNotEmpty) {
-      final url = Uri.tryParse(notifLaunchPayload!);
-      if (url != null &amp;&amp; await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-      }
+    if (notifLaunchData != null) {
+      &#47;&#47; App was launched (cold start) by tapping a notification — open the
+      &#47;&#47; detail page directly instead of silently launching a URL.
+      navigatorKey.currentState?.push(MaterialPageRoute(
+        builder: (_) =&gt; NotificationDetailPage(data: notifLaunchData!),
+      ));
     } else {
       UpdateStartupChecker.run(navigatorKey);
     }

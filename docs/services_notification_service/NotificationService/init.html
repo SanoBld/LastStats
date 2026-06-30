@@ -76,14 +76,10 @@
   await _plugin.initialize(
     const InitializationSettings(android: android, iOS: ios),
     &#47;&#47; Tap handler when app is in foreground or background.
-    &#47;&#47; The payload is the download URL set in showUpdateAvailable().
+    &#47;&#47; Opens the in-app detail page so the user sees the full notification
+    &#47;&#47; (title + body, larger) and can follow a link if there is one.
     onDidReceiveNotificationResponse: (details) async {
-      final payload = details.payload;
-      if (payload == null || payload.isEmpty) return;
-      final url = Uri.tryParse(payload);
-      if (url != null &amp;&amp; await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-      }
+      await _handleTap(details.payload);
     },
   );
 
@@ -119,6 +115,14 @@
       _chUpdateId, _chUpdateName,
       description: &#39;Notifies when a new version of LastStats is available&#39;,
       importance:  Importance.high,
+    ),
+  );
+
+  await androidImpl?.createNotificationChannel(
+    const AndroidNotificationChannel(
+      _chNewsId, _chNewsName,
+      description: &#39;New features, fixes and announcements about LastStats&#39;,
+      importance:  Importance.defaultImportance,
     ),
   );
 }</code></pre>

@@ -161,15 +161,32 @@
   <section class="summary offset-anchor" id="static-methods">
     <h2>Static Methods</h2>
     <dl class="callables">
-        <dt id="getLaunchPayload" class="callable">
-  <span class="name"><a href="../services_notification_service/NotificationService/getLaunchPayload.html">getLaunchPayload</a></span><span class="signature">(<wbr>)
-    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span>&gt;</span></span>
+        <dt id="decodePayload" class="callable">
+  <span class="name"><a href="../services_notification_service/NotificationService/decodePayload.html">decodePayload</a></span><span class="signature">(<wbr><span class="parameter" id="decodePayload-param-raw"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">raw</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span>?</span>
   </span>
   
 
 </dt>
 <dd>
+  Decodes a notification payload into a structured map.
+Accepts both the new JSON format and the old plain-URL format used by
+earlier app versions, so updates from old installs still work.
   
+
+</dd>
+
+        <dt id="getLaunchPayloadData" class="callable">
+  <span class="name"><a href="../services_notification_service/NotificationService/getLaunchPayloadData.html">getLaunchPayloadData</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Call this once in main() right after init(). If the app was launched
+(cold start) by tapping a notification, returns its decoded payload so
+the caller can navigate to the detail page once the app is ready.
   
 
 </dd>
@@ -252,6 +269,21 @@
 
 </dd>
 
+        <dt id="showNews" class="callable">
+  <span class="name"><a href="../services_notification_service/NotificationService/showNews.html">showNews</a></span><span class="signature">(<wbr>{<span class="parameter" id="showNews-param-id"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">id</span>, </span><span class="parameter" id="showNews-param-title"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">title</span>, </span><span class="parameter" id="showNews-param-body"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">body</span>, </span><span class="parameter" id="showNews-param-type"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">type</span>, </span><span class="parameter" id="showNews-param-emoji"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">emoji</span> = <span class="default-value">&#39;&#39;</span>, </span><span class="parameter" id="showNews-param-date"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">date</span> = <span class="default-value">&#39;&#39;</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Fires a notification for a new in-app "actualité" (news) item.
+<code>type</code> mirrors the dashboard's news types: feature, fix, update, alert, info.
+Colors match the in-app news sheet so the experience is consistent.
+  
+
+</dd>
+
         <dt id="showTest" class="callable">
   <span class="name"><a href="../services_notification_service/NotificationService/showTest.html">showTest</a></span><span class="signature">(<wbr>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
@@ -274,8 +306,8 @@
 </dt>
 <dd>
   Fires a high-importance notification when a new version is available.
-<code>downloadUrl</code> is stored as the payload so tapping it launches the download
-directly — no extra step needed.
+Tapping it opens the in-app detail page with an "Open" button that
+launches <code>downloadUrl</code> — it's no longer launched automatically.
   
 
 </dd>

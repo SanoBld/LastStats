@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the callbackDispatcher function from the notification_worker library, for the Dart programming language.">
-  <title>callbackDispatcher function - notification_worker library - Dart API</title>
+  <meta name="description" content="API docs for the navigatorKey property from the notification_service library, for the Dart programming language.">
+  <title>navigatorKey property - notification_service library - Dart API</title>
 
 
   
@@ -25,10 +25,10 @@
   <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">laststats_mobile</a></li>
-    <li><a href="../services_notification_worker/">services&#47;notification_worker.dart</a></li>
-    <li class="self-crumb">callbackDispatcher function</li>
+    <li><a href="../services_notification_service/">services&#47;notification_service.dart</a></li>
+    <li class="self-crumb">navigatorKey property</li>
   </ol>
-  <div class="self-name">callbackDispatcher</div>
+  <div class="self-name">navigatorKey</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -45,55 +45,28 @@
   <div
       id="dartdoc-main-content"
       class="main-content"
-      data-above-sidebar="services_notification_worker&#47;services_notification_worker-library-sidebar.html"
+      data-above-sidebar="services_notification_service&#47;services_notification_service-library-sidebar.html"
       data-below-sidebar="">
       <div>
-<h1><span class="kind-function">callbackDispatcher</span> function 
+<h1><span class="kind-top-level-property">navigatorKey</span> top-level property 
  
 </h1></div>
 
-    <section class="multi-line-signature">
+        <section class="multi-line-signature">
+          
+          <a href="https://api.flutter.dev/flutter/widgets/GlobalKey-class.html">GlobalKey</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/widgets/NavigatorState-class.html">NavigatorState</a></span>&gt;</span>
+          <span class="name ">navigatorKey</span>
+          <div class="features"><span class="feature">final</span></div>
+
+        </section>
         
-<span class="returntype">void</span>
-<span class="name ">callbackDispatcher</span>(<wbr>)
 
         
-
-    </section>
-    
-
-
-    
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">@pragma(&#39;vm:entry-point&#39;)
-void callbackDispatcher() {
-  Workmanager().executeTask((taskName, _) async {
-    WidgetsFlutterBinding.ensureInitialized();
-    await NotificationService.init();
-
-    try {
-      switch (taskName) {
-        case _kTaskMilestone:
-          await _runMilestoneCheck();
-          break;
-        case _kTaskRecap:
-          await _runRecapCheck();
-          break;
-        case _kTaskUpdate:
-          await _runUpdateCheck();
-          break;
-        case _kTaskNews:
-          await _runNewsCheck();
-          break;
-      }
-    } catch (_) {
-      &#47;&#47; Never throw from the worker — WorkManager would retry and spam
-    }
-    return true;
-  });
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">final navigatorKey = GlobalKey&lt;NavigatorState&gt;();</code></pre>
 </section>
+
 
 
   </div> <!-- /.main-content -->
@@ -106,11 +79,11 @@ void callbackDispatcher() {
 </header>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">laststats_mobile</a></li>
-    <li><a href="../services_notification_worker/">notification_worker</a></li>
-    <li class="self-crumb">callbackDispatcher function</li>
+    <li><a href="../services_notification_service/">notification_service</a></li>
+    <li class="self-crumb">navigatorKey property</li>
 </ol>
 
-    <h5>notification_worker library</h5>
+    <h5>notification_service library</h5>
     <div id="dartdoc-sidebar-left-content"></div>
   </div><!--/.sidebar-offcanvas-left-->
   <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
