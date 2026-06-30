@@ -3665,20 +3665,38 @@ class _NewsSheet extends StatelessWidget {
       minChildSize:     0.35,
       maxChildSize:     0.90,
       builder: (ctx, scroll) => Column(children: [
+        // Drag handle
+        Padding(
+          padding: const EdgeInsets.only(top: 10, bottom: 4),
+          child: Container(
+            width: 36, height: 4,
+            decoration: BoxDecoration(
+              color:        scheme.onSurfaceVariant.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
         // Header
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 14),
           child: Row(children: [
-            Icon(Icons.notifications_rounded,
-                size: 20, color: scheme.primary),
-            const SizedBox(width: 10),
+            Container(
+              width: 32, height: 32,
+              decoration: BoxDecoration(
+                color:        scheme.primary.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(Icons.notifications_rounded,
+                  size: 17, color: scheme.primary),
+            ),
+            const SizedBox(width: 12),
             Text(
               isEn ? "What's new" : 'Actualités',
               style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800),
             ),
           ]),
         ),
-        const Divider(height: 1),
+        Divider(height: 1, color: scheme.outlineVariant.withValues(alpha: 0.4)),
 
         // List
         Expanded(
@@ -3713,10 +3731,11 @@ class _NewsSheet extends StatelessWidget {
                     return Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color:        scheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(14),
+                        color:        scheme.surfaceContainerHigh,
+                        borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: color.withValues(alpha: 0.25),
+                          color: scheme.outlineVariant.withValues(alpha: 0.35),
+                          width: 0.8,
                         ),
                       ),
                       child: Row(
@@ -3724,35 +3743,41 @@ class _NewsSheet extends StatelessWidget {
                         children: [
                           // Icon / emoji
                           Container(
-                            width: 36, height: 36,
+                            width: 38, height: 38,
+                            alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              color:        color.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(10),
+                              color:        color.withValues(alpha: 0.14),
+                              borderRadius: BorderRadius.circular(11),
                             ),
-                            child: Center(
-                              child: emoji.isNotEmpty
-                                  ? Text(emoji,
-                                      style: const TextStyle(fontSize: 18))
-                                  : Icon(icon, size: 18, color: color),
-                            ),
+                            child: emoji.isNotEmpty
+                                ? Text(emoji,
+                                    style: const TextStyle(fontSize: 17),
+                                    textAlign: TextAlign.center)
+                                : Icon(icon, size: 18, color: color),
                           ),
                           const SizedBox(width: 12),
                           // Content
                           Expanded(child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(children: [
-                                Expanded(
-                                  child: Text(title,
-                                    style: text.bodyMedium?.copyWith(
-                                        fontWeight: FontWeight.w700)),
-                                ),
-                                if (date.isNotEmpty)
-                                  Text(date,
-                                    style: text.labelSmall?.copyWith(
-                                        color: scheme.onSurfaceVariant,
-                                        fontSize: 10)),
-                              ]),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Text(title,
+                                      style: text.bodyMedium?.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                          height: 1.25)),
+                                  ),
+                                  if (date.isNotEmpty) ...[
+                                    const SizedBox(width: 8),
+                                    Text(date,
+                                      style: text.labelSmall?.copyWith(
+                                          color: scheme.onSurfaceVariant.withValues(alpha: 0.8),
+                                          fontSize: 10)),
+                                  ],
+                                ],
+                              ),
                               if (body.isNotEmpty) ...[
                                 const SizedBox(height: 4),
                                 Text(body,
@@ -3761,13 +3786,13 @@ class _NewsSheet extends StatelessWidget {
                                       height: 1.4)),
                               ],
                               // Type badge
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 8),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 7, vertical: 2),
+                                    horizontal: 8, vertical: 3),
                                 decoration: BoxDecoration(
                                   color:        color.withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
                                   type.toUpperCase(),
@@ -3775,7 +3800,7 @@ class _NewsSheet extends StatelessWidget {
                                     color:         color,
                                     fontSize:      9,
                                     fontWeight:    FontWeight.w700,
-                                    letterSpacing: 0.8,
+                                    letterSpacing: 0.6,
                                   ),
                                 ),
                               ),
