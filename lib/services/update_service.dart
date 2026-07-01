@@ -2,8 +2,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 // ══════════════════════════════════════════════════════════════════════════
-//  UpdateService — reads update info from a static JSON file hosted on
-//  GitHub Pages (gh-pages branch). No GitHub API call, no auth, no rate limit.
+//  UpdateService — reads update info directly from the GitHub Releases API.
+//  No static JSON file needed (the old gh-pages metadata approach was
+//  unreliable since publish-update-metadata.yml could silently fail or the
+//  file could be stale). The Releases API is always authoritative and free,
+//  no auth required for public repos (60 req/h per IP, plenty for this use).
 // ══════════════════════════════════════════════════════════════════════════
 
 enum UpdateChannel { stable, beta }
@@ -11,45 +14,82 @@ enum UpdateChannel { stable, beta }
 class UpdateService {
   UpdateService._();
 
-  // ─── Set to your own GitHub Pages base URL ────────────────────────────
-  static const _pagesBase     = 'https://sanobld.github.io/LastStats-App';
+  // ─── Your real GitHub repo (owner/name) ───────────────────────────────
+  static const _owner = 'SanoBld';
+  static const _repo  = 'LastStats';
   static const currentVersion = '2.6.0';
   // ────────────────────────────────────────────────────────────────────────
 
   static const _timeout = Duration(seconds: 10);
 
   /// Returns an [UpdateInfo] if a newer version exists, or `null` if up to
-  /// date / on network error. [channel] picks stable or beta metadata file.
+  /// date / on network error.
+  ///
+  /// [channel] picks which releases to consider:
+  ///   stable → only non-prerelease releases (tags without a '-' suffix)
+  ///   beta   → the single most recent release of any kind (so beta users
+  ///            see pre-releases AND get notified when stable catches up)
   static Future<UpdateInfo?> checkForUpdate({
     UpdateChannel channel = UpdateChannel.stable,
   }) async {
-    final filename = channel == UpdateChannel.beta ? 'update_beta.json' : 'update.json';
     try {
-      final uri = Uri.parse('$_pagesBase/$filename');
-      final res = await http.get(uri).timeout(_timeout);
+      final uri = Uri.parse(
+        'https://api.github.com/repos/$_owner/$_repo/releases?per_page=10',
+      );
+      final res = await http.get(uri, headers: const {
+        'Accept': 'application/vnd.github+json',
+      }).timeout(_timeout);
+
       if (res.statusCode != 200) return null;
 
-      final data = jsonDecode(utf8.decode(res.bodyBytes));
-      final rawTag = (data['version'] ?? data['tag'] ?? '').toString();
-      final latest = rawTag.startsWith('v') ? rawTag.substring(1) : rawTag;
+      final list = jsonDecode(utf8.decode(res.bodyBytes)) as List<dynamic>;
+      if (list.isEmpty) return null;
 
+      // Drop drafts always; for the stable channel also drop pre-releases.
+      final candidates = list
+          .cast<Map<String, dynamic>>()
+          .where((r) => r['draft'] != true)
+          .where((r) => channel == UpdateChannel.beta || r['prerelease'] != true)
+          .toList();
+
+      if (candidates.isEmpty) return null;
+
+      // GitHub returns releases already sorted by creation date, newest first.
+      final release = candidates.first;
+
+      final rawTag = (release['tag_name'] ?? '').toString();
+      final latest = rawTag.startsWith('v') ? rawTag.substring(1) : rawTag;
       if (latest.isEmpty) return null;
       if (!_isNewer(latest, currentVersion)) return null;
 
+      final assets = (release['assets'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+      String? findAsset(String name) {
+        for (final a in assets) {
+          if ((a['name'] ?? '') == name) return (a['browser_download_url'] ?? '').toString();
+        }
+        return null;
+      }
+
+      // Universal APK preferred for the single-button download action.
+      final apkUrl = findAsset('app-universal-release.apk');
+
       return UpdateInfo(
         version:     latest,
-        releaseUrl:  (data['release_url'] ?? '').toString(),
-        apkUrl:      (data['apk_url'] ?? '').toString(),
-        notes:       (data['notes'] ?? '').toString(),
-        publishedAt: _parseDate(data['published_at']?.toString()),
-        isBeta:      channel == UpdateChannel.beta,
+        releaseUrl:  (release['html_url'] ?? '').toString(),
+        apkUrl:      apkUrl,
+        notes:       (release['body'] ?? '').toString(),
+        publishedAt: _parseDate(release['published_at']?.toString()),
+        isBeta:      release['prerelease'] == true,
       );
     } catch (_) {
       return null;
     }
   }
 
-  // ── Compare semver X.Y.Z ───────────────────────────────────────────────
+  // ── Compare semver, ignoring any "-beta"/"-rc1" suffix ─────────────────
+  // Pre-release suffixes only affect the isBeta flag (set from the API's
+  // own "prerelease" boolean) — version *ordering* still compares numerically
+  // so a "2.7.0-beta" tag is correctly treated as newer than "2.6.0".
   static bool _isNewer(String latest, String current) {
     final l = _parts(latest);
     final c = _parts(current);
@@ -62,8 +102,11 @@ class UpdateService {
     return false;
   }
 
-  static List<int> _parts(String v) =>
-      v.split('.').map((s) => int.tryParse(s) ?? 0).toList();
+  static List<int> _parts(String v) {
+    // Strip "-beta", "-rc1" etc. before splitting on dots.
+    final core = v.split('-').first;
+    return core.split('.').map((s) => int.tryParse(s) ?? 0).toList();
+  }
 
   static DateTime? _parseDate(String? s) {
     if (s == null || s.isEmpty) return null;

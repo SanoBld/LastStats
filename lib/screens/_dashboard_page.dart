@@ -459,10 +459,6 @@ class _DashboardPageState extends State<_DashboardPage> {
 
   // Key on the profile tap target so we can find its position
   final _profileKey = GlobalKey();
-  // Key on the discrete settings button (bottom-right of header)
-  final _settingsBtnKey = GlobalKey();
-  // Key on the news bell button (left of settings button)
-  final _newsBtnKey = GlobalKey();
 
   // Show popup bubble near the profile row
   Future<void> _showProfileMenu() async {
@@ -535,99 +531,6 @@ class _DashboardPageState extends State<_DashboardPage> {
       case 'reset':
         _confirmResetCache();
     }
-  }
-
-  // Open the settings page directly (short tap on the discrete button)
-  Future<void> _openSettings() async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => Scaffold(
-          appBar: AppBar(
-            title: Text(L.navSettings),
-            scrolledUnderElevation: 0,
-          ),
-          body: _SettingsPage(username: widget.username),
-        ),
-      ),
-    );
-    if (mounted) {
-      await _loadPrefs();
-      _resolveHeaderImage();
-    }
-  }
-
-  // Show popup bubble near the settings button (long press = more options)
-  Future<void> _showSettingsMenu() async {
-    final box = _settingsBtnKey.currentContext?.findRenderObject() as RenderBox?;
-    if (box == null || !mounted) return;
-    final pos    = box.localToGlobal(Offset.zero);
-    final size   = box.size;
-    final screen = MediaQuery.of(context).size;
-
-    final result = await showMenu<String>(
-      context: context,
-      position: RelativeRect.fromLTRB(
-        screen.width - pos.dx - size.width,
-        pos.dy + size.height + 4,
-        pos.dx,
-        0,
-      ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      items: [
-        PopupMenuItem(
-          value: 'refresh',
-          child: Row(children: [
-            const Icon(Icons.refresh_rounded, size: 20),
-            const SizedBox(width: 10),
-            Text(L.dashRefresh),
-          ]),
-        ),
-        PopupMenuItem(
-          value: 'settings',
-          child: Row(children: [
-            const Icon(Icons.settings_outlined, size: 20),
-            const SizedBox(width: 10),
-            Text(L.navSettings),
-          ]),
-        ),
-        PopupMenuItem(
-          value: 'reset',
-          child: Builder(builder: (ctx) {
-            final color = Theme.of(ctx).colorScheme.error;
-            return Row(children: [
-              Icon(Icons.delete_sweep_outlined, size: 20, color: color),
-              const SizedBox(width: 10),
-              Text(L.dashResetCache, style: TextStyle(color: color)),
-            ]);
-          }),
-        ),
-      ],
-    );
-
-    if (!mounted) return;
-    switch (result) {
-      case 'refresh':
-        _load();
-      case 'settings':
-        await _openSettings();
-      case 'reset':
-        _confirmResetCache();
-    }
-  }
-
-  // Open the news bell bottom sheet, anchored from the bell button
-  void _openNewsSheet() {
-    _haptic(_HapticImpact.light);
-    _markNewsRead();
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => _NewsSheet(items: _newsItems),
-    );
   }
 
   // Confirmation dialog then full cache wipe + reload
@@ -812,41 +715,67 @@ class _DashboardPageState extends State<_DashboardPage> {
   // Fetch in-app news from gh-pages JSON.
   // URL: https://sanobld.github.io/LastStats/news.json
   Future<void> _fetchNews() async {
-    // Pending app update, stored locally by the background worker — merged
-    // in so it also shows up in this bell, not just as a push notification.
-    Map<String, dynamic>? localUpdate;
-    try {
-      final p   = await SharedPreferences.getInstance();
-      final raw = p.getString('ls_local_update_news');
-      if (raw != null && raw.isNotEmpty) {
-        localUpdate = Map<String, dynamic>.from(jsonDecode(raw) as Map);
-      }
-    } catch (_) {}
+    final allItems = <Map<String, dynamic>>[];
 
+    // ── 1. Remote news.json ───────────────────────────────────────────────
     try {
       final res = await http.get(
         Uri.parse('https://sanobld.github.io/LastStats/news.json'),
       ).timeout(const Duration(seconds: 6));
-      if (res.statusCode != 200 || !mounted) return;
-
-      final data  = jsonDecode(res.body) as Map<String, dynamic>;
-      var items = (data['items'] as List?)
-              ?.cast<Map<String, dynamic>>() ?? [];
-
-      if (localUpdate != null) items = [localUpdate, ...items];
-
-      // Load IDs already seen by the user
-      final p    = await SharedPreferences.getInstance();
-      final seen = Set<String>.from(p.getStringList('ls_news_seen') ?? []);
-      final unread = items.where((i) => !seen.contains(i['id'] ?? '')).length;
-
-      if (mounted) setState(() { _newsItems = items; _unreadCount = unread; });
-    } catch (_) {
-      // Even if the network fetch fails, still show the local update item.
-      if (localUpdate != null && mounted) {
-        setState(() { _newsItems = [localUpdate!]; _unreadCount = 1; });
+      if (res.statusCode == 200) {
+        final data  = jsonDecode(res.body) as Map<String, dynamic>;
+        final items = (data['items'] as List?)
+                ?.cast<Map<String, dynamic>>() ?? [];
+        allItems.addAll(items);
       }
-    }
+    } catch (_) {}
+
+    // ── 2. Update check — inject as a news item if a newer release exists ─
+    // Uses the same GitHub Releases API as update_service.dart.
+    // Respects the user's beta-channel preference.
+    try {
+      final p          = await SharedPreferences.getInstance();
+      final wantsBeta  = p.getBool('ls_beta_channel') ?? false;
+      final channel    = wantsBeta ? UpdateChannel.beta : UpdateChannel.stable;
+      final info       = await UpdateService.checkForUpdate(channel: channel);
+
+      if (info != null) {
+        final id = 'update_v${info.version}';
+        // Avoid duplicating: only add if not already in the list
+        if (!allItems.any((i) => i['id'] == id)) {
+          final isEn   = localeNotifier.value == 'en';
+          final title  = isEn
+              ? '${info.isBeta ? "Beta" : "New"} update: v${info.version}'
+              : '${info.isBeta ? "Bêta" : "Nouvelle"} mise à jour : v${info.version}';
+          final body   = info.notes.isNotEmpty
+              ? (info.notes.length > 300
+                  ? '${info.notes.substring(0, 300)}…'
+                  : info.notes)
+              : (isEn ? 'Tap to download.' : 'Appuie pour télécharger.');
+
+          allItems.insert(0, {
+            'id':    id,
+            'type':  'update',
+            'emoji': info.isBeta ? '🧪' : '🚀',
+            'title': title,
+            'body':  body,
+            'date':  info.publishedAt != null
+                ? '${info.publishedAt!.day}/${info.publishedAt!.month}/${info.publishedAt!.year}'
+                : '',
+            'url':   info.hasApk ? info.apkUrl! : info.releaseUrl,
+          });
+        }
+      }
+    } catch (_) {}
+
+    if (!mounted) return;
+
+    // ── 3. Badge count ────────────────────────────────────────────────────
+    final p      = await SharedPreferences.getInstance();
+    final seen   = Set<String>.from(p.getStringList('ls_news_seen') ?? []);
+    final unread = allItems.where((i) => !seen.contains(i['id'] ?? '')).length;
+
+    if (mounted) setState(() { _newsItems = allItems; _unreadCount = unread; });
   }
 
   // Mark all news as read and persist.
@@ -1308,6 +1237,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                       children: [
                         GestureDetector(
                           key: _profileKey,
+                          onTap: _showProfileMenu,
                           child: Row(children: [
                           Container(
                             decoration: BoxDecoration(
@@ -1387,97 +1317,6 @@ class _DashboardPageState extends State<_DashboardPage> {
                     ),
                   ),
                 ),
-                // Discrete bell (news) + settings buttons, bottom-right of header
-                Positioned(
-                  right: 14,
-                  bottom: 14,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // News bell with unread badge
-                      GestureDetector(
-                        key: _newsBtnKey,
-                        onTap: _openNewsSheet,
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Container(
-                              width: 30, height: 30,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.black.withValues(alpha: 0.28),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.15),
-                                  width: 0.8,
-                                ),
-                              ),
-                              child: Icon(Icons.notifications_rounded,
-                                  size: 15,
-                                  color: Colors.white.withValues(alpha: 0.75)),
-                            ),
-                            ValueListenableBuilder<bool>(
-                              valueListenable: showNewsBadgeNotifier,
-                              builder: (_, showBadge, _) {
-                                if (!showBadge || _unreadCount <= 0) {
-                                  return const SizedBox.shrink();
-                                }
-                                return Positioned(
-                                  right: -2, top: -2,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(2.5),
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Color(0xFFE53935),
-                                    ),
-                                    constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
-                                    child: Text(
-                                      _unreadCount > 9 ? '9+' : '$_unreadCount',
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 8,
-                                        fontWeight: FontWeight.w800,
-                                        height: 1,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Settings: tap → open settings, long press → bubble menu
-                      GestureDetector(
-                        key: _settingsBtnKey,
-                        onTap: () {
-                          _haptic(_HapticImpact.light);
-                          _openSettings();
-                        },
-                        onLongPress: () {
-                          _haptic(_HapticImpact.medium);
-                          _showSettingsMenu();
-                        },
-                        child: Container(
-                          width: 30, height: 30,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.black.withValues(alpha: 0.28),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.15),
-                              width: 0.8,
-                            ),
-                          ),
-                          child: Icon(Icons.settings_rounded,
-                              size: 15,
-                              color: Colors.white.withValues(alpha: 0.75)),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
                 // Sync chip top-left when syncing
                 ValueListenableBuilder<AllScrobblesProgress>(
                   valueListenable: AllScrobblesService.progressNotifier,
@@ -3690,38 +3529,20 @@ class _NewsSheet extends StatelessWidget {
       minChildSize:     0.35,
       maxChildSize:     0.90,
       builder: (ctx, scroll) => Column(children: [
-        // Drag handle
-        Padding(
-          padding: const EdgeInsets.only(top: 10, bottom: 4),
-          child: Container(
-            width: 36, height: 4,
-            decoration: BoxDecoration(
-              color:        scheme.onSurfaceVariant.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-        ),
         // Header
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 14),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
           child: Row(children: [
-            Container(
-              width: 32, height: 32,
-              decoration: BoxDecoration(
-                color:        scheme.primary.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(Icons.notifications_rounded,
-                  size: 17, color: scheme.primary),
-            ),
-            const SizedBox(width: 12),
+            Icon(Icons.notifications_rounded,
+                size: 20, color: scheme.primary),
+            const SizedBox(width: 10),
             Text(
               isEn ? "What's new" : 'Actualités',
               style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800),
             ),
           ]),
         ),
-        Divider(height: 1, color: scheme.outlineVariant.withValues(alpha: 0.4)),
+        const Divider(height: 1),
 
         // List
         Expanded(
@@ -3753,34 +3574,13 @@ class _NewsSheet extends StatelessWidget {
                     final emoji = (item['emoji'] ?? '').toString();
                     final (icon, color) = _typeStyle(type);
 
-                    final url = (item['url'] ?? '').toString();
-
-                    return Material(
-                      color:        scheme.surfaceContainerHigh,
-                      borderRadius: BorderRadius.circular(16),
-                      clipBehavior: Clip.antiAlias,
-                      child: InkWell(
-                        onTap: () {
-                          _haptic(_HapticImpact.light);
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => NotificationDetailPage(data: {
-                              'type':     'news',
-                              'title':    title,
-                              'body':     body,
-                              'newsType': type,
-                              'date':     date,
-                              'emoji':    emoji,
-                              if (url.isNotEmpty) 'url': url,
-                            }),
-                          ));
-                        },
-                        child: Container(
+                    return Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
+                        color:        scheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: scheme.outlineVariant.withValues(alpha: 0.35),
-                          width: 0.8,
+                          color: color.withValues(alpha: 0.25),
                         ),
                       ),
                       child: Row(
@@ -3788,41 +3588,35 @@ class _NewsSheet extends StatelessWidget {
                         children: [
                           // Icon / emoji
                           Container(
-                            width: 38, height: 38,
-                            alignment: Alignment.center,
+                            width: 36, height: 36,
                             decoration: BoxDecoration(
-                              color:        color.withValues(alpha: 0.14),
-                              borderRadius: BorderRadius.circular(11),
+                              color:        color.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            child: emoji.isNotEmpty
-                                ? Text(emoji,
-                                    style: const TextStyle(fontSize: 17),
-                                    textAlign: TextAlign.center)
-                                : Icon(icon, size: 18, color: color),
+                            child: Center(
+                              child: emoji.isNotEmpty
+                                  ? Text(emoji,
+                                      style: const TextStyle(fontSize: 18))
+                                  : Icon(icon, size: 18, color: color),
+                            ),
                           ),
                           const SizedBox(width: 12),
                           // Content
                           Expanded(child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Text(title,
-                                      style: text.bodyMedium?.copyWith(
-                                          fontWeight: FontWeight.w700,
-                                          height: 1.25)),
-                                  ),
-                                  if (date.isNotEmpty) ...[
-                                    const SizedBox(width: 8),
-                                    Text(date,
-                                      style: text.labelSmall?.copyWith(
-                                          color: scheme.onSurfaceVariant.withValues(alpha: 0.8),
-                                          fontSize: 10)),
-                                  ],
-                                ],
-                              ),
+                              Row(children: [
+                                Expanded(
+                                  child: Text(title,
+                                    style: text.bodyMedium?.copyWith(
+                                        fontWeight: FontWeight.w700)),
+                                ),
+                                if (date.isNotEmpty)
+                                  Text(date,
+                                    style: text.labelSmall?.copyWith(
+                                        color: scheme.onSurfaceVariant,
+                                        fontSize: 10)),
+                              ]),
                               if (body.isNotEmpty) ...[
                                 const SizedBox(height: 4),
                                 Text(body,
@@ -3831,13 +3625,13 @@ class _NewsSheet extends StatelessWidget {
                                       height: 1.4)),
                               ],
                               // Type badge
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 6),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 3),
+                                    horizontal: 7, vertical: 2),
                                 decoration: BoxDecoration(
                                   color:        color.withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
                                   type.toUpperCase(),
@@ -3845,15 +3639,13 @@ class _NewsSheet extends StatelessWidget {
                                     color:         color,
                                     fontSize:      9,
                                     fontWeight:    FontWeight.w700,
-                                    letterSpacing: 0.6,
+                                    letterSpacing: 0.8,
                                   ),
                                 ),
                               ),
                             ],
                           )),
                         ],
-                      ),
-                        ),
                       ),
                     );
                   },
