@@ -64,7 +64,11 @@
     
 <section class="desc markdown">
   <p>Returns an <a href="../../services_update_service/UpdateInfo-class.html">UpdateInfo</a> if a newer version exists, or <code>null</code> if up to
-date / on network error. <code>channel</code> picks stable or beta metadata file.</p>
+date / on network error.</p>
+<p><code>channel</code> picks which releases to consider:
+  stable → only non-prerelease releases (tags without a '-' suffix)
+  beta   → the single most recent release of any kind (so beta users
+           see pre-releases AND get notified when stable catches up)</p>
 </section>
 
 
@@ -74,26 +78,54 @@ date / on network error. <code>channel</code> picks stable or beta metadata file
   <pre class="language-dart"><code class="language-dart">static Future&lt;UpdateInfo?&gt; checkForUpdate({
   UpdateChannel channel = UpdateChannel.stable,
 }) async {
-  final filename = channel == UpdateChannel.beta ? &#39;update_beta.json&#39; : &#39;update.json&#39;;
   try {
-    final uri = Uri.parse(&#39;$_pagesBase&#47;$filename&#39;);
-    final res = await http.get(uri).timeout(_timeout);
+    final uri = Uri.parse(
+      &#39;https:&#47;&#47;api.github.com&#47;repos&#47;$_owner&#47;$_repo&#47;releases?per_page=10&#39;,
+    );
+    final res = await http.get(uri, headers: const {
+      &#39;Accept&#39;: &#39;application&#47;vnd.github+json&#39;,
+    }).timeout(_timeout);
+
     if (res.statusCode != 200) return null;
 
-    final data = jsonDecode(utf8.decode(res.bodyBytes));
-    final rawTag = (data[&#39;version&#39;] ?? data[&#39;tag&#39;] ?? &#39;&#39;).toString();
-    final latest = rawTag.startsWith(&#39;v&#39;) ? rawTag.substring(1) : rawTag;
+    final list = jsonDecode(utf8.decode(res.bodyBytes)) as List&lt;dynamic&gt;;
+    if (list.isEmpty) return null;
 
+    &#47;&#47; Drop drafts always; for the stable channel also drop pre-releases.
+    final candidates = list
+        .cast&lt;Map&lt;String, dynamic&gt;&gt;()
+        .where((r) =&gt; r[&#39;draft&#39;] != true)
+        .where((r) =&gt; channel == UpdateChannel.beta || r[&#39;prerelease&#39;] != true)
+        .toList();
+
+    if (candidates.isEmpty) return null;
+
+    &#47;&#47; GitHub returns releases already sorted by creation date, newest first.
+    final release = candidates.first;
+
+    final rawTag = (release[&#39;tag_name&#39;] ?? &#39;&#39;).toString();
+    final latest = rawTag.startsWith(&#39;v&#39;) ? rawTag.substring(1) : rawTag;
     if (latest.isEmpty) return null;
     if (!_isNewer(latest, currentVersion)) return null;
 
+    final assets = (release[&#39;assets&#39;] as List?)?.cast&lt;Map&lt;String, dynamic&gt;&gt;() ?? [];
+    String? findAsset(String name) {
+      for (final a in assets) {
+        if ((a[&#39;name&#39;] ?? &#39;&#39;) == name) return (a[&#39;browser_download_url&#39;] ?? &#39;&#39;).toString();
+      }
+      return null;
+    }
+
+    &#47;&#47; Universal APK preferred for the single-button download action.
+    final apkUrl = findAsset(&#39;app-universal-release.apk&#39;);
+
     return UpdateInfo(
       version:     latest,
-      releaseUrl:  (data[&#39;release_url&#39;] ?? &#39;&#39;).toString(),
-      apkUrl:      (data[&#39;apk_url&#39;] ?? &#39;&#39;).toString(),
-      notes:       (data[&#39;notes&#39;] ?? &#39;&#39;).toString(),
-      publishedAt: _parseDate(data[&#39;published_at&#39;]?.toString()),
-      isBeta:      channel == UpdateChannel.beta,
+      releaseUrl:  (release[&#39;html_url&#39;] ?? &#39;&#39;).toString(),
+      apkUrl:      apkUrl,
+      notes:       (release[&#39;body&#39;] ?? &#39;&#39;).toString(),
+      publishedAt: _parseDate(release[&#39;published_at&#39;]?.toString()),
+      isBeta:      release[&#39;prerelease&#39;] == true,
     );
   } catch (_) {
     return null;
