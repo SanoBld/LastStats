@@ -382,13 +382,13 @@ class _DashboardPageState extends State<_DashboardPage> {
       bool changed = false;
       final newArtists = results[0];
       final newTracks  = results[1];
-      if ((newArtists as List).isNotEmpty && _topArtists.isNotEmpty) {
+      if (newArtists.isNotEmpty && _topArtists.isNotEmpty) {
         if ((newArtists[0] as Map)['name'] != (_topArtists[0] as Map)['name']) { changed = true; }
       } else if (newArtists.length != _topArtists.length) {
         changed = true;
       }
       if (!changed) {
-        if ((newTracks as List).isNotEmpty && _topTracks.isNotEmpty) {
+        if (newTracks.isNotEmpty && _topTracks.isNotEmpty) {
           if ((newTracks[0] as Map)['name'] != (_topTracks[0] as Map)['name']) { changed = true; }
         } else if (newTracks.length != _topTracks.length) {
           changed = true;
@@ -399,14 +399,14 @@ class _DashboardPageState extends State<_DashboardPage> {
         setState(() {
           _topArtists   = newArtists;
           _topTracks    = newTracks;
-          if (results.length > 2) { _topArtistsWeek = results[2] as List; }
-          if (results.length > 3) { _topTracksWeek  = results[3] as List; }
+          if (results.length > 2) { _topArtistsWeek = results[2]; }
+          if (results.length > 3) { _topTracksWeek  = results[3]; }
         });
       }
       DataCache.set(DataCache.keyTopArtists('overall'), results[0]);
       DataCache.set(DataCache.keyTopTracks('overall'),  results[1]);
-      if (results.length > 2 && (results[2] as List).isNotEmpty) { DataCache.set(DataCache.keyTopArtists('7day'), results[2]); }
-      if (results.length > 3 && (results[3] as List).isNotEmpty) { DataCache.set(DataCache.keyTopTracks('7day'),  results[3]); }
+      if (results.length > 2 && results[2].isNotEmpty) { DataCache.set(DataCache.keyTopArtists('7day'), results[2]); }
+      if (results.length > 3 && results[3].isNotEmpty) { DataCache.set(DataCache.keyTopTracks('7day'),  results[3]); }
     } catch (_) {}
   }
 
@@ -3488,68 +3488,6 @@ class _RecentTrackRowState extends State<_RecentTrackRow> {
 }
 
 
-// ── Refresh button with rotation animation ────────────────────────────────────
-
-class _SyncRefreshButton extends StatefulWidget {
-  final bool          isSyncing;
-  final VoidCallback? onPressed;
-  final String        tooltip;
-
-  const _SyncRefreshButton({
-    required this.isSyncing,
-    required this.tooltip,
-    this.onPressed,
-  });
-
-  @override
-  State<_SyncRefreshButton> createState() => _SyncRefreshButtonState();
-}
-
-class _SyncRefreshButtonState extends State<_SyncRefreshButton>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-    if (widget.isSyncing) _ctrl.repeat();
-  }
-
-  @override
-  void didUpdateWidget(_SyncRefreshButton old) {
-    super.didUpdateWidget(old);
-    if (widget.isSyncing && !_ctrl.isAnimating) {
-      _ctrl.repeat();
-    } else if (!widget.isSyncing && _ctrl.isAnimating) {
-      _ctrl.stop();
-      _ctrl.animateTo(0, duration: const Duration(milliseconds: 300));
-    }
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      icon: RotationTransition(
-        turns: _ctrl,
-        child: const Icon(Icons.refresh_rounded),
-      ),
-      onPressed: widget.onPressed,
-      tooltip:   widget.tooltip,
-    );
-  }
-}
-
-
 // ── Sync progress chip ────────────────────────────────────────────────────────
 
 class _SyncProgressChip extends StatelessWidget {
@@ -3751,7 +3689,7 @@ class _NewsSheet extends StatelessWidget {
                   controller:  scroll,
                   padding:     const EdgeInsets.fromLTRB(16, 12, 16, 24),
                   itemCount:   items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
                   itemBuilder: (_, i) {
                     final item  = items[i];
                     final title = (item['title'] ?? '').toString();
@@ -3761,84 +3699,325 @@ class _NewsSheet extends StatelessWidget {
                     final emoji = (item['emoji'] ?? '').toString();
                     final (icon, color) = _typeStyle(type);
 
-                    return Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color:        scheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: color.withValues(alpha: 0.25),
+                    return _NewsListTile(
+                      title: title,
+                      body:  body,
+                      type:  type,
+                      date:  date,
+                      emoji: emoji,
+                      icon:  icon,
+                      color: color,
+                      onTap: () => showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: scheme.surface,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                         ),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Icon / emoji
-                          Container(
-                            width: 36, height: 36,
-                            decoration: BoxDecoration(
-                              color:        color.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Center(
-                              child: emoji.isNotEmpty
-                                  ? Text(emoji,
-                                      style: const TextStyle(fontSize: 18))
-                                  : Icon(icon, size: 18, color: color),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          // Content
-                          Expanded(child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(children: [
-                                Expanded(
-                                  child: Text(title,
-                                    style: text.bodyMedium?.copyWith(
-                                        fontWeight: FontWeight.w700)),
-                                ),
-                                if (date.isNotEmpty)
-                                  Text(date,
-                                    style: text.labelSmall?.copyWith(
-                                        color: scheme.onSurfaceVariant,
-                                        fontSize: 10)),
-                              ]),
-                              if (body.isNotEmpty) ...[
-                                const SizedBox(height: 4),
-                                Text(body,
-                                  style: text.bodySmall?.copyWith(
-                                      color: scheme.onSurfaceVariant,
-                                      height: 1.4)),
-                              ],
-                              // Type badge
-                              const SizedBox(height: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 7, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color:        color.withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  type.toUpperCase(),
-                                  style: TextStyle(
-                                    color:         color,
-                                    fontSize:      9,
-                                    fontWeight:    FontWeight.w700,
-                                    letterSpacing: 0.8,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )),
-                        ],
+                        builder: (_) => _NewsDetailSheet(item: item),
                       ),
                     );
                   },
                 ),
         ),
       ]),
+    );
+  }
+}
+
+
+// ── Single news row (tappable) ────────────────────────────────────────────────
+
+class _NewsListTile extends StatefulWidget {
+  final String     title, body, type, date, emoji;
+  final IconData   icon;
+  final Color      color;
+  final VoidCallback onTap;
+
+  const _NewsListTile({
+    required this.title,
+    required this.body,
+    required this.type,
+    required this.date,
+    required this.emoji,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  State<_NewsListTile> createState() => _NewsListTileState();
+}
+
+class _NewsListTileState extends State<_NewsListTile> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+
+    return GestureDetector(
+      onTap:       () { _haptic(_HapticImpact.light); widget.onTap(); },
+      onTapDown:   (_) => setState(() => _pressed = true),
+      onTapUp:     (_) => setState(() => _pressed = false),
+      onTapCancel: ()  => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale:    _pressed ? 0.98 : 1.0,
+        duration: const Duration(milliseconds: 120),
+        curve:    Curves.easeOut,
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color:        scheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: widget.color.withValues(alpha: 0.25),
+            ),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Icon / emoji
+              Container(
+                width: 36, height: 36,
+                decoration: BoxDecoration(
+                  color:        widget.color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Center(
+                  child: widget.emoji.isNotEmpty
+                      ? Text(widget.emoji, style: const TextStyle(fontSize: 18))
+                      : Icon(widget.icon, size: 18, color: widget.color),
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Content
+              Expanded(child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(widget.title,
+                          style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+                      ),
+                      if (widget.date.isNotEmpty) ...[
+                        const SizedBox(width: 8),
+                        Text(widget.date,
+                          style: text.labelSmall?.copyWith(
+                              color: scheme.onSurfaceVariant, fontSize: 10)),
+                      ],
+                    ],
+                  ),
+                  if (widget.body.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(widget.body,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: text.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant, height: 1.4)),
+                  ],
+                  const SizedBox(height: 8),
+                  Row(children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      decoration: BoxDecoration(
+                        color:        widget.color.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        widget.type.toUpperCase(),
+                        style: TextStyle(
+                          color:         widget.color,
+                          fontSize:      9,
+                          fontWeight:    FontWeight.w700,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    Icon(Icons.chevron_right_rounded,
+                        size: 18, color: scheme.onSurfaceVariant.withValues(alpha: 0.5)),
+                  ]),
+                ],
+              )),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+// ── Full news detail sheet, with clickable links ───────────────────────────────
+
+class _NewsDetailSheet extends StatelessWidget {
+  final Map<String, dynamic> item;
+  const _NewsDetailSheet({required this.item});
+
+  // Matches http(s) URLs inside free text
+  static final RegExp _urlRegex =
+      RegExp(r'(https?:\/\/[^\s]+)', caseSensitive: false);
+
+  Future<void> _openUrl(String rawUrl) async {
+    // Strip trailing punctuation that often sticks to URLs in prose
+    final cleaned = rawUrl.replaceAll(RegExp(r'[)\].,;!?]+$'), '');
+    final uri = Uri.tryParse(cleaned);
+    if (uri == null) return;
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  // Builds a rich text where any URL substring becomes a tappable link.
+  // Uses WidgetSpan + GestureDetector instead of TapGestureRecognizer so no
+  // extra import (flutter/gestures.dart) is required.
+  Widget _linkifiedBody(BuildContext context, String body, TextStyle? style, Color linkColor) {
+    final matches = _urlRegex.allMatches(body).toList();
+    if (matches.isEmpty) {
+      return Text(body, style: style);
+    }
+
+    final spans = <InlineSpan>[];
+    int cursor = 0;
+    for (final m in matches) {
+      if (m.start > cursor) {
+        spans.add(TextSpan(text: body.substring(cursor, m.start)));
+      }
+      final rawUrl = m.group(0)!;
+      spans.add(WidgetSpan(
+        alignment: PlaceholderAlignment.baseline,
+        baseline:  TextBaseline.alphabetic,
+        child: GestureDetector(
+          onTap: () => _openUrl(rawUrl),
+          child: Text(
+            rawUrl,
+            style: style?.copyWith(
+              color:           linkColor,
+              fontWeight:      FontWeight.w600,
+              decoration:      TextDecoration.underline,
+              decorationColor: linkColor,
+            ),
+          ),
+        ),
+      ));
+      cursor = m.end;
+    }
+    if (cursor < body.length) {
+      spans.add(TextSpan(text: body.substring(cursor)));
+    }
+
+    return Text.rich(TextSpan(style: style, children: spans));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+
+    final title = (item['title'] ?? '').toString();
+    final body  = (item['body']  ?? '').toString();
+    final type  = (item['type']  ?? 'info').toString();
+    final date  = (item['date']  ?? '').toString();
+    final emoji = (item['emoji'] ?? '').toString();
+    final url   = (item['url']   ?? '').toString();
+    final (icon, color) = _NewsSheet._typeStyle(type);
+
+    return DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.55,
+      minChildSize:     0.3,
+      maxChildSize:     0.9,
+      builder: (ctx, scroll) => SingleChildScrollView(
+        controller: scroll,
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+
+          // Drag handle
+          Center(child: Container(
+            width: 36, height: 4,
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: scheme.outlineVariant,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          )),
+
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(
+              width: 44, height: 44,
+              decoration: BoxDecoration(
+                color:        color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: emoji.isNotEmpty
+                    ? Text(emoji, style: const TextStyle(fontSize: 22))
+                    : Icon(icon, size: 22, color: color),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                  style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                if (date.isNotEmpty) ...[
+                  const SizedBox(height: 3),
+                  Text(date,
+                    style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
+                ],
+              ],
+            )),
+          ]),
+
+          const SizedBox(height: 8),
+
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color:        color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              type.toUpperCase(),
+              style: TextStyle(
+                color:         color,
+                fontSize:      10,
+                fontWeight:    FontWeight.w700,
+                letterSpacing: 0.8,
+              ),
+            ),
+          ),
+
+          if (body.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            _linkifiedBody(
+              context,
+              body,
+              text.bodyMedium?.copyWith(color: scheme.onSurface, height: 1.5),
+              scheme.primary,
+            ),
+          ],
+
+          if (url.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () => _openUrl(url),
+                icon:  const Icon(Icons.open_in_new_rounded, size: 18),
+                label: Text(
+                  localeNotifier.value == 'en' ? 'Open link' : 'Ouvrir le lien',
+                ),
+              ),
+            ),
+          ],
+        ]),
+      ),
     );
   }
 }
