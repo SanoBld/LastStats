@@ -68,51 +68,12 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; run(GlobalKey&lt;NavigatorState&gt; navigatorKey) async {
-  &#47;&#47; Small delay so the dialog doesn&#39;t pop up before the first frame is drawn
   await Future.delayed(const Duration(milliseconds: 800));
-
-  &#47;&#47; Respect the user&#39;s beta-channel choice from Settings
-  final prefs    = await SharedPreferences.getInstance();
+  final prefs     = await SharedPreferences.getInstance();
   final wantsBeta = prefs.getBool(&#39;ls_beta_channel&#39;) ?? false;
   final channel   = wantsBeta ? UpdateChannel.beta : UpdateChannel.stable;
-
-  final info = await UpdateService.checkForUpdate(channel: channel);
-  if (info == null) return;
-
-  final ctx = navigatorKey.currentContext;
-  if (ctx == null) return;
-
-  showDialog(
-    context: ctx,
-    builder: (dialogCtx) =&gt; AlertDialog(
-      title: Text(
-        info.isBeta
-            ? &#39;Beta update available — v${info.version}&#39;
-            : &#39;Update available — v${info.version}&#39;,
-      ),
-      content: Text(
-        info.notes.isNotEmpty
-            ? (info.notes.length &gt; 200 ? &#39;${info.notes.substring(0, 200)}…&#39; : info.notes)
-            : &#39;A new version of LastStats is available.&#39;,
-      ),
-      actions: [
-        TextButton(
-          onPressed: () =&gt; Navigator.pop(dialogCtx),
-          child: const Text(&#39;Later&#39;),
-        ),
-        FilledButton(
-          onPressed: () async {
-            Navigator.pop(dialogCtx);
-            final url = Uri.parse(info.hasApk ? info.apkUrl! : info.releaseUrl);
-            if (await canLaunchUrl(url)) {
-              await launchUrl(url, mode: LaunchMode.externalApplication);
-            }
-          },
-          child: const Text(&#39;Download&#39;),
-        ),
-      ],
-    ),
-  );
+  &#47;&#47; Result is consumed by _fetchNews in _dashboard_page via UpdateService.
+  await UpdateService.checkForUpdate(channel: channel);
 }</code></pre>
 </section>
 
