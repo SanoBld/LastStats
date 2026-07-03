@@ -3629,11 +3629,10 @@ class _AmbientHeaderState extends State<_AmbientHeader>
 //  In-app news sheet
 // ══════════════════════════════════════════════════════════════════════════════
 
-class _NewsSheet extends StatelessWidget {
+class _NewsSheet extends StatefulWidget {
   final List<Map<String, dynamic>> items;
   const _NewsSheet({required this.items});
 
-  // Map type key to icon + color
   static (IconData, Color) _typeStyle(String type) => switch (type) {
     'feature' => (Icons.auto_awesome_rounded,    Color(0xFF7C3AED)),
     'fix'     => (Icons.build_circle_outlined,   Color(0xFFD97706)),
@@ -3643,10 +3642,38 @@ class _NewsSheet extends StatelessWidget {
   };
 
   @override
+  State<_NewsSheet> createState() => _NewsSheetState();
+}
+
+class _NewsSheetState extends State<_NewsSheet> {
+  String? _type; // null = tous
+  String? _date; // null = tous
+  bool _showFilters = false;
+
+  @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
     final isEn   = localeNotifier.value == 'en';
+    final items  = widget.items;
+
+    final types = items.map((e) => (e['type'] ?? 'info').toString()).toSet().toList()..sort();
+    final dates = items.map((e) => (e['date'] ?? '').toString()).where((d) => d.isNotEmpty).toSet().toList()
+      ..sort((a, b) => b.compareTo(a));
+
+    final filtered = items.where((e) {
+      if (_type != null && (e['type'] ?? 'info').toString() != _type) return false;
+      if (_date != null && (e['date'] ?? '').toString() != _date) return false;
+      return true;
+    }).toList();
+
+    String typeLabel(String t) => switch (t) {
+      'feature' => isEn ? 'Features' : 'Fonctions',
+      'fix'     => isEn ? 'Fixes'    : 'Correctifs',
+      'update'  => isEn ? 'Updates'  : 'Mises à jour',
+      'alert'   => isEn ? 'Alerts'   : 'Alertes',
+      _         => isEn ? 'Info'     : 'Infos',
+    };
 
     return DraggableScrollableSheet(
       expand: false,
@@ -3676,14 +3703,51 @@ class _NewsSheet extends StatelessWidget {
                     style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (items.isNotEmpty)
-                    Text(
-                      '${items.length} ${isEn ? (items.length > 1 ? "items" : "item") : (items.length > 1 ? "éléments" : "élément")}',
-                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-                    ),
+                  Text(
+                    '${filtered.length} ${isEn ? (filtered.length > 1 ? "items" : "item") : (filtered.length > 1 ? "éléments" : "élément")}',
+                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                  ),
                 ]),
               ),
+              IconButton(
+                icon: Icon(_showFilters ? Icons.filter_list_off_rounded : Icons.filter_list_rounded,
+                    color: (_type != null || _date != null) ? scheme.primary : null),
+                tooltip: isEn ? 'Filters' : 'Filtres',
+                onPressed: () => setState(() => _showFilters = !_showFilters),
+              ),
             ]),
+            if (_showFilters) ...[
+              const SizedBox(height: 8),
+              Wrap(spacing: 8, runSpacing: 8, children: [
+                FilterChip(
+                  label: Text(isEn ? 'All' : 'Tous'),
+                  selected: _type == null,
+                  onSelected: (_) => setState(() => _type = null),
+                ),
+                for (final t in types)
+                  FilterChip(
+                    label: Text(typeLabel(t)),
+                    selected: _type == t,
+                    onSelected: (_) => setState(() => _type = _type == t ? null : t),
+                  ),
+              ]),
+              if (dates.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Wrap(spacing: 8, runSpacing: 8, children: [
+                  FilterChip(
+                    label: Text(isEn ? 'Any date' : 'Toute date'),
+                    selected: _date == null,
+                    onSelected: (_) => setState(() => _date = null),
+                  ),
+                  for (final d in dates)
+                    FilterChip(
+                      label: Text(d),
+                      selected: _date == d,
+                      onSelected: (_) => setState(() => _date = _date == d ? null : d),
+                    ),
+                ]),
+              ],
+            ],
             const SizedBox(height: 14),
             Divider(height: 1, color: scheme.outlineVariant.withValues(alpha: 0.5)),
           ]),
@@ -3691,7 +3755,7 @@ class _NewsSheet extends StatelessWidget {
 
         // List
         Expanded(
-          child: items.isEmpty
+          child: filtered.isEmpty
               ? Center(child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -3708,16 +3772,16 @@ class _NewsSheet extends StatelessWidget {
               : ListView.separated(
                   controller:  scroll,
                   padding:     const EdgeInsets.fromLTRB(16, 16, 16, 32),
-                  itemCount:   items.length,
+                  itemCount:   filtered.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (_, i) {
-                    final item  = items[i];
+                    final item  = filtered[i];
                     final title = (item['title'] ?? '').toString();
                     final body  = (item['body']  ?? '').toString();
                     final type  = (item['type']  ?? 'info').toString();
                     final date  = (item['date']  ?? '').toString();
                     final emoji = (item['emoji'] ?? '').toString();
-                    final (icon, color) = _typeStyle(type);
+                    final (icon, color) = _NewsSheet._typeStyle(type);
 
                     return _NewsListTile(
                       title: title,
