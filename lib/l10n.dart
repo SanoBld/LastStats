@@ -277,6 +277,38 @@ abstract class AppStrings {
   String get onboardStartupSub;
   String get onboardUpdatesTitle;
   String get onboardUpdatesSub;
+  String get onboardStyle;
+  String get onboardStyleMaterialYou;
+  String get onboardStyleNothing;
+  String get onboardPreview;
+  String get onboardPreviewButton;
+  String get onboardPreviewOutline;
+  String get onboardPreviewText;
+  String get onboardPreviewBubble;
+  String get onboardAccentTint;
+  String get onboardNothingRedOnly;
+  String get onboardNothingRedYellow;
+  String get onboardDisplay;
+  String get onboardOledTitle;
+  String get onboardOledSub;
+  String get onboardArtworkColorTitle;
+  String get onboardArtworkColorSub;
+  String get onboardNewsTitle;
+  String get onboardNewsSub;
+  String get onboardNewsBadgeTitle;
+  String get onboardNewsBadgeSub;
+  String get onboardHapticTitle;
+  String get onboardHapticSub;
+  String get onboardRecaps;
+  String get onboardDailyRecapTitle;
+  String get onboardDailyRecapSub;
+  String get onboardWeeklyRecapTitle;
+  String get onboardWeeklyRecapSub;
+  String get onboardMilestonesSection;
+  String get onboardMilestonesTitle;
+  String get onboardMilestonesSub;
+  String get onboardGrandMilestonesTitle;
+  String get onboardGrandMilestonesSub;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -548,6 +580,38 @@ class _AppStringsFr implements AppStrings {
   @override String get onboardStartupSub       => 'Quel onglet voir en premier ?';
   @override String get onboardUpdatesTitle     => 'Mises à jour';
   @override String get onboardUpdatesSub       => 'Vérification automatique des nouvelles versions.';
+  @override String get onboardStyle              => 'Style';
+  @override String get onboardStyleMaterialYou    => 'Material You';
+  @override String get onboardStyleNothing        => 'Nothing OS';
+  @override String get onboardPreview             => 'Aperçu';
+  @override String get onboardPreviewButton       => 'Bouton';
+  @override String get onboardPreviewOutline      => 'Contour';
+  @override String get onboardPreviewText         => 'Texte exemple';
+  @override String get onboardPreviewBubble       => 'Bulle';
+  @override String get onboardAccentTint          => 'Teinte d\'accent';
+  @override String get onboardNothingRedOnly      => 'Rouge seul';
+  @override String get onboardNothingRedYellow    => 'Rouge + jaune';
+  @override String get onboardDisplay             => 'Affichage';
+  @override String get onboardOledTitle           => 'Noir OLED';
+  @override String get onboardOledSub             => 'Fond noir pur en mode sombre';
+  @override String get onboardArtworkColorTitle   => 'Couleur depuis la pochette';
+  @override String get onboardArtworkColorSub     => 'Adapter la couleur d\'accent à la pochette en cours de lecture';
+  @override String get onboardNewsTitle           => 'Notifications d\'actualités';
+  @override String get onboardNewsSub             => 'Sois notifié des nouvelles fonctions et correctifs';
+  @override String get onboardNewsBadgeTitle      => 'Pastille d\'actualités';
+  @override String get onboardNewsBadgeSub        => 'Point rouge sur la cloche du dashboard s\'il y a du nouveau';
+  @override String get onboardHapticTitle         => 'Retour haptique';
+  @override String get onboardHapticSub           => 'Ressens de légères vibrations sur les interactions clés';
+  @override String get onboardRecaps              => 'Récapitulatifs';
+  @override String get onboardDailyRecapTitle     => 'Récap quotidien';
+  @override String get onboardDailyRecapSub       => 'Un résumé de ton écoute de la journée';
+  @override String get onboardWeeklyRecapTitle    => 'Récap hebdomadaire';
+  @override String get onboardWeeklyRecapSub      => 'Tes tops artistes, albums et titres de la semaine';
+  @override String get onboardMilestonesSection   => 'Jalons de scrobbles';
+  @override String get onboardMilestonesTitle     => 'Jalons';
+  @override String get onboardMilestonesSub       => 'Célébrer les chiffres ronds de scrobbles';
+  @override String get onboardGrandMilestonesTitle => 'Grands jalons';
+  @override String get onboardGrandMilestonesSub   => 'Célébration spéciale pour les grands jalons';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -819,6 +883,38 @@ class _AppStringsEn implements AppStrings {
   @override String get onboardStartupSub       => 'Which tab do you want to see first?';
   @override String get onboardUpdatesTitle     => 'Updates';
   @override String get onboardUpdatesSub       => 'Automatic check for new versions.';
+  @override String get onboardStyle              => 'Style';
+  @override String get onboardStyleMaterialYou    => 'Material You';
+  @override String get onboardStyleNothing        => 'Nothing OS';
+  @override String get onboardPreview             => 'Preview';
+  @override String get onboardPreviewButton       => 'Button';
+  @override String get onboardPreviewOutline      => 'Outline';
+  @override String get onboardPreviewText         => 'Sample text';
+  @override String get onboardPreviewBubble       => 'Bubble';
+  @override String get onboardAccentTint          => 'Accent tint';
+  @override String get onboardNothingRedOnly      => 'Red only';
+  @override String get onboardNothingRedYellow    => 'Red + yellow';
+  @override String get onboardDisplay             => 'Display';
+  @override String get onboardOledTitle           => 'OLED true black';
+  @override String get onboardOledSub             => 'Pure black background in dark mode';
+  @override String get onboardArtworkColorTitle   => 'Color from artwork';
+  @override String get onboardArtworkColorSub     => 'Match accent color to the now-playing cover art';
+  @override String get onboardNewsTitle           => 'News notifications';
+  @override String get onboardNewsSub             => 'Get notified about new features and fixes';
+  @override String get onboardNewsBadgeTitle      => 'News badge dot';
+  @override String get onboardNewsBadgeSub        => 'Red dot on the dashboard bell when there\'s news';
+  @override String get onboardHapticTitle         => 'Haptic feedback';
+  @override String get onboardHapticSub           => 'Feel subtle vibrations on key interactions';
+  @override String get onboardRecaps              => 'Recaps';
+  @override String get onboardDailyRecapTitle     => 'Daily recap';
+  @override String get onboardDailyRecapSub       => 'A quick summary of your day\'s listening';
+  @override String get onboardWeeklyRecapTitle    => 'Weekly recap';
+  @override String get onboardWeeklyRecapSub      => 'Your week\'s top artists, albums and tracks';
+  @override String get onboardMilestonesSection   => 'Scrobble milestones';
+  @override String get onboardMilestonesTitle     => 'Milestones';
+  @override String get onboardMilestonesSub       => 'Celebrate round-number scrobble counts';
+  @override String get onboardGrandMilestonesTitle => 'Grand milestones';
+  @override String get onboardGrandMilestonesSub   => 'Extra celebration for major milestones';
 }
 
 // ══════════════════════════════════════════════════════════════════════════

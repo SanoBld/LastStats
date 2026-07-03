@@ -175,6 +175,24 @@ class _AppearanceStepState extends State<_AppearanceStep> {
     setState(() {});
   }
 
+  Future<void> _setOled(bool v) async {
+    final p = await SharedPreferences.getInstance();
+    await p.setBool('ls_oled_mode', v);
+    oledModeNotifier.value = v;
+    setState(() {});
+  }
+
+  Future<void> _setNowPlayingColor(bool v) async {
+    final p = await SharedPreferences.getInstance();
+    await p.setBool('ls_use_nowplaying_color', v);
+    useNowPlayingColorNotifier.value = v;
+    if (v) {
+      await p.setBool('ls_use_dynamic_color', false);
+      useDynamicColorNotifier.value = false;
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -188,17 +206,21 @@ class _AppearanceStepState extends State<_AppearanceStep> {
         valueListenable: useDynamicColorNotifier,
         builder: (_, dynamic_, _) => ValueListenableBuilder<Color>(
           valueListenable: accentNotifier,
-          builder: (_, accent, _) => _Step(
+          builder: (_, accent, _) => ValueListenableBuilder<bool>(
+            valueListenable: oledModeNotifier,
+            builder: (_, oled, _) => ValueListenableBuilder<bool>(
+              valueListenable: useNowPlayingColorNotifier,
+              builder: (_, nowPlayingColor, _) => _Step(
             icon: Icons.palette_rounded,
             title: L.onboardAppearanceTitle,
             subtitle: L.onboardAppearanceSub,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(isEn ? 'Style' : 'Style', style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
+              Text(L.onboardStyle, style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
               const SizedBox(height: 10),
               SegmentedButton<String>(
                 segments: [
-                  ButtonSegment(value: 'default', icon: const Icon(Icons.auto_awesome_rounded), label: const Text('Material You')),
-                  ButtonSegment(value: 'nothing', icon: const Icon(Icons.grid_on_rounded), label: const Text('Nothing OS')),
+                  ButtonSegment(value: 'default', icon: const Icon(Icons.auto_awesome_rounded), label: Text(L.onboardStyleMaterialYou)),
+                  ButtonSegment(value: 'nothing', icon: const Icon(Icons.grid_on_rounded), label: Text(L.onboardStyleNothing)),
                 ],
                 selected: {style},
                 onSelectionChanged: (s) => _setStyle(s.first),
@@ -246,7 +268,7 @@ class _AppearanceStepState extends State<_AppearanceStep> {
                     );
                   }).toList()),
                   const SizedBox(height: 22),
-                  Text(isEn ? 'Preview' : 'Aperçu', style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
+                  Text(L.onboardPreview, style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
                   const SizedBox(height: 10),
                   Container(
                     padding: const EdgeInsets.all(14),
@@ -256,11 +278,11 @@ class _AppearanceStepState extends State<_AppearanceStep> {
                     ),
                     child: Wrap(spacing: 10, runSpacing: 10, crossAxisAlignment: WrapCrossAlignment.center, children: [
                       FilledButton(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: accent),
-                          child: Text(isEn ? 'Button' : 'Bouton')),
+                          child: Text(L.onboardPreviewButton)),
                       OutlinedButton(onPressed: () {}, style: OutlinedButton.styleFrom(foregroundColor: accent, side: BorderSide(color: accent)),
-                          child: Text(isEn ? 'Outline' : 'Contour')),
-                      Text(isEn ? 'Sample text' : 'Texte exemple', style: TextStyle(color: accent, fontWeight: FontWeight.w700)),
-                      Chip(label: Text(isEn ? 'Bubble' : 'Bulle'),
+                          child: Text(L.onboardPreviewOutline)),
+                      Text(L.onboardPreviewText, style: TextStyle(color: accent, fontWeight: FontWeight.w700)),
+                      Chip(label: Text(L.onboardPreviewBubble),
                           backgroundColor: accent.withValues(alpha: 0.15),
                           labelStyle: TextStyle(color: accent, fontWeight: FontWeight.w600),
                           side: BorderSide.none),
@@ -268,14 +290,14 @@ class _AppearanceStepState extends State<_AppearanceStep> {
                   ),
                 ],
               ] else ...[
-                Text(isEn ? 'Accent tint' : 'Teinte d\'accent', style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
+                Text(L.onboardAccentTint, style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
                 const SizedBox(height: 10),
                 ValueListenableBuilder<String>(
                   valueListenable: nothingAccentNotifier,
                   builder: (_, nAccent, _) => SegmentedButton<String>(
-                    segments: const [
-                      ButtonSegment(value: 'classic', label: Text('Red only')),
-                      ButtonSegment(value: 'mixed', label: Text('Red + yellow')),
+                    segments: [
+                      ButtonSegment(value: 'classic', label: Text(L.onboardNothingRedOnly)),
+                      ButtonSegment(value: 'mixed', label: Text(L.onboardNothingRedYellow)),
                     ],
                     selected: {nAccent},
                     onSelectionChanged: (s) async {
@@ -286,9 +308,33 @@ class _AppearanceStepState extends State<_AppearanceStep> {
                   ),
                 ),
               ],
+              const SizedBox(height: 22),
+              Text(L.onboardDisplay, style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
+              const SizedBox(height: 6),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.contrast_rounded, color: scheme.primary),
+                title: Text(L.onboardOledTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
+                subtitle: Text(L.onboardOledSub,
+                    style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+                value: oled,
+                onChanged: _setOled,
+              ),
+              const Divider(height: 8),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(Icons.image_rounded, color: scheme.primary),
+                title: Text(L.onboardArtworkColorTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
+                subtitle: Text(L.onboardArtworkColorSub,
+                    style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+                value: nowPlayingColor,
+                onChanged: _setNowPlayingColor,
+              ),
             ]),
           ),
         ),
+      ),
+      ),
       ),
     ),
     );
@@ -303,6 +349,24 @@ class _NotificationsStep extends StatefulWidget {
 }
 
 class _NotificationsStepState extends State<_NotificationsStep> {
+  // Local-only prefs (no global ValueNotifier exists for these — same
+  // pattern as NotificationsPage, which reads/writes them directly).
+  bool _daily = true, _weekly = true, _milestones = true, _grand = true;
+
+  @override
+  void initState() { super.initState(); _load(); }
+
+  Future<void> _load() async {
+    final p = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      _daily      = p.getBool('ls_notif_daily_enabled')     ?? true;
+      _weekly     = p.getBool('ls_notif_weekly_enabled')    ?? true;
+      _milestones = p.getBool('ls_notif_milestone_enabled') ?? true;
+      _grand      = p.getBool('ls_notif_grand_enabled')     ?? true;
+    });
+  }
+
   Future<void> _set(String key, bool v, ValueNotifier<bool> notifier) async {
     final p = await SharedPreferences.getInstance();
     await p.setBool(key, v);
@@ -311,10 +375,16 @@ class _NotificationsStepState extends State<_NotificationsStep> {
     setState(() {});
   }
 
+  Future<void> _setLocal(String key, bool v, void Function(bool) apply) async {
+    final p = await SharedPreferences.getInstance();
+    await p.setBool(key, v);
+    if (v) HapticFeedback.selectionClick();
+    setState(() => apply(v));
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final isEn   = localeNotifier.value == 'en';
 
     return ValueListenableBuilder<bool>(
       valueListenable: notifNewsEnabledNotifier,
@@ -330,8 +400,8 @@ class _NotificationsStepState extends State<_NotificationsStep> {
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               secondary: Icon(Icons.campaign_rounded, color: scheme.primary),
-              title: Text(isEn ? 'News notifications' : 'Notifications d\'actualités', style: const TextStyle(fontWeight: FontWeight.w700)),
-              subtitle: Text(isEn ? 'Get notified about new features and fixes' : 'Sois notifié des nouvelles fonctions et correctifs',
+              title: Text(L.onboardNewsTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
+              subtitle: Text(L.onboardNewsSub,
                   style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
               value: news,
               onChanged: (v) => _set('ls_notif_news_enabled', v, notifNewsEnabledNotifier),
@@ -340,8 +410,8 @@ class _NotificationsStepState extends State<_NotificationsStep> {
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               secondary: Icon(Icons.circle_notifications_rounded, color: scheme.primary),
-              title: Text(isEn ? 'News badge dot' : 'Pastille d\'actualités', style: const TextStyle(fontWeight: FontWeight.w700)),
-              subtitle: Text(isEn ? 'Red dot on the dashboard bell when there\'s news' : 'Point rouge sur la cloche du dashboard s\'il y a du nouveau',
+              title: Text(L.onboardNewsBadgeTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
+              subtitle: Text(L.onboardNewsBadgeSub,
                   style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
               value: badge,
               onChanged: (v) => _set('ls_show_news_badge', v, showNewsBadgeNotifier),
@@ -350,11 +420,61 @@ class _NotificationsStepState extends State<_NotificationsStep> {
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               secondary: Icon(Icons.vibration_rounded, color: scheme.primary),
-              title: Text(isEn ? 'Haptic feedback' : 'Retour haptique', style: const TextStyle(fontWeight: FontWeight.w700)),
-              subtitle: Text(isEn ? 'Feel subtle vibrations on key interactions' : 'Ressens de légères vibrations sur les interactions clés',
+              title: Text(L.onboardHapticTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
+              subtitle: Text(L.onboardHapticSub,
                   style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
               value: haptic,
               onChanged: (v) => _set('ls_haptic_feedback', v, hapticFeedbackNotifier),
+            ),
+            const SizedBox(height: 22),
+            Align(alignment: Alignment.centerLeft, child: Text(
+              L.onboardRecaps,
+              style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface),
+            )),
+            const SizedBox(height: 6),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              secondary: Icon(Icons.today_rounded, color: scheme.primary),
+              title: Text(L.onboardDailyRecapTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
+              subtitle: Text(L.onboardDailyRecapSub,
+                  style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+              value: _daily,
+              onChanged: (v) => _setLocal('ls_notif_daily_enabled', v, (x) => _daily = x),
+            ),
+            const Divider(height: 24),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              secondary: Icon(Icons.date_range_rounded, color: scheme.primary),
+              title: Text(L.onboardWeeklyRecapTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
+              subtitle: Text(L.onboardWeeklyRecapSub,
+                  style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+              value: _weekly,
+              onChanged: (v) => _setLocal('ls_notif_weekly_enabled', v, (x) => _weekly = x),
+            ),
+            const SizedBox(height: 22),
+            Align(alignment: Alignment.centerLeft, child: Text(
+              L.onboardMilestonesSection,
+              style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface),
+            )),
+            const SizedBox(height: 6),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              secondary: Icon(Icons.flag_rounded, color: scheme.primary),
+              title: Text(L.onboardMilestonesTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
+              subtitle: Text(L.onboardMilestonesSub,
+                  style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+              value: _milestones,
+              onChanged: (v) => _setLocal('ls_notif_milestone_enabled', v, (x) => _milestones = x),
+            ),
+            const Divider(height: 24),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              secondary: Icon(Icons.emoji_events_rounded, color: scheme.primary),
+              title: Text(L.onboardGrandMilestonesTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
+              subtitle: Text(L.onboardGrandMilestonesSub,
+                  style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+              value: _grand,
+              onChanged: (v) => _setLocal('ls_notif_grand_enabled', v, (x) => _grand = x),
             ),
           ]),
         )),
