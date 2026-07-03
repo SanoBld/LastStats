@@ -12,13 +12,15 @@ Future<void> _openBioUrl(String rawUrl) async {
 }
 
 Widget _linkifiedText(String body, TextStyle? style, Color linkColor) {
-  final matches = _bioUrlRegex.allMatches(body).toList();
-  if (matches.isEmpty) return Text(body, style: style);
+  // Safety net: strip any leftover raw HTML tags (e.g. stray <a> links)
+  final clean = body.replaceAll(RegExp(r'<[^>]+>'), '');
+  final matches = _bioUrlRegex.allMatches(clean).toList();
+  if (matches.isEmpty) return Text(clean, style: style);
 
   final spans = <InlineSpan>[];
   int cursor = 0;
   for (final m in matches) {
-    if (m.start > cursor) spans.add(TextSpan(text: body.substring(cursor, m.start)));
+    if (m.start > cursor) spans.add(TextSpan(text: clean.substring(cursor, m.start)));
     final rawUrl = m.group(0)!;
     spans.add(WidgetSpan(
       alignment: PlaceholderAlignment.baseline,
@@ -33,7 +35,7 @@ Widget _linkifiedText(String body, TextStyle? style, Color linkColor) {
     ));
     cursor = m.end;
   }
-  if (cursor < body.length) spans.add(TextSpan(text: body.substring(cursor)));
+  if (cursor < clean.length) spans.add(TextSpan(text: clean.substring(cursor)));
   return Text.rich(TextSpan(style: style, children: spans));
 }
 
@@ -467,7 +469,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   String _bio() {
     final raw = (_info?['bio']?['content'] ?? _info?['wiki']?['content'] ?? '').toString();
     if (raw.isEmpty) return '';
-    final idx = raw.indexOf('<a href="https://www.last.fm');
+    final idx = raw.indexOf(RegExp(r'<a href="https?://www\.last\.fm'));
     return idx > 0 ? raw.substring(0, idx).trim() : raw.trim();
   }
 
@@ -698,8 +700,15 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ),
           ],
           const SizedBox(height: 14),
-          // Music app link buttons
-          _buildMusicLinks(hasImage),
+          // Music app link buttons + circular preview play button
+          Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            Expanded(child: _buildMusicLinks(hasImage)),
+            if (widget.type == 'tracks' && (_previewUrl != null || _previewLoading))
+              Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: _buildPreviewRing(scheme),
+              ),
+          ]),
           const SizedBox(height: 16),
         ],
       ),
@@ -911,6 +920,40 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   }
 
 
+  // Small circular play/pause button with a progress ring, shown next to
+  // the music-app links in the header (replaces the old inline card).
+  Widget _buildPreviewRing(ColorScheme scheme) {
+    const size = 40.0;
+    return GestureDetector(
+      onTap: _previewLoading ? null : _togglePreview,
+      child: SizedBox(
+        width: size, height: size,
+        child: Stack(alignment: Alignment.center, children: [
+          SizedBox(
+            width: size, height: size,
+            child: CircularProgressIndicator(
+              value: _previewLoading ? null : _previewPos.clamp(0.0, 1.0),
+              strokeWidth: 2.5,
+              backgroundColor: Colors.white.withValues(alpha: 0.25),
+              valueColor: AlwaysStoppedAnimation(scheme.primary),
+            ),
+          ),
+          Container(
+            width: size - 10, height: size - 10,
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.45),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+              color: Colors.white, size: 18,
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
   // Toggle play / pause for the Deezer 30s preview clip.
   Future<void> _togglePreview() async {
     if (_previewUrl == null) return;
@@ -952,7 +995,9 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   }
 
   // In-app 30s preview player — shown just above the biography for tracks.
-  Widget _buildPreviewPlayer(ColorScheme scheme) {
+  Widget _buildPreviewPlayer(ColorScheme scheme) => const SizedBox.shrink();
+
+  Widget _buildOldPreviewPlayerUnused(ColorScheme scheme) {
     if (_previewUrl == null && !_previewLoading) return const SizedBox.shrink();
 
     final isEn = localeNotifier.value == 'en';
