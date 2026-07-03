@@ -3656,18 +3656,35 @@ class _NewsSheet extends StatelessWidget {
       builder: (ctx, scroll) => Column(children: [
         // Header
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-          child: Row(children: [
-            Icon(Icons.notifications_rounded,
-                size: 20, color: scheme.primary),
-            const SizedBox(width: 10),
-            Text(
-              isEn ? "What's new" : 'Actualités',
-              style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-            ),
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              Container(
+                width: 34, height: 34,
+                decoration: BoxDecoration(
+                  color:        scheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(Icons.notifications_rounded,
+                    size: 18, color: scheme.onPrimaryContainer),
+              ),
+              const SizedBox(width: 12),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(
+                  isEn ? "What's new" : 'Actualités',
+                  style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                ),
+                if (items.isNotEmpty)
+                  Text(
+                    '${items.length} ${isEn ? (items.length > 1 ? "items" : "item") : (items.length > 1 ? "éléments" : "élément")}',
+                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                  ),
+              ]),
+            ]),
+            const SizedBox(height: 14),
+            Divider(height: 1, color: scheme.outlineVariant.withValues(alpha: 0.5)),
           ]),
         ),
-        const Divider(height: 1),
 
         // List
         Expanded(
@@ -3687,9 +3704,9 @@ class _NewsSheet extends StatelessWidget {
                 ))
               : ListView.separated(
                   controller:  scroll,
-                  padding:     const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                  padding:     const EdgeInsets.fromLTRB(16, 16, 16, 32),
                   itemCount:   items.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 10),
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (_, i) {
                     final item  = items[i];
                     final title = (item['title'] ?? '').toString();
@@ -3772,12 +3789,22 @@ class _NewsListTileState extends State<_NewsListTile> {
             color:        scheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: widget.color.withValues(alpha: 0.25),
+              color: scheme.outlineVariant.withValues(alpha: 0.4),
             ),
           ),
-          child: Row(
+          child: IntrinsicHeight(child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Left accent strip
+              Container(
+                width: 4,
+                decoration: BoxDecoration(
+                  color:        widget.color,
+                  borderRadius: const BorderRadius.horizontal(
+                      left: Radius.circular(14)),
+                ),
+              ),
+              const SizedBox(width: 12),
               // Icon / emoji
               Container(
                 width: 36, height: 36,
@@ -3844,7 +3871,7 @@ class _NewsListTileState extends State<_NewsListTile> {
                 ],
               )),
             ],
-          ),
+          )),
         ),
       ),
     );
