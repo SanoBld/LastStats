@@ -8,6 +8,7 @@ import '../services/lastfm_service.dart';
 import '../services/data_cache.dart';
 import '../services/prefetch_service.dart';
 import 'home_screen.dart';
+import 'onboarding_flow.dart';
 
 // ══════════════════════════════════════════════════════════════════════════
 //  SetupScreen — credentials entry (animated redesign)
@@ -817,7 +818,7 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          pageBuilder: (_, __, ___) => HomeScreen(
+          pageBuilder: (_, __, ___) => OnboardingFlow(
             username: widget.username,
             apiKey:   widget.apiKey,
           ),

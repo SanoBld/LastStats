@@ -256,6 +256,21 @@ abstract class AppStrings {
 
   // ── Dashboard extra ─────────────────────────────────────────────────────────
   String get dashPerWeek;
+
+  // ── Onboarding ───────────────────────────────────────────────────────────
+  String get onboardSkip;
+  String get onboardNext;
+  String get onboardFinish;
+  String get onboardBack;
+  String get onboardAppearanceTitle;
+  String get onboardAppearanceSub;
+  String get onboardNotifTitle;
+  String get onboardNotifSub;
+  String get onboardFavTitle;
+  String get onboardFavSub;
+  String get onboardFavHint;
+  String get onboardFavAdd;
+  String get onboardFavEmpty;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -507,6 +522,20 @@ class _AppStringsFr implements AppStrings {
   @override String get detailCopyLyrics      => 'Copier les paroles';
   @override String get detailLyricsCopied    => 'Paroles copiées';
   @override String get dashPerWeek           => 'par semaine';
+
+  @override String get onboardSkip             => 'Passer';
+  @override String get onboardNext             => 'Suivant';
+  @override String get onboardFinish           => 'Terminer';
+  @override String get onboardBack             => 'Retour';
+  @override String get onboardAppearanceTitle  => 'Personnalise ton style';
+  @override String get onboardAppearanceSub    => 'Thème, couleur d\'accent et Material You.';
+  @override String get onboardNotifTitle       => 'Reste informé';
+  @override String get onboardNotifSub         => 'Notifications et vibrations.';
+  @override String get onboardFavTitle         => 'Tes profils favoris';
+  @override String get onboardFavSub           => 'Ajoute des amis Last.fm à retrouver rapidement.';
+  @override String get onboardFavHint          => 'Nom d\'utilisateur Last.fm';
+  @override String get onboardFavAdd           => 'Ajouter';
+  @override String get onboardFavEmpty         => 'Aucun favori pour l\'instant';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -758,6 +787,20 @@ class _AppStringsEn implements AppStrings {
   @override String get detailCopyLyrics      => 'Copy lyrics';
   @override String get detailLyricsCopied    => 'Lyrics copied';
   @override String get dashPerWeek           => 'per week';
+
+  @override String get onboardSkip             => 'Skip';
+  @override String get onboardNext             => 'Next';
+  @override String get onboardFinish           => 'Finish';
+  @override String get onboardBack             => 'Back';
+  @override String get onboardAppearanceTitle  => 'Personalize your style';
+  @override String get onboardAppearanceSub    => 'Theme, accent color and Material You.';
+  @override String get onboardNotifTitle       => 'Stay in the loop';
+  @override String get onboardNotifSub         => 'Notifications and vibrations.';
+  @override String get onboardFavTitle         => 'Your favorite profiles';
+  @override String get onboardFavSub           => 'Add Last.fm friends to find them quickly.';
+  @override String get onboardFavHint          => 'Last.fm username';
+  @override String get onboardFavAdd           => 'Add';
+  @override String get onboardFavEmpty         => 'No favorites yet';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
