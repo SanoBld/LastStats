@@ -1,6 +1,42 @@
 // ignore_for_file: unused_import
 part of 'home_screen.dart';
 
+// ── Renders text with any http(s) URL as a tappable link ───────────────────
+final RegExp _bioUrlRegex = RegExp(r'(https?:\/\/[^\s]+)', caseSensitive: false);
+
+Future<void> _openBioUrl(String rawUrl) async {
+  final cleaned = rawUrl.replaceAll(RegExp(r'[)\].,;!?]+$'), '');
+  final uri = Uri.tryParse(cleaned);
+  if (uri == null) return;
+  if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+}
+
+Widget _linkifiedText(String body, TextStyle? style, Color linkColor) {
+  final matches = _bioUrlRegex.allMatches(body).toList();
+  if (matches.isEmpty) return Text(body, style: style);
+
+  final spans = <InlineSpan>[];
+  int cursor = 0;
+  for (final m in matches) {
+    if (m.start > cursor) spans.add(TextSpan(text: body.substring(cursor, m.start)));
+    final rawUrl = m.group(0)!;
+    spans.add(WidgetSpan(
+      alignment: PlaceholderAlignment.baseline,
+      baseline:  TextBaseline.alphabetic,
+      child: GestureDetector(
+        onTap: () => _openBioUrl(rawUrl),
+        child: Text(rawUrl, style: style?.copyWith(
+          color: linkColor, fontWeight: FontWeight.w600,
+          decoration: TextDecoration.underline, decorationColor: linkColor,
+        )),
+      ),
+    ));
+    cursor = m.end;
+  }
+  if (cursor < body.length) spans.add(TextSpan(text: body.substring(cursor)));
+  return Text.rich(TextSpan(style: style, children: spans));
+}
+
 // ── Simple fade-in wrapper for content that pops in after loading ──────────
 class _FadeIn extends StatelessWidget {
   final Widget child;
@@ -1095,10 +1131,10 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             duration: const Duration(milliseconds: 320),
             curve: Curves.easeInOutCubic,
             alignment: Alignment.topCenter,
-            child: Text(
+            child: _linkifiedText(
               shown,
-              style: text.bodyMedium?.copyWith(
-                  color: scheme.onSurfaceVariant, height: 1.55),
+              text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant, height: 1.55),
+              scheme.primary,
             ),
           ),
 
@@ -1217,7 +1253,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   Widget _buildTopAlbums(ColorScheme scheme) {
     final text   = Theme.of(context).textTheme;
-    final albums = _topAlbums.take(8).toList();
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -1227,15 +1262,18 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           Text(L.detailTopAlbums,
               style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4, mainAxisSpacing: 10,
-              crossAxisSpacing: 10, childAspectRatio: 0.75,
-            ),
-            itemCount: albums.length,
-            itemBuilder: (_, i) {
+          LayoutBuilder(builder: (ctx, box) {
+            final cols = (box.maxWidth / 110).floor().clamp(4, 8);
+            final albums = _topAlbums.take(cols * 2).toList();
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: cols, mainAxisSpacing: 10,
+                crossAxisSpacing: 10, childAspectRatio: 0.75,
+              ),
+              itemCount: albums.length,
+              itemBuilder: (_, i) {
               final a      = albums[i];
               final aName  = (a['name'] ?? '').toString();
               final imgUrl = _extractImage(a['image']);
@@ -1272,7 +1310,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                 ),
               );
             },
-          ),
+              );
+          }),
           const SizedBox(height: 16),
         ],
       ),
