@@ -168,12 +168,21 @@ class _AppearanceStepState extends State<_AppearanceStep> {
     setState(() {});
   }
 
+  Future<void> _setStyle(String v) async {
+    final p = await SharedPreferences.getInstance();
+    await p.setString('ls_theme_style', v);
+    themeStyleNotifier.value = v;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isEn   = localeNotifier.value == 'en';
 
-    return ValueListenableBuilder<ThemeMode>(
+    return ValueListenableBuilder<String>(
+      valueListenable: themeStyleNotifier,
+      builder: (_, style, _) => ValueListenableBuilder<ThemeMode>(
       valueListenable: themeModeNotifier,
       builder: (_, mode, _) => ValueListenableBuilder<bool>(
         valueListenable: useDynamicColorNotifier,
@@ -184,6 +193,17 @@ class _AppearanceStepState extends State<_AppearanceStep> {
             title: L.onboardAppearanceTitle,
             subtitle: L.onboardAppearanceSub,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(isEn ? 'Style' : 'Style', style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
+              const SizedBox(height: 10),
+              SegmentedButton<String>(
+                segments: [
+                  ButtonSegment(value: 'default', icon: const Icon(Icons.auto_awesome_rounded), label: const Text('Material You')),
+                  ButtonSegment(value: 'nothing', icon: const Icon(Icons.grid_on_rounded), label: const Text('Nothing OS')),
+                ],
+                selected: {style},
+                onSelectionChanged: (s) => _setStyle(s.first),
+              ),
+              const SizedBox(height: 22),
               Text(L.settingsTheme, style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
               const SizedBox(height: 10),
               SegmentedButton<ThemeMode>(
@@ -198,37 +218,79 @@ class _AppearanceStepState extends State<_AppearanceStep> {
                 }),
               ),
               const SizedBox(height: 22),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(L.settingsDynamicColor, style: const TextStyle(fontWeight: FontWeight.w700)),
-                subtitle: Text(isEn ? 'Use colors from your wallpaper (Android 12+)' : 'Utiliser les couleurs de ton fond d\'écran (Android 12+)',
-                    style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
-                value: dynamic_,
-                onChanged: _setDynamic,
-              ),
-              if (!dynamic_) ...[
-                const SizedBox(height: 10),
-                Text(L.settingsAccentColor, style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
-                const SizedBox(height: 10),
-                Wrap(spacing: 12, runSpacing: 12, children: _accents.map((a) {
-                  final sel = !dynamic_ && accent.toARGB32() == a.$2.toARGB32();
-                  return GestureDetector(
-                    onTap: () => _setAccent(a.$1, a.$2),
-                    child: Container(
-                      width: 40, height: 40,
-                      decoration: BoxDecoration(
-                        color: a.$2, shape: BoxShape.circle,
-                        border: sel ? Border.all(color: scheme.onSurface, width: 3) : null,
+              if (style == 'default') ...[
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(L.settingsDynamicColor, style: const TextStyle(fontWeight: FontWeight.w700)),
+                  subtitle: Text(isEn ? 'Use colors from your wallpaper (Android 12+)' : 'Utiliser les couleurs de ton fond d\'écran (Android 12+)',
+                      style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+                  value: dynamic_,
+                  onChanged: _setDynamic,
+                ),
+                if (!dynamic_) ...[
+                  const SizedBox(height: 10),
+                  Text(L.settingsAccentColor, style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
+                  const SizedBox(height: 10),
+                  Wrap(spacing: 12, runSpacing: 12, children: _accents.map((a) {
+                    final sel = !dynamic_ && accent.toARGB32() == a.$2.toARGB32();
+                    return GestureDetector(
+                      onTap: () => _setAccent(a.$1, a.$2),
+                      child: Container(
+                        width: 40, height: 40,
+                        decoration: BoxDecoration(
+                          color: a.$2, shape: BoxShape.circle,
+                          border: sel ? Border.all(color: scheme.onSurface, width: 3) : null,
+                        ),
+                        child: sel ? const Icon(Icons.check_rounded, color: Colors.white, size: 18) : null,
                       ),
-                      child: sel ? const Icon(Icons.check_rounded, color: Colors.white, size: 18) : null,
+                    );
+                  }).toList()),
+                  const SizedBox(height: 22),
+                  Text(isEn ? 'Preview' : 'Aperçu', style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: scheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                  );
-                }).toList()),
+                    child: Wrap(spacing: 10, runSpacing: 10, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                      FilledButton(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: accent),
+                          child: Text(isEn ? 'Button' : 'Bouton')),
+                      OutlinedButton(onPressed: () {}, style: OutlinedButton.styleFrom(foregroundColor: accent, side: BorderSide(color: accent)),
+                          child: Text(isEn ? 'Outline' : 'Contour')),
+                      Text(isEn ? 'Sample text' : 'Texte exemple', style: TextStyle(color: accent, fontWeight: FontWeight.w700)),
+                      Chip(label: Text(isEn ? 'Bubble' : 'Bulle'),
+                          backgroundColor: accent.withValues(alpha: 0.15),
+                          labelStyle: TextStyle(color: accent, fontWeight: FontWeight.w600),
+                          side: BorderSide.none),
+                    ]),
+                  ),
+                ],
+              ] else ...[
+                Text(isEn ? 'Accent tint' : 'Teinte d\'accent', style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
+                const SizedBox(height: 10),
+                ValueListenableBuilder<String>(
+                  valueListenable: nothingAccentNotifier,
+                  builder: (_, nAccent, _) => SegmentedButton<String>(
+                    segments: const [
+                      ButtonSegment(value: 'classic', label: Text('Red only')),
+                      ButtonSegment(value: 'mixed', label: Text('Red + yellow')),
+                    ],
+                    selected: {nAccent},
+                    onSelectionChanged: (s) async {
+                      final p = await SharedPreferences.getInstance();
+                      await p.setString('ls_nothing_accent', s.first);
+                      nothingAccentNotifier.value = s.first;
+                    },
+                  ),
+                ),
               ],
             ]),
           ),
         ),
       ),
+    ),
     );
   }
 }
@@ -258,7 +320,9 @@ class _NotificationsStepState extends State<_NotificationsStep> {
       valueListenable: notifNewsEnabledNotifier,
       builder: (_, news, _) => ValueListenableBuilder<bool>(
         valueListenable: hapticFeedbackNotifier,
-        builder: (_, haptic, _) => _Step(
+        builder: (_, haptic, _) => ValueListenableBuilder<bool>(
+          valueListenable: showNewsBadgeNotifier,
+          builder: (_, badge, _) => _Step(
           icon: Icons.notifications_active_rounded,
           title: L.onboardNotifTitle,
           subtitle: L.onboardNotifSub,
@@ -275,6 +339,16 @@ class _NotificationsStepState extends State<_NotificationsStep> {
             const Divider(height: 24),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
+              secondary: Icon(Icons.circle_notifications_rounded, color: scheme.primary),
+              title: Text(isEn ? 'News badge dot' : 'Pastille d\'actualités', style: const TextStyle(fontWeight: FontWeight.w700)),
+              subtitle: Text(isEn ? 'Red dot on the dashboard bell when there\'s news' : 'Point rouge sur la cloche du dashboard s\'il y a du nouveau',
+                  style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+              value: badge,
+              onChanged: (v) => _set('ls_show_news_badge', v, showNewsBadgeNotifier),
+            ),
+            const Divider(height: 24),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
               secondary: Icon(Icons.vibration_rounded, color: scheme.primary),
               title: Text(isEn ? 'Haptic feedback' : 'Retour haptique', style: const TextStyle(fontWeight: FontWeight.w700)),
               subtitle: Text(isEn ? 'Feel subtle vibrations on key interactions' : 'Ressens de légères vibrations sur les interactions clés',
@@ -283,7 +357,7 @@ class _NotificationsStepState extends State<_NotificationsStep> {
               onChanged: (v) => _set('ls_haptic_feedback', v, hapticFeedbackNotifier),
             ),
           ]),
-        ),
+        )),
       ),
     );
   }
@@ -299,12 +373,14 @@ class _DashboardStep extends StatefulWidget {
 class _DashboardStepState extends State<_DashboardStep> {
   final Map<String, bool> _v = {
     'ls_show_nowplay': true, 'ls_show_stats': true, 'ls_show_artists': true,
+    'ls_show_albums': true,
     'ls_show_tracks': true, 'ls_show_friends': true,
   };
   static const _labels = {
     'ls_show_nowplay': (Icons.graphic_eq_rounded, 'En cours d\'écoute', 'Now playing'),
     'ls_show_stats':   (Icons.bar_chart_rounded, 'Statistiques', 'Stats'),
     'ls_show_artists': (Icons.person_rounded, 'Top artistes', 'Top artists'),
+    'ls_show_albums':  (Icons.album_rounded, 'Top albums', 'Top albums'),
     'ls_show_tracks':  (Icons.music_note_rounded, 'Top titres', 'Top tracks'),
     'ls_show_friends': (Icons.people_rounded, 'Amis', 'Friends'),
   };
