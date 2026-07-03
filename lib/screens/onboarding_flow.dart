@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n.dart';
 import '../app_state.dart';
 import 'home_screen.dart';
+import 'settings/settings_helpers.dart';
 
 class OnboardingFlow extends StatefulWidget {
   final String username, apiKey;
@@ -21,7 +22,7 @@ class OnboardingFlow extends StatefulWidget {
 class _OnboardingFlowState extends State<OnboardingFlow> {
   final _pageCtrl = PageController();
   int _page = 0;
-  static const _pages = 3;
+  static const _pages = 6;
 
   void _goTo(int i) {
     setState(() => _page = i);
@@ -48,17 +49,28 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       body: SafeArea(
         child: Column(children: [
           // ── Top bar: progress dots + skip ──────────────────────────────
+          // ── Top progress bar ─────────────────────────────────────────
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 12, 4),
-            child: Row(children: [
-              Row(children: List.generate(_pages, (i) => Container(
-                margin: const EdgeInsets.only(right: 6),
-                width: i == _page ? 22 : 8, height: 8,
-                decoration: BoxDecoration(
-                  color: i == _page ? scheme.primary : scheme.outlineVariant,
-                  borderRadius: BorderRadius.circular(4),
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(3),
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0, end: (_page + 1) / _pages),
+                duration: const Duration(milliseconds: 320),
+                curve: Curves.easeOutCubic,
+                builder: (_, v, __) => LinearProgressIndicator(
+                  value: v, minHeight: 5,
+                  backgroundColor: scheme.surfaceContainerHighest,
+                  valueColor: AlwaysStoppedAnimation(scheme.primary),
                 ),
-              ))),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 10, 12, 4),
+            child: Row(children: [
+              Text('${_page + 1}/$_pages',
+                  style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12, fontWeight: FontWeight.w600)),
               const Spacer(),
               TextButton(onPressed: _finish, child: Text(L.onboardSkip)),
             ]),
@@ -69,7 +81,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               physics: const NeverScrollableScrollPhysics(),
               onPageChanged: (i) => setState(() => _page = i),
               children: const [
-                _AppearanceStep(), _NotificationsStep(), _FavoritesStep(),
+                _AppearanceStep(), _NotificationsStep(), _DashboardStep(),
+                _StartupStep(), _UpdatesStep(), _FavoritesStep(),
               ],
             ),
           ),
@@ -277,7 +290,174 @@ class _NotificationsStepState extends State<_NotificationsStep> {
   }
 }
 
-// ── Step 3: Favorite profiles ────────────────────────────────────────────────
+// ── Step 3: Dashboard sections ───────────────────────────────────────────────
+class _DashboardStep extends StatefulWidget {
+  const _DashboardStep();
+  @override
+  State<_DashboardStep> createState() => _DashboardStepState();
+}
+
+class _DashboardStepState extends State<_DashboardStep> {
+  final Map<String, bool> _v = {
+    'ls_show_nowplay': true, 'ls_show_stats': true, 'ls_show_artists': true,
+    'ls_show_tracks': true, 'ls_show_friends': true,
+  };
+  static const _labels = {
+    'ls_show_nowplay': (Icons.graphic_eq_rounded, 'En cours d\'écoute', 'Now playing'),
+    'ls_show_stats':   (Icons.bar_chart_rounded, 'Statistiques', 'Stats'),
+    'ls_show_artists': (Icons.person_rounded, 'Top artistes', 'Top artists'),
+    'ls_show_tracks':  (Icons.music_note_rounded, 'Top titres', 'Top tracks'),
+    'ls_show_friends': (Icons.people_rounded, 'Amis', 'Friends'),
+  };
+
+  @override
+  void initState() { super.initState(); _load(); }
+
+  Future<void> _load() async {
+    final p = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() { for (final k in _v.keys) { _v[k] = p.getBool(k) ?? true; } });
+  }
+
+  Future<void> _toggle(String k, bool val) async {
+    final p = await SharedPreferences.getInstance();
+    await p.setBool(k, val);
+    setState(() => _v[k] = val);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isEn   = localeNotifier.value == 'en';
+    return _Step(
+      icon: Icons.dashboard_customize_rounded,
+      title: L.onboardDashTitle, subtitle: L.onboardDashSub,
+      child: Column(children: _v.keys.map((k) {
+        final l = _labels[k]!;
+        return SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          secondary: Icon(l.$1, color: scheme.primary),
+          title: Text(isEn ? l.$3 : l.$2, style: const TextStyle(fontWeight: FontWeight.w700)),
+          value: _v[k]!,
+          onChanged: (v) => _toggle(k, v),
+        );
+      }).toList()),
+    );
+  }
+}
+
+// ── Step 4: Startup tab ──────────────────────────────────────────────────────
+class _StartupStep extends StatefulWidget {
+  const _StartupStep();
+  @override
+  State<_StartupStep> createState() => _StartupStepState();
+}
+
+class _StartupStepState extends State<_StartupStep> {
+  int _tab = 0;
+
+  @override
+  void initState() { super.initState(); _load(); }
+
+  Future<void> _load() async {
+    final p = await SharedPreferences.getInstance();
+    if (mounted) setState(() => _tab = p.getInt('ls_startup_tab') ?? 0);
+  }
+
+  Future<void> _set(int i) async {
+    final p = await SharedPreferences.getInstance();
+    await p.setInt('ls_startup_tab', i);
+    setState(() => _tab = i);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final labels = buildStartupLabels();
+    return _Step(
+      icon: Icons.rocket_launch_rounded,
+      title: L.onboardStartupTitle, subtitle: L.onboardStartupSub,
+      child: Column(children: labels.asMap().entries.map((e) {
+        final sel = _tab == e.key;
+        return Card(
+          elevation: 0,
+          margin: const EdgeInsets.only(bottom: 8),
+          color: sel ? scheme.primaryContainer : scheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: sel ? scheme.primary : scheme.outlineVariant.withValues(alpha: 0.4)),
+          ),
+          child: ListTile(
+            leading: Icon(e.value.$1, color: sel ? scheme.onPrimaryContainer : scheme.onSurfaceVariant),
+            title: Text(e.value.$2, style: TextStyle(fontWeight: sel ? FontWeight.w700 : FontWeight.w500)),
+            trailing: sel ? Icon(Icons.check_rounded, color: scheme.onPrimaryContainer) : null,
+            onTap: () => _set(e.key),
+          ),
+        );
+      }).toList()),
+    );
+  }
+}
+
+// ── Step 5: Updates ──────────────────────────────────────────────────────────
+class _UpdatesStep extends StatefulWidget {
+  const _UpdatesStep();
+  @override
+  State<_UpdatesStep> createState() => _UpdatesStepState();
+}
+
+class _UpdatesStepState extends State<_UpdatesStep> {
+  bool _auto = true, _beta = false;
+
+  @override
+  void initState() { super.initState(); _load(); }
+
+  Future<void> _load() async {
+    final p = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      _auto = p.getBool('ls_auto_update_check') ?? true;
+      _beta = p.getBool('ls_beta_channel')       ?? false;
+    });
+  }
+
+  Future<void> _set(String k, bool v, void Function(bool) apply) async {
+    final p = await SharedPreferences.getInstance();
+    await p.setBool(k, v);
+    setState(() => apply(v));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isEn   = localeNotifier.value == 'en';
+    return _Step(
+      icon: Icons.system_update_rounded,
+      title: L.onboardUpdatesTitle, subtitle: L.onboardUpdatesSub,
+      child: Column(children: [
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          secondary: Icon(Icons.notifications_outlined, color: scheme.primary),
+          title: Text(L.settingsAutoUpdate, style: const TextStyle(fontWeight: FontWeight.w700)),
+          value: _auto,
+          onChanged: (v) => _set('ls_auto_update_check', v, (x) => _auto = x),
+        ),
+        const Divider(height: 24),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          secondary: Icon(Icons.science_outlined, color: scheme.primary),
+          title: Text(isEn ? 'Beta updates' : 'Mises à jour bêta', style: const TextStyle(fontWeight: FontWeight.w700)),
+          subtitle: Text(isEn ? 'Early access to pre-releases' : 'Accès anticipé aux pré-versions',
+              style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+          value: _beta,
+          onChanged: (v) => _set('ls_beta_channel', v, (x) => _beta = x),
+        ),
+      ]),
+    );
+  }
+}
+
+// ── Step 6: Favorite profiles ────────────────────────────────────────────────
 class _FavoritesStep extends StatefulWidget {
   const _FavoritesStep();
   @override
@@ -343,4 +523,4 @@ class _FavoritesStepState extends State<_FavoritesStep> {
       ]),
     );
   }
-}
+}l

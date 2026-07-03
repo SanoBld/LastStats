@@ -271,6 +271,12 @@ abstract class AppStrings {
   String get onboardFavHint;
   String get onboardFavAdd;
   String get onboardFavEmpty;
+  String get onboardDashTitle;
+  String get onboardDashSub;
+  String get onboardStartupTitle;
+  String get onboardStartupSub;
+  String get onboardUpdatesTitle;
+  String get onboardUpdatesSub;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -536,6 +542,12 @@ class _AppStringsFr implements AppStrings {
   @override String get onboardFavHint          => 'Nom d\'utilisateur Last.fm';
   @override String get onboardFavAdd           => 'Ajouter';
   @override String get onboardFavEmpty         => 'Aucun favori pour l\'instant';
+  @override String get onboardDashTitle        => 'Ton tableau de bord';
+  @override String get onboardDashSub          => 'Choisis les sections à afficher.';
+  @override String get onboardStartupTitle     => 'Écran de démarrage';
+  @override String get onboardStartupSub       => 'Quel onglet voir en premier ?';
+  @override String get onboardUpdatesTitle     => 'Mises à jour';
+  @override String get onboardUpdatesSub       => 'Vérification automatique des nouvelles versions.';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -801,6 +813,12 @@ class _AppStringsEn implements AppStrings {
   @override String get onboardFavHint          => 'Last.fm username';
   @override String get onboardFavAdd           => 'Add';
   @override String get onboardFavEmpty         => 'No favorites yet';
+  @override String get onboardDashTitle        => 'Your dashboard';
+  @override String get onboardDashSub          => 'Choose which sections to show.';
+  @override String get onboardStartupTitle     => 'Startup screen';
+  @override String get onboardStartupSub       => 'Which tab do you want to see first?';
+  @override String get onboardUpdatesTitle     => 'Updates';
+  @override String get onboardUpdatesSub       => 'Automatic check for new versions.';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
