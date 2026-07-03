@@ -244,7 +244,7 @@ class _AppearanceStepState extends State<_AppearanceStep> {
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   title: Text(L.settingsDynamicColor, style: const TextStyle(fontWeight: FontWeight.w700)),
-                  subtitle: Text(isEn ? 'Use colors from your wallpaper (Android 12+)' : 'Utiliser les couleurs de ton fond d\'écran (Android 12+)',
+                  subtitle: Text(L.onboardDynamicColorSub,
                       style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
                   value: dynamic_,
                   onChanged: _setDynamic,
@@ -267,28 +267,30 @@ class _AppearanceStepState extends State<_AppearanceStep> {
                       ),
                     );
                   }).toList()),
-                  const SizedBox(height: 22),
-                  Text(L.onboardPreview, style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
-                  const SizedBox(height: 10),
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: scheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Wrap(spacing: 10, runSpacing: 10, crossAxisAlignment: WrapCrossAlignment.center, children: [
-                      FilledButton(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: accent),
-                          child: Text(L.onboardPreviewButton)),
-                      OutlinedButton(onPressed: () {}, style: OutlinedButton.styleFrom(foregroundColor: accent, side: BorderSide(color: accent)),
-                          child: Text(L.onboardPreviewOutline)),
-                      Text(L.onboardPreviewText, style: TextStyle(color: accent, fontWeight: FontWeight.w700)),
-                      Chip(label: Text(L.onboardPreviewBubble),
-                          backgroundColor: accent.withValues(alpha: 0.15),
-                          labelStyle: TextStyle(color: accent, fontWeight: FontWeight.w600),
-                          side: BorderSide.none),
-                    ]),
-                  ),
                 ],
+                const SizedBox(height: 22),
+                Text(L.onboardPreview, style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: scheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
+                  ),
+                  // Uses the theme's actual resolved colors (scheme.primary…)
+                  // rather than the raw accent value, so it stays accurate
+                  // and visible in every mode (custom, dynamic, artwork).
+                  child: Wrap(spacing: 10, runSpacing: 10, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                    FilledButton.tonal(onPressed: () {}, child: Text(L.onboardPreviewButton)),
+                    OutlinedButton(onPressed: () {}, child: Text(L.onboardPreviewOutline)),
+                    Text(L.onboardPreviewText, style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w700)),
+                    Chip(label: Text(L.onboardPreviewBubble),
+                        backgroundColor: scheme.secondaryContainer,
+                        labelStyle: TextStyle(color: scheme.onSecondaryContainer, fontWeight: FontWeight.w600),
+                        side: BorderSide.none),
+                  ]),
+                ),
               ] else ...[
                 Text(L.onboardAccentTint, style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
                 const SizedBox(height: 10),
@@ -625,7 +627,6 @@ class _UpdatesStepState extends State<_UpdatesStep> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final isEn   = localeNotifier.value == 'en';
     return _Step(
       icon: Icons.system_update_rounded,
       title: L.onboardUpdatesTitle, subtitle: L.onboardUpdatesSub,
@@ -641,8 +642,8 @@ class _UpdatesStepState extends State<_UpdatesStep> {
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
           secondary: Icon(Icons.science_outlined, color: scheme.primary),
-          title: Text(isEn ? 'Beta updates' : 'Mises à jour bêta', style: const TextStyle(fontWeight: FontWeight.w700)),
-          subtitle: Text(isEn ? 'Early access to pre-releases' : 'Accès anticipé aux pré-versions',
+          title: Text(L.onboardBetaTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
+          subtitle: Text(L.onboardBetaSub,
               style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
           value: _beta,
           onChanged: (v) => _set('ls_beta_channel', v, (x) => _beta = x),

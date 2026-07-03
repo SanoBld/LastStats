@@ -309,6 +309,9 @@ abstract class AppStrings {
   String get onboardMilestonesSub;
   String get onboardGrandMilestonesTitle;
   String get onboardGrandMilestonesSub;
+  String get onboardDynamicColorSub;
+  String get onboardBetaTitle;
+  String get onboardBetaSub;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -612,6 +615,9 @@ class _AppStringsFr implements AppStrings {
   @override String get onboardMilestonesSub       => 'Célébrer les chiffres ronds de scrobbles';
   @override String get onboardGrandMilestonesTitle => 'Grands jalons';
   @override String get onboardGrandMilestonesSub   => 'Célébration spéciale pour les grands jalons';
+  @override String get onboardDynamicColorSub      => 'Utiliser les couleurs de ton fond d\'écran (Android 12+)';
+  @override String get onboardBetaTitle            => 'Mises à jour bêta';
+  @override String get onboardBetaSub              => 'Accès anticipé aux pré-versions';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -915,6 +921,9 @@ class _AppStringsEn implements AppStrings {
   @override String get onboardMilestonesSub       => 'Celebrate round-number scrobble counts';
   @override String get onboardGrandMilestonesTitle => 'Grand milestones';
   @override String get onboardGrandMilestonesSub   => 'Extra celebration for major milestones';
+  @override String get onboardDynamicColorSub      => 'Use colors from your wallpaper (Android 12+)';
+  @override String get onboardBetaTitle            => 'Beta updates';
+  @override String get onboardBetaSub              => 'Early access to pre-releases';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
