@@ -768,8 +768,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     );
 
     return Wrap(
-      alignment: WrapAlignment.center,
-      runAlignment: WrapAlignment.center,
+      alignment: WrapAlignment.start,
+      runAlignment: WrapAlignment.start,
       children: buttons.map(chip).toList(),
     );
   }
@@ -1125,6 +1125,15 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   }
 
   
+  String _lfmBioUrl() {
+    final n = Uri.encodeComponent(_name), a = Uri.encodeComponent(_artist);
+    return switch (widget.type) {
+      'artists' => 'https://www.last.fm/music/$n',
+      'albums'  => 'https://www.last.fm/music/$a/$n',
+      _         => 'https://www.last.fm/music/$a/_/$n',
+    };
+  }
+
   Widget _buildBio(ColorScheme scheme) {
     final text = Theme.of(context).textTheme;
     final bio  = _showTranslated && _translatedBio.isNotEmpty ? _translatedBio : _bio();
@@ -1180,6 +1189,14 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               shown,
               text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant, height: 1.55),
               scheme.primary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: () => _openBioUrl(_lfmBioUrl()),
+            child: Text('Voir sur Last.fm',
+              style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w600,
+                  fontSize: 12, decoration: TextDecoration.underline, decorationColor: scheme.primary),
             ),
           ),
 
