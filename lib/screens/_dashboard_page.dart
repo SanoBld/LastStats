@@ -3656,7 +3656,7 @@ class _NewsSheet extends StatelessWidget {
       builder: (ctx, scroll) => Column(children: [
         // Header
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
               Container(

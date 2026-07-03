@@ -1,6 +1,20 @@
 // ignore_for_file: unused_import
 part of 'home_screen.dart';
 
+// ── Simple fade-in wrapper for content that pops in after loading ──────────
+class _FadeIn extends StatelessWidget {
+  final Widget child;
+  const _FadeIn({required this.child});
+  @override
+  Widget build(BuildContext context) => TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0, end: 1),
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOut,
+        builder: (_, v, c) => Opacity(opacity: v, child: c),
+        child: child,
+      );
+}
+
 // ── Fullscreen image helper (used by detail sheet and profile sheet) ──────────
 
 void _pushFullscreen(BuildContext ctx, String url) {
@@ -553,7 +567,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       _buildStatsRow(scheme),
                       if (_tags().isNotEmpty) _buildTags(scheme),
                       if (widget.type == 'tracks') _buildPreviewPlayer(scheme),
-                      if (_bio().isNotEmpty)  _buildBio(scheme),
+                      if (_bio().isNotEmpty)  _FadeIn(child: _buildBio(scheme)),
                       if (widget.type == 'artists' && _topTracks.isNotEmpty)
                         _buildTopTracks(scheme),
                       if (widget.type == 'artists' && _topAlbums.isNotEmpty)
@@ -561,7 +575,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       if (widget.type == 'albums' && _tracklist.isNotEmpty)
                         _buildTracklist(scheme),
                       if (widget.type == 'tracks') _buildTrackExtra(scheme),
-                      if (widget.type == 'tracks') _buildLyrics(scheme),
+                      if (widget.type == 'tracks') _FadeIn(child: _buildLyrics(scheme)),
                       const SizedBox(height: 48),
                     ],
                   ),
@@ -758,20 +772,24 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       ));
     }
 
-    if (_loadingUser) {
-      stats.add(Center(
-        child: SizedBox(
-          width: 20, height: 20,
-          child: CircularProgressIndicator(strokeWidth: 2, color: scheme.primary),
-        ),
-      ));
-    } else {
-      stats.add(_StatChip(
-        icon: Icons.headphones_rounded,
-        value: _userPlays > 0 ? _fmt(_userPlays) : '—',
-        label: L.detailUserPlays, scheme: scheme, highlight: true,
-      ));
-    }
+    stats.add(AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
+      child: _loadingUser
+          ? Center(
+              key: const ValueKey('loading'),
+              child: SizedBox(
+                width: 20, height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2, color: scheme.primary),
+              ),
+            )
+          : _StatChip(
+              key: const ValueKey('loaded'),
+              icon: Icons.headphones_rounded,
+              value: _userPlays > 0 ? _fmt(_userPlays) : '—',
+              label: L.detailUserPlays, scheme: scheme, highlight: true,
+            ),
+    ));
 
     if (!_loadingUser && _userRank > 0 && _userRank <= 200) {
       stats.add(_StatChip(
@@ -1605,6 +1623,7 @@ class _StatChip extends StatelessWidget {
   final bool        highlight;
 
   const _StatChip({
+    super.key,
     required this.icon, required this.value,
     required this.label, required this.scheme,
     this.highlight = false,
