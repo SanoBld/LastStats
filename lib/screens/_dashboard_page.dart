@@ -3669,17 +3669,20 @@ class _NewsSheet extends StatelessWidget {
                     size: 18, color: scheme.onPrimaryContainer),
               ),
               const SizedBox(width: 12),
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(
-                  isEn ? "What's new" : 'Actualités',
-                  style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-                ),
-                if (items.isNotEmpty)
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(
-                    '${items.length} ${isEn ? (items.length > 1 ? "items" : "item") : (items.length > 1 ? "éléments" : "élément")}',
-                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                    isEn ? "What's new" : 'Actualités',
+                    style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                    overflow: TextOverflow.ellipsis,
                   ),
-              ]),
+                  if (items.isNotEmpty)
+                    Text(
+                      '${items.length} ${isEn ? (items.length > 1 ? "items" : "item") : (items.length > 1 ? "éléments" : "élément")}',
+                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                    ),
+                ]),
+              ),
             ]),
             const SizedBox(height: 14),
             Divider(height: 1, color: scheme.outlineVariant.withValues(alpha: 0.5)),
