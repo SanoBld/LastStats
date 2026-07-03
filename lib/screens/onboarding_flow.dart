@@ -32,9 +32,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
   void _finish() {
     Navigator.of(context).pushReplacement(PageRouteBuilder(
-      pageBuilder: (_, __, ___) =>
+      pageBuilder: (_, _, _) =>
           HomeScreen(username: widget.username, apiKey: widget.apiKey),
-      transitionsBuilder: (_, anim, __, child) =>
+      transitionsBuilder: (_, anim, _, child) =>
           FadeTransition(opacity: anim, child: child),
       transitionDuration: const Duration(milliseconds: 400),
     ));
@@ -43,7 +43,6 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final isEn   = localeNotifier.value == 'en';
 
     return Scaffold(
       body: SafeArea(
@@ -58,7 +57,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 tween: Tween(begin: 0, end: (_page + 1) / _pages),
                 duration: const Duration(milliseconds: 320),
                 curve: Curves.easeOutCubic,
-                builder: (_, v, __) => LinearProgressIndicator(
+                builder: (_, v, _) => LinearProgressIndicator(
                   value: v, minHeight: 5,
                   backgroundColor: scheme.surfaceContainerHighest,
                   valueColor: AlwaysStoppedAnimation(scheme.primary),
@@ -176,11 +175,11 @@ class _AppearanceStepState extends State<_AppearanceStep> {
 
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: themeModeNotifier,
-      builder: (_, mode, __) => ValueListenableBuilder<bool>(
+      builder: (_, mode, _) => ValueListenableBuilder<bool>(
         valueListenable: useDynamicColorNotifier,
-        builder: (_, dynamic_, __) => ValueListenableBuilder<Color>(
+        builder: (_, dynamic_, _) => ValueListenableBuilder<Color>(
           valueListenable: accentNotifier,
-          builder: (_, accent, __) => _Step(
+          builder: (_, accent, _) => _Step(
             icon: Icons.palette_rounded,
             title: L.onboardAppearanceTitle,
             subtitle: L.onboardAppearanceSub,
@@ -257,9 +256,9 @@ class _NotificationsStepState extends State<_NotificationsStep> {
 
     return ValueListenableBuilder<bool>(
       valueListenable: notifNewsEnabledNotifier,
-      builder: (_, news, __) => ValueListenableBuilder<bool>(
+      builder: (_, news, _) => ValueListenableBuilder<bool>(
         valueListenable: hapticFeedbackNotifier,
-        builder: (_, haptic, __) => _Step(
+        builder: (_, haptic, _) => _Step(
           icon: Icons.notifications_active_rounded,
           title: L.onboardNotifTitle,
           subtitle: L.onboardNotifSub,
@@ -523,4 +522,4 @@ class _FavoritesStepState extends State<_FavoritesStep> {
       ]),
     );
   }
-}l
+}
