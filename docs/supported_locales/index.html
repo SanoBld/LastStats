@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="notification_worker library API docs, for the Dart programming language.">
-  <title>notification_worker library - Dart API</title>
+  <meta name="description" content="supported_locales library API docs, for the Dart programming language.">
+  <title>supported_locales library - Dart API</title>
 
 
   
@@ -25,9 +25,9 @@
   <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">laststats_mobile</a></li>
-    <li class="self-crumb">services/notification_worker.dart</li>
+    <li class="self-crumb">supported_locales.dart</li>
   </ol>
-  <div class="self-name">notification_worker</div>
+  <div class="self-name">supported_locales</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -45,13 +45,13 @@
     id="dartdoc-main-content"
     class="main-content"
     data-above-sidebar=""
-    data-below-sidebar="services_notification_worker&#47;services_notification_worker-library-sidebar.html">
+    data-below-sidebar="supported_locales&#47;supported_locales-library-sidebar.html">
   
     <div>
       
 
       <h1>
-        <span class="kind-library">services/notification_worker</span>
+        <span class="kind-library">supported_locales</span>
         library 
  
 
@@ -64,8 +64,8 @@
     <section class="summary offset-anchor" id="classes">
       <h2>Classes</h2>
       <dl>
-          <dt id="NotificationWorker">
-  <span class="name "><a href="../services_notification_worker/NotificationWorker-class.html">NotificationWorker</a></span> 
+          <dt id="SupportedLocale">
+  <span class="name "><a href="../supported_locales/SupportedLocale-class.html">SupportedLocale</a></span> 
 
 </dt>
 <dd>
@@ -79,20 +79,39 @@
 
 
 
+    <section class="summary offset-anchor" id="constants">
+      <h2>Constants</h2>
+      <dl class="properties">
+          <dt id="kSupportedLocales" class="constant">
+    <span class="name "><a href="../supported_locales/kSupportedLocales-constant.html">kSupportedLocales</a></span>
+  <span class="signature">&#8594; const <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../supported_locales/SupportedLocale-class.html">SupportedLocale</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  Every language currently translated in l10n.dart.
+Order here = display order in every language picker.
+  
+
+</dd>
+
+      </dl>
+    </section>
 
 
     <section class="summary offset-anchor" id="functions">
       <h2>Functions</h2>
       <dl class="callables">
-          <dt id="callbackDispatcher" class="callable">
-  <span class="name"><a href="../services_notification_worker/callbackDispatcher.html">callbackDispatcher</a></span><span class="signature">(<wbr>)
-    <span class="returntype parameter">&#8594; void</span>
+          <dt id="supportedLocaleFor" class="callable">
+  <span class="name"><a href="../supported_locales/supportedLocaleFor.html">supportedLocaleFor</a></span><span class="signature">(<wbr><span class="parameter" id="supportedLocaleFor-param-code"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">code</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../supported_locales/SupportedLocale-class.html">SupportedLocale</a></span>
   </span>
   
 
 </dt>
 <dd>
-  
+  Looks up a <a href="../supported_locales/SupportedLocale-class.html">SupportedLocale</a> by code, falling back to French (the app's
+default) if the stored code is somehow unknown (e.g. an old backup).
   
 
 </dd>
@@ -111,7 +130,7 @@
 </header>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">laststats_mobile</a></li>
-    <li class="self-crumb">services/notification_worker.dart</li>
+    <li class="self-crumb">supported_locales.dart</li>
 </ol>
 
     <h5><span class="package-name">laststats_mobile</span> <span class="package-kind">package</span></h5>
@@ -166,7 +185,7 @@
 
   </div>
   <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
-    <h5>notification_worker library</h5>
+    <h5>supported_locales library</h5>
   </div><!--/sidebar-offcanvas-right-->
 </main>
 <footer>
