@@ -111,7 +111,6 @@ and</li>
 Widget build(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
   final text   = Theme.of(context).textTheme;
-  final isEn   = localeNotifier.value == &#39;en&#39;;
 
   final title = (data[&#39;title&#39;] ?? &#39;&#39;).toString();
   final body  = (data[&#39;body&#39;]  ?? &#39;&#39;).toString();
@@ -122,7 +121,7 @@ Widget build(BuildContext context) {
 
   return Scaffold(
     appBar: AppBar(
-      title: Text(isEn ? &#39;Notification&#39; : &#39;Notification&#39;),
+      title: Text(L.notifDetailTitle),
       scrolledUnderElevation: 0,
     ),
     body: ListView(
@@ -189,7 +188,7 @@ Widget build(BuildContext context) {
               }
             },
             icon:  const Icon(Icons.open_in_new_rounded),
-            label: Text(isEn ? &#39;Open link&#39; : &#39;Ouvrir le lien&#39;),
+            label: Text(L.notifDetailOpenLink),
             style: FilledButton.styleFrom(
               minimumSize: const Size.fromHeight(48),
             ),
