@@ -7,6 +7,7 @@ import '../../services/data_cache.dart';
 import '../../services/scrobbles_file_cache.dart';
 import '../../services/image_service.dart';
 import '../../app_state.dart';
+import '../../l10n.dart';
 
 // Storage limit presets in bytes. 0 = unlimited.
 const _limits = [
@@ -32,16 +33,15 @@ class _CachePageState extends State<CachePage> {
   bool _clearing   = false;
 
   bool get _isEn => localeNotifier.value == 'en';
-  String _t(String fr, String en) => _isEn ? en : fr;
 
   @override
   void initState() {
     super.initState();
-    _loadStats();
+    _loadStats(showSpinner: true);
   }
 
-  Future<void> _loadStats() async {
-    setState(() => _loading = true);
+  Future<void> _loadStats({bool showSpinner = false}) async {
+    if (showSpinner) setState(() => _loading = true);
     await StorageManager.init();
     final stats = await StorageManager.getStats();
     if (mounted) setState(() { _stats = stats; _loading = false; });
@@ -81,11 +81,8 @@ class _CachePageState extends State<CachePage> {
 
   Future<void> _clearScrobbles() async {
     final confirmed = await _confirm(
-      _t('Supprimer l\'historique ?', 'Clear scrobble history?'),
-      _t(
-        'L\'historique complet sera supprimé. Il sera rechargé au prochain démarrage.',
-        'The full history will be deleted and re-downloaded on next launch.',
-      ),
+      L.cacheConfirmScrobblesTitle,
+      L.cacheConfirmScrobblesBody,
     );
     if (!confirmed) return;
     setState(() => _clearing = true);
@@ -96,11 +93,8 @@ class _CachePageState extends State<CachePage> {
 
   Future<void> _clearAll() async {
     final confirmed = await _confirm(
-      _t('Vider tout le cache ?', 'Clear all cache?'),
-      _t(
-        'Images, données API et historique seront supprimés.',
-        'Images, API data and scrobble history will all be deleted.',
-      ),
+      L.cacheConfirmAllTitle,
+      L.cacheConfirmAllBody,
     );
     if (!confirmed) return;
     setState(() => _clearing = true);
@@ -120,11 +114,11 @@ class _CachePageState extends State<CachePage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(_t('Annuler', 'Cancel')),
+            child: Text(L.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(_t('Supprimer', 'Delete')),
+            child: Text(L.cacheDelete),
           ),
         ],
       ),
@@ -140,7 +134,7 @@ class _CachePageState extends State<CachePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_t('Stockage', 'Storage')),
+        title: Text(L.cacheTitle),
         scrolledUnderElevation: 0,
       ),
       body: _loading
@@ -149,20 +143,17 @@ class _CachePageState extends State<CachePage> {
               padding: const EdgeInsets.all(20),
               children: [
                 // ── Usage overview ─────────────────────────────────────────
-                _SectionHeader(_t('Utilisation', 'Usage'), text),
+                _SectionHeader(L.cacheUsage, text),
                 const SizedBox(height: 12),
                 _UsageCard(stats: _stats!, scheme: scheme, text: text, isEn: _isEn),
 
                 const SizedBox(height: 24),
 
                 // ── Storage limit ──────────────────────────────────────────
-                _SectionHeader(_t('Limite de stockage', 'Storage limit'), text),
+                _SectionHeader(L.cacheLimit, text),
                 const SizedBox(height: 4),
                 Text(
-                  _t(
-                    'Quand la limite est atteinte, les images les moins récentes sont supprimées automatiquement.',
-                    'When the limit is reached, least-recently-used images are deleted automatically.',
-                  ),
+                  L.cacheLimitHint,
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                 ),
                 const SizedBox(height: 12),
@@ -177,78 +168,80 @@ class _CachePageState extends State<CachePage> {
                 const SizedBox(height: 24),
 
                 // ── Offline mode ───────────────────────────────────────────
-                _SectionHeader(_t('Mode hors ligne', 'Offline mode'), text),
+                _SectionHeader(L.cacheOffline, text),
                 const SizedBox(height: 8),
                 _OfflineModeCard(scheme: scheme, text: text, isEn: _isEn),
 
                 const SizedBox(height: 24),
 
                 // ── Clear categories ───────────────────────────────────────
-                _SectionHeader(_t('Nettoyer', 'Clear'), text),
+                _SectionHeader(L.cacheClearSection, text),
                 const SizedBox(height: 8),
 
-                if (_clearing)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                else ...[
-                  _ClearTile(
-                    icon:     Icons.image_outlined,
-                    color:    scheme.primary,
-                    title:    _t('Images', 'Images'),
-                    subtitle: _t(
-                      'Artwork artistes, albums, titres',
-                      'Artist, album, track artwork',
-                    ),
-                    size:     _stats!.imageBytes,
-                    onTap:    _clearImages,
-                    scheme:   scheme,
-                    text:     text,
-                    isEn:     _isEn,
-                  ),
-                  const SizedBox(height: 8),
-                  _ClearTile(
-                    icon:     Icons.api_outlined,
-                    color:    scheme.secondary,
-                    title:    _t('Données API', 'API data'),
-                    subtitle: _t(
-                      'Top artistes, albums, écoutes récentes…',
-                      'Top artists, albums, recent tracks…',
-                    ),
-                    size:     _stats!.apiBytes,
-                    onTap:    _clearApiCache,
-                    scheme:   scheme,
-                    text:     text,
-                    isEn:     _isEn,
-                  ),
-                  const SizedBox(height: 8),
-                  _ClearTile(
-                    icon:     Icons.history_rounded,
-                    color:    scheme.tertiary,
-                    title:    _t('Historique scrobbles', 'Scrobble history'),
-                    subtitle: _t(
-                      'Toutes les écoutes téléchargées',
-                      'All downloaded scrobble records',
-                    ),
-                    size:     _stats!.scrobbleBytes,
-                    onTap:    _clearScrobbles,
-                    scheme:   scheme,
-                    text:     text,
-                    isEn:     _isEn,
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton.tonalIcon(
-                    onPressed: _clearAll,
-                    icon:  const Icon(Icons.delete_sweep_rounded),
-                    label: Text(_t('Tout vider', 'Clear all')),
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size.fromHeight(48),
-                      backgroundColor: scheme.errorContainer,
-                      foregroundColor: scheme.onErrorContainer,
-                    ),
-                  ),
-                ],
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 220),
+                  switchInCurve:  Curves.easeOut,
+                  switchOutCurve: Curves.easeIn,
+                  transitionBuilder: (child, anim) =>
+                      FadeTransition(opacity: anim, child: child),
+                  child: _clearing
+                      ? const Padding(
+                          key: ValueKey('loading'),
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                      : Column(
+                          key: const ValueKey('list'),
+                          children: [
+                            _ClearTile(
+                              icon:     Icons.image_outlined,
+                              color:    scheme.primary,
+                              title:    L.cacheImages,
+                              subtitle: L.cacheImagesSubtitle,
+                              size:     _stats!.imageBytes,
+                              onTap:    _clearImages,
+                              scheme:   scheme,
+                              text:     text,
+                              isEn:     _isEn,
+                            ),
+                            const SizedBox(height: 8),
+                            _ClearTile(
+                              icon:     Icons.api_outlined,
+                              color:    scheme.secondary,
+                              title:    L.cacheApiData,
+                              subtitle: L.cacheApiDataSubtitle,
+                              size:     _stats!.apiBytes,
+                              onTap:    _clearApiCache,
+                              scheme:   scheme,
+                              text:     text,
+                              isEn:     _isEn,
+                            ),
+                            const SizedBox(height: 8),
+                            _ClearTile(
+                              icon:     Icons.history_rounded,
+                              color:    scheme.tertiary,
+                              title:    L.cacheScrobbles,
+                              subtitle: L.cacheScrobblesSubtitle,
+                              size:     _stats!.scrobbleBytes,
+                              onTap:    _clearScrobbles,
+                              scheme:   scheme,
+                              text:     text,
+                              isEn:     _isEn,
+                            ),
+                            const SizedBox(height: 16),
+                            FilledButton.tonalIcon(
+                              onPressed: _clearAll,
+                              icon:  const Icon(Icons.delete_sweep_rounded),
+                              label: Text(L.cacheClearBtn),
+                              style: FilledButton.styleFrom(
+                                minimumSize: const Size.fromHeight(48),
+                                backgroundColor: scheme.errorContainer,
+                                foregroundColor: scheme.onErrorContainer,
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
 
                 const SizedBox(height: 32),
               ],

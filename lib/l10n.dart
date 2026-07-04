@@ -23,6 +23,28 @@ abstract class AppStrings {
   String get navHistory;
   String get navSettings;
 
+  // ── Cache / Storage page ───────────────────────────────────────────────
+  String get cacheTitle;
+  String get cacheUsage;
+  String get cacheLimit;
+  String get cacheLimitHint;
+  String get cacheOffline;
+  String get cacheClearSection;
+  String get cacheImages;
+  String get cacheImagesSubtitle;
+  String get cacheApiData;
+  String get cacheApiDataSubtitle;
+  String get cacheScrobbles;
+  String get cacheScrobblesSubtitle;
+  String get cacheClearBtn;
+  String get cacheConfirmScrobblesTitle;
+  String get cacheConfirmScrobblesBody;
+  String get cacheConfirmAllTitle;
+  String get cacheConfirmAllBody;
+  String get cacheDelete;
+  String get cacheOfflineTitle;
+  String get cacheOfflineSubtitle;
+
   // ── Common ───────────────────────────────────────────────────────────────
   String get commonArtists;
   String get commonAlbums;
@@ -376,6 +398,27 @@ class _AppStringsFr implements AppStrings {
   @override String get navHistory   => 'Historique';
   @override String get navSettings  => 'Paramètres';
 
+  @override String get cacheTitle                  => 'Stockage';
+  @override String get cacheUsage                  => 'Utilisation';
+  @override String get cacheLimit                  => 'Limite de stockage';
+  @override String get cacheLimitHint              => 'Quand la limite est atteinte, les images les moins récentes sont supprimées automatiquement.';
+  @override String get cacheOffline                => 'Mode hors ligne';
+  @override String get cacheClearSection           => 'Nettoyer';
+  @override String get cacheImages                 => 'Images';
+  @override String get cacheImagesSubtitle         => 'Artwork artistes, albums, titres';
+  @override String get cacheApiData                => 'Données API';
+  @override String get cacheApiDataSubtitle        => 'Top artistes, albums, écoutes récentes…';
+  @override String get cacheScrobbles              => 'Historique scrobbles';
+  @override String get cacheScrobblesSubtitle      => 'Toutes les écoutes téléchargées';
+  @override String get cacheClearBtn               => 'Vider';
+  @override String get cacheConfirmScrobblesTitle  => "Supprimer l'historique ?";
+  @override String get cacheConfirmScrobblesBody   => 'L\'historique complet sera supprimé. Il sera rechargé au prochain démarrage.';
+  @override String get cacheConfirmAllTitle        => 'Vider tout le cache ?';
+  @override String get cacheConfirmAllBody         => 'Images, données API et historique seront supprimés.';
+  @override String get cacheDelete                 => 'Supprimer';
+  @override String get cacheOfflineTitle           => 'Afficher les données en cache hors ligne';
+  @override String get cacheOfflineSubtitle        => 'Les données expirées restent visibles si le réseau est indisponible.';
+
   @override String get commonArtists          => 'Artistes';
   @override String get commonAlbums           => 'Albums';
   @override String get commonTracks           => 'Titres';
@@ -718,6 +761,27 @@ class _AppStringsEn implements AppStrings {
   @override String get navCharts    => 'Charts';
   @override String get navHistory   => 'History';
   @override String get navSettings  => 'Settings';
+
+  @override String get cacheTitle                  => 'Storage';
+  @override String get cacheUsage                  => 'Usage';
+  @override String get cacheLimit                  => 'Storage limit';
+  @override String get cacheLimitHint              => 'When the limit is reached, least-recently-used images are deleted automatically.';
+  @override String get cacheOffline                => 'Offline mode';
+  @override String get cacheClearSection           => 'Clear';
+  @override String get cacheImages                 => 'Images';
+  @override String get cacheImagesSubtitle         => 'Artist, album, track artwork';
+  @override String get cacheApiData                => 'API data';
+  @override String get cacheApiDataSubtitle        => 'Top artists, albums, recent tracks…';
+  @override String get cacheScrobbles              => 'Scrobble history';
+  @override String get cacheScrobblesSubtitle      => 'All downloaded scrobble records';
+  @override String get cacheClearBtn               => 'Clear';
+  @override String get cacheConfirmScrobblesTitle  => 'Clear scrobble history?';
+  @override String get cacheConfirmScrobblesBody   => 'The full history will be deleted and re-downloaded on next launch.';
+  @override String get cacheConfirmAllTitle        => 'Clear all cache?';
+  @override String get cacheConfirmAllBody         => 'Images, API data and scrobble history will all be deleted.';
+  @override String get cacheDelete                 => 'Delete';
+  @override String get cacheOfflineTitle           => 'Show cached data when offline';
+  @override String get cacheOfflineSubtitle        => 'Expired data is still shown if no network is available.';
 
   @override String get commonArtists          => 'Artists';
   @override String get commonAlbums           => 'Albums';

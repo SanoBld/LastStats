@@ -228,23 +228,34 @@ class OfflineImageCache {
   }) {
     if (url.isEmpty) return placeholder ?? const SizedBox.shrink();
 
-    // Web: bypasses CanvasKit/skwasm's CORS requirement by rendering a raw
-    // <img> tag. Returns null (no-op) on native, where Image.network is
-    // unaffected by CORS and works as usual.
-    final webImg = buildCorsBypassImage(url, width: width, height: height, fit: fit);
-    if (webImg != null) {
-      _downloadAndCache(url).ignore(); // best-effort offline cache, may fail on non-CORS hosts
-      return webImg;
-    }
-
-    return FutureBuilder<ImageProvider>(
-      future: imageProvider(url),
+    // Cache checked FIRST (offline or online) — network is only a fallback.
+    return FutureBuilder<Uint8List?>(
+      future: _ensureMeta().then((_) => _getBytes(url)),
       builder: (context, snap) {
-        if (!snap.hasData) {
+        if (snap.connectionState != ConnectionState.done) {
           return placeholder ?? const SizedBox.shrink();
         }
-        return Image(
-          image: snap.data!,
+
+        if (snap.data != null) {
+          return Image.memory(
+            snap.data!,
+            width: width,
+            height: height,
+            fit: fit,
+            gaplessPlayback: true,
+            errorBuilder: (_, __, ___) =>
+                errorWidget ?? placeholder ?? const SizedBox.shrink(),
+          );
+        }
+
+        // Not cached → download in background, show network meanwhile.
+        _downloadAndCache(url).ignore();
+
+        final webImg = buildCorsBypassImage(url, width: width, height: height, fit: fit);
+        if (webImg != null) return webImg;
+
+        return Image.network(
+          url,
           width: width,
           height: height,
           fit: fit,
