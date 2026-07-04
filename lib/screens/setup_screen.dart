@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app_state.dart';
 import '../l10n.dart';
+import '../supported_locales.dart';
 import '../services/lastfm_service.dart';
 import '../services/data_cache.dart';
 import '../services/prefetch_service.dart';
@@ -244,26 +245,25 @@ class _SetupScreenState extends State<SetupScreen>
                     children: [
 
                       // ── Language chips — slide down + fade ──────────────
+                      // Wrap (not a fixed Row) so this scales cleanly to
+                      // 10-20+ languages later: it flows to new lines
+                      // instead of overflowing or requiring layout changes.
                       SlideTransition(
                         position: _langSlide,
                         child: FadeTransition(
                           opacity: _langFade,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          child: Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 10,
+                            runSpacing: 10,
                             children: [
-                              _LangChip(
-                                flag: '🇫🇷', label: 'Français',
-                                selected: !isEn,
-                                onTap: () => _setLocale('fr'),
-                                scheme: scheme, text: text,
-                              ),
-                              const SizedBox(width: 10),
-                              _LangChip(
-                                flag: '🇬🇧', label: 'English',
-                                selected: isEn,
-                                onTap: () => _setLocale('en'),
-                                scheme: scheme, text: text,
-                              ),
+                              for (final lang in kSupportedLocales)
+                                _LangChip(
+                                  flag: lang.flag, label: lang.nativeName,
+                                  selected: localeNotifier.value == lang.code,
+                                  onTap: () => _setLocale(lang.code),
+                                  scheme: scheme, text: text,
+                                ),
                             ],
                           ),
                         ),

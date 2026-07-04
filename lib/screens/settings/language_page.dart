@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n.dart';
 import '../../app_state.dart';
+import '../../supported_locales.dart';
 import 'settings_helpers.dart';
 
 class LanguagePage extends StatefulWidget {
@@ -41,11 +42,6 @@ class _LanguagePageState extends State<LanguagePage> {
     final text   = Theme.of(context).textTheme;
     final isEn   = _locale == 'en';
 
-    const langs = [
-      ('fr', '🇫🇷', 'Français', 'French'),
-      ('en', '🇬🇧', 'English', 'English'),
-    ];
-
     return Scaffold(
       appBar: AppBar(
         title: Text(L.settingsLanguage),
@@ -54,22 +50,21 @@ class _LanguagePageState extends State<LanguagePage> {
       body: ListView(padding: const EdgeInsets.all(20), children: [
 
         SettingsSection(label: L.settingsLanguage, children: [
-          ...langs.map((lang) {
-            final (code, flag, nativeName, enName) = lang;
-            final sel = _locale == code;
+          ...kSupportedLocales.map((lang) {
+            final sel = _locale == lang.code;
             return Column(children: [
               InkWell(
                 borderRadius: BorderRadius.circular(16),
-                onTap: () => _setLocale(code),
+                onTap: () => _setLocale(lang.code),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   child: Row(children: [
-                    Text(flag, style: const TextStyle(fontSize: 28)),
+                    Text(lang.flag, style: const TextStyle(fontSize: 28)),
                     const SizedBox(width: 14),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(nativeName, style: text.bodyLarge?.copyWith(
+                      Text(lang.nativeName, style: text.bodyLarge?.copyWith(
                           fontWeight: sel ? FontWeight.w700 : FontWeight.w500)),
-                      Text(enName, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                      Text(lang.englishName, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                     ])),
                     if (sel)
                       Container(
@@ -88,7 +83,7 @@ class _LanguagePageState extends State<LanguagePage> {
                   ]),
                 ),
               ),
-              if (code != langs.last.$1)
+              if (lang.code != kSupportedLocales.last.code)
                 const Divider(height: 1, indent: 16, endIndent: 16),
             ]);
           }),

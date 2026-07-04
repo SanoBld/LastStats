@@ -1106,11 +1106,1111 @@ class _AppStringsEn implements AppStrings {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
+//  Español
+// ══════════════════════════════════════════════════════════════════════════
+
+class _AppStringsEs implements AppStrings {
+  const _AppStringsEs();
+
+  @override String get period7day     => 'Semana';
+  @override String get period1month   => 'Mes';
+  @override String get period3month   => '3 meses';
+  @override String get period6month   => '6 meses';
+  @override String get period12month  => 'Año';
+  @override String get periodOverall  => 'Todo';
+
+  @override String get navDashboard => 'Panel';
+  @override String get navSearch    => 'Buscar';
+  @override String get navRankings  => 'Clasificación';
+  @override String get navCharts    => 'Gráficos';
+  @override String get navHistory   => 'Historial';
+  @override String get navSettings  => 'Ajustes';
+
+  @override String get cacheTitle                  => 'Almacenamiento';
+  @override String get cacheUsage                  => 'Uso';
+  @override String get cacheLimit                  => 'Límite de almacenamiento';
+  @override String get cacheLimitHint              => 'Cuando se alcanza el límite, las imágenes menos recientes se eliminan automáticamente.';
+  @override String get cacheOffline                => 'Modo sin conexión';
+  @override String get cacheClearSection           => 'Limpiar';
+  @override String get cacheImages                 => 'Imágenes';
+  @override String get cacheImagesSubtitle         => 'Portadas de artistas, álbumes y canciones';
+  @override String get cacheApiData                => 'Datos de la API';
+  @override String get cacheApiDataSubtitle        => 'Top artistas, álbumes, escuchas recientes…';
+  @override String get cacheScrobbles              => 'Historial de scrobbles';
+  @override String get cacheScrobblesSubtitle      => 'Todas las escuchas descargadas';
+  @override String get cacheClearBtn               => 'Vaciar';
+  @override String get cacheConfirmScrobblesTitle  => '¿Eliminar el historial?';
+  @override String get cacheConfirmScrobblesBody   => 'Se eliminará todo el historial. Se volverá a descargar en el próximo inicio.';
+  @override String get cacheConfirmAllTitle        => '¿Vaciar todo el caché?';
+  @override String get cacheConfirmAllBody         => 'Se eliminarán las imágenes, los datos de la API y el historial.';
+  @override String get cacheDelete                 => 'Eliminar';
+  @override String get cacheOfflineTitle           => 'Mostrar datos en caché sin conexión';
+  @override String get cacheOfflineSubtitle        => 'Los datos caducados siguen visibles si no hay red disponible.';
+
+  @override String get commonArtists          => 'Artistas';
+  @override String get commonAlbums           => 'Álbumes';
+  @override String get commonTracks           => 'Canciones';
+  @override String get commonNoResults        => 'Sin resultados';
+  @override String get commonRetry            => 'Reintentar';
+  @override String get commonCancel           => 'Cancelar';
+  @override String get commonApply            => 'Aplicar';
+  @override String get commonPlays            => 'reproducciones';
+  @override String get commonListeners        => 'oyentes';
+  @override String get commonNowPlayingBadge  => 'EN VIVO';
+  @override String get commonNowPlayingLong   => 'Reproduciendo ahora';
+  @override String get commonRecentTracks     => 'Canciones recientes';
+  @override String get commonNoRecentTracks   => 'Sin canciones recientes';
+  @override String get commonTopArtists       => 'Top Artistas';
+
+  @override String get rankingsTitle     => 'Clasificación';
+  @override String get rankingsPodium    => 'Podio';
+  @override String get rankingsContinued => 'Resto de la clasificación';
+  @override String get rankingsAllYears  => 'Todos los años';
+
+  @override String get chartsTitle              => 'Gráficos';
+  @override String get chartsMonthly            => 'Scrobbles — 12 meses';
+  @override String get chartsArtistDist         => 'Top artistas — distribución';
+  @override String get chartsMainstreamTitle    => 'Mainstream vs Joyas ocultas';
+  @override String get chartsMainstreamSubtitle => 'Popularidad mundial de tus artistas favoritos.';
+  @override String get chartsCompute            => 'Calcular';
+  @override String get chartsRecompute          => 'Recalcular';
+  @override String get chartsGem                => 'Joya oculta';
+  @override String get chartsMainstream         => 'Mainstream';
+  @override String globalListeners(String count) => '$count oyentes mundiales';
+
+  @override String get historyTitle           => 'Historial';
+  @override String get historySubtitle        => 'Tus escuchas, día a día';
+  @override String get historyToday           => 'Hoy';
+  @override String get historySelectDate      => 'Seleccionar una fecha';
+  @override String get historyChronological   => 'Cronológico';
+  @override String get historyList            => 'Lista';
+  @override String get historyStats           => 'Estadísticas';
+  @override String get historyNoTracks        => 'Sin escuchas ese día';
+  @override String historyScrobbles(int n)    => '$n scrobbles';
+  @override String historyArtistsCount(int n) => '$n artistas';
+  @override String historyAlbumsCount(int n)  => '$n álbumes';
+  @override String get historyTopArtists      => 'Top artistas';
+  @override String get historyTopAlbums       => 'Top álbumes';
+  @override String get historyTopTracks       => 'Top canciones';
+  @override String get historyHourTracks      => 'canción';
+  @override List<String> get months => const [
+    '', 'ene', 'feb', 'mar', 'abr', 'may', 'jun',
+    'jul', 'ago', 'sep', 'oct', 'nov', 'dic',
+  ];
+  @override String dayLabel(DateTime d) {
+    const dias  = ['lunes','martes','miércoles','jueves','viernes','sábado','domingo'];
+    const meses = ['','enero','febrero','marzo','abril','mayo','junio',
+        'julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    return '${dias[d.weekday - 1]}, ${d.day} de ${meses[d.month]} de ${d.year}';
+  }
+
+  @override String get searchTitle        => 'Buscar';
+  @override String get searchProfiles     => 'Perfiles';
+  @override String get searchHintBar      => 'Artista, álbum, canción o perfil…';
+  @override String get searchHintProfiles => 'Busca un usuario de Last.fm';
+  @override String get searchHintArtists  => 'Busca un artista';
+  @override String get searchHintAlbums   => 'Busca un álbum';
+  @override String get searchHintTracks   => 'Busca una canción';
+  @override String get searchTypePrompt   => 'Escribe en la barra de arriba';
+  @override String get searchAll          => 'Todo';
+  @override String memberSince(String date) => 'Desde $date';
+  @override String get perDay             => 'por día';
+  @override String get activityDays       => 'de actividad';
+
+  @override String get dashStats           => 'Estadísticas';
+  @override String get dashTopTracks       => 'Top Canciones';
+  @override String get dashFriends         => 'Amigos';
+  @override String get dashRefresh         => 'Actualizar';
+  @override String get dashRefreshFriends  => 'Actualizar amigos';
+  @override String get dashScrobbles       => 'scrobbles';
+  @override String get dashScrobblesPerDay => 'por día';
+  @override String get dashDaysActive      => 'de actividad';
+  @override String get dashLastTrack       => 'Última escucha';
+  @override String get dashArtist1         => 'Artista #1';
+  @override String get dashAlbum1          => 'Álbum #1';
+  @override String get dashTrack1          => 'Canción #1';
+  @override String get dashNoFriends       => 'No se encontraron amigos';
+  @override String get dashResetCache      => 'Restablecer caché';
+  @override String get dashResetCacheConfirm => 'Todos los datos de scrobbles en caché se eliminarán y se volverán a descargar desde Last.fm.';
+
+  @override String get dashFriendsActivity => 'Actividad de tus amigos de Last.fm';
+
+  @override String get settingsTitle             => 'Ajustes';
+  @override String get settingsAppearance        => 'Apariencia';
+  @override String get settingsTheme             => 'Tema';
+  @override String get settingsThemeAuto         => 'Auto';
+  @override String get settingsThemeLight        => 'Claro';
+  @override String get settingsThemeDark         => 'Oscuro';
+  @override String get settingsAccentColor       => 'Color de acento';
+  @override String get settingsAccentAuto        => 'Auto';
+  @override String get settingsCustomColor       => 'Personalizado';
+  @override String get settingsCustomColorEdit   => 'Editar';
+  @override String get settingsDynamicColor      => 'Color dinámico';
+  @override String get settingsMaterialYou       => 'Material You';
+  @override String get settingsMaterialYouSub    => 'Usa el color del fondo de pantalla de Android';
+  @override String get settingsMusicColor        => 'Color desde la música';
+  @override String get settingsMusicColorSub     => 'Extrae el color de la carátula actual';
+  @override String get settingsMusicColorNote    => 'El color dominante de la carátula actual reemplaza el acento.';
+  @override String get settingsMusicColorLocked  => 'Desactiva Material You primero';
+  @override String get settingsStartupPage       => 'Página de inicio';
+  @override String get settingsStartupTab        => 'Pestaña al abrir';
+  @override String get settingsDashboardSection  => 'Panel';
+  @override String get settingsHeaderImage       => 'Imagen de cabecera';
+  @override String get settingsHeaderImageSub    => 'La carátula elegida se muestra como fondo de inicio.';
+  @override String get settingsHeaderSource      => 'Fuente';
+  @override String get settingsHeaderPeriod      => 'Período';
+  @override String get settingsHeaderAnimation   => 'Transición';
+  @override String get settingsHeaderAnimationSub => 'Animación al cambiar de carátula.';
+  @override String get settingsHeaderBlur        => 'Desenfoque';
+  @override String get settingsHeaderBlurNone    => 'Ninguno';
+  @override String get settingsHeaderCustomUrl   => 'URL de la imagen';
+  @override String get settingsHeaderCustomUrlHint => 'https://ejemplo.com/imagen.jpg';
+  @override String get settingsHeaderCustomUrlSub  => 'Pega la URL directa de una imagen (jpg, png, webp…).';
+  @override String get settingsHeaderApply       => 'Aplicar';
+  @override String get settingsHeaderFallback    => 'Imagen predeterminada';
+  @override String get settingsHeaderFallbackSub => 'Se muestra cuando no hay música sonando.';
+  @override String get settingsHeaderFallbackUrlLabel => 'URL de la imagen predeterminada';
+  @override String get settingsVisibleSections   => 'Secciones visibles';
+  @override String get settingsNowPlayingSection => 'Reproduciendo ahora';
+  @override String get settingsStatsSection      => 'Estadísticas';
+  @override String get settingsTopArtistsSection => 'Top Artistas';
+  @override String get settingsTopTracksSection  => 'Top Canciones';
+  @override String get settingsFriendsSection    => 'Amigos';
+  @override String get settingsFriendsSectionSub => 'Actividad de tus amigos de Last.fm';
+  @override String get settingsAccount           => 'Cuenta';
+  @override String get settingsConnectedProfile  => 'Perfil de Last.fm conectado';
+  @override String get settingsLogout            => 'Cerrar sesión';
+  @override String get settingsLogoutTitle       => '¿Cerrar sesión?';
+  @override String get settingsLogoutContent     => 'Tus credenciales se eliminarán.';
+  @override String get settingsLogoutConfirm     => 'Cerrar sesión';
+  @override String get settingsBackup            => 'Copia de seguridad y restauración';
+  @override String get settingsExport            => 'Exportar ajustes';
+  @override String get settingsExportSub         => 'Copia un JSON al portapapeles';
+  @override String get settingsImport            => 'Restaurar una copia de seguridad';
+  @override String get settingsImportSub         => 'Pega un JSON exportado anteriormente';
+  @override String get settingsBackupInfo        => 'Incluye: tema, colores, clave API, usuario, cabecera, favoritos. Compatible entre versiones.';
+  @override String get settingsUpdates           => 'Actualizaciones';
+  @override String get settingsAutoUpdate        => 'Verificación automática';
+  @override String get settingsAutoUpdateSub     => 'Una vez al día';
+  @override String get settingsCheckNow          => 'Verificar ahora';
+  @override String get settingsUpToDate          => 'Actualizado';
+  @override String settingsUpdateAvailable(String v) => 'v$v disponible';
+  @override String get settingsCheckFailed       => 'No se pudo verificar.';
+  @override String settingsUpdateBanner(String v) => 'Actualización — v$v';
+  @override String get settingsDownload          => 'Descargar';
+  @override String get settingsViewRelease       => 'Ver';
+  @override String get settingsAbout             => 'Acerca de';
+  @override String get settingsVersion           => 'Versión';
+  @override String get settingsWebVersion        => 'Versión web';
+  @override String get settingsWebVersionSub     => 'sanobld.github.io/LastStats';
+  @override String get settingsSourceCode        => 'Código fuente';
+  @override String get settingsSourceCodeSub     => 'github.com/SanoBld/LastStats-App';
+  @override String get settingsLanguage          => 'Idioma';
+  @override String get settingsAboutProjectDesc  => 'LastStats es un proyecto personal de código abierto. Puede contener errores.';
+  @override String get settingsAboutSupport      => 'Apoya el proyecto';
+  @override String get settingsAboutSupportSub   => '⭐ Deja una estrella en GitHub';
+  @override String get settingsFaq               => 'Preguntas frecuentes';
+
+  @override String get headerNowPlaying  => 'Reproduciendo ahora';
+  @override String get headerTopTrack    => 'Canción #1';
+  @override String get headerTopAlbum    => 'Álbum #1';
+  @override String get headerTopArtist   => 'Artista #1';
+  @override String get headerCustomImage => 'Imagen personalizada';
+  @override String get headerThemeColor  => 'Color del tema';
+  @override String get headerAnimNone    => 'Ninguna';
+  @override String get headerAnimFade    => 'Desvanecer';
+  @override String get headerAnimSlide   => 'Deslizar';
+  @override String get headerAnimZoom    => 'Zoom';
+  @override String get headerPeriodWeek  => 'Semana';
+  @override String get headerPeriodMonth => 'Mes';
+  @override String get headerPeriodAllTime => 'Todo el tiempo';
+
+  @override String get colorPickerTitle       => 'Color personalizado';
+  @override String get colorPickerHue         => 'Tono';
+  @override String get colorPickerSaturation  => 'Saturación';
+  @override String get colorPickerBrightness  => 'Brillo';
+  @override String get colorPickerQuickColors => 'Colores rápidos';
+  @override String get colorPickerInvalid     => 'Formato inválido';
+  @override String get colorCustomTooltip     => 'Personalizado';
+
+  @override String get exportTitle      => 'Exportar ajustes';
+  @override String get exportFilename   => 'Nombre del archivo';
+  @override String get exportJsonContent => 'Contenido JSON';
+  @override String get exportInfo       => 'Copia este JSON, pégalo en un archivo de texto y nómbralo con .json';
+  @override String get exportCopy       => 'Copiar JSON';
+  @override String get exportCopied     => '¡Copiado!';
+  @override String get importTitle      => 'Restaurar una copia de seguridad';
+  @override String get importHintLabel  => 'Pega aquí tu copia de seguridad de LastStats.';
+  @override String get importEmpty      => 'Campo vacío.';
+  @override String get importInvalidJson  => 'JSON inválido.';
+  @override String get importUnknownFile  => 'Archivo no reconocido.';
+  @override String get importInvalidFormat => 'Formato inválido.';
+  @override String get importSuccess    => 'Ajustes restaurados con éxito ✓';
+  @override String get importRestore    => 'Restaurar';
+
+  @override String get setupImportJson      => 'Importar JSON';
+  @override String get setupImportHintLabel => 'Pega el contenido de tu archivo JSON abajo.';
+  @override String get setupImportNote      => '{ "username": "…", "api_key": "…" }';
+  @override String get setupImportFormat    => '{ "username": "...", "api_key": "..." }';
+  @override String get setupInvalidFields   => 'JSON inválido: faltan los campos "username" o "api_key".';
+
+  @override String get detailTracklist       => 'Canciones';
+  @override String get detailAlbumLabel      => 'Álbum';
+  @override String get detailDuration        => 'Duración';
+  @override String get detailTopTracks       => 'Canciones populares';
+  @override String get detailTopAlbums       => 'Álbumes populares';
+  @override String get detailBioReadMore     => 'Leer más';
+  @override String get detailBioReadLess     => 'Leer menos';
+  @override String get detailUserPlays       => 'reproducciones';
+  @override String get detailUserRank        => 'posición';
+  @override String get detailUserRankNA      => 'N/D';
+  @override String get detailGlobalListeners => 'oyentes';
+  @override String get detailPeriod          => 'Período';
+  @override String get detailBiography       => 'Biografía';
+  @override String get detailGlobalListenersLabel => 'Oyentes';
+  @override String get detailTranslate       => 'Traducir';
+  @override String get detailShowOriginal    => 'Ver original';
+  @override String get detailLyrics          => 'Letra';
+  @override String get detailLyricsNotFound  => 'Letra no disponible';
+  @override String get detailCopyLyrics      => 'Copiar letra';
+  @override String get detailLyricsCopied    => 'Letra copiada';
+  @override String get dashPerWeek           => 'por semana';
+
+  @override String get onboardSkip             => 'Omitir';
+  @override String get onboardNext             => 'Siguiente';
+  @override String get onboardFinish           => 'Finalizar';
+  @override String get onboardBack             => 'Atrás';
+  @override String get onboardAppearanceTitle  => 'Personaliza tu estilo';
+  @override String get onboardAppearanceSub    => 'Tema, color de acento y Material You.';
+  @override String get onboardNotifTitle       => 'Mantente informado';
+  @override String get onboardNotifSub         => 'Notificaciones y vibraciones.';
+  @override String get onboardFavTitle         => 'Tus perfiles favoritos';
+  @override String get onboardFavSub           => 'Añade amigos de Last.fm para encontrarlos rápidamente.';
+  @override String get onboardFavHint          => 'Usuario de Last.fm';
+  @override String get onboardFavAdd           => 'Añadir';
+  @override String get onboardFavEmpty         => 'Sin favoritos por ahora';
+  @override String get onboardDashTitle        => 'Tu panel';
+  @override String get onboardDashSub          => 'Elige qué secciones mostrar.';
+  @override String get onboardStartupTitle     => 'Pantalla de inicio';
+  @override String get onboardStartupSub       => '¿Qué pestaña quieres ver primero?';
+  @override String get onboardUpdatesTitle     => 'Actualizaciones';
+  @override String get onboardUpdatesSub       => 'Verificación automática de nuevas versiones.';
+  @override String get onboardStyle              => 'Estilo';
+  @override String get onboardStyleMaterialYou    => 'Material You';
+  @override String get onboardStyleNothing        => 'Nothing OS';
+  @override String get onboardPreview             => 'Vista previa';
+  @override String get onboardPreviewButton       => 'Botón';
+  @override String get onboardPreviewOutline      => 'Contorno';
+  @override String get onboardPreviewText         => 'Texto de ejemplo';
+  @override String get onboardPreviewBubble       => 'Burbuja';
+  @override String get onboardAccentTint          => 'Tono de acento';
+  @override String get onboardNothingRedOnly      => 'Solo rojo';
+  @override String get onboardNothingRedYellow    => 'Rojo + amarillo';
+  @override String get onboardDisplay             => 'Pantalla';
+  @override String get onboardOledTitle           => 'Negro OLED';
+  @override String get onboardOledSub             => 'Fondo negro puro en modo oscuro';
+  @override String get onboardArtworkColorTitle   => 'Color desde la carátula';
+  @override String get onboardArtworkColorSub     => 'Adapta el color de acento a la carátula en reproducción';
+  @override String get onboardNewsTitle           => 'Notificaciones de novedades';
+  @override String get onboardNewsSub             => 'Recibe avisos de nuevas funciones y correcciones';
+  @override String get onboardNewsBadgeTitle      => 'Punto de novedades';
+  @override String get onboardNewsBadgeSub        => 'Punto rojo en la campana del panel cuando hay novedades';
+  @override String get onboardHapticTitle         => 'Retroalimentación háptica';
+  @override String get onboardHapticSub           => 'Siente ligeras vibraciones en interacciones clave';
+  @override String get onboardRecaps              => 'Resúmenes';
+  @override String get onboardDailyRecapTitle     => 'Resumen diario';
+  @override String get onboardDailyRecapSub       => 'Un resumen rápido de tu escucha del día';
+  @override String get onboardWeeklyRecapTitle    => 'Resumen semanal';
+  @override String get onboardWeeklyRecapSub      => 'Tus tops de artistas, álbumes y canciones de la semana';
+  @override String get onboardMilestonesSection   => 'Hitos de scrobbles';
+  @override String get onboardMilestonesTitle     => 'Hitos';
+  @override String get onboardMilestonesSub       => 'Celebra cifras redondas de scrobbles';
+  @override String get onboardGrandMilestonesTitle => 'Grandes hitos';
+  @override String get onboardGrandMilestonesSub   => 'Celebración especial para los grandes hitos';
+  @override String get onboardDynamicColorSub      => 'Usa los colores de tu fondo de pantalla (Android 12+)';
+  @override String get onboardBetaTitle            => 'Actualizaciones beta';
+  @override String get onboardBetaSub              => 'Acceso anticipado a preversiones';
+
+  @override String get notifDetailTitle            => 'Notificación';
+  @override String get notifDetailOpenLink         => 'Abrir enlace';
+
+  @override String get settingsCheckingUpdates     => 'Buscando actualizaciones…';
+  @override String get settingsTapToDownload       => 'Toca para descargar';
+
+  @override String get detailLookingForPreview     => 'Buscando un adelanto…';
+  @override String get detailPreview30Sec          => 'Adelanto · 30 seg';
+
+  @override String get setupTagline                => 'Tus estadísticas de Last.fm, reinventadas.';
+  @override String get setupAnalyseProfile         => 'Analizar un perfil';
+  @override String get setupConnecting             => 'Conectando…';
+  @override String get setupStartAnalysis          => 'Iniciar análisis';
+  @override String get setupOr                     => 'o';
+  @override String setupWelcome(String username)   => '¡Bienvenido, $username!';
+
+  @override String get dashTapToDownload           => 'Toca para descargar.';
+  @override String dashUpdateTitle(String version, bool isBeta) =>
+      '${isBeta ? "Beta" : "Nueva"} actualización: v$version';
+  @override String get dashWeekLabel               => 'ESTA SEMANA';
+  @override String get dashMonthLabel              => 'ESTE MES';
+  @override String get dashYearLabel               => 'ESTE AÑO';
+  @override String get dashTopArtistLabel          => 'Artista top';
+  @override String get dashTopTrackLabel           => 'Canción top';
+  @override String get dashScrobblesLabel          => 'Scrobbles';
+  @override String get newsTypeFeatures            => 'Funciones';
+  @override String get newsTypeFixes               => 'Correcciones';
+  @override String get newsTypeUpdates             => 'Actualizaciones';
+  @override String get newsTypeAlerts              => 'Alertas';
+  @override String get newsTypeInfo                => 'Info';
+  @override String get newsWhatsNew                => 'Novedades';
+  @override String newsItemsCount(int n)           => '$n ${n > 1 ? "elementos" : "elemento"}';
+  @override String get newsFilters                 => 'Filtros';
+  @override String get newsAll                     => 'Todo';
+  @override String get newsAnyDate                 => 'Cualquier fecha';
+  @override String get newsNoNewsYet               => 'Sin novedades por ahora';
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  中文（简体）
+// ══════════════════════════════════════════════════════════════════════════
+
+class _AppStringsZh implements AppStrings {
+  const _AppStringsZh();
+
+  @override String get period7day     => '周';
+  @override String get period1month   => '月';
+  @override String get period3month   => '3个月';
+  @override String get period6month   => '6个月';
+  @override String get period12month  => '年';
+  @override String get periodOverall  => '全部';
+
+  @override String get navDashboard => '仪表盘';
+  @override String get navSearch    => '搜索';
+  @override String get navRankings  => '排行榜';
+  @override String get navCharts    => '图表';
+  @override String get navHistory   => '历史记录';
+  @override String get navSettings  => '设置';
+
+  @override String get cacheTitle                  => '存储';
+  @override String get cacheUsage                  => '已用空间';
+  @override String get cacheLimit                  => '存储上限';
+  @override String get cacheLimitHint              => '达到上限后，最久未使用的图片会自动删除。';
+  @override String get cacheOffline                => '离线模式';
+  @override String get cacheClearSection           => '清理';
+  @override String get cacheImages                 => '图片';
+  @override String get cacheImagesSubtitle         => '艺术家、专辑、歌曲封面';
+  @override String get cacheApiData                => 'API 数据';
+  @override String get cacheApiDataSubtitle        => '热门艺术家、专辑、最近播放…';
+  @override String get cacheScrobbles              => 'Scrobble 历史记录';
+  @override String get cacheScrobblesSubtitle      => '所有已下载的播放记录';
+  @override String get cacheClearBtn               => '清空';
+  @override String get cacheConfirmScrobblesTitle  => '删除历史记录？';
+  @override String get cacheConfirmScrobblesBody   => '完整历史记录将被删除，下次启动时重新下载。';
+  @override String get cacheConfirmAllTitle        => '清空全部缓存？';
+  @override String get cacheConfirmAllBody         => '图片、API 数据和历史记录都将被删除。';
+  @override String get cacheDelete                 => '删除';
+  @override String get cacheOfflineTitle           => '离线时显示缓存数据';
+  @override String get cacheOfflineSubtitle        => '无网络时仍显示过期数据。';
+
+  @override String get commonArtists          => '艺术家';
+  @override String get commonAlbums           => '专辑';
+  @override String get commonTracks           => '歌曲';
+  @override String get commonNoResults        => '无结果';
+  @override String get commonRetry            => '重试';
+  @override String get commonCancel           => '取消';
+  @override String get commonApply            => '应用';
+  @override String get commonPlays            => '播放次数';
+  @override String get commonListeners        => '听众';
+  @override String get commonNowPlayingBadge  => '直播中';
+  @override String get commonNowPlayingLong   => '正在播放';
+  @override String get commonRecentTracks     => '最近播放';
+  @override String get commonNoRecentTracks   => '暂无最近播放';
+  @override String get commonTopArtists       => '热门艺术家';
+
+  @override String get rankingsTitle     => '排行榜';
+  @override String get rankingsPodium    => '领奖台';
+  @override String get rankingsContinued => '排行榜其余部分';
+  @override String get rankingsAllYears  => '所有年份';
+
+  @override String get chartsTitle              => '图表';
+  @override String get chartsMonthly            => 'Scrobbles — 12个月';
+  @override String get chartsArtistDist         => '热门艺术家 — 分布';
+  @override String get chartsMainstreamTitle    => '主流 vs 小众佳作';
+  @override String get chartsMainstreamSubtitle => '你喜爱艺术家的全球人气。';
+  @override String get chartsCompute            => '计算';
+  @override String get chartsRecompute          => '重新计算';
+  @override String get chartsGem                => '小众佳作';
+  @override String get chartsMainstream         => '主流';
+  @override String globalListeners(String count) => '$count 名全球听众';
+
+  @override String get historyTitle           => '历史记录';
+  @override String get historySubtitle        => '你的每日收听记录';
+  @override String get historyToday           => '今天';
+  @override String get historySelectDate      => '选择日期';
+  @override String get historyChronological   => '按时间顺序';
+  @override String get historyList            => '列表';
+  @override String get historyStats           => '统计';
+  @override String get historyNoTracks        => '当天没有收听记录';
+  @override String historyScrobbles(int n)    => '$n 次 scrobble';
+  @override String historyArtistsCount(int n) => '$n 位艺术家';
+  @override String historyAlbumsCount(int n)  => '$n 张专辑';
+  @override String get historyTopArtists      => '热门艺术家';
+  @override String get historyTopAlbums       => '热门专辑';
+  @override String get historyTopTracks       => '热门歌曲';
+  @override String get historyHourTracks      => '首歌曲';
+  @override List<String> get months => const [
+    '', '1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月',
+  ];
+  @override String dayLabel(DateTime d) {
+    const wd = ['一','二','三','四','五','六','日'];
+    return '${d.year}年${d.month}月${d.day}日 星期${wd[d.weekday - 1]}';
+  }
+
+  @override String get searchTitle        => '搜索';
+  @override String get searchProfiles     => '用户';
+  @override String get searchHintBar      => '艺术家、专辑、歌曲或用户…';
+  @override String get searchHintProfiles => '搜索 Last.fm 用户';
+  @override String get searchHintArtists  => '搜索艺术家';
+  @override String get searchHintAlbums   => '搜索专辑';
+  @override String get searchHintTracks   => '搜索歌曲';
+  @override String get searchTypePrompt   => '在上方搜索栏输入';
+  @override String get searchAll          => '全部';
+  @override String memberSince(String date) => '加入于 $date';
+  @override String get perDay             => '每天';
+  @override String get activityDays       => '活跃天数';
+
+  @override String get dashStats           => '统计';
+  @override String get dashTopTracks       => '热门歌曲';
+  @override String get dashFriends         => '好友';
+  @override String get dashRefresh         => '刷新';
+  @override String get dashRefreshFriends  => '刷新好友';
+  @override String get dashScrobbles       => 'scrobbles';
+  @override String get dashScrobblesPerDay => '每天';
+  @override String get dashDaysActive      => '活跃天数';
+  @override String get dashLastTrack       => '最近播放';
+  @override String get dashArtist1         => '第一艺术家';
+  @override String get dashAlbum1          => '第一专辑';
+  @override String get dashTrack1          => '第一歌曲';
+  @override String get dashNoFriends       => '未找到好友';
+  @override String get dashResetCache      => '重置缓存';
+  @override String get dashResetCacheConfirm => '所有本地缓存的 scrobble 数据将被删除，并从 Last.fm 重新下载。';
+
+  @override String get dashFriendsActivity => '你的 Last.fm 好友动态';
+
+  @override String get settingsTitle             => '设置';
+  @override String get settingsAppearance        => '外观';
+  @override String get settingsTheme             => '主题';
+  @override String get settingsThemeAuto         => '自动';
+  @override String get settingsThemeLight        => '浅色';
+  @override String get settingsThemeDark         => '深色';
+  @override String get settingsAccentColor       => '强调色';
+  @override String get settingsAccentAuto        => '自动';
+  @override String get settingsCustomColor       => '自定义';
+  @override String get settingsCustomColorEdit   => '编辑';
+  @override String get settingsDynamicColor      => '动态取色';
+  @override String get settingsMaterialYou       => 'Material You';
+  @override String get settingsMaterialYouSub    => '使用 Android 壁纸取色';
+  @override String get settingsMusicColor        => '取色自音乐';
+  @override String get settingsMusicColorSub     => '从当前专辑封面提取颜色';
+  @override String get settingsMusicColorNote    => '当前封面的主色调将替代强调色。';
+  @override String get settingsMusicColorLocked  => '请先关闭 Material You';
+  @override String get settingsStartupPage       => '启动页面';
+  @override String get settingsStartupTab        => '启动时的标签页';
+  @override String get settingsDashboardSection  => '仪表盘';
+  @override String get settingsHeaderImage       => '头图';
+  @override String get settingsHeaderImageSub    => '所选封面将作为首页背景显示。';
+  @override String get settingsHeaderSource      => '来源';
+  @override String get settingsHeaderPeriod      => '时间段';
+  @override String get settingsHeaderAnimation   => '过渡动画';
+  @override String get settingsHeaderAnimationSub => '切换封面时的动画效果。';
+  @override String get settingsHeaderBlur        => '模糊';
+  @override String get settingsHeaderBlurNone    => '无';
+  @override String get settingsHeaderCustomUrl   => '图片链接';
+  @override String get settingsHeaderCustomUrlHint => 'https://example.com/image.jpg';
+  @override String get settingsHeaderCustomUrlSub  => '粘贴图片的直接链接（jpg、png、webp 等）。';
+  @override String get settingsHeaderApply       => '应用';
+  @override String get settingsHeaderFallback    => '默认图片';
+  @override String get settingsHeaderFallbackSub => '无音乐播放时显示。';
+  @override String get settingsHeaderFallbackUrlLabel => '默认图片链接';
+  @override String get settingsVisibleSections   => '显示的板块';
+  @override String get settingsNowPlayingSection => '正在播放';
+  @override String get settingsStatsSection      => '统计';
+  @override String get settingsTopArtistsSection => '热门艺术家';
+  @override String get settingsTopTracksSection  => '热门歌曲';
+  @override String get settingsFriendsSection    => '好友';
+  @override String get settingsFriendsSectionSub => '你的 Last.fm 好友动态';
+  @override String get settingsAccount           => '账号';
+  @override String get settingsConnectedProfile  => '已连接的 Last.fm 账号';
+  @override String get settingsLogout            => '退出登录';
+  @override String get settingsLogoutTitle       => '退出登录？';
+  @override String get settingsLogoutContent     => '你的登录信息将被删除。';
+  @override String get settingsLogoutConfirm     => '退出登录';
+  @override String get settingsBackup            => '备份与恢复';
+  @override String get settingsExport            => '导出设置';
+  @override String get settingsExportSub         => '将 JSON 复制到剪贴板';
+  @override String get settingsImport            => '恢复备份';
+  @override String get settingsImportSub         => '粘贴之前导出的 JSON';
+  @override String get settingsBackupInfo        => '包含：主题、颜色、API 密钥、用户名、头图、收藏。各版本间兼容。';
+  @override String get settingsUpdates           => '更新';
+  @override String get settingsAutoUpdate        => '自动检查';
+  @override String get settingsAutoUpdateSub     => '每天一次';
+  @override String get settingsCheckNow          => '立即检查';
+  @override String get settingsUpToDate          => '已是最新';
+  @override String settingsUpdateAvailable(String v) => 'v$v 可用';
+  @override String get settingsCheckFailed       => '检查失败。';
+  @override String settingsUpdateBanner(String v) => '更新 — v$v';
+  @override String get settingsDownload          => '下载';
+  @override String get settingsViewRelease       => '查看';
+  @override String get settingsAbout             => '关于';
+  @override String get settingsVersion           => '版本';
+  @override String get settingsWebVersion        => '网页版';
+  @override String get settingsWebVersionSub     => 'sanobld.github.io/LastStats';
+  @override String get settingsSourceCode        => '源代码';
+  @override String get settingsSourceCodeSub     => 'github.com/SanoBld/LastStats-App';
+  @override String get settingsLanguage          => '语言';
+  @override String get settingsAboutProjectDesc  => 'LastStats 是一个开源个人项目，可能存在一些错误。';
+  @override String get settingsAboutSupport      => '支持本项目';
+  @override String get settingsAboutSupportSub   => '⭐ 在 GitHub 上点个 star';
+  @override String get settingsFaq               => '常见问题';
+
+  @override String get headerNowPlaying  => '正在播放';
+  @override String get headerTopTrack    => '第一歌曲';
+  @override String get headerTopAlbum    => '第一专辑';
+  @override String get headerTopArtist   => '第一艺术家';
+  @override String get headerCustomImage => '自定义图片';
+  @override String get headerThemeColor  => '主题色';
+  @override String get headerAnimNone    => '无';
+  @override String get headerAnimFade    => '淡入淡出';
+  @override String get headerAnimSlide   => '滑动';
+  @override String get headerAnimZoom    => '缩放';
+  @override String get headerPeriodWeek  => '周';
+  @override String get headerPeriodMonth => '月';
+  @override String get headerPeriodAllTime => '全部时间';
+
+  @override String get colorPickerTitle       => '自定义颜色';
+  @override String get colorPickerHue         => '色相';
+  @override String get colorPickerSaturation  => '饱和度';
+  @override String get colorPickerBrightness  => '亮度';
+  @override String get colorPickerQuickColors => '快速选色';
+  @override String get colorPickerInvalid     => '格式无效';
+  @override String get colorCustomTooltip     => '自定义';
+
+  @override String get exportTitle      => '导出设置';
+  @override String get exportFilename   => '文件名';
+  @override String get exportJsonContent => 'JSON 内容';
+  @override String get exportInfo       => '复制此 JSON，粘贴到文本文件中，并以 .json 命名';
+  @override String get exportCopy       => '复制 JSON';
+  @override String get exportCopied     => '已复制！';
+  @override String get importTitle      => '恢复备份';
+  @override String get importHintLabel  => '在此粘贴你的 LastStats 备份。';
+  @override String get importEmpty      => '内容为空。';
+  @override String get importInvalidJson  => 'JSON 无效。';
+  @override String get importUnknownFile  => '无法识别的文件。';
+  @override String get importInvalidFormat => '格式无效。';
+  @override String get importSuccess    => '设置已成功恢复 ✓';
+  @override String get importRestore    => '恢复';
+
+  @override String get setupImportJson      => '导入 JSON';
+  @override String get setupImportHintLabel => '在下方粘贴你的 JSON 文件内容。';
+  @override String get setupImportNote      => '{ "username": "…", "api_key": "…" }';
+  @override String get setupImportFormat    => '{ "username": "...", "api_key": "..." }';
+  @override String get setupInvalidFields   => 'JSON 无效：缺少 "username" 或 "api_key" 字段。';
+
+  @override String get detailTracklist       => '歌曲';
+  @override String get detailAlbumLabel      => '专辑';
+  @override String get detailDuration        => '时长';
+  @override String get detailTopTracks       => '热门歌曲';
+  @override String get detailTopAlbums       => '热门专辑';
+  @override String get detailBioReadMore     => '展开';
+  @override String get detailBioReadLess     => '收起';
+  @override String get detailUserPlays       => '播放次数';
+  @override String get detailUserRank        => '排名';
+  @override String get detailUserRankNA      => '无';
+  @override String get detailGlobalListeners => '听众';
+  @override String get detailPeriod          => '时间段';
+  @override String get detailBiography       => '简介';
+  @override String get detailGlobalListenersLabel => '听众';
+  @override String get detailTranslate       => '翻译';
+  @override String get detailShowOriginal    => '查看原文';
+  @override String get detailLyrics          => '歌词';
+  @override String get detailLyricsNotFound  => '暂无歌词';
+  @override String get detailCopyLyrics      => '复制歌词';
+  @override String get detailLyricsCopied    => '歌词已复制';
+  @override String get dashPerWeek           => '每周';
+
+  @override String get onboardSkip             => '跳过';
+  @override String get onboardNext             => '下一步';
+  @override String get onboardFinish           => '完成';
+  @override String get onboardBack             => '返回';
+  @override String get onboardAppearanceTitle  => '自定义你的风格';
+  @override String get onboardAppearanceSub    => '主题、强调色和 Material You。';
+  @override String get onboardNotifTitle       => '及时获知动态';
+  @override String get onboardNotifSub         => '通知与震动。';
+  @override String get onboardFavTitle         => '你的收藏用户';
+  @override String get onboardFavSub           => '添加 Last.fm 好友以便快速查看。';
+  @override String get onboardFavHint          => 'Last.fm 用户名';
+  @override String get onboardFavAdd           => '添加';
+  @override String get onboardFavEmpty         => '暂无收藏';
+  @override String get onboardDashTitle        => '你的仪表盘';
+  @override String get onboardDashSub          => '选择要显示的板块。';
+  @override String get onboardStartupTitle     => '启动界面';
+  @override String get onboardStartupSub       => '你想先看到哪个标签页？';
+  @override String get onboardUpdatesTitle     => '更新';
+  @override String get onboardUpdatesSub       => '自动检查新版本。';
+  @override String get onboardStyle              => '风格';
+  @override String get onboardStyleMaterialYou    => 'Material You';
+  @override String get onboardStyleNothing        => 'Nothing OS';
+  @override String get onboardPreview             => '预览';
+  @override String get onboardPreviewButton       => '按钮';
+  @override String get onboardPreviewOutline      => '轮廓';
+  @override String get onboardPreviewText         => '示例文字';
+  @override String get onboardPreviewBubble       => '气泡';
+  @override String get onboardAccentTint          => '强调色调';
+  @override String get onboardNothingRedOnly      => '仅红色';
+  @override String get onboardNothingRedYellow    => '红+黄';
+  @override String get onboardDisplay             => '显示';
+  @override String get onboardOledTitle           => 'OLED 纯黑';
+  @override String get onboardOledSub             => '深色模式下使用纯黑背景';
+  @override String get onboardArtworkColorTitle   => '取色自封面';
+  @override String get onboardArtworkColorSub     => '将强调色与当前播放的封面匹配';
+  @override String get onboardNewsTitle           => '资讯通知';
+  @override String get onboardNewsSub             => '获取新功能和修复的通知';
+  @override String get onboardNewsBadgeTitle      => '资讯红点';
+  @override String get onboardNewsBadgeSub        => '有新动态时在仪表盘铃铛上显示红点';
+  @override String get onboardHapticTitle         => '触感反馈';
+  @override String get onboardHapticSub           => '在关键操作时感受轻微振动';
+  @override String get onboardRecaps              => '汇总';
+  @override String get onboardDailyRecapTitle     => '每日汇总';
+  @override String get onboardDailyRecapSub       => '你当天收听情况的简要汇总';
+  @override String get onboardWeeklyRecapTitle    => '每周汇总';
+  @override String get onboardWeeklyRecapSub      => '你本周的热门艺术家、专辑和歌曲';
+  @override String get onboardMilestonesSection   => 'Scrobble 里程碑';
+  @override String get onboardMilestonesTitle     => '里程碑';
+  @override String get onboardMilestonesSub       => '庆祝整数的 scrobble 次数';
+  @override String get onboardGrandMilestonesTitle => '重大里程碑';
+  @override String get onboardGrandMilestonesSub   => '为重大里程碑献上特别庆祝';
+  @override String get onboardDynamicColorSub      => '使用你的壁纸颜色（Android 12+）';
+  @override String get onboardBetaTitle            => '测试版更新';
+  @override String get onboardBetaSub              => '抢先体验预发布版本';
+
+  @override String get notifDetailTitle            => '通知';
+  @override String get notifDetailOpenLink         => '打开链接';
+
+  @override String get settingsCheckingUpdates     => '正在检查更新…';
+  @override String get settingsTapToDownload       => '点击下载';
+
+  @override String get detailLookingForPreview     => '正在查找试听片段…';
+  @override String get detailPreview30Sec          => '试听 · 30 秒';
+
+  @override String get setupTagline                => '你的 Last.fm 统计，焕然一新。';
+  @override String get setupAnalyseProfile         => '分析一个账号';
+  @override String get setupConnecting             => '连接中…';
+  @override String get setupStartAnalysis          => '开始分析';
+  @override String get setupOr                     => '或';
+  @override String setupWelcome(String username)   => '欢迎，$username！';
+
+  @override String get dashTapToDownload           => '点击下载。';
+  @override String dashUpdateTitle(String version, bool isBeta) =>
+      '${isBeta ? "测试版" : "新版本"}更新：v$version';
+  @override String get dashWeekLabel               => '本周';
+  @override String get dashMonthLabel              => '本月';
+  @override String get dashYearLabel               => '今年';
+  @override String get dashTopArtistLabel          => '热门艺术家';
+  @override String get dashTopTrackLabel           => '热门歌曲';
+  @override String get dashScrobblesLabel          => 'Scrobbles';
+  @override String get newsTypeFeatures            => '新功能';
+  @override String get newsTypeFixes               => '修复';
+  @override String get newsTypeUpdates             => '更新';
+  @override String get newsTypeAlerts              => '提醒';
+  @override String get newsTypeInfo                => '信息';
+  @override String get newsWhatsNew                => '最新动态';
+  @override String newsItemsCount(int n)           => '$n 条';
+  @override String get newsFilters                 => '筛选';
+  @override String get newsAll                     => '全部';
+  @override String get newsAnyDate                 => '任意日期';
+  @override String get newsNoNewsYet               => '暂无动态';
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  Português (Brasil)
+// ══════════════════════════════════════════════════════════════════════════
+
+class _AppStringsPt implements AppStrings {
+  const _AppStringsPt();
+
+  @override String get period7day     => 'Semana';
+  @override String get period1month   => 'Mês';
+  @override String get period3month   => '3 meses';
+  @override String get period6month   => '6 meses';
+  @override String get period12month  => 'Ano';
+  @override String get periodOverall  => 'Tudo';
+
+  @override String get navDashboard => 'Painel';
+  @override String get navSearch    => 'Buscar';
+  @override String get navRankings  => 'Rankings';
+  @override String get navCharts    => 'Gráficos';
+  @override String get navHistory   => 'Histórico';
+  @override String get navSettings  => 'Configurações';
+
+  @override String get cacheTitle                  => 'Armazenamento';
+  @override String get cacheUsage                  => 'Uso';
+  @override String get cacheLimit                  => 'Limite de armazenamento';
+  @override String get cacheLimitHint              => 'Ao atingir o limite, as imagens menos recentes são excluídas automaticamente.';
+  @override String get cacheOffline                => 'Modo offline';
+  @override String get cacheClearSection           => 'Limpar';
+  @override String get cacheImages                 => 'Imagens';
+  @override String get cacheImagesSubtitle         => 'Capas de artistas, álbuns e faixas';
+  @override String get cacheApiData                => 'Dados da API';
+  @override String get cacheApiDataSubtitle        => 'Top artistas, álbuns, faixas recentes…';
+  @override String get cacheScrobbles              => 'Histórico de scrobbles';
+  @override String get cacheScrobblesSubtitle      => 'Todas as escutas baixadas';
+  @override String get cacheClearBtn               => 'Limpar';
+  @override String get cacheConfirmScrobblesTitle  => 'Excluir o histórico?';
+  @override String get cacheConfirmScrobblesBody   => 'Todo o histórico será excluído e baixado novamente no próximo início.';
+  @override String get cacheConfirmAllTitle        => 'Limpar todo o cache?';
+  @override String get cacheConfirmAllBody         => 'Imagens, dados da API e histórico serão excluídos.';
+  @override String get cacheDelete                 => 'Excluir';
+  @override String get cacheOfflineTitle           => 'Mostrar dados em cache offline';
+  @override String get cacheOfflineSubtitle        => 'Dados expirados continuam visíveis se não houver rede disponível.';
+
+  @override String get commonArtists          => 'Artistas';
+  @override String get commonAlbums           => 'Álbuns';
+  @override String get commonTracks           => 'Faixas';
+  @override String get commonNoResults        => 'Nenhum resultado';
+  @override String get commonRetry            => 'Tentar novamente';
+  @override String get commonCancel           => 'Cancelar';
+  @override String get commonApply            => 'Aplicar';
+  @override String get commonPlays            => 'reproduções';
+  @override String get commonListeners        => 'ouvintes';
+  @override String get commonNowPlayingBadge  => 'AO VIVO';
+  @override String get commonNowPlayingLong   => 'Tocando agora';
+  @override String get commonRecentTracks     => 'Faixas recentes';
+  @override String get commonNoRecentTracks   => 'Nenhuma faixa recente';
+  @override String get commonTopArtists       => 'Top Artistas';
+
+  @override String get rankingsTitle     => 'Rankings';
+  @override String get rankingsPodium    => 'Pódio';
+  @override String get rankingsContinued => 'Restante do ranking';
+  @override String get rankingsAllYears  => 'Todos os anos';
+
+  @override String get chartsTitle              => 'Gráficos';
+  @override String get chartsMonthly            => 'Scrobbles — 12 meses';
+  @override String get chartsArtistDist         => 'Top artistas — distribuição';
+  @override String get chartsMainstreamTitle    => 'Mainstream vs Joias raras';
+  @override String get chartsMainstreamSubtitle => 'Popularidade mundial dos seus artistas favoritos.';
+  @override String get chartsCompute            => 'Calcular';
+  @override String get chartsRecompute          => 'Recalcular';
+  @override String get chartsGem                => 'Joia rara';
+  @override String get chartsMainstream         => 'Mainstream';
+  @override String globalListeners(String count) => '$count ouvintes no mundo';
+
+  @override String get historyTitle           => 'Histórico';
+  @override String get historySubtitle        => 'Suas escutas, dia a dia';
+  @override String get historyToday           => 'Hoje';
+  @override String get historySelectDate      => 'Selecionar uma data';
+  @override String get historyChronological   => 'Cronológico';
+  @override String get historyList            => 'Lista';
+  @override String get historyStats           => 'Estatísticas';
+  @override String get historyNoTracks        => 'Nenhuma escuta nesse dia';
+  @override String historyScrobbles(int n)    => '$n scrobbles';
+  @override String historyArtistsCount(int n) => '$n artistas';
+  @override String historyAlbumsCount(int n)  => '$n álbuns';
+  @override String get historyTopArtists      => 'Top artistas';
+  @override String get historyTopAlbums       => 'Top álbuns';
+  @override String get historyTopTracks       => 'Top faixas';
+  @override String get historyHourTracks      => 'faixa';
+  @override List<String> get months => const [
+    '', 'jan', 'fev', 'mar', 'abr', 'mai', 'jun',
+    'jul', 'ago', 'set', 'out', 'nov', 'dez',
+  ];
+  @override String dayLabel(DateTime d) {
+    const dias  = ['segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado','domingo'];
+    const meses = ['','janeiro','fevereiro','março','abril','maio','junho',
+        'julho','agosto','setembro','outubro','novembro','dezembro'];
+    return '${dias[d.weekday - 1]}, ${d.day} de ${meses[d.month]} de ${d.year}';
+  }
+
+  @override String get searchTitle        => 'Buscar';
+  @override String get searchProfiles     => 'Perfis';
+  @override String get searchHintBar      => 'Artista, álbum, faixa ou perfil…';
+  @override String get searchHintProfiles => 'Buscar um usuário do Last.fm';
+  @override String get searchHintArtists  => 'Buscar um artista';
+  @override String get searchHintAlbums   => 'Buscar um álbum';
+  @override String get searchHintTracks   => 'Buscar uma música';
+  @override String get searchTypePrompt   => 'Digite na barra acima';
+  @override String get searchAll          => 'Tudo';
+  @override String memberSince(String date) => 'Desde $date';
+  @override String get perDay             => 'por dia';
+  @override String get activityDays       => 'de atividade';
+
+  @override String get dashStats           => 'Estatísticas';
+  @override String get dashTopTracks       => 'Top Faixas';
+  @override String get dashFriends         => 'Amigos';
+  @override String get dashRefresh         => 'Atualizar';
+  @override String get dashRefreshFriends  => 'Atualizar amigos';
+  @override String get dashScrobbles       => 'scrobbles';
+  @override String get dashScrobblesPerDay => 'por dia';
+  @override String get dashDaysActive      => 'de atividade';
+  @override String get dashLastTrack       => 'Última tocada';
+  @override String get dashArtist1         => 'Artista #1';
+  @override String get dashAlbum1          => 'Álbum #1';
+  @override String get dashTrack1          => 'Faixa #1';
+  @override String get dashNoFriends       => 'Nenhum amigo encontrado';
+  @override String get dashResetCache      => 'Redefinir cache';
+  @override String get dashResetCacheConfirm => 'Todos os dados de scrobbles em cache serão excluídos e baixados novamente do Last.fm.';
+
+  @override String get dashFriendsActivity => 'Atividade dos seus amigos do Last.fm';
+
+  @override String get settingsTitle             => 'Configurações';
+  @override String get settingsAppearance        => 'Aparência';
+  @override String get settingsTheme             => 'Tema';
+  @override String get settingsThemeAuto         => 'Automático';
+  @override String get settingsThemeLight        => 'Claro';
+  @override String get settingsThemeDark         => 'Escuro';
+  @override String get settingsAccentColor       => 'Cor de destaque';
+  @override String get settingsAccentAuto        => 'Automático';
+  @override String get settingsCustomColor       => 'Personalizado';
+  @override String get settingsCustomColorEdit   => 'Editar';
+  @override String get settingsDynamicColor      => 'Cor dinâmica';
+  @override String get settingsMaterialYou       => 'Material You';
+  @override String get settingsMaterialYouSub    => 'Usa a cor do papel de parede do Android';
+  @override String get settingsMusicColor        => 'Cor a partir da música';
+  @override String get settingsMusicColorSub     => 'Extrai a cor da capa atual';
+  @override String get settingsMusicColorNote    => 'A cor dominante da capa atual substitui o destaque.';
+  @override String get settingsMusicColorLocked  => 'Desative o Material You primeiro';
+  @override String get settingsStartupPage       => 'Página inicial';
+  @override String get settingsStartupTab        => 'Aba ao abrir';
+  @override String get settingsDashboardSection  => 'Painel';
+  @override String get settingsHeaderImage       => 'Imagem de cabeçalho';
+  @override String get settingsHeaderImageSub    => 'A capa escolhida aparece como fundo da tela inicial.';
+  @override String get settingsHeaderSource      => 'Fonte';
+  @override String get settingsHeaderPeriod      => 'Período';
+  @override String get settingsHeaderAnimation   => 'Transição';
+  @override String get settingsHeaderAnimationSub => 'Animação ao trocar de capa.';
+  @override String get settingsHeaderBlur        => 'Desfoque';
+  @override String get settingsHeaderBlurNone    => 'Nenhum';
+  @override String get settingsHeaderCustomUrl   => 'URL da imagem';
+  @override String get settingsHeaderCustomUrlHint => 'https://exemplo.com/imagem.jpg';
+  @override String get settingsHeaderCustomUrlSub  => 'Cole a URL direta de uma imagem (jpg, png, webp…).';
+  @override String get settingsHeaderApply       => 'Aplicar';
+  @override String get settingsHeaderFallback    => 'Imagem padrão';
+  @override String get settingsHeaderFallbackSub => 'Exibida quando nenhuma música está tocando.';
+  @override String get settingsHeaderFallbackUrlLabel => 'URL da imagem padrão';
+  @override String get settingsVisibleSections   => 'Seções visíveis';
+  @override String get settingsNowPlayingSection => 'Tocando agora';
+  @override String get settingsStatsSection      => 'Estatísticas';
+  @override String get settingsTopArtistsSection => 'Top Artistas';
+  @override String get settingsTopTracksSection  => 'Top Faixas';
+  @override String get settingsFriendsSection    => 'Amigos';
+  @override String get settingsFriendsSectionSub => 'Atividade dos seus amigos do Last.fm';
+  @override String get settingsAccount           => 'Conta';
+  @override String get settingsConnectedProfile  => 'Perfil do Last.fm conectado';
+  @override String get settingsLogout            => 'Sair';
+  @override String get settingsLogoutTitle       => 'Sair da conta?';
+  @override String get settingsLogoutContent     => 'Suas credenciais serão excluídas.';
+  @override String get settingsLogoutConfirm     => 'Sair';
+  @override String get settingsBackup            => 'Backup e restauração';
+  @override String get settingsExport            => 'Exportar configurações';
+  @override String get settingsExportSub         => 'Copia um JSON para a área de transferência';
+  @override String get settingsImport            => 'Restaurar um backup';
+  @override String get settingsImportSub         => 'Cole um JSON exportado anteriormente';
+  @override String get settingsBackupInfo        => 'Inclui: tema, cores, chave de API, usuário, cabeçalho, favoritos. Compatível entre versões.';
+  @override String get settingsUpdates           => 'Atualizações';
+  @override String get settingsAutoUpdate        => 'Verificação automática';
+  @override String get settingsAutoUpdateSub     => 'Uma vez por dia';
+  @override String get settingsCheckNow          => 'Verificar agora';
+  @override String get settingsUpToDate          => 'Atualizado';
+  @override String settingsUpdateAvailable(String v) => 'v$v disponível';
+  @override String get settingsCheckFailed       => 'Falha na verificação.';
+  @override String settingsUpdateBanner(String v) => 'Atualização — v$v';
+  @override String get settingsDownload          => 'Baixar';
+  @override String get settingsViewRelease       => 'Ver';
+  @override String get settingsAbout             => 'Sobre';
+  @override String get settingsVersion           => 'Versão';
+  @override String get settingsWebVersion        => 'Versão web';
+  @override String get settingsWebVersionSub     => 'sanobld.github.io/LastStats';
+  @override String get settingsSourceCode        => 'Código-fonte';
+  @override String get settingsSourceCodeSub     => 'github.com/SanoBld/LastStats-App';
+  @override String get settingsLanguage          => 'Idioma';
+  @override String get settingsAboutProjectDesc  => 'LastStats é um projeto pessoal de código aberto. Pode conter bugs.';
+  @override String get settingsAboutSupport      => 'Apoie o projeto';
+  @override String get settingsAboutSupportSub   => '⭐ Deixe uma estrela no GitHub';
+  @override String get settingsFaq               => 'Perguntas frequentes';
+
+  @override String get headerNowPlaying  => 'Tocando agora';
+  @override String get headerTopTrack    => 'Faixa #1';
+  @override String get headerTopAlbum    => 'Álbum #1';
+  @override String get headerTopArtist   => 'Artista #1';
+  @override String get headerCustomImage => 'Imagem personalizada';
+  @override String get headerThemeColor  => 'Cor do tema';
+  @override String get headerAnimNone    => 'Nenhuma';
+  @override String get headerAnimFade    => 'Fade';
+  @override String get headerAnimSlide   => 'Deslizar';
+  @override String get headerAnimZoom    => 'Zoom';
+  @override String get headerPeriodWeek  => 'Semana';
+  @override String get headerPeriodMonth => 'Mês';
+  @override String get headerPeriodAllTime => 'Todo período';
+
+  @override String get colorPickerTitle       => 'Cor personalizada';
+  @override String get colorPickerHue         => 'Matiz';
+  @override String get colorPickerSaturation  => 'Saturação';
+  @override String get colorPickerBrightness  => 'Brilho';
+  @override String get colorPickerQuickColors => 'Cores rápidas';
+  @override String get colorPickerInvalid     => 'Formato inválido';
+  @override String get colorCustomTooltip     => 'Personalizado';
+
+  @override String get exportTitle      => 'Exportar configurações';
+  @override String get exportFilename   => 'Nome do arquivo';
+  @override String get exportJsonContent => 'Conteúdo JSON';
+  @override String get exportInfo       => 'Copie este JSON, cole em um arquivo de texto e nomeie com .json';
+  @override String get exportCopy       => 'Copiar JSON';
+  @override String get exportCopied     => 'Copiado!';
+  @override String get importTitle      => 'Restaurar um backup';
+  @override String get importHintLabel  => 'Cole aqui seu backup do LastStats.';
+  @override String get importEmpty      => 'Campo vazio.';
+  @override String get importInvalidJson  => 'JSON inválido.';
+  @override String get importUnknownFile  => 'Arquivo não reconhecido.';
+  @override String get importInvalidFormat => 'Formato inválido.';
+  @override String get importSuccess    => 'Configurações restauradas com sucesso ✓';
+  @override String get importRestore    => 'Restaurar';
+
+  @override String get setupImportJson      => 'Importar JSON';
+  @override String get setupImportHintLabel => 'Cole o conteúdo do seu arquivo JSON abaixo.';
+  @override String get setupImportNote      => '{ "username": "…", "api_key": "…" }';
+  @override String get setupImportFormat    => '{ "username": "...", "api_key": "..." }';
+  @override String get setupInvalidFields   => 'JSON inválido: faltam os campos "username" ou "api_key".';
+
+  @override String get detailTracklist       => 'Faixas';
+  @override String get detailAlbumLabel      => 'Álbum';
+  @override String get detailDuration        => 'Duração';
+  @override String get detailTopTracks       => 'Faixas populares';
+  @override String get detailTopAlbums       => 'Álbuns populares';
+  @override String get detailBioReadMore     => 'Ler mais';
+  @override String get detailBioReadLess     => 'Ler menos';
+  @override String get detailUserPlays       => 'reproduções';
+  @override String get detailUserRank        => 'posição';
+  @override String get detailUserRankNA      => 'N/D';
+  @override String get detailGlobalListeners => 'ouvintes';
+  @override String get detailPeriod          => 'Período';
+  @override String get detailBiography       => 'Biografia';
+  @override String get detailGlobalListenersLabel => 'Ouvintes';
+  @override String get detailTranslate       => 'Traduzir';
+  @override String get detailShowOriginal    => 'Ver original';
+  @override String get detailLyrics          => 'Letra';
+  @override String get detailLyricsNotFound  => 'Letra não disponível';
+  @override String get detailCopyLyrics      => 'Copiar letra';
+  @override String get detailLyricsCopied    => 'Letra copiada';
+  @override String get dashPerWeek           => 'por semana';
+
+  @override String get onboardSkip             => 'Pular';
+  @override String get onboardNext             => 'Próximo';
+  @override String get onboardFinish           => 'Concluir';
+  @override String get onboardBack             => 'Voltar';
+  @override String get onboardAppearanceTitle  => 'Personalize seu estilo';
+  @override String get onboardAppearanceSub    => 'Tema, cor de destaque e Material You.';
+  @override String get onboardNotifTitle       => 'Fique por dentro';
+  @override String get onboardNotifSub         => 'Notificações e vibrações.';
+  @override String get onboardFavTitle         => 'Seus perfis favoritos';
+  @override String get onboardFavSub           => 'Adicione amigos do Last.fm para encontrá-los rapidamente.';
+  @override String get onboardFavHint          => 'Usuário do Last.fm';
+  @override String get onboardFavAdd           => 'Adicionar';
+  @override String get onboardFavEmpty         => 'Nenhum favorito ainda';
+  @override String get onboardDashTitle        => 'Seu painel';
+  @override String get onboardDashSub          => 'Escolha quais seções mostrar.';
+  @override String get onboardStartupTitle     => 'Tela inicial';
+  @override String get onboardStartupSub       => 'Qual aba você quer ver primeiro?';
+  @override String get onboardUpdatesTitle     => 'Atualizações';
+  @override String get onboardUpdatesSub       => 'Verificação automática de novas versões.';
+  @override String get onboardStyle              => 'Estilo';
+  @override String get onboardStyleMaterialYou    => 'Material You';
+  @override String get onboardStyleNothing        => 'Nothing OS';
+  @override String get onboardPreview             => 'Prévia';
+  @override String get onboardPreviewButton       => 'Botão';
+  @override String get onboardPreviewOutline      => 'Contorno';
+  @override String get onboardPreviewText         => 'Texto de exemplo';
+  @override String get onboardPreviewBubble       => 'Bolha';
+  @override String get onboardAccentTint          => 'Tom de destaque';
+  @override String get onboardNothingRedOnly      => 'Só vermelho';
+  @override String get onboardNothingRedYellow    => 'Vermelho + amarelo';
+  @override String get onboardDisplay             => 'Tela';
+  @override String get onboardOledTitle           => 'Preto OLED';
+  @override String get onboardOledSub             => 'Fundo preto puro no modo escuro';
+  @override String get onboardArtworkColorTitle   => 'Cor a partir da capa';
+  @override String get onboardArtworkColorSub     => 'Combina a cor de destaque com a capa em reprodução';
+  @override String get onboardNewsTitle           => 'Notificações de novidades';
+  @override String get onboardNewsSub             => 'Seja avisado sobre novos recursos e correções';
+  @override String get onboardNewsBadgeTitle      => 'Ponto de novidades';
+  @override String get onboardNewsBadgeSub        => 'Ponto vermelho no sino do painel quando há novidades';
+  @override String get onboardHapticTitle         => 'Feedback tátil';
+  @override String get onboardHapticSub           => 'Sinta vibrações sutis em interações importantes';
+  @override String get onboardRecaps              => 'Resumos';
+  @override String get onboardDailyRecapTitle     => 'Resumo diário';
+  @override String get onboardDailyRecapSub       => 'Um resumo rápido da sua escuta do dia';
+  @override String get onboardWeeklyRecapTitle    => 'Resumo semanal';
+  @override String get onboardWeeklyRecapSub      => 'Seus tops de artistas, álbuns e faixas da semana';
+  @override String get onboardMilestonesSection   => 'Marcos de scrobbles';
+  @override String get onboardMilestonesTitle     => 'Marcos';
+  @override String get onboardMilestonesSub       => 'Celebre números redondos de scrobbles';
+  @override String get onboardGrandMilestonesTitle => 'Grandes marcos';
+  @override String get onboardGrandMilestonesSub   => 'Comemoração especial para grandes marcos';
+  @override String get onboardDynamicColorSub      => 'Usar as cores do seu papel de parede (Android 12+)';
+  @override String get onboardBetaTitle            => 'Atualizações beta';
+  @override String get onboardBetaSub              => 'Acesso antecipado a pré-lançamentos';
+
+  @override String get notifDetailTitle            => 'Notificação';
+  @override String get notifDetailOpenLink         => 'Abrir link';
+
+  @override String get settingsCheckingUpdates     => 'Verificando atualizações…';
+  @override String get settingsTapToDownload       => 'Toque para baixar';
+
+  @override String get detailLookingForPreview     => 'Procurando uma prévia…';
+  @override String get detailPreview30Sec          => 'Prévia · 30 seg';
+
+  @override String get setupTagline                => 'Suas estatísticas do Last.fm, reinventadas.';
+  @override String get setupAnalyseProfile         => 'Analisar um perfil';
+  @override String get setupConnecting             => 'Conectando…';
+  @override String get setupStartAnalysis          => 'Iniciar análise';
+  @override String get setupOr                     => 'ou';
+  @override String setupWelcome(String username)   => 'Bem-vindo, $username!';
+
+  @override String get dashTapToDownload           => 'Toque para baixar.';
+  @override String dashUpdateTitle(String version, bool isBeta) =>
+      '${isBeta ? "Beta" : "Nova"} atualização: v$version';
+  @override String get dashWeekLabel               => 'ESTA SEMANA';
+  @override String get dashMonthLabel              => 'ESTE MÊS';
+  @override String get dashYearLabel               => 'ESTE ANO';
+  @override String get dashTopArtistLabel          => 'Artista top';
+  @override String get dashTopTrackLabel           => 'Faixa top';
+  @override String get dashScrobblesLabel          => 'Scrobbles';
+  @override String get newsTypeFeatures            => 'Novidades';
+  @override String get newsTypeFixes               => 'Correções';
+  @override String get newsTypeUpdates             => 'Atualizações';
+  @override String get newsTypeAlerts              => 'Alertas';
+  @override String get newsTypeInfo                => 'Info';
+  @override String get newsWhatsNew                => 'Novidades';
+  @override String newsItemsCount(int n)           => '$n ${n > 1 ? "itens" : "item"}';
+  @override String get newsFilters                 => 'Filtros';
+  @override String get newsAll                     => 'Tudo';
+  @override String get newsAnyDate                 => 'Qualquer data';
+  @override String get newsNoNewsYet               => 'Nenhuma novidade ainda';
+}
+
+// ══════════════════════════════════════════════════════════════════════════
 //  Accessor.
 // ══════════════════════════════════════════════════════════════════════════
 
 const _fr = _AppStringsFr();
 const _en = _AppStringsEn();
+const _es = _AppStringsEs();
+const _zh = _AppStringsZh();
+const _pt = _AppStringsPt();
 
 /// Returns the current [AppStrings] based on [localeNotifier].
-AppStrings get L => localeNotifier.value == 'en' ? _en : _fr;
+AppStrings get L {
+  switch (localeNotifier.value) {
+    case 'en': return _en;
+    case 'es': return _es;
+    case 'zh': return _zh;
+    case 'pt': return _pt;
+    default:   return _fr;
+  }
+}
