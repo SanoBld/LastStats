@@ -82,23 +82,34 @@
 }) {
   if (url.isEmpty) return placeholder ?? const SizedBox.shrink();
 
-  &#47;&#47; Web: bypasses CanvasKit&#47;skwasm&#39;s CORS requirement by rendering a raw
-  &#47;&#47; &lt;img&gt; tag. Returns null (no-op) on native, where Image.network is
-  &#47;&#47; unaffected by CORS and works as usual.
-  final webImg = buildCorsBypassImage(url, width: width, height: height, fit: fit);
-  if (webImg != null) {
-    _downloadAndCache(url).ignore(); &#47;&#47; best-effort offline cache, may fail on non-CORS hosts
-    return webImg;
-  }
-
-  return FutureBuilder&lt;ImageProvider&gt;(
-    future: imageProvider(url),
+  &#47;&#47; Cache checked FIRST (offline or online) — network is only a fallback.
+  return FutureBuilder&lt;Uint8List?&gt;(
+    future: _ensureMeta().then((_) =&gt; _getBytes(url)),
     builder: (context, snap) {
-      if (!snap.hasData) {
+      if (snap.connectionState != ConnectionState.done) {
         return placeholder ?? const SizedBox.shrink();
       }
-      return Image(
-        image: snap.data!,
+
+      if (snap.data != null) {
+        return Image.memory(
+          snap.data!,
+          width: width,
+          height: height,
+          fit: fit,
+          gaplessPlayback: true,
+          errorBuilder: (_, __, ___) =&gt;
+              errorWidget ?? placeholder ?? const SizedBox.shrink(),
+        );
+      }
+
+      &#47;&#47; Not cached → download in background, show network meanwhile.
+      _downloadAndCache(url).ignore();
+
+      final webImg = buildCorsBypassImage(url, width: width, height: height, fit: fit);
+      if (webImg != null) return webImg;
+
+      return Image.network(
+        url,
         width: width,
         height: height,
         fit: fit,
