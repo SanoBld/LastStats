@@ -7,7 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../app_state.dart';
+import '../l10n.dart';
 
 class NotificationDetailPage extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -42,7 +42,6 @@ class NotificationDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final isEn   = localeNotifier.value == 'en';
 
     final title = (data['title'] ?? '').toString();
     final body  = (data['body']  ?? '').toString();
@@ -53,7 +52,7 @@ class NotificationDetailPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEn ? 'Notification' : 'Notification'),
+        title: Text(L.notifDetailTitle),
         scrolledUnderElevation: 0,
       ),
       body: ListView(
@@ -120,7 +119,7 @@ class NotificationDetailPage extends StatelessWidget {
                 }
               },
               icon:  const Icon(Icons.open_in_new_rounded),
-              label: Text(isEn ? 'Open link' : 'Ouvrir le lien'),
+              label: Text(L.notifDetailOpenLink),
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(48),
               ),

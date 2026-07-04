@@ -312,6 +312,47 @@ abstract class AppStrings {
   String get onboardDynamicColorSub;
   String get onboardBetaTitle;
   String get onboardBetaSub;
+
+  // ── Notification detail ─────────────────────────────────────────────────
+  String get notifDetailTitle;
+  String get notifDetailOpenLink;
+
+  // ── Settings page (update banner) ───────────────────────────────────────
+  String get settingsCheckingUpdates;
+  String get settingsTapToDownload;
+
+  // ── Detail sheet (audio preview) ────────────────────────────────────────
+  String get detailLookingForPreview;
+  String get detailPreview30Sec;
+
+  // ── Setup screen ─────────────────────────────────────────────────────────
+  String get setupTagline;
+  String get setupAnalyseProfile;
+  String get setupConnecting;
+  String get setupStartAnalysis;
+  String get setupOr;
+  String setupWelcome(String username);
+
+  // ── Dashboard: header hint + stat labels + news sheet ───────────────────
+  String get dashTapToDownload;
+  String dashUpdateTitle(String version, bool isBeta);
+  String get dashWeekLabel;
+  String get dashMonthLabel;
+  String get dashYearLabel;
+  String get dashTopArtistLabel;
+  String get dashTopTrackLabel;
+  String get dashScrobblesLabel;
+  String get newsTypeFeatures;
+  String get newsTypeFixes;
+  String get newsTypeUpdates;
+  String get newsTypeAlerts;
+  String get newsTypeInfo;
+  String get newsWhatsNew;
+  String newsItemsCount(int n);
+  String get newsFilters;
+  String get newsAll;
+  String get newsAnyDate;
+  String get newsNoNewsYet;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -618,6 +659,43 @@ class _AppStringsFr implements AppStrings {
   @override String get onboardDynamicColorSub      => 'Utiliser les couleurs de ton fond d\'écran (Android 12+)';
   @override String get onboardBetaTitle            => 'Mises à jour bêta';
   @override String get onboardBetaSub              => 'Accès anticipé aux pré-versions';
+
+  @override String get notifDetailTitle            => 'Notification';
+  @override String get notifDetailOpenLink         => 'Ouvrir le lien';
+
+  @override String get settingsCheckingUpdates     => 'Vérification des mises à jour…';
+  @override String get settingsTapToDownload       => 'Touchez pour télécharger';
+
+  @override String get detailLookingForPreview     => "Recherche d'un extrait…";
+  @override String get detailPreview30Sec          => 'Extrait · 30 sec';
+
+  @override String get setupTagline                => 'Tes stats Last.fm, réinventées.';
+  @override String get setupAnalyseProfile         => 'Analyser un profil';
+  @override String get setupConnecting             => 'Connexion…';
+  @override String get setupStartAnalysis          => "Lancer l'analyse";
+  @override String get setupOr                     => 'ou';
+  @override String setupWelcome(String username)   => 'Bienvenue, $username\u00a0!';
+
+  @override String get dashTapToDownload           => 'Appuie pour télécharger.';
+  @override String dashUpdateTitle(String version, bool isBeta) =>
+      '${isBeta ? "Bêta" : "Nouvelle"} mise à jour : v$version';
+  @override String get dashWeekLabel               => 'CETTE SEMAINE';
+  @override String get dashMonthLabel              => 'CE MOIS';
+  @override String get dashYearLabel               => 'CETTE ANNÉE';
+  @override String get dashTopArtistLabel          => 'Artiste top';
+  @override String get dashTopTrackLabel           => 'Titre top';
+  @override String get dashScrobblesLabel          => 'Scrobbles';
+  @override String get newsTypeFeatures            => 'Fonctions';
+  @override String get newsTypeFixes               => 'Correctifs';
+  @override String get newsTypeUpdates             => 'Mises à jour';
+  @override String get newsTypeAlerts              => 'Alertes';
+  @override String get newsTypeInfo                => 'Infos';
+  @override String get newsWhatsNew                => 'Actualités';
+  @override String newsItemsCount(int n)           => '$n ${n > 1 ? "éléments" : "élément"}';
+  @override String get newsFilters                 => 'Filtres';
+  @override String get newsAll                     => 'Tous';
+  @override String get newsAnyDate                 => 'Toute date';
+  @override String get newsNoNewsYet               => "Pas d'actualité pour le moment";
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -924,6 +1002,43 @@ class _AppStringsEn implements AppStrings {
   @override String get onboardDynamicColorSub      => 'Use colors from your wallpaper (Android 12+)';
   @override String get onboardBetaTitle            => 'Beta updates';
   @override String get onboardBetaSub              => 'Early access to pre-releases';
+
+  @override String get notifDetailTitle            => 'Notification';
+  @override String get notifDetailOpenLink         => 'Open link';
+
+  @override String get settingsCheckingUpdates     => 'Checking for updates…';
+  @override String get settingsTapToDownload       => 'Tap to download';
+
+  @override String get detailLookingForPreview     => 'Looking for a preview…';
+  @override String get detailPreview30Sec          => 'Preview · 30 sec';
+
+  @override String get setupTagline                => 'Your Last.fm stats, reinvented.';
+  @override String get setupAnalyseProfile         => 'Analyse a profile';
+  @override String get setupConnecting             => 'Connecting…';
+  @override String get setupStartAnalysis          => 'Start analysis';
+  @override String get setupOr                     => 'or';
+  @override String setupWelcome(String username)   => 'Welcome, $username!';
+
+  @override String get dashTapToDownload           => 'Tap to download.';
+  @override String dashUpdateTitle(String version, bool isBeta) =>
+      '${isBeta ? "Beta" : "New"} update: v$version';
+  @override String get dashWeekLabel               => 'THIS WEEK';
+  @override String get dashMonthLabel              => 'THIS MONTH';
+  @override String get dashYearLabel               => 'THIS YEAR';
+  @override String get dashTopArtistLabel          => 'Top artist';
+  @override String get dashTopTrackLabel           => 'Top track';
+  @override String get dashScrobblesLabel          => 'Scrobbles';
+  @override String get newsTypeFeatures            => 'Features';
+  @override String get newsTypeFixes               => 'Fixes';
+  @override String get newsTypeUpdates             => 'Updates';
+  @override String get newsTypeAlerts              => 'Alerts';
+  @override String get newsTypeInfo                => 'Info';
+  @override String get newsWhatsNew                => "What's new";
+  @override String newsItemsCount(int n)           => '$n ${n > 1 ? "items" : "item"}';
+  @override String get newsFilters                 => 'Filters';
+  @override String get newsAll                     => 'All';
+  @override String get newsAnyDate                 => 'Any date';
+  @override String get newsNoNewsYet               => 'No news yet';
 }
 
 // ══════════════════════════════════════════════════════════════════════════

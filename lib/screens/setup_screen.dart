@@ -324,8 +324,7 @@ class _SetupScreenState extends State<SetupScreen>
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                isEn ? 'Your Last.fm stats, reinvented.'
-                                     : 'Tes stats Last.fm, réinventées.',
+                                L.setupTagline,
                                 style: text.bodyMedium?.copyWith(
                                     color: scheme.onSurfaceVariant),
                               ),
@@ -365,8 +364,7 @@ class _SetupScreenState extends State<SetupScreen>
                                     ),
                                     const SizedBox(width: 12),
                                     Text(
-                                      isEn ? 'Analyse a profile'
-                                           : 'Analyser un profil',
+                                      L.setupAnalyseProfile,
                                       style: text.titleLarge?.copyWith(
                                           fontWeight: FontWeight.w700),
                                     ),
@@ -468,9 +466,8 @@ class _SetupScreenState extends State<SetupScreen>
                                                 color: scheme.onPrimary))
                                         : const Icon(Icons.bar_chart_rounded),
                                     label: Text(_isLoading
-                                        ? (isEn ? 'Connecting…' : 'Connexion…')
-                                        : (isEn ? 'Start analysis'
-                                               : "Lancer l'analyse")),
+                                        ? L.setupConnecting
+                                        : L.setupStartAnalysis),
                                     style: FilledButton.styleFrom(
                                       padding: const EdgeInsets.symmetric(vertical: 15),
                                       shape: RoundedRectangleBorder(
@@ -522,7 +519,7 @@ class _SetupScreenState extends State<SetupScreen>
                             Expanded(child: Divider(color: scheme.outlineVariant)),
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 12),
-                              child: Text(isEn ? 'or' : 'ou',
+                              child: Text(L.setupOr,
                                   style: text.bodySmall?.copyWith(
                                       color: scheme.onSurfaceVariant)),
                             ),
@@ -915,8 +912,7 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
 
                     // ── "Welcome, username!" ──────────────────────────────
                     Text(
-                      isEn ? 'Welcome, ${widget.username}!'
-                           : 'Bienvenue, ${widget.username}\u00a0!',
+                      L.setupWelcome(widget.username),
                       style: text.titleMedium?.copyWith(
                           color:      scheme.onSurface,
                           fontWeight: FontWeight.w600),

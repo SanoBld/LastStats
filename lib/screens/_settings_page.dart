@@ -229,7 +229,6 @@ class _SettingsPageState extends State<_SettingsPage> {
   Widget build(BuildContext context) {
     final scheme  = Theme.of(context).colorScheme;
     final text    = Theme.of(context).textTheme;
-    final isEn    = localeNotifier.value == 'en';
     final cards   = _buildCards();
     final initial = widget.username.isNotEmpty ? widget.username[0].toUpperCase() : '?';
 
@@ -344,7 +343,7 @@ class _SettingsPageState extends State<_SettingsPage> {
                   SizedBox(width: 10, height: 10, child: CircularProgressIndicator(
                       strokeWidth: 1.5, color: scheme.onSurfaceVariant)),
                   const SizedBox(width: 6),
-                  Text(isEn ? 'Checking for updates…' : 'Vérification des mises à jour…',
+                  Text(L.settingsCheckingUpdates,
                       style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                 ]),
               ],
@@ -460,7 +459,6 @@ class _UpdateBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final isEn   = localeNotifier.value == 'en';
 
     return GestureDetector(
       onTap: onTap,
@@ -478,7 +476,7 @@ class _UpdateBanner extends StatelessWidget {
             Text(L.settingsUpdateBanner(info.version),
                 style: text.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w700, color: scheme.onTertiaryContainer)),
-            Text(isEn ? 'Tap to download' : 'Touchez pour télécharger',
+            Text(L.settingsTapToDownload,
                 style: text.bodySmall?.copyWith(
                     color: scheme.onTertiaryContainer.withValues(alpha: 0.7))),
           ])),

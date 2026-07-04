@@ -1000,8 +1000,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   Widget _buildOldPreviewPlayerUnused(ColorScheme scheme) {
     if (_previewUrl == null && !_previewLoading) return const SizedBox.shrink();
 
-    final isEn = localeNotifier.value == 'en';
-
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Container(
@@ -1019,7 +1017,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                         strokeWidth: 2, color: scheme.primary)),
                 const SizedBox(width: 12),
                 Text(
-                  isEn ? 'Looking for a preview…' : "Recherche d'un extrait…",
+                  L.detailLookingForPreview,
                   style: Theme.of(context).textTheme.bodySmall
                       ?.copyWith(color: scheme.onSurfaceVariant),
                 ),
@@ -1060,7 +1058,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          isEn ? 'Preview · 30 sec' : 'Extrait · 30 sec',
+                          L.detailPreview30Sec,
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(fontWeight: FontWeight.w700),
                         ),

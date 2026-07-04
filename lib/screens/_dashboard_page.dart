@@ -839,15 +839,12 @@ class _DashboardPageState extends State<_DashboardPage> {
         final id = 'update_v${info.version}';
         // Avoid duplicating: only add if not already in the list
         if (!allItems.any((i) => i['id'] == id)) {
-          final isEn   = localeNotifier.value == 'en';
-          final title  = isEn
-              ? '${info.isBeta ? "Beta" : "New"} update: v${info.version}'
-              : '${info.isBeta ? "Bêta" : "Nouvelle"} mise à jour : v${info.version}';
+          final title  = L.dashUpdateTitle(info.version, info.isBeta);
           final body   = info.notes.isNotEmpty
               ? (info.notes.length > 300
                   ? '${info.notes.substring(0, 300)}…'
                   : info.notes)
-              : (isEn ? 'Tap to download.' : 'Appuie pour télécharger.');
+              : L.dashTapToDownload;
 
           allItems.insert(0, {
             'id':    id,
@@ -3077,11 +3074,8 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final isEn   = localeNotifier.value == 'en';
 
-    final labels = isEn
-        ? ['THIS WEEK', 'THIS MONTH', 'THIS YEAR']
-        : ['CETTE SEMAINE', 'CE MOIS', 'CETTE ANNÉE'];
+    final labels = [L.dashWeekLabel, L.dashMonthLabel, L.dashYearLabel];
 
     return Container(
       decoration: BoxDecoration(
@@ -3148,7 +3142,6 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
               onPageChanged: (p) => setState(() => _page = p),
               children: [
                 _periodRow(
-                  isEn:          isEn,
                   topArtist:     widget.topArtistWeek,
                   topTrack:      widget.topTrackWeek,
                   scrobbles:     widget.thisWeekCount > 0
@@ -3158,7 +3151,6 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
                   prevScrobbles: widget.lastWeekCount,
                 ),
                 _periodRow(
-                  isEn:          isEn,
                   topArtist:     widget.topArtistMonth,
                   topTrack:      widget.topTrackMonth,
                   scrobbles:     widget.thisMonthCount,
@@ -3166,7 +3158,6 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
                   prevScrobbles: widget.lastMonthCount,
                 ),
                 _periodRow(
-                  isEn:          isEn,
                   topArtist:     widget.topArtistYear,
                   topTrack:      widget.topTrackYear,
                   scrobbles:     widget.thisYearCount,
@@ -3183,7 +3174,6 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
 
   // Builds one page (3 tiles: top artist | top track | scrobbles)
   Widget _periodRow({
-    required bool isEn,
     Map?  topArtist,
     Map?  topTrack,
     int   scrobbles     = 0,
@@ -3202,7 +3192,7 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
         children: [
           Expanded(child: _WeekTile(
             icon:  Icons.mic_rounded,
-            label: isEn ? 'Top artist' : 'Artiste top',
+            label: L.dashTopArtistLabel,
             value: topArtist != null ? (topArtist['name'] ?? '—').toString() : '—',
             plays: topArtist != null
                 ? int.tryParse((topArtist['playcount'] ?? '0').toString()) ?? 0
@@ -3217,7 +3207,7 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
           ),
           Expanded(child: _WeekTile(
             icon:  Icons.music_note_rounded,
-            label: isEn ? 'Top track' : 'Titre top',
+            label: L.dashTopTrackLabel,
             value: topTrack != null ? (topTrack['name'] ?? '—').toString() : '—',
             plays: topTrack != null
                 ? int.tryParse((topTrack['playcount'] ?? '0').toString()) ?? 0
@@ -3232,7 +3222,7 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
           ),
           Expanded(child: _WeekTile(
             icon:    Icons.headphones_rounded,
-            label:   isEn ? 'Scrobbles' : 'Scrobbles',
+            label:   L.dashScrobblesLabel,
             value:   scrobbles > 0 ? countStr : '—',
             plays:   null,
             percent: pct,
@@ -3654,7 +3644,6 @@ class _NewsSheetState extends State<_NewsSheet> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final isEn   = localeNotifier.value == 'en';
     final items  = widget.items;
 
     final types = items.map((e) => (e['type'] ?? 'info').toString()).toSet().toList()..sort();
@@ -3668,11 +3657,11 @@ class _NewsSheetState extends State<_NewsSheet> {
     }).toList();
 
     String typeLabel(String t) => switch (t) {
-      'feature' => isEn ? 'Features' : 'Fonctions',
-      'fix'     => isEn ? 'Fixes'    : 'Correctifs',
-      'update'  => isEn ? 'Updates'  : 'Mises à jour',
-      'alert'   => isEn ? 'Alerts'   : 'Alertes',
-      _         => isEn ? 'Info'     : 'Infos',
+      'feature' => L.newsTypeFeatures,
+      'fix'     => L.newsTypeFixes,
+      'update'  => L.newsTypeUpdates,
+      'alert'   => L.newsTypeAlerts,
+      _         => L.newsTypeInfo,
     };
 
     return DraggableScrollableSheet(
@@ -3699,12 +3688,12 @@ class _NewsSheetState extends State<_NewsSheet> {
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(
-                    isEn ? "What's new" : 'Actualités',
+                    L.newsWhatsNew,
                     style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800),
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    '${filtered.length} ${isEn ? (filtered.length > 1 ? "items" : "item") : (filtered.length > 1 ? "éléments" : "élément")}',
+                    L.newsItemsCount(filtered.length),
                     style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                   ),
                 ]),
@@ -3712,7 +3701,7 @@ class _NewsSheetState extends State<_NewsSheet> {
               IconButton(
                 icon: Icon(_showFilters ? Icons.filter_list_off_rounded : Icons.filter_list_rounded,
                     color: (_type != null || _date != null) ? scheme.primary : null),
-                tooltip: isEn ? 'Filters' : 'Filtres',
+                tooltip: L.newsFilters,
                 onPressed: () => setState(() => _showFilters = !_showFilters),
               ),
             ]),
@@ -3720,7 +3709,7 @@ class _NewsSheetState extends State<_NewsSheet> {
               const SizedBox(height: 8),
               Wrap(spacing: 8, runSpacing: 8, children: [
                 FilterChip(
-                  label: Text(isEn ? 'All' : 'Tous'),
+                  label: Text(L.newsAll),
                   selected: _type == null,
                   onSelected: (_) => setState(() => _type = null),
                 ),
@@ -3735,7 +3724,7 @@ class _NewsSheetState extends State<_NewsSheet> {
                 const SizedBox(height: 8),
                 Wrap(spacing: 8, runSpacing: 8, children: [
                   FilterChip(
-                    label: Text(isEn ? 'Any date' : 'Toute date'),
+                    label: Text(L.newsAnyDate),
                     selected: _date == null,
                     onSelected: (_) => setState(() => _date = null),
                   ),
@@ -3763,7 +3752,7 @@ class _NewsSheetState extends State<_NewsSheet> {
                         size: 40, color: scheme.onSurfaceVariant),
                     const SizedBox(height: 12),
                     Text(
-                      isEn ? 'No news yet' : "Pas d'actualité pour le moment",
+                      L.newsNoNewsYet,
                       style: text.bodyMedium?.copyWith(
                           color: scheme.onSurfaceVariant),
                     ),
