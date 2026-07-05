@@ -164,7 +164,6 @@ class _AppearancePageState extends State<AppearancePage> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final isEn   = localeNotifier.value == 'en';
 
     return Scaffold(
       appBar: AppBar(
@@ -179,7 +178,7 @@ class _AppearancePageState extends State<AppearancePage> {
         Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: Text(
-            isEn ? 'Visual style' : 'Style visuel',
+            L.apVisualStyle,
             style: text.labelMedium?.copyWith(
                 color: scheme.primary, fontWeight: FontWeight.w700,
                 letterSpacing: 0.8),
@@ -206,7 +205,7 @@ class _AppearancePageState extends State<AppearancePage> {
                     style: text.labelSmall?.copyWith(
                         color: scheme.onSurfaceVariant)),
                 const SizedBox(height: 2),
-                Text(isEn ? 'Default' : 'Défaut',
+                Text(L.apStyleDefault,
                     style: text.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700)),
               ],
@@ -261,14 +260,14 @@ class _AppearancePageState extends State<AppearancePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _NothingLabel(isEn ? 'Accent' : 'Accent'),
+                _NothingLabel(L.apNothingAccentLabel),
                 const SizedBox(height: 10),
                 Row(children: [
                   Expanded(child: _NothingAccentTile(
                     color:    kNothingRed,
-                    label:    isEn ? 'Classic' : 'Classique',
+                    label:    L.apNothingClassic,
                     sublabel: 'Red #FF2020',
-                    desc:     isEn ? 'Red only' : 'Rouge uniquement',
+                    desc:     L.apRedOnlyDesc,
                     selected: _nothingAccent == 'classic',
                     isDark:   _theme != 'light',
                     onTap:    () { _ap_haptic(); _setNothingAccent('classic'); },
@@ -277,9 +276,9 @@ class _AppearancePageState extends State<AppearancePage> {
                   Expanded(child: _NothingAccentTile(
                     color:    kNothingRed,
                     color2:   kNothingYellow,
-                    label:    isEn ? 'Mixed' : 'Mixte',
+                    label:    L.apNothingMixed,
                     sublabel: '+ Yellow #FFC700',
-                    desc:     isEn ? 'Red + yellow touches' : 'Rouge + touches jaunes',
+                    desc:     L.apRedYellowDesc,
                     selected: _nothingAccent == 'mixed',
                     isDark:   _theme != 'light',
                     onTap:    () { _ap_haptic(); _setNothingAccent('mixed'); },
@@ -293,9 +292,7 @@ class _AppearancePageState extends State<AppearancePage> {
 
           // Active banner
           _NothingInfoBanner(
-            isEn
-                ? 'Nothing OS style active. Accent, dynamic color and music color are disabled.'
-                : 'Style Nothing OS actif. Accent, couleur dynamique et couleur musicale sont désactivés.',
+            L.apNothingActiveBanner,
           ),
         ],
 
@@ -339,9 +336,7 @@ class _AppearancePageState extends State<AppearancePage> {
                       color: scheme.onSurfaceVariant),
                   const SizedBox(width: 6),
                   Expanded(child: Text(
-                    isEn
-                        ? 'Nothing dark mode is inherently OLED black. OLED toggle is not needed.'
-                        : 'Le mode sombre Nothing est nativement OLED noir. Le réglage OLED est inutile.',
+                    L.apNothingOledInherent,
                     style: text.bodySmall?.copyWith(
                         color: scheme.onSurfaceVariant),
                   )),
@@ -359,12 +354,10 @@ class _AppearancePageState extends State<AppearancePage> {
               child: SwitchListTile(
                 secondary: Icon(Icons.phone_android_rounded,
                     color: scheme.primary),
-                title: Text(isEn ? 'OLED black theme' : 'Thème noir OLED'),
+                title: Text(L.apOledTitle),
                 subtitle: Text(_isNothing
-                    ? (isEn ? 'Built into Nothing dark mode' : 'Intégré au mode sombre Nothing')
-                    : (isEn
-                        ? 'Pure black backgrounds when dark mode is active'
-                        : 'Fonds noirs purs quand le mode sombre est actif')),
+                    ? L.apOledBuiltIntoNothing
+                    : L.apOledPureBlack),
                 value: _isNothing ? false : _oledMode,
                 onChanged: _isNothing || _theme == 'light'
                     ? null
@@ -448,7 +441,7 @@ class _AppearancePageState extends State<AppearancePage> {
                         onTap: (_useDynamicColor || _useNowPlayingColor)
                             ? null : _pickCustomColor,
                         child: Tooltip(
-                          message: isEn ? 'Custom color' : 'Couleur personnalisée',
+                          message: L.apCustomColorTooltip,
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             width: 36, height: 36,
@@ -548,13 +541,9 @@ class _AppearancePageState extends State<AppearancePage> {
                 const Divider(height: 1, indent: 16, endIndent: 16),
                 ListTile(
                   leading: Icon(Icons.music_off_rounded, color: scheme.primary),
-                  title: Text(isEn
-                      ? 'Color when nothing plays'
-                      : 'Couleur quand rien ne joue'),
+                  title: Text(L.apColorWhenNothingPlays),
                   subtitle: Text(
-                    isEn
-                        ? 'Accent used while no track is scrobbling'
-                        : "Accent utilisé quand aucune piste n'est en cours",
+                    L.apColorWhenNothingPlaysSub,
                     style: text.bodySmall?.copyWith(
                         color: scheme.onSurfaceVariant),
                   ),
@@ -592,12 +581,8 @@ class _AppearancePageState extends State<AppearancePage> {
               const Divider(height: 1, indent: 16, endIndent: 16),
               SwitchListTile(
                 secondary: Icon(Icons.palette_outlined, color: scheme.primary),
-                title: Text(isEn
-                    ? 'Keep last artwork color'
-                    : 'Garder la dernière couleur'),
-                subtitle: Text(isEn
-                    ? 'Keep last artwork color instead of resetting when nothing plays'
-                    : 'Conserver la couleur de la dernière pochette au lieu du fallback'),
+                title: Text(L.apKeepLastArtworkTitle),
+                subtitle: Text(L.apKeepLastArtworkSub),
                 value: _keepLastArtworkColor,
                 onChanged: _useNowPlayingColor && !_useDynamicColor
                     ? (v) async {
@@ -617,14 +602,12 @@ class _AppearancePageState extends State<AppearancePage> {
         //  Artwork color theme — ALWAYS active (works in all styles)
         // ══════════════════════════════════════════════════════════════════
         SettingsSection(
-          label: isEn ? 'Detail pages' : 'Fiches détail',
+          label: L.apDetailPagesSection,
           children: [
             SwitchListTile(
               secondary: Icon(Icons.style_rounded, color: scheme.primary),
               title: Row(children: [
-                Flexible(child: Text(isEn
-                    ? 'Artwork color theme'
-                    : "Thème couleur de l'affiche")),
+                Flexible(child: Text(L.apArtworkColorTheme)),
                 const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -632,14 +615,12 @@ class _AppearancePageState extends State<AppearancePage> {
                       color: scheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: scheme.outlineVariant)),
-                  child: Text(isEn ? 'BETA' : 'BÊTA',
+                  child: Text(L.apBeta,
                       style: text.labelSmall?.copyWith(
                           color: scheme.onSurfaceVariant)),
                 ),
               ]),
-              subtitle: Text(isEn
-                  ? "Detail pages adapt their colors to the artwork's dominant color"
-                  : "Les fiches adaptent leurs couleurs à la couleur dominante de l'affiche"),
+              subtitle: Text(L.apArtworkColorThemeSub),
               value: _artworkColorTheme,
               onChanged: (v) async {
                 await _set('ls_artwork_color_theme', v);
@@ -902,16 +883,13 @@ class _NavLabelSectionState extends State<_NavLabelSection> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final isEn   = localeNotifier.value == 'en';
     return SettingsSection(
-      label: isEn ? 'Navigation bar' : 'Barre de navigation',
+      label: L.apNavBarSection,
       children: [
         SwitchListTile(
           secondary: Icon(Icons.label_outline_rounded, color: scheme.primary),
-          title: Text(isEn ? 'Show tab labels' : 'Afficher les libellés'),
-          subtitle: Text(isEn
-              ? 'Display tab names below icons in the bottom bar'
-              : 'Afficher les noms des onglets sous les icônes'),
+          title: Text(L.apShowTabLabels),
+          subtitle: Text(L.apShowTabLabelsSub),
           value: _labels,
           onChanged: (v) async {
             final p = await SharedPreferences.getInstance();
@@ -947,16 +925,13 @@ class _HapticSectionState extends State<_HapticSection> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final isEn   = localeNotifier.value == 'en';
     return SettingsSection(
-      label: isEn ? 'Interactions' : 'Interactions',
+      label: L.apInteractionsSection,
       children: [
         SwitchListTile(
           secondary: Icon(Icons.vibration_rounded, color: scheme.primary),
-          title: Text(isEn ? 'Haptic feedback' : 'Retour haptique'),
-          subtitle: Text(isEn
-              ? 'Vibrations on taps, selections and gestures'
-              : 'Vibrations sur les appuis, sélections et gestes'),
+          title: Text(L.onboardHapticTitle),
+          subtitle: Text(L.apHapticFeedbackSub),
           value: _haptic,
           onChanged: (v) async {
             final p = await SharedPreferences.getInstance();

@@ -224,7 +224,6 @@ class _BackupPageState extends State<BackupPage> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final isEn   = localeNotifier.value == 'en';
 
     return Scaffold(
       appBar: AppBar(
@@ -245,7 +244,7 @@ class _BackupPageState extends State<BackupPage> {
             Row(children: [
               Icon(Icons.backup_rounded, color: scheme.onPrimaryContainer, size: 22),
               const SizedBox(width: 10),
-              Text(isEn ? 'What\'s included' : 'Ce qui est inclus',
+              Text(L.backupWhatsIncluded,
                   style: text.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w700, color: scheme.onPrimaryContainer)),
             ]),
@@ -313,9 +312,7 @@ class _BackupPageState extends State<BackupPage> {
             Icon(Icons.warning_amber_rounded, size: 16, color: scheme.error),
             const SizedBox(width: 10),
             Expanded(child: Text(
-              isEn
-                  ? 'Restoring a backup will overwrite your current settings.'
-                  : 'Restaurer une sauvegarde écrasera vos paramètres actuels.',
+              L.backupOverwriteWarning,
               style: text.bodySmall?.copyWith(color: scheme.error),
             )),
           ]),

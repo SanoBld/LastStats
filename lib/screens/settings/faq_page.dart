@@ -41,7 +41,7 @@ class _FaqPageState extends State<FaqPage> {
 
         // ── Questions / réponses ──────────────────────────────────────────
         SettingsSection(
-          label: isEn ? 'Frequently asked questions' : 'Questions fréquentes',
+          label: L.faqSectionLabel,
           children: [
             ...items.asMap().entries.map((e) {
               final isLast = e.key == items.length - 1;
@@ -67,9 +67,7 @@ class _FaqPageState extends State<FaqPage> {
             Icon(Icons.favorite_rounded, size: 16, color: scheme.primary),
             const SizedBox(width: 10),
             Expanded(child: Text(
-              isEn
-                  ? 'LastStats is a free, open-source project made with ❤️ by SanoBld.'
-                  : 'LastStats est un projet gratuit et open source réalisé avec ❤️ par SanoBld.',
+              L.faqOpenSourceBadge,
               style: text.bodySmall?.copyWith(color: scheme.onPrimaryContainer),
             )),
           ]),

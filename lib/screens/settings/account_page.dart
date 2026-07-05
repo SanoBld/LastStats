@@ -110,16 +110,13 @@ class _AccountPageState extends State<AccountPage> {
   // ── Remove an account ─────────────────────────────────────────────────────
 
   Future<void> _removeAccount(int index) async {
-    final isEn = localeNotifier.value == 'en';
     final acc  = _accounts[index];
 
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(isEn ? 'Remove account?' : 'Supprimer le compte ?'),
-        content: Text(isEn
-            ? 'Remove @${acc.username} from your accounts?'
-            : 'Supprimer @${acc.username} de vos comptes ?'),
+        title: Text(L.acctRemoveTitle),
+        content: Text(L.acctRemoveBody(acc.username)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -131,7 +128,7 @@ class _AccountPageState extends State<AccountPage> {
               foregroundColor: Theme.of(ctx).colorScheme.onError,
             ),
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(isEn ? 'Remove' : 'Supprimer'),
+            child: Text(L.acctRemoveAction),
           ),
         ],
       ),
@@ -169,7 +166,6 @@ class _AccountPageState extends State<AccountPage> {
 
   Future<void> _addAccount() async {
     if (_accounts.length >= AccountManager.maxAccounts) return;
-    final isEn = localeNotifier.value == 'en';
 
     final result = await showDialog<AccountEntry>(
       context: context,
@@ -177,7 +173,6 @@ class _AccountPageState extends State<AccountPage> {
         existingApiKey: _accounts.isNotEmpty
             ? _accounts[_activeIndex].apiKey
             : null,
-        isEn: isEn,
       ),
     );
     if (result == null || !mounted) return;
@@ -187,17 +182,13 @@ class _AccountPageState extends State<AccountPage> {
 
     if (!added) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(isEn
-            ? 'This account is already added or the list is full.'
-            : 'Ce compte est déjà ajouté ou la liste est pleine.'),
+        content: Text(L.acctAlreadyAddedOrFull),
         behavior: SnackBarBehavior.floating,
       ));
     } else {
       await _load();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(isEn
-            ? '@${result.username} added successfully.'
-            : '@${result.username} ajouté avec succès.'),
+        content: Text(L.acctAddedSuccess(result.username)),
         behavior: SnackBarBehavior.floating,
       ));
     }
@@ -206,14 +197,11 @@ class _AccountPageState extends State<AccountPage> {
   // ── Logout all ────────────────────────────────────────────────────────────
 
   Future<void> _logoutAll() async {
-    final isEn = localeNotifier.value == 'en';
     final ok   = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(L.settingsLogoutTitle),
-        content: Text(isEn
-            ? 'All accounts will be removed. You will return to the setup screen.'
-            : 'Tous les comptes seront supprimés. Vous retournerez à l\'écran de configuration.'),
+        content: Text(L.acctLogoutAllBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -251,7 +239,6 @@ class _AccountPageState extends State<AccountPage> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final isEn   = localeNotifier.value == 'en';
 
     if (_loading) {
       return Scaffold(
@@ -298,9 +285,7 @@ class _AccountPageState extends State<AccountPage> {
 
         // ── Account list ───────────────────────────────────────────────────
         SettingsSection(
-          label: isEn
-              ? 'My accounts (${_accounts.length}/${AccountManager.maxAccounts})'
-              : 'Mes comptes (${_accounts.length}/${AccountManager.maxAccounts})',
+          label: L.acctMyAccounts(_accounts.length, AccountManager.maxAccounts),
           children: [
             ..._accounts.asMap().entries.map((entry) {
               final idx   = entry.key;
@@ -334,7 +319,7 @@ class _AccountPageState extends State<AccountPage> {
                           Icon(Icons.circle, size: 8, color: scheme.primary),
                           const SizedBox(width: 5),
                           Text(
-                            isEn ? 'Active' : 'Actif',
+                            L.acctActive,
                             style: TextStyle(
                                 color: scheme.primary,
                                 fontWeight: FontWeight.w600,
@@ -342,20 +327,20 @@ class _AccountPageState extends State<AccountPage> {
                           ),
                         ])
                       : Text(
-                          isEn ? 'Tap "Switch" to activate' : 'Touchez "Activer" pour basculer',
+                          L.acctTapSwitchToActivate,
                           style: text.bodySmall?.copyWith(
                               color: scheme.onSurfaceVariant)),
                   trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                     if (!isAct)
                       TextButton(
                         onPressed: () => _switchTo(idx),
-                        child: Text(isEn ? 'Switch' : 'Activer'),
+                        child: Text(L.acctSwitch),
                       ),
                     if (_accounts.length > 1)
                       IconButton(
                         icon: Icon(Icons.remove_circle_outline_rounded,
                             color: scheme.error, size: 20),
-                        tooltip: isEn ? 'Remove' : 'Supprimer',
+                        tooltip: L.acctRemoveAction,
                         onPressed: () => _removeAccount(idx),
                       ),
                   ]),
@@ -379,14 +364,12 @@ class _AccountPageState extends State<AccountPage> {
                       color: scheme.onSecondaryContainer, size: 22),
                 ),
                 title: Text(
-                  isEn ? 'Add an account' : 'Ajouter un compte',
+                  L.acctAddAnAccount,
                   style: text.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600, color: scheme.primary),
                 ),
                 subtitle: Text(
-                  isEn
-                      ? '${AccountManager.maxAccounts - _accounts.length} slot(s) remaining'
-                      : '${AccountManager.maxAccounts - _accounts.length} emplacement(s) restant(s)',
+                  L.acctSlotsRemaining(AccountManager.maxAccounts - _accounts.length),
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                 ),
                 onTap: _addAccount,
@@ -399,9 +382,7 @@ class _AccountPageState extends State<AccountPage> {
                       size: 16, color: scheme.onSurfaceVariant),
                   const SizedBox(width: 8),
                   Text(
-                    isEn
-                        ? 'Maximum of 3 accounts reached.'
-                        : 'Maximum de 3 comptes atteint.',
+                    L.acctMaxReached(AccountManager.maxAccounts),
                     style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                   ),
                 ]),
@@ -424,9 +405,7 @@ class _AccountPageState extends State<AccountPage> {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                isEn
-                    ? 'Each account can use a different API key or the same one. You can find your API key at last.fm/api/accounts.'
-                    : 'Chaque compte peut utiliser une clé API différente ou la même. Votre clé API est disponible sur last.fm/api/accounts.',
+                L.acctApiKeyInfo,
                 style: text.bodySmall?.copyWith(color: scheme.onSecondaryContainer),
               ),
             ),
@@ -438,11 +417,11 @@ class _AccountPageState extends State<AccountPage> {
         // ── Last.fm profile link ───────────────────────────────────────────
         if (active != null)
           SettingsSection(
-            label: isEn ? 'Last.fm Profile' : 'Profil Last.fm',
+            label: L.acctLastfmProfileSection,
             children: [
               ListTile(
                 leading: Icon(Icons.open_in_new_rounded, color: scheme.primary, size: 20),
-                title: Text(isEn ? 'View on Last.fm' : 'Voir sur Last.fm'),
+                title: Text(L.acctViewOnLastfm),
                 subtitle: Text(
                   'last.fm/user/${active.username}',
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
@@ -455,7 +434,7 @@ class _AccountPageState extends State<AccountPage> {
 
         // ── Danger zone ────────────────────────────────────────────────────
         SettingsSection(
-          label: isEn ? 'Danger Zone' : 'Zone de danger',
+          label: L.acctDangerZone,
           children: [
             ListTile(
               leading: Icon(Icons.logout_rounded, color: scheme.error),
@@ -464,9 +443,7 @@ class _AccountPageState extends State<AccountPage> {
                 style: TextStyle(color: scheme.error, fontWeight: FontWeight.w600),
               ),
               subtitle: Text(
-                isEn
-                    ? 'Remove all accounts and return to the setup screen.'
-                    : 'Supprimer tous les comptes et revenir à la configuration.',
+                L.acctLogoutAllSub,
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
               ),
               onTap: _logoutAll,
@@ -486,9 +463,8 @@ class _AccountPageState extends State<AccountPage> {
 
 class _AddAccountDialog extends StatefulWidget {
   final String? existingApiKey;
-  final bool    isEn;
 
-  const _AddAccountDialog({this.existingApiKey, required this.isEn});
+  const _AddAccountDialog({this.existingApiKey});
 
   @override
   State<_AddAccountDialog> createState() => _AddAccountDialogState();
@@ -515,11 +491,11 @@ class _AddAccountDialogState extends State<_AddAccountDialog> {
         : _apiKeyCtrl.text.trim();
 
     if (username.isEmpty) {
-      setState(() => _error = widget.isEn ? 'Username is required.' : 'Le pseudo est requis.');
+      setState(() => _error = L.acctUsernameRequired);
       return;
     }
     if (apiKey.isEmpty) {
-      setState(() => _error = widget.isEn ? 'API key is required.' : 'La clé API est requise.');
+      setState(() => _error = L.acctApiKeyRequired);
       return;
     }
     Navigator.pop(context, AccountEntry(username: username, apiKey: apiKey));
@@ -531,7 +507,7 @@ class _AddAccountDialogState extends State<_AddAccountDialog> {
     final text   = Theme.of(context).textTheme;
 
     return AlertDialog(
-      title: Text(widget.isEn ? 'Add an account' : 'Ajouter un compte'),
+      title: Text(L.acctAddAnAccount),
       content: SingleChildScrollView(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
 
@@ -540,7 +516,7 @@ class _AddAccountDialogState extends State<_AddAccountDialog> {
             autofocus: true,
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(
-              labelText: widget.isEn ? 'Last.fm username' : 'Pseudo Last.fm',
+              labelText: L.acctUsernameLabel,
               prefixIcon: const Icon(Icons.person_outline_rounded),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -567,9 +543,7 @@ class _AddAccountDialogState extends State<_AddAccountDialog> {
                   ),
                   Expanded(
                     child: Text(
-                      widget.isEn
-                          ? 'Same API key as the active account'
-                          : 'Même clé API que le compte actif',
+                      L.acctSameApiKey,
                       style: text.bodySmall,
                     ),
                   ),
@@ -584,7 +558,7 @@ class _AddAccountDialogState extends State<_AddAccountDialog> {
               controller: _apiKeyCtrl,
               obscureText: _obscureKey,
               decoration: InputDecoration(
-                labelText: widget.isEn ? 'API key' : 'Clé API',
+                labelText: L.acctApiKeyLabel,
                 prefixIcon: const Icon(Icons.key_rounded),
                 suffixIcon: IconButton(
                   icon: Icon(_obscureKey
@@ -611,7 +585,7 @@ class _AddAccountDialogState extends State<_AddAccountDialog> {
         ),
         FilledButton(
           onPressed: _submit,
-          child: Text(widget.isEn ? 'Add' : 'Ajouter'),
+          child: Text(L.acctAdd),
         ),
       ],
     );

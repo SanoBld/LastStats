@@ -108,9 +108,7 @@ class _SettingsPageState extends State<_SettingsPage> {
       iconBgColor: (s) => s.primaryContainer,
       iconFgColor: (s) => s.onPrimaryContainer,
       title:    () => L.settingsAppearance,
-      subtitle: () => localeNotifier.value == 'en'
-          ? 'Theme, accent, layout, Material You'
-          : 'Thème, accent, disposition, Material You',
+      subtitle: () => L.settingsCardAppearanceSub,
       pageBuilder: (_) => const AppearancePage(),
     ),
     // 1 — Dashboard
@@ -119,9 +117,7 @@ class _SettingsPageState extends State<_SettingsPage> {
       iconBgColor: (s) => s.secondaryContainer,
       iconFgColor: (s) => s.onSecondaryContainer,
       title:    () => L.settingsDashboardSection,
-      subtitle: () => localeNotifier.value == 'en'
-          ? 'Header image, visible sections, stat cards'
-          : 'Image d\'en-tête, sections visibles, cartes de stats',
+      subtitle: () => L.settingsCardDashboardSub,
       pageBuilder: (_) => const DashboardSettingsPage(),
     ),
     // 2 — Startup
@@ -130,9 +126,7 @@ class _SettingsPageState extends State<_SettingsPage> {
       iconBgColor: (s) => s.tertiaryContainer,
       iconFgColor: (s) => s.onTertiaryContainer,
       title:    () => L.settingsStartupPage,
-      subtitle: () => localeNotifier.value == 'en'
-          ? 'Tab displayed on app launch'
-          : 'Onglet affiché au démarrage',
+      subtitle: () => L.settingsCardStartupSub,
       pageBuilder: (_) => const StartupPage(),
     ),
     // 3 — Notifications
@@ -140,10 +134,8 @@ class _SettingsPageState extends State<_SettingsPage> {
       icon: Icons.notifications_rounded,
       iconBgColor: (s) => Color.lerp(s.primaryContainer, s.tertiaryContainer, 0.5)!,
       iconFgColor: (s) => s.onPrimaryContainer,
-      title:    () => 'Notifications',
-      subtitle: () => localeNotifier.value == 'en'
-          ? 'Milestones, daily & weekly recaps'
-          : 'Jalons, récaps quotidiens & hebdo',
+      title:    () => L.settingsNotifications,
+      subtitle: () => L.settingsCardNotificationsSub,
       pageBuilder: (_) => const NotificationsPage(),
     ),
     // 4 — Language
@@ -152,9 +144,10 @@ class _SettingsPageState extends State<_SettingsPage> {
       iconBgColor: (s) => Color.lerp(s.primaryContainer, s.secondaryContainer, 0.5)!,
       iconFgColor: (s) => s.onPrimaryContainer,
       title:    () => L.settingsLanguage,
-      subtitle: () => localeNotifier.value == 'en'
-          ? 'French · English'
-          : 'Français · English',
+      // Dynamic: shows whichever language is actually active, in its own
+      // native name — scales automatically as languages are added to
+      // kSupportedLocales, instead of a hardcoded 'French · English'.
+      subtitle: () => supportedLocaleFor(localeNotifier.value).nativeName,
       pageBuilder: (_) => const LanguagePage(),
     ),
     // 5 — Account
@@ -163,9 +156,7 @@ class _SettingsPageState extends State<_SettingsPage> {
       iconBgColor: (s) => s.primaryContainer,
       iconFgColor: (s) => s.onPrimaryContainer,
       title:    () => L.settingsAccount,
-      subtitle: () => localeNotifier.value == 'en'
-          ? 'Connected Last.fm profile, sign out'
-          : 'Profil Last.fm connecté, déconnexion',
+      subtitle: () => L.settingsCardAccountSub,
       pageBuilder: (u) => AccountPage(username: u),
     ),
     // 6 — Cache
@@ -173,10 +164,8 @@ class _SettingsPageState extends State<_SettingsPage> {
       icon: Icons.storage_rounded,
       iconBgColor: (s) => Color.lerp(s.primaryContainer, s.tertiaryContainer, 0.5)!,
       iconFgColor: (s) => s.onPrimaryContainer,
-      title:    () => 'Cache',
-      subtitle: () => localeNotifier.value == 'en'
-          ? 'History, images, API data'
-          : 'Historique, images, données API',
+      title:    () => L.settingsCache,
+      subtitle: () => L.settingsCardCacheSub,
       pageBuilder: (_) => const CachePage(),
     ),
     // 7 — Backup
@@ -185,9 +174,7 @@ class _SettingsPageState extends State<_SettingsPage> {
       iconBgColor: (s) => s.secondaryContainer,
       iconFgColor: (s) => s.onSecondaryContainer,
       title:    () => L.settingsBackup,
-      subtitle: () => localeNotifier.value == 'en'
-          ? 'Export & restore your settings'
-          : 'Exporter et restaurer vos paramètres',
+      subtitle: () => L.settingsCardBackupSub,
       pageBuilder: (_) => const BackupPage(),
     ),
     // 8 — Updates
@@ -196,9 +183,7 @@ class _SettingsPageState extends State<_SettingsPage> {
       iconBgColor: (s) => s.tertiaryContainer,
       iconFgColor: (s) => s.onTertiaryContainer,
       title:    () => L.settingsUpdates,
-      subtitle: () => localeNotifier.value == 'en'
-          ? 'Check for new versions'
-          : 'Vérifier les nouvelles versions',
+      subtitle: () => L.settingsCardUpdatesSub,
       pageBuilder: (_) => const UpdatesPage(),
     ),
     // 9 — About
@@ -207,9 +192,7 @@ class _SettingsPageState extends State<_SettingsPage> {
       iconBgColor: (s) => Color.lerp(s.tertiaryContainer, s.surface, 0.4)!,
       iconFgColor: (s) => s.onTertiaryContainer,
       title:    () => L.settingsAbout,
-      subtitle: () => localeNotifier.value == 'en'
-          ? 'Version, source code, credits'
-          : 'Version, code source, crédits',
+      subtitle: () => L.settingsCardAboutSub,
       pageBuilder: (_) => const AboutPage(),
     ),
     // 10 — FAQ
@@ -218,9 +201,7 @@ class _SettingsPageState extends State<_SettingsPage> {
       iconBgColor: (s) => Color.lerp(s.secondaryContainer, s.tertiaryContainer, 0.5)!,
       iconFgColor: (s) => s.onSecondaryContainer,
       title:    () => L.settingsFaq,
-      subtitle: () => localeNotifier.value == 'en'
-          ? 'Scrobbling, platforms, open source'
-          : 'Scrobbling, plateformes, open source',
+      subtitle: () => L.settingsCardFaqSub,
       pageBuilder: (_) => const FaqPage(),
     ),
   ];
@@ -263,30 +244,19 @@ class _SettingsPageState extends State<_SettingsPage> {
                     border: Border.all(color: scheme.primary.withValues(alpha: 0.2)),
                   ),
                   child: Row(children: [
-                    _avatarUrl != null
-                        ? ClipOval(
-                            child: SizedBox(
-                              width: 52, height: 52,
-                              child: ImageService.widgetImage(
-                                url: _avatarUrl!,
-                                fit: BoxFit.cover,
-                                placeholder: CircleAvatar(
-                                  radius: 26,
-                                  backgroundColor: scheme.primary,
-                                  child: Text(initial, style: TextStyle(
-                                      fontSize: 20, color: scheme.onPrimary,
-                                      fontWeight: FontWeight.w700)),
-                                ),
-                              ),
-                            ),
-                          )
-                        : CircleAvatar(
-                            radius: 26,
-                            backgroundColor: scheme.primary,
-                            child: Text(initial, style: TextStyle(
-                                fontSize: 20, color: scheme.onPrimary,
-                                fontWeight: FontWeight.w700)),
-                          ),
+                    CircleAvatar(
+                      radius: 26,
+                      backgroundColor: scheme.primary,
+                      backgroundImage: _avatarUrl != null
+                          ? NetworkImage(_avatarUrl!)
+                          : null,
+                      child: _avatarUrl == null
+                          ? Text(initial, style: TextStyle(
+                              fontSize: 20,
+                              color: scheme.onPrimary,
+                              fontWeight: FontWeight.w700))
+                          : null,
+                    ),
                     const SizedBox(width: 14),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text(widget.username,
@@ -507,7 +477,6 @@ class _RestartNotice extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final isEn   = localeNotifier.value == 'en';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -520,9 +489,7 @@ class _RestartNotice extends StatelessWidget {
         Icon(Icons.restart_alt_rounded, size: 16, color: scheme.onSurfaceVariant),
         const SizedBox(width: 10),
         Expanded(child: Text(
-          isEn
-              ? 'Some settings require restarting the app to take full effect.'
-              : 'Certains paramètres nécessitent un redémarrage de l\'app pour être pleinement appliqués.',
+          L.settingsRestartNotice,
           style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
         )),
       ]),

@@ -375,6 +375,170 @@ abstract class AppStrings {
   String get newsAll;
   String get newsAnyDate;
   String get newsNoNewsYet;
+
+  // ── Settings hub cards (main settings list) ─────────────────────────────
+  String get settingsNotifications; // section title, was hardcoded 'Notifications'
+  String get settingsCache;         // section title, was hardcoded 'Cache'
+  String get settingsCardAppearanceSub;
+  String get settingsCardDashboardSub;
+  String get settingsCardStartupSub;
+  String get settingsCardNotificationsSub;
+  String get settingsCardAccountSub;
+  String get settingsCardCacheSub;
+  String get settingsCardBackupSub;
+  String get settingsCardUpdatesSub;
+  String get settingsCardAboutSub;
+  String get settingsCardFaqSub;
+  String get settingsRestartNotice;
+
+  // ── PC mode / navigation layout section ─────────────────────────────────
+  String get pcModeLayout;
+  String get pcModeNavLayout;
+  String get pcModeAuto;
+  String get pcModeSideRail;
+  String get pcModeBottomBar;
+  String get pcModeHintAuto;
+  String get pcModeHintOn;
+  String get pcModeHintOff;
+
+  // ── About page ───────────────────────────────────────────────────────────
+  String get aboutTagline;
+  String get aboutAppInfo;
+  String get aboutScrobbleDownloader;
+  String get aboutScrobbleDownloaderSub;
+  String get aboutPoweredBy;
+  String get aboutImageDisclaimer;
+  String get aboutFooter;
+
+  // ── Updates page ─────────────────────────────────────────────────────────
+  String updatesPublishedOn(String date);
+  String get updatesCurrentVersion;
+  String get updatesBetaTitle;
+  String get updatesBetaSub;
+
+  // ── Backup page ──────────────────────────────────────────────────────────
+  String get backupWhatsIncluded;
+
+  // ── FAQ page ─────────────────────────────────────────────────────────────
+  String get faqSectionLabel;
+  String get backupOverwriteWarning;
+  String get faqOpenSourceBadge;
+  String get cacheUnlimited;
+  String get cacheTotalUsed;
+  String get cacheScrobblesShort;
+  String get restartHintFeatures;
+  String get reorderCardsTitle;
+  String get commonSave;
+
+  // ── Dashboard settings: header fallback ─────────────────────────────────
+  String get dashFallbackWhenNoMusic;
+  String get dashFallbackChooseDisplay;
+  String get dashFallbackPeriodLabel;
+  String get fallbackPeriod1Week;
+  String get fallbackPeriod1Month;
+  String get fallbackPeriodAllTime;
+  String get fallbackTypeNothing;
+  String get fallbackTypeTopTrack;
+  String get fallbackTypeTopAlbum;
+  String get fallbackTypeTopArtist;
+  String get fallbackTypeCustomImage;
+  String fallbackWillShow(String detail);
+  String get fallbackWillShowCustomUrl;
+
+  // ── Dashboard settings: animation & blur ────────────────────────────────
+  String get dashAnimationBlurSection;
+  String get dashMusicAnimationTitle;
+  String get dashMusicAnimationSub;
+  String get dashMusicAnimationInfo;
+
+  // ── Dashboard settings: sections & stat cards ───────────────────────────
+  String get settingsTopAlbumsSection;
+  String get dashRecentPlaysLabel;
+  String get dashStatCardsSectionLabel;
+  String get dashStatCardsHeading;
+  String get dashStatCardsSub;
+
+  // ── Notifications page ───────────────────────────────────────────────────
+  String get notifWorkManagerInfo;
+  String get notifIntervalTitle;
+  String get notifIntervalSubtitle;
+  String get notifRecapsSection;
+  String get notifDailyRecapSubtitle;
+  String get notifWeeklyRecapSubtitle;
+  String get notifNewsSection;
+  String get notifNewsSubtitle;
+  String get notifBadgeOnDashboard;
+  String get notifBadgeSubtitle;
+  String get notifTestLabel;
+  String get notifPermissionDisabledTitle;
+  String get notifPermissionDisabledBody;
+  String get notifGrantPermission;
+  String get notifThresholdIntro;
+  List<String> get notifThresholdMessages; // 4 entries: 1K, 10K, 100K, 1M
+  String get notifIntervalDescription;
+  String get notifCustomValueLabel;
+  String get notifTimeNotifyAt;
+  String get notifDayOfWeek;
+  List<String> get weekdaysShort; // Mon..Sun order, 7 entries
+  String get notifSendTest;
+  String get notifSentCheckBar;
+  String get notifMakeSureWorks;
+  String get notifSentBang;
+  String get notifSendButton;
+
+  // ── Appearance page ──────────────────────────────────────────────────────
+  String get apVisualStyle;
+  String get apStyleDefault;
+  String get apNothingAccentLabel;
+  String get apNothingClassic;
+  String get apRedOnlyDesc;
+  String get apNothingMixed;
+  String get apRedYellowDesc;
+  String get apNothingActiveBanner;
+  String get apNothingOledInherent;
+  String get apOledTitle;
+  String get apOledBuiltIntoNothing;
+  String get apOledPureBlack;
+  String get apCustomColorTooltip;
+  String get apColorWhenNothingPlays;
+  String get apColorWhenNothingPlaysSub;
+  String get apKeepLastArtworkTitle;
+  String get apKeepLastArtworkSub;
+  String get apDetailPagesSection;
+  String get apArtworkColorTheme;
+  String get apBeta;
+  String get apArtworkColorThemeSub;
+  String get apNavBarSection;
+  String get apShowTabLabels;
+  String get apShowTabLabelsSub;
+  String get apInteractionsSection;
+  String get apHapticFeedbackSub;
+
+  // ── Account page ─────────────────────────────────────────────────────────
+  String get acctRemoveTitle;
+  String acctRemoveBody(String username);
+  String get acctRemoveAction;
+  String get acctAlreadyAddedOrFull;
+  String acctAddedSuccess(String username);
+  String get acctLogoutAllBody;
+  String acctMyAccounts(int count, int max);
+  String get acctActive;
+  String get acctTapSwitchToActivate;
+  String get acctSwitch;
+  String get acctAddAnAccount;
+  String acctSlotsRemaining(int n);
+  String acctMaxReached(int max);
+  String get acctApiKeyInfo;
+  String get acctLastfmProfileSection;
+  String get acctViewOnLastfm;
+  String get acctDangerZone;
+  String get acctLogoutAllSub;
+  String get acctUsernameRequired;
+  String get acctApiKeyRequired;
+  String get acctUsernameLabel;
+  String get acctSameApiKey;
+  String get acctApiKeyLabel;
+  String get acctAdd;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -739,6 +903,156 @@ class _AppStringsFr implements AppStrings {
   @override String get newsAll                     => 'Tous';
   @override String get newsAnyDate                 => 'Toute date';
   @override String get newsNoNewsYet               => "Pas d'actualité pour le moment";
+  @override String get settingsNotifications        => 'Notifications';
+  @override String get settingsCache                 => 'Cache';
+  @override String get settingsCardAppearanceSub     => 'Thème, accent, disposition, Material You';
+  @override String get settingsCardDashboardSub      => 'Image d\'en-tête, sections visibles, cartes de stats';
+  @override String get settingsCardStartupSub        => 'Onglet affiché au démarrage';
+  @override String get settingsCardNotificationsSub  => 'Jalons, récaps quotidiens & hebdo';
+  @override String get settingsCardAccountSub        => 'Profil Last.fm connecté, déconnexion';
+  @override String get settingsCardCacheSub          => 'Historique, images, données API';
+  @override String get settingsCardBackupSub         => 'Exporter et restaurer vos paramètres';
+  @override String get settingsCardUpdatesSub        => 'Vérifier les nouvelles versions';
+  @override String get settingsCardAboutSub          => 'Version, code source, crédits';
+  @override String get settingsCardFaqSub            => 'Scrobbling, plateformes, open source';
+  @override String get settingsRestartNotice => "Certains paramètres nécessitent un redémarrage de l'app pour être pleinement appliqués.";
+  @override String get pcModeLayout      => 'Disposition';
+  @override String get pcModeNavLayout   => 'Disposition de navigation';
+  @override String get pcModeAuto        => 'Auto';
+  @override String get pcModeSideRail    => 'Barre latérale';
+  @override String get pcModeBottomBar   => 'Barre du bas';
+  @override String get pcModeHintAuto    => 'Barre latérale sur grand écran (≥ 720 dp), barre du bas sur petit écran.';
+  @override String get pcModeHintOn      => "Toujours utiliser la barre de navigation latérale, quelle que soit la taille de l'écran.";
+  @override String get pcModeHintOff     => "Toujours utiliser la barre de navigation du bas, quelle que soit la taille de l'écran.";
+  @override String get aboutTagline               => 'Votre compagnon de stats Last.fm';
+  @override String get aboutAppInfo                => 'Infos';
+  @override String get aboutScrobbleDownloader     => 'Téléchargeur de scrobbles';
+  @override String get aboutScrobbleDownloaderSub  => 'Exporter tous vos scrobbles dans un fichier';
+  @override String get aboutPoweredBy              => 'Propulsé par';
+  @override String get aboutImageDisclaimer        => 'Les images des artistes, albums et titres sont récupérées automatiquement depuis ces sources et peuvent parfois être incorrectes ou ne pas correspondre au contenu réel.';
+  @override String get aboutFooter                 => 'Fait avec ❤️ · Non affilié à Last.fm / CBS';
+
+  @override String updatesPublishedOn(String date) => 'Publié le $date';
+  @override String get updatesCurrentVersion       => 'Version actuelle';
+  @override String get updatesBetaTitle            => 'Mises à jour bêta';
+  @override String get updatesBetaSub              => 'Recevoir les versions pré-publiées en avant-première';
+
+  @override String get backupWhatsIncluded         => 'Ce qui est inclus';
+
+  @override String get faqSectionLabel             => 'Questions fréquentes';
+  @override String get backupOverwriteWarning => 'Restaurer une sauvegarde écrasera vos paramètres actuels.';
+  @override String get faqOpenSourceBadge => 'LastStats est un projet gratuit et open source réalisé avec ❤️ par SanoBld.';
+  @override String get cacheUnlimited     => 'Illimité';
+  @override String get cacheTotalUsed     => 'Espace utilisé';
+  @override String get cacheScrobblesShort => 'Historique';
+  @override String get restartHintFeatures => "Certaines fonctionnalités nécessitent un redémarrage de l'app pour s'appliquer.";
+  @override String get reorderCardsTitle   => 'Réordonner les cartes';
+  @override String get commonSave          => 'Enregistrer';
+  @override String get dashFallbackWhenNoMusic   => "Quand aucune musique n'est en cours";
+  @override String get dashFallbackChooseDisplay => "Choisissez ce qui s'affiche en arrière-plan à la place";
+  @override String get dashFallbackPeriodLabel   => 'Période du fallback';
+  @override String get fallbackPeriod1Week       => '1 semaine';
+  @override String get fallbackPeriod1Month      => '1 mois';
+  @override String get fallbackPeriodAllTime     => 'Tout le temps';
+  @override String get fallbackTypeNothing       => 'Rien';
+  @override String get fallbackTypeTopTrack      => 'Titre #1';
+  @override String get fallbackTypeTopAlbum      => 'Album #1';
+  @override String get fallbackTypeTopArtist     => 'Artiste #1';
+  @override String get fallbackTypeCustomImage   => 'Image perso.';
+  @override String fallbackWillShow(String detail) => 'Affichera : $detail';
+  @override String get fallbackWillShowCustomUrl => "Affichera : URL d'image personnalisée";
+
+  @override String get dashAnimationBlurSection  => 'Animation & Flou';
+  @override String get dashMusicAnimationTitle   => 'Animation musique';
+  @override String get dashMusicAnimationSub     => "Quand une musique joue, l'image se floute et bouge doucement, comme dans Apple Music.";
+  @override String get dashMusicAnimationInfo    => "Le flou est appliqué automatiquement dans ce mode. Le curseur de flou ci-dessus n'a aucun effet pendant la lecture.";
+
+  @override String get settingsTopAlbumsSection  => 'Top Albums';
+  @override String get dashRecentPlaysLabel      => 'Écoutes récentes';
+  @override String get dashStatCardsSectionLabel => 'Cartes de statistiques';
+  @override String get dashStatCardsHeading      => 'Cartes de stats';
+  @override String get dashStatCardsSub          => 'Choisissez les cartes affichées dans le bloc statistiques.';
+  @override String get notifWorkManagerInfo => "Les notifications tournent en arrière-plan via WorkManager. L'app n'a pas besoin d'être ouverte. Une connexion internet est nécessaire.";
+  @override String get notifIntervalTitle       => 'Tous les X scrobbles';
+  @override String get notifIntervalSubtitle    => 'Notification à intervalle régulier';
+  @override String get notifRecapsSection       => 'Récapitulatifs';
+  @override String get notifDailyRecapSubtitle  => 'Scrobbles du jour + artiste favori';
+  @override String get notifWeeklyRecapSubtitle => 'Scrobbles de la semaine + artiste favori';
+  @override String get notifNewsSection         => 'Actualités';
+  @override String get notifNewsSubtitle        => 'Soyez notifié des nouveautés, correctifs et annonces';
+  @override String get notifBadgeOnDashboard    => "Pastille sur l'accueil";
+  @override String get notifBadgeSubtitle       => "Afficher le point rouge sur la cloche d'actualités";
+  @override String get notifTestLabel           => 'Test';
+  @override String get notifPermissionDisabledTitle => 'Notifications désactivées';
+  @override String get notifPermissionDisabledBody  => 'Accordez la permission pour recevoir les alertes.';
+  @override String get notifGrantPermission     => 'Autoriser';
+  @override String get notifThresholdIntro      => 'Une notification spéciale à chacun de ces paliers :';
+  @override List<String> get notifThresholdMessages => const [
+    "Tes 1 000 premiers scrobbles. L'aventure commence. 🎵",
+    'Tu passes les cinq chiffres ! 🎉',
+    'Tu es un vrai accro à la musique. 🔥',
+    'Un million de scrobbles. C\'est légendaire. 🎸',
+  ];
+  @override String get notifIntervalDescription => 'Envoyer une notification tous les X scrobbles';
+  @override String get notifCustomValueLabel    => 'Valeur personnalisée';
+  @override String get notifTimeNotifyAt        => 'Notifier à';
+  @override String get notifDayOfWeek           => 'Jour de la semaine';
+  @override List<String> get weekdaysShort => const ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+  @override String get notifSendTest            => 'Envoyer une notification test';
+  @override String get notifSentCheckBar        => 'Vérifiez la barre de notifs !';
+  @override String get notifMakeSureWorks       => 'Vérifiez que tout fonctionne.';
+  @override String get notifSentBang            => 'Envoyé !';
+  @override String get notifSendButton          => 'Envoyer';
+  @override String get apVisualStyle             => 'Style visuel';
+  @override String get apStyleDefault            => 'Défaut';
+  @override String get apNothingAccentLabel      => 'Accent';
+  @override String get apNothingClassic          => 'Classique';
+  @override String get apRedOnlyDesc             => 'Rouge uniquement';
+  @override String get apNothingMixed            => 'Mixte';
+  @override String get apRedYellowDesc           => 'Rouge + touches jaunes';
+  @override String get apNothingActiveBanner     => 'Style Nothing OS actif. Accent, couleur dynamique et couleur musicale sont désactivés.';
+  @override String get apNothingOledInherent     => 'Le mode sombre Nothing est nativement OLED noir. Le réglage OLED est inutile.';
+  @override String get apOledTitle               => 'Thème noir OLED';
+  @override String get apOledBuiltIntoNothing    => 'Intégré au mode sombre Nothing';
+  @override String get apOledPureBlack           => 'Fonds noirs purs quand le mode sombre est actif';
+  @override String get apCustomColorTooltip      => 'Couleur personnalisée';
+  @override String get apColorWhenNothingPlays   => 'Couleur quand rien ne joue';
+  @override String get apColorWhenNothingPlaysSub => "Accent utilisé quand aucune piste n'est en cours";
+  @override String get apKeepLastArtworkTitle    => 'Garder la dernière couleur';
+  @override String get apKeepLastArtworkSub      => 'Conserver la couleur de la dernière pochette au lieu du fallback';
+  @override String get apDetailPagesSection      => 'Fiches détail';
+  @override String get apArtworkColorTheme       => "Thème couleur de l'affiche";
+  @override String get apBeta                    => 'BÊTA';
+  @override String get apArtworkColorThemeSub    => "Les fiches adaptent leurs couleurs à la couleur dominante de l'affiche";
+  @override String get apNavBarSection           => 'Barre de navigation';
+  @override String get apShowTabLabels           => 'Afficher les libellés';
+  @override String get apShowTabLabelsSub        => 'Afficher les noms des onglets sous les icônes';
+  @override String get apInteractionsSection     => 'Interactions';
+  @override String get apHapticFeedbackSub       => 'Vibrations sur les appuis, sélections et gestes';
+  @override String get acctRemoveTitle          => 'Supprimer le compte ?';
+  @override String acctRemoveBody(String username) => 'Supprimer @$username de vos comptes ?';
+  @override String get acctRemoveAction         => 'Supprimer';
+  @override String get acctAlreadyAddedOrFull   => 'Ce compte est déjà ajouté ou la liste est pleine.';
+  @override String acctAddedSuccess(String username) => '@$username ajouté avec succès.';
+  @override String get acctLogoutAllBody        => "Tous les comptes seront supprimés. Vous retournerez à l'écran de configuration.";
+  @override String acctMyAccounts(int count, int max) => 'Mes comptes ($count/$max)';
+  @override String get acctActive               => 'Actif';
+  @override String get acctTapSwitchToActivate  => 'Touchez "Activer" pour basculer';
+  @override String get acctSwitch               => 'Activer';
+  @override String get acctAddAnAccount         => 'Ajouter un compte';
+  @override String acctSlotsRemaining(int n)    => '$n emplacement(s) restant(s)';
+  @override String acctMaxReached(int max)      => 'Maximum de $max comptes atteint.';
+  @override String get acctApiKeyInfo           => 'Chaque compte peut utiliser une clé API différente ou la même. Votre clé API est disponible sur last.fm/api/accounts.';
+  @override String get acctLastfmProfileSection => 'Profil Last.fm';
+  @override String get acctViewOnLastfm         => 'Voir sur Last.fm';
+  @override String get acctDangerZone           => 'Zone de danger';
+  @override String get acctLogoutAllSub         => 'Supprimer tous les comptes et revenir à la configuration.';
+  @override String get acctUsernameRequired     => 'Le pseudo est requis.';
+  @override String get acctApiKeyRequired       => 'La clé API est requise.';
+  @override String get acctUsernameLabel        => 'Pseudo Last.fm';
+  @override String get acctSameApiKey           => 'Même clé API que le compte actif';
+  @override String get acctApiKeyLabel          => 'Clé API';
+  @override String get acctAdd                  => 'Ajouter';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1103,6 +1417,156 @@ class _AppStringsEn implements AppStrings {
   @override String get newsAll                     => 'All';
   @override String get newsAnyDate                 => 'Any date';
   @override String get newsNoNewsYet               => 'No news yet';
+  @override String get settingsNotifications        => 'Notifications';
+  @override String get settingsCache                 => 'Cache';
+  @override String get settingsCardAppearanceSub     => 'Theme, accent, layout, Material You';
+  @override String get settingsCardDashboardSub      => 'Header image, visible sections, stat cards';
+  @override String get settingsCardStartupSub        => 'Tab displayed on app launch';
+  @override String get settingsCardNotificationsSub  => 'Milestones, daily & weekly recaps';
+  @override String get settingsCardAccountSub        => 'Connected Last.fm profile, sign out';
+  @override String get settingsCardCacheSub          => 'History, images, API data';
+  @override String get settingsCardBackupSub         => 'Export & restore your settings';
+  @override String get settingsCardUpdatesSub        => 'Check for new versions';
+  @override String get settingsCardAboutSub          => 'Version, source code, credits';
+  @override String get settingsCardFaqSub            => 'Scrobbling, platforms, open source';
+  @override String get settingsRestartNotice => 'Some settings require restarting the app to take full effect.';
+  @override String get pcModeLayout      => 'Layout';
+  @override String get pcModeNavLayout   => 'Navigation layout';
+  @override String get pcModeAuto        => 'Auto';
+  @override String get pcModeSideRail    => 'Side rail';
+  @override String get pcModeBottomBar   => 'Bottom bar';
+  @override String get pcModeHintAuto    => 'Side rail on wide screens (≥ 720 dp), bottom bar on narrow screens.';
+  @override String get pcModeHintOn      => 'Always use the side navigation rail, regardless of screen size.';
+  @override String get pcModeHintOff     => 'Always use the bottom navigation bar, regardless of screen size.';
+  @override String get aboutTagline               => 'Your Last.fm stats companion';
+  @override String get aboutAppInfo                => 'App info';
+  @override String get aboutScrobbleDownloader     => 'Scrobble downloader';
+  @override String get aboutScrobbleDownloaderSub  => 'Export all your scrobbles to a file';
+  @override String get aboutPoweredBy              => 'Powered by';
+  @override String get aboutImageDisclaimer        => 'Artist, album and track images are fetched automatically from these sources and may sometimes be incorrect or not match the actual content.';
+  @override String get aboutFooter                 => 'Made with ❤️ · Not affiliated with Last.fm / CBS';
+
+  @override String updatesPublishedOn(String date) => 'Published on $date';
+  @override String get updatesCurrentVersion       => 'Current version';
+  @override String get updatesBetaTitle            => 'Beta updates';
+  @override String get updatesBetaSub              => 'Get early access to pre-release versions';
+
+  @override String get backupWhatsIncluded         => "What's included";
+
+  @override String get faqSectionLabel             => 'Frequently asked questions';
+  @override String get backupOverwriteWarning => 'Restoring a backup will overwrite your current settings.';
+  @override String get faqOpenSourceBadge => 'LastStats is a free, open-source project made with ❤️ by SanoBld.';
+  @override String get cacheUnlimited     => 'Unlimited';
+  @override String get cacheTotalUsed     => 'Total used';
+  @override String get cacheScrobblesShort => 'Scrobbles';
+  @override String get restartHintFeatures => 'Some features may require restarting the app to take effect.';
+  @override String get reorderCardsTitle   => 'Reorder cards';
+  @override String get commonSave          => 'Save';
+  @override String get dashFallbackWhenNoMusic   => 'When no music is playing';
+  @override String get dashFallbackChooseDisplay => 'Choose what to display as background instead';
+  @override String get dashFallbackPeriodLabel   => 'Fallback period';
+  @override String get fallbackPeriod1Week       => '1 week';
+  @override String get fallbackPeriod1Month      => '1 month';
+  @override String get fallbackPeriodAllTime     => 'All time';
+  @override String get fallbackTypeNothing       => 'Nothing';
+  @override String get fallbackTypeTopTrack      => 'Top Track';
+  @override String get fallbackTypeTopAlbum      => 'Top Album';
+  @override String get fallbackTypeTopArtist     => 'Top Artist';
+  @override String get fallbackTypeCustomImage   => 'Custom image';
+  @override String fallbackWillShow(String detail) => 'Will show: $detail';
+  @override String get fallbackWillShowCustomUrl => 'Will show: custom image URL';
+
+  @override String get dashAnimationBlurSection  => 'Animation & Blur';
+  @override String get dashMusicAnimationTitle   => 'Music animation';
+  @override String get dashMusicAnimationSub     => 'When music is playing, the header image slowly blurs and drifts — like Apple Music.';
+  @override String get dashMusicAnimationInfo    => 'Blur is set automatically when this mode is active. The blur slider above has no effect while music is playing.';
+
+  @override String get settingsTopAlbumsSection  => 'Top Albums';
+  @override String get dashRecentPlaysLabel      => 'Recent plays';
+  @override String get dashStatCardsSectionLabel => 'Stat Cards';
+  @override String get dashStatCardsHeading      => 'Stat Cards';
+  @override String get dashStatCardsSub          => 'Choose and reorder the cards shown in the stats block.';
+  @override String get notifWorkManagerInfo => 'Notifications run in the background via WorkManager. The app does not need to be open. An internet connection is required.';
+  @override String get notifIntervalTitle       => 'Every X scrobbles';
+  @override String get notifIntervalSubtitle    => 'Get notified at regular intervals';
+  @override String get notifRecapsSection       => 'Listening recaps';
+  @override String get notifDailyRecapSubtitle  => 'Scrobble count + top artist for the day';
+  @override String get notifWeeklyRecapSubtitle => 'Scrobble count + top artist for the week';
+  @override String get notifNewsSection         => 'News';
+  @override String get notifNewsSubtitle        => 'Get notified for new features, fixes and announcements';
+  @override String get notifBadgeOnDashboard    => 'Badge on the dashboard';
+  @override String get notifBadgeSubtitle       => 'Show the unread dot on the news bell icon';
+  @override String get notifTestLabel           => 'Test';
+  @override String get notifPermissionDisabledTitle => 'Notifications disabled';
+  @override String get notifPermissionDisabledBody  => 'Grant permission so LastStats can send you alerts.';
+  @override String get notifGrantPermission     => 'Grant permission';
+  @override String get notifThresholdIntro      => "You'll get a special notification at each of these thresholds:";
+  @override List<String> get notifThresholdMessages => const [
+    'Your first 1,000 scrobbles. The journey begins. 🎵',
+    'You hit five figures! 🎉',
+    "You're a true music addict. 🔥",
+    "One million scrobbles. That's legendary. 🎸",
+  ];
+  @override String get notifIntervalDescription => 'Fire a notification every X scrobbles';
+  @override String get notifCustomValueLabel    => 'Custom value';
+  @override String get notifTimeNotifyAt        => 'Notify at';
+  @override String get notifDayOfWeek           => 'Day of the week';
+  @override List<String> get weekdaysShort => const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  @override String get notifSendTest            => 'Send a test notification';
+  @override String get notifSentCheckBar        => 'Check your notification bar!';
+  @override String get notifMakeSureWorks       => 'Make sure everything works.';
+  @override String get notifSentBang            => 'Sent!';
+  @override String get notifSendButton          => 'Send';
+  @override String get apVisualStyle             => 'Visual style';
+  @override String get apStyleDefault            => 'Default';
+  @override String get apNothingAccentLabel      => 'Accent';
+  @override String get apNothingClassic          => 'Classic';
+  @override String get apRedOnlyDesc             => 'Red only';
+  @override String get apNothingMixed            => 'Mixed';
+  @override String get apRedYellowDesc           => 'Red + yellow touches';
+  @override String get apNothingActiveBanner     => 'Nothing OS style active. Accent, dynamic color and music color are disabled.';
+  @override String get apNothingOledInherent     => 'Nothing dark mode is inherently OLED black. OLED toggle is not needed.';
+  @override String get apOledTitle               => 'OLED black theme';
+  @override String get apOledBuiltIntoNothing    => 'Built into Nothing dark mode';
+  @override String get apOledPureBlack           => 'Pure black backgrounds when dark mode is active';
+  @override String get apCustomColorTooltip      => 'Custom color';
+  @override String get apColorWhenNothingPlays   => 'Color when nothing plays';
+  @override String get apColorWhenNothingPlaysSub => 'Accent used while no track is scrobbling';
+  @override String get apKeepLastArtworkTitle    => 'Keep last artwork color';
+  @override String get apKeepLastArtworkSub      => 'Keep last artwork color instead of resetting when nothing plays';
+  @override String get apDetailPagesSection      => 'Detail pages';
+  @override String get apArtworkColorTheme       => 'Artwork color theme';
+  @override String get apBeta                    => 'BETA';
+  @override String get apArtworkColorThemeSub    => "Detail pages adapt their colors to the artwork's dominant color";
+  @override String get apNavBarSection           => 'Navigation bar';
+  @override String get apShowTabLabels           => 'Show tab labels';
+  @override String get apShowTabLabelsSub        => 'Display tab names below icons in the bottom bar';
+  @override String get apInteractionsSection     => 'Interactions';
+  @override String get apHapticFeedbackSub       => 'Vibrations on taps, selections and gestures';
+  @override String get acctRemoveTitle          => 'Remove account?';
+  @override String acctRemoveBody(String username) => 'Remove @$username from your accounts?';
+  @override String get acctRemoveAction         => 'Remove';
+  @override String get acctAlreadyAddedOrFull   => 'This account is already added or the list is full.';
+  @override String acctAddedSuccess(String username) => '@$username added successfully.';
+  @override String get acctLogoutAllBody        => 'All accounts will be removed. You will return to the setup screen.';
+  @override String acctMyAccounts(int count, int max) => 'My accounts ($count/$max)';
+  @override String get acctActive               => 'Active';
+  @override String get acctTapSwitchToActivate  => 'Tap "Switch" to activate';
+  @override String get acctSwitch               => 'Switch';
+  @override String get acctAddAnAccount         => 'Add an account';
+  @override String acctSlotsRemaining(int n)    => '$n slot(s) remaining';
+  @override String acctMaxReached(int max)      => 'Maximum of $max accounts reached.';
+  @override String get acctApiKeyInfo           => 'Each account can use a different API key or the same one. You can find your API key at last.fm/api/accounts.';
+  @override String get acctLastfmProfileSection => 'Last.fm Profile';
+  @override String get acctViewOnLastfm         => 'View on Last.fm';
+  @override String get acctDangerZone           => 'Danger Zone';
+  @override String get acctLogoutAllSub         => 'Remove all accounts and return to the setup screen.';
+  @override String get acctUsernameRequired     => 'Username is required.';
+  @override String get acctApiKeyRequired       => 'API key is required.';
+  @override String get acctUsernameLabel        => 'Last.fm username';
+  @override String get acctSameApiKey           => 'Same API key as the active account';
+  @override String get acctApiKeyLabel          => 'API key';
+  @override String get acctAdd                  => 'Add';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1467,6 +1931,156 @@ class _AppStringsEs implements AppStrings {
   @override String get newsAll                     => 'Todo';
   @override String get newsAnyDate                 => 'Cualquier fecha';
   @override String get newsNoNewsYet               => 'Sin novedades por ahora';
+  @override String get settingsNotifications        => 'Notificaciones';
+  @override String get settingsCache                 => 'Caché';
+  @override String get settingsCardAppearanceSub     => 'Tema, acento, diseño, Material You';
+  @override String get settingsCardDashboardSub      => 'Imagen de cabecera, secciones visibles, tarjetas de estadísticas';
+  @override String get settingsCardStartupSub        => 'Pestaña mostrada al iniciar la app';
+  @override String get settingsCardNotificationsSub  => 'Hitos, resúmenes diarios y semanales';
+  @override String get settingsCardAccountSub        => 'Perfil de Last.fm conectado, cerrar sesión';
+  @override String get settingsCardCacheSub          => 'Historial, imágenes, datos de la API';
+  @override String get settingsCardBackupSub         => 'Exportar y restaurar tus ajustes';
+  @override String get settingsCardUpdatesSub        => 'Buscar nuevas versiones';
+  @override String get settingsCardAboutSub          => 'Versión, código fuente, créditos';
+  @override String get settingsCardFaqSub            => 'Scrobbling, plataformas, código abierto';
+  @override String get settingsRestartNotice => 'Algunos ajustes requieren reiniciar la app para aplicarse por completo.';
+  @override String get pcModeLayout      => 'Diseño';
+  @override String get pcModeNavLayout   => 'Diseño de navegación';
+  @override String get pcModeAuto        => 'Auto';
+  @override String get pcModeSideRail    => 'Barra lateral';
+  @override String get pcModeBottomBar   => 'Barra inferior';
+  @override String get pcModeHintAuto    => 'Barra lateral en pantallas anchas (≥ 720 dp), barra inferior en pantallas estrechas.';
+  @override String get pcModeHintOn      => 'Usar siempre la barra de navegación lateral, sin importar el tamaño de pantalla.';
+  @override String get pcModeHintOff     => 'Usar siempre la barra de navegación inferior, sin importar el tamaño de pantalla.';
+  @override String get aboutTagline               => 'Tu compañero de estadísticas de Last.fm';
+  @override String get aboutAppInfo                => 'Info de la app';
+  @override String get aboutScrobbleDownloader     => 'Descargador de scrobbles';
+  @override String get aboutScrobbleDownloaderSub  => 'Exporta todos tus scrobbles a un archivo';
+  @override String get aboutPoweredBy              => 'Con la ayuda de';
+  @override String get aboutImageDisclaimer        => 'Las imágenes de artistas, álbumes y canciones se obtienen automáticamente de estas fuentes y a veces pueden ser incorrectas o no coincidir con el contenido real.';
+  @override String get aboutFooter                 => 'Hecho con ❤️ · Sin afiliación con Last.fm / CBS';
+
+  @override String updatesPublishedOn(String date) => 'Publicado el $date';
+  @override String get updatesCurrentVersion       => 'Versión actual';
+  @override String get updatesBetaTitle            => 'Actualizaciones beta';
+  @override String get updatesBetaSub              => 'Recibe acceso anticipado a las versiones preliminares';
+
+  @override String get backupWhatsIncluded         => 'Qué incluye';
+
+  @override String get faqSectionLabel             => 'Preguntas frecuentes';
+  @override String get backupOverwriteWarning => 'Restaurar una copia de seguridad sobrescribirá tus ajustes actuales.';
+  @override String get faqOpenSourceBadge => 'LastStats es un proyecto gratuito y de código abierto hecho con ❤️ por SanoBld.';
+  @override String get cacheUnlimited     => 'Ilimitado';
+  @override String get cacheTotalUsed     => 'Total usado';
+  @override String get cacheScrobblesShort => 'Historial';
+  @override String get restartHintFeatures => 'Algunas funciones pueden requerir reiniciar la app para surtir efecto.';
+  @override String get reorderCardsTitle   => 'Reordenar tarjetas';
+  @override String get commonSave          => 'Guardar';
+  @override String get dashFallbackWhenNoMusic   => 'Cuando no hay música sonando';
+  @override String get dashFallbackChooseDisplay => 'Elige qué mostrar de fondo en su lugar';
+  @override String get dashFallbackPeriodLabel   => 'Período del fallback';
+  @override String get fallbackPeriod1Week       => '1 semana';
+  @override String get fallbackPeriod1Month      => '1 mes';
+  @override String get fallbackPeriodAllTime     => 'Todo el tiempo';
+  @override String get fallbackTypeNothing       => 'Nada';
+  @override String get fallbackTypeTopTrack      => 'Canción #1';
+  @override String get fallbackTypeTopAlbum      => 'Álbum #1';
+  @override String get fallbackTypeTopArtist     => 'Artista #1';
+  @override String get fallbackTypeCustomImage   => 'Imagen personalizada';
+  @override String fallbackWillShow(String detail) => 'Mostrará: $detail';
+  @override String get fallbackWillShowCustomUrl => 'Mostrará: URL de imagen personalizada';
+
+  @override String get dashAnimationBlurSection  => 'Animación y desenfoque';
+  @override String get dashMusicAnimationTitle   => 'Animación de música';
+  @override String get dashMusicAnimationSub     => 'Cuando suena música, la imagen se desenfoca y se mueve suavemente, como en Apple Music.';
+  @override String get dashMusicAnimationInfo    => 'El desenfoque se aplica automáticamente en este modo. El control de desenfoque de arriba no tiene efecto mientras suena música.';
+
+  @override String get settingsTopAlbumsSection  => 'Top Álbumes';
+  @override String get dashRecentPlaysLabel      => 'Reproducciones recientes';
+  @override String get dashStatCardsSectionLabel => 'Tarjetas de estadísticas';
+  @override String get dashStatCardsHeading      => 'Tarjetas de stats';
+  @override String get dashStatCardsSub          => 'Elige y reordena las tarjetas mostradas en el bloque de estadísticas.';
+  @override String get notifWorkManagerInfo => 'Las notificaciones se ejecutan en segundo plano mediante WorkManager. La app no necesita estar abierta. Se requiere conexión a internet.';
+  @override String get notifIntervalTitle       => 'Cada X scrobbles';
+  @override String get notifIntervalSubtitle    => 'Recibe avisos a intervalos regulares';
+  @override String get notifRecapsSection       => 'Resúmenes de escucha';
+  @override String get notifDailyRecapSubtitle  => 'Total de scrobbles + artista favorito del día';
+  @override String get notifWeeklyRecapSubtitle => 'Total de scrobbles + artista favorito de la semana';
+  @override String get notifNewsSection         => 'Actualidad';
+  @override String get notifNewsSubtitle        => 'Recibe avisos de nuevas funciones, correcciones y anuncios';
+  @override String get notifBadgeOnDashboard    => 'Insignia en el panel';
+  @override String get notifBadgeSubtitle       => 'Mostrar el punto rojo en la campana de novedades';
+  @override String get notifTestLabel           => 'Prueba';
+  @override String get notifPermissionDisabledTitle => 'Notificaciones desactivadas';
+  @override String get notifPermissionDisabledBody  => 'Concede el permiso para que LastStats pueda enviarte avisos.';
+  @override String get notifGrantPermission     => 'Conceder permiso';
+  @override String get notifThresholdIntro      => 'Recibirás una notificación especial en cada uno de estos hitos:';
+  @override List<String> get notifThresholdMessages => const [
+    'Tus primeros 1000 scrobbles. La aventura comienza. 🎵',
+    '¡Llegaste a cinco cifras! 🎉',
+    'Eres un verdadero adicto a la música. 🔥',
+    'Un millón de scrobbles. Eso es legendario. 🎸',
+  ];
+  @override String get notifIntervalDescription => 'Enviar una notificación cada X scrobbles';
+  @override String get notifCustomValueLabel    => 'Valor personalizado';
+  @override String get notifTimeNotifyAt        => 'Notificar a';
+  @override String get notifDayOfWeek           => 'Día de la semana';
+  @override List<String> get weekdaysShort => const ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+  @override String get notifSendTest            => 'Enviar una notificación de prueba';
+  @override String get notifSentCheckBar        => '¡Revisa tu barra de notificaciones!';
+  @override String get notifMakeSureWorks       => 'Verifica que todo funcione.';
+  @override String get notifSentBang            => '¡Enviado!';
+  @override String get notifSendButton          => 'Enviar';
+  @override String get apVisualStyle             => 'Estilo visual';
+  @override String get apStyleDefault            => 'Predeterminado';
+  @override String get apNothingAccentLabel      => 'Acento';
+  @override String get apNothingClassic          => 'Clásico';
+  @override String get apRedOnlyDesc             => 'Solo rojo';
+  @override String get apNothingMixed            => 'Mixto';
+  @override String get apRedYellowDesc           => 'Rojo + toques amarillos';
+  @override String get apNothingActiveBanner     => 'Estilo Nothing OS activo. El acento, el color dinámico y el color de la música están desactivados.';
+  @override String get apNothingOledInherent     => 'El modo oscuro de Nothing es negro OLED de forma nativa. No hace falta activar OLED.';
+  @override String get apOledTitle               => 'Tema negro OLED';
+  @override String get apOledBuiltIntoNothing    => 'Integrado en el modo oscuro de Nothing';
+  @override String get apOledPureBlack           => 'Fondos negros puros cuando el modo oscuro está activo';
+  @override String get apCustomColorTooltip      => 'Color personalizado';
+  @override String get apColorWhenNothingPlays   => 'Color cuando no suena nada';
+  @override String get apColorWhenNothingPlaysSub => 'Acento usado cuando no hay ninguna pista sonando';
+  @override String get apKeepLastArtworkTitle    => 'Mantener el último color de portada';
+  @override String get apKeepLastArtworkSub      => 'Mantener el último color de portada en lugar de restablecerlo cuando no suena nada';
+  @override String get apDetailPagesSection      => 'Páginas de detalle';
+  @override String get apArtworkColorTheme       => 'Tema de color de la portada';
+  @override String get apBeta                    => 'BETA';
+  @override String get apArtworkColorThemeSub    => 'Las páginas de detalle adaptan sus colores al color dominante de la portada';
+  @override String get apNavBarSection           => 'Barra de navegación';
+  @override String get apShowTabLabels           => 'Mostrar etiquetas de pestañas';
+  @override String get apShowTabLabelsSub        => 'Mostrar los nombres de las pestañas debajo de los iconos';
+  @override String get apInteractionsSection     => 'Interacciones';
+  @override String get apHapticFeedbackSub       => 'Vibraciones en toques, selecciones y gestos';
+  @override String get acctRemoveTitle          => '¿Eliminar cuenta?';
+  @override String acctRemoveBody(String username) => '¿Eliminar @$username de tus cuentas?';
+  @override String get acctRemoveAction         => 'Eliminar';
+  @override String get acctAlreadyAddedOrFull   => 'Esta cuenta ya está añadida o la lista está llena.';
+  @override String acctAddedSuccess(String username) => '@$username añadido correctamente.';
+  @override String get acctLogoutAllBody        => 'Se eliminarán todas las cuentas. Volverás a la pantalla de configuración.';
+  @override String acctMyAccounts(int count, int max) => 'Mis cuentas ($count/$max)';
+  @override String get acctActive               => 'Activa';
+  @override String get acctTapSwitchToActivate  => 'Toca "Cambiar" para activar';
+  @override String get acctSwitch               => 'Cambiar';
+  @override String get acctAddAnAccount         => 'Añadir una cuenta';
+  @override String acctSlotsRemaining(int n)    => '$n espacio(s) restante(s)';
+  @override String acctMaxReached(int max)      => 'Se alcanzó el máximo de $max cuentas.';
+  @override String get acctApiKeyInfo           => 'Cada cuenta puede usar una clave API distinta o la misma. Puedes encontrar tu clave API en last.fm/api/accounts.';
+  @override String get acctLastfmProfileSection => 'Perfil de Last.fm';
+  @override String get acctViewOnLastfm         => 'Ver en Last.fm';
+  @override String get acctDangerZone           => 'Zona de peligro';
+  @override String get acctLogoutAllSub         => 'Eliminar todas las cuentas y volver a la configuración.';
+  @override String get acctUsernameRequired     => 'El nombre de usuario es obligatorio.';
+  @override String get acctApiKeyRequired       => 'La clave API es obligatoria.';
+  @override String get acctUsernameLabel        => 'Usuario de Last.fm';
+  @override String get acctSameApiKey           => 'Misma clave API que la cuenta activa';
+  @override String get acctApiKeyLabel          => 'Clave API';
+  @override String get acctAdd                  => 'Añadir';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1828,6 +2442,156 @@ class _AppStringsZh implements AppStrings {
   @override String get newsAll                     => '全部';
   @override String get newsAnyDate                 => '任意日期';
   @override String get newsNoNewsYet               => '暂无动态';
+  @override String get settingsNotifications        => '通知';
+  @override String get settingsCache                 => '缓存';
+  @override String get settingsCardAppearanceSub     => '主题、强调色、布局、Material You';
+  @override String get settingsCardDashboardSub      => '头图、显示的板块、统计卡片';
+  @override String get settingsCardStartupSub        => '启动时显示的标签页';
+  @override String get settingsCardNotificationsSub  => '里程碑、每日和每周汇总';
+  @override String get settingsCardAccountSub        => '已连接的 Last.fm 账号，退出登录';
+  @override String get settingsCardCacheSub          => '历史记录、图片、API 数据';
+  @override String get settingsCardBackupSub         => '导出和恢复你的设置';
+  @override String get settingsCardUpdatesSub        => '检查新版本';
+  @override String get settingsCardAboutSub          => '版本、源代码、鸣谢';
+  @override String get settingsCardFaqSub            => 'Scrobbling、平台、开源';
+  @override String get settingsRestartNotice => '部分设置需要重启应用才能完全生效。';
+  @override String get pcModeLayout      => '布局';
+  @override String get pcModeNavLayout   => '导航布局';
+  @override String get pcModeAuto        => '自动';
+  @override String get pcModeSideRail    => '侧边栏';
+  @override String get pcModeBottomBar   => '底部导航栏';
+  @override String get pcModeHintAuto    => '宽屏（≥ 720 dp）使用侧边栏，窄屏使用底部导航栏。';
+  @override String get pcModeHintOn      => '始终使用侧边导航栏，无论屏幕尺寸。';
+  @override String get pcModeHintOff     => '始终使用底部导航栏，无论屏幕尺寸。';
+  @override String get aboutTagline               => '你的 Last.fm 统计伴侣';
+  @override String get aboutAppInfo                => '应用信息';
+  @override String get aboutScrobbleDownloader     => 'Scrobble 下载器';
+  @override String get aboutScrobbleDownloaderSub  => '将你所有的 scrobble 导出为文件';
+  @override String get aboutPoweredBy              => '技术支持';
+  @override String get aboutImageDisclaimer        => '艺术家、专辑和歌曲的图片会自动从这些来源获取，有时可能不准确或与实际内容不符。';
+  @override String get aboutFooter                 => '用 ❤️ 制作 · 与 Last.fm / CBS 无关联';
+
+  @override String updatesPublishedOn(String date) => '发布于 $date';
+  @override String get updatesCurrentVersion       => '当前版本';
+  @override String get updatesBetaTitle            => '测试版更新';
+  @override String get updatesBetaSub              => '抢先体验预发布版本';
+
+  @override String get backupWhatsIncluded         => '包含内容';
+
+  @override String get faqSectionLabel             => '常见问题';
+  @override String get backupOverwriteWarning => '恢复备份将覆盖你当前的设置。';
+  @override String get faqOpenSourceBadge => 'LastStats 是一个由 SanoBld 用 ❤️ 打造的免费开源项目。';
+  @override String get cacheUnlimited     => '无限';
+  @override String get cacheTotalUsed     => '已用总量';
+  @override String get cacheScrobblesShort => '历史记录';
+  @override String get restartHintFeatures => '某些功能可能需要重启应用才能生效。';
+  @override String get reorderCardsTitle   => '重新排序卡片';
+  @override String get commonSave          => '保存';
+  @override String get dashFallbackWhenNoMusic   => '当没有音乐播放时';
+  @override String get dashFallbackChooseDisplay => '改为选择在背景中显示的内容';
+  @override String get dashFallbackPeriodLabel   => '备用图片时间段';
+  @override String get fallbackPeriod1Week       => '1 周';
+  @override String get fallbackPeriod1Month      => '1 个月';
+  @override String get fallbackPeriodAllTime     => '全部时间';
+  @override String get fallbackTypeNothing       => '无';
+  @override String get fallbackTypeTopTrack      => '第一歌曲';
+  @override String get fallbackTypeTopAlbum      => '第一专辑';
+  @override String get fallbackTypeTopArtist     => '第一艺术家';
+  @override String get fallbackTypeCustomImage   => '自定义图片';
+  @override String fallbackWillShow(String detail) => '将显示：$detail';
+  @override String get fallbackWillShowCustomUrl => '将显示：自定义图片链接';
+
+  @override String get dashAnimationBlurSection  => '动画与模糊';
+  @override String get dashMusicAnimationTitle   => '音乐动画';
+  @override String get dashMusicAnimationSub     => '播放音乐时，头图会缓慢模糊并漂移——类似 Apple Music。';
+  @override String get dashMusicAnimationInfo    => '此模式开启时模糊会自动应用。播放音乐期间，上方的模糊滑块无效。';
+
+  @override String get settingsTopAlbumsSection  => '热门专辑';
+  @override String get dashRecentPlaysLabel      => '最近播放';
+  @override String get dashStatCardsSectionLabel => '统计卡片';
+  @override String get dashStatCardsHeading      => '统计卡片';
+  @override String get dashStatCardsSub          => '选择并重新排序统计区块中显示的卡片。';
+  @override String get notifWorkManagerInfo => '通知通过 WorkManager 在后台运行，应用无需保持打开状态，但需要网络连接。';
+  @override String get notifIntervalTitle       => '每 X 次 scrobble';
+  @override String get notifIntervalSubtitle    => '按固定间隔接收通知';
+  @override String get notifRecapsSection       => '收听汇总';
+  @override String get notifDailyRecapSubtitle  => '当天 scrobble 数 + 最喜爱的艺术家';
+  @override String get notifWeeklyRecapSubtitle => '本周 scrobble 数 + 最喜爱的艺术家';
+  @override String get notifNewsSection         => '资讯';
+  @override String get notifNewsSubtitle        => '获取新功能、修复和公告的通知';
+  @override String get notifBadgeOnDashboard    => '仪表盘上的徽章';
+  @override String get notifBadgeSubtitle       => '在资讯铃铛图标上显示未读红点';
+  @override String get notifTestLabel           => '测试';
+  @override String get notifPermissionDisabledTitle => '通知已禁用';
+  @override String get notifPermissionDisabledBody  => '授予权限，以便 LastStats 可以向你发送提醒。';
+  @override String get notifGrantPermission     => '授予权限';
+  @override String get notifThresholdIntro      => '达到以下每个节点时，你都会收到一条特别通知：';
+  @override List<String> get notifThresholdMessages => const [
+    '你的第一个 1,000 次 scrobble。旅程开始了。🎵',
+    '你达到了五位数！🎉',
+    '你是真正的音乐狂热者。🔥',
+    '一百万次 scrobble。这是传奇。🎸',
+  ];
+  @override String get notifIntervalDescription => '每 X 次 scrobble 发送一次通知';
+  @override String get notifCustomValueLabel    => '自定义数值';
+  @override String get notifTimeNotifyAt        => '通知时间';
+  @override String get notifDayOfWeek           => '星期几';
+  @override List<String> get weekdaysShort => const ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+  @override String get notifSendTest            => '发送测试通知';
+  @override String get notifSentCheckBar        => '看看你的通知栏！';
+  @override String get notifMakeSureWorks       => '确认一切正常。';
+  @override String get notifSentBang            => '已发送！';
+  @override String get notifSendButton          => '发送';
+  @override String get apVisualStyle             => '视觉风格';
+  @override String get apStyleDefault            => '默认';
+  @override String get apNothingAccentLabel      => '强调色';
+  @override String get apNothingClassic          => '经典';
+  @override String get apRedOnlyDesc             => '仅红色';
+  @override String get apNothingMixed            => '混合';
+  @override String get apRedYellowDesc           => '红色 + 黄色点缀';
+  @override String get apNothingActiveBanner     => 'Nothing OS 风格已启用。强调色、动态取色和音乐取色均已禁用。';
+  @override String get apNothingOledInherent     => 'Nothing 深色模式本身就是 OLED 纯黑，无需再开启 OLED 开关。';
+  @override String get apOledTitle               => 'OLED 黑色主题';
+  @override String get apOledBuiltIntoNothing    => '已内置于 Nothing 深色模式';
+  @override String get apOledPureBlack           => '深色模式激活时使用纯黑背景';
+  @override String get apCustomColorTooltip      => '自定义颜色';
+  @override String get apColorWhenNothingPlays   => '无播放时的颜色';
+  @override String get apColorWhenNothingPlaysSub => '没有歌曲在播放时使用的强调色';
+  @override String get apKeepLastArtworkTitle    => '保留上次封面颜色';
+  @override String get apKeepLastArtworkSub      => '无播放时保留上次封面颜色，而不是重置';
+  @override String get apDetailPagesSection      => '详情页';
+  @override String get apArtworkColorTheme       => '封面配色主题';
+  @override String get apBeta                    => '测试版';
+  @override String get apArtworkColorThemeSub    => '详情页会根据封面的主色调调整配色';
+  @override String get apNavBarSection           => '导航栏';
+  @override String get apShowTabLabels           => '显示标签文字';
+  @override String get apShowTabLabelsSub        => '在底部导航栏图标下方显示标签名称';
+  @override String get apInteractionsSection     => '交互';
+  @override String get apHapticFeedbackSub       => '点击、选择和手势时的振动反馈';
+  @override String get acctRemoveTitle          => '删除账号？';
+  @override String acctRemoveBody(String username) => '从你的账号中删除 @$username？';
+  @override String get acctRemoveAction         => '删除';
+  @override String get acctAlreadyAddedOrFull   => '该账号已添加，或列表已满。';
+  @override String acctAddedSuccess(String username) => '@$username 添加成功。';
+  @override String get acctLogoutAllBody        => '所有账号都将被删除，你将返回设置界面。';
+  @override String acctMyAccounts(int count, int max) => '我的账号 ($count/$max)';
+  @override String get acctActive               => '当前使用';
+  @override String get acctTapSwitchToActivate  => '点击"切换"以激活';
+  @override String get acctSwitch               => '切换';
+  @override String get acctAddAnAccount         => '添加账号';
+  @override String acctSlotsRemaining(int n)    => '还可添加 $n 个';
+  @override String acctMaxReached(int max)      => '已达到最多 $max 个账号的上限。';
+  @override String get acctApiKeyInfo           => '每个账号可以使用不同的 API 密钥，也可以共用同一个。你可以在 last.fm/api/accounts 找到你的 API 密钥。';
+  @override String get acctLastfmProfileSection => 'Last.fm 资料';
+  @override String get acctViewOnLastfm         => '在 Last.fm 上查看';
+  @override String get acctDangerZone           => '危险区域';
+  @override String get acctLogoutAllSub         => '删除所有账号并返回设置界面。';
+  @override String get acctUsernameRequired     => '用户名为必填项。';
+  @override String get acctApiKeyRequired       => 'API 密钥为必填项。';
+  @override String get acctUsernameLabel        => 'Last.fm 用户名';
+  @override String get acctSameApiKey           => '与当前账号使用相同的 API 密钥';
+  @override String get acctApiKeyLabel          => 'API 密钥';
+  @override String get acctAdd                  => '添加';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -2192,6 +2956,156 @@ class _AppStringsPt implements AppStrings {
   @override String get newsAll                     => 'Tudo';
   @override String get newsAnyDate                 => 'Qualquer data';
   @override String get newsNoNewsYet               => 'Nenhuma novidade ainda';
+  @override String get settingsNotifications        => 'Notificações';
+  @override String get settingsCache                 => 'Cache';
+  @override String get settingsCardAppearanceSub     => 'Tema, destaque, layout, Material You';
+  @override String get settingsCardDashboardSub      => 'Imagem de cabeçalho, seções visíveis, cartões de estatísticas';
+  @override String get settingsCardStartupSub        => 'Aba exibida ao abrir o app';
+  @override String get settingsCardNotificationsSub  => 'Marcos, resumos diários e semanais';
+  @override String get settingsCardAccountSub        => 'Perfil do Last.fm conectado, sair';
+  @override String get settingsCardCacheSub          => 'Histórico, imagens, dados da API';
+  @override String get settingsCardBackupSub         => 'Exportar e restaurar suas configurações';
+  @override String get settingsCardUpdatesSub        => 'Verificar novas versões';
+  @override String get settingsCardAboutSub          => 'Versão, código-fonte, créditos';
+  @override String get settingsCardFaqSub            => 'Scrobbling, plataformas, código aberto';
+  @override String get settingsRestartNotice => 'Algumas configurações exigem reiniciar o app para ter efeito completo.';
+  @override String get pcModeLayout      => 'Layout';
+  @override String get pcModeNavLayout   => 'Layout de navegação';
+  @override String get pcModeAuto        => 'Automático';
+  @override String get pcModeSideRail    => 'Barra lateral';
+  @override String get pcModeBottomBar   => 'Barra inferior';
+  @override String get pcModeHintAuto    => 'Barra lateral em telas largas (≥ 720 dp), barra inferior em telas estreitas.';
+  @override String get pcModeHintOn      => 'Sempre usar a barra de navegação lateral, independente do tamanho da tela.';
+  @override String get pcModeHintOff     => 'Sempre usar a barra de navegação inferior, independente do tamanho da tela.';
+  @override String get aboutTagline               => 'Seu companheiro de estatísticas do Last.fm';
+  @override String get aboutAppInfo                => 'Info do app';
+  @override String get aboutScrobbleDownloader     => 'Baixador de scrobbles';
+  @override String get aboutScrobbleDownloaderSub  => 'Exporte todos os seus scrobbles para um arquivo';
+  @override String get aboutPoweredBy              => 'Com tecnologia de';
+  @override String get aboutImageDisclaimer        => 'As imagens de artistas, álbuns e faixas são obtidas automaticamente dessas fontes e às vezes podem estar incorretas ou não corresponder ao conteúdo real.';
+  @override String get aboutFooter                 => 'Feito com ❤️ · Sem afiliação com Last.fm / CBS';
+
+  @override String updatesPublishedOn(String date) => 'Publicado em $date';
+  @override String get updatesCurrentVersion       => 'Versão atual';
+  @override String get updatesBetaTitle            => 'Atualizações beta';
+  @override String get updatesBetaSub              => 'Tenha acesso antecipado às versões pré-lançadas';
+
+  @override String get backupWhatsIncluded         => 'O que está incluído';
+
+  @override String get faqSectionLabel             => 'Perguntas frequentes';
+  @override String get backupOverwriteWarning => 'Restaurar um backup substituirá suas configurações atuais.';
+  @override String get faqOpenSourceBadge => 'LastStats é um projeto gratuito e de código aberto feito com ❤️ por SanoBld.';
+  @override String get cacheUnlimited     => 'Ilimitado';
+  @override String get cacheTotalUsed     => 'Total usado';
+  @override String get cacheScrobblesShort => 'Histórico';
+  @override String get restartHintFeatures => 'Alguns recursos podem exigir reiniciar o app para ter efeito.';
+  @override String get reorderCardsTitle   => 'Reordenar cartões';
+  @override String get commonSave          => 'Salvar';
+  @override String get dashFallbackWhenNoMusic   => 'Quando nenhuma música está tocando';
+  @override String get dashFallbackChooseDisplay => 'Escolha o que mostrar como fundo em vez disso';
+  @override String get dashFallbackPeriodLabel   => 'Período do fallback';
+  @override String get fallbackPeriod1Week       => '1 semana';
+  @override String get fallbackPeriod1Month      => '1 mês';
+  @override String get fallbackPeriodAllTime     => 'Todo período';
+  @override String get fallbackTypeNothing       => 'Nada';
+  @override String get fallbackTypeTopTrack      => 'Faixa #1';
+  @override String get fallbackTypeTopAlbum      => 'Álbum #1';
+  @override String get fallbackTypeTopArtist     => 'Artista #1';
+  @override String get fallbackTypeCustomImage   => 'Imagem personalizada';
+  @override String fallbackWillShow(String detail) => 'Mostrará: $detail';
+  @override String get fallbackWillShowCustomUrl => 'Mostrará: URL de imagem personalizada';
+
+  @override String get dashAnimationBlurSection  => 'Animação e desfoque';
+  @override String get dashMusicAnimationTitle   => 'Animação de música';
+  @override String get dashMusicAnimationSub     => 'Quando uma música toca, a imagem desfoca e se move suavemente, como no Apple Music.';
+  @override String get dashMusicAnimationInfo    => 'O desfoque é aplicado automaticamente neste modo. O controle de desfoque acima não tem efeito enquanto a música toca.';
+
+  @override String get settingsTopAlbumsSection  => 'Top Álbuns';
+  @override String get dashRecentPlaysLabel      => 'Reproduções recentes';
+  @override String get dashStatCardsSectionLabel => 'Cartões de estatísticas';
+  @override String get dashStatCardsHeading      => 'Cartões de stats';
+  @override String get dashStatCardsSub          => 'Escolha e reordene os cartões mostrados no bloco de estatísticas.';
+  @override String get notifWorkManagerInfo => 'As notificações são executadas em segundo plano via WorkManager. O app não precisa estar aberto. É necessária conexão com a internet.';
+  @override String get notifIntervalTitle       => 'A cada X scrobbles';
+  @override String get notifIntervalSubtitle    => 'Receba avisos em intervalos regulares';
+  @override String get notifRecapsSection       => 'Resumos de escuta';
+  @override String get notifDailyRecapSubtitle  => 'Total de scrobbles + artista favorito do dia';
+  @override String get notifWeeklyRecapSubtitle => 'Total de scrobbles + artista favorito da semana';
+  @override String get notifNewsSection         => 'Novidades';
+  @override String get notifNewsSubtitle        => 'Receba avisos de novos recursos, correções e anúncios';
+  @override String get notifBadgeOnDashboard    => 'Emblema no painel';
+  @override String get notifBadgeSubtitle       => 'Mostrar o ponto de não lido no sino de novidades';
+  @override String get notifTestLabel           => 'Teste';
+  @override String get notifPermissionDisabledTitle => 'Notificações desativadas';
+  @override String get notifPermissionDisabledBody  => 'Conceda a permissão para que o LastStats possa enviar avisos.';
+  @override String get notifGrantPermission     => 'Conceder permissão';
+  @override String get notifThresholdIntro      => 'Você receberá uma notificação especial em cada um destes marcos:';
+  @override List<String> get notifThresholdMessages => const [
+    'Seus primeiros 1.000 scrobbles. A jornada começa. 🎵',
+    'Você chegou a cinco dígitos! 🎉',
+    'Você é um verdadeiro viciado em música. 🔥',
+    'Um milhão de scrobbles. Isso é lendário. 🎸',
+  ];
+  @override String get notifIntervalDescription => 'Enviar uma notificação a cada X scrobbles';
+  @override String get notifCustomValueLabel    => 'Valor personalizado';
+  @override String get notifTimeNotifyAt        => 'Notificar às';
+  @override String get notifDayOfWeek           => 'Dia da semana';
+  @override List<String> get weekdaysShort => const ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+  @override String get notifSendTest            => 'Enviar uma notificação de teste';
+  @override String get notifSentCheckBar        => 'Confira sua barra de notificações!';
+  @override String get notifMakeSureWorks       => 'Verifique se tudo funciona.';
+  @override String get notifSentBang            => 'Enviado!';
+  @override String get notifSendButton          => 'Enviar';
+  @override String get apVisualStyle             => 'Estilo visual';
+  @override String get apStyleDefault            => 'Padrão';
+  @override String get apNothingAccentLabel      => 'Destaque';
+  @override String get apNothingClassic          => 'Clássico';
+  @override String get apRedOnlyDesc             => 'Somente vermelho';
+  @override String get apNothingMixed            => 'Misto';
+  @override String get apRedYellowDesc           => 'Vermelho + toques de amarelo';
+  @override String get apNothingActiveBanner     => 'Estilo Nothing OS ativo. Destaque, cor dinâmica e cor da música estão desativados.';
+  @override String get apNothingOledInherent     => 'O modo escuro do Nothing já é preto OLED por natureza. A opção OLED não é necessária.';
+  @override String get apOledTitle               => 'Tema preto OLED';
+  @override String get apOledBuiltIntoNothing    => 'Integrado ao modo escuro do Nothing';
+  @override String get apOledPureBlack           => 'Fundos pretos puros quando o modo escuro está ativo';
+  @override String get apCustomColorTooltip      => 'Cor personalizada';
+  @override String get apColorWhenNothingPlays   => 'Cor quando nada está tocando';
+  @override String get apColorWhenNothingPlaysSub => 'Destaque usado quando nenhuma faixa está tocando';
+  @override String get apKeepLastArtworkTitle    => 'Manter a última cor da capa';
+  @override String get apKeepLastArtworkSub      => 'Manter a última cor da capa em vez de redefinir quando nada está tocando';
+  @override String get apDetailPagesSection      => 'Páginas de detalhes';
+  @override String get apArtworkColorTheme       => 'Tema de cor da capa';
+  @override String get apBeta                    => 'BETA';
+  @override String get apArtworkColorThemeSub    => 'As páginas de detalhes adaptam suas cores à cor dominante da capa';
+  @override String get apNavBarSection           => 'Barra de navegação';
+  @override String get apShowTabLabels           => 'Mostrar rótulos das abas';
+  @override String get apShowTabLabelsSub        => 'Exibir os nomes das abas abaixo dos ícones';
+  @override String get apInteractionsSection     => 'Interações';
+  @override String get apHapticFeedbackSub       => 'Vibrações em toques, seleções e gestos';
+  @override String get acctRemoveTitle          => 'Remover conta?';
+  @override String acctRemoveBody(String username) => 'Remover @$username das suas contas?';
+  @override String get acctRemoveAction         => 'Remover';
+  @override String get acctAlreadyAddedOrFull   => 'Essa conta já foi adicionada ou a lista está cheia.';
+  @override String acctAddedSuccess(String username) => '@$username adicionado com sucesso.';
+  @override String get acctLogoutAllBody        => 'Todas as contas serão removidas. Você voltará para a tela de configuração.';
+  @override String acctMyAccounts(int count, int max) => 'Minhas contas ($count/$max)';
+  @override String get acctActive               => 'Ativa';
+  @override String get acctTapSwitchToActivate  => 'Toque em "Trocar" para ativar';
+  @override String get acctSwitch               => 'Trocar';
+  @override String get acctAddAnAccount         => 'Adicionar uma conta';
+  @override String acctSlotsRemaining(int n)    => '$n vaga(s) restante(s)';
+  @override String acctMaxReached(int max)      => 'Máximo de $max contas atingido.';
+  @override String get acctApiKeyInfo           => 'Cada conta pode usar uma chave de API diferente ou a mesma. Você encontra sua chave de API em last.fm/api/accounts.';
+  @override String get acctLastfmProfileSection => 'Perfil do Last.fm';
+  @override String get acctViewOnLastfm         => 'Ver no Last.fm';
+  @override String get acctDangerZone           => 'Zona de perigo';
+  @override String get acctLogoutAllSub         => 'Remover todas as contas e voltar para a configuração.';
+  @override String get acctUsernameRequired     => 'O nome de usuário é obrigatório.';
+  @override String get acctApiKeyRequired       => 'A chave de API é obrigatória.';
+  @override String get acctUsernameLabel        => 'Usuário do Last.fm';
+  @override String get acctSameApiKey           => 'Mesma chave de API da conta ativa';
+  @override String get acctApiKeyLabel          => 'Chave de API';
+  @override String get acctAdd                  => 'Adicionar';
 }
 
 // ══════════════════════════════════════════════════════════════════════════

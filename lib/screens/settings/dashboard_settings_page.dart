@@ -103,7 +103,6 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   Widget build(BuildContext context) {
     final scheme  = Theme.of(context).colorScheme;
     final text    = Theme.of(context).textTheme;
-    final isEn    = localeNotifier.value == 'en';
     final sources = buildHeaderSources();
     final anims   = buildHeaderAnimations();
     final periods = buildHeaderPeriods();
@@ -217,12 +216,11 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                   const SizedBox(width: 8),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(
-                      isEn ? 'When no music is playing' : 'Quand aucune musique n\'est en cours',
+                      L.dashFallbackWhenNoMusic,
                       style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                     ),
                     Text(
-                      isEn ? 'Choose what to display as background instead'
-                           : 'Choisissez ce qui s\'affiche en arrière-plan à la place',
+                      L.dashFallbackChooseDisplay,
                       style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                     ),
                   ])),
@@ -232,7 +230,6 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                 // Choix du type de fallback
                 _FallbackTypeSelector(
                   value: _fallbackType,
-                  isEn: isEn,
                   scheme: scheme,
                   text: text,
                   onChanged: (val) async {
@@ -250,7 +247,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                     Icon(Icons.date_range_rounded, size: 16, color: scheme.primary),
                     const SizedBox(width: 8),
                     Text(
-                      isEn ? 'Fallback period' : 'Période du fallback',
+                      L.dashFallbackPeriodLabel,
                       style: text.labelMedium?.copyWith(
                           color: scheme.primary, fontWeight: FontWeight.w700),
                     ),
@@ -258,7 +255,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                   const SizedBox(height: 8),
                   Wrap(spacing: 8, runSpacing: 8, children: [
                     _FallbackPeriodChip(
-                      label: isEn ? '1 week' : '1 semaine',
+                      label: L.fallbackPeriod1Week,
                       value: '7day',
                       selected: _fallbackPeriod,
                       onTap: (v) async {
@@ -267,7 +264,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                       },
                     ),
                     _FallbackPeriodChip(
-                      label: isEn ? '1 month' : '1 mois',
+                      label: L.fallbackPeriod1Month,
                       value: '1month',
                       selected: _fallbackPeriod,
                       onTap: (v) async {
@@ -276,7 +273,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                       },
                     ),
                     _FallbackPeriodChip(
-                      label: isEn ? 'All time' : 'Tout le temps',
+                      label: L.fallbackPeriodAllTime,
                       value: 'overall',
                       selected: _fallbackPeriod,
                       onTap: (v) async {
@@ -318,7 +315,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                 // Aperçu du fallback actif
                 if (_fallbackType != 'none') ...[
                   const SizedBox(height: 12),
-                  _FallbackSummary(type: _fallbackType, period: _fallbackPeriod, isEn: isEn),
+                  _FallbackSummary(type: _fallbackType, period: _fallbackPeriod),
                 ],
               ],
             ],
@@ -328,7 +325,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
         const SizedBox(height: 16),
 
         // ── Animation & Flou ──────────────────────────────────────────────
-        SettingsSection(label: isEn ? 'Animation & Blur' : 'Animation & Flou', children: [
+        SettingsSection(label: L.dashAnimationBlurSection, children: [
           Padding(padding: const EdgeInsets.fromLTRB(16, 14, 16, 4), child: Column(
             crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
@@ -391,13 +388,11 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                 contentPadding: EdgeInsets.zero,
                 secondary: Icon(Icons.blur_on_rounded, color: scheme.primary),
                 title: Text(
-                  isEn ? 'Music animation' : 'Animation musique',
+                  L.dashMusicAnimationTitle,
                   style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(
-                  isEn
-                      ? 'When music is playing, the header image slowly blurs and drifts — like Apple Music.'
-                      : 'Quand une musique joue, l\'image se floute et bouge doucement, comme dans Apple Music.',
+                  L.dashMusicAnimationSub,
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                 ),
                 value: _headerMusicAnim,
@@ -424,9 +419,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                         size: 14, color: scheme.primary),
                     const SizedBox(width: 8),
                     Expanded(child: Text(
-                      isEn
-                          ? 'Blur is set automatically when this mode is active. The blur slider above has no effect while music is playing.'
-                          : 'Le flou est appliqué automatiquement dans ce mode. Le curseur de flou ci-dessus n\'a aucun effet pendant la lecture.',
+                      L.dashMusicAnimationInfo,
                       style: text.bodySmall?.copyWith(
                           color: scheme.onPrimaryContainer),
                     )),
@@ -458,7 +451,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
             secondary: const Icon(Icons.album_rounded),
-            title: Text(isEn ? 'Top Albums' : 'Top Albums'), value: _showAlbums,
+            title: Text(L.settingsTopAlbumsSection), value: _showAlbums,
             onChanged: (v) async { await _set('ls_show_albums', v); setState(() => _showAlbums = v); }),
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
@@ -468,7 +461,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
             secondary: const Icon(Icons.history_rounded),
-            title: Text(isEn ? 'Recent plays' : 'Écoutes récentes'), value: _showRecent,
+            title: Text(L.dashRecentPlaysLabel), value: _showRecent,
             onChanged: (v) async { await _set('ls_show_recent', v); setState(() => _showRecent = v); }),
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
@@ -483,26 +476,24 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
 
         // ── Cartes de statistiques ────────────────────────────────────────
         SettingsSection(
-          label: isEn ? 'Stat Cards' : 'Cartes de statistiques',
+          label: L.dashStatCardsSectionLabel,
           children: [
             Padding(padding: const EdgeInsets.fromLTRB(16, 12, 16, 4), child: Column(
               crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
                   Icon(Icons.grid_view_rounded, size: 18, color: scheme.primary),
                   const SizedBox(width: 8),
-                  Text(isEn ? 'Stat Cards' : 'Cartes de stats',
+                  Text(L.dashStatCardsHeading,
                       style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
                 ]),
                 const SizedBox(height: 4),
-                Text(isEn
-                    ? 'Choose and reorder the cards shown in the stats block.'
-                    : 'Choisissez les cartes affichées dans le bloc statistiques.',
+                Text(L.dashStatCardsSub,
                     style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               ],
             )),
             ...kAllStatCards.map((card) {
-              final (id, emoji, labelFr, labelEn) = card;
-              final label   = isEn ? labelEn : labelFr;
+              final (id, emoji, _, _, _, _, _) = card;
+              final label   = statCardLabel(id);
               final enabled = _statCards.contains(id);
               return CheckboxListTile(
                 secondary: Text(emoji, style: const TextStyle(fontSize: 20)),
@@ -521,7 +512,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
             }),
             Padding(padding: const EdgeInsets.fromLTRB(16, 4, 16, 14), child: FilledButton.tonalIcon(
               icon: const Icon(Icons.swap_vert_rounded, size: 18),
-              label: Text(isEn ? 'Reorder cards' : 'Réordonner les cartes'),
+              label: Text(L.reorderCardsTitle),
               onPressed: () async {
                 final result = await showModalBottomSheet<List<String>>(
                   context: context, isScrollControlled: true,
@@ -549,14 +540,12 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
 
 class _FallbackTypeSelector extends StatelessWidget {
   final String value;
-  final bool isEn;
   final ColorScheme scheme;
   final TextTheme text;
   final void Function(String) onChanged;
 
   const _FallbackTypeSelector({
     required this.value,
-    required this.isEn,
     required this.scheme,
     required this.text,
     required this.onChanged,
@@ -565,11 +554,11 @@ class _FallbackTypeSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final options = [
-      ('none',        Icons.hide_image_outlined,   isEn ? 'Nothing'       : 'Rien'),
-      ('top_track',   Icons.music_note_rounded,    isEn ? 'Top Track'     : 'Titre #1'),
-      ('top_album',   Icons.album_rounded,         isEn ? 'Top Album'     : 'Album #1'),
-      ('top_artist',  Icons.mic_rounded,           isEn ? 'Top Artist'    : 'Artiste #1'),
-      ('custom_url',  Icons.image_outlined,        isEn ? 'Custom image'  : 'Image perso.'),
+      ('none',        Icons.hide_image_outlined,   L.fallbackTypeNothing),
+      ('top_track',   Icons.music_note_rounded,    L.fallbackTypeTopTrack),
+      ('top_album',   Icons.album_rounded,         L.fallbackTypeTopAlbum),
+      ('top_artist',  Icons.mic_rounded,           L.fallbackTypeTopArtist),
+      ('custom_url',  Icons.image_outlined,        L.fallbackTypeCustomImage),
     ];
 
     return Column(
@@ -647,24 +636,23 @@ class _FallbackPeriodChip extends StatelessWidget {
 
 class _FallbackSummary extends StatelessWidget {
   final String type, period;
-  final bool isEn;
-  const _FallbackSummary({required this.type, required this.period, required this.isEn});
+  const _FallbackSummary({required this.type, required this.period});
 
   String _typeLabel() {
     switch (type) {
-      case 'top_track':  return isEn ? 'Top Track'  : 'Titre #1';
-      case 'top_album':  return isEn ? 'Top Album'  : 'Album #1';
-      case 'top_artist': return isEn ? 'Top Artist' : 'Artiste #1';
-      case 'custom_url': return isEn ? 'Custom image' : 'Image personnalisée';
+      case 'top_track':  return L.fallbackTypeTopTrack;
+      case 'top_album':  return L.fallbackTypeTopAlbum;
+      case 'top_artist': return L.fallbackTypeTopArtist;
+      case 'custom_url': return L.fallbackTypeCustomImage;
       default: return '';
     }
   }
 
   String _periodLabel() {
     switch (period) {
-      case '7day':   return isEn ? '1 week'    : '1 semaine';
-      case '1month': return isEn ? '1 month'   : '1 mois';
-      default:       return isEn ? 'all time'  : 'tout le temps';
+      case '7day':   return L.fallbackPeriod1Week;
+      case '1month': return L.fallbackPeriod1Month;
+      default:       return L.fallbackPeriodAllTime;
     }
   }
 
@@ -675,12 +663,8 @@ class _FallbackSummary extends StatelessWidget {
 
     final showPeriod = ['top_track', 'top_album', 'top_artist'].contains(type);
     final summary = showPeriod
-        ? (isEn
-            ? 'Will show: $_typeLabel() · $_periodLabel()'
-            : 'Affichera : ${_typeLabel()} · ${_periodLabel()}')
-        : (type == 'custom_url'
-            ? (isEn ? 'Will show: custom image URL' : 'Affichera : URL d\'image personnalisée')
-            : '');
+        ? L.fallbackWillShow('${_typeLabel()} · ${_periodLabel()}')
+        : (type == 'custom_url' ? L.fallbackWillShowCustomUrl : '');
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

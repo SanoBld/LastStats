@@ -18,7 +18,6 @@ class AboutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final isEn   = localeNotifier.value == 'en';
 
     return Scaffold(
       appBar: AppBar(
@@ -45,7 +44,7 @@ class AboutPage extends StatelessWidget {
                   : 'v${UpdateService.currentVersion}',
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           const SizedBox(height: 4),
-          Text(isEn ? 'Your Last.fm stats companion' : 'Votre compagnon de stats Last.fm',
+          Text(L.aboutTagline,
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           const SizedBox(height: 24),
         ])),
@@ -70,7 +69,7 @@ class AboutPage extends StatelessWidget {
         ),
 
         // ── App info ──────────────────────────────────────────────────────
-        SettingsSection(label: isEn ? 'App info' : 'Infos', children: [
+        SettingsSection(label: L.aboutAppInfo, children: [
           ListTile(
             leading: const Icon(Icons.info_outline_rounded),
             title: Text(L.settingsVersion,
@@ -94,13 +93,11 @@ class AboutPage extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.download_rounded),
             title: Text(
-              isEn ? 'Scrobble downloader' : 'Téléchargeur de scrobbles',
+              L.aboutScrobbleDownloader,
               style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
             subtitle: Text(
-              isEn
-                  ? 'Export all your scrobbles to a file'
-                  : 'Exporter tous vos scrobbles dans un fichier',
+              L.aboutScrobbleDownloaderSub,
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
             ),
             trailing: const Icon(Icons.open_in_new_rounded, size: 16),
@@ -136,7 +133,7 @@ class AboutPage extends StatelessWidget {
         const SizedBox(height: 16),
 
         // ── Powered by ────────────────────────────────────────────────────
-        SettingsSection(label: isEn ? 'Powered by' : 'Propulsé par', children: [
+        SettingsSection(label: L.aboutPoweredBy, children: [
           _PoweredByTile(
             icon: Icons.music_note_rounded,
             label: 'Last.fm API',
@@ -200,9 +197,7 @@ class AboutPage extends StatelessWidget {
             Icon(Icons.image_not_supported_outlined, size: 18, color: scheme.secondary),
             const SizedBox(width: 10),
             Expanded(child: Text(
-              isEn
-                  ? 'Artist, album and track images are fetched automatically from these sources and may sometimes be incorrect or not match the actual content.'
-                  : 'Les images des artistes, albums et titres sont récupérées automatiquement depuis ces sources et peuvent parfois être incorrectes ou ne pas correspondre au contenu réel.',
+              L.aboutImageDisclaimer,
               style: text.bodySmall?.copyWith(color: scheme.onSecondaryContainer),
             )),
           ]),
@@ -211,9 +206,7 @@ class AboutPage extends StatelessWidget {
         const SizedBox(height: 20),
 
         Center(child: Text(
-          isEn
-              ? 'Made with ❤️ · Not affiliated with Last.fm / CBS'
-              : 'Fait avec ❤️ · Non affilié à Last.fm / CBS',
+          L.aboutFooter,
           style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
           textAlign: TextAlign.center,
         )),

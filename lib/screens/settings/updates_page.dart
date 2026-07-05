@@ -71,7 +71,6 @@ class _UpdatesPageState extends State<UpdatesPage> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final isEn   = localeNotifier.value == 'en';
 
     return Scaffold(
       appBar: AppBar(
@@ -114,7 +113,7 @@ class _UpdatesPageState extends State<UpdatesPage> {
                   ]),
                   if (_updateInfo!.publishedAt != null)
                     Text(
-                      isEn ? 'Published on ${_fmtDate(_updateInfo!.publishedAt!)}' : 'Publié le ${_fmtDate(_updateInfo!.publishedAt!)}',
+                      L.updatesPublishedOn(_fmtDate(_updateInfo!.publishedAt!)),
                       style: text.bodySmall?.copyWith(color: scheme.onTertiaryContainer.withValues(alpha: 0.7)),
                     ),
                 ])),
@@ -161,7 +160,7 @@ class _UpdatesPageState extends State<UpdatesPage> {
         ],
 
         // ── Version actuelle ──────────────────────────────────────────────
-        SettingsSection(label: isEn ? 'Current version' : 'Version actuelle', children: [
+        SettingsSection(label: L.updatesCurrentVersion, children: [
           ListTile(
             leading: Container(
               width: 40, height: 40,
@@ -209,12 +208,10 @@ class _UpdatesPageState extends State<UpdatesPage> {
           // pre-release metadata file instead of the stable one.
           SwitchListTile(
             secondary: Icon(Icons.science_outlined, color: scheme.primary),
-            title: Text(isEn ? 'Beta updates' : 'Mises à jour bêta',
+            title: Text(L.updatesBetaTitle,
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
             subtitle: Text(
-              isEn
-                  ? 'Get early access to pre-release versions'
-                  : 'Recevoir les versions pré-publiées en avant-première',
+              L.updatesBetaSub,
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
             ),
             value: _betaChannel,

@@ -51,11 +51,11 @@ class _PcModeSectionState extends State<PcModeSection> {
   String get _hint {
     switch (_mode) {
       case 'on':
-        return 'Always use the side navigation rail, regardless of screen size.';
+        return L.pcModeHintOn;
       case 'off':
-        return 'Always use the bottom navigation bar, regardless of screen size.';
+        return L.pcModeHintOff;
       default:
-        return 'Side rail on wide screens (≥ 720 dp), bottom bar on narrow screens.';
+        return L.pcModeHintAuto;
     }
   }
 
@@ -65,7 +65,7 @@ class _PcModeSectionState extends State<PcModeSection> {
     final text   = Theme.of(context).textTheme;
 
     return SettingsSection(
-      label: 'Layout',
+      label: L.pcModeLayout,
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
@@ -78,7 +78,7 @@ class _PcModeSectionState extends State<PcModeSection> {
                     size: 18, color: scheme.primary),
                 const SizedBox(width: 8),
                 Text(
-                  'Navigation layout',
+                  L.pcModeNavLayout,
                   style: text.bodyMedium
                       ?.copyWith(fontWeight: FontWeight.w600),
                 ),
@@ -88,21 +88,21 @@ class _PcModeSectionState extends State<PcModeSection> {
 
               // ── Three-segment toggle ──────────────────────────────────
               SegmentedButton<String>(
-                segments: const [
+                segments: [
                   ButtonSegment(
                     value: 'auto',
-                    icon: Icon(Icons.devices_rounded),
-                    label: Text('Auto'),
+                    icon: const Icon(Icons.devices_rounded),
+                    label: Text(L.pcModeAuto),
                   ),
                   ButtonSegment(
                     value: 'on',
-                    icon: Icon(Icons.view_sidebar_outlined),
-                    label: Text('Side rail'),
+                    icon: const Icon(Icons.view_sidebar_outlined),
+                    label: Text(L.pcModeSideRail),
                   ),
                   ButtonSegment(
                     value: 'off',
-                    icon: Icon(Icons.view_headline_rounded),
-                    label: Text('Bottom bar'),
+                    icon: const Icon(Icons.view_headline_rounded),
+                    label: Text(L.pcModeBottomBar),
                   ),
                 ],
                 selected: {_mode},

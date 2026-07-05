@@ -32,7 +32,6 @@ class _CachePageState extends State<CachePage> {
   bool _loading    = true;
   bool _clearing   = false;
 
-  bool get _isEn => localeNotifier.value == 'en';
 
   @override
   void initState() {
@@ -145,7 +144,7 @@ class _CachePageState extends State<CachePage> {
                 // ── Usage overview ─────────────────────────────────────────
                 _SectionHeader(L.cacheUsage, text),
                 const SizedBox(height: 12),
-                _UsageCard(stats: _stats!, scheme: scheme, text: text, isEn: _isEn),
+                _UsageCard(stats: _stats!, scheme: scheme, text: text),
 
                 const SizedBox(height: 24),
 
@@ -170,7 +169,7 @@ class _CachePageState extends State<CachePage> {
                 // ── Offline mode ───────────────────────────────────────────
                 _SectionHeader(L.cacheOffline, text),
                 const SizedBox(height: 8),
-                _OfflineModeCard(scheme: scheme, text: text, isEn: _isEn),
+                _OfflineModeCard(scheme: scheme, text: text),
 
                 const SizedBox(height: 24),
 
@@ -202,7 +201,6 @@ class _CachePageState extends State<CachePage> {
                               onTap:    _clearImages,
                               scheme:   scheme,
                               text:     text,
-                              isEn:     _isEn,
                             ),
                             const SizedBox(height: 8),
                             _ClearTile(
@@ -214,7 +212,6 @@ class _CachePageState extends State<CachePage> {
                               onTap:    _clearApiCache,
                               scheme:   scheme,
                               text:     text,
-                              isEn:     _isEn,
                             ),
                             const SizedBox(height: 8),
                             _ClearTile(
@@ -226,7 +223,6 @@ class _CachePageState extends State<CachePage> {
                               onTap:    _clearScrobbles,
                               scheme:   scheme,
                               text:     text,
-                              isEn:     _isEn,
                             ),
                             const SizedBox(height: 16),
                             FilledButton.tonalIcon(
@@ -274,13 +270,11 @@ class _UsageCard extends StatelessWidget {
   final StorageStats stats;
   final ColorScheme  scheme;
   final TextTheme    text;
-  final bool         isEn;
 
   const _UsageCard({
     required this.stats,
     required this.scheme,
     required this.text,
-    required this.isEn,
   });
 
   @override
@@ -292,7 +286,7 @@ class _UsageCard extends StatelessWidget {
 
     final totalStr = StorageManager.formatBytes(total);
     final maxStr   = unlimited
-        ? (isEn ? 'Unlimited' : 'Illimité')
+        ? L.cacheUnlimited
         : StorageManager.formatBytes(max);
 
     return Container(
@@ -308,7 +302,7 @@ class _UsageCard extends StatelessWidget {
           Icon(Icons.storage_rounded, color: scheme.primary, size: 22),
           const SizedBox(width: 10),
           Expanded(child: Text(
-            isEn ? 'Total used' : 'Espace utilisé',
+            L.cacheTotalUsed,
             style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           )),
           Text(
@@ -338,7 +332,7 @@ class _UsageCard extends StatelessWidget {
 
         // Per-category breakdown
         _Bar(
-          label:   isEn ? 'Images' : 'Images',
+          label:   L.cacheImages,
           bytes:   stats.imageBytes,
           total:   total,
           color:   scheme.primary,
@@ -347,7 +341,7 @@ class _UsageCard extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         _Bar(
-          label:  isEn ? 'API data' : 'Données API',
+          label:  L.cacheApiData,
           bytes:  stats.apiBytes,
           total:  total,
           color:  scheme.secondary,
@@ -356,7 +350,7 @@ class _UsageCard extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         _Bar(
-          label:  isEn ? 'Scrobbles' : 'Historique',
+          label:  L.cacheScrobblesShort,
           bytes:  stats.scrobbleBytes,
           total:  total,
           color:  scheme.tertiary,
@@ -463,12 +457,10 @@ class _LimitPicker extends StatelessWidget {
 class _OfflineModeCard extends StatefulWidget {
   final ColorScheme scheme;
   final TextTheme   text;
-  final bool        isEn;
 
   const _OfflineModeCard({
     required this.scheme,
     required this.text,
-    required this.isEn,
   });
 
   @override
@@ -509,13 +501,11 @@ class _OfflineModeCardState extends State<_OfflineModeCard> {
           onChanged:   _toggle,
           contentPadding: EdgeInsets.zero,
           title: Text(
-            widget.isEn ? 'Show cached data when offline' : 'Afficher les données en cache hors ligne',
+            L.cacheOfflineTitle,
             style: widget.text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           subtitle: Text(
-            widget.isEn
-                ? 'Expired data is still shown if no network is available.'
-                : 'Les données expirées restent visibles si le réseau est indisponible.',
+            L.cacheOfflineSubtitle,
             style: widget.text.bodySmall?.copyWith(color: widget.scheme.onSurfaceVariant),
           ),
         ),
@@ -533,7 +523,6 @@ class _ClearTile extends StatelessWidget {
   final VoidCallback onTap;
   final ColorScheme  scheme;
   final TextTheme    text;
-  final bool         isEn;
 
   const _ClearTile({
     required this.icon,
@@ -544,7 +533,6 @@ class _ClearTile extends StatelessWidget {
     required this.onTap,
     required this.scheme,
     required this.text,
-    required this.isEn,
   });
 
   @override
@@ -571,7 +559,7 @@ class _ClearTile extends StatelessWidget {
         ),
         trailing: TextButton(
           onPressed: onTap,
-          child: Text(isEn ? 'Clear' : 'Vider',
+          child: Text(L.cacheClearBtn,
               style: TextStyle(color: scheme.error)),
         ),
         contentPadding: const EdgeInsets.fromLTRB(12, 4, 8, 4),

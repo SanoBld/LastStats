@@ -15,6 +15,25 @@ import '../../l10n.dart';
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 
+/// Picks the right label for the current [localeNotifier] value, falling
+/// back to French. Central helper so any data table (stat cards, accent
+/// names…) can support all 5 languages without per-call ternaries.
+String pickLang({
+  required String fr,
+  required String en,
+  required String es,
+  required String zh,
+  required String pt,
+}) {
+  switch (localeNotifier.value) {
+    case 'en': return en;
+    case 'es': return es;
+    case 'zh': return zh;
+    case 'pt': return pt;
+    default:   return fr;
+  }
+}
+
 const kSettingsAccentOptions = [
   (Color(0xFF7C3AED), 'purple',  'Violet / Purple'),
   (Color(0xFF1D4ED8), 'blue',    'Bleu / Blue'),
@@ -27,31 +46,33 @@ const kSettingsAccentOptions = [
 ];
 
 /// Cartes de statistiques — dupliqué ici pour être accessible hors du part-of.
+/// Tuple: (id, emoji, fr, en, es, zh, pt)
 const kAllStatCards = [
-  ('top_artist',      '🎤', 'Artiste #1',           'Artist #1'),
-  ('top_album',       '💿', 'Album #1',              'Album #1'),
-  ('top_track',       '🎵', 'Titre #1',              'Track #1'),
-  ('last_track',      '⏱️', 'Dernière écoute',       'Last played'),
-  ('total',           '🎯', 'Total scrobbles',        'Total scrobbles'),
-  ('avg_day',         '⚡', 'Moy. / jour',            'Avg / day'),
-  ('avg_week',        '📅', 'Moy. / semaine',         'Avg / week'),
-  ('days_active',     '🗓️', 'Jours actifs',           'Days active'),
-  ('since',           '📆', 'Membre depuis',           'Member since'),
-  ('country',         '🌍', 'Pays',                   'Country'),
-  ('top_artist_week', '🎤', 'Artiste #1 (semaine)',   'Artist #1 (week)'),
-  ('top_album_week',  '💿', 'Album #1 (semaine)',     'Album #1 (week)'),
-  ('top_track_week',  '🎵', 'Titre #1 (semaine)',     'Track #1 (week)'),
-  ('artist_count',    '🎸', 'Artistes uniques',       'Unique artists'),
-  ('track_count',     '🎼', 'Titres uniques',         'Unique tracks'),
-  ('album_count',     '💽', 'Albums uniques',         'Unique albums'),
-  ('scrobbles_week',  '📊', 'Scrobbles semaine',      'Scrobbles week'),
+  ('top_artist',      '🎤', 'Artiste #1',            'Artist #1',        'Artista #1',           '第一艺术家',     'Artista #1'),
+  ('top_album',       '💿', 'Album #1',              'Album #1',         'Álbum #1',             '第一专辑',       'Álbum #1'),
+  ('top_track',       '🎵', 'Titre #1',              'Track #1',         'Canción #1',           '第一歌曲',       'Faixa #1'),
+  ('last_track',      '⏱️', 'Dernière écoute',       'Last played',      'Última escucha',       '最近播放',       'Última tocada'),
+  ('total',           '🎯', 'Total scrobbles',       'Total scrobbles',  'Total de scrobbles',   '总 scrobble 数', 'Total de scrobbles'),
+  ('avg_day',         '⚡', 'Moy. / jour',           'Avg / day',        'Prom. / día',          '日均',           'Média / dia'),
+  ('avg_week',        '📅', 'Moy. / semaine',        'Avg / week',       'Prom. / semana',       '周均',           'Média / semana'),
+  ('days_active',     '🗓️', 'Jours actifs',          'Days active',      'Días activos',         '活跃天数',       'Dias ativos'),
+  ('since',           '📆', 'Membre depuis',         'Member since',     'Miembro desde',        '加入时间',       'Membro desde'),
+  ('country',         '🌍', 'Pays',                  'Country',          'País',                 '国家',           'País'),
+  ('top_artist_week', '🎤', 'Artiste #1 (semaine)',  'Artist #1 (week)', 'Artista #1 (semana)',  '第一艺术家（周）', 'Artista #1 (semana)'),
+  ('top_album_week',  '💿', 'Album #1 (semaine)',    'Album #1 (week)',  'Álbum #1 (semana)',    '第一专辑（周）',   'Álbum #1 (semana)'),
+  ('top_track_week',  '🎵', 'Titre #1 (semaine)',    'Track #1 (week)',  'Canción #1 (semana)',  '第一歌曲（周）',   'Faixa #1 (semana)'),
+  ('artist_count',    '🎸', 'Artistes uniques',      'Unique artists',   'Artistas únicos',     '独立艺术家数',   'Artistas únicos'),
+  ('track_count',     '🎼', 'Titres uniques',        'Unique tracks',    'Canciones únicas',    '独立歌曲数',     'Faixas únicas'),
+  ('album_count',     '💽', 'Albums uniques',        'Unique albums',    'Álbumes únicos',      '独立专辑数',     'Álbuns únicos'),
+  ('scrobbles_week',  '📊', 'Scrobbles semaine',     'Scrobbles week',   'Scrobbles semana',    '本周 scrobbles', 'Scrobbles semana'),
 ];
 const kDefaultStatCards = ['top_artist', 'top_album', 'top_track', 'last_track'];
 
 String statCardLabel(String id) {
-  final isEn = localeNotifier.value == 'en';
   for (final c in kAllStatCards) {
-    if (c.$1 == id) return isEn ? c.$4 : c.$3;
+    if (c.$1 == id) {
+      return pickLang(fr: c.$3, en: c.$4, es: c.$5, zh: c.$6, pt: c.$7);
+    }
   }
   return id;
 }
@@ -126,7 +147,6 @@ class RestartBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final isEn   = localeNotifier.value == 'en';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
@@ -138,9 +158,7 @@ class RestartBanner extends StatelessWidget {
         Icon(Icons.info_outline_rounded, size: 16, color: scheme.onTertiaryContainer),
         const SizedBox(width: 10),
         Expanded(child: Text(
-          isEn
-              ? 'Some features may require restarting the app to take effect.'
-              : 'Certaines fonctionnalités nécessitent un redémarrage de l\'app pour s\'appliquer.',
+          L.restartHintFeatures,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: scheme.onTertiaryContainer),
         )),
@@ -427,7 +445,6 @@ class _CardReorderSheetState extends State<CardReorderSheet> {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
     final ctrl   = ScrollController();
-    final isEn   = localeNotifier.value == 'en';
 
     return DraggableScrollableSheet(
       initialChildSize: 0.6, minChildSize: 0.4, maxChildSize: 0.9, expand: false,
@@ -438,11 +455,11 @@ class _CardReorderSheetState extends State<CardReorderSheet> {
               width: 36, height: 4, decoration: BoxDecoration(
                   color: scheme.outlineVariant, borderRadius: BorderRadius.circular(2)))),
           Padding(padding: const EdgeInsets.fromLTRB(20, 4, 16, 12), child: Row(children: [
-            Text(isEn ? 'Reorder cards' : 'Réordonner les cartes',
+            Text(L.reorderCardsTitle,
                 style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
             const Spacer(),
             FilledButton(onPressed: () => Navigator.pop(ctx, _items),
-                child: Text(isEn ? 'Save' : 'Enregistrer')),
+                child: Text(L.commonSave)),
           ])),
           Expanded(child: ReorderableListView(
             scrollController: ctrl,
@@ -454,7 +471,7 @@ class _CardReorderSheetState extends State<CardReorderSheet> {
             }),
             children: _items.map((id) {
               final card = kAllStatCards.firstWhere((c) => c.$1 == id,
-                  orElse: () => (id, '📋', id, id));
+                  orElse: () => (id, '📋', id, id, id, id, id));
               return Card(key: ValueKey(id), elevation: 0,
                 color: scheme.surfaceContainerHighest,
                 margin: const EdgeInsets.symmetric(vertical: 4),
@@ -462,7 +479,7 @@ class _CardReorderSheetState extends State<CardReorderSheet> {
                     side: BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.4))),
                 child: ListTile(
                   leading: Text(card.$2, style: const TextStyle(fontSize: 20)),
-                  title: Text(isEn ? card.$4 : card.$3,
+                  title: Text(statCardLabel(id),
                       style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
                   trailing: Icon(Icons.drag_handle_rounded, color: scheme.onSurfaceVariant),
                 ));
