@@ -1097,7 +1097,7 @@ class _DashboardPageState extends State<_DashboardPage> {
         return _DashStatCard(
           emoji:      '🎯',
           value:      _fmtFull(total),
-          label:      localeNotifier.value == 'en' ? 'Total scrobbles' : 'Total scrobbles',
+          label:      L.dashTotalScrobblesLabel,
           sub:        null,
           rawInt:     total,
           rollPrefix: '',
@@ -1133,21 +1133,21 @@ class _DashboardPageState extends State<_DashboardPage> {
         return _DashStatCard(
           emoji: '📆',
           value: regStr.isNotEmpty ? regStr : '—',
-          label: localeNotifier.value == 'en' ? 'Member since' : 'Membre depuis',
+          label: L.dashMemberSinceLabel,
           sub:   null,
         );
       case 'country':
         return _DashStatCard(
           emoji: '🌍',
           value: (country.isNotEmpty && country != 'None') ? country : '—',
-          label: localeNotifier.value == 'en' ? 'Country' : 'Pays',
+          label: L.dashCountryLabel,
           sub:   null,
         );
       case 'top_artist_week':
         return _DashStatCard(
           emoji: '🎤',
           value: topArtistWeek != null ? (topArtistWeek['name'] ?? '—').toString() : '—',
-          label: localeNotifier.value == 'en' ? 'Artist #1 (week)' : 'Artiste #1 (semaine)',
+          label: L.dashArtistWeekLabel,
           sub:   topArtistWeek != null
               ? '${_fmt(int.tryParse((topArtistWeek['playcount'] ?? '0').toString()) ?? 0)} ${L.commonPlays}'
               : null,
@@ -1156,14 +1156,14 @@ class _DashboardPageState extends State<_DashboardPage> {
         return _DashStatCard(
           emoji: '💿',
           value: topAlbumWeek != null ? (topAlbumWeek['name'] ?? '—').toString() : '—',
-          label: localeNotifier.value == 'en' ? 'Album #1 (week)' : 'Album #1 (semaine)',
+          label: L.dashAlbumWeekLabel,
           sub:   topAlbumWeek != null ? (topAlbumWeek['artist']?['name'] ?? '').toString() : null,
         );
       case 'top_track_week':
         return _DashStatCard(
           emoji: '🎵',
           value: topTrackWeek != null ? (topTrackWeek['name'] ?? '—').toString() : '—',
-          label: localeNotifier.value == 'en' ? 'Track #1 (week)' : 'Titre #1 (semaine)',
+          label: L.dashTrackWeekLabel,
           sub:   topTrackWeek != null
               ? '${_fmt(int.tryParse((topTrackWeek['playcount'] ?? '0').toString()) ?? 0)} ${L.commonPlays}'
               : null,
@@ -1173,7 +1173,7 @@ class _DashboardPageState extends State<_DashboardPage> {
         return _DashStatCard(
           emoji: '🎸', rawInt: n > 0 ? n : null,
           value: n > 0 ? _fmtFull(n) : '—',
-          label: localeNotifier.value == 'en' ? 'Unique artists' : 'Artistes uniques',
+          label: L.dashUniqueArtistsLabel,
           sub: null,
         );
       case 'track_count':
@@ -1181,7 +1181,7 @@ class _DashboardPageState extends State<_DashboardPage> {
         return _DashStatCard(
           emoji: '🎼', rawInt: n > 0 ? n : null,
           value: n > 0 ? _fmtFull(n) : '—',
-          label: localeNotifier.value == 'en' ? 'Unique tracks' : 'Titres uniques',
+          label: L.dashUniqueTracksLabel,
           sub: null,
         );
       case 'album_count':
@@ -1189,7 +1189,7 @@ class _DashboardPageState extends State<_DashboardPage> {
         return _DashStatCard(
           emoji: '💽', rawInt: n > 0 ? n : null,
           value: n > 0 ? _fmtFull(n) : '—',
-          label: localeNotifier.value == 'en' ? 'Unique albums' : 'Albums uniques',
+          label: L.dashUniqueAlbumsLabel,
           sub: null,
         );
       case 'scrobbles_week':
@@ -1197,7 +1197,7 @@ class _DashboardPageState extends State<_DashboardPage> {
         return _DashStatCard(
           emoji: '📊', rawInt: val,
           value: _thisWeekCount > 0 ? _fmtFull(_thisWeekCount) : '~${_fmt(weekly)}',
-          label: localeNotifier.value == 'en' ? 'This week' : 'Cette semaine',
+          label: L.dashThisWeekLabel,
           sub: _thisWeekCount > 0 && _lastWeekCount > 0
               ? _weekDeltaStr(_thisWeekCount, _lastWeekCount)
               : null,
@@ -1614,7 +1614,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                   delay: const Duration(milliseconds: 180),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     _SectionHeader(
-                      title: localeNotifier.value == 'en' ? 'Recent plays' : 'Écoutes récentes',
+                      title: L.dashRecentPlaysLabel,
                       icon: Icons.history_rounded,
                     ),
                     const SizedBox(height: 10),
@@ -1667,7 +1667,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                   delay: const Duration(milliseconds: 360),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     _SectionHeader(
-                      title: localeNotifier.value == 'en' ? 'Top Albums' : 'Top Albums',
+                      title: L.settingsTopAlbumsSection,
                       icon: Icons.album_rounded,
                     ),
                     const SizedBox(height: 10),
@@ -2730,7 +2730,7 @@ class _HeroStatCard extends StatelessWidget {
                 label: L.dashDaysActive,
                 color: scheme.onPrimaryContainer,
                 rawInt: days,
-                suffix: localeNotifier.value == 'en' ? ' d' : ' j',
+                suffix: ' ${L.dashDayUnitShort}',
               ),
             ],
           ),
@@ -4094,7 +4094,7 @@ class _NewsDetailSheet extends StatelessWidget {
                 onPressed: () => _openUrl(url),
                 icon:  const Icon(Icons.open_in_new_rounded, size: 18),
                 label: Text(
-                  localeNotifier.value == 'en' ? 'Open link' : 'Ouvrir le lien',
+                  L.notifDetailOpenLink,
                 ),
               ),
             ),

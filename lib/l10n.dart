@@ -539,6 +539,20 @@ abstract class AppStrings {
   String get acctSameApiKey;
   String get acctApiKeyLabel;
   String get acctAdd;
+  String get languageChangeNote;
+
+  // ── Dashboard page: extra stat cards ────────────────────────────────────
+  String get dashTotalScrobblesLabel;
+  String get dashMemberSinceLabel;
+  String get dashCountryLabel;
+  String get dashArtistWeekLabel;
+  String get dashAlbumWeekLabel;
+  String get dashTrackWeekLabel;
+  String get dashUniqueArtistsLabel;
+  String get dashUniqueTracksLabel;
+  String get dashUniqueAlbumsLabel;
+  String get dashThisWeekLabel;
+  String get dashDayUnitShort;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1053,6 +1067,18 @@ class _AppStringsFr implements AppStrings {
   @override String get acctSameApiKey           => 'Même clé API que le compte actif';
   @override String get acctApiKeyLabel          => 'Clé API';
   @override String get acctAdd                  => 'Ajouter';
+  @override String get languageChangeNote => "La langue change immédiatement dans toute l'application.";
+  @override String get dashTotalScrobblesLabel  => 'Total scrobbles';
+  @override String get dashMemberSinceLabel     => 'Membre depuis';
+  @override String get dashCountryLabel         => 'Pays';
+  @override String get dashArtistWeekLabel      => 'Artiste #1 (semaine)';
+  @override String get dashAlbumWeekLabel       => 'Album #1 (semaine)';
+  @override String get dashTrackWeekLabel       => 'Titre #1 (semaine)';
+  @override String get dashUniqueArtistsLabel   => 'Artistes uniques';
+  @override String get dashUniqueTracksLabel    => 'Titres uniques';
+  @override String get dashUniqueAlbumsLabel    => 'Albums uniques';
+  @override String get dashThisWeekLabel        => 'Cette semaine';
+  @override String get dashDayUnitShort         => 'j';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1567,6 +1593,18 @@ class _AppStringsEn implements AppStrings {
   @override String get acctSameApiKey           => 'Same API key as the active account';
   @override String get acctApiKeyLabel          => 'API key';
   @override String get acctAdd                  => 'Add';
+  @override String get languageChangeNote => 'The language changes immediately throughout the app.';
+  @override String get dashTotalScrobblesLabel  => 'Total scrobbles';
+  @override String get dashMemberSinceLabel     => 'Member since';
+  @override String get dashCountryLabel         => 'Country';
+  @override String get dashArtistWeekLabel      => 'Artist #1 (week)';
+  @override String get dashAlbumWeekLabel       => 'Album #1 (week)';
+  @override String get dashTrackWeekLabel       => 'Track #1 (week)';
+  @override String get dashUniqueArtistsLabel   => 'Unique artists';
+  @override String get dashUniqueTracksLabel    => 'Unique tracks';
+  @override String get dashUniqueAlbumsLabel    => 'Unique albums';
+  @override String get dashThisWeekLabel        => 'This week';
+  @override String get dashDayUnitShort         => 'd';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -2081,6 +2119,18 @@ class _AppStringsEs implements AppStrings {
   @override String get acctSameApiKey           => 'Misma clave API que la cuenta activa';
   @override String get acctApiKeyLabel          => 'Clave API';
   @override String get acctAdd                  => 'Añadir';
+  @override String get languageChangeNote => 'El idioma cambia de inmediato en toda la app.';
+  @override String get dashTotalScrobblesLabel  => 'Total de scrobbles';
+  @override String get dashMemberSinceLabel     => 'Miembro desde';
+  @override String get dashCountryLabel         => 'País';
+  @override String get dashArtistWeekLabel      => 'Artista #1 (semana)';
+  @override String get dashAlbumWeekLabel       => 'Álbum #1 (semana)';
+  @override String get dashTrackWeekLabel       => 'Canción #1 (semana)';
+  @override String get dashUniqueArtistsLabel   => 'Artistas únicos';
+  @override String get dashUniqueTracksLabel    => 'Canciones únicas';
+  @override String get dashUniqueAlbumsLabel    => 'Álbumes únicos';
+  @override String get dashThisWeekLabel        => 'Esta semana';
+  @override String get dashDayUnitShort         => 'd';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -2592,6 +2642,18 @@ class _AppStringsZh implements AppStrings {
   @override String get acctSameApiKey           => '与当前账号使用相同的 API 密钥';
   @override String get acctApiKeyLabel          => 'API 密钥';
   @override String get acctAdd                  => '添加';
+  @override String get languageChangeNote => '语言会立即在整个应用中生效。';
+  @override String get dashTotalScrobblesLabel  => '总 scrobble 数';
+  @override String get dashMemberSinceLabel     => '加入时间';
+  @override String get dashCountryLabel         => '国家';
+  @override String get dashArtistWeekLabel      => '第一艺术家（周）';
+  @override String get dashAlbumWeekLabel       => '第一专辑（周）';
+  @override String get dashTrackWeekLabel       => '第一歌曲（周）';
+  @override String get dashUniqueArtistsLabel   => '独立艺术家数';
+  @override String get dashUniqueTracksLabel    => '独立歌曲数';
+  @override String get dashUniqueAlbumsLabel    => '独立专辑数';
+  @override String get dashThisWeekLabel        => '本周';
+  @override String get dashDayUnitShort         => '天';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -3106,6 +3168,18 @@ class _AppStringsPt implements AppStrings {
   @override String get acctSameApiKey           => 'Mesma chave de API da conta ativa';
   @override String get acctApiKeyLabel          => 'Chave de API';
   @override String get acctAdd                  => 'Adicionar';
+  @override String get languageChangeNote => 'O idioma muda imediatamente em todo o app.';
+  @override String get dashTotalScrobblesLabel  => 'Total de scrobbles';
+  @override String get dashMemberSinceLabel     => 'Membro desde';
+  @override String get dashCountryLabel         => 'País';
+  @override String get dashArtistWeekLabel      => 'Artista #1 (semana)';
+  @override String get dashAlbumWeekLabel       => 'Álbum #1 (semana)';
+  @override String get dashTrackWeekLabel       => 'Faixa #1 (semana)';
+  @override String get dashUniqueArtistsLabel   => 'Artistas únicos';
+  @override String get dashUniqueTracksLabel    => 'Faixas únicas';
+  @override String get dashUniqueAlbumsLabel    => 'Álbuns únicos';
+  @override String get dashThisWeekLabel        => 'Esta semana';
+  @override String get dashDayUnitShort         => 'd';
 }
 
 // ══════════════════════════════════════════════════════════════════════════

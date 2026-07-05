@@ -314,11 +314,11 @@ _TasteAnalysis _analyzeTaste({
 
 String _compatibilityTierLabel(double score) {
   final pct = score * 100;
-  if (pct >= 80) return _ct('Âmes musicales sœurs',      'Musical soulmates');
-  if (pct >= 60) return _ct('Très belle compatibilité',  'Great compatibility');
-  if (pct >= 40) return _ct('Quelques points communs',   'Some common ground');
-  if (pct >= 20) return _ct('Goûts plutôt différents',   'Fairly different tastes');
-  return _ct('Univers musicaux opposés', 'Worlds apart, musically');
+  if (pct >= 80) return _ct('Âmes musicales sœurs', 'Musical soulmates', es: 'Almas gemelas musicales', zh: '音乐上的灵魂伴侣', pt: 'Almas musicais gêmeas');
+  if (pct >= 60) return _ct('Très belle compatibilité', 'Great compatibility', es: 'Muy buena compatibilidad', zh: '非常合拍', pt: 'Ótima compatibilidade');
+  if (pct >= 40) return _ct('Quelques points communs', 'Some common ground', es: 'Algunos puntos en común', zh: '有些共同点', pt: 'Alguns pontos em comum');
+  if (pct >= 20) return _ct('Goûts plutôt différents', 'Fairly different tastes', es: 'Gustos bastante diferentes', zh: '口味差异较大', pt: 'Gostos bem diferentes');
+  return _ct('Univers musicaux opposés', 'Worlds apart, musically', es: 'Universos musicales opuestos', zh: '音乐品味截然不同', pt: 'Universos musicais opostos');
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -538,7 +538,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
           _sharedArtists = selfArtists;
           _sharedTracks  = [];
           _sharedAlbums  = [];
-          _dataLabel     = _ct('C\'est votre propre profil !', 'This is your own profile!');
+          _dataLabel     = _ct('C\'est votre propre profil !', 'This is your own profile!', es: '¡Este es tu propio perfil!', zh: '这是你自己的资料！', pt: 'Este é o seu próprio perfil!');
           _loading       = false;
         });
         return;
@@ -550,10 +550,16 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
           ? _ct(
               '$uniqueArtists artistes de votre historique · top 200 de ${widget.targetUser}',
               '$uniqueArtists artists from your history · ${widget.targetUser}\'s top 200',
+              es: '$uniqueArtists artistas de tu historial · top 200 de ${widget.targetUser}',
+              zh: '来自你收听记录的 $uniqueArtists 位艺术家 · ${widget.targetUser} 的前 200 名',
+              pt: '$uniqueArtists artistas do seu histórico · top 200 de ${widget.targetUser}',
             )
           : _ct(
               'Top 200 artistes & titres (API)',
               'Top 200 artists & tracks (API)',
+              es: 'Top 200 artistas y canciones (API)',
+              zh: '前 200 名艺术家与歌曲（API）',
+              pt: 'Top 200 artistas e faixas (API)',
             );
 
       final analysis = _analyzeTaste(
@@ -594,6 +600,9 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
         _error   = _ct(
           'Impossible de calculer la compatibilité.',
           'Could not work out the compatibility.',
+          es: 'No se pudo calcular la compatibilidad.',
+          zh: '无法计算兼容度。',
+          pt: 'Não foi possível calcular a compatibilidade.',
         );
       });
     }
@@ -619,14 +628,14 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  _ct('Compatibilité musicale', 'Music compatibility'),
+                  _ct('Compatibilité musicale', 'Music compatibility', es: 'Compatibilidad musical', zh: '音乐契合度', pt: 'Compatibilidade musical'),
                   textAlign: TextAlign.center,
                   style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   _loading
-                      ? _ct('Analyse des goûts musicaux…', 'Analyzing musical taste…')
+                      ? _ct('Analyse des goûts musicaux…', 'Analyzing musical taste…', es: 'Analizando gustos musicales…', zh: '正在分析音乐品味…', pt: 'Analisando gostos musicais…')
                       : _dataLabel,
                   textAlign: TextAlign.center,
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
@@ -701,19 +710,28 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
                   if (_totalArtists > 0) _CountPill(
                     icon: Icons.mic_rounded,
                     label: _ct('$_totalArtists artiste${_totalArtists > 1 ? "s" : ""}',
-                               '$_totalArtists artist${_totalArtists > 1 ? "s" : ""}'),
+                               '$_totalArtists artist${_totalArtists > 1 ? "s" : ""}',
+                               es: '$_totalArtists artista${_totalArtists > 1 ? "s" : ""}',
+                               zh: '$_totalArtists 位艺术家',
+                               pt: '$_totalArtists artista${_totalArtists > 1 ? "s" : ""}'),
                     scheme: scheme, text: text,
                   ),
                   if (_totalTracks > 0) _CountPill(
                     icon: Icons.music_note_rounded,
                     label: _ct('$_totalTracks titre${_totalTracks > 1 ? "s" : ""}',
-                               '$_totalTracks track${_totalTracks > 1 ? "s" : ""}'),
+                               '$_totalTracks track${_totalTracks > 1 ? "s" : ""}',
+                               es: '$_totalTracks canción${_totalTracks > 1 ? "es" : ""}',
+                               zh: '$_totalTracks 首歌曲',
+                               pt: '$_totalTracks faixa${_totalTracks > 1 ? "s" : ""}'),
                     scheme: scheme, text: text,
                   ),
                   if (_totalAlbums > 0) _CountPill(
                     icon: Icons.album_rounded,
                     label: _ct('$_totalAlbums album${_totalAlbums > 1 ? "s" : ""}',
-                               '$_totalAlbums album${_totalAlbums > 1 ? "s" : ""}'),
+                               '$_totalAlbums album${_totalAlbums > 1 ? "s" : ""}',
+                               es: '$_totalAlbums álbum${_totalAlbums > 1 ? "es" : ""}',
+                               zh: '$_totalAlbums 张专辑',
+                               pt: '$_totalAlbums álbum${_totalAlbums > 1 ? "ns" : ""}'),
                     scheme: scheme, text: text,
                   ),
                 ],
@@ -772,7 +790,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
           _FadeSlideIn(
             delay: const Duration(milliseconds: 200),
             child: _ExpandableSection(
-              label: _ct('Titres en commun', 'Shared tracks'),
+              label: _ct('Titres en commun', 'Shared tracks', es: 'Canciones en común', zh: '共同歌曲', pt: 'Faixas em comum'),
               icon: Icons.music_note_rounded,
               totalCount: _totalTracks,
               matches: _sharedTracks,
@@ -788,12 +806,12 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
         _FadeSlideIn(
           delay: const Duration(milliseconds: 240),
           child: _ExpandableSection(
-            label: _ct('Artistes en commun', 'Shared artists'),
+            label: _ct('Artistes en commun', 'Shared artists', es: 'Artistas en común', zh: '共同艺术家', pt: 'Artistas em comum'),
             icon: Icons.mic_rounded,
             totalCount: _totalArtists,
             matches: _sharedArtists,
             onItemTap: (m) => _openItemDetail(context, m),
-            emptyText: _ct('Aucun artiste en commun trouvé.', 'No shared artists found.'),
+            emptyText: _ct('Aucun artiste en commun trouvé.', 'No shared artists found.', es: 'No se encontraron artistas en común.', zh: '未找到共同的艺术家。', pt: 'Nenhum artista em comum encontrado.'),
             scheme: scheme,
             text: text,
           ),
@@ -805,7 +823,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
           _FadeSlideIn(
             delay: const Duration(milliseconds: 280),
             child: _ExpandableSection(
-              label: _ct('Albums en commun', 'Shared albums'),
+              label: _ct('Albums en commun', 'Shared albums', es: 'Álbumes en común', zh: '共同专辑', pt: 'Álbuns em comum'),
               icon: Icons.album_rounded,
               totalCount: _totalAlbums,
               matches: _sharedAlbums,
@@ -1197,20 +1215,32 @@ class _ItemCompareSheet extends StatelessWidget {
     final my = match.myPlays, their = match.theirPlays;
     if (my == 0 || their == 0) {
       return _ct("Décompte d'écoutes indisponible pour l'un des deux.",
-                  'Play count unavailable for one of you.');
+                  'Play count unavailable for one of you.',
+                  es: 'Recuento de reproducciones no disponible para uno de los dos.',
+                  zh: '其中一方的播放次数不可用。',
+                  pt: 'Contagem de reproduções indisponível para um dos dois.');
     }
     if (my / their > 1.3) {
       final x = (my / their).toStringAsFixed(1);
       return _ct('Tu écoutes ça ${x}x plus que $theirUsername.',
-                  'You listen to this ${x}x more than $theirUsername.');
+                  'You listen to this ${x}x more than $theirUsername.',
+                  es: 'Escuchas esto ${x}x más que $theirUsername.',
+                  zh: '你听这个的次数是 $theirUsername 的 ${x} 倍。',
+                  pt: 'Você escuta isso ${x}x mais que $theirUsername.');
     }
     if (their / my > 1.3) {
       final x = (their / my).toStringAsFixed(1);
       return _ct('$theirUsername écoute ça ${x}x plus que toi.',
-                  '$theirUsername listens to this ${x}x more than you.');
+                  '$theirUsername listens to this ${x}x more than you.',
+                  es: '$theirUsername escucha esto ${x}x más que tú.',
+                  zh: '$theirUsername 听这个的次数是你的 ${x} 倍。',
+                  pt: '$theirUsername escuta isso ${x}x mais que você.');
     }
     return _ct("Vous l'écoutez à peu près autant tous les deux.",
-                'You both listen to this about equally.');
+                'You both listen to this about equally.',
+                es: 'Ambos escuchan esto casi por igual.',
+                zh: '你们两人听这个的频率差不多。',
+                pt: 'Vocês dois escutam isso quase igualmente.');
   }
 }
 
@@ -1250,7 +1280,7 @@ class _CompareBar extends StatelessWidget {
               ),
             ),
             Text(
-              _ct('$plays écoutes', '$plays plays'),
+              _ct('$plays écoutes', '$plays plays', es: '$plays reproducciones', zh: '$plays 次播放', pt: '$plays reproduções'),
               style: text.labelMedium?.copyWith(
                   fontWeight: FontWeight.w700, color: scheme.onSurfaceVariant),
             ),
@@ -1403,7 +1433,7 @@ class _CompatibilityRing extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  _ct('compatibilité', 'compatibility'),
+                  _ct('compatibilité', 'compatibility', es: 'compatibilidad', zh: '契合度', pt: 'compatibilidade'),
                   style: text.labelSmall?.copyWith(
                       color: scheme.onSurfaceVariant, letterSpacing: 0.6),
                 ),
@@ -1455,8 +1485,10 @@ class _TopMatchCard extends StatelessWidget {
               children: [
                 Text(
                   isTrack
-                      ? _ct('VOUS ADOREZ TOUS LES DEUX', 'YOU BOTH LOVE')
-                      : _ct('ARTISTE PRÉFÉRÉ EN COMMUN', 'SHARED TOP ARTIST'),
+                      ? _ct('VOUS ADOREZ TOUS LES DEUX', 'YOU BOTH LOVE',
+                            es: 'A AMBOS LES ENCANTA', zh: '你们都超爱', pt: 'VOCÊS DOIS AMAM')
+                      : _ct('ARTISTE PRÉFÉRÉ EN COMMUN', 'SHARED TOP ARTIST',
+                            es: 'ARTISTA FAVORITO EN COMÚN', zh: '共同的最爱艺术家', pt: 'ARTISTA FAVORITO EM COMUM'),
                   style: text.labelSmall?.copyWith(
                     color:         scheme.onPrimaryContainer.withValues(alpha: 0.65),
                     fontWeight:    FontWeight.w700,

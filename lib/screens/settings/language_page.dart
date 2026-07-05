@@ -40,7 +40,6 @@ class _LanguagePageState extends State<LanguagePage> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final isEn   = _locale == 'en';
 
     return Scaffold(
       appBar: AppBar(
@@ -103,9 +102,7 @@ class _LanguagePageState extends State<LanguagePage> {
             Icon(Icons.translate_rounded, size: 16, color: scheme.onTertiaryContainer),
             const SizedBox(width: 10),
             Expanded(child: Text(
-              isEn
-                  ? 'The language changes immediately throughout the app.'
-                  : 'La langue change immédiatement dans toute l\'application.',
+              L.languageChangeNote,
               style: text.bodySmall?.copyWith(color: scheme.onTertiaryContainer),
             )),
           ]),

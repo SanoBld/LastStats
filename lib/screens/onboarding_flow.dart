@@ -196,7 +196,6 @@ class _AppearanceStepState extends State<_AppearanceStep> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final isEn   = localeNotifier.value == 'en';
 
     return ValueListenableBuilder<String>(
       valueListenable: themeStyleNotifier,
