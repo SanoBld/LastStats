@@ -263,19 +263,30 @@ class _SettingsPageState extends State<_SettingsPage> {
                     border: Border.all(color: scheme.primary.withValues(alpha: 0.2)),
                   ),
                   child: Row(children: [
-                    CircleAvatar(
-                      radius: 26,
-                      backgroundColor: scheme.primary,
-                      backgroundImage: _avatarUrl != null
-                          ? NetworkImage(_avatarUrl!)
-                          : null,
-                      child: _avatarUrl == null
-                          ? Text(initial, style: TextStyle(
-                              fontSize: 20,
-                              color: scheme.onPrimary,
-                              fontWeight: FontWeight.w700))
-                          : null,
-                    ),
+                    _avatarUrl != null
+                        ? ClipOval(
+                            child: SizedBox(
+                              width: 52, height: 52,
+                              child: ImageService.widgetImage(
+                                url: _avatarUrl!,
+                                fit: BoxFit.cover,
+                                placeholder: CircleAvatar(
+                                  radius: 26,
+                                  backgroundColor: scheme.primary,
+                                  child: Text(initial, style: TextStyle(
+                                      fontSize: 20, color: scheme.onPrimary,
+                                      fontWeight: FontWeight.w700)),
+                                ),
+                              ),
+                            ),
+                          )
+                        : CircleAvatar(
+                            radius: 26,
+                            backgroundColor: scheme.primary,
+                            child: Text(initial, style: TextStyle(
+                                fontSize: 20, color: scheme.onPrimary,
+                                fontWeight: FontWeight.w700)),
+                          ),
                     const SizedBox(width: 14),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text(widget.username,
