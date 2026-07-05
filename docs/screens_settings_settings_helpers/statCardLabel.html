@@ -68,9 +68,10 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">String statCardLabel(String id) {
-  final isEn = localeNotifier.value == &#39;en&#39;;
   for (final c in kAllStatCards) {
-    if (c.$1 == id) return isEn ? c.$4 : c.$3;
+    if (c.$1 == id) {
+      return pickLang(fr: c.$3, en: c.$4, es: c.$5, zh: c.$6, pt: c.$7);
+    }
   }
   return id;
 }</code></pre>

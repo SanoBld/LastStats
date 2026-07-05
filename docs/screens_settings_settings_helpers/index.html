@@ -116,12 +116,13 @@
       <dl class="properties">
           <dt id="kAllStatCards" class="constant">
     <span class="name "><a href="../screens_settings_settings_helpers/kAllStatCards-constant.html">kAllStatCards</a></span>
-  <span class="signature">&#8594; const <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter">(<span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span></span>)</span>&gt;</span></span>
+  <span class="signature">&#8594; const <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter">(<span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span></span>)</span>&gt;</span></span>
   
 
 </dt>
 <dd>
   Cartes de statistiques — dupliqué ici pour être accessible hors du part-of.
+Tuple: (id, emoji, fr, en, es, zh, pt)
   
 
 </dd>
@@ -205,6 +206,21 @@
 </dt>
 <dd>
   
+  
+
+</dd>
+
+          <dt id="pickLang" class="callable">
+  <span class="name"><a href="../screens_settings_settings_helpers/pickLang.html">pickLang</a></span><span class="signature">(<wbr>{<span class="parameter" id="pickLang-param-fr"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">fr</span>, </span><span class="parameter" id="pickLang-param-en"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">en</span>, </span><span class="parameter" id="pickLang-param-es"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">es</span>, </span><span class="parameter" id="pickLang-param-zh"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">zh</span>, </span><span class="parameter" id="pickLang-param-pt"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">pt</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Picks the right label for the current <a href="../app_state/localeNotifier.html">localeNotifier</a> value, falling
+back to French. Central helper so any data table (stat cards, accent
+names…) can support all 5 languages without per-call ternaries.
   
 
 </dd>

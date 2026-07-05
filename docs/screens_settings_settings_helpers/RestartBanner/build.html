@@ -110,7 +110,6 @@ and</li>
   <pre class="language-dart"><code class="language-dart">@override
 Widget build(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
-  final isEn   = localeNotifier.value == &#39;en&#39;;
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
     decoration: BoxDecoration(
@@ -122,9 +121,7 @@ Widget build(BuildContext context) {
       Icon(Icons.info_outline_rounded, size: 16, color: scheme.onTertiaryContainer),
       const SizedBox(width: 10),
       Expanded(child: Text(
-        isEn
-            ? &#39;Some features may require restarting the app to take effect.&#39;
-            : &#39;Certaines fonctionnalités nécessitent un redémarrage de l\&#39;app pour s\&#39;appliquer.&#39;,
+        L.restartHintFeatures,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: scheme.onTertiaryContainer),
       )),

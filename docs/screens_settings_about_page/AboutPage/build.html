@@ -111,7 +111,6 @@ and</li>
 Widget build(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
   final text   = Theme.of(context).textTheme;
-  final isEn   = localeNotifier.value == &#39;en&#39;;
 
   return Scaffold(
     appBar: AppBar(
@@ -138,7 +137,7 @@ Widget build(BuildContext context) {
                 : &#39;v${UpdateService.currentVersion}&#39;,
             style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
         const SizedBox(height: 4),
-        Text(isEn ? &#39;Your Last.fm stats companion&#39; : &#39;Votre compagnon de stats Last.fm&#39;,
+        Text(L.aboutTagline,
             style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
         const SizedBox(height: 24),
       ])),
@@ -163,7 +162,7 @@ Widget build(BuildContext context) {
       ),
 
       &#47;&#47; ── App info ──────────────────────────────────────────────────────
-      SettingsSection(label: isEn ? &#39;App info&#39; : &#39;Infos&#39;, children: [
+      SettingsSection(label: L.aboutAppInfo, children: [
         ListTile(
           leading: const Icon(Icons.info_outline_rounded),
           title: Text(L.settingsVersion,
@@ -187,13 +186,11 @@ Widget build(BuildContext context) {
         ListTile(
           leading: const Icon(Icons.download_rounded),
           title: Text(
-            isEn ? &#39;Scrobble downloader&#39; : &#39;Téléchargeur de scrobbles&#39;,
+            L.aboutScrobbleDownloader,
             style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           subtitle: Text(
-            isEn
-                ? &#39;Export all your scrobbles to a file&#39;
-                : &#39;Exporter tous vos scrobbles dans un fichier&#39;,
+            L.aboutScrobbleDownloaderSub,
             style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
           ),
           trailing: const Icon(Icons.open_in_new_rounded, size: 16),
@@ -229,7 +226,7 @@ Widget build(BuildContext context) {
       const SizedBox(height: 16),
 
       &#47;&#47; ── Powered by ────────────────────────────────────────────────────
-      SettingsSection(label: isEn ? &#39;Powered by&#39; : &#39;Propulsé par&#39;, children: [
+      SettingsSection(label: L.aboutPoweredBy, children: [
         _PoweredByTile(
           icon: Icons.music_note_rounded,
           label: &#39;Last.fm API&#39;,
@@ -293,9 +290,7 @@ Widget build(BuildContext context) {
           Icon(Icons.image_not_supported_outlined, size: 18, color: scheme.secondary),
           const SizedBox(width: 10),
           Expanded(child: Text(
-            isEn
-                ? &#39;Artist, album and track images are fetched automatically from these sources and may sometimes be incorrect or not match the actual content.&#39;
-                : &#39;Les images des artistes, albums et titres sont récupérées automatiquement depuis ces sources et peuvent parfois être incorrectes ou ne pas correspondre au contenu réel.&#39;,
+            L.aboutImageDisclaimer,
             style: text.bodySmall?.copyWith(color: scheme.onSecondaryContainer),
           )),
         ]),
@@ -304,9 +299,7 @@ Widget build(BuildContext context) {
       const SizedBox(height: 20),
 
       Center(child: Text(
-        isEn
-            ? &#39;Made with ❤️ · Not affiliated with Last.fm &#47; CBS&#39;
-            : &#39;Fait avec ❤️ · Non affilié à Last.fm &#47; CBS&#39;,
+        L.aboutFooter,
         style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
         textAlign: TextAlign.center,
       )),
