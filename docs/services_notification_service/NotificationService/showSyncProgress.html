@@ -78,8 +78,12 @@ indeterminate bar (e.g. before the total is known yet).</p>
   required int progress,
   required int max,
   String subtitle = &#39;&#39;,
-}) {
-  final indeterminate = max &lt;= 0;
+}) async {
+  final prefs = await SharedPreferences.getInstance();
+  if (!(prefs.getBool(&#39;ls_notif_sync_enabled&#39;) ?? true)) return;
+  final detail = prefs.getBool(&#39;ls_notif_sync_progress_detail&#39;) ?? true;
+
+  final indeterminate = max &lt;= 0 || !detail;
   const title = &#39;🔄 Syncing scrobbles…&#39;;
   return _plugin.show(
     _idSync,

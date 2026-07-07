@@ -158,6 +158,8 @@ Widget build(BuildContext context) {
                               theme:     nLightWithNav,
                               darkTheme: nDarkWithNav,
                               themeMode: mode,
+                              builder: (context, child) =&gt;
+                                  DesktopTitleBarShell(child: child!),
                               home: (username.isNotEmpty &amp;&amp; apiKey.isNotEmpty)
                                   ? HomeScreen(username: username, apiKey: apiKey,
                                       startupTab: startupTab)
@@ -243,6 +245,8 @@ Widget build(BuildContext context) {
                                     theme:     lTheme,
                                     darkTheme: dTheme,
                                     themeMode: mode,
+                                    builder: (context, child) =&gt;
+                                        DesktopTitleBarShell(child: child!),
                                     home: (username.isNotEmpty &amp;&amp; apiKey.isNotEmpty)
                                         ? HomeScreen(username: username, apiKey: apiKey,
                                             startupTab: startupTab)

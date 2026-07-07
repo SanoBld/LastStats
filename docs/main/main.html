@@ -71,6 +71,22 @@
 
   FlutterError.onError = (details) =&gt; debugPrint(&#39;Flutter error: ${details.exception}&#39;);
 
+  &#47;&#47; ── Custom frameless window (Windows &#47; Linux desktop) ────────────────────
+  &#47;&#47; macOS keeps its native traffic-light buttons; only Windows and Linux get
+  &#47;&#47; the fully custom, theme-matched title bar (see widgets&#47;custom_title_bar.dart).
+  if (!kIsWeb &amp;&amp; (Platform.isWindows || Platform.isLinux)) {
+    await windowManager.ensureInitialized();
+    const windowOptions = WindowOptions(
+      minimumSize: Size(420, 500),
+      backgroundColor: Colors.transparent,
+      titleBarStyle: TitleBarStyle.hidden,
+    );
+    await windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
+  }
+
   final prefs      = await SharedPreferences.getInstance();
   final username   = prefs.getString(&#39;ls_username&#39;) ?? &#39;&#39;;
   final apiKey     = prefs.getString(&#39;ls_apikey&#39;)   ?? &#39;&#39;;

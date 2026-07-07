@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the showSyncDone method from the NotificationService class, for the Dart programming language.">
-  <title>showSyncDone method - NotificationService class - notification_service library - Dart API</title>
+  <meta name="description" content="API docs for the DesktopTitleBarShell.new constructor from Class DesktopTitleBarShell from the custom_title_bar library, for the Dart programming language.">
+  <title>DesktopTitleBarShell.new constructor - DesktopTitleBarShell - custom_title_bar library - Dart API</title>
 
 
   
@@ -25,11 +25,11 @@
   <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">laststats_mobile</a></li>
-    <li><a href="../../services_notification_service/">services&#47;notification_service.dart</a></li>
-    <li><a href="../../services_notification_service/NotificationService-class.html">NotificationService</a></li>
-    <li class="self-crumb">showSyncDone static method</li>
+    <li><a href="../../widgets_custom_title_bar/">widgets&#47;custom_title_bar.dart</a></li>
+    <li><a href="../../widgets_custom_title_bar/DesktopTitleBarShell-class.html">DesktopTitleBarShell</a></li>
+    <li class="self-crumb">DesktopTitleBarShell.new const constructor</li>
   </ol>
-  <div class="self-name">showSyncDone</div>
+  <div class="self-name">DesktopTitleBarShell.new</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -43,58 +43,28 @@
   </button>
 </header>
 <main>
-<div
-    id="dartdoc-main-content"
-    class="main-content"
-    data-above-sidebar="services_notification_service&#47;NotificationService-class-sidebar.html"
-    data-below-sidebar="">
-    <div>
-<h1><span class="kind-method">showSyncDone</span> static method 
+  <div
+      id="dartdoc-main-content"
+      class="main-content"
+      data-above-sidebar="widgets_custom_title_bar&#47;DesktopTitleBarShell-class-sidebar.html"
+      data-below-sidebar="">
+      <div>
+<h1><span class="kind-constructor">DesktopTitleBarShell</span> constructor 
 </h1></div>
 
     <section class="multi-line-signature">
-      
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
-<span class="name ">showSyncDone</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="showSyncDone-param-newCount"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">newCount</span></span></li>
-</ol>)
-
-      
-
+      const
+      <span class="name ">DesktopTitleBarShell</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span></li>
+<li><span class="parameter" id="param-child"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span> <span class="parameter-name">child</span>, </span></li>
+</ol>})
     </section>
     
-<section class="desc markdown">
-  <p>Optional short confirmation once a full sync finishes with new data.</p>
-</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; showSyncDone(int newCount) async {
-  if (newCount &lt;= 0) return cancelSyncProgress();
-  final prefs = await SharedPreferences.getInstance();
-  if (!(prefs.getBool(&#39;ls_notif_sync_enabled&#39;) ?? true)) {
-    return cancelSyncProgress();
-  }
-  const title = &#39;✅ Scrobbles synced&#39;;
-  final body  = &#39;$newCount new scrobble(s) added.&#39;;
-  return _plugin.show(
-    _idSync,
-    title,
-    body,
-    NotificationDetails(
-      android: AndroidNotificationDetails(
-        _chSyncId, _chSyncName,
-        icon:    &#39;@mipmap&#47;ic_launcher&#39;,
-        color:   _kLastFmRed,
-        subText: &#39;LastStats&#39;,
-        autoCancel: true,
-        ongoing:    false,
-      ),
-    ),
-    payload: _payload(type: &#39;sync&#39;, title: title, body: body),
-  );
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">const DesktopTitleBarShell({super.key, required this.child});</code></pre>
 </section>
 
 
@@ -108,16 +78,16 @@
 </header>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">laststats_mobile</a></li>
-    <li><a href="../../services_notification_service/">notification_service</a></li>
-    <li><a href="../../services_notification_service/NotificationService-class.html">NotificationService</a></li>
-    <li class="self-crumb">showSyncDone static method</li>
+    <li><a href="../../widgets_custom_title_bar/">custom_title_bar</a></li>
+    <li><a href="../../widgets_custom_title_bar/DesktopTitleBarShell-class.html">DesktopTitleBarShell</a></li>
+    <li class="self-crumb">DesktopTitleBarShell.new const constructor</li>
 </ol>
 
-    <h5>NotificationService class</h5>
+    <h5>DesktopTitleBarShell class</h5>
     <div id="dartdoc-sidebar-left-content"></div>
-  </div><!--/.sidebar-offcanvas-->
+  </div><!--/.sidebar-offcanvas-left-->
   <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
-</div><!--/.sidebar-offcanvas-->
+  </div><!--/.sidebar-offcanvas-->
 </main>
 <footer>
   <span class="no-break">
