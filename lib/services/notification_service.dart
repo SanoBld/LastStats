@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../screens/notification_detail_page.dart';
 
@@ -393,8 +394,12 @@ class NotificationService {
     required int progress,
     required int max,
     String subtitle = '',
-  }) {
-    final indeterminate = max <= 0;
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!(prefs.getBool('ls_notif_sync_enabled') ?? true)) return;
+    final detail = prefs.getBool('ls_notif_sync_progress_detail') ?? true;
+
+    final indeterminate = max <= 0 || !detail;
     const title = '🔄 Syncing scrobbles…';
     return _plugin.show(
       _idSync,
@@ -424,8 +429,12 @@ class NotificationService {
   static Future<void> cancelSyncProgress() => _plugin.cancel(_idSync);
 
   /// Optional short confirmation once a full sync finishes with new data.
-  static Future<void> showSyncDone(int newCount) {
+  static Future<void> showSyncDone(int newCount) async {
     if (newCount <= 0) return cancelSyncProgress();
+    final prefs = await SharedPreferences.getInstance();
+    if (!(prefs.getBool('ls_notif_sync_enabled') ?? true)) {
+      return cancelSyncProgress();
+    }
     const title = '✅ Scrobbles synced';
     final body  = '$newCount new scrobble(s) added.';
     return _plugin.show(

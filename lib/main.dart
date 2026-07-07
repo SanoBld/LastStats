@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:window_manager/window_manager.dart';
 import 'app_state.dart';
 import 'nothing_theme.dart';
 import 'screens/setup_screen.dart';
@@ -17,6 +18,7 @@ import 'services/notification_service.dart';
 import 'services/notification_worker.dart';
 import 'services/storage_manager.dart';
 import 'services/update_startup.dart';
+import 'widgets/custom_title_bar.dart';
 
 // navigatorKey now lives in notification_service.dart so the notification
 // tap handler can push screens without importing main.dart (would be circular).
@@ -25,6 +27,22 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   FlutterError.onError = (details) => debugPrint('Flutter error: ${details.exception}');
+
+  // ── Custom frameless window (Windows / Linux desktop) ────────────────────
+  // macOS keeps its native traffic-light buttons; only Windows and Linux get
+  // the fully custom, theme-matched title bar (see widgets/custom_title_bar.dart).
+  if (!kIsWeb && (Platform.isWindows || Platform.isLinux)) {
+    await windowManager.ensureInitialized();
+    const windowOptions = WindowOptions(
+      minimumSize: Size(420, 500),
+      backgroundColor: Colors.transparent,
+      titleBarStyle: TitleBarStyle.hidden,
+    );
+    await windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
+  }
 
   final prefs      = await SharedPreferences.getInstance();
   final username   = prefs.getString('ls_username') ?? '';
@@ -159,6 +177,8 @@ class LastStatsApp extends StatelessWidget {
                                 theme:     nLightWithNav,
                                 darkTheme: nDarkWithNav,
                                 themeMode: mode,
+                                builder: (context, child) =>
+                                    DesktopTitleBarShell(child: child!),
                                 home: (username.isNotEmpty && apiKey.isNotEmpty)
                                     ? HomeScreen(username: username, apiKey: apiKey,
                                         startupTab: startupTab)
@@ -244,6 +264,8 @@ class LastStatsApp extends StatelessWidget {
                                       theme:     lTheme,
                                       darkTheme: dTheme,
                                       themeMode: mode,
+                                      builder: (context, child) =>
+                                          DesktopTitleBarShell(child: child!),
                                       home: (username.isNotEmpty && apiKey.isNotEmpty)
                                           ? HomeScreen(username: username, apiKey: apiKey,
                                               startupTab: startupTab)

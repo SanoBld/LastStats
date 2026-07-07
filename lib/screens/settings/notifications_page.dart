@@ -20,6 +20,8 @@ const _kWeeklyHour        = 'ls_notif_weekly_hour';
 const _kWeeklyMin         = 'ls_notif_weekly_min';
 const _kNewsEnabled       = 'ls_notif_news_enabled';
 const _kShowNewsBadge     = 'ls_show_news_badge';
+const _kSyncNotifEnabled  = 'ls_notif_sync_enabled';
+const _kSyncNotifDetail   = 'ls_notif_sync_progress_detail';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -55,6 +57,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
   // News (actualités) push notifications + home badge visibility
   bool _newsOn      = false;
   bool _showBadge   = true;
+
+  // Background scrobble sync notifications
+  bool _syncNotifOn     = true;
+  bool _syncNotifDetail = true;
 
   // Test-notification feedback
   bool _testSent = false;
@@ -97,6 +103,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
       _newsOn    = prefs.getBool(_kNewsEnabled)   ?? false;
       _showBadge = prefs.getBool(_kShowNewsBadge) ?? true;
 
+      _syncNotifOn     = prefs.getBool(_kSyncNotifEnabled) ?? true;
+      _syncNotifDetail = prefs.getBool(_kSyncNotifDetail)  ?? true;
+
       _intervalCtrl.text = _milestoneInterval.toString();
     });
   }
@@ -115,8 +124,20 @@ class _NotificationsPageState extends State<NotificationsPage> {
     await prefs.setInt(_kWeeklyMin,          _weeklyMin);
     await prefs.setBool(_kNewsEnabled,       _newsOn);
     notifNewsEnabledNotifier.value = _newsOn;
+    await prefs.setBool(_kSyncNotifEnabled, _syncNotifOn);
+    await prefs.setBool(_kSyncNotifDetail,  _syncNotifDetail);
     // Re-register WorkManager tasks to reflect new settings
     await NotificationWorker.scheduleAll();
+  }
+
+  void _setSyncNotif(bool v) {
+    setState(() => _syncNotifOn = v);
+    _save();
+  }
+
+  void _setSyncDetail(bool v) {
+    setState(() => _syncNotifDetail = v);
+    _save();
   }
 
   // ── Badge visibility (not a push notification, just a display toggle) ────
@@ -341,6 +362,55 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         )
                       : null,
                 ),
+                const SizedBox(height: 28),
+
+                // ── Section: Scrobble sync ──────────────────────────────────
+                _SectionLabel(L.notifSyncSection, scheme),
+                const SizedBox(height: 10),
+
+                _NotifCard(
+                  scheme:   scheme,
+                  icon:     Icons.sync_rounded,
+                  iconBg:   const Color(0xFF059669).withValues(alpha: 0.14),
+                  iconFg:   const Color(0xFF059669),
+                  title:    L.notifSyncTitle,
+                  subtitle: L.notifSyncSubtitle,
+                  enabled:  _syncNotifOn,
+                  onToggle: _hasPermission ? _setSyncNotif : null,
+                ),
+                if (_syncNotifOn) ...[
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: scheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                          color: scheme.outlineVariant.withValues(alpha: 0.4)),
+                    ),
+                    child: Row(children: [
+                      Container(
+                        width: 42, height: 42,
+                        decoration: BoxDecoration(
+                          color: scheme.surfaceContainerLow,
+                          borderRadius: BorderRadius.circular(11),
+                        ),
+                        child: Icon(Icons.donut_large_rounded,
+                            color: scheme.onSurfaceVariant, size: 22),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text(L.notifSyncDetailTitle,
+                              style: const TextStyle(fontWeight: FontWeight.w700)),
+                          Text(L.notifSyncDetailSubtitle,
+                              style: TextStyle(fontSize: 13, color: scheme.onSurfaceVariant)),
+                        ]),
+                      ),
+                      Switch(value: _syncNotifDetail, onChanged: _setSyncDetail),
+                    ]),
+                  ),
+                ],
                 const SizedBox(height: 28),
 
                 // ── Section: News (actualités) ─────────────────────────────
