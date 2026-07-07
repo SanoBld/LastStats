@@ -70,7 +70,9 @@ class _CustomTitleBarState extends State<_CustomTitleBar> with WindowListener {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return Container(
+    return Material(
+      type: MaterialType.transparency,
+      child: Container(
       height: 36,
       color: scheme.surfaceContainer,
       child: Row(children: [
@@ -114,7 +116,7 @@ class _CustomTitleBarState extends State<_CustomTitleBar> with WindowListener {
           isClose: true,
         ),
       ]),
-    );
+    ));
   }
 }
 

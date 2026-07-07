@@ -15,6 +15,8 @@ class StartupPage extends StatefulWidget {
 
 class _StartupPageState extends State<StartupPage> {
   int _startupTab = 0;
+  String _platform = 'lastfm';
+  bool _showAll = false;
 
   @override
   void initState() {
@@ -31,7 +33,25 @@ class _StartupPageState extends State<StartupPage> {
   Future<void> _load() async {
     final p = await SharedPreferences.getInstance();
     if (!mounted) return;
-    setState(() => _startupTab = p.getInt('ls_startup_tab') ?? 0);
+    setState(() {
+      _startupTab = p.getInt('ls_startup_tab') ?? 0;
+      _platform   = p.getString('ls_music_platform') ?? 'lastfm';
+      _showAll    = p.getBool('ls_show_all_platform_links') ?? false;
+    });
+  }
+
+  Future<void> _setPlatform(String v) async {
+    final p = await SharedPreferences.getInstance();
+    await p.setString('ls_music_platform', v);
+    musicPlatformNotifier.value = v;
+    setState(() => _platform = v);
+  }
+
+  Future<void> _setShowAll(bool v) async {
+    final p = await SharedPreferences.getInstance();
+    await p.setBool('ls_show_all_platform_links', v);
+    showAllPlatformLinksNotifier.value = v;
+    setState(() => _showAll = v);
   }
 
   @override
@@ -105,6 +125,64 @@ class _StartupPageState extends State<StartupPage> {
                   ),
                 );
               }),
+            ],
+          )),
+        ]),
+
+        const SizedBox(height: 16),
+
+        SettingsSection(label: L.settingsMusicPlatform, children: [
+          Padding(padding: const EdgeInsets.fromLTRB(16, 14, 16, 14), child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Icon(Icons.headphones_rounded, size: 18, color: scheme.primary),
+                const SizedBox(width: 8),
+                Text(L.settingsMusicPlatform,
+                    style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+              ]),
+              const SizedBox(height: 6),
+              Text(L.settingsMusicPlatformSub,
+                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              const SizedBox(height: 14),
+              ...[
+                (value: 'lastfm',  icon: Icons.bar_chart_rounded,         label: L.platformLastfm),
+                (value: 'spotify', icon: Icons.spatial_audio_off_rounded, label: L.platformSpotify),
+                (value: 'ytmusic', icon: Icons.music_video_rounded,       label: L.platformYtMusic),
+                (value: 'other',   icon: Icons.apps_rounded,              label: L.platformOther),
+              ].map((o) {
+                final sel = _platform == o.value;
+                return Card(
+                  elevation: 0,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  color: sel ? scheme.primaryContainer : scheme.surface,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(
+                      color: sel ? scheme.primary.withValues(alpha: 0.6)
+                                 : scheme.outlineVariant.withValues(alpha: 0.4),
+                      width: sel ? 1.5 : 1,
+                    ),
+                  ),
+                  child: ListTile(
+                    leading: Icon(o.icon, color: sel ? scheme.onPrimaryContainer : scheme.onSurfaceVariant),
+                    title: Text(o.label, style: TextStyle(
+                        fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
+                        color: sel ? scheme.onPrimaryContainer : scheme.onSurface)),
+                    trailing: sel ? Icon(Icons.check_rounded, color: scheme.onPrimaryContainer) : null,
+                    onTap: () => _setPlatform(o.value),
+                  ),
+                );
+              }),
+              const SizedBox(height: 4),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(L.settingsShowAllPlatformLinks,
+                    style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                subtitle: Text(L.settingsShowAllPlatformLinksSub,
+                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                value: _showAll,
+                onChanged: _setShowAll,
+              ),
             ],
           )),
         ]),

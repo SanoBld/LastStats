@@ -734,7 +734,18 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       (label: 'Spotify',  color: const Color(0xFF1DB954), icon: Icons.spatial_audio_off_rounded,  url: 'https://open.spotify.com/search/$encoded'),
       (label: 'YT Music', color: const Color(0xFFFF0033), icon: Icons.music_video_rounded,        url: 'https://music.youtube.com/search?q=$encoded'),
       (label: 'Web',      color: Colors.white.withValues(alpha: 0.85), icon: Icons.language_rounded, url: 'https://www.google.com/search?q=${Uri.encodeComponent('$q music')}'),
-    ];
+    ].where((b) {
+      // Filters which pills show up, based on the platform chosen at
+      // onboarding (or in Startup settings). Last.fm and Web always show —
+      // they're the app's own source of truth and a universal fallback.
+      if (showAllPlatformLinksNotifier.value) return true;
+      switch (musicPlatformNotifier.value) {
+        case 'spotify': return b.label != 'YT Music';
+        case 'ytmusic': return b.label != 'Spotify';
+        case 'other':   return true;
+        default:        return b.label != 'Spotify' && b.label != 'YT Music'; // lastfm
+      }
+    }).toList();
 
     Widget chip(({String label, Color color, IconData icon, String url}) b) => Padding(
       padding: const EdgeInsets.only(right: 8, bottom: 4),

@@ -22,7 +22,7 @@ class OnboardingFlow extends StatefulWidget {
 class _OnboardingFlowState extends State<OnboardingFlow> {
   final _pageCtrl = PageController();
   int _page = 0;
-  static const _pages = 6;
+  static const _pages = 7;
 
   void _goTo(int i) {
     setState(() => _page = i);
@@ -81,7 +81,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               onPageChanged: (i) => setState(() => _page = i),
               children: const [
                 _AppearanceStep(), _NotificationsStep(), _DashboardStep(),
-                _StartupStep(), _UpdatesStep(), _FavoritesStep(),
+                _StartupStep(), _MusicPlatformStep(), _UpdatesStep(), _FavoritesStep(),
               ],
             ),
           ),
@@ -588,6 +588,65 @@ class _StartupStepState extends State<_StartupStep> {
             title: Text(e.value.$2, style: TextStyle(fontWeight: sel ? FontWeight.w700 : FontWeight.w500)),
             trailing: sel ? Icon(Icons.check_rounded, color: scheme.onPrimaryContainer) : null,
             onTap: () => _set(e.key),
+          ),
+        );
+      }).toList()),
+    );
+  }
+}
+
+// ── Step: Music platform (filters detail-sheet link pills) ──────────────────
+class _MusicPlatformStep extends StatefulWidget {
+  const _MusicPlatformStep();
+  @override
+  State<_MusicPlatformStep> createState() => _MusicPlatformStepState();
+}
+
+class _MusicPlatformStepState extends State<_MusicPlatformStep> {
+  String _platform = 'lastfm';
+
+  @override
+  void initState() { super.initState(); _load(); }
+
+  Future<void> _load() async {
+    final p = await SharedPreferences.getInstance();
+    if (mounted) setState(() => _platform = p.getString('ls_music_platform') ?? 'lastfm');
+  }
+
+  Future<void> _set(String v) async {
+    final p = await SharedPreferences.getInstance();
+    await p.setString('ls_music_platform', v);
+    musicPlatformNotifier.value = v;
+    setState(() => _platform = v);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final options = [
+      (value: 'lastfm',  icon: Icons.bar_chart_rounded,        label: L.platformLastfm),
+      (value: 'spotify', icon: Icons.spatial_audio_off_rounded, label: L.platformSpotify),
+      (value: 'ytmusic', icon: Icons.music_video_rounded,      label: L.platformYtMusic),
+      (value: 'other',   icon: Icons.apps_rounded,             label: L.platformOther),
+    ];
+    return _Step(
+      icon: Icons.headphones_rounded,
+      title: L.onboardPlatformTitle, subtitle: L.onboardPlatformSub,
+      child: Column(children: options.map((o) {
+        final sel = _platform == o.value;
+        return Card(
+          elevation: 0,
+          margin: const EdgeInsets.only(bottom: 8),
+          color: sel ? scheme.primaryContainer : scheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: sel ? scheme.primary : scheme.outlineVariant.withValues(alpha: 0.4)),
+          ),
+          child: ListTile(
+            leading: Icon(o.icon, color: sel ? scheme.onPrimaryContainer : scheme.onSurfaceVariant),
+            title: Text(o.label, style: TextStyle(fontWeight: sel ? FontWeight.w700 : FontWeight.w500)),
+            trailing: sel ? Icon(Icons.check_rounded, color: scheme.onPrimaryContainer) : null,
+            onTap: () => _set(o.value),
           ),
         );
       }).toList()),

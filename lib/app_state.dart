@@ -52,6 +52,14 @@ final notifNewsEnabledNotifier = ValueNotifier<bool>(false);
 // Saved as 'ls_show_news_badge' in SharedPreferences.
 final showNewsBadgeNotifier = ValueNotifier<bool>(true);
 
+// Preferred music-streaming platform, chosen at onboarding.
+// 'lastfm' | 'spotify' | 'ytmusic' | 'other'. Saved as 'ls_music_platform'.
+final musicPlatformNotifier = ValueNotifier<String>('lastfm');
+
+// When true, always show all platform link pills on detail sheets
+// regardless of the chosen platform. Saved as 'ls_show_all_platform_links'.
+final showAllPlatformLinksNotifier = ValueNotifier<bool>(false);
+
 ThemeMode themeFromString(String? s) {
   switch (s) {
     case 'light':  return ThemeMode.light;
