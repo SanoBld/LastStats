@@ -121,14 +121,20 @@
 
   DataCache.offlineMode = prefs.getBool(&#39;ls_cache_serve_stale&#39;) ?? true;
 
-  &#47;&#47; ── Notifications &amp; WorkManager (mobile only) ────────────────────────────
+  &#47;&#47; ── Notifications &amp; WorkManager ───────────────────────────────────────────
+  &#47;&#47; Notifications: mobile + Windows. WorkManager (background scheduling):
+  &#47;&#47; mobile only — Windows has no equivalent OS task scheduler wired up yet,
+  &#47;&#47; so on Windows sync notifications only fire during a manual&#47;foreground sync.
   Map&lt;String, dynamic&gt;? notifLaunchData;
 
   if (!kIsWeb) {
-    final isMobile = Platform.isAndroid || Platform.isIOS;
-    if (isMobile) {
+    final isMobile  = Platform.isAndroid || Platform.isIOS;
+    final isWindows = Platform.isWindows;
+    if (isMobile || isWindows) {
       await NotificationService.init();
       notifLaunchData = await NotificationService.getLaunchPayloadData();
+    }
+    if (isMobile) {
       await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
       await NotificationWorker.scheduleAll();
     }
