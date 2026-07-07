@@ -138,6 +138,15 @@ class _SettingsPageState extends State<_SettingsPage> {
       subtitle: () => L.settingsCardNotificationsSub,
       pageBuilder: (_) => const NotificationsPage(),
     ),
+    // 3b — Sync
+    _SettingsCardData(
+      icon: Icons.sync_rounded,
+      iconBgColor: (s) => s.secondaryContainer,
+      iconFgColor: (s) => s.onSecondaryContainer,
+      title:    () => L.settingsSync,
+      subtitle: () => L.settingsCardSyncSub,
+      pageBuilder: (_) => const SyncPage(),
+    ),
     // 4 — Language
     _SettingsCardData(
       icon: Icons.translate_rounded,

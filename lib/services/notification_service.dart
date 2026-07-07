@@ -27,6 +27,8 @@ class NotificationService {
   static const _chUpdateName    = 'App updates';
   static const _chNewsId        = 'ls_news';
   static const _chNewsName      = 'News & announcements';
+  static const _chSyncId        = 'ls_scrobble_sync';
+  static const _chSyncName      = 'Scrobble sync';
 
   // ── Notification IDs ─────────────────────────────────────────────────────
   static const _idMilestone   = 1;
@@ -34,6 +36,7 @@ class NotificationService {
   static const _idWeeklyRecap = 3;
   static const _idGrand       = 4;
   static const _idUpdate      = 5;
+  static const _idSync        = 6;
   static const _idTest        = 99;
 
   // News notifications use a stable id derived from the item's own id so
@@ -99,6 +102,14 @@ class NotificationService {
         _chNewsId, _chNewsName,
         description: 'New features, fixes and announcements about LastStats',
         importance:  Importance.defaultImportance,
+      ),
+    );
+
+    await androidImpl?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        _chSyncId, _chSyncName,
+        description: 'Progress while syncing your full scrobble history',
+        importance:  Importance.low,
       ),
     );
   }
@@ -374,6 +385,66 @@ class NotificationService {
     'alert'   => const Color(0xFFDC2626),
     _         => const Color(0xFF1D4ED8),
   };
+
+  /// Shows/updates a low-priority ongoing progress notification while a full
+  /// scrobble sync runs in the background. Pass [max] = 0 for an
+  /// indeterminate bar (e.g. before the total is known yet).
+  static Future<void> showSyncProgress({
+    required int progress,
+    required int max,
+    String subtitle = '',
+  }) {
+    final indeterminate = max <= 0;
+    const title = '🔄 Syncing scrobbles…';
+    return _plugin.show(
+      _idSync,
+      title,
+      indeterminate ? subtitle : '$progress / $max  ·  $subtitle',
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          _chSyncId, _chSyncName,
+          icon:           '@mipmap/ic_launcher',
+          color:          _kLastFmRed,
+          subText:        'LastStats',
+          importance:     Importance.low,
+          priority:       Priority.low,
+          onlyAlertOnce:  true,
+          ongoing:        true,
+          autoCancel:     false,
+          showProgress:   true,
+          maxProgress:    indeterminate ? 0 : max,
+          progress:       indeterminate ? 0 : progress,
+          indeterminate:  indeterminate,
+        ),
+      ),
+    );
+  }
+
+  /// Dismisses the progress notification once the sync finishes or fails.
+  static Future<void> cancelSyncProgress() => _plugin.cancel(_idSync);
+
+  /// Optional short confirmation once a full sync finishes with new data.
+  static Future<void> showSyncDone(int newCount) {
+    if (newCount <= 0) return cancelSyncProgress();
+    const title = '✅ Scrobbles synced';
+    final body  = '$newCount new scrobble(s) added.';
+    return _plugin.show(
+      _idSync,
+      title,
+      body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          _chSyncId, _chSyncName,
+          icon:    '@mipmap/ic_launcher',
+          color:   _kLastFmRed,
+          subText: 'LastStats',
+          autoCancel: true,
+          ongoing:    false,
+        ),
+      ),
+      payload: _payload(type: 'sync', title: title, body: body),
+    );
+  }
 
   static Future<void> showTest() => _plugin.show(
         _idTest,

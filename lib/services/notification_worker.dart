@@ -11,12 +11,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 import 'notification_service.dart';
 import 'update_service.dart';
+import 'lastfm_service.dart';
+import 'all_scrobbles_service.dart';
+import 'scrobbles_file_cache.dart';
 
 // ── Task names ───────────────────────────────────────────────────────────────
-const _kTaskMilestone = 'ls_milestone_check';
-const _kTaskRecap     = 'ls_recap_check';
-const _kTaskUpdate    = 'ls_update_check';
-const _kTaskNews      = 'ls_news_check';
+const _kTaskMilestone     = 'ls_milestone_check';
+const _kTaskRecap         = 'ls_recap_check';
+const _kTaskUpdate        = 'ls_update_check';
+const _kTaskNews          = 'ls_news_check';
+const _kTaskScrobbleSync  = 'ls_scrobble_sync_task';
+
+// ── Scrobble background sync prefs ──────────────────────────────────────────
+const _kSyncEnabled   = 'ls_scrobble_sync_enabled';
+const _kSyncFreqHours = 'ls_scrobble_sync_freq_hours'; // 1, 3, 6, 12, 24
 
 // ── Milestone prefs ──────────────────────────────────────────────────────────
 const _kMilestoneEnabled   = 'ls_notif_milestone_enabled';
@@ -85,6 +93,9 @@ void callbackDispatcher() {
           break;
         case _kTaskNews:
           await _runNewsCheck();
+          break;
+        case _kTaskScrobbleSync:
+          await _runScrobbleSync();
           break;
       }
     } catch (_) {
@@ -177,6 +188,53 @@ Future<void> _runNewsCheck() async {
 
 String _shortDate(DateTime d) =>
     '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}';
+
+// ── Scrobble background sync ─────────────────────────────────────────────────
+// Runs a full load (first time) or incremental sync (subsequent runs) and
+// mirrors AllScrobblesService.progressNotifier into an ongoing progress
+// notification so the user sees it happening even with the app closed.
+
+Future<void> _runScrobbleSync() async {
+  final prefs = await SharedPreferences.getInstance();
+  if (!(prefs.getBool(_kSyncEnabled) ?? false)) return;
+
+  final username = prefs.getString(_kUsername) ?? '';
+  final apiKey   = prefs.getString(_kApiKey)   ?? '';
+  if (username.isEmpty || apiKey.isEmpty) return;
+
+  if (AllScrobblesService.isRunning) return; // avoid overlapping runs
+
+  await ScrobblesFileCache.init();
+  final service = LastFmService(apiKey: apiKey, username: username);
+
+  void onProgress() {
+    final p = AllScrobblesService.progressNotifier.value;
+    if (!p.isLoading) return;
+    final subtitle = p.mode == SyncMode.full && p.currentYear != null
+        ? 'Year ${p.currentYear}'
+        : '';
+    NotificationService.showSyncProgress(
+      progress: p.loaded,
+      max:      p.total,
+      subtitle: subtitle,
+    );
+  }
+
+  AllScrobblesService.progressNotifier.addListener(onProgress);
+  try {
+    if (AllScrobblesService.isFirstLoad) {
+      await AllScrobblesService.loadAll(service);
+    } else {
+      await AllScrobblesService.syncNew(service);
+    }
+    final result = AllScrobblesService.progressNotifier.value;
+    await NotificationService.showSyncDone(result.newCount);
+  } catch (_) {
+    await NotificationService.cancelSyncProgress();
+  } finally {
+    AllScrobblesService.progressNotifier.removeListener(onProgress);
+  }
+}
 
 // ── Milestone check ──────────────────────────────────────────────────────────
 
@@ -420,6 +478,24 @@ class NotificationWorker {
         frequency:          const Duration(hours: 1),
         existingWorkPolicy: ExistingWorkPolicy.replace,
         constraints: Constraints(networkType: NetworkType.connected),
+      );
+    }
+
+    // ── Scrobble background sync task ────────────────────────────────────
+    // Only registered when the user enabled auto-sync in settings.
+    // Android enforces a 15-minute minimum periodic interval.
+    await Workmanager().cancelByUniqueName(_kTaskScrobbleSync);
+    final syncOn = prefs.getBool(_kSyncEnabled) ?? false;
+    if (syncOn) {
+      final freqH = prefs.getInt(_kSyncFreqHours) ?? 6;
+      await Workmanager().registerPeriodicTask(
+        _kTaskScrobbleSync,
+        _kTaskScrobbleSync,
+        frequency: Duration(hours: freqH < 1 ? 1 : freqH),
+        existingWorkPolicy: ExistingWorkPolicy.replace,
+        constraints: Constraints(
+          networkType: NetworkType.connected,
+        ),
       );
     }
   }
