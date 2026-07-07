@@ -125,6 +125,14 @@
       importance:  Importance.defaultImportance,
     ),
   );
+
+  await androidImpl?.createNotificationChannel(
+    const AndroidNotificationChannel(
+      _chSyncId, _chSyncName,
+      description: &#39;Progress while syncing your full scrobble history&#39;,
+      importance:  Importance.low,
+    ),
+  );
 }</code></pre>
 </section>
 

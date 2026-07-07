@@ -123,6 +123,24 @@
       constraints: Constraints(networkType: NetworkType.connected),
     );
   }
+
+  &#47;&#47; ── Scrobble background sync task ────────────────────────────────────
+  &#47;&#47; Only registered when the user enabled auto-sync in settings.
+  &#47;&#47; Android enforces a 15-minute minimum periodic interval.
+  await Workmanager().cancelByUniqueName(_kTaskScrobbleSync);
+  final syncOn = prefs.getBool(_kSyncEnabled) ?? false;
+  if (syncOn) {
+    final freqH = prefs.getInt(_kSyncFreqHours) ?? 6;
+    await Workmanager().registerPeriodicTask(
+      _kTaskScrobbleSync,
+      _kTaskScrobbleSync,
+      frequency: Duration(hours: freqH &lt; 1 ? 1 : freqH),
+      existingWorkPolicy: ExistingWorkPolicy.replace,
+      constraints: Constraints(
+        networkType: NetworkType.connected,
+      ),
+    );
+  }
 }</code></pre>
 </section>
 

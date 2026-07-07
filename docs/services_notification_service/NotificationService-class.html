@@ -161,6 +161,19 @@
   <section class="summary offset-anchor" id="static-methods">
     <h2>Static Methods</h2>
     <dl class="callables">
+        <dt id="cancelSyncProgress" class="callable">
+  <span class="name"><a href="../services_notification_service/NotificationService/cancelSyncProgress.html">cancelSyncProgress</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Dismisses the progress notification once the sync finishes or fails.
+  
+
+</dd>
+
         <dt id="decodePayload" class="callable">
   <span class="name"><a href="../services_notification_service/NotificationService/decodePayload.html">decodePayload</a></span><span class="signature">(<wbr><span class="parameter" id="decodePayload-param-raw"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">raw</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span>?</span>
@@ -280,6 +293,34 @@ the caller can navigate to the detail page once the app is ready.
   Fires a notification for a new in-app "actualité" (news) item.
 <code>type</code> mirrors the dashboard's news types: feature, fix, update, alert, info.
 Colors match the in-app news sheet so the experience is consistent.
+  
+
+</dd>
+
+        <dt id="showSyncDone" class="callable">
+  <span class="name"><a href="../services_notification_service/NotificationService/showSyncDone.html">showSyncDone</a></span><span class="signature">(<wbr><span class="parameter" id="showSyncDone-param-newCount"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">newCount</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Optional short confirmation once a full sync finishes with new data.
+  
+
+</dd>
+
+        <dt id="showSyncProgress" class="callable">
+  <span class="name"><a href="../services_notification_service/NotificationService/showSyncProgress.html">showSyncProgress</a></span><span class="signature">(<wbr>{<span class="parameter" id="showSyncProgress-param-progress"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">progress</span>, </span><span class="parameter" id="showSyncProgress-param-max"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">max</span>, </span><span class="parameter" id="showSyncProgress-param-subtitle"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">subtitle</span> = <span class="default-value">&#39;&#39;</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Shows/updates a low-priority ongoing progress notification while a full
+scrobble sync runs in the background. Pass <code>max</code> = 0 for an
+indeterminate bar (e.g. before the total is known yet).
   
 
 </dd>
