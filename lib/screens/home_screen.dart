@@ -297,28 +297,9 @@ class _HomeScreenState extends State<HomeScreen> {
               width: railWidth,
               child: Column(
                 children: [
-                  // Logo / app name header
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    child: collapsed
-                        ? Icon(Icons.equalizer_rounded,
-                              color: scheme.primary, size: 22)
-                        : Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Row(children: [
-                              Icon(Icons.equalizer_rounded,
-                                  color: scheme.primary, size: 22),
-                              const SizedBox(width: 10),
-                              Text(
-                                'LastStats',
-                                style: text.titleMedium?.copyWith(
-                                  color:      scheme.primary,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                            ]),
-                          ),
-                  ),
+                  // Logo/title header removed — the custom title bar
+                  // already shows the app name.
+                  const SizedBox(height: 4),
 
                   // Scrollable destinations
                   Expanded(

@@ -18,7 +18,7 @@ dependencies:
   share_plus: ^10.1.4
   url_launcher: ^6.3.0
   palette_generator: ^0.3.3
-  flutter_local_notifications: ^18.0.0
+  flutter_local_notifications: ^19.4.2
   workmanager: ^0.6.0
   window_manager: ^0.4.3
   web: ^1.1.0

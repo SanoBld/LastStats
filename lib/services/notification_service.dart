@@ -53,8 +53,14 @@ class NotificationService {
       requestBadgePermission: false,
       requestSoundPermission: false,
     );
+    // Windows requires a fixed GUID (must not change between releases).
+    const windows = WindowsInitializationSettings(
+      appName:        'LastStats',
+      appUserModelId: 'Com.SanoBld.LastStats',
+      guid:           '5c3a1e2a-6b1a-4e9b-9b3b-2f7c1a9d4e10',
+    );
     await _plugin.initialize(
-      const InitializationSettings(android: android, iOS: ios),
+      const InitializationSettings(android: android, iOS: ios, windows: windows),
       // Tap handler when app is in foreground or background.
       // Opens the in-app detail page so the user sees the full notification
       // (title + body, larger) and can follow a link if there is one.
