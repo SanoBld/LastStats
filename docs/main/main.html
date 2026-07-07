@@ -103,6 +103,8 @@
   keepLastArtworkColorNotifier.value   = prefs.getBool(&#39;ls_keep_last_artwork_color&#39;) ?? false;
   oledModeNotifier.value               = prefs.getBool(&#39;ls_oled_mode&#39;)               ?? false;
   localeNotifier.value                 = prefs.getString(&#39;ls_locale&#39;)                ?? &#39;fr&#39;;
+  musicPlatformNotifier.value          = prefs.getString(&#39;ls_music_platform&#39;)         ?? &#39;lastfm&#39;;
+  showAllPlatformLinksNotifier.value   = prefs.getBool(&#39;ls_show_all_platform_links&#39;)  ?? false;
 
   final fallbackHex = prefs.getString(&#39;ls_nowplaying_fallback_color&#39;);
   nowPlayingFallbackColorNotifier.value =
