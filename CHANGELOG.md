@@ -30,5 +30,16 @@
 -->
 
 
-## v2.9.5.1-beta
-      - TEST
+## v2.9.6-beta
+- Background scrobble sync with adjustable frequency and a progress notification
+- Customizable sync notifications, now also available on Windows
+- New custom title bar on Windows and Linux
+- Music platform selection (Last.fm, Spotify, YT Music) with official logos, used to filter links shown on track/artist/album pages
+- Updated onboarding favorites step, with Last.fm friend suggestions and profile search
+- Added translations for Spanish, Chinese, and Portuguese
+- General interface improvements across settings
+- Login screen redesign
+- New comparison system
+- Chart sharing (beta)
+- New themes and customization options
+- Various fixes and stability improvements
