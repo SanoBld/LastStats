@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -8,6 +7,7 @@ import '../supported_locales.dart';
 import '../services/lastfm_service.dart';
 import '../services/data_cache.dart';
 import '../services/prefetch_service.dart';
+import '../services/backup_service.dart';
 import 'home_screen.dart';
 import 'onboarding_flow.dart';
 
@@ -27,7 +27,6 @@ class _SetupScreenState extends State<SetupScreen>
 
   final _usernameCtrl = TextEditingController();
   final _apikeyCtrl   = TextEditingController();
-  final _jsonCtrl     = TextEditingController();
 
   bool    _obscureApiKey = true;
   bool    _rememberMe    = true;
@@ -98,7 +97,6 @@ class _SetupScreenState extends State<SetupScreen>
     localeNotifier.removeListener(_onLocale);
     _usernameCtrl.dispose();
     _apikeyCtrl.dispose();
-    _jsonCtrl.dispose();
     _entryCtrl.dispose();
     _floatCtrl.dispose();
     super.dispose();
@@ -112,56 +110,26 @@ class _SetupScreenState extends State<SetupScreen>
     await prefs.setString('ls_locale', code);
   }
 
-  // Parse JSON inline → fill fields
-  // Accepts two formats:
-  //   • Simple : {"username":"…","api_key":"…"}
-  //   • Backup : {"app":"LastStats","prefs":{…}}
-  void _applyJson() {
-    final raw = _jsonCtrl.text.trim();
-    if (raw.isEmpty) return;
-    try {
-      final Map<String, dynamic> data = jsonDecode(raw) as Map<String, dynamic>;
+  // Restore a real backup .json file (picked via the native file dialog)
+  // and fill the username/api key fields — replaces the old copy-paste flow.
+  bool _restoring = false;
 
-      String username = '';
-      String apiKey   = '';
+  Future<void> _restoreFromFile() async {
+    setState(() { _restoring = true; _errorMessage = null; });
+    final result = await BackupService.importFromFile();
+    if (!mounted) return;
+    setState(() => _restoring = false);
 
-      if (data['app'] == 'LastStats' && data['prefs'] is Map) {
-        final prefs       = data['prefs'] as Map<String, dynamic>;
-        final accountsRaw = prefs['ls_accounts'];
-        final activeIdx   = (prefs['ls_active_account'] as num?)?.toInt() ?? 0;
-        if (accountsRaw != null) {
-          try {
-            final accounts = jsonDecode(accountsRaw.toString()) as List;
-            if (accounts.isNotEmpty) {
-              final acc = accounts[activeIdx.clamp(0, accounts.length - 1)]
-                  as Map<String, dynamic>;
-              username = (acc['username'] ?? '').toString().trim();
-              apiKey   = (acc['apiKey']   ?? '').toString().trim();
-            }
-          } catch (_) {}
-        }
-        if (username.isEmpty) username = (prefs['ls_username'] ?? '').toString().trim();
-        if (apiKey.isEmpty)   apiKey   = (prefs['ls_apikey']   ?? '').toString().trim();
-        if (username.isEmpty) username = (data['username'] ?? '').toString().trim();
-        if (apiKey.isEmpty)   apiKey   = (data['api_key'] ?? data['apiKey'] ?? '').toString().trim();
-      } else {
-        username = (data['username'] ?? '').toString().trim();
-        apiKey   = (data['api_key'] ?? data['apiKey'] ?? data['api-key'] ?? '').toString().trim();
-      }
-
-      if (username.isEmpty || apiKey.isEmpty) {
-        setState(() => _errorMessage = L.setupInvalidFields);
-        return;
-      }
-      setState(() {
-        _usernameCtrl.text = username;
-        _apikeyCtrl.text   = apiKey;
-        _jsonCtrl.text     = '';
-        _errorMessage      = null;
-      });
-    } catch (_) {
-      setState(() => _errorMessage = L.importInvalidJson);
+    if (result == null) return; // picker cancelled
+    if (!result.success || (result.username ?? '').isEmpty || (result.apiKey ?? '').isEmpty) {
+      setState(() => _errorMessage = L.importInvalidFormat);
+      return;
     }
+    setState(() {
+      _usernameCtrl.text = result.username!;
+      _apikeyCtrl.text   = result.apiKey!;
+      _errorMessage      = null;
+    });
   }
 
   // Validate + connect
@@ -517,7 +485,7 @@ class _SetupScreenState extends State<SetupScreen>
                           ]),
                           const SizedBox(height: 16),
 
-                          // JSON import card
+                          // Restore from backup file (real file picker)
                           Card(
                             elevation: 0,
                             color: scheme.surfaceContainerHighest,
@@ -532,43 +500,23 @@ class _SetupScreenState extends State<SetupScreen>
                                     Icon(Icons.upload_file_rounded,
                                         size: 20, color: scheme.primary),
                                     const SizedBox(width: 8),
-                                    Text(L.setupImportJson,
+                                    Text(L.setupRestoreBackup,
                                         style: text.titleMedium?.copyWith(
                                             fontWeight: FontWeight.w700)),
                                   ]),
                                   const SizedBox(height: 8),
-                                  Text(L.setupImportHintLabel,
+                                  Text(L.setupRestoreBackupSub,
                                       style: text.bodySmall?.copyWith(
                                           color: scheme.onSurfaceVariant)),
-                                  const SizedBox(height: 4),
-                                  Text(L.setupImportNote,
-                                      style: text.bodySmall?.copyWith(
-                                          fontFamily: 'monospace',
-                                          color: scheme.onSurfaceVariant)),
-                                  const SizedBox(height: 12),
-
-                                  TextField(
-                                    controller:  _jsonCtrl,
-                                    maxLines:    4,
-                                    minLines:    3,
-                                    autocorrect: false,
-                                    style: const TextStyle(
-                                        fontFamily: 'monospace', fontSize: 12),
-                                    decoration: InputDecoration(
-                                      hintText:  L.setupImportFormat,
-                                      hintStyle: const TextStyle(
-                                          fontFamily: 'monospace', fontSize: 12),
-                                      border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(12)),
-                                      contentPadding: const EdgeInsets.all(12),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
+                                  const SizedBox(height: 16),
 
                                   OutlinedButton.icon(
-                                    onPressed: _applyJson,
-                                    icon: const Icon(Icons.check_rounded, size: 18),
-                                    label: Text(L.importRestore),
+                                    onPressed: _restoring ? null : _restoreFromFile,
+                                    icon: _restoring
+                                        ? const SizedBox(width: 16, height: 16,
+                                            child: CircularProgressIndicator(strokeWidth: 2))
+                                        : const Icon(Icons.folder_open_rounded, size: 18),
+                                    label: Text(L.backupChooseFile),
                                     style: OutlinedButton.styleFrom(
                                       padding: const EdgeInsets.symmetric(vertical: 12),
                                       shape: RoundedRectangleBorder(

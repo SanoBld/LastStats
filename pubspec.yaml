@@ -24,6 +24,7 @@ dependencies:
   web: ^1.1.0
   audioplayers: ^6.1.0
   flutter_svg: ^2.0.10
+  file_picker: ^8.1.2
 
 dev_dependencies:
   flutter_test:

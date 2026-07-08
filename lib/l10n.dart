@@ -461,6 +461,12 @@ abstract class AppStrings {
 
   // ── Backup page ──────────────────────────────────────────────────────────
   String get backupWhatsIncluded;
+  String get backupDownloadFile;
+  String get backupChooseFile;
+  String get backupFileSaved;
+  String get backupFileSaveFailed;
+  String get setupRestoreBackup;
+  String get setupRestoreBackupSub;
 
   // ── FAQ page ─────────────────────────────────────────────────────────────
   String get faqSectionLabel;
@@ -1041,6 +1047,12 @@ class _AppStringsFr implements AppStrings {
   @override String get updatesBetaSub              => 'Recevoir les versions pré-publiées en avant-première';
 
   @override String get backupWhatsIncluded         => 'Ce qui est inclus';
+  @override String get backupDownloadFile          => 'Télécharge un fichier .json';
+  @override String get backupChooseFile            => 'Choisir un fichier de sauvegarde';
+  @override String get backupFileSaved             => 'Sauvegarde enregistrée';
+  @override String get backupFileSaveFailed        => "Échec de l'enregistrement";
+  @override String get setupRestoreBackup          => 'Restaurer une sauvegarde';
+  @override String get setupRestoreBackupSub       => "Retrouve ton compte et tes réglages depuis un fichier de sauvegarde .json";
 
   @override String get faqSectionLabel             => 'Questions fréquentes';
   @override String get backupOverwriteWarning => 'Restaurer une sauvegarde écrasera vos paramètres actuels.';
@@ -1613,6 +1625,12 @@ class _AppStringsEn implements AppStrings {
   @override String get updatesBetaSub              => 'Get early access to pre-release versions';
 
   @override String get backupWhatsIncluded         => "What's included";
+  @override String get backupDownloadFile          => 'Downloads a .json file';
+  @override String get backupChooseFile            => 'Choose a backup file';
+  @override String get backupFileSaved             => 'Backup saved';
+  @override String get backupFileSaveFailed        => 'Failed to save the file';
+  @override String get setupRestoreBackup          => 'Restore a backup';
+  @override String get setupRestoreBackupSub       => 'Get your account and settings back from a .json backup file';
 
   @override String get faqSectionLabel             => 'Frequently asked questions';
   @override String get backupOverwriteWarning => 'Restoring a backup will overwrite your current settings.';
@@ -2185,6 +2203,12 @@ class _AppStringsEs implements AppStrings {
   @override String get updatesBetaSub              => 'Recibe acceso anticipado a las versiones preliminares';
 
   @override String get backupWhatsIncluded         => 'Qué incluye';
+  @override String get backupDownloadFile          => 'Descarga un archivo .json';
+  @override String get backupChooseFile            => 'Elegir un archivo de copia de seguridad';
+  @override String get backupFileSaved             => 'Copia de seguridad guardada';
+  @override String get backupFileSaveFailed        => 'No se pudo guardar el archivo';
+  @override String get setupRestoreBackup          => 'Restaurar una copia de seguridad';
+  @override String get setupRestoreBackupSub       => 'Recupera tu cuenta y ajustes desde un archivo .json de copia de seguridad';
 
   @override String get faqSectionLabel             => 'Preguntas frecuentes';
   @override String get backupOverwriteWarning => 'Restaurar una copia de seguridad sobrescribirá tus ajustes actuales.';
@@ -2754,6 +2778,12 @@ class _AppStringsZh implements AppStrings {
   @override String get updatesBetaSub              => '抢先体验预发布版本';
 
   @override String get backupWhatsIncluded         => '包含内容';
+  @override String get backupDownloadFile          => '下载 .json 文件';
+  @override String get backupChooseFile            => '选择备份文件';
+  @override String get backupFileSaved             => '备份已保存';
+  @override String get backupFileSaveFailed        => '保存失败';
+  @override String get setupRestoreBackup          => '恢复备份';
+  @override String get setupRestoreBackupSub       => '从 .json 备份文件恢复你的账号和设置';
 
   @override String get faqSectionLabel             => '常见问题';
   @override String get backupOverwriteWarning => '恢复备份将覆盖你当前的设置。';
@@ -3326,6 +3356,12 @@ class _AppStringsPt implements AppStrings {
   @override String get updatesBetaSub              => 'Tenha acesso antecipado às versões pré-lançadas';
 
   @override String get backupWhatsIncluded         => 'O que está incluído';
+  @override String get backupDownloadFile          => 'Baixa um arquivo .json';
+  @override String get backupChooseFile            => 'Escolher um arquivo de backup';
+  @override String get backupFileSaved             => 'Backup salvo';
+  @override String get backupFileSaveFailed        => 'Falha ao salvar o arquivo';
+  @override String get setupRestoreBackup          => 'Restaurar um backup';
+  @override String get setupRestoreBackupSub       => 'Recupere sua conta e configurações a partir de um arquivo .json de backup';
 
   @override String get faqSectionLabel             => 'Perguntas frequentes';
   @override String get backupOverwriteWarning => 'Restaurar um backup substituirá suas configurações atuais.';
