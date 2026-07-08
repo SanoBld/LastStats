@@ -730,10 +730,10 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     final encoded = Uri.encodeComponent(q);
 
     final buttons = [
-      (label: 'Last.fm',  color: const Color(0xFFD51007), icon: Icons.bar_chart_rounded,         url: lfmUrl),
-      (label: 'Spotify',  color: const Color(0xFF1DB954), icon: Icons.spatial_audio_off_rounded,  url: 'https://open.spotify.com/search/$encoded'),
-      (label: 'YT Music', color: const Color(0xFFFF0033), icon: Icons.music_video_rounded,        url: 'https://music.youtube.com/search?q=$encoded'),
-      (label: 'Web',      color: Colors.white.withValues(alpha: 0.85), icon: Icons.language_rounded, url: 'https://www.google.com/search?q=${Uri.encodeComponent('$q music')}'),
+      (label: 'Last.fm',  color: const Color(0xFFD51007), icon: Icons.bar_chart_rounded,         asset: 'assets/icons/lastfm.svg',  url: lfmUrl),
+      (label: 'Spotify',  color: const Color(0xFF1DB954), icon: Icons.spatial_audio_off_rounded,  asset: 'assets/icons/spotify.svg', url: 'https://open.spotify.com/search/$encoded'),
+      (label: 'YT Music', color: const Color(0xFFFF0033), icon: Icons.music_video_rounded,        asset: 'assets/icons/ytmusic.svg', url: 'https://music.youtube.com/search?q=$encoded'),
+      (label: 'Web',      color: Colors.white.withValues(alpha: 0.85), icon: Icons.language_rounded, asset: null, url: 'https://www.google.com/search?q=${Uri.encodeComponent('$q music')}'),
     ].where((b) {
       // Filters which pills show up, based on the platform chosen at
       // onboarding (or in Startup settings). Last.fm and Web always show —
@@ -747,7 +747,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       }
     }).toList();
 
-    Widget chip(({String label, Color color, IconData icon, String url}) b) => Padding(
+    Widget chip(({String label, Color color, IconData icon, String? asset, String url}) b) => Padding(
       padding: const EdgeInsets.only(right: 8, bottom: 4),
       child: GestureDetector(
         onTap: () async {
@@ -766,8 +766,12 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ),
           ),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(b.icon, size: 14,
-                color: hasImage ? Colors.white.withValues(alpha: 0.90) : b.color),
+            _PlatformGlyph(
+              asset: b.asset,
+              fallbackIcon: b.icon,
+              size: 14,
+              color: hasImage ? Colors.white.withValues(alpha: 0.90) : b.color,
+            ),
             const SizedBox(width: 5),
             Text(b.label, style: TextStyle(
               color: hasImage ? Colors.white.withValues(alpha: 0.90) : b.color,
@@ -2626,4 +2630,51 @@ String _fmtLarge(int n) {
   if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
   if (n >= 1000)    return '${(n / 1000).toStringAsFixed(1)}k';
   return '$n';
+}
+// ── Platform glyph: real brand SVG if the asset exists, else a Material
+//    icon fallback so the app still builds/runs if you haven't added the
+//    official logo files yet (see assets/icons/ — lastfm.svg, spotify.svg,
+//    ytmusic.svg, each downloaded from the brand's own press kit).
+class _PlatformGlyph extends StatelessWidget {
+  final String? asset;
+  final IconData fallbackIcon;
+  final double size;
+  final Color color;
+
+  const _PlatformGlyph({
+    required this.asset,
+    required this.fallbackIcon,
+    required this.size,
+    required this.color,
+  });
+
+  static final Map<String, bool> _existsCache = {};
+
+  Future<bool> _exists(String path) async {
+    if (_existsCache.containsKey(path)) return _existsCache[path]!;
+    try {
+      await rootBundle.load(path);
+      return _existsCache[path] = true;
+    } catch (_) {
+      return _existsCache[path] = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final iconFallback = Icon(fallbackIcon, size: size, color: color);
+    if (asset == null) return iconFallback;
+    return FutureBuilder<bool>(
+      future: _exists(asset!),
+      builder: (_, snap) {
+        if (snap.data != true) return iconFallback;
+        return SvgPicture.asset(
+          asset!,
+          width: size,
+          height: size,
+          colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+        );
+      },
+    );
+  }
 }
