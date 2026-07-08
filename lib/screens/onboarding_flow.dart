@@ -3,11 +3,14 @@
 // Shown once, right after the first scrobble load, before entering HomeScreen.
 // 3 pages: appearance, notifications, favorite profiles.
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n.dart';
 import '../app_state.dart';
+import '../services/lastfm_service.dart';
 import 'home_screen.dart';
 import 'settings/settings_helpers.dart';
 
@@ -79,9 +82,10 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               controller: _pageCtrl,
               physics: const NeverScrollableScrollPhysics(),
               onPageChanged: (i) => setState(() => _page = i),
-              children: const [
-                _AppearanceStep(), _NotificationsStep(), _DashboardStep(),
-                _StartupStep(), _MusicPlatformStep(), _UpdatesStep(), _FavoritesStep(),
+              children: [
+                const _AppearanceStep(), const _NotificationsStep(), const _DashboardStep(),
+                const _StartupStep(), const _MusicPlatformStep(), const _UpdatesStep(),
+                _FavoritesStep(username: widget.username, apiKey: widget.apiKey),
               ],
             ),
           ),
@@ -711,41 +715,149 @@ class _UpdatesStepState extends State<_UpdatesStep> {
   }
 }
 
-// ── Step 6: Favorite profiles ────────────────────────────────────────────────
+// ── Step 7: Favorite profiles ────────────────────────────────────────────────
 class _FavoritesStep extends StatefulWidget {
-  const _FavoritesStep();
+  final String username, apiKey;
+  const _FavoritesStep({required this.username, required this.apiKey});
   @override
   State<_FavoritesStep> createState() => _FavoritesStepState();
 }
 
 class _FavoritesStepState extends State<_FavoritesStep> {
-  final _ctrl = TextEditingController();
+  final _searchCtrl = TextEditingController();
   List<String> _favs = [];
 
-  @override
-  void initState() { super.initState(); _load(); }
+  List<Map<String, dynamic>> _friends = [];
+  bool _loadingFriends = true;
 
+  List<Map<String, dynamic>> _results = [];
+  bool _searching = false;
+  Timer? _debounce;
+
+  LastFmService get _service =>
+      LastFmService(apiKey: widget.apiKey, username: widget.username);
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+    _loadFriends();
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  // Favorites are persisted independently from the live friends/search data —
+  // toggling one off here only edits this local list, so a name chosen during
+  // onboarding stays a favorite even if it later drops off your Last.fm
+  // friends list or a fresh search doesn't return it.
   Future<void> _load() async {
     final p = await SharedPreferences.getInstance();
     if (mounted) setState(() => _favs = p.getStringList('ls_fav_profiles') ?? []);
   }
 
-  Future<void> _add() async {
-    final name = _ctrl.text.trim();
-    if (name.isEmpty || _favs.contains(name)) return;
+  Future<void> _persist() async {
     final p = await SharedPreferences.getInstance();
-    setState(() { _favs = [..._favs, name]; _ctrl.clear(); });
     await p.setStringList('ls_fav_profiles', _favs);
   }
 
-  Future<void> _remove(String name) async {
-    final p = await SharedPreferences.getInstance();
-    setState(() => _favs = _favs.where((f) => f != name).toList());
-    await p.setStringList('ls_fav_profiles', _favs);
+  Future<void> _loadFriends() async {
+    try {
+      final list = await _service.getFriends(limit: 30, withRecentTrack: false);
+      if (!mounted) return;
+      setState(() {
+        _friends = list.cast<Map<String, dynamic>>();
+        _loadingFriends = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() => _loadingFriends = false);
+    }
   }
 
-  @override
-  void dispose() { _ctrl.dispose(); super.dispose(); }
+  void _onSearchChanged(String q) {
+    _debounce?.cancel();
+    final query = q.trim();
+    if (query.isEmpty) {
+      setState(() { _results = []; _searching = false; });
+      return;
+    }
+    setState(() => _searching = true);
+    _debounce = Timer(const Duration(milliseconds: 400), () async {
+      try {
+        final list = await _service.searchUsers(query, limit: 10);
+        if (!mounted) return;
+        setState(() { _results = list.cast<Map<String, dynamic>>(); _searching = false; });
+      } catch (_) {
+        if (mounted) setState(() { _results = []; _searching = false; });
+      }
+    });
+  }
+
+  void _toggle(String name) {
+    setState(() {
+      _favs = _favs.contains(name)
+          ? _favs.where((f) => f != name).toList()
+          : [..._favs, name];
+    });
+    _persist();
+  }
+
+  String? _avatarUrl(Map<String, dynamic> user) {
+    final imgs = user['image'];
+    if (imgs is! List || imgs.isEmpty) return null;
+    for (final img in imgs.reversed) {
+      final url = img is Map ? (img['#text'] as String?) : null;
+      if (url != null && url.isNotEmpty) return url;
+    }
+    return null;
+  }
+
+  Widget _userAvatar(String? url) {
+    if (url != null) {
+      return CircleAvatar(radius: 16, backgroundImage: NetworkImage(url));
+    }
+    return CircleAvatar(
+      radius: 16,
+      backgroundColor: Colors.transparent,
+      child: _LastfmGlyph(size: 18, color: Theme.of(context).colorScheme.primary),
+    );
+  }
+
+  Widget _userTile(Map<String, dynamic> user) {
+    final name = (user['name'] ?? '').toString();
+    if (name.isEmpty) return const SizedBox.shrink();
+    final realname = (user['realname'] ?? '').toString();
+    final sel = _favs.contains(name);
+    final scheme = Theme.of(context).colorScheme;
+    return Card(
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 6),
+      color: sel ? scheme.primaryContainer : scheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: sel ? scheme.primary.withValues(alpha: 0.6)
+                                     : scheme.outlineVariant.withValues(alpha: 0.4)),
+      ),
+      child: ListTile(
+        leading: _userAvatar(_avatarUrl(user)),
+        title: Text(name, style: TextStyle(
+            fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
+            color: sel ? scheme.onPrimaryContainer : scheme.onSurface)),
+        subtitle: realname.isNotEmpty
+            ? Text(realname, style: TextStyle(
+                fontSize: 12,
+                color: sel ? scheme.onPrimaryContainer.withValues(alpha: 0.8) : scheme.onSurfaceVariant))
+            : null,
+        trailing: Icon(sel ? Icons.star_rounded : Icons.star_border_rounded,
+            color: sel ? scheme.primary : scheme.onSurfaceVariant),
+        onTap: () => _toggle(name),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -756,25 +868,94 @@ class _FavoritesStepState extends State<_FavoritesStep> {
       title: L.onboardFavTitle,
       subtitle: L.onboardFavSub,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Expanded(child: TextField(
-            controller: _ctrl,
-            decoration: InputDecoration(hintText: L.onboardFavHint, border: const OutlineInputBorder()),
-            onSubmitted: (_) => _add(),
-          )),
-          const SizedBox(width: 8),
-          FilledButton.tonal(onPressed: _add, child: Text(L.onboardFavAdd)),
-        ]),
-        const SizedBox(height: 18),
-        if (_favs.isEmpty)
-          Text(L.onboardFavEmpty, style: TextStyle(color: scheme.onSurfaceVariant))
+        // ── Search ──────────────────────────────────────────────────────
+        TextField(
+          controller: _searchCtrl,
+          onChanged: _onSearchChanged,
+          decoration: InputDecoration(
+            hintText: L.onboardFavSearchHint,
+            prefixIcon: const Icon(Icons.search_rounded),
+            suffixIcon: _searching
+                ? const Padding(
+                    padding: EdgeInsets.all(12),
+                    child: SizedBox(width: 16, height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2)))
+                : null,
+            border: const OutlineInputBorder(),
+          ),
+        ),
+
+        if (_searchCtrl.text.trim().isNotEmpty) ...[
+          const SizedBox(height: 12),
+          if (!_searching && _results.isEmpty)
+            Text(L.onboardFavNoResults, style: TextStyle(color: scheme.onSurfaceVariant))
+          else
+            ..._results.map(_userTile),
+        ],
+
+        const SizedBox(height: 20),
+
+        // ── Suggested: your existing Last.fm friends ───────────────────
+        Text(L.onboardFavFriendsTitle,
+            style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
+        const SizedBox(height: 8),
+        if (_loadingFriends)
+          const Padding(padding: EdgeInsets.symmetric(vertical: 8),
+              child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)))
+        else if (_friends.isEmpty)
+          Text(L.onboardFavNoFriends, style: TextStyle(color: scheme.onSurfaceVariant))
         else
+          ..._friends.map(_userTile),
+
+        const SizedBox(height: 20),
+
+        // ── Currently selected favorites ────────────────────────────────
+        if (_favs.isNotEmpty) ...[
+          Text(L.onboardFavSelected,
+              style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
+          const SizedBox(height: 10),
           Wrap(spacing: 8, runSpacing: 8, children: _favs.map((f) => Chip(
             label: Text(f),
-            onDeleted: () => _remove(f),
-            avatar: const Icon(Icons.person_rounded, size: 18),
+            onDeleted: () => _toggle(f),
+            avatar: _LastfmGlyph(size: 16, color: scheme.primary),
           )).toList()),
+        ] else
+          Text(L.onboardFavEmpty, style: TextStyle(color: scheme.onSurfaceVariant)),
       ]),
+    );
+  }
+}
+
+// Small Last.fm glyph reused across this file (separate library from
+// home_screen.dart's private _PlatformGlyph, so re-implemented minimally here).
+class _LastfmGlyph extends StatelessWidget {
+  final double size;
+  final Color color;
+  const _LastfmGlyph({required this.size, required this.color});
+
+  static bool? _exists;
+
+  Future<bool> _check() async {
+    if (_exists != null) return _exists!;
+    try {
+      await rootBundle.load('assets/icons/lastfm.svg');
+      return _exists = true;
+    } catch (_) {
+      return _exists = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final fallback = Icon(Icons.bar_chart_rounded, size: size, color: color);
+    return FutureBuilder<bool>(
+      future: _check(),
+      builder: (_, snap) {
+        if (snap.data != true) return fallback;
+        return SvgPicture.asset('assets/icons/lastfm.svg',
+            width: size, height: size,
+            colorFilter: ColorFilter.mode(color, BlendMode.srcIn));
+      },
     );
   }
 }
