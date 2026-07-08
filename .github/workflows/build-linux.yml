@@ -48,9 +48,6 @@ jobs:
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
-      - name: Inject version into app
-        run: sed -i "s/currentVersion = '.*'/currentVersion = '$VERSION'/" lib/services/update_service.dart
-
       - name: Build Linux
         run: flutter build linux --release --build-name="$VERSION" --build-number=${{ github.run_number }}
 

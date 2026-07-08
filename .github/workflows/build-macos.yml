@@ -37,10 +37,6 @@ jobs:
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
-      # macOS ships BSD sed: -i needs an explicit (empty) backup suffix arg.
-      - name: Inject version into app
-        run: sed -i '' "s/currentVersion = '.*'/currentVersion = '$VERSION'/" lib/services/update_service.dart
-
       - name: Build macOS
         run: flutter build macos --release --build-name="$VERSION" --build-number=${{ github.run_number }}
 
