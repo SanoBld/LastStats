@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:package_info_plus/package_info_plus.dart';
 
 // ══════════════════════════════════════════════════════════════════════════
 //  UpdateService — reads update info directly from the GitHub Releases API.
@@ -17,7 +18,30 @@ class UpdateService {
   // ─── Your real GitHub repo (owner/name) ───────────────────────────────
   static const _owner = 'SanoBld';
   static const _repo  = 'LastStats';
-  static const currentVersion = '2.6.0';
+
+  // Read at runtime from pubspec.yaml's `version:` field (via package_info)
+  // instead of a value hardcoded here. No more manual/CI sed injection to
+  // keep in sync — this is always correct, in dev builds and CI builds alike.
+  // Falls back to '0.0.0' only if init() hasn't been called yet.
+  static String currentVersion = '0.0.0';
+
+  static bool _initialized = false;
+
+  /// Call once at app startup (main.dart), before anything reads
+  /// [currentVersion] or calls [checkForUpdate].
+  static Future<void> init() async {
+    if (_initialized) return;
+    _initialized = true;
+    try {
+      final info = await PackageInfo.fromPlatform();
+      // info.version is the pubspec `version:` field before the '+buildNumber'.
+      if (info.version.isNotEmpty) currentVersion = info.version;
+    } catch (_) {
+      // Keep the '0.0.0' fallback — checkForUpdate() will then just always
+      // report an update is available rather than crashing, which is the
+      // safer failure mode.
+    }
+  }
   // ────────────────────────────────────────────────────────────────────────
 
   static const _timeout = Duration(seconds: 10);

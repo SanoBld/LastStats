@@ -14,7 +14,9 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'dart:convert';
+import 'dart:io' show File;
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../app_state.dart';
@@ -95,9 +97,19 @@ class BackupService {
         fileName:    defaultFileName(),
         type:        FileType.custom,
         allowedExtensions: ['json'],
-        bytes:       bytes, // required on mobile/web; ignored (but harmless) on desktop
+        bytes:       bytes, // used by file_picker itself on web/some mobile targets
       );
-      return path != null;
+      if (path == null) return false; // user cancelled the dialog
+
+      // On desktop (Windows/macOS/Linux), saveFile() only returns the chosen
+      // path — it does NOT write the file. We have to do that ourselves.
+      // (On web, the bytes are handled by the browser download and `path`
+      // is just a filename, not a real filesystem path, so skip writing.)
+      if (!kIsWeb) {
+        final file = File(path);
+        await file.writeAsBytes(bytes, flush: true);
+      }
+      return true;
     } catch (_) {
       return false;
     }

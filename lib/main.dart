@@ -18,6 +18,7 @@ import 'services/notification_service.dart';
 import 'services/notification_worker.dart';
 import 'services/storage_manager.dart';
 import 'services/update_startup.dart';
+import 'services/update_service.dart';
 import 'widgets/custom_title_bar.dart';
 
 // navigatorKey now lives in notification_service.dart so the notification
@@ -73,6 +74,7 @@ void main() async {
 
   // ── Data caches & storage ────────────────────────────────────────────────
   await DataCache.init();
+  await UpdateService.init();
   await DataCache.clearExpired();
   await ScrobblesFileCache.init();
   await StorageManager.init();
