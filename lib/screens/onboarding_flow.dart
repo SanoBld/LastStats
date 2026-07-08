@@ -628,10 +628,10 @@ class _MusicPlatformStepState extends State<_MusicPlatformStep> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final options = [
-      (value: 'lastfm',  icon: Icons.bar_chart_rounded,        label: L.platformLastfm),
-      (value: 'spotify', icon: Icons.spatial_audio_off_rounded, label: L.platformSpotify),
-      (value: 'ytmusic', icon: Icons.music_video_rounded,      label: L.platformYtMusic),
-      (value: 'other',   icon: Icons.apps_rounded,             label: L.platformOther),
+      (value: 'lastfm',  icon: Icons.bar_chart_rounded,        asset: 'assets/icons/lastfm.svg',  label: L.platformLastfm),
+      (value: 'spotify', icon: Icons.spatial_audio_off_rounded, asset: 'assets/icons/spotify.svg', label: L.platformSpotify),
+      (value: 'ytmusic', icon: Icons.music_video_rounded,      asset: 'assets/icons/ytmusic.svg', label: L.platformYtMusic),
+      (value: 'other',   icon: Icons.apps_rounded,             asset: null,                        label: L.platformOther),
     ];
     return _Step(
       icon: Icons.headphones_rounded,
@@ -647,13 +647,60 @@ class _MusicPlatformStepState extends State<_MusicPlatformStep> {
             side: BorderSide(color: sel ? scheme.primary : scheme.outlineVariant.withValues(alpha: 0.4)),
           ),
           child: ListTile(
-            leading: Icon(o.icon, color: sel ? scheme.onPrimaryContainer : scheme.onSurfaceVariant),
+            leading: _BrandGlyph(
+              asset: o.asset,
+              fallbackIcon: o.icon,
+              size: 22,
+              color: sel ? scheme.onPrimaryContainer : scheme.onSurfaceVariant,
+            ),
             title: Text(o.label, style: TextStyle(fontWeight: sel ? FontWeight.w700 : FontWeight.w500)),
             trailing: sel ? Icon(Icons.check_rounded, color: scheme.onPrimaryContainer) : null,
             onTap: () => _set(o.value),
           ),
         );
       }).toList()),
+    );
+  }
+}
+
+// Generic brand glyph: shows the real SVG logo from assets/icons/ if present,
+// falls back to a Material icon otherwise (e.g. logo not downloaded yet).
+class _BrandGlyph extends StatelessWidget {
+  final String? asset;
+  final IconData fallbackIcon;
+  final double size;
+  final Color color;
+  const _BrandGlyph({
+    required this.asset,
+    required this.fallbackIcon,
+    required this.size,
+    required this.color,
+  });
+
+  static final Map<String, bool> _existsCache = {};
+
+  Future<bool> _exists(String path) async {
+    if (_existsCache.containsKey(path)) return _existsCache[path]!;
+    try {
+      await rootBundle.load(path);
+      return _existsCache[path] = true;
+    } catch (_) {
+      return _existsCache[path] = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final fallback = Icon(fallbackIcon, size: size, color: color);
+    if (asset == null) return fallback;
+    return FutureBuilder<bool>(
+      future: _exists(asset!),
+      builder: (_, snap) {
+        if (snap.data != true) return fallback;
+        return SvgPicture.asset(asset!,
+            width: size, height: size,
+            colorFilter: ColorFilter.mode(color, BlendMode.srcIn));
+      },
     );
   }
 }

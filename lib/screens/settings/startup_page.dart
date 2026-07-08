@@ -1,6 +1,8 @@
 // lib/screens/settings/startup_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n.dart';
 import '../../app_state.dart';
@@ -145,10 +147,10 @@ class _StartupPageState extends State<StartupPage> {
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               const SizedBox(height: 14),
               ...[
-                (value: 'lastfm',  icon: Icons.bar_chart_rounded,         label: L.platformLastfm),
-                (value: 'spotify', icon: Icons.spatial_audio_off_rounded, label: L.platformSpotify),
-                (value: 'ytmusic', icon: Icons.music_video_rounded,       label: L.platformYtMusic),
-                (value: 'other',   icon: Icons.apps_rounded,              label: L.platformOther),
+                (value: 'lastfm',  icon: Icons.bar_chart_rounded,         asset: 'assets/icons/lastfm.svg',  label: L.platformLastfm),
+                (value: 'spotify', icon: Icons.spatial_audio_off_rounded, asset: 'assets/icons/spotify.svg', label: L.platformSpotify),
+                (value: 'ytmusic', icon: Icons.music_video_rounded,       asset: 'assets/icons/ytmusic.svg', label: L.platformYtMusic),
+                (value: 'other',   icon: Icons.apps_rounded,              asset: null,                       label: L.platformOther),
               ].map((o) {
                 final sel = _platform == o.value;
                 return Card(
@@ -164,7 +166,12 @@ class _StartupPageState extends State<StartupPage> {
                     ),
                   ),
                   child: ListTile(
-                    leading: Icon(o.icon, color: sel ? scheme.onPrimaryContainer : scheme.onSurfaceVariant),
+                    leading: _BrandGlyph(
+                      asset: o.asset,
+                      fallbackIcon: o.icon,
+                      size: 22,
+                      color: sel ? scheme.onPrimaryContainer : scheme.onSurfaceVariant,
+                    ),
                     title: Text(o.label, style: TextStyle(
                         fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
                         color: sel ? scheme.onPrimaryContainer : scheme.onSurface)),
@@ -210,6 +217,48 @@ class _StartupPageState extends State<StartupPage> {
         ),
         const SizedBox(height: 20),
       ]),
+    );
+  }
+}
+
+// Generic brand glyph: real SVG logo from assets/icons/ if present,
+// falls back to a Material icon otherwise.
+class _BrandGlyph extends StatelessWidget {
+  final String? asset;
+  final IconData fallbackIcon;
+  final double size;
+  final Color color;
+  const _BrandGlyph({
+    required this.asset,
+    required this.fallbackIcon,
+    required this.size,
+    required this.color,
+  });
+
+  static final Map<String, bool> _existsCache = {};
+
+  Future<bool> _exists(String path) async {
+    if (_existsCache.containsKey(path)) return _existsCache[path]!;
+    try {
+      await rootBundle.load(path);
+      return _existsCache[path] = true;
+    } catch (_) {
+      return _existsCache[path] = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final fallback = Icon(fallbackIcon, size: size, color: color);
+    if (asset == null) return fallback;
+    return FutureBuilder<bool>(
+      future: _exists(asset!),
+      builder: (_, snap) {
+        if (snap.data != true) return fallback;
+        return SvgPicture.asset(asset!,
+            width: size, height: size,
+            colorFilter: ColorFilter.mode(color, BlendMode.srcIn));
+      },
     );
   }
 }

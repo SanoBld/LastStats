@@ -225,7 +225,7 @@ class _SetupScreenState extends State<SetupScreen>
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final isEn   = localeNotifier.value == 'en';
+
     final size   = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -377,9 +377,7 @@ class _SetupScreenState extends State<SetupScreen>
                                     textInputAction: TextInputAction.next,
                                     autocorrect:     false,
                                     decoration: InputDecoration(
-                                      labelText: isEn
-                                          ? 'Last.fm username'
-                                          : 'Pseudo Last.fm',
+                                      labelText: L.setupUsernameLabel,
                                       prefixIcon: const Icon(
                                           Icons.person_outline_rounded),
                                       border: OutlineInputBorder(
@@ -399,12 +397,8 @@ class _SetupScreenState extends State<SetupScreen>
                                     enableSuggestions: false,
                                     onSubmitted:       (_) => _launch(),
                                     decoration: InputDecoration(
-                                      labelText: isEn
-                                          ? 'Last.fm API key'
-                                          : 'Clé API Last.fm',
-                                      hintText: isEn
-                                          ? '32-character hex key'
-                                          : 'Clé hexadécimale de 32 caractères',
+                                      labelText: L.setupApiKeyLabel,
+                                      hintText: L.setupApiKeyHint,
                                       prefixIcon: const Icon(Icons.key_rounded),
                                       suffixIcon: IconButton(
                                         icon: Icon(_obscureApiKey
@@ -427,9 +421,7 @@ class _SetupScreenState extends State<SetupScreen>
                                         size: 14, color: scheme.onSurfaceVariant),
                                     const SizedBox(width: 6),
                                     Expanded(child: Text(
-                                      isEn
-                                          ? 'Stored locally. Never sent to a third party.'
-                                          : 'Stockée localement. Jamais envoyée à un tiers.',
+                                      L.setupApiKeyPrivacyNote,
                                       style: text.bodySmall?.copyWith(
                                           color: scheme.onSurfaceVariant),
                                     )),
@@ -448,9 +440,7 @@ class _SetupScreenState extends State<SetupScreen>
                                     GestureDetector(
                                       onTap: () => setState(
                                           () => _rememberMe = !_rememberMe),
-                                      child: Text(isEn
-                                          ? 'Remember me'
-                                          : 'Se souvenir de moi'),
+                                      child: Text(L.setupRememberMe),
                                     ),
                                   ]),
                                   const SizedBox(height: 20),
@@ -604,9 +594,7 @@ class _SetupScreenState extends State<SetupScreen>
                                 }
                               },
                               icon: const Icon(Icons.open_in_new_rounded, size: 16),
-                              label: Text(isEn
-                                  ? 'Get a free API key'
-                                  : 'Obtenir une clé API gratuitement'),
+                              label: Text(L.setupGetApiKey),
                             ),
                           ),
 
@@ -858,7 +846,7 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final isEn   = localeNotifier.value == 'en';
+
 
     return Scaffold(
       backgroundColor: scheme.surface,
@@ -933,9 +921,7 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
                               size: 14, color: scheme.onSecondaryContainer),
                           const SizedBox(width: 7),
                           Text(
-                            isEn
-                                ? '${_fmtLarge(widget.totalScrobbles)} scrobbles to import'
-                                : '${_fmtLarge(widget.totalScrobbles)} scrobbles à importer',
+                            L.setupScrobblesToImport(_fmtLarge(widget.totalScrobbles)),
                             style: text.labelMedium?.copyWith(
                                 color:      scheme.onSecondaryContainer,
                                 fontWeight: FontWeight.w700),
@@ -1035,10 +1021,7 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
                                           color: scheme.primary, size: 26),
                                       const SizedBox(width: 10),
                                       Text(
-                                        // Welcome message in chosen language
-                                        isEn
-                                            ? 'Welcome to LastStats!'
-                                            : 'Bienvenue sur LastStats\u00a0!',
+                                        L.setupWelcomeBanner,
                                         style: text.titleMedium?.copyWith(
                                           color:      scheme.primary,
                                           fontWeight: FontWeight.w800,
@@ -1070,9 +1053,7 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
                             size: 15, color: scheme.tertiary),
                         const SizedBox(width: 10),
                         Expanded(child: Text(
-                          isEn
-                              ? 'One-time import — future launches will be instant.'
-                              : 'Import unique — les prochains lancements seront instantanés.',
+                          L.setupOneTimeImportNote,
                           style: text.bodySmall?.copyWith(
                               color: scheme.onSurfaceVariant),
                         )),

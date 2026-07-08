@@ -369,6 +369,15 @@ abstract class AppStrings {
   String get setupStartAnalysis;
   String get setupOr;
   String setupWelcome(String username);
+  String get setupUsernameLabel;
+  String get setupApiKeyLabel;
+  String get setupApiKeyHint;
+  String get setupApiKeyPrivacyNote;
+  String get setupRememberMe;
+  String get setupGetApiKey;
+  String setupScrobblesToImport(String count);
+  String get setupWelcomeBanner;
+  String get setupOneTimeImportNote;
 
   // ── Dashboard: header hint + stat labels + news sheet ───────────────────
   String get dashTapToDownload;
@@ -950,6 +959,15 @@ class _AppStringsFr implements AppStrings {
   @override String get setupStartAnalysis          => "Lancer l'analyse";
   @override String get setupOr                     => 'ou';
   @override String setupWelcome(String username)   => 'Bienvenue, $username\u00a0!';
+  @override String get setupUsernameLabel          => 'Pseudo Last.fm';
+  @override String get setupApiKeyLabel            => 'Clé API Last.fm';
+  @override String get setupApiKeyHint             => 'Clé hexadécimale de 32 caractères';
+  @override String get setupApiKeyPrivacyNote      => 'Stockée localement. Jamais envoyée à un tiers.';
+  @override String get setupRememberMe             => 'Se souvenir de moi';
+  @override String get setupGetApiKey              => 'Obtenir une clé API gratuitement';
+  @override String setupScrobblesToImport(String c) => '$c scrobbles à importer';
+  @override String get setupWelcomeBanner          => 'Bienvenue sur LastStats\u00a0!';
+  @override String get setupOneTimeImportNote      => 'Import unique — les prochains lancements seront instantanés.';
 
   @override String get dashTapToDownload           => 'Appuie pour télécharger.';
   @override String dashUpdateTitle(String version, bool isBeta) =>
@@ -1513,6 +1531,15 @@ class _AppStringsEn implements AppStrings {
   @override String get setupStartAnalysis          => 'Start analysis';
   @override String get setupOr                     => 'or';
   @override String setupWelcome(String username)   => 'Welcome, $username!';
+  @override String get setupUsernameLabel          => 'Last.fm username';
+  @override String get setupApiKeyLabel            => 'Last.fm API key';
+  @override String get setupApiKeyHint             => '32-character hex key';
+  @override String get setupApiKeyPrivacyNote      => 'Stored locally. Never sent to a third party.';
+  @override String get setupRememberMe             => 'Remember me';
+  @override String get setupGetApiKey              => 'Get a free API key';
+  @override String setupScrobblesToImport(String c) => '$c scrobbles to import';
+  @override String get setupWelcomeBanner          => 'Welcome to LastStats!';
+  @override String get setupOneTimeImportNote      => 'One-time import — future launches will be instant.';
 
   @override String get dashTapToDownload           => 'Tap to download.';
   @override String dashUpdateTitle(String version, bool isBeta) =>
@@ -2076,6 +2103,15 @@ class _AppStringsEs implements AppStrings {
   @override String get setupStartAnalysis          => 'Iniciar análisis';
   @override String get setupOr                     => 'o';
   @override String setupWelcome(String username)   => '¡Bienvenido, $username!';
+  @override String get setupUsernameLabel          => 'Usuario de Last.fm';
+  @override String get setupApiKeyLabel            => 'Clave API de Last.fm';
+  @override String get setupApiKeyHint             => 'Clave hexadecimal de 32 caracteres';
+  @override String get setupApiKeyPrivacyNote      => 'Guardada localmente. Nunca enviada a terceros.';
+  @override String get setupRememberMe             => 'Recordarme';
+  @override String get setupGetApiKey              => 'Obtener una clave API gratis';
+  @override String setupScrobblesToImport(String c) => '$c scrobbles por importar';
+  @override String get setupWelcomeBanner          => '¡Bienvenido a LastStats!';
+  @override String get setupOneTimeImportNote      => 'Importación única — los próximos inicios serán instantáneos.';
 
   @override String get dashTapToDownload           => 'Toca para descargar.';
   @override String dashUpdateTitle(String version, bool isBeta) =>
@@ -2636,6 +2672,15 @@ class _AppStringsZh implements AppStrings {
   @override String get setupStartAnalysis          => '开始分析';
   @override String get setupOr                     => '或';
   @override String setupWelcome(String username)   => '欢迎，$username！';
+  @override String get setupUsernameLabel          => 'Last.fm 用户名';
+  @override String get setupApiKeyLabel            => 'Last.fm API 密钥';
+  @override String get setupApiKeyHint             => '32 位十六进制密钥';
+  @override String get setupApiKeyPrivacyNote      => '仅保存在本地，绝不发送给第三方。';
+  @override String get setupRememberMe             => '记住我';
+  @override String get setupGetApiKey              => '免费获取 API 密钥';
+  @override String setupScrobblesToImport(String c) => '待导入 $c 条 scrobble';
+  @override String get setupWelcomeBanner          => '欢迎使用 LastStats！';
+  @override String get setupOneTimeImportNote      => '仅需导入一次 — 之后启动会立即完成。';
 
   @override String get dashTapToDownload           => '点击下载。';
   @override String dashUpdateTitle(String version, bool isBeta) =>
@@ -3199,6 +3244,15 @@ class _AppStringsPt implements AppStrings {
   @override String get setupStartAnalysis          => 'Iniciar análise';
   @override String get setupOr                     => 'ou';
   @override String setupWelcome(String username)   => 'Bem-vindo, $username!';
+  @override String get setupUsernameLabel          => 'Usuário do Last.fm';
+  @override String get setupApiKeyLabel            => 'Chave de API do Last.fm';
+  @override String get setupApiKeyHint             => 'Chave hexadecimal de 32 caracteres';
+  @override String get setupApiKeyPrivacyNote      => 'Armazenada localmente. Nunca enviada a terceiros.';
+  @override String get setupRememberMe             => 'Lembrar de mim';
+  @override String get setupGetApiKey              => 'Obter uma chave de API grátis';
+  @override String setupScrobblesToImport(String c) => '$c scrobbles para importar';
+  @override String get setupWelcomeBanner          => 'Bem-vindo ao LastStats!';
+  @override String get setupOneTimeImportNote      => 'Importação única — as próximas aberturas serão instantâneas.';
 
   @override String get dashTapToDownload           => 'Toque para baixar.';
   @override String dashUpdateTitle(String version, bool isBeta) =>
