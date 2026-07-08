@@ -116,6 +116,7 @@
 
   &#47;&#47; ── Data caches &amp; storage ────────────────────────────────────────────────
   await DataCache.init();
+  await UpdateService.init();
   await DataCache.clearExpired();
   await ScrobblesFileCache.init();
   await StorageManager.init();
