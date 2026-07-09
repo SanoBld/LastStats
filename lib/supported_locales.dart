@@ -35,6 +35,11 @@ const List<SupportedLocale> kSupportedLocales = [
   SupportedLocale(code: 'es', flag: '🇪🇸', nativeName: 'Español',  englishName: 'Spanish'),
   SupportedLocale(code: 'zh', flag: '🇨🇳', nativeName: '中文',      englishName: 'Chinese'),
   SupportedLocale(code: 'pt', flag: '🇧🇷', nativeName: 'Português', englishName: 'Portuguese'),
+  SupportedLocale(code: 'de', flag: '🇩🇪', nativeName: 'Deutsch',   englishName: 'German'),
+  SupportedLocale(code: 'it', flag: '🇮🇹', nativeName: 'Italiano',  englishName: 'Italian'),
+  SupportedLocale(code: 'ja', flag: '🇯🇵', nativeName: '日本語',     englishName: 'Japanese'),
+  SupportedLocale(code: 'ru', flag: '🇷🇺', nativeName: 'Русский',   englishName: 'Russian'),
+  SupportedLocale(code: 'ar', flag: '🇸🇦', nativeName: 'العربية',   englishName: 'Arabic'),
 ];
 
 /// Looks up a [SupportedLocale] by code, falling back to French (the app's
