@@ -110,6 +110,73 @@ class _SetupScreenState extends State<SetupScreen>
     await prefs.setString('ls_locale', code);
   }
 
+  // Opens a scrollable bottom sheet listing every supported language.
+  // Handles 50+ languages gracefully (unlike a row/wrap of chips).
+  void _openLanguageSheet(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: scheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(sheetContext).size.height * 0.6,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Grab handle
+              Padding(
+                padding: const EdgeInsets.only(top: 10, bottom: 4),
+                child: Container(
+                  width: 36, height: 4,
+                  decoration: BoxDecoration(
+                    color: scheme.onSurfaceVariant.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                child: Row(children: [
+                  Text(L.settingsLanguage,
+                      style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                ]),
+              ),
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.only(bottom: 12),
+                  itemCount: kSupportedLocales.length,
+                  itemBuilder: (_, i) {
+                    final lang     = kSupportedLocales[i];
+                    final selected = localeNotifier.value == lang.code;
+                    return ListTile(
+                      onTap: () { _setLocale(lang.code); Navigator.pop(sheetContext); },
+                      leading: Text(lang.flag, style: const TextStyle(fontSize: 22)),
+                      title: Text(lang.nativeName,
+                          style: text.bodyLarge?.copyWith(
+                              fontWeight: selected ? FontWeight.w700 : FontWeight.w500)),
+                      subtitle: Text(lang.englishName,
+                          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                      trailing: selected
+                          ? Icon(Icons.check_rounded, color: scheme.primary)
+                          : null,
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   // Restore a real backup .json file (picked via the native file dialog)
   // and fill the username/api key fields — replaces the old copy-paste flow.
   bool _restoring = false;
@@ -212,27 +279,21 @@ class _SetupScreenState extends State<SetupScreen>
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
 
-                      // ── Language chips — slide down + fade ──────────────
-                      // Wrap (not a fixed Row) so this scales cleanly to
-                      // 10-20+ languages later: it flows to new lines
-                      // instead of overflowing or requiring layout changes.
+                      // ── Language selector — compact dropdown button ─────
+                      // Scales cleanly to 50+ languages: shows only the
+                      // current selection, opens a scrollable sheet on tap
+                      // instead of laying out every option at once.
                       SlideTransition(
                         position: _langSlide,
                         child: FadeTransition(
                           opacity: _langFade,
-                          child: Wrap(
-                            alignment: WrapAlignment.center,
-                            spacing: 10,
-                            runSpacing: 10,
-                            children: [
-                              for (final lang in kSupportedLocales)
-                                _LangChip(
-                                  flag: lang.flag, label: lang.nativeName,
-                                  selected: localeNotifier.value == lang.code,
-                                  onTap: () => _setLocale(lang.code),
-                                  scheme: scheme, text: text,
-                                ),
-                            ],
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: _LangSelectorButton(
+                              current: supportedLocaleFor(localeNotifier.value),
+                              scheme: scheme, text: text,
+                              onTap: () => _openLanguageSheet(context),
+                            ),
                           ),
                         ),
                       ),
@@ -601,57 +662,46 @@ class _SetupBackground extends StatelessWidget {
   }
 }
 
-// ── Language chip ─────────────────────────────────────────────────────────────
-class _LangChip extends StatelessWidget {
-  final String      flag, label;
-  final bool        selected;
-  final VoidCallback onTap;
-  final ColorScheme  scheme;
-  final TextTheme    text;
+// ── Language selector button — shows current pick, opens a sheet ──────────────
+class _LangSelectorButton extends StatelessWidget {
+  final SupportedLocale current;
+  final ColorScheme     scheme;
+  final TextTheme       text;
+  final VoidCallback    onTap;
 
-  const _LangChip({
-    required this.flag,
-    required this.label,
-    required this.selected,
-    required this.onTap,
+  const _LangSelectorButton({
+    required this.current,
     required this.scheme,
     required this.text,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 220),
-      curve: Curves.easeInOut,
-      decoration: BoxDecoration(
-        color: selected
-            ? scheme.primaryContainer
-            : scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: selected
-              ? scheme.primary.withValues(alpha: 0.6)
-              : scheme.outlineVariant,
-          width: selected ? 1.5 : 1,
-        ),
-      ),
+    return Material(
+      color: scheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(20),
       child: InkWell(
         onTap:        onTap,
         borderRadius: BorderRadius.circular(20),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: scheme.outlineVariant),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Text(flag, style: const TextStyle(fontSize: 16)),
-            const SizedBox(width: 7),
+            Text(current.flag, style: const TextStyle(fontSize: 17)),
+            const SizedBox(width: 8),
             Text(
-              label,
-              style: text.labelMedium?.copyWith(
-                color: selected
-                    ? scheme.onPrimaryContainer
-                    : scheme.onSurfaceVariant,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              current.nativeName,
+              style: text.labelLarge?.copyWith(
+                color:       scheme.onSurface,
+                fontWeight:  FontWeight.w700,
               ),
             ),
+            const SizedBox(width: 6),
+            Icon(Icons.expand_more_rounded, size: 18, color: scheme.onSurfaceVariant),
           ]),
         ),
       ),
