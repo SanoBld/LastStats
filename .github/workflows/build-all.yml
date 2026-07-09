@@ -22,14 +22,42 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Skips the rest of the workflow for automated commits that contain
+  # "[skip ci]" in their message (e.g. release.yml's version-bump commit),
+  # so a release doesn't trigger a redundant full 4-platform build.
+  check-skip:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - id: check
+        run: |
+          MSG=$(git log -1 --pretty=%B)
+          if [[ "$MSG" == *"[skip ci]"* ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
   windows:
+    needs: check-skip
+    if: needs.check-skip.outputs.skip != 'true'
     uses: ./.github/workflows/build-windows.yml
 
   macos:
+    needs: check-skip
+    if: needs.check-skip.outputs.skip != 'true'
     uses: ./.github/workflows/build-macos.yml
 
   linux:
+    needs: check-skip
+    if: needs.check-skip.outputs.skip != 'true'
     uses: ./.github/workflows/build-linux.yml
 
   android:
+    needs: check-skip
+    if: needs.check-skip.outputs.skip != 'true'
     uses: ./.github/workflows/build-android.yml

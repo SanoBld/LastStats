@@ -102,6 +102,34 @@ jobs:
           git tag ${{ steps.meta.outputs.tag }} || true
           git push origin ${{ steps.meta.outputs.tag }} || true
 
+      # Keeps pubspec.yaml's `version:` line in sync with every release, so
+      # PackageInfo (used by UpdateService.currentVersion) reports the right
+      # version even in local/dev builds, not just CI-built releases where
+      # --build-name already overrides it at build time.
+      - name: Sync pubspec.yaml version and commit to main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.meta.outputs.version }}"
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Work from main's actual tip, not the tag's commit, so this always
+          # pushes a clean fast-forward regardless of what the tag points to.
+          git fetch origin main
+          git checkout main
+
+          sed -i "s/^version: .*/version: $VERSION+${{ github.run_number }}/" pubspec.yaml
+
+          if git diff --quiet -- pubspec.yaml; then
+            echo "pubspec.yaml already up to date, nothing to commit."
+          else
+            git add pubspec.yaml
+            git commit -m "chore: bump version to $VERSION [skip ci]"
+            git push origin HEAD:main
+          fi
+
   # Each platform builds in its own separate workflow file, receiving the
   # resolved version so the compiled app shows/compares against it.
   windows:
