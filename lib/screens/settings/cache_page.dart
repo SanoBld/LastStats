@@ -7,7 +7,7 @@ import '../../services/data_cache.dart';
 import '../../services/scrobbles_file_cache.dart';
 import '../../services/image_service.dart';
 import '../../app_state.dart';
-import '../../l10n.dart';
+import '../../l10n/l10n.dart';
 
 // Storage limit presets in bytes. 0 = unlimited.
 const _limits = [

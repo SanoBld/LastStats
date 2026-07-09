@@ -7,7 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../l10n.dart';
+import '../l10n/l10n.dart';
 
 class NotificationDetailPage extends StatelessWidget {
   final Map<String, dynamic> data;

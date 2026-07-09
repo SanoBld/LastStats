@@ -1,7 +1,7 @@
 // lib/screens/settings/faq_page.dart
 
 import 'package:flutter/material.dart';
-import '../../l10n.dart';
+import '../../l10n/l10n.dart';
 import '../../app_state.dart';
 import 'settings_helpers.dart';
 

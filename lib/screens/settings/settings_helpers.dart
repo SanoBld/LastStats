@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../app_state.dart';
-import '../../l10n.dart';
+import '../../l10n/l10n.dart';
 
 // ── Clés SharedPreferences (référence) ───────────────────────────────────────
 // ls_header_fallback_type   : 'none' | 'top_track' | 'top_album' | 'top_artist' | 'custom_url'

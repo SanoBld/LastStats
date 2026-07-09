@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../l10n.dart';
+import '../../l10n/l10n.dart';
 import '../../app_state.dart';
 import '../../services/update_service.dart';
 import 'settings_helpers.dart';

@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app_state.dart';
-import '../../l10n.dart';
+import '../../l10n/l10n.dart';
 import '../../services/notification_service.dart';
 import '../../services/notification_worker.dart';
 

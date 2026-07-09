@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../l10n.dart';
+import '../../l10n/l10n.dart';
 import '../../app_state.dart';
 import 'settings_helpers.dart';
 

@@ -1,7 +1,7 @@
 // lib/screens/settings/backup_page.dart
 
 import 'package:flutter/material.dart';
-import '../../l10n.dart';
+import '../../l10n/l10n.dart';
 import '../../services/backup_service.dart';
 import 'settings_helpers.dart';
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app_state.dart';
-import '../l10n.dart';
+import '../l10n/l10n.dart';
 import '../supported_locales.dart';
 import '../services/lastfm_service.dart';
 import '../services/data_cache.dart';

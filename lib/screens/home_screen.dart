@@ -33,7 +33,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../app_state.dart';
-import '../l10n.dart';
+import '../l10n/l10n.dart';
 import '../supported_locales.dart';
 import '../services/lastfm_service.dart';
 import '../services/image_service.dart';
