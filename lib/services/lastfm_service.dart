@@ -217,6 +217,15 @@ class LastFmService {
     return _asList(d['lovedtracks']?['track']);
   }
 
+  Future<int> getLovedTracksCount() async {
+    final d = await _call({
+      'method': 'user.getLovedTracks',
+      'user':   username,
+      'limit':  '1',
+    });
+    return int.tryParse(d['lovedtracks']?['@attr']?['total']?.toString() ?? '0') ?? 0;
+  }
+
   // ── Artist info (global + user context) ─────────────────
   Future<Map<String, dynamic>?> getArtistInfo(String artist) async {
     try {

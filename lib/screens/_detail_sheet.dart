@@ -748,10 +748,9 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (favoritesEnabled) ...[
-                      _buildLoveButton(),
+                    if (favoritesEnabled) _buildLoveButton(),
+                    if (favoritesEnabled && (_previewUrl != null || _previewLoading))
                       const SizedBox(height: 8),
-                    ],
                     if (_previewUrl != null || _previewLoading)
                       _buildPreviewRing(scheme),
                   ],
@@ -764,24 +763,24 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     );
   }
 
-  // Small heart button, shown just above the 30s preview play button.
+  // Heart button, shown just above the 30s preview play button — same scale.
   Widget _buildLoveButton() => GestureDetector(
     onTap: _toggleLove,
     child: Container(
-      width: 32, height: 32,
+      width: 40, height: 40,
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.45),
         shape: BoxShape.circle,
       ),
       child: _loveBusy
           ? const Padding(
-              padding: EdgeInsets.all(8),
+              padding: EdgeInsets.all(10),
               child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
             )
           : Icon(
               _isLoved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
               color: _isLoved ? Colors.redAccent : Colors.white,
-              size: 16,
+              size: 20,
             ),
     ),
   );

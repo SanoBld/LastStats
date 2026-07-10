@@ -538,6 +538,10 @@ class AppStringsRu implements AppStrings {
   @override String get favEmpty                  => 'Пока нет избранного.';
   @override String get settingsLovedBadgeTitle => 'Скромный значок сердца';
   @override String get settingsLovedBadgeSub   => 'Показывает маленькое сердце у избранных треков в недавних, истории и поиске';
+  @override String get favSortRecent   => 'Недавние';
+  @override String get favSortOldest   => 'Старые';
+  @override String get favSortArtistAz => 'Исполнитель А-Я';
+  @override String get favSortTitleAz  => 'Название А-Я';
 
   @override String globalListeners(String count) => '$count слушателей во всём мире';
   @override String historyScrobbles(int n) => '$n скробблов';

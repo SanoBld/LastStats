@@ -602,5 +602,9 @@ class AppStringsEs implements AppStrings {
   @override String get favEmpty                  => 'Aún no hay favoritos.';
   @override String get settingsLovedBadgeTitle => 'Insignia de corazón discreta';
   @override String get settingsLovedBadgeSub   => 'Muestra un pequeño corazón en las canciones favoritas en reproducciones recientes, historial y búsqueda';
+  @override String get favSortRecent   => 'Recientes';
+  @override String get favSortOldest   => 'Antiguos';
+  @override String get favSortArtistAz => 'Artista A-Z';
+  @override String get favSortTitleAz  => 'Título A-Z';
 }
 

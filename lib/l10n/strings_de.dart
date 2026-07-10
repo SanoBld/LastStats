@@ -538,6 +538,10 @@ class AppStringsDe implements AppStrings {
   @override String get favEmpty                  => 'Noch keine Favoriten.';
   @override String get settingsLovedBadgeTitle => 'Dezentes Herz-Symbol';
   @override String get settingsLovedBadgeSub   => 'Zeigt ein kleines Herz bei favorisierten Titeln in zuletzt gehört, Verlauf und Suche';
+  @override String get favSortRecent   => 'Neueste';
+  @override String get favSortOldest   => 'Älteste';
+  @override String get favSortArtistAz => 'Künstler A-Z';
+  @override String get favSortTitleAz  => 'Titel A-Z';
 
   @override String globalListeners(String count) => '$count Hörer weltweit';
   @override String historyScrobbles(int n) => '$n Scrobbles';

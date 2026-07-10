@@ -602,5 +602,9 @@ class AppStringsPt implements AppStrings {
   @override String get favEmpty                  => 'Nenhum favorito ainda.';
   @override String get settingsLovedBadgeTitle => 'Selo de coração discreto';
   @override String get settingsLovedBadgeSub   => 'Mostra um pequeno coração nas faixas favoritas nas reproduções recentes, histórico e busca';
+  @override String get favSortRecent   => 'Recentes';
+  @override String get favSortOldest   => 'Antigos';
+  @override String get favSortArtistAz => 'Artista A-Z';
+  @override String get favSortTitleAz  => 'Título A-Z';
 }
 

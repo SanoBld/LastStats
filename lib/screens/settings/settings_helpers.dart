@@ -55,6 +55,7 @@ const kAllStatCards = [
   ('total',           '🎯', 'Total scrobbles',       'Total scrobbles',  'Total de scrobbles',   '总 scrobble 数', 'Total de scrobbles'),
   ('avg_day',         '⚡', 'Moy. / jour',           'Avg / day',        'Prom. / día',          '日均',           'Média / dia'),
   ('avg_week',        '📅', 'Moy. / semaine',        'Avg / week',       'Prom. / semana',       '周均',           'Média / semana'),
+  ('favorites_count', '❤️', 'Favoris',               'Favorites',        'Favoritos',            '收藏',           'Favoritos'),
   ('days_active',     '🗓️', 'Jours actifs',          'Days active',      'Días activos',         '活跃天数',       'Dias ativos'),
   ('since',           '📆', 'Membre depuis',         'Member since',     'Miembro desde',        '加入时间',       'Membro desde'),
   ('country',         '🌍', 'Pays',                  'Country',          'País',                 '国家',           'País'),

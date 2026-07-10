@@ -599,5 +599,9 @@ class AppStringsZh implements AppStrings {
   @override String get favEmpty                  => '暂无收藏。';
   @override String get settingsLovedBadgeTitle => '低调的爱心标记';
   @override String get settingsLovedBadgeSub   => '在最近播放、历史记录和搜索中为收藏的歌曲显示一个小爱心';
+  @override String get favSortRecent   => '最近';
+  @override String get favSortOldest   => '最早';
+  @override String get favSortArtistAz => '艺人 A-Z';
+  @override String get favSortTitleAz  => '标题 A-Z';
 }
 

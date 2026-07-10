@@ -163,6 +163,7 @@ class DataCache {
   static String keyNowPlaying()   => 'nowplaying';
   static String keyMonthlyScrobbles() => 'monthly';
   static String keyLovedTracks()  => 'loved';
+  static String keyLovedCount()   => 'loved_count';
   static String keyFriends()      => 'friends';
 
   // ── Helpers ───────────────────────────────────────────────────────────────

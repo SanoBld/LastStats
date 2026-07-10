@@ -632,4 +632,8 @@ abstract class AppStrings {
   String get favEmpty;
   String get settingsLovedBadgeTitle;
   String get settingsLovedBadgeSub;
+  String get favSortRecent;
+  String get favSortOldest;
+  String get favSortArtistAz;
+  String get favSortTitleAz;
 }

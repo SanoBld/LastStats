@@ -602,5 +602,9 @@ class AppStringsEn implements AppStrings {
   @override String get favEmpty                  => 'No favorites yet.';
   @override String get settingsLovedBadgeTitle => 'Discreet heart badge';
   @override String get settingsLovedBadgeSub   => 'Shows a small heart on favorite tracks in recent tracks, history, and search';
+  @override String get favSortRecent   => 'Recent';
+  @override String get favSortOldest   => 'Oldest';
+  @override String get favSortArtistAz => 'Artist A-Z';
+  @override String get favSortTitleAz  => 'Title A-Z';
 }
 

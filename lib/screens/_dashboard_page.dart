@@ -116,6 +116,7 @@ class _DashboardPageState extends State<_DashboardPage> {
   bool _showRecent   = true;
   bool _showFavorites = true;
   List<dynamic> _lovedTracks = [];
+  int _lovedCount = 0;
 
   // In-app news feed
   List<Map<String, dynamic>> _newsItems   = [];
@@ -169,6 +170,11 @@ class _DashboardPageState extends State<_DashboardPage> {
           lovedKey((t['artist']?['name'] ?? '').toString(), (t['name'] ?? '').toString()),
       };
     } catch (_) {}
+    try {
+      final count = await widget.service.getLovedTracksCount();
+      await DataCache.set(DataCache.keyLovedCount(), count);
+      if (mounted) setState(() => _lovedCount = count);
+    } catch (_) {}
   }
 
   bool _loadFromCache() {
@@ -188,6 +194,7 @@ class _DashboardPageState extends State<_DashboardPage> {
     final topArtY    = DataCache.getSync(DataCache.keyTopArtists('12month')) as List?;
     final topTrkY    = DataCache.getSync(DataCache.keyTopTracks('12month'))  as List?;
     final loved      = DataCache.getSync(DataCache.keyLovedTracks())        as List?;
+    final lovedCnt   = DataCache.getSync(DataCache.keyLovedCount())         as int?;
 
     Map<String, dynamic>? np;
     final recentF = <dynamic>[];
@@ -220,6 +227,7 @@ class _DashboardPageState extends State<_DashboardPage> {
       _topArtistsYear  = topArtY    ?? [];
       _topTracksYear   = topTrkY    ?? [];
       _lovedTracks     = loved      ?? [];
+      _lovedCount      = lovedCnt   ?? 0;
       _loading         = false;
     });
     if (loved != null) {
@@ -1145,6 +1153,18 @@ class _DashboardPageState extends State<_DashboardPage> {
           rawInt:     weekly,
           rollPrefix: '~',
         );
+      case 'favorites_count':
+        if (!favoritesEnabled) return null;
+        return _DashStatCard(
+          emoji:  '❤️',
+          value:  _fmtFull(_lovedCount),
+          label:  L.favSectionTitle,
+          sub:    null,
+          rawInt: _lovedCount,
+          onTap:  () => Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) => FavoritesPage(service: widget.service),
+          )),
+        );
       case 'days_active':
         return _DashStatCard(
           emoji:      '🗓️',
@@ -1665,25 +1685,6 @@ class _DashboardPageState extends State<_DashboardPage> {
                     onToggleFav: _toggleFav,
                     onRefresh:   _loadFriends,
                   ),
-                ),
-                const SizedBox(height: 20),
-              ],
-
-              // ── Favorites (loved tracks) ─────────────────────────────────
-              if (_showFavorites && favoritesEnabled && _lovedTracks.isNotEmpty) ...[
-                _FadeSlideIn(
-                  delay: const Duration(milliseconds: 270),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    _SectionHeader(title: L.favSectionTitle, icon: Icons.favorite_rounded),
-                    const SizedBox(height: 10),
-                    _FavoritesCard(
-                      tracks:  _lovedTracks.take(4).toList(),
-                      service: widget.service,
-                      onSeeMore: () => Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => FavoritesPage(service: widget.service),
-                      )),
-                    ),
-                  ]),
                 ),
                 const SizedBox(height: 20),
               ],
@@ -2895,6 +2896,7 @@ class _DashStatCard extends StatelessWidget {
   final int?    rawInt;
   final String  rollPrefix;
   final String  rollSuffix;
+  final VoidCallback? onTap;
 
   const _DashStatCard({
     required this.emoji,
@@ -2904,6 +2906,7 @@ class _DashStatCard extends StatelessWidget {
     this.rawInt,
     this.rollPrefix = '',
     this.rollSuffix = '',
+    this.onTap,
   });
 
   @override
@@ -2923,7 +2926,10 @@ class _DashStatCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           side: _cardBorder(scheme),
         ),
-        child: Padding(
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(emoji, style: const TextStyle(fontSize: 22)),
@@ -2955,6 +2961,7 @@ class _DashStatCard extends StatelessWidget {
               Text(sub!, maxLines: 1, overflow: TextOverflow.ellipsis,
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           ]),
+          ),
         ),
       ),
     );
@@ -3404,97 +3411,6 @@ class _RecentTracksList extends StatelessWidget {
             service: service,
           );
         }).toList(),
-      ),
-    );
-  }
-}
-
-
-// ── Favorites card — compact vertical list, no horizontal scroll ─────────────
-
-class _FavoritesCard extends StatelessWidget {
-  final List<dynamic>  tracks;
-  final LastFmService   service;
-  final VoidCallback    onSeeMore;
-
-  const _FavoritesCard({
-    required this.tracks,
-    required this.service,
-    required this.onSeeMore,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.35)),
-      ),
-      child: Column(children: [
-        for (final t in tracks)
-          _FavoriteRow(track: t as Map<String, dynamic>, service: service),
-        InkWell(
-          borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
-          onTap: onSeeMore,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Center(
-              child: Text(L.commonSeeMore, style: text.labelLarge?.copyWith(
-                  color: scheme.primary, fontWeight: FontWeight.w700)),
-            ),
-          ),
-        ),
-      ]),
-    );
-  }
-}
-
-class _FavoriteRow extends StatelessWidget {
-  final Map<String, dynamic> track;
-  final LastFmService        service;
-
-  const _FavoriteRow({required this.track, required this.service});
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
-    final name   = (track['name'] ?? '').toString();
-    final artist = (track['artist']?['name'] ?? '').toString();
-    final rawUrl = _extractImage(track['image']);
-
-    return InkWell(
-      onTap: () {
-        _haptic(_HapticImpact.light);
-        showDetailSheet(context, track, 'tracks', service);
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        child: Row(children: [
-          _SmartImage(
-            size: 40,
-            borderRadius: 8,
-            initialUrl: rawUrl,
-            resolver: () => ImageService.resolveTrack(name, artist,
-                lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null),
-          ),
-          const SizedBox(width: 12),
-          Expanded(child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-              Text(artist, maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-            ],
-          )),
-          const SizedBox(width: 8),
-          const Icon(Icons.favorite_rounded, size: 14, color: Colors.redAccent),
-        ]),
       ),
     );
   }
