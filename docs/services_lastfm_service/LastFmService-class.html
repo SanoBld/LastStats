@@ -61,7 +61,7 @@
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
         <dt id="LastFmService.new" class="callable">
-          <span class="name"><a href="../services_lastfm_service/LastFmService/LastFmService.html">LastFmService</a></span><span class="signature">({<span class="parameter" id="param-apiKey"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">apiKey</span>, </span><span class="parameter" id="param-username"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">username</span></span>})</span>
+          <span class="name"><a href="../services_lastfm_service/LastFmService/LastFmService.html">LastFmService</a></span><span class="signature">({<span class="parameter" id="param-apiKey"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">apiKey</span>, </span><span class="parameter" id="param-username"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">username</span>, </span><span class="parameter" id="param-secret"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">secret</span> = <span class="default-value">&#39;&#39;</span>, </span><span class="parameter" id="param-sessionKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">sessionKey</span> = <span class="default-value">&#39;&#39;</span></span>})</span>
         </dt>
         <dd>
           
@@ -111,6 +111,30 @@
 
 </dd>
 
+        <dt id="secret" class="property">
+  <span class="name"><a href="../services_lastfm_service/LastFmService/secret.html">secret</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="sessionKey" class="property">
+  <span class="name"><a href="../services_lastfm_service/LastFmService/sessionKey.html">sessionKey</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
         <dt id="username" class="property">
   <span class="name"><a href="../services_lastfm_service/LastFmService/username.html">username</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
@@ -132,6 +156,19 @@
       id="instance-methods">
     <h2>Methods</h2>
     <dl class="callables">
+        <dt id="authUrl" class="callable">
+  <span class="name"><a href="../services_lastfm_service/LastFmService/authUrl.html">authUrl</a></span><span class="signature">(<wbr><span class="parameter" id="authUrl-param-token"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">token</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
         <dt id="getAlbumInfo" class="callable">
   <span class="name"><a href="../services_lastfm_service/LastFmService/getAlbumInfo.html">getAlbumInfo</a></span><span class="signature">(<wbr><span class="parameter" id="getAlbumInfo-param-album"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">album</span>, </span><span class="parameter" id="getAlbumInfo-param-artist"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">artist</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span>?</span>&gt;</span></span>
@@ -210,6 +247,19 @@
 
 </dd>
 
+        <dt id="getAuthToken" class="callable">
+  <span class="name"><a href="../services_lastfm_service/LastFmService/getAuthToken.html">getAuthToken</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
         <dt id="getFriends" class="callable">
   <span class="name"><a href="../services_lastfm_service/LastFmService/getFriends.html">getFriends</a></span><span class="signature">(<wbr>{<span class="parameter" id="getFriends-param-limit"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">limit</span> = <span class="default-value">50</span>, </span><span class="parameter" id="getFriends-param-page"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">page</span> = <span class="default-value">1</span>, </span><span class="parameter" id="getFriends-param-withRecentTrack"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">withRecentTrack</span> = <span class="default-value">true</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a></span>&gt;</span></span>
@@ -267,6 +317,19 @@ Pass <code>withRecentTrack</code> = true to include each friend's most recent
         <dt id="getRecentTracks" class="callable">
   <span class="name"><a href="../services_lastfm_service/LastFmService/getRecentTracks.html">getRecentTracks</a></span><span class="signature">(<wbr>{<span class="parameter" id="getRecentTracks-param-limit"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">limit</span> = <span class="default-value">50</span>, </span><span class="parameter" id="getRecentTracks-param-page"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">page</span> = <span class="default-value">1</span>, </span><span class="parameter" id="getRecentTracks-param-from"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">from</span>, </span><span class="parameter" id="getRecentTracks-param-to"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">to</span>, </span><span class="parameter" id="getRecentTracks-param-user"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">user</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getSessionKey" class="callable">
+  <span class="name"><a href="../services_lastfm_service/LastFmService/getSessionKey.html">getSessionKey</a></span><span class="signature">(<wbr><span class="parameter" id="getSessionKey-param-token"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">token</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span>
   </span>
   
 
@@ -355,6 +418,19 @@ Pass <code>withRecentTrack</code> = true to include each friend's most recent
 
 </dd>
 
+        <dt id="loveTrack" class="callable">
+  <span class="name"><a href="../services_lastfm_service/LastFmService/loveTrack.html">loveTrack</a></span><span class="signature">(<wbr><span class="parameter" id="loveTrack-param-track"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">track</span>, </span><span class="parameter" id="loveTrack-param-artist"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">artist</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
         <dt id="noSuchMethod" class="callable inherited">
   <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></span><span class="signature">(<wbr><span class="parameter" id="noSuchMethod-param-invocation"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Invocation-class.html">Invocation</a></span> <span class="parameter-name">invocation</span></span>)
     <span class="returntype parameter">&#8594; dynamic</span>
@@ -432,6 +508,19 @@ Tries user.search first; falls back to user.getInfo for exact matching
 <dd class="inherited">
   A string representation of this object.
   <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="unloveTrack" class="callable">
+  <span class="name"><a href="../services_lastfm_service/LastFmService/unloveTrack.html">unloveTrack</a></span><span class="signature">(<wbr><span class="parameter" id="unloveTrack-param-track"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">track</span>, </span><span class="parameter" id="unloveTrack-param-artist"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">artist</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
 
 </dd>
 
