@@ -60,6 +60,19 @@ final musicPlatformNotifier = ValueNotifier<String>('lastfm');
 // regardless of the chosen platform. Saved as 'ls_show_all_platform_links'.
 final showAllPlatformLinksNotifier = ValueNotifier<bool>(false);
 
+// Last.fm API secret key, used to sign write requests (favorites).
+// Optional — set during setup or later from the account settings.
+// Saved as 'ls_secret_key' in SharedPreferences.
+final secretKeyNotifier = ValueNotifier<String>('');
+
+// Last.fm session key obtained after authorizing favorites access.
+// Empty until the user completes the auth.getSession flow.
+// Saved as 'ls_session_key' in SharedPreferences.
+final sessionKeyNotifier = ValueNotifier<String>('');
+
+/// True once the user has authorized favorites (loved tracks) access.
+bool get favoritesEnabled => sessionKeyNotifier.value.isNotEmpty;
+
 ThemeMode themeFromString(String? s) {
   switch (s) {
     case 'light':  return ThemeMode.light;

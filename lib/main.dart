@@ -63,6 +63,8 @@ void main() async {
   localeNotifier.value                 = prefs.getString('ls_locale')                ?? 'fr';
   musicPlatformNotifier.value          = prefs.getString('ls_music_platform')         ?? 'lastfm';
   showAllPlatformLinksNotifier.value   = prefs.getBool('ls_show_all_platform_links')  ?? false;
+  secretKeyNotifier.value              = prefs.getString('ls_secret_key')            ?? '';
+  sessionKeyNotifier.value             = prefs.getString('ls_session_key')           ?? '';
 
   final fallbackHex = prefs.getString('ls_nowplaying_fallback_color');
   nowPlayingFallbackColorNotifier.value =

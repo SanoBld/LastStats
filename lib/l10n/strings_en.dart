@@ -577,5 +577,28 @@ class AppStringsEn implements AppStrings {
   @override String get dashUniqueAlbumsLabel    => 'Unique albums';
   @override String get dashThisWeekLabel        => 'This week';
   @override String get dashDayUnitShort         => 'd';
+  @override String get setupEnableFavorites      => 'Enable favorites (optional)';
+  @override String get setupFavoritesExplain     => 'Your secret key lets the app love (or unlove) tracks directly on Last.fm.';
+  @override String get setupSecretKeyLabel       => 'Last.fm secret key';
+  @override String get favConnectInvalidSecret   => 'The secret key must be 32 characters long.';
+  @override String get favConnectDialogTitle     => 'Authorize favorites';
+  @override String get favConnectDialogBody      => 'Authorize the app on the Last.fm page opened in your browser, then come back here and confirm.';
+  @override String get favConnectDialogConfirm   => 'I authorized it';
+  @override String get favConnectSuccess         => 'Favorites enabled successfully!';
+  @override String get favConnectError           => 'Could not enable favorites. Check your secret key.';
+  @override String get acctApiKeysSection        => 'API keys';
+  @override String get acctSecretKeyLabel        => 'Secret key';
+  @override String get acctSecretKeyNotSet       => 'Not set';
+  @override String get acctFavoritesExplain      => 'The secret key lets you love (or unlove) tracks directly on Last.fm.';
+  @override String get acctConnectFavorites      => 'Enable favorites';
+  @override String get acctDisconnectFavorites   => 'Disable favorites';
+  @override String get settingsFavoritesSection    => 'Favorites';
+  @override String get settingsFavoritesSectionSub => 'Carousel of your favorite tracks';
+  @override String get settingsFavoritesNeedsKey   => 'Add your secret key in Account to enable';
+  @override String get favSectionTitle           => 'Favorites';
+  @override String get commonSeeMore             => 'See more';
+  @override String get favPageTitle              => 'My favorites';
+  @override String get favSearchHint             => 'Search a track or artist';
+  @override String get favEmpty                  => 'No favorites yet.';
 }
 

@@ -35,6 +35,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   bool   _showAlbums            = true;
   bool   _showRecent            = true;
   bool   _showFriends           = true;
+  bool   _showFavorites         = true;
   bool   _headerMusicAnim       = false; // equalizer animation when music is playing
   List<String> _statCards       = List.from(kDefaultStatCards);
 
@@ -79,6 +80,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
       _showTracks            = p.getBool('ls_show_tracks')               ?? true;
       _showRecent            = p.getBool('ls_show_recent')               ?? true;
       _showFriends           = p.getBool('ls_show_friends')              ?? true;
+      _showFavorites         = p.getBool('ls_show_favorites')            ?? true;
       _headerMusicAnim       = p.getBool('ls_header_music_anim')         ?? false;
       final raw = p.getStringList('ls_stat_cards');
       _statCards = raw != null && raw.isNotEmpty ? raw : List.from(kDefaultStatCards);
@@ -470,6 +472,28 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
             subtitle: Text(L.settingsFriendsSectionSub),
             value: _showFriends,
             onChanged: (v) async { await _set('ls_show_friends', v); setState(() => _showFriends = v); }),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          ValueListenableBuilder<String>(
+            valueListenable: sessionKeyNotifier,
+            builder: (_, session, __) {
+              final enabled = session.isNotEmpty;
+              return Opacity(
+                opacity: enabled ? 1.0 : 0.45,
+                child: SwitchListTile(
+                  secondary: const Icon(Icons.favorite_rounded),
+                  title: Text(L.settingsFavoritesSection),
+                  subtitle: Text(enabled
+                      ? L.settingsFavoritesSectionSub
+                      : L.settingsFavoritesNeedsKey),
+                  value: enabled && _showFavorites,
+                  onChanged: !enabled ? null : (v) async {
+                    await _set('ls_show_favorites', v);
+                    setState(() => _showFavorites = v);
+                  },
+                ),
+              );
+            },
+          ),
         ]),
 
         const SizedBox(height: 16),

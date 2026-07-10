@@ -574,5 +574,28 @@ class AppStringsZh implements AppStrings {
   @override String get dashUniqueAlbumsLabel    => '独立专辑数';
   @override String get dashThisWeekLabel        => '本周';
   @override String get dashDayUnitShort         => '天';
+  @override String get setupEnableFavorites      => '启用收藏（可选）';
+  @override String get setupFavoritesExplain     => '密钥可让应用直接在 Last.fm 上添加或取消收藏歌曲。';
+  @override String get setupSecretKeyLabel       => 'Last.fm 密钥';
+  @override String get favConnectInvalidSecret   => '密钥长度必须为 32 个字符。';
+  @override String get favConnectDialogTitle     => '授权收藏功能';
+  @override String get favConnectDialogBody      => '请在浏览器打开的 Last.fm 页面上授权本应用，然后返回此处确认。';
+  @override String get favConnectDialogConfirm   => '我已授权';
+  @override String get favConnectSuccess         => '收藏功能已成功启用！';
+  @override String get favConnectError           => '无法启用收藏功能，请检查你的密钥。';
+  @override String get acctApiKeysSection        => 'API 密钥';
+  @override String get acctSecretKeyLabel        => '密钥';
+  @override String get acctSecretKeyNotSet       => '未设置';
+  @override String get acctFavoritesExplain      => '密钥可让你直接在 Last.fm 上添加或取消收藏歌曲。';
+  @override String get acctConnectFavorites      => '启用收藏';
+  @override String get acctDisconnectFavorites   => '停用收藏';
+  @override String get settingsFavoritesSection    => '收藏';
+  @override String get settingsFavoritesSectionSub => '你收藏歌曲的横向列表';
+  @override String get settingsFavoritesNeedsKey   => '请在账户中添加密钥以启用';
+  @override String get favSectionTitle           => '收藏';
+  @override String get commonSeeMore             => '查看更多';
+  @override String get favPageTitle              => '我的收藏';
+  @override String get favSearchHint             => '搜索歌曲或艺人';
+  @override String get favEmpty                  => '暂无收藏。';
 }
 

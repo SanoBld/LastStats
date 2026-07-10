@@ -26,6 +26,7 @@ dependencies:
   flutter_svg: ^2.0.10
   file_picker: ^8.1.2
   package_info_plus: ^8.1.1
+  crypto: ^3.0.3
 
 dev_dependencies:
   flutter_test:

@@ -269,6 +269,9 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   int _userPlays = 0;
   int _userRank  = -1;
 
+  bool _isLoved  = false;
+  bool _loveBusy = false;
+
   bool   _translating    = false;
   bool   _showTranslated = false;
   String _translatedBio  = '';
@@ -375,11 +378,42 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
         case 'tracks':
           final info = await widget.service.getTrackInfo(_name, _artist);
-          if (mounted) setState(() => _info = info);
+          if (mounted) {
+            setState(() {
+              _info    = info;
+              _isLoved = info?['userloved']?.toString() == '1';
+            });
+          }
           if (_bio().isNotEmpty) _translateTo(localeNotifier.value);
           _fetchLyrics();
       }
     } catch (_) {}
+  }
+
+  Future<void> _toggleLove() async {
+    if (!favoritesEnabled || _loveBusy) return;
+    final was = _isLoved;
+    setState(() { _isLoved = !was; _loveBusy = true; });
+    _haptic(_HapticImpact.light);
+
+    final svc = LastFmService(
+      apiKey:     widget.service.apiKey,
+      username:   widget.service.username,
+      secret:     secretKeyNotifier.value,
+      sessionKey: sessionKeyNotifier.value,
+    );
+    try {
+      if (was) {
+        await svc.unloveTrack(_name, _artist);
+      } else {
+        await svc.loveTrack(_name, _artist);
+      }
+      await DataCache.invalidate(DataCache.keyLovedTracks());
+    } catch (_) {
+      if (mounted) setState(() => _isLoved = was);
+    } finally {
+      if (mounted) setState(() => _loveBusy = false);
+    }
   }
 
   Future<void> _fetchUserStats() async {
@@ -642,6 +676,33 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ),
           ),
         ),
+
+        // Favorite (heart) button — tracks only, requires favorites auth
+        if (widget.type == 'tracks' && favoritesEnabled)
+          Positioned(
+            top: topPad + 8, right: 12,
+            child: GestureDetector(
+              onTap: _toggleLove,
+              child: Container(
+                width: 36, height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.45),
+                  shape: BoxShape.circle,
+                ),
+                child: _loveBusy
+                    ? const Padding(
+                        padding: EdgeInsets.all(9),
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
+                      )
+                    : Icon(
+                        _isLoved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                        color: _isLoved ? Colors.redAccent : Colors.white,
+                        size: 18,
+                      ),
+              ),
+            ),
+          ),
       ],
     );
   }

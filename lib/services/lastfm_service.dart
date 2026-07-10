@@ -1,15 +1,24 @@
 import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 
 class LastFmService {
   final String apiKey;
   final String username;
+  // Optional — only needed for signed write calls (favorites auth + love/unlove).
+  final String secret;
+  final String sessionKey;
 
   static const _host    = 'ws.audioscrobbler.com';
   static const _path    = '/2.0/';
   static const _timeout = Duration(seconds: 15);
 
-  const LastFmService({required this.apiKey, required this.username});
+  const LastFmService({
+    required this.apiKey,
+    required this.username,
+    this.secret     = '',
+    this.sessionKey = '',
+  });
 
   // ── Core request ────────────────────────────────────────
   Future<dynamic> _call(Map<String, String> params) async {
@@ -29,6 +38,56 @@ class LastFmService {
 
   static List<dynamic> _asList(dynamic v) =>
       v == null ? [] : (v is List ? v : [v]);
+
+  // ── Signed requests (needed for auth + write methods) ────
+  String _sign(Map<String, String> params) {
+    final keys = params.keys.toList()..sort();
+    final buf  = StringBuffer();
+    for (final k in keys) { buf.write(k); buf.write(params[k]); }
+    buf.write(secret);
+    return md5.convert(utf8.encode(buf.toString())).toString();
+  }
+
+  Future<dynamic> _callSigned(Map<String, String> params, {bool post = false}) async {
+    final base   = {...params, 'api_key': apiKey};
+    final sig    = _sign(base);
+    final full   = {...base, 'api_sig': sig, 'format': 'json'};
+    final uri    = Uri.https(_host, _path);
+    final res    = post
+        ? await http.post(uri, body: full).timeout(_timeout)
+        : await http.get(uri.replace(queryParameters: full)).timeout(_timeout);
+    if (res.statusCode != 200) throw Exception('HTTP ${res.statusCode}');
+    final body = jsonDecode(utf8.decode(res.bodyBytes));
+    if (body['error'] != null) throw Exception(body['message'] ?? 'Last.fm API error');
+    return body;
+  }
+
+  // ── Favorites auth flow (token → browser authorization → session key) ────
+  Future<String> getAuthToken() async {
+    final d = await _callSigned({'method': 'auth.getToken'});
+    return (d['token'] ?? '').toString();
+  }
+
+  String authUrl(String token) =>
+      'https://www.last.fm/api/auth/?api_key=$apiKey&token=$token';
+
+  Future<String> getSessionKey(String token) async {
+    final d = await _callSigned({'method': 'auth.getSession', 'token': token});
+    return (d['session']?['key'] ?? '').toString();
+  }
+
+  // ── Loved tracks (write, requires secret + sessionKey) ────
+  Future<void> loveTrack(String track, String artist) async {
+    await _callSigned({
+      'method': 'track.love', 'track': track, 'artist': artist, 'sk': sessionKey,
+    }, post: true);
+  }
+
+  Future<void> unloveTrack(String track, String artist) async {
+    await _callSigned({
+      'method': 'track.unlove', 'track': track, 'artist': artist, 'sk': sessionKey,
+    }, post: true);
+  }
 
   // ── User ────────────────────────────────────────────────
   Future<Map<String, dynamic>?> getUserInfo({String? user}) async {

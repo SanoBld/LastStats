@@ -8,6 +8,7 @@ import '../services/lastfm_service.dart';
 import '../services/data_cache.dart';
 import '../services/prefetch_service.dart';
 import '../services/backup_service.dart';
+import '../services/favorites_auth.dart';
 import 'home_screen.dart';
 import 'onboarding_flow.dart';
 
@@ -27,10 +28,13 @@ class _SetupScreenState extends State<SetupScreen>
 
   final _usernameCtrl = TextEditingController();
   final _apikeyCtrl   = TextEditingController();
+  final _secretCtrl   = TextEditingController();
 
-  bool    _obscureApiKey = true;
-  bool    _rememberMe    = true;
-  bool    _isLoading     = false;
+  bool    _obscureApiKey   = true;
+  bool    _obscureSecret   = true;
+  bool    _enableFavorites = false;
+  bool    _rememberMe      = true;
+  bool    _isLoading       = false;
   String? _errorMessage;
 
   // ── Animation controllers ──────────────────────────────────────────────
@@ -97,6 +101,7 @@ class _SetupScreenState extends State<SetupScreen>
     localeNotifier.removeListener(_onLocale);
     _usernameCtrl.dispose();
     _apikeyCtrl.dispose();
+    _secretCtrl.dispose();
     _entryCtrl.dispose();
     _floatCtrl.dispose();
     super.dispose();
@@ -232,6 +237,14 @@ class _SetupScreenState extends State<SetupScreen>
 
       final totalScrobbles =
           int.tryParse(userInfo['playcount']?.toString() ?? '0') ?? 0;
+
+      // Optional: authorize favorites (loved tracks) — doesn't block setup on failure.
+      if (_enableFavorites && _secretCtrl.text.trim().isNotEmpty) {
+        if (!mounted) return;
+        await connectFavorites(
+          context, username: username, apiKey: apiKey, secret: _secretCtrl.text,
+        );
+      }
 
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
@@ -455,7 +468,71 @@ class _SetupScreenState extends State<SetupScreen>
                                           color: scheme.onSurfaceVariant),
                                     )),
                                   ]),
-                                  const SizedBox(height: 14),
+                                  const SizedBox(height: 4),
+
+                                  // Optional favorites (secret key) section
+                                  InkWell(
+                                    borderRadius: BorderRadius.circular(12),
+                                    onTap: () => setState(
+                                        () => _enableFavorites = !_enableFavorites),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 4),
+                                      child: Row(children: [
+                                        Checkbox(
+                                          value: _enableFavorites,
+                                          onChanged: (v) => setState(
+                                              () => _enableFavorites = v ?? false),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(4)),
+                                        ),
+                                        Expanded(child: Text(
+                                          L.setupEnableFavorites,
+                                          style: text.bodySmall,
+                                        )),
+                                      ]),
+                                    ),
+                                  ),
+                                  AnimatedSize(
+                                    duration: const Duration(milliseconds: 220),
+                                    child: !_enableFavorites
+                                        ? const SizedBox.shrink()
+                                        : Padding(
+                                            padding: const EdgeInsets.only(top: 2, bottom: 10),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  L.setupFavoritesExplain,
+                                                  style: text.bodySmall?.copyWith(
+                                                      color: scheme.onSurfaceVariant),
+                                                ),
+                                                const SizedBox(height: 10),
+                                                TextField(
+                                                  controller:        _secretCtrl,
+                                                  obscureText:       _obscureSecret,
+                                                  autocorrect:       false,
+                                                  enableSuggestions: false,
+                                                  decoration: InputDecoration(
+                                                    labelText: L.setupSecretKeyLabel,
+                                                    prefixIcon: const Icon(Icons.favorite_border_rounded),
+                                                    suffixIcon: IconButton(
+                                                      icon: Icon(_obscureSecret
+                                                          ? Icons.visibility_outlined
+                                                          : Icons.visibility_off_outlined),
+                                                      onPressed: () => setState(
+                                                          () => _obscureSecret = !_obscureSecret),
+                                                    ),
+                                                    border: OutlineInputBorder(
+                                                        borderRadius: BorderRadius.circular(14)),
+                                                    filled:    true,
+                                                    fillColor: scheme.surface,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                  ),
+                                  const SizedBox(height: 6),
 
                                   // Remember me
                                   Row(children: [

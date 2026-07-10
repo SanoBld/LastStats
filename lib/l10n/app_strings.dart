@@ -605,4 +605,29 @@ abstract class AppStrings {
   String get dashUniqueAlbumsLabel;
   String get dashThisWeekLabel;
   String get dashDayUnitShort;
+
+  // ── Favorites (loved tracks) ────────────────────────────────────────────
+  String get setupEnableFavorites;
+  String get setupFavoritesExplain;
+  String get setupSecretKeyLabel;
+  String get favConnectInvalidSecret;
+  String get favConnectDialogTitle;
+  String get favConnectDialogBody;
+  String get favConnectDialogConfirm;
+  String get favConnectSuccess;
+  String get favConnectError;
+  String get acctApiKeysSection;
+  String get acctSecretKeyLabel;
+  String get acctSecretKeyNotSet;
+  String get acctFavoritesExplain;
+  String get acctConnectFavorites;
+  String get acctDisconnectFavorites;
+  String get settingsFavoritesSection;
+  String get settingsFavoritesSectionSub;
+  String get settingsFavoritesNeedsKey;
+  String get favSectionTitle;
+  String get commonSeeMore;
+  String get favPageTitle;
+  String get favSearchHint;
+  String get favEmpty;
 }

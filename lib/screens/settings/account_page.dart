@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/l10n.dart';
 import '../../app_state.dart';
 import '../../services/account_manager.dart';
+import '../../services/favorites_auth.dart';
 import '../setup_screen.dart';
 import '../home_screen.dart';
 import 'settings_helpers.dart';
@@ -28,6 +29,11 @@ class _AccountPageState extends State<AccountPage> {
   bool               _loading     = true;
   String?            _avatarUrl;
 
+  bool   _obscureApiKey  = true;
+  bool   _obscureSecret  = true;
+  bool   _connectingFav  = false;
+  final  _secretCtrl     = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -38,7 +44,16 @@ class _AccountPageState extends State<AccountPage> {
   @override
   void dispose() {
     localeNotifier.removeListener(_rebuild);
+    _secretCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _connectFav(AccountEntry active) async {
+    setState(() => _connectingFav = true);
+    await connectFavorites(
+      context, username: active.username, apiKey: active.apiKey, secret: _secretCtrl.text,
+    );
+    if (mounted) setState(() => _connectingFav = false);
   }
 
   void _rebuild() => setState(() {});
@@ -411,6 +426,97 @@ class _AccountPageState extends State<AccountPage> {
             ),
           ]),
         ),
+
+        const SizedBox(height: 16),
+
+        // ── API keys (favorites) ────────────────────────────────────────────
+        if (active != null)
+          SettingsSection(
+            label: L.acctApiKeysSection,
+            children: [
+              ListTile(
+                leading: Icon(Icons.key_rounded, color: scheme.primary, size: 20),
+                title: Text(L.acctApiKeyLabel),
+                subtitle: Text(
+                  _obscureApiKey ? '•' * 20 : active.apiKey,
+                  style: text.bodySmall?.copyWith(
+                      color: scheme.onSurfaceVariant, fontFamily: 'monospace'),
+                ),
+                trailing: IconButton(
+                  icon: Icon(_obscureApiKey
+                      ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+                  onPressed: () => setState(() => _obscureApiKey = !_obscureApiKey),
+                ),
+              ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              ValueListenableBuilder<String>(
+                valueListenable: secretKeyNotifier,
+                builder: (_, secret, __) => ListTile(
+                  leading: Icon(Icons.favorite_rounded,
+                      color: secret.isNotEmpty ? Colors.redAccent : scheme.onSurfaceVariant,
+                      size: 20),
+                  title: Text(L.acctSecretKeyLabel),
+                  subtitle: Text(
+                    secret.isEmpty
+                        ? L.acctSecretKeyNotSet
+                        : (_obscureSecret ? '•' * 20 : secret),
+                    style: text.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant, fontFamily: 'monospace'),
+                  ),
+                  trailing: secret.isEmpty
+                      ? null
+                      : IconButton(
+                          icon: Icon(_obscureSecret
+                              ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+                          onPressed: () => setState(() => _obscureSecret = !_obscureSecret),
+                        ),
+                ),
+              ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(L.acctFavoritesExplain,
+                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                  const SizedBox(height: 10),
+                  ValueListenableBuilder<String>(
+                    valueListenable: sessionKeyNotifier,
+                    builder: (_, session, __) {
+                      if (session.isNotEmpty) {
+                        return OutlinedButton.icon(
+                          onPressed: disconnectFavorites,
+                          icon: const Icon(Icons.link_off_rounded, size: 18),
+                          label: Text(L.acctDisconnectFavorites),
+                          style: OutlinedButton.styleFrom(foregroundColor: scheme.error),
+                        );
+                      }
+                      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        TextField(
+                          controller:  _secretCtrl,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            labelText:  L.acctSecretKeyLabel,
+                            prefixIcon: const Icon(Icons.vpn_key_rounded),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            isDense: true,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        FilledButton.icon(
+                          onPressed: _connectingFav ? null : () => _connectFav(active),
+                          icon: _connectingFav
+                              ? const SizedBox(width: 16, height: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2))
+                              : const Icon(Icons.favorite_border_rounded, size: 18),
+                          label: Text(L.acctConnectFavorites),
+                        ),
+                      ]);
+                    },
+                  ),
+                ]),
+              ),
+            ],
+          ),
 
         const SizedBox(height: 16),
 

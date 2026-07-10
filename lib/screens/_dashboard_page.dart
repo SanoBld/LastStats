@@ -114,6 +114,8 @@ class _DashboardPageState extends State<_DashboardPage> {
   bool _showAlbums   = true;
   bool _showTracks   = true;
   bool _showRecent   = true;
+  bool _showFavorites = true;
+  List<dynamic> _lovedTracks = [];
 
   // In-app news feed
   List<Map<String, dynamic>> _newsItems   = [];
@@ -149,10 +151,20 @@ class _DashboardPageState extends State<_DashboardPage> {
     if (gotCache) {
       _resolveHeaderImage();
       if (_showFriends) _loadFriends();
+      if (favoritesEnabled) _loadFavorites();
       _load(silent: true);
     } else {
       _load();
+      if (favoritesEnabled) _loadFavorites();
     }
+  }
+
+  Future<void> _loadFavorites() async {
+    try {
+      final fresh = await widget.service.getLovedTracks(limit: 15);
+      await DataCache.set(DataCache.keyLovedTracks(), fresh);
+      if (mounted) setState(() => _lovedTracks = fresh);
+    } catch (_) {}
   }
 
   bool _loadFromCache() {
@@ -171,6 +183,7 @@ class _DashboardPageState extends State<_DashboardPage> {
     final topTrkM    = DataCache.getSync(DataCache.keyTopTracks('1month'))   as List?;
     final topArtY    = DataCache.getSync(DataCache.keyTopArtists('12month')) as List?;
     final topTrkY    = DataCache.getSync(DataCache.keyTopTracks('12month'))  as List?;
+    final loved      = DataCache.getSync(DataCache.keyLovedTracks())        as List?;
 
     Map<String, dynamic>? np;
     final recentF = <dynamic>[];
@@ -202,6 +215,7 @@ class _DashboardPageState extends State<_DashboardPage> {
       _topTracksMonth  = topTrkM    ?? [];
       _topArtistsYear  = topArtY    ?? [];
       _topTracksYear   = topTrkY    ?? [];
+      _lovedTracks     = loved      ?? [];
       _loading         = false;
     });
 
@@ -230,6 +244,7 @@ class _DashboardPageState extends State<_DashboardPage> {
       _showTracks            = p.getBool('ls_show_tracks')              ?? true;
       _showRecent            = p.getBool('ls_show_recent')              ?? true;
       _showFriends           = p.getBool('ls_show_friends')             ?? true;
+      _showFavorites         = p.getBool('ls_show_favorites')           ?? true;
       final rawCards = p.getStringList('ls_stat_cards');
       _statCards   = rawCards != null && rawCards.isNotEmpty
           ? rawCards : List.from(_kDefaultStatCards);
@@ -1640,6 +1655,33 @@ class _DashboardPageState extends State<_DashboardPage> {
                     onToggleFav: _toggleFav,
                     onRefresh:   _loadFriends,
                   ),
+                ),
+                const SizedBox(height: 20),
+              ],
+
+              // ── Favorites (loved tracks) ─────────────────────────────────
+              if (_showFavorites && favoritesEnabled && _lovedTracks.isNotEmpty) ...[
+                _FadeSlideIn(
+                  delay: const Duration(milliseconds: 270),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [
+                      Expanded(
+                        child: _SectionHeader(title: L.favSectionTitle, icon: Icons.favorite_rounded),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => FavoritesPage(service: widget.service),
+                        )),
+                        child: Text(L.commonSeeMore),
+                      ),
+                    ]),
+                    const SizedBox(height: 10),
+                    _HorizontalCarousel(
+                      items:   _lovedTracks.take(10).toList(),
+                      type:    'tracks',
+                      service: widget.service,
+                    ),
+                  ]),
                 ),
                 const SizedBox(height: 20),
               ],

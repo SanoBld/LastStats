@@ -577,5 +577,28 @@ class AppStringsFr implements AppStrings {
   @override String get dashUniqueAlbumsLabel    => 'Albums uniques';
   @override String get dashThisWeekLabel        => 'Cette semaine';
   @override String get dashDayUnitShort         => 'j';
+  @override String get setupEnableFavorites      => 'Activer les favoris (facultatif)';
+  @override String get setupFavoritesExplain     => 'Ta clé secrète permet à l\'application de marquer des titres en favori (ou de les retirer) directement sur Last.fm.';
+  @override String get setupSecretKeyLabel       => 'Clé secrète Last.fm';
+  @override String get favConnectInvalidSecret   => 'La clé secrète doit faire 32 caractères.';
+  @override String get favConnectDialogTitle     => 'Autoriser les favoris';
+  @override String get favConnectDialogBody      => 'Autorise l\'application sur la page Last.fm ouverte dans ton navigateur, puis reviens ici et confirme.';
+  @override String get favConnectDialogConfirm   => 'J\'ai autorisé';
+  @override String get favConnectSuccess         => 'Favoris activés avec succès !';
+  @override String get favConnectError           => 'Impossible d\'activer les favoris. Vérifie ta clé secrète.';
+  @override String get acctApiKeysSection        => 'Clés API';
+  @override String get acctSecretKeyLabel        => 'Clé secrète';
+  @override String get acctSecretKeyNotSet       => 'Non renseignée';
+  @override String get acctFavoritesExplain      => 'La clé secrète permet de mettre en favori (ou retirer) des titres directement sur Last.fm.';
+  @override String get acctConnectFavorites      => 'Activer les favoris';
+  @override String get acctDisconnectFavorites   => 'Désactiver les favoris';
+  @override String get settingsFavoritesSection    => 'Favoris';
+  @override String get settingsFavoritesSectionSub => 'Carrousel de tes titres favoris';
+  @override String get settingsFavoritesNeedsKey   => 'Ajoute ta clé secrète dans Compte pour activer';
+  @override String get favSectionTitle           => 'Favoris';
+  @override String get commonSeeMore             => 'Voir plus';
+  @override String get favPageTitle              => 'Mes favoris';
+  @override String get favSearchHint             => 'Rechercher un titre ou un artiste';
+  @override String get favEmpty                  => 'Aucun favori pour le moment.';
 }
 
