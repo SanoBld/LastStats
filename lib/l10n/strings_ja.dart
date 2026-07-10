@@ -536,6 +536,8 @@ class AppStringsJa implements AppStrings {
   @override String get favPageTitle              => 'マイお気に入り';
   @override String get favSearchHint             => '曲名やアーティストを検索';
   @override String get favEmpty                  => 'お気に入りはまだありません。';
+  @override String get settingsLovedBadgeTitle => '控えめなハートバッジ';
+  @override String get settingsLovedBadgeSub   => '最近の再生履歴、履歴、検索でお気に入りの曲に小さなハートを表示します';
 
   @override String globalListeners(String count) => '世界のリスナー数：$count人';
   @override String historyScrobbles(int n) => '$n回のスクロブル';

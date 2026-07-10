@@ -409,6 +409,10 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         await svc.loveTrack(_name, _artist);
       }
       await DataCache.invalidate(DataCache.keyLovedTracks());
+      final key    = lovedKey(_artist, _name);
+      final newSet = Set<String>.from(lovedTrackKeysNotifier.value);
+      was ? newSet.remove(key) : newSet.add(key);
+      lovedTrackKeysNotifier.value = newSet;
     } catch (_) {
       if (mounted) setState(() => _isLoved = was);
     } finally {
@@ -676,33 +680,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ),
           ),
         ),
-
-        // Favorite (heart) button — tracks only, requires favorites auth
-        if (widget.type == 'tracks' && favoritesEnabled)
-          Positioned(
-            top: topPad + 8, right: 12,
-            child: GestureDetector(
-              onTap: _toggleLove,
-              child: Container(
-                width: 36, height: 36,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.45),
-                  shape: BoxShape.circle,
-                ),
-                child: _loveBusy
-                    ? const Padding(
-                        padding: EdgeInsets.all(9),
-                        child: CircularProgressIndicator(
-                            strokeWidth: 2, color: Colors.white),
-                      )
-                    : Icon(
-                        _isLoved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                        color: _isLoved ? Colors.redAccent : Colors.white,
-                        size: 18,
-                      ),
-              ),
-            ),
-          ),
       ],
     );
   }
@@ -761,13 +738,24 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ),
           ],
           const SizedBox(height: 14),
-          // Music app link buttons + circular preview play button
-          Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          // Music app link buttons + heart (above) & circular preview play button
+          Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Expanded(child: _buildMusicLinks(hasImage)),
-            if (widget.type == 'tracks' && (_previewUrl != null || _previewLoading))
+            if (widget.type == 'tracks' &&
+                (favoritesEnabled || _previewUrl != null || _previewLoading))
               Padding(
                 padding: const EdgeInsets.only(left: 8),
-                child: _buildPreviewRing(scheme),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (favoritesEnabled) ...[
+                      _buildLoveButton(),
+                      const SizedBox(height: 8),
+                    ],
+                    if (_previewUrl != null || _previewLoading)
+                      _buildPreviewRing(scheme),
+                  ],
+                ),
               ),
           ]),
           const SizedBox(height: 16),
@@ -775,6 +763,28 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       ),
     );
   }
+
+  // Small heart button, shown just above the 30s preview play button.
+  Widget _buildLoveButton() => GestureDetector(
+    onTap: _toggleLove,
+    child: Container(
+      width: 32, height: 32,
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.45),
+        shape: BoxShape.circle,
+      ),
+      child: _loveBusy
+          ? const Padding(
+              padding: EdgeInsets.all(8),
+              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+            )
+          : Icon(
+              _isLoved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+              color: _isLoved ? Colors.redAccent : Colors.white,
+              size: 16,
+            ),
+    ),
+  );
 
   // ── Music app links ─────────────────────────────────────────────────────────
 

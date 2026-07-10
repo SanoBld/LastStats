@@ -536,6 +536,8 @@ class AppStringsRu implements AppStrings {
   @override String get favPageTitle              => 'Мои избранные';
   @override String get favSearchHint             => 'Поиск трека или исполнителя';
   @override String get favEmpty                  => 'Пока нет избранного.';
+  @override String get settingsLovedBadgeTitle => 'Скромный значок сердца';
+  @override String get settingsLovedBadgeSub   => 'Показывает маленькое сердце у избранных треков в недавних, истории и поиске';
 
   @override String globalListeners(String count) => '$count слушателей во всём мире';
   @override String historyScrobbles(int n) => '$n скробблов';

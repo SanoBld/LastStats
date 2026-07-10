@@ -536,6 +536,8 @@ class AppStringsAr implements AppStrings {
   @override String get favPageTitle              => 'مفضلتي';
   @override String get favSearchHint             => 'ابحث عن مقطوعة أو فنان';
   @override String get favEmpty                  => 'لا توجد مفضلة بعد.';
+  @override String get settingsLovedBadgeTitle => 'شارة قلب مميّزة بشكل خفيف';
+  @override String get settingsLovedBadgeSub   => 'تعرض قلبًا صغيرًا على المقطوعات المفضلة في الاستماع الأخير والسجل والبحث';
 
   @override String globalListeners(String count) => '$count مستمع حول العالم';
   @override String historyScrobbles(int n) => '$n تشغيلة';

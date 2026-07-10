@@ -600,5 +600,7 @@ class AppStringsFr implements AppStrings {
   @override String get favPageTitle              => 'Mes favoris';
   @override String get favSearchHint             => 'Rechercher un titre ou un artiste';
   @override String get favEmpty                  => 'Aucun favori pour le moment.';
+  @override String get settingsLovedBadgeTitle => 'Badge cœur discret';
+  @override String get settingsLovedBadgeSub   => 'Affiche un petit cœur sur les titres favoris dans les écoutes récentes, l\'historique et la recherche';
 }
 

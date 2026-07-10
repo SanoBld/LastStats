@@ -630,4 +630,6 @@ abstract class AppStrings {
   String get favPageTitle;
   String get favSearchHint;
   String get favEmpty;
+  String get settingsLovedBadgeTitle;
+  String get settingsLovedBadgeSub;
 }

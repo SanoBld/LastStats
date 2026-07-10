@@ -164,6 +164,10 @@ class _DashboardPageState extends State<_DashboardPage> {
       final fresh = await widget.service.getLovedTracks(limit: 15);
       await DataCache.set(DataCache.keyLovedTracks(), fresh);
       if (mounted) setState(() => _lovedTracks = fresh);
+      lovedTrackKeysNotifier.value = {
+        for (final t in fresh)
+          lovedKey((t['artist']?['name'] ?? '').toString(), (t['name'] ?? '').toString()),
+      };
     } catch (_) {}
   }
 
@@ -218,6 +222,12 @@ class _DashboardPageState extends State<_DashboardPage> {
       _lovedTracks     = loved      ?? [];
       _loading         = false;
     });
+    if (loved != null) {
+      lovedTrackKeysNotifier.value = {
+        for (final t in loved)
+          lovedKey((t['artist']?['name'] ?? '').toString(), (t['name'] ?? '').toString()),
+      };
+    }
 
     if (np != null) _extractColor(np);
     return true;
@@ -1664,22 +1674,14 @@ class _DashboardPageState extends State<_DashboardPage> {
                 _FadeSlideIn(
                   delay: const Duration(milliseconds: 270),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Row(children: [
-                      Expanded(
-                        child: _SectionHeader(title: L.favSectionTitle, icon: Icons.favorite_rounded),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => FavoritesPage(service: widget.service),
-                        )),
-                        child: Text(L.commonSeeMore),
-                      ),
-                    ]),
+                    _SectionHeader(title: L.favSectionTitle, icon: Icons.favorite_rounded),
                     const SizedBox(height: 10),
-                    _HorizontalCarousel(
-                      items:   _lovedTracks.take(10).toList(),
-                      type:    'tracks',
+                    _FavoritesCard(
+                      tracks:  _lovedTracks.take(4).toList(),
                       service: widget.service,
+                      onSeeMore: () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => FavoritesPage(service: widget.service),
+                      )),
                     ),
                   ]),
                 ),
@@ -3408,6 +3410,97 @@ class _RecentTracksList extends StatelessWidget {
 }
 
 
+// ── Favorites card — compact vertical list, no horizontal scroll ─────────────
+
+class _FavoritesCard extends StatelessWidget {
+  final List<dynamic>  tracks;
+  final LastFmService   service;
+  final VoidCallback    onSeeMore;
+
+  const _FavoritesCard({
+    required this.tracks,
+    required this.service,
+    required this.onSeeMore,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.35)),
+      ),
+      child: Column(children: [
+        for (final t in tracks)
+          _FavoriteRow(track: t as Map<String, dynamic>, service: service),
+        InkWell(
+          borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+          onTap: onSeeMore,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Center(
+              child: Text(L.commonSeeMore, style: text.labelLarge?.copyWith(
+                  color: scheme.primary, fontWeight: FontWeight.w700)),
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+class _FavoriteRow extends StatelessWidget {
+  final Map<String, dynamic> track;
+  final LastFmService        service;
+
+  const _FavoriteRow({required this.track, required this.service});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+    final name   = (track['name'] ?? '').toString();
+    final artist = (track['artist']?['name'] ?? '').toString();
+    final rawUrl = _extractImage(track['image']);
+
+    return InkWell(
+      onTap: () {
+        _haptic(_HapticImpact.light);
+        showDetailSheet(context, track, 'tracks', service);
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        child: Row(children: [
+          _SmartImage(
+            size: 40,
+            borderRadius: 8,
+            initialUrl: rawUrl,
+            resolver: () => ImageService.resolveTrack(name, artist,
+                lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null),
+          ),
+          const SizedBox(width: 12),
+          Expanded(child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+              Text(artist, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            ],
+          )),
+          const SizedBox(width: 8),
+          const Icon(Icons.favorite_rounded, size: 14, color: Colors.redAccent),
+        ]),
+      ),
+    );
+  }
+}
+
+
 // ── Single recent track row ───────────────────────────────────────────────────
 
 class _RecentTrackRow extends StatefulWidget {
@@ -3496,6 +3589,20 @@ class _RecentTrackRowState extends State<_RecentTrackRow> {
                 )),
 
                 const SizedBox(width: 8),
+
+                ValueListenableBuilder<Set<String>>(
+                  valueListenable: lovedTrackKeysNotifier,
+                  builder: (_, loved, __) {
+                    if (!showLovedBadgeNotifier.value ||
+                        !loved.contains(lovedKey(artist, title))) {
+                      return const SizedBox.shrink();
+                    }
+                    return const Padding(
+                      padding: EdgeInsets.only(right: 4),
+                      child: Icon(Icons.favorite_rounded, size: 11, color: Colors.redAccent),
+                    );
+                  },
+                ),
 
                 Text(
                   dateStr,

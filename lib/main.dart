@@ -65,6 +65,7 @@ void main() async {
   showAllPlatformLinksNotifier.value   = prefs.getBool('ls_show_all_platform_links')  ?? false;
   secretKeyNotifier.value              = prefs.getString('ls_secret_key')            ?? '';
   sessionKeyNotifier.value             = prefs.getString('ls_session_key')           ?? '';
+  showLovedBadgeNotifier.value         = prefs.getBool('ls_show_loved_badge')        ?? true;
 
   final fallbackHex = prefs.getString('ls_nowplaying_fallback_color');
   nowPlayingFallbackColorNotifier.value =

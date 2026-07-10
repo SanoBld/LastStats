@@ -73,6 +73,20 @@ final sessionKeyNotifier = ValueNotifier<String>('');
 /// True once the user has authorized favorites (loved tracks) access.
 bool get favoritesEnabled => sessionKeyNotifier.value.isNotEmpty;
 
+// Cache of "artist|track" (lowercased) keys currently loved — powers the
+// discreet heart badges in recent tracks, history, and search results.
+final lovedTrackKeysNotifier = ValueNotifier<Set<String>>({});
+
+// Show a small heart badge on loved tracks in recent/history/search lists.
+// Saved as 'ls_show_loved_badge' in SharedPreferences.
+final showLovedBadgeNotifier = ValueNotifier<bool>(true);
+
+String lovedKey(String artist, String track) =>
+    '${artist.trim().toLowerCase()}|${track.trim().toLowerCase()}';
+
+bool isTrackLoved(String artist, String track) =>
+    lovedTrackKeysNotifier.value.contains(lovedKey(artist, track));
+
 ThemeMode themeFromString(String? s) {
   switch (s) {
     case 'light':  return ThemeMode.light;

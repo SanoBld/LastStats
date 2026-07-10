@@ -600,5 +600,7 @@ class AppStringsEs implements AppStrings {
   @override String get favPageTitle              => 'Mis favoritos';
   @override String get favSearchHint             => 'Buscar una canción o artista';
   @override String get favEmpty                  => 'Aún no hay favoritos.';
+  @override String get settingsLovedBadgeTitle => 'Insignia de corazón discreta';
+  @override String get settingsLovedBadgeSub   => 'Muestra un pequeño corazón en las canciones favoritas en reproducciones recientes, historial y búsqueda';
 }
 

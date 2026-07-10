@@ -536,6 +536,8 @@ class AppStringsIt implements AppStrings {
   @override String get favPageTitle              => 'I miei preferiti';
   @override String get favSearchHint             => 'Cerca un brano o un artista';
   @override String get favEmpty                  => 'Ancora nessun preferito.';
+  @override String get settingsLovedBadgeTitle => 'Icona cuore discreta';
+  @override String get settingsLovedBadgeSub   => 'Mostra un piccolo cuore sui brani preferiti in ascolti recenti, cronologia e ricerca';
 
   @override String globalListeners(String count) => '$count ascoltatori globali';
   @override String historyScrobbles(int n) => '$n scrobble';
