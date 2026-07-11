@@ -162,7 +162,8 @@ Future<int?> _extractDominantColorArgb(Uint8List bytes) async {
 class _DismissOnOverscroll extends StatefulWidget {
   final Widget       child;
   final VoidCallback onDismiss;
-  const _DismissOnOverscroll({required this.child, required this.onDismiss});
+  final ValueChanged<double>? onScrollUpdate;
+  const _DismissOnOverscroll({required this.child, required this.onDismiss, this.onScrollUpdate});
 
   @override
   State<_DismissOnOverscroll> createState() => _DismissOnOverscrollState();
@@ -175,6 +176,7 @@ class _DismissOnOverscrollState extends State<_DismissOnOverscroll> {
   @override
   Widget build(BuildContext context) => NotificationListener<ScrollNotification>(
     onNotification: (n) {
+      widget.onScrollUpdate?.call(n.metrics.pixels);
       if (n is ScrollStartNotification || n is ScrollEndNotification) {
         _pulled = 0;
       } else if (n is OverscrollNotification && n.overscroll < 0) {
@@ -272,6 +274,9 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   bool _isLoved  = false;
   bool _loveBusy = false;
 
+  final _scrimOpacity = ValueNotifier<double>(0);
+  double _imgHeight   = 400;
+
   bool   _translating    = false;
   bool   _showTranslated = false;
   String _translatedBio  = '';
@@ -299,10 +304,23 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     if (widget.type == 'tracks') _fetchDeezerPreview();
   }
 
+  // Deferred to after the current frame — updating a ValueNotifier
+  // synchronously from a scroll notification can otherwise land mid-build
+  // and silently break the frame (buttons stop responding, no error shown).
+  void _onScroll(double pixels) {
+    final threshold = _imgHeight - 90;
+    final raw = threshold > 0 ? (pixels / threshold).clamp(0.0, 1.0) : 0.0;
+    if (raw == _scrimOpacity.value) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _scrimOpacity.value = raw;
+    });
+  }
+
   @override
   void dispose() {
     _audioPlayer?.stop();
     _audioPlayer?.dispose();
+    _scrimOpacity.dispose();
     super.dispose();
   }
 
@@ -573,6 +591,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     final topPad   = MediaQuery.of(ctx).padding.top;
     final imgH     = mediaH * 0.44;
     final hasImage = _resolvedImage.isNotEmpty;
+    _imgHeight = imgH;
 
     return Stack(
       children: [
@@ -619,6 +638,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         // and never overlaps underlying items when the user scrolls down.
         _DismissOnOverscroll(
           onDismiss: () => Navigator.pop(ctx),
+          onScrollUpdate: _onScroll,
           child: SingleChildScrollView(
             physics: const ClampingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics()),
@@ -661,8 +681,14 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           ),
         ),
 
-        // Status bar scrim — always above the scroll content
-        _StatusBarScrim(height: topPad),
+        // Status bar scrim — fades in once scrolled past the hero image
+        ValueListenableBuilder<double>(
+          valueListenable: _scrimOpacity,
+          builder: (_, opacity, __) => Opacity(
+            opacity: opacity,
+            child: _StatusBarScrim(height: topPad),
+          ),
+        ),
 
         // Back button
         Positioned(
