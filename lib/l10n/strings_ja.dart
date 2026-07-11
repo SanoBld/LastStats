@@ -529,7 +529,7 @@ class AppStringsJa implements AppStrings {
   @override String get acctConnectFavorites      => 'お気に入りを有効にする';
   @override String get acctDisconnectFavorites   => 'お気に入りを無効にする';
   @override String get settingsFavoritesSection    => 'お気に入り';
-  @override String get settingsFavoritesSectionSub => 'お気に入り曲のカルーセル';
+  @override String get settingsFavoritesSectionSub => '統計にお気に入りの数を表示します';
   @override String get settingsFavoritesNeedsKey   => '有効にするにはアカウントでシークレットキーを追加してください';
   @override String get favSectionTitle           => 'お気に入り';
   @override String get commonSeeMore             => 'もっと見る';

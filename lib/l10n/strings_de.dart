@@ -529,7 +529,7 @@ class AppStringsDe implements AppStrings {
   @override String get acctConnectFavorites      => 'Favoriten aktivieren';
   @override String get acctDisconnectFavorites   => 'Favoriten deaktivieren';
   @override String get settingsFavoritesSection    => 'Favoriten';
-  @override String get settingsFavoritesSectionSub => 'Karussell deiner Lieblingstitel';
+  @override String get settingsFavoritesSectionSub => 'Zeigt die Anzahl deiner Favoriten in der Statistik';
   @override String get settingsFavoritesNeedsKey   => 'Füge deinen geheimen Schlüssel im Konto hinzu, um zu aktivieren';
   @override String get favSectionTitle           => 'Favoriten';
   @override String get commonSeeMore             => 'Mehr anzeigen';

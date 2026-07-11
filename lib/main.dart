@@ -68,11 +68,14 @@ void main() async {
 
   // One-time migration: if favorites was already connected before this card
   // existed, make sure it's added to the user's saved stat card selection.
-  if (sessionKeyNotifier.value.isNotEmpty) {
+  // Guarded by its own flag so it never re-adds a card the user removed.
+  final favMigrated = prefs.getBool('ls_fav_stat_migrated') ?? false;
+  if (!favMigrated && sessionKeyNotifier.value.isNotEmpty) {
     final cards = prefs.getStringList('ls_stat_cards');
     if (cards != null && !cards.contains('favorites_count')) {
       await prefs.setStringList('ls_stat_cards', [...cards, 'favorites_count']);
     }
+    await prefs.setBool('ls_fav_stat_migrated', true);
   }
   showLovedBadgeNotifier.value         = prefs.getBool('ls_show_loved_badge')        ?? true;
 

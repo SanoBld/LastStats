@@ -529,7 +529,7 @@ class AppStringsRu implements AppStrings {
   @override String get acctConnectFavorites      => 'Включить избранное';
   @override String get acctDisconnectFavorites   => 'Отключить избранное';
   @override String get settingsFavoritesSection    => 'Избранное';
-  @override String get settingsFavoritesSectionSub => 'Карусель избранных треков';
+  @override String get settingsFavoritesSectionSub => 'Показывает количество избранного в статистике';
   @override String get settingsFavoritesNeedsKey   => 'Добавьте секретный ключ в разделе «Аккаунт», чтобы включить';
   @override String get favSectionTitle           => 'Избранное';
   @override String get commonSeeMore             => 'Показать больше';

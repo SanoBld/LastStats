@@ -593,7 +593,7 @@ class AppStringsPt implements AppStrings {
   @override String get acctConnectFavorites      => 'Ativar favoritos';
   @override String get acctDisconnectFavorites   => 'Desativar favoritos';
   @override String get settingsFavoritesSection    => 'Favoritos';
-  @override String get settingsFavoritesSectionSub => 'Carrossel das suas faixas favoritas';
+  @override String get settingsFavoritesSectionSub => 'Mostra o número de favoritos nas estatísticas';
   @override String get settingsFavoritesNeedsKey   => 'Adicione sua chave secreta em Conta para ativar';
   @override String get favSectionTitle           => 'Favoritos';
   @override String get commonSeeMore             => 'Ver mais';

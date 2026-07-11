@@ -529,7 +529,7 @@ class AppStringsAr implements AppStrings {
   @override String get acctConnectFavorites      => 'تفعيل المفضلة';
   @override String get acctDisconnectFavorites   => 'إلغاء تفعيل المفضلة';
   @override String get settingsFavoritesSection    => 'المفضلة';
-  @override String get settingsFavoritesSectionSub => 'شريط مقطوعاتك المفضلة';
+  @override String get settingsFavoritesSectionSub => 'يعرض عدد المفضلة في الإحصائيات';
   @override String get settingsFavoritesNeedsKey   => 'أضف المفتاح السري في الحساب للتفعيل';
   @override String get favSectionTitle           => 'المفضلة';
   @override String get commonSeeMore             => 'عرض المزيد';

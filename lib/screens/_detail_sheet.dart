@@ -162,7 +162,8 @@ Future<int?> _extractDominantColorArgb(Uint8List bytes) async {
 class _DismissOnOverscroll extends StatefulWidget {
   final Widget       child;
   final VoidCallback onDismiss;
-  const _DismissOnOverscroll({required this.child, required this.onDismiss});
+  final ValueChanged<double>? onScrollUpdate;
+  const _DismissOnOverscroll({required this.child, required this.onDismiss, this.onScrollUpdate});
 
   @override
   State<_DismissOnOverscroll> createState() => _DismissOnOverscrollState();
@@ -175,6 +176,7 @@ class _DismissOnOverscrollState extends State<_DismissOnOverscroll> {
   @override
   Widget build(BuildContext context) => NotificationListener<ScrollNotification>(
     onNotification: (n) {
+      widget.onScrollUpdate?.call(n.metrics.pixels);
       if (n is ScrollStartNotification || n is ScrollEndNotification) {
         _pulled = 0;
       } else if (n is OverscrollNotification && n.overscroll < 0) {
@@ -272,7 +274,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   bool _isLoved  = false;
   bool _loveBusy = false;
 
-  final _scrollCtrl    = ScrollController();
   final _scrimOpacity  = ValueNotifier<double>(0);
   double _imgHeight    = 400;
 
@@ -301,12 +302,11 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     super.initState();
     _fetchAll();
     if (widget.type == 'tracks') _fetchDeezerPreview();
-    _scrollCtrl.addListener(_onScroll);
   }
 
-  void _onScroll() {
+  void _onScroll(double pixels) {
     final threshold = _imgHeight - 90;
-    final raw = threshold > 0 ? (_scrollCtrl.offset / threshold).clamp(0.0, 1.0) : 0.0;
+    final raw = threshold > 0 ? (pixels / threshold).clamp(0.0, 1.0) : 0.0;
     _scrimOpacity.value = raw;
   }
 
@@ -314,8 +314,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   void dispose() {
     _audioPlayer?.stop();
     _audioPlayer?.dispose();
-    _scrollCtrl.removeListener(_onScroll);
-    _scrollCtrl.dispose();
     _scrimOpacity.dispose();
     super.dispose();
   }
@@ -634,8 +632,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         // and never overlaps underlying items when the user scrolls down.
         _DismissOnOverscroll(
           onDismiss: () => Navigator.pop(ctx),
+          onScrollUpdate: _onScroll,
           child: SingleChildScrollView(
-            controller: _scrollCtrl,
             physics: const ClampingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics()),
             child: Column(

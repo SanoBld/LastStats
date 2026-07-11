@@ -590,7 +590,7 @@ class AppStringsZh implements AppStrings {
   @override String get acctConnectFavorites      => '启用收藏';
   @override String get acctDisconnectFavorites   => '停用收藏';
   @override String get settingsFavoritesSection    => '收藏';
-  @override String get settingsFavoritesSectionSub => '你收藏歌曲的横向列表';
+  @override String get settingsFavoritesSectionSub => '在统计中显示收藏数量';
   @override String get settingsFavoritesNeedsKey   => '请在账户中添加密钥以启用';
   @override String get favSectionTitle           => '收藏';
   @override String get commonSeeMore             => '查看更多';
