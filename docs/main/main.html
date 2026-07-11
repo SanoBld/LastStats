@@ -107,6 +107,15 @@
   showAllPlatformLinksNotifier.value   = prefs.getBool(&#39;ls_show_all_platform_links&#39;)  ?? false;
   secretKeyNotifier.value              = prefs.getString(&#39;ls_secret_key&#39;)            ?? &#39;&#39;;
   sessionKeyNotifier.value             = prefs.getString(&#39;ls_session_key&#39;)           ?? &#39;&#39;;
+
+  &#47;&#47; One-time migration: if favorites was already connected before this card
+  &#47;&#47; existed, make sure it&#39;s added to the user&#39;s saved stat card selection.
+  if (sessionKeyNotifier.value.isNotEmpty) {
+    final cards = prefs.getStringList(&#39;ls_stat_cards&#39;);
+    if (cards != null &amp;&amp; !cards.contains(&#39;favorites_count&#39;)) {
+      await prefs.setStringList(&#39;ls_stat_cards&#39;, [...cards, &#39;favorites_count&#39;]);
+    }
+  }
   showLovedBadgeNotifier.value         = prefs.getBool(&#39;ls_show_loved_badge&#39;)        ?? true;
 
   final fallbackHex = prefs.getString(&#39;ls_nowplaying_fallback_color&#39;);
