@@ -272,6 +272,10 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   bool _isLoved  = false;
   bool _loveBusy = false;
 
+  final _scrollCtrl    = ScrollController();
+  final _scrimOpacity  = ValueNotifier<double>(0);
+  double _imgHeight    = 400;
+
   bool   _translating    = false;
   bool   _showTranslated = false;
   String _translatedBio  = '';
@@ -297,12 +301,22 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     super.initState();
     _fetchAll();
     if (widget.type == 'tracks') _fetchDeezerPreview();
+    _scrollCtrl.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final threshold = _imgHeight - 90;
+    final raw = threshold > 0 ? (_scrollCtrl.offset / threshold).clamp(0.0, 1.0) : 0.0;
+    _scrimOpacity.value = raw;
   }
 
   @override
   void dispose() {
     _audioPlayer?.stop();
     _audioPlayer?.dispose();
+    _scrollCtrl.removeListener(_onScroll);
+    _scrollCtrl.dispose();
+    _scrimOpacity.dispose();
     super.dispose();
   }
 
@@ -573,6 +587,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     final topPad   = MediaQuery.of(ctx).padding.top;
     final imgH     = mediaH * 0.44;
     final hasImage = _resolvedImage.isNotEmpty;
+    _imgHeight = imgH;
 
     return Stack(
       children: [
@@ -620,6 +635,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         _DismissOnOverscroll(
           onDismiss: () => Navigator.pop(ctx),
           child: SingleChildScrollView(
+            controller: _scrollCtrl,
             physics: const ClampingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics()),
             child: Column(
@@ -661,8 +677,14 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           ),
         ),
 
-        // Status bar scrim — always above the scroll content
-        _StatusBarScrim(height: topPad),
+        // Status bar scrim — fades in once scrolled past the hero image
+        ValueListenableBuilder<double>(
+          valueListenable: _scrimOpacity,
+          builder: (_, opacity, __) => Opacity(
+            opacity: opacity,
+            child: _StatusBarScrim(height: topPad),
+          ),
+        ),
 
         // Back button
         Positioned(
@@ -680,6 +702,13 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ),
           ),
         ),
+
+        // Heart button — tracks only, fixed top-right
+        if (widget.type == 'tracks' && favoritesEnabled)
+          Positioned(
+            top: topPad + 8, right: 12,
+            child: _buildLoveButton(),
+          ),
       ],
     );
   }
@@ -738,23 +767,13 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ),
           ],
           const SizedBox(height: 14),
-          // Music app link buttons + heart (fixed, above) & circular preview play button
+          // Music app link buttons + circular preview play button
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Expanded(child: _buildMusicLinks(hasImage)),
-            if (widget.type == 'tracks' &&
-                (favoritesEnabled || _previewUrl != null || _previewLoading))
+            if (widget.type == 'tracks' && (_previewUrl != null || _previewLoading))
               Padding(
                 padding: const EdgeInsets.only(left: 8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (favoritesEnabled) _buildLoveButton(),
-                    if (favoritesEnabled && (_previewUrl != null || _previewLoading))
-                      const SizedBox(height: 8),
-                    if (_previewUrl != null || _previewLoading)
-                      _buildPreviewRing(scheme),
-                  ],
-                ),
+                child: _buildPreviewRing(scheme),
               ),
           ]),
           const SizedBox(height: 16),
@@ -763,24 +782,24 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     );
   }
 
-  // Heart button — fixed position above the preview player, same size for every track.
+  // Heart button — fixed top-right, same style/size as the back button.
   Widget _buildLoveButton() => GestureDetector(
     onTap: _toggleLove,
     child: Container(
-      width: 40, height: 40,
+      width: 36, height: 36,
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.45),
         shape: BoxShape.circle,
       ),
       child: _loveBusy
           ? const Padding(
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.all(9),
               child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
             )
           : Icon(
               _isLoved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
               color: _isLoved ? Colors.redAccent : Colors.white,
-              size: 20,
+              size: 18,
             ),
     ),
   );
