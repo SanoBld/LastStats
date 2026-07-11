@@ -1636,6 +1636,9 @@ class _DashboardPageState extends State<_DashboardPage> {
                       regStr:      regStr,
                       lovedCount:  _lovedCount,
                       showLoved:   _showFavorites && favoritesEnabled,
+                      onFavoritesTap: () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => FavoritesPage(service: widget.service),
+                      )),
                     ),
                     const SizedBox(height: 10),
                     _StatGrid(children: _statCards.map((id) {
@@ -2693,6 +2696,7 @@ class _HeroStatCard extends StatelessWidget {
   final String regStr;
   final int    lovedCount;
   final bool   showLoved;
+  final VoidCallback? onFavoritesTap;
 
   const _HeroStatCard({
     required this.total,
@@ -2702,6 +2706,7 @@ class _HeroStatCard extends StatelessWidget {
     required this.regStr,
     this.lovedCount = 0,
     this.showLoved  = false,
+    this.onFavoritesTap,
   });
 
   @override
@@ -2790,6 +2795,7 @@ class _HeroStatCard extends StatelessWidget {
                   label: L.favSectionTitle,
                   color: scheme.onPrimaryContainer,
                   rawInt: lovedCount,
+                  onTap: onFavoritesTap,
                 ),
               ],
             ],
@@ -2839,6 +2845,7 @@ class _MiniMetric extends StatelessWidget {
   final int?     rawInt;
   final String   prefix;
   final String   suffix;
+  final VoidCallback? onTap;
 
   const _MiniMetric({
     required this.icon,
@@ -2847,6 +2854,7 @@ class _MiniMetric extends StatelessWidget {
     this.rawInt,
     this.prefix = '',
     this.suffix = '',
+    this.onTap,
   });
 
   @override
@@ -2855,7 +2863,7 @@ class _MiniMetric extends StatelessWidget {
     final valueStyle = text.bodyLarge?.copyWith(
         fontWeight: FontWeight.w800, color: color);
 
-    return Column(mainAxisSize: MainAxisSize.min, children: [
+    final content = Column(mainAxisSize: MainAxisSize.min, children: [
       Icon(icon, size: 16, color: color.withValues(alpha: 0.7)),
       const SizedBox(height: 3),
       if (rawInt != null)
@@ -2874,6 +2882,13 @@ class _MiniMetric extends StatelessWidget {
           style: text.labelSmall?.copyWith(
               color: color.withValues(alpha: 0.6), fontSize: 10)),
     ]);
+
+    if (onTap == null) return content;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: content,
+    );
   }
 }
 
