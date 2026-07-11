@@ -1629,11 +1629,13 @@ class _DashboardPageState extends State<_DashboardPage> {
                     _SectionHeader(title: L.dashStats, icon: Icons.bar_chart_rounded),
                     const SizedBox(height: 10),
                     _HeroStatCard(
-                      total:  total,
-                      avg:    avg.round(),
-                      days:   days,
-                      weekly: weekly,
-                      regStr: regStr,
+                      total:       total,
+                      avg:         avg.round(),
+                      days:        days,
+                      weekly:      weekly,
+                      regStr:      regStr,
+                      lovedCount:  _lovedCount,
+                      showLoved:   _showFavorites && favoritesEnabled,
                     ),
                     const SizedBox(height: 10),
                     _StatGrid(children: _statCards.map((id) {
@@ -2689,6 +2691,8 @@ String _fmtFull(int n) {
 class _HeroStatCard extends StatelessWidget {
   final int    total, avg, days, weekly;
   final String regStr;
+  final int    lovedCount;
+  final bool   showLoved;
 
   const _HeroStatCard({
     required this.total,
@@ -2696,6 +2700,8 @@ class _HeroStatCard extends StatelessWidget {
     required this.days,
     required this.weekly,
     required this.regStr,
+    this.lovedCount = 0,
+    this.showLoved  = false,
   });
 
   @override
@@ -2777,6 +2783,15 @@ class _HeroStatCard extends StatelessWidget {
                 rawInt: days,
                 suffix: ' ${L.dashDayUnitShort}',
               ),
+              if (showLoved) ...[
+                _VertDivider(color: scheme.onPrimaryContainer),
+                _MiniMetric(
+                  icon: Icons.favorite_rounded,
+                  label: L.favSectionTitle,
+                  color: scheme.onPrimaryContainer,
+                  rawInt: lovedCount,
+                ),
+              ],
             ],
           ),
 

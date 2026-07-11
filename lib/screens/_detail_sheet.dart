@@ -739,7 +739,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           ],
           const SizedBox(height: 14),
           // Music app link buttons + heart (fixed, above) & circular preview play button
-          Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Expanded(child: _buildMusicLinks(hasImage)),
             if (widget.type == 'tracks' &&
                 (favoritesEnabled || _previewUrl != null || _previewLoading))
