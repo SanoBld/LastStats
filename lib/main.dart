@@ -65,6 +65,15 @@ void main() async {
   showAllPlatformLinksNotifier.value   = prefs.getBool('ls_show_all_platform_links')  ?? false;
   secretKeyNotifier.value              = prefs.getString('ls_secret_key')            ?? '';
   sessionKeyNotifier.value             = prefs.getString('ls_session_key')           ?? '';
+
+  // One-time migration: if favorites was already connected before this card
+  // existed, make sure it's added to the user's saved stat card selection.
+  if (sessionKeyNotifier.value.isNotEmpty) {
+    final cards = prefs.getStringList('ls_stat_cards');
+    if (cards != null && !cards.contains('favorites_count')) {
+      await prefs.setStringList('ls_stat_cards', [...cards, 'favorites_count']);
+    }
+  }
   showLovedBadgeNotifier.value         = prefs.getBool('ls_show_loved_badge')        ?? true;
 
   final fallbackHex = prefs.getString('ls_nowplaying_fallback_color');

@@ -494,30 +494,6 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
               );
             },
           ),
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          ValueListenableBuilder<String>(
-            valueListenable: sessionKeyNotifier,
-            builder: (_, session, __) {
-              final enabled = session.isNotEmpty;
-              return Opacity(
-                opacity: enabled ? 1.0 : 0.45,
-                child: ValueListenableBuilder<bool>(
-                  valueListenable: showLovedBadgeNotifier,
-                  builder: (_, showBadge, __) => SwitchListTile(
-                    secondary: const Icon(Icons.favorite_border_rounded),
-                    title: Text(L.settingsLovedBadgeTitle),
-                    subtitle: Text(L.settingsLovedBadgeSub),
-                    value: enabled && showBadge,
-                    onChanged: !enabled ? null : (v) async {
-                      await _set('ls_show_loved_badge', v);
-                      showLovedBadgeNotifier.value = v;
-                      setState(() {});
-                    },
-                  ),
-                ),
-              );
-            },
-          ),
         ]),
 
         const SizedBox(height: 16),

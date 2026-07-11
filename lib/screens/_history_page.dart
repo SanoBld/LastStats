@@ -456,22 +456,8 @@ class _HistTrackRow extends StatelessWidget {
               resolver: () => ImageService.resolveTrack(tit, art, lastfmUrl: raw.isNotEmpty ? raw : null)),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              Expanded(child: Text(tit, maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600))),
-              ValueListenableBuilder<Set<String>>(
-                valueListenable: lovedTrackKeysNotifier,
-                builder: (_, loved, __) {
-                  if (!showLovedBadgeNotifier.value || !loved.contains(lovedKey(art, tit))) {
-                    return const SizedBox.shrink();
-                  }
-                  return const Padding(
-                    padding: EdgeInsets.only(left: 4),
-                    child: Icon(Icons.favorite_rounded, size: 12, color: Colors.redAccent),
-                  );
-                },
-              ),
-            ]),
+            Text(tit, maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
             Text(art, maxLines: 1, overflow: TextOverflow.ellipsis,
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             if (alb.isNotEmpty) Row(children: [
@@ -512,22 +498,8 @@ class _HistListeView extends StatelessWidget {
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
           leading: _SmartImage(size: 44, borderRadius: 6, initialUrl: raw,
               resolver: () => ImageService.resolveTrack(tit, art, lastfmUrl: raw.isNotEmpty ? raw : null)),
-          title: Row(children: [
-            Expanded(child: Text(tit, maxLines: 1, overflow: TextOverflow.ellipsis,
-                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600))),
-            ValueListenableBuilder<Set<String>>(
-              valueListenable: lovedTrackKeysNotifier,
-              builder: (_, loved, __) {
-                if (!showLovedBadgeNotifier.value || !loved.contains(lovedKey(art, tit))) {
-                  return const SizedBox.shrink();
-                }
-                return const Padding(
-                  padding: EdgeInsets.only(left: 4),
-                  child: Icon(Icons.favorite_rounded, size: 12, color: Colors.redAccent),
-                );
-              },
-            ),
-          ]),
+          title: Text(tit, maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
           subtitle: Text(alb.isNotEmpty ? '$art · $alb' : art,
               maxLines: 1, overflow: TextOverflow.ellipsis,
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),

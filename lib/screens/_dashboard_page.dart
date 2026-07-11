@@ -3506,20 +3506,6 @@ class _RecentTrackRowState extends State<_RecentTrackRow> {
 
                 const SizedBox(width: 8),
 
-                ValueListenableBuilder<Set<String>>(
-                  valueListenable: lovedTrackKeysNotifier,
-                  builder: (_, loved, __) {
-                    if (!showLovedBadgeNotifier.value ||
-                        !loved.contains(lovedKey(artist, title))) {
-                      return const SizedBox.shrink();
-                    }
-                    return const Padding(
-                      padding: EdgeInsets.only(right: 4),
-                      child: Icon(Icons.favorite_rounded, size: 11, color: Colors.redAccent),
-                    );
-                  },
-                ),
-
                 Text(
                   dateStr,
                   style: text.labelSmall?.copyWith(

@@ -9,24 +9,6 @@ const int _kSearchTracks   = 3;
 
 const String _ph = '2a96cbd8b46e442fc41c2b86b821562f';
 
-/// Small discreet heart badge shown over a track tile when it's loved.
-Widget _lovedDot(String artist, String name) => ValueListenableBuilder<Set<String>>(
-  valueListenable: lovedTrackKeysNotifier,
-  builder: (_, loved, __) {
-    if (!showLovedBadgeNotifier.value || !loved.contains(lovedKey(artist, name))) {
-      return const SizedBox.shrink();
-    }
-    return Container(
-      padding: const EdgeInsets.all(3),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.55),
-        shape: BoxShape.circle,
-      ),
-      child: const Icon(Icons.favorite_rounded, size: 10, color: Colors.redAccent),
-    );
-  },
-);
-
 class _SearchPage extends StatefulWidget {
   final LastFmService service;
   const _SearchPage({required this.service});
@@ -356,12 +338,8 @@ class _SearchPageState extends State<_SearchPage> {
               return InkWell(
                 borderRadius: BorderRadius.circular(10),
                 onTap: () { _haptic(_HapticImpact.light); _openMusicDetail(context, norm, 'tracks'); },
-                child: Stack(children: [
-                  _ItemTile(name: name, sub: artist, imageUrl: raw, rank: '',
-                    imageFuture: ImageService.resolveTrack(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null)),
-                  if (favoritesEnabled)
-                    Positioned(right: 8, top: 8, child: _lovedDot(artist, name)),
-                ]),
+                child: _ItemTile(name: name, sub: artist, imageUrl: raw, rank: '',
+                  imageFuture: ImageService.resolveTrack(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null)),
               );
             }),
           ],
@@ -434,11 +412,7 @@ class _SearchPageState extends State<_SearchPage> {
         return InkWell(
           onTap: () => _openMusicDetail(context, normalized, type),
           borderRadius: BorderRadius.circular(8),
-          child: Stack(children: [
-            _ItemTile(name: name, sub: sub, imageUrl: imgRaw, imageFuture: imgF, rank: '${i + 1}'),
-            if (type == 'tracks' && favoritesEnabled)
-              Positioned(right: 8, top: 8, child: _lovedDot(artist, name)),
-          ]),
+          child: _ItemTile(name: name, sub: sub, imageUrl: imgRaw, imageFuture: imgF, rank: '${i + 1}'),
         );
       },
     );
