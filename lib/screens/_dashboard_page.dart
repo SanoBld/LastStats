@@ -48,7 +48,7 @@ const _kAllStatCards = [
   ('album_count',     '💽', 'Albums uniques',         'Unique albums'),
   ('scrobbles_week',  '📊', 'Scrobbles semaine',      'Scrobbles week'),
 ];
-const _kDefaultStatCards = ['top_artist', 'top_album', 'top_track', 'last_track'];
+const _kDefaultStatCards = ['top_artist', 'top_album', 'top_track', 'last_track', 'favorites_count'];
 
 
 // ── Dashboard page ────────────────────────────────────────────────────────────

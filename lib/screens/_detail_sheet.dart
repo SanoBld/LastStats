@@ -712,16 +712,24 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            _name,
-            style: text.headlineMedium?.copyWith(
-              fontWeight: FontWeight.w900,
-              color:      hasImage ? Colors.white : scheme.onSurface,
-              shadows:    hasImage
-                  ? [Shadow(blurRadius: 8, color: Colors.black.withValues(alpha: 0.5))]
-                  : null,
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Expanded(
+              child: Text(
+                _name,
+                style: text.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color:      hasImage ? Colors.white : scheme.onSurface,
+                  shadows:    hasImage
+                      ? [Shadow(blurRadius: 8, color: Colors.black.withValues(alpha: 0.5))]
+                      : null,
+                ),
+              ),
             ),
-          ),
+            if (widget.type == 'tracks' && favoritesEnabled) ...[
+              const SizedBox(width: 8),
+              _buildLoveButton(),
+            ],
+          ]),
           if (_artist.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
@@ -738,23 +746,13 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ),
           ],
           const SizedBox(height: 14),
-          // Music app link buttons + heart (above) & circular preview play button
+          // Music app link buttons + circular preview play button
           Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Expanded(child: _buildMusicLinks(hasImage)),
-            if (widget.type == 'tracks' &&
-                (favoritesEnabled || _previewUrl != null || _previewLoading))
+            if (widget.type == 'tracks' && (_previewUrl != null || _previewLoading))
               Padding(
                 padding: const EdgeInsets.only(left: 8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (favoritesEnabled) _buildLoveButton(),
-                    if (favoritesEnabled && (_previewUrl != null || _previewLoading))
-                      const SizedBox(height: 8),
-                    if (_previewUrl != null || _previewLoading)
-                      _buildPreviewRing(scheme),
-                  ],
-                ),
+                child: _buildPreviewRing(scheme),
               ),
           ]),
           const SizedBox(height: 16),
@@ -763,7 +761,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     );
   }
 
-  // Heart button, shown just above the 30s preview play button — same scale.
+  // Heart button, shown next to the title, same scale as the preview button.
   Widget _buildLoveButton() => GestureDetector(
     onTap: _toggleLove,
     child: Container(

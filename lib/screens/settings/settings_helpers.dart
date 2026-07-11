@@ -67,7 +67,7 @@ const kAllStatCards = [
   ('album_count',     '💽', 'Albums uniques',        'Unique albums',    'Álbumes únicos',      '独立专辑数',     'Álbuns únicos'),
   ('scrobbles_week',  '📊', 'Scrobbles semaine',     'Scrobbles week',   'Scrobbles semana',    '本周 scrobbles', 'Scrobbles semana'),
 ];
-const kDefaultStatCards = ['top_artist', 'top_album', 'top_track', 'last_track'];
+const kDefaultStatCards = ['top_artist', 'top_album', 'top_track', 'last_track', 'favorites_count'];
 
 String statCardLabel(String id) {
   for (final c in kAllStatCards) {
