@@ -732,48 +732,23 @@ class _ChartsPageState extends State<_ChartsPage>
   Widget _buildYearChips(ColorScheme s, TextTheme t) {
     // 0 = sentinel for "All time"
     final years = [0, ...(_availableYears.isNotEmpty ? _availableYears : [_selectedYear])];
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(),
-      child: Row(
+    return SizedBox(
+      height: 44,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
         children: years.map((year) {
           final selected = year == _selectedYear;
           final label    = year == 0 ? _ct('Tout le temps', 'All time', es: 'Todo el tiempo', zh: '全部时间', pt: 'Todo período') : '$year';
           return Padding(
             key: _chipKey(year),
             padding: const EdgeInsets.only(right: 8),
-            child: _TapScale(
-              scale: 0.93,
-              child: GestureDetector(
-                onTap: () => _onYearChanged(year),
-                child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                curve: Curves.easeOutCubic,
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                decoration: BoxDecoration(
-                  color: selected ? s.primary : s.surfaceContainerHigh,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: selected ? s.primary : s.outlineVariant.withValues(alpha: 0.6),
-                    width: 1,
-                  ),
-                  boxShadow: selected
-                      ? [BoxShadow(
-                          color: s.primary.withValues(alpha: 0.22),
-                          blurRadius: 8, offset: const Offset(0, 2))]
-                      : null,
-                ),
-                child: Text(
-                  label,
-                  style: t.labelMedium?.copyWith(
-                    color: selected ? s.onPrimary : s.onSurfaceVariant,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-              ),
+            child: FilterChip(
+              label: Text(label),
+              selected: selected,
+              showCheckmark: false,
+              onSelected: (_) => _onYearChanged(year),
             ),
-          ), // _TapScale
           );
         }).toList(),
       ),
@@ -1038,7 +1013,17 @@ class _ChartsPageState extends State<_ChartsPage>
                       child: CircularProgressIndicator(),
                     ))
                   else if (_tags.isNotEmpty)
-                    RepaintBoundary(key: _xkeys['genres'], child: _TagsCard(tags: _tags)),
+                    RepaintBoundary(
+                      key: _xkeys['genres'],
+                      child: _SwipeDistributionCard(
+                        items:       _tags,
+                        getLabel:    (e) => (e as _TagEntry).name,
+                        getPlays:    (e) => (e as _TagEntry).count,
+                        baseColor:   scheme.tertiary,
+                        secondColor: scheme.primary,
+                        onTap:       (_) {},
+                      ),
+                    ),
                   const SizedBox(height: 28),
 
                   // 4. Listening habits
