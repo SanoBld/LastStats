@@ -1590,7 +1590,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                           '${_nowPlaying!['name']}_${_nowPlaying!['artist']?['#text']}',
                         ),
                         children: [
-                          _NowPlayingCard(track: _nowPlaying!),
+                          _NowPlayingCard(track: _nowPlaying!, service: widget.service),
                           const SizedBox(height: 12),
                         ],
                       )
@@ -3003,7 +3003,8 @@ class _DashStatCard extends StatelessWidget {
 
 class _NowPlayingCard extends StatelessWidget {
   final Map<String, dynamic> track;
-  const _NowPlayingCard({required this.track});
+  final LastFmService        service;
+  const _NowPlayingCard({required this.track, required this.service});
 
   @override
   Widget build(BuildContext context) {
@@ -3014,7 +3015,18 @@ class _NowPlayingCard extends StatelessWidget {
     final album  = (track['album']?['#text']  ?? '').toString();
     final rawUrl = _extractImage(track['image']);
 
-    return Container(
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: () {
+        _haptic(_HapticImpact.light);
+        showDetailSheet(context, {
+          'name':   title,
+          'artist': {'name': artist, '#text': artist},
+          'album':  {'#text': album, 'name': album},
+          'image':  track['image'],
+        }, 'tracks', service);
+      },
+      child: Container(
       decoration: BoxDecoration(
         color: scheme.secondaryContainer,
         borderRadius: BorderRadius.circular(20),
@@ -3092,6 +3104,7 @@ class _NowPlayingCard extends StatelessWidget {
             ],
           )),
         ]),
+      ),
       ),
     );
   }

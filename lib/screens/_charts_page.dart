@@ -1263,6 +1263,7 @@ class _MonthlyCardState extends State<_MonthlyCard> {
   final _sc = ScrollController();
   static const _colW    = 48.0;
   static const _barMaxH = 110.0;
+  int? _touchIdx;
 
   @override
   void initState() {
@@ -1324,12 +1325,16 @@ class _MonthlyCardState extends State<_MonthlyCard> {
                   children: () {
                     final widgets = <Widget>[];
                     String? prevYear;
+                    var i = 0;
                     for (final e in sorted) {
+                      final idx   = i++;
                       final year  = e.key.substring(0, 4);
                       final ratio = maxVal > 0 ? e.value / maxVal : 0.0;
                       final barH  = (_barMaxH * ratio).clamp(2.0, _barMaxH);
                       final isMax = e.value == maxVal;
-                      final color = isMax ? s.primary
+                      final touched = _touchIdx == idx;
+                      final color = touched ? s.primary
+                          : isMax ? s.primary
                           : Color.lerp(s.primaryContainer, s.primary, ratio * 0.75)!;
 
                       // Year separator line
@@ -1360,17 +1365,20 @@ class _MonthlyCardState extends State<_MonthlyCard> {
 
                       widgets.add(SizedBox(
                         width: _colW,
-                        child: Column(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => setState(() => _touchIdx = touched ? null : idx),
+                          child: Column(
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Text(
-                              ratio > 0.12 ? _fmtExact(e.value) : '',
+                              (ratio > 0.12 || touched) ? _fmtExact(e.value) : '',
                               textAlign: TextAlign.center,
                               style: t.labelSmall?.copyWith(
                                 fontSize: 8,
-                                color: isMax ? s.primary : s.onSurfaceVariant,
-                                fontWeight: isMax ? FontWeight.w800 : FontWeight.normal,
+                                color: (isMax || touched) ? s.primary : s.onSurfaceVariant,
+                                fontWeight: (isMax || touched) ? FontWeight.w800 : FontWeight.normal,
                               ),
                             ),
                             const SizedBox(height: 3),
@@ -1383,6 +1391,9 @@ class _MonthlyCardState extends State<_MonthlyCard> {
                                   gradient: _barGradient(color),
                                   borderRadius: const BorderRadius.vertical(
                                       top: Radius.circular(7)),
+                                  border: touched
+                                      ? Border.all(color: s.onPrimary.withValues(alpha: 0.6), width: 1.5)
+                                      : null,
                                 ),
                               ),
                             ),
@@ -1392,11 +1403,12 @@ class _MonthlyCardState extends State<_MonthlyCard> {
                               textAlign: TextAlign.center,
                               style: t.labelSmall?.copyWith(
                                 fontSize: 9,
-                                color: isMax ? s.primary : s.onSurfaceVariant,
-                                fontWeight: isMax ? FontWeight.w700 : FontWeight.normal,
+                                color: (isMax || touched) ? s.primary : s.onSurfaceVariant,
+                                fontWeight: (isMax || touched) ? FontWeight.w700 : FontWeight.normal,
                               ),
                             ),
                           ],
+                          ),
                         ),
                       ));
                     }
@@ -1428,6 +1440,7 @@ class _CumulativeLineCardState extends State<_CumulativeLineCard> {
   final _sc = ScrollController();
   static const _ptW    = 42.0;
   static const _chartH = 140.0;
+  int? _touchIdx;
 
   @override
   void initState() {
@@ -1439,6 +1452,13 @@ class _CumulativeLineCardState extends State<_CumulativeLineCard> {
 
   @override
   void dispose() { _sc.dispose(); super.dispose(); }
+
+  void _updateTouch(double dx, double contentW, int n) {
+    if (n < 2) return;
+    final step = contentW / (n - 1);
+    final idx  = (dx / step).round().clamp(0, n - 1);
+    if (idx != _touchIdx) setState(() => _touchIdx = idx);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1473,7 +1493,19 @@ class _CumulativeLineCardState extends State<_CumulativeLineCard> {
                 s: s, t: t,
               ),
           ]),
-          const SizedBox(height: 18),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 18,
+            child: (_touchIdx != null && _touchIdx! < keys.length)
+                ? Text(
+                    '${L.months[int.tryParse(keys[_touchIdx!].substring(5)) ?? 1]} '
+                    '${keys[_touchIdx!].substring(0, 4)} · ${_fmtExact(vals[_touchIdx!].toInt())}',
+                    style: t.labelMedium?.copyWith(
+                        color: s.primary, fontWeight: FontWeight.w700),
+                  )
+                : null,
+          ),
+          const SizedBox(height: 8),
 
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             // Fixed Y-axis
@@ -1512,13 +1544,21 @@ class _CumulativeLineCardState extends State<_CumulativeLineCard> {
                     SizedBox(
                       width: contentW,
                       height: _chartH,
-                      child: CustomPaint(
-                        painter: _LinePainter(
-                          keys:          keys,
-                          values:        vals,
-                          color:         s.primary,
-                          gridColor:     s.outlineVariant.withValues(alpha: 0.30),
-                          dotInnerColor: s.surface,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onPanDown:   (d) => _updateTouch(d.localPosition.dx, contentW, keys.length),
+                        onPanUpdate: (d) => _updateTouch(d.localPosition.dx, contentW, keys.length),
+                        onPanEnd:    (_) => setState(() => _touchIdx = null),
+                        onPanCancel: () => setState(() => _touchIdx = null),
+                        child: CustomPaint(
+                          painter: _LinePainter(
+                            keys:          keys,
+                            values:        vals,
+                            color:         s.primary,
+                            gridColor:     s.outlineVariant.withValues(alpha: 0.30),
+                            dotInnerColor: s.surface,
+                            touchIndex:    _touchIdx,
+                          ),
                         ),
                       ),
                     ),
@@ -1561,12 +1601,14 @@ class _LinePainter extends CustomPainter {
   final Color        color;
   final Color        gridColor;
   final Color        dotInnerColor;
+  final int?         touchIndex;
   const _LinePainter({
     required this.keys,
     required this.values,
     required this.color,
     required this.gridColor,
     required this.dotInnerColor,
+    this.touchIndex,
   });
 
   @override
@@ -1642,11 +1684,27 @@ class _LinePainter extends CustomPainter {
     canvas.drawCircle(pts.last, 7, Paint()..color = color.withValues(alpha: 0.15));
     canvas.drawCircle(pts.last, 4, Paint()..color = color);
     canvas.drawCircle(pts.last, 2, Paint()..color = dotInnerColor);
+
+    // Touch guide — vertical dashed line + highlighted dot at the touched index
+    if (touchIndex != null && touchIndex! >= 0 && touchIndex! < n) {
+      final p = pts[touchIndex!];
+      final guidePaint = Paint()..color = color.withValues(alpha: 0.5)..strokeWidth = 1;
+      const dash = 4.0, gap = 3.0;
+      var y = 0.0;
+      while (y < h) {
+        canvas.drawLine(Offset(p.dx, y), Offset(p.dx, (y + dash).clamp(0, h)), guidePaint);
+        y += dash + gap;
+      }
+      canvas.drawCircle(p, 8, Paint()..color = color.withValues(alpha: 0.18));
+      canvas.drawCircle(p, 5, Paint()..color = color);
+      canvas.drawCircle(p, 2.5, Paint()..color = dotInnerColor);
+    }
   }
 
   @override
   bool shouldRepaint(_LinePainter old) =>
-      old.values != values || old.color != color || old.dotInnerColor != dotInnerColor;
+      old.values != values || old.color != color ||
+      old.dotInnerColor != dotInnerColor || old.touchIndex != touchIndex;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
