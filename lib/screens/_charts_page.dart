@@ -921,46 +921,54 @@ class _ChartsPageState extends State<_ChartsPage>
         ? const Center(key: ValueKey('c_l'), child: CircularProgressIndicator())
         : _error != null
           ? KeyedSubtree(key: const ValueKey('c_e'), child: _ErrorView(message: _error!, onRetry: _load))
-          : SafeArea(key: const ValueKey('c_ok'), child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-
-          // ── Fixed header ──────────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 14, 8, 0),
-            child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-              Expanded(
-                child: Text(L.chartsTitle,
-                    style: text.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w800)),
+          : SafeArea(key: const ValueKey('c_ok'), child: RefreshIndicator(
+        onRefresh: _load,
+        child: CustomScrollView(
+          slivers: [
+            // ── Collapsing top bar ─────────────────────────────────────────
+            SliverAppBar(
+              pinned: true,
+              backgroundColor: scheme.surface,
+              surfaceTintColor: scheme.surfaceTint,
+              scrolledUnderElevation: 3,
+              elevation: 0,
+              expandedHeight: 84,
+              titleSpacing: 20,
+              automaticallyImplyLeading: false,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.ios_share_rounded),
+                  tooltip: _ct('Exporter un graphique', 'Export a chart', es: 'Exportar un gráfico', zh: '导出图表', pt: 'Exportar um gráfico'),
+                  onPressed: () => _exportFlow(context),
+                ),
+                const SizedBox(width: 4),
+              ],
+              flexibleSpace: FlexibleSpaceBar(
+                titlePadding: const EdgeInsets.only(left: 20, bottom: 16, right: 56),
+                title: Text(L.chartsTitle,
+                    style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
               ),
-              IconButton(
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 40, minHeight: 32),
-                icon: const Icon(Icons.ios_share_rounded),
-                tooltip: _ct('Exporter un graphique', 'Export a chart', es: 'Exportar un gráfico', zh: '导出图表', pt: 'Exportar um gráfico'),
-                onPressed: () => _exportFlow(context),
-              ),
-            ]),
-          ),
-          const SizedBox(height: 14),
-          Padding(
-            padding: const EdgeInsets.only(left: 20),
-            child: _buildYearChips(scheme, text),
-          ),
-          const SizedBox(height: 16),
+            ),
 
-          // ── Scrollable content ────────────────────────────────────────────
-          Expanded(
-            child: AnimatedOpacity(
+            // ── Pinned year selector ────────────────────────────────────────
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _StickyHeaderDelegate(
+                height: 60,
+                backgroundColor: scheme.surface,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+                  child: _buildYearChips(scheme, text),
+                ),
+              ),
+            ),
+
+            // ── Scrollable content ───────────────────────────────────────────
+            SliverOpacity(
               opacity: _yearDataLoading ? 0.5 : 1.0,
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOutCubic,
-              child: RefreshIndicator(
-                onRefresh: _load,
-                child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 48),
-                children: [
+              sliver: SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 48),
+                sliver: SliverList(delegate: SliverChildListDelegate([
 
                   _buildHistoryBanner(context),
 
@@ -1172,14 +1180,13 @@ class _ChartsPageState extends State<_ChartsPage>
                     RepaintBoundary(key: _xkeys['streaks'], child: _StreakCard(data: calendarForView)),
                     const SizedBox(height: 20),
                   ],
-                ],
+                ])),
               ),
             ),
-          ),
+          ],
         ),
-      ],
-    ),
-    ), // SafeArea
+      ), // RefreshIndicator
+      ), // SafeArea
     ); // AnimatedSwitcher
 }
 }
@@ -1187,6 +1194,31 @@ class _ChartsPageState extends State<_ChartsPage>
 // ══════════════════════════════════════════════════════════════════════════
 //  Shared helpers
 // ══════════════════════════════════════════════════════════════════════════
+
+/// Pins a fixed-height widget (the year chips row) below the collapsing app bar.
+class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final double  height;
+  final Color   backgroundColor;
+  final Widget  child;
+  const _StickyHeaderDelegate({
+    required this.height,
+    required this.backgroundColor,
+    required this.child,
+  });
+
+  @override
+  double get minExtent => height;
+  @override
+  double get maxExtent => height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) =>
+      Container(color: backgroundColor, alignment: Alignment.center, child: child);
+
+  @override
+  bool shouldRebuild(_StickyHeaderDelegate old) =>
+      old.height != height || old.backgroundColor != backgroundColor || old.child != child;
+}
 
 /// Shared card decoration: M3 surface, subtle border.
 BoxDecoration _chartCardDecoration(ColorScheme s) => BoxDecoration(
