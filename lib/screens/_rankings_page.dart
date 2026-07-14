@@ -14,6 +14,7 @@ class _RankingsPageState extends State<_RankingsPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabs;
   String _period       = 'overall';
+  String _sortMode     = 'plays'; // 'plays' | 'az' — only used when a year is selected
   int?   _selectedYear;          // null = use period chips; int = year filter
   List<int> _availableYears = [];
 
@@ -50,7 +51,6 @@ class _RankingsPageState extends State<_RankingsPage>
   Widget build(BuildContext context) {
     final scheme  = Theme.of(context).colorScheme;
     final text    = Theme.of(context).textTheme;
-    final periods = _localizedPeriods();
 
     return Scaffold(
       body: SafeArea(
@@ -97,18 +97,23 @@ class _RankingsPageState extends State<_RankingsPage>
             const SizedBox(height: 4),
           ],
 
-          // Period chips — hidden when a year is selected (local data used instead)
-          if (_selectedYear == null)
+          // Sort chips — only shown for a specific selected year. Period chips
+          // don't make sense there (they're relative to "now", not to that year),
+          // and "toutes les années" already means true all-time (no sub-filter).
+          if (_selectedYear != null)
             SizedBox(
               height: 44,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-                children: periods.map((p) {
-                  final sel = p.$1 == _period;
+                children: [
+                  ('plays', _ct('Écoutes', 'Plays')),
+                  ('az',    _ct('A–Z', 'A–Z')),
+                ].map((s) {
+                  final sel = s.$1 == _sortMode;
                   return Padding(padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(label: Text(p.$2), selected: sel,
-                        onSelected: (_) { if (!sel) { _haptic(_HapticImpact.selection); setState(() => _period = p.$1); } }));
+                    child: FilterChip(label: Text(s.$2), selected: sel,
+                        onSelected: (_) { if (!sel) { _haptic(_HapticImpact.selection); setState(() => _sortMode = s.$1); } }));
                 }).toList(),
               ),
             ),
@@ -120,11 +125,11 @@ class _RankingsPageState extends State<_RankingsPage>
           ]),
           Expanded(child: TabBarView(controller: _tabs, children: [
             _TopListBody(service: widget.service, type: 'artists',
-                period: _period, year: _selectedYear),
+                period: _period, year: _selectedYear, sortMode: _sortMode),
             _TopListBody(service: widget.service, type: 'albums',
-                period: _period, year: _selectedYear),
+                period: _period, year: _selectedYear, sortMode: _sortMode),
             _TopListBody(service: widget.service, type: 'tracks',
-                period: _period, year: _selectedYear),
+                period: _period, year: _selectedYear, sortMode: _sortMode),
           ])),
         ]),
       ),
@@ -136,8 +141,9 @@ class _TopListBody extends StatefulWidget {
   final LastFmService service;
   final String type, period;
   final int?   year;           // null = API; int = local cached scrobbles
+  final String sortMode;       // 'plays' | 'az' — only applied when year != null
   const _TopListBody({required this.service, required this.type,
-      required this.period, this.year});
+      required this.period, this.year, this.sortMode = 'plays'});
 
   @override
   State<_TopListBody> createState() => _TopListBodyState();
@@ -161,7 +167,18 @@ class _TopListBodyState extends State<_TopListBody>
     super.didUpdateWidget(old);
     if (old.period != widget.period ||
         old.type   != widget.type   ||
-        old.year   != widget.year) _load(reset: true);
+        old.year   != widget.year) { _load(reset: true); }
+    else if (old.sortMode != widget.sortMode) { setState(() {}); }
+  }
+
+  /// Items to display — re-sorted client-side when browsing a specific year,
+  /// since that data is already fully loaded locally (no need to re-fetch).
+  List<dynamic> get _displayItems {
+    if (widget.year == null || widget.sortMode != 'az') return _items;
+    final sorted = List<dynamic>.from(_items);
+    sorted.sort((a, b) => (a['name'] ?? '').toString().toLowerCase()
+        .compareTo((b['name'] ?? '').toString().toLowerCase()));
+    return sorted;
   }
 
   // Compute top items from locally-cached scrobbles for a given year.
@@ -281,21 +298,24 @@ class _TopListBodyState extends State<_TopListBody>
       child: NotificationListener<ScrollNotification>(
       onNotification: (n) {
         if (!_exhausted && !_loadingMore && n.metrics.pixels >= n.metrics.maxScrollExtent - 200) {
-          _page++; _load();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted && !_exhausted && !_loadingMore) { _page++; _load(); }
+          });
         }
         return false;
       },
       child: CustomScrollView(slivers: [
-        if (_items.length >= 3)
+        if (_displayItems.length >= 3)
           SliverToBoxAdapter(child: _PodiumWidget(
-              items: _items.take(3).toList(), type: widget.type,
+              items: _displayItems.take(3).toList(), type: widget.type,
               onTap: (item) { _haptic(_HapticImpact.light); _showDetail(context, item as Map<String, dynamic>); })),
 
         SliverList(delegate: SliverChildBuilderDelegate(
           (ctx, i) {
-            final off = _items.length >= 3 ? 3 : 0;
+            final items = _displayItems;
+            final off = items.length >= 3 ? 3 : 0;
             final idx = i + off;
-            if (idx >= _items.length) {
+            if (idx >= items.length) {
               return AnimatedSwitcher(
                 duration: const Duration(milliseconds: 250),
                 child: _loadingMore
@@ -304,7 +324,7 @@ class _TopListBodyState extends State<_TopListBody>
                   : const SizedBox.shrink(),
               );
             }
-            final item   = _items[idx] as Map<String, dynamic>;
+            final item   = items[idx] as Map<String, dynamic>;
             final name   = (item['name'] ?? '').toString();
             final plays  = _fmt(int.tryParse((item['playcount'] ?? '0').toString()) ?? 0);
             final artist = (item['artist']?['name'] ?? '').toString();
@@ -329,7 +349,7 @@ class _TopListBodyState extends State<_TopListBody>
               ), // _FadeSlideIn
             );
           },
-          childCount: (_items.length >= 3 ? _items.length - 3 : _items.length) + 1,
+          childCount: (_displayItems.length >= 3 ? _displayItems.length - 3 : _displayItems.length) + 1,
         )),
       ]),
     ),  // NotificationListener
