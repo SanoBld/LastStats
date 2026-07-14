@@ -921,54 +921,42 @@ class _ChartsPageState extends State<_ChartsPage>
         ? const Center(key: ValueKey('c_l'), child: CircularProgressIndicator())
         : _error != null
           ? KeyedSubtree(key: const ValueKey('c_e'), child: _ErrorView(message: _error!, onRetry: _load))
-          : SafeArea(key: const ValueKey('c_ok'), child: RefreshIndicator(
-        onRefresh: _load,
-        child: CustomScrollView(
-          slivers: [
-            // ── Collapsing top bar ─────────────────────────────────────────
-            SliverAppBar(
-              pinned: true,
-              backgroundColor: scheme.surface,
-              surfaceTintColor: scheme.surfaceTint,
-              scrolledUnderElevation: 3,
-              elevation: 0,
-              expandedHeight: 84,
-              titleSpacing: 20,
-              automaticallyImplyLeading: false,
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.ios_share_rounded),
-                  tooltip: _ct('Exporter un graphique', 'Export a chart', es: 'Exportar un gráfico', zh: '导出图表', pt: 'Exportar um gráfico'),
-                  onPressed: () => _exportFlow(context),
-                ),
-                const SizedBox(width: 4),
-              ],
-              flexibleSpace: FlexibleSpaceBar(
-                titlePadding: const EdgeInsets.only(left: 20, bottom: 16, right: 56),
-                title: Text(L.chartsTitle,
-                    style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
-              ),
-            ),
+          : SafeArea(key: const ValueKey('c_ok'), child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
 
-            // ── Pinned year selector ────────────────────────────────────────
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _StickyHeaderDelegate(
-                height: 60,
-                backgroundColor: scheme.surface,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
-                  child: _buildYearChips(scheme, text),
-                ),
+          // ── Fixed header — same style as every other tab ───────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 16, 2),
+            child: Row(children: [
+              Expanded(child:
+                Text(L.chartsTitle, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
               ),
-            ),
+              IconButton(
+                icon: const Icon(Icons.ios_share_rounded),
+                tooltip: _ct('Exporter un graphique', 'Export a chart', es: 'Exportar un gráfico', zh: '导出图表', pt: 'Exportar um gráfico'),
+                onPressed: () => _exportFlow(context),
+              ),
+            ]),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _buildYearChips(scheme, text),
+          ),
+          const SizedBox(height: 14),
 
-            // ── Scrollable content ───────────────────────────────────────────
-            SliverOpacity(
+          // ── Scrollable content ────────────────────────────────────────────
+          Expanded(
+            child: AnimatedOpacity(
               opacity: _yearDataLoading ? 0.5 : 1.0,
-              sliver: SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 48),
-                sliver: SliverList(delegate: SliverChildListDelegate([
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              child: RefreshIndicator(
+                onRefresh: _load,
+                child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 48),
+                children: [
 
                   _buildHistoryBanner(context),
 
@@ -1180,13 +1168,14 @@ class _ChartsPageState extends State<_ChartsPage>
                     RepaintBoundary(key: _xkeys['streaks'], child: _StreakCard(data: calendarForView)),
                     const SizedBox(height: 20),
                   ],
-                ])),
+                ],
               ),
             ),
-          ],
+          ),
         ),
-      ), // RefreshIndicator
-      ), // SafeArea
+      ],
+    ),
+    ), // SafeArea
     ); // AnimatedSwitcher
 }
 }
@@ -1195,36 +1184,23 @@ class _ChartsPageState extends State<_ChartsPage>
 //  Shared helpers
 // ══════════════════════════════════════════════════════════════════════════
 
-/// Pins a fixed-height widget (the year chips row) below the collapsing app bar.
-class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final double  height;
-  final Color   backgroundColor;
-  final Widget  child;
-  const _StickyHeaderDelegate({
-    required this.height,
-    required this.backgroundColor,
-    required this.child,
-  });
-
-  @override
-  double get minExtent => height;
-  @override
-  double get maxExtent => height;
-
-  @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) =>
-      Container(color: backgroundColor, alignment: Alignment.center, child: child);
-
-  @override
-  bool shouldRebuild(_StickyHeaderDelegate old) =>
-      old.height != height || old.backgroundColor != backgroundColor || old.child != child;
-}
-
-/// Shared card decoration: M3 surface, subtle border.
+/// Shared card decoration: M3 surface, subtle gradient + soft shadow, used by
+/// every chart card so the whole tab reads as one cohesive, modern set.
 BoxDecoration _chartCardDecoration(ColorScheme s) => BoxDecoration(
-  color: s.surfaceContainer,
+  gradient: LinearGradient(
+    begin: Alignment.topLeft,
+    end:   Alignment.bottomRight,
+    colors: [s.surfaceContainerHigh, s.surfaceContainer],
+  ),
   borderRadius: BorderRadius.circular(20),
-  border: Border.all(color: s.outlineVariant.withValues(alpha: 0.40), width: 1),
+  border: Border.all(color: s.outlineVariant.withValues(alpha: 0.35), width: 1),
+  boxShadow: [
+    BoxShadow(
+      color: s.shadow.withValues(alpha: 0.05),
+      blurRadius: 16,
+      offset: const Offset(0, 6),
+    ),
+  ],
 );
 
 /// Gradient bar fill: lighter at base, full color at top.
