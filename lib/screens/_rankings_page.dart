@@ -56,25 +56,46 @@ class _RankingsPageState extends State<_RankingsPage>
       body: SafeArea(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
+            padding: const EdgeInsets.fromLTRB(20, 12, 16, 2),
             child: Row(children: [
               Expanded(
                 child: Text(L.rankingsTitle,
                     style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
               ),
-              // Year dropdown — only shown when cached years exist
-              if (_availableYears.isNotEmpty)
-                _YearDropdown(
-                  years:        _availableYears,
-                  selectedYear: _selectedYear,
-                  scheme:       scheme,
-                  text:         text,
-                  onChanged: (y) => setState(() {
-                    _selectedYear = y;
-                  }),
-                ),
             ]),
           ),
+          const SizedBox(height: 10),
+
+          // Year selector — same FilterChip row, same place as the Charts tab
+          if (_availableYears.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                height: 44,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  children: [0, ..._availableYears].map((year) {
+                    final selected = year == 0 ? _selectedYear == null : year == _selectedYear;
+                    final label    = year == 0 ? L.rankingsAllYears : '$year';
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: FilterChip(
+                        label: Text(label),
+                        selected: selected,
+                        showCheckmark: false,
+                        onSelected: (_) {
+                          _haptic(_HapticImpact.selection);
+                          setState(() => _selectedYear = year == 0 ? null : year);
+                        },
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+          ],
 
           // Period chips — hidden when a year is selected (local data used instead)
           if (_selectedYear == null)
@@ -424,71 +445,6 @@ class _PodiumWidget extends StatelessWidget {
               style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
         ),
       ]),
-    );
-  }
-}
-
-// ── Year selector dropdown ─────────────────────────────────────────────────────
-
-class _YearDropdown extends StatelessWidget {
-  final List<int>   years;
-  final int?        selectedYear;
-  final ColorScheme scheme;
-  final TextTheme   text;
-  final void Function(int?) onChanged;
-
-  const _YearDropdown({
-    required this.years,
-    required this.selectedYear,
-    required this.scheme,
-    required this.text,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: selectedYear != null
-            ? scheme.primaryContainer
-            : scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: scheme.outlineVariant.withValues(alpha: 0.4),
-        ),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<int?>(
-          value:       selectedYear,
-          isDense:     true,
-          icon: Icon(Icons.arrow_drop_down_rounded,
-              size: 18, color: scheme.onSurfaceVariant),
-          style: text.labelMedium?.copyWith(
-            color:      selectedYear != null
-                ? scheme.onPrimaryContainer
-                : scheme.onSurfaceVariant,
-            fontWeight: FontWeight.w600,
-          ),
-          hint: Text(L.rankingsAllYears,
-              style: text.labelMedium?.copyWith(
-                  color: scheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
-          onChanged: onChanged,
-          items: [
-            // "All years" option resets to null (period chips)
-            DropdownMenuItem<int?>(
-              value: null,
-              child: Text(L.rankingsAllYears,
-                  style: text.labelMedium?.copyWith(fontWeight: FontWeight.w600)),
-            ),
-            ...years.map((y) => DropdownMenuItem<int?>(
-              value: y,
-              child: Text('$y',
-                  style: text.labelMedium?.copyWith(fontWeight: FontWeight.w600)),
-            )),
-          ],
-        ),
-      ),
     );
   }
 }
