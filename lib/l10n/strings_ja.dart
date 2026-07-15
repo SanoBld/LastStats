@@ -542,6 +542,8 @@ class AppStringsJa implements AppStrings {
   @override String get favSortOldest   => '古い順';
   @override String get favSortArtistAz => 'アーティスト A-Z';
   @override String get favSortTitleAz  => 'タイトル A-Z';
+  @override String get rankingsWholeYear       => '通年';
+  @override String get chartsExportGeneratedOn => '生成日';
 
   @override String globalListeners(String count) => '世界のリスナー数：$count人';
   @override String historyScrobbles(int n) => '$n回のスクロブル';

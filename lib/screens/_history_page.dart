@@ -123,7 +123,7 @@ class _HistoryPageState extends State<_HistoryPage>
             ]),
           ),
 
-          const SizedBox(height: 6),
+          const SizedBox(height: 10),
 
           // Date navigation
           Padding(

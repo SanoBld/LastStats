@@ -542,6 +542,8 @@ class AppStringsDe implements AppStrings {
   @override String get favSortOldest   => 'Älteste';
   @override String get favSortArtistAz => 'Künstler A-Z';
   @override String get favSortTitleAz  => 'Titel A-Z';
+  @override String get rankingsWholeYear       => 'Ganzes Jahr';
+  @override String get chartsExportGeneratedOn => 'erstellt am';
 
   @override String globalListeners(String count) => '$count Hörer weltweit';
   @override String historyScrobbles(int n) => '$n Scrobbles';

@@ -542,6 +542,8 @@ class AppStringsAr implements AppStrings {
   @override String get favSortOldest   => 'الأقدم';
   @override String get favSortArtistAz => 'الفنان أ-ي';
   @override String get favSortTitleAz  => 'العنوان أ-ي';
+  @override String get rankingsWholeYear       => 'طوال العام';
+  @override String get chartsExportGeneratedOn => 'أُنشئ في';
 
   @override String globalListeners(String count) => '$count مستمع حول العالم';
   @override String historyScrobbles(int n) => '$n تشغيلة';

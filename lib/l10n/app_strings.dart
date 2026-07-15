@@ -636,4 +636,6 @@ abstract class AppStrings {
   String get favSortOldest;
   String get favSortArtistAz;
   String get favSortTitleAz;
+  String get rankingsWholeYear;
+  String get chartsExportGeneratedOn;
 }

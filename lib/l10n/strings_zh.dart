@@ -603,5 +603,7 @@ class AppStringsZh implements AppStrings {
   @override String get favSortOldest   => '最早';
   @override String get favSortArtistAz => '艺人 A-Z';
   @override String get favSortTitleAz  => '标题 A-Z';
+  @override String get rankingsWholeYear       => '全年';
+  @override String get chartsExportGeneratedOn => '生成于';
 }
 

@@ -606,5 +606,7 @@ class AppStringsPt implements AppStrings {
   @override String get favSortOldest   => 'Antigos';
   @override String get favSortArtistAz => 'Artista A-Z';
   @override String get favSortTitleAz  => 'Título A-Z';
+  @override String get rankingsWholeYear       => 'Ano inteiro';
+  @override String get chartsExportGeneratedOn => 'gerado em';
 }
 

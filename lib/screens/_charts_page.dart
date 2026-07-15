@@ -536,61 +536,61 @@ class _ChartsPageState extends State<_ChartsPage>
     final scheme = Theme.of(ctx).colorScheme;
     final txt    = Theme.of(ctx).textTheme;
 
-    // Step 1: choose chart
+    // Step 1: choose chart — compact grid, fits without scrolling
     final chartId = await showModalBottomSheet<String>(
       context: ctx,
-      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (sh) => DraggableScrollableSheet(
-        initialChildSize: 0.55,
-        minChildSize: 0.35,
-        maxChildSize: 0.85,
-        expand: false,
-        builder: (_, sc) => SafeArea(
-          child: Column(children: [
-            const SizedBox(height: 12),
-            Container(width: 36, height: 4,
-                decoration: BoxDecoration(color: scheme.outlineVariant,
-                    borderRadius: BorderRadius.circular(2))),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-              child: Row(children: [
-                Expanded(
-                  child: Text(_ct('Quel graphique ?', 'Which chart?',
-                      es: '¿Qué gráfico?', zh: '选择图表', pt: 'Qual gráfico?'),
-                      style: txt.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: scheme.tertiaryContainer,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text('Beta',
-                      style: txt.labelSmall?.copyWith(
-                          color: scheme.onTertiaryContainer,
-                          fontWeight: FontWeight.w700)),
-                ),
-              ]),
-            ),
-            Expanded(
-              child: ListView(controller: sc, children: [
-                ..._kCharts.map((c) => ListTile(
-                  leading: Icon(c.$7, color: scheme.primary),
-                  title: Text(_ct(c.$2, c.$3, es: c.$4, zh: c.$5, pt: c.$6)),
+      builder: (sh) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const SizedBox(height: 12),
+          Container(width: 36, height: 4,
+              decoration: BoxDecoration(color: scheme.outlineVariant,
+                  borderRadius: BorderRadius.circular(2))),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+            child: Row(children: [
+              Expanded(
+                child: Text(_ct('Quel graphique ?', 'Which chart?',
+                    es: '¿Qué gráfico?', zh: '选择图表', pt: 'Qual gráfico?'),
+                    style: txt.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+              ),
+            ]),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+            child: Wrap(
+              spacing: 10, runSpacing: 10,
+              children: _kCharts.map((c) {
+                final label = _ct(c.$2, c.$3, es: c.$4, zh: c.$5, pt: c.$6);
+                return InkWell(
+                  borderRadius: BorderRadius.circular(16),
                   onTap: () { _haptic(_HapticImpact.selection); Navigator.pop(sh, c.$1); },
-                )),
-                const SizedBox(height: 8),
-              ]),
+                  child: Container(
+                    width: (MediaQuery.of(sh).size.width - 16 * 2 - 10) / 2,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: scheme.surfaceContainerHigh,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
+                    ),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Icon(c.$7, color: scheme.primary, size: 22),
+                      const SizedBox(height: 8),
+                      Text(label, maxLines: 2, overflow: TextOverflow.ellipsis,
+                          style: txt.labelLarge?.copyWith(fontWeight: FontWeight.w700)),
+                    ]),
+                  ),
+                );
+              }).toList(),
             ),
-          ]),
-        ),
+          ),
+        ]),
       ),
     );
     if (chartId == null || !ctx.mounted) return;
 
-    // Step 2: choose year
+    // Step 2: choose year — single wrap row, fits without scrolling
     final years = [0, ..._availableYears];
     final targetYear = await showModalBottomSheet<int>(
       context: ctx,
@@ -603,23 +603,106 @@ class _ChartsPageState extends State<_ChartsPage>
               decoration: BoxDecoration(color: scheme.outlineVariant,
                   borderRadius: BorderRadius.circular(2))),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
             child: Align(alignment: Alignment.centerLeft,
               child: Text(_ct('Quelle période ?', 'Which period?',
                   es: '¿Qué período?', zh: '选择时间段', pt: 'Qual período?'),
                   style: txt.titleMedium?.copyWith(fontWeight: FontWeight.w700))),
           ),
-          ...years.map((y) => ListTile(
-            title: Text(y == 0 ? _ct('Tout le temps', 'All time', es: 'Todo el tiempo', zh: '全部时间', pt: 'Todo período') : '$y'),
-            onTap: () { _haptic(_HapticImpact.selection); Navigator.pop(sh, y); },
-          )),
-          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+            child: Wrap(
+              spacing: 8, runSpacing: 8,
+              children: years.map((y) => FilterChip(
+                label: Text(y == 0
+                    ? _ct('Tout le temps', 'All time', es: 'Todo el tiempo', zh: '全部时间', pt: 'Todo período')
+                    : '$y'),
+                selected: false,
+                showCheckmark: false,
+                onSelected: (_) { _haptic(_HapticImpact.selection); Navigator.pop(sh, y); },
+              )).toList(),
+            ),
+          ),
         ]),
       ),
     );
     if (targetYear == null || !ctx.mounted) return;
 
     await _captureAndShare(ctx, chartId, targetYear);
+  }
+
+  /// Composes a clean, branded PNG: app name + chart title + active filter
+  /// info as a header above the captured chart, plus a small footer.
+  Future<Uint8List> _composeExportImage({
+    required ui.Image chartImage,
+    required String title,
+    required String subtitle,
+    required ColorScheme scheme,
+  }) async {
+    const width    = 1000.0;
+    const pad      = 32.0;
+    const headerH  = 150.0;
+    const footerH  = 56.0;
+    final scale    = (width - pad * 2) / chartImage.width;
+    final chartH   = chartImage.height * scale;
+    final totalH   = headerH + chartH + footerH;
+
+    final recorder = ui.PictureRecorder();
+    final canvas   = Canvas(recorder, Rect.fromLTWH(0, 0, width, totalH));
+
+    // Background
+    canvas.drawRect(Rect.fromLTWH(0, 0, width, totalH),
+        Paint()..color = scheme.surface);
+
+    // App name badge
+    final brand = TextPainter(
+      text: TextSpan(text: 'LastStats', style: TextStyle(
+          fontSize: 18, fontWeight: FontWeight.w800, color: scheme.primary)),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    brand.paint(canvas, const Offset(pad, 28));
+
+    // Chart title
+    final titleTp = TextPainter(
+      text: TextSpan(text: title, style: TextStyle(
+          fontSize: 32, fontWeight: FontWeight.w800, color: scheme.onSurface)),
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: width - pad * 2);
+    titleTp.paint(canvas, const Offset(pad, 62));
+
+    // Active filter (subtitle)
+    final subTp = TextPainter(
+      text: TextSpan(text: subtitle, style: TextStyle(
+          fontSize: 18, fontWeight: FontWeight.w600, color: scheme.primary)),
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: width - pad * 2);
+    subTp.paint(canvas, Offset(pad, 62 + titleTp.height + 6));
+
+    // Divider
+    canvas.drawLine(Offset(pad, headerH - 10), Offset(width - pad, headerH - 10),
+        Paint()..color = scheme.outlineVariant.withValues(alpha: 0.4)..strokeWidth = 1);
+
+    // Chart image, scaled to the canvas width
+    canvas.save();
+    canvas.translate(pad, headerH);
+    canvas.scale(scale);
+    canvas.drawImage(chartImage, Offset.zero, Paint());
+    canvas.restore();
+
+    // Footer watermark
+    final footTp = TextPainter(
+      text: TextSpan(text: 'LastStats · ${L.chartsExportGeneratedOn} '
+          '${DateTime.now().day.toString().padLeft(2, '0')}/'
+          '${DateTime.now().month.toString().padLeft(2, '0')}/${DateTime.now().year}',
+          style: TextStyle(fontSize: 13, color: scheme.onSurfaceVariant)),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    footTp.paint(canvas, Offset(pad, totalH - footerH + (footerH - footTp.height) / 2));
+
+    final picture = recorder.endRecording();
+    final img = await picture.toImage(width.toInt(), totalH.toInt());
+    final bd  = await img.toByteData(format: ImageByteFormat.png);
+    return bd!.buffer.asUint8List();
   }
 
   Future<void> _captureAndShare(BuildContext ctx, String chartId, int year) async {
@@ -693,12 +776,23 @@ class _ChartsPageState extends State<_ChartsPage>
         return;
       }
 
-      final img   = await rb.toImage(pixelRatio: 3.0);
-      final bd    = await img.toByteData(format: ImageByteFormat.png);
-      final bytes = bd!.buffer.asUint8List();
+      final chartImg = await rb.toImage(pixelRatio: 3.0);
+      final scheme   = Theme.of(ctx).colorScheme;
+      final chartDef = _kCharts.firstWhere((c) => c.$1 == chartId);
+      final title    = _ct(chartDef.$2, chartDef.$3, es: chartDef.$4, zh: chartDef.$5, pt: chartDef.$6);
+      final yearStr  = year == 0 ? 'alltime' : '$year';
+      final subtitle = year == 0
+          ? _ct('Tout le temps', 'All time', es: 'Todo el tiempo', zh: '全部时间', pt: 'Todo período')
+          : '$year';
+
+      final bytes = await _composeExportImage(
+        chartImage: chartImg,
+        title:      title,
+        subtitle:   subtitle,
+        scheme:     scheme,
+      );
 
       final tmp     = await getTemporaryDirectory();
-      final yearStr = year == 0 ? 'alltime' : '$year';
       final file    = File('${tmp.path}/laststats_${chartId}_$yearStr.png');
       await file.writeAsBytes(bytes);
 

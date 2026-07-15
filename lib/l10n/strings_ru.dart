@@ -542,6 +542,8 @@ class AppStringsRu implements AppStrings {
   @override String get favSortOldest   => 'Старые';
   @override String get favSortArtistAz => 'Исполнитель А-Я';
   @override String get favSortTitleAz  => 'Название А-Я';
+  @override String get rankingsWholeYear       => 'Весь год';
+  @override String get chartsExportGeneratedOn => 'создано';
 
   @override String globalListeners(String count) => '$count слушателей во всём мире';
   @override String historyScrobbles(int n) => '$n скробблов';

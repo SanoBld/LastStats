@@ -106,7 +106,7 @@ class _RankingsPageState extends State<_RankingsPage>
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
                 children: [0, ...List.generate(12, (i) => i + 1)].map((m) {
                   final sel   = m == _selectedMonth;
-                  final label = m == 0 ? _ct('Toute l\'année', 'Whole year') : L.months[m];
+                  final label = m == 0 ? L.rankingsWholeYear : L.months[m];
                   return Padding(padding: const EdgeInsets.only(right: 8),
                     child: FilterChip(label: Text(label), selected: sel, showCheckmark: false,
                         onSelected: (_) { if (!sel) { _haptic(_HapticImpact.selection); setState(() => _selectedMonth = m); } }));
