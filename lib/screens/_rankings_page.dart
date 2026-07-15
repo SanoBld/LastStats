@@ -14,7 +14,7 @@ class _RankingsPageState extends State<_RankingsPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabs;
   String _period       = 'overall';
-  String _sortMode     = 'plays'; // 'plays' | 'az' — only used when a year is selected
+  int    _selectedMonth = 0; // 0 = whole year, 1-12 = specific month — only used with a year
   int?   _selectedYear;          // null = use period chips; int = year filter
   List<int> _availableYears = [];
 
@@ -97,23 +97,19 @@ class _RankingsPageState extends State<_RankingsPage>
             const SizedBox(height: 4),
           ],
 
-          // Sort chips — only shown for a specific selected year. Period chips
-          // don't make sense there (they're relative to "now", not to that year),
-          // and "toutes les années" already means true all-time (no sub-filter).
+          // Month selector — only shown for a specific selected year.
           if (_selectedYear != null)
             SizedBox(
               height: 44,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-                children: [
-                  ('plays', _ct('Écoutes', 'Plays')),
-                  ('az',    _ct('A–Z', 'A–Z')),
-                ].map((s) {
-                  final sel = s.$1 == _sortMode;
+                children: [0, ...List.generate(12, (i) => i + 1)].map((m) {
+                  final sel   = m == _selectedMonth;
+                  final label = m == 0 ? _ct('Toute l\'année', 'Whole year') : L.months[m];
                   return Padding(padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(label: Text(s.$2), selected: sel,
-                        onSelected: (_) { if (!sel) { _haptic(_HapticImpact.selection); setState(() => _sortMode = s.$1); } }));
+                    child: FilterChip(label: Text(label), selected: sel, showCheckmark: false,
+                        onSelected: (_) { if (!sel) { _haptic(_HapticImpact.selection); setState(() => _selectedMonth = m); } }));
                 }).toList(),
               ),
             ),
@@ -125,11 +121,11 @@ class _RankingsPageState extends State<_RankingsPage>
           ]),
           Expanded(child: TabBarView(controller: _tabs, children: [
             _TopListBody(service: widget.service, type: 'artists',
-                period: _period, year: _selectedYear, sortMode: _sortMode),
+                period: _period, year: _selectedYear, month: _selectedMonth),
             _TopListBody(service: widget.service, type: 'albums',
-                period: _period, year: _selectedYear, sortMode: _sortMode),
+                period: _period, year: _selectedYear, month: _selectedMonth),
             _TopListBody(service: widget.service, type: 'tracks',
-                period: _period, year: _selectedYear, sortMode: _sortMode),
+                period: _period, year: _selectedYear, month: _selectedMonth),
           ])),
         ]),
       ),
@@ -141,9 +137,9 @@ class _TopListBody extends StatefulWidget {
   final LastFmService service;
   final String type, period;
   final int?   year;           // null = API; int = local cached scrobbles
-  final String sortMode;       // 'plays' | 'az' — only applied when year != null
+  final int    month;          // 0 = whole year, 1-12 = specific month — only used when year != null
   const _TopListBody({required this.service, required this.type,
-      required this.period, this.year, this.sortMode = 'plays'});
+      required this.period, this.year, this.month = 0});
 
   @override
   State<_TopListBody> createState() => _TopListBodyState();
@@ -167,23 +163,17 @@ class _TopListBodyState extends State<_TopListBody>
     super.didUpdateWidget(old);
     if (old.period != widget.period ||
         old.type   != widget.type   ||
-        old.year   != widget.year) { _load(reset: true); }
-    else if (old.sortMode != widget.sortMode) { setState(() {}); }
-  }
-
-  /// Items to display — re-sorted client-side when browsing a specific year,
-  /// since that data is already fully loaded locally (no need to re-fetch).
-  List<dynamic> get _displayItems {
-    if (widget.year == null || widget.sortMode != 'az') return _items;
-    final sorted = List<dynamic>.from(_items);
-    sorted.sort((a, b) => (a['name'] ?? '').toString().toLowerCase()
-        .compareTo((b['name'] ?? '').toString().toLowerCase()));
-    return sorted;
+        old.year   != widget.year   ||
+        old.month  != widget.month) { _load(reset: true); }
   }
 
   // Compute top items from locally-cached scrobbles for a given year.
   Future<List<Map<String, dynamic>>> _computeLocalTop(int year) async {
-    final records = AllScrobblesService.getRecordsForYear(year) ?? [];
+    var records = AllScrobblesService.getRecordsForYear(year) ?? [];
+    if (widget.month != 0) {
+      records = records.where((r) =>
+          DateTime.fromMillisecondsSinceEpoch(r.ts * 1000).month == widget.month).toList();
+    }
     if (records.isEmpty) {
       return [];
     }
@@ -305,14 +295,14 @@ class _TopListBodyState extends State<_TopListBody>
         return false;
       },
       child: CustomScrollView(slivers: [
-        if (_displayItems.length >= 3)
+        if (_items.length >= 3)
           SliverToBoxAdapter(child: _PodiumWidget(
-              items: _displayItems.take(3).toList(), type: widget.type,
+              items: _items.take(3).toList(), type: widget.type,
               onTap: (item) { _haptic(_HapticImpact.light); _showDetail(context, item as Map<String, dynamic>); })),
 
         SliverList(delegate: SliverChildBuilderDelegate(
           (ctx, i) {
-            final items = _displayItems;
+            final items = _items;
             final off = items.length >= 3 ? 3 : 0;
             final idx = i + off;
             if (idx >= items.length) {
@@ -349,7 +339,7 @@ class _TopListBodyState extends State<_TopListBody>
               ), // _FadeSlideIn
             );
           },
-          childCount: (_displayItems.length >= 3 ? _displayItems.length - 3 : _displayItems.length) + 1,
+          childCount: (_items.length >= 3 ? _items.length - 3 : _items.length) + 1,
         )),
       ]),
     ),  // NotificationListener
