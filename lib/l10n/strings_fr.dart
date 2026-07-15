@@ -606,7 +606,7 @@ class AppStringsFr implements AppStrings {
   @override String get favSortOldest   => 'Anciens';
   @override String get favSortArtistAz => 'Artiste A-Z';
   @override String get favSortTitleAz  => 'Titre A-Z';
-  @override String get rankingsWholeYear       => 'Toute l'année';
+  @override String get rankingsWholeYear       => 'Toute l\'année';
   @override String get chartsExportGeneratedOn => 'généré le';
 }
 
