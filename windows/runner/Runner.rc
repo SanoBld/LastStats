@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "laststats_mobile" "\0"
+            VALUE "CompanyName", "SanoBld" "\0"
+            VALUE "FileDescription", "LastStats" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "laststats_mobile" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.example. All rights reserved." "\0"
+            VALUE "InternalName", "LastStats" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 SanoBld. All rights reserved." "\0"
             VALUE "OriginalFilename", "laststats_mobile.exe" "\0"
-            VALUE "ProductName", "laststats_mobile" "\0"
+            VALUE "ProductName", "LastStats" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

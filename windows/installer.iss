@@ -30,6 +30,8 @@ SolidCompression=yes
 SetupIconFile=runner\resources\app_icon.ico
 WizardStyle=modern
 DisableProgramGroupPage=yes
+CloseApplications=yes
+RestartApplications=yes
 #if MyArch == "arm64"
 ArchitecturesInstallIn64BitMode=arm64
 ArchitecturesAllowed=arm64
