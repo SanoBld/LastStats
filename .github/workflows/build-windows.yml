@@ -20,7 +20,7 @@ on:
         default: ''
 
 jobs:
-  build:
+  build-x64:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -55,13 +55,39 @@ jobs:
           name: laststats-windows
           path: laststats-windows.zip
 
-      # Windows on ARM (Snapdragon-powered devices, e.g. Surface Pro X).
-      # Cross-compiled from this same x64 runner — needs the ARM64 build
-      # tools component for Visual Studio, which is preinstalled on
-      # GitHub's windows-latest image.
+  # Windows on ARM (Snapdragon-powered devices, e.g. Surface Pro X / Surface
+  # Laptop 7 ARM). Unlike Android, Flutter has no "--target-platform" flag to
+  # cross-compile Windows ARM64 from an x64 host — it must be built natively
+  # on an ARM64 Windows machine. GitHub provides a hosted ARM64 Windows
+  # runner ("windows-11-arm", currently in public preview) for exactly this.
+  #
+  # NOTE: if this job fails with "no runner matching 'windows-11-arm'", it
+  # means that runner label isn't enabled for this repo/plan yet — remove
+  # this job (or ask GitHub support to enable it) until it is.
+  build-arm64:
+    runs-on: windows-11-arm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+      - run: flutter pub get
+      - run: dart run flutter_launcher_icons
+
+      - name: Resolve version
+        shell: bash
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
       - name: Build Windows (ARM64)
         shell: bash
-        run: flutter build windows --release --target-platform windows-arm64 --build-name="$VERSION" --build-number=${{ github.run_number }}
+        run: flutter build windows --release --build-name="$VERSION" --build-number=${{ github.run_number }}
 
       - name: Zip Windows ARM64 build
         shell: pwsh
