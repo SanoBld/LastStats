@@ -67,7 +67,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: laststats-windows-installer
-          path: installer_output\LastStats-Setup-x64.exe
+          path: windows\installer_output\LastStats-Setup-x64.exe
 
   # Windows on ARM (Snapdragon-powered devices, e.g. Surface Pro X / Surface
   # Laptop 7 ARM). Unlike Android, Flutter has no "--target-platform" flag to
@@ -130,4 +130,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: laststats-windows-arm64-installer
-          path: installer_output\LastStats-Setup-arm64.exe
+          path: windows\installer_output\LastStats-Setup-arm64.exe

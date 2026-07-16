@@ -27,7 +27,7 @@ OutputBaseFilename=LastStats-Setup-{#MyArch}
 OutputDir=installer_output
 Compression=lzma
 SolidCompression=yes
-SetupIconFile=windows\runner\resources\app_icon.ico
+SetupIconFile=runner\resources\app_icon.ico
 WizardStyle=modern
 DisableProgramGroupPage=yes
 #if MyArch == "arm64"
@@ -46,7 +46,7 @@ Name: "french";  MessagesFile: "compiler:Languages\French.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
-Source: "build\windows\{#MyArch}\runner\Release\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
+Source: "..\build\windows\{#MyArch}\runner\Release\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
 
 [Icons]
 Name: "{group}\LastStats"; Filename: "{app}\{#MyAppExeName}"
