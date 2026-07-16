@@ -205,7 +205,8 @@ jobs:
             ### Desktop
             | File | Platform |
             |------|----------|
-            | `laststats-windows.zip` | Windows |
+            | `laststats-windows.zip` | Windows (x64) |
+            | `laststats-windows-arm64.zip` | Windows on ARM (Snapdragon) |
             | `laststats-linux.zip`   | Linux |
             | `laststats-macos.zip`   | macOS |
 

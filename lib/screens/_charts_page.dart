@@ -564,6 +564,17 @@ class _ChartsPageState extends State<_ChartsPage>
                     es: '¿Qué gráfico?', zh: '选择图表', pt: 'Qual gráfico?'),
                     style: txt.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
               ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: scheme.tertiaryContainer,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text('Beta',
+                    style: txt.labelSmall?.copyWith(
+                        color: scheme.onTertiaryContainer,
+                        fontWeight: FontWeight.w700)),
+              ),
             ]),
           ),
           Flexible(
@@ -673,6 +684,20 @@ class _ChartsPageState extends State<_ChartsPage>
       textDirection: TextDirection.ltr,
     )..layout();
     brand.paint(canvas, const Offset(pad, 28));
+
+    // "Beta" badge next to the brand name
+    final betaW = brand.width + 10;
+    final betaTp = TextPainter(
+      text: const TextSpan(text: 'BETA', style: TextStyle(
+          fontSize: 11, fontWeight: FontWeight.w800, color: Colors.white)),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    final betaRect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(pad + betaW, 26, betaTp.width + 12, 20),
+      const Radius.circular(10),
+    );
+    canvas.drawRRect(betaRect, Paint()..color = scheme.tertiary);
+    betaTp.paint(canvas, Offset(pad + betaW + 6, 30));
 
     // Chart title
     final titleTp = TextPainter(

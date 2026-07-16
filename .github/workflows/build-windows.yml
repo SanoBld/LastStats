@@ -41,16 +41,32 @@ jobs:
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
-      - name: Build Windows
+      - name: Build Windows (x64)
         shell: bash
         run: flutter build windows --release --build-name="$VERSION" --build-number=${{ github.run_number }}
 
       # The /* makes sure the zip contains the files directly,
       # not a wrapping "Release" folder.
-      - name: Zip Windows build
+      - name: Zip Windows x64 build
         shell: pwsh
         run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath laststats-windows.zip
       - uses: actions/upload-artifact@v4
         with:
           name: laststats-windows
           path: laststats-windows.zip
+
+      # Windows on ARM (Snapdragon-powered devices, e.g. Surface Pro X).
+      # Cross-compiled from this same x64 runner — needs the ARM64 build
+      # tools component for Visual Studio, which is preinstalled on
+      # GitHub's windows-latest image.
+      - name: Build Windows (ARM64)
+        shell: bash
+        run: flutter build windows --release --target-platform windows-arm64 --build-name="$VERSION" --build-number=${{ github.run_number }}
+
+      - name: Zip Windows ARM64 build
+        shell: pwsh
+        run: Compress-Archive -Path build/windows/arm64/runner/Release/* -DestinationPath laststats-windows-arm64.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: laststats-windows-arm64
+          path: laststats-windows-arm64.zip
