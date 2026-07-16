@@ -205,8 +205,10 @@ jobs:
             ### Desktop
             | File | Platform |
             |------|----------|
-            | `laststats-windows.zip` | Windows (x64) |
-            | `laststats-windows-arm64.zip` | Windows on ARM (Snapdragon) |
+            | `LastStats-Setup-x64.exe` | **Windows (x64) — recommended installer** |
+            | `LastStats-Setup-arm64.exe` | **Windows on ARM (Snapdragon) — recommended installer** |
+            | `laststats-windows.zip` | Windows (x64), portable / no install |
+            | `laststats-windows-arm64.zip` | Windows on ARM, portable / no install |
             | `laststats-linux.zip`   | Linux |
             | `laststats-macos.zip`   | macOS |
 

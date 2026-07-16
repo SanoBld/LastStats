@@ -55,6 +55,20 @@ jobs:
           name: laststats-windows
           path: laststats-windows.zip
 
+      # Proper installer: puts files in Program Files, adds Start Menu +
+      # optional Desktop shortcut with the app icon, and an uninstaller.
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+      - name: Build installer (x64)
+        shell: pwsh
+        env:
+          APP_VERSION: ${{ env.VERSION }}
+        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" windows\installer.iss /DMyArch=x64'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: laststats-windows-installer
+          path: installer_output\LastStats-Setup-x64.exe
+
   # Windows on ARM (Snapdragon-powered devices, e.g. Surface Pro X / Surface
   # Laptop 7 ARM). Unlike Android, Flutter has no "--target-platform" flag to
   # cross-compile Windows ARM64 from an x64 host — it must be built natively
@@ -105,3 +119,15 @@ jobs:
         with:
           name: laststats-windows-arm64
           path: laststats-windows-arm64.zip
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+      - name: Build installer (ARM64)
+        shell: pwsh
+        env:
+          APP_VERSION: ${{ env.VERSION }}
+        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" windows\installer.iss /DMyArch=arm64'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: laststats-windows-arm64-installer
+          path: installer_output\LastStats-Setup-arm64.exe
