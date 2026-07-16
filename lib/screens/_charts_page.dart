@@ -100,10 +100,15 @@ class _ChartsPageState extends State<_ChartsPage>
   int        _selectedYear   = DateTime.now().year;
   List<int>  _availableYears = [DateTime.now().year];
 
-  bool get _isAllTime => _selectedYear == 0;
-
   // ── History loading progress ──────────────────────────────────────────────
   AllScrobblesProgress _historyProgress = AllScrobblesProgress.idle();
+
+  // Controls the main chart list — used to force lazy off-screen charts to
+  // lay out before export capture (a chart never scrolled into view has no
+  // valid RenderRepaintBoundary size yet).
+  final _mainScroll = ScrollController();
+
+  bool get _isAllTime => _selectedYear == 0;
 
   @override
   bool get wantKeepAlive => true;
@@ -118,6 +123,7 @@ class _ChartsPageState extends State<_ChartsPage>
   @override
   void dispose() {
     AllScrobblesService.progressNotifier.removeListener(_onHistoryProgress);
+    _mainScroll.dispose();
     super.dispose();
   }
 
@@ -536,13 +542,16 @@ class _ChartsPageState extends State<_ChartsPage>
     final scheme = Theme.of(ctx).colorScheme;
     final txt    = Theme.of(ctx).textTheme;
 
-    // Step 1: choose chart — compact grid, fits without scrolling
+    // Step 1: choose chart — grid, scrollable if it overflows
     final chartId = await showModalBottomSheet<String>(
       context: ctx,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (sh) => SafeArea(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(sh).size.height * 0.75),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
           const SizedBox(height: 12),
           Container(width: 36, height: 4,
               decoration: BoxDecoration(color: scheme.outlineVariant,
@@ -557,35 +566,38 @@ class _ChartsPageState extends State<_ChartsPage>
               ),
             ]),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
-            child: Wrap(
-              spacing: 10, runSpacing: 10,
-              children: _kCharts.map((c) {
-                final label = _ct(c.$2, c.$3, es: c.$4, zh: c.$5, pt: c.$6);
-                return InkWell(
-                  borderRadius: BorderRadius.circular(16),
-                  onTap: () { _haptic(_HapticImpact.selection); Navigator.pop(sh, c.$1); },
-                  child: Container(
-                    width: (MediaQuery.of(sh).size.width - 16 * 2 - 10) / 2,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                    decoration: BoxDecoration(
-                      color: scheme.surfaceContainerHigh,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
+          Flexible(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+              child: Wrap(
+                spacing: 10, runSpacing: 10,
+                children: _kCharts.map((c) {
+                  final label = _ct(c.$2, c.$3, es: c.$4, zh: c.$5, pt: c.$6);
+                  return InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () { _haptic(_HapticImpact.selection); Navigator.pop(sh, c.$1); },
+                    child: Container(
+                      width: (MediaQuery.of(sh).size.width - 16 * 2 - 10) / 2,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: scheme.surfaceContainerHigh,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
+                      ),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Icon(c.$7, color: scheme.primary, size: 22),
+                        const SizedBox(height: 8),
+                        Text(label, maxLines: 2, overflow: TextOverflow.ellipsis,
+                            style: txt.labelLarge?.copyWith(fontWeight: FontWeight.w700)),
+                      ]),
                     ),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Icon(c.$7, color: scheme.primary, size: 22),
-                      const SizedBox(height: 8),
-                      Text(label, maxLines: 2, overflow: TextOverflow.ellipsis,
-                          style: txt.labelLarge?.copyWith(fontWeight: FontWeight.w700)),
-                    ]),
-                  ),
-                );
-              }).toList(),
+                  );
+                }).toList(),
+              ),
             ),
           ),
         ]),
+        ),
       ),
     );
     if (chartId == null || !ctx.mounted) return;
@@ -705,6 +717,31 @@ class _ChartsPageState extends State<_ChartsPage>
     return bd!.buffer.asUint8List();
   }
 
+  /// A chart far down the list may never have been scrolled into view, so its
+  /// RepaintBoundary has no valid layout yet ("size.isEmpty"). Jumping to the
+  /// bottom forces the whole (variable-height) list to lay out — computing
+  /// maxScrollExtent requires measuring every child — which makes every
+  /// chart's RenderRepaintBoundary valid for capture, regardless of where the
+  /// user actually scrolled to.
+  Future<RenderRepaintBoundary?> _ensureChartLaidOut(String chartId) async {
+    RenderRepaintBoundary? find() =>
+        _xkeys[chartId]?.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+
+    var rb = find();
+    if (rb != null && !rb.size.isEmpty) return rb;
+
+    if (_mainScroll.hasClients) {
+      _mainScroll.jumpTo(_mainScroll.position.maxScrollExtent);
+      // Two frames: one to lay out, one to settle/paint.
+      for (var i = 0; i < 2; i++) {
+        final done = Completer<void>();
+        WidgetsBinding.instance.addPostFrameCallback((_) => done.complete());
+        await done.future;
+      }
+    }
+    return find();
+  }
+
   Future<void> _captureAndShare(BuildContext ctx, String chartId, int year) async {
     final saved    = _selectedYear;
     final switched = year != saved;
@@ -764,8 +801,7 @@ class _ChartsPageState extends State<_ChartsPage>
         await ready.future;
       }
 
-      final rb = _xkeys[chartId]?.currentContext?.findRenderObject()
-          as RenderRepaintBoundary?;
+      final rb = await _ensureChartLaidOut(chartId);
       if (rb == null || rb.size.isEmpty) {
         closeDialog();
         if (ctx.mounted) {
@@ -1049,6 +1085,7 @@ class _ChartsPageState extends State<_ChartsPage>
               child: RefreshIndicator(
                 onRefresh: _load,
                 child: ListView(
+                controller: _mainScroll,
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 48),
                 children: [
 
