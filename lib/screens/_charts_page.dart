@@ -742,6 +742,39 @@ class _ChartsPageState extends State<_ChartsPage>
     return find();
   }
 
+  /// Renders [child] off-screen (fully laid out and painted, just physically
+  /// outside the visible viewport) and captures it as an image. Used for
+  /// charts that need to show ALL their data unclipped for export, regardless
+  /// of their normal on-screen scrolled/clipped state.
+  Future<ui.Image?> _renderOffscreen(BuildContext ctx, Widget child) async {
+    final key     = GlobalKey();
+    final overlay = Overlay.of(ctx, rootOverlay: true);
+    late OverlayEntry entry;
+
+    entry = OverlayEntry(builder: (_) => Positioned(
+      left: -20000, top: 0,
+      child: Material(
+        type: MaterialType.transparency,
+        child: RepaintBoundary(key: key, child: child),
+      ),
+    ));
+    overlay.insert(entry);
+
+    try {
+      // A couple of frames for layout + paint to settle.
+      for (var i = 0; i < 3; i++) {
+        final done = Completer<void>();
+        WidgetsBinding.instance.addPostFrameCallback((_) => done.complete());
+        await done.future;
+      }
+      final rb = key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (rb == null || rb.size.isEmpty) return null;
+      return await rb.toImage(pixelRatio: 3.0);
+    } finally {
+      entry.remove();
+    }
+  }
+
   Future<void> _captureAndShare(BuildContext ctx, String chartId, int year) async {
     final saved    = _selectedYear;
     final switched = year != saved;
@@ -801,18 +834,46 @@ class _ChartsPageState extends State<_ChartsPage>
         await ready.future;
       }
 
-      final rb = await _ensureChartLaidOut(chartId);
-      if (rb == null || rb.size.isEmpty) {
-        closeDialog();
-        if (ctx.mounted) {
-          ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(
-              _ct('Graphique non disponible pour cette période',
-                  'Chart not available for this period'))));
+      ui.Image chartImg;
+
+      if (chartId == 'monthly' || chartId == 'cumul') {
+        // These two charts have their own internal horizontal scroll (jumped
+        // to the most recent months) — capturing them live only grabs
+        // whatever happens to be in that inner viewport. Render a full-width,
+        // unclipped copy off-screen instead, so every month is visible.
+        final allTimeMonthly = _buildAllTimeMonthly();
+        final periodMonthly  = _isAllTime ? allTimeMonthly : (_monthly ?? const <String, int>{});
+
+        final child = chartId == 'monthly'
+            ? _MonthlyCard(monthly: periodMonthly, exportMode: true)
+            : _CumulativeLineCard(data: _buildCumulative(periodMonthly), exportMode: true);
+        final naturalWidth = 100.0 + (chartId == 'monthly' ? 52.0 : 42.0) * periodMonthly.length;
+
+        final img = await _renderOffscreen(ctx, SizedBox(width: naturalWidth.clamp(320, 6000), child: child));
+        if (img == null) {
+          closeDialog();
+          if (ctx.mounted) {
+            ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(
+                _ct('Graphique non disponible pour cette période',
+                    'Chart not available for this period'))));
+          }
+          return;
         }
-        return;
+        chartImg = img;
+      } else {
+        final rb = await _ensureChartLaidOut(chartId);
+        if (rb == null || rb.size.isEmpty) {
+          closeDialog();
+          if (ctx.mounted) {
+            ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(
+                _ct('Graphique non disponible pour cette période',
+                    'Chart not available for this period'))));
+          }
+          return;
+        }
+        chartImg = await rb.toImage(pixelRatio: 3.0);
       }
 
-      final chartImg = await rb.toImage(pixelRatio: 3.0);
       final scheme   = Theme.of(ctx).colorScheme;
       final chartDef = _kCharts.firstWhere((c) => c.$1 == chartId);
       final title    = _ct(chartDef.$2, chartDef.$3, es: chartDef.$4, zh: chartDef.$5, pt: chartDef.$6);
@@ -1377,7 +1438,8 @@ List<Color> _buildPalette(Color base, Color second, int count) {
 
 class _MonthlyCard extends StatefulWidget {
   final Map<String, int> monthly;
-  const _MonthlyCard({required this.monthly});
+  final bool exportMode; // true = render all months unclipped, no internal scroll
+  const _MonthlyCard({required this.monthly, this.exportMode = false});
 
   @override
   State<_MonthlyCard> createState() => _MonthlyCardState();
@@ -1392,9 +1454,11 @@ class _MonthlyCardState extends State<_MonthlyCard> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_sc.hasClients) _sc.jumpTo(_sc.position.maxScrollExtent);
-    });
+    if (!widget.exportMode) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_sc.hasClients) _sc.jumpTo(_sc.position.maxScrollExtent);
+      });
+    }
   }
 
   @override
@@ -1440,111 +1504,112 @@ class _MonthlyCardState extends State<_MonthlyCard> {
               ]),
             ),
             Expanded(
-              child: SingleChildScrollView(
+              child: widget.exportMode
+                ? _buildBarsRow(sorted, maxVal, s, t)
+                : SingleChildScrollView(
                 controller: _sc,
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: () {
-                    final widgets = <Widget>[];
-                    String? prevYear;
-                    var i = 0;
-                    for (final e in sorted) {
-                      final idx   = i++;
-                      final year  = e.key.substring(0, 4);
-                      final ratio = maxVal > 0 ? e.value / maxVal : 0.0;
-                      final barH  = (_barMaxH * ratio).clamp(2.0, _barMaxH);
-                      final isMax = e.value == maxVal;
-                      final touched = _touchIdx == idx;
-                      final color = touched ? s.primary
-                          : isMax ? s.primary
-                          : Color.lerp(s.primaryContainer, s.primary, ratio * 0.75)!;
-
-                      // Year separator line
-                      if (prevYear != null && year != prevYear) {
-                        widgets.add(SizedBox(
-                          width: 26,
-                          height: _barMaxH + 16,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(year,
-                                  style: t.labelSmall?.copyWith(
-                                      fontSize: 8, color: s.primary,
-                                      fontWeight: FontWeight.w800)),
-                              const SizedBox(height: 4),
-                              SizedBox(
-                                height: _barMaxH,
-                                child: VerticalDivider(
-                                  width: 1, thickness: 1,
-                                  color: s.primary.withValues(alpha: 0.35),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ));
-                      }
-                      prevYear = year;
-
-                      widgets.add(SizedBox(
-                        width: _colW,
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () => setState(() => _touchIdx = touched ? null : idx),
-                          child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(
-                              (ratio > 0.12 || touched) ? _fmtExact(e.value) : '',
-                              textAlign: TextAlign.center,
-                              style: t.labelSmall?.copyWith(
-                                fontSize: 8,
-                                color: (isMax || touched) ? s.primary : s.onSurfaceVariant,
-                                fontWeight: (isMax || touched) ? FontWeight.w800 : FontWeight.normal,
-                              ),
-                            ),
-                            const SizedBox(height: 3),
-                            Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Container(
-                                width: _colW - 10,
-                                height: barH,
-                                decoration: BoxDecoration(
-                                  gradient: _barGradient(color),
-                                  borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(7)),
-                                  border: touched
-                                      ? Border.all(color: s.onPrimary.withValues(alpha: 0.6), width: 1.5)
-                                      : null,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              L.months[int.tryParse(e.key.substring(5)) ?? 1],
-                              textAlign: TextAlign.center,
-                              style: t.labelSmall?.copyWith(
-                                fontSize: 9,
-                                color: (isMax || touched) ? s.primary : s.onSurfaceVariant,
-                                fontWeight: (isMax || touched) ? FontWeight.w700 : FontWeight.normal,
-                              ),
-                            ),
-                          ],
-                          ),
-                        ),
-                      ));
-                    }
-                    return widgets;
-                  }(),
-                ),
+                child: _buildBarsRow(sorted, maxVal, s, t),
               ),
             ),
           ]),
         ],
       ),
     );
+  }
+
+  Widget _buildBarsRow(List<MapEntry<String, int>> sorted, int maxVal, ColorScheme s, TextTheme t) {
+    final widgets = <Widget>[];
+    String? prevYear;
+    var i = 0;
+    for (final e in sorted) {
+      final idx   = i++;
+      final year  = e.key.substring(0, 4);
+      final ratio = maxVal > 0 ? e.value / maxVal : 0.0;
+      final barH  = (_barMaxH * ratio).clamp(2.0, _barMaxH);
+      final isMax = e.value == maxVal;
+      final touched = _touchIdx == idx;
+      final color = touched ? s.primary
+          : isMax ? s.primary
+          : Color.lerp(s.primaryContainer, s.primary, ratio * 0.75)!;
+
+      // Year separator line
+      if (prevYear != null && year != prevYear) {
+        widgets.add(SizedBox(
+          width: 26,
+          height: _barMaxH + 16,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(year,
+                  style: t.labelSmall?.copyWith(
+                      fontSize: 8, color: s.primary,
+                      fontWeight: FontWeight.w800)),
+              const SizedBox(height: 4),
+              SizedBox(
+                height: _barMaxH,
+                child: VerticalDivider(
+                  width: 1, thickness: 1,
+                  color: s.primary.withValues(alpha: 0.35),
+                ),
+              ),
+            ],
+          ),
+        ));
+      }
+      prevYear = year;
+
+      widgets.add(SizedBox(
+        width: _colW,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => setState(() => _touchIdx = touched ? null : idx),
+          child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              (ratio > 0.12 || touched) ? _fmtExact(e.value) : '',
+              textAlign: TextAlign.center,
+              style: t.labelSmall?.copyWith(
+                fontSize: 8,
+                color: (isMax || touched) ? s.primary : s.onSurfaceVariant,
+                fontWeight: (isMax || touched) ? FontWeight.w800 : FontWeight.normal,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                width: _colW - 10,
+                height: barH,
+                decoration: BoxDecoration(
+                  gradient: _barGradient(color),
+                  borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(7)),
+                  border: touched
+                      ? Border.all(color: s.onPrimary.withValues(alpha: 0.6), width: 1.5)
+                      : null,
+                ),
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              L.months[int.tryParse(e.key.substring(5)) ?? 1],
+              textAlign: TextAlign.center,
+              style: t.labelSmall?.copyWith(
+                fontSize: 9,
+                color: (isMax || touched) ? s.primary : s.onSurfaceVariant,
+                fontWeight: (isMax || touched) ? FontWeight.w700 : FontWeight.normal,
+              ),
+            ),
+          ],
+          ),
+        ),
+      ));
+    }
+    return Row(crossAxisAlignment: CrossAxisAlignment.end, children: widgets);
   }
 }
 
@@ -1554,7 +1619,8 @@ class _MonthlyCardState extends State<_MonthlyCard> {
 
 class _CumulativeLineCard extends StatefulWidget {
   final Map<String, int> data;
-  const _CumulativeLineCard({required this.data});
+  final bool exportMode;
+  const _CumulativeLineCard({required this.data, this.exportMode = false});
 
   @override
   State<_CumulativeLineCard> createState() => _CumulativeLineCardState();
@@ -1569,9 +1635,11 @@ class _CumulativeLineCardState extends State<_CumulativeLineCard> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_sc.hasClients) _sc.jumpTo(_sc.position.maxScrollExtent);
-    });
+    if (!widget.exportMode) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_sc.hasClients) _sc.jumpTo(_sc.position.maxScrollExtent);
+      });
+    }
   }
 
   @override
@@ -1656,13 +1724,26 @@ class _CumulativeLineCardState extends State<_CumulativeLineCard> {
               ),
             ),
 
-            // Scrollable chart
+            // Scrollable chart (or unclipped, in export mode)
             Expanded(
-              child: SingleChildScrollView(
+              child: widget.exportMode
+                ? _buildLineContent(keys, vals, contentW, s, t)
+                : SingleChildScrollView(
                 controller: _sc,
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
-                child: Column(
+                child: _buildLineContent(keys, vals, contentW, s, t),
+              ),
+            ),
+          ]),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLineContent(List<String> keys, List<double> vals, double contentW,
+      ColorScheme s, TextTheme t) {
+    return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
@@ -1709,13 +1790,7 @@ class _CumulativeLineCardState extends State<_CumulativeLineCard> {
                       ),
                     ),
                   ],
-                ),
-              ),
-            ),
-          ]),
-        ],
-      ),
-    );
+                );
   }
 }
 
