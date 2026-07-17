@@ -1272,41 +1272,45 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ),
           ),
           const SizedBox(height: 8),
-          GestureDetector(
-            onTap: () => _openBioUrl(_lfmBioUrl()),
-            child: Text('Voir sur Last.fm',
-              style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w600,
-                  fontSize: 12, decoration: TextDecoration.underline, decorationColor: scheme.primary),
-            ),
-          ),
-
-          if (bio.length > maxChars) ...[
-            const SizedBox(height: 8),
-            GestureDetector(
-              onTap: () => setState(() => _bioExpanded = !_bioExpanded),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _bioExpanded ? L.detailBioReadLess : L.detailBioReadMore,
-                    style: TextStyle(
-                      color: scheme.primary,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                    ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (bio.length > maxChars)
+                GestureDetector(
+                  onTap: () => setState(() => _bioExpanded = !_bioExpanded),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _bioExpanded ? L.detailBioReadLess : L.detailBioReadMore,
+                        style: TextStyle(
+                          color: scheme.primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      AnimatedRotation(
+                        turns:    _bioExpanded ? -0.5 : 0.0,
+                        duration: const Duration(milliseconds: 300),
+                        curve:    Curves.easeInOutCubic,
+                        child: Icon(Icons.expand_more_rounded,
+                            size: 18, color: scheme.primary),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 4),
-                  AnimatedRotation(
-                    turns:    _bioExpanded ? -0.5 : 0.0,
-                    duration: const Duration(milliseconds: 300),
-                    curve:    Curves.easeInOutCubic,
-                    child: Icon(Icons.expand_more_rounded,
-                        size: 18, color: scheme.primary),
-                  ),
-                ],
+                )
+              else
+                const SizedBox.shrink(),
+              GestureDetector(
+                onTap: () => _openBioUrl(_lfmBioUrl()),
+                child: Text('Voir sur Last.fm',
+                  style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w600,
+                      fontSize: 12, decoration: TextDecoration.underline, decorationColor: scheme.primary),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
           const SizedBox(height: 20),
         ],
       ),

@@ -41,7 +41,18 @@ ArchitecturesAllowed=x64compatible
 #endif
 
 [Languages]
-Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "english";           MessagesFile: "compiler:Default.isl"
+Name: "french";            MessagesFile: "compiler:Languages\French.isl"
+Name: "spanish";           MessagesFile: "compiler:Languages\Spanish.isl"
+Name: "german";            MessagesFile: "compiler:Languages\German.isl"
+Name: "italian";           MessagesFile: "compiler:Languages\Italian.isl"
+Name: "portuguese";        MessagesFile: "compiler:Languages\Portuguese.isl"
+Name: "japanese";          MessagesFile: "compiler:Languages\Japanese.isl"
+Name: "russian";           MessagesFile: "compiler:Languages\Russian.isl"
+Name: "arabic";            MessagesFile: "compiler:Languages\Arabic.isl"
+; Chinese (Simplified) isn't bundled with Inno Setup by default — the CI
+; workflow downloads it into this folder before compiling (see build-windows.yml).
+Name: "chinesesimplified"; MessagesFile: "ChineseSimplified.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
