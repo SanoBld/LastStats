@@ -50,9 +50,9 @@ Name: "portuguese";        MessagesFile: "compiler:Languages\Portuguese.isl"
 Name: "japanese";          MessagesFile: "compiler:Languages\Japanese.isl"
 Name: "russian";           MessagesFile: "compiler:Languages\Russian.isl"
 Name: "arabic";            MessagesFile: "compiler:Languages\Arabic.isl"
-; Chinese (Simplified) isn't bundled with Inno Setup by default — the CI
-; workflow downloads it into this folder before compiling (see build-windows.yml).
-Name: "chinesesimplified"; MessagesFile: "ChineseSimplified.isl"
+; Chinese (Simplified) is NOT bundled with Inno Setup and has no reliably
+; reachable official download URL — left out rather than risk another
+; broken build. Can be added later with a verified source if needed.
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"

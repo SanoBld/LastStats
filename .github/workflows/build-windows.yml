@@ -59,9 +59,6 @@ jobs:
       # optional Desktop shortcut with the app icon, and an uninstaller.
       - name: Install Inno Setup
         run: choco install innosetup -y --no-progress
-      - name: Download Chinese (Simplified) language file
-        shell: pwsh
-        run: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/Unofficial/ChineseSimplified.isl" -OutFile "windows\ChineseSimplified.isl"
       - name: Build installer (x64)
         shell: pwsh
         env:
@@ -125,9 +122,6 @@ jobs:
 
       - name: Install Inno Setup
         run: choco install innosetup -y --no-progress
-      - name: Download Chinese (Simplified) language file
-        shell: pwsh
-        run: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/Unofficial/ChineseSimplified.isl" -OutFile "windows\ChineseSimplified.isl"
       - name: Build installer (ARM64)
         shell: pwsh
         env:
