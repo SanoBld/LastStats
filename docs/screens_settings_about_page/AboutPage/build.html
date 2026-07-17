@@ -225,6 +225,24 @@ Widget build(BuildContext context) {
 
       const SizedBox(height: 16),
 
+      &#47;&#47; ── Keyboard shortcuts (desktop) ─────────────────────────────────
+      SettingsSection(label: L.aboutShortcuts, children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+          child: Text(L.aboutShortcutsSub,
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+        ),
+        _ShortcutTile(label: L.shortcutSwitchTabs, keys: &#39;Ctrl + 1–5&#39;),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        _ShortcutTile(label: L.shortcutSearch, keys: &#39;Ctrl + F&#39;),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        _ShortcutTile(label: L.shortcutClose, keys: &#39;Esc&#39;),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        _ShortcutTile(label: L.shortcutRefresh, keys: &#39;F5&#39;),
+      ]),
+
+      const SizedBox(height: 16),
+
       &#47;&#47; ── Powered by ────────────────────────────────────────────────────
       SettingsSection(label: L.aboutPoweredBy, children: [
         _PoweredByTile(
