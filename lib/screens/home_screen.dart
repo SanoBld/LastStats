@@ -22,7 +22,7 @@ import 'dart:ui' as ui;
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart' show Clipboard, ClipboardData, HapticFeedback, rootBundle;
+import 'package:flutter/services.dart' show Clipboard, ClipboardData, HapticFeedback, rootBundle, LogicalKeyboardKey, SingleActivator;
 import 'package:http/http.dart' as http;
 import 'package:palette_generator/palette_generator.dart';
 import 'package:path_provider/path_provider.dart';
@@ -295,70 +295,85 @@ class _HomeScreenState extends State<HomeScreen> {
     final collapsed = _railCollapsed;
     final railWidth = collapsed ? 56.0 : 200.0;
 
-    return Scaffold(
-      body: SafeArea(
-        child: Row(
-          children: [
-            // ── Side rail ────────────────────────────────────────────────
-            SizedBox(
-              width: railWidth,
-              child: Column(
-                children: [
-                  // Logo/title header removed — the custom title bar
-                  // already shows the app name.
-                  const SizedBox(height: 4),
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.digit1, control: true): () => setState(() => _idx = 0),
+        const SingleActivator(LogicalKeyboardKey.digit2, control: true): () => setState(() => _idx = 1),
+        const SingleActivator(LogicalKeyboardKey.digit3, control: true): () => setState(() => _idx = 2),
+        const SingleActivator(LogicalKeyboardKey.digit4, control: true): () => setState(() => _idx = 3),
+        const SingleActivator(LogicalKeyboardKey.digit5, control: true): () => setState(() => _idx = 4),
+        const SingleActivator(LogicalKeyboardKey.keyF, control: true): () => setState(() => _idx = 1),
+        const SingleActivator(LogicalKeyboardKey.escape): () => Navigator.maybePop(context),
+        const SingleActivator(LogicalKeyboardKey.f5): () => PrefetchService.prefetchAll(_service),
+      },
+      child: Focus(
+        autofocus: true,
+        child: Scaffold(
+        body: SafeArea(
+          child: Row(
+            children: [
+              // ── Side rail ────────────────────────────────────────────────
+              SizedBox(
+                width: railWidth,
+                child: Column(
+                  children: [
+                    // Logo/title header removed — the custom title bar
+                    // already shows the app name.
+                    const SizedBox(height: 4),
 
-                  // Scrollable destinations
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: IntrinsicHeight(
-                        child: NavigationRail(
-                          selectedIndex:         _idx,
-                          onDestinationSelected: (i) { _haptic(_HapticImpact.selection); setState(() => _idx = i); },
-                          extended:              !collapsed,
-                          labelType: collapsed
-                              ? NavigationRailLabelType.none
-                              : NavigationRailLabelType.none,
-                          minWidth:         56,
-                          minExtendedWidth: 200,
-                          destinations:    _wideDestinations,
+                    // Scrollable destinations
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: IntrinsicHeight(
+                          child: NavigationRail(
+                            selectedIndex:         _idx,
+                            onDestinationSelected: (i) { _haptic(_HapticImpact.selection); setState(() => _idx = i); },
+                            extended:              !collapsed,
+                            labelType: collapsed
+                                ? NavigationRailLabelType.none
+                                : NavigationRailLabelType.none,
+                            minWidth:         56,
+                            minExtendedWidth: 200,
+                            destinations:    _wideDestinations,
+                          ),
                         ),
                       ),
                     ),
-                  ),
 
-                  // Collapse / expand toggle
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: IconButton(
-                      icon: Icon(
-                        collapsed
-                            ? Icons.chevron_right_rounded
-                            : Icons.chevron_left_rounded,
+                    // Collapse / expand toggle
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: IconButton(
+                        icon: Icon(
+                          collapsed
+                              ? Icons.chevron_right_rounded
+                              : Icons.chevron_left_rounded,
+                        ),
+                        tooltip: collapsed ? 'Expand rail' : 'Collapse rail',
+                        onPressed: () {
+                          final next = !_railCollapsed;
+                          setState(() => _railCollapsed = next);
+                          SharedPreferences.getInstance()
+                              .then((p) => p.setBool('ls_rail_collapsed', next));
+                        },
                       ),
-                      tooltip: collapsed ? 'Expand rail' : 'Collapse rail',
-                      onPressed: () {
-                        final next = !_railCollapsed;
-                        setState(() => _railCollapsed = next);
-                        SharedPreferences.getInstance()
-                            .then((p) => p.setBool('ls_rail_collapsed', next));
-                      },
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            // ── Separator ────────────────────────────────────────────────
-            VerticalDivider(
-              width:     1,
-              thickness: 1,
-              color:     scheme.outlineVariant.withValues(alpha: 0.35),
-            ),
+              // ── Separator ────────────────────────────────────────────────
+              VerticalDivider(
+                width:     1,
+                thickness: 1,
+                color:     scheme.outlineVariant.withValues(alpha: 0.35),
+              ),
 
-            // ── Content area ─────────────────────────────────────────────
-            Expanded(child: _pageStack(pages, pages.length)),
-          ],
+              // ── Content area ─────────────────────────────────────────────
+              Expanded(child: _pageStack(pages, pages.length)),
+            ],
+          ),
+        ),
         ),
       ),
     );

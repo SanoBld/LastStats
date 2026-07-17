@@ -605,5 +605,19 @@ class AppStringsZh implements AppStrings {
   @override String get favSortTitleAz  => '标题 A-Z';
   @override String get rankingsWholeYear       => '全年';
   @override String get chartsExportGeneratedOn => '生成于';
+  @override String get faqQ1 => 'LastStats 会记录我的音乐播放记录吗？';
+  @override String get faqA1 => '不会。LastStats 是一款可视化应用：它显示你 Last.fm 账户上已有的播放记录，但本身不会记录任何内容。\n\n如需自动记录音乐播放，请使用专门的应用，例如 Pano Scrobbler（Android 可用）。';
+  @override String get faqQ2 => '会推出 iOS 版本吗？';
+  @override String get faqA2 => '不会。目前没有推出 iOS 版本的计划。';
+  @override String get faqQ3 => '该应用能在 macOS 或其他平台运行吗？';
+  @override String get faqA3 => 'LastStats Mobile 是在 Android 上开发和测试的。其他平台（macOS、Windows、Linux 等）上的表现未经验证——可能出现错误或异常行为。';
+  @override String get faqQ4 => 'LastStats 是开源的吗？';
+  @override String get faqA4 => '是的！源代码可在 GitHub 上自由获取。该项目由 SanoBld 独立用心打造。欢迎贡献代码、反馈问题，或点个 ⭐。';
+  @override String get aboutShortcuts => '键盘快捷键';
+  @override String get aboutShortcutsSub => '适用于电脑 / 大屏幕';
+  @override String get shortcutSwitchTabs => '切换标签页';
+  @override String get shortcutSearch => '搜索';
+  @override String get shortcutClose => '关闭面板';
+  @override String get shortcutRefresh => '刷新';
 }
 

@@ -638,4 +638,22 @@ abstract class AppStrings {
   String get favSortTitleAz;
   String get rankingsWholeYear;
   String get chartsExportGeneratedOn;
+
+  // ── FAQ ──────────────────────────────────────────────────────────────────
+  String get faqQ1;
+  String get faqA1;
+  String get faqQ2;
+  String get faqA2;
+  String get faqQ3;
+  String get faqA3;
+  String get faqQ4;
+  String get faqA4;
+
+  // ── Keyboard shortcuts (desktop) ────────────────────────────────────────
+  String get aboutShortcuts;
+  String get aboutShortcutsSub;
+  String get shortcutSwitchTabs;
+  String get shortcutSearch;
+  String get shortcutClose;
+  String get shortcutRefresh;
 }

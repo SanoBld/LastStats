@@ -544,6 +544,20 @@ class AppStringsJa implements AppStrings {
   @override String get favSortTitleAz  => 'タイトル A-Z';
   @override String get rankingsWholeYear       => '通年';
   @override String get chartsExportGeneratedOn => '生成日';
+  @override String get faqQ1 => 'LastStatsは自分の音楽をスクロブリングしますか？';
+  @override String get faqA1 => 'いいえ。LastStatsは可視化アプリで、すでにLast.fmアカウントに記録されているスクロブルを表示するだけで、自分では記録しません。\n\n音楽を自動でスクロブリングするには、Pano Scrobbler（Android用）などの専用アプリを使用してください。';
+  @override String get faqQ2 => 'iOS版の予定はありますか？';
+  @override String get faqA2 => 'いいえ。現時点でiOS版の予定はありません。';
+  @override String get faqQ3 => 'macOSや他のプラットフォームでも動作しますか？';
+  @override String get faqA3 => 'LastStats MobileはAndroidで開発・テストされています。他のプラットフォーム（macOS、Windows、Linuxなど）での動作は検証されておらず、不具合や予期しない動作が発生する可能性があります。';
+  @override String get faqQ4 => 'LastStatsはオープンソースですか？';
+  @override String get faqA4 => 'はい！ソースコードはGitHubで自由に公開されています。このプロジェクトはSanoBldが情熱を持って開発した独立プロジェクトです。ひ売貢献したり、不具合を報告したり、⭐を付けてください。';
+  @override String get aboutShortcuts => 'キーボードショートカット';
+  @override String get aboutShortcutsSub => 'PC・大画面で利用可能';
+  @override String get shortcutSwitchTabs => 'タブを切り替え';
+  @override String get shortcutSearch => '検索';
+  @override String get shortcutClose => 'シートを閉じる';
+  @override String get shortcutRefresh => '更新';
 
   @override String globalListeners(String count) => '世界のリスナー数：$count人';
   @override String historyScrobbles(int n) => '$n回のスクロブル';

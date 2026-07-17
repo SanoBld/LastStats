@@ -608,5 +608,19 @@ class AppStringsEs implements AppStrings {
   @override String get favSortTitleAz  => 'Título A-Z';
   @override String get rankingsWholeYear       => 'Todo el año';
   @override String get chartsExportGeneratedOn => 'generado el';
+  @override String get faqQ1 => '¿LastStats hace scrobble de mi música?';
+  @override String get faqA1 => 'No. LastStats es una aplicación de visualización: muestra los scrobbles ya registrados en tu cuenta de Last.fm, pero no registra ninguno por sí misma.\n\nPara hacer scrobble automáticamente de tu música, usa una app dedicada como Pano Scrobbler (disponible en Android).';
+  @override String get faqQ2 => '¿Está prevista una versión para iOS?';
+  @override String get faqA2 => 'No. Por ahora no hay una versión para iOS prevista.';
+  @override String get faqQ3 => '¿La app funciona en macOS u otras plataformas?';
+  @override String get faqA3 => 'LastStats Mobile se desarrolla y prueba en Android. El funcionamiento en otras plataformas (macOS, Windows, Linux…) no está verificado — pueden producirse errores o comportamientos inesperados.';
+  @override String get faqQ4 => '¿LastStats es de código abierto?';
+  @override String get faqA4 => '¡Sí! El código fuente está disponible libremente en GitHub. El proyecto es independiente, hecho con pasión por SanoBld. Puedes contribuir, reportar errores o simplemente dejar una estrella ⭐.';
+  @override String get aboutShortcuts => 'Atajos de teclado';
+  @override String get aboutShortcutsSub => 'Disponibles en PC / pantalla grande';
+  @override String get shortcutSwitchTabs => 'Cambiar de pestaña';
+  @override String get shortcutSearch => 'Buscar';
+  @override String get shortcutClose => 'Cerrar una ficha';
+  @override String get shortcutRefresh => 'Actualizar';
 }
 

@@ -28,9 +28,13 @@ class _FaqPageState extends State<FaqPage> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final isEn   = localeNotifier.value == 'en';
 
-    final items = isEn ? _itemsEn : _itemsFr;
+    final items = [
+      _FaqItem(Icons.sync_rounded,          L.faqQ1, L.faqA1),
+      _FaqItem(Icons.phone_iphone_rounded,  L.faqQ2, L.faqA2),
+      _FaqItem(Icons.devices_other_rounded, L.faqQ3, L.faqA3),
+      _FaqItem(Icons.code_rounded,          L.faqQ4, L.faqA4),
+    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -87,70 +91,6 @@ class _FaqItem {
   final String answer;
   const _FaqItem(this.icon, this.question, this.answer);
 }
-
-// ── Contenu FR ────────────────────────────────────────────────────────────────
-
-const _itemsFr = [
-  _FaqItem(
-    Icons.sync_rounded,
-    'Est-ce que LastStats scrobble ma musique ?',
-    'Non. LastStats est une application de visualisation : elle affiche les scrobbles '
-    'déjà enregistrés sur ton compte Last.fm, mais elle n\'en enregistre pas elle-même.\n\n'
-    'Pour scrobbler automatiquement ta musique, utilise une application dédiée comme '
-    'Pano Scrobbler (disponible sur Android).',
-  ),
-  _FaqItem(
-    Icons.phone_iphone_rounded,
-    'Une version iOS est-elle prévue ?',
-    'Non. Une version iOS n\'est pas prévue pour le moment.',
-  ),
-  _FaqItem(
-    Icons.devices_other_rounded,
-    'L\'app fonctionne-t-elle sur macOS ou d\'autres plateformes ?',
-    'LastStats Mobile est développé et testé sur Android. '
-    'Le fonctionnement sur d\'autres plateformes (macOS, Windows, Linux…) n\'est pas vérifié — '
-    'des bugs ou des dysfonctionnements sont possibles.',
-  ),
-  _FaqItem(
-    Icons.code_rounded,
-    'LastStats est-il open source ?',
-    'Oui ! Le code source est disponible librement sur GitHub. '
-    'Le projet est indépendant, réalisé avec passion par SanoBld. '
-    'Tu peux y contribuer, signaler des bugs ou simplement laisser une étoile ⭐.',
-  ),
-];
-
-// ── Contenu EN ────────────────────────────────────────────────────────────────
-
-const _itemsEn = [
-  _FaqItem(
-    Icons.sync_rounded,
-    'Does LastStats scrobble my music?',
-    'No. LastStats is a visualisation app: it displays the scrobbles already recorded '
-    'on your Last.fm account, but it does not record any itself.\n\n'
-    'To automatically scrobble your music, use a dedicated app such as '
-    'Pano Scrobbler (available on Android).',
-  ),
-  _FaqItem(
-    Icons.phone_iphone_rounded,
-    'Is an iOS version planned?',
-    'No. An iOS version is not planned at this time.',
-  ),
-  _FaqItem(
-    Icons.devices_other_rounded,
-    'Does the app work on macOS or other platforms?',
-    'LastStats Mobile is developed and tested on Android. '
-    'Behaviour on other platforms (macOS, Windows, Linux…) is unverified — '
-    'bugs or unexpected behaviour may occur.',
-  ),
-  _FaqItem(
-    Icons.code_rounded,
-    'Is LastStats open source?',
-    'Yes! The source code is freely available on GitHub. '
-    'The project is independent, built with passion by SanoBld. '
-    'Feel free to contribute, report bugs, or leave a star ⭐.',
-  ),
-];
 
 // ── Tuile FAQ expansible ──────────────────────────────────────────────────────
 

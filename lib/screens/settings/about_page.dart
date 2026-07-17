@@ -132,6 +132,24 @@ class AboutPage extends StatelessWidget {
 
         const SizedBox(height: 16),
 
+        // ── Keyboard shortcuts (desktop) ─────────────────────────────────
+        SettingsSection(label: L.aboutShortcuts, children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+            child: Text(L.aboutShortcutsSub,
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+          ),
+          _ShortcutTile(label: L.shortcutSwitchTabs, keys: 'Ctrl + 1–5'),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _ShortcutTile(label: L.shortcutSearch, keys: 'Ctrl + F'),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _ShortcutTile(label: L.shortcutClose, keys: 'Esc'),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _ShortcutTile(label: L.shortcutRefresh, keys: 'F5'),
+        ]),
+
+        const SizedBox(height: 16),
+
         // ── Powered by ────────────────────────────────────────────────────
         SettingsSection(label: L.aboutPoweredBy, children: [
           _PoweredByTile(
@@ -212,6 +230,31 @@ class AboutPage extends StatelessWidget {
         )),
         const SizedBox(height: 20),
       ]),
+    );
+  }
+}
+
+class _ShortcutTile extends StatelessWidget {
+  final String label, keys;
+  const _ShortcutTile({required this.label, required this.keys});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return ListTile(
+      title: Text(label,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+      trailing: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.5)),
+        ),
+        child: Text(keys,
+            style: TextStyle(fontFamily: 'monospace', fontSize: 12,
+                fontWeight: FontWeight.w700, color: scheme.onSurfaceVariant)),
+      ),
     );
   }
 }
