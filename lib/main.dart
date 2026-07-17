@@ -78,6 +78,7 @@ void main() async {
     await prefs.setBool('ls_fav_stat_migrated', true);
   }
   showLovedBadgeNotifier.value         = prefs.getBool('ls_show_loved_badge')        ?? true;
+  showFavoritesStatNotifier.value      = prefs.getBool('ls_show_favorites')          ?? true;
 
   final fallbackHex = prefs.getString('ls_nowplaying_fallback_color');
   nowPlayingFallbackColorNotifier.value =

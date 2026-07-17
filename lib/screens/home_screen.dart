@@ -147,6 +147,11 @@ class _HomeScreenState extends State<HomeScreen> {
     _idx     = widget.startupTab.clamp(0, _kTabHistory);
     _service = LastFmService(apiKey: widget.apiKey, username: widget.username);
 
+    SharedPreferences.getInstance().then((p) {
+      final saved = p.getBool('ls_rail_collapsed');
+      if (saved != null && mounted) setState(() => _railCollapsed = saved);
+    });
+
     localeNotifier.addListener(_onLocaleChange);
     pcModeNotifier.addListener(_onLocaleChange);
 
@@ -332,8 +337,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             : Icons.chevron_left_rounded,
                       ),
                       tooltip: collapsed ? 'Expand rail' : 'Collapse rail',
-                      onPressed: () =>
-                          setState(() => _railCollapsed = !_railCollapsed),
+                      onPressed: () {
+                        final next = !_railCollapsed;
+                        setState(() => _railCollapsed = next);
+                        SharedPreferences.getInstance()
+                            .then((p) => p.setBool('ls_rail_collapsed', next));
+                      },
                     ),
                   ),
                 ],

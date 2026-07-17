@@ -488,6 +488,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                   value: enabled && _showFavorites,
                   onChanged: !enabled ? null : (v) async {
                     await _set('ls_show_favorites', v);
+                    showFavoritesStatNotifier.value = v;
                     setState(() => _showFavorites = v);
                   },
                 ),

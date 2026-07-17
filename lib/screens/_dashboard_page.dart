@@ -114,7 +114,6 @@ class _DashboardPageState extends State<_DashboardPage> {
   bool _showAlbums   = true;
   bool _showTracks   = true;
   bool _showRecent   = true;
-  bool _showFavorites = true;
   List<dynamic> _lovedTracks = [];
   int _lovedCount = 0;
 
@@ -262,7 +261,6 @@ class _DashboardPageState extends State<_DashboardPage> {
       _showTracks            = p.getBool('ls_show_tracks')              ?? true;
       _showRecent            = p.getBool('ls_show_recent')              ?? true;
       _showFriends           = p.getBool('ls_show_friends')             ?? true;
-      _showFavorites         = p.getBool('ls_show_favorites')           ?? true;
       final rawCards = p.getStringList('ls_stat_cards');
       _statCards   = rawCards != null && rawCards.isNotEmpty
           ? rawCards : List.from(_kDefaultStatCards);
@@ -1628,17 +1626,20 @@ class _DashboardPageState extends State<_DashboardPage> {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     _SectionHeader(title: L.dashStats, icon: Icons.bar_chart_rounded),
                     const SizedBox(height: 10),
-                    _HeroStatCard(
-                      total:       total,
-                      avg:         avg.round(),
-                      days:        days,
-                      weekly:      weekly,
-                      regStr:      regStr,
-                      lovedCount:  _lovedCount,
-                      showLoved:   _showFavorites && favoritesEnabled,
-                      onFavoritesTap: () => Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => FavoritesPage(service: widget.service),
-                      )),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: showFavoritesStatNotifier,
+                      builder: (_, showFavStat, __) => _HeroStatCard(
+                        total:       total,
+                        avg:         avg.round(),
+                        days:        days,
+                        weekly:      weekly,
+                        regStr:      regStr,
+                        lovedCount:  _lovedCount,
+                        showLoved:   showFavStat && favoritesEnabled,
+                        onFavoritesTap: () => Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => FavoritesPage(service: widget.service),
+                        )),
+                      ),
                     ),
                     const SizedBox(height: 10),
                     _StatGrid(children: _statCards.map((id) {

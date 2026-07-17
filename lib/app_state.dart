@@ -81,6 +81,10 @@ final lovedTrackKeysNotifier = ValueNotifier<Set<String>>({});
 // Saved as 'ls_show_loved_badge' in SharedPreferences.
 final showLovedBadgeNotifier = ValueNotifier<bool>(true);
 
+// Show the "Favoris" metric in the dashboard's main stats card.
+// Saved as 'ls_show_favorites' in SharedPreferences.
+final showFavoritesStatNotifier = ValueNotifier<bool>(true);
+
 String lovedKey(String artist, String track) =>
     '${artist.trim().toLowerCase()}|${track.trim().toLowerCase()}';
 
