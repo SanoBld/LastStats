@@ -120,6 +120,7 @@
     await prefs.setBool(&#39;ls_fav_stat_migrated&#39;, true);
   }
   showLovedBadgeNotifier.value         = prefs.getBool(&#39;ls_show_loved_badge&#39;)        ?? true;
+  showFavoritesStatNotifier.value      = prefs.getBool(&#39;ls_show_favorites&#39;)          ?? true;
 
   final fallbackHex = prefs.getString(&#39;ls_nowplaying_fallback_color&#39;);
   nowPlayingFallbackColorNotifier.value =
