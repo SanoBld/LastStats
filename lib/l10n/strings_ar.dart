@@ -552,6 +552,12 @@ class AppStringsAr implements AppStrings {
   @override String get faqA3 => 'يتم تطوير واختبار LastStats Mobile على أندرويد. الأداء على المنصات الأخرى (macOS، Windows، Linux...) غير متحقق منه — قد تحدث أخطاء أو سلوك غير متوقع.';
   @override String get faqQ4 => 'هل LastStats مفتوح المصدر؟';
   @override String get faqA4 => 'نعم! الكود المصدري متاح بحرية على GitHub. المشروع مستقل، صُنع بشغف من قبل SanoBld. لا تتردد في المساهمة أو الإبلاغ عن الأخطاء أو ترك نجمة ⭐.';
+  @override String get faqQ5 => 'أين يتم تخزين بياناتي؟';
+  @override String get faqA5 => 'على جهازك فقط. لا يمتلك LastStats أي خادم: يتم تخزين السكروبلات مؤقتًا محليًا للوصول السريع، وتبقى بيانات اعتماد Last.fm مخزّنة محليًا أيضًا. لا يتم إرسال أي شيء إلى أي جهة سوى واجهة برمجة تطبيقات Last.fm الرسمية.';
+  @override String get faqQ6 => 'كيف أُفعّل المفضلة؟';
+  @override String get faqA6 => 'انتقل إلى الإعدادات > الحساب وأدخل مفتاحك السري الخاص بـ Last.fm. بعد الاتصال، ستتمكن من إضافة المقطوعات إلى المفضلة مباشرة من التطبيق.';
+  @override String get settingsPlatformDisabledByShowAll => 'معطّل: يتم عرض جميع الروابط بالفعل.';
+  @override String get commonInDevelopment => 'قيد التطوير';
   @override String get aboutShortcuts => 'اختصارات لوحة المفاتيح';
   @override String get aboutShortcutsSub => 'متاحة على الكمبيوتر / الشاشة الكبيرة';
   @override String get shortcutSwitchTabs => 'التبديل بين الأقسام';

@@ -552,6 +552,12 @@ class AppStringsRu implements AppStrings {
   @override String get faqA3 => 'LastStats Mobile разрабатывается и тестируется на Android. Работа на других платформах (macOS, Windows, Linux…) не проверена — возможны ошибки или неожиданное поведение.';
   @override String get faqQ4 => 'Является ли LastStats открытым исходным кодом?';
   @override String get faqA4 => 'Да! Исходный код свободно доступен на GitHub. Проект независимый, сделан с любовью SanoBld. Не стесняйтесь вносить вклад, сообщать об ошибках или просто поставить звездочку ⭐.';
+  @override String get faqQ5 => 'Где хранятся мои данные?';
+  @override String get faqA5 => 'Только на вашем устройстве. У LastStats нет сервера: скробблы кэшируются локально для быстрого доступа, а данные для входа в Last.fm также хранятся локально. Ничего не отправляется никуда, кроме официального API Last.fm.';
+  @override String get faqQ6 => 'Как включить избранное?';
+  @override String get faqA6 => 'Перейдите в Настройки > Аккаунт и введите секретный ключ Last.fm. После подключения вы сможете добавлять треки в избранное прямо из приложения.';
+  @override String get settingsPlatformDisabledByShowAll => 'Отключено: все ссылки уже отображаются.';
+  @override String get commonInDevelopment => 'В разработке';
   @override String get aboutShortcuts => 'Горячие клавиши';
   @override String get aboutShortcutsSub => 'Доступны на ПК / большом экране';
   @override String get shortcutSwitchTabs => 'Переключение вкладок';

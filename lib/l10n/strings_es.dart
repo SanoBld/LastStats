@@ -616,6 +616,12 @@ class AppStringsEs implements AppStrings {
   @override String get faqA3 => 'LastStats Mobile se desarrolla y prueba en Android. El funcionamiento en otras plataformas (macOS, Windows, Linux…) no está verificado — pueden producirse errores o comportamientos inesperados.';
   @override String get faqQ4 => '¿LastStats es de código abierto?';
   @override String get faqA4 => '¡Sí! El código fuente está disponible libremente en GitHub. El proyecto es independiente, hecho con pasión por SanoBld. Puedes contribuir, reportar errores o simplemente dejar una estrella ⭐.';
+  @override String get faqQ5 => '¿Dónde se almacenan mis datos?';
+  @override String get faqA5 => 'Solo en tu dispositivo. LastStats no tiene servidor: tus scrobbles se guardan en caché localmente para un acceso rápido, y tus credenciales de Last.fm también se almacenan localmente. No se envía nada excepto a la API oficial de Last.fm.';
+  @override String get faqQ6 => '¿Cómo activo los favoritos?';
+  @override String get faqA6 => 'Ve a Ajustes > Cuenta e introduce tu clave secreta de Last.fm. Una vez conectada, podrás marcar canciones como favoritas directamente desde la app.';
+  @override String get settingsPlatformDisabledByShowAll => 'Desactivado: ya se muestran todos los enlaces.';
+  @override String get commonInDevelopment => 'En desarrollo';
   @override String get aboutShortcuts => 'Atajos de teclado';
   @override String get aboutShortcutsSub => 'Disponibles en PC / pantalla grande';
   @override String get shortcutSwitchTabs => 'Cambiar de pestaña';

@@ -648,6 +648,12 @@ abstract class AppStrings {
   String get faqA3;
   String get faqQ4;
   String get faqA4;
+  String get faqQ5;
+  String get faqA5;
+  String get faqQ6;
+  String get faqA6;
+  String get settingsPlatformDisabledByShowAll;
+  String get commonInDevelopment;
 
   // ── Keyboard shortcuts (desktop) ────────────────────────────────────────
   String get aboutShortcuts;

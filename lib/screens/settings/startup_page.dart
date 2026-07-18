@@ -146,7 +146,12 @@ class _StartupPageState extends State<StartupPage> {
               Text(L.settingsMusicPlatformSub,
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               const SizedBox(height: 14),
-              ...[
+              Opacity(
+                opacity: _showAll ? 0.45 : 1.0,
+                child: IgnorePointer(
+                  ignoring: _showAll,
+                  child: Column(children: [
+                    ...[
                 (value: 'lastfm',  icon: Icons.bar_chart_rounded,         asset: 'assets/icons/lastfm.svg',  label: L.platformLastfm),
                 (value: 'spotify', icon: Icons.spatial_audio_off_rounded, asset: 'assets/icons/spotify.svg', label: L.platformSpotify),
                 (value: 'ytmusic', icon: Icons.music_video_rounded,       asset: 'assets/icons/ytmusic.svg', label: L.platformYtMusic),
@@ -179,7 +184,20 @@ class _StartupPageState extends State<StartupPage> {
                     onTap: () => _setPlatform(o.value),
                   ),
                 );
-              }),
+                    }),
+                  ]),
+                ),
+              ),
+              if (_showAll) ...[
+                const SizedBox(height: 4),
+                Row(children: [
+                  Icon(Icons.info_outline_rounded, size: 14, color: scheme.onSurfaceVariant),
+                  const SizedBox(width: 6),
+                  Expanded(child: Text(L.settingsPlatformDisabledByShowAll,
+                      style: text.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant, fontStyle: FontStyle.italic))),
+                ]),
+              ],
               const SizedBox(height: 4),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,

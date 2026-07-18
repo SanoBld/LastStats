@@ -613,6 +613,12 @@ class AppStringsZh implements AppStrings {
   @override String get faqA3 => 'LastStats Mobile 是在 Android 上开发和测试的。其他平台（macOS、Windows、Linux 等）上的表现未经验证——可能出现错误或异常行为。';
   @override String get faqQ4 => 'LastStats 是开源的吗？';
   @override String get faqA4 => '是的！源代码可在 GitHub 上自由获取。该项目由 SanoBld 独立用心打造。欢迎贡献代码、反馈问题，或点个 ⭐。';
+  @override String get faqQ5 => '我的数据存储在哪里？';
+  @override String get faqA5 => '仅存储在你的设备上。LastStats 没有服务器：你的播放记录会在本地缓存以便快速访问，你的 Last.fm 账户信息也保存在本地。除官方 Last.fm API 外，不会向任何地方发送数据。';
+  @override String get faqQ6 => '如何启用收藏功能？';
+  @override String get faqA6 => '前往「设置 > 账户」并输入你的 Last.fm 密钥。连接成功后，即可直接在应用中收藏歌曲。';
+  @override String get settingsPlatformDisabledByShowAll => '已停用：已显示全部链接。';
+  @override String get commonInDevelopment => '开发中';
   @override String get aboutShortcuts => '键盘快捷键';
   @override String get aboutShortcutsSub => '适用于电脑 / 大屏幕';
   @override String get shortcutSwitchTabs => '切换标签页';
