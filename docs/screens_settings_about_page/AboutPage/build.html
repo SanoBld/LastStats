@@ -133,7 +133,7 @@ Widget build(BuildContext context) {
             style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
         const SizedBox(height: 4),
         Text(UpdateService.currentVersion == &#39;2.6.0&#39;
-                ? &#39;In development&#39;
+                ? L.commonInDevelopment
                 : &#39;v${UpdateService.currentVersion}&#39;,
             style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
         const SizedBox(height: 4),
@@ -168,7 +168,7 @@ Widget build(BuildContext context) {
           title: Text(L.settingsVersion,
               style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
           trailing: Text(UpdateService.currentVersion == &#39;2.6.0&#39;
-                  ? &#39;In development&#39;
+                  ? L.commonInDevelopment
                   : &#39;v${UpdateService.currentVersion}&#39;,
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
         ),
