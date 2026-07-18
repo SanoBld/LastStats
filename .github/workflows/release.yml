@@ -117,8 +117,8 @@ jobs:
 
           # Work from main's actual tip, not the tag's commit, so this always
           # pushes a clean fast-forward regardless of what the tag points to.
-          git fetch origin main
-          git checkout -B main origin/main
+          git fetch origin master
+          git checkout -B master origin/master
 
           sed -i "s/^version: .*/version: $VERSION+${{ github.run_number }}/" pubspec.yaml
 
@@ -127,7 +127,7 @@ jobs:
           else
             git add pubspec.yaml
             git commit -m "chore: bump version to $VERSION [skip ci]"
-            git push origin HEAD:main
+            git push origin HEAD:master
           fi
 
   # Each platform builds in its own separate workflow file, receiving the
