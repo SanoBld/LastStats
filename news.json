@@ -1,6 +1,14 @@
 {
   "items": [
     {
+      "id": "news_1784370119",
+      "title": "Save your API keys before updating",
+      "body": "Before updating to v2.9.9-beta, save your Last.fm API key and secret key. After updating, resetting the app is recommended to properly reconfigure both keys.",
+      "type": "alert",
+      "emoji": "🔑",
+      "date": "18/07"
+    },
+    {
       "id": "news_1783807263",
       "title": "Look... ",
       "body": "What ? ",
