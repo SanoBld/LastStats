@@ -151,14 +151,19 @@
     <h2>Static Methods</h2>
     <dl class="callables">
         <dt id="applyBackupJson" class="callable">
-  <span class="name"><a href="../services_backup_service/BackupService/applyBackupJson.html">applyBackupJson</a></span><span class="signature">(<wbr><span class="parameter" id="applyBackupJson-param-raw"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">raw</span></span>)
+  <span class="name"><a href="../services_backup_service/BackupService/applyBackupJson.html">applyBackupJson</a></span><span class="signature">(<wbr><span class="parameter" id="applyBackupJson-param-raw"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">raw</span>, {</span><span class="parameter" id="applyBackupJson-param-restoreApiKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">restoreApiKey</span> = <span class="default-value">true</span>, </span><span class="parameter" id="applyBackupJson-param-restoreSecretKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">restoreSecretKey</span> = <span class="default-value">true</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../services_backup_service/BackupResult-class.html">BackupResult</a></span>&gt;</span></span>
   </span>
   
 
 </dt>
 <dd>
-  
+  Applies a raw backup JSON string.
+<code>restoreApiKey</code> controls whether the Last.fm username + API key (and
+the whole multi-account list, which embeds per-account keys) are
+restored. <code>restoreSecretKey</code> controls whether the API secret key (and
+the session key derived from it) are restored. Both default to true
+for backward compatibility.
   
 
 </dd>
@@ -210,8 +215,40 @@
 
 </dt>
 <dd>
-  Opens the native file picker, reads + parses the chosen .json, applies
-it, and returns the result. Returns null if the user cancelled.
+  Kept for backward compatibility — reads + applies a backup file in one
+shot, restoring the API key and secret key unconditionally. Prefer
+<a href="../services_backup_service/BackupService/pickAndPreviewFile.html">pickAndPreviewFile</a> + <a href="../services_backup_service/BackupService/applyBackupJson.html">applyBackupJson</a> when the caller wants to let
+the user choose what to restore.
+  
+
+</dd>
+
+        <dt id="pickAndPreviewFile" class="callable">
+  <span class="name"><a href="../services_backup_service/BackupService/pickAndPreviewFile.html">pickAndPreviewFile</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../services_backup_service/BackupPreview-class.html">BackupPreview</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Opens the native file picker and reads the chosen .json, returning a
+<a href="../services_backup_service/BackupPreview-class.html">BackupPreview</a> so the caller can ask the user which sensitive keys
+(API key, secret key) to actually restore before applying anything.
+Returns null if the user cancelled or the file couldn't be read/parsed.
+  
+
+</dd>
+
+        <dt id="previewBackup" class="callable">
+  <span class="name"><a href="../services_backup_service/BackupService/previewBackup.html">previewBackup</a></span><span class="signature">(<wbr><span class="parameter" id="previewBackup-param-raw"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">raw</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../services_backup_service/BackupPreview-class.html">BackupPreview</a>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Inspects a raw backup JSON string without applying anything, so the UI
+can show "restore API key?" / "restore secret key?" checkboxes.
   
 
 </dd>

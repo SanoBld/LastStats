@@ -62,8 +62,10 @@
     </section>
     
 <section class="desc markdown">
-  <p>Opens the native file picker, reads + parses the chosen .json, applies
-it, and returns the result. Returns null if the user cancelled.</p>
+  <p>Kept for backward compatibility — reads + applies a backup file in one
+shot, restoring the API key and secret key unconditionally. Prefer
+<a href="../../services_backup_service/BackupService/pickAndPreviewFile.html">pickAndPreviewFile</a> + <a href="../../services_backup_service/BackupService/applyBackupJson.html">applyBackupJson</a> when the caller wants to let
+the user choose what to restore.</p>
 </section>
 
 
@@ -71,26 +73,9 @@ it, and returns the result. Returns null if the user cancelled.</p>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;BackupResult?&gt; importFromFile() async {
-  final result = await FilePicker.platform.pickFiles(
-    dialogTitle: &#39;Choose a LastStats backup file&#39;,
-    type: FileType.custom,
-    allowedExtensions: [&#39;json&#39;],
-    withData: true,
-  );
-  if (result == null || result.files.isEmpty) return null;
-
-  final file = result.files.single;
-  final bytes = file.bytes;
-  if (bytes == null) return const BackupResult(success: false);
-
-  String raw;
-  try {
-    raw = utf8.decode(bytes);
-  } catch (_) {
-    return const BackupResult(success: false);
-  }
-
-  return applyBackupJson(raw);
+  final preview = await pickAndPreviewFile();
+  if (preview == null) return null;
+  return applyBackupJson(preview.raw);
 }</code></pre>
 </section>
 

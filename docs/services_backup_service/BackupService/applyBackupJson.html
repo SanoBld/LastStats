@@ -55,19 +55,33 @@
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../services_backup_service/BackupResult-class.html">BackupResult</a></span>&gt;</span></span>
-<span class="name ">applyBackupJson</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="applyBackupJson-param-raw"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">raw</span></span></li>
-</ol>)
+<span class="name ">applyBackupJson</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="applyBackupJson-param-raw"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">raw</span>, {</span></li>
+<li><span class="parameter" id="applyBackupJson-param-restoreApiKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">restoreApiKey</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="applyBackupJson-param-restoreSecretKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">restoreSecretKey</span> = <span class="default-value">true</span>, </span></li>
+</ol>})
 
       
 
     </section>
     
+<section class="desc markdown">
+  <p>Applies a raw backup JSON string.
+<code>restoreApiKey</code> controls whether the Last.fm username + API key (and
+the whole multi-account list, which embeds per-account keys) are
+restored. <code>restoreSecretKey</code> controls whether the API secret key (and
+the session key derived from it) are restored. Both default to true
+for backward compatibility.</p>
+</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Future&lt;BackupResult&gt; applyBackupJson(String raw) async {
+  <pre class="language-dart"><code class="language-dart">static Future&lt;BackupResult&gt; applyBackupJson(
+  String raw, {
+  bool restoreApiKey = true,
+  bool restoreSecretKey = true,
+}) async {
   Map&lt;String, dynamic&gt; parsed;
   try {
     parsed = jsonDecode(raw) as Map&lt;String, dynamic&gt;;
@@ -93,6 +107,23 @@
     prefsMap = {&#39;ls_username&#39;: u, &#39;ls_apikey&#39;: k};
     username = u;
     apiKey   = k;
+  }
+
+  &#47;&#47; Drop sensitive keys the user chose not to restore.
+  final exclude = &lt;String&gt;{};
+  if (!restoreApiKey) {
+    exclude.addAll([&#39;ls_apikey&#39;, &#39;ls_username&#39;, &#39;ls_accounts&#39;, &#39;ls_active_account&#39;]);
+    username = null;
+    apiKey   = null;
+  }
+  if (!restoreSecretKey) {
+    &#47;&#47; The session key is only valid alongside the secret it was derived
+    &#47;&#47; from — restoring it without the secret would silently break
+    &#47;&#47; favorites, so both are excluded together.
+    exclude.addAll([&#39;ls_secret_key&#39;, &#39;ls_session_key&#39;]);
+  }
+  if (exclude.isNotEmpty) {
+    prefsMap.removeWhere((k, _) =&gt; exclude.contains(k));
   }
 
   await _applyPrefs(prefsMap);
