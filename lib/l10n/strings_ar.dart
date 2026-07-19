@@ -558,12 +558,17 @@ class AppStringsAr implements AppStrings {
   @override String get faqA6 => 'انتقل إلى الإعدادات > الحساب وأدخل مفتاحك السري الخاص بـ Last.fm. بعد الاتصال، ستتمكن من إضافة المقطوعات إلى المفضلة مباشرة من التطبيق.';
   @override String get settingsPlatformDisabledByShowAll => 'معطّل: يتم عرض جميع الروابط بالفعل.';
   @override String get commonInDevelopment => 'قيد التطوير';
+  @override String get commonSeeLess => 'عرض أقل';
+  @override String get commonShare => 'مشاركة';
+  @override String get newsCustomDate => 'تاريخ مخصص';
   @override String get aboutShortcuts => 'اختصارات لوحة المفاتيح';
   @override String get aboutShortcutsSub => 'متاحة على الكمبيوتر / الشاشة الكبيرة';
   @override String get shortcutSwitchTabs => 'التبديل بين الأقسام';
   @override String get shortcutSearch => 'بحث';
   @override String get shortcutClose => 'إغلاق الصفحة';
   @override String get shortcutRefresh => 'تحديث';
+  @override String get aboutDiscord => 'انضم إلى Discord';
+  @override String get aboutDiscordSub => 'دردشة واقتراحات وإعلانات مباشرة';
 
   @override String globalListeners(String count) => '$count مستمع حول العالم';
   @override String historyScrobbles(int n) => '$n تشغيلة';

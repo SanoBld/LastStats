@@ -622,11 +622,16 @@ class AppStringsEs implements AppStrings {
   @override String get faqA6 => 'Ve a Ajustes > Cuenta e introduce tu clave secreta de Last.fm. Una vez conectada, podrás marcar canciones como favoritas directamente desde la app.';
   @override String get settingsPlatformDisabledByShowAll => 'Desactivado: ya se muestran todos los enlaces.';
   @override String get commonInDevelopment => 'En desarrollo';
+  @override String get commonSeeLess => 'Ver menos';
+  @override String get commonShare => 'Compartir';
+  @override String get newsCustomDate => 'Fecha personalizada';
   @override String get aboutShortcuts => 'Atajos de teclado';
   @override String get aboutShortcutsSub => 'Disponibles en PC / pantalla grande';
   @override String get shortcutSwitchTabs => 'Cambiar de pestaña';
   @override String get shortcutSearch => 'Buscar';
   @override String get shortcutClose => 'Cerrar una ficha';
   @override String get shortcutRefresh => 'Actualizar';
+  @override String get aboutDiscord => 'Unirse al Discord';
+  @override String get aboutDiscordSub => 'Chat, sugerencias y anuncios en directo';
 }
 

@@ -558,12 +558,17 @@ class AppStringsJa implements AppStrings {
   @override String get faqA6 => '設定 > アカウントに進み、Last.fmのシークレットキーを入力してください。接続後、アプリから直接曲をお気に入り登録できるようになります。';
   @override String get settingsPlatformDisabledByShowAll => '無効：すでにすべてのリンクが表示されています。';
   @override String get commonInDevelopment => '開発中';
+  @override String get commonSeeLess => '閉じる';
+  @override String get commonShare => '共有';
+  @override String get newsCustomDate => 'カスタム日付';
   @override String get aboutShortcuts => 'キーボードショートカット';
   @override String get aboutShortcutsSub => 'PC・大画面で利用可能';
   @override String get shortcutSwitchTabs => 'タブを切り替え';
   @override String get shortcutSearch => '検索';
   @override String get shortcutClose => 'シートを閉じる';
   @override String get shortcutRefresh => '更新';
+  @override String get aboutDiscord => 'Discordに参加';
+  @override String get aboutDiscordSub => 'チャット、提案、ライブ告知';
 
   @override String globalListeners(String count) => '世界のリスナー数：$count人';
   @override String historyScrobbles(int n) => '$n回のスクロブル';

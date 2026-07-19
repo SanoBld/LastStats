@@ -21,6 +21,7 @@ class _UpdatesPageState extends State<UpdatesPage> {
   bool        _checkingUpdate = false;
   UpdateInfo? _updateInfo;
   String?     _updateError;
+  bool        _notesExpanded  = false;
 
   @override
   void initState() {
@@ -120,30 +121,51 @@ class _UpdatesPageState extends State<UpdatesPage> {
               ]),
               if (_updateInfo!.notes.isNotEmpty) ...[
                 const SizedBox(height: 10),
-                Text(
-                  _updateInfo!.notes.length > 200
-                      ? '${_updateInfo!.notes.substring(0, 200)}…'
-                      : _updateInfo!.notes,
-                  style: text.bodySmall?.copyWith(color: scheme.onTertiaryContainer.withValues(alpha: 0.85)),
+                AnimatedCrossFade(
+                  duration: const Duration(milliseconds: 200),
+                  crossFadeState: _notesExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                  firstChild: Text(
+                    _updateInfo!.notes.length > 200
+                        ? '${_updateInfo!.notes.substring(0, 200)}…'
+                        : _updateInfo!.notes,
+                    style: text.bodySmall?.copyWith(color: scheme.onTertiaryContainer.withValues(alpha: 0.85)),
+                  ),
+                  secondChild: Text(
+                    _updateInfo!.notes,
+                    style: text.bodySmall?.copyWith(color: scheme.onTertiaryContainer.withValues(alpha: 0.85)),
+                  ),
                 ),
+                if (_updateInfo!.notes.length > 200) ...[
+                  const SizedBox(height: 6),
+                  InkWell(
+                    onTap: () => setState(() => _notesExpanded = !_notesExpanded),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Text(_notesExpanded ? L.commonSeeLess : L.commonSeeMore,
+                          style: text.labelMedium?.copyWith(
+                              color: scheme.onTertiaryContainer, fontWeight: FontWeight.w700)),
+                      Icon(_notesExpanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                          size: 18, color: scheme.onTertiaryContainer),
+                    ]),
+                  ),
+                ],
               ],
               const SizedBox(height: 14),
               Row(children: [
                 Expanded(child: FilledButton.icon(
                   onPressed: () async {
-                    final url = Uri.parse(_updateInfo!.hasApk
-                        ? _updateInfo!.apkUrl! : _updateInfo!.releaseUrl);
+                    final url = Uri.parse(_updateInfo!.hasDownload
+                        ? _updateInfo!.downloadUrl! : _updateInfo!.releaseUrl);
                     if (await canLaunchUrl(url)) await launchUrl(url, mode: LaunchMode.externalApplication);
                   },
-                  icon: Icon(_updateInfo!.hasApk ? Icons.download_rounded : Icons.open_in_new_rounded),
-                  label: Text(_updateInfo!.hasApk ? L.settingsDownload : L.settingsViewRelease),
+                  icon: Icon(_downloadIcon(_updateInfo!.downloadKind)),
+                  label: Text(_updateInfo!.hasDownload ? L.settingsDownload : L.settingsViewRelease),
                   style: FilledButton.styleFrom(
                     backgroundColor: scheme.tertiary,
                     foregroundColor: scheme.onTertiary,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 )),
-                if (_updateInfo!.hasApk) ...[
+                if (_updateInfo!.hasDownload) ...[
                   const SizedBox(width: 10),
                   OutlinedButton(
                     onPressed: () async {
@@ -263,6 +285,13 @@ class _UpdatesPageState extends State<UpdatesPage> {
       ]),
     );
   }
+
+  IconData _downloadIcon(DownloadKind k) => switch (k) {
+    DownloadKind.apk       => Icons.download_rounded,
+    DownloadKind.installer => Icons.install_desktop_rounded,
+    DownloadKind.zip       => Icons.folder_zip_rounded,
+    DownloadKind.none      => Icons.open_in_new_rounded,
+  };
 
   String _fmtDate(DateTime d) {
     final months = L.months;

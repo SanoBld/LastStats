@@ -827,15 +827,9 @@ class _DashboardPageState extends State<_DashboardPage> {
   void _openNewsSheet() {
     _haptic(_HapticImpact.light);
     _markNewsRead();
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => _NewsSheet(items: _newsItems),
-    );
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => _NewsPage(items: _newsItems),
+    ));
   }
 
   // Fetch in-app news from gh-pages JSON.
@@ -886,7 +880,7 @@ class _DashboardPageState extends State<_DashboardPage> {
             'date':  info.publishedAt != null
                 ? '${info.publishedAt!.day}/${info.publishedAt!.month}/${info.publishedAt!.year}'
                 : '',
-            'url':   info.hasApk ? info.apkUrl! : info.releaseUrl,
+            'url':   info.hasDownload ? info.downloadUrl! : info.releaseUrl,
           });
         }
       }
@@ -3714,9 +3708,9 @@ class _AmbientHeaderState extends State<_AmbientHeader>
 //  In-app news sheet
 // ══════════════════════════════════════════════════════════════════════════════
 
-class _NewsSheet extends StatefulWidget {
+class _NewsPage extends StatefulWidget {
   final List<Map<String, dynamic>> items;
-  const _NewsSheet({required this.items});
+  const _NewsPage({required this.items});
 
   static (IconData, Color) _typeStyle(String type) => switch (type) {
     'feature' => (Icons.auto_awesome_rounded,    Color(0xFF7C3AED)),
@@ -3727,13 +3721,34 @@ class _NewsSheet extends StatefulWidget {
   };
 
   @override
-  State<_NewsSheet> createState() => _NewsSheetState();
+  State<_NewsPage> createState() => _NewsPageState();
 }
 
-class _NewsSheetState extends State<_NewsSheet> {
-  String? _type; // null = tous
-  String? _date; // null = tous
-  bool _showFilters = false;
+class _NewsPageState extends State<_NewsPage> {
+  String? _type;
+  DateTimeRange? _customRange;
+
+  // Items store dates as 'D/M' or 'D/M/YYYY' — assumes current year when absent.
+  DateTime? _parseDate(String raw) {
+    final parts = raw.split('/');
+    if (parts.length < 2) return null;
+    final d = int.tryParse(parts[0]);
+    final m = int.tryParse(parts[1]);
+    if (d == null || m == null) return null;
+    final y = parts.length > 2 ? (int.tryParse(parts[2]) ?? DateTime.now().year) : DateTime.now().year;
+    try { return DateTime(y, m, d); } catch (_) { return null; }
+  }
+
+  Future<void> _pickCustomRange(BuildContext context) async {
+    final now = DateTime.now();
+    final range = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(now.year - 3),
+      lastDate: now,
+      initialDateRange: _customRange,
+    );
+    if (range != null) setState(() => _customRange = range);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -3742,12 +3757,16 @@ class _NewsSheetState extends State<_NewsSheet> {
     final items  = widget.items;
 
     final types = items.map((e) => (e['type'] ?? 'info').toString()).toSet().toList()..sort();
-    final dates = items.map((e) => (e['date'] ?? '').toString()).where((d) => d.isNotEmpty).toSet().toList()
-      ..sort((a, b) => b.compareTo(a));
 
     final filtered = items.where((e) {
       if (_type != null && (e['type'] ?? 'info').toString() != _type) return false;
-      if (_date != null && (e['date'] ?? '').toString() != _date) return false;
+      if (_customRange != null) {
+        final d = _parseDate((e['date'] ?? '').toString());
+        if (d == null) return false;
+        final start = DateTime(_customRange!.start.year, _customRange!.start.month, _customRange!.start.day);
+        final end   = DateTime(_customRange!.end.year, _customRange!.end.month, _customRange!.end.day, 23, 59, 59);
+        if (d.isBefore(start) || d.isAfter(end)) return false;
+      }
       return true;
     }).toList();
 
@@ -3759,85 +3778,51 @@ class _NewsSheetState extends State<_NewsSheet> {
       _         => L.newsTypeInfo,
     };
 
-    return DraggableScrollableSheet(
-      expand: false,
-      initialChildSize: 0.55,
-      minChildSize:     0.35,
-      maxChildSize:     0.90,
-      builder: (ctx, scroll) => Column(children: [
-        // Header
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(L.newsWhatsNew),
+        actions: [
+          if (_type != null || _customRange != null)
+            IconButton(
+              icon: const Icon(Icons.filter_alt_off_rounded),
+              tooltip: L.newsAll,
+              onPressed: () => setState(() { _type = null; _customRange = null; }),
+            ),
+        ],
+      ),
+      body: Column(children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              Container(
-                width: 34, height: 34,
-                decoration: BoxDecoration(
-                  color:        scheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(10),
+            Text(L.newsItemsCount(filtered.length),
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            const SizedBox(height: 10),
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              FilterChip(
+                label: Text(L.newsAll),
+                selected: _type == null,
+                onSelected: (_) => setState(() => _type = null),
+              ),
+              for (final t in types)
+                FilterChip(
+                  label: Text(typeLabel(t)),
+                  selected: _type == t,
+                  onSelected: (_) => setState(() => _type = _type == t ? null : t),
                 ),
-                child: Icon(Icons.notifications_rounded,
-                    size: 18, color: scheme.onPrimaryContainer),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(
-                    L.newsWhatsNew,
-                    style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    L.newsItemsCount(filtered.length),
-                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-                  ),
-                ]),
-              ),
-              IconButton(
-                icon: Icon(_showFilters ? Icons.filter_list_off_rounded : Icons.filter_list_rounded,
-                    color: (_type != null || _date != null) ? scheme.primary : null),
-                tooltip: L.newsFilters,
-                onPressed: () => setState(() => _showFilters = !_showFilters),
+              ActionChip(
+                avatar: Icon(Icons.date_range_rounded,
+                    size: 18, color: _customRange != null ? scheme.onPrimaryContainer : null),
+                label: Text(_customRange == null
+                    ? L.newsCustomDate
+                    : '${_customRange!.start.day}/${_customRange!.start.month} \u2192 '
+                      '${_customRange!.end.day}/${_customRange!.end.month}'),
+                backgroundColor: _customRange != null ? scheme.primaryContainer : null,
+                onPressed: () => _pickCustomRange(context),
               ),
             ]),
-            if (_showFilters) ...[
-              const SizedBox(height: 8),
-              Wrap(spacing: 8, runSpacing: 8, children: [
-                FilterChip(
-                  label: Text(L.newsAll),
-                  selected: _type == null,
-                  onSelected: (_) => setState(() => _type = null),
-                ),
-                for (final t in types)
-                  FilterChip(
-                    label: Text(typeLabel(t)),
-                    selected: _type == t,
-                    onSelected: (_) => setState(() => _type = _type == t ? null : t),
-                  ),
-              ]),
-              if (dates.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Wrap(spacing: 8, runSpacing: 8, children: [
-                  FilterChip(
-                    label: Text(L.newsAnyDate),
-                    selected: _date == null,
-                    onSelected: (_) => setState(() => _date = null),
-                  ),
-                  for (final d in dates)
-                    FilterChip(
-                      label: Text(d),
-                      selected: _date == d,
-                      onSelected: (_) => setState(() => _date = _date == d ? null : d),
-                    ),
-                ]),
-              ],
-            ],
-            const SizedBox(height: 14),
-            Divider(height: 1, color: scheme.outlineVariant.withValues(alpha: 0.5)),
           ]),
         ),
-
-        // List
+        const SizedBox(height: 8),
         Expanded(
           child: filtered.isEmpty
               ? Center(child: Column(
@@ -3846,16 +3831,12 @@ class _NewsSheetState extends State<_NewsSheet> {
                     Icon(Icons.notifications_off_outlined,
                         size: 40, color: scheme.onSurfaceVariant),
                     const SizedBox(height: 12),
-                    Text(
-                      L.newsNoNewsYet,
-                      style: text.bodyMedium?.copyWith(
-                          color: scheme.onSurfaceVariant),
-                    ),
+                    Text(L.newsNoNewsYet,
+                        style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
                   ],
                 ))
               : ListView.separated(
-                  controller:  scroll,
-                  padding:     const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                  padding:     const EdgeInsets.fromLTRB(16, 4, 16, 32),
                   itemCount:   filtered.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (_, i) {
@@ -3865,16 +3846,11 @@ class _NewsSheetState extends State<_NewsSheet> {
                     final type  = (item['type']  ?? 'info').toString();
                     final date  = (item['date']  ?? '').toString();
                     final emoji = (item['emoji'] ?? '').toString();
-                    final (icon, color) = _NewsSheet._typeStyle(type);
+                    final (icon, color) = _NewsPage._typeStyle(type);
 
                     return _NewsListTile(
-                      title: title,
-                      body:  body,
-                      type:  type,
-                      date:  date,
-                      emoji: emoji,
-                      icon:  icon,
-                      color: color,
+                      title: title, body: body, type: type, date: date,
+                      emoji: emoji, icon: icon, color: color,
                       onTap: () => showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
@@ -4102,7 +4078,7 @@ class _NewsDetailSheet extends StatelessWidget {
     final date  = (item['date']  ?? '').toString();
     final emoji = (item['emoji'] ?? '').toString();
     final url   = (item['url']   ?? '').toString();
-    final (icon, color) = _NewsSheet._typeStyle(type);
+    final (icon, color) = _NewsPage._typeStyle(type);
 
     return DraggableScrollableSheet(
       expand: false,
@@ -4181,21 +4157,100 @@ class _NewsDetailSheet extends StatelessWidget {
             ),
           ],
 
-          if (url.isNotEmpty) ...[
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: () => _openUrl(url),
-                icon:  const Icon(Icons.open_in_new_rounded, size: 18),
-                label: Text(
-                  L.notifDetailOpenLink,
+          const SizedBox(height: 20),
+          Row(children: [
+            if (url.isNotEmpty) ...[
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: () => _openUrl(url),
+                  icon:  const Icon(Icons.open_in_new_rounded, size: 18),
+                  label: Text(L.notifDetailOpenLink),
                 ),
               ),
+              const SizedBox(width: 10),
+            ],
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () => _shareAsImage(context, scheme),
+                icon:  const Icon(Icons.ios_share_rounded, size: 18),
+                label: Text(L.commonShare),
+              ),
             ),
-          ],
+          ]),
         ]),
       ),
     );
+  }
+
+  Future<void> _shareAsImage(BuildContext context, ColorScheme scheme) async {
+    final title = (item['title'] ?? '').toString();
+    final body  = (item['body']  ?? '').toString();
+    final type  = (item['type']  ?? 'info').toString();
+    final date  = (item['date']  ?? '').toString();
+    final emoji = (item['emoji'] ?? '').toString();
+    final (_, color) = _NewsPage._typeStyle(type);
+
+    const width = 900.0;
+    const pad   = 32.0;
+    final titleTp = TextPainter(
+      text: TextSpan(text: title, style: const TextStyle(
+          fontSize: 32, fontWeight: FontWeight.w800, color: Colors.white)),
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: width - pad * 2);
+    final bodyTp = TextPainter(
+      text: TextSpan(text: body, style: const TextStyle(fontSize: 18, color: Colors.white70, height: 1.5)),
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: width - pad * 2);
+
+    final headerH = 90.0;
+    final titleH  = titleTp.height + 16;
+    final bodyH   = body.isNotEmpty ? bodyTp.height + 24 : 0.0;
+    final footerH = 56.0;
+    final totalH  = headerH + titleH + bodyH + footerH + pad;
+
+    final recorder = ui.PictureRecorder();
+    final canvas   = Canvas(recorder, Rect.fromLTWH(0, 0, width, totalH));
+
+    canvas.drawRect(Rect.fromLTWH(0, 0, width, totalH), Paint()..color = const Color(0xFF1A1220));
+    canvas.drawRect(Rect.fromLTWH(0, 0, width, 6), Paint()..color = color);
+
+    final brand = TextPainter(
+      text: const TextSpan(text: 'LastStats', style: TextStyle(
+          fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white70)),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    brand.paint(canvas, const Offset(pad, 26));
+
+    final emojiTp = TextPainter(
+      text: TextSpan(text: emoji.isNotEmpty ? emoji : '\ud83d\udce2', style: const TextStyle(fontSize: 30)),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    emojiTp.paint(canvas, Offset(width - pad - emojiTp.width, 20));
+
+    titleTp.paint(canvas, Offset(pad, headerH));
+    var y = headerH + titleH;
+
+    if (body.isNotEmpty) {
+      bodyTp.paint(canvas, Offset(pad, y));
+      y += bodyH;
+    }
+
+    if (date.isNotEmpty) {
+      final dateTp = TextPainter(
+        text: TextSpan(text: date, style: const TextStyle(fontSize: 13, color: Colors.white54)),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      dateTp.paint(canvas, Offset(pad, totalH - footerH + (footerH - dateTp.height) / 2));
+    }
+
+    final picture = recorder.endRecording();
+    final img = await picture.toImage(width.toInt(), totalH.toInt());
+    final bd  = await img.toByteData(format: ImageByteFormat.png);
+    final bytes = bd!.buffer.asUint8List();
+
+    final tmp  = await getTemporaryDirectory();
+    final file = File('${tmp.path}/laststats_news.png');
+    await file.writeAsBytes(bytes);
+    await Share.shareXFiles([XFile(file.path)]);
   }
 }

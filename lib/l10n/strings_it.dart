@@ -558,12 +558,17 @@ class AppStringsIt implements AppStrings {
   @override String get faqA6 => 'Vai su Impostazioni > Account e inserisci la tua chiave segreta Last.fm. Una volta connessa, potrai aggiungere brani ai preferiti direttamente dall\'app.';
   @override String get settingsPlatformDisabledByShowAll => 'Disattivato: tutti i link sono già mostrati.';
   @override String get commonInDevelopment => 'In sviluppo';
+  @override String get commonSeeLess => 'Vedi meno';
+  @override String get commonShare => 'Condividi';
+  @override String get newsCustomDate => 'Data personalizzata';
   @override String get aboutShortcuts => 'Scorciatoie da tastiera';
   @override String get aboutShortcutsSub => 'Disponibili su PC / schermo grande';
   @override String get shortcutSwitchTabs => 'Cambia scheda';
   @override String get shortcutSearch => 'Cerca';
   @override String get shortcutClose => 'Chiudi una scheda';
   @override String get shortcutRefresh => 'Aggiorna';
+  @override String get aboutDiscord => 'Unisciti a Discord';
+  @override String get aboutDiscordSub => 'Chat, suggerimenti e annunci in diretta';
 
   @override String globalListeners(String count) => '$count ascoltatori globali';
   @override String historyScrobbles(int n) => '$n scrobble';

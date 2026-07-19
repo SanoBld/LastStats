@@ -558,12 +558,17 @@ class AppStringsRu implements AppStrings {
   @override String get faqA6 => 'Перейдите в Настройки > Аккаунт и введите секретный ключ Last.fm. После подключения вы сможете добавлять треки в избранное прямо из приложения.';
   @override String get settingsPlatformDisabledByShowAll => 'Отключено: все ссылки уже отображаются.';
   @override String get commonInDevelopment => 'В разработке';
+  @override String get commonSeeLess => 'Свернуть';
+  @override String get commonShare => 'Поделиться';
+  @override String get newsCustomDate => 'Свой период';
   @override String get aboutShortcuts => 'Горячие клавиши';
   @override String get aboutShortcutsSub => 'Доступны на ПК / большом экране';
   @override String get shortcutSwitchTabs => 'Переключение вкладок';
   @override String get shortcutSearch => 'Поиск';
   @override String get shortcutClose => 'Закрыть карточку';
   @override String get shortcutRefresh => 'Обновить';
+  @override String get aboutDiscord => 'Присоединиться к Discord';
+  @override String get aboutDiscordSub => 'Общение, предложения и анонсы в реальном времени';
 
   @override String globalListeners(String count) => '$count слушателей во всём мире';
   @override String historyScrobbles(int n) => '$n скробблов';

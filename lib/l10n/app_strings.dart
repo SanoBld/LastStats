@@ -654,6 +654,9 @@ abstract class AppStrings {
   String get faqA6;
   String get settingsPlatformDisabledByShowAll;
   String get commonInDevelopment;
+  String get commonSeeLess;
+  String get commonShare;
+  String get newsCustomDate;
 
   // ── Keyboard shortcuts (desktop) ────────────────────────────────────────
   String get aboutShortcuts;
@@ -662,4 +665,6 @@ abstract class AppStrings {
   String get shortcutSearch;
   String get shortcutClose;
   String get shortcutRefresh;
+  String get aboutDiscord;
+  String get aboutDiscordSub;
 }

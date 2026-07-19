@@ -558,12 +558,17 @@ class AppStringsDe implements AppStrings {
   @override String get faqA6 => 'Gehe zu Einstellungen > Konto und gib deinen Last.fm-Secret-Key ein. Nach der Verbindung kannst du Titel direkt in der App favorisieren.';
   @override String get settingsPlatformDisabledByShowAll => 'Deaktiviert: Es werden bereits alle Links angezeigt.';
   @override String get commonInDevelopment => 'In Entwicklung';
+  @override String get commonSeeLess => 'Weniger anzeigen';
+  @override String get commonShare => 'Teilen';
+  @override String get newsCustomDate => 'Eigener Zeitraum';
   @override String get aboutShortcuts => 'Tastenkürzel';
   @override String get aboutShortcutsSub => 'Verfügbar auf dem PC / großen Bildschirmen';
   @override String get shortcutSwitchTabs => 'Tab wechseln';
   @override String get shortcutSearch => 'Suchen';
   @override String get shortcutClose => 'Ansicht schließen';
   @override String get shortcutRefresh => 'Aktualisieren';
+  @override String get aboutDiscord => 'Discord beitreten';
+  @override String get aboutDiscordSub => 'Austausch, Vorschläge und Live-Ankündigungen';
 
   @override String globalListeners(String count) => '$count Hörer weltweit';
   @override String historyScrobbles(int n) => '$n Scrobbles';

@@ -619,11 +619,16 @@ class AppStringsZh implements AppStrings {
   @override String get faqA6 => '前往「设置 > 账户」并输入你的 Last.fm 密钥。连接成功后，即可直接在应用中收藏歌曲。';
   @override String get settingsPlatformDisabledByShowAll => '已停用：已显示全部链接。';
   @override String get commonInDevelopment => '开发中';
+  @override String get commonSeeLess => '收起';
+  @override String get commonShare => '分享';
+  @override String get newsCustomDate => '自定义日期';
   @override String get aboutShortcuts => '键盘快捷键';
   @override String get aboutShortcutsSub => '适用于电脑 / 大屏幕';
   @override String get shortcutSwitchTabs => '切换标签页';
   @override String get shortcutSearch => '搜索';
   @override String get shortcutClose => '关闭面板';
   @override String get shortcutRefresh => '刷新';
+  @override String get aboutDiscord => '加入 Discord';
+  @override String get aboutDiscordSub => '交流、建议和实时公告';
 }
 

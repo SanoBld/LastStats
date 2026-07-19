@@ -622,11 +622,16 @@ class AppStringsEn implements AppStrings {
   @override String get faqA6 => 'Go to Settings > Account and enter your Last.fm secret key. Once connected, you\'ll be able to favorite tracks directly from the app.';
   @override String get settingsPlatformDisabledByShowAll => 'Disabled: all links are already shown.';
   @override String get commonInDevelopment => 'In development';
+  @override String get commonSeeLess => 'See less';
+  @override String get commonShare => 'Share';
+  @override String get newsCustomDate => 'Custom date';
   @override String get aboutShortcuts => 'Keyboard shortcuts';
   @override String get aboutShortcutsSub => 'Available on desktop / large screens';
   @override String get shortcutSwitchTabs => 'Switch tabs';
   @override String get shortcutSearch => 'Search';
   @override String get shortcutClose => 'Close a sheet';
   @override String get shortcutRefresh => 'Refresh';
+  @override String get aboutDiscord => 'Join the Discord';
+  @override String get aboutDiscordSub => 'Chat, suggestions and live announcements';
 }
 

@@ -1,58 +1,32 @@
 import 'dart:convert';
+import 'dart:ffi' show Abi;
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 
-// ══════════════════════════════════════════════════════════════════════════
-//  UpdateService — reads update info directly from the GitHub Releases API.
-//  No static JSON file needed (the old gh-pages metadata approach was
-//  unreliable since publish-update-metadata.yml could silently fail or the
-//  file could be stale). The Releases API is always authoritative and free,
-//  no auth required for public repos (60 req/h per IP, plenty for this use).
-// ══════════════════════════════════════════════════════════════════════════
-
 enum UpdateChannel { stable, beta }
+
+enum DownloadKind { apk, installer, zip, none }
 
 class UpdateService {
   UpdateService._();
 
-  // ─── Your real GitHub repo (owner/name) ───────────────────────────────
   static const _owner = 'SanoBld';
   static const _repo  = 'LastStats';
 
-  // Read at runtime from pubspec.yaml's `version:` field (via package_info)
-  // instead of a value hardcoded here. No more manual/CI sed injection to
-  // keep in sync — this is always correct, in dev builds and CI builds alike.
-  // Falls back to '0.0.0' only if init() hasn't been called yet.
   static String currentVersion = '0.0.0';
-
   static bool _initialized = false;
 
-  /// Call once at app startup (main.dart), before anything reads
-  /// [currentVersion] or calls [checkForUpdate].
   static Future<void> init() async {
     if (_initialized) return;
     _initialized = true;
     try {
       final info = await PackageInfo.fromPlatform();
-      // info.version is the pubspec `version:` field before the '+buildNumber'.
       if (info.version.isNotEmpty) currentVersion = info.version;
-    } catch (_) {
-      // Keep the '0.0.0' fallback — checkForUpdate() will then just always
-      // report an update is available rather than crashing, which is the
-      // safer failure mode.
-    }
+    } catch (_) {}
   }
-  // ────────────────────────────────────────────────────────────────────────
 
   static const _timeout = Duration(seconds: 10);
 
-  /// Returns an [UpdateInfo] if a newer version exists, or `null` if up to
-  /// date / on network error.
-  ///
-  /// [channel] picks which releases to consider:
-  ///   stable → only non-prerelease releases (tags without a '-' suffix)
-  ///   beta   → the single most recent release of any kind (so beta users
-  ///            see pre-releases AND get notified when stable catches up)
   static Future<UpdateInfo?> checkForUpdate({
     UpdateChannel channel = UpdateChannel.stable,
   }) async {
@@ -69,7 +43,6 @@ class UpdateService {
       final list = jsonDecode(utf8.decode(res.bodyBytes)) as List<dynamic>;
       if (list.isEmpty) return null;
 
-      // Drop drafts always; for the stable channel also drop pre-releases.
       final candidates = list
           .cast<Map<String, dynamic>>()
           .where((r) => r['draft'] != true)
@@ -78,7 +51,6 @@ class UpdateService {
 
       if (candidates.isEmpty) return null;
 
-      // GitHub returns releases already sorted by creation date, newest first.
       final release = candidates.first;
 
       final rawTag = (release['tag_name'] ?? '').toString();
@@ -87,20 +59,13 @@ class UpdateService {
       if (!_isNewer(latest, currentVersion)) return null;
 
       final assets = (release['assets'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-      String? findAsset(String name) {
-        for (final a in assets) {
-          if ((a['name'] ?? '') == name) return (a['browser_download_url'] ?? '').toString();
-        }
-        return null;
-      }
-
-      // Universal APK preferred for the single-button download action.
-      final apkUrl = findAsset('app-universal-release.apk');
+      final match = _bestAssetForPlatform(assets);
 
       return UpdateInfo(
         version:     latest,
         releaseUrl:  (release['html_url'] ?? '').toString(),
-        apkUrl:      apkUrl,
+        downloadUrl: match.$1,
+        downloadKind: match.$2,
         notes:       (release['body'] ?? '').toString(),
         publishedAt: _parseDate(release['published_at']?.toString()),
         isBeta:      release['prerelease'] == true,
@@ -110,10 +75,52 @@ class UpdateService {
     }
   }
 
-  // ── Compare semver, ignoring any "-beta"/"-rc1" suffix ─────────────────
-  // Pre-release suffixes only affect the isBeta flag (set from the API's
-  // own "prerelease" boolean) — version *ordering* still compares numerically
-  // so a "2.7.0-beta" tag is correctly treated as newer than "2.6.0".
+  // Picks the right release asset for the current OS + CPU architecture.
+  // Abi.current() is built into dart:ffi — no extra package needed.
+  static (String?, DownloadKind) _bestAssetForPlatform(List<Map<String, dynamic>> assets) {
+    String? find(String name) {
+      for (final a in assets) {
+        if ((a['name'] ?? '') == name) return (a['browser_download_url'] ?? '').toString();
+      }
+      return null;
+    }
+
+    final universal = find('app-universal-release.apk');
+
+    switch (Abi.current()) {
+      case Abi.androidArm64:
+        return (find('app-arm64-v8a-release.apk') ?? universal, DownloadKind.apk);
+      case Abi.androidArm:
+        return (find('app-armeabi-v7a-release.apk') ?? universal, DownloadKind.apk);
+      case Abi.androidX64:
+        return (find('app-x86_64-release.apk') ?? universal, DownloadKind.apk);
+      case Abi.androidIA32:
+        return (universal, DownloadKind.apk);
+
+      case Abi.windowsArm64:
+        final exe = find('LastStats-Setup-arm64.exe');
+        if (exe != null) return (exe, DownloadKind.installer);
+        return (find('laststats-windows-arm64.zip'), DownloadKind.zip);
+      case Abi.windowsX64:
+      case Abi.windowsIA32:
+        final exe = find('LastStats-Setup-x64.exe');
+        if (exe != null) return (exe, DownloadKind.installer);
+        return (find('laststats-windows.zip'), DownloadKind.zip);
+
+      case Abi.macosArm64:
+      case Abi.macosX64:
+        return (find('laststats-macos.zip'), DownloadKind.zip);
+
+      case Abi.linuxArm64:
+      case Abi.linuxX64:
+      case Abi.linuxIA32:
+        return (find('laststats-linux.zip'), DownloadKind.zip);
+
+      default:
+        return (universal, universal != null ? DownloadKind.apk : DownloadKind.none);
+    }
+  }
+
   static bool _isNewer(String latest, String current) {
     final l = _parts(latest);
     final c = _parts(current);
@@ -127,7 +134,6 @@ class UpdateService {
   }
 
   static List<int> _parts(String v) {
-    // Strip "-beta", "-rc1" etc. before splitting on dots.
     final core = v.split('-').first;
     return core.split('.').map((s) => int.tryParse(s) ?? 0).toList();
   }
@@ -138,24 +144,24 @@ class UpdateService {
   }
 }
 
-// ══════════════════════════════════════════════════════════════════════════
-
 class UpdateInfo {
-  final String    version;
-  final String    releaseUrl;
-  final String?   apkUrl;
-  final String    notes;
-  final DateTime? publishedAt;
-  final bool      isBeta;
+  final String       version;
+  final String       releaseUrl;
+  final String?      downloadUrl;
+  final DownloadKind downloadKind;
+  final String       notes;
+  final DateTime?    publishedAt;
+  final bool         isBeta;
 
   const UpdateInfo({
     required this.version,
     required this.releaseUrl,
-    this.apkUrl,
+    this.downloadUrl,
+    this.downloadKind = DownloadKind.none,
     required this.notes,
     this.publishedAt,
     this.isBeta = false,
   });
 
-  bool get hasApk => apkUrl != null && apkUrl!.isNotEmpty;
+  bool get hasDownload => downloadUrl != null && downloadUrl!.isNotEmpty;
 }

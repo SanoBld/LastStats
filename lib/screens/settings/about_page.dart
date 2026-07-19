@@ -1,6 +1,8 @@
 // lib/screens/settings/about_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../l10n/l10n.dart';
 import '../../app_state.dart';
@@ -127,6 +129,17 @@ class AboutPage extends StatelessWidget {
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             trailing: const Icon(Icons.open_in_new_rounded, size: 16),
             onTap: () => _open('https://github.com/SanoBld/LastStats'),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          ListTile(
+            leading: _SafeSvgIcon(asset: 'assets/icons/discord.svg',
+                fallback: Icons.forum_rounded, color: scheme.primary),
+            title: Text(L.aboutDiscord,
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            subtitle: Text(L.aboutDiscordSub,
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            trailing: const Icon(Icons.open_in_new_rounded, size: 16),
+            onTap: () => _open('https://discord.gg/JjqmkQgZBs'),
           ),
         ]),
 
@@ -255,6 +268,24 @@ class _ShortcutTile extends StatelessWidget {
             style: TextStyle(fontFamily: 'monospace', fontSize: 12,
                 fontWeight: FontWeight.w700, color: scheme.onSurfaceVariant)),
       ),
+    );
+  }
+}
+
+class _SafeSvgIcon extends StatelessWidget {
+  final String asset;
+  final IconData fallback;
+  final Color color;
+  const _SafeSvgIcon({required this.asset, required this.fallback, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: rootBundle.load(asset).then((_) => true).catchError((_) => false),
+      builder: (_, snap) => snap.data == true
+          ? SvgPicture.asset(asset, width: 22, height: 22,
+              colorFilter: ColorFilter.mode(color, BlendMode.srcIn))
+          : Icon(fallback, color: color, size: 22),
     );
   }
 }
