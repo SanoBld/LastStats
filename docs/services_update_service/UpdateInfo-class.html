@@ -61,7 +61,7 @@
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
         <dt id="UpdateInfo.new" class="callable">
-          <span class="name"><a href="../services_update_service/UpdateInfo/UpdateInfo.html">UpdateInfo</a></span><span class="signature">({<span class="parameter" id="param-version"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">version</span>, </span><span class="parameter" id="param-releaseUrl"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">releaseUrl</span>, </span><span class="parameter" id="param-apkUrl"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">apkUrl</span>, </span><span class="parameter" id="param-notes"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">notes</span>, </span><span class="parameter" id="param-publishedAt"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/DateTime-class.html">DateTime</a>?</span> <span class="parameter-name">publishedAt</span>, </span><span class="parameter" id="param-isBeta"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isBeta</span> = <span class="default-value">false</span></span>})</span>
+          <span class="name"><a href="../services_update_service/UpdateInfo/UpdateInfo.html">UpdateInfo</a></span><span class="signature">({<span class="parameter" id="param-version"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">version</span>, </span><span class="parameter" id="param-releaseUrl"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">releaseUrl</span>, </span><span class="parameter" id="param-downloadUrl"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">downloadUrl</span>, </span><span class="parameter" id="param-downloadKind"><span class="type-annotation"><a href="../services_update_service/DownloadKind.html">DownloadKind</a></span> <span class="parameter-name">downloadKind</span> = <span class="default-value">DownloadKind.none</span>, </span><span class="parameter" id="param-notes"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">notes</span>, </span><span class="parameter" id="param-publishedAt"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/DateTime-class.html">DateTime</a>?</span> <span class="parameter-name">publishedAt</span>, </span><span class="parameter" id="param-isBeta"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isBeta</span> = <span class="default-value">false</span></span>})</span>
         </dt>
         <dd>
           
@@ -75,8 +75,20 @@
       id="instance-properties">
     <h2>Properties</h2>
     <dl class="properties">
-        <dt id="apkUrl" class="property">
-  <span class="name"><a href="../services_update_service/UpdateInfo/apkUrl.html">apkUrl</a></span>
+        <dt id="downloadKind" class="property">
+  <span class="name"><a href="../services_update_service/UpdateInfo/downloadKind.html">downloadKind</a></span>
+  <span class="signature">&#8594; <a href="../services_update_service/DownloadKind.html">DownloadKind</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="downloadUrl" class="property">
+  <span class="name"><a href="../services_update_service/UpdateInfo/downloadUrl.html">downloadUrl</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span>
   
 
@@ -87,8 +99,8 @@
 
 </dd>
 
-        <dt id="hasApk" class="property">
-  <span class="name"><a href="../services_update_service/UpdateInfo/hasApk.html">hasApk</a></span>
+        <dt id="hasDownload" class="property">
+  <span class="name"><a href="../services_update_service/UpdateInfo/hasDownload.html">hasDownload</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
   
 

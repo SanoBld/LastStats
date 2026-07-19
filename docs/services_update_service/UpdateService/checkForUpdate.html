@@ -62,14 +62,6 @@
 
     </section>
     
-<section class="desc markdown">
-  <p>Returns an <a href="../../services_update_service/UpdateInfo-class.html">UpdateInfo</a> if a newer version exists, or <code>null</code> if up to
-date / on network error.</p>
-<p><code>channel</code> picks which releases to consider:
-  stable → only non-prerelease releases (tags without a '-' suffix)
-  beta   → the single most recent release of any kind (so beta users
-           see pre-releases AND get notified when stable catches up)</p>
-</section>
 
 
     
@@ -91,7 +83,6 @@ date / on network error.</p>
     final list = jsonDecode(utf8.decode(res.bodyBytes)) as List&lt;dynamic&gt;;
     if (list.isEmpty) return null;
 
-    &#47;&#47; Drop drafts always; for the stable channel also drop pre-releases.
     final candidates = list
         .cast&lt;Map&lt;String, dynamic&gt;&gt;()
         .where((r) =&gt; r[&#39;draft&#39;] != true)
@@ -100,7 +91,6 @@ date / on network error.</p>
 
     if (candidates.isEmpty) return null;
 
-    &#47;&#47; GitHub returns releases already sorted by creation date, newest first.
     final release = candidates.first;
 
     final rawTag = (release[&#39;tag_name&#39;] ?? &#39;&#39;).toString();
@@ -109,20 +99,13 @@ date / on network error.</p>
     if (!_isNewer(latest, currentVersion)) return null;
 
     final assets = (release[&#39;assets&#39;] as List?)?.cast&lt;Map&lt;String, dynamic&gt;&gt;() ?? [];
-    String? findAsset(String name) {
-      for (final a in assets) {
-        if ((a[&#39;name&#39;] ?? &#39;&#39;) == name) return (a[&#39;browser_download_url&#39;] ?? &#39;&#39;).toString();
-      }
-      return null;
-    }
-
-    &#47;&#47; Universal APK preferred for the single-button download action.
-    final apkUrl = findAsset(&#39;app-universal-release.apk&#39;);
+    final match = _bestAssetForPlatform(assets);
 
     return UpdateInfo(
       version:     latest,
       releaseUrl:  (release[&#39;html_url&#39;] ?? &#39;&#39;).toString(),
-      apkUrl:      apkUrl,
+      downloadUrl: match.$1,
+      downloadKind: match.$2,
       notes:       (release[&#39;body&#39;] ?? &#39;&#39;).toString(),
       publishedAt: _parseDate(release[&#39;published_at&#39;]?.toString()),
       isBeta:      release[&#39;prerelease&#39;] == true,

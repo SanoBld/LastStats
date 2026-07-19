@@ -61,10 +61,6 @@
 
     </section>
     
-<section class="desc markdown">
-  <p>Call once at app startup (main.dart), before anything reads
-<a href="../../services_update_service/UpdateService/currentVersion.html">currentVersion</a> or calls <a href="../../services_update_service/UpdateService/checkForUpdate.html">checkForUpdate</a>.</p>
-</section>
 
 
     
@@ -75,13 +71,8 @@
   _initialized = true;
   try {
     final info = await PackageInfo.fromPlatform();
-    &#47;&#47; info.version is the pubspec `version:` field before the &#39;+buildNumber&#39;.
     if (info.version.isNotEmpty) currentVersion = info.version;
-  } catch (_) {
-    &#47;&#47; Keep the &#39;0.0.0&#39; fallback — checkForUpdate() will then just always
-    &#47;&#47; report an update is available rather than crashing, which is the
-    &#47;&#47; safer failure mode.
-  }
+  } catch (_) {}
 }</code></pre>
 </section>
 

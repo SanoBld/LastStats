@@ -221,6 +221,17 @@ Widget build(BuildContext context) {
           trailing: const Icon(Icons.open_in_new_rounded, size: 16),
           onTap: () =&gt; _open(&#39;https:&#47;&#47;github.com&#47;SanoBld&#47;LastStats&#39;),
         ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        ListTile(
+          leading: _SafeSvgIcon(asset: &#39;assets&#47;icons&#47;discord.svg&#39;,
+              fallback: Icons.forum_rounded, color: scheme.primary),
+          title: Text(L.aboutDiscord,
+              style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+          subtitle: Text(L.aboutDiscordSub,
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+          trailing: const Icon(Icons.open_in_new_rounded, size: 16),
+          onTap: () =&gt; _open(&#39;https:&#47;&#47;discord.gg&#47;JjqmkQgZBs&#39;),
+        ),
       ]),
 
       const SizedBox(height: 16),
