@@ -92,15 +92,85 @@ class MarkdownLite extends StatelessWidget {
     return TextSpan(style: style, children: spans);
   }
 
+  // A line is a table row if it contains at least one '|' with content
+  // around it (GitHub-flavored markdown style: "| a | b |").
+  static bool _isTableRow(String line) =>
+      line.trim().startsWith('|') || (line.contains('|') && line.trim().isNotEmpty);
+
+  // A separator row looks like "|---|---|" or "|:--|--:|".
+  static bool _isTableSeparator(String line) =>
+      RegExp(r'^\s*\|?[\s:\-|]+\|?\s*$').hasMatch(line) && line.contains('-');
+
+  static List<String> _splitRow(String line) {
+    var l = line.trim();
+    if (l.startsWith('|')) l = l.substring(1);
+    if (l.endsWith('|')) l = l.substring(0, l.length - 1);
+    return l.split('|').map((c) => c.trim()).toList();
+  }
+
+  Widget _buildTable(BuildContext context, List<String> header, List<List<String>> rows) {
+    final scheme = Theme.of(context).colorScheme;
+    final borderColor = scheme.outlineVariant.withValues(alpha: 0.5);
+    final cellStyle = style?.copyWith(fontSize: (style?.fontSize ?? 13) - 1);
+
+    Widget cell(String text, {bool bold = false}) => Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          child: Text.rich(_parseInline(text),
+              style: cellStyle?.copyWith(fontWeight: bold ? FontWeight.w700 : FontWeight.w400)),
+        );
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8, top: 2),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: 0),
+          child: Table(
+            border: TableBorder.all(color: borderColor, width: 1, borderRadius: BorderRadius.circular(6)),
+            defaultColumnWidth: const IntrinsicColumnWidth(),
+            children: [
+              TableRow(
+                decoration: BoxDecoration(color: scheme.surfaceContainerHighest),
+                children: header.map((h) => cell(h, bold: true)).toList(),
+              ),
+              for (final r in rows)
+                TableRow(children: [
+                  for (var i = 0; i < header.length; i++) cell(i < r.length ? r[i] : ''),
+                ]),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final lines = text.split('\n');
     final widgets = <Widget>[];
+    int i = 0;
 
-    for (final raw in lines) {
+    while (i < lines.length) {
+      final raw = lines[i];
       final line = raw.trimRight();
+
+      // ── Table block: header row + separator row + data rows ────────────
+      if (i + 1 < lines.length && _isTableRow(line) && _isTableSeparator(lines[i + 1])) {
+        final header = _splitRow(line);
+        var j = i + 2;
+        final rows = <List<String>>[];
+        while (j < lines.length && _isTableRow(lines[j]) && lines[j].trim().isNotEmpty) {
+          rows.add(_splitRow(lines[j]));
+          j++;
+        }
+        widgets.add(_buildTable(context, header, rows));
+        i = j;
+        continue;
+      }
+
       if (line.isEmpty) {
         widgets.add(const SizedBox(height: 6));
+        i++;
         continue;
       }
 
@@ -117,6 +187,7 @@ class MarkdownLite extends StatelessWidget {
                 fontSize: (style?.fontSize ?? 14) + (level == 1 ? 4 : level == 2 ? 2 : 1),
               )),
         ));
+        i++;
         continue;
       }
 
@@ -130,6 +201,7 @@ class MarkdownLite extends StatelessWidget {
             Expanded(child: Text.rich(_parseInline(bulletMatch.group(1)!), style: style)),
           ]),
         ));
+        i++;
         continue;
       }
 
@@ -137,6 +209,7 @@ class MarkdownLite extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 2),
         child: Text.rich(_parseInline(line), style: style),
       ));
+      i++;
     }
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: widgets);

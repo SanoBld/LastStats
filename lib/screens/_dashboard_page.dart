@@ -865,11 +865,7 @@ class _DashboardPageState extends State<_DashboardPage> {
         // Avoid duplicating: only add if not already in the list
         if (!allItems.any((i) => i['id'] == id)) {
           final title  = L.dashUpdateTitle(info.version, info.isBeta);
-          final body   = info.notes.isNotEmpty
-              ? (info.notes.length > 300
-                  ? '${info.notes.substring(0, 300)}…'
-                  : info.notes)
-              : L.dashTapToDownload;
+          final body   = info.notes.isNotEmpty ? info.notes : L.dashTapToDownload;
 
           allItems.insert(0, {
             'id':    id,
