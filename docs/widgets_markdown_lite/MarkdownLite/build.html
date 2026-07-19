@@ -111,11 +111,29 @@ and</li>
 Widget build(BuildContext context) {
   final lines = text.split(&#39;\n&#39;);
   final widgets = &lt;Widget&gt;[];
+  int i = 0;
 
-  for (final raw in lines) {
+  while (i &lt; lines.length) {
+    final raw = lines[i];
     final line = raw.trimRight();
+
+    &#47;&#47; ── Table block: header row + separator row + data rows ────────────
+    if (i + 1 &lt; lines.length &amp;&amp; _isTableRow(line) &amp;&amp; _isTableSeparator(lines[i + 1])) {
+      final header = _splitRow(line);
+      var j = i + 2;
+      final rows = &lt;List&lt;String&gt;&gt;[];
+      while (j &lt; lines.length &amp;&amp; _isTableRow(lines[j]) &amp;&amp; lines[j].trim().isNotEmpty) {
+        rows.add(_splitRow(lines[j]));
+        j++;
+      }
+      widgets.add(_buildTable(context, header, rows));
+      i = j;
+      continue;
+    }
+
     if (line.isEmpty) {
       widgets.add(const SizedBox(height: 6));
+      i++;
       continue;
     }
 
@@ -132,6 +150,7 @@ Widget build(BuildContext context) {
               fontSize: (style?.fontSize ?? 14) + (level == 1 ? 4 : level == 2 ? 2 : 1),
             )),
       ));
+      i++;
       continue;
     }
 
@@ -145,6 +164,7 @@ Widget build(BuildContext context) {
           Expanded(child: Text.rich(_parseInline(bulletMatch.group(1)!), style: style)),
         ]),
       ));
+      i++;
       continue;
     }
 
@@ -152,6 +172,7 @@ Widget build(BuildContext context) {
       padding: const EdgeInsets.only(bottom: 2),
       child: Text.rich(_parseInline(line), style: style),
     ));
+    i++;
   }
 
   return Column(crossAxisAlignment: CrossAxisAlignment.start, children: widgets);
