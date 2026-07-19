@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../l10n/l10n.dart';
 import '../../app_state.dart';
 import '../../services/update_service.dart';
+import '../../widgets/markdown_lite.dart';
 import 'settings_helpers.dart';
 
 class UpdatesPage extends StatefulWidget {
@@ -124,15 +125,20 @@ class _UpdatesPageState extends State<UpdatesPage> {
                 AnimatedCrossFade(
                   duration: const Duration(milliseconds: 200),
                   crossFadeState: _notesExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-                  firstChild: Text(
-                    _updateInfo!.notes.length > 200
+                  // Collapsed: truncate raw markdown source, then render it
+                  // (rendering after truncation keeps things simple; a stray
+                  // trailing "**" just won't be interpreted, which is fine).
+                  firstChild: MarkdownLite(
+                    text: _updateInfo!.notes.length > 200
                         ? '${_updateInfo!.notes.substring(0, 200)}…'
                         : _updateInfo!.notes,
                     style: text.bodySmall?.copyWith(color: scheme.onTertiaryContainer.withValues(alpha: 0.85)),
+                    linkColor: scheme.onTertiaryContainer,
                   ),
-                  secondChild: Text(
-                    _updateInfo!.notes,
+                  secondChild: MarkdownLite(
+                    text: _updateInfo!.notes,
                     style: text.bodySmall?.copyWith(color: scheme.onTertiaryContainer.withValues(alpha: 0.85)),
+                    linkColor: scheme.onTertiaryContainer,
                   ),
                 ),
                 if (_updateInfo!.notes.length > 200) ...[

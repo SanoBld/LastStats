@@ -43,6 +43,7 @@ import '../services/prefetch_service.dart';
 import '../services/all_scrobbles_service.dart';
 import '../services/translation_service.dart';
 import '../services/lyrics_service.dart';
+import '../widgets/markdown_lite.dart';
 import 'favorites_page.dart';
 import 'notification_detail_page.dart';
 

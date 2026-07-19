@@ -4012,59 +4012,16 @@ class _NewsDetailSheet extends StatelessWidget {
   final Map<String, dynamic> item;
   const _NewsDetailSheet({required this.item});
 
-  // Matches http(s) URLs inside free text
-  static final RegExp _urlRegex =
-      RegExp(r'(https?:\/\/[^\s]+)', caseSensitive: false);
-
+  // NOTE: rich text rendering (bold/italic/code/lists/headers/links) is now
+  // handled by the shared MarkdownLite widget (see widgets/markdown_lite.dart).
+  // This helper is still used by the "open link" action button below.
   Future<void> _openUrl(String rawUrl) async {
-    // Strip trailing punctuation that often sticks to URLs in prose
     final cleaned = rawUrl.replaceAll(RegExp(r'[)\].,;!?]+$'), '');
     final uri = Uri.tryParse(cleaned);
     if (uri == null) return;
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
-  }
-
-  // Builds a rich text where any URL substring becomes a tappable link.
-  // Uses WidgetSpan + GestureDetector instead of TapGestureRecognizer so no
-  // extra import (flutter/gestures.dart) is required.
-  Widget _linkifiedBody(BuildContext context, String body, TextStyle? style, Color linkColor) {
-    final matches = _urlRegex.allMatches(body).toList();
-    if (matches.isEmpty) {
-      return Text(body, style: style);
-    }
-
-    final spans = <InlineSpan>[];
-    int cursor = 0;
-    for (final m in matches) {
-      if (m.start > cursor) {
-        spans.add(TextSpan(text: body.substring(cursor, m.start)));
-      }
-      final rawUrl = m.group(0)!;
-      spans.add(WidgetSpan(
-        alignment: PlaceholderAlignment.baseline,
-        baseline:  TextBaseline.alphabetic,
-        child: GestureDetector(
-          onTap: () => _openUrl(rawUrl),
-          child: Text(
-            rawUrl,
-            style: style?.copyWith(
-              color:           linkColor,
-              fontWeight:      FontWeight.w600,
-              decoration:      TextDecoration.underline,
-              decorationColor: linkColor,
-            ),
-          ),
-        ),
-      ));
-      cursor = m.end;
-    }
-    if (cursor < body.length) {
-      spans.add(TextSpan(text: body.substring(cursor)));
-    }
-
-    return Text.rich(TextSpan(style: style, children: spans));
   }
 
   @override
@@ -4149,11 +4106,10 @@ class _NewsDetailSheet extends StatelessWidget {
 
           if (body.isNotEmpty) ...[
             const SizedBox(height: 16),
-            _linkifiedBody(
-              context,
-              body,
-              text.bodyMedium?.copyWith(color: scheme.onSurface, height: 1.5),
-              scheme.primary,
+            MarkdownLite(
+              text: body,
+              style: text.bodyMedium?.copyWith(color: scheme.onSurface, height: 1.5),
+              linkColor: scheme.primary,
             ),
           ],
 
