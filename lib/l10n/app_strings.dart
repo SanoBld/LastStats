@@ -469,6 +469,7 @@ abstract class AppStrings {
   String get backupRestoreKeysDesc;
   String get backupRestoreApiKeyLabel;
   String get backupRestoreSecretKeyLabel;
+  String get backupIncludeKeysDesc;
 
   // ── FAQ page ─────────────────────────────────────────────────────────────
   String get faqSectionLabel;

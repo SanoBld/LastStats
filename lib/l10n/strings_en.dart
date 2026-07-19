@@ -449,6 +449,7 @@ class AppStringsEn implements AppStrings {
   @override String get backupRestoreKeysDesc => 'Choose which Last.fm keys to restore from this backup.';
   @override String get backupRestoreApiKeyLabel => 'API key';
   @override String get backupRestoreSecretKeyLabel => 'Secret key';
+  @override String get backupIncludeKeysDesc => 'Include the keys in the exported file';
 
   @override String get faqSectionLabel             => 'Frequently asked questions';
   @override String get backupOverwriteWarning => 'Restoring a backup will overwrite your current settings.';

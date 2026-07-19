@@ -401,6 +401,7 @@ class AppStringsDe implements AppStrings {
   @override String get backupRestoreKeysDesc => 'Wähle, welche Last.fm-Schlüssel aus dieser Sicherung wiederhergestellt werden sollen.';
   @override String get backupRestoreApiKeyLabel => 'API-Schlüssel';
   @override String get backupRestoreSecretKeyLabel => 'Geheimer Schlüssel';
+  @override String get backupIncludeKeysDesc => 'Schlüssel in die exportierte Datei einbeziehen';
   @override String get faqSectionLabel => 'Häufig gestellte Fragen';
   @override String get backupOverwriteWarning => 'Das Wiederherstellen einer Sicherung überschreibt deine aktuellen Einstellungen.';
   @override String get faqOpenSourceBadge => 'LastStats ist ein kostenloses Open-Source-Projekt, mit ❤️ erstellt von SanoBld.';

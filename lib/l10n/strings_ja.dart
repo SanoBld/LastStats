@@ -401,6 +401,7 @@ class AppStringsJa implements AppStrings {
   @override String get backupRestoreKeysDesc => 'このバックアップから復元するLast.fmのキーを選んでください。';
   @override String get backupRestoreApiKeyLabel => 'APIキー';
   @override String get backupRestoreSecretKeyLabel => 'シークレットキー';
+  @override String get backupIncludeKeysDesc => 'エクスポートするファイルにキーを含める';
   @override String get faqSectionLabel => 'よくある質問';
   @override String get backupOverwriteWarning => 'バックアップを復元すると、現在の設定は上書きされます。';
   @override String get faqOpenSourceBadge => 'LastStatsはSanoBldが❤️を込めて作った無料のオープンソースプロジェクトです。';

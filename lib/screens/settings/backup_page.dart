@@ -16,9 +16,18 @@ class _BackupPageState extends State<BackupPage> {
   bool _exporting = false;
   bool _importing = false;
 
+  // Whether to include the Last.fm API key / secret key in the exported
+  // file. Both default to on; the user can uncheck either before exporting
+  // (e.g. to share a backup without sensitive credentials).
+  bool _includeApiKey    = true;
+  bool _includeSecretKey = true;
+
   Future<void> _export() async {
     setState(() => _exporting = true);
-    final ok = await BackupService.exportToFile();
+    final ok = await BackupService.exportToFile(
+      includeApiKey:    _includeApiKey,
+      includeSecretKey: _includeSecretKey,
+    );
     if (!mounted) return;
     setState(() => _exporting = false);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -160,6 +169,24 @@ class _BackupPageState extends State<BackupPage> {
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             trailing: Icon(Icons.chevron_right_rounded, color: scheme.onSurfaceVariant),
             onTap: _exporting ? null : _export,
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          SwitchListTile(
+            secondary: Icon(Icons.vpn_key_rounded, color: scheme.primary),
+            title: Text(L.backupRestoreApiKeyLabel,
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            subtitle: Text(L.backupIncludeKeysDesc,
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            value: _includeApiKey,
+            onChanged: (v) => setState(() => _includeApiKey = v),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          SwitchListTile(
+            secondary: Icon(Icons.key_rounded, color: scheme.primary),
+            title: Text(L.backupRestoreSecretKeyLabel,
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            value: _includeSecretKey,
+            onChanged: (v) => setState(() => _includeSecretKey = v),
           ),
         ]),
 

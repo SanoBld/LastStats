@@ -446,6 +446,7 @@ class AppStringsZh implements AppStrings {
   @override String get backupRestoreKeysDesc => '选择要从此备份恢复的 Last.fm 密钥。';
   @override String get backupRestoreApiKeyLabel => 'API 密钥';
   @override String get backupRestoreSecretKeyLabel => '密钥';
+  @override String get backupIncludeKeysDesc => '在导出的文件中包含密钥';
 
   @override String get faqSectionLabel             => '常见问题';
   @override String get backupOverwriteWarning => '恢复备份将覆盖你当前的设置。';

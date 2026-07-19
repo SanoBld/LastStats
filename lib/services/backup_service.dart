@@ -55,12 +55,28 @@ class BackupService {
 
   // ── Build the backup payload ─────────────────────────────────────────────
 
-  static Future<String> buildBackupJson() async {
+  /// Builds the backup JSON.
+  /// [includeApiKey] controls whether the Last.fm username + API key (and
+  /// the whole multi-account list, which embeds per-account keys) are
+  /// written to the file. [includeSecretKey] controls whether the API
+  /// secret key (and the session key derived from it) are written.
+  /// Both default to true so nothing changes for existing callers.
+  static Future<String> buildBackupJson({
+    bool includeApiKey = true,
+    bool includeSecretKey = true,
+  }) async {
     final p = await SharedPreferences.getInstance();
     final map = <String, dynamic>{};
     for (final key in p.getKeys()) {
       if (!key.startsWith('ls_')) continue;
       if (_kBackupExcludeKeys.contains(key)) continue;
+      if (!includeApiKey &&
+          (key == 'ls_apikey' || key == 'ls_username' || key == 'ls_accounts' || key == 'ls_active_account')) {
+        continue;
+      }
+      if (!includeSecretKey && (key == 'ls_secret_key' || key == 'ls_session_key')) {
+        continue;
+      }
       final v = p.get(key);
       if (v != null) map[key] = v;
     }
@@ -68,20 +84,22 @@ class BackupService {
     String activeUsername = '';
     String activeApiKey   = '';
 
-    final accountsRaw = map['ls_accounts'];
-    if (accountsRaw != null) {
-      try {
-        final accounts  = jsonDecode(accountsRaw.toString()) as List;
-        final activeIdx = (map['ls_active_account'] as num?)?.toInt() ?? 0;
-        if (accounts.isNotEmpty) {
-          final acc      = accounts[activeIdx.clamp(0, accounts.length - 1)] as Map<String, dynamic>;
-          activeUsername = (acc['username'] ?? '').toString();
-          activeApiKey   = (acc['apiKey']   ?? '').toString();
-        }
-      } catch (_) {}
+    if (includeApiKey) {
+      final accountsRaw = map['ls_accounts'];
+      if (accountsRaw != null) {
+        try {
+          final accounts  = jsonDecode(accountsRaw.toString()) as List;
+          final activeIdx = (map['ls_active_account'] as num?)?.toInt() ?? 0;
+          if (accounts.isNotEmpty) {
+            final acc      = accounts[activeIdx.clamp(0, accounts.length - 1)] as Map<String, dynamic>;
+            activeUsername = (acc['username'] ?? '').toString();
+            activeApiKey   = (acc['apiKey']   ?? '').toString();
+          }
+        } catch (_) {}
+      }
+      if (activeUsername.isEmpty) activeUsername = (map['ls_username'] ?? '').toString();
+      if (activeApiKey.isEmpty)   activeApiKey   = (map['ls_apikey']   ?? '').toString();
     }
-    if (activeUsername.isEmpty) activeUsername = (map['ls_username'] ?? '').toString();
-    if (activeApiKey.isEmpty)   activeApiKey   = (map['ls_apikey']   ?? '').toString();
 
     final now = DateTime.now();
     return jsonEncode({
@@ -103,9 +121,15 @@ class BackupService {
   // ── Export: real "Save As" dialog ────────────────────────────────────────
 
   /// Returns true if a file was actually written, false if cancelled/failed.
-  static Future<bool> exportToFile() async {
+  static Future<bool> exportToFile({
+    bool includeApiKey = true,
+    bool includeSecretKey = true,
+  }) async {
     try {
-      final payload = await buildBackupJson();
+      final payload = await buildBackupJson(
+        includeApiKey: includeApiKey,
+        includeSecretKey: includeSecretKey,
+      );
       final bytes   = Uint8List.fromList(utf8.encode(payload));
       final path = await FilePicker.platform.saveFile(
         dialogTitle: 'Save LastStats backup',

@@ -401,6 +401,7 @@ class AppStringsRu implements AppStrings {
   @override String get backupRestoreKeysDesc => 'Выберите, какие ключи Last.fm восстановить из этой резервной копии.';
   @override String get backupRestoreApiKeyLabel => 'Ключ API';
   @override String get backupRestoreSecretKeyLabel => 'Секретный ключ';
+  @override String get backupIncludeKeysDesc => 'Включить ключи в экспортируемый файл';
   @override String get faqSectionLabel => 'Часто задаваемые вопросы';
   @override String get backupOverwriteWarning => 'Восстановление резервной копии перезапишет ваши текущие настройки.';
   @override String get faqOpenSourceBadge => 'LastStats — бесплатный проект с открытым исходным кодом, созданный SanoBld с ❤️.';

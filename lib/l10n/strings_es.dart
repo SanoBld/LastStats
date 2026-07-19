@@ -449,6 +449,7 @@ class AppStringsEs implements AppStrings {
   @override String get backupRestoreKeysDesc => 'Elige qué claves de Last.fm restaurar desde esta copia de seguridad.';
   @override String get backupRestoreApiKeyLabel => 'Clave de API';
   @override String get backupRestoreSecretKeyLabel => 'Clave secreta';
+  @override String get backupIncludeKeysDesc => 'Incluir las claves en el archivo exportado';
 
   @override String get faqSectionLabel             => 'Preguntas frecuentes';
   @override String get backupOverwriteWarning => 'Restaurar una copia de seguridad sobrescribirá tus ajustes actuales.';
