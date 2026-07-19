@@ -117,7 +117,7 @@ Future<void> _runUpdateCheck() async {
 
   // Always keep the latest pending update as a local "news" item so it
   // shows up in the dashboard's news bell, even if we don't re-notify.
-  final downloadUrl = info.hasApk ? info.apkUrl! : info.releaseUrl;
+  final downloadUrl = info.hasDownload ? info.downloadUrl! : info.releaseUrl;
   final localItem = jsonEncode({
     'id':    'local_update_${info.version}',
     'title': 'LastStats ${info.version} disponible',
