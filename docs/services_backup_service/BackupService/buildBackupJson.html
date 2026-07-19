@@ -55,23 +55,43 @@
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span>
-<span class="name ">buildBackupJson</span>(<wbr>)
+<span class="name ">buildBackupJson</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="buildBackupJson-param-includeApiKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeApiKey</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="buildBackupJson-param-includeSecretKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeSecretKey</span> = <span class="default-value">true</span>, </span></li>
+</ol>})
 
       
 
     </section>
     
+<section class="desc markdown">
+  <p>Builds the backup JSON.
+<code>includeApiKey</code> controls whether the Last.fm username + API key (and
+the whole multi-account list, which embeds per-account keys) are
+written to the file. <code>includeSecretKey</code> controls whether the API
+secret key (and the session key derived from it) are written.
+Both default to true so nothing changes for existing callers.</p>
+</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Future&lt;String&gt; buildBackupJson() async {
+  <pre class="language-dart"><code class="language-dart">static Future&lt;String&gt; buildBackupJson({
+  bool includeApiKey = true,
+  bool includeSecretKey = true,
+}) async {
   final p = await SharedPreferences.getInstance();
   final map = &lt;String, dynamic&gt;{};
   for (final key in p.getKeys()) {
     if (!key.startsWith(&#39;ls_&#39;)) continue;
     if (_kBackupExcludeKeys.contains(key)) continue;
+    if (!includeApiKey &amp;&amp;
+        (key == &#39;ls_apikey&#39; || key == &#39;ls_username&#39; || key == &#39;ls_accounts&#39; || key == &#39;ls_active_account&#39;)) {
+      continue;
+    }
+    if (!includeSecretKey &amp;&amp; (key == &#39;ls_secret_key&#39; || key == &#39;ls_session_key&#39;)) {
+      continue;
+    }
     final v = p.get(key);
     if (v != null) map[key] = v;
   }
@@ -79,20 +99,22 @@
   String activeUsername = &#39;&#39;;
   String activeApiKey   = &#39;&#39;;
 
-  final accountsRaw = map[&#39;ls_accounts&#39;];
-  if (accountsRaw != null) {
-    try {
-      final accounts  = jsonDecode(accountsRaw.toString()) as List;
-      final activeIdx = (map[&#39;ls_active_account&#39;] as num?)?.toInt() ?? 0;
-      if (accounts.isNotEmpty) {
-        final acc      = accounts[activeIdx.clamp(0, accounts.length - 1)] as Map&lt;String, dynamic&gt;;
-        activeUsername = (acc[&#39;username&#39;] ?? &#39;&#39;).toString();
-        activeApiKey   = (acc[&#39;apiKey&#39;]   ?? &#39;&#39;).toString();
-      }
-    } catch (_) {}
+  if (includeApiKey) {
+    final accountsRaw = map[&#39;ls_accounts&#39;];
+    if (accountsRaw != null) {
+      try {
+        final accounts  = jsonDecode(accountsRaw.toString()) as List;
+        final activeIdx = (map[&#39;ls_active_account&#39;] as num?)?.toInt() ?? 0;
+        if (accounts.isNotEmpty) {
+          final acc      = accounts[activeIdx.clamp(0, accounts.length - 1)] as Map&lt;String, dynamic&gt;;
+          activeUsername = (acc[&#39;username&#39;] ?? &#39;&#39;).toString();
+          activeApiKey   = (acc[&#39;apiKey&#39;]   ?? &#39;&#39;).toString();
+        }
+      } catch (_) {}
+    }
+    if (activeUsername.isEmpty) activeUsername = (map[&#39;ls_username&#39;] ?? &#39;&#39;).toString();
+    if (activeApiKey.isEmpty)   activeApiKey   = (map[&#39;ls_apikey&#39;]   ?? &#39;&#39;).toString();
   }
-  if (activeUsername.isEmpty) activeUsername = (map[&#39;ls_username&#39;] ?? &#39;&#39;).toString();
-  if (activeApiKey.isEmpty)   activeApiKey   = (map[&#39;ls_apikey&#39;]   ?? &#39;&#39;).toString();
 
   final now = DateTime.now();
   return jsonEncode({

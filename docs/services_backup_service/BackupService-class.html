@@ -169,14 +169,19 @@ for backward compatibility.
 </dd>
 
         <dt id="buildBackupJson" class="callable">
-  <span class="name"><a href="../services_backup_service/BackupService/buildBackupJson.html">buildBackupJson</a></span><span class="signature">(<wbr>)
+  <span class="name"><a href="../services_backup_service/BackupService/buildBackupJson.html">buildBackupJson</a></span><span class="signature">(<wbr>{<span class="parameter" id="buildBackupJson-param-includeApiKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeApiKey</span> = <span class="default-value">true</span>, </span><span class="parameter" id="buildBackupJson-param-includeSecretKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeSecretKey</span> = <span class="default-value">true</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span>
   </span>
   
 
 </dt>
 <dd>
-  
+  Builds the backup JSON.
+<code>includeApiKey</code> controls whether the Last.fm username + API key (and
+the whole multi-account list, which embeds per-account keys) are
+written to the file. <code>includeSecretKey</code> controls whether the API
+secret key (and the session key derived from it) are written.
+Both default to true so nothing changes for existing callers.
   
 
 </dd>
@@ -195,7 +200,7 @@ for backward compatibility.
 </dd>
 
         <dt id="exportToFile" class="callable">
-  <span class="name"><a href="../services_backup_service/BackupService/exportToFile.html">exportToFile</a></span><span class="signature">(<wbr>)
+  <span class="name"><a href="../services_backup_service/BackupService/exportToFile.html">exportToFile</a></span><span class="signature">(<wbr>{<span class="parameter" id="exportToFile-param-includeApiKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeApiKey</span> = <span class="default-value">true</span>, </span><span class="parameter" id="exportToFile-param-includeSecretKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeSecretKey</span> = <span class="default-value">true</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
   </span>
   
