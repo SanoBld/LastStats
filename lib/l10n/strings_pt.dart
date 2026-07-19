@@ -445,6 +445,10 @@ class AppStringsPt implements AppStrings {
   @override String get backupFileSaveFailed        => 'Falha ao salvar o arquivo';
   @override String get setupRestoreBackup          => 'Restaurar um backup';
   @override String get setupRestoreBackupSub       => 'Recupere sua conta e configurações a partir de um arquivo .json de backup';
+  @override String get backupRestoreKeysTitle => 'Restaurar chaves de API';
+  @override String get backupRestoreKeysDesc => 'Escolha quais chaves do Last.fm restaurar a partir deste backup.';
+  @override String get backupRestoreApiKeyLabel => 'Chave de API';
+  @override String get backupRestoreSecretKeyLabel => 'Chave secreta';
 
   @override String get faqSectionLabel             => 'Perguntas frequentes';
   @override String get backupOverwriteWarning => 'Restaurar um backup substituirá suas configurações atuais.';

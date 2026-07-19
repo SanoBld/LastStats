@@ -29,10 +29,73 @@ class _BackupPageState extends State<BackupPage> {
 
   Future<void> _import() async {
     setState(() => _importing = true);
-    final result = await BackupService.importFromFile();
+    final preview = await BackupService.pickAndPreviewFile();
+    if (!mounted) return;
+    if (preview == null) {
+      setState(() => _importing = false);
+      return; // user cancelled the picker, or file unreadable
+    }
+
+    // Ask which sensitive keys to restore, only for the ones actually
+    // present in the backup file.
+    bool restoreApiKey    = preview.hasApiKey;
+    bool restoreSecretKey = preview.hasSecretKey;
+
+    if (preview.hasApiKey || preview.hasSecretKey) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (dialogCtx) => StatefulBuilder(
+          builder: (dialogCtx, setDialogState) => AlertDialog(
+            title: Text(L.backupRestoreKeysTitle),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(L.backupRestoreKeysDesc),
+                if (preview.hasApiKey)
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(L.backupRestoreApiKeyLabel),
+                    value: restoreApiKey,
+                    onChanged: (v) => setDialogState(() => restoreApiKey = v ?? false),
+                  ),
+                if (preview.hasSecretKey)
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(L.backupRestoreSecretKeyLabel),
+                    value: restoreSecretKey,
+                    onChanged: (v) => setDialogState(() => restoreSecretKey = v ?? false),
+                  ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogCtx).pop(false),
+                child: Text(L.commonCancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(dialogCtx).pop(true),
+                child: Text(L.commonApply),
+              ),
+            ],
+          ),
+        ),
+      );
+      if (confirmed != true) {
+        if (mounted) setState(() => _importing = false);
+        return; // user cancelled the restore itself
+      }
+    }
+
+    final result = await BackupService.applyBackupJson(
+      preview.raw,
+      restoreApiKey:    restoreApiKey,
+      restoreSecretKey: restoreSecretKey,
+    );
     if (!mounted) return;
     setState(() => _importing = false);
-    if (result == null) return; // user cancelled the picker
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(result.success ? L.importSuccess : L.importInvalidFormat),
       behavior: SnackBarBehavior.floating,

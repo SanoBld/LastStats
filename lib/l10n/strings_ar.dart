@@ -397,6 +397,10 @@ class AppStringsAr implements AppStrings {
   @override String get backupFileSaveFailed => 'فشل حفظ الملف';
   @override String get setupRestoreBackup => 'استعادة نسخة احتياطية';
   @override String get setupRestoreBackupSub => 'استرجع حسابك وإعداداتك من ملف نسخة احتياطية .json';
+  @override String get backupRestoreKeysTitle => 'استعادة مفاتيح API';
+  @override String get backupRestoreKeysDesc => 'اختر مفاتيح Last.fm التي تريد استعادتها من هذه النسخة الاحتياطية.';
+  @override String get backupRestoreApiKeyLabel => 'مفتاح API';
+  @override String get backupRestoreSecretKeyLabel => 'المفتاح السري';
   @override String get faqSectionLabel => 'الأسئلة الشائعة';
   @override String get backupOverwriteWarning => 'ستؤدي استعادة نسخة احتياطية إلى استبدال إعداداتك الحالية.';
   @override String get faqOpenSourceBadge => 'LastStats مشروع مجاني ومفتوح المصدر صنعه SanoBld بـ ❤️.';

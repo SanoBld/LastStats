@@ -397,6 +397,10 @@ class AppStringsJa implements AppStrings {
   @override String get backupFileSaveFailed => 'ファイルの保存に失敗しました';
   @override String get setupRestoreBackup => 'バックアップを復元';
   @override String get setupRestoreBackupSub => '.jsonバックアップファイルからアカウントと設定を復元します';
+  @override String get backupRestoreKeysTitle => 'APIキーを復元';
+  @override String get backupRestoreKeysDesc => 'このバックアップから復元するLast.fmのキーを選んでください。';
+  @override String get backupRestoreApiKeyLabel => 'APIキー';
+  @override String get backupRestoreSecretKeyLabel => 'シークレットキー';
   @override String get faqSectionLabel => 'よくある質問';
   @override String get backupOverwriteWarning => 'バックアップを復元すると、現在の設定は上書きされます。';
   @override String get faqOpenSourceBadge => 'LastStatsはSanoBldが❤️を込めて作った無料のオープンソースプロジェクトです。';

@@ -445,6 +445,10 @@ class AppStringsEs implements AppStrings {
   @override String get backupFileSaveFailed        => 'No se pudo guardar el archivo';
   @override String get setupRestoreBackup          => 'Restaurar una copia de seguridad';
   @override String get setupRestoreBackupSub       => 'Recupera tu cuenta y ajustes desde un archivo .json de copia de seguridad';
+  @override String get backupRestoreKeysTitle => 'Restaurar claves de API';
+  @override String get backupRestoreKeysDesc => 'Elige qué claves de Last.fm restaurar desde esta copia de seguridad.';
+  @override String get backupRestoreApiKeyLabel => 'Clave de API';
+  @override String get backupRestoreSecretKeyLabel => 'Clave secreta';
 
   @override String get faqSectionLabel             => 'Preguntas frecuentes';
   @override String get backupOverwriteWarning => 'Restaurar una copia de seguridad sobrescribirá tus ajustes actuales.';

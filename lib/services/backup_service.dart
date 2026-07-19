@@ -35,6 +35,21 @@ class BackupResult {
   const BackupResult({required this.success, this.username, this.apiKey});
 }
 
+/// Lightweight look at a backup file's content, used to ask the user which
+/// sensitive keys they want to restore before actually applying anything.
+class BackupPreview {
+  final String raw;
+  final bool hasApiKey;
+  final bool hasSecretKey;
+  final String? username;
+  const BackupPreview({
+    required this.raw,
+    required this.hasApiKey,
+    required this.hasSecretKey,
+    this.username,
+  });
+}
+
 class BackupService {
   BackupService._();
 
@@ -117,9 +132,11 @@ class BackupService {
 
   // ── Import: real file picker ─────────────────────────────────────────────
 
-  /// Opens the native file picker, reads + parses the chosen .json, applies
-  /// it, and returns the result. Returns null if the user cancelled.
-  static Future<BackupResult?> importFromFile() async {
+  /// Opens the native file picker and reads the chosen .json, returning a
+  /// [BackupPreview] so the caller can ask the user which sensitive keys
+  /// (API key, secret key) to actually restore before applying anything.
+  /// Returns null if the user cancelled or the file couldn't be read/parsed.
+  static Future<BackupPreview?> pickAndPreviewFile() async {
     final result = await FilePicker.platform.pickFiles(
       dialogTitle: 'Choose a LastStats backup file',
       type: FileType.custom,
@@ -128,23 +145,79 @@ class BackupService {
     );
     if (result == null || result.files.isEmpty) return null;
 
-    final file = result.files.single;
-    final bytes = file.bytes;
-    if (bytes == null) return const BackupResult(success: false);
+    final bytes = result.files.single.bytes;
+    if (bytes == null) return null;
 
     String raw;
     try {
       raw = utf8.decode(bytes);
     } catch (_) {
-      return const BackupResult(success: false);
+      return null;
     }
 
-    return applyBackupJson(raw);
+    return previewBackup(raw);
+  }
+
+  /// Inspects a raw backup JSON string without applying anything, so the UI
+  /// can show "restore API key?" / "restore secret key?" checkboxes.
+  static BackupPreview? previewBackup(String raw) {
+    Map<String, dynamic> parsed;
+    try {
+      parsed = jsonDecode(raw) as Map<String, dynamic>;
+    } catch (_) {
+      return null;
+    }
+
+    String username = '';
+    bool hasApiKey = false;
+    bool hasSecretKey = false;
+
+    if (parsed['app'] == 'LastStats') {
+      final prefs = parsed['prefs'];
+      if (prefs is Map) {
+        hasApiKey = (prefs['ls_apikey']     ?? '').toString().isNotEmpty ||
+                    (parsed['api_key']      ?? '').toString().isNotEmpty;
+        hasSecretKey = (prefs['ls_secret_key'] ?? '').toString().isNotEmpty;
+      }
+      username = (parsed['username'] ?? '').toString();
+    } else {
+      // Simple format fallback: {"username":"…","api_key":"…"}
+      final k = (parsed['api_key'] ?? parsed['apiKey'] ?? parsed['api-key'] ?? '').toString();
+      hasApiKey = k.isNotEmpty;
+      username  = (parsed['username'] ?? '').toString();
+    }
+
+    return BackupPreview(
+      raw: raw,
+      hasApiKey: hasApiKey,
+      hasSecretKey: hasSecretKey,
+      username: username.isEmpty ? null : username,
+    );
+  }
+
+  /// Kept for backward compatibility — reads + applies a backup file in one
+  /// shot, restoring the API key and secret key unconditionally. Prefer
+  /// [pickAndPreviewFile] + [applyBackupJson] when the caller wants to let
+  /// the user choose what to restore.
+  static Future<BackupResult?> importFromFile() async {
+    final preview = await pickAndPreviewFile();
+    if (preview == null) return null;
+    return applyBackupJson(preview.raw);
   }
 
   // ── Apply a parsed backup ────────────────────────────────────────────────
 
-  static Future<BackupResult> applyBackupJson(String raw) async {
+  /// Applies a raw backup JSON string.
+  /// [restoreApiKey] controls whether the Last.fm username + API key (and
+  /// the whole multi-account list, which embeds per-account keys) are
+  /// restored. [restoreSecretKey] controls whether the API secret key (and
+  /// the session key derived from it) are restored. Both default to true
+  /// for backward compatibility.
+  static Future<BackupResult> applyBackupJson(
+    String raw, {
+    bool restoreApiKey = true,
+    bool restoreSecretKey = true,
+  }) async {
     Map<String, dynamic> parsed;
     try {
       parsed = jsonDecode(raw) as Map<String, dynamic>;
@@ -170,6 +243,23 @@ class BackupService {
       prefsMap = {'ls_username': u, 'ls_apikey': k};
       username = u;
       apiKey   = k;
+    }
+
+    // Drop sensitive keys the user chose not to restore.
+    final exclude = <String>{};
+    if (!restoreApiKey) {
+      exclude.addAll(['ls_apikey', 'ls_username', 'ls_accounts', 'ls_active_account']);
+      username = null;
+      apiKey   = null;
+    }
+    if (!restoreSecretKey) {
+      // The session key is only valid alongside the secret it was derived
+      // from — restoring it without the secret would silently break
+      // favorites, so both are excluded together.
+      exclude.addAll(['ls_secret_key', 'ls_session_key']);
+    }
+    if (exclude.isNotEmpty) {
+      prefsMap.removeWhere((k, _) => exclude.contains(k));
     }
 
     await _applyPrefs(prefsMap);
@@ -221,5 +311,22 @@ class BackupService {
     oledModeNotifier.value              = p.getBool('ls_oled_mode')            ?? false;
     musicPlatformNotifier.value         = p.getString('ls_music_platform')     ?? 'lastfm';
     showAllPlatformLinksNotifier.value  = p.getBool('ls_show_all_platform_links') ?? false;
+    // Last.fm write-access credentials (only present if they were restored).
+    secretKeyNotifier.value             = p.getString('ls_secret_key')  ?? '';
+    sessionKeyNotifier.value            = p.getString('ls_session_key') ?? '';
+    // Remaining misc toggles.
+    hapticFeedbackNotifier.value        = p.getBool('ls_haptic_feedback')      ?? true;
+    navLabelNotifier.value              = p.getBool('ls_nav_labels')           ?? true;
+    notifNewsEnabledNotifier.value      = p.getBool('ls_notif_news_enabled')   ?? false;
+    showNewsBadgeNotifier.value         = p.getBool('ls_show_news_badge')      ?? true;
+    showLovedBadgeNotifier.value        = p.getBool('ls_show_loved_badge')     ?? true;
+    showFavoritesStatNotifier.value     = p.getBool('ls_show_favorites')       ?? true;
+    artworkColorThemeNotifier.value     = p.getBool('ls_artwork_color_theme')  ?? false;
+    keepLastArtworkColorNotifier.value  = p.getBool('ls_keep_last_artwork_color') ?? false;
+    pcModeNotifier.value                = p.getString('ls_pc_mode')            ?? 'auto';
+    final fallbackHex = p.getString('ls_nowplaying_fallback_color');
+    if (fallbackHex != null) {
+      nowPlayingFallbackColorNotifier.value = accentFromString(fallbackHex);
+    }
   }
 }

@@ -465,6 +465,10 @@ abstract class AppStrings {
   String get backupFileSaveFailed;
   String get setupRestoreBackup;
   String get setupRestoreBackupSub;
+  String get backupRestoreKeysTitle;
+  String get backupRestoreKeysDesc;
+  String get backupRestoreApiKeyLabel;
+  String get backupRestoreSecretKeyLabel;
 
   // ── FAQ page ─────────────────────────────────────────────────────────────
   String get faqSectionLabel;

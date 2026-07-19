@@ -397,6 +397,10 @@ class AppStringsDe implements AppStrings {
   @override String get backupFileSaveFailed => 'Datei konnte nicht gespeichert werden';
   @override String get setupRestoreBackup => 'Sicherung wiederherstellen';
   @override String get setupRestoreBackupSub => 'Stelle dein Konto und deine Einstellungen aus einer .json-Sicherungsdatei wieder her';
+  @override String get backupRestoreKeysTitle => 'API-Schlüssel wiederherstellen';
+  @override String get backupRestoreKeysDesc => 'Wähle, welche Last.fm-Schlüssel aus dieser Sicherung wiederhergestellt werden sollen.';
+  @override String get backupRestoreApiKeyLabel => 'API-Schlüssel';
+  @override String get backupRestoreSecretKeyLabel => 'Geheimer Schlüssel';
   @override String get faqSectionLabel => 'Häufig gestellte Fragen';
   @override String get backupOverwriteWarning => 'Das Wiederherstellen einer Sicherung überschreibt deine aktuellen Einstellungen.';
   @override String get faqOpenSourceBadge => 'LastStats ist ein kostenloses Open-Source-Projekt, mit ❤️ erstellt von SanoBld.';

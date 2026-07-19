@@ -397,6 +397,10 @@ class AppStringsIt implements AppStrings {
   @override String get backupFileSaveFailed => 'Impossibile salvare il file';
   @override String get setupRestoreBackup => 'Ripristina un backup';
   @override String get setupRestoreBackupSub => 'Recupera il tuo account e le impostazioni da un file di backup .json';
+  @override String get backupRestoreKeysTitle => 'Ripristina chiavi API';
+  @override String get backupRestoreKeysDesc => 'Scegli quali chiavi Last.fm ripristinare da questo backup.';
+  @override String get backupRestoreApiKeyLabel => 'Chiave API';
+  @override String get backupRestoreSecretKeyLabel => 'Chiave segreta';
   @override String get faqSectionLabel => 'Domande frequenti';
   @override String get backupOverwriteWarning => 'Il ripristino di un backup sovrascriverà le tue impostazioni attuali.';
   @override String get faqOpenSourceBadge => 'LastStats è un progetto gratuito e open-source realizzato con ❤️ da SanoBld.';

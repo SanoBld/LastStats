@@ -4004,9 +4004,21 @@ class _NewsListTileState extends State<_NewsListTile> {
 
 // ── Full news detail sheet, with clickable links ───────────────────────────────
 
-class _NewsDetailSheet extends StatelessWidget {
+class _NewsDetailSheet extends StatefulWidget {
   final Map<String, dynamic> item;
   const _NewsDetailSheet({required this.item});
+
+  @override
+  State<_NewsDetailSheet> createState() => _NewsDetailSheetState();
+}
+
+class _NewsDetailSheetState extends State<_NewsDetailSheet> {
+  Map<String, dynamic> get item => widget.item;
+
+  // Above this length, the body starts collapsed behind a "Voir plus" link
+  // so long release notes don't force the sheet open at full height.
+  static const _collapseThreshold = 400;
+  bool _expanded = false;
 
   // NOTE: rich text rendering (bold/italic/code/lists/headers/links) is now
   // handled by the shared MarkdownLite widget (see widgets/markdown_lite.dart).
@@ -4032,6 +4044,9 @@ class _NewsDetailSheet extends StatelessWidget {
     final emoji = (item['emoji'] ?? '').toString();
     final url   = (item['url']   ?? '').toString();
     final (icon, color) = _NewsPage._typeStyle(type);
+
+    final isLong    = body.length > _collapseThreshold;
+    final shownBody = (isLong && !_expanded) ? body.substring(0, _collapseThreshold) : body;
 
     return DraggableScrollableSheet(
       expand: false,
@@ -4103,10 +4118,23 @@ class _NewsDetailSheet extends StatelessWidget {
           if (body.isNotEmpty) ...[
             const SizedBox(height: 16),
             MarkdownLite(
-              text: body,
+              text: shownBody,
               style: text.bodyMedium?.copyWith(color: scheme.onSurface, height: 1.5),
               linkColor: scheme.primary,
             ),
+            if (isLong) ...[
+              const SizedBox(height: 4),
+              InkWell(
+                onTap: () => setState(() => _expanded = !_expanded),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Text(_expanded ? L.commonSeeLess : L.commonSeeMore,
+                      style: text.labelMedium?.copyWith(
+                          color: scheme.primary, fontWeight: FontWeight.w700)),
+                  Icon(_expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                      size: 18, color: scheme.primary),
+                ]),
+              ),
+            ],
           ],
 
           const SizedBox(height: 20),

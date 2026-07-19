@@ -445,6 +445,10 @@ class AppStringsFr implements AppStrings {
   @override String get backupFileSaveFailed        => "Échec de l'enregistrement";
   @override String get setupRestoreBackup          => 'Restaurer une sauvegarde';
   @override String get setupRestoreBackupSub       => "Retrouve ton compte et tes réglages depuis un fichier de sauvegarde .json";
+  @override String get backupRestoreKeysTitle => "Restaurer les clés API";
+  @override String get backupRestoreKeysDesc => "Choisis les clés Last.fm à restaurer depuis cette sauvegarde.";
+  @override String get backupRestoreApiKeyLabel => "Clé API";
+  @override String get backupRestoreSecretKeyLabel => "Clé secrète";
 
   @override String get faqSectionLabel             => 'Questions fréquentes';
   @override String get backupOverwriteWarning => 'Restaurer une sauvegarde écrasera vos paramètres actuels.';
