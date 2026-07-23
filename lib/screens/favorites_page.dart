@@ -102,9 +102,23 @@ class _FavoritesPageState extends State<FavoritesPage> {
     final scheme = Theme.of(context).colorScheme;
     final items  = _filtered;
 
+    final text   = Theme.of(context).textTheme;
+
     return Scaffold(
-      appBar: AppBar(title: Text(L.favPageTitle)),
-      body: AnimatedSwitcher(
+      body: SafeArea(child: Column(children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 12, 16, 2),
+          child: Row(children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back_rounded),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            Expanded(child:
+              Text(L.favPageTitle, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
+            ),
+          ]),
+        ),
+        Expanded(child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
         child: _loading
           ? const Center(key: ValueKey('load'), child: CircularProgressIndicator())
@@ -161,7 +175,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
                       ),
               ),
             ]),
-      ),
+      )),
+      ])),
     );
   }
 

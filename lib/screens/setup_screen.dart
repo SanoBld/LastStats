@@ -232,8 +232,10 @@ class _SetupScreenState extends State<SetupScreen>
       final service  = LastFmService(apiKey: apiKey, username: username);
       final userInfo = await service.getUserInfo();
 
-      if (userInfo == null) throw Exception(
+      if (userInfo == null) {
+        throw Exception(
           localeNotifier.value == 'en' ? 'Profile not found.' : 'Profil introuvable.');
+      }
 
       if (_rememberMe) {
         final prefs = await SharedPreferences.getInstance();
@@ -265,13 +267,13 @@ class _SetupScreenState extends State<SetupScreen>
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          pageBuilder: (_, __, ___) => _FirstLoadScreen(
+          pageBuilder: (_, _, _) => _FirstLoadScreen(
             username:       username,
             apiKey:         apiKey,
             service:        service,
             totalScrobbles: totalScrobbles,
           ),
-          transitionsBuilder: (_, anim, __, child) => FadeTransition(
+          transitionsBuilder: (_, anim, _, child) => FadeTransition(
             opacity: CurvedAnimation(parent: anim, curve: Curves.easeOut),
             child: child,
           ),
@@ -894,11 +896,11 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          pageBuilder: (_, __, ___) => OnboardingFlow(
+          pageBuilder: (_, _, _) => OnboardingFlow(
             username: widget.username,
             apiKey:   widget.apiKey,
           ),
-          transitionsBuilder: (_, anim, __, child) {
+          transitionsBuilder: (_, anim, _, child) {
             final curved = CurvedAnimation(
                 parent: anim, curve: Curves.easeOutCubic);
             return SlideTransition(
@@ -1039,7 +1041,7 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
                         tween: Tween(begin: 0, end: _state.fraction),
                         duration: const Duration(milliseconds: 400),
                         curve: Curves.easeOutCubic,
-                        builder: (_, v, __) => LinearProgressIndicator(
+                        builder: (_, v, _) => LinearProgressIndicator(
                           value:           v,
                           minHeight:       7,
                           backgroundColor: scheme.surfaceContainerHigh,
