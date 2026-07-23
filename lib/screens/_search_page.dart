@@ -94,8 +94,7 @@ class _SearchPageState extends State<_SearchPage> {
           widget.service.searchAlbums(q,  limit: 10),
           widget.service.searchTracks(q,  limit: 10),
         ]);
-        if (mounted) {
-          setState(() {
+        if (mounted) setState(() {
           _allResults = {
             _kSearchProfiles: res[0],
             _kSearchArtists:  res[1],
@@ -105,7 +104,6 @@ class _SearchPageState extends State<_SearchPage> {
           _results   = [];
           _searching = false;
         });
-        }
       } else {
         List<dynamic> res;
         switch (_tab) {
@@ -279,7 +277,7 @@ class _SearchPageState extends State<_SearchPage> {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 itemCount: profiles.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 10),
+                separatorBuilder: (_, __) => const SizedBox(width: 10),
                 itemBuilder: (ctx, i) {
                   final u     = profiles[i] as Map<String, dynamic>;
                   final uname = (u['name'] ?? '').toString();
@@ -307,8 +305,9 @@ class _SearchPageState extends State<_SearchPage> {
               return InkWell(
                 borderRadius: BorderRadius.circular(10),
                 onTap: () { _haptic(_HapticImpact.light); _openMusicDetail(context, item, 'artists'); },
-                child: _ItemTile(name: name, sub: '', imageUrl: raw, rank: '',
-                  imageFuture: ImageService.resolveArtist(name, lastfmUrl: raw.isNotEmpty ? raw : null)),
+                child: _FadeSlideIn(
+                  child: _ItemTile(name: name, sub: '', imageUrl: raw, rank: '',
+                  imageFuture: ImageService.resolveArtist(name, lastfmUrl: raw.isNotEmpty ? raw : null))),
               );
             }),
           ],
@@ -324,8 +323,9 @@ class _SearchPageState extends State<_SearchPage> {
               return InkWell(
                 borderRadius: BorderRadius.circular(10),
                 onTap: () { _haptic(_HapticImpact.light); _openMusicDetail(context, norm, 'albums'); },
-                child: _ItemTile(name: name, sub: artist, imageUrl: raw, rank: '',
-                  imageFuture: ImageService.resolveAlbum(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null)),
+                child: _FadeSlideIn(
+                  child: _ItemTile(name: name, sub: artist, imageUrl: raw, rank: '',
+                  imageFuture: ImageService.resolveAlbum(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null))),
               );
             }),
           ],
@@ -341,8 +341,9 @@ class _SearchPageState extends State<_SearchPage> {
               return InkWell(
                 borderRadius: BorderRadius.circular(10),
                 onTap: () { _haptic(_HapticImpact.light); _openMusicDetail(context, norm, 'tracks'); },
-                child: _ItemTile(name: name, sub: artist, imageUrl: raw, rank: '',
-                  imageFuture: ImageService.resolveTrack(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null)),
+                child: _FadeSlideIn(
+                  child: _ItemTile(name: name, sub: artist, imageUrl: raw, rank: '',
+                  imageFuture: ImageService.resolveTrack(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null))),
               );
             }),
           ],
@@ -415,7 +416,10 @@ class _SearchPageState extends State<_SearchPage> {
         return InkWell(
           onTap: () => _openMusicDetail(context, normalized, type),
           borderRadius: BorderRadius.circular(8),
-          child: _ItemTile(name: name, sub: sub, imageUrl: imgRaw, imageFuture: imgF, rank: '${i + 1}'),
+          child: _FadeSlideIn(
+            delay: Duration(milliseconds: (i * 25).clamp(0, 250)),
+            child: _ItemTile(name: name, sub: sub, imageUrl: imgRaw, imageFuture: imgF, rank: '${i + 1}'),
+          ),
         );
       },
     );

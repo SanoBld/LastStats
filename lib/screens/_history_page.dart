@@ -287,7 +287,7 @@ class _HistoryPageState extends State<_HistoryPage>
 class _TapScale extends StatefulWidget {
   final Widget child;
   final double scale;
-  const _TapScale({required this.child}) : scale = 0.92;
+  const _TapScale({required this.child, this.scale = 0.92});
   @override State<_TapScale> createState() => _TapScaleState();
 }
 class _TapScaleState extends State<_TapScale> {
@@ -494,7 +494,9 @@ class _HistListeView extends StatelessWidget {
         final alb = (t['album']?['#text']  ?? '').toString();
         final raw = _extractImage(t['image']);
         final timeOnly = _localTimeString(t);
-        return ListTile(
+        return _FadeSlideIn(
+          delay: Duration(milliseconds: (i * 20).clamp(0, 200)),
+          child: ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
           leading: _SmartImage(size: 44, borderRadius: 6, initialUrl: raw,
               resolver: () => ImageService.resolveTrack(tit, art, lastfmUrl: raw.isNotEmpty ? raw : null)),
@@ -514,7 +516,7 @@ class _HistListeView extends StatelessWidget {
               service,
             );
           },
-        );
+        ));
       },
     );
   }

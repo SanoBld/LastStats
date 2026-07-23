@@ -1618,7 +1618,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                     const SizedBox(height: 10),
                     ValueListenableBuilder<bool>(
                       valueListenable: showFavoritesStatNotifier,
-                      builder: (_, showFavStat, _) => _HeroStatCard(
+                      builder: (_, showFavStat, __) => _HeroStatCard(
                         total:       total,
                         avg:         avg.round(),
                         days:        days,
@@ -2107,11 +2107,14 @@ class _FriendsSection extends StatelessWidget {
                       final f     = friends[i];
                       final isFav = favorites.contains(f.username)
                                  || favProfiles.contains(f.username);
-                      return _FriendCard(
-                        friend:      f,
-                        isFav:       isFav,
-                        service:     service,
-                        onToggleFav: () => onToggleFav(f.username, !isFav),
+                      return _FadeSlideIn(
+                        delay: Duration(milliseconds: (i * 30).clamp(0, 240)),
+                        child: _FriendCard(
+                          friend:      f,
+                          isFav:       isFav,
+                          service:     service,
+                          onToggleFav: () => onToggleFav(f.username, !isFav),
+                        ),
                       );
                     },
                   ),
@@ -3775,20 +3778,24 @@ class _NewsPageState extends State<_NewsPage> {
     };
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(L.newsWhatsNew),
-        actions: [
-          if (_type != null || _customRange != null)
-            IconButton(
-              icon: const Icon(Icons.filter_alt_off_rounded),
-              tooltip: L.newsAll,
-              onPressed: () => setState(() { _type = null; _customRange = null; }),
-            ),
-        ],
-      ),
-      body: Column(children: [
+      body: SafeArea(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        // Header aligned with the other pages' style (title + trailing icon)
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          padding: const EdgeInsets.fromLTRB(20, 12, 16, 2),
+          child: Row(children: [
+            Expanded(child:
+              Text(L.newsWhatsNew, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
+            ),
+            if (_type != null || _customRange != null)
+              IconButton(
+                icon: const Icon(Icons.filter_alt_off_rounded),
+                tooltip: L.newsAll,
+                onPressed: () => setState(() { _type = null; _customRange = null; }),
+              ),
+          ]),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(L.newsItemsCount(filtered.length),
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
@@ -3844,7 +3851,9 @@ class _NewsPageState extends State<_NewsPage> {
                     final emoji = (item['emoji'] ?? '').toString();
                     final (icon, color) = _NewsPage._typeStyle(type);
 
-                    return _NewsListTile(
+                    return _FadeSlideIn(
+                      delay: Duration(milliseconds: (i * 25).clamp(0, 250)),
+                      child: _NewsListTile(
                       title: title, body: body, type: type, date: date,
                       emoji: emoji, icon: icon, color: color,
                       onTap: () => showModalBottomSheet(
@@ -3856,11 +3865,11 @@ class _NewsPageState extends State<_NewsPage> {
                         ),
                         builder: (_) => _NewsDetailSheet(item: item),
                       ),
-                    );
+                    ));
                   },
                 ),
         ),
-      ]),
+      ])),
     );
   }
 }
