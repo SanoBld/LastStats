@@ -3781,8 +3781,12 @@ class _NewsPageState extends State<_NewsPage> {
       body: SafeArea(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         // Header aligned with the other pages' style (title + trailing icon)
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 16, 2),
+          padding: const EdgeInsets.fromLTRB(4, 12, 16, 2),
           child: Row(children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back_rounded),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
             Expanded(child:
               Text(L.newsWhatsNew, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
             ),

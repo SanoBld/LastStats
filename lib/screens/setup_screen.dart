@@ -5,9 +5,11 @@ import '../app_state.dart';
 import '../l10n/l10n.dart';
 import '../supported_locales.dart';
 import '../services/lastfm_service.dart';
+import '../services/data_cache.dart';
 import '../services/prefetch_service.dart';
 import '../services/backup_service.dart';
 import '../services/favorites_auth.dart';
+import 'home_screen.dart';
 import 'onboarding_flow.dart';
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -199,6 +201,12 @@ class _SetupScreenState extends State<SetupScreen>
       _usernameCtrl.text = result.username!;
       _apikeyCtrl.text   = result.apiKey!;
       _errorMessage      = null;
+      // Reflect a restored secret key in the UI too, not just prefs,
+      // so the user can see/verify it before launching.
+      if (secretKeyNotifier.value.isNotEmpty) {
+        _secretCtrl.text   = secretKeyNotifier.value;
+        _enableFavorites   = true;
+      }
     });
   }
 
@@ -224,15 +232,23 @@ class _SetupScreenState extends State<SetupScreen>
       final service  = LastFmService(apiKey: apiKey, username: username);
       final userInfo = await service.getUserInfo();
 
-      if (userInfo == null) {
-        throw Exception(
+      if (userInfo == null) throw Exception(
           localeNotifier.value == 'en' ? 'Profile not found.' : 'Profil introuvable.');
-      }
 
       if (_rememberMe) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('ls_username', username);
         await prefs.setString('ls_apikey',   apiKey);
+      } else {
+        // A backup import (if used) writes credentials to disk straight
+        // away, regardless of this checkbox — clear them here so "don't
+        // remember me" is actually honored. In-memory notifiers are left
+        // untouched, so favorites still work for the current session.
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('ls_username');
+        await prefs.remove('ls_apikey');
+        await prefs.remove('ls_secret_key');
+        await prefs.remove('ls_session_key');
       }
 
       final totalScrobbles =
@@ -249,13 +265,13 @@ class _SetupScreenState extends State<SetupScreen>
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          pageBuilder: (_, _, _) => _FirstLoadScreen(
+          pageBuilder: (_, __, ___) => _FirstLoadScreen(
             username:       username,
             apiKey:         apiKey,
             service:        service,
             totalScrobbles: totalScrobbles,
           ),
-          transitionsBuilder: (_, anim, _, child) => FadeTransition(
+          transitionsBuilder: (_, anim, __, child) => FadeTransition(
             opacity: CurvedAnimation(parent: anim, curve: Curves.easeOut),
             child: child,
           ),
@@ -878,11 +894,11 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          pageBuilder: (_, _, _) => OnboardingFlow(
+          pageBuilder: (_, __, ___) => OnboardingFlow(
             username: widget.username,
             apiKey:   widget.apiKey,
           ),
-          transitionsBuilder: (_, anim, _, child) {
+          transitionsBuilder: (_, anim, __, child) {
             final curved = CurvedAnimation(
                 parent: anim, curve: Curves.easeOutCubic);
             return SlideTransition(
@@ -1023,7 +1039,7 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
                         tween: Tween(begin: 0, end: _state.fraction),
                         duration: const Duration(milliseconds: 400),
                         curve: Curves.easeOutCubic,
-                        builder: (_, v, _) => LinearProgressIndicator(
+                        builder: (_, v, __) => LinearProgressIndicator(
                           value:           v,
                           minHeight:       7,
                           backgroundColor: scheme.surfaceContainerHigh,
