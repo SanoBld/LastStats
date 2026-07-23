@@ -70,7 +70,9 @@
   _mem.clear();
   await init();
   final keys = _prefs!.getKeys().where((k) =&gt; k.startsWith(_prefix)).toList();
-  for (final k in keys) await _prefs!.remove(k);
+  for (final k in keys) {
+    await _prefs!.remove(k);
+  }
 }</code></pre>
 </section>
 

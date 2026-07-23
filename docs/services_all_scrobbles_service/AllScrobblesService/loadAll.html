@@ -87,7 +87,9 @@
       &#47;&#47; Skip si déjà en cache complet (sauf l&#39;année en cours, qui peut
       &#47;&#47; avoir de nouveaux scrobbles depuis le dernier chargement complet)
       if (!force &amp;&amp; isYearCached(year) &amp;&amp; isYearComplete(year) &amp;&amp;
-          year != currentYear) continue;
+          year != currentYear) {
+        continue;
+      }
 
       progressNotifier.value = AllScrobblesProgress(
         isLoading:   true,

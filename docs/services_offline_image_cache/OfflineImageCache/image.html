@@ -97,7 +97,7 @@
           height: height,
           fit: fit,
           gaplessPlayback: true,
-          errorBuilder: (_, __, ___) =&gt;
+          errorBuilder: (_, _, _) =&gt;
               errorWidget ?? placeholder ?? const SizedBox.shrink(),
         );
       }
@@ -114,7 +114,7 @@
         height: height,
         fit: fit,
         gaplessPlayback: true,
-        errorBuilder: (_, __, ___) =&gt;
+        errorBuilder: (_, _, _) =&gt;
             errorWidget ?? placeholder ?? const SizedBox.shrink(),
       );
     },

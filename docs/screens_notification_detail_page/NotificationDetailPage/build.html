@@ -124,7 +124,11 @@ Widget build(BuildContext context) {
       title: Text(L.notifDetailTitle),
       scrolledUnderElevation: 0,
     ),
-    body: ListView(
+    body: TweenAnimationBuilder&lt;double&gt;(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 300),
+      builder: (_, v, child) =&gt; Opacity(opacity: v, child: child),
+      child: ListView(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
       children: [
         &#47;&#47; Big icon &#47; emoji badge
@@ -195,6 +199,7 @@ Widget build(BuildContext context) {
           ),
         ],
       ],
+    ),
     ),
   );
 }</code></pre>
