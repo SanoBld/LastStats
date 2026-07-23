@@ -10,8 +10,7 @@ class _FadeSlideIn extends StatefulWidget {
   const _FadeSlideIn({
     required this.child,
     this.delay    = Duration.zero,
-    this.duration = const Duration(milliseconds: 350),
-  });
+  }) : duration = const Duration(milliseconds: 350);
 
   @override
   State<_FadeSlideIn> createState() => _FadeSlideInState();
@@ -196,7 +195,7 @@ class _SmartImageState extends State<_SmartImage> {
   Widget _img(String url, ColorScheme s) => ClipRRect(
     borderRadius: BorderRadius.circular(widget.borderRadius),
     child: Image.network(url, width: widget.size, height: widget.size, fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _fallback(s)));
+        errorBuilder: (_, _, _) => _fallback(s)));
 
   Widget _loading(ColorScheme s) => ClipRRect(
     borderRadius: BorderRadius.circular(widget.borderRadius),

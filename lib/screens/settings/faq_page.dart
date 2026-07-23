@@ -98,7 +98,7 @@ class _FaqItem {
 
 class _FaqTile extends StatefulWidget {
   final _FaqItem item;
-  const _FaqTile({super.key, required this.item});
+  const _FaqTile({required this.item});
 
   @override
   State<_FaqTile> createState() => _FaqTileState();

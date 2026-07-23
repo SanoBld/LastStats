@@ -261,7 +261,9 @@ class AllScrobblesService {
         // Skip si déjà en cache complet (sauf l'année en cours, qui peut
         // avoir de nouveaux scrobbles depuis le dernier chargement complet)
         if (!force && isYearCached(year) && isYearComplete(year) &&
-            year != currentYear) continue;
+            year != currentYear) {
+          continue;
+        }
 
         progressNotifier.value = AllScrobblesProgress(
           isLoading:   true,

@@ -104,8 +104,12 @@ Map<String, double> _buildGenreWeights(
 double _overlapScore(Map<String, double> a, Map<String, double> b) {
   if (a.isEmpty || b.isEmpty) return 0.0;
   double shared = 0, sumA = 0, sumB = 0;
-  for (final wa in a.values) sumA += wa;
-  for (final wb in b.values) sumB += wb;
+  for (final wa in a.values) {
+    sumA += wa;
+  }
+  for (final wb in b.values) {
+    sumB += wb;
+  }
   for (final k in a.keys) {
     final wb = b[k];
     if (wb != null) {
@@ -1225,7 +1229,7 @@ class _ItemCompareSheet extends StatelessWidget {
       return _ct('Tu écoutes ça ${x}x plus que $theirUsername.',
                   'You listen to this ${x}x more than $theirUsername.',
                   es: 'Escuchas esto ${x}x más que $theirUsername.',
-                  zh: '你听这个的次数是 $theirUsername 的 ${x} 倍。',
+                  zh: '你听这个的次数是 $theirUsername 的 $x 倍。',
                   pt: 'Você escuta isso ${x}x mais que $theirUsername.');
     }
     if (their / my > 1.3) {
@@ -1233,7 +1237,7 @@ class _ItemCompareSheet extends StatelessWidget {
       return _ct('$theirUsername écoute ça ${x}x plus que toi.',
                   '$theirUsername listens to this ${x}x more than you.',
                   es: '$theirUsername escucha esto ${x}x más que tú.',
-                  zh: '$theirUsername 听这个的次数是你的 ${x} 倍。',
+                  zh: '$theirUsername 听这个的次数是你的 $x 倍。',
                   pt: '$theirUsername escuta isso ${x}x mais que você.');
     }
     return _ct("Vous l'écoutez à peu près autant tous les deux.",

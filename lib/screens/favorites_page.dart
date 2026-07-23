@@ -104,9 +104,11 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
     return Scaffold(
       appBar: AppBar(title: Text(L.favPageTitle)),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(children: [
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 250),
+        child: _loading
+          ? const Center(key: ValueKey('load'), child: CircularProgressIndicator())
+          : Column(key: const ValueKey('content'), children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                 child: TextField(
@@ -143,15 +145,23 @@ class _FavoritesPageState extends State<FavoritesPage> {
                         separatorBuilder: (_, _) => const Divider(height: 1),
                         itemBuilder: (ctx, i) {
                           final t = items[i] as Map<String, dynamic>;
-                          return _FavoriteListTile(
-                            track:  t,
-                            onTap:  () => showDetailSheet(ctx, Map<String, dynamic>.from(t), 'tracks', widget.service),
-                            onRemove: () => _remove(t),
+                          // Light fade-in, no popup feel
+                          return TweenAnimationBuilder<double>(
+                            key: ValueKey(t['name']?.toString() ?? i),
+                            tween: Tween(begin: 0, end: 1),
+                            duration: const Duration(milliseconds: 220),
+                            builder: (_, v, child) => Opacity(opacity: v, child: child),
+                            child: _FavoriteListTile(
+                              track:  t,
+                              onTap:  () => showDetailSheet(ctx, Map<String, dynamic>.from(t), 'tracks', widget.service),
+                              onRemove: () => _remove(t),
+                            ),
                           );
                         },
                       ),
               ),
             ]),
+      ),
     );
   }
 

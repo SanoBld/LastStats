@@ -5,7 +5,6 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../l10n/l10n.dart';
-import '../../app_state.dart';
 import '../../services/update_service.dart';
 import 'settings_helpers.dart';
 

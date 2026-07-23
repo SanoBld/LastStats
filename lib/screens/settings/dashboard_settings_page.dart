@@ -475,7 +475,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
           const Divider(height: 1, indent: 16, endIndent: 16),
           ValueListenableBuilder<String>(
             valueListenable: sessionKeyNotifier,
-            builder: (_, session, __) {
+            builder: (_, session, _) {
               final enabled = session.isNotEmpty;
               return Opacity(
                 opacity: enabled ? 1.0 : 0.45,

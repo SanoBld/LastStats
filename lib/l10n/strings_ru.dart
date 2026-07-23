@@ -593,7 +593,7 @@ class AppStringsRu implements AppStrings {
   @override String dashUpdateTitle(String version, bool isBeta) =>
       '${isBeta ? "Бета-" : "Новое "}обновление: v$version';
   @override String newsItemsCount(int n) => '$n ${n > 1 ? "записей" : "запись"}';
-  @override String syncFrequencyHours(int h) => 'Каждые ${h} ч';
+  @override String syncFrequencyHours(int h) => 'Каждые $h ч';
   @override String syncNewScrobblesFound(int n) => n == 0 ? 'Новых скробблов нет' : 'Найдено новых скробблов: $n';
   @override String updatesPublishedOn(String date) => 'Опубликовано $date';
   @override String fallbackWillShow(String detail) => 'Будет показано: $detail';

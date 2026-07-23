@@ -2,11 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/storage_manager.dart';
-import '../../services/offline_image_cache.dart';
 import '../../services/data_cache.dart';
 import '../../services/scrobbles_file_cache.dart';
 import '../../services/image_service.dart';
-import '../../app_state.dart';
 import '../../l10n/l10n.dart';
 
 // Storage limit presets in bytes. 0 = unlimited.
@@ -474,9 +472,11 @@ class _OfflineModeCardState extends State<_OfflineModeCard> {
   void initState() {
     super.initState();
     SharedPreferences.getInstance().then((p) {
-      if (mounted) setState(() {
+      if (mounted) {
+        setState(() {
         _keepStale = p.getBool('ls_cache_serve_stale') ?? true;
       });
+      }
     });
   }
 

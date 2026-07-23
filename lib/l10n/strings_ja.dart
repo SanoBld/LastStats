@@ -592,7 +592,7 @@ class AppStringsJa implements AppStrings {
   @override String dashUpdateTitle(String version, bool isBeta) =>
       '${isBeta ? "ベータ" : "新しい"}アップデート：v$version';
   @override String newsItemsCount(int n) => '$n件';
-  @override String syncFrequencyHours(int h) => '${h}時間ごと';
+  @override String syncFrequencyHours(int h) => '$h時間ごと';
   @override String syncNewScrobblesFound(int n) => n == 0 ? '新しいスクロブルはありません' : '新しいスクロブルが$n件見つかりました';
   @override String updatesPublishedOn(String date) => '$date に公開';
   @override String fallbackWillShow(String detail) => '表示内容：$detail';

@@ -243,7 +243,7 @@ class OfflineImageCache {
             height: height,
             fit: fit,
             gaplessPlayback: true,
-            errorBuilder: (_, __, ___) =>
+            errorBuilder: (_, _, _) =>
                 errorWidget ?? placeholder ?? const SizedBox.shrink(),
           );
         }
@@ -260,7 +260,7 @@ class OfflineImageCache {
           height: height,
           fit: fit,
           gaplessPlayback: true,
-          errorBuilder: (_, __, ___) =>
+          errorBuilder: (_, _, _) =>
               errorWidget ?? placeholder ?? const SizedBox.shrink(),
         );
       },

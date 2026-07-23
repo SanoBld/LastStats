@@ -24,7 +24,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData, HapticFeedback, rootBundle, LogicalKeyboardKey, SingleActivator;
 import 'package:http/http.dart' as http;
-import 'package:palette_generator/palette_generator.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -45,7 +44,6 @@ import '../services/translation_service.dart';
 import '../services/lyrics_service.dart';
 import '../widgets/markdown_lite.dart';
 import 'favorites_page.dart';
-import 'notification_detail_page.dart';
 
 
 // ── Settings sub-pages ────────────────────────────────────────────────────────

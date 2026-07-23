@@ -94,7 +94,8 @@ class _SearchPageState extends State<_SearchPage> {
           widget.service.searchAlbums(q,  limit: 10),
           widget.service.searchTracks(q,  limit: 10),
         ]);
-        if (mounted) setState(() {
+        if (mounted) {
+          setState(() {
           _allResults = {
             _kSearchProfiles: res[0],
             _kSearchArtists:  res[1],
@@ -104,6 +105,7 @@ class _SearchPageState extends State<_SearchPage> {
           _results   = [];
           _searching = false;
         });
+        }
       } else {
         List<dynamic> res;
         switch (_tab) {
@@ -277,7 +279,7 @@ class _SearchPageState extends State<_SearchPage> {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 itemCount: profiles.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 10),
+                separatorBuilder: (_, _) => const SizedBox(width: 10),
                 itemBuilder: (ctx, i) {
                   final u     = profiles[i] as Map<String, dynamic>;
                   final uname = (u['name'] ?? '').toString();

@@ -132,7 +132,9 @@ class DataCache {
     _mem.clear();
     await init();
     final keys = _prefs!.getKeys().where((k) => k.startsWith(_prefix)).toList();
-    for (final k in keys) await _prefs!.remove(k);
+    for (final k in keys) {
+      await _prefs!.remove(k);
+    }
   }
 
   // ── Stats ─────────────────────────────────────────────────────────────────

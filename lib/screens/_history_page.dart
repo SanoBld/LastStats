@@ -287,7 +287,7 @@ class _HistoryPageState extends State<_HistoryPage>
 class _TapScale extends StatefulWidget {
   final Widget child;
   final double scale;
-  const _TapScale({required this.child, this.scale = 0.92});
+  const _TapScale({required this.child}) : scale = 0.92;
   @override State<_TapScale> createState() => _TapScaleState();
 }
 class _TapScaleState extends State<_TapScale> {

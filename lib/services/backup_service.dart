@@ -300,8 +300,9 @@ class BackupService {
     for (final e in prefs.entries) {
       if (!e.key.startsWith('ls_')) continue;
       final v = e.value;
-      if (v is bool)        await p.setBool(e.key, v);
-      else if (v is int)    await p.setInt(e.key, v);
+      if (v is bool) {
+        await p.setBool(e.key, v);
+      } else if (v is int)    await p.setInt(e.key, v);
       else if (v is double) await p.setDouble(e.key, v);
       else if (v is String) await p.setString(e.key, v);
       else if (v is List)   await p.setStringList(e.key, List<String>.from(v));

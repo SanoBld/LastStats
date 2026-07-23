@@ -13,7 +13,7 @@ class _RankingsPage extends StatefulWidget {
 class _RankingsPageState extends State<_RankingsPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabs;
-  String _period       = 'overall';
+  final String _period       = 'overall';
   int    _selectedMonth = 0; // 0 = whole year, 1-12 = specific month — only used with a year
   int?   _selectedYear;          // null = use period chips; int = year filter
   List<int> _availableYears = [];

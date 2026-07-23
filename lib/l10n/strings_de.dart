@@ -593,7 +593,7 @@ class AppStringsDe implements AppStrings {
   @override String dashUpdateTitle(String version, bool isBeta) =>
       '${isBeta ? "Beta" : "Neues"}-Update: v$version';
   @override String newsItemsCount(int n) => '$n ${n > 1 ? "Einträge" : "Eintrag"}';
-  @override String syncFrequencyHours(int h) => 'Alle ${h} Std.';
+  @override String syncFrequencyHours(int h) => 'Alle $h Std.';
   @override String syncNewScrobblesFound(int n) => n == 0 ? 'Keine neuen Scrobbles' : '$n neue(r) Scrobble(s) gefunden';
   @override String updatesPublishedOn(String date) => 'Veröffentlicht am $date';
   @override String fallbackWillShow(String detail) => 'Wird angezeigt: $detail';

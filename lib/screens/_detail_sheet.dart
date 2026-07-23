@@ -120,7 +120,7 @@ Future<int?> _extractDominantColorArgb(Uint8List bytes) async {
 
     final pixels = raw.buffer.asUint8List();
 
-    int? _dominant(bool saturatedOnly) {
+    int? dominant(bool saturatedOnly) {
       final counts = <int, int>{};
       for (int i = 0; i < pixels.length; i += 4) {
         if (pixels[i + 3] < 200) continue; // skip near-transparent pixels
@@ -149,7 +149,7 @@ Future<int?> _extractDominantColorArgb(Uint8List bytes) async {
 
     // Prefer the saturated-only pass; fall back to unfiltered for
     // monochrome or very desaturated images (album art in B&W, etc.).
-    return _dominant(true) ?? _dominant(false);
+    return dominant(true) ?? dominant(false);
   } catch (_) {
     return null;
   }
@@ -1055,10 +1055,12 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         if (mounted) setState(() => _previewDur = d);
       });
       _audioPlayer!.onPositionChanged.listen((pos) {
-        if (mounted) setState(() {
+        if (mounted) {
+          setState(() {
           final total = _previewDur.inMilliseconds;
           _previewPos = total > 0 ? pos.inMilliseconds / total : 0.0;
         });
+        }
       });
       _audioPlayer!.onPlayerComplete.listen((_) {
         if (mounted) setState(() { _isPlaying = false; _previewPos = 0; });

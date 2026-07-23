@@ -593,7 +593,7 @@ class AppStringsAr implements AppStrings {
   @override String dashUpdateTitle(String version, bool isBeta) =>
       'تحديث ${isBeta ? "تجريبي" : "جديد"}: v$version';
   @override String newsItemsCount(int n) => '$n عنصر';
-  @override String syncFrequencyHours(int h) => 'كل ${h} ساعة';
+  @override String syncFrequencyHours(int h) => 'كل $h ساعة';
   @override String syncNewScrobblesFound(int n) => n == 0 ? 'لا توجد تشغيلات جديدة' : 'تم العثور على $n تشغيلة جديدة';
   @override String updatesPublishedOn(String date) => 'نُشر في $date';
   @override String fallbackWillShow(String detail) => 'سيُعرض: $detail';

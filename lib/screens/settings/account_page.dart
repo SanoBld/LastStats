@@ -451,7 +451,7 @@ class _AccountPageState extends State<AccountPage> {
               const Divider(height: 1, indent: 16, endIndent: 16),
               ValueListenableBuilder<String>(
                 valueListenable: secretKeyNotifier,
-                builder: (_, secret, __) => ListTile(
+                builder: (_, secret, _) => ListTile(
                   leading: Icon(Icons.favorite_rounded,
                       color: secret.isNotEmpty ? Colors.redAccent : scheme.onSurfaceVariant,
                       size: 20),
@@ -481,7 +481,7 @@ class _AccountPageState extends State<AccountPage> {
                   const SizedBox(height: 10),
                   ValueListenableBuilder<String>(
                     valueListenable: sessionKeyNotifier,
-                    builder: (_, session, __) {
+                    builder: (_, session, _) {
                       if (session.isNotEmpty) {
                         return OutlinedButton.icon(
                           onPressed: disconnectFavorites,

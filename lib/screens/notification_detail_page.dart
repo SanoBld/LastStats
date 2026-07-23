@@ -55,7 +55,11 @@ class NotificationDetailPage extends StatelessWidget {
         title: Text(L.notifDetailTitle),
         scrolledUnderElevation: 0,
       ),
-      body: ListView(
+      body: TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0, end: 1),
+        duration: const Duration(milliseconds: 300),
+        builder: (_, v, child) => Opacity(opacity: v, child: child),
+        child: ListView(
         padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
         children: [
           // Big icon / emoji badge
@@ -126,6 +130,7 @@ class NotificationDetailPage extends StatelessWidget {
             ),
           ],
         ],
+      ),
       ),
     );
   }

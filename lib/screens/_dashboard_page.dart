@@ -1618,7 +1618,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                     const SizedBox(height: 10),
                     ValueListenableBuilder<bool>(
                       valueListenable: showFavoritesStatNotifier,
-                      builder: (_, showFavStat, __) => _HeroStatCard(
+                      builder: (_, showFavStat, _) => _HeroStatCard(
                         total:       total,
                         avg:         avg.round(),
                         days:        days,
