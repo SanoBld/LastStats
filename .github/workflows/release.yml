@@ -118,7 +118,7 @@ jobs:
           # Work from main's actual tip, not the tag's commit, so this always
           # pushes a clean fast-forward regardless of what the tag points to.
           git fetch origin master
-          git checkout main
+          git checkout master
 
           sed -i "s/^version: .*/version: $VERSION+${{ github.run_number }}/" pubspec.yaml
 
