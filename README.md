@@ -3,12 +3,12 @@
 <p align="center">
   <img src="https://img.shields.io/github/v/release/SanoBld/LastStats-App?style=flat-square&color=7C3AED&label=Version" alt="Latest Release">
   <img src="https://img.shields.io/github/downloads/SanoBld/LastStats-App/total?style=flat-square&color=7C3AED&label=Downloads" alt="Total Downloads">
-  <a href="https://discord.gg/JjqmkQgZBs"><img src="https://img.shields.io/discord/JjqmkQgZBs?style=flat-square&color=5865F2&label=Discord&logo=discord&logoColor=white" alt="Discord"></a>
+  <a href="https://discord.gg/JjqmkQgZBs"><img src="https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord"></a>
 </p>
 
-🎵 A modern, multiplatform app built with Flutter and Material You to track and explore your listening habits in real time, using the Last.fm API. No fake data, no gimmicks, just your own stats, nicely presented.
+🎵 A modern, multiplatform app built with Flutter and Material You to track and explore your listening habits in real time, using the Last.fm API.
 
-Come say hi on Discord, share feedback, or get help: https://discord.gg/JjqmkQgZBs
+Join the Discord to chat, share feedback, or ask for help: https://discord.gg/JjqmkQgZBs
 
 ---
 
@@ -28,8 +28,8 @@ Come say hi on Discord, share feedback, or get help: https://discord.gg/JjqmkQgZ
 **❤️ Favorites**
 - Like tracks, artists, and albums directly from the app, through your own Last.fm account
 - A dedicated Favorites page with filters and cover art, where you can also remove items
-- A small heart badge next to loved tracks in your recent listens, history, and search results, which can be toggled off if you prefer a cleaner look
-- A favorites count shown on your dashboard, which you can hide if you want a simpler view
+- A small heart badge next to loved tracks in your recent listens, history, and search results, with an option to turn it off
+- A favorites count shown on your dashboard, with an option to hide it
 
 **📊 Data and sync**
 - Direct connection to the Last.fm API for real, live scrobbles, top artists, albums, and tracks
@@ -49,9 +49,9 @@ Come say hi on Discord, share feedback, or get help: https://discord.gg/JjqmkQgZ
 - The app follows your system language automatically, or you can pick one yourself from the settings
 
 **⚙️ Other little touches**
-- Haptic feedback on key actions, so the app feels a bit more alive
+- Haptic feedback on key actions
 - A quick search bar to find any artist, album, or track
-- Import and export your settings and appearance, so you can move to a new device without starting over
+- Import and export your settings and appearance, useful when switching devices
 - Built in update checker that lets you know as soon as a new version is ready to download
 
 ---
