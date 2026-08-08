@@ -55,7 +55,11 @@
     <section class="multi-line-signature">
       const
       <span class="name ">Tilt3DCard</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span></li>
-<li><span class="parameter" id="param-child"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span> <span class="parameter-name">child</span>, </span></li>
+<li><span class="parameter" id="param-front"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span> <span class="parameter-name">front</span>, </span></li>
+<li><span class="parameter" id="param-back"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span> <span class="parameter-name">back</span>, </span></li>
+<li><span class="parameter" id="param-width"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">width</span>, </span></li>
+<li><span class="parameter" id="param-height"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">height</span>, </span></li>
+<li><span class="parameter" id="param-radius"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">radius</span> = <span class="default-value">22</span>, </span></li>
 </ol>})
     </section>
     
@@ -64,7 +68,14 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">const Tilt3DCard({super.key, required this.child});</code></pre>
+  <pre class="language-dart"><code class="language-dart">const Tilt3DCard({
+  super.key,
+  required this.front,
+  required this.back,
+  required this.width,
+  required this.height,
+  this.radius = 22,
+});</code></pre>
 </section>
 
 
