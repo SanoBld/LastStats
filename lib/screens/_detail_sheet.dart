@@ -1752,11 +1752,13 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
             child: GestureDetector(
               onTap: () { if (!_isZoomed) Navigator.pop(context); },
               child: Center(
-                child: Image.network(
-                  widget.url, fit: BoxFit.contain,
-                  errorBuilder: (_, _, _) => const Icon(
-                      Icons.broken_image_rounded,
-                      color: Colors.white54, size: 64),
+                child: Tilt3DCard(
+                  child: Image.network(
+                    widget.url, fit: BoxFit.contain,
+                    errorBuilder: (_, _, _) => const Icon(
+                        Icons.broken_image_rounded,
+                        color: Colors.white54, size: 64),
+                  ),
                 ),
               ),
             ),
