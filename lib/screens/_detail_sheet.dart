@@ -100,39 +100,51 @@ class _CardBack extends StatelessWidget {
     return Container(
       color: bg,
       padding: const EdgeInsets.all(22),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Stack(
         children: [
-          if (title.isNotEmpty)
-            Text(title, style: TextStyle(color: fg,
-                fontSize: 20, fontWeight: FontWeight.w700)),
-          if (subtitle.isNotEmpty) ...[
-            const SizedBox(height: 6),
-            Text(subtitle, style: TextStyle(color: fgDim, fontSize: 15)),
-          ],
-          if (releaseDate.isNotEmpty) ...[
-            const SizedBox(height: 14),
-            Row(children: [
-              Icon(Icons.calendar_today_rounded, color: fgWeak, size: 14),
-              const SizedBox(width: 6),
-              Text(releaseDate, style: TextStyle(color: fgDim, fontSize: 13)),
-            ]),
-          ],
-          for (final e in extra) ...[
-            const SizedBox(height: 8),
-            Row(children: [
-              Icon(e.$1, color: fgWeak, size: 14),
-              const SizedBox(width: 6),
-              Text(e.$2, style: TextStyle(color: fgDim, fontSize: 13)),
-            ]),
-          ],
-          const SizedBox(height: 18),
-          Row(children: [
-            Icon(Icons.info_outline_rounded, color: fgWeak, size: 16),
-            const SizedBox(width: 6),
-            Text('Source : $source', style: TextStyle(color: fgWeak, fontSize: 13)),
-          ]),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (title.isNotEmpty)
+                Text(title, style: TextStyle(color: fg,
+                    fontSize: 20, fontWeight: FontWeight.w700)),
+              if (subtitle.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Text(subtitle, style: TextStyle(color: fgDim, fontSize: 15)),
+              ],
+              if (releaseDate.isNotEmpty) ...[
+                const SizedBox(height: 14),
+                Row(children: [
+                  Icon(Icons.calendar_today_rounded, color: fgWeak, size: 14),
+                  const SizedBox(width: 6),
+                  Text(releaseDate, style: TextStyle(color: fgDim, fontSize: 13)),
+                ]),
+              ],
+              for (final e in extra) ...[
+                const SizedBox(height: 8),
+                Row(children: [
+                  Icon(e.$1, color: fgWeak, size: 14),
+                  const SizedBox(width: 6),
+                  Text(e.$2, style: TextStyle(color: fgDim, fontSize: 13)),
+                ]),
+              ],
+              const SizedBox(height: 18),
+              Row(children: [
+                Icon(Icons.info_outline_rounded, color: fgWeak, size: 16),
+                const SizedBox(width: 6),
+                Text('Source : $source', style: TextStyle(color: fgWeak, fontSize: 13)),
+              ]),
+            ],
+          ),
+          Positioned(
+            left: 0, right: 0, bottom: 0,
+            child: Center(
+              child: Text('LastStats', style: TextStyle(
+                  color: fgWeak, fontSize: 11, fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5)),
+            ),
+          ),
         ],
       ),
     );
@@ -602,10 +614,10 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           if (l > 0) (Icons.headphones_rounded, '${_compactNum(l)} auditeurs'),
         ];
       default:
-        final dur   = int.tryParse((_info?['duration'] ?? '0').toString()) ?? 0;
+        final plays = int.tryParse((_info?['playcount'] ?? _info?['userplaycount'] ?? '0').toString()) ?? 0;
         final album = (_info?['album']?['title'] ?? '').toString();
         return [
-          if (dur > 0) (Icons.timer_outlined, '${dur ~/ 60}:${(dur % 60).toString().padLeft(2, '0')}'),
+          if (plays > 0) (Icons.play_circle_outline_rounded, '${_compactNum(plays)} scrobbles'),
           if (album.isNotEmpty) (Icons.album_rounded, album),
         ];
     }
@@ -1908,12 +1920,35 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
     final size   = MediaQuery.of(context).size;
     final cardW  = math.min(size.width * 0.8, 340.0);
     final cardH  = math.min(size.height * 0.62, cardW * 1.35);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final edge   = isDark ? Colors.black : Colors.white;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: edge,
       body: Stack(
         fit: StackFit.expand,
         children: [
+          // Blurred artwork background, faded to dark or light depending
+          // on the app theme, instead of a flat black backdrop.
+          Positioned.fill(
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 50, sigmaY: 50, tileMode: TileMode.mirror),
+              child: Image.network(
+                widget.url, fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => ColoredBox(color: edge),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  radius: 1.2,
+                  colors: [Colors.transparent, edge.withValues(alpha: 0.93)],
+                ),
+              ),
+            ),
+          ),
           GestureDetector(
             onTap: () => Navigator.pop(context),
             behavior: HitTestBehavior.opaque,
@@ -2071,7 +2106,7 @@ class _ShareCardArt extends StatelessWidget {
                 Row(children: [
                   const Icon(Icons.graphic_eq_rounded, color: Colors.white38, size: 14),
                   const SizedBox(width: 6),
-                  Text('Last Stats · $source',
+                  Text('LastStats · $source',
                       style: const TextStyle(color: Colors.white38, fontSize: 11)),
                 ]),
               ],
