@@ -18,6 +18,10 @@ class Tilt3DCard extends StatefulWidget {
   final Widget back;
   final double width, height;
   final double radius;
+  // Groundwork for a future achievements system (e.g. "50+ écoutes" badge).
+  // Null = no badge yet. When set, draws a gold ring around the card.
+  // Not wired to real logic yet — just the visual hook to build on later.
+  final bool achievementUnlocked;
   const Tilt3DCard({
     super.key,
     required this.front,
@@ -25,6 +29,7 @@ class Tilt3DCard extends StatefulWidget {
     required this.width,
     required this.height,
     this.radius = 22,
+    this.achievementUnlocked = false,
   });
 
   @override
@@ -172,20 +177,33 @@ class _Tilt3DCardState extends State<Tilt3DCard>
                   return Transform(
                     alignment: Alignment.center,
                     transform: m,
-                    child: ClipRRect(
-                      borderRadius: radius,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          side,
-                          if (enabled && showFront)
-                            IgnorePointer(
-                              child: _GlassReflection(
-                                rx: _rx, ry: _ry,
-                                width: widget.width, height: widget.height,
+                    child: Container(
+                      decoration: widget.achievementUnlocked
+                          ? BoxDecoration(
+                              borderRadius: radius,
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFFFFD76A), Color(0xFFB8860B)],
+                                begin: Alignment.topLeft, end: Alignment.bottomRight,
                               ),
-                            ),
-                        ],
+                            )
+                          : null,
+                      padding: widget.achievementUnlocked
+                          ? const EdgeInsets.all(2.5) : EdgeInsets.zero,
+                      child: ClipRRect(
+                        borderRadius: radius,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            side,
+                            if (enabled && showFront)
+                              IgnorePointer(
+                                child: _GlassReflection(
+                                  rx: _rx, ry: _ry,
+                                  width: widget.width, height: widget.height,
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
                     ),
                   );

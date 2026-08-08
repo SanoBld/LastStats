@@ -614,10 +614,11 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           if (l > 0) (Icons.headphones_rounded, '${_compactNum(l)} auditeurs'),
         ];
       default:
-        final plays = int.tryParse((_info?['playcount'] ?? _info?['userplaycount'] ?? '0').toString()) ?? 0;
+        // User's own scrobbles for this track (not the global Last.fm count).
+        final plays = int.tryParse((_info?['userplaycount'] ?? _info?['playcount'] ?? '0').toString()) ?? 0;
         final album = (_info?['album']?['title'] ?? '').toString();
         return [
-          if (plays > 0) (Icons.play_circle_outline_rounded, '${_compactNum(plays)} scrobbles'),
+          if (plays > 0) (Icons.play_circle_outline_rounded, '$plays scrobbles'),
           if (album.isNotEmpty) (Icons.album_rounded, album),
         ];
     }
@@ -1851,6 +1852,8 @@ class _FullscreenImageViewer extends StatefulWidget {
   final String source;
   final String releaseDate;
   final List<(IconData, String)> extra;
+  // Groundwork only: not computed from real data yet.
+  final bool achievementUnlocked;
   const _FullscreenImageViewer({
     required this.url,
     this.title = '',
@@ -1858,6 +1861,7 @@ class _FullscreenImageViewer extends StatefulWidget {
     this.source = 'Last.fm',
     this.releaseDate = '',
     this.extra = const [],
+    this.achievementUnlocked = false,
   });
 
   @override
@@ -1960,6 +1964,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
                 child: Tilt3DCard(
                   width: cardW,
                   height: cardH,
+                  achievementUnlocked: widget.achievementUnlocked,
                   front: Image.network(
                     widget.url, fit: BoxFit.cover,
                     errorBuilder: (_, _, _) => const ColoredBox(
