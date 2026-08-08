@@ -192,13 +192,13 @@ class _SmartImageState extends State<_SmartImage> {
     );
   }
 
-  Widget _img(String url, ColorScheme s) => LivingArtwork(
+  Widget _img(String url, ColorScheme s) => ClipRRect(
     borderRadius: BorderRadius.circular(widget.borderRadius),
-    intensity: widget.size * 0.03, // scale parallax with artwork size
-    child: SizedBox(
-      width: widget.size, height: widget.size,
-      child: Image.network(url, fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => _fallback(s))));
+    child: LivingArtwork(
+      size: widget.size,
+      child: Image.network(url, width: widget.size, height: widget.size, fit: BoxFit.cover,
+          errorBuilder: (_, _, _) => _fallback(s)),
+    ));
 
   Widget _loading(ColorScheme s) => ClipRRect(
     borderRadius: BorderRadius.circular(widget.borderRadius),

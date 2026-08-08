@@ -2437,16 +2437,12 @@ class _BlurredHeaderImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget img = LivingArtwork(
-      intensity: 14, // header is big, so give it more parallax room
-      borderRadius: BorderRadius.zero,
-      child: Image.network(
-        url,
-        fit: BoxFit.cover,
-        width: double.infinity,
-        height: double.infinity,
-        errorBuilder: (_, _, _) => _GradientHeader(scheme: scheme),
-      ),
+    Widget img = Image.network(
+      url,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      errorBuilder: (_, _, _) => _GradientHeader(scheme: scheme),
     );
     if (blur > 0.5) {
       img = ImageFiltered(
