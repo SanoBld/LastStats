@@ -87,6 +87,7 @@ void main() async {
   pcModeNotifier.value   = prefs.getString('ls_pc_mode') ?? 'auto';
   navLabelNotifier.value     = prefs.getBool('ls_nav_labels')      ?? true;
   hapticFeedbackNotifier.value = prefs.getBool('ls_haptic_feedback') ?? true;
+  livingArtworkNotifier.value = prefs.getBool('ls_living_artwork') ?? true;
 
   // ── Data caches & storage ────────────────────────────────────────────────
   await DataCache.init();

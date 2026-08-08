@@ -342,6 +342,7 @@ class BackupService {
     // Remaining misc toggles.
     hapticFeedbackNotifier.value        = p.getBool('ls_haptic_feedback')      ?? true;
     navLabelNotifier.value              = p.getBool('ls_nav_labels')           ?? true;
+    livingArtworkNotifier.value         = p.getBool('ls_living_artwork')       ?? true;
     notifNewsEnabledNotifier.value      = p.getBool('ls_notif_news_enabled')   ?? false;
     showNewsBadgeNotifier.value         = p.getBool('ls_show_news_badge')      ?? true;
     showLovedBadgeNotifier.value        = p.getBool('ls_show_loved_badge')     ?? true;

@@ -644,6 +644,9 @@ class _AppearancePageState extends State<AppearancePage> {
         const SizedBox(height: 16),
         const _HapticSection(),
 
+        const SizedBox(height: 16),
+        const _LivingArtworkSection(),
+
         const SizedBox(height: 20),
         const RestartBanner(),
         const SizedBox(height: 20),
@@ -896,6 +899,48 @@ class _NavLabelSectionState extends State<_NavLabelSection> {
             await p.setBool('ls_nav_labels', v);
             setState(() => _labels = v);
             navLabelNotifier.value = v;
+          },
+        ),
+      ],
+    );
+  }
+}
+
+// ── Living artwork (idle zoom + tilt parallax on covers) toggle ────────────
+
+class _LivingArtworkSection extends StatefulWidget {
+  const _LivingArtworkSection();
+  @override
+  State<_LivingArtworkSection> createState() => _LivingArtworkSectionState();
+}
+
+class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
+  bool _enabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((p) {
+      if (mounted) setState(() => _enabled = p.getBool('ls_living_artwork') ?? true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return SettingsSection(
+      label: L.apInteractionsSection,
+      children: [
+        SwitchListTile(
+          secondary: Icon(Icons.blur_on_rounded, color: scheme.primary),
+          title: Text('Pochettes animées'),
+          subtitle: Text('Zoom doux et effet de profondeur sur les images'),
+          value: _enabled,
+          onChanged: (v) async {
+            final p = await SharedPreferences.getInstance();
+            await p.setBool('ls_living_artwork', v);
+            setState(() => _enabled = v);
+            livingArtworkNotifier.value = v;
           },
         ),
       ],
