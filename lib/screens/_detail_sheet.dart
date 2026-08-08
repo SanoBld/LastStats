@@ -53,16 +53,25 @@ class _FadeIn extends StatelessWidget {
       );
 }
 
+// Compact number: 12345 -> "12.3k", 4200000 -> "4.2M".
+String _compactNum(int n) {
+  if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
+  if (n >= 1000)    return '${(n / 1000).toStringAsFixed(1)}k';
+  return '$n';
+}
+
 // ── Fullscreen image helper (used by detail sheet and profile sheet) ──────────
 
 void _pushFullscreen(BuildContext ctx, String url,
-    {String title = '', String subtitle = '', String source = 'Last.fm', String releaseDate = ''}) {
+    {String title = '', String subtitle = '', String source = 'Last.fm',
+     String releaseDate = '', List<(IconData, String)> extra = const []}) {
   Navigator.of(ctx).push(PageRouteBuilder(
     opaque: false,
     barrierColor: Colors.black,
     barrierDismissible: true,
     pageBuilder: (_, _, _) => _FullscreenImageViewer(
-        url: url, title: title, subtitle: subtitle, source: source, releaseDate: releaseDate),
+        url: url, title: title, subtitle: subtitle, source: source,
+        releaseDate: releaseDate, extra: extra),
     transitionsBuilder: (_, anim, _, child) =>
         FadeTransition(opacity: anim, child: child),
     transitionDuration: const Duration(milliseconds: 220),
@@ -74,9 +83,10 @@ void _pushFullscreen(BuildContext ctx, String url,
 class _CardBack extends StatelessWidget {
   final String title, subtitle, source, releaseDate;
   final Color? dominant;
+  final List<(IconData, String)> extra;
   const _CardBack({
     required this.title, required this.subtitle, required this.source,
-    this.releaseDate = '', this.dominant,
+    this.releaseDate = '', this.dominant, this.extra = const [],
   });
 
   @override
@@ -107,6 +117,14 @@ class _CardBack extends StatelessWidget {
               Icon(Icons.calendar_today_rounded, color: fgWeak, size: 14),
               const SizedBox(width: 6),
               Text(releaseDate, style: TextStyle(color: fgDim, fontSize: 13)),
+            ]),
+          ],
+          for (final e in extra) ...[
+            const SizedBox(height: 8),
+            Row(children: [
+              Icon(e.$1, color: fgWeak, size: 14),
+              const SizedBox(width: 6),
+              Text(e.$2, style: TextStyle(color: fgDim, fontSize: 13)),
             ]),
           ],
           const SizedBox(height: 18),
@@ -567,6 +585,32 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     return idx > 0 ? raw.substring(0, idx).trim() : raw;
   }
 
+  // Small extra stat lines shown on the back of the fullscreen card.
+  List<(IconData, String)> _cardExtraInfo() {
+    switch (widget.type) {
+      case 'artists':
+        final l = _globalListeners(), p = _globalPlaycount();
+        return [
+          if (l > 0) (Icons.headphones_rounded, '${_compactNum(l)} auditeurs'),
+          if (p > 0) (Icons.play_circle_outline_rounded, '${_compactNum(p)} écoutes'),
+        ];
+      case 'albums':
+        final n = _tracklist.length;
+        final l = _globalListeners();
+        return [
+          if (n > 0) (Icons.queue_music_rounded, '$n titres'),
+          if (l > 0) (Icons.headphones_rounded, '${_compactNum(l)} auditeurs'),
+        ];
+      default:
+        final dur   = int.tryParse((_info?['duration'] ?? '0').toString()) ?? 0;
+        final album = (_info?['album']?['title'] ?? '').toString();
+        return [
+          if (dur > 0) (Icons.timer_outlined, '${dur ~/ 60}:${(dur % 60).toString().padLeft(2, '0')}'),
+          if (album.isNotEmpty) (Icons.album_rounded, album),
+        ];
+    }
+  }
+
   String _bio() {
     final raw = (_info?['bio']?['content'] ?? _info?['wiki']?['content'] ?? '').toString();
     if (raw.isEmpty) return '';
@@ -694,6 +738,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                   onTap: hasImage ? () => _pushFullscreen(ctx, _resolvedImage,
                       title: _name, subtitle: _artist,
                       releaseDate: _releaseDate(),
+                      extra: _cardExtraInfo(),
                       source: switch (widget.type) {
                         'artists' => 'Artiste · Last.fm',
                         'albums'  => 'Album · Last.fm',
@@ -1793,12 +1838,14 @@ class _FullscreenImageViewer extends StatefulWidget {
   final String subtitle;
   final String source;
   final String releaseDate;
+  final List<(IconData, String)> extra;
   const _FullscreenImageViewer({
     required this.url,
     this.title = '',
     this.subtitle = '',
     this.source = 'Last.fm',
     this.releaseDate = '',
+    this.extra = const [],
   });
 
   @override
@@ -1807,6 +1854,8 @@ class _FullscreenImageViewer extends StatefulWidget {
 
 class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
   Color? _dominant;
+  bool   _sharing = false;
+  final  _shareKey = GlobalKey();
 
   @override
   void initState() {
@@ -1823,6 +1872,34 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
       final argb = await _extractDominantColorArgb(response.bodyBytes);
       if (argb != null && mounted) setState(() => _dominant = Color(argb));
     } catch (_) {}
+  }
+
+  // Renders a clean, non-tilted share card (off-screen) and exports it as
+  // a PNG so the image, title, and details stay crisp and readable.
+  Future<void> _shareCard() async {
+    if (_sharing) return;
+    setState(() => _sharing = true);
+    try {
+      await precacheImage(NetworkImage(widget.url), context);
+      await Future.delayed(const Duration(milliseconds: 80));
+      final rb = _shareKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (rb == null) return;
+      final img   = await rb.toImage(pixelRatio: 3.0);
+      final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
+      img.dispose();
+      if (bytes == null) return;
+      final tmp  = await getTemporaryDirectory();
+      final safe = widget.title.isEmpty
+          ? 'artwork' : widget.title.replaceAll(RegExp(r'[^\w]+'), '_');
+      final file = File('${tmp.path}/laststats_$safe.png');
+      await file.writeAsBytes(bytes.buffer.asUint8List());
+      if (mounted) _haptic(_HapticImpact.light);
+      await Share.shareXFiles([XFile(file.path)]);
+    } catch (_) {
+      // Network or render failure: fail silently, nothing to share.
+    } finally {
+      if (mounted) setState(() => _sharing = false);
+    }
   }
 
   @override
@@ -1861,6 +1938,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
                     subtitle: widget.subtitle,
                     source: widget.source,
                     releaseDate: widget.releaseDate,
+                    extra: widget.extra,
                     dominant: _dominant,
                   ),
                 ),
@@ -1868,26 +1946,141 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
             ),
           ),
 
-          // Close button — always visible
+          // Off-screen clean render used for the share export — positioned
+          // way outside the viewport so it still lays out and paints
+          // (needed for RepaintBoundary.toImage) without ever being seen.
           Positioned(
-            top: topPad + 8, right: 12,
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                width: 36, height: 36,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.55),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.close_rounded,
-                    color: Colors.white, size: 20),
+            left: -9999, top: -9999,
+            child: RepaintBoundary(
+              key: _shareKey,
+              child: _ShareCardArt(
+                url: widget.url, title: widget.title, subtitle: widget.subtitle,
+                releaseDate: widget.releaseDate, source: widget.source,
+                extra: widget.extra,
               ),
             ),
+          ),
+
+          // Close + share buttons — always visible
+          Positioned(
+            top: topPad + 8, right: 12,
+            child: Row(children: [
+              GestureDetector(
+                onTap: _sharing ? null : _shareCard,
+                child: Container(
+                  width: 36, height: 36,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.55),
+                    shape: BoxShape.circle,
+                  ),
+                  child: _sharing
+                      ? const Padding(
+                          padding: EdgeInsets.all(9),
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white70),
+                        )
+                      : const Icon(Icons.ios_share_rounded,
+                          color: Colors.white, size: 18),
+                ),
+              ),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  width: 36, height: 36,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.55),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close_rounded,
+                      color: Colors.white, size: 20),
+                ),
+              ),
+            ]),
           ),
         ],
       ),
     );
   }
+}
+
+// Clean, flat, non-tilted card used only for the share export image.
+class _ShareCardArt extends StatelessWidget {
+  final String url, title, subtitle, releaseDate, source;
+  final List<(IconData, String)> extra;
+  const _ShareCardArt({
+    required this.url, required this.title, required this.subtitle,
+    required this.releaseDate, required this.source, required this.extra,
+  });
+
+  Widget _tag(IconData icon, String text) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Icon(icon, color: Colors.white60, size: 13),
+      const SizedBox(width: 4),
+      Text(text, style: const TextStyle(color: Colors.white60, fontSize: 12)),
+    ],
+  );
+
+  @override
+  Widget build(BuildContext context) => ClipRRect(
+    borderRadius: BorderRadius.circular(28),
+    child: SizedBox(
+      width: 360, height: 506,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.network(url, fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => const ColoredBox(color: Color(0xFF222222))),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                stops: const [0.0, 0.45, 1.0],
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.05),
+                  Colors.black.withValues(alpha: 0.88),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            left: 24, right: 24, bottom: 22,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (title.isNotEmpty)
+                  Text(title, maxLines: 2, overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: Colors.white,
+                          fontSize: 22, fontWeight: FontWeight.w800)),
+                if (subtitle.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: Colors.white70, fontSize: 15)),
+                ],
+                if (releaseDate.isNotEmpty || extra.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Wrap(spacing: 14, runSpacing: 4, children: [
+                    if (releaseDate.isNotEmpty) _tag(Icons.calendar_today_rounded, releaseDate),
+                    for (final e in extra) _tag(e.$1, e.$2),
+                  ]),
+                ],
+                const SizedBox(height: 14),
+                Row(children: [
+                  const Icon(Icons.graphic_eq_rounded, color: Colors.white38, size: 14),
+                  const SizedBox(width: 6),
+                  Text('Last Stats · $source',
+                      style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                ]),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 // ── Gradient fallback when no image is available ──────────────────────────────

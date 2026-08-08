@@ -50,19 +50,37 @@ class _Tilt3DCardState extends State<Tilt3DCard>
   double _rx = 0, _ry = 0;
   bool _dragging = false;
 
+  // Sensor tilt is calibrated relative to a baseline instead of absolute
+  // gravity, so holding the phone normally (vertical, in hand) doesn't
+  // leave the card permanently leaning — only movement AWAY from wherever
+  // the phone was when last recalibrated (tap) moves the card.
+  double _lastAx = 0, _lastAy = 0;
+  double _baseAx = 0, _baseAy = 0;
+  bool   _calibrated = false;
+
   @override
   void initState() {
     super.initState();
     _smoother = createTicker(_onTick)..start();
     try {
       _sub = accelerometerEventStream().listen((e) {
+        _lastAx = e.x;
+        _lastAy = e.y;
+        if (!_calibrated) { _baseAx = e.x; _baseAy = e.y; _calibrated = true; }
         if (!mounted || _dragging) return;
-        // Wider mapping so a normal forward/back phone tilt reaches the
-        // full range instead of only a small slice of it.
-        _targetRx = (e.y / 6.5).clamp(-1.0, 1.0);
-        _targetRy = (-e.x / 6.5).clamp(-1.0, 1.0);
+        _targetRx = ((e.y - _baseAy) / 4.2).clamp(-1.0, 1.0);
+        _targetRy = ((_baseAx - e.x) / 4.2).clamp(-1.0, 1.0);
       }, onError: (_) {}, cancelOnError: true);
     } catch (_) {}
+  }
+
+  // Re-zero the baseline to the phone's current position, so tilting can
+  // resume from wherever it's held now instead of an old fixed reference.
+  void _recalibrate() {
+    _baseAx = _lastAx;
+    _baseAy = _lastAy;
+    _targetRx = 0;
+    _targetRy = 0;
   }
 
   // Frame-rate independent exponential smoothing: rendered rx/ry ease
@@ -97,11 +115,11 @@ class _Tilt3DCardState extends State<Tilt3DCard>
 
   void _resetTilt() {
     _dragging = false;
-    _targetRx = 0;
-    _targetRy = 0;
+    _recalibrate();
   }
 
   void _toggleFlip() {
+    _recalibrate();
     if (_flip.value < 0.5) {
       _flip.forward();
     } else {
