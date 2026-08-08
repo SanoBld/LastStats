@@ -56,49 +56,69 @@ class _FadeIn extends StatelessWidget {
 // ── Fullscreen image helper (used by detail sheet and profile sheet) ──────────
 
 void _pushFullscreen(BuildContext ctx, String url,
-    {String title = '', String subtitle = '', String source = 'Last.fm'}) {
+    {String title = '', String subtitle = '', String source = 'Last.fm', String releaseDate = ''}) {
   Navigator.of(ctx).push(PageRouteBuilder(
     opaque: false,
     barrierColor: Colors.black,
     barrierDismissible: true,
     pageBuilder: (_, _, _) => _FullscreenImageViewer(
-        url: url, title: title, subtitle: subtitle, source: source),
+        url: url, title: title, subtitle: subtitle, source: source, releaseDate: releaseDate),
     transitionsBuilder: (_, anim, _, child) =>
         FadeTransition(opacity: anim, child: child),
     transitionDuration: const Duration(milliseconds: 220),
   ));
 }
 
-// Text side of the fullscreen card (release date / author / source).
+// Text side of the fullscreen card. Background = dominant artwork color,
+// text color adapts (white on dark art, dark on light art).
 class _CardBack extends StatelessWidget {
-  final String title, subtitle, source;
-  const _CardBack({required this.title, required this.subtitle, required this.source});
+  final String title, subtitle, source, releaseDate;
+  final Color? dominant;
+  const _CardBack({
+    required this.title, required this.subtitle, required this.source,
+    this.releaseDate = '', this.dominant,
+  });
 
   @override
-  Widget build(BuildContext context) => Container(
-    color: const Color(0xFF171717),
-    padding: const EdgeInsets.all(22),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (title.isNotEmpty)
-          Text(title, style: const TextStyle(color: Colors.white,
-              fontSize: 20, fontWeight: FontWeight.w700)),
-        if (subtitle.isNotEmpty) ...[
-          const SizedBox(height: 6),
-          Text(subtitle, style: const TextStyle(color: Colors.white70, fontSize: 15)),
+  Widget build(BuildContext context) {
+    final bg = dominant ?? const Color(0xFF171717);
+    final light = ThemeData.estimateBrightnessForColor(bg) == Brightness.light;
+    final fg     = light ? Colors.black87 : Colors.white;
+    final fgDim  = light ? Colors.black54 : Colors.white70;
+    final fgWeak = light ? Colors.black38 : Colors.white38;
+
+    return Container(
+      color: bg,
+      padding: const EdgeInsets.all(22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (title.isNotEmpty)
+            Text(title, style: TextStyle(color: fg,
+                fontSize: 20, fontWeight: FontWeight.w700)),
+          if (subtitle.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(subtitle, style: TextStyle(color: fgDim, fontSize: 15)),
+          ],
+          if (releaseDate.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Row(children: [
+              Icon(Icons.calendar_today_rounded, color: fgWeak, size: 14),
+              const SizedBox(width: 6),
+              Text(releaseDate, style: TextStyle(color: fgDim, fontSize: 13)),
+            ]),
+          ],
+          const SizedBox(height: 18),
+          Row(children: [
+            Icon(Icons.info_outline_rounded, color: fgWeak, size: 16),
+            const SizedBox(width: 6),
+            Text('Source : $source', style: TextStyle(color: fgWeak, fontSize: 13)),
+          ]),
         ],
-        const SizedBox(height: 18),
-        Row(children: [
-          const Icon(Icons.info_outline_rounded, color: Colors.white38, size: 16),
-          const SizedBox(width: 6),
-          Text('Source : $source',
-              style: const TextStyle(color: Colors.white38, fontSize: 13)),
-        ]),
-      ],
-    ),
-  );
+      ),
+    );
+  }
 }
 
 
@@ -539,6 +559,14 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   static List<dynamic> _asList(dynamic v) =>
       v == null ? [] : (v is List ? v : [v]);
 
+  // Last.fm album date format: "26 Feb, 2015, 00:00" — drop the time part.
+  String _releaseDate() {
+    final raw = (_info?['wiki']?['published'] ?? '').toString().trim();
+    if (raw.isEmpty) return '';
+    final idx = raw.lastIndexOf(',');
+    return idx > 0 ? raw.substring(0, idx).trim() : raw;
+  }
+
   String _bio() {
     final raw = (_info?['bio']?['content'] ?? _info?['wiki']?['content'] ?? '').toString();
     if (raw.isEmpty) return '';
@@ -665,6 +693,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                   behavior: HitTestBehavior.opaque,
                   onTap: hasImage ? () => _pushFullscreen(ctx, _resolvedImage,
                       title: _name, subtitle: _artist,
+                      releaseDate: _releaseDate(),
                       source: switch (widget.type) {
                         'artists' => 'Artiste · Last.fm',
                         'albums'  => 'Album · Last.fm',
@@ -1763,11 +1792,13 @@ class _FullscreenImageViewer extends StatefulWidget {
   final String title;
   final String subtitle;
   final String source;
+  final String releaseDate;
   const _FullscreenImageViewer({
     required this.url,
     this.title = '',
     this.subtitle = '',
     this.source = 'Last.fm',
+    this.releaseDate = '',
   });
 
   @override
@@ -1775,6 +1806,25 @@ class _FullscreenImageViewer extends StatefulWidget {
 }
 
 class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
+  Color? _dominant;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDominantColor();
+  }
+
+  // Same cheap histogram extractor used for the artwork theme; run again
+  // here so the card back always gets a color, even if that setting is off.
+  Future<void> _loadDominantColor() async {
+    try {
+      final response = await http.get(Uri.parse(widget.url)).timeout(const Duration(seconds: 6));
+      if (!mounted || response.statusCode != 200 || response.bodyBytes.isEmpty) return;
+      final argb = await _extractDominantColorArgb(response.bodyBytes);
+      if (argb != null && mounted) setState(() => _dominant = Color(argb));
+    } catch (_) {}
+  }
+
   @override
   Widget build(BuildContext context) {
     final topPad = MediaQuery.of(context).padding.top;
@@ -1810,6 +1860,8 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
                     title: widget.title,
                     subtitle: widget.subtitle,
                     source: widget.source,
+                    releaseDate: widget.releaseDate,
+                    dominant: _dominant,
                   ),
                 ),
               ),

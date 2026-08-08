@@ -1,12 +1,15 @@
 // 3D flip card, Pokémon-card style, used in the fullscreen artwork viewer.
 // - drag with a finger, tilt the phone, or hover with a mouse: card leans
-//   in 3D following the input
+//   in 3D following the input, smoothed so it never feels jerky
+// - slow breathing zoom loop, like a gentle smooth pan
+// - soft moving glass-style highlight (real reflection, not a color band)
 // - tap to flip and read info on the back
 // Fixed width/height so layout is always stable (no more broken framing).
 // Toggle: Settings > Appearance ("Pochettes animées" / livingArtworkNotifier).
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import '../app_state.dart';
 
@@ -29,41 +32,73 @@ class Tilt3DCard extends StatefulWidget {
 }
 
 class _Tilt3DCardState extends State<Tilt3DCard>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _flip =
       AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+  // Slow breathing zoom, like a smooth camera drift. Kept separate from
+  // the tilt so it never conflicts with drag/sensor input.
+  late final AnimationController _breathe =
+      AnimationController(vsync: this, duration: const Duration(seconds: 5))
+        ..repeat(reverse: true);
+  late final Animation<double> _breatheCurve =
+      CurvedAnimation(parent: _breathe, curve: Curves.easeInOut);
+  late final Ticker _smoother;
   StreamSubscription<AccelerometerEvent>? _sub;
 
-  double _rx = 0, _ry = 0;  // tilt, -1..1
+  // Raw input target, -1..1. Rendered values chase this smoothly.
+  double _targetRx = 0, _targetRy = 0;
+  double _rx = 0, _ry = 0;
   bool _dragging = false;
 
   @override
   void initState() {
     super.initState();
+    _smoother = createTicker(_onTick)..start();
     try {
       _sub = accelerometerEventStream().listen((e) {
         if (!mounted || _dragging) return;
-        setState(() {
-          _rx = (e.y / 9.8).clamp(-1, 1);
-          _ry = (-e.x / 9.8).clamp(-1, 1);
-        });
+        // Wider mapping so a normal forward/back phone tilt reaches the
+        // full range instead of only a small slice of it.
+        _targetRx = (e.y / 6.5).clamp(-1.0, 1.0);
+        _targetRy = (-e.x / 6.5).clamp(-1.0, 1.0);
       }, onError: (_) {}, cancelOnError: true);
     } catch (_) {}
   }
 
+  // Frame-rate independent exponential smoothing: rendered rx/ry ease
+  // towards the target instead of snapping to every noisy sensor sample.
+  Duration? _lastTick;
+  void _onTick(Duration elapsed) {
+    final last = _lastTick;
+    _lastTick = elapsed;
+    if (last == null) return;
+    final dtMs = (elapsed - last).inMilliseconds.clamp(1, 64);
+    final t = 1 - math.pow(1 - 0.22, dtMs / 16.0).toDouble();
+    final nrx = _rx + (_targetRx - _rx) * t;
+    final nry = _ry + (_targetRy - _ry) * t;
+    if ((nrx - _rx).abs() > 0.0005 || (nry - _ry).abs() > 0.0005) {
+      setState(() { _rx = nrx; _ry = nry; });
+    }
+  }
+
   @override
-  void dispose() { _flip.dispose(); _sub?.cancel(); super.dispose(); }
+  void dispose() {
+    _flip.dispose();
+    _breathe.dispose();
+    _smoother.dispose();
+    _sub?.cancel();
+    super.dispose();
+  }
 
   void _tiltFromLocal(Offset local) {
-    setState(() {
-      _ry = ((local.dx / widget.width) - 0.5) * 2;
-      _rx = -((local.dy / widget.height) - 0.5) * 2;
-    });
+    _targetRy = ((local.dx / widget.width) - 0.5) * 2;
+    _targetRx = -((local.dy / widget.height) - 0.5) * 2;
   }
 
   void _resetTilt() {
     _dragging = false;
-    setState(() { _rx = 0; _ry = 0; });
+    _targetRx = 0;
+    _targetRy = 0;
   }
 
   void _toggleFlip() {
@@ -92,15 +127,19 @@ class _Tilt3DCardState extends State<Tilt3DCard>
               width: widget.width,
               height: widget.height,
               child: AnimatedBuilder(
-                animation: _flip,
+                animation: Listenable.merge([_flip, _breatheCurve]),
                 builder: (context, _) {
                   final flipAngle = _flip.value * math.pi;
                   final showFront = flipAngle <= math.pi / 2;
-                  final tiltX = enabled ? _rx * 0.28 : 0.0;
-                  final tiltY = enabled ? _ry * 0.28 : 0.0;
+                  // Full-range tilt: up to ~35° so a real phone pitch reads
+                  // as the card leaning all the way, not a tiny nudge.
+                  final tiltX = enabled ? _rx * 0.62 : 0.0;
+                  final tiltY = enabled ? _ry * 0.62 : 0.0;
+                  final zoom  = 1.0 + _breatheCurve.value * 0.035;
 
                   final m = Matrix4.identity()
-                    ..setEntry(3, 2, 0.0018)
+                    ..setEntry(3, 2, 0.0016)
+                    ..scale(zoom)
                     ..rotateX(tiltX)
                     ..rotateY(flipAngle + tiltY);
 
@@ -122,7 +161,12 @@ class _Tilt3DCardState extends State<Tilt3DCard>
                         children: [
                           side,
                           if (enabled && showFront)
-                            IgnorePointer(child: _HoloSheen(rx: _rx, ry: _ry)),
+                            IgnorePointer(
+                              child: _GlassReflection(
+                                rx: _rx, ry: _ry,
+                                width: widget.width, height: widget.height,
+                              ),
+                            ),
                         ],
                       ),
                     ),
@@ -137,34 +181,35 @@ class _Tilt3DCardState extends State<Tilt3DCard>
   }
 }
 
-// Diagonal light band that follows the tilt direction, like the foil
-// sheen on a holographic trading card. Front side only.
-class _HoloSheen extends StatelessWidget {
+// Soft light patch that slides across the artwork as the card tilts,
+// like a real reflection off glass rather than a fixed diagonal band.
+class _GlassReflection extends StatelessWidget {
   final double rx, ry;
-  const _HoloSheen({required this.rx, required this.ry});
+  final double width, height;
+  const _GlassReflection({
+    required this.rx, required this.ry,
+    required this.width, required this.height,
+  });
 
   @override
   Widget build(BuildContext context) {
+    // The light source stays put, so the highlight moves opposite the tilt.
+    final ax = (-ry).clamp(-1.0, 1.0);
+    final ay = (-rx * 0.8 - 0.25).clamp(-1.0, 1.0);
     final strength = math.sqrt(rx * rx + ry * ry).clamp(0.0, 1.0);
-    return Opacity(
-      opacity: 0.05 + strength * 0.22,
-      child: Align(
-        alignment: Alignment(ry, rx),
-        child: Transform.rotate(
-          angle: math.pi / 4,
-          child: Container(
-            width: 500,
-            height: 80,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.white.withValues(alpha: 0),
-                  Colors.white,
-                  Colors.cyanAccent.withValues(alpha: 0.6),
-                  Colors.white.withValues(alpha: 0),
-                ],
-              ),
-            ),
+
+    return Align(
+      alignment: Alignment(ax, ay),
+      child: Container(
+        width: width * 1.3,
+        height: height * 0.6,
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            colors: [
+              Colors.white.withValues(alpha: 0.22 + strength * 0.16),
+              Colors.white.withValues(alpha: 0),
+            ],
+            stops: const [0.0, 1.0],
           ),
         ),
       ),
