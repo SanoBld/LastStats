@@ -55,17 +55,52 @@ class _FadeIn extends StatelessWidget {
 
 // ── Fullscreen image helper (used by detail sheet and profile sheet) ──────────
 
-void _pushFullscreen(BuildContext ctx, String url) {
+void _pushFullscreen(BuildContext ctx, String url,
+    {String title = '', String subtitle = '', String source = 'Last.fm'}) {
   Navigator.of(ctx).push(PageRouteBuilder(
     opaque: false,
     barrierColor: Colors.black,
     barrierDismissible: true,
-    pageBuilder: (_, _, _) => _FullscreenImageViewer(url: url),
+    pageBuilder: (_, _, _) => _FullscreenImageViewer(
+        url: url, title: title, subtitle: subtitle, source: source),
     transitionsBuilder: (_, anim, _, child) =>
         FadeTransition(opacity: anim, child: child),
     transitionDuration: const Duration(milliseconds: 220),
   ));
 }
+
+// Text side of the fullscreen card (release date / author / source).
+class _CardBack extends StatelessWidget {
+  final String title, subtitle, source;
+  const _CardBack({required this.title, required this.subtitle, required this.source});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    color: const Color(0xFF171717),
+    padding: const EdgeInsets.all(22),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (title.isNotEmpty)
+          Text(title, style: const TextStyle(color: Colors.white,
+              fontSize: 20, fontWeight: FontWeight.w700)),
+        if (subtitle.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Text(subtitle, style: const TextStyle(color: Colors.white70, fontSize: 15)),
+        ],
+        const SizedBox(height: 18),
+        Row(children: [
+          const Icon(Icons.info_outline_rounded, color: Colors.white38, size: 16),
+          const SizedBox(width: 6),
+          Text('Source : $source',
+              style: const TextStyle(color: Colors.white38, fontSize: 13)),
+        ]),
+      ],
+    ),
+  );
+}
+
 
 // ── Artwork color theme (beta) ──────────────────────────────────────────────
 // Builds the fully artwork-themed variant of [base]. We only need the two
@@ -628,7 +663,13 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                 // Tappable image zone — moves with scroll, no hitbox drift
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: hasImage ? () => _pushFullscreen(ctx, _resolvedImage) : null,
+                  onTap: hasImage ? () => _pushFullscreen(ctx, _resolvedImage,
+                      title: _name, subtitle: _artist,
+                      source: switch (widget.type) {
+                        'artists' => 'Artiste · Last.fm',
+                        'albums'  => 'Album · Last.fm',
+                        _         => 'Titre · Last.fm',
+                      }) : null,
                   child: SizedBox(height: imgH - 90, width: double.infinity),
                 ),
                 _buildHeader(ctx, scheme, imgH, hasImage),
@@ -1716,55 +1757,66 @@ class _BlurFadeImageState extends State<_BlurFadeImage>
 
 // ── Fullscreen image viewer ───────────────────────────────────────────────────
 
-// Fullscreen image viewer — supports pinch zoom, close button, tap to dismiss
+// Fullscreen artwork viewer — fixed-size 3D tilt card, drag/tilt/flip.
 class _FullscreenImageViewer extends StatefulWidget {
   final String url;
-  const _FullscreenImageViewer({required this.url});
+  final String title;
+  final String subtitle;
+  final String source;
+  const _FullscreenImageViewer({
+    required this.url,
+    this.title = '',
+    this.subtitle = '',
+    this.source = 'Last.fm',
+  });
 
   @override
   State<_FullscreenImageViewer> createState() => _FullscreenImageViewerState();
 }
 
 class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
-  final _tc     = TransformationController();
-  bool _isZoomed = false;
-
-  @override
-  void dispose() { _tc.dispose(); super.dispose(); }
-
   @override
   Widget build(BuildContext context) {
     final topPad = MediaQuery.of(context).padding.top;
+    final size   = MediaQuery.of(context).size;
+    final cardW  = math.min(size.width * 0.8, 340.0);
+    final cardH  = math.min(size.height * 0.62, cardW * 1.35);
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // InteractiveViewer handles pinch-zoom and pan.
-          // Inner GestureDetector handles tap-to-dismiss (only when not zoomed).
-          InteractiveViewer(
-            transformationController: _tc,
-            minScale: 0.8,
-            maxScale: 6.0,
-            onInteractionEnd: (_) => setState(() {
-              _isZoomed = _tc.value != Matrix4.identity();
-            }),
-            child: GestureDetector(
-              onTap: () { if (!_isZoomed) Navigator.pop(context); },
-              child: Center(
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            behavior: HitTestBehavior.opaque,
+            child: Center(
+              // Stop taps on the card itself from bubbling to the
+              // dismiss-on-tap background behind it.
+              child: GestureDetector(
+                onTap: () {},
                 child: Tilt3DCard(
-                  child: Image.network(
-                    widget.url, fit: BoxFit.contain,
-                    errorBuilder: (_, _, _) => const Icon(
-                        Icons.broken_image_rounded,
-                        color: Colors.white54, size: 64),
+                  width: cardW,
+                  height: cardH,
+                  front: Image.network(
+                    widget.url, fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => const ColoredBox(
+                      color: Colors.black26,
+                      child: Icon(Icons.broken_image_rounded,
+                          color: Colors.white54, size: 64),
+                    ),
+                  ),
+                  back: _CardBack(
+                    title: widget.title,
+                    subtitle: widget.subtitle,
+                    source: widget.source,
                   ),
                 ),
               ),
             ),
           ),
 
-          // Close button — always visible, resets zoom then dismisses
+          // Close button — always visible
           Positioned(
             top: topPad + 8, right: 12,
             child: GestureDetector(
@@ -2121,7 +2173,9 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                 // Avatar tap zone — inline so hitbox moves with scroll
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: hasAv ? () => _pushFullscreen(ctx, avatarUrl) : null,
+                  onTap: hasAv ? () => _pushFullscreen(ctx, avatarUrl,
+                      title: widget.username, subtitle: 'Profil',
+                      source: 'Last.fm') : null,
                   child: SizedBox(height: imgH - 90, width: double.infinity),
                 ),
                 _buildProfileHeader(ctx, scheme, hasAv, avatarUrl),

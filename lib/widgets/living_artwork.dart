@@ -1,6 +1,8 @@
-// 3D tilt card, Pokémon-card style, used in the fullscreen artwork viewer.
-// Tilts on phone movement (accelerometer) and on mouse hover (desktop/web).
-// A holographic sheen sweeps across the cover following the tilt angle.
+// 3D flip card, Pokémon-card style, used in the fullscreen artwork viewer.
+// - drag with a finger, tilt the phone, or hover with a mouse: card leans
+//   in 3D following the input
+// - tap to flip and read info on the back
+// Fixed width/height so layout is always stable (no more broken framing).
 // Toggle: Settings > Appearance ("Pochettes animées" / livingArtworkNotifier).
 import 'dart:async';
 import 'dart:math' as math;
@@ -9,8 +11,18 @@ import 'package:sensors_plus/sensors_plus.dart';
 import '../app_state.dart';
 
 class Tilt3DCard extends StatefulWidget {
-  final Widget child;
-  const Tilt3DCard({super.key, required this.child});
+  final Widget front;
+  final Widget back;
+  final double width, height;
+  final double radius;
+  const Tilt3DCard({
+    super.key,
+    required this.front,
+    required this.back,
+    required this.width,
+    required this.height,
+    this.radius = 22,
+  });
 
   @override
   State<Tilt3DCard> createState() => _Tilt3DCardState();
@@ -18,20 +30,19 @@ class Tilt3DCard extends StatefulWidget {
 
 class _Tilt3DCardState extends State<Tilt3DCard>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _spring =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 260));
+  late final AnimationController _flip =
+      AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
   StreamSubscription<AccelerometerEvent>? _sub;
 
-  // Current tilt, -1..1 on each axis.
-  double _rx = 0, _ry = 0;
-  bool _hovering = false;
+  double _rx = 0, _ry = 0;  // tilt, -1..1
+  bool _dragging = false;
 
   @override
   void initState() {
     super.initState();
     try {
       _sub = accelerometerEventStream().listen((e) {
-        if (!mounted || _hovering) return; // pointer takes priority when present
+        if (!mounted || _dragging) return;
         setState(() {
           _rx = (e.y / 9.8).clamp(-1, 1);
           _ry = (-e.x / 9.8).clamp(-1, 1);
@@ -41,18 +52,26 @@ class _Tilt3DCardState extends State<Tilt3DCard>
   }
 
   @override
-  void dispose() { _spring.dispose(); _sub?.cancel(); super.dispose(); }
+  void dispose() { _flip.dispose(); _sub?.cancel(); super.dispose(); }
 
-  void _setTiltFromLocal(Offset local, Size size) {
+  void _tiltFromLocal(Offset local) {
     setState(() {
-      _ry = ((local.dx / size.width) - 0.5) * 2;   // left/right
-      _rx = -((local.dy / size.height) - 0.5) * 2;  // up/down
+      _ry = ((local.dx / widget.width) - 0.5) * 2;
+      _rx = -((local.dy / widget.height) - 0.5) * 2;
     });
   }
 
   void _resetTilt() {
-    _hovering = false;
+    _dragging = false;
     setState(() { _rx = 0; _ry = 0; });
+  }
+
+  void _toggleFlip() {
+    if (_flip.value < 0.5) {
+      _flip.forward();
+    } else {
+      _flip.reverse();
+    }
   }
 
   @override
@@ -60,41 +79,58 @@ class _Tilt3DCardState extends State<Tilt3DCard>
     return ValueListenableBuilder<bool>(
       valueListenable: livingArtworkNotifier,
       builder: (context, enabled, _) {
-        if (!enabled) return widget.child;
-        return LayoutBuilder(
-          builder: (context, c) {
-            final size = Size(c.maxWidth, c.maxHeight);
-            return MouseRegion(
-              onEnter: (_) => _hovering = true,
-              onHover: (e) => _setTiltFromLocal(e.localPosition, size),
-              onExit: (_) => _resetTilt(),
-              child: TweenAnimationBuilder<double>(
-                tween: Tween(begin: 0, end: 1),
-                duration: const Duration(milliseconds: 120),
-                builder: (context, _, __) {
-                  final angleX = _rx * 0.35; // radians, ~20°
-                  final angleY = _ry * 0.35;
+        final radius = BorderRadius.circular(widget.radius);
+        return MouseRegion(
+          onHover: enabled ? (e) => _tiltFromLocal(e.localPosition) : null,
+          onExit: enabled ? (_) => _resetTilt() : null,
+          child: GestureDetector(
+            onTap: _toggleFlip,
+            onPanStart: enabled ? (_) => _dragging = true : null,
+            onPanUpdate: enabled ? (d) => _tiltFromLocal(d.localPosition) : null,
+            onPanEnd: enabled ? (_) => _resetTilt() : null,
+            child: SizedBox(
+              width: widget.width,
+              height: widget.height,
+              child: AnimatedBuilder(
+                animation: _flip,
+                builder: (context, _) {
+                  final flipAngle = _flip.value * math.pi;
+                  final showFront = flipAngle <= math.pi / 2;
+                  final tiltX = enabled ? _rx * 0.28 : 0.0;
+                  final tiltY = enabled ? _ry * 0.28 : 0.0;
+
                   final m = Matrix4.identity()
-                    ..setEntry(3, 2, 0.0016) // perspective
-                    ..rotateX(angleX)
-                    ..rotateY(angleY);
+                    ..setEntry(3, 2, 0.0018)
+                    ..rotateX(tiltX)
+                    ..rotateY(flipAngle + tiltY);
+
+                  final side = showFront
+                      ? widget.front
+                      : Transform(
+                          alignment: Alignment.center,
+                          transform: Matrix4.identity()..rotateY(math.pi),
+                          child: widget.back,
+                        );
+
                   return Transform(
                     alignment: Alignment.center,
                     transform: m,
-                    child: Stack(
-                      fit: StackFit.passthrough,
-                      children: [
-                        widget.child,
-                        IgnorePointer(
-                          child: _HoloSheen(rx: _rx, ry: _ry),
-                        ),
-                      ],
+                    child: ClipRRect(
+                      borderRadius: radius,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          side,
+                          if (enabled && showFront)
+                            IgnorePointer(child: _HoloSheen(rx: _rx, ry: _ry)),
+                        ],
+                      ),
                     ),
                   );
                 },
               ),
-            );
-          },
+            ),
+          ),
         );
       },
     );
@@ -102,7 +138,7 @@ class _Tilt3DCardState extends State<Tilt3DCard>
 }
 
 // Diagonal light band that follows the tilt direction, like the foil
-// sheen on a holographic trading card.
+// sheen on a holographic trading card. Front side only.
 class _HoloSheen extends StatelessWidget {
   final double rx, ry;
   const _HoloSheen({required this.rx, required this.ry});
@@ -111,7 +147,7 @@ class _HoloSheen extends StatelessWidget {
   Widget build(BuildContext context) {
     final strength = math.sqrt(rx * rx + ry * ry).clamp(0.0, 1.0);
     return Opacity(
-      opacity: 0.05 + strength * 0.20,
+      opacity: 0.05 + strength * 0.22,
       child: Align(
         alignment: Alignment(ry, rx),
         child: Transform.rotate(

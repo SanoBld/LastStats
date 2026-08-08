@@ -16,6 +16,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math' show sqrt;
+import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui';
 import 'dart:ui' as ui;
