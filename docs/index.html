@@ -43,72 +43,86 @@
   <div id="dartdoc-main-content" class="main-content">
       
 <section class="desc markdown">
-  <h1 id="laststats-">LastStats 🎵</h1>
+  <h1 id="laststats">LastStats</h1>
 <p align="center">
   <img src="https://img.shields.io/github/v/release/SanoBld/LastStats-App?style=flat-square&amp;color=7C3AED&amp;label=Version" alt="Latest Release">
-  <img src="https://img.shields.io/github/actions/workflow/status/SanoBld/LastStats-App/build-all.yml?branch=main&amp;style=flat-square&amp;label=Builds" alt="Build Status">
-  <img src="https://img.shields.io/github/license/SanoBld/LastStats-App?style=flat-square&amp;color=555555" alt="License">
+  <img src="https://img.shields.io/github/downloads/SanoBld/LastStats-App/total?style=flat-square&amp;color=7C3AED&amp;label=Downloads" alt="Total Downloads">
+  <a href="https://discord.gg/JjqmkQgZBs"><img src="https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&amp;logo=discord&amp;logoColor=white" alt="Discord"></a>
 </p>
-<p>A modern, multiplatform application built with <strong>Flutter</strong> and <strong>Material You (M3)</strong> to visualize, track, and analyze your listening statistics in real-time using the <strong>Last.fm</strong> API.</p>
+<p>🎵 A modern, multiplatform app built with Flutter and Material You to track and explore your listening habits in real time, using the Last.fm API.</p>
+<p>Join the Discord to chat, share feedback, or ask for help: <a href="https://discord.gg/JjqmkQgZBs">https://discord.gg/JjqmkQgZBs</a></p>
 <hr>
-<h2 id="-features">✨ Features</h2>
+<h2 id="features">Features</h2>
+<p><strong>🎨 Design and theming</strong></p>
 <ul>
-<li>
-<p><strong>Minimalist &amp; Modern Design:</strong> Clean interface inspired by technical aesthetics, optimized for quick and efficient data reading.</p>
-</li>
-<li>
-<p><strong>Material You &amp; Advanced Theming:</strong> Fully supports system dark/light modes, custom accent colors (via presets or raw Hex codes), and dynamic palette extraction (<code>palette_generator</code>) that shifts the app's accent colors based on your <strong>Now Playing</strong> album artwork.</p>
-</li>
-<li>
-<p><strong>Smart Image Resolution Chain:</strong> Built-in multi-source artwork locator with an in-memory cache. If Last.fm doesn't provide a valid image, the app automatically falls back through the <strong>iTunes Search API</strong>, <strong>Deezer API</strong>, and <strong>MusicBrainz / Cover Art Archive</strong>.</p>
-</li>
-<li>
-<p><strong>Real Data &amp; Flexible Timeframes:</strong> Direct, seamless connection with the Last.fm API to fetch live user profiles, recent scrobbles, and ranked lists across customizable periods (7 days, 1 month, 3 months, 6 months, 12 months, or overall).</p>
-</li>
-<li>
-<p><strong>Zero Simulated Data:</strong> The application purely processes functional, live API streams with robust network error handling and retry mechanisms.</p>
-</li>
-<li>
-<p><strong>Integrated Update Checker:</strong> Automated version tracking using the GitHub Releases API to notify users instantly when a newer release or APK is available.</p>
-</li>
-<li>
-<p><strong>Multiplatform:</strong> Architecture optimized to target Android, Windows, macOS, Linux, and Web from a single codebase.</p>
-</li>
+<li>Clean, minimalist interface that works on phones, tablets, and desktop</li>
+<li>Full support for system light and dark mode, plus a pure black OLED theme for AMOLED screens</li>
+<li>Custom accent colors, either from presets or your own hex code</li>
+<li>Dynamic color that can match your device's system palette</li>
+<li>A Nothing OS inspired theme, with a classic red style or a mixed red and yellow style</li>
+<li>Optional Now Playing color mode, where the app's accent shifts to match the artwork of the track you are listening to, with a fallback color and the option to keep the last color once playback stops</li>
+<li>Optional tinted detail sheets, using the dominant color pulled from the album artwork</li>
+<li>Adaptive navigation: a side rail on wide screens, a bottom bar on smaller ones, and a manual switch if you prefer one over the other</li>
+<li>Show or hide labels under the navigation bar icons</li>
+</ul>
+<p><strong>❤️ Favorites</strong></p>
+<ul>
+<li>Like tracks, artists, and albums directly from the app, through your own Last.fm account</li>
+<li>A dedicated Favorites page with filters and cover art, where you can also remove items</li>
+<li>A small heart badge next to loved tracks in your recent listens, history, and search results, with an option to turn it off</li>
+<li>A favorites count shown on your dashboard, with an option to hide it</li>
+</ul>
+<p><strong>📊 Data and sync</strong></p>
+<ul>
+<li>Direct connection to the Last.fm API for real, live scrobbles, top artists, albums, and tracks</li>
+<li>Flexible time ranges: 7 days, 1 month, 3 months, 6 months, 12 months, or all time</li>
+<li>Background sync that keeps your stats up to date automatically, even when the app is closed</li>
+<li>Local cache to reduce loading times and API calls</li>
+<li>Smart artwork search: if Last.fm has no image, the app looks it up through iTunes, Deezer, and the Cover Art Archive</li>
+<li>No fake or simulated data, everything comes from your real listening history</li>
+</ul>
+<p><strong>🔔 Notifications</strong></p>
+<ul>
+<li>Get notified when new app updates or news posts are published</li>
+<li>A small badge on the news bell so you never miss an update</li>
+<li>Notifications can be turned on or off at any time, on every supported platform including Windows</li>
+</ul>
+<p><strong>🌍 Languages</strong></p>
+<ul>
+<li>Available in French, English, Spanish, Chinese, Portuguese, German, Italian, Japanese, Russian, and Arabic</li>
+<li>The app follows your system language automatically, or you can pick one yourself from the settings</li>
+</ul>
+<p><strong>⚙️ Other little touches</strong></p>
+<ul>
+<li>Haptic feedback on key actions</li>
+<li>A quick search bar to find any artist, album, or track</li>
+<li>Import and export your settings and appearance, useful when switching devices</li>
+<li>Built in update checker that lets you know as soon as a new version is ready to download</li>
 </ul>
 <hr>
-<h2 id="-downloads--automated-builds-cicd">🚀 Downloads &amp; Automated Builds (CI/CD)</h2>
-<p>This project uses an automated multi-platform pipeline powered by <strong>GitHub Actions</strong>. Every update pushed to the repository simultaneously triggers release compilations for all target environments.</p>
-<p>You can download the latest builds directly from the <strong>Actions</strong> tab of this repository:</p>
-<ul>
-<li>🤖 <strong>Android:</strong> <code>laststats-android-apk</code> (Features native adaptive icons)</li>
-<li>🪟 <strong>Windows:</strong> <code>laststats-windows-app</code></li>
-<li>🌐 <strong>Web:</strong> <code>laststats-web-app</code></li>
-<li>🍏 <strong>macOS:</strong> <code>laststats-macos-app</code></li>
-<li>🐧 <strong>Linux:</strong> <code>laststats-linux-app</code></li>
-</ul>
-<blockquote>
-<p>⚠️ <strong>Warning / Stability Note:</strong>
-Executables downloaded directly from the <strong>Actions</strong> tab include the very latest features and real-time code updates. Consequently, <strong>these development builds are highly likely to contain bugs</strong>. Some specific features might temporarily glitch, malfunction, or exhibit unstable behavior.</p>
-</blockquote>
+<h2 id="-downloads">📥 Downloads</h2>
+<p>You can find every release, for every platform, on the releases page:</p>
+<p><a href="https://github.com/SanoBld/LastStats-App/releases">https://github.com/SanoBld/LastStats-App/releases</a></p>
+<p>Prebuilt files are also generated automatically after each update, through GitHub Actions:</p>
+<p><a href="https://github.com/SanoBld/LastStats-App/actions">https://github.com/SanoBld/LastStats-App/actions</a></p>
+<p>Builds coming straight from Actions contain the latest code and may include bugs that have not been fixed yet. If you want a stable experience, use the releases page instead.</p>
+<p>Supported platforms: Android, Windows, macOS, and Linux.</p>
 <hr>
-<h2 id="-technologies-used">📦 Technologies Used</h2>
+<h2 id="-built-with">🛠️ Built with</h2>
 <ul>
-<li><strong>Framework:</strong> Flutter (Dart)</li>
-<li><strong>Design System:</strong> Material Design 3 (Material You)</li>
-<li><strong>Key Packages:</strong>
-<ul>
-<li><code>dynamic_color</code> – Dynamic system palette adaptation.</li>
-<li><code>palette_generator</code> – Contextual color profile extraction from album art.</li>
-<li><code>shared_preferences</code> – Persistent storage for user credentials and custom UI configurations.</li>
-<li><code>http</code> – Concurrent network management for REST requests.</li>
-<li><code>url_launcher</code> – External web redirection management.</li>
-</ul>
-</li>
-<li><strong>API Integration:</strong> Last.fm REST API, iTunes Search API, Deezer API, and Cover Art Archive.</li>
+<li>Flutter and Dart</li>
+<li>Material Design 3 (Material You)</li>
+<li>Last.fm REST API, with iTunes Search, Deezer, and Cover Art Archive as backup sources for missing artwork</li>
 </ul>
 <hr>
-<h2 id="-license">📝 License</h2>
-<p>This project is open-source. Feel free to use, modify, or contribute to it.</p>
+<h2 id="-support-and-feedback">🙋 Support and feedback</h2>
+<p>Found a bug, or have an idea for a new feature? Open an issue here:</p>
+<p><a href="https://github.com/SanoBld/LastStats-App/issues">https://github.com/SanoBld/LastStats-App/issues</a></p>
+<p>Or join the Discord to chat directly and follow what's coming next:</p>
+<p><a href="https://discord.gg/JjqmkQgZBs">https://discord.gg/JjqmkQgZBs</a></p>
+<hr>
+<h2 id="about">About</h2>
+<p>This project is developed independently, in my free time. It is open source, so you are free to use it, modify it, or contribute to it. If you enjoy the app, a star on the repository always helps.</p>
 </section>
 
 
@@ -542,6 +556,13 @@ Executables downloaded directly from the <strong>Actions</strong> tab include th
 <dd>
 </dd>
 
+          <dt id="living_artwork">
+  <span class="name"><a href="widgets_living_artwork/">widgets/living_artwork</a></span> 
+
+</dt>
+<dd>
+</dd>
+
           <dt id="markdown_lite">
   <span class="name"><a href="widgets_markdown_lite/">widgets/markdown_lite</a></span> 
 
@@ -627,6 +648,7 @@ Executables downloaded directly from the <strong>Actions</strong> tab include th
       <li><a href="services_web_img_web/">services/web_img_web</a></li>
       <li><a href="supported_locales/">supported_locales</a></li>
       <li><a href="widgets_custom_title_bar/">widgets/custom_title_bar</a></li>
+      <li><a href="widgets_living_artwork/">widgets/living_artwork</a></li>
       <li><a href="widgets_markdown_lite/">widgets/markdown_lite</a></li>
 </ol>
 
@@ -637,7 +659,7 @@ Executables downloaded directly from the <strong>Actions</strong> tab include th
 <footer>
   <span class="no-break">
     laststats_mobile
-      2.6.0+1
+      3.0.0+20
   </span>
   
 </footer>
