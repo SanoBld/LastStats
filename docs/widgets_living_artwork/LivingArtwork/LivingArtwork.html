@@ -56,10 +56,7 @@
       const
       <span class="name ">LivingArtwork</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span></li>
 <li><span class="parameter" id="param-child"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span> <span class="parameter-name">child</span>, </span></li>
-<li><span class="parameter" id="param-intensity"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">intensity</span> = <span class="default-value">6</span>, </span></li>
-<li><span class="parameter" id="param-zoom"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">zoom</span> = <span class="default-value">true</span>, </span></li>
-<li><span class="parameter" id="param-gloss"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">gloss</span> = <span class="default-value">true</span>, </span></li>
-<li><span class="parameter" id="param-borderRadius"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/painting/BorderRadius-class.html">BorderRadius</a>?</span> <span class="parameter-name">borderRadius</span>, </span></li>
+<li><span class="parameter" id="param-size"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">size</span>, </span></li>
 </ol>})
     </section>
     
@@ -68,14 +65,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">const LivingArtwork({
-  super.key,
-  required this.child,
-  this.intensity = 6,
-  this.zoom = true,
-  this.gloss = true,
-  this.borderRadius,
-});</code></pre>
+  <pre class="language-dart"><code class="language-dart">const LivingArtwork({super.key, required this.child, required this.size});</code></pre>
 </section>
 
 
@@ -103,7 +93,7 @@
 <footer>
   <span class="no-break">
     laststats_mobile
-      3.0.0+20
+      2.6.0+1
   </span>
   
 </footer>
