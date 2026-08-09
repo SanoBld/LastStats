@@ -2440,6 +2440,9 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     super.initState();
     _localIsFav = widget.isFav;
     _load();
+    // Kick off a background library sync so the comparator (and the
+    // "syncing…" indicator above) can upgrade past the top-200 fallback.
+    FriendsLibraryService.syncFriendIfStale(widget.username, widget.service);
   }
 
   Future<void> _load() async {
@@ -2539,6 +2542,24 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     final d = _days();
     return d > 0 ? _total() / d : 0;
   }
+
+  // Achievements are computed straight from user.getInfo — same stats we
+  // already fetch for the header, no full scrobble history needed.
+  List<AchievementProgress> _achievements() {
+    final days   = _days();
+    final weekly = days > 0 ? ((_total() / days) * 7).round() : 0;
+    return computeAchievements(
+      totalScrobbles: _total(),
+      artistCount: int.tryParse((_info?['artist_count'] ?? '0').toString()) ?? 0,
+      albumCount:  int.tryParse((_info?['album_count']  ?? '0').toString()) ?? 0,
+      trackCount:  int.tryParse((_info?['track_count']  ?? '0').toString()) ?? 0,
+      yearsRegistered: (days / 365).floor(),
+      weeklyAvg: weekly,
+    );
+  }
+
+  CardTier _profileCardTier() =>
+      profileTier(_achievements().where((a) => a.unlocked).length);
 
   bool _hasAvatar(String url) => url.isNotEmpty && !url.contains(_ph);
 
@@ -2653,6 +2674,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                   behavior: HitTestBehavior.opaque,
                   onTap: hasAv ? () => _pushFullscreen(ctx, avatarUrl,
                       title: widget.username, subtitle: 'Profil',
+                      tier: _profileCardTier(),
                       source: 'Last.fm') : null,
                   child: SizedBox(height: imgH - 90, width: double.infinity),
                 ),
@@ -2664,6 +2686,8 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                     children: [
                       _buildStatsRow(scheme),
                       _buildCompareButton(context),
+                      _buildFriendSyncStatus(scheme),
+                      _buildAchievementsPreview(ctx, scheme),
                       if (_isNowPlaying) _buildNowPlayingCard(scheme),
                       if (_topArtists.isNotEmpty) ...[
                         _sectionHeader(L.commonTopArtists, scheme),
@@ -2939,6 +2963,81 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // Top 4 unlocked achievements (highest tier first) + a link to the full
+  // list. Computed from user.getInfo — no full scrobble sync needed here.
+  // Small "syncing…" hint while this friend's full library downloads in
+  // the background — the comparator still works meanwhile (top-200 fallback).
+  Widget _buildFriendSyncStatus(ColorScheme scheme) {
+    return ValueListenableBuilder<Set<String>>(
+      valueListenable: FriendsLibraryService.syncingNotifier,
+      builder: (context, syncing, _) {
+        if (!syncing.contains(widget.username.toLowerCase())) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: Row(children: [
+            SizedBox(width: 12, height: 12,
+                child: CircularProgressIndicator(strokeWidth: 1.6, color: scheme.onSurfaceVariant)),
+            const SizedBox(width: 8),
+            Text(_ct('Synchronisation des données…', 'Syncing full library…'),
+                style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+          ]),
+        );
+      },
+    );
+  }
+
+  Widget _buildAchievementsPreview(BuildContext ctx, ColorScheme scheme) {
+    final list = _achievements();
+    final unlockedList = list.where((a) => a.unlocked).toList()
+      ..sort((a, b) => CardTier.values.indexOf(b.def.tier)
+          .compareTo(CardTier.values.indexOf(a.def.tier)));
+    final preview = unlockedList.take(4).toList();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(L.achvTitle, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+              GestureDetector(
+                onTap: () => showAchievementsSheet(ctx, _info),
+                child: Row(children: [
+                  Text(_ct('Voir plus', 'See more'), style: TextStyle(
+                      color: scheme.primary, fontSize: 13, fontWeight: FontWeight.w600)),
+                  Icon(Icons.chevron_right_rounded, size: 16, color: scheme.primary),
+                ]),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (preview.isEmpty)
+            Text(_ct('Aucun succès débloqué pour l\u2019instant', 'No achievements unlocked yet'),
+                style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13))
+          else
+            SizedBox(
+              height: 76,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: preview.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 12),
+                itemBuilder: (_, i) {
+                  final a = preview[i];
+                  return Column(mainAxisSize: MainAxisSize.min, children: [
+                    _AchvTierBadge(tier: a.def.tier, size: 50, icon: a.def.icon),
+                    const SizedBox(height: 4),
+                    Text(tierLabel(a.def.tier), style: const TextStyle(fontSize: 10)),
+                  ]);
+                },
+              ),
+            ),
+        ],
       ),
     );
   }

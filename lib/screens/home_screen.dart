@@ -44,6 +44,7 @@ import '../services/all_scrobbles_service.dart';
 import '../services/translation_service.dart';
 import '../services/lyrics_service.dart';
 import '../services/achievements.dart';
+import '../services/friends_library_service.dart';
 import '../widgets/markdown_lite.dart';
 import '../widgets/living_artwork.dart';
 import 'favorites_page.dart';

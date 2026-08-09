@@ -406,14 +406,20 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
       // myArtistW will be empty. Fall back to API in that case.
       final hasMeaningfulData = myArtistW.isNotEmpty;
 
+      // Full synced library for the other person, if FriendsLibraryService
+      // already has it — skips the top-200 cap entirely when available.
+      // Kick off a background sync too, so it's ready faster next time.
+      final theirLib = !isSelf ? FriendsLibraryService.get(widget.targetUser) : null;
+      if (!isSelf) FriendsLibraryService.syncFriendIfStale(widget.targetUser, widget.service);
+
       // ── API fetches ───────────────────────────────────────────────────────
       // Always: my avatar + their avatar.
-      // Not-self: their top 200 artists/tracks/albums.
+      // Not-self, no full library cached yet: their top 200 as fallback.
       // No meaningful cache: my top 200 from API as fallback.
       final futs = <Future>[
         widget.service.getUserInfo(user: _myUsername),
         widget.service.getUserInfo(user: widget.targetUser),
-        if (!isSelf) ...[
+        if (!isSelf && theirLib == null) ...[
           widget.service.getTopArtists(user: widget.targetUser, period: 'overall', limit: 200),
           widget.service.getTopTracks( user: widget.targetUser, period: 'overall', limit: 200),
           widget.service.getTopAlbums( user: widget.targetUser, period: 'overall', limit: 200),
@@ -436,9 +442,9 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
       final myInfo    = res[i++] as Map<String, dynamic>?;
       final theirInfo = res[i++] as Map<String, dynamic>?;
 
-      final theirArtists = !isSelf ? res[i++] as List<dynamic> : <dynamic>[];
-      final theirTracks  = !isSelf ? res[i++] as List<dynamic> : <dynamic>[];
-      final theirAlbums  = !isSelf ? res[i++] as List<dynamic> : <dynamic>[];
+      final theirArtists = !isSelf ? (theirLib?.artists ?? res[i++] as List<dynamic>) : <dynamic>[];
+      final theirTracks  = !isSelf ? (theirLib?.tracks  ?? res[i++] as List<dynamic>) : <dynamic>[];
+      final theirAlbums  = !isSelf ? (theirLib?.albums  ?? res[i++] as List<dynamic>) : <dynamic>[];
 
       if (!hasMeaningfulData && !isSelf) {
         final myArtistsFb = res[i++] as List<dynamic>;

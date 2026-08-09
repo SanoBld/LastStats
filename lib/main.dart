@@ -14,6 +14,7 @@ import 'screens/notification_detail_page.dart';
 import 'services/data_cache.dart';
 import 'services/image_service.dart';
 import 'services/scrobbles_file_cache.dart';
+import 'services/friends_library_service.dart';
 import 'services/notification_service.dart';
 import 'services/notification_worker.dart';
 import 'services/storage_manager.dart';
@@ -94,6 +95,7 @@ void main() async {
   await UpdateService.init();
   await DataCache.clearExpired();
   await ScrobblesFileCache.init();
+  await FriendsLibraryService.init();
   await StorageManager.init();
   ImageService.pruneExpired();
 

@@ -729,6 +729,12 @@ class _DashboardPageState extends State<_DashboardPage> {
       });
 
       if (mounted) setState(() { _friends = friends; _friendsLoading = false; });
+
+      // Fire-and-forget: sync any friend past the configured interval.
+      // Low priority — never awaited, never blocks this screen.
+      FriendsLibraryService.syncAllStale(
+        friends.map((f) => f.username).toList(), widget.service,
+      );
     } catch (_) {
       if (mounted) setState(() => _friendsLoading = false);
     }
