@@ -764,18 +764,16 @@ class _ChartsPageState extends State<_ChartsPage>
     canvas.drawRRect(pillRect, Paint()..color = scheme.primaryContainer);
     subTp.paint(canvas, Offset(left + 11, pillTop + 6));
 
-    // ── Chart image — inset in its own rounded frame ────────────────────
+    // ── Chart image — no extra clip/frame: it already carries its own
+    // rounded card + background from the live widget, so wrapping it in a
+    // second rounded rect just produces mismatched double corners. We draw
+    // it as-is, with high-quality filtering so downscaling stays sharp.
     final chartTop = outerPad + headerH;
-    final chartFrame = RRect.fromRectAndRadius(
-      Rect.fromLTWH(left, chartTop, innerWidth, chartH),
-      const Radius.circular(18),
-    );
-    canvas.drawRRect(chartFrame, Paint()..color = scheme.surface);
     canvas.save();
-    canvas.clipRRect(chartFrame);
     canvas.translate(left, chartTop);
     canvas.scale(scale);
-    canvas.drawImage(chartImage, Offset.zero, Paint());
+    canvas.drawImage(chartImage, Offset.zero,
+        Paint()..filterQuality = FilterQuality.high..isAntiAlias = true);
     canvas.restore();
 
     // ── Footer: thin divider + watermark + date ─────────────────────────
@@ -797,7 +795,7 @@ class _ChartsPageState extends State<_ChartsPage>
     canvas.restore(); // card clip
 
     final picture = recorder.endRecording();
-    final img = await picture.toImage(width.toInt(), totalH.toInt());
+    final img = await picture.toImage(width.round(), totalH.round());
     final bd  = await img.toByteData(format: ImageByteFormat.png);
     return bd!.buffer.asUint8List();
   }
