@@ -645,4 +645,8 @@ class AppStringsZh implements AppStrings {
   @override String get achvDescArtists => '至少收听过一次的不同艺术家数量。';
   @override String get achvDescAlbums => '至少收听过一次的不同专辑数量。';
   @override String get achvDescLoyalty => 'Last.fm 账号的注册时长。';
+  @override String get achvCatTracks => '曲目';
+  @override String get achvDescTracks => '收听过的不同曲目数量。';
+  @override String get achvCatPace => '节奏';
+  @override String get achvDescPace => '每周平均播放次数。';
 }

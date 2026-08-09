@@ -648,4 +648,8 @@ class AppStringsFr implements AppStrings {
   @override String get achvDescArtists => "Nombre d'artistes différents écoutés au moins une fois.";
   @override String get achvDescAlbums => "Nombre d'albums différents écoutés au moins une fois.";
   @override String get achvDescLoyalty => 'Ancienneté du compte Last.fm.';
+  @override String get achvCatTracks => 'Titres';
+  @override String get achvDescTracks => 'Nombre de titres différents (distincts) écoutés.';
+  @override String get achvCatPace => 'Rythme';
+  @override String get achvDescPace => "Moyenne d'écoutes par semaine.";
 }

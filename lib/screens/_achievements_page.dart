@@ -19,14 +19,15 @@ void showAchievementsSheet(BuildContext context, Map<String, dynamic>? userInfo)
   ));
 }
 
-int _yearsSince(dynamic registered) {
+int _yearsSince(dynamic registered) => (_daysSince(registered) / 365).floor();
+
+int _daysSince(dynamic registered) {
   if (registered == null) return 0;
   final ts = registered is Map
       ? int.tryParse((registered['#text'] ?? registered['unixtime'] ?? '0').toString()) ?? 0
       : int.tryParse(registered.toString()) ?? 0;
   if (ts <= 0) return 0;
-  final days = (DateTime.now().millisecondsSinceEpoch / 1000 - ts) / 86400;
-  return (days / 365).floor();
+  return ((DateTime.now().millisecondsSinceEpoch / 1000 - ts) / 86400).floor();
 }
 
 class _AchievementsSheet extends StatelessWidget {
@@ -39,10 +40,14 @@ class _AchievementsSheet extends StatelessWidget {
     final total   = int.tryParse((userInfo?['playcount']    ?? '0').toString()) ?? 0;
     final artists = int.tryParse((userInfo?['artist_count'] ?? '0').toString()) ?? 0;
     final albums  = int.tryParse((userInfo?['album_count']  ?? '0').toString()) ?? 0;
+    final tracks  = int.tryParse((userInfo?['track_count']  ?? '0').toString()) ?? 0;
+    final days    = _daysSince(userInfo?['registered']);
+    final weekly  = days > 0 ? ((total / days) * 7).round() : 0;
 
     final list = computeAchievements(
       totalScrobbles: total, artistCount: artists,
-      albumCount: albums, yearsRegistered: _yearsSince(userInfo?['registered']),
+      albumCount: albums, trackCount: tracks,
+      yearsRegistered: _yearsSince(userInfo?['registered']), weeklyAvg: weekly,
     );
     final unlocked = list.where((a) => a.unlocked).length;
     final myTier   = profileTier(unlocked);
@@ -98,7 +103,9 @@ class _AchvCategoryCard extends StatelessWidget {
     AchvCategory.listening => (L.achvCatListening, L.achvDescListening, Icons.headphones_rounded),
     AchvCategory.artists   => (L.achvCatArtists,   L.achvDescArtists,   Icons.mic_external_on_rounded),
     AchvCategory.albums    => (L.achvCatAlbums,    L.achvDescAlbums,    Icons.album_rounded),
+    AchvCategory.tracks    => (L.achvCatTracks,    L.achvDescTracks,    Icons.music_note_rounded),
     AchvCategory.loyalty   => (L.achvCatLoyalty,   L.achvDescLoyalty,   Icons.cake_rounded),
+    AchvCategory.pace      => (L.achvCatPace,      L.achvDescPace,      Icons.speed_rounded),
   };
 
   @override
@@ -204,7 +211,9 @@ class _AchvMilestoneTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final ratio  = (a.current / a.def.threshold).clamp(0.0, 1.0);
-    return Container(
+    return GestureDetector(
+      onTap: () => _openAchvCard(context, a, icon),
+      child: Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -245,11 +254,103 @@ class _AchvMilestoneTile extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 }
 
-// ── Shared tier visuals ─────────────────────────────────────────────────────
+// ── 3D badge card viewer ────────────────────────────────────────────────────
+
+void _openAchvCard(BuildContext context, AchievementProgress a, IconData icon) {
+  Navigator.of(context).push(PageRouteBuilder(
+    opaque: false,
+    barrierColor: Colors.black87,
+    barrierDismissible: true,
+    pageBuilder: (_, _, _) => _AchvCardViewer(a: a, icon: icon),
+    transitionsBuilder: (_, anim, _, child) => FadeTransition(opacity: anim, child: child),
+    transitionDuration: const Duration(milliseconds: 220),
+  ));
+}
+
+// Same Tilt3DCard used for artwork, adapted for a badge: front is the
+// textured tier surface + icon, back shows the level details.
+class _AchvCardViewer extends StatelessWidget {
+  final AchievementProgress a;
+  final IconData icon;
+  const _AchvCardViewer({required this.a, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    final size  = MediaQuery.of(context).size;
+    final cardW = math.min(size.width * 0.72, 300.0);
+    final cardH = cardW * 1.35;
+    final topPad = MediaQuery.of(context).padding.top;
+
+    return Scaffold(
+      backgroundColor: Colors.black87,
+      body: Stack(children: [
+        GestureDetector(
+          onTap: () => Navigator.pop(context),
+          behavior: HitTestBehavior.opaque,
+          child: Center(
+            child: GestureDetector(
+              onTap: () {},
+              child: Tilt3DCard(
+                width: cardW, height: cardH,
+                tier: a.unlocked ? a.def.tier : CardTier.none,
+                front: _AchvTierSurface(
+                  tier: a.def.tier,
+                  child: Center(
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      Icon(icon, size: 60, color: Colors.black87),
+                      const SizedBox(height: 14),
+                      Text(tierLabel(a.def.tier), style: const TextStyle(
+                          fontSize: 22, fontWeight: FontWeight.w800, color: Colors.black87)),
+                    ]),
+                  ),
+                ),
+                back: Container(
+                  color: const Color(0xFF171717),
+                  padding: const EdgeInsets.all(22),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(tierLabel(a.def.tier), style: const TextStyle(
+                          color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 10),
+                      Text('${a.current} / ${a.def.threshold}',
+                          style: const TextStyle(color: Colors.white70, fontSize: 15)),
+                      const SizedBox(height: 10),
+                      Row(children: [
+                        Icon(a.unlocked ? Icons.check_circle_rounded : Icons.lock_outline_rounded,
+                            size: 16, color: a.unlocked ? Colors.green : Colors.white38),
+                        const SizedBox(width: 6),
+                        Text(a.unlocked ? 'Débloqué' : 'Verrouillé',
+                            style: const TextStyle(color: Colors.white54, fontSize: 13)),
+                      ]),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          top: topPad + 8, right: 12,
+          child: GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              width: 36, height: 36,
+              decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.55), shape: BoxShape.circle),
+              child: const Icon(Icons.close_rounded, color: Colors.white, size: 20),
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
+}
 
 // Flat rectangular surface with the tier's metallic sheen, used as the
 // header strip of category cards. Rounded corners only where placed.

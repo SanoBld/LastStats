@@ -648,4 +648,8 @@ class AppStringsPt implements AppStrings {
   @override String get achvDescArtists => 'Número de artistas diferentes ouvidos pelo menos uma vez.';
   @override String get achvDescAlbums => 'Número de álbuns diferentes ouvidos pelo menos uma vez.';
   @override String get achvDescLoyalty => 'Tempo de conta no Last.fm.';
+  @override String get achvCatTracks => 'Faixas';
+  @override String get achvDescTracks => 'Número de faixas diferentes ouvidas.';
+  @override String get achvCatPace => 'Ritmo';
+  @override String get achvDescPace => 'Média de scrobbles por semana.';
 }

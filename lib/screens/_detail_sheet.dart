@@ -65,14 +65,17 @@ String _compactNum(int n) {
 void _pushFullscreen(BuildContext ctx, String url,
     {String title = '', String subtitle = '', String source = 'Last.fm',
      String releaseDate = '', List<(IconData, String)> extra = const [],
-     CardTier tier = CardTier.none}) {
+     CardTier tier = CardTier.none, int myPlaycount = 0,
+     String previewTrackName = '', String previewArtistName = ''}) {
   Navigator.of(ctx).push(PageRouteBuilder(
     opaque: false,
     barrierColor: Colors.black,
     barrierDismissible: true,
     pageBuilder: (_, _, _) => _FullscreenImageViewer(
         url: url, title: title, subtitle: subtitle, source: source,
-        releaseDate: releaseDate, extra: extra, tier: tier),
+        releaseDate: releaseDate, extra: extra, tier: tier,
+        myPlaycount: myPlaycount,
+        previewTrackName: previewTrackName, previewArtistName: previewArtistName),
     transitionsBuilder: (_, anim, _, child) =>
         FadeTransition(opacity: anim, child: child),
     transitionDuration: const Duration(milliseconds: 220),
@@ -609,26 +612,25 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   // Small extra stat lines shown on the back of the fullscreen card.
   List<(IconData, String)> _cardExtraInfo() {
+    // Own scrobbles for this exact item — shown on every type.
+    final mine = _myPlaycount();
     switch (widget.type) {
       case 'artists':
-        final l = _globalListeners(), p = _globalPlaycount();
+        final l = _globalListeners();
         return [
+          if (mine > 0) (Icons.play_circle_outline_rounded, '$mine scrobbles'),
           if (l > 0) (Icons.headphones_rounded, '${_compactNum(l)} auditeurs'),
-          if (p > 0) (Icons.play_circle_outline_rounded, '${_compactNum(p)} écoutes'),
         ];
       case 'albums':
         final n = _tracklist.length;
-        final l = _globalListeners();
         return [
+          if (mine > 0) (Icons.play_circle_outline_rounded, '$mine scrobbles'),
           if (n > 0) (Icons.queue_music_rounded, '$n titres'),
-          if (l > 0) (Icons.headphones_rounded, '${_compactNum(l)} auditeurs'),
         ];
       default:
-        // User's own scrobbles for this track (not the global Last.fm count).
-        final plays = _myPlaycount();
         final album = (_info?['album']?['title'] ?? '').toString();
         return [
-          if (plays > 0) (Icons.play_circle_outline_rounded, '$plays scrobbles'),
+          if (mine > 0) (Icons.play_circle_outline_rounded, '$mine scrobbles'),
           if (album.isNotEmpty) (Icons.album_rounded, album),
         ];
     }
@@ -763,6 +765,9 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       releaseDate: _releaseDate(),
                       extra: _cardExtraInfo(),
                       tier: tierForPlays(_myPlaycount()),
+                      myPlaycount: _myPlaycount(),
+                      previewTrackName: widget.type == 'tracks' ? _name : '',
+                      previewArtistName: widget.type == 'tracks' ? _artist : '',
                       source: switch (widget.type) {
                         'artists' => 'Artiste · Last.fm',
                         'albums'  => 'Album · Last.fm',
@@ -1864,6 +1869,9 @@ class _FullscreenImageViewer extends StatefulWidget {
   final String releaseDate;
   final List<(IconData, String)> extra;
   final CardTier tier;
+  final int myPlaycount;
+  final String previewTrackName;
+  final String previewArtistName;
   const _FullscreenImageViewer({
     required this.url,
     this.title = '',
@@ -1872,6 +1880,9 @@ class _FullscreenImageViewer extends StatefulWidget {
     this.releaseDate = '',
     this.extra = const [],
     this.tier = CardTier.none,
+    this.myPlaycount = 0,
+    this.previewTrackName = '',
+    this.previewArtistName = '',
   });
 
   @override
@@ -1883,10 +1894,27 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
   bool   _sharing = false;
   final  _shareKey = GlobalKey();
 
+  // Lightweight 30s preview player, own instance (this viewer has no link
+  // back to the detail sheet's player state).
+  String?      _previewUrl;
+  bool         _previewLoading = false;
+  bool         _isPlaying = false;
+  AudioPlayer? _player;
+  Duration     _previewDur = Duration.zero;
+  double       _previewPos = 0.0;
+
+  bool get _canPlay => widget.previewTrackName.isNotEmpty;
+
   @override
   void initState() {
     super.initState();
     _loadDominantColor();
+  }
+
+  @override
+  void dispose() {
+    _player?.dispose();
+    super.dispose();
   }
 
   // Same cheap histogram extractor used for the artwork theme; run again
@@ -1898,6 +1926,105 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
       final argb = await _extractDominantColorArgb(response.bodyBytes);
       if (argb != null && mounted) setState(() => _dominant = Color(argb));
     } catch (_) {}
+  }
+
+  Future<void> _togglePlay() async {
+    if (!_canPlay) return;
+    _haptic(_HapticImpact.medium);
+
+    if (_isPlaying) {
+      await _player?.pause();
+      if (mounted) setState(() => _isPlaying = false);
+      return;
+    }
+
+    if (_previewUrl == null) {
+      if (mounted) setState(() => _previewLoading = true);
+      try {
+        final q   = Uri.encodeComponent('${widget.previewTrackName} ${widget.previewArtistName}');
+        final uri = Uri.parse('https://api.deezer.com/search?q=$q&limit=5');
+        final res = await http.get(uri).timeout(const Duration(seconds: 6));
+        if (res.statusCode == 200) {
+          final data   = jsonDecode(res.body) as Map<String, dynamic>;
+          final tracks = (data['data'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+          for (final t in tracks) {
+            final u = (t['preview'] as String?) ?? '';
+            if (u.isNotEmpty) { _previewUrl = u; break; }
+          }
+        }
+      } catch (_) {}
+      if (mounted) setState(() => _previewLoading = false);
+      if (_previewUrl == null) return;
+    }
+
+    _player ??= AudioPlayer()
+      ..onDurationChanged.listen((d) { if (mounted) setState(() => _previewDur = d); })
+      ..onPositionChanged.listen((pos) {
+        if (!mounted) return;
+        final total = _previewDur.inMilliseconds;
+        setState(() => _previewPos = total > 0 ? pos.inMilliseconds / total : 0.0);
+      })
+      ..onPlayerComplete.listen((_) {
+        if (mounted) setState(() { _isPlaying = false; _previewPos = 0; });
+      });
+
+    await _player!.play(UrlSource(_previewUrl!));
+    if (mounted) setState(() => _isPlaying = true);
+  }
+
+  // Shows what tier this item is at and how far to the next one.
+  void _showTierInfo() {
+    final next = nextPlayThreshold(widget.myPlaycount);
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              _AchvTierBadge(tier: widget.tier, size: 48),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(widget.tier == CardTier.none ? 'Aucun palier' : tierLabel(widget.tier),
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+                    Text('${widget.myPlaycount} scrobbles',
+                        style: TextStyle(color: Theme.of(ctx).colorScheme.onSurfaceVariant, fontSize: 13)),
+                  ],
+                ),
+              ),
+            ]),
+            if (next != null) ...[
+              const SizedBox(height: 16),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: (widget.myPlaycount / next).clamp(0.0, 1.0), minHeight: 6,
+                  backgroundColor: Theme.of(ctx).colorScheme.surfaceContainerHighest,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text('${widget.myPlaycount} / $next pour le palier suivant',
+                  style: TextStyle(color: Theme.of(ctx).colorScheme.onSurfaceVariant, fontSize: 12)),
+            ] else if (widget.tier != CardTier.none) ...[
+              const SizedBox(height: 12),
+              const Text('Palier maximum atteint 🎉', style: TextStyle(fontWeight: FontWeight.w600)),
+            ] else ...[
+              const SizedBox(height: 12),
+              Text('Écoute ce titre pour débloquer un premier palier (dès ${kPlayTierThresholds.first} écoutes).',
+                  style: TextStyle(color: Theme.of(ctx).colorScheme.onSurfaceVariant, fontSize: 12)),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 
   // Renders a clean, non-tilted share card (off-screen) and exports it as
@@ -2048,6 +2175,62 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
               ),
             ]),
           ),
+
+          // Info button — top-left, mirrors the close/share group.
+          Positioned(
+            top: topPad + 8, left: 12,
+            child: GestureDetector(
+              onTap: _showTierInfo,
+              child: Container(
+                width: 36, height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.55),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.info_outline_rounded,
+                    color: Colors.white, size: 19),
+              ),
+            ),
+          ),
+
+          // Play button — bottom center, only for tracks.
+          if (_canPlay)
+            Positioned(
+              left: 0, right: 0,
+              bottom: MediaQuery.of(context).padding.bottom + 24,
+              child: Center(
+                child: GestureDetector(
+                  onTap: _previewLoading ? null : _togglePlay,
+                  child: Container(
+                    width: 60, height: 60,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.6),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white24, width: 1.5),
+                    ),
+                    child: _previewLoading
+                        ? const Padding(
+                            padding: EdgeInsets.all(18),
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white70),
+                          )
+                        : Stack(alignment: Alignment.center, children: [
+                            SizedBox(
+                              width: 60, height: 60,
+                              child: CircularProgressIndicator(
+                                value: _previewPos.clamp(0.0, 1.0),
+                                strokeWidth: 2,
+                                backgroundColor: Colors.transparent,
+                                valueColor: const AlwaysStoppedAnimation(Colors.white),
+                              ),
+                            ),
+                            Icon(_isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                                color: Colors.white, size: 28),
+                          ]),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

@@ -87,6 +87,14 @@ CardTier tierForPlays(int n) {
   return best;
 }
 
+// Next threshold above [n], or null once the top tier is reached.
+int? nextPlayThreshold(int n) {
+  for (final t in kPlayTierThresholds) {
+    if (n < t) return t;
+  }
+  return null;
+}
+
 // Overall profile tier = how many achievements are unlocked, mapped onto
 // the same 9-rank scale.
 const _profileTierThresholds = [2, 4, 6, 8, 10, 12, 13, 15, 17];
@@ -98,7 +106,7 @@ CardTier profileTier(int unlockedCount) {
   return best;
 }
 
-enum AchvCategory { listening, artists, albums, loyalty }
+enum AchvCategory { listening, artists, albums, tracks, loyalty, pace }
 
 class AchievementDef {
   final String id;
@@ -131,6 +139,16 @@ const kAchievements = <AchievementDef>[
   AchievementDef('y3',  AchvCategory.loyalty, 3,  CardTier.silver,     Icons.cake_rounded),
   AchievementDef('y5',  AchvCategory.loyalty, 5,  CardTier.emerald,    Icons.cake_rounded),
   AchievementDef('y10', AchvCategory.loyalty, 10, CardTier.iridescent, Icons.cake_rounded),
+  // Titres — distinct tracks scrobbled
+  AchievementDef('t100',  AchvCategory.tracks, 100,  CardTier.bronze,   Icons.music_note_rounded),
+  AchievementDef('t300',  AchvCategory.tracks, 300,  CardTier.gold,     Icons.music_note_rounded),
+  AchievementDef('t600',  AchvCategory.tracks, 600,  CardTier.sapphire, Icons.music_note_rounded),
+  AchievementDef('t1000', AchvCategory.tracks, 1000, CardTier.diamond,  Icons.music_note_rounded),
+  // Rythme — average scrobbles per week
+  AchievementDef('p20',  AchvCategory.pace, 20,  CardTier.bronze,     Icons.speed_rounded),
+  AchievementDef('p50',  AchvCategory.pace, 50,  CardTier.silver,     Icons.speed_rounded),
+  AchievementDef('p100', AchvCategory.pace, 100, CardTier.gold,       Icons.speed_rounded),
+  AchievementDef('p200', AchvCategory.pace, 200, CardTier.iridescent, Icons.speed_rounded),
 ];
 
 class AchievementProgress {
@@ -146,13 +164,17 @@ List<AchievementProgress> computeAchievements({
   required int totalScrobbles,
   required int artistCount,
   required int albumCount,
+  required int trackCount,
   required int yearsRegistered,
+  required int weeklyAvg,
 }) {
   int currentFor(AchvCategory c) => switch (c) {
     AchvCategory.listening => totalScrobbles,
     AchvCategory.artists   => artistCount,
     AchvCategory.albums    => albumCount,
+    AchvCategory.tracks    => trackCount,
     AchvCategory.loyalty   => yearsRegistered,
+    AchvCategory.pace      => weeklyAvg,
   };
   return kAchievements.map((d) {
     final cur = currentFor(d.category);

@@ -167,7 +167,15 @@ class _Tilt3DCardState extends State<Tilt3DCard>
                     ..rotateY(flipAngle + tiltY);
 
                   final side = showFront
-                      ? widget.front
+                      ? (enabled
+                          // Very light parallax: the artwork shifts a few
+                          // pixels opposite the tilt, oversized slightly so
+                          // no edge gap ever shows through the clip.
+                          ? Transform.translate(
+                              offset: Offset(-_ry * 7, -_rx * 7),
+                              child: Transform.scale(scale: 1.05, child: widget.front),
+                            )
+                          : widget.front)
                       : Transform(
                           alignment: Alignment.center,
                           transform: Matrix4.identity()..rotateY(math.pi),

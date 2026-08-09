@@ -618,4 +618,8 @@ class AppStringsJa implements AppStrings {
   @override String get achvDescArtists => '一度でも聴いたことのある異なるアーティストの数。';
   @override String get achvDescAlbums => '一度でも聴いたことのある異なるアルバムの数。';
   @override String get achvDescLoyalty => 'Last.fmアカウントの利用歴。';
+  @override String get achvCatTracks => '楽曲';
+  @override String get achvDescTracks => '再生した異なる楽曲の数。';
+  @override String get achvCatPace => 'ペース';
+  @override String get achvDescPace => '週あたりの平均スクロブル数。';
 }
