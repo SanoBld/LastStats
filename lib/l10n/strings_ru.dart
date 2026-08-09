@@ -609,5 +609,10 @@ class AppStringsRu implements AppStrings {
     'Вы настоящий музыкальный фанат. 🔥',
     'Миллион скробблов. Это легендарно. 🎸',
   ];
+  @override String get achvTitle => 'Достижения';
+  @override String achvUnlocked(int unlocked, int total) => '$unlocked / $total разблокировано';
+  @override String get achvCatListening => 'Прослушивание';
+  @override String get achvCatArtists => 'Артисты';
+  @override String get achvCatAlbums => 'Альбомы';
+  @override String get achvCatLoyalty => 'Верность';
 }
-

@@ -43,6 +43,7 @@ import '../services/prefetch_service.dart';
 import '../services/all_scrobbles_service.dart';
 import '../services/translation_service.dart';
 import '../services/lyrics_service.dart';
+import '../services/achievements.dart';
 import '../widgets/markdown_lite.dart';
 import '../widgets/living_artwork.dart';
 import 'favorites_page.dart';
@@ -72,6 +73,7 @@ part '_history_page.dart';
 part '_settings_page.dart';
 part '_shared_widgets.dart';
 part '_taste_compare_sheet.dart';
+part '_achievements_page.dart';
 
 
 

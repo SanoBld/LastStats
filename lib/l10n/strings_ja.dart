@@ -608,5 +608,10 @@ class AppStringsJa implements AppStrings {
     'あなたは真の音楽中毒者です。🔥',
     '100万スクロブル達成。伝説です。🎸',
   ];
+  @override String get achvTitle => '実績';
+  @override String achvUnlocked(int unlocked, int total) => '解除済み $unlocked / $total';
+  @override String get achvCatListening => 'リスニング';
+  @override String get achvCatArtists => 'アーティスト';
+  @override String get achvCatAlbums => 'アルバム';
+  @override String get achvCatLoyalty => '継続';
 }
-

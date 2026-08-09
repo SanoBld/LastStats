@@ -609,5 +609,10 @@ class AppStringsAr implements AppStrings {
     'أنت مدمن موسيقى حقيقي. 🔥',
     'مليون تشغيلة. هذا أسطوري. 🎸',
   ];
+  @override String get achvTitle => 'الإنجازات';
+  @override String achvUnlocked(int unlocked, int total) => '$unlocked / $total مفتوح';
+  @override String get achvCatListening => 'الاستماع';
+  @override String get achvCatArtists => 'الفنانون';
+  @override String get achvCatAlbums => 'الألبومات';
+  @override String get achvCatLoyalty => 'الولاء';
 }
-

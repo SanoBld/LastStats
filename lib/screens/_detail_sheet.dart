@@ -64,14 +64,15 @@ String _compactNum(int n) {
 
 void _pushFullscreen(BuildContext ctx, String url,
     {String title = '', String subtitle = '', String source = 'Last.fm',
-     String releaseDate = '', List<(IconData, String)> extra = const []}) {
+     String releaseDate = '', List<(IconData, String)> extra = const [],
+     CardTier tier = CardTier.none}) {
   Navigator.of(ctx).push(PageRouteBuilder(
     opaque: false,
     barrierColor: Colors.black,
     barrierDismissible: true,
     pageBuilder: (_, _, _) => _FullscreenImageViewer(
         url: url, title: title, subtitle: subtitle, source: source,
-        releaseDate: releaseDate, extra: extra),
+        releaseDate: releaseDate, extra: extra, tier: tier),
     transitionsBuilder: (_, anim, _, child) =>
         FadeTransition(opacity: anim, child: child),
     transitionDuration: const Duration(milliseconds: 220),
@@ -597,6 +598,15 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     return idx > 0 ? raw.substring(0, idx).trim() : raw;
   }
 
+  // User's own play count for this item (not the global Last.fm count).
+  // Artists keep it nested under stats; albums/tracks have it top-level.
+  int _myPlaycount() {
+    final v = widget.type == 'artists'
+        ? (_info?['stats']?['userplaycount'] ?? 0)
+        : (_info?['userplaycount'] ?? 0);
+    return int.tryParse(v.toString()) ?? 0;
+  }
+
   // Small extra stat lines shown on the back of the fullscreen card.
   List<(IconData, String)> _cardExtraInfo() {
     switch (widget.type) {
@@ -615,7 +625,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         ];
       default:
         // User's own scrobbles for this track (not the global Last.fm count).
-        final plays = int.tryParse((_info?['userplaycount'] ?? _info?['playcount'] ?? '0').toString()) ?? 0;
+        final plays = _myPlaycount();
         final album = (_info?['album']?['title'] ?? '').toString();
         return [
           if (plays > 0) (Icons.play_circle_outline_rounded, '$plays scrobbles'),
@@ -752,6 +762,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       title: _name, subtitle: _artist,
                       releaseDate: _releaseDate(),
                       extra: _cardExtraInfo(),
+                      tier: tierForPlays(_myPlaycount()),
                       source: switch (widget.type) {
                         'artists' => 'Artiste · Last.fm',
                         'albums'  => 'Album · Last.fm',
@@ -1852,8 +1863,7 @@ class _FullscreenImageViewer extends StatefulWidget {
   final String source;
   final String releaseDate;
   final List<(IconData, String)> extra;
-  // Groundwork only: not computed from real data yet.
-  final bool achievementUnlocked;
+  final CardTier tier;
   const _FullscreenImageViewer({
     required this.url,
     this.title = '',
@@ -1861,7 +1871,7 @@ class _FullscreenImageViewer extends StatefulWidget {
     this.source = 'Last.fm',
     this.releaseDate = '',
     this.extra = const [],
-    this.achievementUnlocked = false,
+    this.tier = CardTier.none,
   });
 
   @override
@@ -1964,7 +1974,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
                 child: Tilt3DCard(
                   width: cardW,
                   height: cardH,
-                  achievementUnlocked: widget.achievementUnlocked,
+                  tier: widget.tier,
                   front: Image.network(
                     widget.url, fit: BoxFit.cover,
                     errorBuilder: (_, _, _) => const ColoredBox(

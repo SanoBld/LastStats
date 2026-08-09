@@ -12,16 +12,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import '../app_state.dart';
+import '../services/achievements.dart';
 
 class Tilt3DCard extends StatefulWidget {
   final Widget front;
   final Widget back;
   final double width, height;
   final double radius;
-  // Groundwork for a future achievements system (e.g. "50+ écoutes" badge).
-  // Null = no badge yet. When set, draws a gold ring around the card.
-  // Not wired to real logic yet — just the visual hook to build on later.
-  final bool achievementUnlocked;
+  // Achievement border: bronze → iridescent, based on play count.
+  // CardTier.none = no border (default, unaffected layout).
+  final CardTier tier;
   const Tilt3DCard({
     super.key,
     required this.front,
@@ -29,7 +29,7 @@ class Tilt3DCard extends StatefulWidget {
     required this.width,
     required this.height,
     this.radius = 22,
-    this.achievementUnlocked = false,
+    this.tier = CardTier.none,
   });
 
   @override
@@ -178,17 +178,15 @@ class _Tilt3DCardState extends State<Tilt3DCard>
                     alignment: Alignment.center,
                     transform: m,
                     child: Container(
-                      decoration: widget.achievementUnlocked
-                          ? BoxDecoration(
-                              borderRadius: radius,
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFFFD76A), Color(0xFFB8860B)],
-                                begin: Alignment.topLeft, end: Alignment.bottomRight,
-                              ),
-                            )
-                          : null,
-                      padding: widget.achievementUnlocked
-                          ? const EdgeInsets.all(2.5) : EdgeInsets.zero,
+                      decoration: widget.tier == CardTier.none ? null : BoxDecoration(
+                        borderRadius: radius,
+                        gradient: LinearGradient(
+                          colors: tierGradient(widget.tier)!,
+                          begin: Alignment.topLeft, end: Alignment.bottomRight,
+                        ),
+                      ),
+                      padding: widget.tier == CardTier.none
+                          ? EdgeInsets.zero : const EdgeInsets.all(2.5),
                       child: ClipRRect(
                         borderRadius: radius,
                         child: Stack(

@@ -520,6 +520,14 @@ class _DashboardPageState extends State<_DashboardPage> {
           ]),
         ),
         PopupMenuItem(
+          value: 'achievements',
+          child: Row(children: [
+            const Icon(Icons.emoji_events_outlined, size: 20),
+            const SizedBox(width: 10),
+            Text(L.achvTitle),
+          ]),
+        ),
+        PopupMenuItem(
           value: 'settings',
           child: Row(children: [
             const Icon(Icons.settings_outlined, size: 20),
@@ -545,6 +553,8 @@ class _DashboardPageState extends State<_DashboardPage> {
     switch (result) {
       case 'refresh':
         _load();
+      case 'achievements':
+        showAchievementsSheet(context, _userInfo);
       case 'settings':
         await Navigator.of(context).push(
           MaterialPageRoute(

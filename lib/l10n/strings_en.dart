@@ -638,5 +638,10 @@ class AppStringsEn implements AppStrings {
   @override String get shortcutRefresh => 'Refresh';
   @override String get aboutDiscord => 'Join the Discord';
   @override String get aboutDiscordSub => 'Chat, suggestions and live announcements';
+  @override String get achvTitle => 'Achievements';
+  @override String achvUnlocked(int unlocked, int total) => '$unlocked / $total unlocked';
+  @override String get achvCatListening => 'Listening';
+  @override String get achvCatArtists => 'Artists';
+  @override String get achvCatAlbums => 'Albums';
+  @override String get achvCatLoyalty => 'Loyalty';
 }
-

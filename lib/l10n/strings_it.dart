@@ -609,5 +609,10 @@ class AppStringsIt implements AppStrings {
     'Sei un vero dipendente della musica. 🔥',
     'Un milione di scrobble. Leggendario. 🎸',
   ];
+  @override String get achvTitle => 'Obiettivi';
+  @override String achvUnlocked(int unlocked, int total) => '$unlocked / $total sbloccati';
+  @override String get achvCatListening => 'Ascolto';
+  @override String get achvCatArtists => 'Artisti';
+  @override String get achvCatAlbums => 'Album';
+  @override String get achvCatLoyalty => 'Fedeltà';
 }
-

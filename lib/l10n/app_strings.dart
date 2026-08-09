@@ -672,4 +672,12 @@ abstract class AppStrings {
   String get shortcutRefresh;
   String get aboutDiscord;
   String get aboutDiscordSub;
+
+  // ── Achievements ─────────────────────────────────────────────────────────
+  String get achvTitle;
+  String achvUnlocked(int unlocked, int total);
+  String get achvCatListening;
+  String get achvCatArtists;
+  String get achvCatAlbums;
+  String get achvCatLoyalty;
 }

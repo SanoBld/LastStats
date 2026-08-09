@@ -635,5 +635,10 @@ class AppStringsZh implements AppStrings {
   @override String get shortcutRefresh => '刷新';
   @override String get aboutDiscord => '加入 Discord';
   @override String get aboutDiscordSub => '交流、建议和实时公告';
+  @override String get achvTitle => '成就';
+  @override String achvUnlocked(int unlocked, int total) => '已解锁 $unlocked / $total';
+  @override String get achvCatListening => '收听';
+  @override String get achvCatArtists => '艺术家';
+  @override String get achvCatAlbums => '专辑';
+  @override String get achvCatLoyalty => '忠诚度';
 }
-
