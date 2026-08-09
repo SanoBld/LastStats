@@ -1,7 +1,38 @@
 // Achievements system: card border tiers + unlockable milestones.
 // All computed from data already cached locally (user.getInfo stats),
 // no extra network calls.
+import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+
+// Single shared clock driving the "moving sheen" on tier badges/surfaces.
+// One timer for the whole app instead of one AnimationController per badge
+// — cheap, and every badge/surface just reads the current phase.
+class TierShimmer {
+  TierShimmer._();
+  static final ValueNotifier<double> phase = ValueNotifier(0.0);
+  static Timer? _timer;
+
+  static void ensureRunning() {
+    _timer ??= Timer.periodic(const Duration(milliseconds: 60), (_) {
+      phase.value = (phase.value + 0.012) % 1.0;
+    });
+  }
+}
+
+// Infinite account level, based on total scrobbles. Each level needs more
+// than the last (quadratic curve), so it keeps getting harder forever —
+// no cap, no "final" level.
+int accountLevel(int totalScrobbles) {
+  if (totalScrobbles <= 0) return 1;
+  return math.sqrt(totalScrobbles / 25).floor() + 1;
+}
+
+// Total scrobbles required to REACH [level].
+int levelThreshold(int level) {
+  final l = level - 1;
+  return 25 * l * l;
+}
 
 // 9 ranks, low to high. Last one is the "ultimate" tier: reached once and
 // stays maxed out beyond its threshold (no cap on how high you can go).

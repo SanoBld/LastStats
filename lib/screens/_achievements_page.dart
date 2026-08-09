@@ -51,7 +51,11 @@ class _AchievementsSheet extends StatelessWidget {
     );
     final unlocked = list.where((a) => a.unlocked).length;
     final myTier   = profileTier(unlocked);
-    final name     = (userInfo?['name'] ?? '').toString();
+    final avatarUrl = _extractImage(userInfo?['image']);
+    final level     = accountLevel(total);
+    final lvlFrom   = levelThreshold(level);
+    final lvlTo     = levelThreshold(level + 1);
+    final lvlRatio  = lvlTo > lvlFrom ? (total - lvlFrom) / (lvlTo - lvlFrom) : 0.0;
 
     final byCategory = <AchvCategory, List<AchievementProgress>>{};
     for (final a in list) {
@@ -63,25 +67,22 @@ class _AchievementsSheet extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
         children: [
-          if (name.isNotEmpty && myTier != CardTier.none)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Center(
-                child: Text.rich(TextSpan(children: [
-                  TextSpan(text: '$name ${_ct('a le contour', 'has the')} ',
-                      style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13)),
-                  TextSpan(text: tierLabel(myTier),
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13,
-                          color: tierGradient(myTier)![1])),
-                ])),
-              ),
-            ),
           Center(
             child: Column(children: [
-              _AchvTierBadge(tier: myTier, size: 92),
+              _AchvTierBadge(tier: myTier, size: 92, avatarUrl: avatarUrl),
               const SizedBox(height: 10),
-              Text(myTier == CardTier.none ? '—' : tierLabel(myTier),
+              Text(_ct('Niveau $level', 'Level $level'),
                   style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 6),
+              SizedBox(
+                width: 160,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(value: lvlRatio.clamp(0.0, 1.0), minHeight: 5),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text('$total / $lvlTo', style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12)),
               const SizedBox(height: 4),
               Text(L.achvUnlocked(unlocked, list.length),
                   style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13)),
@@ -367,57 +368,117 @@ class _AchvCardViewer extends StatelessWidget {
 }
 
 // Flat rectangular surface with the tier's metallic sheen, used as the
-// header strip of category cards. Rounded corners only where placed.
-class _AchvTierSurface extends StatelessWidget {
+// header strip of category cards. The sheen slowly sweeps across it
+// (shared clock — see TierShimmer) so tiers read as distinct, alive
+// materials instead of a flat color block.
+class _AchvTierSurface extends StatefulWidget {
   final CardTier tier;
   final Widget? child;
   const _AchvTierSurface({required this.tier, this.child});
 
   @override
+  State<_AchvTierSurface> createState() => _AchvTierSurfaceState();
+}
+
+class _AchvTierSurfaceState extends State<_AchvTierSurface> {
+  @override
+  void initState() {
+    super.initState();
+    TierShimmer.ensureRunning();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final grad = tierGradient(tier);
-    return Container(
-      decoration: BoxDecoration(
-        color: grad == null ? Theme.of(context).colorScheme.surfaceContainerHighest : null,
-        gradient: grad == null ? null : LinearGradient(
-          colors: grad, stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
-          begin: Alignment.topLeft, end: Alignment.bottomRight,
-        ),
-      ),
-      child: child,
+    final grad = tierGradient(widget.tier);
+    if (grad == null) {
+      return Container(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        child: widget.child,
+      );
+    }
+    return ValueListenableBuilder<double>(
+      valueListenable: TierShimmer.phase,
+      builder: (context, phase, child) {
+        final s = math.sin(phase * 2 * math.pi) * 0.5;
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: grad, stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
+              begin: Alignment(-1 + s, -1), end: Alignment(1 + s, 1),
+            ),
+          ),
+          child: child,
+        );
+      },
+      child: widget.child,
     );
   }
 }
 
-// Circular tier badge with the same sheen, used for the profile summary
-// and each milestone row.
-class _AchvTierBadge extends StatelessWidget {
+// Circular tier badge with the same moving sheen. Can show either an icon
+// (achievement badges) or a profile photo clipped inside the ring (used
+// for the account summary at the top of the sheet).
+class _AchvTierBadge extends StatefulWidget {
   final CardTier tier;
   final double size;
   final IconData? icon;
+  final String? avatarUrl;
   final bool dim;
-  const _AchvTierBadge({required this.tier, required this.size, this.icon, this.dim = false});
+  const _AchvTierBadge({
+    required this.tier, required this.size,
+    this.icon, this.avatarUrl, this.dim = false,
+  });
+
+  @override
+  State<_AchvTierBadge> createState() => _AchvTierBadgeState();
+}
+
+class _AchvTierBadgeState extends State<_AchvTierBadge> {
+  @override
+  void initState() {
+    super.initState();
+    TierShimmer.ensureRunning();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final grad = tierGradient(tier);
-    return Opacity(
-      opacity: dim ? 0.35 : 1.0,
-      child: Container(
-        width: size, height: size,
+    final grad = tierGradient(widget.tier);
+    final hasAvatar = (widget.avatarUrl ?? '').isNotEmpty;
+
+    Widget content(double phase) {
+      final s = math.sin(phase * 2 * math.pi) * 0.5;
+      return Container(
+        width: widget.size, height: widget.size,
+        padding: hasAvatar ? const EdgeInsets.all(3) : EdgeInsets.zero,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: grad == null ? null : LinearGradient(
             colors: grad, stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
-            begin: Alignment.topLeft, end: Alignment.bottomRight,
+            begin: Alignment(-1 + s, -1), end: Alignment(1 + s, 1),
           ),
           color: grad == null ? Theme.of(context).colorScheme.surfaceContainerHighest : null,
           boxShadow: grad == null ? null : [
             BoxShadow(color: grad[1].withValues(alpha: 0.5), blurRadius: 10, spreadRadius: -2),
           ],
         ),
-        child: icon == null ? null : Icon(icon, size: size * 0.42, color: Colors.black87),
-      ),
+        child: hasAvatar
+            ? ClipOval(
+                child: Image.network(widget.avatarUrl!, fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => const Icon(Icons.person_rounded, color: Colors.black87)),
+              )
+            : (widget.icon == null ? null
+                : Icon(widget.icon, size: widget.size * 0.42, color: Colors.black87)),
+      );
+    }
+
+    return Opacity(
+      opacity: widget.dim ? 0.35 : 1.0,
+      child: grad == null
+          ? content(0)
+          : ValueListenableBuilder<double>(
+              valueListenable: TierShimmer.phase,
+              builder: (context, phase, _) => content(phase),
+            ),
     );
   }
 }

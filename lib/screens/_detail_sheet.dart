@@ -62,6 +62,15 @@ String _compactNum(int n) {
 
 // ── Fullscreen image helper (used by detail sheet and profile sheet) ──────────
 
+String _achvCategoryLabel(AchvCategory c) => switch (c) {
+  AchvCategory.listening => L.achvCatListening,
+  AchvCategory.artists   => L.achvCatArtists,
+  AchvCategory.albums    => L.achvCatAlbums,
+  AchvCategory.tracks    => L.achvCatTracks,
+  AchvCategory.loyalty   => L.achvCatLoyalty,
+  AchvCategory.pace      => L.achvCatPace,
+};
+
 void _pushFullscreen(BuildContext ctx, String url,
     {String title = '', String subtitle = '', String source = 'Last.fm',
      String releaseDate = '', List<(IconData, String)> extra = const [],
@@ -3043,16 +3052,15 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                 style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13))
           else
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                for (final a in preview) ...[
+                for (final a in preview)
                   Column(mainAxisSize: MainAxisSize.min, children: [
                     _AchvTierBadge(tier: a.def.tier, size: 50, icon: a.def.icon),
                     const SizedBox(height: 4),
-                    Text(tierLabel(a.def.tier), style: const TextStyle(fontSize: 10)),
+                    Text(_achvCategoryLabel(a.def.category),
+                        style: const TextStyle(fontSize: 10)),
                   ]),
-                  if (a != preview.last) const SizedBox(width: 18),
-                ],
               ],
             ),
         ],

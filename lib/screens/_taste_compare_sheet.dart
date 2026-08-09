@@ -556,21 +556,38 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
 
       // ── Data source label ─────────────────────────────────────────────────
       final uniqueArtists = myArtistW.length;
+      final theirFull = theirLib != null; // full synced library vs top-200 fallback
       final dataLabel = hasMeaningfulData
-          ? _ct(
-              '$uniqueArtists artistes de votre historique · top 200 de ${widget.targetUser}',
-              '$uniqueArtists artists from your history · ${widget.targetUser}\'s top 200',
-              es: '$uniqueArtists artistas de tu historial · top 200 de ${widget.targetUser}',
-              zh: '来自你收听记录的 $uniqueArtists 位艺术家 · ${widget.targetUser} 的前 200 名',
-              pt: '$uniqueArtists artistas do seu histórico · top 200 de ${widget.targetUser}',
-            )
-          : _ct(
-              'Top 200 artistes & titres (API)',
-              'Top 200 artists & tracks (API)',
-              es: 'Top 200 artistas y canciones (API)',
-              zh: '前 200 名艺术家与歌曲（API）',
-              pt: 'Top 200 artistas e faixas (API)',
-            );
+          ? (theirFull
+              ? _ct(
+                  '$uniqueArtists artistes de votre historique · bibliothèque complète de ${widget.targetUser}',
+                  '$uniqueArtists artists from your history · ${widget.targetUser}\'s full library',
+                  es: '$uniqueArtists artistas de tu historial · biblioteca completa de ${widget.targetUser}',
+                  zh: '来自你收听记录的 $uniqueArtists 位艺术家 · ${widget.targetUser} 的完整曲库',
+                  pt: '$uniqueArtists artistas do seu histórico · biblioteca completa de ${widget.targetUser}',
+                )
+              : _ct(
+                  '$uniqueArtists artistes de votre historique · top 200 de ${widget.targetUser}',
+                  '$uniqueArtists artists from your history · ${widget.targetUser}\'s top 200',
+                  es: '$uniqueArtists artistas de tu historial · top 200 de ${widget.targetUser}',
+                  zh: '来自你收听记录的 $uniqueArtists 位艺术家 · ${widget.targetUser} 的前 200 名',
+                  pt: '$uniqueArtists artistas do seu histórico · top 200 de ${widget.targetUser}',
+                ))
+          : (theirFull
+              ? _ct(
+                  'Bibliothèque complète (API)',
+                  'Full library (API)',
+                  es: 'Biblioteca completa (API)',
+                  zh: '完整曲库（API）',
+                  pt: 'Biblioteca completa (API)',
+                )
+              : _ct(
+                  'Top 200 artistes & titres (API)',
+                  'Top 200 artists & tracks (API)',
+                  es: 'Top 200 artistas y canciones (API)',
+                  zh: '前 200 名艺术家与歌曲（API）',
+                  pt: 'Top 200 artistas e faixas (API)',
+                ));
 
       final analysis = _analyzeTaste(
         myArtistW:       myArtistW,
