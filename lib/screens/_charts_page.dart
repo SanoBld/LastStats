@@ -1199,7 +1199,7 @@ class _ChartsPageState extends State<_ChartsPage>
         children: [
 
           // ── Fixed header — same style as every other tab ───────────────────
-          Padding(
+          _FadeInSection(index: 0, slideFrom: -0.04, child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 12, 16, 2),
             child: Row(children: [
               Expanded(child:
@@ -1211,12 +1211,12 @@ class _ChartsPageState extends State<_ChartsPage>
                 onPressed: () => _exportFlow(context),
               ),
             ]),
-          ),
+          )),
           const SizedBox(height: 10),
-          Padding(
+          _FadeInSection(index: 1, slideFrom: -0.04, child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: _buildYearChips(scheme, text),
-          ),
+          )),
           const SizedBox(height: 14),
 
           // ── Scrollable content ────────────────────────────────────────────
@@ -1235,211 +1235,250 @@ class _ChartsPageState extends State<_ChartsPage>
                   _buildHistoryBanner(context),
 
                   // 1. Monthly bars — scoped to the selected period
-                  _SectionHeader(title: L.chartsMonthly, icon: Icons.calendar_month_rounded),
-                  const SizedBox(height: 4),
-                  Text(periodLabel,
-                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                  const SizedBox(height: 12),
-                  RepaintBoundary(
-                    key: _xkeys['monthly'],
-                    child: periodMonthly.isNotEmpty
-                        ? _MonthlyCard(monthly: periodMonthly)
-                        : const SizedBox.shrink(),
-                  ),
+                  _FadeInSection(index: 0, child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _SectionHeader(title: L.chartsMonthly, icon: Icons.calendar_month_rounded),
+                      const SizedBox(height: 4),
+                      Text(periodLabel,
+                          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                      const SizedBox(height: 12),
+                      RepaintBoundary(
+                        key: _xkeys['monthly'],
+                        child: periodMonthly.isNotEmpty
+                            ? _MonthlyCard(monthly: periodMonthly)
+                            : const SizedBox.shrink(),
+                      ),
+                    ],
+                  )),
                   const SizedBox(height: 28),
 
                   // 2. Cumulative line — scoped to the selected period
                   if (periodCumulative.length >= 2) ...[
-                    _SectionHeader(
-                      title: _ct('Progression des scrobbles', 'Scrobble progression', es: 'Progresión de scrobbles', zh: 'Scrobble 进度', pt: 'Progressão de scrobbles'),
-                      icon: Icons.trending_up_rounded,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(periodLabel,
-                        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                    const SizedBox(height: 12),
-                    RepaintBoundary(
-                      key: _xkeys['cumul'],
-                      child: _CumulativeLineCard(data: periodCumulative),
-                    ),
+                    _FadeInSection(index: 1, child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionHeader(
+                          title: _ct('Progression des scrobbles', 'Scrobble progression', es: 'Progresión de scrobbles', zh: 'Scrobble 进度', pt: 'Progressão de scrobbles'),
+                          icon: Icons.trending_up_rounded,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(periodLabel,
+                            style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                        const SizedBox(height: 12),
+                        RepaintBoundary(
+                          key: _xkeys['cumul'],
+                          child: _CumulativeLineCard(data: periodCumulative),
+                        ),
+                      ],
+                    )),
                     const SizedBox(height: 28),
                   ],
 
                   // 3. Musical genres (all-time)
-                  _SectionHeader(
-                    title: _ct('Vos genres musicaux', 'Your musical genres', es: 'Tus géneros musicales', zh: '你的音乐风格', pt: 'Seus gêneros musicais'),
-                    icon: Icons.equalizer_rounded,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _ct('Basé sur vos top artistes (all-time)',
-                        'Based on your top artists (all-time)'),
-                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-                  ),
-                  const SizedBox(height: 12),
-                  if (_tagsLoading)
-                    const Center(child: Padding(
-                      padding: EdgeInsets.all(24),
-                      child: CircularProgressIndicator(),
-                    ))
-                  else if (_tags.isNotEmpty)
-                    RepaintBoundary(
-                      key: _xkeys['genres'],
-                      child: _SwipeDistributionCard(
-                        items:       _tags,
-                        getLabel:    (e) => (e as _TagEntry).name,
-                        getPlays:    (e) => (e as _TagEntry).count,
-                        baseColor:   scheme.tertiary,
-                        secondColor: scheme.primary,
-                        onTap:       (_) {},
+                  _FadeInSection(index: 2, child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _SectionHeader(
+                        title: _ct('Vos genres musicaux', 'Your musical genres', es: 'Tus géneros musicales', zh: '你的音乐风格', pt: 'Seus gêneros musicais'),
+                        icon: Icons.equalizer_rounded,
                       ),
-                    ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _ct('Basé sur vos top artistes (all-time)',
+                            'Based on your top artists (all-time)'),
+                        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                      ),
+                      const SizedBox(height: 12),
+                      if (_tagsLoading)
+                        const Center(child: Padding(
+                          padding: EdgeInsets.all(24),
+                          child: CircularProgressIndicator(),
+                        ))
+                      else if (_tags.isNotEmpty)
+                        RepaintBoundary(
+                          key: _xkeys['genres'],
+                          child: _SwipeDistributionCard(
+                            items:       _tags,
+                            getLabel:    (e) => (e as _TagEntry).name,
+                            getPlays:    (e) => (e as _TagEntry).count,
+                            baseColor:   scheme.tertiary,
+                            secondColor: scheme.primary,
+                            onTap:       (_) {},
+                          ),
+                        ),
+                    ],
+                  )),
                   const SizedBox(height: 28),
 
                   // 4. Listening habits
-                  _SectionHeader(
-                    title: _ct("Habitudes d'écoute", 'Listening habits', es: 'Hábitos de escucha', zh: '收听习惯', pt: 'Hábitos de escuta'),
-                    icon: Icons.access_time_rounded,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(habitsSubtitle,
-                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                  const SizedBox(height: 12),
-                  if (_hourlyLoading)
-                    const Center(child: Padding(
-                      padding: EdgeInsets.all(24),
-                      child: CircularProgressIndicator(),
-                    ))
-                  else if (_hourlyData != null) ...[
-                    RepaintBoundary(
-                      key: _xkeys['habits'],
-                      child: Column(children: [
-                        _HourlyBarCard(data: _hourlyData!),
-                        const SizedBox(height: 12),
-                        _WeekdayBarCard(data: _weekdayData!),
-                      ]),
-                    ),
-                  ],
+                  _FadeInSection(index: 3, child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _SectionHeader(
+                        title: _ct("Habitudes d'écoute", 'Listening habits', es: 'Hábitos de escucha', zh: '收听习惯', pt: 'Hábitos de escuta'),
+                        icon: Icons.access_time_rounded,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(habitsSubtitle,
+                          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                      const SizedBox(height: 12),
+                      if (_hourlyLoading)
+                        const Center(child: Padding(
+                          padding: EdgeInsets.all(24),
+                          child: CircularProgressIndicator(),
+                        ))
+                      else if (_hourlyData != null)
+                        RepaintBoundary(
+                          key: _xkeys['habits'],
+                          child: Column(children: [
+                            _HourlyBarCard(data: _hourlyData!),
+                            const SizedBox(height: 12),
+                            _WeekdayBarCard(data: _weekdayData!),
+                          ]),
+                        ),
+                    ],
+                  )),
                   const SizedBox(height: 28),
 
                   // 5. Artist distribution — always shown, loader inside while year loads
-                  _SectionHeader(title: L.chartsArtistDist, icon: Icons.mic_rounded),
-                  const SizedBox(height: 4),
-                  Text(topLabel,
-                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                  const SizedBox(height: 12),
-                  if (_yearDataLoading)
-                    const Center(child: Padding(
-                      padding: EdgeInsets.all(24),
-                      child: CircularProgressIndicator(),
-                    ))
-                  else if (artistItems.isNotEmpty)
-                    RepaintBoundary(
-                      key: _xkeys['artists'],
-                      child: _SwipeDistributionCard(
-                        items:       artistItems,
-                        getLabel:    (e) => _sanitizeName((e['name'] ?? '').toString()),
-                        getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
-                        baseColor:   scheme.primary,
-                        secondColor: scheme.tertiary,
-                        onTap: (e) => showDetailSheet(context,
-                            Map<String, dynamic>.from(e as Map), 'artists', widget.service),
-                      ),
-                    )
-                  else
-                    _EmptyYearCard(),
+                  _FadeInSection(index: 4, child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _SectionHeader(title: L.chartsArtistDist, icon: Icons.mic_rounded),
+                      const SizedBox(height: 4),
+                      Text(topLabel,
+                          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                      const SizedBox(height: 12),
+                      if (_yearDataLoading)
+                        const Center(child: Padding(
+                          padding: EdgeInsets.all(24),
+                          child: CircularProgressIndicator(),
+                        ))
+                      else if (artistItems.isNotEmpty)
+                        RepaintBoundary(
+                          key: _xkeys['artists'],
+                          child: _SwipeDistributionCard(
+                            items:       artistItems,
+                            getLabel:    (e) => _sanitizeName((e['name'] ?? '').toString()),
+                            getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
+                            baseColor:   scheme.primary,
+                            secondColor: scheme.tertiary,
+                            onTap: (e) => showDetailSheet(context,
+                                Map<String, dynamic>.from(e as Map), 'artists', widget.service),
+                          ),
+                        )
+                      else
+                        _EmptyYearCard(),
+                    ],
+                  )),
                   const SizedBox(height: 28),
 
                   // 6. Album distribution — always shown, loader inside while year loads
-                  _SectionHeader(
-                    title: _ct('Répartition par album', 'Album distribution', es: 'Distribución por álbum', zh: '专辑分布', pt: 'Distribuição por álbum'),
-                    icon: Icons.album_rounded,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(albumLabel,
-                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                  const SizedBox(height: 12),
-                  if (_yearDataLoading)
-                    const Center(child: Padding(
-                      padding: EdgeInsets.all(24),
-                      child: CircularProgressIndicator(),
-                    ))
-                  else if (albumItems.isNotEmpty)
-                    RepaintBoundary(
-                      key: _xkeys['albums'],
-                      child: _SwipeDistributionCard(
-                        items:       albumItems,
-                        getLabel:    (e) => _sanitizeName((e['name'] ?? '').toString()),
-                        getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
-                        baseColor:   scheme.secondary,
-                        secondColor: scheme.primary,
-                        onTap: (e) => showDetailSheet(context,
-                            Map<String, dynamic>.from(e as Map), 'albums', widget.service),
+                  _FadeInSection(index: 5, child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _SectionHeader(
+                        title: _ct('Répartition par album', 'Album distribution', es: 'Distribución por álbum', zh: '专辑分布', pt: 'Distribuição por álbum'),
+                        icon: Icons.album_rounded,
                       ),
-                    )
-                  else
-                    _EmptyYearCard(),
+                      const SizedBox(height: 4),
+                      Text(albumLabel,
+                          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                      const SizedBox(height: 12),
+                      if (_yearDataLoading)
+                        const Center(child: Padding(
+                          padding: EdgeInsets.all(24),
+                          child: CircularProgressIndicator(),
+                        ))
+                      else if (albumItems.isNotEmpty)
+                        RepaintBoundary(
+                          key: _xkeys['albums'],
+                          child: _SwipeDistributionCard(
+                            items:       albumItems,
+                            getLabel:    (e) => _sanitizeName((e['name'] ?? '').toString()),
+                            getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
+                            baseColor:   scheme.secondary,
+                            secondColor: scheme.primary,
+                            onTap: (e) => showDetailSheet(context,
+                                Map<String, dynamic>.from(e as Map), 'albums', widget.service),
+                          ),
+                        )
+                      else
+                        _EmptyYearCard(),
+                    ],
+                  )),
                   const SizedBox(height: 28),
 
                   // 7. Listening calendar — single year, or every year glued
                   // together (separated by a marker) for "All time"
-                  _SectionHeader(
-                    title: _ct('Calendrier musical', 'Listening calendar', es: 'Calendario de escucha', zh: '收听日历', pt: 'Calendário de escuta'),
-                    icon: Icons.grid_on_rounded,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _isAllTime
-                        ? (heatmapYears.length > 1
-                            ? _ct(
-                                'Activité journalière — ${heatmapYears.first} à ${heatmapYears.last}',
-                                'Daily activity — ${heatmapYears.first} to ${heatmapYears.last}')
-                            : _ct('Activité journalière — toutes les années',
-                                  'Daily activity — all years'))
-                        : hasFullData
-                            ? _ct('Activité journalière — $_selectedYear',
-                                  'Daily activity — $_selectedYear')
-                            : _selectedYear != DateTime.now().year
-                                ? _ct('Chargez l\'historique pour voir $_selectedYear',
-                                      'Load history to see $_selectedYear')
-                                : _ct('Activité journalière — 12 mois',
-                                      'Daily activity — last 12 months'),
-                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-                  ),
-                  const SizedBox(height: 12),
-                  if (_isAllTime)
-                    (calendarForView != null && calendarForView.isNotEmpty)
-                        ? RepaintBoundary(
-                            key: _xkeys['calendar'],
-                            child: _HeatmapCard(
-                                data: calendarForView, start: heatmapStart, end: heatmapEnd))
-                        : _NoDataCard(
-                            year: 0,
-                            label: _ct('toutes les années', 'all years', es: 'todos los años', zh: '所有年份', pt: 'todos os anos'),
-                            onLoad: () => AllScrobblesService.loadAll(widget.service),
-                          )
-                  else if (_calendarLoading)
-                    const Center(child: Padding(
-                      padding: EdgeInsets.all(24),
-                      child: CircularProgressIndicator(),
-                    ))
-                  else if (calendarForView != null)
-                    RepaintBoundary(
-                      key: _xkeys['calendar'],
-                      child: _HeatmapCard(
-                          data: calendarForView, start: heatmapStart, end: heatmapEnd))
-                  else if (!hasFullData && _selectedYear != DateTime.now().year)
-                    _NoDataCard(year: _selectedYear, onLoad: () => AllScrobblesService.loadAll(widget.service)),
+                  _FadeInSection(index: 6, child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _SectionHeader(
+                        title: _ct('Calendrier musical', 'Listening calendar', es: 'Calendario de escucha', zh: '收听日历', pt: 'Calendário de escuta'),
+                        icon: Icons.grid_on_rounded,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _isAllTime
+                            ? (heatmapYears.length > 1
+                                ? _ct(
+                                    'Activité journalière — ${heatmapYears.first} à ${heatmapYears.last}',
+                                    'Daily activity — ${heatmapYears.first} to ${heatmapYears.last}')
+                                : _ct('Activité journalière — toutes les années',
+                                      'Daily activity — all years'))
+                            : hasFullData
+                                ? _ct('Activité journalière — $_selectedYear',
+                                      'Daily activity — $_selectedYear')
+                                : _selectedYear != DateTime.now().year
+                                    ? _ct('Chargez l\'historique pour voir $_selectedYear',
+                                          'Load history to see $_selectedYear')
+                                    : _ct('Activité journalière — 12 mois',
+                                          'Daily activity — last 12 months'),
+                        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                      ),
+                      const SizedBox(height: 12),
+                      if (_isAllTime)
+                        (calendarForView != null && calendarForView.isNotEmpty)
+                            ? RepaintBoundary(
+                                key: _xkeys['calendar'],
+                                child: _HeatmapCard(
+                                    data: calendarForView, start: heatmapStart, end: heatmapEnd))
+                            : _NoDataCard(
+                                year: 0,
+                                label: _ct('toutes les années', 'all years', es: 'todos los años', zh: '所有年份', pt: 'todos os anos'),
+                                onLoad: () => AllScrobblesService.loadAll(widget.service),
+                              )
+                      else if (_calendarLoading)
+                        const Center(child: Padding(
+                          padding: EdgeInsets.all(24),
+                          child: CircularProgressIndicator(),
+                        ))
+                      else if (calendarForView != null)
+                        RepaintBoundary(
+                          key: _xkeys['calendar'],
+                          child: _HeatmapCard(
+                              data: calendarForView, start: heatmapStart, end: heatmapEnd))
+                      else if (!hasFullData && _selectedYear != DateTime.now().year)
+                        _NoDataCard(year: _selectedYear, onLoad: () => AllScrobblesService.loadAll(widget.service)),
+                    ],
+                  )),
                   const SizedBox(height: 28),
 
                   // 8. Listening streaks
                   if (calendarForView != null && calendarForView.isNotEmpty) ...[
-                    _SectionHeader(
-                      title: _ct('Séries d\'écoute', 'Listening streaks', es: 'Rachas de escucha', zh: '连续收听', pt: 'Sequências de escuta'),
-                      icon: Icons.local_fire_department_rounded,
-                    ),
-                    const SizedBox(height: 12),
-                    RepaintBoundary(key: _xkeys['streaks'], child: _StreakCard(data: calendarForView)),
+                    _FadeInSection(index: 7, child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionHeader(
+                          title: _ct('Séries d\'écoute', 'Listening streaks', es: 'Rachas de escucha', zh: '连续收听', pt: 'Sequências de escuta'),
+                          icon: Icons.local_fire_department_rounded,
+                        ),
+                        const SizedBox(height: 12),
+                        RepaintBoundary(key: _xkeys['streaks'], child: _StreakCard(data: calendarForView)),
+                      ],
+                    )),
                     const SizedBox(height: 20),
                   ],
                 ],
@@ -1455,8 +1494,50 @@ class _ChartsPageState extends State<_ChartsPage>
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-//  Shared helpers
+//  Entrance animation — cascading fade + slide-up, played once per section
+//  the first time it lays out (e.g. on first arrival on the tab). Reused for
+//  the header, the year chips, and every chart section below.
 // ══════════════════════════════════════════════════════════════════════════
+class _FadeInSection extends StatefulWidget {
+  final int index;
+  final Widget child;
+  final double slideFrom; // fraction of height to slide up from
+  const _FadeInSection({required this.index, required this.child, this.slideFrom = 0.06});
+
+  @override
+  State<_FadeInSection> createState() => _FadeInSectionState();
+}
+
+class _FadeInSectionState extends State<_FadeInSection> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+      vsync: this, duration: const Duration(milliseconds: 480));
+  late final Animation<double> _fade = CurvedAnimation(parent: _c, curve: Curves.easeOut);
+  late final Animation<Offset> _slide = Tween<Offset>(
+    begin: Offset(0, widget.slideFrom),
+    end:   Offset.zero,
+  ).animate(CurvedAnimation(parent: _c, curve: Curves.easeOutCubic));
+
+  @override
+  void initState() {
+    super.initState();
+    final delay = Duration(milliseconds: 55 * widget.index.clamp(0, 12));
+    Future.delayed(delay, () { if (mounted) _c.forward(); });
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => FadeTransition(
+    opacity: _fade,
+    child: SlideTransition(position: _slide, child: widget.child),
+  );
+}
+
+
 
 /// Shared card decoration: M3 surface, subtle gradient + soft shadow, used by
 /// every chart card so the whole tab reads as one cohesive, modern set.
