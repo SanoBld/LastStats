@@ -662,79 +662,139 @@ class _ChartsPageState extends State<_ChartsPage>
     required String subtitle,
     required ColorScheme scheme,
   }) async {
-    const width    = 1000.0;
-    const pad      = 32.0;
-    const headerH  = 150.0;
-    const footerH  = 56.0;
-    final scale    = (width - pad * 2) / chartImage.width;
-    final chartH   = chartImage.height * scale;
-    final totalH   = headerH + chartH + footerH;
+    const width     = 1080.0;
+    const outerPad  = 28.0;   // margin around the whole card
+    const cardPad   = 32.0;   // padding inside the card
+    const headerH   = 128.0;
+    const footerH   = 52.0;
+    const radius    = 28.0;
+
+    final innerWidth = width - outerPad * 2 - cardPad * 2;
+    final scale       = innerWidth / chartImage.width;
+    final chartH      = chartImage.height * scale;
+    final cardH       = headerH + chartH + footerH;
+    final totalH      = cardH + outerPad * 2;
 
     final recorder = ui.PictureRecorder();
     final canvas   = Canvas(recorder, Rect.fromLTWH(0, 0, width, totalH));
 
-    // Background
-    canvas.drawRect(Rect.fromLTWH(0, 0, width, totalH),
-        Paint()..color = scheme.surface);
+    // ── Page background — soft brand-tinted gradient, not a flat fill ──────
+    final pageRect = Rect.fromLTWH(0, 0, width, totalH);
+    canvas.drawRect(pageRect, Paint()..shader = ui.Gradient.linear(
+      pageRect.topLeft, pageRect.bottomRight,
+      [scheme.primary.withValues(alpha: 0.10), scheme.surface, scheme.surface],
+      [0.0, 0.35, 1.0],
+    ));
 
-    // App name badge
+    // ── Card ─────────────────────────────────────────────────────────────
+    final cardRect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(outerPad, outerPad, width - outerPad * 2, cardH),
+      const Radius.circular(radius),
+    );
+    canvas.drawRRect(
+      cardRect.shift(const Offset(0, 8)),
+      Paint()..color = scheme.shadow.withValues(alpha: 0.12)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 20),
+    );
+    canvas.drawRRect(cardRect, Paint()..shader = ui.Gradient.linear(
+      Offset(outerPad, outerPad), Offset(width - outerPad, outerPad + cardH),
+      [scheme.surfaceContainerHigh, scheme.surfaceContainer],
+    ));
+    canvas.drawRRect(
+      cardRect,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1
+        ..color = scheme.outlineVariant.withValues(alpha: 0.4),
+    );
+
+    canvas.save();
+    canvas.clipRRect(cardRect);
+    final left = outerPad + cardPad;
+    var   top  = outerPad + 30.0;
+
+    // ── Brand mark: rounded gradient badge + wordmark ───────────────────
+    const markSize = 36.0;
+    final markRect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(left, top, markSize, markSize),
+      const Radius.circular(11),
+    );
+    canvas.drawRRect(markRect, Paint()..shader = ui.Gradient.linear(
+      markRect.outerRect.topLeft, markRect.outerRect.bottomRight,
+      [scheme.primary, scheme.tertiary],
+    ));
+    final markGlyph = TextPainter(
+      text: TextSpan(text: '♪', style: TextStyle(
+          fontSize: 18, fontWeight: FontWeight.w800, color: scheme.onPrimary)),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    markGlyph.paint(canvas, Offset(
+        left + (markSize - markGlyph.width) / 2,
+        top + (markSize - markGlyph.height) / 2));
+
     final brand = TextPainter(
       text: TextSpan(text: 'LastStats', style: TextStyle(
-          fontSize: 18, fontWeight: FontWeight.w800, color: scheme.primary)),
+          fontSize: 19, fontWeight: FontWeight.w800, color: scheme.onSurface,
+          letterSpacing: -0.2)),
       textDirection: TextDirection.ltr,
     )..layout();
-    brand.paint(canvas, const Offset(pad, 28));
+    brand.paint(canvas, Offset(left + markSize + 12, top + (markSize - brand.height) / 2));
 
-    // "Beta" badge next to the brand name
-    final betaW = brand.width + 10;
-    final betaTp = TextPainter(
-      text: const TextSpan(text: 'BETA', style: TextStyle(
-          fontSize: 11, fontWeight: FontWeight.w800, color: Colors.white)),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    final betaRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(pad + betaW, 26, betaTp.width + 12, 20),
-      const Radius.circular(10),
-    );
-    canvas.drawRRect(betaRect, Paint()..color = scheme.tertiary);
-    betaTp.paint(canvas, Offset(pad + betaW + 6, 30));
+    top += markSize + 22;
 
-    // Chart title
+    // ── Chart title + subtitle pill ─────────────────────────────────────
     final titleTp = TextPainter(
       text: TextSpan(text: title, style: TextStyle(
-          fontSize: 32, fontWeight: FontWeight.w800, color: scheme.onSurface)),
+          fontSize: 30, fontWeight: FontWeight.w800, color: scheme.onSurface,
+          letterSpacing: -0.4, height: 1.05)),
       textDirection: TextDirection.ltr,
-    )..layout(maxWidth: width - pad * 2);
-    titleTp.paint(canvas, const Offset(pad, 62));
+    )..layout(maxWidth: width - left - outerPad - cardPad);
+    titleTp.paint(canvas, Offset(left, top));
 
-    // Active filter (subtitle)
     final subTp = TextPainter(
       text: TextSpan(text: subtitle, style: TextStyle(
-          fontSize: 18, fontWeight: FontWeight.w600, color: scheme.primary)),
+          fontSize: 14, fontWeight: FontWeight.w700, color: scheme.onPrimaryContainer)),
       textDirection: TextDirection.ltr,
-    )..layout(maxWidth: width - pad * 2);
-    subTp.paint(canvas, Offset(pad, 62 + titleTp.height + 6));
+    )..layout();
+    final pillTop = top + titleTp.height + 10;
+    final pillRect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(left, pillTop, subTp.width + 22, subTp.height + 12),
+      const Radius.circular(20),
+    );
+    canvas.drawRRect(pillRect, Paint()..color = scheme.primaryContainer);
+    subTp.paint(canvas, Offset(left + 11, pillTop + 6));
 
-    // Divider
-    canvas.drawLine(Offset(pad, headerH - 10), Offset(width - pad, headerH - 10),
-        Paint()..color = scheme.outlineVariant.withValues(alpha: 0.4)..strokeWidth = 1);
-
-    // Chart image, scaled to the canvas width
+    // ── Chart image — inset in its own rounded frame ────────────────────
+    final chartTop = outerPad + headerH;
+    final chartFrame = RRect.fromRectAndRadius(
+      Rect.fromLTWH(left, chartTop, innerWidth, chartH),
+      const Radius.circular(18),
+    );
+    canvas.drawRRect(chartFrame, Paint()..color = scheme.surface);
     canvas.save();
-    canvas.translate(pad, headerH);
+    canvas.clipRRect(chartFrame);
+    canvas.translate(left, chartTop);
     canvas.scale(scale);
     canvas.drawImage(chartImage, Offset.zero, Paint());
     canvas.restore();
 
-    // Footer watermark
+    // ── Footer: thin divider + watermark + date ─────────────────────────
+    final footTop = chartTop + chartH + 14;
+    canvas.drawLine(Offset(left, footTop), Offset(width - outerPad - cardPad, footTop),
+        Paint()..color = scheme.outlineVariant.withValues(alpha: 0.35)..strokeWidth = 1);
+
+    final now = DateTime.now();
     final footTp = TextPainter(
-      text: TextSpan(text: 'LastStats · ${L.chartsExportGeneratedOn} '
-          '${DateTime.now().day.toString().padLeft(2, '0')}/'
-          '${DateTime.now().month.toString().padLeft(2, '0')}/${DateTime.now().year}',
-          style: TextStyle(fontSize: 13, color: scheme.onSurfaceVariant)),
+      text: TextSpan(text: 'LastStats  ·  ${L.chartsExportGeneratedOn} '
+          '${now.day.toString().padLeft(2, '0')}/'
+          '${now.month.toString().padLeft(2, '0')}/${now.year}',
+          style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600,
+              color: scheme.onSurfaceVariant)),
       textDirection: TextDirection.ltr,
     )..layout();
-    footTp.paint(canvas, Offset(pad, totalH - footerH + (footerH - footTp.height) / 2));
+    footTp.paint(canvas, Offset(left, footTop + (footerH - 14 - footTp.height) / 2 + 8));
+
+    canvas.restore(); // card clip
 
     final picture = recorder.endRecording();
     final img = await picture.toImage(width.toInt(), totalH.toInt());
@@ -748,6 +808,12 @@ class _ChartsPageState extends State<_ChartsPage>
   /// maxScrollExtent requires measuring every child — which makes every
   /// chart's RenderRepaintBoundary valid for capture, regardless of where the
   /// user actually scrolled to.
+  Future<void> _nextFrame() async {
+    final done = Completer<void>();
+    WidgetsBinding.instance.addPostFrameCallback((_) => done.complete());
+    await done.future;
+  }
+
   Future<RenderRepaintBoundary?> _ensureChartLaidOut(String chartId) async {
     RenderRepaintBoundary? find() =>
         _xkeys[chartId]?.currentContext?.findRenderObject() as RenderRepaintBoundary?;
@@ -755,16 +821,37 @@ class _ChartsPageState extends State<_ChartsPage>
     var rb = find();
     if (rb != null && !rb.size.isEmpty) return rb;
 
-    if (_mainScroll.hasClients) {
-      _mainScroll.jumpTo(_mainScroll.position.maxScrollExtent);
-      // Two frames: one to lay out, one to settle/paint.
-      for (var i = 0; i < 2; i++) {
-        final done = Completer<void>();
-        WidgetsBinding.instance.addPostFrameCallback((_) => done.complete());
-        await done.future;
+    // Retry a handful of times: force full layout by jumping to the bottom
+    // of the list (virtualized slivers off-screen have no layout yet), then
+    // give the tree extra frames to settle — a single pass isn't always
+    // enough when the chart is also waiting on an async setState.
+    for (var attempt = 0; attempt < 6; attempt++) {
+      if (_mainScroll.hasClients) {
+        _mainScroll.jumpTo(_mainScroll.position.maxScrollExtent);
       }
+      await _nextFrame();
+      await _nextFrame();
+      rb = find();
+      if (rb != null && !rb.size.isEmpty) return rb;
+      // Small grace delay before the next attempt — lets any in-flight
+      // setState from year-switching land.
+      await Future.delayed(const Duration(milliseconds: 80));
     }
     return find();
+  }
+
+  /// Waits for the async chain triggered by a year switch to fully settle
+  /// (year data loaded + widget tree rebuilt), instead of assuming a single
+  /// frame is enough. Prevents capturing a stale "loading…" placeholder.
+  Future<void> _waitForYearDataSettled() async {
+    for (var i = 0; i < 20; i++) {
+      if (!mounted) return;
+      if (!_yearDataLoading) break;
+      await Future.delayed(const Duration(milliseconds: 60));
+    }
+    // Two extra frames so the newly-settled data has actually been painted.
+    await _nextFrame();
+    await _nextFrame();
   }
 
   /// Renders [child] off-screen (fully laid out and painted, just physically
@@ -852,11 +939,7 @@ class _ChartsPageState extends State<_ChartsPage>
         }
         await _loadYearData(year);
         if (mounted) setState(() { _yearDataLoading = false; });
-
-        // Wait one frame for widgets to rebuild with new data
-        final ready = Completer<void>();
-        WidgetsBinding.instance.addPostFrameCallback((_) => ready.complete());
-        await ready.future;
+        await _waitForYearDataSettled();
       }
 
       ui.Image chartImg;
