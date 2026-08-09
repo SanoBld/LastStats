@@ -7,16 +7,47 @@ import 'package:flutter/material.dart';
 // stays maxed out beyond its threshold (no cap on how high you can go).
 enum CardTier { none, bronze, silver, gold, platinum, emerald, sapphire, diamond, chrome, iridescent }
 
+// Rich multi-stop gradients: base tone → bright sheen → base → deeper
+// shadow tone. Gives a noticeable metallic/gem texture without any 3D
+// trick — just careful color stops. Used for both the card border and
+// the achievement badges so the look stays consistent everywhere.
 const _tierGradients = <CardTier, List<Color>>{
-  CardTier.bronze:     [Color(0xFFCD7F32), Color(0xFF8C5A2B)],
-  CardTier.silver:     [Color(0xFFE8E8E8), Color(0xFF9B9B9B)],
-  CardTier.gold:       [Color(0xFFFFD76A), Color(0xFFB8860B)],
-  CardTier.platinum:   [Color(0xFFEAF4FF), Color(0xFFB8C4CE)],
-  CardTier.emerald:    [Color(0xFF6EE7B7), Color(0xFF047857)],
-  CardTier.sapphire:   [Color(0xFF60A5FA), Color(0xFF1D4ED8)],
-  CardTier.diamond:    [Color(0xFFB3F5FF), Color(0xFF3FA9C9)],
-  CardTier.chrome:     [Color(0xFFF5F5F5), Color(0xFF6E7A85), Color(0xFFF5F5F5)],
-  CardTier.iridescent: [Color(0xFFFF9AF4), Color(0xFF9AD8FF), Color(0xFFFFE29A), Color(0xFFFF9AF4)],
+  CardTier.bronze: [
+    Color(0xFF6B4321), Color(0xFFCD7F32), Color(0xFFF0B27A),
+    Color(0xFFCD7F32), Color(0xFF5A3818),
+  ],
+  CardTier.silver: [
+    Color(0xFF8A8A8A), Color(0xFFDCDCDC), Color(0xFFFFFFFF),
+    Color(0xFFC3C3C3), Color(0xFF7A7A7A),
+  ],
+  CardTier.gold: [
+    Color(0xFF8C6A0A), Color(0xFFFFD76A), Color(0xFFFFF3C4),
+    Color(0xFFD9A62B), Color(0xFF7A5A08),
+  ],
+  CardTier.platinum: [
+    Color(0xFF9FB2BE), Color(0xFFEAF4FF), Color(0xFFFFFFFF),
+    Color(0xFFCBD8E0), Color(0xFF8697A2),
+  ],
+  CardTier.emerald: [
+    Color(0xFF045C42), Color(0xFF34D399), Color(0xFFB8FCE0),
+    Color(0xFF10B981), Color(0xFF03422F),
+  ],
+  CardTier.sapphire: [
+    Color(0xFF1E3A8A), Color(0xFF3B82F6), Color(0xFFBFDBFE),
+    Color(0xFF2563EB), Color(0xFF1E2E6B),
+  ],
+  CardTier.diamond: [
+    Color(0xFF2A8DA6), Color(0xFF9FF3FF), Color(0xFFFFFFFF),
+    Color(0xFF6FE0F5), Color(0xFF1F6D80),
+  ],
+  CardTier.chrome: [
+    Color(0xFF5E6A73), Color(0xFFE8E8E8), Color(0xFFFFFFFF),
+    Color(0xFF9AA5AC), Color(0xFF3F474D),
+  ],
+  CardTier.iridescent: [
+    Color(0xFFFF9AF4), Color(0xFF9AD8FF), Color(0xFFC8FFEC),
+    Color(0xFFFFE29A), Color(0xFFFF9AF4),
+  ],
 };
 
 List<Color>? tierGradient(CardTier t) => t == CardTier.none ? null : _tierGradients[t];
@@ -33,6 +64,13 @@ String tierLabel(CardTier t) => switch (t) {
   CardTier.iridescent => 'Iridescent',
   CardTier.none       => '',
 };
+
+// Mid-tone from each tier's gradient — used as a soft tinted background
+// (e.g. category cards) instead of the full bright gradient.
+Color? tierSoftColor(CardTier t) {
+  final g = tierGradient(t);
+  return g == null ? null : g[0];
+}
 
 // Play-count thresholds for the card border on a track/album/artist.
 const kPlayTierThresholds = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
@@ -120,4 +158,24 @@ List<AchievementProgress> computeAchievements({
     final cur = currentFor(d.category);
     return AchievementProgress(d, cur, cur >= d.threshold);
   }).toList();
+}
+
+// Summary for a category card: raw value, highest tier reached, and the
+// next locked milestone (null once everything in the category is unlocked).
+class CategorySummary {
+  final int current;
+  final CardTier tier;
+  final AchievementProgress? next;
+  const CategorySummary(this.current, this.tier, this.next);
+}
+
+CategorySummary summarizeCategory(List<AchievementProgress> items) {
+  final current = items.isEmpty ? 0 : items.first.current;
+  var tier = CardTier.none;
+  AchievementProgress? next;
+  for (final a in items) {
+    if (a.unlocked) tier = a.def.tier;
+    else { next ??= a; }
+  }
+  return CategorySummary(current, tier, next);
 }

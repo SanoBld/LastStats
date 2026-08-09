@@ -182,11 +182,19 @@ class _Tilt3DCardState extends State<Tilt3DCard>
                         borderRadius: radius,
                         gradient: LinearGradient(
                           colors: tierGradient(widget.tier)!,
+                          stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
                           begin: Alignment.topLeft, end: Alignment.bottomRight,
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: tierGradient(widget.tier)![1].withValues(alpha: 0.45),
+                            blurRadius: 16, spreadRadius: -2,
+                          ),
+                        ],
                       ),
+                      // Thicker rim so the tier border reads as a real edge.
                       padding: widget.tier == CardTier.none
-                          ? EdgeInsets.zero : const EdgeInsets.all(2.5),
+                          ? EdgeInsets.zero : const EdgeInsets.all(4.5),
                       child: ClipRRect(
                         borderRadius: radius,
                         child: Stack(

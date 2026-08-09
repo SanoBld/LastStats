@@ -615,4 +615,8 @@ class AppStringsRu implements AppStrings {
   @override String get achvCatArtists => 'Артисты';
   @override String get achvCatAlbums => 'Альбомы';
   @override String get achvCatLoyalty => 'Верность';
+  @override String get achvDescListening => 'Всего прослушанных треков (скроббл), по всем исполнителям.';
+  @override String get achvDescArtists => 'Количество разных исполнителей, прослушанных хотя бы раз.';
+  @override String get achvDescAlbums => 'Количество разных альбомов, прослушанных хотя бы раз.';
+  @override String get achvDescLoyalty => 'Как давно существует аккаунт Last.fm.';
 }

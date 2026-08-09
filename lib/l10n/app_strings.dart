@@ -680,4 +680,8 @@ abstract class AppStrings {
   String get achvCatArtists;
   String get achvCatAlbums;
   String get achvCatLoyalty;
+  String get achvDescListening;
+  String get achvDescArtists;
+  String get achvDescAlbums;
+  String get achvDescLoyalty;
 }

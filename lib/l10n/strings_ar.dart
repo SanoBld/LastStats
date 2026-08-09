@@ -615,4 +615,8 @@ class AppStringsAr implements AppStrings {
   @override String get achvCatArtists => 'الفنانون';
   @override String get achvCatAlbums => 'الألبومات';
   @override String get achvCatLoyalty => 'الولاء';
+  @override String get achvDescListening => 'إجمالي التشغيلات لكل الفنانين.';
+  @override String get achvDescArtists => 'عدد الفنانين المختلفين الذين استمعت إليهم مرة واحدة على الأقل.';
+  @override String get achvDescAlbums => 'عدد الألبومات المختلفة التي استمعت إليها مرة واحدة على الأقل.';
+  @override String get achvDescLoyalty => 'مدة وجود حساب Last.fm.';
 }
