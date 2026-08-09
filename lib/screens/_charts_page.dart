@@ -656,148 +656,107 @@ class _ChartsPageState extends State<_ChartsPage>
 
   /// Composes a clean, branded PNG: app name + chart title + active filter
   /// info as a header above the captured chart, plus a small footer.
-  Future<Uint8List> _composeExportImage({
+  /// Builds the export card as REAL Flutter widgets (same text rendering,
+  /// same theme, same anti-aliasing as the app itself) instead of hand-drawn
+  /// canvas geometry — this is what was causing the blurry / misaligned
+  /// corners before. It's rendered off-screen via [_renderOffscreen] and
+  /// the result is re-captured as a single flat PNG.
+  Widget _buildExportCard({
     required ui.Image chartImage,
     required String title,
-    required String subtitle,
+    required String yearLabel,
     required ColorScheme scheme,
-  }) async {
-    const width     = 1080.0;
-    const outerPad  = 28.0;   // margin around the whole card
-    const cardPad   = 32.0;   // padding inside the card
-    const headerH   = 128.0;
-    const footerH   = 52.0;
-    const radius    = 28.0;
-
-    final innerWidth = width - outerPad * 2 - cardPad * 2;
-    final scale       = innerWidth / chartImage.width;
-    final chartH      = chartImage.height * scale;
-    final cardH       = headerH + chartH + footerH;
-    final totalH      = cardH + outerPad * 2;
-
-    final recorder = ui.PictureRecorder();
-    final canvas   = Canvas(recorder, Rect.fromLTWH(0, 0, width, totalH));
-
-    // ── Page background — soft brand-tinted gradient, not a flat fill ──────
-    final pageRect = Rect.fromLTWH(0, 0, width, totalH);
-    canvas.drawRect(pageRect, Paint()..shader = ui.Gradient.linear(
-      pageRect.topLeft, pageRect.bottomRight,
-      [scheme.primary.withValues(alpha: 0.10), scheme.surface, scheme.surface],
-      [0.0, 0.35, 1.0],
-    ));
-
-    // ── Card ─────────────────────────────────────────────────────────────
-    final cardRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(outerPad, outerPad, width - outerPad * 2, cardH),
-      const Radius.circular(radius),
-    );
-    canvas.drawRRect(
-      cardRect.shift(const Offset(0, 8)),
-      Paint()..color = scheme.shadow.withValues(alpha: 0.12)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 20),
-    );
-    canvas.drawRRect(cardRect, Paint()..shader = ui.Gradient.linear(
-      Offset(outerPad, outerPad), Offset(width - outerPad, outerPad + cardH),
-      [scheme.surfaceContainerHigh, scheme.surfaceContainer],
-    ));
-    canvas.drawRRect(
-      cardRect,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1
-        ..color = scheme.outlineVariant.withValues(alpha: 0.4),
-    );
-
-    canvas.save();
-    canvas.clipRRect(cardRect);
-    final left = outerPad + cardPad;
-    var   top  = outerPad + 30.0;
-
-    // ── Brand mark: rounded gradient badge + wordmark ───────────────────
-    const markSize = 36.0;
-    final markRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(left, top, markSize, markSize),
-      const Radius.circular(11),
-    );
-    canvas.drawRRect(markRect, Paint()..shader = ui.Gradient.linear(
-      markRect.outerRect.topLeft, markRect.outerRect.bottomRight,
-      [scheme.primary, scheme.tertiary],
-    ));
-    final markGlyph = TextPainter(
-      text: TextSpan(text: '♪', style: TextStyle(
-          fontSize: 18, fontWeight: FontWeight.w800, color: scheme.onPrimary)),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    markGlyph.paint(canvas, Offset(
-        left + (markSize - markGlyph.width) / 2,
-        top + (markSize - markGlyph.height) / 2));
-
-    final brand = TextPainter(
-      text: TextSpan(text: 'LastStats', style: TextStyle(
-          fontSize: 19, fontWeight: FontWeight.w800, color: scheme.onSurface,
-          letterSpacing: -0.2)),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    brand.paint(canvas, Offset(left + markSize + 12, top + (markSize - brand.height) / 2));
-
-    top += markSize + 22;
-
-    // ── Chart title + subtitle pill ─────────────────────────────────────
-    final titleTp = TextPainter(
-      text: TextSpan(text: title, style: TextStyle(
-          fontSize: 30, fontWeight: FontWeight.w800, color: scheme.onSurface,
-          letterSpacing: -0.4, height: 1.05)),
-      textDirection: TextDirection.ltr,
-    )..layout(maxWidth: width - left - outerPad - cardPad);
-    titleTp.paint(canvas, Offset(left, top));
-
-    final subTp = TextPainter(
-      text: TextSpan(text: subtitle, style: TextStyle(
-          fontSize: 14, fontWeight: FontWeight.w700, color: scheme.onPrimaryContainer)),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    final pillTop = top + titleTp.height + 10;
-    final pillRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(left, pillTop, subTp.width + 22, subTp.height + 12),
-      const Radius.circular(20),
-    );
-    canvas.drawRRect(pillRect, Paint()..color = scheme.primaryContainer);
-    subTp.paint(canvas, Offset(left + 11, pillTop + 6));
-
-    // ── Chart image — no extra clip/frame: it already carries its own
-    // rounded card + background from the live widget, so wrapping it in a
-    // second rounded rect just produces mismatched double corners. We draw
-    // it as-is, with high-quality filtering so downscaling stays sharp.
-    final chartTop = outerPad + headerH;
-    canvas.save();
-    canvas.translate(left, chartTop);
-    canvas.scale(scale);
-    canvas.drawImage(chartImage, Offset.zero,
-        Paint()..filterQuality = FilterQuality.high..isAntiAlias = true);
-    canvas.restore();
-
-    // ── Footer: thin divider + watermark + date ─────────────────────────
-    final footTop = chartTop + chartH + 14;
-    canvas.drawLine(Offset(left, footTop), Offset(width - outerPad - cardPad, footTop),
-        Paint()..color = scheme.outlineVariant.withValues(alpha: 0.35)..strokeWidth = 1);
-
+  }) {
     final now = DateTime.now();
-    final footTp = TextPainter(
-      text: TextSpan(text: 'LastStats  ·  ${L.chartsExportGeneratedOn} '
-          '${now.day.toString().padLeft(2, '0')}/'
-          '${now.month.toString().padLeft(2, '0')}/${now.year}',
-          style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600,
-              color: scheme.onSurfaceVariant)),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    footTp.paint(canvas, Offset(left, footTop + (footerH - 14 - footTp.height) / 2 + 8));
+    final dateStr = '${now.day.toString().padLeft(2, '0')}/'
+        '${now.month.toString().padLeft(2, '0')}/${now.year}';
 
-    canvas.restore(); // card clip
-
-    final picture = recorder.endRecording();
-    final img = await picture.toImage(width.round(), totalH.round());
-    final bd  = await img.toByteData(format: ImageByteFormat.png);
-    return bd!.buffer.asUint8List();
+    return Container(
+      width: 1080,
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft, end: Alignment.bottomRight,
+          colors: [scheme.primary.withValues(alpha: 0.10), scheme.surface],
+        ),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
+          boxShadow: [BoxShadow(
+              color: scheme.shadow.withValues(alpha: 0.14),
+              blurRadius: 24, offset: const Offset(0, 10))],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(children: [
+              Container(
+                width: 36, height: 36,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(11),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft, end: Alignment.bottomRight,
+                    colors: [scheme.primary, scheme.tertiary]),
+                ),
+                child: Text('♪', style: TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.w800, color: scheme.onPrimary)),
+              ),
+              const SizedBox(width: 12),
+              Text('LastStats', style: TextStyle(
+                  fontSize: 19, fontWeight: FontWeight.w800, letterSpacing: -0.2,
+                  color: scheme.onSurface)),
+              const Spacer(),
+              // Year shown clearly, top-right — always visible at a glance.
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                decoration: BoxDecoration(
+                  color: scheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(yearLabel, style: TextStyle(
+                    fontSize: 14, fontWeight: FontWeight.w800,
+                    color: scheme.onPrimaryContainer)),
+              ),
+            ]),
+            const SizedBox(height: 22),
+            Text(title, style: TextStyle(
+                fontSize: 30, fontWeight: FontWeight.w800, height: 1.05,
+                letterSpacing: -0.4, color: scheme.onSurface)),
+            const SizedBox(height: 24),
+            // The captured chart, laid out at its natural aspect ratio, in
+            // its own light frame so it reads clearly against the card.
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: scheme.surface,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: AspectRatio(
+                aspectRatio: chartImage.width / chartImage.height,
+                child: RawImage(
+                  image: chartImage,
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.high,
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Divider(height: 1, color: scheme.outlineVariant.withValues(alpha: 0.35)),
+            const SizedBox(height: 14),
+            Text('LastStats  ·  ${L.chartsExportGeneratedOn} $dateStr', style: TextStyle(
+                fontSize: 12.5, fontWeight: FontWeight.w600,
+                color: scheme.onSurfaceVariant)),
+          ],
+        ),
+      ),
+    );
   }
 
   /// A chart far down the list may never have been scrolled into view, so its
@@ -984,16 +943,33 @@ class _ChartsPageState extends State<_ChartsPage>
       final chartDef = _kCharts.firstWhere((c) => c.$1 == chartId);
       final title    = _ct(chartDef.$2, chartDef.$3, es: chartDef.$4, zh: chartDef.$5, pt: chartDef.$6);
       final yearStr  = year == 0 ? 'alltime' : '$year';
-      final subtitle = year == 0
+      final yearLabel = year == 0
           ? _ct('Tout le temps', 'All time', es: 'Todo el tiempo', zh: '全部时间', pt: 'Todo período')
           : '$year';
 
-      final bytes = await _composeExportImage(
+      // Compose the final shareable image out of real widgets (not manual
+      // canvas drawing) so text and corners render exactly like the rest of
+      // the app — sharp, correctly rounded, nothing approximated.
+      final exportCard = _buildExportCard(
         chartImage: chartImg,
         title:      title,
-        subtitle:   subtitle,
+        yearLabel:  yearLabel,
         scheme:     scheme,
       );
+      final composedImg = await _renderOffscreen(ctx, Theme(
+        data: Theme.of(ctx),
+        child: Material(type: MaterialType.transparency, child: exportCard),
+      ));
+      if (composedImg == null) {
+        closeDialog();
+        if (ctx.mounted) {
+          ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(
+              _ct('Impossible de générer l\'image', 'Could not generate the image'))));
+        }
+        return;
+      }
+      final composedBd = await composedImg.toByteData(format: ImageByteFormat.png);
+      final bytes = composedBd!.buffer.asUint8List();
 
       final tmp     = await getTemporaryDirectory();
       final file    = File('${tmp.path}/laststats_${chartId}_$yearStr.png');
