@@ -7,9 +7,14 @@ class _FadeSlideIn extends StatefulWidget {
   final Widget child;
   final Duration delay;
   final Duration duration;
+  // When true, the entrance is skipped entirely and the child appears
+  // already fully in place (used for "play once per app session" spots,
+  // e.g. the dashboard, so re-visiting the tab doesn't replay it).
+  final bool skipAnimation;
   const _FadeSlideIn({
     required this.child,
-    this.delay    = Duration.zero,
+    this.delay         = Duration.zero,
+    this.skipAnimation = false,
   }) : duration = const Duration(milliseconds: 350);
 
   @override
@@ -32,7 +37,9 @@ class _FadeSlideInState extends State<_FadeSlideIn>
       end:   Offset.zero,
     ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
 
-    if (widget.delay == Duration.zero) {
+    if (widget.skipAnimation) {
+      _ctrl.value = 1.0; // already "arrived" — no fade/slide to play
+    } else if (widget.delay == Duration.zero) {
       _ctrl.forward();
     } else {
       Future.delayed(widget.delay, () { if (mounted) _ctrl.forward(); });

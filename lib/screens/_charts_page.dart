@@ -1493,10 +1493,15 @@ class _ChartsPageState extends State<_ChartsPage>
 }
 }
 
+// Session-level flag: the cascading entrance only plays the very first time
+// the Charts tab is built after the app launches (not every time you
+// navigate back to it, scroll down and up, etc.).
+bool _chartsEntrancePlayed = false;
+
 // ══════════════════════════════════════════════════════════════════════════
 //  Entrance animation — cascading fade + slide-up, played once per section
-//  the first time it lays out (e.g. on first arrival on the tab). Reused for
-//  the header, the year chips, and every chart section below.
+//  the first time it lays out. Reused for the header, the year chips, and
+//  every chart section below.
 // ══════════════════════════════════════════════════════════════════════════
 class _FadeInSection extends StatefulWidget {
   final int index;
@@ -1520,8 +1525,20 @@ class _FadeInSectionState extends State<_FadeInSection> with SingleTickerProvide
   @override
   void initState() {
     super.initState();
+    if (_chartsEntrancePlayed) {
+      // Already shown once this session — appear instantly, no replay.
+      _c.value = 1.0;
+      return;
+    }
     final delay = Duration(milliseconds: 55 * widget.index.clamp(0, 12));
     Future.delayed(delay, () { if (mounted) _c.forward(); });
+    // The very last section (index 7, the streaks card) marks the session
+    // as "animation done" once its own entrance finishes.
+    if (widget.index >= 7) {
+      Future.delayed(delay + const Duration(milliseconds: 480), () {
+        _chartsEntrancePlayed = true;
+      });
+    }
   }
 
   @override

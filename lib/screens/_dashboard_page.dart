@@ -62,6 +62,11 @@ class _DashboardPage extends StatefulWidget {
   State<_DashboardPage> createState() => _DashboardPageState();
 }
 
+// Session-level flag: the section-entrance cascade only plays the first
+// time the dashboard is built after the app launches — not every time you
+// come back to this tab.
+bool _dashboardEntrancePlayed = false;
+
 class _DashboardPageState extends State<_DashboardPage> {
   Map<String, dynamic>? _userInfo;
   List<dynamic> _topArtists    = [];
@@ -127,6 +132,8 @@ class _DashboardPageState extends State<_DashboardPage> {
   Set<String>       _favFriends     = {};
   Set<String>       _favProfiles    = {};
   bool              _friendsLoading = false;
+
+  bool _entranceMarkScheduled = false;
 
   @override
   void initState() {
@@ -1264,6 +1271,15 @@ class _DashboardPageState extends State<_DashboardPage> {
     }
 
     final info      = _userInfo!;
+    // Last section entrance starts at 420ms + plays for 350ms — mark the
+    // session as "already animated" right after, so scrolling away and
+    // back (or any rebuild) shows sections instantly, no replay.
+    if (!_entranceMarkScheduled && !_dashboardEntrancePlayed) {
+      _entranceMarkScheduled = true;
+      Future.delayed(const Duration(milliseconds: 850), () {
+        _dashboardEntrancePlayed = true;
+      });
+    }
     final name      = (info['name']     ?? widget.username).toString();
     final realName  = (info['realname'] ?? '').toString();
     final country   = (info['country']  ?? '').toString();
@@ -1598,6 +1614,7 @@ class _DashboardPageState extends State<_DashboardPage> {
               // ── Swipeable week/month/year highlights strip ───────────────
               if (hasStripData) ...[
                 _FadeSlideIn(
+                  skipAnimation: _dashboardEntrancePlayed,
                   delay: const Duration(milliseconds: 60),
                   child: _WeekHighlightStrip(
                   topArtistWeek:  _topArtistsWeek.isNotEmpty  ? _topArtistsWeek[0]  as Map : null,
@@ -1622,6 +1639,7 @@ class _DashboardPageState extends State<_DashboardPage> {
               // ── Stats ────────────────────────────────────────────────────
               if (_showStats) ...[
                 _FadeSlideIn(
+                  skipAnimation: _dashboardEntrancePlayed,
                   delay: const Duration(milliseconds: 120),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     _SectionHeader(title: L.dashStats, icon: Icons.bar_chart_rounded),
@@ -1662,6 +1680,7 @@ class _DashboardPageState extends State<_DashboardPage> {
               // ── Recent plays ─────────────────────────────────────────────
               if (_showRecent && _recentTracks.isNotEmpty) ...[
                 _FadeSlideIn(
+                  skipAnimation: _dashboardEntrancePlayed,
                   delay: const Duration(milliseconds: 180),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     _SectionHeader(
@@ -1681,6 +1700,7 @@ class _DashboardPageState extends State<_DashboardPage> {
               // ── Friends ──────────────────────────────────────────────────
               if (_showFriends) ...[
                 _FadeSlideIn(
+                  skipAnimation: _dashboardEntrancePlayed,
                   delay: const Duration(milliseconds: 240),
                   child: _FriendsSection(
                     friends:     _friends,
@@ -1698,6 +1718,7 @@ class _DashboardPageState extends State<_DashboardPage> {
               // ── Top artists carousel ─────────────────────────────────────
               if (_showArtists && _topArtists.isNotEmpty) ...[
                 _FadeSlideIn(
+                  skipAnimation: _dashboardEntrancePlayed,
                   delay: const Duration(milliseconds: 300),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     _SectionHeader(title: L.commonTopArtists, icon: Icons.mic_rounded),
@@ -1715,6 +1736,7 @@ class _DashboardPageState extends State<_DashboardPage> {
               // ── Top albums carousel ──────────────────────────────────────
               if (_showAlbums && _topAlbums.isNotEmpty) ...[
                 _FadeSlideIn(
+                  skipAnimation: _dashboardEntrancePlayed,
                   delay: const Duration(milliseconds: 360),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     _SectionHeader(
@@ -1735,6 +1757,7 @@ class _DashboardPageState extends State<_DashboardPage> {
               // ── Top tracks carousel ──────────────────────────────────────
               if (_showTracks && _topTracks.isNotEmpty) ...[
                 _FadeSlideIn(
+                  skipAnimation: _dashboardEntrancePlayed,
                   delay: const Duration(milliseconds: 420),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     _SectionHeader(title: L.dashTopTracks, icon: Icons.music_note_rounded),
