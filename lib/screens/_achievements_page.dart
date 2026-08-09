@@ -51,6 +51,7 @@ class _AchievementsSheet extends StatelessWidget {
     );
     final unlocked = list.where((a) => a.unlocked).length;
     final myTier   = profileTier(unlocked);
+    final name     = (userInfo?['name'] ?? '').toString();
 
     final byCategory = <AchvCategory, List<AchievementProgress>>{};
     for (final a in list) {
@@ -62,6 +63,19 @@ class _AchievementsSheet extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
         children: [
+          if (name.isNotEmpty && myTier != CardTier.none)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Center(
+                child: Text.rich(TextSpan(children: [
+                  TextSpan(text: '$name ${_ct('a le contour', 'has the')} ',
+                      style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13)),
+                  TextSpan(text: tierLabel(myTier),
+                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13,
+                          color: tierGradient(myTier)![1])),
+                ])),
+              ),
+            ),
           Center(
             child: Column(children: [
               _AchvTierBadge(tier: myTier, size: 92),

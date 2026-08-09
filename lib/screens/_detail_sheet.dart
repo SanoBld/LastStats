@@ -1903,18 +1903,48 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
   Duration     _previewDur = Duration.zero;
   double       _previewPos = 0.0;
 
+  // null = still checking, true/false = checked. The play button only
+  // renders once we know a preview actually exists for this track.
+  bool? _previewAvailable;
+
   bool get _canPlay => widget.previewTrackName.isNotEmpty;
 
   @override
   void initState() {
     super.initState();
     _loadDominantColor();
+    if (_canPlay) _checkPreviewAvailable();
   }
 
   @override
   void dispose() {
     _player?.dispose();
     super.dispose();
+  }
+
+  // Silent lookup, run once on open, so the play button only shows up when
+  // there's actually something to play (no dead button for obscure tracks).
+  Future<void> _checkPreviewAvailable() async {
+    final url = await _fetchDeezerPreviewUrl();
+    if (!mounted) return;
+    setState(() { _previewUrl = url; _previewAvailable = url != null; });
+  }
+
+  Future<String?> _fetchDeezerPreviewUrl() async {
+    try {
+      final q   = Uri.encodeComponent('${widget.previewTrackName} ${widget.previewArtistName}');
+      final uri = Uri.parse('https://api.deezer.com/search?q=$q&limit=5');
+      final res = await http.get(uri).timeout(const Duration(seconds: 6));
+      if (res.statusCode == 200) {
+        final data   = jsonDecode(res.body) as Map<String, dynamic>;
+        final tracks = (data['data'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+        for (final t in tracks) {
+          final u = (t['preview'] as String?) ?? '';
+          if (u.isNotEmpty) return u;
+        }
+      }
+    } catch (_) {}
+    return null;
   }
 
   // Same cheap histogram extractor used for the artwork theme; run again
@@ -1929,7 +1959,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
   }
 
   Future<void> _togglePlay() async {
-    if (!_canPlay) return;
+    if (_previewAvailable != true) return;
     _haptic(_HapticImpact.medium);
 
     if (_isPlaying) {
@@ -1940,20 +1970,8 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
 
     if (_previewUrl == null) {
       if (mounted) setState(() => _previewLoading = true);
-      try {
-        final q   = Uri.encodeComponent('${widget.previewTrackName} ${widget.previewArtistName}');
-        final uri = Uri.parse('https://api.deezer.com/search?q=$q&limit=5');
-        final res = await http.get(uri).timeout(const Duration(seconds: 6));
-        if (res.statusCode == 200) {
-          final data   = jsonDecode(res.body) as Map<String, dynamic>;
-          final tracks = (data['data'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-          for (final t in tracks) {
-            final u = (t['preview'] as String?) ?? '';
-            if (u.isNotEmpty) { _previewUrl = u; break; }
-          }
-        }
-      } catch (_) {}
-      if (mounted) setState(() => _previewLoading = false);
+      final url = await _fetchDeezerPreviewUrl();
+      if (mounted) setState(() { _previewUrl = url; _previewLoading = false; });
       if (_previewUrl == null) return;
     }
 
@@ -2193,8 +2211,10 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
             ),
           ),
 
-          // Play button — bottom center, only for tracks.
-          if (_canPlay)
+          // Play button — bottom center, only once a preview is confirmed
+          // available. Takes the card-back dominant color (same as the
+          // back-of-card theme) instead of plain white.
+          if (_previewAvailable == true)
             Positioned(
               left: 0, right: 0,
               bottom: MediaQuery.of(context).padding.bottom + 24,
@@ -2206,13 +2226,14 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.6),
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white24, width: 1.5),
+                      border: Border.all(
+                          color: (_dominant ?? Colors.white).withValues(alpha: 0.55), width: 1.5),
                     ),
                     child: _previewLoading
-                        ? const Padding(
-                            padding: EdgeInsets.all(18),
+                        ? Padding(
+                            padding: const EdgeInsets.all(18),
                             child: CircularProgressIndicator(
-                                strokeWidth: 2, color: Colors.white70),
+                                strokeWidth: 2, color: _dominant ?? Colors.white70),
                           )
                         : Stack(alignment: Alignment.center, children: [
                             SizedBox(
@@ -2221,7 +2242,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
                                 value: _previewPos.clamp(0.0, 1.0),
                                 strokeWidth: 2,
                                 backgroundColor: Colors.transparent,
-                                valueColor: const AlwaysStoppedAnimation(Colors.white),
+                                valueColor: AlwaysStoppedAnimation(_dominant ?? Colors.white),
                               ),
                             ),
                             Icon(_isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
@@ -3021,21 +3042,18 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
             Text(_ct('Aucun succès débloqué pour l\u2019instant', 'No achievements unlocked yet'),
                 style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13))
           else
-            SizedBox(
-              height: 76,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: preview.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 12),
-                itemBuilder: (_, i) {
-                  final a = preview[i];
-                  return Column(mainAxisSize: MainAxisSize.min, children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                for (final a in preview) ...[
+                  Column(mainAxisSize: MainAxisSize.min, children: [
                     _AchvTierBadge(tier: a.def.tier, size: 50, icon: a.def.icon),
                     const SizedBox(height: 4),
                     Text(tierLabel(a.def.tier), style: const TextStyle(fontSize: 10)),
-                  ]);
-                },
-              ),
+                  ]),
+                  if (a != preview.last) const SizedBox(width: 18),
+                ],
+              ],
             ),
         ],
       ),
