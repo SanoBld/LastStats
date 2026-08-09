@@ -136,6 +136,7 @@
   await UpdateService.init();
   await DataCache.clearExpired();
   await ScrobblesFileCache.init();
+  await FriendsLibraryService.init();
   await StorageManager.init();
   ImageService.pruneExpired();
 
