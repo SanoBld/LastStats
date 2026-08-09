@@ -58,7 +58,9 @@
 <span class="name ">computeAchievements</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="computeAchievements-param-totalScrobbles"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">totalScrobbles</span>, </span></li>
 <li><span class="parameter" id="computeAchievements-param-artistCount"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">artistCount</span>, </span></li>
 <li><span class="parameter" id="computeAchievements-param-albumCount"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">albumCount</span>, </span></li>
+<li><span class="parameter" id="computeAchievements-param-trackCount"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">trackCount</span>, </span></li>
 <li><span class="parameter" id="computeAchievements-param-yearsRegistered"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">yearsRegistered</span>, </span></li>
+<li><span class="parameter" id="computeAchievements-param-weeklyAvg"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">weeklyAvg</span>, </span></li>
 </ol>})
 
         
@@ -74,13 +76,17 @@
   required int totalScrobbles,
   required int artistCount,
   required int albumCount,
+  required int trackCount,
   required int yearsRegistered,
+  required int weeklyAvg,
 }) {
   int currentFor(AchvCategory c) =&gt; switch (c) {
     AchvCategory.listening =&gt; totalScrobbles,
     AchvCategory.artists   =&gt; artistCount,
     AchvCategory.albums    =&gt; albumCount,
+    AchvCategory.tracks    =&gt; trackCount,
     AchvCategory.loyalty   =&gt; yearsRegistered,
+    AchvCategory.pace      =&gt; weeklyAvg,
   };
   return kAchievements.map((d) {
     final cur = currentFor(d.category);
