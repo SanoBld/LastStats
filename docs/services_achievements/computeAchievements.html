@@ -61,6 +61,8 @@
 <li><span class="parameter" id="computeAchievements-param-trackCount"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">trackCount</span>, </span></li>
 <li><span class="parameter" id="computeAchievements-param-yearsRegistered"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">yearsRegistered</span>, </span></li>
 <li><span class="parameter" id="computeAchievements-param-weeklyAvg"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">weeklyAvg</span>, </span></li>
+<li><span class="parameter" id="computeAchievements-param-bestStreakDays"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">bestStreakDays</span> = <span class="default-value">0</span>, </span></li>
+<li><span class="parameter" id="computeAchievements-param-bestDayScrobbles"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">bestDayScrobbles</span> = <span class="default-value">0</span>, </span></li>
 </ol>})
 
         
@@ -79,6 +81,8 @@
   required int trackCount,
   required int yearsRegistered,
   required int weeklyAvg,
+  int bestStreakDays = 0,   &#47;&#47; own account only — 0 for friends (no raw history)
+  int bestDayScrobbles = 0, &#47;&#47; own account only — 0 for friends
 }) {
   int currentFor(AchvCategory c) =&gt; switch (c) {
     AchvCategory.listening =&gt; totalScrobbles,
@@ -87,6 +91,8 @@
     AchvCategory.tracks    =&gt; trackCount,
     AchvCategory.loyalty   =&gt; yearsRegistered,
     AchvCategory.pace      =&gt; weeklyAvg,
+    AchvCategory.streak    =&gt; bestStreakDays,
+    AchvCategory.marathon  =&gt; bestDayScrobbles,
   };
   return kAchievements.map((d) {
     final cur = currentFor(d.category);
