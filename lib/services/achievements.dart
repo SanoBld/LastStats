@@ -158,7 +158,7 @@ const kAchievements = <AchievementDef>[
   AchievementDef('l6', AchvCategory.listening, 10000,  CardTier.sapphire,   Icons.headphones_rounded),
   AchievementDef('l7', AchvCategory.listening, 25000,  CardTier.diamond,    Icons.headphones_rounded),
   AchievementDef('l8', AchvCategory.listening, 50000,  CardTier.chrome,     Icons.headphones_rounded),
-  AchievementDef('l9', AchvCategory.listening, 100000, CardTier.iridescent, Icons.headphones_rounded),
+  AchievementDef('l9', AchvCategory.listening, 500000, CardTier.iridescent, Icons.headphones_rounded),
   // Artistes — distinct artists
   AchievementDef('a1', AchvCategory.artists, 25,  CardTier.bronze,     Icons.mic_external_on_rounded),
   AchievementDef('a2', AchvCategory.artists, 50,  CardTier.silver,     Icons.mic_external_on_rounded),
@@ -168,7 +168,7 @@ const kAchievements = <AchievementDef>[
   AchievementDef('a6', AchvCategory.artists, 300, CardTier.sapphire,   Icons.mic_external_on_rounded),
   AchievementDef('a7', AchvCategory.artists, 400, CardTier.diamond,    Icons.mic_external_on_rounded),
   AchievementDef('a8', AchvCategory.artists, 500, CardTier.chrome,     Icons.mic_external_on_rounded),
-  AchievementDef('a9', AchvCategory.artists, 750, CardTier.iridescent, Icons.mic_external_on_rounded),
+  AchievementDef('a9', AchvCategory.artists, 3000, CardTier.iridescent, Icons.mic_external_on_rounded),
   // Albums — distinct albums
   AchievementDef('ab1', AchvCategory.albums, 25,  CardTier.bronze,     Icons.album_rounded),
   AchievementDef('ab2', AchvCategory.albums, 50,  CardTier.silver,     Icons.album_rounded),
@@ -178,7 +178,7 @@ const kAchievements = <AchievementDef>[
   AchievementDef('ab6', AchvCategory.albums, 300, CardTier.sapphire,   Icons.album_rounded),
   AchievementDef('ab7', AchvCategory.albums, 400, CardTier.diamond,    Icons.album_rounded),
   AchievementDef('ab8', AchvCategory.albums, 500, CardTier.chrome,     Icons.album_rounded),
-  AchievementDef('ab9', AchvCategory.albums, 750, CardTier.iridescent, Icons.album_rounded),
+  AchievementDef('ab9', AchvCategory.albums, 3000, CardTier.iridescent, Icons.album_rounded),
   // Titres — distinct tracks
   AchievementDef('t1', AchvCategory.tracks, 50,   CardTier.bronze,     Icons.music_note_rounded),
   AchievementDef('t2', AchvCategory.tracks, 100,  CardTier.silver,     Icons.music_note_rounded),
@@ -188,7 +188,7 @@ const kAchievements = <AchievementDef>[
   AchievementDef('t6', AchvCategory.tracks, 600,  CardTier.sapphire,   Icons.music_note_rounded),
   AchievementDef('t7', AchvCategory.tracks, 800,  CardTier.diamond,    Icons.music_note_rounded),
   AchievementDef('t8', AchvCategory.tracks, 1000, CardTier.chrome,     Icons.music_note_rounded),
-  AchievementDef('t9', AchvCategory.tracks, 1500, CardTier.iridescent, Icons.music_note_rounded),
+  AchievementDef('t9', AchvCategory.tracks, 6000, CardTier.iridescent, Icons.music_note_rounded),
   // Fidélité — years since registration
   AchievementDef('y1', AchvCategory.loyalty, 1,  CardTier.bronze,     Icons.cake_rounded),
   AchievementDef('y2', AchvCategory.loyalty, 2,  CardTier.silver,     Icons.cake_rounded),
@@ -198,7 +198,7 @@ const kAchievements = <AchievementDef>[
   AchievementDef('y6', AchvCategory.loyalty, 6,  CardTier.sapphire,   Icons.cake_rounded),
   AchievementDef('y7', AchvCategory.loyalty, 7,  CardTier.diamond,    Icons.cake_rounded),
   AchievementDef('y8', AchvCategory.loyalty, 8,  CardTier.chrome,     Icons.cake_rounded),
-  AchievementDef('y9', AchvCategory.loyalty, 10, CardTier.iridescent, Icons.cake_rounded),
+  AchievementDef('y9', AchvCategory.loyalty, 15, CardTier.iridescent, Icons.cake_rounded),
   // Rythme — average scrobbles per week
   AchievementDef('p1', AchvCategory.pace, 10,  CardTier.bronze,     Icons.speed_rounded),
   AchievementDef('p2', AchvCategory.pace, 20,  CardTier.silver,     Icons.speed_rounded),
@@ -208,7 +208,7 @@ const kAchievements = <AchievementDef>[
   AchievementDef('p6', AchvCategory.pace, 100, CardTier.sapphire,   Icons.speed_rounded),
   AchievementDef('p7', AchvCategory.pace, 150, CardTier.diamond,    Icons.speed_rounded),
   AchievementDef('p8', AchvCategory.pace, 200, CardTier.chrome,     Icons.speed_rounded),
-  AchievementDef('p9', AchvCategory.pace, 300, CardTier.iridescent, Icons.speed_rounded),
+  AchievementDef('p9', AchvCategory.pace, 750, CardTier.iridescent, Icons.speed_rounded),
 ];
 
 class AchievementProgress {

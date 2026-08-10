@@ -5,11 +5,11 @@
 // the full milestone list for that category.
 part of 'home_screen.dart';
 
-void showAchievementsSheet(BuildContext context, Map<String, dynamic>? userInfo) {
+void showAchievementsSheet(BuildContext context, Map<String, dynamic>? userInfo, {bool isSelf = false}) {
   Navigator.of(context).push(PageRouteBuilder(
     opaque: false,
     fullscreenDialog: true,
-    pageBuilder: (_, _, _) => _AchievementsSheet(userInfo: userInfo),
+    pageBuilder: (_, _, _) => _AchievementsSheet(userInfo: userInfo, isSelf: isSelf),
     transitionsBuilder: (_, anim, _, child) => SlideTransition(
       position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
           .animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
@@ -32,7 +32,8 @@ int _daysSince(dynamic registered) {
 
 class _AchievementsSheet extends StatelessWidget {
   final Map<String, dynamic>? userInfo;
-  const _AchievementsSheet({required this.userInfo});
+  final bool isSelf;
+  const _AchievementsSheet({required this.userInfo, this.isSelf = false});
 
   @override
   Widget build(BuildContext context) {
@@ -71,18 +72,30 @@ class _AchievementsSheet extends StatelessWidget {
             child: Column(children: [
               _AchvTierBadge(tier: myTier, size: 92, avatarUrl: avatarUrl),
               const SizedBox(height: 10),
-              Text(_ct('Niveau $level', 'Level $level'),
-                  style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 6),
-              SizedBox(
-                width: 160,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(value: lvlRatio.clamp(0.0, 1.0), minHeight: 5),
-                ),
+              GestureDetector(
+                onTap: isSelf ? () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const _LevelHistoryPage())) : null,
+                child: Column(children: [
+                  Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text(_ct('Niveau $level', 'Level $level'),
+                        style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800)),
+                    if (isSelf) ...[
+                      const SizedBox(width: 4),
+                      Icon(Icons.chevron_right_rounded, size: 20, color: scheme.onSurfaceVariant),
+                    ],
+                  ]),
+                  const SizedBox(height: 6),
+                  SizedBox(
+                    width: 160,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(value: lvlRatio.clamp(0.0, 1.0), minHeight: 5),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text('$total / $lvlTo', style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12)),
+                ]),
               ),
-              const SizedBox(height: 4),
-              Text('$total / $lvlTo', style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12)),
               const SizedBox(height: 4),
               Text(L.achvUnlocked(unlocked, list.length),
                   style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13)),
@@ -363,6 +376,79 @@ class _AchvCardViewer extends StatelessWidget {
           ),
         ),
       ]),
+    );
+  }
+}
+
+// ── Level history (own account only — needs full scrobble timestamps) ──────
+
+// Walks the full local scrobble history once and records the moment the
+// cumulative count first crossed each level's threshold.
+List<(int level, int ts)> _computeLevelHistory() {
+  final years = AllScrobblesService.getCachedYears()..sort();
+  final allTs = <int>[];
+  for (final y in years) {
+    allTs.addAll(AllScrobblesService.getTimestampsForYear(y) ?? []);
+  }
+  allTs.sort();
+
+  final history = <(int, int)>[];
+  var lastLevel = 0;
+  for (var i = 0; i < allTs.length; i++) {
+    final lvl = accountLevel(i + 1);
+    if (lvl > lastLevel) {
+      history.add((lvl, allTs[i]));
+      lastLevel = lvl;
+    }
+  }
+  return history.reversed.toList(); // most recent first
+}
+
+class _LevelHistoryPage extends StatelessWidget {
+  const _LevelHistoryPage();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme  = Theme.of(context).colorScheme;
+    final history = _computeLevelHistory();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_ct('Historique des niveaux', 'Level history')),
+        scrolledUnderElevation: 0,
+      ),
+      body: history.isEmpty
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  _ct('Pas encore assez de données — synchronise ton historique complet dans les réglages.',
+                      'Not enough data yet — sync your full history in Settings.'),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: scheme.onSurfaceVariant),
+                ),
+              ),
+            )
+          : ListView.separated(
+              padding: const EdgeInsets.all(16),
+              itemCount: history.length,
+              separatorBuilder: (_, _) => const Divider(height: 1),
+              itemBuilder: (_, i) {
+                final (level, ts) = history[i];
+                final date = DateTime.fromMillisecondsSinceEpoch(ts * 1000);
+                final dateStr = '${date.day.toString().padLeft(2, '0')}/'
+                    '${date.month.toString().padLeft(2, '0')}/${date.year}';
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: scheme.primaryContainer,
+                    child: Text('$level', style: TextStyle(
+                        color: scheme.onPrimaryContainer, fontWeight: FontWeight.w700, fontSize: 13)),
+                  ),
+                  title: Text(_ct('Niveau $level', 'Level $level')),
+                  trailing: Text(dateStr, style: TextStyle(color: scheme.onSurfaceVariant)),
+                );
+              },
+            ),
     );
   }
 }

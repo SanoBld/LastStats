@@ -1,7 +1,10 @@
 // 3D flip card, Pokémon-card style, used in the fullscreen artwork viewer.
 // - drag with a finger, tilt the phone, or hover with a mouse: card leans
 //   in 3D following the input, smoothed so it never feels jerky
-// - slow breathing zoom loop, like a gentle smooth pan
+// - pinch with two fingers to zoom slightly, smooth (replaces the old
+//   automatic breathing-zoom loop — zoom is now user-driven only)
+// - occasional tiny organic "tremble" on top of the tilt, so it doesn't
+//   feel perfectly rigid/mechanical
 // - soft moving glass-style highlight (real reflection, not a color band)
 // - tap to flip and read info on the back
 // Fixed width/height so layout is always stable (no more broken framing).
@@ -40,20 +43,25 @@ class _Tilt3DCardState extends State<Tilt3DCard>
     with TickerProviderStateMixin {
   late final AnimationController _flip =
       AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
-  // Slow breathing zoom, like a smooth camera drift. Kept separate from
-  // the tilt so it never conflicts with drag/sensor input.
-  late final AnimationController _breathe =
-      AnimationController(vsync: this, duration: const Duration(seconds: 5))
-        ..repeat(reverse: true);
-  late final Animation<double> _breatheCurve =
-      CurvedAnimation(parent: _breathe, curve: Curves.easeInOut);
   late final Ticker _smoother;
   StreamSubscription<AccelerometerEvent>? _sub;
+  final _rng = math.Random();
 
   // Raw input target, -1..1. Rendered values chase this smoothly.
   double _targetRx = 0, _targetRy = 0;
   double _rx = 0, _ry = 0;
   bool _dragging = false;
+
+  // Pinch-to-zoom: subtle range only, smoothed like the tilt.
+  double _targetZoom = 1.0;
+  double _zoom = 1.0;
+  double _zoomAtGestureStart = 1.0;
+
+  // Tiny random impulse added on top of the tilt every few seconds, decayed
+  // quickly — gives the card a slightly organic "not perfectly rigid" feel.
+  double _jitterRx = 0, _jitterRy = 0;
+  double _nextJitterAt = 0;
+  double _clock = 0;
 
   // Sensor tilt is calibrated relative to a baseline instead of absolute
   // gravity, so holding the phone normally (vertical, in hand) doesn't
@@ -66,6 +74,7 @@ class _Tilt3DCardState extends State<Tilt3DCard>
   @override
   void initState() {
     super.initState();
+    _nextJitterAt = 2 + _rng.nextDouble() * 3;
     _smoother = createTicker(_onTick)..start();
     try {
       _sub = accelerometerEventStream().listen((e) {
@@ -88,26 +97,40 @@ class _Tilt3DCardState extends State<Tilt3DCard>
     _targetRy = 0;
   }
 
-  // Frame-rate independent exponential smoothing: rendered rx/ry ease
-  // towards the target instead of snapping to every noisy sensor sample.
+  // Frame-rate independent exponential smoothing: rendered rx/ry/zoom ease
+  // towards their targets instead of snapping. Also drives the periodic
+  // micro-jitter impulse and its decay.
   Duration? _lastTick;
   void _onTick(Duration elapsed) {
     final last = _lastTick;
     _lastTick = elapsed;
     if (last == null) return;
     final dtMs = (elapsed - last).inMilliseconds.clamp(1, 64);
-    final t = 1 - math.pow(1 - 0.22, dtMs / 16.0).toDouble();
-    final nrx = _rx + (_targetRx - _rx) * t;
-    final nry = _ry + (_targetRy - _ry) * t;
-    if ((nrx - _rx).abs() > 0.0005 || (nry - _ry).abs() > 0.0005) {
-      setState(() { _rx = nrx; _ry = nry; });
+    final dt = dtMs / 1000.0;
+    _clock += dt;
+
+    if (_clock >= _nextJitterAt) {
+      _jitterRx = (_rng.nextDouble() - 0.5) * 0.16;
+      _jitterRy = (_rng.nextDouble() - 0.5) * 0.16;
+      _nextJitterAt = _clock + 2.5 + _rng.nextDouble() * 4;
+    }
+    _jitterRx *= 0.90;
+    _jitterRy *= 0.90;
+
+    final t  = 1 - math.pow(1 - 0.22, dtMs / 16.0).toDouble();
+    final tz = 1 - math.pow(1 - 0.18, dtMs / 16.0).toDouble();
+    final nrx = _rx   + (_targetRx   - _rx)   * t;
+    final nry = _ry   + (_targetRy   - _ry)   * t;
+    final nz  = _zoom + (_targetZoom - _zoom) * tz;
+    if ((nrx - _rx).abs() > 0.0005 || (nry - _ry).abs() > 0.0005 ||
+        (nz - _zoom).abs() > 0.0005 || _jitterRx.abs() > 0.0005 || _jitterRy.abs() > 0.0005) {
+      setState(() { _rx = nrx; _ry = nry; _zoom = nz; });
     }
   }
 
   @override
   void dispose() {
     _flip.dispose();
-    _breathe.dispose();
     _smoother.dispose();
     _sub?.cancel();
     super.dispose();
@@ -132,6 +155,20 @@ class _Tilt3DCardState extends State<Tilt3DCard>
     }
   }
 
+  void _onScaleStart(ScaleStartDetails d) {
+    _dragging = true;
+    _zoomAtGestureStart = _targetZoom;
+  }
+
+  void _onScaleUpdate(ScaleUpdateDetails d) {
+    if (d.pointerCount >= 2) {
+      // Two fingers: pinch-zoom. Small range only ("seulement un peu").
+      _targetZoom = (_zoomAtGestureStart * d.scale).clamp(1.0, 1.12);
+    } else {
+      _tiltFromLocal(d.localFocalPoint);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<bool>(
@@ -143,22 +180,25 @@ class _Tilt3DCardState extends State<Tilt3DCard>
           onExit: enabled ? (_) => _resetTilt() : null,
           child: GestureDetector(
             onTap: _toggleFlip,
-            onPanStart: enabled ? (_) => _dragging = true : null,
-            onPanUpdate: enabled ? (d) => _tiltFromLocal(d.localPosition) : null,
-            onPanEnd: enabled ? (_) => _resetTilt() : null,
+            onScaleStart:  enabled ? _onScaleStart : null,
+            onScaleUpdate: enabled ? _onScaleUpdate : null,
+            onScaleEnd:    enabled ? (_) => _resetTilt() : null,
             child: SizedBox(
               width: widget.width,
               height: widget.height,
               child: AnimatedBuilder(
-                animation: Listenable.merge([_flip, _breatheCurve]),
+                animation: _flip,
                 builder: (context, _) {
                   final flipAngle = _flip.value * math.pi;
                   final showFront = flipAngle <= math.pi / 2;
                   // Full-range tilt: up to ~35° so a real phone pitch reads
                   // as the card leaning all the way, not a tiny nudge.
-                  final tiltX = enabled ? _rx * 0.62 : 0.0;
-                  final tiltY = enabled ? _ry * 0.62 : 0.0;
-                  final zoom  = 1.0 + _breatheCurve.value * 0.035;
+                  // Jitter is added on top for a slightly organic feel.
+                  final effRx = _rx + _jitterRx;
+                  final effRy = _ry + _jitterRy;
+                  final tiltX = enabled ? effRx * 0.62 : 0.0;
+                  final tiltY = enabled ? effRy * 0.62 : 0.0;
+                  final zoom  = enabled ? _zoom : 1.0;
 
                   final m = Matrix4.identity()
                     ..setEntry(3, 2, 0.0016)
@@ -172,7 +212,7 @@ class _Tilt3DCardState extends State<Tilt3DCard>
                           // pixels opposite the tilt, oversized slightly so
                           // no edge gap ever shows through the clip.
                           ? Transform.translate(
-                              offset: Offset(-_ry * 7, -_rx * 7),
+                              offset: Offset(-effRy * 7, -effRx * 7),
                               child: Transform.scale(scale: 1.05, child: widget.front),
                             )
                           : widget.front)
@@ -212,7 +252,7 @@ class _Tilt3DCardState extends State<Tilt3DCard>
                             if (enabled && showFront)
                               IgnorePointer(
                                 child: _GlassReflection(
-                                  rx: _rx, ry: _ry,
+                                  rx: effRx, ry: effRy,
                                   width: widget.width, height: widget.height,
                                 ),
                               ),

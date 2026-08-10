@@ -561,7 +561,7 @@ class _DashboardPageState extends State<_DashboardPage> {
       case 'refresh':
         _load();
       case 'achievements':
-        showAchievementsSheet(context, _userInfo);
+        showAchievementsSheet(context, _userInfo, isSelf: true);
       case 'settings':
         await Navigator.of(context).push(
           MaterialPageRoute(
