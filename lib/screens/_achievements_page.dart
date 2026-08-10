@@ -45,11 +45,28 @@ class _AchievementsSheet extends StatelessWidget {
     final days    = _daysSince(userInfo?['registered']);
     final weekly  = days > 0 ? ((total / days) * 7).round() : 0;
 
-    final list = computeAchievements(
+    // Streak/marathon need raw scrobble timestamps — only available for
+    // the account currently synced locally (own account).
+    var bestStreak = 0, bestDay = 0;
+    if (isSelf) {
+      final years = AllScrobblesService.getCachedYears();
+      (bestStreak, bestDay) = computeStreakAndMarathon(
+          years, (y) => AllScrobblesService.getTimestampsForYear(y) ?? []);
+    }
+
+    var list = computeAchievements(
       totalScrobbles: total, artistCount: artists,
       albumCount: albums, trackCount: tracks,
       yearsRegistered: _yearsSince(userInfo?['registered']), weeklyAvg: weekly,
+      bestStreakDays: bestStreak, bestDayScrobbles: bestDay,
     );
+    // Friends have no raw history — don't judge them on categories they
+    // have no data for.
+    if (!isSelf) {
+      list = list.where((a) =>
+          a.def.category != AchvCategory.streak &&
+          a.def.category != AchvCategory.marathon).toList();
+    }
     final unlocked = list.where((a) => a.unlocked).length;
     final myTier   = profileTier(unlocked);
     final avatarUrl = _extractImage(userInfo?['image']);
@@ -62,6 +79,8 @@ class _AchievementsSheet extends StatelessWidget {
     for (final a in list) {
       byCategory.putIfAbsent(a.def.category, () => []).add(a);
     }
+    final visibleCategories = byCategory.keys.toList()
+      ..sort((a, b) => AchvCategory.values.indexOf(a).compareTo(AchvCategory.values.indexOf(b)));
 
     return Scaffold(
       appBar: AppBar(title: Text(L.achvTitle), scrolledUnderElevation: 0),
@@ -115,7 +134,7 @@ class _AchievementsSheet extends StatelessWidget {
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
               childAspectRatio: 0.92,
-              children: AchvCategory.values.map((cat) {
+              children: visibleCategories.map((cat) {
                 final items = byCategory[cat]!;
                 return _AchvCategoryCard(category: cat, items: items);
               }).toList(),
@@ -143,6 +162,8 @@ class _AchvCategoryCard extends StatelessWidget {
     AchvCategory.tracks    => (L.achvCatTracks,    L.achvDescTracks,    Icons.music_note_rounded),
     AchvCategory.loyalty   => (L.achvCatLoyalty,   L.achvDescLoyalty,   Icons.cake_rounded),
     AchvCategory.pace      => (L.achvCatPace,      L.achvDescPace,      Icons.speed_rounded),
+    AchvCategory.streak    => (L.achvCatStreak,    L.achvDescStreak,    Icons.local_fire_department_rounded),
+    AchvCategory.marathon  => (L.achvCatMarathon,  L.achvDescMarathon,  Icons.bolt_rounded),
   };
 
   @override

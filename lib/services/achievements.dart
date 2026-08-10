@@ -34,6 +34,33 @@ int levelThreshold(int level) {
   return 25 * l * l;
 }
 
+// Best consecutive-day streak and best single-day scrobble count, computed
+// once from the full local scrobble history (own account only — friends
+// only have aggregated top lists, no raw timestamps).
+(int bestStreakDays, int bestDayScrobbles) computeStreakAndMarathon(List<int> years, List<int> Function(int) timestampsForYear) {
+  final dayCounts = <int, int>{}; // day-index (epoch days) -> scrobble count
+  for (final y in years) {
+    for (final ts in timestampsForYear(y)) {
+      final day = ts ~/ 86400;
+      dayCounts[day] = (dayCounts[day] ?? 0) + 1;
+    }
+  }
+  if (dayCounts.isEmpty) return (0, 0);
+
+  final days = dayCounts.keys.toList()..sort();
+  var bestStreak = 1, curStreak = 1;
+  for (var i = 1; i < days.length; i++) {
+    if (days[i] == days[i - 1] + 1) {
+      curStreak++;
+      if (curStreak > bestStreak) bestStreak = curStreak;
+    } else {
+      curStreak = 1;
+    }
+  }
+  final bestDay = dayCounts.values.reduce((a, b) => a > b ? a : b);
+  return (bestStreak, bestDay);
+}
+
 // 9 ranks, low to high. Last one is the "ultimate" tier: reached once and
 // stays maxed out beyond its threshold (no cap on how high you can go).
 enum CardTier { none, bronze, silver, gold, platinum, emerald, sapphire, diamond, chrome, iridescent }
@@ -137,7 +164,7 @@ CardTier profileTier(int unlockedCount) {
   return best;
 }
 
-enum AchvCategory { listening, artists, albums, tracks, loyalty, pace }
+enum AchvCategory { listening, artists, albums, tracks, loyalty, pace, streak, marathon }
 
 class AchievementDef {
   final String id;
@@ -209,6 +236,27 @@ const kAchievements = <AchievementDef>[
   AchievementDef('p7', AchvCategory.pace, 150, CardTier.diamond,    Icons.speed_rounded),
   AchievementDef('p8', AchvCategory.pace, 200, CardTier.chrome,     Icons.speed_rounded),
   AchievementDef('p9', AchvCategory.pace, 750, CardTier.iridescent, Icons.speed_rounded),
+  // Assiduité — longest run of consecutive days with at least one scrobble.
+  // Own account only (needs full local scrobble history).
+  AchievementDef('s1', AchvCategory.streak, 3,    CardTier.bronze,     Icons.local_fire_department_rounded),
+  AchievementDef('s2', AchvCategory.streak, 7,    CardTier.silver,     Icons.local_fire_department_rounded),
+  AchievementDef('s3', AchvCategory.streak, 14,   CardTier.gold,       Icons.local_fire_department_rounded),
+  AchievementDef('s4', AchvCategory.streak, 30,   CardTier.platinum,   Icons.local_fire_department_rounded),
+  AchievementDef('s5', AchvCategory.streak, 60,   CardTier.emerald,    Icons.local_fire_department_rounded),
+  AchievementDef('s6', AchvCategory.streak, 100,  CardTier.sapphire,   Icons.local_fire_department_rounded),
+  AchievementDef('s7', AchvCategory.streak, 200,  CardTier.diamond,    Icons.local_fire_department_rounded),
+  AchievementDef('s8', AchvCategory.streak, 365,  CardTier.chrome,     Icons.local_fire_department_rounded),
+  AchievementDef('s9', AchvCategory.streak, 1000, CardTier.iridescent, Icons.local_fire_department_rounded),
+  // Marathon — most scrobbles in a single day. Own account only.
+  AchievementDef('m1', AchvCategory.marathon, 20,   CardTier.bronze,     Icons.bolt_rounded),
+  AchievementDef('m2', AchvCategory.marathon, 50,   CardTier.silver,     Icons.bolt_rounded),
+  AchievementDef('m3', AchvCategory.marathon, 100,  CardTier.gold,       Icons.bolt_rounded),
+  AchievementDef('m4', AchvCategory.marathon, 150,  CardTier.platinum,   Icons.bolt_rounded),
+  AchievementDef('m5', AchvCategory.marathon, 200,  CardTier.emerald,    Icons.bolt_rounded),
+  AchievementDef('m6', AchvCategory.marathon, 300,  CardTier.sapphire,   Icons.bolt_rounded),
+  AchievementDef('m7', AchvCategory.marathon, 500,  CardTier.diamond,    Icons.bolt_rounded),
+  AchievementDef('m8', AchvCategory.marathon, 750,  CardTier.chrome,     Icons.bolt_rounded),
+  AchievementDef('m9', AchvCategory.marathon, 1000, CardTier.iridescent, Icons.bolt_rounded),
 ];
 
 class AchievementProgress {
@@ -227,6 +275,8 @@ List<AchievementProgress> computeAchievements({
   required int trackCount,
   required int yearsRegistered,
   required int weeklyAvg,
+  int bestStreakDays = 0,   // own account only — 0 for friends (no raw history)
+  int bestDayScrobbles = 0, // own account only — 0 for friends
 }) {
   int currentFor(AchvCategory c) => switch (c) {
     AchvCategory.listening => totalScrobbles,
@@ -235,6 +285,8 @@ List<AchievementProgress> computeAchievements({
     AchvCategory.tracks    => trackCount,
     AchvCategory.loyalty   => yearsRegistered,
     AchvCategory.pace      => weeklyAvg,
+    AchvCategory.streak    => bestStreakDays,
+    AchvCategory.marathon  => bestDayScrobbles,
   };
   return kAchievements.map((d) {
     final cur = currentFor(d.category);

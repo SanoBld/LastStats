@@ -649,4 +649,8 @@ class AppStringsZh implements AppStrings {
   @override String get achvDescTracks => '收听过的不同曲目数量。';
   @override String get achvCatPace => '节奏';
   @override String get achvDescPace => '每周平均播放次数。';
+  @override String get achvCatStreak => '连续打卡';
+  @override String get achvDescStreak => '连续有播放记录的最长天数。';
+  @override String get achvCatMarathon => '马拉松';
+  @override String get achvDescMarathon => '单日最多播放次数。';
 }

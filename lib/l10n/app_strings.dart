@@ -688,4 +688,8 @@ abstract class AppStrings {
   String get achvDescTracks;
   String get achvCatPace;
   String get achvDescPace;
+  String get achvCatStreak;
+  String get achvDescStreak;
+  String get achvCatMarathon;
+  String get achvDescMarathon;
 }

@@ -623,4 +623,8 @@ class AppStringsDe implements AppStrings {
   @override String get achvDescTracks => 'Anzahl verschiedener gehörter Titel.';
   @override String get achvCatPace => 'Tempo';
   @override String get achvDescPace => 'Durchschnittliche Scrobbles pro Woche.';
+  @override String get achvCatStreak => 'Serie';
+  @override String get achvDescStreak => 'Die längste Serie aufeinanderfolgender Tage mit mindestens einem Scrobble.';
+  @override String get achvCatMarathon => 'Marathon';
+  @override String get achvDescMarathon => 'Die meisten Scrobbles an einem einzigen Tag.';
 }

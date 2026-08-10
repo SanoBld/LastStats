@@ -652,4 +652,8 @@ class AppStringsFr implements AppStrings {
   @override String get achvDescTracks => 'Nombre de titres différents (distincts) écoutés.';
   @override String get achvCatPace => 'Rythme';
   @override String get achvDescPace => "Moyenne d'écoutes par semaine.";
+  @override String get achvCatStreak => 'Assiduité';
+  @override String get achvDescStreak => "Plus longue série de jours d'affilée avec au moins une écoute.";
+  @override String get achvCatMarathon => 'Marathon';
+  @override String get achvDescMarathon => "Le plus grand nombre d'écoutes en une seule journée.";
 }

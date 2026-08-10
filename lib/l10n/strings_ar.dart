@@ -623,4 +623,8 @@ class AppStringsAr implements AppStrings {
   @override String get achvDescTracks => 'عدد المقاطع المختلفة التي استمعت إليها.';
   @override String get achvCatPace => 'الوتيرة';
   @override String get achvDescPace => 'متوسط التشغيلات أسبوعياً.';
+  @override String get achvCatStreak => 'التتابع';
+  @override String get achvDescStreak => 'أطول سلسلة أيام متتالية بها استماع واحد على الأقل.';
+  @override String get achvCatMarathon => 'الماراثون';
+  @override String get achvDescMarathon => 'أكبر عدد من الاستماعات في يوم واحد.';
 }

@@ -622,4 +622,8 @@ class AppStringsJa implements AppStrings {
   @override String get achvDescTracks => '再生した異なる楽曲の数。';
   @override String get achvCatPace => 'ペース';
   @override String get achvDescPace => '週あたりの平均スクロブル数。';
+  @override String get achvCatStreak => '連続記録';
+  @override String get achvDescStreak => '1日1回以上再生した連続日数の最長記録。';
+  @override String get achvCatMarathon => 'マラソン';
+  @override String get achvDescMarathon => '1日の最多再生回数。';
 }

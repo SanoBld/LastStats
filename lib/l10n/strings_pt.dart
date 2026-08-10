@@ -652,4 +652,8 @@ class AppStringsPt implements AppStrings {
   @override String get achvDescTracks => 'Número de faixas diferentes ouvidas.';
   @override String get achvCatPace => 'Ritmo';
   @override String get achvDescPace => 'Média de scrobbles por semana.';
+  @override String get achvCatStreak => 'Sequência';
+  @override String get achvDescStreak => 'A sequência mais longa de dias consecutivos com pelo menos uma audição.';
+  @override String get achvCatMarathon => 'Maratona';
+  @override String get achvDescMarathon => 'O maior número de audições em um único dia.';
 }

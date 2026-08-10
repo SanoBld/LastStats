@@ -623,4 +623,8 @@ class AppStringsRu implements AppStrings {
   @override String get achvDescTracks => 'Количество разных прослушанных треков.';
   @override String get achvCatPace => 'Темп';
   @override String get achvDescPace => 'Среднее число скробблов в неделю.';
+  @override String get achvCatStreak => 'Серия';
+  @override String get achvDescStreak => 'Самая длинная серия дней подряд хотя бы с одним прослушиванием.';
+  @override String get achvCatMarathon => 'Марафон';
+  @override String get achvDescMarathon => 'Наибольшее число прослушиваний за один день.';
 }

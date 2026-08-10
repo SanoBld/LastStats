@@ -626,10 +626,7 @@ class _NotifCard extends StatelessWidget {
         color: scheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: enabled
-              ? scheme.primary.withValues(alpha: 0.35)
-              : scheme.outlineVariant.withValues(alpha: 0.4),
-          width: enabled ? 1.5 : 1,
+          color: scheme.outlineVariant.withValues(alpha: 0.4),
         ),
       ),
       child: Column(children: [

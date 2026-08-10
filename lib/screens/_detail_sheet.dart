@@ -69,6 +69,8 @@ String _achvCategoryLabel(AchvCategory c) => switch (c) {
   AchvCategory.tracks    => L.achvCatTracks,
   AchvCategory.loyalty   => L.achvCatLoyalty,
   AchvCategory.pace      => L.achvCatPace,
+  AchvCategory.streak    => L.achvCatStreak,
+  AchvCategory.marathon  => L.achvCatMarathon,
 };
 
 void _pushFullscreen(BuildContext ctx, String url,
@@ -2577,6 +2579,10 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
 
   // Achievements are computed straight from user.getInfo — same stats we
   // already fetch for the header, no full scrobble history needed.
+  // This profile sheet is used for friends (never the logged-in account —
+  // that goes through the dashboard's own showAchievementsSheet(isSelf:true)
+  // path), so streak/marathon are always excluded: we have no raw scrobble
+  // history for anyone but ourselves.
   List<AchievementProgress> _achievements() {
     final days   = _days();
     final weekly = days > 0 ? ((_total() / days) * 7).round() : 0;
@@ -2587,7 +2593,9 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
       trackCount:  int.tryParse((_info?['track_count']  ?? '0').toString()) ?? 0,
       yearsRegistered: (days / 365).floor(),
       weeklyAvg: weekly,
-    );
+    ).where((a) =>
+        a.def.category != AchvCategory.streak &&
+        a.def.category != AchvCategory.marathon).toList();
   }
 
   CardTier _profileCardTier() =>

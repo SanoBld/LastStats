@@ -652,4 +652,8 @@ class AppStringsEs implements AppStrings {
   @override String get achvDescTracks => 'Número de canciones distintas escuchadas.';
   @override String get achvCatPace => 'Ritmo';
   @override String get achvDescPace => 'Promedio de scrobbles por semana.';
+  @override String get achvCatStreak => 'Racha';
+  @override String get achvDescStreak => 'La racha más larga de días consecutivos con al menos una escucha.';
+  @override String get achvCatMarathon => 'Maratón';
+  @override String get achvDescMarathon => 'El mayor número de escuchas en un solo día.';
 }

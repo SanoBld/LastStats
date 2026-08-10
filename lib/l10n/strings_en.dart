@@ -652,4 +652,8 @@ class AppStringsEn implements AppStrings {
   @override String get achvDescTracks => 'Number of different (distinct) tracks listened to.';
   @override String get achvCatPace => 'Pace';
   @override String get achvDescPace => 'Average scrobbles per week.';
+  @override String get achvCatStreak => 'Streak';
+  @override String get achvDescStreak => 'Longest run of consecutive days with at least one scrobble.';
+  @override String get achvCatMarathon => 'Marathon';
+  @override String get achvDescMarathon => 'The most scrobbles in a single day.';
 }
