@@ -14,6 +14,10 @@ import '../services/lastfm_service.dart';
 import 'home_screen.dart';
 import 'settings/settings_helpers.dart';
 
+// Local 2-language helper (French/English) — this file isn't part of the
+// home_screen.dart library so it can't reuse the shared _ct() defined there.
+String _ct(String fr, String en) => localeNotifier.value == 'en' ? en : fr;
+
 class OnboardingFlow extends StatefulWidget {
   final String username, apiKey;
   const OnboardingFlow({super.key, required this.username, required this.apiKey});
@@ -397,7 +401,9 @@ class _NotificationsStepState extends State<_NotificationsStep> {
         valueListenable: hapticFeedbackNotifier,
         builder: (_, haptic, _) => ValueListenableBuilder<bool>(
           valueListenable: showNewsBadgeNotifier,
-          builder: (_, badge, _) => _Step(
+          builder: (_, badge, _) => ValueListenableBuilder<bool>(
+            valueListenable: achievementsEnabledNotifier,
+            builder: (_, achv, _) => _Step(
           icon: Icons.notifications_active_rounded,
           title: L.onboardNotifTitle,
           subtitle: L.onboardNotifSub,
@@ -481,8 +487,25 @@ class _NotificationsStepState extends State<_NotificationsStep> {
               value: _grand,
               onChanged: (v) => _setLocal('ls_notif_grand_enabled', v, (x) => _grand = x),
             ),
+            const SizedBox(height: 22),
+            Align(alignment: Alignment.centerLeft, child: Text(
+              _ct('Succès', 'Achievements'),
+              style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface),
+            )),
+            const SizedBox(height: 6),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              secondary: Icon(Icons.emoji_events_rounded, color: scheme.primary),
+              title: Text(_ct('Succès et niveaux', 'Achievements and levels'),
+                  style: const TextStyle(fontWeight: FontWeight.w700)),
+              subtitle: Text(_ct('Paliers, badges et niveau de compte',
+                  'Tiers, badges, and account level'),
+                  style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+              value: achv,
+              onChanged: (v) => _set('ls_achievements_enabled', v, achievementsEnabledNotifier),
+            ),
           ]),
-        )),
+        ))),
       ),
     );
   }

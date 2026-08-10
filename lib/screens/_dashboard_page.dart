@@ -526,14 +526,15 @@ class _DashboardPageState extends State<_DashboardPage> {
             Text(L.dashRefresh),
           ]),
         ),
-        PopupMenuItem(
-          value: 'achievements',
-          child: Row(children: [
-            const Icon(Icons.emoji_events_outlined, size: 20),
-            const SizedBox(width: 10),
-            Text(L.achvTitle),
-          ]),
-        ),
+        if (achievementsEnabledNotifier.value)
+          PopupMenuItem(
+            value: 'achievements',
+            child: Row(children: [
+              const Icon(Icons.emoji_events_outlined, size: 20),
+              const SizedBox(width: 10),
+              Text(L.achvTitle),
+            ]),
+          ),
         PopupMenuItem(
           value: 'settings',
           child: Row(children: [
@@ -1074,6 +1075,43 @@ class _DashboardPageState extends State<_DashboardPage> {
 
   // ── Stat helpers ──────────────────────────────────────────────────────────
 
+  // Small tappable "Level N" pill with a mini progress bar, shown right
+  // under the profile header. Opens the level history page on tap.
+  Widget _buildLevelPill() {
+    final total  = _total();
+    final level  = accountLevel(total);
+    final from   = levelThreshold(level);
+    final to     = levelThreshold(level + 1);
+    final ratio  = to > from ? (total - from) / (to - from) : 0.0;
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: GestureDetector(
+        onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const _LevelHistoryPage())),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Text(_ct('Niv. $level', 'Lvl $level'),
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.9),
+                fontSize: 12, fontWeight: FontWeight.w700,
+                shadows: const [Shadow(color: Colors.black45, blurRadius: 4)],
+              )),
+          const SizedBox(width: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(3),
+            child: SizedBox(
+              width: 70, height: 4,
+              child: LinearProgressIndicator(
+                value: ratio.clamp(0.0, 1.0),
+                backgroundColor: Colors.white.withValues(alpha: 0.25),
+                valueColor: AlwaysStoppedAnimation(Colors.white.withValues(alpha: 0.9)),
+              ),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
   int    _total()  => int.tryParse((_userInfo?['playcount'] ?? '0').toString()) ?? 0;
   int    _days()   {
     final raw = _userInfo?['registered'];
@@ -1467,6 +1505,8 @@ class _DashboardPageState extends State<_DashboardPage> {
                                     )),
                                 ],
                               ]),
+                              if (achievementsEnabledNotifier.value)
+                                _buildLevelPill(),
                             ],
                           )),
                         ]),

@@ -2204,21 +2204,23 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
           ),
 
           // Info button — top-left, mirrors the close/share group.
-          Positioned(
-            top: topPad + 8, left: 12,
-            child: GestureDetector(
-              onTap: _showTierInfo,
-              child: Container(
-                width: 36, height: 36,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.55),
-                  shape: BoxShape.circle,
+          // Only relevant when the achievements system is on.
+          if (achievementsEnabledNotifier.value)
+            Positioned(
+              top: topPad + 8, left: 12,
+              child: GestureDetector(
+                onTap: _showTierInfo,
+                child: Container(
+                  width: 36, height: 36,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.55),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.info_outline_rounded,
+                      color: Colors.white, size: 19),
                 ),
-                child: const Icon(Icons.info_outline_rounded,
-                    color: Colors.white, size: 19),
               ),
             ),
-          ),
 
           // Play button — bottom center, only once a preview is confirmed
           // available. Takes the card-back dominant color (same as the
@@ -2717,7 +2719,8 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                       _buildStatsRow(scheme),
                       _buildCompareButton(context),
                       _buildFriendSyncStatus(scheme),
-                      _buildAchievementsPreview(ctx, scheme),
+                      if (achievementsEnabledNotifier.value)
+                        _buildAchievementsPreview(ctx, scheme),
                       if (_isNowPlaying) _buildNowPlayingCard(scheme),
                       if (_topArtists.isNotEmpty) ...[
                         _sectionHeader(L.commonTopArtists, scheme),

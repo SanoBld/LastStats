@@ -48,6 +48,9 @@ final navLabelNotifier = ValueNotifier<bool>(true);
 // Saved as 'ls_living_artwork' in SharedPreferences.
 final livingArtworkNotifier = ValueNotifier<bool>(true);
 
+// Saved as 'ls_achievements_enabled' in SharedPreferences.
+final achievementsEnabledNotifier = ValueNotifier<bool>(true);
+
 // Push a local notification when a new "actualité" (news) item is published.
 // Saved as 'ls_notif_news_enabled' in SharedPreferences.
 final notifNewsEnabledNotifier = ValueNotifier<bool>(false);

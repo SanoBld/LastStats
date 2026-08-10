@@ -45,7 +45,7 @@ class _Tilt3DCardState extends State<Tilt3DCard>
       AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
   late final Ticker _smoother;
   StreamSubscription<AccelerometerEvent>? _sub;
-  final _rng = math.Random();
+
 
   // Raw input target, -1..1. Rendered values chase this smoothly.
   double _targetRx = 0, _targetRy = 0;
@@ -56,12 +56,6 @@ class _Tilt3DCardState extends State<Tilt3DCard>
   double _targetZoom = 1.0;
   double _zoom = 1.0;
   double _zoomAtGestureStart = 1.0;
-
-  // Tiny random impulse added on top of the tilt every few seconds, decayed
-  // quickly — gives the card a slightly organic "not perfectly rigid" feel.
-  double _jitterRx = 0, _jitterRy = 0;
-  double _nextJitterAt = 0;
-  double _clock = 0;
 
   // Sensor tilt is calibrated relative to a baseline instead of absolute
   // gravity, so holding the phone normally (vertical, in hand) doesn't
@@ -74,7 +68,6 @@ class _Tilt3DCardState extends State<Tilt3DCard>
   @override
   void initState() {
     super.initState();
-    _nextJitterAt = 2 + _rng.nextDouble() * 3;
     _smoother = createTicker(_onTick)..start();
     try {
       _sub = accelerometerEventStream().listen((e) {
@@ -98,24 +91,13 @@ class _Tilt3DCardState extends State<Tilt3DCard>
   }
 
   // Frame-rate independent exponential smoothing: rendered rx/ry/zoom ease
-  // towards their targets instead of snapping. Also drives the periodic
-  // micro-jitter impulse and its decay.
+  // towards their targets instead of snapping.
   Duration? _lastTick;
   void _onTick(Duration elapsed) {
     final last = _lastTick;
     _lastTick = elapsed;
     if (last == null) return;
     final dtMs = (elapsed - last).inMilliseconds.clamp(1, 64);
-    final dt = dtMs / 1000.0;
-    _clock += dt;
-
-    if (_clock >= _nextJitterAt) {
-      _jitterRx = (_rng.nextDouble() - 0.5) * 0.16;
-      _jitterRy = (_rng.nextDouble() - 0.5) * 0.16;
-      _nextJitterAt = _clock + 2.5 + _rng.nextDouble() * 4;
-    }
-    _jitterRx *= 0.90;
-    _jitterRy *= 0.90;
 
     final t  = 1 - math.pow(1 - 0.22, dtMs / 16.0).toDouble();
     final tz = 1 - math.pow(1 - 0.18, dtMs / 16.0).toDouble();
@@ -123,7 +105,7 @@ class _Tilt3DCardState extends State<Tilt3DCard>
     final nry = _ry   + (_targetRy   - _ry)   * t;
     final nz  = _zoom + (_targetZoom - _zoom) * tz;
     if ((nrx - _rx).abs() > 0.0005 || (nry - _ry).abs() > 0.0005 ||
-        (nz - _zoom).abs() > 0.0005 || _jitterRx.abs() > 0.0005 || _jitterRy.abs() > 0.0005) {
+        (nz - _zoom).abs() > 0.0005) {
       setState(() { _rx = nrx; _ry = nry; _zoom = nz; });
     }
   }
@@ -175,6 +157,7 @@ class _Tilt3DCardState extends State<Tilt3DCard>
       valueListenable: livingArtworkNotifier,
       builder: (context, enabled, _) {
         final radius = BorderRadius.circular(widget.radius);
+        final effTier = achievementsEnabledNotifier.value ? widget.tier : CardTier.none;
         return MouseRegion(
           onHover: enabled ? (e) => _tiltFromLocal(e.localPosition) : null,
           onExit: enabled ? (_) => _resetTilt() : null,
@@ -194,8 +177,8 @@ class _Tilt3DCardState extends State<Tilt3DCard>
                   // Full-range tilt: up to ~35° so a real phone pitch reads
                   // as the card leaning all the way, not a tiny nudge.
                   // Jitter is added on top for a slightly organic feel.
-                  final effRx = _rx + _jitterRx;
-                  final effRy = _ry + _jitterRy;
+                  final effRx = _rx;
+                  final effRy = _ry;
                   final tiltX = enabled ? effRx * 0.62 : 0.0;
                   final tiltY = enabled ? effRy * 0.62 : 0.0;
                   final zoom  = enabled ? _zoom : 1.0;
@@ -226,22 +209,23 @@ class _Tilt3DCardState extends State<Tilt3DCard>
                     alignment: Alignment.center,
                     transform: m,
                     child: Container(
-                      decoration: widget.tier == CardTier.none ? null : BoxDecoration(
+                      decoration: effTier == CardTier.none ? null : BoxDecoration(
                         borderRadius: radius,
                         gradient: LinearGradient(
-                          colors: tierGradient(widget.tier)!,
+                          colors: tierGradient(effTier)!,
                           stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
-                          begin: Alignment.topLeft, end: Alignment.bottomRight,
+                          begin: Alignment(-1 - effRy * 0.7, -1 - effRx * 0.7),
+                          end: Alignment(1 - effRy * 0.7, 1 - effRx * 0.7),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: tierGradient(widget.tier)![1].withValues(alpha: 0.45),
+                            color: tierGradient(effTier)![1].withValues(alpha: 0.45),
                             blurRadius: 16, spreadRadius: -2,
                           ),
                         ],
                       ),
                       // Thicker rim so the tier border reads as a real edge.
-                      padding: widget.tier == CardTier.none
+                      padding: effTier == CardTier.none
                           ? EdgeInsets.zero : const EdgeInsets.all(4.5),
                       child: ClipRRect(
                         borderRadius: radius,

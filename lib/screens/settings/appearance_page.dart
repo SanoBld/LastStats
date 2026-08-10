@@ -14,6 +14,10 @@ void _ap_haptic() {
   if (hapticFeedbackNotifier.value) HapticFeedback.lightImpact();
 }
 
+// Local 2-language helper (French/English) — this file isn't part of the
+// home_screen.dart library so it can't reuse the shared _ct() defined there.
+String _ct(String fr, String en) => localeNotifier.value == 'en' ? en : fr;
+
 class AppearancePage extends StatefulWidget {
   const AppearancePage({super.key});
 
@@ -916,12 +920,16 @@ class _LivingArtworkSection extends StatefulWidget {
 
 class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
   bool _enabled = true;
+  bool _achievementsOn = true;
 
   @override
   void initState() {
     super.initState();
     SharedPreferences.getInstance().then((p) {
-      if (mounted) setState(() => _enabled = p.getBool('ls_living_artwork') ?? true);
+      if (mounted) setState(() {
+        _enabled = p.getBool('ls_living_artwork') ?? true;
+        _achievementsOn = p.getBool('ls_achievements_enabled') ?? true;
+      });
     });
   }
 
@@ -941,6 +949,19 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
             await p.setBool('ls_living_artwork', v);
             setState(() => _enabled = v);
             livingArtworkNotifier.value = v;
+          },
+        ),
+        SwitchListTile(
+          secondary: Icon(Icons.emoji_events_outlined, color: scheme.primary),
+          title: Text(_ct('Succès et niveaux', 'Achievements and levels')),
+          subtitle: Text(_ct('Paliers, badges et niveau de compte',
+              'Tiers, badges, and account level')),
+          value: _achievementsOn,
+          onChanged: (v) async {
+            final p = await SharedPreferences.getInstance();
+            await p.setBool('ls_achievements_enabled', v);
+            setState(() => _achievementsOn = v);
+            achievementsEnabledNotifier.value = v;
           },
         ),
       ],

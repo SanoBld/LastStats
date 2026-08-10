@@ -89,6 +89,7 @@ void main() async {
   navLabelNotifier.value     = prefs.getBool('ls_nav_labels')      ?? true;
   hapticFeedbackNotifier.value = prefs.getBool('ls_haptic_feedback') ?? true;
   livingArtworkNotifier.value = prefs.getBool('ls_living_artwork') ?? true;
+  achievementsEnabledNotifier.value = prefs.getBool('ls_achievements_enabled') ?? true;
 
   // ── Data caches & storage ────────────────────────────────────────────────
   await DataCache.init();

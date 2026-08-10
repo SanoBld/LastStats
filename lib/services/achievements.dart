@@ -48,16 +48,16 @@ const _tierGradients = <CardTier, List<Color>>{
     Color(0xFFCD7F32), Color(0xFF5A3818),
   ],
   CardTier.silver: [
-    Color(0xFF8A8A8A), Color(0xFFDCDCDC), Color(0xFFFFFFFF),
-    Color(0xFFC3C3C3), Color(0xFF7A7A7A),
+    Color(0xFF6B6B70), Color(0xFFC8C8CC), Color(0xFFFFFFFF),
+    Color(0xFFA8A8AD), Color(0xFF56565A),
   ],
   CardTier.gold: [
     Color(0xFF8C6A0A), Color(0xFFFFD76A), Color(0xFFFFF3C4),
     Color(0xFFD9A62B), Color(0xFF7A5A08),
   ],
   CardTier.platinum: [
-    Color(0xFF9FB2BE), Color(0xFFEAF4FF), Color(0xFFFFFFFF),
-    Color(0xFFCBD8E0), Color(0xFF8697A2),
+    Color(0xFFB9AC9A), Color(0xFFF3E9DA), Color(0xFFFFFDF8),
+    Color(0xFFDCCBB0), Color(0xFF9C8C74),
   ],
   CardTier.emerald: [
     Color(0xFF045C42), Color(0xFF34D399), Color(0xFFB8FCE0),
@@ -72,8 +72,8 @@ const _tierGradients = <CardTier, List<Color>>{
     Color(0xFF6FE0F5), Color(0xFF1F6D80),
   ],
   CardTier.chrome: [
-    Color(0xFF5E6A73), Color(0xFFE8E8E8), Color(0xFFFFFFFF),
-    Color(0xFF9AA5AC), Color(0xFF3F474D),
+    Color(0xFF15171A), Color(0xFFFFFFFF), Color(0xFF1D2124),
+    Color(0xFFFFFFFF), Color(0xFF15171A),
   ],
   CardTier.iridescent: [
     Color(0xFFFF9AF4), Color(0xFF9AD8FF), Color(0xFFC8FFEC),

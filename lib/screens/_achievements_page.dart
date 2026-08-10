@@ -65,9 +65,12 @@ class _AchievementsSheet extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(L.achvTitle), scrolledUnderElevation: 0),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-        children: [
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+            children: [
           Center(
             child: Column(children: [
               _AchvTierBadge(tier: myTier, size: 92, avatarUrl: avatarUrl),
@@ -102,19 +105,25 @@ class _AchievementsSheet extends StatelessWidget {
             ]),
           ),
           const SizedBox(height: 22),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 0.92,
-            children: AchvCategory.values.map((cat) {
-              final items = byCategory[cat]!;
-              return _AchvCategoryCard(category: cat, items: items);
-            }).toList(),
-          ),
+          LayoutBuilder(builder: (context, box) {
+            // 2 columns on phones, more as the window gets wider (PC/tablet).
+            final cols = box.maxWidth >= 620 ? 3 : (box.maxWidth >= 420 ? 2 : 2);
+            return GridView.count(
+              crossAxisCount: cols,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 0.92,
+              children: AchvCategory.values.map((cat) {
+                final items = byCategory[cat]!;
+                return _AchvCategoryCard(category: cat, items: items);
+              }).toList(),
+            );
+          }),
         ],
+          ),
+        ),
       ),
     );
   }
@@ -218,13 +227,18 @@ class _AchvCategoryDetailPage extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(title), scrolledUnderElevation: 0),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-        children: [
-          Text(description, style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13)),
-          const SizedBox(height: 18),
-          ...items.map((a) => _AchvMilestoneTile(a: a, icon: icon)),
-        ],
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 640),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+            children: [
+              Text(description, style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13)),
+              const SizedBox(height: 18),
+              ...items.map((a) => _AchvMilestoneTile(a: a, icon: icon)),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -417,7 +431,10 @@ class _LevelHistoryPage extends StatelessWidget {
         title: Text(_ct('Historique des niveaux', 'Level history')),
         scrolledUnderElevation: 0,
       ),
-      body: history.isEmpty
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 640),
+          child: history.isEmpty
           ? Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -449,6 +466,8 @@ class _LevelHistoryPage extends StatelessWidget {
                 );
               },
             ),
+        ),
+      ),
     );
   }
 }
