@@ -55,9 +55,10 @@
     <section class="multi-line-signature">
         
 <span class="returntype">void</span>
-<span class="name ">showAchievementsSheet</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="showAchievementsSheet-param-context"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span></li>
-<li><span class="parameter" id="showAchievementsSheet-param-userInfo"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span>?</span> <span class="parameter-name">userInfo</span></span></li>
-</ol>)
+<span class="name ">showAchievementsSheet</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="showAchievementsSheet-param-context"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span></li>
+<li><span class="parameter" id="showAchievementsSheet-param-userInfo"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span>?</span> <span class="parameter-name">userInfo</span>, {</span></li>
+<li><span class="parameter" id="showAchievementsSheet-param-isSelf"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isSelf</span> = <span class="default-value">false</span>, </span></li>
+</ol>})
 
         
 
@@ -68,11 +69,11 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void showAchievementsSheet(BuildContext context, Map&lt;String, dynamic&gt;? userInfo) {
+  <pre class="language-dart"><code class="language-dart">void showAchievementsSheet(BuildContext context, Map&lt;String, dynamic&gt;? userInfo, {bool isSelf = false}) {
   Navigator.of(context).push(PageRouteBuilder(
     opaque: false,
     fullscreenDialog: true,
-    pageBuilder: (_, _, _) =&gt; _AchievementsSheet(userInfo: userInfo),
+    pageBuilder: (_, _, _) =&gt; _AchievementsSheet(userInfo: userInfo, isSelf: isSelf),
     transitionsBuilder: (_, anim, _, child) =&gt; SlideTransition(
       position: Tween&lt;Offset&gt;(begin: const Offset(0, 1), end: Offset.zero)
           .animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
