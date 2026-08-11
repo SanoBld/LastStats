@@ -179,6 +179,44 @@
       UpdateStartupChecker.run(navigatorKey);
     }
   });
+
+  &#47;&#47; ── QR profile deep links ────────────────────────────────────────────────
+  &#47;&#47; laststats:&#47;&#47;profile&#47;&lt;username&gt;, opened either from our own in-app
+  &#47;&#47; scanner or by any other camera&#47;QR app on the device.
+  if (!kIsWeb &amp;&amp; (Platform.isAndroid || Platform.isIOS)) {
+    final appLinks = AppLinks();
+
+    Future&lt;void&gt; handleLink(Uri uri) async {
+      final scanned = QrLinkService.usernameFromScan(uri.toString());
+      if (scanned == null) return;
+      final ctx = navigatorKey.currentContext;
+      if (ctx == null || username.isEmpty || apiKey.isEmpty) return;
+
+      final p = await SharedPreferences.getInstance();
+      final favs = Set&lt;String&gt;.from(p.getStringList(&#39;ls_fav_profiles&#39;) ?? []);
+      final service = LastFmService(apiKey: apiKey, username: username);
+
+      showProfileSheet(
+        ctx, scanned, service,
+        isFav: favs.contains(scanned),
+        onToggleFav: () async {
+          final updated = Set&lt;String&gt;.from(favs);
+          if (favs.contains(scanned)) { updated.remove(scanned); } else { updated.add(scanned); }
+          final p2 = await SharedPreferences.getInstance();
+          await p2.setStringList(&#39;ls_fav_profiles&#39;, updated.toList());
+        },
+      );
+    }
+
+    &#47;&#47; Cold start via a link.
+    try {
+      final initial = await appLinks.getInitialLink();
+      if (initial != null) await handleLink(initial);
+    } catch (_) {}
+
+    &#47;&#47; App already running, link opened while foregrounded&#47;backgrounded.
+    appLinks.uriLinkStream.listen(handleLink, onError: (_) {});
+  }
 }</code></pre>
 </section>
 
