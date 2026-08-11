@@ -337,13 +337,47 @@ void _openAchvCard(BuildContext context, AchievementProgress a, IconData icon) {
 
 // Same Tilt3DCard used for artwork, adapted for a badge: front is the
 // textured tier surface + icon, back shows the level details.
-class _AchvCardViewer extends StatelessWidget {
+class _AchvCardViewer extends StatefulWidget {
   final AchievementProgress a;
   final IconData icon;
   const _AchvCardViewer({required this.a, required this.icon});
 
   @override
+  State<_AchvCardViewer> createState() => _AchvCardViewerState();
+}
+
+class _AchvCardViewerState extends State<_AchvCardViewer> {
+  bool _sharing = false;
+  final _shareKey = GlobalKey();
+
+  // Same technique as the artwork card share: render a clean off-screen
+  // copy and export it as a PNG.
+  Future<void> _shareBadge() async {
+    if (_sharing) return;
+    setState(() => _sharing = true);
+    try {
+      final rb = _shareKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (rb == null) return;
+      final img   = await rb.toImage(pixelRatio: 3.0);
+      final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
+      img.dispose();
+      if (bytes == null) return;
+      final tmp  = await getTemporaryDirectory();
+      final file = File('${tmp.path}/laststats_badge_${widget.a.def.id}.png');
+      await file.writeAsBytes(bytes.buffer.asUint8List());
+      if (mounted) HapticFeedback.lightImpact();
+      await Share.shareXFiles([XFile(file.path)]);
+    } catch (_) {
+      // Render/share failure: fail silently, nothing to share.
+    } finally {
+      if (mounted) setState(() => _sharing = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final a = widget.a;
+    final icon = widget.icon;
     final size  = MediaQuery.of(context).size;
     final cardW = math.min(size.width * 0.72, 300.0);
     final cardH = cardW * 1.35;
@@ -399,20 +433,94 @@ class _AchvCardViewer extends StatelessWidget {
             ),
           ),
         ),
+
+        // Off-screen clean render for the share export.
+        Positioned(
+          left: -9999, top: -9999,
+          child: RepaintBoundary(
+            key: _shareKey,
+            child: _ShareBadgeArt(a: a, icon: icon),
+          ),
+        ),
+
         Positioned(
           top: topPad + 8, right: 12,
-          child: GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 36, height: 36,
-              decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.55), shape: BoxShape.circle),
-              child: const Icon(Icons.close_rounded, color: Colors.white, size: 20),
+          child: Row(children: [
+            GestureDetector(
+              onTap: _sharing ? null : _shareBadge,
+              child: Container(
+                width: 36, height: 36,
+                decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.55), shape: BoxShape.circle),
+                child: _sharing
+                    ? const Padding(
+                        padding: EdgeInsets.all(9),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white70),
+                      )
+                    : const Icon(Icons.ios_share_rounded, color: Colors.white, size: 18),
+              ),
             ),
-          ),
+            const SizedBox(width: 10),
+            GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                width: 36, height: 36,
+                decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.55), shape: BoxShape.circle),
+                child: const Icon(Icons.close_rounded, color: Colors.white, size: 20),
+              ),
+            ),
+          ]),
         ),
       ]),
     );
   }
+}
+
+// Clean, flat, non-tilted badge used only for the share export image.
+class _ShareBadgeArt extends StatelessWidget {
+  final AchievementProgress a;
+  final IconData icon;
+  const _ShareBadgeArt({required this.a, required this.icon});
+
+  @override
+  Widget build(BuildContext context) => ClipRRect(
+    borderRadius: BorderRadius.circular(28),
+    child: SizedBox(
+      width: 320, height: 400,
+      child: Stack(fit: StackFit.expand, children: [
+        _AchvTierSurface(tier: a.def.tier),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter, end: Alignment.bottomCenter,
+              stops: const [0.0, 0.5, 1.0],
+              colors: [Colors.transparent, Colors.black.withValues(alpha: 0.05), Colors.black.withValues(alpha: 0.85)],
+            ),
+          ),
+        ),
+        Center(child: Icon(icon, size: 72, color: Colors.black87)),
+        Positioned(
+          left: 24, right: 24, bottom: 22,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(tierLabel(a.def.tier), style: const TextStyle(
+                  color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 4),
+              Text('${a.current} / ${a.def.threshold}',
+                  style: const TextStyle(color: Colors.white70, fontSize: 15)),
+              const SizedBox(height: 12),
+              Row(children: [
+                const Icon(Icons.graphic_eq_rounded, color: Colors.white38, size: 14),
+                const SizedBox(width: 6),
+                const Text('LastStats', style: TextStyle(color: Colors.white38, fontSize: 11)),
+              ]),
+            ],
+          ),
+        ),
+      ]),
+    ),
+  );
 }
 
 // ── Level history (own account only — needs full scrobble timestamps) ──────
