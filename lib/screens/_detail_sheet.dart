@@ -155,30 +155,35 @@ class _CardBack extends StatelessWidget {
               ]),
             ],
           ),
-          if (qrData != null && qrData!.isNotEmpty)
-            Positioned(
-              left: 0, right: 0, bottom: 22,
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: QrImageView(
-                    data: qrData!, version: QrVersions.auto,
-                    size: 84, gapless: true,
-                    backgroundColor: Colors.white,
-                  ),
-                ),
-              ),
-            ),
+          // Watermark + QR share as one discreet row along the bottom edge,
+          // instead of a floating white square — reads as a designed
+          // element, not something slapped on top.
           Positioned(
-            left: 0, right: 0, bottom: 0,
-            child: Center(
-              child: Text('LastStats', style: TextStyle(
-                  color: fgWeak, fontSize: 11, fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5)),
+            left: 20, right: 20, bottom: 14,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('LastStats', style: TextStyle(
+                    color: fgWeak, fontSize: 11, fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5)),
+                if (qrData != null && qrData!.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(7),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withValues(alpha: 0.25),
+                            blurRadius: 8, offset: const Offset(0, 2)),
+                      ],
+                    ),
+                    child: QrImageView(
+                      data: qrData!, version: QrVersions.auto,
+                      size: 44, gapless: true,
+                    ),
+                  ),
+              ],
             ),
           ),
         ],
@@ -2319,52 +2324,44 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
             ),
 
           // Play button — bottom center, only once a preview is confirmed
-          // available. Takes the card-back dominant color (same as the
-          // back-of-card theme) instead of plain white.
+          // available. A thick progress ring wraps around it (same idea as
+          // before, just heavier stroke) instead of a separate bar.
           if (_previewAvailable == true)
             Positioned(
               left: 0, right: 0,
               bottom: MediaQuery.of(context).padding.bottom + 24,
               child: Center(
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  GestureDetector(
-                    onTap: _previewLoading ? null : _togglePlay,
-                    child: Container(
-                      width: 60, height: 60,
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.6),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                            color: (_dominant ?? Colors.white).withValues(alpha: 0.55), width: 1.5),
-                      ),
-                      child: _previewLoading
-                          ? Padding(
-                              padding: const EdgeInsets.all(18),
+                child: GestureDetector(
+                  onTap: _previewLoading ? null : _togglePlay,
+                  child: Container(
+                    width: 64, height: 64,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.6),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                          color: (_dominant ?? Colors.white).withValues(alpha: 0.35), width: 1.5),
+                    ),
+                    child: _previewLoading
+                        ? Padding(
+                            padding: const EdgeInsets.all(19),
+                            child: CircularProgressIndicator(
+                                strokeWidth: 4.5, color: _dominant ?? Colors.white70),
+                          )
+                        : Stack(alignment: Alignment.center, children: [
+                            SizedBox(
+                              width: 64, height: 64,
                               child: CircularProgressIndicator(
-                                  strokeWidth: 2, color: _dominant ?? Colors.white70),
-                            )
-                          : Icon(_isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                              color: Colors.white, size: 28),
-                    ),
+                                value: _previewPos.clamp(0.0, 1.0),
+                                strokeWidth: 4.5,
+                                backgroundColor: Colors.white.withValues(alpha: 0.2),
+                                valueColor: AlwaysStoppedAnimation(_dominant ?? Colors.white),
+                              ),
+                            ),
+                            Icon(_isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                                color: Colors.white, size: 26),
+                          ]),
                   ),
-                  // Thick rounded bar, same look as the track sheet's
-                  // preview player, instead of a thin ring.
-                  if (!_previewLoading) ...[
-                    const SizedBox(height: 10),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(6),
-                      child: SizedBox(
-                        width: 130,
-                        child: LinearProgressIndicator(
-                          value: _previewPos.clamp(0.0, 1.0),
-                          minHeight: 6,
-                          backgroundColor: Colors.white.withValues(alpha: 0.25),
-                          valueColor: AlwaysStoppedAnimation(_dominant ?? Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ]),
+                ),
               ),
             ),
         ],
@@ -2396,37 +2393,35 @@ class _ShareCardArt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasQr = qrData != null && qrData!.isNotEmpty;
-    // Taller canvas when a QR block needs to fit at the bottom, so the
-    // artwork itself never gets cropped to make room.
-    final height = hasQr ? 610.0 : 506.0;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(28),
       child: SizedBox(
-        width: 360, height: height,
-        child: Column(
+        width: 360, height: 506,
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            Expanded(
-              child: Stack(
-                fit: StackFit.expand,
+            Image.network(url, fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => const ColoredBox(color: Color(0xFF222222))),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                  stops: const [0.0, 0.45, 1.0],
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.05),
+                    Colors.black.withValues(alpha: 0.88),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              left: 24, right: 24, bottom: 22,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Image.network(url, fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => const ColoredBox(color: Color(0xFF222222))),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                        stops: const [0.0, 0.45, 1.0],
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withValues(alpha: 0.05),
-                          Colors.black.withValues(alpha: 0.88),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 24, right: 24, bottom: 22,
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
@@ -2457,24 +2452,27 @@ class _ShareCardArt extends StatelessWidget {
                       ],
                     ),
                   ),
+                  // QR embedded right into the photo's bottom-right corner —
+                  // part of the composition, not a separate strip glued on.
+                  if (hasQr) ...[
+                    const SizedBox(width: 14),
+                    Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(9),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black.withValues(alpha: 0.35),
+                              blurRadius: 12, offset: const Offset(0, 3)),
+                        ],
+                      ),
+                      child: QrImageView(
+                          data: qrData!, version: QrVersions.auto, size: 58, gapless: true),
+                    ),
+                  ],
                 ],
               ),
             ),
-            if (hasQr)
-              Container(
-                width: double.infinity,
-                color: const Color(0xFF171717),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                        color: Colors.white, borderRadius: BorderRadius.circular(8)),
-                    child: QrImageView(
-                        data: qrData!, version: QrVersions.auto, size: 82, gapless: true),
-                  ),
-                ),
-              ),
           ],
         ),
       ),

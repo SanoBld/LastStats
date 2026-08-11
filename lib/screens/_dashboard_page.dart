@@ -526,6 +526,14 @@ class _DashboardPageState extends State<_DashboardPage> {
             Text(L.dashRefresh),
           ]),
         ),
+        PopupMenuItem(
+          value: 'myprofile',
+          child: Row(children: [
+            const Icon(Icons.person_outline_rounded, size: 20),
+            const SizedBox(width: 10),
+            Text(_ct('Voir mon profil', 'View my profile')),
+          ]),
+        ),
         if (achievementsEnabledNotifier.value)
           PopupMenuItem(
             value: 'achievements',
@@ -569,6 +577,9 @@ class _DashboardPageState extends State<_DashboardPage> {
     switch (result) {
       case 'refresh':
         _load();
+      case 'myprofile':
+        showProfileSheet(context, widget.username, widget.service,
+            isFav: false, onToggleFav: () {});
       case 'achievements':
         showAchievementsSheet(context, _userInfo, isSelf: true);
       case 'qrscan':
