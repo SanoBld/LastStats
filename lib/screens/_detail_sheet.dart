@@ -171,7 +171,7 @@ class _CardBack extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: bg,
                       borderRadius: BorderRadius.circular(7),
                       boxShadow: [
                         BoxShadow(color: Colors.black.withValues(alpha: 0.25),
@@ -181,6 +181,10 @@ class _CardBack extends StatelessWidget {
                     child: QrImageView(
                       data: qrData!, version: QrVersions.auto,
                       size: 44, gapless: true,
+                      // QR modules/eyes follow fg so they stay readable against bg.
+                      dataModuleStyle: QrDataModuleStyle(color: fg, dataModuleShape: QrDataModuleShape.square),
+                      eyeStyle: QrEyeStyle(color: fg, eyeShape: QrEyeShape.square),
+                      backgroundColor: bg,
                     ),
                   ),
               ],
@@ -2459,7 +2463,10 @@ class _ShareCardArt extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        // Semi-transparent instead of solid white, so it
+                        // blends into the dark gradient rather than sitting
+                        // on top as a glaring block.
+                        color: Colors.white.withValues(alpha: 0.85),
                         borderRadius: BorderRadius.circular(9),
                         boxShadow: [
                           BoxShadow(color: Colors.black.withValues(alpha: 0.35),
@@ -2467,7 +2474,8 @@ class _ShareCardArt extends StatelessWidget {
                         ],
                       ),
                       child: QrImageView(
-                          data: qrData!, version: QrVersions.auto, size: 58, gapless: true),
+                          data: qrData!, version: QrVersions.auto, size: 58, gapless: true,
+                          backgroundColor: Colors.transparent),
                     ),
                   ],
                 ],
