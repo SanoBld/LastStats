@@ -168,24 +168,14 @@ class _CardBack extends StatelessWidget {
                     color: fgWeak, fontSize: 11, fontWeight: FontWeight.w600,
                     letterSpacing: 0.5)),
                 if (qrData != null && qrData!.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: bg,
-                      borderRadius: BorderRadius.circular(7),
-                      boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.25),
-                            blurRadius: 8, offset: const Offset(0, 2)),
-                      ],
-                    ),
-                    child: QrImageView(
-                      data: qrData!, version: QrVersions.auto,
-                      size: 44, gapless: true,
-                      // QR modules/eyes follow fg so they stay readable against bg.
-                      dataModuleStyle: QrDataModuleStyle(color: fg, dataModuleShape: QrDataModuleShape.square),
-                      eyeStyle: QrEyeStyle(color: fg, eyeShape: QrEyeShape.square),
-                      backgroundColor: bg,
-                    ),
+                  // No container/border — QR sits directly on the card's
+                  // dominant color, bigger than before.
+                  QrImageView(
+                    data: qrData!, version: QrVersions.auto,
+                    size: 60, gapless: true,
+                    dataModuleStyle: QrDataModuleStyle(color: fg, dataModuleShape: QrDataModuleShape.square),
+                    eyeStyle: QrEyeStyle(color: fg, eyeShape: QrEyeShape.square),
+                    backgroundColor: Colors.transparent,
                   ),
               ],
             ),
@@ -2461,11 +2451,10 @@ class _ShareCardArt extends StatelessWidget {
                   if (hasQr) ...[
                     const SizedBox(width: 14),
                     Container(
-                      padding: const EdgeInsets.all(5),
+                      // Thin margin now — just enough to demute the QR from
+                      // the photo, not a thick white frame around it.
+                      padding: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
-                        // Semi-transparent instead of solid white, so it
-                        // blends into the dark gradient rather than sitting
-                        // on top as a glaring block.
                         color: Colors.white.withValues(alpha: 0.85),
                         borderRadius: BorderRadius.circular(9),
                         boxShadow: [
@@ -2474,7 +2463,7 @@ class _ShareCardArt extends StatelessWidget {
                         ],
                       ),
                       child: QrImageView(
-                          data: qrData!, version: QrVersions.auto, size: 58, gapless: true,
+                          data: qrData!, version: QrVersions.auto, size: 84, gapless: true,
                           backgroundColor: Colors.transparent),
                     ),
                   ],
