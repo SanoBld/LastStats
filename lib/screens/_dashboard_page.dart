@@ -536,6 +536,14 @@ class _DashboardPageState extends State<_DashboardPage> {
             ]),
           ),
         PopupMenuItem(
+          value: 'qrscan',
+          child: Row(children: [
+            const Icon(Icons.qr_code_scanner_rounded, size: 20),
+            const SizedBox(width: 10),
+            Text(_ct('Scanner un profil', 'Scan a profile')),
+          ]),
+        ),
+        PopupMenuItem(
           value: 'settings',
           child: Row(children: [
             const Icon(Icons.settings_outlined, size: 20),
@@ -563,6 +571,8 @@ class _DashboardPageState extends State<_DashboardPage> {
         _load();
       case 'achievements':
         showAchievementsSheet(context, _userInfo, isSelf: true);
+      case 'qrscan':
+        showQrScannerPage(context, widget.service);
       case 'settings':
         await Navigator.of(context).push(
           MaterialPageRoute(

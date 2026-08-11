@@ -45,6 +45,9 @@ import '../services/translation_service.dart';
 import '../services/lyrics_service.dart';
 import '../services/achievements.dart';
 import '../services/friends_library_service.dart';
+import '../services/qr_link_service.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../widgets/markdown_lite.dart';
 import '../widgets/living_artwork.dart';
 import 'favorites_page.dart';
@@ -75,6 +78,7 @@ part '_settings_page.dart';
 part '_shared_widgets.dart';
 part '_taste_compare_sheet.dart';
 part '_achievements_page.dart';
+part 'qr_scanner_page.dart';
 
 
 

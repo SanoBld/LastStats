@@ -20,7 +20,10 @@ import 'services/notification_worker.dart';
 import 'services/storage_manager.dart';
 import 'services/update_startup.dart';
 import 'services/update_service.dart';
+import 'services/qr_link_service.dart';
+import 'services/lastfm_service.dart';
 import 'widgets/custom_title_bar.dart';
+import 'package:app_links/app_links.dart';
 
 // navigatorKey now lives in notification_service.dart so the notification
 // tap handler can push screens without importing main.dart (would be circular).
@@ -138,6 +141,44 @@ void main() async {
       UpdateStartupChecker.run(navigatorKey);
     }
   });
+
+  // ── QR profile deep links ────────────────────────────────────────────────
+  // laststats://profile/<username>, opened either from our own in-app
+  // scanner or by any other camera/QR app on the device.
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+    final appLinks = AppLinks();
+
+    Future<void> handleLink(Uri uri) async {
+      final scanned = QrLinkService.usernameFromScan(uri.toString());
+      if (scanned == null) return;
+      final ctx = navigatorKey.currentContext;
+      if (ctx == null || username.isEmpty || apiKey.isEmpty) return;
+
+      final p = await SharedPreferences.getInstance();
+      final favs = Set<String>.from(p.getStringList('ls_fav_profiles') ?? []);
+      final service = LastFmService(apiKey: apiKey, username: username);
+
+      showProfileSheet(
+        ctx, scanned, service,
+        isFav: favs.contains(scanned),
+        onToggleFav: () async {
+          final updated = Set<String>.from(favs);
+          if (favs.contains(scanned)) { updated.remove(scanned); } else { updated.add(scanned); }
+          final p2 = await SharedPreferences.getInstance();
+          await p2.setStringList('ls_fav_profiles', updated.toList());
+        },
+      );
+    }
+
+    // Cold start via a link.
+    try {
+      final initial = await appLinks.getInitialLink();
+      if (initial != null) await handleLink(initial);
+    } catch (_) {}
+
+    // App already running, link opened while foregrounded/backgrounded.
+    appLinks.uriLinkStream.listen(handleLink, onError: (_) {});
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════

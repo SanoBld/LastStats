@@ -16,6 +16,9 @@ dependencies:
   shared_preferences: ^2.2.3
   path_provider: ^2.1.5
   share_plus: ^10.1.4
+  qr_flutter: ^4.1.0
+  mobile_scanner: ^5.2.3
+  app_links: ^6.3.2
   url_launcher: ^6.3.0
   palette_generator: ^0.3.3
   flutter_local_notifications: ^19.4.2

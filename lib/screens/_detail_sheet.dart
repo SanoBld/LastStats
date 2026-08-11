@@ -77,7 +77,8 @@ void _pushFullscreen(BuildContext ctx, String url,
     {String title = '', String subtitle = '', String source = 'Last.fm',
      String releaseDate = '', List<(IconData, String)> extra = const [],
      CardTier tier = CardTier.none, int myPlaycount = 0,
-     String previewTrackName = '', String previewArtistName = ''}) {
+     String previewTrackName = '', String previewArtistName = '',
+     String? qrData, String? profileUsername}) {
   Navigator.of(ctx).push(PageRouteBuilder(
     opaque: false,
     barrierColor: Colors.black,
@@ -86,7 +87,8 @@ void _pushFullscreen(BuildContext ctx, String url,
         url: url, title: title, subtitle: subtitle, source: source,
         releaseDate: releaseDate, extra: extra, tier: tier,
         myPlaycount: myPlaycount,
-        previewTrackName: previewTrackName, previewArtistName: previewArtistName),
+        previewTrackName: previewTrackName, previewArtistName: previewArtistName,
+        qrData: qrData, profileUsername: profileUsername),
     transitionsBuilder: (_, anim, _, child) =>
         FadeTransition(opacity: anim, child: child),
     transitionDuration: const Duration(milliseconds: 220),
@@ -99,9 +101,10 @@ class _CardBack extends StatelessWidget {
   final String title, subtitle, source, releaseDate;
   final Color? dominant;
   final List<(IconData, String)> extra;
+  final String? qrData; // profile cards only — deep link encoded as QR
   const _CardBack({
     required this.title, required this.subtitle, required this.source,
-    this.releaseDate = '', this.dominant, this.extra = const [],
+    this.releaseDate = '', this.dominant, this.extra = const [], this.qrData,
   });
 
   @override
@@ -152,6 +155,24 @@ class _CardBack extends StatelessWidget {
               ]),
             ],
           ),
+          if (qrData != null && qrData!.isNotEmpty)
+            Positioned(
+              left: 0, right: 0, bottom: 22,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: QrImageView(
+                    data: qrData!, version: QrVersions.auto,
+                    size: 84, gapless: true,
+                    backgroundColor: Colors.white,
+                  ),
+                ),
+              ),
+            ),
           Positioned(
             left: 0, right: 0, bottom: 0,
             child: Center(
@@ -1883,6 +1904,8 @@ class _FullscreenImageViewer extends StatefulWidget {
   final int myPlaycount;
   final String previewTrackName;
   final String previewArtistName;
+  final String? qrData;         // set only for profile cards
+  final String? profileUsername; // set only for profile cards
   const _FullscreenImageViewer({
     required this.url,
     this.title = '',
@@ -1894,16 +1917,27 @@ class _FullscreenImageViewer extends StatefulWidget {
     this.myPlaycount = 0,
     this.previewTrackName = '',
     this.previewArtistName = '',
+    this.qrData,
+    this.profileUsername,
   });
+
+  bool get isProfileCard => profileUsername != null && profileUsername!.isNotEmpty;
 
   @override
   State<_FullscreenImageViewer> createState() => _FullscreenImageViewerState();
 }
 
-class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
+class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
+    with SingleTickerProviderStateMixin {
   Color? _dominant;
   bool   _sharing = false;
   final  _shareKey = GlobalKey();
+
+  // Soft pulsing glow behind the card while a preview is playing — subtle,
+  // just enough to notice something's happening.
+  late final AnimationController _glowCtrl =
+      AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))
+        ..repeat(reverse: true);
 
   // Lightweight 30s preview player, own instance (this viewer has no link
   // back to the detail sheet's player state).
@@ -1930,6 +1964,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
   @override
   void dispose() {
     _player?.dispose();
+    _glowCtrl.dispose();
     super.dispose();
   }
 
@@ -2058,12 +2093,42 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
 
   // Renders a clean, non-tilted share card (off-screen) and exports it as
   // a PNG so the image, title, and details stay crisp and readable.
+  String? _shareQrPayload; // set only during a profile share, read by the
+                            // off-screen _ShareCardArt before capture.
+
   Future<void> _shareCard() async {
     if (_sharing) return;
-    setState(() => _sharing = true);
+
+    String? qrPayload;
+    if (widget.isProfileCard) {
+      final choice = await showDialog<String>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(_ct('QR code ?', 'QR code?')),
+          content: Text(_ct(
+              'Ajouter un QR code à l\u2019image partagée, pour que la personne qui la voit puisse scanner ton profil ?',
+              'Add a QR code to the shared image, so whoever sees it can scan your profile?')),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, 'none'),
+                child: Text(_ct('Sans QR', 'No QR'))),
+            TextButton(onPressed: () => Navigator.pop(ctx, 'app'),
+                child: Text(_ct('Vers l\u2019app', 'To the app'))),
+            TextButton(onPressed: () => Navigator.pop(ctx, 'web'),
+                child: Text(_ct('Vers Last.fm', 'To Last.fm'))),
+          ],
+        ),
+      );
+      if (choice == null) return; // dialog dismissed — cancel the share
+      if (choice == 'app') qrPayload = QrLinkService.appLink(widget.profileUsername!);
+      if (choice == 'web') qrPayload = QrLinkService.webLink(widget.profileUsername!);
+    }
+
+    setState(() { _sharing = true; _shareQrPayload = qrPayload; });
     try {
       await precacheImage(NetworkImage(widget.url), context);
-      await Future.delayed(const Duration(milliseconds: 80));
+      // Extra frame so the off-screen card re-renders with the QR choice
+      // before we capture it.
+      await Future.delayed(const Duration(milliseconds: 100));
       final rb = _shareKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
       if (rb == null) return;
       final img   = await rb.toImage(pixelRatio: 3.0);
@@ -2123,32 +2188,61 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
             onTap: () => Navigator.pop(context),
             behavior: HitTestBehavior.opaque,
             child: Center(
-              // Stop taps on the card itself from bubbling to the
-              // dismiss-on-tap background behind it.
-              child: GestureDetector(
-                onTap: () {},
-                child: Tilt3DCard(
-                  width: cardW,
-                  height: cardH,
-                  tier: widget.tier,
-                  front: Image.network(
-                    widget.url, fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) => const ColoredBox(
-                      color: Colors.black26,
-                      child: Icon(Icons.broken_image_rounded,
-                          color: Colors.white54, size: 64),
+              child: Stack(alignment: Alignment.center, children: [
+                // Soft pulsing glow behind the card, only while playing.
+                AnimatedBuilder(
+                  animation: _glowCtrl,
+                  builder: (context, _) {
+                    final pulse = 0.85 + _glowCtrl.value * 0.15;
+                    return AnimatedOpacity(
+                      opacity: _isPlaying ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: Transform.scale(
+                        scale: pulse,
+                        child: Container(
+                          width: cardW * 0.9, height: cardH * 0.9,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: (_dominant ?? Colors.white).withValues(alpha: 0.35),
+                                blurRadius: 60, spreadRadius: 10,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                // Stop taps on the card itself from bubbling to the
+                // dismiss-on-tap background behind it.
+                GestureDetector(
+                  onTap: () {},
+                  child: Tilt3DCard(
+                    width: cardW,
+                    height: cardH,
+                    tier: widget.tier,
+                    front: Image.network(
+                      widget.url, fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => const ColoredBox(
+                        color: Colors.black26,
+                        child: Icon(Icons.broken_image_rounded,
+                            color: Colors.white54, size: 64),
+                      ),
+                    ),
+                    back: _CardBack(
+                      title: widget.title,
+                      subtitle: widget.subtitle,
+                      source: widget.source,
+                      releaseDate: widget.releaseDate,
+                      extra: widget.extra,
+                      dominant: _dominant,
+                      qrData: widget.qrData,
                     ),
                   ),
-                  back: _CardBack(
-                    title: widget.title,
-                    subtitle: widget.subtitle,
-                    source: widget.source,
-                    releaseDate: widget.releaseDate,
-                    extra: widget.extra,
-                    dominant: _dominant,
-                  ),
                 ),
-              ),
+              ]),
             ),
           ),
 
@@ -2162,7 +2256,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
               child: _ShareCardArt(
                 url: widget.url, title: widget.title, subtitle: widget.subtitle,
                 releaseDate: widget.releaseDate, source: widget.source,
-                extra: widget.extra,
+                extra: widget.extra, qrData: _shareQrPayload,
               ),
             ),
           ),
@@ -2232,37 +2326,45 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
               left: 0, right: 0,
               bottom: MediaQuery.of(context).padding.bottom + 24,
               child: Center(
-                child: GestureDetector(
-                  onTap: _previewLoading ? null : _togglePlay,
-                  child: Container(
-                    width: 60, height: 60,
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.6),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                          color: (_dominant ?? Colors.white).withValues(alpha: 0.55), width: 1.5),
-                    ),
-                    child: _previewLoading
-                        ? Padding(
-                            padding: const EdgeInsets.all(18),
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: _dominant ?? Colors.white70),
-                          )
-                        : Stack(alignment: Alignment.center, children: [
-                            SizedBox(
-                              width: 60, height: 60,
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  GestureDetector(
+                    onTap: _previewLoading ? null : _togglePlay,
+                    child: Container(
+                      width: 60, height: 60,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.6),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                            color: (_dominant ?? Colors.white).withValues(alpha: 0.55), width: 1.5),
+                      ),
+                      child: _previewLoading
+                          ? Padding(
+                              padding: const EdgeInsets.all(18),
                               child: CircularProgressIndicator(
-                                value: _previewPos.clamp(0.0, 1.0),
-                                strokeWidth: 2,
-                                backgroundColor: Colors.transparent,
-                                valueColor: AlwaysStoppedAnimation(_dominant ?? Colors.white),
-                              ),
-                            ),
-                            Icon(_isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                                color: Colors.white, size: 28),
-                          ]),
+                                  strokeWidth: 2, color: _dominant ?? Colors.white70),
+                            )
+                          : Icon(_isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                              color: Colors.white, size: 28),
+                    ),
                   ),
-                ),
+                  // Thick rounded bar, same look as the track sheet's
+                  // preview player, instead of a thin ring.
+                  if (!_previewLoading) ...[
+                    const SizedBox(height: 10),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: SizedBox(
+                        width: 130,
+                        child: LinearProgressIndicator(
+                          value: _previewPos.clamp(0.0, 1.0),
+                          minHeight: 6,
+                          backgroundColor: Colors.white.withValues(alpha: 0.25),
+                          valueColor: AlwaysStoppedAnimation(_dominant ?? Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ]),
               ),
             ),
         ],
@@ -2275,9 +2377,11 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
 class _ShareCardArt extends StatelessWidget {
   final String url, title, subtitle, releaseDate, source;
   final List<(IconData, String)> extra;
+  final String? qrData; // when set, the card is taller and shows a QR block
   const _ShareCardArt({
     required this.url, required this.title, required this.subtitle,
     required this.releaseDate, required this.source, required this.extra,
+    this.qrData,
   });
 
   Widget _tag(IconData icon, String text) => Row(
@@ -2290,64 +2394,92 @@ class _ShareCardArt extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) => ClipRRect(
-    borderRadius: BorderRadius.circular(28),
-    child: SizedBox(
-      width: 360, height: 506,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.network(url, fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => const ColoredBox(color: Color(0xFF222222))),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                stops: const [0.0, 0.45, 1.0],
-                colors: [
-                  Colors.transparent,
-                  Colors.black.withValues(alpha: 0.05),
-                  Colors.black.withValues(alpha: 0.88),
+  Widget build(BuildContext context) {
+    final hasQr = qrData != null && qrData!.isNotEmpty;
+    // Taller canvas when a QR block needs to fit at the bottom, so the
+    // artwork itself never gets cropped to make room.
+    final height = hasQr ? 610.0 : 506.0;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: SizedBox(
+        width: 360, height: height,
+        child: Column(
+          children: [
+            Expanded(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.network(url, fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => const ColoredBox(color: Color(0xFF222222))),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                        stops: const [0.0, 0.45, 1.0],
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.05),
+                          Colors.black.withValues(alpha: 0.88),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 24, right: 24, bottom: 22,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (title.isNotEmpty)
+                          Text(title, maxLines: 2, overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(color: Colors.white,
+                                  fontSize: 22, fontWeight: FontWeight.w800)),
+                        if (subtitle.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(color: Colors.white70, fontSize: 15)),
+                        ],
+                        if (releaseDate.isNotEmpty || extra.isNotEmpty) ...[
+                          const SizedBox(height: 10),
+                          Wrap(spacing: 14, runSpacing: 4, children: [
+                            if (releaseDate.isNotEmpty) _tag(Icons.calendar_today_rounded, releaseDate),
+                            for (final e in extra) _tag(e.$1, e.$2),
+                          ]),
+                        ],
+                        const SizedBox(height: 14),
+                        Row(children: [
+                          const Icon(Icons.graphic_eq_rounded, color: Colors.white38, size: 14),
+                          const SizedBox(width: 6),
+                          Text('LastStats · $source',
+                              style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                        ]),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-          ),
-          Positioned(
-            left: 24, right: 24, bottom: 22,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (title.isNotEmpty)
-                  Text(title, maxLines: 2, overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Colors.white,
-                          fontSize: 22, fontWeight: FontWeight.w800)),
-                if (subtitle.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Colors.white70, fontSize: 15)),
-                ],
-                if (releaseDate.isNotEmpty || extra.isNotEmpty) ...[
-                  const SizedBox(height: 10),
-                  Wrap(spacing: 14, runSpacing: 4, children: [
-                    if (releaseDate.isNotEmpty) _tag(Icons.calendar_today_rounded, releaseDate),
-                    for (final e in extra) _tag(e.$1, e.$2),
-                  ]),
-                ],
-                const SizedBox(height: 14),
-                Row(children: [
-                  const Icon(Icons.graphic_eq_rounded, color: Colors.white38, size: 14),
-                  const SizedBox(width: 6),
-                  Text('LastStats · $source',
-                      style: const TextStyle(color: Colors.white38, fontSize: 11)),
-                ]),
-              ],
-            ),
-          ),
-        ],
+            if (hasQr)
+              Container(
+                width: double.infinity,
+                color: const Color(0xFF171717),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                        color: Colors.white, borderRadius: BorderRadius.circular(8)),
+                    child: QrImageView(
+                        data: qrData!, version: QrVersions.auto, size: 82, gapless: true),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 // ── Gradient fallback when no image is available ──────────────────────────────
@@ -2715,6 +2847,8 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                   onTap: hasAv ? () => _pushFullscreen(ctx, avatarUrl,
                       title: widget.username, subtitle: 'Profil',
                       tier: _profileCardTier(),
+                      qrData: QrLinkService.appLink(widget.username),
+                      profileUsername: widget.username,
                       source: 'Last.fm') : null,
                   child: SizedBox(height: imgH - 90, width: double.infinity),
                 ),
