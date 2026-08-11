@@ -155,31 +155,25 @@ class _CardBack extends StatelessWidget {
               ]),
             ],
           ),
-          // Watermark + QR share as one discreet row along the bottom edge,
-          // instead of a floating white square — reads as a designed
-          // element, not something slapped on top.
-          Positioned(
-            left: 20, right: 20, bottom: 14,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('LastStats', style: TextStyle(
-                    color: fgWeak, fontSize: 11, fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5)),
-                if (qrData != null && qrData!.isNotEmpty)
-                  // No container/border — QR sits directly on the card's
-                  // dominant color, bigger than before.
-                  QrImageView(
-                    data: qrData!, version: QrVersions.auto,
-                    size: 60, gapless: true,
-                    dataModuleStyle: QrDataModuleStyle(color: fg, dataModuleShape: QrDataModuleShape.square),
-                    eyeStyle: QrEyeStyle(color: fg, eyeShape: QrEyeShape.square),
-                    backgroundColor: Colors.transparent,
-                  ),
-              ],
-            ),
+          // Watermark, bottom-left, small.
+          const Positioned(
+            left: 20, bottom: 18,
+            child: Text('LastStats', style: TextStyle(
+                color: Colors.white38, fontSize: 11, fontWeight: FontWeight.w600,
+                letterSpacing: 0.5)),
           ),
+          // QR, pinned to the bottom-right corner, bigger + no border.
+          if (qrData != null && qrData!.isNotEmpty)
+            Positioned(
+              right: 20, bottom: 14,
+              child: QrImageView(
+                data: qrData!, version: QrVersions.auto,
+                size: 88, gapless: true,
+                dataModuleStyle: QrDataModuleStyle(color: fg, dataModuleShape: QrDataModuleShape.square),
+                eyeStyle: QrEyeStyle(color: fg, eyeShape: QrEyeShape.square),
+                backgroundColor: Colors.transparent,
+              ),
+            ),
         ],
       ),
     );
@@ -2446,25 +2440,17 @@ class _ShareCardArt extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // QR embedded right into the photo's bottom-right corner —
-                  // part of the composition, not a separate strip glued on.
+                  // QR in the photo's bottom-right corner, no white frame,
+                  // white modules so it reads on the dark photo gradient.
                   if (hasQr) ...[
                     const SizedBox(width: 14),
-                    Container(
-                      // Thin margin now — just enough to demute the QR from
-                      // the photo, not a thick white frame around it.
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.85),
-                        borderRadius: BorderRadius.circular(9),
-                        boxShadow: [
-                          BoxShadow(color: Colors.black.withValues(alpha: 0.35),
-                              blurRadius: 12, offset: const Offset(0, 3)),
-                        ],
-                      ),
-                      child: QrImageView(
-                          data: qrData!, version: QrVersions.auto, size: 84, gapless: true,
-                          backgroundColor: Colors.transparent),
+                    QrImageView(
+                      data: qrData!, version: QrVersions.auto, size: 84, gapless: true,
+                      dataModuleStyle: const QrDataModuleStyle(
+                          color: Colors.white, dataModuleShape: QrDataModuleShape.square),
+                      eyeStyle: const QrEyeStyle(
+                          color: Colors.white, eyeShape: QrEyeShape.square),
+                      backgroundColor: Colors.transparent,
                     ),
                   ],
                 ],
@@ -2839,12 +2825,18 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                 // Avatar tap zone — inline so hitbox moves with scroll
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: hasAv ? () => _pushFullscreen(ctx, avatarUrl,
-                      title: widget.username, subtitle: 'Profil',
-                      tier: _profileCardTier(),
-                      qrData: QrLinkService.appLink(widget.username),
-                      profileUsername: widget.username,
-                      source: 'Last.fm') : null,
+                  onTap: hasAv ? () {
+                    // Full name if we have one, else fall back to username.
+                    final realName = ((_info ?? {})['realname'] ?? '').toString();
+                    final fullName = realName.isNotEmpty ? realName : widget.username;
+                    _pushFullscreen(ctx, avatarUrl,
+                        title: fullName, subtitle: '@${widget.username}',
+                        tier: _profileCardTier(),
+                        extra: [(Icons.headphones_rounded, '${_total()} scrobbles')],
+                        qrData: QrLinkService.appLink(widget.username),
+                        profileUsername: widget.username,
+                        source: 'Last.fm');
+                  } : null,
                   child: SizedBox(height: imgH - 90, width: double.infinity),
                 ),
                 _buildProfileHeader(ctx, scheme, hasAv, avatarUrl),
