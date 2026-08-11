@@ -133,13 +133,16 @@
   achievementsEnabledNotifier.value = prefs.getBool(&#39;ls_achievements_enabled&#39;) ?? true;
 
   &#47;&#47; ── Data caches &amp; storage ────────────────────────────────────────────────
-  await DataCache.init();
-  await UpdateService.init();
-  await DataCache.clearExpired();
-  await ScrobblesFileCache.init();
-  await FriendsLibraryService.init();
+  &#47;&#47; These 4 inits don&#39;t depend on each other, so run them together instead
+  &#47;&#47; of one-by-one — cuts real time-to-first-frame since they mostly wait
+  &#47;&#47; on disk I&#47;O anyway.
+  await Future.wait([
+    DataCache.init(),
+    UpdateService.init(),
+    ScrobblesFileCache.init(),
+    FriendsLibraryService.init(),
+  ]);
   await StorageManager.init();
-  ImageService.pruneExpired();
 
   DataCache.offlineMode = prefs.getBool(&#39;ls_cache_serve_stale&#39;) ?? true;
 
@@ -167,6 +170,11 @@
     apiKey:     apiKey,
     startupTab: startupTab,
   ));
+
+  &#47;&#47; Cache cleanup — not needed for the first frame, so it runs after the
+  &#47;&#47; app is already visible instead of blocking startup.
+  DataCache.clearExpired().ignore();
+  ImageService.pruneExpired();
 
   WidgetsBinding.instance.addPostFrameCallback((_) async {
     if (notifLaunchData != null) {
