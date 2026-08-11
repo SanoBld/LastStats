@@ -2117,10 +2117,18 @@ class _CarouselImageState extends State<_CarouselImage> {
     );
   }
 
-  Widget _img(String url, ColorScheme s) => Image.network(
-    url, width: widget.width, height: widget.height, fit: BoxFit.cover,
-    errorBuilder: (_, _, _) => _fallback(s),
-  );
+  Widget _img(String url, ColorScheme s) {
+    // Decode at display resolution (x devicePixelRatio), not source's full
+    // size — this is the grid tile widget, used a lot, so it's the biggest
+    // RAM win. Same on-screen quality, just no wasted decoded pixels.
+    final dpr = MediaQuery.of(context).devicePixelRatio;
+    return Image.network(
+      url, width: widget.width, height: widget.height, fit: BoxFit.cover,
+      cacheWidth:  (widget.width  * dpr).round(),
+      cacheHeight: (widget.height * dpr).round(),
+      errorBuilder: (_, _, _) => _fallback(s),
+    );
+  }
 
   Widget _skeleton(ColorScheme s) => Container(
     width: widget.width, height: widget.height,

@@ -155,17 +155,20 @@ class _CardBack extends StatelessWidget {
               ]),
             ],
           ),
-          // Watermark, bottom-left, small.
+          // Watermark, bottom-left. left:0/bottom:0 here line up with the
+          // Container's own 22px padding (Positioned is relative to the
+          // already-padded area), so it lines up with the text column above.
           const Positioned(
-            left: 20, bottom: 18,
+            left: 0, bottom: 0,
             child: Text('LastStats', style: TextStyle(
                 color: Colors.white38, fontSize: 11, fontWeight: FontWeight.w600,
                 letterSpacing: 0.5)),
           ),
-          // QR, pinned to the bottom-right corner, bigger + no border.
+          // QR, pinned to the bottom-right corner, same 0/0 inset as the
+          // watermark so both sit flush with the card's padded edge.
           if (qrData != null && qrData!.isNotEmpty)
             Positioned(
-              right: 20, bottom: 14,
+              right: 0, bottom: 0,
               child: QrImageView(
                 data: qrData!, version: QrVersions.auto,
                 size: 88, gapless: true,
@@ -3229,6 +3232,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
               borderRadius: BorderRadius.circular(8),
               child: hasImg
                   ? Image.network(rawUrl, width: 46, height: 46, fit: BoxFit.cover,
+                      cacheWidth: 138, cacheHeight: 138, // decode ~3x for high-DPI, not full-size
                       errorBuilder: (_, _, _) => _artBox(46, scheme))
                   : _artBox(46, scheme),
             ),
@@ -3386,6 +3390,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
               borderRadius: BorderRadius.circular(8),
               child: hasImg
                   ? Image.network(rawUrl, width: 44, height: 44, fit: BoxFit.cover,
+                      cacheWidth: 132, cacheHeight: 132, // decode ~3x for high-DPI, not full-size
                       errorBuilder: (_, _, _) => _artBox(44, scheme))
                   : _artBox(44, scheme),
             ),

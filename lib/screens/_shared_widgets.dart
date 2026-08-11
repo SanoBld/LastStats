@@ -199,10 +199,17 @@ class _SmartImageState extends State<_SmartImage> {
     );
   }
 
-  Widget _img(String url, ColorScheme s) => ClipRRect(
-    borderRadius: BorderRadius.circular(widget.borderRadius),
-    child: Image.network(url, width: widget.size, height: widget.size, fit: BoxFit.cover,
-        errorBuilder: (_, _, _) => _fallback(s)));
+  Widget _img(String url, ColorScheme s) {
+    // Decode at display resolution (x devicePixelRatio) instead of the
+    // source's full size — big RAM saving for lists of small avatars,
+    // no visible quality loss since it still matches screen pixels.
+    final px = (widget.size * MediaQuery.of(context).devicePixelRatio).round();
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(widget.borderRadius),
+      child: Image.network(url, width: widget.size, height: widget.size, fit: BoxFit.cover,
+          cacheWidth: px, cacheHeight: px,
+          errorBuilder: (_, _, _) => _fallback(s)));
+  }
 
   Widget _loading(ColorScheme s) => ClipRRect(
     borderRadius: BorderRadius.circular(widget.borderRadius),
