@@ -147,6 +147,17 @@ class _SettingsPageState extends State<_SettingsPage> {
       subtitle: () => L.settingsCardSyncSub,
       pageBuilder: (_) => const SyncPage(),
     ),
+    // 3c — Battery saver
+    _SettingsCardData(
+      icon: Icons.battery_saver_rounded,
+      iconBgColor: (s) => s.tertiaryContainer,
+      iconFgColor: (s) => s.onTertiaryContainer,
+      title:    () => localeNotifier.value == 'en' ? 'Battery saver' : 'Mode éco',
+      subtitle: () => localeNotifier.value == 'en'
+          ? 'Save battery, fewer effects'
+          : 'Économiser la batterie, moins d\'effets',
+      pageBuilder: (_) => const BatterySaverPage(),
+    ),
     // 4 — Language
     _SettingsCardData(
       icon: Icons.translate_rounded,

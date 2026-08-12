@@ -51,6 +51,21 @@ final livingArtworkNotifier = ValueNotifier<bool>(true);
 // Saved as 'ls_achievements_enabled' in SharedPreferences.
 final achievementsEnabledNotifier = ValueNotifier<bool>(true);
 
+// ── Battery / power saver ────────────────────────────────────────────────
+// Manual switch — user forces eco mode on regardless of battery level.
+// Saved as 'ls_eco_mode_manual'.
+final ecoModeManualNotifier = ValueNotifier<bool>(false);
+// Auto switch — turn eco mode on by itself once battery drops below
+// [ecoModeThresholdNotifier]%. Saved as 'ls_eco_mode_auto'.
+final ecoModeAutoNotifier = ValueNotifier<bool>(false);
+// Battery % threshold for the auto switch. Saved as 'ls_eco_mode_threshold'.
+final ecoModeThresholdNotifier = ValueNotifier<int>(20);
+// Combined "is eco mode actually active right now" — true if the manual
+// switch is on, OR auto is on and battery is at/below the threshold.
+// Widgets should only ever read/watch THIS one, not the raw switches above.
+// Kept in sync by EcoModeController (see services/eco_mode_controller.dart).
+final ecoModeActiveNotifier = ValueNotifier<bool>(false);
+
 // Push a local notification when a new "actualité" (news) item is published.
 // Saved as 'ls_notif_news_enabled' in SharedPreferences.
 final notifNewsEnabledNotifier = ValueNotifier<bool>(false);

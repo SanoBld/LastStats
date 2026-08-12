@@ -21,6 +21,7 @@ import 'services/storage_manager.dart';
 import 'services/update_startup.dart';
 import 'services/update_service.dart';
 import 'services/qr_link_service.dart';
+import 'services/eco_mode_controller.dart';
 import 'services/lastfm_service.dart';
 import 'widgets/custom_title_bar.dart';
 import 'package:app_links/app_links.dart';
@@ -93,6 +94,9 @@ void main() async {
   hapticFeedbackNotifier.value = prefs.getBool('ls_haptic_feedback') ?? true;
   livingArtworkNotifier.value = prefs.getBool('ls_living_artwork') ?? true;
   achievementsEnabledNotifier.value = prefs.getBool('ls_achievements_enabled') ?? true;
+  ecoModeManualNotifier.value    = prefs.getBool('ls_eco_mode_manual')    ?? false;
+  ecoModeAutoNotifier.value      = prefs.getBool('ls_eco_mode_auto')      ?? false;
+  ecoModeThresholdNotifier.value = prefs.getInt('ls_eco_mode_threshold') ?? 20;
 
   // ── Data caches & storage ────────────────────────────────────────────────
   // These 4 inits don't depend on each other, so run them together instead
@@ -137,6 +141,7 @@ void main() async {
   // app is already visible instead of blocking startup.
   DataCache.clearExpired().ignore();
   ImageService.pruneExpired();
+  EcoModeController.init(); // battery watcher, also not needed for frame 1
 
   WidgetsBinding.instance.addPostFrameCallback((_) async {
     if (notifLaunchData != null) {

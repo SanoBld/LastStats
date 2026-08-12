@@ -11,6 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  battery_plus: ^6.2.1
+  flutter_displaymode: ^0.6.0
   http: ^1.6.0
   dynamic_color: ^1.8.1
   shared_preferences: ^2.2.3

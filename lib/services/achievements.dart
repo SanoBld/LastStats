@@ -4,6 +4,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../app_state.dart';
 
 // Single shared clock driving the "moving sheen" on tier badges/surfaces.
 // One timer for the whole app instead of one AnimationController per badge
@@ -18,6 +19,8 @@ class TierShimmer {
 
   static void ensureRunning() {
     _refCount++;
+    // Eco mode: don't even start the sheen animation — badges stay static.
+    if (ecoModeActiveNotifier.value) return;
     // 80ms (~12fps) — still reads as a smooth sweep, fewer wake-ups than 60ms.
     _timer ??= Timer.periodic(const Duration(milliseconds: 80), (_) {
       phase.value = (phase.value + 0.012) % 1.0;

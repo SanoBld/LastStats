@@ -141,15 +141,23 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     WidgetsBinding.instance.addObserver(this);
     _initWithCache();
     _startTimers();
+    // Eco mode toggled mid-session → restart timers with the new interval.
+    ecoModeActiveNotifier.addListener(_onEcoModeChanged);
+  }
+
+  void _onEcoModeChanged() {
+    _stopTimers();
+    _startTimers();
   }
 
   // Poll for "now playing" / top-lists updates only while the app is
   // actually visible — no point burning battery/data refreshing a screen
-  // nobody can see.
+  // nobody can see. Eco mode also stretches the intervals out.
   void _startTimers() {
-    _npTimer  ??= Timer.periodic(const Duration(seconds: 10), (_) => _refreshLive());
+    final eco = ecoModeActiveNotifier.value;
+    _npTimer  ??= Timer.periodic(Duration(seconds: eco ? 30 : 10), (_) => _refreshLive());
     // Refresh top lists every 1 minute to reduce flicker from stale data
-    _topTimer ??= Timer.periodic(const Duration(minutes: 1), (_) => _refreshTopLists());
+    _topTimer ??= Timer.periodic(Duration(minutes: eco ? 5 : 1), (_) => _refreshTopLists());
   }
 
   void _stopTimers() {
@@ -172,6 +180,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    ecoModeActiveNotifier.removeListener(_onEcoModeChanged);
     _npTimer?.cancel();
     _topTimer?.cancel();
     super.dispose();

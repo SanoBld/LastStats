@@ -69,12 +69,15 @@ class _Tilt3DCardState extends State<Tilt3DCard>
   void initState() {
     super.initState();
     _smoother = createTicker(_onTick)..start();
+    // Skip the accelerometer entirely in eco mode — no tilt parallax means
+    // no sensor stream running, no extra wakeups.
+    if (ecoModeActiveNotifier.value) return;
     try {
       _sub = accelerometerEventStream().listen((e) {
         _lastAx = e.x;
         _lastAy = e.y;
         if (!_calibrated) { _baseAx = e.x; _baseAy = e.y; _calibrated = true; }
-        if (!mounted || _dragging) return;
+        if (!mounted || _dragging || ecoModeActiveNotifier.value) return;
         _targetRx = ((e.y - _baseAy) / 4.2).clamp(-1.0, 1.0);
         _targetRy = ((_baseAx - e.x) / 4.2).clamp(-1.0, 1.0);
       }, onError: (_) {}, cancelOnError: true);
