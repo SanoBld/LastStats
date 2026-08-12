@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the checkForUpdate method from the UpdateService class, for the Dart programming language.">
-  <title>checkForUpdate method - UpdateService class - update_service library - Dart API</title>
+  <meta name="description" content="API docs for the UpdateHistoryPage.new constructor from Class UpdateHistoryPage from the update_history_page library, for the Dart programming language.">
+  <title>UpdateHistoryPage.new constructor - UpdateHistoryPage - update_history_page library - Dart API</title>
 
 
   
@@ -25,11 +25,11 @@
   <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">laststats_mobile</a></li>
-    <li><a href="../../services_update_service/">services&#47;update_service.dart</a></li>
-    <li><a href="../../services_update_service/UpdateService-class.html">UpdateService</a></li>
-    <li class="self-crumb">checkForUpdate static method</li>
+    <li><a href="../../screens_settings_update_history_page/">screens&#47;settings&#47;update_history_page.dart</a></li>
+    <li><a href="../../screens_settings_update_history_page/UpdateHistoryPage-class.html">UpdateHistoryPage</a></li>
+    <li class="self-crumb">UpdateHistoryPage.new const constructor</li>
   </ol>
-  <div class="self-name">checkForUpdate</div>
+  <div class="self-name">UpdateHistoryPage.new</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -43,23 +43,19 @@
   </button>
 </header>
 <main>
-<div
-    id="dartdoc-main-content"
-    class="main-content"
-    data-above-sidebar="services_update_service&#47;UpdateService-class-sidebar.html"
-    data-below-sidebar="">
-    <div>
-<h1><span class="kind-method">checkForUpdate</span> static method 
+  <div
+      id="dartdoc-main-content"
+      class="main-content"
+      data-above-sidebar="screens_settings_update_history_page&#47;UpdateHistoryPage-class-sidebar.html"
+      data-below-sidebar="">
+      <div>
+<h1><span class="kind-constructor">UpdateHistoryPage</span> constructor 
 </h1></div>
 
     <section class="multi-line-signature">
-      
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../services_update_service/UpdateInfo-class.html">UpdateInfo</a>?</span>&gt;</span></span>
-<span class="name ">checkForUpdate</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="checkForUpdate-param-channel"><span class="type-annotation"><a href="../../services_update_service/UpdateChannel.html">UpdateChannel</a></span> <span class="parameter-name">channel</span> = <span class="default-value">UpdateChannel.stable</span>, </span></li>
+      const
+      <span class="name ">UpdateHistoryPage</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span></li>
 </ol>})
-
-      
-
     </section>
     
 
@@ -67,15 +63,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Future&lt;UpdateInfo?&gt; checkForUpdate({
-  UpdateChannel channel = UpdateChannel.stable,
-}) async {
-  final all = await fetchReleaseHistory(channel: channel, perPage: 10);
-  if (all.isEmpty) return null;
-  final latest = all.first;
-  if (!_isNewer(latest.version, currentVersion)) return null;
-  return latest;
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">const UpdateHistoryPage({super.key});</code></pre>
 </section>
 
 
@@ -89,16 +77,16 @@
 </header>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">laststats_mobile</a></li>
-    <li><a href="../../services_update_service/">update_service</a></li>
-    <li><a href="../../services_update_service/UpdateService-class.html">UpdateService</a></li>
-    <li class="self-crumb">checkForUpdate static method</li>
+    <li><a href="../../screens_settings_update_history_page/">update_history_page</a></li>
+    <li><a href="../../screens_settings_update_history_page/UpdateHistoryPage-class.html">UpdateHistoryPage</a></li>
+    <li class="self-crumb">UpdateHistoryPage.new const constructor</li>
 </ol>
 
-    <h5>UpdateService class</h5>
+    <h5>UpdateHistoryPage class</h5>
     <div id="dartdoc-sidebar-left-content"></div>
-  </div><!--/.sidebar-offcanvas-->
+  </div><!--/.sidebar-offcanvas-left-->
   <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
-</div><!--/.sidebar-offcanvas-->
+  </div><!--/.sidebar-offcanvas-->
 </main>
 <footer>
   <span class="no-break">

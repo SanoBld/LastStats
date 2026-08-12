@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the checkForUpdate method from the UpdateService class, for the Dart programming language.">
-  <title>checkForUpdate method - UpdateService class - update_service library - Dart API</title>
+  <meta name="description" content="API docs for the fetchReleaseHistory method from the UpdateService class, for the Dart programming language.">
+  <title>fetchReleaseHistory method - UpdateService class - update_service library - Dart API</title>
 
 
   
@@ -27,9 +27,9 @@
     <li><a href="../../index.html">laststats_mobile</a></li>
     <li><a href="../../services_update_service/">services&#47;update_service.dart</a></li>
     <li><a href="../../services_update_service/UpdateService-class.html">UpdateService</a></li>
-    <li class="self-crumb">checkForUpdate static method</li>
+    <li class="self-crumb">fetchReleaseHistory static method</li>
   </ol>
-  <div class="self-name">checkForUpdate</div>
+  <div class="self-name">fetchReleaseHistory</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -49,13 +49,14 @@
     data-above-sidebar="services_update_service&#47;UpdateService-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">checkForUpdate</span> static method 
+<h1><span class="kind-method">fetchReleaseHistory</span> static method 
 </h1></div>
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../services_update_service/UpdateInfo-class.html">UpdateInfo</a>?</span>&gt;</span></span>
-<span class="name ">checkForUpdate</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="checkForUpdate-param-channel"><span class="type-annotation"><a href="../../services_update_service/UpdateChannel.html">UpdateChannel</a></span> <span class="parameter-name">channel</span> = <span class="default-value">UpdateChannel.stable</span>, </span></li>
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../services_update_service/UpdateInfo-class.html">UpdateInfo</a></span>&gt;</span></span>&gt;</span></span>
+<span class="name ">fetchReleaseHistory</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="fetchReleaseHistory-param-channel"><span class="type-annotation"><a href="../../services_update_service/UpdateChannel.html">UpdateChannel</a></span> <span class="parameter-name">channel</span> = <span class="default-value">UpdateChannel.stable</span>, </span></li>
+<li><span class="parameter" id="fetchReleaseHistory-param-perPage"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">perPage</span> = <span class="default-value">30</span>, </span></li>
 </ol>})
 
       
@@ -67,14 +68,46 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Future&lt;UpdateInfo?&gt; checkForUpdate({
+  <pre class="language-dart"><code class="language-dart">static Future&lt;List&lt;UpdateInfo&gt;&gt; fetchReleaseHistory({
   UpdateChannel channel = UpdateChannel.stable,
+  int perPage = 30,
 }) async {
-  final all = await fetchReleaseHistory(channel: channel, perPage: 10);
-  if (all.isEmpty) return null;
-  final latest = all.first;
-  if (!_isNewer(latest.version, currentVersion)) return null;
-  return latest;
+  try {
+    final uri = Uri.parse(
+      &#39;https:&#47;&#47;api.github.com&#47;repos&#47;$_owner&#47;$_repo&#47;releases?per_page=$perPage&#39;,
+    );
+    final res = await http.get(uri, headers: const {
+      &#39;Accept&#39;: &#39;application&#47;vnd.github+json&#39;,
+    }).timeout(_timeout);
+
+    if (res.statusCode != 200) return [];
+
+    final list = jsonDecode(utf8.decode(res.bodyBytes)) as List&lt;dynamic&gt;;
+
+    final releases = list
+        .cast&lt;Map&lt;String, dynamic&gt;&gt;()
+        .where((r) =&gt; r[&#39;draft&#39;] != true)
+        .where((r) =&gt; channel == UpdateChannel.beta || r[&#39;prerelease&#39;] != true)
+        .toList();
+
+    return releases.map((release) {
+      final rawTag = (release[&#39;tag_name&#39;] ?? &#39;&#39;).toString();
+      final version = rawTag.startsWith(&#39;v&#39;) ? rawTag.substring(1) : rawTag;
+      final assets = (release[&#39;assets&#39;] as List?)?.cast&lt;Map&lt;String, dynamic&gt;&gt;() ?? [];
+      final match = _bestAssetForPlatform(assets);
+      return UpdateInfo(
+        version:      version,
+        releaseUrl:   (release[&#39;html_url&#39;] ?? &#39;&#39;).toString(),
+        downloadUrl:  match.$1,
+        downloadKind: match.$2,
+        notes:        (release[&#39;body&#39;] ?? &#39;&#39;).toString(),
+        publishedAt:  _parseDate(release[&#39;published_at&#39;]?.toString()),
+        isBeta:       release[&#39;prerelease&#39;] == true,
+      );
+    }).toList();
+  } catch (_) {
+    return [];
+  }
 }</code></pre>
 </section>
 
@@ -91,7 +124,7 @@
     <li><a href="../../index.html">laststats_mobile</a></li>
     <li><a href="../../services_update_service/">update_service</a></li>
     <li><a href="../../services_update_service/UpdateService-class.html">UpdateService</a></li>
-    <li class="self-crumb">checkForUpdate static method</li>
+    <li class="self-crumb">fetchReleaseHistory static method</li>
 </ol>
 
     <h5>UpdateService class</h5>
