@@ -622,6 +622,12 @@ class _AchvTierSurfaceState extends State<_AchvTierSurface> {
   }
 
   @override
+  void dispose() {
+    TierShimmer.release();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final grad = tierGradient(widget.tier);
     if (grad == null) {
@@ -672,6 +678,12 @@ class _AchvTierBadgeState extends State<_AchvTierBadge> {
   void initState() {
     super.initState();
     TierShimmer.ensureRunning();
+  }
+
+  @override
+  void dispose() {
+    TierShimmer.release();
+    super.dispose();
   }
 
   @override

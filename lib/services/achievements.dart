@@ -8,15 +8,29 @@ import 'package:flutter/material.dart';
 // Single shared clock driving the "moving sheen" on tier badges/surfaces.
 // One timer for the whole app instead of one AnimationController per badge
 // — cheap, and every badge/surface just reads the current phase.
+// Ref-counted: only ticks while at least one badge is actually on screen,
+// and stops the instant the last one is gone — no background battery drain.
 class TierShimmer {
   TierShimmer._();
   static final ValueNotifier<double> phase = ValueNotifier(0.0);
   static Timer? _timer;
+  static int _refCount = 0;
 
   static void ensureRunning() {
-    _timer ??= Timer.periodic(const Duration(milliseconds: 60), (_) {
+    _refCount++;
+    // 80ms (~12fps) — still reads as a smooth sweep, fewer wake-ups than 60ms.
+    _timer ??= Timer.periodic(const Duration(milliseconds: 80), (_) {
       phase.value = (phase.value + 0.012) % 1.0;
     });
+  }
+
+  static void release() {
+    _refCount--;
+    if (_refCount <= 0) {
+      _refCount = 0;
+      _timer?.cancel();
+      _timer = null;
+    }
   }
 }
 

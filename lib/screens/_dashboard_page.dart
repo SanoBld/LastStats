@@ -67,7 +67,7 @@ class _DashboardPage extends StatefulWidget {
 // come back to this tab.
 bool _dashboardEntrancePlayed = false;
 
-class _DashboardPageState extends State<_DashboardPage> {
+class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObserver {
   Map<String, dynamic>? _userInfo;
   List<dynamic> _topArtists    = [];
   List<dynamic> _topAlbums     = [];
@@ -138,14 +138,40 @@ class _DashboardPageState extends State<_DashboardPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initWithCache();
-    _npTimer  = Timer.periodic(const Duration(seconds: 10), (_) => _refreshLive());
+    _startTimers();
+  }
+
+  // Poll for "now playing" / top-lists updates only while the app is
+  // actually visible — no point burning battery/data refreshing a screen
+  // nobody can see.
+  void _startTimers() {
+    _npTimer  ??= Timer.periodic(const Duration(seconds: 10), (_) => _refreshLive());
     // Refresh top lists every 1 minute to reduce flicker from stale data
-    _topTimer = Timer.periodic(const Duration(minutes: 1), (_) => _refreshTopLists());
+    _topTimer ??= Timer.periodic(const Duration(minutes: 1), (_) => _refreshTopLists());
+  }
+
+  void _stopTimers() {
+    _npTimer?.cancel();
+    _topTimer?.cancel();
+    _npTimer  = null;
+    _topTimer = null;
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _startTimers();
+      _refreshLive(); // catch up immediately instead of waiting up to 10s
+    } else {
+      _stopTimers();
+    }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _npTimer?.cancel();
     _topTimer?.cancel();
     super.dispose();
