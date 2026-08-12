@@ -7,6 +7,7 @@ import '../../l10n/l10n.dart';
 import '../../app_state.dart';
 import '../../services/update_service.dart';
 import '../../widgets/markdown_lite.dart';
+import 'update_history_page.dart';
 import 'settings_helpers.dart';
 
 class UpdatesPage extends StatefulWidget {
@@ -284,6 +285,28 @@ class _UpdatesPageState extends State<UpdatesPage> {
                             color: scheme.tertiary, fontWeight: FontWeight.w600)),
             trailing: Icon(Icons.chevron_right_rounded, color: scheme.onSurfaceVariant),
             onTap: _checkingUpdate ? null : () => _checkUpdate(),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          // Full changelog + downloadable installer for every past release,
+          // not just the newest one.
+          ListTile(
+            leading: Container(
+              width: 40, height: 40,
+              decoration: BoxDecoration(
+                color: scheme.secondaryContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(Icons.history_rounded, color: scheme.onSecondaryContainer),
+            ),
+            title: Text(localeNotifier.value == 'en' ? 'Version history' : 'Historique des versions',
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            subtitle: Text(localeNotifier.value == 'en'
+                ? 'All past releases, changelogs and downloads'
+                : 'Toutes les anciennes versions, changelogs et téléchargements',
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            trailing: Icon(Icons.chevron_right_rounded, color: scheme.onSurfaceVariant),
+            onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const UpdateHistoryPage())),
           ),
         ]),
 

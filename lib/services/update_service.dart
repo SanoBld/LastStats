@@ -30,48 +30,55 @@ class UpdateService {
   static Future<UpdateInfo?> checkForUpdate({
     UpdateChannel channel = UpdateChannel.stable,
   }) async {
+    final all = await fetchReleaseHistory(channel: channel, perPage: 10);
+    if (all.isEmpty) return null;
+    final latest = all.first;
+    if (!_isNewer(latest.version, currentVersion)) return null;
+    return latest;
+  }
+
+  // All past releases (for the "version history" page) — same GitHub call
+  // as checkForUpdate but returns every matching release instead of just
+  // the newest, and doesn't compare against the currently installed one.
+  static Future<List<UpdateInfo>> fetchReleaseHistory({
+    UpdateChannel channel = UpdateChannel.stable,
+    int perPage = 30,
+  }) async {
     try {
       final uri = Uri.parse(
-        'https://api.github.com/repos/$_owner/$_repo/releases?per_page=10',
+        'https://api.github.com/repos/$_owner/$_repo/releases?per_page=$perPage',
       );
       final res = await http.get(uri, headers: const {
         'Accept': 'application/vnd.github+json',
       }).timeout(_timeout);
 
-      if (res.statusCode != 200) return null;
+      if (res.statusCode != 200) return [];
 
       final list = jsonDecode(utf8.decode(res.bodyBytes)) as List<dynamic>;
-      if (list.isEmpty) return null;
 
-      final candidates = list
+      final releases = list
           .cast<Map<String, dynamic>>()
           .where((r) => r['draft'] != true)
           .where((r) => channel == UpdateChannel.beta || r['prerelease'] != true)
           .toList();
 
-      if (candidates.isEmpty) return null;
-
-      final release = candidates.first;
-
-      final rawTag = (release['tag_name'] ?? '').toString();
-      final latest = rawTag.startsWith('v') ? rawTag.substring(1) : rawTag;
-      if (latest.isEmpty) return null;
-      if (!_isNewer(latest, currentVersion)) return null;
-
-      final assets = (release['assets'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-      final match = _bestAssetForPlatform(assets);
-
-      return UpdateInfo(
-        version:     latest,
-        releaseUrl:  (release['html_url'] ?? '').toString(),
-        downloadUrl: match.$1,
-        downloadKind: match.$2,
-        notes:       (release['body'] ?? '').toString(),
-        publishedAt: _parseDate(release['published_at']?.toString()),
-        isBeta:      release['prerelease'] == true,
-      );
+      return releases.map((release) {
+        final rawTag = (release['tag_name'] ?? '').toString();
+        final version = rawTag.startsWith('v') ? rawTag.substring(1) : rawTag;
+        final assets = (release['assets'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+        final match = _bestAssetForPlatform(assets);
+        return UpdateInfo(
+          version:      version,
+          releaseUrl:   (release['html_url'] ?? '').toString(),
+          downloadUrl:  match.$1,
+          downloadKind: match.$2,
+          notes:        (release['body'] ?? '').toString(),
+          publishedAt:  _parseDate(release['published_at']?.toString()),
+          isBeta:       release['prerelease'] == true,
+        );
+      }).toList();
     } catch (_) {
-      return null;
+      return [];
     }
   }
 
