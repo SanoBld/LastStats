@@ -561,6 +561,10 @@ class AppStringsIt implements AppStrings {
   @override String get faqA5 => 'Solo sul tuo dispositivo. LastStats non ha alcun server: i tuoi scrobble vengono memorizzati localmente per un accesso rapido, e anche le tue credenziali Last.fm restano salvate in locale. Nulla viene inviato se non all\'API ufficiale di Last.fm.';
   @override String get faqQ6 => 'Come attivo i preferiti?';
   @override String get faqA6 => 'Vai su Impostazioni > Account e inserisci la tua chiave segreta Last.fm. Una volta connessa, potrai aggiungere brani ai preferiti direttamente dall\'app.';
+  @override String get faqQ7 => 'Cos\u2019\u00e8 uno \'scrobble\'?';
+  @override String get faqA7 => 'Uno scrobble \u00e8 un brano registrato come ascoltato sul tuo account Last.fm: \u00e8 il termine ufficiale di Last.fm per \'un ascolto conteggiato\'. Tutti i tuoi totali (artisti top, statistiche, ecc.) si basano su questo.';
+  @override String get faqQ8 => 'Come funzionano livelli e obiettivi?';
+  @override String get faqA8 => 'Il tuo livello account cresce con il numero totale di scrobble (non c\u2019\u00e8 un livello massimo). Le card mostrano anche un bordo (bronzo \u2192 iridescente) in base a quante volte quell\u2019artista/brano/album \u00e8 stato ascoltato. Tutto viene calcolato automaticamente dalle statistiche gi\u00e0 in cache locale, senza chiamate di rete aggiuntive.';
   @override String get settingsPlatformDisabledByShowAll => 'Disattivato: tutti i link sono già mostrati.';
   @override String get commonInDevelopment => 'In sviluppo';
   @override String get commonSeeLess => 'Vedi meno';

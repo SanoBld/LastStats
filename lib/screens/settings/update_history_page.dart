@@ -130,12 +130,20 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
                                       style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                                 ],
                               ])),
-                              Icon(isExpanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
-                                  color: scheme.onSurfaceVariant),
+                              AnimatedRotation(
+                                duration: const Duration(milliseconds: 220),
+                                turns: isExpanded ? 0.5 : 0,
+                                child: Icon(Icons.expand_more_rounded, color: scheme.onSurfaceVariant),
+                              ),
                             ]),
                           ),
                         ),
-                        if (isExpanded) Padding(
+                        AnimatedCrossFade(
+                          duration: const Duration(milliseconds: 220),
+                          sizeCurve: Curves.easeOutCubic,
+                          crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                          firstChild: const SizedBox(width: double.infinity),
+                          secondChild: Padding(
                           padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             if (r.notes.isNotEmpty)
@@ -166,7 +174,7 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
                               ],
                             ]),
                           ]),
-                        ),
+                        )),
                       ]),
                     );
                   },

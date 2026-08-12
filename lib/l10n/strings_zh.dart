@@ -622,6 +622,10 @@ class AppStringsZh implements AppStrings {
   @override String get faqA5 => '仅存储在你的设备上。LastStats 没有服务器：你的播放记录会在本地缓存以便快速访问，你的 Last.fm 账户信息也保存在本地。除官方 Last.fm API 外，不会向任何地方发送数据。';
   @override String get faqQ6 => '如何启用收藏功能？';
   @override String get faqA6 => '前往「设置 > 账户」并输入你的 Last.fm 密钥。连接成功后，即可直接在应用中收藏歌曲。';
+  @override String get faqQ7 => '\u4ec0\u4e48\u662f\u201cscrobble\u201d\uff1f';
+  @override String get faqA7 => 'scrobble \u662f\u6307\u5728\u4f60\u7684 Last.fm \u8d26\u6237\u4e0a\u8bb0\u5f55\u4e00\u6b21\u64ad\u653e\u2014\u2014\u8fd9\u662f Last.fm \u5b98\u65b9\u672f\u8bed\uff0c\u8868\u793a\u201c\u4e00\u6b21\u88ab\u8ba1\u5165\u7684\u64ad\u653e\u201d\u3002\u4f60\u7684\u6240\u6709\u7edf\u8ba1\u6570\u636e\uff08\u6392\u884c\u699c\u3001\u603b\u91cf\u7b49\uff09\u90fd\u57fa\u4e8e\u5b83\u3002';
+  @override String get faqQ8 => '\u7b49\u7ea7\u4e0e\u6210\u5c31\u7cfb\u7edf\u662f\u600e\u4e48\u8fd0\u4f5c\u7684\uff1f';
+  @override String get faqA8 => '\u4f60\u7684\u8d26\u6237\u7b49\u7ea7\u968f\u603b scrobble \u6570\u589e\u957f\uff08\u6ca1\u6709\u4e0a\u9650\uff09\u3002\u5361\u7247\u4e5f\u4f1a\u6839\u636e\u8be5\u827a\u672f\u5bb6/\u6b4c\u66f2/\u4e13\u8f91\u7684\u64ad\u653e\u6b21\u6570\u663e\u793a\u8fb9\u6846\u989c\u8272\uff08\u9752\u94dc\u2192\u4e94\u5f69\uff09\u3002\u8fd9\u4e9b\u90fd\u57fa\u4e8e\u672c\u5730\u5df2\u7f13\u5b58\u7684\u7edf\u8ba1\u6570\u636e\u81ea\u52a8\u8ba1\u7b97\uff0c\u4e0d\u4f1a\u989d\u5916\u8bf7\u6c42\u7f51\u7edc\u3002';
   @override String get settingsPlatformDisabledByShowAll => '已停用：已显示全部链接。';
   @override String get commonInDevelopment => '开发中';
   @override String get commonSeeLess => '收起';

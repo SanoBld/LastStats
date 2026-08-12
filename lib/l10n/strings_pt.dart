@@ -625,6 +625,10 @@ class AppStringsPt implements AppStrings {
   @override String get faqA5 => 'Apenas no seu dispositivo. O LastStats não tem servidor: seus scrobbles ficam em cache local para acesso rápido, e suas credenciais do Last.fm também ficam armazenadas localmente. Nada é enviado além da API oficial do Last.fm.';
   @override String get faqQ6 => 'Como ativo os favoritos?';
   @override String get faqA6 => 'Acesse Configurações > Conta e informe sua chave secreta do Last.fm. Uma vez conectada, você poderá favoritar faixas diretamente pelo app.';
+  @override String get faqQ7 => 'O que \u00e9 um \'scrobble\'?';
+  @override String get faqA7 => 'Um scrobble \u00e9 uma faixa registrada como ouvida na sua conta do Last.fm \u2014 \u00e9 o termo oficial do Last.fm para \'uma escuta contabilizada\'. Todos os seus totais (artistas mais ouvidos, estat\u00edsticas etc.) s\u00e3o baseados nisso.';
+  @override String get faqQ8 => 'Como funcionam os n\u00edveis e conquistas?';
+  @override String get faqA8 => 'Seu n\u00edvel de conta cresce com o total de scrobbles (n\u00e3o h\u00e1 n\u00edvel m\u00e1ximo). Os cart\u00f5es tamb\u00e9m ganham uma borda (bronze \u2192 iridescente) de acordo com quantas vezes aquele artista/faixa/\u00e1lbum foi tocado. Tudo \u00e9 calculado automaticamente a partir das estat\u00edsticas j\u00e1 em cache local, sem chamadas de rede extras.';
   @override String get settingsPlatformDisabledByShowAll => 'Desativado: todos os links já estão sendo exibidos.';
   @override String get commonInDevelopment => 'Em desenvolvimento';
   @override String get commonSeeLess => 'Ver menos';

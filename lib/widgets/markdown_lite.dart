@@ -150,9 +150,19 @@ class MarkdownLite extends StatelessWidget {
     final widgets = <Widget>[];
     int i = 0;
 
+    // ── Standalone image: "![alt](url)" on its own line ─────────────────
+    final imgMatch = RegExp(r'^!\[[^\]]*\]\((\S+)\)$');
+
     while (i < lines.length) {
       final raw = lines[i];
       final line = raw.trimRight();
+
+      final im = imgMatch.firstMatch(line.trim());
+      if (im != null) {
+        widgets.add(_MarkdownImage(url: im.group(1)!));
+        i++;
+        continue;
+      }
 
       // ── Table block: header row + separator row + data rows ────────────
       if (i + 1 < lines.length && _isTableRow(line) && _isTableSeparator(lines[i + 1])) {
@@ -223,4 +233,53 @@ class _Token {
   final _TokType type;
   final String text;
   _Token(this.start, this.end, this.type, this.text);
+}
+
+// Real photo inline in the changelog — tap to open full screen, pinch to zoom.
+class _MarkdownImage extends StatelessWidget {
+  final String url;
+  const _MarkdownImage({required this.url});
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: GestureDetector(
+      onTap: () => Navigator.of(context).push(PageRouteBuilder(
+        opaque: false,
+        barrierColor: Colors.black87,
+        pageBuilder: (_, _, _) => _FullscreenImage(url: url),
+      )),
+      child: Hero(
+        tag: url,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.network(url, fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => const SizedBox.shrink()),
+        ),
+      ),
+    ),
+  );
+}
+
+// Full-screen, pinch-to-zoom viewer for a single changelog photo.
+class _FullscreenImage extends StatelessWidget {
+  final String url;
+  const _FullscreenImage({required this.url});
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+    onTap: () => Navigator.of(context).pop(),
+    child: Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Center(
+        child: Hero(
+          tag: url,
+          child: InteractiveViewer(
+            minScale: 1, maxScale: 5,
+            child: Image.network(url, fit: BoxFit.contain),
+          ),
+        ),
+      ),
+    ),
+  );
 }

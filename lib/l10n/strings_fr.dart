@@ -625,6 +625,10 @@ class AppStringsFr implements AppStrings {
   @override String get faqA5 => 'Uniquement sur votre appareil. LastStats ne dispose d’aucun serveur : vos scrobbles sont mis en cache localement pour un accès rapide, et vos identifiants Last.fm restent stockés en local. Rien n’est envoyé ailleurs qu’à l’API officielle de Last.fm.';
   @override String get faqQ6 => 'Comment activer les favoris ?';
   @override String get faqA6 => 'Rendez-vous dans Paramètres > Compte et renseignez votre clé secrète Last.fm. Une fois connectée, vous pourrez ajouter des titres en favori directement depuis l’application.';
+  @override String get faqQ7 => 'C\'est quoi un \u00abscrobble\u00bb ?';
+  @override String get faqA7 => 'Un scrobble, c\'est un titre enregistr\u00e9 comme \u00e9cout\u00e9 sur votre compte Last.fm \u2014 c\'est le terme officiel Last.fm pour \u00abune \u00e9coute compt\u00e9e\u00bb. Tous vos totaux (top artistes, statistiques, etc.) sont bas\u00e9s dessus.';
+  @override String get faqQ8 => 'Comment fonctionnent les niveaux et les succ\u00e8s ?';
+  @override String get faqA8 => 'Votre niveau de compte augmente avec votre nombre total de scrobbles (il n\'y a pas de niveau maximum). Les cartes affichent aussi une bordure (bronze \u2192 iridescente) selon le nombre d\'\u00e9coutes de l\'artiste/titre/album concern\u00e9. Tout est calcul\u00e9 automatiquement \u00e0 partir de vos statistiques d\u00e9j\u00e0 en cache, sans appel r\u00e9seau suppl\u00e9mentaire.';
   @override String get settingsPlatformDisabledByShowAll => 'Choix désactivé : tous les liens sont déjà affichés.';
   @override String get commonInDevelopment => 'En développement';
   @override String get commonSeeLess => 'Voir moins';

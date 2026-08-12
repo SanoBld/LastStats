@@ -36,6 +36,8 @@ class _FaqPageState extends State<FaqPage> {
       _FaqItem(Icons.code_rounded,          L.faqQ4, L.faqA4),
       _FaqItem(Icons.lock_outline_rounded,  L.faqQ5, L.faqA5),
       _FaqItem(Icons.favorite_border_rounded, L.faqQ6, L.faqA6),
+      _FaqItem(Icons.repeat_rounded,          L.faqQ7, L.faqA7),
+      _FaqItem(Icons.military_tech_rounded,   L.faqQ8, L.faqA8),
     ];
 
     return Scaffold(

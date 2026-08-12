@@ -561,6 +561,10 @@ class AppStringsDe implements AppStrings {
   @override String get faqA5 => 'Nur auf deinem Gerät. LastStats hat keinen Server: Deine Scrobbles werden lokal zwischengespeichert, und auch deine Last.fm-Zugangsdaten bleiben lokal gespeichert. Es wird nichts irgendwohin gesendet außer an die offizielle Last.fm-API.';
   @override String get faqQ6 => 'Wie aktiviere ich Favoriten?';
   @override String get faqA6 => 'Gehe zu Einstellungen > Konto und gib deinen Last.fm-Secret-Key ein. Nach der Verbindung kannst du Titel direkt in der App favorisieren.';
+  @override String get faqQ7 => 'Was ist ein \'Scrobble\'?';
+  @override String get faqA7 => 'Ein Scrobble ist ein Titel, der als geh\u00f6rt auf deinem Last.fm-Konto erfasst wird \u2014 das ist Last.fms eigener Begriff f\u00fcr \'ein gez\u00e4hltes Abspielen\'. Alle deine Gesamtwerte (Top-Interpreten, Statistiken usw.) basieren darauf.';
+  @override String get faqQ8 => 'Wie funktionieren Level und Erfolge?';
+  @override String get faqA8 => 'Dein Kontolevel steigt mit deiner Gesamtzahl an Scrobbles (es gibt kein H\u00f6chstlevel). Karten erhalten au\u00dferdem einen Rahmen (Bronze \u2192 schillernd), je nachdem wie oft der jeweilige Interpret/Titel/das Album gespielt wurde. Alles wird automatisch aus bereits lokal zwischengespeicherten Statistiken berechnet, ohne zus\u00e4tzliche Netzwerkaufrufe.';
   @override String get settingsPlatformDisabledByShowAll => 'Deaktiviert: Es werden bereits alle Links angezeigt.';
   @override String get commonInDevelopment => 'In Entwicklung';
   @override String get commonSeeLess => 'Weniger anzeigen';

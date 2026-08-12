@@ -625,6 +625,10 @@ class AppStringsEn implements AppStrings {
   @override String get faqA5 => 'On your device only. LastStats has no server: your scrobbles are cached locally for fast access, and your Last.fm credentials are stored locally too. Nothing is sent anywhere except Last.fm\'s official API.';
   @override String get faqQ6 => 'How do I enable favorites?';
   @override String get faqA6 => 'Go to Settings > Account and enter your Last.fm secret key. Once connected, you\'ll be able to favorite tracks directly from the app.';
+  @override String get faqQ7 => 'What is a \'scrobble\'?';
+  @override String get faqA7 => 'A scrobble is a track logged as played on your Last.fm account \u2014 it\'s Last.fm\'s own term for \'one counted listen\'. All your totals (top artists, stats, etc.) are based on it.';
+  @override String get faqQ8 => 'How do levels and achievements work?';
+  @override String get faqA8 => 'Your account level grows with your total scrobble count (there\'s no max level). Cards also get a border (bronze \u2192 iridescent) based on how many times that artist/track/album has been played. Everything is computed automatically from stats already cached locally, with no extra network calls.';
   @override String get settingsPlatformDisabledByShowAll => 'Disabled: all links are already shown.';
   @override String get commonInDevelopment => 'In development';
   @override String get commonSeeLess => 'See less';
