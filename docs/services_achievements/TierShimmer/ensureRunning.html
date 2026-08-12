@@ -68,6 +68,8 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static void ensureRunning() {
   _refCount++;
+  &#47;&#47; Eco mode: don&#39;t even start the sheen animation — badges stay static.
+  if (ecoModeActiveNotifier.value) return;
   &#47;&#47; 80ms (~12fps) — still reads as a smooth sweep, fewer wake-ups than 60ms.
   _timer ??= Timer.periodic(const Duration(milliseconds: 80), (_) {
     phase.value = (phase.value + 0.012) % 1.0;
