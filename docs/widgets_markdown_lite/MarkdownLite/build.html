@@ -113,9 +113,19 @@ Widget build(BuildContext context) {
   final widgets = &lt;Widget&gt;[];
   int i = 0;
 
+  &#47;&#47; ── Standalone image: &quot;![alt](url)&quot; on its own line ─────────────────
+  final imgMatch = RegExp(r&#39;^!\[[^\]]*\]\((\S+)\)$&#39;);
+
   while (i &lt; lines.length) {
     final raw = lines[i];
     final line = raw.trimRight();
+
+    final im = imgMatch.firstMatch(line.trim());
+    if (im != null) {
+      widgets.add(_MarkdownImage(url: im.group(1)!));
+      i++;
+      continue;
+    }
 
     &#47;&#47; ── Table block: header row + separator row + data rows ────────────
     if (i + 1 &lt; lines.length &amp;&amp; _isTableRow(line) &amp;&amp; _isTableSeparator(lines[i + 1])) {
