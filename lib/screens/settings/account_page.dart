@@ -202,6 +202,7 @@ class _AccountPageState extends State<AccountPage> {
       ));
     } else {
       await _load();
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(L.acctAddedSuccess(result.username)),
         behavior: SnackBarBehavior.floating,

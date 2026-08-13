@@ -191,7 +191,7 @@ class _Tilt3DCardState extends State<Tilt3DCard>
 
                   final m = Matrix4.identity()
                     ..setEntry(3, 2, 0.0016)
-                    ..scale(zoom)
+                    ..scaleByDouble(zoom, zoom, zoom, 1.0)
                     ..rotateX(tiltX)
                     ..rotateY(flipAngle + tiltY);
 

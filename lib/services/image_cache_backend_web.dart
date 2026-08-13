@@ -118,8 +118,8 @@ class ImageCacheBackend {
       if (result == null || result.isUndefinedOrNull) return 0;
       int total = 0;
       for (final v in (result as JSArray<JSAny?>).toDart) {
-        if (v is JSUint8Array) total += v.toDart.length;
-        if (v is JSString)     total += v.toDart.length * 2; // meta string
+        if (v.isA<JSUint8Array>()) total += (v as JSUint8Array).toDart.length;
+        if (v.isA<JSString>())     total += (v as JSString).toDart.length * 2; // meta string
       }
       return total;
     } catch (_) { return 0; }

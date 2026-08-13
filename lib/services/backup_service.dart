@@ -302,10 +302,15 @@ class BackupService {
       final v = e.value;
       if (v is bool) {
         await p.setBool(e.key, v);
-      } else if (v is int)    await p.setInt(e.key, v);
-      else if (v is double) await p.setDouble(e.key, v);
-      else if (v is String) await p.setString(e.key, v);
-      else if (v is List)   await p.setStringList(e.key, List<String>.from(v));
+      } else if (v is int) {
+        await p.setInt(e.key, v);
+      } else if (v is double) {
+        await p.setDouble(e.key, v);
+      } else if (v is String) {
+        await p.setString(e.key, v);
+      } else if (v is List) {
+        await p.setStringList(e.key, List<String>.from(v));
+      }
     }
 
     // Keep ls_username/ls_apikey in sync with the active multi-account entry.

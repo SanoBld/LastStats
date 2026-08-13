@@ -49,7 +49,6 @@ class _RankingsPageState extends State<_RankingsPage>
 
   @override
   Widget build(BuildContext context) {
-    final scheme  = Theme.of(context).colorScheme;
     final text    = Theme.of(context).textTheme;
 
     return Scaffold(

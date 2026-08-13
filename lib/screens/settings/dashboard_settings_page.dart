@@ -24,9 +24,6 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   String _fallbackType          = 'none';
   String _fallbackPeriod        = 'overall';   // '7day' | '1month' | 'overall'
   String _fallbackCustomUrl     = '';
-  // (conservé pour compatibilité avec l'ancien booléen)
-  bool   _headerFallbackEnabled = false;
-  String _headerFallbackUrl     = '';
   // ── Sections visibles ────────────────────────────────────────────────
   bool   _showNowPlay           = true;
   bool   _showStats             = true;
@@ -71,8 +68,6 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
       _fallbackType          = p.getString('ls_header_fallback_type')    ?? 'none';
       _fallbackPeriod        = p.getString('ls_header_fallback_period')  ?? 'overall';
       _fallbackCustomUrl     = p.getString('ls_header_fallback_url')     ?? '';
-      _headerFallbackEnabled = p.getBool('ls_header_fallback_enabled')   ?? false;
-      _headerFallbackUrl     = p.getString('ls_header_fallback_url')     ?? '';
       _showNowPlay           = p.getBool('ls_show_nowplay')              ?? true;
       _showStats             = p.getBool('ls_show_stats')                ?? true;
       _showArtists           = p.getBool('ls_show_artists')              ?? true;

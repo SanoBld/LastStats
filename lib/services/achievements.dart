@@ -325,8 +325,11 @@ CategorySummary summarizeCategory(List<AchievementProgress> items) {
   var tier = CardTier.none;
   AchievementProgress? next;
   for (final a in items) {
-    if (a.unlocked) tier = a.def.tier;
-    else { next ??= a; }
+    if (a.unlocked) {
+      tier = a.def.tier;
+    } else {
+      next ??= a;
+    }
   }
   return CategorySummary(current, tier, next);
 }

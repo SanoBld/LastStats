@@ -119,7 +119,6 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   bool _showAlbums   = true;
   bool _showTracks   = true;
   bool _showRecent   = true;
-  List<dynamic> _lovedTracks = [];
   int _lovedCount = 0;
 
   // In-app news feed
@@ -205,7 +204,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     try {
       final fresh = await widget.service.getLovedTracks(limit: 15);
       await DataCache.set(DataCache.keyLovedTracks(), fresh);
-      if (mounted) setState(() => _lovedTracks = fresh);
+      if (mounted) setState(() {});
       lovedTrackKeysNotifier.value = {
         for (final t in fresh)
           lovedKey((t['artist']?['name'] ?? '').toString(), (t['name'] ?? '').toString()),
@@ -267,7 +266,6 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
       _topTracksMonth  = topTrkM    ?? [];
       _topArtistsYear  = topArtY    ?? [];
       _topTracksYear   = topTrkY    ?? [];
-      _lovedTracks     = loved      ?? [];
       _lovedCount      = lovedCnt   ?? 0;
       _loading         = false;
     });

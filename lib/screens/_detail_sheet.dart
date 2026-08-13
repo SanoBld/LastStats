@@ -1243,142 +1243,9 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     if (mounted) setState(() => _isPlaying = true);
   }
 
-  String _fmtDur(double fraction) {
-    final secs = (fraction * _previewDur.inSeconds).floor();
-    final m    = secs ~/ 60;
-    final s    = (secs % 60).toString().padLeft(2, '0');
-    return '$m:$s';
-  }
-
   // In-app 30s preview player — shown just above the biography for tracks.
   Widget _buildPreviewPlayer(ColorScheme scheme) => const SizedBox.shrink();
 
-  Widget _buildOldPreviewPlayerUnused(ColorScheme scheme) {
-    if (_previewUrl == null && !_previewLoading) return const SizedBox.shrink();
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color:        scheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-              color: scheme.outlineVariant.withValues(alpha: 0.45)),
-        ),
-        child: _previewLoading
-            ? Row(children: [
-                SizedBox(width: 18, height: 18,
-                    child: CircularProgressIndicator(
-                        strokeWidth: 2, color: scheme.primary)),
-                const SizedBox(width: 12),
-                Text(
-                  L.detailLookingForPreview,
-                  style: Theme.of(context).textTheme.bodySmall
-                      ?.copyWith(color: scheme.onSurfaceVariant),
-                ),
-              ])
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Row: play button + labels + Deezer badge
-                  Row(children: [
-                    // Play / Pause button
-                    GestureDetector(
-                      onTap: _togglePreview,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 180),
-                        width: 48, height: 48,
-                        decoration: BoxDecoration(
-                          color:  scheme.primary,
-                          shape:  BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color:      scheme.primary.withValues(alpha: 0.35),
-                              blurRadius: 12,
-                              offset:     const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          _isPlaying
-                              ? Icons.pause_rounded
-                              : Icons.play_arrow_rounded,
-                          color: scheme.onPrimary,
-                          size:  26,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          L.detailPreview30Sec,
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.w700),
-                        ),
-                        const SizedBox(height: 2),
-                        Row(children: [
-                          Icon(Icons.music_note_rounded,
-                              size: 11, color: scheme.onSurfaceVariant),
-                          const SizedBox(width: 3),
-                          Text('Deezer',
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                      color: scheme.onSurfaceVariant,
-                                      fontSize: 11)),
-                        ]),
-                      ],
-                    )),
-                    // Time counter
-                    Text(
-                      _fmtDur(_previewPos),
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color:      scheme.onSurfaceVariant,
-                            fontFamily: 'monospace',
-                            fontSize:   12,
-                          ),
-                    ),
-                  ]),
-
-                  const SizedBox(height: 12),
-
-                  // Progress bar
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: LinearProgressIndicator(
-                      value:           _previewPos.clamp(0.0, 1.0),
-                      minHeight:       5,
-                      backgroundColor: scheme.outlineVariant
-                          .withValues(alpha: 0.5),
-                      valueColor: AlwaysStoppedAnimation<Color>(scheme.primary),
-                    ),
-                  ),
-
-                  const SizedBox(height: 6),
-
-                  // 0:00 ─────────────────── 0:30
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('0:00',
-                          style: Theme.of(context).textTheme.labelSmall
-                              ?.copyWith(color: scheme.onSurfaceVariant
-                                  .withValues(alpha: 0.6), fontSize: 10)),
-                      Text('0:30',
-                          style: Theme.of(context).textTheme.labelSmall
-                              ?.copyWith(color: scheme.onSurfaceVariant
-                                  .withValues(alpha: 0.6), fontSize: 10)),
-                    ],
-                  ),
-                ],
-              ),
-      ),
-    );
-  }
-
-  
   String _lfmBioUrl() {
     final n = Uri.encodeComponent(_name), a = Uri.encodeComponent(_artist);
     return switch (widget.type) {
@@ -2119,8 +1986,10 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
       if (choice == 'web') qrPayload = QrLinkService.webLink(widget.profileUsername!);
     }
 
+    if (!mounted) return;
     setState(() { _sharing = true; _shareQrPayload = qrPayload; });
     try {
+      if (!mounted) return;
       await precacheImage(NetworkImage(widget.url), context);
       // Extra frame so the off-screen card re-renders with the QR choice
       // before we capture it.

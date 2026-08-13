@@ -61,7 +61,6 @@ const _kBR6   = BorderRadius.all(Radius.circular(6));
 // Pill (primary buttons, FAB, chips) — 999 px
 const _kBRPill = BorderRadius.all(Radius.circular(999));
 
-const _shape16   = RoundedRectangleBorder(borderRadius: _kBR16);
 const _shape6    = RoundedRectangleBorder(borderRadius: _kBR6);
 const _shapePill = RoundedRectangleBorder(borderRadius: _kBRPill);
 

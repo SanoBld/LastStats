@@ -10,7 +10,7 @@ import 'settings_helpers.dart';
 import 'pc_mode_section.dart';
 
 // Local haptic helper for appearance page.
-void _ap_haptic() {
+void _apHaptic() {
   if (hapticFeedbackNotifier.value) HapticFeedback.lightImpact();
 }
 
@@ -218,7 +218,7 @@ class _AppearancePageState extends State<AppearancePage> {
           const SizedBox(width: 12),
           Expanded(child: _StyleCard(
             selected:    _isNothing,
-            onTap:       () { _ap_haptic(); _setStyle('nothing'); },
+            onTap:       () { _apHaptic(); _setStyle('nothing'); },
             showDark:    _theme != 'light', // light preview when light mode chosen
             accentColor: kNothingRed,
             child: Builder(builder: (ctx) {
@@ -274,7 +274,7 @@ class _AppearancePageState extends State<AppearancePage> {
                     desc:     L.apRedOnlyDesc,
                     selected: _nothingAccent == 'classic',
                     isDark:   _theme != 'light',
-                    onTap:    () { _ap_haptic(); _setNothingAccent('classic'); },
+                    onTap:    () { _apHaptic(); _setNothingAccent('classic'); },
                   )),
                   const SizedBox(width: 10),
                   Expanded(child: _NothingAccentTile(
@@ -285,7 +285,7 @@ class _AppearancePageState extends State<AppearancePage> {
                     desc:     L.apRedYellowDesc,
                     selected: _nothingAccent == 'mixed',
                     isDark:   _theme != 'light',
-                    onTap:    () { _ap_haptic(); _setNothingAccent('mixed'); },
+                    onTap:    () { _apHaptic(); _setNothingAccent('mixed'); },
                   )),
                 ]),
               ],
@@ -926,10 +926,12 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
   void initState() {
     super.initState();
     SharedPreferences.getInstance().then((p) {
-      if (mounted) setState(() {
-        _enabled = p.getBool('ls_living_artwork') ?? true;
-        _achievementsOn = p.getBool('ls_achievements_enabled') ?? true;
-      });
+      if (mounted) {
+        setState(() {
+          _enabled = p.getBool('ls_living_artwork') ?? true;
+          _achievementsOn = p.getBool('ls_achievements_enabled') ?? true;
+        });
+      }
     });
   }
 

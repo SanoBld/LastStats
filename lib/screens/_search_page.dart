@@ -426,20 +426,6 @@ class _SearchPageState extends State<_SearchPage> {
       },
     );
   }
-
-  Widget _buildUserCard(BuildContext ctx, Map<String, dynamic> u) {
-    final uname = (u['name'] ?? '').toString();
-    final isFav = _favProfiles.contains(uname);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: _SearchUserCard(
-        user:        u,
-        isFav:       isFav,
-        onTap:       () { _haptic(_HapticImpact.light); _openProfile(ctx, uname); },
-        onToggleFav: () => _toggleFavProfile(uname, !isFav),
-      ),
-    );
-  }
 }
 
 // ── Empty state ───────────────────────────────────────────────────────────────

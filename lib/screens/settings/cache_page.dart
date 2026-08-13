@@ -46,14 +46,6 @@ class _CachePageState extends State<CachePage> {
 
   // ── Storage limit picker ──────────────────────────────────────────────────
 
-  int _selectedLimitBytes() {
-    final cur = StorageManager.maxBytes;
-    for (final p in _limits) {
-      if (p.bytes == cur) return cur;
-    }
-    return StorageStats(imageBytes: 0, scrobbleBytes: 0, apiBytes: 0, maxBytes: cur).maxBytes;
-  }
-
   Future<void> _setLimit(int bytes) async {
     await StorageManager.setMaxBytes(bytes);
     if (bytes > 0) await StorageManager.enforceQuota();

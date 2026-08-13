@@ -164,12 +164,16 @@ void main() async {
     Future<void> handleLink(Uri uri) async {
       final scanned = QrLinkService.usernameFromScan(uri.toString());
       if (scanned == null) return;
-      final ctx = navigatorKey.currentContext;
-      if (ctx == null || username.isEmpty || apiKey.isEmpty) return;
+      if (username.isEmpty || apiKey.isEmpty) return;
 
       final p = await SharedPreferences.getInstance();
       final favs = Set<String>.from(p.getStringList('ls_fav_profiles') ?? []);
       final service = LastFmService(apiKey: apiKey, username: username);
+
+      // Re-read the context after the await above: the navigator (or the
+      // widget tree under it) may have changed while we were awaiting.
+      final ctx = navigatorKey.currentContext;
+      if (ctx == null || !ctx.mounted) return;
 
       showProfileSheet(
         ctx, scanned, service,

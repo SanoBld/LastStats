@@ -899,6 +899,7 @@ class _ChartsPageState extends State<_ChartsPage>
         await _waitForYearDataSettled();
       }
 
+      if (!ctx.mounted) return;
       ui.Image chartImg;
 
       if (chartId == 'monthly' || chartId == 'cumul') {
@@ -939,6 +940,7 @@ class _ChartsPageState extends State<_ChartsPage>
         chartImg = await rb.toImage(pixelRatio: 3.0);
       }
 
+      if (!ctx.mounted) return;
       final scheme   = Theme.of(ctx).colorScheme;
       final chartDef = _kCharts.firstWhere((c) => c.$1 == chartId);
       final title    = _ct(chartDef.$2, chartDef.$3, es: chartDef.$4, zh: chartDef.$5, pt: chartDef.$6);
@@ -2084,76 +2086,6 @@ class _LinePainter extends CustomPainter {
   bool shouldRepaint(_LinePainter old) =>
       old.values != values || old.color != color ||
       old.dotInnerColor != dotInnerColor || old.touchIndex != touchIndex;
-}
-
-// ══════════════════════════════════════════════════════════════════════════
-//  _TagsCard — genre list with gradient bars
-// ══════════════════════════════════════════════════════════════════════════
-
-class _TagsCard extends StatelessWidget {
-  final List<_TagEntry> tags;
-  const _TagsCard({required this.tags});
-
-  @override
-  Widget build(BuildContext context) {
-    final s       = Theme.of(context).colorScheme;
-    final t       = Theme.of(context).textTheme;
-    final palette = _buildPalette(s.primary, s.tertiary, tags.length);
-    final maxVal  = tags.isEmpty ? 1
-        : tags.map((e) => e.count).reduce((a, b) => a > b ? a : b);
-
-    return Container(
-      decoration: _chartCardDecoration(s),
-      padding: const EdgeInsets.all(18),
-      child: Column(
-        children: tags.asMap().entries.map((e) {
-          final ratio = maxVal > 0 ? e.value.count / maxVal : 0.0;
-          final color = palette[e.key % palette.length];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 14),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
-                Container(
-                  width: 8, height: 8,
-                  decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-                ),
-                const SizedBox(width: 8),
-                Text(e.value.name,
-                    style: t.bodySmall?.copyWith(fontWeight: FontWeight.w600)),
-                const Spacer(),
-                Text('${(ratio * 100).round()}%',
-                    style: t.bodySmall?.copyWith(
-                        color: s.onSurfaceVariant, fontSize: 10)),
-              ]),
-              const SizedBox(height: 7),
-              LayoutBuilder(builder: (_, box) {
-                final barW = box.maxWidth * ratio;
-                return Stack(children: [
-                  Container(
-                    height: 7,
-                    decoration: BoxDecoration(
-                      color: s.surfaceContainerHigh,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 550),
-                    curve: Curves.easeOutCubic,
-                    width: barW.clamp(7.0, box.maxWidth),
-                    height: 7,
-                    decoration: BoxDecoration(
-                      gradient: _barGradient(color, vertical: false),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ]);
-              }),
-            ]),
-          );
-        }).toList(),
-      ),
-    );
-  }
 }
 
 // ══════════════════════════════════════════════════════════════════════════

@@ -23,7 +23,7 @@ import 'dart:ui' as ui;
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart' show Clipboard, ClipboardData, HapticFeedback, rootBundle, LogicalKeyboardKey, SingleActivator;
+import 'package:flutter/services.dart' show Clipboard, ClipboardData, HapticFeedback, rootBundle, LogicalKeyboardKey;
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -87,12 +87,7 @@ part 'qr_scanner_page.dart';
 const double _kWideBreakpoint = 720.0;
 
 // ── Tab indices ───────────────────────────────────────────────────────────────
-const int _kTabDashboard = 0;
-const int _kTabSearch    = 1;
-const int _kTabRankings  = 2;
-const int _kTabCharts    = 3;
 const int _kTabHistory   = 4;
-const int _kTabSettings  = 5; // wide mode only
 
 
 /// Returns localised (key, label) pairs for period filter chips.
@@ -300,7 +295,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildWideLayout(BuildContext context, List<Widget> pages) {
     final scheme    = Theme.of(context).colorScheme;
-    final text      = Theme.of(context).textTheme;
     final collapsed = _railCollapsed;
     final railWidth = collapsed ? 56.0 : 200.0;
 

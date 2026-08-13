@@ -136,7 +136,7 @@ class CacheBackend {
       final list = (result as JSArray<JSAny?>).toDart;
       int total = 0;
       for (final v in list) {
-        if (v is JSString) total += v.toDart.length * 2;
+        if (v.isA<JSString>()) total += (v as JSString).toDart.length * 2;
       }
       return total;
     } catch (_) {

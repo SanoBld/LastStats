@@ -5,11 +5,9 @@ import '../app_state.dart';
 import '../l10n/l10n.dart';
 import '../supported_locales.dart';
 import '../services/lastfm_service.dart';
-import '../services/data_cache.dart';
 import '../services/prefetch_service.dart';
 import '../services/backup_service.dart';
 import '../services/favorites_auth.dart';
-import 'home_screen.dart';
 import 'onboarding_flow.dart';
 
 // ══════════════════════════════════════════════════════════════════════════

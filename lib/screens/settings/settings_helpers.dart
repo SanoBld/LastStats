@@ -465,8 +465,7 @@ class _CardReorderSheetState extends State<CardReorderSheet> {
           Expanded(child: ReorderableListView(
             scrollController: ctrl,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            onReorder: (oldIdx, newIdx) => setState(() {
-              if (newIdx > oldIdx) newIdx--;
+            onReorderItem: (oldIdx, newIdx) => setState(() {
               final item = _items.removeAt(oldIdx);
               _items.insert(newIdx, item);
             }),

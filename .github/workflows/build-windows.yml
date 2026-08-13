@@ -22,6 +22,11 @@ on:
 jobs:
   build-x64:
     runs-on: windows-latest
+    # Declared here so the env.VERSION reference below resolves statically
+    # (VSCode's Actions linter can't otherwise see the value set later via
+    # $GITHUB_ENV). Actual value is set at runtime in "Resolve version".
+    env:
+      VERSION: ''
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -84,6 +89,8 @@ jobs:
   # this job (or ask GitHub support to enable it) until it is.
   build-arm64:
     runs-on: windows-11-arm
+    env:
+      VERSION: ''
     steps:
       - uses: actions/checkout@v4
 
