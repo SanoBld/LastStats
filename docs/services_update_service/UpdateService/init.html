@@ -72,6 +72,7 @@
   try {
     final info = await PackageInfo.fromPlatform();
     if (info.version.isNotEmpty) currentVersion = info.version;
+    currentBuildNumber = info.buildNumber;
   } catch (_) {}
 }</code></pre>
 </section>
