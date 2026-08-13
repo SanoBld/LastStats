@@ -59,7 +59,7 @@ class AppStringsJa implements AppStrings {
   @override String get rankingsContinued => 'ランキングの続き';
   @override String get rankingsAllYears => '全期間';
   @override String get chartsTitle => 'チャート';
-  @override String get chartsMonthly => 'スクロブル数 — 過去12ヶ月';
+  @override String get chartsMonthly => 'スクロブル数（過去12ヶ月）';
   @override String get chartsArtistDist => 'トップアーティストの内訳';
   @override String get chartsMainstreamTitle => 'メジャー系 vs 発掘アーティスト';
   @override String get chartsMainstreamSubtitle => 'お気に入りアーティストの世界的な人気度。';
@@ -326,7 +326,7 @@ class AppStringsJa implements AppStrings {
   @override String get setupRememberMe => 'ログイン情報を保存';
   @override String get setupGetApiKey => '無料でAPIキーを取得';
   @override String get setupWelcomeBanner => 'LastStatsへようこそ！';
-  @override String get setupOneTimeImportNote => '初回のみのインポートです — 次回以降の起動は瞬時に完了します。';
+  @override String get setupOneTimeImportNote => '初回のみのインポートです。次回以降の起動は瞬時に完了します。';
   @override String get dashTapToDownload => 'タップしてダウンロード。';
   @override String get dashWeekLabel => '今週';
   @override String get dashMonthLabel => '今月';
@@ -565,6 +565,16 @@ class AppStringsJa implements AppStrings {
   @override String get faqA7 => '\u300cscrobble\u300d\u3068\u306f\u3001Last.fm\u30a2\u30ab\u30a6\u30f3\u30c8\u306b\u518d\u751f\u3068\u3057\u3066\u8a18\u9332\u3055\u308c\u305f\u697d\u66f2\u3092\u6307\u3057\u3001Last.fm\u56fa\u6709\u306e\u7528\u8a9e\u3067\u300c1\u56de\u306e\u30ab\u30a6\u30f3\u30c8\u3055\u308c\u305f\u518d\u751f\u300d\u3092\u610f\u5473\u3057\u307e\u3059\u3002\u3059\u3079\u3066\u306e\u5408\u8a08\uff08\u30c8\u30c3\u30d7\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u3084\u7d71\u8a08\u306a\u3069\uff09\u306f\u3053\u308c\u306b\u57fa\u3065\u3044\u3066\u3044\u307e\u3059\u3002';
   @override String get faqQ8 => '\u30ec\u30d9\u30eb\u3068\u5b9f\u7e3e\u306e\u4ed5\u7d44\u307f\u306f\uff1f';
   @override String get faqA8 => '\u30a2\u30ab\u30a6\u30f3\u30c8\u30ec\u30d9\u30eb\u306f\u7dcf scrobble \u6570\u306b\u5fdc\u3058\u3066\u4e0a\u304c\u308a\u3001\u4e0a\u9650\u306f\u3042\u308a\u307e\u305b\u3093\u3002\u30ab\u30fc\u30c9\u306b\u306f\u305d\u306e\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8/\u697d\u66f2/\u30a2\u30eb\u30d0\u30e0\u306e\u518d\u751f\u56de\u6570\u306b\u5fdc\u3058\u305f\u679a\u679a(\u30d6\u30ed\u30f3\u30ba\u2192\u865a\u5f69)\u304c\u4ed8\u304d\u307e\u3059\u3002\u3059\u3079\u3066\u30ed\u30fc\u30ab\u30eb\u306b\u30ad\u30e3\u30c3\u30b7\u30e5\u6e08\u307f\u306e\u7d71\u8a08\u304b\u3089\u81ea\u52d5\u8a08\u7b97\u3055\u308c\u3001\u8ffd\u52a0\u306e\u901a\u4fe1\u306f\u767a\u751f\u3057\u307e\u305b\u3093\u3002';
+  @override String get faqQ9 => '省電力モードはどのように機能しますか？';
+  @override String get faqA9 => '省電力モードは自動同期の間隔を広げてバッテリーを節約します。設定 > 一般から手動でオンにするか、バッテリー残量に応じてアプリに自動で有効化させることもできます。';
+  @override String get faqQ10 => 'データのバックアップや復元はどうすればいいですか？';
+  @override String get faqA10 => '設定 > バックアップから、バックアップファイルを書き出せます（Last.fmキーを含めるかどうかも選べます）。後で同じ端末や別の端末に読み込めます。';
+  @override String get faqQ11 => 'オフラインでも使えますか？';
+  @override String get faqA11 => 'ある程度は可能です。読み込み済みの統計はローカルキャッシュのおかげでオフラインでも見られますが、新しいスクロブルの取得には通信が必要です。';
+  @override String get faqQ12 => 'Last.fmアカウントを切り替えられますか？';
+  @override String get faqA12 => 'はい。設定 > アカウントからログアウトし、別のユーザー名で再度ログインしてください。データが混ざらないよう、ローカルキャッシュは自動的にリセットされます。';
+  @override String get faqQ13 => '通知はどう設定しますか？';
+  @override String get faqA13 => '設定 > 通知から、同期完了時の通知のオン/オフや頻度を設定できます。';
   @override String get settingsPlatformDisabledByShowAll => '無効：すでにすべてのリンクが表示されています。';
   @override String get commonInDevelopment => '開発中';
   @override String get commonSeeLess => '閉じる';
@@ -590,7 +600,7 @@ class AppStringsJa implements AppStrings {
   }
   @override String memberSince(String date) => '$date から利用';
   @override String settingsUpdateAvailable(String v) => 'v$v が利用可能';
-  @override String settingsUpdateBanner(String v) => 'アップデート — v$v';
+  @override String settingsUpdateBanner(String v) => 'アップデート v$v';
   @override String setupWelcome(String username) => 'ようこそ、$username さん！';
   @override String setupScrobblesToImport(String c) => 'インポート予定のスクロブル：$c件';
   @override String dashUpdateTitle(String version, bool isBeta) =>

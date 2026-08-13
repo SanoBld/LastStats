@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ffi' show Abi;
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -14,7 +15,13 @@ class UpdateService {
   static const _repo  = 'LastStats';
 
   static String currentVersion = '0.0.0';
+  static String currentBuildNumber = '';
   static bool _initialized = false;
+
+  // True for a locally-built/debug run (not an official release build).
+  // Used to label the installed version as "dev" instead of pretending it
+  // matches a specific GitHub release tag.
+  static bool get isDevBuild => kDebugMode;
 
   static Future<void> init() async {
     if (_initialized) return;
@@ -22,8 +29,15 @@ class UpdateService {
     try {
       final info = await PackageInfo.fromPlatform();
       if (info.version.isNotEmpty) currentVersion = info.version;
+      currentBuildNumber = info.buildNumber;
     } catch (_) {}
   }
+
+  // A release only counts as "the one currently installed" when the version
+  // matches AND this isn't a dev build, since dev builds are never actually
+  // published as a GitHub release.
+  static bool isInstalledRelease(String releaseVersion) =>
+      !isDevBuild && releaseVersion == currentVersion;
 
   static const _timeout = Duration(seconds: 10);
 

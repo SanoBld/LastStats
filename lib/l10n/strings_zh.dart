@@ -64,8 +64,8 @@ class AppStringsZh implements AppStrings {
   @override String get rankingsAllYears  => '所有年份';
 
   @override String get chartsTitle              => '图表';
-  @override String get chartsMonthly            => 'Scrobbles — 12个月';
-  @override String get chartsArtistDist         => '热门艺术家 — 分布';
+  @override String get chartsMonthly            => 'Scrobbles（12个月）';
+  @override String get chartsArtistDist         => '热门艺术家（分布）';
   @override String get chartsMainstreamTitle    => '主流 vs 小众佳作';
   @override String get chartsMainstreamSubtitle => '你喜爱艺术家的全球人气。';
   @override String get chartsCompute            => '计算';
@@ -189,7 +189,7 @@ class AppStringsZh implements AppStrings {
   @override String get settingsUpToDate          => '已是最新';
   @override String settingsUpdateAvailable(String v) => 'v$v 可用';
   @override String get settingsCheckFailed       => '检查失败。';
-  @override String settingsUpdateBanner(String v) => '更新 — v$v';
+  @override String settingsUpdateBanner(String v) => '更新 v$v';
   @override String get settingsDownload          => '下载';
   @override String get settingsViewRelease       => '查看';
   @override String get settingsAbout             => '关于';
@@ -362,7 +362,7 @@ class AppStringsZh implements AppStrings {
   @override String get setupGetApiKey              => '免费获取 API 密钥';
   @override String setupScrobblesToImport(String c) => '待导入 $c 条 scrobble';
   @override String get setupWelcomeBanner          => '欢迎使用 LastStats！';
-  @override String get setupOneTimeImportNote      => '仅需导入一次 — 之后启动会立即完成。';
+  @override String get setupOneTimeImportNote      => '仅需导入一次，之后启动会立即完成。';
 
   @override String get dashTapToDownload           => '点击下载。';
   @override String dashUpdateTitle(String version, bool isBeta) =>
@@ -473,7 +473,7 @@ class AppStringsZh implements AppStrings {
 
   @override String get dashAnimationBlurSection  => '动画与模糊';
   @override String get dashMusicAnimationTitle   => '音乐动画';
-  @override String get dashMusicAnimationSub     => '播放音乐时，头图会缓慢模糊并漂移——类似 Apple Music。';
+  @override String get dashMusicAnimationSub     => '播放音乐时，头图会缓慢模糊并漂移，类似 Apple Music。';
   @override String get dashMusicAnimationInfo    => '此模式开启时模糊会自动应用。播放音乐期间，上方的模糊滑块无效。';
 
   @override String get settingsTopAlbumsSection  => '热门专辑';
@@ -615,7 +615,7 @@ class AppStringsZh implements AppStrings {
   @override String get faqQ2 => '会推出 iOS 版本吗？';
   @override String get faqA2 => '不会。目前没有推出 iOS 版本的计划。';
   @override String get faqQ3 => '该应用能在 macOS 或其他平台运行吗？';
-  @override String get faqA3 => 'LastStats Mobile 是在 Android 上开发和测试的。其他平台（macOS、Windows、Linux 等）上的表现未经验证——可能出现错误或异常行为。';
+  @override String get faqA3 => 'LastStats Mobile 是在 Android 上开发和测试的。其他平台（macOS、Windows、Linux 等）上的表现未经验证，可能出现错误或异常行为。';
   @override String get faqQ4 => 'LastStats 是开源的吗？';
   @override String get faqA4 => '是的！源代码可在 GitHub 上自由获取。该项目由 SanoBld 独立用心打造。欢迎贡献代码、反馈问题，或点个 ⭐。';
   @override String get faqQ5 => '我的数据存储在哪里？';
@@ -626,6 +626,16 @@ class AppStringsZh implements AppStrings {
   @override String get faqA7 => 'scrobble \u662f\u6307\u5728\u4f60\u7684 Last.fm \u8d26\u6237\u4e0a\u8bb0\u5f55\u4e00\u6b21\u64ad\u653e\u2014\u2014\u8fd9\u662f Last.fm \u5b98\u65b9\u672f\u8bed\uff0c\u8868\u793a\u201c\u4e00\u6b21\u88ab\u8ba1\u5165\u7684\u64ad\u653e\u201d\u3002\u4f60\u7684\u6240\u6709\u7edf\u8ba1\u6570\u636e\uff08\u6392\u884c\u699c\u3001\u603b\u91cf\u7b49\uff09\u90fd\u57fa\u4e8e\u5b83\u3002';
   @override String get faqQ8 => '\u7b49\u7ea7\u4e0e\u6210\u5c31\u7cfb\u7edf\u662f\u600e\u4e48\u8fd0\u4f5c\u7684\uff1f';
   @override String get faqA8 => '\u4f60\u7684\u8d26\u6237\u7b49\u7ea7\u968f\u603b scrobble \u6570\u589e\u957f\uff08\u6ca1\u6709\u4e0a\u9650\uff09\u3002\u5361\u7247\u4e5f\u4f1a\u6839\u636e\u8be5\u827a\u672f\u5bb6/\u6b4c\u66f2/\u4e13\u8f91\u7684\u64ad\u653e\u6b21\u6570\u663e\u793a\u8fb9\u6846\u989c\u8272\uff08\u9752\u94dc\u2192\u4e94\u5f69\uff09\u3002\u8fd9\u4e9b\u90fd\u57fa\u4e8e\u672c\u5730\u5df2\u7f13\u5b58\u7684\u7edf\u8ba1\u6570\u636e\u81ea\u52a8\u8ba1\u7b97\uff0c\u4e0d\u4f1a\u989d\u5916\u8bf7\u6c42\u7f51\u7edc\u3002';
+  @override String get faqQ9 => '省电模式是如何工作的？';
+  @override String get faqA9 => '省电模式会拉长自动同步的间隔以节省电量。你可以在设置 > 通用中手动开启，或让应用根据电量自行决定是否启用。';
+  @override String get faqQ10 => '如何备份或恢复我的数据？';
+  @override String get faqA10 => '前往设置 > 备份，可以导出备份文件（可选择是否包含 Last.fm 密钥），之后在本机或其他设备重新导入。';
+  @override String get faqQ11 => '应用可以离线使用吗？';
+  @override String get faqA11 => '可以，在一定程度上。已加载的统计数据会通过本地缓存离线保留，但获取新的 scrobble 仍需要联网。';
+  @override String get faqQ12 => '可以切换 Last.fm 账号吗？';
+  @override String get faqA12 => '可以。在设置 > 账号中退出登录，再用另一个用户名重新登录即可。本地缓存会自动清空，避免数据混淆。';
+  @override String get faqQ13 => '如何设置通知？';
+  @override String get faqA13 => '在设置 > 通知中，可以开启同步完成提醒、选择提醒频率，或完全关闭通知。';
   @override String get settingsPlatformDisabledByShowAll => '已停用：已显示全部链接。';
   @override String get commonInDevelopment => '开发中';
   @override String get commonSeeLess => '收起';

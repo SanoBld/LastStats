@@ -59,8 +59,8 @@ class AppStringsRu implements AppStrings {
   @override String get rankingsContinued => 'Остальная часть рейтинга';
   @override String get rankingsAllYears => 'Все годы';
   @override String get chartsTitle => 'Графики';
-  @override String get chartsMonthly => 'Скробблы — 12 месяцев';
-  @override String get chartsArtistDist => 'Топ исполнителей — распределение';
+  @override String get chartsMonthly => 'Скробблы (12 месяцев)';
+  @override String get chartsArtistDist => 'Топ исполнителей (распределение)';
   @override String get chartsMainstreamTitle => 'Мейнстрим и скрытые жемчужины';
   @override String get chartsMainstreamSubtitle => 'Мировая популярность ваших любимых исполнителей.';
   @override String get chartsCompute => 'Рассчитать';
@@ -175,7 +175,7 @@ class AppStringsRu implements AppStrings {
   @override String get settingsSourceCode => 'Исходный код';
   @override String get settingsSourceCodeSub => 'github.com/SanoBld/LastStats-App';
   @override String get settingsLanguage => 'Язык';
-  @override String get settingsAboutProjectDesc => 'LastStats — личный проект с открытым исходным кодом. Может содержать ошибки.';
+  @override String get settingsAboutProjectDesc => 'LastStats, личный проект с открытым исходным кодом. Может содержать ошибки.';
   @override String get settingsAboutSupport => 'Поддержать проект';
   @override String get settingsAboutSupportSub => '⭐ Поставьте звезду на GitHub';
   @override String get settingsFaq => 'Частые вопросы';
@@ -326,7 +326,7 @@ class AppStringsRu implements AppStrings {
   @override String get setupRememberMe => 'Запомнить меня';
   @override String get setupGetApiKey => 'Получить бесплатный ключ API';
   @override String get setupWelcomeBanner => 'Добро пожаловать в LastStats!';
-  @override String get setupOneTimeImportNote => 'Разовый импорт — следующие запуски будут мгновенными.';
+  @override String get setupOneTimeImportNote => 'Разовый импорт, следующие запуски будут мгновенными.';
   @override String get dashTapToDownload => 'Нажмите, чтобы скачать.';
   @override String get dashWeekLabel => 'ЭТА НЕДЕЛЯ';
   @override String get dashMonthLabel => 'ЭТОТ МЕСЯЦ';
@@ -404,7 +404,7 @@ class AppStringsRu implements AppStrings {
   @override String get backupIncludeKeysDesc => 'Включить ключи в экспортируемый файл';
   @override String get faqSectionLabel => 'Часто задаваемые вопросы';
   @override String get backupOverwriteWarning => 'Восстановление резервной копии перезапишет ваши текущие настройки.';
-  @override String get faqOpenSourceBadge => 'LastStats — бесплатный проект с открытым исходным кодом, созданный SanoBld с ❤️.';
+  @override String get faqOpenSourceBadge => 'LastStats, бесплатный проект с открытым исходным кодом, созданный SanoBld с ❤️.';
   @override String get cacheUnlimited => 'Без ограничений';
   @override String get cacheTotalUsed => 'Всего использовано';
   @override String get cacheScrobblesShort => 'Скробблы';
@@ -425,7 +425,7 @@ class AppStringsRu implements AppStrings {
   @override String get fallbackWillShowCustomUrl => 'Будет показано: URL своего изображения';
   @override String get dashAnimationBlurSection => 'Анимация и размытие';
   @override String get dashMusicAnimationTitle => 'Музыкальная анимация';
-  @override String get dashMusicAnimationSub => 'Когда играет музыка, изображение заголовка медленно размывается и смещается — как в Apple Music.';
+  @override String get dashMusicAnimationSub => 'Когда играет музыка, изображение заголовка медленно размывается и смещается, как в Apple Music.';
   @override String get dashMusicAnimationInfo => 'Размытие устанавливается автоматически, когда включён этот режим. Ползунок размытия выше не действует, пока играет музыка.';
   @override String get settingsTopAlbumsSection => 'Топ альбомов';
   @override String get dashRecentPlaysLabel => 'Недавние прослушивания';
@@ -550,11 +550,11 @@ class AppStringsRu implements AppStrings {
   @override String get rankingsWholeYear       => 'Весь год';
   @override String get chartsExportGeneratedOn => 'создано';
   @override String get faqQ1 => 'Скробблит ли LastStats мою музыку?';
-  @override String get faqA1 => 'Нет. LastStats — это приложение для визуализации: оно показывает скробблы, уже записанные в вашем аккаунте Last.fm, но само ничего не записывает.\n\nЧтобы автоматически скробблить музыку, используйте специальное приложение, например Pano Scrobbler (доступно на Android).';
+  @override String get faqA1 => 'Нет. LastStats, это приложение для визуализации: оно показывает скробблы, уже записанные в вашем аккаунте Last.fm, но само ничего не записывает.\n\nЧтобы автоматически скробблить музыку, используйте специальное приложение, например Pano Scrobbler (доступно на Android).';
   @override String get faqQ2 => 'Планируется ли версия для iOS?';
   @override String get faqA2 => 'Нет. На данный момент версия для iOS не планируется.';
   @override String get faqQ3 => 'Работает ли приложение на macOS или других платформах?';
-  @override String get faqA3 => 'LastStats Mobile разрабатывается и тестируется на Android. Работа на других платформах (macOS, Windows, Linux…) не проверена — возможны ошибки или неожиданное поведение.';
+  @override String get faqA3 => 'LastStats Mobile разрабатывается и тестируется на Android. Работа на других платформах (macOS, Windows, Linux…) не проверена, возможны ошибки или неожиданное поведение.';
   @override String get faqQ4 => 'Является ли LastStats открытым исходным кодом?';
   @override String get faqA4 => 'Да! Исходный код свободно доступен на GitHub. Проект независимый, сделан с любовью SanoBld. Не стесняйтесь вносить вклад, сообщать об ошибках или просто поставить звездочку ⭐.';
   @override String get faqQ5 => 'Где хранятся мои данные?';
@@ -565,6 +565,16 @@ class AppStringsRu implements AppStrings {
   @override String get faqA7 => 'Scrobble \u2014 \u044d\u0442\u043e \u0442\u0440\u0435\u043a, \u0437\u0430\u0444\u0438\u043a\u0441\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439 \u043a\u0430\u043a \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0430\u043d\u043d\u044b\u0439 \u043d\u0430 \u0432\u0430\u0448\u0435\u043c \u0430\u043a\u043a\u0430\u0443\u043d\u0442\u0435 Last.fm \u2014 \u044d\u0442\u043e \u0441\u043e\u0431\u0441\u0442\u0432\u0435\u043d\u043d\u044b\u0439 \u0442\u0435\u0440\u043c\u0438\u043d Last.fm \u0434\u043b\u044f \u00ab\u0437\u0430\u0441\u0447\u0438\u0442\u0430\u043d\u043d\u043e\u0433\u043e \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u044f\u00bb. \u0412\u0441\u0435 \u0432\u0430\u0448\u0438 \u0438\u0442\u043e\u0433\u0438 (\u0442\u043e\u043f \u0438\u0441\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u0435\u0439, \u0441\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0430 \u0438 \u0442.\u0434.) \u043e\u0441\u043d\u043e\u0432\u0430\u043d\u044b \u043d\u0430 \u043d\u0451\u043c.';
   @override String get faqQ8 => '\u041a\u0430\u043a \u0440\u0430\u0431\u043e\u0442\u0430\u044e\u0442 \u0443\u0440\u043e\u0432\u043d\u0438 \u0438 \u0434\u043e\u0441\u0442\u0438\u0436\u0435\u043d\u0438\u044f?';
   @override String get faqA8 => '\u0423\u0440\u043e\u0432\u0435\u043d\u044c \u0430\u043a\u043a\u0430\u0443\u043d\u0442\u0430 \u0440\u0430\u0441\u0442\u0451\u0442 \u0432\u043c\u0435\u0441\u0442\u0435 \u0441 \u043e\u0431\u0449\u0438\u043c \u0447\u0438\u0441\u043b\u043e\u043c scrobble (\u043c\u0430\u043a\u0441\u0438\u043c\u0430\u043b\u044c\u043d\u043e\u0433\u043e \u0443\u0440\u043e\u0432\u043d\u044f \u043d\u0435\u0442). \u041a\u0430\u0440\u0442\u043e\u0447\u043a\u0438 \u0442\u0430\u043a\u0436\u0435 \u043f\u043e\u043b\u0443\u0447\u0430\u044e\u0442 \u0440\u0430\u043c\u043a\u0443 (\u0431\u0440\u043e\u043d\u0437\u0430 \u2192 \u043f\u0435\u0440\u0435\u043b\u0438\u0432\u0447\u0430\u0442\u0430\u044f) \u0432 \u0437\u0430\u0432\u0438\u0441\u0438\u043c\u043e\u0441\u0442\u0438 \u043e\u0442 \u0447\u0438\u0441\u043b\u0430 \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u0439 \u044d\u0442\u043e\u0433\u043e \u0438\u0441\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044f/\u0442\u0440\u0435\u043a\u0430/\u0430\u043b\u044c\u0431\u043e\u043c\u0430. \u0412\u0441\u0451 \u0432\u044b\u0447\u0438\u0441\u043b\u044f\u0435\u0442\u0441\u044f \u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u0438\u0437 \u0443\u0436\u0435 \u0437\u0430\u043a\u044d\u0448\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u043e\u0439 \u043b\u043e\u043a\u0430\u043b\u044c\u043d\u043e\u0439 \u0441\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0438, \u0431\u0435\u0437 \u0434\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0445 \u0441\u0435\u0442\u0435\u0432\u044b\u0445 \u0437\u0430\u043f\u0440\u043e\u0441\u043e\u0432.';
+  @override String get faqQ9 => 'Как работает энергосберегающий режим?';
+  @override String get faqA9 => 'Энергосберегающий режим увеличивает интервалы между автосинхронизациями для экономии батареи. Его можно включить вручную или позволить приложению делать это самому в зависимости от заряда, в разделе Настройки > Общие.';
+  @override String get faqQ10 => 'Как сделать резервную копию или восстановить данные?';
+  @override String get faqA10 => 'Откройте Настройки > Резервное копирование. Можно экспортировать файл резервной копии (с ключом Last.fm или без него) и позже импортировать его снова или на другом устройстве.';
+  @override String get faqQ11 => 'Работает ли приложение офлайн?';
+  @override String get faqA11 => 'Да, отчасти. Уже загруженная статистика остаётся доступной офлайн благодаря локальному кешу, но для получения новых скробблов нужно подключение.';
+  @override String get faqQ12 => 'Можно ли сменить аккаунт Last.fm?';
+  @override String get faqA12 => 'Да. В Настройки > Аккаунт выйдите из текущего аккаунта и войдите с другим именем пользователя. Локальный кеш автоматически сбрасывается, чтобы данные не смешивались.';
+  @override String get faqQ13 => 'Как настроить уведомления?';
+  @override String get faqA13 => 'В Настройки > Уведомления можно включить оповещения об окончании синхронизации, выбрать их частоту или полностью отключить.';
   @override String get settingsPlatformDisabledByShowAll => 'Отключено: все ссылки уже отображаются.';
   @override String get commonInDevelopment => 'В разработке';
   @override String get commonSeeLess => 'Свернуть';
@@ -591,7 +601,7 @@ class AppStringsRu implements AppStrings {
   }
   @override String memberSince(String date) => 'Участник с $date';
   @override String settingsUpdateAvailable(String v) => 'Доступна v$v';
-  @override String settingsUpdateBanner(String v) => 'Обновление — v$v';
+  @override String settingsUpdateBanner(String v) => 'Обновление v$v';
   @override String setupWelcome(String username) => 'Добро пожаловать, $username!';
   @override String setupScrobblesToImport(String c) => '$c скробблов для импорта';
   @override String dashUpdateTitle(String version, bool isBeta) =>
