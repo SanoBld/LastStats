@@ -40,7 +40,13 @@ class AboutPage extends StatelessWidget {
           Text('LastStats',
               style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 4),
+<<<<<<< HEAD
           Text(UpdateService.displayVersion ?? 'dev',
+=======
+          Text(UpdateService.isDevBuild
+                  ? 'v${UpdateService.currentVersion} (dev)'
+                  : 'v${UpdateService.currentVersion}',
+>>>>>>> 7f6b22748c9163c9da866ae70c64d2e0abc3c0bd
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           const SizedBox(height: 4),
           Text(L.aboutTagline,
@@ -73,7 +79,13 @@ class AboutPage extends StatelessWidget {
             leading: const Icon(Icons.info_outline_rounded),
             title: Text(L.settingsVersion,
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+<<<<<<< HEAD
             trailing: Text(UpdateService.displayVersion ?? 'dev',
+=======
+            trailing: Text(UpdateService.isDevBuild
+                    ? 'v${UpdateService.currentVersion} (dev)'
+                    : 'v${UpdateService.currentVersion}',
+>>>>>>> 7f6b22748c9163c9da866ae70c64d2e0abc3c0bd
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),

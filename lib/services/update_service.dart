@@ -23,6 +23,7 @@ class UpdateService {
   // matches a specific GitHub release tag.
   static bool get isDevBuild => kDebugMode;
 
+<<<<<<< HEAD
   // True for a CI build that was made without an explicit version input
   // (e.g. an ad-hoc GitHub Actions run). The workflow tags those builds as
   // "0.0.0-dev.<run>" instead of reusing the stale pubspec.yaml version, so
@@ -39,6 +40,8 @@ class UpdateService {
     return 'v$currentVersion';
   }
 
+=======
+>>>>>>> 7f6b22748c9163c9da866ae70c64d2e0abc3c0bd
   static Future<void> init() async {
     if (_initialized) return;
     _initialized = true;
@@ -50,10 +53,17 @@ class UpdateService {
   }
 
   // A release only counts as "the one currently installed" when the version
+<<<<<<< HEAD
   // matches AND we actually have a genuine, known version, since dev/ad-hoc
   // builds are never actually published as a GitHub release.
   static bool isInstalledRelease(String releaseVersion) =>
       !isDevBuild && !isUnknownVersion && releaseVersion == currentVersion;
+=======
+  // matches AND this isn't a dev build, since dev builds are never actually
+  // published as a GitHub release.
+  static bool isInstalledRelease(String releaseVersion) =>
+      !isDevBuild && releaseVersion == currentVersion;
+>>>>>>> 7f6b22748c9163c9da866ae70c64d2e0abc3c0bd
 
   static const _timeout = Duration(seconds: 10);
 

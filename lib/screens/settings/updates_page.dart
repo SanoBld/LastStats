@@ -208,8 +208,7 @@ class _UpdatesPageState extends State<UpdatesPage> {
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.5)),
               ),
-              child: Text(
-                  UpdateService.displayVersion ?? 'dev',
+              child: Text('v${UpdateService.currentVersion}',
                   style: text.labelMedium?.copyWith(
                       fontFamily: 'monospace', color: scheme.onSurfaceVariant)),
             ),

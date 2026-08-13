@@ -110,76 +110,9 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
               ? Center(child: Text(
                   isEn ? 'Could not load release history.' : 'Impossible de charger l\'historique.',
                   style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)))
-              : Column(children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      // Installed version. No real version to show for an
-                      // ad-hoc build (no CI version input), so say so
-                      // instead of displaying a stale, misleading number.
-                      Row(children: [
-                        Icon(Icons.smartphone_rounded, size: 16, color: scheme.onSurfaceVariant),
-                        const SizedBox(width: 6),
-                        Text(
-                          UpdateService.displayVersion == null
-                              ? (isEn ? 'Installed: dev build (unknown version)' : 'Installée : build de dev (version inconnue)')
-                              : (isEn ? 'Installed: ${UpdateService.displayVersion}' : 'Installée : ${UpdateService.displayVersion}'),
-                          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-                        ),
-                      ]),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: _searchCtrl,
-                        onChanged: (v) => setState(() => _query = v),
-                        decoration: InputDecoration(
-                          hintText: isEn ? 'Search a version or changelog…' : 'Rechercher une version ou un changelog…',
-                          prefixIcon: const Icon(Icons.search_rounded, size: 20),
-                          suffixIcon: _query.isEmpty ? null : IconButton(
-                            icon: const Icon(Icons.close_rounded, size: 18),
-                            onPressed: () => setState(() { _searchCtrl.clear(); _query = ''; }),
-                          ),
-                          isDense: true,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(children: [
-                        _filterChip(isEn ? 'All' : 'Toutes', _HistoryFilter.all, scheme, text),
-                        const SizedBox(width: 8),
-                        _filterChip(isEn ? 'Official' : 'Officiel', _HistoryFilter.official, scheme, text),
-                        const SizedBox(width: 8),
-                        _filterChip('Beta', _HistoryFilter.beta, scheme, text),
-                      ]),
-                    ]),
-                  ),
-                  Expanded(child: _buildList(scheme, text, isEn)),
-                ]),
-    );
-  }
-
-  Widget _filterChip(String label, _HistoryFilter value, ColorScheme scheme, TextTheme text) {
-    final selected = _filter == value;
-    return ChoiceChip(
-      label: Text(label),
-      selected: selected,
-      onSelected: (_) => setState(() => _filter = value),
-      labelStyle: text.labelMedium?.copyWith(
-          fontWeight: FontWeight.w600,
-          color: selected ? scheme.onPrimaryContainer : scheme.onSurfaceVariant),
-      selectedColor: scheme.primaryContainer,
-    );
-  }
-
-  Widget _buildList(ColorScheme scheme, TextTheme text, bool isEn) {
-    final releases = _filtered;
-    if (releases.isEmpty) {
-      return Center(child: Text(
-          isEn ? 'No release matches your search.' : 'Aucune version ne correspond à votre recherche.',
-          style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)));
-    }
-    return ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-                  itemCount: releases.length,
+              : ListView.separated(
+                  padding: const EdgeInsets.all(20),
+                  itemCount: _releases.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (_, i) {
                     final r          = releases[i];
