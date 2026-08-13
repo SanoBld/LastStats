@@ -52,10 +52,10 @@ class _Tilt3DCardState extends State<Tilt3DCard>
   double _rx = 0, _ry = 0;
   bool _dragging = false;
 
-  // Pinch-to-zoom, smoothed like the tilt. Wide range so users can really
-  // zoom in on the artwork, not just a subtle breathing effect.
+  // Pinch-to-zoom, smoothed like the tilt. Kept small so tilting the card
+  // never pushes the art past the camera near the edges.
   static const double _minZoom = 1.0;
-  static const double _maxZoom = 3.5;
+  static const double _maxZoom = 1.25;
   double _targetZoom = 1.0;
   double _zoom = 1.0;
   double _zoomAtGestureStart = 1.0;
