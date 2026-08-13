@@ -17,12 +17,19 @@ class UpdateHistoryPage extends StatefulWidget {
   State<UpdateHistoryPage> createState() => _UpdateHistoryPageState();
 }
 
+// Filter applied to the release list, on top of the free-text search.
+enum _HistoryFilter { all, beta, official }
+
 class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
   List<UpdateInfo> _releases = [];
   bool             _loading  = true;
   bool             _betaChannel = false;
-  // Which version numbers have their changelog expanded — latest starts open.
+  // Which version numbers have their changelog expanded, latest starts open.
   final Set<String> _expanded = {};
+
+  final TextEditingController _searchCtrl = TextEditingController();
+  String          _query  = '';
+  _HistoryFilter  _filter = _HistoryFilter.all;
 
   @override
   void initState() {
@@ -32,7 +39,25 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
   }
 
   @override
-  void dispose() { localeNotifier.removeListener(_rebuild); super.dispose(); }
+  void dispose() {
+    localeNotifier.removeListener(_rebuild);
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  // Search (matches version + changelog text) combined with the beta/official filter.
+  List<UpdateInfo> get _filtered {
+    return _releases.where((r) {
+      switch (_filter) {
+        case _HistoryFilter.beta:     if (!r.isBeta) return false;
+        case _HistoryFilter.official: if (r.isBeta)  return false;
+        case _HistoryFilter.all:      break;
+      }
+      if (_query.isEmpty) return true;
+      final q = _query.toLowerCase();
+      return r.version.toLowerCase().contains(q) || r.notes.toLowerCase().contains(q);
+    }).toList();
+  }
 
   void _rebuild() => setState(() {});
 
@@ -85,14 +110,81 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
               ? Center(child: Text(
                   isEn ? 'Could not load release history.' : 'Impossible de charger l\'historique.',
                   style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)))
-              : ListView.separated(
-                  padding: const EdgeInsets.all(20),
-                  itemCount: _releases.length,
+              : Column(children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      // Installed version. No real version to show for an
+                      // ad-hoc build (no CI version input), so say so
+                      // instead of displaying a stale, misleading number.
+                      Row(children: [
+                        Icon(Icons.smartphone_rounded, size: 16, color: scheme.onSurfaceVariant),
+                        const SizedBox(width: 6),
+                        Text(
+                          UpdateService.displayVersion == null
+                              ? (isEn ? 'Installed: dev build (unknown version)' : 'Installée : build de dev (version inconnue)')
+                              : (isEn ? 'Installed: ${UpdateService.displayVersion}' : 'Installée : ${UpdateService.displayVersion}'),
+                          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                        ),
+                      ]),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _searchCtrl,
+                        onChanged: (v) => setState(() => _query = v),
+                        decoration: InputDecoration(
+                          hintText: isEn ? 'Search a version or changelog…' : 'Rechercher une version ou un changelog…',
+                          prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                          suffixIcon: _query.isEmpty ? null : IconButton(
+                            icon: const Icon(Icons.close_rounded, size: 18),
+                            onPressed: () => setState(() { _searchCtrl.clear(); _query = ''; }),
+                          ),
+                          isDense: true,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(children: [
+                        _filterChip(isEn ? 'All' : 'Toutes', _HistoryFilter.all, scheme, text),
+                        const SizedBox(width: 8),
+                        _filterChip(isEn ? 'Official' : 'Officiel', _HistoryFilter.official, scheme, text),
+                        const SizedBox(width: 8),
+                        _filterChip('Beta', _HistoryFilter.beta, scheme, text),
+                      ]),
+                    ]),
+                  ),
+                  Expanded(child: _buildList(scheme, text, isEn)),
+                ]),
+    );
+  }
+
+  Widget _filterChip(String label, _HistoryFilter value, ColorScheme scheme, TextTheme text) {
+    final selected = _filter == value;
+    return ChoiceChip(
+      label: Text(label),
+      selected: selected,
+      onSelected: (_) => setState(() => _filter = value),
+      labelStyle: text.labelMedium?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: selected ? scheme.onPrimaryContainer : scheme.onSurfaceVariant),
+      selectedColor: scheme.primaryContainer,
+    );
+  }
+
+  Widget _buildList(ColorScheme scheme, TextTheme text, bool isEn) {
+    final releases = _filtered;
+    if (releases.isEmpty) {
+      return Center(child: Text(
+          isEn ? 'No release matches your search.' : 'Aucune version ne correspond à votre recherche.',
+          style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)));
+    }
+    return ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                  itemCount: releases.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (_, i) {
-                    final r          = _releases[i];
-                    final isLatest   = i == 0;
-                    final isCurrent  = r.version == UpdateService.currentVersion;
+                    final r          = releases[i];
+                    final isLatest   = i == 0 && _query.isEmpty && _filter == _HistoryFilter.all;
+                    final isCurrent  = UpdateService.isInstalledRelease(r.version);
                     final isExpanded = _expanded.contains(r.version);
 
                     return Container(
@@ -178,8 +270,7 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
                       ]),
                     );
                   },
-                ),
-    );
+                );
   }
 
   Widget _chip(String label, Color bg, Color fg, ColorScheme scheme) => Container(

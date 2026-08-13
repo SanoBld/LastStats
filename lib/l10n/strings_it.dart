@@ -59,8 +59,8 @@ class AppStringsIt implements AppStrings {
   @override String get rankingsContinued => 'Resto della classifica';
   @override String get rankingsAllYears => 'Tutti gli anni';
   @override String get chartsTitle => 'Grafici';
-  @override String get chartsMonthly => 'Scrobble — 12 mesi';
-  @override String get chartsArtistDist => 'Artisti principali — ripartizione';
+  @override String get chartsMonthly => 'Scrobble (12 mesi)';
+  @override String get chartsArtistDist => 'Artisti principali (ripartizione)';
   @override String get chartsMainstreamTitle => 'Mainstream vs Perle nascoste';
   @override String get chartsMainstreamSubtitle => 'Popolarità globale dei tuoi artisti preferiti.';
   @override String get chartsCompute => 'Calcola';
@@ -326,7 +326,7 @@ class AppStringsIt implements AppStrings {
   @override String get setupRememberMe => 'Ricordami';
   @override String get setupGetApiKey => 'Ottieni una chiave API gratuita';
   @override String get setupWelcomeBanner => 'Benvenuto su LastStats!';
-  @override String get setupOneTimeImportNote => 'Importazione unica — i prossimi avvii saranno istantanei.';
+  @override String get setupOneTimeImportNote => 'Importazione unica, i prossimi avvii saranno istantanei.';
   @override String get dashTapToDownload => 'Tocca per scaricare.';
   @override String get dashWeekLabel => 'QUESTA SETTIMANA';
   @override String get dashMonthLabel => 'QUESTO MESE';
@@ -565,6 +565,16 @@ class AppStringsIt implements AppStrings {
   @override String get faqA7 => 'Uno scrobble \u00e8 un brano registrato come ascoltato sul tuo account Last.fm: \u00e8 il termine ufficiale di Last.fm per \'un ascolto conteggiato\'. Tutti i tuoi totali (artisti top, statistiche, ecc.) si basano su questo.';
   @override String get faqQ8 => 'Come funzionano livelli e obiettivi?';
   @override String get faqA8 => 'Il tuo livello account cresce con il numero totale di scrobble (non c\u2019\u00e8 un livello massimo). Le card mostrano anche un bordo (bronzo \u2192 iridescente) in base a quante volte quell\u2019artista/brano/album \u00e8 stato ascoltato. Tutto viene calcolato automaticamente dalle statistiche gi\u00e0 in cache locale, senza chiamate di rete aggiuntive.';
+  @override String get faqQ9 => 'Come funziona la modalità risparmio?';
+  @override String get faqA9 => 'La modalità risparmio distanzia le sincronizzazioni automatiche per risparmiare batteria. Puoi attivarla manualmente o lasciare che l\'app lo faccia da sola in base al livello di batteria, da Impostazioni > Generali.';
+  @override String get faqQ10 => 'Come faccio un backup o lo ripristino?';
+  @override String get faqA10 => 'Vai su Impostazioni > Backup. Puoi esportare un file di backup (con o senza la tua chiave Last.fm) e reimportarlo in seguito o su un altro dispositivo.';
+  @override String get faqQ11 => 'L\'app funziona offline?';
+  @override String get faqA11 => 'Sì, entro certi limiti. Le statistiche già caricate restano disponibili offline grazie alla cache locale, ma serve una connessione per recuperare nuovi scrobble.';
+  @override String get faqQ12 => 'Posso cambiare account Last.fm?';
+  @override String get faqA12 => 'Sì. Da Impostazioni > Account, esci e accedi di nuovo con un altro nome utente. La cache locale viene azzerata automaticamente per evitare di mescolare i dati.';
+  @override String get faqQ13 => 'Come configuro le notifiche?';
+  @override String get faqA13 => 'Da Impostazioni > Notifiche puoi attivare gli avvisi di sincronizzazione completata, sceglierne la frequenza o disattivarli del tutto.';
   @override String get settingsPlatformDisabledByShowAll => 'Disattivato: tutti i link sono già mostrati.';
   @override String get commonInDevelopment => 'In sviluppo';
   @override String get commonSeeLess => 'Vedi meno';
@@ -591,7 +601,7 @@ class AppStringsIt implements AppStrings {
   }
   @override String memberSince(String date) => 'Membro dal $date';
   @override String settingsUpdateAvailable(String v) => 'v$v disponibile';
-  @override String settingsUpdateBanner(String v) => 'Aggiornamento — v$v';
+  @override String settingsUpdateBanner(String v) => 'Aggiornamento v$v';
   @override String setupWelcome(String username) => 'Benvenuto, $username!';
   @override String setupScrobblesToImport(String c) => '$c scrobble da importare';
   @override String dashUpdateTitle(String version, bool isBeta) =>

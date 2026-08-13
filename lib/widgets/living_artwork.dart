@@ -52,7 +52,10 @@ class _Tilt3DCardState extends State<Tilt3DCard>
   double _rx = 0, _ry = 0;
   bool _dragging = false;
 
-  // Pinch-to-zoom: subtle range only, smoothed like the tilt.
+  // Pinch-to-zoom, smoothed like the tilt. Wide range so users can really
+  // zoom in on the artwork, not just a subtle breathing effect.
+  static const double _minZoom = 1.0;
+  static const double _maxZoom = 3.5;
   double _targetZoom = 1.0;
   double _zoom = 1.0;
   double _zoomAtGestureStart = 1.0;
@@ -147,8 +150,8 @@ class _Tilt3DCardState extends State<Tilt3DCard>
 
   void _onScaleUpdate(ScaleUpdateDetails d) {
     if (d.pointerCount >= 2) {
-      // Two fingers: pinch-zoom. Small range only ("seulement un peu").
-      _targetZoom = (_zoomAtGestureStart * d.scale).clamp(1.0, 1.12);
+      // Two fingers: pinch-zoom, wide range.
+      _targetZoom = (_zoomAtGestureStart * d.scale).clamp(_minZoom, _maxZoom);
     } else {
       _tiltFromLocal(d.localFocalPoint);
     }

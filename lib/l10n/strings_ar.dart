@@ -59,8 +59,8 @@ class AppStringsAr implements AppStrings {
   @override String get rankingsContinued => 'بقية الترتيب';
   @override String get rankingsAllYears => 'كل السنوات';
   @override String get chartsTitle => 'الرسوم البيانية';
-  @override String get chartsMonthly => 'التشغيلات — 12 شهرًا';
-  @override String get chartsArtistDist => 'أفضل الفنانين — التوزيع';
+  @override String get chartsMonthly => 'التشغيلات (12 شهرًا)';
+  @override String get chartsArtistDist => 'أفضل الفنانين (التوزيع)';
   @override String get chartsMainstreamTitle => 'المشهور مقابل الجواهر الخفية';
   @override String get chartsMainstreamSubtitle => 'الشعبية العالمية لفنانيك المفضلين.';
   @override String get chartsCompute => 'احسب';
@@ -326,7 +326,7 @@ class AppStringsAr implements AppStrings {
   @override String get setupRememberMe => 'تذكرني';
   @override String get setupGetApiKey => 'احصل على مفتاح API مجانًا';
   @override String get setupWelcomeBanner => 'مرحبًا بك في LastStats!';
-  @override String get setupOneTimeImportNote => 'استيراد لمرة واحدة — عمليات التشغيل القادمة ستكون فورية.';
+  @override String get setupOneTimeImportNote => 'استيراد لمرة واحدة، عمليات التشغيل القادمة ستكون فورية.';
   @override String get dashTapToDownload => 'اضغط للتنزيل.';
   @override String get dashWeekLabel => 'هذا الأسبوع';
   @override String get dashMonthLabel => 'هذا الشهر';
@@ -425,7 +425,7 @@ class AppStringsAr implements AppStrings {
   @override String get fallbackWillShowCustomUrl => 'سيُعرض: رابط صورة مخصصة';
   @override String get dashAnimationBlurSection => 'الحركة والتمويه';
   @override String get dashMusicAnimationTitle => 'حركة الموسيقى';
-  @override String get dashMusicAnimationSub => 'عند تشغيل الموسيقى، تتلاشى صورة الرأس وتتحرك ببطء — على غرار Apple Music.';
+  @override String get dashMusicAnimationSub => 'عند تشغيل الموسيقى، تتلاشى صورة الرأس وتتحرك ببطء، على غرار Apple Music.';
   @override String get dashMusicAnimationInfo => 'يُضبط التمويه تلقائيًا عند تفعيل هذا الوضع. شريط التمويه أعلاه لا تأثير له أثناء تشغيل الموسيقى.';
   @override String get settingsTopAlbumsSection => 'أفضل الألبومات';
   @override String get dashRecentPlaysLabel => 'التشغيلات الأخيرة';
@@ -554,7 +554,7 @@ class AppStringsAr implements AppStrings {
   @override String get faqQ2 => 'هل هناك نسخة مخطط لها لـ iOS؟';
   @override String get faqA2 => 'لا. لا توجد نسخة مخطط لها لـ iOS في الوقت الحالي.';
   @override String get faqQ3 => 'هل يعمل التطبيق على macOS أو منصات أخرى؟';
-  @override String get faqA3 => 'يتم تطوير واختبار LastStats Mobile على أندرويد. الأداء على المنصات الأخرى (macOS، Windows، Linux...) غير متحقق منه — قد تحدث أخطاء أو سلوك غير متوقع.';
+  @override String get faqA3 => 'يتم تطوير واختبار LastStats Mobile على أندرويد. الأداء على المنصات الأخرى (macOS، Windows، Linux...) غير متحقق منه، قد تحدث أخطاء أو سلوك غير متوقع.';
   @override String get faqQ4 => 'هل LastStats مفتوح المصدر؟';
   @override String get faqA4 => 'نعم! الكود المصدري متاح بحرية على GitHub. المشروع مستقل، صُنع بشغف من قبل SanoBld. لا تتردد في المساهمة أو الإبلاغ عن الأخطاء أو ترك نجمة ⭐.';
   @override String get faqQ5 => 'أين يتم تخزين بياناتي؟';
@@ -565,6 +565,16 @@ class AppStringsAr implements AppStrings {
   @override String get faqA7 => '\u0627\u0644\u0640scrobble \u0647\u0648 \u0645\u0642\u0637\u0648\u0639\u0629 \u064a\u062a\u0645 \u062a\u0633\u062c\u064a\u0644\u0647\u0627 \u0643\u0645\u0634\u063a\u0648\u0644\u0629 \u0641\u064a \u062d\u0633\u0627\u0628\u0643 \u0639\u0644\u0649 Last.fm \u2014 \u0625\u0646\u0647 \u0627\u0644\u0645\u0635\u0637\u0644\u062d \u0627\u0644\u0631\u0633\u0645\u064a \u0644\u0640 Last.fm \u0644\u0640 \u0627\u0633\u062a\u0645\u0627\u0639 \u0648\u0627\u062d\u062f \u0645\u062d\u062a\u0633\u0628. \u062c\u0645\u064a\u0639 \u0625\u062d\u0635\u0627\u0626\u064a\u0627\u062a\u0643 (\u0623\u0641\u0636\u0644 \u0627\u0644\u0641\u0646\u0627\u0646\u064a\u0646\u060c \u0627\u0644\u0625\u062d\u0635\u0627\u0626\u064a\u0627\u062a...) \u0645\u0628\u0646\u064a\u0629 \u0639\u0644\u064a\u0647.';
   @override String get faqQ8 => '\u0643\u064a\u0641 \u064a\u0639\u0645\u0644 \u0646\u0638\u0627\u0645 \u0627\u0644\u0645\u0633\u062a\u0648\u064a\u0627\u062a \u0648\u0627\u0644\u0625\u0646\u062c\u0627\u0632\u0627\u062a\u061f';
   @override String get faqA8 => '\u064a\u0631\u062a\u0641\u0639 \u0645\u0633\u062a\u0648\u0649 \u062d\u0633\u0627\u0628\u0643 \u0645\u0639 \u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0640scrobbles (\u0644\u0627 \u064a\u0648\u062c\u062f \u0645\u0633\u062a\u0648\u0649 \u0623\u0642\u0635\u0649). \u062a\u0638\u0647\u0631 \u0627\u0644\u0628\u0637\u0627\u0642\u0627\u062a \u0623\u064a\u0636\u064b\u0627 \u0625\u0637\u0627\u0631\u064b\u0627 (\u0628\u0631\u0648\u0646\u0632\u064a \u2192 \u0645\u062a\u0639\u062f\u062f \u0627\u0644\u0623\u0644\u0648\u0627\u0646) \u062d\u0633\u0628 \u0639\u062f\u062f \u0645\u0631\u0627\u062a \u0627\u0644\u0627\u0633\u062a\u0645\u0627\u0639 \u0644\u0630\u0644\u0643 \u0627\u0644\u0641\u0646\u0627\u0646/\u0627\u0644\u0645\u0642\u0637\u0648\u0639\u0629/\u0627\u0644\u0623\u0644\u0628\u0648\u0645. \u064a\u0643\u0644 \u0634\u064a\u0623 \u064a\u064f\u062d\u0633\u0628 \u062a\u0644\u0642\u0627\u0626\u064a\u064b\u0627 \u0645\u0646 \u0627\u0644\u0625\u062d\u0635\u0627\u0626\u064a\u0627\u062a \u0627\u0644\u0645\u062e\u0632\u0651\u0646\u0629 \u0645\u062d\u0644\u064a\u064b\u0627 \u0628\u0627\u0644\u0641\u0639\u0644\u060c \u0628\u062f\u0648\u0646 \u0623\u064a \u0637\u0644\u0628\u0627\u062a \u0634\u0628\u0643\u0629 \u0625\u0636\u0627\u0641\u064a\u0629.';
+  @override String get faqQ9 => 'كيف يعمل وضع توفير الطاقة؟';
+  @override String get faqA9 => 'يباعد وضع توفير الطاقة بين عمليات المزامنة التلقائية لتوفير البطارية. يمكنك تفعيله يدويًا أو ترك التطبيق يفعّله تلقائيًا حسب مستوى البطارية، من الإعدادات > عام.';
+  @override String get faqQ10 => 'كيف أنسخ بياناتي احتياطيًا أو أستعيدها؟';
+  @override String get faqA10 => 'انتقل إلى الإعدادات > النسخ الاحتياطي. يمكنك تصدير ملف نسخة احتياطية (مع أو بدون مفتاح Last.fm) ثم استيراده لاحقًا أو على جهاز آخر.';
+  @override String get faqQ11 => 'هل يعمل التطبيق دون اتصال بالإنترنت؟';
+  @override String get faqA11 => 'نعم، إلى حد ما. تبقى الإحصائيات المحمّلة مسبقًا متاحة دون اتصال بفضل التخزين المؤقت المحلي، لكن الاتصال ضروري لجلب تشغيلات جديدة.';
+  @override String get faqQ12 => 'هل يمكنني تغيير حساب Last.fm؟';
+  @override String get faqA12 => 'نعم. من الإعدادات > الحساب، سجّل الخروج ثم سجّل الدخول باسم مستخدم آخر. تتم إعادة ضبط التخزين المؤقت المحلي تلقائيًا لتجنب اختلاط البيانات.';
+  @override String get faqQ13 => 'كيف أضبط الإشعارات؟';
+  @override String get faqA13 => 'من الإعدادات > الإشعارات، يمكنك تفعيل تنبيهات اكتمال المزامنة واختيار تكرارها أو إيقافها بالكامل.';
   @override String get settingsPlatformDisabledByShowAll => 'معطّل: يتم عرض جميع الروابط بالفعل.';
   @override String get commonInDevelopment => 'قيد التطوير';
   @override String get commonSeeLess => 'عرض أقل';
@@ -591,7 +601,7 @@ class AppStringsAr implements AppStrings {
   }
   @override String memberSince(String date) => 'عضو منذ $date';
   @override String settingsUpdateAvailable(String v) => 'الإصدار v$v متاح';
-  @override String settingsUpdateBanner(String v) => 'تحديث — v$v';
+  @override String settingsUpdateBanner(String v) => 'تحديث v$v';
   @override String setupWelcome(String username) => 'مرحبًا، $username!';
   @override String setupScrobblesToImport(String c) => '$c تشغيلة للاستيراد';
   @override String dashUpdateTitle(String version, bool isBeta) =>
