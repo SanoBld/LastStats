@@ -79,7 +79,7 @@
     final list = (result as JSArray&lt;JSAny?&gt;).toDart;
     int total = 0;
     for (final v in list) {
-      if (v is JSString) total += v.toDart.length * 2;
+      if (v.isA&lt;JSString&gt;()) total += (v as JSString).toDart.length * 2;
     }
     return total;
   } catch (_) {

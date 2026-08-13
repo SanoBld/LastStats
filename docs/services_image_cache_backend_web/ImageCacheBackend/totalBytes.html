@@ -75,8 +75,8 @@
     if (result == null || result.isUndefinedOrNull) return 0;
     int total = 0;
     for (final v in (result as JSArray&lt;JSAny?&gt;).toDart) {
-      if (v is JSUint8Array) total += v.toDart.length;
-      if (v is JSString)     total += v.toDart.length * 2; &#47;&#47; meta string
+      if (v.isA&lt;JSUint8Array&gt;()) total += (v as JSUint8Array).toDart.length;
+      if (v.isA&lt;JSString&gt;())     total += (v as JSString).toDart.length * 2; &#47;&#47; meta string
     }
     return total;
   } catch (_) { return 0; }
