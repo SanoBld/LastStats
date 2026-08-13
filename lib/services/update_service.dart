@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ffi' show Abi;
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -14,7 +15,29 @@ class UpdateService {
   static const _repo  = 'LastStats';
 
   static String currentVersion = '0.0.0';
+  static String currentBuildNumber = '';
   static bool _initialized = false;
+
+  // True for a locally-built/debug run (not an official release build).
+  // Used to label the installed version as "dev" instead of pretending it
+  // matches a specific GitHub release tag.
+  static bool get isDevBuild => kDebugMode;
+
+  // True for a CI build that was made without an explicit version input
+  // (e.g. an ad-hoc GitHub Actions run). The workflow tags those builds as
+  // "0.0.0-dev.<run>" instead of reusing the stale pubspec.yaml version, so
+  // the app can tell "no real version" apart from "a real release".
+  static bool get isUnknownVersion =>
+      currentVersion == '0.0.0' || currentVersion.contains('-dev');
+
+  // Best string to show for the installed version, or null when there is no
+  // genuine version to show (ad-hoc CI build). Callers should hide the
+  // version entirely in that case rather than display a misleading number.
+  static String? get displayVersion {
+    if (isDevBuild) return 'v$currentVersion (dev)';
+    if (isUnknownVersion) return null;
+    return 'v$currentVersion';
+  }
 
   static Future<void> init() async {
     if (_initialized) return;
@@ -22,8 +45,15 @@ class UpdateService {
     try {
       final info = await PackageInfo.fromPlatform();
       if (info.version.isNotEmpty) currentVersion = info.version;
+      currentBuildNumber = info.buildNumber;
     } catch (_) {}
   }
+
+  // A release only counts as "the one currently installed" when the version
+  // matches AND we actually have a genuine, known version, since dev/ad-hoc
+  // builds are never actually published as a GitHub release.
+  static bool isInstalledRelease(String releaseVersion) =>
+      !isDevBuild && !isUnknownVersion && releaseVersion == currentVersion;
 
   static const _timeout = Duration(seconds: 10);
 

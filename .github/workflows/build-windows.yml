@@ -37,7 +37,11 @@ jobs:
           if [ -n "${{ inputs.version }}" ]; then
             VERSION="${{ inputs.version }}"
           else
-            VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
+            # No explicit version means this is an ad-hoc/dev build, not a
+            # real release: tag it as such instead of reusing the (possibly
+            # stale) pubspec.yaml version, so the app never claims to be a
+            # release it isn't.
+            VERSION="0.0.0-dev.${{ github.run_number }}"
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
@@ -104,7 +108,11 @@ jobs:
           if [ -n "${{ inputs.version }}" ]; then
             VERSION="${{ inputs.version }}"
           else
-            VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
+            # No explicit version means this is an ad-hoc/dev build, not a
+            # real release: tag it as such instead of reusing the (possibly
+            # stale) pubspec.yaml version, so the app never claims to be a
+            # release it isn't.
+            VERSION="0.0.0-dev.${{ github.run_number }}"
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 

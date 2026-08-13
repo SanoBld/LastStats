@@ -64,8 +64,8 @@ class AppStringsEn implements AppStrings {
   @override String get rankingsAllYears  => 'All years';
 
   @override String get chartsTitle              => 'Charts';
-  @override String get chartsMonthly            => 'Scrobbles — 12 months';
-  @override String get chartsArtistDist         => 'Top artists — breakdown';
+  @override String get chartsMonthly            => 'Scrobbles (12 months)';
+  @override String get chartsArtistDist         => 'Top artists (breakdown)';
   @override String get chartsMainstreamTitle    => 'Mainstream vs Hidden gems';
   @override String get chartsMainstreamSubtitle => 'Global popularity of your favourite artists.';
   @override String get chartsCompute            => 'Compute';
@@ -192,7 +192,7 @@ class AppStringsEn implements AppStrings {
   @override String get settingsUpToDate          => 'Up to date';
   @override String settingsUpdateAvailable(String v) => 'v$v available';
   @override String get settingsCheckFailed       => 'Check failed.';
-  @override String settingsUpdateBanner(String v) => 'Update — v$v';
+  @override String settingsUpdateBanner(String v) => 'Update v$v';
   @override String get settingsDownload          => 'Download';
   @override String get settingsViewRelease       => 'View';
   @override String get settingsAbout             => 'About';
@@ -365,7 +365,7 @@ class AppStringsEn implements AppStrings {
   @override String get setupGetApiKey              => 'Get a free API key';
   @override String setupScrobblesToImport(String c) => '$c scrobbles to import';
   @override String get setupWelcomeBanner          => 'Welcome to LastStats!';
-  @override String get setupOneTimeImportNote      => 'One-time import — future launches will be instant.';
+  @override String get setupOneTimeImportNote      => 'One-time import, future launches will be instant.';
 
   @override String get dashTapToDownload           => 'Tap to download.';
   @override String dashUpdateTitle(String version, bool isBeta) =>
@@ -476,7 +476,7 @@ class AppStringsEn implements AppStrings {
 
   @override String get dashAnimationBlurSection  => 'Animation & Blur';
   @override String get dashMusicAnimationTitle   => 'Music animation';
-  @override String get dashMusicAnimationSub     => 'When music is playing, the header image slowly blurs and drifts — like Apple Music.';
+  @override String get dashMusicAnimationSub     => 'When music is playing, the header image slowly blurs and drifts, like Apple Music.';
   @override String get dashMusicAnimationInfo    => 'Blur is set automatically when this mode is active. The blur slider above has no effect while music is playing.';
 
   @override String get settingsTopAlbumsSection  => 'Top Albums';
@@ -618,7 +618,7 @@ class AppStringsEn implements AppStrings {
   @override String get faqQ2 => 'Is an iOS version planned?';
   @override String get faqA2 => 'No. An iOS version is not planned at this time.';
   @override String get faqQ3 => 'Does the app work on macOS or other platforms?';
-  @override String get faqA3 => 'LastStats Mobile is developed and tested on Android. Behaviour on other platforms (macOS, Windows, Linux…) is unverified — bugs or unexpected behaviour may occur.';
+  @override String get faqA3 => 'LastStats Mobile is developed and tested on Android. Behaviour on other platforms (macOS, Windows, Linux…) is unverified, bugs or unexpected behaviour may occur.';
   @override String get faqQ4 => 'Is LastStats open source?';
   @override String get faqA4 => 'Yes! The source code is freely available on GitHub. The project is independent, built with passion by SanoBld. Feel free to contribute, report bugs, or leave a star ⭐.';
   @override String get faqQ5 => 'Where is my data stored?';
@@ -629,6 +629,16 @@ class AppStringsEn implements AppStrings {
   @override String get faqA7 => 'A scrobble is a track logged as played on your Last.fm account \u2014 it\'s Last.fm\'s own term for \'one counted listen\'. All your totals (top artists, stats, etc.) are based on it.';
   @override String get faqQ8 => 'How do levels and achievements work?';
   @override String get faqA8 => 'Your account level grows with your total scrobble count (there\'s no max level). Cards also get a border (bronze \u2192 iridescent) based on how many times that artist/track/album has been played. Everything is computed automatically from stats already cached locally, with no extra network calls.';
+  @override String get faqQ9 => 'How does eco mode work?';
+  @override String get faqA9 => 'Eco mode spaces out automatic syncs to save battery. You can turn it on manually or let the app enable it itself based on battery level, from Settings > General.';
+  @override String get faqQ10 => 'How do I back up or restore my data?';
+  @override String get faqA10 => 'Go to Settings > Backup. You can export a backup file (with or without your Last.fm key) and re-import it later or on another device.';
+  @override String get faqQ11 => 'Does the app work offline?';
+  @override String get faqA11 => 'Yes, to some extent. Stats already loaded stay available offline thanks to local caching, but a connection is still needed to fetch new scrobbles.';
+  @override String get faqQ12 => 'Can I switch Last.fm accounts?';
+  @override String get faqA12 => 'Yes. From Settings > Account, sign out and sign back in with a different username. The local cache is automatically reset to avoid mixing data.';
+  @override String get faqQ13 => 'How do I set up notifications?';
+  @override String get faqA13 => 'From Settings > Notifications, you can enable sync-complete alerts, choose how often they appear, or turn them off entirely.';
   @override String get settingsPlatformDisabledByShowAll => 'Disabled: all links are already shown.';
   @override String get commonInDevelopment => 'In development';
   @override String get commonSeeLess => 'See less';

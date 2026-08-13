@@ -64,8 +64,8 @@ class AppStringsEs implements AppStrings {
   @override String get rankingsAllYears  => 'Todos los años';
 
   @override String get chartsTitle              => 'Gráficos';
-  @override String get chartsMonthly            => 'Scrobbles — 12 meses';
-  @override String get chartsArtistDist         => 'Top artistas — distribución';
+  @override String get chartsMonthly            => 'Scrobbles (12 meses)';
+  @override String get chartsArtistDist         => 'Top artistas (distribución)';
   @override String get chartsMainstreamTitle    => 'Mainstream vs Joyas ocultas';
   @override String get chartsMainstreamSubtitle => 'Popularidad mundial de tus artistas favoritos.';
   @override String get chartsCompute            => 'Calcular';
@@ -192,7 +192,7 @@ class AppStringsEs implements AppStrings {
   @override String get settingsUpToDate          => 'Actualizado';
   @override String settingsUpdateAvailable(String v) => 'v$v disponible';
   @override String get settingsCheckFailed       => 'No se pudo verificar.';
-  @override String settingsUpdateBanner(String v) => 'Actualización — v$v';
+  @override String settingsUpdateBanner(String v) => 'Actualización v$v';
   @override String get settingsDownload          => 'Descargar';
   @override String get settingsViewRelease       => 'Ver';
   @override String get settingsAbout             => 'Acerca de';
@@ -365,7 +365,7 @@ class AppStringsEs implements AppStrings {
   @override String get setupGetApiKey              => 'Obtener una clave API gratis';
   @override String setupScrobblesToImport(String c) => '$c scrobbles por importar';
   @override String get setupWelcomeBanner          => '¡Bienvenido a LastStats!';
-  @override String get setupOneTimeImportNote      => 'Importación única — los próximos inicios serán instantáneos.';
+  @override String get setupOneTimeImportNote      => 'Importación única, los próximos inicios serán instantáneos.';
 
   @override String get dashTapToDownload           => 'Toca para descargar.';
   @override String dashUpdateTitle(String version, bool isBeta) =>
@@ -618,7 +618,7 @@ class AppStringsEs implements AppStrings {
   @override String get faqQ2 => '¿Está prevista una versión para iOS?';
   @override String get faqA2 => 'No. Por ahora no hay una versión para iOS prevista.';
   @override String get faqQ3 => '¿La app funciona en macOS u otras plataformas?';
-  @override String get faqA3 => 'LastStats Mobile se desarrolla y prueba en Android. El funcionamiento en otras plataformas (macOS, Windows, Linux…) no está verificado — pueden producirse errores o comportamientos inesperados.';
+  @override String get faqA3 => 'LastStats Mobile se desarrolla y prueba en Android. El funcionamiento en otras plataformas (macOS, Windows, Linux…) no está verificado, pueden producirse errores o comportamientos inesperados.';
   @override String get faqQ4 => '¿LastStats es de código abierto?';
   @override String get faqA4 => '¡Sí! El código fuente está disponible libremente en GitHub. El proyecto es independiente, hecho con pasión por SanoBld. Puedes contribuir, reportar errores o simplemente dejar una estrella ⭐.';
   @override String get faqQ5 => '¿Dónde se almacenan mis datos?';
@@ -629,6 +629,16 @@ class AppStringsEs implements AppStrings {
   @override String get faqA7 => 'Un scrobble es una canci\u00f3n registrada como escuchada en tu cuenta de Last.fm; es el t\u00e9rmino propio de Last.fm para \'una escucha contada\'. Todos tus totales (artistas top, estad\u00edsticas, etc.) se basan en ello.';
   @override String get faqQ8 => '\u00bfC\u00f3mo funcionan los niveles y los logros?';
   @override String get faqA8 => 'Tu nivel de cuenta crece con tu total de scrobbles (no hay nivel m\u00e1ximo). Las tarjetas tambi\u00e9n muestran un borde (bronce \u2192 iridiscente) seg\u00fan las veces que se ha escuchado ese artista/canci\u00f3n/\u00e1lbum. Todo se calcula autom\u00e1ticamente a partir de estad\u00edsticas ya guardadas en cach\u00e9, sin llamadas de red adicionales.';
+  @override String get faqQ9 => '¿Cómo funciona el modo ahorro?';
+  @override String get faqA9 => 'El modo ahorro espacia las sincronizaciones automáticas para ahorrar batería. Puedes activarlo manualmente o dejar que la app lo haga sola según el nivel de batería, desde Ajustes > General.';
+  @override String get faqQ10 => '¿Cómo hago una copia de seguridad o la restauro?';
+  @override String get faqA10 => 'Ve a Ajustes > Copia de seguridad. Puedes exportar un archivo de copia (con o sin tu clave de Last.fm) y volver a importarlo más tarde o en otro dispositivo.';
+  @override String get faqQ11 => '¿Funciona la app sin conexión?';
+  @override String get faqA11 => 'Sí, hasta cierto punto. Las estadísticas ya cargadas siguen disponibles sin conexión gracias a la caché local, pero se necesita conexión para obtener nuevos scrobbles.';
+  @override String get faqQ12 => '¿Puedo cambiar de cuenta de Last.fm?';
+  @override String get faqA12 => 'Sí. Desde Ajustes > Cuenta, cierra sesión y vuelve a iniciarla con otro nombre de usuario. La caché local se reinicia automáticamente para evitar mezclar datos.';
+  @override String get faqQ13 => '¿Cómo configuro las notificaciones?';
+  @override String get faqA13 => 'Desde Ajustes > Notificaciones, puedes activar los avisos de sincronización completada, elegir su frecuencia o desactivarlos por completo.';
   @override String get settingsPlatformDisabledByShowAll => 'Desactivado: ya se muestran todos los enlaces.';
   @override String get commonInDevelopment => 'En desarrollo';
   @override String get commonSeeLess => 'Ver menos';

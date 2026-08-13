@@ -59,8 +59,8 @@ class AppStringsDe implements AppStrings {
   @override String get rankingsContinued => 'Restliche Rangliste';
   @override String get rankingsAllYears => 'Alle Jahre';
   @override String get chartsTitle => 'Charts';
-  @override String get chartsMonthly => 'Scrobbles — 12 Monate';
-  @override String get chartsArtistDist => 'Top-Künstler — Aufteilung';
+  @override String get chartsMonthly => 'Scrobbles (12 Monate)';
+  @override String get chartsArtistDist => 'Top-Künstler (Aufteilung)';
   @override String get chartsMainstreamTitle => 'Mainstream vs. Geheimtipps';
   @override String get chartsMainstreamSubtitle => 'Globale Popularität deiner Lieblingskünstler.';
   @override String get chartsCompute => 'Berechnen';
@@ -326,7 +326,7 @@ class AppStringsDe implements AppStrings {
   @override String get setupRememberMe => 'Angemeldet bleiben';
   @override String get setupGetApiKey => 'Kostenlosen API-Schlüssel holen';
   @override String get setupWelcomeBanner => 'Willkommen bei LastStats!';
-  @override String get setupOneTimeImportNote => 'Einmaliger Import — künftige Starts sind sofort.';
+  @override String get setupOneTimeImportNote => 'Einmaliger Import, künftige Starts sind sofort.';
   @override String get dashTapToDownload => 'Zum Herunterladen tippen.';
   @override String get dashWeekLabel => 'DIESE WOCHE';
   @override String get dashMonthLabel => 'DIESER MONAT';
@@ -425,7 +425,7 @@ class AppStringsDe implements AppStrings {
   @override String get fallbackWillShowCustomUrl => 'Wird angezeigt: eigene Bild-URL';
   @override String get dashAnimationBlurSection => 'Animation & Weichzeichnung';
   @override String get dashMusicAnimationTitle => 'Musikanimation';
-  @override String get dashMusicAnimationSub => 'Während Musik läuft, verschwimmt und bewegt sich das Kopfbild sanft — wie bei Apple Music.';
+  @override String get dashMusicAnimationSub => 'Während Musik läuft, verschwimmt und bewegt sich das Kopfbild sanft, wie bei Apple Music.';
   @override String get dashMusicAnimationInfo => 'Die Weichzeichnung wird in diesem Modus automatisch eingestellt. Der obige Regler hat keine Wirkung, während Musik läuft.';
   @override String get settingsTopAlbumsSection => 'Top-Alben';
   @override String get dashRecentPlaysLabel => 'Letzte Wiedergaben';
@@ -554,7 +554,7 @@ class AppStringsDe implements AppStrings {
   @override String get faqQ2 => 'Ist eine iOS-Version geplant?';
   @override String get faqA2 => 'Nein. Eine iOS-Version ist derzeit nicht geplant.';
   @override String get faqQ3 => 'Funktioniert die App unter macOS oder anderen Plattformen?';
-  @override String get faqA3 => 'LastStats Mobile wird auf Android entwickelt und getestet. Das Verhalten auf anderen Plattformen (macOS, Windows, Linux…) ist nicht überprüft — Fehler oder unerwartetes Verhalten sind möglich.';
+  @override String get faqA3 => 'LastStats Mobile wird auf Android entwickelt und getestet. Das Verhalten auf anderen Plattformen (macOS, Windows, Linux…) ist nicht überprüft, Fehler oder unerwartetes Verhalten sind möglich.';
   @override String get faqQ4 => 'Ist LastStats Open Source?';
   @override String get faqA4 => 'Ja! Der Quellcode ist frei auf GitHub verfügbar. Das Projekt ist unabhängig und wird mit Leidenschaft von SanoBld entwickelt. Du kannst gerne beitragen, Fehler melden oder einfach einen Stern ⭐ dalassen.';
   @override String get faqQ5 => 'Wo werden meine Daten gespeichert?';
@@ -565,6 +565,16 @@ class AppStringsDe implements AppStrings {
   @override String get faqA7 => 'Ein Scrobble ist ein Titel, der als geh\u00f6rt auf deinem Last.fm-Konto erfasst wird \u2014 das ist Last.fms eigener Begriff f\u00fcr \'ein gez\u00e4hltes Abspielen\'. Alle deine Gesamtwerte (Top-Interpreten, Statistiken usw.) basieren darauf.';
   @override String get faqQ8 => 'Wie funktionieren Level und Erfolge?';
   @override String get faqA8 => 'Dein Kontolevel steigt mit deiner Gesamtzahl an Scrobbles (es gibt kein H\u00f6chstlevel). Karten erhalten au\u00dferdem einen Rahmen (Bronze \u2192 schillernd), je nachdem wie oft der jeweilige Interpret/Titel/das Album gespielt wurde. Alles wird automatisch aus bereits lokal zwischengespeicherten Statistiken berechnet, ohne zus\u00e4tzliche Netzwerkaufrufe.';
+  @override String get faqQ9 => 'Wie funktioniert der Energiesparmodus?';
+  @override String get faqA9 => 'Der Energiesparmodus verlängert die Abstände zwischen automatischen Synchronisierungen, um Akku zu sparen. Du kannst ihn manuell aktivieren oder die App ihn je nach Akkustand selbst einschalten lassen, unter Einstellungen > Allgemein.';
+  @override String get faqQ10 => 'Wie sichere oder stelle ich meine Daten wieder her?';
+  @override String get faqA10 => 'Gehe zu Einstellungen > Sicherung. Du kannst eine Sicherungsdatei exportieren (mit oder ohne deinen Last.fm-Schlüssel) und sie später oder auf einem anderen Gerät wieder importieren.';
+  @override String get faqQ11 => 'Funktioniert die App offline?';
+  @override String get faqA11 => 'Ja, bis zu einem gewissen Grad. Bereits geladene Statistiken bleiben dank lokalem Cache offline verfügbar, für neue Scrobbles ist aber eine Verbindung nötig.';
+  @override String get faqQ12 => 'Kann ich das Last.fm-Konto wechseln?';
+  @override String get faqA12 => 'Ja. Melde dich unter Einstellungen > Konto ab und mit einem anderen Benutzernamen wieder an. Der lokale Cache wird automatisch geleert, damit sich keine Daten vermischen.';
+  @override String get faqQ13 => 'Wie richte ich Benachrichtigungen ein?';
+  @override String get faqA13 => 'Unter Einstellungen > Benachrichtigungen kannst du Hinweise nach abgeschlossener Synchronisierung aktivieren, ihre Häufigkeit wählen oder sie ganz ausschalten.';
   @override String get settingsPlatformDisabledByShowAll => 'Deaktiviert: Es werden bereits alle Links angezeigt.';
   @override String get commonInDevelopment => 'In Entwicklung';
   @override String get commonSeeLess => 'Weniger anzeigen';
@@ -591,7 +601,7 @@ class AppStringsDe implements AppStrings {
   }
   @override String memberSince(String date) => 'Mitglied seit $date';
   @override String settingsUpdateAvailable(String v) => 'v$v verfügbar';
-  @override String settingsUpdateBanner(String v) => 'Update — v$v';
+  @override String settingsUpdateBanner(String v) => 'Update v$v';
   @override String setupWelcome(String username) => 'Willkommen, $username!';
   @override String setupScrobblesToImport(String c) => '$c Scrobbles zu importieren';
   @override String dashUpdateTitle(String version, bool isBeta) =>
