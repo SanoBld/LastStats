@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the isInstalledRelease method from the UpdateService class, for the Dart programming language.">
-  <title>isInstalledRelease method - UpdateService class - update_service library - Dart API</title>
+  <meta name="description" content="API docs for the displayVersion property from the UpdateService class, for the Dart programming language.">
+  <title>displayVersion property - UpdateService class - update_service library - Dart API</title>
 
 
   
@@ -27,9 +27,9 @@
     <li><a href="../../index.html">laststats_mobile</a></li>
     <li><a href="../../services_update_service/">services&#47;update_service.dart</a></li>
     <li><a href="../../services_update_service/UpdateService-class.html">UpdateService</a></li>
-    <li class="self-crumb">isInstalledRelease static method</li>
+    <li class="self-crumb">displayVersion property</li>
   </ol>
-  <div class="self-name">isInstalledRelease</div>
+  <div class="self-name">displayVersion</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -49,32 +49,40 @@
     data-above-sidebar="services_update_service&#47;UpdateService-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">isInstalledRelease</span> static method 
+<h1><span class="kind-property">displayVersion</span> property 
 </h1></div>
 
+    
+
+    
+        
+  <section id="getter">
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
-<span class="name ">isInstalledRelease</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="isInstalledRelease-param-releaseVersion"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">releaseVersion</span></span></li>
-</ol>)
-
+      <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span>
+      get
+      <span class="name ">displayVersion</span>
       
 
     </section>
     
 
-
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static bool isInstalledRelease(String releaseVersion) =&gt;
-    !isDevBuild &amp;&amp; !isUnknownVersion &amp;&amp; releaseVersion == currentVersion;</code></pre>
+  <pre class="language-dart"><code class="language-dart">static String? get displayVersion {
+  if (isDevBuild) return &#39;v$currentVersion (dev)&#39;;
+  if (isUnknownVersion) return null;
+  return &#39;v$currentVersion&#39;;
+}</code></pre>
 </section>
 
+  </section>
 
-  </div> <!-- /.main-content -->
-  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
-    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+
+</div> <!-- /.main-content -->
+<div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+  <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
 <header id="header-search-sidebar" class="hidden-l">
   <form class="search-sidebar" role="search">
     <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
@@ -84,13 +92,13 @@
     <li><a href="../../index.html">laststats_mobile</a></li>
     <li><a href="../../services_update_service/">update_service</a></li>
     <li><a href="../../services_update_service/UpdateService-class.html">UpdateService</a></li>
-    <li class="self-crumb">isInstalledRelease static method</li>
+    <li class="self-crumb">displayVersion property</li>
 </ol>
 
-    <h5>UpdateService class</h5>
-    <div id="dartdoc-sidebar-left-content"></div>
-  </div><!--/.sidebar-offcanvas-->
-  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  <h5>UpdateService class</h5>
+  <div id="dartdoc-sidebar-left-content"></div>
+</div><!--/.sidebar-offcanvas-->
+<div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
 </div><!--/.sidebar-offcanvas-->
 </main>
 <footer>

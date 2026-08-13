@@ -132,9 +132,7 @@ Widget build(BuildContext context) {
         Text(&#39;LastStats&#39;,
             style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
         const SizedBox(height: 4),
-        Text(UpdateService.isDevBuild
-                ? &#39;v${UpdateService.currentVersion} (dev)&#39;
-                : &#39;v${UpdateService.currentVersion}&#39;,
+        Text(UpdateService.displayVersion ?? &#39;dev&#39;,
             style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
         const SizedBox(height: 4),
         Text(L.aboutTagline,
@@ -167,9 +165,7 @@ Widget build(BuildContext context) {
           leading: const Icon(Icons.info_outline_rounded),
           title: Text(L.settingsVersion,
               style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-          trailing: Text(UpdateService.isDevBuild
-                  ? &#39;v${UpdateService.currentVersion} (dev)&#39;
-                  : &#39;v${UpdateService.currentVersion}&#39;,
+          trailing: Text(UpdateService.displayVersion ?? &#39;dev&#39;,
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
         ),
         const Divider(height: 1, indent: 16, endIndent: 16),
