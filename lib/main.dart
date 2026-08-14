@@ -303,17 +303,17 @@ class LastStatsApp extends StatelessWidget {
                                 final ColorScheme lightScheme =
                                     (useDynamic && lightDynamic != null)
                                         ? lightDynamic.harmonized()
-                                        : ColorScheme.fromSeed(
+                                        : neutralizeIfGraySeed(ColorScheme.fromSeed(
                                             seedColor:  seedColorForScheme(accent),
                                             brightness: Brightness.light,
-                                          );
+                                          ), accent);
                                 final ColorScheme darkSchemeBase =
                                     (useDynamic && darkDynamic != null)
                                         ? darkDynamic.harmonized()
-                                        : ColorScheme.fromSeed(
+                                        : neutralizeIfGraySeed(ColorScheme.fromSeed(
                                             seedColor:  seedColorForScheme(accent),
                                             brightness: Brightness.dark,
-                                          );
+                                          ), accent);
                                 final ColorScheme darkScheme = oled
                                     ? darkSchemeBase.copyWith(
                                         surface:                 Colors.black,

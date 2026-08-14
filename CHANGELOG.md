@@ -48,3 +48,4 @@
 
 **Performance**
 - General app optimization, faster and smoother overall
+

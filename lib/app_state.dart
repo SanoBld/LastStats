@@ -152,8 +152,50 @@ String colorToHex(Color c) {
 /// Returns the seed color to pass to ColorScheme.fromSeed.
 ///
 /// Any color, including pure black and white, is passed through unchanged.
-/// Material's HCT-based tonal palette generation handles zero-chroma seeds
-/// fine and produces a true neutral gray scale, no need to substitute a
-/// blue-grey stand-in for black/white as before (which is exactly why
-/// "black" and "white" used to look faintly blue-tinted).
 Color seedColorForScheme(Color c) => c;
+
+/// True for colors with (near) zero saturation: black, white, and grays.
+bool isNeutralColor(Color c) => HSLColor.fromColor(c).saturation < 0.03;
+
+/// Strips any hue from [c], keeping only its lightness, so it reads as a
+/// true neutral gray (same lightness, zero saturation).
+Color _toNeutralGray(Color c) =>
+    HSLColor.fromColor(c).withSaturation(0).withHue(0).toColor();
+
+/// Material's HCT-based ColorScheme.fromSeed bakes in a faint hue (often
+/// blue/purple) even for a seed with zero chroma — a float-rounding quirk
+/// in the underlying HCT conversion, not something under our control. When
+/// the user picked a true black/white/gray accent, that tint is exactly
+/// the "everything looks bluish" bug: this strips it back out of every
+/// scheme field that would otherwise carry it, without touching schemes
+/// built from an actually-colored seed.
+ColorScheme neutralizeIfGraySeed(ColorScheme scheme, Color seed) {
+  if (!isNeutralColor(seed)) return scheme;
+  return scheme.copyWith(
+    primary:                 _toNeutralGray(scheme.primary),
+    onPrimary:               _toNeutralGray(scheme.onPrimary),
+    primaryContainer:        _toNeutralGray(scheme.primaryContainer),
+    onPrimaryContainer:      _toNeutralGray(scheme.onPrimaryContainer),
+    secondary:               _toNeutralGray(scheme.secondary),
+    onSecondary:             _toNeutralGray(scheme.onSecondary),
+    secondaryContainer:      _toNeutralGray(scheme.secondaryContainer),
+    onSecondaryContainer:    _toNeutralGray(scheme.onSecondaryContainer),
+    tertiary:                _toNeutralGray(scheme.tertiary),
+    onTertiary:              _toNeutralGray(scheme.onTertiary),
+    tertiaryContainer:       _toNeutralGray(scheme.tertiaryContainer),
+    onTertiaryContainer:     _toNeutralGray(scheme.onTertiaryContainer),
+    outline:                 _toNeutralGray(scheme.outline),
+    outlineVariant:          _toNeutralGray(scheme.outlineVariant),
+    surfaceTint:             _toNeutralGray(scheme.surfaceTint),
+    surface:                 _toNeutralGray(scheme.surface),
+    surfaceDim:              _toNeutralGray(scheme.surfaceDim),
+    surfaceBright:           _toNeutralGray(scheme.surfaceBright),
+    surfaceContainerLowest:  _toNeutralGray(scheme.surfaceContainerLowest),
+    surfaceContainerLow:     _toNeutralGray(scheme.surfaceContainerLow),
+    surfaceContainer:        _toNeutralGray(scheme.surfaceContainer),
+    surfaceContainerHigh:    _toNeutralGray(scheme.surfaceContainerHigh),
+    surfaceContainerHighest: _toNeutralGray(scheme.surfaceContainerHighest),
+    onSurface:               _toNeutralGray(scheme.onSurface),
+    onSurfaceVariant:        _toNeutralGray(scheme.onSurfaceVariant),
+  );
+}

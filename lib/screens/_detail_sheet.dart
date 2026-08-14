@@ -196,10 +196,10 @@ class _CardBack extends StatelessWidget {
 ({ColorScheme scheme, Color surface}) _artworkScheme(
   ColorScheme base, Color artworkColor,
 ) {
-  final seeded = ColorScheme.fromSeed(
+  final seeded = neutralizeIfGraySeed(ColorScheme.fromSeed(
     seedColor:  seedColorForScheme(artworkColor),
     brightness: base.brightness,
-  );
+  ), artworkColor);
   final scheme = base.copyWith(
     primary:                 seeded.primary,
     onPrimary:               seeded.onPrimary,
