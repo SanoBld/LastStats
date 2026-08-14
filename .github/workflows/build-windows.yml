@@ -28,7 +28,7 @@ jobs:
     env:
       VERSION: ''
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
@@ -92,7 +92,7 @@ jobs:
     env:
       VERSION: ''
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       # subosito/flutter-action can't resolve a "stable" SDK build for the
       # arm64 architecture on this runner ("Unable to determine Flutter

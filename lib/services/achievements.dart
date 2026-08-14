@@ -4,6 +4,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../app_state.dart';
 
 // Single shared clock driving the "moving sheen" on tier badges/surfaces.
@@ -181,7 +182,32 @@ CardTier profileTier(int unlockedCount) {
   return best;
 }
 
-enum AchvCategory { listening, artists, albums, tracks, loyalty, pace, streak, marathon }
+// Cached at startup (see main.dart) so the achievements sheet — a
+// StatelessWidget built synchronously — can read social/comparison counts
+// without an extra async round-trip.
+class AchievementsExtras {
+  AchievementsExtras._();
+
+  static int friendsCount = 0;
+  static int comparisonsCount = 0;
+
+  static Future<void> init() async {
+    final p = await SharedPreferences.getInstance();
+    friendsCount = (p.getStringList('ls_fav_profiles') ?? []).length;
+    comparisonsCount = p.getInt('ls_comparisons_count') ?? 0;
+  }
+
+  // Called once per completed (non-self) taste comparison. Kept as a
+  // simple incrementing counter, not a set of usernames, so re-comparing
+  // the same friend still counts as engagement.
+  static Future<void> recordComparison() async {
+    final p = await SharedPreferences.getInstance();
+    comparisonsCount += 1;
+    await p.setInt('ls_comparisons_count', comparisonsCount);
+  }
+}
+
+enum AchvCategory { listening, artists, albums, tracks, loyalty, pace, streak, marathon, social, comparisons }
 
 class AchievementDef {
   final String id;
@@ -274,6 +300,26 @@ const kAchievements = <AchievementDef>[
   AchievementDef('m7', AchvCategory.marathon, 500,  CardTier.diamond,    Icons.bolt_rounded),
   AchievementDef('m8', AchvCategory.marathon, 750,  CardTier.chrome,     Icons.bolt_rounded),
   AchievementDef('m9', AchvCategory.marathon, 1000, CardTier.iridescent, Icons.bolt_rounded),
+  // Social — number of friends/profiles added.
+  AchievementDef('so1', AchvCategory.social, 1,  CardTier.bronze,     Icons.people_alt_rounded),
+  AchievementDef('so2', AchvCategory.social, 3,  CardTier.silver,     Icons.people_alt_rounded),
+  AchievementDef('so3', AchvCategory.social, 5,  CardTier.gold,       Icons.people_alt_rounded),
+  AchievementDef('so4', AchvCategory.social, 10, CardTier.platinum,   Icons.people_alt_rounded),
+  AchievementDef('so5', AchvCategory.social, 15, CardTier.emerald,    Icons.people_alt_rounded),
+  AchievementDef('so6', AchvCategory.social, 20, CardTier.sapphire,   Icons.people_alt_rounded),
+  AchievementDef('so7', AchvCategory.social, 30, CardTier.diamond,    Icons.people_alt_rounded),
+  AchievementDef('so8', AchvCategory.social, 50, CardTier.chrome,     Icons.people_alt_rounded),
+  AchievementDef('so9', AchvCategory.social, 100, CardTier.iridescent, Icons.people_alt_rounded),
+  // Comparisons — number of taste comparisons run against other profiles.
+  AchievementDef('c1', AchvCategory.comparisons, 1,   CardTier.bronze,     Icons.compare_arrows_rounded),
+  AchievementDef('c2', AchvCategory.comparisons, 5,   CardTier.silver,     Icons.compare_arrows_rounded),
+  AchievementDef('c3', AchvCategory.comparisons, 10,  CardTier.gold,       Icons.compare_arrows_rounded),
+  AchievementDef('c4', AchvCategory.comparisons, 25,  CardTier.platinum,   Icons.compare_arrows_rounded),
+  AchievementDef('c5', AchvCategory.comparisons, 50,  CardTier.emerald,    Icons.compare_arrows_rounded),
+  AchievementDef('c6', AchvCategory.comparisons, 75,  CardTier.sapphire,   Icons.compare_arrows_rounded),
+  AchievementDef('c7', AchvCategory.comparisons, 100, CardTier.diamond,    Icons.compare_arrows_rounded),
+  AchievementDef('c8', AchvCategory.comparisons, 200, CardTier.chrome,     Icons.compare_arrows_rounded),
+  AchievementDef('c9', AchvCategory.comparisons, 500, CardTier.iridescent, Icons.compare_arrows_rounded),
 ];
 
 class AchievementProgress {
@@ -294,16 +340,20 @@ List<AchievementProgress> computeAchievements({
   required int weeklyAvg,
   int bestStreakDays = 0,   // own account only — 0 for friends (no raw history)
   int bestDayScrobbles = 0, // own account only — 0 for friends
+  int friendsCount = 0,
+  int comparisonsCount = 0,
 }) {
   int currentFor(AchvCategory c) => switch (c) {
-    AchvCategory.listening => totalScrobbles,
-    AchvCategory.artists   => artistCount,
-    AchvCategory.albums    => albumCount,
-    AchvCategory.tracks    => trackCount,
-    AchvCategory.loyalty   => yearsRegistered,
-    AchvCategory.pace      => weeklyAvg,
-    AchvCategory.streak    => bestStreakDays,
-    AchvCategory.marathon  => bestDayScrobbles,
+    AchvCategory.listening    => totalScrobbles,
+    AchvCategory.artists      => artistCount,
+    AchvCategory.albums       => albumCount,
+    AchvCategory.tracks       => trackCount,
+    AchvCategory.loyalty      => yearsRegistered,
+    AchvCategory.pace         => weeklyAvg,
+    AchvCategory.streak       => bestStreakDays,
+    AchvCategory.marathon     => bestDayScrobbles,
+    AchvCategory.social       => friendsCount,
+    AchvCategory.comparisons  => comparisonsCount,
   };
   return kAchievements.map((d) {
     final cur = currentFor(d.category);

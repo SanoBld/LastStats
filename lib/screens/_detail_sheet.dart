@@ -71,6 +71,8 @@ String _achvCategoryLabel(AchvCategory c) => switch (c) {
   AchvCategory.pace      => L.achvCatPace,
   AchvCategory.streak    => L.achvCatStreak,
   AchvCategory.marathon  => L.achvCatMarathon,
+  AchvCategory.social       => L.achvCatSocial,
+  AchvCategory.comparisons  => L.achvCatComparisons,
 };
 
 void _pushFullscreen(BuildContext ctx, String url,
@@ -2580,7 +2582,9 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
       weeklyAvg: weekly,
     ).where((a) =>
         a.def.category != AchvCategory.streak &&
-        a.def.category != AchvCategory.marathon).toList();
+        a.def.category != AchvCategory.marathon &&
+        a.def.category != AchvCategory.social &&
+        a.def.category != AchvCategory.comparisons).toList();
   }
 
   CardTier _profileCardTier() =>

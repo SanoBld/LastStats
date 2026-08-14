@@ -14,7 +14,7 @@ jobs:
   publish-metadata:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       # The release event already includes the list of attached files
       # (assets), so we can read the APK download URLs directly from it —

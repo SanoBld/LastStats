@@ -640,4 +640,10 @@ class AppStringsJa implements AppStrings {
   @override String get achvDescStreak => '1日1回以上再生した連続日数の最長記録。';
   @override String get achvCatMarathon => 'マラソン';
   @override String get achvDescMarathon => '1日の最多再生回数。';
+  @override String get achvCatSocial => 'ソーシャル';
+  @override String get achvDescSocial => '追加した友達またはプロフィールの数。';
+  @override String get achvCatComparisons => '比較';
+  @override String get achvDescComparisons => '行った音楽の好み比較の回数。';
+  @override String get achvUnlockedBadge => '解除済み';
+  @override String get achvLockedBadge => 'ロック中';
 }

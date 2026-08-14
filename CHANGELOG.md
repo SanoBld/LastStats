@@ -30,7 +30,7 @@
 -->
 
 
-## v3.1.0-beta
+## v3.1.0
 
 **Levels & Achievements**
 - New account level system, based on total scrobbles

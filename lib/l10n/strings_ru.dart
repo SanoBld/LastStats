@@ -641,4 +641,10 @@ class AppStringsRu implements AppStrings {
   @override String get achvDescStreak => 'Самая длинная серия дней подряд хотя бы с одним прослушиванием.';
   @override String get achvCatMarathon => 'Марафон';
   @override String get achvDescMarathon => 'Наибольшее число прослушиваний за один день.';
+  @override String get achvCatSocial => 'Общение';
+  @override String get achvDescSocial => 'Количество добавленных друзей или профилей.';
+  @override String get achvCatComparisons => 'Сравнения';
+  @override String get achvDescComparisons => 'Количество выполненных сравнений музыкальных вкусов.';
+  @override String get achvUnlockedBadge => 'Открыто';
+  @override String get achvLockedBadge => 'Заблокировано';
 }

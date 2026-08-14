@@ -150,9 +150,10 @@ String colorToHex(Color c) {
 }
 
 /// Returns the seed color to pass to ColorScheme.fromSeed.
-Color seedColorForScheme(Color c) {
-  final luminance = c.computeLuminance();
-  if (luminance < 0.008) return const Color(0xFF455A64);
-  if (luminance > 0.97)  return const Color(0xFF90A4AE);
-  return c;
-}
+///
+/// Any color, including pure black and white, is passed through unchanged.
+/// Material's HCT-based tonal palette generation handles zero-chroma seeds
+/// fine and produces a true neutral gray scale, no need to substitute a
+/// blue-grey stand-in for black/white as before (which is exactly why
+/// "black" and "white" used to look faintly blue-tinted).
+Color seedColorForScheme(Color c) => c;

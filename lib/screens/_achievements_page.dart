@@ -59,13 +59,18 @@ class _AchievementsSheet extends StatelessWidget {
       albumCount: albums, trackCount: tracks,
       yearsRegistered: _yearsSince(userInfo?['registered']), weeklyAvg: weekly,
       bestStreakDays: bestStreak, bestDayScrobbles: bestDay,
+      friendsCount: AchievementsExtras.friendsCount,
+      comparisonsCount: AchievementsExtras.comparisonsCount,
     );
-    // Friends have no raw history — don't judge them on categories they
-    // have no data for.
+    // Friends have no raw history, and social/comparison counts are about
+    // the current user's own activity — don't judge friends on categories
+    // they have no data for.
     if (!isSelf) {
       list = list.where((a) =>
           a.def.category != AchvCategory.streak &&
-          a.def.category != AchvCategory.marathon).toList();
+          a.def.category != AchvCategory.marathon &&
+          a.def.category != AchvCategory.social &&
+          a.def.category != AchvCategory.comparisons).toList();
     }
     final unlocked = list.where((a) => a.unlocked).length;
     final myTier   = profileTier(unlocked);
@@ -164,6 +169,8 @@ class _AchvCategoryCard extends StatelessWidget {
     AchvCategory.pace      => (L.achvCatPace,      L.achvDescPace,      Icons.speed_rounded),
     AchvCategory.streak    => (L.achvCatStreak,    L.achvDescStreak,    Icons.local_fire_department_rounded),
     AchvCategory.marathon  => (L.achvCatMarathon,  L.achvDescMarathon,  Icons.bolt_rounded),
+    AchvCategory.social      => (L.achvCatSocial,      L.achvDescSocial,      Icons.people_alt_rounded),
+    AchvCategory.comparisons => (L.achvCatComparisons, L.achvDescComparisons, Icons.compare_arrows_rounded),
   };
 
   @override
@@ -401,8 +408,11 @@ class _AchvCardViewerState extends State<_AchvCardViewer> {
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
                       Icon(icon, size: 60, color: Colors.black87),
                       const SizedBox(height: 14),
+                      Text(_achvCategoryLabel(a.def.category), textAlign: TextAlign.center, style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.w800, color: Colors.black87)),
+                      const SizedBox(height: 2),
                       Text(tierLabel(a.def.tier), style: const TextStyle(
-                          fontSize: 22, fontWeight: FontWeight.w800, color: Colors.black87)),
+                          fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black54)),
                     ]),
                   ),
                 ),
@@ -413,8 +423,11 @@ class _AchvCardViewerState extends State<_AchvCardViewer> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(tierLabel(a.def.tier), style: const TextStyle(
+                      Text(_achvCategoryLabel(a.def.category), style: const TextStyle(
                           color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 4),
+                      Text(tierLabel(a.def.tier), style: const TextStyle(
+                          color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 10),
                       Text('${a.current} / ${a.def.threshold}',
                           style: const TextStyle(color: Colors.white70, fontSize: 15)),
@@ -423,7 +436,7 @@ class _AchvCardViewerState extends State<_AchvCardViewer> {
                         Icon(a.unlocked ? Icons.check_circle_rounded : Icons.lock_outline_rounded,
                             size: 16, color: a.unlocked ? Colors.green : Colors.white38),
                         const SizedBox(width: 6),
-                        Text(a.unlocked ? 'Débloqué' : 'Verrouillé',
+                        Text(a.unlocked ? L.achvUnlockedBadge : L.achvLockedBadge,
                             style: const TextStyle(color: Colors.white54, fontSize: 13)),
                       ]),
                     ],
@@ -504,8 +517,11 @@ class _ShareBadgeArt extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(tierLabel(a.def.tier), style: const TextStyle(
+              Text(_achvCategoryLabel(a.def.category), style: const TextStyle(
                   color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 2),
+              Text(tierLabel(a.def.tier), style: const TextStyle(
+                  color: Colors.white70, fontSize: 15, fontWeight: FontWeight.w600)),
               const SizedBox(height: 4),
               Text('${a.current} / ${a.def.threshold}',
                   style: const TextStyle(color: Colors.white70, fontSize: 15)),

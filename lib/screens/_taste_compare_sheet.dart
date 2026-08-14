@@ -620,6 +620,9 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
         _sharedGenres  = analysis.sharedGenres;
         _loading       = false;
       });
+      // Only real cross-profile comparisons count toward the achievement,
+      // not viewing your own stats through this same screen.
+      if (!isSelf) AchievementsExtras.recordComparison();
     } catch (_) {
       if (!mounted) return;
       setState(() {

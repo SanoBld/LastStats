@@ -15,6 +15,7 @@ import 'services/data_cache.dart';
 import 'services/image_service.dart';
 import 'services/scrobbles_file_cache.dart';
 import 'services/friends_library_service.dart';
+import 'services/achievements.dart';
 import 'services/notification_service.dart';
 import 'services/notification_worker.dart';
 import 'services/storage_manager.dart';
@@ -107,6 +108,7 @@ void main() async {
     UpdateService.init(),
     ScrobblesFileCache.init(),
     FriendsLibraryService.init(),
+    AchievementsExtras.init(),
   ]);
   await StorageManager.init();
 

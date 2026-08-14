@@ -641,4 +641,10 @@ class AppStringsDe implements AppStrings {
   @override String get achvDescStreak => 'Die längste Serie aufeinanderfolgender Tage mit mindestens einem Scrobble.';
   @override String get achvCatMarathon => 'Marathon';
   @override String get achvDescMarathon => 'Die meisten Scrobbles an einem einzigen Tag.';
+  @override String get achvCatSocial => 'Sozial';
+  @override String get achvDescSocial => 'Die Anzahl hinzugefügter Freunde oder Profile.';
+  @override String get achvCatComparisons => 'Vergleiche';
+  @override String get achvDescComparisons => 'Die Anzahl der durchgeführten Musikgeschmack-Vergleiche.';
+  @override String get achvUnlockedBadge => 'Freigeschaltet';
+  @override String get achvLockedBadge => 'Gesperrt';
 }

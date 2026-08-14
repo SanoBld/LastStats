@@ -641,4 +641,10 @@ class AppStringsAr implements AppStrings {
   @override String get achvDescStreak => 'أطول سلسلة أيام متتالية بها استماع واحد على الأقل.';
   @override String get achvCatMarathon => 'الماراثون';
   @override String get achvDescMarathon => 'أكبر عدد من الاستماعات في يوم واحد.';
+  @override String get achvCatSocial => 'اجتماعي';
+  @override String get achvDescSocial => 'عدد الأصدقاء أو الملفات الشخصية المضافة.';
+  @override String get achvCatComparisons => 'المقارنات';
+  @override String get achvDescComparisons => 'عدد مقارنات الذوق الموسيقي التي تم إجراؤها.';
+  @override String get achvUnlockedBadge => 'مفتوح';
+  @override String get achvLockedBadge => 'مقفل';
 }

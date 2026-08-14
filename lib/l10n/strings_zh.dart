@@ -667,4 +667,10 @@ class AppStringsZh implements AppStrings {
   @override String get achvDescStreak => '连续有播放记录的最长天数。';
   @override String get achvCatMarathon => '马拉松';
   @override String get achvDescMarathon => '单日最多播放次数。';
+  @override String get achvCatSocial => '社交';
+  @override String get achvDescSocial => '已添加的好友或个人资料数量。';
+  @override String get achvCatComparisons => '对比';
+  @override String get achvDescComparisons => '已进行的音乐品味对比次数。';
+  @override String get achvUnlockedBadge => '已解锁';
+  @override String get achvLockedBadge => '未解锁';
 }

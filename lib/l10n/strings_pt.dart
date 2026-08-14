@@ -670,4 +670,10 @@ class AppStringsPt implements AppStrings {
   @override String get achvDescStreak => 'A sequência mais longa de dias consecutivos com pelo menos uma audição.';
   @override String get achvCatMarathon => 'Maratona';
   @override String get achvDescMarathon => 'O maior número de audições em um único dia.';
+  @override String get achvCatSocial => 'Social';
+  @override String get achvDescSocial => 'O número de amigos ou perfis adicionados.';
+  @override String get achvCatComparisons => 'Comparações';
+  @override String get achvDescComparisons => 'O número de comparações de gosto musical feitas.';
+  @override String get achvUnlockedBadge => 'Desbloqueado';
+  @override String get achvLockedBadge => 'Bloqueado';
 }

@@ -706,4 +706,10 @@ abstract class AppStrings {
   String get achvDescStreak;
   String get achvCatMarathon;
   String get achvDescMarathon;
+  String get achvCatSocial;
+  String get achvDescSocial;
+  String get achvCatComparisons;
+  String get achvDescComparisons;
+  String get achvUnlockedBadge;
+  String get achvLockedBadge;
 }

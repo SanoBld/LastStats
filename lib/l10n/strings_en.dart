@@ -670,4 +670,10 @@ class AppStringsEn implements AppStrings {
   @override String get achvDescStreak => 'Longest run of consecutive days with at least one scrobble.';
   @override String get achvCatMarathon => 'Marathon';
   @override String get achvDescMarathon => 'The most scrobbles in a single day.';
+  @override String get achvCatSocial => 'Social';
+  @override String get achvDescSocial => 'The number of friends or profiles added.';
+  @override String get achvCatComparisons => 'Comparisons';
+  @override String get achvDescComparisons => 'The number of taste comparisons made.';
+  @override String get achvUnlockedBadge => 'Unlocked';
+  @override String get achvLockedBadge => 'Locked';
 }

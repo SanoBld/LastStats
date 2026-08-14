@@ -670,4 +670,10 @@ class AppStringsEs implements AppStrings {
   @override String get achvDescStreak => 'La racha más larga de días consecutivos con al menos una escucha.';
   @override String get achvCatMarathon => 'Maratón';
   @override String get achvDescMarathon => 'El mayor número de escuchas en un solo día.';
+  @override String get achvCatSocial => 'Social';
+  @override String get achvDescSocial => 'El número de amigos o perfiles añadidos.';
+  @override String get achvCatComparisons => 'Comparaciones';
+  @override String get achvDescComparisons => 'El número de comparaciones de gustos musicales realizadas.';
+  @override String get achvUnlockedBadge => 'Desbloqueado';
+  @override String get achvLockedBadge => 'Bloqueado';
 }
