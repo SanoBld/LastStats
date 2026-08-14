@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 // ── Global notifiers ─────────────────────────────────────────────────────────
@@ -6,6 +7,45 @@ final accentNotifier             = ValueNotifier<Color>(const Color(0xFF7C3AED))
 final useDynamicColorNotifier    = ValueNotifier<bool>(false);
 final useNowPlayingColorNotifier = ValueNotifier<bool>(false);
 final localeNotifier             = ValueNotifier<String>('fr');
+
+// ── Day/night accent colors ──────────────────────────────────────────────
+// Use a different accent color for the light theme than for the dark
+// theme, instead of a single accent everywhere.
+// Saved as 'ls_use_daynight_accent'.
+final useDayNightAccentNotifier = ValueNotifier<bool>(false);
+// Accent used for the dark theme when the option above is on.
+// [accentNotifier] doubles as the light/day accent.
+// Saved as 'ls_accent_dark'.
+final accentDarkNotifier = ValueNotifier<Color>(const Color(0xFF7C3AED));
+// Instead of tying day/night to which theme (light/dark) is on screen,
+// switch by the clock instead — the accent then follows the time of day
+// even if the app itself stays in dark theme all along.
+// Saved as 'ls_daynight_use_hours'.
+final dayNightUseHoursNotifier = ValueNotifier<bool>(false);
+// Hour (0-23) at which the "day" accent starts being used.
+// Saved as 'ls_daynight_day_start_hour'.
+final dayStartHourNotifier = ValueNotifier<int>(7);
+// Hour (0-23) at which the "night" accent starts being used.
+// Saved as 'ls_daynight_night_start_hour'.
+final nightStartHourNotifier = ValueNotifier<int>(20);
+// Ticks once a minute so anything listening (the hour-based accent switch)
+// re-evaluates without needing the user to touch the app.
+final minuteTickNotifier = ValueNotifier<int>(0);
+Timer? _minuteTicker;
+void startMinuteTicker() {
+  _minuteTicker ??= Timer.periodic(const Duration(minutes: 1),
+      (_) => minuteTickNotifier.value++);
+}
+
+/// True if, right now, the "night" accent/hours window applies, given the
+/// configured start-of-day and start-of-night hours (wraps past midnight).
+bool isNightByHour(int dayStartHour, int nightStartHour) {
+  final h = DateTime.now().hour;
+  if (nightStartHour == dayStartHour) return false;
+  return nightStartHour > dayStartHour
+      ? (h >= nightStartHour || h < dayStartHour)
+      : (h >= nightStartHour && h < dayStartHour);
+}
 
 // Visual style preset: 'default' | 'nothing'
 // Saved as 'ls_theme_style' in SharedPreferences.
@@ -161,6 +201,13 @@ bool isNeutralColor(Color c) => HSLColor.fromColor(c).saturation < 0.03;
 /// true neutral gray (same lightness, zero saturation).
 Color _toNeutralGray(Color c) =>
     HSLColor.fromColor(c).withSaturation(0).withHue(0).toColor();
+
+/// Same fix as [neutralizeIfGraySeed], but for a ColorScheme that came from
+/// the OS (Material You / dynamic color from wallpaper) rather than from
+/// our own seed color — there [scheme.primary] itself is the best signal
+/// for "this device's dynamic color is essentially gray".
+ColorScheme neutralizeIfGraySchemeItself(ColorScheme scheme) =>
+    neutralizeIfGraySeed(scheme, scheme.primary);
 
 /// Material's HCT-based ColorScheme.fromSeed bakes in a faint hue (often
 /// blue/purple) even for a seed with zero chroma — a float-rounding quirk

@@ -117,6 +117,14 @@ class AppStringsDe implements AppStrings {
   @override String get settingsCustomColor => 'Benutzerdefiniert';
   @override String get settingsCustomColorEdit => 'Bearbeiten';
   @override String get settingsDynamicColor => 'Dynamische Farbe';
+  @override String get settingsDayNightAccent          => 'Tag/Nacht-Akzent';
+  @override String get settingsDayNightAccentToggle    => 'Unterschiedliche Farben für Tag/Nacht';
+  @override String get settingsDayNightAccentToggleSub => 'Verwendet eine andere Akzentfarbe für das dunkle Design.';
+  @override String get settingsDayNightAccentDark      => 'Farbe (dunkles Design)';
+  @override String get settingsDayNightUseHours        => 'Feste Uhrzeiten verwenden';
+  @override String get settingsDayNightUseHoursSub     => 'Wechselt die Farbe nach Uhrzeit statt nach aktivem Design.';
+  @override String get settingsDayNightDayStart        => 'Tag beginnt um';
+  @override String get settingsDayNightNightStart      => 'Nacht beginnt um';
   @override String get settingsMaterialYou => 'Material You';
   @override String get settingsMaterialYouSub => 'Android-Hintergrundfarbe verwenden';
   @override String get settingsMusicColor => 'Farbe aus Musik';

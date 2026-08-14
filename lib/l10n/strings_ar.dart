@@ -117,6 +117,14 @@ class AppStringsAr implements AppStrings {
   @override String get settingsCustomColor => 'مخصص';
   @override String get settingsCustomColorEdit => 'تعديل';
   @override String get settingsDynamicColor => 'لون ديناميكي';
+  @override String get settingsDayNightAccent          => 'لون النهار/الليل';
+  @override String get settingsDayNightAccentToggle    => 'ألوان مختلفة للنهار والليل';
+  @override String get settingsDayNightAccentToggleSub => 'يستخدم لون تمييز مختلف للسمة الداكنة.';
+  @override String get settingsDayNightAccentDark      => 'اللون (السمة الداكنة)';
+  @override String get settingsDayNightUseHours        => 'استخدام ساعات محددة';
+  @override String get settingsDayNightUseHoursSub     => 'يغيّر اللون حسب الوقت بدلاً من السمة النشطة.';
+  @override String get settingsDayNightDayStart        => 'يبدأ النهار في';
+  @override String get settingsDayNightNightStart      => 'يبدأ الليل في';
   @override String get settingsMaterialYou => 'Material You';
   @override String get settingsMaterialYouSub => 'استخدام لون خلفية أندرويد';
   @override String get settingsMusicColor => 'لون من الموسيقى';

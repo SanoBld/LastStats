@@ -61,6 +61,13 @@ void main() async {
   nothingAccentNotifier.value          = prefs.getString('ls_nothing_accent')        ?? 'classic';
   themeModeNotifier.value              = themeFromString(prefs.getString('ls_theme'));
   accentNotifier.value                 = accentFromString(prefs.getString('ls_accent'));
+  useDayNightAccentNotifier.value      = prefs.getBool('ls_use_daynight_accent')     ?? false;
+  accentDarkNotifier.value             = prefs.getString('ls_accent_dark') != null
+      ? accentFromString(prefs.getString('ls_accent_dark')) : accentNotifier.value;
+  dayNightUseHoursNotifier.value       = prefs.getBool('ls_daynight_use_hours')      ?? false;
+  dayStartHourNotifier.value           = prefs.getInt('ls_daynight_day_start_hour')   ?? 7;
+  nightStartHourNotifier.value         = prefs.getInt('ls_daynight_night_start_hour') ?? 20;
+  startMinuteTicker();
   useDynamicColorNotifier.value        = prefs.getBool('ls_use_dynamic_color')       ?? false;
   useNowPlayingColorNotifier.value     = prefs.getBool('ls_use_nowplaying_color')    ?? false;
   artworkColorThemeNotifier.value      = prefs.getBool('ls_artwork_color_theme')     ?? false;
@@ -291,6 +298,38 @@ class LastStatsApp extends StatelessWidget {
                 return ValueListenableBuilder<Color>(
                   valueListenable: accentNotifier,
                   builder: (_, accent, _) {
+                    return ValueListenableBuilder<bool>(
+                      valueListenable: useDayNightAccentNotifier,
+                      builder: (_, useDayNight, _) {
+                        return ValueListenableBuilder<Color>(
+                          valueListenable: accentDarkNotifier,
+                          builder: (_, accentDark, _) {
+                            return ValueListenableBuilder<bool>(
+                              valueListenable: dayNightUseHoursNotifier,
+                              builder: (_, useHours, _) {
+                                return ValueListenableBuilder<int>(
+                                  valueListenable: dayStartHourNotifier,
+                                  builder: (_, dayStartHour, _) {
+                                    return ValueListenableBuilder<int>(
+                                      valueListenable: nightStartHourNotifier,
+                                      builder: (_, nightStartHour, _) {
+                                        return ValueListenableBuilder<int>(
+                                          valueListenable: minuteTickNotifier,
+                                          builder: (_, _, _) {
+                    // Resolve which accent feeds the light theme and which
+                    // feeds the dark theme. With hour-based switching on,
+                    // both themes get the *same* accent (the one matching
+                    // the current clock time), so the accent follows the
+                    // time of day even while staying in dark theme.
+                    final bool nightNow = useHours
+                        ? isNightByHour(dayStartHour, nightStartHour)
+                        : false;
+                    final Color lightAccent = !useDayNight
+                        ? accent
+                        : (useHours ? (nightNow ? accentDark : accent) : accent);
+                    final Color darkAccent = !useDayNight
+                        ? accent
+                        : (useHours ? (nightNow ? accentDark : accent) : accentDark);
                     return ValueListenableBuilder<ThemeMode>(
                       valueListenable: themeModeNotifier,
                       builder: (_, mode, _) {
@@ -302,18 +341,18 @@ class LastStatsApp extends StatelessWidget {
                               builder: (_, _, _) {
                                 final ColorScheme lightScheme =
                                     (useDynamic && lightDynamic != null)
-                                        ? lightDynamic.harmonized()
+                                        ? neutralizeIfGraySchemeItself(lightDynamic.harmonized())
                                         : neutralizeIfGraySeed(ColorScheme.fromSeed(
-                                            seedColor:  seedColorForScheme(accent),
+                                            seedColor:  seedColorForScheme(lightAccent),
                                             brightness: Brightness.light,
-                                          ), accent);
+                                          ), lightAccent);
                                 final ColorScheme darkSchemeBase =
                                     (useDynamic && darkDynamic != null)
-                                        ? darkDynamic.harmonized()
+                                        ? neutralizeIfGraySchemeItself(darkDynamic.harmonized())
                                         : neutralizeIfGraySeed(ColorScheme.fromSeed(
-                                            seedColor:  seedColorForScheme(accent),
+                                            seedColor:  seedColorForScheme(darkAccent),
                                             brightness: Brightness.dark,
-                                          ), accent);
+                                          ), darkAccent);
                                 final ColorScheme darkScheme = oled
                                     ? darkSchemeBase.copyWith(
                                         surface:                 Colors.black,
@@ -363,19 +402,31 @@ class LastStatsApp extends StatelessWidget {
                                     );
                                   },
                                 );
-                              },
-                            );
-                          },
-                        );
-                      },
-                    );
-                  },
-                );
-              },
-            );
-          },
-        );
-      },
-    );
-  }
+                        },
+                      );
+                    },
+                  );
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          );
+        },
+      );
+    },
+  );
+        },
+      );
+    }
 }

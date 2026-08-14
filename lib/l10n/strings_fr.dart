@@ -142,6 +142,14 @@ class AppStringsFr implements AppStrings {
   @override String get settingsCustomColor       => 'Personnalisé';
   @override String get settingsCustomColorEdit   => 'Modifier';
   @override String get settingsDynamicColor      => 'Couleur dynamique';
+  @override String get settingsDayNightAccent          => 'Accent jour/nuit';
+  @override String get settingsDayNightAccentToggle    => 'Couleurs différentes jour/nuit';
+  @override String get settingsDayNightAccentToggleSub => "Utilise une autre couleur d'accent pour le thème sombre.";
+  @override String get settingsDayNightAccentDark      => 'Couleur (thème sombre)';
+  @override String get settingsDayNightUseHours        => 'Utiliser des heures précises';
+  @override String get settingsDayNightUseHoursSub     => "Change de couleur selon l'heure au lieu du thème actif.";
+  @override String get settingsDayNightDayStart        => 'Début du jour';
+  @override String get settingsDayNightNightStart      => 'Début de la nuit';
   @override String get settingsMaterialYou       => 'Material You';
   @override String get settingsMaterialYouSub    => 'Utilise la couleur du thème Android';
   @override String get settingsMusicColor        => 'Couleur depuis la musique';

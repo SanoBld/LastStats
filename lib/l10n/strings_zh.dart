@@ -139,6 +139,14 @@ class AppStringsZh implements AppStrings {
   @override String get settingsCustomColor       => '自定义';
   @override String get settingsCustomColorEdit   => '编辑';
   @override String get settingsDynamicColor      => '动态取色';
+  @override String get settingsDayNightAccent          => '日间/夜间强调色';
+  @override String get settingsDayNightAccentToggle    => '日夜使用不同颜色';
+  @override String get settingsDayNightAccentToggleSub => '为深色主题使用另一种强调色。';
+  @override String get settingsDayNightAccentDark      => '颜色（深色主题）';
+  @override String get settingsDayNightUseHours        => '使用指定时间';
+  @override String get settingsDayNightUseHoursSub     => '按时间而非当前主题切换颜色。';
+  @override String get settingsDayNightDayStart        => '白天开始于';
+  @override String get settingsDayNightNightStart      => '夜晚开始于';
   @override String get settingsMaterialYou       => 'Material You';
   @override String get settingsMaterialYouSub    => '使用 Android 壁纸取色';
   @override String get settingsMusicColor        => '取色自音乐';

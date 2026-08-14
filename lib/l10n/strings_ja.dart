@@ -117,6 +117,14 @@ class AppStringsJa implements AppStrings {
   @override String get settingsCustomColor => 'カスタム';
   @override String get settingsCustomColorEdit => '編集';
   @override String get settingsDynamicColor => 'ダイナミックカラー';
+  @override String get settingsDayNightAccent          => '昼夜のアクセントカラー';
+  @override String get settingsDayNightAccentToggle    => '昼と夜で別の色を使う';
+  @override String get settingsDayNightAccentToggleSub => 'ダークテーマに別のアクセントカラーを使用します。';
+  @override String get settingsDayNightAccentDark      => '色（ダークテーマ）';
+  @override String get settingsDayNightUseHours        => '指定した時間を使う';
+  @override String get settingsDayNightUseHoursSub     => '現在のテーマではなく時刻で色を切り替えます。';
+  @override String get settingsDayNightDayStart        => '昼の開始時刻';
+  @override String get settingsDayNightNightStart      => '夜の開始時刻';
   @override String get settingsMaterialYou => 'Material You';
   @override String get settingsMaterialYouSub => 'Androidの壁紙の色を使用';
   @override String get settingsMusicColor => '楽曲から色を取得';

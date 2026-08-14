@@ -117,6 +117,14 @@ class AppStringsRu implements AppStrings {
   @override String get settingsCustomColor => 'Свой цвет';
   @override String get settingsCustomColorEdit => 'Изменить';
   @override String get settingsDynamicColor => 'Динамический цвет';
+  @override String get settingsDayNightAccent          => 'Акцент день/ночь';
+  @override String get settingsDayNightAccentToggle    => 'Разные цвета днём и ночью';
+  @override String get settingsDayNightAccentToggleSub => 'Использует другой акцентный цвет для тёмной темы.';
+  @override String get settingsDayNightAccentDark      => 'Цвет (тёмная тема)';
+  @override String get settingsDayNightUseHours        => 'Использовать точное время';
+  @override String get settingsDayNightUseHoursSub     => 'Меняет цвет по времени суток, а не по активной теме.';
+  @override String get settingsDayNightDayStart        => 'День начинается в';
+  @override String get settingsDayNightNightStart      => 'Ночь начинается в';
   @override String get settingsMaterialYou => 'Material You';
   @override String get settingsMaterialYouSub => 'Использовать цвет обоев Android';
   @override String get settingsMusicColor => 'Цвет из музыки';

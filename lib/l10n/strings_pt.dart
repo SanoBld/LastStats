@@ -142,6 +142,14 @@ class AppStringsPt implements AppStrings {
   @override String get settingsCustomColor       => 'Personalizado';
   @override String get settingsCustomColorEdit   => 'Editar';
   @override String get settingsDynamicColor      => 'Cor dinâmica';
+  @override String get settingsDayNightAccent          => 'Acento dia/noite';
+  @override String get settingsDayNightAccentToggle    => 'Cores diferentes para dia/noite';
+  @override String get settingsDayNightAccentToggleSub => 'Usa uma cor de acento diferente para o tema escuro.';
+  @override String get settingsDayNightAccentDark      => 'Cor (tema escuro)';
+  @override String get settingsDayNightUseHours        => 'Usar horários específicos';
+  @override String get settingsDayNightUseHoursSub     => 'Muda de cor pelo horário em vez do tema ativo.';
+  @override String get settingsDayNightDayStart        => 'O dia começa às';
+  @override String get settingsDayNightNightStart      => 'A noite começa às';
   @override String get settingsMaterialYou       => 'Material You';
   @override String get settingsMaterialYouSub    => 'Usa a cor do papel de parede do Android';
   @override String get settingsMusicColor        => 'Cor a partir da música';

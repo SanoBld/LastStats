@@ -36,6 +36,11 @@ class _AppearancePageState extends State<AppearancePage> {
   bool   _keepLastArtworkColor = false;
   bool   _oledMode             = false;
   Color  _fallbackAccent       = const Color(0xFF7C3AED);
+  bool   _useDayNightAccent    = false;
+  String _accentDark           = 'purple';
+  bool   _dayNightUseHours     = false;
+  int    _dayStartHour         = 7;
+  int    _nightStartHour       = 20;
 
   @override
   void initState() {
@@ -69,6 +74,11 @@ class _AppearancePageState extends State<AppearancePage> {
       _fallbackAccent = fbHex != null
           ? accentFromString(fbHex)
           : accentFromString(p.getString('ls_accent'));
+      _useDayNightAccent = p.getBool('ls_use_daynight_accent')          ?? false;
+      _accentDark        = p.getString('ls_accent_dark')                ?? _accent;
+      _dayNightUseHours  = p.getBool('ls_daynight_use_hours')           ?? false;
+      _dayStartHour      = p.getInt('ls_daynight_day_start_hour')       ?? 7;
+      _nightStartHour    = p.getInt('ls_daynight_night_start_hour')     ?? 20;
     });
   }
 
@@ -76,6 +86,7 @@ class _AppearancePageState extends State<AppearancePage> {
     final p = await SharedPreferences.getInstance();
     if (v is bool)   await p.setBool(key, v);
     if (v is String) await p.setString(key, v);
+    if (v is int)    await p.setInt(key, v);
   }
 
   // Switch visual style.
@@ -146,6 +157,43 @@ class _AppearancePageState extends State<AppearancePage> {
       nowPlayingFallbackColorNotifier.value = result;
       accentNotifier.value = result;
     }
+  }
+
+  Future<void> _setUseDayNightAccent(bool v) async {
+    await _set('ls_use_daynight_accent', v);
+    setState(() => _useDayNightAccent = v);
+    useDayNightAccentNotifier.value = v;
+  }
+
+  Future<void> _setDayNightUseHours(bool v) async {
+    await _set('ls_daynight_use_hours', v);
+    setState(() => _dayNightUseHours = v);
+    dayNightUseHoursNotifier.value = v;
+  }
+
+  Future<void> _pickDarkAccentColor() async {
+    final result = await showDialog<Color>(
+      context: context,
+      builder: (_) => ColorPickerDialog(initialColor: accentDarkNotifier.value),
+    );
+    if (result != null && mounted) {
+      final hex = colorToHex(result);
+      await _set('ls_accent_dark', hex);
+      setState(() => _accentDark = hex);
+      accentDarkNotifier.value = result;
+    }
+  }
+
+  Future<void> _setDayStartHour(int h) async {
+    await _set('ls_daynight_day_start_hour', h);
+    setState(() => _dayStartHour = h);
+    dayStartHourNotifier.value = h;
+  }
+
+  Future<void> _setNightStartHour(int h) async {
+    await _set('ls_daynight_night_start_hour', h);
+    setState(() => _nightStartHour = h);
+    nightStartHourNotifier.value = h;
   }
 
   bool get _isCustomAccent =>
@@ -488,6 +536,89 @@ class _AppearancePageState extends State<AppearancePage> {
                   ],
                 ],
               )),
+            ]),
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        // ══════════════════════════════════════════════════════════════════
+        //  Day/night accent — separate colors for light vs dark theme
+        // ══════════════════════════════════════════════════════════════════
+        Opacity(
+          opacity: (_isNothing || _useDynamicColor || _useNowPlayingColor) ? 0.3 : 1.0,
+          child: IgnorePointer(
+            ignoring: _isNothing || _useDynamicColor || _useNowPlayingColor,
+            child: SettingsSection(label: L.settingsDayNightAccent, children: [
+              SwitchListTile(
+                secondary: Icon(Icons.brightness_4_rounded, color: scheme.primary),
+                title:    Text(L.settingsDayNightAccentToggle),
+                subtitle: Text(L.settingsDayNightAccentToggleSub),
+                value:    _useDayNightAccent,
+                onChanged: _setUseDayNightAccent,
+              ),
+              if (_useDayNightAccent) ...[
+                const Divider(height: 1),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                  child: Row(children: [
+                    Icon(Icons.dark_mode_rounded, size: 20, color: scheme.onSurfaceVariant),
+                    const SizedBox(width: 12),
+                    Expanded(child: Text(L.settingsDayNightAccentDark,
+                        style: text.bodyMedium)),
+                    GestureDetector(
+                      onTap: _pickDarkAccentColor,
+                      child: Container(width: 28, height: 28,
+                          decoration: BoxDecoration(
+                              color: accentDarkNotifier.value, shape: BoxShape.circle,
+                              border: Border.all(color: scheme.outlineVariant))),
+                    ),
+                  ]),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(52, 0, 16, 8),
+                  child: Text(colorToHex(accentDarkNotifier.value),
+                      style: text.bodySmall?.copyWith(
+                          fontFamily: 'monospace', color: scheme.onSurfaceVariant)),
+                ),
+                const Divider(height: 1),
+                SwitchListTile(
+                  secondary: Icon(Icons.schedule_rounded, color: scheme.onSurfaceVariant),
+                  title:    Text(L.settingsDayNightUseHours),
+                  subtitle: Text(L.settingsDayNightUseHoursSub),
+                  value:    _dayNightUseHours,
+                  onChanged: _setDayNightUseHours,
+                ),
+                if (_dayNightUseHours) ...[
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: Icon(Icons.wb_sunny_rounded, color: scheme.onSurfaceVariant),
+                    title:   Text(L.settingsDayNightDayStart),
+                    trailing: TextButton(
+                      onPressed: () async {
+                        final t = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay(hour: _dayStartHour, minute: 0));
+                        if (t != null) _setDayStartHour(t.hour);
+                      },
+                      child: Text('${_dayStartHour.toString().padLeft(2, '0')}:00'),
+                    ),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.nightlight_round, color: scheme.onSurfaceVariant),
+                    title:   Text(L.settingsDayNightNightStart),
+                    trailing: TextButton(
+                      onPressed: () async {
+                        final t = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay(hour: _nightStartHour, minute: 0));
+                        if (t != null) _setNightStartHour(t.hour);
+                      },
+                      child: Text('${_nightStartHour.toString().padLeft(2, '0')}:00'),
+                    ),
+                  ),
+                ],
+              ],
             ]),
           ),
         ),

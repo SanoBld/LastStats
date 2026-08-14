@@ -142,6 +142,14 @@ class AppStringsEs implements AppStrings {
   @override String get settingsCustomColor       => 'Personalizado';
   @override String get settingsCustomColorEdit   => 'Editar';
   @override String get settingsDynamicColor      => 'Color dinámico';
+  @override String get settingsDayNightAccent          => 'Acento día/noche';
+  @override String get settingsDayNightAccentToggle    => 'Colores diferentes de día y de noche';
+  @override String get settingsDayNightAccentToggleSub => 'Usa un color de acento diferente para el tema oscuro.';
+  @override String get settingsDayNightAccentDark      => 'Color (tema oscuro)';
+  @override String get settingsDayNightUseHours        => 'Usar horas específicas';
+  @override String get settingsDayNightUseHoursSub     => 'Cambia de color según la hora en lugar del tema activo.';
+  @override String get settingsDayNightDayStart        => 'El día empieza a las';
+  @override String get settingsDayNightNightStart      => 'La noche empieza a las';
   @override String get settingsMaterialYou       => 'Material You';
   @override String get settingsMaterialYouSub    => 'Usa el color del fondo de pantalla de Android';
   @override String get settingsMusicColor        => 'Color desde la música';

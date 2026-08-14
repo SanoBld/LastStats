@@ -140,6 +140,14 @@ abstract class AppStrings {
   String get settingsCustomColor;
   String get settingsCustomColorEdit;
   String get settingsDynamicColor;
+  String get settingsDayNightAccent;
+  String get settingsDayNightAccentToggle;
+  String get settingsDayNightAccentToggleSub;
+  String get settingsDayNightAccentDark;
+  String get settingsDayNightUseHours;
+  String get settingsDayNightUseHoursSub;
+  String get settingsDayNightDayStart;
+  String get settingsDayNightNightStart;
   String get settingsMaterialYou;
   String get settingsMaterialYouSub;
   String get settingsMusicColor;
