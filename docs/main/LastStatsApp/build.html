@@ -194,17 +194,17 @@ Widget build(BuildContext context) {
                               final ColorScheme lightScheme =
                                   (useDynamic &amp;&amp; lightDynamic != null)
                                       ? lightDynamic.harmonized()
-                                      : ColorScheme.fromSeed(
+                                      : neutralizeIfGraySeed(ColorScheme.fromSeed(
                                           seedColor:  seedColorForScheme(accent),
                                           brightness: Brightness.light,
-                                        );
+                                        ), accent);
                               final ColorScheme darkSchemeBase =
                                   (useDynamic &amp;&amp; darkDynamic != null)
                                       ? darkDynamic.harmonized()
-                                      : ColorScheme.fromSeed(
+                                      : neutralizeIfGraySeed(ColorScheme.fromSeed(
                                           seedColor:  seedColorForScheme(accent),
                                           brightness: Brightness.dark,
-                                        );
+                                        ), accent);
                               final ColorScheme darkScheme = oled
                                   ? darkSchemeBase.copyWith(
                                       surface:                 Colors.black,
@@ -296,7 +296,7 @@ Widget build(BuildContext context) {
 <footer>
   <span class="no-break">
     laststats_mobile
-      3.1.0-beta+21
+      2.6.0+1
   </span>
   
 </footer>

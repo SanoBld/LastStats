@@ -465,6 +465,19 @@
 
 </dd>
 
+          <dt id="isNeutralColor" class="callable">
+  <span class="name"><a href="../app_state/isNeutralColor.html">isNeutralColor</a></span><span class="signature">(<wbr><span class="parameter" id="isNeutralColor-param-c"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Color-class.html">Color</a></span> <span class="parameter-name">c</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  True for colors with (near) zero saturation: black, white, and grays.
+  
+
+</dd>
+
           <dt id="isTrackLoved" class="callable">
   <span class="name"><a href="../app_state/isTrackLoved.html">isTrackLoved</a></span><span class="signature">(<wbr><span class="parameter" id="isTrackLoved-param-artist"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">artist</span>, </span><span class="parameter" id="isTrackLoved-param-track"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">track</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
@@ -487,6 +500,25 @@
 </dt>
 <dd>
   
+  
+
+</dd>
+
+          <dt id="neutralizeIfGraySeed" class="callable">
+  <span class="name"><a href="../app_state/neutralizeIfGraySeed.html">neutralizeIfGraySeed</a></span><span class="signature">(<wbr><span class="parameter" id="neutralizeIfGraySeed-param-scheme"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/material/ColorScheme-class.html">ColorScheme</a></span> <span class="parameter-name">scheme</span>, </span><span class="parameter" id="neutralizeIfGraySeed-param-seed"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Color-class.html">Color</a></span> <span class="parameter-name">seed</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/material/ColorScheme-class.html">ColorScheme</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Material's HCT-based ColorScheme.fromSeed bakes in a faint hue (often
+blue/purple) even for a seed with zero chroma — a float-rounding quirk
+in the underlying HCT conversion, not something under our control. When
+the user picked a true black/white/gray accent, that tint is exactly
+the "everything looks bluish" bug: this strips it back out of every
+scheme field that would otherwise carry it, without touching schemes
+built from an actually-colored seed.
   
 
 </dd>
@@ -616,7 +648,7 @@
 <footer>
   <span class="no-break">
     laststats_mobile
-      3.1.0-beta+21
+      2.6.0+1
   </span>
   
 </footer>
