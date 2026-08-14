@@ -14,6 +14,7 @@ import '../../services/lastfm_service.dart';
 import '../../services/all_scrobbles_service.dart';
 import '../../services/notification_worker.dart';
 import '../../services/friends_library_service.dart';
+import 'settings_helpers.dart';
 
 const _kSyncEnabled   = 'ls_scrobble_sync_enabled';
 const _kSyncFreqHours = 'ls_scrobble_sync_freq_hours';
@@ -159,9 +160,7 @@ class _SyncPageState extends State<SyncPage> {
               padding: const EdgeInsets.all(16),
               children: [
                 // ── Auto sync section ────────────────────────────────────
-                Card(
-                  margin: EdgeInsets.zero,
-                  child: Column(children: [
+                SettingsSection(label: L.syncAutoTitle, children: [
                     SwitchListTile(
                       title: Text(L.syncAutoTitle),
                       subtitle: Text(L.syncAutoSubtitle),
@@ -187,18 +186,13 @@ class _SyncPageState extends State<SyncPage> {
                         ]),
                       ),
                     ],
-                  ]),
-                ),
+                ]),
 
                 const SizedBox(height: 20),
 
                 // ── Manual sync section ──────────────────────────────────
-                Text(L.syncManualTitle,
-                    style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
-                const SizedBox(height: 10),
-                Card(
-                  margin: EdgeInsets.zero,
-                  child: Padding(
+                SettingsSection(label: L.syncManualTitle, children: [
+                  Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Row(children: [
@@ -243,15 +237,13 @@ class _SyncPageState extends State<SyncPage> {
                       ],
                     ]),
                   ),
-                ),
+                ]),
 
                 const SizedBox(height: 20),
-                Text(_syncCt('Synchronisation des amis', 'Friends sync'),
-                    style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
-                const SizedBox(height: 10),
-                Card(
-                  margin: EdgeInsets.zero,
-                  child: Padding(
+                SettingsSection(
+                  label: _syncCt('Synchronisation des amis', 'Friends sync'),
+                  children: [
+                  Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text(_syncCt('Fréquence de synchronisation', 'Sync frequency'),
@@ -301,7 +293,7 @@ class _SyncPageState extends State<SyncPage> {
                       ],
                     ]),
                   ),
-                ),
+                ]),
 
                 const SizedBox(height: 16),
                 Text(L.syncNotifNote,

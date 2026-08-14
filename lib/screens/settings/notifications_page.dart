@@ -6,6 +6,7 @@ import '../../app_state.dart';
 import '../../l10n/l10n.dart';
 import '../../services/notification_service.dart';
 import '../../services/notification_worker.dart';
+import 'settings_helpers.dart';
 
 // ── Prefs keys (must match notification_worker.dart exactly) ─────────────────
 const _kMilestoneEnabled  = 'ls_notif_milestone_enabled';
@@ -242,247 +243,192 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   icon: Icons.info_outline_rounded,
                   text: L.notifWorkManagerInfo,
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 16),
 
                 // ── Section: Milestones ────────────────────────────────────
-                _SectionLabel(
-                  L.onboardMilestonesSection,
-                  scheme,
-                ),
-                const SizedBox(height: 10),
-
-                // Grand milestones card
-                _NotifCard(
-                  scheme:   scheme,
-                  icon:     Icons.emoji_events_rounded,
-                  iconBg:   const Color(0xFFFFECB3),
-                  iconFg:   const Color(0xFFE65100),
-                  title:    L.onboardGrandMilestonesTitle,
-                  subtitle: '1K · 5K · 10K · 25K · 50K · 100K · 250K · 500K · 1M',
-                  enabled:  _grandOn,
-                  onToggle: _hasPermission ? _setGrand : null,
-                  child: _grandOn
-                      ? _GrandMilestoneInfo(scheme: scheme, text: text)
-                      : null,
-                ),
-                const SizedBox(height: 10),
-
-                // Interval milestone card
-                _NotifCard(
-                  scheme:   scheme,
-                  icon:     Icons.flag_rounded,
-                  iconBg:   scheme.primaryContainer,
-                  iconFg:   scheme.onPrimaryContainer,
-                  title:    L.notifIntervalTitle,
-                  subtitle: L.notifIntervalSubtitle,
-                  enabled:  _milestoneOn,
-                  onToggle: _hasPermission ? _setMilestone : null,
-                  child: _milestoneOn
-                      ? _MilestoneConfig(
-                          interval: _milestoneInterval,
-                          ctrl:     _intervalCtrl,
-                          scheme:   scheme,
-                          text:     text,
-                          onChange: (v) {
-                            setState(() => _milestoneInterval = v);
-                            // Reset so the new interval is detected fresh
-                            NotificationWorker.resetMilestoneCount();
-                            _save();
-                          },
-                        )
-                      : null,
-                ),
-                const SizedBox(height: 28),
+                SettingsSection(label: L.onboardMilestonesSection, children: [
+                  SwitchListTile(
+                    secondary: Icon(Icons.emoji_events_rounded, color: scheme.primary),
+                    title:    Text(L.onboardGrandMilestonesTitle),
+                    subtitle: const Text('1K · 5K · 10K · 25K · 50K · 100K · 250K · 500K · 1M'),
+                    value:    _grandOn,
+                    onChanged: _hasPermission ? _setGrand : null,
+                  ),
+                  if (_grandOn) ...[
+                    const Divider(height: 1),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+                      child: _GrandMilestoneInfo(scheme: scheme, text: text),
+                    ),
+                  ],
+                  const Divider(height: 1),
+                  SwitchListTile(
+                    secondary: Icon(Icons.flag_rounded, color: scheme.primary),
+                    title:    Text(L.notifIntervalTitle),
+                    subtitle: Text(L.notifIntervalSubtitle),
+                    value:    _milestoneOn,
+                    onChanged: _hasPermission ? _setMilestone : null,
+                  ),
+                  if (_milestoneOn) ...[
+                    const Divider(height: 1),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+                      child: _MilestoneConfig(
+                        interval: _milestoneInterval,
+                        ctrl:     _intervalCtrl,
+                        scheme:   scheme,
+                        text:     text,
+                        onChange: (v) {
+                          setState(() => _milestoneInterval = v);
+                          // Reset so the new interval is detected fresh
+                          NotificationWorker.resetMilestoneCount();
+                          _save();
+                        },
+                      ),
+                    ),
+                  ],
+                ]),
+                const SizedBox(height: 16),
 
                 // ── Section: Recaps ────────────────────────────────────────
-                _SectionLabel(
-                  L.notifRecapsSection,
-                  scheme,
-                ),
-                const SizedBox(height: 10),
-
-                // Daily recap
-                _NotifCard(
-                  scheme:   scheme,
-                  icon:     Icons.today_rounded,
-                  iconBg:   scheme.secondaryContainer,
-                  iconFg:   scheme.onSecondaryContainer,
-                  title:    L.onboardDailyRecapTitle,
-                  subtitle: L.notifDailyRecapSubtitle,
-                  enabled:  _dailyOn,
-                  onToggle: _hasPermission ? _setDaily : null,
-                  child: _dailyOn
-                      ? _TimePicker(
-                          hour:   _dailyHour,
-                          minute: _dailyMin,
-                          scheme: scheme,
-                          text:   text,
-                          onTap:  () => _pickTime(
-                            hour:     _dailyHour,
-                            minute:   _dailyMin,
-                            onPicked: (h, m) {
-                              _dailyHour = h;
-                              _dailyMin  = m;
-                            },
-                          ),
-                        )
-                      : null,
-                ),
-                const SizedBox(height: 10),
-
-                // Weekly recap
-                _NotifCard(
-                  scheme:   scheme,
-                  icon:     Icons.date_range_rounded,
-                  iconBg:   scheme.tertiaryContainer,
-                  iconFg:   scheme.onTertiaryContainer,
-                  title:    L.onboardWeeklyRecapTitle,
-                  subtitle: L.notifWeeklyRecapSubtitle,
-                  enabled:  _weeklyOn,
-                  onToggle: _hasPermission ? _setWeekly : null,
-                  child: _weeklyOn
-                      ? _WeeklyConfig(
-                          day:         _weeklyDay,
-                          hour:        _weeklyHour,
-                          minute:      _weeklyMin,
-                          scheme:      scheme,
-                          text:        text,
-                          onDayChanged: (d) {
-                            setState(() => _weeklyDay = d);
-                            _save();
+                SettingsSection(label: L.notifRecapsSection, children: [
+                  SwitchListTile(
+                    secondary: Icon(Icons.today_rounded, color: scheme.primary),
+                    title:    Text(L.onboardDailyRecapTitle),
+                    subtitle: Text(L.notifDailyRecapSubtitle),
+                    value:    _dailyOn,
+                    onChanged: _hasPermission ? _setDaily : null,
+                  ),
+                  if (_dailyOn) ...[
+                    const Divider(height: 1),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+                      child: _TimePicker(
+                        hour:   _dailyHour,
+                        minute: _dailyMin,
+                        scheme: scheme,
+                        text:   text,
+                        onTap:  () => _pickTime(
+                          hour:     _dailyHour,
+                          minute:   _dailyMin,
+                          onPicked: (h, m) {
+                            _dailyHour = h;
+                            _dailyMin  = m;
                           },
-                          onTimeTap: () => _pickTime(
-                            hour:     _weeklyHour,
-                            minute:   _weeklyMin,
-                            onPicked: (h, m) {
-                              _weeklyHour = h;
-                              _weeklyMin  = m;
-                            },
-                          ),
-                        )
-                      : null,
-                ),
-                const SizedBox(height: 28),
+                        ),
+                      ),
+                    ),
+                  ],
+                  const Divider(height: 1),
+                  SwitchListTile(
+                    secondary: Icon(Icons.date_range_rounded, color: scheme.primary),
+                    title:    Text(L.onboardWeeklyRecapTitle),
+                    subtitle: Text(L.notifWeeklyRecapSubtitle),
+                    value:    _weeklyOn,
+                    onChanged: _hasPermission ? _setWeekly : null,
+                  ),
+                  if (_weeklyOn) ...[
+                    const Divider(height: 1),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+                      child: _WeeklyConfig(
+                        day:         _weeklyDay,
+                        hour:        _weeklyHour,
+                        minute:      _weeklyMin,
+                        scheme:      scheme,
+                        text:        text,
+                        onDayChanged: (d) {
+                          setState(() => _weeklyDay = d);
+                          _save();
+                        },
+                        onTimeTap: () => _pickTime(
+                          hour:     _weeklyHour,
+                          minute:   _weeklyMin,
+                          onPicked: (h, m) {
+                            _weeklyHour = h;
+                            _weeklyMin  = m;
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ]),
+                const SizedBox(height: 16),
 
                 // ── Section: Scrobble sync ──────────────────────────────────
-                _SectionLabel(L.notifSyncSection, scheme),
-                const SizedBox(height: 10),
-
-                _NotifCard(
-                  scheme:   scheme,
-                  icon:     Icons.sync_rounded,
-                  iconBg:   const Color(0xFF059669).withValues(alpha: 0.14),
-                  iconFg:   const Color(0xFF059669),
-                  title:    L.notifSyncTitle,
-                  subtitle: L.notifSyncSubtitle,
-                  enabled:  _syncNotifOn,
-                  onToggle: _hasPermission ? _setSyncNotif : null,
-                ),
-                if (_syncNotifOn) ...[
-                  const SizedBox(height: 10),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: scheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                          color: scheme.outlineVariant.withValues(alpha: 0.4)),
-                    ),
-                    child: Row(children: [
-                      Container(
-                        width: 42, height: 42,
-                        decoration: BoxDecoration(
-                          color: scheme.surfaceContainerLow,
-                          borderRadius: BorderRadius.circular(11),
-                        ),
-                        child: Icon(Icons.donut_large_rounded,
-                            color: scheme.onSurfaceVariant, size: 22),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(L.notifSyncDetailTitle,
-                              style: const TextStyle(fontWeight: FontWeight.w700)),
-                          Text(L.notifSyncDetailSubtitle,
-                              style: TextStyle(fontSize: 13, color: scheme.onSurfaceVariant)),
-                        ]),
-                      ),
-                      Switch(value: _syncNotifDetail, onChanged: _setSyncDetail),
-                    ]),
+                SettingsSection(label: L.notifSyncSection, children: [
+                  SwitchListTile(
+                    secondary: Icon(Icons.sync_rounded, color: scheme.primary),
+                    title:    Text(L.notifSyncTitle),
+                    subtitle: Text(L.notifSyncSubtitle),
+                    value:    _syncNotifOn,
+                    onChanged: _hasPermission ? _setSyncNotif : null,
                   ),
-                ],
-                const SizedBox(height: 28),
+                  if (_syncNotifOn) ...[
+                    const Divider(height: 1),
+                    SwitchListTile(
+                      secondary: Icon(Icons.donut_large_rounded, color: scheme.primary),
+                      title:    Text(L.notifSyncDetailTitle),
+                      subtitle: Text(L.notifSyncDetailSubtitle),
+                      value:    _syncNotifDetail,
+                      onChanged: _setSyncDetail,
+                    ),
+                  ],
+                ]),
+                const SizedBox(height: 16),
 
                 // ── Section: News (actualités) ─────────────────────────────
-                _SectionLabel(
-                  L.notifNewsSection,
-                  scheme,
-                ),
-                const SizedBox(height: 10),
-
-                _NotifCard(
-                  scheme:   scheme,
-                  icon:     Icons.campaign_rounded,
-                  iconBg:   const Color(0xFF1D4ED8).withValues(alpha: 0.14),
-                  iconFg:   const Color(0xFF1D4ED8),
-                  title:    L.onboardNewsTitle,
-                  subtitle: L.notifNewsSubtitle,
-                  enabled:  _newsOn,
-                  onToggle: _hasPermission ? _setNews : null,
-                ),
-                const SizedBox(height: 10),
-
-                // Badge toggle — pure display setting, no permission needed
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: scheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                        color: scheme.outlineVariant.withValues(alpha: 0.4)),
+                SettingsSection(label: L.notifNewsSection, children: [
+                  SwitchListTile(
+                    secondary: Icon(Icons.campaign_rounded, color: scheme.primary),
+                    title:    Text(L.onboardNewsTitle),
+                    subtitle: Text(L.notifNewsSubtitle),
+                    value:    _newsOn,
+                    onChanged: _hasPermission ? _setNews : null,
                   ),
-                  child: Row(children: [
-                    Container(
-                      width: 42, height: 42,
-                      decoration: BoxDecoration(
-                        color: scheme.surfaceContainerLow,
-                        borderRadius: BorderRadius.circular(11),
-                      ),
-                      child: Icon(Icons.circle_notifications_rounded,
-                          color: scheme.onSurfaceVariant, size: 22),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(
-                          L.notifBadgeOnDashboard,
-                          style: const TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        Text(
-                          L.notifBadgeSubtitle,
-                          style: TextStyle(
-                              fontSize: 13, color: scheme.onSurfaceVariant),
-                        ),
-                      ]),
-                    ),
-                    Switch(value: _showBadge, onChanged: _setShowBadge),
-                  ]),
-                ),
+                  const Divider(height: 1),
+                  SwitchListTile(
+                    secondary: Icon(Icons.circle_notifications_rounded, color: scheme.primary),
+                    title:    Text(L.notifBadgeOnDashboard),
+                    subtitle: Text(L.notifBadgeSubtitle),
+                    value:    _showBadge,
+                    onChanged: _setShowBadge,
+                  ),
+                ]),
 
-                const SizedBox(height: 28),
+                const SizedBox(height: 16),
 
                 // ── Test button ────────────────────────────────────────────
                 if (_hasPermission) ...[
-                  _SectionLabel(
-                    L.notifTestLabel,
-                    scheme,
-                  ),
-                  const SizedBox(height: 10),
-                  _TestButton(
-                    sent:    _testSent,
-                    scheme:  scheme,
-                    onTap:   _sendTest,
-                  ),
+                  SettingsSection(label: L.notifTestLabel, children: [
+                    ListTile(
+                      leading: Icon(
+                        _testSent ? Icons.check_circle_rounded : Icons.notifications_active_rounded,
+                        color: _testSent ? Colors.green : scheme.primary,
+                      ),
+                      title:    Text(L.notifSendTest),
+                      subtitle: Text(_testSent ? L.notifSentCheckBar : L.notifMakeSureWorks),
+                      trailing: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: _testSent
+                            ? Padding(
+                                key: const ValueKey('done'),
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(L.notifSentBang, style: const TextStyle(
+                                    color: Colors.green, fontWeight: FontWeight.w700, fontSize: 13)),
+                              )
+                            : FilledButton.tonal(
+                                key:       const ValueKey('btn'),
+                                onPressed: _sendTest,
+                                style: FilledButton.styleFrom(
+                                  visualDensity: VisualDensity.compact,
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                ),
+                                child: Text(L.notifSendButton),
+                              ),
+                      ),
+                    ),
+                  ]),
                 ],
 
                 const SizedBox(height: 32),
@@ -576,102 +522,6 @@ class _InfoNote extends StatelessWidget {
   }
 }
 
-// ── Section label ─────────────────────────────────────────────────────────────
-
-class _SectionLabel extends StatelessWidget {
-  final String      label;
-  final ColorScheme scheme;
-  const _SectionLabel(this.label, this.scheme);
-
-  @override
-  Widget build(BuildContext context) => Text(
-    label,
-    style: TextStyle(
-        fontSize:    12,
-        fontWeight:  FontWeight.w700,
-        color:       scheme.primary,
-        letterSpacing: 0.6),
-  );
-}
-
-// ── Notification card ─────────────────────────────────────────────────────────
-
-class _NotifCard extends StatelessWidget {
-  final ColorScheme scheme;
-  final IconData    icon;
-  final Color       iconBg, iconFg;
-  final String      title, subtitle;
-  final bool        enabled;
-  final void Function(bool)? onToggle;
-  final Widget? child;
-
-  const _NotifCard({
-    required this.scheme,
-    required this.icon,
-    required this.iconBg,
-    required this.iconFg,
-    required this.title,
-    required this.subtitle,
-    required this.enabled,
-    required this.onToggle,
-    this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: scheme.outlineVariant.withValues(alpha: 0.4),
-        ),
-      ),
-      child: Column(children: [
-        // Header row
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
-          child: Row(children: [
-            Container(
-              width: 42, height: 42,
-              decoration: BoxDecoration(
-                  color: iconBg, borderRadius: BorderRadius.circular(11)),
-              child: Icon(icon, color: iconFg, size: 22),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      style: text.bodyMedium
-                          ?.copyWith(fontWeight: FontWeight.w700)),
-                  Text(subtitle,
-                      style: text.bodySmall?.copyWith(
-                          color: scheme.onSurfaceVariant, height: 1.3)),
-                ],
-              ),
-            ),
-            Switch(value: enabled, onChanged: onToggle),
-          ]),
-        ),
-
-        // Expanded config section (animated)
-        if (child != null) ...[
-          Divider(height: 1,
-              color: scheme.outlineVariant.withValues(alpha: 0.4)),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
-            child: child!,
-          ),
-        ],
-      ]),
-    );
-  }
-}
-
 // ── Grand milestone info box ──────────────────────────────────────────────────
 
 class _GrandMilestoneInfo extends StatelessWidget {
@@ -712,17 +562,17 @@ class _GrandMilestoneInfo extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color:        const Color(0xFFE65100).withValues(alpha: 0.12),
+                  color:        scheme.primaryContainer,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                      color: const Color(0xFFE65100).withValues(alpha: 0.3)),
+                      color: scheme.primary.withValues(alpha: 0.3)),
                 ),
                 child: Text(
                   t,
                   style: TextStyle(
                     fontSize:   12,
                     fontWeight: FontWeight.w700,
-                    color:      const Color(0xFFE65100),
+                    color:      scheme.onPrimaryContainer,
                   ),
                 ),
               ),
@@ -954,88 +804,5 @@ class _WeeklyConfig extends StatelessWidget {
         ),
       ]),
     ]);
-  }
-}
-
-// ── Test notification button ──────────────────────────────────────────────────
-
-class _TestButton extends StatelessWidget {
-  final bool         sent;
-  final ColorScheme  scheme;
-  final VoidCallback onTap;
-  const _TestButton({
-    required this.sent,
-    required this.scheme,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-            color: scheme.outlineVariant.withValues(alpha: 0.4)),
-      ),
-      child: Row(children: [
-        Container(
-          width: 42, height: 42,
-          decoration: BoxDecoration(
-            color: scheme.surfaceContainerLow,
-            borderRadius: BorderRadius.circular(11),
-          ),
-          child: Icon(
-            sent
-                ? Icons.check_circle_rounded
-                : Icons.notifications_active_rounded,
-            color: sent ? Colors.green : scheme.onSurfaceVariant,
-            size: 22,
-          ),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(
-              L.notifSendTest,
-              style: const TextStyle(fontWeight: FontWeight.w700),
-            ),
-            Text(
-              sent
-                  ? L.notifSentCheckBar
-                  : L.notifMakeSureWorks,
-              style: TextStyle(
-                  fontSize: 13, color: scheme.onSurfaceVariant),
-            ),
-          ]),
-        ),
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          child: sent
-              ? Padding(
-                  key: const ValueKey('done'),
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    L.notifSentBang,
-                    style: TextStyle(
-                      color:      Colors.green,
-                      fontWeight: FontWeight.w700,
-                      fontSize:   13,
-                    ),
-                  ),
-                )
-              : FilledButton.tonal(
-                  key:       const ValueKey('btn'),
-                  onPressed: onTap,
-                  style: FilledButton.styleFrom(
-                    visualDensity: VisualDensity.compact,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                  ),
-                  child: Text(L.notifSendButton),
-                ),
-        ),
-      ]),
-    );
   }
 }
