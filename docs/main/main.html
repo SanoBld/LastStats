@@ -97,6 +97,13 @@
   nothingAccentNotifier.value          = prefs.getString(&#39;ls_nothing_accent&#39;)        ?? &#39;classic&#39;;
   themeModeNotifier.value              = themeFromString(prefs.getString(&#39;ls_theme&#39;));
   accentNotifier.value                 = accentFromString(prefs.getString(&#39;ls_accent&#39;));
+  useDayNightAccentNotifier.value      = prefs.getBool(&#39;ls_use_daynight_accent&#39;)     ?? false;
+  accentDarkNotifier.value             = prefs.getString(&#39;ls_accent_dark&#39;) != null
+      ? accentFromString(prefs.getString(&#39;ls_accent_dark&#39;)) : accentNotifier.value;
+  dayNightUseHoursNotifier.value       = prefs.getBool(&#39;ls_daynight_use_hours&#39;)      ?? false;
+  dayStartHourNotifier.value           = prefs.getInt(&#39;ls_daynight_day_start_hour&#39;)   ?? 7;
+  nightStartHourNotifier.value         = prefs.getInt(&#39;ls_daynight_night_start_hour&#39;) ?? 20;
+  startMinuteTicker();
   useDynamicColorNotifier.value        = prefs.getBool(&#39;ls_use_dynamic_color&#39;)       ?? false;
   useNowPlayingColorNotifier.value     = prefs.getBool(&#39;ls_use_nowplaying_color&#39;)    ?? false;
   artworkColorThemeNotifier.value      = prefs.getBool(&#39;ls_artwork_color_theme&#39;)     ?? false;

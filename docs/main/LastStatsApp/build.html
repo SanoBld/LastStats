@@ -182,6 +182,38 @@ Widget build(BuildContext context) {
               return ValueListenableBuilder&lt;Color&gt;(
                 valueListenable: accentNotifier,
                 builder: (_, accent, _) {
+                  return ValueListenableBuilder&lt;bool&gt;(
+                    valueListenable: useDayNightAccentNotifier,
+                    builder: (_, useDayNight, _) {
+                      return ValueListenableBuilder&lt;Color&gt;(
+                        valueListenable: accentDarkNotifier,
+                        builder: (_, accentDark, _) {
+                          return ValueListenableBuilder&lt;bool&gt;(
+                            valueListenable: dayNightUseHoursNotifier,
+                            builder: (_, useHours, _) {
+                              return ValueListenableBuilder&lt;int&gt;(
+                                valueListenable: dayStartHourNotifier,
+                                builder: (_, dayStartHour, _) {
+                                  return ValueListenableBuilder&lt;int&gt;(
+                                    valueListenable: nightStartHourNotifier,
+                                    builder: (_, nightStartHour, _) {
+                                      return ValueListenableBuilder&lt;int&gt;(
+                                        valueListenable: minuteTickNotifier,
+                                        builder: (_, _, _) {
+                  &#47;&#47; Resolve which accent feeds the light theme and which
+                  &#47;&#47; feeds the dark theme. With hour-based switching on,
+                  &#47;&#47; both themes get the *same* accent (the one matching
+                  &#47;&#47; the current clock time), so the accent follows the
+                  &#47;&#47; time of day even while staying in dark theme.
+                  final bool nightNow = useHours
+                      ? isNightByHour(dayStartHour, nightStartHour)
+                      : false;
+                  final Color lightAccent = !useDayNight
+                      ? accent
+                      : (useHours ? (nightNow ? accentDark : accent) : accent);
+                  final Color darkAccent = !useDayNight
+                      ? accent
+                      : (useHours ? (nightNow ? accentDark : accent) : accentDark);
                   return ValueListenableBuilder&lt;ThemeMode&gt;(
                     valueListenable: themeModeNotifier,
                     builder: (_, mode, _) {
@@ -193,18 +225,18 @@ Widget build(BuildContext context) {
                             builder: (_, _, _) {
                               final ColorScheme lightScheme =
                                   (useDynamic &amp;&amp; lightDynamic != null)
-                                      ? lightDynamic.harmonized()
+                                      ? neutralizeIfGraySchemeItself(lightDynamic.harmonized())
                                       : neutralizeIfGraySeed(ColorScheme.fromSeed(
-                                          seedColor:  seedColorForScheme(accent),
+                                          seedColor:  seedColorForScheme(lightAccent),
                                           brightness: Brightness.light,
-                                        ), accent);
+                                        ), lightAccent);
                               final ColorScheme darkSchemeBase =
                                   (useDynamic &amp;&amp; darkDynamic != null)
-                                      ? darkDynamic.harmonized()
+                                      ? neutralizeIfGraySchemeItself(darkDynamic.harmonized())
                                       : neutralizeIfGraySeed(ColorScheme.fromSeed(
-                                          seedColor:  seedColorForScheme(accent),
+                                          seedColor:  seedColorForScheme(darkAccent),
                                           brightness: Brightness.dark,
-                                        ), accent);
+                                        ), darkAccent);
                               final ColorScheme darkScheme = oled
                                   ? darkSchemeBase.copyWith(
                                       surface:                 Colors.black,
@@ -254,21 +286,33 @@ Widget build(BuildContext context) {
                                   );
                                 },
                               );
-                            },
-                          );
-                        },
-                      );
-                    },
-                  );
-                },
-              );
-            },
-          );
-        },
-      );
-    },
-  );
-}</code></pre>
+                      },
+                    );
+                  },
+                );
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  },
+);
+      },
+    );
+  }</code></pre>
 </section>
 
 
