@@ -5,7 +5,7 @@
     android:targetCellWidth="2"
     android:targetCellHeight="2"
     android:updatePeriodMillis="1800000"
-    android:initialLayout="@layout/widget_loved_count"
-    android:previewLayout="@layout/widget_loved_count"
+    android:initialLayout="@layout/widget_loved_count_nothing"
+    android:previewLayout="@layout/widget_loved_count_nothing"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen" />

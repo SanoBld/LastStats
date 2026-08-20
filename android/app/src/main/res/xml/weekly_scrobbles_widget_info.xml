@@ -5,7 +5,7 @@
     android:targetCellWidth="2"
     android:targetCellHeight="2"
     android:updatePeriodMillis="1800000"
-    android:initialLayout="@layout/widget_weekly_scrobbles"
-    android:previewLayout="@layout/widget_weekly_scrobbles"
+    android:initialLayout="@layout/widget_weekly_scrobbles_nothing"
+    android:previewLayout="@layout/widget_weekly_scrobbles_nothing"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen" />

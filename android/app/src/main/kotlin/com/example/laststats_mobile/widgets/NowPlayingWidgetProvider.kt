@@ -21,8 +21,13 @@ class NowPlayingWidgetProvider : AppWidgetProvider() {
         val artist = data.getString("artist_name", "") ?: ""
         val artUrl = data.getString("track_art", "") ?: ""
         val playing = data.getBoolean("is_playing", false)
+        val palette = WidgetTheme.resolve(context, data)
+        val layout = WidgetTheme.layoutFor(
+            data, R.layout.widget_now_playing_nothing, R.layout.widget_now_playing_default
+        )
 
-        val views = RemoteViews(context.packageName, R.layout.widget_now_playing)
+        val views = RemoteViews(context.packageName, layout)
+        views.setInt(R.id.widget_root, "setBackgroundResource", palette.bgDrawableRes)
         if (track.isEmpty()) {
             views.setTextViewText(R.id.widget_track, "No scrobble yet")
             views.setTextViewText(R.id.widget_artist, "")
@@ -30,10 +35,13 @@ class NowPlayingWidgetProvider : AppWidgetProvider() {
             views.setTextViewText(R.id.widget_track, track)
             views.setTextViewText(R.id.widget_artist, artist)
         }
+        views.setTextColor(R.id.widget_track, palette.text)
+        views.setTextColor(R.id.widget_artist, palette.muted)
         views.setTextViewText(
             R.id.widget_status,
             if (playing) "NOW PLAYING" else "LAST PLAYED"
         )
+        views.setTextColor(R.id.widget_status, palette.accent)
         WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
         for (id in ids) manager.updateAppWidget(id, views)
 

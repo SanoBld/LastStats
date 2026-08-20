@@ -23,15 +23,24 @@ class RecapWidgetProvider : AppWidgetProvider() {
         val track = data.getString("track_name", "") ?: ""
         val artist = data.getString("artist_name", "") ?: ""
         val artUrl = data.getString("track_art", "") ?: ""
+        val palette = WidgetTheme.resolve(context, data)
+        val layout = WidgetTheme.layoutFor(
+            data, R.layout.widget_recap_nothing, R.layout.widget_recap_default
+        )
 
-        val views = RemoteViews(context.packageName, R.layout.widget_recap)
+        val views = RemoteViews(context.packageName, layout)
+        views.setInt(R.id.widget_root, "setBackgroundResource", palette.bgDrawableRes)
         views.setTextViewText(R.id.recap_total, total)
         views.setTextViewText(R.id.recap_weekly, weekly)
         views.setTextViewText(R.id.recap_loved, loved)
+        for (i in intArrayOf(R.id.recap_total, R.id.recap_weekly, R.id.recap_loved)) {
+            views.setTextColor(i, palette.text)
+        }
         views.setTextViewText(
             R.id.recap_now,
             if (track.isEmpty()) "No scrobble yet" else "$track — $artist"
         )
+        views.setTextColor(R.id.recap_now, palette.text)
         WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
         for (id in ids) manager.updateAppWidget(id, views)
 

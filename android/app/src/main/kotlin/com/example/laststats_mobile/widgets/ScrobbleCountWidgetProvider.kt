@@ -18,11 +18,18 @@ class ScrobbleCountWidgetProvider : AppWidgetProvider() {
         val data = HomeWidgetPlugin.getData(context)
         val total = data.getString("total_scrobbles", "0") ?: "0"
         val username = data.getString("username", "") ?: ""
+        val palette = WidgetTheme.resolve(context, data)
+        val layout = WidgetTheme.layoutFor(
+            data, R.layout.widget_scrobble_count_nothing, R.layout.widget_scrobble_count_default
+        )
 
         for (id in ids) {
-            val views = RemoteViews(context.packageName, R.layout.widget_scrobble_count)
+            val views = RemoteViews(context.packageName, layout)
+            views.setInt(R.id.widget_root, "setBackgroundResource", palette.bgDrawableRes)
             views.setTextViewText(R.id.widget_value, total)
+            views.setTextColor(R.id.widget_value, palette.text)
             views.setTextViewText(R.id.widget_label, "scrobbles · $username")
+            views.setTextColor(R.id.widget_label, palette.accent)
             WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
             manager.updateAppWidget(id, views)
         }

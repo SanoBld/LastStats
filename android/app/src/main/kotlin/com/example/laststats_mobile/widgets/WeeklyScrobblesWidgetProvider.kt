@@ -17,11 +17,18 @@ class WeeklyScrobblesWidgetProvider : AppWidgetProvider() {
     ) {
         val data = HomeWidgetPlugin.getData(context)
         val weekly = data.getString("weekly_scrobbles", "0") ?: "0"
+        val palette = WidgetTheme.resolve(context, data)
+        val layout = WidgetTheme.layoutFor(
+            data, R.layout.widget_weekly_scrobbles_nothing, R.layout.widget_weekly_scrobbles_default
+        )
 
         for (id in ids) {
-            val views = RemoteViews(context.packageName, R.layout.widget_weekly_scrobbles)
+            val views = RemoteViews(context.packageName, layout)
+            views.setInt(R.id.widget_root, "setBackgroundResource", palette.bgDrawableRes)
             views.setTextViewText(R.id.widget_value, weekly)
+            views.setTextColor(R.id.widget_value, palette.text)
             views.setTextViewText(R.id.widget_label, "scrobbles this week")
+            views.setTextColor(R.id.widget_label, palette.accent)
             WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
             manager.updateAppWidget(id, views)
         }
