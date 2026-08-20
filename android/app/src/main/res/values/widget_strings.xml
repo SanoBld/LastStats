@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_name_scrobbles">LastStats — Total scrobbles</string>
+    <string name="widget_name_now_playing">LastStats — Now playing</string>
+    <string name="widget_name_loved">LastStats — Loved tracks</string>
+    <string name="widget_name_weekly">LastStats — This week</string>
+    <string name="widget_name_recap">LastStats — Recap</string>
+</resources>

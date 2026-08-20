@@ -1,4 +1,4 @@
-// Widget showing the current (or last played) track.
+// Widget showing the current (or last played) track, with album art.
 
 package com.example.laststats_mobile.widgets
 
@@ -8,6 +8,7 @@ import android.content.Context
 import android.widget.RemoteViews
 import com.example.laststats_mobile.R
 import es.antonborri.home_widget.HomeWidgetPlugin
+import kotlin.concurrent.thread
 
 class NowPlayingWidgetProvider : AppWidgetProvider() {
     override fun onUpdate(
@@ -18,23 +19,31 @@ class NowPlayingWidgetProvider : AppWidgetProvider() {
         val data = HomeWidgetPlugin.getData(context)
         val track = data.getString("track_name", "") ?: ""
         val artist = data.getString("artist_name", "") ?: ""
+        val artUrl = data.getString("track_art", "") ?: ""
         val playing = data.getBoolean("is_playing", false)
 
-        for (id in ids) {
-            val views = RemoteViews(context.packageName, R.layout.widget_now_playing)
-            if (track.isEmpty()) {
-                views.setTextViewText(R.id.widget_track, "No scrobble yet")
-                views.setTextViewText(R.id.widget_artist, "")
-            } else {
-                views.setTextViewText(R.id.widget_track, track)
-                views.setTextViewText(R.id.widget_artist, artist)
-            }
-            views.setTextViewText(
-                R.id.widget_status,
-                if (playing) "▶ Now playing" else "Last played"
-            )
-            WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
-            manager.updateAppWidget(id, views)
+        val views = RemoteViews(context.packageName, R.layout.widget_now_playing)
+        if (track.isEmpty()) {
+            views.setTextViewText(R.id.widget_track, "No scrobble yet")
+            views.setTextViewText(R.id.widget_artist, "")
+        } else {
+            views.setTextViewText(R.id.widget_track, track)
+            views.setTextViewText(R.id.widget_artist, artist)
+        }
+        views.setTextViewText(
+            R.id.widget_status,
+            if (playing) "NOW PLAYING" else "LAST PLAYED"
+        )
+        WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
+        for (id in ids) manager.updateAppWidget(id, views)
+
+        // Album art loads async — push a second update once it's ready.
+        thread {
+            val bitmap = WidgetImageLoader.fetch(artUrl)?.let {
+                WidgetImageLoader.roundCorners(it, 24f)
+            } ?: return@thread
+            views.setImageViewBitmap(R.id.widget_art, bitmap)
+            for (id in ids) manager.updateAppWidget(id, views)
         }
     }
 }

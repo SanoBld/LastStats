@@ -8,6 +8,7 @@ import android.content.Context
 import android.widget.RemoteViews
 import com.example.laststats_mobile.R
 import es.antonborri.home_widget.HomeWidgetPlugin
+import kotlin.concurrent.thread
 
 class RecapWidgetProvider : AppWidgetProvider() {
     override fun onUpdate(
@@ -21,18 +22,25 @@ class RecapWidgetProvider : AppWidgetProvider() {
         val loved = data.getString("loved_count", "0") ?: "0"
         val track = data.getString("track_name", "") ?: ""
         val artist = data.getString("artist_name", "") ?: ""
+        val artUrl = data.getString("track_art", "") ?: ""
 
-        for (id in ids) {
-            val views = RemoteViews(context.packageName, R.layout.widget_recap)
-            views.setTextViewText(R.id.recap_total, total)
-            views.setTextViewText(R.id.recap_weekly, weekly)
-            views.setTextViewText(R.id.recap_loved, loved)
-            views.setTextViewText(
-                R.id.recap_now,
-                if (track.isEmpty()) "No scrobble yet" else "$track — $artist"
-            )
-            WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
-            manager.updateAppWidget(id, views)
+        val views = RemoteViews(context.packageName, R.layout.widget_recap)
+        views.setTextViewText(R.id.recap_total, total)
+        views.setTextViewText(R.id.recap_weekly, weekly)
+        views.setTextViewText(R.id.recap_loved, loved)
+        views.setTextViewText(
+            R.id.recap_now,
+            if (track.isEmpty()) "No scrobble yet" else "$track — $artist"
+        )
+        WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
+        for (id in ids) manager.updateAppWidget(id, views)
+
+        thread {
+            val bitmap = WidgetImageLoader.fetch(artUrl)?.let {
+                WidgetImageLoader.roundCorners(it, 14f)
+            } ?: return@thread
+            views.setImageViewBitmap(R.id.recap_art, bitmap)
+            for (id in ids) manager.updateAppWidget(id, views)
         }
     }
 }

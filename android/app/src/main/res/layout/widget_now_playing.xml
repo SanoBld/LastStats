@@ -4,35 +4,52 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:padding="14dp">
+    android:padding="12dp">
 
-    <TextView
-        android:id="@+id/widget_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#D4364B"
-        android:textSize="11sp"
-        android:textStyle="bold" />
+    <ImageView
+        android:id="@+id/widget_art"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/widget_art_placeholder"
+        android:scaleType="centerCrop" />
 
-    <TextView
-        android:id="@+id/widget_track"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/widget_artist"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:textColor="#B0AEB3"
-        android:textSize="13sp" />
+        <TextView
+            android:id="@+id/widget_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/ntype82_regular"
+            android:textColor="#FF2020"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/widget_track"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:fontFamily="@font/ntype82_regular"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_artist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:fontFamily="@font/ntype82_regular"
+            android:textColor="#8A8A8A"
+            android:textSize="12sp" />
+    </LinearLayout>
 </LinearLayout>

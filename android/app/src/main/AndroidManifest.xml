@@ -118,7 +118,7 @@
             android:value="2" />
 
         <!-- Home screen widgets -->
-        <receiver android:name=".widgets.ScrobbleCountWidgetProvider" android:exported="false">
+        <receiver android:name=".widgets.ScrobbleCountWidgetProvider" android:exported="false" android:label="@string/widget_name_scrobbles">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -127,7 +127,7 @@
                 android:resource="@xml/scrobble_count_widget_info" />
         </receiver>
 
-        <receiver android:name=".widgets.NowPlayingWidgetProvider" android:exported="false">
+        <receiver android:name=".widgets.NowPlayingWidgetProvider" android:exported="false" android:label="@string/widget_name_now_playing">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -136,7 +136,7 @@
                 android:resource="@xml/now_playing_widget_info" />
         </receiver>
 
-        <receiver android:name=".widgets.LovedCountWidgetProvider" android:exported="false">
+        <receiver android:name=".widgets.LovedCountWidgetProvider" android:exported="false" android:label="@string/widget_name_loved">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -145,7 +145,7 @@
                 android:resource="@xml/loved_count_widget_info" />
         </receiver>
 
-        <receiver android:name=".widgets.WeeklyScrobblesWidgetProvider" android:exported="false">
+        <receiver android:name=".widgets.WeeklyScrobblesWidgetProvider" android:exported="false" android:label="@string/widget_name_weekly">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -154,7 +154,7 @@
                 android:resource="@xml/weekly_scrobbles_widget_info" />
         </receiver>
 
-        <receiver android:name=".widgets.RecapWidgetProvider" android:exported="false">
+        <receiver android:name=".widgets.RecapWidgetProvider" android:exported="false" android:label="@string/widget_name_recap">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
