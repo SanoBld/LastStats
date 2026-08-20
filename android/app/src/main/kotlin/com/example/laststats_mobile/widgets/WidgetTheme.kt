@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.graphics.Color
+import com.example.laststats_mobile.R
 
 data class WidgetPalette(
     val bgDrawableRes: Int,
