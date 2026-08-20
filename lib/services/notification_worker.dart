@@ -14,6 +14,7 @@ import 'update_service.dart';
 import 'lastfm_service.dart';
 import 'all_scrobbles_service.dart';
 import 'scrobbles_file_cache.dart';
+import 'widget_service.dart';
 
 // ── Task names ───────────────────────────────────────────────────────────────
 const _kTaskMilestone     = 'ls_milestone_check';
@@ -101,6 +102,8 @@ void callbackDispatcher() {
     } catch (_) {
       // Never throw from the worker — WorkManager would retry and spam
     }
+    // Keep home screen widgets fresh on every background run.
+    await WidgetService.updateAll();
     return true;
   });
 }

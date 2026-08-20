@@ -18,6 +18,7 @@ import 'services/friends_library_service.dart';
 import 'services/achievements.dart';
 import 'services/notification_service.dart';
 import 'services/notification_worker.dart';
+import 'services/widget_service.dart';
 import 'services/storage_manager.dart';
 import 'services/update_startup.dart';
 import 'services/update_service.dart';
@@ -137,6 +138,8 @@ void main() async {
     if (isMobile) {
       await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
       await NotificationWorker.scheduleAll();
+      // Fire-and-forget: refresh home screen widgets on app start.
+      WidgetService.updateAll();
     }
   }
 
