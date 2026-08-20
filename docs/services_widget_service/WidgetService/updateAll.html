@@ -76,6 +76,14 @@
     final apiKey = prefs.getString(&#39;ls_apikey&#39;) ?? &#39;&#39;;
     if (username.isEmpty || apiKey.isEmpty) return; &#47;&#47; not logged in
 
+    &#47;&#47; App theme, passed to Android so widgets match it (style + light&#47;dark).
+    final themeStyle = prefs.getString(&#39;ls_theme_style&#39;) ?? &#39;default&#39;;
+    final themeMode = prefs.getString(&#39;ls_theme&#39;) ?? &#39;system&#39;;
+    final accentRaw = prefs.getString(&#39;ls_accent&#39;) ?? &#39;&#39;;
+    await HomeWidget.saveWidgetData&lt;String&gt;(&#39;theme_style&#39;, themeStyle);
+    await HomeWidget.saveWidgetData&lt;String&gt;(&#39;theme_mode&#39;, themeMode);
+    await HomeWidget.saveWidgetData&lt;String&gt;(&#39;accent_color&#39;, accentRaw);
+
     await HomeWidget.setAppGroupId(_appGroupId);
     final api = LastFmService(apiKey: apiKey, username: username);
 
