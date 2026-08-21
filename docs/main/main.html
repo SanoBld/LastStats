@@ -175,6 +175,8 @@
       await NotificationWorker.scheduleAll();
       &#47;&#47; Fire-and-forget: refresh home screen widgets on app start.
       WidgetService.updateAll();
+      &#47;&#47; ...and every time the app comes back to the foreground.
+      WidgetsBinding.instance.addObserver(_WidgetRefreshObserver());
     }
   }
 

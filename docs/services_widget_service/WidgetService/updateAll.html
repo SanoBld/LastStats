@@ -79,12 +79,14 @@
     &#47;&#47; App theme, passed to Android so widgets match it (style + light&#47;dark).
     final themeStyle = prefs.getString(&#39;ls_theme_style&#39;) ?? &#39;default&#39;;
     final themeMode = prefs.getString(&#39;ls_theme&#39;) ?? &#39;system&#39;;
-    final accentRaw = prefs.getString(&#39;ls_accent&#39;) ?? &#39;&#39;;
+    final accentLight = prefs.getString(&#39;ls_accent&#39;) ?? &#39;&#39;;
+    final accentDark = prefs.getString(&#39;ls_accent_dark&#39;) ?? accentLight;
+    await HomeWidget.setAppGroupId(_appGroupId);
     await HomeWidget.saveWidgetData&lt;String&gt;(&#39;theme_style&#39;, themeStyle);
     await HomeWidget.saveWidgetData&lt;String&gt;(&#39;theme_mode&#39;, themeMode);
-    await HomeWidget.saveWidgetData&lt;String&gt;(&#39;accent_color&#39;, accentRaw);
+    await HomeWidget.saveWidgetData&lt;String&gt;(&#39;accent_light&#39;, accentLight);
+    await HomeWidget.saveWidgetData&lt;String&gt;(&#39;accent_dark&#39;, accentDark);
 
-    await HomeWidget.setAppGroupId(_appGroupId);
     final api = LastFmService(apiKey: apiKey, username: username);
 
     &#47;&#47; Total scrobbles + user avatar
