@@ -25,13 +25,13 @@ class ScrobbleCountWidgetProvider : AppWidgetProvider() {
 
         for (id in ids) {
             val views = RemoteViews(context.packageName, layout)
-            views.setInt(R.id.widget_root, "setBackgroundResource", palette.bgDrawableRes)
+            views.setInt(R.id.card_bg, "setColorFilter", palette.surface)
+            views.setInt(R.id.icon_chip, "setColorFilter", palette.chip)
             views.setTextViewText(R.id.widget_value, total)
             views.setTextColor(R.id.widget_value, palette.text)
             views.setTextViewText(R.id.widget_label, "scrobbles · $username")
             views.setTextColor(R.id.widget_label, palette.accent)
-            views.setInt(R.id.accent_bar, "setBackgroundColor", palette.accent)
-        WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
+            WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
             manager.updateAppWidget(id, views)
         }
     }

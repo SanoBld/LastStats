@@ -1,36 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_bg_nothing_dark"
-    android:orientation="vertical"
-    android:padding="14dp">
-    <ImageView
-        android:id="@+id/accent_bar"
-        android:layout_width="26dp"
-        android:layout_height="3dp"
-        android:layout_marginBottom="10dp"
-        android:background="#FFFFFF" />
-
+    android:layout_height="match_parent">
 
     <ImageView
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:src="@mipmap/ic_launcher" />
+        android:id="@+id/card_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/widget_card_shape" />
 
-    <TextView
-        android:id="@+id/widget_value"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:textColor="#FFFFFF"
-        android:textSize="30sp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="14dp">
 
-    <TextView
-        android:id="@+id/widget_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FF2020"
-        android:textSize="11sp" />
-</LinearLayout>
+        <FrameLayout
+            android:layout_width="28dp"
+            android:layout_height="28dp">
+            <ImageView
+                android:id="@+id/icon_chip"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/widget_chip_circle" />
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:src="@mipmap/ic_launcher" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/widget_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="11sp" />
+    </LinearLayout>
+</FrameLayout>

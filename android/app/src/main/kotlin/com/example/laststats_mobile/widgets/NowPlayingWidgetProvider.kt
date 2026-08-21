@@ -27,7 +27,6 @@ class NowPlayingWidgetProvider : AppWidgetProvider() {
         )
 
         val views = RemoteViews(context.packageName, layout)
-        views.setInt(R.id.widget_root, "setBackgroundResource", palette.bgDrawableRes)
         if (track.isEmpty()) {
             views.setTextViewText(R.id.widget_track, "No scrobble yet")
             views.setTextViewText(R.id.widget_artist, "")

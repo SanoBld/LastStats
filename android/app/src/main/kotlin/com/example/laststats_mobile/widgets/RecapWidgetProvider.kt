@@ -29,7 +29,8 @@ class RecapWidgetProvider : AppWidgetProvider() {
         )
 
         val views = RemoteViews(context.packageName, layout)
-        views.setInt(R.id.widget_root, "setBackgroundResource", palette.bgDrawableRes)
+        views.setInt(R.id.card_bg, "setColorFilter", palette.surface)
+        views.setInt(R.id.icon_chip, "setColorFilter", palette.chip)
         views.setTextViewText(R.id.recap_total, total)
         views.setTextViewText(R.id.recap_weekly, weekly)
         views.setTextViewText(R.id.recap_loved, loved)
@@ -41,7 +42,6 @@ class RecapWidgetProvider : AppWidgetProvider() {
             if (track.isEmpty()) "No scrobble yet" else "$track — $artist"
         )
         views.setTextColor(R.id.recap_now, palette.text)
-        views.setInt(R.id.accent_bar, "setBackgroundColor", palette.accent)
         WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
         for (id in ids) manager.updateAppWidget(id, views)
 

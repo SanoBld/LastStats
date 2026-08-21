@@ -1,5 +1,6 @@
-// Reads the app's theme choice (style + light/dark) and turns it into
-// concrete colors for the widgets. Falls back to sensible defaults.
+// Reads the app's theme choice (style + light/dark + accent) and turns it
+// into concrete colors for the widgets — including a card background that's
+// actually tinted with the user's chosen accent, like Material You does.
 
 package com.example.laststats_mobile.widgets
 
@@ -7,10 +8,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.graphics.Color
-import com.example.laststats_mobile.R
 
 data class WidgetPalette(
-    val bgDrawableRes: Int,
+    val surface: Int,   // card background color (tinted by accent)
+    val chip: Int,      // small icon-chip background
     val text: Int,
     val muted: Int,
     val accent: Int
@@ -30,40 +31,33 @@ object WidgetTheme {
             }
         }
 
-        return if (style == "nothing") {
-            if (isDark) {
-                WidgetPalette(
-                    bgDrawableRes = R.drawable.widget_bg_nothing_dark,
-                    text = Color.parseColor("#FFFFFF"),
-                    muted = Color.parseColor("#8A8A8A"),
-                    accent = Color.parseColor("#FF2020")
-                )
-            } else {
-                WidgetPalette(
-                    bgDrawableRes = R.drawable.widget_bg_nothing_light,
-                    text = Color.parseColor("#0D0D0D"),
-                    muted = Color.parseColor("#6B6B6B"),
-                    accent = Color.parseColor("#FF2020")
-                )
-            }
+        val accent = if (style == "nothing") {
+            Color.parseColor("#FF2020")
         } else {
-            val accent = parseAccent(data.getString("accent_color", ""))
-            if (isDark) {
-                WidgetPalette(
-                    bgDrawableRes = R.drawable.widget_bg_default_dark,
-                    text = Color.parseColor("#E6E1E5"),
-                    muted = Color.parseColor("#948F99"),
-                    accent = accent
-                )
-            } else {
-                WidgetPalette(
-                    bgDrawableRes = R.drawable.widget_bg_default_light,
-                    text = Color.parseColor("#1C1B1F"),
-                    muted = Color.parseColor("#79747E"),
-                    accent = accent
-                )
-            }
+            parseAccent(data.getString("accent_color", ""))
         }
+
+        // Base card color, then a touch of accent mixed in — mirrors the
+        // app's own Material You surfaces (ColorScheme.fromSeed).
+        val base = if (isDark) Color.parseColor("#0D0D0D") else Color.parseColor("#FFFFFF")
+        val surfaceMix = if (style == "nothing") 0.05f else 0.12f
+        val surface = blend(base, accent, surfaceMix)
+
+        val chipMix = if (isDark) 0.30f else 0.18f
+        val chip = blend(base, accent, chipMix)
+
+        val text = if (isDark) Color.parseColor("#F5F5F5") else Color.parseColor("#0D0D0D")
+        val muted = if (isDark) Color.parseColor("#9A9A9A") else Color.parseColor("#6B6B6B")
+
+        return WidgetPalette(surface, chip, text, muted, accent)
+    }
+
+    // Mixes `overlay` into `base` by `ratio` (0 = pure base, 1 = pure overlay).
+    private fun blend(base: Int, overlay: Int, ratio: Float): Int {
+        val r = (Color.red(base) * (1 - ratio) + Color.red(overlay) * ratio).toInt()
+        val g = (Color.green(base) * (1 - ratio) + Color.green(overlay) * ratio).toInt()
+        val b = (Color.blue(base) * (1 - ratio) + Color.blue(overlay) * ratio).toInt()
+        return Color.rgb(r, g, b)
     }
 
     // Mirrors app_state.dart's accentFromString: named key or '#RRGGBB' hex.
@@ -85,8 +79,8 @@ object WidgetTheme {
         }
     }
 
-    // Which layout resource to inflate — the Nothing style uses the app's
-    // dot-matrix fonts, the default style uses the system font.
+    // Which layout resource to inflate — same idea for both, kept separate
+    // in case the two styles need to diverge again later.
     fun layoutFor(data: SharedPreferences, nothingRes: Int, defaultRes: Int): Int {
         val style = data.getString("theme_style", "default") ?: "default"
         return if (style == "nothing") nothingRes else defaultRes

@@ -3,9 +3,9 @@
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/widget_bg_nothing_dark"
     android:clipToOutline="true"
-    android:outlineProvider="background">
+    android:outlineProvider="background"
+    android:background="@drawable/widget_card_shape">
 
     <!-- Full-bleed album art -->
     <ImageView
