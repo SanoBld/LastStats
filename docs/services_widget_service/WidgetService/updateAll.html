@@ -81,11 +81,13 @@
     final themeMode = prefs.getString(&#39;ls_theme&#39;) ?? &#39;system&#39;;
     final accentLight = prefs.getString(&#39;ls_accent&#39;) ?? &#39;&#39;;
     final accentDark = prefs.getString(&#39;ls_accent_dark&#39;) ?? accentLight;
+    final widgetTint = prefs.getBool(&#39;ls_widget_tint&#39;) ?? false;
     await HomeWidget.setAppGroupId(_appGroupId);
     await HomeWidget.saveWidgetData&lt;String&gt;(&#39;theme_style&#39;, themeStyle);
     await HomeWidget.saveWidgetData&lt;String&gt;(&#39;theme_mode&#39;, themeMode);
     await HomeWidget.saveWidgetData&lt;String&gt;(&#39;accent_light&#39;, accentLight);
     await HomeWidget.saveWidgetData&lt;String&gt;(&#39;accent_dark&#39;, accentDark);
+    await HomeWidget.saveWidgetData&lt;bool&gt;(&#39;widget_tint&#39;, widgetTint);
 
     final api = LastFmService(apiKey: apiKey, username: username);
 
