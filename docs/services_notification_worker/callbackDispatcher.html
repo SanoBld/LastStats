@@ -89,6 +89,8 @@ void callbackDispatcher() {
         case _kTaskScrobbleSync:
           await _runScrobbleSync();
           break;
+        case _kTaskWidgetRefresh:
+          break; &#47;&#47; WidgetService.updateAll() below already covers it
       }
     } catch (_) {
       &#47;&#47; Never throw from the worker — WorkManager would retry and spam

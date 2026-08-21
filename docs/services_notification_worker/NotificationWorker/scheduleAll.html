@@ -141,6 +141,18 @@
       ),
     );
   }
+
+  &#47;&#47; ── Widget refresh task ──────────────────────────────────────────────
+  &#47;&#47; Always registered — the only way home screen widgets get fresh data
+  &#47;&#47; when the app isn&#39;t open. Android enforces a 15-minute minimum.
+  await Workmanager().cancelByUniqueName(_kTaskWidgetRefresh);
+  await Workmanager().registerPeriodicTask(
+    _kTaskWidgetRefresh,
+    _kTaskWidgetRefresh,
+    frequency:          const Duration(minutes: 30),
+    existingWorkPolicy: ExistingWorkPolicy.keep,
+    constraints: Constraints(networkType: NetworkType.connected),
+  );
 }</code></pre>
 </section>
 
