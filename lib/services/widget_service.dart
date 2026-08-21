@@ -30,11 +30,13 @@ class WidgetService {
       final themeMode = prefs.getString('ls_theme') ?? 'system';
       final accentLight = prefs.getString('ls_accent') ?? '';
       final accentDark = prefs.getString('ls_accent_dark') ?? accentLight;
+      final widgetTint = prefs.getBool('ls_widget_tint') ?? false;
       await HomeWidget.setAppGroupId(_appGroupId);
       await HomeWidget.saveWidgetData<String>('theme_style', themeStyle);
       await HomeWidget.saveWidgetData<String>('theme_mode', themeMode);
       await HomeWidget.saveWidgetData<String>('accent_light', accentLight);
       await HomeWidget.saveWidgetData<String>('accent_dark', accentDark);
+      await HomeWidget.saveWidgetData<bool>('widget_tint', widgetTint);
 
       final api = LastFmService(apiKey: apiKey, username: username);
 

@@ -42,6 +42,7 @@ class _AppearancePageState extends State<AppearancePage> {
   bool   _dayNightUseHours     = false;
   int    _dayStartHour         = 7;
   int    _nightStartHour       = 20;
+  bool   _widgetTint           = false;
 
   @override
   void initState() {
@@ -72,6 +73,7 @@ class _AppearancePageState extends State<AppearancePage> {
       _artworkColorTheme    = p.getBool('ls_artwork_color_theme')       ?? false;
       _keepLastArtworkColor = p.getBool('ls_keep_last_artwork_color')   ?? false;
       _oledMode             = p.getBool('ls_oled_mode')                 ?? false;
+      _widgetTint           = p.getBool('ls_widget_tint')               ?? false;
       final fbHex = p.getString('ls_nowplaying_fallback_color');
       _fallbackAccent = fbHex != null
           ? accentFromString(fbHex)
@@ -424,6 +426,38 @@ class _AppearancePageState extends State<AppearancePage> {
             ),
           ),
         ]),
+
+        const SizedBox(height: 16),
+
+        // ══════════════════════════════════════════════════════════════════
+        //  Android widgets — separate from in-app accent, Android-only
+        // ══════════════════════════════════════════════════════════════════
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Text(
+            _ct('Widgets Android', 'Android widgets'),
+            style: text.labelMedium?.copyWith(
+                color: scheme.primary, fontWeight: FontWeight.w700,
+                letterSpacing: 0.8),
+          ),
+        ),
+        Card(
+          margin: EdgeInsets.zero,
+          child: SwitchListTile(
+            secondary: Icon(Icons.widgets_rounded, color: scheme.primary),
+            title: Text(_ct('Teinter avec l\'accent', 'Tint with accent color')),
+            subtitle: Text(_ct(
+              'Sinon les widgets restent blanc / noir pur, quel que soit le thème de l\'app.',
+              'Otherwise widgets stay pure white / black, regardless of the app\'s theme.',
+            )),
+            value: _widgetTint,
+            onChanged: (v) async {
+              await _set('ls_widget_tint', v);
+              setState(() => _widgetTint = v);
+              WidgetService.updateAll();
+            },
+          ),
+        ),
 
         const SizedBox(height: 16),
 

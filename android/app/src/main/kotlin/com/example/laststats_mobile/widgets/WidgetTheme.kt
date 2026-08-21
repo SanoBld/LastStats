@@ -38,13 +38,16 @@ object WidgetTheme {
             parseAccent(data.getString(key, ""))
         }
 
-        // Base card color, then a touch of accent mixed in — mirrors the
-        // app's own Material You surfaces (ColorScheme.fromSeed).
+        // Base card color, then — only if the user opted in — a touch of
+        // accent mixed in, mirroring the app's own Material You surfaces.
+        // Off by default: widgets stay pure white / pure black.
+        val tintOn = data.getBoolean("widget_tint", false)
         val base = if (isDark) Color.parseColor("#0D0D0D") else Color.parseColor("#FFFFFF")
-        val surfaceMix = if (style == "nothing") 0.05f else 0.12f
+        val surfaceMix = if (!tintOn) 0f else if (style == "nothing") 0.05f else 0.12f
         val surface = blend(base, accent, surfaceMix)
 
-        val chipMix = if (isDark) 0.30f else 0.18f
+        val chipMix = if (!tintOn) (if (isDark) 0.12f else 0.08f)
+                      else (if (isDark) 0.30f else 0.18f)
         val chip = blend(base, accent, chipMix)
 
         val text = if (isDark) Color.parseColor("#F5F5F5") else Color.parseColor("#0D0D0D")

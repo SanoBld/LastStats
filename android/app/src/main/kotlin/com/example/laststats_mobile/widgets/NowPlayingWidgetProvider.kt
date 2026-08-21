@@ -34,8 +34,8 @@ class NowPlayingWidgetProvider : AppWidgetProvider() {
             views.setTextViewText(R.id.widget_track, track)
             views.setTextViewText(R.id.widget_artist, artist)
         }
-        views.setTextColor(R.id.widget_track, palette.text)
-        views.setTextColor(R.id.widget_artist, palette.muted)
+        // Text sits over a photo + dark scrim, never over the app's surface
+        // color — so it must always stay light, regardless of light/dark theme.
         views.setTextViewText(
             R.id.widget_status,
             if (playing) "NOW PLAYING" else "LAST PLAYED"

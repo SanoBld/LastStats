@@ -30,25 +30,10 @@
 -->
 
 
-## v3.1.0
+## v3.2.0
 
-**Levels & Achievements**
-- New account level system, based on total scrobbles
-- New achievements system, with card borders (bronze to iridescent) based on play count
-- Two new achievement categories: friends added, and taste comparisons made
-- All computed automatically from cached stats, no extra network calls
-
-**3D Artwork Cards**
-- Share artwork cards as an image
-- QR code sharing and QR code scanning for profiles
-- Achievement badges now show their name when shared, not just the tier
-
-**Settings**
-- Rebuilt settings tabs, including a redesigned FAQ page with more questions
-- Eco mode for battery saving
-- Reworked updates page, with a searchable, filterable version history
-- Fixed accent colors: picking black or white no longer looks tinted blue
-- New: separate accent color for light and dark theme, optionally switched by a fixed time of day instead of the active theme
-
-**Performance**
-- General app optimization, faster and smoother overall
+**Home Screen Widgets** (Android)
+- New: 5 home screen widgets — total scrobbles, now playing, loved tracks, this week, and a full recap
+- Now Playing widget shows the album art full-bleed, with track and artist over a dark gradient
+- Widgets follow the app's theme (style, light/dark, and accent color), with a toggle to keep them pure white/black instead
+- Auto-refresh while the app is open, plus a background task every ~30 min
