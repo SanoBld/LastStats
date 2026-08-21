@@ -109,6 +109,37 @@ class WidgetService {
     }
   }
 
+  /// Lightweight push — no network call. Reuses now-playing data the app
+  /// already fetched (dashboard polling), so it's cheap enough to call on
+  /// every poll tick (every 10–30s) and keeps the widget genuinely live.
+  static Future<void> pushNowPlaying(Map<String, dynamic>? np) async {
+    try {
+      await HomeWidget.setAppGroupId(_appGroupId);
+      String trackName = '', artistName = '', trackArt = '';
+      bool isPlaying = false;
+      if (np != null) {
+        trackName = np['name']?.toString() ?? '';
+        artistName = (np['artist'] is Map)
+            ? (np['artist']['#text']?.toString() ?? '')
+            : np['artist']?.toString() ?? '';
+        trackArt = _pickImage(np['image']);
+        isPlaying = np['@attr']?['nowplaying'] == 'true';
+      }
+      await HomeWidget.saveWidgetData<String>('track_name', trackName);
+      await HomeWidget.saveWidgetData<String>('artist_name', artistName);
+      await HomeWidget.saveWidgetData<String>('track_art', trackArt);
+      await HomeWidget.saveWidgetData<bool>('is_playing', isPlaying);
+      await HomeWidget.updateWidget(
+        name: _providerNowPlaying, androidName: _providerNowPlaying,
+      );
+      await HomeWidget.updateWidget(
+        name: _providerRecap, androidName: _providerRecap,
+      );
+    } catch (_) {
+      // Best-effort — never disrupt the app's own polling loop.
+    }
+  }
+
   static String _pickImage(dynamic images) {
     if (images is! List || images.isEmpty) return '';
     // Last.fm gives sizes small→extralarge; take the biggest available.

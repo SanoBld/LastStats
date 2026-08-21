@@ -423,6 +423,9 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         _lastExtractedUrl = '';
         accentNotifier.value = _lastFallback();
       }
+      // Keep the "now playing" widget live while the app is open — no
+      // extra network call, this reuses what was just fetched above.
+      WidgetService.pushNowPlaying(np);
 
       if (changed) {
         setState(() => _nowPlaying = np);
@@ -434,6 +437,9 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
 
   Future<void> _refreshTopLists() async {
     if (!mounted) return;
+    // Full stats refresh (total/weekly/loved) while the app is open —
+    // don't rely only on app-open/close events or the ~30min background task.
+    WidgetService.updateAll();
     try {
       final results = await Future.wait([
         widget.service.getTopArtists(period: 'overall', limit: 50),
