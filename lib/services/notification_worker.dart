@@ -504,7 +504,6 @@ class NotificationWorker {
         ),
       );
     }
-  }
 
     // ── Widget refresh task ──────────────────────────────────────────────
     // Always registered — the only way home screen widgets get fresh data
