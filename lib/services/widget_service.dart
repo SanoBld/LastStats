@@ -112,7 +112,10 @@ class WidgetService {
     // Last.fm gives sizes small→extralarge; take the biggest available.
     for (final img in images.reversed) {
       final url = img['#text']?.toString() ?? '';
-      if (url.isNotEmpty) return url;
+      // Skip Last.fm's own "no cover art" placeholder image.
+      if (url.isNotEmpty && !url.contains('2a96cbd8b46e442fc41c2b86b821562f')) {
+        return url;
+      }
     }
     return '';
   }

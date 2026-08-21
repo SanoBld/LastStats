@@ -22,6 +22,7 @@ const _kTaskRecap         = 'ls_recap_check';
 const _kTaskUpdate        = 'ls_update_check';
 const _kTaskNews          = 'ls_news_check';
 const _kTaskScrobbleSync  = 'ls_scrobble_sync_task';
+const _kTaskWidgetRefresh = 'ls_widget_refresh_task';
 
 // ── Scrobble background sync prefs ──────────────────────────────────────────
 const _kSyncEnabled   = 'ls_scrobble_sync_enabled';
@@ -98,6 +99,8 @@ void callbackDispatcher() {
         case _kTaskScrobbleSync:
           await _runScrobbleSync();
           break;
+        case _kTaskWidgetRefresh:
+          break; // WidgetService.updateAll() below already covers it
       }
     } catch (_) {
       // Never throw from the worker — WorkManager would retry and spam
@@ -501,6 +504,19 @@ class NotificationWorker {
         ),
       );
     }
+  }
+
+    // ── Widget refresh task ──────────────────────────────────────────────
+    // Always registered — the only way home screen widgets get fresh data
+    // when the app isn't open. Android enforces a 15-minute minimum.
+    await Workmanager().cancelByUniqueName(_kTaskWidgetRefresh);
+    await Workmanager().registerPeriodicTask(
+      _kTaskWidgetRefresh,
+      _kTaskWidgetRefresh,
+      frequency:          const Duration(minutes: 30),
+      existingWorkPolicy: ExistingWorkPolicy.keep,
+      constraints: Constraints(networkType: NetworkType.connected),
+    );
   }
 
   static Future<void> cancelAll() async {

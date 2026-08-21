@@ -42,6 +42,7 @@ class NowPlayingWidgetProvider : AppWidgetProvider() {
             if (playing) "NOW PLAYING" else "LAST PLAYED"
         )
         views.setTextColor(R.id.widget_status, palette.accent)
+        views.setInt(R.id.accent_bar, "setBackgroundColor", palette.accent)
         WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
         for (id in ids) manager.updateAppWidget(id, views)
 

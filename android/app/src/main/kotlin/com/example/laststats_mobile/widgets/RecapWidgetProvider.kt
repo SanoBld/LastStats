@@ -41,6 +41,7 @@ class RecapWidgetProvider : AppWidgetProvider() {
             if (track.isEmpty()) "No scrobble yet" else "$track — $artist"
         )
         views.setTextColor(R.id.recap_now, palette.text)
+        views.setInt(R.id.accent_bar, "setBackgroundColor", palette.accent)
         WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
         for (id in ids) manager.updateAppWidget(id, views)
 
