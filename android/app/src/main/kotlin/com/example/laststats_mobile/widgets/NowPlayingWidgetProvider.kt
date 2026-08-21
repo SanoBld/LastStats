@@ -42,15 +42,12 @@ class NowPlayingWidgetProvider : AppWidgetProvider() {
             if (playing) "NOW PLAYING" else "LAST PLAYED"
         )
         views.setTextColor(R.id.widget_status, palette.accent)
-        views.setInt(R.id.accent_bar, "setBackgroundColor", palette.accent)
         WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
         for (id in ids) manager.updateAppWidget(id, views)
 
         // Album art loads async — push a second update once it's ready.
         thread {
-            val bitmap = WidgetImageLoader.fetch(artUrl)?.let {
-                WidgetImageLoader.roundCorners(it, 24f)
-            } ?: return@thread
+            val bitmap = WidgetImageLoader.fetch(artUrl) ?: return@thread
             views.setImageViewBitmap(R.id.widget_art, bitmap)
             for (id in ids) manager.updateAppWidget(id, views)
         }

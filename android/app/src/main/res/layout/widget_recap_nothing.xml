@@ -35,7 +35,6 @@
             android:layout_marginStart="8dp"
             android:maxLines="1"
             android:ellipsize="end"
-            android:fontFamily="@font/ntype82_regular"
             android:textColor="#FFFFFF"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -61,14 +60,12 @@
                 android:id="@+id/recap_total"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/ndot57_regular"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="total"
-                android:fontFamily="@font/ntype82_regular"
                 android:textColor="#FF2020"
                 android:textSize="10sp" />
         </LinearLayout>
@@ -82,14 +79,12 @@
                 android:id="@+id/recap_weekly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/ndot57_regular"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="this week"
-                android:fontFamily="@font/ntype82_regular"
                 android:textColor="#FF2020"
                 android:textSize="10sp" />
         </LinearLayout>
@@ -103,14 +98,12 @@
                 android:id="@+id/recap_loved"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/ndot57_regular"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="loved"
-                android:fontFamily="@font/ntype82_regular"
                 android:textColor="#FF2020"
                 android:textSize="10sp" />
         </LinearLayout>

@@ -24,7 +24,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:fontFamily="@font/ndot57_regular"
         android:textColor="#FFFFFF"
         android:textSize="30sp" />
 
@@ -32,7 +31,6 @@
         android:id="@+id/widget_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/ntype82_regular"
         android:textColor="#FF2020"
         android:textSize="11sp" />
 </LinearLayout>
