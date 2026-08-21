@@ -6,7 +6,7 @@
     android:background="@drawable/widget_bg_nothing_dark"
     android:orientation="vertical"
     android:padding="14dp">
-    <View
+    <ImageView
         android:id="@+id/accent_bar"
         android:layout_width="26dp"
         android:layout_height="3dp"

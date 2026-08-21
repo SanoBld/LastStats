@@ -16,7 +16,7 @@
         android:scaleType="centerCrop" />
 
     <!-- Dark scrim so text stays readable over any art -->
-    <View
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/widget_art_scrim" />
