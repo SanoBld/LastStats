@@ -140,6 +140,8 @@ void main() async {
       await NotificationWorker.scheduleAll();
       // Fire-and-forget: refresh home screen widgets on app start.
       WidgetService.updateAll();
+      // ...and every time the app comes back to the foreground.
+      WidgetsBinding.instance.addObserver(_WidgetRefreshObserver());
     }
   }
 
@@ -213,6 +215,15 @@ void main() async {
 // ══════════════════════════════════════════════════════════════════════════════
 //  LastStatsApp
 // ══════════════════════════════════════════════════════════════════════════════
+
+// Refreshes home screen widgets (scrobbles, now playing…) every time the
+// app returns to the foreground — background refresh alone is too slow.
+class _WidgetRefreshObserver extends WidgetsBindingObserver {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) WidgetService.updateAll();
+  }
+}
 
 class LastStatsApp extends StatelessWidget {
   final String username;

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../app_state.dart';
 import '../../nothing_theme.dart';
 import '../../l10n/l10n.dart';
+import '../../services/widget_service.dart';
 import 'settings_helpers.dart';
 import 'pc_mode_section.dart';
 
@@ -52,6 +53,7 @@ class _AppearancePageState extends State<AppearancePage> {
   @override
   void dispose() {
     localeNotifier.removeListener(_rebuild);
+    WidgetService.updateAll(); // push new accent/theme to home screen widgets
     super.dispose();
   }
 

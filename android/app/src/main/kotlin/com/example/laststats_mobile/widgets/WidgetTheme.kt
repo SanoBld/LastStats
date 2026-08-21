@@ -34,7 +34,8 @@ object WidgetTheme {
         val accent = if (style == "nothing") {
             Color.parseColor("#FF2020")
         } else {
-            parseAccent(data.getString("accent_color", ""))
+            val key = if (isDark) "accent_dark" else "accent_light"
+            parseAccent(data.getString(key, ""))
         }
 
         // Base card color, then a touch of accent mixed in — mirrors the

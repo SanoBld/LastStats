@@ -28,12 +28,14 @@ class WidgetService {
       // App theme, passed to Android so widgets match it (style + light/dark).
       final themeStyle = prefs.getString('ls_theme_style') ?? 'default';
       final themeMode = prefs.getString('ls_theme') ?? 'system';
-      final accentRaw = prefs.getString('ls_accent') ?? '';
+      final accentLight = prefs.getString('ls_accent') ?? '';
+      final accentDark = prefs.getString('ls_accent_dark') ?? accentLight;
+      await HomeWidget.setAppGroupId(_appGroupId);
       await HomeWidget.saveWidgetData<String>('theme_style', themeStyle);
       await HomeWidget.saveWidgetData<String>('theme_mode', themeMode);
-      await HomeWidget.saveWidgetData<String>('accent_color', accentRaw);
+      await HomeWidget.saveWidgetData<String>('accent_light', accentLight);
+      await HomeWidget.saveWidgetData<String>('accent_dark', accentDark);
 
-      await HomeWidget.setAppGroupId(_appGroupId);
       final api = LastFmService(apiKey: apiKey, username: username);
 
       // Total scrobbles + user avatar
