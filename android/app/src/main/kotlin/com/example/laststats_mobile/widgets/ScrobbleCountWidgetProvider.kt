@@ -1,4 +1,5 @@
-// Widget showing the total scrobble count.
+// Widget showing the total scrobble count. Size-responsive: tiny (just the
+// number), pill (icon + number), full (icon, number, label).
 
 package com.example.laststats_mobile.widgets
 
@@ -19,20 +20,39 @@ class ScrobbleCountWidgetProvider : AppWidgetProvider() {
         val total = data.getString("total_scrobbles", "0") ?: "0"
         val username = data.getString("username", "") ?: ""
         val palette = WidgetTheme.resolve(context, data)
-        val layout = WidgetTheme.layoutFor(
-            data, R.layout.widget_scrobble_count_nothing, R.layout.widget_scrobble_count_default
-        )
+        val nothing = data.getString("theme_style", "default") == "nothing"
 
-        for (id in ids) {
-            val views = RemoteViews(context.packageName, layout)
-            views.setInt(R.id.card_bg, "setColorFilter", palette.surface)
-            views.setInt(R.id.icon_chip, "setColorFilter", palette.chip)
-            views.setTextViewText(R.id.widget_value, total)
-            views.setTextColor(R.id.widget_value, palette.text)
-            views.setTextViewText(R.id.widget_label, context.getString(R.string.widget_scrobbles_label, username))
-            views.setTextColor(R.id.widget_label, palette.accent)
-            WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
-            manager.updateAppWidget(id, views)
+        fun build(tinyRes: Int, pillRes: Int, fullRes: Int): RemoteViews {
+            val tiny = RemoteViews(context.packageName, tinyRes)
+            tiny.setInt(R.id.card_bg, "setColorFilter", palette.surface)
+            tiny.setTextViewText(R.id.widget_value, total)
+            tiny.setTextColor(R.id.widget_value, palette.text)
+            WidgetUtils.setOpenAppIntent(context, tiny, R.id.widget_root)
+
+            val pill = RemoteViews(context.packageName, pillRes)
+            pill.setInt(R.id.card_bg, "setColorFilter", palette.surface)
+            pill.setInt(R.id.icon_chip, "setColorFilter", palette.chip)
+            pill.setTextViewText(R.id.widget_value, total)
+            pill.setTextColor(R.id.widget_value, palette.text)
+            WidgetUtils.setOpenAppIntent(context, pill, R.id.widget_root)
+
+            val full = RemoteViews(context.packageName, fullRes)
+            full.setInt(R.id.card_bg, "setColorFilter", palette.surface)
+            full.setInt(R.id.icon_chip, "setColorFilter", palette.chip)
+            full.setTextViewText(R.id.widget_value, total)
+            full.setTextColor(R.id.widget_value, palette.text)
+            full.setTextViewText(R.id.widget_label, context.getString(R.string.widget_scrobbles_label, username))
+            full.setTextColor(R.id.widget_label, palette.accent)
+            WidgetUtils.setOpenAppIntent(context, full, R.id.widget_root)
+
+            return WidgetUtils.responsiveViews(context, tiny, pill, full)
         }
+
+        val views = if (nothing) {
+            build(R.layout.widget_scrobble_count_tiny_nothing, R.layout.widget_scrobble_count_pill_nothing, R.layout.widget_scrobble_count_nothing)
+        } else {
+            build(R.layout.widget_scrobble_count_tiny_default, R.layout.widget_scrobble_count_pill_default, R.layout.widget_scrobble_count_default)
+        }
+        for (id in ids) manager.updateAppWidget(id, views)
     }
 }

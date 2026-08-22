@@ -15,4 +15,26 @@ object WidgetUtils {
         val pending: PendingIntent = HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java)
         views.setOnClickPendingIntent(layoutId, pending)
     }
+
+    // Builds a size-responsive widget: Android 12+ picks the right layout
+    // automatically as the widget is resized (tiny number-only → pill →
+    // full card). Older Android just gets the full layout always.
+    fun responsiveViews(
+        context: Context,
+        tiny: RemoteViews,
+        pill: RemoteViews,
+        full: RemoteViews
+    ): RemoteViews {
+        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            RemoteViews(
+                mapOf(
+                    android.util.SizeF(40f, 40f) to tiny,
+                    android.util.SizeF(110f, 40f) to pill,
+                    android.util.SizeF(110f, 110f) to full
+                )
+            )
+        } else {
+            full
+        }
+    }
 }

@@ -36,22 +36,117 @@ class _SettingsPageState extends State<_SettingsPage> {
   bool        _autoUpdate     = true;
   String?     _avatarUrl;
   String      _searchQuery    = '';
+  final _searchCtrl = TextEditingController();
+  // Quick-toggle settings, editable directly from a search result — a small
+  // set for now (not every option in the app yet).
+  bool? _quickOled;
+  bool? _quickWidgetTint;
 
   @override
   void initState() {
     super.initState();
     _loadAndCheck();
     _fetchAvatar();
+    _loadQuickToggles();
     localeNotifier.addListener(_rebuild);
   }
 
   @override
   void dispose() {
     localeNotifier.removeListener(_rebuild);
+    _searchCtrl.dispose();
     super.dispose();
   }
 
   void _rebuild() => setState(() {});
+
+  Future<void> _loadQuickToggles() async {
+    final p = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      _quickOled       = p.getBool('ls_oled_mode')   ?? false;
+      _quickWidgetTint = p.getBool('ls_widget_tint') ?? false;
+    });
+  }
+
+  Future<void> _setQuickPref(String key, bool value) async {
+    final p = await SharedPreferences.getInstance();
+    await p.setBool(key, value);
+  }
+
+  List<Widget> _buildQuickToggleResults(
+    BuildContext context, String q, ColorScheme scheme, TextTheme text,
+  ) {
+    final en = localeNotifier.value == 'en';
+    final items = <Widget>[];
+
+    bool matches(List<String> keywords) =>
+        keywords.any((k) => k.contains(q) || q.contains(k));
+
+    if (_quickOled != null && matches(
+        ['oled', 'noir pur', 'pure black', 'amoled'])) {
+      items.add(_quickToggleTile(
+        icon: Icons.contrast_rounded,
+        title: en ? 'OLED mode' : 'Mode OLED',
+        subtitle: en ? 'Pure black background' : 'Fond noir pur',
+        value: _quickOled!,
+        onChanged: (v) async {
+          await _setQuickPref('ls_oled_mode', v);
+          setState(() => _quickOled = v);
+        },
+        scheme: scheme, text: text,
+      ));
+    }
+
+    if (_quickWidgetTint != null && matches(
+        ['widget', 'couleur', 'color', 'accent', 'teinte', 'tint'])) {
+      items.add(_quickToggleTile(
+        icon: Icons.widgets_rounded,
+        title: en ? 'Colored widgets' : 'Widgets colorés',
+        subtitle: en
+            ? 'Tint home screen widgets with the accent color'
+            : 'Teinte les widgets de l\'écran d\'accueil avec l\'accent',
+        value: _quickWidgetTint!,
+        onChanged: (v) async {
+          await _setQuickPref('ls_widget_tint', v);
+          setState(() => _quickWidgetTint = v);
+          WidgetService.updateAll();
+        },
+        scheme: scheme, text: text,
+      ));
+    }
+
+    if (items.isEmpty) return const [];
+    return [...items, const SizedBox(height: 8)];
+  }
+
+  Widget _quickToggleTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+    required ColorScheme scheme,
+    required TextTheme text,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Container(
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45), width: 1),
+        ),
+        child: SwitchListTile(
+          secondary: Icon(icon, color: scheme.primary),
+          title: Text(title),
+          subtitle: Text(subtitle, style: text.bodySmall),
+          value: value,
+          onChanged: onChanged,
+        ),
+      ),
+    );
+  }
 
   // Fetch the Last.fm profile picture URL.
   Future<void> _fetchAvatar() async {
@@ -331,6 +426,7 @@ class _SettingsPageState extends State<_SettingsPage> {
                   border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45), width: 1),
                 ),
                 child: TextField(
+                  controller: _searchCtrl,
                   onChanged: (v) => setState(() => _searchQuery = v),
                   style: text.bodyMedium,
                   decoration: InputDecoration(
@@ -343,13 +439,20 @@ class _SettingsPageState extends State<_SettingsPage> {
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
                             icon: Icon(Icons.close_rounded, color: scheme.onSurfaceVariant),
-                            onPressed: () => setState(() => _searchQuery = ''),
+                            onPressed: () {
+                              _searchCtrl.clear();
+                              setState(() => _searchQuery = '');
+                            },
                           )
                         : null,
                   ),
                 ),
               ),
               const SizedBox(height: 16),
+
+              // Quick-toggle search results — editable right here, no need
+              // to open the category page.
+              if (q.isNotEmpty) ..._buildQuickToggleResults(context, q, scheme, text),
 
               // Update banner
               if (_updateInfo != null)
