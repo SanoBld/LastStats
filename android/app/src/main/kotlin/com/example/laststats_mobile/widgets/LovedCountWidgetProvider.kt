@@ -28,7 +28,7 @@ class LovedCountWidgetProvider : AppWidgetProvider() {
             views.setInt(R.id.icon_chip, "setColorFilter", palette.chip)
             views.setTextViewText(R.id.widget_value, loved)
             views.setTextColor(R.id.widget_value, palette.text)
-            views.setTextViewText(R.id.widget_label, "loved tracks ♥")
+            views.setTextViewText(R.id.widget_label, context.getString(R.string.widget_loved_label))
             views.setTextColor(R.id.widget_label, palette.accent)
             WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
             manager.updateAppWidget(id, views)

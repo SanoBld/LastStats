@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_name_scrobbles">LastStats — Total des scrobbles</string>
+    <string name="widget_name_now_playing">LastStats — Écoute en cours</string>
+    <string name="widget_name_loved">LastStats — Titres aimés</string>
+    <string name="widget_name_weekly">LastStats — Cette semaine</string>
+    <string name="widget_name_recap">LastStats — Récap</string>
+
+    <string name="widget_scrobbles_label">scrobbles · %1$s</string>
+    <string name="widget_loved_label">titres aimés ♥</string>
+    <string name="widget_weekly_label">scrobbles cette semaine</string>
+    <string name="widget_no_scrobble">Aucun scrobble</string>
+    <string name="widget_now_playing_status">EN COURS</string>
+    <string name="widget_last_played_status">DERNIÈRE ÉCOUTE</string>
+    <string name="widget_recap_total">total</string>
+    <string name="widget_recap_week">cette semaine</string>
+    <string name="widget_recap_loved">aimés</string>
+</resources>

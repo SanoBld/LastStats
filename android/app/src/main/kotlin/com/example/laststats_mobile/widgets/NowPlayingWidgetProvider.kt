@@ -28,7 +28,7 @@ class NowPlayingWidgetProvider : AppWidgetProvider() {
 
         val views = RemoteViews(context.packageName, layout)
         if (track.isEmpty()) {
-            views.setTextViewText(R.id.widget_track, "No scrobble yet")
+            views.setTextViewText(R.id.widget_track, context.getString(R.string.widget_no_scrobble))
             views.setTextViewText(R.id.widget_artist, "")
         } else {
             views.setTextViewText(R.id.widget_track, track)
@@ -38,7 +38,8 @@ class NowPlayingWidgetProvider : AppWidgetProvider() {
         // color — so it must always stay light, regardless of light/dark theme.
         views.setTextViewText(
             R.id.widget_status,
-            if (playing) "NOW PLAYING" else "LAST PLAYED"
+            if (playing) context.getString(R.string.widget_now_playing_status)
+            else context.getString(R.string.widget_last_played_status)
         )
         views.setTextColor(R.id.widget_status, palette.accent)
         WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)

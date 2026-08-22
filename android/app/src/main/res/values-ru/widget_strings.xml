@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_name_scrobbles">LastStats — Всего скробблов</string>
+    <string name="widget_name_now_playing">LastStats — Сейчас играет</string>
+    <string name="widget_name_loved">LastStats — Любимые</string>
+    <string name="widget_name_weekly">LastStats — За неделю</string>
+    <string name="widget_name_recap">LastStats — Сводка</string>
+
+    <string name="widget_scrobbles_label">скробблов · %1$s</string>
+    <string name="widget_loved_label">любимые треки ♥</string>
+    <string name="widget_weekly_label">скробблов за неделю</string>
+    <string name="widget_no_scrobble">Пока нет скробблов</string>
+    <string name="widget_now_playing_status">СЕЙЧАС ИГРАЕТ</string>
+    <string name="widget_last_played_status">ПОСЛЕДНИЙ ТРЕК</string>
+    <string name="widget_recap_total">всего</string>
+    <string name="widget_recap_week">за неделю</string>
+    <string name="widget_recap_loved">любимые</string>
+</resources>

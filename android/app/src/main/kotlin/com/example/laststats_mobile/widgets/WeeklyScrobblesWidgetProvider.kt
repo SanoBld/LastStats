@@ -28,7 +28,7 @@ class WeeklyScrobblesWidgetProvider : AppWidgetProvider() {
             views.setInt(R.id.icon_chip, "setColorFilter", palette.chip)
             views.setTextViewText(R.id.widget_value, weekly)
             views.setTextColor(R.id.widget_value, palette.text)
-            views.setTextViewText(R.id.widget_label, "scrobbles this week")
+            views.setTextViewText(R.id.widget_label, context.getString(R.string.widget_weekly_label))
             views.setTextColor(R.id.widget_label, palette.accent)
             WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
             manager.updateAppWidget(id, views)

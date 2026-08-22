@@ -29,7 +29,7 @@ class ScrobbleCountWidgetProvider : AppWidgetProvider() {
             views.setInt(R.id.icon_chip, "setColorFilter", palette.chip)
             views.setTextViewText(R.id.widget_value, total)
             views.setTextColor(R.id.widget_value, palette.text)
-            views.setTextViewText(R.id.widget_label, "scrobbles · $username")
+            views.setTextViewText(R.id.widget_label, context.getString(R.string.widget_scrobbles_label, username))
             views.setTextColor(R.id.widget_label, palette.accent)
             WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
             manager.updateAppWidget(id, views)

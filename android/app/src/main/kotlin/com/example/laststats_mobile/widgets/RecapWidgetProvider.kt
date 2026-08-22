@@ -39,7 +39,7 @@ class RecapWidgetProvider : AppWidgetProvider() {
         }
         views.setTextViewText(
             R.id.recap_now,
-            if (track.isEmpty()) "No scrobble yet" else "$track — $artist"
+            if (track.isEmpty()) context.getString(R.string.widget_no_scrobble) else "$track — $artist"
         )
         views.setTextColor(R.id.recap_now, palette.text)
         WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)

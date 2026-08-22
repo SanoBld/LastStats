@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_name_scrobbles">LastStats — إجمالي مرات الاستماع</string>
+    <string name="widget_name_now_playing">LastStats — قيد التشغيل الآن</string>
+    <string name="widget_name_loved">LastStats — المفضلة</string>
+    <string name="widget_name_weekly">LastStats — هذا الأسبوع</string>
+    <string name="widget_name_recap">LastStats — ملخص</string>
+
+    <string name="widget_scrobbles_label">مرات الاستماع · %1$s</string>
+    <string name="widget_loved_label">المفضلة ♥</string>
+    <string name="widget_weekly_label">مرات الاستماع هذا الأسبوع</string>
+    <string name="widget_no_scrobble">لا يوجد استماع بعد</string>
+    <string name="widget_now_playing_status">قيد التشغيل الآن</string>
+    <string name="widget_last_played_status">آخر أغنية</string>
+    <string name="widget_recap_total">الإجمالي</string>
+    <string name="widget_recap_week">هذا الأسبوع</string>
+    <string name="widget_recap_loved">المفضلة</string>
+</resources>

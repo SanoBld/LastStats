@@ -445,10 +445,10 @@ class _AppearancePageState extends State<AppearancePage> {
           margin: EdgeInsets.zero,
           child: SwitchListTile(
             secondary: Icon(Icons.widgets_rounded, color: scheme.primary),
-            title: Text(_ct('Teinter avec l\'accent', 'Tint with accent color')),
+            title: Text(_ct('Widgets colorés', 'Colored widgets')),
             subtitle: Text(_ct(
-              'Sinon les widgets restent blanc / noir pur, quel que soit le thème de l\'app.',
-              'Otherwise widgets stay pure white / black, regardless of the app\'s theme.',
+              'Applique la couleur d\'accent au fond des widgets de l\'écran d\'accueil. Désactivé : blanc ou noir pur.',
+              'Applies the accent color to the home screen widgets\' background. Off: pure white or black.',
             )),
             value: _widgetTint,
             onChanged: (v) async {

@@ -35,6 +35,7 @@ class _SettingsPageState extends State<_SettingsPage> {
   bool        _checkingUpdate = false;
   bool        _autoUpdate     = true;
   String?     _avatarUrl;
+  String      _searchQuery    = '';
 
   @override
   void initState() {
@@ -231,6 +232,12 @@ class _SettingsPageState extends State<_SettingsPage> {
     final scheme  = Theme.of(context).colorScheme;
     final text    = Theme.of(context).textTheme;
     final cards   = _buildCards();
+    final q = _searchQuery.trim().toLowerCase();
+    final filteredCards = q.isEmpty
+        ? cards
+        : cards.where((c) =>
+            c.title().toLowerCase().contains(q) ||
+            c.subtitle().toLowerCase().contains(q)).toList();
     final initial = widget.username.isNotEmpty ? widget.username[0].toUpperCase() : '?';
 
     final screenWidth      = MediaQuery.sizeOf(context).width;
@@ -290,6 +297,20 @@ class _SettingsPageState extends State<_SettingsPage> {
               ),
               const SizedBox(height: 16),
 
+              // Search bar — filters the category grid below by title/subtitle.
+              SearchBar(
+                hintText: localeNotifier.value == 'en' ? 'Search settings…' : 'Rechercher un réglage…',
+                leading: Icon(Icons.search_rounded, color: scheme.onSurfaceVariant),
+                trailing: _searchQuery.isNotEmpty
+                    ? [IconButton(
+                        icon: const Icon(Icons.close_rounded),
+                        onPressed: () => setState(() => _searchQuery = ''),
+                      )]
+                    : null,
+                onChanged: (v) => setState(() => _searchQuery = v),
+              ),
+              const SizedBox(height: 16),
+
               // Update banner
               if (_updateInfo != null)
                 _UpdateBanner(
@@ -305,19 +326,28 @@ class _SettingsPageState extends State<_SettingsPage> {
           )),
 
           // ── Category grid ───────────────────────────────────────────────
+          if (filteredCards.isEmpty)
+            SliverToBoxAdapter(child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+              child: Center(child: Text(
+                localeNotifier.value == 'en' ? 'No settings found' : 'Aucun réglage trouvé',
+                style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+              )),
+            ))
+          else
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             sliver: SliverGrid(
               delegate: SliverChildBuilderDelegate(
                 (ctx, i) => _CategoryCard(
-                  data:     cards[i],
+                  data:     filteredCards[i],
                   username: widget.username,
                   compact:  !isWide,
-                  // Badge on Updates card (index 8)
-                  badge: (i == 8 && _updateInfo != null) ? '!' : null,
-                  onTap: () { _haptic(_HapticImpact.light); _push(ctx, cards[i].pageBuilder(widget.username)); },
+                  // Badge on the Updates card, wherever it lands post-filter.
+                  badge: (filteredCards[i].title() == cards[8].title() && _updateInfo != null) ? '!' : null,
+                  onTap: () { _haptic(_HapticImpact.light); _push(ctx, filteredCards[i].pageBuilder(widget.username)); },
                 ),
-                childCount: cards.length,
+                childCount: filteredCards.length,
               ),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount:   crossAxisCount,

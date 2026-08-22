@@ -12,18 +12,18 @@
 
     <!-- Icon, top-left -->
     <FrameLayout
-        android:layout_width="34dp"
-        android:layout_height="34dp"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
         android:layout_gravity="top|start"
-        android:layout_margin="16dp">
+        android:layout_margin="12dp">
         <ImageView
             android:id="@+id/icon_chip"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:src="@drawable/widget_chip_circle" />
         <ImageView
-            android:layout_width="19dp"
-            android:layout_height="19dp"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
             android:layout_gravity="center"
             android:src="@mipmap/ic_launcher" />
     </FrameLayout>
@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|start"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="12dp">
 
         <TextView
             android:id="@+id/widget_value"

@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Picker names -->
     <string name="widget_name_scrobbles">LastStats — Total scrobbles</string>
     <string name="widget_name_now_playing">LastStats — Now playing</string>
     <string name="widget_name_loved">LastStats — Loved tracks</string>
     <string name="widget_name_weekly">LastStats — This week</string>
     <string name="widget_name_recap">LastStats — Recap</string>
+
+    <!-- On-widget text -->
+    <string name="widget_scrobbles_label">scrobbles · %1$s</string>
+    <string name="widget_loved_label">loved tracks ♥</string>
+    <string name="widget_weekly_label">scrobbles this week</string>
+    <string name="widget_no_scrobble">No scrobble yet</string>
+    <string name="widget_now_playing_status">NOW PLAYING</string>
+    <string name="widget_last_played_status">LAST PLAYED</string>
+    <string name="widget_recap_total">total</string>
+    <string name="widget_recap_week">this week</string>
+    <string name="widget_recap_loved">loved</string>
 </resources>
