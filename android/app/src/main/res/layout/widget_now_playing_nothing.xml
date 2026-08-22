@@ -30,6 +30,8 @@
         android:layout_margin="14dp"
         android:textColor="#FFFFFF"
         android:textSize="10sp"
+        android:textAllCaps="true"
+        android:letterSpacing="0.06"
         android:textStyle="bold" />
 
     <!-- Track info, bottom-left -->
@@ -47,7 +49,7 @@
             android:maxLines="1"
             android:ellipsize="end"
             android:textColor="#FFFFFF"
-            android:textSize="16sp"
+            android:textSize="19sp"
             android:textStyle="bold" />
 
         <TextView

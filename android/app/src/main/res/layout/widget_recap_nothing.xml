@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="14dp">
+        android:padding="18dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -24,8 +24,8 @@
 
             <ImageView
                 android:id="@+id/recap_art"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:background="@drawable/widget_art_placeholder"
                 android:scaleType="centerCrop" />
 
@@ -38,7 +38,7 @@
                 android:layout_marginEnd="8dp"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:textSize="13sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <FrameLayout
@@ -60,7 +60,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="18dp"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -72,7 +72,7 @@
                     android:id="@+id/recap_total"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="18sp"
+                    android:textSize="24sp"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:textStyle="bold" />
@@ -80,8 +80,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="total"
+                    android:layout_marginTop="2dp"
                     android:maxLines="1"
                     android:ellipsize="end"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.02"
                     android:textSize="10sp" />
             </LinearLayout>
 
@@ -94,7 +97,7 @@
                     android:id="@+id/recap_weekly"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="18sp"
+                    android:textSize="24sp"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:textStyle="bold" />
@@ -102,8 +105,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="this week"
+                    android:layout_marginTop="2dp"
                     android:maxLines="1"
                     android:ellipsize="end"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.02"
                     android:textSize="10sp" />
             </LinearLayout>
 
@@ -116,7 +122,7 @@
                     android:id="@+id/recap_loved"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="18sp"
+                    android:textSize="24sp"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:textStyle="bold" />
@@ -124,8 +130,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="loved"
+                    android:layout_marginTop="2dp"
                     android:maxLines="1"
                     android:ellipsize="end"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.02"
                     android:textSize="10sp" />
             </LinearLayout>
         </LinearLayout>
