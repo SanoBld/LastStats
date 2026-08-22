@@ -432,31 +432,24 @@ class _AppearancePageState extends State<AppearancePage> {
         // ══════════════════════════════════════════════════════════════════
         //  Android widgets — separate from in-app accent, Android-only
         // ══════════════════════════════════════════════════════════════════
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Text(
-            _ct('Widgets Android', 'Android widgets'),
-            style: text.labelMedium?.copyWith(
-                color: scheme.primary, fontWeight: FontWeight.w700,
-                letterSpacing: 0.8),
-          ),
-        ),
-        Card(
-          margin: EdgeInsets.zero,
-          child: SwitchListTile(
-            secondary: Icon(Icons.widgets_rounded, color: scheme.primary),
-            title: Text(_ct('Widgets colorés', 'Colored widgets')),
-            subtitle: Text(_ct(
-              'Applique la couleur d\'accent au fond des widgets de l\'écran d\'accueil. Désactivé : blanc ou noir pur.',
-              'Applies the accent color to the home screen widgets\' background. Off: pure white or black.',
-            )),
-            value: _widgetTint,
-            onChanged: (v) async {
-              await _set('ls_widget_tint', v);
-              setState(() => _widgetTint = v);
-              WidgetService.updateAll();
-            },
-          ),
+        SettingsSection(
+          label: localeNotifier.value == 'en' ? 'Android widgets' : 'Widgets Android',
+          children: [
+            SwitchListTile(
+              secondary: Icon(Icons.widgets_rounded, color: scheme.primary),
+              title: Text(_ct('Widgets colorés', 'Colored widgets')),
+              subtitle: Text(_ct(
+                'Applique la couleur d\'accent au fond des widgets de l\'écran d\'accueil. Désactivé : blanc ou noir pur.',
+                'Applies the accent color to the home screen widgets\' background. Off: pure white or black.',
+              )),
+              value: _widgetTint,
+              onChanged: (v) async {
+                await _set('ls_widget_tint', v);
+                setState(() => _widgetTint = v);
+                WidgetService.updateAll();
+              },
+            ),
+          ],
         ),
 
         const SizedBox(height: 16),

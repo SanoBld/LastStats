@@ -227,6 +227,34 @@ class _SettingsPageState extends State<_SettingsPage> {
     ),
   ];
 
+  // Keyword index of specific options living *inside* each category page —
+  // so a search for e.g. "couleur" or "notif" finds the right category even
+  // though those words aren't in the category's own title/subtitle.
+  static const Map<int, List<String>> _subKeywords = {
+    0: ['couleur', 'accent', 'color', 'thème', 'theme', 'sombre', 'dark',
+        'clair', 'light', 'oled', 'nothing', 'police', 'font', 'widget'],
+    1: ['ordre', 'order', 'carte', 'card', 'graphique', 'chart', 'période', 'period'],
+    2: ['écran', 'screen', 'accueil', 'home', 'ouverture', 'launch'],
+    3: ['notification', 'notif', 'palier', 'milestone', 'récap', 'recap', 'actualité', 'news'],
+    4: ['synchro', 'sync', 'arrière-plan', 'background'],
+    5: ['batterie', 'battery', 'éco', 'eco'],
+    6: ['langue', 'language', 'français', 'french', 'english', 'anglais'],
+    7: ['compte', 'account', 'last.fm', 'lastfm', 'déconnexion', 'logout', 'profil'],
+    8: ['cache', 'stockage', 'storage', 'vider', 'clear', 'hors-ligne', 'offline'],
+    9: ['sauvegarde', 'backup', 'export', 'import', 'restaurer', 'restore'],
+    10: ['mise à jour', 'update', 'version'],
+    11: ['à propos', 'about', 'contact', 'crédit'],
+    12: ['aide', 'faq', 'question'],
+  };
+
+  bool _matchesQuery(_SettingsCardData c, int index, String q) {
+    if (c.title().toLowerCase().contains(q)) return true;
+    if (c.subtitle().toLowerCase().contains(q)) return true;
+    final sub = _subKeywords[index];
+    if (sub != null && sub.any((k) => k.contains(q) || q.contains(k))) return true;
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme  = Theme.of(context).colorScheme;
@@ -235,9 +263,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     final q = _searchQuery.trim().toLowerCase();
     final filteredCards = q.isEmpty
         ? cards
-        : cards.where((c) =>
-            c.title().toLowerCase().contains(q) ||
-            c.subtitle().toLowerCase().contains(q)).toList();
+        : [for (var i = 0; i < cards.length; i++) if (_matchesQuery(cards[i], i, q)) cards[i]];
     final initial = widget.username.isNotEmpty ? widget.username[0].toUpperCase() : '?';
 
     final screenWidth      = MediaQuery.sizeOf(context).width;
@@ -298,16 +324,30 @@ class _SettingsPageState extends State<_SettingsPage> {
               const SizedBox(height: 16),
 
               // Search bar — filters the category grid below by title/subtitle.
-              SearchBar(
-                hintText: localeNotifier.value == 'en' ? 'Search settings…' : 'Rechercher un réglage…',
-                leading: Icon(Icons.search_rounded, color: scheme.onSurfaceVariant),
-                trailing: _searchQuery.isNotEmpty
-                    ? [IconButton(
-                        icon: const Icon(Icons.close_rounded),
-                        onPressed: () => setState(() => _searchQuery = ''),
-                      )]
-                    : null,
-                onChanged: (v) => setState(() => _searchQuery = v),
+              Container(
+                decoration: BoxDecoration(
+                  color: scheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45), width: 1),
+                ),
+                child: TextField(
+                  onChanged: (v) => setState(() => _searchQuery = v),
+                  style: text.bodyMedium,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                    border: InputBorder.none,
+                    hintText: localeNotifier.value == 'en' ? 'Search settings…' : 'Rechercher un réglage…',
+                    hintStyle: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+                    prefixIcon: Icon(Icons.search_rounded, color: scheme.onSurfaceVariant),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: Icon(Icons.close_rounded, color: scheme.onSurfaceVariant),
+                            onPressed: () => setState(() => _searchQuery = ''),
+                          )
+                        : null,
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
 

@@ -10,32 +10,31 @@
         android:layout_height="match_parent"
         android:src="@drawable/widget_card_shape" />
 
-    <!-- Icon, top-left -->
-    <FrameLayout
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:layout_gravity="top|start"
-        android:layout_margin="12dp">
-        <ImageView
-            android:id="@+id/icon_chip"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/widget_chip_circle" />
-        <ImageView
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:layout_gravity="center"
-            android:src="@mipmap/ic_launcher" />
-    </FrameLayout>
-
-    <!-- Number is the point of the widget — anchor it to the bottom
-         and give it the most visual weight. -->
+    <!-- Sequential vertical flow — icon, then number, then label.
+         Never overlaps, even when the widget is resized very small:
+         content just gets tighter or clipped, but stays readable. -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
+        android:layout_height="match_parent"
         android:orientation="vertical"
+        android:gravity="bottom"
         android:padding="12dp">
+
+        <FrameLayout
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginBottom="6dp">
+            <ImageView
+                android:id="@+id/icon_chip"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/widget_chip_circle" />
+            <ImageView
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:layout_gravity="center"
+                android:src="@mipmap/ic_launcher" />
+        </FrameLayout>
 
         <TextView
             android:id="@+id/widget_value"
@@ -43,7 +42,7 @@
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:ellipsize="end"
-            android:textSize="38sp"
+            android:textSize="32sp"
             android:textStyle="bold" />
 
         <TextView
@@ -55,7 +54,7 @@
             android:ellipsize="end"
             android:textAllCaps="true"
             android:letterSpacing="0.03"
-            android:textSize="11sp"
+            android:textSize="10sp"
             android:textStyle="bold" />
     </LinearLayout>
 </FrameLayout>
