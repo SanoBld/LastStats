@@ -30,7 +30,7 @@ object WidgetUtils {
                 mapOf(
                     android.util.SizeF(40f, 40f) to tiny,
                     android.util.SizeF(110f, 40f) to pill,
-                    android.util.SizeF(110f, 110f) to full
+                    android.util.SizeF(130f, 130f) to full
                 )
             )
         } else {

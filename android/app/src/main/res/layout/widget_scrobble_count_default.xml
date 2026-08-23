@@ -45,7 +45,7 @@
             android:includeFontPadding="false"
             android:autoSizeTextType="uniform"
             android:autoSizeMinTextSize="22sp"
-            android:autoSizeMaxTextSize="48sp"
+            android:autoSizeMaxTextSize="36sp"
             android:textStyle="bold" />
 
         <TextView

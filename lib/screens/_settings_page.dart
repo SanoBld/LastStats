@@ -4,6 +4,152 @@
 // ══════════════════════════════════════════════════════════════════════════
 part of 'home_screen.dart';
 
+// ── Quick search results ──────────────────────────────────────────────────
+//
+// A quick toggle is a single boolean setting from anywhere in the app,
+// surfaced directly in search results — matched by keyword and editable
+// right there, bound to the app's existing global notifier + pref key.
+//
+// TO ADD A NEW ONE: just append an entry to `_quickToggles` below with the
+// setting's keywords, its global ValueNotifier (from app_state.dart), and
+// the SharedPreferences key it's saved under. No other wiring needed —
+// search picks it up automatically.
+class _QuickToggle {
+  final List<String> keywords;
+  final IconData icon;
+  final String titleFr, titleEn, subFr, subEn;
+  final ValueNotifier<bool> notifier;
+  final String prefKey;
+  const _QuickToggle({
+    required this.keywords, required this.icon,
+    required this.titleFr, required this.titleEn,
+    required this.subFr, required this.subEn,
+    required this.notifier, required this.prefKey,
+  });
+}
+
+final List<_QuickToggle> _quickToggles = [
+  _QuickToggle(
+    keywords: ['oled', 'noir pur', 'pure black', 'amoled'],
+    icon: Icons.contrast_rounded,
+    titleFr: 'Mode OLED', titleEn: 'OLED mode',
+    subFr: 'Fond noir pur', subEn: 'Pure black background',
+    notifier: oledModeNotifier, prefKey: 'ls_oled_mode',
+  ),
+  _QuickToggle(
+    keywords: ['éco', 'eco', 'batterie', 'battery'],
+    icon: Icons.battery_saver_rounded,
+    titleFr: 'Mode éco (manuel)', titleEn: 'Eco mode (manual)',
+    subFr: 'Réduit l\'usage batterie', subEn: 'Cuts battery use',
+    notifier: ecoModeManualNotifier, prefKey: 'ls_eco_mode_manual',
+  ),
+  _QuickToggle(
+    keywords: ['actualité', 'news', 'notification'],
+    icon: Icons.newspaper_rounded,
+    titleFr: 'Notifications actualités', titleEn: 'News notifications',
+    subFr: 'Alertes sur les nouveautés Last.fm', subEn: 'Alerts about Last.fm news',
+    notifier: notifNewsEnabledNotifier, prefKey: 'ls_notif_news_enabled',
+  ),
+  _QuickToggle(
+    keywords: ['vibration', 'haptique', 'haptic', 'retour'],
+    icon: Icons.vibration_rounded,
+    titleFr: 'Retour haptique', titleEn: 'Haptic feedback',
+    subFr: 'Vibrations lors des interactions', subEn: 'Vibrations on interactions',
+    notifier: hapticFeedbackNotifier, prefKey: 'ls_haptic_feedback',
+  ),
+  _QuickToggle(
+    keywords: ['succès', 'achievement', 'trophée', 'badge'],
+    icon: Icons.emoji_events_rounded,
+    titleFr: 'Succès', titleEn: 'Achievements',
+    subFr: 'Affiche les succès débloqués', subEn: 'Shows unlocked achievements',
+    notifier: achievementsEnabledNotifier, prefKey: 'ls_achievements_enabled',
+  ),
+];
+
+// Same idea for options too complex for an inline switch (a color sheet,
+// a whole page): shown with a live preview of the current value, tapping
+// jumps straight to that page. TO ADD ONE: append below.
+class _QuickLink {
+  final List<String> keywords;
+  final IconData icon;
+  final String titleFr, titleEn;
+  final Widget Function(BuildContext ctx, ColorScheme s, TextTheme t) trailing;
+  final Widget Function(String username) pageBuilder;
+  const _QuickLink({
+    required this.keywords, required this.icon,
+    required this.titleFr, required this.titleEn,
+    required this.trailing, required this.pageBuilder,
+  });
+}
+
+final List<_QuickLink> _quickLinks = [
+  _QuickLink(
+    keywords: ['couleur', 'accent', 'color', 'palette'],
+    icon: Icons.palette_rounded,
+    titleFr: 'Couleur d\'accent', titleEn: 'Accent color',
+    trailing: (ctx, s, t) => Container(
+      width: 22, height: 22,
+      decoration: BoxDecoration(
+        color: accentNotifier.value, shape: BoxShape.circle,
+        border: Border.all(color: s.outlineVariant),
+      ),
+    ),
+    pageBuilder: (_) => const AppearancePage(),
+  ),
+  _QuickLink(
+    keywords: ['thème', 'theme', 'sombre', 'dark', 'clair', 'light', 'système', 'system'],
+    icon: Icons.dark_mode_rounded,
+    titleFr: 'Thème', titleEn: 'Theme',
+    trailing: (ctx, s, t) {
+      final en = localeNotifier.value == 'en';
+      final mode = switch (themeModeNotifier.value) {
+        ThemeMode.dark   => en ? 'Dark'   : 'Sombre',
+        ThemeMode.light  => en ? 'Light'  : 'Clair',
+        ThemeMode.system => en ? 'System' : 'Système',
+      };
+      return Text(mode, style: t.bodyMedium?.copyWith(color: s.onSurfaceVariant));
+    },
+    pageBuilder: (_) => const AppearancePage(),
+  ),
+  _QuickLink(
+    keywords: ['langue', 'language'],
+    icon: Icons.language_rounded,
+    titleFr: 'Langue', titleEn: 'Language',
+    trailing: (ctx, s, t) => Text(localeNotifier.value.toUpperCase(),
+        style: t.bodyMedium?.copyWith(color: s.onSurfaceVariant)),
+    pageBuilder: (_) => const LanguagePage(),
+  ),
+  _QuickLink(
+    keywords: ['plateforme', 'platform', 'spotify', 'lastfm', 'last.fm', 'ytmusic'],
+    icon: Icons.graphic_eq_rounded,
+    titleFr: 'Plateforme musicale', titleEn: 'Music platform',
+    trailing: (ctx, s, t) => Text(musicPlatformNotifier.value,
+        style: t.bodyMedium?.copyWith(color: s.onSurfaceVariant)),
+    pageBuilder: (_) => const StartupPage(),
+  ),
+  _QuickLink(
+    keywords: ['compte', 'account', 'déconnexion', 'logout', 'profil'],
+    icon: Icons.person_rounded,
+    titleFr: 'Compte', titleEn: 'Account',
+    trailing: (ctx, s, t) => Icon(Icons.chevron_right_rounded, color: s.onSurfaceVariant),
+    pageBuilder: (username) => AccountPage(username: username),
+  ),
+  _QuickLink(
+    keywords: ['synchro', 'sync', 'arrière-plan', 'background'],
+    icon: Icons.sync_rounded,
+    titleFr: 'Synchronisation', titleEn: 'Sync',
+    trailing: (ctx, s, t) => Icon(Icons.chevron_right_rounded, color: s.onSurfaceVariant),
+    pageBuilder: (_) => const SyncPage(),
+  ),
+  _QuickLink(
+    keywords: ['cache', 'stockage', 'storage', 'vider', 'clear', 'hors-ligne', 'offline'],
+    icon: Icons.storage_rounded,
+    titleFr: 'Cache', titleEn: 'Cache',
+    trailing: (ctx, s, t) => Icon(Icons.chevron_right_rounded, color: s.onSurfaceVariant),
+    pageBuilder: (_) => const CachePage(),
+  ),
+];
+
 class _SettingsCardData {
   final IconData icon;
   final Color Function(ColorScheme) iconBgColor;
@@ -37,9 +183,9 @@ class _SettingsPageState extends State<_SettingsPage> {
   String?     _avatarUrl;
   String      _searchQuery    = '';
   final _searchCtrl = TextEditingController();
-  // Quick-toggle settings, editable directly from a search result — a small
-  // set for now (not every option in the app yet).
-  bool? _quickOled;
+  // Widget tint has no global ValueNotifier (Android-only setting), so it's
+  // tracked locally. Every other quick-toggle below binds straight to the
+  // app's existing global notifiers instead.
   bool? _quickWidgetTint;
 
   @override
@@ -63,10 +209,7 @@ class _SettingsPageState extends State<_SettingsPage> {
   Future<void> _loadQuickToggles() async {
     final p = await SharedPreferences.getInstance();
     if (!mounted) return;
-    setState(() {
-      _quickOled       = p.getBool('ls_oled_mode')   ?? false;
-      _quickWidgetTint = p.getBool('ls_widget_tint') ?? false;
-    });
+    setState(() => _quickWidgetTint = p.getBool('ls_widget_tint') ?? false);
   }
 
   Future<void> _setQuickPref(String key, bool value) async {
@@ -83,21 +226,26 @@ class _SettingsPageState extends State<_SettingsPage> {
     bool matches(List<String> keywords) =>
         keywords.any((k) => k.contains(q) || q.contains(k));
 
-    if (_quickOled != null && matches(
-        ['oled', 'noir pur', 'pure black', 'amoled'])) {
-      items.add(_quickToggleTile(
-        icon: Icons.contrast_rounded,
-        title: en ? 'OLED mode' : 'Mode OLED',
-        subtitle: en ? 'Pure black background' : 'Fond noir pur',
-        value: _quickOled!,
-        onChanged: (v) async {
-          await _setQuickPref('ls_oled_mode', v);
-          setState(() => _quickOled = v);
-        },
-        scheme: scheme, text: text,
+    // Global-notifier-backed toggles — one entry per item in `_quickToggles`.
+    for (final t in _quickToggles) {
+      if (!matches(t.keywords)) continue;
+      items.add(ValueListenableBuilder<bool>(
+        valueListenable: t.notifier,
+        builder: (context, value, child) => _quickToggleTile(
+          icon: t.icon,
+          title: en ? t.titleEn : t.titleFr,
+          subtitle: en ? t.subEn : t.subFr,
+          value: value,
+          onChanged: (v) async {
+            t.notifier.value = v;
+            await _setQuickPref(t.prefKey, v);
+          },
+          scheme: scheme, text: text,
+        ),
       ));
     }
 
+    // Widget tint — Android-only, no global notifier, handled locally.
     if (_quickWidgetTint != null && matches(
         ['widget', 'couleur', 'color', 'accent', 'teinte', 'tint'])) {
       items.add(_quickToggleTile(
@@ -132,45 +280,13 @@ class _SettingsPageState extends State<_SettingsPage> {
     bool matches(List<String> keywords) =>
         keywords.any((k) => k.contains(q) || q.contains(k));
 
-    if (matches(['couleur', 'accent', 'color', 'palette'])) {
+    for (final l in _quickLinks) {
+      if (!matches(l.keywords)) continue;
       items.add(_quickLinkTile(
-        icon: Icons.palette_rounded,
-        title: en ? 'Accent color' : 'Couleur d\'accent',
-        trailing: Container(
-          width: 22, height: 22,
-          decoration: BoxDecoration(
-            color: accentNotifier.value,
-            shape: BoxShape.circle,
-            border: Border.all(color: scheme.outlineVariant),
-          ),
-        ),
-        onTap: () => _push(context, const AppearancePage()),
-        scheme: scheme, text: text,
-      ));
-    }
-
-    if (matches(['thème', 'theme', 'sombre', 'dark', 'clair', 'light', 'système', 'system'])) {
-      final mode = switch (themeModeNotifier.value) {
-        ThemeMode.dark   => en ? 'Dark'   : 'Sombre',
-        ThemeMode.light  => en ? 'Light'  : 'Clair',
-        ThemeMode.system => en ? 'System' : 'Système',
-      };
-      items.add(_quickLinkTile(
-        icon: Icons.dark_mode_rounded,
-        title: en ? 'Theme' : 'Thème',
-        trailing: Text(mode, style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
-        onTap: () => _push(context, const AppearancePage()),
-        scheme: scheme, text: text,
-      ));
-    }
-
-    if (matches(['langue', 'language'])) {
-      items.add(_quickLinkTile(
-        icon: Icons.language_rounded,
-        title: en ? 'Language' : 'Langue',
-        trailing: Text(localeNotifier.value.toUpperCase(),
-            style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
-        onTap: () => _push(context, const LanguagePage()),
+        icon: l.icon,
+        title: en ? l.titleEn : l.titleFr,
+        trailing: l.trailing(context, scheme, text),
+        onTap: () => _push(context, l.pageBuilder(widget.username)),
         scheme: scheme, text: text,
       ));
     }
