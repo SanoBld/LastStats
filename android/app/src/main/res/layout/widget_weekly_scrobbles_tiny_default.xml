@@ -22,7 +22,7 @@
         android:includeFontPadding="false"
         android:autoSizeTextType="uniform"
         android:autoSizeMinTextSize="10sp"
-        android:autoSizeMaxTextSize="26sp"
-        android:paddingHorizontal="6dp"
+        android:autoSizeMaxTextSize="40sp"
+        android:paddingHorizontal="4dp"
         android:textStyle="bold" />
 </FrameLayout>

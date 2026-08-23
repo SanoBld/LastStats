@@ -120,6 +120,91 @@ class _SettingsPageState extends State<_SettingsPage> {
     return [...items, const SizedBox(height: 8)];
   }
 
+  // "Preview + jump" results, for options too complex to edit inline
+  // (a color sheet, a language list…). Shows the current value so it reads
+  // as the option itself, not just its category — tapping opens that page.
+  List<Widget> _buildQuickLinkResults(
+    BuildContext context, String q, ColorScheme scheme, TextTheme text,
+  ) {
+    final en = localeNotifier.value == 'en';
+    final items = <Widget>[];
+
+    bool matches(List<String> keywords) =>
+        keywords.any((k) => k.contains(q) || q.contains(k));
+
+    if (matches(['couleur', 'accent', 'color', 'palette'])) {
+      items.add(_quickLinkTile(
+        icon: Icons.palette_rounded,
+        title: en ? 'Accent color' : 'Couleur d\'accent',
+        trailing: Container(
+          width: 22, height: 22,
+          decoration: BoxDecoration(
+            color: accentNotifier.value,
+            shape: BoxShape.circle,
+            border: Border.all(color: scheme.outlineVariant),
+          ),
+        ),
+        onTap: () => _push(context, const AppearancePage()),
+        scheme: scheme, text: text,
+      ));
+    }
+
+    if (matches(['thème', 'theme', 'sombre', 'dark', 'clair', 'light', 'système', 'system'])) {
+      final mode = switch (themeModeNotifier.value) {
+        ThemeMode.dark   => en ? 'Dark'   : 'Sombre',
+        ThemeMode.light  => en ? 'Light'  : 'Clair',
+        ThemeMode.system => en ? 'System' : 'Système',
+      };
+      items.add(_quickLinkTile(
+        icon: Icons.dark_mode_rounded,
+        title: en ? 'Theme' : 'Thème',
+        trailing: Text(mode, style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
+        onTap: () => _push(context, const AppearancePage()),
+        scheme: scheme, text: text,
+      ));
+    }
+
+    if (matches(['langue', 'language'])) {
+      items.add(_quickLinkTile(
+        icon: Icons.language_rounded,
+        title: en ? 'Language' : 'Langue',
+        trailing: Text(localeNotifier.value.toUpperCase(),
+            style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
+        onTap: () => _push(context, const LanguagePage()),
+        scheme: scheme, text: text,
+      ));
+    }
+
+    if (items.isEmpty) return const [];
+    return [...items, const SizedBox(height: 8)];
+  }
+
+  Widget _quickLinkTile({
+    required IconData icon,
+    required String title,
+    required Widget trailing,
+    required VoidCallback onTap,
+    required ColorScheme scheme,
+    required TextTheme text,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Container(
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45), width: 1),
+        ),
+        child: ListTile(
+          leading: Icon(icon, color: scheme.primary),
+          title: Text(title),
+          trailing: trailing,
+          onTap: () { _haptic(_HapticImpact.light); onTap(); },
+        ),
+      ),
+    );
+  }
+
   Widget _quickToggleTile({
     required IconData icon,
     required String title,
@@ -453,6 +538,8 @@ class _SettingsPageState extends State<_SettingsPage> {
               // Quick-toggle search results — editable right here, no need
               // to open the category page.
               if (q.isNotEmpty) ..._buildQuickToggleResults(context, q, scheme, text),
+              // Preview + jump results, for options too complex to edit inline.
+              if (q.isNotEmpty) ..._buildQuickLinkResults(context, q, scheme, text),
 
               // Update banner
               if (_updateInfo != null)
