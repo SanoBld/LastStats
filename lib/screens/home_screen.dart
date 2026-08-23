@@ -124,6 +124,12 @@ void _haptic([_HapticImpact impact = _HapticImpact.light]) {
 //  HomeScreen
 // ══════════════════════════════════════════════════════════════════════════════
 
+/// Full 10-language lookup for ad-hoc strings not yet in the main l10n
+/// system — falls back to English, then French.
+/// Keys: fr, en, es, de, it, pt, ru, ja, zh, ar.
+String _tr(Map<String, String> byLocale) =>
+    byLocale[localeNotifier.value] ?? byLocale['en'] ?? byLocale['fr'] ?? '';
+
 class HomeScreen extends StatefulWidget {
   final String username;
   final String apiKey;
