@@ -5,8 +5,13 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../l10n/l10n.dart';
+import '../../app_state.dart';
 import '../../services/update_service.dart';
 import 'settings_helpers.dart';
+
+/// Full 10-language lookup — falls back to English, then French.
+String _tr(Map<String, String> byLocale) =>
+    byLocale[localeNotifier.value] ?? byLocale['en'] ?? byLocale['fr'] ?? '';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -88,20 +93,6 @@ class AboutPage extends StatelessWidget {
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           ListTile(
-            leading: const Icon(Icons.download_rounded),
-            title: Text(
-              L.aboutScrobbleDownloader,
-              style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-            ),
-            subtitle: Text(
-              L.aboutScrobbleDownloaderSub,
-              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-            trailing: const Icon(Icons.open_in_new_rounded, size: 16),
-            onTap: () => _open('https://sanobld.github.io/LastStats/LastStats-downloader/'),
-          ),
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          ListTile(
             leading: const Icon(Icons.code_rounded),
             title: Text(L.settingsSourceCode,
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
@@ -113,6 +104,52 @@ class AboutPage extends StatelessWidget {
         ]),
 
         const SizedBox(height: 16),
+
+        // ── Inspirations / credits ──────────────────────────────────────────
+        SettingsSection(
+          label: 'Inspirations',
+          children: [
+            ListTile(
+              leading: const Icon(Icons.library_music_rounded),
+              title: const Text('Metrolist',
+                  style: TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: Text(_tr({
+                'fr': 'Client YouTube Music open-source — la reconnaissance audio de LastStats s\'inspire de son moteur Shazam.',
+                'en': 'Open-source YouTube Music client — LastStats\' audio recognition is inspired by its Shazam engine.',
+                'es': 'Cliente de YouTube Music de código abierto — el reconocimiento de audio de LastStats se inspira en su motor Shazam.',
+                'de': 'Open-Source-YouTube-Music-Client — die Audioerkennung von LastStats basiert auf dessen Shazam-Engine.',
+                'it': 'Client YouTube Music open source — il riconoscimento audio di LastStats si ispira al suo motore Shazam.',
+                'pt': 'Cliente de YouTube Music open-source — o reconhecimento de áudio do LastStats é inspirado no seu motor Shazam.',
+                'ru': 'Открытый клиент YouTube Music — распознавание аудио в LastStats вдохновлено его движком Shazam.',
+                'ja': 'オープンソースの YouTube Music クライアント — LastStats の音声認識はその Shazam エンジンを参考にしています。',
+                'zh': '开源 YouTube Music 客户端 — LastStats 的音频识别功能借鉴了其 Shazam 引擎。',
+                'ar': 'عميل يوتيوب ميوزك مفتوح المصدر — التعرف الصوتي في LastStats مستوحى من محرك Shazam الخاص به.',
+              }), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              trailing: const Icon(Icons.open_in_new_rounded, size: 16),
+              onTap: () => _open('https://github.com/MetrolistGroup/Metrolist'),
+            ),
+            const Divider(height: 1, indent: 16, endIndent: 16),
+            ListTile(
+              leading: const Icon(Icons.flare_rounded),
+              title: const Text('Better Nothing Music Visualizer',
+                  style: TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: Text(_tr({
+                'fr': 'Visualiseur audio pour Glyph Interface, moteur haptique et flash des téléphones Nothing.',
+                'en': 'Audio visualizer for the Glyph Interface, haptic motor, and flashlight of Nothing phones.',
+                'es': 'Visualizador de audio para la Glyph Interface, el motor háptico y el flash de los Nothing phones.',
+                'de': 'Audio-Visualizer für das Glyph Interface, den Vibrationsmotor und die Taschenlampe der Nothing-Phones.',
+                'it': 'Visualizzatore audio per la Glyph Interface, il motore aptico e il flash dei telefoni Nothing.',
+                'pt': 'Visualizador de áudio para a Glyph Interface, motor háptico e flash dos telefones Nothing.',
+                'ru': 'Аудиовизуализатор для Glyph Interface, вибромотора и фонарика телефонов Nothing.',
+                'ja': 'Nothing フォンの Glyph インターフェース、ハプティックモーター、フラッシュライト向けの音声ビジュアライザー。',
+                'zh': '面向 Nothing 手机 Glyph 界面、触觉马达和手电筒的音频可视化工具。',
+                'ar': 'مُصوِّر صوتي لواجهة Glyph والمحرك اللمسي والفلاش في هواتف Nothing.',
+              }), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              trailing: const Icon(Icons.open_in_new_rounded, size: 16),
+              onTap: () => _open('https://github.com/Aleks-Levet/better-nothing-music-visualizer'),
+            ),
+          ],
+        ),
 
         // ── Support ───────────────────────────────────────────────────────
         SettingsSection(label: L.settingsAboutSupport, children: [
