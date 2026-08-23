@@ -1,6 +1,6 @@
 // lib/services/image_service.dart
 //
-// Resolves artwork URLs from Last.fm → iTunes → Deezer → MusicBrainz.
+// Resolves artwork URLs from Last.fm → YouTube Music → iTunes → Deezer → MusicBrainz.
 // Downloads and caches image bytes via OfflineImageCache for offline use.
 //
 // Main entry points:
@@ -88,6 +88,9 @@ class ImageService {
     final mem = _getUrl(key);
     if (mem != null) return mem;
 
+    final ytMusic = await _ytMusicSearch(artist, 'artist', expectArtist: artist);
+    if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic);
+
     final itunes = await _itunesSearch(artist, 'musicArtist', 'artistTerm', artist);
     if (itunes.isNotEmpty) return _persistUrl(key, itunes);
 
@@ -112,6 +115,9 @@ class ImageService {
     final key = 'album|$artist|$album';
     final mem = _getUrl(key);
     if (mem != null) return mem;
+
+    final ytMusic = await _ytMusicSearch('$artist $album', 'album', expectArtist: artist, expectTitle: album);
+    if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic);
 
     final itunes = await _itunesSearch('$artist $album', 'album', null, artist, album);
     if (itunes.isNotEmpty) return _persistUrl(key, itunes);
@@ -138,6 +144,9 @@ class ImageService {
     final key = 'track|$artist|$track';
     final mem = _getUrl(key);
     if (mem != null) return mem;
+
+    final ytMusic = await _ytMusicSearch('$artist $track', 'song', expectArtist: artist, expectTitle: track);
+    if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic);
 
     final itunes = await _itunesSearch('$artist $track', 'song', null, artist, track);
     if (itunes.isNotEmpty) return _persistUrl(key, itunes);
@@ -259,6 +268,80 @@ class ImageService {
     final longer  = a.length <= b.length ? b : a;
     if (shorter.length >= 4 && longer.contains(shorter)) return true;
     return false;
+  }
+
+  // Searches YouTube Music. No public API exists for this — this hits the
+  // same unofficial internal endpoint YouTube Music's own web player uses
+  // (the one ytmusicapi/InnerTune/Metrolist rely on). It's not documented
+  // or guaranteed by Google, so it can break without warning; iTunes/Deezer/
+  // MusicBrainz below stay as solid fallbacks either way.
+  static const _ytmFilters = {
+    'artist': 'EgWKAQIgAWoKEAMQBBAJEAoQBQ%3D%3D',
+    'album':  'EgWKAQIYAWoKEAMQBBAJEAoQBQ%3D%3D',
+    'song':   'EgWKAQIIAWoKEAMQBBAJEAoQBQ%3D%3D',
+  };
+
+  static Future<String> _ytMusicSearch(
+    String term,
+    String type, {
+    String? expectArtist,
+    String? expectTitle,
+  }) async {
+    try {
+      final res = await http.post(
+        Uri.https('music.youtube.com', '/youtubei/v1/search',
+            {'prettyPrint': 'false'}),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Format-Version': '1',
+          'Referer': 'https://music.youtube.com/',
+        },
+        body: jsonEncode({
+          'context': {
+            'client': {'clientName': 'WEB_REMIX', 'clientVersion': '1.20240101.01.00'}
+          },
+          'query': term,
+          'params': _ytmFilters[type],
+        }),
+      ).timeout(_timeout);
+      if (res.statusCode != 200) return '';
+
+      final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+      final shelves = data['contents']?['tabbedSearchResultsRenderer']?['tabs']?[0]
+          ?['tabRenderer']?['content']?['sectionListRenderer']?['contents'] as List?;
+      if (shelves == null) return '';
+
+      for (final shelf in shelves) {
+        final items = shelf['musicShelfRenderer']?['contents'] as List?;
+        if (items == null || items.isEmpty) continue;
+        final item = items.first['musicResponsiveListItemRenderer'];
+        if (item == null) continue;
+
+        // First flex column = title (song/album) or artist name.
+        final flexCols = item['flexColumns'] as List?;
+        final title = flexCols?[0]?['musicResponsiveListItemFlexColumnRenderer']
+            ?['text']?['runs']?[0]?['text']?.toString() ?? '';
+        String subtitleArtist = '';
+        if (flexCols != null && flexCols.length > 1) {
+          final runs = flexCols[1]['musicResponsiveListItemFlexColumnRenderer']
+              ?['text']?['runs'] as List?;
+          if (runs != null && runs.isNotEmpty) subtitleArtist = runs.first['text']?.toString() ?? '';
+        }
+
+        if (expectArtist != null &&
+            !_similar(expectArtist, type == 'artist' ? title : subtitleArtist)) continue;
+        if (expectTitle != null && !_similar(expectTitle, title)) continue;
+
+        final thumbs = item['thumbnail']?['musicThumbnailRenderer']?['thumbnail']
+            ?['thumbnails'] as List?;
+        if (thumbs == null || thumbs.isEmpty) continue;
+        final raw = (thumbs.last['url'] ?? '').toString();
+        if (raw.isEmpty) continue;
+        // YT thumbnail URLs take an arbitrary width/height suffix — bump it up.
+        return raw.replaceAll(RegExp(r'=w\d+-h\d+.*$'), '=w1200-h1200');
+      }
+      return '';
+    } catch (_) { return ''; }
   }
 
   // Searches iTunes and only returns artwork if the result actually matches

@@ -105,25 +105,30 @@ class AboutPage extends StatelessWidget {
 
         const SizedBox(height: 16),
 
-        // ── Inspirations / credits ──────────────────────────────────────────
+        // ── Coup de cœur / credits ──────────────────────────────────────────
         SettingsSection(
-          label: 'Inspirations',
+          label: _tr({
+            'fr': 'Coups de cœur', 'en': 'Favorites',
+            'es': 'Favoritos', 'de': 'Favoriten', 'it': 'Preferiti',
+            'pt': 'Favoritos', 'ru': 'Избранное', 'ja': 'お気に入り',
+            'zh': '精选推荐', 'ar': 'المفضلة',
+          }),
           children: [
             ListTile(
               leading: const Icon(Icons.library_music_rounded),
               title: const Text('Metrolist',
                   style: TextStyle(fontWeight: FontWeight.w600)),
               subtitle: Text(_tr({
-                'fr': 'Client YouTube Music open-source — la reconnaissance audio de LastStats s\'inspire de son moteur Shazam.',
-                'en': 'Open-source YouTube Music client — LastStats\' audio recognition is inspired by its Shazam engine.',
-                'es': 'Cliente de YouTube Music de código abierto — el reconocimiento de audio de LastStats se inspira en su motor Shazam.',
-                'de': 'Open-Source-YouTube-Music-Client — die Audioerkennung von LastStats basiert auf dessen Shazam-Engine.',
-                'it': 'Client YouTube Music open source — il riconoscimento audio di LastStats si ispira al suo motore Shazam.',
-                'pt': 'Cliente de YouTube Music open-source — o reconhecimento de áudio do LastStats é inspirado no seu motor Shazam.',
-                'ru': 'Открытый клиент YouTube Music — распознавание аудио в LastStats вдохновлено его движком Shazam.',
-                'ja': 'オープンソースの YouTube Music クライアント — LastStats の音声認識はその Shazam エンジンを参考にしています。',
-                'zh': '开源 YouTube Music 客户端 — LastStats 的音频识别功能借鉴了其 Shazam 引擎。',
-                'ar': 'عميل يوتيوب ميوزك مفتوح المصدر — التعرف الصوتي في LastStats مستوحى من محرك Shazam الخاص به.',
+                'fr': 'Client YouTube Music avancé.',
+                'en': 'Advanced YouTube Music client.',
+                'es': 'Cliente avanzado de YouTube Music.',
+                'de': 'Fortschrittlicher YouTube-Music-Client.',
+                'it': 'Client avanzato per YouTube Music.',
+                'pt': 'Cliente avançado do YouTube Music.',
+                'ru': 'Продвинутый клиент YouTube Music.',
+                'ja': '高機能な YouTube Music クライアント。',
+                'zh': '功能强大的 YouTube Music 客户端。',
+                'ar': 'عميل متقدم لتطبيق يوتيوب ميوزك.',
               }), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               trailing: const Icon(Icons.open_in_new_rounded, size: 16),
               onTap: () => _open('https://github.com/MetrolistGroup/Metrolist'),
@@ -134,22 +139,24 @@ class AboutPage extends StatelessWidget {
               title: const Text('Better Nothing Music Visualizer',
                   style: TextStyle(fontWeight: FontWeight.w600)),
               subtitle: Text(_tr({
-                'fr': 'Visualiseur audio pour Glyph Interface, moteur haptique et flash des téléphones Nothing.',
-                'en': 'Audio visualizer for the Glyph Interface, haptic motor, and flashlight of Nothing phones.',
-                'es': 'Visualizador de audio para la Glyph Interface, el motor háptico y el flash de los Nothing phones.',
-                'de': 'Audio-Visualizer für das Glyph Interface, den Vibrationsmotor und die Taschenlampe der Nothing-Phones.',
-                'it': 'Visualizzatore audio per la Glyph Interface, il motore aptico e il flash dei telefoni Nothing.',
-                'pt': 'Visualizador de áudio para a Glyph Interface, motor háptico e flash dos telefones Nothing.',
-                'ru': 'Аудиовизуализатор для Glyph Interface, вибромотора и фонарика телефонов Nothing.',
-                'ja': 'Nothing フォンの Glyph インターフェース、ハプティックモーター、フラッシュライト向けの音声ビジュアライザー。',
-                'zh': '面向 Nothing 手机 Glyph 界面、触觉马达和手电筒的音频可视化工具。',
-                'ar': 'مُصوِّر صوتي لواجهة Glyph والمحرك اللمسي والفلاش في هواتف Nothing.',
+                'fr': 'Synchronise les Glyphs des téléphones Nothing à la musique.',
+                'en': 'Syncs the Glyphs of Nothing phones to the music.',
+                'es': 'Sincroniza los Glyphs de los Nothing phones con la música.',
+                'de': 'Synchronisiert die Glyphs der Nothing-Phones mit der Musik.',
+                'it': 'Sincronizza i Glyph dei telefoni Nothing con la musica.',
+                'pt': 'Sincroniza os Glyphs dos telefones Nothing com a música.',
+                'ru': 'Синхронизирует Glyph телефонов Nothing с музыкой.',
+                'ja': 'Nothing フォンの Glyph を音楽に同期させます。',
+                'zh': '将 Nothing 手机的 Glyph 灯效与音乐同步。',
+                'ar': 'يزامن مصابيح Glyph في هواتف Nothing مع الموسيقى.',
               }), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               trailing: const Icon(Icons.open_in_new_rounded, size: 16),
               onTap: () => _open('https://github.com/Aleks-Levet/better-nothing-music-visualizer'),
             ),
           ],
         ),
+
+        const SizedBox(height: 16),
 
         // ── Support ───────────────────────────────────────────────────────
         SettingsSection(label: L.settingsAboutSupport, children: [
