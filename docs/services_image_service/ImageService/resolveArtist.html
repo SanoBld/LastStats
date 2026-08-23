@@ -75,6 +75,9 @@
   final mem = _getUrl(key);
   if (mem != null) return mem;
 
+  final ytMusic = await _ytMusicSearch(artist, &#39;artist&#39;, expectArtist: artist);
+  if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic);
+
   final itunes = await _itunesSearch(artist, &#39;musicArtist&#39;, &#39;artistTerm&#39;, artist);
   if (itunes.isNotEmpty) return _persistUrl(key, itunes);
 

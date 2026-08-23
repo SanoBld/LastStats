@@ -192,25 +192,30 @@ Widget build(BuildContext context) {
 
       const SizedBox(height: 16),
 
-      &#47;&#47; ── Inspirations &#47; credits ──────────────────────────────────────────
+      &#47;&#47; ── Coup de cœur &#47; credits ──────────────────────────────────────────
       SettingsSection(
-        label: &#39;Inspirations&#39;,
+        label: _tr({
+          &#39;fr&#39;: &#39;Coups de cœur&#39;, &#39;en&#39;: &#39;Favorites&#39;,
+          &#39;es&#39;: &#39;Favoritos&#39;, &#39;de&#39;: &#39;Favoriten&#39;, &#39;it&#39;: &#39;Preferiti&#39;,
+          &#39;pt&#39;: &#39;Favoritos&#39;, &#39;ru&#39;: &#39;Избранное&#39;, &#39;ja&#39;: &#39;お気に入り&#39;,
+          &#39;zh&#39;: &#39;精选推荐&#39;, &#39;ar&#39;: &#39;المفضلة&#39;,
+        }),
         children: [
           ListTile(
             leading: const Icon(Icons.library_music_rounded),
             title: const Text(&#39;Metrolist&#39;,
                 style: TextStyle(fontWeight: FontWeight.w600)),
             subtitle: Text(_tr({
-              &#39;fr&#39;: &#39;Client YouTube Music open-source — la reconnaissance audio de LastStats s\&#39;inspire de son moteur Shazam.&#39;,
-              &#39;en&#39;: &#39;Open-source YouTube Music client — LastStats\&#39; audio recognition is inspired by its Shazam engine.&#39;,
-              &#39;es&#39;: &#39;Cliente de YouTube Music de código abierto — el reconocimiento de audio de LastStats se inspira en su motor Shazam.&#39;,
-              &#39;de&#39;: &#39;Open-Source-YouTube-Music-Client — die Audioerkennung von LastStats basiert auf dessen Shazam-Engine.&#39;,
-              &#39;it&#39;: &#39;Client YouTube Music open source — il riconoscimento audio di LastStats si ispira al suo motore Shazam.&#39;,
-              &#39;pt&#39;: &#39;Cliente de YouTube Music open-source — o reconhecimento de áudio do LastStats é inspirado no seu motor Shazam.&#39;,
-              &#39;ru&#39;: &#39;Открытый клиент YouTube Music — распознавание аудио в LastStats вдохновлено его движком Shazam.&#39;,
-              &#39;ja&#39;: &#39;オープンソースの YouTube Music クライアント — LastStats の音声認識はその Shazam エンジンを参考にしています。&#39;,
-              &#39;zh&#39;: &#39;开源 YouTube Music 客户端 — LastStats 的音频识别功能借鉴了其 Shazam 引擎。&#39;,
-              &#39;ar&#39;: &#39;عميل يوتيوب ميوزك مفتوح المصدر — التعرف الصوتي في LastStats مستوحى من محرك Shazam الخاص به.&#39;,
+              &#39;fr&#39;: &#39;Client YouTube Music avancé.&#39;,
+              &#39;en&#39;: &#39;Advanced YouTube Music client.&#39;,
+              &#39;es&#39;: &#39;Cliente avanzado de YouTube Music.&#39;,
+              &#39;de&#39;: &#39;Fortschrittlicher YouTube-Music-Client.&#39;,
+              &#39;it&#39;: &#39;Client avanzato per YouTube Music.&#39;,
+              &#39;pt&#39;: &#39;Cliente avançado do YouTube Music.&#39;,
+              &#39;ru&#39;: &#39;Продвинутый клиент YouTube Music.&#39;,
+              &#39;ja&#39;: &#39;高機能な YouTube Music クライアント。&#39;,
+              &#39;zh&#39;: &#39;功能强大的 YouTube Music 客户端。&#39;,
+              &#39;ar&#39;: &#39;عميل متقدم لتطبيق يوتيوب ميوزك.&#39;,
             }), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             trailing: const Icon(Icons.open_in_new_rounded, size: 16),
             onTap: () =&gt; _open(&#39;https:&#47;&#47;github.com&#47;MetrolistGroup&#47;Metrolist&#39;),
@@ -221,22 +226,24 @@ Widget build(BuildContext context) {
             title: const Text(&#39;Better Nothing Music Visualizer&#39;,
                 style: TextStyle(fontWeight: FontWeight.w600)),
             subtitle: Text(_tr({
-              &#39;fr&#39;: &#39;Visualiseur audio pour Glyph Interface, moteur haptique et flash des téléphones Nothing.&#39;,
-              &#39;en&#39;: &#39;Audio visualizer for the Glyph Interface, haptic motor, and flashlight of Nothing phones.&#39;,
-              &#39;es&#39;: &#39;Visualizador de audio para la Glyph Interface, el motor háptico y el flash de los Nothing phones.&#39;,
-              &#39;de&#39;: &#39;Audio-Visualizer für das Glyph Interface, den Vibrationsmotor und die Taschenlampe der Nothing-Phones.&#39;,
-              &#39;it&#39;: &#39;Visualizzatore audio per la Glyph Interface, il motore aptico e il flash dei telefoni Nothing.&#39;,
-              &#39;pt&#39;: &#39;Visualizador de áudio para a Glyph Interface, motor háptico e flash dos telefones Nothing.&#39;,
-              &#39;ru&#39;: &#39;Аудиовизуализатор для Glyph Interface, вибромотора и фонарика телефонов Nothing.&#39;,
-              &#39;ja&#39;: &#39;Nothing フォンの Glyph インターフェース、ハプティックモーター、フラッシュライト向けの音声ビジュアライザー。&#39;,
-              &#39;zh&#39;: &#39;面向 Nothing 手机 Glyph 界面、触觉马达和手电筒的音频可视化工具。&#39;,
-              &#39;ar&#39;: &#39;مُصوِّر صوتي لواجهة Glyph والمحرك اللمسي والفلاش في هواتف Nothing.&#39;,
+              &#39;fr&#39;: &#39;Synchronise les Glyphs des téléphones Nothing à la musique.&#39;,
+              &#39;en&#39;: &#39;Syncs the Glyphs of Nothing phones to the music.&#39;,
+              &#39;es&#39;: &#39;Sincroniza los Glyphs de los Nothing phones con la música.&#39;,
+              &#39;de&#39;: &#39;Synchronisiert die Glyphs der Nothing-Phones mit der Musik.&#39;,
+              &#39;it&#39;: &#39;Sincronizza i Glyph dei telefoni Nothing con la musica.&#39;,
+              &#39;pt&#39;: &#39;Sincroniza os Glyphs dos telefones Nothing com a música.&#39;,
+              &#39;ru&#39;: &#39;Синхронизирует Glyph телефонов Nothing с музыкой.&#39;,
+              &#39;ja&#39;: &#39;Nothing フォンの Glyph を音楽に同期させます。&#39;,
+              &#39;zh&#39;: &#39;将 Nothing 手机的 Glyph 灯效与音乐同步。&#39;,
+              &#39;ar&#39;: &#39;يزامن مصابيح Glyph في هواتف Nothing مع الموسيقى.&#39;,
             }), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             trailing: const Icon(Icons.open_in_new_rounded, size: 16),
             onTap: () =&gt; _open(&#39;https:&#47;&#47;github.com&#47;Aleks-Levet&#47;better-nothing-music-visualizer&#39;),
           ),
         ],
       ),
+
+      const SizedBox(height: 16),
 
       &#47;&#47; ── Support ───────────────────────────────────────────────────────
       SettingsSection(label: L.settingsAboutSupport, children: [
