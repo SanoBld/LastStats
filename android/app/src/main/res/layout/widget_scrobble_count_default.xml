@@ -45,14 +45,14 @@
             android:includeFontPadding="false"
             android:autoSizeTextType="uniform"
             android:autoSizeMinTextSize="22sp"
-            android:autoSizeMaxTextSize="36sp"
+            android:autoSizeMaxTextSize="30sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/widget_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="5dp"
             android:maxLines="1"
             android:ellipsize="end"
             android:textAllCaps="true"
