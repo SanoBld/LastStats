@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the resolveArtist method from the ImageService class, for the Dart programming language.">
-  <title>resolveArtist method - ImageService class - image_service library - Dart API</title>
+  <meta name="description" content="API docs for the sourceLabel method from the ImageService class, for the Dart programming language.">
+  <title>sourceLabel method - ImageService class - image_service library - Dart API</title>
 
 
   
@@ -27,9 +27,9 @@
     <li><a href="../../index.html">laststats_mobile</a></li>
     <li><a href="../../services_image_service/">services&#47;image_service.dart</a></li>
     <li><a href="../../services_image_service/ImageService-class.html">ImageService</a></li>
-    <li class="self-crumb">resolveArtist static method</li>
+    <li class="self-crumb">sourceLabel static method</li>
   </ol>
-  <div class="self-name">resolveArtist</div>
+  <div class="self-name">sourceLabel</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -49,55 +49,42 @@
     data-above-sidebar="services_image_service&#47;ImageService-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">resolveArtist</span> static method 
+<h1><span class="kind-method">sourceLabel</span> static method 
 </h1></div>
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span>
-<span class="name ">resolveArtist</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="resolveArtist-param-artist"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">artist</span>, {</span></li>
-<li><span class="parameter" id="resolveArtist-param-lastfmUrl"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">lastfmUrl</span>, </span></li>
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+<span class="name ">sourceLabel</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="sourceLabel-param-type"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">type</span>, </span></li>
+<li><span class="parameter" id="sourceLabel-param-artist"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">artist</span>, {</span></li>
+<li><span class="parameter" id="sourceLabel-param-album"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">album</span> = <span class="default-value">&#39;&#39;</span>, </span></li>
+<li><span class="parameter" id="sourceLabel-param-track"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">track</span> = <span class="default-value">&#39;&#39;</span>, </span></li>
 </ol>})
 
       
 
     </section>
     
+<section class="desc markdown">
+  <p>Human-readable, translated name of the source that provided the
+artwork currently cached for this artist/album/track — for the small
+gray attribution label shown under artwork. Returns '' if unknown.</p>
+</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Future&lt;String&gt; resolveArtist(String artist, {String? lastfmUrl}) async {
-  final key = &#39;artist|$artist&#39;;
-  if (_ok(lastfmUrl)) {
-    _cacheBytes(lastfmUrl!);
-    _sourceOf[key] = &#39;lastfm&#39;;
-    return lastfmUrl;
-  }
-  await _ensureDiskCache();
-  final mem = _getUrl(key);
-  if (mem != null) return mem;
-
-  final ytMusic = await _ytMusicSearch(artist, &#39;artist&#39;, expectArtist: artist);
-  if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic, &#39;ytmusic&#39;);
-
-  final itunes = await _itunesSearch(artist, &#39;musicArtist&#39;, &#39;artistTerm&#39;, artist);
-  if (itunes.isNotEmpty) return _persistUrl(key, itunes, &#39;itunes&#39;);
-
-  final deezer = await _deezerArtist(artist);
-  if (deezer.isNotEmpty) return _persistUrl(key, deezer, &#39;deezer&#39;);
-
-  final audioDb = await _audioDbArtist(artist);
-  if (audioDb.isNotEmpty) return _persistUrl(key, audioDb, &#39;audiodb&#39;);
-
-  final mb = await _mbArtistImage(artist);
-  if (mb.isNotEmpty) return _persistUrl(key, mb, &#39;musicbrainz&#39;);
-
-  final wiki = await _wikipediaImage(artist, expectName: artist);
-  if (wiki.isNotEmpty) return _persistUrl(key, wiki, &#39;wikipedia&#39;);
-
-  return _persistUrl(key, &#39;&#39;);
+  <pre class="language-dart"><code class="language-dart">static String sourceLabel(String type, String artist, {String album = &#39;&#39;, String track = &#39;&#39;}) {
+  final key = switch (type) {
+    &#39;artist&#39; =&gt; &#39;artist|$artist&#39;,
+    &#39;album&#39;  =&gt; &#39;album|$artist|$album&#39;,
+    &#39;track&#39;  =&gt; &#39;track|$artist|$track&#39;,
+    _ =&gt; &#39;&#39;,
+  };
+  final raw = _sourceOf[key];
+  if (raw == null || raw.isEmpty) return &#39;&#39;;
+  return _tr(_sourceNames[raw] ?? const {});
 }</code></pre>
 </section>
 
@@ -114,7 +101,7 @@
     <li><a href="../../index.html">laststats_mobile</a></li>
     <li><a href="../../services_image_service/">image_service</a></li>
     <li><a href="../../services_image_service/ImageService-class.html">ImageService</a></li>
-    <li class="self-crumb">resolveArtist static method</li>
+    <li class="self-crumb">sourceLabel static method</li>
 </ol>
 
     <h5>ImageService class</h5>

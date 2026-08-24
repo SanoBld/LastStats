@@ -72,32 +72,36 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;String&gt; resolveTrack(String track, String artist,
     {String? lastfmUrl, String album = &#39;&#39;}) async {
-  if (_ok(lastfmUrl)) { _cacheBytes(lastfmUrl!); return lastfmUrl; }
-  await _ensureDiskCache();
   final key = &#39;track|$artist|$track&#39;;
+  if (_ok(lastfmUrl)) {
+    _cacheBytes(lastfmUrl!);
+    _sourceOf[key] = &#39;lastfm&#39;;
+    return lastfmUrl;
+  }
+  await _ensureDiskCache();
   final mem = _getUrl(key);
   if (mem != null) return mem;
 
   final ytMusic = await _ytMusicSearch(&#39;$artist $track&#39;, &#39;song&#39;, expectArtist: artist, expectTitle: track);
-  if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic);
+  if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic, &#39;ytmusic&#39;);
 
   final itunes = await _itunesSearch(&#39;$artist $track&#39;, &#39;song&#39;, null, artist, track);
-  if (itunes.isNotEmpty) return _persistUrl(key, itunes);
+  if (itunes.isNotEmpty) return _persistUrl(key, itunes, &#39;itunes&#39;);
 
   final deezer = await _deezerTrack(track, artist);
-  if (deezer.isNotEmpty) return _persistUrl(key, deezer);
+  if (deezer.isNotEmpty) return _persistUrl(key, deezer, &#39;deezer&#39;);
 
   final audioDb = await _audioDbTrack(track, artist);
-  if (audioDb.isNotEmpty) return _persistUrl(key, audioDb);
+  if (audioDb.isNotEmpty) return _persistUrl(key, audioDb, &#39;audiodb&#39;);
 
   &#47;&#47; Reuses album cover art if the caller knows the parent album.
   if (album.isNotEmpty) {
     final mb = await _mbAlbum(album, artist);
-    if (mb.isNotEmpty) return _persistUrl(key, mb);
+    if (mb.isNotEmpty) return _persistUrl(key, mb, &#39;musicbrainz&#39;);
   }
 
   final wiki = await _wikipediaImage(&#39;$artist $track song&#39;, expectName: track);
-  if (wiki.isNotEmpty) return _persistUrl(key, wiki);
+  if (wiki.isNotEmpty) return _persistUrl(key, wiki, &#39;wikipedia&#39;);
 
   return _persistUrl(key, &#39;&#39;);
 }</code></pre>
