@@ -153,11 +153,6 @@ class ImageService {
 
   static Future<String> resolveArtist(String artist, {String? lastfmUrl}) async {
     final key = 'artist|$artist';
-    if (_ok(lastfmUrl)) {
-      _cacheBytes(lastfmUrl!);
-      _sourceOf[key] = 'lastfm';
-      return lastfmUrl;
-    }
     await _ensureDiskCache();
     final mem = _getUrl(key);
     if (mem != null) return mem;
@@ -180,16 +175,19 @@ class ImageService {
     final wiki = await _wikipediaImage(artist, expectName: artist);
     if (wiki.isNotEmpty) return _persistUrl(key, wiki, 'wikipedia');
 
+    // Last.fm last — its own catalog images are usually much lower
+    // resolution (~300px) than the sources above, so it's a fallback here
+    // rather than an automatic first pick.
+    if (_ok(lastfmUrl)) {
+      _cacheBytes(lastfmUrl!);
+      return _persistUrl(key, lastfmUrl, 'lastfm');
+    }
+
     return _persistUrl(key, '');
   }
 
   static Future<String> resolveAlbum(String album, String artist, {String? lastfmUrl}) async {
     final key = 'album|$artist|$album';
-    if (_ok(lastfmUrl)) {
-      _cacheBytes(lastfmUrl!);
-      _sourceOf[key] = 'lastfm';
-      return lastfmUrl;
-    }
     await _ensureDiskCache();
     final mem = _getUrl(key);
     if (mem != null) return mem;
@@ -212,17 +210,17 @@ class ImageService {
     final wiki = await _wikipediaImage('$artist $album album', expectName: album);
     if (wiki.isNotEmpty) return _persistUrl(key, wiki, 'wikipedia');
 
+    if (_ok(lastfmUrl)) {
+      _cacheBytes(lastfmUrl!);
+      return _persistUrl(key, lastfmUrl, 'lastfm');
+    }
+
     return _persistUrl(key, '');
   }
 
   static Future<String> resolveTrack(String track, String artist,
       {String? lastfmUrl, String album = ''}) async {
     final key = 'track|$artist|$track';
-    if (_ok(lastfmUrl)) {
-      _cacheBytes(lastfmUrl!);
-      _sourceOf[key] = 'lastfm';
-      return lastfmUrl;
-    }
     await _ensureDiskCache();
     final mem = _getUrl(key);
     if (mem != null) return mem;
@@ -247,6 +245,11 @@ class ImageService {
 
     final wiki = await _wikipediaImage('$artist $track song', expectName: track);
     if (wiki.isNotEmpty) return _persistUrl(key, wiki, 'wikipedia');
+
+    if (_ok(lastfmUrl)) {
+      _cacheBytes(lastfmUrl!);
+      return _persistUrl(key, lastfmUrl, 'lastfm');
+    }
 
     return _persistUrl(key, '');
   }
@@ -388,6 +391,9 @@ class ImageService {
           'Referer': 'https://music.youtube.com/',
           'X-YouTube-Client-Name': '67',
           'X-YouTube-Client-Version': '1.20240101.01.00',
+          // Google's edge servers reject requests without a browser-like UA.
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+              'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         },
         body: jsonEncode({
           'context': {
@@ -402,11 +408,18 @@ class ImageService {
           'params': _ytmFilters[type],
         }),
       ).timeout(_timeout);
-      if (res.statusCode != 200) return '';
+      if (res.statusCode != 200) {
+        debugLog('[ytmusic] HTTP ${res.statusCode} for "$term" ($type)');
+        return '';
+      }
 
       final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
       final sections = data['contents']?['tabbedSearchResultsRenderer']?['tabs']?[0]
           ?['tabRenderer']?['content']?['sectionListRenderer']?['contents'] as List?;
+      if (sections == null) {
+        debugLog('[ytmusic] no sections in response for "$term" — response shape may have changed');
+        return '';
+      }
       if (sections == null) return '';
 
       for (final section in sections) {
@@ -449,8 +462,12 @@ class ImageService {
         final url = _bestThumbnail(item['thumbnail']);
         if (url.isNotEmpty) return url;
       }
+      debugLog('[ytmusic] no matching result for "$term" ($type, expectArtist=$expectArtist, expectTitle=$expectTitle)');
       return '';
-    } catch (_) { return ''; }
+    } catch (e) {
+      debugLog('[ytmusic] exception for "$term": $e');
+      return '';
+    }
   }
 
   // Mirrors Metrolist's ThumbnailRenderer.getThumbnailUrl() fallback chain:
