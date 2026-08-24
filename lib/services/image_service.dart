@@ -59,6 +59,8 @@ class ImageService {
             continue;
           }
           _mem[k.substring(_diskPrefix.length)] = url;
+          final src = (e['source'] as String?) ?? '';
+          if (src.isNotEmpty) _sourceOf[k.substring(_diskPrefix.length)] = src;
         } catch (_) { _prefs!.remove(k).ignore(); }
       }
     } catch (_) {}
