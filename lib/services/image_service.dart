@@ -9,6 +9,7 @@
 //   prefetchBytes(url)                           → background download
 
 import 'dart:convert';
+import 'package:flutter/material.dart' show Theme, TextStyle;
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -440,7 +441,9 @@ class ImageService {
         }
 
         if (expectArtist != null &&
-            !_similar(expectArtist, type == 'artist' ? title : subtitleArtist)) continue;
+            !_similar(expectArtist, type == 'artist' ? title : subtitleArtist)) {
+          continue;
+        }
         if (expectTitle != null && !_similar(expectTitle, title)) continue;
 
         final url = _bestThumbnail(item['thumbnail']);
