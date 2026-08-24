@@ -14,6 +14,11 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'offline_image_cache.dart';
 import 'storage_manager.dart';
+import '../app_state.dart';
+
+/// Full 10-language lookup — falls back to English, then French.
+String _tr(Map<String, String> byLocale) =>
+    byLocale[localeNotifier.value] ?? byLocale['en'] ?? byLocale['fr'] ?? '';
 
 class ImageService {
   ImageService._();
@@ -25,6 +30,9 @@ class ImageService {
 
   // In-memory URL cache (session).
   static final Map<String, String> _mem = {};
+  // Which source produced each cache key's URL — for the small attribution
+  // label shown under artwork. Keyed by the same `key` used in `_mem`.
+  static final Map<String, String> _sourceOf = {};
 
   static SharedPreferences? _prefs;
   static bool _diskLoaded = false;
@@ -57,20 +65,81 @@ class ImageService {
 
   static String? _getUrl(String key) => _mem[key];
 
-  static Future<String> _persistUrl(String key, String url) async {
+  static Future<String> _persistUrl(String key, String url, [String source = '']) async {
     _mem[key] = url;
+    if (source.isNotEmpty) _sourceOf[key] = source;
     if (url.isEmpty) return url;
     try {
       _prefs ??= await SharedPreferences.getInstance();
       await _prefs!.setString(
         '$_diskPrefix$key',
-        jsonEncode({'url': url, 'ts': DateTime.now().millisecondsSinceEpoch}),
+        jsonEncode({'url': url, 'ts': DateTime.now().millisecondsSinceEpoch, 'source': source}),
       );
     } catch (_) {}
     // Kick off background byte download.
     _cacheBytes(url);
     return url;
   }
+
+  /// Human-readable, translated name of the source that provided the
+  /// artwork currently cached for this artist/album/track — for the small
+  /// gray attribution label shown under artwork. Returns '' if unknown.
+  static String sourceLabel(String type, String artist, {String album = '', String track = ''}) {
+    final key = switch (type) {
+      'artist' => 'artist|$artist',
+      'album'  => 'album|$artist|$album',
+      'track'  => 'track|$artist|$track',
+      _ => '',
+    };
+    final raw = _sourceOf[key];
+    if (raw == null || raw.isEmpty) return '';
+    return _tr(_sourceNames[raw] ?? const {});
+  }
+
+  static const Map<String, Map<String, String>> _sourceNames = {
+    'lastfm': {
+      'fr': 'Source : Last.fm', 'en': 'Source: Last.fm', 'es': 'Fuente: Last.fm',
+      'de': 'Quelle: Last.fm', 'it': 'Fonte: Last.fm', 'pt': 'Fonte: Last.fm',
+      'ru': 'Источник: Last.fm', 'ja': '提供元: Last.fm', 'zh': '来源：Last.fm',
+      'ar': 'المصدر: Last.fm',
+    },
+    'ytmusic': {
+      'fr': 'Source : YouTube Music', 'en': 'Source: YouTube Music', 'es': 'Fuente: YouTube Music',
+      'de': 'Quelle: YouTube Music', 'it': 'Fonte: YouTube Music', 'pt': 'Fonte: YouTube Music',
+      'ru': 'Источник: YouTube Music', 'ja': '提供元: YouTube Music', 'zh': '来源：YouTube Music',
+      'ar': 'المصدر: YouTube Music',
+    },
+    'itunes': {
+      'fr': 'Source : iTunes', 'en': 'Source: iTunes', 'es': 'Fuente: iTunes',
+      'de': 'Quelle: iTunes', 'it': 'Fonte: iTunes', 'pt': 'Fonte: iTunes',
+      'ru': 'Источник: iTunes', 'ja': '提供元: iTunes', 'zh': '来源：iTunes',
+      'ar': 'المصدر: iTunes',
+    },
+    'deezer': {
+      'fr': 'Source : Deezer', 'en': 'Source: Deezer', 'es': 'Fuente: Deezer',
+      'de': 'Quelle: Deezer', 'it': 'Fonte: Deezer', 'pt': 'Fonte: Deezer',
+      'ru': 'Источник: Deezer', 'ja': '提供元: Deezer', 'zh': '来源：Deezer',
+      'ar': 'المصدر: Deezer',
+    },
+    'audiodb': {
+      'fr': 'Source : TheAudioDB', 'en': 'Source: TheAudioDB', 'es': 'Fuente: TheAudioDB',
+      'de': 'Quelle: TheAudioDB', 'it': 'Fonte: TheAudioDB', 'pt': 'Fonte: TheAudioDB',
+      'ru': 'Источник: TheAudioDB', 'ja': '提供元: TheAudioDB', 'zh': '来源：TheAudioDB',
+      'ar': 'المصدر: TheAudioDB',
+    },
+    'musicbrainz': {
+      'fr': 'Source : MusicBrainz', 'en': 'Source: MusicBrainz', 'es': 'Fuente: MusicBrainz',
+      'de': 'Quelle: MusicBrainz', 'it': 'Fonte: MusicBrainz', 'pt': 'Fonte: MusicBrainz',
+      'ru': 'Источник: MusicBrainz', 'ja': '提供元: MusicBrainz', 'zh': '来源：MusicBrainz',
+      'ar': 'المصدر: MusicBrainz',
+    },
+    'wikipedia': {
+      'fr': 'Source : Wikipédia', 'en': 'Source: Wikipedia', 'es': 'Fuente: Wikipedia',
+      'de': 'Quelle: Wikipedia', 'it': 'Fonte: Wikipedia', 'pt': 'Fonte: Wikipedia',
+      'ru': 'Источник: Википедия', 'ja': '提供元: Wikipedia', 'zh': '来源：维基百科',
+      'ar': 'المصدر: ويكيبيديا',
+    },
+  };
 
   static void _cacheBytes(String url) {
     if (url.isEmpty) return;
@@ -82,89 +151,101 @@ class ImageService {
   // ── Public: resolve URL ───────────────────────────────────────────────────
 
   static Future<String> resolveArtist(String artist, {String? lastfmUrl}) async {
-    if (_ok(lastfmUrl)) { _cacheBytes(lastfmUrl!); return lastfmUrl; }
-    await _ensureDiskCache();
     final key = 'artist|$artist';
+    if (_ok(lastfmUrl)) {
+      _cacheBytes(lastfmUrl!);
+      _sourceOf[key] = 'lastfm';
+      return lastfmUrl;
+    }
+    await _ensureDiskCache();
     final mem = _getUrl(key);
     if (mem != null) return mem;
 
     final ytMusic = await _ytMusicSearch(artist, 'artist', expectArtist: artist);
-    if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic);
+    if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic, 'ytmusic');
 
     final itunes = await _itunesSearch(artist, 'musicArtist', 'artistTerm', artist);
-    if (itunes.isNotEmpty) return _persistUrl(key, itunes);
+    if (itunes.isNotEmpty) return _persistUrl(key, itunes, 'itunes');
 
     final deezer = await _deezerArtist(artist);
-    if (deezer.isNotEmpty) return _persistUrl(key, deezer);
+    if (deezer.isNotEmpty) return _persistUrl(key, deezer, 'deezer');
 
     final audioDb = await _audioDbArtist(artist);
-    if (audioDb.isNotEmpty) return _persistUrl(key, audioDb);
+    if (audioDb.isNotEmpty) return _persistUrl(key, audioDb, 'audiodb');
 
     final mb = await _mbArtistImage(artist);
-    if (mb.isNotEmpty) return _persistUrl(key, mb);
+    if (mb.isNotEmpty) return _persistUrl(key, mb, 'musicbrainz');
 
     final wiki = await _wikipediaImage(artist, expectName: artist);
-    if (wiki.isNotEmpty) return _persistUrl(key, wiki);
+    if (wiki.isNotEmpty) return _persistUrl(key, wiki, 'wikipedia');
 
     return _persistUrl(key, '');
   }
 
   static Future<String> resolveAlbum(String album, String artist, {String? lastfmUrl}) async {
-    if (_ok(lastfmUrl)) { _cacheBytes(lastfmUrl!); return lastfmUrl; }
-    await _ensureDiskCache();
     final key = 'album|$artist|$album';
+    if (_ok(lastfmUrl)) {
+      _cacheBytes(lastfmUrl!);
+      _sourceOf[key] = 'lastfm';
+      return lastfmUrl;
+    }
+    await _ensureDiskCache();
     final mem = _getUrl(key);
     if (mem != null) return mem;
 
     final ytMusic = await _ytMusicSearch('$artist $album', 'album', expectArtist: artist, expectTitle: album);
-    if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic);
+    if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic, 'ytmusic');
 
     final itunes = await _itunesSearch('$artist $album', 'album', null, artist, album);
-    if (itunes.isNotEmpty) return _persistUrl(key, itunes);
+    if (itunes.isNotEmpty) return _persistUrl(key, itunes, 'itunes');
 
     final deezer = await _deezerAlbum(album, artist);
-    if (deezer.isNotEmpty) return _persistUrl(key, deezer);
+    if (deezer.isNotEmpty) return _persistUrl(key, deezer, 'deezer');
 
     final audioDb = await _audioDbAlbum(album, artist);
-    if (audioDb.isNotEmpty) return _persistUrl(key, audioDb);
+    if (audioDb.isNotEmpty) return _persistUrl(key, audioDb, 'audiodb');
 
     final mb = await _mbAlbum(album, artist);
-    if (mb.isNotEmpty) return _persistUrl(key, mb);
+    if (mb.isNotEmpty) return _persistUrl(key, mb, 'musicbrainz');
 
     final wiki = await _wikipediaImage('$artist $album album', expectName: album);
-    if (wiki.isNotEmpty) return _persistUrl(key, wiki);
+    if (wiki.isNotEmpty) return _persistUrl(key, wiki, 'wikipedia');
 
     return _persistUrl(key, '');
   }
 
   static Future<String> resolveTrack(String track, String artist,
       {String? lastfmUrl, String album = ''}) async {
-    if (_ok(lastfmUrl)) { _cacheBytes(lastfmUrl!); return lastfmUrl; }
-    await _ensureDiskCache();
     final key = 'track|$artist|$track';
+    if (_ok(lastfmUrl)) {
+      _cacheBytes(lastfmUrl!);
+      _sourceOf[key] = 'lastfm';
+      return lastfmUrl;
+    }
+    await _ensureDiskCache();
     final mem = _getUrl(key);
     if (mem != null) return mem;
 
     final ytMusic = await _ytMusicSearch('$artist $track', 'song', expectArtist: artist, expectTitle: track);
-    if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic);
+    if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic, 'ytmusic');
 
     final itunes = await _itunesSearch('$artist $track', 'song', null, artist, track);
-    if (itunes.isNotEmpty) return _persistUrl(key, itunes);
+    if (itunes.isNotEmpty) return _persistUrl(key, itunes, 'itunes');
 
     final deezer = await _deezerTrack(track, artist);
-    if (deezer.isNotEmpty) return _persistUrl(key, deezer);
+    if (deezer.isNotEmpty) return _persistUrl(key, deezer, 'deezer');
 
     final audioDb = await _audioDbTrack(track, artist);
-    if (audioDb.isNotEmpty) return _persistUrl(key, audioDb);
+    if (audioDb.isNotEmpty) return _persistUrl(key, audioDb, 'audiodb');
 
     // Reuses album cover art if the caller knows the parent album.
     if (album.isNotEmpty) {
       final mb = await _mbAlbum(album, artist);
-      if (mb.isNotEmpty) return _persistUrl(key, mb);
+      if (mb.isNotEmpty) return _persistUrl(key, mb, 'musicbrainz');
     }
 
     final wiki = await _wikipediaImage('$artist $track song', expectName: track);
-    if (wiki.isNotEmpty) return _persistUrl(key, wiki);
+    if (wiki.isNotEmpty) return _persistUrl(key, wiki, 'wikipedia');
 
     return _persistUrl(key, '');
   }
@@ -275,6 +356,16 @@ class ImageService {
   // (the one ytmusicapi/InnerTune/Metrolist rely on). It's not documented
   // or guaranteed by Google, so it can break without warning; iTunes/Deezer/
   // MusicBrainz below stay as solid fallbacks either way.
+  //
+  // Fixed after checking Metrolist's source: the actual request-building
+  // code lives in an external submodule they don't ship in exports, so it
+  // couldn't be copied directly — but their *response models* (included)
+  // confirmed two real bugs here: missing API key/client headers (which was
+  // silently failing every request — no logged error, just an empty
+  // result), and only handling list results while an artist search's "top
+  // result" comes back as a different JSON shape (a single "card", not a
+  // list) that was never checked at all.
+  static const _ytmApiKey = 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
   static const _ytmFilters = {
     'artist': 'EgWKAQIgAWoKEAMQBBAJEAoQBQ%3D%3D',
     'album':  'EgWKAQIYAWoKEAMQBBAJEAoQBQ%3D%3D',
@@ -289,16 +380,22 @@ class ImageService {
   }) async {
     try {
       final res = await http.post(
-        Uri.https('music.youtube.com', '/youtubei/v1/search',
-            {'prettyPrint': 'false'}),
+        Uri.https('music.youtube.com', '/youtubei/v1/search', {'key': _ytmApiKey}),
         headers: {
           'Content-Type': 'application/json',
-          'X-Goog-Api-Format-Version': '1',
+          'Origin': 'https://music.youtube.com',
           'Referer': 'https://music.youtube.com/',
+          'X-YouTube-Client-Name': '67',
+          'X-YouTube-Client-Version': '1.20240101.01.00',
         },
         body: jsonEncode({
           'context': {
-            'client': {'clientName': 'WEB_REMIX', 'clientVersion': '1.20240101.01.00'}
+            'client': {
+              'clientName': 'WEB_REMIX',
+              'clientVersion': '1.20240101.01.00',
+              'hl': 'en',
+              'gl': 'US',
+            }
           },
           'query': term,
           'params': _ytmFilters[type],
@@ -307,12 +404,26 @@ class ImageService {
       if (res.statusCode != 200) return '';
 
       final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
-      final shelves = data['contents']?['tabbedSearchResultsRenderer']?['tabs']?[0]
+      final sections = data['contents']?['tabbedSearchResultsRenderer']?['tabs']?[0]
           ?['tabRenderer']?['content']?['sectionListRenderer']?['contents'] as List?;
-      if (shelves == null) return '';
+      if (sections == null) return '';
 
-      for (final shelf in shelves) {
-        final items = shelf['musicShelfRenderer']?['contents'] as List?;
+      for (final section in sections) {
+        // Artist searches usually surface a single "top result" card first —
+        // a different shape than the regular list, and it was never checked.
+        final card = section['musicCardShelfRenderer'];
+        if (card != null) {
+          final title = card['title']?['runs']?[0]?['text']?.toString() ?? '';
+          final subtitle = card['subtitle']?['runs']?[0]?['text']?.toString() ?? '';
+          final match = expectArtist == null ||
+              _similar(expectArtist, type == 'artist' ? title : subtitle);
+          if (match && (expectTitle == null || _similar(expectTitle, title))) {
+            final url = _bestThumbnail(card['thumbnail']);
+            if (url.isNotEmpty) return url;
+          }
+        }
+
+        final items = section['musicShelfRenderer']?['contents'] as List?;
         if (items == null || items.isEmpty) continue;
         final item = items.first['musicResponsiveListItemRenderer'];
         if (item == null) continue;
@@ -332,16 +443,27 @@ class ImageService {
             !_similar(expectArtist, type == 'artist' ? title : subtitleArtist)) continue;
         if (expectTitle != null && !_similar(expectTitle, title)) continue;
 
-        final thumbs = item['thumbnail']?['musicThumbnailRenderer']?['thumbnail']
-            ?['thumbnails'] as List?;
-        if (thumbs == null || thumbs.isEmpty) continue;
-        final raw = (thumbs.last['url'] ?? '').toString();
-        if (raw.isEmpty) continue;
-        // YT thumbnail URLs take an arbitrary width/height suffix — bump it up.
-        return raw.replaceAll(RegExp(r'=w\d+-h\d+.*$'), '=w1200-h1200');
+        final url = _bestThumbnail(item['thumbnail']);
+        if (url.isNotEmpty) return url;
       }
       return '';
     } catch (_) { return ''; }
+  }
+
+  // Mirrors Metrolist's ThumbnailRenderer.getThumbnailUrl() fallback chain:
+  // regular thumbnail → animated thumbnail's backup → cropped-square variant.
+  static String _bestThumbnail(dynamic thumbnailRenderer) {
+    if (thumbnailRenderer == null) return '';
+    final direct = thumbnailRenderer['musicThumbnailRenderer']?['thumbnail']?['thumbnails'] as List?;
+    final animated = thumbnailRenderer['musicAnimatedThumbnailRenderer']
+        ?['backupRenderer']?['thumbnail']?['thumbnails'] as List?;
+    final cropped = thumbnailRenderer['croppedSquareThumbnailRenderer']?['thumbnail']?['thumbnails'] as List?;
+    final thumbs = direct ?? animated ?? cropped;
+    if (thumbs == null || thumbs.isEmpty) return '';
+    final raw = (thumbs.last['url'] ?? '').toString();
+    if (raw.isEmpty) return '';
+    // YT thumbnail URLs take an arbitrary width/height suffix — bump it up.
+    return raw.replaceAll(RegExp(r'=w\d+-h\d+.*$'), '=w1200-h1200');
   }
 
   // Searches iTunes and only returns artwork if the result actually matches
@@ -571,6 +693,39 @@ class ImageService {
 
   static void debugLog(String msg) {
     assert(() { debugPrint(msg); return true; }());
+  }
+}
+
+/// Small gray attribution label — "Source: iTunes" etc. — meant to sit at
+/// the bottom of an artist/album/track sheet, under the artwork. Shows
+/// nothing if the source isn't known yet (e.g. still resolving).
+class ImageSourceLabel extends StatelessWidget {
+  final String type; // 'artist' | 'album' | 'track'
+  final String artist;
+  final String album;
+  final String track;
+  const ImageSourceLabel({
+    super.key,
+    required this.type,
+    required this.artist,
+    this.album = '',
+    this.track = '',
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final label = ImageService.sourceLabel(type, artist, album: album, track: track);
+    if (label.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+              fontSize: 11,
+            ),
+      ),
+    );
   }
 }
 

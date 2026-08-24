@@ -826,6 +826,21 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                         _buildTracklist(scheme),
                       if (widget.type == 'tracks') _buildTrackExtra(scheme),
                       if (widget.type == 'tracks') _FadeIn(child: _buildLyrics(scheme)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Center(
+                          child: ImageSourceLabel(
+                            type: switch (widget.type) {
+                              'artists' => 'artist',
+                              'albums'  => 'album',
+                              _         => 'track',
+                            },
+                            artist: widget.type == 'artists' ? _name : _artist,
+                            album: widget.type == 'albums' ? _name : '',
+                            track: widget.type == 'tracks' ? _name : '',
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 48),
                     ],
                   ),
