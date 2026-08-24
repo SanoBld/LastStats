@@ -70,11 +70,6 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;String&gt; resolveArtist(String artist, {String? lastfmUrl}) async {
   final key = &#39;artist|$artist&#39;;
-  if (_ok(lastfmUrl)) {
-    _cacheBytes(lastfmUrl!);
-    _sourceOf[key] = &#39;lastfm&#39;;
-    return lastfmUrl;
-  }
   await _ensureDiskCache();
   final mem = _getUrl(key);
   if (mem != null) return mem;
@@ -96,6 +91,14 @@
 
   final wiki = await _wikipediaImage(artist, expectName: artist);
   if (wiki.isNotEmpty) return _persistUrl(key, wiki, &#39;wikipedia&#39;);
+
+  &#47;&#47; Last.fm last — its own catalog images are usually much lower
+  &#47;&#47; resolution (~300px) than the sources above, so it&#39;s a fallback here
+  &#47;&#47; rather than an automatic first pick.
+  if (_ok(lastfmUrl)) {
+    _cacheBytes(lastfmUrl!);
+    return _persistUrl(key, lastfmUrl, &#39;lastfm&#39;);
+  }
 
   return _persistUrl(key, &#39;&#39;);
 }</code></pre>

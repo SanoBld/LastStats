@@ -71,11 +71,6 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;String&gt; resolveAlbum(String album, String artist, {String? lastfmUrl}) async {
   final key = &#39;album|$artist|$album&#39;;
-  if (_ok(lastfmUrl)) {
-    _cacheBytes(lastfmUrl!);
-    _sourceOf[key] = &#39;lastfm&#39;;
-    return lastfmUrl;
-  }
   await _ensureDiskCache();
   final mem = _getUrl(key);
   if (mem != null) return mem;
@@ -97,6 +92,11 @@
 
   final wiki = await _wikipediaImage(&#39;$artist $album album&#39;, expectName: album);
   if (wiki.isNotEmpty) return _persistUrl(key, wiki, &#39;wikipedia&#39;);
+
+  if (_ok(lastfmUrl)) {
+    _cacheBytes(lastfmUrl!);
+    return _persistUrl(key, lastfmUrl, &#39;lastfm&#39;);
+  }
 
   return _persistUrl(key, &#39;&#39;);
 }</code></pre>
