@@ -211,6 +211,12 @@ class AboutPage extends StatelessWidget {
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           _PoweredByTile(
+            icon: Icons.smart_display_rounded,
+            label: 'YouTube Music',
+            url: 'https://music.youtube.com',
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _PoweredByTile(
             icon: Icons.apple_rounded,
             label: 'iTunes Search API',
             url: 'https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTuneSearchAPI',

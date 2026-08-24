@@ -153,7 +153,13 @@ class _CardBack extends StatelessWidget {
               Row(children: [
                 Icon(Icons.info_outline_rounded, color: fgWeak, size: 16),
                 const SizedBox(width: 6),
-                Text('Source : $source', style: TextStyle(color: fgWeak, fontSize: 13)),
+                Text(_tr({
+                  'fr': 'Source : $source', 'en': 'Source: $source',
+                  'es': 'Fuente: $source', 'de': 'Quelle: $source',
+                  'it': 'Fonte: $source', 'pt': 'Fonte: $source',
+                  'ru': 'Источник: $source', 'ja': '提供元: $source',
+                  'zh': '来源：$source', 'ar': 'المصدر: $source',
+                }), style: TextStyle(color: fgWeak, fontSize: 13)),
               ]),
             ],
           ),
@@ -631,6 +637,17 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     return idx > 0 ? raw.substring(0, idx).trim() : raw;
   }
 
+  // Which source actually provided the currently-shown artwork.
+  // Falls back to "Last.fm" if unresolved (matches the old default).
+  String _currentImageSource() {
+    final name = switch (widget.type) {
+      'artists' => ImageService.sourceName('artist', _name),
+      'albums'  => ImageService.sourceName('album', _artist, album: _name),
+      _         => ImageService.sourceName('track', _artist, track: _name),
+    };
+    return name.isNotEmpty ? name : 'Last.fm';
+  }
+
   // User's own play count for this item (not the global Last.fm count).
   // Artists keep it nested under stats; albums/tracks have it top-level.
   int _myPlaycount() {
@@ -798,11 +815,38 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       myPlaycount: _myPlaycount(),
                       previewTrackName: widget.type == 'tracks' ? _name : '',
                       previewArtistName: widget.type == 'tracks' ? _artist : '',
-                      source: switch (widget.type) {
-                        'artists' => 'Artiste · Last.fm',
-                        'albums'  => 'Album · Last.fm',
-                        _         => 'Titre · Last.fm',
-                      }) : null,
+                      source: '${_tr({
+                        'fr': switch (widget.type) {
+                          'artists' => 'Artiste', 'albums' => 'Album', _ => 'Titre',
+                        },
+                        'en': switch (widget.type) {
+                          'artists' => 'Artist', 'albums' => 'Album', _ => 'Track',
+                        },
+                        'es': switch (widget.type) {
+                          'artists' => 'Artista', 'albums' => 'Álbum', _ => 'Canción',
+                        },
+                        'de': switch (widget.type) {
+                          'artists' => 'Künstler', 'albums' => 'Album', _ => 'Titel',
+                        },
+                        'it': switch (widget.type) {
+                          'artists' => 'Artista', 'albums' => 'Album', _ => 'Brano',
+                        },
+                        'pt': switch (widget.type) {
+                          'artists' => 'Artista', 'albums' => 'Álbum', _ => 'Faixa',
+                        },
+                        'ru': switch (widget.type) {
+                          'artists' => 'Исполнитель', 'albums' => 'Альбом', _ => 'Трек',
+                        },
+                        'ja': switch (widget.type) {
+                          'artists' => 'アーティスト', 'albums' => 'アルバム', _ => '曲',
+                        },
+                        'zh': switch (widget.type) {
+                          'artists' => '艺术家', 'albums' => '专辑', _ => '歌曲',
+                        },
+                        'ar': switch (widget.type) {
+                          'artists' => 'فنان', 'albums' => 'ألبوم', _ => 'أغنية',
+                        },
+                      })} · ${_currentImageSource()}') : null,
                   child: SizedBox(height: imgH - 90, width: double.infinity),
                 ),
                 _buildHeader(ctx, scheme, imgH, hasImage),

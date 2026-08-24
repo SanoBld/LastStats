@@ -97,6 +97,24 @@ class ImageService {
     return _tr(_sourceNames[raw] ?? const {});
   }
 
+  /// Bare brand name (e.g. "YouTube Music"), no "Source:" prefix — for
+  /// composing into a longer label like "Artist · YouTube Music".
+  static String sourceName(String type, String artist, {String album = '', String track = ''}) {
+    final key = switch (type) {
+      'artist' => 'artist|$artist',
+      'album'  => 'album|$artist|$album',
+      'track'  => 'track|$artist|$track',
+      _ => '',
+    };
+    return _sourceDisplayNames[_sourceOf[key]] ?? '';
+  }
+
+  static const Map<String, String> _sourceDisplayNames = {
+    'lastfm': 'Last.fm', 'ytmusic': 'YouTube Music', 'itunes': 'iTunes',
+    'deezer': 'Deezer', 'audiodb': 'TheAudioDB', 'musicbrainz': 'MusicBrainz',
+    'wikipedia': 'Wikipedia',
+  };
+
   static const Map<String, Map<String, String>> _sourceNames = {
     'lastfm': {
       'fr': 'Source : Last.fm', 'en': 'Source: Last.fm', 'es': 'Fuente: Last.fm',
