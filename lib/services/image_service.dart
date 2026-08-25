@@ -54,13 +54,16 @@ class ImageService {
           final e   = jsonDecode(raw) as Map<String, dynamic>;
           final ts  = (e['ts'] as num?)?.toInt() ?? 0;
           final url = (e['url'] as String?) ?? '';
-          if (url.isEmpty || (now - ts) > _diskTtlMs) {
+          final src = (e['source'] as String?) ?? '';
+          // Entries cached before source-tracking existed have no 'source'
+          // field — rather than show a guessed/fake source for those, drop
+          // them so they get re-resolved (and properly tagged) next time.
+          if (url.isEmpty || src.isEmpty || (now - ts) > _diskTtlMs) {
             _prefs!.remove(k).ignore();
             continue;
           }
           _mem[k.substring(_diskPrefix.length)] = url;
-          final src = (e['source'] as String?) ?? '';
-          if (src.isNotEmpty) _sourceOf[k.substring(_diskPrefix.length)] = src;
+          _sourceOf[k.substring(_diskPrefix.length)] = src;
         } catch (_) { _prefs!.remove(k).ignore(); }
       }
     } catch (_) {}
