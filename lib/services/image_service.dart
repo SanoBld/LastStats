@@ -180,9 +180,10 @@ class ImageService {
     final mem = _getUrl(key);
     if (mem != null) return mem;
 
-    final ytMusic = await _ytMusicSearch(artist, 'artist', expectArtist: artist);
-    if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic, 'ytmusic');
-
+    // YouTube Music moved down for artists specifically: artist photos on
+    // there are often non-square (banners, portraits) and its thumbnail
+    // proxy can distort them in the app's square/round artist thumbnails —
+    // iTunes/Deezer's catalog art is consistently well-cropped for artists.
     final itunes = await _itunesSearch(artist, 'musicArtist', 'artistTerm', artist);
     if (itunes.isNotEmpty) return _persistUrl(key, itunes, 'itunes');
 
@@ -191,6 +192,9 @@ class ImageService {
 
     final audioDb = await _audioDbArtist(artist);
     if (audioDb.isNotEmpty) return _persistUrl(key, audioDb, 'audiodb');
+
+    final ytMusic = await _ytMusicSearch(artist, 'artist', expectArtist: artist);
+    if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic, 'ytmusic');
 
     final mb = await _mbArtistImage(artist);
     if (mb.isNotEmpty) return _persistUrl(key, mb, 'musicbrainz');

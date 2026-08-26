@@ -236,12 +236,23 @@ class OfflineImageCache {
           return placeholder ?? const SizedBox.shrink();
         }
 
+        // Decode at the actual display size (× device pixel ratio) instead
+        // of the source's full resolution — a 40dp list thumbnail doesn't
+        // need a 3000×3000 bitmap sitting in memory. Only applied when a
+        // display size was actually requested; omitted otherwise (e.g. the
+        // detail sheet's full-size hero image still wants native quality).
+        final dpr = MediaQuery.of(context).devicePixelRatio;
+        final cacheWidth  = width  != null ? (width * dpr).round()  : null;
+        final cacheHeight = height != null ? (height * dpr).round() : null;
+
         if (snap.data != null) {
           return Image.memory(
             snap.data!,
             width: width,
             height: height,
             fit: fit,
+            cacheWidth: cacheWidth,
+            cacheHeight: cacheHeight,
             gaplessPlayback: true,
             errorBuilder: (_, _, _) =>
                 errorWidget ?? placeholder ?? const SizedBox.shrink(),
@@ -259,6 +270,8 @@ class OfflineImageCache {
           width: width,
           height: height,
           fit: fit,
+          cacheWidth: cacheWidth,
+          cacheHeight: cacheHeight,
           gaplessPlayback: true,
           errorBuilder: (_, _, _) =>
               errorWidget ?? placeholder ?? const SizedBox.shrink(),
