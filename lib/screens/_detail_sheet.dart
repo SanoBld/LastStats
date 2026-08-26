@@ -1406,12 +1406,45 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                 const SizedBox.shrink(),
               GestureDetector(
                 onTap: () => _openBioUrl(_lfmBioUrl()),
-                child: Text('Voir sur Last.fm',
+                child: Text(_tr({
+                  'fr': 'Voir sur Last.fm', 'en': 'View on Last.fm',
+                  'es': 'Ver en Last.fm', 'de': 'Auf Last.fm ansehen',
+                  'it': 'Vedi su Last.fm', 'pt': 'Ver no Last.fm',
+                  'ru': 'Смотреть на Last.fm', 'ja': 'Last.fm で見る',
+                  'zh': '在 Last.fm 上查看', 'ar': 'عرض على Last.fm',
+                }),
                   style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w600,
                       fontSize: 12, decoration: TextDecoration.underline, decorationColor: scheme.primary),
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            _showTranslated
+                ? _tr({
+                    'fr': 'Texte original : Last.fm — Traduction : Google Translate',
+                    'en': 'Original text: Last.fm — Translation: Google Translate',
+                    'es': 'Texto original: Last.fm — Traducción: Google Translate',
+                    'de': 'Originaltext: Last.fm — Übersetzung: Google Translate',
+                    'it': 'Testo originale: Last.fm — Traduzione: Google Translate',
+                    'pt': 'Texto original: Last.fm — Tradução: Google Translate',
+                    'ru': 'Исходный текст: Last.fm — Перевод: Google Translate',
+                    'ja': '原文: Last.fm — 翻訳: Google 翻訳',
+                    'zh': '原文来自 Last.fm — 翻译来自 Google 翻译',
+                    'ar': 'النص الأصلي: Last.fm — الترجمة: ترجمة جوجل',
+                  })
+                : _tr({
+                    'fr': 'Source : Last.fm', 'en': 'Source: Last.fm',
+                    'es': 'Fuente: Last.fm', 'de': 'Quelle: Last.fm',
+                    'it': 'Fonte: Last.fm', 'pt': 'Fonte: Last.fm',
+                    'ru': 'Источник: Last.fm', 'ja': '提供元: Last.fm',
+                    'zh': '来源：Last.fm', 'ar': 'المصدر: Last.fm',
+                  }),
+            style: text.bodySmall?.copyWith(
+              color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
+              fontSize: 11,
+            ),
           ),
           const SizedBox(height: 20),
         ],

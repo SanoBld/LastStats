@@ -505,8 +505,22 @@ class ImageService {
     if (thumbs == null || thumbs.isEmpty) return '';
     final raw = (thumbs.last['url'] ?? '').toString();
     if (raw.isEmpty) return '';
-    // YT thumbnail URLs take an arbitrary width/height suffix — bump it up.
-    return raw.replaceAll(RegExp(r'=w\d+-h\d+.*$'), '=w1200-h1200');
+    return _upsizeYtThumbnail(raw);
+  }
+
+  // Bumps a YT thumbnail URL's resolution while keeping its original aspect
+  // ratio — forcing a fixed w=h square (the old behavior) stretched any
+  // non-square source (artist photos, banners) into a distorted square.
+  static String _upsizeYtThumbnail(String url) {
+    final m = RegExp(r'=w(\d+)-h(\d+)').firstMatch(url);
+    if (m == null) return url;
+    final w = int.tryParse(m.group(1)!) ?? 0;
+    final h = int.tryParse(m.group(2)!) ?? 0;
+    if (w <= 0 || h <= 0) return url;
+    final scale = 1200 / (w > h ? w : h);
+    final newW = (w * scale).round();
+    final newH = (h * scale).round();
+    return url.replaceFirst(RegExp(r'=w\d+-h\d+.*$'), '=w$newW-h$newH');
   }
 
   // Searches iTunes and only returns artwork if the result actually matches
