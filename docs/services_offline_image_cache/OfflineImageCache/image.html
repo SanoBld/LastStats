@@ -90,12 +90,23 @@
         return placeholder ?? const SizedBox.shrink();
       }
 
+      &#47;&#47; Decode at the actual display size (× device pixel ratio) instead
+      &#47;&#47; of the source&#39;s full resolution — a 40dp list thumbnail doesn&#39;t
+      &#47;&#47; need a 3000×3000 bitmap sitting in memory. Only applied when a
+      &#47;&#47; display size was actually requested; omitted otherwise (e.g. the
+      &#47;&#47; detail sheet&#39;s full-size hero image still wants native quality).
+      final dpr = MediaQuery.of(context).devicePixelRatio;
+      final cacheWidth  = width  != null ? (width * dpr).round()  : null;
+      final cacheHeight = height != null ? (height * dpr).round() : null;
+
       if (snap.data != null) {
         return Image.memory(
           snap.data!,
           width: width,
           height: height,
           fit: fit,
+          cacheWidth: cacheWidth,
+          cacheHeight: cacheHeight,
           gaplessPlayback: true,
           errorBuilder: (_, _, _) =&gt;
               errorWidget ?? placeholder ?? const SizedBox.shrink(),
@@ -113,6 +124,8 @@
         width: width,
         height: height,
         fit: fit,
+        cacheWidth: cacheWidth,
+        cacheHeight: cacheHeight,
         gaplessPlayback: true,
         errorBuilder: (_, _, _) =&gt;
             errorWidget ?? placeholder ?? const SizedBox.shrink(),
