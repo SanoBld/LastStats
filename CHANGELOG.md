@@ -55,7 +55,8 @@
 - Two new achievement categories: friends added, and taste comparisons made
 - All computed automatically from cached stats, no extra network calls
 
-**3D Artwork Cards**
+**3D Artwork Cards & Sharing**
+- Share options have been visually enhanced and modernized
 - Share artwork cards as an image
 - QR code sharing and QR code scanning for profiles
 - Achievement badges now show their name when shared, not just the tier
