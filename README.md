@@ -7,6 +7,8 @@
 <p align="center">
   <img src="https://img.shields.io/github/v/release/SanoBld/LastStats-App?style=flat-square&color=7C3AED&label=Version" alt="Latest Release">
   <img src="https://img.shields.io/github/downloads/SanoBld/LastStats-App/total?style=flat-square&color=7C3AED&label=Downloads" alt="Total Downloads">
+  <img src="https://img.shields.io/github/stars/SanoBld/LastStats-App?style=flat-square&color=7C3AED&label=Stars" alt="Stars">
+  <img src="https://img.shields.io/github/license/SanoBld/LastStats-App?style=flat-square&color=7C3AED&label=License" alt="License">
   <a href="https://discord.gg/JjqmkQgZBs"><img src="https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord"></a>
 </p>
 
@@ -29,6 +31,10 @@ Join the Discord to chat, share feedback, or ask for help: https://discord.gg/Jj
   <img src="docs/screenshots/flip_card.png" width="200" alt="3D artwork flip card">
   <img src="docs/screenshots/album_view.png" width="200" alt="Album artwork viewer">
 </p>
+<p align="center">
+  <img src="docs/screenshots/achievements.png" width="200" alt="Achievements">
+  <img src="docs/screenshots/share_card.png" width="200" alt="Shareable stats card">
+</p>
 
 ---
 
@@ -50,6 +56,10 @@ Join the Discord to chat, share feedback, or ask for help: https://discord.gg/Jj
 - A dedicated Favorites page with filters and cover art, where you can also remove items
 - A small heart badge next to loved tracks in your recent listens, history, and search results, with an option to turn it off
 - A favorites count shown on your dashboard, with an option to hide it
+
+**🏆 Achievements**
+- A leveling system based on your real listening activity, with dozens of achievements to unlock
+- Categories covering listening totals, artist and album diversity, loyalty, comparisons, and more
 
 **📊 Data and sync**
 - Direct connection to the Last.fm API for real, live scrobbles, top artists, albums, and tracks
@@ -97,6 +107,17 @@ Supported platforms: Android, Windows, macOS, and Linux.
 - Flutter and Dart
 - Material Design 3 (Material You)
 - Last.fm REST API, with iTunes Search, Deezer, and Cover Art Archive as backup sources for missing artwork
+
+---
+
+## ⭐ Star history
+
+<a href="https://star-history.com/#SanoBld/LastStats-App&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=SanoBld/LastStats-App&type=Date&theme=dark" />
+    <img src="https://api.star-history.com/svg?repos=SanoBld/LastStats-App&type=Date" alt="Star History Chart" />
+  </picture>
+</a>
 
 ---
 
