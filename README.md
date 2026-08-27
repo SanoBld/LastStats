@@ -1,6 +1,10 @@
 # LastStats
 
 <p align="center">
+  <img src="assets/icons/app_logo.svg" width="96" height="96" alt="LastStats logo">
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/github/v/release/SanoBld/LastStats-App?style=flat-square&color=7C3AED&label=Version" alt="Latest Release">
   <img src="https://img.shields.io/github/downloads/SanoBld/LastStats-App/total?style=flat-square&color=7C3AED&label=Downloads" alt="Total Downloads">
   <a href="https://discord.gg/JjqmkQgZBs"><img src="https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord"></a>
@@ -9,6 +13,22 @@
 🎵 A modern, multiplatform app built with Flutter and Material You to track and explore your listening habits in real time, using the Last.fm API.
 
 Join the Discord to chat, share feedback, or ask for help: https://discord.gg/JjqmkQgZBs
+
+---
+
+## 📸 Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/dashboard.png" width="200" alt="Dashboard">
+  <img src="docs/screenshots/rankings.png" width="200" alt="Rankings">
+  <img src="docs/screenshots/charts.png" width="200" alt="Charts">
+  <img src="docs/screenshots/history.png" width="200" alt="History">
+</p>
+<p align="center">
+  <img src="docs/screenshots/artist_detail.png" width="200" alt="Artist detail page">
+  <img src="docs/screenshots/flip_card.png" width="200" alt="3D artwork flip card">
+  <img src="docs/screenshots/album_view.png" width="200" alt="Album artwork viewer">
+</p>
 
 ---
 
