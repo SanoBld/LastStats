@@ -704,8 +704,9 @@ class _ChartsPageState extends State<_ChartsPage>
                     begin: Alignment.topLeft, end: Alignment.bottomRight,
                     colors: [scheme.primary, scheme.tertiary]),
                 ),
-                child: Text('♪', style: TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.w800, color: scheme.onPrimary)),
+                padding: const EdgeInsets.all(8),
+                child: SvgPicture.asset('assets/icons/app_logo.svg',
+                    colorFilter: ColorFilter.mode(scheme.onPrimary, BlendMode.srcIn)),
               ),
               const SizedBox(width: 12),
               Text('LastStats', style: TextStyle(
