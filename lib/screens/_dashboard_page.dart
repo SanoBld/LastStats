@@ -4332,59 +4332,50 @@ class _NewsDetailSheetState extends State<_NewsDetailSheet> {
 
     const width = 900.0;
     const pad   = 32.0;
-    final titleTp = TextPainter(
-      text: TextSpan(text: title, style: const TextStyle(
-          fontSize: 32, fontWeight: FontWeight.w800, color: Colors.white)),
-      textDirection: TextDirection.ltr,
-    )..layout(maxWidth: width - pad * 2);
-    final bodyTp = TextPainter(
-      text: TextSpan(text: body, style: const TextStyle(fontSize: 18, color: Colors.white70, height: 1.5)),
-      textDirection: TextDirection.ltr,
-    )..layout(maxWidth: width - pad * 2);
 
-    final headerH = 90.0;
-    final titleH  = titleTp.height + 16;
-    final bodyH   = body.isNotEmpty ? bodyTp.height + 24 : 0.0;
-    final footerH = 56.0;
-    final totalH  = headerH + titleH + bodyH + footerH + pad;
+    // Built as a real widget tree (not manually drawn) so the body's
+    // markdown (**bold**, # headers…) renders exactly like it does
+    // on-screen — reuses MarkdownLite instead of a hand-rolled parser —
+    // and colors follow the app's actual theme (pure black/white on OLED,
+    // light theme included) instead of a hardcoded dark background.
+    final card = Container(
+      width: width,
+      color: scheme.surface,
+      padding: const EdgeInsets.all(pad),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(height: 6, width: width, color: color,
+              margin: const EdgeInsets.only(bottom: pad - 6)),
+          Row(children: [
+            Text('LastStats', style: TextStyle(
+                fontSize: 16, fontWeight: FontWeight.w800,
+                color: scheme.onSurfaceVariant)),
+            const Spacer(),
+            Text(emoji.isNotEmpty ? emoji : '📢', style: const TextStyle(fontSize: 30)),
+          ]),
+          const SizedBox(height: 22),
+          Text(title, style: TextStyle(
+              fontSize: 32, fontWeight: FontWeight.w800, color: scheme.onSurface)),
+          if (body.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            MarkdownLite(
+              text: body,
+              style: TextStyle(fontSize: 18, height: 1.5, color: scheme.onSurface.withValues(alpha: 0.8)),
+              linkColor: color,
+            ),
+          ],
+          if (date.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            Text(date, style: TextStyle(fontSize: 13, color: scheme.onSurfaceVariant.withValues(alpha: 0.7))),
+          ],
+        ],
+      ),
+    );
 
-    final recorder = ui.PictureRecorder();
-    final canvas   = Canvas(recorder, Rect.fromLTWH(0, 0, width, totalH));
-
-    canvas.drawRect(Rect.fromLTWH(0, 0, width, totalH), Paint()..color = const Color(0xFF1A1220));
-    canvas.drawRect(Rect.fromLTWH(0, 0, width, 6), Paint()..color = color);
-
-    final brand = TextPainter(
-      text: const TextSpan(text: 'LastStats', style: TextStyle(
-          fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white70)),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    brand.paint(canvas, const Offset(pad, 26));
-
-    final emojiTp = TextPainter(
-      text: TextSpan(text: emoji.isNotEmpty ? emoji : '\ud83d\udce2', style: const TextStyle(fontSize: 30)),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    emojiTp.paint(canvas, Offset(width - pad - emojiTp.width, 20));
-
-    titleTp.paint(canvas, Offset(pad, headerH));
-    var y = headerH + titleH;
-
-    if (body.isNotEmpty) {
-      bodyTp.paint(canvas, Offset(pad, y));
-      y += bodyH;
-    }
-
-    if (date.isNotEmpty) {
-      final dateTp = TextPainter(
-        text: TextSpan(text: date, style: const TextStyle(fontSize: 13, color: Colors.white54)),
-        textDirection: TextDirection.ltr,
-      )..layout();
-      dateTp.paint(canvas, Offset(pad, totalH - footerH + (footerH - dateTp.height) / 2));
-    }
-
-    final picture = recorder.endRecording();
-    final img = await picture.toImage(width.toInt(), totalH.toInt());
+    final img = await _renderShareCardOffscreen(context, card, width: width);
+    if (img == null) return;
     final bd  = await img.toByteData(format: ImageByteFormat.png);
     final bytes = bd!.buffer.asUint8List();
 
@@ -4392,5 +4383,36 @@ class _NewsDetailSheetState extends State<_NewsDetailSheet> {
     final file = File('${tmp.path}/laststats_news.png');
     await file.writeAsBytes(bytes);
     await Share.shareXFiles([XFile(file.path)]);
+  }
+}
+
+// Renders [child] off-screen at its natural height for a fixed [width],
+// fully laid out and painted outside the visible viewport, then captures
+// it as an image — same technique used for full chart exports.
+Future<ui.Image?> _renderShareCardOffscreen(BuildContext ctx, Widget child, {required double width}) async {
+  final key     = GlobalKey();
+  final overlay = Overlay.of(ctx, rootOverlay: true);
+  late OverlayEntry entry;
+
+  entry = OverlayEntry(builder: (_) => Positioned(
+    left: -20000, top: 0,
+    child: Material(
+      type: MaterialType.transparency,
+      child: RepaintBoundary(key: key, child: child),
+    ),
+  ));
+  overlay.insert(entry);
+
+  try {
+    for (var i = 0; i < 3; i++) {
+      final done = Completer<void>();
+      WidgetsBinding.instance.addPostFrameCallback((_) => done.complete());
+      await done.future;
+    }
+    final rb = key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+    if (rb == null || rb.size.isEmpty) return null;
+    return await rb.toImage(pixelRatio: 3.0);
+  } finally {
+    entry.remove();
   }
 }

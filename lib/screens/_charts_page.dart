@@ -926,6 +926,40 @@ class _ChartsPageState extends State<_ChartsPage>
           return;
         }
         chartImg = img;
+      } else if (chartId == 'calendar') {
+        // Same problem as monthly/cumul: the heatmap has its own internal
+        // horizontal scroll to fit every year (2025, 2026…) — a live capture
+        // only grabs whatever's currently scrolled into view. Render the
+        // full, unclipped calendar off-screen so every week/year shows.
+        final calendarForView = _isAllTime ? _buildAllTimeCalendar() : _calendarData;
+        final heatmapYears = _isAllTime
+            ? (_availableYears.isNotEmpty ? _availableYears : [DateTime.now().year])
+            : [_selectedYear];
+        final heatmapStart = DateTime(heatmapYears.first, 1, 1);
+        final heatmapEnd   = heatmapYears.last == DateTime.now().year
+            ? DateTime.now()
+            : DateTime(heatmapYears.last, 12, 31);
+
+        final totalDays = heatmapEnd.difference(heatmapStart).inDays + 1;
+        final weeks     = ((totalDays + 6) / 7).ceil();
+        // Mirrors _HeatmapCard's own cell(10) + gap(1.5) sizing, plus padding.
+        final naturalWidth = 40.0 + weeks * 11.5;
+
+        final child = _HeatmapCard(
+          data: calendarForView ?? const <String, int>{},
+          start: heatmapStart, end: heatmapEnd,
+        );
+        final img = await _renderOffscreen(ctx, SizedBox(width: naturalWidth.clamp(320, 8000), child: child));
+        if (img == null) {
+          closeDialog();
+          if (ctx.mounted) {
+            ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(
+                _ct('Graphique non disponible pour cette période',
+                    'Chart not available for this period'))));
+          }
+          return;
+        }
+        chartImg = img;
       } else {
         final rb = await _ensureChartLaidOut(chartId);
         if (rb == null || rb.size.isEmpty) {
