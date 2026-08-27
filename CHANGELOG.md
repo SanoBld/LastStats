@@ -42,7 +42,7 @@
 
 **Settings**
 - New search bar in Settings, filtering every category and jumping straight into common options (accent color, theme, language, and more), some editable inline
-- New "Inspirations" section in About, crediting Metrolist and Better Nothing Music Visualizer
+- New "Favorite" section in About, crediting Metrolist and Better Nothing Music Visualizer
 - Rebuilt settings tabs, including a redesigned FAQ page with more questions
 - Eco mode for battery saving
 - Reworked updates page, with a searchable, filterable version history
