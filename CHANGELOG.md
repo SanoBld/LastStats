@@ -32,7 +32,7 @@
 
 ## v3.2.0
 
-**Home Screen Widgets** (Android)
+**Home Screen Widgets** (Android BETA)
 - New: 5 home screen widgets — total scrobbles, now playing, loved tracks, this week, and a full recap
 - Now Playing widget shows the album art full-bleed, with track and artist over a dark gradient
 - Widgets follow the app's theme (style, light/dark, and accent color), with a toggle to keep them pure white/black instead
