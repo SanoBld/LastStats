@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the showAchievementsSheet function from the home_screen library, for the Dart programming language.">
-  <title>showAchievementsSheet function - home_screen library - Dart API</title>
+  <meta name="description" content="API docs for the String property from the about_page library, for the Dart programming language.">
+  <title>String property - about_page library - Dart API</title>
 
 
   
@@ -25,10 +25,10 @@
   <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">laststats_mobile</a></li>
-    <li><a href="../screens_home_screen/">screens&#47;home_screen.dart</a></li>
-    <li class="self-crumb">showAchievementsSheet function</li>
+    <li><a href="../screens_settings_about_page/">screens&#47;settings&#47;about_page.dart</a></li>
+    <li class="self-crumb">String property</li>
   </ol>
-  <div class="self-name">showAchievementsSheet</div>
+  <div class="self-name">String</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -45,44 +45,32 @@
   <div
       id="dartdoc-main-content"
       class="main-content"
-      data-above-sidebar="screens_home_screen&#47;screens_home_screen-library-sidebar.html"
+      data-above-sidebar="screens_settings_about_page&#47;screens_settings_about_page-library-sidebar.html"
       data-below-sidebar="">
       <div>
-<h1><span class="kind-function">showAchievementsSheet</span> function 
+<h1><span class="kind-top-level-property">String</span> top-level property 
  
 </h1></div>
 
-    <section class="multi-line-signature">
+        <section class="multi-line-signature">
+          
+          dynamic
+          <span class="name ">String</span>
+          <div class="features"><span class="feature">getter/setter pair</span></div>
+
+        </section>
         
-<span class="returntype">void</span>
-<span class="name ">showAchievementsSheet</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="showAchievementsSheet-param-context"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span></li>
-<li><span class="parameter" id="showAchievementsSheet-param-userInfo"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a>?</span> <span class="parameter-name">userInfo</span>, {</span></li>
-<li><span class="parameter" id="showAchievementsSheet-param-isSelf"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isSelf</span> = <span class="default-value">false</span>, </span></li>
-</ol>})
 
         
-
-    </section>
-    
-
-
-    
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void showAchievementsSheet(BuildContext context, Map&lt;String, dynamic&gt;? userInfo, {bool isSelf = false}) {
-  Navigator.of(context).push(PageRouteBuilder(
-    opaque: false,
-    fullscreenDialog: true,
-    pageBuilder: (_, _, _) =&gt; _AchievementsSheet(userInfo: userInfo, isSelf: isSelf),
-    transitionsBuilder: (_, anim, _, child) =&gt; SlideTransition(
-      position: Tween&lt;Offset&gt;(begin: const Offset(0, 1), end: Offset.zero)
-          .animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
-      child: child,
-    ),
-    transitionDuration: const Duration(milliseconds: 380),
-  ));
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+&#47;&#47;&#47; Picks the self-contained logo SVG (own background baked in): the plain
+&#47;&#47;&#47; mono logo by default, the red-dot &quot;Nothing&quot; variant only when that theme
+&#47;&#47;&#47; is active — matching brightness either way.
+String</code></pre>
 </section>
+
 
 
   </div> <!-- /.main-content -->
@@ -95,11 +83,11 @@
 </header>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">laststats_mobile</a></li>
-    <li><a href="../screens_home_screen/">home_screen</a></li>
-    <li class="self-crumb">showAchievementsSheet function</li>
+    <li><a href="../screens_settings_about_page/">about_page</a></li>
+    <li class="self-crumb">String property</li>
 </ol>
 
-    <h5>home_screen library</h5>
+    <h5>about_page library</h5>
     <div id="dartdoc-sidebar-left-content"></div>
   </div><!--/.sidebar-offcanvas-left-->
   <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">

@@ -89,17 +89,16 @@
                 .toList() ??
             []);
 
+    &#47;&#47; Read all raw blobs on the UI isolate (cheap I&#47;O), then decode+parse
+    &#47;&#47; everything at once in a single background isolate — avoids both
+    &#47;&#47; blocking the UI thread and spawning one isolate per year.
+    final rawByYear = &lt;int, String&gt;{};
     for (final year in years) {
       final raw = await CacheBackend.read(_yearKey(year));
-      if (raw == null) continue;
-      try {
-        final decoded = jsonDecode(raw) as Map&lt;String, dynamic&gt;;
-        final version = (decoded[&#39;v&#39;] as num?)?.toInt() ?? 1;
-        &#47;&#47; Pas de vérification TTL — les données sont permanentes
-        final records = _parseRecords(decoded[&#39;data&#39;], version);
-        if (records != null) _years[year] = records;
-      } catch (_) {}
+      if (raw != null) rawByYear[year] = raw;
     }
+    final parsed = await compute(_decodeYearsRecords, rawByYear);
+    _years.addAll(parsed);
 
     debugPrint(&#39;[ScrobblesCache] ${_years.length} année(s) chargée(s) &#39;
         &#39;(${getTotalScrobbleCount()} scrobbles).&#39;);
