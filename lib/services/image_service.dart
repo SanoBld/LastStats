@@ -9,7 +9,7 @@
 //   prefetchBytes(url)                           → background download
 
 import 'dart:convert';
-import 'package:flutter/material.dart' show Theme, TextStyle;
+import 'package:flutter/material.dart' show Theme;
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -447,7 +447,6 @@ class ImageService {
         debugLog('[ytmusic] no sections in response for "$term" — response shape may have changed');
         return '';
       }
-      if (sections == null) return '';
 
       for (final section in sections) {
         // Artist searches usually surface a single "top result" card first —

@@ -10,12 +10,17 @@
 // Fixed width/height so layout is always stable (no more broken framing).
 // Toggle: Settings > Appearance ("Pochettes animées" / livingArtworkNotifier).
 import 'dart:async';
+import 'dart:io' show Platform;
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import '../app_state.dart';
 import '../services/achievements.dart';
+
+bool get _isDesktop =>
+    !kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS);
 
 class Tilt3DCard extends StatefulWidget {
   final Widget front;
@@ -72,9 +77,10 @@ class _Tilt3DCardState extends State<Tilt3DCard>
   void initState() {
     super.initState();
     _smoother = createTicker(_onTick)..start();
-    // Skip the accelerometer entirely in eco mode — no tilt parallax means
-    // no sensor stream running, no extra wakeups.
-    if (ecoModeActiveNotifier.value) return;
+    // Skip the accelerometer entirely in eco mode, and on desktop — there's
+    // no accelerometer there, mouse hover already drives the tilt, and the
+    // sensors_plus channel can hang/throw repeatedly on Windows/Linux.
+    if (ecoModeActiveNotifier.value || _isDesktop) return;
     try {
       _sub = accelerometerEventStream().listen((e) {
         _lastAx = e.x;

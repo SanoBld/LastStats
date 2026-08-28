@@ -43,7 +43,6 @@ class _AppearancePageState extends State<AppearancePage> {
   bool   _oledMode             = false;
   Color  _fallbackAccent       = const Color(0xFF7C3AED);
   bool   _useDayNightAccent    = false;
-  String _accentDark           = 'purple';
   bool   _dayNightUseHours     = false;
   int    _dayStartHour         = 7;
   int    _nightStartHour       = 20;
@@ -84,7 +83,6 @@ class _AppearancePageState extends State<AppearancePage> {
           ? accentFromString(fbHex)
           : accentFromString(p.getString('ls_accent'));
       _useDayNightAccent = p.getBool('ls_use_daynight_accent')          ?? false;
-      _accentDark        = p.getString('ls_accent_dark')                ?? _accent;
       _dayNightUseHours  = p.getBool('ls_daynight_use_hours')           ?? false;
       _dayStartHour      = p.getInt('ls_daynight_day_start_hour')       ?? 7;
       _nightStartHour    = p.getInt('ls_daynight_night_start_hour')     ?? 20;
@@ -188,7 +186,6 @@ class _AppearancePageState extends State<AppearancePage> {
     if (result != null && mounted) {
       final hex = colorToHex(result);
       await _set('ls_accent_dark', hex);
-      setState(() => _accentDark = hex);
       accentDarkNotifier.value = result;
     }
   }
