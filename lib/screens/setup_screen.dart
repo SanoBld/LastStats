@@ -15,12 +15,12 @@ import 'onboarding_flow.dart';
 //  SetupScreen — credentials entry (animated redesign)
 // ══════════════════════════════════════════════════════════════════════════
 
-/// Picks the self-contained logo SVG (own background baked in): the plain
-/// mono logo by default, the red-dot "Nothing" variant only when that theme
-/// is active — matching brightness either way.
+/// Picks the self-contained logo SVG (own background baked in) matching the
+/// current theme family (Nothing red-dot vs plain mono) and brightness.
 String _logoAsset(BuildContext context) {
   final dark = Theme.of(context).brightness == Brightness.dark;
-  final family = themeStyleNotifier.value == 'nothing' ? 'app_logo_nothing' : 'app_logo';
+  final nothing = themeStyleNotifier.value == 'nothing';
+  final family = nothing ? 'app_logo_nothing' : 'app_logo';
   return 'assets/icons/${family}_${dark ? 'black_bg' : 'white_bg'}.svg';
 }
 
