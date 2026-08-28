@@ -9,22 +9,12 @@ import '../../app_state.dart';
 import '../../services/update_service.dart';
 import 'settings_helpers.dart';
 
-<<<<<<< HEAD
 /// Picks the self-contained logo SVG (own background baked in): the plain
 /// mono logo by default, the red-dot "Nothing" variant only when that theme
 /// is active — matching brightness either way.
 String _logoAsset(BuildContext context) {
   final dark = Theme.of(context).brightness == Brightness.dark;
   final family = themeStyleNotifier.value == 'nothing' ? 'app_logo_nothing' : 'app_logo';
-=======
-/// Picks the self-contained logo SVG (own background baked in) matching the
-/// current theme family (Nothing red-dot vs plain mono) and brightness, so
-/// the icon always contrasts correctly instead of a black square on black.
-String _logoAsset(BuildContext context) {
-  final dark = Theme.of(context).brightness == Brightness.dark;
-  final nothing = themeStyleNotifier.value == 'nothing';
-  final family = nothing ? 'app_logo_nothing' : 'app_logo';
->>>>>>> 74dff491d5c3c271f0f329336c309c70f6cd1d95
   return 'assets/icons/${family}_${dark ? 'black_bg' : 'white_bg'}.svg';
 }
 
