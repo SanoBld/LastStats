@@ -123,10 +123,7 @@ Widget build(BuildContext context) {
       Center(child: Column(children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(20),
-          child: Image.asset(
-            &#39;assets&#47;images&#47;icon-512.png&#39;,
-            width: 80, height: 80, fit: BoxFit.cover,
-          ),
+          child: SvgPicture.asset(_logoAsset(context), width: 80, height: 80),
         ),
         const SizedBox(height: 14),
         Text(&#39;LastStats&#39;,
@@ -404,7 +401,7 @@ Widget build(BuildContext context) {
 <footer>
   <span class="no-break">
     laststats_mobile
-      3.1.0+22
+      3.2.0+23
   </span>
   
 </footer>

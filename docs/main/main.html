@@ -66,185 +66,13 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  FlutterError.onError = (details) =&gt; debugPrint(&#39;Flutter error: ${details.exception}&#39;);
-
-  &#47;&#47; ── Custom frameless window (Windows &#47; Linux desktop) ────────────────────
-  &#47;&#47; macOS keeps its native traffic-light buttons; only Windows and Linux get
-  &#47;&#47; the fully custom, theme-matched title bar (see widgets&#47;custom_title_bar.dart).
-  if (!kIsWeb &amp;&amp; (Platform.isWindows || Platform.isLinux)) {
-    await windowManager.ensureInitialized();
-    const windowOptions = WindowOptions(
-      minimumSize: Size(420, 500),
-      backgroundColor: Colors.transparent,
-      titleBarStyle: TitleBarStyle.hidden,
-    );
-    await windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-      await windowManager.focus();
-    });
-  }
-
-  final prefs      = await SharedPreferences.getInstance();
-  final username   = prefs.getString(&#39;ls_username&#39;) ?? &#39;&#39;;
-  final apiKey     = prefs.getString(&#39;ls_apikey&#39;)   ?? &#39;&#39;;
-  final startupTab = prefs.getInt(&#39;ls_startup_tab&#39;) ?? 0;
-
-  &#47;&#47; ── Appearance ──────────────────────────────────────────────────────────
-  themeStyleNotifier.value             = prefs.getString(&#39;ls_theme_style&#39;)           ?? &#39;default&#39;;
-  nothingAccentNotifier.value          = prefs.getString(&#39;ls_nothing_accent&#39;)        ?? &#39;classic&#39;;
-  themeModeNotifier.value              = themeFromString(prefs.getString(&#39;ls_theme&#39;));
-  accentNotifier.value                 = accentFromString(prefs.getString(&#39;ls_accent&#39;));
-  useDayNightAccentNotifier.value      = prefs.getBool(&#39;ls_use_daynight_accent&#39;)     ?? false;
-  accentDarkNotifier.value             = prefs.getString(&#39;ls_accent_dark&#39;) != null
-      ? accentFromString(prefs.getString(&#39;ls_accent_dark&#39;)) : accentNotifier.value;
-  dayNightUseHoursNotifier.value       = prefs.getBool(&#39;ls_daynight_use_hours&#39;)      ?? false;
-  dayStartHourNotifier.value           = prefs.getInt(&#39;ls_daynight_day_start_hour&#39;)   ?? 7;
-  nightStartHourNotifier.value         = prefs.getInt(&#39;ls_daynight_night_start_hour&#39;) ?? 20;
-  startMinuteTicker();
-  useDynamicColorNotifier.value        = prefs.getBool(&#39;ls_use_dynamic_color&#39;)       ?? false;
-  useNowPlayingColorNotifier.value     = prefs.getBool(&#39;ls_use_nowplaying_color&#39;)    ?? false;
-  artworkColorThemeNotifier.value      = prefs.getBool(&#39;ls_artwork_color_theme&#39;)     ?? false;
-  keepLastArtworkColorNotifier.value   = prefs.getBool(&#39;ls_keep_last_artwork_color&#39;) ?? false;
-  oledModeNotifier.value               = prefs.getBool(&#39;ls_oled_mode&#39;)               ?? false;
-  localeNotifier.value                 = prefs.getString(&#39;ls_locale&#39;)                ?? &#39;fr&#39;;
-  musicPlatformNotifier.value          = prefs.getString(&#39;ls_music_platform&#39;)         ?? &#39;lastfm&#39;;
-  showAllPlatformLinksNotifier.value   = prefs.getBool(&#39;ls_show_all_platform_links&#39;)  ?? false;
-  secretKeyNotifier.value              = prefs.getString(&#39;ls_secret_key&#39;)            ?? &#39;&#39;;
-  sessionKeyNotifier.value             = prefs.getString(&#39;ls_session_key&#39;)           ?? &#39;&#39;;
-
-  &#47;&#47; One-time migration: if favorites was already connected before this card
-  &#47;&#47; existed, make sure it&#39;s added to the user&#39;s saved stat card selection.
-  &#47;&#47; Guarded by its own flag so it never re-adds a card the user removed.
-  final favMigrated = prefs.getBool(&#39;ls_fav_stat_migrated&#39;) ?? false;
-  if (!favMigrated &amp;&amp; sessionKeyNotifier.value.isNotEmpty) {
-    final cards = prefs.getStringList(&#39;ls_stat_cards&#39;);
-    if (cards != null &amp;&amp; !cards.contains(&#39;favorites_count&#39;)) {
-      await prefs.setStringList(&#39;ls_stat_cards&#39;, [...cards, &#39;favorites_count&#39;]);
-    }
-    await prefs.setBool(&#39;ls_fav_stat_migrated&#39;, true);
-  }
-  showLovedBadgeNotifier.value         = prefs.getBool(&#39;ls_show_loved_badge&#39;)        ?? true;
-  showFavoritesStatNotifier.value      = prefs.getBool(&#39;ls_show_favorites&#39;)          ?? true;
-
-  final fallbackHex = prefs.getString(&#39;ls_nowplaying_fallback_color&#39;);
-  nowPlayingFallbackColorNotifier.value =
-      fallbackHex != null ? accentFromString(fallbackHex) : accentNotifier.value;
-
-  pcModeNotifier.value   = prefs.getString(&#39;ls_pc_mode&#39;) ?? &#39;auto&#39;;
-  navLabelNotifier.value     = prefs.getBool(&#39;ls_nav_labels&#39;)      ?? true;
-  hapticFeedbackNotifier.value = prefs.getBool(&#39;ls_haptic_feedback&#39;) ?? true;
-  livingArtworkNotifier.value = prefs.getBool(&#39;ls_living_artwork&#39;) ?? true;
-  achievementsEnabledNotifier.value = prefs.getBool(&#39;ls_achievements_enabled&#39;) ?? true;
-  ecoModeManualNotifier.value    = prefs.getBool(&#39;ls_eco_mode_manual&#39;)    ?? false;
-  ecoModeAutoNotifier.value      = prefs.getBool(&#39;ls_eco_mode_auto&#39;)      ?? false;
-  ecoModeThresholdNotifier.value = prefs.getInt(&#39;ls_eco_mode_threshold&#39;) ?? 20;
-
-  &#47;&#47; ── Data caches &amp; storage ────────────────────────────────────────────────
-  &#47;&#47; These 4 inits don&#39;t depend on each other, so run them together instead
-  &#47;&#47; of one-by-one — cuts real time-to-first-frame since they mostly wait
-  &#47;&#47; on disk I&#47;O anyway.
-  await Future.wait([
-    DataCache.init(),
-    UpdateService.init(),
-    ScrobblesFileCache.init(),
-    FriendsLibraryService.init(),
-    AchievementsExtras.init(),
-  ]);
-  await StorageManager.init();
-
-  DataCache.offlineMode = prefs.getBool(&#39;ls_cache_serve_stale&#39;) ?? true;
-
-  &#47;&#47; ── Notifications &amp; WorkManager ───────────────────────────────────────────
-  &#47;&#47; Notifications: mobile + Windows. WorkManager (background scheduling):
-  &#47;&#47; mobile only — Windows has no equivalent OS task scheduler wired up yet,
-  &#47;&#47; so on Windows sync notifications only fire during a manual&#47;foreground sync.
-  Map&lt;String, dynamic&gt;? notifLaunchData;
-
-  if (!kIsWeb) {
-    final isMobile  = Platform.isAndroid || Platform.isIOS;
-    final isWindows = Platform.isWindows;
-    if (isMobile || isWindows) {
-      await NotificationService.init();
-      notifLaunchData = await NotificationService.getLaunchPayloadData();
-    }
-    if (isMobile) {
-      await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
-      await NotificationWorker.scheduleAll();
-      &#47;&#47; Fire-and-forget: refresh home screen widgets on app start.
-      WidgetService.updateAll();
-      &#47;&#47; ...and every time the app comes back to the foreground.
-      WidgetsBinding.instance.addObserver(_WidgetRefreshObserver());
-    }
-  }
-
-  runApp(LastStatsApp(
-    username:   username,
-    apiKey:     apiKey,
-    startupTab: startupTab,
-  ));
-
-  &#47;&#47; Cache cleanup — not needed for the first frame, so it runs after the
-  &#47;&#47; app is already visible instead of blocking startup.
-  DataCache.clearExpired().ignore();
-  ImageService.pruneExpired();
-  EcoModeController.init(); &#47;&#47; battery watcher, also not needed for frame 1
-
-  WidgetsBinding.instance.addPostFrameCallback((_) async {
-    if (notifLaunchData != null) {
-      &#47;&#47; App was launched (cold start) by tapping a notification — open the
-      &#47;&#47; detail page directly instead of silently launching a URL.
-      navigatorKey.currentState?.push(MaterialPageRoute(
-        builder: (_) =&gt; NotificationDetailPage(data: notifLaunchData!),
-      ));
-    } else {
-      UpdateStartupChecker.run(navigatorKey);
-    }
+  <pre class="language-dart"><code class="language-dart">void main() {
+  runZonedGuarded(_mainImpl, (error, stack) {
+    &#47;&#47; On Windows&#47;Linux desktop an uncaught async error outside a guarded
+    &#47;&#47; zone terminates the whole process (unlike mobile, which just drops
+    &#47;&#47; the frame) — this was the main source of the reported PC crashes.
+    debugPrint(&#39;Uncaught error: $error&#39;);
   });
-
-  &#47;&#47; ── QR profile deep links ────────────────────────────────────────────────
-  &#47;&#47; laststats:&#47;&#47;profile&#47;&lt;username&gt;, opened either from our own in-app
-  &#47;&#47; scanner or by any other camera&#47;QR app on the device.
-  if (!kIsWeb &amp;&amp; (Platform.isAndroid || Platform.isIOS)) {
-    final appLinks = AppLinks();
-
-    Future&lt;void&gt; handleLink(Uri uri) async {
-      final scanned = QrLinkService.usernameFromScan(uri.toString());
-      if (scanned == null) return;
-      if (username.isEmpty || apiKey.isEmpty) return;
-
-      final p = await SharedPreferences.getInstance();
-      final favs = Set&lt;String&gt;.from(p.getStringList(&#39;ls_fav_profiles&#39;) ?? []);
-      final service = LastFmService(apiKey: apiKey, username: username);
-
-      &#47;&#47; Re-read the context after the await above: the navigator (or the
-      &#47;&#47; widget tree under it) may have changed while we were awaiting.
-      final ctx = navigatorKey.currentContext;
-      if (ctx == null || !ctx.mounted) return;
-
-      showProfileSheet(
-        ctx, scanned, service,
-        isFav: favs.contains(scanned),
-        onToggleFav: () async {
-          final updated = Set&lt;String&gt;.from(favs);
-          if (favs.contains(scanned)) { updated.remove(scanned); } else { updated.add(scanned); }
-          final p2 = await SharedPreferences.getInstance();
-          await p2.setStringList(&#39;ls_fav_profiles&#39;, updated.toList());
-        },
-      );
-    }
-
-    &#47;&#47; Cold start via a link.
-    try {
-      final initial = await appLinks.getInitialLink();
-      if (initial != null) await handleLink(initial);
-    } catch (_) {}
-
-    &#47;&#47; App already running, link opened while foregrounded&#47;backgrounded.
-    appLinks.uriLinkStream.listen(handleLink, onError: (_) {});
-  }
 }</code></pre>
 </section>
 
@@ -272,7 +100,7 @@
 <footer>
   <span class="no-break">
     laststats_mobile
-      3.1.0+22
+      3.2.0+23
   </span>
   
 </footer>
