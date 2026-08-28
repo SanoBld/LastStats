@@ -86,8 +86,21 @@ class ScrobbleRecord {
   String toString() => '$ts · $artist — $track';
 }
 
-// ══════════════════════════════════════════════════════════════════════════
-//  Cache
+// Top-level so it can run in a separate isolate via compute(). Decodes and
+// parses every year's raw JSON blob at once, off the UI thread — with years
+// of scrobble history this was blocking startup for seconds on PC.
+Map<int, List<ScrobbleRecord>> _decodeYearsRecords(Map<int, String> rawByYear) {
+  final out = <int, List<ScrobbleRecord>>{};
+  for (final entry in rawByYear.entries) {
+    try {
+      final decoded = jsonDecode(entry.value) as Map<String, dynamic>;
+      final version = (decoded['v'] as num?)?.toInt() ?? 1;
+      final records = ScrobblesFileCache._parseRecords(decoded['data'], version);
+      if (records != null) out[entry.key] = records;
+    } catch (_) {}
+  }
+  return out;
+}
 // ══════════════════════════════════════════════════════════════════════════
 
 class ScrobblesFileCache {
@@ -132,17 +145,16 @@ class ScrobblesFileCache {
                   .toList() ??
               []);
 
+      // Read all raw blobs on the UI isolate (cheap I/O), then decode+parse
+      // everything at once in a single background isolate — avoids both
+      // blocking the UI thread and spawning one isolate per year.
+      final rawByYear = <int, String>{};
       for (final year in years) {
         final raw = await CacheBackend.read(_yearKey(year));
-        if (raw == null) continue;
-        try {
-          final decoded = jsonDecode(raw) as Map<String, dynamic>;
-          final version = (decoded['v'] as num?)?.toInt() ?? 1;
-          // Pas de vérification TTL — les données sont permanentes
-          final records = _parseRecords(decoded['data'], version);
-          if (records != null) _years[year] = records;
-        } catch (_) {}
+        if (raw != null) rawByYear[year] = raw;
       }
+      final parsed = await compute(_decodeYearsRecords, rawByYear);
+      _years.addAll(parsed);
 
       debugPrint('[ScrobblesCache] ${_years.length} année(s) chargée(s) '
           '(${getTotalScrobbleCount()} scrobbles).');

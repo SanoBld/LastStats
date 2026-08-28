@@ -1,5 +1,7 @@
 // lib/main.dart
+import 'dart:async';
 import 'dart:io' show Platform;
+import 'dart:ui' show PlatformDispatcher;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -31,10 +33,34 @@ import 'package:app_links/app_links.dart';
 // navigatorKey now lives in notification_service.dart so the notification
 // tap handler can push screens without importing main.dart (would be circular).
 
-void main() async {
+void main() {
+  runZonedGuarded(_mainImpl, (error, stack) {
+    // On Windows/Linux desktop an uncaught async error outside a guarded
+    // zone terminates the whole process (unlike mobile, which just drops
+    // the frame) — this was the main source of the reported PC crashes.
+    debugPrint('Uncaught error: $error');
+  });
+}
+
+Future<void> _mainImpl() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   FlutterError.onError = (details) => debugPrint('Flutter error: ${details.exception}');
+  // Same reasoning as above, for errors raised outside the Flutter framework
+  // (platform channels, timers, etc.) on desktop.
+  PlatformDispatcher.instance.onError = (error, stack) {
+    debugPrint('Platform error: $error');
+    return true;
+  };
+
+  // Bigger decoded-image cache on PC: large windows/high-DPI monitors show
+  // far more artwork at once than a phone screen, so the default 100 MB /
+  // 1000-image limit was constantly evicting and re-decoding images —
+  // the source of the reported micro-freezes while scrolling.
+  if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+    PaintingBinding.instance.imageCache.maximumSize = 3000;
+    PaintingBinding.instance.imageCache.maximumSizeBytes = 300 << 20; // 300 MB
+  }
 
   // ── Custom frameless window (Windows / Linux desktop) ────────────────────
   // macOS keeps its native traffic-light buttons; only Windows and Linux get

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app_state.dart';
@@ -13,6 +14,15 @@ import 'onboarding_flow.dart';
 // ══════════════════════════════════════════════════════════════════════════
 //  SetupScreen — credentials entry (animated redesign)
 // ══════════════════════════════════════════════════════════════════════════
+
+/// Picks the self-contained logo SVG (own background baked in): the plain
+/// mono logo by default, the red-dot "Nothing" variant only when that theme
+/// is active — matching brightness either way.
+String _logoAsset(BuildContext context) {
+  final dark = Theme.of(context).brightness == Brightness.dark;
+  final family = themeStyleNotifier.value == 'nothing' ? 'app_logo_nothing' : 'app_logo';
+  return 'assets/icons/${family}_${dark ? 'black_bg' : 'white_bg'}.svg';
+}
 
 class SetupScreen extends StatefulWidget {
   const SetupScreen({super.key});
@@ -355,20 +365,8 @@ class _SetupScreenState extends State<SetupScreen>
                                 ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(24),
-                                  child: Image.asset(
-                                    'assets/images/icon-512.png',
-                                    width: 90, height: 90, fit: BoxFit.cover,
-                                    errorBuilder: (_, _, _) => Container(
-                                      width: 90, height: 90,
-                                      decoration: BoxDecoration(
-                                        color: scheme.primaryContainer,
-                                        borderRadius: BorderRadius.circular(24),
-                                      ),
-                                      child: Icon(Icons.headphones_rounded,
-                                          size: 46,
-                                          color: scheme.onPrimaryContainer),
-                                    ),
-                                  ),
+                                  child: SvgPicture.asset(_logoAsset(context),
+                                      width: 90, height: 90),
                                 ),
                               ),
                               const SizedBox(height: 18),

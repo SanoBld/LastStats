@@ -9,6 +9,15 @@ import '../../app_state.dart';
 import '../../services/update_service.dart';
 import 'settings_helpers.dart';
 
+/// Picks the self-contained logo SVG (own background baked in): the plain
+/// mono logo by default, the red-dot "Nothing" variant only when that theme
+/// is active — matching brightness either way.
+String _logoAsset(BuildContext context) {
+  final dark = Theme.of(context).brightness == Brightness.dark;
+  final family = themeStyleNotifier.value == 'nothing' ? 'app_logo_nothing' : 'app_logo';
+  return 'assets/icons/${family}_${dark ? 'black_bg' : 'white_bg'}.svg';
+}
+
 /// Full 10-language lookup — falls back to English, then French.
 String _tr(Map<String, String> byLocale) =>
     byLocale[localeNotifier.value] ?? byLocale['en'] ?? byLocale['fr'] ?? '';
@@ -36,10 +45,7 @@ class AboutPage extends StatelessWidget {
         Center(child: Column(children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child: Image.asset(
-              'assets/images/icon-512.png',
-              width: 80, height: 80, fit: BoxFit.cover,
-            ),
+            child: SvgPicture.asset(_logoAsset(context), width: 80, height: 80),
           ),
           const SizedBox(height: 14),
           Text('LastStats',
