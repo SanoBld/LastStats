@@ -655,4 +655,17 @@ class AppStringsAr implements AppStrings {
   @override String get achvDescComparisons => 'عدد مقارنات الذوق الموسيقي التي تم إجراؤها.';
   @override String get achvUnlockedBadge => 'مفتوح';
   @override String get achvLockedBadge => 'مقفل';
+  @override String get dashRecap => 'ملخص';
+  @override String get recapDay => 'اليوم';
+  @override String get recapWeek => 'هذا الأسبوع';
+  @override String get recapMonth => 'هذا الشهر';
+  @override String get recapScrobbles => 'عمليات استماع';
+  @override String get recapArtists => 'الفنانون';
+  @override String get recapTracks => 'المقاطع';
+  @override String get recapTopArtist => 'أفضل فنان';
+  @override String get recapTopTrack => 'أفضل مقطع';
+  @override String get recapTopAlbum => 'أفضل ألبوم';
+  @override String get recapAvgDay => 'المعدل/يوم';
+  @override String get recapNoData => 'لا توجد عمليات استماع لهذه الفترة.';
+  @override String get recapSeeFull => 'عرض الملخص الكامل';
 }

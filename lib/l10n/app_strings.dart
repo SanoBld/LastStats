@@ -116,6 +116,7 @@ abstract class AppStrings {
   String get dashFriends;
   String get dashRefresh;
   String get dashRefreshFriends;
+  String get dashRecap;
   String get dashScrobbles;
   String get dashScrobblesPerDay;
   String get dashDaysActive;
@@ -720,4 +721,18 @@ abstract class AppStrings {
   String get achvDescComparisons;
   String get achvUnlockedBadge;
   String get achvLockedBadge;
+
+  // ── Recap story (day/week/month) ────────────────────────────────────────
+  String get recapDay;
+  String get recapWeek;
+  String get recapMonth;
+  String get recapScrobbles;
+  String get recapArtists;
+  String get recapTracks;
+  String get recapTopArtist;
+  String get recapTopTrack;
+  String get recapTopAlbum;
+  String get recapAvgDay;
+  String get recapNoData;
+  String get recapSeeFull;
 }

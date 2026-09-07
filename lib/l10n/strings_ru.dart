@@ -655,4 +655,17 @@ class AppStringsRu implements AppStrings {
   @override String get achvDescComparisons => 'Количество выполненных сравнений музыкальных вкусов.';
   @override String get achvUnlockedBadge => 'Открыто';
   @override String get achvLockedBadge => 'Заблокировано';
+  @override String get dashRecap => 'Итоги';
+  @override String get recapDay => 'Сегодня';
+  @override String get recapWeek => 'На этой неделе';
+  @override String get recapMonth => 'В этом месяце';
+  @override String get recapScrobbles => 'скробблов';
+  @override String get recapArtists => 'Исполнители';
+  @override String get recapTracks => 'Треки';
+  @override String get recapTopArtist => 'Топ исполнитель';
+  @override String get recapTopTrack => 'Топ трек';
+  @override String get recapTopAlbum => 'Топ альбом';
+  @override String get recapAvgDay => 'Ср/день';
+  @override String get recapNoData => 'За этот период прослушиваний нет.';
+  @override String get recapSeeFull => 'Смотреть полные итоги';
 }

@@ -654,4 +654,17 @@ class AppStringsJa implements AppStrings {
   @override String get achvDescComparisons => '行った音楽の好み比較の回数。';
   @override String get achvUnlockedBadge => '解除済み';
   @override String get achvLockedBadge => 'ロック中';
+  @override String get dashRecap => '振り返り';
+  @override String get recapDay => '今日';
+  @override String get recapWeek => '今週';
+  @override String get recapMonth => '今月';
+  @override String get recapScrobbles => '再生数';
+  @override String get recapArtists => 'アーティスト';
+  @override String get recapTracks => '曲';
+  @override String get recapTopArtist => 'トップアーティスト';
+  @override String get recapTopTrack => 'トップ曲';
+  @override String get recapTopAlbum => 'トップアルバム';
+  @override String get recapAvgDay => '1日平均';
+  @override String get recapNoData => 'この期間の再生履歴はありません。';
+  @override String get recapSeeFull => '振り返りを見る';
 }

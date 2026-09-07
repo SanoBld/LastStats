@@ -681,4 +681,17 @@ class AppStringsZh implements AppStrings {
   @override String get achvDescComparisons => '已进行的音乐品味对比次数。';
   @override String get achvUnlockedBadge => '已解锁';
   @override String get achvLockedBadge => '未解锁';
+  @override String get dashRecap => '回顾';
+  @override String get recapDay => '今天';
+  @override String get recapWeek => '本周';
+  @override String get recapMonth => '本月';
+  @override String get recapScrobbles => '播放次数';
+  @override String get recapArtists => '艺术家';
+  @override String get recapTracks => '歌曲';
+  @override String get recapTopArtist => '最多艺术家';
+  @override String get recapTopTrack => '最多歌曲';
+  @override String get recapTopAlbum => '最多专辑';
+  @override String get recapAvgDay => '日均';
+  @override String get recapNoData => '此时段暂无播放记录。';
+  @override String get recapSeeFull => '查看完整回顾';
 }

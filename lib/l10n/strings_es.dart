@@ -684,4 +684,17 @@ class AppStringsEs implements AppStrings {
   @override String get achvDescComparisons => 'El número de comparaciones de gustos musicales realizadas.';
   @override String get achvUnlockedBadge => 'Desbloqueado';
   @override String get achvLockedBadge => 'Bloqueado';
+  @override String get dashRecap => 'Resumen';
+  @override String get recapDay => 'Hoy';
+  @override String get recapWeek => 'Esta semana';
+  @override String get recapMonth => 'Este mes';
+  @override String get recapScrobbles => 'escuchas';
+  @override String get recapArtists => 'Artistas';
+  @override String get recapTracks => 'Canciones';
+  @override String get recapTopArtist => 'Artista top';
+  @override String get recapTopTrack => 'Canción top';
+  @override String get recapTopAlbum => 'Álbum top';
+  @override String get recapAvgDay => 'Prom/día';
+  @override String get recapNoData => 'Sin escuchas en este período.';
+  @override String get recapSeeFull => 'Ver resumen completo';
 }

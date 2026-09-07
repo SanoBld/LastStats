@@ -8,6 +8,9 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../l10n/l10n.dart';
+import '../services/account_manager.dart';
+import '../services/lastfm_service.dart';
+import 'recap_story_page.dart';
 
 class NotificationDetailPage extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -48,6 +51,7 @@ class NotificationDetailPage extends StatelessWidget {
     final url   = (data['url']   ?? '').toString();
     final date  = (data['date']  ?? '').toString();
     final emoji = (data['emoji'] ?? '').toString();
+    final type  = (data['type']  ?? '').toString();
     final (icon, color) = _style();
 
     return Scaffold(
@@ -109,6 +113,28 @@ class NotificationDetailPage extends StatelessWidget {
               child: Text(
                 body,
                 style: text.bodyLarge?.copyWith(height: 1.5),
+              ),
+            ),
+          ],
+
+          if (type == 'daily' || type == 'weekly') ...[
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: () async {
+                final acc = await AccountManager.getActive();
+                if (acc == null || !acc.isValid || !context.mounted) return;
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => RecapStoryPage(
+                    service: LastFmService(apiKey: acc.apiKey, username: acc.username),
+                    username: acc.username,
+                    initialPeriod: type == 'daily' ? 0 : 1,
+                  ),
+                ));
+              },
+              icon:  const Icon(Icons.auto_stories_rounded),
+              label: Text(L.recapSeeFull),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
               ),
             ),
           ],

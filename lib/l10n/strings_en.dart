@@ -684,4 +684,17 @@ class AppStringsEn implements AppStrings {
   @override String get achvDescComparisons => 'The number of taste comparisons made.';
   @override String get achvUnlockedBadge => 'Unlocked';
   @override String get achvLockedBadge => 'Locked';
+  @override String get dashRecap => 'Recap';
+  @override String get recapDay => 'Today';
+  @override String get recapWeek => 'This week';
+  @override String get recapMonth => 'This month';
+  @override String get recapScrobbles => 'scrobbles';
+  @override String get recapArtists => 'Artists';
+  @override String get recapTracks => 'Tracks';
+  @override String get recapTopArtist => 'Top artist';
+  @override String get recapTopTrack => 'Top track';
+  @override String get recapTopAlbum => 'Top album';
+  @override String get recapAvgDay => 'Avg/day';
+  @override String get recapNoData => 'No scrobbles for this period yet.';
+  @override String get recapSeeFull => 'See full recap';
 }

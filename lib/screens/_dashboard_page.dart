@@ -558,6 +558,14 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       items: [
         PopupMenuItem(
+          value: 'recap',
+          child: Row(children: [
+            const Icon(Icons.auto_stories_rounded, size: 20),
+            const SizedBox(width: 10),
+            Text(L.dashRecap),
+          ]),
+        ),
+        PopupMenuItem(
           value: 'refresh',
           child: Row(children: [
             const Icon(Icons.refresh_rounded, size: 20),
@@ -616,6 +624,14 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     switch (result) {
       case 'refresh':
         _load();
+      case 'recap':
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => RecapStoryPage(
+            service: widget.service,
+            username: widget.username,
+            initialPeriod: 1,
+          ),
+        ));
       case 'myprofile':
         showProfileSheet(context, widget.username, widget.service,
             isFav: false, onToggleFav: () {});
