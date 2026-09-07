@@ -117,6 +117,7 @@ Widget build(BuildContext context) {
   final url   = (data[&#39;url&#39;]   ?? &#39;&#39;).toString();
   final date  = (data[&#39;date&#39;]  ?? &#39;&#39;).toString();
   final emoji = (data[&#39;emoji&#39;] ?? &#39;&#39;).toString();
+  final type  = (data[&#39;type&#39;]  ?? &#39;&#39;).toString();
   final (icon, color) = _style();
 
   return Scaffold(
@@ -178,6 +179,28 @@ Widget build(BuildContext context) {
             child: Text(
               body,
               style: text.bodyLarge?.copyWith(height: 1.5),
+            ),
+          ),
+        ],
+
+        if (type == &#39;daily&#39; || type == &#39;weekly&#39;) ...[
+          const SizedBox(height: 24),
+          FilledButton.icon(
+            onPressed: () async {
+              final acc = await AccountManager.getActive();
+              if (acc == null || !acc.isValid || !context.mounted) return;
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) =&gt; RecapStoryPage(
+                  service: LastFmService(apiKey: acc.apiKey, username: acc.username),
+                  username: acc.username,
+                  initialPeriod: type == &#39;daily&#39; ? 0 : 1,
+                ),
+              ));
+            },
+            icon:  const Icon(Icons.auto_stories_rounded),
+            label: Text(L.recapSeeFull),
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(48),
             ),
           ),
         ],
