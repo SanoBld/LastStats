@@ -1,24 +1,34 @@
 // lib/screens/recap_story_page.dart
 //
 // "Story" style recap: 3 pages (Today / This week / This month) with big
-// numbers, top artist/track/album and a small bar chart. Opened from the
-// dashboard avatar bubble, or from a daily/weekly notification.
+// numbers, a Material You podium (top 3 artists/tracks/albums) and a small
+// bar chart. Opened from the dashboard avatar bubble, or from a
+// daily/weekly notification. Uses the app's dynamic colorScheme so it always
+// matches the current Material You theme.
 
 import 'package:flutter/material.dart';
 import '../services/lastfm_service.dart';
 import '../l10n/l10n.dart';
+
+// Callback used to open the existing item detail sheet (artist/album/track).
+// Passed in by the caller since that sheet lives in home_screen.dart's part
+// files and can't be imported directly from here.
+typedef OpenDetailFn = void Function(
+    BuildContext context, Map<String, dynamic> item, String type, LastFmService service);
 
 class RecapStoryPage extends StatefulWidget {
   final LastFmService service;
   final String username;
   // 0 = day, 1 = week, 2 = month
   final int initialPeriod;
+  final OpenDetailFn? onOpenDetail;
 
   const RecapStoryPage({
     super.key,
     required this.service,
     required this.username,
     this.initialPeriod = 1,
+    this.onOpenDetail,
   });
 
   @override
@@ -31,12 +41,9 @@ class _RecapData {
   int prevCount = 0;
   int uniqueArtists = 0;
   int uniqueTracks = 0;
-  Map? topArtist;
-  int topArtistPlays = 0;
-  Map? topTrack;
-  int topTrackPlays = 0;
-  Map? topAlbum;
-  int topAlbumPlays = 0;
+  List<Map<String, dynamic>> topArtists = [];
+  List<Map<String, dynamic>> topTracks = [];
+  List<Map<String, dynamic>> topAlbums = [];
   List<double> bars = [];
   List<String> barLabels = [];
   bool loading = true;
@@ -45,13 +52,9 @@ class _RecapData {
 
 class _RecapStoryPageState extends State<RecapStoryPage> {
   late int _period = widget.initialPeriod.clamp(0, 2).toInt();
+  // 0 = artists, 1 = tracks, 2 = albums
+  int _category = 0;
   final List<_RecapData> _data = [_RecapData(), _RecapData(), _RecapData()];
-
-  static const _gradients = [
-    [Color(0xFF7C3AED), Color(0xFF1D4ED8)], // day: violet -> blue
-    [Color(0xFFD51007), Color(0xFFF97316)], // week: last.fm red -> orange
-    [Color(0xFF059669), Color(0xFF0D9488)], // month: green -> teal
-  ];
 
   @override
   void initState() {
@@ -112,7 +115,7 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
 
     if (p == 0) {
       // Last.fm has no "1 day" top-list period, so we pull today's raw
-      // scrobbles once and count everything ourselves.
+      // scrobbles once and rank everything ourselves.
       final raw = await widget.service.getRecentTracks(
           from: _ts(start), to: _ts(nowEnd), limit: 200);
       final list = raw['track'] is List
@@ -148,16 +151,25 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
       data.uniqueArtists = artistCount.length;
       data.uniqueTracks = trackCount.length;
 
-      if (artistCount.isNotEmpty) {
-        final top = artistCount.entries.reduce((a, b) => a.value >= b.value ? a : b);
-        data.topArtist = artistItem[top.key];
-        data.topArtistPlays = top.value;
-      }
-      if (trackCount.isNotEmpty) {
-        final top = trackCount.entries.reduce((a, b) => a.value >= b.value ? a : b);
-        data.topTrack = trackItem[top.key];
-        data.topTrackPlays = top.value;
-      }
+      // Top 3 artists — built from the raw scrobble each artist appeared in
+      // (no dedicated artist image in recenttracks, so we reuse its track art).
+      final artistEntries = artistCount.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
+      data.topArtists = artistEntries.take(3).map((e) {
+        final src = artistItem[e.key]!;
+        return {'name': e.key, 'playcount': '${e.value}', 'image': src['image']};
+      }).toList();
+
+      final trackEntries = trackCount.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
+      data.topTracks = trackEntries.take(3).map((e) {
+        final src = Map<String, dynamic>.from(trackItem[e.key]!);
+        src['playcount'] = '${e.value}';
+        return src;
+      }).toList();
+
+      // No album breakdown for "today" — would need per-scrobble album
+      // grouping with little payoff for a single day.
 
       // Condense the 24 hours into 8 buckets of 3h for the mini chart.
       final buckets = List<int>.filled(8, 0);
@@ -170,28 +182,13 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
     } else {
       final apiPeriod = p == 1 ? '7day' : '1month';
       final topLists = await Future.wait([
-        widget.service.getTopArtists(period: apiPeriod, limit: 1),
-        widget.service.getTopTracks(period: apiPeriod, limit: 1),
-        widget.service.getTopAlbums(period: apiPeriod, limit: 1),
+        widget.service.getTopArtists(period: apiPeriod, limit: 3),
+        widget.service.getTopTracks(period: apiPeriod, limit: 3),
+        widget.service.getTopAlbums(period: apiPeriod, limit: 3),
       ]);
-      final topArtists = topLists[0];
-      final topTracks = topLists[1];
-      final topAlbums = topLists[2];
-      if (topArtists.isNotEmpty) {
-        data.topArtist = topArtists[0] as Map;
-        data.topArtistPlays =
-            int.tryParse((data.topArtist!['playcount'] ?? '0').toString()) ?? 0;
-      }
-      if (topTracks.isNotEmpty) {
-        data.topTrack = topTracks[0] as Map;
-        data.topTrackPlays =
-            int.tryParse((data.topTrack!['playcount'] ?? '0').toString()) ?? 0;
-      }
-      if (topAlbums.isNotEmpty) {
-        data.topAlbum = topAlbums[0] as Map;
-        data.topAlbumPlays =
-            int.tryParse((data.topAlbum!['playcount'] ?? '0').toString()) ?? 0;
-      }
+      data.topArtists = topLists[0].cast<Map<String, dynamic>>();
+      data.topTracks = topLists[1].cast<Map<String, dynamic>>();
+      data.topAlbums = topLists[2].cast<Map<String, dynamic>>();
 
       // Full top-200 lists just to count how many distinct artists/tracks.
       final wide = await Future.wait([
@@ -240,8 +237,7 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
     return (entry is Map ? entry['#text'] ?? '' : '').toString();
   }
 
-  String _artistOf(Map? item) {
-    if (item == null) return '';
+  String _artistOf(Map item) {
     final a = item['artist'];
     if (a is Map) return (a['#text'] ?? a['name'] ?? '').toString();
     return (a ?? '').toString();
@@ -259,19 +255,24 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
     _load(p);
   }
 
+  String _detailType(int category) =>
+      switch (category) { 0 => 'artists', 1 => 'tracks', _ => 'albums' };
+
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final d = _data[_period];
     final labels = [L.recapDay, L.recapWeek, L.recapMonth];
-    final gradient = _gradients[_period];
 
     return Scaffold(
+      backgroundColor: scheme.surface,
       body: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: gradient,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            colors: [scheme.primaryContainer.withValues(alpha: 0.55), scheme.surface],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            stops: const [0, 0.32],
           ),
         ),
         child: SafeArea(
@@ -287,7 +288,9 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
                       margin: const EdgeInsets.symmetric(horizontal: 3),
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: i == _period ? 0.95 : 0.35),
+                        color: i == _period
+                            ? scheme.primary
+                            : scheme.primary.withValues(alpha: 0.25),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -300,13 +303,13 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
               padding: const EdgeInsets.fromLTRB(8, 4, 16, 8),
               child: Row(children: [
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, color: Colors.white),
+                  icon: Icon(Icons.close_rounded, color: scheme.onSurface),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
                 Expanded(
                   child: Text(labels[_period],
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: scheme.onSurface,
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
                       )),
@@ -315,16 +318,16 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
             ),
             Expanded(
               child: d.loading && !d.loaded
-                  ? const Center(child: CircularProgressIndicator(color: Colors.white))
-                  : _body(context, d),
+                  ? Center(child: CircularProgressIndicator(color: scheme.primary))
+                  : _body(context, scheme, d),
             ),
             // Prev / next controls
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
               child: Row(children: [
-                _navBtn(Icons.chevron_left_rounded, _period > 0, () => _go(_period - 1)),
+                _navBtn(scheme, Icons.chevron_left_rounded, _period > 0, () => _go(_period - 1)),
                 const Spacer(),
-                _navBtn(Icons.chevron_right_rounded, _period < 2, () => _go(_period + 1)),
+                _navBtn(scheme, Icons.chevron_right_rounded, _period < 2, () => _go(_period + 1)),
               ]),
             ),
           ]),
@@ -333,52 +336,58 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
     );
   }
 
-  Widget _navBtn(IconData icon, bool enabled, VoidCallback onTap) {
+  Widget _navBtn(ColorScheme scheme, IconData icon, bool enabled, VoidCallback onTap) {
     return Opacity(
       opacity: enabled ? 1 : 0.25,
       child: IconButton(
-        icon: Icon(icon, color: Colors.white, size: 30),
+        icon: Icon(icon, color: scheme.onSurface, size: 30),
         onPressed: enabled ? onTap : null,
       ),
     );
   }
 
-  Widget _body(BuildContext context, _RecapData d) {
+  Widget _body(BuildContext context, ColorScheme scheme, _RecapData d) {
     if (d.count == 0) {
       return Center(
         child: Text(L.recapNoData,
-            style: const TextStyle(color: Colors.white70, fontSize: 15)),
+            style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 15)),
       );
     }
 
     final delta = d.prevCount > 0 ? (d.count - d.prevCount) / d.prevCount * 100 : null;
+    final lists = [d.topArtists, d.topTracks, d.topAlbums];
+    // "Today" has no album breakdown — fall back to tracks if albums picked.
+    final category = (_period == 0 && _category == 2) ? 1 : _category;
+    final categoryItems = lists[category];
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         // Big scrobble count
         Text('${d.count}',
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: scheme.onSurface,
               fontSize: 56,
               fontWeight: FontWeight.w900,
               height: 1,
             )),
         Row(children: [
           Text(L.recapScrobbles,
-              style: const TextStyle(color: Colors.white70, fontSize: 14)),
+              style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 14)),
           if (delta != null) ...[
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.18),
+                color: scheme.primaryContainer,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
                 '${delta >= 0 ? '+' : ''}${delta.toStringAsFixed(0)}%',
-                style: const TextStyle(
-                    color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700),
+                style: TextStyle(
+                    color: scheme.onPrimaryContainer,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700),
               ),
             ),
           ],
@@ -387,73 +396,85 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
 
         // Unique artists / tracks / avg per day
         Row(children: [
-          Expanded(child: _statChip(L.recapArtists, '${d.uniqueArtists}')),
+          Expanded(child: _statChip(scheme, L.recapArtists, '${d.uniqueArtists}')),
           const SizedBox(width: 10),
-          Expanded(child: _statChip(L.recapTracks, '${d.uniqueTracks}')),
+          Expanded(child: _statChip(scheme, L.recapTracks, '${d.uniqueTracks}')),
           const SizedBox(width: 10),
           Expanded(
-              child: _statChip(L.recapAvgDay,
+              child: _statChip(scheme, L.recapAvgDay,
                   (d.count / (_period == 0 ? 1 : (_period == 1 ? 7 : 30))).toStringAsFixed(1))),
         ]),
         const SizedBox(height: 22),
 
         // Mini bar chart
-        if (d.bars.isNotEmpty) _barChart(d),
-        const SizedBox(height: 22),
+        if (d.bars.isNotEmpty) _barChart(scheme, d),
+        const SizedBox(height: 26),
 
-        if (d.topArtist != null)
-          _highlightCard(
-            icon: Icons.person_rounded,
-            label: L.recapTopArtist,
-            title: (d.topArtist!['name'] ?? '').toString(),
-            sub: '${_fmt(d.topArtistPlays)} ${L.commonPlays}',
-            imageUrl: _img(d.topArtist!['image']),
-          ),
-        const SizedBox(height: 12),
-        if (d.topTrack != null)
-          _highlightCard(
-            icon: Icons.music_note_rounded,
-            label: L.recapTopTrack,
-            title: (d.topTrack!['name'] ?? '').toString(),
-            sub: _artistOf(d.topTrack).isNotEmpty
-                ? '${_artistOf(d.topTrack)} · ${_fmt(d.topTrackPlays)} ${L.commonPlays}'
-                : '${_fmt(d.topTrackPlays)} ${L.commonPlays}',
-            imageUrl: _img(d.topTrack!['image']),
-          ),
-        if (d.topAlbum != null) ...[
-          const SizedBox(height: 12),
-          _highlightCard(
-            icon: Icons.album_rounded,
-            label: L.recapTopAlbum,
-            title: (d.topAlbum!['name'] ?? '').toString(),
-            sub: _artistOf(d.topAlbum).isNotEmpty
-                ? '${_artistOf(d.topAlbum)} · ${_fmt(d.topAlbumPlays)} ${L.commonPlays}'
-                : '${_fmt(d.topAlbumPlays)} ${L.commonPlays}',
-            imageUrl: _img(d.topAlbum!['image']),
-          ),
-        ],
+        // Category switcher: Artists / Tracks / Albums
+        Row(children: [
+          _categoryChip(scheme, L.recapArtists, 0),
+          const SizedBox(width: 8),
+          _categoryChip(scheme, L.recapTracks, 1),
+          if (_period != 0) ...[
+            const SizedBox(width: 8),
+            _categoryChip(scheme, L.recapTopAlbum, 2),
+          ],
+        ]),
+        const SizedBox(height: 18),
+
+        if (categoryItems.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Center(
+              child: Text(L.recapNoData,
+                  style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13)),
+            ),
+          )
+        else
+          _podium(context, scheme, categoryItems, _detailType(category)),
       ]),
     );
   }
 
-  Widget _statChip(String label, String value) {
+  Widget _categoryChip(ColorScheme scheme, String label, int index) {
+    final selected = _category == index;
+    return GestureDetector(
+      onTap: () => setState(() => _category = index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+        decoration: BoxDecoration(
+          color: selected ? scheme.primary : scheme.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(label,
+            style: TextStyle(
+              color: selected ? scheme.onPrimary : scheme.onSurfaceVariant,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            )),
+      ),
+    );
+  }
+
+  Widget _statChip(ColorScheme scheme, String label, String value) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.14),
+        color: scheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(children: [
         Text(value,
-            style: const TextStyle(
-                color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+            style: TextStyle(
+                color: scheme.onSurface, fontSize: 18, fontWeight: FontWeight.w800)),
         const SizedBox(height: 2),
-        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 11)),
+        Text(label, style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 11)),
       ]),
     );
   }
 
-  Widget _barChart(_RecapData d) {
+  Widget _barChart(ColorScheme scheme, _RecapData d) {
     return SizedBox(
       height: 90,
       child: Row(
@@ -469,13 +490,13 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
                     duration: const Duration(milliseconds: 300),
                     height: 6 + d.bars[i] * 58,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.35 + d.bars[i] * 0.55),
+                      color: scheme.primary.withValues(alpha: 0.35 + d.bars[i] * 0.55),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(d.barLabels[i],
-                      style: const TextStyle(color: Colors.white60, fontSize: 10)),
+                      style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 10)),
                 ],
               ),
             ),
@@ -485,53 +506,164 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
     );
   }
 
-  Widget _highlightCard({
-    required IconData icon,
-    required String label,
-    required String title,
-    required String sub,
-    required String imageUrl,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: imageUrl.isNotEmpty
-              ? Image.network(imageUrl, width: 52, height: 52, fit: BoxFit.cover,
-                  errorBuilder: (context, error, stack) => _fallbackIcon(icon))
-              : _fallbackIcon(icon),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(label,
-                style: const TextStyle(
-                    color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 2),
-            Text(title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                    color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
-            Text(sub,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Colors.white70, fontSize: 12)),
-          ]),
-        ),
-      ]),
+  // Podium: rank 1 in the middle (tallest), 2 on the left, 3 on the right —
+  // classic podium layout. Falls back to a simple stacked list under 3 items.
+  Widget _podium(
+      BuildContext context, ColorScheme scheme, List<Map<String, dynamic>> items, String type) {
+    if (items.length < 3) {
+      return Column(children: [
+        for (var i = 0; i < items.length; i++) ...[
+          if (i > 0) const SizedBox(height: 10),
+          _podiumRow(context, scheme, items[i], i, type),
+        ],
+      ]);
+    }
+
+    // [1st, 2nd, 3rd] -> display order [2nd, 1st, 3rd]
+    const order = [1, 0, 2];
+    const heights = [96.0, 128.0, 78.0];
+    const avatarSizes = [56.0, 68.0, 48.0];
+    final colors = [scheme.secondaryContainer, scheme.primaryContainer, scheme.tertiaryContainer];
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: List.generate(3, (slot) {
+        final rank = order[slot];
+        final item = items[rank];
+        final plays = int.tryParse((item['playcount'] ?? '0').toString()) ?? 0;
+        final title = (item['name'] ?? '').toString();
+        final sub = type == 'artists' ? '' : _artistOf(item);
+        final img = _img(item['image']);
+
+        return Expanded(
+          child: GestureDetector(
+            onTap: widget.onOpenDetail == null
+                ? null
+                : () => widget.onOpenDetail!(context, item, type, widget.service),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Stack(clipBehavior: Clip.none, children: [
+                  ClipOval(
+                    child: img.isNotEmpty
+                        ? Image.network(img,
+                            width: avatarSizes[slot],
+                            height: avatarSizes[slot],
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stack) =>
+                                _podiumFallback(scheme, avatarSizes[slot], type))
+                        : _podiumFallback(scheme, avatarSizes[slot], type),
+                  ),
+                  Positioned(
+                    right: -2,
+                    bottom: -2,
+                    child: Container(
+                      width: 22,
+                      height: 22,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: scheme.primary,
+                        border: Border.all(color: scheme.surface, width: 2),
+                      ),
+                      child: Text('${rank + 1}',
+                          style: TextStyle(
+                              color: scheme.onPrimary,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800)),
+                    ),
+                  ),
+                ]),
+                const SizedBox(height: 8),
+                Text(title,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        color: scheme.onSurface, fontSize: 12, fontWeight: FontWeight.w700)),
+                if (sub.isNotEmpty)
+                  Text(sub,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 10)),
+                Text('${_fmt(plays)} ${L.commonPlays}',
+                    style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 10)),
+                const SizedBox(height: 8),
+                Container(
+                  height: heights[slot],
+                  decoration: BoxDecoration(
+                    color: colors[slot],
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                  ),
+                ),
+              ]),
+            ),
+          ),
+        );
+      }),
     );
   }
 
-  Widget _fallbackIcon(IconData icon) => Container(
-        width: 52,
-        height: 52,
-        color: Colors.white.withValues(alpha: 0.15),
-        child: Icon(icon, color: Colors.white70, size: 24),
+  Widget _podiumRow(
+      BuildContext context, ColorScheme scheme, Map<String, dynamic> item, int rank, String type) {
+    final plays = int.tryParse((item['playcount'] ?? '0').toString()) ?? 0;
+    final title = (item['name'] ?? '').toString();
+    final sub = type == 'artists' ? '' : _artistOf(item);
+    final img = _img(item['image']);
+
+    return GestureDetector(
+      onTap: widget.onOpenDetail == null
+          ? null
+          : () => widget.onOpenDetail!(context, item, type, widget.service),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(children: [
+          ClipOval(
+            child: img.isNotEmpty
+                ? Image.network(img, width: 44, height: 44, fit: BoxFit.cover,
+                    errorBuilder: (context, error, stack) =>
+                        _podiumFallback(scheme, 44, type))
+                : _podiumFallback(scheme, 44, type),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      color: scheme.onSurface, fontSize: 14, fontWeight: FontWeight.w700)),
+              if (sub.isNotEmpty)
+                Text(sub,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 11)),
+            ]),
+          ),
+          Text('${_fmt(plays)} ${L.commonPlays}',
+              style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12)),
+        ]),
+      ),
+    );
+  }
+
+  Widget _podiumFallback(ColorScheme scheme, double size, String type) => Container(
+        width: size,
+        height: size,
+        color: scheme.surfaceContainerHighest,
+        child: Icon(
+          type == 'artists'
+              ? Icons.person_rounded
+              : type == 'albums'
+                  ? Icons.album_rounded
+                  : Icons.music_note_rounded,
+          color: scheme.onSurfaceVariant,
+          size: size * 0.5,
+        ),
       );
 }

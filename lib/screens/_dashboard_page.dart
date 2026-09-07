@@ -630,6 +630,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
             service: widget.service,
             username: widget.username,
             initialPeriod: 1,
+            onOpenDetail: showDetailSheet,
           ),
         ));
       case 'myprofile':
