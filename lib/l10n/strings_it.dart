@@ -668,4 +668,5 @@ class AppStringsIt implements AppStrings {
   @override String get recapAvgDay => 'Media/giorno';
   @override String get recapNoData => 'Nessun ascolto in questo periodo.';
   @override String get recapSeeFull => 'Vedi riepilogo completo';
+  @override String get recapTop10 => 'Top 10';
 }

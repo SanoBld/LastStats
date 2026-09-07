@@ -694,4 +694,5 @@ class AppStringsZh implements AppStrings {
   @override String get recapAvgDay => '日均';
   @override String get recapNoData => '此时段暂无播放记录。';
   @override String get recapSeeFull => '查看完整回顾';
+  @override String get recapTop10 => '前10名';
 }

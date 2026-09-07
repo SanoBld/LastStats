@@ -697,4 +697,5 @@ class AppStringsEs implements AppStrings {
   @override String get recapAvgDay => 'Prom/día';
   @override String get recapNoData => 'Sin escuchas en este período.';
   @override String get recapSeeFull => 'Ver resumen completo';
+  @override String get recapTop10 => 'Top 10';
 }

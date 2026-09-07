@@ -667,4 +667,5 @@ class AppStringsJa implements AppStrings {
   @override String get recapAvgDay => '1日平均';
   @override String get recapNoData => 'この期間の再生履歴はありません。';
   @override String get recapSeeFull => '振り返りを見る';
+  @override String get recapTop10 => 'トップ10';
 }

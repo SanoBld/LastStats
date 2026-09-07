@@ -697,4 +697,5 @@ class AppStringsEn implements AppStrings {
   @override String get recapAvgDay => 'Avg/day';
   @override String get recapNoData => 'No scrobbles for this period yet.';
   @override String get recapSeeFull => 'See full recap';
+  @override String get recapTop10 => 'Top 10';
 }

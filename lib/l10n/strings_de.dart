@@ -668,4 +668,5 @@ class AppStringsDe implements AppStrings {
   @override String get recapAvgDay => 'Ø/Tag';
   @override String get recapNoData => 'Noch keine Scrobbles in diesem Zeitraum.';
   @override String get recapSeeFull => 'Ganzen Rückblick ansehen';
+  @override String get recapTop10 => 'Top 10';
 }

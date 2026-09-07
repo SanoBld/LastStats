@@ -697,4 +697,5 @@ class AppStringsPt implements AppStrings {
   @override String get recapAvgDay => 'Média/dia';
   @override String get recapNoData => 'Sem escutas neste período.';
   @override String get recapSeeFull => 'Ver resumo completo';
+  @override String get recapTop10 => 'Top 10';
 }

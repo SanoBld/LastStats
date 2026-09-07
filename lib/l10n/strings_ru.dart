@@ -668,4 +668,5 @@ class AppStringsRu implements AppStrings {
   @override String get recapAvgDay => 'Ср/день';
   @override String get recapNoData => 'За этот период прослушиваний нет.';
   @override String get recapSeeFull => 'Смотреть полные итоги';
+  @override String get recapTop10 => 'Топ 10';
 }

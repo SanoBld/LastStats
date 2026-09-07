@@ -735,4 +735,5 @@ abstract class AppStrings {
   String get recapAvgDay;
   String get recapNoData;
   String get recapSeeFull;
+  String get recapTop10;
 }

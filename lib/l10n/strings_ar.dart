@@ -668,4 +668,5 @@ class AppStringsAr implements AppStrings {
   @override String get recapAvgDay => 'المعدل/يوم';
   @override String get recapNoData => 'لا توجد عمليات استماع لهذه الفترة.';
   @override String get recapSeeFull => 'عرض الملخص الكامل';
+  @override String get recapTop10 => 'أفضل 10';
 }

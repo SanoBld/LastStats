@@ -697,4 +697,5 @@ class AppStringsFr implements AppStrings {
   @override String get recapAvgDay => 'Moy/jour';
   @override String get recapNoData => 'Aucune écoute pour cette période.';
   @override String get recapSeeFull => 'Voir le récap complet';
+  @override String get recapTop10 => 'Top 10';
 }
