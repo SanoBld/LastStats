@@ -468,6 +468,43 @@ class _ChartsPageState extends State<_ChartsPage>
     });
   }
 
+  /// Waits until every year from registration to now is actually cached,
+  /// starting the background sync if it isn't already running. Without this,
+  /// "All time" exports/views only reflect whatever happened to be cached
+  /// at that moment — which can silently be missing entire years if the
+  /// background sync hadn't gotten to them yet.
+  Future<void> _ensureFullHistoryLoaded(ValueNotifier<String> statusText) async {
+    final regYear     = AllScrobblesService.getRegistrationYear();
+    final currentYear = DateTime.now().year;
+    final expected     = List.generate(currentYear - regYear + 1, (i) => regYear + i);
+
+    bool allCached() => expected.every(AllScrobblesService.isYearCached);
+
+    if (allCached()) return;
+
+    if (!AllScrobblesService.isRunning) {
+      // Not awaited on purpose: progress is observed via progressNotifier
+      // below so the dialog can show live status.
+      unawaited(AllScrobblesService.loadAll(widget.service));
+    }
+
+    // Poll progress until the sync finishes or every expected year is
+    // cached, with a generous cap so a flaky connection can't hang the
+    // export forever.
+    for (var i = 0; i < 1200; i++) {
+      if (!mounted) return;
+      final p = AllScrobblesService.progressNotifier.value;
+      if (p.isLoading && p.currentYear != null) {
+        statusText.value = _ct(
+            'Récupération de ${p.currentYear}… (${p.yearIndex}/${p.totalYears})',
+            'Fetching ${p.currentYear}… (${p.yearIndex}/${p.totalYears})');
+      }
+      if (!AllScrobblesService.isRunning || allCached()) break;
+      await Future.delayed(const Duration(milliseconds: 250));
+    }
+    _refreshAvailableYears();
+  }
+
   Map<String, int> _buildAllTimeMonthly() {
     final result = <String, int>{};
     for (final year in _availableYears) {
@@ -849,6 +886,9 @@ class _ChartsPageState extends State<_ChartsPage>
     final saved    = _selectedYear;
     final switched = year != saved;
 
+    final statusText = ValueNotifier<String>(
+        _ct('Export en cours…', 'Exporting…', es: 'Exportando…', zh: '正在导出…', pt: 'Exportando…'));
+
     // Show loading overlay with fade (no blocking popup)
     showGeneralDialog(
       context: ctx,
@@ -870,7 +910,10 @@ class _ChartsPageState extends State<_ChartsPage>
               child: Column(mainAxisSize: MainAxisSize.min, children: [
                 const CircularProgressIndicator(),
                 const SizedBox(height: 16),
-                Text(_ct('Export en cours…', 'Exporting…', es: 'Exportando…', zh: '正在导出…', pt: 'Exportando…')),
+                ValueListenableBuilder<String>(
+                  valueListenable: statusText,
+                  builder: (_, text, _) => Text(text, textAlign: TextAlign.center),
+                ),
               ]),
             ),
           ),
@@ -883,6 +926,18 @@ class _ChartsPageState extends State<_ChartsPage>
     }
 
     try {
+      // "Tout le temps" must actually contain every year — the background
+      // sync (AllScrobblesService.loadAll) may still be running or may not
+      // have started, so what's cached at this exact moment can be a subset
+      // of the real history. Force it to finish before building the export
+      // so no year silently goes missing from the calendar/monthly/cumul.
+      if (year == 0) {
+        await _ensureFullHistoryLoaded(statusText);
+        if (!ctx.mounted) { closeDialog(); return; }
+        statusText.value = _ct('Export en cours…', 'Exporting…',
+            es: 'Exportando…', zh: '正在导出…', pt: 'Exportando…');
+      }
+
       if (switched) {
         // Silently load data for the target year (dialog covers the screen)
         if (mounted) {
@@ -1021,6 +1076,7 @@ class _ChartsPageState extends State<_ChartsPage>
             SnackBar(content: Text('${_ct('Erreur', 'Error', es: 'Error', zh: '错误', pt: 'Erro')}: $e')));
       }
     } finally {
+      statusText.dispose();
       // Restore original year
       if (switched && mounted) {
         setState(() {
