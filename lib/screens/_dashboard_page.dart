@@ -1167,11 +1167,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
             MaterialPageRoute(builder: (_) => const _LevelHistoryPage())),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           Text(_ct('Niv. $level', 'Lvl $level'),
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.9),
-                fontSize: 12, fontWeight: FontWeight.w700,
-                shadows: const [Shadow(color: Colors.black45, blurRadius: 4)],
-              )),
+              style: AppText.badge.copyWith(color: Colors.white.withValues(alpha: 0.9), shadows: const [Shadow(color: Colors.black45, blurRadius: 4)])),
           const SizedBox(width: 6),
           ClipRRect(
             borderRadius: BorderRadius.circular(3),
@@ -1542,12 +1538,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(name,
-                                style: const TextStyle(
-                                  color:      Colors.white,
-                                  fontSize:   20,
-                                  fontWeight: FontWeight.w800,
-                                  shadows: [Shadow(color: Colors.black54, blurRadius: 4)],
-                                )),
+                                style: AppText.title.copyWith(color: Colors.white, shadows: [Shadow(color: Colors.black54, blurRadius: 4)])),
                               if (realName.isNotEmpty)
                                 Text(realName,
                                   style: TextStyle(

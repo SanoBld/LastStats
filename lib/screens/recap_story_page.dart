@@ -439,11 +439,7 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
                   ),
                   Expanded(
                     child: Text(labels[_period],
-                        style: TextStyle(
-                          color: scheme.onSurface,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                        )),
+                        style: AppText.title.copyWith(color: scheme.onSurface)),
                   ),
                   IconButton(
                     tooltip: L.commonShare,
@@ -533,12 +529,7 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
         // Big scrobble count, with a small pop-in animation
         _FadeInUp(
           child: Text('${d.count}',
-              style: TextStyle(
-                color: scheme.onSurface,
-                fontSize: 56,
-                fontWeight: FontWeight.w900,
-                height: 1,
-              )),
+              style: AppText.hero.copyWith(color: scheme.onSurface, height: 1)),
         ),
         Row(children: [
           Text(L.recapScrobbles,
@@ -691,11 +682,7 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
           borderRadius: AppRadius.xlR,
         ),
         child: Text(label,
-            style: TextStyle(
-              color: selected ? scheme.onPrimary : scheme.onSurfaceVariant,
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-            )),
+            style: AppText.body.copyWith(color: selected ? scheme.onPrimary : scheme.onSurfaceVariant)),
       ),
     );
   }

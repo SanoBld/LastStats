@@ -166,11 +166,9 @@ class _CardBack extends StatelessWidget {
           // Watermark, bottom-left. left:0/bottom:0 here line up with the
           // Container's own 22px padding (Positioned is relative to the
           // already-padded area), so it lines up with the text column above.
-          const Positioned(
+          Positioned(
             left: 0, bottom: 0,
-            child: Text('LastStats', style: TextStyle(
-                color: Colors.white38, fontSize: 11, fontWeight: FontWeight.w600,
-                letterSpacing: 0.5)),
+            child: Text('LastStats', style: AppText.label.copyWith(color: Colors.white38, letterSpacing: 0.5)),
           ),
           // QR, pinned to the bottom-right corner, same 0/0 inset as the
           // watermark so both sit flush with the card's padded edge.
@@ -1073,10 +1071,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               color: hasImage ? Colors.white.withValues(alpha: 0.90) : b.color,
             ),
             const SizedBox(width: 5),
-            Text(b.label, style: TextStyle(
-              color: hasImage ? Colors.white.withValues(alpha: 0.90) : b.color,
-              fontSize: 11, fontWeight: FontWeight.w600,
-            )),
+            Text(b.label, style: AppText.label.copyWith(color: hasImage ? Colors.white.withValues(alpha: 0.90) : b.color)),
           ]),
         ),
       ),

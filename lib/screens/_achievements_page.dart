@@ -224,8 +224,7 @@ class _AchvCategoryCard extends StatelessWidget {
                       summary.next == null
                           ? '${summary.current} · ${tierLabel(summary.tier)}'
                           : '${summary.current} / ${summary.next!.def.threshold}',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700,
-                          color: scheme.primary),
+                      style: AppText.badge.copyWith(color: scheme.primary),
                     ),
                   ],
                 ),
@@ -603,8 +602,7 @@ class _LevelHistoryPage extends StatelessWidget {
                 return ListTile(
                   leading: CircleAvatar(
                     backgroundColor: scheme.primaryContainer,
-                    child: Text('$level', style: TextStyle(
-                        color: scheme.onPrimaryContainer, fontWeight: FontWeight.w700, fontSize: 13)),
+                    child: Text('$level', style: AppText.body.copyWith(color: scheme.onPrimaryContainer)),
                   ),
                   title: Text(_ct('Niveau $level', 'Level $level')),
                   trailing: Text(dateStr, style: TextStyle(color: scheme.onSurfaceVariant)),
