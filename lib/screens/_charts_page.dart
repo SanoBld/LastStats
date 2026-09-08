@@ -1008,12 +1008,26 @@ class _ChartsPageState extends State<_ChartsPage>
             ? DateTime.now()
             : DateTime(heatmapYears.last, 12, 31);
 
-        final totalDays = heatmapEnd.difference(heatmapStart).inDays + 1;
-        final weeks     = ((totalDays + 6) / 7).ceil();
-        // Rows now stack one per year, so width only needs to fit a single
-        // year's worth of weeks (max 53) plus the year-label gutter, not
-        // the full multi-year span.
-        final maxWeeksInAnyYear = weeks > 53 ? 53.0 : weeks.toDouble();
+        // BUG WAS HERE: width used to be capped at a hard-coded 53 weeks,
+        // computed from the total number of days in the WHOLE multi-year
+        // span. That number is basically always > 53, so it always got
+        // clamped down to exactly 53 -- which is only "one year" wide by
+        // luck. Some years actually need 54 week-columns depending on which
+        // weekday Jan 1st falls on, so that year's last column (often
+        // December) got silently cut off the image.
+        // Fix: compute the real number of week-columns for EACH year (same
+        // formula as _yearBlock below) and use the widest one. No guessing.
+        int weeksNeededForYear(int y) {
+          final yStart   = y == heatmapStart.year ? heatmapStart : DateTime(y, 1, 1);
+          final yEnd     = y == heatmapEnd.year   ? heatmapEnd   : DateTime(y, 12, 31);
+          final startWd  = yStart.weekday;
+          final days     = yEnd.difference(yStart).inDays + 1;
+          final cells    = (startWd - 1) + days;
+          return (cells / 7).ceil();
+        }
+        final maxWeeksInAnyYear = heatmapYears.isEmpty
+            ? 53
+            : heatmapYears.map(weeksNeededForYear).reduce((a, b) => a > b ? a : b);
         final naturalWidth = 60.0 + maxWeeksInAnyYear * 11.5;
 
         final child = _HeatmapCard(
@@ -1551,7 +1565,7 @@ class _ChartsPageState extends State<_ChartsPage>
                         (calendarForView != null && calendarForView.isNotEmpty)
                             ? RepaintBoundary(
                                 key: _xkeys['calendar'],
-                                child: _HeatmapCard(
+                                child: _HeatmapPager(
                                     data: calendarForView, start: heatmapStart, end: heatmapEnd))
                             : _NoDataCard(
                                 year: 0,
@@ -1566,7 +1580,7 @@ class _ChartsPageState extends State<_ChartsPage>
                       else if (calendarForView != null)
                         RepaintBoundary(
                           key: _xkeys['calendar'],
-                          child: _HeatmapCard(
+                          child: _HeatmapPager(
                               data: calendarForView, start: heatmapStart, end: heatmapEnd))
                       else if (!hasFullData && _selectedYear != DateTime.now().year)
                         _NoDataCard(year: _selectedYear, onLoad: () => AllScrobblesService.loadAll(widget.service)),
@@ -3089,7 +3103,10 @@ class _HeatmapCard extends StatelessWidget {
   final Map<String, int> data;
   final DateTime          start;
   final DateTime          end;
-  const _HeatmapCard({required this.data, required this.start, required this.end});
+  // If set, draw only these years instead of every year between start/end.
+  // Used by _HeatmapPager below to show a few years at a time on screen.
+  final List<int>?        onlyYears;
+  const _HeatmapCard({required this.data, required this.start, required this.end, this.onlyYears});
 
   static const _cell = 10.0;
   static const _gap  = 1.5;
@@ -3204,7 +3221,7 @@ class _HeatmapCard extends StatelessWidget {
     // One row per calendar year (GitHub-style stacked blocks) instead of one
     // continuous horizontal strip — a multi-year "all time" span used to
     // require scrolling very far right and got visually cut off in exports.
-    final years = [for (var y = startDay.year; y <= endDay.year; y++) y];
+    final years = onlyYears ?? [for (var y = startDay.year; y <= endDay.year; y++) y];
     final yearBlocks = years.map((y) {
       final yearStart = y == startDay.year ? startDay : DateTime(y, 1, 1);
       final yearEnd   = y == endDay.year ? endDay : DateTime(y, 12, 31);
@@ -3253,6 +3270,115 @@ class _HeatmapCard extends StatelessWidget {
           ]),
         ],
       ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  _HeatmapPager — shows only a few years at a time on screen, with
+//  prev/next arrows, instead of stacking every year forever as history
+//  grows. Only used for the live in-app view. The shared/exported image
+//  still uses _HeatmapCard directly with every year, since a shared picture
+//  is meant to show the whole history at once.
+// ══════════════════════════════════════════════════════════════════════════
+
+class _HeatmapPager extends StatefulWidget {
+  final Map<String, int> data;
+  final DateTime          start;
+  final DateTime          end;
+  const _HeatmapPager({required this.data, required this.start, required this.end});
+
+  @override
+  State<_HeatmapPager> createState() => _HeatmapPagerState();
+}
+
+class _HeatmapPagerState extends State<_HeatmapPager> {
+  // How many year-rows we show at once on screen.
+  static const _yearsPerPage = 3;
+
+  // Index (into the full year list) of the first year on the current page.
+  int _pageStart = 0;
+
+  List<int> _allYears() =>
+      [for (var y = widget.start.year; y <= widget.end.year; y++) y];
+
+  @override
+  void initState() {
+    super.initState();
+    _jumpToNewestPage();
+  }
+
+  @override
+  void didUpdateWidget(covariant _HeatmapPager old) {
+    super.didUpdateWidget(old);
+    // If years were added/removed (e.g. sync just finished, or a new year
+    // started), keep the page index valid instead of pointing past the end.
+    final total = _allYears().length;
+    if (_pageStart > total - 1) _jumpToNewestPage();
+  }
+
+  // Open on the most recent years first — that's what people want to see.
+  void _jumpToNewestPage() {
+    final total = _allYears().length;
+    _pageStart = total > _yearsPerPage ? total - _yearsPerPage : 0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s     = Theme.of(context).colorScheme;
+    final t     = Theme.of(context).textTheme;
+    final years = _allYears();
+
+    final pageEnd   = (_pageStart + _yearsPerPage).clamp(0, years.length);
+    final pageYears = years.sublist(_pageStart, pageEnd);
+
+    // The very first / last year of the WHOLE range may be partial (history
+    // starts mid-year, or "now" is mid-year) — every other year in between
+    // is a full Jan 1 -> Dec 31 block.
+    final blockStart = pageYears.first == widget.start.year
+        ? widget.start : DateTime(pageYears.first, 1, 1);
+    final blockEnd = pageYears.last == widget.end.year
+        ? widget.end : DateTime(pageYears.last, 12, 31);
+
+    final canGoOlder = _pageStart > 0;
+    final canGoNewer = pageEnd < years.length;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _HeatmapCard(
+          data: widget.data, start: blockStart, end: blockEnd,
+          onlyYears: pageYears,
+        ),
+        if (years.length > _yearsPerPage)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  icon: const Icon(Icons.chevron_left_rounded),
+                  color: canGoOlder ? s.primary : s.onSurfaceVariant.withValues(alpha: 0.3),
+                  onPressed: canGoOlder
+                      ? () => setState(() => _pageStart -= _yearsPerPage)
+                      : null,
+                ),
+                Text('${pageYears.first} – ${pageYears.last}',
+                    style: t.labelSmall?.copyWith(
+                        fontWeight: FontWeight.w700, color: s.onSurfaceVariant)),
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  icon: const Icon(Icons.chevron_right_rounded),
+                  color: canGoNewer ? s.primary : s.onSurfaceVariant.withValues(alpha: 0.3),
+                  onPressed: canGoNewer
+                      ? () => setState(() => _pageStart += _yearsPerPage)
+                      : null,
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }
