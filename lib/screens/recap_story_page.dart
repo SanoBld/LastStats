@@ -6,12 +6,14 @@
 // bubble, or from a daily/weekly notification. Uses the app's dynamic
 // colorScheme so it always matches the current Material You theme.
 
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/lastfm_service.dart';
 import '../services/image_service.dart';
 import '../l10n/l10n.dart';
@@ -74,8 +76,49 @@ class _RecapData {
   List<Map<String, dynamic>> topAlbums = [];
   List<double> bars = [];
   List<String> barLabels = [];
+  // Real calendar range this recap covers — used for the share card subtitle.
+  DateTime? periodStart;
+  DateTime? periodEnd;
   bool loading = true;
   bool loaded = false;
+
+  Map<String, dynamic> toJson() => {
+        'count': count,
+        'prevCount': prevCount,
+        'uniqueArtists': uniqueArtists,
+        'uniqueTracks': uniqueTracks,
+        'topArtists': topArtists,
+        'topTracks': topTracks,
+        'topAlbums': topAlbums,
+        'bars': bars,
+        'barLabels': barLabels,
+        'periodStart': periodStart?.millisecondsSinceEpoch,
+        'periodEnd': periodEnd?.millisecondsSinceEpoch,
+      };
+
+  static _RecapData fromJson(Map<String, dynamic> j) {
+    final d = _RecapData();
+    d.count = (j['count'] as num?)?.toInt() ?? 0;
+    d.prevCount = (j['prevCount'] as num?)?.toInt() ?? 0;
+    d.uniqueArtists = (j['uniqueArtists'] as num?)?.toInt() ?? 0;
+    d.uniqueTracks = (j['uniqueTracks'] as num?)?.toInt() ?? 0;
+    d.topArtists = ((j['topArtists'] as List?) ?? [])
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+    d.topTracks = ((j['topTracks'] as List?) ?? [])
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+    d.topAlbums = ((j['topAlbums'] as List?) ?? [])
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+    d.bars = ((j['bars'] as List?) ?? []).map((e) => (e as num).toDouble()).toList();
+    d.barLabels = ((j['barLabels'] as List?) ?? []).map((e) => e.toString()).toList();
+    final ps = j['periodStart'] as num?;
+    final pe = j['periodEnd'] as num?;
+    if (ps != null) d.periodStart = DateTime.fromMillisecondsSinceEpoch(ps.toInt());
+    if (pe != null) d.periodEnd = DateTime.fromMillisecondsSinceEpoch(pe.toInt());
+    return d;
+  }
 }
 
 class _RecapStoryPageState extends State<RecapStoryPage> {
@@ -101,8 +144,53 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
 
   int _total(Map r) => int.tryParse((r['@attr']?['total'] ?? '0').toString()) ?? 0;
 
+  // Persistent cache (SharedPreferences) so week/month recaps don't have to
+  // be refetched from the Last.fm API every time the page is reopened.
+  // "Today" is skipped: it changes every few minutes and is cheap to fetch
+  // anyway (one API call), so caching it would mostly show stale numbers.
+  static const _cacheTtl = [null, Duration(minutes: 20), Duration(hours: 2)];
+
+  String _cacheKey(int p) => 'recap_cache_${widget.username}_$p';
+
+  Future<_RecapData?> _readCache(int p) async {
+    final ttl = _cacheTtl[p];
+    if (ttl == null) return null;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_cacheKey(p));
+      if (raw == null) return null;
+      final j = jsonDecode(raw) as Map<String, dynamic>;
+      final ts = (j['_cachedAt'] as num?)?.toInt() ?? 0;
+      if (DateTime.now().millisecondsSinceEpoch - ts > ttl.inMilliseconds) return null;
+      return _RecapData.fromJson(j);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _writeCache(int p, _RecapData data) async {
+    if (_cacheTtl[p] == null) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final j = data.toJson();
+      j['_cachedAt'] = DateTime.now().millisecondsSinceEpoch;
+      await prefs.setString(_cacheKey(p), jsonEncode(j));
+    } catch (_) {
+      // Non-critical: worst case we just refetch next time.
+    }
+  }
+
   Future<void> _load(int p) async {
     if (_data[p].loaded) return;
+
+    final cached = await _readCache(p);
+    if (cached != null && mounted) {
+      cached.loaded = true;
+      cached.loading = false;
+      setState(() => _data[p] = cached);
+      return;
+    }
+
     setState(() => _data[p].loading = true);
     try {
       final fresh = await _fetch(p);
@@ -110,6 +198,7 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
       fresh.loading = false;
       if (!mounted) return;
       setState(() => _data[p] = fresh);
+      _writeCache(p, fresh);
     } catch (_) {
       if (!mounted) return;
       setState(() => _data[p].loading = false);
@@ -139,6 +228,8 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
     }
 
     final data = _RecapData();
+    data.periodStart = start;
+    data.periodEnd = now;
 
     // Total scrobbles for this period + the previous one (for the delta chip).
     final totals = await Future.wait([
@@ -401,8 +492,7 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
               periodLabel: labels[_period],
               username: widget.username,
               data: d,
-              type: _detailType(category),
-              items: categoryItems,
+              period: _period,
             ),
           ),
         ),
@@ -907,72 +997,192 @@ class _ItemImgState extends State<_ItemImg> {
 }
 
 // Clean, control-free layout rendered off-screen and exported as a PNG
-// when the user taps "share". Portrait story ratio.
+// when the user taps "share". Portrait story ratio. Shows more than the
+// on-screen podium: date range, key stats, activity chart and a top 3 for
+// every category that has data (not just the one currently selected).
 class _ShareCard extends StatelessWidget {
   final ColorScheme scheme;
   final String periodLabel;
   final String username;
   final _RecapData data;
-  final String type;
-  final List<Map<String, dynamic>> items;
+  final int period;
 
   const _ShareCard({
     required this.scheme,
     required this.periodLabel,
     required this.username,
     required this.data,
-    required this.type,
-    required this.items,
+    required this.period,
   });
+
+  static const _months = [
+    '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+
+  String _fmtDate(DateTime d) => '${d.day} ${_months[d.month]}';
+
+  String get _dateRange {
+    final s = data.periodStart, e = data.periodEnd;
+    if (s == null || e == null) return '';
+    if (s.year == e.year && s.month == e.month && s.day == e.day) return _fmtDate(e);
+    return '${_fmtDate(s)} – ${_fmtDate(e)}';
+  }
 
   @override
   Widget build(BuildContext context) {
-    final top3 = items.take(3).toList();
+    final delta = data.prevCount > 0 ? (data.count - data.prevCount) / data.prevCount * 100 : null;
+    final sections = <(String, String, List<Map<String, dynamic>>)>[
+      (L.recapArtists, 'artists', data.topArtists),
+      (L.recapTracks, 'tracks', data.topTracks),
+      (L.recapTopAlbum, 'albums', data.topAlbums),
+    ];
+
     return Material(
       color: scheme.surface,
       child: Container(
-        width: 360,
-        padding: const EdgeInsets.fromLTRB(24, 40, 24, 32),
+        width: 380,
+        padding: const EdgeInsets.fromLTRB(24, 40, 24, 28),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [scheme.primaryContainer, scheme.surface],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            stops: const [0, 0.4],
+            stops: const [0, 0.3],
           ),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
           Text('LastStats · $username',
               style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13, fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
-          Text(periodLabel,
-              style: TextStyle(color: scheme.onSurface, fontSize: 22, fontWeight: FontWeight.w800)),
+          Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Text(periodLabel,
+                style: TextStyle(color: scheme.onSurface, fontSize: 24, fontWeight: FontWeight.w800)),
+            if (_dateRange.isNotEmpty) ...[
+              const SizedBox(width: 8),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 3),
+                child: Text(_dateRange,
+                    style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13)),
+              ),
+            ],
+          ]),
           const SizedBox(height: 18),
+
+          // Big number + delta
           Text('${data.count}',
-              style: TextStyle(color: scheme.onSurface, fontSize: 60, fontWeight: FontWeight.w900, height: 1)),
-          Text(L.recapScrobbles, style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 14)),
-          const SizedBox(height: 26),
-          for (var i = 0; i < top3.length; i++) ...[
-            if (i > 0) const SizedBox(height: 10),
-            Row(children: [
-              Text('${i + 1}',
-                  style: TextStyle(color: scheme.primary, fontSize: 16, fontWeight: FontWeight.w900)),
-              const SizedBox(width: 10),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: _ItemImg(item: top3[i], type: type, size: 40, round: false),
+              style: TextStyle(color: scheme.onSurface, fontSize: 58, fontWeight: FontWeight.w900, height: 1)),
+          Row(children: [
+            Text(L.recapScrobbles, style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 14)),
+            if (delta != null) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration:
+                    BoxDecoration(color: scheme.primaryContainer, borderRadius: BorderRadius.circular(10)),
+                child: Text('${delta >= 0 ? '+' : ''}${delta.toStringAsFixed(0)}%',
+                    style: TextStyle(
+                        color: scheme.onPrimaryContainer, fontSize: 12, fontWeight: FontWeight.w700)),
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text((top3[i]['name'] ?? '').toString(),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: scheme.onSurface, fontSize: 14, fontWeight: FontWeight.w700)),
+            ],
+          ]),
+          const SizedBox(height: 18),
+
+          // Key stats row
+          Row(children: [
+            Expanded(child: _stat(L.recapArtists, '${data.uniqueArtists}')),
+            const SizedBox(width: 8),
+            Expanded(child: _stat(L.recapTracks, '${data.uniqueTracks}')),
+            const SizedBox(width: 8),
+            Expanded(
+                child: _stat(L.recapAvgDay,
+                    (data.count / (period == 0 ? 1 : (period == 1 ? 7 : 30))).toStringAsFixed(1))),
+          ]),
+
+          // Activity chart
+          if (data.bars.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            SizedBox(
+              height: 46,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: List.generate(data.bars.length, (i) {
+                  return Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: Container(
+                        height: 4 + data.bars[i] * 38,
+                        decoration: BoxDecoration(
+                          color: scheme.primary.withValues(alpha: 0.35 + data.bars[i] * 0.55),
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
               ),
-            ]),
+            ),
           ],
+
+          // Top 3 for every category that has data
+          for (final (label, type, items) in sections)
+            if (items.isNotEmpty) ...[
+              const SizedBox(height: 22),
+              Text(label.toUpperCase(),
+                  style: TextStyle(
+                      color: scheme.primary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5)),
+              const SizedBox(height: 8),
+              for (var i = 0; i < items.take(3).length; i++) ...[
+                if (i > 0) const SizedBox(height: 8),
+                Row(children: [
+                  SizedBox(
+                    width: 16,
+                    child: Text('${i + 1}',
+                        style: TextStyle(color: scheme.primary, fontSize: 14, fontWeight: FontWeight.w900)),
+                  ),
+                  const SizedBox(width: 6),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(7),
+                    child: _ItemImg(item: items[i], type: type, size: 34, round: false),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text((items[i]['name'] ?? '').toString(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: scheme.onSurface, fontSize: 13, fontWeight: FontWeight.w700)),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                      '${_fmtNum(int.tryParse((items[i]['playcount'] ?? '0').toString()) ?? 0)} ${L.commonPlays}',
+                      style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 11)),
+                ]),
+              ],
+            ],
+
+          const SizedBox(height: 24),
+          Center(
+            child: Text('laststats.app',
+                style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 11, fontWeight: FontWeight.w600)),
+          ),
         ]),
       ),
     );
   }
+
+  Widget _stat(String label, String value) => Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(children: [
+          Text(value, style: TextStyle(color: scheme.onSurface, fontSize: 15, fontWeight: FontWeight.w800)),
+          const SizedBox(height: 1),
+          Text(label, style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 10)),
+        ]),
+      );
 }
