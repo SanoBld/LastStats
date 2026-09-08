@@ -101,6 +101,22 @@ Map<int, List<ScrobbleRecord>> _decodeYearsRecords(Map<int, String> rawByYear) {
   }
   return out;
 }
+
+// Same idea but for the "ok" flag stored next to each year's data. Kept as
+// a separate small pass since it needs the raw JSON, not the parsed records.
+Map<int, bool> _decodeYearsOkFlags(Map<int, String> rawByYear) {
+  final out = <int, bool>{};
+  for (final entry in rawByYear.entries) {
+    try {
+      final decoded = jsonDecode(entry.value) as Map<String, dynamic>;
+      // Old files never wrote "ok" -> default to true (don't force a
+      // re-download of everything for people who already had cache before
+      // this fix).
+      out[entry.key] = decoded['ok'] as bool? ?? true;
+    } catch (_) {}
+  }
+  return out;
+}
 // ══════════════════════════════════════════════════════════════════════════
 
 class ScrobblesFileCache {
@@ -110,6 +126,11 @@ class ScrobblesFileCache {
 
   // ── Cache mémoire ─────────────────────────────────────────────────────────
   static final Map<int, List<ScrobbleRecord>> _years = {};
+  // True = this year finished downloading with no error. False = the
+  // download broke early (network error), so it must be retried later even
+  // if it looks "cached". Missing key = old file from before this flag
+  // existed, we just trust it like before (assume complete).
+  static final Map<int, bool>                 _yearOk = {};
   static Map<String, dynamic>?                _meta;
   static bool                                 _initialized = false;
 
@@ -155,6 +176,8 @@ class ScrobblesFileCache {
       }
       final parsed = await compute(_decodeYearsRecords, rawByYear);
       _years.addAll(parsed);
+      final okFlags = await compute(_decodeYearsOkFlags, rawByYear);
+      _yearOk.addAll(okFlags);
 
       debugPrint('[ScrobblesCache] ${_years.length} année(s) chargée(s) '
           '(${getTotalScrobbleCount()} scrobbles).');
@@ -176,14 +199,21 @@ class ScrobblesFileCache {
 
   static bool isYearCached(int year) => _years.containsKey(year);
 
-  /// Vrai si tous les records de [year] ont leurs métadonnées (track+artist).
-  /// Une année sans aucun scrobble (liste vide) est considérée complète :
-  /// elle a bien été chargée depuis l'API, il n'y avait simplement rien.
-  /// Retourne false uniquement si la clé est absente (jamais chargée) ou si
-  /// au moins un record manque ses métadonnées (ancien cache v1).
+  /// Vrai si tous les records de [year] ont leurs métadonnées (track+artist)
+  /// ET si le téléchargement de cette année s'est terminé sans erreur.
+  /// Retourne false si :
+  ///   - la clé est absente (jamais chargée),
+  ///   - le téléchargement a été coupé par une erreur réseau (voir [_yearOk],
+  ///     rempli par setYear(..., complete: false)) — sinon une année qui a
+  ///     planté au milieu du téléchargement reste bloquée pour toujours avec
+  ///     seulement une poignée de scrobbles, et n'est jamais retentée,
+  ///   - au moins un record manque ses métadonnées (ancien cache v1).
+  /// Une année sans aucun scrobble (liste vide) MAIS bien terminée est
+  /// considérée complète : elle a bien été chargée, il n'y avait rien.
   static bool isYearComplete(int year) {
     final records = _years[year];
     if (records == null) return false;          // jamais chargée
+    if (_yearOk[year] == false) return false;   // téléchargement cassé
     if (records.isEmpty) return true;           // année blanche = complète
     return records.every((r) => r.hasMetadata);
   }
@@ -206,13 +236,20 @@ class ScrobblesFileCache {
   //  Écriture (async — persiste dans le backend)
   // ──────────────────────────────────────────────────────────────────────────
 
-  static Future<void> setYear(int year, List<ScrobbleRecord> records) async {
-    _years[year] = records;
+  /// Save one year of scrobbles.
+  /// [complete] tells if the download really finished (true) or broke early
+  /// because of a network error (false). Keep it true by default so nothing
+  /// else in the app has to change.
+  static Future<void> setYear(int year, List<ScrobbleRecord> records,
+      {bool complete = true}) async {
+    _years[year]   = records;
+    _yearOk[year]  = complete;
     try {
       final ts      = DateTime.now().millisecondsSinceEpoch;
       final payload = jsonEncode({
         'v':    _fileVersion,
         'ts':   ts,   // date d'écriture (informatif)
+        'ok':   complete, // did the download finish without error?
         'data': records.map((r) => r.toList()).toList(),
       });
       await CacheBackend.write(_yearKey(year), payload);

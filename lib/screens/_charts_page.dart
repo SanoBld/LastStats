@@ -478,31 +478,43 @@ class _ChartsPageState extends State<_ChartsPage>
     final currentYear = DateTime.now().year;
     final expected     = List.generate(currentYear - regYear + 1, (i) => regYear + i);
 
-    bool allCached() => expected.every(AllScrobblesService.isYearCached);
+    // A year only counts as "ready" if it is cached AND fully downloaded
+    // (isYearComplete). A year that broke mid-download (network error) is
+    // cached but NOT complete, so it must not be treated as done here.
+    bool oneYearReady(int y) =>
+        AllScrobblesService.isYearCached(y) && AllScrobblesService.isYearComplete(y);
+    bool allReady() => expected.every(oneYearReady);
 
-    if (allCached()) return;
+    if (allReady()) return;
 
-    if (!AllScrobblesService.isRunning) {
-      // Not awaited on purpose: progress is observed via progressNotifier
-      // below so the dialog can show live status.
-      unawaited(AllScrobblesService.loadAll(widget.service));
-    }
-
-    // Poll progress until the sync finishes or every expected year is
-    // cached, with a generous cap so a flaky connection can't hang the
-    // export forever.
-    for (var i = 0; i < 1200; i++) {
-      if (!mounted) return;
-      final p = AllScrobblesService.progressNotifier.value;
-      if (p.isLoading && p.currentYear != null) {
-        statusText.value = _ct(
-            'Récupération de ${p.currentYear}… (${p.yearIndex}/${p.totalYears})',
-            'Fetching ${p.currentYear}… (${p.yearIndex}/${p.totalYears})');
+    // Try a few times: one loadAll() pass can leave some years broken
+    // (network blip), so we simply run it again for whatever is still
+    // missing, instead of giving up after the very first attempt.
+    for (var attempt = 0; attempt < 3 && !allReady(); attempt++) {
+      if (!AllScrobblesService.isRunning) {
+        // Not awaited on purpose: progress is observed via progressNotifier
+        // below so the dialog can show live status.
+        unawaited(AllScrobblesService.loadAll(widget.service));
       }
-      if (!AllScrobblesService.isRunning || allCached()) break;
-      await Future.delayed(const Duration(milliseconds: 250));
+
+      // Poll progress until this sync pass finishes, with a generous cap
+      // so a flaky connection can't hang the export forever.
+      for (var i = 0; i < 1200; i++) {
+        if (!mounted) return;
+        final p = AllScrobblesService.progressNotifier.value;
+        if (p.isLoading && p.currentYear != null) {
+          statusText.value = _ct(
+              'Récupération de ${p.currentYear}… (${p.yearIndex}/${p.totalYears})',
+              'Fetching ${p.currentYear}… (${p.yearIndex}/${p.totalYears})');
+        }
+        // Only stop waiting once the sync actually stopped running.
+        // (Do NOT stop early just because allReady() looks true here —
+        // progressNotifier can lag one tick behind the real cache state.)
+        if (!AllScrobblesService.isRunning) break;
+        await Future.delayed(const Duration(milliseconds: 250));
+      }
+      _refreshAvailableYears();
     }
-    _refreshAvailableYears();
   }
 
   Map<String, int> _buildAllTimeMonthly() {

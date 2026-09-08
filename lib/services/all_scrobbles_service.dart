@@ -182,6 +182,10 @@ class AllScrobblesService {
     final records = <ScrobbleRecord>[];
     int page       = 1;
     int totalPages = 1;
+    // Stays true only if we read every page with no error. If a page fails
+    // (network blip, rate limit...) we set this to false so the year is not
+    // wrongly saved as "done" -> it will be retried on the next full sync.
+    bool finishedOk = true;
 
     try {
       do {
@@ -227,12 +231,16 @@ class AllScrobblesService {
           if (page <= totalPages) await Future.delayed(_delay);
         } catch (e) {
           debugPrint('[AllScrobbles] Erreur année=$year page=$page : $e');
+          finishedOk = false; // page fetch broke -> year is not fully loaded
           break;
         }
       } while (page <= totalPages);
 
       records.sort((a, b) => a.ts.compareTo(b.ts));
-      await ScrobblesFileCache.setYear(year, records);
+      await ScrobblesFileCache.setYear(year, records, complete: finishedOk);
+      // Always list the year in meta so its file gets re-read at app start,
+      // even if broken -- the "ok" flag inside the file itself (see above)
+      // is what tells the app to retry it, not whether it's in this list.
       await _updateMeta(year);
       return records;
     } finally {
