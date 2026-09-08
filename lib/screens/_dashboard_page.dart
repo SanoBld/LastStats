@@ -133,6 +133,27 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   bool              _friendsLoading = false;
 
   bool _entranceMarkScheduled = false;
+  bool _hasNewStory = false;
+
+  static const _kStorySeenKey = 'ls_story_last_seen_date';
+
+  String _todayKey() {
+    final n = DateTime.now();
+    return '${n.year}-${n.month}-${n.day}';
+  }
+
+  Future<void> _checkNewStory() async {
+    final p = await SharedPreferences.getInstance();
+    final lastSeen = p.getString(_kStorySeenKey);
+    final isNew = lastSeen != _todayKey();
+    if (mounted && isNew != _hasNewStory) setState(() => _hasNewStory = isNew);
+  }
+
+  Future<void> _markStorySeen() async {
+    final p = await SharedPreferences.getInstance();
+    await p.setString(_kStorySeenKey, _todayKey());
+    if (mounted) setState(() => _hasNewStory = false);
+  }
 
   @override
   void initState() {
@@ -140,6 +161,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     WidgetsBinding.instance.addObserver(this);
     _initWithCache();
     _startTimers();
+    _checkNewStory();
     // Eco mode toggled mid-session → restart timers with the new interval.
     ecoModeActiveNotifier.addListener(_onEcoModeChanged);
   }
@@ -565,22 +587,6 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
             Text(L.dashRecap),
           ]),
         ),
-        PopupMenuItem(
-          value: 'refresh',
-          child: Row(children: [
-            const Icon(Icons.refresh_rounded, size: 20),
-            const SizedBox(width: 10),
-            Text(L.dashRefresh),
-          ]),
-        ),
-        PopupMenuItem(
-          value: 'myprofile',
-          child: Row(children: [
-            const Icon(Icons.person_outline_rounded, size: 20),
-            const SizedBox(width: 10),
-            Text(_ct('Voir mon profil', 'View my profile')),
-          ]),
-        ),
         if (achievementsEnabledNotifier.value)
           PopupMenuItem(
             value: 'achievements',
@@ -598,33 +604,13 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
             Text(_ct('Scanner un profil', 'Scan a profile')),
           ]),
         ),
-        PopupMenuItem(
-          value: 'settings',
-          child: Row(children: [
-            const Icon(Icons.settings_outlined, size: 20),
-            const SizedBox(width: 10),
-            Text(L.navSettings),
-          ]),
-        ),
-        PopupMenuItem(
-          value: 'reset',
-          child: Builder(builder: (ctx) {
-            final color = Theme.of(ctx).colorScheme.error;
-            return Row(children: [
-              Icon(Icons.delete_sweep_outlined, size: 20, color: color),
-              const SizedBox(width: 10),
-              Text(L.dashResetCache, style: TextStyle(color: color)),
-            ]);
-          }),
-        ),
       ],
     );
 
     if (!mounted) return;
     switch (result) {
-      case 'refresh':
-        _load();
       case 'recap':
+        _markStorySeen();
         Navigator.of(context).push(MaterialPageRoute(
           builder: (_) => RecapStoryPage(
             service: widget.service,
@@ -633,31 +619,10 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
             onOpenDetail: showDetailSheet,
           ),
         ));
-      case 'myprofile':
-        showProfileSheet(context, widget.username, widget.service,
-            isFav: false, onToggleFav: () {});
       case 'achievements':
         showAchievementsSheet(context, _userInfo, isSelf: true);
       case 'qrscan':
         showQrScannerPage(context, widget.service);
-      case 'settings':
-        await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => Scaffold(
-              appBar: AppBar(
-                title: Text(L.navSettings),
-                scrolledUnderElevation: 0,
-              ),
-              body: _SettingsPage(username: widget.username),
-            ),
-          ),
-        );
-        if (mounted) {
-          await _loadPrefs();
-          _resolveHeaderImage();
-        }
-      case 'reset':
-        _confirmResetCache();
     }
   }
 
@@ -1505,32 +1470,47 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         GestureDetector(
-                          key: _profileKey,
                           onTap: _showProfileMenu,
                           child: Row(children: [
                           Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.6),
-                                width: 2.5,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.3),
-                                  blurRadius: 8,
+                            key: _profileKey,
+                            padding: EdgeInsets.all(_hasNewStory ? 3 : 0),
+                            decoration: _hasNewStory
+                                ? BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: SweepGradient(
+                                      colors: [
+                                        scheme.primary,
+                                        scheme.tertiary,
+                                        scheme.primary,
+                                      ],
+                                    ),
+                                  )
+                                : null,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.6),
+                                  width: 2.5,
                                 ),
-                              ],
-                            ),
-                            child: CircleAvatar(
-                              radius: 28,
-                              backgroundColor: scheme.primary.withValues(alpha: 0.3),
-                              backgroundImage: avatarUrl.isNotEmpty
-                                  ? NetworkImage(avatarUrl) : null,
-                              child: avatarUrl.isEmpty
-                                  ? const Icon(Icons.person_rounded,
-                                      size: 28, color: Colors.white)
-                                  : null,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.3),
+                                    blurRadius: 8,
+                                  ),
+                                ],
+                              ),
+                              child: CircleAvatar(
+                                radius: 28,
+                                backgroundColor: scheme.primary.withValues(alpha: 0.3),
+                                backgroundImage: avatarUrl.isNotEmpty
+                                    ? NetworkImage(avatarUrl) : null,
+                                child: avatarUrl.isEmpty
+                                    ? const Icon(Icons.person_rounded,
+                                        size: 28, color: Colors.white)
+                                    : null,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
