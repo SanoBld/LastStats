@@ -139,7 +139,7 @@ class _HistoryPageState extends State<_HistoryPage>
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
                       decoration: BoxDecoration(
                         color:  scheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: AppRadius.mdR,
                         border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
                       ),
                       child: Row(children: [
@@ -174,7 +174,7 @@ class _HistoryPageState extends State<_HistoryPage>
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
                             decoration: BoxDecoration(
                               color: scheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: AppRadius.mdR,
                             ),
                             child: Row(mainAxisSize: MainAxisSize.min, children: [
                               Icon(Icons.today_rounded, size: 15, color: scheme.onPrimaryContainer),
@@ -319,7 +319,7 @@ class _HistNavBtn extends StatelessWidget {
       width: 40, height: 40,
       decoration: BoxDecoration(
         color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppRadius.mdR,
         border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
       ),
       child: Icon(icon, size: 22,
@@ -339,7 +339,7 @@ class _HistStatPill extends StatelessWidget {
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     decoration: BoxDecoration(
       color: scheme.secondaryContainer.withValues(alpha: 0.6),
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: AppRadius.xlR,
     ),
     child: Row(mainAxisSize: MainAxisSize.min, children: [
       Icon(icon, size: 14, color: scheme.primary),

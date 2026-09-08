@@ -555,7 +555,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         screen.width - pos.dx - size.width,
         0,
       ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      shape: RoundedRectangleBorder(borderRadius: AppRadius.lgR),
       items: [
         PopupMenuItem(
           value: 'recap',
@@ -880,7 +880,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         pos.dx,
         0,
       ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      shape: RoundedRectangleBorder(borderRadius: AppRadius.lgR),
       items: [
         PopupMenuItem(
           value: 'refresh',
@@ -2094,7 +2094,7 @@ class _CarouselCardState extends State<_CarouselCard> {
                         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                         decoration: BoxDecoration(
                           color:        Colors.white.withValues(alpha: 0.18),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: AppRadius.xlR,
                           border:       Border.all(
                               color: Colors.white.withValues(alpha: 0.25), width: 0.8),
                         ),
@@ -2875,7 +2875,7 @@ class _HeroStatCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: scheme.primaryContainer,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppRadius.xlR,
         border: Border.all(
           color: scheme.primary.withValues(alpha: 0.18),
           width: 1,
@@ -3174,7 +3174,7 @@ class _NowPlayingCard extends StatelessWidget {
     final rawUrl = _extractImage(track['image']);
 
     return InkWell(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: AppRadius.xlR,
       onTap: () {
         _haptic(_HapticImpact.light);
         showDetailSheet(context, {
@@ -3187,7 +3187,7 @@ class _NowPlayingCard extends StatelessWidget {
       child: Container(
       decoration: BoxDecoration(
         color: scheme.secondaryContainer,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppRadius.xlR,
         border: Border.all(
           color: scheme.secondary.withValues(alpha: 0.25),
           width: 1,
@@ -4087,7 +4087,7 @@ class _NewsListTileState extends State<_NewsListTile> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color:        scheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: AppRadius.lgR,
             border: Border.all(
               color: scheme.outlineVariant.withValues(alpha: 0.4),
             ),
@@ -4152,7 +4152,7 @@ class _NewsListTileState extends State<_NewsListTile> {
                       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                       decoration: BoxDecoration(
                         color:        widget.color.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: AppRadius.smR,
                       ),
                       child: Text(
                         widget.type.toUpperCase(),
@@ -4250,7 +4250,7 @@ class _NewsDetailSheetState extends State<_NewsDetailSheet> {
               width: 44, height: 44,
               decoration: BoxDecoration(
                 color:        color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppRadius.mdR,
               ),
               child: Center(
                 child: emoji.isNotEmpty
@@ -4279,7 +4279,7 @@ class _NewsDetailSheetState extends State<_NewsDetailSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
               color:        color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppRadius.smR,
             ),
             child: Text(
               type.toUpperCase(),

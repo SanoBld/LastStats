@@ -1,5 +1,8 @@
 // ignore_for_file: unused_import
 part of 'home_screen.dart';
+// Story-style shared design tokens (typography, radii, motion) — see
+// lib/theme/story_style.dart. Applied here so every screen using these
+// shared widgets automatically matches the recap story's look.
 
 // ── Reusable entrance animation: fade + subtle upward slide ──────────────────
 // Wrap any list item with this to get a gentle slide-in on first render.
@@ -236,13 +239,10 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
     return Row(children: [
       Icon(icon, size: 18, color: scheme.primary),
       const SizedBox(width: 8),
-      Text(title,
-          style: text.titleSmall?.copyWith(
-              fontWeight: FontWeight.w800, color: scheme.onSurface)),
+      Text(title, style: AppText.itemTitle.copyWith(color: scheme.onSurface)),
       const SizedBox(width: 10),
       Expanded(
         child: Divider(
@@ -264,26 +264,24 @@ class _ItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
     return InkWell(
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: AppRadius.mdR,
       child: Padding(padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
         child: Row(children: [
           SizedBox(width: 28, child: Text(rank, textAlign: TextAlign.center,
-              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant, fontWeight: FontWeight.w700))),
+              style: AppText.label.copyWith(color: scheme.onSurfaceVariant))),
           const SizedBox(width: 8),
-          _SmartImage(size: 48, borderRadius: 8, initialUrl: imageUrl,
+          _SmartImage(size: 48, borderRadius: AppRadius.sm, initialUrl: imageUrl,
               resolver: imageFuture != null ? () => imageFuture! : () => Future.value('')),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                style: AppText.itemTitle.copyWith(fontSize: 14, color: scheme.onSurface)),
             Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis,
-                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                style: AppText.label.copyWith(color: scheme.onSurfaceVariant)),
           ])),
           if (plays != null) Padding(padding: const EdgeInsets.only(left: 8),
-            child: Text(plays!, style: text.bodySmall
-                ?.copyWith(color: scheme.primary, fontWeight: FontWeight.w600))),
+            child: Text(plays!, style: AppText.body.copyWith(color: scheme.primary))),
         ])));
   }
 }

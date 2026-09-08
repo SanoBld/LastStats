@@ -287,7 +287,7 @@ class _AchvMilestoneTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppRadius.lgR,
         color: scheme.surfaceContainerHigh,
       ),
       child: Row(

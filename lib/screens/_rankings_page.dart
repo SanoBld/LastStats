@@ -326,7 +326,7 @@ class _TopListBodyState extends State<_TopListBody>
             }
             return InkWell(
               onTap: () { _haptic(_HapticImpact.light); _showDetail(ctx, item); },
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppRadius.smR,
               child: _FadeSlideIn(
                 // Stagger each item slightly for a cascade effect
                 delay: Duration(milliseconds: (idx * 25).clamp(0, 250)),
@@ -426,7 +426,7 @@ class _PodiumWidget extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
                         decoration: BoxDecoration(
                           color: podOn.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: AppRadius.xlR,
                         ),
                         child: Text('#${di + 1}', style: text.labelSmall?.copyWith(
                             color: podOn, fontWeight: FontWeight.w800)),

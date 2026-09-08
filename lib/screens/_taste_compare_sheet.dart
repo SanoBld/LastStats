@@ -784,7 +784,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: scheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: AppRadius.xlR,
                       border: Border.all(color: scheme.outlineVariant),
                     ),
                     child: Text(
@@ -949,7 +949,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
                     padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
                     decoration: BoxDecoration(
                       color:        scheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: AppRadius.xlR,
                     ),
                     child: Text(
                       '${widget.totalCount}',
@@ -1035,7 +1035,7 @@ class _RankedListTile extends StatelessWidget {
     };
 
     return InkWell(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: AppRadius.mdR,
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -1178,7 +1178,7 @@ class _ItemCompareSheet extends StatelessWidget {
           children: [
             // Tap the header again to open the full item page (bio, top tracks, etc).
             InkWell(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: AppRadius.xlR,
               onTap: () { _haptic(_HapticImpact.light); showDetailSheet(context, _asLastFmItem, _detailType, service); },
               child: Padding(
                 padding: const EdgeInsets.all(8),
@@ -1498,7 +1498,7 @@ class _TopMatchCard extends StatelessWidget {
       child: Row(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppRadius.mdR,
             child: SizedBox(
               width: 52, height: 52,
               child: _ResolvedImage(
@@ -1574,7 +1574,7 @@ class _CountPill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color:        scheme.secondaryContainer,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppRadius.xlR,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

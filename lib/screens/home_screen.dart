@@ -69,6 +69,7 @@ import 'settings/faq_page.dart';
 import 'settings/sync_page.dart';
 import 'settings/battery_saver_page.dart';
 import '../services/widget_service.dart';
+import '../theme/story_style.dart';
 
 // Parts
 part '_dashboard_page.dart';

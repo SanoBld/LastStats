@@ -195,7 +195,7 @@ class _SearchPageState extends State<_SearchPage> {
                   filled:    true,
                   fillColor: scheme.surfaceContainerHighest,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: AppRadius.lgR,
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -417,7 +417,7 @@ class _SearchPageState extends State<_SearchPage> {
 
         return InkWell(
           onTap: () => _openMusicDetail(context, normalized, type),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: AppRadius.smR,
           child: _FadeSlideIn(
             delay: Duration(milliseconds: (i * 25).clamp(0, 250)),
             child: _ItemTile(name: name, sub: sub, imageUrl: imgRaw, imageFuture: imgF, rank: '${i + 1}'),

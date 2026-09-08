@@ -714,7 +714,7 @@ class _SettingsPageState extends State<_SettingsPage> {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: scheme.primaryContainer.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: AppRadius.xlR,
                     border: Border.all(color: scheme.primary.withValues(alpha: 0.2)),
                   ),
                   child: Row(children: [
@@ -907,13 +907,13 @@ class _CategoryCard extends StatelessWidget {
 
     return Material(
       color: scheme.surfaceContainerHighest,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: AppRadius.xlR,
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppRadius.xlR,
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: AppRadius.xlR,
             border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45)),
           ),
           padding: EdgeInsets.all(cardPad),
@@ -1016,7 +1016,7 @@ class _RestartNotice extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppRadius.mdR,
         border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
       ),
       child: Row(children: [

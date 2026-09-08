@@ -11,6 +11,7 @@ import '../services/data_cache.dart';
 import '../services/image_service.dart';
 import '../services/lastfm_service.dart';
 import 'home_screen.dart' show showDetailSheet;
+import '../theme/story_style.dart';
 
 enum _SortMode { recent, oldest, artistAz, titleAz }
 
@@ -129,7 +130,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                   decoration: InputDecoration(
                     hintText:   L.favSearchHint,
                     prefixIcon: const Icon(Icons.search_rounded),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(borderRadius: AppRadius.mdR),
                     isDense: true,
                   ),
                   onChanged: (v) => setState(() => _query = v),
@@ -222,7 +223,7 @@ class _FavoriteListTile extends StatelessWidget {
     return ListTile(
       onTap: onTap,
       leading: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppRadius.smR,
         child: SizedBox(
           width: 44, height: 44,
           child: FutureBuilder<String>(

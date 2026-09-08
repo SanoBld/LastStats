@@ -17,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/lastfm_service.dart';
 import '../services/image_service.dart';
 import '../l10n/l10n.dart';
+import '../theme/story_style.dart';
 
 // Callback used to open the existing item detail sheet (artist/album/track).
 // Passed in by the caller since that sheet lives in home_screen.dart's part
@@ -641,7 +642,7 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Stack(children: [
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: AppRadius.mdR,
                       child: _ItemImg(item: item, type: type, size: 104, round: false),
                     ),
                     Positioned(
@@ -651,7 +652,7 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: scheme.surface.withValues(alpha: 0.85),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: AppRadius.smR,
                         ),
                         child: Text('#$rank',
                             style: TextStyle(
@@ -687,7 +688,7 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
         decoration: BoxDecoration(
           color: selected ? scheme.primary : scheme.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: AppRadius.xlR,
         ),
         child: Text(label,
             style: TextStyle(
@@ -704,7 +705,7 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         color: scheme.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppRadius.lgR,
       ),
       child: Column(children: [
         Text(value,
@@ -857,7 +858,7 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: scheme.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: AppRadius.lgR,
         ),
         child: Row(children: [
           ClipOval(child: _ItemImg(item: item, type: type, size: 44, round: true)),
@@ -1177,7 +1178,7 @@ class _ShareCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
           color: scheme.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadius.mdR,
         ),
         child: Column(children: [
           Text(value, style: TextStyle(color: scheme.onSurface, fontSize: 15, fontWeight: FontWeight.w800)),

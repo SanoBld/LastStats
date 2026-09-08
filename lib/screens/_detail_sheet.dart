@@ -937,7 +937,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
             decoration: BoxDecoration(
               color: scheme.primary,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: AppRadius.xlR,
             ),
             child: Text(
               switch (widget.type) {
@@ -1194,7 +1194,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
             decoration: BoxDecoration(
               color:        scheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: AppRadius.xlR,
               border:       Border.all(color: scheme.outlineVariant),
             ),
             child: Text(name, style: TextStyle(
@@ -1354,7 +1354,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                           backgroundColor: scheme.surfaceContainerHighest,
                           foregroundColor: scheme.onSurfaceVariant,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20)),
+                              borderRadius: AppRadius.xlR),
                         ),
                       ),
                     ),
@@ -1480,7 +1480,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             return _FadeSlideIn(
               delay: Duration(milliseconds: i * 55),
               child: InkWell(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppRadius.smR,
                 onTap: () {
                   final item = Map<String, dynamic>.from(t);
                   item['artist'] ??= {'name': _name};
@@ -1572,7 +1572,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: AppRadius.smR,
                         child: AspectRatio(
                           aspectRatio: 1,
                           child: _SmartImage(
@@ -2923,7 +2923,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
           decoration: BoxDecoration(
             color: scheme.primary,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: AppRadius.xlR,
           ),
           child: const Text(
             'Profil',
@@ -2958,7 +2958,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
               color:        Colors.greenAccent.shade400.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: AppRadius.xlR,
               border:       Border.all(color: Colors.greenAccent.shade400),
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -3079,7 +3079,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           onPressed: () => showTasteCompareSheet(ctx, widget.username, widget.service),
           style: FilledButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape: RoundedRectangleBorder(borderRadius: AppRadius.lgR),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -3194,7 +3194,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           ),
           child: Row(children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppRadius.smR,
               child: hasImg
                   ? Image.network(rawUrl, width: 46, height: 46, fit: BoxFit.cover,
                       cacheWidth: 138, cacheHeight: 138, // decode ~3x for high-DPI, not full-size
@@ -3352,7 +3352,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
         child: Row(children: [
           Stack(children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppRadius.smR,
               child: hasImg
                   ? Image.network(rawUrl, width: 44, height: 44, fit: BoxFit.cover,
                       cacheWidth: 132, cacheHeight: 132, // decode ~3x for high-DPI, not full-size
@@ -3440,7 +3440,7 @@ class _ProfileStatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
-          color: bg, borderRadius: BorderRadius.circular(14)),
+          color: bg, borderRadius: AppRadius.lgR),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         Icon(icon, size: 18, color: fg.withValues(alpha: 0.8)),
         const SizedBox(height: 5),

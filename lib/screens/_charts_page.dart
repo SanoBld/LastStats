@@ -568,7 +568,7 @@ class _ChartsPageState extends State<_ChartsPage>
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: scheme.tertiaryContainer,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: AppRadius.xlR,
                 ),
                 child: Text('Beta',
                     style: txt.labelSmall?.copyWith(
@@ -718,7 +718,7 @@ class _ChartsPageState extends State<_ChartsPage>
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                 decoration: BoxDecoration(
                   color: scheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: AppRadius.xlR,
                 ),
                 child: Text(yearLabel, style: TextStyle(
                     fontSize: 14, fontWeight: FontWeight.w800,
@@ -1134,7 +1134,7 @@ class _ChartsPageState extends State<_ChartsPage>
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: s.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: AppRadius.lgR,
           border: Border.all(color: s.outlineVariant.withValues(alpha: 0.45), width: 1),
         ),
         child: Row(children: [
@@ -1601,7 +1601,7 @@ BoxDecoration _chartCardDecoration(ColorScheme s) => BoxDecoration(
     end:   Alignment.bottomRight,
     colors: [s.surfaceContainerHigh, s.surfaceContainer],
   ),
-  borderRadius: BorderRadius.circular(20),
+  borderRadius: AppRadius.xlR,
   border: Border.all(color: s.outlineVariant.withValues(alpha: 0.35), width: 1),
   boxShadow: [
     BoxShadow(
@@ -2634,7 +2634,7 @@ class _StreakCard extends StatelessWidget {
                     height: 7,
                     decoration: BoxDecoration(
                       color: s.surfaceContainerHigh,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: AppRadius.smR,
                     ),
                   ),
                   FractionallySizedBox(
@@ -2643,7 +2643,7 @@ class _StreakCard extends StatelessWidget {
                       height: 7,
                       decoration: BoxDecoration(
                         gradient: _barGradient(s.primary, vertical: false),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: AppRadius.smR,
                       ),
                     ),
                   ),
