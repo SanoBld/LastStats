@@ -998,8 +998,11 @@ class _ChartsPageState extends State<_ChartsPage>
 
         final totalDays = heatmapEnd.difference(heatmapStart).inDays + 1;
         final weeks     = ((totalDays + 6) / 7).ceil();
-        // Mirrors _HeatmapCard's own cell(10) + gap(1.5) sizing, plus padding.
-        final naturalWidth = 40.0 + weeks * 11.5;
+        // Rows now stack one per year, so width only needs to fit a single
+        // year's worth of weeks (max 53) plus the year-label gutter, not
+        // the full multi-year span.
+        final maxWeeksInAnyYear = weeks > 53 ? 53.0 : weeks.toDouble();
+        final naturalWidth = 60.0 + maxWeeksInAnyYear * 11.5;
 
         final child = _HeatmapCard(
           data: calendarForView ?? const <String, int>{},
@@ -3079,19 +3082,14 @@ class _HeatmapCard extends StatelessWidget {
   static const _cell = 10.0;
   static const _gap  = 1.5;
 
-  @override
-  Widget build(BuildContext context) {
-    final s      = Theme.of(context).colorScheme;
-    final t      = Theme.of(context).textTheme;
-    final maxVal = data.values.fold(0, (a, b) => a > b ? a : b);
-
-    final startDay   = DateTime(start.year, start.month, start.day);
-    final endDay     = DateTime(end.year, end.month, end.day);
-    final startWd    = startDay.weekday;
-    final totalDays  = endDay.difference(startDay).inDays + 1;
+  // One year's worth of week columns + month labels, laid out exactly like
+  // GitHub's contribution graph: 7 rows (days) × N columns (weeks).
+  Widget _yearBlock(BuildContext context, ColorScheme s, TextTheme t,
+      DateTime yearStart, DateTime yearEnd, int maxVal) {
+    final startWd    = yearStart.weekday;
+    final totalDays  = yearEnd.difference(yearStart).inDays + 1;
     final totalCells = (startWd - 1) + totalDays;
     final weeks      = (totalCells / 7).ceil();
-    final spansYears = endDay.year != startDay.year;
 
     final weekColumns = List.generate(weeks, (col) {
       return List.generate(7, (row) {
@@ -3101,24 +3099,105 @@ class _HeatmapCard extends StatelessWidget {
       });
     });
 
-    // Month label for the week column where each month begins. January
-    // also carries the year so multi-year spans stay readable.
     final monthStarts = <int, String>{};
-    final yearBoundaryCols = <int>{};
-    var cursor = DateTime(startDay.year, startDay.month, 1);
-    while (!cursor.isAfter(endDay)) {
-      final off = cursor.difference(startDay).inDays + (startWd - 1);
-      if (off >= 0) {
-        final col = off ~/ 7;
-        monthStarts[col] = spansYears && cursor.month == 1
-            ? '${L.months[cursor.month]} ${cursor.year}'
-            : L.months[cursor.month];
-        if (cursor.month == 1 && cursor.year != startDay.year) {
-          yearBoundaryCols.add(col);
-        }
-      }
+    var cursor = DateTime(yearStart.year, yearStart.month, 1);
+    while (!cursor.isAfter(yearEnd)) {
+      final off = cursor.difference(yearStart).inDays + (startWd - 1);
+      if (off >= 0) monthStarts[off ~/ 7] = L.months[cursor.month];
       cursor = DateTime(cursor.year, cursor.month + 1, 1);
     }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Year label, left-aligned, vertically centered on the grid.
+        Padding(
+          padding: const EdgeInsets.only(right: 8, top: 14),
+          child: SizedBox(
+            width: 34,
+            child: Text('${yearStart.year}',
+                style: t.labelSmall?.copyWith(
+                    fontSize: 11, fontWeight: FontWeight.w800, color: s.primary)),
+          ),
+        ),
+        ...weekColumns.asMap().entries.map((entry) {
+          final col  = entry.key;
+          final days = entry.value;
+          return Padding(
+            padding: const EdgeInsets.only(right: _gap),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 14,
+                  child: monthStarts.containsKey(col)
+                      ? Text(
+                          monthStarts[col]!,
+                          style: t.labelSmall?.copyWith(
+                            fontSize: 8,
+                            color: s.onSurfaceVariant.withValues(alpha: 0.65),
+                            fontWeight: FontWeight.w700,
+                          ),
+                        )
+                      : null,
+                ),
+                const SizedBox(height: 2),
+                ...days.map((offset) {
+                  if (offset == null) {
+                    return SizedBox(width: _cell, height: _cell + _gap);
+                  }
+                  final d   = yearStart.add(Duration(days: offset));
+                  final key = '${d.year}-'
+                      '${d.month.toString().padLeft(2, '0')}-'
+                      '${d.day.toString().padLeft(2, '0')}';
+                  final count = data[key] ?? 0;
+                  final ratio = (maxVal > 0 && count > 0) ? count / maxVal : 0.0;
+                  final scaled = ratio > 0 ? sqrt(ratio).clamp(0.0, 1.0) : 0.0;
+                  final color = count == 0
+                      ? s.surfaceContainerHigh
+                      : Color.lerp(s.primaryContainer, s.primary,
+                          (scaled * 0.85 + 0.15).clamp(0.0, 1.0))!;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: _gap),
+                    child: Tooltip(
+                      message: count > 0
+                          ? '${d.day}/${d.month}/${d.year} — $count scrobbles' : '',
+                      child: Container(
+                        width: _cell, height: _cell,
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(2.5),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s      = Theme.of(context).colorScheme;
+    final t      = Theme.of(context).textTheme;
+    final maxVal = data.values.fold(0, (a, b) => a > b ? a : b);
+
+    final startDay = DateTime(start.year, start.month, start.day);
+    final endDay   = DateTime(end.year, end.month, end.day);
+
+    // One row per calendar year (GitHub-style stacked blocks) instead of one
+    // continuous horizontal strip — a multi-year "all time" span used to
+    // require scrolling very far right and got visually cut off in exports.
+    final years = [for (var y = startDay.year; y <= endDay.year; y++) y];
+    final yearBlocks = years.map((y) {
+      final yearStart = y == startDay.year ? startDay : DateTime(y, 1, 1);
+      final yearEnd   = y == endDay.year ? endDay : DateTime(y, 12, 31);
+      return _yearBlock(context, s, t, yearStart, yearEnd, maxVal);
+    }).toList();
 
     return Container(
       decoration: _chartCardDecoration(s),
@@ -3129,88 +3208,14 @@ class _HeatmapCard extends StatelessWidget {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
-            child: Row(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: weekColumns.asMap().entries.map((entry) {
-                final col  = entry.key;
-                final days = entry.value;
-                final isYearStart = yearBoundaryCols.contains(col);
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Thin separator before a new year, columns stay glued
-                    if (isYearStart)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 4),
-                        child: SizedBox(
-                          height: _cell + 16,
-                          child: VerticalDivider(
-                            width: 1, thickness: 1,
-                            color: s.primary.withValues(alpha: 0.35),
-                          ),
-                        ),
-                      ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: _gap),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Month label or empty placeholder
-                          SizedBox(
-                            height: 14,
-                            child: monthStarts.containsKey(col)
-                                ? Text(
-                                    monthStarts[col]!,
-                                    style: t.labelSmall?.copyWith(
-                                      fontSize: 8,
-                                      color: isYearStart
-                                          ? s.primary
-                                          : s.onSurfaceVariant.withValues(alpha: 0.65),
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  )
-                                : null,
-                          ),
-                          const SizedBox(height: 2),
-                          ...days.map((offset) {
-                            if (offset == null) {
-                              return SizedBox(width: _cell, height: _cell + _gap);
-                            }
-                            final d   = startDay.add(Duration(days: offset));
-                            final key = '${d.year}-'
-                                '${d.month.toString().padLeft(2, '0')}-'
-                                '${d.day.toString().padLeft(2, '0')}';
-                            final count = data[key] ?? 0;
-                            final ratio = (maxVal > 0 && count > 0)
-                                ? count / maxVal : 0.0;
-                            final scaled = ratio > 0
-                                ? sqrt(ratio).clamp(0.0, 1.0) : 0.0;
-                            final color = count == 0
-                                ? s.surfaceContainerHigh
-                                : Color.lerp(
-                                    s.primaryContainer, s.primary,
-                                    (scaled * 0.85 + 0.15).clamp(0.0, 1.0))!;
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: _gap),
-                              child: Tooltip(
-                                message: count > 0
-                                    ? '${d.day}/${d.month}/${d.year} — $count scrobbles' : '',
-                                child: Container(
-                                  width: _cell, height: _cell,
-                                  decoration: BoxDecoration(
-                                    color: color,
-                                    borderRadius: BorderRadius.circular(2.5),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              }).toList(),
+              children: [
+                for (var i = 0; i < yearBlocks.length; i++) ...[
+                  if (i > 0) const SizedBox(height: 10),
+                  yearBlocks[i],
+                ],
+              ],
             ),
           ),
           const SizedBox(height: 10),
