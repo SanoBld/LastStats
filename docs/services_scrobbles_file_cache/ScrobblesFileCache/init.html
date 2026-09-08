@@ -99,6 +99,8 @@
     }
     final parsed = await compute(_decodeYearsRecords, rawByYear);
     _years.addAll(parsed);
+    final okFlags = await compute(_decodeYearsOkFlags, rawByYear);
+    _yearOk.addAll(okFlags);
 
     debugPrint(&#39;[ScrobblesCache] ${_years.length} année(s) chargée(s) &#39;
         &#39;(${getTotalScrobbleCount()} scrobbles).&#39;);

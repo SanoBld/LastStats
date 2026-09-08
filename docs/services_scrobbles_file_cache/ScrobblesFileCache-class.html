@@ -276,11 +276,9 @@
 
 </dt>
 <dd>
-  Vrai si tous les records de <code>year</code> ont leurs métadonnées (track+artist).
-Une année sans aucun scrobble (liste vide) est considérée complète :
-elle a bien été chargée depuis l'API, il n'y avait simplement rien.
-Retourne false uniquement si la clé est absente (jamais chargée) ou si
-au moins un record manque ses métadonnées (ancien cache v1).
+  Vrai si tous les records de <code>year</code> ont leurs métadonnées (track+artist)
+ET si le téléchargement de cette année s'est terminé sans erreur.
+Retourne false si :
   
 
 </dd>
@@ -313,14 +311,17 @@ Seul <a href="../services_scrobbles_file_cache/ScrobblesFileCache/clear.html">cl
 </dd>
 
         <dt id="setYear" class="callable">
-  <span class="name"><a href="../services_scrobbles_file_cache/ScrobblesFileCache/setYear.html">setYear</a></span><span class="signature">(<wbr><span class="parameter" id="setYear-param-year"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">year</span>, </span><span class="parameter" id="setYear-param-records"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../services_scrobbles_file_cache/ScrobbleRecord-class.html">ScrobbleRecord</a></span>&gt;</span></span> <span class="parameter-name">records</span></span>)
+  <span class="name"><a href="../services_scrobbles_file_cache/ScrobblesFileCache/setYear.html">setYear</a></span><span class="signature">(<wbr><span class="parameter" id="setYear-param-year"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">year</span>, </span><span class="parameter" id="setYear-param-records"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../services_scrobbles_file_cache/ScrobbleRecord-class.html">ScrobbleRecord</a></span>&gt;</span></span> <span class="parameter-name">records</span>, {</span><span class="parameter" id="setYear-param-complete"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">complete</span> = <span class="default-value">true</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
   </span>
   
 
 </dt>
 <dd>
-  
+  Save one year of scrobbles.
+<code>complete</code> tells if the download really finished (true) or broke early
+because of a network error (false). Keep it true by default so nothing
+else in the app has to change.
   
 
 </dd>

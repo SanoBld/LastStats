@@ -99,6 +99,10 @@ Stocke les records complets (ts + track + artist + album).</p>
   final records = &lt;ScrobbleRecord&gt;[];
   int page       = 1;
   int totalPages = 1;
+  &#47;&#47; Stays true only if we read every page with no error. If a page fails
+  &#47;&#47; (network blip, rate limit...) we set this to false so the year is not
+  &#47;&#47; wrongly saved as &quot;done&quot; -&gt; it will be retried on the next full sync.
+  bool finishedOk = true;
 
   try {
     do {
@@ -144,12 +148,16 @@ Stocke les records complets (ts + track + artist + album).</p>
         if (page &lt;= totalPages) await Future.delayed(_delay);
       } catch (e) {
         debugPrint(&#39;[AllScrobbles] Erreur année=$year page=$page : $e&#39;);
+        finishedOk = false; &#47;&#47; page fetch broke -&gt; year is not fully loaded
         break;
       }
     } while (page &lt;= totalPages);
 
     records.sort((a, b) =&gt; a.ts.compareTo(b.ts));
-    await ScrobblesFileCache.setYear(year, records);
+    await ScrobblesFileCache.setYear(year, records, complete: finishedOk);
+    &#47;&#47; Always list the year in meta so its file gets re-read at app start,
+    &#47;&#47; even if broken -- the &quot;ok&quot; flag inside the file itself (see above)
+    &#47;&#47; is what tells the app to retry it, not whether it&#39;s in this list.
     await _updateMeta(year);
     return records;
   } finally {

@@ -55,26 +55,36 @@
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
-<span class="name ">setYear</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="setYear-param-year"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">year</span>, </span></li>
-<li><span class="parameter" id="setYear-param-records"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../services_scrobbles_file_cache/ScrobbleRecord-class.html">ScrobbleRecord</a></span>&gt;</span></span> <span class="parameter-name">records</span></span></li>
-</ol>)
+<span class="name ">setYear</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="setYear-param-year"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">year</span>, </span></li>
+<li><span class="parameter" id="setYear-param-records"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../services_scrobbles_file_cache/ScrobbleRecord-class.html">ScrobbleRecord</a></span>&gt;</span></span> <span class="parameter-name">records</span>, {</span></li>
+<li><span class="parameter" id="setYear-param-complete"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">complete</span> = <span class="default-value">true</span>, </span></li>
+</ol>})
 
       
 
     </section>
     
+<section class="desc markdown">
+  <p>Save one year of scrobbles.
+<code>complete</code> tells if the download really finished (true) or broke early
+because of a network error (false). Keep it true by default so nothing
+else in the app has to change.</p>
+</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; setYear(int year, List&lt;ScrobbleRecord&gt; records) async {
-  _years[year] = records;
+  <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; setYear(int year, List&lt;ScrobbleRecord&gt; records,
+    {bool complete = true}) async {
+  _years[year]   = records;
+  _yearOk[year]  = complete;
   try {
     final ts      = DateTime.now().millisecondsSinceEpoch;
     final payload = jsonEncode({
       &#39;v&#39;:    _fileVersion,
       &#39;ts&#39;:   ts,   &#47;&#47; date d&#39;écriture (informatif)
+      &#39;ok&#39;:   complete, &#47;&#47; did the download finish without error?
       &#39;data&#39;: records.map((r) =&gt; r.toList()).toList(),
     });
     await CacheBackend.write(_yearKey(year), payload);

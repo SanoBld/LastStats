@@ -63,11 +63,19 @@
     </section>
     
 <section class="desc markdown">
-  <p>Vrai si tous les records de <code>year</code> ont leurs métadonnées (track+artist).
-Une année sans aucun scrobble (liste vide) est considérée complète :
-elle a bien été chargée depuis l'API, il n'y avait simplement rien.
-Retourne false uniquement si la clé est absente (jamais chargée) ou si
-au moins un record manque ses métadonnées (ancien cache v1).</p>
+  <p>Vrai si tous les records de <code>year</code> ont leurs métadonnées (track+artist)
+ET si le téléchargement de cette année s'est terminé sans erreur.
+Retourne false si :</p>
+<ul>
+<li>la clé est absente (jamais chargée),</li>
+<li>le téléchargement a été coupé par une erreur réseau (voir <code>_yearOk</code>,
+rempli par setYear(..., complete: false)) — sinon une année qui a
+planté au milieu du téléchargement reste bloquée pour toujours avec
+seulement une poignée de scrobbles, et n'est jamais retentée,</li>
+<li>au moins un record manque ses métadonnées (ancien cache v1).
+Une année sans aucun scrobble (liste vide) MAIS bien terminée est
+considérée complète : elle a bien été chargée, il n'y avait rien.</li>
+</ul>
 </section>
 
 
@@ -77,6 +85,7 @@ au moins un record manque ses métadonnées (ancien cache v1).</p>
   <pre class="language-dart"><code class="language-dart">static bool isYearComplete(int year) {
   final records = _years[year];
   if (records == null) return false;          &#47;&#47; jamais chargée
+  if (_yearOk[year] == false) return false;   &#47;&#47; téléchargement cassé
   if (records.isEmpty) return true;           &#47;&#47; année blanche = complète
   return records.every((r) =&gt; r.hasMetadata);
 }</code></pre>
