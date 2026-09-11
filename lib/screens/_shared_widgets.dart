@@ -71,11 +71,9 @@ class _FadeSlideInState extends State<_FadeSlideIn>
 class _PressScale extends StatefulWidget {
   final Widget child;
   final VoidCallback? onTap;
-  final double downScale;
   const _PressScale({
     required this.child,
     this.onTap,
-    this.downScale = 0.96,
   });
 
   @override
@@ -96,7 +94,7 @@ class _PressScaleState extends State<_PressScale> {
       onTapCancel: widget.onTap == null ? null : () => _setDown(false),
       onTap:       widget.onTap,
       child: AnimatedScale(
-        scale: _down ? widget.downScale : 1.0,
+        scale: _down ? 0.96 : 1.0,
         duration: const Duration(milliseconds: 120),
         curve: Curves.easeOut,
         child: widget.child,
