@@ -74,6 +74,7 @@ the search page's folder tab and the quick "new folder" shortcut above.</p>
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; showFolderEditorSheet(BuildContext context, {FavFolder? existing}) async {
   final nameCtrl = TextEditingController(text: existing?.name ?? &#39;&#39;);
+  final descCtrl = TextEditingController(text: existing?.description ?? &#39;&#39;);
   String emoji   = existing?.emoji ?? kFavFolderEmojis.first;
   int colorValue = existing?.colorValue ?? kFavFolderColors.first;
 
@@ -87,7 +88,8 @@ the search page's folder tab and the quick "new folder" shortcut above.</p>
           left: 20, right: 20, top: 20,
           bottom: 20 + MediaQuery.of(ctx).viewInsets.bottom,
         ),
-        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+        child: SingleChildScrollView(
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(existing == null ? L.favFolderNew : L.favFolderEdit,
               style: Theme.of(ctx).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
           const SizedBox(height: 16),
@@ -114,6 +116,16 @@ the search page's folder tab and the quick "new folder" shortcut above.</p>
               ),
             ),
           ]),
+          const SizedBox(height: 12),
+          TextField(
+            controller: descCtrl,
+            maxLines: 2,
+            decoration: InputDecoration(
+              hintText: L.favFolderDescPlaceholder,
+              border: OutlineInputBorder(borderRadius: AppRadius.smR),
+              isDense: true,
+            ),
+          ),
           const SizedBox(height: 18),
           Text(L.favFolderEmoji, style: Theme.of(ctx).textTheme.labelMedium
               ?.copyWith(color: scheme.onSurfaceVariant)),
@@ -194,18 +206,21 @@ the search page's folder tab and the quick "new folder" shortcut above.</p>
             ),
           ]),
         ]),
+        ),
       );
     }),
   );
 
   if (result != true) return;
   final name = nameCtrl.text.trim();
+  final desc = descCtrl.text.trim();
   if (existing == null) {
     if (name.isEmpty) return;
-    await FavoritesFoldersService.createFolder(name, emoji, colorValue);
+    await FavoritesFoldersService.createFolder(name, emoji, colorValue, description: desc);
   } else {
     await FavoritesFoldersService.updateFolder(existing.id,
-        name: name.isEmpty ? existing.name : name, emoji: emoji, colorValue: colorValue);
+        name: name.isEmpty ? existing.name : name, emoji: emoji, colorValue: colorValue,
+        description: desc);
   }
 }</code></pre>
 </section>

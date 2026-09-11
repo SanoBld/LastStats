@@ -84,7 +84,13 @@
   if (folderIds.isEmpty) {
     updatedMeta.remove(key);
   } else if (meta != null) {
-    updatedMeta[key] = meta;
+    &#47;&#47; Keep the original &quot;added&quot; time if this item was already saved
+    &#47;&#47; somewhere, so re-toggling a folder doesn&#39;t bump it to the top.
+    final existing = updatedMeta[key];
+    updatedMeta[key] = existing != null
+        ? FolderItem(key: key, name: meta.name, artist: meta.artist,
+            image: meta.image, addedAt: existing.addedAt)
+        : meta;
   }
   metaNotifier.value = updatedMeta;
   await _persistMeta();

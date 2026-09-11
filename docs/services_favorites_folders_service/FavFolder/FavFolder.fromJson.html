@@ -64,10 +64,11 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">factory FavFolder.fromJson(Map&lt;String, dynamic&gt; j) =&gt; FavFolder(
-  id:         (j[&#39;id&#39;]    ?? &#39;&#39;).toString(),
-  name:       (j[&#39;name&#39;]  ?? &#39;&#39;).toString(),
-  emoji:      (j[&#39;emoji&#39;] ?? &#39;📁&#39;).toString(),
-  colorValue: (j[&#39;color&#39;] is num) ? (j[&#39;color&#39;] as num).toInt() : 0xFF6750A4,
+  id:          (j[&#39;id&#39;]    ?? &#39;&#39;).toString(),
+  name:        (j[&#39;name&#39;]  ?? &#39;&#39;).toString(),
+  emoji:       (j[&#39;emoji&#39;] ?? &#39;📁&#39;).toString(),
+  colorValue:  (j[&#39;color&#39;] is num) ? (j[&#39;color&#39;] as num).toInt() : 0xFF6750A4,
+  description: (j[&#39;desc&#39;]  ?? &#39;&#39;).toString(),
 );</code></pre>
 </section>
 

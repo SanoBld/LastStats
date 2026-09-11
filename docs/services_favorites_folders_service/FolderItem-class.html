@@ -54,8 +54,8 @@
 
     
 <section class="desc markdown">
-  <p>Small snapshot of a saved item, just enough to show it in a folder list
-without needing to hit the API again.</p>
+  <p>Small snapshot of a saved track, just enough to show it in a folder list
+without needing to hit the API again. Folders only hold tracks.</p>
 </section>
 
 
@@ -65,7 +65,7 @@ without needing to hit the API again.</p>
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
         <dt id="FolderItem.new" class="callable">
-          <span class="name"><a href="../services_favorites_folders_service/FolderItem/FolderItem.html">FolderItem</a></span><span class="signature">({<span class="parameter" id="param-key"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, </span><span class="parameter" id="param-type"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">type</span>, </span><span class="parameter" id="param-name"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="param-artist"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">artist</span>, </span><span class="parameter" id="param-image"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">image</span></span>})</span>
+          <span class="name"><a href="../services_favorites_folders_service/FolderItem/FolderItem.html">FolderItem</a></span><span class="signature">({<span class="parameter" id="param-key"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, </span><span class="parameter" id="param-name"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="param-artist"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">artist</span>, </span><span class="parameter" id="param-image"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">image</span>, </span><span class="parameter" id="param-addedAt"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">addedAt</span></span>})</span>
         </dt>
         <dd>
           
@@ -85,6 +85,18 @@ without needing to hit the API again.</p>
       id="instance-properties">
     <h2>Properties</h2>
     <dl class="properties">
+        <dt id="addedAt" class="property">
+  <span class="name"><a href="../services_favorites_folders_service/FolderItem/addedAt.html">addedAt</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
         <dt id="artist" class="property">
   <span class="name"><a href="../services_favorites_folders_service/FolderItem/artist.html">artist</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
@@ -154,18 +166,6 @@ without needing to hit the API again.</p>
 <dd class="inherited">
   A representation of the runtime type of the object.
   <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
-
-</dd>
-
-        <dt id="type" class="property">
-  <span class="name"><a href="../services_favorites_folders_service/FolderItem/type.html">type</a></span>
-  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
-  
-
-</dt>
-<dd>
-  
-  <div class="features"><span class="feature">final</span></div>
 
 </dd>
 

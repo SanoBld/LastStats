@@ -206,7 +206,7 @@ unloved, so it doesn't linger orphaned if it's later re-loved.
 </dd>
 
         <dt id="createFolder" class="callable">
-  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/createFolder.html">createFolder</a></span><span class="signature">(<wbr><span class="parameter" id="createFolder-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="createFolder-param-emoji"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">emoji</span>, </span><span class="parameter" id="createFolder-param-colorValue"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">colorValue</span></span>)
+  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/createFolder.html">createFolder</a></span><span class="signature">(<wbr><span class="parameter" id="createFolder-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="createFolder-param-emoji"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">emoji</span>, </span><span class="parameter" id="createFolder-param-colorValue"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">colorValue</span>, {</span><span class="parameter" id="createFolder-param-description"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">description</span> = <span class="default-value">&#39;&#39;</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../services_favorites_folders_service/FavFolder-class.html">FavFolder</a></span>&gt;</span></span>
   </span>
   
@@ -258,15 +258,15 @@ unloved, so it doesn't linger orphaned if it's later re-loved.
 </dd>
 
         <dt id="itemKey" class="callable">
-  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/itemKey.html">itemKey</a></span><span class="signature">(<wbr><span class="parameter" id="itemKey-param-type"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">type</span>, </span><span class="parameter" id="itemKey-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="itemKey-param-artist"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">artist</span></span>)
+  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/itemKey.html">itemKey</a></span><span class="signature">(<wbr><span class="parameter" id="itemKey-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="itemKey-param-artist"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">artist</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
   </span>
   
 
 </dt>
 <dd>
-  Build a stable key for any searchable item. Type is included so a
-track and an artist that share a name never collide.
+  Build a stable key for a track. Kept as a function (rather than just
+using name+artist) in case a non-track key format is ever needed.
   
 
 </dd>
@@ -311,7 +311,7 @@ track and an artist that share a name never collide.
 </dd>
 
         <dt id="updateFolder" class="callable">
-  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/updateFolder.html">updateFolder</a></span><span class="signature">(<wbr><span class="parameter" id="updateFolder-param-id"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">id</span>, {</span><span class="parameter" id="updateFolder-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">name</span>, </span><span class="parameter" id="updateFolder-param-emoji"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">emoji</span>, </span><span class="parameter" id="updateFolder-param-colorValue"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">colorValue</span></span>})
+  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/updateFolder.html">updateFolder</a></span><span class="signature">(<wbr><span class="parameter" id="updateFolder-param-id"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">id</span>, {</span><span class="parameter" id="updateFolder-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">name</span>, </span><span class="parameter" id="updateFolder-param-emoji"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">emoji</span>, </span><span class="parameter" id="updateFolder-param-colorValue"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">colorValue</span>, </span><span class="parameter" id="updateFolder-param-description"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">description</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
   </span>
   

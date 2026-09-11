@@ -65,11 +65,11 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">factory FolderItem.fromJson(String key, Map&lt;String, dynamic&gt; j) =&gt; FolderItem(
-  key:    key,
-  type:   (j[&#39;type&#39;]   ?? &#39;tracks&#39;).toString(),
-  name:   (j[&#39;name&#39;]   ?? &#39;&#39;).toString(),
-  artist: (j[&#39;artist&#39;] ?? &#39;&#39;).toString(),
-  image:  (j[&#39;image&#39;]  ?? &#39;&#39;).toString(),
+  key:     key,
+  name:    (j[&#39;name&#39;]   ?? &#39;&#39;).toString(),
+  artist:  (j[&#39;artist&#39;] ?? &#39;&#39;).toString(),
+  image:   (j[&#39;image&#39;]  ?? &#39;&#39;).toString(),
+  addedAt: (j[&#39;addedAt&#39;] is num) ? (j[&#39;addedAt&#39;] as num).toInt() : 0,
 );</code></pre>
 </section>
 
