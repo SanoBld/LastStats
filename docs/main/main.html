@@ -72,6 +72,7 @@
     &#47;&#47; zone terminates the whole process (unlike mobile, which just drops
     &#47;&#47; the frame) — this was the main source of the reported PC crashes.
     debugPrint(&#39;Uncaught error: $error&#39;);
+    CrashLogService.instance.logError(error, stack, context: &#39;zone&#39;);
   });
 }</code></pre>
 </section>
