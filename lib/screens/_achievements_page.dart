@@ -599,13 +599,16 @@ class _LevelHistoryPage extends StatelessWidget {
                 final date = DateTime.fromMillisecondsSinceEpoch(ts * 1000);
                 final dateStr = '${date.day.toString().padLeft(2, '0')}/'
                     '${date.month.toString().padLeft(2, '0')}/${date.year}';
-                return ListTile(
+                return _FadeSlideIn(
+                  delay: _staggerDelay(i),
+                  child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor: scheme.primaryContainer,
                     child: Text('$level', style: AppText.body.copyWith(color: scheme.onPrimaryContainer)),
                   ),
                   title: Text(_ct('Niveau $level', 'Level $level')),
                   trailing: Text(dateStr, style: TextStyle(color: scheme.onSurfaceVariant)),
+                  ),
                 );
               },
             ),

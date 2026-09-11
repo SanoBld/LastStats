@@ -4,6 +4,12 @@ part of 'home_screen.dart';
 // lib/theme/story_style.dart. Applied here so every screen using these
 // shared widgets automatically matches the recap story's look.
 
+// ── Small helper: capped stagger delay for long lists ────────────────────────
+// Using `i * 35ms` directly on a 200-item list would mean the last item
+// waits 7 seconds to appear, so we cap how far the delay grows.
+Duration _staggerDelay(int index) =>
+    Duration(milliseconds: index.clamp(0, 10) * 35);
+
 // ── Reusable entrance animation: fade + subtle upward slide ──────────────────
 // Wrap any list item with this to get a gentle slide-in on first render.
 class _FadeSlideIn extends StatefulWidget {

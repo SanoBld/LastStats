@@ -121,7 +121,7 @@ class SettingsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    final content = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Padding(
         padding: const EdgeInsets.only(left: 4, bottom: 6),
         child: Text(label.toUpperCase(), style: text.labelSmall?.copyWith(
@@ -137,6 +137,20 @@ class SettingsSection extends StatelessWidget {
         child: Column(children: children),
       ),
     ]);
+
+    // Small one-shot fade + rise on mount so settings pages don't feel
+    // static — every card gently "settles" into place the first time
+    // it's built, no controller/dispose needed since its a plain tween.
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+      builder: (_, v, child) => Opacity(
+        opacity: v,
+        child: Transform.translate(offset: Offset(0, (1 - v) * 12), child: child),
+      ),
+      child: content,
+    );
   }
 }
 

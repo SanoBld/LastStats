@@ -392,7 +392,7 @@ class _PodiumWidget extends StatelessWidget {
             }
             final (podC, podOn) = podiumColors[di];
 
-            return Expanded(child: GestureDetector(
+            return Expanded(child: _PressScale(
               onTap: () { _haptic(_HapticImpact.light); onTap(item); },
               child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
                 ClipRRect(

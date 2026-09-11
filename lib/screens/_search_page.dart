@@ -375,11 +375,14 @@ class _SearchPageState extends State<_SearchPage> {
           final u     = _results[i] as Map<String, dynamic>;
           final uname = (u['name'] ?? '').toString();
           final isFav = _favProfiles.contains(uname);
-          return _SearchUserCard(
-            user:        u,
-            isFav:       isFav,
-            onTap:       () { _haptic(_HapticImpact.light); _openProfile(ctx, uname); },
-            onToggleFav: () => _toggleFavProfile(uname, !isFav),
+          return _FadeSlideIn(
+            delay: _staggerDelay(i),
+            child: _SearchUserCard(
+              user:        u,
+              isFav:       isFav,
+              onTap:       () { _haptic(_HapticImpact.light); _openProfile(ctx, uname); },
+              onToggleFav: () => _toggleFavProfile(uname, !isFav),
+            ),
           );
         },
       );
