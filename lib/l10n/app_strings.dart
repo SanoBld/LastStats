@@ -661,6 +661,21 @@ abstract class AppStrings {
   String get favSortOldest;
   String get favSortArtistAz;
   String get favSortTitleAz;
+
+  // ── Favorites: folders ───────────────────────────────────────────────────
+  String get favFoldersAll;
+  String get favFolderNew;
+  String get favFolderNamePlaceholder;
+  String get favFolderCreate;
+  String get favFolderEdit;
+  String get favFolderDelete;
+  String get favFolderDeleteConfirm;
+  String get favFolderAssignTitle;
+  String get favFolderEmoji;
+  String get favFolderColor;
+  String get favFolderSave;
+  String get favFolderEmpty;
+
   String get rankingsWholeYear;
   String get chartsExportGeneratedOn;
 
