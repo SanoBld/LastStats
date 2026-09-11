@@ -111,7 +111,7 @@ and</li>
 Widget build(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
   final text   = Theme.of(context).textTheme;
-  return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+  final content = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 6),
       child: Text(label.toUpperCase(), style: text.labelSmall?.copyWith(
@@ -127,6 +127,20 @@ Widget build(BuildContext context) {
       child: Column(children: children),
     ),
   ]);
+
+  &#47;&#47; Small one-shot fade + rise on mount so settings pages don&#39;t feel
+  &#47;&#47; static — every card gently &quot;settles&quot; into place the first time
+  &#47;&#47; it&#39;s built, no controller&#47;dispose needed since its a plain tween.
+  return TweenAnimationBuilder&lt;double&gt;(
+    tween: Tween(begin: 0.0, end: 1.0),
+    duration: const Duration(milliseconds: 320),
+    curve: Curves.easeOutCubic,
+    builder: (_, v, child) =&gt; Opacity(
+      opacity: v,
+      child: Transform.translate(offset: Offset(0, (1 - v) * 12), child: child),
+    ),
+    child: content,
+  );
 }</code></pre>
 </section>
 
