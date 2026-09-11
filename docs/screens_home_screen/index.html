@@ -64,6 +64,15 @@
     <section class="summary offset-anchor" id="classes">
       <h2>Classes</h2>
       <dl>
+          <dt id="FoldersBrowser">
+  <span class="name "><a href="../screens_home_screen/FoldersBrowser-class.html">FoldersBrowser</a></span> 
+
+</dt>
+<dd>
+  The Folders tab body: a horizontal chip row to pick/create/edit a
+folder, and below it the list of items saved in the selected folder.
+</dd>
+
           <dt id="HomeScreen">
   <span class="name "><a href="../screens_home_screen/HomeScreen-class.html">HomeScreen</a></span> 
 
@@ -106,6 +115,35 @@
 </dt>
 <dd>
   
+  
+
+</dd>
+
+          <dt id="showFolderAssignSheet" class="callable">
+  <span class="name"><a href="../screens_home_screen/showFolderAssignSheet.html">showFolderAssignSheet</a></span><span class="signature">(<wbr><span class="parameter" id="showFolderAssignSheet-param-context"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, {</span><span class="parameter" id="showFolderAssignSheet-param-type"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">type</span>, </span><span class="parameter" id="showFolderAssignSheet-param-name"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="showFolderAssignSheet-param-artist"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">artist</span>, </span><span class="parameter" id="showFolderAssignSheet-param-image"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">image</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Bottom sheet to save/unsave one item (track, album or artist) into
+folders. Shared between the search page and the music card, so any
+place with a "save to folder" button opens the same picker.
+  
+
+</dd>
+
+          <dt id="showFolderEditorSheet" class="callable">
+  <span class="name"><a href="../screens_home_screen/showFolderEditorSheet.html">showFolderEditorSheet</a></span><span class="signature">(<wbr><span class="parameter" id="showFolderEditorSheet-param-context"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, {</span><span class="parameter" id="showFolderEditorSheet-param-existing"><span class="type-annotation"><a href="../services_favorites_folders_service/FavFolder-class.html">FavFolder</a>?</span> <span class="parameter-name">existing</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Create-or-edit sheet for a folder (name, emoji, color). Shared between
+the search page's folder tab and the quick "new folder" shortcut above.
   
 
 </dd>

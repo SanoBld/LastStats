@@ -71,14 +71,21 @@
   await ensureLoaded();
   foldersNotifier.value = foldersNotifier.value.where((f) =&gt; f.id != id).toList();
   await _persistFolders();
-  &#47;&#47; Clean up any track assignments pointing at the deleted folder.
-  final updated = &lt;String, List&lt;String&gt;&gt;{};
+
+  &#47;&#47; Drop the folder from every item, then forget items left in no folder
+  &#47;&#47; at all — their metadata is only useful while they&#39;re saved somewhere.
+  final updatedAssign = &lt;String, List&lt;String&gt;&gt;{};
   for (final e in assignNotifier.value.entries) {
     final remaining = e.value.where((fid) =&gt; fid != id).toList();
-    if (remaining.isNotEmpty) updated[e.key] = remaining;
+    if (remaining.isNotEmpty) updatedAssign[e.key] = remaining;
   }
-  assignNotifier.value = updated;
+  assignNotifier.value = updatedAssign;
   await _persistAssign();
+
+  final updatedMeta = Map&lt;String, FolderItem&gt;.from(metaNotifier.value)
+    ..removeWhere((k, _) =&gt; !updatedAssign.containsKey(k));
+  metaNotifier.value = updatedMeta;
+  await _persistMeta();
 }</code></pre>
 </section>
 

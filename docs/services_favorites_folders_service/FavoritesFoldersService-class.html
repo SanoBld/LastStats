@@ -173,22 +173,34 @@
 
 </dd>
 
+        <dt id="metaNotifier" class="property">
+  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/metaNotifier.html">metaNotifier</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/foundation/ValueNotifier-class.html">ValueNotifier</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="../services_favorites_folders_service/FolderItem-class.html">FolderItem</a></span>&gt;</span></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
     </dl>
   </section>
     
   <section class="summary offset-anchor" id="static-methods">
     <h2>Static Methods</h2>
     <dl class="callables">
-        <dt id="clearTrack" class="callable">
-  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/clearTrack.html">clearTrack</a></span><span class="signature">(<wbr><span class="parameter" id="clearTrack-param-trackKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">trackKey</span></span>)
+        <dt id="clearItem" class="callable">
+  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/clearItem.html">clearItem</a></span><span class="signature">(<wbr><span class="parameter" id="clearItem-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
   </span>
   
 
 </dt>
 <dd>
-  Drop a track from every folder — used when a track is unloved, so it
-doesn't linger orphaned in a folder if it's later re-loved.
+  Drop an item from every folder — used e.g. when a loved track is
+unloved, so it doesn't linger orphaned if it's later re-loved.
   
 
 </dd>
@@ -232,8 +244,8 @@ doesn't linger orphaned in a folder if it's later re-loved.
 
 </dd>
 
-        <dt id="foldersForTrack" class="callable">
-  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/foldersForTrack.html">foldersForTrack</a></span><span class="signature">(<wbr><span class="parameter" id="foldersForTrack-param-trackKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">trackKey</span></span>)
+        <dt id="foldersForItem" class="callable">
+  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/foldersForItem.html">foldersForItem</a></span><span class="signature">(<wbr><span class="parameter" id="foldersForItem-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span>
   </span>
   
@@ -245,8 +257,35 @@ doesn't linger orphaned in a folder if it's later re-loved.
 
 </dd>
 
-        <dt id="setFoldersForTrack" class="callable">
-  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/setFoldersForTrack.html">setFoldersForTrack</a></span><span class="signature">(<wbr><span class="parameter" id="setFoldersForTrack-param-trackKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">trackKey</span>, </span><span class="parameter" id="setFoldersForTrack-param-folderIds"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">folderIds</span></span>)
+        <dt id="itemKey" class="callable">
+  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/itemKey.html">itemKey</a></span><span class="signature">(<wbr><span class="parameter" id="itemKey-param-type"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">type</span>, </span><span class="parameter" id="itemKey-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="itemKey-param-artist"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">artist</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Build a stable key for any searchable item. Type is included so a
+track and an artist that share a name never collide.
+  
+
+</dd>
+
+        <dt id="itemsInFolder" class="callable">
+  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/itemsInFolder.html">itemsInFolder</a></span><span class="signature">(<wbr><span class="parameter" id="itemsInFolder-param-folderId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">folderId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../services_favorites_folders_service/FolderItem-class.html">FolderItem</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  All items currently saved in one folder, most recently added last.
+  
+
+</dd>
+
+        <dt id="setFoldersForItem" class="callable">
+  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/setFoldersForItem.html">setFoldersForItem</a></span><span class="signature">(<wbr><span class="parameter" id="setFoldersForItem-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, </span><span class="parameter" id="setFoldersForItem-param-folderIds"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">folderIds</span>, {</span><span class="parameter" id="setFoldersForItem-param-meta"><span class="type-annotation"><a href="../services_favorites_folders_service/FolderItem-class.html">FolderItem</a>?</span> <span class="parameter-name">meta</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
   </span>
   
@@ -258,8 +297,8 @@ doesn't linger orphaned in a folder if it's later re-loved.
 
 </dd>
 
-        <dt id="toggleTrackInFolder" class="callable">
-  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/toggleTrackInFolder.html">toggleTrackInFolder</a></span><span class="signature">(<wbr><span class="parameter" id="toggleTrackInFolder-param-trackKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">trackKey</span>, </span><span class="parameter" id="toggleTrackInFolder-param-folderId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">folderId</span></span>)
+        <dt id="toggleItemInFolder" class="callable">
+  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/toggleItemInFolder.html">toggleItemInFolder</a></span><span class="signature">(<wbr><span class="parameter" id="toggleItemInFolder-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, </span><span class="parameter" id="toggleItemInFolder-param-folderId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">folderId</span>, {</span><span class="parameter" id="toggleItemInFolder-param-meta"><span>required</span> <span class="type-annotation"><a href="../services_favorites_folders_service/FolderItem-class.html">FolderItem</a></span> <span class="parameter-name">meta</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
   </span>
   

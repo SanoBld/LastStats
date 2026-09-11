@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the showFolderAssignSheet function from the home_screen library, for the Dart programming language.">
+  <title>showFolderAssignSheet function - home_screen library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">laststats_mobile</a></li>
+    <li><a href="../screens_home_screen/">screens&#47;home_screen.dart</a></li>
+    <li class="self-crumb">showFolderAssignSheet function</li>
+  </ol>
+  <div class="self-name">showFolderAssignSheet</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+  <div
+      id="dartdoc-main-content"
+      class="main-content"
+      data-above-sidebar="screens_home_screen&#47;screens_home_screen-library-sidebar.html"
+      data-below-sidebar="">
+      <div>
+<h1><span class="kind-function">showFolderAssignSheet</span> function 
+ 
+</h1></div>
+
+    <section class="multi-line-signature">
+        
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+<span class="name ">showFolderAssignSheet</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="showFolderAssignSheet-param-context"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, {</span></li>
+<li><span class="parameter" id="showFolderAssignSheet-param-type"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">type</span>, </span></li>
+<li><span class="parameter" id="showFolderAssignSheet-param-name"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span></li>
+<li><span class="parameter" id="showFolderAssignSheet-param-artist"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">artist</span>, </span></li>
+<li><span class="parameter" id="showFolderAssignSheet-param-image"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">image</span>, </span></li>
+</ol>})
+
+        
+
+    </section>
+    
+<section class="desc markdown">
+  <p>Bottom sheet to save/unsave one item (track, album or artist) into
+folders. Shared between the search page and the music card, so any
+place with a "save to folder" button opens the same picker.</p>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; showFolderAssignSheet(
+  BuildContext context, {
+  required String type,
+  required String name,
+  required String artist,
+  required String image,
+}) async {
+  await FavoritesFoldersService.ensureLoaded();
+  final key = FavoritesFoldersService.itemKey(type, name, artist);
+  final meta = FolderItem(key: key, type: type, name: name, artist: artist, image: image);
+
+  await showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    builder: (ctx) =&gt; ValueListenableBuilder&lt;List&lt;FavFolder&gt;&gt;(
+      valueListenable: FavoritesFoldersService.foldersNotifier,
+      builder: (ctx, folders, _) =&gt; ValueListenableBuilder&lt;Map&lt;String, List&lt;String&gt;&gt;&gt;(
+        valueListenable: FavoritesFoldersService.assignNotifier,
+        builder: (ctx, _, _) {
+          final scheme = Theme.of(ctx).colorScheme;
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Row(children: [
+                    Expanded(child: Text(L.favFolderAssignTitle,
+                        style: Theme.of(ctx).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700))),
+                  ]),
+                ),
+                const SizedBox(height: 8),
+                if (folders.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Text(L.searchFoldersHint,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: scheme.onSurfaceVariant)),
+                  ),
+                ...folders.map((f) {
+                  final checked = FavoritesFoldersService.foldersForItem(key).contains(f.id);
+                  return CheckboxListTile(
+                    value: checked,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    secondary: CircleAvatar(
+                      backgroundColor: f.color.withValues(alpha: 0.25),
+                      child: Text(f.emoji, style: const TextStyle(fontSize: 16)),
+                    ),
+                    title: Text(f.name),
+                    onChanged: (_) =&gt;
+                        FavoritesFoldersService.toggleItemInFolder(key, f.id, meta: meta),
+                  );
+                }),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.add_rounded),
+                  title: Text(L.favFolderNew),
+                  onTap: () async {
+                    Navigator.pop(ctx);
+                    await showFolderEditorSheet(context);
+                  },
+                ),
+              ]),
+            ),
+          );
+        },
+      ),
+    ),
+  );
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../index.html">laststats_mobile</a></li>
+    <li><a href="../screens_home_screen/">home_screen</a></li>
+    <li class="self-crumb">showFolderAssignSheet function</li>
+</ol>
+
+    <h5>home_screen library</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div><!--/.sidebar-offcanvas-left-->
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    laststats_mobile
+      3.2.0+23
+  </span>
+  
+</footer>
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

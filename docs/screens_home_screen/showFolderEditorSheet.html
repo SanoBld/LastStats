@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the showFolderEditorSheet function from the home_screen library, for the Dart programming language.">
+  <title>showFolderEditorSheet function - home_screen library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">laststats_mobile</a></li>
+    <li><a href="../screens_home_screen/">screens&#47;home_screen.dart</a></li>
+    <li class="self-crumb">showFolderEditorSheet function</li>
+  </ol>
+  <div class="self-name">showFolderEditorSheet</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+  <div
+      id="dartdoc-main-content"
+      class="main-content"
+      data-above-sidebar="screens_home_screen&#47;screens_home_screen-library-sidebar.html"
+      data-below-sidebar="">
+      <div>
+<h1><span class="kind-function">showFolderEditorSheet</span> function 
+ 
+</h1></div>
+
+    <section class="multi-line-signature">
+        
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+<span class="name ">showFolderEditorSheet</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="showFolderEditorSheet-param-context"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, {</span></li>
+<li><span class="parameter" id="showFolderEditorSheet-param-existing"><span class="type-annotation"><a href="../services_favorites_folders_service/FavFolder-class.html">FavFolder</a>?</span> <span class="parameter-name">existing</span>, </span></li>
+</ol>})
+
+        
+
+    </section>
+    
+<section class="desc markdown">
+  <p>Create-or-edit sheet for a folder (name, emoji, color). Shared between
+the search page's folder tab and the quick "new folder" shortcut above.</p>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; showFolderEditorSheet(BuildContext context, {FavFolder? existing}) async {
+  final nameCtrl = TextEditingController(text: existing?.name ?? &#39;&#39;);
+  String emoji   = existing?.emoji ?? kFavFolderEmojis.first;
+  int colorValue = existing?.colorValue ?? kFavFolderColors.first;
+
+  final result = await showModalBottomSheet&lt;bool&gt;(
+    context: context,
+    isScrollControlled: true,
+    builder: (ctx) =&gt; StatefulBuilder(builder: (ctx, setSheet) {
+      final scheme = Theme.of(ctx).colorScheme;
+      return Padding(
+        padding: EdgeInsets.only(
+          left: 20, right: 20, top: 20,
+          bottom: 20 + MediaQuery.of(ctx).viewInsets.bottom,
+        ),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(existing == null ? L.favFolderNew : L.favFolderEdit,
+              style: Theme.of(ctx).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+          const SizedBox(height: 16),
+          Row(children: [
+            Container(
+              width: 52, height: 52,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Color(colorValue).withValues(alpha: 0.25),
+                borderRadius: AppRadius.mdR,
+              ),
+              child: Text(emoji, style: const TextStyle(fontSize: 26)),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextField(
+                controller: nameCtrl,
+                autofocus: existing == null,
+                decoration: InputDecoration(
+                  hintText: L.favFolderNamePlaceholder,
+                  border: OutlineInputBorder(borderRadius: AppRadius.smR),
+                  isDense: true,
+                ),
+              ),
+            ),
+          ]),
+          const SizedBox(height: 18),
+          Text(L.favFolderEmoji, style: Theme.of(ctx).textTheme.labelMedium
+              ?.copyWith(color: scheme.onSurfaceVariant)),
+          const SizedBox(height: 8),
+          Wrap(spacing: 8, runSpacing: 8, children: kFavFolderEmojis.map((e) {
+            final selected = e == emoji;
+            return GestureDetector(
+              onTap: () =&gt; setSheet(() =&gt; emoji = e),
+              child: Container(
+                width: 40, height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: selected ? scheme.primaryContainer : scheme.surfaceContainerHighest,
+                  border: selected ? Border.all(color: scheme.primary, width: 2) : null,
+                ),
+                child: Text(e, style: const TextStyle(fontSize: 18)),
+              ),
+            );
+          }).toList()),
+          const SizedBox(height: 18),
+          Text(L.favFolderColor, style: Theme.of(ctx).textTheme.labelMedium
+              ?.copyWith(color: scheme.onSurfaceVariant)),
+          const SizedBox(height: 8),
+          Wrap(spacing: 8, runSpacing: 8, children: kFavFolderColors.map((c) {
+            final selected = c == colorValue;
+            return GestureDetector(
+              onTap: () =&gt; setSheet(() =&gt; colorValue = c),
+              child: Container(
+                width: 32, height: 32,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(c),
+                  border: selected
+                      ? Border.all(color: scheme.onSurface, width: 2.5)
+                      : null,
+                ),
+              ),
+            );
+          }).toList()),
+          const SizedBox(height: 22),
+          Row(children: [
+            if (existing != null) ...[
+              Expanded(
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(foregroundColor: scheme.error),
+                  icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                  label: Text(L.favFolderDelete),
+                  onPressed: () async {
+                    final confirm = await showDialog&lt;bool&gt;(
+                      context: ctx,
+                      builder: (dctx) =&gt; AlertDialog(
+                        content: Text(L.favFolderDeleteConfirm),
+                        actions: [
+                          TextButton(onPressed: () =&gt; Navigator.pop(dctx, false), child: Text(L.commonCancel)),
+                          FilledButton.tonal(
+                            style: FilledButton.styleFrom(foregroundColor: scheme.error),
+                            onPressed: () =&gt; Navigator.pop(dctx, true),
+                            child: Text(L.favFolderDelete),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirm == true) {
+                      await FavoritesFoldersService.deleteFolder(existing.id);
+                      if (ctx.mounted) Navigator.pop(ctx, false);
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(width: 10),
+            ],
+            Expanded(
+              child: FilledButton(
+                onPressed: () =&gt; Navigator.pop(ctx, true),
+                child: Text(existing == null ? L.favFolderCreate : L.favFolderSave),
+              ),
+            ),
+          ]),
+        ]),
+      );
+    }),
+  );
+
+  if (result != true) return;
+  final name = nameCtrl.text.trim();
+  if (existing == null) {
+    if (name.isEmpty) return;
+    await FavoritesFoldersService.createFolder(name, emoji, colorValue);
+  } else {
+    await FavoritesFoldersService.updateFolder(existing.id,
+        name: name.isEmpty ? existing.name : name, emoji: emoji, colorValue: colorValue);
+  }
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../index.html">laststats_mobile</a></li>
+    <li><a href="../screens_home_screen/">home_screen</a></li>
+    <li class="self-crumb">showFolderEditorSheet function</li>
+</ol>
+
+    <h5>home_screen library</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div><!--/.sidebar-offcanvas-left-->
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    laststats_mobile
+      3.2.0+23
+  </span>
+  
+</footer>
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+
