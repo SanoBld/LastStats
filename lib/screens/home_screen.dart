@@ -208,16 +208,29 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   Widget _pageStack(List<Widget> pages, int count) {
+    // Each page gets a tiny fade + scale on top of the opacity toggle,
+    // so switching tabs feels like the page "settles in" instead of
+    // just popping visible. The scale is subtle on purpose — this stack
+    // keeps every page mounted (for state), so the effect only needs to
+    // read as a light polish, not a full page transition.
     return Stack(
-      children: List.generate(count, (i) => IgnorePointer(
-        ignoring: _idx != i,
-        child: AnimatedOpacity(
-          opacity: _idx == i ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeInOut,
-          child: pages[i],
-        ),
-      )),
+      children: List.generate(count, (i) {
+        final active = _idx == i;
+        return IgnorePointer(
+          ignoring: !active,
+          child: AnimatedOpacity(
+            opacity: active ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeInOut,
+            child: AnimatedScale(
+              scale: active ? 1.0 : 0.985,
+              duration: const Duration(milliseconds: 260),
+              curve: Curves.easeOutCubic,
+              child: pages[i],
+            ),
+          ),
+        );
+      }),
     );
   }
 

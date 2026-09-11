@@ -3028,6 +3028,16 @@ class _StatGrid extends StatelessWidget {
   final List<Widget> children;
   const _StatGrid({required this.children});
 
+  // Small helper: wrap a card with a gentle staggered pop-in, so cards
+  // cascade one after another instead of all jumping in at once.
+  // Skipped after the dashboard has already played its entrance once,
+  // same rule as the rest of the page.
+  Widget _stagger(Widget child, int index) => _FadeSlideIn(
+    skipAnimation: _dashboardEntrancePlayed,
+    delay: Duration(milliseconds: 40 * index),
+    child: child,
+  );
+
   @override
   Widget build(BuildContext context) {
     final pairs = <Widget>[];
@@ -3035,9 +3045,9 @@ class _StatGrid extends StatelessWidget {
       final hasRight = i + 1 < children.length;
       pairs.add(IntrinsicHeight(
         child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Expanded(child: children[i]),
+          Expanded(child: _stagger(children[i], i)),
           const SizedBox(width: 10),
-          Expanded(child: hasRight ? children[i + 1] : const SizedBox()),
+          Expanded(child: hasRight ? _stagger(children[i + 1], i + 1) : const SizedBox()),
         ]),
       ));
       if (i + 2 < children.length) pairs.add(const SizedBox(height: 10));
@@ -3078,6 +3088,8 @@ class _DashStatCard extends StatelessWidget {
     // SizedBox.expand fills the height provided by IntrinsicHeight in _StatGrid,
     // making all cards the same height regardless of content length
     return SizedBox.expand(
+      child: _PressScale(
+      onTap: onTap,
       child: Card(
         elevation: 0,
         color: scheme.surfaceContainerHighest,
@@ -3122,6 +3134,7 @@ class _DashStatCard extends StatelessWidget {
           ]),
           ),
         ),
+      ),
       ),
     );
   }

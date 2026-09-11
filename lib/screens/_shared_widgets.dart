@@ -59,6 +59,46 @@ class _FadeSlideInState extends State<_FadeSlideIn>
   );
 }
 
+// ── Reusable press animation: small scale-down bounce on tap ─────────────────
+// Wrap any tappable card/button in this to give it a "squishy", tactile feel
+// instead of a flat InkWell tap. Doesnt eat the tap, it just forward it.
+class _PressScale extends StatefulWidget {
+  final Widget child;
+  final VoidCallback? onTap;
+  final double downScale;
+  const _PressScale({
+    required this.child,
+    this.onTap,
+    this.downScale = 0.96,
+  });
+
+  @override
+  State<_PressScale> createState() => _PressScaleState();
+}
+
+class _PressScaleState extends State<_PressScale> {
+  bool _down = false;
+
+  void _setDown(bool v) { if (mounted) setState(() => _down = v); }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapDown:   widget.onTap == null ? null : (_) => _setDown(true),
+      onTapUp:     widget.onTap == null ? null : (_) => _setDown(false),
+      onTapCancel: widget.onTap == null ? null : () => _setDown(false),
+      onTap:       widget.onTap,
+      child: AnimatedScale(
+        scale: _down ? widget.downScale : 1.0,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOut,
+        child: widget.child,
+      ),
+    );
+  }
+}
+
 // ── Pulsing status dot (used in NowPlayingCard and friend cards) ──────────────
 class _PulsingDot extends StatefulWidget {
   final Color color;

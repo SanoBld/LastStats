@@ -164,6 +164,102 @@ class AboutPage extends StatelessWidget {
 
         const SizedBox(height: 16),
 
+        // ── Sources / docs used to build this app ────────────────────────
+        // All links below point to free, open documentation (Flutter's
+        // own docs and the Material 3 spec) that guided the UI and the
+        // animation work in this app.
+        SettingsSection(
+          label: _tr({
+            'fr': 'Sources', 'en': 'Sources',
+            'es': 'Fuentes', 'de': 'Quellen', 'it': 'Fonti',
+            'pt': 'Fontes', 'ru': 'Источники', 'ja': 'ソース',
+            'zh': '来源', 'ar': 'المصادر',
+          }),
+          children: [
+            ListTile(
+              leading: const Icon(Icons.menu_book_rounded),
+              title: const Text('Flutter documentation',
+                  style: TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: Text(_tr({
+                'fr': 'Doc officielle Flutter (widgets, thèmes, API).',
+                'en': 'Official Flutter docs (widgets, theming, API).',
+                'es': 'Documentación oficial de Flutter.',
+                'de': 'Offizielle Flutter-Dokumentation.',
+                'it': 'Documentazione ufficiale di Flutter.',
+                'pt': 'Documentação oficial do Flutter.',
+                'ru': 'Официальная документация Flutter.',
+                'ja': 'Flutter の公式ドキュメント。',
+                'zh': 'Flutter 官方文档。',
+                'ar': 'وثائق Flutter الرسمية.',
+              }), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              trailing: const Icon(Icons.open_in_new_rounded, size: 16),
+              onTap: () => _open('https://docs.flutter.dev/'),
+            ),
+            const Divider(height: 1, indent: 16, endIndent: 16),
+            ListTile(
+              leading: const Icon(Icons.palette_outlined),
+              title: const Text('Material 3 — Flutter guide',
+                  style: TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: Text(_tr({
+                'fr': "Guide officiel Material 3 pour développer avec Flutter.",
+                'en': 'Official Material 3 guide for developing with Flutter.',
+                'es': 'Guía oficial de Material 3 para Flutter.',
+                'de': 'Offizieller Material-3-Leitfaden für Flutter.',
+                'it': 'Guida ufficiale a Material 3 per Flutter.',
+                'pt': 'Guia oficial do Material 3 para Flutter.',
+                'ru': 'Официальное руководство Material 3 для Flutter.',
+                'ja': 'Flutter 向け Material 3 公式ガイド。',
+                'zh': '面向 Flutter 的 Material 3 官方指南。',
+                'ar': 'دليل Material 3 الرسمي لتطوير Flutter.',
+              }), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              trailing: const Icon(Icons.open_in_new_rounded, size: 16),
+              onTap: () => _open('https://m3.material.io/develop/flutter'),
+            ),
+            const Divider(height: 1, indent: 16, endIndent: 16),
+            ListTile(
+              leading: const Icon(Icons.description_outlined),
+              title: const Text('ThemeData.useMaterial3',
+                  style: TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: Text(_tr({
+                'fr': 'Référence API Flutter pour le thème Material 3.',
+                'en': 'Flutter API reference for the Material 3 theme flag.',
+                'es': 'Referencia de la API de Flutter para Material 3.',
+                'de': 'Flutter-API-Referenz für das Material-3-Theme.',
+                'it': 'Riferimento API Flutter per Material 3.',
+                'pt': 'Referência da API Flutter para o Material 3.',
+                'ru': 'Справочник API Flutter для темы Material 3.',
+                'ja': 'Material 3 テーマの Flutter API リファレンス。',
+                'zh': 'Material 3 主题的 Flutter API 参考。',
+                'ar': 'مرجع Flutter API لسمة Material 3.',
+              }), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              trailing: const Icon(Icons.open_in_new_rounded, size: 16),
+              onTap: () => _open('https://api.flutter.dev/flutter/material/ThemeData/useMaterial3.html'),
+            ),
+            const Divider(height: 1, indent: 16, endIndent: 16),
+            ListTile(
+              leading: const Icon(Icons.dashboard_customize_outlined),
+              title: const Text('flutter_adaptive_scaffold (pub.dev)',
+                  style: TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: Text(_tr({
+                'fr': 'Package Flutter officiel pour les layouts adaptatifs.',
+                'en': 'Official Flutter package for adaptive layouts.',
+                'es': 'Paquete oficial de Flutter para layouts adaptativos.',
+                'de': 'Offizielles Flutter-Paket für adaptive Layouts.',
+                'it': 'Pacchetto ufficiale Flutter per layout adattivi.',
+                'pt': 'Pacote oficial do Flutter para layouts adaptativos.',
+                'ru': 'Официальный пакет Flutter для адаптивных макетов.',
+                'ja': 'アダプティブレイアウト用の Flutter 公式パッケージ。',
+                'zh': '用于自适应布局的 Flutter 官方包。',
+                'ar': 'حزمة Flutter الرسمية للتخطيطات المتكيفة.',
+              }), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              trailing: const Icon(Icons.open_in_new_rounded, size: 16),
+              onTap: () => _open('https://pub.dev/packages/flutter_adaptive_scaffold'),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 16),
+
         // ── Support ───────────────────────────────────────────────────────
         SettingsSection(label: L.settingsAboutSupport, children: [
           ListTile(
