@@ -1045,6 +1045,27 @@ class _ChartsPageState extends State<_ChartsPage>
           return;
         }
         chartImg = img;
+      } else if (chartId == 'habits') {
+        // Same class of bug as monthly/cumul/calendar: the hourly chart
+        // auto-scrolls to the peak hour on screen, so a live capture only
+        // grabbed whatever 5-6 hours happened to be scrolled into view.
+        // Render both habit cards off-screen, unclipped, full 24h width.
+        final child = Column(children: [
+          _HourlyBarCard(data: _hourlyData ?? const <int, int>{}, exportMode: true),
+          const SizedBox(height: 12),
+          _WeekdayBarCard(data: _weekdayData ?? const <int, int>{}),
+        ]);
+        final img = await _renderOffscreen(ctx, SizedBox(width: 30 + 24 * 33.0 + 32, child: child));
+        if (img == null) {
+          closeDialog();
+          if (ctx.mounted) {
+            ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(
+                _ct('Graphique non disponible pour cette période',
+                    'Chart not available for this period'))));
+          }
+          return;
+        }
+        chartImg = img;
       } else {
         final rb = await _ensureChartLaidOut(chartId);
         if (rb == null || rb.size.isEmpty) {
@@ -2214,7 +2235,11 @@ class _LinePainter extends CustomPainter {
 
 class _HourlyBarCard extends StatefulWidget {
   final Map<int, int> data;
-  const _HourlyBarCard({required this.data});
+  // true = render all 24 hours unclipped, no internal scroll (used for
+  // sharing — the on-screen version auto-scrolls to the peak hour, which
+  // used to mean an export only captured whatever was scrolled into view).
+  final bool exportMode;
+  const _HourlyBarCard({required this.data, this.exportMode = false});
 
   @override
   State<_HourlyBarCard> createState() => _HourlyBarCardState();
@@ -2236,6 +2261,7 @@ class _HourlyBarCardState extends State<_HourlyBarCard> {
   @override
   void initState() {
     super.initState();
+    if (widget.exportMode) return; // no scroll to settle in export mode
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_sc.hasClients) return;
       final peakH = widget.data.isEmpty ? 0
@@ -2306,11 +2332,26 @@ class _HourlyBarCardState extends State<_HourlyBarCard> {
               ]),
             ),
             Expanded(
-              child: SingleChildScrollView(
+              child: widget.exportMode
+                ? _buildHourColumns(bandColors, maxVal, peakH, isEn, s, t)
+                : SingleChildScrollView(
                 controller: _sc,
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
-                child: SizedBox(
+                child: _buildHourColumns(bandColors, maxVal, peakH, isEn, s, t),
+              ),
+            ),
+          ]),
+        ],
+      ),
+    );
+  }
+
+  // Extracted so both the live scrollable view and the export (unclipped,
+  // no scroll) path render the exact same 24-column content.
+  Widget _buildHourColumns(List<Color> bandColors, int maxVal, int peakH,
+      bool isEn, ColorScheme s, TextTheme t) {
+    return SizedBox(
                   width: 24 * _colW,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -2411,13 +2452,7 @@ class _HourlyBarCardState extends State<_HourlyBarCard> {
                       ),
                     ],
                   ),
-                ),
-              ),
-            ),
-          ]),
-        ],
-      ),
-    );
+                );
   }
 }
 
