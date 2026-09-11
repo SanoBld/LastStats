@@ -1,8 +1,10 @@
 // lib/screens/settings/backup_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../l10n/l10n.dart';
 import '../../services/backup_service.dart';
+import '../../services/crash_log_service.dart';
 import 'settings_helpers.dart';
 
 class BackupPage extends StatefulWidget {
@@ -15,6 +17,59 @@ class BackupPage extends StatefulWidget {
 class _BackupPageState extends State<BackupPage> {
   bool _exporting = false;
   bool _importing = false;
+  bool _logBusy   = false;
+  int? _logSizeBytes; // null = not checked yet, 0 = empty
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshLogSize();
+  }
+
+  Future<void> _refreshLogSize() async {
+    final f = await CrashLogService.instance.getFile();
+    if (!mounted) return;
+    if (f == null || !await f.exists()) { setState(() => _logSizeBytes = 0); return; }
+    final len = await f.length();
+    if (mounted) setState(() => _logSizeBytes = len);
+  }
+
+  Future<void> _shareLog() async {
+    setState(() => _logBusy = true);
+    final f = await CrashLogService.instance.getFile();
+    if (!mounted) return;
+    setState(() => _logBusy = false);
+    if (f == null || !await f.exists() || await f.length() == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(L.backupCrashLogEmpty), behavior: SnackBarBehavior.floating));
+      return;
+    }
+    await Share.shareXFiles([XFile(f.path)], text: 'LastStats — crash_log.txt');
+  }
+
+  Future<void> _clearLog() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(L.backupCrashLogClearConfirm),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(L.commonCancel)),
+          FilledButton.tonal(onPressed: () => Navigator.pop(ctx, true), child: Text(L.backupCrashLogClear)),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await CrashLogService.instance.clear();
+    if (!mounted) return;
+    setState(() => _logSizeBytes = 0);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(L.backupCrashLogCleared), behavior: SnackBarBehavior.floating));
+  }
+
+  String _fmtSize(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    return '${(bytes / 1024).toStringAsFixed(1)} KB';
+  }
 
   // Whether to include the Last.fm API key / secret key in the exported
   // file. Both default to on; the user can uncheck either before exporting
@@ -217,7 +272,56 @@ class _BackupPageState extends State<BackupPage> {
           ),
         ]),
 
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
+
+        // ── Journal d'erreurs ─────────────────────────────────────────────
+        SettingsSection(label: L.settingsCrashLog, children: [
+          ListTile(
+            leading: Container(
+              width: 40, height: 40,
+              decoration: BoxDecoration(
+                color: scheme.tertiaryContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(Icons.description_outlined, color: scheme.onTertiaryContainer, size: 22),
+            ),
+            title: Text(L.settingsCrashLog,
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            subtitle: Text(
+              _logSizeBytes == null
+                  ? L.backupCrashLogDesc
+                  : (_logSizeBytes == 0 ? L.backupCrashLogEmpty : _fmtSize(_logSizeBytes!)),
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
+            child: Row(children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: (_logBusy || (_logSizeBytes ?? 0) == 0) ? null : _shareLog,
+                  icon: _logBusy
+                      ? const SizedBox(width: 16, height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Icon(Icons.ios_share_rounded, size: 18),
+                  label: Text(L.backupCrashLogShare),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: (_logSizeBytes ?? 0) == 0 ? null : _clearLog,
+                  icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                  label: Text(L.backupCrashLogClear),
+                  style: OutlinedButton.styleFrom(foregroundColor: scheme.error),
+                ),
+              ),
+            ]),
+          ),
+        ]),
+
+        const SizedBox(height: 16),
 
         // Avertissement données
         Container(

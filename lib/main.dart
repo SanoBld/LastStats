@@ -27,6 +27,7 @@ import 'services/update_service.dart';
 import 'services/qr_link_service.dart';
 import 'services/eco_mode_controller.dart';
 import 'services/lastfm_service.dart';
+import 'services/crash_log_service.dart';
 import 'widgets/custom_title_bar.dart';
 import 'package:app_links/app_links.dart';
 
@@ -39,17 +40,22 @@ void main() {
     // zone terminates the whole process (unlike mobile, which just drops
     // the frame) — this was the main source of the reported PC crashes.
     debugPrint('Uncaught error: $error');
+    CrashLogService.instance.logError(error, stack, context: 'zone');
   });
 }
 
 Future<void> _mainImpl() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  FlutterError.onError = (details) => debugPrint('Flutter error: ${details.exception}');
+  FlutterError.onError = (details) {
+    debugPrint('Flutter error: ${details.exception}');
+    CrashLogService.instance.logError(details.exception, details.stack, context: 'flutter');
+  };
   // Same reasoning as above, for errors raised outside the Flutter framework
   // (platform channels, timers, etc.) on desktop.
   PlatformDispatcher.instance.onError = (error, stack) {
     debugPrint('Platform error: $error');
+    CrashLogService.instance.logError(error, stack, context: 'platform');
     return true;
   };
 

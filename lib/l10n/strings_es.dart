@@ -458,6 +458,13 @@ class AppStringsEs implements AppStrings {
   @override String get backupRestoreApiKeyLabel => 'Clave de API';
   @override String get backupRestoreSecretKeyLabel => 'Clave secreta';
   @override String get backupIncludeKeysDesc => 'Incluir las claves en el archivo exportado';
+  @override String get settingsCrashLog => 'Registro de errores';
+  @override String get backupCrashLogDesc => 'Guarda los errores que encuentra la app, útil para reportar un fallo.';
+  @override String get backupCrashLogShare => 'Compartir registro';
+  @override String get backupCrashLogClear => 'Vaciar registro';
+  @override String get backupCrashLogEmpty => 'No hay errores registrados';
+  @override String get backupCrashLogCleared => 'Registro vaciado';
+  @override String get backupCrashLogClearConfirm => '¿Vaciar el registro de errores?';
 
   @override String get faqSectionLabel             => 'Preguntas frecuentes';
   @override String get backupOverwriteWarning => 'Restaurar una copia de seguridad sobrescribirá tus ajustes actuales.';
@@ -523,6 +530,8 @@ class AppStringsEs implements AppStrings {
   @override String get notifTimeNotifyAt        => 'Notificar a';
   @override String get notifDayOfWeek           => 'Día de la semana';
   @override List<String> get weekdaysShort => const ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+  @override List<String> get weekdaysNarrow => const ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+  @override String get weekAbbrev => 'S';
   @override String get notifSendTest            => 'Enviar una notificación de prueba';
   @override String get notifSentCheckBar        => '¡Revisa tu barra de notificaciones!';
   @override String get notifMakeSureWorks       => 'Verifica que todo funcione.';

@@ -410,6 +410,13 @@ class AppStringsAr implements AppStrings {
   @override String get backupRestoreApiKeyLabel => 'مفتاح API';
   @override String get backupRestoreSecretKeyLabel => 'المفتاح السري';
   @override String get backupIncludeKeysDesc => 'تضمين المفاتيح في الملف المُصدَّر';
+  @override String get settingsCrashLog => 'سجل الأخطاء';
+  @override String get backupCrashLogDesc => 'يسجل الأخطاء التي يواجهها التطبيق، مفيد للإبلاغ عن مشكلة.';
+  @override String get backupCrashLogShare => 'مشاركة السجل';
+  @override String get backupCrashLogClear => 'مسح السجل';
+  @override String get backupCrashLogEmpty => 'لا توجد أخطاء مسجلة';
+  @override String get backupCrashLogCleared => 'تم مسح السجل';
+  @override String get backupCrashLogClearConfirm => 'مسح سجل الأخطاء؟';
   @override String get faqSectionLabel => 'الأسئلة الشائعة';
   @override String get backupOverwriteWarning => 'ستؤدي استعادة نسخة احتياطية إلى استبدال إعداداتك الحالية.';
   @override String get faqOpenSourceBadge => 'LastStats مشروع مجاني ومفتوح المصدر صنعه SanoBld بـ ❤️.';
@@ -625,6 +632,8 @@ class AppStringsAr implements AppStrings {
   @override String acctSlotsRemaining(int n) => 'متبقٍ $n مكان';
   @override String acctMaxReached(int max) => 'تم الوصول إلى الحد الأقصى وهو $max حسابات.';
   @override List<String> get weekdaysShort => const ['اث', 'ثل', 'أرب', 'خم', 'جم', 'سبت', 'أحد'];
+  @override List<String> get weekdaysNarrow => const ['ن', 'ث', 'ر', 'خ', 'ج', 'س', 'ح'];
+  @override String get weekAbbrev => 'أ';
   @override List<String> get notifThresholdMessages => const [
     'أول 1000 تشغيلة لك. الرحلة تبدأ. 🎵',
     'وصلت إلى خمس خانات! 🎉',

@@ -410,6 +410,13 @@ class AppStringsRu implements AppStrings {
   @override String get backupRestoreApiKeyLabel => 'Ключ API';
   @override String get backupRestoreSecretKeyLabel => 'Секретный ключ';
   @override String get backupIncludeKeysDesc => 'Включить ключи в экспортируемый файл';
+  @override String get settingsCrashLog => 'Журнал ошибок';
+  @override String get backupCrashLogDesc => 'Записывает ошибки приложения — полезно при сообщении о баге.';
+  @override String get backupCrashLogShare => 'Поделиться журналом';
+  @override String get backupCrashLogClear => 'Очистить журнал';
+  @override String get backupCrashLogEmpty => 'Ошибок не зафиксировано';
+  @override String get backupCrashLogCleared => 'Журнал очищен';
+  @override String get backupCrashLogClearConfirm => 'Очистить журнал ошибок?';
   @override String get faqSectionLabel => 'Часто задаваемые вопросы';
   @override String get backupOverwriteWarning => 'Восстановление резервной копии перезапишет ваши текущие настройки.';
   @override String get faqOpenSourceBadge => 'LastStats, бесплатный проект с открытым исходным кодом, созданный SanoBld с ❤️.';
@@ -625,6 +632,8 @@ class AppStringsRu implements AppStrings {
   @override String acctSlotsRemaining(int n) => 'Осталось мест: $n';
   @override String acctMaxReached(int max) => 'Достигнут максимум в $max аккаунтов.';
   @override List<String> get weekdaysShort => const ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+  @override List<String> get weekdaysNarrow => const ['П', 'В', 'С', 'Ч', 'П', 'С', 'В'];
+  @override String get weekAbbrev => 'Н';
   @override List<String> get notifThresholdMessages => const [
     'Ваши первые 1000 скробблов. Путешествие начинается. 🎵',
     'Вы достигли пятизначного числа! 🎉',

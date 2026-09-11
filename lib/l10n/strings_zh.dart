@@ -455,6 +455,13 @@ class AppStringsZh implements AppStrings {
   @override String get backupRestoreApiKeyLabel => 'API 密钥';
   @override String get backupRestoreSecretKeyLabel => '密钥';
   @override String get backupIncludeKeysDesc => '在导出的文件中包含密钥';
+  @override String get settingsCrashLog => '错误日志';
+  @override String get backupCrashLogDesc => '记录应用遇到的错误，方便反馈问题。';
+  @override String get backupCrashLogShare => '分享日志';
+  @override String get backupCrashLogClear => '清空日志';
+  @override String get backupCrashLogEmpty => '没有记录到错误';
+  @override String get backupCrashLogCleared => '日志已清空';
+  @override String get backupCrashLogClearConfirm => '清空错误日志？';
 
   @override String get faqSectionLabel             => '常见问题';
   @override String get backupOverwriteWarning => '恢复备份将覆盖你当前的设置。';
@@ -520,6 +527,8 @@ class AppStringsZh implements AppStrings {
   @override String get notifTimeNotifyAt        => '通知时间';
   @override String get notifDayOfWeek           => '星期几';
   @override List<String> get weekdaysShort => const ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+  @override List<String> get weekdaysNarrow => const ['一', '二', '三', '四', '五', '六', '日'];
+  @override String get weekAbbrev => '周';
   @override String get notifSendTest            => '发送测试通知';
   @override String get notifSentCheckBar        => '看看你的通知栏！';
   @override String get notifMakeSureWorks       => '确认一切正常。';

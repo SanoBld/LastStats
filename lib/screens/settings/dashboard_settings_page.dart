@@ -6,6 +6,16 @@ import '../../l10n/l10n.dart';
 import '../../app_state.dart';
 import 'settings_helpers.dart';
 
+// Stat-card ids that open a detail sheet / page when tapped on the
+// dashboard (see _DashboardPage._statCardWidget in _dashboard_page.dart).
+// Kept in sync manually with that switch — used only for the little
+// "tappable" hint icon shown in the customization list below.
+const Set<String> _kTappableStatCards = {
+  'top_artist', 'top_album', 'top_track', 'last_track',
+  'top_artist_week', 'top_album_week', 'top_track_week',
+  'favorites_count',
+};
+
 class DashboardSettingsPage extends StatefulWidget {
   const DashboardSettingsPage({super.key});
 
@@ -515,9 +525,19 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
               final (id, emoji, _, _, _, _, _) = card;
               final label   = statCardLabel(id);
               final enabled = _statCards.contains(id);
+              // These cards open a detail sheet / page when tapped on the
+              // dashboard — small hint here so it's clear before enabling.
+              final tappable = _kTappableStatCards.contains(id);
               return CheckboxListTile(
                 secondary: Text(emoji, style: const TextStyle(fontSize: 20)),
-                title: Text(label),
+                title: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Flexible(child: Text(label)),
+                  if (tappable) ...[
+                    const SizedBox(width: 6),
+                    Icon(Icons.touch_app_rounded, size: 15,
+                        color: scheme.onSurfaceVariant.withValues(alpha: 0.6)),
+                  ],
+                ]),
                 value: enabled,
                 controlAffinity: ListTileControlAffinity.trailing,
                 dense: true,

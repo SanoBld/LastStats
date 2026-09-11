@@ -480,6 +480,15 @@ abstract class AppStrings {
   String get backupRestoreSecretKeyLabel;
   String get backupIncludeKeysDesc;
 
+  // ── Backup page: crash/error log ────────────────────────────────────────
+  String get settingsCrashLog;
+  String get backupCrashLogDesc;
+  String get backupCrashLogShare;
+  String get backupCrashLogClear;
+  String get backupCrashLogEmpty;
+  String get backupCrashLogCleared;
+  String get backupCrashLogClearConfirm;
+
   // ── FAQ page ─────────────────────────────────────────────────────────────
   String get faqSectionLabel;
   String get backupOverwriteWarning;
@@ -546,6 +555,8 @@ abstract class AppStrings {
   String get notifTimeNotifyAt;
   String get notifDayOfWeek;
   List<String> get weekdaysShort; // Mon..Sun order, 7 entries
+  List<String> get weekdaysNarrow; // Mon..Sun, single-letter (chart axis labels)
+  String get weekAbbrev; // single-letter/glyph prefix for "Week N" chart labels
   String get notifSendTest;
   String get notifSentCheckBar;
   String get notifMakeSureWorks;

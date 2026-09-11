@@ -410,6 +410,13 @@ class AppStringsDe implements AppStrings {
   @override String get backupRestoreApiKeyLabel => 'API-Schlüssel';
   @override String get backupRestoreSecretKeyLabel => 'Geheimer Schlüssel';
   @override String get backupIncludeKeysDesc => 'Schlüssel in die exportierte Datei einbeziehen';
+  @override String get settingsCrashLog => 'Fehlerprotokoll';
+  @override String get backupCrashLogDesc => 'Zeichnet App-Fehler auf, nützlich zum Melden eines Bugs.';
+  @override String get backupCrashLogShare => 'Protokoll teilen';
+  @override String get backupCrashLogClear => 'Protokoll leeren';
+  @override String get backupCrashLogEmpty => 'Keine Fehler aufgezeichnet';
+  @override String get backupCrashLogCleared => 'Protokoll geleert';
+  @override String get backupCrashLogClearConfirm => 'Fehlerprotokoll leeren?';
   @override String get faqSectionLabel => 'Häufig gestellte Fragen';
   @override String get backupOverwriteWarning => 'Das Wiederherstellen einer Sicherung überschreibt deine aktuellen Einstellungen.';
   @override String get faqOpenSourceBadge => 'LastStats ist ein kostenloses Open-Source-Projekt, mit ❤️ erstellt von SanoBld.';
@@ -625,6 +632,8 @@ class AppStringsDe implements AppStrings {
   @override String acctSlotsRemaining(int n) => '$n Platz/Plätze übrig';
   @override String acctMaxReached(int max) => 'Maximum von $max Konten erreicht.';
   @override List<String> get weekdaysShort => const ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+  @override List<String> get weekdaysNarrow => const ['M', 'D', 'M', 'D', 'F', 'S', 'S'];
+  @override String get weekAbbrev => 'W';
   @override List<String> get notifThresholdMessages => const [
     'Deine ersten 1.000 Scrobbles. Die Reise beginnt. 🎵',
     'Du hast fünfstellig geknackt! 🎉',

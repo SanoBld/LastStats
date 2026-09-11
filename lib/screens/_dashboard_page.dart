@@ -1189,6 +1189,8 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
           sub:   topArtist != null
               ? '${_fmt(int.tryParse((topArtist['playcount'] ?? '0').toString()) ?? 0)} ${L.commonPlays}'
               : null,
+          onTap: topArtist == null ? null : () =>
+              showDetailSheet(context, Map<String, dynamic>.from(topArtist), 'artists', widget.service),
         );
       case 'top_album':
         return _DashStatCard(
@@ -1196,6 +1198,8 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
           value: topAlbum != null ? (topAlbum['name'] ?? '—').toString() : '—',
           label: L.dashAlbum1,
           sub:   topAlbum != null ? (topAlbum['artist']?['name'] ?? '').toString() : null,
+          onTap: topAlbum == null ? null : () =>
+              showDetailSheet(context, Map<String, dynamic>.from(topAlbum), 'albums', widget.service),
         );
       case 'top_track':
         return _DashStatCard(
@@ -1205,6 +1209,8 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
           sub:   topTrack != null
               ? '${_fmt(int.tryParse((topTrack['playcount'] ?? '0').toString()) ?? 0)} ${L.commonPlays}'
               : null,
+          onTap: topTrack == null ? null : () =>
+              showDetailSheet(context, Map<String, dynamic>.from(topTrack), 'tracks', widget.service),
         );
       case 'last_track':
         return _DashStatCard(
@@ -1212,6 +1218,8 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
           value: lastTrack != null ? (lastTrack['name'] ?? '—').toString() : '—',
           label: L.dashLastTrack,
           sub:   lastTrack != null ? _fmtTrackDateLocal(lastTrack) : null,
+          onTap: lastTrack == null ? null : () =>
+              showDetailSheet(context, Map<String, dynamic>.from(lastTrack), 'tracks', widget.service),
         );
       case 'total':
         return _DashStatCard(
@@ -1283,6 +1291,8 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
           sub:   topArtistWeek != null
               ? '${_fmt(int.tryParse((topArtistWeek['playcount'] ?? '0').toString()) ?? 0)} ${L.commonPlays}'
               : null,
+          onTap: topArtistWeek == null ? null : () =>
+              showDetailSheet(context, Map<String, dynamic>.from(topArtistWeek), 'artists', widget.service),
         );
       case 'top_album_week':
         return _DashStatCard(
@@ -1290,6 +1300,8 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
           value: topAlbumWeek != null ? (topAlbumWeek['name'] ?? '—').toString() : '—',
           label: L.dashAlbumWeekLabel,
           sub:   topAlbumWeek != null ? (topAlbumWeek['artist']?['name'] ?? '').toString() : null,
+          onTap: topAlbumWeek == null ? null : () =>
+              showDetailSheet(context, Map<String, dynamic>.from(topAlbumWeek), 'albums', widget.service),
         );
       case 'top_track_week':
         return _DashStatCard(
@@ -1299,6 +1311,8 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
           sub:   topTrackWeek != null
               ? '${_fmt(int.tryParse((topTrackWeek['playcount'] ?? '0').toString()) ?? 0)} ${L.commonPlays}'
               : null,
+          onTap: topTrackWeek == null ? null : () =>
+              showDetailSheet(context, Map<String, dynamic>.from(topTrackWeek), 'tracks', widget.service),
         );
       case 'artist_count':
         final n = int.tryParse((_userInfo?['artist_count'] ?? '0').toString()) ?? 0;
@@ -1348,7 +1362,27 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         duration: const Duration(milliseconds: 300),
         child: _loading
           ? _DashboardSkeleton(scheme: scheme)
-          : _ErrorView(message: _error!, onRetry: _load),
+          : Column(children: [
+              // Settings stays reachable even when the dashboard failed to
+              // load — otherwise an HTTP error could strand the user with
+              // no way to reach settings (e.g. to fix the account/API key).
+              SafeArea(
+                bottom: false,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: GestureDetector(
+                      key: _settingsBtnKey,
+                      onTap: () { _haptic(_HapticImpact.light); _openSettings(); },
+                      onLongPress: () { _haptic(_HapticImpact.medium); _showSettingsMenu(); },
+                      child: Icon(Icons.settings_rounded, color: scheme.onSurfaceVariant, size: 24),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(child: _ErrorView(message: _error!, onRetry: _load)),
+            ]),
       );
     }
 

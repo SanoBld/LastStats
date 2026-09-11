@@ -346,8 +346,8 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
       final maxB = counts.fold<int>(0, (m, v) => v > m ? v : m);
       data.bars = counts.map((v) => maxB == 0 ? 0.0 : v / maxB).toList();
       data.barLabels = p == 1
-          ? const ['M', 'T', 'W', 'T', 'F', 'S', 'S']
-          : List.generate(5, (i) => 'W${i + 1}');
+          ? L.weekdaysNarrow
+          : List.generate(5, (i) => '${L.weekAbbrev}${i + 1}');
     }
 
     return data;

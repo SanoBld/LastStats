@@ -410,6 +410,13 @@ class AppStringsJa implements AppStrings {
   @override String get backupRestoreApiKeyLabel => 'APIキー';
   @override String get backupRestoreSecretKeyLabel => 'シークレットキー';
   @override String get backupIncludeKeysDesc => 'エクスポートするファイルにキーを含める';
+  @override String get settingsCrashLog => 'エラーログ';
+  @override String get backupCrashLogDesc => 'アプリで発生したエラーを記録します。不具合報告に役立ちます。';
+  @override String get backupCrashLogShare => 'ログを共有';
+  @override String get backupCrashLogClear => 'ログを消去';
+  @override String get backupCrashLogEmpty => '記録されたエラーはありません';
+  @override String get backupCrashLogCleared => 'ログを消去しました';
+  @override String get backupCrashLogClearConfirm => 'エラーログを消去しますか？';
   @override String get faqSectionLabel => 'よくある質問';
   @override String get backupOverwriteWarning => 'バックアップを復元すると、現在の設定は上書きされます。';
   @override String get faqOpenSourceBadge => 'LastStatsはSanoBldが❤️を込めて作った無料のオープンソースプロジェクトです。';
@@ -624,6 +631,8 @@ class AppStringsJa implements AppStrings {
   @override String acctSlotsRemaining(int n) => '残り$n枠';
   @override String acctMaxReached(int max) => '最大$max件のアカウントに達しました。';
   @override List<String> get weekdaysShort => const ['月','火','水','木','金','土','日'];
+  @override List<String> get weekdaysNarrow => const ['月','火','水','木','金','土','日'];
+  @override String get weekAbbrev => '週';
   @override List<String> get notifThresholdMessages => const [
     '最初の1,000スクロブル達成。旅の始まりです。🎵',
     '5桁に到達しました！🎉',
