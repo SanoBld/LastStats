@@ -567,6 +567,7 @@ class AppStringsRu implements AppStrings {
   @override String get favFoldersAll => 'Все';
   @override String get favFolderNew => 'Новая папка';
   @override String get favFolderNamePlaceholder => 'Название папки';
+  @override String get favFolderDescPlaceholder => 'Описание (необязательно)';
   @override String get favFolderCreate => 'Создать';
   @override String get favFolderEdit => 'Изменить папку';
   @override String get favFolderDelete => 'Удалить';

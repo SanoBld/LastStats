@@ -567,6 +567,7 @@ class AppStringsAr implements AppStrings {
   @override String get favFoldersAll => 'الكل';
   @override String get favFolderNew => 'مجلد جديد';
   @override String get favFolderNamePlaceholder => 'اسم المجلد';
+  @override String get favFolderDescPlaceholder => 'الوصف (اختياري)';
   @override String get favFolderCreate => 'إنشاء';
   @override String get favFolderEdit => 'تعديل المجلد';
   @override String get favFolderDelete => 'حذف';

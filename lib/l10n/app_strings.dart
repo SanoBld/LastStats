@@ -668,6 +668,7 @@ abstract class AppStrings {
   String get favFoldersAll;
   String get favFolderNew;
   String get favFolderNamePlaceholder;
+  String get favFolderDescPlaceholder;
   String get favFolderCreate;
   String get favFolderEdit;
   String get favFolderDelete;

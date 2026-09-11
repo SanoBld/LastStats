@@ -6,7 +6,6 @@ const int _kSearchProfiles = 0;
 const int _kSearchArtists  = 1;
 const int _kSearchAlbums   = 2;
 const int _kSearchTracks   = 3;
-const int _kSearchFolders  = 4;
 
 const String _ph = '2a96cbd8b46e442fc41c2b86b821562f';
 
@@ -37,7 +36,6 @@ class _SearchPageState extends State<_SearchPage> {
     (_kSearchArtists,  L.commonArtists,   Icons.mic_rounded),
     (_kSearchAlbums,   L.commonAlbums,    Icons.album_rounded),
     (_kSearchTracks,   L.commonTracks,    Icons.music_note_rounded),
-    (_kSearchFolders,  L.searchFolders,   Icons.folder_rounded),
   ];
 
   @override
@@ -132,8 +130,6 @@ class _SearchPageState extends State<_SearchPage> {
   void _switchTab(int tab) {
     if (_tab == tab) return;
     setState(() { _tab = tab; _results = []; _allResults = {}; _error = null; });
-    // The Folders tab browses saved items directly, it doesn't search.
-    if (tab == _kSearchFolders) return;
     final q = _ctrl.text.trim();
     if (q.isNotEmpty) _search(q);
   }
@@ -171,8 +167,6 @@ class _SearchPageState extends State<_SearchPage> {
             ),
             const SizedBox(height: 10),
 
-            // The Folders tab browses saved items — no text search needed.
-            if (_tab != _kSearchFolders)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: TextField(
@@ -209,7 +203,24 @@ class _SearchPageState extends State<_SearchPage> {
               ),
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
+
+            // Dedicated button to a real, separate Folders page — folders
+            // are not a search tab, they're their own space for saved tracks.
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.folder_rounded, size: 18),
+                  label: Text(L.searchFolders),
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => FoldersGridPage(service: widget.service))),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 8),
 
             SizedBox(
               height: 36,
@@ -236,9 +247,7 @@ class _SearchPageState extends State<_SearchPage> {
 
             const SizedBox(height: 8),
 
-            Expanded(child: _tab == _kSearchFolders
-                ? FoldersBrowser(service: widget.service)
-                : _buildResults(context, scheme, Theme.of(context).textTheme)),
+            Expanded(child: _buildResults(context, scheme, Theme.of(context).textTheme)),
           ],
         ),
       ),
@@ -316,8 +325,7 @@ class _SearchPageState extends State<_SearchPage> {
                 borderRadius: BorderRadius.circular(10),
                 onTap: () { _haptic(_HapticImpact.light); _openMusicDetail(context, item, 'artists'); },
                 child: _FadeSlideIn(
-                  child: _FolderAwareItemTile(name: name, sub: '', imageUrl: raw, rank: '',
-                  type: 'artists', artist: '', image: raw,
+                  child: _ItemTile(name: name, sub: '', imageUrl: raw, rank: '',
                   imageFuture: ImageService.resolveArtist(name, lastfmUrl: raw.isNotEmpty ? raw : null))),
               );
             }),
@@ -335,8 +343,7 @@ class _SearchPageState extends State<_SearchPage> {
                 borderRadius: BorderRadius.circular(10),
                 onTap: () { _haptic(_HapticImpact.light); _openMusicDetail(context, norm, 'albums'); },
                 child: _FadeSlideIn(
-                  child: _FolderAwareItemTile(name: name, sub: artist, imageUrl: raw, rank: '',
-                  type: 'albums', artist: artist, image: raw,
+                  child: _ItemTile(name: name, sub: artist, imageUrl: raw, rank: '',
                   imageFuture: ImageService.resolveAlbum(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null))),
               );
             }),
@@ -355,7 +362,7 @@ class _SearchPageState extends State<_SearchPage> {
                 onTap: () { _haptic(_HapticImpact.light); _openMusicDetail(context, norm, 'tracks'); },
                 child: _FadeSlideIn(
                   child: _FolderAwareItemTile(name: name, sub: artist, imageUrl: raw, rank: '',
-                  type: 'tracks', artist: artist, image: raw,
+                  artist: artist, image: raw,
                   imageFuture: ImageService.resolveTrack(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null))),
               );
             }),
@@ -434,8 +441,10 @@ class _SearchPageState extends State<_SearchPage> {
           borderRadius: AppRadius.smR,
           child: _FadeSlideIn(
             delay: Duration(milliseconds: (i * 25).clamp(0, 250)),
-            child: _FolderAwareItemTile(name: name, sub: sub, imageUrl: imgRaw, imageFuture: imgF,
-                rank: '${i + 1}', type: type, artist: artist, image: imgRaw),
+            child: type == 'tracks'
+                ? _FolderAwareItemTile(name: name, sub: sub, imageUrl: imgRaw, imageFuture: imgF,
+                    rank: '${i + 1}', artist: artist, image: imgRaw)
+                : _ItemTile(name: name, sub: sub, imageUrl: imgRaw, imageFuture: imgF, rank: '${i + 1}'),
           ),
         );
       },

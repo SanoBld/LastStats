@@ -56,7 +56,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
     lovedTrackKeysNotifier.value = newSet;
     // Also drop it from any folder it was saved in.
     FavoritesFoldersService.clearItem(
-        FavoritesFoldersService.itemKey('tracks', name, artist));
+        FavoritesFoldersService.itemKey(name, artist));
 
     final svc = LastFmService(
       apiKey:     widget.service.apiKey,

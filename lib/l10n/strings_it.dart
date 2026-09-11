@@ -567,6 +567,7 @@ class AppStringsIt implements AppStrings {
   @override String get favFoldersAll => 'Tutti';
   @override String get favFolderNew => 'Nuova cartella';
   @override String get favFolderNamePlaceholder => 'Nome cartella';
+  @override String get favFolderDescPlaceholder => 'Descrizione (opzionale)';
   @override String get favFolderCreate => 'Crea';
   @override String get favFolderEdit => 'Modifica cartella';
   @override String get favFolderDelete => 'Elimina';

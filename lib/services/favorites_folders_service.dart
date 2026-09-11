@@ -1,16 +1,16 @@
 // lib/services/favorites_folders_service.dart
 // ══════════════════════════════════════════════════════════════════════════
-//  Folders now live in the Search tab, not in Favorites. A folder can hold
-//  any kind of item — tracks, albums, or artists — saved from search results.
-//  Each item can be in several folders at once.
+//  Folders now live in their own page (accessed from Search), not in
+//  Favorites. A folder holds tracks only, saved from search results or
+//  from any track card. Each track can be in several folders at once.
 //
 //  Storage stays on plain SharedPreferences keys, all prefixed 'ls_' so the
 //  existing BackupService picks them up automatically (it already scans
 //  every 'ls_*' key). No extra code needed there.
-//   • ls_fav_folders      → JSON list of folders (id, name, emoji, color)
-//   • ls_folder_items     → JSON map: item key → list of folder ids
-//   • ls_folder_item_meta → JSON map: item key → {type, name, artist, image}
-//     (meta is needed so a folder can display an item even if it never
+//   • ls_fav_folders      → JSON list of folders (id, name, emoji, color, desc)
+//   • ls_folder_items     → JSON map: track key → list of folder ids
+//   • ls_folder_item_meta → JSON map: track key → {name, artist, image, addedAt}
+//     (meta is needed so a folder can display a track even if it never
 //     appears again in a later search)
 // ══════════════════════════════════════════════════════════════════════════
 
@@ -23,53 +23,56 @@ class FavFolder {
   String name;
   String emoji;
   int colorValue; // ARGB, so it survives JSON round-trips cleanly
+  String description;
 
   FavFolder({
     required this.id,
     required this.name,
     required this.emoji,
     required this.colorValue,
+    this.description = '',
   });
 
   Color get color => Color(colorValue);
 
   Map<String, dynamic> toJson() =>
-      {'id': id, 'name': name, 'emoji': emoji, 'color': colorValue};
+      {'id': id, 'name': name, 'emoji': emoji, 'color': colorValue, 'desc': description};
 
   factory FavFolder.fromJson(Map<String, dynamic> j) => FavFolder(
-    id:         (j['id']    ?? '').toString(),
-    name:       (j['name']  ?? '').toString(),
-    emoji:      (j['emoji'] ?? '📁').toString(),
-    colorValue: (j['color'] is num) ? (j['color'] as num).toInt() : 0xFF6750A4,
+    id:          (j['id']    ?? '').toString(),
+    name:        (j['name']  ?? '').toString(),
+    emoji:       (j['emoji'] ?? '📁').toString(),
+    colorValue:  (j['color'] is num) ? (j['color'] as num).toInt() : 0xFF6750A4,
+    description: (j['desc']  ?? '').toString(),
   );
 }
 
-/// Small snapshot of a saved item, just enough to show it in a folder list
-/// without needing to hit the API again.
+/// Small snapshot of a saved track, just enough to show it in a folder list
+/// without needing to hit the API again. Folders only hold tracks.
 class FolderItem {
   final String key;
-  final String type;   // 'tracks' | 'albums' | 'artists'
   final String name;
-  final String artist;  // empty for artist items
+  final String artist;
   final String image;
+  final int addedAt;    // epoch ms, used to sort "recent first" in a folder
 
   FolderItem({
     required this.key,
-    required this.type,
     required this.name,
     required this.artist,
     required this.image,
+    required this.addedAt,
   });
 
   Map<String, dynamic> toJson() =>
-      {'type': type, 'name': name, 'artist': artist, 'image': image};
+      {'name': name, 'artist': artist, 'image': image, 'addedAt': addedAt};
 
   factory FolderItem.fromJson(String key, Map<String, dynamic> j) => FolderItem(
-    key:    key,
-    type:   (j['type']   ?? 'tracks').toString(),
-    name:   (j['name']   ?? '').toString(),
-    artist: (j['artist'] ?? '').toString(),
-    image:  (j['image']  ?? '').toString(),
+    key:     key,
+    name:    (j['name']   ?? '').toString(),
+    artist:  (j['artist'] ?? '').toString(),
+    image:   (j['image']  ?? '').toString(),
+    addedAt: (j['addedAt'] is num) ? (j['addedAt'] as num).toInt() : 0,
   );
 }
 
@@ -96,10 +99,10 @@ class FavoritesFoldersService {
   static const _kAssignKey  = 'ls_folder_items';
   static const _kMetaKey    = 'ls_folder_item_meta';
 
-  /// Build a stable key for any searchable item. Type is included so a
-  /// track and an artist that share a name never collide.
-  static String itemKey(String type, String name, String artist) =>
-      '$type|${artist.trim().toLowerCase()}|${name.trim().toLowerCase()}';
+  /// Build a stable key for a track. Kept as a function (rather than just
+  /// using name+artist) in case a non-track key format is ever needed.
+  static String itemKey(String name, String artist) =>
+      '${artist.trim().toLowerCase()}|${name.trim().toLowerCase()}';
 
   // Folder list, item→folders assignment, and item metadata — all kept
   // live so every part of the UI updates together without re-reading
@@ -163,20 +166,21 @@ class FavoritesFoldersService {
 
   // ── Folder CRUD ────────────────────────────────────────────────────────
 
-  static Future<FavFolder> createFolder(String name, String emoji, int colorValue) async {
+  static Future<FavFolder> createFolder(String name, String emoji, int colorValue, {String description = ''}) async {
     await ensureLoaded();
     final folder = FavFolder(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
       name: name.trim().isEmpty ? '📁' : name.trim(),
       emoji: emoji,
       colorValue: colorValue,
+      description: description.trim(),
     );
     foldersNotifier.value = [...foldersNotifier.value, folder];
     await _persistFolders();
     return folder;
   }
 
-  static Future<void> updateFolder(String id, {String? name, String? emoji, int? colorValue}) async {
+  static Future<void> updateFolder(String id, {String? name, String? emoji, int? colorValue, String? description}) async {
     await ensureLoaded();
     foldersNotifier.value = foldersNotifier.value.map((f) {
       if (f.id != id) return f;
@@ -185,6 +189,7 @@ class FavoritesFoldersService {
         name: name ?? f.name,
         emoji: emoji ?? f.emoji,
         colorValue: colorValue ?? f.colorValue,
+        description: description ?? f.description,
       );
     }).toList();
     await _persistFolders();
@@ -231,7 +236,13 @@ class FavoritesFoldersService {
     if (folderIds.isEmpty) {
       updatedMeta.remove(key);
     } else if (meta != null) {
-      updatedMeta[key] = meta;
+      // Keep the original "added" time if this item was already saved
+      // somewhere, so re-toggling a folder doesn't bump it to the top.
+      final existing = updatedMeta[key];
+      updatedMeta[key] = existing != null
+          ? FolderItem(key: key, name: meta.name, artist: meta.artist,
+              image: meta.image, addedAt: existing.addedAt)
+          : meta;
     }
     metaNotifier.value = updatedMeta;
     await _persistMeta();
