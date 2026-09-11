@@ -88,6 +88,8 @@ class AppStringsRu implements AppStrings {
   @override String get searchHintTracks => 'Найти песню';
   @override String get searchTypePrompt => 'Введите текст в строке поиска выше';
   @override String get searchAll => 'Все';
+  @override String get searchFolders => 'Папки';
+  @override String get searchFoldersHint => 'Создайте папку, чтобы сохранять треки, альбомы или исполнителей.';
   @override String get perDay => 'в день';
   @override String get activityDays => 'дней активности';
   @override String get dashStats => 'Статистика';

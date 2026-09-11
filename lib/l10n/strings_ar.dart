@@ -88,6 +88,8 @@ class AppStringsAr implements AppStrings {
   @override String get searchHintTracks => 'ابحث عن أغنية';
   @override String get searchTypePrompt => 'اكتب في شريط البحث أعلاه';
   @override String get searchAll => 'الكل';
+  @override String get searchFolders => 'المجلدات';
+  @override String get searchFoldersHint => 'أنشئ مجلدًا لحفظ المقاطع أو الألبومات أو الفنانين.';
   @override String get perDay => 'يوميًا';
   @override String get activityDays => 'أيام النشاط';
   @override String get dashStats => 'إحصائيات';

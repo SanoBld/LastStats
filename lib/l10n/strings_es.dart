@@ -109,6 +109,8 @@ class AppStringsEs implements AppStrings {
   @override String get searchHintTracks   => 'Busca una canción';
   @override String get searchTypePrompt   => 'Escribe en la barra de arriba';
   @override String get searchAll          => 'Todo';
+  @override String get searchFolders => 'Carpetas';
+  @override String get searchFoldersHint => 'Crea una carpeta para guardar canciones, álbumes o artistas.';
   @override String memberSince(String date) => 'Desde $date';
   @override String get perDay             => 'por día';
   @override String get activityDays       => 'de actividad';

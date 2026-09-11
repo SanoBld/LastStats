@@ -109,6 +109,8 @@ class AppStringsPt implements AppStrings {
   @override String get searchHintTracks   => 'Buscar uma música';
   @override String get searchTypePrompt   => 'Digite na barra acima';
   @override String get searchAll          => 'Tudo';
+  @override String get searchFolders => 'Pastas';
+  @override String get searchFoldersHint => 'Crie uma pasta para guardar músicas, álbuns ou artistas.';
   @override String memberSince(String date) => 'Desde $date';
   @override String get perDay             => 'por dia';
   @override String get activityDays       => 'de atividade';

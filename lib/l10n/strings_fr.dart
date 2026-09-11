@@ -109,6 +109,8 @@ class AppStringsFr implements AppStrings {
   @override String get searchHintTracks   => 'Recherche une chanson';
   @override String get searchTypePrompt   => 'Tape dans la barre ci-dessus';
   @override String get searchAll          => 'Tout';
+  @override String get searchFolders => 'Dossiers';
+  @override String get searchFoldersHint => 'Crée un dossier pour ranger des titres, albums ou artistes.';
   @override String memberSince(String date) => 'Depuis $date';
   @override String get perDay             => 'par jour';
   @override String get activityDays       => "d'activité";

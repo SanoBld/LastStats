@@ -302,8 +302,14 @@ class _ItemTile extends StatelessWidget {
   final String name, sub, imageUrl, rank;
   final Future<String>? imageFuture;
   final String? plays;
+  // Optional "save to folder" button. When set, a folder icon shows on the
+  // right; folderEmojis (if any) are shown as a small strip under sub, so
+  // the user can see at a glance which folder(s) this item is saved in.
+  final VoidCallback? onAssign;
+  final List<String>  folderEmojis;
   const _ItemTile({required this.name, required this.sub, required this.imageUrl,
-      required this.rank, this.imageFuture, this.plays});
+      required this.rank, this.imageFuture, this.plays, this.onAssign,
+      this.folderEmojis = const []});
 
   @override
   Widget build(BuildContext context) {
@@ -321,12 +327,409 @@ class _ItemTile extends StatelessWidget {
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
                 style: AppText.itemTitle.copyWith(fontSize: 14, color: scheme.onSurface)),
-            Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis,
-                style: AppText.label.copyWith(color: scheme.onSurfaceVariant)),
+            Row(children: [
+              if (sub.isNotEmpty) Flexible(child: Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: AppText.label.copyWith(color: scheme.onSurfaceVariant))),
+              if (folderEmojis.isNotEmpty) Padding(
+                padding: const EdgeInsets.only(left: 4),
+                child: Text(folderEmojis.take(3).join(''), style: const TextStyle(fontSize: 11)),
+              ),
+            ]),
           ])),
           if (plays != null) Padding(padding: const EdgeInsets.only(left: 8),
             child: Text(plays!, style: AppText.body.copyWith(color: scheme.primary))),
+          if (onAssign != null) IconButton(
+            icon: Icon(Icons.create_new_folder_outlined, size: 18, color: scheme.onSurfaceVariant),
+            onPressed: onAssign,
+            visualDensity: VisualDensity.compact,
+          ),
         ])));
+  }
+}
+
+/// Bottom sheet to save/unsave one item (track, album or artist) into
+/// folders. Shared between the search page and the music card, so any
+/// place with a "save to folder" button opens the same picker.
+Future<void> showFolderAssignSheet(
+  BuildContext context, {
+  required String type,
+  required String name,
+  required String artist,
+  required String image,
+}) async {
+  await FavoritesFoldersService.ensureLoaded();
+  final key = FavoritesFoldersService.itemKey(type, name, artist);
+  final meta = FolderItem(key: key, type: type, name: name, artist: artist, image: image);
+
+  await showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    builder: (ctx) => ValueListenableBuilder<List<FavFolder>>(
+      valueListenable: FavoritesFoldersService.foldersNotifier,
+      builder: (ctx, folders, _) => ValueListenableBuilder<Map<String, List<String>>>(
+        valueListenable: FavoritesFoldersService.assignNotifier,
+        builder: (ctx, _, _) {
+          final scheme = Theme.of(ctx).colorScheme;
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Row(children: [
+                    Expanded(child: Text(L.favFolderAssignTitle,
+                        style: Theme.of(ctx).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700))),
+                  ]),
+                ),
+                const SizedBox(height: 8),
+                if (folders.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Text(L.searchFoldersHint,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: scheme.onSurfaceVariant)),
+                  ),
+                ...folders.map((f) {
+                  final checked = FavoritesFoldersService.foldersForItem(key).contains(f.id);
+                  return CheckboxListTile(
+                    value: checked,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    secondary: CircleAvatar(
+                      backgroundColor: f.color.withValues(alpha: 0.25),
+                      child: Text(f.emoji, style: const TextStyle(fontSize: 16)),
+                    ),
+                    title: Text(f.name),
+                    onChanged: (_) =>
+                        FavoritesFoldersService.toggleItemInFolder(key, f.id, meta: meta),
+                  );
+                }),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.add_rounded),
+                  title: Text(L.favFolderNew),
+                  onTap: () async {
+                    Navigator.pop(ctx);
+                    await showFolderEditorSheet(context);
+                  },
+                ),
+              ]),
+            ),
+          );
+        },
+      ),
+    ),
+  );
+}
+
+/// Create-or-edit sheet for a folder (name, emoji, color). Shared between
+/// the search page's folder tab and the quick "new folder" shortcut above.
+Future<void> showFolderEditorSheet(BuildContext context, {FavFolder? existing}) async {
+  final nameCtrl = TextEditingController(text: existing?.name ?? '');
+  String emoji   = existing?.emoji ?? kFavFolderEmojis.first;
+  int colorValue = existing?.colorValue ?? kFavFolderColors.first;
+
+  final result = await showModalBottomSheet<bool>(
+    context: context,
+    isScrollControlled: true,
+    builder: (ctx) => StatefulBuilder(builder: (ctx, setSheet) {
+      final scheme = Theme.of(ctx).colorScheme;
+      return Padding(
+        padding: EdgeInsets.only(
+          left: 20, right: 20, top: 20,
+          bottom: 20 + MediaQuery.of(ctx).viewInsets.bottom,
+        ),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(existing == null ? L.favFolderNew : L.favFolderEdit,
+              style: Theme.of(ctx).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+          const SizedBox(height: 16),
+          Row(children: [
+            Container(
+              width: 52, height: 52,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Color(colorValue).withValues(alpha: 0.25),
+                borderRadius: AppRadius.mdR,
+              ),
+              child: Text(emoji, style: const TextStyle(fontSize: 26)),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextField(
+                controller: nameCtrl,
+                autofocus: existing == null,
+                decoration: InputDecoration(
+                  hintText: L.favFolderNamePlaceholder,
+                  border: OutlineInputBorder(borderRadius: AppRadius.smR),
+                  isDense: true,
+                ),
+              ),
+            ),
+          ]),
+          const SizedBox(height: 18),
+          Text(L.favFolderEmoji, style: Theme.of(ctx).textTheme.labelMedium
+              ?.copyWith(color: scheme.onSurfaceVariant)),
+          const SizedBox(height: 8),
+          Wrap(spacing: 8, runSpacing: 8, children: kFavFolderEmojis.map((e) {
+            final selected = e == emoji;
+            return GestureDetector(
+              onTap: () => setSheet(() => emoji = e),
+              child: Container(
+                width: 40, height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: selected ? scheme.primaryContainer : scheme.surfaceContainerHighest,
+                  border: selected ? Border.all(color: scheme.primary, width: 2) : null,
+                ),
+                child: Text(e, style: const TextStyle(fontSize: 18)),
+              ),
+            );
+          }).toList()),
+          const SizedBox(height: 18),
+          Text(L.favFolderColor, style: Theme.of(ctx).textTheme.labelMedium
+              ?.copyWith(color: scheme.onSurfaceVariant)),
+          const SizedBox(height: 8),
+          Wrap(spacing: 8, runSpacing: 8, children: kFavFolderColors.map((c) {
+            final selected = c == colorValue;
+            return GestureDetector(
+              onTap: () => setSheet(() => colorValue = c),
+              child: Container(
+                width: 32, height: 32,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(c),
+                  border: selected
+                      ? Border.all(color: scheme.onSurface, width: 2.5)
+                      : null,
+                ),
+              ),
+            );
+          }).toList()),
+          const SizedBox(height: 22),
+          Row(children: [
+            if (existing != null) ...[
+              Expanded(
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(foregroundColor: scheme.error),
+                  icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                  label: Text(L.favFolderDelete),
+                  onPressed: () async {
+                    final confirm = await showDialog<bool>(
+                      context: ctx,
+                      builder: (dctx) => AlertDialog(
+                        content: Text(L.favFolderDeleteConfirm),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.pop(dctx, false), child: Text(L.commonCancel)),
+                          FilledButton.tonal(
+                            style: FilledButton.styleFrom(foregroundColor: scheme.error),
+                            onPressed: () => Navigator.pop(dctx, true),
+                            child: Text(L.favFolderDelete),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirm == true) {
+                      await FavoritesFoldersService.deleteFolder(existing.id);
+                      if (ctx.mounted) Navigator.pop(ctx, false);
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(width: 10),
+            ],
+            Expanded(
+              child: FilledButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text(existing == null ? L.favFolderCreate : L.favFolderSave),
+              ),
+            ),
+          ]),
+        ]),
+      );
+    }),
+  );
+
+  if (result != true) return;
+  final name = nameCtrl.text.trim();
+  if (existing == null) {
+    if (name.isEmpty) return;
+    await FavoritesFoldersService.createFolder(name, emoji, colorValue);
+  } else {
+    await FavoritesFoldersService.updateFolder(existing.id,
+        name: name.isEmpty ? existing.name : name, emoji: emoji, colorValue: colorValue);
+  }
+}
+
+/// Wraps _ItemTile and keeps its folder badges/button in sync with
+/// FavoritesFoldersService, so search result cards update live when the
+/// user saves or unsaves them from a folder.
+class _FolderAwareItemTile extends StatelessWidget {
+  final String name, sub, imageUrl, rank, type, artist, image;
+  final Future<String>? imageFuture;
+  const _FolderAwareItemTile({
+    required this.name, required this.sub, required this.imageUrl, required this.rank,
+    required this.type, required this.artist, required this.image, this.imageFuture,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final key = FavoritesFoldersService.itemKey(type, name, artist);
+    return ValueListenableBuilder<Map<String, List<String>>>(
+      valueListenable: FavoritesFoldersService.assignNotifier,
+      builder: (ctx, _, _) {
+        final ids = FavoritesFoldersService.foldersForItem(key);
+        final emojis = FavoritesFoldersService.foldersNotifier.value
+            .where((f) => ids.contains(f.id)).map((f) => f.emoji).toList();
+        return _ItemTile(
+          name: name, sub: sub, imageUrl: imageUrl, rank: rank, imageFuture: imageFuture,
+          folderEmojis: emojis,
+          onAssign: () => showFolderAssignSheet(context, type: type, name: name, artist: artist, image: image),
+        );
+      },
+    );
+  }
+}
+
+/// The Folders tab body: a horizontal chip row to pick/create/edit a
+/// folder, and below it the list of items saved in the selected folder.
+class FoldersBrowser extends StatefulWidget {
+  final LastFmService service;
+  const FoldersBrowser({super.key, required this.service});
+
+  @override
+  State<FoldersBrowser> createState() => _FoldersBrowserState();
+}
+
+class _FoldersBrowserState extends State<FoldersBrowser> {
+  String? _selected; // null = show items from every folder combined
+
+  @override
+  void initState() {
+    super.initState();
+    FavoritesFoldersService.ensureLoaded();
+  }
+
+  void _openItem(FolderItem item) {
+    final data = <String, dynamic>{
+      'name': item.name,
+      'artist': {'name': item.artist},
+      'image': item.image.isEmpty ? [] : [{'#text': item.image, 'size': 'large'}],
+    };
+    showDetailSheet(context, data, item.type, widget.service);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return ValueListenableBuilder<List<FavFolder>>(
+      valueListenable: FavoritesFoldersService.foldersNotifier,
+      builder: (ctx, folders, _) {
+        // If the selected folder got deleted, fall back to "all".
+        if (_selected != null && folders.every((f) => f.id != _selected)) {
+          _selected = null;
+        }
+        return ValueListenableBuilder<Map<String, List<String>>>(
+          valueListenable: FavoritesFoldersService.assignNotifier,
+          builder: (ctx, _, _) {
+            List<FolderItem> items;
+            if (_selected == null) {
+              // "All" view: union of every folder's items, no duplicates.
+              final byKey = <String, FolderItem>{};
+              for (final f in folders) {
+                for (final it in FavoritesFoldersService.itemsInFolder(f.id)) {
+                  byKey[it.key] = it;
+                }
+              }
+              items = byKey.values.toList();
+            } else {
+              items = FavoritesFoldersService.itemsInFolder(_selected!);
+            }
+
+            return Column(children: [
+              SizedBox(
+                height: 40,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(L.favFoldersAll),
+                        selected: _selected == null,
+                        showCheckmark: false,
+                        onSelected: (_) => setState(() => _selected = null),
+                      ),
+                    ),
+                    for (final f in folders)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: GestureDetector(
+                          onLongPress: () => showFolderEditorSheet(context, existing: f),
+                          child: ChoiceChip(
+                            avatar: Text(f.emoji, style: const TextStyle(fontSize: 14)),
+                            label: Text(f.name),
+                            selected: _selected == f.id,
+                            showCheckmark: false,
+                            selectedColor: f.color.withValues(alpha: 0.32),
+                            onSelected: (_) => setState(() => _selected = f.id),
+                          ),
+                        ),
+                      ),
+                    ActionChip(
+                      avatar: const Icon(Icons.add_rounded, size: 16),
+                      label: Text(L.favFolderNew),
+                      onPressed: () => showFolderEditorSheet(context),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Expanded(
+                child: items.isEmpty
+                    ? Center(child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Text(
+                          folders.isEmpty ? L.searchFoldersHint : L.favFolderEmpty,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: scheme.onSurfaceVariant),
+                        ),
+                      ))
+                    : ListView.separated(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        itemCount: items.length,
+                        separatorBuilder: (_, _) => const Divider(height: 1),
+                        itemBuilder: (ctx, i) {
+                          final it = items[i];
+                          return ListTile(
+                            onTap: () => _openItem(it),
+                            leading: ClipRRect(
+                              borderRadius: AppRadius.smR,
+                              child: SizedBox(width: 44, height: 44,
+                                child: it.image.isNotEmpty
+                                    ? Image.network(it.image, fit: BoxFit.cover,
+                                        errorBuilder: (_, _, _) => Container(color: scheme.secondaryContainer))
+                                    : Container(color: scheme.secondaryContainer,
+                                        child: Icon(Icons.music_note_rounded, color: scheme.onSecondaryContainer, size: 20)),
+                              ),
+                            ),
+                            title: Text(it.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+                            subtitle: it.artist.isEmpty ? null
+                                : Text(it.artist, maxLines: 1, overflow: TextOverflow.ellipsis),
+                            trailing: IconButton(
+                              icon: Icon(Icons.create_new_folder_outlined, size: 20, color: scheme.onSurfaceVariant),
+                              onPressed: () => showFolderAssignSheet(context,
+                                  type: it.type, name: it.name, artist: it.artist, image: it.image),
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ]);
+          },
+        );
+      },
+    );
   }
 }
 

@@ -52,6 +52,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../widgets/markdown_lite.dart';
 import '../widgets/living_artwork.dart';
 import 'favorites_page.dart';
+import '../services/favorites_folders_service.dart';
 
 
 // ── Settings sub-pages ────────────────────────────────────────────────────────

@@ -88,6 +88,8 @@ class AppStringsIt implements AppStrings {
   @override String get searchHintTracks => 'Trova un brano';
   @override String get searchTypePrompt => 'Digita nella barra di ricerca sopra';
   @override String get searchAll => 'Tutti';
+  @override String get searchFolders => 'Cartelle';
+  @override String get searchFoldersHint => 'Crea una cartella per salvare brani, album o artisti.';
   @override String get perDay => 'al giorno';
   @override String get activityDays => 'di attività';
   @override String get dashStats => 'Statistiche';

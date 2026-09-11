@@ -1,13 +1,17 @@
 // lib/services/favorites_folders_service.dart
 // ══════════════════════════════════════════════════════════════════════════
-//  Folders for the Favorites page: user-created groups with an emoji and a
-//  color, tracks can belong to zero, one or several folders.
+//  Folders now live in the Search tab, not in Favorites. A folder can hold
+//  any kind of item — tracks, albums, or artists — saved from search results.
+//  Each item can be in several folders at once.
 //
-//  Storage is two SharedPreferences keys, both prefixed 'ls_' like every
-//  other persisted setting in this app — which means BackupService already
-//  exports and restores them automatically, no extra plumbing needed there.
-//   • ls_fav_folders        → JSON list of folders (id, name, emoji, color)
-//   • ls_fav_track_folders  → JSON map: track key → list of folder ids
+//  Storage stays on plain SharedPreferences keys, all prefixed 'ls_' so the
+//  existing BackupService picks them up automatically (it already scans
+//  every 'ls_*' key). No extra code needed there.
+//   • ls_fav_folders      → JSON list of folders (id, name, emoji, color)
+//   • ls_folder_items     → JSON map: item key → list of folder ids
+//   • ls_folder_item_meta → JSON map: item key → {type, name, artist, image}
+//     (meta is needed so a folder can display an item even if it never
+//     appears again in a later search)
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'dart:convert';
@@ -40,6 +44,35 @@ class FavFolder {
   );
 }
 
+/// Small snapshot of a saved item, just enough to show it in a folder list
+/// without needing to hit the API again.
+class FolderItem {
+  final String key;
+  final String type;   // 'tracks' | 'albums' | 'artists'
+  final String name;
+  final String artist;  // empty for artist items
+  final String image;
+
+  FolderItem({
+    required this.key,
+    required this.type,
+    required this.name,
+    required this.artist,
+    required this.image,
+  });
+
+  Map<String, dynamic> toJson() =>
+      {'type': type, 'name': name, 'artist': artist, 'image': image};
+
+  factory FolderItem.fromJson(String key, Map<String, dynamic> j) => FolderItem(
+    key:    key,
+    type:   (j['type']   ?? 'tracks').toString(),
+    name:   (j['name']   ?? '').toString(),
+    artist: (j['artist'] ?? '').toString(),
+    image:  (j['image']  ?? '').toString(),
+  );
+}
+
 // Curated palette so folders stay legible against both light and dark
 // surfaces — mostly Material-ish tones, nothing too washed out or too neon.
 const List<int> kFavFolderColors = [
@@ -60,13 +93,20 @@ class FavoritesFoldersService {
   FavoritesFoldersService._();
 
   static const _kFoldersKey = 'ls_fav_folders';
-  static const _kAssignKey  = 'ls_fav_track_folders';
+  static const _kAssignKey  = 'ls_folder_items';
+  static const _kMetaKey    = 'ls_folder_item_meta';
 
-  // Folder list, and the track→folders assignment map, both kept live so
-  // every part of the favorites page updates together without re-reading
+  /// Build a stable key for any searchable item. Type is included so a
+  /// track and an artist that share a name never collide.
+  static String itemKey(String type, String name, String artist) =>
+      '$type|${artist.trim().toLowerCase()}|${name.trim().toLowerCase()}';
+
+  // Folder list, item→folders assignment, and item metadata — all kept
+  // live so every part of the UI updates together without re-reading
   // SharedPreferences on every rebuild.
   static final ValueNotifier<List<FavFolder>> foldersNotifier = ValueNotifier([]);
   static final ValueNotifier<Map<String, List<String>>> assignNotifier = ValueNotifier({});
+  static final ValueNotifier<Map<String, FolderItem>> metaNotifier = ValueNotifier({});
 
   static bool _loaded = false;
 
@@ -93,6 +133,15 @@ class FavoritesFoldersService {
             (k, v) => MapEntry(k, List<String>.from(v as List)));
       } catch (_) {}
     }
+
+    final metaRaw = p.getString(_kMetaKey);
+    if (metaRaw != null && metaRaw.isNotEmpty) {
+      try {
+        final decoded = Map<String, dynamic>.from(jsonDecode(metaRaw));
+        metaNotifier.value = decoded.map((k, v) =>
+            MapEntry(k, FolderItem.fromJson(k, Map<String, dynamic>.from(v))));
+      } catch (_) {}
+    }
   }
 
   static Future<void> _persistFolders() async {
@@ -104,6 +153,12 @@ class FavoritesFoldersService {
   static Future<void> _persistAssign() async {
     final p = await SharedPreferences.getInstance();
     await p.setString(_kAssignKey, jsonEncode(assignNotifier.value));
+  }
+
+  static Future<void> _persistMeta() async {
+    final p = await SharedPreferences.getInstance();
+    await p.setString(_kMetaKey,
+        jsonEncode(metaNotifier.value.map((k, v) => MapEntry(k, v.toJson()))));
   }
 
   // ── Folder CRUD ────────────────────────────────────────────────────────
@@ -139,44 +194,69 @@ class FavoritesFoldersService {
     await ensureLoaded();
     foldersNotifier.value = foldersNotifier.value.where((f) => f.id != id).toList();
     await _persistFolders();
-    // Clean up any track assignments pointing at the deleted folder.
-    final updated = <String, List<String>>{};
+
+    // Drop the folder from every item, then forget items left in no folder
+    // at all — their metadata is only useful while they're saved somewhere.
+    final updatedAssign = <String, List<String>>{};
     for (final e in assignNotifier.value.entries) {
       final remaining = e.value.where((fid) => fid != id).toList();
-      if (remaining.isNotEmpty) updated[e.key] = remaining;
+      if (remaining.isNotEmpty) updatedAssign[e.key] = remaining;
     }
-    assignNotifier.value = updated;
+    assignNotifier.value = updatedAssign;
     await _persistAssign();
+
+    final updatedMeta = Map<String, FolderItem>.from(metaNotifier.value)
+      ..removeWhere((k, _) => !updatedAssign.containsKey(k));
+    metaNotifier.value = updatedMeta;
+    await _persistMeta();
   }
 
-  // ── Track ↔ folder assignment ─────────────────────────────────────────
+  // ── Item ↔ folder assignment ───────────────────────────────────────────
 
-  static List<String> foldersForTrack(String trackKey) =>
-      assignNotifier.value[trackKey] ?? const [];
+  static List<String> foldersForItem(String key) =>
+      assignNotifier.value[key] ?? const [];
 
-  static Future<void> setFoldersForTrack(String trackKey, List<String> folderIds) async {
+  static Future<void> setFoldersForItem(String key, List<String> folderIds, {FolderItem? meta}) async {
     await ensureLoaded();
-    final updated = Map<String, List<String>>.from(assignNotifier.value);
+    final updatedAssign = Map<String, List<String>>.from(assignNotifier.value);
     if (folderIds.isEmpty) {
-      updated.remove(trackKey);
+      updatedAssign.remove(key);
     } else {
-      updated[trackKey] = folderIds;
+      updatedAssign[key] = folderIds;
     }
-    assignNotifier.value = updated;
+    assignNotifier.value = updatedAssign;
     await _persistAssign();
+
+    final updatedMeta = Map<String, FolderItem>.from(metaNotifier.value);
+    if (folderIds.isEmpty) {
+      updatedMeta.remove(key);
+    } else if (meta != null) {
+      updatedMeta[key] = meta;
+    }
+    metaNotifier.value = updatedMeta;
+    await _persistMeta();
   }
 
-  static Future<void> toggleTrackInFolder(String trackKey, String folderId) async {
-    final current = List<String>.from(foldersForTrack(trackKey));
+  static Future<void> toggleItemInFolder(String key, String folderId, {required FolderItem meta}) async {
+    final current = List<String>.from(foldersForItem(key));
     if (current.contains(folderId)) {
       current.remove(folderId);
     } else {
       current.add(folderId);
     }
-    await setFoldersForTrack(trackKey, current);
+    await setFoldersForItem(key, current, meta: meta);
   }
 
-  /// Drop a track from every folder — used when a track is unloved, so it
-  /// doesn't linger orphaned in a folder if it's later re-loved.
-  static Future<void> clearTrack(String trackKey) => setFoldersForTrack(trackKey, const []);
+  /// Drop an item from every folder — used e.g. when a loved track is
+  /// unloved, so it doesn't linger orphaned if it's later re-loved.
+  static Future<void> clearItem(String key) => setFoldersForItem(key, const []);
+
+  /// All items currently saved in one folder, most recently added last.
+  static List<FolderItem> itemsInFolder(String folderId) {
+    final keys = assignNotifier.value.entries
+        .where((e) => e.value.contains(folderId))
+        .map((e) => e.key);
+    return keys.map((k) => metaNotifier.value[k])
+        .whereType<FolderItem>().toList();
+  }
 }

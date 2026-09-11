@@ -88,6 +88,8 @@ class AppStringsJa implements AppStrings {
   @override String get searchHintTracks => '曲を検索';
   @override String get searchTypePrompt => '上の検索バーに入力してください';
   @override String get searchAll => 'すべて';
+  @override String get searchFolders => 'フォルダ';
+  @override String get searchFoldersHint => 'フォルダを作成して曲・アルバム・アーティストを保存';
   @override String get perDay => '1日あたり';
   @override String get activityDays => 'アクティブ日数';
   @override String get dashStats => '統計';

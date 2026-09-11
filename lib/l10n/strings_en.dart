@@ -109,6 +109,8 @@ class AppStringsEn implements AppStrings {
   @override String get searchHintTracks   => 'Find a song';
   @override String get searchTypePrompt   => 'Type in the search bar above';
   @override String get searchAll          => 'All';
+  @override String get searchFolders => 'Folders';
+  @override String get searchFoldersHint => 'Create a folder to save tracks, albums or artists.';
   @override String memberSince(String date) => 'Since $date';
   @override String get perDay             => 'per day';
   @override String get activityDays       => 'of activity';

@@ -88,6 +88,8 @@ class AppStringsDe implements AppStrings {
   @override String get searchHintTracks => 'Song finden';
   @override String get searchTypePrompt => 'Oben in die Suchleiste tippen';
   @override String get searchAll => 'Alle';
+  @override String get searchFolders => 'Ordner';
+  @override String get searchFoldersHint => 'Erstelle einen Ordner, um Titel, Alben oder Künstler zu speichern.';
   @override String get perDay => 'pro Tag';
   @override String get activityDays => 'aktive Tage';
   @override String get dashStats => 'Statistik';

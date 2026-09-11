@@ -106,6 +106,8 @@ abstract class AppStrings {
   String get searchHintTracks;
   String get searchTypePrompt;
   String get searchAll;
+  String get searchFolders;
+  String get searchFoldersHint;
   String memberSince(String date);
   String get perDay;
   String get activityDays;

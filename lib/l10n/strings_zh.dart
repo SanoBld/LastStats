@@ -106,6 +106,8 @@ class AppStringsZh implements AppStrings {
   @override String get searchHintTracks   => '搜索歌曲';
   @override String get searchTypePrompt   => '在上方搜索栏输入';
   @override String get searchAll          => '全部';
+  @override String get searchFolders => '文件夹';
+  @override String get searchFoldersHint => '创建文件夹以保存歌曲、专辑或艺术家';
   @override String memberSince(String date) => '加入于 $date';
   @override String get perDay             => '每天';
   @override String get activityDays       => '活跃天数';
