@@ -58,6 +58,7 @@
 <span class="name ">buildBackupJson</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="buildBackupJson-param-includeApiKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeApiKey</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="buildBackupJson-param-includeSecretKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeSecretKey</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="buildBackupJson-param-includeFolders"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeFolders</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="buildBackupJson-param-includeThemes"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeThemes</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="buildBackupJson-param-includeScrobbles"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeScrobbles</span> = <span class="default-value">false</span>, </span></li>
 </ol>})
 
@@ -82,6 +83,7 @@ Both default to true so nothing changes for existing callers.</p>
   bool includeApiKey = true,
   bool includeSecretKey = true,
   bool includeFolders = true,
+  bool includeThemes = true,
   &#47;&#47; NEW: when true, the full scrobble history (every track ever played,
   &#47;&#47; as cached on this device) is embedded in the backup file too.
   bool includeScrobbles = false,
@@ -99,6 +101,9 @@ Both default to true so nothing changes for existing callers.</p>
       continue;
     }
     if (!includeFolders &amp;&amp; _kFolderKeys.contains(key)) {
+      continue;
+    }
+    if (!includeThemes &amp;&amp; _kThemeKeys.contains(key)) {
       continue;
     }
     final v = p.get(key);
@@ -129,6 +134,41 @@ Both default to true so nothing changes for existing callers.</p>
   &#47;&#47; actually asked for them (this can be a big amount of data).
   Map&lt;String, String&gt;? scrobbles;
   if (includeScrobbles) {
+    &#47;&#47; Best-effort: pull the latest scrobbles from Last.fm first, so the
+    &#47;&#47; backup actually has &quot;everything&quot; and not just what was cached the
+    &#47;&#47; last time the app happened to sync. Use the account credentials
+    &#47;&#47; even if includeApiKey&#47;includeSecretKey are off — those flags only
+    &#47;&#47; control what&#39;s WRITTEN to the file, not what we&#39;re allowed to use
+    &#47;&#47; to talk to Last.fm right now.
+    &#47;&#47; Read credentials straight from SharedPreferences (not from `map`,
+    &#47;&#47; which may have dropped them if includeApiKey is off) — those flags
+    &#47;&#47; only control what&#39;s WRITTEN to the file, not what we&#39;re allowed to
+    &#47;&#47; use to talk to Last.fm right now.
+    String syncUsername = p.getString(&#39;ls_username&#39;) ?? &#39;&#39;;
+    String syncApiKey   = p.getString(&#39;ls_apikey&#39;)   ?? &#39;&#39;;
+    final accountsRaw = p.getString(&#39;ls_accounts&#39;);
+    if (accountsRaw != null &amp;&amp; accountsRaw.isNotEmpty) {
+      try {
+        final accounts  = jsonDecode(accountsRaw) as List;
+        final activeIdx = p.getInt(&#39;ls_active_account&#39;) ?? 0;
+        if (accounts.isNotEmpty) {
+          final acc = accounts[activeIdx.clamp(0, accounts.length - 1)] as Map&lt;String, dynamic&gt;;
+          if ((acc[&#39;username&#39;] ?? &#39;&#39;).toString().isNotEmpty) syncUsername = acc[&#39;username&#39;].toString();
+          if ((acc[&#39;apiKey&#39;]   ?? &#39;&#39;).toString().isNotEmpty) syncApiKey   = acc[&#39;apiKey&#39;].toString();
+        }
+      } catch (_) {}
+    }
+    if (syncUsername.isNotEmpty &amp;&amp; syncApiKey.isNotEmpty) {
+      try {
+        final service = LastFmService(
+          apiKey:   syncApiKey,
+          username: syncUsername,
+        );
+        await AllScrobblesService.syncNew(service);
+      } catch (_) {
+        &#47;&#47; Offline or API error: fall back to whatever is already cached.
+      }
+    }
     scrobbles = await ScrobblesFileCache.exportRawForBackup();
   }
 

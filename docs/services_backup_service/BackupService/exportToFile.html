@@ -58,6 +58,7 @@
 <span class="name ">exportToFile</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="exportToFile-param-includeApiKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeApiKey</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="exportToFile-param-includeSecretKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeSecretKey</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="exportToFile-param-includeFolders"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeFolders</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="exportToFile-param-includeThemes"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeThemes</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="exportToFile-param-includeScrobbles"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeScrobbles</span> = <span class="default-value">false</span>, </span></li>
 </ol>})
 
@@ -77,6 +78,7 @@
   bool includeApiKey = true,
   bool includeSecretKey = true,
   bool includeFolders = true,
+  bool includeThemes = true,
   bool includeScrobbles = false,
 }) async {
   try {
@@ -84,6 +86,7 @@
       includeApiKey: includeApiKey,
       includeSecretKey: includeSecretKey,
       includeFolders: includeFolders,
+      includeThemes: includeThemes,
       includeScrobbles: includeScrobbles,
     );
     final bytes   = Uint8List.fromList(utf8.encode(payload));
@@ -96,11 +99,16 @@
     );
     if (path == null) return false; &#47;&#47; user cancelled the dialog
 
-    &#47;&#47; On desktop (Windows&#47;macOS&#47;Linux), saveFile() only returns the chosen
-    &#47;&#47; path — it does NOT write the file. We have to do that ourselves.
-    &#47;&#47; (On web, the bytes are handled by the browser download and `path`
-    &#47;&#47; is just a filename, not a real filesystem path, so skip writing.)
-    if (!kIsWeb) {
+    &#47;&#47; BUG FIX: writing the file ourselves only makes sense on desktop.
+    &#47;&#47; On Android&#47;iOS, file_picker already saves the bytes itself (the
+    &#47;&#47; returned &quot;path&quot; there is often a content:&#47;&#47; URI, not a real
+    &#47;&#47; filesystem path), so calling File(path).writeAsBytes() on mobile
+    &#47;&#47; throws — the file was actually saved fine, but we returned false
+    &#47;&#47; and showed &quot;couldn&#39;t save&quot; by mistake. Only do the manual write
+    &#47;&#47; on Windows&#47;macOS&#47;Linux, where file_picker does NOT write for us.
+    final isDesktop = !kIsWeb &amp;&amp;
+        (Platform.isWindows || Platform.isMacOS || Platform.isLinux);
+    if (isDesktop) {
       final file = File(path);
       await file.writeAsBytes(bytes, flush: true);
     }
