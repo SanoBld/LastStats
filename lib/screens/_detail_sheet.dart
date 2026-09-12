@@ -404,11 +404,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   String _lyrics         = '';
   bool   _lyricsExpanded = false;
 
-  // ── Shoutbox (read-only — Last.fm's public API has no write endpoint) ───
-  bool          _loadingShouts = false;
-  List<dynamic> _shouts        = [];
-  bool          _shoutsFailed  = false;
-
   // Deezer 30s preview player
   String?      _previewUrl;
   bool         _previewLoading = false;
@@ -476,7 +471,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   }
 
   Future<void> _fetchMeta() async {
-    _fetchShouts(); // independent of the switch below, same for all 3 types
     try {
       switch (widget.type) {
         case 'artists':
@@ -1697,29 +1691,16 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   // API only exposes a READ method (*.getShouts) — there is no official
   // way to post a comment through the API, so "reply" opens the real
   // Last.fm page in the browser instead of posting in-app.
-  Future<void> _fetchShouts() async {
-    if (_name.isEmpty) return;
-    if ((widget.type == 'tracks' || widget.type == 'albums') && _artist.isEmpty) return;
-
-    setState(() { _loadingShouts = true; _shoutsFailed = false; });
-    List<dynamic> result = [];
-    try {
-      switch (widget.type) {
-        case 'artists':
-          result = await widget.service.getArtistShouts(_name, limit: 15);
-        case 'albums':
-          result = await widget.service.getAlbumShouts(_name, _artist, limit: 15);
-        case 'tracks':
-          result = await widget.service.getTrackShouts(_name, _artist, limit: 15);
-      }
-    } catch (_) {
-      if (mounted) setState(() => _shoutsFailed = true);
-    }
-    if (mounted) setState(() { _shouts = result; _loadingShouts = false; });
+  Future<void> _openShoutbox() async {
+    final uri = Uri.tryParse(_shoutboxUrl());
+    if (uri == null) return;
+    if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
-  // Builds the real Last.fm URL for this item's shoutbox, so "reply" opens
-  // the actual page where the person can post a comment (the API can't).
+  // Builds the real Last.fm URL for this item's shoutbox. Last.fm removed
+  // every shoutbox API method (read AND write) in their 2016 relaunch, so
+  // this card can't show the actual comments in-app — it just opens the
+  // real page where the person can read/post them.
   String _shoutboxUrl() {
     String enc(String s) => Uri.encodeComponent(s).replaceAll('%20', '+');
     switch (widget.type) {
@@ -1733,16 +1714,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     }
   }
 
-  Future<void> _openShoutbox() async {
-    final uri = Uri.tryParse(_shoutboxUrl());
-    if (uri == null) return;
-    if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
-  }
-
   Widget _buildShoutbox(ColorScheme scheme) {
-    // Nothing to show and nothing loading: don't render an empty section.
-    if (!_loadingShouts && _shouts.isEmpty && !_shoutsFailed) return const SizedBox.shrink();
-
     final text = Theme.of(context).textTheme;
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
@@ -1751,71 +1723,24 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         color: scheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Icon(Icons.forum_rounded, size: 20, color: scheme.primary),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(L.detailShoutbox,
-                    style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
-              ),
-              TextButton.icon(
-                onPressed: _openShoutbox,
-                icon: const Icon(Icons.open_in_new_rounded, size: 16),
-                label: Text(L.detailShoutboxReply),
-              ),
-            ],
+          Icon(Icons.forum_rounded, size: 20, color: scheme.primary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(L.detailShoutbox,
+                style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
           ),
-          const SizedBox(height: 8),
-          if (_loadingShouts)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-            )
-          else if (_shoutsFailed)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text(L.detailShoutboxError,
-                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-            )
-          else
-            ...(_shouts.take(5).map((s) {
-              final map    = s as Map<String, dynamic>;
-              final author = (map['author'] ?? '').toString();
-              // Body comes as HTML from the API (can contain <a> links) —
-              // reuse the same de-linkifying helper used for the bio text.
-              final body   = (map['body'] ?? '')
-                  .toString()
-                  .replaceAll(RegExp(r'<[^>]*>'), '');
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(author,
-                        style: text.bodySmall?.copyWith(
-                            fontWeight: FontWeight.w700, color: scheme.primary)),
-                    const SizedBox(height: 2),
-                    Text(body, style: text.bodyMedium),
-                  ],
-                ),
-              );
-            })),
-          if (_shouts.length > 5)
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TextButton(
-                onPressed: _openShoutbox,
-                child: Text(L.detailShoutboxSeeAll),
-              ),
-            ),
+          TextButton.icon(
+            onPressed: _openShoutbox,
+            icon: const Icon(Icons.open_in_new_rounded, size: 16),
+            label: Text(L.detailShoutboxReply),
+          ),
         ],
       ),
     );
   }
+
 
 
   // ── Lyrics ──────────────────────────────────────────────────────────────────
@@ -2682,21 +2607,6 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
   Color?    _artworkColor;  // dominant color extracted from banner image
   late bool _localIsFav;
 
-  // ── Post a message on this friend's shoutbox (user.shout) ────────────────
-  // Unlike track/artist/album shouts, Last.fm DOES have a real write method
-  // for a user's own wall — this only shows up when logged in with the
-  // favorites auth (secret + session key), same requirement as love/unlove.
-  final _shoutCtrl = TextEditingController();
-  bool   _shoutSending = false;
-  bool   _shoutSent    = false;
-  String? _shoutError;
-
-  @override
-  void dispose() {
-    _shoutCtrl.dispose();
-    super.dispose();
-  }
-
   @override
   void initState() {
     super.initState();
@@ -2735,37 +2645,6 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
       }
     } catch (_) {
       if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  bool get _canShout =>
-      favoritesEnabled &&
-      widget.username.toLowerCase() != widget.service.username.toLowerCase();
-
-  Future<void> _sendShout() async {
-    final message = _shoutCtrl.text.trim();
-    if (message.isEmpty || _shoutSending) return;
-    setState(() { _shoutSending = true; _shoutError = null; });
-
-    final svc = LastFmService(
-      apiKey:     widget.service.apiKey,
-      username:   widget.service.username,
-      secret:     secretKeyNotifier.value,
-      sessionKey: sessionKeyNotifier.value,
-    );
-    try {
-      await svc.shoutUser(widget.username, message);
-      if (mounted) {
-        _shoutCtrl.clear();
-        setState(() { _shoutSending = false; _shoutSent = true; });
-        // Reset the "sent" confirmation after a few seconds so the field
-        // is ready to use again without a stale checkmark lingering.
-        Future.delayed(const Duration(seconds: 3), () {
-          if (mounted) setState(() => _shoutSent = false);
-        });
-      }
-    } catch (_) {
-      if (mounted) setState(() { _shoutSending = false; _shoutError = L.profileShoutError; });
     }
   }
 
@@ -3012,7 +2891,6 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                         _sectionHeader(L.commonRecentTracks, scheme),
                         ..._recent.map((r) => _buildRecentRow(r, scheme)),
                       ],
-                      if (_canShout) _buildShoutComposer(scheme),
                       const SizedBox(height: 48),
                     ],
                   ),
@@ -3066,63 +2944,6 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           ),
         ),
       ],
-    );
-  }
-
-  // Post a message on this friend's shoutbox/wall (user.shout — a real
-  // Last.fm write method, unlike track/artist/album which are read-only).
-  Widget _buildShoutComposer(ColorScheme scheme) {
-    final text = Theme.of(context).textTheme;
-    return Container(
-      margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.forum_rounded, size: 20, color: scheme.primary),
-              const SizedBox(width: 8),
-              Text(L.profileShoutTitle,
-                  style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
-            ],
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _shoutCtrl,
-            maxLines: 3,
-            maxLength: 1000, // same limit as the real Last.fm shoutbox form
-            enabled: !_shoutSending,
-            decoration: InputDecoration(
-              hintText: L.profileShoutHint,
-              filled: true,
-              fillColor: scheme.surface,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-            ),
-          ),
-          if (_shoutError != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Text(_shoutError!,
-                  style: text.bodySmall?.copyWith(color: scheme.error)),
-            ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: FilledButton.icon(
-              onPressed: _shoutSending ? null : _sendShout,
-              icon: _shoutSending
-                  ? const SizedBox(width: 16, height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2))
-                  : Icon(_shoutSent ? Icons.check_rounded : Icons.send_rounded, size: 18),
-              label: Text(_shoutSent ? L.profileShoutSent : L.profileShoutSend),
-            ),
-          ),
-        ],
-      ),
     );
   }
 

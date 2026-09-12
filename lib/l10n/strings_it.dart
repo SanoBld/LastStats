@@ -250,15 +250,8 @@ class AppStringsIt implements AppStrings {
   @override String get detailLyricsCopied => 'Testo copiato';
 
   @override String get detailShoutbox => 'Shoutbox di Last.fm';
-  @override String get detailShoutboxReply => 'Rispondi';
-  @override String get detailShoutboxError => 'Impossibile caricare i commenti.';
-  @override String get detailShoutboxSeeAll => 'Vedi tutti i commenti';  @override String get dashPerWeek => 'a settimana';
-
-  @override String get profileShoutTitle => 'Scrivi sulla sua bacheca';
-  @override String get profileShoutHint => 'Scrivi un messaggio...';
-  @override String get profileShoutSend => 'Invia';
-  @override String get profileShoutSent => 'Inviato!';
-  @override String get profileShoutError => 'Impossibile inviare il messaggio.';  @override String get onboardSkip => 'Salta';
+  @override String get detailShoutboxReply => 'Rispondi';  @override String get dashPerWeek => 'a settimana';
+  @override String get onboardSkip => 'Salta';
   @override String get onboardNext => 'Avanti';
   @override String get onboardFinish => 'Fine';
   @override String get onboardBack => 'Indietro';

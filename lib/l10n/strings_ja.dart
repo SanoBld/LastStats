@@ -250,15 +250,8 @@ class AppStringsJa implements AppStrings {
   @override String get detailLyricsCopied => '歌詞をコピーしました';
 
   @override String get detailShoutbox => 'Last.fmのシャウトボックス';
-  @override String get detailShoutboxReply => '返信';
-  @override String get detailShoutboxError => 'コメントを読み込めませんでした。';
-  @override String get detailShoutboxSeeAll => 'すべてのコメントを見る';  @override String get dashPerWeek => '週あたり';
-
-  @override String get profileShoutTitle => 'ウォールに投稿';
-  @override String get profileShoutHint => 'メッセージを書く...';
-  @override String get profileShoutSend => '送信';
-  @override String get profileShoutSent => '送信しました!';
-  @override String get profileShoutError => 'メッセージを送信できませんでした。';  @override String get onboardSkip => 'スキップ';
+  @override String get detailShoutboxReply => '返信';  @override String get dashPerWeek => '週あたり';
+  @override String get onboardSkip => 'スキップ';
   @override String get onboardNext => '次へ';
   @override String get onboardFinish => '完了';
   @override String get onboardBack => '戻る';

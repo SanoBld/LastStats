@@ -282,15 +282,8 @@ class AppStringsFr implements AppStrings {
   @override String get detailLyricsCopied    => 'Paroles copiées';
 
   @override String get detailShoutbox => 'Discussion Last.fm';
-  @override String get detailShoutboxReply => 'Répondre';
-  @override String get detailShoutboxError => 'Impossible de charger les commentaires.';
-  @override String get detailShoutboxSeeAll => 'Voir tous les commentaires';  @override String get dashPerWeek           => 'par semaine';
+  @override String get detailShoutboxReply => 'Répondre';  @override String get dashPerWeek           => 'par semaine';
 
-  @override String get profileShoutTitle => 'Écrire sur son mur';
-  @override String get profileShoutHint => 'Écris un message...';
-  @override String get profileShoutSend => 'Envoyer';
-  @override String get profileShoutSent => 'Envoyé !';
-  @override String get profileShoutError => 'Impossible d\'envoyer le message.';
   @override String get onboardSkip             => 'Passer';
   @override String get onboardNext             => 'Suivant';
   @override String get onboardFinish           => 'Terminer';

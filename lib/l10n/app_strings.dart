@@ -288,15 +288,6 @@ abstract class AppStrings {
   // ── Detail sheet: shoutbox (NEW) ─────────────────────────────────────────
   String get detailShoutbox;
   String get detailShoutboxReply;
-  String get detailShoutboxError;
-  String get detailShoutboxSeeAll;
-
-  // ── Friend profile: post a shout (NEW) ───────────────────────────────────
-  String get profileShoutTitle;
-  String get profileShoutHint;
-  String get profileShoutSend;
-  String get profileShoutSent;
-  String get profileShoutError;
 
   // ── Dashboard extra ─────────────────────────────────────────────────────────
   String get dashPerWeek;
