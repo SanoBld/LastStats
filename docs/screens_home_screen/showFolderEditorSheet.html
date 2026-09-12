@@ -184,7 +184,10 @@
             if (existing != null) ...[
               Expanded(
                 child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(foregroundColor: scheme.error),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: scheme.error,
+                    side: BorderSide(color: scheme.error),
+                  ),
                   icon: const Icon(Icons.delete_outline_rounded, size: 18),
                   label: Text(L.favFolderDelete),
                   onPressed: () async {
@@ -194,8 +197,11 @@
                         content: Text(L.favFolderDeleteConfirm),
                         actions: [
                           TextButton(onPressed: () =&gt; Navigator.pop(dctx, false), child: Text(L.commonCancel)),
-                          FilledButton.tonal(
-                            style: FilledButton.styleFrom(foregroundColor: scheme.error),
+                          FilledButton(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: scheme.error,
+                              foregroundColor: scheme.onError,
+                            ),
                             onPressed: () =&gt; Navigator.pop(dctx, true),
                             child: Text(L.favFolderDelete),
                           ),
