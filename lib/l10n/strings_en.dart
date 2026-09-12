@@ -463,9 +463,12 @@ class AppStringsEn implements AppStrings {
   @override String get backupIncludeFoldersDesc => 'Carries your track folders and their content.';
   @override String get backupIncludeKeysDesc => 'Include the keys in the exported file';
 
+  @override String get backupIncludeThemesLabel => 'Export themes';
+  @override String get backupIncludeThemesDesc => 'Lets you share just the look (colors, style) with someone else.';
   @override String get backupIncludeScrobblesLabel => 'Include full history';
   @override String get backupIncludeScrobblesDesc => 'Adds every track you have ever played (can be large).';
-  @override String backupExportedOn(String date) => 'Backup from $date';
+
+  @override String get backupScrobblesSlowWarning => 'This can take a while and is slower than a normal backup.';  @override String backupExportedOn(String date) => 'Backup from $date';
   @override String get backupScrobblesErrorTitle => 'Error in history';
   @override String get backupScrobblesErrorDesc => 'Some years in the history look corrupted in this file. What do you want to do?';
   @override String get backupScrobblesKeepAnyway => 'Continue anyway';

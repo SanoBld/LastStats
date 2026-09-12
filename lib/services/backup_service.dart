@@ -14,13 +14,15 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'dart:convert';
-import 'dart:io' show File;
+import 'dart:io' show File, Platform;
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../app_state.dart';
 import 'scrobbles_file_cache.dart';
+import 'all_scrobbles_service.dart';
+import 'lastfm_service.dart';
 
 /// Runtime-only / session state that should never be exported — everything
 /// else under the 'ls_' prefix (including any future theme or setting key)
@@ -36,6 +38,24 @@ const _kFolderKeys = {
   'ls_folder_items',
   'ls_folder_item_meta',
   'ls_folder_order',
+};
+
+/// Appearance / theme keys. Filtered out when the user unchecks "include
+/// themes" on export — handy to share just the look of the app with
+/// someone else without also sending your Last.fm account or folders.
+const _kThemeKeys = {
+  'ls_theme',
+  'ls_accent',
+  'ls_use_dynamic_color',
+  'ls_use_nowplaying_color',
+  'ls_nowplaying_fallback_color',
+  'ls_theme_style',
+  'ls_nothing_accent',
+  'ls_oled_mode',
+  'ls_artwork_color_theme',
+  'ls_keep_last_artwork_color',
+  'ls_living_artwork',
+  'ls_pc_mode',
 };
 
 class BackupResult {
@@ -93,6 +113,7 @@ class BackupService {
     bool includeApiKey = true,
     bool includeSecretKey = true,
     bool includeFolders = true,
+    bool includeThemes = true,
     // NEW: when true, the full scrobble history (every track ever played,
     // as cached on this device) is embedded in the backup file too.
     bool includeScrobbles = false,
@@ -110,6 +131,9 @@ class BackupService {
         continue;
       }
       if (!includeFolders && _kFolderKeys.contains(key)) {
+        continue;
+      }
+      if (!includeThemes && _kThemeKeys.contains(key)) {
         continue;
       }
       final v = p.get(key);
@@ -140,6 +164,41 @@ class BackupService {
     // actually asked for them (this can be a big amount of data).
     Map<String, String>? scrobbles;
     if (includeScrobbles) {
+      // Best-effort: pull the latest scrobbles from Last.fm first, so the
+      // backup actually has "everything" and not just what was cached the
+      // last time the app happened to sync. Use the account credentials
+      // even if includeApiKey/includeSecretKey are off — those flags only
+      // control what's WRITTEN to the file, not what we're allowed to use
+      // to talk to Last.fm right now.
+      // Read credentials straight from SharedPreferences (not from `map`,
+      // which may have dropped them if includeApiKey is off) — those flags
+      // only control what's WRITTEN to the file, not what we're allowed to
+      // use to talk to Last.fm right now.
+      String syncUsername = p.getString('ls_username') ?? '';
+      String syncApiKey   = p.getString('ls_apikey')   ?? '';
+      final accountsRaw = p.getString('ls_accounts');
+      if (accountsRaw != null && accountsRaw.isNotEmpty) {
+        try {
+          final accounts  = jsonDecode(accountsRaw) as List;
+          final activeIdx = p.getInt('ls_active_account') ?? 0;
+          if (accounts.isNotEmpty) {
+            final acc = accounts[activeIdx.clamp(0, accounts.length - 1)] as Map<String, dynamic>;
+            if ((acc['username'] ?? '').toString().isNotEmpty) syncUsername = acc['username'].toString();
+            if ((acc['apiKey']   ?? '').toString().isNotEmpty) syncApiKey   = acc['apiKey'].toString();
+          }
+        } catch (_) {}
+      }
+      if (syncUsername.isNotEmpty && syncApiKey.isNotEmpty) {
+        try {
+          final service = LastFmService(
+            apiKey:   syncApiKey,
+            username: syncUsername,
+          );
+          await AllScrobblesService.syncNew(service);
+        } catch (_) {
+          // Offline or API error: fall back to whatever is already cached.
+        }
+      }
       scrobbles = await ScrobblesFileCache.exportRawForBackup();
     }
 
@@ -168,6 +227,7 @@ class BackupService {
     bool includeApiKey = true,
     bool includeSecretKey = true,
     bool includeFolders = true,
+    bool includeThemes = true,
     bool includeScrobbles = false,
   }) async {
     try {
@@ -175,6 +235,7 @@ class BackupService {
         includeApiKey: includeApiKey,
         includeSecretKey: includeSecretKey,
         includeFolders: includeFolders,
+        includeThemes: includeThemes,
         includeScrobbles: includeScrobbles,
       );
       final bytes   = Uint8List.fromList(utf8.encode(payload));
@@ -187,11 +248,16 @@ class BackupService {
       );
       if (path == null) return false; // user cancelled the dialog
 
-      // On desktop (Windows/macOS/Linux), saveFile() only returns the chosen
-      // path — it does NOT write the file. We have to do that ourselves.
-      // (On web, the bytes are handled by the browser download and `path`
-      // is just a filename, not a real filesystem path, so skip writing.)
-      if (!kIsWeb) {
+      // BUG FIX: writing the file ourselves only makes sense on desktop.
+      // On Android/iOS, file_picker already saves the bytes itself (the
+      // returned "path" there is often a content:// URI, not a real
+      // filesystem path), so calling File(path).writeAsBytes() on mobile
+      // throws — the file was actually saved fine, but we returned false
+      // and showed "couldn't save" by mistake. Only do the manual write
+      // on Windows/macOS/Linux, where file_picker does NOT write for us.
+      final isDesktop = !kIsWeb &&
+          (Platform.isWindows || Platform.isMacOS || Platform.isLinux);
+      if (isDesktop) {
         final file = File(path);
         await file.writeAsBytes(bytes, flush: true);
       }

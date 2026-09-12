@@ -463,9 +463,12 @@ class AppStringsEs implements AppStrings {
   @override String get backupIncludeFoldersDesc => 'Incluye tus carpetas de canciones y su contenido.';
   @override String get backupIncludeKeysDesc => 'Incluir las claves en el archivo exportado';
 
+  @override String get backupIncludeThemesLabel => 'Exportar temas';
+  @override String get backupIncludeThemesDesc => 'Te permite compartir solo el aspecto (colores, estilo) con otra persona.';
   @override String get backupIncludeScrobblesLabel => 'Incluir todo el historial';
   @override String get backupIncludeScrobblesDesc => 'Añade todas las canciones escuchadas desde el principio (puede ser grande).';
-  @override String backupExportedOn(String date) => 'Copia de seguridad del $date';
+
+  @override String get backupScrobblesSlowWarning => 'Esto puede tardar un poco y es más lento que una copia de seguridad normal.';  @override String backupExportedOn(String date) => 'Copia de seguridad del $date';
   @override String get backupScrobblesErrorTitle => 'Error en el historial';
   @override String get backupScrobblesErrorDesc => 'Algunos años del historial parecen estar dañados en este archivo. ¿Qué quieres hacer?';
   @override String get backupScrobblesKeepAnyway => 'Continuar de todos modos';

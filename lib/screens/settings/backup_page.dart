@@ -97,6 +97,7 @@ class _BackupPageState extends State<BackupPage> {
   bool _includeApiKey    = true;
   bool _includeSecretKey = true;
   bool _includeFolders   = true;
+  bool _includeThemes    = true;
   // NEW: off by default, since embedding the full listening history makes
   // the backup file much bigger.
   bool _includeScrobbles = false;
@@ -107,6 +108,7 @@ class _BackupPageState extends State<BackupPage> {
       includeApiKey:    _includeApiKey,
       includeSecretKey: _includeSecretKey,
       includeFolders:   _includeFolders,
+      includeThemes:    _includeThemes,
       includeScrobbles: _includeScrobbles,
     );
     if (!mounted) return;
@@ -339,11 +341,26 @@ class _BackupPageState extends State<BackupPage> {
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
+            secondary: Icon(Icons.palette_rounded, color: scheme.primary),
+            title: Text(L.backupIncludeThemesLabel,
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            subtitle: Text(L.backupIncludeThemesDesc,
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            value: _includeThemes,
+            onChanged: (v) => setState(() => _includeThemes = v),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          SwitchListTile(
             secondary: Icon(Icons.library_music_rounded, color: scheme.primary),
             title: Text(L.backupIncludeScrobblesLabel,
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-            subtitle: Text(L.backupIncludeScrobblesDesc,
-                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            subtitle: Text(
+              // Extra warning: this option can take a while and re-syncs
+              // with Last.fm before exporting, so it's slower than a
+              // normal backup — the user should know that up front.
+              '${L.backupIncludeScrobblesDesc} ${L.backupScrobblesSlowWarning}',
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+            ),
             value: _includeScrobbles,
             onChanged: (v) => setState(() => _includeScrobbles = v),
           ),

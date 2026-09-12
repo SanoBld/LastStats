@@ -463,9 +463,12 @@ class AppStringsPt implements AppStrings {
   @override String get backupIncludeFoldersDesc => 'Inclui as suas pastas de músicas e o respetivo conteúdo.';
   @override String get backupIncludeKeysDesc => 'Incluir as chaves no arquivo exportado';
 
+  @override String get backupIncludeThemesLabel => 'Exportar temas';
+  @override String get backupIncludeThemesDesc => 'Permite compartilhar apenas a aparência (cores, estilo) com outra pessoa.';
   @override String get backupIncludeScrobblesLabel => 'Incluir todo o histórico';
   @override String get backupIncludeScrobblesDesc => 'Adiciona todas as músicas ouvidas desde o início (pode ser grande).';
-  @override String backupExportedOn(String date) => 'Backup de $date';
+
+  @override String get backupScrobblesSlowWarning => 'Isso pode demorar um pouco e é mais lento que um backup normal.';  @override String backupExportedOn(String date) => 'Backup de $date';
   @override String get backupScrobblesErrorTitle => 'Erro no histórico';
   @override String get backupScrobblesErrorDesc => 'Alguns anos do histórico parecem estar corrompidos neste arquivo. O que deseja fazer?';
   @override String get backupScrobblesKeepAnyway => 'Continuar mesmo assim';

@@ -415,9 +415,12 @@ class AppStringsDe implements AppStrings {
   @override String get backupIncludeFoldersDesc => 'Enthält deine Titelordner und deren Inhalt.';
   @override String get backupIncludeKeysDesc => 'Schlüssel in die exportierte Datei einbeziehen';
 
+  @override String get backupIncludeThemesLabel => 'Designs exportieren';
+  @override String get backupIncludeThemesDesc => 'Damit kannst du nur das Aussehen (Farben, Stil) mit jemandem teilen.';
   @override String get backupIncludeScrobblesLabel => 'Gesamten Verlauf einschließen';
   @override String get backupIncludeScrobblesDesc => 'Fügt alle jemals gehörten Titel hinzu (kann groß sein).';
-  @override String backupExportedOn(String date) => 'Sicherung vom $date';
+
+  @override String get backupScrobblesSlowWarning => 'Das kann eine Weile dauern und ist langsamer als eine normale Sicherung.';  @override String backupExportedOn(String date) => 'Sicherung vom $date';
   @override String get backupScrobblesErrorTitle => 'Fehler im Verlauf';
   @override String get backupScrobblesErrorDesc => 'Einige Jahre im Verlauf scheinen in dieser Datei beschädigt zu sein. Was möchtest du tun?';
   @override String get backupScrobblesKeepAnyway => 'Trotzdem fortfahren';

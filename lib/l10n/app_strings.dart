@@ -486,12 +486,17 @@ abstract class AppStrings {
   // ── Backup page: scrobble history (NEW) ─────────────────────────────────
   String get backupIncludeScrobblesLabel;
   String get backupIncludeScrobblesDesc;
+  String get backupScrobblesSlowWarning;
   String backupExportedOn(String date);
   String get backupScrobblesErrorTitle;
   String get backupScrobblesErrorDesc;
   String get backupScrobblesKeepAnyway;
   String get backupScrobblesCancel;
   String get backupScrobblesSkipRefetch;
+
+  // ── Backup page: theme export toggle (NEW) ──────────────────────────────
+  String get backupIncludeThemesLabel;
+  String get backupIncludeThemesDesc;
 
   // ── Backup page: crash/error log ────────────────────────────────────────
   String get settingsCrashLog;

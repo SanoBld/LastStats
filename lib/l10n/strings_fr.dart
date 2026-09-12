@@ -463,9 +463,12 @@ class AppStringsFr implements AppStrings {
   @override String get backupIncludeFoldersDesc => 'Emporte tes dossiers de titres et leur contenu.';
   @override String get backupIncludeKeysDesc => "Inclure les clés dans le fichier exporté";
 
+  @override String get backupIncludeThemesLabel => 'Exporter les thèmes';
+  @override String get backupIncludeThemesDesc => 'Permet de partager juste l\'apparence (couleurs, style) avec quelqu\'un d\'autre.';
   @override String get backupIncludeScrobblesLabel => 'Inclure tout l\'historique';
   @override String get backupIncludeScrobblesDesc => 'Ajoute tous tes titres écoutés depuis le début (peut être volumineux).';
-  @override String backupExportedOn(String date) => 'Sauvegarde du $date';
+
+  @override String get backupScrobblesSlowWarning => 'Cela peut prendre du temps et être moins rapide qu\'une sauvegarde normale.';  @override String backupExportedOn(String date) => 'Sauvegarde du $date';
   @override String get backupScrobblesErrorTitle => 'Erreur dans l\'historique';
   @override String get backupScrobblesErrorDesc => 'Certaines années de l\'historique semblent corrompues dans ce fichier. Que veux-tu faire ?';
   @override String get backupScrobblesKeepAnyway => 'Continuer quand même';
