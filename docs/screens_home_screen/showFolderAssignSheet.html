@@ -82,6 +82,7 @@ the same picker.</p>
   required String image,
 }) async {
   await FavoritesFoldersService.ensureLoaded();
+  if (!context.mounted) return;
   final key = FavoritesFoldersService.itemKey(name, artist);
   final meta = FolderItem(key: key, name: name, artist: artist, image: image,
       addedAt: DateTime.now().millisecondsSinceEpoch);
