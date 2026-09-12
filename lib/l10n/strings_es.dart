@@ -465,7 +465,18 @@ class AppStringsEs implements AppStrings {
 
   @override String get backupIncludeThemesLabel => 'Exportar temas';
   @override String get backupIncludeThemesDesc => 'Te permite compartir solo el aspecto (colores, estilo) con otra persona.';
-  @override String get backupIncludeScrobblesLabel => 'Incluir todo el historial';
+
+  @override String get backupAutoTitle => 'Copia de seguridad automática';
+  @override String get backupAutoEnableLabel => 'Activar copia de seguridad automática';
+  @override String get backupAutoEnableDesc => 'Guarda una copia de seguridad sola, en el intervalo elegido abajo.';
+  @override String get backupAutoFreqLabel => 'Frecuencia';
+  @override String get backupAutoFreqDaily => 'Cada día';
+  @override String get backupAutoFreqWeekly => 'Cada semana';
+  @override String get backupAutoFreqMonthly => 'Cada mes';
+  @override String get backupAutoFreqYearly => 'Cada año';
+  @override String get backupAutoFolderLabel => 'Carpeta de copia de seguridad';
+  @override String get backupAutoFolderDefault => 'Carpeta predeterminada de la app';
+  @override String backupAutoNextLabel(String date) => 'Próxima copia: $date';  @override String get backupIncludeScrobblesLabel => 'Incluir todo el historial';
   @override String get backupIncludeScrobblesDesc => 'Añade todas las canciones escuchadas desde el principio (puede ser grande).';
 
   @override String get backupScrobblesSlowWarning => 'Esto puede tardar un poco y es más lento que una copia de seguridad normal.';  @override String backupExportedOn(String date) => 'Copia de seguridad del $date';

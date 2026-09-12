@@ -465,7 +465,18 @@ class AppStringsFr implements AppStrings {
 
   @override String get backupIncludeThemesLabel => 'Exporter les thèmes';
   @override String get backupIncludeThemesDesc => 'Permet de partager juste l\'apparence (couleurs, style) avec quelqu\'un d\'autre.';
-  @override String get backupIncludeScrobblesLabel => 'Inclure tout l\'historique';
+
+  @override String get backupAutoTitle => 'Sauvegarde automatique';
+  @override String get backupAutoEnableLabel => 'Activer la sauvegarde automatique';
+  @override String get backupAutoEnableDesc => 'Enregistre une sauvegarde toute seule, à l\'intervalle choisi ci-dessous.';
+  @override String get backupAutoFreqLabel => 'Fréquence';
+  @override String get backupAutoFreqDaily => 'Tous les jours';
+  @override String get backupAutoFreqWeekly => 'Toutes les semaines';
+  @override String get backupAutoFreqMonthly => 'Tous les mois';
+  @override String get backupAutoFreqYearly => 'Tous les ans';
+  @override String get backupAutoFolderLabel => 'Dossier de sauvegarde';
+  @override String get backupAutoFolderDefault => 'Dossier par défaut de l\'application';
+  @override String backupAutoNextLabel(String date) => 'Prochaine sauvegarde : $date';  @override String get backupIncludeScrobblesLabel => 'Inclure tout l\'historique';
   @override String get backupIncludeScrobblesDesc => 'Ajoute tous tes titres écoutés depuis le début (peut être volumineux).';
 
   @override String get backupScrobblesSlowWarning => 'Cela peut prendre du temps et être moins rapide qu\'une sauvegarde normale.';  @override String backupExportedOn(String date) => 'Sauvegarde du $date';

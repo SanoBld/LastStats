@@ -462,7 +462,18 @@ class AppStringsZh implements AppStrings {
 
   @override String get backupIncludeThemesLabel => '导出主题';
   @override String get backupIncludeThemesDesc => '仅将外观(颜色、样式)分享给其他人。';
-  @override String get backupIncludeScrobblesLabel => '包含完整历史记录';
+
+  @override String get backupAutoTitle => '自动备份';
+  @override String get backupAutoEnableLabel => '启用自动备份';
+  @override String get backupAutoEnableDesc => '按照下方选择的间隔自动保存备份。';
+  @override String get backupAutoFreqLabel => '频率';
+  @override String get backupAutoFreqDaily => '每天';
+  @override String get backupAutoFreqWeekly => '每周';
+  @override String get backupAutoFreqMonthly => '每月';
+  @override String get backupAutoFreqYearly => '每年';
+  @override String get backupAutoFolderLabel => '备份文件夹';
+  @override String get backupAutoFolderDefault => '应用默认文件夹';
+  @override String backupAutoNextLabel(String date) => '下次备份:$date';  @override String get backupIncludeScrobblesLabel => '包含完整历史记录';
   @override String get backupIncludeScrobblesDesc => '添加你从一开始播放过的所有曲目(文件可能会很大)。';
 
   @override String get backupScrobblesSlowWarning => '这可能需要一些时间,比普通备份慢。';  @override String backupExportedOn(String date) => '备份于 $date';

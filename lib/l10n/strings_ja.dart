@@ -417,7 +417,18 @@ class AppStringsJa implements AppStrings {
 
   @override String get backupIncludeThemesLabel => 'テーマをエクスポート';
   @override String get backupIncludeThemesDesc => '見た目(色やスタイル)だけを他の人と共有できます。';
-  @override String get backupIncludeScrobblesLabel => '履歴をすべて含める';
+
+  @override String get backupAutoTitle => '自動バックアップ';
+  @override String get backupAutoEnableLabel => '自動バックアップを有効にする';
+  @override String get backupAutoEnableDesc => '下で選んだ間隔で自動的にバックアップを保存します。';
+  @override String get backupAutoFreqLabel => '頻度';
+  @override String get backupAutoFreqDaily => '毎日';
+  @override String get backupAutoFreqWeekly => '毎週';
+  @override String get backupAutoFreqMonthly => '毎月';
+  @override String get backupAutoFreqYearly => '毎年';
+  @override String get backupAutoFolderLabel => 'バックアップフォルダ';
+  @override String get backupAutoFolderDefault => 'アプリの既定フォルダ';
+  @override String backupAutoNextLabel(String date) => '次回のバックアップ: $date';  @override String get backupIncludeScrobblesLabel => '履歴をすべて含める';
   @override String get backupIncludeScrobblesDesc => 'これまで再生したすべての曲を追加します(容量が大きくなる場合があります)。';
 
   @override String get backupScrobblesSlowWarning => '時間がかかる場合があり、通常のバックアップより遅くなります。';  @override String backupExportedOn(String date) => '$date のバックアップ';

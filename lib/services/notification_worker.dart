@@ -15,6 +15,7 @@ import 'lastfm_service.dart';
 import 'all_scrobbles_service.dart';
 import 'scrobbles_file_cache.dart';
 import 'widget_service.dart';
+import 'auto_backup_service.dart';
 
 // ── Task names ───────────────────────────────────────────────────────────────
 const _kTaskMilestone     = 'ls_milestone_check';
@@ -23,6 +24,7 @@ const _kTaskUpdate        = 'ls_update_check';
 const _kTaskNews          = 'ls_news_check';
 const _kTaskScrobbleSync  = 'ls_scrobble_sync_task';
 const _kTaskWidgetRefresh = 'ls_widget_refresh_task';
+const _kTaskAutoBackup    = 'ls_auto_backup_task';
 
 // ── Scrobble background sync prefs ──────────────────────────────────────────
 const _kSyncEnabled   = 'ls_scrobble_sync_enabled';
@@ -101,6 +103,11 @@ void callbackDispatcher() {
           break;
         case _kTaskWidgetRefresh:
           break; // WidgetService.updateAll() below already covers it
+        case _kTaskAutoBackup:
+          // The service itself checks if a backup is actually due — this
+          // task just runs that check periodically in the background.
+          await AutoBackupService.checkAndRunIfDue();
+          break;
       }
     } catch (_) {
       // Never throw from the worker — WorkManager would retry and spam
@@ -516,6 +523,23 @@ class NotificationWorker {
       existingWorkPolicy: ExistingWorkPolicy.keep,
       constraints: Constraints(networkType: NetworkType.connected),
     );
+
+    // ── Automatic backup task (Android background) ───────────────────────
+    // Only registered when the user turned on auto-backup in Settings.
+    // Checks every 6 hours whether a backup is actually due (daily / weekly
+    // / monthly / yearly) — this lets backups happen even if the app is
+    // never opened on the due date, on top of the on-launch check in
+    // main.dart which covers every other platform.
+    await Workmanager().cancelByUniqueName(_kTaskAutoBackup);
+    final autoBackupOn = prefs.getBool(AutoBackupService.kEnabled) ?? false;
+    if (autoBackupOn) {
+      await Workmanager().registerPeriodicTask(
+        _kTaskAutoBackup,
+        _kTaskAutoBackup,
+        frequency:          const Duration(hours: 6),
+        existingWorkPolicy: ExistingWorkPolicy.keep,
+      );
+    }
   }
 
   static Future<void> cancelAll() async {

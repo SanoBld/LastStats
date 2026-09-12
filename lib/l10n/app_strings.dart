@@ -498,6 +498,19 @@ abstract class AppStrings {
   String get backupIncludeThemesLabel;
   String get backupIncludeThemesDesc;
 
+  // ── Backup page: automatic backup (NEW) ─────────────────────────────────
+  String get backupAutoTitle;
+  String get backupAutoEnableLabel;
+  String get backupAutoEnableDesc;
+  String get backupAutoFreqLabel;
+  String get backupAutoFreqDaily;
+  String get backupAutoFreqWeekly;
+  String get backupAutoFreqMonthly;
+  String get backupAutoFreqYearly;
+  String get backupAutoFolderLabel;
+  String get backupAutoFolderDefault;
+  String backupAutoNextLabel(String date);
+
   // ── Backup page: crash/error log ────────────────────────────────────────
   String get settingsCrashLog;
   String get backupCrashLogDesc;

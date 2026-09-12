@@ -417,7 +417,18 @@ class AppStringsIt implements AppStrings {
 
   @override String get backupIncludeThemesLabel => 'Esporta temi';
   @override String get backupIncludeThemesDesc => 'Ti permette di condividere solo l\'aspetto (colori, stile) con qualcun altro.';
-  @override String get backupIncludeScrobblesLabel => 'Includi tutta la cronologia';
+
+  @override String get backupAutoTitle => 'Backup automatico';
+  @override String get backupAutoEnableLabel => 'Attiva il backup automatico';
+  @override String get backupAutoEnableDesc => 'Salva un backup da solo, all\'intervallo scelto qui sotto.';
+  @override String get backupAutoFreqLabel => 'Frequenza';
+  @override String get backupAutoFreqDaily => 'Ogni giorno';
+  @override String get backupAutoFreqWeekly => 'Ogni settimana';
+  @override String get backupAutoFreqMonthly => 'Ogni mese';
+  @override String get backupAutoFreqYearly => 'Ogni anno';
+  @override String get backupAutoFolderLabel => 'Cartella di backup';
+  @override String get backupAutoFolderDefault => 'Cartella predefinita dell\'app';
+  @override String backupAutoNextLabel(String date) => 'Prossimo backup: $date';  @override String get backupIncludeScrobblesLabel => 'Includi tutta la cronologia';
   @override String get backupIncludeScrobblesDesc => 'Aggiunge tutti i brani ascoltati dall\'inizio (può essere corposo).';
 
   @override String get backupScrobblesSlowWarning => 'Questo può richiedere tempo ed è più lento di un backup normale.';  @override String backupExportedOn(String date) => 'Backup del $date';

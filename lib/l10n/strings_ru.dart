@@ -417,7 +417,18 @@ class AppStringsRu implements AppStrings {
 
   @override String get backupIncludeThemesLabel => 'Экспортировать темы';
   @override String get backupIncludeThemesDesc => 'Позволяет поделиться только внешним видом (цвета, стиль) с кем-то ещё.';
-  @override String get backupIncludeScrobblesLabel => 'Включить всю историю';
+
+  @override String get backupAutoTitle => 'Автоматическое резервное копирование';
+  @override String get backupAutoEnableLabel => 'Включить автоматическое резервное копирование';
+  @override String get backupAutoEnableDesc => 'Самостоятельно сохраняет резервную копию с выбранным ниже интервалом.';
+  @override String get backupAutoFreqLabel => 'Частота';
+  @override String get backupAutoFreqDaily => 'Каждый день';
+  @override String get backupAutoFreqWeekly => 'Каждую неделю';
+  @override String get backupAutoFreqMonthly => 'Каждый месяц';
+  @override String get backupAutoFreqYearly => 'Каждый год';
+  @override String get backupAutoFolderLabel => 'Папка для резервных копий';
+  @override String get backupAutoFolderDefault => 'Папка приложения по умолчанию';
+  @override String backupAutoNextLabel(String date) => 'Следующая копия: $date';  @override String get backupIncludeScrobblesLabel => 'Включить всю историю';
   @override String get backupIncludeScrobblesDesc => 'Добавляет все прослушанные треки с самого начала (может быть большим).';
 
   @override String get backupScrobblesSlowWarning => 'Это может занять некоторое время и медленнее обычной резервной копии.';  @override String backupExportedOn(String date) => 'Резервная копия от $date';

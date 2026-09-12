@@ -28,6 +28,7 @@ import 'services/qr_link_service.dart';
 import 'services/eco_mode_controller.dart';
 import 'services/lastfm_service.dart';
 import 'services/crash_log_service.dart';
+import 'services/auto_backup_service.dart';
 import 'widgets/custom_title_bar.dart';
 import 'package:app_links/app_links.dart';
 
@@ -153,6 +154,12 @@ Future<void> _mainImpl() async {
   await StorageManager.init();
 
   DataCache.offlineMode = prefs.getBool('ls_cache_serve_stale') ?? true;
+
+  // Fire-and-forget: silently writes a fresh backup file if the automatic
+  // backup feature is on AND due (daily/weekly/monthly/yearly — see
+  // Settings > Backup). Works on every platform except web (no real
+  // filesystem there). Never blocks app startup.
+  unawaited(AutoBackupService.checkAndRunIfDue());
 
   // ── Notifications & WorkManager ───────────────────────────────────────────
   // Notifications: mobile + Windows. WorkManager (background scheduling):

@@ -417,7 +417,18 @@ class AppStringsAr implements AppStrings {
 
   @override String get backupIncludeThemesLabel => 'تصدير السمات';
   @override String get backupIncludeThemesDesc => 'يتيح لك مشاركة المظهر فقط (الألوان، النمط) مع شخص آخر.';
-  @override String get backupIncludeScrobblesLabel => 'تضمين كامل السجل';
+
+  @override String get backupAutoTitle => 'النسخ الاحتياطي التلقائي';
+  @override String get backupAutoEnableLabel => 'تفعيل النسخ الاحتياطي التلقائي';
+  @override String get backupAutoEnableDesc => 'يحفظ نسخة احتياطية تلقائيًا حسب الفاصل الزمني المحدد أدناه.';
+  @override String get backupAutoFreqLabel => 'التكرار';
+  @override String get backupAutoFreqDaily => 'كل يوم';
+  @override String get backupAutoFreqWeekly => 'كل أسبوع';
+  @override String get backupAutoFreqMonthly => 'كل شهر';
+  @override String get backupAutoFreqYearly => 'كل سنة';
+  @override String get backupAutoFolderLabel => 'مجلد النسخ الاحتياطي';
+  @override String get backupAutoFolderDefault => 'المجلد الافتراضي للتطبيق';
+  @override String backupAutoNextLabel(String date) => 'النسخة القادمة: $date';  @override String get backupIncludeScrobblesLabel => 'تضمين كامل السجل';
   @override String get backupIncludeScrobblesDesc => 'يضيف كل المقاطع التي استمعت إليها منذ البداية (قد يكون كبير الحجم).';
 
   @override String get backupScrobblesSlowWarning => 'قد يستغرق هذا بعض الوقت وهو أبطأ من النسخة الاحتياطية العادية.';  @override String backupExportedOn(String date) => 'نسخة احتياطية بتاريخ $date';

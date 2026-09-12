@@ -56,6 +56,13 @@ const _kThemeKeys = {
   'ls_keep_last_artwork_color',
   'ls_living_artwork',
   'ls_pc_mode',
+  // Day/night accent colors — was missing from the first version of this
+  // set, so "export themes off" was leaking this feature's settings.
+  'ls_use_daynight_accent',
+  'ls_accent_dark',
+  'ls_daynight_use_hours',
+  'ls_daynight_day_start_hour',
+  'ls_daynight_night_start_hour',
 };
 
 class BackupResult {
@@ -503,6 +510,17 @@ class BackupService {
     themeStyleNotifier.value            = p.getString('ls_theme_style')        ?? 'default';
     nothingAccentNotifier.value         = p.getString('ls_nothing_accent')     ?? 'classic';
     oledModeNotifier.value              = p.getBool('ls_oled_mode')            ?? false;
+    // Day/night accent colors — these were being written to disk on
+    // restore but never pushed into the live notifiers, so a backup
+    // restored on a fresh device (or mid-session) silently ignored this
+    // whole feature until the app was manually restarted. Fixed here.
+    useDayNightAccentNotifier.value     = p.getBool('ls_use_daynight_accent')  ?? false;
+    accentDarkNotifier.value            = p.getString('ls_accent_dark') != null
+        ? accentFromString(p.getString('ls_accent_dark'))
+        : accentNotifier.value;
+    dayNightUseHoursNotifier.value      = p.getBool('ls_daynight_use_hours')      ?? false;
+    dayStartHourNotifier.value          = p.getInt('ls_daynight_day_start_hour')   ?? 7;
+    nightStartHourNotifier.value        = p.getInt('ls_daynight_night_start_hour') ?? 20;
     musicPlatformNotifier.value         = p.getString('ls_music_platform')     ?? 'lastfm';
     showAllPlatformLinksNotifier.value  = p.getBool('ls_show_all_platform_links') ?? false;
     // Last.fm write-access credentials (only present if they were restored).

@@ -1,10 +1,14 @@
 // lib/screens/settings/backup_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../l10n/l10n.dart';
 import '../../services/backup_service.dart';
 import '../../services/crash_log_service.dart';
+import '../../services/auto_backup_service.dart';
+import '../../services/notification_worker.dart';
 import 'settings_helpers.dart';
 
 class BackupPage extends StatefulWidget {
@@ -20,10 +24,68 @@ class _BackupPageState extends State<BackupPage> {
   bool _logBusy   = false;
   int? _logSizeBytes; // null = not checked yet, 0 = empty
 
+  // ── Automatic backup state ────────────────────────────────────────────
+  bool _autoBackupEnabled           = false;
+  String _autoBackupFreq            = 'weekly';
+  bool _autoBackupIncludeScrobbles  = false;
+  String? _autoBackupDir;           // null = not chosen yet -> app default
+  DateTime? _autoBackupNextDue;
+  bool _autoBackupBusy = false;
+
   @override
   void initState() {
     super.initState();
     _refreshLogSize();
+    _loadAutoBackupPrefs();
+  }
+
+  Future<void> _loadAutoBackupPrefs() async {
+    final p = await SharedPreferences.getInstance();
+    final next = await AutoBackupService.getNextDueDate();
+    if (!mounted) return;
+    setState(() {
+      _autoBackupEnabled          = p.getBool(AutoBackupService.kEnabled) ?? false;
+      _autoBackupFreq             = p.getString(AutoBackupService.kFreq) ?? 'weekly';
+      _autoBackupIncludeScrobbles = p.getBool(AutoBackupService.kIncludeScrobbles) ?? false;
+      _autoBackupDir              = p.getString(AutoBackupService.kDir);
+      _autoBackupNextDue          = next;
+    });
+  }
+
+  Future<void> _setAutoBackupEnabled(bool v) async {
+    setState(() => _autoBackupEnabled = v);
+    final p = await SharedPreferences.getInstance();
+    await p.setBool(AutoBackupService.kEnabled, v);
+    // Re-registers (or cancels) the Android background task; harmless
+    // no-op on platforms without WorkManager, same as the sync toggle.
+    await NotificationWorker.scheduleAll();
+    _loadAutoBackupPrefs();
+  }
+
+  Future<void> _setAutoBackupFreq(String freq) async {
+    setState(() => _autoBackupFreq = freq);
+    final p = await SharedPreferences.getInstance();
+    await p.setString(AutoBackupService.kFreq, freq);
+    _loadAutoBackupPrefs();
+  }
+
+  Future<void> _setAutoBackupIncludeScrobbles(bool v) async {
+    setState(() => _autoBackupIncludeScrobbles = v);
+    final p = await SharedPreferences.getInstance();
+    await p.setBool(AutoBackupService.kIncludeScrobbles, v);
+  }
+
+  Future<void> _pickAutoBackupDir() async {
+    setState(() => _autoBackupBusy = true);
+    final path = await FilePicker.platform.getDirectoryPath(
+      dialogTitle: 'Choose auto-backup folder',
+    );
+    if (!mounted) return;
+    setState(() => _autoBackupBusy = false);
+    if (path == null) return; // user cancelled
+    final p = await SharedPreferences.getInstance();
+    await p.setString(AutoBackupService.kDir, path);
+    setState(() => _autoBackupDir = path);
   }
 
   Future<void> _refreshLogSize() async {
@@ -89,6 +151,15 @@ class _BackupPageState extends State<BackupPage> {
   String _fmtDate(DateTime d) {
     String two(int n) => n.toString().padLeft(2, '0');
     return '${two(d.day)}/${two(d.month)}/${d.year}';
+  }
+
+  Widget _freqChip(String value, String label) {
+    final selected = _autoBackupFreq == value;
+    return ChoiceChip(
+      label: Text(label),
+      selected: selected,
+      onSelected: (_) => _setAutoBackupFreq(value),
+    );
   }
 
   // Whether to include the Last.fm API key / secret key in the exported
@@ -391,6 +462,78 @@ class _BackupPageState extends State<BackupPage> {
             trailing: Icon(Icons.chevron_right_rounded, color: scheme.onSurfaceVariant),
             onTap: _importing ? null : _import,
           ),
+        ]),
+
+        const SizedBox(height: 16),
+
+        // ── Sauvegarde automatique ──────────────────────────────────────────
+        SettingsSection(label: L.backupAutoTitle, children: [
+          SwitchListTile(
+            secondary: Icon(Icons.schedule_rounded, color: scheme.primary),
+            title: Text(L.backupAutoEnableLabel,
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            subtitle: Text(L.backupAutoEnableDesc,
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            value: _autoBackupEnabled,
+            onChanged: _setAutoBackupEnabled,
+          ),
+          if (_autoBackupEnabled) ...[
+            const Divider(height: 1, indent: 16, endIndent: 16),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+              child: Text(L.backupAutoFreqLabel,
+                  style: text.bodySmall?.copyWith(
+                      color: scheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+              child: Wrap(spacing: 8, runSpacing: 8, children: [
+                _freqChip('daily',   L.backupAutoFreqDaily),
+                _freqChip('weekly',  L.backupAutoFreqWeekly),
+                _freqChip('monthly', L.backupAutoFreqMonthly),
+                _freqChip('yearly',  L.backupAutoFreqYearly),
+              ]),
+            ),
+            const Divider(height: 1, indent: 16, endIndent: 16),
+            SwitchListTile(
+              secondary: Icon(Icons.library_music_rounded, color: scheme.primary),
+              title: Text(L.backupIncludeScrobblesLabel,
+                  style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+              subtitle: Text(L.backupScrobblesSlowWarning,
+                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              value: _autoBackupIncludeScrobbles,
+              onChanged: _setAutoBackupIncludeScrobbles,
+            ),
+            const Divider(height: 1, indent: 16, endIndent: 16),
+            ListTile(
+              leading: Icon(Icons.folder_open_rounded, color: scheme.primary),
+              title: Text(L.backupAutoFolderLabel,
+                  style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+              subtitle: Text(
+                _autoBackupDir?.isNotEmpty == true
+                    ? _autoBackupDir!
+                    : L.backupAutoFolderDefault,
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              trailing: _autoBackupBusy
+                  ? const SizedBox(width: 16, height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2))
+                  : Icon(Icons.chevron_right_rounded, color: scheme.onSurfaceVariant),
+              onTap: _autoBackupBusy ? null : _pickAutoBackupDir,
+            ),
+            if (_autoBackupNextDue != null) ...[
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+                child: Text(
+                  L.backupAutoNextLabel(_fmtDate(_autoBackupNextDue!)),
+                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                ),
+              ),
+            ],
+          ],
         ]),
 
         const SizedBox(height: 16),

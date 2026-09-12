@@ -417,7 +417,18 @@ class AppStringsDe implements AppStrings {
 
   @override String get backupIncludeThemesLabel => 'Designs exportieren';
   @override String get backupIncludeThemesDesc => 'Damit kannst du nur das Aussehen (Farben, Stil) mit jemandem teilen.';
-  @override String get backupIncludeScrobblesLabel => 'Gesamten Verlauf einschließen';
+
+  @override String get backupAutoTitle => 'Automatische Sicherung';
+  @override String get backupAutoEnableLabel => 'Automatische Sicherung aktivieren';
+  @override String get backupAutoEnableDesc => 'Erstellt selbstständig eine Sicherung, im unten gewählten Intervall.';
+  @override String get backupAutoFreqLabel => 'Häufigkeit';
+  @override String get backupAutoFreqDaily => 'Täglich';
+  @override String get backupAutoFreqWeekly => 'Wöchentlich';
+  @override String get backupAutoFreqMonthly => 'Monatlich';
+  @override String get backupAutoFreqYearly => 'Jährlich';
+  @override String get backupAutoFolderLabel => 'Sicherungsordner';
+  @override String get backupAutoFolderDefault => 'Standardordner der App';
+  @override String backupAutoNextLabel(String date) => 'Nächste Sicherung: $date';  @override String get backupIncludeScrobblesLabel => 'Gesamten Verlauf einschließen';
   @override String get backupIncludeScrobblesDesc => 'Fügt alle jemals gehörten Titel hinzu (kann groß sein).';
 
   @override String get backupScrobblesSlowWarning => 'Das kann eine Weile dauern und ist langsamer als eine normale Sicherung.';  @override String backupExportedOn(String date) => 'Sicherung vom $date';
