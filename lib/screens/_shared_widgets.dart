@@ -425,34 +425,50 @@ Future<void> showFolderAssignSheet(
 /// Create-or-edit sheet for a folder (name, emoji, color). Shared between
 /// the search page's folder tab and the quick "new folder" shortcut above.
 /// Small dialog to type or paste exactly one custom emoji, used by the "+"
-/// tile in the folder editor's emoji grid.
+/// tile in the folder editor's emoji grid. Restricts input to a single
+/// grapheme cluster — typing or pasting a second emoji replaces the first,
+/// instead of letting them stack/overlap in the field.
 Future<String?> _promptCustomEmoji(BuildContext context) {
   final ctrl = TextEditingController();
   return showDialog<String>(
     context: context,
-    builder: (dctx) => AlertDialog(
-      title: Text(L.favFolderCustomEmojiTitle),
-      content: TextField(
-        controller: ctrl,
-        autofocus: true,
-        textAlign: TextAlign.center,
-        maxLength: 4, // some emoji are 2+ code units; still "one emoji"
-        style: const TextStyle(fontSize: 28),
-        decoration: InputDecoration(
-          counterText: '',
-          hintText: '🎉',
-          helperText: L.favFolderCustomEmojiHelper,
-          border: const OutlineInputBorder(),
+    builder: (dctx) => StatefulBuilder(builder: (dctx, setDialog) {
+      void enforceOneEmoji(String v) {
+        final chars = v.characters;
+        if (chars.length <= 1) return;
+        // Keep only the most recently typed/pasted character, so adding a
+        // second emoji swaps in the new one instead of appending it.
+        final single = chars.last;
+        ctrl.value = TextEditingValue(
+          text: single,
+          selection: TextSelection.collapsed(offset: single.length),
+        );
+        setDialog(() {});
+      }
+
+      return AlertDialog(
+        title: Text(L.favFolderCustomEmojiTitle),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 28),
+          decoration: InputDecoration(
+            hintText: '🎉',
+            helperText: L.favFolderCustomEmojiHelper,
+            border: const OutlineInputBorder(),
+          ),
+          onChanged: enforceOneEmoji,
         ),
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(dctx), child: Text(L.commonCancel)),
-        FilledButton(
-          onPressed: () => Navigator.pop(dctx, ctrl.text.trim()),
-          child: Text(L.favFolderSave),
-        ),
-      ],
-    ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dctx), child: Text(L.commonCancel)),
+          FilledButton(
+            onPressed: () => Navigator.pop(dctx, ctrl.text.trim()),
+            child: Text(L.favFolderSave),
+          ),
+        ],
+      );
+    }),
   );
 }
 
@@ -572,7 +588,10 @@ Future<void> showFolderEditorSheet(BuildContext context, {FavFolder? existing}) 
             if (existing != null) ...[
               Expanded(
                 child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(foregroundColor: scheme.error),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: scheme.error,
+                    side: BorderSide(color: scheme.error),
+                  ),
                   icon: const Icon(Icons.delete_outline_rounded, size: 18),
                   label: Text(L.favFolderDelete),
                   onPressed: () async {
@@ -582,8 +601,11 @@ Future<void> showFolderEditorSheet(BuildContext context, {FavFolder? existing}) 
                         content: Text(L.favFolderDeleteConfirm),
                         actions: [
                           TextButton(onPressed: () => Navigator.pop(dctx, false), child: Text(L.commonCancel)),
-                          FilledButton.tonal(
-                            style: FilledButton.styleFrom(foregroundColor: scheme.error),
+                          FilledButton(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: scheme.error,
+                              foregroundColor: scheme.onError,
+                            ),
                             onPressed: () => Navigator.pop(dctx, true),
                             child: Text(L.favFolderDelete),
                           ),

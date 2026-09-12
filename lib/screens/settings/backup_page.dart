@@ -61,7 +61,14 @@ class _BackupPageState extends State<BackupPage> {
         title: Text(L.backupCrashLogClearConfirm),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(L.commonCancel)),
-          FilledButton.tonal(onPressed: () => Navigator.pop(ctx, true), child: Text(L.backupCrashLogClear)),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(ctx).colorScheme.error,
+              foregroundColor: Theme.of(ctx).colorScheme.onError,
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(L.backupCrashLogClear),
+          ),
         ],
       ),
     );
@@ -333,7 +340,10 @@ class _BackupPageState extends State<BackupPage> {
                   onPressed: (_logSizeBytes ?? 0) == 0 ? null : _clearLog,
                   icon: const Icon(Icons.delete_outline_rounded, size: 18),
                   label: Text(L.backupCrashLogClear),
-                  style: OutlinedButton.styleFrom(foregroundColor: scheme.error),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: scheme.error,
+                    side: BorderSide(color: scheme.error),
+                  ),
                 ),
               ),
             ]),

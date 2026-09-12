@@ -488,7 +488,10 @@ class _AccountPageState extends State<AccountPage> {
                           onPressed: disconnectFavorites,
                           icon: const Icon(Icons.link_off_rounded, size: 18),
                           label: Text(L.acctDisconnectFavorites),
-                          style: OutlinedButton.styleFrom(foregroundColor: scheme.error),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: scheme.error,
+                            side: BorderSide(color: scheme.error),
+                          ),
                         );
                       }
                       return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
