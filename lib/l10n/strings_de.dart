@@ -253,7 +253,12 @@ class AppStringsDe implements AppStrings {
   @override String get detailShoutboxReply => 'Antworten';
   @override String get detailShoutboxError => 'Kommentare konnten nicht geladen werden.';
   @override String get detailShoutboxSeeAll => 'Alle Kommentare ansehen';  @override String get dashPerWeek => 'pro Woche';
-  @override String get onboardSkip => 'Überspringen';
+
+  @override String get profileShoutTitle => 'Auf der Pinnwand schreiben';
+  @override String get profileShoutHint => 'Nachricht schreiben...';
+  @override String get profileShoutSend => 'Senden';
+  @override String get profileShoutSent => 'Gesendet!';
+  @override String get profileShoutError => 'Nachricht konnte nicht gesendet werden.';  @override String get onboardSkip => 'Überspringen';
   @override String get onboardNext => 'Weiter';
   @override String get onboardFinish => 'Fertig';
   @override String get onboardBack => 'Zurück';

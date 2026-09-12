@@ -89,6 +89,16 @@ class LastFmService {
     }, post: true);
   }
 
+  // ── User shoutbox (write, requires secret + sessionKey) ───
+  // Unlike track/artist/album (read-only, see getTrackShouts etc.), a
+  // user's own wall DOES have a real write method: user.shout. Posts the
+  // signed-in user's message onto [user]'s shoutbox.
+  Future<void> shoutUser(String user, String message) async {
+    await _callSigned({
+      'method': 'user.shout', 'user': user, 'message': message, 'sk': sessionKey,
+    }, post: true);
+  }
+
   // ── User ────────────────────────────────────────────────
   Future<Map<String, dynamic>?> getUserInfo({String? user}) async {
     final d = await _call({'method': 'user.getInfo', 'user': user ?? username});

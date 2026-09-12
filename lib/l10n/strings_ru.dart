@@ -253,7 +253,12 @@ class AppStringsRu implements AppStrings {
   @override String get detailShoutboxReply => 'Ответить';
   @override String get detailShoutboxError => 'Не удалось загрузить комментарии.';
   @override String get detailShoutboxSeeAll => 'Показать все комментарии';  @override String get dashPerWeek => 'в неделю';
-  @override String get onboardSkip => 'Пропустить';
+
+  @override String get profileShoutTitle => 'Написать на стене';
+  @override String get profileShoutHint => 'Напишите сообщение...';
+  @override String get profileShoutSend => 'Отправить';
+  @override String get profileShoutSent => 'Отправлено!';
+  @override String get profileShoutError => 'Не удалось отправить сообщение.';  @override String get onboardSkip => 'Пропустить';
   @override String get onboardNext => 'Далее';
   @override String get onboardFinish => 'Готово';
   @override String get onboardBack => 'Назад';

@@ -253,7 +253,12 @@ class AppStringsAr implements AppStrings {
   @override String get detailShoutboxReply => 'الرد';
   @override String get detailShoutboxError => 'تعذر تحميل التعليقات.';
   @override String get detailShoutboxSeeAll => 'عرض كل التعليقات';  @override String get dashPerWeek => 'أسبوعيًا';
-  @override String get onboardSkip => 'تخطي';
+
+  @override String get profileShoutTitle => 'الكتابة على الحائط';
+  @override String get profileShoutHint => 'اكتب رسالة...';
+  @override String get profileShoutSend => 'إرسال';
+  @override String get profileShoutSent => 'تم الإرسال!';
+  @override String get profileShoutError => 'تعذر إرسال الرسالة.';  @override String get onboardSkip => 'تخطي';
   @override String get onboardNext => 'التالي';
   @override String get onboardFinish => 'إنهاء';
   @override String get onboardBack => 'رجوع';

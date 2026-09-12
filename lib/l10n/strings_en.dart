@@ -286,6 +286,11 @@ class AppStringsEn implements AppStrings {
   @override String get detailShoutboxError => 'Couldn\'t load the comments.';
   @override String get detailShoutboxSeeAll => 'See all comments';  @override String get dashPerWeek           => 'per week';
 
+  @override String get profileShoutTitle => 'Post on their wall';
+  @override String get profileShoutHint => 'Write a message...';
+  @override String get profileShoutSend => 'Send';
+  @override String get profileShoutSent => 'Sent!';
+  @override String get profileShoutError => 'Couldn\'t send the message.';
   @override String get onboardSkip             => 'Skip';
   @override String get onboardNext             => 'Next';
   @override String get onboardFinish           => 'Finish';

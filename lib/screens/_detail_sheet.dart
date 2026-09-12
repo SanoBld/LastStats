@@ -2682,6 +2682,21 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
   Color?    _artworkColor;  // dominant color extracted from banner image
   late bool _localIsFav;
 
+  // ── Post a message on this friend's shoutbox (user.shout) ────────────────
+  // Unlike track/artist/album shouts, Last.fm DOES have a real write method
+  // for a user's own wall — this only shows up when logged in with the
+  // favorites auth (secret + session key), same requirement as love/unlove.
+  final _shoutCtrl = TextEditingController();
+  bool   _shoutSending = false;
+  bool   _shoutSent    = false;
+  String? _shoutError;
+
+  @override
+  void dispose() {
+    _shoutCtrl.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -2720,6 +2735,37 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
       }
     } catch (_) {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  bool get _canShout =>
+      favoritesEnabled &&
+      widget.username.toLowerCase() != widget.service.username.toLowerCase();
+
+  Future<void> _sendShout() async {
+    final message = _shoutCtrl.text.trim();
+    if (message.isEmpty || _shoutSending) return;
+    setState(() { _shoutSending = true; _shoutError = null; });
+
+    final svc = LastFmService(
+      apiKey:     widget.service.apiKey,
+      username:   widget.service.username,
+      secret:     secretKeyNotifier.value,
+      sessionKey: sessionKeyNotifier.value,
+    );
+    try {
+      await svc.shoutUser(widget.username, message);
+      if (mounted) {
+        _shoutCtrl.clear();
+        setState(() { _shoutSending = false; _shoutSent = true; });
+        // Reset the "sent" confirmation after a few seconds so the field
+        // is ready to use again without a stale checkmark lingering.
+        Future.delayed(const Duration(seconds: 3), () {
+          if (mounted) setState(() => _shoutSent = false);
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() { _shoutSending = false; _shoutError = L.profileShoutError; });
     }
   }
 
@@ -2966,6 +3012,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                         _sectionHeader(L.commonRecentTracks, scheme),
                         ..._recent.map((r) => _buildRecentRow(r, scheme)),
                       ],
+                      if (_canShout) _buildShoutComposer(scheme),
                       const SizedBox(height: 48),
                     ],
                   ),
@@ -3019,6 +3066,63 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           ),
         ),
       ],
+    );
+  }
+
+  // Post a message on this friend's shoutbox/wall (user.shout — a real
+  // Last.fm write method, unlike track/artist/album which are read-only).
+  Widget _buildShoutComposer(ColorScheme scheme) {
+    final text = Theme.of(context).textTheme;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.forum_rounded, size: 20, color: scheme.primary),
+              const SizedBox(width: 8),
+              Text(L.profileShoutTitle,
+                  style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _shoutCtrl,
+            maxLines: 3,
+            maxLength: 1000, // same limit as the real Last.fm shoutbox form
+            enabled: !_shoutSending,
+            decoration: InputDecoration(
+              hintText: L.profileShoutHint,
+              filled: true,
+              fillColor: scheme.surface,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+          ),
+          if (_shoutError != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(_shoutError!,
+                  style: text.bodySmall?.copyWith(color: scheme.error)),
+            ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: FilledButton.icon(
+              onPressed: _shoutSending ? null : _sendShout,
+              icon: _shoutSending
+                  ? const SizedBox(width: 16, height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2))
+                  : Icon(_shoutSent ? Icons.check_rounded : Icons.send_rounded, size: 18),
+              label: Text(_shoutSent ? L.profileShoutSent : L.profileShoutSend),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

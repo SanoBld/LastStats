@@ -286,6 +286,11 @@ class AppStringsEs implements AppStrings {
   @override String get detailShoutboxError => 'No se pudieron cargar los comentarios.';
   @override String get detailShoutboxSeeAll => 'Ver todos los comentarios';  @override String get dashPerWeek           => 'por semana';
 
+  @override String get profileShoutTitle => 'Escribir en su muro';
+  @override String get profileShoutHint => 'Escribe un mensaje...';
+  @override String get profileShoutSend => 'Enviar';
+  @override String get profileShoutSent => '¡Enviado!';
+  @override String get profileShoutError => 'No se pudo enviar el mensaje.';
   @override String get onboardSkip             => 'Omitir';
   @override String get onboardNext             => 'Siguiente';
   @override String get onboardFinish           => 'Finalizar';

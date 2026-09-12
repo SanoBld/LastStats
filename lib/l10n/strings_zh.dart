@@ -283,6 +283,11 @@ class AppStringsZh implements AppStrings {
   @override String get detailShoutboxError => '无法加载评论。';
   @override String get detailShoutboxSeeAll => '查看所有评论';  @override String get dashPerWeek           => '每周';
 
+  @override String get profileShoutTitle => '在留言板留言';
+  @override String get profileShoutHint => '写一条消息...';
+  @override String get profileShoutSend => '发送';
+  @override String get profileShoutSent => '已发送!';
+  @override String get profileShoutError => '无法发送消息。';
   @override String get onboardSkip             => '跳过';
   @override String get onboardNext             => '下一步';
   @override String get onboardFinish           => '完成';
