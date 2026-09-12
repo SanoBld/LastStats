@@ -91,6 +91,11 @@ void callbackDispatcher() {
           break;
         case _kTaskWidgetRefresh:
           break; &#47;&#47; WidgetService.updateAll() below already covers it
+        case _kTaskAutoBackup:
+          &#47;&#47; The service itself checks if a backup is actually due — this
+          &#47;&#47; task just runs that check periodically in the background.
+          await AutoBackupService.checkAndRunIfDue();
+          break;
       }
     } catch (_) {
       &#47;&#47; Never throw from the worker — WorkManager would retry and spam

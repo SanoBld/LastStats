@@ -153,6 +153,23 @@
     existingWorkPolicy: ExistingWorkPolicy.keep,
     constraints: Constraints(networkType: NetworkType.connected),
   );
+
+  &#47;&#47; ── Automatic backup task (Android background) ───────────────────────
+  &#47;&#47; Only registered when the user turned on auto-backup in Settings.
+  &#47;&#47; Checks every 6 hours whether a backup is actually due (daily &#47; weekly
+  &#47;&#47; &#47; monthly &#47; yearly) — this lets backups happen even if the app is
+  &#47;&#47; never opened on the due date, on top of the on-launch check in
+  &#47;&#47; main.dart which covers every other platform.
+  await Workmanager().cancelByUniqueName(_kTaskAutoBackup);
+  final autoBackupOn = prefs.getBool(AutoBackupService.kEnabled) ?? false;
+  if (autoBackupOn) {
+    await Workmanager().registerPeriodicTask(
+      _kTaskAutoBackup,
+      _kTaskAutoBackup,
+      frequency:          const Duration(hours: 6),
+      existingWorkPolicy: ExistingWorkPolicy.keep,
+    );
+  }
 }</code></pre>
 </section>
 
