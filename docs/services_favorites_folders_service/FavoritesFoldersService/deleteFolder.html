@@ -86,6 +86,11 @@
     ..removeWhere((k, _) =&gt; !updatedAssign.containsKey(k));
   metaNotifier.value = updatedMeta;
   await _persistMeta();
+
+  final updatedOrder = Map&lt;String, List&lt;String&gt;&gt;.from(orderNotifier.value)
+    ..remove(id);
+  orderNotifier.value = updatedOrder;
+  await _persistOrder();
 }</code></pre>
 </section>
 

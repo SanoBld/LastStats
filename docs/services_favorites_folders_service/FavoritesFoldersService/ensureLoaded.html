@@ -98,6 +98,15 @@
           MapEntry(k, FolderItem.fromJson(k, Map&lt;String, dynamic&gt;.from(v))));
     } catch (_) {}
   }
+
+  final orderRaw = p.getString(_kOrderKey);
+  if (orderRaw != null &amp;&amp; orderRaw.isNotEmpty) {
+    try {
+      final decoded = Map&lt;String, dynamic&gt;.from(jsonDecode(orderRaw));
+      orderNotifier.value = decoded.map(
+          (k, v) =&gt; MapEntry(k, List&lt;String&gt;.from(v as List)));
+    } catch (_) {}
+  }
 }</code></pre>
 </section>
 

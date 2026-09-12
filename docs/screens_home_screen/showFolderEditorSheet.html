@@ -63,10 +63,6 @@
 
     </section>
     
-<section class="desc markdown">
-  <p>Create-or-edit sheet for a folder (name, emoji, color). Shared between
-the search page's folder tab and the quick "new folder" shortcut above.</p>
-</section>
 
 
     
@@ -101,23 +97,7 @@ the search page's folder tab and the quick "new folder" shortcut above.</p>
                 color: Color(colorValue).withValues(alpha: 0.25),
                 borderRadius: AppRadius.mdR,
               ),
-              child: SizedBox(
-                width: 40, height: 40,
-                &#47;&#47; Free-form emoji field — type or paste literally any emoji.
-                &#47;&#47; The quick-pick grid below is just a shortcut on top of this.
-                child: TextField(
-                  controller: TextEditingController(text: emoji),
-                  textAlign: TextAlign.center,
-                  maxLength: 4,
-                  style: const TextStyle(fontSize: 22),
-                  decoration: const InputDecoration(
-                    counterText: &#39;&#39;,
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                  onChanged: (v) =&gt; setSheet(() =&gt; emoji = v.isEmpty ? &#39;📁&#39; : v),
-                ),
-              ),
+              child: Text(emoji, style: const TextStyle(fontSize: 26)),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -146,22 +126,39 @@ the search page's folder tab and the quick "new folder" shortcut above.</p>
           Text(L.favFolderEmoji, style: Theme.of(ctx).textTheme.labelMedium
               ?.copyWith(color: scheme.onSurfaceVariant)),
           const SizedBox(height: 8),
-          Wrap(spacing: 8, runSpacing: 8, children: kFavFolderEmojis.map((e) {
-            final selected = e == emoji;
-            return GestureDetector(
-              onTap: () =&gt; setSheet(() =&gt; emoji = e),
+          Wrap(spacing: 8, runSpacing: 8, children: [
+            for (final e in kFavFolderEmojis)
+              GestureDetector(
+                onTap: () =&gt; setSheet(() =&gt; emoji = e),
+                child: Container(
+                  width: 40, height: 40,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: e == emoji ? scheme.primaryContainer : scheme.surfaceContainerHighest,
+                    border: e == emoji ? Border.all(color: scheme.primary, width: 2) : null,
+                  ),
+                  child: Text(e, style: const TextStyle(fontSize: 18)),
+                ),
+              ),
+            &#47;&#47; &quot;+&quot; tile: type or paste any other emoji, one only.
+            GestureDetector(
+              onTap: () async {
+                final custom = await _promptCustomEmoji(ctx);
+                if (custom != null &amp;&amp; custom.isNotEmpty) setSheet(() =&gt; emoji = custom);
+              },
               child: Container(
                 width: 40, height: 40,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: selected ? scheme.primaryContainer : scheme.surfaceContainerHighest,
-                  border: selected ? Border.all(color: scheme.primary, width: 2) : null,
+                  color: scheme.surfaceContainerHighest,
+                  border: Border.all(color: scheme.outlineVariant),
                 ),
-                child: Text(e, style: const TextStyle(fontSize: 18)),
+                child: Icon(Icons.add_rounded, size: 18, color: scheme.onSurfaceVariant),
               ),
-            );
-          }).toList()),
+            ),
+          ]),
           const SizedBox(height: 18),
           Text(L.favFolderColor, style: Theme.of(ctx).textTheme.labelMedium
               ?.copyWith(color: scheme.onSurfaceVariant)),

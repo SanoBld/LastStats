@@ -185,6 +185,18 @@
 
 </dd>
 
+        <dt id="orderNotifier" class="property">
+  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/orderNotifier.html">orderNotifier</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/foundation/ValueNotifier-class.html">ValueNotifier</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span>&gt;</span></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
     </dl>
   </section>
     
@@ -280,6 +292,33 @@ using name+artist) in case a non-track key format is ever needed.
 </dt>
 <dd>
   All items currently saved in one folder, most recently added last.
+  
+
+</dd>
+
+        <dt id="orderedItemsInFolder" class="callable">
+  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/orderedItemsInFolder.html">orderedItemsInFolder</a></span><span class="signature">(<wbr><span class="parameter" id="orderedItemsInFolder-param-folderId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">folderId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../services_favorites_folders_service/FolderItem-class.html">FolderItem</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Items in a folder, respecting the user's manual drag order. Any item
+not yet in the saved order (e.g. just added) is appended at the end.
+  
+
+</dd>
+
+        <dt id="reorderFolder" class="callable">
+  <span class="name"><a href="../services_favorites_folders_service/FavoritesFoldersService/reorderFolder.html">reorderFolder</a></span><span class="signature">(<wbr><span class="parameter" id="reorderFolder-param-folderId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">folderId</span>, </span><span class="parameter" id="reorderFolder-param-keysInOrder"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">keysInOrder</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
   
 
 </dd>
