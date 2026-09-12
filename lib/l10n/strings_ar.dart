@@ -414,7 +414,15 @@ class AppStringsAr implements AppStrings {
   @override String get backupIncludeFoldersLabel => 'تضمين المجلدات';
   @override String get backupIncludeFoldersDesc => 'يشمل مجلدات المقاطع الخاصة بك ومحتواها.';
   @override String get backupIncludeKeysDesc => 'تضمين المفاتيح في الملف المُصدَّر';
-  @override String get settingsCrashLog => 'سجل الأخطاء';
+
+  @override String get backupIncludeScrobblesLabel => 'تضمين كامل السجل';
+  @override String get backupIncludeScrobblesDesc => 'يضيف كل المقاطع التي استمعت إليها منذ البداية (قد يكون كبير الحجم).';
+  @override String backupExportedOn(String date) => 'نسخة احتياطية بتاريخ $date';
+  @override String get backupScrobblesErrorTitle => 'خطأ في السجل';
+  @override String get backupScrobblesErrorDesc => 'يبدو أن بعض سنوات السجل تالفة في هذا الملف. ماذا تريد أن تفعل؟';
+  @override String get backupScrobblesKeepAnyway => 'المتابعة على أي حال';
+  @override String get backupScrobblesCancel => 'إلغاء السجل';
+  @override String get backupScrobblesSkipRefetch => 'تخطي وإعادة التحميل عبر الإنترنت';  @override String get settingsCrashLog => 'سجل الأخطاء';
   @override String get backupCrashLogDesc => 'يسجل الأخطاء التي يواجهها التطبيق، مفيد للإبلاغ عن مشكلة.';
   @override String get backupCrashLogShare => 'مشاركة السجل';
   @override String get backupCrashLogClear => 'مسح السجل';

@@ -462,7 +462,15 @@ class AppStringsPt implements AppStrings {
   @override String get backupIncludeFoldersLabel => 'Incluir pastas';
   @override String get backupIncludeFoldersDesc => 'Inclui as suas pastas de músicas e o respetivo conteúdo.';
   @override String get backupIncludeKeysDesc => 'Incluir as chaves no arquivo exportado';
-  @override String get settingsCrashLog => 'Registro de erros';
+
+  @override String get backupIncludeScrobblesLabel => 'Incluir todo o histórico';
+  @override String get backupIncludeScrobblesDesc => 'Adiciona todas as músicas ouvidas desde o início (pode ser grande).';
+  @override String backupExportedOn(String date) => 'Backup de $date';
+  @override String get backupScrobblesErrorTitle => 'Erro no histórico';
+  @override String get backupScrobblesErrorDesc => 'Alguns anos do histórico parecem estar corrompidos neste arquivo. O que deseja fazer?';
+  @override String get backupScrobblesKeepAnyway => 'Continuar mesmo assim';
+  @override String get backupScrobblesCancel => 'Cancelar histórico';
+  @override String get backupScrobblesSkipRefetch => 'Ignorar e baixar novamente online';  @override String get settingsCrashLog => 'Registro de erros';
   @override String get backupCrashLogDesc => 'Registra os erros encontrados pelo app, útil para reportar um bug.';
   @override String get backupCrashLogShare => 'Compartilhar registro';
   @override String get backupCrashLogClear => 'Limpar registro';

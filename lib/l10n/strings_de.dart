@@ -414,7 +414,15 @@ class AppStringsDe implements AppStrings {
   @override String get backupIncludeFoldersLabel => 'Ordner einschließen';
   @override String get backupIncludeFoldersDesc => 'Enthält deine Titelordner und deren Inhalt.';
   @override String get backupIncludeKeysDesc => 'Schlüssel in die exportierte Datei einbeziehen';
-  @override String get settingsCrashLog => 'Fehlerprotokoll';
+
+  @override String get backupIncludeScrobblesLabel => 'Gesamten Verlauf einschließen';
+  @override String get backupIncludeScrobblesDesc => 'Fügt alle jemals gehörten Titel hinzu (kann groß sein).';
+  @override String backupExportedOn(String date) => 'Sicherung vom $date';
+  @override String get backupScrobblesErrorTitle => 'Fehler im Verlauf';
+  @override String get backupScrobblesErrorDesc => 'Einige Jahre im Verlauf scheinen in dieser Datei beschädigt zu sein. Was möchtest du tun?';
+  @override String get backupScrobblesKeepAnyway => 'Trotzdem fortfahren';
+  @override String get backupScrobblesCancel => 'Verlauf verwerfen';
+  @override String get backupScrobblesSkipRefetch => 'Überspringen und online neu laden';  @override String get settingsCrashLog => 'Fehlerprotokoll';
   @override String get backupCrashLogDesc => 'Zeichnet App-Fehler auf, nützlich zum Melden eines Bugs.';
   @override String get backupCrashLogShare => 'Protokoll teilen';
   @override String get backupCrashLogClear => 'Protokoll leeren';

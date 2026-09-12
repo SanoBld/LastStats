@@ -20,6 +20,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../app_state.dart';
+import 'scrobbles_file_cache.dart';
 
 /// Runtime-only / session state that should never be exported — everything
 /// else under the 'ls_' prefix (including any future theme or setting key)
@@ -51,12 +52,30 @@ class BackupPreview {
   final bool hasApiKey;
   final bool hasSecretKey;
   final String? username;
+  // Date the backup file was created (from "exported_at"). Shown to the
+  // user before they restore, so they know how old the file is.
+  final DateTime? exportedAt;
+  // True if this backup file also contains the full scrobble history.
+  final bool hasScrobbles;
   const BackupPreview({
     required this.raw,
     required this.hasApiKey,
     required this.hasSecretKey,
     this.username,
+    this.exportedAt,
+    this.hasScrobbles = false,
   });
+}
+
+/// What to do with years of scrobble data that failed validation.
+enum ScrobbleConflictMode {
+  /// Keep going as before: import everything, broken years included.
+  keepAnyway,
+  /// Cancel: do not import ANY scrobble, keep whatever is already on device.
+  cancelScrobbles,
+  /// Skip only the broken years and mark them so the app re-downloads
+  /// them from Last.fm online next time it syncs.
+  skipAndRefetch,
 }
 
 class BackupService {
@@ -74,6 +93,9 @@ class BackupService {
     bool includeApiKey = true,
     bool includeSecretKey = true,
     bool includeFolders = true,
+    // NEW: when true, the full scrobble history (every track ever played,
+    // as cached on this device) is embedded in the backup file too.
+    bool includeScrobbles = false,
   }) async {
     final p = await SharedPreferences.getInstance();
     final map = <String, dynamic>{};
@@ -114,14 +136,22 @@ class BackupService {
       if (activeApiKey.isEmpty)   activeApiKey   = (map['ls_apikey']   ?? '').toString();
     }
 
+    // NEW: raw per-year scrobble blobs, only read from disk if the user
+    // actually asked for them (this can be a big amount of data).
+    Map<String, String>? scrobbles;
+    if (includeScrobbles) {
+      scrobbles = await ScrobblesFileCache.exportRawForBackup();
+    }
+
     final now = DateTime.now();
     return jsonEncode({
       'app':         'LastStats',
-      'version':     '3', // v3 = dynamic key discovery (all ls_* keys)
-      'exported_at': now.toIso8601String(),
+      'version':     '4', // v4 = added optional full scrobble history
+      'exported_at': now.toIso8601String(), // backup date, used on restore
       'username':    activeUsername,
       'api_key':     activeApiKey,
       'prefs':       map,
+      if (scrobbles != null) 'scrobbles': scrobbles,
     });
   }
 
@@ -138,12 +168,14 @@ class BackupService {
     bool includeApiKey = true,
     bool includeSecretKey = true,
     bool includeFolders = true,
+    bool includeScrobbles = false,
   }) async {
     try {
       final payload = await buildBackupJson(
         includeApiKey: includeApiKey,
         includeSecretKey: includeSecretKey,
         includeFolders: includeFolders,
+        includeScrobbles: includeScrobbles,
       );
       final bytes   = Uint8List.fromList(utf8.encode(payload));
       final path = await FilePicker.platform.saveFile(
@@ -210,6 +242,8 @@ class BackupService {
     String username = '';
     bool hasApiKey = false;
     bool hasSecretKey = false;
+    bool hasScrobbles = false;
+    DateTime? exportedAt;
 
     if (parsed['app'] == 'LastStats') {
       final prefs = parsed['prefs'];
@@ -219,6 +253,9 @@ class BackupService {
         hasSecretKey = (prefs['ls_secret_key'] ?? '').toString().isNotEmpty;
       }
       username = (parsed['username'] ?? '').toString();
+      hasScrobbles = parsed['scrobbles'] is Map && (parsed['scrobbles'] as Map).isNotEmpty;
+      final exportedRaw = (parsed['exported_at'] ?? '').toString();
+      exportedAt = DateTime.tryParse(exportedRaw);
     } else {
       // Simple format fallback: {"username":"…","api_key":"…"}
       final k = (parsed['api_key'] ?? parsed['apiKey'] ?? parsed['api-key'] ?? '').toString();
@@ -231,7 +268,28 @@ class BackupService {
       hasApiKey: hasApiKey,
       hasSecretKey: hasSecretKey,
       username: username.isEmpty ? null : username,
+      exportedAt: exportedAt,
+      hasScrobbles: hasScrobbles,
     );
+  }
+
+  /// Checks the scrobble data inside a backup file for corruption, WITHOUT
+  /// importing anything. Call this before [applyBackupJson] when
+  /// [BackupPreview.hasScrobbles] is true, so the UI can ask the user what
+  /// to do if some years are broken.
+  static ScrobbleImportCheck checkScrobbles(String raw) {
+    try {
+      final parsed = jsonDecode(raw) as Map<String, dynamic>;
+      final scrobbles = parsed['scrobbles'];
+      if (scrobbles is! Map) {
+        return const ScrobbleImportCheck(validYears: [], brokenYears: []);
+      }
+      return ScrobblesFileCache.checkRawForImport(
+        Map<String, dynamic>.from(scrobbles),
+      );
+    } catch (_) {
+      return const ScrobbleImportCheck(validYears: [], brokenYears: []);
+    }
   }
 
   /// Kept for backward compatibility — reads + applies a backup file in one
@@ -252,10 +310,16 @@ class BackupService {
   /// restored. [restoreSecretKey] controls whether the API secret key (and
   /// the session key derived from it) are restored. Both default to true
   /// for backward compatibility.
+  /// [restoreScrobbles] controls whether the embedded scrobble history (if
+  /// any) is imported at all. [scrobbleMode] only matters when the backup
+  /// has broken/corrupted years (see [checkScrobbles]) — it tells us what
+  /// the user chose to do about it.
   static Future<BackupResult> applyBackupJson(
     String raw, {
     bool restoreApiKey = true,
     bool restoreSecretKey = true,
+    bool restoreScrobbles = false,
+    ScrobbleConflictMode scrobbleMode = ScrobbleConflictMode.keepAnyway,
   }) async {
     Map<String, dynamic> parsed;
     try {
@@ -302,6 +366,25 @@ class BackupService {
     }
 
     await _applyPrefs(prefsMap);
+
+    // ── Scrobbles (optional, can be big) ─────────────────────────────────
+    // "cancelScrobbles" means: user said no, don't touch scrobbles at all.
+    final scrobblesRaw = parsed['scrobbles'];
+    if (restoreScrobbles &&
+        scrobbleMode != ScrobbleConflictMode.cancelScrobbles &&
+        scrobblesRaw is Map) {
+      // keepAnyway -> import broken years as-is (best effort).
+      // skipAndRefetch -> drop broken years, they'll be re-downloaded from
+      // Last.fm the next time the app syncs (online), like a normal user
+      // who never had a backup for that year.
+      final importMode = scrobbleMode == ScrobbleConflictMode.skipAndRefetch
+          ? 'refetch'
+          : 'keep';
+      await ScrobblesFileCache.importRawFromBackup(
+        Map<String, dynamic>.from(scrobblesRaw),
+        mode: importMode,
+      );
+    }
 
     final p = await SharedPreferences.getInstance();
     username = p.getString('ls_username') ?? username;

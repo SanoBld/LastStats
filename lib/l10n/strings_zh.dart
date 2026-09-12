@@ -459,7 +459,15 @@ class AppStringsZh implements AppStrings {
   @override String get backupIncludeFoldersLabel => '包含文件夹';
   @override String get backupIncludeFoldersDesc => '包含你的歌曲文件夹及其内容';
   @override String get backupIncludeKeysDesc => '在导出的文件中包含密钥';
-  @override String get settingsCrashLog => '错误日志';
+
+  @override String get backupIncludeScrobblesLabel => '包含完整历史记录';
+  @override String get backupIncludeScrobblesDesc => '添加你从一开始播放过的所有曲目(文件可能会很大)。';
+  @override String backupExportedOn(String date) => '备份于 $date';
+  @override String get backupScrobblesErrorTitle => '历史记录出错';
+  @override String get backupScrobblesErrorDesc => '此文件中的部分年份历史记录似乎已损坏。你想怎么做?';
+  @override String get backupScrobblesKeepAnyway => '仍然继续';
+  @override String get backupScrobblesCancel => '取消历史记录';
+  @override String get backupScrobblesSkipRefetch => '跳过并重新在线下载';  @override String get settingsCrashLog => '错误日志';
   @override String get backupCrashLogDesc => '记录应用遇到的错误，方便反馈问题。';
   @override String get backupCrashLogShare => '分享日志';
   @override String get backupCrashLogClear => '清空日志';

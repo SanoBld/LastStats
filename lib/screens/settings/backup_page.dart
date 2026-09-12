@@ -85,12 +85,21 @@ class _BackupPageState extends State<BackupPage> {
     return '${(bytes / 1024).toStringAsFixed(1)} KB';
   }
 
+  // Simple dd/mm/yyyy formatting for the backup date, no extra package.
+  String _fmtDate(DateTime d) {
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${two(d.day)}/${two(d.month)}/${d.year}';
+  }
+
   // Whether to include the Last.fm API key / secret key in the exported
   // file. Both default to on; the user can uncheck either before exporting
   // (e.g. to share a backup without sensitive credentials).
   bool _includeApiKey    = true;
   bool _includeSecretKey = true;
   bool _includeFolders   = true;
+  // NEW: off by default, since embedding the full listening history makes
+  // the backup file much bigger.
+  bool _includeScrobbles = false;
 
   Future<void> _export() async {
     setState(() => _exporting = true);
@@ -98,6 +107,7 @@ class _BackupPageState extends State<BackupPage> {
       includeApiKey:    _includeApiKey,
       includeSecretKey: _includeSecretKey,
       includeFolders:   _includeFolders,
+      includeScrobbles: _includeScrobbles,
     );
     if (!mounted) return;
     setState(() => _exporting = false);
@@ -117,11 +127,14 @@ class _BackupPageState extends State<BackupPage> {
     }
 
     // Ask which sensitive keys to restore, only for the ones actually
-    // present in the backup file.
+    // present in the backup file. Also offer to restore the scrobble
+    // history if this backup has one — shown together in the same dialog,
+    // and the dialog's title/subtitle already say when the backup is from.
     bool restoreApiKey    = preview.hasApiKey;
     bool restoreSecretKey = preview.hasSecretKey;
+    bool restoreScrobbles = preview.hasScrobbles;
 
-    if (preview.hasApiKey || preview.hasSecretKey) {
+    if (preview.hasApiKey || preview.hasSecretKey || preview.hasScrobbles) {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (dialogCtx) => StatefulBuilder(
@@ -132,6 +145,15 @@ class _BackupPageState extends State<BackupPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(L.backupRestoreKeysDesc),
+                // Backup date: always shown to the user before restoring.
+                if (preview.exportedAt != null) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    L.backupExportedOn(_fmtDate(preview.exportedAt!)),
+                    style: Theme.of(dialogCtx).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(dialogCtx).colorScheme.onSurfaceVariant),
+                  ),
+                ],
                 if (preview.hasApiKey)
                   CheckboxListTile(
                     contentPadding: EdgeInsets.zero,
@@ -147,6 +169,14 @@ class _BackupPageState extends State<BackupPage> {
                     title: Text(L.backupRestoreSecretKeyLabel),
                     value: restoreSecretKey,
                     onChanged: (v) => setDialogState(() => restoreSecretKey = v ?? false),
+                  ),
+                if (preview.hasScrobbles)
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(L.backupIncludeScrobblesLabel),
+                    value: restoreScrobbles,
+                    onChanged: (v) => setDialogState(() => restoreScrobbles = v ?? false),
                   ),
               ],
             ),
@@ -169,10 +199,48 @@ class _BackupPageState extends State<BackupPage> {
       }
     }
 
+    // If we're restoring scrobbles, check them for corruption FIRST and
+    // ask the user what to do before touching anything on disk.
+    var scrobbleMode = ScrobbleConflictMode.keepAnyway;
+    if (restoreScrobbles) {
+      final check = BackupService.checkScrobbles(preview.raw);
+      if (check.hasErrors) {
+        final choice = await showDialog<ScrobbleConflictMode>(
+          context: context,
+          builder: (dialogCtx) => AlertDialog(
+            title: Text(L.backupScrobblesErrorTitle),
+            content: Text(L.backupScrobblesErrorDesc),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogCtx)
+                    .pop(ScrobbleConflictMode.cancelScrobbles),
+                child: Text(L.backupScrobblesCancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(dialogCtx)
+                    .pop(ScrobbleConflictMode.skipAndRefetch),
+                child: Text(L.backupScrobblesSkipRefetch),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(dialogCtx)
+                    .pop(ScrobbleConflictMode.keepAnyway),
+                child: Text(L.backupScrobblesKeepAnyway),
+              ),
+            ],
+          ),
+        );
+        // Dialog dismissed (e.g. back button): safest default is to not
+        // touch the scrobble history at all.
+        scrobbleMode = choice ?? ScrobbleConflictMode.cancelScrobbles;
+      }
+    }
+
     final result = await BackupService.applyBackupJson(
       preview.raw,
       restoreApiKey:    restoreApiKey,
       restoreSecretKey: restoreSecretKey,
+      restoreScrobbles: restoreScrobbles,
+      scrobbleMode:     scrobbleMode,
     );
     if (!mounted) return;
     setState(() => _importing = false);
@@ -268,6 +336,16 @@ class _BackupPageState extends State<BackupPage> {
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             value: _includeFolders,
             onChanged: (v) => setState(() => _includeFolders = v),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          SwitchListTile(
+            secondary: Icon(Icons.library_music_rounded, color: scheme.primary),
+            title: Text(L.backupIncludeScrobblesLabel,
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            subtitle: Text(L.backupIncludeScrobblesDesc,
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            value: _includeScrobbles,
+            onChanged: (v) => setState(() => _includeScrobbles = v),
           ),
         ]),
 

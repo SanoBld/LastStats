@@ -414,7 +414,15 @@ class AppStringsRu implements AppStrings {
   @override String get backupIncludeFoldersLabel => 'Включить папки';
   @override String get backupIncludeFoldersDesc => 'Сохраняет ваши папки с треками и их содержимое.';
   @override String get backupIncludeKeysDesc => 'Включить ключи в экспортируемый файл';
-  @override String get settingsCrashLog => 'Журнал ошибок';
+
+  @override String get backupIncludeScrobblesLabel => 'Включить всю историю';
+  @override String get backupIncludeScrobblesDesc => 'Добавляет все прослушанные треки с самого начала (может быть большим).';
+  @override String backupExportedOn(String date) => 'Резервная копия от $date';
+  @override String get backupScrobblesErrorTitle => 'Ошибка в истории';
+  @override String get backupScrobblesErrorDesc => 'Похоже, некоторые годы истории повреждены в этом файле. Что вы хотите сделать?';
+  @override String get backupScrobblesKeepAnyway => 'Продолжить в любом случае';
+  @override String get backupScrobblesCancel => 'Отменить историю';
+  @override String get backupScrobblesSkipRefetch => 'Пропустить и загрузить заново онлайн';  @override String get settingsCrashLog => 'Журнал ошибок';
   @override String get backupCrashLogDesc => 'Записывает ошибки приложения — полезно при сообщении о баге.';
   @override String get backupCrashLogShare => 'Поделиться журналом';
   @override String get backupCrashLogClear => 'Очистить журнал';

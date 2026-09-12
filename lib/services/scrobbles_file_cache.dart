@@ -119,6 +119,15 @@ Map<int, bool> _decodeYearsOkFlags(Map<int, String> rawByYear) {
 }
 // ══════════════════════════════════════════════════════════════════════════
 
+/// Result of checking a backup's scrobble data for corruption BEFORE
+/// importing anything (see [ScrobblesFileCache.checkRawForImport]).
+class ScrobbleImportCheck {
+  final List<int> validYears;
+  final List<int> brokenYears;
+  const ScrobbleImportCheck({required this.validYears, required this.brokenYears});
+  bool get hasErrors => brokenYears.isNotEmpty;
+}
+
 class ScrobblesFileCache {
   ScrobblesFileCache._();
 
@@ -276,6 +285,113 @@ class ScrobblesFileCache {
   // ──────────────────────────────────────────────────────────────────────────
 
   static Future<int> getDiskUsageBytes() => CacheBackend.totalBytes();
+
+  // ──────────────────────────────────────────────────────────────────────────
+  //  Backup / restore support (used by BackupService)
+  // ──────────────────────────────────────────────────────────────────────────
+
+  /// Reads every cached year (+ meta) as raw JSON strings, so BackupService
+  /// can embed the full scrobble history into a backup file.
+  static Future<Map<String, String>> exportRawForBackup() async {
+    final out = <String, String>{};
+    for (final year in getCachedYears()) {
+      final raw = await CacheBackend.read(_yearKey(year));
+      if (raw != null) out[_yearKey(year)] = raw;
+    }
+    final metaRaw = await CacheBackend.read(_metaKey);
+    if (metaRaw != null) out[_metaKey] = metaRaw;
+    return out;
+  }
+
+  /// Tries to parse every "year_XXXX" entry from a backup's "scrobbles" map,
+  /// WITHOUT writing anything, so the UI can warn the user first.
+  static ScrobbleImportCheck checkRawForImport(Map<String, dynamic> raw) {
+    final valid = <int>[];
+    final broken = <int>[];
+    for (final key in raw.keys) {
+      if (!key.startsWith('year_')) continue;
+      final year = int.tryParse(key.substring(5));
+      if (year == null) continue;
+      try {
+        final decoded = jsonDecode(raw[key].toString()) as Map<String, dynamic>;
+        final version = (decoded['v'] as num?)?.toInt() ?? 1;
+        final records = _parseRecords(decoded['data'], version);
+        if (records == null) {
+          broken.add(year);
+        } else {
+          valid.add(year);
+        }
+      } catch (_) {
+        broken.add(year);
+      }
+    }
+    valid.sort();
+    broken.sort();
+    return ScrobbleImportCheck(validYears: valid, brokenYears: broken);
+  }
+
+  /// Imports scrobbles from a backup's "scrobbles" map. Years already on
+  /// this device are MERGED (union by timestamp) rather than overwritten,
+  /// so restoring on a new phone that already synced a few days keeps
+  /// everything — nothing is lost either side.
+  ///
+  /// [mode]:
+  ///   'keep'    → import every year, broken ones included (best effort).
+  ///   'refetch' → drop broken years and mark them incomplete, so the app
+  ///               re-downloads them from Last.fm on the next online sync.
+  static Future<void> importRawFromBackup(
+    Map<String, dynamic> raw, {
+    required String mode,
+  }) async {
+    for (final key in raw.keys) {
+      if (!key.startsWith('year_')) continue;
+      final year = int.tryParse(key.substring(5));
+      if (year == null) continue;
+
+      List<ScrobbleRecord>? imported;
+      bool importedOk = true;
+      try {
+        final decoded = jsonDecode(raw[key].toString()) as Map<String, dynamic>;
+        final version = (decoded['v'] as num?)?.toInt() ?? 1;
+        imported = _parseRecords(decoded['data'], version);
+        importedOk = decoded['ok'] as bool? ?? true;
+      } catch (_) {
+        imported = null;
+      }
+
+      if (imported == null) {
+        // Nothing usable for this year, whatever the mode.
+        continue;
+      }
+      if (mode == 'refetch' && !importedOk) {
+        // Broken year, user chose "skip + refetch online": don't import
+        // it, and don't touch what's already cached either — just leave
+        // it marked incomplete so a normal sync re-downloads it.
+        continue;
+      }
+
+      // Merge with whatever is already on this device: union by
+      // timestamp; if the same scrobble exists twice, prefer the copy
+      // that actually has track/artist metadata.
+      final existing = _years[year] ?? const <ScrobbleRecord>[];
+      final byTs = <int, ScrobbleRecord>{for (final r in existing) r.ts: r};
+      for (final r in imported) {
+        final current = byTs[r.ts];
+        if (current == null || (!current.hasMetadata && r.hasMetadata)) {
+          byTs[r.ts] = r;
+        }
+      }
+      final merged = byTs.values.toList()..sort((a, b) => a.ts.compareTo(b.ts));
+
+      final complete = (_yearOk[year] ?? true) && importedOk;
+      await setYear(year, merged, complete: complete);
+    }
+
+    // Update "loaded_years" so the newly imported years are recognized by
+    // the rest of the app (AllScrobblesService etc.) on next read.
+    final years = getCachedYears();
+    await setMeta({..._meta ?? {}, 'loaded_years': years});
+  }
 
   // ──────────────────────────────────────────────────────────────────────────
   //  Nettoyage

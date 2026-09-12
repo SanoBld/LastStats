@@ -414,7 +414,15 @@ class AppStringsIt implements AppStrings {
   @override String get backupIncludeFoldersLabel => 'Includi cartelle';
   @override String get backupIncludeFoldersDesc => 'Include le tue cartelle di brani e il loro contenuto.';
   @override String get backupIncludeKeysDesc => 'Includi le chiavi nel file esportato';
-  @override String get settingsCrashLog => 'Registro errori';
+
+  @override String get backupIncludeScrobblesLabel => 'Includi tutta la cronologia';
+  @override String get backupIncludeScrobblesDesc => 'Aggiunge tutti i brani ascoltati dall\'inizio (può essere corposo).';
+  @override String backupExportedOn(String date) => 'Backup del $date';
+  @override String get backupScrobblesErrorTitle => 'Errore nella cronologia';
+  @override String get backupScrobblesErrorDesc => 'Alcuni anni della cronologia sembrano danneggiati in questo file. Cosa vuoi fare?';
+  @override String get backupScrobblesKeepAnyway => 'Continua comunque';
+  @override String get backupScrobblesCancel => 'Annulla cronologia';
+  @override String get backupScrobblesSkipRefetch => 'Ignora e riscarica online';  @override String get settingsCrashLog => 'Registro errori';
   @override String get backupCrashLogDesc => 'Registra gli errori riscontrati dall\'app, utile per segnalare un bug.';
   @override String get backupCrashLogShare => 'Condividi registro';
   @override String get backupCrashLogClear => 'Svuota registro';

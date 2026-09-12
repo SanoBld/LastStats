@@ -414,7 +414,15 @@ class AppStringsJa implements AppStrings {
   @override String get backupIncludeFoldersLabel => 'フォルダを含める';
   @override String get backupIncludeFoldersDesc => '曲のフォルダとその中身を含めます';
   @override String get backupIncludeKeysDesc => 'エクスポートするファイルにキーを含める';
-  @override String get settingsCrashLog => 'エラーログ';
+
+  @override String get backupIncludeScrobblesLabel => '履歴をすべて含める';
+  @override String get backupIncludeScrobblesDesc => 'これまで再生したすべての曲を追加します(容量が大きくなる場合があります)。';
+  @override String backupExportedOn(String date) => '$date のバックアップ';
+  @override String get backupScrobblesErrorTitle => '履歴にエラーがあります';
+  @override String get backupScrobblesErrorDesc => 'このファイル内の履歴の一部の年が壊れているようです。どうしますか?';
+  @override String get backupScrobblesKeepAnyway => 'そのまま続ける';
+  @override String get backupScrobblesCancel => '履歴をキャンセル';
+  @override String get backupScrobblesSkipRefetch => 'スキップしてオンラインで再取得';  @override String get settingsCrashLog => 'エラーログ';
   @override String get backupCrashLogDesc => 'アプリで発生したエラーを記録します。不具合報告に役立ちます。';
   @override String get backupCrashLogShare => 'ログを共有';
   @override String get backupCrashLogClear => 'ログを消去';

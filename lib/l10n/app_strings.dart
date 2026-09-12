@@ -483,6 +483,16 @@ abstract class AppStrings {
   String get backupIncludeFoldersLabel;
   String get backupIncludeFoldersDesc;  String get backupIncludeKeysDesc;
 
+  // ── Backup page: scrobble history (NEW) ─────────────────────────────────
+  String get backupIncludeScrobblesLabel;
+  String get backupIncludeScrobblesDesc;
+  String backupExportedOn(String date);
+  String get backupScrobblesErrorTitle;
+  String get backupScrobblesErrorDesc;
+  String get backupScrobblesKeepAnyway;
+  String get backupScrobblesCancel;
+  String get backupScrobblesSkipRefetch;
+
   // ── Backup page: crash/error log ────────────────────────────────────────
   String get settingsCrashLog;
   String get backupCrashLogDesc;

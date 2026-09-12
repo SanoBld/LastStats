@@ -462,7 +462,15 @@ class AppStringsFr implements AppStrings {
   @override String get backupIncludeFoldersLabel => 'Inclure les dossiers';
   @override String get backupIncludeFoldersDesc => 'Emporte tes dossiers de titres et leur contenu.';
   @override String get backupIncludeKeysDesc => "Inclure les clés dans le fichier exporté";
-  @override String get settingsCrashLog => 'Journal d\'erreurs';
+
+  @override String get backupIncludeScrobblesLabel => 'Inclure tout l\'historique';
+  @override String get backupIncludeScrobblesDesc => 'Ajoute tous tes titres écoutés depuis le début (peut être volumineux).';
+  @override String backupExportedOn(String date) => 'Sauvegarde du $date';
+  @override String get backupScrobblesErrorTitle => 'Erreur dans l\'historique';
+  @override String get backupScrobblesErrorDesc => 'Certaines années de l\'historique semblent corrompues dans ce fichier. Que veux-tu faire ?';
+  @override String get backupScrobblesKeepAnyway => 'Continuer quand même';
+  @override String get backupScrobblesCancel => 'Annuler l\'historique';
+  @override String get backupScrobblesSkipRefetch => 'Ignorer et retélécharger en ligne';  @override String get settingsCrashLog => 'Journal d\'erreurs';
   @override String get backupCrashLogDesc => 'Enregistre les erreurs rencontrées par l\'app, utile pour signaler un bug.';
   @override String get backupCrashLogShare => 'Partager le journal';
   @override String get backupCrashLogClear => 'Vider le journal';
