@@ -39,7 +39,14 @@ class _BackupPageState extends State<BackupPage> {
     final f = await CrashLogService.instance.getFile();
     if (!mounted) return;
     setState(() => _logBusy = false);
-    if (f == null || !await f.exists() || await f.length() == 0) {
+    if (f == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(L.backupCrashLogEmpty), behavior: SnackBarBehavior.floating));
+      return;
+    }
+    final empty = !await f.exists() || await f.length() == 0;
+    if (!mounted) return;
+    if (empty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(L.backupCrashLogEmpty), behavior: SnackBarBehavior.floating));
       return;
@@ -76,12 +83,14 @@ class _BackupPageState extends State<BackupPage> {
   // (e.g. to share a backup without sensitive credentials).
   bool _includeApiKey    = true;
   bool _includeSecretKey = true;
+  bool _includeFolders   = true;
 
   Future<void> _export() async {
     setState(() => _exporting = true);
     final ok = await BackupService.exportToFile(
       includeApiKey:    _includeApiKey,
       includeSecretKey: _includeSecretKey,
+      includeFolders:   _includeFolders,
     );
     if (!mounted) return;
     setState(() => _exporting = false);
@@ -242,6 +251,16 @@ class _BackupPageState extends State<BackupPage> {
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
             value: _includeSecretKey,
             onChanged: (v) => setState(() => _includeSecretKey = v),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          SwitchListTile(
+            secondary: Icon(Icons.folder_rounded, color: scheme.primary),
+            title: Text(L.backupIncludeFoldersLabel,
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            subtitle: Text(L.backupIncludeFoldersDesc,
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            value: _includeFolders,
+            onChanged: (v) => setState(() => _includeFolders = v),
           ),
         ]),
 

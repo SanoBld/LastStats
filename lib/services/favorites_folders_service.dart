@@ -98,6 +98,7 @@ class FavoritesFoldersService {
   static const _kFoldersKey = 'ls_fav_folders';
   static const _kAssignKey  = 'ls_folder_items';
   static const _kMetaKey    = 'ls_folder_item_meta';
+  static const _kOrderKey   = 'ls_folder_order';
 
   /// Build a stable key for a track. Kept as a function (rather than just
   /// using name+artist) in case a non-track key format is ever needed.
@@ -110,6 +111,8 @@ class FavoritesFoldersService {
   static final ValueNotifier<List<FavFolder>> foldersNotifier = ValueNotifier([]);
   static final ValueNotifier<Map<String, List<String>>> assignNotifier = ValueNotifier({});
   static final ValueNotifier<Map<String, FolderItem>> metaNotifier = ValueNotifier({});
+  // Manual drag order per folder: folder id → ordered list of track keys.
+  static final ValueNotifier<Map<String, List<String>>> orderNotifier = ValueNotifier({});
 
   static bool _loaded = false;
 
@@ -145,6 +148,15 @@ class FavoritesFoldersService {
             MapEntry(k, FolderItem.fromJson(k, Map<String, dynamic>.from(v))));
       } catch (_) {}
     }
+
+    final orderRaw = p.getString(_kOrderKey);
+    if (orderRaw != null && orderRaw.isNotEmpty) {
+      try {
+        final decoded = Map<String, dynamic>.from(jsonDecode(orderRaw));
+        orderNotifier.value = decoded.map(
+            (k, v) => MapEntry(k, List<String>.from(v as List)));
+      } catch (_) {}
+    }
   }
 
   static Future<void> _persistFolders() async {
@@ -162,6 +174,11 @@ class FavoritesFoldersService {
     final p = await SharedPreferences.getInstance();
     await p.setString(_kMetaKey,
         jsonEncode(metaNotifier.value.map((k, v) => MapEntry(k, v.toJson()))));
+  }
+
+  static Future<void> _persistOrder() async {
+    final p = await SharedPreferences.getInstance();
+    await p.setString(_kOrderKey, jsonEncode(orderNotifier.value));
   }
 
   // ── Folder CRUD ────────────────────────────────────────────────────────
@@ -214,6 +231,11 @@ class FavoritesFoldersService {
       ..removeWhere((k, _) => !updatedAssign.containsKey(k));
     metaNotifier.value = updatedMeta;
     await _persistMeta();
+
+    final updatedOrder = Map<String, List<String>>.from(orderNotifier.value)
+      ..remove(id);
+    orderNotifier.value = updatedOrder;
+    await _persistOrder();
   }
 
   // ── Item ↔ folder assignment ───────────────────────────────────────────
@@ -269,5 +291,26 @@ class FavoritesFoldersService {
         .map((e) => e.key);
     return keys.map((k) => metaNotifier.value[k])
         .whereType<FolderItem>().toList();
+  }
+
+  /// Items in a folder, respecting the user's manual drag order. Any item
+  /// not yet in the saved order (e.g. just added) is appended at the end.
+  static List<FolderItem> orderedItemsInFolder(String folderId) {
+    final all = {for (final it in itemsInFolder(folderId)) it.key: it};
+    final order = orderNotifier.value[folderId] ?? const [];
+    final ordered = <FolderItem>[];
+    for (final key in order) {
+      final it = all.remove(key);
+      if (it != null) ordered.add(it);
+    }
+    ordered.addAll(all.values); // anything new, not in the saved order yet
+    return ordered;
+  }
+
+  static Future<void> reorderFolder(String folderId, List<String> keysInOrder) async {
+    final updated = Map<String, List<String>>.from(orderNotifier.value);
+    updated[folderId] = keysInOrder;
+    orderNotifier.value = updated;
+    await _persistOrder();
   }
 }

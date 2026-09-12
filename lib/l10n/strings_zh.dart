@@ -456,6 +456,8 @@ class AppStringsZh implements AppStrings {
   @override String get backupRestoreKeysDesc => '选择要从此备份恢复的 Last.fm 密钥。';
   @override String get backupRestoreApiKeyLabel => 'API 密钥';
   @override String get backupRestoreSecretKeyLabel => '密钥';
+  @override String get backupIncludeFoldersLabel => '包含文件夹';
+  @override String get backupIncludeFoldersDesc => '包含你的歌曲文件夹及其内容';
   @override String get backupIncludeKeysDesc => '在导出的文件中包含密钥';
   @override String get settingsCrashLog => '错误日志';
   @override String get backupCrashLogDesc => '记录应用遇到的错误，方便反馈问题。';
@@ -627,9 +629,12 @@ class AppStringsZh implements AppStrings {
   @override String get favSortOldest   => '最早';
   @override String get favSortArtistAz => '艺人 A-Z';
   @override String get favSortTitleAz  => '标题 A-Z';
+  @override String get favFolderSortCustom => '手动';
   @override String get favFoldersAll => '全部';
   @override String get favFolderNew => '新建文件夹';
   @override String get favFolderNamePlaceholder => '文件夹名称';
+  @override String get favFolderCustomEmojiTitle => '选择一个表情符号';
+  @override String get favFolderCustomEmojiHelper => '仅限一个表情符号，不能输入文字';
   @override String get favFolderDescPlaceholder => '描述（可选）';
   @override String get favFolderRecentlyPlayed => '最近播放';
   @override String get favFolderCreate => '创建';

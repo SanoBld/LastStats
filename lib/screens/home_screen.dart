@@ -53,6 +53,7 @@ import '../widgets/markdown_lite.dart';
 import '../widgets/living_artwork.dart';
 import 'favorites_page.dart';
 import '../services/favorites_folders_service.dart';
+import 'track_row_tile.dart';
 
 
 // ── Settings sub-pages ────────────────────────────────────────────────────────

@@ -411,6 +411,8 @@ class AppStringsJa implements AppStrings {
   @override String get backupRestoreKeysDesc => 'このバックアップから復元するLast.fmのキーを選んでください。';
   @override String get backupRestoreApiKeyLabel => 'APIキー';
   @override String get backupRestoreSecretKeyLabel => 'シークレットキー';
+  @override String get backupIncludeFoldersLabel => 'フォルダを含める';
+  @override String get backupIncludeFoldersDesc => '曲のフォルダとその中身を含めます';
   @override String get backupIncludeKeysDesc => 'エクスポートするファイルにキーを含める';
   @override String get settingsCrashLog => 'エラーログ';
   @override String get backupCrashLogDesc => 'アプリで発生したエラーを記録します。不具合報告に役立ちます。';
@@ -564,9 +566,12 @@ class AppStringsJa implements AppStrings {
   @override String get favSortOldest   => '古い順';
   @override String get favSortArtistAz => 'アーティスト A-Z';
   @override String get favSortTitleAz  => 'タイトル A-Z';
+  @override String get favFolderSortCustom => '手動';
   @override String get favFoldersAll => 'すべて';
   @override String get favFolderNew => '新しいフォルダ';
   @override String get favFolderNamePlaceholder => 'フォルダ名';
+  @override String get favFolderCustomEmojiTitle => '絵文字を選ぶ';
+  @override String get favFolderCustomEmojiHelper => '絵文字は1つだけ、テキストは不可';
   @override String get favFolderDescPlaceholder => '説明（任意）';
   @override String get favFolderRecentlyPlayed => '最近再生した曲';
   @override String get favFolderCreate => '作成';

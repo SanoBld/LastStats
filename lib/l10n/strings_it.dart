@@ -411,6 +411,8 @@ class AppStringsIt implements AppStrings {
   @override String get backupRestoreKeysDesc => 'Scegli quali chiavi Last.fm ripristinare da questo backup.';
   @override String get backupRestoreApiKeyLabel => 'Chiave API';
   @override String get backupRestoreSecretKeyLabel => 'Chiave segreta';
+  @override String get backupIncludeFoldersLabel => 'Includi cartelle';
+  @override String get backupIncludeFoldersDesc => 'Include le tue cartelle di brani e il loro contenuto.';
   @override String get backupIncludeKeysDesc => 'Includi le chiavi nel file esportato';
   @override String get settingsCrashLog => 'Registro errori';
   @override String get backupCrashLogDesc => 'Registra gli errori riscontrati dall\'app, utile per segnalare un bug.';
@@ -564,9 +566,12 @@ class AppStringsIt implements AppStrings {
   @override String get favSortOldest   => 'Meno recenti';
   @override String get favSortArtistAz => 'Artista A-Z';
   @override String get favSortTitleAz  => 'Titolo A-Z';
+  @override String get favFolderSortCustom => 'Manuale';
   @override String get favFoldersAll => 'Tutti';
   @override String get favFolderNew => 'Nuova cartella';
   @override String get favFolderNamePlaceholder => 'Nome cartella';
+  @override String get favFolderCustomEmojiTitle => "Scegli un'emoji";
+  @override String get favFolderCustomEmojiHelper => "Solo un'emoji, niente testo.";
   @override String get favFolderDescPlaceholder => 'Descrizione (opzionale)';
   @override String get favFolderRecentlyPlayed => 'Ascoltati di recente';
   @override String get favFolderCreate => 'Crea';

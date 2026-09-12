@@ -28,6 +28,15 @@ const _kBackupExcludeKeys = {
   'ls_last_update_check',
 };
 
+/// Keys backing the folders feature (favorites_folders_service.dart).
+/// Filtered out when the user unchecks "include folders" on export.
+const _kFolderKeys = {
+  'ls_fav_folders',
+  'ls_folder_items',
+  'ls_folder_item_meta',
+  'ls_folder_order',
+};
+
 class BackupResult {
   final bool success;
   final String? username;
@@ -64,6 +73,7 @@ class BackupService {
   static Future<String> buildBackupJson({
     bool includeApiKey = true,
     bool includeSecretKey = true,
+    bool includeFolders = true,
   }) async {
     final p = await SharedPreferences.getInstance();
     final map = <String, dynamic>{};
@@ -75,6 +85,9 @@ class BackupService {
         continue;
       }
       if (!includeSecretKey && (key == 'ls_secret_key' || key == 'ls_session_key')) {
+        continue;
+      }
+      if (!includeFolders && _kFolderKeys.contains(key)) {
         continue;
       }
       final v = p.get(key);
@@ -124,11 +137,13 @@ class BackupService {
   static Future<bool> exportToFile({
     bool includeApiKey = true,
     bool includeSecretKey = true,
+    bool includeFolders = true,
   }) async {
     try {
       final payload = await buildBackupJson(
         includeApiKey: includeApiKey,
         includeSecretKey: includeSecretKey,
+        includeFolders: includeFolders,
       );
       final bytes   = Uint8List.fromList(utf8.encode(payload));
       final path = await FilePicker.platform.saveFile(

@@ -411,6 +411,8 @@ class AppStringsAr implements AppStrings {
   @override String get backupRestoreKeysDesc => 'اختر مفاتيح Last.fm التي تريد استعادتها من هذه النسخة الاحتياطية.';
   @override String get backupRestoreApiKeyLabel => 'مفتاح API';
   @override String get backupRestoreSecretKeyLabel => 'المفتاح السري';
+  @override String get backupIncludeFoldersLabel => 'تضمين المجلدات';
+  @override String get backupIncludeFoldersDesc => 'يشمل مجلدات المقاطع الخاصة بك ومحتواها.';
   @override String get backupIncludeKeysDesc => 'تضمين المفاتيح في الملف المُصدَّر';
   @override String get settingsCrashLog => 'سجل الأخطاء';
   @override String get backupCrashLogDesc => 'يسجل الأخطاء التي يواجهها التطبيق، مفيد للإبلاغ عن مشكلة.';
@@ -564,9 +566,12 @@ class AppStringsAr implements AppStrings {
   @override String get favSortOldest   => 'الأقدم';
   @override String get favSortArtistAz => 'الفنان أ-ي';
   @override String get favSortTitleAz  => 'العنوان أ-ي';
+  @override String get favFolderSortCustom => 'يدوي';
   @override String get favFoldersAll => 'الكل';
   @override String get favFolderNew => 'مجلد جديد';
   @override String get favFolderNamePlaceholder => 'اسم المجلد';
+  @override String get favFolderCustomEmojiTitle => 'اختر رمزًا تعبيريًا';
+  @override String get favFolderCustomEmojiHelper => 'رمز تعبيري واحد فقط، بلا نص.';
   @override String get favFolderDescPlaceholder => 'الوصف (اختياري)';
   @override String get favFolderRecentlyPlayed => 'استُمع إليها مؤخرًا';
   @override String get favFolderCreate => 'إنشاء';

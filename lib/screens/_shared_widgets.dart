@@ -424,6 +424,38 @@ Future<void> showFolderAssignSheet(
 
 /// Create-or-edit sheet for a folder (name, emoji, color). Shared between
 /// the search page's folder tab and the quick "new folder" shortcut above.
+/// Small dialog to type or paste exactly one custom emoji, used by the "+"
+/// tile in the folder editor's emoji grid.
+Future<String?> _promptCustomEmoji(BuildContext context) {
+  final ctrl = TextEditingController();
+  return showDialog<String>(
+    context: context,
+    builder: (dctx) => AlertDialog(
+      title: Text(L.favFolderCustomEmojiTitle),
+      content: TextField(
+        controller: ctrl,
+        autofocus: true,
+        textAlign: TextAlign.center,
+        maxLength: 4, // some emoji are 2+ code units; still "one emoji"
+        style: const TextStyle(fontSize: 28),
+        decoration: InputDecoration(
+          counterText: '',
+          hintText: '🎉',
+          helperText: L.favFolderCustomEmojiHelper,
+          border: const OutlineInputBorder(),
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(dctx), child: Text(L.commonCancel)),
+        FilledButton(
+          onPressed: () => Navigator.pop(dctx, ctrl.text.trim()),
+          child: Text(L.favFolderSave),
+        ),
+      ],
+    ),
+  );
+}
+
 Future<void> showFolderEditorSheet(BuildContext context, {FavFolder? existing}) async {
   final nameCtrl = TextEditingController(text: existing?.name ?? '');
   final descCtrl = TextEditingController(text: existing?.description ?? '');
@@ -453,23 +485,7 @@ Future<void> showFolderEditorSheet(BuildContext context, {FavFolder? existing}) 
                 color: Color(colorValue).withValues(alpha: 0.25),
                 borderRadius: AppRadius.mdR,
               ),
-              child: SizedBox(
-                width: 40, height: 40,
-                // Free-form emoji field — type or paste literally any emoji.
-                // The quick-pick grid below is just a shortcut on top of this.
-                child: TextField(
-                  controller: TextEditingController(text: emoji),
-                  textAlign: TextAlign.center,
-                  maxLength: 4,
-                  style: const TextStyle(fontSize: 22),
-                  decoration: const InputDecoration(
-                    counterText: '',
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                  onChanged: (v) => setSheet(() => emoji = v.isEmpty ? '📁' : v),
-                ),
-              ),
+              child: Text(emoji, style: const TextStyle(fontSize: 26)),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -498,22 +514,39 @@ Future<void> showFolderEditorSheet(BuildContext context, {FavFolder? existing}) 
           Text(L.favFolderEmoji, style: Theme.of(ctx).textTheme.labelMedium
               ?.copyWith(color: scheme.onSurfaceVariant)),
           const SizedBox(height: 8),
-          Wrap(spacing: 8, runSpacing: 8, children: kFavFolderEmojis.map((e) {
-            final selected = e == emoji;
-            return GestureDetector(
-              onTap: () => setSheet(() => emoji = e),
+          Wrap(spacing: 8, runSpacing: 8, children: [
+            for (final e in kFavFolderEmojis)
+              GestureDetector(
+                onTap: () => setSheet(() => emoji = e),
+                child: Container(
+                  width: 40, height: 40,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: e == emoji ? scheme.primaryContainer : scheme.surfaceContainerHighest,
+                    border: e == emoji ? Border.all(color: scheme.primary, width: 2) : null,
+                  ),
+                  child: Text(e, style: const TextStyle(fontSize: 18)),
+                ),
+              ),
+            // "+" tile: type or paste any other emoji, one only.
+            GestureDetector(
+              onTap: () async {
+                final custom = await _promptCustomEmoji(ctx);
+                if (custom != null && custom.isNotEmpty) setSheet(() => emoji = custom);
+              },
               child: Container(
                 width: 40, height: 40,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: selected ? scheme.primaryContainer : scheme.surfaceContainerHighest,
-                  border: selected ? Border.all(color: scheme.primary, width: 2) : null,
+                  color: scheme.surfaceContainerHighest,
+                  border: Border.all(color: scheme.outlineVariant),
                 ),
-                child: Text(e, style: const TextStyle(fontSize: 18)),
+                child: Icon(Icons.add_rounded, size: 18, color: scheme.onSurfaceVariant),
               ),
-            );
-          }).toList()),
+            ),
+          ]),
           const SizedBox(height: 18),
           Text(L.favFolderColor, style: Theme.of(ctx).textTheme.labelMedium
               ?.copyWith(color: scheme.onSurfaceVariant)),
@@ -745,7 +778,7 @@ class _FolderCard extends StatelessWidget {
   }
 }
 
-enum _FolderSort { recent, oldest, artistAz, titleAz }
+enum _FolderSort { recent, oldest, artistAz, titleAz, custom }
 
 /// Detail page for one folder: its saved tracks, sortable, removable.
 class _FolderDetailPage extends StatefulWidget {
@@ -770,12 +803,14 @@ class _FolderDetailPageState extends State<_FolderDetailPage> {
   }
 
   List<FolderItem> _sorted(List<FolderItem> items) {
+    if (_sort == _FolderSort.custom) return items; // already in saved order
     final list = List<FolderItem>.from(items);
     switch (_sort) {
       case _FolderSort.recent:   list.sort((a, b) => b.addedAt.compareTo(a.addedAt));
       case _FolderSort.oldest:   list.sort((a, b) => a.addedAt.compareTo(b.addedAt));
       case _FolderSort.artistAz: list.sort((a, b) => a.artist.toLowerCase().compareTo(b.artist.toLowerCase()));
       case _FolderSort.titleAz:  list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      case _FolderSort.custom:   break; // unreachable, handled above
     }
     return list;
   }
@@ -833,6 +868,7 @@ class _FolderDetailPageState extends State<_FolderDetailPage> {
               _sortChip(L.favSortOldest,   _FolderSort.oldest),
               _sortChip(L.favSortArtistAz, _FolderSort.artistAz),
               _sortChip(L.favSortTitleAz,  _FolderSort.titleAz),
+              _sortChip(L.favFolderSortCustom, _FolderSort.custom),
             ],
           ),
         ),
@@ -840,42 +876,63 @@ class _FolderDetailPageState extends State<_FolderDetailPage> {
         Expanded(
           child: ValueListenableBuilder<Map<String, List<String>>>(
             valueListenable: FavoritesFoldersService.assignNotifier,
-            builder: (ctx, _, _) {
-              final items = _sorted(FavoritesFoldersService.itemsInFolder(widget.folder.id));
-              if (items.isEmpty) {
-                return Center(child: Text(L.favFolderEmpty,
-                    style: TextStyle(color: scheme.onSurfaceVariant)));
-              }
-              return ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                itemCount: items.length,
-                separatorBuilder: (_, _) => const Divider(height: 1),
-                itemBuilder: (ctx, i) {
-                  final it = items[i];
-                  return ListTile(
-                    onTap: () => _openItem(it),
-                    leading: ClipRRect(
-                      borderRadius: AppRadius.smR,
-                      child: SizedBox(width: 44, height: 44,
-                        child: it.image.isNotEmpty
-                            ? Image.network(it.image, fit: BoxFit.cover,
-                                errorBuilder: (_, _, _) => Container(color: scheme.secondaryContainer))
-                            : Container(color: scheme.secondaryContainer,
-                                child: Icon(Icons.music_note_rounded, color: scheme.onSecondaryContainer, size: 20)),
-                      ),
-                    ),
-                    title: Text(it.name, maxLines: 1, overflow: TextOverflow.ellipsis),
-                    subtitle: it.artist.isEmpty ? null
-                        : Text(it.artist, maxLines: 1, overflow: TextOverflow.ellipsis),
-                    trailing: IconButton(
-                      icon: Icon(Icons.close_rounded, size: 20, color: scheme.onSurfaceVariant),
-                      onPressed: () => FavoritesFoldersService.toggleItemInFolder(
-                          it.key, widget.folder.id, meta: it),
-                    ),
+            builder: (ctx, _, _) => ValueListenableBuilder<Map<String, List<String>>>(
+              valueListenable: FavoritesFoldersService.orderNotifier,
+              builder: (ctx, _, _) {
+                final items = _sort == _FolderSort.custom
+                    ? FavoritesFoldersService.orderedItemsInFolder(widget.folder.id)
+                    : _sorted(FavoritesFoldersService.itemsInFolder(widget.folder.id));
+                if (items.isEmpty) {
+                  return Center(child: Text(L.favFolderEmpty,
+                      style: TextStyle(color: scheme.onSurfaceVariant)));
+                }
+
+                if (_sort == _FolderSort.custom) {
+                  // Drag handle mode: reordering here writes straight to
+                  // the folder's saved order, so it sticks next time too.
+                  return ReorderableListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    itemCount: items.length,
+                    // ignore: deprecated_member_use
+                    onReorder: (oldIndex, newIndex) {
+                      final reordered = List<FolderItem>.from(items);
+                      if (newIndex > oldIndex) newIndex -= 1;
+                      final moved = reordered.removeAt(oldIndex);
+                      reordered.insert(newIndex, moved);
+                      FavoritesFoldersService.reorderFolder(
+                          widget.folder.id, reordered.map((e) => e.key).toList());
+                    },
+                    itemBuilder: (ctx, i) {
+                      final it = items[i];
+                      return TrackRowTile(
+                        key: ValueKey(it.key),
+                        name: it.name, artist: it.artist, imageUrl: it.image,
+                        onTap: () => _openItem(it),
+                        trailing: Icon(Icons.drag_handle_rounded, color: scheme.onSurfaceVariant),
+                      );
+                    },
                   );
-                },
-              );
-            },
+                }
+
+                return ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  itemCount: items.length,
+                  separatorBuilder: (_, _) => const Divider(height: 1),
+                  itemBuilder: (ctx, i) {
+                    final it = items[i];
+                    return TrackRowTile(
+                      name: it.name, artist: it.artist, imageUrl: it.image,
+                      onTap: () => _openItem(it),
+                      trailing: IconButton(
+                        icon: Icon(Icons.close_rounded, size: 20, color: scheme.onSurfaceVariant),
+                        onPressed: () => FavoritesFoldersService.toggleItemInFolder(
+                            it.key, widget.folder.id, meta: it),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ),
       ])),
@@ -1018,28 +1075,8 @@ class _AddTracksToFolderPageState extends State<_AddTracksToFolderPage> {
                           builder: (ctx, _, _) {
                             final inFolder = FavoritesFoldersService
                                 .foldersForItem(key).contains(widget.folder.id);
-                            return ListTile(
-                              leading: ClipRRect(
-                                borderRadius: AppRadius.smR,
-                                child: SizedBox(width: 44, height: 44,
-                                  child: FutureBuilder<String>(
-                                    future: ImageService.resolveTrack(name, artist,
-                                        lastfmUrl: raw.isNotEmpty ? raw : null),
-                                    builder: (ctx, snap) {
-                                      final url = snap.data ?? raw;
-                                      if (url.isEmpty) {
-                                        return Container(color: scheme.secondaryContainer,
-                                            child: Icon(Icons.music_note_rounded,
-                                                color: scheme.onSecondaryContainer, size: 20));
-                                      }
-                                      return Image.network(url, fit: BoxFit.cover,
-                                          errorBuilder: (_, _, _) => Container(color: scheme.secondaryContainer));
-                                    },
-                                  ),
-                                ),
-                              ),
-                              title: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis),
-                              subtitle: Text(artist, maxLines: 1, overflow: TextOverflow.ellipsis),
+                            return TrackRowTile(
+                              name: name, artist: artist, imageUrl: raw,
                               trailing: IconButton(
                                 icon: Icon(
                                   inFolder ? Icons.check_circle_rounded : Icons.add_circle_outline_rounded,

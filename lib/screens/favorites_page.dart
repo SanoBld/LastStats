@@ -9,10 +9,10 @@ import 'package:flutter/material.dart';
 import '../app_state.dart';
 import '../l10n/l10n.dart';
 import '../services/data_cache.dart';
-import '../services/image_service.dart';
 import '../services/lastfm_service.dart';
 import '../services/favorites_folders_service.dart' show FavoritesFoldersService;
 import 'home_screen.dart' show showDetailSheet, showFolderAssignSheet;
+import 'track_row_tile.dart';
 import '../theme/story_style.dart';
 
 enum _SortMode { recent, oldest, artistAz, titleAz }
@@ -219,42 +219,17 @@ class _FavoriteListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final name   = (track['name'] ?? '').toString();
     final artist = (track['artist']?['name'] ?? '').toString();
     final rawUrl = _extractImage(track['image']);
 
-    return ListTile(
+    // Long-pressing the heart opens the folder picker, same as everywhere
+    // else a track can be saved into a folder.
+    return TrackRowTile(
+      name: name,
+      artist: artist,
+      imageUrl: rawUrl,
       onTap: onTap,
-      leading: ClipRRect(
-        borderRadius: AppRadius.smR,
-        child: SizedBox(
-          width: 44, height: 44,
-          child: FutureBuilder<String>(
-            future: ImageService.resolveTrack(name, artist,
-                lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null),
-            builder: (ctx, snap) {
-              final url = snap.data ?? rawUrl;
-              if (url.isEmpty) {
-                return Container(
-                  color: scheme.secondaryContainer,
-                  child: Icon(Icons.music_note_rounded,
-                      color: scheme.onSecondaryContainer, size: 20),
-                );
-              }
-              return Image.network(url, fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => Container(
-                    color: scheme.secondaryContainer,
-                    child: Icon(Icons.music_note_rounded,
-                        color: scheme.onSecondaryContainer, size: 20),
-                  ));
-            },
-          ),
-        ),
-      ),
-      title: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis),
-      subtitle: Text(artist, maxLines: 1, overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
       trailing: GestureDetector(
         onLongPress: () => showFolderAssignSheet(context, name: name, artist: artist, image: rawUrl),
         child: IconButton(

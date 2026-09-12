@@ -480,7 +480,8 @@ abstract class AppStrings {
   String get backupRestoreKeysDesc;
   String get backupRestoreApiKeyLabel;
   String get backupRestoreSecretKeyLabel;
-  String get backupIncludeKeysDesc;
+  String get backupIncludeFoldersLabel;
+  String get backupIncludeFoldersDesc;  String get backupIncludeKeysDesc;
 
   // ── Backup page: crash/error log ────────────────────────────────────────
   String get settingsCrashLog;
@@ -663,11 +664,14 @@ abstract class AppStrings {
   String get favSortOldest;
   String get favSortArtistAz;
   String get favSortTitleAz;
+  String get favFolderSortCustom;
 
   // ── Favorites: folders ───────────────────────────────────────────────────
   String get favFoldersAll;
   String get favFolderNew;
   String get favFolderNamePlaceholder;
+  String get favFolderCustomEmojiTitle;
+  String get favFolderCustomEmojiHelper;
   String get favFolderDescPlaceholder;
   String get favFolderRecentlyPlayed;
   String get favFolderCreate;
