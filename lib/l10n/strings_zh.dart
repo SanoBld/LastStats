@@ -631,6 +631,7 @@ class AppStringsZh implements AppStrings {
   @override String get favFolderNew => '新建文件夹';
   @override String get favFolderNamePlaceholder => '文件夹名称';
   @override String get favFolderDescPlaceholder => '描述（可选）';
+  @override String get favFolderRecentlyPlayed => '最近播放';
   @override String get favFolderCreate => '创建';
   @override String get favFolderEdit => '编辑文件夹';
   @override String get favFolderDelete => '删除';

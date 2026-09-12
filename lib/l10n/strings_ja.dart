@@ -568,6 +568,7 @@ class AppStringsJa implements AppStrings {
   @override String get favFolderNew => '新しいフォルダ';
   @override String get favFolderNamePlaceholder => 'フォルダ名';
   @override String get favFolderDescPlaceholder => '説明（任意）';
+  @override String get favFolderRecentlyPlayed => '最近再生した曲';
   @override String get favFolderCreate => '作成';
   @override String get favFolderEdit => 'フォルダを編集';
   @override String get favFolderDelete => '削除';

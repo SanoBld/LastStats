@@ -634,6 +634,7 @@ class AppStringsEs implements AppStrings {
   @override String get favFolderNew => 'Nueva carpeta';
   @override String get favFolderNamePlaceholder => 'Nombre de la carpeta';
   @override String get favFolderDescPlaceholder => 'Descripción (opcional)';
+  @override String get favFolderRecentlyPlayed => 'Escuchado recientemente';
   @override String get favFolderCreate => 'Crear';
   @override String get favFolderEdit => 'Editar carpeta';
   @override String get favFolderDelete => 'Eliminar';

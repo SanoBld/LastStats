@@ -12,7 +12,7 @@ import '../services/data_cache.dart';
 import '../services/image_service.dart';
 import '../services/lastfm_service.dart';
 import '../services/favorites_folders_service.dart' show FavoritesFoldersService;
-import 'home_screen.dart' show showDetailSheet;
+import 'home_screen.dart' show showDetailSheet, showFolderAssignSheet;
 import '../theme/story_style.dart';
 
 enum _SortMode { recent, oldest, artistAz, titleAz }
@@ -255,9 +255,12 @@ class _FavoriteListTile extends StatelessWidget {
       title: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: Text(artist, maxLines: 1, overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-      trailing: IconButton(
-        icon: const Icon(Icons.favorite_rounded, color: Colors.redAccent, size: 20),
-        onPressed: onRemove,
+      trailing: GestureDetector(
+        onLongPress: () => showFolderAssignSheet(context, name: name, artist: artist, image: rawUrl),
+        child: IconButton(
+          icon: const Icon(Icons.favorite_rounded, color: Colors.redAccent, size: 20),
+          onPressed: onRemove,
+        ),
       ),
     );
   }

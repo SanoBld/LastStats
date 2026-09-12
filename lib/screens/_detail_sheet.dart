@@ -992,8 +992,12 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   }
 
   // Heart button — fixed top-right, same style/size as the back button.
+  // Long-press (tracks only) opens the folder picker, same one used
+  // everywhere else, so loving and filing a track happen from one spot.
   Widget _buildLoveButton() => GestureDetector(
     onTap: _toggleLove,
+    onLongPress: widget.type != 'tracks' ? null : () => showFolderAssignSheet(
+        context, name: _name, artist: _artist, image: _resolvedImage),
     child: Container(
       width: 36, height: 36,
       decoration: BoxDecoration(

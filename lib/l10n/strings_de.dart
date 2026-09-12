@@ -568,6 +568,7 @@ class AppStringsDe implements AppStrings {
   @override String get favFolderNew => 'Neuer Ordner';
   @override String get favFolderNamePlaceholder => 'Ordnername';
   @override String get favFolderDescPlaceholder => 'Beschreibung (optional)';
+  @override String get favFolderRecentlyPlayed => 'Kürzlich gehört';
   @override String get favFolderCreate => 'Erstellen';
   @override String get favFolderEdit => 'Ordner bearbeiten';
   @override String get favFolderDelete => 'Löschen';

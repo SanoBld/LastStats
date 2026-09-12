@@ -634,6 +634,7 @@ class AppStringsFr implements AppStrings {
   @override String get favFolderNew => 'Nouveau dossier';
   @override String get favFolderNamePlaceholder => 'Nom du dossier';
   @override String get favFolderDescPlaceholder => 'Description (optionnel)';
+  @override String get favFolderRecentlyPlayed => 'Écoutés récemment';
   @override String get favFolderCreate => 'Créer';
   @override String get favFolderEdit => 'Modifier le dossier';
   @override String get favFolderDelete => 'Supprimer';

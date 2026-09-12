@@ -634,6 +634,7 @@ class AppStringsPt implements AppStrings {
   @override String get favFolderNew => 'Nova pasta';
   @override String get favFolderNamePlaceholder => 'Nome da pasta';
   @override String get favFolderDescPlaceholder => 'Descrição (opcional)';
+  @override String get favFolderRecentlyPlayed => 'Ouvidas recentemente';
   @override String get favFolderCreate => 'Criar';
   @override String get favFolderEdit => 'Editar pasta';
   @override String get favFolderDelete => 'Excluir';

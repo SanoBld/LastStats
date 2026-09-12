@@ -357,6 +357,7 @@ Future<void> showFolderAssignSheet(
   required String image,
 }) async {
   await FavoritesFoldersService.ensureLoaded();
+  if (!context.mounted) return;
   final key = FavoritesFoldersService.itemKey(name, artist);
   final meta = FolderItem(key: key, name: name, artist: artist, image: image,
       addedAt: DateTime.now().millisecondsSinceEpoch);
@@ -452,7 +453,23 @@ Future<void> showFolderEditorSheet(BuildContext context, {FavFolder? existing}) 
                 color: Color(colorValue).withValues(alpha: 0.25),
                 borderRadius: AppRadius.mdR,
               ),
-              child: Text(emoji, style: const TextStyle(fontSize: 26)),
+              child: SizedBox(
+                width: 40, height: 40,
+                // Free-form emoji field — type or paste literally any emoji.
+                // The quick-pick grid below is just a shortcut on top of this.
+                child: TextField(
+                  controller: TextEditingController(text: emoji),
+                  textAlign: TextAlign.center,
+                  maxLength: 4,
+                  style: const TextStyle(fontSize: 22),
+                  decoration: const InputDecoration(
+                    counterText: '',
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  onChanged: (v) => setSheet(() => emoji = v.isEmpty ? '📁' : v),
+                ),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -772,25 +789,39 @@ class _FolderDetailPageState extends State<_FolderDetailPage> {
       body: SafeArea(child: Column(children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(4, 12, 16, 2),
-          child: Row(children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back_rounded),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            Text(widget.folder.emoji, style: const TextStyle(fontSize: 22)),
-            const SizedBox(width: 8),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(widget.folder.name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
-              if (widget.folder.description.isNotEmpty)
-                Text(widget.folder.description, maxLines: 1, overflow: TextOverflow.ellipsis,
-                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-            ])),
-            IconButton(
-              icon: const Icon(Icons.edit_outlined),
-              onPressed: () => showFolderEditorSheet(context, existing: widget.folder),
-            ),
-          ]),
+          child: ValueListenableBuilder<List<FavFolder>>(
+            valueListenable: FavoritesFoldersService.foldersNotifier,
+            builder: (ctx, folders, _) {
+              // Reflect edits (name/emoji/description) live; fall back to
+              // the folder we were opened with if it somehow got deleted.
+              final folder = folders.firstWhere((f) => f.id == widget.folder.id,
+                  orElse: () => widget.folder);
+              return Row(children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back_rounded),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                Text(folder.emoji, style: const TextStyle(fontSize: 22)),
+                const SizedBox(width: 8),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(folder.name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+                  if (folder.description.isNotEmpty)
+                    Text(folder.description, maxLines: 1, overflow: TextOverflow.ellipsis,
+                        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                ])),
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed: () => showFolderEditorSheet(context, existing: folder),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add_rounded),
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => _AddTracksToFolderPage(service: widget.service, folder: folder))),
+                ),
+              ]);
+            },
+          ),
         ),
         SizedBox(
           height: 40,
@@ -860,6 +891,184 @@ class _FolderDetailPageState extends State<_FolderDetailPage> {
       onSelected: (_) => setState(() => _sort = mode),
     ),
   );
+}
+
+/// Search-and-add page reachable from a folder: shows already-listened
+/// tracks by default (most recent scrobbles), then Last.fm search results
+/// once the user types. Same visual language as the main Search tab so the
+/// two feel like the same tool.
+class _AddTracksToFolderPage extends StatefulWidget {
+  final LastFmService service;
+  final FavFolder     folder;
+  const _AddTracksToFolderPage({required this.service, required this.folder});
+
+  @override
+  State<_AddTracksToFolderPage> createState() => _AddTracksToFolderPageState();
+}
+
+class _AddTracksToFolderPageState extends State<_AddTracksToFolderPage> {
+  final _ctrl = TextEditingController();
+  Timer? _debounce;
+  List<dynamic> _results = [];
+  bool _loading = true;
+  bool _searching = false; // true once there's a query, vs "recent" mode
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRecent();
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadRecent() async {
+    setState(() => _loading = true);
+    try {
+      final d = await widget.service.getRecentTracks(limit: 40);
+      final tracks = (d['track'] is List) ? d['track'] as List : [];
+      if (mounted) setState(() { _results = tracks; _loading = false; });
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  void _onQueryChanged(String q) {
+    _debounce?.cancel();
+    final query = q.trim();
+    if (query.isEmpty) {
+      setState(() => _searching = false);
+      _loadRecent();
+      return;
+    }
+    _debounce = Timer(const Duration(milliseconds: 500), () => _search(query));
+  }
+
+  Future<void> _search(String query) async {
+    setState(() { _loading = true; _searching = true; });
+    try {
+      final tracks = await widget.service.searchTracks(query, limit: 30);
+      if (mounted) setState(() { _results = tracks; _loading = false; });
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+
+    return Scaffold(
+      body: SafeArea(child: Column(children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 12, 16, 2),
+          child: Row(children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back_rounded),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            Expanded(child: Text(widget.folder.name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800))),
+          ]),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: TextField(
+            controller: _ctrl,
+            decoration: InputDecoration(
+              hintText: L.searchHintTracks,
+              prefixIcon: const Icon(Icons.search_rounded),
+              border: OutlineInputBorder(borderRadius: AppRadius.mdR),
+              isDense: true,
+            ),
+            onChanged: _onQueryChanged,
+          ),
+        ),
+        if (!_searching) Padding(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+          child: Row(children: [
+            Text(L.favFolderRecentlyPlayed, style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
+          ]),
+        ),
+        const SizedBox(height: 4),
+        Expanded(
+          child: _loading
+              ? const Center(child: CircularProgressIndicator())
+              : _results.isEmpty
+                  ? Center(child: Text(L.commonNoResults, style: TextStyle(color: scheme.onSurfaceVariant)))
+                  : ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      itemCount: _results.length,
+                      separatorBuilder: (_, _) => const Divider(height: 1),
+                      itemBuilder: (ctx, i) {
+                        final t      = _results[i] as Map<String, dynamic>;
+                        final name   = (t['name'] ?? '').toString();
+                        final artist = (t['artist'] is Map
+                            ? t['artist']['name'] : t['artist'])?.toString() ?? '';
+                        final raw    = _extractImageStatic(t['image']);
+                        final key    = FavoritesFoldersService.itemKey(name, artist);
+
+                        return ValueListenableBuilder<Map<String, List<String>>>(
+                          valueListenable: FavoritesFoldersService.assignNotifier,
+                          builder: (ctx, _, _) {
+                            final inFolder = FavoritesFoldersService
+                                .foldersForItem(key).contains(widget.folder.id);
+                            return ListTile(
+                              leading: ClipRRect(
+                                borderRadius: AppRadius.smR,
+                                child: SizedBox(width: 44, height: 44,
+                                  child: FutureBuilder<String>(
+                                    future: ImageService.resolveTrack(name, artist,
+                                        lastfmUrl: raw.isNotEmpty ? raw : null),
+                                    builder: (ctx, snap) {
+                                      final url = snap.data ?? raw;
+                                      if (url.isEmpty) {
+                                        return Container(color: scheme.secondaryContainer,
+                                            child: Icon(Icons.music_note_rounded,
+                                                color: scheme.onSecondaryContainer, size: 20));
+                                      }
+                                      return Image.network(url, fit: BoxFit.cover,
+                                          errorBuilder: (_, _, _) => Container(color: scheme.secondaryContainer));
+                                    },
+                                  ),
+                                ),
+                              ),
+                              title: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis),
+                              subtitle: Text(artist, maxLines: 1, overflow: TextOverflow.ellipsis),
+                              trailing: IconButton(
+                                icon: Icon(
+                                  inFolder ? Icons.check_circle_rounded : Icons.add_circle_outline_rounded,
+                                  color: inFolder ? scheme.primary : scheme.onSurfaceVariant,
+                                ),
+                                onPressed: () => FavoritesFoldersService.toggleItemInFolder(
+                                  key, widget.folder.id,
+                                  meta: FolderItem(key: key, name: name, artist: artist, image: raw,
+                                      addedAt: DateTime.now().millisecondsSinceEpoch),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+        ),
+      ])),
+    );
+  }
+
+  static String _extractImageStatic(dynamic raw) {
+    if (raw is! List) return '';
+    for (final img in raw.reversed) {
+      final url = (img is Map ? img['#text'] : '')?.toString() ?? '';
+      if (url.isNotEmpty) return url;
+    }
+    return '';
+  }
 }
 
 class _ErrorView extends StatelessWidget {

@@ -634,6 +634,7 @@ class AppStringsEn implements AppStrings {
   @override String get favFolderNew => 'New folder';
   @override String get favFolderNamePlaceholder => 'Folder name';
   @override String get favFolderDescPlaceholder => 'Description (optional)';
+  @override String get favFolderRecentlyPlayed => 'Recently played';
   @override String get favFolderCreate => 'Create';
   @override String get favFolderEdit => 'Edit folder';
   @override String get favFolderDelete => 'Delete';
