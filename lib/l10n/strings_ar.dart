@@ -248,7 +248,11 @@ class AppStringsAr implements AppStrings {
   @override String get detailLyricsNotFound => 'كلمات الأغنية غير متوفرة';
   @override String get detailCopyLyrics => 'نسخ الكلمات';
   @override String get detailLyricsCopied => 'تم نسخ الكلمات';
-  @override String get dashPerWeek => 'أسبوعيًا';
+
+  @override String get detailShoutbox => 'صندوق تعليقات Last.fm';
+  @override String get detailShoutboxReply => 'الرد';
+  @override String get detailShoutboxError => 'تعذر تحميل التعليقات.';
+  @override String get detailShoutboxSeeAll => 'عرض كل التعليقات';  @override String get dashPerWeek => 'أسبوعيًا';
   @override String get onboardSkip => 'تخطي';
   @override String get onboardNext => 'التالي';
   @override String get onboardFinish => 'إنهاء';

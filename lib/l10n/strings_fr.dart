@@ -280,7 +280,11 @@ class AppStringsFr implements AppStrings {
   @override String get detailLyricsNotFound  => 'Paroles non disponibles';
   @override String get detailCopyLyrics      => 'Copier les paroles';
   @override String get detailLyricsCopied    => 'Paroles copiées';
-  @override String get dashPerWeek           => 'par semaine';
+
+  @override String get detailShoutbox => 'Discussion Last.fm';
+  @override String get detailShoutboxReply => 'Répondre';
+  @override String get detailShoutboxError => 'Impossible de charger les commentaires.';
+  @override String get detailShoutboxSeeAll => 'Voir tous les commentaires';  @override String get dashPerWeek           => 'par semaine';
 
   @override String get onboardSkip             => 'Passer';
   @override String get onboardNext             => 'Suivant';

@@ -248,7 +248,11 @@ class AppStringsJa implements AppStrings {
   @override String get detailLyricsNotFound => '歌詞が見つかりません';
   @override String get detailCopyLyrics => '歌詞をコピー';
   @override String get detailLyricsCopied => '歌詞をコピーしました';
-  @override String get dashPerWeek => '週あたり';
+
+  @override String get detailShoutbox => 'Last.fmのシャウトボックス';
+  @override String get detailShoutboxReply => '返信';
+  @override String get detailShoutboxError => 'コメントを読み込めませんでした。';
+  @override String get detailShoutboxSeeAll => 'すべてのコメントを見る';  @override String get dashPerWeek => '週あたり';
   @override String get onboardSkip => 'スキップ';
   @override String get onboardNext => '次へ';
   @override String get onboardFinish => '完了';

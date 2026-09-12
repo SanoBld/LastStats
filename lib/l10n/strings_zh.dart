@@ -277,7 +277,11 @@ class AppStringsZh implements AppStrings {
   @override String get detailLyricsNotFound  => '暂无歌词';
   @override String get detailCopyLyrics      => '复制歌词';
   @override String get detailLyricsCopied    => '歌词已复制';
-  @override String get dashPerWeek           => '每周';
+
+  @override String get detailShoutbox => 'Last.fm 留言板';
+  @override String get detailShoutboxReply => '回复';
+  @override String get detailShoutboxError => '无法加载评论。';
+  @override String get detailShoutboxSeeAll => '查看所有评论';  @override String get dashPerWeek           => '每周';
 
   @override String get onboardSkip             => '跳过';
   @override String get onboardNext             => '下一步';

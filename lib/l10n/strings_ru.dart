@@ -248,7 +248,11 @@ class AppStringsRu implements AppStrings {
   @override String get detailLyricsNotFound => 'Текст песни недоступен';
   @override String get detailCopyLyrics => 'Копировать текст';
   @override String get detailLyricsCopied => 'Текст скопирован';
-  @override String get dashPerWeek => 'в неделю';
+
+  @override String get detailShoutbox => 'Обсуждение на Last.fm';
+  @override String get detailShoutboxReply => 'Ответить';
+  @override String get detailShoutboxError => 'Не удалось загрузить комментарии.';
+  @override String get detailShoutboxSeeAll => 'Показать все комментарии';  @override String get dashPerWeek => 'в неделю';
   @override String get onboardSkip => 'Пропустить';
   @override String get onboardNext => 'Далее';
   @override String get onboardFinish => 'Готово';

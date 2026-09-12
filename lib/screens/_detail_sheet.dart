@@ -404,6 +404,11 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   String _lyrics         = '';
   bool   _lyricsExpanded = false;
 
+  // ── Shoutbox (read-only — Last.fm's public API has no write endpoint) ───
+  bool          _loadingShouts = false;
+  List<dynamic> _shouts        = [];
+  bool          _shoutsFailed  = false;
+
   // Deezer 30s preview player
   String?      _previewUrl;
   bool         _previewLoading = false;
@@ -471,6 +476,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   }
 
   Future<void> _fetchMeta() async {
+    _fetchShouts(); // independent of the switch below, same for all 3 types
     try {
       switch (widget.type) {
         case 'artists':
@@ -867,6 +873,10 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       if (widget.type == 'albums' && _tracklist.isNotEmpty)
                         _buildTracklist(scheme),
                       if (widget.type == 'tracks') _buildTrackExtra(scheme),
+                      // Shoutbox — placed right above the lyrics for tracks
+                      // (per the user's request), and after the top
+                      // tracks/albums/tracklist for artists/albums.
+                      _FadeIn(child: _buildShoutbox(scheme)),
                       if (widget.type == 'tracks') _FadeIn(child: _buildLyrics(scheme)),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -1682,8 +1692,133 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     );
   }
 
-  // ── Lyrics ──────────────────────────────────────────────────────────────────
+  // ── Shoutbox ───────────────────────────────────────────────────────────────
+  // Last.fm's shoutbox (comments under a track/artist/album). The public
+  // API only exposes a READ method (*.getShouts) — there is no official
+  // way to post a comment through the API, so "reply" opens the real
+  // Last.fm page in the browser instead of posting in-app.
+  Future<void> _fetchShouts() async {
+    if (_name.isEmpty) return;
+    if ((widget.type == 'tracks' || widget.type == 'albums') && _artist.isEmpty) return;
 
+    setState(() { _loadingShouts = true; _shoutsFailed = false; });
+    List<dynamic> result = [];
+    try {
+      switch (widget.type) {
+        case 'artists':
+          result = await widget.service.getArtistShouts(_name, limit: 15);
+        case 'albums':
+          result = await widget.service.getAlbumShouts(_name, _artist, limit: 15);
+        case 'tracks':
+          result = await widget.service.getTrackShouts(_name, _artist, limit: 15);
+      }
+    } catch (_) {
+      if (mounted) setState(() => _shoutsFailed = true);
+    }
+    if (mounted) setState(() { _shouts = result; _loadingShouts = false; });
+  }
+
+  // Builds the real Last.fm URL for this item's shoutbox, so "reply" opens
+  // the actual page where the person can post a comment (the API can't).
+  String _shoutboxUrl() {
+    String enc(String s) => Uri.encodeComponent(s).replaceAll('%20', '+');
+    switch (widget.type) {
+      case 'artists':
+        return 'https://www.last.fm/music/${enc(_name)}/+shoutbox';
+      case 'albums':
+        return 'https://www.last.fm/music/${enc(_artist)}/${enc(_name)}/+shoutbox';
+      case 'tracks':
+      default:
+        return 'https://www.last.fm/music/${enc(_artist)}/_/${enc(_name)}/+shoutbox';
+    }
+  }
+
+  Future<void> _openShoutbox() async {
+    final uri = Uri.tryParse(_shoutboxUrl());
+    if (uri == null) return;
+    if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  Widget _buildShoutbox(ColorScheme scheme) {
+    // Nothing to show and nothing loading: don't render an empty section.
+    if (!_loadingShouts && _shouts.isEmpty && !_shoutsFailed) return const SizedBox.shrink();
+
+    final text = Theme.of(context).textTheme;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.forum_rounded, size: 20, color: scheme.primary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(L.detailShoutbox,
+                    style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+              ),
+              TextButton.icon(
+                onPressed: _openShoutbox,
+                icon: const Icon(Icons.open_in_new_rounded, size: 16),
+                label: Text(L.detailShoutboxReply),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (_loadingShouts)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 20),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            )
+          else if (_shoutsFailed)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(L.detailShoutboxError,
+                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            )
+          else
+            ...(_shouts.take(5).map((s) {
+              final map    = s as Map<String, dynamic>;
+              final author = (map['author'] ?? '').toString();
+              // Body comes as HTML from the API (can contain <a> links) —
+              // reuse the same de-linkifying helper used for the bio text.
+              final body   = (map['body'] ?? '')
+                  .toString()
+                  .replaceAll(RegExp(r'<[^>]*>'), '');
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(author,
+                        style: text.bodySmall?.copyWith(
+                            fontWeight: FontWeight.w700, color: scheme.primary)),
+                    const SizedBox(height: 2),
+                    Text(body, style: text.bodyMedium),
+                  ],
+                ),
+              );
+            })),
+          if (_shouts.length > 5)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton(
+                onPressed: _openShoutbox,
+                child: Text(L.detailShoutboxSeeAll),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+
+  // ── Lyrics ──────────────────────────────────────────────────────────────────
   Widget _buildLyrics(ColorScheme scheme) {
     final text     = Theme.of(context).textTheme;
     const maxChars = 320;

@@ -248,7 +248,11 @@ class AppStringsIt implements AppStrings {
   @override String get detailLyricsNotFound => 'Testo non disponibile';
   @override String get detailCopyLyrics => 'Copia testo';
   @override String get detailLyricsCopied => 'Testo copiato';
-  @override String get dashPerWeek => 'a settimana';
+
+  @override String get detailShoutbox => 'Shoutbox di Last.fm';
+  @override String get detailShoutboxReply => 'Rispondi';
+  @override String get detailShoutboxError => 'Impossibile caricare i commenti.';
+  @override String get detailShoutboxSeeAll => 'Vedi tutti i commenti';  @override String get dashPerWeek => 'a settimana';
   @override String get onboardSkip => 'Salta';
   @override String get onboardNext => 'Avanti';
   @override String get onboardFinish => 'Fine';

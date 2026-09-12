@@ -293,6 +293,55 @@ class LastFmService {
     }
   }
 
+  // ── Shoutbox (read-only) ──────────────────────────────────
+  // Last.fm's public API only exposes a way to READ shouts (comments), not
+  // to post one — there is no official "shout.Add"/write method. That's
+  // why there's no corresponding postShout()/addShout() here: posting has
+  // to happen on the real Last.fm site (see the "reply" button in the UI).
+  Future<List<dynamic>> getArtistShouts(String artist, {int limit = 15}) async {
+    try {
+      final d = await _call({
+        'method':      'artist.getShouts',
+        'artist':      artist,
+        'autocorrect': '1',
+        'limit':       '$limit',
+      });
+      return _asList(d['shouts']?['shout']);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<List<dynamic>> getAlbumShouts(String album, String artist, {int limit = 15}) async {
+    try {
+      final d = await _call({
+        'method':      'album.getShouts',
+        'album':       album,
+        'artist':      artist,
+        'autocorrect': '1',
+        'limit':       '$limit',
+      });
+      return _asList(d['shouts']?['shout']);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<List<dynamic>> getTrackShouts(String track, String artist, {int limit = 15}) async {
+    try {
+      final d = await _call({
+        'method':      'track.getShouts',
+        'track':       track,
+        'artist':      artist,
+        'autocorrect': '1',
+        'limit':       '$limit',
+      });
+      return _asList(d['shouts']?['shout']);
+    } catch (_) {
+      return [];
+    }
+  }
+
   // ── Album info (global + user context) ──────────────────
   Future<Map<String, dynamic>?> getAlbumInfo(String album, String artist) async {
     try {

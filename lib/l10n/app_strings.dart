@@ -285,6 +285,12 @@ abstract class AppStrings {
   String get detailCopyLyrics;
   String get detailLyricsCopied;
 
+  // ── Detail sheet: shoutbox (NEW) ─────────────────────────────────────────
+  String get detailShoutbox;
+  String get detailShoutboxReply;
+  String get detailShoutboxError;
+  String get detailShoutboxSeeAll;
+
   // ── Dashboard extra ─────────────────────────────────────────────────────────
   String get dashPerWeek;
 

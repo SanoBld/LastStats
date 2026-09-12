@@ -280,7 +280,11 @@ class AppStringsEn implements AppStrings {
   @override String get detailLyricsNotFound  => 'Lyrics not available';
   @override String get detailCopyLyrics      => 'Copy lyrics';
   @override String get detailLyricsCopied    => 'Lyrics copied';
-  @override String get dashPerWeek           => 'per week';
+
+  @override String get detailShoutbox => 'Last.fm shoutbox';
+  @override String get detailShoutboxReply => 'Reply';
+  @override String get detailShoutboxError => 'Couldn\'t load the comments.';
+  @override String get detailShoutboxSeeAll => 'See all comments';  @override String get dashPerWeek           => 'per week';
 
   @override String get onboardSkip             => 'Skip';
   @override String get onboardNext             => 'Next';

@@ -280,7 +280,11 @@ class AppStringsPt implements AppStrings {
   @override String get detailLyricsNotFound  => 'Letra não disponível';
   @override String get detailCopyLyrics      => 'Copiar letra';
   @override String get detailLyricsCopied    => 'Letra copiada';
-  @override String get dashPerWeek           => 'por semana';
+
+  @override String get detailShoutbox => 'Shoutbox do Last.fm';
+  @override String get detailShoutboxReply => 'Responder';
+  @override String get detailShoutboxError => 'Não foi possível carregar os comentários.';
+  @override String get detailShoutboxSeeAll => 'Ver todos os comentários';  @override String get dashPerWeek           => 'por semana';
 
   @override String get onboardSkip             => 'Pular';
   @override String get onboardNext             => 'Próximo';
