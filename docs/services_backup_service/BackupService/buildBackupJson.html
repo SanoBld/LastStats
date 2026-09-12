@@ -58,6 +58,7 @@
 <span class="name ">buildBackupJson</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="buildBackupJson-param-includeApiKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeApiKey</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="buildBackupJson-param-includeSecretKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeSecretKey</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="buildBackupJson-param-includeFolders"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeFolders</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="buildBackupJson-param-includeScrobbles"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeScrobbles</span> = <span class="default-value">false</span>, </span></li>
 </ol>})
 
       
@@ -81,6 +82,9 @@ Both default to true so nothing changes for existing callers.</p>
   bool includeApiKey = true,
   bool includeSecretKey = true,
   bool includeFolders = true,
+  &#47;&#47; NEW: when true, the full scrobble history (every track ever played,
+  &#47;&#47; as cached on this device) is embedded in the backup file too.
+  bool includeScrobbles = false,
 }) async {
   final p = await SharedPreferences.getInstance();
   final map = &lt;String, dynamic&gt;{};
@@ -121,14 +125,22 @@ Both default to true so nothing changes for existing callers.</p>
     if (activeApiKey.isEmpty)   activeApiKey   = (map[&#39;ls_apikey&#39;]   ?? &#39;&#39;).toString();
   }
 
+  &#47;&#47; NEW: raw per-year scrobble blobs, only read from disk if the user
+  &#47;&#47; actually asked for them (this can be a big amount of data).
+  Map&lt;String, String&gt;? scrobbles;
+  if (includeScrobbles) {
+    scrobbles = await ScrobblesFileCache.exportRawForBackup();
+  }
+
   final now = DateTime.now();
   return jsonEncode({
     &#39;app&#39;:         &#39;LastStats&#39;,
-    &#39;version&#39;:     &#39;3&#39;, &#47;&#47; v3 = dynamic key discovery (all ls_* keys)
-    &#39;exported_at&#39;: now.toIso8601String(),
+    &#39;version&#39;:     &#39;4&#39;, &#47;&#47; v4 = added optional full scrobble history
+    &#39;exported_at&#39;: now.toIso8601String(), &#47;&#47; backup date, used on restore
     &#39;username&#39;:    activeUsername,
     &#39;api_key&#39;:     activeApiKey,
     &#39;prefs&#39;:       map,
+    if (scrobbles != null) &#39;scrobbles&#39;: scrobbles,
   });
 }</code></pre>
 </section>

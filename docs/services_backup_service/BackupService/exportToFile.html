@@ -58,6 +58,7 @@
 <span class="name ">exportToFile</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="exportToFile-param-includeApiKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeApiKey</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="exportToFile-param-includeSecretKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeSecretKey</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="exportToFile-param-includeFolders"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeFolders</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="exportToFile-param-includeScrobbles"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeScrobbles</span> = <span class="default-value">false</span>, </span></li>
 </ol>})
 
       
@@ -76,12 +77,14 @@
   bool includeApiKey = true,
   bool includeSecretKey = true,
   bool includeFolders = true,
+  bool includeScrobbles = false,
 }) async {
   try {
     final payload = await buildBackupJson(
       includeApiKey: includeApiKey,
       includeSecretKey: includeSecretKey,
       includeFolders: includeFolders,
+      includeScrobbles: includeScrobbles,
     );
     final bytes   = Uint8List.fromList(utf8.encode(payload));
     final path = await FilePicker.platform.saveFile(

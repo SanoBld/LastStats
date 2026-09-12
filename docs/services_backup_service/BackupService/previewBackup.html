@@ -82,6 +82,8 @@ can show "restore API key?" / "restore secret key?" checkboxes.</p>
   String username = &#39;&#39;;
   bool hasApiKey = false;
   bool hasSecretKey = false;
+  bool hasScrobbles = false;
+  DateTime? exportedAt;
 
   if (parsed[&#39;app&#39;] == &#39;LastStats&#39;) {
     final prefs = parsed[&#39;prefs&#39;];
@@ -91,6 +93,9 @@ can show "restore API key?" / "restore secret key?" checkboxes.</p>
       hasSecretKey = (prefs[&#39;ls_secret_key&#39;] ?? &#39;&#39;).toString().isNotEmpty;
     }
     username = (parsed[&#39;username&#39;] ?? &#39;&#39;).toString();
+    hasScrobbles = parsed[&#39;scrobbles&#39;] is Map &amp;&amp; (parsed[&#39;scrobbles&#39;] as Map).isNotEmpty;
+    final exportedRaw = (parsed[&#39;exported_at&#39;] ?? &#39;&#39;).toString();
+    exportedAt = DateTime.tryParse(exportedRaw);
   } else {
     &#47;&#47; Simple format fallback: {&quot;username&quot;:&quot;…&quot;,&quot;api_key&quot;:&quot;…&quot;}
     final k = (parsed[&#39;api_key&#39;] ?? parsed[&#39;apiKey&#39;] ?? parsed[&#39;api-key&#39;] ?? &#39;&#39;).toString();
@@ -103,6 +108,8 @@ can show "restore API key?" / "restore secret key?" checkboxes.</p>
     hasApiKey: hasApiKey,
     hasSecretKey: hasSecretKey,
     username: username.isEmpty ? null : username,
+    exportedAt: exportedAt,
+    hasScrobbles: hasScrobbles,
   );
 }</code></pre>
 </section>

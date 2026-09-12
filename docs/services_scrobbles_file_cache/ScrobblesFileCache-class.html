@@ -150,6 +150,20 @@
   <section class="summary offset-anchor" id="static-methods">
     <h2>Static Methods</h2>
     <dl class="callables">
+        <dt id="checkRawForImport" class="callable">
+  <span class="name"><a href="../services_scrobbles_file_cache/ScrobblesFileCache/checkRawForImport.html">checkRawForImport</a></span><span class="signature">(<wbr><span class="parameter" id="checkRawForImport-param-raw"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">raw</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../services_scrobbles_file_cache/ScrobbleImportCheck-class.html">ScrobbleImportCheck</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Tries to parse every "year_XXXX" entry from a backup's "scrobbles" map,
+WITHOUT writing anything, so the UI can warn the user first.
+  
+
+</dd>
+
         <dt id="clear" class="callable">
   <span class="name"><a href="../services_scrobbles_file_cache/ScrobblesFileCache/clear.html">clear</a></span><span class="signature">(<wbr>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
@@ -160,6 +174,20 @@
 <dd>
   Vide complètement le cache (mémoire + stockage).
 À appeler uniquement lors d'une déconnexion du compte.
+  
+
+</dd>
+
+        <dt id="exportRawForBackup" class="callable">
+  <span class="name"><a href="../services_scrobbles_file_cache/ScrobblesFileCache/exportRawForBackup.html">exportRawForBackup</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Reads every cached year (+ meta) as raw JSON strings, so BackupService
+can embed the full scrobble history into a backup file.
   
 
 </dd>
@@ -238,6 +266,22 @@
 </dt>
 <dd>
   Nombre total de scrobbles en cache (toutes années confondues).
+  
+
+</dd>
+
+        <dt id="importRawFromBackup" class="callable">
+  <span class="name"><a href="../services_scrobbles_file_cache/ScrobblesFileCache/importRawFromBackup.html">importRawFromBackup</a></span><span class="signature">(<wbr><span class="parameter" id="importRawFromBackup-param-raw"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">raw</span>, {</span><span class="parameter" id="importRawFromBackup-param-mode"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">mode</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Imports scrobbles from a backup's "scrobbles" map. Years already on
+this device are MERGED (union by timestamp) rather than overwritten,
+so restoring on a new phone that already synced a few days keeps
+everything — nothing is lost either side.
   
 
 </dd>
