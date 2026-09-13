@@ -141,7 +141,7 @@ Future<void> _mainImpl() async {
   ecoModeThresholdNotifier.value = prefs.getInt('ls_eco_mode_threshold') ?? 20;
 
   // ── Data caches & storage ────────────────────────────────────────────────
-  // These 4 inits don't depend on each other, so run them together instead
+  // These 5 inits don't depend on each other, so run them together instead
   // of one-by-one — cuts real time-to-first-frame since they mostly wait
   // on disk I/O anyway.
   await Future.wait([
@@ -150,8 +150,8 @@ Future<void> _mainImpl() async {
     ScrobblesFileCache.init(),
     FriendsLibraryService.init(),
     AchievementsExtras.init(),
+    StorageManager.init(),
   ]);
-  await StorageManager.init();
 
   DataCache.offlineMode = prefs.getBool('ls_cache_serve_stale') ?? true;
 
@@ -165,16 +165,22 @@ Future<void> _mainImpl() async {
   // Notifications: mobile + Windows. WorkManager (background scheduling):
   // mobile only — Windows has no equivalent OS task scheduler wired up yet,
   // so on Windows sync notifications only fire during a manual/foreground sync.
+  //
+  // On Windows, NotificationService.init() registers the app with the OS
+  // toast/COM system, which can take a noticeable moment. Waiting on it
+  // here used to delay the very first frame (the window stays invisible
+  // until _mainImpl finishes) — that was the main cause of the slow-to-
+  // appear window on Windows. It doesn't touch anything the first frame
+  // needs, so it's now deferred until right after runApp instead.
   Map<String, dynamic>? notifLaunchData;
 
   if (!kIsWeb) {
-    final isMobile  = Platform.isAndroid || Platform.isIOS;
-    final isWindows = Platform.isWindows;
-    if (isMobile || isWindows) {
+    final isMobile = Platform.isAndroid || Platform.isIOS;
+    if (isMobile) {
+      // Mobile still awaits: WorkManager scheduling right below needs
+      // notification channels to exist first.
       await NotificationService.init();
       notifLaunchData = await NotificationService.getLaunchPayloadData();
-    }
-    if (isMobile) {
       await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
       await NotificationWorker.scheduleAll();
       // Fire-and-forget: refresh home screen widgets on app start.
@@ -196,10 +202,25 @@ Future<void> _mainImpl() async {
   ImageService.pruneExpired();
   EcoModeController.init(); // battery watcher, also not needed for frame 1
 
+  if (!kIsWeb && Platform.isWindows) {
+    // Deferred (see comment above): init, then handle a cold-start
+    // notification tap the same way the post-frame callback below does.
+    unawaited(NotificationService.init().then((_) async {
+      final data = await NotificationService.getLaunchPayloadData();
+      if (data != null) {
+        navigatorKey.currentState?.push(MaterialPageRoute(
+          builder: (_) => NotificationDetailPage(data: data),
+        ));
+      }
+    }));
+  }
+
   WidgetsBinding.instance.addPostFrameCallback((_) async {
     if (notifLaunchData != null) {
       // App was launched (cold start) by tapping a notification — open the
       // detail page directly instead of silently launching a URL.
+      // (Windows never sets notifLaunchData here — see the deferred block
+      // above, which handles its own cold-start notification tap.)
       navigatorKey.currentState?.push(MaterialPageRoute(
         builder: (_) => NotificationDetailPage(data: notifLaunchData!),
       ));
