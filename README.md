@@ -51,6 +51,11 @@ Join the Discord to chat, share feedback, or ask for help: https://discord.gg/Jj
 - Adaptive navigation: a side rail on wide screens, a bottom bar on smaller ones, and a manual switch if you prefer one over the other
 - Show or hide labels under the navigation bar icons
 
+**🏠 Dashboard**
+- Pick your own nickname (set during setup or later in Settings) — shown instead of your raw Last.fm account name
+- Choose which chart the dashboard shows: a listening calendar (last 60 days) or monthly bars
+- Quick stats, now playing, recent tracks, and a friends section, all customizable from Dashboard settings
+
 **❤️ Favorites**
 - Like tracks, artists, and albums directly from the app, through your own Last.fm account
 - A dedicated Favorites page with filters and cover art, where you can also remove items
@@ -66,8 +71,16 @@ Join the Discord to chat, share feedback, or ask for help: https://discord.gg/Jj
 - Flexible time ranges: 7 days, 1 month, 3 months, 6 months, 12 months, or all time
 - Background sync that keeps your stats up to date automatically, even when the app is closed
 - Local cache to reduce loading times and API calls
-- Smart artwork search: if Last.fm has no image, the app looks it up through iTunes, Deezer, and the Cover Art Archive
+- Smart artwork search: if Last.fm has no image, the app looks it up through iTunes, Deezer, MusicBrainz, and the Cover Art Archive
 - No fake or simulated data, everything comes from your real listening history
+
+**🔎 Search**
+- A dedicated search tab for artists, albums, tracks, and Last.fm profiles
+- Search bar in the news page too, filtering by title and content as you type
+- One consistent search bar look across the app: News, Search, and Settings
+
+**📤 Sharing**
+- Share artwork, charts, achievement badges, and recap cards anywhere — including Windows, macOS, and Linux, where the file is saved and revealed directly in your file explorer
 
 **🔔 Notifications**
 - Get notified when new app updates or news posts are published
@@ -77,10 +90,10 @@ Join the Discord to chat, share feedback, or ask for help: https://discord.gg/Jj
 **🌍 Languages**
 - Available in French, English, Spanish, Chinese, Portuguese, German, Italian, Japanese, Russian, and Arabic
 - The app follows your system language automatically, or you can pick one yourself from the settings
+- All translations, including French, are generated with AI assistance and may contain the occasional inaccuracy — corrections are always welcome
 
 **⚙️ Other little touches**
 - Haptic feedback on key actions
-- A quick search bar to find any artist, album, or track
 - Import and export your settings and appearance, useful when switching devices
 - Built in update checker that lets you know as soon as a new version is ready to download
 
@@ -98,7 +111,41 @@ https://github.com/SanoBld/LastStats-App/actions
 
 Builds coming straight from Actions contain the latest code and may include bugs that have not been fixed yet. If you want a stable experience, use the releases page instead.
 
-Supported platforms: Android, Windows, macOS, and Linux.
+Supported platforms: **Android, Windows, macOS, and Linux.**
+
+---
+
+## 💻 Installation
+
+### Android
+1. Download the `.apk` file from the [releases page](https://github.com/SanoBld/LastStats-App/releases).
+2. Open it on your phone. If Android blocks the install, allow "Install unknown apps" for the app you used to open the file (browser or file manager), then try again.
+
+### Windows
+1. Download the Windows `.zip` (or `.exe`, depending on the release) from the [releases page](https://github.com/SanoBld/LastStats-App/releases).
+2. Unzip it anywhere, then run `LastStats.exe`.
+3. Windows SmartScreen may warn about an unrecognized app since the build isn't code-signed — click "More info" then "Run anyway" to continue.
+4. Sharing files from the app (charts, artwork, etc.) saves them to your Downloads folder and opens Explorer with the file selected — this is expected on an unpackaged build like this one.
+
+### macOS
+1. Download the macOS build from the [releases page](https://github.com/SanoBld/LastStats-App/releases).
+2. Move `LastStats.app` to your Applications folder.
+3. Since the build isn't notarized, the first launch requires right-click → "Open" → "Open" again (macOS will otherwise refuse to run apps from an unidentified developer).
+
+### Linux
+1. Download the Linux build from the [releases page](https://github.com/SanoBld/LastStats-App/releases).
+2. Extract it, then run the `LastStats` executable (`chmod +x LastStats` first if needed).
+
+### Building from source
+Requires the [Flutter SDK](https://docs.flutter.dev/get-started/install) (matching the version in `pubspec.yaml`).
+
+```bash
+git clone https://github.com/SanoBld/LastStats.git
+cd LastStats
+flutter pub get
+flutter run              # run on a connected device/emulator
+flutter build apk        # or: windows / macos / linux
+```
 
 ---
 
@@ -106,7 +153,8 @@ Supported platforms: Android, Windows, macOS, and Linux.
 
 - Flutter and Dart
 - Material Design 3 (Material You)
-- Last.fm REST API, with iTunes Search, Deezer, and Cover Art Archive as backup sources for missing artwork
+- Last.fm REST API, with iTunes Search, Deezer, MusicBrainz, and the Cover Art Archive as backup sources for missing artwork
+- The full list of open-source packages used is visible in-app, under Settings → About, each linking to its pub.dev page
 
 ---
 
@@ -131,6 +179,20 @@ https://github.com/SanoBld/LastStats-App/issues
 Or join the Discord to chat directly and follow what's coming next:
 
 https://discord.gg/JjqmkQgZBs
+
+---
+
+## 📄 License
+
+This project is released under the **MIT License** — see [LICENSE](LICENSE) for the full text.
+
+In short: you're free to use, modify, duplicate, or redistribute this project, for any purpose, as long as you credit the original author (Sano Bld).
+
+---
+
+## 🤖 A note on AI
+
+For transparency: AI was used as a tool throughout this project — to help write and review a good part of the app's code, and to generate all of the in-app translations (French included). It's not the whole story behind this app, but it's a real part of it, and it felt worth stating plainly rather than leaving it unsaid.
 
 ---
 

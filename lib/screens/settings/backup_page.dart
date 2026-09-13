@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:share_plus/share_plus.dart';
 import '../../services/app_share.dart';
 import '../../l10n/l10n.dart';
 import '../../services/backup_service.dart';
@@ -271,6 +270,9 @@ class _BackupPageState extends State<BackupPage> {
         if (mounted) setState(() => _importing = false);
         return; // user cancelled the restore itself
       }
+      // Guard the next dialog too — the widget could have been unmounted
+      // while the user was looking at the previous one.
+      if (!mounted) return;
     }
 
     // If we're restoring scrobbles, check them for corruption FIRST and

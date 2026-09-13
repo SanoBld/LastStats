@@ -217,7 +217,7 @@ class BackupService {
       'username':    activeUsername,
       'api_key':     activeApiKey,
       'prefs':       map,
-      if (scrobbles != null) 'scrobbles': scrobbles,
+      'scrobbles':   ?scrobbles,
     });
   }
 

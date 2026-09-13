@@ -57,3 +57,8 @@
 - Added a proper open-source license (MIT) — use, modify, duplicate or redistribute freely, just credit the author — with a link to the full license text
 - Translations page now notes that ALL translations, including French, were generated with AI assistance and may contain inaccuracies
 - About page now also notes that AI was used to help develop a good part of the app's code
+- README rewritten to match the current app (dashboard chart picker, custom nickname, working desktop sharing, license, AI note) and now includes real per-platform installation steps
+
+**Code cleanup**
+- Removed dead code left over from the old dashboard carousels
+- Cleaned up a handful of unused imports and analyzer warnings
