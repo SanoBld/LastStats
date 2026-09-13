@@ -169,37 +169,23 @@ class _SearchPageState extends State<_SearchPage> {
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: TextField(
+              child: _AppSearchField(
                 controller:      _ctrl,
                 focusNode:       _focusNode,
                 onChanged:       _onChanged,
                 textInputAction: TextInputAction.search,
+                hintText:        L.searchHintBar,
+                loading:         _searching,
                 onSubmitted: (v) {
                   if (v.trim().isNotEmpty) _search(v.trim());
                   // Dismiss keyboard on submit
                   _dismissKeyboard();
                 },
-                decoration: InputDecoration(
-                  hintText:  L.searchHintBar,
-                  prefixIcon: const Icon(Icons.search_rounded),
-                  suffixIcon: _ctrl.text.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear_rounded),
-                          onPressed: () {
-                            _ctrl.clear();
-                            _dismissKeyboard();
-                            setState(() { _results = []; _error = null; _searching = false; });
-                          },
-                        )
-                      : null,
-                  filled:    true,
-                  fillColor: scheme.surfaceContainerHighest,
-                  border: OutlineInputBorder(
-                    borderRadius: AppRadius.lgR,
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
+                onClear: () {
+                  _ctrl.clear();
+                  _dismissKeyboard();
+                  setState(() { _results = []; _error = null; _searching = false; });
+                },
               ),
             ),
 

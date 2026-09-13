@@ -1687,14 +1687,10 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                                     children: [
                                       Text(bigName,
                                         style: AppText.title.copyWith(color: Colors.white, shadows: [Shadow(color: Colors.black54, blurRadius: 4)])),
-                                      if (nickname.isNotEmpty)
-                                        Text(name,
-                                          style: TextStyle(
-                                            color: Colors.white.withValues(alpha: 0.85),
-                                            fontSize: 13,
-                                            shadows: const [Shadow(color: Colors.black45, blurRadius: 4)],
-                                          ))
-                                      else if (realName.isNotEmpty)
+                                      // Nickname set → that's all we show now (no account
+                                      // name underneath). No nickname → keep the old
+                                      // behavior of showing the Last.fm real name, if any.
+                                      if (nickname.isEmpty && realName.isNotEmpty)
                                         Text(realName,
                                           style: TextStyle(
                                             color: Colors.white.withValues(alpha: 0.85),
@@ -4111,33 +4107,16 @@ class _NewsPageState extends State<_NewsPage> {
             Text(L.newsItemsCount(filtered.length),
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             const SizedBox(height: 10),
-            TextField(
+            _AppSearchField(
               controller: _searchCtrl,
-              onChanged: _onSearchChanged,
-              decoration: InputDecoration(
-                hintText:   L.newsSearchHint,
-                prefixIcon: const Icon(Icons.search_rounded),
-                suffixIcon: _searching
-                    ? const Padding(
-                        padding: EdgeInsets.all(14),
-                        child: SizedBox(width: 16, height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2)),
-                      )
-                    : (_searchCtrl.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.close_rounded),
-                            onPressed: () {
-                              _searchCtrl.clear();
-                              _debounce?.cancel();
-                              setState(() { _query = ''; _searching = false; });
-                            },
-                          )
-                        : null),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                isDense: true,
-                filled: true,
-                fillColor: scheme.surfaceContainerHigh,
-              ),
+              hintText:   L.newsSearchHint,
+              loading:    _searching,
+              onChanged:  _onSearchChanged,
+              onClear: () {
+                _searchCtrl.clear();
+                _debounce?.cancel();
+                setState(() { _query = ''; _searching = false; });
+              },
             ),
             const SizedBox(height: 10),
             Wrap(spacing: 8, runSpacing: 8, children: [

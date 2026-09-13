@@ -745,40 +745,20 @@ class _SettingsPageState extends State<_SettingsPage> {
               const SizedBox(height: 16),
 
               // Search bar — filters the category grid below by title/subtitle.
-              Container(
-                decoration: BoxDecoration(
-                  color: scheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45), width: 1),
-                ),
-                child: TextField(
-                  controller: _searchCtrl,
-                  onChanged: (v) => setState(() => _searchQuery = v),
-                  style: text.bodyMedium,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                    border: InputBorder.none,
-                    hintText: _tr({
-                      'fr': 'Rechercher un réglage…', 'en': 'Search settings…',
-                      'es': 'Buscar un ajuste…', 'de': 'Einstellung suchen…',
-                      'it': 'Cerca un\'impostazione…', 'pt': 'Pesquisar configuração…',
-                      'ru': 'Поиск настройки…', 'ja': '設定を検索…',
-                      'zh': '搜索设置…', 'ar': 'ابحث عن إعداد…',
-                    }),
-                    hintStyle: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-                    prefixIcon: Icon(Icons.search_rounded, color: scheme.onSurfaceVariant),
-                    suffixIcon: _searchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: Icon(Icons.close_rounded, color: scheme.onSurfaceVariant),
-                            onPressed: () {
-                              _searchCtrl.clear();
-                              setState(() => _searchQuery = '');
-                            },
-                          )
-                        : null,
-                  ),
-                ),
+              _AppSearchField(
+                controller: _searchCtrl,
+                onChanged: (v) => setState(() => _searchQuery = v),
+                hintText: _tr({
+                  'fr': 'Rechercher un réglage…', 'en': 'Search settings…',
+                  'es': 'Buscar un ajuste…', 'de': 'Einstellung suchen…',
+                  'it': 'Cerca un\'impostazione…', 'pt': 'Pesquisar configuração…',
+                  'ru': 'Поиск настройки…', 'ja': '設定を検索…',
+                  'zh': '搜索设置…', 'ar': 'ابحث عن إعداد…',
+                }),
+                onClear: () {
+                  _searchCtrl.clear();
+                  setState(() => _searchQuery = '');
+                },
               ),
               const SizedBox(height: 16),
 

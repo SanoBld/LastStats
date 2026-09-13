@@ -1204,3 +1204,60 @@ String _fmtTrackDateLocal(Map t) {
   }
   return _fmtDate((t['date']?['#text'] ?? '').toString());
 }
+// ══════════════════════════════════════════════════════════════════════════
+//  _AppSearchField — one shared look for every search bar in the app
+//  (News, Search tab, Settings search) so they don't drift apart.
+// ══════════════════════════════════════════════════════════════════════════
+class _AppSearchField extends StatelessWidget {
+  final TextEditingController controller;
+  final String hintText;
+  final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
+  final VoidCallback? onClear;
+  final bool loading;
+  final FocusNode? focusNode;
+  final TextInputAction? textInputAction;
+
+  const _AppSearchField({
+    required this.controller,
+    required this.hintText,
+    this.onChanged,
+    this.onSubmitted,
+    this.onClear,
+    this.loading = false,
+    this.focusNode,
+    this.textInputAction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return TextField(
+      controller:      controller,
+      focusNode:       focusNode,
+      onChanged:       onChanged,
+      onSubmitted:     onSubmitted,
+      textInputAction: textInputAction ?? TextInputAction.search,
+      decoration: InputDecoration(
+        hintText:   hintText,
+        prefixIcon: const Icon(Icons.search_rounded),
+        suffixIcon: loading
+            ? const Padding(
+                padding: EdgeInsets.all(14),
+                child: SizedBox(width: 16, height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2)),
+              )
+            : (controller.text.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: onClear,
+                  )
+                : null),
+        border:    OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+        isDense:   true,
+        filled:    true,
+        fillColor: scheme.surfaceContainerHigh,
+      ),
+    );
+  }
+}
