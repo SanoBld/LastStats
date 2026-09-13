@@ -539,8 +539,8 @@ class AppStringsEs implements AppStrings {
   @override String get aboutLicenseSection => 'Licencia';
   @override String get aboutLicenseText => 'Este proyecto se publica bajo la licencia MIT: eres libre de usarlo, modificarlo, duplicarlo o redistribuirlo, solo cítame.';
   @override String get aboutLicenseLink => 'Ver licencia completa';
-  @override String get languageAiNote => 'Todas las traducciones, incluido el francés, se generaron con ayuda de IA y pueden contener imprecisiones.';
-  @override String get aboutAiDevNote => 'A título informativo: la IA también se usó para ayudar a desarrollar esta app (no todo, pero buena parte del código se escribió con su ayuda).';
+  @override String get languageAiNote => 'Las traducciones fueron generadas por IA y pueden contener imprecisiones.';
+  @override String get aboutAiDevNote => 'La IA también se usó para desarrollar esta app.';
   @override String get notifWorkManagerInfo => 'Las notificaciones se ejecutan en segundo plano mediante WorkManager. La app no necesita estar abierta. Se requiere conexión a internet.';
   @override String get notifIntervalTitle       => 'Cada X scrobbles';
   @override String get notifIntervalSubtitle    => 'Recibe avisos a intervalos regulares';

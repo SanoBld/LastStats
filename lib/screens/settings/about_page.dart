@@ -264,28 +264,34 @@ class AboutPage extends StatelessWidget {
         SettingsSection(
           label: L.aboutOpenSourceLibs,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
-              child: Text(L.aboutOpenSourceLibsSub,
-                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
-              child: Wrap(spacing: 8, runSpacing: 8, children: [
-                for (final pkg in const [
-                  'cupertino_icons', 'battery_plus', 'flutter_displaymode', 'http',
-                  'dynamic_color', 'shared_preferences', 'path_provider', 'share_plus',
-                  'qr_flutter', 'mobile_scanner', 'app_links', 'url_launcher',
-                  'palette_generator', 'flutter_local_notifications', 'workmanager',
-                  'window_manager', 'audioplayers', 'flutter_svg', 'file_picker',
-                  'package_info_plus', 'crypto', 'sensors_plus', 'home_widget',
-                ])
-                  ActionChip(
-                    label: Text(pkg),
-                    avatar: const Icon(Icons.open_in_new_rounded, size: 14),
-                    onPressed: () => _open('https://pub.dev/packages/$pkg'),
+            Theme(
+              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                title: Text(L.aboutOpenSourceLibsSub,
+                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+                childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Wrap(spacing: 8, runSpacing: 8, children: [
+                      for (final pkg in const [
+                        'cupertino_icons', 'battery_plus', 'flutter_displaymode', 'http',
+                        'dynamic_color', 'shared_preferences', 'path_provider', 'share_plus',
+                        'qr_flutter', 'mobile_scanner', 'app_links', 'url_launcher',
+                        'palette_generator', 'flutter_local_notifications', 'workmanager',
+                        'window_manager', 'audioplayers', 'flutter_svg', 'file_picker',
+                        'package_info_plus', 'crypto', 'sensors_plus', 'home_widget',
+                      ])
+                        ActionChip(
+                          label: Text(pkg),
+                          avatar: const Icon(Icons.open_in_new_rounded, size: 14),
+                          onPressed: () => _open('https://pub.dev/packages/$pkg'),
+                        ),
+                    ]),
                   ),
-              ]),
+                ],
+              ),
             ),
           ],
         ),

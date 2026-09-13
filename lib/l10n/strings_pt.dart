@@ -539,8 +539,8 @@ class AppStringsPt implements AppStrings {
   @override String get aboutLicenseSection => 'Licença';
   @override String get aboutLicenseText => 'Este projeto é publicado sob a licença MIT: fique à vontade para usar, modificar, duplicar ou redistribuir, só me cite.';
   @override String get aboutLicenseLink => 'Ver licença completa';
-  @override String get languageAiNote => 'Todas as traduções, incluindo o francês, foram geradas com ajuda de IA e podem conter imprecisões.';
-  @override String get aboutAiDevNote => 'A título informativo: a IA também foi usada para ajudar a desenvolver este app (não tudo, mas boa parte do código foi escrita com a sua ajuda).';
+  @override String get languageAiNote => 'As traduções foram geradas por IA e podem conter imprecisões.';
+  @override String get aboutAiDevNote => 'A IA também foi usada para desenvolver este app.';
   @override String get notifWorkManagerInfo => 'As notificações são executadas em segundo plano via WorkManager. O app não precisa estar aberto. É necessária conexão com a internet.';
   @override String get notifIntervalTitle       => 'A cada X scrobbles';
   @override String get notifIntervalSubtitle    => 'Receba avisos em intervalos regulares';

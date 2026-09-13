@@ -487,8 +487,8 @@ class AppStringsAr implements AppStrings {
   @override String get aboutLicenseSection => 'الرخصة';
   @override String get aboutLicenseText => 'هذا المشروع منشور بموجب رخصة MIT: يمكنك استخدامه أو تعديله أو نسخه أو إعادة توزيعه بحرية، فقط مع ذكر اسمي.';
   @override String get aboutLicenseLink => 'عرض الرخصة الكاملة';
-  @override String get languageAiNote => 'جميع الترجمات، بما فيها الفرنسية، تم إنشاؤها بمساعدة الذكاء الاصطناعي وقد تحتوي على أخطاء.';
-  @override String get aboutAiDevNote => 'على سبيل التوضيح: تم استخدام الذكاء الاصطناعي أيضًا للمساعدة في تطوير هذا التطبيق (ليس كله، لكن جزءًا كبيرًا من الكود كُتب بمساعدته).';
+  @override String get languageAiNote => 'تم إنشاء الترجمات بواسطة الذكاء الاصطناعي وقد تحتوي على أخطاء.';
+  @override String get aboutAiDevNote => 'استُخدم الذكاء الاصطناعي أيضًا في تطوير هذا التطبيق.';
   @override String get notifWorkManagerInfo => 'تعمل الإشعارات في الخلفية عبر WorkManager. لا حاجة لفتح التطبيق. يلزم اتصال بالإنترنت.';
   @override String get notifIntervalTitle => 'كل X من التشغيلات';
   @override String get notifIntervalSubtitle => 'تلقَّ إشعارات على فترات منتظمة';

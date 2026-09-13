@@ -487,8 +487,8 @@ class AppStringsRu implements AppStrings {
   @override String get aboutLicenseSection => 'Лицензия';
   @override String get aboutLicenseText => 'Этот проект выпущен под лицензией MIT: вы можете свободно использовать, изменять, копировать или распространять его, просто указывайте автора.';
   @override String get aboutLicenseLink => 'Посмотреть полную лицензию';
-  @override String get languageAiNote => 'Все переводы, включая французский, были созданы с помощью ИИ и могут содержать неточности.';
-  @override String get aboutAiDevNote => 'Для прозрачности: ИИ также использовался при разработке этого приложения (не всё, но значительная часть кода была написана с его помощью).';
+  @override String get languageAiNote => 'Переводы созданы с помощью ИИ и могут содержать неточности.';
+  @override String get aboutAiDevNote => 'ИИ также использовался при разработке этого приложения.';
   @override String get notifWorkManagerInfo => 'Уведомления работают в фоне через WorkManager. Приложение не обязательно должно быть открыто. Требуется подключение к интернету.';
   @override String get notifIntervalTitle => 'Каждые X скробблов';
   @override String get notifIntervalSubtitle => 'Получайте уведомления через регулярные интервалы';

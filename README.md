@@ -90,7 +90,7 @@ Join the Discord to chat, share feedback, or ask for help: https://discord.gg/Jj
 **🌍 Languages**
 - Available in French, English, Spanish, Chinese, Portuguese, German, Italian, Japanese, Russian, and Arabic
 - The app follows your system language automatically, or you can pick one yourself from the settings
-- All translations, including French, are generated with AI assistance and may contain the occasional inaccuracy — corrections are always welcome
+- All translations are generated with AI assistance and may contain the occasional inaccuracy
 
 **⚙️ Other little touches**
 - Haptic feedback on key actions
@@ -186,15 +186,9 @@ https://discord.gg/JjqmkQgZBs
 
 This project is released under the **MIT License** — see [LICENSE](LICENSE) for the full text.
 
-In short: you're free to use, modify, duplicate, or redistribute this project, for any purpose, as long as you credit the original author (Sano Bld).
+In short: use it, modify it, duplicate it, redistribute it, for any purpose — just credit Sano Bld.
 
----
-
-## 🤖 A note on AI
-
-For transparency: AI was used as a tool throughout this project — to help write and review a good part of the app's code, and to generate all of the in-app translations (French included). It's not the whole story behind this app, but it's a real part of it, and it felt worth stating plainly rather than leaving it unsaid.
-
----
+AI was used as a tool for part of the development and for the in-app translations.
 
 ## About
 

@@ -487,8 +487,8 @@ class AppStringsDe implements AppStrings {
   @override String get aboutLicenseSection => 'Lizenz';
   @override String get aboutLicenseText => 'Dieses Projekt steht unter der MIT-Lizenz: du darfst es frei nutzen, verändern, duplizieren oder weiterverbreiten, nenne einfach meinen Namen.';
   @override String get aboutLicenseLink => 'Vollständige Lizenz ansehen';
-  @override String get languageAiNote => 'Alle Übersetzungen, auch Französisch, wurden mit KI-Unterstützung erstellt und können Ungenauigkeiten enthalten.';
-  @override String get aboutAiDevNote => 'Zur Transparenz: KI wurde auch bei der Entwicklung dieser App eingesetzt (nicht alles, aber ein guter Teil des Codes wurde mit ihrer Hilfe geschrieben).';
+  @override String get languageAiNote => 'Die Übersetzungen wurden von KI erstellt und können Ungenauigkeiten enthalten.';
+  @override String get aboutAiDevNote => 'KI wurde auch bei der Entwicklung dieser App eingesetzt.';
   @override String get notifWorkManagerInfo => 'Benachrichtigungen laufen über WorkManager im Hintergrund. Die App muss nicht geöffnet sein. Eine Internetverbindung ist erforderlich.';
   @override String get notifIntervalTitle => 'Alle X Scrobbles';
   @override String get notifIntervalSubtitle => 'In regelmäßigen Abständen benachrichtigt werden';
