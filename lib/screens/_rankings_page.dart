@@ -73,7 +73,8 @@ class _RankingsPageState extends State<_RankingsPage>
                 height: 44,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
+                  // Android-style stretch at the edges, not the iOS rubber-band bounce.
+                  physics: const ClampingScrollPhysics(),
                   children: [0, ..._availableYears].map((year) {
                     final selected = year == 0 ? _selectedYear == null : year == _selectedYear;
                     final label    = year == 0 ? L.rankingsAllYears : '$year';
@@ -295,9 +296,18 @@ class _TopListBodyState extends State<_TopListBody>
       },
       child: CustomScrollView(slivers: [
         if (_items.length >= 3)
-          SliverToBoxAdapter(child: _PodiumWidget(
+          SliverToBoxAdapter(
+            // Keyed on the actual podium names: without this, Flutter can
+            // reuse the previous podium's image widgets when a filter swaps
+            // in different people at the same 3 positions, so the photos
+            // stayed stuck on the old names. A fresh key forces a clean
+            // rebuild (and fresh image fetch) every time the top 3 change.
+            key: ValueKey('podium_${widget.type}_${widget.year}_${widget.month}_'
+                '${_items.take(3).map((e) => (e as Map)['name']).join('|')}'),
+            child: _PodiumWidget(
               items: _items.take(3).toList(), type: widget.type,
-              onTap: (item) { _haptic(_HapticImpact.light); _showDetail(context, item as Map<String, dynamic>); })),
+              onTap: (item) { _haptic(_HapticImpact.light); _showDetail(context, item as Map<String, dynamic>); }),
+          ),
 
         SliverList(delegate: SliverChildBuilderDelegate(
           (ctx, i) {
@@ -325,6 +335,7 @@ class _TopListBodyState extends State<_TopListBody>
               default:        imgF = ImageService.resolveTrack(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null);
             }
             return InkWell(
+              key: ValueKey('rank_row_${widget.type}_${idx}_$name'),
               onTap: () { _haptic(_HapticImpact.light); _showDetail(ctx, item); },
               borderRadius: AppRadius.smR,
               child: _FadeSlideIn(
@@ -396,6 +407,7 @@ class _PodiumWidget extends StatelessWidget {
               onTap: () { _haptic(_HapticImpact.light); onTap(item); },
               child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
                 ClipRRect(
+                  key: ValueKey('podium_img_${type}_$name'),
                   borderRadius: BorderRadius.circular(imgSz[col] / 4),
                   child: _SmartImage(size: imgSz[col], borderRadius: imgSz[col] / 4,
                       initialUrl: raw, resolver: () => imgF),

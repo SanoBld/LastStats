@@ -30,36 +30,23 @@
 -->
 
 
-## v3.2.0
+## v3.5.0
 
-**Home Screen Widgets** (Android BETA)
-- New: 5 home screen widgets — total scrobbles, now playing, loved tracks, this week, and a full recap
-- Now Playing widget shows the album art full-bleed, with track and artist over a dark gradient
-- Widgets follow the app's theme (style, light/dark, and accent color), with a toggle to keep them pure white/black instead
-- Size-responsive: the 3 stat widgets adapt their layout as you resize them, down to a compact number-only square
-- Auto-refresh while the app is open (live for Now Playing, periodic for stats), plus a background task every ~30 min
-- Fully translated into all 10 supported languages, including the widget picker names
+**Dashboard**
+- New dashboard chart: a listening calendar (last 60 days) or monthly bars — replaces the old top artists/albums/tracks block, pick which one in Dashboard settings
+- New: set a custom display name (in the intro flow or Settings > Account) — shown big on the dashboard, with your actual Last.fm account name underneath
+- Faster dashboard chart loading: proper pagination (was silently missing scrobbles on busy periods) and background caching instead of refetching every time
 
-**Settings**
-- New search bar in Settings, filtering every category and jumping straight into common options (accent color, theme, language, and more), some editable inline
-- New "Favorite" section in About, crediting Metrolist and Better Nothing Music Visualizer
-- Rebuilt settings tabs, including a redesigned FAQ page with more questions
-- Eco mode for battery saving
-- Reworked updates page, with a searchable, filterable version history
-- Fixed accent colors: picking black or white no longer looks tinted blue
-- New: separate accent color for light and dark theme, optionally switched by a fixed time of day instead of the active theme
+**Rankings**
+- Fixed: podium photos sometimes stayed stuck on the previous top 3 after changing the year/month filter
+- Year selector now stretches at the edges (Android style) instead of the iOS rubber-band bounce, same for the Charts tab
 
-**Levels & Achievements**
-- New account level system, based on total scrobbles
-- New achievements system, with card borders (bronze to iridescent) based on play count
-- Two new achievement categories: friends added, and taste comparisons made
-- All computed automatically from cached stats, no extra network calls
+**News**
+- New search bar in the news/what's-new page, filters by title and body as you type
 
-**3D Artwork Cards & Sharing**
-- Share options have been visually enhanced and modernized
-- Share artwork cards as an image
-- QR code sharing and QR code scanning for profiles
-- Achievement badges now show their name when shared, not just the tier
+**Sharing**
+- Fixed sharing (artwork, charts, achievement badges, crash logs, recap cards) on Windows, macOS and Linux — desktop now saves the file and reveals it in the file explorer/Finder instead of relying on the native share charm, which silently failed for unpackaged desktop builds
 
-**Performance**
-- General app optimization, faster and smoother overall
+**Performance (Windows)**
+- Notification system setup no longer blocks the app's first frame on Windows — the window now appears noticeably faster on startup
+- A few redundant startup steps now run in parallel instead of one after another

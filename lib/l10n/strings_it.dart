@@ -478,6 +478,10 @@ class AppStringsIt implements AppStrings {
   @override String get settingsDashboardChartSection => 'Grafico della dashboard';
   @override String get dashChartCalendarLabel => "Calendario d'ascolto";
   @override String get dashChartMonthlyLabel => 'Barre mensili';
+  @override String get settingsDisplayNameSection => 'Nome personalizzato';
+  @override String get settingsDisplayNameLabel => 'Come vuoi essere chiamato?';
+  @override String get settingsDisplayNameHint => "Es. Sano Bld — lascia vuoto per usare il nome dell'account";
+  @override String get newsSearchHint => 'Cerca nelle novità…';
   @override String get notifWorkManagerInfo => 'Le notifiche vengono eseguite in background tramite WorkManager. L\'app non deve essere aperta. È richiesta una connessione a internet.';
   @override String get notifIntervalTitle => 'Ogni X scrobble';
   @override String get notifIntervalSubtitle => 'Ricevi notifiche a intervalli regolari';

@@ -108,6 +108,7 @@ Future<void> _mainImpl() async {
   keepLastArtworkColorNotifier.value   = prefs.getBool('ls_keep_last_artwork_color') ?? false;
   oledModeNotifier.value               = prefs.getBool('ls_oled_mode')               ?? false;
   localeNotifier.value                 = prefs.getString('ls_locale')                ?? 'fr';
+  displayNameNotifier.value            = prefs.getString('ls_display_name')          ?? '';
   musicPlatformNotifier.value          = prefs.getString('ls_music_platform')         ?? 'lastfm';
   showAllPlatformLinksNotifier.value   = prefs.getBool('ls_show_all_platform_links')  ?? false;
   secretKeyNotifier.value              = prefs.getString('ls_secret_key')            ?? '';

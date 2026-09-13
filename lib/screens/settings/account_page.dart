@@ -33,6 +33,7 @@ class _AccountPageState extends State<AccountPage> {
   bool   _obscureSecret  = true;
   bool   _connectingFav  = false;
   final  _secretCtrl     = TextEditingController();
+  late final _nameCtrl   = TextEditingController(text: displayNameNotifier.value);
 
   @override
   void initState() {
@@ -45,7 +46,15 @@ class _AccountPageState extends State<AccountPage> {
   void dispose() {
     localeNotifier.removeListener(_rebuild);
     _secretCtrl.dispose();
+    _nameCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _saveDisplayName(String value) async {
+    final v = value.trim();
+    displayNameNotifier.value = v;
+    final p = await SharedPreferences.getInstance();
+    await p.setString('ls_display_name', v);
   }
 
   Future<void> _connectFav(AccountEntry active) async {
@@ -298,6 +307,31 @@ class _AccountPageState extends State<AccountPage> {
             const SizedBox(height: 24),
           ])),
         ],
+
+        // ── Custom display name ──────────────────────────────────────────
+        // What the app calls you on the dashboard, instead of the raw
+        // Last.fm account name. Empty = just use the account name.
+        SettingsSection(
+          label: L.settingsDisplayNameSection,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+              child: TextField(
+                controller: _nameCtrl,
+                decoration: InputDecoration(
+                  labelText: L.settingsDisplayNameLabel,
+                  hintText:  L.settingsDisplayNameHint,
+                  border:    const OutlineInputBorder(),
+                  isDense:   true,
+                ),
+                textInputAction: TextInputAction.done,
+                onSubmitted: _saveDisplayName,
+                onTapOutside: (_) => _saveDisplayName(_nameCtrl.text),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
 
         // ── Account list ───────────────────────────────────────────────────
         SettingsSection(

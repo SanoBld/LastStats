@@ -478,6 +478,10 @@ class AppStringsAr implements AppStrings {
   @override String get settingsDashboardChartSection => 'رسم لوحة التحكم البياني';
   @override String get dashChartCalendarLabel => 'تقويم الاستماع';
   @override String get dashChartMonthlyLabel => 'أعمدة شهرية';
+  @override String get settingsDisplayNameSection => 'اسم مخصص';
+  @override String get settingsDisplayNameLabel => 'كيف نناديك؟';
+  @override String get settingsDisplayNameHint => 'مثال: Sano Bld — اتركه فارغًا لاستخدام اسم الحساب';
+  @override String get newsSearchHint => 'البحث في الأخبار…';
   @override String get notifWorkManagerInfo => 'تعمل الإشعارات في الخلفية عبر WorkManager. لا حاجة لفتح التطبيق. يلزم اتصال بالإنترنت.';
   @override String get notifIntervalTitle => 'كل X من التشغيلات';
   @override String get notifIntervalSubtitle => 'تلقَّ إشعارات على فترات منتظمة';

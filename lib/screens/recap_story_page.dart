@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import '../services/app_share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/lastfm_service.dart';
 import '../services/image_service.dart';
@@ -377,7 +378,7 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
       final tmp = await getTemporaryDirectory();
       final file = File('${tmp.path}/laststats_recap_${widget.username}_$_period.png');
       await file.writeAsBytes(bytes.buffer.asUint8List());
-      await Share.shareXFiles([XFile(file.path)]);
+      await AppShare.shareFile(file);
     } catch (_) {
       // Render/share failure: fail silently, nothing to share.
     } finally {

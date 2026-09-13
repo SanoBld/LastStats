@@ -478,6 +478,10 @@ class AppStringsJa implements AppStrings {
   @override String get settingsDashboardChartSection => 'ダッシュボードのグラフ';
   @override String get dashChartCalendarLabel => '再生カレンダー';
   @override String get dashChartMonthlyLabel => '月別バー';
+  @override String get settingsDisplayNameSection => '表示名';
+  @override String get settingsDisplayNameLabel => '何と呼べばいい？';
+  @override String get settingsDisplayNameHint => '例: Sano Bld — 空欄の場合はアカウント名を使用します';
+  @override String get newsSearchHint => 'お知らせを検索…';
   @override String get notifWorkManagerInfo => '通知はWorkManagerによりバックグラウンドで動作します。アプリを開いておく必要はありません。インターネット接続が必要です。';
   @override String get notifIntervalTitle => 'スクロブルX回ごと';
   @override String get notifIntervalSubtitle => '一定間隔で通知を受け取ります';

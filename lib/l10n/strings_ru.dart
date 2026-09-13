@@ -478,6 +478,10 @@ class AppStringsRu implements AppStrings {
   @override String get settingsDashboardChartSection => 'График панели';
   @override String get dashChartCalendarLabel => 'Календарь прослушиваний';
   @override String get dashChartMonthlyLabel => 'Столбцы по месяцам';
+  @override String get settingsDisplayNameSection => 'Своё имя';
+  @override String get settingsDisplayNameLabel => 'Как вас называть?';
+  @override String get settingsDisplayNameHint => 'Например, Sano Bld — оставьте пустым, чтобы использовать имя аккаунта';
+  @override String get newsSearchHint => 'Поиск по новостям…';
   @override String get notifWorkManagerInfo => 'Уведомления работают в фоне через WorkManager. Приложение не обязательно должно быть открыто. Требуется подключение к интернету.';
   @override String get notifIntervalTitle => 'Каждые X скробблов';
   @override String get notifIntervalSubtitle => 'Получайте уведомления через регулярные интервалы';

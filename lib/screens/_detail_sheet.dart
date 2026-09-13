@@ -2159,7 +2159,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
       final file = File('${tmp.path}/laststats_$safe.png');
       await file.writeAsBytes(bytes.buffer.asUint8List());
       if (mounted) _haptic(_HapticImpact.light);
-      await Share.shareXFiles([XFile(file.path)]);
+      await AppShare.shareFile(file);
     } catch (_) {
       // Network or render failure: fail silently, nothing to share.
     } finally {

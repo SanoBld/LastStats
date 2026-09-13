@@ -1118,7 +1118,7 @@ class _ChartsPageState extends State<_ChartsPage>
       await file.writeAsBytes(bytes);
 
       closeDialog();
-      await Share.shareXFiles([XFile(file.path)]);
+      await AppShare.shareFile(file);
     } catch (e) {
       closeDialog();
       if (ctx.mounted) {
@@ -1152,7 +1152,8 @@ class _ChartsPageState extends State<_ChartsPage>
       height: 44,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
+        // Android-style stretch at the edges, not the iOS rubber-band bounce.
+        physics: const ClampingScrollPhysics(),
         children: years.map((year) {
           final selected = year == _selectedYear;
           final label    = year == 0 ? _ct('Tout le temps', 'All time', es: 'Todo el tiempo', zh: '全部时间', pt: 'Todo período') : '$year';

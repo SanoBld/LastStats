@@ -568,6 +568,14 @@ abstract class AppStrings {
   String get dashChartCalendarLabel;
   String get dashChartMonthlyLabel;
 
+  // ── Custom display name ─────────────────────────────────────────────────
+  String get settingsDisplayNameSection;
+  String get settingsDisplayNameLabel;
+  String get settingsDisplayNameHint;
+
+  // ── News search ──────────────────────────────────────────────────────────
+  String get newsSearchHint;
+
   // ── Notifications page ───────────────────────────────────────────────────
   String get notifWorkManagerInfo;
   String get notifIntervalTitle;

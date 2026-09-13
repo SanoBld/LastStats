@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
+import '../../services/app_share.dart';
 import '../../l10n/l10n.dart';
 import '../../services/backup_service.dart';
 import '../../services/crash_log_service.dart';
@@ -113,7 +114,7 @@ class _BackupPageState extends State<BackupPage> {
         content: Text(L.backupCrashLogEmpty), behavior: SnackBarBehavior.floating));
       return;
     }
-    await Share.shareXFiles([XFile(f.path)], text: 'LastStats — crash_log.txt');
+    await AppShare.shareFile(f, text: 'LastStats — crash_log.txt');
   }
 
   Future<void> _clearLog() async {

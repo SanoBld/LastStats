@@ -1678,15 +1678,33 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                           Expanded(child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(name,
-                                style: AppText.title.copyWith(color: Colors.white, shadows: [Shadow(color: Colors.black54, blurRadius: 4)])),
-                              if (realName.isNotEmpty)
-                                Text(realName,
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.85),
-                                    fontSize: 13,
-                                    shadows: const [Shadow(color: Colors.black45, blurRadius: 4)],
-                                  )),
+                              ValueListenableBuilder<String>(
+                                valueListenable: displayNameNotifier,
+                                builder: (_, nickname, _) {
+                                  final bigName = nickname.isNotEmpty ? nickname : name;
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(bigName,
+                                        style: AppText.title.copyWith(color: Colors.white, shadows: [Shadow(color: Colors.black54, blurRadius: 4)])),
+                                      if (nickname.isNotEmpty)
+                                        Text(name,
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(alpha: 0.85),
+                                            fontSize: 13,
+                                            shadows: const [Shadow(color: Colors.black45, blurRadius: 4)],
+                                          ))
+                                      else if (realName.isNotEmpty)
+                                        Text(realName,
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(alpha: 0.85),
+                                            fontSize: 13,
+                                            shadows: const [Shadow(color: Colors.black45, blurRadius: 4)],
+                                          )),
+                                    ],
+                                  );
+                                },
+                              ),
                               Row(children: [
                                 if (country.isNotEmpty && country != 'None') ...[
                                   Icon(Icons.location_on_outlined,
@@ -3988,6 +4006,28 @@ class _NewsPage extends StatefulWidget {
 class _NewsPageState extends State<_NewsPage> {
   String? _type;
   DateTimeRange? _customRange;
+  final _searchCtrl = TextEditingController();
+  String _query = '';
+  bool _searching = false;
+  Timer? _debounce;
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  // Debounced so fast typing doesn't re-filter on every keystroke — also
+  // gives the small "searching…" indicator something real to show for.
+  void _onSearchChanged(String value) {
+    _debounce?.cancel();
+    setState(() => _searching = true);
+    _debounce = Timer(const Duration(milliseconds: 250), () {
+      if (!mounted) return;
+      setState(() { _query = value.trim().toLowerCase(); _searching = false; });
+    });
+  }
 
   // Items store dates as 'D/M' or 'D/M/YYYY' — assumes current year when absent.
   DateTime? _parseDate(String raw) {
@@ -4028,6 +4068,11 @@ class _NewsPageState extends State<_NewsPage> {
         final end   = DateTime(_customRange!.end.year, _customRange!.end.month, _customRange!.end.day, 23, 59, 59);
         if (d.isBefore(start) || d.isAfter(end)) return false;
       }
+      if (_query.isNotEmpty) {
+        final title = (e['title'] ?? '').toString().toLowerCase();
+        final body  = (e['body']  ?? '').toString().toLowerCase();
+        if (!title.contains(_query) && !body.contains(_query)) return false;
+      }
       return true;
     }).toList();
 
@@ -4065,6 +4110,35 @@ class _NewsPageState extends State<_NewsPage> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(L.newsItemsCount(filtered.length),
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _searchCtrl,
+              onChanged: _onSearchChanged,
+              decoration: InputDecoration(
+                hintText:   L.newsSearchHint,
+                prefixIcon: const Icon(Icons.search_rounded),
+                suffixIcon: _searching
+                    ? const Padding(
+                        padding: EdgeInsets.all(14),
+                        child: SizedBox(width: 16, height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2)),
+                      )
+                    : (_searchCtrl.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.close_rounded),
+                            onPressed: () {
+                              _searchCtrl.clear();
+                              _debounce?.cancel();
+                              setState(() { _query = ''; _searching = false; });
+                            },
+                          )
+                        : null),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                isDense: true,
+                filled: true,
+                fillColor: scheme.surfaceContainerHigh,
+              ),
+            ),
             const SizedBox(height: 10),
             Wrap(spacing: 8, runSpacing: 8, children: [
               FilterChip(
@@ -4497,7 +4571,7 @@ class _NewsDetailSheetState extends State<_NewsDetailSheet> {
     final tmp  = await getTemporaryDirectory();
     final file = File('${tmp.path}/laststats_news.png');
     await file.writeAsBytes(bytes);
-    await Share.shareXFiles([XFile(file.path)]);
+    await AppShare.shareFile(file);
   }
 }
 

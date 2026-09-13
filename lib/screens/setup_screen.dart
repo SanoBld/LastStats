@@ -37,6 +37,7 @@ class _SetupScreenState extends State<SetupScreen>
   final _usernameCtrl = TextEditingController();
   final _apikeyCtrl   = TextEditingController();
   final _secretCtrl   = TextEditingController();
+  final _displayNameCtrl = TextEditingController();
 
   bool    _obscureApiKey   = true;
   bool    _obscureSecret   = true;
@@ -110,6 +111,7 @@ class _SetupScreenState extends State<SetupScreen>
     _usernameCtrl.dispose();
     _apikeyCtrl.dispose();
     _secretCtrl.dispose();
+    _displayNameCtrl.dispose();
     _entryCtrl.dispose();
     _floatCtrl.dispose();
     super.dispose();
@@ -259,6 +261,15 @@ class _SetupScreenState extends State<SetupScreen>
         await prefs.remove('ls_apikey');
         await prefs.remove('ls_secret_key');
         await prefs.remove('ls_session_key');
+      }
+
+      // Custom display name (optional) — stored regardless of "remember
+      // me", same as the other appearance/behavior prefs.
+      final customName = _displayNameCtrl.text.trim();
+      if (customName.isNotEmpty) {
+        displayNameNotifier.value = customName;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('ls_display_name', customName);
       }
 
       final totalScrobbles =
@@ -436,6 +447,23 @@ class _SetupScreenState extends State<SetupScreen>
                                       labelText: L.setupUsernameLabel,
                                       prefixIcon: const Icon(
                                           Icons.person_outline_rounded),
+                                      border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(14)),
+                                      filled:    true,
+                                      fillColor: scheme.surface,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 14),
+
+                                  // Custom display name — optional, editable
+                                  // later in Settings > Account.
+                                  TextField(
+                                    controller:      _displayNameCtrl,
+                                    textInputAction: TextInputAction.next,
+                                    decoration: InputDecoration(
+                                      labelText: L.settingsDisplayNameLabel,
+                                      hintText:  L.settingsDisplayNameHint,
+                                      prefixIcon: const Icon(Icons.badge_outlined),
                                       border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(14)),
                                       filled:    true,

@@ -530,6 +530,10 @@ class AppStringsEn implements AppStrings {
   @override String get settingsDashboardChartSection => 'Dashboard chart';
   @override String get dashChartCalendarLabel => 'Listening calendar';
   @override String get dashChartMonthlyLabel => 'Monthly bars';
+  @override String get settingsDisplayNameSection => 'Custom name';
+  @override String get settingsDisplayNameLabel => 'What should we call you?';
+  @override String get settingsDisplayNameHint => 'E.g. Sano Bld — leave empty to use your account name';
+  @override String get newsSearchHint => 'Search the news…';
   @override String get notifWorkManagerInfo => 'Notifications run in the background via WorkManager. The app does not need to be open. An internet connection is required.';
   @override String get notifIntervalTitle       => 'Every X scrobbles';
   @override String get notifIntervalSubtitle    => 'Get notified at regular intervals';

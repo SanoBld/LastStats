@@ -530,6 +530,10 @@ class AppStringsPt implements AppStrings {
   @override String get settingsDashboardChartSection => 'Gráfico do painel';
   @override String get dashChartCalendarLabel => 'Calendário de escuta';
   @override String get dashChartMonthlyLabel => 'Barras mensais';
+  @override String get settingsDisplayNameSection => 'Nome personalizado';
+  @override String get settingsDisplayNameLabel => 'Como devemos te chamar?';
+  @override String get settingsDisplayNameHint => 'Ex. Sano Bld — deixe vazio para usar o nome da conta';
+  @override String get newsSearchHint => 'Pesquisar nas novidades…';
   @override String get notifWorkManagerInfo => 'As notificações são executadas em segundo plano via WorkManager. O app não precisa estar aberto. É necessária conexão com a internet.';
   @override String get notifIntervalTitle       => 'A cada X scrobbles';
   @override String get notifIntervalSubtitle    => 'Receba avisos em intervalos regulares';

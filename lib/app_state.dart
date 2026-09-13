@@ -8,6 +8,11 @@ final useDynamicColorNotifier    = ValueNotifier<bool>(false);
 final useNowPlayingColorNotifier = ValueNotifier<bool>(false);
 final localeNotifier             = ValueNotifier<String>('fr');
 
+// Custom "what should we call you" name, set in the intro flow or in
+// Settings. Empty = fall back to the Last.fm account name everywhere.
+// Saved as 'ls_display_name'.
+final displayNameNotifier        = ValueNotifier<String>('');
+
 // ── Day/night accent colors ──────────────────────────────────────────────
 // Use a different accent color for the light theme than for the dark
 // theme, instead of a single accent everywhere.
