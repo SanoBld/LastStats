@@ -482,6 +482,13 @@ class AppStringsDe implements AppStrings {
   @override String get settingsDisplayNameLabel => 'Wie sollen wir dich nennen?';
   @override String get settingsDisplayNameHint => 'Z. B. Sano Bld — leer lassen, um den Kontonamen zu verwenden';
   @override String get newsSearchHint => 'News durchsuchen…';
+  @override String get aboutOpenSourceLibs => 'Open-Source-Bibliotheken';
+  @override String get aboutOpenSourceLibsSub => 'Alle Flutter-Pakete, die für diese App verwendet wurden.';
+  @override String get aboutLicenseSection => 'Lizenz';
+  @override String get aboutLicenseText => 'Dieses Projekt steht unter der MIT-Lizenz: du darfst es frei nutzen, verändern, duplizieren oder weiterverbreiten, nenne einfach meinen Namen.';
+  @override String get aboutLicenseLink => 'Vollständige Lizenz ansehen';
+  @override String get languageAiNote => 'Alle Übersetzungen, auch Französisch, wurden mit KI-Unterstützung erstellt und können Ungenauigkeiten enthalten.';
+  @override String get aboutAiDevNote => 'Zur Transparenz: KI wurde auch bei der Entwicklung dieser App eingesetzt (nicht alles, aber ein guter Teil des Codes wurde mit ihrer Hilfe geschrieben).';
   @override String get notifWorkManagerInfo => 'Benachrichtigungen laufen über WorkManager im Hintergrund. Die App muss nicht geöffnet sein. Eine Internetverbindung ist erforderlich.';
   @override String get notifIntervalTitle => 'Alle X Scrobbles';
   @override String get notifIntervalSubtitle => 'In regelmäßigen Abständen benachrichtigt werden';

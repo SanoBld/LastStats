@@ -531,6 +531,13 @@ class AppStringsZh implements AppStrings {
   @override String get settingsDisplayNameLabel => '我们该怎么称呼你？';
   @override String get settingsDisplayNameHint => '例如 Sano Bld — 留空则使用账号名称';
   @override String get newsSearchHint => '搜索动态…';
+  @override String get aboutOpenSourceLibs => '开源库';
+  @override String get aboutOpenSourceLibsSub => '构建此应用所使用的所有 Flutter 包。';
+  @override String get aboutLicenseSection => '许可证';
+  @override String get aboutLicenseText => '本项目基于 MIT 许可证发布：你可以自由使用、修改、复制或再分发，只需注明出处即可。';
+  @override String get aboutLicenseLink => '查看完整许可证';
+  @override String get languageAiNote => '包括法语在内的所有翻译均由 AI 辅助生成，可能存在不准确之处。';
+  @override String get aboutAiDevNote => '仅供参考：本应用的开发也借助了 AI（并非全部，但相当一部分代码是在 AI 协助下编写的）。';
   @override String get notifWorkManagerInfo => '通知通过 WorkManager 在后台运行，应用无需保持打开状态，但需要网络连接。';
   @override String get notifIntervalTitle       => '每 X 次 scrobble';
   @override String get notifIntervalSubtitle    => '按固定间隔接收通知';

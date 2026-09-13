@@ -534,6 +534,13 @@ class AppStringsPt implements AppStrings {
   @override String get settingsDisplayNameLabel => 'Como devemos te chamar?';
   @override String get settingsDisplayNameHint => 'Ex. Sano Bld — deixe vazio para usar o nome da conta';
   @override String get newsSearchHint => 'Pesquisar nas novidades…';
+  @override String get aboutOpenSourceLibs => 'Bibliotecas de código aberto';
+  @override String get aboutOpenSourceLibsSub => 'Todos os pacotes Flutter usados para criar o app.';
+  @override String get aboutLicenseSection => 'Licença';
+  @override String get aboutLicenseText => 'Este projeto é publicado sob a licença MIT: fique à vontade para usar, modificar, duplicar ou redistribuir, só me cite.';
+  @override String get aboutLicenseLink => 'Ver licença completa';
+  @override String get languageAiNote => 'Todas as traduções, incluindo o francês, foram geradas com ajuda de IA e podem conter imprecisões.';
+  @override String get aboutAiDevNote => 'A título informativo: a IA também foi usada para ajudar a desenvolver este app (não tudo, mas boa parte do código foi escrita com a sua ajuda).';
   @override String get notifWorkManagerInfo => 'As notificações são executadas em segundo plano via WorkManager. O app não precisa estar aberto. É necessária conexão com a internet.';
   @override String get notifIntervalTitle       => 'A cada X scrobbles';
   @override String get notifIntervalSubtitle    => 'Receba avisos em intervalos regulares';

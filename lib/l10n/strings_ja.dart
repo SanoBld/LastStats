@@ -482,6 +482,13 @@ class AppStringsJa implements AppStrings {
   @override String get settingsDisplayNameLabel => '何と呼べばいい？';
   @override String get settingsDisplayNameHint => '例: Sano Bld — 空欄の場合はアカウント名を使用します';
   @override String get newsSearchHint => 'お知らせを検索…';
+  @override String get aboutOpenSourceLibs => 'オープンソースライブラリ';
+  @override String get aboutOpenSourceLibsSub => 'このアプリの構築に使用したすべての Flutter パッケージ。';
+  @override String get aboutLicenseSection => 'ライセンス';
+  @override String get aboutLicenseText => 'このプロジェクトは MIT ライセンスの下で公開されています。自由に使用、改変、複製、再配布できますが、私の名前を記載してください。';
+  @override String get aboutLicenseLink => 'ライセンス全文を見る';
+  @override String get languageAiNote => 'フランス語を含むすべての翻訳は AI の支援を受けて作成されており、不正確な場合があります。';
+  @override String get aboutAiDevNote => '参考までに：このアプリの開発にも AI の支援を活用しています（すべてではありませんが、コードのかなりの部分は AI の助けを借りて書かれています）。';
   @override String get notifWorkManagerInfo => '通知はWorkManagerによりバックグラウンドで動作します。アプリを開いておく必要はありません。インターネット接続が必要です。';
   @override String get notifIntervalTitle => 'スクロブルX回ごと';
   @override String get notifIntervalSubtitle => '一定間隔で通知を受け取ります';

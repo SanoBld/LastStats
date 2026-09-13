@@ -576,6 +576,19 @@ abstract class AppStrings {
   // ── News search ──────────────────────────────────────────────────────────
   String get newsSearchHint;
 
+  // ── About: transparency (open-source libraries, license) ────────────────
+  String get aboutOpenSourceLibs;
+  String get aboutOpenSourceLibsSub;
+  String get aboutLicenseSection;
+  String get aboutLicenseText;
+  String get aboutLicenseLink;
+
+  // ── Language page: AI-translation disclaimer ─────────────────────────────
+  String get languageAiNote;
+
+  // ── About: AI-assisted development disclosure ────────────────────────────
+  String get aboutAiDevNote;
+
   // ── Notifications page ───────────────────────────────────────────────────
   String get notifWorkManagerInfo;
   String get notifIntervalTitle;

@@ -108,6 +108,25 @@ class _LanguagePageState extends State<LanguagePage> {
           ]),
         ),
         const SizedBox(height: 20),
+
+        // AI-translation disclaimer
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: scheme.surfaceContainerHigh,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
+          ),
+          child: Row(children: [
+            Icon(Icons.auto_awesome_rounded, size: 16, color: scheme.onSurfaceVariant),
+            const SizedBox(width: 10),
+            Expanded(child: Text(
+              L.languageAiNote,
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+            )),
+          ]),
+        ),
+        const SizedBox(height: 20),
       ]),
     );
   }

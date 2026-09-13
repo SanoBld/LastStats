@@ -534,6 +534,13 @@ class AppStringsEn implements AppStrings {
   @override String get settingsDisplayNameLabel => 'What should we call you?';
   @override String get settingsDisplayNameHint => 'E.g. Sano Bld — leave empty to use your account name';
   @override String get newsSearchHint => 'Search the news…';
+  @override String get aboutOpenSourceLibs => 'Open-source libraries';
+  @override String get aboutOpenSourceLibsSub => 'Every Flutter package used to build this app.';
+  @override String get aboutLicenseSection => 'License';
+  @override String get aboutLicenseText => 'This project is released under the MIT License: feel free to use, modify, duplicate or redistribute it, just credit me.';
+  @override String get aboutLicenseLink => 'View full license';
+  @override String get languageAiNote => 'All translations, including French, were generated with AI assistance and may contain inaccuracies.';
+  @override String get aboutAiDevNote => 'For transparency: AI was also used to help develop this app (not all of it, but a good part of the code was written with its help).';
   @override String get notifWorkManagerInfo => 'Notifications run in the background via WorkManager. The app does not need to be open. An internet connection is required.';
   @override String get notifIntervalTitle       => 'Every X scrobbles';
   @override String get notifIntervalSubtitle    => 'Get notified at regular intervals';

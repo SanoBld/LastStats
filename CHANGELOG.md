@@ -51,3 +51,9 @@
 **Performance (Windows)**
 - Notification system setup no longer blocks the app's first frame on Windows — the window now appears noticeably faster on startup
 - A few redundant startup steps now run in parallel instead of one after another
+
+**Transparency**
+- About page now lists every open-source Flutter package used to build the app, each linking to its pub.dev page
+- Added a proper open-source license (MIT) — use, modify, duplicate or redistribute freely, just credit the author — with a link to the full license text
+- Translations page now notes that ALL translations, including French, were generated with AI assistance and may contain inaccuracies
+- About page now also notes that AI was used to help develop a good part of the app's code
