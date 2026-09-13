@@ -342,28 +342,34 @@ Widget build(BuildContext context) {
       SettingsSection(
         label: L.aboutOpenSourceLibs,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
-            child: Text(L.aboutOpenSourceLibsSub,
-                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
-            child: Wrap(spacing: 8, runSpacing: 8, children: [
-              for (final pkg in const [
-                &#39;cupertino_icons&#39;, &#39;battery_plus&#39;, &#39;flutter_displaymode&#39;, &#39;http&#39;,
-                &#39;dynamic_color&#39;, &#39;shared_preferences&#39;, &#39;path_provider&#39;, &#39;share_plus&#39;,
-                &#39;qr_flutter&#39;, &#39;mobile_scanner&#39;, &#39;app_links&#39;, &#39;url_launcher&#39;,
-                &#39;palette_generator&#39;, &#39;flutter_local_notifications&#39;, &#39;workmanager&#39;,
-                &#39;window_manager&#39;, &#39;audioplayers&#39;, &#39;flutter_svg&#39;, &#39;file_picker&#39;,
-                &#39;package_info_plus&#39;, &#39;crypto&#39;, &#39;sensors_plus&#39;, &#39;home_widget&#39;,
-              ])
-                ActionChip(
-                  label: Text(pkg),
-                  avatar: const Icon(Icons.open_in_new_rounded, size: 14),
-                  onPressed: () =&gt; _open(&#39;https:&#47;&#47;pub.dev&#47;packages&#47;$pkg&#39;),
+          Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              title: Text(L.aboutOpenSourceLibsSub,
+                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+              childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Wrap(spacing: 8, runSpacing: 8, children: [
+                    for (final pkg in const [
+                      &#39;cupertino_icons&#39;, &#39;battery_plus&#39;, &#39;flutter_displaymode&#39;, &#39;http&#39;,
+                      &#39;dynamic_color&#39;, &#39;shared_preferences&#39;, &#39;path_provider&#39;, &#39;share_plus&#39;,
+                      &#39;qr_flutter&#39;, &#39;mobile_scanner&#39;, &#39;app_links&#39;, &#39;url_launcher&#39;,
+                      &#39;palette_generator&#39;, &#39;flutter_local_notifications&#39;, &#39;workmanager&#39;,
+                      &#39;window_manager&#39;, &#39;audioplayers&#39;, &#39;flutter_svg&#39;, &#39;file_picker&#39;,
+                      &#39;package_info_plus&#39;, &#39;crypto&#39;, &#39;sensors_plus&#39;, &#39;home_widget&#39;,
+                    ])
+                      ActionChip(
+                        label: Text(pkg),
+                        avatar: const Icon(Icons.open_in_new_rounded, size: 14),
+                        onPressed: () =&gt; _open(&#39;https:&#47;&#47;pub.dev&#47;packages&#47;$pkg&#39;),
+                      ),
+                  ]),
                 ),
-            ]),
+              ],
+            ),
           ),
         ],
       ),
