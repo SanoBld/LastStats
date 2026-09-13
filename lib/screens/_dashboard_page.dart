@@ -335,40 +335,37 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     });
   }
 
-  // How many days back the mini calendar heatmap shows on the dashboard.
-  // Short window on purpose: this is a quick glance widget, not the full
-  // multi-year calendar from the Charts tab.
+  // How many days back the dashboard chart looks at. Same short window for
+  // both the calendar and the monthly bars — this is a quick glance widget,
+  // not the full multi-year history from the Charts tab, so it stays fast.
   static const _kDashChartDays = 60;
-  // How many months of history to fetch for the "monthly bars" choice.
-  static const _kDashChartMonths = 6;
 
   // ── Dashboard chart (listening calendar / monthly bars) ─────────────────
-  // Fetches a few months of scrobbles once, fully paginated (not just the
-  // first page), and builds both a day-by-day map (for the calendar
-  // heatmap) and a month-by-month map (for the monthly bars). Fetching
-  // only page 1 used to silently drop scrobbles on busy months — fixed by
-  // looping through every page the API reports.
+  // Loads cached data first (instant, if we have any from the last 30 min),
+  // then refreshes from the API in the background. Pages are fetched in
+  // parallel once we know how many there are — fetching them one by one
+  // with a delay in between (the old approach) is what made this slow.
   Future<void> _loadDashboardChart() async {
     if (_dashChartLoading) return;
+
+    // Instant paint from cache, if any.
+    final cached = DataCache.getSync('dashchart_${_kDashChartDays}d') as Map?;
+    if (cached != null) {
+      setState(() {
+        _dashChartCalendar = Map<String, int>.from(cached['calendar'] as Map);
+        _dashChartMonthly  = Map<String, int>.from(cached['monthly']  as Map);
+        _dashChartLoaded   = true;
+      });
+    }
+
     setState(() => _dashChartLoading = true);
     try {
       final now   = DateTime.now();
-      final since = DateTime(now.year, now.month - (_kDashChartMonths - 1), 1);
+      final since = now.subtract(const Duration(days: _kDashChartDays - 1));
       final calendarData = <String, int>{};
       final monthlyData  = <String, int>{};
 
-      var page       = 1;
-      var totalPages = 1;
-      do {
-        final data = await widget.service.getRecentTracks(
-          limit: 200, page: page,
-          from: since.millisecondsSinceEpoch ~/ 1000,
-          to:   now.millisecondsSinceEpoch   ~/ 1000,
-        );
-        final attr = data['@attr'] as Map?;
-        if (attr != null) {
-          totalPages = int.tryParse(attr['totalPages']?.toString() ?? '1') ?? 1;
-        }
+      void ingest(Map data) {
         final raw  = data['track'];
         final list = raw is List ? raw : (raw != null ? [raw] : <dynamic>[]);
         for (final t in list) {
@@ -386,10 +383,31 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
           calendarData[dayKey]  = (calendarData[dayKey]  ?? 0) + 1;
           monthlyData[monthKey] = (monthlyData[monthKey] ?? 0) + 1;
         }
-        page++;
-        // Small delay between pages, same courtesy as the full sync service.
-        if (page <= totalPages) await Future.delayed(const Duration(milliseconds: 150));
-      } while (page <= totalPages);
+      }
+
+      // First page tells us how many pages there are in total.
+      final first = await widget.service.getRecentTracks(
+        limit: 200, page: 1,
+        from: since.millisecondsSinceEpoch ~/ 1000,
+        to:   now.millisecondsSinceEpoch   ~/ 1000,
+      );
+      ingest(first);
+      final attr = first['@attr'] as Map?;
+      final totalPages = int.tryParse(attr?['totalPages']?.toString() ?? '1') ?? 1;
+
+      // Remaining pages (60 days rarely needs more than 1-2 anyway), all
+      // fetched at once instead of one-by-one.
+      if (totalPages > 1) {
+        final rest = await Future.wait(List.generate(totalPages - 1, (i) {
+          final page = i + 2;
+          return widget.service.getRecentTracks(
+            limit: 200, page: page,
+            from: since.millisecondsSinceEpoch ~/ 1000,
+            to:   now.millisecondsSinceEpoch   ~/ 1000,
+          ).catchError((_) => <String, dynamic>{});
+        }));
+        for (final data in rest) { ingest(data); }
+      }
 
       if (!mounted) return;
       setState(() {
@@ -398,6 +416,8 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         _dashChartLoading  = false;
         _dashChartLoaded   = true;
       });
+      await DataCache.set('dashchart_${_kDashChartDays}d',
+          {'calendar': calendarData, 'monthly': monthlyData});
     } catch (_) {
       if (mounted) setState(() => _dashChartLoading = false);
     }
