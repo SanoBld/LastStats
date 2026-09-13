@@ -87,6 +87,12 @@
 <li>Adaptive navigation: a side rail on wide screens, a bottom bar on smaller ones, and a manual switch if you prefer one over the other</li>
 <li>Show or hide labels under the navigation bar icons</li>
 </ul>
+<p><strong>🏠 Dashboard</strong></p>
+<ul>
+<li>Pick your own nickname (set during setup or later in Settings) — shown instead of your raw Last.fm account name</li>
+<li>Choose which chart the dashboard shows: a listening calendar (last 60 days) or monthly bars</li>
+<li>Quick stats, now playing, recent tracks, and a friends section, all customizable from Dashboard settings</li>
+</ul>
 <p><strong>❤️ Favorites</strong></p>
 <ul>
 <li>Like tracks, artists, and albums directly from the app, through your own Last.fm account</li>
@@ -105,8 +111,18 @@
 <li>Flexible time ranges: 7 days, 1 month, 3 months, 6 months, 12 months, or all time</li>
 <li>Background sync that keeps your stats up to date automatically, even when the app is closed</li>
 <li>Local cache to reduce loading times and API calls</li>
-<li>Smart artwork search: if Last.fm has no image, the app looks it up through iTunes, Deezer, and the Cover Art Archive</li>
+<li>Smart artwork search: if Last.fm has no image, the app looks it up through iTunes, Deezer, MusicBrainz, and the Cover Art Archive</li>
 <li>No fake or simulated data, everything comes from your real listening history</li>
+</ul>
+<p><strong>🔎 Search</strong></p>
+<ul>
+<li>A dedicated search tab for artists, albums, tracks, and Last.fm profiles</li>
+<li>Search bar in the news page too, filtering by title and content as you type</li>
+<li>One consistent search bar look across the app: News, Search, and Settings</li>
+</ul>
+<p><strong>📤 Sharing</strong></p>
+<ul>
+<li>Share artwork, charts, achievement badges, and recap cards anywhere — including Windows, macOS, and Linux, where the file is saved and revealed directly in your file explorer</li>
 </ul>
 <p><strong>🔔 Notifications</strong></p>
 <ul>
@@ -118,11 +134,11 @@
 <ul>
 <li>Available in French, English, Spanish, Chinese, Portuguese, German, Italian, Japanese, Russian, and Arabic</li>
 <li>The app follows your system language automatically, or you can pick one yourself from the settings</li>
+<li>All translations, including French, are generated with AI assistance and may contain the occasional inaccuracy — corrections are always welcome</li>
 </ul>
 <p><strong>⚙️ Other little touches</strong></p>
 <ul>
 <li>Haptic feedback on key actions</li>
-<li>A quick search bar to find any artist, album, or track</li>
 <li>Import and export your settings and appearance, useful when switching devices</li>
 <li>Built in update checker that lets you know as soon as a new version is ready to download</li>
 </ul>
@@ -133,13 +149,47 @@
 <p>Prebuilt files are also generated automatically after each update, through GitHub Actions:</p>
 <p><a href="https://github.com/SanoBld/LastStats-App/actions">https://github.com/SanoBld/LastStats-App/actions</a></p>
 <p>Builds coming straight from Actions contain the latest code and may include bugs that have not been fixed yet. If you want a stable experience, use the releases page instead.</p>
-<p>Supported platforms: Android, Windows, macOS, and Linux.</p>
+<p>Supported platforms: <strong>Android, Windows, macOS, and Linux.</strong></p>
+<hr>
+<h2 id="-installation">💻 Installation</h2>
+<h3 id="android">Android</h3>
+<ol>
+<li>Download the <code>.apk</code> file from the <a href="https://github.com/SanoBld/LastStats-App/releases">releases page</a>.</li>
+<li>Open it on your phone. If Android blocks the install, allow "Install unknown apps" for the app you used to open the file (browser or file manager), then try again.</li>
+</ol>
+<h3 id="windows">Windows</h3>
+<ol>
+<li>Download the Windows <code>.zip</code> (or <code>.exe</code>, depending on the release) from the <a href="https://github.com/SanoBld/LastStats-App/releases">releases page</a>.</li>
+<li>Unzip it anywhere, then run <code>LastStats.exe</code>.</li>
+<li>Windows SmartScreen may warn about an unrecognized app since the build isn't code-signed — click "More info" then "Run anyway" to continue.</li>
+<li>Sharing files from the app (charts, artwork, etc.) saves them to your Downloads folder and opens Explorer with the file selected — this is expected on an unpackaged build like this one.</li>
+</ol>
+<h3 id="macos">macOS</h3>
+<ol>
+<li>Download the macOS build from the <a href="https://github.com/SanoBld/LastStats-App/releases">releases page</a>.</li>
+<li>Move <code>LastStats.app</code> to your Applications folder.</li>
+<li>Since the build isn't notarized, the first launch requires right-click → "Open" → "Open" again (macOS will otherwise refuse to run apps from an unidentified developer).</li>
+</ol>
+<h3 id="linux">Linux</h3>
+<ol>
+<li>Download the Linux build from the <a href="https://github.com/SanoBld/LastStats-App/releases">releases page</a>.</li>
+<li>Extract it, then run the <code>LastStats</code> executable (<code>chmod +x LastStats</code> first if needed).</li>
+</ol>
+<h3 id="building-from-source">Building from source</h3>
+<p>Requires the <a href="https://docs.flutter.dev/get-started/install">Flutter SDK</a> (matching the version in <code>pubspec.yaml</code>).</p>
+<pre class="language-bash"><code class="language-bash">git clone https://github.com/SanoBld/LastStats.git
+cd LastStats
+flutter pub get
+flutter run              # run on a connected device/emulator
+flutter build apk        # or: windows / macos / linux
+</code></pre>
 <hr>
 <h2 id="-built-with">🛠️ Built with</h2>
 <ul>
 <li>Flutter and Dart</li>
 <li>Material Design 3 (Material You)</li>
-<li>Last.fm REST API, with iTunes Search, Deezer, and Cover Art Archive as backup sources for missing artwork</li>
+<li>Last.fm REST API, with iTunes Search, Deezer, MusicBrainz, and the Cover Art Archive as backup sources for missing artwork</li>
+<li>The full list of open-source packages used is visible in-app, under Settings → About, each linking to its pub.dev page</li>
 </ul>
 <hr>
 <h2 id="-star-history">⭐ Star history</h2>
@@ -156,6 +206,13 @@
 <p><a href="https://github.com/SanoBld/LastStats-App/issues">https://github.com/SanoBld/LastStats-App/issues</a></p>
 <p>Or join the Discord to chat directly and follow what's coming next:</p>
 <p><a href="https://discord.gg/JjqmkQgZBs">https://discord.gg/JjqmkQgZBs</a></p>
+<hr>
+<h2 id="-license">📄 License</h2>
+<p>This project is released under the <strong>MIT License</strong> — see <a href="LICENSE">LICENSE</a> for the full text.</p>
+<p>In short: you're free to use, modify, duplicate, or redistribute this project, for any purpose, as long as you credit the original author (Sano Bld).</p>
+<hr>
+<h2 id="-a-note-on-ai">🤖 A note on AI</h2>
+<p>For transparency: AI was used as a tool throughout this project — to help write and review a good part of the app's code, and to generate all of the in-app translations (French included). It's not the whole story behind this app, but it's a real part of it, and it felt worth stating plainly rather than leaving it unsaid.</p>
 <hr>
 <h2 id="about">About</h2>
 <p>This project is developed independently, in my free time. It is open source, so you are free to use it, modify it, or contribute to it. If you enjoy the app, a star on the repository always helps.</p>
