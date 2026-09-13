@@ -6,6 +6,11 @@ import '../../l10n/l10n.dart';
 import '../../app_state.dart';
 import 'settings_helpers.dart';
 
+// Tiny inline FR/EN helper for the 2 new labels below (not worth adding
+// full L10n keys for every language just for this small picker).
+String _dashChartLabel(String fr, String en) =>
+    localeNotifier.value == 'en' ? en : fr;
+
 // Stat-card ids that open a detail sheet / page when tapped on the
 // dashboard (see _DashboardPage._statCardWidget in _dashboard_page.dart).
 // Kept in sync manually with that switch — used only for the little
@@ -37,10 +42,10 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   // ── Sections visibles ────────────────────────────────────────────────
   bool   _showNowPlay           = true;
   bool   _showStats             = true;
-  bool   _showArtists           = true;
-  bool   _showTracks            = true;
-  bool   _showAlbums            = true;
   bool   _showRecent            = true;
+  // Which chart replaces the old top artists/albums/tracks block.
+  // 'calendar' = listening calendar (heatmap), 'monthly' = monthly bars.
+  String _dashboardChart        = 'calendar';
   bool   _showFriends           = true;
   bool   _showFavorites         = true;
   bool   _headerMusicAnim       = false; // equalizer animation when music is playing
@@ -80,9 +85,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
       _fallbackCustomUrl     = p.getString('ls_header_fallback_url')     ?? '';
       _showNowPlay           = p.getBool('ls_show_nowplay')              ?? true;
       _showStats             = p.getBool('ls_show_stats')                ?? true;
-      _showArtists           = p.getBool('ls_show_artists')              ?? true;
-      _showAlbums            = p.getBool('ls_show_albums')               ?? true;
-      _showTracks            = p.getBool('ls_show_tracks')               ?? true;
+      _dashboardChart        = p.getString('ls_dashboard_chart')         ?? 'calendar';
       _showRecent            = p.getBool('ls_show_recent')               ?? true;
       _showFriends           = p.getBool('ls_show_friends')              ?? true;
       _showFavorites         = p.getBool('ls_show_favorites')            ?? true;
@@ -452,21 +455,6 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
             onChanged: (v) async { await _set('ls_show_stats', v); setState(() => _showStats = v); }),
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
-            secondary: const Icon(Icons.mic_rounded),
-            title: Text(L.settingsTopArtistsSection), value: _showArtists,
-            onChanged: (v) async { await _set('ls_show_artists', v); setState(() => _showArtists = v); }),
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          SwitchListTile(
-            secondary: const Icon(Icons.album_rounded),
-            title: Text(L.settingsTopAlbumsSection), value: _showAlbums,
-            onChanged: (v) async { await _set('ls_show_albums', v); setState(() => _showAlbums = v); }),
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          SwitchListTile(
-            secondary: const Icon(Icons.music_note_rounded),
-            title: Text(L.settingsTopTracksSection), value: _showTracks,
-            onChanged: (v) async { await _set('ls_show_tracks', v); setState(() => _showTracks = v); }),
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          SwitchListTile(
             secondary: const Icon(Icons.history_rounded),
             title: Text(L.dashRecentPlaysLabel), value: _showRecent,
             onChanged: (v) async { await _set('ls_show_recent', v); setState(() => _showRecent = v); }),
@@ -501,6 +489,44 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
             },
           ),
         ]),
+
+        const SizedBox(height: 16),
+
+        // ── Graphique du dashboard ──────────────────────────────────────────
+        // Lets the user pick which chart replaces the old top artists /
+        // albums / tracks block on the dashboard.
+        SettingsSection(
+          label: _dashChartLabel('Graphique du dashboard', 'Dashboard chart'),
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+              child: Wrap(spacing: 8, runSpacing: 8, children: [
+                (
+                  'calendar',
+                  _dashChartLabel('Calendrier musical', 'Listening calendar'),
+                  Icons.grid_on_rounded,
+                ),
+                (
+                  'monthly',
+                  _dashChartLabel('Barres mensuelles', 'Monthly bars'),
+                  Icons.calendar_month_rounded,
+                ),
+              ].map((opt) {
+                final (key, label, icon) = opt;
+                return FilterChip(
+                  avatar: Icon(icon, size: 16),
+                  label: Text(label),
+                  selected: _dashboardChart == key,
+                  showCheckmark: false,
+                  onSelected: (_) async {
+                    await _set('ls_dashboard_chart', key);
+                    setState(() => _dashboardChart = key);
+                  },
+                );
+              }).toList()),
+            ),
+          ],
+        ),
 
         const SizedBox(height: 16),
 

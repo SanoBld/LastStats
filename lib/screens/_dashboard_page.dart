@@ -115,11 +115,16 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   // Section visibility
   bool _showNowPlay  = true;
   bool _showStats    = true;
-  bool _showArtists  = true;
-  bool _showAlbums   = true;
-  bool _showTracks   = true;
   bool _showRecent   = true;
   int _lovedCount = 0;
+
+  // Dashboard chart (replaces the old top artists/albums/tracks block).
+  // 'calendar' = listening calendar heatmap, 'monthly' = monthly bars.
+  String _dashboardChart      = 'calendar';
+  Map<String, int>? _dashChartCalendar;
+  Map<String, int>? _dashChartMonthly;
+  bool _dashChartLoading      = false;
+  bool _dashChartLoaded       = false;
 
   // In-app news feed
   List<Map<String, dynamic>> _newsItems   = [];
@@ -162,6 +167,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     _initWithCache();
     _startTimers();
     _checkNewStory();
+    _loadDashboardChart();
     // Eco mode toggled mid-session → restart timers with the new interval.
     ecoModeActiveNotifier.addListener(_onEcoModeChanged);
   }
@@ -318,9 +324,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
       _headerMusicAnim       = p.getBool('ls_header_music_anim')        ?? false;
       _showNowPlay           = p.getBool('ls_show_nowplay')             ?? true;
       _showStats             = p.getBool('ls_show_stats')               ?? true;
-      _showArtists           = p.getBool('ls_show_artists')             ?? true;
-      _showAlbums            = p.getBool('ls_show_albums')              ?? true;
-      _showTracks            = p.getBool('ls_show_tracks')              ?? true;
+      _dashboardChart        = p.getString('ls_dashboard_chart')        ?? 'calendar';
       _showRecent            = p.getBool('ls_show_recent')              ?? true;
       _showFriends           = p.getBool('ls_show_friends')             ?? true;
       final rawCards = p.getStringList('ls_stat_cards');
@@ -329,6 +333,92 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
       _favFriends  = Set<String>.from(p.getStringList('ls_fav_friends')  ?? []);
       _favProfiles = Set<String>.from(p.getStringList('ls_fav_profiles') ?? []);
     });
+  }
+
+  // ── Dashboard chart (listening calendar / monthly bars) ─────────────────
+  // Fetches the last 12 months of scrobbles once and builds both a
+  // day-by-day map (for the calendar heatmap) and a month-by-month map
+  // (for the monthly bars), so switching the chart choice needs no refetch.
+  Future<void> _loadDashboardChart() async {
+    if (_dashChartLoading) return;
+    setState(() => _dashChartLoading = true);
+    try {
+      final now = DateTime.now();
+      final calendarData = <String, int>{};
+      final monthlyData  = <String, int>{};
+      final futures = List.generate(12, (i) {
+        final month = DateTime(now.year, now.month - (11 - i), 1);
+        final nextM = DateTime(month.year, month.month + 1, 1);
+        return widget.service.getRecentTracks(
+          limit: 200, page: 1,
+          from: month.millisecondsSinceEpoch ~/ 1000,
+          to:   nextM.millisecondsSinceEpoch ~/ 1000,
+        ).catchError((_) => <String, dynamic>{});
+      });
+      final pages = await Future.wait(futures);
+      for (final pageData in pages) {
+        final raw  = pageData['track'];
+        final list = raw is List ? raw : (raw != null ? [raw] : <dynamic>[]);
+        for (final t in list) {
+          final m = t as Map?;
+          if (m == null) continue;
+          if (m['@attr']?['nowplaying'] == 'true') continue;
+          final uts = (m['date'] as Map?)?['uts']?.toString() ?? '';
+          if (uts.isEmpty) continue;
+          final sec = int.tryParse(uts);
+          if (sec == null) continue;
+          final dt = DateTime.fromMillisecondsSinceEpoch(sec * 1000);
+          final dayKey   = '${dt.year}-${dt.month.toString().padLeft(2, '0')}-'
+              '${dt.day.toString().padLeft(2, '0')}';
+          final monthKey = '${dt.year}-${dt.month.toString().padLeft(2, '0')}';
+          calendarData[dayKey]  = (calendarData[dayKey]  ?? 0) + 1;
+          monthlyData[monthKey] = (monthlyData[monthKey] ?? 0) + 1;
+        }
+      }
+      if (!mounted) return;
+      setState(() {
+        _dashChartCalendar = calendarData;
+        _dashChartMonthly  = monthlyData;
+        _dashChartLoading  = false;
+        _dashChartLoaded   = true;
+      });
+    } catch (_) {
+      if (mounted) setState(() => _dashChartLoading = false);
+    }
+  }
+
+  // Builds the header + content for the chosen dashboard chart.
+  Widget _buildDashboardChartSection() {
+    final now   = DateTime.now();
+    final start = DateTime(now.year, now.month - 11, 1);
+    final title = _dashboardChart == 'monthly'
+        ? _ct('Barres mensuelles', 'Monthly bars')
+        : _ct('Calendrier musical', 'Listening calendar');
+    final icon = _dashboardChart == 'monthly'
+        ? Icons.calendar_month_rounded
+        : Icons.grid_on_rounded;
+
+    Widget content;
+    if (_dashChartLoading && !_dashChartLoaded) {
+      content = const Padding(
+        padding: EdgeInsets.symmetric(vertical: 24),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    } else if (_dashboardChart == 'monthly') {
+      content = _MonthlyCard(monthly: _dashChartMonthly ?? const <String, int>{});
+    } else {
+      content = _HeatmapCard(
+        data:  _dashChartCalendar ?? const <String, int>{},
+        start: start,
+        end:   now,
+      );
+    }
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      _SectionHeader(title: title, icon: icon),
+      const SizedBox(height: 10),
+      content,
+    ]);
   }
 
   Future<void> _load({bool silent = false}) async {
@@ -1843,62 +1933,15 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                 const SizedBox(height: 20),
               ],
 
-              // ── Top artists carousel ─────────────────────────────────────
-              if (_showArtists && _topArtists.isNotEmpty) ...[
-                _FadeSlideIn(
-                  skipAnimation: _dashboardEntrancePlayed,
-                  delay: const Duration(milliseconds: 300),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    _SectionHeader(title: L.commonTopArtists, icon: Icons.mic_rounded),
-                    const SizedBox(height: 10),
-                    _HorizontalCarousel(
-                      items:   _topArtists.take(10).toList(),
-                      type:    'artists',
-                      service: widget.service,
-                    ),
-                  ]),
-                ),
-                const SizedBox(height: 20),
-              ],
-
-              // ── Top albums carousel ──────────────────────────────────────
-              if (_showAlbums && _topAlbums.isNotEmpty) ...[
-                _FadeSlideIn(
-                  skipAnimation: _dashboardEntrancePlayed,
-                  delay: const Duration(milliseconds: 360),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    _SectionHeader(
-                      title: L.settingsTopAlbumsSection,
-                      icon: Icons.album_rounded,
-                    ),
-                    const SizedBox(height: 10),
-                    _HorizontalCarousel(
-                      items:   _topAlbums.take(10).toList(),
-                      type:    'albums',
-                      service: widget.service,
-                    ),
-                  ]),
-                ),
-                const SizedBox(height: 20),
-              ],
-
-              // ── Top tracks carousel ──────────────────────────────────────
-              if (_showTracks && _topTracks.isNotEmpty) ...[
-                _FadeSlideIn(
-                  skipAnimation: _dashboardEntrancePlayed,
-                  delay: const Duration(milliseconds: 420),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    _SectionHeader(title: L.dashTopTracks, icon: Icons.music_note_rounded),
-                    const SizedBox(height: 10),
-                    _HorizontalCarousel(
-                      items:   _topTracks.take(10).toList(),
-                      type:    'tracks',
-                      service: widget.service,
-                    ),
-                  ]),
-                ),
-                const SizedBox(height: 20),
-              ],
+              // ── Dashboard chart (replaces top artists/albums/tracks) ─────
+              // Shows the listening calendar (heatmap) or monthly bars,
+              // picked by the user in the dashboard settings page.
+              _FadeSlideIn(
+                skipAnimation: _dashboardEntrancePlayed,
+                delay: const Duration(milliseconds: 300),
+                child: _buildDashboardChartSection(),
+              ),
+              const SizedBox(height: 20),
 
             ]),
           ),
