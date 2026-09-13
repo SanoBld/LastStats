@@ -338,6 +338,78 @@ Widget build(BuildContext context) {
 
       const SizedBox(height: 16),
 
+      &#47;&#47; ── Open source libraries (transparency: every package used) ────
+      SettingsSection(
+        label: L.aboutOpenSourceLibs,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+            child: Text(L.aboutOpenSourceLibsSub,
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
+            child: Wrap(spacing: 8, runSpacing: 8, children: [
+              for (final pkg in const [
+                &#39;cupertino_icons&#39;, &#39;battery_plus&#39;, &#39;flutter_displaymode&#39;, &#39;http&#39;,
+                &#39;dynamic_color&#39;, &#39;shared_preferences&#39;, &#39;path_provider&#39;, &#39;share_plus&#39;,
+                &#39;qr_flutter&#39;, &#39;mobile_scanner&#39;, &#39;app_links&#39;, &#39;url_launcher&#39;,
+                &#39;palette_generator&#39;, &#39;flutter_local_notifications&#39;, &#39;workmanager&#39;,
+                &#39;window_manager&#39;, &#39;audioplayers&#39;, &#39;flutter_svg&#39;, &#39;file_picker&#39;,
+                &#39;package_info_plus&#39;, &#39;crypto&#39;, &#39;sensors_plus&#39;, &#39;home_widget&#39;,
+              ])
+                ActionChip(
+                  label: Text(pkg),
+                  avatar: const Icon(Icons.open_in_new_rounded, size: 14),
+                  onPressed: () =&gt; _open(&#39;https:&#47;&#47;pub.dev&#47;packages&#47;$pkg&#39;),
+                ),
+            ]),
+          ),
+        ],
+      ),
+
+      const SizedBox(height: 16),
+
+      &#47;&#47; ── License ──────────────────────────────────────────────────────
+      SettingsSection(label: L.aboutLicenseSection, children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          child: Text(L.aboutLicenseText,
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+        ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        ListTile(
+          leading: const Icon(Icons.gavel_rounded),
+          title: Text(L.aboutLicenseLink,
+              style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+          subtitle: const Text(&#39;MIT License&#39;),
+          trailing: const Icon(Icons.open_in_new_rounded, size: 16),
+          onTap: () =&gt; _open(&#39;https:&#47;&#47;github.com&#47;SanoBld&#47;LastStats&#47;blob&#47;main&#47;LICENSE&#39;),
+        ),
+      ]),
+
+      const SizedBox(height: 16),
+
+      &#47;&#47; ── AI transparency note (development) ───────────────────────────
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
+        ),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Icon(Icons.auto_awesome_rounded, size: 18, color: scheme.onSurfaceVariant),
+          const SizedBox(width: 10),
+          Expanded(child: Text(
+            L.aboutAiDevNote,
+            style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+          )),
+        ]),
+      ),
+
+      const SizedBox(height: 16),
+
       &#47;&#47; ── Support ───────────────────────────────────────────────────────
       SettingsSection(label: L.settingsAboutSupport, children: [
         ListTile(
