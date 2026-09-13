@@ -70,26 +70,39 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; shareFile(File file, {String? text}) async {
   if (!kIsWeb &amp;&amp; (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
+    final name = file.path.split(Platform.pathSeparator).last;
+
+    &#47;&#47; 1) Preferred: Downloads folder, then reveal it.
     try {
-      final dir  = await getDownloadsDirectory() ?? await getApplicationDocumentsDirectory();
-      final name = file.path.split(Platform.pathSeparator).last;
+      final dir = await getDownloadsDirectory();
+      if (dir != null) {
+        final dest = File(&#39;${dir.path}${Platform.pathSeparator}$name&#39;);
+        await file.copy(dest.path);
+        await _reveal(dest.path, dir.path);
+        return;
+      }
+    } catch (_) {
+      &#47;&#47; Try the next fallback instead of giving up.
+    }
+
+    &#47;&#47; 2) Fallback: app&#39;s own documents folder (always writable), then
+    &#47;&#47;    still try to reveal it — but don&#39;t let a reveal failure stop us
+    &#47;&#47;    from at least having saved the file.
+    try {
+      final dir  = await getApplicationDocumentsDirectory();
       final dest = File(&#39;${dir.path}${Platform.pathSeparator}$name&#39;);
       await file.copy(dest.path);
-      if (Platform.isWindows) {
-        &#47;&#47; Opens Explorer with the file highlighted.
-        await Process.run(&#39;explorer&#39;, [&#39;&#47;select,&#39;, dest.path]);
-      } else if (Platform.isMacOS) {
-        &#47;&#47; Opens Finder with the file highlighted.
-        await Process.run(&#39;open&#39;, [&#39;-R&#39;, dest.path]);
-      } else {
-        await Process.run(&#39;xdg-open&#39;, [dir.path]);
-      }
+      try { await _reveal(dest.path, dir.path); } catch (_) {}
       return;
     } catch (_) {
-      &#47;&#47; Couldn&#39;t spawn a process (sandboxed build, missing binary…) —
-      &#47;&#47; fall through and at least try the normal share sheet below.
+      &#47;&#47; Genuinely nothing worked — do NOT fall back to Share.shareXFiles
+      &#47;&#47; here, it&#39;s the broken native charm this whole file exists to
+      &#47;&#47; avoid. Just give up quietly rather than show that dialog again.
+      return;
     }
   }
+
+  &#47;&#47; Android &#47; iOS: the native share sheet works fine.
   await Share.shareXFiles([XFile(file.path)], text: text);
 }</code></pre>
 </section>
