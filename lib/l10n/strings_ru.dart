@@ -475,6 +475,9 @@ class AppStringsRu implements AppStrings {
   @override String get dashStatCardsSectionLabel => 'Карточки статистики';
   @override String get dashStatCardsHeading => 'Карточки статистики';
   @override String get dashStatCardsSub => 'Выберите и упорядочьте карточки, показанные в блоке статистики.';
+  @override String get settingsDashboardChartSection => 'График панели';
+  @override String get dashChartCalendarLabel => 'Календарь прослушиваний';
+  @override String get dashChartMonthlyLabel => 'Столбцы по месяцам';
   @override String get notifWorkManagerInfo => 'Уведомления работают в фоне через WorkManager. Приложение не обязательно должно быть открыто. Требуется подключение к интернету.';
   @override String get notifIntervalTitle => 'Каждые X скробблов';
   @override String get notifIntervalSubtitle => 'Получайте уведомления через регулярные интервалы';

@@ -475,6 +475,9 @@ class AppStringsIt implements AppStrings {
   @override String get dashStatCardsSectionLabel => 'Schede statistiche';
   @override String get dashStatCardsHeading => 'Schede statistiche';
   @override String get dashStatCardsSub => 'Scegli e riordina le schede mostrate nel blocco statistiche.';
+  @override String get settingsDashboardChartSection => 'Grafico della dashboard';
+  @override String get dashChartCalendarLabel => "Calendario d'ascolto";
+  @override String get dashChartMonthlyLabel => 'Barre mensili';
   @override String get notifWorkManagerInfo => 'Le notifiche vengono eseguite in background tramite WorkManager. L\'app non deve essere aperta. È richiesta una connessione a internet.';
   @override String get notifIntervalTitle => 'Ogni X scrobble';
   @override String get notifIntervalSubtitle => 'Ricevi notifiche a intervalli regolari';

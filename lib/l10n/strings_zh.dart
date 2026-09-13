@@ -524,6 +524,9 @@ class AppStringsZh implements AppStrings {
   @override String get dashStatCardsSectionLabel => '统计卡片';
   @override String get dashStatCardsHeading      => '统计卡片';
   @override String get dashStatCardsSub          => '选择并重新排序统计区块中显示的卡片。';
+  @override String get settingsDashboardChartSection => '仪表盘图表';
+  @override String get dashChartCalendarLabel => '收听日历';
+  @override String get dashChartMonthlyLabel => '月度柱状图';
   @override String get notifWorkManagerInfo => '通知通过 WorkManager 在后台运行，应用无需保持打开状态，但需要网络连接。';
   @override String get notifIntervalTitle       => '每 X 次 scrobble';
   @override String get notifIntervalSubtitle    => '按固定间隔接收通知';

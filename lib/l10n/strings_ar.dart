@@ -475,6 +475,9 @@ class AppStringsAr implements AppStrings {
   @override String get dashStatCardsSectionLabel => 'بطاقات الإحصائيات';
   @override String get dashStatCardsHeading => 'بطاقات الإحصائيات';
   @override String get dashStatCardsSub => 'اختر ورتّب البطاقات المعروضة في قسم الإحصائيات.';
+  @override String get settingsDashboardChartSection => 'رسم لوحة التحكم البياني';
+  @override String get dashChartCalendarLabel => 'تقويم الاستماع';
+  @override String get dashChartMonthlyLabel => 'أعمدة شهرية';
   @override String get notifWorkManagerInfo => 'تعمل الإشعارات في الخلفية عبر WorkManager. لا حاجة لفتح التطبيق. يلزم اتصال بالإنترنت.';
   @override String get notifIntervalTitle => 'كل X من التشغيلات';
   @override String get notifIntervalSubtitle => 'تلقَّ إشعارات على فترات منتظمة';

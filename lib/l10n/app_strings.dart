@@ -563,6 +563,11 @@ abstract class AppStrings {
   String get dashStatCardsHeading;
   String get dashStatCardsSub;
 
+  // ── Dashboard chart picker (replaces old top artists/albums/tracks) ────
+  String get settingsDashboardChartSection;
+  String get dashChartCalendarLabel;
+  String get dashChartMonthlyLabel;
+
   // ── Notifications page ───────────────────────────────────────────────────
   String get notifWorkManagerInfo;
   String get notifIntervalTitle;

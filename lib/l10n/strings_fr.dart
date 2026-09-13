@@ -527,6 +527,9 @@ class AppStringsFr implements AppStrings {
   @override String get dashStatCardsSectionLabel => 'Cartes de statistiques';
   @override String get dashStatCardsHeading      => 'Cartes de stats';
   @override String get dashStatCardsSub          => 'Choisissez les cartes affichées dans le bloc statistiques.';
+  @override String get settingsDashboardChartSection => 'Graphique du dashboard';
+  @override String get dashChartCalendarLabel => 'Calendrier musical';
+  @override String get dashChartMonthlyLabel => 'Barres mensuelles';
   @override String get notifWorkManagerInfo => "Les notifications tournent en arrière-plan via WorkManager. L'app n'a pas besoin d'être ouverte. Une connexion internet est nécessaire.";
   @override String get notifIntervalTitle       => 'Tous les X scrobbles';
   @override String get notifIntervalSubtitle    => 'Notification à intervalle régulier';

@@ -335,29 +335,41 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     });
   }
 
+  // How many days back the mini calendar heatmap shows on the dashboard.
+  // Short window on purpose: this is a quick glance widget, not the full
+  // multi-year calendar from the Charts tab.
+  static const _kDashChartDays = 60;
+  // How many months of history to fetch for the "monthly bars" choice.
+  static const _kDashChartMonths = 6;
+
   // ── Dashboard chart (listening calendar / monthly bars) ─────────────────
-  // Fetches the last 12 months of scrobbles once and builds both a
-  // day-by-day map (for the calendar heatmap) and a month-by-month map
-  // (for the monthly bars), so switching the chart choice needs no refetch.
+  // Fetches a few months of scrobbles once, fully paginated (not just the
+  // first page), and builds both a day-by-day map (for the calendar
+  // heatmap) and a month-by-month map (for the monthly bars). Fetching
+  // only page 1 used to silently drop scrobbles on busy months — fixed by
+  // looping through every page the API reports.
   Future<void> _loadDashboardChart() async {
     if (_dashChartLoading) return;
     setState(() => _dashChartLoading = true);
     try {
-      final now = DateTime.now();
+      final now   = DateTime.now();
+      final since = DateTime(now.year, now.month - (_kDashChartMonths - 1), 1);
       final calendarData = <String, int>{};
       final monthlyData  = <String, int>{};
-      final futures = List.generate(12, (i) {
-        final month = DateTime(now.year, now.month - (11 - i), 1);
-        final nextM = DateTime(month.year, month.month + 1, 1);
-        return widget.service.getRecentTracks(
-          limit: 200, page: 1,
-          from: month.millisecondsSinceEpoch ~/ 1000,
-          to:   nextM.millisecondsSinceEpoch ~/ 1000,
-        ).catchError((_) => <String, dynamic>{});
-      });
-      final pages = await Future.wait(futures);
-      for (final pageData in pages) {
-        final raw  = pageData['track'];
+
+      var page       = 1;
+      var totalPages = 1;
+      do {
+        final data = await widget.service.getRecentTracks(
+          limit: 200, page: page,
+          from: since.millisecondsSinceEpoch ~/ 1000,
+          to:   now.millisecondsSinceEpoch   ~/ 1000,
+        );
+        final attr = data['@attr'] as Map?;
+        if (attr != null) {
+          totalPages = int.tryParse(attr['totalPages']?.toString() ?? '1') ?? 1;
+        }
+        final raw  = data['track'];
         final list = raw is List ? raw : (raw != null ? [raw] : <dynamic>[]);
         for (final t in list) {
           final m = t as Map?;
@@ -374,7 +386,11 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
           calendarData[dayKey]  = (calendarData[dayKey]  ?? 0) + 1;
           monthlyData[monthKey] = (monthlyData[monthKey] ?? 0) + 1;
         }
-      }
+        page++;
+        // Small delay between pages, same courtesy as the full sync service.
+        if (page <= totalPages) await Future.delayed(const Duration(milliseconds: 150));
+      } while (page <= totalPages);
+
       if (!mounted) return;
       setState(() {
         _dashChartCalendar = calendarData;
@@ -390,10 +406,11 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   // Builds the header + content for the chosen dashboard chart.
   Widget _buildDashboardChartSection() {
     final now   = DateTime.now();
-    final start = DateTime(now.year, now.month - 11, 1);
+    // Calendar only shows the last _kDashChartDays days — no year rows.
+    final calStart = now.subtract(const Duration(days: _kDashChartDays - 1));
     final title = _dashboardChart == 'monthly'
-        ? _ct('Barres mensuelles', 'Monthly bars')
-        : _ct('Calendrier musical', 'Listening calendar');
+        ? L.dashChartMonthlyLabel
+        : L.dashChartCalendarLabel;
     final icon = _dashboardChart == 'monthly'
         ? Icons.calendar_month_rounded
         : Icons.grid_on_rounded;
@@ -407,9 +424,9 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     } else if (_dashboardChart == 'monthly') {
       content = _MonthlyCard(monthly: _dashChartMonthly ?? const <String, int>{});
     } else {
-      content = _HeatmapCard(
+      content = _CompactHeatmap(
         data:  _dashChartCalendar ?? const <String, int>{},
-        start: start,
+        start: calStart,
         end:   now,
       );
     }
@@ -4492,5 +4509,147 @@ Future<ui.Image?> _renderShareCardOffscreen(BuildContext ctx, Widget child, {req
     return await rb.toImage(pixelRatio: 3.0);
   } finally {
     entry.remove();
+  }
+}
+// ══════════════════════════════════════════════════════════════════════════
+//  _CompactHeatmap — small "last N days" listening calendar for the
+//  dashboard. Unlike _HeatmapCard (Charts tab), this never splits or labels
+//  rows by year — it is meant to show a short recent window (e.g. the last
+//  60 days) as a single continuous strip.
+// ══════════════════════════════════════════════════════════════════════════
+class _CompactHeatmap extends StatelessWidget {
+  final Map<String, int> data;
+  final DateTime start;
+  final DateTime end;
+  const _CompactHeatmap({required this.data, required this.start, required this.end});
+
+  static const _cell = 12.0;
+  static const _gap  = 2.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    final t = Theme.of(context).textTheme;
+
+    final startDay = DateTime(start.year, start.month, start.day);
+    final endDay   = DateTime(end.year, end.month, end.day);
+    final maxVal   = data.values.fold(0, (a, b) => a > b ? a : b);
+
+    // Same week-grid layout idea as the Charts tab heatmap, minus the
+    // per-year split and the year label column.
+    final startWd    = startDay.weekday;
+    final totalDays  = endDay.difference(startDay).inDays + 1;
+    final totalCells = (startWd - 1) + totalDays;
+    final weeks      = (totalCells / 7).ceil();
+
+    final weekColumns = List.generate(weeks, (col) {
+      return List.generate(7, (row) {
+        final offset = col * 7 + row - (startWd - 1);
+        if (offset < 0 || offset >= totalDays) return null;
+        return offset;
+      });
+    });
+
+    // Month label shown once, above the week column where that month starts.
+    final monthStarts = <int, String>{};
+    var cursor = DateTime(startDay.year, startDay.month, 1);
+    while (!cursor.isAfter(endDay)) {
+      final off = cursor.difference(startDay).inDays + (startWd - 1);
+      if (off >= 0) monthStarts[off ~/ 7] = L.months[cursor.month];
+      cursor = DateTime(cursor.year, cursor.month + 1, 1);
+    }
+
+    return Container(
+      decoration: _chartCardDecoration(s),
+      padding: const EdgeInsets.fromLTRB(14, 16, 14, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: weekColumns.asMap().entries.map((entry) {
+                final col  = entry.key;
+                final days = entry.value;
+                return Padding(
+                  padding: const EdgeInsets.only(right: _gap),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 14,
+                        child: monthStarts.containsKey(col)
+                            ? Text(
+                                monthStarts[col]!,
+                                style: t.labelSmall?.copyWith(
+                                  fontSize: 8,
+                                  color: s.onSurfaceVariant.withValues(alpha: 0.65),
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              )
+                            : null,
+                      ),
+                      const SizedBox(height: 2),
+                      ...days.map((offset) {
+                        if (offset == null) {
+                          return const SizedBox(width: _cell, height: _cell + _gap);
+                        }
+                        final d   = startDay.add(Duration(days: offset));
+                        final key = '${d.year}-'
+                            '${d.month.toString().padLeft(2, '0')}-'
+                            '${d.day.toString().padLeft(2, '0')}';
+                        final count  = data[key] ?? 0;
+                        final ratio  = (maxVal > 0 && count > 0) ? count / maxVal : 0.0;
+                        final scaled = ratio > 0 ? sqrt(ratio).clamp(0.0, 1.0) : 0.0;
+                        final color = count == 0
+                            ? s.surfaceContainerHigh
+                            : Color.lerp(s.primaryContainer, s.primary,
+                                (scaled * 0.85 + 0.15).clamp(0.0, 1.0))!;
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: _gap),
+                          child: Tooltip(
+                            message: count > 0
+                                ? '${d.day}/${d.month}/${d.year} — $count scrobbles' : '',
+                            child: Container(
+                              width: _cell, height: _cell,
+                              decoration: BoxDecoration(
+                                color: color,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(children: [
+            const Spacer(),
+            Text(_ct('Moins', 'Less', es: 'Menos', zh: '少', pt: 'Menos'),
+                style: t.labelSmall?.copyWith(fontSize: 9, color: s.onSurfaceVariant)),
+            const SizedBox(width: 4),
+            ...List.generate(5, (i) => Container(
+              width: 10, height: 10,
+              margin: const EdgeInsets.only(right: 2),
+              decoration: BoxDecoration(
+                color: i == 0
+                    ? s.surfaceContainerHigh
+                    : Color.lerp(s.primaryContainer, s.primary, (i / 4).clamp(0.0, 1.0)),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            )),
+            const SizedBox(width: 4),
+            Text(_ct('Plus', 'More', es: 'Más', zh: '多', pt: 'Mais'),
+                style: t.labelSmall?.copyWith(fontSize: 9, color: s.onSurfaceVariant)),
+          ]),
+        ],
+      ),
+    );
   }
 }

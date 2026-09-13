@@ -527,6 +527,9 @@ class AppStringsPt implements AppStrings {
   @override String get dashStatCardsSectionLabel => 'Cartões de estatísticas';
   @override String get dashStatCardsHeading      => 'Cartões de stats';
   @override String get dashStatCardsSub          => 'Escolha e reordene os cartões mostrados no bloco de estatísticas.';
+  @override String get settingsDashboardChartSection => 'Gráfico do painel';
+  @override String get dashChartCalendarLabel => 'Calendário de escuta';
+  @override String get dashChartMonthlyLabel => 'Barras mensais';
   @override String get notifWorkManagerInfo => 'As notificações são executadas em segundo plano via WorkManager. O app não precisa estar aberto. É necessária conexão com a internet.';
   @override String get notifIntervalTitle       => 'A cada X scrobbles';
   @override String get notifIntervalSubtitle    => 'Receba avisos em intervalos regulares';

@@ -6,11 +6,6 @@ import '../../l10n/l10n.dart';
 import '../../app_state.dart';
 import 'settings_helpers.dart';
 
-// Tiny inline FR/EN helper for the 2 new labels below (not worth adding
-// full L10n keys for every language just for this small picker).
-String _dashChartLabel(String fr, String en) =>
-    localeNotifier.value == 'en' ? en : fr;
-
 // Stat-card ids that open a detail sheet / page when tapped on the
 // dashboard (see _DashboardPage._statCardWidget in _dashboard_page.dart).
 // Kept in sync manually with that switch — used only for the little
@@ -496,21 +491,13 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
         // Lets the user pick which chart replaces the old top artists /
         // albums / tracks block on the dashboard.
         SettingsSection(
-          label: _dashChartLabel('Graphique du dashboard', 'Dashboard chart'),
+          label: L.settingsDashboardChartSection,
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               child: Wrap(spacing: 8, runSpacing: 8, children: [
-                (
-                  'calendar',
-                  _dashChartLabel('Calendrier musical', 'Listening calendar'),
-                  Icons.grid_on_rounded,
-                ),
-                (
-                  'monthly',
-                  _dashChartLabel('Barres mensuelles', 'Monthly bars'),
-                  Icons.calendar_month_rounded,
-                ),
+                ('calendar', L.dashChartCalendarLabel, Icons.grid_on_rounded),
+                ('monthly',  L.dashChartMonthlyLabel,  Icons.calendar_month_rounded),
               ].map((opt) {
                 final (key, label, icon) = opt;
                 return FilterChip(
