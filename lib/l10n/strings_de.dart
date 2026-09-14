@@ -62,7 +62,7 @@ class AppStringsDe implements AppStrings {
   @override String get chartsMonthly => 'Scrobbles (12 Monate)';
   @override String get chartsArtistDist => 'Top-Künstler (Aufteilung)';
   @override String get chartsMainstreamTitle => 'Mainstream vs. Geheimtipps';
-  @override String get chartsMainstreamSubtitle => 'Globale Popularität deiner Lieblingskünstler.';
+  @override String get chartsMainstreamSubtitle => 'Globale Popularität Ihrer Lieblingskünstler.';
   @override String get chartsCompute => 'Berechnen';
   @override String get chartsRecompute => 'Neu berechnen';
   @override String get chartsGem => 'Geheimtipp';
@@ -107,7 +107,7 @@ class AppStringsDe implements AppStrings {
   @override String get dashNoFriends => 'Keine Freunde gefunden';
   @override String get dashResetCache => 'Cache zurücksetzen';
   @override String get dashResetCacheConfirm => 'Alle lokal zwischengespeicherten Scrobble-Daten werden gelöscht und erneut von Last.fm heruntergeladen.';
-  @override String get dashFriendsActivity => 'Aktivität deiner Last.fm-Freunde';
+  @override String get dashFriendsActivity => 'Aktivität Ihrer Last.fm-Freunde';
   @override String get settingsTitle => 'Einstellungen';
   @override String get settingsAppearance => 'Erscheinungsbild';
   @override String get settingsTheme => 'Design';
@@ -146,7 +146,7 @@ class AppStringsDe implements AppStrings {
   @override String get settingsHeaderBlurNone => 'Keine';
   @override String get settingsHeaderCustomUrl => 'Bild-URL';
   @override String get settingsHeaderCustomUrlHint => 'https://example.com/image.jpg';
-  @override String get settingsHeaderCustomUrlSub => 'Füge die direkte URL eines Bildes ein (jpg, png, webp…).';
+  @override String get settingsHeaderCustomUrlSub => 'Fügen Sie die direkte URL eines Bildes ein (jpg, png, webp…).';
   @override String get settingsHeaderApply => 'Anwenden';
   @override String get settingsHeaderFallback => 'Standardbild';
   @override String get settingsHeaderFallbackSub => 'Wird angezeigt, wenn keine Musik läuft.';
@@ -157,7 +157,7 @@ class AppStringsDe implements AppStrings {
   @override String get settingsTopArtistsSection => 'Top-Künstler';
   @override String get settingsTopTracksSection => 'Top-Titel';
   @override String get settingsFriendsSection => 'Freunde';
-  @override String get settingsFriendsSectionSub => 'Aktivität deiner Last.fm-Freunde';
+  @override String get settingsFriendsSectionSub => 'Aktivität Ihrer Last.fm-Freunde';
   @override String get settingsAccount => 'Konto';
   @override String get settingsConnectedProfile => 'Verbundenes Last.fm-Profil';
   @override String get settingsLogout => 'Abmelden';
@@ -216,7 +216,7 @@ class AppStringsDe implements AppStrings {
   @override String get exportCopy => 'JSON kopieren';
   @override String get exportCopied => 'Kopiert!';
   @override String get importTitle => 'Sicherung wiederherstellen';
-  @override String get importHintLabel => 'Füge hier deine LastStats-Sicherung ein.';
+  @override String get importHintLabel => 'Fügen Sie hier Ihre LastStats-Sicherung ein.';
   @override String get importEmpty => 'Feld ist leer.';
   @override String get importInvalidJson => 'Ungültiges JSON.';
   @override String get importUnknownFile => 'Nicht erkannte Datei.';
@@ -224,7 +224,7 @@ class AppStringsDe implements AppStrings {
   @override String get importSuccess => 'Einstellungen erfolgreich wiederhergestellt ✓';
   @override String get importRestore => 'Wiederherstellen';
   @override String get setupImportJson => 'JSON importieren';
-  @override String get setupImportHintLabel => 'Füge unten den Inhalt deiner JSON-Datei ein.';
+  @override String get setupImportHintLabel => 'Fügen Sie unten den Inhalt Ihrer JSON-Datei ein.';
   @override String get setupImportNote => '{ "username": "…", "api_key": "…" }';
   @override String get setupImportFormat => '{ "username": "...", "api_key": "..." }';
   @override String get setupInvalidFields => 'Ungültiges JSON: Felder "username" oder "api_key" fehlen.';
@@ -255,7 +255,7 @@ class AppStringsDe implements AppStrings {
   @override String get onboardNext => 'Weiter';
   @override String get onboardFinish => 'Fertig';
   @override String get onboardBack => 'Zurück';
-  @override String get onboardAppearanceTitle => 'Personalisiere deinen Stil';
+  @override String get onboardAppearanceTitle => 'Personalisieren Sie Ihren Stil';
   @override String get onboardAppearanceSub => 'Design, Akzentfarbe und Material You.';
   @override String get onboardNotifTitle => 'Immer auf dem Laufenden';
   @override String get onboardNotifSub => 'Benachrichtigungen und Vibrationen.';
@@ -272,8 +272,8 @@ class AppStringsDe implements AppStrings {
   @override String get onboardDashTitle => 'Deine Übersicht';
   @override String get onboardDashSub => 'Wähle, welche Bereiche angezeigt werden.';
   @override String get onboardStartupTitle => 'Startbildschirm';
-  @override String get onboardStartupSub => 'Welchen Tab möchtest du zuerst sehen?';
-  @override String get onboardPlatformTitle => 'Worauf hörst du Musik?';
+  @override String get onboardStartupSub => 'Welchen Tab möchten Sie zuerst sehen?';
+  @override String get onboardPlatformTitle => 'Worauf hören Sie Musik?';
   @override String get onboardPlatformSub => 'Damit werden nur die nützlichen Links auf Titel-/Künstler-/Album-Seiten angezeigt.';
   @override String get platformLastfm => 'Last.fm';
   @override String get platformSpotify => 'Spotify';
@@ -309,7 +309,7 @@ class AppStringsDe implements AppStrings {
   @override String get onboardHapticSub => 'Spüre leichte Vibrationen bei wichtigen Interaktionen';
   @override String get onboardRecaps => 'Zusammenfassungen';
   @override String get onboardDailyRecapTitle => 'Tageszusammenfassung';
-  @override String get onboardDailyRecapSub => 'Eine kurze Übersicht deines Höralltags';
+  @override String get onboardDailyRecapSub => 'Eine kurze Übersicht Ihres Höralltags';
   @override String get onboardWeeklyRecapTitle => 'Wochenzusammenfassung';
   @override String get onboardWeeklyRecapSub => 'Deine Top-Künstler, Alben und Titel der Woche';
   @override String get onboardMilestonesSection => 'Scrobble-Meilensteine';
@@ -317,7 +317,7 @@ class AppStringsDe implements AppStrings {
   @override String get onboardMilestonesSub => 'Feiere runde Scrobble-Zahlen';
   @override String get onboardGrandMilestonesTitle => 'Große Meilensteine';
   @override String get onboardGrandMilestonesSub => 'Extra-Feier bei großen Meilensteinen';
-  @override String get onboardDynamicColorSub => 'Farben aus deinem Hintergrundbild verwenden (Android 12+)';
+  @override String get onboardDynamicColorSub => 'Farben aus Ihrem Hintergrundbild verwenden (Android 12+)';
   @override String get onboardBetaTitle => 'Beta-Updates';
   @override String get onboardBetaSub => 'Früher Zugriff auf Vorabversionen';
   @override String get notifDetailTitle => 'Benachrichtigung';
@@ -373,7 +373,7 @@ class AppStringsDe implements AppStrings {
   @override String get settingsRestartNotice => 'Manche Einstellungen erfordern einen Neustart der App, um vollständig wirksam zu werden.';
   @override String get syncPageTitle => 'Scrobble-Synchronisierung';
   @override String get syncAutoTitle => 'Automatische Synchronisierung';
-  @override String get syncAutoSubtitle => 'Synchronisiert deinen Verlauf regelmäßig im Hintergrund';
+  @override String get syncAutoSubtitle => 'Synchronisiert Ihren Verlauf regelmäßig im Hintergrund';
   @override String get syncFrequencyLabel => 'Häufigkeit';
   @override String get syncFrequencyDaily => 'Einmal täglich';
   @override String get syncManualTitle => 'Manuelle Synchronisierung';
@@ -395,7 +395,7 @@ class AppStringsDe implements AppStrings {
   @override String get aboutTagline => 'Dein Last.fm-Statistik-Begleiter';
   @override String get aboutAppInfo => 'App-Info';
   @override String get aboutScrobbleDownloader => 'Scrobble-Downloader';
-  @override String get aboutScrobbleDownloaderSub => 'Exportiere alle deine Scrobbles in eine Datei';
+  @override String get aboutScrobbleDownloaderSub => 'Exportiert alle Ihre Scrobbles in eine Datei';
   @override String get aboutPoweredBy => 'Unterstützt von';
   @override String get aboutImageDisclaimer => 'Bilder von Künstlern, Alben und Titeln werden automatisch aus diesen Quellen abgerufen und können gelegentlich falsch sein oder nicht zum tatsächlichen Inhalt passen.';
   @override String get aboutFooter => 'Mit ❤️ gemacht · Nicht mit Last.fm / CBS verbunden';
@@ -408,17 +408,17 @@ class AppStringsDe implements AppStrings {
   @override String get backupFileSaved => 'Sicherung gespeichert';
   @override String get backupFileSaveFailed => 'Datei konnte nicht gespeichert werden';
   @override String get setupRestoreBackup => 'Sicherung wiederherstellen';
-  @override String get setupRestoreBackupSub => 'Stelle dein Konto und deine Einstellungen aus einer .json-Sicherungsdatei wieder her';
+  @override String get setupRestoreBackupSub => 'Stellt Ihr Konto und Ihre Einstellungen aus einer .json-Sicherungsdatei wieder her';
   @override String get backupRestoreKeysTitle => 'API-Schlüssel wiederherstellen';
   @override String get backupRestoreKeysDesc => 'Wähle, welche Last.fm-Schlüssel aus dieser Sicherung wiederhergestellt werden sollen.';
   @override String get backupRestoreApiKeyLabel => 'API-Schlüssel';
   @override String get backupRestoreSecretKeyLabel => 'Geheimer Schlüssel';
   @override String get backupIncludeFoldersLabel => 'Ordner einschließen';
-  @override String get backupIncludeFoldersDesc => 'Enthält deine Titelordner und deren Inhalt.';
+  @override String get backupIncludeFoldersDesc => 'Enthält Ihre Titelordner und deren Inhalt.';
   @override String get backupIncludeKeysDesc => 'Schlüssel in die exportierte Datei einbeziehen';
 
   @override String get backupIncludeThemesLabel => 'Designs exportieren';
-  @override String get backupIncludeThemesDesc => 'Damit kannst du nur das Aussehen (Farben, Stil) mit jemandem teilen.';
+  @override String get backupIncludeThemesDesc => 'Damit können Sie nur das Aussehen (Farben, Stil) mit jemandem teilen.';
 
   @override String get backupAutoTitle => 'Automatische Sicherung';
   @override String get backupAutoEnableLabel => 'Automatische Sicherung aktivieren';
@@ -435,7 +435,7 @@ class AppStringsDe implements AppStrings {
 
   @override String get backupScrobblesSlowWarning => 'Das kann eine Weile dauern und ist langsamer als eine normale Sicherung.';  @override String backupExportedOn(String date) => 'Sicherung vom $date';
   @override String get backupScrobblesErrorTitle => 'Fehler im Verlauf';
-  @override String get backupScrobblesErrorDesc => 'Einige Jahre im Verlauf scheinen in dieser Datei beschädigt zu sein. Was möchtest du tun?';
+  @override String get backupScrobblesErrorDesc => 'Einige Jahre im Verlauf scheinen in dieser Datei beschädigt zu sein. Was möchten Sie tun?';
   @override String get backupScrobblesKeepAnyway => 'Trotzdem fortfahren';
   @override String get backupScrobblesCancel => 'Verlauf verwerfen';
   @override String get backupScrobblesSkipRefetch => 'Überspringen und online neu laden';  @override String get settingsCrashLog => 'Fehlerprotokoll';
@@ -446,7 +446,7 @@ class AppStringsDe implements AppStrings {
   @override String get backupCrashLogCleared => 'Protokoll geleert';
   @override String get backupCrashLogClearConfirm => 'Fehlerprotokoll leeren?';
   @override String get faqSectionLabel => 'Häufig gestellte Fragen';
-  @override String get backupOverwriteWarning => 'Das Wiederherstellen einer Sicherung überschreibt deine aktuellen Einstellungen.';
+  @override String get backupOverwriteWarning => 'Das Wiederherstellen einer Sicherung überschreibt Ihre aktuellen Einstellungen.';
   @override String get faqOpenSourceBadge => 'LastStats ist ein kostenloses Open-Source-Projekt, mit ❤️ erstellt von SanoBld.';
   @override String get cacheUnlimited => 'Unbegrenzt';
   @override String get cacheTotalUsed => 'Gesamt belegt';
@@ -479,13 +479,13 @@ class AppStringsDe implements AppStrings {
   @override String get dashChartCalendarLabel => 'Hörkalender';
   @override String get dashChartMonthlyLabel => 'Monatsbalken';
   @override String get settingsDisplayNameSection => 'Eigener Name';
-  @override String get settingsDisplayNameLabel => 'Wie sollen wir dich nennen?';
+  @override String get settingsDisplayNameLabel => 'Wie sollen wir Sie nennen?';
   @override String get settingsDisplayNameHint => 'Z. B. Sano Bld — leer lassen, um den Kontonamen zu verwenden';
   @override String get newsSearchHint => 'News durchsuchen…';
   @override String get aboutOpenSourceLibs => 'Open-Source-Bibliotheken';
   @override String get aboutOpenSourceLibsSub => 'Alle Flutter-Pakete, die für diese App verwendet wurden.';
   @override String get aboutLicenseSection => 'Lizenz';
-  @override String get aboutLicenseText => 'Dieses Projekt steht unter der MIT-Lizenz: du darfst es frei nutzen, verändern, duplizieren oder weiterverbreiten, nenne einfach meinen Namen.';
+  @override String get aboutLicenseText => 'Dieses Projekt steht unter der MIT-Lizenz: Sie dürfen es frei nutzen, verändern, duplizieren oder weiterverbreiten, nennen Sie einfach meinen Namen.';
   @override String get aboutLicenseLink => 'Vollständige Lizenz ansehen';
   @override String get languageAiNote => 'Die Übersetzungen wurden von KI erstellt und können Ungenauigkeiten enthalten.';
   @override String get aboutAiDevNote => 'KI wurde auch bei der Entwicklung dieser App eingesetzt.';
@@ -506,7 +506,7 @@ class AppStringsDe implements AppStrings {
   @override String get notifBadgeSubtitle => 'Zeigt den ungelesen-Punkt am Neuigkeiten-Glockensymbol';
   @override String get notifTestLabel => 'Test';
   @override String get notifPermissionDisabledTitle => 'Benachrichtigungen deaktiviert';
-  @override String get notifPermissionDisabledBody => 'Erteile die Berechtigung, damit LastStats dir Hinweise senden kann.';
+  @override String get notifPermissionDisabledBody => 'Erteilen Sie die Berechtigung, damit LastStats Ihnen Hinweise senden kann.';
   @override String get notifGrantPermission => 'Berechtigung erteilen';
   @override String get notifThresholdIntro => 'Du erhältst bei jedem dieser Meilensteine eine besondere Benachrichtigung:';
   @override String get notifIntervalDescription => 'Alle X Scrobbles eine Benachrichtigung auslösen';
@@ -514,7 +514,7 @@ class AppStringsDe implements AppStrings {
   @override String get notifTimeNotifyAt => 'Benachrichtigen um';
   @override String get notifDayOfWeek => 'Wochentag';
   @override String get notifSendTest => 'Testbenachrichtigung senden';
-  @override String get notifSentCheckBar => 'Schau in deine Benachrichtigungsleiste!';
+  @override String get notifSentCheckBar => 'Schauen Sie in Ihre Benachrichtigungsleiste!';
   @override String get notifMakeSureWorks => 'Stelle sicher, dass alles funktioniert.';
   @override String get notifSentBang => 'Gesendet!';
   @override String get notifSendButton => 'Senden';
@@ -552,7 +552,7 @@ class AppStringsDe implements AppStrings {
   @override String get acctTapSwitchToActivate => 'Zum Aktivieren auf „Wechseln“ tippen';
   @override String get acctSwitch => 'Wechseln';
   @override String get acctAddAnAccount => 'Konto hinzufügen';
-  @override String get acctApiKeyInfo => 'Jedes Konto kann einen anderen oder denselben API-Schlüssel verwenden. Du findest deinen API-Schlüssel unter last.fm/api/accounts.';
+  @override String get acctApiKeyInfo => 'Jedes Konto kann einen anderen oder denselben API-Schlüssel verwenden. Sie finden Ihren API-Schlüssel unter last.fm/api/accounts.';
   @override String get acctLastfmProfileSection => 'Last.fm-Profil';
   @override String get acctViewOnLastfm => 'Auf Last.fm ansehen';
   @override String get acctDangerZone => 'Gefahrenzone';
@@ -576,14 +576,14 @@ class AppStringsDe implements AppStrings {
   @override String get dashThisWeekLabel => 'Diese Woche';
   @override String get dashDayUnitShort => 'T';
   @override String get setupEnableFavorites      => 'Favoriten aktivieren (optional)';
-  @override String get setupFavoritesExplain     => 'Mit deinem geheimen Schlüssel kann die App Titel direkt auf Last.fm favorisieren (oder entfernen).';
+  @override String get setupFavoritesExplain     => 'Mit Ihrem geheimen Schlüssel kann die App Titel direkt auf Last.fm favorisieren (oder entfernen).';
   @override String get setupSecretKeyLabel       => 'Last.fm Secret Key';
   @override String get favConnectInvalidSecret   => 'Der geheime Schlüssel muss 32 Zeichen lang sein.';
   @override String get favConnectDialogTitle     => 'Favoriten autorisieren';
   @override String get favConnectDialogBody      => 'Autorisiere die App auf der im Browser geöffneten Last.fm-Seite und kehre dann hierher zurück, um zu bestätigen.';
   @override String get favConnectDialogConfirm   => 'Ich habe autorisiert';
   @override String get favConnectSuccess         => 'Favoriten erfolgreich aktiviert!';
-  @override String get favConnectError           => 'Favoriten konnten nicht aktiviert werden. Prüfe deinen geheimen Schlüssel.';
+  @override String get favConnectError           => 'Favoriten konnten nicht aktiviert werden. Prüfen Sie Ihren geheimen Schlüssel.';
   @override String get acctApiKeysSection        => 'API-Schlüssel';
   @override String get acctSecretKeyLabel        => 'Geheimer Schlüssel';
   @override String get acctSecretKeyNotSet       => 'Nicht festgelegt';
@@ -591,8 +591,8 @@ class AppStringsDe implements AppStrings {
   @override String get acctConnectFavorites      => 'Favoriten aktivieren';
   @override String get acctDisconnectFavorites   => 'Favoriten deaktivieren';
   @override String get settingsFavoritesSection    => 'Favoriten';
-  @override String get settingsFavoritesSectionSub => 'Zeigt die Anzahl deiner Favoriten in der Statistik';
-  @override String get settingsFavoritesNeedsKey   => 'Füge deinen geheimen Schlüssel im Konto hinzu, um zu aktivieren';
+  @override String get settingsFavoritesSectionSub => 'Zeigt die Anzahl Ihrer Favoriten in der Statistik';
+  @override String get settingsFavoritesNeedsKey   => 'Fügen Sie Ihren geheimen Schlüssel im Konto hinzu, um zu aktivieren';
   @override String get favSectionTitle           => 'Favoriten';
   @override String get commonSeeMore             => 'Mehr anzeigen';
   @override String get favPageTitle              => 'Meine Favoriten';
@@ -624,7 +624,7 @@ class AppStringsDe implements AppStrings {
   @override String get rankingsWholeYear       => 'Ganzes Jahr';
   @override String get chartsExportGeneratedOn => 'erstellt am';
   @override String get faqQ1 => 'Scrobbelt LastStats meine Musik?';
-  @override String get faqA1 => 'Nein. LastStats ist eine Visualisierungs-App: Sie zeigt die bereits auf deinem Last.fm-Konto gespeicherten Scrobbles an, zeichnet aber selbst keine auf.\n\nUm deine Musik automatisch zu scrobbeln, nutze eine dedizierte App wie Pano Scrobbler (verfügbar für Android).';
+  @override String get faqA1 => 'Nein. LastStats ist eine Visualisierungs-App: Sie zeigt die bereits auf Ihrem Last.fm-Konto gespeicherten Scrobbles an, zeichnet aber selbst keine auf.\n\nUm Ihre Musik automatisch zu scrobbeln, nutzen Sie eine dedizierte App wie Pano Scrobbler (verfügbar für Android).';
   @override String get faqQ2 => 'Ist eine iOS-Version geplant?';
   @override String get faqA2 => 'Nein. Eine iOS-Version ist derzeit nicht geplant.';
   @override String get faqQ3 => 'Funktioniert die App unter macOS oder anderen Plattformen?';
@@ -632,23 +632,23 @@ class AppStringsDe implements AppStrings {
   @override String get faqQ4 => 'Ist LastStats Open Source?';
   @override String get faqA4 => 'Ja! Der Quellcode ist frei auf GitHub verfügbar. Das Projekt ist unabhängig und wird mit Leidenschaft von SanoBld entwickelt. Du kannst gerne beitragen, Fehler melden oder einfach einen Stern ⭐ dalassen.';
   @override String get faqQ5 => 'Wo werden meine Daten gespeichert?';
-  @override String get faqA5 => 'Nur auf deinem Gerät. LastStats hat keinen Server: Deine Scrobbles werden lokal zwischengespeichert, und auch deine Last.fm-Zugangsdaten bleiben lokal gespeichert. Es wird nichts irgendwohin gesendet außer an die offizielle Last.fm-API.';
+  @override String get faqA5 => 'Nur auf Ihrem Gerät. LastStats hat keinen Server: Ihre Scrobbles werden lokal zwischengespeichert, und auch Ihre Last.fm-Zugangsdaten bleiben lokal gespeichert. Es wird nichts irgendwohin gesendet außer an die offizielle Last.fm-API.';
   @override String get faqQ6 => 'Wie aktiviere ich Favoriten?';
-  @override String get faqA6 => 'Gehe zu Einstellungen > Konto und gib deinen Last.fm-Secret-Key ein. Nach der Verbindung kannst du Titel direkt in der App favorisieren.';
+  @override String get faqA6 => 'Gehen Sie zu Einstellungen > Konto und geben Sie Ihren Last.fm-Secret-Key ein. Nach der Verbindung können Sie Titel direkt in der App favorisieren.';
   @override String get faqQ7 => 'Was ist ein \'Scrobble\'?';
-  @override String get faqA7 => 'Ein Scrobble ist ein Titel, der als geh\u00f6rt auf deinem Last.fm-Konto erfasst wird \u2014 das ist Last.fms eigener Begriff f\u00fcr \'ein gez\u00e4hltes Abspielen\'. Alle deine Gesamtwerte (Top-Interpreten, Statistiken usw.) basieren darauf.';
+  @override String get faqA7 => 'Ein Scrobble ist ein Titel, der als geh\u00f6rt auf Ihrem Last.fm-Konto erfasst wird \u2014 das ist Last.fms eigener Begriff f\u00fcr \'ein gez\u00e4hltes Abspielen\'. Alle Ihre Gesamtwerte (Top-Interpreten, Statistiken usw.) basieren darauf.';
   @override String get faqQ8 => 'Wie funktionieren Level und Erfolge?';
-  @override String get faqA8 => 'Dein Kontolevel steigt mit deiner Gesamtzahl an Scrobbles (es gibt kein H\u00f6chstlevel). Karten erhalten au\u00dferdem einen Rahmen (Bronze \u2192 schillernd), je nachdem wie oft der jeweilige Interpret/Titel/das Album gespielt wurde. Alles wird automatisch aus bereits lokal zwischengespeicherten Statistiken berechnet, ohne zus\u00e4tzliche Netzwerkaufrufe.';
+  @override String get faqA8 => 'Ihr Kontolevel steigt mit Ihrer Gesamtzahl an Scrobbles (es gibt kein H\u00f6chstlevel). Karten erhalten au\u00dferdem einen Rahmen (Bronze \u2192 schillernd), je nachdem wie oft der jeweilige Interpret/Titel/das Album gespielt wurde. Alles wird automatisch aus bereits lokal zwischengespeicherten Statistiken berechnet, ohne zus\u00e4tzliche Netzwerkaufrufe.';
   @override String get faqQ9 => 'Wie funktioniert der Energiesparmodus?';
   @override String get faqA9 => 'Der Energiesparmodus verlängert die Abstände zwischen automatischen Synchronisierungen, um Akku zu sparen. Du kannst ihn manuell aktivieren oder die App ihn je nach Akkustand selbst einschalten lassen, unter Einstellungen > Allgemein.';
   @override String get faqQ10 => 'Wie sichere oder stelle ich meine Daten wieder her?';
-  @override String get faqA10 => 'Gehe zu Einstellungen > Sicherung. Du kannst eine Sicherungsdatei exportieren (mit oder ohne deinen Last.fm-Schlüssel) und sie später oder auf einem anderen Gerät wieder importieren.';
+  @override String get faqA10 => 'Gehen Sie zu Einstellungen > Sicherung. Sie können eine Sicherungsdatei exportieren (mit oder ohne Ihren Last.fm-Schlüssel) und sie später oder auf einem anderen Gerät wieder importieren.';
   @override String get faqQ11 => 'Funktioniert die App offline?';
   @override String get faqA11 => 'Ja, bis zu einem gewissen Grad. Bereits geladene Statistiken bleiben dank lokalem Cache offline verfügbar, für neue Scrobbles ist aber eine Verbindung nötig.';
   @override String get faqQ12 => 'Kann ich das Last.fm-Konto wechseln?';
-  @override String get faqA12 => 'Ja. Melde dich unter Einstellungen > Konto ab und mit einem anderen Benutzernamen wieder an. Der lokale Cache wird automatisch geleert, damit sich keine Daten vermischen.';
+  @override String get faqA12 => 'Ja. Melden Sie sich unter Einstellungen > Konto ab und mit einem anderen Benutzernamen wieder an. Der lokale Cache wird automatisch geleert, damit sich keine Daten vermischen.';
   @override String get faqQ13 => 'Wie richte ich Benachrichtigungen ein?';
-  @override String get faqA13 => 'Unter Einstellungen > Benachrichtigungen kannst du Hinweise nach abgeschlossener Synchronisierung aktivieren, ihre Häufigkeit wählen oder sie ganz ausschalten.';
+  @override String get faqA13 => 'Unter Einstellungen > Benachrichtigungen können Sie Hinweise nach abgeschlossener Synchronisierung aktivieren, ihre Häufigkeit wählen oder sie ganz ausschalten.';
   @override String get settingsPlatformDisabledByShowAll => 'Deaktiviert: Es werden bereits alle Links angezeigt.';
   @override String get commonInDevelopment => 'In Entwicklung';
   @override String get commonSeeLess => 'Weniger anzeigen';
@@ -685,7 +685,7 @@ class AppStringsDe implements AppStrings {
   @override String syncNewScrobblesFound(int n) => n == 0 ? 'Keine neuen Scrobbles' : '$n neue(r) Scrobble(s) gefunden';
   @override String updatesPublishedOn(String date) => 'Veröffentlicht am $date';
   @override String fallbackWillShow(String detail) => 'Wird angezeigt: $detail';
-  @override String acctRemoveBody(String username) => '@$username aus deinen Konten entfernen?';
+  @override String acctRemoveBody(String username) => '@$username aus Ihren Konten entfernen?';
   @override String acctAddedSuccess(String username) => '@$username erfolgreich hinzugefügt.';
   @override String acctMyAccounts(int count, int max) => 'Meine Konten ($count/$max)';
   @override String acctSlotsRemaining(int n) => '$n Platz/Plätze übrig';
@@ -694,9 +694,9 @@ class AppStringsDe implements AppStrings {
   @override List<String> get weekdaysNarrow => const ['M', 'D', 'M', 'D', 'F', 'S', 'S'];
   @override String get weekAbbrev => 'W';
   @override List<String> get notifThresholdMessages => const [
-    'Deine ersten 1.000 Scrobbles. Die Reise beginnt. 🎵',
-    'Du hast fünfstellig geknackt! 🎉',
-    'Du bist ein echter Musiksüchtiger. 🔥',
+    'Ihre ersten 1.000 Scrobbles. Die Reise beginnt. 🎵',
+    'Sie haben fünfstellig geknackt! 🎉',
+    'Sie sind ein echter Musikfan. 🔥',
     'Eine Million Scrobbles. Das ist legendär. 🎸',
   ];
   @override String get achvTitle => 'Erfolge';

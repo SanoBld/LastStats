@@ -505,7 +505,7 @@ class AppStringsEn implements AppStrings {
   @override String get commonSave          => 'Save';
   @override String get dashFallbackWhenNoMusic   => 'When no music is playing';
   @override String get dashFallbackChooseDisplay => 'Choose what to display as background instead';
-  @override String get dashFallbackPeriodLabel   => 'Fallback period';
+  @override String get dashFallbackPeriodLabel   => 'Backup period';
   @override String get fallbackPeriod1Week       => '1 week';
   @override String get fallbackPeriod1Month      => '1 month';
   @override String get fallbackPeriodAllTime     => 'All time';

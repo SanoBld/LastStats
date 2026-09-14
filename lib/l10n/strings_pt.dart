@@ -505,7 +505,7 @@ class AppStringsPt implements AppStrings {
   @override String get commonSave          => 'Salvar';
   @override String get dashFallbackWhenNoMusic   => 'Quando nenhuma música está tocando';
   @override String get dashFallbackChooseDisplay => 'Escolha o que mostrar como fundo em vez disso';
-  @override String get dashFallbackPeriodLabel   => 'Período do fallback';
+  @override String get dashFallbackPeriodLabel   => 'Período de reserva';
   @override String get fallbackPeriod1Week       => '1 semana';
   @override String get fallbackPeriod1Month      => '1 mês';
   @override String get fallbackPeriodAllTime     => 'Todo período';

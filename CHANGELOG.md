@@ -59,6 +59,9 @@
 - About page now also notes that AI was used to help develop a good part of the app's code
 - README rewritten to match the current app (dashboard chart picker, custom nickname, working desktop sharing, license, AI note) and now includes real per-platform installation steps
 
+**Texts**
+- Improved wording across all translations, more natural phrasing, fewer stiff/technical terms
+
 **Code cleanup**
 - Removed dead code left over from the old dashboard carousels
 - Cleaned up a handful of unused imports and analyzer warnings
