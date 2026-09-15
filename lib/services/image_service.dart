@@ -8,6 +8,7 @@
 //   widgetImage(url, ...)                        → offline-capable Widget
 //   prefetchBytes(url)                           → background download
 
+import 'dart:collection' show LinkedHashMap;
 import 'dart:convert';
 import 'package:flutter/material.dart' show Theme;
 import 'package:flutter/widgets.dart';
@@ -30,10 +31,34 @@ class ImageService {
   static const _diskTtlMs   = 7 * 24 * 60 * 60 * 1000;
 
   // In-memory URL cache (session).
-  static final Map<String, String> _mem = {};
+  // BUG FIX: this used to be a plain Map with no size limit. On a long
+  // session (lots of scrolling through history/charts/search), every
+  // artist/album/track ever looked up stayed in RAM forever — this was
+  // one of the causes of the app using more and more memory the longer
+  // it stayed open. LinkedHashMap + a hard cap turns it into a simple
+  // LRU cache: oldest-used entries are dropped once the cap is hit.
+  static final Map<String, String> _mem = LinkedHashMap<String, String>();
   // Which source produced each cache key's URL — for the small attribution
   // label shown under artwork. Keyed by the same `key` used in `_mem`.
-  static final Map<String, String> _sourceOf = {};
+  static final Map<String, String> _sourceOf = LinkedHashMap<String, String>();
+  // Max entries kept in RAM at once. Disk cache (SharedPreferences) still
+  // has everything, so nothing is lost — it just gets re-read from disk
+  // instead of staying in memory forever.
+  static const int _memCap = 4000;
+
+  // Marks [key] as recently used and trims the cache if it grew past the
+  // cap. Call this every time an entry is read or written.
+  static void _touch(String key) {
+    final url = _mem.remove(key);
+    if (url != null) _mem[key] = url; // re-insert = moves to "most recent"
+    final src = _sourceOf.remove(key);
+    if (src != null) _sourceOf[key] = src;
+    while (_mem.length > _memCap) {
+      final oldest = _mem.keys.first;
+      _mem.remove(oldest);
+      _sourceOf.remove(oldest);
+    }
+  }
 
   static SharedPreferences? _prefs;
   static bool _diskLoaded = false;
@@ -69,11 +94,16 @@ class ImageService {
     } catch (_) {}
   }
 
-  static String? _getUrl(String key) => _mem[key];
+  static String? _getUrl(String key) {
+    final url = _mem[key];
+    if (url != null) _touch(key); // mark as recently used, keep it in RAM
+    return url;
+  }
 
   static Future<String> _persistUrl(String key, String url, [String source = '']) async {
     _mem[key] = url;
     if (source.isNotEmpty) _sourceOf[key] = source;
+    _touch(key);
     if (url.isEmpty) return url;
     try {
       _prefs ??= await SharedPreferences.getInstance();
