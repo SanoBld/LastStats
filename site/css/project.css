@@ -1,0 +1,365 @@
+/* extra styles just for the project detail pages (like laststats.html) */
+/* this file loads AFTER style.css, so it reuse all the same M3 color tokens */
+
+.project-page-header {
+  /* the generic "section" rule caps width at 1200px, which was clamping the
+     gradient blobs to that same box too, so they hard-cut before the real
+     screen edge instead of fading out. force it full width here. */
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding-top: 8rem;
+  padding-bottom: 5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+/* keep the actual text content readable and centered like a normal section
+   again (skip the two full-bleed background layers, they need the real width) */
+.project-page-header > *:not(.project-hero-bg):not(.project-hero-grid) {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* full-bleed gradient behind the whole header, same recipe as the main hero
+   (radial blobs + faint grid), fading out smoothly at the bottom instead of
+   cutting off in a hard line like it did before */
+.project-hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 10%, var(--md-primary-container), transparent 55%),
+    radial-gradient(circle at 85% 15%, var(--md-tertiary-container), transparent 45%),
+    radial-gradient(circle at 50% 100%, var(--md-secondary-container), transparent 50%);
+  opacity: .8;
+  z-index: -2;
+  animation: drift 22s ease-in-out infinite alternate;
+  -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
+}
+.project-hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(var(--md-outline-variant) 1px, transparent 1px), linear-gradient(90deg, var(--md-outline-variant) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 20%, #000 30%, transparent 80%);
+  opacity: .2;
+  z-index: -1;
+}
+
+/* the app logo, drawn as an inline svg so "currentColor" actually works
+   (it does not when the svg is loaded through an <img> tag, learned that too) */
+.project-logo {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 1.5rem;
+  border-radius: var(--shape-xl);
+  background: var(--md-surface-container-high);
+  color: var(--md-primary);
+  box-shadow: 0 1px 3px rgba(var(--md-shadow), .3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.project-logo svg { width: 85%; height: 85%; }
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .88rem;
+  font-weight: 500;
+  color: var(--md-primary);
+  padding: .5rem .9rem;
+  border-radius: var(--shape-full);
+  transition: background .25s var(--m3-standard);
+}
+.back-link:hover { background: var(--md-primary-container); }
+
+.project-page-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2.2rem, 6vw, 3.6rem);
+  margin: 1.2rem 0 1rem;
+}
+
+.project-page-desc {
+  max-width: 42rem;
+  margin: 0 auto 1.6rem;
+  color: var(--md-on-surface-variant);
+  font-size: 1.05rem;
+}
+
+/* action buttons row (github, discord, etc) */
+.project-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-bottom: 3rem; }
+.project-actions a, .project-actions button {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-size: .95rem; font-weight: 500;
+  padding: .8rem 1.5rem;
+  border-radius: var(--shape-full);
+  background: var(--md-primary); color: var(--md-on-primary);
+  box-shadow: 0 1px 3px rgba(var(--md-shadow), .3);
+  transition: transform .2s var(--m3-standard), box-shadow .2s var(--m3-standard);
+  border: none; cursor: pointer; font-family: inherit;
+}
+.project-actions a.tonal, .project-actions button.tonal { background: var(--md-secondary-container); color: var(--md-on-secondary-container); box-shadow: none; }
+.project-actions a:hover, .project-actions button:hover { transform: translateY(-3px); box-shadow: 0 6px 16px -4px rgba(var(--md-shadow), .4); }
+
+/* download modal: pick OS then architecture, then jumps straight to the
+   matching asset from the latest GitHub release */
+.dl-modal {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, .6);
+  opacity: 0; visibility: hidden;
+  transition: opacity .25s var(--m3-standard), visibility 0s linear .25s;
+  padding: 1.5rem;
+}
+.dl-modal.is-open { opacity: 1; visibility: visible; transition: opacity .25s var(--m3-standard); }
+.dl-modal-box {
+  background: var(--md-surface-container-high);
+  border-radius: var(--shape-xl);
+  width: min(420px, 100%);
+  padding: 1.75rem;
+  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, .6);
+  transform: scale(.96);
+  transition: transform .22s var(--m3-standard);
+}
+.dl-modal.is-open .dl-modal-box { transform: scale(1); }
+.dl-modal-title { font-family: var(--font-heading); font-size: 1.2rem; margin: 0 0 .3rem; }
+.dl-modal-sub { font-size: .85rem; color: var(--md-on-surface-variant); margin: 0 0 1.2rem; }
+.dl-modal-close {
+  position: absolute; top: 1.1rem; right: 1.1rem;
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none; color: var(--md-on-surface-variant); cursor: pointer;
+}
+.dl-modal-close:hover { background: var(--md-surface-container-highest); }
+.dl-modal-box { position: relative; }
+.dl-step-title { font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--md-on-surface-variant); margin: 0 0 .6rem; }
+.dl-options { display: flex; flex-direction: column; gap: .5rem; margin-bottom: .4rem; }
+.dl-option {
+  display: flex; align-items: center; gap: .7rem;
+  width: 100%; text-align: left;
+  padding: .8rem .9rem;
+  border-radius: var(--shape-md);
+  background: var(--md-surface-container-low);
+  border: 1px solid transparent;
+  color: var(--md-on-surface);
+  font-family: inherit; font-size: .92rem; font-weight: 500;
+  cursor: pointer;
+  transition: background .2s var(--m3-standard), border-color .2s var(--m3-standard);
+}
+.dl-option:hover { background: var(--md-secondary-container); }
+.dl-option svg { flex-shrink: 0; }
+.dl-option-text { display: flex; flex-direction: column; gap: .15rem; }
+.dl-option-text small { font-weight: 400; color: var(--md-on-surface-variant); font-size: .78rem; }
+.dl-back { margin-top: .6rem; font-size: .82rem; color: var(--md-primary); background: none; border: none; cursor: pointer; padding: .3rem 0; font-family: inherit; }
+.dl-status { font-size: .85rem; color: var(--md-on-surface-variant); text-align: center; padding: 1rem 0; }
+.dl-status.is-error { color: var(--md-error, #b3261e); }
+
+/* "About the app" text block, plain and readable */
+.about-app { max-width: 46rem; margin: 0 auto 4rem; text-align: left; }
+.about-app p { color: var(--md-on-surface-variant); font-size: 1.05rem; margin-bottom: 1rem; }
+.about-app p:last-child { margin-bottom: 0; }
+
+/* app walkthrough — real screenshot next to real text, alternating sides,
+   instead of a generic emoji-card grid or an auto-scrolling strip. */
+.showcase { display: flex; flex-direction: column; gap: 4.5rem; margin-bottom: 4rem; }
+.showcase-row { display: flex; align-items: center; gap: 3.5rem; }
+.showcase-row.from-right { flex-direction: row-reverse; }
+.showcase-media {
+  flex: 0 0 260px;
+  border-radius: var(--shape-lg);
+  overflow: hidden;
+  background: var(--md-surface-container-low);
+  box-shadow: 0 1px 2px rgba(var(--md-shadow), .15);
+  transition: transform .35s var(--m3-emphasized-decel), box-shadow .35s var(--m3-emphasized-decel);
+}
+.showcase-media:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 12px 26px -10px rgba(var(--md-shadow), .35); }
+.showcase-media img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 9/16; display: block; transform: scale(1.12); }
+.showcase-text { flex: 1; text-align: left; }
+.showcase-text h3 { font-family: var(--font-display); font-weight: 500; font-size: 1.4rem; margin-bottom: .7rem; color: var(--md-on-surface); }
+.showcase-text p { font-size: 1.02rem; line-height: 1.65; color: var(--md-on-surface-variant); }
+
+/* reveal but sliding in sideways instead of up, and from whichever side the
+   media sits on, so the story really feels like it's stepping in. */
+.reveal-x { opacity: 0; transition: opacity .7s var(--m3-emphasized-decel), transform .7s var(--m3-emphasized-decel); }
+.reveal-x.from-left { transform: translateX(-40px); }
+.reveal-x.from-right { transform: translateX(40px); }
+.reveal-x.in-view { opacity: 1; transform: translateX(0); }
+
+@media (max-width: 760px) {
+  .showcase-row, .showcase-row.from-right { flex-direction: column; }
+  .showcase-media { flex: 0 0 auto; width: 220px; margin: 0 auto; }
+  .showcase-text { text-align: center; }
+  .reveal-x.from-left, .reveal-x.from-right { transform: translateY(24px); }
+}
+
+/* feature list, small M3 chips grid to sum up main features */
+.feature-chips { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 2.5rem; justify-content: center; }
+.feature-chips span {
+  font-size: .82rem; font-weight: 500;
+  padding: .5rem 1rem;
+  border-radius: var(--shape-sm);
+  background: var(--md-tertiary-container);
+  color: var(--md-on-tertiary-container);
+  transition: transform .25s var(--m3-standard);
+}
+.feature-chips span:hover { transform: translateY(-2px); }
+
+.gallery-section-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  margin-bottom: 1.5rem;
+  color: var(--md-on-background);
+  /* sits above the progress rail so the two never visually overlap */
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 640px) {
+  .project-page-header { padding-top: 6rem; }
+  .about-app { text-align: left; }
+}
+
+/* clickable screenshots open the lightbox */
+.showcase-media.lightbox-trigger { cursor: zoom-in; }
+
+/* bottom gallery, shown as a stack of cards you click through */
+.card-stack {
+  position: relative;
+  width: min(78vw, 260px);
+  aspect-ratio: 9/16;
+  margin: 0 auto 1rem;
+}
+.card-stack-item {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--shape-lg);
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--md-surface-container-low);
+  box-shadow: 0 10px 24px -10px rgba(var(--md-shadow), .4);
+  opacity: 1;
+  transition: transform .5s var(--m3-emphasized-decel), opacity .5s var(--m3-emphasized-decel), box-shadow .3s var(--m3-standard);
+  /* messy uno-pile look: --i is the stack depth (0 = on top, set by JS),
+     --jx/--jy/--r are a small random jitter fixed per card at init, and
+     both scale up with depth so lower cards peek out unevenly */
+  transform:
+    translate(calc(var(--jx, 0px) * (var(--i, 0) + 1)), calc(var(--jy, 0px) * (var(--i, 0) + 1) + var(--i, 0) * 6px))
+    rotate(calc(var(--r, 0deg) + var(--i, 0) * 1deg))
+    scale(calc(1 - var(--i, 0) * 0.035));
+  z-index: calc(20 - var(--i, 0));
+}
+.card-stack-item:hover { box-shadow: 0 16px 32px -12px rgba(var(--md-shadow), .5); }
+.card-stack-item img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  /* a light zoom so the background decor around the phone mockup shows less,
+     without breaking the picture's proportions */
+  transform: scale(1.14);
+}
+.card-stack-item.is-leaving {
+  transition: transform .38s var(--m3-emphasized-accel), opacity .32s var(--m3-emphasized-accel);
+  transform: translate(55%, -6%) rotate(8deg) scale(.96);
+  opacity: 0;
+  z-index: 21; /* always stays above the rest while it flies off */
+}
+/* used for one frame to snap the card straight into its back-of-pile spot
+   with no transition/fade, instead of animating the return trip */
+.card-stack-item.is-returning { transition: none; }
+.card-stack-hint {
+  text-align: center;
+  font-size: .85rem;
+  color: var(--md-on-surface-variant);
+  margin-bottom: 4rem;
+}
+
+/* github stats strip: stars and latest release, pulled live from the API */
+.gh-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+.gh-stats .gh-stat {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .88rem;
+  font-weight: 500;
+  padding: .6rem 1.1rem;
+  border-radius: var(--shape-full);
+  background: var(--md-surface-container-high);
+  color: var(--md-on-surface-variant);
+}
+.gh-stats .gh-stat svg { flex: none; color: var(--md-primary); }
+
+/* nav hides on scroll down, comes back on scroll up */
+.nav { transition: transform .3s var(--m3-standard); }
+.nav.nav-hidden { transform: translateY(-120%); }
+
+/* ===== side scroll-progress rail ===== */
+.showcase-wrap { display: flex; align-items: flex-start; gap: 3.5rem; margin-top: 1rem; }
+.showcase-progress {
+  flex: 0 0 2px;
+  position: sticky;
+  /* sticks to the viewport top and reserves a full viewport of height, then
+     centers its content with flexbox instead of a translateY hack — that
+     hack rendered the rail past its own box, straight over the title above */
+  top: 0;
+  align-self: stretch;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.showcase-progress-inner {
+  position: relative;
+  width: 2px;
+  height: min(56vh, 480px);
+}
+.showcase { flex: 1; min-width: 0; }
+.showcase-progress-track,
+.showcase-progress-fill {
+  position: absolute;
+  left: 0; top: 0;
+  width: 2px;
+  border-radius: var(--shape-full);
+}
+.showcase-progress-track {
+  height: 100%;
+  background: repeating-linear-gradient(to bottom, var(--md-outline-variant) 0 4px, transparent 4px 10px);
+}
+.showcase-progress-fill {
+  height: 0%;
+  background: var(--md-primary);
+  transition: height .1s linear;
+}
+.showcase-progress-ticks { position: absolute; inset: 0; }
+.showcase-progress-ticks .tick {
+  position: absolute;
+  left: 50%;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--md-surface-container-high);
+  border: 2px solid var(--md-outline-variant);
+  transform: translate(-50%, -50%);
+  transition: background .25s var(--m3-standard), border-color .25s var(--m3-standard), transform .25s var(--m3-standard);
+}
+.showcase-progress-ticks .tick.is-active {
+  background: var(--md-primary);
+  border-color: var(--md-primary);
+  transform: translate(-50%, -50%) scale(1.3);
+}
+/* only show the rail where there's actually room for it beside the 1200px
+   content column without touching anything */
+@media (max-width: 1350px) {
+  .showcase-wrap { display: block; }
+  .showcase-progress { display: none; }
+}

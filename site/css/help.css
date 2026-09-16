@@ -1,0 +1,148 @@
+/* extra styles just for the help page (help.html) */
+/* loads after style.css and project.css, reuses the same M3 tokens */
+
+.help-header { padding-bottom: 3rem; }
+
+/* back-link (css/project.css already defines .back-link, this just centers it here) */
+.help-header .back-link { margin-bottom: 1.5rem; }
+
+.help-section { max-width: 900px; }
+
+/* plain info card, one per topic, readable text block on a soft surface */
+.help-card {
+  background: var(--md-surface-container-low);
+  border-radius: var(--shape-lg);
+  padding: 1.6rem 1.8rem;
+  margin-bottom: 1.2rem;
+  text-align: left;
+}
+.help-card h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.15rem;
+  margin-bottom: .6rem;
+  color: var(--md-on-surface);
+}
+.help-card p {
+  color: var(--md-on-surface-variant);
+  font-size: .98rem;
+  line-height: 1.6;
+}
+.help-card p + p { margin-top: .7rem; }
+.help-note {
+  margin-top: .9rem;
+  font-size: .88rem !important;
+  color: var(--md-on-tertiary-container) !important;
+  background: var(--md-tertiary-container);
+  border-radius: var(--shape-sm);
+  padding: .7rem .9rem;
+}
+
+/* numbered connection steps */
+.help-steps {
+  list-style: none;
+  counter-reset: help-step;
+  color: var(--md-on-surface-variant);
+  font-size: .98rem;
+  line-height: 1.6;
+}
+.help-steps li {
+  counter-increment: help-step;
+  position: relative;
+  padding-left: 2.5rem;
+  margin-bottom: 1rem;
+}
+.help-steps li:last-child { margin-bottom: 0; }
+.help-steps li::before {
+  content: counter(help-step);
+  position: absolute;
+  left: 0; top: 0;
+  width: 1.7rem; height: 1.7rem;
+  border-radius: 50%;
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  font-family: var(--font-display);
+  font-size: .82rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.help-external-link {
+  display: inline-flex;
+  margin-top: 1rem;
+  font-size: .9rem; font-weight: 500;
+  padding: .7rem 1.2rem;
+  border-radius: var(--shape-full);
+  background: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+  transition: transform .2s var(--m3-standard);
+}
+.help-external-link:hover { transform: translateY(-2px); }
+
+/* FAQ accordion, built with plain <details>/<summary>, no JS needed */
+.faq-list {
+  background: var(--md-surface-container-low);
+  border-radius: var(--shape-lg);
+  overflow: hidden;
+  text-align: left;
+  margin-bottom: 2rem;
+}
+.faq-item { border-bottom: 1px solid var(--md-outline-variant); }
+.faq-item:last-child { border-bottom: none; }
+.faq-item summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.4rem;
+  font-size: .96rem;
+  font-weight: 600;
+  color: var(--md-on-surface);
+  transition: background .2s var(--m3-standard);
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary:hover { background: var(--md-surface-container-high); }
+.faq-chevron { flex-shrink: 0; color: var(--md-on-surface-variant); transition: transform .25s var(--m3-standard); }
+.faq-item[open] .faq-chevron { transform: rotate(180deg); }
+.faq-item p {
+  padding: 0 1.4rem 1.3rem 1.4rem;
+  color: var(--md-on-surface-variant);
+  font-size: .92rem;
+  line-height: 1.6;
+}
+
+/* open-source badge, same look as the one in the app's FAQ screen */
+.help-badge {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  border-radius: var(--shape-md);
+  padding: .9rem 1.1rem;
+  font-size: .85rem;
+}
+.help-badge svg { flex-shrink: 0; color: var(--md-primary); }
+
+.help-more {
+  text-align: center;
+  color: var(--md-on-surface-variant);
+  font-size: .92rem;
+  margin-top: 1.2rem;
+}
+.help-more a { color: var(--md-primary); font-weight: 600; }
+.help-more a:hover { text-decoration: underline; }
+
+@media (max-width: 640px) {
+  .help-card { padding: 1.3rem 1.4rem; }
+}
+
+/* Legal notice page */
+.legal-content { max-width: 760px; margin: 0 auto; padding: 0 1.5rem 4rem; display: flex; flex-direction: column; gap: 1.4rem; }
+.legal-block {
+  background: var(--md-surface-container-low); border: 1px solid var(--md-outline-variant);
+  border-radius: var(--shape-lg); padding: 1.5rem 1.7rem;
+}
+.legal-block h2 { font-family: var(--font-display); font-size: 1.05rem; margin-bottom: .6rem; color: var(--md-primary); }
+.legal-block p { color: var(--md-on-surface-variant); font-size: .92rem; line-height: 1.6; }
+.legal-block p + p { margin-top: .6rem; }
