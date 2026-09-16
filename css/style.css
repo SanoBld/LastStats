@@ -1,0 +1,423 @@
+/* ==========================================================
+   MATERIAL DESIGN 3 — Design tokens (seed color: teal-blue #10617D)
+   ========================================================== */
+:root {
+  --md-primary: #10617D;
+  --md-on-primary: #FFFFFF;
+  --md-primary-container: #BEE9FF;
+  --md-on-primary-container: #001F2A;
+
+  --md-secondary: #4B6268;
+  --md-on-secondary: #FFFFFF;
+  --md-secondary-container: #CEE7EE;
+  --md-on-secondary-container: #061E23;
+
+  --md-tertiary: #5C5B7D;
+  --md-on-tertiary: #FFFFFF;
+  --md-tertiary-container: #E3DFFF;
+  --md-on-tertiary-container: #191837;
+
+  --md-error: #BA1A1A;
+
+  --md-background: #F6FAFC;
+  --md-on-background: #171C1E;
+  --md-on-surface: #171C1E;
+  --md-on-surface-variant: #40484C;
+  --md-outline-variant: #C0C8CC;
+
+  --md-surface-container-low: #F0F4F6;
+  --md-surface-container: #EAEFF1;
+  --md-surface-container-high: #E4EAED;
+
+  --md-shadow: 0,0,0;
+
+  --m3-standard: cubic-bezier(.2,0,0,1);
+  --m3-emphasized-decel: cubic-bezier(.05,.7,.1,1);
+
+  --shape-sm: 8px;
+  --shape-md: 12px;
+  --shape-lg: 16px;
+  --shape-xl: 28px;
+  --shape-full: 999px;
+
+  --font-display: 'Google Sans Display', 'Space Grotesk', sans-serif;
+  --font-body: 'Roboto', 'Inter', sans-serif;
+}
+
+[data-theme="dark"] {
+  --md-primary: #83D1F0;
+  --md-on-primary: #00344A;
+  --md-primary-container: #004D63;
+  --md-on-primary-container: #BEE9FF;
+
+  --md-secondary: #B2CBD2;
+  --md-on-secondary: #1D3438;
+  --md-secondary-container: #334A4F;
+  --md-on-secondary-container: #CEE7EE;
+
+  --md-tertiary: #C6C2EA;
+  --md-on-tertiary: #2D2C4C;
+  --md-tertiary-container: #444364;
+  --md-on-tertiary-container: #E3DFFF;
+
+  --md-error: #FFB4AB;
+
+  --md-background: #0E1416;
+  --md-on-background: #DEE4E7;
+  --md-on-surface: #DEE4E7;
+  --md-on-surface-variant: #C0C8CC;
+  --md-outline-variant: #40484C;
+
+  --md-surface-container-low: #171C1E;
+  --md-surface-container: #1B2123;
+  --md-surface-container-high: #252B2D;
+
+  --md-shadow: 0,0,0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+::selection { background: var(--md-primary-container); color: var(--md-on-primary-container); }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--md-background);
+  color: var(--md-on-background);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  transition: background .5s var(--m3-standard), color .5s var(--m3-standard);
+  overflow-x: hidden;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+
+/* Ripple M3 */
+.md-ripple { position: relative; overflow: hidden; }
+.ripple-ink {
+  position: absolute;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .18;
+  transform: scale(0);
+  animation: ripple-anim .6s var(--m3-standard);
+  pointer-events: none;
+}
+@keyframes ripple-anim { to { transform: scale(1); opacity: 0; } }
+
+/* Theme toggle — icon button tonal, sits in the nav flex row now (not fixed anymore)
+   so it never floats on top of other text like it used to do with contact link */
+.theme-toggle {
+  width: 44px; height: 44px; flex-shrink: 0; border-radius: var(--shape-full);
+  border: none; background: var(--md-secondary-container); color: var(--md-on-secondary-container);
+  cursor: pointer; z-index: 200; display: flex; align-items: center; justify-content: center;
+  transition: transform .2s var(--m3-standard);
+  box-shadow: 0 1px 3px rgba(var(--md-shadow), .3);
+}
+.theme-toggle:hover { transform: scale(1.06); }
+.theme-toggle:active { transform: scale(.94); }
+.theme-toggle .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--md-primary); transition: transform .3s var(--m3-standard), box-shadow .3s var(--m3-standard); box-shadow: 0 0 0 2px transparent; }
+[data-theme="dark"] .theme-toggle .dot { transform: scale(.75); box-shadow: 0 0 8px var(--md-primary); }
+/* auto mode: half-filled ring around the dot, on top of whichever light/dark look is resolved */
+[data-theme-mode="auto"] .theme-toggle .dot { box-shadow: 0 0 0 2px var(--md-outline-variant); }
+[data-theme-mode="auto"][data-theme="dark"] .theme-toggle .dot { box-shadow: 0 0 0 2px var(--md-outline-variant), 0 0 8px var(--md-primary); }
+
+/* nav language switch, sits next to the theme dot */
+.nav-toggles { display: flex; align-items: center; gap: .5rem; }
+.lang-toggle {
+  height: 44px; padding: 0 .95rem; flex-shrink: 0; border-radius: var(--shape-full);
+  border: none; background: var(--md-secondary-container); color: var(--md-on-secondary-container);
+  cursor: pointer; z-index: 200; display: flex; align-items: center; justify-content: center;
+  font-size: .82rem; font-weight: 700; letter-spacing: .03em;
+  transition: transform .2s var(--m3-standard);
+  box-shadow: 0 1px 3px rgba(var(--md-shadow), .3);
+}
+.lang-toggle:hover { transform: scale(1.06); }
+.lang-toggle:active { transform: scale(.94); }
+
+/* Cursor glow — very faint ambience only, not a spotlight */
+.cursor-glow {
+  position: fixed; top: 0; left: 0; width: 160px; height: 160px; border-radius: 50%;
+  pointer-events: none; transform: translate(-50%, -50%); z-index: 1; will-change: transform;
+  background: radial-gradient(circle, var(--md-primary-container), transparent 65%); opacity: .1;
+}
+@media (hover: none) { .cursor-glow { display: none; } }
+
+/* Nav — M3 Top App Bar pill */
+.nav { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: flex-end; align-items: center; gap: .8rem; padding: 1.1rem 2.5rem; z-index: 100; }
+.nav-logo {
+  font-family: var(--font-display); font-weight: 500; font-size: 1.15rem; color: var(--md-on-surface);
+  background: var(--md-surface-container-high); width: 40px; height: 40px; border-radius: var(--shape-lg);
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-links { list-style: none; display: flex; align-items: center; height: 44px; box-sizing: border-box; gap: .3rem; background: var(--md-surface-container-high); backdrop-filter: blur(16px); padding: 0 .35rem; border-radius: var(--shape-full); }
+.nav-links a { color: var(--md-on-surface-variant); font-size: .88rem; font-weight: 500; padding: .55rem 1.1rem; border-radius: var(--shape-full); display: inline-flex; align-items: center; height: 100%; box-sizing: border-box; transition: background .25s var(--m3-standard), color .25s var(--m3-standard); }
+.nav-links a:hover { background: var(--md-primary-container); color: var(--md-on-primary-container); }
+@media (max-width: 640px) { .nav-links { gap: 0; } .nav-links li:nth-child(3) { display: none; } }
+
+/* Hero */
+.hero { position: relative; min-height: 100svh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.hero-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, var(--md-primary-container), transparent 55%),
+    radial-gradient(circle at 82% 25%, var(--md-tertiary-container), transparent 45%),
+    radial-gradient(circle at 55% 90%, var(--md-secondary-container), transparent 50%);
+  opacity: .8;
+  animation: drift 22s ease-in-out infinite alternate;
+}
+@keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(-4%, 3%) scale(1.12); } }
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(var(--md-outline-variant) 1px, transparent 1px), linear-gradient(90deg, var(--md-outline-variant) 1px, transparent 1px);
+  background-size: 64px 64px; mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 80%); opacity: .25;
+}
+.hero-noise {
+  position: absolute; inset: 0; opacity: .03; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.hero-content { width: 100%; text-align: center; padding: 0 2.5rem; position: relative; z-index: 2; }
+.hero-tag { display: inline-block; font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--md-primary); background: var(--md-primary-container); padding: .4rem 1rem; border-radius: var(--shape-full); margin-bottom: 1.5rem; font-weight: 600; }
+
+.hero-title { font-family: var(--font-display); font-weight: 500; font-size: clamp(2.8rem, 11vw, 6.8rem); line-height: 1; letter-spacing: -.01em; position: relative; }
+.hero-title span { display: block; opacity: 0; transform: translateY(40px); }
+.hero-title .reveal-char { animation: rise 1s var(--m3-emphasized-decel) forwards; }
+.hero-title .reveal-char:nth-child(2) { animation-delay: .12s; }
+@keyframes rise { to { opacity: 1; transform: translateY(0); } }
+.hero-title .outline { background: linear-gradient(100deg, var(--md-primary), var(--md-tertiary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+.hero-sub { margin-top: 1.4rem; color: var(--md-on-surface-variant); font-size: clamp(1rem, 2vw, 1.2rem); }
+
+/* "Decouvrir" button — classic scroll-mouse indicator (outline capsule with a
+   dot dropping inside) next to the label. redone from scratch, simpler and
+   quieter than the old FAB+ring version. */
+.hero-scroll {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: .85rem;
+  color: var(--md-on-surface-variant);
+  transition: color .25s var(--m3-standard);
+}
+.hero-scroll:hover { color: var(--md-primary); }
+.hero-scroll-mouse {
+  position: relative;
+  flex-shrink: 0;
+  width: 24px; height: 38px;
+  border-radius: var(--shape-full);
+  border: 2px solid currentColor;
+  transition: border-color .25s var(--m3-standard);
+}
+.hero-scroll-dot {
+  position: absolute;
+  top: 7px; left: 50%;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  transform: translate(-50%, 0);
+  animation: scroll-dot-drop 1.9s var(--m3-standard) infinite;
+}
+@keyframes scroll-dot-drop {
+  0%   { transform: translate(-50%, 0);    opacity: 1; }
+  60%  { transform: translate(-50%, 14px); opacity: 0; }
+  61%  { transform: translate(-50%, 0);    opacity: 0; }
+  100% { transform: translate(-50%, 0);    opacity: 1; }
+}
+.hero-scroll-label {
+  font-size: .85rem;
+  font-weight: 600;
+  letter-spacing: .03em;
+  white-space: nowrap;
+}
+
+/* wrapper that holds the music widget + the "Decouvrir" button.
+   on desktop the widget sits pinned to the left (a bit tilted) and the button
+   stays perfectly centered no matter the widget width */
+.hero-actions {
+  position: relative;
+  width: 100%;
+  min-height: 64px;
+  margin-top: 2rem;
+}
+
+/* Now-playing widget — M3 filled card (pill) */
+.music-widget {
+  display: inline-flex;
+  align-items: center;
+  gap: .9rem;
+  max-width: 280px;
+  padding: .5rem 1.3rem .5rem .5rem;
+  border-radius: var(--shape-full);
+  background: var(--md-surface-container-high);
+  text-align: left;
+  box-shadow: 0 1px 2px rgba(var(--md-shadow), .2);
+}
+.music-widget.hidden { display: none; }
+.music-art {
+  position: relative;
+  display: block;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--md-primary-container);
+  flex-shrink: 0;
+}
+.music-art img { width: 100%; height: 100%; object-fit: cover; display: none; }
+.music-art.has-art img { display: block; }
+.music-art-fallback {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  color: var(--md-on-primary-container);
+}
+/* js toggles this once real cover art has loaded, so the note icon disappears */
+.music-art.has-art .music-art-fallback { display: none; }
+.music-widget.is-playing .music-art img,
+.music-widget.is-playing .music-art-fallback { animation: spin 6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.music-text { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.music-label { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--md-primary); font-weight: 600; }
+.music-track,
+.music-artist { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.music-track { font-size: .88rem; font-family: var(--font-display); color: var(--md-on-surface); }
+.music-artist { font-size: .78rem; color: var(--md-on-surface-variant); }
+
+@media (min-width: 641px) {
+  .hero-actions .music-widget {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%) rotate(-4deg);
+    transition: transform .3s var(--m3-standard);
+  }
+  .hero-actions .music-widget:hover { transform: translateY(-50%) rotate(0deg) scale(1.02); }
+  .hero-actions .hero-scroll {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: 0;
+  }
+}
+@media (max-width: 640px) {
+  /* not enough room to pin things left/center, just stack them normally */
+  .hero-actions { display: flex; flex-direction: column; align-items: center; gap: 1.2rem; min-height: 0; }
+  .hero-actions .music-widget { margin: 0 auto; }
+  .hero-actions .hero-scroll { margin-top: 0; }
+}
+
+/* Marquee */
+.marquee { position: absolute; bottom: 0; left: 0; right: 0; background: var(--md-surface-container); overflow: hidden; padding: 1rem 0; z-index: 2; }
+.marquee-track { display: flex; gap: 1.3rem; white-space: nowrap; width: max-content; animation: scroll-left 22s linear infinite; font-family: var(--font-display); font-size: .9rem; color: var(--md-on-surface-variant); }
+.marquee-track span:nth-child(2n) { color: var(--md-primary); font-weight: 500; }
+@keyframes scroll-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* Reveal-on-scroll */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s var(--m3-emphasized-decel), transform .7s var(--m3-emphasized-decel); }
+.reveal.in-view { opacity: 1; transform: translateY(0); }
+.hero-title span:nth-child(2) { transition-delay: .1s; }
+
+/* fade-only reveal, for elements that already own a transform (the music widget's
+   rotate, the button's centering translate) — using plain .reveal on those made the
+   reveal's own translateY overwrite that transform completely and snap the element
+   to the wrong spot once it came into view. This one only touches opacity. */
+.reveal-fade { opacity: 0; transition: opacity .7s var(--m3-emphasized-decel); }
+.reveal-fade.in-view { opacity: 1; }
+
+/* Sections */
+section { padding: 7rem 2.5rem; max-width: 1200px; margin: 0 auto; }
+.section-head { margin-bottom: 3rem; }
+.section-tag { display: inline-block; font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--md-tertiary); background: var(--md-tertiary-container); padding: .35rem .9rem; border-radius: var(--shape-full); font-weight: 600; margin-bottom: .8rem; }
+.section-title { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); font-weight: 500; color: var(--md-on-background); }
+
+/* Project cards — M3 elevated */
+.project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+@media (max-width: 400px) {
+  /* 320px minmax leaves no room once you subtract the section's own padding
+     on the smallest phones, so it was forcing a few px of horizontal scroll */
+  .project-grid { grid-template-columns: 1fr; }
+}
+.project-card {
+  background: var(--md-surface-container-low); border-radius: var(--shape-xl); overflow: hidden; position: relative;
+  box-shadow: 0 1px 2px rgba(var(--md-shadow), .15);
+  transition: transform .4s var(--m3-emphasized-decel), box-shadow .4s var(--m3-emphasized-decel), background .3s;
+}
+.project-card:hover { transform: translateY(-6px); background: var(--md-surface-container-high); box-shadow: 0 8px 24px -8px rgba(var(--md-shadow), .35), 0 2px 6px rgba(var(--md-shadow), .2); }
+.project-img { aspect-ratio: 16/10; background: linear-gradient(135deg, var(--md-primary-container), var(--md-tertiary-container)); overflow: hidden; position: relative; }
+/* when a card shows a logo instead of a screenshot, center it nicely instead of stretching it like a cover photo */
+.project-img.logo-tile { display: flex; align-items: center; justify-content: center; color: var(--md-primary); }
+.project-img.logo-tile svg { width: 30%; height: 30%; transition: transform .5s var(--m3-emphasized-decel); }
+.project-card:hover .project-img.logo-tile svg { transform: scale(1.1); }
+.project-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--m3-standard); }
+.project-card:hover .project-img img { transform: scale(1.05); }
+.project-info { padding: 1.5rem 1.6rem 1.7rem; }
+.project-info h3 { font-family: var(--font-display); font-weight: 500; font-size: 1.25rem; margin-bottom: .5rem; color: var(--md-on-surface); }
+.project-desc { color: var(--md-on-surface-variant); font-size: .92rem; margin-bottom: 1.1rem; }
+
+.project-tags { display: flex; gap: .5rem; margin-bottom: 1.3rem; flex-wrap: wrap; }
+.project-tags span { font-size: .75rem; padding: .35rem .85rem; border-radius: var(--shape-sm); background: var(--md-secondary-container); color: var(--md-on-secondary-container); font-weight: 500; transition: transform .25s var(--m3-standard), background .25s; }
+.project-tags span:hover { transform: translateY(-2px); background: var(--md-secondary); color: var(--md-on-secondary); }
+
+.project-link { font-size: .88rem; font-weight: 600; color: var(--md-primary); padding: .6rem 1rem; margin: -.6rem -1rem; border-radius: var(--shape-full); display: inline-block; transition: background .25s var(--m3-standard); }
+.project-link:hover { background: var(--md-primary-container); }
+
+/* About */
+.about-content p { font-size: clamp(1.1rem, 2.4vw, 1.5rem); max-width: 46rem; color: var(--md-on-surface-variant); }
+
+/* Contact — M3 filled/tonal buttons */
+.contact-links { display: flex; gap: 1rem; flex-wrap: wrap; }
+.contact-links a { font-family: var(--font-body); font-size: 1rem; font-weight: 500; padding: .9rem 1.6rem; border-radius: var(--shape-full); background: var(--md-primary); color: var(--md-on-primary); box-shadow: 0 1px 3px rgba(var(--md-shadow), .3); transition: box-shadow .3s var(--m3-standard), transform .2s var(--m3-standard); }
+.contact-links a:nth-child(2) { background: var(--md-secondary-container); color: var(--md-on-secondary-container); box-shadow: none; }
+.contact-links a:nth-child(3) { background: var(--md-tertiary-container); color: var(--md-on-tertiary-container); box-shadow: none; }
+.contact-links a:hover { transform: translateY(-3px); box-shadow: 0 6px 16px -4px rgba(var(--md-shadow), .4); }
+
+.footer { text-align: center; padding: 2.5rem; color: var(--md-on-surface-variant); font-size: .8rem; }
+.footer .footer-links { margin-top: .4rem; display: flex; justify-content: center; gap: .6rem; }
+.footer .footer-links a { color: var(--md-on-surface-variant); text-decoration: underline; text-underline-offset: 2px; }
+.footer .footer-links a:hover { color: var(--md-primary); }
+
+@media (max-width: 640px) { section { padding: 4.5rem 1.3rem; } .nav { padding: 1rem 1.2rem; } }
+
+/* ===== Lightbox — click a screenshot to see it big, click again to zoom ===== */
+body.lightbox-locked { overflow: hidden; }
+.lightbox {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, .82);
+  opacity: 0; visibility: hidden;
+  transition: opacity .25s var(--m3-standard), visibility 0s linear .25s;
+}
+.lightbox.is-open { opacity: 1; visibility: visible; transition: opacity .25s var(--m3-standard); }
+.lightbox-stage {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  padding: 4rem 1.5rem;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.lightbox-stage img {
+  max-width: 100%; max-height: 100%;
+  border-radius: var(--shape-md);
+  cursor: zoom-in;
+  transition: transform .35s var(--m3-emphasized-decel);
+  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, .6);
+}
+.lightbox-stage img.is-zoomed { transform: scale(2.2); cursor: zoom-out; }
+.lightbox-close {
+  position: absolute; top: 1.3rem; right: 1.3rem;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255, 255, 255, .1);
+  color: #fff;
+  transition: background .25s var(--m3-standard);
+}
+.lightbox-close:hover { background: rgba(255, 255, 255, .2); }
+.lightbox-hint {
+  position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+  font-size: .8rem; color: rgba(255, 255, 255, .65);
+  pointer-events: none;
+}
+@media (max-width: 640px) {
+  .lightbox-stage { padding: 3rem 1rem; }
+  .lightbox-close { top: .8rem; right: .8rem; width: 40px; height: 40px; }
+}
