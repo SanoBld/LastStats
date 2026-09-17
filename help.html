@@ -19,8 +19,8 @@
   <div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
 
   <nav class="nav">
-    <a href="index.html" class="nav-logo md-ripple" aria-label="LastStats — accueil">
-      <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><rect x="349" y="374" width="72" height="290" rx="36"/><rect x="476" y="299" width="72" height="440" rx="36"/><rect x="603" y="399" width="72" height="240" rx="36"/><circle cx="512" cy="843" r="48"/></svg>
+    <a href="help.html" class="nav-logo md-ripple" aria-label="Aide">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     </a>
     <div class="nav-toggles">
       <button type="button" class="lang-toggle md-ripple" aria-label="Switch to English">EN</button>
@@ -75,25 +75,27 @@
 
     <div class="help-card reveal">
       <h3 data-fr="Quelle app utiliser pour scrobbler ?" data-en="Which app should I use to scrobble?">Quelle app utiliser pour scrobbler ?</h3>
-      <p data-fr="Pour que vos écoutes remontent automatiquement sur Last.fm, il vous faut un « scrobbler ». Sur Android, l'app la plus recommandée est Pano Scrobbler : elle détecte ce que vous écoutez dans n'importe quelle app de musique (Spotify, YouTube Music, etc.) et l'envoie sur Last.fm. Beaucoup de lecteurs desktop (comme Spotify) ont aussi une connexion Last.fm intégrée, activable directement dans leurs paramètres." data-en="For your listens to reach Last.fm automatically, you need a 'scrobbler'. On Android, the most recommended app is Pano Scrobbler: it detects what you're playing in any music app (Spotify, YouTube Music, etc.) and sends it to Last.fm. Many desktop players (like Spotify) also have a built-in Last.fm connection you can turn on directly in their settings.">
-        Pour que vos écoutes remontent automatiquement sur Last.fm, il vous faut un « scrobbler ».
-        Sur Android, l'app la plus recommandée est Pano Scrobbler : elle détecte ce que vous
-        écoutez dans n'importe quelle app de musique (Spotify, YouTube Music, etc.) et l'envoie
-        sur Last.fm. Beaucoup de lecteurs desktop (comme Spotify) ont aussi une connexion Last.fm
-        intégrée, activable directement dans leurs paramètres.
+      <p>
+        <span data-fr="Pour que vos écoutes remontent sur " data-en="For your listens to reach ">Pour que vos écoutes remontent sur </span><a href="https://www.last.fm" target="_blank" rel="noopener">Last.fm</a><span data-fr=" automatiquement, il vous faut un « scrobbler »." data-en=" automatically, you need a 'scrobbler'."> automatiquement, il vous faut un « scrobbler ».</span>
+        <span data-fr="Sur Android, l'app la plus recommandée est " data-en="On Android, the most recommended app is ">Sur Android, l'app la plus recommandée est </span><a href="https://play.google.com/store/apps/details?id=com.arn.scrobble" target="_blank" rel="noopener">Pano Scrobbler</a><span data-fr=" : elle détecte ce que vous écoutez dans n'importe quelle app de musique (Spotify, YouTube Music, etc.) et l'envoie sur Last.fm. Beaucoup de lecteurs desktop (comme Spotify) ont aussi une connexion Last.fm intégrée, activable directement dans leurs paramètres." data-en=": it detects what you're playing in any music app (Spotify, YouTube Music, etc.) and sends it to Last.fm. Many desktop players (like Spotify) also have a built-in Last.fm connection you can turn on directly in their settings."> : elle détecte ce que vous écoutez dans n'importe quelle app de musique (Spotify, YouTube Music, etc.) et l'envoie sur Last.fm. Beaucoup de lecteurs desktop (comme Spotify) ont aussi une connexion Last.fm intégrée, activable directement dans leurs paramètres.</span>
       </p>
     </div>
 
     <div class="help-card reveal">
       <h3 data-fr="Comment connecter LastStats à mon compte ?" data-en="How do I connect LastStats to my account?">Comment connecter LastStats à mon compte ?</h3>
       <ol class="help-steps">
-        <li data-fr="Si vous n'avez pas encore de compte Last.fm, créez-en un gratuitement sur last.fm." data-en="If you don't have a Last.fm account yet, create one for free on last.fm.">Si vous n'avez pas encore de compte Last.fm, créez-en un gratuitement sur last.fm.</li>
-        <li data-fr="Installez un scrobbler (ex. Pano Scrobbler) ou activez le scrobbling depuis votre lecteur de musique habituel, pour que vos écoutes commencent à s'enregistrer." data-en="Install a scrobbler (e.g. Pano Scrobbler) or turn on scrobbling from your usual music player, so your listens start being logged.">Installez un scrobbler (ex. Pano Scrobbler) ou activez le scrobbling depuis votre lecteur de musique habituel, pour que vos écoutes commencent à s'enregistrer.</li>
+        <li>
+          <span data-fr="Si vous n'avez pas encore de compte Last.fm, créez-en un gratuitement sur " data-en="If you don't have a Last.fm account yet, create one for free on ">Si vous n'avez pas encore de compte Last.fm, créez-en un gratuitement sur </span><a href="https://www.last.fm/join" target="_blank" rel="noopener">last.fm</a>.
+        </li>
+        <li>
+          <span data-fr="Installez un scrobbler (ex. " data-en="Install a scrobbler (e.g. ">Installez un scrobbler (ex. </span><a href="https://play.google.com/store/apps/details?id=com.arn.scrobble" target="_blank" rel="noopener">Pano Scrobbler</a><span data-fr=") ou activez le scrobbling depuis votre lecteur de musique habituel, pour que vos écoutes commencent à s'enregistrer." data-en=") or turn on scrobbling from your usual music player, so your listens start being logged.">) ou activez le scrobbling depuis votre lecteur de musique habituel, pour que vos écoutes commencent à s'enregistrer.</span>
+        </li>
         <li data-fr="Ouvrez LastStats, entrez votre nom d'utilisateur Last.fm, puis une clé API. Vous pouvez en créer une gratuitement sur la page « Créer une clé API » du site de Last.fm." data-en="Open LastStats, enter your Last.fm username, then an API key. You can create one for free on Last.fm's 'Create API key' page.">Ouvrez LastStats, entrez votre nom d'utilisateur Last.fm, puis une clé API. Vous pouvez en créer une gratuitement sur la page « Créer une clé API » du site de Last.fm.</li>
         <li data-fr="Optionnel : pour utiliser les favoris, renseignez aussi une clé secrète Last.fm dans le même écran, ou plus tard depuis Paramètres > Compte." data-en="Optional: to use favorites, also enter a Last.fm secret key on the same screen, or later from Settings > Account.">Optionnel : pour utiliser les favoris, renseignez aussi une clé secrète Last.fm dans le même écran, ou plus tard depuis Paramètres > Compte.</li>
       </ol>
       <a class="help-external-link md-ripple" href="https://www.last.fm/api/account/create" target="_blank" rel="noopener">
-        <span data-fr="Créer une clé API Last.fm →" data-en="Create a Last.fm API key →">Créer une clé API Last.fm →</span>
+        <span data-fr="Créer une clé API Last.fm" data-en="Create a Last.fm API key">Créer une clé API Last.fm</span>
+        <svg class="arrow-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
       </a>
     </div>
   </section>
@@ -218,7 +220,10 @@
 
     <p class="help-more" data-fr="Une question sans réponse ici ? Passez sur le Discord." data-en="Still have a question? Drop by the Discord.">
       Une question sans réponse ici ?
-      <a href="https://discord.gg/JjqmkQgZBs" target="_blank" rel="noopener" data-fr="Passez sur le Discord →" data-en="Drop by the Discord →">Passez sur le Discord →</a>
+      <a href="https://discord.gg/JjqmkQgZBs" target="_blank" rel="noopener" class="inline-link">
+        <span data-fr="Passez sur le Discord" data-en="Drop by the Discord">Passez sur le Discord</span>
+        <svg class="arrow-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+      </a>
     </p>
   </section>
 
