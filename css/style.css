@@ -378,6 +378,11 @@ section { padding: 7rem 2.5rem; max-width: 1200px; margin: 0 auto; }
 
 .footer { text-align: center; padding: 2.5rem; color: var(--md-on-surface-variant); font-size: .8rem; }
 .footer .footer-links { margin-top: .4rem; display: flex; flex-wrap: wrap; justify-content: center; gap: .3rem .8rem; }
+.about-cta {
+  display: inline-block; margin-top: 1.2rem; padding: .5rem 1.2rem; border-radius: var(--shape-full);
+  background: var(--md-secondary-container); color: var(--md-on-secondary-container);
+  font-size: .8rem; font-weight: 500; text-decoration: none;
+}
 .footer .footer-links a { color: var(--md-on-surface-variant); text-decoration: underline; text-underline-offset: 2px; }
 .footer .footer-links a:hover { color: var(--md-primary); }
 
