@@ -119,6 +119,15 @@
     modal.setAttribute('aria-hidden', 'true');
   }
 
+  function withTransition(renderFn) {
+    const content = modal.querySelector('#dl-modal-content');
+    content.classList.add('is-switching');
+    setTimeout(() => {
+      renderFn();
+      modal.querySelector('#dl-modal-content').classList.remove('is-switching');
+    }, 180);
+  }
+
   function renderPlatformStep() {
     const content = modal.querySelector('#dl-modal-content');
     content.innerHTML = `
@@ -133,9 +142,9 @@
       btn.innerHTML = `${platform.icon}<span>${platform.label}</span>`;
       btn.addEventListener('click', () => {
         if (platform.archs) {
-          renderArchStep(platform);
+          withTransition(() => renderArchStep(platform));
         } else {
-          resolveDownload(platform, null);
+          withTransition(() => resolveDownload(platform, null));
         }
       });
       list.appendChild(btn);
@@ -159,10 +168,10 @@
       btn.innerHTML = sub
         ? `<span class="dl-option-text"><strong>${arch.label}</strong><small>${sub}</small></span>`
         : `<span>${arch.label}</span>`;
-      btn.addEventListener('click', () => resolveDownload(platform, arch));
+      btn.addEventListener('click', () => withTransition(() => resolveDownload(platform, arch)));
       list.appendChild(btn);
     });
-    content.querySelector('.dl-back').addEventListener('click', renderPlatformStep);
+    content.querySelector('.dl-back').addEventListener('click', () => withTransition(renderPlatformStep));
   }
 
   function renderStatus(message, isError) {
@@ -171,7 +180,7 @@
       <h3 class="dl-modal-title" id="dl-modal-title">${t('dlDownloadTitle', 'Téléchargement')}</h3>
       <p class="dl-status${isError ? ' is-error' : ''}">${message}</p>
       <button type="button" class="dl-back">${t('dlBackRetry', '← Retour')}</button>`;
-    content.querySelector('.dl-back').addEventListener('click', renderPlatformStep);
+    content.querySelector('.dl-back').addEventListener('click', () => withTransition(renderPlatformStep));
   }
 
   function resolveDownload(platform, arch) {
