@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aide — LastStats</title>
+<title>LastStats</title>
 <meta name="description" content="Aide LastStats : comment ça marche, comment connecter votre compte Last.fm, et toutes les questions fréquentes.">
 <meta name="theme-color" content="#10617D">
+<link rel="icon" href="assets/img/favicon-light.png" media="(prefers-color-scheme: light)">
+<link rel="icon" href="assets/img/favicon-dark.png" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
@@ -17,6 +19,9 @@
   <div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
 
   <nav class="nav">
+    <a href="index.html" class="nav-logo md-ripple" aria-label="LastStats — accueil">
+      <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><rect x="349" y="374" width="72" height="290" rx="36"/><rect x="476" y="299" width="72" height="440" rx="36"/><rect x="603" y="399" width="72" height="240" rx="36"/><circle cx="512" cy="843" r="48"/></svg>
+    </a>
     <div class="nav-toggles">
       <button type="button" class="lang-toggle md-ripple" aria-label="Switch to English">EN</button>
       <button id="theme-toggle" class="theme-toggle md-ripple" aria-label="Changer de thème">
@@ -220,6 +225,10 @@
   <footer class="footer">
     <p>© 2026 Sano Bld</p>
     <div class="footer-links">
+      <a href="help.html" data-fr="Aide" data-en="Help">Aide</a>
+      <a href="https://github.com/SanoBld/LastStats-App" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/SanoBld/LastStats-App/releases" target="_blank" rel="noopener" data-fr="Télécharger" data-en="Download">Télécharger</a>
+      <a href="https://discord.gg/JjqmkQgZBs" target="_blank" rel="noopener">Discord</a>
       <a href="legal.html" data-fr="Mentions légales" data-en="Legal notice">Mentions légales</a>
     </div>
   </footer>
