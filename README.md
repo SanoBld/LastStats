@@ -1,7 +1,10 @@
 # LastStats
 
 <p align="center">
-  <img src="assets/icons/app_logo.svg" width="96" height="96" alt="LastStats logo">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/icons/app_logo_dark.png">
+    <img src="assets/icons/app_logo_light.png" width="96" height="96" alt="LastStats logo">
+  </picture>
 </p>
 
 <p align="center">
