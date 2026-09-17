@@ -9,6 +9,7 @@
     fr: {
       nowPlaying: 'Écoute en cours',
       ghFavorites: 'favoris',
+      ghDownloads: 'téléchargements',
       ghLatestVersion: 'Dernière version',
       lightboxZoomIn: 'Clique pour zoomer',
       lightboxZoomOut: 'Clique pour dézoomer',
@@ -30,6 +31,7 @@
     en: {
       nowPlaying: 'Now playing',
       ghFavorites: 'stars',
+      ghDownloads: 'downloads',
       ghLatestVersion: 'Latest version',
       lightboxZoomIn: 'Click to zoom in',
       lightboxZoomOut: 'Click to zoom out',
