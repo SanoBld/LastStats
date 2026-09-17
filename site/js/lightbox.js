@@ -1,15 +1,17 @@
 // Click a screenshot -> see it big. Click it again to zoom in around wherever
 // you clicked, click once more (or the backdrop / X / Esc) to close.
+// Exposes window.Lightbox.init() so pages that inject images after load
+// (like the README-driven about page) can hook new <img> triggers in too.
 (function () {
   const lightbox = document.getElementById('lightbox');
   const stage = document.getElementById('lightbox-stage');
   const img = document.getElementById('lightbox-img');
   const closeBtn = document.getElementById('lightbox-close');
   const hint = document.getElementById('lightbox-hint');
-  const triggers = document.querySelectorAll('.lightbox-trigger img');
-  if (!lightbox || !triggers.length) return;
+  if (!lightbox) return;
 
   let isZoomed = false;
+  const bound = new WeakSet();
 
   function open(src, alt) {
     img.src = src;
@@ -29,14 +31,19 @@
     img.classList.remove('is-zoomed');
   }
 
-  triggers.forEach((t) => {
-    t.addEventListener('click', () => open(t.src, t.alt));
-  });
+  function init(root) {
+    const scope = root || document;
+    scope.querySelectorAll('.lightbox-trigger img').forEach((t) => {
+      if (bound.has(t)) return;
+      bound.add(t);
+      t.style.cursor = 'zoom-in';
+      t.addEventListener('click', () => open(t.src, t.alt));
+    });
+  }
 
   img.addEventListener('click', (e) => {
     e.stopPropagation();
     if (!isZoomed) {
-      // zoom in centered on wherever the click landed
       const r = img.getBoundingClientRect();
       const originX = ((e.clientX - r.left) / r.width) * 100;
       const originY = ((e.clientY - r.top) / r.height) * 100;
@@ -57,4 +64,7 @@
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && lightbox.classList.contains('is-open')) close();
   });
+
+  window.Lightbox = { init };
+  init();
 })();

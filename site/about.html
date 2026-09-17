@@ -46,9 +46,24 @@
   </section>
 
   <main class="about-content">
+    <nav class="readme-toc" id="readme-toc" aria-hidden="true" aria-label="Sommaire">
+      <div class="readme-progress-track"><div class="readme-progress-bar" id="readme-progress-bar"></div></div>
+      <div class="readme-toc-list" id="readme-toc-list"></div>
+    </nav>
     <div id="readme-status" class="about-status" data-fr="Chargement du README…" data-en="Loading README…">Chargement du README…</div>
     <article id="readme-body" class="markdown-body reveal-fade"></article>
   </main>
+
+  <!-- lightbox overlay, reused for every README screenshot -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button class="lightbox-close md-ripple" id="lightbox-close" aria-label="Fermer">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+    <div class="lightbox-stage" id="lightbox-stage">
+      <img id="lightbox-img" src="" alt="">
+    </div>
+    <span class="lightbox-hint" id="lightbox-hint">Clique pour zoomer</span>
+  </div>
 
   <footer class="footer">
     <p>© 2026 Sano Bld</p>
@@ -68,6 +83,7 @@
   <script src="js/cursor.js"></script>
   <script src="js/ripple.js"></script>
   <script src="js/nav-autohide.js"></script>
+  <script src="js/lightbox.js"></script>
   <script src="js/readme.js" data-repo="SanoBld/LastStats-App"></script>
 </body>
 </html>
