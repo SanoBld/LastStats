@@ -14,6 +14,13 @@
 .markdown-body ul, .markdown-body ol { margin: 0 0 1rem 1.3rem; padding: 0; }
 .markdown-body li { margin-bottom: .3rem; }
 .markdown-body img { max-width: 100%; border-radius: var(--shape-lg); }
+.markdown-body p[align="center"], .markdown-body div[align="center"] {
+  text-align: center; display: flex; flex-wrap: wrap; justify-content: center;
+  align-items: center; gap: .5rem;
+}
+.markdown-body p[align="center"] img, .markdown-body div[align="center"] img {
+  display: inline-block; max-width: 100%; height: auto; margin: 0;
+}
 .markdown-body code {
   background: var(--md-surface-container-high); padding: .1rem .4rem; border-radius: .3rem;
   font-size: .85em; font-family: monospace;
