@@ -1,6 +1,32 @@
-.about-content { max-width: 760px; margin: 0 auto; padding: 0 1.5rem 4rem; }
-.about-status { text-align: center; color: var(--md-on-surface-variant); padding: 2rem 0; font-size: .9rem; }
+.about-content { max-width: 1040px; margin: 0 auto; padding: 0 1.5rem 4rem; display: flex; gap: 2.5rem; align-items: flex-start; }
+.markdown-body { flex: 1; min-width: 0; }
+.about-status { flex: 1; text-align: center; color: var(--md-on-surface-variant); padding: 2rem 0; font-size: .9rem; }
 .about-status.is-error { color: var(--md-error, #b3261e); }
+
+/* Left sidebar — reading progress rail + clickable table of contents */
+.readme-toc {
+  display: flex; gap: .8rem; width: 220px; flex-shrink: 0; position: sticky; top: 5.5rem;
+  max-height: calc(100vh - 7rem); overflow: hidden;
+}
+.readme-toc[aria-hidden="true"] { display: none; }
+.readme-progress-track {
+  width: 3px; flex-shrink: 0; border-radius: 3px; background: var(--md-outline-variant);
+  position: relative; overflow: hidden;
+}
+.readme-progress-bar {
+  position: absolute; top: 0; left: 0; width: 100%; height: 0%;
+  background: var(--md-primary); border-radius: 3px; transition: height .1s linear;
+}
+.readme-toc-list { display: flex; flex-direction: column; gap: .1rem; overflow-y: auto; font-size: .82rem; }
+.readme-toc-list a {
+  color: var(--md-on-surface-variant); padding: .3rem 0; text-decoration: none;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .15s var(--m3-standard);
+}
+.readme-toc-list a:hover { color: var(--md-primary); }
+.readme-toc-list .readme-toc-h1 { font-weight: 700; }
+.readme-toc-list .readme-toc-h2 { padding-left: 0; }
+.readme-toc-list .readme-toc-h3 { padding-left: .9rem; font-size: .78rem; opacity: .85; }
+@media (max-width: 900px) { .readme-toc { display: none !important; } .about-content { display: block; } }
 
 .markdown-body { line-height: 1.7; color: var(--md-on-surface); }
 .markdown-body h1, .markdown-body h2, .markdown-body h3 {
