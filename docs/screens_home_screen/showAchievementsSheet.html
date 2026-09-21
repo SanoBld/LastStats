@@ -70,16 +70,10 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">void showAchievementsSheet(BuildContext context, Map&lt;String, dynamic&gt;? userInfo, {bool isSelf = false}) {
-  Navigator.of(context).push(PageRouteBuilder(
-    opaque: false,
-    fullscreenDialog: true,
-    pageBuilder: (_, _, _) =&gt; _AchievementsSheet(userInfo: userInfo, isSelf: isSelf),
-    transitionsBuilder: (_, anim, _, child) =&gt; SlideTransition(
-      position: Tween&lt;Offset&gt;(begin: const Offset(0, 1), end: Offset.zero)
-          .animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
-      child: child,
-    ),
-    transitionDuration: const Duration(milliseconds: 380),
+  &#47;&#47; The tapped card grows into the page (container transform).
+  Navigator.of(context).push(M3ContainerRoute&lt;void&gt;(
+    builder: (_) =&gt; _AchievementsSheet(userInfo: userInfo, isSelf: isSelf),
+    origin: M3Motion.originOf(context),
   ));
 }</code></pre>
 </section>

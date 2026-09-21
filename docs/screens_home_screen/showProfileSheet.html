@@ -78,22 +78,14 @@
   bool isFav = false,
   VoidCallback? onToggleFav,
 }) {
-  Navigator.of(context).push(PageRouteBuilder(
-    opaque: false,
-    fullscreenDialog: true,
-    pageBuilder: (_, _, _) =&gt; _FullProfileSheet(
+  Navigator.of(context).push(_detailRoute(
+    context,
+    (_) =&gt; _FullProfileSheet(
       username:    username,
       service:     service,
       isFav:       isFav,
       onToggleFav: onToggleFav ?? () {},
     ),
-    transitionsBuilder: (_, anim, _, child) =&gt; SlideTransition(
-      position: Tween&lt;Offset&gt;(begin: const Offset(0, 1), end: Offset.zero)
-          .animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
-      child: child,
-    ),
-    transitionDuration:        const Duration(milliseconds: 380),
-    reverseTransitionDuration: const Duration(milliseconds: 300),
   ));
 }</code></pre>
 </section>

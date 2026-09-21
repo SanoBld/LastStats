@@ -76,17 +76,9 @@
   String type,          &#47;&#47; &#39;artists&#39; | &#39;albums&#39; | &#39;tracks&#39;
   LastFmService service,
 ) {
-  Navigator.of(context).push(PageRouteBuilder(
-    opaque: false,
-    fullscreenDialog: true,
-    pageBuilder:        (_, _, _) =&gt; _ItemDetailSheet(item: item, type: type, service: service),
-    transitionsBuilder: (_, anim, _, child) =&gt; SlideTransition(
-      position: Tween&lt;Offset&gt;(begin: const Offset(0, 1), end: Offset.zero)
-          .animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
-      child: child,
-    ),
-    transitionDuration:        const Duration(milliseconds: 380),
-    reverseTransitionDuration: const Duration(milliseconds: 300),
+  Navigator.of(context).push(_detailRoute(
+    context,
+    (_) =&gt; _ItemDetailSheet(item: item, type: type, service: service),
   ));
 }</code></pre>
 </section>

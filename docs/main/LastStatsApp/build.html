@@ -146,10 +146,12 @@ Widget build(BuildContext context) {
                             final nLightWithNav = nLight.copyWith(
                               navigationBarTheme: nLight.navigationBarTheme
                                   .copyWith(labelBehavior: navBehavior),
+                            pageTransitionsTheme: kM3PageTransitions,
                             );
                             final nDarkWithNav = nDark.copyWith(
                               navigationBarTheme: nDark.navigationBarTheme
                                   .copyWith(labelBehavior: navBehavior),
+                            pageTransitionsTheme: kM3PageTransitions,
                             );
                             return MaterialApp(
                               navigatorKey:               navigatorKey,
@@ -261,12 +263,14 @@ Widget build(BuildContext context) {
                                   final lTheme = ThemeData(
                                     colorScheme: lightScheme,
                                     useMaterial3: true,
+                                    pageTransitionsTheme: kM3PageTransitions,
                                     navigationBarTheme: NavigationBarThemeData(
                                         labelBehavior: navBehavior),
                                   );
                                   final dTheme = ThemeData(
                                     colorScheme: darkScheme,
                                     useMaterial3: true,
+                                    pageTransitionsTheme: kM3PageTransitions,
                                     navigationBarTheme: NavigationBarThemeData(
                                         labelBehavior: navBehavior),
                                   );
