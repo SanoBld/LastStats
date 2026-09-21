@@ -55,6 +55,7 @@ import 'favorites_page.dart';
 import '../services/favorites_folders_service.dart';
 import 'track_row_tile.dart';
 import '../theme/m3_motion.dart';
+import '../theme/m3_shapes.dart';
 import '../widgets/skeleton.dart';
 import '../widgets/m3_action_row.dart';
 

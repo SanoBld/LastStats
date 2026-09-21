@@ -4,6 +4,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'dart:convert';
+import '../../theme/m3_shapes.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/skeleton.dart';
 import 'package:http/http.dart' as http;
@@ -138,6 +139,7 @@ class _AccountPageState extends State<AccountPage> {
     final acc  = _accounts[index];
 
     final ok = await showDialog<bool>(
+    animationStyle: kM3DialogAnimation,
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(L.acctRemoveTitle),
@@ -193,6 +195,7 @@ class _AccountPageState extends State<AccountPage> {
     if (_accounts.length >= AccountManager.maxAccounts) return;
 
     final result = await showDialog<AccountEntry>(
+    animationStyle: kM3DialogAnimation,
       context: context,
       builder: (_) => _AddAccountDialog(
         existingApiKey: _accounts.isNotEmpty
@@ -224,6 +227,7 @@ class _AccountPageState extends State<AccountPage> {
 
   Future<void> _logoutAll() async {
     final ok   = await showDialog<bool>(
+    animationStyle: kM3DialogAnimation,
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(L.settingsLogoutTitle),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../theme/m3_motion.dart';
+import '../theme/m3_shapes.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -74,25 +76,25 @@ class _SetupScreenState extends State<SetupScreen>
     );
 
     _langFade  = CurvedAnimation(parent: _entryCtrl,
-        curve: const Interval(0.0, 0.45, curve: Curves.easeOut));
+        curve: const Interval(0.0, 0.45, curve: M3Motion.emphasizedDecelerate));
     _langSlide = Tween<Offset>(begin: const Offset(0, -0.6), end: Offset.zero)
         .animate(CurvedAnimation(parent: _entryCtrl,
-            curve: const Interval(0.0, 0.5, curve: Curves.easeOutCubic)));
+            curve: const Interval(0.0, 0.5, curve: M3Motion.emphasizedDecelerate)));
 
     _logoScale = Tween<double>(begin: 0.55, end: 1.0).animate(
         CurvedAnimation(parent: _entryCtrl,
-            curve: const Interval(0.1, 0.65, curve: Curves.easeOutBack)));
+            curve: const Interval(0.1, 0.65, curve: M3Motion.emphasizedDecelerate)));
     _logoFade  = CurvedAnimation(parent: _entryCtrl,
-        curve: const Interval(0.1, 0.55, curve: Curves.easeOut));
+        curve: const Interval(0.1, 0.55, curve: M3Motion.emphasizedDecelerate));
 
     _cardSlide = Tween<Offset>(begin: const Offset(0, 0.14), end: Offset.zero)
         .animate(CurvedAnimation(parent: _entryCtrl,
-            curve: const Interval(0.35, 0.95, curve: Curves.easeOutCubic)));
+            curve: const Interval(0.35, 0.95, curve: M3Motion.emphasizedDecelerate)));
     _cardFade  = CurvedAnimation(parent: _entryCtrl,
-        curve: const Interval(0.35, 0.85, curve: Curves.easeOut));
+        curve: const Interval(0.35, 0.85, curve: M3Motion.emphasizedDecelerate));
 
     _footerFade = CurvedAnimation(parent: _entryCtrl,
-        curve: const Interval(0.62, 1.0, curve: Curves.easeOut));
+        curve: const Interval(0.62, 1.0, curve: M3Motion.emphasizedDecelerate));
 
     _entryCtrl.forward();
 
@@ -102,7 +104,7 @@ class _SetupScreenState extends State<SetupScreen>
       duration: const Duration(milliseconds: 2600),
     )..repeat(reverse: true);
     _floatAnim = Tween<double>(begin: -5.5, end: 5.5).animate(
-        CurvedAnimation(parent: _floatCtrl, curve: Curves.easeInOut));
+        CurvedAnimation(parent: _floatCtrl, curve: M3Motion.emphasized));
   }
 
   @override
@@ -131,6 +133,7 @@ class _SetupScreenState extends State<SetupScreen>
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
     showModalBottomSheet(
+    sheetAnimationStyle: kM3SheetAnimation,
       context: context,
       backgroundColor: scheme.surface,
       shape: const RoundedRectangleBorder(
@@ -285,18 +288,13 @@ class _SetupScreenState extends State<SetupScreen>
 
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
-        PageRouteBuilder(
-          pageBuilder: (_, _, _) => _FirstLoadScreen(
+        M3FadeThroughRoute<void>(
+          builder: (_) => _FirstLoadScreen(
             username:       username,
             apiKey:         apiKey,
             service:        service,
             totalScrobbles: totalScrobbles,
           ),
-          transitionsBuilder: (_, anim, _, child) => FadeTransition(
-            opacity: CurvedAnimation(parent: anim, curve: Curves.easeOut),
-            child: child,
-          ),
-          transitionDuration: const Duration(milliseconds: 350),
         ),
       );
     } catch (e) {
@@ -881,7 +879,7 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
     // Page fade-in
     _fadeCtrl = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 600));
-    _fade = CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeOut);
+    _fade = CurvedAnimation(parent: _fadeCtrl, curve: M3Motion.emphasizedDecelerate);
     _fadeCtrl.forward();
 
     // Pulsing icon
@@ -889,15 +887,15 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
         vsync: this, duration: const Duration(milliseconds: 1400))
       ..repeat(reverse: true);
     _pulse = Tween<double>(begin: 0.92, end: 1.0).animate(
-        CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
+        CurvedAnimation(parent: _pulseCtrl, curve: M3Motion.emphasized));
 
     // Welcome banner (scale-in + fade-in on completion)
     _welcomeCtrl = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 550));
     _welcomeScale = Tween<double>(begin: 0.75, end: 1.0).animate(
-        CurvedAnimation(parent: _welcomeCtrl, curve: Curves.easeOutBack));
+        CurvedAnimation(parent: _welcomeCtrl, curve: M3Motion.emphasizedDecelerate));
     _welcomeFade  = CurvedAnimation(
-        parent: _welcomeCtrl, curve: Curves.easeOut);
+        parent: _welcomeCtrl, curve: M3Motion.emphasizedDecelerate);
 
     PrefetchService.progressNotifier.addListener(_onProgress);
     PrefetchService.prefetchAllWithProgress(widget.service, force: true);
@@ -919,23 +917,11 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
     Future.delayed(const Duration(milliseconds: 1600), () {
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
-        PageRouteBuilder(
-          pageBuilder: (_, _, _) => OnboardingFlow(
+        M3FadeThroughRoute<void>(
+          builder: (_) => OnboardingFlow(
             username: widget.username,
             apiKey:   widget.apiKey,
           ),
-          transitionsBuilder: (_, anim, _, child) {
-            final curved = CurvedAnimation(
-                parent: anim, curve: Curves.easeOutCubic);
-            return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0.0, 0.06),
-                end:   Offset.zero,
-              ).animate(curved),
-              child: FadeTransition(opacity: curved, child: child),
-            );
-          },
-          transitionDuration: const Duration(milliseconds: 550),
         ),
       );
     });
@@ -1064,7 +1050,7 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
                       child: TweenAnimationBuilder<double>(
                         tween: Tween(begin: 0, end: _state.fraction),
                         duration: const Duration(milliseconds: 400),
-                        curve: Curves.easeOutCubic,
+                        curve: M3Motion.emphasizedDecelerate,
                         builder: (_, v, _) => LinearProgressIndicator(
                           value:           v,
                           minHeight:       7,
@@ -1077,10 +1063,8 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
                     const SizedBox(height: 10),
 
                     // ── Current step label (below bar) ────────────────────
-                    AnimatedSwitcher(
+                    M3Switcher(
                       duration: const Duration(milliseconds: 220),
-                      transitionBuilder: (child, anim) =>
-                          FadeTransition(opacity: anim, child: child),
                       child: Text(
                         _state.isComplete
                             ? _t('✨ Import terminé !', '✨ Import complete!')
@@ -1101,7 +1085,7 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
                     // Written in the chosen language (FR / EN)
                     AnimatedSize(
                       duration: const Duration(milliseconds: 400),
-                      curve: Curves.easeOutCubic,
+                      curve: M3Motion.emphasizedDecelerate,
                       child: _state.isComplete
                           ? FadeTransition(
                               opacity: _welcomeFade,
@@ -1223,7 +1207,7 @@ class _FirstLoadChecklistState extends State<_FirstLoadChecklist> {
           _sc.animateTo(
             _sc.position.maxScrollExtent,
             duration: const Duration(milliseconds: 280),
-            curve: Curves.easeOut,
+            curve: M3Motion.emphasizedDecelerate,
           );
         }
       });
@@ -1247,7 +1231,7 @@ class _FirstLoadChecklistState extends State<_FirstLoadChecklist> {
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 350),
-      curve: Curves.easeOut,
+      curve: M3Motion.emphasizedDecelerate,
       width: double.infinity,
       constraints: const BoxConstraints(maxHeight: 340),
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),

@@ -338,3 +338,24 @@ class M3Switcher extends StatelessWidget {
     );
   }
 }
+
+// ── One-time flows (setup → onboarding → home) ─────────────────────────────
+// Old page fades out first, then the new page fades in. No overlap.
+class M3FadeThroughRoute<T> extends PageRouteBuilder<T> {
+  M3FadeThroughRoute({required WidgetBuilder builder})
+      : super(
+          transitionDuration: const Duration(milliseconds: 300),
+          reverseTransitionDuration: const Duration(milliseconds: 200),
+          pageBuilder: (context, _, _) => builder(context),
+          transitionsBuilder: (context, animation, secondary, child) {
+            final incoming = animation.drive(CurveTween(
+                curve: const Interval(0.35, 1.0, curve: Curves.easeOut)));
+            final outgoing = ReverseAnimation(secondary.drive(CurveTween(
+                curve: const Interval(0.0, 0.35, curve: Curves.easeIn))));
+            return FadeTransition(
+              opacity: outgoing,
+              child: FadeTransition(opacity: incoming, child: child),
+            );
+          },
+        );
+}

@@ -1,6 +1,7 @@
 // lib/screens/settings/appearance_page.dart
 
 import 'package:flutter/material.dart';
+import '../../theme/m3_shapes.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app_state.dart';
@@ -141,6 +142,7 @@ class _AppearancePageState extends State<AppearancePage> {
   Future<void> _pickCustomColor() async {
     if (_useDynamicColor || _useNowPlayingColor) return;
     final result = await showDialog<Color>(
+    animationStyle: kM3DialogAnimation,
       context: context,
       builder: (_) => ColorPickerDialog(initialColor: accentNotifier.value),
     );
@@ -154,6 +156,7 @@ class _AppearancePageState extends State<AppearancePage> {
 
   Future<void> _pickFallbackColor() async {
     final result = await showDialog<Color>(
+    animationStyle: kM3DialogAnimation,
       context: context,
       builder: (_) => ColorPickerDialog(initialColor: _fallbackAccent),
     );
@@ -180,6 +183,7 @@ class _AppearancePageState extends State<AppearancePage> {
 
   Future<void> _pickDarkAccentColor() async {
     final result = await showDialog<Color>(
+    animationStyle: kM3DialogAnimation,
       context: context,
       builder: (_) => ColorPickerDialog(initialColor: accentDarkNotifier.value),
     );

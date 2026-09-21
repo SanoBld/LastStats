@@ -1,17 +1,22 @@
 // lib/widgets/m3_action_row.dart
 // ══════════════════════════════════════════════════════════════════════════
-//  Material 3 action buttons: a round button (heart) next to a wide pill
-//  button (play). Both are tonal and change shape a little when pressed.
+//  Material 3 action buttons.
+//  • M3CircleButton → cookie shaped round button (heart), accent color
+//  • M3PillButton   → wide pill button (play), tonal color
+//  Both morph to a softer square while pressed.
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import '../theme/m3_motion.dart';
+import '../theme/m3_shapes.dart';
 
 // Shared base: colored shape + ripple + press animation.
 class _M3Pressable extends StatefulWidget {
   const _M3Pressable({
     required this.height,
     required this.color,
+    required this.idleShape,
+    required this.pressedShape,
     required this.child,
     this.width,
     this.onTap,
@@ -22,6 +27,8 @@ class _M3Pressable extends StatefulWidget {
   final double        height;
   final double?       width;
   final Color         color;
+  final OutlinedBorder idleShape;
+  final OutlinedBorder pressedShape;
   final Widget        child;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
@@ -37,12 +44,10 @@ class _M3PressableState extends State<_M3Pressable> {
   @override
   Widget build(BuildContext context) {
     final reduce = M3Motion.reduced(context);
-    // Round when idle, a softer square when pressed.
-    final radius = BorderRadius.circular(
-        (_down && !reduce) ? 18.0 : widget.height / 2);
+    final shape  = (_down && !reduce) ? widget.pressedShape : widget.idleShape;
 
     Widget body = AnimatedScale(
-      scale: (_down && !reduce) ? 0.96 : 1.0,
+      scale: (_down && !reduce) ? 0.95 : 1.0,
       duration: M3Motion.short,
       curve: M3Motion.standard,
       child: AnimatedContainer(
@@ -51,15 +56,15 @@ class _M3PressableState extends State<_M3Pressable> {
         width: widget.width,
         height: widget.height,
         clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: widget.color.withValues(
               alpha: widget.onTap == null ? 0.6 : 1.0),
-          borderRadius: radius,
+          shape: shape,
         ),
         child: Material(
           type: MaterialType.transparency,
           child: InkWell(
-            borderRadius: radius,
+            customBorder: shape,
             onTap: widget.onTap,
             onLongPress: widget.onLongPress,
             onHighlightChanged: (v) => setState(() => _down = v),
@@ -70,14 +75,13 @@ class _M3PressableState extends State<_M3Pressable> {
     );
 
     if (widget.tooltip != null) {
-      body = Semantics(
-          button: true, label: widget.tooltip, child: body);
+      body = Semantics(button: true, label: widget.tooltip, child: body);
     }
     return body;
   }
 }
 
-/// Round button (56 dp), for example the heart.
+/// Round cookie button (56 dp), for example the heart. Uses the accent color.
 class M3CircleButton extends StatelessWidget {
   const M3CircleButton({
     super.key,
@@ -85,7 +89,6 @@ class M3CircleButton extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.busy = false,
-    this.iconColor,
     this.tooltip,
   });
 
@@ -93,17 +96,18 @@ class M3CircleButton extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final bool          busy;
-  final Color?        iconColor;
   final String?       tooltip;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final fg = iconColor ?? scheme.onTertiaryContainer;
+    final fg = scheme.onPrimary;
     return _M3Pressable(
       width: 56,
       height: 56,
-      color: scheme.tertiaryContainer,
+      color: scheme.primary,
+      idleShape:    const M3CookieBorder(lobes: 8, amplitude: 0.07),
+      pressedShape: const M3CookieBorder(lobes: 8, amplitude: 0.0),
       onTap: busy ? null : onTap,
       onLongPress: onLongPress,
       tooltip: tooltip,
@@ -142,40 +146,43 @@ class M3PillButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final fg = scheme.onPrimaryContainer;
+    final fg = scheme.onSecondaryContainer;
     return _M3Pressable(
       height: 56,
-      color: scheme.primaryContainer,
+      color: scheme.secondaryContainer,
+      idleShape: const StadiumBorder(),
+      pressedShape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       onTap: busy ? null : onTap,
       tooltip: tooltip,
       child: SizedBox.expand(
         child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Positioned.fill(
-            child: TweenAnimationBuilder<double>(
-              tween: Tween<double>(end: progress.clamp(0.0, 1.0)),
-              duration: M3Motion.short,
-              builder: (context, v, _) => FractionallySizedBox(
-                alignment: Alignment.centerLeft,
-                widthFactor: v,
-                child: ColoredBox(
-                    color: scheme.primary.withValues(alpha: 0.22)),
+          alignment: Alignment.center,
+          children: [
+            Positioned.fill(
+              child: TweenAnimationBuilder<double>(
+                tween: Tween<double>(end: progress.clamp(0.0, 1.0)),
+                duration: M3Motion.short,
+                builder: (context, v, _) => FractionallySizedBox(
+                  alignment: Alignment.centerLeft,
+                  widthFactor: v,
+                  child: ColoredBox(
+                      color: scheme.secondary.withValues(alpha: 0.22)),
+                ),
               ),
             ),
-          ),
-          M3Switcher(
-            duration: M3Motion.short,
-            child: busy
-                ? SizedBox(
-                    key: const ValueKey('busy'),
-                    width: 22, height: 22,
-                    child: CircularProgressIndicator(
-                        strokeWidth: 2, color: fg),
-                  )
-                : Icon(icon, key: ValueKey(icon), color: fg, size: 30),
-          ),
-        ],
+            M3Switcher(
+              duration: M3Motion.short,
+              child: busy
+                  ? SizedBox(
+                      key: const ValueKey('busy'),
+                      width: 22, height: 22,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: fg),
+                    )
+                  : Icon(icon, key: ValueKey(icon), color: fg, size: 30),
+            ),
+          ],
         ),
       ),
     );

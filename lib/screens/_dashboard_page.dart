@@ -756,6 +756,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   // Confirmation dialog then full cache wipe + reload
   Future<void> _confirmResetCache() async {
     final ok = await showDialog<bool>(
+    animationStyle: kM3DialogAnimation,
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(L.dashResetCache),
@@ -1577,13 +1578,13 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                           position: Tween<Offset>(
                             begin: const Offset(0.06, 0),
                             end:   Offset.zero,
-                          ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
+                          ).animate(CurvedAnimation(parent: anim, curve: M3Motion.emphasizedDecelerate)),
                           child: FadeTransition(opacity: anim, child: child),
                         );
                       case 'zoom':
                         return ScaleTransition(
                           scale: Tween<double>(begin: 1.10, end: 1.0)
-                              .animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
+                              .animate(CurvedAnimation(parent: anim, curve: M3Motion.emphasizedDecelerate)),
                           child: FadeTransition(opacity: anim, child: child),
                         );
                       default:
@@ -1855,15 +1856,15 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
               // Key changes when track changes → animation triggers only then
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 400),
-                switchInCurve:  Curves.easeOutCubic,
-                switchOutCurve: Curves.easeIn,
+                switchInCurve:  M3Motion.emphasizedDecelerate,
+                switchOutCurve: M3Motion.emphasizedAccelerate,
                 transitionBuilder: (child, anim) => FadeTransition(
                   opacity: anim,
                   child: SlideTransition(
                     position: Tween<Offset>(
                       begin: const Offset(0, 0.08),
                       end:   Offset.zero,
-                    ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
+                    ).animate(CurvedAnimation(parent: anim, curve: M3Motion.emphasizedDecelerate)),
                     child: child,
                   ),
                 ),
@@ -2157,7 +2158,7 @@ class _FriendCardState extends State<_FriendCard> {
       child: AnimatedScale(
         scale:    _pressed ? 0.95 : 1.0,
         duration: const Duration(milliseconds: 130),
-        curve:    Curves.easeOut,
+        curve:    M3Motion.emphasizedDecelerate,
         child: Container(
           width: 116,
           margin: const EdgeInsets.only(right: 10),
@@ -2610,7 +2611,7 @@ class _RollingNumberState extends State<_RollingNumber>
   void initState() {
     super.initState();
     _ctrl = AnimationController(vsync: this, duration: widget.duration);
-    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
+    _anim = CurvedAnimation(parent: _ctrl, curve: M3Motion.emphasizedDecelerate);
     _ctrl.forward();
   }
 
@@ -2947,9 +2948,8 @@ class _DashStatCard extends StatelessWidget {
                 style:    valueStyle,
               )
             else
-              AnimatedSwitcher(
+              M3Switcher(
                 duration: const Duration(milliseconds: 300),
-                transitionBuilder: (c, a) => FadeTransition(opacity: a, child: c),
                 child: Text(
                   value,
                   key: ValueKey(value),
@@ -3182,7 +3182,7 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
                 onTap: () { _haptic(_HapticImpact.selection); _ctrl.animateToPage(
                   i,
                   duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
+                  curve: M3Motion.emphasized,
                 ); },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
@@ -3630,12 +3630,12 @@ class _AmbientHeaderState extends State<_AmbientHeader>
     )..repeat(reverse: true);
 
     _scale = Tween<double>(begin: 1.0, end: 1.08)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+        .animate(CurvedAnimation(parent: _ctrl, curve: M3Motion.emphasized));
 
     _dx = Tween<double>(begin: -8.0, end: 8.0)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutSine));
+        .animate(CurvedAnimation(parent: _ctrl, curve: M3Motion.emphasized));
     _dy = Tween<double>(begin: -5.0, end: 5.0)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutCubic));
+        .animate(CurvedAnimation(parent: _ctrl, curve: M3Motion.emphasized));
   }
 
   @override
@@ -3880,6 +3880,7 @@ class _NewsPageState extends State<_NewsPage> {
                       title: title, body: body, type: type, date: date,
                       emoji: emoji, icon: icon, color: color,
                       onTap: () => showModalBottomSheet(
+    sheetAnimationStyle: kM3SheetAnimation,
                         context: context,
                         isScrollControlled: true,
                         backgroundColor: scheme.surface,
@@ -3937,7 +3938,7 @@ class _NewsListTileState extends State<_NewsListTile> {
       child: AnimatedScale(
         scale:    _pressed ? 0.98 : 1.0,
         duration: const Duration(milliseconds: 120),
-        curve:    Curves.easeOut,
+        curve:    M3Motion.emphasizedDecelerate,
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(

@@ -419,7 +419,7 @@ class _PodiumWidget extends StatelessWidget {
                 TweenAnimationBuilder<double>(
                   tween:    Tween(begin: 0.0, end: heights[col]),
                   duration: Duration(milliseconds: 550 + col * 80),
-                  curve:    Curves.easeOutCubic,
+                  curve:    M3Motion.emphasizedDecelerate,
                   builder: (_, h, child) => SizedBox(height: h, child: child),
                   child: Container(
                     width: double.infinity,

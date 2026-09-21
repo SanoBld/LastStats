@@ -1,6 +1,7 @@
 // lib/screens/settings/backup_page.dart
 
 import 'package:flutter/material.dart';
+import '../../theme/m3_shapes.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/app_share.dart';
@@ -118,6 +119,7 @@ class _BackupPageState extends State<BackupPage> {
 
   Future<void> _clearLog() async {
     final confirmed = await showDialog<bool>(
+    animationStyle: kM3DialogAnimation,
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(L.backupCrashLogClearConfirm),
@@ -209,6 +211,7 @@ class _BackupPageState extends State<BackupPage> {
 
     if (preview.hasApiKey || preview.hasSecretKey || preview.hasScrobbles) {
       final confirmed = await showDialog<bool>(
+    animationStyle: kM3DialogAnimation,
         context: context,
         builder: (dialogCtx) => StatefulBuilder(
           builder: (dialogCtx, setDialogState) => AlertDialog(
@@ -282,6 +285,7 @@ class _BackupPageState extends State<BackupPage> {
       final check = BackupService.checkScrobbles(preview.raw);
       if (check.hasErrors) {
         final choice = await showDialog<ScrobbleConflictMode>(
+    animationStyle: kM3DialogAnimation,
           context: context,
           builder: (dialogCtx) => AlertDialog(
             title: Text(L.backupScrobblesErrorTitle),

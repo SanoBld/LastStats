@@ -47,7 +47,7 @@ class _FadeIn extends StatelessWidget {
   Widget build(BuildContext context) => TweenAnimationBuilder<double>(
         tween: Tween(begin: 0, end: 1),
         duration: const Duration(milliseconds: 350),
-        curve: Curves.easeOut,
+        curve: M3Motion.emphasizedDecelerate,
         builder: (_, v, c) => Opacity(opacity: v, child: c),
         child: child,
       );
@@ -607,6 +607,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       'ja': '日本語',     'ko': '한국어',    'ar': 'العربية',
     };
     showModalBottomSheet(
+    sheetAnimationStyle: kM3SheetAnimation,
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
@@ -738,7 +739,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       // frame, which could show a blank/black frame during page transitions.
       child: AnimatedTheme(
         duration: const Duration(milliseconds: 450),
-        curve: Curves.easeOut,
+        curve: M3Motion.emphasizedDecelerate,
         data: targetTheme,
         child: Builder(builder: (innerContext) {
           final scheme  = Theme.of(innerContext).colorScheme;
@@ -865,6 +866,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       _buildStatsRow(scheme),
                       if (_tags().isNotEmpty) _buildTags(scheme),
                       if (widget.type == 'tracks') _buildPreviewPlayer(scheme),
+                      // Heart + play, right above the biography
+                      if (widget.type == 'tracks') _buildActionRow(scheme),
                       if (_bio().isNotEmpty)  _FadeIn(child: _buildBio(scheme)),
                       if (widget.type == 'artists' && _topTracks.isNotEmpty)
                         _buildTopTracks(scheme),
@@ -873,10 +876,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       if (widget.type == 'albums' && _tracklist.isNotEmpty)
                         _buildTracklist(scheme),
                       if (widget.type == 'tracks') _buildTrackExtra(scheme),
-                      // Shoutbox — placed right above the lyrics for tracks
-                      // (per the user's request), and after the top
-                      // tracks/albums/tracklist for artists/albums.
-                      _FadeIn(child: _buildShoutbox(scheme)),
                       if (widget.type == 'tracks') _FadeIn(child: _buildLyrics(scheme)),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -893,6 +892,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                           ),
                         ),
                       ),
+                      // Last.fm discussion: always the last thing on the page
+                      _FadeIn(child: _buildShoutbox(scheme)),
                       const SizedBox(height: 48),
                     ],
                   ),
@@ -980,44 +981,47 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ),
           ],
           const SizedBox(height: 14),
-          // Heart (round) + play (wide pill), tracks only
-          if (widget.type == 'tracks' &&
-              (favoritesEnabled || _previewUrl != null || _previewLoading)) ...[
-            M3ActionRow(
-              circle: favoritesEnabled
-                  ? M3CircleButton(
-                      icon: _isLoved
-                          ? Icons.favorite_rounded
-                          : Icons.favorite_border_rounded,
-                      iconColor: _isLoved ? Colors.redAccent : null,
-                      busy: _loveBusy,
-                      onTap: _toggleLove,
-                      onLongPress: () => showFolderAssignSheet(
-                          context, name: _name, artist: _artist,
-                          image: _resolvedImage),
-                      tooltip: 'Love',
-                    )
-                  : null,
-              pill: (_previewUrl != null || _previewLoading)
-                  ? M3PillButton(
-                      icon: _isPlaying
-                          ? Icons.pause_rounded
-                          : Icons.play_arrow_rounded,
-                      busy: _previewLoading,
-                      progress: _previewPos,
-                      onTap: _togglePreview,
-                      tooltip: 'Play preview',
-                    )
-                  : null,
-            ),
-            const SizedBox(height: 14),
-          ],
           // Music app link buttons
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Expanded(child: _buildMusicLinks(hasImage)),
           ]),
           const SizedBox(height: 16),
         ],
+      ),
+    );
+  }
+
+  // Heart (round, accent) + play (wide pill). Tracks only.
+  Widget _buildActionRow(ColorScheme scheme) {
+    final hasPlay = _previewUrl != null || _previewLoading;
+    if (!favoritesEnabled && !hasPlay) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: M3ActionRow(
+        circle: favoritesEnabled
+            ? M3CircleButton(
+                icon: _isLoved
+                    ? Icons.favorite_rounded
+                    : Icons.favorite_border_rounded,
+                busy: _loveBusy,
+                onTap: _toggleLove,
+                onLongPress: () => showFolderAssignSheet(
+                    context, name: _name, artist: _artist,
+                    image: _resolvedImage),
+                tooltip: 'Love',
+              )
+            : null,
+        pill: hasPlay
+            ? M3PillButton(
+                icon: _isPlaying
+                    ? Icons.pause_rounded
+                    : Icons.play_arrow_rounded,
+                busy: _previewLoading,
+                progress: _previewPos,
+                onTap: _togglePreview,
+                tooltip: 'Play preview',
+              )
+            : null,
       ),
     );
   }
@@ -1136,9 +1140,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       ));
     }
 
-    stats.add(AnimatedSwitcher(
+    stats.add(M3Switcher(
       duration: const Duration(milliseconds: 300),
-      transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
       child: _loadingUser
           ? Center(
               key: const ValueKey('loading'),
@@ -1335,7 +1338,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           // Animated expand/collapse
           AnimatedSize(
             duration: const Duration(milliseconds: 320),
-            curve: Curves.easeInOutCubic,
+            curve: M3Motion.emphasized,
             alignment: Alignment.topCenter,
             child: _linkifiedText(
               shown,
@@ -1365,7 +1368,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       AnimatedRotation(
                         turns:    _bioExpanded ? -0.5 : 0.0,
                         duration: const Duration(milliseconds: 300),
-                        curve:    Curves.easeInOutCubic,
+                        curve:    M3Motion.emphasized,
                         child: Icon(Icons.expand_more_rounded,
                             size: 18, color: scheme.primary),
                       ),
@@ -1476,7 +1479,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                           child: TweenAnimationBuilder<double>(
                             tween: Tween(begin: 0, end: frac.clamp(0.0, 1.0)),
                             duration: Duration(milliseconds: 600 + i * 80),
-                            curve: Curves.easeOut,
+                            curve: M3Motion.emphasizedDecelerate,
                             builder: (_, v, _) => LinearProgressIndicator(
                               value: v, minHeight: 5,
                               color:           scheme.primary,
@@ -1698,7 +1701,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             child: Text(L.detailShoutbox,
                 style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
           ),
-          TextButton.icon(
+          FilledButton.tonalIcon(
             onPressed: _openShoutbox,
             icon: const Icon(Icons.open_in_new_rounded, size: 16),
             label: Text(L.detailShoutboxReply),
@@ -1753,7 +1756,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           else ...[
             AnimatedSize(
               duration: const Duration(milliseconds: 320),
-              curve: Curves.easeInOutCubic,
+              curve: M3Motion.emphasized,
               alignment: Alignment.topCenter,
               child: Text(shown,
                   style: text.bodyMedium?.copyWith(
@@ -1775,7 +1778,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                     AnimatedRotation(
                       turns:    _lyricsExpanded ? -0.5 : 0.0,
                       duration: const Duration(milliseconds: 300),
-                      curve:    Curves.easeInOutCubic,
+                      curve:    M3Motion.emphasized,
                       child: Icon(Icons.expand_more_rounded,
                           size: 18, color: scheme.primary),
                     ),
@@ -1817,7 +1820,7 @@ class _BlurFadeImageState extends State<_BlurFadeImage>
     _imageLoaded = cached;
     _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
     _blur = Tween<double>(begin: cached ? 0.0 : 16.0, end: 0.0)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+        .animate(CurvedAnimation(parent: _ctrl, curve: M3Motion.emphasizedDecelerate));
     if (cached) _ctrl.value = 1.0;
   }
 
@@ -2023,6 +2026,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
   void _showTierInfo() {
     final next = nextPlayThreshold(widget.myPlaycount);
     showModalBottomSheet(
+    sheetAnimationStyle: kM3SheetAnimation,
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
       shape: const RoundedRectangleBorder(
@@ -2085,6 +2089,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
     String? qrPayload;
     if (widget.isProfileCard) {
       final choice = await showDialog<String>(
+    animationStyle: kM3DialogAnimation,
         context: context,
         builder: (ctx) => AlertDialog(
           title: Text(_ct('QR code ?', 'QR code?')),
@@ -2734,7 +2739,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
       value: SystemUiOverlayStyle.light,
       child: AnimatedTheme(
         duration: const Duration(milliseconds: 450),
-        curve: Curves.easeOut,
+        curve: M3Motion.emphasizedDecelerate,
         data: targetTheme,
         child: Builder(builder: (innerContext) {
           final scheme  = Theme.of(innerContext).colorScheme;

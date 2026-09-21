@@ -4,6 +4,7 @@
 // 3 pages: appearance, notifications, favorite profiles.
 
 import 'dart:async';
+import '../theme/m3_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -34,16 +35,13 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   void _goTo(int i) {
     setState(() => _page = i);
     _pageCtrl.animateToPage(i,
-        duration: const Duration(milliseconds: 320), curve: Curves.easeOutCubic);
+        duration: const Duration(milliseconds: 320), curve: M3Motion.emphasizedDecelerate);
   }
 
   void _finish() {
-    Navigator.of(context).pushReplacement(PageRouteBuilder(
-      pageBuilder: (_, _, _) =>
+    Navigator.of(context).pushReplacement(M3FadeThroughRoute<void>(
+      builder: (_) =>
           HomeScreen(username: widget.username, apiKey: widget.apiKey),
-      transitionsBuilder: (_, anim, _, child) =>
-          FadeTransition(opacity: anim, child: child),
-      transitionDuration: const Duration(milliseconds: 400),
     ));
   }
 
@@ -63,7 +61,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               child: TweenAnimationBuilder<double>(
                 tween: Tween(begin: 0, end: (_page + 1) / _pages),
                 duration: const Duration(milliseconds: 320),
-                curve: Curves.easeOutCubic,
+                curve: M3Motion.emphasizedDecelerate,
                 builder: (_, v, _) => LinearProgressIndicator(
                   value: v, minHeight: 5,
                   backgroundColor: scheme.surfaceContainerHighest,

@@ -31,6 +31,7 @@ import 'services/crash_log_service.dart';
 import 'services/auto_backup_service.dart';
 import 'widgets/custom_title_bar.dart';
 import 'theme/m3_motion.dart';
+import 'theme/m3_shapes.dart';
 import 'package:app_links/app_links.dart';
 
 // navigatorKey now lives in notification_service.dart so the notification
@@ -452,20 +453,20 @@ class LastStatsApp extends StatelessWidget {
                                         : NavigationDestinationLabelBehavior.alwaysHide;
                                     // Inject labelBehavior into both themes so it
                                     // takes effect regardless of widget-level override.
-                                    final lTheme = ThemeData(
+                                    final lTheme = applyM3Shapes(ThemeData(
                                       colorScheme: lightScheme,
                                       useMaterial3: true,
                                       pageTransitionsTheme: kM3PageTransitions,
                                       navigationBarTheme: NavigationBarThemeData(
                                           labelBehavior: navBehavior),
-                                    );
-                                    final dTheme = ThemeData(
+                                    ));
+                                    final dTheme = applyM3Shapes(ThemeData(
                                       colorScheme: darkScheme,
                                       useMaterial3: true,
                                       pageTransitionsTheme: kM3PageTransitions,
                                       navigationBarTheme: NavigationBarThemeData(
                                           labelBehavior: navBehavior),
-                                    );
+                                    ));
                                     return MaterialApp(
                                       navigatorKey:               navigatorKey,
                                       title:                      'LastStats',

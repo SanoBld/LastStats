@@ -462,7 +462,7 @@ class _ChartsPageState extends State<_ChartsPage>
       if (ctx != null) {
         Scrollable.ensureVisible(ctx,
             duration: const Duration(milliseconds: 250),
-            curve: Curves.easeOutCubic,
+            curve: M3Motion.emphasizedDecelerate,
             alignment: 0.5);
       }
     });
@@ -593,6 +593,7 @@ class _ChartsPageState extends State<_ChartsPage>
 
     // Step 1: choose chart — grid, scrollable if it overflows
     final chartId = await showModalBottomSheet<String>(
+    sheetAnimationStyle: kM3SheetAnimation,
       context: ctx,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -665,6 +666,7 @@ class _ChartsPageState extends State<_ChartsPage>
     // Step 2: choose year — single wrap row, fits without scrolling
     final years = [0, ..._availableYears];
     final targetYear = await showModalBottomSheet<int>(
+    sheetAnimationStyle: kM3SheetAnimation,
       context: ctx,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
@@ -909,7 +911,7 @@ class _ChartsPageState extends State<_ChartsPage>
       barrierColor: Colors.black45,
       transitionDuration: const Duration(milliseconds: 220),
       transitionBuilder: (_, anim, _, child) => FadeTransition(
-        opacity: CurvedAnimation(parent: anim, curve: Curves.easeOut),
+        opacity: CurvedAnimation(parent: anim, curve: M3Motion.emphasizedDecelerate),
         child: child,
       ),
       pageBuilder: (_, _, _)  => PopScope(
@@ -1368,7 +1370,7 @@ class _ChartsPageState extends State<_ChartsPage>
             child: AnimatedOpacity(
               opacity: _yearDataLoading ? 0.5 : 1.0,
               duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOutCubic,
+              curve: M3Motion.emphasizedDecelerate,
               child: RefreshIndicator(
                 onRefresh: _load,
                 child: ListView(
@@ -1645,11 +1647,11 @@ class _FadeInSection extends StatefulWidget {
 class _FadeInSectionState extends State<_FadeInSection> with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
       vsync: this, duration: const Duration(milliseconds: 480));
-  late final Animation<double> _fade = CurvedAnimation(parent: _c, curve: Curves.easeOut);
+  late final Animation<double> _fade = CurvedAnimation(parent: _c, curve: M3Motion.emphasizedDecelerate);
   late final Animation<Offset> _slide = Tween<Offset>(
     begin: Offset(0, widget.slideFrom),
     end:   Offset.zero,
-  ).animate(CurvedAnimation(parent: _c, curve: Curves.easeOutCubic));
+  ).animate(CurvedAnimation(parent: _c, curve: M3Motion.emphasizedDecelerate));
 
   @override
   void initState() {
@@ -2255,7 +2257,7 @@ class _HourlyBarCardState extends State<_HourlyBarCard> {
       final target = (peakH * _colW - 120.0)
           .clamp(0.0, _sc.position.maxScrollExtent);
       _sc.animateTo(target,
-          duration: const Duration(milliseconds: 500), curve: Curves.easeOutCubic);
+          duration: const Duration(milliseconds: 500), curve: M3Motion.emphasizedDecelerate);
     });
   }
 
@@ -2998,7 +3000,7 @@ class _SwipeDistributionCardState extends State<_SwipeDistributionCard> {
       children: [
         AnimatedSize(
           duration: const Duration(milliseconds: 260),
-          curve: Curves.easeInOutCubic,
+          curve: M3Motion.emphasized,
           child: SizedBox(
             height: height,
             child: PageView(

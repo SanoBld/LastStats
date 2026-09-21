@@ -1,6 +1,7 @@
 // lib/screens/settings/dashboard_settings_page.dart
 
 import 'package:flutter/material.dart';
+import '../../theme/m3_shapes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/l10n.dart';
 import '../../app_state.dart';
@@ -568,6 +569,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
               label: Text(L.reorderCardsTitle),
               onPressed: () async {
                 final result = await showModalBottomSheet<List<String>>(
+                  sheetAnimationStyle: kM3SheetAnimation,
                   context: context, isScrollControlled: true,
                   backgroundColor: Colors.transparent, useSafeArea: true,
                   builder: (_) => CardReorderSheet(cards: List.from(_statCards)),

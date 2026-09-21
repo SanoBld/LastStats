@@ -3,6 +3,7 @@
 // Lists every past release: version, date, full changelog, and a direct
 // download button per version — not just the newest one.
 import 'package:flutter/material.dart';
+import '../../theme/m3_motion.dart';
 import '../../widgets/skeleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -233,7 +234,7 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
                         ),
                         AnimatedCrossFade(
                           duration: const Duration(milliseconds: 220),
-                          sizeCurve: Curves.easeOutCubic,
+                          sizeCurve: M3Motion.emphasizedDecelerate,
                           crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
                           firstChild: const SizedBox(width: double.infinity),
                           secondChild: Padding(

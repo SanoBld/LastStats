@@ -6,6 +6,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
+import '../theme/m3_shapes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app_state.dart';
@@ -37,6 +38,7 @@ Future<bool> connectFavorites(
     if (!context.mounted) return false;
 
     final confirmed = await showDialog<bool>(
+      animationStyle: kM3DialogAnimation,
       context: context,
       builder: (ctx) => AlertDialog(
         title:   Text(L.favConnectDialogTitle),

@@ -1,5 +1,7 @@
 // lib/screens/settings/cache_page.dart
 import 'package:flutter/material.dart';
+import '../../theme/m3_motion.dart';
+import '../../theme/m3_shapes.dart';
 import '../../widgets/skeleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/storage_manager.dart';
@@ -97,6 +99,7 @@ class _CachePageState extends State<CachePage> {
 
   Future<bool> _confirm(String title, String body) async {
     return await showDialog<bool>(
+    animationStyle: kM3DialogAnimation,
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(title),
@@ -168,12 +171,8 @@ class _CachePageState extends State<CachePage> {
                 _SectionHeader(L.cacheClearSection, text),
                 const SizedBox(height: 8),
 
-                AnimatedSwitcher(
+                M3Switcher(
                   duration: const Duration(milliseconds: 220),
-                  switchInCurve:  Curves.easeOut,
-                  switchOutCurve: Curves.easeIn,
-                  transitionBuilder: (child, anim) =>
-                      FadeTransition(opacity: anim, child: child),
                   child: _clearing
                       ? const Padding(
                           key: ValueKey('loading'),

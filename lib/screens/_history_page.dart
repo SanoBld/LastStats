@@ -143,9 +143,8 @@ class _HistoryPageState extends State<_HistoryPage>
                         border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
                       ),
                       child: Row(children: [
-                      AnimatedSwitcher(
+                      M3Switcher(
                         duration: const Duration(milliseconds: 220),
-                        transitionBuilder: (c, a) => FadeTransition(opacity: a, child: c),
                         child: Text(
                           _dateFmt(),
                           key: ValueKey(_dateFmt()),
@@ -162,7 +161,7 @@ class _HistoryPageState extends State<_HistoryPage>
               // AnimatedSize makes the date picker shrink/grow smoothly
               AnimatedSize(
                 duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutCubic,
+                curve: M3Motion.emphasizedDecelerate,
                 child: !_isToday
                   ? AnimatedOpacity(
                       opacity: 1.0,
@@ -241,14 +240,14 @@ class _HistoryPageState extends State<_HistoryPage>
           Expanded(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
-              switchInCurve:  Curves.easeOutCubic,
-              switchOutCurve: Curves.easeInCubic,
+              switchInCurve:  M3Motion.emphasizedDecelerate,
+              switchOutCurve: M3Motion.emphasizedAccelerate,
               transitionBuilder: (child, anim) {
                 final dir = _navDirection;
                 final slideIn = Tween<Offset>(
                   begin: Offset(dir == 0 ? 0.0 : dir < 0 ? -0.22 : 0.22, 0),
                   end:   Offset.zero,
-                ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic));
+                ).animate(CurvedAnimation(parent: anim, curve: M3Motion.emphasizedDecelerate));
                 return SlideTransition(position: slideIn,
                     child: FadeTransition(opacity: anim, child: child));
               },
@@ -300,7 +299,7 @@ class _TapScaleState extends State<_TapScale> {
     child: AnimatedScale(
       scale:           _down ? widget.scale : 1.0,
       duration:        const Duration(milliseconds: 80),
-      curve:           Curves.easeOut,
+      curve:           M3Motion.emphasizedDecelerate,
       child:           widget.child,
     ),
   );
@@ -598,7 +597,7 @@ class _HistStatSection extends StatelessWidget {
               child: TweenAnimationBuilder<double>(
                 tween:    Tween(begin: 0.0, end: max > 0 ? e.value / max : 0),
                 duration: const Duration(milliseconds: 500),
-                curve:    Curves.easeOutCubic,
+                curve:    M3Motion.emphasizedDecelerate,
                 builder: (_, v, _) => LinearProgressIndicator(
                   value:           v,
                   minHeight:       4,

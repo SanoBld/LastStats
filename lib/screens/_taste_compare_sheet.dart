@@ -6,6 +6,7 @@ void showTasteCompareSheet(
   LastFmService service,
 ) {
   showModalBottomSheet(
+    sheetAnimationStyle: kM3SheetAnimation,
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
@@ -870,6 +871,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
   // Opens the detail sheet comparing my plays vs theirs for one item.
   void _openItemDetail(BuildContext context, _SharedMatch match) {
     showModalBottomSheet(
+    sheetAnimationStyle: kM3SheetAnimation,
       context: context,
       showDragHandle: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -972,7 +974,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
           ),
           AnimatedSize(
             duration: const Duration(milliseconds: 220),
-            curve:    Curves.easeOutCubic,
+            curve:    M3Motion.emphasizedDecelerate,
             child: empty
                 ? Padding(
                     padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
@@ -1322,7 +1324,7 @@ class _CompareBar extends StatelessWidget {
           child: TweenAnimationBuilder<double>(
             tween:    Tween(begin: 0, end: ratio),
             duration: const Duration(milliseconds: 700),
-            curve:    Curves.easeOutCubic,
+            curve:    M3Motion.emphasizedDecelerate,
             builder: (context, value, _) => LinearProgressIndicator(
               value:           value,
               minHeight:       10,
@@ -1436,7 +1438,7 @@ class _CompatibilityRing extends StatelessWidget {
     return TweenAnimationBuilder<double>(
       tween:    Tween(begin: 0, end: score),
       duration: const Duration(milliseconds: 1100),
-      curve:    Curves.easeOutCubic,
+      curve:    M3Motion.emphasizedDecelerate,
       builder: (context, value, _) => SizedBox(
         width: 152, height: 152,
         child: Stack(

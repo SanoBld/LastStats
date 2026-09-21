@@ -2,6 +2,7 @@
 // Partagé par toutes les sous-pages de paramètres / Shared by all settings sub-pages
 
 import 'package:flutter/material.dart';
+import '../../theme/m3_motion.dart';
 import 'package:flutter/services.dart';
 import '../../app_state.dart';
 import '../../l10n/l10n.dart';
@@ -144,7 +145,7 @@ class SettingsSection extends StatelessWidget {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
       duration: const Duration(milliseconds: 320),
-      curve: Curves.easeOutCubic,
+      curve: M3Motion.emphasizedDecelerate,
       builder: (_, v, child) => Opacity(
         opacity: v,
         child: Transform.translate(offset: Offset(0, (1 - v) * 12), child: child),

@@ -7,6 +7,7 @@
 // colorScheme so it always matches the current Material You theme.
 
 import 'dart:convert';
+import '../theme/m3_motion.dart';
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
@@ -460,7 +461,7 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
                     // Cross-fade whenever the period or category changes.
                     : AnimatedSwitcher(
                         duration: const Duration(milliseconds: 260),
-                        switchInCurve: Curves.easeOut,
+                        switchInCurve: M3Motion.emphasizedDecelerate,
                         child: _body(context, scheme, d, category, categoryItems,
                             key: ValueKey('$_period-$category')),
                       ),
@@ -898,11 +899,11 @@ class _FadeInUpState extends State<_FadeInUp> {
     return AnimatedOpacity(
       opacity: _show ? 1 : 0,
       duration: const Duration(milliseconds: 350),
-      curve: Curves.easeOut,
+      curve: M3Motion.emphasizedDecelerate,
       child: AnimatedSlide(
         offset: _show ? Offset.zero : const Offset(0, 0.15),
         duration: const Duration(milliseconds: 350),
-        curve: Curves.easeOut,
+        curve: M3Motion.emphasizedDecelerate,
         child: widget.child,
       ),
     );

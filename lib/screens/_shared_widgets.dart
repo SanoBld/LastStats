@@ -40,11 +40,11 @@ class _FadeSlideInState extends State<_FadeSlideIn>
   void initState() {
     super.initState();
     _ctrl  = AnimationController(vsync: this, duration: widget.duration);
-    _fade  = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
+    _fade  = CurvedAnimation(parent: _ctrl, curve: M3Motion.emphasizedDecelerate);
     _slide = Tween<Offset>(
       begin: const Offset(0, 0.06),
       end:   Offset.zero,
-    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+    ).animate(CurvedAnimation(parent: _ctrl, curve: M3Motion.emphasizedDecelerate));
 
     if (widget.skipAnimation) {
       _ctrl.value = 1.0; // already "arrived" — no fade/slide to play
@@ -96,7 +96,7 @@ class _PressScaleState extends State<_PressScale> {
       child: AnimatedScale(
         scale: _down ? 0.96 : 1.0,
         duration: const Duration(milliseconds: 120),
-        curve: Curves.easeOut,
+        curve: M3Motion.emphasizedDecelerate,
         child: widget.child,
       ),
     );
@@ -125,7 +125,7 @@ class _PulsingDotState extends State<_PulsingDot>
         vsync: this, duration: const Duration(milliseconds: 900))
       ..repeat(reverse: true);
     _scale = Tween<double>(begin: 0.75, end: 1.25)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+        .animate(CurvedAnimation(parent: _ctrl, curve: M3Motion.emphasized));
   }
 
   @override
@@ -232,9 +232,8 @@ class _SmartImageState extends State<_SmartImage> {
           child = url.isEmpty ? _fallback(scheme) : _img(url, scheme);
         }
         // Smooth fade between the loading placeholder and the resolved image
-        return AnimatedSwitcher(
+        return M3Switcher(
           duration: const Duration(milliseconds: 280),
-          transitionBuilder: (c, a) => FadeTransition(opacity: a, child: c),
           child: KeyedSubtree(
             key: ValueKey(snap.connectionState == ConnectionState.done
                 ? (snap.data ?? 'fallback')
@@ -363,6 +362,7 @@ Future<void> showFolderAssignSheet(
       addedAt: DateTime.now().millisecondsSinceEpoch);
 
   await showModalBottomSheet(
+    sheetAnimationStyle: kM3SheetAnimation,
     context: context,
     isScrollControlled: true,
     builder: (ctx) => ValueListenableBuilder<List<FavFolder>>(
@@ -431,6 +431,7 @@ Future<void> showFolderAssignSheet(
 Future<String?> _promptCustomEmoji(BuildContext context) {
   final ctrl = TextEditingController();
   return showDialog<String>(
+    animationStyle: kM3DialogAnimation,
     context: context,
     builder: (dctx) => StatefulBuilder(builder: (dctx, setDialog) {
       void enforceOneEmoji(String v) {
@@ -479,6 +480,7 @@ Future<void> showFolderEditorSheet(BuildContext context, {FavFolder? existing}) 
   int colorValue = existing?.colorValue ?? kFavFolderColors.first;
 
   final result = await showModalBottomSheet<bool>(
+    sheetAnimationStyle: kM3SheetAnimation,
     context: context,
     isScrollControlled: true,
     builder: (ctx) => StatefulBuilder(builder: (ctx, setSheet) {
@@ -596,6 +598,7 @@ Future<void> showFolderEditorSheet(BuildContext context, {FavFolder? existing}) 
                   label: Text(L.favFolderDelete),
                   onPressed: () async {
                     final confirm = await showDialog<bool>(
+    animationStyle: kM3DialogAnimation,
                       context: ctx,
                       builder: (dctx) => AlertDialog(
                         content: Text(L.favFolderDeleteConfirm),
