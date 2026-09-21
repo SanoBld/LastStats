@@ -91,6 +91,7 @@ the same picker.</p>
     sheetAnimationStyle: kM3SheetAnimation,
     context: context,
     isScrollControlled: true,
+    showDragHandle: true,
     builder: (ctx) =&gt; ValueListenableBuilder&lt;List&lt;FavFolder&gt;&gt;(
       valueListenable: FavoritesFoldersService.foldersNotifier,
       builder: (ctx, folders, _) =&gt; ValueListenableBuilder&lt;Map&lt;String, List&lt;String&gt;&gt;&gt;(
@@ -116,28 +117,49 @@ the same picker.</p>
                         textAlign: TextAlign.center,
                         style: TextStyle(color: scheme.onSurfaceVariant)),
                   ),
-                ...folders.map((f) {
-                  final checked = FavoritesFoldersService.foldersForItem(key).contains(f.id);
-                  return CheckboxListTile(
-                    value: checked,
-                    controlAffinity: ListTileControlAffinity.leading,
-                    secondary: CircleAvatar(
-                      backgroundColor: f.color.withValues(alpha: 0.25),
-                      child: Text(f.emoji, style: const TextStyle(fontSize: 16)),
+                for (int i = 0; i &lt; folders.length; i++)
+                  Builder(builder: (_) {
+                    final f = folders[i];
+                    final checked = FavoritesFoldersService.foldersForItem(key).contains(f.id);
+                    return M3SegmentTile(
+                      index: i,
+                      count: folders.length,
+                      selected: checked,
+                      child: ListTile(
+                        leading: M3CookieBadge(
+                          size: 40,
+                          color: f.color.withValues(alpha: 0.3),
+                          child: Text(f.emoji, style: const TextStyle(fontSize: 18)),
+                        ),
+                        title: Text(f.name),
+                        trailing: M3Switcher(
+                          duration: M3Motion.effectsDefaultDuration,
+                          child: checked
+                              ? Icon(Icons.check_circle_rounded,
+                                  key: const ValueKey(&#39;on&#39;), color: scheme.primary)
+                              : Icon(Icons.circle_outlined,
+                                  key: const ValueKey(&#39;off&#39;),
+                                  color: scheme.onSurfaceVariant),
+                        ),
+                        onTap: () =&gt; FavoritesFoldersService.toggleItemInFolder(key, f.id, meta: meta),
+                      ),
+                    );
+                  }),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.tonalIcon(
+                      style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+                      icon: const Icon(Icons.add_rounded),
+                      label: Text(L.favFolderNew),
+                      onPressed: () async {
+                        Navigator.pop(ctx);
+                        await showFolderEditorSheet(context);
+                      },
                     ),
-                    title: Text(f.name),
-                    onChanged: (_) =&gt;
-                        FavoritesFoldersService.toggleItemInFolder(key, f.id, meta: meta),
-                  );
-                }),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.add_rounded),
-                  title: Text(L.favFolderNew),
-                  onTap: () async {
-                    Navigator.pop(ctx);
-                    await showFolderEditorSheet(context);
-                  },
+                  ),
                 ),
               ]),
             ),

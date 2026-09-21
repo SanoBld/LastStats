@@ -110,32 +110,17 @@ and</li>
   <pre class="language-dart"><code class="language-dart">@override
 Widget build(BuildContext context) {
   FavoritesFoldersService.ensureLoaded();
-  final scheme = Theme.of(context).colorScheme;
-  final text   = Theme.of(context).textTheme;
 
   return Scaffold(
     body: SafeArea(child: Column(children: [
-      Padding(
-        padding: const EdgeInsets.fromLTRB(4, 12, 16, 2),
-        child: Row(children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back_rounded),
-            onPressed: () =&gt; Navigator.of(context).pop(),
-          ),
-          Expanded(child: Text(L.searchFolders,
-              style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800))),
-        ]),
-      ),
+      M3PageHeader(title: L.searchFolders),
       Expanded(
         child: ValueListenableBuilder&lt;List&lt;FavFolder&gt;&gt;(
           valueListenable: FavoritesFoldersService.foldersNotifier,
           builder: (ctx, folders, _) {
             if (folders.isEmpty) {
-              return Center(child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: Text(L.searchFoldersHint, textAlign: TextAlign.center,
-                    style: TextStyle(color: scheme.onSurfaceVariant)),
-              ));
+              return M3EmptyState(
+                  icon: Icons.folder_open_rounded, message: L.searchFoldersHint);
             }
             return GridView.builder(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -163,6 +148,7 @@ Widget build(BuildContext context) {
           child: SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
+              style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(56)),
               icon: const Icon(Icons.add_rounded),
               label: Text(L.favFolderNew),
               onPressed: () =&gt; showFolderEditorSheet(context),
