@@ -110,40 +110,43 @@ and</li>
   <pre class="language-dart"><code class="language-dart">@override
 Widget build(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
-  final fg = scheme.onPrimaryContainer;
+  final fg = scheme.onSecondaryContainer;
   return _M3Pressable(
     height: 56,
-    color: scheme.primaryContainer,
+    color: scheme.secondaryContainer,
+    idleShape: const StadiumBorder(),
+    pressedShape:
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
     onTap: busy ? null : onTap,
     tooltip: tooltip,
     child: SizedBox.expand(
       child: Stack(
-      alignment: Alignment.center,
-      children: [
-        Positioned.fill(
-          child: TweenAnimationBuilder&lt;double&gt;(
-            tween: Tween&lt;double&gt;(end: progress.clamp(0.0, 1.0)),
-            duration: M3Motion.short,
-            builder: (context, v, _) =&gt; FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: v,
-              child: ColoredBox(
-                  color: scheme.primary.withValues(alpha: 0.22)),
+        alignment: Alignment.center,
+        children: [
+          Positioned.fill(
+            child: TweenAnimationBuilder&lt;double&gt;(
+              tween: Tween&lt;double&gt;(end: progress.clamp(0.0, 1.0)),
+              duration: M3Motion.short,
+              builder: (context, v, _) =&gt; FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: v,
+                child: ColoredBox(
+                    color: scheme.secondary.withValues(alpha: 0.22)),
+              ),
             ),
           ),
-        ),
-        M3Switcher(
-          duration: M3Motion.short,
-          child: busy
-              ? SizedBox(
-                  key: const ValueKey(&#39;busy&#39;),
-                  width: 22, height: 22,
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2, color: fg),
-                )
-              : Icon(icon, key: ValueKey(icon), color: fg, size: 30),
-        ),
-      ],
+          M3Switcher(
+            duration: M3Motion.short,
+            child: busy
+                ? SizedBox(
+                    key: const ValueKey(&#39;busy&#39;),
+                    width: 22, height: 22,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: fg),
+                  )
+                : Icon(icon, key: ValueKey(icon), color: fg, size: 30),
+          ),
+        ],
       ),
     ),
   );

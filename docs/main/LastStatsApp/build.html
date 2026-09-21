@@ -260,20 +260,20 @@ Widget build(BuildContext context) {
                                       : NavigationDestinationLabelBehavior.alwaysHide;
                                   &#47;&#47; Inject labelBehavior into both themes so it
                                   &#47;&#47; takes effect regardless of widget-level override.
-                                  final lTheme = ThemeData(
+                                  final lTheme = applyM3Shapes(ThemeData(
                                     colorScheme: lightScheme,
                                     useMaterial3: true,
                                     pageTransitionsTheme: kM3PageTransitions,
                                     navigationBarTheme: NavigationBarThemeData(
                                         labelBehavior: navBehavior),
-                                  );
-                                  final dTheme = ThemeData(
+                                  ));
+                                  final dTheme = applyM3Shapes(ThemeData(
                                     colorScheme: darkScheme,
                                     useMaterial3: true,
                                     pageTransitionsTheme: kM3PageTransitions,
                                     navigationBarTheme: NavigationBarThemeData(
                                         labelBehavior: navBehavior),
-                                  );
+                                  ));
                                   return MaterialApp(
                                     navigatorKey:               navigatorKey,
                                     title:                      &#39;LastStats&#39;,

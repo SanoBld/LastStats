@@ -110,11 +110,13 @@ and</li>
   <pre class="language-dart"><code class="language-dart">@override
 Widget build(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
-  final fg = iconColor ?? scheme.onTertiaryContainer;
+  final fg = scheme.onPrimary;
   return _M3Pressable(
     width: 56,
     height: 56,
-    color: scheme.tertiaryContainer,
+    color: scheme.primary,
+    idleShape:    const M3CookieBorder(lobes: 8, amplitude: 0.07),
+    pressedShape: const M3CookieBorder(lobes: 8, amplitude: 0.0),
     onTap: busy ? null : onTap,
     onLongPress: onLongPress,
     tooltip: tooltip,

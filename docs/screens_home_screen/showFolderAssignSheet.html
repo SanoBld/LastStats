@@ -88,6 +88,7 @@ the same picker.</p>
       addedAt: DateTime.now().millisecondsSinceEpoch);
 
   await showModalBottomSheet(
+    sheetAnimationStyle: kM3SheetAnimation,
     context: context,
     isScrollControlled: true,
     builder: (ctx) =&gt; ValueListenableBuilder&lt;List&lt;FavFolder&gt;&gt;(
