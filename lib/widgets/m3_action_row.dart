@@ -48,11 +48,11 @@ class _M3PressableState extends State<_M3Pressable> {
 
     Widget body = AnimatedScale(
       scale: (_down && !reduce) ? 0.95 : 1.0,
-      duration: M3Motion.short,
-      curve: M3Motion.standard,
+      duration: M3Motion.spatialFastDuration,
+      curve: M3Motion.spatialFast,
       child: AnimatedContainer(
-        duration: M3Motion.medium,
-        curve: M3Motion.emphasized,
+        duration: M3Motion.spatialFastDuration,
+        curve: M3Motion.spatialFast,
         width: widget.width,
         height: widget.height,
         clipBehavior: Clip.antiAlias,

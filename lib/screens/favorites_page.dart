@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import '../theme/m3_motion.dart';
+import '../widgets/m3_components.dart';
 import '../widgets/skeleton.dart';
 import '../app_state.dart';
 import '../l10n/l10n.dart';
@@ -107,76 +108,56 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final items  = _filtered;
-
-    final text   = Theme.of(context).textTheme;
 
     return Scaffold(
       body: SafeArea(child: Column(children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(4, 12, 16, 2),
-          child: Row(children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back_rounded),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            Expanded(child:
-              Text(L.favPageTitle, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
-            ),
-          ]),
-        ),
+        M3PageHeader(title: L.favPageTitle),
         Expanded(child: M3Switcher(
         duration: const Duration(milliseconds: 250),
         child: _loading
           ? const SkeletonList(key: ValueKey('load'))
           : Column(key: const ValueKey('content'), children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText:   L.favSearchHint,
-                    prefixIcon: const Icon(Icons.search_rounded),
-                    border: OutlineInputBorder(borderRadius: AppRadius.mdR),
-                    isDense: true,
-                  ),
-                  onChanged: (v) => setState(() => _query = v),
-                ),
+              M3SearchField(
+                hint: L.favSearchHint,
+                onChanged: (v) => setState(() => _query = v),
               ),
-              SizedBox(
-                height: 40,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  children: [
-                    _sortChip(L.favSortRecent,   _SortMode.recent),
-                    _sortChip(L.favSortOldest,   _SortMode.oldest),
-                    _sortChip(L.favSortArtistAz, _SortMode.artistAz),
-                    _sortChip(L.favSortTitleAz,  _SortMode.titleAz),
-                  ],
-                ),
+              M3ButtonGroup<_SortMode>(
+                items: [
+                  (_SortMode.recent,   L.favSortRecent),
+                  (_SortMode.oldest,   L.favSortOldest),
+                  (_SortMode.artistAz, L.favSortArtistAz),
+                  (_SortMode.titleAz,  L.favSortTitleAz),
+                ],
+                selected: _sort,
+                onSelected: (m) => setState(() => _sort = m),
               ),
               const SizedBox(height: 8),
               Expanded(
                 child: items.isEmpty
-                    ? Center(child: Text(L.favEmpty,
-                        style: TextStyle(color: scheme.onSurfaceVariant)))
-                    : ListView.separated(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    ? M3EmptyState(
+                        icon: Icons.favorite_border_rounded,
+                        message: L.favEmpty)
+                    : ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
                         itemCount: items.length,
-                        separatorBuilder: (_, _) => const Divider(height: 1),
                         itemBuilder: (ctx, i) {
                           final t = items[i] as Map<String, dynamic>;
                           // Light fade-in, no popup feel
                           return TweenAnimationBuilder<double>(
                             key: ValueKey(t['name']?.toString() ?? i),
                             tween: Tween(begin: 0, end: 1),
-                            duration: const Duration(milliseconds: 220),
+                            duration: M3Motion.effectsDefaultDuration,
+                            curve: M3Motion.effectsDefault,
                             builder: (_, v, child) => Opacity(opacity: v, child: child),
-                            child: _FavoriteListTile(
-                              track:  t,
-                              onTap:  () => showDetailSheet(ctx, Map<String, dynamic>.from(t), 'tracks', widget.service),
-                              onRemove: () => _remove(t),
+                            child: M3SegmentTile(
+                              index: i,
+                              count: items.length,
+                              child: _FavoriteListTile(
+                                track:  t,
+                                onTap:  () => showDetailSheet(ctx, Map<String, dynamic>.from(t), 'tracks', widget.service),
+                                onRemove: () => _remove(t),
+                              ),
                             ),
                           );
                         },
@@ -187,16 +168,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
       ])),
     );
   }
-
-  Widget _sortChip(String label, _SortMode mode) => Padding(
-    padding: const EdgeInsets.only(right: 8),
-    child: ChoiceChip(
-      label: Text(label),
-      selected: _sort == mode,
-      showCheckmark: false,
-      onSelected: (_) => setState(() => _sort = mode),
-    ),
-  );
 }
 
 class _FavoriteListTile extends StatelessWidget {
@@ -234,8 +205,9 @@ class _FavoriteListTile extends StatelessWidget {
       onTap: onTap,
       trailing: GestureDetector(
         onLongPress: () => showFolderAssignSheet(context, name: name, artist: artist, image: rawUrl),
-        child: IconButton(
-          icon: const Icon(Icons.favorite_rounded, color: Colors.redAccent, size: 20),
+        child: IconButton.filledTonal(
+          icon: Icon(Icons.favorite_rounded,
+              color: Theme.of(context).colorScheme.primary, size: 20),
           onPressed: onRemove,
         ),
       ),

@@ -26,6 +26,21 @@ class M3Motion {
   static const Curve emphasizedAccelerate = Cubic(0.3, 0.0, 0.8, 0.15);
   static const Curve standard             = Cubic(0.2, 0.0, 0.0, 1.0);
 
+  // Motion physics (springs), converted to curves as Material recommends
+  // when real springs are not available (Flutter). "Spatial" = moves, size,
+  // shape (a little overshoot). "Effects" = color, opacity (no overshoot).
+  static const Curve spatialFast    = Cubic(0.42, 1.67, 0.21, 0.90); // 350 ms
+  static const Curve spatialDefault = Cubic(0.38, 1.21, 0.22, 1.00); // 500 ms
+  static const Curve spatialSlow    = Cubic(0.39, 1.29, 0.35, 0.98); // 650 ms
+  static const Curve effectsFast    = Cubic(0.31, 0.94, 0.34, 1.00); // 150 ms
+  static const Curve effectsDefault = Cubic(0.34, 0.80, 0.34, 1.00); // 200 ms
+  static const Curve effectsSlow    = Cubic(0.34, 0.88, 0.34, 1.00); // 300 ms
+
+  static const Duration spatialFastDuration    = Duration(milliseconds: 350);
+  static const Duration spatialDefaultDuration = Duration(milliseconds: 500);
+  static const Duration effectsFastDuration    = Duration(milliseconds: 150);
+  static const Duration effectsDefaultDuration = Duration(milliseconds: 200);
+
   // Durations
   static const Duration short  = Duration(milliseconds: 150);
   static const Duration medium = Duration(milliseconds: 300);
@@ -321,7 +336,7 @@ class M3Switcher extends StatelessWidget {
         final v = animation.value;
         final opacity = leaving
             ? const Interval(0.65, 1.0).transform(v)
-            : const Interval(0.35, 1.0, curve: Curves.easeOut).transform(v);
+            : const Interval(0.35, 1.0, curve: M3Motion.effectsDefault).transform(v);
         return Opacity(opacity: opacity, child: child);
       },
     );

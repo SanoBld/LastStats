@@ -365,6 +365,7 @@ Future<void> showFolderAssignSheet(
     sheetAnimationStyle: kM3SheetAnimation,
     context: context,
     isScrollControlled: true,
+    showDragHandle: true,
     builder: (ctx) => ValueListenableBuilder<List<FavFolder>>(
       valueListenable: FavoritesFoldersService.foldersNotifier,
       builder: (ctx, folders, _) => ValueListenableBuilder<Map<String, List<String>>>(
@@ -390,28 +391,49 @@ Future<void> showFolderAssignSheet(
                         textAlign: TextAlign.center,
                         style: TextStyle(color: scheme.onSurfaceVariant)),
                   ),
-                ...folders.map((f) {
-                  final checked = FavoritesFoldersService.foldersForItem(key).contains(f.id);
-                  return CheckboxListTile(
-                    value: checked,
-                    controlAffinity: ListTileControlAffinity.leading,
-                    secondary: CircleAvatar(
-                      backgroundColor: f.color.withValues(alpha: 0.25),
-                      child: Text(f.emoji, style: const TextStyle(fontSize: 16)),
+                for (int i = 0; i < folders.length; i++)
+                  Builder(builder: (_) {
+                    final f = folders[i];
+                    final checked = FavoritesFoldersService.foldersForItem(key).contains(f.id);
+                    return M3SegmentTile(
+                      index: i,
+                      count: folders.length,
+                      selected: checked,
+                      child: ListTile(
+                        leading: M3CookieBadge(
+                          size: 40,
+                          color: f.color.withValues(alpha: 0.3),
+                          child: Text(f.emoji, style: const TextStyle(fontSize: 18)),
+                        ),
+                        title: Text(f.name),
+                        trailing: M3Switcher(
+                          duration: M3Motion.effectsDefaultDuration,
+                          child: checked
+                              ? Icon(Icons.check_circle_rounded,
+                                  key: const ValueKey('on'), color: scheme.primary)
+                              : Icon(Icons.circle_outlined,
+                                  key: const ValueKey('off'),
+                                  color: scheme.onSurfaceVariant),
+                        ),
+                        onTap: () => FavoritesFoldersService.toggleItemInFolder(key, f.id, meta: meta),
+                      ),
+                    );
+                  }),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.tonalIcon(
+                      style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+                      icon: const Icon(Icons.add_rounded),
+                      label: Text(L.favFolderNew),
+                      onPressed: () async {
+                        Navigator.pop(ctx);
+                        await showFolderEditorSheet(context);
+                      },
                     ),
-                    title: Text(f.name),
-                    onChanged: (_) =>
-                        FavoritesFoldersService.toggleItemInFolder(key, f.id, meta: meta),
-                  );
-                }),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.add_rounded),
-                  title: Text(L.favFolderNew),
-                  onTap: () async {
-                    Navigator.pop(ctx);
-                    await showFolderEditorSheet(context);
-                  },
+                  ),
                 ),
               ]),
             ),
@@ -692,32 +714,17 @@ class FoldersGridPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FavoritesFoldersService.ensureLoaded();
-    final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
 
     return Scaffold(
       body: SafeArea(child: Column(children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(4, 12, 16, 2),
-          child: Row(children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back_rounded),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            Expanded(child: Text(L.searchFolders,
-                style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800))),
-          ]),
-        ),
+        M3PageHeader(title: L.searchFolders),
         Expanded(
           child: ValueListenableBuilder<List<FavFolder>>(
             valueListenable: FavoritesFoldersService.foldersNotifier,
             builder: (ctx, folders, _) {
               if (folders.isEmpty) {
-                return Center(child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
-                  child: Text(L.searchFoldersHint, textAlign: TextAlign.center,
-                      style: TextStyle(color: scheme.onSurfaceVariant)),
-                ));
+                return M3EmptyState(
+                    icon: Icons.folder_open_rounded, message: L.searchFoldersHint);
               }
               return GridView.builder(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -745,6 +752,7 @@ class FoldersGridPage extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
+                style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(56)),
                 icon: const Icon(Icons.add_rounded),
                 label: Text(L.favFolderNew),
                 onPressed: () => showFolderEditorSheet(context),
@@ -771,32 +779,28 @@ class _FolderCard extends StatelessWidget {
       valueListenable: FavoritesFoldersService.assignNotifier,
       builder: (ctx, _, _) {
         final count = FavoritesFoldersService.itemsInFolder(folder.id).length;
-        return InkWell(
+        return M3PressCard(
+          color: folder.color.withValues(alpha: 0.18),
           onTap: onTap,
           onLongPress: onLongPress,
-          borderRadius: AppRadius.lgR,
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: folder.color.withValues(alpha: 0.16),
-              borderRadius: AppRadius.lgR,
-              border: Border.all(color: folder.color.withValues(alpha: 0.4)),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            M3CookieBadge(
+              size: 52,
+              color: folder.color.withValues(alpha: 0.35),
+              child: Text(folder.emoji, style: const TextStyle(fontSize: 26)),
             ),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(folder.emoji, style: const TextStyle(fontSize: 30)),
-              const Spacer(),
-              Text(folder.name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
-              if (folder.description.isNotEmpty) ...[
-                const SizedBox(height: 2),
-                Text(folder.description, maxLines: 2, overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-              ],
-              const SizedBox(height: 6),
-              Text('$count', style: Theme.of(context).textTheme.labelSmall
-                  ?.copyWith(color: scheme.onSurfaceVariant)),
-            ]),
-          ),
+            const Spacer(),
+            Text(folder.name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+            if (folder.description.isNotEmpty) ...[
+              const SizedBox(height: 2),
+              Text(folder.description, maxLines: 2, overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            ],
+            const SizedBox(height: 6),
+            Text('$count', style: Theme.of(context).textTheme.labelSmall
+                ?.copyWith(color: scheme.onSurfaceVariant)),
+          ]),
         );
       },
     );
@@ -847,55 +851,41 @@ class _FolderDetailPageState extends State<_FolderDetailPage> {
 
     return Scaffold(
       body: SafeArea(child: Column(children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(4, 12, 16, 2),
-          child: ValueListenableBuilder<List<FavFolder>>(
-            valueListenable: FavoritesFoldersService.foldersNotifier,
-            builder: (ctx, folders, _) {
-              // Reflect edits (name/emoji/description) live; fall back to
-              // the folder we were opened with if it somehow got deleted.
-              final folder = folders.firstWhere((f) => f.id == widget.folder.id,
-                  orElse: () => widget.folder);
-              return Row(children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back_rounded),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-                Text(folder.emoji, style: const TextStyle(fontSize: 22)),
-                const SizedBox(width: 8),
-                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(folder.name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                      style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
-                  if (folder.description.isNotEmpty)
-                    Text(folder.description, maxLines: 1, overflow: TextOverflow.ellipsis,
-                        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                ])),
-                IconButton(
+        ValueListenableBuilder<List<FavFolder>>(
+          valueListenable: FavoritesFoldersService.foldersNotifier,
+          builder: (ctx, folders, _) {
+            // Reflect edits (name/emoji/description) live; fall back to
+            // the folder we were opened with if it somehow got deleted.
+            final folder = folders.firstWhere((f) => f.id == widget.folder.id,
+                orElse: () => widget.folder);
+            return M3PageHeader(
+              title: folder.name,
+              subtitle: folder.description,
+              leading: Text(folder.emoji, style: const TextStyle(fontSize: 24)),
+              actions: [
+                IconButton.filledTonal(
                   icon: const Icon(Icons.edit_outlined),
                   onPressed: () => showFolderEditorSheet(context, existing: folder),
                 ),
-                IconButton(
+                IconButton.filled(
                   icon: const Icon(Icons.add_rounded),
                   onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (_) => _AddTracksToFolderPage(service: widget.service, folder: folder))),
                 ),
-              ]);
-            },
-          ),
+              ],
+            );
+          },
         ),
-        SizedBox(
-          height: 40,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            children: [
-              _sortChip(L.favSortRecent,   _FolderSort.recent),
-              _sortChip(L.favSortOldest,   _FolderSort.oldest),
-              _sortChip(L.favSortArtistAz, _FolderSort.artistAz),
-              _sortChip(L.favSortTitleAz,  _FolderSort.titleAz),
-              _sortChip(L.favFolderSortCustom, _FolderSort.custom),
-            ],
-          ),
+        M3ButtonGroup<_FolderSort>(
+          items: [
+            (_FolderSort.recent,   L.favSortRecent),
+            (_FolderSort.oldest,   L.favSortOldest),
+            (_FolderSort.artistAz, L.favSortArtistAz),
+            (_FolderSort.titleAz,  L.favSortTitleAz),
+            (_FolderSort.custom,   L.favFolderSortCustom),
+          ],
+          selected: _sort,
+          onSelected: (m) => setState(() => _sort = m),
         ),
         const SizedBox(height: 8),
         Expanded(
@@ -908,8 +898,8 @@ class _FolderDetailPageState extends State<_FolderDetailPage> {
                     ? FavoritesFoldersService.orderedItemsInFolder(widget.folder.id)
                     : _sorted(FavoritesFoldersService.itemsInFolder(widget.folder.id));
                 if (items.isEmpty) {
-                  return Center(child: Text(L.favFolderEmpty,
-                      style: TextStyle(color: scheme.onSurfaceVariant)));
+                  return M3EmptyState(
+                      icon: Icons.music_note_rounded, message: L.favFolderEmpty);
                 }
 
                 if (_sort == _FolderSort.custom) {
@@ -929,29 +919,36 @@ class _FolderDetailPageState extends State<_FolderDetailPage> {
                     },
                     itemBuilder: (ctx, i) {
                       final it = items[i];
-                      return TrackRowTile(
+                      return M3SegmentTile(
                         key: ValueKey(it.key),
-                        name: it.name, artist: it.artist, imageUrl: it.image,
-                        onTap: () => _openItem(it),
-                        trailing: Icon(Icons.drag_handle_rounded, color: scheme.onSurfaceVariant),
+                        index: i,
+                        count: items.length,
+                        child: TrackRowTile(
+                          name: it.name, artist: it.artist, imageUrl: it.image,
+                          onTap: () => _openItem(it),
+                          trailing: Icon(Icons.drag_handle_rounded, color: scheme.onSurfaceVariant),
+                        ),
                       );
                     },
                   );
                 }
 
-                return ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                return ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
                   itemCount: items.length,
-                  separatorBuilder: (_, _) => const Divider(height: 1),
                   itemBuilder: (ctx, i) {
                     final it = items[i];
-                    return TrackRowTile(
-                      name: it.name, artist: it.artist, imageUrl: it.image,
-                      onTap: () => _openItem(it),
-                      trailing: IconButton(
-                        icon: Icon(Icons.close_rounded, size: 20, color: scheme.onSurfaceVariant),
-                        onPressed: () => FavoritesFoldersService.toggleItemInFolder(
-                            it.key, widget.folder.id, meta: it),
+                    return M3SegmentTile(
+                      index: i,
+                      count: items.length,
+                      child: TrackRowTile(
+                        name: it.name, artist: it.artist, imageUrl: it.image,
+                        onTap: () => _openItem(it),
+                        trailing: IconButton(
+                          icon: Icon(Icons.close_rounded, size: 20, color: scheme.onSurfaceVariant),
+                          onPressed: () => FavoritesFoldersService.toggleItemInFolder(
+                              it.key, widget.folder.id, meta: it),
+                        ),
                       ),
                     );
                   },
@@ -963,16 +960,6 @@ class _FolderDetailPageState extends State<_FolderDetailPage> {
       ])),
     );
   }
-
-  Widget _sortChip(String label, _FolderSort mode) => Padding(
-    padding: const EdgeInsets.only(right: 8),
-    child: ChoiceChip(
-      label: Text(label),
-      selected: _sort == mode,
-      showCheckmark: false,
-      onSelected: (_) => setState(() => _sort = mode),
-    ),
-  );
 }
 
 /// Search-and-add page reachable from a folder: shows already-listened

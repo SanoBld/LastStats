@@ -58,6 +58,7 @@ import '../theme/m3_motion.dart';
 import '../theme/m3_shapes.dart';
 import '../widgets/skeleton.dart';
 import '../widgets/m3_action_row.dart';
+import '../widgets/m3_components.dart';
 
 
 // ── Settings sub-pages ────────────────────────────────────────────────────────
