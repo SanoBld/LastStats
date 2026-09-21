@@ -30,6 +30,7 @@ import 'services/lastfm_service.dart';
 import 'services/crash_log_service.dart';
 import 'services/auto_backup_service.dart';
 import 'widgets/custom_title_bar.dart';
+import 'theme/m3_motion.dart';
 import 'package:app_links/app_links.dart';
 
 // navigatorKey now lives in notification_service.dart so the notification
@@ -337,10 +338,12 @@ class LastStatsApp extends StatelessWidget {
                               final nLightWithNav = nLight.copyWith(
                                 navigationBarTheme: nLight.navigationBarTheme
                                     .copyWith(labelBehavior: navBehavior),
+                              pageTransitionsTheme: kM3PageTransitions,
                               );
                               final nDarkWithNav = nDark.copyWith(
                                 navigationBarTheme: nDark.navigationBarTheme
                                     .copyWith(labelBehavior: navBehavior),
+                              pageTransitionsTheme: kM3PageTransitions,
                               );
                               return MaterialApp(
                                 navigatorKey:               navigatorKey,
@@ -452,12 +455,14 @@ class LastStatsApp extends StatelessWidget {
                                     final lTheme = ThemeData(
                                       colorScheme: lightScheme,
                                       useMaterial3: true,
+                                      pageTransitionsTheme: kM3PageTransitions,
                                       navigationBarTheme: NavigationBarThemeData(
                                           labelBehavior: navBehavior),
                                     );
                                     final dTheme = ThemeData(
                                       colorScheme: darkScheme,
                                       useMaterial3: true,
+                                      pageTransitionsTheme: kM3PageTransitions,
                                       navigationBarTheme: NavigationBarThemeData(
                                           labelBehavior: navBehavior),
                                     );

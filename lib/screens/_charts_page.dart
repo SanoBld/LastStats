@@ -1332,10 +1332,10 @@ class _ChartsPageState extends State<_ChartsPage>
     final topLabel    = usingFallback ? _ct('All-time (données $_selectedYear en cours)', 'All-time ($_selectedYear loading)') : (_isAllTime ? _ct('All-time', 'All-time') : '$_selectedYear');
     final albumLabel  = topLabel;
 
-    return AnimatedSwitcher(
+    return M3Switcher(
       duration: const Duration(milliseconds: 300),
       child: _loading
-        ? const Center(key: ValueKey('c_l'), child: CircularProgressIndicator())
+        ? const SkeletonList(key: ValueKey('c_l'), header: true)
         : _error != null
           ? KeyedSubtree(key: const ValueKey('c_e'), child: _ErrorView(message: _error!, onRetry: _load))
           : SafeArea(key: const ValueKey('c_ok'), child: Column(
@@ -1435,10 +1435,7 @@ class _ChartsPageState extends State<_ChartsPage>
                       ),
                       const SizedBox(height: 12),
                       if (_tagsLoading)
-                        const Center(child: Padding(
-                          padding: EdgeInsets.all(24),
-                          child: CircularProgressIndicator(),
-                        ))
+                        const SkeletonBlock(height: 180)
                       else if (_tags.isNotEmpty)
                         RepaintBoundary(
                           key: _xkeys['genres'],
@@ -1468,10 +1465,7 @@ class _ChartsPageState extends State<_ChartsPage>
                           style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                       const SizedBox(height: 12),
                       if (_hourlyLoading)
-                        const Center(child: Padding(
-                          padding: EdgeInsets.all(24),
-                          child: CircularProgressIndicator(),
-                        ))
+                        const SkeletonBlock(height: 180)
                       else if (_hourlyData != null)
                         RepaintBoundary(
                           key: _xkeys['habits'],
@@ -1495,10 +1489,7 @@ class _ChartsPageState extends State<_ChartsPage>
                           style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                       const SizedBox(height: 12),
                       if (_yearDataLoading)
-                        const Center(child: Padding(
-                          padding: EdgeInsets.all(24),
-                          child: CircularProgressIndicator(),
-                        ))
+                        const SkeletonBlock(height: 180)
                       else if (artistItems.isNotEmpty)
                         RepaintBoundary(
                           key: _xkeys['artists'],
@@ -1531,10 +1522,7 @@ class _ChartsPageState extends State<_ChartsPage>
                           style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                       const SizedBox(height: 12),
                       if (_yearDataLoading)
-                        const Center(child: Padding(
-                          padding: EdgeInsets.all(24),
-                          child: CircularProgressIndicator(),
-                        ))
+                        const SkeletonBlock(height: 180)
                       else if (albumItems.isNotEmpty)
                         RepaintBoundary(
                           key: _xkeys['albums'],
@@ -1595,10 +1583,7 @@ class _ChartsPageState extends State<_ChartsPage>
                                 onLoad: () => AllScrobblesService.loadAll(widget.service),
                               )
                       else if (_calendarLoading)
-                        const Center(child: Padding(
-                          padding: EdgeInsets.all(24),
-                          child: CircularProgressIndicator(),
-                        ))
+                        const SkeletonBlock(height: 180)
                       else if (calendarForView != null)
                         RepaintBoundary(
                           key: _xkeys['calendar'],

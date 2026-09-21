@@ -3,6 +3,7 @@
 // Lists every past release: version, date, full changelog, and a direct
 // download button per version — not just the newest one.
 import 'package:flutter/material.dart';
+import '../../widgets/skeleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../l10n/l10n.dart';
@@ -105,7 +106,7 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
         centerTitle: false,
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const SkeletonList()
           : _releases.isEmpty
               ? Center(child: Text(
                   isEn ? 'Could not load release history.' : 'Impossible de charger l\'historique.',

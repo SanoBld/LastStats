@@ -1077,7 +1077,7 @@ class _AddTracksToFolderPageState extends State<_AddTracksToFolderPage> {
         const SizedBox(height: 4),
         Expanded(
           child: _loading
-              ? const Center(child: CircularProgressIndicator())
+              ? const SkeletonList()
               : _results.isEmpty
                   ? Center(child: Text(L.commonNoResults, style: TextStyle(color: scheme.onSurfaceVariant)))
                   : ListView.separated(

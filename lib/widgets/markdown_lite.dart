@@ -248,6 +248,11 @@ class _MarkdownImage extends StatelessWidget {
         opaque: false,
         barrierColor: Colors.black87,
         pageBuilder: (_, _, _) => _FullscreenImage(url: url),
+        // No jump cut: quick fade in and out.
+        transitionsBuilder: (_, anim, _, child) =>
+            FadeTransition(opacity: anim, child: child),
+        transitionDuration: const Duration(milliseconds: 220),
+        reverseTransitionDuration: const Duration(milliseconds: 180),
       )),
       child: Hero(
         tag: url,

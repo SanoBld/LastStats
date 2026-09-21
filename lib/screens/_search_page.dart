@@ -241,10 +241,10 @@ class _SearchPageState extends State<_SearchPage> {
   }
 
   Widget _buildResults(BuildContext context, ColorScheme scheme, TextTheme text) {
-    return AnimatedSwitcher(
+    return M3Switcher(
       duration: const Duration(milliseconds: 280),
       child: _searching
-        ? const Center(key: ValueKey('search_load'), child: CircularProgressIndicator())
+        ? const SkeletonList(key: ValueKey('search_load'))
         : _buildResultsContent(context, scheme, text),
     );
   }

@@ -272,10 +272,10 @@ class _TopListBodyState extends State<_TopListBody>
     final scheme = Theme.of(context).colorScheme;
 
     if (_loading || _error != null || _items.isEmpty) {
-      return AnimatedSwitcher(
+      return M3Switcher(
         duration: const Duration(milliseconds: 300),
         child: _loading
-          ? const Center(key: ValueKey('rank_load'), child: CircularProgressIndicator())
+          ? const SkeletonList(key: ValueKey('rank_load'))
           : _error != null
             ? _ErrorView(message: _error!, onRetry: () => _load(reset: true))
             : Center(key: const ValueKey('rank_empty'), child: Text(L.commonNoResults,
@@ -283,7 +283,7 @@ class _TopListBodyState extends State<_TopListBody>
       );
     }
 
-    return AnimatedSwitcher(
+    return M3Switcher(
       duration: const Duration(milliseconds: 300),
       child: NotificationListener<ScrollNotification>(
       onNotification: (n) {

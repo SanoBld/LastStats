@@ -345,18 +345,24 @@ void showDetailSheet(
   String type,          // 'artists' | 'albums' | 'tracks'
   LastFmService service,
 ) {
-  Navigator.of(context).push(PageRouteBuilder(
-    opaque: false,
-    fullscreenDialog: true,
-    pageBuilder:        (_, _, _) => _ItemDetailSheet(item: item, type: type, service: service),
-    transitionsBuilder: (_, anim, _, child) => SlideTransition(
-      position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
-          .animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
-      child: child,
-    ),
-    transitionDuration:        const Duration(milliseconds: 380),
-    reverseTransitionDuration: const Duration(milliseconds: 300),
+  Navigator.of(context).push(_detailRoute(
+    context,
+    (_) => _ItemDetailSheet(item: item, type: type, service: service),
   ));
+}
+
+// From a list: the item grows into the page (container transform).
+// From inside another detail page (deep navigation): normal forward/back.
+Route<void> _detailRoute(BuildContext context, WidgetBuilder builder) {
+  final nested = context.widget is _ItemDetailSheet ||
+      context.widget is _FullProfileSheet ||
+      context.findAncestorWidgetOfExactType<_ItemDetailSheet>() != null ||
+      context.findAncestorWidgetOfExactType<_FullProfileSheet>() != null;
+  if (nested) return MaterialPageRoute<void>(builder: builder);
+  return M3ContainerRoute<void>(
+    builder: builder,
+    origin: M3Motion.originOf(context),
+  );
 }
 
 
@@ -916,12 +922,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           ),
         ),
 
-        // Heart button — tracks only, fixed top-right
-        if (widget.type == 'tracks' && favoritesEnabled)
-          Positioned(
-            top: topPad + 8, right: 12,
-            child: _buildLoveButton(),
-          ),
       ],
     );
   }
@@ -980,46 +980,47 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ),
           ],
           const SizedBox(height: 14),
-          // Music app link buttons + circular preview play button
+          // Heart (round) + play (wide pill), tracks only
+          if (widget.type == 'tracks' &&
+              (favoritesEnabled || _previewUrl != null || _previewLoading)) ...[
+            M3ActionRow(
+              circle: favoritesEnabled
+                  ? M3CircleButton(
+                      icon: _isLoved
+                          ? Icons.favorite_rounded
+                          : Icons.favorite_border_rounded,
+                      iconColor: _isLoved ? Colors.redAccent : null,
+                      busy: _loveBusy,
+                      onTap: _toggleLove,
+                      onLongPress: () => showFolderAssignSheet(
+                          context, name: _name, artist: _artist,
+                          image: _resolvedImage),
+                      tooltip: 'Love',
+                    )
+                  : null,
+              pill: (_previewUrl != null || _previewLoading)
+                  ? M3PillButton(
+                      icon: _isPlaying
+                          ? Icons.pause_rounded
+                          : Icons.play_arrow_rounded,
+                      busy: _previewLoading,
+                      progress: _previewPos,
+                      onTap: _togglePreview,
+                      tooltip: 'Play preview',
+                    )
+                  : null,
+            ),
+            const SizedBox(height: 14),
+          ],
+          // Music app link buttons
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Expanded(child: _buildMusicLinks(hasImage)),
-            if (widget.type == 'tracks' && (_previewUrl != null || _previewLoading))
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: _buildPreviewRing(scheme),
-              ),
           ]),
           const SizedBox(height: 16),
         ],
       ),
     );
   }
-
-  // Heart button — fixed top-right, same style/size as the back button.
-  // Long-press (tracks only) opens the folder picker, same one used
-  // everywhere else, so loving and filing a track happen from one spot.
-  Widget _buildLoveButton() => GestureDetector(
-    onTap: _toggleLove,
-    onLongPress: widget.type != 'tracks' ? null : () => showFolderAssignSheet(
-        context, name: _name, artist: _artist, image: _resolvedImage),
-    child: Container(
-      width: 36, height: 36,
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.45),
-        shape: BoxShape.circle,
-      ),
-      child: _loveBusy
-          ? const Padding(
-              padding: EdgeInsets.all(9),
-              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-            )
-          : Icon(
-              _isLoved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-              color: _isLoved ? Colors.redAccent : Colors.white,
-              size: 18,
-            ),
-    ),
-  );
 
   // ── Music app links ─────────────────────────────────────────────────────────
 
@@ -1237,40 +1238,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     if (mounted) setState(() => _previewLoading = false);
   }
 
-
-  // Small circular play/pause button with a progress ring, shown next to
-  // the music-app links in the header (replaces the old inline card).
-  Widget _buildPreviewRing(ColorScheme scheme) {
-    const size = 40.0;
-    return GestureDetector(
-      onTap: _previewLoading ? null : _togglePreview,
-      child: SizedBox(
-        width: size, height: size,
-        child: Stack(alignment: Alignment.center, children: [
-          SizedBox(
-            width: size, height: size,
-            child: CircularProgressIndicator(
-              value: _previewLoading ? null : _previewPos.clamp(0.0, 1.0),
-              strokeWidth: 2.5,
-              backgroundColor: Colors.white.withValues(alpha: 0.25),
-              valueColor: AlwaysStoppedAnimation(scheme.primary),
-            ),
-          ),
-          Container(
-            width: size - 10, height: size - 10,
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.45),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-              color: Colors.white, size: 18,
-            ),
-          ),
-        ]),
-      ),
-    );
-  }
 
   // Toggle play / pause for the Deezer 30s preview clip.
   Future<void> _togglePreview() async {
@@ -2556,22 +2523,14 @@ void showProfileSheet(
   bool isFav = false,
   VoidCallback? onToggleFav,
 }) {
-  Navigator.of(context).push(PageRouteBuilder(
-    opaque: false,
-    fullscreenDialog: true,
-    pageBuilder: (_, _, _) => _FullProfileSheet(
+  Navigator.of(context).push(_detailRoute(
+    context,
+    (_) => _FullProfileSheet(
       username:    username,
       service:     service,
       isFav:       isFav,
       onToggleFav: onToggleFav ?? () {},
     ),
-    transitionsBuilder: (_, anim, _, child) => SlideTransition(
-      position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
-          .animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
-      child: child,
-    ),
-    transitionDuration:        const Duration(milliseconds: 380),
-    reverseTransitionDuration: const Duration(milliseconds: 300),
   ));
 }
 

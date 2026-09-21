@@ -5,6 +5,7 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../../widgets/skeleton.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/l10n.dart';
@@ -268,7 +269,7 @@ class _AccountPageState extends State<AccountPage> {
     if (_loading) {
       return Scaffold(
         appBar: AppBar(title: Text(L.settingsAccount), centerTitle: false),
-        body: const Center(child: CircularProgressIndicator()),
+        body: const SkeletonList(),
       );
     }
 

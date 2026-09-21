@@ -6,6 +6,8 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
+import '../theme/m3_motion.dart';
+import '../widgets/skeleton.dart';
 import '../app_state.dart';
 import '../l10n/l10n.dart';
 import '../services/data_cache.dart';
@@ -124,10 +126,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
             ),
           ]),
         ),
-        Expanded(child: AnimatedSwitcher(
+        Expanded(child: M3Switcher(
         duration: const Duration(milliseconds: 250),
         child: _loading
-          ? const Center(key: ValueKey('load'), child: CircularProgressIndicator())
+          ? const SkeletonList(key: ValueKey('load'))
           : Column(key: const ValueKey('content'), children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),

@@ -438,8 +438,8 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     Widget content;
     if (_dashChartLoading && !_dashChartLoaded) {
       content = const Padding(
-        padding: EdgeInsets.symmetric(vertical: 24),
-        child: Center(child: CircularProgressIndicator()),
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: SkeletonBlock(height: 160),
       );
     } else if (_dashboardChart == 'monthly') {
       content = _MonthlyCard(monthly: _dashChartMonthly ?? const <String, int>{});
@@ -1485,7 +1485,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     final scheme = Theme.of(context).colorScheme;
 
     if (_loading || _error != null) {
-      return AnimatedSwitcher(
+      return M3Switcher(
         duration: const Duration(milliseconds: 300),
         child: _loading
           ? _DashboardSkeleton(scheme: scheme)
@@ -1544,7 +1544,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                       || _topArtistsMonth.isNotEmpty || _topTracksMonth.isNotEmpty
                       || _topArtistsYear.isNotEmpty  || _topTracksYear.isNotEmpty;
 
-    return AnimatedSwitcher(
+    return M3Switcher(
       duration: const Duration(milliseconds: 300),
       child: RefreshIndicator(
       key: const ValueKey('dash_ok'),
@@ -2435,8 +2435,11 @@ class _DashboardSkeleton extends StatelessWidget {
         ),
       );
 
+  // Soft pulse around the whole skeleton.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => SkeletonPulse(child: _content(context));
+
+  Widget _content(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(slivers: [
         SliverAppBar(

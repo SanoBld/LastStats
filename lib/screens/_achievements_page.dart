@@ -6,16 +6,10 @@
 part of 'home_screen.dart';
 
 void showAchievementsSheet(BuildContext context, Map<String, dynamic>? userInfo, {bool isSelf = false}) {
-  Navigator.of(context).push(PageRouteBuilder(
-    opaque: false,
-    fullscreenDialog: true,
-    pageBuilder: (_, _, _) => _AchievementsSheet(userInfo: userInfo, isSelf: isSelf),
-    transitionsBuilder: (_, anim, _, child) => SlideTransition(
-      position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
-          .animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
-      child: child,
-    ),
-    transitionDuration: const Duration(milliseconds: 380),
+  // The tapped card grows into the page (container transform).
+  Navigator.of(context).push(M3ContainerRoute<void>(
+    builder: (_) => _AchievementsSheet(userInfo: userInfo, isSelf: isSelf),
+    origin: M3Motion.originOf(context),
   ));
 }
 

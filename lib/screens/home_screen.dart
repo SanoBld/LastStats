@@ -54,6 +54,9 @@ import '../widgets/living_artwork.dart';
 import 'favorites_page.dart';
 import '../services/favorites_folders_service.dart';
 import 'track_row_tile.dart';
+import '../theme/m3_motion.dart';
+import '../widgets/skeleton.dart';
+import '../widgets/m3_action_row.dart';
 
 
 // ── Settings sub-pages ────────────────────────────────────────────────────────
@@ -210,29 +213,11 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   Widget _pageStack(List<Widget> pages, int count) {
-    // Each page gets a tiny fade + scale on top of the opacity toggle,
-    // so switching tabs feels like the page "settles in" instead of
-    // just popping visible. The scale is subtle on purpose — this stack
-    // keeps every page mounted (for state), so the effect only needs to
-    // read as a light polish, not a full page transition.
-    return Stack(
-      children: List.generate(count, (i) {
-        final active = _idx == i;
-        return IgnorePointer(
-          ignoring: !active,
-          child: AnimatedOpacity(
-            opacity: active ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeInOut,
-            child: AnimatedScale(
-              scale: active ? 1.0 : 0.985,
-              duration: const Duration(milliseconds: 260),
-              curve: Curves.easeOutCubic,
-              child: pages[i],
-            ),
-          ),
-        );
-      }),
+    // Top level tabs: the old page fades out first, then the new page
+    // fades in (Material 3 "fade through"). Pages stay alive for state.
+    return M3FadeThroughStack(
+      index: _idx,
+      children: pages.sublist(0, count),
     );
   }
 

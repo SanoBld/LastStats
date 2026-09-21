@@ -1,5 +1,6 @@
 // lib/screens/settings/cache_page.dart
 import 'package:flutter/material.dart';
+import '../../widgets/skeleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/storage_manager.dart';
 import '../../services/data_cache.dart';
@@ -127,7 +128,7 @@ class _CachePageState extends State<CachePage> {
         scrolledUnderElevation: 0,
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const SkeletonList()
           : ListView(
               padding: const EdgeInsets.all(20),
               children: [

@@ -1,6 +1,7 @@
 // lib/screens/settings/notifications_page.dart
 
 import 'package:flutter/material.dart';
+import '../../widgets/skeleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app_state.dart';
 import '../../l10n/l10n.dart';
@@ -227,7 +228,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         centerTitle: false,
       ),
       body: _checkingPerm
-          ? const Center(child: CircularProgressIndicator())
+          ? const SkeletonList()
           : ListView(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               children: [
