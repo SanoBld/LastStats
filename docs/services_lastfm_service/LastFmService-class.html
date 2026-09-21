@@ -260,6 +260,32 @@
 
 </dd>
 
+        <dt id="getChartTopArtists" class="callable">
+  <span class="name"><a href="../services_lastfm_service/LastFmService/getChartTopArtists.html">getChartTopArtists</a></span><span class="signature">(<wbr>{<span class="parameter" id="getChartTopArtists-param-limit"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">limit</span> = <span class="default-value">15</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getChartTopTracks" class="callable">
+  <span class="name"><a href="../services_lastfm_service/LastFmService/getChartTopTracks.html">getChartTopTracks</a></span><span class="signature">(<wbr>{<span class="parameter" id="getChartTopTracks-param-limit"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">limit</span> = <span class="default-value">15</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
         <dt id="getFriends" class="callable">
   <span class="name"><a href="../services_lastfm_service/LastFmService/getFriends.html">getFriends</a></span><span class="signature">(<wbr>{<span class="parameter" id="getFriends-param-limit"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">limit</span> = <span class="default-value">50</span>, </span><span class="parameter" id="getFriends-param-page"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">page</span> = <span class="default-value">1</span>, </span><span class="parameter" id="getFriends-param-withRecentTrack"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">withRecentTrack</span> = <span class="default-value">true</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a></span>&gt;</span></span>
@@ -271,6 +297,19 @@
   Returns the friend list of <a href="../services_lastfm_service/LastFmService/username.html">username</a>.
 Pass <code>withRecentTrack</code> = true to include each friend's most recent
 (or currently playing) track in the response — saves extra requests.
+  
+
+</dd>
+
+        <dt id="getGeoTopTracks" class="callable">
+  <span class="name"><a href="../services_lastfm_service/LastFmService/getGeoTopTracks.html">getGeoTopTracks</a></span><span class="signature">(<wbr><span class="parameter" id="getGeoTopTracks-param-country"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">country</span>, {</span><span class="parameter" id="getGeoTopTracks-param-limit"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">limit</span> = <span class="default-value">15</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
   
 
 </dd>
@@ -343,6 +382,19 @@ Pass <code>withRecentTrack</code> = true to include each friend's most recent
         <dt id="getSessionKey" class="callable">
   <span class="name"><a href="../services_lastfm_service/LastFmService/getSessionKey.html">getSessionKey</a></span><span class="signature">(<wbr><span class="parameter" id="getSessionKey-param-token"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">token</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getSimilarArtists" class="callable">
+  <span class="name"><a href="../services_lastfm_service/LastFmService/getSimilarArtists.html">getSimilarArtists</a></span><span class="signature">(<wbr><span class="parameter" id="getSimilarArtists-param-artist"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">artist</span>, {</span><span class="parameter" id="getSimilarArtists-param-limit"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">limit</span> = <span class="default-value">15</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a></span>&gt;</span></span>
   </span>
   
 

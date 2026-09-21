@@ -110,8 +110,12 @@ and</li>
   <pre class="language-dart"><code class="language-dart">@override
 Widget build(BuildContext context) {
   final idx = shapeIndex ?? m3ShapeIndex(seed ?? &#39;&#39;);
-  Widget clip(double s) =&gt;
-      ClipPath(clipper: ShapeBorderClipper(shape: m3ImageShape(idx, s)), child: child);
+  Widget clip(double s) =&gt; ValueListenableBuilder&lt;String&gt;(
+        valueListenable: imageShapeNotifier,
+        builder: (_, mode, _) =&gt; ClipPath(
+            clipper: ShapeBorderClipper(shape: m3ResolveShape(mode, idx, s)),
+            child: child),
+      );
   if (size != null) return clip(size!);
   return LayoutBuilder(builder: (context, box) {
     final s = box.biggest.shortestSide;
