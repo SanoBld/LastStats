@@ -549,7 +549,7 @@ class _AccountPageState extends State<AccountPage> {
                           onPressed: _connectingFav ? null : () => _connectFav(active),
                           icon: _connectingFav
                               ? const SizedBox(width: 16, height: 16,
-                                  child: CircularProgressIndicator(strokeWidth: 2))
+                                  child: M3Spinner())
                               : const Icon(Icons.favorite_border_rounded, size: 18),
                           label: Text(L.acctConnectFavorites),
                         ),

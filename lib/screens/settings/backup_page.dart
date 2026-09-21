@@ -1,6 +1,7 @@
 // lib/screens/settings/backup_page.dart
 
 import 'package:flutter/material.dart';
+import '../../widgets/skeleton.dart';
 import '../../widgets/m3_components.dart';
 import '../../theme/m3_shapes.dart';
 import 'package:file_picker/file_picker.dart';
@@ -379,8 +380,7 @@ class _BackupPageState extends State<BackupPage> {
               child: _exporting
                   ? Padding(
                       padding: const EdgeInsets.all(10),
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: scheme.onPrimaryContainer))
+                      child: M3Spinner(color: scheme.onPrimaryContainer))
                   : Icon(Icons.upload_rounded, color: scheme.onPrimaryContainer, size: 22),
             ),
             title: Text(L.settingsExport,
@@ -459,8 +459,7 @@ class _BackupPageState extends State<BackupPage> {
               child: _importing
                   ? Padding(
                       padding: const EdgeInsets.all(10),
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: scheme.onSecondaryContainer))
+                      child: M3Spinner(color: scheme.onSecondaryContainer))
                   : Icon(Icons.folder_open_rounded, color: scheme.onSecondaryContainer, size: 22),
             ),
             title: Text(L.settingsImport,
@@ -527,7 +526,7 @@ class _BackupPageState extends State<BackupPage> {
               ),
               trailing: _autoBackupBusy
                   ? const SizedBox(width: 16, height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2))
+                      child: M3Spinner())
                   : Icon(Icons.chevron_right_rounded, color: scheme.onSurfaceVariant),
               onTap: _autoBackupBusy ? null : _pickAutoBackupDir,
             ),
@@ -575,7 +574,7 @@ class _BackupPageState extends State<BackupPage> {
                   onPressed: (_logBusy || (_logSizeBytes ?? 0) == 0) ? null : _shareLog,
                   icon: _logBusy
                       ? const SizedBox(width: 16, height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2))
+                          child: M3Spinner())
                       : const Icon(Icons.ios_share_rounded, size: 18),
                   label: Text(L.backupCrashLogShare),
                 ),

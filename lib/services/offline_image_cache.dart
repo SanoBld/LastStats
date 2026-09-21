@@ -11,6 +11,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import '../widgets/skeleton.dart';
 
 import 'image_cache_backend_stub.dart'
     if (dart.library.io)   'image_cache_backend_native.dart'
@@ -226,6 +227,7 @@ class OfflineImageCache {
     Widget? placeholder,
     Widget? errorWidget,
   }) {
+    final ph = placeholder ?? M3ImagePlaceholder(width: width, height: height);
     if (url.isEmpty) return placeholder ?? const SizedBox.shrink();
 
     // Cache checked FIRST (offline or online) — network is only a fallback.
@@ -233,7 +235,7 @@ class OfflineImageCache {
       future: _ensureMeta().then((_) => _getBytes(url)),
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.done) {
-          return placeholder ?? const SizedBox.shrink();
+          return ph;
         }
 
         // Decode at the actual display size (× device pixel ratio) instead
@@ -273,6 +275,7 @@ class OfflineImageCache {
           cacheWidth: cacheWidth,
           cacheHeight: cacheHeight,
           gaplessPlayback: true,
+          loadingBuilder: (_, child, p) => p == null ? child : ph,
           errorBuilder: (_, _, _) =>
               errorWidget ?? placeholder ?? const SizedBox.shrink(),
         );

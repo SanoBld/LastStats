@@ -1203,7 +1203,7 @@ class _ChartsPageState extends State<_ChartsPage>
           Row(children: [
             SizedBox(
               width: 13, height: 13,
-              child: CircularProgressIndicator(strokeWidth: 2, color: s.primary),
+              child: M3Spinner(color: s.primary),
             ),
             const SizedBox(width: 10),
             Expanded(

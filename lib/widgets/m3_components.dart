@@ -12,6 +12,8 @@
 //  • M3Chip          → animated chip (replaces FilterChip / ChoiceChip)
 //  • M3SegmentedButton → animated segmented buttons
 //  • M3TonalButton   → button that morphs its corners when pressed
+//  • M3ShapedBox     → clips an image with Material You shapes (cookie, circle, clover…)
+//  • M3NetImage      → network image with shape + loader
 //  • M3MaxWidth      → centers content on wide screens
 // ══════════════════════════════════════════════════════════════════════════
 
@@ -19,6 +21,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../theme/m3_motion.dart';
 import '../theme/m3_shapes.dart';
+import 'skeleton.dart';
 
 BorderRadius _clampRadius(BorderRadius b) {
   Radius c(Radius r) => Radius.circular(math.max(0.0, r.x));
@@ -587,6 +590,110 @@ class _M3TonalButtonState extends State<M3TonalButton> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Material You shapes for images ─────────────────────────────────────────
+const int kM3ImageShapeCount = 8;
+
+/// Same text always gives the same shape.
+int m3ShapeIndex(String seed) {
+  var h = 17;
+  for (final u in seed.codeUnits) {
+    h = (h * 31 + u) & 0x7fffffff;
+  }
+  return h % kM3ImageShapeCount;
+}
+
+ShapeBorder m3ImageShape(int index, double s) {
+  switch (index % kM3ImageShapeCount) {
+    case 0: return const M3CookieBorder(lobes: 8, amplitude: 0.07);   // cookie
+    case 1: return const CircleBorder();                              // circle
+    case 2: return const M3CookieBorder(lobes: 4, amplitude: 0.2);    // clover
+    case 3: return RoundedRectangleBorder(                            // arch
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(s / 2), topRight: Radius.circular(s / 2),
+            bottomLeft: Radius.circular(s * 0.14), bottomRight: Radius.circular(s * 0.14)));
+    case 4: return const M3CookieBorder(lobes: 12, amplitude: 0.07);  // burst
+    case 5: return RoundedRectangleBorder(                            // squircle
+        borderRadius: BorderRadius.circular(s * 0.36));
+    case 6: return RoundedRectangleBorder(                            // leaf
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(s * 0.5), bottomRight: Radius.circular(s * 0.5),
+            topRight: Radius.circular(s * 0.14), bottomLeft: Radius.circular(s * 0.14)));
+    default: return const M3CookieBorder(lobes: 2, amplitude: 0.2);   // stretched oval
+  }
+}
+
+class M3ShapedBox extends StatelessWidget {
+  const M3ShapedBox({
+    super.key,
+    required this.child,
+    this.seed,
+    this.shapeIndex,
+    this.size,
+  });
+
+  final Widget child;
+  final String? seed;      // same seed = same shape
+  final int?    shapeIndex; // or pick the shape yourself
+  final double? size;      // if null, uses the available space
+
+  @override
+  Widget build(BuildContext context) {
+    final idx = shapeIndex ?? m3ShapeIndex(seed ?? '');
+    Widget clip(double s) =>
+        ClipPath(clipper: ShapeBorderClipper(shape: m3ImageShape(idx, s)), child: child);
+    if (size != null) return clip(size!);
+    return LayoutBuilder(builder: (context, box) {
+      final s = box.biggest.shortestSide;
+      return clip(s.isFinite ? s : 48);
+    });
+  }
+}
+
+class M3NetImage extends StatelessWidget {
+  const M3NetImage({
+    super.key,
+    required this.url,
+    required this.size,
+    this.seed,
+    this.fallback,
+  });
+
+  final String url;
+  final double size;
+  final String? seed;
+  final Widget? fallback;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final px = (size * MediaQuery.devicePixelRatioOf(context)).round();
+    return M3ShapedBox(
+      size: size,
+      seed: seed ?? url,
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: Image.network(
+          url,
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          cacheWidth: px,
+          cacheHeight: px,
+          loadingBuilder: (_, child, p) =>
+              p == null ? child : M3ImagePlaceholder(width: size, height: size),
+          errorBuilder: (_, _, _) => fallback ??
+              ColoredBox(
+                color: scheme.surfaceContainerHigh,
+                child: Icon(Icons.music_note_rounded,
+                    color: scheme.onSurfaceVariant, size: size * 0.5),
+              ),
         ),
       ),
     );

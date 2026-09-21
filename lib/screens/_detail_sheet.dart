@@ -1149,7 +1149,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               key: const ValueKey('loading'),
               child: SizedBox(
                 width: 20, height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2, color: scheme.primary),
+                child: M3Spinner(color: scheme.primary),
               ),
             )
           : _StatChip(
@@ -1309,27 +1309,48 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               Text(L.detailBiography,
                   style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
               _translating
-                  ? const SizedBox(width: 16, height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2))
+                  ? const SizedBox(width: 28, height: 28, child: M3Spinner())
                   : GestureDetector(
                       onLongPress: _pickTranslationLanguage,
-                      child: TextButton.icon(
-                        onPressed: _toggleTranslate,
-                        icon: Icon(
-                          _showTranslated ? Icons.undo_rounded : Icons.translate_rounded,
-                          size: 16,
-                        ),
-                        label: Text(
-                          _showTranslated ? L.detailShowOriginal : L.detailTranslate,
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                        ),
-                        style: TextButton.styleFrom(
-                          padding:         const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          minimumSize:     const Size(0, 0),
-                          backgroundColor: scheme.surfaceContainerHighest,
-                          foregroundColor: scheme.onSurfaceVariant,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: AppRadius.xlR),
+                      child: M3TonalButton(
+                        height: 36,
+                        radius: BorderRadius.circular(18),
+                        // translated = vivid accent, original = calm color
+                        color: _showTranslated
+                            ? scheme.primaryContainer
+                            : scheme.surfaceContainerHigh,
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        onTap: _toggleTranslate,
+                        child: M3Switcher(
+                          duration: M3Motion.effectsDefaultDuration,
+                          child: Row(
+                            key: ValueKey(_showTranslated),
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _showTranslated
+                                    ? Icons.undo_rounded
+                                    : Icons.translate_rounded,
+                                size: 16,
+                                color: _showTranslated
+                                    ? scheme.onPrimaryContainer
+                                    : scheme.primary,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                _showTranslated
+                                    ? L.detailShowOriginal
+                                    : L.detailTranslate,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: _showTranslated
+                                      ? scheme.onPrimaryContainer
+                                      : scheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -1750,7 +1771,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           if (_loadingLyrics)
             const Center(child: Padding(
               padding: EdgeInsets.symmetric(vertical: 16),
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: M3Spinner(),
             ))
           else if (_lyrics.isEmpty)
             Text(L.detailLyricsNotFound,
@@ -1841,6 +1862,17 @@ class _BlurFadeImageState extends State<_BlurFadeImage>
       fit: StackFit.expand,
       children: [
         widget.fallback,
+        // Loader while the poster loads (upper part of the screen)
+        Align(
+          alignment: const Alignment(0, -0.55),
+          child: IgnorePointer(
+            child: AnimatedOpacity(
+              opacity: _imageLoaded ? 0.0 : 1.0,
+              duration: M3Motion.effectsDefaultDuration,
+              child: const M3LoadingIndicator(size: 64),
+            ),
+          ),
+        ),
         AnimatedBuilder(
           animation: _blur,
           builder: (_, child) => ImageFiltered(
@@ -2268,8 +2300,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
                   child: _sharing
                       ? const Padding(
                           padding: EdgeInsets.all(9),
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white70),
+                          child: M3Spinner(color: Colors.white70),
                         )
                       : const Icon(Icons.ios_share_rounded,
                           color: Colors.white, size: 18),
@@ -2331,8 +2362,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
                     child: _previewLoading
                         ? Padding(
                             padding: const EdgeInsets.all(19),
-                            child: CircularProgressIndicator(
-                                strokeWidth: 4.5, color: _dominant ?? Colors.white70),
+                            child: M3Spinner(color: _dominant ?? Colors.white70),
                           )
                         : Stack(alignment: Alignment.center, children: [
                             SizedBox(
@@ -3135,7 +3165,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           child: Row(children: [
             SizedBox(width: 12, height: 12,
-                child: CircularProgressIndicator(strokeWidth: 1.6, color: scheme.onSurfaceVariant)),
+                child: M3Spinner(color: scheme.onSurfaceVariant)),
             const SizedBox(width: 8),
             Text(_ct('Synchronisation des données…', 'Syncing full library…'),
                 style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
@@ -3218,13 +3248,11 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                 color: Colors.greenAccent.shade400.withValues(alpha: 0.5)),
           ),
           child: Row(children: [
-            ClipRRect(
-              borderRadius: AppRadius.smR,
+            SizedBox(
+              width: 46, height: 46,
               child: hasImg
-                  ? Image.network(rawUrl, width: 46, height: 46, fit: BoxFit.cover,
-                      cacheWidth: 138, cacheHeight: 138, // decode ~3x for high-DPI, not full-size
-                      errorBuilder: (_, _, _) => _artBox(46, scheme))
-                  : _artBox(46, scheme),
+                  ? M3NetImage(url: rawUrl, size: 46, fallback: _artBox(46, scheme))
+                  : M3ShapedBox(size: 46, seed: rawUrl, child: _artBox(46, scheme)),
             ),
             const SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -3376,13 +3404,11 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
         child: Row(children: [
           Stack(children: [
-            ClipRRect(
-              borderRadius: AppRadius.smR,
+            SizedBox(
+              width: 44, height: 44,
               child: hasImg
-                  ? Image.network(rawUrl, width: 44, height: 44, fit: BoxFit.cover,
-                      cacheWidth: 132, cacheHeight: 132, // decode ~3x for high-DPI, not full-size
-                      errorBuilder: (_, _, _) => _artBox(44, scheme))
-                  : _artBox(44, scheme),
+                  ? M3NetImage(url: rawUrl, size: 44, fallback: _artBox(44, scheme))
+                  : M3ShapedBox(size: 44, seed: rawUrl, child: _artBox(44, scheme)),
             ),
             if (isNp)
               Positioned(right: 0, bottom: 0,

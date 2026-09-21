@@ -7,6 +7,7 @@ import 'dart:async';
 import '../theme/m3_motion.dart';
 import 'package:flutter/material.dart';
 import '../widgets/m3_components.dart';
+import '../widgets/skeleton.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -948,7 +949,7 @@ class _FavoritesStepState extends State<_FavoritesStep> {
                 ? const Padding(
                     padding: EdgeInsets.all(12),
                     child: SizedBox(width: 16, height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2)))
+                        child: M3Spinner()))
                 : null,
             border: const OutlineInputBorder(),
           ),
@@ -970,7 +971,7 @@ class _FavoritesStepState extends State<_FavoritesStep> {
         const SizedBox(height: 8),
         if (_loadingFriends)
           const Padding(padding: EdgeInsets.symmetric(vertical: 8),
-              child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)))
+              child: SizedBox(width: 18, height: 18, child: M3Spinner()))
         else if (_friends.isEmpty)
           Text(L.onboardFavNoFriends, style: TextStyle(color: scheme.onSurfaceVariant))
         else

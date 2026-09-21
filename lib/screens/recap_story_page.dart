@@ -8,6 +8,7 @@
 
 import 'dart:convert';
 import '../widgets/skeleton.dart';
+import '../widgets/m3_components.dart';
 import '../theme/m3_motion.dart';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -417,14 +418,20 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
                   return Expanded(
                     child: GestureDetector(
                       onTap: () => _go(i),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 3),
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: i == _period
-                              ? scheme.primary
-                              : scheme.primary.withValues(alpha: 0.25),
-                          borderRadius: BorderRadius.circular(2),
+                      behavior: HitTestBehavior.opaque,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: AnimatedContainer(
+                          duration: M3Motion.spatialFastDuration,
+                          curve: M3Motion.spatialFast,
+                          margin: const EdgeInsets.symmetric(horizontal: 3),
+                          height: i == _period ? 8 : 4,
+                          decoration: BoxDecoration(
+                            color: i == _period
+                                ? scheme.primary
+                                : scheme.primary.withValues(alpha: 0.25),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                         ),
                       ),
                     ),
@@ -435,22 +442,22 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 4, 16, 8),
                 child: Row(children: [
-                  IconButton(
-                    icon: Icon(Icons.close_rounded, color: scheme.onSurface),
+                  IconButton.filledTonal(
+                    icon: const Icon(Icons.close_rounded),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(labels[_period],
                         style: AppText.title.copyWith(color: scheme.onSurface)),
                   ),
-                  IconButton(
+                  IconButton.filledTonal(
                     tooltip: L.commonShare,
                     icon: _sharing
                         ? SizedBox(
                             width: 20,
                             height: 20,
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: scheme.onSurface))
+                            child: M3Spinner(color: scheme.onSurface))
                         : Icon(Icons.ios_share_rounded, color: scheme.onSurface),
                     onPressed: (d.count == 0 || _sharing) ? null : _shareRecap,
                   ),
@@ -500,12 +507,14 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
   }
 
   Widget _navBtn(ColorScheme scheme, IconData icon, bool enabled, VoidCallback onTap) {
-    return Opacity(
-      opacity: enabled ? 1 : 0.25,
-      child: IconButton(
-        icon: Icon(icon, color: scheme.onSurface, size: 30),
-        onPressed: enabled ? onTap : null,
-      ),
+    return M3TonalButton(
+      width: 72,
+      height: 52,
+      padding: EdgeInsets.zero,
+      color: scheme.secondaryContainer,
+      radius: BorderRadius.circular(26),
+      onTap: enabled ? onTap : null,
+      child: Icon(icon, color: scheme.onSecondaryContainer, size: 28),
     );
   }
 
@@ -634,8 +643,9 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
                 width: 104,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Stack(children: [
-                    ClipRRect(
-                      borderRadius: AppRadius.mdR,
+                    M3ShapedBox(
+                      size: 104,
+                      seed: title,
                       child: _ItemImg(item: item, type: type, size: 104, round: false),
                     ),
                     Positioned(
@@ -673,19 +683,10 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
   }
 
   Widget _categoryChip(ColorScheme scheme, String label, int index) {
-    final selected = _category == index;
-    return GestureDetector(
-      onTap: () => setState(() => _category = index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-        decoration: BoxDecoration(
-          color: selected ? scheme.primary : scheme.surfaceContainerHigh,
-          borderRadius: AppRadius.xlR,
-        ),
-        child: Text(label,
-            style: AppText.body.copyWith(color: selected ? scheme.onPrimary : scheme.onSurfaceVariant)),
-      ),
+    return M3Chip(
+      label: Text(label),
+      selected: _category == index,
+      onSelected: (_) => setState(() => _category = index),
     );
   }
 
@@ -777,7 +778,9 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
                   Stack(clipBehavior: Clip.none, children: [
-                    ClipOval(
+                    M3ShapedBox(
+                      size: avatarSizes[slot],
+                      shapeIndex: slot == 0 ? 0 : (slot == 1 ? 2 : 7),
                       child: _ItemImg(
                           item: item, type: type, size: avatarSizes[slot], round: true),
                     ),
@@ -850,7 +853,7 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
           borderRadius: AppRadius.lgR,
         ),
         child: Row(children: [
-          ClipOval(child: _ItemImg(item: item, type: type, size: 44, round: true)),
+          M3ShapedBox(size: 44, seed: title, child: _ItemImg(item: item, type: type, size: 44, round: true)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1134,8 +1137,9 @@ class _ShareCard extends StatelessWidget {
                         style: TextStyle(color: scheme.primary, fontSize: 14, fontWeight: FontWeight.w900)),
                   ),
                   const SizedBox(width: 6),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(7),
+                  M3ShapedBox(
+                    size: 34,
+                    seed: (items[i]['name'] ?? '').toString(),
                     child: _ItemImg(item: items[i], type: type, size: 34, round: false),
                   ),
                   const SizedBox(width: 10),

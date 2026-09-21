@@ -69,21 +69,20 @@ class M3Motion {
 }
 
 // ── Forward / backward (normal navigation) ─────────────────────────────────
-// Uses the Material 3 default "fade forwards" transition.
+// Rise + fade with a spatial spring. The old page stays solid underneath.
 class M3PageTransitionsBuilder extends PageTransitionsBuilder {
   const M3PageTransitionsBuilder();
 
-  static const FadeForwardsPageTransitionsBuilder _base =
-      FadeForwardsPageTransitionsBuilder();
+  @override
+  Duration get transitionDuration => M3Motion.spatialDefaultDuration;
 
   @override
-  Duration get transitionDuration => _base.transitionDuration;
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 300);
 
+  // The page underneath stays still and solid (no fade), so nothing
+  // behind it (for example the home screen) shows through while animating.
   @override
-  Duration get reverseTransitionDuration => _base.reverseTransitionDuration;
-
-  @override
-  get delegatedTransition => _base.delegatedTransition;
+  get delegatedTransition => null;
 
   @override
   Widget buildTransitions<T>(
@@ -97,8 +96,28 @@ class M3PageTransitionsBuilder extends PageTransitionsBuilder {
     if (M3Motion.reduced(context)) {
       return FadeTransition(opacity: animation, child: child);
     }
-    return _base.buildTransitions<T>(
-        route, context, animation, secondaryAnimation, child);
+    final move = CurvedAnimation(
+      parent: animation,
+      curve: M3Motion.spatialDefault,
+      reverseCurve: M3Motion.emphasizedAccelerate,
+    );
+    final fade = CurvedAnimation(
+      parent: animation,
+      curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+      reverseCurve: const Interval(0.3, 1.0, curve: Curves.easeIn),
+    );
+    return FadeTransition(
+      opacity: fade,
+      child: SlideTransition(
+        position: Tween<Offset>(begin: const Offset(0.0, 0.06), end: Offset.zero)
+            .animate(move),
+        // Solid background so the page is never see-through.
+        child: ColoredBox(
+          color: Theme.of(context).colorScheme.surface,
+          child: child,
+        ),
+      ),
+    );
   }
 }
 

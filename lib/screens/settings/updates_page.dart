@@ -1,6 +1,7 @@
 // lib/screens/settings/updates_page.dart
 
 import 'package:flutter/material.dart';
+import '../../widgets/skeleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../l10n/l10n.dart';
@@ -263,7 +264,7 @@ class _UpdatesPageState extends State<UpdatesPage> {
             leading: _checkingUpdate
                 ? const SizedBox(width: 40, height: 40, child: Center(
                     child: SizedBox(width: 22, height: 22,
-                        child: CircularProgressIndicator(strokeWidth: 2.5))))
+                        child: M3Spinner())))
                 : Container(
                     width: 40, height: 40,
                     decoration: BoxDecoration(

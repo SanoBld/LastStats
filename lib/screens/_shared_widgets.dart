@@ -161,8 +161,9 @@ class _SmartImage extends StatefulWidget {
   final String? initialUrl;
   final Future<String> Function() resolver;
   final double size, borderRadius;
+  final String? seed;   // same seed = same Material You shape
   const _SmartImage({required this.resolver, required this.size,
-      required this.borderRadius, this.initialUrl});
+      required this.borderRadius, this.initialUrl, this.seed});
 
   static const _ph = '2a96cbd8b46e442fc41c2b86b821562f';
 
@@ -250,29 +251,33 @@ class _SmartImageState extends State<_SmartImage> {
     // source's full size — big RAM saving for lists of small avatars,
     // no visible quality loss since it still matches screen pixels.
     final px = (widget.size * MediaQuery.of(context).devicePixelRatio).round();
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(widget.borderRadius),
-      child: Image.network(url, width: widget.size, height: widget.size, fit: BoxFit.cover,
-          cacheWidth: px, cacheHeight: px,
-          errorBuilder: (_, _, _) => _fallback(s)));
+    return _shaped(Image.network(url, width: widget.size, height: widget.size, fit: BoxFit.cover,
+        cacheWidth: px, cacheHeight: px,
+        loadingBuilder: (_, child, p) => p == null ? child : _loadingBox(s),
+        errorBuilder: (_, _, _) => _fallbackBox(s)));
   }
 
-  Widget _loading(ColorScheme s) => ClipRRect(
-    borderRadius: BorderRadius.circular(widget.borderRadius),
-    child: Container(width: widget.size, height: widget.size,
-      color: s.surfaceContainerHighest,
-      child: Center(child: SizedBox(
-        width:  widget.size * 0.4,
-        height: widget.size * 0.4,
-        child: CircularProgressIndicator(
-            strokeWidth: 1.5, color: s.primary.withValues(alpha: 0.5))))));
+  // Every image gets a Material You shape (cookie, circle, clover…).
+  Widget _shaped(Widget child) => M3ShapedBox(
+      size: widget.size,
+      seed: widget.seed ?? widget.initialUrl ?? '',
+      child: child);
 
-  Widget _fallback(ColorScheme s) => ClipRRect(
-    borderRadius: BorderRadius.circular(widget.borderRadius),
-    child: Container(width: widget.size, height: widget.size,
-      color: s.surfaceContainerHighest,
+  Widget _loadingBox(ColorScheme s) => Container(
+      width: widget.size, height: widget.size,
+      color: s.surfaceContainerHigh,
+      alignment: Alignment.center,
+      child: M3LoadingIndicator(size: (widget.size * 0.55).clamp(14.0, 40.0)));
+
+  Widget _fallbackBox(ColorScheme s) => Container(
+      width: widget.size, height: widget.size,
+      color: s.surfaceContainerHigh,
       child: Icon(Icons.music_note_rounded,
-          color: s.onSurfaceVariant, size: widget.size * 0.5)));
+          color: s.onSurfaceVariant, size: widget.size * 0.5));
+
+  Widget _loading(ColorScheme s) => _shaped(_loadingBox(s));
+
+  Widget _fallback(ColorScheme s) => _shaped(_fallbackBox(s));
 }
 
 class _SectionHeader extends StatelessWidget {
@@ -320,7 +325,7 @@ class _ItemTile extends StatelessWidget {
           SizedBox(width: 28, child: Text(rank, textAlign: TextAlign.center,
               style: AppText.label.copyWith(color: scheme.onSurfaceVariant))),
           const SizedBox(width: 8),
-          _SmartImage(size: 48, borderRadius: AppRadius.sm, initialUrl: imageUrl,
+          _SmartImage(size: 48, borderRadius: AppRadius.sm, initialUrl: imageUrl, seed: name,
               resolver: imageFuture != null ? () => imageFuture! : () => Future.value('')),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1234,7 +1239,7 @@ class _AppSearchField extends StatelessWidget {
             ? const Padding(
                 padding: EdgeInsets.all(14),
                 child: SizedBox(width: 16, height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2)),
+                    child: M3Spinner()),
               )
             : (controller.text.isNotEmpty
                 ? IconButton(

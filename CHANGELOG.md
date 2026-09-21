@@ -46,6 +46,13 @@
 - News colors now follow the app accent colors
 - New shared-axis animation when opening the level history, with grouped rows and cookie level badges
 
+**Images, loading and pages**
+- Images use Material You shapes (cookie, circle, clover, arch, leaf, oval…) in lists, popular albums, history and recaps, each item keeps its own shape
+- Posters, images and the biography show the wavy loading indicator while loading, all small spinners in the app now use it too
+- Translate button redesigned in Material You, it changes color and shape when the bio is translated
+- Recaps: tonal buttons, animated story bar, animated filters and shaped images
+- Page transitions no longer show the home screen behind while animating (fixes the achievements category animation)
+
 **Options and settings**
 - All chips and segmented buttons now animate: the selected one becomes a pill, the others stay soft squares
 - Rankings: new date button opens a Material You sheet to pick year and month

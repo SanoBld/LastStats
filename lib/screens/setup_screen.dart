@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/skeleton.dart';
 import '../theme/m3_motion.dart';
 import '../theme/m3_shapes.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -597,9 +598,7 @@ class _SetupScreenState extends State<SetupScreen>
                                     icon: _isLoading
                                         ? SizedBox(
                                             width: 18, height: 18,
-                                            child: CircularProgressIndicator(
-                                                strokeWidth: 2,
-                                                color: scheme.onPrimary))
+                                            child: M3Spinner(color: scheme.onPrimary))
                                         : const Icon(Icons.bar_chart_rounded),
                                     label: Text(_isLoading
                                         ? L.setupConnecting
@@ -692,7 +691,7 @@ class _SetupScreenState extends State<SetupScreen>
                                     onPressed: _restoring ? null : _restoreFromFile,
                                     icon: _restoring
                                         ? const SizedBox(width: 16, height: 16,
-                                            child: CircularProgressIndicator(strokeWidth: 2))
+                                            child: M3Spinner())
                                         : const Icon(Icons.folder_open_rounded, size: 18),
                                     label: Text(L.backupChooseFile),
                                     style: OutlinedButton.styleFrom(
@@ -1309,10 +1308,7 @@ class _FirstLoadChecklistState extends State<_FirstLoadChecklist> {
           : Row(children: [
               SizedBox(
                 width: 16, height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth:  2.2,
-                  valueColor: AlwaysStoppedAnimation(scheme.primary),
-                ),
+                child: M3Spinner(),
               ),
               const SizedBox(width: 12),
               Text(
@@ -1358,10 +1354,7 @@ class _StepRow extends StatelessWidget {
                 ? Icon(Icons.check_circle_rounded,
                     size: 18, color: scheme.primary,
                     key: const ValueKey('done'))
-                : CircularProgressIndicator(
-                    strokeWidth: 2.2,
-                    valueColor: AlwaysStoppedAnimation(scheme.primary),
-                    key: const ValueKey('active')),
+                : M3Spinner(),
           ),
         ),
         const SizedBox(width: 10),

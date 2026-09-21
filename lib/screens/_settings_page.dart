@@ -835,8 +835,7 @@ class _SettingsPageState extends State<_SettingsPage> {
               if (_checkingUpdate) ...[
                 const SizedBox(height: 6),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  SizedBox(width: 10, height: 10, child: CircularProgressIndicator(
-                      strokeWidth: 1.5, color: scheme.onSurfaceVariant)),
+                  SizedBox(width: 10, height: 10, child: M3Spinner(color: scheme.onSurfaceVariant)),
                   const SizedBox(width: 6),
                   Text(L.settingsCheckingUpdates,
                       style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),

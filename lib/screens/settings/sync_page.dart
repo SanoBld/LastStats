@@ -264,7 +264,7 @@ class _SyncPageState extends State<SyncPage> {
                         onPressed: _resyncingAll ? null : _resyncAllFriends,
                         icon: _resyncingAll
                             ? const SizedBox(width: 16, height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2))
+                                child: M3Spinner())
                             : const Icon(Icons.sync_rounded),
                         label: Text(_syncCt('Tout resynchroniser', 'Resync everyone')),
                       ),
@@ -281,7 +281,7 @@ class _SyncPageState extends State<SyncPage> {
                               Expanded(child: Text(u, style: text.bodyMedium)),
                               if (syncing)
                                 const SizedBox(width: 16, height: 16,
-                                    child: CircularProgressIndicator(strokeWidth: 2))
+                                    child: M3Spinner())
                               else
                                 IconButton(
                                   visualDensity: VisualDensity.compact,

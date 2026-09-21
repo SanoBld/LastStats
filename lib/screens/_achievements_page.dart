@@ -460,7 +460,7 @@ class _AchvCardViewerState extends State<_AchvCardViewer> {
                 child: _sharing
                     ? const Padding(
                         padding: EdgeInsets.all(9),
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white70),
+                        child: M3Spinner(color: Colors.white70),
                       )
                     : const Icon(Icons.ios_share_rounded, color: Colors.white, size: 18),
               ),

@@ -8,6 +8,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
+import 'skeleton.dart';
 import '../theme/m3_motion.dart';
 import '../theme/m3_shapes.dart';
 
@@ -121,7 +122,7 @@ class M3CircleButton extends StatelessWidget {
             ? SizedBox(
                 key: const ValueKey('busy'),
                 width: 20, height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2, color: fg),
+                child: M3Spinner(color: fg),
               )
             : Icon(icon, key: ValueKey(icon), color: fg, size: 26),
       ),
@@ -186,8 +187,7 @@ class M3PillButton extends StatelessWidget {
                   ? SizedBox(
                       key: const ValueKey('busy'),
                       width: 22, height: 22,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: fg),
+                      child: M3Spinner(color: fg),
                     )
                   : Icon(icon, key: ValueKey(icon), color: fg, size: 30),
             ),

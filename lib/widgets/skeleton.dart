@@ -137,8 +137,9 @@ class SkeletonList extends StatelessWidget {
 // ── Loading indicator (wavy shape that spins and morphs) ───────────────────
 // Material 3 Expressive style: a soft wavy shape inside a round container.
 class M3LoadingIndicator extends StatefulWidget {
-  const M3LoadingIndicator({super.key, this.size = 48});
+  const M3LoadingIndicator({super.key, this.size = 48, this.color});
   final double size;
+  final Color? color;   // set = only the bumpy shape, in this color (for buttons)
 
   @override
   State<M3LoadingIndicator> createState() => _M3LoadingIndicatorState();
@@ -181,8 +182,8 @@ class _M3LoadingIndicatorState extends State<M3LoadingIndicator>
           size: Size.square(widget.size),
           painter: _LoaderPainter(
             progress: _c,
-            container: scheme.primaryContainer,
-            shape: scheme.primary,
+            container: widget.color == null ? scheme.primaryContainer : null,
+            shape: widget.color ?? scheme.primary,
           ),
         ),
       ),
@@ -198,20 +199,20 @@ class _LoaderPainter extends CustomPainter {
   }) : super(repaint: progress);
 
   final Animation<double> progress;
-  final Color container;
+  final Color? container;
   final Color shape;
 
   @override
   void paint(Canvas canvas, Size size) {
     final c = size.center(Offset.zero);
     final r = size.shortestSide / 2;
-    canvas.drawCircle(c, r, Paint()..color = container);
+    if (container != null) canvas.drawCircle(c, r, Paint()..color = container!);
 
     final t = progress.value;
     // Bumps get softer and sharper again while it spins.
     final amp = 0.07 + 0.09 * (0.5 - 0.5 * math.cos(t * math.pi * 4));
     final path = M3CookieBorder(lobes: 9, amplitude: amp)
-        .getOuterPath(Rect.fromCircle(center: Offset.zero, radius: r * 0.58));
+        .getOuterPath(Rect.fromCircle(center: Offset.zero, radius: r * (container == null ? 0.95 : 0.58)));
 
     canvas.save();
     canvas.translate(c.dx, c.dy);
@@ -223,4 +224,45 @@ class _LoaderPainter extends CustomPainter {
   @override
   bool shouldRepaint(_LoaderPainter old) =>
       old.container != container || old.shape != shape;
+}
+
+
+// ── Small loader that fits its parent ──────────────────────────────────────
+// Drop-in for CircularProgressIndicator: takes the size of the SizedBox
+// around it (32 when there is none).
+class M3Spinner extends StatelessWidget {
+  const M3Spinner({super.key, this.color});
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(builder: (context, box) {
+        final tight = box.hasTightWidth && box.hasTightHeight;
+        final size = tight ? math.min(box.maxWidth, box.maxHeight) : 32.0;
+        return Center(child: M3LoadingIndicator(size: size, color: color));
+      });
+}
+
+// ── Image placeholder: soft box + small loader ─────────────────────────────
+class M3ImagePlaceholder extends StatelessWidget {
+  const M3ImagePlaceholder({super.key, this.width, this.height});
+  final double? width;
+  final double? height;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return LayoutBuilder(builder: (context, box) {
+      final w = width ?? (box.maxWidth.isFinite ? box.maxWidth : 48);
+      final h = height ?? (box.maxHeight.isFinite ? box.maxHeight : 48);
+      final size = (math.min(w, h) * 0.5).clamp(16.0, 56.0);
+      return SizedBox(
+        width: width,
+        height: height,
+        child: ColoredBox(
+          color: scheme.surfaceContainerHigh,
+          child: Center(child: M3LoadingIndicator(size: size)),
+        ),
+      );
+    });
+  }
 }
