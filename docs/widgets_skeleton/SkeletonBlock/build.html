@@ -108,8 +108,12 @@ and</li>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
-Widget build(BuildContext context) =&gt; SkeletonPulse(
-      child: SkeletonBox(height: height, radius: radius),
+Widget build(BuildContext context) =&gt; Stack(
+      alignment: Alignment.center,
+      children: [
+        SkeletonPulse(child: SkeletonBox(height: height, radius: radius)),
+        const M3LoadingIndicator(size: 44),
+      ],
     );</code></pre>
 </section>
 

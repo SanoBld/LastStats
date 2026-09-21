@@ -109,7 +109,7 @@ and</li>
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 Widget build(BuildContext context) {
-  return SkeletonPulse(
+  final list = SkeletonPulse(
     child: SingleChildScrollView(
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -141,6 +141,11 @@ Widget build(BuildContext context) {
       ),
     ),
   );
+  &#47;&#47; Loader always in the middle of the page, on top of the grey boxes.
+  return Stack(children: [
+    Positioned.fill(child: list),
+    const Positioned.fill(child: Center(child: M3LoadingIndicator(size: 72))),
+  ]);
 }</code></pre>
 </section>
 
