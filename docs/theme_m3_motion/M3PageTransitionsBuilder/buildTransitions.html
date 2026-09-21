@@ -98,8 +98,28 @@ Widget buildTransitions&lt;T&gt;(
   if (M3Motion.reduced(context)) {
     return FadeTransition(opacity: animation, child: child);
   }
-  return _base.buildTransitions&lt;T&gt;(
-      route, context, animation, secondaryAnimation, child);
+  final move = CurvedAnimation(
+    parent: animation,
+    curve: M3Motion.spatialDefault,
+    reverseCurve: M3Motion.emphasizedAccelerate,
+  );
+  final fade = CurvedAnimation(
+    parent: animation,
+    curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+    reverseCurve: const Interval(0.3, 1.0, curve: Curves.easeIn),
+  );
+  return FadeTransition(
+    opacity: fade,
+    child: SlideTransition(
+      position: Tween&lt;Offset&gt;(begin: const Offset(0.0, 0.06), end: Offset.zero)
+          .animate(move),
+      &#47;&#47; Solid background so the page is never see-through.
+      child: ColoredBox(
+        color: Theme.of(context).colorScheme.surface,
+        child: child,
+      ),
+    ),
+  );
 }</code></pre>
 </section>
 

@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the M3LoadingIndicator.new constructor from Class M3LoadingIndicator from the skeleton library, for the Dart programming language.">
-  <title>M3LoadingIndicator.new constructor - M3LoadingIndicator - skeleton library - Dart API</title>
+  <meta name="description" content="API docs for the M3ShapedBox.new constructor from Class M3ShapedBox from the m3_components library, for the Dart programming language.">
+  <title>M3ShapedBox.new constructor - M3ShapedBox - m3_components library - Dart API</title>
 
 
   
@@ -25,11 +25,11 @@
   <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">laststats_mobile</a></li>
-    <li><a href="../../widgets_skeleton/">widgets&#47;skeleton.dart</a></li>
-    <li><a href="../../widgets_skeleton/M3LoadingIndicator-class.html">M3LoadingIndicator</a></li>
-    <li class="self-crumb">M3LoadingIndicator.new const constructor</li>
+    <li><a href="../../widgets_m3_components/">widgets&#47;m3_components.dart</a></li>
+    <li><a href="../../widgets_m3_components/M3ShapedBox-class.html">M3ShapedBox</a></li>
+    <li class="self-crumb">M3ShapedBox.new const constructor</li>
   </ol>
-  <div class="self-name">M3LoadingIndicator.new</div>
+  <div class="self-name">M3ShapedBox.new</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -46,17 +46,19 @@
   <div
       id="dartdoc-main-content"
       class="main-content"
-      data-above-sidebar="widgets_skeleton&#47;M3LoadingIndicator-class-sidebar.html"
+      data-above-sidebar="widgets_m3_components&#47;M3ShapedBox-class-sidebar.html"
       data-below-sidebar="">
       <div>
-<h1><span class="kind-constructor">M3LoadingIndicator</span> constructor 
+<h1><span class="kind-constructor">M3ShapedBox</span> constructor 
 </h1></div>
 
     <section class="multi-line-signature">
       const
-      <span class="name ">M3LoadingIndicator</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span></li>
-<li><span class="parameter" id="param-size"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">size</span> = <span class="default-value">48</span>, </span></li>
-<li><span class="parameter" id="param-color"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Color-class.html">Color</a>?</span> <span class="parameter-name">color</span>, </span></li>
+      <span class="name ">M3ShapedBox</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span></li>
+<li><span class="parameter" id="param-child"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span> <span class="parameter-name">child</span>, </span></li>
+<li><span class="parameter" id="param-seed"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">seed</span>, </span></li>
+<li><span class="parameter" id="param-shapeIndex"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">shapeIndex</span>, </span></li>
+<li><span class="parameter" id="param-size"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a>?</span> <span class="parameter-name">size</span>, </span></li>
 </ol>})
     </section>
     
@@ -65,7 +67,13 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">const M3LoadingIndicator({super.key, this.size = 48, this.color});</code></pre>
+  <pre class="language-dart"><code class="language-dart">const M3ShapedBox({
+  super.key,
+  required this.child,
+  this.seed,
+  this.shapeIndex,
+  this.size,
+});</code></pre>
 </section>
 
 
@@ -79,12 +87,12 @@
 </header>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">laststats_mobile</a></li>
-    <li><a href="../../widgets_skeleton/">skeleton</a></li>
-    <li><a href="../../widgets_skeleton/M3LoadingIndicator-class.html">M3LoadingIndicator</a></li>
-    <li class="self-crumb">M3LoadingIndicator.new const constructor</li>
+    <li><a href="../../widgets_m3_components/">m3_components</a></li>
+    <li><a href="../../widgets_m3_components/M3ShapedBox-class.html">M3ShapedBox</a></li>
+    <li class="self-crumb">M3ShapedBox.new const constructor</li>
 </ol>
 
-    <h5>M3LoadingIndicator class</h5>
+    <h5>M3ShapedBox class</h5>
     <div id="dartdoc-sidebar-left-content"></div>
   </div><!--/.sidebar-offcanvas-left-->
   <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">

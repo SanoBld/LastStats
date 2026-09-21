@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the build method from the M3CircleButton class, for the Dart programming language.">
-  <title>build method - M3CircleButton class - m3_action_row library - Dart API</title>
+  <meta name="description" content="API docs for the build method from the M3ShapedBox class, for the Dart programming language.">
+  <title>build method - M3ShapedBox class - m3_components library - Dart API</title>
 
 
   
@@ -25,8 +25,8 @@
   <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">laststats_mobile</a></li>
-    <li><a href="../../widgets_m3_action_row/">widgets&#47;m3_action_row.dart</a></li>
-    <li><a href="../../widgets_m3_action_row/M3CircleButton-class.html">M3CircleButton</a></li>
+    <li><a href="../../widgets_m3_components/">widgets&#47;m3_components.dart</a></li>
+    <li><a href="../../widgets_m3_components/M3ShapedBox-class.html">M3ShapedBox</a></li>
     <li class="self-crumb">build method</li>
   </ol>
   <div class="self-name">build</div>
@@ -46,7 +46,7 @@
 <div
     id="dartdoc-main-content"
     class="main-content"
-    data-above-sidebar="widgets_m3_action_row&#47;M3CircleButton-class-sidebar.html"
+    data-above-sidebar="widgets_m3_components&#47;M3ShapedBox-class-sidebar.html"
     data-below-sidebar="">
     <div>
 <h1><span class="kind-method">build</span> method 
@@ -95,7 +95,7 @@ and</li>
 <li>any ambient state obtained from the <code>context</code> using
 <a href="https://api.flutter.dev/flutter/widgets/BuildContext/dependOnInheritedWidgetOfExactType.html">BuildContext.dependOnInheritedWidgetOfExactType</a>.</li>
 </ul>
-<p>If a widget's <a href="../../widgets_m3_action_row/M3CircleButton/build.html">build</a> method is to depend on anything else, use a
+<p>If a widget's <a href="../../widgets_m3_components/M3ShapedBox/build.html">build</a> method is to depend on anything else, use a
 <a href="https://api.flutter.dev/flutter/widgets/StatefulWidget-class.html">StatefulWidget</a> instead.</p>
 <p>See also:</p>
 <ul>
@@ -109,29 +109,14 @@ and</li>
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 Widget build(BuildContext context) {
-  final scheme = Theme.of(context).colorScheme;
-  final fg = active ? scheme.onPrimary : scheme.onSecondaryContainer;
-  return _M3Pressable(
-    width: 56,
-    height: 56,
-    color: active ? scheme.primary : scheme.secondaryContainer,
-    &#47;&#47; amplitude 0 is a perfect circle, so the shape grows its bumps
-    idleShape: M3CookieBorder(lobes: 8, amplitude: active ? 0.09 : 0.0),
-    pressedShape: M3CookieBorder(lobes: 8, amplitude: active ? 0.0 : 0.05),
-    onTap: busy ? null : onTap,
-    onLongPress: onLongPress,
-    tooltip: tooltip,
-    child: M3Switcher(
-      duration: M3Motion.short,
-      child: busy
-          ? SizedBox(
-              key: const ValueKey(&#39;busy&#39;),
-              width: 20, height: 20,
-              child: M3Spinner(color: fg),
-            )
-          : Icon(icon, key: ValueKey(icon), color: fg, size: 26),
-    ),
-  );
+  final idx = shapeIndex ?? m3ShapeIndex(seed ?? &#39;&#39;);
+  Widget clip(double s) =&gt;
+      ClipPath(clipper: ShapeBorderClipper(shape: m3ImageShape(idx, s)), child: child);
+  if (size != null) return clip(size!);
+  return LayoutBuilder(builder: (context, box) {
+    final s = box.biggest.shortestSide;
+    return clip(s.isFinite ? s : 48);
+  });
 }</code></pre>
 </section>
 
@@ -146,12 +131,12 @@ Widget build(BuildContext context) {
 </header>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">laststats_mobile</a></li>
-    <li><a href="../../widgets_m3_action_row/">m3_action_row</a></li>
-    <li><a href="../../widgets_m3_action_row/M3CircleButton-class.html">M3CircleButton</a></li>
+    <li><a href="../../widgets_m3_components/">m3_components</a></li>
+    <li><a href="../../widgets_m3_components/M3ShapedBox-class.html">M3ShapedBox</a></li>
     <li class="self-crumb">build method</li>
 </ol>
 
-    <h5>M3CircleButton class</h5>
+    <h5>M3ShapedBox class</h5>
     <div id="dartdoc-sidebar-left-content"></div>
   </div><!--/.sidebar-offcanvas-->
   <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">

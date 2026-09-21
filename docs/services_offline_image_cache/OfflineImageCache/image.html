@@ -80,6 +80,7 @@
   Widget? placeholder,
   Widget? errorWidget,
 }) {
+  final ph = placeholder ?? M3ImagePlaceholder(width: width, height: height);
   if (url.isEmpty) return placeholder ?? const SizedBox.shrink();
 
   &#47;&#47; Cache checked FIRST (offline or online) — network is only a fallback.
@@ -87,7 +88,7 @@
     future: _ensureMeta().then((_) =&gt; _getBytes(url)),
     builder: (context, snap) {
       if (snap.connectionState != ConnectionState.done) {
-        return placeholder ?? const SizedBox.shrink();
+        return ph;
       }
 
       &#47;&#47; Decode at the actual display size (× device pixel ratio) instead
@@ -127,6 +128,7 @@
         cacheWidth: cacheWidth,
         cacheHeight: cacheHeight,
         gaplessPlayback: true,
+        loadingBuilder: (_, child, p) =&gt; p == null ? child : ph,
         errorBuilder: (_, _, _) =&gt;
             errorWidget ?? placeholder ?? const SizedBox.shrink(),
       );

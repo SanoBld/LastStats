@@ -144,8 +144,7 @@ Widget build(BuildContext context) {
                 ? SizedBox(
                     key: const ValueKey(&#39;busy&#39;),
                     width: 22, height: 22,
-                    child: CircularProgressIndicator(
-                        strokeWidth: 2, color: fg),
+                    child: M3Spinner(color: fg),
                   )
                 : Icon(icon, key: ValueKey(icon), color: fg, size: 30),
           ),
