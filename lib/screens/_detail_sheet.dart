@@ -1004,6 +1004,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                     ? Icons.favorite_rounded
                     : Icons.favorite_border_rounded,
                 busy: _loveBusy,
+                active: _isLoved,
                 onTap: _toggleLove,
                 onLongPress: () => showFolderAssignSheet(
                     context, name: _name, artist: _artist,
@@ -1017,6 +1018,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                     ? Icons.pause_rounded
                     : Icons.play_arrow_rounded,
                 busy: _previewLoading,
+                active: _isPlaying,
                 progress: _previewPos,
                 onTap: _togglePreview,
                 tooltip: 'Play preview',

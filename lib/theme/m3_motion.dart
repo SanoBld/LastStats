@@ -373,3 +373,54 @@ class M3FadeThroughRoute<T> extends PageRouteBuilder<T> {
           },
         );
 }
+
+
+// ── Shared axis (Y) route ──────────────────────────────────────────────────
+// For child pages of the same flow (for example account level -> level
+// history). New page rises and fades in with a spatial spring, the old one
+// fades out and shrinks a little. Going back is the reverse, but faster.
+class M3SharedAxisRoute<T> extends PageRouteBuilder<T> {
+  M3SharedAxisRoute({required WidgetBuilder builder})
+      : super(
+          transitionDuration: M3Motion.spatialDefaultDuration,
+          reverseTransitionDuration: const Duration(milliseconds: 300),
+          pageBuilder: (context, _, _) => builder(context),
+          transitionsBuilder: (context, animation, secondary, child) {
+            final reduce = M3Motion.reduced(context);
+            if (reduce) return FadeTransition(opacity: animation, child: child);
+            final rise = CurvedAnimation(
+              parent: animation,
+              curve: M3Motion.spatialDefault,
+              reverseCurve: M3Motion.emphasizedAccelerate,
+            );
+            final fadeIn = CurvedAnimation(
+              parent: animation,
+              curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+              reverseCurve: const Interval(0.4, 1.0, curve: Curves.easeIn),
+            );
+            final behind = CurvedAnimation(
+              parent: secondary,
+              curve: M3Motion.emphasizedDecelerate,
+            );
+            return FadeTransition(
+              opacity: ReverseAnimation(
+                  behind.drive(CurveTween(curve: const Interval(0.0, 0.5)))),
+              child: ScaleTransition(
+                scale: Tween<double>(begin: 1.0, end: 0.94).animate(behind),
+                child: FadeTransition(
+                  opacity: fadeIn,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                            begin: const Offset(0, 0.08), end: Offset.zero)
+                        .animate(rise),
+                    child: ScaleTransition(
+                      scale: Tween<double>(begin: 0.96, end: 1.0).animate(rise),
+                      child: child,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+}

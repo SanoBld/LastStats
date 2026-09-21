@@ -119,80 +119,74 @@ class _HistoryPageState extends State<_HistoryPage>
               Expanded(child:
                 Text(L.historyTitle, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
               ),
-              IconButton(icon: const Icon(Icons.refresh_rounded), onPressed: _load),
+              IconButton.filledTonal(icon: const Icon(Icons.refresh_rounded), onPressed: _load),
             ]),
           ),
 
           const SizedBox(height: 10),
 
-          // Date navigation
+          // Date navigation: connected buttons (big outer, small inner corners)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(children: [
-              _TapScale(child: _HistNavBtn(icon: Icons.chevron_left_rounded, onTap: () { _haptic(_HapticImpact.selection); _prev(); }, scheme: scheme)),
-              const SizedBox(width: 8),
+              M3TonalButton(
+                width: 52,
+                padding: EdgeInsets.zero,
+                radius: const BorderRadius.horizontal(
+                    left: Radius.circular(24), right: Radius.circular(8)),
+                onTap: () { _haptic(_HapticImpact.selection); _prev(); },
+                child: Icon(Icons.chevron_left_rounded, color: scheme.onSurface),
+              ),
+              const SizedBox(width: 2),
               Expanded(
-                child: _TapScale(
-                  child: GestureDetector(
-                    onTap: () { _haptic(_HapticImpact.selection); _pickDate(); },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-                      decoration: BoxDecoration(
-                        color:  scheme.surfaceContainerHighest,
-                        borderRadius: AppRadius.mdR,
-                        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
+                child: M3TonalButton(
+                  radius: BorderRadius.circular(8),
+                  onTap: () { _haptic(_HapticImpact.selection); _pickDate(); },
+                  child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    M3Switcher(
+                      duration: M3Motion.effectsDefaultDuration,
+                      child: Text(
+                        _dateFmt(),
+                        key: ValueKey(_dateFmt()),
+                        style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                       ),
-                      child: Row(children: [
-                      M3Switcher(
-                        duration: const Duration(milliseconds: 220),
-                        child: Text(
-                          _dateFmt(),
-                          key: ValueKey(_dateFmt()),
-                          style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                        Icon(Icons.calendar_month_rounded, size: 16, color: scheme.onSurfaceVariant),
-                      ]),
                     ),
-                  ),
+                    const SizedBox(width: 8),
+                    Icon(Icons.calendar_month_rounded, size: 18, color: scheme.primary),
+                  ]),
                 ),
               ),
-              if (!_isToday) const SizedBox(width: 8),
-              // AnimatedSize makes the date picker shrink/grow smoothly
+              // Today button grows in / out with a spring
               AnimatedSize(
-                duration: const Duration(milliseconds: 220),
-                curve: M3Motion.emphasizedDecelerate,
-                child: !_isToday
-                  ? AnimatedOpacity(
-                      opacity: 1.0,
-                      duration: const Duration(milliseconds: 180),
-                      child: _TapScale(
-                        child: GestureDetector(
+                duration: M3Motion.spatialFastDuration,
+                curve: M3Motion.spatialFast,
+                alignment: Alignment.centerLeft,
+                child: _isToday
+                    ? const SizedBox.shrink()
+                    : Padding(
+                        padding: const EdgeInsets.only(left: 2),
+                        child: M3TonalButton(
+                          color: scheme.primaryContainer,
+                          radius: BorderRadius.circular(8),
                           onTap: _goToday,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-                            decoration: BoxDecoration(
-                              color: scheme.primaryContainer,
-                              borderRadius: AppRadius.mdR,
-                            ),
-                            child: Row(mainAxisSize: MainAxisSize.min, children: [
-                              Icon(Icons.today_rounded, size: 15, color: scheme.onPrimaryContainer),
-                              const SizedBox(width: 5),
-                              Text(L.historyToday, style: text.labelMedium?.copyWith(
-                                  color: scheme.onPrimaryContainer, fontWeight: FontWeight.w600)),
-                            ]),
-                          ),
+                          child: Row(mainAxisSize: MainAxisSize.min, children: [
+                            Icon(Icons.today_rounded, size: 18, color: scheme.onPrimaryContainer),
+                            const SizedBox(width: 6),
+                            Text(L.historyToday, style: text.labelLarge?.copyWith(
+                                color: scheme.onPrimaryContainer, fontWeight: FontWeight.w700)),
+                          ]),
                         ),
                       ),
-                    )
-                  : const SizedBox.shrink(),
               ),
-              const SizedBox(width: 8),
-              _TapScale(child: _HistNavBtn(
-                icon: Icons.chevron_right_rounded,
-                onTap: _isToday ? null : _next,
-                scheme: scheme,
-              )),
+              const SizedBox(width: 2),
+              M3TonalButton(
+                width: 52,
+                padding: EdgeInsets.zero,
+                radius: const BorderRadius.horizontal(
+                    left: Radius.circular(8), right: Radius.circular(24)),
+                onTap: _isToday ? null : () { _haptic(_HapticImpact.selection); _next(); },
+                child: Icon(Icons.chevron_right_rounded, color: scheme.onSurface),
+              ),
             ]),
           ),
 
@@ -283,50 +277,6 @@ class _HistoryPageState extends State<_HistoryPage>
 }
 
 // ── Tap-scale feedback (press animation) ────────────────────────────────────
-class _TapScale extends StatefulWidget {
-  final Widget child;
-  final double scale;
-  const _TapScale({required this.child}) : scale = 0.92;
-  @override State<_TapScale> createState() => _TapScaleState();
-}
-class _TapScaleState extends State<_TapScale> {
-  bool _down = false;
-  @override
-  Widget build(BuildContext context) => Listener(
-    onPointerDown:   (_) => setState(() => _down = true),
-    onPointerUp:     (_) => setState(() => _down = false),
-    onPointerCancel: (_) => setState(() => _down = false),
-    child: AnimatedScale(
-      scale:           _down ? widget.scale : 1.0,
-      duration:        const Duration(milliseconds: 80),
-      curve:           M3Motion.emphasizedDecelerate,
-      child:           widget.child,
-    ),
-  );
-}
-
-// ── Navigation button ────────────────────────────────────────────────────────
-class _HistNavBtn extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback? onTap;
-  final ColorScheme scheme;
-  const _HistNavBtn({required this.icon, required this.onTap, required this.scheme});
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    child: Container(
-      width: 40, height: 40,
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
-        borderRadius: AppRadius.mdR,
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
-      ),
-      child: Icon(icon, size: 22,
-          color: onTap == null ? scheme.onSurface.withValues(alpha: 0.25) : scheme.onSurface),
-    ),
-  );
-}
-
 // ── Stat pill ────────────────────────────────────────────────────────────────
 class _HistStatPill extends StatelessWidget {
   final IconData icon;

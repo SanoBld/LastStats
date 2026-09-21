@@ -11,6 +11,7 @@
 //  • M3CookieBadge   → round bumpy badge (emoji / icon)
 //  • M3Chip          → animated chip (replaces FilterChip / ChoiceChip)
 //  • M3SegmentedButton → animated segmented buttons
+//  • M3TonalButton   → button that morphs its corners when pressed
 //  • M3MaxWidth      → centers content on wide screens
 // ══════════════════════════════════════════════════════════════════════════
 
@@ -528,4 +529,66 @@ class M3MaxWidth extends StatelessWidget {
           child: child,
         ),
       );
+}
+
+// ── Button that morphs when pressed ────────────────────────────────────────
+class M3TonalButton extends StatefulWidget {
+  const M3TonalButton({
+    super.key,
+    required this.child,
+    this.onTap,
+    this.color,
+    this.radius = const BorderRadius.all(Radius.circular(24)),
+    this.width,
+    this.height = 48,
+    this.padding = const EdgeInsets.symmetric(horizontal: 14),
+  });
+
+  final Widget child;
+  final VoidCallback? onTap;      // null = disabled
+  final Color? color;
+  final BorderRadius radius;      // shape at rest
+  final double? width;
+  final double height;
+  final EdgeInsetsGeometry padding;
+
+  @override
+  State<M3TonalButton> createState() => _M3TonalButtonState();
+}
+
+class _M3TonalButtonState extends State<M3TonalButton> {
+  bool _down = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final down = _down && !M3Motion.reduced(context);
+    final r = down ? BorderRadius.circular(12) : widget.radius;
+    final base = widget.color ?? scheme.surfaceContainerHigh;
+    return AnimatedScale(
+      scale: down ? 0.94 : 1.0,
+      duration: M3Motion.spatialFastDuration,
+      curve: M3Motion.spatialFast,
+      child: SizedBox(
+        width: widget.width,
+        child: M3ShapeMorph(
+          radius: r,
+          height: widget.height,
+          color: widget.onTap == null ? base.withValues(alpha: 0.5) : base,
+          child: Material(
+            type: MaterialType.transparency,
+            child: InkWell(
+              borderRadius: r,
+              onTap: widget.onTap,
+              onHighlightChanged: (v) => setState(() => _down = v),
+              child: Padding(
+                padding: widget.padding,
+                child: Center(child: widget.child),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

@@ -3,7 +3,8 @@
 //  Material 3 action buttons.
 //  • M3CircleButton → cookie shaped round button (heart), accent color
 //  • M3PillButton   → wide pill button (play), tonal color
-//  Both morph to a softer square while pressed.
+//  Both have an off state (round, calm color) and an on state
+//  (cookie / square, vivid accent color) and morph between them.
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
@@ -51,8 +52,8 @@ class _M3PressableState extends State<_M3Pressable> {
       duration: M3Motion.spatialFastDuration,
       curve: M3Motion.spatialFast,
       child: AnimatedContainer(
-        duration: M3Motion.spatialFastDuration,
-        curve: M3Motion.spatialFast,
+        duration: M3Motion.spatialDefaultDuration,
+        curve: M3Motion.spatialDefault,
         width: widget.width,
         height: widget.height,
         clipBehavior: Clip.antiAlias,
@@ -89,6 +90,7 @@ class M3CircleButton extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.busy = false,
+    this.active = false,
     this.tooltip,
   });
 
@@ -96,18 +98,20 @@ class M3CircleButton extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final bool          busy;
+  final bool          active;   // on = cookie + vivid color, off = circle
   final String?       tooltip;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final fg = scheme.onPrimary;
+    final fg = active ? scheme.onPrimary : scheme.onSecondaryContainer;
     return _M3Pressable(
       width: 56,
       height: 56,
-      color: scheme.primary,
-      idleShape:    const M3CookieBorder(lobes: 8, amplitude: 0.07),
-      pressedShape: const M3CookieBorder(lobes: 8, amplitude: 0.0),
+      color: active ? scheme.primary : scheme.secondaryContainer,
+      // amplitude 0 is a perfect circle, so the shape grows its bumps
+      idleShape: M3CookieBorder(lobes: 8, amplitude: active ? 0.09 : 0.0),
+      pressedShape: M3CookieBorder(lobes: 8, amplitude: active ? 0.0 : 0.05),
       onTap: busy ? null : onTap,
       onLongPress: onLongPress,
       tooltip: tooltip,
@@ -134,6 +138,7 @@ class M3PillButton extends StatelessWidget {
     this.onTap,
     this.busy = false,
     this.progress = 0,
+    this.active = false,
     this.tooltip,
   });
 
@@ -141,18 +146,21 @@ class M3PillButton extends StatelessWidget {
   final VoidCallback? onTap;
   final bool          busy;
   final double        progress;
+  final bool          active;   // on = square + vivid color, off = round
   final String?       tooltip;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final fg = scheme.onSecondaryContainer;
+    final fg = active ? scheme.onPrimary : scheme.onSecondaryContainer;
     return _M3Pressable(
       height: 56,
-      color: scheme.secondaryContainer,
-      idleShape: const StadiumBorder(),
-      pressedShape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      color: active ? scheme.primary : scheme.secondaryContainer,
+      idleShape: active
+          ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))
+          : const StadiumBorder(),
+      pressedShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(active ? 10 : 18)),
       onTap: busy ? null : onTap,
       tooltip: tooltip,
       child: SizedBox.expand(
@@ -167,7 +175,8 @@ class M3PillButton extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   widthFactor: v,
                   child: ColoredBox(
-                      color: scheme.secondary.withValues(alpha: 0.22)),
+                      color: (active ? scheme.onPrimary : scheme.secondary)
+                          .withValues(alpha: 0.22)),
                 ),
               ),
             ),

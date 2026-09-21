@@ -39,6 +39,13 @@
 - Favorites and favorite folders redesigned: grouped buttons, grouped list rows, pill search, cookie badges, cards that change shape when pressed
 - "Add to folder" sheet redesigned with drag handle, tinted rows and animated check
 
+**Buttons and details**
+- Heart button: round when not loved, grows into the bumpy cookie shape with the vivid accent color when loved
+- Play button: round pill when stopped, turns into a rounded square with the vivid accent color while playing
+- History date buttons redesigned as connected Material You buttons that change shape when pressed
+- News colors now follow the app accent colors
+- New shared-axis animation when opening the level history, with grouped rows and cookie level badges
+
 **Options and settings**
 - All chips and segmented buttons now animate: the selected one becomes a pill, the others stay soft squares
 - Rankings: new date button opens a Material You sheet to pick year and month

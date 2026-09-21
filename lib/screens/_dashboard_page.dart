@@ -3696,12 +3696,14 @@ class _NewsPage extends StatefulWidget {
   final List<Map<String, dynamic>> items;
   const _NewsPage({required this.items});
 
-  static (IconData, Color) _typeStyle(String type) => switch (type) {
-    'feature' => (Icons.auto_awesome_rounded,    Color(0xFF7C3AED)),
-    'fix'     => (Icons.build_circle_outlined,   Color(0xFFD97706)),
-    'update'  => (Icons.system_update_rounded,   Color(0xFF059669)),
-    'alert'   => (Icons.warning_amber_rounded,   Color(0xFFDC2626)),
-    _         => (Icons.info_outline_rounded,    Color(0xFF1D4ED8)),
+  // Colors come from the app accent (theme), not fixed colors.
+  static (IconData, Color) _typeStyle(String type, ColorScheme s) => switch (type) {
+    'feature' => (Icons.auto_awesome_rounded,  s.primary),
+    'fix'     => (Icons.build_circle_outlined, s.tertiary),
+    'update'  => (Icons.system_update_rounded, s.secondary),
+    'alert'   => (Icons.warning_amber_rounded, s.error),
+    _         => (Icons.info_outline_rounded,
+                  Color.lerp(s.primary, s.tertiary, 0.5)!),
   };
 
   @override
@@ -3877,7 +3879,7 @@ class _NewsPageState extends State<_NewsPage> {
                     final type  = (item['type']  ?? 'info').toString();
                     final date  = (item['date']  ?? '').toString();
                     final emoji = (item['emoji'] ?? '').toString();
-                    final (icon, color) = _NewsPage._typeStyle(type);
+                    final (icon, color) = _NewsPage._typeStyle(type, scheme);
 
                     return _FadeSlideIn(
                       delay: Duration(milliseconds: (i * 25).clamp(0, 250)),
@@ -4081,7 +4083,7 @@ class _NewsDetailSheetState extends State<_NewsDetailSheet> {
     final date  = (item['date']  ?? '').toString();
     final emoji = (item['emoji'] ?? '').toString();
     final url   = (item['url']   ?? '').toString();
-    final (icon, color) = _NewsPage._typeStyle(type);
+    final (icon, color) = _NewsPage._typeStyle(type, scheme);
 
     final isLong    = body.length > _collapseThreshold;
     final shownBody = (isLong && !_expanded) ? body.substring(0, _collapseThreshold) : body;
@@ -4206,7 +4208,7 @@ class _NewsDetailSheetState extends State<_NewsDetailSheet> {
     final type  = (item['type']  ?? 'info').toString();
     final date  = (item['date']  ?? '').toString();
     final emoji = (item['emoji'] ?? '').toString();
-    final (_, color) = _NewsPage._typeStyle(type);
+    final (_, color) = _NewsPage._typeStyle(type, scheme);
 
     const width = 900.0;
     const pad   = 32.0;

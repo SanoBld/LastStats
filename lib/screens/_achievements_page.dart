@@ -95,7 +95,7 @@ class _AchievementsSheet extends StatelessWidget {
               const SizedBox(height: 10),
               GestureDetector(
                 onTap: isSelf ? () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const _LevelHistoryPage())) : null,
+                    M3SharedAxisRoute(builder: (_) => const _LevelHistoryPage())) : null,
                 child: Column(children: [
                   Row(mainAxisSize: MainAxisSize.min, children: [
                     Text(_ct('Niveau $level', 'Level $level'),
@@ -584,10 +584,9 @@ class _LevelHistoryPage extends StatelessWidget {
                 ),
               ),
             )
-          : ListView.separated(
+          : ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: history.length,
-              separatorBuilder: (_, _) => const Divider(height: 1),
               itemBuilder: (_, i) {
                 final (level, ts) = history[i];
                 final date = DateTime.fromMillisecondsSinceEpoch(ts * 1000);
@@ -595,13 +594,20 @@ class _LevelHistoryPage extends StatelessWidget {
                     '${date.month.toString().padLeft(2, '0')}/${date.year}';
                 return _FadeSlideIn(
                   delay: _staggerDelay(i),
-                  child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: scheme.primaryContainer,
-                    child: Text('$level', style: AppText.body.copyWith(color: scheme.onPrimaryContainer)),
-                  ),
-                  title: Text(_ct('Niveau $level', 'Level $level')),
-                  trailing: Text(dateStr, style: TextStyle(color: scheme.onSurfaceVariant)),
+                  child: M3SegmentTile(
+                    index: i,
+                    count: history.length,
+                    child: ListTile(
+                      leading: M3CookieBadge(
+                        size: 44,
+                        color: scheme.primaryContainer,
+                        child: Text('$level', style: AppText.body.copyWith(
+                            color: scheme.onPrimaryContainer,
+                            fontWeight: FontWeight.w800)),
+                      ),
+                      title: Text(_ct('Niveau $level', 'Level $level')),
+                      trailing: Text(dateStr, style: TextStyle(color: scheme.onSurfaceVariant)),
+                    ),
                   ),
                 );
               },
