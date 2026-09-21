@@ -47,6 +47,70 @@ class _RankingsPageState extends State<_RankingsPage>
     if (mounted) setState(() => _availableYears = years);
   }
 
+  // Bottom sheet: years then months, animated chips in a wrap.
+  Future<void> _pickDate(BuildContext context) async {
+    _haptic(_HapticImpact.selection);
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (sh) => StatefulBuilder(builder: (sh, setSheet) {
+        final scheme = Theme.of(sh).colorScheme;
+        final text   = Theme.of(sh).textTheme;
+        Widget title(String t) => Padding(
+              padding: const EdgeInsets.fromLTRB(4, 12, 4, 8),
+              child: Text(t, style: text.titleSmall?.copyWith(
+                  color: scheme.primary, fontWeight: FontWeight.w700)),
+            );
+        return SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              title(L.rankingsAllYears),
+              Wrap(spacing: 8, runSpacing: 8, children: [
+                for (final y in [0, ..._availableYears])
+                  M3Chip(
+                    label: Text(y == 0 ? L.rankingsAllYears : '$y'),
+                    selected: y == 0 ? _selectedYear == null : y == _selectedYear,
+                    onSelected: (_) {
+                      _haptic(_HapticImpact.selection);
+                      setState(() {
+                        _selectedYear = y == 0 ? null : y;
+                        _selectedMonth = 0;
+                      });
+                      setSheet(() {});
+                    },
+                  ),
+              ]),
+              AnimatedSize(
+                duration: M3Motion.spatialFastDuration,
+                curve: M3Motion.spatialFast,
+                alignment: Alignment.topCenter,
+                child: _selectedYear == null
+                    ? const SizedBox(width: double.infinity)
+                    : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        title(L.rankingsWholeYear),
+                        Wrap(spacing: 8, runSpacing: 8, children: [
+                          for (final m in [0, ...List.generate(12, (i) => i + 1)])
+                            M3Chip(
+                              label: Text(m == 0 ? L.rankingsWholeYear : L.months[m]),
+                              selected: m == _selectedMonth,
+                              onSelected: (_) {
+                                _haptic(_HapticImpact.selection);
+                                setState(() => _selectedMonth = m);
+                                setSheet(() {});
+                              },
+                            ),
+                        ]),
+                      ]),
+              ),
+            ]),
+          ),
+        );
+      }),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final text    = Theme.of(context).textTheme;
@@ -60,6 +124,17 @@ class _RankingsPageState extends State<_RankingsPage>
               Expanded(
                 child: Text(L.rankingsTitle,
                     style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
+              ),
+              // Opens a Material You sheet to pick the date
+              M3Chip(
+                avatar: const Icon(Icons.calendar_month_rounded),
+                label: Text(_selectedYear == null
+                    ? L.rankingsAllYears
+                    : (_selectedMonth == 0
+                        ? '$_selectedYear'
+                        : '${L.months[_selectedMonth]} $_selectedYear')),
+                selected: _selectedYear != null,
+                onSelected: (_) => _pickDate(context),
               ),
             ]),
           ),
@@ -80,7 +155,7 @@ class _RankingsPageState extends State<_RankingsPage>
                     final label    = year == 0 ? L.rankingsAllYears : '$year';
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
-                      child: FilterChip(
+                      child: M3Chip(
                         label: Text(label),
                         selected: selected,
                         showCheckmark: false,
@@ -108,7 +183,7 @@ class _RankingsPageState extends State<_RankingsPage>
                   final sel   = m == _selectedMonth;
                   final label = m == 0 ? L.rankingsWholeYear : L.months[m];
                   return Padding(padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(label: Text(label), selected: sel, showCheckmark: false,
+                    child: M3Chip(label: Text(label), selected: sel, showCheckmark: false,
                         onSelected: (_) { if (!sel) { _haptic(_HapticImpact.selection); setState(() => _selectedMonth = m); } }));
                 }).toList(),
               ),

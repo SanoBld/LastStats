@@ -323,6 +323,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Focus(
         autofocus: true,
         child: Scaffold(
+        backgroundColor: scheme.surfaceContainer,
         body: SafeArea(
           child: Row(
             children: [
@@ -348,6 +349,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 : NavigationRailLabelType.none,
                             minWidth:         56,
                             minExtendedWidth: 200,
+                            backgroundColor:  Colors.transparent,
+                            indicatorShape:   RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
                             destinations:    _wideDestinations,
                           ),
                         ),
@@ -376,15 +380,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // ── Separator ────────────────────────────────────────────────
-              VerticalDivider(
-                width:     1,
-                thickness: 1,
-                color:     scheme.outlineVariant.withValues(alpha: 0.35),
+              // ── Content area: rounded panel, like the Material 3 tablet layout
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(28),
+                    child: ColoredBox(
+                      color: scheme.surface,
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 1400),
+                          child: _pageStack(pages, pages.length),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
-
-              // ── Content area ─────────────────────────────────────────────
-              Expanded(child: _pageStack(pages, pages.length)),
             ],
           ),
         ),

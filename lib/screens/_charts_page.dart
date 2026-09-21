@@ -687,7 +687,7 @@ class _ChartsPageState extends State<_ChartsPage>
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
             child: Wrap(
               spacing: 8, runSpacing: 8,
-              children: years.map((y) => FilterChip(
+              children: years.map((y) => M3Chip(
                 label: Text(y == 0
                     ? _ct('Tout le temps', 'All time', es: 'Todo el tiempo', zh: '全部时间', pt: 'Todo período')
                     : '$y'),
@@ -1162,7 +1162,7 @@ class _ChartsPageState extends State<_ChartsPage>
           return Padding(
             key: _chipKey(year),
             padding: const EdgeInsets.only(right: 8),
-            child: FilterChip(
+            child: M3Chip(
               label: Text(label),
               selected: selected,
               showCheckmark: false,

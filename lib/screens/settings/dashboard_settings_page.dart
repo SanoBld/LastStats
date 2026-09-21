@@ -1,6 +1,7 @@
 // lib/screens/settings/dashboard_settings_page.dart
 
 import 'package:flutter/material.dart';
+import '../../widgets/m3_components.dart';
 import '../../theme/m3_shapes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/l10n.dart';
@@ -139,7 +140,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
               Wrap(spacing: 8, runSpacing: 8, children: sources.map((opt) {
                 final (key, label, icon) = opt;
                 final sel = _headerSource == key;
-                return FilterChip(
+                return M3Chip(
                   avatar: Icon(icon, size: 16), label: Text(label),
                   selected: sel, showCheckmark: false,
                   onSelected: (_) async {
@@ -202,7 +203,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                 const SizedBox(height: 10),
                 Wrap(spacing: 8, runSpacing: 8, children: periods.map((opt) {
                   final (key, label) = opt;
-                  return FilterChip(
+                  return M3Chip(
                     label: Text(label), selected: _headerPeriod == key, showCheckmark: false,
                     onSelected: (_) async {
                       await _set('ls_header_period', key);
@@ -346,7 +347,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
               const SizedBox(height: 10),
               Wrap(spacing: 8, runSpacing: 8, children: anims.map((opt) {
                 final (key, label, icon) = opt;
-                return FilterChip(
+                return M3Chip(
                   avatar: Icon(icon, size: 16), label: Text(label),
                   selected: _headerAnimation == key, showCheckmark: false,
                   onSelected: (_) async {
@@ -501,7 +502,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                 ('monthly',  L.dashChartMonthlyLabel,  Icons.calendar_month_rounded),
               ].map((opt) {
                 final (key, label, icon) = opt;
-                return FilterChip(
+                return M3Chip(
                   avatar: Icon(icon, size: 16),
                   label: Text(label),
                   selected: _dashboardChart == key,
@@ -678,7 +679,7 @@ class _FallbackPeriodChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sel = value == selected;
-    return FilterChip(
+    return M3Chip(
       label: Text(label),
       selected: sel,
       showCheckmark: false,

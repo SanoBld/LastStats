@@ -1,5 +1,6 @@
 // lib/screens/settings/cache_page.dart
 import 'package:flutter/material.dart';
+import '../../widgets/m3_components.dart';
 import '../../theme/m3_motion.dart';
 import '../../theme/m3_shapes.dart';
 import '../../widgets/skeleton.dart';
@@ -427,7 +428,7 @@ class _LimitPicker extends StatelessWidget {
       runSpacing: 8,
       children: limits.map((p) {
         final selected = p.bytes == current;
-        return ChoiceChip(
+        return M3Chip(
           label:         Text(p.label),
           selected:      selected,
           onSelected:    (_) => onSelect(p.bytes),

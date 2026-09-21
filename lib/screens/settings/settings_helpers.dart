@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import '../../theme/m3_motion.dart';
+import '../../widgets/m3_components.dart';
 import 'package:flutter/services.dart';
 import '../../app_state.dart';
 import '../../l10n/l10n.dart';
@@ -128,15 +129,14 @@ class SettingsSection extends StatelessWidget {
         child: Text(label.toUpperCase(), style: text.labelSmall?.copyWith(
             color: scheme.primary, fontWeight: FontWeight.w700, letterSpacing: 1.2)),
       ),
-      Card(
-        elevation: 0,
-        color: scheme.surfaceContainerHighest,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.45), width: 1),
-        ),
-        child: Column(children: children),
-      ),
+      // Each row is its own tile: big outer corners, small inner corners.
+      Builder(builder: (_) {
+        final rows = children.where((c) => c is! Divider).toList();
+        return Column(children: [
+          for (var i = 0; i < rows.length; i++)
+            M3SegmentTile(index: i, count: rows.length, child: rows[i]),
+        ]);
+      }),
     ]);
 
     // Small one-shot fade + rise on mount so settings pages don't feel
@@ -144,10 +144,10 @@ class SettingsSection extends StatelessWidget {
     // it's built, no controller/dispose needed since its a plain tween.
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
-      duration: const Duration(milliseconds: 320),
-      curve: M3Motion.emphasizedDecelerate,
+      duration: M3Motion.spatialDefaultDuration,
+      curve: M3Motion.spatialDefault,
       builder: (_, v, child) => Opacity(
-        opacity: v,
+        opacity: v.clamp(0.0, 1.0),
         child: Transform.translate(offset: Offset(0, (1 - v) * 12), child: child),
       ),
       child: content,

@@ -690,7 +690,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     final screenWidth      = MediaQuery.sizeOf(context).width;
     final isWide           = screenWidth >= 720;
     final crossAxisCount   = !isWide ? 2 : (screenWidth >= 1200 ? 4 : 3);
-    final maxContentWidth  = isWide ? 1100.0 : double.infinity;
+    final maxContentWidth  = isWide ? 1200.0 : double.infinity;
     final gridAspectRatio  = isWide ? 1.35 : 1.1;
     final gridSpacing      = isWide ? 16.0 : 12.0;
 
@@ -708,27 +708,28 @@ class _SettingsPageState extends State<_SettingsPage> {
               const SizedBox(height: 16),
 
               // Profile card
-              GestureDetector(
+              M3PressCard(
+                color: scheme.primaryContainer,
+                padding: const EdgeInsets.all(16),
                 onTap: () { _haptic(_HapticImpact.light); _push(context, AccountPage(username: widget.username)); },
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: scheme.primaryContainer.withValues(alpha: 0.5),
-                    borderRadius: AppRadius.xlR,
-                    border: Border.all(color: scheme.primary.withValues(alpha: 0.2)),
-                  ),
-                  child: Row(children: [
-                    CircleAvatar(
-                      radius: 26,
-                      backgroundColor: scheme.primary,
-                      backgroundImage: _avatarUrl != null
-                          ? NetworkImage(_avatarUrl!)
-                          : null,
+                child: (Row(children: [
+                    Container(
+                      width: 56, height: 56,
+                      alignment: Alignment.center,
+                      clipBehavior: Clip.antiAlias,
+                      decoration: ShapeDecoration(
+                        color: scheme.primary,
+                        image: _avatarUrl != null
+                            ? DecorationImage(
+                                image: NetworkImage(_avatarUrl!), fit: BoxFit.cover)
+                            : null,
+                        shape: const M3CookieBorder(lobes: 8, amplitude: 0.07),
+                      ),
                       child: _avatarUrl == null
                           ? Text(initial, style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 22,
                               color: scheme.onPrimary,
-                              fontWeight: FontWeight.w700))
+                              fontWeight: FontWeight.w800))
                           : null,
                     ),
                     const SizedBox(width: 14),
@@ -739,8 +740,7 @@ class _SettingsPageState extends State<_SettingsPage> {
                           style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                     ])),
                     Icon(Icons.chevron_right_rounded, color: scheme.primary),
-                  ]),
-                ),
+                  ])),
               ),
               const SizedBox(height: 16),
 
@@ -879,32 +879,21 @@ class _CategoryCard extends StatelessWidget {
 
     final iconBox     = compact ? 44.0 : 56.0;
     final iconGlyph   = compact ? 24.0 : 28.0;
-    final iconRadius  = compact ? 12.0 : 14.0;
     final cardPad     = compact ? 16.0 : 20.0;
     final titleStyle  = compact ? text.bodyMedium : text.titleSmall;
     final chevronSize = compact ? 14.0 : 17.0;
     final badgeSize   = compact ? 18.0 : 20.0;
 
-    return Material(
-      color: scheme.surfaceContainerHighest,
-      borderRadius: AppRadius.xlR,
-      child: InkWell(
-        borderRadius: AppRadius.xlR,
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: AppRadius.xlR,
-            border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45)),
-          ),
-          padding: EdgeInsets.all(cardPad),
-          child: Stack(children: [
+    return M3PressCard(
+      color: scheme.surfaceContainerHigh,
+      padding: EdgeInsets.all(cardPad),
+      onTap: onTap,
+      child: SizedBox.expand(
+        child: Stack(children: [
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Container(
-                width: iconBox, height: iconBox,
-                decoration: BoxDecoration(
-                  color: data.iconBgColor(scheme),
-                  borderRadius: BorderRadius.circular(iconRadius),
-                ),
+              M3CookieBadge(
+                size: iconBox,
+                color: data.iconBgColor(scheme),
                 child: Icon(data.icon, color: data.iconFgColor(scheme), size: iconGlyph),
               ),
               const Spacer(),
@@ -936,8 +925,7 @@ class _CategoryCard extends StatelessWidget {
               child: Icon(Icons.arrow_forward_ios_rounded,
                   size: chevronSize, color: scheme.onSurfaceVariant.withValues(alpha: 0.5)),
             ),
-          ]),
-        ),
+        ]),
       ),
     );
   }

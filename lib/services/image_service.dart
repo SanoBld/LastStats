@@ -8,7 +8,6 @@
 //   widgetImage(url, ...)                        → offline-capable Widget
 //   prefetchBytes(url)                           → background download
 
-import 'dart:collection' show LinkedHashMap;
 import 'dart:convert';
 import 'package:flutter/material.dart' show Theme;
 import 'package:flutter/widgets.dart';
@@ -37,10 +36,10 @@ class ImageService {
   // one of the causes of the app using more and more memory the longer
   // it stayed open. LinkedHashMap + a hard cap turns it into a simple
   // LRU cache: oldest-used entries are dropped once the cap is hit.
-  static final Map<String, String> _mem = LinkedHashMap<String, String>();
+  static final Map<String, String> _mem = {};
   // Which source produced each cache key's URL — for the small attribution
   // label shown under artwork. Keyed by the same `key` used in `_mem`.
-  static final Map<String, String> _sourceOf = LinkedHashMap<String, String>();
+  static final Map<String, String> _sourceOf = {};
   // Max entries kept in RAM at once. Disk cache (SharedPreferences) still
   // has everything, so nothing is lost — it just gets re-read from disk
   // instead of staying in memory forever.

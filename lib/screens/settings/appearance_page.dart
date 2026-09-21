@@ -1,6 +1,7 @@
 // lib/screens/settings/appearance_page.dart
 
 import 'package:flutter/material.dart';
+import '../../widgets/m3_components.dart';
 import '../../theme/m3_shapes.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -373,7 +374,7 @@ class _AppearancePageState extends State<AppearancePage> {
                     style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
               ]),
               const SizedBox(height: 12),
-              SegmentedButton<String>(
+              M3SegmentedButton<String>(
                 segments: [
                   ButtonSegment(value: 'system',
                       icon: const Icon(Icons.brightness_auto_rounded),

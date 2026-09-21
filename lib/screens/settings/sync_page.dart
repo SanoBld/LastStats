@@ -7,6 +7,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
+import '../../widgets/m3_components.dart';
 import '../../widgets/skeleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/l10n.dart';
@@ -178,7 +179,7 @@ class _SyncPageState extends State<SyncPage> {
                           const SizedBox(height: 10),
                           Wrap(spacing: 8, runSpacing: 8, children: [
                             for (final h in _kFrequencyOptions)
-                              ChoiceChip(
+                              M3Chip(
                                 label: Text(h == 24 ? L.syncFrequencyDaily : L.syncFrequencyHours(h)),
                                 selected: _freqH == h,
                                 onSelected: (_) => _setFreq(h),
@@ -252,7 +253,7 @@ class _SyncPageState extends State<SyncPage> {
                       const SizedBox(height: 10),
                       Wrap(spacing: 8, runSpacing: 8, children: [
                         for (final h in _kFriendsIntervalOptions)
-                          ChoiceChip(
+                          M3Chip(
                             label: Text(h == 24 ? _syncCt('Chaque jour', 'Daily') : '${h}h'),
                             selected: _friendsIntervalH == h,
                             onSelected: (_) => _setFriendsInterval(h),

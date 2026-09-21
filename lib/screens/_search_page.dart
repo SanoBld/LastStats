@@ -217,14 +217,13 @@ class _SearchPageState extends State<_SearchPage> {
                   final sel = t.$1 == _tab;
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
+                    child: M3Chip(
                       avatar: Icon(t.$3, size: 14,
                           color: sel ? scheme.onSecondaryContainer : scheme.onSurfaceVariant),
                       label:  Text(t.$2),
                       selected: sel,
                       showCheckmark: false,
                       onSelected: (_) { _haptic(_HapticImpact.selection); _switchTab(t.$1); },
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
                     ),
                   );
                 }).toList(),
@@ -368,8 +367,8 @@ class _SearchPageState extends State<_SearchPage> {
       // via _openProfile which calls _dismissKeyboard()
       return GridView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 220,
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,
           childAspectRatio: 1.0,

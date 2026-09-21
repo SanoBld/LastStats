@@ -9,6 +9,9 @@
 //  • M3SearchField   → pill search field
 //  • M3EmptyState    → cookie icon + message
 //  • M3CookieBadge   → round bumpy badge (emoji / icon)
+//  • M3Chip          → animated chip (replaces FilterChip / ChoiceChip)
+//  • M3SegmentedButton → animated segmented buttons
+//  • M3MaxWidth      → centers content on wide screens
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'dart:math' as math;
@@ -365,4 +368,164 @@ class M3EmptyState extends StatelessWidget {
       ),
     );
   }
+}
+
+// ── Animated chip (same API as FilterChip / ChoiceChip) ────────────────────
+// Selected: pill shape + primary color. Not selected: soft square.
+class M3Chip extends StatelessWidget {
+  const M3Chip({
+    super.key,
+    required this.label,
+    required this.selected,
+    this.onSelected,
+    this.avatar,
+    this.showCheckmark,
+    this.visualDensity,
+    this.selectedColor,
+    this.labelStyle,
+  });
+
+  final Widget label;
+  final bool selected;
+  final ValueChanged<bool>? onSelected;
+  final Widget? avatar;
+  final bool? showCheckmark;       // ignored, kept for easy replacing
+  final VisualDensity? visualDensity;
+  final Color? selectedColor;      // ignored
+  final TextStyle? labelStyle;     // ignored
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final compact = visualDensity == VisualDensity.compact;
+    final r = BorderRadius.circular(selected ? 20 : 10);
+    final fg = selected ? scheme.onSecondaryContainer : scheme.onSurfaceVariant;
+    return AnimatedScale(
+      scale: selected ? 1.0 : 0.98,
+      duration: M3Motion.spatialFastDuration,
+      curve: M3Motion.spatialFast,
+      child: M3ShapeMorph(
+        radius: r,
+        height: compact ? 32 : 40,
+        color: selected
+            ? scheme.secondaryContainer
+            : scheme.surfaceContainerHigh,
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            borderRadius: r,
+            onTap: onSelected == null ? null : () => onSelected!(!selected),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: compact ? 12 : 16),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                if (avatar != null) ...[
+                  IconTheme(
+                      data: IconThemeData(color: fg, size: 16), child: avatar!),
+                  const SizedBox(width: 6),
+                ],
+                DefaultTextStyle(
+                  style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                      color: fg),
+                  child: label,
+                ),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Animated segmented button (same API as SegmentedButton) ────────────────
+class M3SegmentedButton<T> extends StatelessWidget {
+  const M3SegmentedButton({
+    super.key,
+    required this.segments,
+    required this.selected,
+    this.onSelectionChanged,
+    this.style,
+    this.showSelectedIcon,
+  });
+
+  final List<ButtonSegment<T>> segments;
+  final Set<T> selected;
+  final ValueChanged<Set<T>>? onSelectionChanged;
+  final ButtonStyle? style;        // ignored
+  final bool? showSelectedIcon;    // ignored
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Row(children: [
+      for (var i = 0; i < segments.length; i++) ...[
+        if (i > 0) const SizedBox(width: 2),
+        Expanded(child: _seg(context, scheme, segments[i], i)),
+      ],
+    ]);
+  }
+
+  Widget _seg(BuildContext context, ColorScheme scheme, ButtonSegment<T> s, int i) {
+    final sel = selected.contains(s.value);
+    final n = segments.length;
+    // Selected = full pill. Others: round outside, small inside.
+    final big = 24.0, small = 8.0;
+    final r = sel
+        ? BorderRadius.circular(big)
+        : BorderRadius.horizontal(
+            left: Radius.circular(i == 0 ? big : small),
+            right: Radius.circular(i == n - 1 ? big : small));
+    final fg = sel ? scheme.onSecondaryContainer : scheme.onSurfaceVariant;
+    return M3ShapeMorph(
+      radius: r,
+      height: 48,
+      color: sel ? scheme.secondaryContainer : scheme.surfaceContainerHigh,
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          borderRadius: r,
+          onTap: onSelectionChanged == null ? null : () => onSelectionChanged!({s.value}),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                if (s.icon != null) ...[
+                  IconTheme(data: IconThemeData(color: fg, size: 18), child: s.icon!),
+                  if (s.label != null) const SizedBox(width: 6),
+                ],
+                if (s.label != null)
+                  Flexible(
+                    child: DefaultTextStyle(
+                      style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                          fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
+                          color: fg),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      child: s.label!,
+                    ),
+                  ),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Centers content on wide screens ────────────────────────────────────────
+class M3MaxWidth extends StatelessWidget {
+  const M3MaxWidth({super.key, required this.child, this.maxWidth = 1100});
+  final Widget child;
+  final double maxWidth;
+
+  @override
+  Widget build(BuildContext context) => Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxWidth),
+          child: child,
+        ),
+      );
 }

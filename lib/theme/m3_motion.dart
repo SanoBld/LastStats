@@ -15,7 +15,6 @@
 import 'dart:ui' show lerpDouble;
 import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 class M3Motion {
   M3Motion._();

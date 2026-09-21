@@ -6,6 +6,7 @@
 import 'dart:async';
 import '../theme/m3_motion.dart';
 import 'package:flutter/material.dart';
+import '../widgets/m3_components.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -222,7 +223,7 @@ class _AppearanceStepState extends State<_AppearanceStep> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(L.onboardStyle, style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
               const SizedBox(height: 10),
-              SegmentedButton<String>(
+              M3SegmentedButton<String>(
                 segments: [
                   ButtonSegment(value: 'default', icon: const Icon(Icons.auto_awesome_rounded), label: Text(L.onboardStyleMaterialYou)),
                   ButtonSegment(value: 'nothing', icon: const Icon(Icons.grid_on_rounded), label: Text(L.onboardStyleNothing)),
@@ -233,7 +234,7 @@ class _AppearanceStepState extends State<_AppearanceStep> {
               const SizedBox(height: 22),
               Text(L.settingsTheme, style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
               const SizedBox(height: 10),
-              SegmentedButton<ThemeMode>(
+              M3SegmentedButton<ThemeMode>(
                 segments: [
                   ButtonSegment(value: ThemeMode.system, icon: const Icon(Icons.brightness_auto_rounded), label: Text(L.settingsThemeAuto)),
                   ButtonSegment(value: ThemeMode.light,  icon: const Icon(Icons.light_mode_rounded),      label: Text(L.settingsThemeLight)),
@@ -301,7 +302,7 @@ class _AppearanceStepState extends State<_AppearanceStep> {
                 const SizedBox(height: 10),
                 ValueListenableBuilder<String>(
                   valueListenable: nothingAccentNotifier,
-                  builder: (_, nAccent, _) => SegmentedButton<String>(
+                  builder: (_, nAccent, _) => M3SegmentedButton<String>(
                     segments: [
                       ButtonSegment(value: 'classic', label: Text(L.onboardNothingRedOnly)),
                       ButtonSegment(value: 'mixed', label: Text(L.onboardNothingRedYellow)),

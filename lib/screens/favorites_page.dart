@@ -16,7 +16,6 @@ import '../services/lastfm_service.dart';
 import '../services/favorites_folders_service.dart' show FavoritesFoldersService;
 import 'home_screen.dart' show showDetailSheet, showFolderAssignSheet;
 import 'track_row_tile.dart';
-import '../theme/story_style.dart';
 
 enum _SortMode { recent, oldest, artistAz, titleAz }
 

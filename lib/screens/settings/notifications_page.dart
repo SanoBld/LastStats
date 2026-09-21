@@ -1,6 +1,7 @@
 // lib/screens/settings/notifications_page.dart
 
 import 'package:flutter/material.dart';
+import '../../widgets/m3_components.dart';
 import '../../widgets/skeleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app_state.dart';
@@ -664,7 +665,7 @@ class _MilestoneConfig extends StatelessWidget {
         spacing: 6,
         children: [
           for (final v in [100, 250, 500, 1000])
-            FilterChip(
+            M3Chip(
               label:         Text('$v'),
               selected:      interval == v,
               visualDensity: VisualDensity.compact,
@@ -777,7 +778,7 @@ class _WeeklyConfig extends StatelessWidget {
         spacing: 6,
         children: List.generate(7, (i) {
           final dayNum = i + 1;
-          return FilterChip(
+          return M3Chip(
             label:         Text(days[i]),
             selected:      day == dayNum,
             visualDensity: VisualDensity.compact,

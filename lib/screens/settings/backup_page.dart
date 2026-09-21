@@ -1,6 +1,7 @@
 // lib/screens/settings/backup_page.dart
 
 import 'package:flutter/material.dart';
+import '../../widgets/m3_components.dart';
 import '../../theme/m3_shapes.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -157,7 +158,7 @@ class _BackupPageState extends State<BackupPage> {
 
   Widget _freqChip(String value, String label) {
     final selected = _autoBackupFreq == value;
-    return ChoiceChip(
+    return M3Chip(
       label: Text(label),
       selected: selected,
       onSelected: (_) => _setAutoBackupFreq(value),

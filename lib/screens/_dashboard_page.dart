@@ -3829,13 +3829,13 @@ class _NewsPageState extends State<_NewsPage> {
             ),
             const SizedBox(height: 10),
             Wrap(spacing: 8, runSpacing: 8, children: [
-              FilterChip(
+              M3Chip(
                 label: Text(L.newsAll),
                 selected: _type == null,
                 onSelected: (_) => setState(() => _type = null),
               ),
               for (final t in types)
-                FilterChip(
+                M3Chip(
                   label: Text(typeLabel(t)),
                   selected: _type == t,
                   onSelected: (_) => setState(() => _type = _type == t ? null : t),

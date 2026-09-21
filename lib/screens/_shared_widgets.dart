@@ -728,8 +728,8 @@ class FoldersGridPage extends StatelessWidget {
               }
               return GridView.builder(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 240,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
                   childAspectRatio: 1.05,
@@ -847,7 +847,6 @@ class _FolderDetailPageState extends State<_FolderDetailPage> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
 
     return Scaffold(
       body: SafeArea(child: Column(children: [

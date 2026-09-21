@@ -30,38 +30,21 @@
 -->
 
 
-## v3.5.0
+## v3.6.0
 
-**Dashboard**
-- New dashboard chart: a listening calendar (last 60 days) or monthly bars — replaces the old top artists/albums/tracks block, pick which one in Dashboard settings
-- New: set a custom display name (in the intro flow or Settings > Account) — shown big on the dashboard; if set, that's all that's shown (no more Last.fm account name underneath)
-- Faster dashboard chart loading: proper pagination (was silently missing scrobbles on busy periods) and background caching instead of refetching every time
+**Material 3 Expressive**
+- New wavy loading indicator (rotating bumpy shape) replaces the old spinners on full pages, chart sections and dialogs
+- Loading screens are centered and visible everywhere, skeleton blocks have more contrast in dark theme
+- Motion physics: spring-like curves (spatial and effects, fast / default / slow) for buttons, switches, chips and new components
+- Favorites and favorite folders redesigned: grouped buttons, grouped list rows, pill search, cookie badges, cards that change shape when pressed
+- "Add to folder" sheet redesigned with drag handle, tinted rows and animated check
 
-**Rankings**
-- Fixed: podium photos sometimes stayed stuck on the previous top 3 after changing the year/month filter
-- Year selector now stretches at the edges (Android style) instead of the iOS rubber-band bounce, same for the Charts tab
+**Options and settings**
+- All chips and segmented buttons now animate: the selected one becomes a pill, the others stay soft squares
+- Rankings: new date button opens a Material You sheet to pick year and month
+- Settings redesigned: grouped rows with big outer and small inner corners, cookie profile avatar and category badges, press-morph cards
 
-**News**
-- New search bar in the news/what's-new page, filters by title and body as you type
-- Search bar visual style is now the same everywhere it appears: News, the Search tab, and Settings search
+**Large screens**
+- Side rail with rounded indicator, content in a rounded centered panel (tablet style)
+- Profile search grid and folder grid adapt to the screen width
 
-**Sharing**
-- Fixed sharing (artwork, charts, achievement badges, crash logs, recap cards) on Windows, macOS and Linux: desktop no longer touches the native share charm at all (it was still being used as a silent fallback, which is what caused the "we couldn't show all the possible shares" error some of you saw) — it now always saves the file and reveals it in the file explorer/Finder instead
-
-**Performance (Windows)**
-- Notification system setup no longer blocks the app's first frame on Windows — the window now appears noticeably faster on startup
-- A few redundant startup steps now run in parallel instead of one after another
-
-**Transparency**
-- About page now lists every open-source Flutter package used to build the app, each linking to its pub.dev page
-- Added a proper open-source license (MIT) — use, modify, duplicate or redistribute freely, just credit the author — with a link to the full license text
-- Translations page now notes that ALL translations, including French, were generated with AI assistance and may contain inaccuracies
-- About page now also notes that AI was used to help develop a good part of the app's code
-- README rewritten to match the current app (dashboard chart picker, custom nickname, working desktop sharing, license, AI note) and now includes real per-platform installation steps
-
-**Texts**
-- Improved wording across all translations, more natural phrasing, fewer stiff/technical terms
-
-**Code cleanup**
-- Removed dead code left over from the old dashboard carousels
-- Cleaned up a handful of unused imports and analyzer warnings

@@ -3,6 +3,7 @@
 // Lists every past release: version, date, full changelog, and a direct
 // download button per version — not just the newest one.
 import 'package:flutter/material.dart';
+import '../../widgets/m3_components.dart';
 import '../../theme/m3_motion.dart';
 import '../../widgets/skeleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -161,7 +162,7 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
 
   Widget _filterChip(String label, _HistoryFilter value, ColorScheme scheme, TextTheme text) {
     final selected = _filter == value;
-    return ChoiceChip(
+    return M3Chip(
       label: Text(label),
       selected: selected,
       onSelected: (_) => setState(() => _filter = value),

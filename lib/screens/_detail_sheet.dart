@@ -1107,7 +1107,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         children: _localizedPeriods().map((p) => Padding(
           padding: const EdgeInsets.only(right: 8),
-          child: FilterChip(
+          child: M3Chip(
             label: Text(p.$2),
             selected: p.$1 == _period,
             showCheckmark: false,
