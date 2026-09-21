@@ -110,13 +110,15 @@ and</li>
   <pre class="language-dart"><code class="language-dart">@override
 Widget build(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
-  final fg = scheme.onSecondaryContainer;
+  final fg = active ? scheme.onPrimary : scheme.onSecondaryContainer;
   return _M3Pressable(
     height: 56,
-    color: scheme.secondaryContainer,
-    idleShape: const StadiumBorder(),
-    pressedShape:
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+    color: active ? scheme.primary : scheme.secondaryContainer,
+    idleShape: active
+        ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))
+        : const StadiumBorder(),
+    pressedShape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(active ? 10 : 18)),
     onTap: busy ? null : onTap,
     tooltip: tooltip,
     child: SizedBox.expand(
@@ -131,7 +133,8 @@ Widget build(BuildContext context) {
                 alignment: Alignment.centerLeft,
                 widthFactor: v,
                 child: ColoredBox(
-                    color: scheme.secondary.withValues(alpha: 0.22)),
+                    color: (active ? scheme.onPrimary : scheme.secondary)
+                        .withValues(alpha: 0.22)),
               ),
             ),
           ),

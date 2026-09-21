@@ -110,13 +110,14 @@ and</li>
   <pre class="language-dart"><code class="language-dart">@override
 Widget build(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
-  final fg = scheme.onPrimary;
+  final fg = active ? scheme.onPrimary : scheme.onSecondaryContainer;
   return _M3Pressable(
     width: 56,
     height: 56,
-    color: scheme.primary,
-    idleShape:    const M3CookieBorder(lobes: 8, amplitude: 0.07),
-    pressedShape: const M3CookieBorder(lobes: 8, amplitude: 0.0),
+    color: active ? scheme.primary : scheme.secondaryContainer,
+    &#47;&#47; amplitude 0 is a perfect circle, so the shape grows its bumps
+    idleShape: M3CookieBorder(lobes: 8, amplitude: active ? 0.09 : 0.0),
+    pressedShape: M3CookieBorder(lobes: 8, amplitude: active ? 0.0 : 0.05),
     onTap: busy ? null : onTap,
     onLongPress: onLongPress,
     tooltip: tooltip,
