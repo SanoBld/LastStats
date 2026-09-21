@@ -319,7 +319,7 @@ class _TopListBodyState extends State<_TopListBody>
                 duration: const Duration(milliseconds: 250),
                 child: _loadingMore
                   ? const Padding(key: ValueKey('more'), padding: EdgeInsets.all(16),
-                      child: Center(child: CircularProgressIndicator()))
+                      child: Center(child: M3LoadingIndicator()))
                   : const SizedBox.shrink(),
               );
             }

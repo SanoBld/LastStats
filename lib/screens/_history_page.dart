@@ -252,7 +252,7 @@ class _HistoryPageState extends State<_HistoryPage>
                     child: FadeTransition(opacity: anim, child: child));
               },
               child: _loading
-                ? const Center(key: ValueKey('hist_load'), child: CircularProgressIndicator())
+                ? const Center(key: ValueKey('hist_load'), child: M3LoadingIndicator())
                 : _error != null
                   ? _ErrorView(message: _error!, onRetry: _load)
                   : _tracks.isEmpty

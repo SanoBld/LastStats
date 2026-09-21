@@ -689,7 +689,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
   Widget _buildLoading(ColorScheme scheme) => SizedBox(
     height: 280,
     child: Center(
-      child: CircularProgressIndicator(color: scheme.primary),
+      child: M3LoadingIndicator(),
     ),
   );
 

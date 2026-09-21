@@ -177,7 +177,7 @@ class _CachePageState extends State<CachePage> {
                       ? const Padding(
                           key: ValueKey('loading'),
                           padding: EdgeInsets.symmetric(vertical: 16),
-                          child: Center(child: CircularProgressIndicator()),
+                          child: Center(child: M3LoadingIndicator()),
                         )
                       : Column(
                           key: const ValueKey('list'),

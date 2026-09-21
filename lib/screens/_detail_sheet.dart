@@ -2746,7 +2746,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           final surface = Theme.of(innerContext).scaffoldBackgroundColor;
           return Scaffold(
             body: _loading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(child: M3LoadingIndicator())
                 : _buildContent(innerContext, scheme, surface),
           );
         }),

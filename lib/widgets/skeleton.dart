@@ -5,8 +5,10 @@
 //  and content does not pop in and jump around.
 // ══════════════════════════════════════════════════════════════════════════
 
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../theme/m3_motion.dart';
+import '../theme/m3_shapes.dart';
 
 /// Makes everything inside it pulse softly.
 class SkeletonPulse extends StatefulWidget {
@@ -61,7 +63,7 @@ class SkeletonBox extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: scheme.onSurface.withValues(alpha: 0.08),
+        color: scheme.onSurface.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(radius),
       ),
     );
@@ -75,8 +77,12 @@ class SkeletonBlock extends StatelessWidget {
   final double radius;
 
   @override
-  Widget build(BuildContext context) => SkeletonPulse(
-        child: SkeletonBox(height: height, radius: radius),
+  Widget build(BuildContext context) => Stack(
+        alignment: Alignment.center,
+        children: [
+          SkeletonPulse(child: SkeletonBox(height: height, radius: radius)),
+          const M3LoadingIndicator(size: 44),
+        ],
       );
 }
 
@@ -88,7 +94,7 @@ class SkeletonList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SkeletonPulse(
+    final list = SkeletonPulse(
       child: SingleChildScrollView(
         physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -120,5 +126,101 @@ class SkeletonList extends StatelessWidget {
         ),
       ),
     );
+    // Loader always in the middle of the page, on top of the grey boxes.
+    return Stack(children: [
+      Positioned.fill(child: list),
+      const Positioned.fill(child: Center(child: M3LoadingIndicator(size: 72))),
+    ]);
   }
+}
+
+// ── Loading indicator (wavy shape that spins and morphs) ───────────────────
+// Material 3 Expressive style: a soft wavy shape inside a round container.
+class M3LoadingIndicator extends StatefulWidget {
+  const M3LoadingIndicator({super.key, this.size = 48});
+  final double size;
+
+  @override
+  State<M3LoadingIndicator> createState() => _M3LoadingIndicatorState();
+}
+
+class _M3LoadingIndicatorState extends State<M3LoadingIndicator>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2400),
+  );
+  bool _started = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reduced motion → still shape, no spin.
+    if (M3Motion.reduced(context)) {
+      _c.stop();
+      _started = false;
+    } else if (!_started) {
+      _c.repeat();
+      _started = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Semantics(
+      label: 'Loading',
+      child: RepaintBoundary(
+        child: CustomPaint(
+          size: Size.square(widget.size),
+          painter: _LoaderPainter(
+            progress: _c,
+            container: scheme.primaryContainer,
+            shape: scheme.primary,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LoaderPainter extends CustomPainter {
+  _LoaderPainter({
+    required this.progress,
+    required this.container,
+    required this.shape,
+  }) : super(repaint: progress);
+
+  final Animation<double> progress;
+  final Color container;
+  final Color shape;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = size.center(Offset.zero);
+    final r = size.shortestSide / 2;
+    canvas.drawCircle(c, r, Paint()..color = container);
+
+    final t = progress.value;
+    // Bumps get softer and sharper again while it spins.
+    final amp = 0.07 + 0.09 * (0.5 - 0.5 * math.cos(t * math.pi * 4));
+    final path = M3CookieBorder(lobes: 9, amplitude: amp)
+        .getOuterPath(Rect.fromCircle(center: Offset.zero, radius: r * 0.58));
+
+    canvas.save();
+    canvas.translate(c.dx, c.dy);
+    canvas.rotate(t * math.pi * 2);
+    canvas.drawPath(path, Paint()..color = shape);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_LoaderPainter old) =>
+      old.container != container || old.shape != shape;
 }

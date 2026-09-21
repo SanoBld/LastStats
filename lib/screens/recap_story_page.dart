@@ -7,6 +7,7 @@
 // colorScheme so it always matches the current Material You theme.
 
 import 'dart:convert';
+import '../widgets/skeleton.dart';
 import '../theme/m3_motion.dart';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -457,7 +458,7 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
               ),
               Expanded(
                 child: d.loading && !d.loaded
-                    ? Center(child: CircularProgressIndicator(color: scheme.primary))
+                    ? Center(child: M3LoadingIndicator())
                     // Cross-fade whenever the period or category changes.
                     : AnimatedSwitcher(
                         duration: const Duration(milliseconds: 260),

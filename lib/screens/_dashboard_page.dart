@@ -2431,14 +2431,19 @@ class _DashboardSkeleton extends StatelessWidget {
       Container(
         width: w, height: h,
         decoration: BoxDecoration(
-          color: scheme.onSurface.withValues(alpha: 0.07),
+          color: scheme.onSurface.withValues(alpha: 0.13),
           borderRadius: BorderRadius.circular(r),
         ),
       );
 
   // Soft pulse around the whole skeleton.
   @override
-  Widget build(BuildContext context) => SkeletonPulse(child: _content(context));
+  Widget build(BuildContext context) => Stack(children: [
+        Positioned.fill(child: SkeletonPulse(child: _content(context))),
+        // Loader always in the middle of the screen
+        const Positioned.fill(
+            child: Center(child: M3LoadingIndicator(size: 72))),
+      ]);
 
   Widget _content(BuildContext context) {
     return Scaffold(
@@ -2470,7 +2475,7 @@ class _DashboardSkeleton extends StatelessWidget {
                           width: 58, height: 58,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: scheme.onSurface.withValues(alpha: 0.08),
+                            color: scheme.onSurface.withValues(alpha: 0.14),
                           ),
                         ),
                         const SizedBox(width: 14),
@@ -2534,7 +2539,7 @@ class _DashboardSkeleton extends StatelessWidget {
                   Container(
                     width: 44, height: 44,
                     decoration: BoxDecoration(
-                      color: scheme.onSurface.withValues(alpha: 0.07),
+                      color: scheme.onSurface.withValues(alpha: 0.13),
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
