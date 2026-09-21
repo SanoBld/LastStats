@@ -89,6 +89,31 @@ class LastFmService {
     }, post: true);
   }
 
+  // ── Discover (charts, similar artists, country) ─────────
+  Future<List<dynamic>> getChartTopTracks({int limit = 15}) async {
+    final d = await _call({'method': 'chart.getTopTracks', 'limit': '$limit'});
+    return _asList(d['tracks']?['track']);
+  }
+
+  Future<List<dynamic>> getChartTopArtists({int limit = 15}) async {
+    final d = await _call({'method': 'chart.getTopArtists', 'limit': '$limit'});
+    return _asList(d['artists']?['artist']);
+  }
+
+  Future<List<dynamic>> getSimilarArtists(String artist, {int limit = 15}) async {
+    final d = await _call({
+      'method': 'artist.getSimilar', 'artist': artist, 'limit': '$limit',
+    });
+    return _asList(d['similarartists']?['artist']);
+  }
+
+  Future<List<dynamic>> getGeoTopTracks(String country, {int limit = 15}) async {
+    final d = await _call({
+      'method': 'geo.getTopTracks', 'country': country, 'limit': '$limit',
+    });
+    return _asList(d['tracks']?['track']);
+  }
+
   // ── User ────────────────────────────────────────────────
   Future<Map<String, dynamic>?> getUserInfo({String? user}) async {
     final d = await _call({'method': 'user.getInfo', 'user': user ?? username});

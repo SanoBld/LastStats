@@ -138,6 +138,7 @@ Future<void> _mainImpl() async {
   navLabelNotifier.value     = prefs.getBool('ls_nav_labels')      ?? true;
   hapticFeedbackNotifier.value = prefs.getBool('ls_haptic_feedback') ?? true;
   livingArtworkNotifier.value = prefs.getBool('ls_living_artwork') ?? true;
+  imageShapeNotifier.value = prefs.getString('ls_image_shape') ?? 'mix';
   achievementsEnabledNotifier.value = prefs.getBool('ls_achievements_enabled') ?? true;
   ecoModeManualNotifier.value    = prefs.getBool('ls_eco_mode_manual')    ?? false;
   ecoModeAutoNotifier.value      = prefs.getBool('ls_eco_mode_auto')      ?? false;

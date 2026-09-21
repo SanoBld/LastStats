@@ -93,6 +93,10 @@ final navLabelNotifier = ValueNotifier<bool>(true);
 // Saved as 'ls_living_artwork' in SharedPreferences.
 final livingArtworkNotifier = ValueNotifier<bool>(true);
 
+// How images are clipped. Saved as 'ls_image_shape'.
+// 'mix' = varied Material You shapes, 'square', 'circle', or 'shape:N' (N = 0..7).
+final imageShapeNotifier = ValueNotifier<String>('mix');
+
 // Saved as 'ls_achievements_enabled' in SharedPreferences.
 final achievementsEnabledNotifier = ValueNotifier<bool>(true);
 

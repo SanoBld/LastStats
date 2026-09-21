@@ -80,6 +80,7 @@ import '../theme/story_style.dart';
 
 // Parts
 part '_dashboard_page.dart';
+part '_discover_section.dart';
 part '_search_page.dart';
 part '_rankings_page.dart';
 part '_detail_sheet.dart';

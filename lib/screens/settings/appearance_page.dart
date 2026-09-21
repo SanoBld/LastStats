@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import '../../widgets/m3_components.dart';
+import '../../theme/m3_motion.dart';
 import '../../theme/m3_shapes.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -838,6 +839,9 @@ class _AppearancePageState extends State<AppearancePage> {
         const SizedBox(height: 16),
         const _LivingArtworkSection(),
 
+        const SizedBox(height: 16),
+        const _ImageShapeSection(),
+
         const SizedBox(height: 20),
         const RestartBanner(),
         const SizedBox(height: 20),
@@ -1195,6 +1199,96 @@ class _HapticSectionState extends State<_HapticSection> {
             hapticFeedbackNotifier.value = v;
             if (v) HapticFeedback.mediumImpact(); // confirm it works
           },
+        ),
+      ],
+    );
+  }
+}
+
+// ── Image shapes: mix of Material You shapes, square, circle, or one shape ──
+
+class _ImageShapeSection extends StatelessWidget {
+  const _ImageShapeSection();
+
+  Future<void> _pick(String mode) async {
+    imageShapeNotifier.value = mode;
+    final p = await SharedPreferences.getInstance();
+    await p.setString('ls_image_shape', mode);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+    return SettingsSection(
+      label: pickLang(fr: 'Formes des images', en: 'Image shapes', es: 'Formas de imágenes', zh: '图片形状', pt: 'Formas das imagens'),
+      children: [
+        ValueListenableBuilder<String>(
+          valueListenable: imageShapeNotifier,
+          builder: (_, mode, _) => Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(
+                pickLang(
+                  fr: 'Pochettes, artistes et albums',
+                  en: 'Covers, artists and albums',
+                  es: 'Portadas, artistas y álbumes',
+                  zh: '封面、艺术家和专辑',
+                  pt: 'Capas, artistas e álbuns'),
+                style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 12),
+              Wrap(spacing: 8, runSpacing: 8, children: [
+                M3Chip(
+                  avatar: const Icon(Icons.auto_awesome_rounded),
+                  label: Text(pickLang(fr: 'Mélange', en: 'Mix', es: 'Mezcla', zh: '混合', pt: 'Mistura')),
+                  selected: mode == 'mix',
+                  onSelected: (_) => _pick('mix'),
+                ),
+                M3Chip(
+                  avatar: const Icon(Icons.crop_square_rounded),
+                  label: Text(pickLang(fr: 'Carré', en: 'Square', es: 'Cuadrado', zh: '方形', pt: 'Quadrado')),
+                  selected: mode == 'square',
+                  onSelected: (_) => _pick('square'),
+                ),
+                M3Chip(
+                  avatar: const Icon(Icons.circle_outlined),
+                  label: Text(pickLang(fr: 'Cercle', en: 'Circle', es: 'Círculo', zh: '圆形', pt: 'Círculo')),
+                  selected: mode == 'circle',
+                  onSelected: (_) => _pick('circle'),
+                ),
+              ]),
+              const SizedBox(height: 16),
+              Text(
+                pickLang(
+                  fr: 'Ou choisis une seule forme',
+                  en: 'Or pick a single shape',
+                  es: 'O elige una sola forma',
+                  zh: '或选择单一形状',
+                  pt: 'Ou escolha uma só forma'),
+                style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+              const SizedBox(height: 10),
+              Wrap(spacing: 10, runSpacing: 10, children: [
+                for (var i = 0; i < kM3ImageShapeCount; i++)
+                  GestureDetector(
+                    onTap: () => _pick('shape:$i'),
+                    child: AnimatedContainer(
+                      duration: M3Motion.spatialFastDuration,
+                      curve: M3Motion.spatialFast,
+                      width: mode == 'shape:$i' ? 56 : 48,
+                      height: mode == 'shape:$i' ? 56 : 48,
+                      decoration: ShapeDecoration(
+                        color: mode == 'shape:$i'
+                            ? scheme.primary
+                            : scheme.secondaryContainer,
+                        shape: m3ImageShape(i, 48),
+                      ),
+                    ),
+                  ),
+              ]),
+            ]),
+          ),
         ),
       ],
     );

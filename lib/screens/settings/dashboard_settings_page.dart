@@ -40,6 +40,8 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   bool   _showNowPlay           = true;
   bool   _showStats             = true;
   bool   _showRecent            = true;
+  bool   _showDiscover          = true;
+  List<String> _discoverSources = ['community', 'artists', 'foryou', 'country'];
   // Which chart replaces the old top artists/albums/tracks block.
   // 'calendar' = listening calendar (heatmap), 'monthly' = monthly bars.
   String _dashboardChart        = 'calendar';
@@ -84,6 +86,8 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
       _showStats             = p.getBool('ls_show_stats')                ?? true;
       _dashboardChart        = p.getString('ls_dashboard_chart')         ?? 'calendar';
       _showRecent            = p.getBool('ls_show_recent')               ?? true;
+      _showDiscover          = p.getBool('ls_show_discover')             ?? true;
+      _discoverSources       = p.getStringList('ls_discover_sources') ?? ['community', 'artists', 'foryou', 'country'];
       _showFriends           = p.getBool('ls_show_friends')              ?? true;
       _showFavorites         = p.getBool('ls_show_favorites')            ?? true;
       _headerMusicAnim       = p.getBool('ls_header_music_anim')         ?? false;
@@ -450,6 +454,40 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
             secondary: const Icon(Icons.bar_chart_rounded),
             title: Text(L.settingsStatsSection), value: _showStats,
             onChanged: (v) async { await _set('ls_show_stats', v); setState(() => _showStats = v); }),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          SwitchListTile(
+            secondary: const Icon(Icons.explore_rounded),
+            title: Text(pickLang(fr: 'Découvrir', en: 'Discover', es: 'Descubrir', zh: '发现', pt: 'Descobrir')),
+            subtitle: Text(pickLang(
+                fr: 'Idées de musique à faire défiler',
+                en: 'Music ideas you can swipe through',
+                es: 'Ideas de música para deslizar',
+                zh: '可滑动浏览的音乐推荐',
+                pt: 'Ideias de música para deslizar')),
+            value: _showDiscover,
+            onChanged: (v) async { await _set('ls_show_discover', v); setState(() => _showDiscover = v); }),
+          if (_showDiscover)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 14),
+              child: Wrap(spacing: 8, runSpacing: 8, children: [
+                for (final e in {
+                  'community': pickLang(fr: 'Communauté', en: 'Community', es: 'Comunidad', zh: '社区', pt: 'Comunidade'),
+                  'artists':   pickLang(fr: 'Artistes tendance', en: 'Trending artists', es: 'Artistas en tendencia', zh: '热门艺术家', pt: 'Artistas em alta'),
+                  'foryou':    pickLang(fr: 'Pour toi', en: 'For you', es: 'Para ti', zh: '为你推荐', pt: 'Para você'),
+                  'country':   pickLang(fr: 'Ton pays', en: 'Your country', es: 'Tu país', zh: '你的国家', pt: 'Seu país'),
+                }.entries)
+                  M3Chip(
+                    label: Text(e.value),
+                    selected: _discoverSources.contains(e.key),
+                    onSelected: (_) async {
+                      final next = List<String>.from(_discoverSources);
+                      next.contains(e.key) ? next.remove(e.key) : next.add(e.key);
+                      await _saveList('ls_discover_sources', next);
+                      setState(() => _discoverSources = next);
+                    },
+                  ),
+              ]),
+            ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
             secondary: const Icon(Icons.history_rounded),

@@ -20,6 +20,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../theme/m3_motion.dart';
+import '../app_state.dart';
 import '../theme/m3_shapes.dart';
 import 'skeleton.dart';
 
@@ -628,6 +629,19 @@ ShapeBorder m3ImageShape(int index, double s) {
   }
 }
 
+/// Shape for the current setting (Settings > Appearance).
+ShapeBorder m3ResolveShape(String mode, int index, double s) {
+  if (mode == 'square') {
+    return RoundedRectangleBorder(borderRadius: BorderRadius.circular(s * 0.14));
+  }
+  if (mode == 'circle') return const CircleBorder();
+  if (mode.startsWith('shape:')) {
+    final n = int.tryParse(mode.substring(6));
+    if (n != null) return m3ImageShape(n, s);
+  }
+  return m3ImageShape(index, s);
+}
+
 class M3ShapedBox extends StatelessWidget {
   const M3ShapedBox({
     super.key,
@@ -645,8 +659,12 @@ class M3ShapedBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final idx = shapeIndex ?? m3ShapeIndex(seed ?? '');
-    Widget clip(double s) =>
-        ClipPath(clipper: ShapeBorderClipper(shape: m3ImageShape(idx, s)), child: child);
+    Widget clip(double s) => ValueListenableBuilder<String>(
+          valueListenable: imageShapeNotifier,
+          builder: (_, mode, _) => ClipPath(
+              clipper: ShapeBorderClipper(shape: m3ResolveShape(mode, idx, s)),
+              child: child),
+        );
     if (size != null) return clip(size!);
     return LayoutBuilder(builder: (context, box) {
       final s = box.biggest.shortestSide;

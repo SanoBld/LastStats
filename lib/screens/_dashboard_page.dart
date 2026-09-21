@@ -116,6 +116,8 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   bool _showNowPlay  = true;
   bool _showStats    = true;
   bool _showRecent   = true;
+  bool _showDiscover = true;
+  List<String> _discoverSources = List.from(_kDiscoverAll);
   int _lovedCount = 0;
 
   // Dashboard chart (replaces the old top artists/albums/tracks block).
@@ -326,6 +328,8 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
       _showStats             = p.getBool('ls_show_stats')               ?? true;
       _dashboardChart        = p.getString('ls_dashboard_chart')        ?? 'calendar';
       _showRecent            = p.getBool('ls_show_recent')              ?? true;
+      _showDiscover          = p.getBool('ls_show_discover')            ?? true;
+      _discoverSources       = p.getStringList('ls_discover_sources') ?? List.from(_kDiscoverAll);
       _showFriends           = p.getBool('ls_show_friends')             ?? true;
       final rawCards = p.getStringList('ls_stat_cards');
       _statCards   = rawCards != null && rawCards.isNotEmpty
@@ -1943,6 +1947,21 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                       );
                     }).whereType<Widget>().toList()),
                   ]),
+                ),
+                const SizedBox(height: 20),
+              ],
+
+              // ── Discover: swipeable picks (community, charts, for you) ───
+              if (_showDiscover && _discoverSources.isNotEmpty) ...[
+                _FadeSlideIn(
+                  skipAnimation: _dashboardEntrancePlayed,
+                  delay: const Duration(milliseconds: 150),
+                  child: _DiscoverSection(
+                    service:   widget.service,
+                    topArtist: (topArtist?['name'] ?? '').toString(),
+                    country:   country,
+                    sources:   _discoverSources,
+                  ),
                 ),
                 const SizedBox(height: 20),
               ],

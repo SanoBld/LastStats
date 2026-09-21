@@ -46,6 +46,11 @@
 - News colors now follow the app accent colors
 - New shared-axis animation when opening the level history, with grouped rows and cookie level badges
 
+**Discover and image shapes**
+- New dashboard section "Discover" between the stats and the recent plays: swipeable music ideas (community picks, trending artists, similar to your top artist, your country) with Material You shaped images
+- Show or hide it, and pick its sources, in Settings > Dashboard
+- New setting Settings > Appearance > Image shapes: mix of Material You shapes, square, circle, or one single shape for all images
+
 **Images, loading and pages**
 - Images use Material You shapes (cookie, circle, clover, arch, leaf, oval…) in lists, popular albums, history and recaps, each item keeps its own shape
 - Posters, images and the biography show the wavy loading indicator while loading, all small spinners in the app now use it too
