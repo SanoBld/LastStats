@@ -1,12 +1,16 @@
 // lib/screens/_discover_section.dart
 // ══════════════════════════════════════════════════════════════════════════
-//  Dashboard "Discover": swipeable music ideas (community, charts,
-//  similar artists, your country). Images use the Material You shapes.
-//  The section and its sources are set in Settings > Dashboard.
+//  Dashboard "Discover": swipeable music ideas.
+//    1. "Pour toi" (personal)  — similar to your top artist, your country
+//    2. "Tendances Last.fm" (global) — worldwide top tracks / top artists
+//  Images use the Material You shapes. Section and sources are set in
+//  Settings > Dashboard.
 // ══════════════════════════════════════════════════════════════════════════
 part of 'home_screen.dart';
 
 const _kDiscoverAll = ['community', 'artists', 'foryou', 'country'];
+const _kDiscoverPersonal = ['foryou', 'country'];
+const _kDiscoverGlobal   = ['community', 'artists'];
 
 class _DiscoverItem {
   final String name, sub, imageUrl, type;
@@ -14,7 +18,7 @@ class _DiscoverItem {
   const _DiscoverItem(this.name, this.sub, this.imageUrl, this.type, this.raw);
 }
 
-class _DiscoverSection extends StatefulWidget {
+class _DiscoverSection extends StatelessWidget {
   final LastFmService service;
   final String topArtist, country;
   final List<String> sources;
@@ -25,11 +29,68 @@ class _DiscoverSection extends StatefulWidget {
     required this.sources,
   });
 
+  List<String> _avail(List<String> group) => [
+        for (final s in group)
+          if (sources.contains(s) &&
+              !(s == 'country' && (country.isEmpty || country == 'None')) &&
+              !(s == 'foryou' && topArtist.isEmpty))
+            s
+      ];
+
   @override
-  State<_DiscoverSection> createState() => _DiscoverSectionState();
+  Widget build(BuildContext context) {
+    final personal = _avail(_kDiscoverPersonal);
+    final global   = _avail(_kDiscoverGlobal);
+    if (personal.isEmpty && global.isEmpty) return const SizedBox.shrink();
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      if (personal.isNotEmpty)
+        _DiscoverGroup(
+          key: const ValueKey('discover_personal'),
+          service: service,
+          topArtist: topArtist,
+          country: country,
+          sources: personal,
+          icon: Icons.auto_awesome_rounded,
+          title: _tr({'fr': 'Pour toi', 'en': 'For you', 'es': 'Para ti', 'de': 'Für dich', 'it': 'Per te', 'pt': 'Para você'}),
+        ),
+      if (personal.isNotEmpty && global.isNotEmpty) const SizedBox(height: 20),
+      if (global.isNotEmpty)
+        _DiscoverGroup(
+          key: const ValueKey('discover_global'),
+          service: service,
+          topArtist: topArtist,
+          country: country,
+          sources: global,
+          icon: Icons.public_rounded,
+          title: _tr({'fr': 'Tendances Last.fm', 'en': 'Last.fm trends', 'es': 'Tendencias de Last.fm', 'de': 'Last.fm-Trends', 'it': 'Tendenze Last.fm', 'pt': 'Tendências do Last.fm'}),
+        ),
+    ]);
+  }
 }
 
-class _DiscoverSectionState extends State<_DiscoverSection> {
+// ── One swipeable group (personal OR global), with its own source tabs ─────
+class _DiscoverGroup extends StatefulWidget {
+  final LastFmService service;
+  final String topArtist, country;
+  final List<String> sources;
+  final IconData icon;
+  final String title;
+  const _DiscoverGroup({
+    super.key,
+    required this.service,
+    required this.topArtist,
+    required this.country,
+    required this.sources,
+    required this.icon,
+    required this.title,
+  });
+
+  @override
+  State<_DiscoverGroup> createState() => _DiscoverGroupState();
+}
+
+class _DiscoverGroupState extends State<_DiscoverGroup> {
   // Kept for the whole session so switching tabs is instant.
   static final Map<String, (DateTime, List<_DiscoverItem>)> _cache = {};
 
@@ -38,25 +99,18 @@ class _DiscoverSectionState extends State<_DiscoverSection> {
   List<_DiscoverItem> _items = [];
   bool _loading = true;
 
-  List<String> get _sources => [
-        for (final s in _kDiscoverAll)
-          if (widget.sources.contains(s) &&
-              !(s == 'country' && (widget.country.isEmpty || widget.country == 'None')) &&
-              !(s == 'foryou' && widget.topArtist.isEmpty))
-            s
-      ];
-
   @override
   void initState() {
     super.initState();
-    _select(_sources.isEmpty ? '' : _sources.first);
+    _select(widget.sources.first);
   }
 
   @override
-  void didUpdateWidget(_DiscoverSection old) {
+  void didUpdateWidget(_DiscoverGroup old) {
     super.didUpdateWidget(old);
-    final list = _sources;
-    if (!list.contains(_source) && list.isNotEmpty) _select(list.first);
+    if (!widget.sources.contains(_source) && widget.sources.isNotEmpty) {
+      _select(widget.sources.first);
+    }
   }
 
   @override
@@ -66,9 +120,9 @@ class _DiscoverSectionState extends State<_DiscoverSection> {
   }
 
   String _label(String s) => switch (s) {
-        'community' => _tr({'fr': 'Communauté', 'en': 'Community', 'es': 'Comunidad', 'de': 'Community', 'it': 'Community', 'pt': 'Comunidade'}),
-        'artists'   => _tr({'fr': 'Artistes tendance', 'en': 'Trending artists', 'es': 'Artistas en tendencia', 'de': 'Trend-Künstler', 'it': 'Artisti di tendenza', 'pt': 'Artistas em alta'}),
-        'foryou'    => _tr({'fr': 'Pour toi', 'en': 'For you', 'es': 'Para ti', 'de': 'Für dich', 'it': 'Per te', 'pt': 'Para você'}),
+        'community' => _tr({'fr': 'Top titres', 'en': 'Top tracks', 'es': 'Top canciones', 'de': 'Top-Titel', 'it': 'Top brani', 'pt': 'Top faixas'}),
+        'artists'   => _tr({'fr': 'Top artistes', 'en': 'Top artists', 'es': 'Top artistas', 'de': 'Top-Künstler', 'it': 'Top artisti', 'pt': 'Top artistas'}),
+        'foryou'    => _tr({'fr': 'Comme ${widget.topArtist}', 'en': 'Like ${widget.topArtist}'}),
         _           => _tr({'fr': 'Ton pays', 'en': 'Your country', 'es': 'Tu país', 'de': 'Dein Land', 'it': 'Il tuo paese', 'pt': 'Seu país'}),
       };
 
@@ -138,14 +192,11 @@ class _DiscoverSectionState extends State<_DiscoverSection> {
   Widget build(BuildContext context) {
     final scheme  = Theme.of(context).colorScheme;
     final text    = Theme.of(context).textTheme;
-    final sources = _sources;
+    final sources = widget.sources;
     if (sources.isEmpty) return const SizedBox.shrink();
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      _SectionHeader(
-        title: _tr({'fr': 'Découvrir', 'en': 'Discover', 'es': 'Descubrir', 'de': 'Entdecken', 'it': 'Scopri', 'pt': 'Descobrir'}),
-        icon: Icons.explore_rounded,
-      ),
+      _SectionHeader(title: widget.title, icon: widget.icon),
       const SizedBox(height: 10),
       if (sources.length > 1)
         SizedBox(
@@ -169,16 +220,26 @@ class _DiscoverSectionState extends State<_DiscoverSection> {
         final h     = imgSz + 64;
         return SizedBox(
           height: h,
+          width: double.infinity,
           child: M3Switcher(
             duration: M3Motion.effectsDefaultDuration,
             child: _loading
-                ? const Center(key: ValueKey('load'), child: M3LoadingIndicator(size: 56))
+                // A single card-sized placeholder, not a full-width block,
+                // so it never looks like a plain grey rectangle.
+                ? Align(
+                    key: const ValueKey('load'),
+                    alignment: Alignment.topLeft,
+                    child: _loadingCard(imgSz, scheme),
+                  )
                 : _items.isEmpty
-                    ? Center(
+                    ? SizedBox(
                         key: const ValueKey('empty'),
-                        child: Text(
-                          _tr({'fr': 'Rien à afficher pour le moment', 'en': 'Nothing to show right now'}),
-                          style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+                        width: double.infinity,
+                        child: Center(
+                          child: Text(
+                            _tr({'fr': 'Rien à afficher pour le moment', 'en': 'Nothing to show right now'}),
+                            style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+                          ),
                         ),
                       )
                     : PageView.builder(
@@ -194,6 +255,23 @@ class _DiscoverSectionState extends State<_DiscoverSection> {
       }),
     ]);
   }
+
+  // Same shape + same animated loader as the rest of the app, sized to the
+  // card that will replace it once loaded.
+  Widget _loadingCard(double imgSz, ColorScheme scheme) => SizedBox(
+        width: imgSz,
+        height: imgSz + 64,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          M3ShapedBox(
+            size: imgSz,
+            child: Container(
+              color: scheme.surfaceContainerHigh,
+              alignment: Alignment.center,
+              child: M3LoadingIndicator(size: (imgSz * 0.32).clamp(28.0, 56.0)),
+            ),
+          ),
+        ]),
+      );
 
   // Centered card is big, the ones next to it are smaller (spring feel).
   Widget _card(int i, double imgSz, ColorScheme scheme, TextTheme text) {

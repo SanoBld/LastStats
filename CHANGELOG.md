@@ -46,6 +46,10 @@
 - News colors now follow the app accent colors
 - New shared-axis animation when opening the level history, with grouped rows and cookie level badges
 
+**Discover: personal first**
+- The Discover section is now split in two: "Pour toi" (your top artist and your country) always comes first, "Tendances Last.fm" (worldwide top tracks / top artists) comes below
+- Fixed a plain grey loading box on Discover: it now shows the usual small animated wavy loader, correctly sized
+
 **Discover and image shapes**
 - New dashboard section "Discover" between the stats and the recent plays: swipeable music ideas (community picks, trending artists, similar to your top artist, your country) with Material You shaped images
 - Show or hide it, and pick its sources, in Settings > Dashboard
