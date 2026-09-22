@@ -469,23 +469,56 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
           if (_showDiscover)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 14),
-              child: Wrap(spacing: 8, runSpacing: 8, children: [
-                for (final e in {
-                  'community': pickLang(fr: 'Communauté', en: 'Community', es: 'Comunidad', zh: '社区', pt: 'Comunidade'),
-                  'artists':   pickLang(fr: 'Artistes tendance', en: 'Trending artists', es: 'Artistas en tendencia', zh: '热门艺术家', pt: 'Artistas em alta'),
-                  'foryou':    pickLang(fr: 'Pour toi', en: 'For you', es: 'Para ti', zh: '为你推荐', pt: 'Para você'),
-                  'country':   pickLang(fr: 'Ton pays', en: 'Your country', es: 'Tu país', zh: '你的国家', pt: 'Seu país'),
-                }.entries)
-                  M3Chip(
-                    label: Text(e.value),
-                    selected: _discoverSources.contains(e.key),
-                    onSelected: (_) async {
-                      final next = List<String>.from(_discoverSources);
-                      next.contains(e.key) ? next.remove(e.key) : next.add(e.key);
-                      await _saveList('ls_discover_sources', next);
-                      setState(() => _discoverSources = next);
-                    },
-                  ),
+              child: Column(children: [
+                _DiscoverGroupToggle(
+                  icon: Icons.auto_awesome_rounded,
+                  title: pickLang(fr: 'Pour toi', en: 'For you', es: 'Para ti', zh: '为你推荐', pt: 'Para você'),
+                  labels: {
+                    'foryou':  pickLang(fr: 'Comme ton artiste préféré', en: 'Like your top artist', es: 'Como tu artista favorito', zh: '与你最喜爱的艺术家相似', pt: 'Como seu artista favorito'),
+                    'country': pickLang(fr: 'Ton pays', en: 'Your country', es: 'Tu país', zh: '你的国家', pt: 'Seu país'),
+                  },
+                  selected: _discoverSources,
+                  onToggleGroup: (on) async {
+                    final next = List<String>.from(_discoverSources);
+                    for (final k in ['foryou', 'country']) {
+                      if (on) { if (!next.contains(k)) next.add(k); }
+                      else { next.remove(k); }
+                    }
+                    await _saveList('ls_discover_sources', next);
+                    setState(() => _discoverSources = next);
+                  },
+                  onToggleKey: (k) async {
+                    final next = List<String>.from(_discoverSources);
+                    next.contains(k) ? next.remove(k) : next.add(k);
+                    await _saveList('ls_discover_sources', next);
+                    setState(() => _discoverSources = next);
+                  },
+                ),
+                const SizedBox(height: 10),
+                _DiscoverGroupToggle(
+                  icon: Icons.public_rounded,
+                  title: pickLang(fr: 'Tendances Last.fm', en: 'Last.fm trends', es: 'Tendencias de Last.fm', zh: 'Last.fm 趋势', pt: 'Tendências do Last.fm'),
+                  labels: {
+                    'community': pickLang(fr: 'Top titres', en: 'Top tracks', es: 'Top canciones', zh: '热门歌曲', pt: 'Top faixas'),
+                    'artists':   pickLang(fr: 'Top artistes', en: 'Top artists', es: 'Top artistas', zh: '热门艺术家', pt: 'Top artistas'),
+                  },
+                  selected: _discoverSources,
+                  onToggleGroup: (on) async {
+                    final next = List<String>.from(_discoverSources);
+                    for (final k in ['community', 'artists']) {
+                      if (on) { if (!next.contains(k)) next.add(k); }
+                      else { next.remove(k); }
+                    }
+                    await _saveList('ls_discover_sources', next);
+                    setState(() => _discoverSources = next);
+                  },
+                  onToggleKey: (k) async {
+                    final next = List<String>.from(_discoverSources);
+                    next.contains(k) ? next.remove(k) : next.add(k);
+                    await _saveList('ls_discover_sources', next);
+                    setState(() => _discoverSources = next);
+                  },
+                ),
               ]),
             ),
           const Divider(height: 1, indent: 16, endIndent: 16),
@@ -625,6 +658,64 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
         const SizedBox(height: 20),
         const RestartBanner(),
         const SizedBox(height: 20),
+      ]),
+    );
+  }
+}
+
+// ── Groupe "Pour toi" / "Tendances Last.fm" avec son propre switch ─────────
+// A group switch turns the whole group on/off at once (adds/removes all
+// its source keys); when on, per-source chips let you fine-tune which
+// tabs show up inside that group on the dashboard.
+class _DiscoverGroupToggle extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final Map<String, String> labels; // source key -> chip label
+  final List<String> selected;
+  final void Function(bool on) onToggleGroup;
+  final void Function(String key) onToggleKey;
+
+  const _DiscoverGroupToggle({
+    required this.icon,
+    required this.title,
+    required this.labels,
+    required this.selected,
+    required this.onToggleGroup,
+    required this.onToggleKey,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+    final on     = labels.keys.any(selected.contains);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
+      ),
+      child: Column(children: [
+        SwitchListTile(
+          dense: true,
+          secondary: Icon(icon, size: 20, color: scheme.primary),
+          title: Text(title, style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+          value: on,
+          onChanged: onToggleGroup,
+        ),
+        if (on)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: Wrap(spacing: 8, runSpacing: 8, children: [
+              for (final e in labels.entries)
+                M3Chip(
+                  label: Text(e.value),
+                  selected: selected.contains(e.key),
+                  onSelected: (_) => onToggleKey(e.key),
+                ),
+            ]),
+          ),
       ]),
     );
   }
