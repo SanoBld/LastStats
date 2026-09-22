@@ -1,7 +1,8 @@
 // lib/screens/_discover_section.dart
 // ══════════════════════════════════════════════════════════════════════════
 //  Dashboard "Discover": swipeable music ideas.
-//    1. "Pour toi" (personal)  — similar to your top artist, your country
+//    1. "Pour toi" (personal)  — similar to your top artist, your top
+//       genre/tag, your country
 //    2. "Tendances Last.fm" (global) — worldwide top tracks / top artists
 //  Images use the Material You shapes. Section and sources are set in
 //  Settings > Dashboard.
@@ -9,18 +10,24 @@
 //  Notes:
 //   - Cards are capped to a max width so the section stays readable on
 //     wide (desktop) screens instead of stretching to a huge size.
-//   - Each card carries a small play-count badge (shape picked from the
-//     same Material You shape set used for images) when Last.fm gives us
-//     a count. "community"/"country" come from Last.fm's global chart
-//     endpoints, which are not personalized and can include duplicates or
-//     unrelated entries — we de-duplicate what we get, but the underlying
-//     data quality is Last.fm's, not ours (Last.fm's public API has no
-//     real "recommended for you" endpoint anymore).
+//   - Each card carries a small play-count badge in a Material You shape
+//     when Last.fm gives us a count. "community"/"country" come from
+//     Last.fm's global chart endpoints, which are not personalized and
+//     can include duplicates or unrelated entries — we de-duplicate what
+//     we get, but the underlying data quality is Last.fm's, not ours
+//     (Last.fm's public API has no real "recommended for you" endpoint
+//     anymore — "genre" below is our own stand-in, built from the tags of
+//     your own top artist).
+//   - Every state change here (_select) is defensive: it never lets an
+//     exception escape mid-build, because an uncaught error here used to
+//     surface as a plain grey box (Flutter's release-mode ErrorWidget)
+//     that only "fixed itself" once the user tapped something else and
+//     forced a fresh rebuild.
 // ══════════════════════════════════════════════════════════════════════════
 part of 'home_screen.dart';
 
-const _kDiscoverAll = ['community', 'artists', 'foryou', 'country'];
-const _kDiscoverPersonal = ['foryou', 'country'];
+const _kDiscoverAll = ['community', 'artists', 'foryou', 'genre', 'country'];
+const _kDiscoverPersonal = ['foryou', 'genre', 'country'];
 const _kDiscoverGlobal   = ['community', 'artists'];
 
 // Cards never grow past this width, even on very wide desktop windows.
@@ -52,7 +59,8 @@ class _DiscoverSection extends StatelessWidget {
         for (final s in group)
           if (sources.contains(s) &&
               !(s == 'country' && (country.isEmpty || country == 'None')) &&
-              !(s == 'foryou' && topArtist.isEmpty))
+              !(s == 'foryou' && topArtist.isEmpty) &&
+              !(s == 'genre' && topArtist.isEmpty))
             s
       ];
 
@@ -128,14 +136,7 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
   @override
   void initState() {
     super.initState();
-    // Deferred to after the first frame: calling setState synchronously
-    // from initState (before this widget has ever been painted) could, on
-    // some desktop targets, leave the loaded state "ready" internally
-    // without a frame being requested to show it — the old symptom was a
-    // placeholder stuck until the next unrelated tap forced a repaint.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _select(widget.sources.first);
-    });
+    _select(widget.sources.first);
   }
 
   @override
@@ -156,9 +157,14 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
         'community' => _tr({'fr': 'Top titres', 'en': 'Top tracks', 'es': 'Top canciones', 'de': 'Top-Titel', 'it': 'Top brani', 'pt': 'Top faixas'}),
         'artists'   => _tr({'fr': 'Top artistes', 'en': 'Top artists', 'es': 'Top artistas', 'de': 'Top-Künstler', 'it': 'Top artisti', 'pt': 'Top artistas'}),
         'foryou'    => _tr({'fr': 'Comme ${widget.topArtist}', 'en': 'Like ${widget.topArtist}'}),
+        'genre'     => _tr({'fr': 'Ton genre', 'en': 'Your genre', 'es': 'Tu género', 'de': 'Dein Genre', 'it': 'Il tuo genere', 'pt': 'Seu gênero'}),
         _           => _tr({'fr': 'Ton pays', 'en': 'Your country', 'es': 'Tu país', 'de': 'Dein Land', 'it': 'Il tuo paese', 'pt': 'Seu país'}),
       };
 
+  // Every step here is wrapped so a network hiccup, a missing field, or an
+  // empty tag list can never throw up out of this function — a swallowed
+  // error used to mean the loading placeholder stayed on screen forever
+  // instead of falling back to the empty state.
   Future<void> _select(String source) async {
     if (source.isEmpty) return;
     final key = '$source|${widget.topArtist}|${widget.country}';
@@ -166,7 +172,7 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
     if (hit != null && DateTime.now().difference(hit.$1).inMinutes < 30) {
       if (!mounted) return;
       setState(() { _source = source; _items = hit.$2; _loading = false; });
-      if (_ctrl.hasClients) _ctrl.jumpToPage(0);
+      _safeJumpToStart();
       return;
     }
     if (!mounted) return;
@@ -174,15 +180,22 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
     List<_DiscoverItem> items = [];
     try {
       items = _dedupe(await _fetch(source));
-    } catch (_) {}
+    } catch (_) {
+      items = [];
+    }
     if (items.isNotEmpty) _cache[key] = (DateTime.now(), items);
     if (!mounted || _source != source) return;
     setState(() { _items = items; _loading = false; });
-    // Make sure the new page really gets painted even if nothing else
-    // triggers a frame right after this (see the initState note above).
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && _ctrl.hasClients) _ctrl.jumpToPage(0);
-    });
+    _safeJumpToStart();
+  }
+
+  void _safeJumpToStart() {
+    try {
+      if (_ctrl.hasClients) _ctrl.jumpToPage(0);
+    } catch (_) {
+      // Controller can be mid-detach right after a source switch — never
+      // worth crashing the whole section over a scroll reset.
+    }
   }
 
   // Last.fm's chart / geo endpoints aren't personalized and regularly
@@ -203,9 +216,9 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
       final a = m['artist'];
       return a is Map ? (a['name'] ?? '').toString() : (a ?? '').toString();
     }
-    _DiscoverItem track(dynamic t) {
+    _DiscoverItem track(dynamic t, [String? subOverride]) {
       final m = Map<String, dynamic>.from(t as Map);
-      return _DiscoverItem((m['name'] ?? '').toString(), artistOf(m),
+      return _DiscoverItem((m['name'] ?? '').toString(), subOverride ?? artistOf(m),
           _extractImage(m['image']), 'tracks', m);
     }
     _DiscoverItem artist(dynamic t, String sub) {
@@ -215,15 +228,25 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
     }
     switch (source) {
       case 'community':
-        return (await s.getChartTopTracks(limit: _kDiscoverFetchLimit)).map(track).toList();
+        return (await s.getChartTopTracks(limit: _kDiscoverFetchLimit)).map((t) => track(t)).toList();
       case 'artists':
         return (await s.getChartTopArtists(limit: _kDiscoverFetchLimit)).map((a) => artist(a, '')).toList();
       case 'foryou':
         final sub = _tr({'fr': 'Comme ${widget.topArtist}', 'en': 'Like ${widget.topArtist}'});
         return (await s.getSimilarArtists(widget.topArtist, limit: _kDiscoverFetchLimit))
             .map((a) => artist(a, sub)).toList();
+      case 'genre':
+        // Derive a taste-based list from your own top artist's tags,
+        // instead of Last.fm's generic (non-personalized) charts.
+        final tags = await s.getArtistTopTags(widget.topArtist);
+        if (tags.isEmpty) return [];
+        final tagName = (Map<String, dynamic>.from(tags.first as Map)['name'] ?? '').toString();
+        if (tagName.isEmpty) return [];
+        final subLabel = _tr({'fr': 'Genre : $tagName', 'en': 'Genre: $tagName'});
+        return (await s.getTagTopTracks(tagName, limit: _kDiscoverFetchLimit))
+            .map((t) => track(t, subLabel)).toList();
       default:
-        return (await s.getGeoTopTracks(widget.country, limit: _kDiscoverFetchLimit)).map(track).toList();
+        return (await s.getGeoTopTracks(widget.country, limit: _kDiscoverFetchLimit)).map((t) => track(t)).toList();
     }
   }
 
@@ -276,11 +299,26 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
             duration: M3Motion.effectsDefaultDuration,
             child: _loading
                 // A single card-sized placeholder, not a full-width block,
-                // so it never looks like a plain grey rectangle.
-                ? Align(
+                // so it never looks like a plain grey rectangle. Explicit
+                // width/height (not just Align) so it can never be
+                // stretched by a parent that hands out tight constraints.
+                ? SizedBox(
                     key: ValueKey('load_$_source'),
-                    alignment: Alignment.topLeft,
-                    child: _loadingCard(imgSz, scheme),
+                    width: double.infinity,
+                    height: h,
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      widthFactor: 1,
+                      heightFactor: 1,
+                      // Tappable as a manual retry: if a source ever gets
+                      // visually stuck on the placeholder, tapping it
+                      // re-triggers the fetch instead of leaving the user
+                      // with no way out other than switching tabs.
+                      child: GestureDetector(
+                        onTap: () => _select(_source),
+                        child: _loadingCard(imgSz, scheme),
+                      ),
+                    ),
                   )
                 : _items.isEmpty
                     ? SizedBox(
@@ -385,9 +423,20 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
 }
 
 // ── Small play-count pill on the card image, in a Material You shape ───────
-// The shape is picked from the same shape set used for images (cookie,
-// clover, squircle, leaf, ...) so badges look varied, not all the same
-// rounded rectangle.
+// Only "safe" shapes for a small text pill: a plain rectangle and a couple
+// of rounded/stadium variants. The full 8-shape set used for images
+// (cookie, clover, leaf, arch...) has lobes and asymmetric corners that
+// clip short text at small sizes, so badges use their own smaller set with
+// generous padding instead.
+ShapeBorder _badgeShape(int idx) {
+  switch (idx % 4) {
+    case 0: return const StadiumBorder();                                   // pill
+    case 1: return RoundedRectangleBorder(borderRadius: BorderRadius.circular(6));   // rectangle
+    case 2: return RoundedRectangleBorder(borderRadius: BorderRadius.circular(14));  // squircle-ish
+    default: return const M3CookieBorder(lobes: 10, amplitude: 0.035);      // near-circle, very soft bumps
+  }
+}
+
 class _PlayBadge extends StatelessWidget {
   final String seed;
   final int count;
@@ -396,24 +445,24 @@ class _PlayBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    // Offset the seed so the badge doesn't always land on the same shape
-    // as the image right behind it.
-    final idx = m3ShapeIndex('badge_$seed') % kM3ImageShapeCount;
-    final shape = m3ImageShape(idx, 34);
+    final idx = m3ShapeIndex('badge_$seed');
+    final shape = _badgeShape(idx);
     return PhysicalShape(
       color: scheme.primaryContainer,
       elevation: 1.5,
       shadowColor: Colors.black.withValues(alpha: 0.3),
       clipper: ShapeBorderClipper(shape: shape),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+        // Generous padding so text never touches a rounded/soft edge.
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           Icon(Icons.play_arrow_rounded, size: 13, color: scheme.onPrimaryContainer),
-          const SizedBox(width: 2),
+          const SizedBox(width: 3),
           Text(_fmt(count),
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
+                height: 1.0,
                 color: scheme.onPrimaryContainer,
               )),
         ]),

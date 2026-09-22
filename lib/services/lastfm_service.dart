@@ -114,6 +114,16 @@ class LastFmService {
     return _asList(d['tracks']?['track']);
   }
 
+  // Top tracks for a genre/mood tag (e.g. the user's most-listened tag) —
+  // used by the dashboard's "Discover" section for a taste-based source
+  // that isn't just the global chart.
+  Future<List<dynamic>> getTagTopTracks(String tag, {int limit = 15}) async {
+    final d = await _call({
+      'method': 'tag.getTopTracks', 'tag': tag, 'limit': '$limit',
+    });
+    return _asList(d['tracks']?['track']);
+  }
+
   // ── User ────────────────────────────────────────────────
   Future<Map<String, dynamic>?> getUserInfo({String? user}) async {
     final d = await _call({'method': 'user.getInfo', 'user': user ?? username});

@@ -41,7 +41,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   bool   _showStats             = true;
   bool   _showRecent            = true;
   bool   _showDiscover          = true;
-  List<String> _discoverSources = ['community', 'artists', 'foryou', 'country'];
+  List<String> _discoverSources = ['community', 'artists', 'foryou', 'genre', 'country'];
   // Which chart replaces the old top artists/albums/tracks block.
   // 'calendar' = listening calendar (heatmap), 'monthly' = monthly bars.
   String _dashboardChart        = 'calendar';
@@ -87,7 +87,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
       _dashboardChart        = p.getString('ls_dashboard_chart')         ?? 'calendar';
       _showRecent            = p.getBool('ls_show_recent')               ?? true;
       _showDiscover          = p.getBool('ls_show_discover')             ?? true;
-      _discoverSources       = p.getStringList('ls_discover_sources') ?? ['community', 'artists', 'foryou', 'country'];
+      _discoverSources       = p.getStringList('ls_discover_sources') ?? ['community', 'artists', 'foryou', 'genre', 'country'];
       _showFriends           = p.getBool('ls_show_friends')              ?? true;
       _showFavorites         = p.getBool('ls_show_favorites')            ?? true;
       _headerMusicAnim       = p.getBool('ls_header_music_anim')         ?? false;
@@ -475,12 +475,13 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                   title: pickLang(fr: 'Pour toi', en: 'For you', es: 'Para ti', zh: '为你推荐', pt: 'Para você'),
                   labels: {
                     'foryou':  pickLang(fr: 'Comme ton artiste préféré', en: 'Like your top artist', es: 'Como tu artista favorito', zh: '与你最喜爱的艺术家相似', pt: 'Como seu artista favorito'),
+                    'genre':   pickLang(fr: 'Ton genre', en: 'Your genre', es: 'Tu género', zh: '你的音乐类型', pt: 'Seu gênero'),
                     'country': pickLang(fr: 'Ton pays', en: 'Your country', es: 'Tu país', zh: '你的国家', pt: 'Seu país'),
                   },
                   selected: _discoverSources,
                   onToggleGroup: (on) async {
                     final next = List<String>.from(_discoverSources);
-                    for (final k in ['foryou', 'country']) {
+                    for (final k in ['foryou', 'genre', 'country']) {
                       if (on) { if (!next.contains(k)) next.add(k); }
                       else { next.remove(k); }
                     }
