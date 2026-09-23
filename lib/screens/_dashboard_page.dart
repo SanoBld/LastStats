@@ -124,6 +124,9 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   // Kept in sync with the drag handles in DashboardSettingsPage.
   List<String> _sectionOrder = List.from(kDefaultSectionOrder);
   bool _infiniteScroll = false;
+  bool _discoverSmart = false;
+  List<String> _discoverSolo = [];
+  String _discoverLayout = 'scroll';
 
   // Dashboard chart (replaces the old top artists/albums/tracks block).
   // 'calendar' = listening calendar heatmap, 'monthly' = monthly bars.
@@ -349,6 +352,9 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
       _showFriends           = p.getBool('ls_show_friends')             ?? true;
       _sectionOrder          = migrateSectionOrder(p.getStringList('ls_section_order'));
       _infiniteScroll        = p.getBool('ls_infinite_scroll')          ?? false;
+      _discoverSmart         = p.getBool('ls_discover_smart')           ?? false;
+      _discoverLayout        = p.getString('ls_discover_layout')        ?? 'scroll';
+      _discoverSolo          = p.getStringList('ls_discover_solo')      ?? [];
       final rawCards = p.getStringList('ls_stat_cards');
       _statCards   = rawCards != null && rawCards.isNotEmpty
           ? rawCards : List.from(_kDefaultStatCards);
@@ -513,6 +519,9 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
               country:   country,
               sources:   _discoverSources,
               infiniteScroll: _infiniteScroll,
+              smartOrder: _discoverSmart,
+              filterLayout: _discoverLayout,
+              soloSources: _discoverSolo,
             ),
           ),
           const SizedBox(height: 20),

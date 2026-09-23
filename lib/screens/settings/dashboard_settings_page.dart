@@ -51,6 +51,9 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   List<String> _statCards       = List.from(kDefaultStatCards);
   List<String> _sectionOrder    = List.from(kDefaultSectionOrder);
   bool   _infiniteScroll        = false;
+  bool   _discoverSmart         = false;
+  String _discoverLayout        = 'scroll';
+  List<String> _discoverSolo    = [];
 
   final _customUrlCtrl         = TextEditingController();
   final _fallbackCustomUrlCtrl = TextEditingController();
@@ -95,6 +98,9 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
       _headerMusicAnim       = p.getBool('ls_header_music_anim')         ?? false;
       _sectionOrder          = migrateSectionOrder(p.getStringList('ls_section_order'));
       _infiniteScroll        = p.getBool('ls_infinite_scroll')          ?? false;
+      _discoverSmart         = p.getBool('ls_discover_smart')           ?? false;
+      _discoverLayout        = p.getString('ls_discover_layout')        ?? 'scroll';
+      _discoverSolo          = p.getStringList('ls_discover_solo')      ?? [];
       final raw = p.getStringList('ls_stat_cards');
       _statCards = raw != null && raw.isNotEmpty ? raw : List.from(kDefaultStatCards);
     });
@@ -112,6 +118,45 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   Future<void> _saveList(String key, List<String> list) async {
     final p = await SharedPreferences.getInstance();
     await p.setStringList(key, list);
+  }
+
+  String _layoutLabel(String k) => switch (k) {
+        'wrap' => L.discoverLayoutWrap,
+        'list' => L.discoverLayoutList,
+        _      => L.discoverLayoutScroll,
+      };
+
+  // Pick the filters that get their own row.
+  Future<void> _pickSolo() async {
+    final chosen = Set<String>.from(_discoverSolo);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setD) => AlertDialog(
+          title: Text(L.discoverSoloTitle),
+          content: SizedBox(
+            width: 320,
+            child: ListView(shrinkWrap: true, children: [
+              for (final k in _discoverSources)
+                CheckboxListTile(
+                  dense: true,
+                  title: Text(discoverSourceLabel(k)),
+                  value: chosen.contains(k),
+                  onChanged: (v) => setD(() => v == true ? chosen.add(k) : chosen.remove(k)),
+                ),
+            ]),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(L.commonCancel)),
+            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(L.commonSave)),
+          ],
+        ),
+      ),
+    );
+    if (ok != true) return;
+    final next = chosen.toList();
+    await _saveList('ls_discover_solo', next);
+    if (mounted) setState(() => _discoverSolo = next);
   }
 
   @override
@@ -502,22 +547,46 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                 pt: 'Ideias de música para deslizar')),
             value: _showDiscover,
             onChanged: (v) async { await _set('ls_show_discover', v); setState(() => _showDiscover = v); }),
-          if (_showDiscover)
+          if (_showDiscover) ...[
+            SwitchListTile(
+              secondary: const Icon(Icons.auto_graph_rounded),
+              title: Text(L.discoverSmartTitle),
+              subtitle: Text(L.discoverSmartSub),
+              value: _discoverSmart,
+              onChanged: (v) async { await _set('ls_discover_smart', v); setState(() => _discoverSmart = v); }),
+            ListTile(
+              leading: const Icon(Icons.view_agenda_outlined),
+              title: Text(L.discoverLayoutTitle),
+              subtitle: Text(_layoutLabel(_discoverLayout)),
+              trailing: PopupMenuButton<String>(
+                icon: const Icon(Icons.arrow_drop_down_rounded),
+                onSelected: (v) async {
+                  final p = await SharedPreferences.getInstance();
+                  await p.setString('ls_discover_layout', v);
+                  setState(() => _discoverLayout = v);
+                },
+                itemBuilder: (_) => [
+                  for (final k in const ['scroll', 'wrap', 'list'])
+                    PopupMenuItem(value: k, child: Text(_layoutLabel(k))),
+                ],
+              )),
+            ListTile(
+              leading: const Icon(Icons.splitscreen_rounded),
+              title: Text(L.discoverSoloTitle),
+              subtitle: Text(_discoverSolo.isEmpty
+                  ? '${L.discoverSoloSub}\n${L.discoverSoloNone}'
+                  : _discoverSolo.map(discoverSourceLabel).join(', ')),
+              isThreeLine: _discoverSolo.isEmpty,
+              onTap: _pickSolo),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 14),
               child: Column(children: [
                 _DiscoverGroupToggle(
                   icon: Icons.auto_awesome_rounded,
-                  title: pickLang(fr: 'Pour toi', en: 'For you', es: 'Para ti', zh: '为你推荐', pt: 'Para você'),
+                  title: L.discoverForYou,
                   labels: {
-                    'foryou':    pickLang(fr: 'Ton mix', en: 'Your mix', es: 'Tu mix', zh: '你的混合推荐', pt: 'Seu mix'),
-                    'onthisday': pickLang(fr: 'Ce jour-là', en: 'On this day', es: 'Un día como hoy', zh: '历史上的今天', pt: 'Neste dia'),
-                    'fresh':     pickLang(fr: 'Ce mois-ci', en: 'This month', es: 'Este mes', zh: '本月', pt: 'Este mês'),
-                    'genre':     pickLang(fr: 'Tes genres', en: 'Your genres', es: 'Tus géneros', zh: '你的音乐类型', pt: 'Seus gêneros'),
-                    'deeper':    pickLang(fr: 'Titres cachés', en: 'Deep cuts', es: 'Joyas ocultas', zh: '冷门佳作', pt: 'Faixas escondidas'),
-                    'forgotten': pickLang(fr: 'Oubliés', en: 'Forgotten', es: 'Olvidadas', zh: '被遗忘的歌', pt: 'Esquecidas'),
-                    'albums':    pickLang(fr: 'Albums', en: 'Albums', es: 'Álbumes', zh: '专辑', pt: 'Álbuns'),
-                    'country':   pickLang(fr: 'Ton pays', en: 'Your country', es: 'Tu país', zh: '你的国家', pt: 'Seu país'),
+                    for (final k in const ['foryou', 'onthisday', 'fresh', 'genre', 'deeper', 'forgotten', 'albums', 'country'])
+                      k: discoverSourceLabel(k),
                   },
                   selected: _discoverSources,
                   onToggleGroup: (on) async {
@@ -539,7 +608,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                 const SizedBox(height: 10),
                 _DiscoverGroupToggle(
                   icon: Icons.public_rounded,
-                  title: pickLang(fr: 'Tendances mondiales', en: 'Global trends', es: 'Tendencias globales', zh: '全球趋势', pt: 'Tendências globais'),
+                  title: L.discoverGlobalTrends,
                   labels: {
                     for (final e in const [
                       ('gt', 'week'), ('gt', 'month'), ('gt', 'year'),
@@ -567,6 +636,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                 ),
               ]),
             ),
+          ],
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
             secondary: const Icon(Icons.history_rounded),
@@ -710,19 +780,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
 }
 
 // "Tracks · week" style label for the global trend chips.
-String _globalLabel(String kind, String range) {
-  final k = switch (kind) {
-    'gt' => pickLang(fr: 'Titres', en: 'Tracks', es: 'Canciones', zh: '歌曲', pt: 'Faixas'),
-    'ga' => pickLang(fr: 'Artistes', en: 'Artists', es: 'Artistas', zh: '艺术家', pt: 'Artistas'),
-    _    => pickLang(fr: 'Albums', en: 'Albums', es: 'Álbumes', zh: '专辑', pt: 'Álbuns'),
-  };
-  final r = switch (range) {
-    'week'  => pickLang(fr: 'semaine', en: 'week', es: 'semana', zh: '周', pt: 'semana'),
-    'month' => pickLang(fr: 'mois', en: 'month', es: 'mes', zh: '月', pt: 'mês'),
-    _       => pickLang(fr: 'année', en: 'year', es: 'año', zh: '年', pt: 'ano'),
-  };
-  return '$k · $r';
-}
+String _globalLabel(String kind, String range) => discoverSourceLabel('${kind}_$range');
 
 // ── Groupe "Pour toi" / "Tendances mondiales" avec son propre switch ─────────
 // A group switch turns the whole group on/off at once (adds/removes all

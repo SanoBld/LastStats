@@ -737,4 +737,32 @@ class AppStringsRu implements AppStrings {
   @override String get recapNoData => 'За этот период прослушиваний нет.';
   @override String get recapSeeFull => 'Смотреть полные итоги';
   @override String get recapTop10 => 'Топ 10';
+
+  // ── Discover filters ─────────────────────────────────────────────────────
+  @override String get discoverSmartTitle => 'Самый подходящий фильтр первым';
+  @override String get discoverSmartSub => 'Выбирает по времени, дате, истории и вашим привычкам';
+  @override String get discoverLayoutTitle => 'Вид фильтров';
+  @override String get discoverLayoutScroll => 'Одна прокручиваемая строка';
+  @override String get discoverLayoutWrap => 'Несколько строк';
+  @override String get discoverLayoutList => 'Один фильтр на строку';
+  @override String get discoverSoloTitle => 'Отдельные фильтры';
+  @override String get discoverSoloSub => 'Показывает выбранные фильтры отдельной строкой, вне вкладки';
+  @override String get discoverSoloNone => 'Нет';
+  @override String get discoverForYou => 'Для вас';
+  @override String get discoverGlobalTrends => 'Мировые тренды';
+  @override String get discoverSrcForyou => 'Ваш микс';
+  @override String get discoverSrcOnthisday => 'В этот день';
+  @override String get discoverSrcFresh => 'В этом месяце';
+  @override String get discoverSrcGenre => 'Ваши жанры';
+  @override String get discoverSrcDeeper => 'Скрытые жемчужины';
+  @override String get discoverSrcForgotten => 'Забытые';
+  @override String get discoverSrcAlbums => 'Альбомы';
+  @override String get discoverSrcCountry => 'Ваша страна';
+  @override String get discoverTracks => 'Треки';
+  @override String get discoverArtists => 'Исполнители';
+  @override String get discoverWeek => 'неделя';
+  @override String get discoverMonth => 'месяц';
+  @override String get discoverYear => 'год';
+  @override String get discoverNothing => 'Пока нечего показывать';
+  @override String discoverLike(String names) => 'Как $names';
 }

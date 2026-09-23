@@ -736,4 +736,32 @@ class AppStringsJa implements AppStrings {
   @override String get recapNoData => 'この期間の再生履歴はありません。';
   @override String get recapSeeFull => '振り返りを見る';
   @override String get recapTop10 => 'トップ10';
+
+  // ── Discover filters ─────────────────────────────────────────────────────
+  @override String get discoverSmartTitle => '最も関連性の高いフィルターを先頭に';
+  @override String get discoverSmartSub => '時間帯・日付・履歴・使い方に合わせて選びます';
+  @override String get discoverLayoutTitle => 'フィルターの表示';
+  @override String get discoverLayoutScroll => '1行でスクロール';
+  @override String get discoverLayoutWrap => '複数行';
+  @override String get discoverLayoutList => '1行に1フィルター';
+  @override String get discoverSoloTitle => '別枠のフィルター';
+  @override String get discoverSoloSub => '選んだフィルターをタブの外の専用行に表示します';
+  @override String get discoverSoloNone => 'なし';
+  @override String get discoverForYou => 'あなたへ';
+  @override String get discoverGlobalTrends => '世界のトレンド';
+  @override String get discoverSrcForyou => 'あなたのミックス';
+  @override String get discoverSrcOnthisday => 'この日に';
+  @override String get discoverSrcFresh => '今月';
+  @override String get discoverSrcGenre => 'あなたのジャンル';
+  @override String get discoverSrcDeeper => '隠れた名曲';
+  @override String get discoverSrcForgotten => '忘れていた曲';
+  @override String get discoverSrcAlbums => 'アルバム';
+  @override String get discoverSrcCountry => 'あなたの国';
+  @override String get discoverTracks => 'トラック';
+  @override String get discoverArtists => 'アーティスト';
+  @override String get discoverWeek => '週';
+  @override String get discoverMonth => '月';
+  @override String get discoverYear => '年';
+  @override String get discoverNothing => '今は表示するものがありません';
+  @override String discoverLike(String names) => '$names のような';
 }

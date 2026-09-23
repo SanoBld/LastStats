@@ -737,4 +737,32 @@ class AppStringsAr implements AppStrings {
   @override String get recapNoData => 'لا توجد عمليات استماع لهذه الفترة.';
   @override String get recapSeeFull => 'عرض الملخص الكامل';
   @override String get recapTop10 => 'أفضل 10';
+
+  // ── Discover filters ─────────────────────────────────────────────────────
+  @override String get discoverSmartTitle => 'الفلتر الأكثر صلة أولاً';
+  @override String get discoverSmartSub => 'يختار حسب الوقت والتاريخ وسجلّك وعاداتك';
+  @override String get discoverLayoutTitle => 'عرض الفلاتر';
+  @override String get discoverLayoutScroll => 'سطر واحد قابل للتمرير';
+  @override String get discoverLayoutWrap => 'عدة أسطر';
+  @override String get discoverLayoutList => 'فلتر واحد في كل سطر';
+  @override String get discoverSoloTitle => 'فلاتر منفصلة';
+  @override String get discoverSoloSub => 'يعرض الفلاتر المختارة في صف خاص بها خارج تبويبها';
+  @override String get discoverSoloNone => 'لا شيء';
+  @override String get discoverForYou => 'لك';
+  @override String get discoverGlobalTrends => 'الاتجاهات العالمية';
+  @override String get discoverSrcForyou => 'مزيجك';
+  @override String get discoverSrcOnthisday => 'في مثل هذا اليوم';
+  @override String get discoverSrcFresh => 'هذا الشهر';
+  @override String get discoverSrcGenre => 'أنواعك الموسيقية';
+  @override String get discoverSrcDeeper => 'جواهر مخفية';
+  @override String get discoverSrcForgotten => 'منسيّة';
+  @override String get discoverSrcAlbums => 'ألبومات';
+  @override String get discoverSrcCountry => 'بلدك';
+  @override String get discoverTracks => 'المقطوعات';
+  @override String get discoverArtists => 'الفنانون';
+  @override String get discoverWeek => 'أسبوع';
+  @override String get discoverMonth => 'شهر';
+  @override String get discoverYear => 'سنة';
+  @override String get discoverNothing => 'لا شيء لعرضه حالياً';
+  @override String discoverLike(String names) => 'مثل $names';
 }

@@ -766,4 +766,32 @@ class AppStringsEs implements AppStrings {
   @override String get recapNoData => 'Sin escuchas en este período.';
   @override String get recapSeeFull => 'Ver resumen completo';
   @override String get recapTop10 => 'Top 10';
+
+  // ── Discover filters ─────────────────────────────────────────────────────
+  @override String get discoverSmartTitle => 'Filtro más relevante primero';
+  @override String get discoverSmartSub => 'Elige según la hora, el día, tu historial y tus hábitos';
+  @override String get discoverLayoutTitle => 'Diseño de los filtros';
+  @override String get discoverLayoutScroll => 'Una línea deslizable';
+  @override String get discoverLayoutWrap => 'Varias líneas';
+  @override String get discoverLayoutList => 'Un filtro por línea';
+  @override String get discoverSoloTitle => 'Filtros aparte';
+  @override String get discoverSoloSub => 'Muestra los filtros elegidos en su propia fila, fuera de su pestaña';
+  @override String get discoverSoloNone => 'Ninguno';
+  @override String get discoverForYou => 'Para ti';
+  @override String get discoverGlobalTrends => 'Tendencias globales';
+  @override String get discoverSrcForyou => 'Tu mix';
+  @override String get discoverSrcOnthisday => 'Un día como hoy';
+  @override String get discoverSrcFresh => 'Este mes';
+  @override String get discoverSrcGenre => 'Tus géneros';
+  @override String get discoverSrcDeeper => 'Joyas ocultas';
+  @override String get discoverSrcForgotten => 'Olvidadas';
+  @override String get discoverSrcAlbums => 'Álbumes';
+  @override String get discoverSrcCountry => 'Tu país';
+  @override String get discoverTracks => 'Canciones';
+  @override String get discoverArtists => 'Artistas';
+  @override String get discoverWeek => 'semana';
+  @override String get discoverMonth => 'mes';
+  @override String get discoverYear => 'año';
+  @override String get discoverNothing => 'Nada que mostrar por ahora';
+  @override String discoverLike(String names) => 'Como $names';
 }

@@ -763,4 +763,32 @@ class AppStringsZh implements AppStrings {
   @override String get recapNoData => '此时段暂无播放记录。';
   @override String get recapSeeFull => '查看完整回顾';
   @override String get recapTop10 => '前10名';
+
+  // ── Discover filters ─────────────────────────────────────────────────────
+  @override String get discoverSmartTitle => '最相关的筛选优先';
+  @override String get discoverSmartSub => '根据时间、日期、你的历史和使用习惯选择';
+  @override String get discoverLayoutTitle => '筛选布局';
+  @override String get discoverLayoutScroll => '单行滚动';
+  @override String get discoverLayoutWrap => '多行';
+  @override String get discoverLayoutList => '每行一个筛选';
+  @override String get discoverSoloTitle => '独立筛选';
+  @override String get discoverSoloSub => '将所选筛选显示在单独一行，不放在标签内';
+  @override String get discoverSoloNone => '无';
+  @override String get discoverForYou => '为你推荐';
+  @override String get discoverGlobalTrends => '全球趋势';
+  @override String get discoverSrcForyou => '你的混合推荐';
+  @override String get discoverSrcOnthisday => '历史上的今天';
+  @override String get discoverSrcFresh => '本月';
+  @override String get discoverSrcGenre => '你的音乐类型';
+  @override String get discoverSrcDeeper => '冷门佳作';
+  @override String get discoverSrcForgotten => '被遗忘的歌';
+  @override String get discoverSrcAlbums => '专辑';
+  @override String get discoverSrcCountry => '你的国家';
+  @override String get discoverTracks => '歌曲';
+  @override String get discoverArtists => '艺术家';
+  @override String get discoverWeek => '周';
+  @override String get discoverMonth => '月';
+  @override String get discoverYear => '年';
+  @override String get discoverNothing => '暂无内容';
+  @override String discoverLike(String names) => '类似 $names';
 }

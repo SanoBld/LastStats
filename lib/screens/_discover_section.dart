@@ -75,13 +75,31 @@ class _DiscoverSection extends StatelessWidget {
   final String topArtist, country;
   final List<String> sources;
   final bool infiniteScroll;
+  final bool smartOrder;      // most relevant filter first
+  final String filterLayout;  // 'scroll' | 'wrap' | 'list'
+  final List<String> soloSources; // filters shown on their own row
   const _DiscoverSection({
     required this.service,
     required this.topArtist,
     required this.country,
     required this.sources,
     this.infiniteScroll = false,
+    this.smartOrder = false,
+    this.filterLayout = 'scroll',
+    this.soloSources = const [],
   });
+
+  static IconData _soloIcon(String s) => switch (s) {
+        'foryou'    => Icons.auto_awesome_rounded,
+        'onthisday' => Icons.history_rounded,
+        'fresh'     => Icons.calendar_month_rounded,
+        'genre'     => Icons.category_rounded,
+        'deeper'    => Icons.travel_explore_rounded,
+        'forgotten' => Icons.replay_rounded,
+        'albums'    => Icons.album_rounded,
+        'country'   => Icons.flag_rounded,
+        _           => Icons.public_rounded,
+      };
 
   List<String> _avail(List<String> group) => [
         for (final s in group)
@@ -94,9 +112,11 @@ class _DiscoverSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final personal = _avail(_kDiscoverPersonal);
-    final global   = _avail(_kDiscoverGlobal);
-    if (personal.isEmpty && global.isEmpty) return const SizedBox.shrink();
+    final all      = _avail(_kDiscoverAll);
+    final solo     = [for (final s in all) if (soloSources.contains(s)) s];
+    final personal = _avail(_kDiscoverPersonal).where((s) => !solo.contains(s)).toList();
+    final global   = _avail(_kDiscoverGlobal).where((s) => !solo.contains(s)).toList();
+    if (personal.isEmpty && global.isEmpty && solo.isEmpty) return const SizedBox.shrink();
 
     // Cap the whole section's width so it doesn't blow up on desktop.
     return Align(
@@ -104,6 +124,20 @@ class _DiscoverSection extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: _kDiscoverMaxWidth),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // Filters the user pulled out of their tab: one row each.
+          for (final s in solo) ...[
+            _DiscoverGroup(
+              key: ValueKey('discover_solo_$s'),
+              service: service,
+              topArtist: topArtist,
+              country: country,
+              sources: [s],
+              icon: _soloIcon(s),
+              title: discoverSourceLabel(s),
+              infiniteScroll: infiniteScroll,
+            ),
+            const SizedBox(height: 20),
+          ],
           if (personal.isNotEmpty)
             _DiscoverGroup(
               key: const ValueKey('discover_personal'),
@@ -112,8 +146,10 @@ class _DiscoverSection extends StatelessWidget {
               country: country,
               sources: personal,
               icon: Icons.auto_awesome_rounded,
-              title: _tr({'fr': 'Pour toi', 'en': 'For you', 'es': 'Para ti', 'de': 'Für dich', 'it': 'Per te', 'pt': 'Para você'}),
+              title: L.discoverForYou,
               infiniteScroll: infiniteScroll,
+              smartOrder: smartOrder,
+              filterLayout: filterLayout,
             ),
           if (personal.isNotEmpty && global.isNotEmpty) const SizedBox(height: 20),
           if (global.isNotEmpty)
@@ -124,8 +160,10 @@ class _DiscoverSection extends StatelessWidget {
               country: country,
               sources: global,
               icon: Icons.public_rounded,
-              title: _tr({'fr': 'Tendances mondiales', 'en': 'Global trends', 'es': 'Tendencias globales', 'de': 'Globale Trends', 'it': 'Tendenze globali', 'pt': 'Tendências globais'}),
+              title: L.discoverGlobalTrends,
               infiniteScroll: infiniteScroll,
+              smartOrder: smartOrder,
+              filterLayout: filterLayout,
             ),
         ]),
       ),
@@ -141,6 +179,8 @@ class _DiscoverGroup extends StatefulWidget {
   final IconData icon;
   final String title;
   final bool infiniteScroll;
+  final bool smartOrder;
+  final String filterLayout;
   const _DiscoverGroup({
     super.key,
     required this.service,
@@ -150,6 +190,8 @@ class _DiscoverGroup extends StatefulWidget {
     required this.icon,
     required this.title,
     this.infiniteScroll = false,
+    this.smartOrder = false,
+    this.filterLayout = 'scroll',
   });
 
   @override
@@ -165,17 +207,176 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
   List<_DiscoverItem> _items = [];
   bool _loading = true;
 
+  // ── Smart order ("most relevant first", Spotify-like) ──────────────────
+  // Signals: base usefulness, your habits (taps + opened cards, decaying),
+  // the moment (time of day, weekend, start of month), whether "on this
+  // day" really has memories today, and rotation (not the same first
+  // filter every time you open the app).
+  static final Set<String> _emptySources = {}; // came back empty this session
+  static const Map<String, double> _prior = {
+    'foryou': 10, 'fresh': 8, 'onthisday': 6, 'genre': 6, 'albums': 5,
+    'deeper': 5, 'forgotten': 4, 'country': 3,
+    'gt_week': 6, 'ga_week': 5, 'gb_week': 4,
+    'gt_month': 4, 'ga_month': 3, 'gb_month': 3,
+    'gt_year': 2, 'ga_year': 2, 'gb_year': 2,
+  };
+  Map<String, List<num>> _taps = {}; // source -> [weight, lastEpochMs]
+  String _lastFirst = '';            // first filter shown last time
+  int _lastFirstMs = 0;
+  int _todayCount = -1;              // "on this day" items found (-1 = unknown)
+  List<String> _order = [];          // chips order (frozen for the session)
+
+  String get _gid => widget.sources.contains('foryou') ? 'p' : 'g';
+
+  Future<void> _loadPrefs() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      final raw = p.getString('ls_discover_taps');
+      if (raw != null) {
+        final m = jsonDecode(raw) as Map<String, dynamic>;
+        _taps = {
+          for (final e in m.entries) e.key: [for (final v in (e.value as List)) v as num]
+        };
+      }
+      final lf = (p.getString('ls_discover_lastfirst_$_gid') ?? '').split('|');
+      if (lf.length == 2) {
+        _lastFirst = lf[0];
+        _lastFirstMs = int.tryParse(lf[1]) ?? 0;
+      }
+    } catch (_) {
+      _taps = {};
+    }
+  }
+
+  Future<void> _savePrefs() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setString('ls_discover_taps', jsonEncode(_taps));
+    } catch (_) {}
+  }
+
+  Future<void> _saveLastFirst(String s) async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setString('ls_discover_lastfirst_$_gid',
+          '$s|${DateTime.now().millisecondsSinceEpoch}');
+    } catch (_) {}
+  }
+
+  // The user picked a filter (weight 1) or opened one of its cards (2).
+  void _record(String s, double weight) {
+    if (!widget.smartOrder) return;
+    final t = _taps[s] ?? [0, 0];
+    _taps[s] = [t[0] + weight, DateTime.now().millisecondsSinceEpoch];
+    _savePrefs();
+  }
+
+  // Bonus / malus that depends on the moment.
+  double _context(String s, DateTime now) {
+    final h = now.hour;
+    final morning = h >= 5 && h < 12;
+    final evening = h >= 18 || h < 5;
+    final weekend = now.weekday >= 6;
+    switch (s) {
+      case 'foryou':
+        return morning ? 1 : 0;
+      case 'fresh':
+        return (now.day <= 7 ? 3 : 0) + (morning ? 1 : 0); // new month = new music
+      case 'forgotten':
+      case 'deeper':
+        return (evening ? 2 : 0) + (weekend ? 1.5 : 0);    // time to dig
+      case 'albums':
+        return (weekend ? 1.5 : 0) + (evening ? 1 : 0);
+      case 'genre':
+        return (h >= 12 && h < 18) ? 1 : 0;
+      case 'onthisday':
+        // Only relevant if you really listened on this date in past years.
+        if (_todayCount == 0) return -100;
+        return _todayCount > 0 ? 6 + math.min(_todayCount, 10) * 0.3 : 0;
+      default:
+        return 0;
+    }
+  }
+
+  double _score(String s) {
+    final now = DateTime.now();
+    var v = (_prior[s] ?? 1) + _context(s, now);
+    final t = _taps[s];
+    if (t != null) {
+      final days = (now.millisecondsSinceEpoch - t[1]) / 86400000;
+      final decay = math.pow(0.5, days / 14).toDouble(); // halves every 14 days
+      v += 4 * math.log(1 + t[0] * decay);
+    }
+    // Rotation: it was already first recently -> give another one a turn.
+    if (s == _lastFirst) {
+      final last = DateTime.fromMillisecondsSinceEpoch(_lastFirstMs);
+      if (s == 'onthisday') {
+        if (last.year == now.year && last.month == now.month && last.day == now.day) v -= 8;
+      } else if (now.difference(last).inHours < 6) {
+        v -= 3;
+      }
+    }
+    if (_emptySources.contains(s)) v -= 100;
+    return v;
+  }
+
+  List<String> _computeOrder() {
+    final list = List<String>.from(widget.sources);
+    if (!widget.smartOrder || list.length < 2) return list;
+    final idx = {for (var i = 0; i < list.length; i++) list[i]: i};
+    list.sort((a, b) {
+      final c = _score(b).compareTo(_score(a));
+      return c != 0 ? c : idx[a]!.compareTo(idx[b]!); // stable on ties
+    });
+    return list;
+  }
+
+  // Loads a source without showing it (used to know if "on this day" has
+  // anything today). Result goes in the cache so the tab opens instantly.
+  Future<int> _probe(String s) async {
+    final key = '$s|${widget.topArtist}|${widget.country}';
+    final hit = _cache[key];
+    if (hit != null && DateTime.now().difference(hit.$1).inMinutes < 30) {
+      return hit.$2.length;
+    }
+    final items = _dedupe(await _fetch(s).timeout(const Duration(seconds: 5)));
+    if (items.isNotEmpty) {
+      _cache[key] = (DateTime.now(), items);
+      _emptySources.remove(s);
+    } else {
+      _emptySources.add(s);
+    }
+    return items.length;
+  }
+
+  Future<void> _init() async {
+    if (widget.smartOrder && widget.sources.length > 1) {
+      await _loadPrefs();
+      if (widget.sources.contains('onthisday')) {
+        try { _todayCount = await _probe('onthisday'); } catch (_) {}
+      }
+      if (!mounted) return;
+    }
+    _order = _computeOrder();
+    if (_order.isEmpty) return;
+    if (widget.smartOrder && _order.length > 1) _saveLastFirst(_order.first);
+    _select(_order.first);
+  }
+
   @override
   void initState() {
     super.initState();
-    _select(widget.sources.first);
+    _order = List<String>.from(widget.sources);
+    _init();
   }
 
   @override
   void didUpdateWidget(_DiscoverGroup old) {
     super.didUpdateWidget(old);
-    if (!widget.sources.contains(_source) && widget.sources.isNotEmpty) {
-      _select(widget.sources.first);
+    final changed = old.smartOrder != widget.smartOrder ||
+        old.sources.join(',') != widget.sources.join(',');
+    if (changed) {
+      _init();
     }
   }
 
@@ -185,31 +386,7 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
     super.dispose();
   }
 
-  String _label(String s) {
-    if (s.startsWith('g') && s.contains('_')) {
-      final kind = switch (s.substring(0, 2)) {
-        'gt' => _tr({'fr': 'Titres', 'en': 'Tracks', 'es': 'Canciones', 'de': 'Titel', 'it': 'Brani', 'pt': 'Faixas'}),
-        'ga' => _tr({'fr': 'Artistes', 'en': 'Artists', 'es': 'Artistas', 'de': 'Künstler', 'it': 'Artisti', 'pt': 'Artistas'}),
-        _    => _tr({'fr': 'Albums', 'en': 'Albums', 'es': 'Álbumes', 'de': 'Alben', 'it': 'Album', 'pt': 'Álbuns'}),
-      };
-      final range = switch (s.substring(3)) {
-        'week'  => _tr({'fr': 'semaine', 'en': 'week', 'es': 'semana', 'de': 'Woche', 'it': 'settimana', 'pt': 'semana'}),
-        'month' => _tr({'fr': 'mois', 'en': 'month', 'es': 'mes', 'de': 'Monat', 'it': 'mese', 'pt': 'mês'}),
-        _       => _tr({'fr': 'année', 'en': 'year', 'es': 'año', 'de': 'Jahr', 'it': 'anno', 'pt': 'ano'}),
-      };
-      return '$kind · $range';
-    }
-    return switch (s) {
-      'foryou'    => _tr({'fr': 'Ton mix', 'en': 'Your mix', 'es': 'Tu mix', 'de': 'Dein Mix', 'it': 'Il tuo mix', 'pt': 'Seu mix'}),
-      'onthisday' => _tr({'fr': 'Ce jour-là', 'en': 'On this day', 'es': 'Un día como hoy', 'de': 'An diesem Tag', 'it': 'In questo giorno', 'pt': 'Neste dia'}),
-      'fresh'     => _tr({'fr': 'Ce mois-ci', 'en': 'This month', 'es': 'Este mes', 'de': 'Diesen Monat', 'it': 'Questo mese', 'pt': 'Este mês'}),
-      'genre'     => _tr({'fr': 'Tes genres', 'en': 'Your genres', 'es': 'Tus géneros', 'de': 'Deine Genres', 'it': 'I tuoi generi', 'pt': 'Seus gêneros'}),
-      'deeper'    => _tr({'fr': 'Titres cachés', 'en': 'Deep cuts', 'es': 'Joyas ocultas', 'de': 'Deep Cuts', 'it': 'Perle nascoste', 'pt': 'Faixas escondidas'}),
-      'forgotten' => _tr({'fr': 'Oubliés', 'en': 'Forgotten', 'es': 'Olvidadas', 'de': 'Vergessen', 'it': 'Dimenticate', 'pt': 'Esquecidas'}),
-      'albums'    => _tr({'fr': 'Albums', 'en': 'Albums', 'es': 'Álbumes', 'de': 'Alben', 'it': 'Album', 'pt': 'Álbuns'}),
-      _           => _tr({'fr': 'Ton pays', 'en': 'Your country', 'es': 'Tu país', 'de': 'Dein Land', 'it': 'Il tuo paese', 'pt': 'Seu país'}),
-    };
-  }
+  String _label(String s) => discoverSourceLabel(s);
 
   // Every step here is wrapped so a network hiccup, a missing field, or an
   // empty tag list can never throw up out of this function — a swallowed
@@ -233,7 +410,12 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
     } catch (_) {
       items = [];
     }
-    if (items.isNotEmpty) _cache[key] = (DateTime.now(), items);
+    if (items.isNotEmpty) {
+      _cache[key] = (DateTime.now(), items);
+      _emptySources.remove(source);
+    } else {
+      _emptySources.add(source);
+    }
     if (!mounted || _source != source) return;
     setState(() { _items = items; _loading = false; });
     _safeJumpToStart();
@@ -263,9 +445,7 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
   // "Like A, B" line shown under artists / albums picked by the engine.
   String _likeSub(List<String> reasons) {
     if (reasons.isEmpty) return '';
-    final names = reasons.join(', ');
-    return _tr({'fr': 'Comme $names', 'en': 'Like $names', 'es': 'Como $names',
-        'de': 'Wie $names', 'it': 'Come $names', 'pt': 'Como $names'});
+    return L.discoverLike(reasons.join(', '));
   }
 
   _DiscoverItem _fromRec(TasteRec r) {
@@ -339,6 +519,7 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
   }
 
   void _open(_DiscoverItem it) {
+    _record(_source, 2);
     _haptic(_HapticImpact.light);
     final Map<String, dynamic> item = it.type == 'artists'
         ? {'name': it.name, 'image': it.raw['image']}
@@ -354,27 +535,13 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
   Widget build(BuildContext context) {
     final scheme  = Theme.of(context).colorScheme;
     final text    = Theme.of(context).textTheme;
-    final sources = widget.sources;
+    final sources = _order.length == widget.sources.length ? _order : widget.sources;
     if (sources.isEmpty) return const SizedBox.shrink();
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       _SectionHeader(title: widget.title, icon: widget.icon),
       const SizedBox(height: 10),
-      if (sources.length > 1)
-        SizedBox(
-          height: 40,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            physics: const ClampingScrollPhysics(),
-            itemCount: sources.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 8),
-            itemBuilder: (_, i) => M3Chip(
-              label: Text(_label(sources[i])),
-              selected: sources[i] == _source,
-              onSelected: (_) { _haptic(_HapticImpact.selection); _select(sources[i]); },
-            ),
-          ),
-        ),
+      if (sources.length > 1) _filters(sources),
       const SizedBox(height: 12),
       LayoutBuilder(builder: (context, box) {
         final page  = box.maxWidth * 0.6;
@@ -414,7 +581,7 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
                         width: double.infinity,
                         child: Center(
                           child: Text(
-                            _tr({'fr': 'Rien à afficher pour le moment', 'en': 'Nothing to show right now'}),
+                            L.discoverNothing,
                             style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
                           ),
                         ),
@@ -435,6 +602,40 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
         );
       }),
     ]);
+  }
+
+  Widget _chip(String src) => M3Chip(
+        label: Text(_label(src)),
+        selected: src == _source,
+        onSelected: (_) {
+          _haptic(_HapticImpact.selection);
+          _record(src, 1);
+          _select(src);
+        },
+      );
+
+  // Filter row: one scrolling line, a wrapped block, or one filter per line.
+  Widget _filters(List<String> sources) {
+    switch (widget.filterLayout) {
+      case 'wrap':
+        return Wrap(spacing: 8, runSpacing: 8, children: [for (final s in sources) _chip(s)]);
+      case 'list':
+        return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          for (final s in sources)
+            Padding(padding: const EdgeInsets.only(bottom: 8), child: _chip(s)),
+        ]);
+      default:
+        return SizedBox(
+          height: 40,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            physics: const ClampingScrollPhysics(),
+            itemCount: sources.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
+            itemBuilder: (_, i) => _chip(sources[i]),
+          ),
+        );
+    }
   }
 
   // Same shape + same animated loader as the rest of the app, sized to the

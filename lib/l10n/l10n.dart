@@ -52,3 +52,31 @@ AppStrings get L {
     default:   return _fr;
   }
 }
+
+/// Label of a Discover filter id (personal ids or gt/ga/gb_week/month/year).
+String discoverSourceLabel(String s) {
+  final l = L;
+  if (s.startsWith('g') && s.contains('_')) {
+    final kind = switch (s.substring(0, 2)) {
+      'gt' => l.discoverTracks,
+      'ga' => l.discoverArtists,
+      _    => l.discoverSrcAlbums,
+    };
+    final range = switch (s.substring(3)) {
+      'week'  => l.discoverWeek,
+      'month' => l.discoverMonth,
+      _       => l.discoverYear,
+    };
+    return '$kind · $range';
+  }
+  return switch (s) {
+    'foryou'    => l.discoverSrcForyou,
+    'onthisday' => l.discoverSrcOnthisday,
+    'fresh'     => l.discoverSrcFresh,
+    'genre'     => l.discoverSrcGenre,
+    'deeper'    => l.discoverSrcDeeper,
+    'forgotten' => l.discoverSrcForgotten,
+    'albums'    => l.discoverSrcAlbums,
+    _           => l.discoverSrcCountry,
+  };
+}

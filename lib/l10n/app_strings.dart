@@ -828,4 +828,32 @@ abstract class AppStrings {
   String get recapNoData;
   String get recapSeeFull;
   String get recapTop10;
+
+  // ── Discover filters ─────────────────────────────────────────────────────
+  String get discoverSmartTitle;
+  String get discoverSmartSub;
+  String get discoverLayoutTitle;
+  String get discoverLayoutScroll;
+  String get discoverLayoutWrap;
+  String get discoverLayoutList;
+  String get discoverSoloTitle;
+  String get discoverSoloSub;
+  String get discoverSoloNone;
+  String get discoverForYou;
+  String get discoverGlobalTrends;
+  String get discoverSrcForyou;
+  String get discoverSrcOnthisday;
+  String get discoverSrcFresh;
+  String get discoverSrcGenre;
+  String get discoverSrcDeeper;
+  String get discoverSrcForgotten;
+  String get discoverSrcAlbums;
+  String get discoverSrcCountry;
+  String get discoverTracks;
+  String get discoverArtists;
+  String get discoverWeek;
+  String get discoverMonth;
+  String get discoverYear;
+  String get discoverNothing;
+  String discoverLike(String names);
 }
