@@ -108,11 +108,12 @@ and</li>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
-Widget build(BuildContext context) =&gt; ListTile(
+Widget build(BuildContext context) =&gt; SettingTile(
       leading: Icon(icon),
       title: Text(title),
       subtitle: subtitle == null || subtitle!.isEmpty ? null : Text(subtitle!),
-      trailing: const Icon(Icons.chevron_right_rounded),
+      trailing: trailing ??
+          Icon(Icons.chevron_right_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
       onTap: onTap,
     );</code></pre>
 </section>

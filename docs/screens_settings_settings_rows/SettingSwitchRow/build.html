@@ -108,12 +108,13 @@ and</li>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
-Widget build(BuildContext context) =&gt; SwitchListTile(
-      secondary: Icon(icon),
+Widget build(BuildContext context) =&gt; SettingTile(
+      leading: Icon(icon),
       title: Text(title),
       subtitle: subtitle == null ? null : Text(subtitle!),
-      value: value,
-      onChanged: onChanged,
+      enabled: onChanged != null,
+      trailing: Switch(value: value, onChanged: onChanged),
+      onTap: onChanged == null ? null : () =&gt; onChanged!(!value),
     );</code></pre>
 </section>
 

@@ -111,29 +111,47 @@ and</li>
 Widget build(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
   final text = Theme.of(context).textTheme;
-  return Padding(
-    padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
-    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(children: [
-        Icon(icon, color: scheme.onSurfaceVariant),
-        const SizedBox(width: 16),
-        Expanded(child: Text(title, style: text.bodyLarge)),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-          decoration: BoxDecoration(
-            color: scheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: scheme.outlineVariant),
+  return AnimatedOpacity(
+    opacity: enabled ? 1 : 0.45,
+    duration: M3Motion.effectsFastDuration,
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          M3CookieBadge(
+            size: 40,
+            color: scheme.primaryContainer,
+            child: Icon(icon, size: 20, color: scheme.onPrimaryContainer),
           ),
-          child: Text(valueLabel, style: text.labelMedium?.copyWith(fontFamily: &#39;monospace&#39;)),
+          const SizedBox(width: 16),
+          Expanded(child: Text(title,
+              style: text.titleMedium?.copyWith(fontWeight: FontWeight.w600))),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: ShapeDecoration(
+              color: scheme.secondaryContainer,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+            child: Text(valueLabel,
+                style: text.labelLarge?.copyWith(
+                    color: scheme.onSecondaryContainer, fontWeight: FontWeight.w700)),
+          ),
+        ]),
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            trackHeight: 12,
+            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
+            overlayShape: const RoundSliderOverlayShape(overlayRadius: 22),
+          ),
+          child: Slider(
+            value: value, min: min, max: max, divisions: divisions,
+            label: valueLabel,
+            onChanged: enabled ? onChanged : null,
+            onChangeEnd: onChangeEnd,
+          ),
         ),
       ]),
-      Slider(
-        value: value, min: min, max: max, divisions: divisions,
-        label: valueLabel,
-        onChanged: onChanged, onChangeEnd: onChangeEnd,
-      ),
-    ]),
+    ),
   );
 }</code></pre>
 </section>

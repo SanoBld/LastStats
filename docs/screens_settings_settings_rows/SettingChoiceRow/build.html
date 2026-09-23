@@ -110,14 +110,16 @@ and</li>
   <pre class="language-dart"><code class="language-dart">@override
 Widget build(BuildContext context) {
   final current = options.where((o) =&gt; o.$1 == value).map((o) =&gt; o.$2);
-  return SettingActionRow(
-    icon: icon,
-    title: title,
-    subtitle: current.isEmpty ? &#39;&#39; : current.first,
+  return SettingTile(
+    leading: Icon(icon),
+    title: Text(title),
+    subtitle: description == null || description!.isEmpty ? null : Text(description!),
+    trailing: current.isEmpty ? null : _ValuePill(current.first),
     onTap: () async {
       final r = await showModalBottomSheet&lt;String&gt;(
         sheetAnimationStyle: kM3SheetAnimation,
         context: context,
+        isScrollControlled: true,
         backgroundColor: Colors.transparent,
         useSafeArea: true,
         builder: (_) =&gt; _ChoiceSheet(title: title, options: options, value: value),

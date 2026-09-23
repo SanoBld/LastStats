@@ -112,20 +112,23 @@ Widget build(BuildContext context) =&gt; SettingActionRow(
       icon: icon,
       title: title,
       subtitle: value.isEmpty ? hint : value,
+      trailing: Icon(Icons.edit_rounded, size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
       onTap: () async {
         final ctrl = TextEditingController(text: value);
         final r = await showDialog&lt;String&gt;(
+          animationStyle: kM3DialogAnimation,
           context: context,
           builder: (ctx) =&gt; AlertDialog(
+            icon: Icon(icon),
             title: Text(title),
             content: TextField(
               controller: ctrl,
               autofocus: true,
               autocorrect: false,
-              keyboardType: TextInputType.url,
+              keyboardType: keyboardType,
               decoration: InputDecoration(
                 hintText: hint,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
               ),
               onSubmitted: (v) =&gt; Navigator.pop(ctx, v.trim()),
             ),
