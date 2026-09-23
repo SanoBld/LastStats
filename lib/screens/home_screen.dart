@@ -67,6 +67,7 @@ import '../widgets/m3_components.dart';
 import 'settings/appearance_page.dart';
 import 'settings/notifications_page.dart';
 import 'settings/dashboard_settings_page.dart';
+import 'settings/settings_helpers.dart';
 import 'settings/startup_page.dart';
 import 'settings/language_page.dart';
 import 'settings/account_page.dart';

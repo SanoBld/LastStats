@@ -419,6 +419,12 @@ class M3Chip extends StatelessWidget {
           type: MaterialType.transparency,
           child: InkWell(
             borderRadius: r,
+            // Fixes a visual glitch: the default highlight color would
+            // sometimes stay painted as a full white square until the
+            // next drag/scroll event forced a repaint. Splash only, no
+            // persisting highlight overlay.
+            highlightColor: Colors.transparent,
+            splashColor: fg.withValues(alpha: 0.10),
             onTap: onSelected == null ? null : () => onSelected!(!selected),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: compact ? 12 : 16),

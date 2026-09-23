@@ -120,6 +120,11 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   List<String> _discoverSources = List.from(_kDiscoverDefault);
   int _lovedCount = 0;
 
+  // Order in which the reorderable dashboard blocks are stacked.
+  // Kept in sync with the drag handles in DashboardSettingsPage.
+  List<String> _sectionOrder = List.from(kDefaultSectionOrder);
+  bool _infiniteScroll = false;
+
   // Dashboard chart (replaces the old top artists/albums/tracks block).
   // 'calendar' = listening calendar heatmap, 'monthly' = monthly bars.
   String _dashboardChart      = 'calendar';
@@ -342,6 +347,8 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         p.setBool('ls_discover_v2', true);
       }
       _showFriends           = p.getBool('ls_show_friends')             ?? true;
+      _sectionOrder          = migrateSectionOrder(p.getStringList('ls_section_order'));
+      _infiniteScroll        = p.getBool('ls_infinite_scroll')          ?? false;
       final rawCards = p.getStringList('ls_stat_cards');
       _statCards   = rawCards != null && rawCards.isNotEmpty
           ? rawCards : List.from(_kDefaultStatCards);
@@ -435,6 +442,131 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
           {'calendar': calendarData, 'monthly': monthlyData});
     } catch (_) {
       if (mounted) setState(() => _dashChartLoading = false);
+    }
+  }
+
+  // Returns [block, SizedBox(20)] for a reorderable section id, or []
+  // when that section is hidden / has nothing to show. Keeping this as
+  // a list (not a single widget) lets a hidden section contribute no
+  // spacing at all, same as the old fixed-order `if (...) [...]` blocks.
+  List<Widget> _buildOrderedSection(
+    String id, {
+    required int total, required double avg, required int weekly,
+    required int days, required String regStr, required String country,
+    required Map? topArtist, required Map? topAlbum,
+    required Map? topTrack, required Map? lastTrack,
+    required bool favoritesEnabled,
+  }) {
+    final delay = Duration(milliseconds: 120 + 30 * _sectionOrder.indexOf(id));
+    switch (id) {
+      case 'stats':
+        if (!_showStats) return const [];
+        return [
+          _FadeSlideIn(
+            skipAnimation: _dashboardEntrancePlayed,
+            delay: delay,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              _SectionHeader(title: L.dashStats, icon: Icons.bar_chart_rounded),
+              const SizedBox(height: 10),
+              ValueListenableBuilder<bool>(
+                valueListenable: showFavoritesStatNotifier,
+                builder: (_, showFavStat, _) => _HeroStatCard(
+                  total:       total,
+                  avg:         avg.round(),
+                  days:        days,
+                  weekly:      weekly,
+                  regStr:      regStr,
+                  lovedCount:  _lovedCount,
+                  showLoved:   showFavStat && favoritesEnabled,
+                  onFavoritesTap: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => FavoritesPage(service: widget.service),
+                  )),
+                ),
+              ),
+              const SizedBox(height: 10),
+              _StatGrid(children: _statCards.map((cid) {
+                return _buildStatCard(
+                  cid,
+                  total: total, avg: avg, weekly: weekly,
+                  days: days, regStr: regStr, country: country,
+                  topArtist: topArtist, topAlbum: topAlbum,
+                  topTrack: topTrack, lastTrack: lastTrack,
+                  topArtistWeek: _topArtistsWeek.isNotEmpty ? _topArtistsWeek[0] as Map : null,
+                  topAlbumWeek:  _topAlbumsWeek.isNotEmpty  ? _topAlbumsWeek[0]  as Map : null,
+                  topTrackWeek:  _topTracksWeek.isNotEmpty  ? _topTracksWeek[0]  as Map : null,
+                );
+              }).whereType<Widget>().toList()),
+            ]),
+          ),
+          const SizedBox(height: 20),
+        ];
+
+      case 'discover':
+        if (!_showDiscover || _discoverSources.isEmpty) return const [];
+        return [
+          _FadeSlideIn(
+            skipAnimation: _dashboardEntrancePlayed,
+            delay: delay,
+            child: _DiscoverSection(
+              service:   widget.service,
+              topArtist: (topArtist?['name'] ?? '').toString(),
+              country:   country,
+              sources:   _discoverSources,
+              infiniteScroll: _infiniteScroll,
+            ),
+          ),
+          const SizedBox(height: 20),
+        ];
+
+      case 'recent':
+        if (!_showRecent || _recentTracks.isEmpty) return const [];
+        return [
+          _FadeSlideIn(
+            skipAnimation: _dashboardEntrancePlayed,
+            delay: delay,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              _SectionHeader(title: L.dashRecentPlaysLabel, icon: Icons.history_rounded),
+              const SizedBox(height: 10),
+              _RecentTracksList(
+                tracks:  _recentTracks.take(5).toList(),
+                service: widget.service,
+              ),
+            ]),
+          ),
+          const SizedBox(height: 20),
+        ];
+
+      case 'friends':
+        if (!_showFriends) return const [];
+        return [
+          _FadeSlideIn(
+            skipAnimation: _dashboardEntrancePlayed,
+            delay: delay,
+            child: _FriendsSection(
+              friends:     _friends,
+              favorites:   _favFriends,
+              favProfiles: _favProfiles,
+              service:     widget.service,
+              isLoading:   _friendsLoading,
+              onToggleFav: _toggleFav,
+              onRefresh:   _loadFriends,
+            ),
+          ),
+          const SizedBox(height: 20),
+        ];
+
+      case 'chart':
+        return [
+          _FadeSlideIn(
+            skipAnimation: _dashboardEntrancePlayed,
+            delay: delay,
+            child: _buildDashboardChartSection(),
+          ),
+          const SizedBox(height: 20),
+        ];
+
+      default:
+        return const [];
     }
   }
 
@@ -1921,109 +2053,16 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                 const SizedBox(height: 20),
               ],
 
-              // ── Stats ────────────────────────────────────────────────────
-              if (_showStats) ...[
-                _FadeSlideIn(
-                  skipAnimation: _dashboardEntrancePlayed,
-                  delay: const Duration(milliseconds: 120),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    _SectionHeader(title: L.dashStats, icon: Icons.bar_chart_rounded),
-                    const SizedBox(height: 10),
-                    ValueListenableBuilder<bool>(
-                      valueListenable: showFavoritesStatNotifier,
-                      builder: (_, showFavStat, _) => _HeroStatCard(
-                        total:       total,
-                        avg:         avg.round(),
-                        days:        days,
-                        weekly:      weekly,
-                        regStr:      regStr,
-                        lovedCount:  _lovedCount,
-                        showLoved:   showFavStat && favoritesEnabled,
-                        onFavoritesTap: () => Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => FavoritesPage(service: widget.service),
-                        )),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    _StatGrid(children: _statCards.map((id) {
-                      return _buildStatCard(
-                        id,
-                        total: total, avg: avg, weekly: weekly,
-                        days: days, regStr: regStr, country: country,
-                        topArtist: topArtist, topAlbum: topAlbum,
-                        topTrack: topTrack, lastTrack: lastTrack,
-                        topArtistWeek: _topArtistsWeek.isNotEmpty ? _topArtistsWeek[0] as Map : null,
-                        topAlbumWeek:  _topAlbumsWeek.isNotEmpty  ? _topAlbumsWeek[0]  as Map : null,
-                        topTrackWeek:  _topTracksWeek.isNotEmpty  ? _topTracksWeek[0]  as Map : null,
-                      );
-                    }).whereType<Widget>().toList()),
-                  ]),
+              // ── Reorderable blocks (order set in Dashboard Settings) ─────
+              for (final id in _sectionOrder)
+                ..._buildOrderedSection(
+                  id,
+                  total: total, avg: avg, weekly: weekly, days: days,
+                  regStr: regStr, country: country,
+                  topArtist: topArtist, topAlbum: topAlbum,
+                  topTrack: topTrack, lastTrack: lastTrack,
+                  favoritesEnabled: favoritesEnabled,
                 ),
-                const SizedBox(height: 20),
-              ],
-
-              // ── Discover: swipeable picks (community, charts, for you) ───
-              if (_showDiscover && _discoverSources.isNotEmpty) ...[
-                _FadeSlideIn(
-                  skipAnimation: _dashboardEntrancePlayed,
-                  delay: const Duration(milliseconds: 150),
-                  child: _DiscoverSection(
-                    service:   widget.service,
-                    topArtist: (topArtist?['name'] ?? '').toString(),
-                    country:   country,
-                    sources:   _discoverSources,
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
-
-              // ── Recent plays ─────────────────────────────────────────────
-              if (_showRecent && _recentTracks.isNotEmpty) ...[
-                _FadeSlideIn(
-                  skipAnimation: _dashboardEntrancePlayed,
-                  delay: const Duration(milliseconds: 180),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    _SectionHeader(
-                      title: L.dashRecentPlaysLabel,
-                      icon: Icons.history_rounded,
-                    ),
-                    const SizedBox(height: 10),
-                    _RecentTracksList(
-                      tracks:  _recentTracks.take(5).toList(),
-                      service: widget.service,
-                    ),
-                  ]),
-                ),
-                const SizedBox(height: 20),
-              ],
-
-              // ── Friends ──────────────────────────────────────────────────
-              if (_showFriends) ...[
-                _FadeSlideIn(
-                  skipAnimation: _dashboardEntrancePlayed,
-                  delay: const Duration(milliseconds: 240),
-                  child: _FriendsSection(
-                    friends:     _friends,
-                    favorites:   _favFriends,
-                    favProfiles: _favProfiles,
-                    service:     widget.service,
-                    isLoading:   _friendsLoading,
-                    onToggleFav: _toggleFav,
-                    onRefresh:   _loadFriends,
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
-
-              // ── Dashboard chart (replaces top artists/albums/tracks) ─────
-              // Shows the listening calendar (heatmap) or monthly bars,
-              // picked by the user in the dashboard settings page.
-              _FadeSlideIn(
-                skipAnimation: _dashboardEntrancePlayed,
-                delay: const Duration(milliseconds: 300),
-                child: _buildDashboardChartSection(),
-              ),
-              const SizedBox(height: 20),
 
             ]),
           ),

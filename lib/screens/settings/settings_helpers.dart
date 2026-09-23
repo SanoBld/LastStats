@@ -71,6 +71,41 @@ const kAllStatCards = [
 ];
 const kDefaultStatCards = ['top_artist', 'top_album', 'top_track', 'last_track', 'favorites_count'];
 
+// ── Reorderable dashboard section order ─────────────────────────────────────
+// The 5 blocks below "now playing" / the week-highlight strip that the user
+// can both show/hide (existing settings) and now drag-reorder.
+const kDefaultSectionOrder = ['stats', 'discover', 'recent', 'friends', 'chart'];
+
+/// Cleans a saved section order: drops unknown ids, appends any new/missing
+/// id from [kDefaultSectionOrder] at the end so an older save (or one from
+/// before this feature existed) still shows every block.
+List<String> migrateSectionOrder(List<String>? saved) {
+  if (saved == null || saved.isEmpty) return List.from(kDefaultSectionOrder);
+  final out = <String>[for (final id in saved) if (kDefaultSectionOrder.contains(id)) id];
+  for (final id in kDefaultSectionOrder) {
+    if (!out.contains(id)) out.add(id);
+  }
+  return out;
+}
+
+String sectionOrderLabel(String id) => switch (id) {
+  'stats'    => pickLang(fr: 'Statistiques', en: 'Stats', es: 'Estadísticas', zh: '统计', pt: 'Estatísticas'),
+  'discover' => pickLang(fr: 'Découvrir', en: 'Discover', es: 'Descubrir', zh: '发现', pt: 'Descobrir'),
+  'recent'   => pickLang(fr: 'Écoutes récentes', en: 'Recent plays', es: 'Reproducciones recientes', zh: '最近播放', pt: 'Tocadas recentemente'),
+  'friends'  => pickLang(fr: 'Amis', en: 'Friends', es: 'Amigos', zh: '好友', pt: 'Amigos'),
+  'chart'    => pickLang(fr: 'Graphique / calendrier', en: 'Chart / calendar', es: 'Gráfico / calendario', zh: '图表/日历', pt: 'Gráfico / calendário'),
+  _          => id,
+};
+
+IconData sectionOrderIcon(String id) => switch (id) {
+  'stats'    => Icons.bar_chart_rounded,
+  'discover' => Icons.explore_rounded,
+  'recent'   => Icons.history_rounded,
+  'friends'  => Icons.people_rounded,
+  'chart'    => Icons.grid_on_rounded,
+  _          => Icons.widgets_rounded,
+};
+
 String statCardLabel(String id) {
   for (final c in kAllStatCards) {
     if (c.$1 == id) {
@@ -499,6 +534,71 @@ class _CardReorderSheetState extends State<CardReorderSheet> {
                   trailing: Icon(Icons.drag_handle_rounded, color: scheme.onSurfaceVariant),
                 ));
             }).toList(),
+          )),
+        ])),
+      ),
+    );
+  }
+}
+
+// ── Bottom sheet to drag-reorder the dashboard's main sections ─────────────
+class SectionOrderSheet extends StatefulWidget {
+  final List<String> order;
+  const SectionOrderSheet({super.key, required this.order});
+
+  @override
+  State<SectionOrderSheet> createState() => _SectionOrderSheetState();
+}
+
+class _SectionOrderSheetState extends State<SectionOrderSheet> {
+  late List<String> _items;
+
+  @override
+  void initState() { super.initState(); _items = List.from(widget.order); }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+    final ctrl   = ScrollController();
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.55, minChildSize: 0.35, maxChildSize: 0.85, expand: false,
+      builder: (ctx, sc) => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        child: Container(color: scheme.surface, child: Column(children: [
+          Center(child: Container(margin: const EdgeInsets.only(top: 10, bottom: 8),
+              width: 36, height: 4, decoration: BoxDecoration(
+                  color: scheme.outlineVariant, borderRadius: BorderRadius.circular(2)))),
+          Padding(padding: const EdgeInsets.fromLTRB(20, 4, 16, 12), child: Row(children: [
+            Text(pickLang(fr: 'Réorganiser', en: 'Reorder', es: 'Reordenar', zh: '调整顺序', pt: 'Reordenar'),
+                style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+            const Spacer(),
+            FilledButton(onPressed: () => Navigator.pop(ctx, _items),
+                child: Text(L.commonSave)),
+          ])),
+          Expanded(child: ReorderableListView(
+            scrollController: ctrl,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            onReorderItem: (oldIdx, newIdx) => setState(() {
+              final item = _items.removeAt(oldIdx);
+              _items.insert(newIdx, item);
+            }),
+            children: [
+              for (final id in _items)
+                Card(key: ValueKey(id), elevation: 0,
+                  color: scheme.surfaceContainerHighest,
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.4))),
+                  child: ListTile(
+                    leading: Icon(sectionOrderIcon(id), color: scheme.primary),
+                    title: Text(sectionOrderLabel(id),
+                        style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                    trailing: Icon(Icons.drag_handle_rounded, color: scheme.onSurfaceVariant),
+                  ),
+                ),
+            ],
           )),
         ])),
       ),

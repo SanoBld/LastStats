@@ -21,6 +21,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'lastfm_service.dart';
+import 'all_scrobbles_service.dart';
 
 class TasteRec {
   final String name;
@@ -286,7 +287,9 @@ class TasteEngine {
         final name = _n(t['name']);
         final count = int.tryParse((t['count'] ?? '0').toString()) ?? 0;
         if (name.isEmpty || count < 20 || _genericTags.contains(name) ||
-            _badTag.hasMatch(name) || p.knownArtists.contains(name)) continue;
+            _badTag.hasMatch(name) || p.knownArtists.contains(name)) {
+          continue;
+        }
         score[name] = (score[name] ?? 0) + seeds[i].value * count / 100;
       }
     }
@@ -363,6 +366,35 @@ class TasteEngine {
     return out;
   }
 
+  /// "On this day": tracks you played on this same day/month in past years,
+  /// picked from the local full-history cache (offline, no network call).
+  /// Only years that have already been downloaded into the cache are used,
+  /// so this can return fewer items — or none — until the history is loaded.
+  Future<List<TasteRec>> onThisDay({int limit = 24}) async {
+    final now = DateTime.now();
+    final out = <TasteRec>[];
+    final seen = <String>{};
+    for (final year in AllScrobblesService.getCachedYears()) {
+      if (year == now.year) continue; // "today" itself, not a memory yet
+      final recs = AllScrobblesService.getRecordsForYear(year);
+      if (recs == null || recs.isEmpty) continue;
+      for (final r in recs) {
+        final d = DateTime.fromMillisecondsSinceEpoch(r.ts * 1000);
+        if (d.month != now.month || d.day != now.day) continue;
+        final key = '${_n(r.artist)}|${_n(r.track)}';
+        if (!seen.add(key)) continue;
+        out.add(TasteRec(
+            name: r.track, artist: r.artist, type: 'tracks',
+            reasons: ['${now.year - year}']));
+      }
+    }
+    // Most recent memories first (a track from last year rather than five
+    // years ago feels more relevant), shuffled a little inside each year
+    // so it is not always the same handful of tracks from that day.
+    out.shuffle();
+    return out.take(limit).toList();
+  }
+
   /// Best albums of the artists the engine recommends, minus albums you own.
   Future<List<TasteRec>> albums({int limit = 24}) async {
     final p = await _getProfile();
@@ -380,7 +412,7 @@ class TasteEngine {
         if (m is! Map) continue;
         final name = (m['name'] ?? '').toString();
         if (name.isEmpty || name == '(null)' ||
-            p.knownAlbums.contains('${_n(recs[j].name)}|${_n(name)}')) continue;
+            p.knownAlbums.contains('${_n(recs[j].name)}|${_n(name)}')) { continue; }
         out.add(TasteRec(
             name: name, artist: recs[j].name, type: 'albums',
             image: m['image'], reasons: recs[j].reasons));

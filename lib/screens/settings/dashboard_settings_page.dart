@@ -49,6 +49,8 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   bool   _showFavorites         = true;
   bool   _headerMusicAnim       = false; // equalizer animation when music is playing
   List<String> _statCards       = List.from(kDefaultStatCards);
+  List<String> _sectionOrder    = List.from(kDefaultSectionOrder);
+  bool   _infiniteScroll        = false;
 
   final _customUrlCtrl         = TextEditingController();
   final _fallbackCustomUrlCtrl = TextEditingController();
@@ -91,6 +93,8 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
       _showFriends           = p.getBool('ls_show_friends')              ?? true;
       _showFavorites         = p.getBool('ls_show_favorites')            ?? true;
       _headerMusicAnim       = p.getBool('ls_header_music_anim')         ?? false;
+      _sectionOrder          = migrateSectionOrder(p.getStringList('ls_section_order'));
+      _infiniteScroll        = p.getBool('ls_infinite_scroll')          ?? false;
       final raw = p.getStringList('ls_stat_cards');
       _statCards = raw != null && raw.isNotEmpty ? raw : List.from(kDefaultStatCards);
     });
@@ -445,6 +449,38 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
 
         // ── Sections visibles ─────────────────────────────────────────────
         SettingsSection(label: L.settingsVisibleSections, children: [
+          Padding(padding: const EdgeInsets.fromLTRB(16, 12, 16, 4), child: FilledButton.tonalIcon(
+            icon: const Icon(Icons.swap_vert_rounded, size: 18),
+            label: Text(pickLang(
+                fr: 'Réorganiser les sections', en: 'Reorder sections',
+                es: 'Reordenar secciones', zh: '调整版块顺序', pt: 'Reordenar seções')),
+            onPressed: () async {
+              final result = await showModalBottomSheet<List<String>>(
+                sheetAnimationStyle: kM3SheetAnimation,
+                context: context, isScrollControlled: true,
+                backgroundColor: Colors.transparent, useSafeArea: true,
+                builder: (_) => SectionOrderSheet(order: List.from(_sectionOrder)),
+              );
+              if (result != null && mounted) {
+                await _saveList('ls_section_order', result);
+                setState(() => _sectionOrder = result);
+              }
+            },
+          )),
+          SwitchListTile(
+            secondary: const Icon(Icons.loop_rounded),
+            title: Text(pickLang(
+                fr: 'Défilement infini', en: 'Infinite scroll',
+                es: 'Desplazamiento infinito', zh: '无限滚动', pt: 'Rolagem infinita')),
+            subtitle: Text(pickLang(
+                fr: 'La section Découvrir boucle et charge plus de suggestions',
+                en: 'The Discover section loops and loads more suggestions',
+                es: 'La sección Descubrir se repite y carga más sugerencias',
+                zh: '"发现"版块循环并加载更多推荐',
+                pt: 'A seção Descobrir repete e carrega mais sugestões')),
+            value: _infiniteScroll,
+            onChanged: (v) async { await _set('ls_infinite_scroll', v); setState(() => _infiniteScroll = v); }),
+          const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
             secondary: const Icon(Icons.play_circle_outline_rounded),
             title: Text(L.settingsNowPlayingSection), value: _showNowPlay,
@@ -475,6 +511,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                   title: pickLang(fr: 'Pour toi', en: 'For you', es: 'Para ti', zh: '为你推荐', pt: 'Para você'),
                   labels: {
                     'foryou':    pickLang(fr: 'Ton mix', en: 'Your mix', es: 'Tu mix', zh: '你的混合推荐', pt: 'Seu mix'),
+                    'onthisday': pickLang(fr: 'Ce jour-là', en: 'On this day', es: 'Un día como hoy', zh: '历史上的今天', pt: 'Neste dia'),
                     'fresh':     pickLang(fr: 'Ce mois-ci', en: 'This month', es: 'Este mes', zh: '本月', pt: 'Este mês'),
                     'genre':     pickLang(fr: 'Tes genres', en: 'Your genres', es: 'Tus géneros', zh: '你的音乐类型', pt: 'Seus gêneros'),
                     'deeper':    pickLang(fr: 'Titres cachés', en: 'Deep cuts', es: 'Joyas ocultas', zh: '冷门佳作', pt: 'Faixas escondidas'),
@@ -485,7 +522,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                   selected: _discoverSources,
                   onToggleGroup: (on) async {
                     final next = List<String>.from(_discoverSources);
-                    for (final k in ['foryou', 'fresh', 'genre', 'deeper', 'forgotten', 'albums', 'country']) {
+                    for (final k in ['foryou', 'onthisday', 'fresh', 'genre', 'deeper', 'forgotten', 'albums', 'country']) {
                       if (on) { if (!next.contains(k)) next.add(k); }
                       else { next.remove(k); }
                     }

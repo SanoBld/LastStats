@@ -25,7 +25,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 part of 'home_screen.dart';
 
-const _kDiscoverPersonal = ['foryou', 'fresh', 'genre', 'deeper', 'forgotten', 'albums', 'country'];
+const _kDiscoverPersonal = ['foryou', 'onthisday', 'fresh', 'genre', 'deeper', 'forgotten', 'albums', 'country'];
 // gt = tracks, ga = artists, gb = albums  ·  week / month / year
 const _kDiscoverGlobal = [
   'gt_week', 'gt_month', 'gt_year',
@@ -74,11 +74,13 @@ class _DiscoverSection extends StatelessWidget {
   final LastFmService service;
   final String topArtist, country;
   final List<String> sources;
+  final bool infiniteScroll;
   const _DiscoverSection({
     required this.service,
     required this.topArtist,
     required this.country,
     required this.sources,
+    this.infiniteScroll = false,
   });
 
   List<String> _avail(List<String> group) => [
@@ -111,6 +113,7 @@ class _DiscoverSection extends StatelessWidget {
               sources: personal,
               icon: Icons.auto_awesome_rounded,
               title: _tr({'fr': 'Pour toi', 'en': 'For you', 'es': 'Para ti', 'de': 'Für dich', 'it': 'Per te', 'pt': 'Para você'}),
+              infiniteScroll: infiniteScroll,
             ),
           if (personal.isNotEmpty && global.isNotEmpty) const SizedBox(height: 20),
           if (global.isNotEmpty)
@@ -122,6 +125,7 @@ class _DiscoverSection extends StatelessWidget {
               sources: global,
               icon: Icons.public_rounded,
               title: _tr({'fr': 'Tendances mondiales', 'en': 'Global trends', 'es': 'Tendencias globales', 'de': 'Globale Trends', 'it': 'Tendenze globali', 'pt': 'Tendências globais'}),
+              infiniteScroll: infiniteScroll,
             ),
         ]),
       ),
@@ -136,6 +140,7 @@ class _DiscoverGroup extends StatefulWidget {
   final List<String> sources;
   final IconData icon;
   final String title;
+  final bool infiniteScroll;
   const _DiscoverGroup({
     super.key,
     required this.service,
@@ -144,6 +149,7 @@ class _DiscoverGroup extends StatefulWidget {
     required this.sources,
     required this.icon,
     required this.title,
+    this.infiniteScroll = false,
   });
 
   @override
@@ -195,6 +201,7 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
     }
     return switch (s) {
       'foryou'    => _tr({'fr': 'Ton mix', 'en': 'Your mix', 'es': 'Tu mix', 'de': 'Dein Mix', 'it': 'Il tuo mix', 'pt': 'Seu mix'}),
+      'onthisday' => _tr({'fr': 'Ce jour-là', 'en': 'On this day', 'es': 'Un día como hoy', 'de': 'An diesem Tag', 'it': 'In questo giorno', 'pt': 'Neste dia'}),
       'fresh'     => _tr({'fr': 'Ce mois-ci', 'en': 'This month', 'es': 'Este mes', 'de': 'Diesen Monat', 'it': 'Questo mese', 'pt': 'Este mês'}),
       'genre'     => _tr({'fr': 'Tes genres', 'en': 'Your genres', 'es': 'Tus géneros', 'de': 'Deine Genres', 'it': 'I tuoi generi', 'pt': 'Seus gêneros'}),
       'deeper'    => _tr({'fr': 'Titres cachés', 'en': 'Deep cuts', 'es': 'Joyas ocultas', 'de': 'Deep Cuts', 'it': 'Perle nascoste', 'pt': 'Faixas escondidas'}),
@@ -313,6 +320,8 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
         return (await engine.deeperCuts(limit: _kDiscoverFetchLimit)).map(_fromRec).toList();
       case 'forgotten':
         return (await engine.forgotten(limit: _kDiscoverFetchLimit)).map(_fromRec).toList();
+      case 'onthisday':
+        return (await engine.onThisDay(limit: _kDiscoverFetchLimit)).map(_fromRec).toList();
       case 'albums':
         return (await engine.albums(limit: _kDiscoverFetchLimit)).map(_fromRec).toList();
       default:
@@ -411,12 +420,16 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
                         ),
                       )
                     : PageView.builder(
-                        key: ValueKey(_source),
+                        key: ValueKey('${_source}_${widget.infiniteScroll}'),
                         controller: _ctrl,
                         padEnds: false,
                         physics: const BouncingScrollPhysics(),
-                        itemCount: _items.length,
-                        itemBuilder: (_, i) => _card(i, imgSz, scheme, text),
+                        // Infinite scroll: no bound on itemCount, cards
+                        // just repeat by wrapping the index — cheap and
+                        // avoids having to keep fetching new pages from
+                        // Last.fm/ListenBrainz just to fill an endless list.
+                        itemCount: widget.infiniteScroll ? null : _items.length,
+                        itemBuilder: (_, i) => _card(i % _items.length, imgSz, scheme, text),
                       ),
           ),
         );

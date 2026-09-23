@@ -32,6 +32,14 @@
 
 ## v3.6.0
 
+**Dashboard: reorderable and more customizable**
+- New "Reorder sections" button in Settings > Dashboard: drag Stats, Discover, Recent plays, Friends and the Chart/calendar block into any order you like
+- New "Infinite scroll" option in Settings > Dashboard: the Discover section loops endlessly instead of stopping at the last card
+- New Discover source "On this day": tracks you played on this same day/month in previous years, pulled from your locally cached listening history (works offline once your history is loaded)
+
+**Fixes**
+- Fixed a white square that stayed visible on a chip (e.g. tapping "This month" in Discover) until scrolling — chips no longer keep a stuck highlight after a tap
+
 **Material 3 Expressive**
 - New wavy loading indicator (rotating bumpy shape) replaces the old spinners on full pages, chart sections and dialogs
 - Loading screens are centered and visible everywhere, skeleton blocks have more contrast in dark theme
