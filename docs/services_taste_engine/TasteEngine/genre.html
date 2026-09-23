@@ -82,7 +82,9 @@
       final name = _n(t[&#39;name&#39;]);
       final count = int.tryParse((t[&#39;count&#39;] ?? &#39;0&#39;).toString()) ?? 0;
       if (name.isEmpty || count &lt; 20 || _genericTags.contains(name) ||
-          _badTag.hasMatch(name) || p.knownArtists.contains(name)) continue;
+          _badTag.hasMatch(name) || p.knownArtists.contains(name)) {
+        continue;
+      }
       score[name] = (score[name] ?? 0) + seeds[i].value * count &#47; 100;
     }
   }

@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the albums method from the TasteEngine class, for the Dart programming language.">
-  <title>albums method - TasteEngine class - taste_engine library - Dart API</title>
+  <meta name="description" content="API docs for the createState method from the SectionOrderSheet class, for the Dart programming language.">
+  <title>createState method - SectionOrderSheet class - settings_helpers library - Dart API</title>
 
 
   
@@ -25,11 +25,11 @@
   <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">laststats_mobile</a></li>
-    <li><a href="../../services_taste_engine/">services&#47;taste_engine.dart</a></li>
-    <li><a href="../../services_taste_engine/TasteEngine-class.html">TasteEngine</a></li>
-    <li class="self-crumb">albums method</li>
+    <li><a href="../../screens_settings_settings_helpers/">screens&#47;settings&#47;settings_helpers.dart</a></li>
+    <li><a href="../../screens_settings_settings_helpers/SectionOrderSheet-class.html">SectionOrderSheet</a></li>
+    <li class="self-crumb">createState method</li>
   </ol>
-  <div class="self-name">albums</div>
+  <div class="self-name">createState</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -46,56 +46,48 @@
 <div
     id="dartdoc-main-content"
     class="main-content"
-    data-above-sidebar="services_taste_engine&#47;TasteEngine-class-sidebar.html"
+    data-above-sidebar="screens_settings_settings_helpers&#47;SectionOrderSheet-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">albums</span> method 
+<h1><span class="kind-method">createState</span> method 
 </h1></div>
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../services_taste_engine/TasteRec-class.html">TasteRec</a></span>&gt;</span></span>&gt;</span></span>
-<span class="name ">albums</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="albums-param-limit"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">limit</span> = <span class="default-value">24</span>, </span></li>
-</ol>})
+  <div>
+    <ol class="annotation-list">
+        <li>@<a href="https://api.flutter.dev/flutter/dart-core/override-constant.html">override</a></li>
+    </ol>
+  </div>
+<span class="returntype"><a href="https://api.flutter.dev/flutter/widgets/State-class.html">State</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../screens_settings_settings_helpers/SectionOrderSheet-class.html">SectionOrderSheet</a></span>&gt;</span></span>
+<span class="name ">createState</span>(<wbr>)
 
-      
+      <div class="features"><span class="feature">override</span></div>
 
     </section>
     
 <section class="desc markdown">
-  <p>Best albums of the artists the engine recommends, minus albums you own.</p>
+  <p>Creates the mutable state for this widget at a given location in the tree.</p>
+<p>Subclasses should override this method to return a newly created
+instance of their associated <a href="https://api.flutter.dev/flutter/widgets/State-class.html">State</a> subclass:</p>
+<pre class="language-dart"><code class="language-dart">@override
+State&lt;SomeWidget&gt; createState() =&gt; _SomeWidgetState();
+</code></pre>
+<p>The framework can call this method multiple times over the lifetime of
+a <a href="https://api.flutter.dev/flutter/widgets/StatefulWidget-class.html">StatefulWidget</a>. For example, if the widget is inserted into the tree
+in multiple locations, the framework will create a separate <a href="https://api.flutter.dev/flutter/widgets/State-class.html">State</a> object
+for each location. Similarly, if the widget is removed from the tree and
+later inserted into the tree again, the framework will call <a href="../../screens_settings_settings_helpers/SectionOrderSheet/createState.html">createState</a>
+again to create a fresh <a href="https://api.flutter.dev/flutter/widgets/State-class.html">State</a> object, simplifying the lifecycle of
+<a href="https://api.flutter.dev/flutter/widgets/State-class.html">State</a> objects.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;List&lt;TasteRec&gt;&gt; albums({int limit = 24}) async {
-  final p = await _getProfile();
-  final recs = (await forYou(limit: 12)).take(10).toList();
-  final lists = await _pool&lt;TasteRec, List&lt;dynamic&gt;&gt;(
-      recs, (r) =&gt; s.getArtistTopAlbums(r.name, limit: 4));
-
-  final out = &lt;TasteRec&gt;[];
-  for (var i = 0; out.length &lt; limit; i++) {
-    var any = false;
-    for (var j = 0; j &lt; recs.length; j++) {
-      if (i &gt;= lists[j].length) continue;
-      any = true;
-      final m = lists[j][i];
-      if (m is! Map) continue;
-      final name = (m[&#39;name&#39;] ?? &#39;&#39;).toString();
-      if (name.isEmpty || name == &#39;(null)&#39; ||
-          p.knownAlbums.contains(&#39;${_n(recs[j].name)}|${_n(name)}&#39;)) { continue; }
-      out.add(TasteRec(
-          name: name, artist: recs[j].name, type: &#39;albums&#39;,
-          image: m[&#39;image&#39;], reasons: recs[j].reasons));
-      if (out.length &gt;= limit) break;
-    }
-    if (!any || i &gt;= 3) break;
-  }
-  return out;
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">@override
+State&lt;SectionOrderSheet&gt; createState() =&gt; _SectionOrderSheetState();</code></pre>
 </section>
 
 
@@ -109,12 +101,12 @@
 </header>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">laststats_mobile</a></li>
-    <li><a href="../../services_taste_engine/">taste_engine</a></li>
-    <li><a href="../../services_taste_engine/TasteEngine-class.html">TasteEngine</a></li>
-    <li class="self-crumb">albums method</li>
+    <li><a href="../../screens_settings_settings_helpers/">settings_helpers</a></li>
+    <li><a href="../../screens_settings_settings_helpers/SectionOrderSheet-class.html">SectionOrderSheet</a></li>
+    <li class="self-crumb">createState method</li>
 </ol>
 
-    <h5>TasteEngine class</h5>
+    <h5>SectionOrderSheet class</h5>
     <div id="dartdoc-sidebar-left-content"></div>
   </div><!--/.sidebar-offcanvas-->
   <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">

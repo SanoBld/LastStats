@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the albums method from the TasteEngine class, for the Dart programming language.">
-  <title>albums method - TasteEngine class - taste_engine library - Dart API</title>
+  <meta name="description" content="API docs for the onThisDay method from the TasteEngine class, for the Dart programming language.">
+  <title>onThisDay method - TasteEngine class - taste_engine library - Dart API</title>
 
 
   
@@ -27,9 +27,9 @@
     <li><a href="../../index.html">laststats_mobile</a></li>
     <li><a href="../../services_taste_engine/">services&#47;taste_engine.dart</a></li>
     <li><a href="../../services_taste_engine/TasteEngine-class.html">TasteEngine</a></li>
-    <li class="self-crumb">albums method</li>
+    <li class="self-crumb">onThisDay method</li>
   </ol>
-  <div class="self-name">albums</div>
+  <div class="self-name">onThisDay</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -49,13 +49,13 @@
     data-above-sidebar="services_taste_engine&#47;TasteEngine-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">albums</span> method 
+<h1><span class="kind-method">onThisDay</span> method 
 </h1></div>
 
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../services_taste_engine/TasteRec-class.html">TasteRec</a></span>&gt;</span></span>&gt;</span></span>
-<span class="name ">albums</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="albums-param-limit"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">limit</span> = <span class="default-value">24</span>, </span></li>
+<span class="name ">onThisDay</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="onThisDay-param-limit"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">limit</span> = <span class="default-value">24</span>, </span></li>
 </ol>})
 
       
@@ -63,38 +63,39 @@
     </section>
     
 <section class="desc markdown">
-  <p>Best albums of the artists the engine recommends, minus albums you own.</p>
+  <p>"On this day": tracks you played on this same day/month in past years,
+picked from the local full-history cache (offline, no network call).
+Only years that have already been downloaded into the cache are used,
+so this can return fewer items — or none — until the history is loaded.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;List&lt;TasteRec&gt;&gt; albums({int limit = 24}) async {
-  final p = await _getProfile();
-  final recs = (await forYou(limit: 12)).take(10).toList();
-  final lists = await _pool&lt;TasteRec, List&lt;dynamic&gt;&gt;(
-      recs, (r) =&gt; s.getArtistTopAlbums(r.name, limit: 4));
-
+  <pre class="language-dart"><code class="language-dart">Future&lt;List&lt;TasteRec&gt;&gt; onThisDay({int limit = 24}) async {
+  final now = DateTime.now();
   final out = &lt;TasteRec&gt;[];
-  for (var i = 0; out.length &lt; limit; i++) {
-    var any = false;
-    for (var j = 0; j &lt; recs.length; j++) {
-      if (i &gt;= lists[j].length) continue;
-      any = true;
-      final m = lists[j][i];
-      if (m is! Map) continue;
-      final name = (m[&#39;name&#39;] ?? &#39;&#39;).toString();
-      if (name.isEmpty || name == &#39;(null)&#39; ||
-          p.knownAlbums.contains(&#39;${_n(recs[j].name)}|${_n(name)}&#39;)) { continue; }
+  final seen = &lt;String&gt;{};
+  for (final year in AllScrobblesService.getCachedYears()) {
+    if (year == now.year) continue; &#47;&#47; &quot;today&quot; itself, not a memory yet
+    final recs = AllScrobblesService.getRecordsForYear(year);
+    if (recs == null || recs.isEmpty) continue;
+    for (final r in recs) {
+      final d = DateTime.fromMillisecondsSinceEpoch(r.ts * 1000);
+      if (d.month != now.month || d.day != now.day) continue;
+      final key = &#39;${_n(r.artist)}|${_n(r.track)}&#39;;
+      if (!seen.add(key)) continue;
       out.add(TasteRec(
-          name: name, artist: recs[j].name, type: &#39;albums&#39;,
-          image: m[&#39;image&#39;], reasons: recs[j].reasons));
-      if (out.length &gt;= limit) break;
+          name: r.track, artist: r.artist, type: &#39;tracks&#39;,
+          reasons: [&#39;${now.year - year}&#39;]));
     }
-    if (!any || i &gt;= 3) break;
   }
-  return out;
+  &#47;&#47; Most recent memories first (a track from last year rather than five
+  &#47;&#47; years ago feels more relevant), shuffled a little inside each year
+  &#47;&#47; so it is not always the same handful of tracks from that day.
+  out.shuffle();
+  return out.take(limit).toList();
 }</code></pre>
 </section>
 
@@ -111,7 +112,7 @@
     <li><a href="../../index.html">laststats_mobile</a></li>
     <li><a href="../../services_taste_engine/">taste_engine</a></li>
     <li><a href="../../services_taste_engine/TasteEngine-class.html">TasteEngine</a></li>
-    <li class="self-crumb">albums method</li>
+    <li class="self-crumb">onThisDay method</li>
 </ol>
 
     <h5>TasteEngine class</h5>
