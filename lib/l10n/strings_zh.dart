@@ -767,13 +767,6 @@ class AppStringsZh implements AppStrings {
   // ── Discover filters ─────────────────────────────────────────────────────
   @override String get discoverSmartTitle => '最相关的筛选优先';
   @override String get discoverSmartSub => '根据时间、日期、你的历史和使用习惯选择';
-  @override String get discoverLayoutTitle => '筛选布局';
-  @override String get discoverLayoutScroll => '单行滚动';
-  @override String get discoverLayoutWrap => '多行';
-  @override String get discoverLayoutList => '每行一个筛选';
-  @override String get discoverSoloTitle => '独立筛选';
-  @override String get discoverSoloSub => '将所选筛选显示在单独一行，不放在标签内';
-  @override String get discoverSoloNone => '无';
   @override String get discoverForYou => '为你推荐';
   @override String get discoverGlobalTrends => '全球趋势';
   @override String get discoverSrcForyou => '你的混合推荐';
@@ -791,4 +784,15 @@ class AppStringsZh implements AppStrings {
   @override String get discoverYear => '年';
   @override String get discoverNothing => '暂无内容';
   @override String discoverLike(String names) => '类似 $names';
+  @override String get dashReorderSections => '调整版块顺序';
+  @override String get dashInfiniteTitle => '无限滚动';
+  @override String get dashInfiniteSub => '"发现"版块循环并加载更多推荐';
+  @override String get dashDiscoverTitle => '发现';
+  @override String get dashDiscoverSub => '可滑动浏览的音乐推荐';
+  @override String get dashSortButton => '排序';
+  @override String get dashSortDone => '完成';
+  @override String get dashSortHint => '拖动项目以更改顺序';
+  @override String get dashSortSmartNote => '智能排序已开启：会根据时机重新排列这些筛选。';
+  @override String get dashSeparateRow => '单独一行显示';
+  @override String dashFiltersOf(String group) => '筛选 · $group';
 }

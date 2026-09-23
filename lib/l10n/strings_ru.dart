@@ -741,13 +741,6 @@ class AppStringsRu implements AppStrings {
   // ── Discover filters ─────────────────────────────────────────────────────
   @override String get discoverSmartTitle => 'Самый подходящий фильтр первым';
   @override String get discoverSmartSub => 'Выбирает по времени, дате, истории и вашим привычкам';
-  @override String get discoverLayoutTitle => 'Вид фильтров';
-  @override String get discoverLayoutScroll => 'Одна прокручиваемая строка';
-  @override String get discoverLayoutWrap => 'Несколько строк';
-  @override String get discoverLayoutList => 'Один фильтр на строку';
-  @override String get discoverSoloTitle => 'Отдельные фильтры';
-  @override String get discoverSoloSub => 'Показывает выбранные фильтры отдельной строкой, вне вкладки';
-  @override String get discoverSoloNone => 'Нет';
   @override String get discoverForYou => 'Для вас';
   @override String get discoverGlobalTrends => 'Мировые тренды';
   @override String get discoverSrcForyou => 'Ваш микс';
@@ -765,4 +758,15 @@ class AppStringsRu implements AppStrings {
   @override String get discoverYear => 'год';
   @override String get discoverNothing => 'Пока нечего показывать';
   @override String discoverLike(String names) => 'Как $names';
+  @override String get dashReorderSections => 'Изменить порядок разделов';
+  @override String get dashInfiniteTitle => 'Бесконечная прокрутка';
+  @override String get dashInfiniteSub => 'Раздел «Открытия» зацикливается и подгружает больше рекомендаций';
+  @override String get dashDiscoverTitle => 'Открытия';
+  @override String get dashDiscoverSub => 'Музыкальные идеи для просмотра';
+  @override String get dashSortButton => 'Сортировка';
+  @override String get dashSortDone => 'Готово';
+  @override String get dashSortHint => 'Перетащите элементы, чтобы изменить порядок';
+  @override String get dashSortSmartNote => 'Умная сортировка включена: она может менять порядок фильтров в зависимости от момента.';
+  @override String get dashSeparateRow => 'Показать отдельной строкой';
+  @override String dashFiltersOf(String group) => 'Фильтры · $group';
 }

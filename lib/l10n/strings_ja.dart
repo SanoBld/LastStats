@@ -740,13 +740,6 @@ class AppStringsJa implements AppStrings {
   // ── Discover filters ─────────────────────────────────────────────────────
   @override String get discoverSmartTitle => '最も関連性の高いフィルターを先頭に';
   @override String get discoverSmartSub => '時間帯・日付・履歴・使い方に合わせて選びます';
-  @override String get discoverLayoutTitle => 'フィルターの表示';
-  @override String get discoverLayoutScroll => '1行でスクロール';
-  @override String get discoverLayoutWrap => '複数行';
-  @override String get discoverLayoutList => '1行に1フィルター';
-  @override String get discoverSoloTitle => '別枠のフィルター';
-  @override String get discoverSoloSub => '選んだフィルターをタブの外の専用行に表示します';
-  @override String get discoverSoloNone => 'なし';
   @override String get discoverForYou => 'あなたへ';
   @override String get discoverGlobalTrends => '世界のトレンド';
   @override String get discoverSrcForyou => 'あなたのミックス';
@@ -764,4 +757,15 @@ class AppStringsJa implements AppStrings {
   @override String get discoverYear => '年';
   @override String get discoverNothing => '今は表示するものがありません';
   @override String discoverLike(String names) => '$names のような';
+  @override String get dashReorderSections => 'セクションを並べ替え';
+  @override String get dashInfiniteTitle => '無限スクロール';
+  @override String get dashInfiniteSub => '「発見」がループし、より多くの提案を読み込みます';
+  @override String get dashDiscoverTitle => '発見';
+  @override String get dashDiscoverSub => 'スワイプで見られる音楽の提案';
+  @override String get dashSortButton => '並べ替え';
+  @override String get dashSortDone => '完了';
+  @override String get dashSortHint => '項目をドラッグして順番を変更';
+  @override String get dashSortSmartNote => 'スマート順序が有効です。状況に応じてこれらのフィルターの順序が変わることがあります。';
+  @override String get dashSeparateRow => '別の行に表示';
+  @override String dashFiltersOf(String group) => 'フィルター · $group';
 }

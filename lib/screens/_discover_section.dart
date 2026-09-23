@@ -76,7 +76,6 @@ class _DiscoverSection extends StatelessWidget {
   final List<String> sources;
   final bool infiniteScroll;
   final bool smartOrder;      // most relevant filter first
-  final String filterLayout;  // 'scroll' | 'wrap' | 'list'
   final List<String> soloSources; // filters shown on their own row
   const _DiscoverSection({
     required this.service,
@@ -85,7 +84,6 @@ class _DiscoverSection extends StatelessWidget {
     required this.sources,
     this.infiniteScroll = false,
     this.smartOrder = false,
-    this.filterLayout = 'scroll',
     this.soloSources = const [],
   });
 
@@ -101,9 +99,10 @@ class _DiscoverSection extends StatelessWidget {
         _           => Icons.public_rounded,
       };
 
+  // Follows the user's saved order (Settings > Dashboard > filters).
   List<String> _avail(List<String> group) => [
-        for (final s in group)
-          if (sources.contains(s) &&
+        for (final s in sources)
+          if (group.contains(s) &&
               !(s == 'country' && (country.isEmpty || country == 'None')) &&
               !(const {'foryou', 'fresh', 'genre', 'deeper', 'albums'}.contains(s) &&
                   topArtist.isEmpty))
@@ -149,7 +148,6 @@ class _DiscoverSection extends StatelessWidget {
               title: L.discoverForYou,
               infiniteScroll: infiniteScroll,
               smartOrder: smartOrder,
-              filterLayout: filterLayout,
             ),
           if (personal.isNotEmpty && global.isNotEmpty) const SizedBox(height: 20),
           if (global.isNotEmpty)
@@ -163,7 +161,6 @@ class _DiscoverSection extends StatelessWidget {
               title: L.discoverGlobalTrends,
               infiniteScroll: infiniteScroll,
               smartOrder: smartOrder,
-              filterLayout: filterLayout,
             ),
         ]),
       ),
@@ -180,7 +177,6 @@ class _DiscoverGroup extends StatefulWidget {
   final String title;
   final bool infiniteScroll;
   final bool smartOrder;
-  final String filterLayout;
   const _DiscoverGroup({
     super.key,
     required this.service,
@@ -191,7 +187,6 @@ class _DiscoverGroup extends StatefulWidget {
     required this.title,
     this.infiniteScroll = false,
     this.smartOrder = false,
-    this.filterLayout = 'scroll',
   });
 
   @override
@@ -614,29 +609,17 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
         },
       );
 
-  // Filter row: one scrolling line, a wrapped block, or one filter per line.
-  Widget _filters(List<String> sources) {
-    switch (widget.filterLayout) {
-      case 'wrap':
-        return Wrap(spacing: 8, runSpacing: 8, children: [for (final s in sources) _chip(s)]);
-      case 'list':
-        return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          for (final s in sources)
-            Padding(padding: const EdgeInsets.only(bottom: 8), child: _chip(s)),
-        ]);
-      default:
-        return SizedBox(
-          height: 40,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            physics: const ClampingScrollPhysics(),
-            itemCount: sources.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 8),
-            itemBuilder: (_, i) => _chip(sources[i]),
-          ),
-        );
-    }
-  }
+  // Filter row: one scrolling line.
+  Widget _filters(List<String> sources) => SizedBox(
+        height: 40,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          physics: const ClampingScrollPhysics(),
+          itemCount: sources.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 8),
+          itemBuilder: (_, i) => _chip(sources[i]),
+        ),
+      );
 
   // Same shape + same animated loader as the rest of the app, sized to the
   // card that will replace it once loaded.

@@ -832,13 +832,6 @@ abstract class AppStrings {
   // ── Discover filters ─────────────────────────────────────────────────────
   String get discoverSmartTitle;
   String get discoverSmartSub;
-  String get discoverLayoutTitle;
-  String get discoverLayoutScroll;
-  String get discoverLayoutWrap;
-  String get discoverLayoutList;
-  String get discoverSoloTitle;
-  String get discoverSoloSub;
-  String get discoverSoloNone;
   String get discoverForYou;
   String get discoverGlobalTrends;
   String get discoverSrcForyou;
@@ -856,4 +849,15 @@ abstract class AppStrings {
   String get discoverYear;
   String get discoverNothing;
   String discoverLike(String names);
+  String get dashReorderSections;
+  String get dashInfiniteTitle;
+  String get dashInfiniteSub;
+  String get dashDiscoverTitle;
+  String get dashDiscoverSub;
+  String get dashSortButton;
+  String get dashSortDone;
+  String get dashSortHint;
+  String get dashSortSmartNote;
+  String get dashSeparateRow;
+  String dashFiltersOf(String group);
 }

@@ -770,13 +770,6 @@ class AppStringsFr implements AppStrings {
   // ── Discover filters ─────────────────────────────────────────────────────
   @override String get discoverSmartTitle => 'Filtre le plus pertinent en premier';
   @override String get discoverSmartSub => 'Choisit selon l\'heure, le jour, ton historique et tes habitudes';
-  @override String get discoverLayoutTitle => 'Affichage des filtres';
-  @override String get discoverLayoutScroll => 'Une ligne défilante';
-  @override String get discoverLayoutWrap => 'Sur plusieurs lignes';
-  @override String get discoverLayoutList => 'Un filtre par ligne';
-  @override String get discoverSoloTitle => 'Filtres à part';
-  @override String get discoverSoloSub => 'Affiche les filtres choisis sur leur propre ligne, hors de leur onglet';
-  @override String get discoverSoloNone => 'Aucun';
   @override String get discoverForYou => 'Pour toi';
   @override String get discoverGlobalTrends => 'Tendances mondiales';
   @override String get discoverSrcForyou => 'Ton mix';
@@ -794,4 +787,15 @@ class AppStringsFr implements AppStrings {
   @override String get discoverYear => 'année';
   @override String get discoverNothing => 'Rien à afficher pour le moment';
   @override String discoverLike(String names) => 'Comme $names';
+  @override String get dashReorderSections => 'Réorganiser les sections';
+  @override String get dashInfiniteTitle => 'Défilement infini';
+  @override String get dashInfiniteSub => 'La section Découvrir boucle et charge plus de suggestions';
+  @override String get dashDiscoverTitle => 'Découvrir';
+  @override String get dashDiscoverSub => 'Idées de musique à faire défiler';
+  @override String get dashSortButton => 'Trier';
+  @override String get dashSortDone => 'Terminé';
+  @override String get dashSortHint => 'Glisse les éléments pour changer leur ordre';
+  @override String get dashSortSmartNote => 'Le tri intelligent est actif : il peut réordonner ces filtres selon le moment.';
+  @override String get dashSeparateRow => 'Afficher sur une ligne à part';
+  @override String dashFiltersOf(String group) => 'Filtres · $group';
 }

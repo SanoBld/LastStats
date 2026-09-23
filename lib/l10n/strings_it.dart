@@ -741,13 +741,6 @@ class AppStringsIt implements AppStrings {
   // ── Discover filters ─────────────────────────────────────────────────────
   @override String get discoverSmartTitle => 'Filtro più rilevante per primo';
   @override String get discoverSmartSub => 'Sceglie in base a ora, giorno, cronologia e abitudini';
-  @override String get discoverLayoutTitle => 'Layout dei filtri';
-  @override String get discoverLayoutScroll => 'Una riga scorrevole';
-  @override String get discoverLayoutWrap => 'Più righe';
-  @override String get discoverLayoutList => 'Un filtro per riga';
-  @override String get discoverSoloTitle => 'Filtri separati';
-  @override String get discoverSoloSub => 'Mostra i filtri scelti su una riga propria, fuori dalla loro scheda';
-  @override String get discoverSoloNone => 'Nessuno';
   @override String get discoverForYou => 'Per te';
   @override String get discoverGlobalTrends => 'Tendenze globali';
   @override String get discoverSrcForyou => 'Il tuo mix';
@@ -765,4 +758,15 @@ class AppStringsIt implements AppStrings {
   @override String get discoverYear => 'anno';
   @override String get discoverNothing => 'Niente da mostrare al momento';
   @override String discoverLike(String names) => 'Come $names';
+  @override String get dashReorderSections => 'Riordina le sezioni';
+  @override String get dashInfiniteTitle => 'Scorrimento infinito';
+  @override String get dashInfiniteSub => 'La sezione Scopri si ripete e carica più suggerimenti';
+  @override String get dashDiscoverTitle => 'Scopri';
+  @override String get dashDiscoverSub => 'Idee musicali da scorrere';
+  @override String get dashSortButton => 'Ordina';
+  @override String get dashSortDone => 'Fatto';
+  @override String get dashSortHint => 'Trascina gli elementi per cambiarne l\'ordine';
+  @override String get dashSortSmartNote => 'Ordine intelligente attivo: può riordinare questi filtri in base al momento.';
+  @override String get dashSeparateRow => 'Mostra su una riga a parte';
+  @override String dashFiltersOf(String group) => 'Filtri · $group';
 }

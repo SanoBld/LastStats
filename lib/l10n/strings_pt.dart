@@ -770,13 +770,6 @@ class AppStringsPt implements AppStrings {
   // ── Discover filters ─────────────────────────────────────────────────────
   @override String get discoverSmartTitle => 'Filtro mais relevante primeiro';
   @override String get discoverSmartSub => 'Escolhe pela hora, dia, histórico e seus hábitos';
-  @override String get discoverLayoutTitle => 'Layout dos filtros';
-  @override String get discoverLayoutScroll => 'Uma linha rolável';
-  @override String get discoverLayoutWrap => 'Várias linhas';
-  @override String get discoverLayoutList => 'Um filtro por linha';
-  @override String get discoverSoloTitle => 'Filtros separados';
-  @override String get discoverSoloSub => 'Mostra os filtros escolhidos em uma linha própria, fora da aba';
-  @override String get discoverSoloNone => 'Nenhum';
   @override String get discoverForYou => 'Para você';
   @override String get discoverGlobalTrends => 'Tendências globais';
   @override String get discoverSrcForyou => 'Seu mix';
@@ -794,4 +787,15 @@ class AppStringsPt implements AppStrings {
   @override String get discoverYear => 'ano';
   @override String get discoverNothing => 'Nada para mostrar no momento';
   @override String discoverLike(String names) => 'Como $names';
+  @override String get dashReorderSections => 'Reordenar seções';
+  @override String get dashInfiniteTitle => 'Rolagem infinita';
+  @override String get dashInfiniteSub => 'A seção Descobrir repete e carrega mais sugestões';
+  @override String get dashDiscoverTitle => 'Descobrir';
+  @override String get dashDiscoverSub => 'Ideias de música para deslizar';
+  @override String get dashSortButton => 'Ordenar';
+  @override String get dashSortDone => 'Concluído';
+  @override String get dashSortHint => 'Arraste os itens para mudar a ordem';
+  @override String get dashSortSmartNote => 'A ordem inteligente está ativa: pode reordenar estes filtros conforme o momento.';
+  @override String get dashSeparateRow => 'Mostrar em uma linha separada';
+  @override String dashFiltersOf(String group) => 'Filtros · $group';
 }

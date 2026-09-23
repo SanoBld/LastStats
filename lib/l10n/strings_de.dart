@@ -741,13 +741,6 @@ class AppStringsDe implements AppStrings {
   // ── Discover filters ─────────────────────────────────────────────────────
   @override String get discoverSmartTitle => 'Relevantester Filter zuerst';
   @override String get discoverSmartSub => 'Wählt nach Uhrzeit, Datum, Verlauf und deinen Gewohnheiten';
-  @override String get discoverLayoutTitle => 'Filteranzeige';
-  @override String get discoverLayoutScroll => 'Eine scrollbare Zeile';
-  @override String get discoverLayoutWrap => 'Mehrere Zeilen';
-  @override String get discoverLayoutList => 'Ein Filter pro Zeile';
-  @override String get discoverSoloTitle => 'Separate Filter';
-  @override String get discoverSoloSub => 'Zeigt gewählte Filter in einer eigenen Zeile, außerhalb ihres Tabs';
-  @override String get discoverSoloNone => 'Keine';
   @override String get discoverForYou => 'Für dich';
   @override String get discoverGlobalTrends => 'Globale Trends';
   @override String get discoverSrcForyou => 'Dein Mix';
@@ -765,4 +758,15 @@ class AppStringsDe implements AppStrings {
   @override String get discoverYear => 'Jahr';
   @override String get discoverNothing => 'Im Moment nichts anzuzeigen';
   @override String discoverLike(String names) => 'Wie $names';
+  @override String get dashReorderSections => 'Bereiche neu anordnen';
+  @override String get dashInfiniteTitle => 'Endloses Scrollen';
+  @override String get dashInfiniteSub => 'Der Entdecken-Bereich wiederholt sich und lädt mehr Vorschläge';
+  @override String get dashDiscoverTitle => 'Entdecken';
+  @override String get dashDiscoverSub => 'Musikideen zum Durchwischen';
+  @override String get dashSortButton => 'Sortieren';
+  @override String get dashSortDone => 'Fertig';
+  @override String get dashSortHint => 'Elemente ziehen, um die Reihenfolge zu ändern';
+  @override String get dashSortSmartNote => 'Intelligente Sortierung ist aktiv: Sie kann diese Filter je nach Moment umsortieren.';
+  @override String get dashSeparateRow => 'In eigener Zeile anzeigen';
+  @override String dashFiltersOf(String group) => 'Filter · $group';
 }

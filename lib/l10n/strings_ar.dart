@@ -741,13 +741,6 @@ class AppStringsAr implements AppStrings {
   // ── Discover filters ─────────────────────────────────────────────────────
   @override String get discoverSmartTitle => 'الفلتر الأكثر صلة أولاً';
   @override String get discoverSmartSub => 'يختار حسب الوقت والتاريخ وسجلّك وعاداتك';
-  @override String get discoverLayoutTitle => 'عرض الفلاتر';
-  @override String get discoverLayoutScroll => 'سطر واحد قابل للتمرير';
-  @override String get discoverLayoutWrap => 'عدة أسطر';
-  @override String get discoverLayoutList => 'فلتر واحد في كل سطر';
-  @override String get discoverSoloTitle => 'فلاتر منفصلة';
-  @override String get discoverSoloSub => 'يعرض الفلاتر المختارة في صف خاص بها خارج تبويبها';
-  @override String get discoverSoloNone => 'لا شيء';
   @override String get discoverForYou => 'لك';
   @override String get discoverGlobalTrends => 'الاتجاهات العالمية';
   @override String get discoverSrcForyou => 'مزيجك';
@@ -765,4 +758,15 @@ class AppStringsAr implements AppStrings {
   @override String get discoverYear => 'سنة';
   @override String get discoverNothing => 'لا شيء لعرضه حالياً';
   @override String discoverLike(String names) => 'مثل $names';
+  @override String get dashReorderSections => 'إعادة ترتيب الأقسام';
+  @override String get dashInfiniteTitle => 'تمرير لا نهائي';
+  @override String get dashInfiniteSub => 'يتكرر قسم الاكتشاف ويحمّل المزيد من الاقتراحات';
+  @override String get dashDiscoverTitle => 'اكتشف';
+  @override String get dashDiscoverSub => 'أفكار موسيقية للتصفح';
+  @override String get dashSortButton => 'ترتيب';
+  @override String get dashSortDone => 'تم';
+  @override String get dashSortHint => 'اسحب العناصر لتغيير ترتيبها';
+  @override String get dashSortSmartNote => 'الترتيب الذكي مفعّل: قد يعيد ترتيب هذه الفلاتر حسب الوقت.';
+  @override String get dashSeparateRow => 'عرض في صف منفصل';
+  @override String dashFiltersOf(String group) => 'الفلاتر · $group';
 }

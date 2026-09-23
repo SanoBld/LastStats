@@ -770,13 +770,6 @@ class AppStringsEn implements AppStrings {
   // ── Discover filters ─────────────────────────────────────────────────────
   @override String get discoverSmartTitle => 'Most relevant filter first';
   @override String get discoverSmartSub => 'Picks by time of day, date, your history and your habits';
-  @override String get discoverLayoutTitle => 'Filter layout';
-  @override String get discoverLayoutScroll => 'One scrolling line';
-  @override String get discoverLayoutWrap => 'Multiple lines';
-  @override String get discoverLayoutList => 'One filter per line';
-  @override String get discoverSoloTitle => 'Separate filters';
-  @override String get discoverSoloSub => 'Shows chosen filters on their own row, outside their tab';
-  @override String get discoverSoloNone => 'None';
   @override String get discoverForYou => 'For you';
   @override String get discoverGlobalTrends => 'Global trends';
   @override String get discoverSrcForyou => 'Your mix';
@@ -794,4 +787,15 @@ class AppStringsEn implements AppStrings {
   @override String get discoverYear => 'year';
   @override String get discoverNothing => 'Nothing to show right now';
   @override String discoverLike(String names) => 'Like $names';
+  @override String get dashReorderSections => 'Reorder sections';
+  @override String get dashInfiniteTitle => 'Infinite scroll';
+  @override String get dashInfiniteSub => 'The Discover section loops and loads more suggestions';
+  @override String get dashDiscoverTitle => 'Discover';
+  @override String get dashDiscoverSub => 'Music ideas you can swipe through';
+  @override String get dashSortButton => 'Sort';
+  @override String get dashSortDone => 'Done';
+  @override String get dashSortHint => 'Drag items to change their order';
+  @override String get dashSortSmartNote => 'Smart order is on: it can reorder these filters depending on the moment.';
+  @override String get dashSeparateRow => 'Show on its own row';
+  @override String dashFiltersOf(String group) => 'Filters · $group';
 }

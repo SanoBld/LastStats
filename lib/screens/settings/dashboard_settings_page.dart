@@ -1,12 +1,12 @@
 // lib/screens/settings/dashboard_settings_page.dart
 
 import 'package:flutter/material.dart';
-import '../../widgets/m3_components.dart';
 import '../../theme/m3_shapes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/l10n.dart';
 import '../../app_state.dart';
 import 'settings_helpers.dart';
+import 'settings_rows.dart';
 
 // Stat-card ids that open a detail sheet / page when tapped on the
 // dashboard (see _DashboardPage._statCardWidget in _dashboard_page.dart).
@@ -52,11 +52,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   List<String> _sectionOrder    = List.from(kDefaultSectionOrder);
   bool   _infiniteScroll        = false;
   bool   _discoverSmart         = false;
-  String _discoverLayout        = 'scroll';
   List<String> _discoverSolo    = [];
-
-  final _customUrlCtrl         = TextEditingController();
-  final _fallbackCustomUrlCtrl = TextEditingController();
 
   @override
   void initState() {
@@ -68,8 +64,6 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   @override
   void dispose() {
     localeNotifier.removeListener(_rebuild);
-    _customUrlCtrl.dispose();
-    _fallbackCustomUrlCtrl.dispose();
     super.dispose();
   }
 
@@ -99,13 +93,10 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
       _sectionOrder          = migrateSectionOrder(p.getStringList('ls_section_order'));
       _infiniteScroll        = p.getBool('ls_infinite_scroll')          ?? false;
       _discoverSmart         = p.getBool('ls_discover_smart')           ?? false;
-      _discoverLayout        = p.getString('ls_discover_layout')        ?? 'scroll';
       _discoverSolo          = p.getStringList('ls_discover_solo')      ?? [];
       final raw = p.getStringList('ls_stat_cards');
       _statCards = raw != null && raw.isNotEmpty ? raw : List.from(kDefaultStatCards);
     });
-    _customUrlCtrl.text         = _headerCustomUrl;
-    _fallbackCustomUrlCtrl.text = _fallbackCustomUrl;
   }
 
   Future<void> _set<T>(String key, T v) async {
@@ -120,386 +111,207 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
     await p.setStringList(key, list);
   }
 
-  String _layoutLabel(String k) => switch (k) {
-        'wrap' => L.discoverLayoutWrap,
-        'list' => L.discoverLayoutList,
-        _      => L.discoverLayoutScroll,
+  static const _personalIds = ['foryou', 'onthisday', 'fresh', 'genre', 'deeper', 'forgotten', 'albums', 'country'];
+  static const _globalIds = [
+    'gt_week', 'gt_month', 'gt_year',
+    'ga_week', 'ga_month', 'ga_year',
+    'gb_week', 'gb_month', 'gb_year',
+  ];
+
+  static IconData _srcIcon(String s) => switch (s) {
+        'foryou'    => Icons.auto_awesome_rounded,
+        'onthisday' => Icons.history_rounded,
+        'fresh'     => Icons.calendar_month_rounded,
+        'genre'     => Icons.category_rounded,
+        'deeper'    => Icons.travel_explore_rounded,
+        'forgotten' => Icons.replay_rounded,
+        'albums'    => Icons.album_rounded,
+        'country'   => Icons.flag_rounded,
+        _           => s.startsWith('gt') ? Icons.music_note_rounded
+                     : s.startsWith('ga') ? Icons.mic_rounded : Icons.album_rounded,
       };
 
-  // Pick the filters that get their own row.
-  Future<void> _pickSolo() async {
-    final chosen = Set<String>.from(_discoverSolo);
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setD) => AlertDialog(
-          title: Text(L.discoverSoloTitle),
-          content: SizedBox(
-            width: 320,
-            child: ListView(shrinkWrap: true, children: [
-              for (final k in _discoverSources)
-                CheckboxListTile(
-                  dense: true,
-                  title: Text(discoverSourceLabel(k)),
-                  value: chosen.contains(k),
-                  onChanged: (v) => setD(() => v == true ? chosen.add(k) : chosen.remove(k)),
-                ),
-            ]),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(L.commonCancel)),
-            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(L.commonSave)),
-          ],
-        ),
+  // Choose + sort the filters of one group (and pick which get their own row).
+  Future<void> _pickFilters(List<String> group, String groupTitle) async {
+    final current = [for (final s in _discoverSources) if (group.contains(s)) s];
+    final res = await showModalBottomSheet<PickSortResult>(
+      sheetAnimationStyle: kM3SheetAnimation,
+      context: context, isScrollControlled: true,
+      backgroundColor: Colors.transparent, useSafeArea: true,
+      builder: (_) => PickSortSheet(
+        title: L.dashFiltersOf(groupTitle),
+        items: [for (final k in group) PickItem(k, discoverSourceLabel(k), icon: _srcIcon(k))],
+        selected: current,
+        solo: _discoverSolo.toSet(),
+        allowSolo: true,
+        note: _discoverSmart ? L.dashSortSmartNote : null,
       ),
     );
-    if (ok != true) return;
-    final next = chosen.toList();
-    await _saveList('ls_discover_solo', next);
-    if (mounted) setState(() => _discoverSolo = next);
+    if (res == null || !mounted) return;
+    final personal = identical(group, _personalIds) ? res.selected
+        : [for (final s in _discoverSources) if (_personalIds.contains(s)) s];
+    final global = identical(group, _globalIds) ? res.selected
+        : [for (final s in _discoverSources) if (_globalIds.contains(s)) s];
+    final next = [...personal, ...global];
+    final solo = [
+      for (final s in _discoverSolo) if (!group.contains(s)) s,
+      ...res.solo,
+    ];
+    await _saveList('ls_discover_sources', next);
+    await _saveList('ls_discover_solo', solo);
+    setState(() { _discoverSources = next; _discoverSolo = solo; });
+  }
+
+  String _filtersSummary(List<String> group) {
+    final on = [for (final s in _discoverSources) if (group.contains(s)) discoverSourceLabel(s)];
+    return on.isEmpty ? '—' : on.join(', ');
+  }
+
+  // Choose + sort the stat cards.
+  Future<void> _pickCards() async {
+    final res = await showModalBottomSheet<PickSortResult>(
+      sheetAnimationStyle: kM3SheetAnimation,
+      context: context, isScrollControlled: true,
+      backgroundColor: Colors.transparent, useSafeArea: true,
+      builder: (_) => PickSortSheet(
+        title: L.dashStatCardsSectionLabel,
+        items: [
+          for (final c in kAllStatCards)
+            PickItem(c.$1, statCardLabel(c.$1), emoji: c.$2, hint: _kTappableStatCards.contains(c.$1)),
+        ],
+        selected: _statCards,
+      ),
+    );
+    if (res == null || !mounted) return;
+    await _saveList('ls_stat_cards', res.selected);
+    setState(() => _statCards = res.selected);
+  }
+
+  Future<void> _setStr(String key, String v, void Function() apply) async {
+    await _set(key, v);
+    if (mounted) setState(apply);
+  }
+
+  Future<void> _setBool(String key, bool v, void Function() apply) async {
+    await _set(key, v);
+    if (mounted) setState(apply);
   }
 
   @override
   Widget build(BuildContext context) {
-    final scheme  = Theme.of(context).colorScheme;
-    final text    = Theme.of(context).textTheme;
-    final sources = buildHeaderSources();
-    final anims   = buildHeaderAnimations();
     final periods = buildHeaderPeriods();
+    final isTop = ['top_track', 'top_album', 'top_artist'].contains(_headerSource);
+    final fbTop = ['top_track', 'top_album', 'top_artist'].contains(_fallbackType);
+    final fbOptions = <ChoiceOption>[
+      ('none',       L.fallbackTypeNothing,     Icons.hide_image_outlined),
+      ('top_track',  L.fallbackTypeTopTrack,    Icons.music_note_rounded),
+      ('top_album',  L.fallbackTypeTopAlbum,    Icons.album_rounded),
+      ('top_artist', L.fallbackTypeTopArtist,   Icons.mic_rounded),
+      ('custom_url', L.fallbackTypeCustomImage, Icons.image_outlined),
+    ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(L.settingsDashboardSection),
-        centerTitle: false,
-      ),
+      appBar: AppBar(title: Text(L.settingsDashboardSection), centerTitle: false),
       body: ListView(padding: const EdgeInsets.all(20), children: [
 
-        // ── Image d'en-tête ───────────────────────────────────────────────
+        // ── Header image ──────────────────────────────────────────────────
         SettingsSection(label: L.settingsHeaderImage, children: [
-          Padding(padding: const EdgeInsets.fromLTRB(16, 14, 16, 14), child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start, children: [
-
-              // Source
-              Row(children: [
-                Icon(Icons.wallpaper_rounded, size: 18, color: scheme.primary),
-                const SizedBox(width: 8),
-                Text(L.settingsHeaderSource,
-                    style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-              ]),
-              const SizedBox(height: 4),
-              Text(L.settingsHeaderImageSub,
-                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-              const SizedBox(height: 12),
-              Wrap(spacing: 8, runSpacing: 8, children: sources.map((opt) {
-                final (key, label, icon) = opt;
-                final sel = _headerSource == key;
-                return M3Chip(
-                  avatar: Icon(icon, size: 16), label: Text(label),
-                  selected: sel, showCheckmark: false,
-                  onSelected: (_) async {
-                    await _set('ls_header_source', key);
-                    setState(() => _headerSource = key);
-                  },
-                );
-              }).toList()),
-
-              // ── URL personnalisée (source = custom) ───────────────────
-              if (_headerSource == 'custom') ...[
-                const SizedBox(height: 16),
-                Divider(color: scheme.outlineVariant.withValues(alpha: 0.4)),
-                const SizedBox(height: 12),
-                Row(children: [
-                  Icon(Icons.link_rounded, size: 18, color: scheme.primary),
-                  const SizedBox(width: 8),
-                  Text(L.settingsHeaderCustomUrl,
-                      style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-                ]),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _customUrlCtrl, autocorrect: false,
-                  keyboardType: TextInputType.url, textInputAction: TextInputAction.done,
-                  decoration: InputDecoration(
-                    hintText: L.settingsHeaderCustomUrlHint,
-                    prefixIcon: const Icon(Icons.image_outlined),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.check_circle_outline_rounded),
-                      tooltip: L.settingsHeaderApply,
-                      onPressed: () async {
-                        final url = _customUrlCtrl.text.trim();
-                        await _set('ls_header_custom_url', url);
-                        setState(() => _headerCustomUrl = url);
-                      },
-                    ),
-                  ),
-                  onSubmitted: (url) async {
-                    await _set('ls_header_custom_url', url.trim());
-                    setState(() => _headerCustomUrl = url.trim());
-                  },
-                ),
-                const SizedBox(height: 6),
-                Text(L.settingsHeaderCustomUrlSub,
-                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-              ],
-
-              // ── Période (source = top_*) ───────────────────────────────
-              if (['top_track', 'top_album', 'top_artist'].contains(_headerSource)) ...[
-                const SizedBox(height: 16),
-                Divider(color: scheme.outlineVariant.withValues(alpha: 0.4)),
-                const SizedBox(height: 12),
-                Row(children: [
-                  Icon(Icons.date_range_rounded, size: 18, color: scheme.primary),
-                  const SizedBox(width: 8),
-                  Text(L.settingsHeaderPeriod,
-                      style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-                ]),
-                const SizedBox(height: 10),
-                Wrap(spacing: 8, runSpacing: 8, children: periods.map((opt) {
-                  final (key, label) = opt;
-                  return M3Chip(
-                    label: Text(label), selected: _headerPeriod == key, showCheckmark: false,
-                    onSelected: (_) async {
-                      await _set('ls_header_period', key);
-                      setState(() => _headerPeriod = key);
-                    },
-                  );
-                }).toList()),
-              ],
-
-              // ── Fallback "Aucune musique en cours" (source = nowplaying) ─
-              if (_headerSource == 'nowplaying') ...[
-                const SizedBox(height: 16),
-                Divider(color: scheme.outlineVariant.withValues(alpha: 0.4)),
-                const SizedBox(height: 14),
-                Row(children: [
-                  Icon(Icons.music_off_rounded, size: 18, color: scheme.primary),
-                  const SizedBox(width: 8),
-                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(
-                      L.dashFallbackWhenNoMusic,
-                      style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-                    ),
-                    Text(
-                      L.dashFallbackChooseDisplay,
-                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-                    ),
-                  ])),
-                ]),
-                const SizedBox(height: 12),
-
-                // Choix du type de fallback
-                _FallbackTypeSelector(
-                  value: _fallbackType,
-                  scheme: scheme,
-                  text: text,
-                  onChanged: (val) async {
-                    await _set('ls_header_fallback_type', val);
-                    // Rétrocompatibilité : met à jour l'ancien booléen
-                    await _set('ls_header_fallback_enabled', val != 'none');
-                    setState(() => _fallbackType = val);
-                  },
-                ),
-
-                // Période (si fallback = top_track / top_album / top_artist)
-                if (['top_track', 'top_album', 'top_artist'].contains(_fallbackType)) ...[
-                  const SizedBox(height: 14),
-                  Row(children: [
-                    Icon(Icons.date_range_rounded, size: 16, color: scheme.primary),
-                    const SizedBox(width: 8),
-                    Text(
-                      L.dashFallbackPeriodLabel,
-                      style: text.labelMedium?.copyWith(
-                          color: scheme.primary, fontWeight: FontWeight.w700),
-                    ),
-                  ]),
-                  const SizedBox(height: 8),
-                  Wrap(spacing: 8, runSpacing: 8, children: [
-                    _FallbackPeriodChip(
-                      label: L.fallbackPeriod1Week,
-                      value: '7day',
-                      selected: _fallbackPeriod,
-                      onTap: (v) async {
-                        await _set('ls_header_fallback_period', v);
-                        setState(() => _fallbackPeriod = v);
-                      },
-                    ),
-                    _FallbackPeriodChip(
-                      label: L.fallbackPeriod1Month,
-                      value: '1month',
-                      selected: _fallbackPeriod,
-                      onTap: (v) async {
-                        await _set('ls_header_fallback_period', v);
-                        setState(() => _fallbackPeriod = v);
-                      },
-                    ),
-                    _FallbackPeriodChip(
-                      label: L.fallbackPeriodAllTime,
-                      value: 'overall',
-                      selected: _fallbackPeriod,
-                      onTap: (v) async {
-                        await _set('ls_header_fallback_period', v);
-                        setState(() => _fallbackPeriod = v);
-                      },
-                    ),
-                  ]),
+          SettingChoiceRow(
+            icon: Icons.wallpaper_rounded,
+            title: L.settingsHeaderSource,
+            options: [for (final o in buildHeaderSources()) (o.$1, o.$2, o.$3)],
+            value: _headerSource,
+            onChanged: (v) => _setStr('ls_header_source', v, () => _headerSource = v),
+          ),
+          if (_headerSource == 'custom')
+            SettingTextRow(
+              icon: Icons.link_rounded,
+              title: L.settingsHeaderCustomUrl,
+              hint: L.settingsHeaderCustomUrlHint,
+              value: _headerCustomUrl,
+              onChanged: (v) => _setStr('ls_header_custom_url', v, () => _headerCustomUrl = v),
+            ),
+          if (isTop)
+            SettingChoiceRow(
+              icon: Icons.date_range_rounded,
+              title: L.settingsHeaderPeriod,
+              options: [for (final o in periods) (o.$1, o.$2, null)],
+              value: _headerPeriod,
+              onChanged: (v) => _setStr('ls_header_period', v, () => _headerPeriod = v),
+            ),
+          if (_headerSource == 'nowplaying') ...[
+            SettingChoiceRow(
+              icon: Icons.music_off_rounded,
+              title: L.dashFallbackWhenNoMusic,
+              options: fbOptions,
+              value: _fallbackType,
+              onChanged: (v) async {
+                await _set('ls_header_fallback_type', v);
+                await _set('ls_header_fallback_enabled', v != 'none'); // old key
+                if (mounted) setState(() => _fallbackType = v);
+              },
+            ),
+            if (fbTop)
+              SettingChoiceRow(
+                icon: Icons.date_range_rounded,
+                title: L.dashFallbackPeriodLabel,
+                options: [
+                  ('7day',    L.fallbackPeriod1Week,   null),
+                  ('1month',  L.fallbackPeriod1Month,  null),
+                  ('overall', L.fallbackPeriodAllTime, null),
                 ],
-
-                // URL personnalisée de fallback
-                if (_fallbackType == 'custom_url') ...[
-                  const SizedBox(height: 14),
-                  TextField(
-                    controller: _fallbackCustomUrlCtrl, autocorrect: false,
-                    keyboardType: TextInputType.url, textInputAction: TextInputAction.done,
-                    decoration: InputDecoration(
-                      labelText: L.settingsHeaderFallbackUrlLabel,
-                      hintText: L.settingsHeaderCustomUrlHint,
-                      prefixIcon: const Icon(Icons.image_outlined),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.check_circle_outline_rounded),
-                        tooltip: L.settingsHeaderApply,
-                        onPressed: () async {
-                          final url = _fallbackCustomUrlCtrl.text.trim();
-                          await _set('ls_header_fallback_url', url);
-                          setState(() => _fallbackCustomUrl = url);
-                        },
-                      ),
-                    ),
-                    onSubmitted: (url) async {
-                      await _set('ls_header_fallback_url', url.trim());
-                      setState(() => _fallbackCustomUrl = url.trim());
-                    },
-                  ),
-                ],
-
-                // Aperçu du fallback actif
-                if (_fallbackType != 'none') ...[
-                  const SizedBox(height: 12),
-                  _FallbackSummary(type: _fallbackType, period: _fallbackPeriod),
-                ],
-              ],
-            ],
-          )),
+                value: _fallbackPeriod,
+                onChanged: (v) => _setStr('ls_header_fallback_period', v, () => _fallbackPeriod = v),
+              ),
+            if (_fallbackType == 'custom_url')
+              SettingTextRow(
+                icon: Icons.image_outlined,
+                title: L.settingsHeaderFallbackUrlLabel,
+                hint: L.settingsHeaderCustomUrlHint,
+                value: _fallbackCustomUrl,
+                onChanged: (v) => _setStr('ls_header_fallback_url', v, () => _fallbackCustomUrl = v),
+              ),
+          ],
         ]),
 
         const SizedBox(height: 16),
 
-        // ── Animation & Flou ──────────────────────────────────────────────
+        // ── Animation & blur ──────────────────────────────────────────────
         SettingsSection(label: L.dashAnimationBlurSection, children: [
-          Padding(padding: const EdgeInsets.fromLTRB(16, 14, 16, 4), child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
-                Icon(Icons.animation_rounded, size: 18, color: scheme.primary),
-                const SizedBox(width: 8),
-                Text(L.settingsHeaderAnimation,
-                    style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-              ]),
-              const SizedBox(height: 4),
-              Text(L.settingsHeaderAnimationSub,
-                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-              const SizedBox(height: 10),
-              Wrap(spacing: 8, runSpacing: 8, children: anims.map((opt) {
-                final (key, label, icon) = opt;
-                return M3Chip(
-                  avatar: Icon(icon, size: 16), label: Text(label),
-                  selected: _headerAnimation == key, showCheckmark: false,
-                  onSelected: (_) async {
-                    await _set('ls_header_animation', key);
-                    setState(() => _headerAnimation = key);
-                  },
-                );
-              }).toList()),
-
-              const SizedBox(height: 16),
-              Divider(color: scheme.outlineVariant.withValues(alpha: 0.4)),
-              const SizedBox(height: 12),
-
-              Row(children: [
-                Icon(Icons.blur_on_rounded, size: 18, color: scheme.primary),
-                const SizedBox(width: 8),
-                Text(L.settingsHeaderBlur,
-                    style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(color: scheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: scheme.outlineVariant)),
-                  child: Text(
-                    _headerBlur < 1 ? L.settingsHeaderBlurNone : '${_headerBlur.round()}',
-                    style: text.labelMedium?.copyWith(fontFamily: 'monospace'),
-                  ),
-                ),
-              ]),
-              const SizedBox(height: 4),
-              Slider(
-                value: _headerBlur, min: 0, max: 20, divisions: 20,
-                label: _headerBlur < 1 ? L.settingsHeaderBlurNone : '${_headerBlur.round()}',
-                onChanged: (v) => setState(() => _headerBlur = v),
-                onChangeEnd: (v) async => await _set('ls_header_blur', v),
-              ),
-              const SizedBox(height: 8),
-
-              // ── Music playback animation ──────────────────────────────
-              const SizedBox(height: 16),
-              Divider(color: scheme.outlineVariant.withValues(alpha: 0.4)),
-              const SizedBox(height: 4),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                secondary: Icon(Icons.blur_on_rounded, color: scheme.primary),
-                title: Text(
-                  L.dashMusicAnimationTitle,
-                  style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-                ),
-                subtitle: Text(
-                  L.dashMusicAnimationSub,
-                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-                ),
-                value: _headerMusicAnim,
-                onChanged: (v) async {
-                  final p = await SharedPreferences.getInstance();
-                  await p.setBool('ls_header_music_anim', v);
-                  setState(() => _headerMusicAnim = v);
-                },
-              ),
-              // Info: blur is forced to 18 when the animation is active,
-              // overriding the manual blur slider value.
-              if (_headerMusicAnim) ...[
-                const SizedBox(height: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: scheme.primaryContainer.withValues(alpha: 0.35),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                        color: scheme.primary.withValues(alpha: 0.25)),
-                  ),
-                  child: Row(children: [
-                    Icon(Icons.info_outline_rounded,
-                        size: 14, color: scheme.primary),
-                    const SizedBox(width: 8),
-                    Expanded(child: Text(
-                      L.dashMusicAnimationInfo,
-                      style: text.bodySmall?.copyWith(
-                          color: scheme.onPrimaryContainer),
-                    )),
-                  ]),
-                ),
-              ],
-            ],
-          )),
+          SettingChoiceRow(
+            icon: Icons.animation_rounded,
+            title: L.settingsHeaderAnimation,
+            options: [for (final o in buildHeaderAnimations()) (o.$1, o.$2, o.$3)],
+            value: _headerAnimation,
+            onChanged: (v) => _setStr('ls_header_animation', v, () => _headerAnimation = v),
+          ),
+          SettingSliderRow(
+            icon: Icons.blur_on_rounded,
+            title: L.settingsHeaderBlur,
+            valueLabel: _headerBlur < 1 ? L.settingsHeaderBlurNone : '${_headerBlur.round()}',
+            value: _headerBlur, min: 0, max: 20, divisions: 20,
+            onChanged: (v) => setState(() => _headerBlur = v),
+            onChangeEnd: (v) async => await _set('ls_header_blur', v),
+          ),
+          SettingSwitchRow(
+            icon: Icons.graphic_eq_rounded,
+            title: L.dashMusicAnimationTitle,
+            subtitle: _headerMusicAnim
+                ? '${L.dashMusicAnimationSub}\n${L.dashMusicAnimationInfo}'
+                : L.dashMusicAnimationSub,
+            value: _headerMusicAnim,
+            onChanged: (v) => _setBool('ls_header_music_anim', v, () => _headerMusicAnim = v),
+          ),
         ]),
 
         const SizedBox(height: 16),
 
-        // ── Sections visibles ─────────────────────────────────────────────
+        // ── Visible sections ──────────────────────────────────────────────
         SettingsSection(label: L.settingsVisibleSections, children: [
-          Padding(padding: const EdgeInsets.fromLTRB(16, 12, 16, 4), child: FilledButton.tonalIcon(
-            icon: const Icon(Icons.swap_vert_rounded, size: 18),
-            label: Text(pickLang(
-                fr: 'Réorganiser les sections', en: 'Reorder sections',
-                es: 'Reordenar secciones', zh: '调整版块顺序', pt: 'Reordenar seções')),
-            onPressed: () async {
+          SettingActionRow(
+            icon: Icons.swap_vert_rounded,
+            title: L.dashReorderSections,
+            onTap: () async {
               final result = await showModalBottomSheet<List<String>>(
                 sheetAnimationStyle: kM3SheetAnimation,
                 context: context, isScrollControlled: true,
@@ -511,162 +323,54 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                 setState(() => _sectionOrder = result);
               }
             },
-          )),
-          SwitchListTile(
-            secondary: const Icon(Icons.loop_rounded),
-            title: Text(pickLang(
-                fr: 'Défilement infini', en: 'Infinite scroll',
-                es: 'Desplazamiento infinito', zh: '无限滚动', pt: 'Rolagem infinita')),
-            subtitle: Text(pickLang(
-                fr: 'La section Découvrir boucle et charge plus de suggestions',
-                en: 'The Discover section loops and loads more suggestions',
-                es: 'La sección Descubrir se repite y carga más sugerencias',
-                zh: '"发现"版块循环并加载更多推荐',
-                pt: 'A seção Descobrir repete e carrega mais sugestões')),
-            value: _infiniteScroll,
-            onChanged: (v) async { await _set('ls_infinite_scroll', v); setState(() => _infiniteScroll = v); }),
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          SwitchListTile(
-            secondary: const Icon(Icons.play_circle_outline_rounded),
-            title: Text(L.settingsNowPlayingSection), value: _showNowPlay,
-            onChanged: (v) async { await _set('ls_show_nowplay', v); setState(() => _showNowPlay = v); }),
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          SwitchListTile(
-            secondary: const Icon(Icons.bar_chart_rounded),
-            title: Text(L.settingsStatsSection), value: _showStats,
-            onChanged: (v) async { await _set('ls_show_stats', v); setState(() => _showStats = v); }),
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          SwitchListTile(
-            secondary: const Icon(Icons.explore_rounded),
-            title: Text(pickLang(fr: 'Découvrir', en: 'Discover', es: 'Descubrir', zh: '发现', pt: 'Descobrir')),
-            subtitle: Text(pickLang(
-                fr: 'Idées de musique à faire défiler',
-                en: 'Music ideas you can swipe through',
-                es: 'Ideas de música para deslizar',
-                zh: '可滑动浏览的音乐推荐',
-                pt: 'Ideias de música para deslizar')),
+          ),
+          SettingSwitchRow(
+            icon: Icons.play_circle_outline_rounded,
+            title: L.settingsNowPlayingSection,
+            value: _showNowPlay,
+            onChanged: (v) => _setBool('ls_show_nowplay', v, () => _showNowPlay = v),
+          ),
+          SettingSwitchRow(
+            icon: Icons.bar_chart_rounded,
+            title: L.settingsStatsSection,
+            value: _showStats,
+            onChanged: (v) => _setBool('ls_show_stats', v, () => _showStats = v),
+          ),
+          SettingSwitchRow(
+            icon: Icons.explore_rounded,
+            title: L.dashDiscoverTitle,
+            subtitle: L.dashDiscoverSub,
             value: _showDiscover,
-            onChanged: (v) async { await _set('ls_show_discover', v); setState(() => _showDiscover = v); }),
-          if (_showDiscover) ...[
-            SwitchListTile(
-              secondary: const Icon(Icons.auto_graph_rounded),
-              title: Text(L.discoverSmartTitle),
-              subtitle: Text(L.discoverSmartSub),
-              value: _discoverSmart,
-              onChanged: (v) async { await _set('ls_discover_smart', v); setState(() => _discoverSmart = v); }),
-            ListTile(
-              leading: const Icon(Icons.view_agenda_outlined),
-              title: Text(L.discoverLayoutTitle),
-              subtitle: Text(_layoutLabel(_discoverLayout)),
-              trailing: PopupMenuButton<String>(
-                icon: const Icon(Icons.arrow_drop_down_rounded),
-                onSelected: (v) async {
-                  final p = await SharedPreferences.getInstance();
-                  await p.setString('ls_discover_layout', v);
-                  setState(() => _discoverLayout = v);
-                },
-                itemBuilder: (_) => [
-                  for (final k in const ['scroll', 'wrap', 'list'])
-                    PopupMenuItem(value: k, child: Text(_layoutLabel(k))),
-                ],
-              )),
-            ListTile(
-              leading: const Icon(Icons.splitscreen_rounded),
-              title: Text(L.discoverSoloTitle),
-              subtitle: Text(_discoverSolo.isEmpty
-                  ? '${L.discoverSoloSub}\n${L.discoverSoloNone}'
-                  : _discoverSolo.map(discoverSourceLabel).join(', ')),
-              isThreeLine: _discoverSolo.isEmpty,
-              onTap: _pickSolo),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 14),
-              child: Column(children: [
-                _DiscoverGroupToggle(
-                  icon: Icons.auto_awesome_rounded,
-                  title: L.discoverForYou,
-                  labels: {
-                    for (final k in const ['foryou', 'onthisday', 'fresh', 'genre', 'deeper', 'forgotten', 'albums', 'country'])
-                      k: discoverSourceLabel(k),
-                  },
-                  selected: _discoverSources,
-                  onToggleGroup: (on) async {
-                    final next = List<String>.from(_discoverSources);
-                    for (final k in ['foryou', 'onthisday', 'fresh', 'genre', 'deeper', 'forgotten', 'albums', 'country']) {
-                      if (on) { if (!next.contains(k)) next.add(k); }
-                      else { next.remove(k); }
-                    }
-                    await _saveList('ls_discover_sources', next);
-                    setState(() => _discoverSources = next);
-                  },
-                  onToggleKey: (k) async {
-                    final next = List<String>.from(_discoverSources);
-                    next.contains(k) ? next.remove(k) : next.add(k);
-                    await _saveList('ls_discover_sources', next);
-                    setState(() => _discoverSources = next);
-                  },
-                ),
-                const SizedBox(height: 10),
-                _DiscoverGroupToggle(
-                  icon: Icons.public_rounded,
-                  title: L.discoverGlobalTrends,
-                  labels: {
-                    for (final e in const [
-                      ('gt', 'week'), ('gt', 'month'), ('gt', 'year'),
-                      ('ga', 'week'), ('ga', 'month'), ('ga', 'year'),
-                      ('gb', 'week'), ('gb', 'month'), ('gb', 'year'),
-                    ])
-                      '${e.$1}_${e.$2}': _globalLabel(e.$1, e.$2),
-                  },
-                  selected: _discoverSources,
-                  onToggleGroup: (on) async {
-                    final next = List<String>.from(_discoverSources);
-                    for (final k in ['gt_week', 'gt_month', 'ga_week', 'ga_month']) {
-                      if (on) { if (!next.contains(k)) next.add(k); }
-                      else { next.removeWhere((x) => x.startsWith('g') && x.contains('_')); }
-                    }
-                    await _saveList('ls_discover_sources', next);
-                    setState(() => _discoverSources = next);
-                  },
-                  onToggleKey: (k) async {
-                    final next = List<String>.from(_discoverSources);
-                    next.contains(k) ? next.remove(k) : next.add(k);
-                    await _saveList('ls_discover_sources', next);
-                    setState(() => _discoverSources = next);
-                  },
-                ),
-              ]),
-            ),
-          ],
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          SwitchListTile(
-            secondary: const Icon(Icons.history_rounded),
-            title: Text(L.dashRecentPlaysLabel), value: _showRecent,
-            onChanged: (v) async { await _set('ls_show_recent', v); setState(() => _showRecent = v); }),
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          SwitchListTile(
-            secondary: const Icon(Icons.people_rounded),
-            title: Text(L.settingsFriendsSection),
-            subtitle: Text(L.settingsFriendsSectionSub),
+            onChanged: (v) => _setBool('ls_show_discover', v, () => _showDiscover = v),
+          ),
+          SettingSwitchRow(
+            icon: Icons.history_rounded,
+            title: L.dashRecentPlaysLabel,
+            value: _showRecent,
+            onChanged: (v) => _setBool('ls_show_recent', v, () => _showRecent = v),
+          ),
+          SettingSwitchRow(
+            icon: Icons.people_rounded,
+            title: L.settingsFriendsSection,
+            subtitle: L.settingsFriendsSectionSub,
             value: _showFriends,
-            onChanged: (v) async { await _set('ls_show_friends', v); setState(() => _showFriends = v); }),
-          const Divider(height: 1, indent: 16, endIndent: 16),
+            onChanged: (v) => _setBool('ls_show_friends', v, () => _showFriends = v),
+          ),
           ValueListenableBuilder<String>(
             valueListenable: sessionKeyNotifier,
             builder: (_, session, _) {
               final enabled = session.isNotEmpty;
               return Opacity(
                 opacity: enabled ? 1.0 : 0.45,
-                child: SwitchListTile(
-                  secondary: const Icon(Icons.favorite_rounded),
-                  title: Text(L.settingsFavoritesSection),
-                  subtitle: Text(enabled
-                      ? L.settingsFavoritesSectionSub
-                      : L.settingsFavoritesNeedsKey),
+                child: SettingSwitchRow(
+                  icon: Icons.favorite_rounded,
+                  title: L.settingsFavoritesSection,
+                  subtitle: enabled ? L.settingsFavoritesSectionSub : L.settingsFavoritesNeedsKey,
                   value: enabled && _showFavorites,
                   onChanged: !enabled ? null : (v) async {
                     await _set('ls_show_favorites', v);
                     showFavoritesStatNotifier.value = v;
-                    setState(() => _showFavorites = v);
+                    if (mounted) setState(() => _showFavorites = v);
                   },
                 ),
               );
@@ -674,314 +378,70 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
           ),
         ]),
 
-        const SizedBox(height: 16),
-
-        // ── Graphique du dashboard ──────────────────────────────────────────
-        // Lets the user pick which chart replaces the old top artists /
-        // albums / tracks block on the dashboard.
-        SettingsSection(
-          label: L.settingsDashboardChartSection,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-              child: Wrap(spacing: 8, runSpacing: 8, children: [
-                ('calendar', L.dashChartCalendarLabel, Icons.grid_on_rounded),
-                ('monthly',  L.dashChartMonthlyLabel,  Icons.calendar_month_rounded),
-              ].map((opt) {
-                final (key, label, icon) = opt;
-                return M3Chip(
-                  avatar: Icon(icon, size: 16),
-                  label: Text(label),
-                  selected: _dashboardChart == key,
-                  showCheckmark: false,
-                  onSelected: (_) async {
-                    await _set('ls_dashboard_chart', key);
-                    setState(() => _dashboardChart = key);
-                  },
-                );
-              }).toList()),
+        // ── Discover ──────────────────────────────────────────────────────
+        if (_showDiscover) ...[
+          const SizedBox(height: 16),
+          SettingsSection(label: L.dashDiscoverTitle, children: [
+            SettingSwitchRow(
+              icon: Icons.auto_graph_rounded,
+              title: L.discoverSmartTitle,
+              subtitle: L.discoverSmartSub,
+              value: _discoverSmart,
+              onChanged: (v) => _setBool('ls_discover_smart', v, () => _discoverSmart = v),
             ),
-          ],
-        ),
+            SettingSwitchRow(
+              icon: Icons.loop_rounded,
+              title: L.dashInfiniteTitle,
+              subtitle: L.dashInfiniteSub,
+              value: _infiniteScroll,
+              onChanged: (v) => _setBool('ls_infinite_scroll', v, () => _infiniteScroll = v),
+            ),
+            SettingActionRow(
+              icon: Icons.auto_awesome_rounded,
+              title: L.dashFiltersOf(L.discoverForYou),
+              subtitle: _filtersSummary(_personalIds),
+              onTap: () => _pickFilters(_personalIds, L.discoverForYou),
+            ),
+            SettingActionRow(
+              icon: Icons.public_rounded,
+              title: L.dashFiltersOf(L.discoverGlobalTrends),
+              subtitle: _filtersSummary(_globalIds),
+              onTap: () => _pickFilters(_globalIds, L.discoverGlobalTrends),
+            ),
+          ]),
+        ],
 
         const SizedBox(height: 16),
 
-        // ── Cartes de statistiques ────────────────────────────────────────
-        SettingsSection(
-          label: L.dashStatCardsSectionLabel,
-          children: [
-            Padding(padding: const EdgeInsets.fromLTRB(16, 12, 16, 4), child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(children: [
-                  Icon(Icons.grid_view_rounded, size: 18, color: scheme.primary),
-                  const SizedBox(width: 8),
-                  Text(L.dashStatCardsHeading,
-                      style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-                ]),
-                const SizedBox(height: 4),
-                Text(L.dashStatCardsSub,
-                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-              ],
-            )),
-            ...kAllStatCards.map((card) {
-              final (id, emoji, _, _, _, _, _) = card;
-              final label   = statCardLabel(id);
-              final enabled = _statCards.contains(id);
-              // These cards open a detail sheet / page when tapped on the
-              // dashboard — small hint here so it's clear before enabling.
-              final tappable = _kTappableStatCards.contains(id);
-              return CheckboxListTile(
-                secondary: Text(emoji, style: const TextStyle(fontSize: 20)),
-                title: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Flexible(child: Text(label)),
-                  if (tappable) ...[
-                    const SizedBox(width: 6),
-                    Icon(Icons.touch_app_rounded, size: 15,
-                        color: scheme.onSurfaceVariant.withValues(alpha: 0.6)),
-                  ],
-                ]),
-                value: enabled,
-                controlAffinity: ListTileControlAffinity.trailing,
-                dense: true,
-                onChanged: (v) async {
-                  final updated = List<String>.from(_statCards);
-                  if (v == true) { if (!updated.contains(id)) updated.add(id); }
-                  else { updated.remove(id); }
-                  await _saveList('ls_stat_cards', updated);
-                  setState(() => _statCards = updated);
-                },
-              );
-            }),
-            Padding(padding: const EdgeInsets.fromLTRB(16, 4, 16, 14), child: FilledButton.tonalIcon(
-              icon: const Icon(Icons.swap_vert_rounded, size: 18),
-              label: Text(L.reorderCardsTitle),
-              onPressed: () async {
-                final result = await showModalBottomSheet<List<String>>(
-                  sheetAnimationStyle: kM3SheetAnimation,
-                  context: context, isScrollControlled: true,
-                  backgroundColor: Colors.transparent, useSafeArea: true,
-                  builder: (_) => CardReorderSheet(cards: List.from(_statCards)),
-                );
-                if (result != null && mounted) {
-                  await _saveList('ls_stat_cards', result);
-                  setState(() => _statCards = result);
-                }
-              },
-            )),
-          ],
-        ),
+        // ── Dashboard chart ───────────────────────────────────────────────
+        SettingsSection(label: L.settingsDashboardChartSection, children: [
+          SettingChoiceRow(
+            icon: Icons.insights_rounded,
+            title: L.settingsDashboardChartSection,
+            options: [
+              ('calendar', L.dashChartCalendarLabel, Icons.grid_on_rounded),
+              ('monthly',  L.dashChartMonthlyLabel,  Icons.calendar_month_rounded),
+            ],
+            value: _dashboardChart,
+            onChanged: (v) => _setStr('ls_dashboard_chart', v, () => _dashboardChart = v),
+          ),
+        ]),
+
+        const SizedBox(height: 16),
+
+        // ── Stat cards ────────────────────────────────────────────────────
+        SettingsSection(label: L.dashStatCardsSectionLabel, children: [
+          SettingActionRow(
+            icon: Icons.grid_view_rounded,
+            title: L.dashStatCardsHeading,
+            subtitle: '${_statCards.length} / ${kAllStatCards.length}',
+            onTap: _pickCards,
+          ),
+        ]),
 
         const SizedBox(height: 20),
         const RestartBanner(),
         const SizedBox(height: 20),
-      ]),
-    );
-  }
-}
-
-// "Tracks · week" style label for the global trend chips.
-String _globalLabel(String kind, String range) => discoverSourceLabel('${kind}_$range');
-
-// ── Groupe "Pour toi" / "Tendances mondiales" avec son propre switch ─────────
-// A group switch turns the whole group on/off at once (adds/removes all
-// its source keys); when on, per-source chips let you fine-tune which
-// tabs show up inside that group on the dashboard.
-class _DiscoverGroupToggle extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final Map<String, String> labels; // source key -> chip label
-  final List<String> selected;
-  final void Function(bool on) onToggleGroup;
-  final void Function(String key) onToggleKey;
-
-  const _DiscoverGroupToggle({
-    required this.icon,
-    required this.title,
-    required this.labels,
-    required this.selected,
-    required this.onToggleGroup,
-    required this.onToggleKey,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
-    final on     = labels.keys.any(selected.contains);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
-      ),
-      child: Column(children: [
-        SwitchListTile(
-          dense: true,
-          secondary: Icon(icon, size: 20, color: scheme.primary),
-          title: Text(title, style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
-          value: on,
-          onChanged: onToggleGroup,
-        ),
-        if (on)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-            child: Wrap(spacing: 8, runSpacing: 8, children: [
-              for (final e in labels.entries)
-                M3Chip(
-                  label: Text(e.value),
-                  selected: selected.contains(e.key),
-                  onSelected: (_) => onToggleKey(e.key),
-                ),
-            ]),
-          ),
-      ]),
-    );
-  }
-}
-
-// ── Widget sélecteur de type de fallback ──────────────────────────────────────
-
-class _FallbackTypeSelector extends StatelessWidget {
-  final String value;
-  final ColorScheme scheme;
-  final TextTheme text;
-  final void Function(String) onChanged;
-
-  const _FallbackTypeSelector({
-    required this.value,
-    required this.scheme,
-    required this.text,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final options = [
-      ('none',        Icons.hide_image_outlined,   L.fallbackTypeNothing),
-      ('top_track',   Icons.music_note_rounded,    L.fallbackTypeTopTrack),
-      ('top_album',   Icons.album_rounded,         L.fallbackTypeTopAlbum),
-      ('top_artist',  Icons.mic_rounded,           L.fallbackTypeTopArtist),
-      ('custom_url',  Icons.image_outlined,        L.fallbackTypeCustomImage),
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: options.map((opt) {
-        final (key, icon, label) = opt;
-        final sel = value == key;
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(12),
-            onTap: () => onChanged(key),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-              decoration: BoxDecoration(
-                color: sel
-                    ? scheme.primaryContainer.withValues(alpha: 0.7)
-                    : scheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: sel
-                      ? scheme.primary.withValues(alpha: 0.55)
-                      : scheme.outlineVariant.withValues(alpha: 0.4),
-                  width: sel ? 1.5 : 1,
-                ),
-              ),
-              child: Row(children: [
-                Icon(icon,
-                    size: 18,
-                    color: sel ? scheme.onPrimaryContainer : scheme.onSurfaceVariant),
-                const SizedBox(width: 10),
-                Text(label, style: text.bodyMedium?.copyWith(
-                  fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
-                  color: sel ? scheme.onPrimaryContainer : scheme.onSurface,
-                )),
-                const Spacer(),
-                if (sel)
-                  Icon(Icons.check_circle_rounded, size: 18, color: scheme.primary)
-                else
-                  Icon(Icons.radio_button_unchecked_rounded,
-                      size: 18, color: scheme.outlineVariant),
-              ]),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
-// ── Chip de période pour le fallback ─────────────────────────────────────────
-
-class _FallbackPeriodChip extends StatelessWidget {
-  final String label, value, selected;
-  final void Function(String) onTap;
-  const _FallbackPeriodChip({
-    required this.label, required this.value,
-    required this.selected, required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final sel = value == selected;
-    return M3Chip(
-      label: Text(label),
-      selected: sel,
-      showCheckmark: false,
-      onSelected: (_) => onTap(value),
-    );
-  }
-}
-
-// ── Résumé du fallback actif ──────────────────────────────────────────────────
-
-class _FallbackSummary extends StatelessWidget {
-  final String type, period;
-  const _FallbackSummary({required this.type, required this.period});
-
-  String _typeLabel() {
-    switch (type) {
-      case 'top_track':  return L.fallbackTypeTopTrack;
-      case 'top_album':  return L.fallbackTypeTopAlbum;
-      case 'top_artist': return L.fallbackTypeTopArtist;
-      case 'custom_url': return L.fallbackTypeCustomImage;
-      default: return '';
-    }
-  }
-
-  String _periodLabel() {
-    switch (period) {
-      case '7day':   return L.fallbackPeriod1Week;
-      case '1month': return L.fallbackPeriod1Month;
-      default:       return L.fallbackPeriodAllTime;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
-
-    final showPeriod = ['top_track', 'top_album', 'top_artist'].contains(type);
-    final summary = showPeriod
-        ? L.fallbackWillShow('${_typeLabel()} · ${_periodLabel()}')
-        : (type == 'custom_url' ? L.fallbackWillShowCustomUrl : '');
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
-      ),
-      child: Row(children: [
-        Icon(Icons.info_outline_rounded, size: 14, color: scheme.onSurfaceVariant),
-        const SizedBox(width: 8),
-        Expanded(child: Text(summary,
-            style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant))),
       ]),
     );
   }
