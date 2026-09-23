@@ -11,6 +11,7 @@ import '../l10n/l10n.dart';
 import '../services/account_manager.dart';
 import '../services/lastfm_service.dart';
 import 'recap_story_page.dart';
+import 'settings/settings_rows.dart';
 
 class NotificationDetailPage extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -117,43 +118,39 @@ class NotificationDetailPage extends StatelessWidget {
             ),
           ],
 
-          if (type == 'daily' || type == 'weekly') ...[
+          if (type == 'daily' || type == 'weekly' || url.isNotEmpty) ...[
             const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: () async {
-                final acc = await AccountManager.getActive();
-                if (acc == null || !acc.isValid || !context.mounted) return;
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => RecapStoryPage(
-                    service: LastFmService(apiKey: acc.apiKey, username: acc.username),
-                    username: acc.username,
-                    initialPeriod: type == 'daily' ? 0 : 1,
-                  ),
-                ));
-              },
-              icon:  const Icon(Icons.auto_stories_rounded),
-              label: Text(L.recapSeeFull),
-              style: FilledButton.styleFrom(
-                minimumSize: const Size.fromHeight(48),
-              ),
-            ),
-          ],
-
-          if (url.isNotEmpty) ...[
-            const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: () async {
-                final uri = Uri.tryParse(url);
-                if (uri != null && await canLaunchUrl(uri)) {
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                }
-              },
-              icon:  const Icon(Icons.open_in_new_rounded),
-              label: Text(L.notifDetailOpenLink),
-              style: FilledButton.styleFrom(
-                minimumSize: const Size.fromHeight(48),
-              ),
-            ),
+            SettingActionGroup(items: [
+              if (type == 'daily' || type == 'weekly')
+                ActionGroupItem(
+                  primary: true,
+                  icon: Icons.auto_stories_rounded,
+                  label: L.recapSeeFull,
+                  onPressed: () async {
+                    final acc = await AccountManager.getActive();
+                    if (acc == null || !acc.isValid || !context.mounted) return;
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => RecapStoryPage(
+                        service: LastFmService(apiKey: acc.apiKey, username: acc.username),
+                        username: acc.username,
+                        initialPeriod: type == 'daily' ? 0 : 1,
+                      ),
+                    ));
+                  },
+                ),
+              if (url.isNotEmpty)
+                ActionGroupItem(
+                  primary: type != 'daily' && type != 'weekly',
+                  icon: Icons.open_in_new_rounded,
+                  label: L.notifDetailOpenLink,
+                  onPressed: () async {
+                    final uri = Uri.tryParse(url);
+                    if (uri != null && await canLaunchUrl(uri)) {
+                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                    }
+                  },
+                ),
+            ]),
           ],
         ],
       ),

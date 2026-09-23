@@ -216,11 +216,14 @@ class _SyncPageState extends State<SyncPage> {
                         Text('${L.syncInProgress} ${progress.shortLabel}',
                             style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                       ] else ...[
-                        FilledButton.icon(
-                          onPressed: _syncNow,
-                          icon: const Icon(Icons.sync_rounded),
-                          label: Text(L.syncNowButton),
-                        ),
+                        SettingActionGroup(items: [
+                          ActionGroupItem(
+                            primary: true,
+                            icon: Icons.sync_rounded,
+                            label: L.syncNowButton,
+                            onPressed: _syncNow,
+                          ),
+                        ]),
                         if (progress.isDone) ...[
                           const SizedBox(height: 10),
                           Text(
@@ -252,14 +255,14 @@ class _SyncPageState extends State<SyncPage> {
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      FilledButton.icon(
-                        onPressed: _resyncingAll ? null : _resyncAllFriends,
-                        icon: _resyncingAll
-                            ? const SizedBox(width: 16, height: 16,
-                                child: M3Spinner())
-                            : const Icon(Icons.sync_rounded),
-                        label: Text(_syncCt('Tout resynchroniser', 'Resync everyone')),
-                      ),
+                      SettingActionGroup(items: [
+                        ActionGroupItem(
+                          primary: true,
+                          icon: Icons.sync_rounded,
+                          label: _syncCt('Tout resynchroniser', 'Resync everyone'),
+                          onPressed: _resyncingAll ? null : _resyncAllFriends,
+                        ),
+                      ]),
                       if (_friendUsernames.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         const Divider(height: 1),

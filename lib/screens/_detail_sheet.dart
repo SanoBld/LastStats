@@ -864,6 +864,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       Divider(height: 1,
                           color: scheme.outlineVariant.withValues(alpha: 0.4)),
                       _buildStatsRow(scheme),
+                      _buildMusicLinks(scheme),
                       if (_tags().isNotEmpty) _buildTags(scheme),
                       if (widget.type == 'tracks') _buildPreviewPlayer(scheme),
                       // Heart + play, right above the biography
@@ -980,11 +981,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               ),
             ),
           ],
-          const SizedBox(height: 14),
-          // Music app link buttons
-          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Expanded(child: _buildMusicLinks(hasImage)),
-          ]),
           const SizedBox(height: 16),
         ],
       ),
@@ -1030,7 +1026,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   // ── Music app links ─────────────────────────────────────────────────────────
 
-  Widget _buildMusicLinks(bool hasImage) {
+  Widget _buildMusicLinks(ColorScheme scheme) {
     final encodedName   = Uri.encodeComponent(_name);
     final encodedArtist = Uri.encodeComponent(_artist);
 
@@ -1060,42 +1056,25 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       }
     }).toList();
 
-    Widget chip(({String label, Color color, IconData icon, String? asset, String url}) b) => Padding(
-      padding: const EdgeInsets.only(right: 8, bottom: 4),
-      child: GestureDetector(
-        onTap: () async {
-          final uri = Uri.parse(b.url);
-          try { await launchUrl(uri, mode: LaunchMode.externalApplication); }
-          catch (_) { await launchUrl(uri, mode: LaunchMode.platformDefault); }
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: hasImage ? 0.38 : 0.10),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: (hasImage ? Colors.white : Colors.black).withValues(alpha: 0.18),
-              width: 1,
+    // Logo-only Material You buttons, each with its own expressive shape.
+    const shapeIdx = [0, 5, 4, 1]; // cookie, squircle, burst, circle
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: [
+          for (var i = 0; i < buttons.length; i++)
+            _PlatformLinkButton(
+              label: buttons[i].label,
+              asset: buttons[i].asset,
+              fallbackIcon: buttons[i].icon,
+              url: buttons[i].url,
+              brandColor: buttons[i].asset == null ? null : buttons[i].color,
+              shape: m3ImageShape(shapeIdx[i % shapeIdx.length], 48),
             ),
-          ),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            _PlatformGlyph(
-              asset: b.asset,
-              fallbackIcon: b.icon,
-              size: 14,
-              color: hasImage ? Colors.white.withValues(alpha: 0.90) : b.color,
-            ),
-            const SizedBox(width: 5),
-            Text(b.label, style: AppText.label.copyWith(color: hasImage ? Colors.white.withValues(alpha: 0.90) : b.color)),
-          ]),
-        ),
+        ],
       ),
-    );
-
-    return Wrap(
-      alignment: WrapAlignment.start,
-      runAlignment: WrapAlignment.start,
-      children: buttons.map(chip).toList(),
     );
   }
 
@@ -3560,6 +3539,72 @@ class _PlatformGlyph extends StatelessWidget {
           colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
         );
       },
+    );
+  }
+}
+
+// ── Logo-only platform button (Material You tonal, expressive shape) ──────
+class _PlatformLinkButton extends StatefulWidget {
+  final String label, url;
+  final String? asset;
+  final IconData fallbackIcon;
+  final Color? brandColor;
+  final ShapeBorder shape;
+
+  const _PlatformLinkButton({
+    required this.label,
+    required this.url,
+    required this.asset,
+    required this.fallbackIcon,
+    required this.brandColor,
+    required this.shape,
+  });
+
+  @override
+  State<_PlatformLinkButton> createState() => _PlatformLinkButtonState();
+}
+
+class _PlatformLinkButtonState extends State<_PlatformLinkButton> {
+  bool _down = false;
+
+  Future<void> _open() async {
+    final uri = Uri.parse(widget.url);
+    try { await launchUrl(uri, mode: LaunchMode.externalApplication); }
+    catch (_) { await launchUrl(uri, mode: LaunchMode.platformDefault); }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final down = _down && !M3Motion.reduced(context);
+    return Tooltip(
+      message: widget.label,
+      child: AnimatedScale(
+        scale: down ? 0.92 : 1.0,
+        duration: M3Motion.spatialFastDuration,
+        curve: M3Motion.spatialFast,
+        child: Material(
+          color: scheme.secondaryContainer,
+          shape: widget.shape,
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            customBorder: widget.shape,
+            onTap: _open,
+            onHighlightChanged: (v) => setState(() => _down = v),
+            child: SizedBox(
+              width: 48, height: 48,
+              child: Center(
+                child: _PlatformGlyph(
+                  asset: widget.asset,
+                  fallbackIcon: widget.fallbackIcon,
+                  size: 22,
+                  color: widget.brandColor ?? scheme.onSecondaryContainer,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

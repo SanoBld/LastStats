@@ -6,6 +6,7 @@
 import 'dart:convert';
 import '../../theme/m3_shapes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../widgets/skeleton.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +17,7 @@ import '../../services/favorites_auth.dart';
 import '../setup_screen.dart';
 import '../home_screen.dart';
 import 'settings_helpers.dart';
+import 'settings_rows.dart';
 
 class AccountPage extends StatefulWidget {
   final String username;
@@ -83,6 +85,15 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   // Fetch the Last.fm profile picture URL for the active account.
+  Future<void> _copyKey(String value) async {
+    await Clipboard.setData(ClipboardData(text: value));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+          content: Text(L.exportCopied), duration: const Duration(seconds: 1)));
+  }
+
   Future<void> _fetchAvatar(String username, String apiKey) async {
     try {
       final uri = Uri.parse(
@@ -482,16 +493,23 @@ class _AccountPageState extends State<AccountPage> {
                   style: text.bodySmall?.copyWith(
                       color: scheme.onSurfaceVariant, fontFamily: 'monospace'),
                 ),
-                trailing: IconButton(
-                  icon: Icon(_obscureApiKey
-                      ? Icons.visibility_outlined : Icons.visibility_off_outlined),
-                  onPressed: () => setState(() => _obscureApiKey = !_obscureApiKey),
-                ),
+                onTap: () => _copyKey(active.apiKey),
+                trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                  IconButton(
+                    icon: const Icon(Icons.copy_rounded, size: 20),
+                    onPressed: () => _copyKey(active.apiKey),
+                  ),
+                  IconButton(
+                    icon: Icon(_obscureApiKey
+                        ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+                    onPressed: () => setState(() => _obscureApiKey = !_obscureApiKey),
+                  ),
+                ]),
               ),
               const Divider(height: 1, indent: 16, endIndent: 16),
               ValueListenableBuilder<String>(
                 valueListenable: secretKeyNotifier,
-                builder: (_, secret, _) => ListTile(
+                builder: (_, secret, _) => SettingTile(
                   leading: Icon(Icons.favorite_rounded,
                       color: secret.isNotEmpty ? Colors.redAccent : scheme.onSurfaceVariant,
                       size: 20),
@@ -503,13 +521,20 @@ class _AccountPageState extends State<AccountPage> {
                     style: text.bodySmall?.copyWith(
                         color: scheme.onSurfaceVariant, fontFamily: 'monospace'),
                   ),
+                  onTap: secret.isEmpty ? null : () => _copyKey(secret),
                   trailing: secret.isEmpty
                       ? null
-                      : IconButton(
-                          icon: Icon(_obscureSecret
-                              ? Icons.visibility_outlined : Icons.visibility_off_outlined),
-                          onPressed: () => setState(() => _obscureSecret = !_obscureSecret),
-                        ),
+                      : Row(mainAxisSize: MainAxisSize.min, children: [
+                          IconButton(
+                            icon: const Icon(Icons.copy_rounded, size: 20),
+                            onPressed: () => _copyKey(secret),
+                          ),
+                          IconButton(
+                            icon: Icon(_obscureSecret
+                                ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+                            onPressed: () => setState(() => _obscureSecret = !_obscureSecret),
+                          ),
+                        ]),
                 ),
               ),
               const Divider(height: 1, indent: 16, endIndent: 16),
@@ -523,15 +548,14 @@ class _AccountPageState extends State<AccountPage> {
                     valueListenable: sessionKeyNotifier,
                     builder: (_, session, _) {
                       if (session.isNotEmpty) {
-                        return OutlinedButton.icon(
-                          onPressed: disconnectFavorites,
-                          icon: const Icon(Icons.link_off_rounded, size: 18),
-                          label: Text(L.acctDisconnectFavorites),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: scheme.error,
-                            side: BorderSide(color: scheme.error),
+                        return SettingActionGroup(items: [
+                          ActionGroupItem(
+                            danger: true,
+                            icon: Icons.link_off_rounded,
+                            label: L.acctDisconnectFavorites,
+                            onPressed: disconnectFavorites,
                           ),
-                        );
+                        ]);
                       }
                       return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         TextField(
@@ -545,14 +569,14 @@ class _AccountPageState extends State<AccountPage> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        FilledButton.icon(
-                          onPressed: _connectingFav ? null : () => _connectFav(active),
-                          icon: _connectingFav
-                              ? const SizedBox(width: 16, height: 16,
-                                  child: M3Spinner())
-                              : const Icon(Icons.favorite_border_rounded, size: 18),
-                          label: Text(L.acctConnectFavorites),
-                        ),
+                        SettingActionGroup(items: [
+                          ActionGroupItem(
+                            primary: true,
+                            icon: Icons.favorite_border_rounded,
+                            label: L.acctConnectFavorites,
+                            onPressed: _connectingFav ? null : () => _connectFav(active),
+                          ),
+                        ]),
                       ]);
                     },
                   ),
