@@ -739,8 +739,8 @@ class AppStringsDe implements AppStrings {
   @override String get recapTop10 => 'Top 10';
 
   // ── Discover filters ─────────────────────────────────────────────────────
-  @override String get discoverSmartTitle => 'Relevantester Filter zuerst';
-  @override String get discoverSmartSub => 'Wählt nach Uhrzeit, Datum, Verlauf und deinen Gewohnheiten';
+  @override String get discoverSmartTitle => 'Nützlichster Filter zuerst';
+  @override String get discoverSmartSub => 'Je nach Uhrzeit, Tag und deinen Vorlieben';
   @override String get discoverForYou => 'Für dich';
   @override String get discoverGlobalTrends => 'Globale Trends';
   @override String get discoverSrcForyou => 'Dein Mix';
@@ -756,18 +756,18 @@ class AppStringsDe implements AppStrings {
   @override String get discoverWeek => 'Woche';
   @override String get discoverMonth => 'Monat';
   @override String get discoverYear => 'Jahr';
-  @override String get discoverNothing => 'Im Moment nichts anzuzeigen';
+  @override String get discoverNothing => 'Noch nichts zu zeigen';
   @override String discoverLike(String names) => 'Wie $names';
-  @override String get dashReorderSections => 'Bereiche neu anordnen';
+  @override String get dashReorderSections => 'Reihenfolge der Bereiche ändern';
   @override String get dashInfiniteTitle => 'Endloses Scrollen';
-  @override String get dashInfiniteSub => 'Der Entdecken-Bereich wiederholt sich und lädt mehr Vorschläge';
+  @override String get dashInfiniteSub => 'Entdecken läuft in Endlosschleife und schlägt immer mehr vor';
   @override String get dashDiscoverTitle => 'Entdecken';
-  @override String get dashDiscoverSub => 'Musikideen zum Durchwischen';
+  @override String get dashDiscoverSub => 'Musiktipps zum Durchwischen';
   @override String get dashSortButton => 'Sortieren';
   @override String get dashSortDone => 'Fertig';
-  @override String get dashSortHint => 'Elemente ziehen, um die Reihenfolge zu ändern';
-  @override String get dashSortSmartNote => 'Intelligente Sortierung ist aktiv: Sie kann diese Filter je nach Moment umsortieren.';
-  @override String get dashSeparateRow => 'In eigener Zeile anzeigen';
-  @override String dashFiltersOf(String group) => 'Filter · $group';
-  @override String get apShapeSingle => 'Einzelne Form';
+  @override String get dashSortHint => 'Zum Umsortieren ziehen';
+  @override String get dashSortSmartNote => 'Die intelligente Sortierung ist an und kann diese Reihenfolge je nach Moment ändern.';
+  @override String get dashSeparateRow => 'In eigener Zeile';
+  @override String dashFiltersOf(String group) => 'Filter für „$group“';
+  @override String get apShapeSingle => 'Nur eine Form';
 }

@@ -4,7 +4,6 @@
 // Controls pcModeNotifier ('auto' | 'on' | 'off') and persists to prefs.
 
 import 'package:flutter/material.dart';
-import '../../widgets/m3_components.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app_state.dart';
 import '../../l10n/l10n.dart';
@@ -63,9 +62,6 @@ class _PcModeSectionState extends State<PcModeSection> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
-
     return SettingsSection(
       label: L.pcModeLayout,
       children: [

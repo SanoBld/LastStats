@@ -73,7 +73,7 @@ class _FaqPageState extends State<FaqPage> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: scheme.primaryContainer.withValues(alpha: 0.45),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
           ),
           child: Row(children: [

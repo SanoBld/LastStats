@@ -193,7 +193,7 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
                     return Container(
                       decoration: BoxDecoration(
                         color: isLatest ? scheme.tertiaryContainer.withValues(alpha: 0.5) : scheme.surface,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(24),
                         border: Border.all(
                           color: isLatest
                               ? scheme.tertiary.withValues(alpha: 0.5)
@@ -203,7 +203,7 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
                       ),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         InkWell(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(24),
                           onTap: () => setState(() {
                             if (isExpanded) { _expanded.remove(r.version); }
                             else { _expanded.add(r.version); }

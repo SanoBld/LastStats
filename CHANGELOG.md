@@ -37,7 +37,9 @@
 - Same controls everywhere: switch rows, "choice" rows, action rows, sliders, text/URL rows and time rows. The current value is always visible on the right (no more mixed chips, segmented buttons and cards)
 - New choice sheet: shows all options at once with shape-morphing cards, and scrolls only when the list is too long for the screen
 - Applied to Dashboard, Appearance, Startup, Notifications, Backup, Sync, Cache, Battery saver and PC mode. Older rows on the other pages are restyled automatically
-- All new texts are translated in the 10 app languages
+- Updates, About, Account, FAQ, Language and Version history now share the same style: softer rounded cards, cookie-shaped logo and icons, rounder update banner
+- Destructive actions (log out, clear cache…) now use a red container with a matching icon instead of a red icon on a blue badge
+- All new texts are translated in the 10 app languages, reworded to sound natural
 
 **Dashboard settings**
 - Settings > Dashboard rebuilt: header image, animation and blur, visible sections, Discover, chart and stat cards, each with the same row types

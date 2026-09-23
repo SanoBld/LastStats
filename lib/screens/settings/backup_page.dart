@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import '../../widgets/skeleton.dart';
-import '../../widgets/m3_components.dart';
 import '../../theme/m3_shapes.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -341,7 +340,7 @@ class _BackupPageState extends State<BackupPage> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: scheme.primaryContainer.withValues(alpha: 0.4),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -591,7 +590,7 @@ class _BackupPageState extends State<BackupPage> {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: scheme.errorContainer.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(color: scheme.error.withValues(alpha: 0.25)),
           ),
           child: Row(children: [

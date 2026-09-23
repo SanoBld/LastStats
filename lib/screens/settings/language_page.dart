@@ -53,7 +53,7 @@ class _LanguagePageState extends State<LanguagePage> {
             final sel = _locale == lang.code;
             return Column(children: [
               InkWell(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(24),
                 onTap: () => _setLocale(lang.code),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -95,7 +95,7 @@ class _LanguagePageState extends State<LanguagePage> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: scheme.tertiaryContainer.withValues(alpha: 0.4),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
           ),
           child: Row(children: [
@@ -114,7 +114,7 @@ class _LanguagePageState extends State<LanguagePage> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: scheme.surfaceContainerHigh,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
           ),
           child: Row(children: [

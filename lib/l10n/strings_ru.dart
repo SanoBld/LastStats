@@ -739,8 +739,8 @@ class AppStringsRu implements AppStrings {
   @override String get recapTop10 => 'Топ 10';
 
   // ── Discover filters ─────────────────────────────────────────────────────
-  @override String get discoverSmartTitle => 'Самый подходящий фильтр первым';
-  @override String get discoverSmartSub => 'Выбирает по времени, дате, истории и вашим привычкам';
+  @override String get discoverSmartTitle => 'Сначала самый полезный фильтр';
+  @override String get discoverSmartSub => 'С учётом времени, дня и того, чем вы пользуетесь чаще всего';
   @override String get discoverForYou => 'Для вас';
   @override String get discoverGlobalTrends => 'Мировые тренды';
   @override String get discoverSrcForyou => 'Ваш микс';
@@ -756,18 +756,18 @@ class AppStringsRu implements AppStrings {
   @override String get discoverWeek => 'неделя';
   @override String get discoverMonth => 'месяц';
   @override String get discoverYear => 'год';
-  @override String get discoverNothing => 'Пока нечего показывать';
+  @override String get discoverNothing => 'Пока ничего нет';
   @override String discoverLike(String names) => 'Как $names';
   @override String get dashReorderSections => 'Изменить порядок разделов';
   @override String get dashInfiniteTitle => 'Бесконечная прокрутка';
-  @override String get dashInfiniteSub => 'Раздел «Открытия» зацикливается и подгружает больше рекомендаций';
+  @override String get dashInfiniteSub => '«Открытия» идут по кругу и предлагают всё новое';
   @override String get dashDiscoverTitle => 'Открытия';
-  @override String get dashDiscoverSub => 'Музыкальные идеи для просмотра';
+  @override String get dashDiscoverSub => 'Музыкальные идеи, которые можно листать';
   @override String get dashSortButton => 'Сортировка';
   @override String get dashSortDone => 'Готово';
-  @override String get dashSortHint => 'Перетащите элементы, чтобы изменить порядок';
-  @override String get dashSortSmartNote => 'Умная сортировка включена: она может менять порядок фильтров в зависимости от момента.';
-  @override String get dashSeparateRow => 'Показать отдельной строкой';
-  @override String dashFiltersOf(String group) => 'Фильтры · $group';
-  @override String get apShapeSingle => 'Одна форма';
+  @override String get dashSortHint => 'Перетащите, чтобы изменить порядок';
+  @override String get dashSortSmartNote => 'Умная сортировка включена, поэтому порядок может меняться в зависимости от момента.';
+  @override String get dashSeparateRow => 'Отдельной строкой';
+  @override String dashFiltersOf(String group) => 'Фильтры раздела «$group»';
+  @override String get apShapeSingle => 'Только одна форма';
 }

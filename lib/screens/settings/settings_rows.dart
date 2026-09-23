@@ -27,6 +27,7 @@ class SettingTile extends StatefulWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final bool enabled;
+  final bool danger; // destructive action: red container badge + red title
   const SettingTile({
     super.key,
     this.leading,
@@ -36,6 +37,7 @@ class SettingTile extends StatefulWidget {
     this.onTap,
     this.onLongPress,
     this.enabled = true,
+    this.danger = false,
   });
 
   @override
@@ -52,16 +54,25 @@ class _SettingTileState extends State<SettingTile> {
     final reduce = M3Motion.reduced(context);
 
     Widget? badge;
+    var danger = widget.danger;
     if (widget.leading != null) {
       var inner = widget.leading!;
-      if (inner is Icon && inner.icon != null) inner = Icon(inner.icon);
+      // Old pages wrap their icon in a Container / colored Icon: unwrap it so
+      // every row gets the same badge, and keep "red icon" = destructive.
+      if (inner is Container && inner.child is Icon) inner = inner.child!;
+      if (inner is Icon && inner.icon != null) {
+        if (inner.color != null && inner.color == scheme.error) danger = true;
+        inner = Icon(inner.icon);
+      }
+      final bg = danger ? scheme.errorContainer : scheme.primaryContainer;
+      final fg = danger ? scheme.onErrorContainer : scheme.onPrimaryContainer;
       badge = M3CookieBadge(
         size: 40,
-        color: scheme.primaryContainer,
+        color: bg,
         child: IconTheme(
-          data: IconThemeData(color: scheme.onPrimaryContainer, size: 20),
+          data: IconThemeData(color: fg, size: 20),
           child: DefaultTextStyle(
-            style: TextStyle(fontSize: 18, color: scheme.onPrimaryContainer),
+            style: TextStyle(fontSize: 18, color: fg),
             child: inner,
           ),
         ),
@@ -75,7 +86,9 @@ class _SettingTileState extends State<SettingTile> {
         Expanded(
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
             DefaultTextStyle(
-              style: text.titleMedium!.copyWith(fontWeight: FontWeight.w600, color: scheme.onSurface),
+              style: text.titleMedium!.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: danger ? scheme.error : scheme.onSurface),
               child: widget.title,
             ),
             if (widget.subtitle != null) ...[
@@ -176,6 +189,7 @@ class SettingActionRow extends StatelessWidget {
   final String? subtitle;
   final VoidCallback? onTap;
   final Widget? trailing;
+  final bool danger;
   const SettingActionRow({
     super.key,
     required this.icon,
@@ -183,11 +197,13 @@ class SettingActionRow extends StatelessWidget {
     this.subtitle,
     this.onTap,
     this.trailing,
+    this.danger = false,
   });
 
   @override
   Widget build(BuildContext context) => SettingTile(
         leading: Icon(icon),
+        danger: danger,
         title: Text(title),
         subtitle: subtitle == null || subtitle!.isEmpty ? null : Text(subtitle!),
         trailing: trailing ??
@@ -465,7 +481,7 @@ class _OptionCard extends StatelessWidget {
                       child: title,
                     ),
                   ),
-                  if (trailing != null) trailing!,
+                  ?trailing,
                 ]),
               ),
             ),

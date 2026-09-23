@@ -768,8 +768,8 @@ class AppStringsFr implements AppStrings {
   @override String get recapTop10 => 'Top 10';
 
   // ── Discover filters ─────────────────────────────────────────────────────
-  @override String get discoverSmartTitle => 'Filtre le plus pertinent en premier';
-  @override String get discoverSmartSub => 'Choisit selon l\'heure, le jour, ton historique et tes habitudes';
+  @override String get discoverSmartTitle => 'Filtre le plus utile en premier';
+  @override String get discoverSmartSub => 'Selon l\'heure, le jour et ce que tu écoutes le plus';
   @override String get discoverForYou => 'Pour toi';
   @override String get discoverGlobalTrends => 'Tendances mondiales';
   @override String get discoverSrcForyou => 'Ton mix';
@@ -785,18 +785,18 @@ class AppStringsFr implements AppStrings {
   @override String get discoverWeek => 'semaine';
   @override String get discoverMonth => 'mois';
   @override String get discoverYear => 'année';
-  @override String get discoverNothing => 'Rien à afficher pour le moment';
+  @override String get discoverNothing => 'Rien à afficher pour l\'instant';
   @override String discoverLike(String names) => 'Comme $names';
-  @override String get dashReorderSections => 'Réorganiser les sections';
+  @override String get dashReorderSections => 'Changer l\'ordre des sections';
   @override String get dashInfiniteTitle => 'Défilement infini';
-  @override String get dashInfiniteSub => 'La section Découvrir boucle et charge plus de suggestions';
+  @override String get dashInfiniteSub => 'Découvrir tourne en boucle et propose toujours plus d\'idées';
   @override String get dashDiscoverTitle => 'Découvrir';
-  @override String get dashDiscoverSub => 'Idées de musique à faire défiler';
+  @override String get dashDiscoverSub => 'Des idées de musique à faire défiler';
   @override String get dashSortButton => 'Trier';
   @override String get dashSortDone => 'Terminé';
-  @override String get dashSortHint => 'Glisse les éléments pour changer leur ordre';
-  @override String get dashSortSmartNote => 'Le tri intelligent est actif : il peut réordonner ces filtres selon le moment.';
-  @override String get dashSeparateRow => 'Afficher sur une ligne à part';
-  @override String dashFiltersOf(String group) => 'Filtres · $group';
-  @override String get apShapeSingle => 'Forme unique';
+  @override String get dashSortHint => 'Glisse pour changer l\'ordre';
+  @override String get dashSortSmartNote => 'Le tri intelligent est activé, il peut donc changer cet ordre selon le moment.';
+  @override String get dashSeparateRow => 'Sur sa propre ligne';
+  @override String dashFiltersOf(String group) => 'Filtres de « $group »';
+  @override String get apShapeSingle => 'Une seule forme';
 }

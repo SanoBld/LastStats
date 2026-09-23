@@ -10,6 +10,7 @@ import '../../services/update_service.dart';
 import '../../widgets/markdown_lite.dart';
 import 'update_history_page.dart';
 import 'settings_helpers.dart';
+import '../../widgets/m3_components.dart';
 
 class UpdatesPage extends StatefulWidget {
   const UpdatesPage({super.key});
@@ -89,12 +90,11 @@ class _UpdatesPageState extends State<UpdatesPage> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: scheme.tertiaryContainer,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
+              borderRadius: BorderRadius.circular(28),
             ),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                Icon(Icons.system_update_rounded, color: scheme.onTertiaryContainer, size: 28),
+                M3CookieBadge(size: 48, color: scheme.tertiary, child: Icon(Icons.system_update_rounded, color: scheme.onTertiary)),
                 const SizedBox(width: 12),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [

@@ -2,8 +2,6 @@
 import 'package:flutter/material.dart';
 import 'settings_helpers.dart';
 import 'settings_rows.dart';
-import '../../widgets/m3_components.dart';
-import '../../theme/m3_motion.dart';
 import '../../theme/m3_shapes.dart';
 import '../../widgets/skeleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -192,6 +190,7 @@ class _CachePageState extends State<CachePage> {
                     SettingActionRow(
                       icon: Icons.delete_sweep_rounded,
                       title: L.cacheClearBtn,
+                      danger: true,
                       onTap: _clearAll,
                     ),
                   ],

@@ -739,8 +739,8 @@ class AppStringsAr implements AppStrings {
   @override String get recapTop10 => 'أفضل 10';
 
   // ── Discover filters ─────────────────────────────────────────────────────
-  @override String get discoverSmartTitle => 'الفلتر الأكثر صلة أولاً';
-  @override String get discoverSmartSub => 'يختار حسب الوقت والتاريخ وسجلّك وعاداتك';
+  @override String get discoverSmartTitle => 'الفلتر الأنسب أولاً';
+  @override String get discoverSmartSub => 'حسب الوقت واليوم وما تستخدمه أكثر';
   @override String get discoverForYou => 'لك';
   @override String get discoverGlobalTrends => 'الاتجاهات العالمية';
   @override String get discoverSrcForyou => 'مزيجك';
@@ -756,18 +756,18 @@ class AppStringsAr implements AppStrings {
   @override String get discoverWeek => 'أسبوع';
   @override String get discoverMonth => 'شهر';
   @override String get discoverYear => 'سنة';
-  @override String get discoverNothing => 'لا شيء لعرضه حالياً';
+  @override String get discoverNothing => 'لا يوجد شيء لعرضه الآن';
   @override String discoverLike(String names) => 'مثل $names';
-  @override String get dashReorderSections => 'إعادة ترتيب الأقسام';
+  @override String get dashReorderSections => 'تغيير ترتيب الأقسام';
   @override String get dashInfiniteTitle => 'تمرير لا نهائي';
-  @override String get dashInfiniteSub => 'يتكرر قسم الاكتشاف ويحمّل المزيد من الاقتراحات';
+  @override String get dashInfiniteSub => 'يتكرر قسم الاكتشاف ويواصل اقتراح المزيد';
   @override String get dashDiscoverTitle => 'اكتشف';
-  @override String get dashDiscoverSub => 'أفكار موسيقية للتصفح';
+  @override String get dashDiscoverSub => 'أفكار موسيقية للتصفح بالسحب';
   @override String get dashSortButton => 'ترتيب';
   @override String get dashSortDone => 'تم';
-  @override String get dashSortHint => 'اسحب العناصر لتغيير ترتيبها';
-  @override String get dashSortSmartNote => 'الترتيب الذكي مفعّل: قد يعيد ترتيب هذه الفلاتر حسب الوقت.';
-  @override String get dashSeparateRow => 'عرض في صف منفصل';
-  @override String dashFiltersOf(String group) => 'الفلاتر · $group';
-  @override String get apShapeSingle => 'شكل واحد';
+  @override String get dashSortHint => 'اسحب لتغيير الترتيب';
+  @override String get dashSortSmartNote => 'الترتيب الذكي مفعّل، لذا قد يتغير هذا الترتيب حسب الوقت.';
+  @override String get dashSeparateRow => 'في صف خاص به';
+  @override String dashFiltersOf(String group) => 'فلاتر «$group»';
+  @override String get apShapeSingle => 'شكل واحد فقط';
 }

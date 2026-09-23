@@ -768,8 +768,8 @@ class AppStringsPt implements AppStrings {
   @override String get recapTop10 => 'Top 10';
 
   // ── Discover filters ─────────────────────────────────────────────────────
-  @override String get discoverSmartTitle => 'Filtro mais relevante primeiro';
-  @override String get discoverSmartSub => 'Escolhe pela hora, dia, histórico e seus hábitos';
+  @override String get discoverSmartTitle => 'O filtro mais útil primeiro';
+  @override String get discoverSmartSub => 'Conforme a hora, o dia e o que você mais usa';
   @override String get discoverForYou => 'Para você';
   @override String get discoverGlobalTrends => 'Tendências globais';
   @override String get discoverSrcForyou => 'Seu mix';
@@ -785,18 +785,18 @@ class AppStringsPt implements AppStrings {
   @override String get discoverWeek => 'semana';
   @override String get discoverMonth => 'mês';
   @override String get discoverYear => 'ano';
-  @override String get discoverNothing => 'Nada para mostrar no momento';
+  @override String get discoverNothing => 'Ainda não há nada para mostrar';
   @override String discoverLike(String names) => 'Como $names';
-  @override String get dashReorderSections => 'Reordenar seções';
+  @override String get dashReorderSections => 'Mudar a ordem das seções';
   @override String get dashInfiniteTitle => 'Rolagem infinita';
-  @override String get dashInfiniteSub => 'A seção Descobrir repete e carrega mais sugestões';
+  @override String get dashInfiniteSub => 'O Descobrir se repete e continua sugerindo mais';
   @override String get dashDiscoverTitle => 'Descobrir';
   @override String get dashDiscoverSub => 'Ideias de música para deslizar';
   @override String get dashSortButton => 'Ordenar';
   @override String get dashSortDone => 'Concluído';
-  @override String get dashSortHint => 'Arraste os itens para mudar a ordem';
-  @override String get dashSortSmartNote => 'A ordem inteligente está ativa: pode reordenar estes filtros conforme o momento.';
-  @override String get dashSeparateRow => 'Mostrar em uma linha separada';
-  @override String dashFiltersOf(String group) => 'Filtros · $group';
-  @override String get apShapeSingle => 'Forma única';
+  @override String get dashSortHint => 'Arraste para mudar a ordem';
+  @override String get dashSortSmartNote => 'A ordem inteligente está ligada e pode mudar essa ordem conforme o momento.';
+  @override String get dashSeparateRow => 'Em uma linha só dele';
+  @override String dashFiltersOf(String group) => 'Filtros de “$group”';
+  @override String get apShapeSingle => 'Uma só forma';
 }

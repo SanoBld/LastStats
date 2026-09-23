@@ -126,7 +126,7 @@ class _StartupPageState extends State<StartupPage> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: scheme.tertiaryContainer.withValues(alpha: 0.4),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
           ),
           child: Row(children: [

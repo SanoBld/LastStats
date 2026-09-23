@@ -8,6 +8,7 @@ import '../../l10n/l10n.dart';
 import '../../app_state.dart';
 import '../../services/update_service.dart';
 import 'settings_helpers.dart';
+import '../../widgets/m3_components.dart';
 
 /// Picks the self-contained logo SVG (own background baked in): the plain
 /// mono logo by default, the red-dot "Nothing" variant only when that theme
@@ -43,9 +44,10 @@ class AboutPage extends StatelessWidget {
 
         // ── Logo / header ─────────────────────────────────────────────────
         Center(child: Column(children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: SvgPicture.asset(_logoAsset(context), width: 80, height: 80),
+          M3CookieBadge(
+            size: 104,
+            color: scheme.primaryContainer,
+            child: SvgPicture.asset(_logoAsset(context), width: 68, height: 68),
           ),
           const SizedBox(height: 14),
           Text('LastStats',
@@ -66,7 +68,7 @@ class AboutPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
               color: scheme.secondaryContainer.withValues(alpha: 0.45),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(24),
               border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.3)),
             ),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -323,7 +325,7 @@ class AboutPage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
             color: scheme.surfaceContainerHigh,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
           ),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -446,7 +448,7 @@ class AboutPage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
             color: scheme.secondaryContainer.withValues(alpha: 0.45),
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.3)),
           ),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [

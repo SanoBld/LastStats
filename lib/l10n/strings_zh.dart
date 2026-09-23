@@ -765,8 +765,8 @@ class AppStringsZh implements AppStrings {
   @override String get recapTop10 => '前10名';
 
   // ── Discover filters ─────────────────────────────────────────────────────
-  @override String get discoverSmartTitle => '最相关的筛选优先';
-  @override String get discoverSmartSub => '根据时间、日期、你的历史和使用习惯选择';
+  @override String get discoverSmartTitle => '最有用的筛选排在最前';
+  @override String get discoverSmartSub => '根据时间、日期和你最常用的内容排序';
   @override String get discoverForYou => '为你推荐';
   @override String get discoverGlobalTrends => '全球趋势';
   @override String get discoverSrcForyou => '你的混合推荐';
@@ -782,18 +782,18 @@ class AppStringsZh implements AppStrings {
   @override String get discoverWeek => '周';
   @override String get discoverMonth => '月';
   @override String get discoverYear => '年';
-  @override String get discoverNothing => '暂无内容';
+  @override String get discoverNothing => '暂时没有内容';
   @override String discoverLike(String names) => '类似 $names';
   @override String get dashReorderSections => '调整版块顺序';
   @override String get dashInfiniteTitle => '无限滚动';
-  @override String get dashInfiniteSub => '"发现"版块循环并加载更多推荐';
+  @override String get dashInfiniteSub => '「发现」会循环播放，不断给你新推荐';
   @override String get dashDiscoverTitle => '发现';
-  @override String get dashDiscoverSub => '可滑动浏览的音乐推荐';
+  @override String get dashDiscoverSub => '左右滑动，发现新音乐';
   @override String get dashSortButton => '排序';
   @override String get dashSortDone => '完成';
-  @override String get dashSortHint => '拖动项目以更改顺序';
-  @override String get dashSortSmartNote => '智能排序已开启：会根据时机重新排列这些筛选。';
-  @override String get dashSeparateRow => '单独一行显示';
-  @override String dashFiltersOf(String group) => '筛选 · $group';
-  @override String get apShapeSingle => '单一形状';
+  @override String get dashSortHint => '拖动即可调整顺序';
+  @override String get dashSortSmartNote => '已开启智能排序，所以顺序可能会随时间变化。';
+  @override String get dashSeparateRow => '单独占一行';
+  @override String dashFiltersOf(String group) => '「$group」的筛选';
+  @override String get apShapeSingle => '只用一种形状';
 }

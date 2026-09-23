@@ -452,7 +452,7 @@ class _AccountPageState extends State<AccountPage> {
           padding: const EdgeInsets.all(13),
           decoration: BoxDecoration(
             color: scheme.secondaryContainer.withValues(alpha: 0.4),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.3)),
           ),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
