@@ -127,7 +127,35 @@ final WidgetStateProperty<OutlinedBorder?> _roundShape =
 ThemeData applyM3Shapes(ThemeData t) {
   ButtonStyle pill(ButtonStyle? base) =>
       (base ?? const ButtonStyle()).copyWith(shape: _pillShape);
+  final cs = t.colorScheme;
+  final r20 = RoundedRectangleBorder(borderRadius: BorderRadius.circular(20));
   return t.copyWith(
+    // Notification bar: floating, tinted with the app accent, rounded.
+    snackBarTheme: SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: cs.secondaryContainer,
+      contentTextStyle: t.textTheme.bodyMedium?.copyWith(
+          color: cs.onSecondaryContainer, fontWeight: FontWeight.w600),
+      actionTextColor: cs.primary,
+      closeIconColor: cs.onSecondaryContainer,
+      elevation: 3,
+      insetPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      shape: r20,
+    ),
+    // Drop-down menus share the same rounded, tonal surface.
+    popupMenuTheme: PopupMenuThemeData(
+      color: cs.surfaceContainerHigh,
+      surfaceTintColor: Colors.transparent,
+      elevation: 3,
+      shape: r20,
+    ),
+    dropdownMenuTheme: DropdownMenuThemeData(
+      menuStyle: MenuStyle(
+        backgroundColor: WidgetStatePropertyAll(cs.surfaceContainerHigh),
+        surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+        shape: WidgetStatePropertyAll(r20),
+      ),
+    ),
     filledButtonTheme:   FilledButtonThemeData(style: pill(t.filledButtonTheme.style)),
     elevatedButtonTheme: ElevatedButtonThemeData(style: pill(t.elevatedButtonTheme.style)),
     outlinedButtonTheme: OutlinedButtonThemeData(style: pill(t.outlinedButtonTheme.style)),
@@ -156,3 +184,20 @@ const AnimationStyle kM3DialogAnimation = AnimationStyle(
   curve:           M3Motion.emphasizedDecelerate,
   reverseCurve:    M3Motion.emphasizedAccelerate,
 );
+
+/// Shows a snackbar with a soft spring-like slide (emphasized curves) and
+/// replaces the one currently on screen instead of queueing behind it.
+ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showAppSnackBar(
+    BuildContext context, SnackBar bar) {
+  final m = ScaffoldMessenger.of(context);
+  m.hideCurrentSnackBar();
+  return m.showSnackBar(
+    bar,
+    snackBarAnimationStyle: AnimationStyle(
+      duration: const Duration(milliseconds: 420),
+      reverseDuration: const Duration(milliseconds: 220),
+      curve: M3Motion.emphasizedDecelerate,
+      reverseCurve: M3Motion.emphasizedAccelerate,
+    ),
+  );
+}

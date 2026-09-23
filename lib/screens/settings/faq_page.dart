@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../l10n/l10n.dart';
 import '../../app_state.dart';
 import 'settings_helpers.dart';
+import 'settings_rows.dart';
 
 class FaqPage extends StatefulWidget {
   const FaqPage({super.key});
@@ -53,18 +54,24 @@ class _FaqPageState extends State<FaqPage> {
       body: ListView(padding: const EdgeInsets.all(20), children: [
 
         // ── Questions / réponses ──────────────────────────────────────────
-        SettingsSection(
-          label: L.faqSectionLabel,
-          children: [
-            ...items.asMap().entries.map((e) {
-              final isLast = e.key == items.length - 1;
-              return Column(children: [
-                _FaqTile(item: e.value),
-                if (!isLast) const Divider(height: 1, indent: 16, endIndent: 16),
-              ]);
-            }),
-          ],
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: Text(L.faqSectionLabel,
+              style: text.titleSmall?.copyWith(
+                  color: scheme.primary, fontWeight: FontWeight.w800, letterSpacing: 0.4)),
         ),
+        for (final it in items)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: SettingExpandable(
+              boxed: true,
+              icon: it.icon,
+              title: it.question,
+              body: Text(it.answer,
+                  style: text.bodyMedium?.copyWith(
+                      color: scheme.onSurfaceVariant, height: 1.5)),
+            ),
+          ),
 
         const SizedBox(height: 16),
 
@@ -99,61 +106,4 @@ class _FaqItem {
   final String question;
   final String answer;
   const _FaqItem(this.icon, this.question, this.answer);
-}
-
-// ── Tuile FAQ expansible ──────────────────────────────────────────────────────
-
-class _FaqTile extends StatefulWidget {
-  final _FaqItem item;
-  const _FaqTile({required this.item});
-
-  @override
-  State<_FaqTile> createState() => _FaqTileState();
-}
-
-class _FaqTileState extends State<_FaqTile> {
-  bool _expanded = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
-
-    return InkWell(
-      onTap: () => setState(() => _expanded = !_expanded),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Icon(widget.item.icon, size: 18, color: scheme.primary),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(widget.item.question,
-                  style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-            ),
-            const SizedBox(width: 8),
-            AnimatedRotation(
-              turns: _expanded ? 0.5 : 0,
-              duration: const Duration(milliseconds: 200),
-              child: Icon(Icons.keyboard_arrow_down_rounded,
-                  size: 20, color: scheme.onSurfaceVariant),
-            ),
-          ]),
-          AnimatedCrossFade(
-            duration: const Duration(milliseconds: 200),
-            crossFadeState: _expanded
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
-            firstChild: const SizedBox.shrink(),
-            secondChild: Padding(
-              padding: const EdgeInsets.only(top: 10, left: 30),
-              child: Text(widget.item.answer,
-                  style: text.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant, height: 1.55)),
-            ),
-          ),
-        ]),
-      ),
-    );
-  }
 }

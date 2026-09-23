@@ -105,14 +105,14 @@ class _BackupPageState extends State<BackupPage> {
     if (!mounted) return;
     setState(() => _logBusy = false);
     if (f == null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      showAppSnackBar(context, SnackBar(
         content: Text(L.backupCrashLogEmpty), behavior: SnackBarBehavior.floating));
       return;
     }
     final empty = !await f.exists() || await f.length() == 0;
     if (!mounted) return;
     if (empty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      showAppSnackBar(context, SnackBar(
         content: Text(L.backupCrashLogEmpty), behavior: SnackBarBehavior.floating));
       return;
     }
@@ -142,7 +142,7 @@ class _BackupPageState extends State<BackupPage> {
     await CrashLogService.instance.clear();
     if (!mounted) return;
     setState(() => _logSizeBytes = 0);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    showAppSnackBar(context, SnackBar(
       content: Text(L.backupCrashLogCleared), behavior: SnackBarBehavior.floating));
   }
 
@@ -179,7 +179,7 @@ class _BackupPageState extends State<BackupPage> {
     );
     if (!mounted) return;
     setState(() => _exporting = false);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    showAppSnackBar(context, SnackBar(
       content: Text(ok ? L.backupFileSaved : L.backupFileSaveFailed),
       behavior: SnackBarBehavior.floating,
     ));
@@ -317,7 +317,7 @@ class _BackupPageState extends State<BackupPage> {
     );
     if (!mounted) return;
     setState(() => _importing = false);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    showAppSnackBar(context, SnackBar(
       content: Text(result.success ? L.importSuccess : L.importInvalidFormat),
       behavior: SnackBarBehavior.floating,
     ));
@@ -556,28 +556,17 @@ class _BackupPageState extends State<BackupPage> {
           const Divider(height: 1, indent: 16, endIndent: 16),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
-            child: Row(children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: (_logBusy || (_logSizeBytes ?? 0) == 0) ? null : _shareLog,
-                  icon: _logBusy
-                      ? const SizedBox(width: 16, height: 16,
-                          child: M3Spinner())
-                      : const Icon(Icons.ios_share_rounded, size: 18),
-                  label: Text(L.backupCrashLogShare),
-                ),
+            child: SettingActionGroup(items: [
+              ActionGroupItem(
+                icon: _logBusy ? null : Icons.ios_share_rounded,
+                label: L.backupCrashLogShare,
+                onPressed: (_logBusy || (_logSizeBytes ?? 0) == 0) ? null : _shareLog,
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: (_logSizeBytes ?? 0) == 0 ? null : _clearLog,
-                  icon: const Icon(Icons.delete_outline_rounded, size: 18),
-                  label: Text(L.backupCrashLogClear),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: scheme.error,
-                    side: BorderSide(color: scheme.error),
-                  ),
-                ),
+              ActionGroupItem(
+                danger: true,
+                icon: Icons.delete_outline_rounded,
+                label: L.backupCrashLogClear,
+                onPressed: (_logSizeBytes ?? 0) == 0 ? null : _clearLog,
               ),
             ]),
           ),

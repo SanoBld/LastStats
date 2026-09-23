@@ -989,7 +989,7 @@ class _ChartsPageState extends State<_ChartsPage>
         if (img == null) {
           closeDialog();
           if (ctx.mounted) {
-            ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(
+            showAppSnackBar(ctx, SnackBar(content: Text(
                 _ct('Graphique non disponible pour cette période',
                     'Chart not available for this period'))));
           }
@@ -1040,7 +1040,7 @@ class _ChartsPageState extends State<_ChartsPage>
         if (img == null) {
           closeDialog();
           if (ctx.mounted) {
-            ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(
+            showAppSnackBar(ctx, SnackBar(content: Text(
                 _ct('Graphique non disponible pour cette période',
                     'Chart not available for this period'))));
           }
@@ -1061,7 +1061,7 @@ class _ChartsPageState extends State<_ChartsPage>
         if (img == null) {
           closeDialog();
           if (ctx.mounted) {
-            ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(
+            showAppSnackBar(ctx, SnackBar(content: Text(
                 _ct('Graphique non disponible pour cette période',
                     'Chart not available for this period'))));
           }
@@ -1073,7 +1073,7 @@ class _ChartsPageState extends State<_ChartsPage>
         if (rb == null || rb.size.isEmpty) {
           closeDialog();
           if (ctx.mounted) {
-            ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(
+            showAppSnackBar(ctx, SnackBar(content: Text(
                 _ct('Graphique non disponible pour cette période',
                     'Chart not available for this period'))));
           }
@@ -1107,7 +1107,7 @@ class _ChartsPageState extends State<_ChartsPage>
       if (composedImg == null) {
         closeDialog();
         if (ctx.mounted) {
-          ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(
+          showAppSnackBar(ctx, SnackBar(content: Text(
               _ct('Impossible de générer l\'image', 'Could not generate the image'))));
         }
         return;
@@ -1124,7 +1124,7 @@ class _ChartsPageState extends State<_ChartsPage>
     } catch (e) {
       closeDialog();
       if (ctx.mounted) {
-        ScaffoldMessenger.of(ctx).showSnackBar(
+        showAppSnackBar(ctx, 
             SnackBar(content: Text('${_ct('Erreur', 'Error', es: 'Error', zh: '错误', pt: 'Erro')}: $e')));
       }
     } finally {

@@ -8,6 +8,7 @@ import '../../l10n/l10n.dart';
 import '../../app_state.dart';
 import '../../services/update_service.dart';
 import 'settings_helpers.dart';
+import 'settings_rows.dart';
 import '../../widgets/m3_components.dart';
 
 /// Picks the self-contained logo SVG (own background baked in): the plain
@@ -266,17 +267,10 @@ class AboutPage extends StatelessWidget {
         SettingsSection(
           label: L.aboutOpenSourceLibs,
           children: [
-            Theme(
-              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-              child: ExpansionTile(
-                title: Text(L.aboutOpenSourceLibsSub,
-                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                tilePadding: const EdgeInsets.symmetric(horizontal: 16),
-                childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Wrap(spacing: 8, runSpacing: 8, children: [
+            SettingExpandable(
+              icon: Icons.inventory_2_outlined,
+              title: L.aboutOpenSourceLibsSub,
+              body: Wrap(spacing: 8, runSpacing: 8, children: [
                       for (final pkg in const [
                         'cupertino_icons', 'battery_plus', 'flutter_displaymode', 'http',
                         'dynamic_color', 'shared_preferences', 'path_provider', 'share_plus',
@@ -291,9 +285,6 @@ class AboutPage extends StatelessWidget {
                           onPressed: () => _open('https://pub.dev/packages/$pkg'),
                         ),
                     ]),
-                  ),
-                ],
-              ),
             ),
           ],
         ),

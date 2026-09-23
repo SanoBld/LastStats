@@ -22,7 +22,7 @@ Future<bool> connectFavorites(
 }) async {
   final trimmed = secret.trim();
   if (trimmed.length != 32) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    showAppSnackBar(context, 
       SnackBar(content: Text(L.favConnectInvalidSecret)));
     return false;
   }
@@ -67,13 +67,13 @@ Future<bool> connectFavorites(
     sessionKeyNotifier.value = sessionKey;
 
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      showAppSnackBar(context, 
         SnackBar(content: Text(L.favConnectSuccess)));
     }
     return true;
   } catch (_) {
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      showAppSnackBar(context, 
         SnackBar(content: Text(L.favConnectError)));
     }
     return false;

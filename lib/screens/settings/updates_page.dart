@@ -10,6 +10,7 @@ import '../../services/update_service.dart';
 import '../../widgets/markdown_lite.dart';
 import 'update_history_page.dart';
 import 'settings_helpers.dart';
+import 'settings_rows.dart';
 import '../../widgets/m3_components.dart';
 
 class UpdatesPage extends StatefulWidget {
@@ -158,31 +159,26 @@ class _UpdatesPageState extends State<UpdatesPage> {
                 ],
               ],
               const SizedBox(height: 14),
-              Row(children: [
-                Expanded(child: FilledButton.icon(
+              SettingActionGroup(items: [
+                ActionGroupItem(
+                  primary: true,
+                  icon: _downloadIcon(_updateInfo!.downloadKind),
+                  label: _updateInfo!.hasDownload ? L.settingsDownload : L.settingsViewRelease,
                   onPressed: () async {
                     final url = Uri.parse(_updateInfo!.hasDownload
                         ? _updateInfo!.downloadUrl! : _updateInfo!.releaseUrl);
                     if (await canLaunchUrl(url)) await launchUrl(url, mode: LaunchMode.externalApplication);
                   },
-                  icon: Icon(_downloadIcon(_updateInfo!.downloadKind)),
-                  label: Text(_updateInfo!.hasDownload ? L.settingsDownload : L.settingsViewRelease),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: scheme.tertiary,
-                    foregroundColor: scheme.onTertiary,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                )),
-                if (_updateInfo!.hasDownload) ...[
-                  const SizedBox(width: 10),
-                  OutlinedButton(
+                ),
+                if (_updateInfo!.hasDownload)
+                  ActionGroupItem(
+                    icon: Icons.open_in_new_rounded,
+                    label: L.settingsViewRelease,
                     onPressed: () async {
                       final url = Uri.parse(_updateInfo!.releaseUrl);
                       if (await canLaunchUrl(url)) await launchUrl(url, mode: LaunchMode.externalApplication);
                     },
-                    child: Text(L.settingsViewRelease),
                   ),
-                ],
               ]),
             ]),
           ),

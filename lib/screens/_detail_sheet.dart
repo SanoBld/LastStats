@@ -1760,7 +1760,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                   visualDensity: VisualDensity.compact,
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: _lyrics));
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    showAppSnackBar(context, 
                       SnackBar(content: Text(L.detailLyricsCopied)),
                     );
                   },

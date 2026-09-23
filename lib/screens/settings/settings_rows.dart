@@ -711,3 +711,169 @@ class _PickSortSheetState extends State<PickSortSheet> {
     return _sheetShell(context, header: header, body: body);
   }
 }
+
+// ── Connected action buttons ────────────────────────────────────────────────
+// Buttons that sit side by side share one shape: rounded squares that touch
+// (big outer corners, small inner corners) and melt into a pill when pressed.
+
+class ActionGroupItem {
+  final IconData? icon;
+  final String label;
+  final VoidCallback? onPressed;
+  final bool primary; // filled with the accent color, otherwise tonal
+  final bool danger;  // red container (delete…)
+  const ActionGroupItem({
+    required this.label,
+    this.icon,
+    this.onPressed,
+    this.primary = false,
+    this.danger = false,
+  });
+}
+
+class SettingActionGroup extends StatelessWidget {
+  final List<ActionGroupItem> items;
+  const SettingActionGroup({super.key, required this.items});
+
+  @override
+  Widget build(BuildContext context) => Row(children: [
+        for (var i = 0; i < items.length; i++) ...[
+          if (i > 0) const SizedBox(width: 2),
+          Expanded(child: _GroupButton(item: items[i], index: i, count: items.length)),
+        ],
+      ]);
+}
+
+class _GroupButton extends StatefulWidget {
+  final ActionGroupItem item;
+  final int index, count;
+  const _GroupButton({required this.item, required this.index, required this.count});
+
+  @override
+  State<_GroupButton> createState() => _GroupButtonState();
+}
+
+class _GroupButtonState extends State<_GroupButton> {
+  bool _down = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final it = widget.item;
+    final enabled = it.onPressed != null;
+    const outer = Radius.circular(20), inner = Radius.circular(6), pill = Radius.circular(28);
+    final first = widget.index == 0, last = widget.index == widget.count - 1;
+    final radius = _down && !M3Motion.reduced(context)
+        ? const BorderRadius.all(pill)
+        : BorderRadius.horizontal(
+            left: first ? outer : inner,
+            right: last ? outer : inner,
+          );
+    final bg = it.danger
+        ? scheme.errorContainer
+        : it.primary ? scheme.primary : scheme.secondaryContainer;
+    final fg = it.danger
+        ? scheme.onErrorContainer
+        : it.primary ? scheme.onPrimary : scheme.onSecondaryContainer;
+
+    return AnimatedOpacity(
+      opacity: enabled ? 1 : 0.45,
+      duration: M3Motion.effectsFastDuration,
+      child: M3ShapeMorph(
+        radius: radius,
+        color: bg,
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            onTap: it.onPressed,
+            onHighlightChanged: (v) => setState(() => _down = v),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 48),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  if (it.icon != null) ...[
+                    Icon(it.icon, size: 18, color: fg),
+                    const SizedBox(width: 8),
+                  ],
+                  Flexible(
+                    child: Text(it.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            color: fg, fontWeight: FontWeight.w700)),
+                  ),
+                ]),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Expandable (accordion) ──────────────────────────────────────────────────
+// Header row + body that grows with a spring-free emphasized curve. With
+// [boxed] the card morphs (corners + tone) while it opens.
+
+class SettingExpandable extends StatefulWidget {
+  final IconData icon;
+  final String title;
+  final Widget body;
+  final bool boxed;
+  final bool initiallyExpanded;
+  const SettingExpandable({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.body,
+    this.boxed = false,
+    this.initiallyExpanded = false,
+  });
+
+  @override
+  State<SettingExpandable> createState() => _SettingExpandableState();
+}
+
+class _SettingExpandableState extends State<SettingExpandable> {
+  late bool _open = widget.initiallyExpanded;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final reduce = M3Motion.reduced(context);
+
+    final content = Column(mainAxisSize: MainAxisSize.min, children: [
+      SettingTile(
+        leading: Icon(widget.icon),
+        title: Text(widget.title),
+        trailing: AnimatedRotation(
+          turns: _open ? 0.5 : 0,
+          duration: reduce ? Duration.zero : M3Motion.spatialFastDuration,
+          curve: M3Motion.spatialFast,
+          child: Icon(Icons.keyboard_arrow_down_rounded, color: scheme.onSurfaceVariant),
+        ),
+        onTap: () => setState(() => _open = !_open),
+      ),
+      AnimatedSize(
+        duration: reduce ? Duration.zero : const Duration(milliseconds: 320),
+        curve: M3Motion.emphasized,
+        alignment: Alignment.topCenter,
+        child: _open
+            ? Padding(
+                padding: const EdgeInsets.fromLTRB(72, 0, 16, 16),
+                child: SizedBox(width: double.infinity, child: widget.body),
+              )
+            : const SizedBox(width: double.infinity),
+      ),
+    ]);
+
+    if (!widget.boxed) return content;
+    return M3ShapeMorph(
+      radius: BorderRadius.circular(_open ? 28 : 20),
+      color: _open ? scheme.surfaceContainerHigh : scheme.surfaceContainerLow,
+      child: Material(type: MaterialType.transparency, child: content),
+    );
+  }
+}

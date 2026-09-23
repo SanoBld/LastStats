@@ -40,6 +40,11 @@
 - Updates, About, Account, FAQ, Language and Version history now share the same style: softer rounded cards, cookie-shaped logo and icons, rounder update banner
 - Destructive actions (log out, clear cache…) now use a red container with a matching icon instead of a red icon on a blue badge
 - All new texts are translated in the 10 app languages, reworded to sound natural
+- Notification bars ("Backup saved", "Export failed"…) now float with the app accent color, rounded corners and a smooth slide-in/out animation
+- Side-by-side buttons (update download/details, crash log share/clear) form a connected group of rounded squares that turn into a pill when pressed
+- FAQ questions and the open-source libraries list are now Material 3 accordions: card that morphs when opened, spring chevron, smooth height animation
+- Pop-up and drop-down menus use the same rounded tonal surface
+- Backups already include every Dashboard setting (sections order, stat cards, Discover filters, order, own-row filters, smart order, infinite scroll, header options); restore reloads them as before
 
 **Dashboard settings**
 - Settings > Dashboard rebuilt: header image, animation and blur, visible sections, Discover, chart and stat cards, each with the same row types

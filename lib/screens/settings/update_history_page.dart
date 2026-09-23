@@ -3,6 +3,7 @@
 // Lists every past release: version, date, full changelog, and a direct
 // download button per version — not just the newest one.
 import 'package:flutter/material.dart';
+import 'settings_rows.dart';
 import '../../widgets/m3_components.dart';
 import '../../theme/m3_motion.dart';
 import '../../widgets/skeleton.dart';
@@ -251,22 +252,20 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
                               Text(isEn ? 'No description.' : 'Aucune description.',
                                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                             const SizedBox(height: 12),
-                            Row(children: [
-                              Expanded(child: FilledButton.icon(
-                                onPressed: () => _open(r.hasDownload ? r.downloadUrl! : r.releaseUrl),
-                                icon: Icon(_downloadIcon(r.downloadKind), size: 18),
-                                label: Text(r.hasDownload
+                            SettingActionGroup(items: [
+                              ActionGroupItem(
+                                primary: true,
+                                icon: _downloadIcon(r.downloadKind),
+                                label: r.hasDownload
                                     ? (isEn ? 'Download' : 'Télécharger')
-                                    : (isEn ? 'View release' : 'Voir la release')),
-                                style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 10)),
-                              )),
-                              if (r.hasDownload) ...[
-                                const SizedBox(width: 8),
-                                OutlinedButton(
+                                    : (isEn ? 'View release' : 'Voir la release'),
+                                onPressed: () => _open(r.hasDownload ? r.downloadUrl! : r.releaseUrl),
+                              ),
+                              if (r.hasDownload)
+                                ActionGroupItem(
+                                  label: isEn ? 'Details' : 'Détails',
                                   onPressed: () => _open(r.releaseUrl),
-                                  child: Text(isEn ? 'Details' : 'Détails'),
                                 ),
-                              ],
                             ]),
                           ]),
                         )),
