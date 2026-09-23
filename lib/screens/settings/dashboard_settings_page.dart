@@ -41,7 +41,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   bool   _showStats             = true;
   bool   _showRecent            = true;
   bool   _showDiscover          = true;
-  List<String> _discoverSources = ['community', 'artists', 'foryou', 'genre', 'country'];
+  List<String> _discoverSources = ['foryou', 'fresh', 'genre', 'deeper', 'forgotten', 'albums', 'country', 'gt_week', 'gt_month', 'ga_week', 'ga_month'];
   // Which chart replaces the old top artists/albums/tracks block.
   // 'calendar' = listening calendar (heatmap), 'monthly' = monthly bars.
   String _dashboardChart        = 'calendar';
@@ -87,7 +87,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
       _dashboardChart        = p.getString('ls_dashboard_chart')         ?? 'calendar';
       _showRecent            = p.getBool('ls_show_recent')               ?? true;
       _showDiscover          = p.getBool('ls_show_discover')             ?? true;
-      _discoverSources       = p.getStringList('ls_discover_sources') ?? ['community', 'artists', 'foryou', 'genre', 'country'];
+      _discoverSources       = p.getStringList('ls_discover_sources') ?? ['foryou', 'fresh', 'genre', 'deeper', 'forgotten', 'albums', 'country', 'gt_week', 'gt_month', 'ga_week', 'ga_month'];
       _showFriends           = p.getBool('ls_show_friends')              ?? true;
       _showFavorites         = p.getBool('ls_show_favorites')            ?? true;
       _headerMusicAnim       = p.getBool('ls_header_music_anim')         ?? false;
@@ -474,14 +474,18 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                   icon: Icons.auto_awesome_rounded,
                   title: pickLang(fr: 'Pour toi', en: 'For you', es: 'Para ti', zh: '为你推荐', pt: 'Para você'),
                   labels: {
-                    'foryou':  pickLang(fr: 'Comme ton artiste préféré', en: 'Like your top artist', es: 'Como tu artista favorito', zh: '与你最喜爱的艺术家相似', pt: 'Como seu artista favorito'),
-                    'genre':   pickLang(fr: 'Ton genre', en: 'Your genre', es: 'Tu género', zh: '你的音乐类型', pt: 'Seu gênero'),
-                    'country': pickLang(fr: 'Ton pays', en: 'Your country', es: 'Tu país', zh: '你的国家', pt: 'Seu país'),
+                    'foryou':    pickLang(fr: 'Ton mix', en: 'Your mix', es: 'Tu mix', zh: '你的混合推荐', pt: 'Seu mix'),
+                    'fresh':     pickLang(fr: 'Ce mois-ci', en: 'This month', es: 'Este mes', zh: '本月', pt: 'Este mês'),
+                    'genre':     pickLang(fr: 'Tes genres', en: 'Your genres', es: 'Tus géneros', zh: '你的音乐类型', pt: 'Seus gêneros'),
+                    'deeper':    pickLang(fr: 'Titres cachés', en: 'Deep cuts', es: 'Joyas ocultas', zh: '冷门佳作', pt: 'Faixas escondidas'),
+                    'forgotten': pickLang(fr: 'Oubliés', en: 'Forgotten', es: 'Olvidadas', zh: '被遗忘的歌', pt: 'Esquecidas'),
+                    'albums':    pickLang(fr: 'Albums', en: 'Albums', es: 'Álbumes', zh: '专辑', pt: 'Álbuns'),
+                    'country':   pickLang(fr: 'Ton pays', en: 'Your country', es: 'Tu país', zh: '你的国家', pt: 'Seu país'),
                   },
                   selected: _discoverSources,
                   onToggleGroup: (on) async {
                     final next = List<String>.from(_discoverSources);
-                    for (final k in ['foryou', 'genre', 'country']) {
+                    for (final k in ['foryou', 'fresh', 'genre', 'deeper', 'forgotten', 'albums', 'country']) {
                       if (on) { if (!next.contains(k)) next.add(k); }
                       else { next.remove(k); }
                     }
@@ -498,17 +502,21 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                 const SizedBox(height: 10),
                 _DiscoverGroupToggle(
                   icon: Icons.public_rounded,
-                  title: pickLang(fr: 'Tendances Last.fm', en: 'Last.fm trends', es: 'Tendencias de Last.fm', zh: 'Last.fm 趋势', pt: 'Tendências do Last.fm'),
+                  title: pickLang(fr: 'Tendances mondiales', en: 'Global trends', es: 'Tendencias globales', zh: '全球趋势', pt: 'Tendências globais'),
                   labels: {
-                    'community': pickLang(fr: 'Top titres', en: 'Top tracks', es: 'Top canciones', zh: '热门歌曲', pt: 'Top faixas'),
-                    'artists':   pickLang(fr: 'Top artistes', en: 'Top artists', es: 'Top artistas', zh: '热门艺术家', pt: 'Top artistas'),
+                    for (final e in const [
+                      ('gt', 'week'), ('gt', 'month'), ('gt', 'year'),
+                      ('ga', 'week'), ('ga', 'month'), ('ga', 'year'),
+                      ('gb', 'week'), ('gb', 'month'), ('gb', 'year'),
+                    ])
+                      '${e.$1}_${e.$2}': _globalLabel(e.$1, e.$2),
                   },
                   selected: _discoverSources,
                   onToggleGroup: (on) async {
                     final next = List<String>.from(_discoverSources);
-                    for (final k in ['community', 'artists']) {
+                    for (final k in ['gt_week', 'gt_month', 'ga_week', 'ga_month']) {
                       if (on) { if (!next.contains(k)) next.add(k); }
-                      else { next.remove(k); }
+                      else { next.removeWhere((x) => x.startsWith('g') && x.contains('_')); }
                     }
                     await _saveList('ls_discover_sources', next);
                     setState(() => _discoverSources = next);
@@ -664,7 +672,22 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
   }
 }
 
-// ── Groupe "Pour toi" / "Tendances Last.fm" avec son propre switch ─────────
+// "Tracks · week" style label for the global trend chips.
+String _globalLabel(String kind, String range) {
+  final k = switch (kind) {
+    'gt' => pickLang(fr: 'Titres', en: 'Tracks', es: 'Canciones', zh: '歌曲', pt: 'Faixas'),
+    'ga' => pickLang(fr: 'Artistes', en: 'Artists', es: 'Artistas', zh: '艺术家', pt: 'Artistas'),
+    _    => pickLang(fr: 'Albums', en: 'Albums', es: 'Álbumes', zh: '专辑', pt: 'Álbuns'),
+  };
+  final r = switch (range) {
+    'week'  => pickLang(fr: 'semaine', en: 'week', es: 'semana', zh: '周', pt: 'semana'),
+    'month' => pickLang(fr: 'mois', en: 'month', es: 'mes', zh: '月', pt: 'mês'),
+    _       => pickLang(fr: 'année', en: 'year', es: 'año', zh: '年', pt: 'ano'),
+  };
+  return '$k · $r';
+}
+
+// ── Groupe "Pour toi" / "Tendances mondiales" avec son propre switch ─────────
 // A group switch turns the whole group on/off at once (adds/removes all
 // its source keys); when on, per-source chips let you fine-tune which
 // tabs show up inside that group on the dashboard.

@@ -117,7 +117,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   bool _showStats    = true;
   bool _showRecent   = true;
   bool _showDiscover = true;
-  List<String> _discoverSources = List.from(_kDiscoverAll);
+  List<String> _discoverSources = List.from(_kDiscoverDefault);
   int _lovedCount = 0;
 
   // Dashboard chart (replaces the old top artists/albums/tracks block).
@@ -329,7 +329,18 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
       _dashboardChart        = p.getString('ls_dashboard_chart')        ?? 'calendar';
       _showRecent            = p.getBool('ls_show_recent')              ?? true;
       _showDiscover          = p.getBool('ls_show_discover')            ?? true;
-      _discoverSources       = p.getStringList('ls_discover_sources') ?? List.from(_kDiscoverAll);
+      _discoverSources       = p.getStringList('ls_discover_sources') != null
+          ? _discoverMigrate(p.getStringList('ls_discover_sources')!)
+          : List.from(_kDiscoverDefault);
+      // One-time upgrade: turn on the new personal categories for users who
+      // saved their Discover sources before they existed.
+      if (p.getBool('ls_discover_v2') != true) {
+        for (final k in _kDiscoverPersonal) {
+          if (!_discoverSources.contains(k)) _discoverSources.add(k);
+        }
+        p.setStringList('ls_discover_sources', _discoverSources);
+        p.setBool('ls_discover_v2', true);
+      }
       _showFriends           = p.getBool('ls_show_friends')             ?? true;
       final rawCards = p.getStringList('ls_stat_cards');
       _statCards   = rawCards != null && rawCards.isNotEmpty

@@ -1,23 +1,22 @@
 // lib/screens/_discover_section.dart
 // ══════════════════════════════════════════════════════════════════════════
 //  Dashboard "Discover": swipeable music ideas.
-//    1. "Pour toi" (personal)  — similar to your top artist, your top
-//       genre/tag, your country
-//    2. "Tendances Last.fm" (global) — worldwide top tracks / top artists
+//    1. "For you" (personal) — built by our own TasteEngine from YOUR
+//       listening data (see services/taste_engine.dart): your mix, this
+//       month, your genres, deep cuts, forgotten favorites, albums, and
+//       your country.
+//    2. "Global trends" — real week / month / year charts (tracks, artists,
+//       albums) from ListenBrainz (see services/listenbrainz_service.dart),
+//       because Last.fm's chart endpoints have no time range.
 //  Images use the Material You shapes. Section and sources are set in
 //  Settings > Dashboard.
 //
 //  Notes:
 //   - Cards are capped to a max width so the section stays readable on
 //     wide (desktop) screens instead of stretching to a huge size.
-//   - Each card carries a small play-count badge in a Material You shape
-//     when Last.fm gives us a count. "community"/"country" come from
-//     Last.fm's global chart endpoints, which are not personalized and
-//     can include duplicates or unrelated entries — we de-duplicate what
-//     we get, but the underlying data quality is Last.fm's, not ours
-//     (Last.fm's public API has no real "recommended for you" endpoint
-//     anymore — "genre" below is our own stand-in, built from the tags of
-//     your own top artist).
+//   - Each card carries a small count badge (plays / listens) in a
+//     rectangular shape; shapes vary per card but are never circular, so
+//     the text always fits inside.
 //   - Every state change here (_select) is defensive: it never lets an
 //     exception escape mid-build, because an uncaught error here used to
 //     surface as a plain grey box (Flutter's release-mode ErrorWidget)
@@ -26,9 +25,34 @@
 // ══════════════════════════════════════════════════════════════════════════
 part of 'home_screen.dart';
 
-const _kDiscoverAll = ['community', 'artists', 'foryou', 'genre', 'country'];
-const _kDiscoverPersonal = ['foryou', 'genre', 'country'];
-const _kDiscoverGlobal   = ['community', 'artists'];
+const _kDiscoverPersonal = ['foryou', 'fresh', 'genre', 'deeper', 'forgotten', 'albums', 'country'];
+// gt = tracks, ga = artists, gb = albums  ·  week / month / year
+const _kDiscoverGlobal = [
+  'gt_week', 'gt_month', 'gt_year',
+  'ga_week', 'ga_month', 'ga_year',
+  'gb_week', 'gb_month', 'gb_year',
+];
+const _kDiscoverAll = [..._kDiscoverPersonal, ..._kDiscoverGlobal];
+// What a fresh install shows (the rest can be enabled in Settings).
+const _kDiscoverDefault = [
+  ..._kDiscoverPersonal, 'gt_week', 'gt_month', 'ga_week', 'ga_month',
+];
+
+/// Converts a saved source list from an older version: legacy ids are
+/// mapped to their new equivalent and unknown ids are dropped.
+List<String> _discoverMigrate(List<String> saved) {
+  const legacy = {
+    'community': ['gt_week', 'gt_month'],
+    'artists':   ['ga_week', 'ga_month'],
+  };
+  final out = <String>[];
+  for (final id in saved) {
+    for (final n in (legacy[id] ?? [id])) {
+      if (_kDiscoverAll.contains(n) && !out.contains(n)) out.add(n);
+    }
+  }
+  return out;
+}
 
 // Cards never grow past this width, even on very wide desktop windows.
 const double _kDiscoverMaxWidth = 640;
@@ -38,8 +62,10 @@ const int _kDiscoverFetchLimit = 24;
 
 class _DiscoverItem {
   final String name, sub, imageUrl, type;
+  final String artist; // real artist name (tracks / albums); sub is display text
   final Map<String, dynamic> raw;
-  const _DiscoverItem(this.name, this.sub, this.imageUrl, this.type, this.raw);
+  const _DiscoverItem(this.name, this.sub, this.imageUrl, this.type, this.raw,
+      {this.artist = ''});
 
   int get playcount => int.tryParse((raw['playcount'] ?? '0').toString()) ?? 0;
 }
@@ -59,8 +85,8 @@ class _DiscoverSection extends StatelessWidget {
         for (final s in group)
           if (sources.contains(s) &&
               !(s == 'country' && (country.isEmpty || country == 'None')) &&
-              !(s == 'foryou' && topArtist.isEmpty) &&
-              !(s == 'genre' && topArtist.isEmpty))
+              !(const {'foryou', 'fresh', 'genre', 'deeper', 'albums'}.contains(s) &&
+                  topArtist.isEmpty))
             s
       ];
 
@@ -95,7 +121,7 @@ class _DiscoverSection extends StatelessWidget {
               country: country,
               sources: global,
               icon: Icons.public_rounded,
-              title: _tr({'fr': 'Tendances Last.fm', 'en': 'Last.fm trends', 'es': 'Tendencias de Last.fm', 'de': 'Last.fm-Trends', 'it': 'Tendenze Last.fm', 'pt': 'Tendências do Last.fm'}),
+              title: _tr({'fr': 'Tendances mondiales', 'en': 'Global trends', 'es': 'Tendencias globales', 'de': 'Globale Trends', 'it': 'Tendenze globali', 'pt': 'Tendências globais'}),
             ),
         ]),
       ),
@@ -153,13 +179,30 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
     super.dispose();
   }
 
-  String _label(String s) => switch (s) {
-        'community' => _tr({'fr': 'Top titres', 'en': 'Top tracks', 'es': 'Top canciones', 'de': 'Top-Titel', 'it': 'Top brani', 'pt': 'Top faixas'}),
-        'artists'   => _tr({'fr': 'Top artistes', 'en': 'Top artists', 'es': 'Top artistas', 'de': 'Top-Künstler', 'it': 'Top artisti', 'pt': 'Top artistas'}),
-        'foryou'    => _tr({'fr': 'Comme ${widget.topArtist}', 'en': 'Like ${widget.topArtist}'}),
-        'genre'     => _tr({'fr': 'Ton genre', 'en': 'Your genre', 'es': 'Tu género', 'de': 'Dein Genre', 'it': 'Il tuo genere', 'pt': 'Seu gênero'}),
-        _           => _tr({'fr': 'Ton pays', 'en': 'Your country', 'es': 'Tu país', 'de': 'Dein Land', 'it': 'Il tuo paese', 'pt': 'Seu país'}),
+  String _label(String s) {
+    if (s.startsWith('g') && s.contains('_')) {
+      final kind = switch (s.substring(0, 2)) {
+        'gt' => _tr({'fr': 'Titres', 'en': 'Tracks', 'es': 'Canciones', 'de': 'Titel', 'it': 'Brani', 'pt': 'Faixas'}),
+        'ga' => _tr({'fr': 'Artistes', 'en': 'Artists', 'es': 'Artistas', 'de': 'Künstler', 'it': 'Artisti', 'pt': 'Artistas'}),
+        _    => _tr({'fr': 'Albums', 'en': 'Albums', 'es': 'Álbumes', 'de': 'Alben', 'it': 'Album', 'pt': 'Álbuns'}),
       };
+      final range = switch (s.substring(3)) {
+        'week'  => _tr({'fr': 'semaine', 'en': 'week', 'es': 'semana', 'de': 'Woche', 'it': 'settimana', 'pt': 'semana'}),
+        'month' => _tr({'fr': 'mois', 'en': 'month', 'es': 'mes', 'de': 'Monat', 'it': 'mese', 'pt': 'mês'}),
+        _       => _tr({'fr': 'année', 'en': 'year', 'es': 'año', 'de': 'Jahr', 'it': 'anno', 'pt': 'ano'}),
+      };
+      return '$kind · $range';
+    }
+    return switch (s) {
+      'foryou'    => _tr({'fr': 'Ton mix', 'en': 'Your mix', 'es': 'Tu mix', 'de': 'Dein Mix', 'it': 'Il tuo mix', 'pt': 'Seu mix'}),
+      'fresh'     => _tr({'fr': 'Ce mois-ci', 'en': 'This month', 'es': 'Este mes', 'de': 'Diesen Monat', 'it': 'Questo mese', 'pt': 'Este mês'}),
+      'genre'     => _tr({'fr': 'Tes genres', 'en': 'Your genres', 'es': 'Tus géneros', 'de': 'Deine Genres', 'it': 'I tuoi generi', 'pt': 'Seus gêneros'}),
+      'deeper'    => _tr({'fr': 'Titres cachés', 'en': 'Deep cuts', 'es': 'Joyas ocultas', 'de': 'Deep Cuts', 'it': 'Perle nascoste', 'pt': 'Faixas escondidas'}),
+      'forgotten' => _tr({'fr': 'Oubliés', 'en': 'Forgotten', 'es': 'Olvidadas', 'de': 'Vergessen', 'it': 'Dimenticate', 'pt': 'Esquecidas'}),
+      'albums'    => _tr({'fr': 'Albums', 'en': 'Albums', 'es': 'Álbumes', 'de': 'Alben', 'it': 'Album', 'pt': 'Álbuns'}),
+      _           => _tr({'fr': 'Ton pays', 'en': 'Your country', 'es': 'Tu país', 'de': 'Dein Land', 'it': 'Il tuo paese', 'pt': 'Seu país'}),
+    };
+  }
 
   // Every step here is wrapped so a network hiccup, a missing field, or an
   // empty tag list can never throw up out of this function — a swallowed
@@ -210,55 +253,91 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
     return out;
   }
 
+  // "Like A, B" line shown under artists / albums picked by the engine.
+  String _likeSub(List<String> reasons) {
+    if (reasons.isEmpty) return '';
+    final names = reasons.join(', ');
+    return _tr({'fr': 'Comme $names', 'en': 'Like $names', 'es': 'Como $names',
+        'de': 'Wie $names', 'it': 'Come $names', 'pt': 'Como $names'});
+  }
+
+  _DiscoverItem _fromRec(TasteRec r) {
+    final String sub;
+    if (r.type == 'artists') {
+      sub = _likeSub(r.reasons);
+    } else if (r.tag.isNotEmpty) {
+      sub = '${r.artist} · ${r.tag}';
+    } else {
+      sub = r.artist;
+    }
+    return _DiscoverItem(r.name, sub, _extractImage(r.image), r.type,
+        {'image': r.image, 'playcount': r.playcount.toString()},
+        artist: r.artist);
+  }
+
+  _DiscoverItem _fromChart(ChartEntry e, String type) => _DiscoverItem(
+      e.name, e.artist, e.imageUrl, type,
+      {
+        'image': e.imageUrl.isEmpty
+            ? null
+            : [{'#text': e.imageUrl, 'size': 'extralarge'}],
+        'playcount': e.listens.toString(),
+      },
+      artist: e.artist);
+
   Future<List<_DiscoverItem>> _fetch(String source) async {
     final s = widget.service;
-    String artistOf(Map m) {
-      final a = m['artist'];
-      return a is Map ? (a['name'] ?? '').toString() : (a ?? '').toString();
+
+    // Global trends: real week / month / year charts (ListenBrainz).
+    if (source.startsWith('g') && source.contains('_')) {
+      final (entity, type) = switch (source.substring(0, 2)) {
+        'gt' => ('tracks', 'tracks'),
+        'ga' => ('artists', 'artists'),
+        _    => ('albums', 'albums'),
+      };
+      final list = await ListenBrainzService.sitewide(
+          entity, source.substring(3), limit: _kDiscoverFetchLimit);
+      return list.map((e) => _fromChart(e, type)).toList();
     }
-    _DiscoverItem track(dynamic t, [String? subOverride]) {
-      final m = Map<String, dynamic>.from(t as Map);
-      return _DiscoverItem((m['name'] ?? '').toString(), subOverride ?? artistOf(m),
-          _extractImage(m['image']), 'tracks', m);
-    }
-    _DiscoverItem artist(dynamic t, String sub) {
-      final m = Map<String, dynamic>.from(t as Map);
-      return _DiscoverItem((m['name'] ?? '').toString(), sub,
-          _extractImage(m['image']), 'artists', m);
-    }
+
+    // Personal picks: computed from your own listening data.
+    final engine = TasteEngine(s);
     switch (source) {
-      case 'community':
-        return (await s.getChartTopTracks(limit: _kDiscoverFetchLimit)).map((t) => track(t)).toList();
-      case 'artists':
-        return (await s.getChartTopArtists(limit: _kDiscoverFetchLimit)).map((a) => artist(a, '')).toList();
       case 'foryou':
-        final sub = _tr({'fr': 'Comme ${widget.topArtist}', 'en': 'Like ${widget.topArtist}'});
-        return (await s.getSimilarArtists(widget.topArtist, limit: _kDiscoverFetchLimit))
-            .map((a) => artist(a, sub)).toList();
+        return (await engine.forYou(limit: _kDiscoverFetchLimit)).map(_fromRec).toList();
+      case 'fresh':
+        return (await engine.fresh(limit: _kDiscoverFetchLimit)).map(_fromRec).toList();
       case 'genre':
-        // Derive a taste-based list from your own top artist's tags,
-        // instead of Last.fm's generic (non-personalized) charts.
-        final tags = await s.getArtistTopTags(widget.topArtist);
-        if (tags.isEmpty) return [];
-        final tagName = (Map<String, dynamic>.from(tags.first as Map)['name'] ?? '').toString();
-        if (tagName.isEmpty) return [];
-        final subLabel = _tr({'fr': 'Genre : $tagName', 'en': 'Genre: $tagName'});
-        return (await s.getTagTopTracks(tagName, limit: _kDiscoverFetchLimit))
-            .map((t) => track(t, subLabel)).toList();
+        return (await engine.genre(limit: _kDiscoverFetchLimit)).map(_fromRec).toList();
+      case 'deeper':
+        return (await engine.deeperCuts(limit: _kDiscoverFetchLimit)).map(_fromRec).toList();
+      case 'forgotten':
+        return (await engine.forgotten(limit: _kDiscoverFetchLimit)).map(_fromRec).toList();
+      case 'albums':
+        return (await engine.albums(limit: _kDiscoverFetchLimit)).map(_fromRec).toList();
       default:
-        return (await s.getGeoTopTracks(widget.country, limit: _kDiscoverFetchLimit)).map((t) => track(t)).toList();
+        String artistOf(Map m) {
+          final a = m['artist'];
+          return a is Map ? (a['name'] ?? '').toString() : (a ?? '').toString();
+        }
+        return (await s.getGeoTopTracks(widget.country, limit: _kDiscoverFetchLimit))
+            .map((t) {
+          final m = Map<String, dynamic>.from(t as Map);
+          return _DiscoverItem((m['name'] ?? '').toString(), artistOf(m),
+              _extractImage(m['image']), 'tracks', m, artist: artistOf(m));
+        }).toList();
     }
   }
 
   void _open(_DiscoverItem it) {
     _haptic(_HapticImpact.light);
-    final Map<String, dynamic> item = it.type == 'tracks'
-        ? {
+    final Map<String, dynamic> item = it.type == 'artists'
+        ? {'name': it.name, 'image': it.raw['image']}
+        : {
             'name': it.name,
-            'artist': {'name': it.sub, '#text': it.sub},
+            'artist': {'name': it.artist, '#text': it.artist},
             'image': it.raw['image'],
-          }
-        : {'name': it.name, 'image': it.raw['image']};
+          };
     showDetailSheet(context, item, it.type, widget.service);
   }
 
@@ -393,11 +472,14 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
                 borderRadius: 24,
                 seed: '${it.name}${it.sub}',
                 initialUrl: it.imageUrl,
-                resolver: () => it.type == 'tracks'
-                    ? ImageService.resolveTrack(it.name, it.sub,
-                        lastfmUrl: it.imageUrl.isNotEmpty ? it.imageUrl : null)
-                    : ImageService.resolveArtist(it.name,
-                        lastfmUrl: it.imageUrl.isNotEmpty ? it.imageUrl : null),
+                resolver: () => switch (it.type) {
+                  'tracks' => ImageService.resolveTrack(it.name, it.artist,
+                      lastfmUrl: it.imageUrl.isNotEmpty ? it.imageUrl : null),
+                  'albums' => ImageService.resolveAlbum(it.name, it.artist,
+                      lastfmUrl: it.imageUrl.isNotEmpty ? it.imageUrl : null),
+                  _ => ImageService.resolveArtist(it.name,
+                      lastfmUrl: it.imageUrl.isNotEmpty ? it.imageUrl : null),
+                },
               ),
               if (it.playcount > 0)
                 Positioned(top: -10, right: -8, child: _PlayBadge(
@@ -422,18 +504,21 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
   }
 }
 
-// ── Small play-count pill on the card image, in a Material You shape ───────
-// Only "safe" shapes for a small text pill: a plain rectangle and a couple
-// of rounded/stadium variants. The full 8-shape set used for images
-// (cookie, clover, leaf, arch...) has lobes and asymmetric corners that
-// clip short text at small sizes, so badges use their own smaller set with
-// generous padding instead.
+// ── Small count badge on the card image ────────────────────────────────────
+// Rectangular shapes only (no circle / cookie): the text is a wide, short
+// label, so a round shape always made it overflow. Each card gets one of
+// these at random-but-stable (same seed = same shape) for some variation.
 ShapeBorder _badgeShape(int idx) {
-  switch (idx % 4) {
-    case 0: return const StadiumBorder();                                   // pill
-    case 1: return RoundedRectangleBorder(borderRadius: BorderRadius.circular(6));   // rectangle
-    case 2: return RoundedRectangleBorder(borderRadius: BorderRadius.circular(14));  // squircle-ish
-    default: return const M3CookieBorder(lobes: 10, amplitude: 0.035);      // near-circle, very soft bumps
+  switch (idx % 6) {
+    case 0: return RoundedRectangleBorder(borderRadius: BorderRadius.circular(4));   // sharp rectangle
+    case 1: return RoundedRectangleBorder(borderRadius: BorderRadius.circular(10));  // rounded rectangle
+    case 2: return BeveledRectangleBorder(borderRadius: BorderRadius.circular(8));   // cut corners
+    case 3: return const RoundedRectangleBorder(                                     // tab / leaf
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(14), bottomRight: Radius.circular(14),
+            topRight: Radius.circular(3), bottomLeft: Radius.circular(3)));
+    case 4: return ContinuousRectangleBorder(borderRadius: BorderRadius.circular(22)); // squircle
+    default: return const StadiumBorder();                                           // pill
   }
 }
 
@@ -454,11 +539,13 @@ class _PlayBadge extends StatelessWidget {
       clipper: ShapeBorderClipper(shape: shape),
       child: Padding(
         // Generous padding so text never touches a rounded/soft edge.
-        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           Icon(Icons.play_arrow_rounded, size: 13, color: scheme.onPrimaryContainer),
           const SizedBox(width: 3),
           Text(_fmt(count),
+              maxLines: 1,
+              softWrap: false,
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,

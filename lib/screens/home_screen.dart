@@ -35,6 +35,8 @@ import '../app_state.dart';
 import '../l10n/l10n.dart';
 import '../supported_locales.dart';
 import '../services/lastfm_service.dart';
+import '../services/taste_engine.dart';
+import '../services/listenbrainz_service.dart';
 import '../services/image_service.dart';
 import '../services/update_service.dart';
 import 'recap_story_page.dart';
