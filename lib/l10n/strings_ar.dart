@@ -769,4 +769,5 @@ class AppStringsAr implements AppStrings {
   @override String get dashSortSmartNote => 'الترتيب الذكي مفعّل: قد يعيد ترتيب هذه الفلاتر حسب الوقت.';
   @override String get dashSeparateRow => 'عرض في صف منفصل';
   @override String dashFiltersOf(String group) => 'الفلاتر · $group';
+  @override String get apShapeSingle => 'شكل واحد';
 }

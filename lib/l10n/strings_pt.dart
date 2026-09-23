@@ -798,4 +798,5 @@ class AppStringsPt implements AppStrings {
   @override String get dashSortSmartNote => 'A ordem inteligente está ativa: pode reordenar estes filtros conforme o momento.';
   @override String get dashSeparateRow => 'Mostrar em uma linha separada';
   @override String dashFiltersOf(String group) => 'Filtros · $group';
+  @override String get apShapeSingle => 'Forma única';
 }

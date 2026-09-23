@@ -769,4 +769,5 @@ class AppStringsDe implements AppStrings {
   @override String get dashSortSmartNote => 'Intelligente Sortierung ist aktiv: Sie kann diese Filter je nach Moment umsortieren.';
   @override String get dashSeparateRow => 'In eigener Zeile anzeigen';
   @override String dashFiltersOf(String group) => 'Filter · $group';
+  @override String get apShapeSingle => 'Einzelne Form';
 }

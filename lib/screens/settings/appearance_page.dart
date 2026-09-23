@@ -11,6 +11,7 @@ import '../../nothing_theme.dart';
 import '../../l10n/l10n.dart';
 import '../../services/widget_service.dart';
 import 'settings_helpers.dart';
+import 'settings_rows.dart';
 import 'pc_mode_section.dart';
 
 // Local haptic helper for appearance page.
@@ -366,48 +367,18 @@ class _AppearancePageState extends State<AppearancePage> {
         //  Theme — ALWAYS active (Nothing supports light + dark)
         // ══════════════════════════════════════════════════════════════════
         SettingsSection(label: L.settingsTheme, children: [
-          Padding(padding: const EdgeInsets.fromLTRB(16, 14, 16, 14), child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
-                Icon(Icons.contrast_rounded, size: 18, color: scheme.primary),
-                const SizedBox(width: 8),
-                Text(L.settingsTheme,
-                    style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-              ]),
-              const SizedBox(height: 12),
-              M3SegmentedButton<String>(
-                segments: [
-                  ButtonSegment(value: 'system',
-                      icon: const Icon(Icons.brightness_auto_rounded),
-                      label: Text(L.settingsThemeAuto)),
-                  ButtonSegment(value: 'light',
-                      icon: const Icon(Icons.light_mode_rounded),
-                      label: Text(L.settingsThemeLight)),
-                  ButtonSegment(value: 'dark',
-                      icon: const Icon(Icons.dark_mode_rounded),
-                      label: Text(L.settingsThemeDark)),
-                ],
-                selected: {_theme},
-                onSelectionChanged: (s) => _setTheme(s.first),
-                style: const ButtonStyle(
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-              ),
-              // When Nothing is active, explain OLED is built-in for dark
-              if (_isNothing) ...[
-                const SizedBox(height: 10),
-                Row(children: [
-                  Icon(Icons.info_outline_rounded, size: 13,
-                      color: scheme.onSurfaceVariant),
-                  const SizedBox(width: 6),
-                  Expanded(child: Text(
-                    L.apNothingOledInherent,
-                    style: text.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant),
-                  )),
-                ]),
-              ],
+          SettingChoiceRow(
+            icon: Icons.contrast_rounded,
+            title: L.settingsTheme,
+            options: [
+              ('system', L.settingsThemeAuto,  Icons.brightness_auto_rounded),
+              ('light',  L.settingsThemeLight, Icons.light_mode_rounded),
+              ('dark',   L.settingsThemeDark,  Icons.dark_mode_rounded),
             ],
-          )),
+            value: _theme,
+            description: _isNothing ? L.apNothingOledInherent : null,
+            onChanged: (v) => _setTheme(v),
+          ),
 
           // OLED toggle — grayed out when Nothing is active (redundant)
           const Divider(height: 1, indent: 16, endIndent: 16),
@@ -1225,47 +1196,36 @@ class _ImageShapeSection extends StatelessWidget {
       children: [
         ValueListenableBuilder<String>(
           valueListenable: imageShapeNotifier,
+          builder: (_, mode, _) => SettingChoiceRow(
+            icon: Icons.image_outlined,
+            title: pickLang(
+                fr: 'Pochettes, artistes et albums',
+                en: 'Covers, artists and albums',
+                es: 'Portadas, artistas y álbumes',
+                zh: '封面、艺术家和专辑',
+                pt: 'Capas, artistas e álbuns'),
+            options: [
+              ('mix',    pickLang(fr: 'Mélange', en: 'Mix', es: 'Mezcla', zh: '混合', pt: 'Mistura'), Icons.auto_awesome_rounded),
+              ('square', pickLang(fr: 'Carré', en: 'Square', es: 'Cuadrado', zh: '方形', pt: 'Quadrado'), Icons.crop_square_rounded),
+              ('circle', pickLang(fr: 'Cercle', en: 'Circle', es: 'Círculo', zh: '圆形', pt: 'Círculo'), Icons.circle_outlined),
+              ('custom', L.apShapeSingle, Icons.interests_rounded),
+            ],
+            value: mode.startsWith('shape:') ? 'custom' : mode,
+            onChanged: (v) => _pick(v == 'custom' ? 'shape:0' : v),
+          ),
+        ),
+        ValueListenableBuilder<String>(
+          valueListenable: imageShapeNotifier,
           builder: (_, mode, _) => Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(
                 pickLang(
-                  fr: 'Pochettes, artistes et albums',
-                  en: 'Covers, artists and albums',
-                  es: 'Portadas, artistas y álbumes',
-                  zh: '封面、艺术家和专辑',
-                  pt: 'Capas, artistas e álbuns'),
-                style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 12),
-              Wrap(spacing: 8, runSpacing: 8, children: [
-                M3Chip(
-                  avatar: const Icon(Icons.auto_awesome_rounded),
-                  label: Text(pickLang(fr: 'Mélange', en: 'Mix', es: 'Mezcla', zh: '混合', pt: 'Mistura')),
-                  selected: mode == 'mix',
-                  onSelected: (_) => _pick('mix'),
-                ),
-                M3Chip(
-                  avatar: const Icon(Icons.crop_square_rounded),
-                  label: Text(pickLang(fr: 'Carré', en: 'Square', es: 'Cuadrado', zh: '方形', pt: 'Quadrado')),
-                  selected: mode == 'square',
-                  onSelected: (_) => _pick('square'),
-                ),
-                M3Chip(
-                  avatar: const Icon(Icons.circle_outlined),
-                  label: Text(pickLang(fr: 'Cercle', en: 'Circle', es: 'Círculo', zh: '圆形', pt: 'Círculo')),
-                  selected: mode == 'circle',
-                  onSelected: (_) => _pick('circle'),
-                ),
-              ]),
-              const SizedBox(height: 16),
-              Text(
-                pickLang(
-                  fr: 'Ou choisis une seule forme',
-                  en: 'Or pick a single shape',
-                  es: 'O elige una sola forma',
-                  zh: '或选择单一形状',
-                  pt: 'Ou escolha uma só forma'),
+                    fr: 'Ou choisis une seule forme',
+                    en: 'Or pick a single shape',
+                    es: 'O elige una sola forma',
+                    zh: '或选择单一形状',
+                    pt: 'Ou escolha uma só forma'),
                 style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant),
               ),
               const SizedBox(height: 10),

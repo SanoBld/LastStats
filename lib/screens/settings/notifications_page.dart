@@ -9,6 +9,7 @@ import '../../l10n/l10n.dart';
 import '../../services/notification_service.dart';
 import '../../services/notification_worker.dart';
 import 'settings_helpers.dart';
+import 'settings_rows.dart';
 
 // ── Prefs keys (must match notification_worker.dart exactly) ─────────────────
 const _kMilestoneEnabled  = 'ls_notif_milestone_enabled';
@@ -218,6 +219,14 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   // ── Build ────────────────────────────────────────────────────────────────
 
+  void _onIntervalChange(int v) {
+    setState(() => _milestoneInterval = v);
+    _intervalCtrl.text = '$v';
+    // Reset so the new interval is detected fresh
+    NotificationWorker.resetMilestoneCount();
+    _save();
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -273,20 +282,27 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   ),
                   if (_milestoneOn) ...[
                     const Divider(height: 1),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
-                      child: _MilestoneConfig(
-                        interval: _milestoneInterval,
-                        ctrl:     _intervalCtrl,
-                        scheme:   scheme,
-                        text:     text,
-                        onChange: (v) {
-                          setState(() => _milestoneInterval = v);
-                          // Reset so the new interval is detected fresh
-                          NotificationWorker.resetMilestoneCount();
-                          _save();
-                        },
-                      ),
+                    SettingChoiceRow(
+                      icon: Icons.tune_rounded,
+                      title: L.notifIntervalTitle,
+                      description: L.notifIntervalDescription,
+                      options: [
+                        for (final v in {100, 250, 500, 1000, _milestoneInterval}.toList()..sort())
+                          ('$v', '$v', null),
+                      ],
+                      value: '$_milestoneInterval',
+                      onChanged: (v) => _onIntervalChange(int.parse(v)),
+                    ),
+                    SettingTextRow(
+                      icon: Icons.edit_rounded,
+                      title: L.notifCustomValueLabel,
+                      hint: 'scrobbles',
+                      value: '$_milestoneInterval',
+                      keyboardType: TextInputType.number,
+                      onChanged: (v) {
+                        final parsed = int.tryParse(v);
+                        if (parsed != null && parsed > 0) _onIntervalChange(parsed);
+                      },
                     ),
                   ],
                 ]),
@@ -303,21 +319,18 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   ),
                   if (_dailyOn) ...[
                     const Divider(height: 1),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
-                      child: _TimePicker(
-                        hour:   _dailyHour,
+                    SettingTimeRow(
+                      icon: Icons.schedule_rounded,
+                      title: L.notifTimeNotifyAt,
+                      hour: _dailyHour,
+                      minute: _dailyMin,
+                      onTap: () => _pickTime(
+                        hour: _dailyHour,
                         minute: _dailyMin,
-                        scheme: scheme,
-                        text:   text,
-                        onTap:  () => _pickTime(
-                          hour:     _dailyHour,
-                          minute:   _dailyMin,
-                          onPicked: (h, m) {
-                            _dailyHour = h;
-                            _dailyMin  = m;
-                          },
-                        ),
+                        onPicked: (h, m) {
+                          _dailyHour = h;
+                          _dailyMin  = m;
+                        },
                       ),
                     ),
                   ],
@@ -331,26 +344,30 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   ),
                   if (_weeklyOn) ...[
                     const Divider(height: 1),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
-                      child: _WeeklyConfig(
-                        day:         _weeklyDay,
-                        hour:        _weeklyHour,
-                        minute:      _weeklyMin,
-                        scheme:      scheme,
-                        text:        text,
-                        onDayChanged: (d) {
-                          setState(() => _weeklyDay = d);
-                          _save();
+                    SettingChoiceRow(
+                      icon: Icons.event_rounded,
+                      title: L.notifDayOfWeek,
+                      options: [
+                        for (var i = 0; i < 7; i++) ('${i + 1}', L.weekdaysShort[i], null),
+                      ],
+                      value: '$_weeklyDay',
+                      onChanged: (v) {
+                        setState(() => _weeklyDay = int.parse(v));
+                        _save();
+                      },
+                    ),
+                    SettingTimeRow(
+                      icon: Icons.schedule_rounded,
+                      title: L.notifTimeNotifyAt,
+                      hour: _weeklyHour,
+                      minute: _weeklyMin,
+                      onTap: () => _pickTime(
+                        hour: _weeklyHour,
+                        minute: _weeklyMin,
+                        onPicked: (h, m) {
+                          _weeklyHour = h;
+                          _weeklyMin  = m;
                         },
-                        onTimeTap: () => _pickTime(
-                          hour:     _weeklyHour,
-                          minute:   _weeklyMin,
-                          onPicked: (h, m) {
-                            _weeklyHour = h;
-                            _weeklyMin  = m;
-                          },
-                        ),
                       ),
                     ),
                   ],
@@ -631,180 +648,6 @@ class _ExampleRow extends StatelessWidget {
               color: scheme.onSurfaceVariant, height: 1.3),
         ),
       ),
-    ]);
-  }
-}
-
-// ── Interval milestone config: quick chips + custom text field ────────────────
-
-class _MilestoneConfig extends StatelessWidget {
-  final int  interval;
-  final TextEditingController ctrl;
-  final ColorScheme scheme;
-  final TextTheme   text;
-  final void Function(int) onChange;
-  const _MilestoneConfig({
-    required this.interval,
-    required this.ctrl,
-    required this.scheme,
-    required this.text,
-    required this.onChange,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(
-        L.notifIntervalDescription,
-        style: text.bodySmall
-            ?.copyWith(color: scheme.onSurfaceVariant, height: 1.3),
-      ),
-      const SizedBox(height: 10),
-      // Quick-pick chips
-      Wrap(
-        spacing: 6,
-        children: [
-          for (final v in [100, 250, 500, 1000])
-            M3Chip(
-              label:         Text('$v'),
-              selected:      interval == v,
-              visualDensity: VisualDensity.compact,
-              onSelected:    (_) {
-                ctrl.text = '$v';
-                onChange(v);
-              },
-            ),
-        ],
-      ),
-      const SizedBox(height: 10),
-      // Custom value field
-      SizedBox(
-        height: 44,
-        child: TextField(
-          controller:   ctrl,
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-            labelText:     L.notifCustomValueLabel,
-            border:        const OutlineInputBorder(),
-            isDense:       true,
-            suffixText:    'scrobbles',
-            contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12, vertical: 10),
-          ),
-          onSubmitted: (v) {
-            final parsed = int.tryParse(v);
-            if (parsed != null && parsed > 0) onChange(parsed);
-          },
-        ),
-      ),
-    ]);
-  }
-}
-
-// ── Time picker row ───────────────────────────────────────────────────────────
-
-class _TimePicker extends StatelessWidget {
-  final int    hour, minute;
-  final ColorScheme scheme;
-  final TextTheme   text;
-  final VoidCallback onTap;
-  const _TimePicker({
-    required this.hour,
-    required this.minute,
-    required this.scheme,
-    required this.text,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final hh = hour.toString().padLeft(2, '0');
-    final mm = minute.toString().padLeft(2, '0');
-    return Row(children: [
-      Text(
-        L.notifTimeNotifyAt,
-        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-      ),
-      const SizedBox(width: 12),
-      FilledButton.tonal(
-        onPressed: onTap,
-        style: FilledButton.styleFrom(
-          visualDensity: VisualDensity.compact,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-        ),
-        child: Text(
-          '$hh:$mm',
-          style: const TextStyle(
-            fontWeight:   FontWeight.w700,
-            fontFeatures: [FontFeature.tabularFigures()],
-          ),
-        ),
-      ),
-    ]);
-  }
-}
-
-// ── Weekly config: day chips + time picker ────────────────────────────────────
-
-class _WeeklyConfig extends StatelessWidget {
-  final int  day, hour, minute;
-  final ColorScheme  scheme;
-  final TextTheme    text;
-  final void Function(int) onDayChanged;
-  final VoidCallback onTimeTap;
-  const _WeeklyConfig({
-    required this.day,
-    required this.hour,
-    required this.minute,
-    required this.scheme,
-    required this.text,
-    required this.onDayChanged,
-    required this.onTimeTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final days = L.weekdaysShort;
-    final hh = hour.toString().padLeft(2, '0');
-    final mm = minute.toString().padLeft(2, '0');
-
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(
-        L.notifDayOfWeek,
-        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-      ),
-      const SizedBox(height: 8),
-      Wrap(
-        spacing: 6,
-        children: List.generate(7, (i) {
-          final dayNum = i + 1;
-          return M3Chip(
-            label:         Text(days[i]),
-            selected:      day == dayNum,
-            visualDensity: VisualDensity.compact,
-            onSelected:    (_) => onDayChanged(dayNum),
-          );
-        }),
-      ),
-      const SizedBox(height: 12),
-      Row(children: [
-        Text(
-          L.notifTimeNotifyAt,
-          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-        ),
-        const SizedBox(width: 12),
-        FilledButton.tonal(
-          onPressed: onTimeTap,
-          style: FilledButton.styleFrom(
-            visualDensity: VisualDensity.compact,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-          ),
-          child: Text(
-            '$hh:$mm',
-            style: const TextStyle(fontWeight: FontWeight.w700),
-          ),
-        ),
-      ]),
     ]);
   }
 }

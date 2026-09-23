@@ -798,4 +798,5 @@ class AppStringsEs implements AppStrings {
   @override String get dashSortSmartNote => 'El orden inteligente está activo: puede reordenar estos filtros según el momento.';
   @override String get dashSeparateRow => 'Mostrar en una fila aparte';
   @override String dashFiltersOf(String group) => 'Filtros · $group';
+  @override String get apShapeSingle => 'Forma única';
 }

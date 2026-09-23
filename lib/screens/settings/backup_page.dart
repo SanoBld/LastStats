@@ -13,6 +13,7 @@ import '../../services/crash_log_service.dart';
 import '../../services/auto_backup_service.dart';
 import '../../services/notification_worker.dart';
 import 'settings_helpers.dart';
+import 'settings_rows.dart';
 
 class BackupPage extends StatefulWidget {
   const BackupPage({super.key});
@@ -155,15 +156,6 @@ class _BackupPageState extends State<BackupPage> {
   String _fmtDate(DateTime d) {
     String two(int n) => n.toString().padLeft(2, '0');
     return '${two(d.day)}/${two(d.month)}/${d.year}';
-  }
-
-  Widget _freqChip(String value, String label) {
-    final selected = _autoBackupFreq == value;
-    return M3Chip(
-      label: Text(label),
-      selected: selected,
-      onSelected: (_) => _setAutoBackupFreq(value),
-    );
   }
 
   // Whether to include the Last.fm API key / secret key in the exported
@@ -486,20 +478,17 @@ class _BackupPageState extends State<BackupPage> {
           ),
           if (_autoBackupEnabled) ...[
             const Divider(height: 1, indent: 16, endIndent: 16),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-              child: Text(L.backupAutoFreqLabel,
-                  style: text.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-              child: Wrap(spacing: 8, runSpacing: 8, children: [
-                _freqChip('daily',   L.backupAutoFreqDaily),
-                _freqChip('weekly',  L.backupAutoFreqWeekly),
-                _freqChip('monthly', L.backupAutoFreqMonthly),
-                _freqChip('yearly',  L.backupAutoFreqYearly),
-              ]),
+            SettingChoiceRow(
+              icon: Icons.event_repeat_rounded,
+              title: L.backupAutoFreqLabel,
+              options: [
+                ('daily',   L.backupAutoFreqDaily,   null),
+                ('weekly',  L.backupAutoFreqWeekly,  null),
+                ('monthly', L.backupAutoFreqMonthly, null),
+                ('yearly',  L.backupAutoFreqYearly,  null),
+              ],
+              value: _autoBackupFreq,
+              onChanged: _setAutoBackupFreq,
             ),
             const Divider(height: 1, indent: 16, endIndent: 16),
             SwitchListTile(

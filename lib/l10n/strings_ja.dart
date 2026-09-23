@@ -768,4 +768,5 @@ class AppStringsJa implements AppStrings {
   @override String get dashSortSmartNote => 'スマート順序が有効です。状況に応じてこれらのフィルターの順序が変わることがあります。';
   @override String get dashSeparateRow => '別の行に表示';
   @override String dashFiltersOf(String group) => 'フィルター · $group';
+  @override String get apShapeSingle => '単一の形';
 }

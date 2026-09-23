@@ -769,4 +769,5 @@ class AppStringsRu implements AppStrings {
   @override String get dashSortSmartNote => 'Умная сортировка включена: она может менять порядок фильтров в зависимости от момента.';
   @override String get dashSeparateRow => 'Показать отдельной строкой';
   @override String dashFiltersOf(String group) => 'Фильтры · $group';
+  @override String get apShapeSingle => 'Одна форма';
 }

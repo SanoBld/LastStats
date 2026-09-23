@@ -795,4 +795,5 @@ class AppStringsZh implements AppStrings {
   @override String get dashSortSmartNote => '智能排序已开启：会根据时机重新排列这些筛选。';
   @override String get dashSeparateRow => '单独一行显示';
   @override String dashFiltersOf(String group) => '筛选 · $group';
+  @override String get apShapeSingle => '单一形状';
 }

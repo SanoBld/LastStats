@@ -7,6 +7,7 @@ import '../../widgets/m3_components.dart';
 import 'package:flutter/services.dart';
 import '../../app_state.dart';
 import '../../l10n/l10n.dart';
+import 'settings_rows.dart';
 
 // ── Clés SharedPreferences (référence) ───────────────────────────────────────
 // ls_header_fallback_type   : 'none' | 'top_track' | 'top_album' | 'top_artist' | 'custom_url'
@@ -154,36 +155,75 @@ class SettingsSection extends StatelessWidget {
   final List<Widget> children;
   const SettingsSection({super.key, required this.label, required this.children});
 
+  // Old pages still build plain ListTile / SwitchListTile rows: they are
+  // re-dressed here so every setting shares the same Expressive look
+  // (cookie icon badge, spring press, same spacing).
+  static Widget _restyle(Widget w) {
+    if (w is SwitchListTile) {
+      final v = w.value;
+      final cb = w.onChanged;
+      return SettingTile(
+        leading: w.secondary,
+        title: w.title ?? const SizedBox.shrink(),
+        subtitle: w.subtitle,
+        enabled: cb != null,
+        trailing: Switch(value: v, onChanged: cb),
+        onTap: cb == null ? null : () => cb(!v),
+      );
+    }
+    if (w is ListTile) {
+      return SettingTile(
+        leading: w.leading,
+        title: w.title ?? const SizedBox.shrink(),
+        subtitle: w.subtitle,
+        trailing: w.trailing,
+        enabled: w.enabled,
+        onTap: w.onTap,
+        onLongPress: w.onLongPress,
+      );
+    }
+    return w;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
+    final theme  = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final text   = theme.textTheme;
+    final rows = children.where((c) => c is! Divider).map(_restyle).toList();
+
     final content = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Padding(
-        padding: const EdgeInsets.only(left: 4, bottom: 6),
-        child: Text(label.toUpperCase(), style: text.labelSmall?.copyWith(
-            color: scheme.primary, fontWeight: FontWeight.w700, letterSpacing: 1.2)),
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        child: Text(label, style: text.titleSmall?.copyWith(
+            color: scheme.primary, fontWeight: FontWeight.w800, letterSpacing: 0.4)),
       ),
-      // Each row is its own tile: big outer corners, small inner corners.
-      Builder(builder: (_) {
-        final rows = children.where((c) => c is! Divider).toList();
-        return Column(children: [
+      // Every switch shows a check in its thumb when on (M3 Expressive).
+      Theme(
+        data: theme.copyWith(
+          switchTheme: SwitchThemeData(
+            thumbIcon: WidgetStateProperty.resolveWith((states) =>
+                states.contains(WidgetState.selected)
+                    ? const Icon(Icons.check_rounded)
+                    : null),
+          ),
+        ),
+        // Each row is its own tile: big outer corners, small inner corners.
+        child: Column(children: [
           for (var i = 0; i < rows.length; i++)
             M3SegmentTile(index: i, count: rows.length, child: rows[i]),
-        ]);
-      }),
+        ]),
+      ),
     ]);
 
-    // Small one-shot fade + rise on mount so settings pages don't feel
-    // static — every card gently "settles" into place the first time
-    // it's built, no controller/dispose needed since its a plain tween.
+    // One-shot spring: the section fades in and rises into place.
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
       duration: M3Motion.spatialDefaultDuration,
       curve: M3Motion.spatialDefault,
       builder: (_, v, child) => Opacity(
         opacity: v.clamp(0.0, 1.0),
-        child: Transform.translate(offset: Offset(0, (1 - v) * 12), child: child),
+        child: Transform.translate(offset: Offset(0, (1 - v) * 16), child: child),
       ),
       child: content,
     );

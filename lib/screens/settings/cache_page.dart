@@ -1,5 +1,7 @@
 // lib/screens/settings/cache_page.dart
 import 'package:flutter/material.dart';
+import 'settings_helpers.dart';
+import 'settings_rows.dart';
 import '../../widgets/m3_components.dart';
 import '../../theme/m3_motion.dart';
 import '../../theme/m3_shapes.dart';
@@ -137,122 +139,69 @@ class _CachePageState extends State<CachePage> {
               padding: const EdgeInsets.all(20),
               children: [
                 // ── Usage overview ─────────────────────────────────────────
-                _SectionHeader(L.cacheUsage, text),
-                const SizedBox(height: 12),
-                _UsageCard(stats: _stats!, scheme: scheme, text: text),
+                SettingsSection(label: L.cacheUsage, children: [
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: _UsageCard(stats: _stats!, scheme: scheme, text: text),
+                  ),
+                ]),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
 
-                // ── Storage limit ──────────────────────────────────────────
-                _SectionHeader(L.cacheLimit, text),
-                const SizedBox(height: 4),
-                Text(
-                  L.cacheLimitHint,
-                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-                ),
-                const SizedBox(height: 12),
-                _LimitPicker(
-                  current:  StorageManager.maxBytes,
-                  limits:   _limits,
-                  onSelect: _setLimit,
-                  scheme:   scheme,
-                  text:     text,
-                ),
+                // ── Storage limit + offline mode ────────────────────────────
+                SettingsSection(label: L.cacheLimit, children: [
+                  SettingChoiceRow(
+                    icon: Icons.storage_rounded,
+                    title: L.cacheLimit,
+                    options: [for (final l in _limits) ('${l.bytes}', l.label, null)],
+                    value: '${StorageManager.maxBytes}',
+                    description: L.cacheLimitHint,
+                    onChanged: (v) => _setLimit(int.parse(v)),
+                  ),
+                  _OfflineModeCard(scheme: scheme, text: text),
+                ]),
 
-                const SizedBox(height: 24),
-
-                // ── Offline mode ───────────────────────────────────────────
-                _SectionHeader(L.cacheOffline, text),
-                const SizedBox(height: 8),
-                _OfflineModeCard(scheme: scheme, text: text),
-
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
 
                 // ── Clear categories ───────────────────────────────────────
-                _SectionHeader(L.cacheClearSection, text),
-                const SizedBox(height: 8),
-
-                M3Switcher(
-                  duration: const Duration(milliseconds: 220),
-                  child: _clearing
-                      ? const Padding(
-                          key: ValueKey('loading'),
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          child: Center(child: M3LoadingIndicator()),
-                        )
-                      : Column(
-                          key: const ValueKey('list'),
-                          children: [
-                            _ClearTile(
-                              icon:     Icons.image_outlined,
-                              color:    scheme.primary,
-                              title:    L.cacheImages,
-                              subtitle: L.cacheImagesSubtitle,
-                              size:     _stats!.imageBytes,
-                              onTap:    _clearImages,
-                              scheme:   scheme,
-                              text:     text,
-                            ),
-                            const SizedBox(height: 8),
-                            _ClearTile(
-                              icon:     Icons.api_outlined,
-                              color:    scheme.secondary,
-                              title:    L.cacheApiData,
-                              subtitle: L.cacheApiDataSubtitle,
-                              size:     _stats!.apiBytes,
-                              onTap:    _clearApiCache,
-                              scheme:   scheme,
-                              text:     text,
-                            ),
-                            const SizedBox(height: 8),
-                            _ClearTile(
-                              icon:     Icons.history_rounded,
-                              color:    scheme.tertiary,
-                              title:    L.cacheScrobbles,
-                              subtitle: L.cacheScrobblesSubtitle,
-                              size:     _stats!.scrobbleBytes,
-                              onTap:    _clearScrobbles,
-                              scheme:   scheme,
-                              text:     text,
-                            ),
-                            const SizedBox(height: 16),
-                            FilledButton.tonalIcon(
-                              onPressed: _clearAll,
-                              icon:  const Icon(Icons.delete_sweep_rounded),
-                              label: Text(L.cacheClearBtn),
-                              style: FilledButton.styleFrom(
-                                minimumSize: const Size.fromHeight(48),
-                                backgroundColor: scheme.errorContainer,
-                                foregroundColor: scheme.onErrorContainer,
-                              ),
-                            ),
-                          ],
-                        ),
-                ),
+                SettingsSection(label: L.cacheClearSection, children: [
+                  if (_clearing)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(child: M3LoadingIndicator()),
+                    )
+                  else ...[
+                    SettingActionRow(
+                      icon: Icons.image_outlined,
+                      title: L.cacheImages,
+                      subtitle: '${StorageManager.formatBytes(_stats!.imageBytes)} · ${L.cacheImagesSubtitle}',
+                      onTap: _clearImages,
+                    ),
+                    SettingActionRow(
+                      icon: Icons.api_outlined,
+                      title: L.cacheApiData,
+                      subtitle: '${StorageManager.formatBytes(_stats!.apiBytes)} · ${L.cacheApiDataSubtitle}',
+                      onTap: _clearApiCache,
+                    ),
+                    SettingActionRow(
+                      icon: Icons.history_rounded,
+                      title: L.cacheScrobbles,
+                      subtitle: '${StorageManager.formatBytes(_stats!.scrobbleBytes)} · ${L.cacheScrobblesSubtitle}',
+                      onTap: _clearScrobbles,
+                    ),
+                    SettingActionRow(
+                      icon: Icons.delete_sweep_rounded,
+                      title: L.cacheClearBtn,
+                      onTap: _clearAll,
+                    ),
+                  ],
+                ]),
 
                 const SizedBox(height: 32),
               ],
             ),
     );
   }
-}
-
-// ── Section header ────────────────────────────────────────────────────────────
-
-class _SectionHeader extends StatelessWidget {
-  final String label;
-  final TextTheme text;
-  const _SectionHeader(this.label, this.text);
-
-  @override
-  Widget build(BuildContext context) => Text(
-        label,
-        style: text.labelMedium?.copyWith(
-          color: Theme.of(context).colorScheme.primary,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.5,
-        ),
-      );
 }
 
 // ── Usage card ────────────────────────────────────────────────────────────────
@@ -404,45 +353,6 @@ class _Bar extends StatelessWidget {
   }
 }
 
-// ── Limit picker ──────────────────────────────────────────────────────────────
-
-class _LimitPicker extends StatelessWidget {
-  final int    current;
-  final List<({String label, int bytes})> limits;
-  final void Function(int) onSelect;
-  final ColorScheme scheme;
-  final TextTheme   text;
-
-  const _LimitPicker({
-    required this.current,
-    required this.limits,
-    required this.onSelect,
-    required this.scheme,
-    required this.text,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: limits.map((p) {
-        final selected = p.bytes == current;
-        return M3Chip(
-          label:         Text(p.label),
-          selected:      selected,
-          onSelected:    (_) => onSelect(p.bytes),
-          selectedColor: scheme.primaryContainer,
-          labelStyle:    text.bodyMedium?.copyWith(
-            fontWeight: selected ? FontWeight.w700 : FontWeight.normal,
-            color:      selected ? scheme.onPrimaryContainer : null,
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
 // ── Offline mode toggle ───────────────────────────────────────────────────────
 
 class _OfflineModeCard extends StatefulWidget {
@@ -481,83 +391,11 @@ class _OfflineModeCardState extends State<_OfflineModeCard> {
   }
 
   @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        decoration: BoxDecoration(
-          color:        widget.scheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-              color: widget.scheme.outlineVariant.withValues(alpha: 0.45)),
-        ),
-        child: SwitchListTile(
-          value:       _keepStale,
-          onChanged:   _toggle,
-          contentPadding: EdgeInsets.zero,
-          title: Text(
-            L.cacheOfflineTitle,
-            style: widget.text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          subtitle: Text(
-            L.cacheOfflineSubtitle,
-            style: widget.text.bodySmall?.copyWith(color: widget.scheme.onSurfaceVariant),
-          ),
-        ),
+  Widget build(BuildContext context) => SettingSwitchRow(
+        icon: Icons.cloud_off_rounded,
+        title: L.cacheOfflineTitle,
+        subtitle: L.cacheOfflineSubtitle,
+        value: _keepStale,
+        onChanged: _toggle,
       );
-}
-
-// ── Clear tile ────────────────────────────────────────────────────────────────
-
-class _ClearTile extends StatelessWidget {
-  final IconData    icon;
-  final Color       color;
-  final String      title;
-  final String      subtitle;
-  final int         size;
-  final VoidCallback onTap;
-  final ColorScheme  scheme;
-  final TextTheme    text;
-
-  const _ClearTile({
-    required this.icon,
-    required this.color,
-    required this.title,
-    required this.subtitle,
-    required this.size,
-    required this.onTap,
-    required this.scheme,
-    required this.text,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color:        scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45)),
-      ),
-      child: ListTile(
-        leading: Container(
-          width: 40, height: 40,
-          decoration: BoxDecoration(
-            color:        color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, color: color, size: 20),
-        ),
-        title: Text(title, style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-        subtitle: Text(
-          '${StorageManager.formatBytes(size)} · $subtitle',
-          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-        ),
-        trailing: TextButton(
-          onPressed: onTap,
-          child: Text(L.cacheClearBtn,
-              style: TextStyle(color: scheme.error)),
-        ),
-        contentPadding: const EdgeInsets.fromLTRB(12, 4, 8, 4),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
-    );
-  }
 }

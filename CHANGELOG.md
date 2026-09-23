@@ -32,6 +32,27 @@
 
 ## v3.6.0
 
+**Settings: redesigned in Material 3 Expressive**
+- Every settings page now shares one design: cookie-shaped icon badges, grouped tiles (big outer corners, small inner corners), spring press animation, a check icon inside switches, clearer section titles and an 8dp spacing scale
+- Same controls everywhere: switch rows, "choice" rows, action rows, sliders, text/URL rows and time rows. The current value is always visible on the right (no more mixed chips, segmented buttons and cards)
+- New choice sheet: shows all options at once with shape-morphing cards, and scrolls only when the list is too long for the screen
+- Applied to Dashboard, Appearance, Startup, Notifications, Backup, Sync, Cache, Battery saver and PC mode. Older rows on the other pages are restyled automatically
+- All new texts are translated in the 10 app languages
+
+**Dashboard settings**
+- Settings > Dashboard rebuilt: header image, animation and blur, visible sections, Discover, chart and stat cards, each with the same row types
+- New "Choose and sort" sheet for Discover filters and stat cards: tick what you want and use the Sort button to drag them in your order (the chosen order is now used on the dashboard)
+- Discover filters can be shown on their own row, outside their tab ("Show on its own row" icon in the sheet)
+- Discover filters stay on one scrolling line
+
+**Discover: smart order**
+- New option "Most relevant filter first": filters are sorted by usefulness for the moment (time of day, weekend, start of the month), your habits (filters you pick and cards you open, recent ones count more), and rotation so the same filter is not always first
+- "On this day" jumps to the front once a day when you really listened to music on this date in past years, and is hidden when there is nothing to show
+- Filters that come back empty go to the end
+
+**Fixes**
+- Fixed Dart analyzer errors on the dashboard (weekly count type), the deprecated `onReorder` in the reorder sheet and missing braces in the taste engine
+
 **Dashboard: reorderable and more customizable**
 - New "Reorder sections" button in Settings > Dashboard: drag Stats, Discover, Recent plays, Friends and the Chart/calendar block into any order you like
 - New "Infinite scroll" option in Settings > Dashboard: the Discover section loops endlessly instead of stopping at the last card

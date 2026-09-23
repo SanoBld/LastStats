@@ -798,4 +798,5 @@ class AppStringsEn implements AppStrings {
   @override String get dashSortSmartNote => 'Smart order is on: it can reorder these filters depending on the moment.';
   @override String get dashSeparateRow => 'Show on its own row';
   @override String dashFiltersOf(String group) => 'Filters · $group';
+  @override String get apShapeSingle => 'Single shape';
 }

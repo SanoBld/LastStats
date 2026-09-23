@@ -17,6 +17,7 @@ import '../../services/all_scrobbles_service.dart';
 import '../../services/notification_worker.dart';
 import '../../services/friends_library_service.dart';
 import 'settings_helpers.dart';
+import 'settings_rows.dart';
 
 const _kSyncEnabled   = 'ls_scrobble_sync_enabled';
 const _kSyncFreqHours = 'ls_scrobble_sync_freq_hours';
@@ -171,21 +172,15 @@ class _SyncPageState extends State<SyncPage> {
                     ),
                     if (_enabled) ...[
                       const Divider(height: 1),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(L.syncFrequencyLabel,
-                              style: text.labelLarge?.copyWith(color: scheme.onSurfaceVariant)),
-                          const SizedBox(height: 10),
-                          Wrap(spacing: 8, runSpacing: 8, children: [
-                            for (final h in _kFrequencyOptions)
-                              M3Chip(
-                                label: Text(h == 24 ? L.syncFrequencyDaily : L.syncFrequencyHours(h)),
-                                selected: _freqH == h,
-                                onSelected: (_) => _setFreq(h),
-                              ),
-                          ]),
-                        ]),
+                      SettingChoiceRow(
+                        icon: Icons.update_rounded,
+                        title: L.syncFrequencyLabel,
+                        options: [
+                          for (final h in _kFrequencyOptions)
+                            ('$h', h == 24 ? L.syncFrequencyDaily : L.syncFrequencyHours(h), null),
+                        ],
+                        value: '$_freqH',
+                        onChanged: (v) => _setFreq(int.parse(v)),
                       ),
                     ],
                 ]),
@@ -245,21 +240,19 @@ class _SyncPageState extends State<SyncPage> {
                 SettingsSection(
                   label: _syncCt('Synchronisation des amis', 'Friends sync'),
                   children: [
+                  SettingChoiceRow(
+                    icon: Icons.update_rounded,
+                    title: _syncCt('Fréquence de synchronisation', 'Sync frequency'),
+                    options: [
+                      for (final h in _kFriendsIntervalOptions)
+                        ('$h', h == 24 ? _syncCt('Chaque jour', 'Daily') : '${h}h', null),
+                    ],
+                    value: '$_friendsIntervalH',
+                    onChanged: (v) => _setFriendsInterval(int.parse(v)),
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(_syncCt('Fréquence de synchronisation', 'Sync frequency'),
-                          style: text.labelLarge?.copyWith(color: scheme.onSurfaceVariant)),
-                      const SizedBox(height: 10),
-                      Wrap(spacing: 8, runSpacing: 8, children: [
-                        for (final h in _kFriendsIntervalOptions)
-                          M3Chip(
-                            label: Text(h == 24 ? _syncCt('Chaque jour', 'Daily') : '${h}h'),
-                            selected: _friendsIntervalH == h,
-                            onSelected: (_) => _setFriendsInterval(h),
-                          ),
-                      ]),
-                      const SizedBox(height: 16),
                       FilledButton.icon(
                         onPressed: _resyncingAll ? null : _resyncAllFriends,
                         icon: _resyncingAll

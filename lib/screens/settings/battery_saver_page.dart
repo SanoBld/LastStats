@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app_state.dart';
 import 'settings_helpers.dart';
+import 'settings_rows.dart';
 
 class BatterySaverPage extends StatefulWidget {
   const BatterySaverPage({super.key});
@@ -113,33 +114,15 @@ class _BatterySaverPageState extends State<BatterySaverPage> {
               value: _auto,
               onChanged: _setAuto,
             ),
-            Padding(padding: const EdgeInsets.fromLTRB(16, 0, 16, 12), child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(children: [
-                  Icon(Icons.percent_rounded, size: 18,
-                      color: _auto ? scheme.primary : scheme.onSurfaceVariant.withValues(alpha: 0.4)),
-                  const SizedBox(width: 8),
-                  Text(isEn ? 'Threshold' : 'Seuil',
-                      style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600,
-                          color: _auto ? null : scheme.onSurfaceVariant.withValues(alpha: 0.4))),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(color: scheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: scheme.outlineVariant)),
-                    child: Text('$_threshold%',
-                        style: text.labelMedium?.copyWith(fontFamily: 'monospace')),
-                  ),
-                ]),
-                Slider(
-                  value: _threshold.toDouble(), min: 5, max: 90, divisions: 17,
-                  label: '$_threshold%',
-                  onChanged: _auto ? (v) => setState(() => _threshold = v.round()) : null,
-                  onChangeEnd: (v) => _setThreshold(v.round()),
-                ),
-              ],
-            )),
+            SettingSliderRow(
+              icon: Icons.percent_rounded,
+              title: isEn ? 'Threshold' : 'Seuil',
+              valueLabel: '$_threshold%',
+              value: _threshold.toDouble(), min: 5, max: 90, divisions: 17,
+              enabled: _auto,
+              onChanged: (v) => setState(() => _threshold = v.round()),
+              onChangeEnd: (v) => _setThreshold(v.round()),
+            ),
           ],
         ),
       ]),

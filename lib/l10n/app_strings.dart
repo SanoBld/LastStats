@@ -860,4 +860,5 @@ abstract class AppStrings {
   String get dashSortSmartNote;
   String get dashSeparateRow;
   String dashFiltersOf(String group);
+  String get apShapeSingle;
 }

@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../app_state.dart';
 import '../../l10n/l10n.dart';
 import 'settings_helpers.dart';
+import 'settings_rows.dart';
 
 class PcModeSection extends StatefulWidget {
   const PcModeSection({super.key});
@@ -68,60 +69,17 @@ class _PcModeSectionState extends State<PcModeSection> {
     return SettingsSection(
       label: L.pcModeLayout,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── Section title ─────────────────────────────────────────
-              Row(children: [
-                Icon(Icons.desktop_windows_outlined,
-                    size: 18, color: scheme.primary),
-                const SizedBox(width: 8),
-                Text(
-                  L.pcModeNavLayout,
-                  style: text.bodyMedium
-                      ?.copyWith(fontWeight: FontWeight.w600),
-                ),
-              ]),
-
-              const SizedBox(height: 12),
-
-              // ── Three-segment toggle ──────────────────────────────────
-              M3SegmentedButton<String>(
-                segments: [
-                  ButtonSegment(
-                    value: 'auto',
-                    icon: const Icon(Icons.devices_rounded),
-                    label: Text(L.pcModeAuto),
-                  ),
-                  ButtonSegment(
-                    value: 'on',
-                    icon: const Icon(Icons.view_sidebar_outlined),
-                    label: Text(L.pcModeSideRail),
-                  ),
-                  ButtonSegment(
-                    value: 'off',
-                    icon: const Icon(Icons.view_headline_rounded),
-                    label: Text(L.pcModeBottomBar),
-                  ),
-                ],
-                selected: {_mode},
-                onSelectionChanged: (s) => _setMode(s.first),
-                style: const ButtonStyle(
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-              ),
-
-              const SizedBox(height: 8),
-
-              // ── Contextual hint ───────────────────────────────────────
-              Text(
-                _hint,
-                style: text.bodySmall
-                    ?.copyWith(color: scheme.onSurfaceVariant),
-              ),
-            ],
-          ),
+        SettingChoiceRow(
+          icon: Icons.desktop_windows_outlined,
+          title: L.pcModeNavLayout,
+          options: [
+            ('auto', L.pcModeAuto,      Icons.devices_rounded),
+            ('on',   L.pcModeSideRail,  Icons.view_sidebar_outlined),
+            ('off',  L.pcModeBottomBar, Icons.view_headline_rounded),
+          ],
+          value: _mode,
+          description: _hint,
+          onChanged: _setMode,
         ),
       ],
     );
