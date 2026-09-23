@@ -1,0 +1,137 @@
+/* ==========================================================
+   MATERIAL 3 EXPRESSIVE — shapes + spring motion
+   Loaded after every other stylesheet: it only overrides shape and motion,
+   colors/tokens still come from style.css.
+   ========================================================== */
+:root {
+  /* spring-like easing (linear() overshoots a bit, cubic-bezier is the fallback) */
+  --spring-fast: cubic-bezier(.34, 1.56, .64, 1);
+  --spring-slow: cubic-bezier(.3, 1.35, .5, 1);
+  --shape-cookie: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M100.0 50.0L99.8 52.6L99.2 55.2L98.2 57.6L97.0 60.0L95.8 62.3L94.5 64.5L93.4 66.7L92.5 68.9L91.7 71.3L91.0 73.7L90.3 76.2L89.5 78.7L88.4 81.1L87.0 83.4L85.4 85.4L83.4 87.0L81.1 88.4L78.7 89.5L76.2 90.3L73.7 91.0L71.3 91.7L68.9 92.5L66.7 93.4L64.5 94.5L62.3 95.8L60.0 97.0L57.6 98.2L55.2 99.2L52.6 99.8L50.0 100.0L47.4 99.8L44.8 99.2L42.4 98.2L40.0 97.0L37.7 95.8L35.5 94.5L33.3 93.4L31.1 92.5L28.7 91.7L26.3 91.0L23.8 90.3L21.3 89.5L18.9 88.4L16.6 87.0L14.6 85.4L13.0 83.4L11.6 81.1L10.5 78.7L9.7 76.2L9.0 73.7L8.3 71.3L7.5 68.9L6.6 66.7L5.5 64.5L4.2 62.3L3.0 60.0L1.8 57.6L0.8 55.2L0.2 52.6L0.0 50.0L0.2 47.4L0.8 44.8L1.8 42.4L3.0 40.0L4.2 37.7L5.5 35.5L6.6 33.3L7.5 31.1L8.3 28.7L9.0 26.3L9.7 23.8L10.5 21.3L11.6 18.9L13.0 16.6L14.6 14.6L16.6 13.0L18.9 11.6L21.3 10.5L23.8 9.7L26.3 9.0L28.7 8.3L31.1 7.5L33.3 6.6L35.5 5.5L37.7 4.2L40.0 3.0L42.4 1.8L44.8 0.8L47.4 0.2L50.0 0.0L52.6 0.2L55.2 0.8L57.6 1.8L60.0 3.0L62.3 4.2L64.5 5.5L66.7 6.6L68.9 7.5L71.3 8.3L73.7 9.0L76.2 9.7L78.7 10.5L81.1 11.6L83.4 13.0L85.4 14.6L87.0 16.6L88.4 18.9L89.5 21.3L90.3 23.8L91.0 26.3L91.7 28.7L92.5 31.1L93.4 33.3L94.5 35.5L95.8 37.7L97.0 40.0L98.2 42.4L99.2 44.8L99.8 47.4Z'/%3E%3C/svg%3E");
+  --shape-clover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M100.0 50.0L99.8 52.6L99.3 55.2L98.4 57.7L97.3 60.1L95.9 62.3L94.3 64.4L92.5 66.3L90.6 68.1L88.7 69.7L86.8 71.2L84.9 72.7L83.1 74.1L81.4 75.4L79.8 76.8L78.3 78.3L76.8 79.8L75.4 81.4L74.1 83.1L72.7 84.9L71.2 86.8L69.7 88.7L68.1 90.6L66.3 92.5L64.4 94.3L62.3 95.9L60.1 97.3L57.7 98.4L55.2 99.3L52.6 99.8L50.0 100.0L47.4 99.8L44.8 99.3L42.3 98.4L39.9 97.3L37.7 95.9L35.6 94.3L33.7 92.5L31.9 90.6L30.3 88.7L28.8 86.8L27.3 84.9L25.9 83.1L24.6 81.4L23.2 79.8L21.7 78.3L20.2 76.8L18.6 75.4L16.9 74.1L15.1 72.7L13.2 71.2L11.3 69.7L9.4 68.1L7.5 66.3L5.7 64.4L4.1 62.3L2.7 60.1L1.6 57.7L0.7 55.2L0.2 52.6L0.0 50.0L0.2 47.4L0.7 44.8L1.6 42.3L2.7 39.9L4.1 37.7L5.7 35.6L7.5 33.7L9.4 31.9L11.3 30.3L13.2 28.7L15.1 27.3L16.9 25.9L18.6 24.6L20.2 23.2L21.7 21.7L23.2 20.2L24.6 18.6L25.9 16.9L27.3 15.1L28.7 13.2L30.3 11.3L31.9 9.4L33.7 7.5L35.6 5.7L37.7 4.1L39.9 2.7L42.3 1.6L44.8 0.7L47.4 0.2L50.0 0.0L52.6 0.2L55.2 0.7L57.7 1.6L60.1 2.7L62.3 4.1L64.4 5.7L66.3 7.5L68.1 9.4L69.7 11.3L71.2 13.2L72.7 15.1L74.1 16.9L75.4 18.6L76.8 20.2L78.3 21.7L79.8 23.2L81.4 24.6L83.1 25.9L84.9 27.3L86.8 28.7L88.7 30.3L90.6 31.9L92.5 33.7L94.3 35.6L95.9 37.7L97.3 39.9L98.4 42.3L99.3 44.8L99.8 47.4Z'/%3E%3C/svg%3E");
+  --r-outer: 28px;
+  --r-inner: 6px;
+  --r-press: 12px;
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --spring-fast: linear(0, .42 9%, .9 21%, 1.08 34%, 1.05 46%, .99 62%, 1.003 80%, 1);
+    --spring-slow: linear(0, .25 7%, .7 17%, 1.05 30%, 1.07 42%, 1.01 58%, .995 74%, 1);
+  }
+}
+
+/* ---------- Buttons: pill at rest, morph to a soft square when pressed ---------- */
+.project-actions a, .project-actions button,
+.contact-links a, .about-cta, .lang-toggle,
+.back-link, .help-external-link {
+  border-radius: var(--r-outer);
+  transition:
+    border-radius .5s var(--spring-slow),
+    transform .45s var(--spring-fast),
+    box-shadow .3s var(--m3-standard),
+    background-color .25s var(--m3-standard);
+}
+.project-actions a:hover, .project-actions button:hover,
+.contact-links a:hover, .lang-toggle:hover {
+  transform: translateY(-2px);
+  border-radius: 18px;
+}
+.lang-toggle:hover { transform: scale(1.06); }
+.project-actions a:active, .project-actions button:active,
+.contact-links a:active, .about-cta:active, .lang-toggle:active,
+.back-link:active, .help-external-link:active,
+.is-pressed {
+  transform: scale(.94);
+  border-radius: var(--r-press);
+  transition-duration: .18s, .18s, .3s, .25s;
+}
+
+/* ---------- Connected button group (GitHub + Download): touching buttons,
+   big outer corners / small inner corners, melt into a pill when pressed ---------- */
+.project-actions, .contact-links { gap: 2px; flex-wrap: nowrap; }
+.project-actions > :first-child, .contact-links > :first-child { border-radius: var(--r-outer) var(--r-inner) var(--r-inner) var(--r-outer); }
+.project-actions > :last-child,  .contact-links > :last-child  { border-radius: var(--r-inner) var(--r-outer) var(--r-outer) var(--r-inner); }
+.project-actions > :only-child,  .contact-links > :only-child  { border-radius: var(--r-outer); }
+.project-actions > :not(:first-child):not(:last-child),
+.contact-links  > :not(:first-child):not(:last-child) { border-radius: var(--r-inner); }
+.project-actions > :hover, .contact-links > :hover { border-radius: 20px; }
+.project-actions > :active, .contact-links > :active, .project-actions > .is-pressed, .contact-links > .is-pressed {
+  border-radius: 999px; transform: scale(.96);
+}
+@media (max-width: 520px) {
+  .project-actions, .contact-links { flex-direction: column; align-items: stretch; }
+  .project-actions > *, .contact-links > * { justify-content: center; text-align: center; }
+  .project-actions > :first-child, .contact-links > :first-child { border-radius: var(--r-outer) var(--r-outer) var(--r-inner) var(--r-inner); }
+  .project-actions > :last-child,  .contact-links > :last-child  { border-radius: var(--r-inner) var(--r-inner) var(--r-outer) var(--r-outer); }
+}
+
+/* ---------- Icon buttons: cookie-shaped, spin + squash with a spring ---------- */
+.theme-toggle, .nav-logo, .lightbox-close, .dl-modal-close {
+  isolation: isolate;
+  background: transparent !important; box-shadow: none !important;
+  border-radius: 50%;
+  transition: transform .5s var(--spring-fast);
+}
+.theme-toggle::before, .nav-logo::before, .lightbox-close::before, .dl-modal-close::before {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  background: var(--md-secondary-container);
+  -webkit-mask: var(--shape-cookie) center / 100% 100% no-repeat;
+          mask: var(--shape-cookie) center / 100% 100% no-repeat;
+  transition: transform .6s var(--spring-slow), background-color .25s var(--m3-standard);
+}
+.lightbox-close::before { background: rgba(255,255,255,.14); }
+.theme-toggle:hover::before, .nav-logo:hover::before,
+.lightbox-close:hover::before, .dl-modal-close:hover::before { transform: rotate(45deg) scale(1.06); }
+.theme-toggle:active, .nav-logo:active, .lightbox-close:active, .dl-modal-close:active,
+.theme-toggle.is-pressed, .nav-logo.is-pressed { transform: scale(.88); }
+.theme-toggle:active::before, .nav-logo:active::before { transform: rotate(90deg) scale(.96); }
+.theme-toggle:hover, .nav-logo:hover { transform: none; }
+/* the ripple would be clipped to the round box, keep it inside the cookie */
+.theme-toggle, .nav-logo, .lightbox-close, .dl-modal-close { overflow: visible; }
+.theme-toggle .ripple-ink, .nav-logo .ripple-ink, .lightbox-close .ripple-ink, .dl-modal-close .ripple-ink { display: none; }
+.nav-logo { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: var(--md-on-secondary-container); }
+
+/* ---------- Chips: rounded square that melts into a pill on hover ---------- */
+.feature-chips span, .project-tags span {
+  transition: border-radius .5s var(--spring-slow), transform .45s var(--spring-fast), background .25s;
+}
+.feature-chips span:hover, .project-tags span:hover { border-radius: var(--shape-full); transform: translateY(-2px) scale(1.04); }
+
+/* ---------- Text link button ---------- */
+.project-link { transition: background .25s var(--m3-standard), border-radius .5s var(--spring-slow); }
+.project-link:hover { border-radius: 14px; }
+
+/* ---------- Download dialog: expressive list (M3 segmented tiles) ---------- */
+.dl-modal-box {
+  border-radius: 36px;
+  transform: scale(.88) translateY(24px);
+  opacity: 0;
+  transition: transform .55s var(--spring-slow), opacity .2s var(--m3-standard);
+}
+.dl-modal.is-open .dl-modal-box { transform: none; opacity: 1; }
+.dl-options { gap: 2px; }
+.dl-option {
+  border-radius: var(--r-inner);
+  transition: border-radius .5s var(--spring-slow), transform .45s var(--spring-fast), background .2s var(--m3-standard);
+}
+.dl-option:first-child { border-radius: 20px 20px var(--r-inner) var(--r-inner); }
+.dl-option:last-child  { border-radius: var(--r-inner) var(--r-inner) 20px 20px; }
+.dl-option:only-child  { border-radius: 20px; }
+.dl-option:hover { border-radius: 20px; }
+.dl-option:active, .dl-option.is-pressed { border-radius: 999px; transform: scale(.97); transition-duration: .15s; }
+.dl-back {
+  padding: .5rem 1rem; margin-left: -1rem; border-radius: var(--shape-full);
+  transition: background .25s var(--m3-standard), border-radius .5s var(--spring-slow), transform .45s var(--spring-fast);
+}
+.dl-back:hover { background: var(--md-primary-container); border-radius: 14px; }
+.dl-back:active { transform: scale(.94); border-radius: 10px; }
+
+/* ---------- Cards / screenshots: softer, bouncier lift ---------- */
+.showcase-media { border-radius: 28px; transition: transform .5s var(--spring-fast), box-shadow .35s var(--m3-emphasized-decel), border-radius .5s var(--spring-slow); }
+.showcase-media:hover { border-radius: 40px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+
+.theme-toggle, .nav-logo { position: relative; }
