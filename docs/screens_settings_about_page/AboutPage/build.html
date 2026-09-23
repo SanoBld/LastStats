@@ -121,9 +121,10 @@ Widget build(BuildContext context) {
 
       &#47;&#47; ── Logo &#47; header ─────────────────────────────────────────────────
       Center(child: Column(children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: SvgPicture.asset(_logoAsset(context), width: 80, height: 80),
+        M3CookieBadge(
+          size: 104,
+          color: scheme.primaryContainer,
+          child: SvgPicture.asset(_logoAsset(context), width: 68, height: 68),
         ),
         const SizedBox(height: 14),
         Text(&#39;LastStats&#39;,
@@ -144,7 +145,7 @@ Widget build(BuildContext context) {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
             color: scheme.secondaryContainer.withValues(alpha: 0.45),
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.3)),
           ),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -401,7 +402,7 @@ Widget build(BuildContext context) {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: scheme.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
         ),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -524,7 +525,7 @@ Widget build(BuildContext context) {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: scheme.secondaryContainer.withValues(alpha: 0.45),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.3)),
         ),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
