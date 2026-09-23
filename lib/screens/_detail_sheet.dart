@@ -1056,26 +1056,47 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       }
     }).toList();
 
-    // Logo-only Material You buttons, each with its own expressive shape.
-    const shapeIdx = [0, 5, 4, 1]; // cookie, squircle, burst, circle
+    // Full-width row of logo-only Material You buttons (monochrome, themed).
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
-      child: Wrap(
-        spacing: 10,
-        runSpacing: 10,
-        children: [
-          for (var i = 0; i < buttons.length; i++)
-            _PlatformLinkButton(
-              label: buttons[i].label,
-              asset: buttons[i].asset,
-              fallbackIcon: buttons[i].icon,
-              url: buttons[i].url,
-              brandColor: buttons[i].asset == null ? null : buttons[i].color,
-              shape: m3ImageShape(shapeIdx[i % shapeIdx.length], 48),
+      child: ValueListenableBuilder<String>(
+        valueListenable: imageShapeNotifier,
+        builder: (_, mode, _) => Row(children: [
+          for (var i = 0; i < buttons.length; i++) ...[
+            if (i > 0) const SizedBox(width: 10),
+            Expanded(
+              child: _PlatformLinkButton(
+                label: buttons[i].label,
+                asset: buttons[i].asset,
+                fallbackIcon: buttons[i].icon,
+                url: buttons[i].url,
+                shape: _linkShape(mode, i),
+              ),
             ),
-        ],
+          ],
+        ]),
       ),
     );
+  }
+
+  // Wide-button shape that follows the "image shape" setting.
+  ShapeBorder _linkShape(String mode, int i) {
+    const h = 60.0;
+    if (mode == 'square') {
+      return RoundedRectangleBorder(borderRadius: BorderRadius.circular(h * 0.2));
+    }
+    if (mode == 'circle') return const StadiumBorder();
+    final idx = mode.startsWith('shape:')
+        ? (int.tryParse(mode.substring(6)) ?? i)
+        : i;
+    return switch (idx % 3) {
+      0 => RoundedRectangleBorder(borderRadius: BorderRadius.circular(h * 0.36)),
+      1 => RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(h * 0.5), bottomRight: Radius.circular(h * 0.5),
+              topRight: Radius.circular(h * 0.16), bottomLeft: Radius.circular(h * 0.16))),
+      _ => const StadiumBorder(),
+    };
   }
 
   // ── Period selector ─────────────────────────────────────────────────────────
@@ -3548,7 +3569,6 @@ class _PlatformLinkButton extends StatefulWidget {
   final String label, url;
   final String? asset;
   final IconData fallbackIcon;
-  final Color? brandColor;
   final ShapeBorder shape;
 
   const _PlatformLinkButton({
@@ -3556,7 +3576,6 @@ class _PlatformLinkButton extends StatefulWidget {
     required this.url,
     required this.asset,
     required this.fallbackIcon,
-    required this.brandColor,
     required this.shape,
   });
 
@@ -3592,13 +3611,13 @@ class _PlatformLinkButtonState extends State<_PlatformLinkButton> {
             onTap: _open,
             onHighlightChanged: (v) => setState(() => _down = v),
             child: SizedBox(
-              width: 48, height: 48,
+              height: 60,
               child: Center(
                 child: _PlatformGlyph(
                   asset: widget.asset,
                   fallbackIcon: widget.fallbackIcon,
-                  size: 22,
-                  color: widget.brandColor ?? scheme.onSecondaryContainer,
+                  size: 28,
+                  color: scheme.onSecondaryContainer,
                 ),
               ),
             ),
