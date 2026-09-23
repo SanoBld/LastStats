@@ -183,43 +183,39 @@ Widget build(BuildContext context) {
           ),
         ],
 
-        if (type == &#39;daily&#39; || type == &#39;weekly&#39;) ...[
+        if (type == &#39;daily&#39; || type == &#39;weekly&#39; || url.isNotEmpty) ...[
           const SizedBox(height: 24),
-          FilledButton.icon(
-            onPressed: () async {
-              final acc = await AccountManager.getActive();
-              if (acc == null || !acc.isValid || !context.mounted) return;
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) =&gt; RecapStoryPage(
-                  service: LastFmService(apiKey: acc.apiKey, username: acc.username),
-                  username: acc.username,
-                  initialPeriod: type == &#39;daily&#39; ? 0 : 1,
-                ),
-              ));
-            },
-            icon:  const Icon(Icons.auto_stories_rounded),
-            label: Text(L.recapSeeFull),
-            style: FilledButton.styleFrom(
-              minimumSize: const Size.fromHeight(48),
-            ),
-          ),
-        ],
-
-        if (url.isNotEmpty) ...[
-          const SizedBox(height: 24),
-          FilledButton.icon(
-            onPressed: () async {
-              final uri = Uri.tryParse(url);
-              if (uri != null &amp;&amp; await canLaunchUrl(uri)) {
-                await launchUrl(uri, mode: LaunchMode.externalApplication);
-              }
-            },
-            icon:  const Icon(Icons.open_in_new_rounded),
-            label: Text(L.notifDetailOpenLink),
-            style: FilledButton.styleFrom(
-              minimumSize: const Size.fromHeight(48),
-            ),
-          ),
+          SettingActionGroup(items: [
+            if (type == &#39;daily&#39; || type == &#39;weekly&#39;)
+              ActionGroupItem(
+                primary: true,
+                icon: Icons.auto_stories_rounded,
+                label: L.recapSeeFull,
+                onPressed: () async {
+                  final acc = await AccountManager.getActive();
+                  if (acc == null || !acc.isValid || !context.mounted) return;
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) =&gt; RecapStoryPage(
+                      service: LastFmService(apiKey: acc.apiKey, username: acc.username),
+                      username: acc.username,
+                      initialPeriod: type == &#39;daily&#39; ? 0 : 1,
+                    ),
+                  ));
+                },
+              ),
+            if (url.isNotEmpty)
+              ActionGroupItem(
+                primary: type != &#39;daily&#39; &amp;&amp; type != &#39;weekly&#39;,
+                icon: Icons.open_in_new_rounded,
+                label: L.notifDetailOpenLink,
+                onPressed: () async {
+                  final uri = Uri.tryParse(url);
+                  if (uri != null &amp;&amp; await canLaunchUrl(uri)) {
+                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  }
+                },
+              ),
+          ]),
         ],
       ],
     ),
