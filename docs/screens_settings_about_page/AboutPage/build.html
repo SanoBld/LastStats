@@ -343,17 +343,10 @@ Widget build(BuildContext context) {
       SettingsSection(
         label: L.aboutOpenSourceLibs,
         children: [
-          Theme(
-            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-            child: ExpansionTile(
-              title: Text(L.aboutOpenSourceLibsSub,
-                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-              tilePadding: const EdgeInsets.symmetric(horizontal: 16),
-              childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Wrap(spacing: 8, runSpacing: 8, children: [
+          SettingExpandable(
+            icon: Icons.inventory_2_outlined,
+            title: L.aboutOpenSourceLibsSub,
+            body: Wrap(spacing: 8, runSpacing: 8, children: [
                     for (final pkg in const [
                       &#39;cupertino_icons&#39;, &#39;battery_plus&#39;, &#39;flutter_displaymode&#39;, &#39;http&#39;,
                       &#39;dynamic_color&#39;, &#39;shared_preferences&#39;, &#39;path_provider&#39;, &#39;share_plus&#39;,
@@ -368,9 +361,6 @@ Widget build(BuildContext context) {
                         onPressed: () =&gt; _open(&#39;https:&#47;&#47;pub.dev&#47;packages&#47;$pkg&#39;),
                       ),
                   ]),
-                ),
-              ],
-            ),
           ),
         ],
       ),

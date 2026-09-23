@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the applyM3Shapes function from the m3_shapes library, for the Dart programming language.">
-  <title>applyM3Shapes function - m3_shapes library - Dart API</title>
+  <meta name="description" content="API docs for the showAppSnackBar function from the m3_shapes library, for the Dart programming language.">
+  <title>showAppSnackBar function - m3_shapes library - Dart API</title>
 
 
   
@@ -26,9 +26,9 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">laststats_mobile</a></li>
     <li><a href="../theme_m3_shapes/">theme&#47;m3_shapes.dart</a></li>
-    <li class="self-crumb">applyM3Shapes function</li>
+    <li class="self-crumb">showAppSnackBar function</li>
   </ol>
-  <div class="self-name">applyM3Shapes</div>
+  <div class="self-name">showAppSnackBar</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -48,67 +48,41 @@
       data-above-sidebar="theme_m3_shapes&#47;theme_m3_shapes-library-sidebar.html"
       data-below-sidebar="">
       <div>
-<h1><span class="kind-function">applyM3Shapes</span> function 
+<h1><span class="kind-function">showAppSnackBar</span> function 
  
 </h1></div>
 
     <section class="multi-line-signature">
         
-<span class="returntype"><a href="https://api.flutter.dev/flutter/material/ThemeData-class.html">ThemeData</a></span>
-<span class="name ">applyM3Shapes</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="applyM3Shapes-param-t"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/material/ThemeData-class.html">ThemeData</a></span> <span class="parameter-name">t</span></span></li>
+<span class="returntype"><a href="https://api.flutter.dev/flutter/material/ScaffoldFeatureController-class.html">ScaffoldFeatureController</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/material/SnackBar-class.html">SnackBar</a></span>, <span class="type-parameter"><a href="https://api.flutter.dev/flutter/material/SnackBarClosedReason.html">SnackBarClosedReason</a></span>&gt;</span></span>
+<span class="name ">showAppSnackBar</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="showAppSnackBar-param-context"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span></li>
+<li><span class="parameter" id="showAppSnackBar-param-bar"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/material/SnackBar-class.html">SnackBar</a></span> <span class="parameter-name">bar</span></span></li>
 </ol>)
 
         
 
     </section>
     
+<section class="desc markdown">
+  <p>Shows a snackbar with a soft spring-like slide (emphasized curves) and
+replaces the one currently on screen instead of queueing behind it.</p>
+</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">ThemeData applyM3Shapes(ThemeData t) {
-  ButtonStyle pill(ButtonStyle? base) =&gt;
-      (base ?? const ButtonStyle()).copyWith(shape: _pillShape);
-  final cs = t.colorScheme;
-  final r20 = RoundedRectangleBorder(borderRadius: BorderRadius.circular(20));
-  return t.copyWith(
-    &#47;&#47; Notification bar: floating, tinted with the app accent, rounded.
-    snackBarTheme: SnackBarThemeData(
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: cs.secondaryContainer,
-      contentTextStyle: t.textTheme.bodyMedium?.copyWith(
-          color: cs.onSecondaryContainer, fontWeight: FontWeight.w600),
-      actionTextColor: cs.primary,
-      closeIconColor: cs.onSecondaryContainer,
-      elevation: 3,
-      insetPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      shape: r20,
-    ),
-    &#47;&#47; Drop-down menus share the same rounded, tonal surface.
-    popupMenuTheme: PopupMenuThemeData(
-      color: cs.surfaceContainerHigh,
-      surfaceTintColor: Colors.transparent,
-      elevation: 3,
-      shape: r20,
-    ),
-    dropdownMenuTheme: DropdownMenuThemeData(
-      menuStyle: MenuStyle(
-        backgroundColor: WidgetStatePropertyAll(cs.surfaceContainerHigh),
-        surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
-        shape: WidgetStatePropertyAll(r20),
-      ),
-    ),
-    filledButtonTheme:   FilledButtonThemeData(style: pill(t.filledButtonTheme.style)),
-    elevatedButtonTheme: ElevatedButtonThemeData(style: pill(t.elevatedButtonTheme.style)),
-    outlinedButtonTheme: OutlinedButtonThemeData(style: pill(t.outlinedButtonTheme.style)),
-    textButtonTheme:     TextButtonThemeData(style: pill(t.textButtonTheme.style)),
-    iconButtonTheme: IconButtonThemeData(
-      style: (t.iconButtonTheme.style ?? const ButtonStyle())
-          .copyWith(shape: _roundShape),
-    ),
-    floatingActionButtonTheme: t.floatingActionButtonTheme.copyWith(
-      shape: const M3CookieBorder(lobes: 8, amplitude: 0.05),
+  <pre class="language-dart"><code class="language-dart">ScaffoldFeatureController&lt;SnackBar, SnackBarClosedReason&gt; showAppSnackBar(
+    BuildContext context, SnackBar bar) {
+  final m = ScaffoldMessenger.of(context);
+  m.hideCurrentSnackBar();
+  return m.showSnackBar(
+    bar,
+    snackBarAnimationStyle: AnimationStyle(
+      duration: const Duration(milliseconds: 420),
+      reverseDuration: const Duration(milliseconds: 220),
+      curve: M3Motion.emphasizedDecelerate,
+      reverseCurve: M3Motion.emphasizedAccelerate,
     ),
   );
 }</code></pre>
@@ -126,7 +100,7 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">laststats_mobile</a></li>
     <li><a href="../theme_m3_shapes/">m3_shapes</a></li>
-    <li class="self-crumb">applyM3Shapes function</li>
+    <li class="self-crumb">showAppSnackBar function</li>
 </ol>
 
     <h5>m3_shapes library</h5>
