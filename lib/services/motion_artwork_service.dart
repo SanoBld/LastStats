@@ -1,8 +1,10 @@
 // Finds Apple Music "motion artwork" (the animated album covers) for an
 // album or a track. Flow:
-//   1. iTunes Search API (no key) -> Apple Music album page URL.
-//   2. Fetch that page, read its embedded JSON, pick the square HLS (.m3u8)
-//      video if the album has one.
+//   1. iTunes Search API (no key) -> Apple Music album id + page URL.
+//   2. Preferred: Apple Music catalog API (editorialVideo), using the
+//      anonymous token that the public web player itself embeds.
+//   3. Fallback: read the album page's embedded JSON and pick an HLS
+//      (.m3u8) video if the album has one.
 // Returns null when nothing is found (most albums have no motion artwork),
 // so callers just keep showing the static cover.
 import 'dart:convert';
@@ -31,8 +33,12 @@ class MotionArtworkService {
     final key = '${_norm(artist)}|${_norm(album)}|${_norm(track)}';
     if (_cache.containsKey(key)) return _cache[key];
     try {
-      final page = await _albumPageUrl(artist, album, track);
-      final video = page == null ? null : await _videoFromPage(page);
+      final hit = await _albumPageUrl(artist, album, track);
+      String? video;
+      if (hit != null) {
+        video = await _videoFromApi(hit.$1);
+        video ??= await _videoFromPage(hit.$2);
+      }
       _cache[key] = video;
       return video;
     } catch (_) {
@@ -54,7 +60,8 @@ class MotionArtworkService {
     return s.length >= 4 && l.contains(s);
   }
 
-  static Future<String?> _albumPageUrl(
+  // Returns (collectionId, album page URL) of the best match.
+  static Future<(String, String)?> _albumPageUrl(
       String artist, String album, String track) async {
     final byAlbum = album.isNotEmpty;
     final res = await http.get(Uri.https('itunes.apple.com', '/search', {
@@ -74,12 +81,63 @@ class MotionArtworkService {
       if (!_similar(byAlbum ? album : track, title)) continue;
       final url = (item['collectionViewUrl'] ?? '').toString();
       if (url.isEmpty) continue;
+      final id = (item['collectionId'] ?? '').toString();
+      if (id.isEmpty) continue;
       // Drop the "?i=trackId" part so we get the album page itself.
-      return url.split('?').first;
+      return (id, url.split('?').first);
     }
     return null;
   }
 
+  // ── Catalog API path ───────────────────────────────────────────────────
+  static String? _token;
+
+  // The web player ships a public, anonymous developer token inside its
+  // main JS bundle. We read it from there.
+  static Future<String?> _getToken() async {
+    if (_token != null) return _token;
+    final home = await http.get(Uri.parse('https://music.apple.com/us/browse'),
+        headers: {'User-Agent': _ua}).timeout(_timeout);
+    if (home.statusCode != 200) return null;
+    final src = RegExp(r'src="(/assets/index[^"]+\.js)"').firstMatch(home.body);
+    if (src == null) return null;
+    final js = await http.get(Uri.parse('https://music.apple.com${src.group(1)}'),
+        headers: {'User-Agent': _ua}).timeout(const Duration(seconds: 15));
+    if (js.statusCode != 200) return null;
+    final t = RegExp(r'eyJh[\w-]+\.[\w-]+\.[\w-]+').firstMatch(js.body);
+    return _token = t?.group(0);
+  }
+
+  static Future<String?> _videoFromApi(String albumId) async {
+    try {
+      final token = await _getToken();
+      if (token == null) return null;
+      final res = await http.get(
+        Uri.https('amp-api.music.apple.com', '/v1/catalog/us/albums/$albumId',
+            {'extend': 'editorialVideo'}),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Origin': 'https://music.apple.com',
+          'User-Agent': _ua,
+        },
+      ).timeout(_timeout);
+      if (res.statusCode == 401) _token = null; // expired, refetch next time
+      if (res.statusCode != 200) return null;
+      final data = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
+      if (data.isEmpty) return null;
+      final ev = data.first['attributes']?['editorialVideo'];
+      if (ev is! Map) return null;
+      // Square first (matches album art), then tall.
+      for (final k in ['motionDetailSquare', 'motionSquareVideo1x1',
+                       'motionDetailTall', 'motionTallVideo3x4']) {
+        final v = ev[k]?['video'];
+        if (v is String && v.isNotEmpty) return v;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  // ── Page scraping fallback ─────────────────────────────────────────────
   static Future<String?> _videoFromPage(String pageUrl) async {
     final res = await http.get(Uri.parse(pageUrl), headers: {
       'User-Agent': _ua,

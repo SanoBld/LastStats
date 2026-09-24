@@ -423,6 +423,31 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   String get _name   => (widget.item['name']            ?? '').toString();
   String get _artist => (widget.item['artist']?['name'] ?? '').toString();
 
+  // Apple Music motion artwork shown in the header (albums and tracks).
+  String? _motionUrl;
+  bool    _motionChecked = false;
+  bool    _showMotion    = true;
+
+  bool get _motionWanted =>
+      widget.type != 'artists' &&
+      motionArtworkNotifier.value &&
+      !ecoModeActiveNotifier.value &&
+      MotionArtworkService.supported;
+
+  String get _motionAlbum => widget.type == 'albums'
+      ? _name
+      : (_info?['album']?['title'] ?? '').toString();
+
+  Future<void> _loadMotion() async {
+    if (!_motionWanted || _artist.isEmpty) return;
+    final url = await MotionArtworkService.find(
+      artist: _artist,
+      album: _motionAlbum,
+      track: widget.type == 'tracks' ? _name : '',
+    );
+    if (mounted) setState(() { _motionUrl = url; _motionChecked = true; });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -440,6 +465,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   Future<void> _fetchAll() async {
     _resolveImage();
     await Future.wait([_fetchMeta(), _fetchUserStats()]);
+    // Track info (album title) is loaded now, so the lookup can use it.
+    _loadMotion();
   }
 
   Future<void> _resolveImage() async {
@@ -763,37 +790,56 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     return Stack(
       children: [
 
-        // Background image (fullscreen, covers status bar)
-        Positioned.fill(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 500),
-            transitionBuilder: (child, anim) =>
-                FadeTransition(opacity: anim, child: child),
-            child: hasImage
-                ? _BlurFadeImage(
-                    key: ValueKey(_resolvedImage),
-                    url: _resolvedImage,
-                    fallback: _DetailGradientBg(scheme: scheme),
-                  )
-                : _DetailGradientBg(key: const ValueKey('fallback'), scheme: scheme),
-          ),
-        ),
+        // Plain surface behind everything; the hero image fades into it.
+        Positioned.fill(child: ColoredBox(color: surface)),
 
-        // Gradient: dark top → surface at bottom
-        Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin:  Alignment.topCenter,
-                end:    Alignment.bottomCenter,
-                stops:  const [0.0, 0.28, 0.52, 1.0],
-                colors: [
-                  Colors.black.withValues(alpha: 0.55),
-                  Colors.transparent,
-                  surface.withValues(alpha: 0.82),
-                  surface,
-                ],
-              ),
+        // Hero image (or motion artwork): full width, taller crop so more of
+        // the cover shows horizontally, then a long alpha fade into the
+        // surface colour so there is no visible edge (dark or light theme).
+        Positioned(
+          top: 0, left: 0, right: 0,
+          height: imgH + 216,
+          child: ShaderMask(
+            blendMode: BlendMode.dstIn,
+            shaderCallback: (r) => const LinearGradient(
+              begin: Alignment.topCenter,
+              end:   Alignment.bottomCenter,
+              stops: [0.0, 0.6, 1.0],
+              colors: [Colors.black, Colors.black, Colors.transparent],
+            ).createShader(r),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  transitionBuilder: (child, anim) =>
+                      FadeTransition(opacity: anim, child: child),
+                  child: hasImage
+                      ? _BlurFadeImage(
+                          key: ValueKey(_resolvedImage),
+                          url: _resolvedImage,
+                          fallback: _DetailGradientBg(scheme: scheme),
+                        )
+                      : _DetailGradientBg(key: const ValueKey('fallback'), scheme: scheme),
+                ),
+                if (hasImage && _showMotion && _motionUrl != null)
+                  MotionArtworkVideo(key: ValueKey(_motionUrl), url: _motionUrl!),
+                // Darkening under the status bar and the title text; it is
+                // inside the mask so it fades out with the image.
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end:   Alignment.bottomCenter,
+                      stops: [0.0, 0.25, 0.5, 0.75, 1.0],
+                      colors: [
+                        Color(0x80000000), Color(0x00000000), Color(0x00000000),
+                        Color(0x73000000), Color(0x73000000),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -864,6 +910,17 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                   child: SizedBox(height: imgH - 90, width: double.infinity),
                 ),
                 _buildHeader(ctx, scheme, imgH, hasImage),
+                // Soft blend from the image into the body panel.
+                Container(
+                  height: 56,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end:   Alignment.bottomCenter,
+                      colors: [surface.withValues(alpha: 0), surface],
+                    ),
+                  ),
+                ),
                 Container(
                   color: surface,
                   child: Column(
@@ -916,20 +973,30 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         // Status bar scrim — always above the scroll content
         _StatusBarScrim(height: topPad),
 
+        // Photo / video switch (top-right), only for albums and tracks
+        if (hasImage && _motionWanted)
+          Positioned(
+            top: topPad + 8, right: 12,
+            child: _MotionToggleButton(
+              scheme: scheme,
+              checked: _motionChecked,
+              available: _motionUrl != null,
+              showing: _showMotion,
+              onToggle: () => setState(() => _showMotion = !_showMotion),
+            ),
+          ),
+
         // Back button
         Positioned(
           top: topPad + 8, left: 12,
-          child: GestureDetector(
+          child: M3TonalButton(
+            width: 44, height: 44,
+            radius: BorderRadius.circular(16),
+            padding: EdgeInsets.zero,
+            color: scheme.secondaryContainer,
             onTap: () => Navigator.pop(ctx),
-            child: Container(
-              width: 36, height: 36,
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.45),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded,
-                  color: Colors.white, size: 16),
-            ),
+            child: Icon(Icons.arrow_back_rounded,
+                color: scheme.onSecondaryContainer, size: 22),
           ),
         ),
 
@@ -1990,18 +2057,24 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
 
   // Apple Music motion artwork (HLS video), null until found.
   String? _motionUrl;
+  bool    _motionChecked = false;
+  bool    _showMotion    = true;
+
+  bool get _motionWanted =>
+      motionArtworkNotifier.value &&
+      !ecoModeActiveNotifier.value &&
+      MotionArtworkService.supported &&
+      widget.motionArtist.isNotEmpty &&
+      (widget.motionAlbum.isNotEmpty || widget.motionTrack.isNotEmpty);
 
   Future<void> _loadMotion() async {
-    if (!motionArtworkNotifier.value || ecoModeActiveNotifier.value) return;
-    if (!MotionArtworkService.supported) return;
-    if (widget.motionArtist.isEmpty ||
-        (widget.motionAlbum.isEmpty && widget.motionTrack.isEmpty)) return;
+    if (!_motionWanted) return;
     final url = await MotionArtworkService.find(
       artist: widget.motionArtist,
       album: widget.motionAlbum,
       track: widget.motionTrack,
     );
-    if (mounted && url != null) setState(() => _motionUrl = url);
+    if (mounted) setState(() { _motionUrl = url; _motionChecked = true; });
   }
 
   @override
@@ -2290,7 +2363,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
                           ),
                         ),
                         // Animated cover fades in over the static one.
-                        if (_motionUrl != null)
+                        if (_motionUrl != null && _showMotion)
                           MotionArtworkVideo(url: _motionUrl!),
                       ],
                     ),
@@ -2328,6 +2401,16 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
           Positioned(
             top: topPad + 8, right: 12,
             child: Row(children: [
+              if (_motionWanted) ...[
+                _MotionToggleButton(
+                  scheme: Theme.of(context).colorScheme,
+                  checked: _motionChecked,
+                  available: _motionUrl != null,
+                  showing: _showMotion,
+                  onToggle: () => setState(() => _showMotion = !_showMotion),
+                ),
+                const SizedBox(width: 10),
+              ],
               GestureDetector(
                 onTap: _sharing ? null : _shareCard,
                 child: Container(
@@ -2941,17 +3024,14 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
         // Back button — same style as detail sheets
         Positioned(
           top: topPad + 8, left: 12,
-          child: GestureDetector(
+          child: M3TonalButton(
+            width: 44, height: 44,
+            radius: BorderRadius.circular(16),
+            padding: EdgeInsets.zero,
+            color: scheme.secondaryContainer,
             onTap: () => Navigator.pop(ctx),
-            child: Container(
-              width: 36, height: 36,
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.45),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded,
-                  color: Colors.white, size: 16),
-            ),
+            child: Icon(Icons.arrow_back_rounded,
+                color: scheme.onSecondaryContainer, size: 22),
           ),
         ),
 
@@ -3663,6 +3743,51 @@ class _PlatformLinkButtonState extends State<_PlatformLinkButton> {
           ),
         ),
       ),
+    );
+  }
+}
+
+
+// Photo / video switch, Material You rounded-square style. While the lookup
+// runs it shows a spinner; if the album has no motion artwork it is dimmed
+// and a tap explains why.
+class _MotionToggleButton extends StatelessWidget {
+  final ColorScheme scheme;
+  final bool checked, available, showing;
+  final VoidCallback onToggle;
+  const _MotionToggleButton({
+    required this.scheme, required this.checked, required this.available,
+    required this.showing, required this.onToggle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = scheme.onSecondaryContainer;
+    final Widget icon;
+    if (!checked) {
+      icon = SizedBox(width: 18, height: 18, child: M3Spinner(color: fg));
+    } else if (!available) {
+      icon = Icon(Icons.videocam_off_rounded, color: fg.withValues(alpha: 0.6), size: 22);
+    } else {
+      // Shows what a tap will switch TO.
+      icon = Icon(showing ? Icons.photo_rounded : Icons.videocam_rounded,
+          color: fg, size: 22);
+    }
+    return M3TonalButton(
+      width: 44, height: 44,
+      radius: BorderRadius.circular(16),
+      padding: EdgeInsets.zero,
+      color: scheme.secondaryContainer,
+      onTap: !checked
+          ? null
+          : available
+              ? onToggle
+              : () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(_ct('Pas de pochette animée pour cet album',
+                        'No animated cover for this album')),
+                    duration: const Duration(seconds: 2),
+                  )),
+      child: icon,
     );
   }
 }
