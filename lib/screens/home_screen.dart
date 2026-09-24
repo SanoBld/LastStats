@@ -54,6 +54,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../widgets/markdown_lite.dart';
 import '../widgets/living_artwork.dart';
 import '../widgets/motion_artwork_video.dart';
+import '../widgets/scroll_status_bar.dart';
 import '../services/motion_artwork_service.dart';
 import 'favorites_page.dart';
 import '../services/favorites_folders_service.dart';
@@ -223,9 +224,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _pageStack(List<Widget> pages, int count) {
     // Top level tabs: the old page fades out first, then the new page
     // fades in (Material 3 "fade through"). Pages stay alive for state.
-    return M3FadeThroughStack(
-      index: _idx,
-      children: pages.sublist(0, count),
+    // Solid status bar slides in once a tab's content is scrolled.
+    return ScrollStatusBarHost(
+      color: Theme.of(context).colorScheme.surfaceContainer,
+      resetToken: _idx,
+      child: M3FadeThroughStack(
+        index: _idx,
+        children: pages.sublist(0, count),
+      ),
     );
   }
 

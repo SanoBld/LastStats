@@ -427,6 +427,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   String? _motionUrl;
   bool    _motionChecked = false;
   bool    _showMotion    = true;
+  bool    _statusBarOn   = false; // solid status bar visible after scrolling
 
   bool get _motionWanted =>
       widget.type != 'artists' &&
@@ -761,8 +762,13 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           }()
         : baseTheme.copyWith(scaffoldBackgroundColor: baseScheme.surface);
 
+    // Status icons stay white over the image; once the solid bar is showing
+    // they follow that bar's brightness so they remain readable.
+    final barLight = _statusBarOn &&
+        ThemeData.estimateBrightnessForColor(
+            targetTheme.scaffoldBackgroundColor) == Brightness.light;
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
+      value: barLight ? SystemUiOverlayStyle.dark : SystemUiOverlayStyle.light,
       // AnimatedTheme cross-fades ThemeData on its own — far safer than a
       // hand-rolled TweenAnimationBuilder that rebuilds Theme+Scaffold every
       // frame, which could show a blank/black frame during page transitions.
@@ -798,14 +804,21 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         // surface colour so there is no visible edge (dark or light theme).
         Positioned(
           top: 0, left: 0, right: 0,
-          height: imgH + 216 + 48,
+          height: imgH + 130,
           child: ShaderMask(
             blendMode: BlendMode.dstIn,
             shaderCallback: (r) => const LinearGradient(
               begin: Alignment.topCenter,
               end:   Alignment.bottomCenter,
-              stops: [0.0, 0.6, 1.0],
-              colors: [Colors.black, Colors.black, Colors.transparent],
+              // Many stops on an ease curve: the image melts into the
+              // background instead of showing a visible edge.
+              stops: [0.0, 0.30, 0.42, 0.54, 0.65, 0.76, 0.86, 0.94, 1.0],
+              colors: [
+                Colors.black,
+                Color(0xF2000000), Color(0xD9000000), Color(0xB0000000),
+                Color(0x80000000), Color(0x52000000), Color(0x2B000000),
+                Color(0x0F000000), Colors.transparent,
+              ],
             ).createShader(r),
             child: Stack(
               fit: StackFit.expand,
@@ -834,13 +847,13 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end:   Alignment.bottomCenter,
-                      stops: const [0.0, 0.09, 0.5, 0.75, 1.0],
+                      stops: const [0.0, 0.09, 0.42, 0.68, 1.0],
                       colors: [
                         Theme.of(ctx).brightness == Brightness.dark
                             ? const Color(0x59000000)
                             : const Color(0x66FFFFFF),
                         const Color(0x00000000), const Color(0x00000000),
-                        const Color(0x73000000), const Color(0x73000000),
+                        const Color(0x8C000000), const Color(0x8C000000),
                       ],
                     ),
                   ),
@@ -855,7 +868,11 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         // show through instead of forcing the iOS-style bounce.
         // Image tap is inline in the scroll so the hitbox follows content
         // and never overlaps underlying items when the user scrolls down.
-        _DismissOnOverscroll(
+        Positioned.fill(child: ScrollStatusBarHost(
+          // Album-tinted bar (follows the artwork theme when enabled).
+          color: Color.alphaBlend(scheme.primary.withValues(alpha: 0.16), surface),
+          onVisibleChanged: (v) => setState(() => _statusBarOn = v),
+          child: _DismissOnOverscroll(
           onDismiss: () => Navigator.pop(ctx),
           child: SingleChildScrollView(
             physics: const ClampingScrollPhysics(
@@ -913,12 +930,12 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                           'artists' => 'فنان', 'albums' => 'ألبوم', _ => 'أغنية',
                         },
                       })} · ${_currentImageSource()}') : null,
-                  child: SizedBox(height: imgH - 90 + 48, width: double.infinity),
+                  child: SizedBox(height: imgH - 20, width: double.infinity),
                 ),
                 _buildHeader(ctx, scheme, imgH, hasImage),
                 // Soft blend from the image into the body panel.
                 Container(
-                  height: 32,
+                  height: 24,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
@@ -974,7 +991,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               ],
             ),
           ),
-        ),
+        ))),
 
         // Photo / video switch (top-right), only for albums and tracks
         if (hasImage && _motionWanted)
@@ -2063,8 +2080,12 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
       AnimationController(vsync: this, duration: const Duration(seconds: 9));
 
   // Material You play button: a circle that morphs into a rotating star
-  // (scalloped cookie shape) while the preview plays, with a progress ring.
-  Widget _buildPlayButton(ColorScheme s) {
+  // (scalloped cookie shape) while the preview plays. Uses the artwork's
+  // colour when the "artwork colour theme" option is on.
+  Widget _buildPlayButton(ColorScheme base) {
+    final s = (artworkColorThemeNotifier.value && _dominant != null)
+        ? _artworkScheme(base, _dominant!).scheme
+        : base;
     final playing = _isPlaying;
     if (playing && !_spinCtrl.isAnimating) {
       _spinCtrl.repeat();
@@ -2074,23 +2095,8 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
     return GestureDetector(
       onTap: _previewLoading ? null : _togglePlay,
       child: SizedBox(
-        width: 80, height: 80,
+        width: 84, height: 84,
         child: Stack(alignment: Alignment.center, children: [
-          // Progress ring, only while playing.
-          AnimatedOpacity(
-            opacity: playing ? 1 : 0,
-            duration: const Duration(milliseconds: 300),
-            child: SizedBox(
-              width: 80, height: 80,
-              child: CircularProgressIndicator(
-                value: _previewPos.clamp(0.0, 1.0),
-                strokeWidth: 4,
-                strokeCap: StrokeCap.round,
-                backgroundColor: s.primary.withValues(alpha: 0.25),
-                valueColor: AlwaysStoppedAnimation(s.primary),
-              ),
-            ),
-          ),
           AnimatedBuilder(
             animation: _spinCtrl,
             builder: (_, child) => Transform.rotate(
@@ -2098,7 +2104,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 500),
               curve: Curves.easeInOutCubicEmphasized,
-              width: 62, height: 62,
+              width: 76, height: 76,
               decoration: ShapeDecoration(
                 color: s.primaryContainer,
                 shape: M3CookieBorder(lobes: 8, amplitude: playing ? 0.22 : 0.0),
@@ -2113,14 +2119,14 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
           ),
           _previewLoading
               ? SizedBox(
-                  width: 24, height: 24,
+                  width: 26, height: 26,
                   child: M3Spinner(color: s.onPrimaryContainer))
               : AnimatedSwitcher(
                   duration: const Duration(milliseconds: 200),
                   child: Icon(
                     playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
                     key: ValueKey(playing),
-                    color: s.onPrimaryContainer, size: 30,
+                    color: s.onPrimaryContainer, size: 34,
                   ),
                 ),
         ]),
