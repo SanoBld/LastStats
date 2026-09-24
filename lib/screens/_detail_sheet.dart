@@ -798,7 +798,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         // surface colour so there is no visible edge (dark or light theme).
         Positioned(
           top: 0, left: 0, right: 0,
-          height: imgH + 216,
+          height: imgH + 216 + 48,
           child: ShaderMask(
             blendMode: BlendMode.dstIn,
             shaderCallback: (r) => const LinearGradient(
@@ -826,15 +826,21 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                   MotionArtworkVideo(key: ValueKey(_motionUrl), url: _motionUrl!),
                 // Darkening under the status bar and the title text; it is
                 // inside the mask so it fades out with the image.
-                const DecoratedBox(
+                // The top fade is black (dark theme) or white (light theme),
+                // very subtle, and lives on the image only: once the body
+                // panel scrolls over the image it disappears with it.
+                DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end:   Alignment.bottomCenter,
-                      stops: [0.0, 0.25, 0.5, 0.75, 1.0],
+                      stops: const [0.0, 0.09, 0.5, 0.75, 1.0],
                       colors: [
-                        Color(0x80000000), Color(0x00000000), Color(0x00000000),
-                        Color(0x73000000), Color(0x73000000),
+                        Theme.of(ctx).brightness == Brightness.dark
+                            ? const Color(0x59000000)
+                            : const Color(0x66FFFFFF),
+                        const Color(0x00000000), const Color(0x00000000),
+                        const Color(0x73000000), const Color(0x73000000),
                       ],
                     ),
                   ),
@@ -907,12 +913,12 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                           'artists' => 'فنان', 'albums' => 'ألبوم', _ => 'أغنية',
                         },
                       })} · ${_currentImageSource()}') : null,
-                  child: SizedBox(height: imgH - 90, width: double.infinity),
+                  child: SizedBox(height: imgH - 90 + 48, width: double.infinity),
                 ),
                 _buildHeader(ctx, scheme, imgH, hasImage),
                 // Soft blend from the image into the body panel.
                 Container(
-                  height: 56,
+                  height: 32,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
@@ -969,9 +975,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ),
           ),
         ),
-
-        // Status bar scrim — always above the scroll content
-        _StatusBarScrim(height: topPad),
 
         // Photo / video switch (top-right), only for albums and tracks
         if (hasImage && _motionWanted)
@@ -2029,7 +2032,7 @@ class _FullscreenImageViewer extends StatefulWidget {
 }
 
 class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   Color? _dominant;
   bool   _sharing = false;
   final  _shareKey = GlobalKey();
@@ -2054,6 +2057,76 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
   bool? _previewAvailable;
 
   bool get _canPlay => widget.previewTrackName.isNotEmpty;
+
+  // Slow rotation of the play button while music plays.
+  late final AnimationController _spinCtrl =
+      AnimationController(vsync: this, duration: const Duration(seconds: 9));
+
+  // Material You play button: a circle that morphs into a rotating star
+  // (scalloped cookie shape) while the preview plays, with a progress ring.
+  Widget _buildPlayButton(ColorScheme s) {
+    final playing = _isPlaying;
+    if (playing && !_spinCtrl.isAnimating) {
+      _spinCtrl.repeat();
+    } else if (!playing && _spinCtrl.isAnimating) {
+      _spinCtrl.stop();
+    }
+    return GestureDetector(
+      onTap: _previewLoading ? null : _togglePlay,
+      child: SizedBox(
+        width: 80, height: 80,
+        child: Stack(alignment: Alignment.center, children: [
+          // Progress ring, only while playing.
+          AnimatedOpacity(
+            opacity: playing ? 1 : 0,
+            duration: const Duration(milliseconds: 300),
+            child: SizedBox(
+              width: 80, height: 80,
+              child: CircularProgressIndicator(
+                value: _previewPos.clamp(0.0, 1.0),
+                strokeWidth: 4,
+                strokeCap: StrokeCap.round,
+                backgroundColor: s.primary.withValues(alpha: 0.25),
+                valueColor: AlwaysStoppedAnimation(s.primary),
+              ),
+            ),
+          ),
+          AnimatedBuilder(
+            animation: _spinCtrl,
+            builder: (_, child) => Transform.rotate(
+              angle: _spinCtrl.value * 2 * math.pi, child: child),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOutCubicEmphasized,
+              width: 62, height: 62,
+              decoration: ShapeDecoration(
+                color: s.primaryContainer,
+                shape: M3CookieBorder(lobes: 8, amplitude: playing ? 0.22 : 0.0),
+                shadows: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.35),
+                    blurRadius: 14,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          _previewLoading
+              ? SizedBox(
+                  width: 24, height: 24,
+                  child: M3Spinner(color: s.onPrimaryContainer))
+              : AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: Icon(
+                    playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                    key: ValueKey(playing),
+                    color: s.onPrimaryContainer, size: 30,
+                  ),
+                ),
+        ]),
+      ),
+    );
+  }
 
   // Apple Music motion artwork (HLS video), null until found.
   String? _motionUrl;
@@ -2088,6 +2161,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
   @override
   void dispose() {
     _player?.dispose();
+    _spinCtrl.dispose();
     _glowCtrl.dispose();
     super.dispose();
   }
@@ -2471,36 +2545,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
               left: 0, right: 0,
               bottom: MediaQuery.of(context).padding.bottom + 24,
               child: Center(
-                child: GestureDetector(
-                  onTap: _previewLoading ? null : _togglePlay,
-                  child: Container(
-                    width: 64, height: 64,
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.6),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                          color: (_dominant ?? Colors.white).withValues(alpha: 0.35), width: 1.5),
-                    ),
-                    child: _previewLoading
-                        ? Padding(
-                            padding: const EdgeInsets.all(19),
-                            child: M3Spinner(color: _dominant ?? Colors.white70),
-                          )
-                        : Stack(alignment: Alignment.center, children: [
-                            SizedBox(
-                              width: 64, height: 64,
-                              child: CircularProgressIndicator(
-                                value: _previewPos.clamp(0.0, 1.0),
-                                strokeWidth: 4.5,
-                                backgroundColor: Colors.white.withValues(alpha: 0.2),
-                                valueColor: AlwaysStoppedAnimation(_dominant ?? Colors.white),
-                              ),
-                            ),
-                            Icon(_isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                                color: Colors.white, size: 26),
-                          ]),
-                  ),
-                ),
+                child: _buildPlayButton(Theme.of(context).colorScheme),
               ),
             ),
         ],
