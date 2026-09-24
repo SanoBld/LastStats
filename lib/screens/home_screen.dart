@@ -228,6 +228,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return ScrollStatusBarHost(
       color: Theme.of(context).colorScheme.surfaceContainer,
       resetToken: _idx,
+      // Dashboard: wait until its 170dp header image has fully collapsed.
+      threshold: _idx == 0
+          ? 170 - MediaQuery.of(context).padding.top
+          : 24,
       child: M3FadeThroughStack(
         index: _idx,
         children: pages.sublist(0, count),

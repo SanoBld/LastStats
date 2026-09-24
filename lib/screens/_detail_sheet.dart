@@ -804,7 +804,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         // surface colour so there is no visible edge (dark or light theme).
         Positioned(
           top: 0, left: 0, right: 0,
-          height: imgH + 130,
+          height: imgH + 230,
           child: ShaderMask(
             blendMode: BlendMode.dstIn,
             shaderCallback: (r) => const LinearGradient(
@@ -853,7 +853,10 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                             ? const Color(0x59000000)
                             : const Color(0x66FFFFFF),
                         const Color(0x00000000), const Color(0x00000000),
-                        const Color(0x8C000000), const Color(0x8C000000),
+                        Theme.of(ctx).brightness == Brightness.dark
+                            ? const Color(0x8C000000) : const Color(0x00000000),
+                        Theme.of(ctx).brightness == Brightness.dark
+                            ? const Color(0x8C000000) : const Color(0x00000000),
                       ],
                     ),
                   ),
@@ -869,6 +872,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         // Image tap is inline in the scroll so the hitbox follows content
         // and never overlaps underlying items when the user scrolls down.
         Positioned.fill(child: ScrollStatusBarHost(
+          // Only once the background image has scrolled out completely.
+          threshold: imgH + 200,
           // Album-tinted bar (follows the artwork theme when enabled).
           color: Color.alphaBlend(scheme.primary.withValues(alpha: 0.16), surface),
           onVisibleChanged: (v) => setState(() => _statusBarOn = v),
@@ -930,7 +935,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                           'artists' => 'فنان', 'albums' => 'ألبوم', _ => 'أغنية',
                         },
                       })} · ${_currentImageSource()}') : null,
-                  child: SizedBox(height: imgH - 20, width: double.infinity),
+                  child: SizedBox(height: imgH + 40, width: double.infinity),
                 ),
                 _buildHeader(ctx, scheme, imgH, hasImage),
                 // Soft blend from the image into the body panel.
@@ -994,13 +999,13 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         ))),
 
         // Photo / video switch (top-right), only for albums and tracks
-        if (hasImage && _motionWanted)
+        if (hasImage && _motionWanted && _motionChecked && _motionUrl != null)
           Positioned(
             top: topPad + 8, right: 12,
             child: _MotionToggleButton(
               scheme: scheme,
-              checked: _motionChecked,
-              available: _motionUrl != null,
+              checked: true,
+              available: true,
               showing: _showMotion,
               onToggle: () => setState(() => _showMotion = !_showMotion),
             ),
@@ -1028,6 +1033,9 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   Widget _buildHeader(BuildContext ctx, ColorScheme scheme, double imgH, bool hasImage) {
     final text = Theme.of(ctx).textTheme;
+    // White over the (dark) image in dark theme; in light theme the image
+    // fades into a light surface, so use the normal text colour.
+    final onImg = Theme.of(ctx).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: Column(
@@ -1056,8 +1064,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             _name,
             style: text.headlineMedium?.copyWith(
               fontWeight: FontWeight.w900,
-              color:      hasImage ? Colors.white : scheme.onSurface,
-              shadows:    hasImage
+              color:      hasImage && onImg ? Colors.white : scheme.onSurface,
+              shadows:    hasImage && onImg
                   ? [Shadow(blurRadius: 8, color: Colors.black.withValues(alpha: 0.5))]
                   : null,
             ),
@@ -1067,11 +1075,11 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             Text(
               _artist,
               style: text.bodyLarge?.copyWith(
-                color:      hasImage
+                color:      hasImage && onImg
                     ? Colors.white.withValues(alpha: 0.85)
                     : scheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
-                shadows: hasImage
+                shadows: hasImage && onImg
                     ? [Shadow(blurRadius: 6, color: Colors.black.withValues(alpha: 0.5))]
                     : null,
               ),
@@ -2075,6 +2083,16 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
 
   bool get _canPlay => widget.previewTrackName.isNotEmpty;
 
+  Widget _viewerBtn(ColorScheme s, Widget icon, VoidCallback? onTap) =>
+      M3TonalButton(
+        width: 44, height: 44,
+        radius: BorderRadius.circular(16),
+        padding: EdgeInsets.zero,
+        color: s.secondaryContainer,
+        onTap: onTap,
+        child: icon,
+      );
+
   // Slow rotation of the play button while music plays.
   late final AnimationController _spinCtrl =
       AnimationController(vsync: this, duration: const Duration(seconds: 9));
@@ -2477,49 +2495,36 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
             ),
           ),
 
-          // Close + share buttons — always visible
+          // Video toggle (only if a video exists), share and close: Material
+          // You rounded squares using the app theme.
           Positioned(
             top: topPad + 8, right: 12,
             child: Row(children: [
-              if (_motionWanted) ...[
+              if (_motionWanted && _motionChecked && _motionUrl != null) ...[
                 _MotionToggleButton(
                   scheme: Theme.of(context).colorScheme,
-                  checked: _motionChecked,
-                  available: _motionUrl != null,
+                  checked: true,
+                  available: true,
                   showing: _showMotion,
                   onToggle: () => setState(() => _showMotion = !_showMotion),
                 ),
                 const SizedBox(width: 10),
               ],
-              GestureDetector(
-                onTap: _sharing ? null : _shareCard,
-                child: Container(
-                  width: 36, height: 36,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.55),
-                    shape: BoxShape.circle,
-                  ),
-                  child: _sharing
-                      ? const Padding(
-                          padding: EdgeInsets.all(9),
-                          child: M3Spinner(color: Colors.white70),
-                        )
-                      : const Icon(Icons.ios_share_rounded,
-                          color: Colors.white, size: 18),
-                ),
+              _viewerBtn(
+                Theme.of(context).colorScheme,
+                _sharing
+                    ? SizedBox(width: 18, height: 18,
+                        child: M3Spinner(color: Theme.of(context).colorScheme.onSecondaryContainer))
+                    : Icon(Icons.ios_share_rounded, size: 21,
+                        color: Theme.of(context).colorScheme.onSecondaryContainer),
+                _sharing ? null : _shareCard,
               ),
               const SizedBox(width: 10),
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  width: 36, height: 36,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.55),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.close_rounded,
-                      color: Colors.white, size: 20),
-                ),
+              _viewerBtn(
+                Theme.of(context).colorScheme,
+                Icon(Icons.close_rounded, size: 22,
+                    color: Theme.of(context).colorScheme.onSecondaryContainer),
+                () => Navigator.pop(context),
               ),
             ]),
           ),
@@ -2529,17 +2534,11 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
           if (achievementsEnabledNotifier.value)
             Positioned(
               top: topPad + 8, left: 12,
-              child: GestureDetector(
-                onTap: _showTierInfo,
-                child: Container(
-                  width: 36, height: 36,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.55),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.info_outline_rounded,
-                      color: Colors.white, size: 19),
-                ),
+              child: _viewerBtn(
+                Theme.of(context).colorScheme,
+                Icon(Icons.info_outline_rounded, size: 22,
+                    color: Theme.of(context).colorScheme.onSecondaryContainer),
+                _showTierInfo,
               ),
             ),
 
