@@ -804,7 +804,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         // surface colour so there is no visible edge (dark or light theme).
         Positioned(
           top: 0, left: 0, right: 0,
-          height: imgH + 230,
+          height: imgH + 200,
           child: ShaderMask(
             blendMode: BlendMode.dstIn,
             shaderCallback: (r) => const LinearGradient(
@@ -873,7 +873,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         // and never overlaps underlying items when the user scrolls down.
         Positioned.fill(child: ScrollStatusBarHost(
           // Only once the background image has scrolled out completely.
-          threshold: imgH + 200,
+          threshold: imgH + 170,
           // Album-tinted bar (follows the artwork theme when enabled).
           color: Color.alphaBlend(scheme.primary.withValues(alpha: 0.16), surface),
           onVisibleChanged: (v) => setState(() => _statusBarOn = v),
@@ -935,12 +935,12 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                           'artists' => 'فنان', 'albums' => 'ألبوم', _ => 'أغنية',
                         },
                       })} · ${_currentImageSource()}') : null,
-                  child: SizedBox(height: imgH + 40, width: double.infinity),
+                  child: SizedBox(height: imgH + 66, width: double.infinity),
                 ),
                 _buildHeader(ctx, scheme, imgH, hasImage),
                 // Soft blend from the image into the body panel.
                 Container(
-                  height: 24,
+                  height: 12,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
@@ -1002,13 +1002,13 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         if (hasImage && _motionWanted && _motionChecked && _motionUrl != null)
           Positioned(
             top: topPad + 8, right: 12,
-            child: _MotionToggleButton(
+            child: _FadeIn(child: _MotionToggleButton(
               scheme: scheme,
               checked: true,
               available: true,
               showing: _showMotion,
               onToggle: () => setState(() => _showMotion = !_showMotion),
-            ),
+            )),
           ),
 
         // Back button
@@ -1085,7 +1085,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               ),
             ),
           ],
-          const SizedBox(height: 16),
+          const SizedBox(height: 4),
         ],
       ),
     );
@@ -2083,6 +2083,62 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
 
   bool get _canPlay => widget.previewTrackName.isNotEmpty;
 
+  // Colours for every control on the card: artwork accent when that option
+  // is on, otherwise the app theme.
+  ColorScheme _cardScheme(ColorScheme base) =>
+      (artworkColorThemeNotifier.value && _dominant != null)
+          ? _artworkScheme(base, _dominant!).scheme
+          : base;
+
+  // Share + close (+ photo/video switch when a video exists) glued together,
+  // like the grouped settings items: big outer corners, small inner ones.
+  Widget _viewerGroup(ColorScheme s, bool showToggle) {
+    final fg = s.onSecondaryContainer;
+    BorderRadius r(bool first, bool last) => BorderRadius.horizontal(
+        left:  Radius.circular(first ? 22 : 6),
+        right: Radius.circular(last  ? 22 : 6));
+    Widget btn(Widget icon, VoidCallback? onTap, BorderRadius radius) =>
+        M3TonalButton(
+          width: 44, height: 44,
+          radius: radius,
+          padding: EdgeInsets.zero,
+          color: s.secondaryContainer,
+          onTap: onTap,
+          child: icon,
+        );
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      // Fades (and makes room) instead of popping in.
+      AnimatedSize(
+        duration: const Duration(milliseconds: 320),
+        curve: M3Motion.emphasizedDecelerate,
+        alignment: Alignment.centerRight,
+        child: showToggle
+            ? Padding(
+                padding: const EdgeInsets.only(right: 3),
+                child: _FadeIn(
+                  child: btn(
+                    Icon(_showMotion ? Icons.photo_rounded : Icons.videocam_rounded,
+                        color: fg, size: 22),
+                    () => setState(() => _showMotion = !_showMotion),
+                    r(true, false),
+                  ),
+                ),
+              )
+            : const SizedBox.shrink(),
+      ),
+      btn(
+        _sharing
+            ? SizedBox(width: 18, height: 18, child: M3Spinner(color: fg))
+            : Icon(Icons.ios_share_rounded, size: 21, color: fg),
+        _sharing ? null : _shareCard,
+        r(!showToggle, false),
+      ),
+      const SizedBox(width: 3),
+      btn(Icon(Icons.close_rounded, size: 22, color: fg),
+          () => Navigator.pop(context), r(false, true)),
+    ]);
+  }
+
   Widget _viewerBtn(ColorScheme s, Widget icon, VoidCallback? onTap) =>
       M3TonalButton(
         width: 44, height: 44,
@@ -2101,9 +2157,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
   // (scalloped cookie shape) while the preview plays. Uses the artwork's
   // colour when the "artwork colour theme" option is on.
   Widget _buildPlayButton(ColorScheme base) {
-    final s = (artworkColorThemeNotifier.value && _dominant != null)
-        ? _artworkScheme(base, _dominant!).scheme
-        : base;
+    final s = _cardScheme(base);
     final playing = _isPlaying;
     if (playing && !_spinCtrl.isAnimating) {
       _spinCtrl.repeat();
@@ -2495,49 +2549,24 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
             ),
           ),
 
-          // Video toggle (only if a video exists), share and close: Material
-          // You rounded squares using the app theme.
+          // Share / close (+ video switch): connected Material You group.
           Positioned(
             top: topPad + 8, right: 12,
-            child: Row(children: [
-              if (_motionWanted && _motionChecked && _motionUrl != null) ...[
-                _MotionToggleButton(
-                  scheme: Theme.of(context).colorScheme,
-                  checked: true,
-                  available: true,
-                  showing: _showMotion,
-                  onToggle: () => setState(() => _showMotion = !_showMotion),
-                ),
-                const SizedBox(width: 10),
-              ],
-              _viewerBtn(
-                Theme.of(context).colorScheme,
-                _sharing
-                    ? SizedBox(width: 18, height: 18,
-                        child: M3Spinner(color: Theme.of(context).colorScheme.onSecondaryContainer))
-                    : Icon(Icons.ios_share_rounded, size: 21,
-                        color: Theme.of(context).colorScheme.onSecondaryContainer),
-                _sharing ? null : _shareCard,
-              ),
-              const SizedBox(width: 10),
-              _viewerBtn(
-                Theme.of(context).colorScheme,
-                Icon(Icons.close_rounded, size: 22,
-                    color: Theme.of(context).colorScheme.onSecondaryContainer),
-                () => Navigator.pop(context),
-              ),
-            ]),
+            child: _viewerGroup(
+              _cardScheme(Theme.of(context).colorScheme),
+              _motionWanted && _motionChecked && _motionUrl != null,
+            ),
           ),
 
-          // Info button — top-left, mirrors the close/share group.
-          // Only relevant when the achievements system is on.
+          // Info button — top-left. Only relevant when the achievements
+          // system is on.
           if (achievementsEnabledNotifier.value)
             Positioned(
               top: topPad + 8, left: 12,
               child: _viewerBtn(
-                Theme.of(context).colorScheme,
+                _cardScheme(Theme.of(context).colorScheme),
                 Icon(Icons.info_outline_rounded, size: 22,
-                    color: Theme.of(context).colorScheme.onSecondaryContainer),
+                    color: _cardScheme(Theme.of(context).colorScheme).onSecondaryContainer),
                 _showTierInfo,
               ),
             ),
