@@ -77,8 +77,12 @@
   final key = &#39;${_norm(artist)}|${_norm(album)}|${_norm(track)}&#39;;
   if (_cache.containsKey(key)) return _cache[key];
   try {
-    final page = await _albumPageUrl(artist, album, track);
-    final video = page == null ? null : await _videoFromPage(page);
+    final hit = await _albumPageUrl(artist, album, track);
+    String? video;
+    if (hit != null) {
+      video = await _videoFromApi(hit.$1);
+      video ??= await _videoFromPage(hit.$2);
+    }
     _cache[key] = video;
     return video;
   } catch (_) {
