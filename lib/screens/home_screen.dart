@@ -53,6 +53,8 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../widgets/markdown_lite.dart';
 import '../widgets/living_artwork.dart';
+import '../widgets/motion_artwork_video.dart';
+import '../services/motion_artwork_service.dart';
 import 'favorites_page.dart';
 import '../services/favorites_folders_service.dart';
 import 'track_row_tile.dart';

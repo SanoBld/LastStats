@@ -80,7 +80,8 @@ void _pushFullscreen(BuildContext ctx, String url,
      String releaseDate = '', List<(IconData, String)> extra = const [],
      CardTier tier = CardTier.none, int myPlaycount = 0,
      String previewTrackName = '', String previewArtistName = '',
-     String? qrData, String? profileUsername}) {
+     String? qrData, String? profileUsername,
+     String motionArtist = '', String motionAlbum = '', String motionTrack = ''}) {
   Navigator.of(ctx).push(PageRouteBuilder(
     opaque: false,
     barrierColor: Colors.black,
@@ -90,7 +91,8 @@ void _pushFullscreen(BuildContext ctx, String url,
         releaseDate: releaseDate, extra: extra, tier: tier,
         myPlaycount: myPlaycount,
         previewTrackName: previewTrackName, previewArtistName: previewArtistName,
-        qrData: qrData, profileUsername: profileUsername),
+        qrData: qrData, profileUsername: profileUsername,
+        motionArtist: motionArtist, motionAlbum: motionAlbum, motionTrack: motionTrack),
     transitionsBuilder: (_, anim, _, child) =>
         FadeTransition(opacity: anim, child: child),
     transitionDuration: const Duration(milliseconds: 220),
@@ -820,6 +822,13 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       myPlaycount: _myPlaycount(),
                       previewTrackName: widget.type == 'tracks' ? _name : '',
                       previewArtistName: widget.type == 'tracks' ? _artist : '',
+                      motionArtist: widget.type == 'artists' ? '' : _artist,
+                      motionAlbum: widget.type == 'albums'
+                          ? _name
+                          : widget.type == 'tracks'
+                              ? (_info?['album']?['title'] ?? '').toString()
+                              : '',
+                      motionTrack: widget.type == 'tracks' ? _name : '',
                       source: '${_tr({
                         'fr': switch (widget.type) {
                           'artists' => 'Artiste', 'albums' => 'Album', _ => 'Titre',
@@ -1926,6 +1935,8 @@ class _FullscreenImageViewer extends StatefulWidget {
   final String previewArtistName;
   final String? qrData;         // set only for profile cards
   final String? profileUsername; // set only for profile cards
+  // Used to look up Apple Music motion artwork (albums and tracks only).
+  final String motionArtist, motionAlbum, motionTrack;
   const _FullscreenImageViewer({
     required this.url,
     this.title = '',
@@ -1939,6 +1950,9 @@ class _FullscreenImageViewer extends StatefulWidget {
     this.previewArtistName = '',
     this.qrData,
     this.profileUsername,
+    this.motionArtist = '',
+    this.motionAlbum = '',
+    this.motionTrack = '',
   });
 
   bool get isProfileCard => profileUsername != null && profileUsername!.isNotEmpty;
@@ -1974,10 +1988,27 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
 
   bool get _canPlay => widget.previewTrackName.isNotEmpty;
 
+  // Apple Music motion artwork (HLS video), null until found.
+  String? _motionUrl;
+
+  Future<void> _loadMotion() async {
+    if (!motionArtworkNotifier.value || ecoModeActiveNotifier.value) return;
+    if (!MotionArtworkService.supported) return;
+    if (widget.motionArtist.isEmpty ||
+        (widget.motionAlbum.isEmpty && widget.motionTrack.isEmpty)) return;
+    final url = await MotionArtworkService.find(
+      artist: widget.motionArtist,
+      album: widget.motionAlbum,
+      track: widget.motionTrack,
+    );
+    if (mounted && url != null) setState(() => _motionUrl = url);
+  }
+
   @override
   void initState() {
     super.initState();
     _loadDominantColor();
+    _loadMotion();
     if (_canPlay) _checkPreviewAvailable();
   }
 
@@ -2247,13 +2278,21 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
                     width: cardW,
                     height: cardH,
                     tier: widget.tier,
-                    front: Image.network(
-                      widget.url, fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => const ColoredBox(
-                        color: Colors.black26,
-                        child: Icon(Icons.broken_image_rounded,
-                            color: Colors.white54, size: 64),
-                      ),
+                    front: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.network(
+                          widget.url, fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => const ColoredBox(
+                            color: Colors.black26,
+                            child: Icon(Icons.broken_image_rounded,
+                                color: Colors.white54, size: 64),
+                          ),
+                        ),
+                        // Animated cover fades in over the static one.
+                        if (_motionUrl != null)
+                          MotionArtworkVideo(url: _motionUrl!),
+                      ],
                     ),
                     back: _CardBack(
                       title: widget.title,

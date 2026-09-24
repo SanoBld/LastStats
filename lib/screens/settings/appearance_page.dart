@@ -1083,6 +1083,7 @@ class _LivingArtworkSection extends StatefulWidget {
 class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
   bool _enabled = true;
   bool _achievementsOn = true;
+  bool _motionOn = true;
 
   @override
   void initState() {
@@ -1092,6 +1093,7 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
         setState(() {
           _enabled = p.getBool('ls_living_artwork') ?? true;
           _achievementsOn = p.getBool('ls_achievements_enabled') ?? true;
+          _motionOn = p.getBool('ls_motion_artwork') ?? true;
         });
       }
     });
@@ -1113,6 +1115,19 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
             await p.setBool('ls_living_artwork', v);
             setState(() => _enabled = v);
             livingArtworkNotifier.value = v;
+          },
+        ),
+        SwitchListTile(
+          secondary: Icon(Icons.movie_filter_rounded, color: scheme.primary),
+          title: Text(_ct('Pochettes vidéo (Apple Music)', 'Video covers (Apple Music)')),
+          subtitle: Text(_ct('Joue la pochette animée quand elle existe',
+              'Plays the animated cover when one exists')),
+          value: _motionOn,
+          onChanged: (v) async {
+            final p = await SharedPreferences.getInstance();
+            await p.setBool('ls_motion_artwork', v);
+            setState(() => _motionOn = v);
+            motionArtworkNotifier.value = v;
           },
         ),
         SwitchListTile(

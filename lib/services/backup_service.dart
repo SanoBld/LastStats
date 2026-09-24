@@ -55,6 +55,7 @@ const _kThemeKeys = {
   'ls_artwork_color_theme',
   'ls_keep_last_artwork_color',
   'ls_living_artwork',
+  'ls_motion_artwork',
   'ls_pc_mode',
   // Day/night accent colors — was missing from the first version of this
   // set, so "export themes off" was leaking this feature's settings.
@@ -530,6 +531,7 @@ class BackupService {
     hapticFeedbackNotifier.value        = p.getBool('ls_haptic_feedback')      ?? true;
     navLabelNotifier.value              = p.getBool('ls_nav_labels')           ?? true;
     livingArtworkNotifier.value         = p.getBool('ls_living_artwork')       ?? true;
+    motionArtworkNotifier.value         = p.getBool('ls_motion_artwork')       ?? true;
     notifNewsEnabledNotifier.value      = p.getBool('ls_notif_news_enabled')   ?? false;
     showNewsBadgeNotifier.value         = p.getBool('ls_show_news_badge')      ?? true;
     showLovedBadgeNotifier.value        = p.getBool('ls_show_loved_badge')     ?? true;
