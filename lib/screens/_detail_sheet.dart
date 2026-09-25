@@ -848,26 +848,9 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                 ),
                 if (hasImage && _showMotion && _motionUrl != null)
                   MotionArtworkVideo(key: ValueKey(_motionUrl), url: _motionUrl!),
-                // Darkening under the status bar and the title text; it is
-                // inside the mask so it fades out with the image.
-                // The top fade is black (dark theme) or white (light theme),
-                // very subtle, and lives on the image only: once the body
-                // panel scrolls over the image it disappears with it.
-                // Only a soft dark scrim behind the title near the bottom of
-                // the image; no fade at the top (status bar area stays clean).
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end:   Alignment.bottomCenter,
-                      stops: const [0.0, 0.42, 0.68, 1.0],
-                      colors: [
-                        const Color(0x00000000), const Color(0x00000000),
-                        const Color(0x46000000), const Color(0x46000000),
-                      ],
-                    ),
-                  ),
-                ),
+                // No darkening scrim any more — the photo shows as-is.
+                // Legibility now comes from the title's own shaped
+                // background instead of a scrim over the whole image.
               ],
             ),
           ),
@@ -945,14 +928,21 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                   child: SizedBox(height: imgH + 66, width: double.infinity),
                 ),
                 _buildHeader(ctx, scheme, imgH, hasImage),
-                // Soft blend from the image into the body panel.
+                // Soft blend from the image into the body panel — tall and
+                // gradual on purpose so it reads as a fade, not a hard
+                // white line cutting across the photo.
                 Container(
-                  height: 12,
+                  height: 30,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end:   Alignment.bottomCenter,
-                      colors: [surface.withValues(alpha: 0), surface],
+                      stops: const [0.0, 0.7, 1.0],
+                      colors: [
+                        surface.withValues(alpha: 0),
+                        surface.withValues(alpha: 0.35),
+                        surface,
+                      ],
                     ),
                   ),
                 ),
@@ -1012,35 +1002,56 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           ),
         ))),
 
-        // Photo / video switch (top-right), only for albums and tracks
-        if (hasImage && _motionWanted && _motionChecked && _motionUrl != null)
-          Positioned(
-            top: topPad + 8, right: 12,
-            child: _FadeIn(child: _MotionToggleButton(
-              scheme: scheme,
-              checked: true,
-              available: true,
-              showing: _showMotion,
-              onToggle: () => setState(() => _showMotion = !_showMotion),
-            )),
-          ),
-
-        // Back button
+        // Back (+ photo/video switch when there's motion art): one glued
+        // Material You group, top-left — same connected-pill treatment as
+        // the fullscreen 3D card's button group.
         Positioned(
           top: topPad + 8, left: 12,
-          child: M3TonalButton(
-            width: 44, height: 44,
-            radius: BorderRadius.circular(16),
-            padding: EdgeInsets.zero,
-            color: scheme.secondaryContainer,
-            onTap: () => Navigator.pop(ctx),
-            child: Icon(Icons.arrow_back_rounded,
-                color: scheme.onSecondaryContainer, size: 22),
+          child: _headerButtonGroup(
+            ctx, scheme,
+            showToggle: hasImage && _motionWanted && _motionChecked && _motionUrl != null,
           ),
         ),
 
       ],
     );
+  }
+
+  // Back button, plus the photo/video switch glued right next to it when
+  // there's motion art — big outer corners, small inner ones, same
+  // connected-pill language as the share/close group on the 3D card.
+  Widget _headerButtonGroup(BuildContext ctx, ColorScheme scheme, {required bool showToggle}) {
+    BorderRadius r(bool first, bool last) => BorderRadius.horizontal(
+        left:  Radius.circular(first ? 22 : 6),
+        right: Radius.circular(last  ? 22 : 6));
+    Widget btn(Widget icon, VoidCallback? onTap, BorderRadius radius) => M3TonalButton(
+        width: 44, height: 44,
+        radius: radius,
+        padding: EdgeInsets.zero,
+        color: scheme.secondaryContainer,
+        onTap: onTap,
+        child: icon,
+      );
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      btn(Icon(Icons.arrow_back_rounded, color: scheme.onSecondaryContainer, size: 22),
+          () => Navigator.pop(ctx), r(true, !showToggle)),
+      AnimatedSize(
+        duration: const Duration(milliseconds: 320),
+        curve: M3Motion.emphasizedDecelerate,
+        alignment: Alignment.centerLeft,
+        child: showToggle
+            ? Padding(
+                padding: const EdgeInsets.only(left: 3),
+                child: _FadeIn(child: btn(
+                  Icon(_showMotion ? Icons.photo_rounded : Icons.videocam_rounded,
+                      color: scheme.onSecondaryContainer, size: 22),
+                  () => setState(() => _showMotion = !_showMotion),
+                  r(false, true),
+                )),
+              )
+            : const SizedBox.shrink(),
+      ),
+    ]);
   }
 
   // ── Header ─────────────────────────────────────────────────────────────────
@@ -1075,15 +1086,12 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            _name,
-            style: text.headlineMedium?.copyWith(
-              fontWeight: FontWeight.w900,
-              color:      hasImage && onImg ? Colors.white : scheme.onSurface,
-              shadows:    hasImage && onImg
-                  ? [Shadow(blurRadius: 8, color: Colors.black.withValues(alpha: 0.5))]
-                  : null,
-            ),
+          _TitleBubble(
+            text: _name,
+            scheme: scheme,
+            style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w900) ??
+                const TextStyle(fontWeight: FontWeight.w900, fontSize: 28),
+            maxWidth: MediaQuery.of(ctx).size.width - 40,
           ),
           if (_artist.isNotEmpty) ...[
             const SizedBox(height: 4),
@@ -2718,6 +2726,90 @@ class _ShareCardArt extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Expressive title bubble ─────────────────────────────────────────────────
+// The item's title, in a Material You blob shape sized to fit it — never
+// wider than the text needs, and the text never spills past the shape.
+// Starts small (max half the header's width) and grows to fit the full
+// title on tap; shrinks back on a second tap.
+class _TitleBubble extends StatefulWidget {
+  final String      text;
+  final TextStyle   style;
+  final ColorScheme scheme;
+  final double      maxWidth; // full width available in the header
+  const _TitleBubble({
+    required this.text, required this.style,
+    required this.scheme, required this.maxWidth,
+  });
+
+  @override
+  State<_TitleBubble> createState() => _TitleBubbleState();
+}
+
+class _TitleBubbleState extends State<_TitleBubble> {
+  bool _expanded = false;
+  static const _h = 52.0;
+  static const _hPad = 20.0;
+
+  // A handful of shapes that stay clean at any aspect ratio — corner
+  // radii are pinned to the bubble's fixed height, so stretching the
+  // width (to fit longer titles) never distorts them.
+  ShapeBorder _shapeFor(int seed) {
+    switch (seed % 5) {
+      case 0: return const StadiumBorder();
+      case 1: return RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(_h * 0.32)); // squircle
+      case 2: return RoundedRectangleBorder(               // leaf
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(_h * 0.85), bottomRight: Radius.circular(_h * 0.85),
+              topRight: Radius.circular(_h * 0.18), bottomLeft: Radius.circular(_h * 0.18)));
+      case 3: return RoundedRectangleBorder(               // arch
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(_h * 0.55), topRight: Radius.circular(_h * 0.55),
+              bottomLeft: Radius.circular(_h * 0.14), bottomRight: Radius.circular(_h * 0.14)));
+      default: return const M3CookieBorder(lobes: 8, amplitude: 0.045); // gentle scallop
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tp = TextPainter(
+      text: TextSpan(text: widget.text, style: widget.style),
+      textDirection: Directionality.of(context),
+      maxLines: 1,
+    )..layout();
+
+    final natural       = tp.width + _hPad * 2;
+    final collapsedMax  = widget.maxWidth * 0.5;
+    final fitsCollapsed = natural <= collapsedMax;
+    final targetWidth   = (fitsCollapsed || _expanded)
+        ? math.min(natural, widget.maxWidth)
+        : collapsedMax;
+
+    return GestureDetector(
+      onTap: fitsCollapsed ? null : () => setState(() => _expanded = !_expanded),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 380),
+        curve:    M3Motion.emphasized,
+        width:    targetWidth,
+        height:   _h,
+        alignment: Alignment.center,
+        padding:  const EdgeInsets.symmetric(horizontal: _hPad),
+        decoration: ShapeDecoration(
+          color: widget.scheme.primaryContainer,
+          shape: _shapeFor(m3ShapeIndex(widget.text)),
+        ),
+        child: Text(
+          widget.text,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          softWrap: false,
+          style: widget.style.copyWith(color: widget.scheme.onPrimaryContainer),
         ),
       ),
     );
