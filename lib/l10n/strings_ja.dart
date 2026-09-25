@@ -235,7 +235,8 @@ class AppStringsJa implements AppStrings {
   @override String get detailTopAlbums => '人気のアルバム';
   @override String get detailBioReadMore => '続きを読む';
   @override String get detailBioReadLess => '閉じる';
-  @override String get detailUserPlays => '再生回数';
+  @override String get detailUserPlays => 'あなたの再生回数';
+  @override String get detailGlobalPlays => '総再生回数';
   @override String get detailUserRank => '順位';
   @override String get detailUserRankNA => '該当なし';
   @override String get detailGlobalListeners => 'リスナー';

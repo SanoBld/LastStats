@@ -235,7 +235,8 @@ class AppStringsIt implements AppStrings {
   @override String get detailTopAlbums => 'Album popolari';
   @override String get detailBioReadMore => 'Leggi di più';
   @override String get detailBioReadLess => 'Mostra meno';
-  @override String get detailUserPlays => 'riproduzioni';
+  @override String get detailUserPlays => 'i tuoi ascolti';
+  @override String get detailGlobalPlays => 'riproduzioni totali';
   @override String get detailUserRank => 'posizione';
   @override String get detailUserRankNA => 'N/D';
   @override String get detailGlobalListeners => 'ascoltatori';

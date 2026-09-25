@@ -958,9 +958,16 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       Divider(height: 1,
                           color: scheme.outlineVariant.withValues(alpha: 0.4)),
                       _buildStatsRow(scheme),
-                      _buildMusicLinks(scheme),
-                      // Heart + play — above the genre tags.
-                      if (widget.type == 'tracks') _buildActionRow(scheme),
+                      _buildMusicLinks(
+                        scheme,
+                        leading: widget.type == 'tracks' && !_hasPlay && favoritesEnabled
+                            ? _buildLoveButton(scheme)
+                            : null,
+                      ),
+                      // Heart + play — above the genre tags. Only when there
+                      // is a preview to play; otherwise the heart moves onto
+                      // the links row above (see leading:, just above).
+                      if (widget.type == 'tracks' && _hasPlay) _buildActionRow(scheme),
                       if (_tags().isNotEmpty) _buildTags(scheme),
                       if (widget.type == 'tracks') _buildPreviewPlayer(scheme),
                       if (_bio().isNotEmpty)  _FadeIn(child: _buildBio(scheme)),
@@ -1092,27 +1099,28 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   }
 
   // Heart (round, accent) + play (wide pill). Tracks only.
+  bool get _hasPlay => _previewUrl != null || _previewLoading;
+
+  Widget _buildLoveButton(ColorScheme scheme) => M3CircleButton(
+        icon: _isLoved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+        busy: _loveBusy,
+        active: _isLoved,
+        onTap: _toggleLove,
+        onLongPress: () => showFolderAssignSheet(
+            context, name: _name, artist: _artist, image: _resolvedImage),
+        tooltip: 'Love',
+      );
+
+  // Heart + play, only shown together when there IS a preview to play;
+  // otherwise the heart is placed on the music-links row instead (see
+  // _buildMusicLinks's `leading` parameter).
   Widget _buildActionRow(ColorScheme scheme) {
-    final hasPlay = _previewUrl != null || _previewLoading;
-    if (!favoritesEnabled && !hasPlay) return const SizedBox.shrink();
+    if (!favoritesEnabled && !_hasPlay) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: M3ActionRow(
-        circle: favoritesEnabled
-            ? M3CircleButton(
-                icon: _isLoved
-                    ? Icons.favorite_rounded
-                    : Icons.favorite_border_rounded,
-                busy: _loveBusy,
-                active: _isLoved,
-                onTap: _toggleLove,
-                onLongPress: () => showFolderAssignSheet(
-                    context, name: _name, artist: _artist,
-                    image: _resolvedImage),
-                tooltip: 'Love',
-              )
-            : null,
-        pill: hasPlay
+        circle: favoritesEnabled ? _buildLoveButton(scheme) : null,
+        pill: _hasPlay
             ? M3PillButton(
                 icon: _isPlaying
                     ? Icons.pause_rounded
@@ -1130,7 +1138,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   // ── Music app links ─────────────────────────────────────────────────────────
 
-  Widget _buildMusicLinks(ColorScheme scheme) {
+  Widget _buildMusicLinks(ColorScheme scheme, {Widget? leading}) {
     final encodedName   = Uri.encodeComponent(_name);
     final encodedArtist = Uri.encodeComponent(_artist);
 
@@ -1166,6 +1174,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       child: ValueListenableBuilder<String>(
         valueListenable: imageShapeNotifier,
         builder: (_, mode, _) => Row(children: [
+          if (leading != null) ...[leading, const SizedBox(width: 10)],
           for (var i = 0; i < buttons.length; i++) ...[
             if (i > 0) const SizedBox(width: 10),
             Expanded(
@@ -1242,7 +1251,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     if (gp > 0) {
       stats.add(_StatChip(
         icon: Icons.play_circle_rounded, value: _fmt(gp),
-        label: L.commonPlays, scheme: scheme,
+        label: L.detailGlobalPlays, scheme: scheme,
       ));
     }
 

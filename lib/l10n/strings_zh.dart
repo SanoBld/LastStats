@@ -264,7 +264,8 @@ class AppStringsZh implements AppStrings {
   @override String get detailTopAlbums       => '热门专辑';
   @override String get detailBioReadMore     => '展开';
   @override String get detailBioReadLess     => '收起';
-  @override String get detailUserPlays       => '播放次数';
+  @override String get detailUserPlays       => '你的播放次数';
+  @override String get detailGlobalPlays       => '总播放次数';
   @override String get detailUserRank        => '排名';
   @override String get detailUserRankNA      => '无';
   @override String get detailGlobalListeners => '听众';

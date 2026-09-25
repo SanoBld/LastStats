@@ -272,6 +272,9 @@ abstract class AppStrings {
   String get detailBioReadMore;
   String get detailBioReadLess;
   String get detailUserPlays;
+  // Global play count on the detail page, shown next to detailUserPlays —
+  // give it a different word so the two stats aren't both just "plays".
+  String get detailGlobalPlays => commonPlays;
   String get detailUserRank;
   String get detailUserRankNA;
   String get detailGlobalListeners;

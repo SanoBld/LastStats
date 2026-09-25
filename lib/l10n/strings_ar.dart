@@ -235,7 +235,8 @@ class AppStringsAr implements AppStrings {
   @override String get detailTopAlbums => 'الألبومات الشائعة';
   @override String get detailBioReadMore => 'قراءة المزيد';
   @override String get detailBioReadLess => 'عرض أقل';
-  @override String get detailUserPlays => 'مرات التشغيل';
+  @override String get detailUserPlays => 'استماعاتك';
+  @override String get detailGlobalPlays => 'إجمالي مرات التشغيل';
   @override String get detailUserRank => 'الترتيب';
   @override String get detailUserRankNA => 'غير متاح';
   @override String get detailGlobalListeners => 'مستمعون';

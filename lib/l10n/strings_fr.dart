@@ -267,7 +267,8 @@ class AppStringsFr implements AppStrings {
   @override String get detailTopAlbums       => 'Albums populaires';
   @override String get detailBioReadMore     => 'Lire la suite';
   @override String get detailBioReadLess     => 'Réduire';
-  @override String get detailUserPlays       => 'écoutes';
+  @override String get detailUserPlays       => 'tes écoutes';
+  @override String get detailGlobalPlays      => 'écoutes totales';
   @override String get detailUserRank        => 'classement';
   @override String get detailUserRankNA      => 'N/A';
   @override String get detailGlobalListeners => 'auditeurs';

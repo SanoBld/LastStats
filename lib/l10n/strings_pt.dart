@@ -267,7 +267,8 @@ class AppStringsPt implements AppStrings {
   @override String get detailTopAlbums       => 'Álbuns populares';
   @override String get detailBioReadMore     => 'Ler mais';
   @override String get detailBioReadLess     => 'Ler menos';
-  @override String get detailUserPlays       => 'reproduções';
+  @override String get detailUserPlays       => 'suas reproduções';
+  @override String get detailGlobalPlays       => 'reproduções totais';
   @override String get detailUserRank        => 'posição';
   @override String get detailUserRankNA      => 'N/D';
   @override String get detailGlobalListeners => 'ouvintes';
