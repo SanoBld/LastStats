@@ -3178,10 +3178,10 @@ class _NowPlayingCard extends StatelessWidget {
         child: Row(children: [
 
           _NowPlayingSpinningArt(
-            size: 64,
+            size: 88,
             seed: '$title-$artist',
             child: _SmartImage(
-              size: 64,
+              size: 88,
               borderRadius: 12,
               shaped: false,
               initialUrl: rawUrl,

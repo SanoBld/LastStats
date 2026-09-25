@@ -3447,51 +3447,70 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
   }
 
 
+  // Same card as the artist/album/track poster's stats row: one rounded
+  // surfaceContainerHigh bubble, segments divided by a hairline, instead
+  // of three separate boxed tiles — keeps every poster on the same
+  // Material You language.
   Widget _buildStatsRow(ColorScheme scheme) {
     final total = _total();
     final avg   = _avg();
     final days  = _days();
 
+    final stats = [
+      _StatChip(icon: Icons.headphones_rounded, value: _fmtLarge(total),
+          label: L.dashScrobbles, scheme: scheme, highlight: true),
+      _StatChip(icon: Icons.trending_up_rounded, value: '~${_fmt(avg.round())}',
+          label: L.perDay, scheme: scheme),
+      _StatChip(icon: Icons.calendar_month_rounded, value: _fmt(days),
+          label: L.activityDays, scheme: scheme),
+    ];
+
+    final rowChildren = <Widget>[];
+    for (var i = 0; i < stats.length; i++) {
+      rowChildren.add(Expanded(child: stats[i]));
+      if (i < stats.length - 1) {
+        rowChildren.add(VerticalDivider(
+          width: 1, thickness: 1,
+          color: scheme.outlineVariant.withValues(alpha: 0.5),
+        ));
+      }
+    }
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Row(children: [
-        Expanded(child: _ProfileStatCard(
-          icon: Icons.headphones_rounded, value: _fmtLarge(total),
-          label: L.dashScrobbles, scheme: scheme, primary: true,
-        )),
-        const SizedBox(width: 10),
-        Expanded(child: _ProfileStatCard(
-          icon: Icons.trending_up_rounded, value: '~${_fmt(avg.round())}',
-          label: L.perDay, scheme: scheme,
-        )),
-        const SizedBox(width: 10),
-        Expanded(child: _ProfileStatCard(
-          icon: Icons.calendar_month_rounded, value: _fmt(days),
-          label: L.activityDays, scheme: scheme,
-        )),
-      ]),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        decoration: BoxDecoration(
+          color:        scheme.surfaceContainerHigh,
+          borderRadius: AppRadius.xlR,
+        ),
+        child: IntrinsicHeight(child: Row(children: rowChildren)),
+      ),
     );
   }
 
+  // Same wide Material You pill used for "read more" / music-link actions
+  // elsewhere, instead of a raw FilledButton.tonal.
   Widget _buildCompareButton(BuildContext ctx) {
+    final scheme = Theme.of(ctx).colorScheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       child: SizedBox(
         width: double.infinity,
-        child: FilledButton.tonal(
-          onPressed: () => showTasteCompareSheet(ctx, widget.username, widget.service),
-          style: FilledButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            shape: RoundedRectangleBorder(borderRadius: AppRadius.lgR),
-          ),
+        child: M3TonalButton(
+          height: 46,
+          radius: AppRadius.lgR,
+          color: scheme.secondaryContainer,
+          onTap: () => showTasteCompareSheet(ctx, widget.username, widget.service),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.graphic_eq_rounded, size: 16),
+              Icon(Icons.graphic_eq_rounded, size: 16, color: scheme.onSecondaryContainer),
               const SizedBox(width: 8),
               Text(
                 _ct('Comparer les goûts musicaux', 'Compare Music Taste'),
-                style: const TextStyle(fontWeight: FontWeight.w700),
+                style: TextStyle(
+                    fontWeight: FontWeight.w700, color: scheme.onSecondaryContainer),
               ),
             ],
           ),
@@ -3511,13 +3530,20 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
         if (!syncing.contains(widget.username.toLowerCase())) return const SizedBox.shrink();
         return Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-          child: Row(children: [
-            SizedBox(width: 12, height: 12,
-                child: M3Spinner(color: scheme.onSurfaceVariant)),
-            const SizedBox(width: 8),
-            Text(_ct('Synchronisation des données…', 'Syncing full library…'),
-                style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
-          ]),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: scheme.surfaceContainerHigh,
+              borderRadius: AppRadius.lgR,
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              SizedBox(width: 12, height: 12,
+                  child: M3Spinner(color: scheme.onSurfaceVariant)),
+              const SizedBox(width: 8),
+              Text(_ct('Synchronisation des données…', 'Syncing full library…'),
+                  style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+            ]),
+          ),
         );
       },
     );
@@ -3539,13 +3565,11 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(L.achvTitle, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
-              GestureDetector(
+              _M3Pill(
+                icon: Icons.chevron_right_rounded,
+                label: _ct('Voir plus', 'See more'),
+                scheme: scheme,
                 onTap: () => showAchievementsSheet(ctx, _info),
-                child: Row(children: [
-                  Text(_ct('Voir plus', 'See more'), style: TextStyle(
-                      color: scheme.primary, fontSize: 13, fontWeight: FontWeight.w600)),
-                  Icon(Icons.chevron_right_rounded, size: 16, color: scheme.primary),
-                ]),
               ),
             ],
           ),
@@ -3817,45 +3841,6 @@ class _BannerMeta extends StatelessWidget {
 }
 
 // ── Profile stat card ─────────────────────────────────────────────────────────
-
-class _ProfileStatCard extends StatelessWidget {
-  final IconData    icon;
-  final String      value;
-  final String      label;
-  final ColorScheme scheme;
-  final bool        primary;
-
-  const _ProfileStatCard({
-    required this.icon, required this.value,
-    required this.label, required this.scheme,
-    this.primary = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bg = primary ? scheme.primaryContainer : scheme.surfaceContainerHighest;
-    final fg = primary ? scheme.onPrimaryContainer : scheme.onSurfaceVariant;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      decoration: BoxDecoration(
-          color: bg, borderRadius: AppRadius.lgR),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Icon(icon, size: 18, color: fg.withValues(alpha: 0.8)),
-        const SizedBox(height: 5),
-        Text(value,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w800, color: fg, fontSize: 13)),
-        const SizedBox(height: 2),
-        Text(label,
-          textAlign: TextAlign.center, maxLines: 1,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: fg.withValues(alpha: 0.7), fontSize: 9)),
-      ]),
-    );
-  }
-}
 
 // ── Compact large-number formatter ────────────────────────────────────────────
 
