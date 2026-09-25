@@ -3066,7 +3066,19 @@ class _RotatingShapeClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final rect = Offset.zero & size;
-    final path = shape.getOuterPath(rect);
+    // Non-round shapes (squircle, leaf, arch…) reach all the way to the
+    // corners of their bounding box. Rotating that box-filling shape in
+    // place pushes its corners outside the widget's own bounds, so they
+    // got flatly cut off by the render box instead of spinning cleanly.
+    // Shrinking the rect the shape is drawn into by 1/√2 keeps the whole
+    // shape inside the circle inscribed in [size] at every angle, so it
+    // spins freely without ever touching (and clipping against) the edge.
+    final innerRect = Rect.fromCenter(
+      center: rect.center,
+      width:  size.width  * 0.7071,
+      height: size.height * 0.7071,
+    );
+    final path = shape.getOuterPath(innerRect);
     final m = Matrix4.identity()
       ..translate(rect.center.dx, rect.center.dy)
       ..rotateZ(turns * 2 * math.pi)

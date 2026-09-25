@@ -1087,13 +1087,16 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           ),
           const SizedBox(height: 8),
           _TitleBubble(
-            text: _name,
+            // For a track, the artist rides along inside the same block —
+            // there's no separate artist line below it in that case.
+            text: widget.type == 'tracks' && _artist.isNotEmpty
+                ? '$_name — $_artist' : _name,
             scheme: scheme,
             style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w900) ??
                 const TextStyle(fontWeight: FontWeight.w900, fontSize: 28),
             maxWidth: MediaQuery.of(ctx).size.width - 40,
           ),
-          if (_artist.isNotEmpty) ...[
+          if (widget.type != 'tracks' && _artist.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
               _artist,
@@ -2759,8 +2762,11 @@ class _TitleBubbleState extends State<_TitleBubble> {
   // A handful of shapes that stay clean at any aspect ratio — corner
   // radii are pinned to the bubble's fixed height, so stretching the
   // width (to fit longer titles) never distorts them.
+  // The cookie/scallop shape used to be in this rotation too, but it's
+  // drawn from the *shortest* side, so on a wide bubble it just sits as a
+  // circle in the middle instead of stretching to fill the pill — dropped.
   ShapeBorder _shapeFor(int seed) {
-    switch (seed % 5) {
+    switch (seed % 4) {
       case 0: return const StadiumBorder();
       case 1: return RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(_h * 0.32)); // squircle
@@ -2768,11 +2774,10 @@ class _TitleBubbleState extends State<_TitleBubble> {
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(_h * 0.85), bottomRight: Radius.circular(_h * 0.85),
               topRight: Radius.circular(_h * 0.18), bottomLeft: Radius.circular(_h * 0.18)));
-      case 3: return RoundedRectangleBorder(               // arch
+      default: return RoundedRectangleBorder(              // arch
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(_h * 0.55), topRight: Radius.circular(_h * 0.55),
               bottomLeft: Radius.circular(_h * 0.14), bottomRight: Radius.circular(_h * 0.14)));
-      default: return const M3CookieBorder(lobes: 8, amplitude: 0.045); // gentle scallop
     }
   }
 
@@ -2785,7 +2790,10 @@ class _TitleBubbleState extends State<_TitleBubble> {
     )..layout();
 
     final natural       = tp.width + _hPad * 2;
-    final collapsedMax  = widget.maxWidth * 0.5;
+    // Base (collapsed) state now stretches to 3/4 of the header width
+    // instead of half — a tap still expands it a bit further, up to the
+    // full width, when the title doesn't already fit at 3/4.
+    final collapsedMax  = widget.maxWidth * 0.75;
     final fitsCollapsed = natural <= collapsedMax;
     final targetWidth   = (fitsCollapsed || _expanded)
         ? math.min(natural, widget.maxWidth)
