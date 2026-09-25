@@ -75,7 +75,7 @@ Returns '' on failure.</p>
   <pre class="language-dart"><code class="language-dart">static Future&lt;String&gt; translate(String text, String target) async {
   if (text.isEmpty) return &#39;&#39;;
   try {
-    &#47;&#47; Google splits long text into chunks of ~5000 chars internally,
+    &#47;&#47; Google splits long text into chunks of ~5000 chars internally
     &#47;&#47; but the free endpoint works fine for typical bios.
     final uri = Uri.https(&#39;translate.googleapis.com&#39;, &#39;&#47;translate_a&#47;single&#39;, {
       &#39;client&#39;: &#39;gtx&#39;,
