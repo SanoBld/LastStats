@@ -162,8 +162,12 @@ class _SmartImage extends StatefulWidget {
   final Future<String> Function() resolver;
   final double size, borderRadius;
   final String? seed;   // same seed = same Material You shape
+  // Set to false when a parent already applies its own clip (e.g. a
+  // rotating shape mask) — skips the built-in M3 shape so it isn't
+  // clipped twice.
+  final bool shaped;
   const _SmartImage({required this.resolver, required this.size,
-      required this.borderRadius, this.initialUrl, this.seed});
+      required this.borderRadius, this.initialUrl, this.seed, this.shaped = true});
 
   static const _ph = '2a96cbd8b46e442fc41c2b86b821562f';
 
@@ -257,11 +261,14 @@ class _SmartImageState extends State<_SmartImage> {
         errorBuilder: (_, _, _) => _fallbackBox(s)));
   }
 
-  // Every image gets a Material You shape (cookie, circle, clover…).
-  Widget _shaped(Widget child) => M3ShapedBox(
-      size: widget.size,
-      seed: widget.seed ?? widget.initialUrl ?? '',
-      child: child);
+  // Every image gets a Material You shape (cookie, circle, clover…),
+  // unless the parent asked to apply its own clip instead.
+  Widget _shaped(Widget child) => widget.shaped
+      ? M3ShapedBox(
+          size: widget.size,
+          seed: widget.seed ?? widget.initialUrl ?? '',
+          child: child)
+      : child;
 
   Widget _loadingBox(ColorScheme s) => Container(
       width: widget.size, height: widget.size,

@@ -1327,17 +1327,13 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         spacing: 8, runSpacing: 8,
         children: tags.map((t) {
           final name = (t['name'] ?? '').toString();
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-            decoration: BoxDecoration(
-              color: scheme.secondaryContainer,
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.circular(999), // Material You stadium
-            ),
-            child: Text(name, style: TextStyle(
-              fontSize: 12, color: scheme.onSecondaryContainer,
-              fontWeight: FontWeight.w700,
-            )),
+          // Reuses the app's real M3 chip (shape-morph + state layer);
+          // "selected" just picks its rounder, tonal look — it isn't
+          // interactive here since there is nothing to toggle.
+          return M3Chip(
+            label: Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+            selected: true,
+            visualDensity: VisualDensity.compact,
           );
         }).toList(),
       ),
@@ -1756,6 +1752,20 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   // ── Track extra info ────────────────────────────────────────────────────────
 
+  // Opens the album's own poster (fullscreen card), not the Last.fm page.
+  Future<void> _openAlbumPoster(String album) async {
+    _haptic(_HapticImpact.light);
+    final url = await ImageService.resolveAlbum(album, _artist);
+    if (!mounted) return;
+    _pushFullscreen(context, url,
+        title: album, subtitle: _artist,
+        source: _tr({
+          'fr': 'Album', 'en': 'Album', 'es': 'Álbum', 'de': 'Album',
+          'it': 'Album', 'pt': 'Álbum', 'ru': 'Альбом', 'ja': 'アルバム',
+          'zh': '专辑', 'ar': 'ألبوم',
+        }));
+  }
+
   Widget _buildTrackExtra(ColorScheme scheme) {
     final text   = Theme.of(context).textTheme;
     final album  = (_info?['album']?['title'] ?? '').toString();
@@ -1803,9 +1813,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         child: IntrinsicHeight(
           child: Row(children: [
             if (album.isNotEmpty)
-              cell(L.detailAlbumLabel, album, onTap: () => _openBioUrl(
-                  'https://www.last.fm/music/${Uri.encodeComponent(_artist)}'
-                  '/${Uri.encodeComponent(album)}')),
+              cell(L.detailAlbumLabel, album, onTap: () => _openAlbumPoster(album)),
             if (album.isNotEmpty && durStr.isNotEmpty)
               VerticalDivider(width: 1, thickness: 1,
                   color: scheme.outlineVariant.withValues(alpha: 0.5)),
@@ -2103,12 +2111,12 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
 
   bool get _canPlay => widget.previewTrackName.isNotEmpty;
 
-  // Colours for every control on the card: artwork accent when that option
-  // is on, otherwise the app theme.
+  // Colours for every control on the poster: always the artwork's own
+  // accent when we have one, so every button on a poster carries a bit of
+  // its colour — independent of the app-wide "artwork colour theme" toggle,
+  // which only affects the rest of the app.
   ColorScheme _cardScheme(ColorScheme base) =>
-      (artworkColorThemeNotifier.value && _dominant != null)
-          ? _artworkScheme(base, _dominant!).scheme
-          : base;
+      _dominant != null ? _artworkScheme(base, _dominant!).scheme : base;
 
   // Share + close (+ photo/video switch when a video exists) glued together,
   // like the grouped settings items: big outer corners, small inner ones.
@@ -2641,15 +2649,17 @@ class _ShareCardArt extends StatelessWidget {
           children: [
             Image.network(url, fit: BoxFit.cover,
                 errorBuilder: (_, _, _) => const ColoredBox(color: Color(0xFF222222))),
+            // Lighter than before — just enough for the title to stay
+            // readable, without hiding much of the photo itself.
             DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                  stops: const [0.0, 0.45, 1.0],
+                  stops: const [0.0, 0.62, 1.0],
                   colors: [
                     Colors.transparent,
-                    Colors.black.withValues(alpha: 0.05),
-                    Colors.black.withValues(alpha: 0.88),
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.55),
                   ],
                 ),
               ),
@@ -2714,9 +2724,10 @@ class _ShareCardArt extends StatelessWidget {
 }
 
 // ── Small Material You pill button, used for "read more", "view on
-// Last.fm" and similar inline actions. Tonal fill, stadium shape, with a
-// tiny scale animation on press so it feels alive.
-class _M3Pill extends StatefulWidget {
+// Last.fm" and similar inline actions. Built on the app's own M3TonalButton
+// (real state-layer ripple + press shape-morph) instead of a hand-rolled
+// animation, so it matches every other button in the app.
+class _M3Pill extends StatelessWidget {
   final IconData      icon;
   final String        label;
   final VoidCallback  onTap;
@@ -2728,42 +2739,20 @@ class _M3Pill extends StatefulWidget {
   });
 
   @override
-  State<_M3Pill> createState() => _M3PillState();
-}
-
-class _M3PillState extends State<_M3Pill> {
-  bool _pressed = false;
-
-  @override
   Widget build(BuildContext context) {
-    final bg = widget.filled
-        ? widget.scheme.primaryContainer
-        : widget.scheme.surfaceContainerHigh;
-    final fg = widget.filled
-        ? widget.scheme.onPrimaryContainer
-        : widget.scheme.primary;
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp:   (_) => setState(() => _pressed = false),
-      onTapCancel: () => setState(() => _pressed = false),
-      onTap: widget.onTap,
-      child: AnimatedScale(
-        scale: _pressed ? 0.94 : 1.0,
-        duration: const Duration(milliseconds: 120),
-        curve: Curves.easeOut,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: M3Motion.emphasized,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(widget.icon, size: 16, color: fg),
-            const SizedBox(width: 6),
-            Text(widget.label, style: TextStyle(
-                color: fg, fontWeight: FontWeight.w700, fontSize: 12.5)),
-          ]),
-        ),
-      ),
+    final bg = filled ? scheme.primaryContainer : scheme.surfaceContainerHigh;
+    final fg = filled ? scheme.onPrimaryContainer : scheme.primary;
+    return M3TonalButton(
+      height: 36,
+      radius: BorderRadius.circular(999),
+      color: bg,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      onTap: onTap,
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(icon, size: 16, color: fg),
+        const SizedBox(width: 6),
+        Text(label, style: TextStyle(color: fg, fontWeight: FontWeight.w700, fontSize: 12.5)),
+      ]),
     );
   }
 }

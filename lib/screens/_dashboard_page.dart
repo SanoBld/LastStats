@@ -3055,14 +3055,41 @@ class _DashStatCard extends StatelessWidget {
 
 // ── Now playing card ──────────────────────────────────────────────────────────
 
-// While a track is playing live, a slim rounded-square frame slowly spins
-// behind the artwork — only the frame turns, the photo itself stays still.
+// Rotates the outer path of a ShapeBorder around the box center, without
+// touching the content it clips — used so the Material You shape itself
+// spins while the artwork underneath stays perfectly still.
+class _RotatingShapeClipper extends CustomClipper<Path> {
+  final ShapeBorder shape;
+  final double      turns; // 0..1 (fraction of a full turn)
+  const _RotatingShapeClipper({required this.shape, required this.turns});
+
+  @override
+  Path getClip(Size size) {
+    final rect = Offset.zero & size;
+    final path = shape.getOuterPath(rect);
+    final m = Matrix4.identity()
+      ..translate(rect.center.dx, rect.center.dy)
+      ..rotateZ(turns * 2 * math.pi)
+      ..translate(-rect.center.dx, -rect.center.dy);
+    return path.transform(m.storage);
+  }
+
+  @override
+  bool shouldReclip(_RotatingShapeClipper old) =>
+      old.turns != turns || old.shape != shape;
+}
+
+// While a track is playing live, the artwork's own Material You shape
+// (whichever one is currently selected in Settings) slowly spins in place.
+// The image itself never moves or rotates — it fully fills the square
+// underneath, so as the shape mask turns there is never a seam or gap,
+// just a different slice of the same still photo showing through.
 class _NowPlayingSpinningArt extends StatefulWidget {
   final double size;
-  final Color  color;
+  final String seed; // same seed as the rest of the app picks the same shape
   final Widget child;
   const _NowPlayingSpinningArt(
-      {required this.size, required this.color, required this.child});
+      {required this.size, required this.seed, required this.child});
 
   @override
   State<_NowPlayingSpinningArt> createState() => _NowPlayingSpinningArtState();
@@ -3071,7 +3098,7 @@ class _NowPlayingSpinningArt extends StatefulWidget {
 class _NowPlayingSpinningArtState extends State<_NowPlayingSpinningArt>
     with SingleTickerProviderStateMixin {
   late final AnimationController _c =
-      AnimationController(vsync: this, duration: const Duration(seconds: 6))
+      AnimationController(vsync: this, duration: const Duration(seconds: 8))
         ..repeat();
 
   @override
@@ -3082,24 +3109,19 @@ class _NowPlayingSpinningArtState extends State<_NowPlayingSpinningArt>
 
   @override
   Widget build(BuildContext context) {
-    final frameSize = widget.size + 14;
-    return SizedBox(
-      width: frameSize, height: frameSize,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          RotationTransition(
-            turns: _c,
-            child: Container(
-              width: frameSize, height: frameSize,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(frameSize * 0.28),
-                border: Border.all(color: widget.color.withValues(alpha: 0.55), width: 2),
-              ),
-            ),
+    final idx = m3ShapeIndex(widget.seed);
+    return ValueListenableBuilder<String>(
+      valueListenable: imageShapeNotifier,
+      builder: (_, mode, _) => AnimatedBuilder(
+        animation: _c,
+        builder: (_, child) => ClipPath(
+          clipper: _RotatingShapeClipper(
+            shape: m3ResolveShape(mode, idx, widget.size),
+            turns: _c.value,
           ),
-          widget.child,
-        ],
+          child: child,
+        ),
+        child: SizedBox(width: widget.size, height: widget.size, child: widget.child),
       ),
     );
   }
@@ -3145,10 +3167,11 @@ class _NowPlayingCard extends StatelessWidget {
 
           _NowPlayingSpinningArt(
             size: 64,
-            color: scheme.secondary,
+            seed: '$title-$artist',
             child: _SmartImage(
               size: 64,
               borderRadius: 12,
+              shaped: false,
               initialUrl: rawUrl,
               resolver: () => ImageService.resolveTrack(title, artist,
                   lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null),
