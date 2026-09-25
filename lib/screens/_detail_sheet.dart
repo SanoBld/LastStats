@@ -218,6 +218,11 @@ class _CardBack extends StatelessWidget {
     outline:                 seeded.outline,
     outlineVariant:          seeded.outlineVariant,
     surfaceContainerHighest: seeded.surfaceContainerHighest,
+    // Was missing: every "tonal" block (period filter chips, the stats
+    // bubble, the plain M3Pill/M3TonalButton fill) reads this role, so
+    // leaving it out meant they kept the app's flat neutral colour
+    // instead of the poster's own tint even with the option on.
+    surfaceContainerHigh:    seeded.surfaceContainerHigh,
     onSurfaceVariant:        seeded.onSurfaceVariant,
   );
   final surface = Color.lerp(base.surface, artworkColor, 0.18)!;
@@ -858,7 +863,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       stops: const [0.0, 0.42, 0.68, 1.0],
                       colors: [
                         const Color(0x00000000), const Color(0x00000000),
-                        const Color(0x8C000000), const Color(0x8C000000),
+                        const Color(0x46000000), const Color(0x46000000),
                       ],
                     ),
                   ),
@@ -1752,18 +1757,14 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   // ── Track extra info ────────────────────────────────────────────────────────
 
-  // Opens the album's own poster (fullscreen card), not the Last.fm page.
-  Future<void> _openAlbumPoster(String album) async {
+  // Opens the album's own detail sheet (same page as tapping it anywhere
+  // else in the app) — not the fullscreen 3D card, not the Last.fm page.
+  void _openAlbumPoster(String album) {
     _haptic(_HapticImpact.light);
-    final url = await ImageService.resolveAlbum(album, _artist);
-    if (!mounted) return;
-    _pushFullscreen(context, url,
-        title: album, subtitle: _artist,
-        source: _tr({
-          'fr': 'Album', 'en': 'Album', 'es': 'Álbum', 'de': 'Album',
-          'it': 'Album', 'pt': 'Álbum', 'ru': 'Альбом', 'ja': 'アルバム',
-          'zh': '专辑', 'ar': 'ألبوم',
-        }));
+    showDetailSheet(context, {
+      'name':   album,
+      'artist': {'name': _artist, '#text': _artist},
+    }, 'albums', widget.service);
   }
 
   Widget _buildTrackExtra(ColorScheme scheme) {
