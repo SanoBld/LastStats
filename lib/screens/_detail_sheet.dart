@@ -959,10 +959,10 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                           color: scheme.outlineVariant.withValues(alpha: 0.4)),
                       _buildStatsRow(scheme),
                       _buildMusicLinks(scheme),
+                      // Heart + play — above the genre tags.
+                      if (widget.type == 'tracks') _buildActionRow(scheme),
                       if (_tags().isNotEmpty) _buildTags(scheme),
                       if (widget.type == 'tracks') _buildPreviewPlayer(scheme),
-                      // Heart + play, right above the biography
-                      if (widget.type == 'tracks') _buildActionRow(scheme),
                       if (_bio().isNotEmpty)  _FadeIn(child: _buildBio(scheme)),
                       if (widget.type == 'artists' && _topTracks.isNotEmpty)
                         _buildTopTracks(scheme),
