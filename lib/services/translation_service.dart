@@ -13,7 +13,7 @@ class TranslationService {
   static Future<String> translate(String text, String target) async {
     if (text.isEmpty) return '';
     try {
-      // Google splits long text into chunks of ~5000 chars internally,
+      // Google splits long text into chunks of ~5000 chars internally
       // but the free endpoint works fine for typical bios.
       final uri = Uri.https('translate.googleapis.com', '/translate_a/single', {
         'client': 'gtx',
