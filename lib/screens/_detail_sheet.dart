@@ -692,6 +692,12 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     return int.tryParse(v.toString()) ?? 0;
   }
 
+  // What the "your plays" chip should show: the top-200-based count for
+  // the selected period, or the exact uncapped count for "overall" when
+  // the top-200 lookup came back empty.
+  int get _displayUserPlays =>
+      (_userPlays == 0 && _period == 'overall') ? _myPlaycount() : _userPlays;
+
   // Small extra stat lines shown on the back of the fullscreen card.
   List<(IconData, String)> _cardExtraInfo() {
     // Own scrobbles for this exact item — shown on every type.
@@ -842,21 +848,17 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                 // The top fade is black (dark theme) or white (light theme),
                 // very subtle, and lives on the image only: once the body
                 // panel scrolls over the image it disappears with it.
+                // Only a soft dark scrim behind the title near the bottom of
+                // the image; no fade at the top (status bar area stays clean).
                 DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end:   Alignment.bottomCenter,
-                      stops: const [0.0, 0.09, 0.42, 0.68, 1.0],
+                      stops: const [0.0, 0.42, 0.68, 1.0],
                       colors: [
-                        Theme.of(ctx).brightness == Brightness.dark
-                            ? const Color(0x59000000)
-                            : const Color(0x66FFFFFF),
                         const Color(0x00000000), const Color(0x00000000),
-                        Theme.of(ctx).brightness == Brightness.dark
-                            ? const Color(0x8C000000) : const Color(0x00000000),
-                        Theme.of(ctx).brightness == Brightness.dark
-                            ? const Color(0x8C000000) : const Color(0x00000000),
+                        const Color(0x8C000000), const Color(0x8C000000),
                       ],
                     ),
                   ),
@@ -1040,9 +1042,10 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   Widget _buildHeader(BuildContext ctx, ColorScheme scheme, double imgH, bool hasImage) {
     final text = Theme.of(ctx).textTheme;
-    // White over the (dark) image in dark theme; in light theme the image
-    // fades into a light surface, so use the normal text colour.
-    final onImg = Theme.of(ctx).brightness == Brightness.dark;
+    // Title is always white over the artwork, in every theme, for all
+    // three item types (artist/album/track). Falls back to the normal
+    // text colour only when there is no image to sit on top of.
+    final onImg = true;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: Column(
@@ -1268,7 +1271,11 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           : _StatChip(
               key: const ValueKey('loaded'),
               icon: Icons.headphones_rounded,
-              value: _userPlays > 0 ? _fmt(_userPlays) : '—',
+              // getUserItemStats only searches the user's top-200 for the
+              // period, so it reports 0 for real scrobbles outside that
+              // top-200 (the exact count from *.getInfo does not have this
+              // cap, matching what the 3D map shows).
+              value: _displayUserPlays > 0 ? _fmt(_displayUserPlays) : '—',
               label: L.detailUserPlays, scheme: scheme, highlight: true,
             ),
     ));
@@ -1294,10 +1301,18 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       }
     }
 
+    // Global plays and your plays share one Material You bubble.
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: IntrinsicHeight(
-        child: Row(children: rowChildren),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        decoration: BoxDecoration(
+          color:        scheme.surfaceContainerHigh,
+          borderRadius: AppRadius.xlR,
+        ),
+        child: IntrinsicHeight(
+          child: Row(children: rowChildren),
+        ),
       ),
     );
   }
@@ -1313,15 +1328,15 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         children: tags.map((t) {
           final name = (t['name'] ?? '').toString();
           return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
             decoration: BoxDecoration(
-              color:        scheme.surfaceContainerHighest,
-              borderRadius: AppRadius.xlR,
-              border:       Border.all(color: scheme.outlineVariant),
+              color: scheme.secondaryContainer,
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.circular(999), // Material You stadium
             ),
             child: Text(name, style: TextStyle(
-              fontSize: 12, color: scheme.onSurfaceVariant,
-              fontWeight: FontWeight.w600,
+              fontSize: 12, color: scheme.onSecondaryContainer,
+              fontWeight: FontWeight.w700,
             )),
           );
         }).toList(),
@@ -1482,49 +1497,29 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               scheme.primary,
             ),
           ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8, runSpacing: 8,
             children: [
               if (bio.length > maxChars)
-                GestureDetector(
+                _M3Pill(
+                  scheme: scheme,
+                  icon: _bioExpanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                  label: _bioExpanded ? L.detailBioReadLess : L.detailBioReadMore,
                   onTap: () => setState(() => _bioExpanded = !_bioExpanded),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _bioExpanded ? L.detailBioReadLess : L.detailBioReadMore,
-                        style: TextStyle(
-                          color: scheme.primary,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      AnimatedRotation(
-                        turns:    _bioExpanded ? -0.5 : 0.0,
-                        duration: const Duration(milliseconds: 300),
-                        curve:    M3Motion.emphasized,
-                        child: Icon(Icons.expand_more_rounded,
-                            size: 18, color: scheme.primary),
-                      ),
-                    ],
-                  ),
-                )
-              else
-                const SizedBox.shrink(),
-              GestureDetector(
-                onTap: () => _openBioUrl(_lfmBioUrl()),
-                child: Text(_tr({
+                ),
+              _M3Pill(
+                scheme: scheme,
+                filled: true,
+                icon: Icons.open_in_new_rounded,
+                label: _tr({
                   'fr': 'Voir sur Last.fm', 'en': 'View on Last.fm',
                   'es': 'Ver en Last.fm', 'de': 'Auf Last.fm ansehen',
                   'it': 'Vedi su Last.fm', 'pt': 'Ver no Last.fm',
                   'ru': 'Смотреть на Last.fm', 'ja': 'Last.fm で見る',
                   'zh': '在 Last.fm 上查看', 'ar': 'عرض على Last.fm',
                 }),
-                  style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w600,
-                      fontSize: 12, decoration: TextDecoration.underline, decorationColor: scheme.primary),
-                ),
+                onTap: () => _openBioUrl(_lfmBioUrl()),
               ),
             ],
           ),
@@ -1768,26 +1763,55 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     final durStr = dur > 0
         ? '${dur ~/ 60000}:${((dur % 60000) ~/ 1000).toString().padLeft(2, '0')}' : '';
 
+    if (album.isEmpty && durStr.isEmpty) return const SizedBox.shrink();
+
+    Widget cell(String label, String value, {VoidCallback? onTap}) => Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppRadius.xlR,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(label, style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
+              const SizedBox(height: 2),
+              Row(mainAxisSize: MainAxisSize.min, children: [
+                Flexible(child: Text(value, overflow: TextOverflow.ellipsis,
+                    style: text.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: onTap != null ? scheme.primary : null))),
+                if (onTap != null) ...[
+                  const SizedBox(width: 4),
+                  Icon(Icons.chevron_right_rounded, size: 16, color: scheme.primary),
+                ],
+              ]),
+            ],
+          ),
+        ),
+      ),
+    );
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (album.isNotEmpty) ...[
-            Text(L.detailAlbumLabel,
-                style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
-            const SizedBox(height: 2),
-            Text(album, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 12),
-          ],
-          if (durStr.isNotEmpty) ...[
-            Text(L.detailDuration,
-                style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
-            const SizedBox(height: 2),
-            Text(durStr, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
-          ],
-          const SizedBox(height: 8),
-        ],
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: Container(
+        decoration: BoxDecoration(
+          color:        scheme.surfaceContainerHigh,
+          borderRadius: AppRadius.xlR,
+        ),
+        child: IntrinsicHeight(
+          child: Row(children: [
+            if (album.isNotEmpty)
+              cell(L.detailAlbumLabel, album, onTap: () => _openBioUrl(
+                  'https://www.last.fm/music/${Uri.encodeComponent(_artist)}'
+                  '/${Uri.encodeComponent(album)}')),
+            if (album.isNotEmpty && durStr.isNotEmpty)
+              VerticalDivider(width: 1, thickness: 1,
+                  color: scheme.outlineVariant.withValues(alpha: 0.5)),
+            if (durStr.isNotEmpty) cell(L.detailDuration, durStr),
+          ]),
+        ),
       ),
     );
   }
@@ -1837,10 +1861,12 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             child: Text(L.detailShoutbox,
                 style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
           ),
-          FilledButton.tonalIcon(
-            onPressed: _openShoutbox,
-            icon: const Icon(Icons.open_in_new_rounded, size: 16),
-            label: Text(L.detailShoutboxReply),
+          _M3Pill(
+            scheme: scheme,
+            filled: true,
+            icon: Icons.open_in_new_rounded,
+            label: L.detailShoutboxReply,
+            onTap: _openShoutbox,
           ),
         ],
       ),
@@ -1899,27 +1925,12 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       color: scheme.onSurfaceVariant, height: 1.6)),
             ),
             if (_lyrics.length > maxChars) ...[
-              const SizedBox(height: 8),
-              GestureDetector(
+              const SizedBox(height: 10),
+              _M3Pill(
+                scheme: scheme,
+                icon: _lyricsExpanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                label: _lyricsExpanded ? L.detailBioReadLess : L.detailBioReadMore,
                 onTap: () => setState(() => _lyricsExpanded = !_lyricsExpanded),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _lyricsExpanded ? L.detailBioReadLess : L.detailBioReadMore,
-                      style: TextStyle(color: scheme.primary,
-                          fontWeight: FontWeight.w600, fontSize: 13),
-                    ),
-                    const SizedBox(width: 4),
-                    AnimatedRotation(
-                      turns:    _lyricsExpanded ? -0.5 : 0.0,
-                      duration: const Duration(milliseconds: 300),
-                      curve:    M3Motion.emphasized,
-                      child: Icon(Icons.expand_more_rounded,
-                          size: 18, color: scheme.primary),
-                    ),
-                  ],
-                ),
               ),
             ],
           ],
@@ -2696,6 +2707,61 @@ class _ShareCardArt extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Small Material You pill button, used for "read more", "view on
+// Last.fm" and similar inline actions. Tonal fill, stadium shape, with a
+// tiny scale animation on press so it feels alive.
+class _M3Pill extends StatefulWidget {
+  final IconData      icon;
+  final String        label;
+  final VoidCallback  onTap;
+  final ColorScheme   scheme;
+  final bool          filled; // filled = primaryContainer, else surface tonal
+  const _M3Pill({
+    required this.icon, required this.label, required this.onTap,
+    required this.scheme, this.filled = false,
+  });
+
+  @override
+  State<_M3Pill> createState() => _M3PillState();
+}
+
+class _M3PillState extends State<_M3Pill> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = widget.filled
+        ? widget.scheme.primaryContainer
+        : widget.scheme.surfaceContainerHigh;
+    final fg = widget.filled
+        ? widget.scheme.onPrimaryContainer
+        : widget.scheme.primary;
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp:   (_) => setState(() => _pressed = false),
+      onTapCancel: () => setState(() => _pressed = false),
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        scale: _pressed ? 0.94 : 1.0,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOut,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: M3Motion.emphasized,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Icon(widget.icon, size: 16, color: fg),
+            const SizedBox(width: 6),
+            Text(widget.label, style: TextStyle(
+                color: fg, fontWeight: FontWeight.w700, fontSize: 12.5)),
+          ]),
         ),
       ),
     );

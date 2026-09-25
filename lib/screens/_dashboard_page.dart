@@ -3055,6 +3055,56 @@ class _DashStatCard extends StatelessWidget {
 
 // ── Now playing card ──────────────────────────────────────────────────────────
 
+// While a track is playing live, a slim rounded-square frame slowly spins
+// behind the artwork — only the frame turns, the photo itself stays still.
+class _NowPlayingSpinningArt extends StatefulWidget {
+  final double size;
+  final Color  color;
+  final Widget child;
+  const _NowPlayingSpinningArt(
+      {required this.size, required this.color, required this.child});
+
+  @override
+  State<_NowPlayingSpinningArt> createState() => _NowPlayingSpinningArtState();
+}
+
+class _NowPlayingSpinningArtState extends State<_NowPlayingSpinningArt>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c =
+      AnimationController(vsync: this, duration: const Duration(seconds: 6))
+        ..repeat();
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final frameSize = widget.size + 14;
+    return SizedBox(
+      width: frameSize, height: frameSize,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          RotationTransition(
+            turns: _c,
+            child: Container(
+              width: frameSize, height: frameSize,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(frameSize * 0.28),
+                border: Border.all(color: widget.color.withValues(alpha: 0.55), width: 2),
+              ),
+            ),
+          ),
+          widget.child,
+        ],
+      ),
+    );
+  }
+}
+
 class _NowPlayingCard extends StatelessWidget {
   final Map<String, dynamic> track;
   final LastFmService        service;
@@ -3093,12 +3143,16 @@ class _NowPlayingCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Row(children: [
 
-          _SmartImage(
+          _NowPlayingSpinningArt(
             size: 64,
-            borderRadius: 12,
-            initialUrl: rawUrl,
-            resolver: () => ImageService.resolveTrack(title, artist,
-                lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null),
+            color: scheme.secondary,
+            child: _SmartImage(
+              size: 64,
+              borderRadius: 12,
+              initialUrl: rawUrl,
+              resolver: () => ImageService.resolveTrack(title, artist,
+                  lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null),
+            ),
           ),
 
           const SizedBox(width: 14),
