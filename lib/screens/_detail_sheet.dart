@@ -2035,8 +2035,6 @@ class _BlurFadeImageState extends State<_BlurFadeImage>
               fit: BoxFit.cover,
               width:  double.infinity,
               height: double.infinity,
-              color:          Colors.black.withValues(alpha: 0.55),
-              colorBlendMode: BlendMode.darken,
               // loadingBuilder: image stays hidden until fully loaded,
               // preventing the intrinsic-size → BoxFit.cover jump
               loadingBuilder: (_, child, progress) {
@@ -2737,10 +2735,9 @@ class _ShareCardArt extends StatelessWidget {
 
 // ── Expressive title bubble ─────────────────────────────────────────────────
 // The item's title, in a Material You blob shape sized to fit it — never
-// wider than the text needs, and the text never spills past the shape.
-// Starts small (max half the header's width) and grows to fit the full
-// title on tap; shrinks back on a second tap.
-class _TitleBubble extends StatefulWidget {
+// wider than the text needs, sized to fit the title, capped at the full
+// header width for very long titles (where it ellipsizes).
+class _TitleBubble extends StatelessWidget {
   final String      text;
   final TextStyle   style;
   final ColorScheme scheme;
@@ -2750,12 +2747,6 @@ class _TitleBubble extends StatefulWidget {
     required this.scheme, required this.maxWidth,
   });
 
-  @override
-  State<_TitleBubble> createState() => _TitleBubbleState();
-}
-
-class _TitleBubbleState extends State<_TitleBubble> {
-  bool _expanded = false;
   static const _h = 52.0;
   static const _hPad = 20.0;
 
@@ -2784,41 +2775,31 @@ class _TitleBubbleState extends State<_TitleBubble> {
   @override
   Widget build(BuildContext context) {
     final tp = TextPainter(
-      text: TextSpan(text: widget.text, style: widget.style),
+      text: TextSpan(text: text, style: style),
       textDirection: Directionality.of(context),
       maxLines: 1,
     )..layout();
 
-    final natural       = tp.width + _hPad * 2;
-    // Base (collapsed) state now stretches to 3/4 of the header width
-    // instead of half — a tap still expands it a bit further, up to the
-    // full width, when the title doesn't already fit at 3/4.
-    final collapsedMax  = widget.maxWidth * 0.75;
-    final fitsCollapsed = natural <= collapsedMax;
-    final targetWidth   = (fitsCollapsed || _expanded)
-        ? math.min(natural, widget.maxWidth)
-        : collapsedMax;
+    final natural     = tp.width + _hPad * 2;
+    final targetWidth = math.min(natural, maxWidth);
 
-    return GestureDetector(
-      onTap: fitsCollapsed ? null : () => setState(() => _expanded = !_expanded),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 380),
-        curve:    M3Motion.emphasized,
-        width:    targetWidth,
-        height:   _h,
-        alignment: Alignment.center,
-        padding:  const EdgeInsets.symmetric(horizontal: _hPad),
-        decoration: ShapeDecoration(
-          color: widget.scheme.primaryContainer,
-          shape: _shapeFor(m3ShapeIndex(widget.text)),
-        ),
-        child: Text(
-          widget.text,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          softWrap: false,
-          style: widget.style.copyWith(color: widget.scheme.onPrimaryContainer),
-        ),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 380),
+      curve:    M3Motion.emphasized,
+      width:    targetWidth,
+      height:   _h,
+      alignment: Alignment.center,
+      padding:  const EdgeInsets.symmetric(horizontal: _hPad),
+      decoration: ShapeDecoration(
+        color: scheme.primaryContainer,
+        shape: _shapeFor(m3ShapeIndex(text)),
+      ),
+      child: Text(
+        text,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
+        style: style.copyWith(color: scheme.onPrimaryContainer),
       ),
     );
   }
@@ -3181,16 +3162,19 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           ),
         ),
 
-        // Gradient overlay: dark top → surface at bottom
+        // Fades the banner into the surface at the bottom — same soft
+        // blend as the artist/album/track poster, no dark tint on the
+        // photo itself, just enough of a surface fade for the content
+        // below to read cleanly.
         Positioned.fill(
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin:  Alignment.topCenter,
                 end:    Alignment.bottomCenter,
-                stops:  const [0.0, 0.28, 0.52, 1.0],
+                stops:  const [0.0, 0.5, 0.78, 1.0],
                 colors: [
-                  Colors.black.withValues(alpha: 0.55),
+                  Colors.transparent,
                   Colors.transparent,
                   surface.withValues(alpha: 0.82),
                   surface,
@@ -3343,31 +3327,32 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
             color: scheme.primary,
             borderRadius: AppRadius.xlR,
           ),
-          child: const Text(
+          child: Text(
             'Profil',
             style: TextStyle(
-              color: Colors.white, fontSize: 11,
+              color: scheme.onPrimary, fontSize: 11,
               fontWeight: FontWeight.w700, letterSpacing: 0.8,
             ),
           ),
         ),
         const SizedBox(height: 8),
 
-        Text(
-          name,
-          style: text.headlineMedium?.copyWith(
-            fontWeight: FontWeight.w900,
-            color: Colors.white,
-            shadows: [Shadow(blurRadius: 8,
-                color: Colors.black.withValues(alpha: 0.5))],
-          ),
+        _TitleBubble(
+          text: name,
+          scheme: scheme,
+          style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w900) ??
+              const TextStyle(fontWeight: FontWeight.w900, fontSize: 28),
+          maxWidth: MediaQuery.of(ctx).size.width - 40,
         ),
 
         if (realName.isNotEmpty) ...[
-          const SizedBox(height: 3),
+          const SizedBox(height: 4),
           Text(realName,
-            style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.75), fontSize: 13)),
+            style: text.bodyLarge?.copyWith(
+                color: Colors.white.withValues(alpha: 0.85),
+                fontWeight: FontWeight.w500,
+                shadows: [Shadow(blurRadius: 6,
+                    color: Colors.black.withValues(alpha: 0.5))])),
         ],
 
         if (_isNowPlaying) ...[
