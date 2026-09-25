@@ -1087,30 +1087,22 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           ),
           const SizedBox(height: 8),
           _TitleBubble(
-            // For a track, the artist rides along inside the same block —
-            // there's no separate artist line below it in that case.
-            text: widget.type == 'tracks' && _artist.isNotEmpty
-                ? '$_name — $_artist' : _name,
+            text: _name,
+            subtitle: widget.type != 'artists' ? _artist : null,
+            subtitleStyle: text.bodyLarge?.copyWith(
+              color:      hasImage && onImg
+                  ? Colors.white.withValues(alpha: 0.85)
+                  : scheme.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
+              shadows: hasImage && onImg
+                  ? [Shadow(blurRadius: 6, color: Colors.black.withValues(alpha: 0.5))]
+                  : null,
+            ),
             scheme: scheme,
             style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w900) ??
                 const TextStyle(fontWeight: FontWeight.w900, fontSize: 28),
             maxWidth: MediaQuery.of(ctx).size.width - 40,
           ),
-          if (widget.type != 'tracks' && _artist.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(
-              _artist,
-              style: text.bodyLarge?.copyWith(
-                color:      hasImage && onImg
-                    ? Colors.white.withValues(alpha: 0.85)
-                    : scheme.onSurfaceVariant,
-                fontWeight: FontWeight.w500,
-                shadows: hasImage && onImg
-                    ? [Shadow(blurRadius: 6, color: Colors.black.withValues(alpha: 0.5))]
-                    : null,
-              ),
-            ),
-          ],
           const SizedBox(height: 4),
         ],
       ),
@@ -2739,12 +2731,14 @@ class _ShareCardArt extends StatelessWidget {
 // header width for very long titles (where it ellipsizes).
 class _TitleBubble extends StatelessWidget {
   final String      text;
+  final String?     subtitle;      // artist / real name — sits on the same line
   final TextStyle   style;
+  final TextStyle?  subtitleStyle;
   final ColorScheme scheme;
   final double      maxWidth; // full width available in the header
   const _TitleBubble({
-    required this.text, required this.style,
-    required this.scheme, required this.maxWidth,
+    required this.text, this.subtitle, required this.style,
+    this.subtitleStyle, required this.scheme, required this.maxWidth,
   });
 
   static const _h = 52.0;
@@ -2780,29 +2774,82 @@ class _TitleBubble extends StatelessWidget {
       maxLines: 1,
     )..layout();
 
-    final natural     = tp.width + _hPad * 2;
-    final targetWidth = math.min(natural, maxWidth);
+    final hasSubtitle = subtitle != null && subtitle!.isNotEmpty;
+    final natural      = tp.width + _hPad * 2;
+    // With an artist/name riding along on the same line, the bubble only
+    // gets a share of the width — the rest goes to that text. On its own
+    // it can use the full width.
+    final bubbleCap    = hasSubtitle ? maxWidth * 0.62 : maxWidth;
+    final bubbleWidth  = math.min(natural, bubbleCap);
+    // When the title doesn't fit even at the cap, it no longer gets cut
+    // off with "…" — the shape scrolls horizontally so the whole title
+    // can be swiped into view without ever spilling past its own edges.
+    final overflows    = natural > bubbleWidth + 0.5;
+    final shape        = _shapeFor(m3ShapeIndex(text));
 
-    return AnimatedContainer(
+    final bubble = AnimatedContainer(
       duration: const Duration(milliseconds: 380),
       curve:    M3Motion.emphasized,
-      width:    targetWidth,
+      width:    bubbleWidth,
       height:   _h,
       alignment: Alignment.center,
-      padding:  const EdgeInsets.symmetric(horizontal: _hPad),
-      decoration: ShapeDecoration(
-        color: scheme.primaryContainer,
-        shape: _shapeFor(m3ShapeIndex(text)),
-      ),
-      child: Text(
-        text,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        softWrap: false,
-        style: style.copyWith(color: scheme.onPrimaryContainer),
-      ),
+      decoration: ShapeDecoration(color: scheme.primaryContainer, shape: shape),
+      child: overflows
+          ? ClipPath(
+              clipper: ShapeBorderClipper(shape: shape),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: _hPad),
+                child: Text(text, maxLines: 1, softWrap: false,
+                    style: style.copyWith(color: scheme.onPrimaryContainer)),
+              ),
+            )
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: _hPad),
+              child: Text(text, maxLines: 1, softWrap: false,
+                  style: style.copyWith(color: scheme.onPrimaryContainer)),
+            ),
+    );
+
+    if (!hasSubtitle) return bubble;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        bubble,
+        const SizedBox(width: 10),
+        Flexible(
+          child: Text(subtitle!, maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: subtitleStyle),
+        ),
+      ],
     );
   }
+}
+
+// ── Ring outline in a Material You shape (star burst / circle) ─────────────
+// Used for the "now playing" ring around a friend's avatar so it always
+// matches the avatar's own shape (star when favourited, circle otherwise).
+class _ShapeRingPainter extends CustomPainter {
+  final ShapeBorder shape;
+  final Color       color;
+  final double      width;
+  const _ShapeRingPainter({required this.shape, required this.color, required this.width});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = (Offset.zero & size).deflate(width / 2);
+    final path = shape.getOuterPath(rect);
+    canvas.drawPath(path, Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = width
+      ..color = color);
+  }
+
+  @override
+  bool shouldRepaint(_ShapeRingPainter old) =>
+      old.shape != shape || old.color != color || old.width != width;
 }
 
 // ── Small Material You pill button, used for "read more", "view on
@@ -3145,41 +3192,38 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
 
     return Stack(
       children: [
-        // Background: blurred banner image or gradient fallback
-        Positioned.fill(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 500),
-            transitionBuilder: (child, anim) =>
-                FadeTransition(opacity: anim, child: child),
-            child: hasImage
-                ? _BlurFadeImage(
-                    key: ValueKey(_bannerUrl),
-                    url: _bannerUrl,
-                    fallback: _DetailGradientBg(scheme: scheme),
-                  )
-                : _DetailGradientBg(
-                    key: const ValueKey('fallback'), scheme: scheme),
-          ),
-        ),
+        // Plain surface behind everything; the banner fades into it —
+        // exact same technique as the artist/album/track poster's hero.
+        Positioned.fill(child: ColoredBox(color: surface)),
 
-        // Fades the banner into the surface at the bottom — same soft
-        // blend as the artist/album/track poster, no dark tint on the
-        // photo itself, just enough of a surface fade for the content
-        // below to read cleanly.
-        Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin:  Alignment.topCenter,
-                end:    Alignment.bottomCenter,
-                stops:  const [0.0, 0.5, 0.78, 1.0],
-                colors: [
-                  Colors.transparent,
-                  Colors.transparent,
-                  surface.withValues(alpha: 0.82),
-                  surface,
-                ],
-              ),
+        Positioned(
+          top: 0, left: 0, right: 0,
+          height: imgH + 200,
+          child: ShaderMask(
+            blendMode: BlendMode.dstIn,
+            shaderCallback: (r) => const LinearGradient(
+              begin: Alignment.topCenter,
+              end:   Alignment.bottomCenter,
+              stops: [0.0, 0.30, 0.42, 0.54, 0.65, 0.76, 0.86, 0.94, 1.0],
+              colors: [
+                Colors.black,
+                Color(0xF2000000), Color(0xD9000000), Color(0xB0000000),
+                Color(0x80000000), Color(0x52000000), Color(0x2B000000),
+                Color(0x0F000000), Colors.transparent,
+              ],
+            ).createShader(r),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 500),
+              transitionBuilder: (child, anim) =>
+                  FadeTransition(opacity: anim, child: child),
+              child: hasImage
+                  ? _BlurFadeImage(
+                      key: ValueKey(_bannerUrl),
+                      url: _bannerUrl,
+                      fallback: _DetailGradientBg(scheme: scheme),
+                    )
+                  : _DetailGradientBg(
+                      key: const ValueKey('fallback'), scheme: scheme),
             ),
           ),
         ),
@@ -3219,7 +3263,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildStatsRow(scheme),
-                      _buildCompareButton(context),
+                      _buildCompareButton(ctx),
                       _buildFriendSyncStatus(scheme),
                       if (achievementsEnabledNotifier.value)
                         _buildAchievementsPreview(ctx, scheme),
@@ -3249,45 +3293,51 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
         // Status bar scrim — always above the scroll content
         _StatusBarScrim(height: topPad),
 
-        // Back button — same style as detail sheets
+        // Back + favourite: one glued Material You group, top-left — same
+        // connected-pill treatment as the artist/album/track poster's
+        // back+motion-toggle group, instead of a floating black circle.
         Positioned(
           top: topPad + 8, left: 12,
-          child: M3TonalButton(
-            width: 44, height: 44,
-            radius: BorderRadius.circular(16),
-            padding: EdgeInsets.zero,
-            color: scheme.secondaryContainer,
-            onTap: () => Navigator.pop(ctx),
-            child: Icon(Icons.arrow_back_rounded,
-                color: scheme.onSecondaryContainer, size: 22),
-          ),
-        ),
-
-        // Favourite button top-right
-        Positioned(
-          top: topPad + 8, right: 12,
-          child: GestureDetector(
-            onTap: () {
-              _haptic(_HapticImpact.heavy);
-              setState(() => _localIsFav = !_localIsFav);
-              widget.onToggleFav();
-            },
-            child: Container(
-              width: 36, height: 36,
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.45),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                _localIsFav ? Icons.star_rounded : Icons.star_outline_rounded,
-                size: 20,
-                color: _localIsFav ? Colors.amber.shade400 : Colors.white,
-              ),
-            ),
-          ),
+          child: _headerButtonGroup(ctx, scheme),
         ),
       ],
     );
+  }
+
+  // Back button, plus the favourite star glued right next to it — same
+  // connected-pill language as the artist/album/track poster's header group.
+  Widget _headerButtonGroup(BuildContext ctx, ColorScheme scheme) {
+    BorderRadius r(bool first, bool last) => BorderRadius.horizontal(
+        left:  Radius.circular(first ? 22 : 6),
+        right: Radius.circular(last  ? 22 : 6));
+    Widget btn(Widget icon, VoidCallback? onTap, BorderRadius radius) => M3TonalButton(
+        width: 44, height: 44,
+        radius: radius,
+        padding: EdgeInsets.zero,
+        color: scheme.secondaryContainer,
+        onTap: onTap,
+        child: icon,
+      );
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      btn(Icon(Icons.arrow_back_rounded, color: scheme.onSecondaryContainer, size: 22),
+          () => Navigator.pop(ctx), r(true, false)),
+      Padding(
+        padding: const EdgeInsets.only(left: 3),
+        child: btn(
+          Icon(
+            _localIsFav ? Icons.star_rounded : Icons.star_outline_rounded,
+            color: _localIsFav ? Colors.amber.shade400 : scheme.onSecondaryContainer,
+            size: 22,
+          ),
+          () {
+            _haptic(_HapticImpact.heavy);
+            setState(() => _localIsFav = !_localIsFav);
+            widget.onToggleFav();
+          },
+          r(false, true),
+        ),
+      ),
+    ]);
   }
 
   // Profile header (replaces _buildBanner) — same layout as _buildHeader
@@ -3339,21 +3389,18 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
 
         _TitleBubble(
           text: name,
+          subtitle: realName.isNotEmpty ? realName : null,
+          subtitleStyle: text.bodyLarge?.copyWith(
+              color: Colors.white.withValues(alpha: 0.85),
+              fontWeight: FontWeight.w500,
+              shadows: [Shadow(blurRadius: 6,
+                  color: Colors.black.withValues(alpha: 0.5))]),
           scheme: scheme,
           style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w900) ??
               const TextStyle(fontWeight: FontWeight.w900, fontSize: 28),
           maxWidth: MediaQuery.of(ctx).size.width - 40,
         ),
-
-        if (realName.isNotEmpty) ...[
-          const SizedBox(height: 4),
-          Text(realName,
-            style: text.bodyLarge?.copyWith(
-                color: Colors.white.withValues(alpha: 0.85),
-                fontWeight: FontWeight.w500,
-                shadows: [Shadow(blurRadius: 6,
-                    color: Colors.black.withValues(alpha: 0.5))])),
-        ],
+        const SizedBox(height: 4),
 
         if (_isNowPlaying) ...[
           const SizedBox(height: 8),
@@ -3393,24 +3440,41 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
       ],
     );
 
-    // Avatar — anchored bottom-right, next to the text block
+    // Avatar — anchored bottom-right, next to the text block. Shape follows
+    // favourite status: a Material You star burst for favourite friends,
+    // a plain circle otherwise — same shape language as the rest of the
+    // poster's Material You blocks.
+    final avatarShape = _localIsFav
+        ? const M3CookieBorder(lobes: 8, amplitude: 0.38)
+        : const CircleBorder();
     final avatar = Stack(alignment: Alignment.center, children: [
       if (_isNowPlaying)
-        Container(
+        SizedBox(
           width: 96, height: 96,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.greenAccent.shade400, width: 3),
+          child: CustomPaint(
+            painter: _ShapeRingPainter(
+              shape: avatarShape,
+              color: Colors.greenAccent.shade400,
+              width: 3,
+            ),
           ),
         ),
-      CircleAvatar(
-        radius: 42,
-        backgroundColor: scheme.primaryContainer,
-        backgroundImage: hasAv ? NetworkImage(avatarUrl) : null,
-        child: hasAv ? null : Text(
-          name.isNotEmpty ? name[0].toUpperCase() : '?',
-          style: const TextStyle(
-              color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900),
+      ClipPath(
+        clipper: ShapeBorderClipper(shape: avatarShape),
+        child: SizedBox(
+          width: 84, height: 84,
+          child: hasAv
+              ? Image.network(avatarUrl, fit: BoxFit.cover)
+              : ColoredBox(
+                  color: scheme.primaryContainer,
+                  child: Center(
+                    child: Text(
+                      name.isNotEmpty ? name[0].toUpperCase() : '?',
+                      style: const TextStyle(
+                          color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900),
+                    ),
+                  ),
+                ),
         ),
       ),
       if (_isNowPlaying)
