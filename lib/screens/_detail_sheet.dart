@@ -325,27 +325,6 @@ class _DismissOnOverscrollState extends State<_DismissOnOverscroll> {
   );
 }
 
-// ── Status bar scrim ────────────────────────────────────────────────────────
-// Keeps system status bar icons (time, battery, wifi) legible above the
-// scrolling content, regardless of scroll position.
-class _StatusBarScrim extends StatelessWidget {
-  final double height;
-  const _StatusBarScrim({required this.height});
-
-  @override
-  Widget build(BuildContext context) => Positioned(
-    top: 0, left: 0, right: 0, height: height,
-    child: IgnorePointer(
-      child: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(color: Colors.black.withValues(alpha: 0.22)),
-        ),
-      ),
-    ),
-  );
-}
-
 void showDetailSheet(
   BuildContext context,
   Map<String, dynamic> item,
@@ -1089,6 +1068,9 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           _TitleBubble(
             text: _name,
             subtitle: widget.type != 'artists' ? _artist : null,
+            onSubtitleTap: widget.type != 'artists' && _artist.isNotEmpty
+                ? () => showDetailSheet(ctx, {'name': _artist}, 'artists', widget.service)
+                : null,
             subtitleStyle: text.bodyLarge?.copyWith(
               color:      hasImage && onImg
                   ? Colors.white.withValues(alpha: 0.85)
@@ -2739,7 +2721,10 @@ class _TitleBubble extends StatelessWidget {
   const _TitleBubble({
     required this.text, this.subtitle, required this.style,
     this.subtitleStyle, required this.scheme, required this.maxWidth,
+    this.onSubtitleTap,
   });
+
+  final VoidCallback? onSubtitleTap; // tapping the artist opens their own poster
 
   static const _h = 52.0;
   static const _hPad = 20.0;
@@ -2773,14 +2758,20 @@ class _TitleBubble extends StatelessWidget {
 
     // Title + artist are built as one rich run of text — that way, when
     // it's too long, they scroll together inside the same shape instead
-    // of the artist being split off outside it.
+    // of the artist being split off outside it. Tapping the artist part
+    // (when a callback is given) opens their own poster.
+    final subtitleRecognizer = (hasSubtitle && onSubtitleTap != null)
+        ? (TapGestureRecognizer()..onTap = onSubtitleTap) : null;
     final span = TextSpan(children: [
       TextSpan(text: text, style: style.copyWith(color: onColor)),
       if (hasSubtitle)
         TextSpan(
           text: '  •  $subtitle',
+          recognizer: subtitleRecognizer,
           style: (subtitleStyle ?? style).copyWith(
-              color: onColor.withValues(alpha: 0.75), fontWeight: FontWeight.w600),
+              color: onColor.withValues(alpha: 0.75), fontWeight: FontWeight.w600,
+              decoration: subtitleRecognizer != null ? TextDecoration.underline : null,
+              decorationColor: onColor.withValues(alpha: 0.4)),
         ),
     ]);
 
@@ -3177,7 +3168,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
   Widget _buildContent(BuildContext ctx, ColorScheme scheme, Color surface) {
     final mediaH    = MediaQuery.of(ctx).size.height;
     final topPad    = MediaQuery.of(ctx).padding.top;
-    final imgH      = mediaH * 0.42;
+    final imgH      = mediaH * 0.44;
     final hasImage  = _bannerUrl.isNotEmpty;
     final info      = _info ?? {};
     final avatarUrl = _extractImage(info['image']);
@@ -3224,7 +3215,12 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
         // Scrollable content — pull-down-to-dismiss via overscroll.
         // ClampingScrollPhysics lets the native Android stretch overscroll
         // show through instead of forcing the iOS-style bounce.
-        _DismissOnOverscroll(
+        // Same as the artist/album/track poster: the system status bar only
+        // gets a solid backing once the banner has scrolled past it.
+        Positioned.fill(child: ScrollStatusBarHost(
+          threshold: imgH - 60,
+          color: Color.alphaBlend(scheme.primary.withValues(alpha: 0.16), surface),
+          child: _DismissOnOverscroll(
           onDismiss: () => Navigator.pop(ctx),
           child: SingleChildScrollView(
             physics: const ClampingScrollPhysics(
@@ -3281,10 +3277,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
               ],
             ),
           ),
-        ),
-
-        // Status bar scrim — always above the scroll content
-        _StatusBarScrim(height: topPad),
+        ))),
 
         // Back + favourite: one glued Material You group, top-left — same
         // connected-pill treatment as the artist/album/track poster's
@@ -3890,8 +3883,17 @@ class _BannerMeta extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
-    Icon(icon, size: 12, color: Colors.white.withValues(alpha: 0.75)),
-    const SizedBox(width: 4),
+    // Icon sits inside its own small circle — same rounded, contained
+    // look as the rest of the poster's Material You badges.
+    Container(
+      width: 22, height: 22,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white.withValues(alpha: 0.18),
+      ),
+      child: Icon(icon, size: 12, color: Colors.white.withValues(alpha: 0.9)),
+    ),
+    const SizedBox(width: 6),
     Text(label,
       style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 12)),
   ]);

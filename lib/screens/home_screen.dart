@@ -22,6 +22,7 @@ import 'dart:ui';
 import 'dart:ui' as ui;
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart' show TapGestureRecognizer;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData, HapticFeedback, rootBundle, LogicalKeyboardKey;
 import 'package:http/http.dart' as http;
