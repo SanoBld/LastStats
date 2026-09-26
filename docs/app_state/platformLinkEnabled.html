@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the musicPlatformNotifier property from the app_state library, for the Dart programming language.">
-  <title>musicPlatformNotifier property - app_state library - Dart API</title>
+  <meta name="description" content="API docs for the platformLinkEnabled function from the app_state library, for the Dart programming language.">
+  <title>platformLinkEnabled function - app_state library - Dart API</title>
 
 
   
@@ -26,9 +26,9 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">laststats_mobile</a></li>
     <li><a href="../app_state/">app_state.dart</a></li>
-    <li class="self-crumb">musicPlatformNotifier property</li>
+    <li class="self-crumb">platformLinkEnabled function</li>
   </ol>
-  <div class="self-name">musicPlatformNotifier</div>
+  <div class="self-name">platformLinkEnabled</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -48,25 +48,28 @@
       data-above-sidebar="app_state&#47;app_state-library-sidebar.html"
       data-below-sidebar="">
       <div>
-<h1><span class="kind-top-level-property">musicPlatformNotifier</span> top-level property 
+<h1><span class="kind-function">platformLinkEnabled</span> function 
  
 </h1></div>
 
-        <section class="multi-line-signature">
-          
-          <a href="https://api.flutter.dev/flutter/foundation/ValueNotifier-class.html">ValueNotifier</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span>
-          <span class="name ">musicPlatformNotifier</span>
-          <div class="features"><span class="feature">final</span></div>
-
-        </section>
+    <section class="multi-line-signature">
         
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+<span class="name ">platformLinkEnabled</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="platformLinkEnabled-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span></span></li>
+</ol>)
 
         
+
+    </section>
+    
+
+
+    
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">final musicPlatformNotifier = ValueNotifier&lt;String&gt;(&#39;&#39;);</code></pre>
+  <pre class="language-dart"><code class="language-dart">bool platformLinkEnabled(String key) =&gt;
+    platformLinksShowAll() || musicPlatformNotifier.value.split(&#39;,&#39;).contains(key);</code></pre>
 </section>
-
 
 
   </div> <!-- /.main-content -->
@@ -80,7 +83,7 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">laststats_mobile</a></li>
     <li><a href="../app_state/">app_state</a></li>
-    <li class="self-crumb">musicPlatformNotifier property</li>
+    <li class="self-crumb">platformLinkEnabled function</li>
 </ol>
 
     <h5>app_state library</h5>
