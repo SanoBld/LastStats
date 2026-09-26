@@ -3080,9 +3080,9 @@ class _RotatingShapeClipper extends CustomClipper<Path> {
     );
     final path = shape.getOuterPath(innerRect);
     final m = Matrix4.identity()
-      ..translate(rect.center.dx, rect.center.dy)
+      ..translateByDouble(rect.center.dx, rect.center.dy, 0, 1)
       ..rotateZ(turns * 2 * math.pi)
-      ..translate(-rect.center.dx, -rect.center.dy);
+      ..translateByDouble(-rect.center.dx, -rect.center.dy, 0, 1);
     return path.transform(m.storage);
   }
 

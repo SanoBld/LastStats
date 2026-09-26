@@ -2768,26 +2768,36 @@ class _TitleBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasSubtitle = subtitle != null && subtitle!.isNotEmpty;
+    final onColor     = scheme.onPrimaryContainer;
+
+    // Title + artist are built as one rich run of text — that way, when
+    // it's too long, they scroll together inside the same shape instead
+    // of the artist being split off outside it.
+    final span = TextSpan(children: [
+      TextSpan(text: text, style: style.copyWith(color: onColor)),
+      if (hasSubtitle)
+        TextSpan(
+          text: '  •  $subtitle',
+          style: (subtitleStyle ?? style).copyWith(
+              color: onColor.withValues(alpha: 0.75), fontWeight: FontWeight.w600),
+        ),
+    ]);
+
     final tp = TextPainter(
-      text: TextSpan(text: text, style: style),
-      textDirection: Directionality.of(context),
-      maxLines: 1,
+      text: span, textDirection: Directionality.of(context), maxLines: 1,
     )..layout();
 
-    final hasSubtitle = subtitle != null && subtitle!.isNotEmpty;
-    final natural      = tp.width + _hPad * 2;
-    // With an artist/name riding along on the same line, the bubble only
-    // gets a share of the width — the rest goes to that text. On its own
-    // it can use the full width.
-    final bubbleCap    = hasSubtitle ? maxWidth * 0.62 : maxWidth;
-    final bubbleWidth  = math.min(natural, bubbleCap);
-    // When the title doesn't fit even at the cap, it no longer gets cut
-    // off with "…" — the shape scrolls horizontally so the whole title
-    // can be swiped into view without ever spilling past its own edges.
-    final overflows    = natural > bubbleWidth + 0.5;
-    final shape        = _shapeFor(m3ShapeIndex(text));
+    final natural     = tp.width + _hPad * 2;
+    final bubbleWidth = math.min(natural, maxWidth);
+    // When even the full width isn't enough, it no longer gets cut off
+    // with "…" — the shape scrolls horizontally so the whole title (and
+    // the artist riding along with it) can be swiped into view without
+    // ever spilling past the shape's own edges.
+    final overflows = natural > bubbleWidth + 0.5;
+    final shape     = _shapeFor(m3ShapeIndex(text));
 
-    final bubble = AnimatedContainer(
+    return AnimatedContainer(
       duration: const Duration(milliseconds: 380),
       curve:    M3Motion.emphasized,
       width:    bubbleWidth,
@@ -2800,30 +2810,13 @@ class _TitleBubble extends StatelessWidget {
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: _hPad),
-                child: Text(text, maxLines: 1, softWrap: false,
-                    style: style.copyWith(color: scheme.onPrimaryContainer)),
+                child: Text.rich(span, maxLines: 1, softWrap: false),
               ),
             )
           : Padding(
               padding: const EdgeInsets.symmetric(horizontal: _hPad),
-              child: Text(text, maxLines: 1, softWrap: false,
-                  style: style.copyWith(color: scheme.onPrimaryContainer)),
+              child: Text.rich(span, maxLines: 1, softWrap: false),
             ),
-    );
-
-    if (!hasSubtitle) return bubble;
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        bubble,
-        const SizedBox(width: 10),
-        Flexible(
-          child: Text(subtitle!, maxLines: 1, overflow: TextOverflow.ellipsis,
-              style: subtitleStyle),
-        ),
-      ],
     );
   }
 }
@@ -3445,7 +3438,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     // a plain circle otherwise — same shape language as the rest of the
     // poster's Material You blocks.
     final avatarShape = _localIsFav
-        ? const M3CookieBorder(lobes: 8, amplitude: 0.38)
+        ? const M3CookieBorder(lobes: 10, amplitude: 0.20)
         : const CircleBorder();
     final avatar = Stack(alignment: Alignment.center, children: [
       if (_isNowPlaying)

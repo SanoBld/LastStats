@@ -712,7 +712,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
 
         _FadeSlideIn(
           delay: const Duration(milliseconds: 80),
-          child: Center(child: _CompatibilityRing(score: _score)),
+          child: Center(child: _CompatibilityBadge(score: _score)),
         ),
         const SizedBox(height: 8),
 
@@ -739,7 +739,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
                 alignment: WrapAlignment.center,
                 children: [
                   if (_totalArtists > 0) _CountPill(
-                    icon: Icons.mic_rounded,
+                    icon: Icons.mic_rounded, seed: 0,
                     label: _ct('$_totalArtists artiste${_totalArtists > 1 ? "s" : ""}',
                                '$_totalArtists artist${_totalArtists > 1 ? "s" : ""}',
                                es: '$_totalArtists artista${_totalArtists > 1 ? "s" : ""}',
@@ -748,7 +748,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
                     scheme: scheme, text: text,
                   ),
                   if (_totalTracks > 0) _CountPill(
-                    icon: Icons.music_note_rounded,
+                    icon: Icons.music_note_rounded, seed: 1,
                     label: _ct('$_totalTracks titre${_totalTracks > 1 ? "s" : ""}',
                                '$_totalTracks track${_totalTracks > 1 ? "s" : ""}',
                                es: '$_totalTracks canción${_totalTracks > 1 ? "es" : ""}',
@@ -757,7 +757,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
                     scheme: scheme, text: text,
                   ),
                   if (_totalAlbums > 0) _CountPill(
-                    icon: Icons.album_rounded,
+                    icon: Icons.album_rounded, seed: 2,
                     label: _ct('$_totalAlbums album${_totalAlbums > 1 ? "s" : ""}',
                                '$_totalAlbums album${_totalAlbums > 1 ? "s" : ""}',
                                es: '$_totalAlbums álbum${_totalAlbums > 1 ? "es" : ""}',
@@ -1424,11 +1424,13 @@ class _DuoAvatars extends StatelessWidget {
   }
 }
 
-// ── Animated compatibility ring ───────────────────────────────────────────────
+// ── Compatibility badge — Material You blob instead of a plain circular
+// progress ring, same scallop-shape language as the poster title blocks
+// and the "now playing" avatar ring. ──────────────────────────────────────
 
-class _CompatibilityRing extends StatelessWidget {
+class _CompatibilityBadge extends StatelessWidget {
   final double score;
-  const _CompatibilityRing({required this.score});
+  const _CompatibilityBadge({required this.score});
 
   @override
   Widget build(BuildContext context) {
@@ -1439,41 +1441,37 @@ class _CompatibilityRing extends StatelessWidget {
       tween:    Tween(begin: 0, end: score),
       duration: const Duration(milliseconds: 1100),
       curve:    M3Motion.emphasizedDecelerate,
-      builder: (context, value, _) => SizedBox(
-        width: 152, height: 152,
-        child: Stack(
+      builder: (context, value, _) {
+        // The blob gets a touch more expressive (deeper scallops) the
+        // higher the compatibility — a shape that grows with the score,
+        // instead of a bar that just fills up.
+        final amplitude = 0.05 + value * 0.12;
+        return Container(
+          width: 168, height: 168,
           alignment: Alignment.center,
-          children: [
-            SizedBox(
-              width: 152, height: 152,
-              child: CircularProgressIndicator(
-                value:           value,
-                strokeWidth:     12,
-                strokeCap:       StrokeCap.round,
-                backgroundColor: scheme.surfaceContainerHighest,
-                valueColor:      AlwaysStoppedAnimation(scheme.primary),
+          decoration: ShapeDecoration(
+            color: scheme.primaryContainer,
+            shape: M3CookieBorder(lobes: 10, amplitude: amplitude),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '${(value * 100).round()}%',
+                style: text.displaySmall?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: scheme.onPrimaryContainer, height: 1),
               ),
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '${(value * 100).round()}%',
-                  style: text.displaySmall?.copyWith(
-                      fontWeight: FontWeight.w900,
-                      color: scheme.onSurface, height: 1),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  _ct('compatibilité', 'compatibility', es: 'compatibilidad', zh: '契合度', pt: 'compatibilidade'),
-                  style: text.labelSmall?.copyWith(
-                      color: scheme.onSurfaceVariant, letterSpacing: 0.6),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+              const SizedBox(height: 2),
+              Text(
+                _ct('compatibilité', 'compatibility', es: 'compatibilidad', zh: '契合度', pt: 'compatibilidade'),
+                style: text.labelSmall?.copyWith(
+                    color: scheme.onPrimaryContainer.withValues(alpha: 0.75), letterSpacing: 0.6),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -1562,22 +1560,36 @@ class _CountPill extends StatelessWidget {
   final String      label;
   final ColorScheme scheme;
   final TextTheme   text;
+  final int         seed; // picks one of the poster's Material You shapes
 
   const _CountPill({
     required this.icon,
     required this.label,
     required this.scheme,
     required this.text,
+    this.seed = 0,
   });
+
+  // Same shape rotation as the poster title bubbles / avatar ring, so
+  // this row reads as the same Material You language as the rest of
+  // the app rather than a plain generic rounded chip.
+  ShapeBorder _shape() {
+    const h = 28.0;
+    switch (seed % 3) {
+      case 0: return const StadiumBorder();
+      case 1: return RoundedRectangleBorder(borderRadius: BorderRadius.circular(h * 0.5));
+      default: return RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(h * 0.85), bottomRight: Radius.circular(h * 0.85),
+              topRight: Radius.circular(h * 0.2),  bottomLeft: Radius.circular(h * 0.2)));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color:        scheme.secondaryContainer,
-        borderRadius: AppRadius.xlR,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: ShapeDecoration(color: scheme.secondaryContainer, shape: _shape()),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
