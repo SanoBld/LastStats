@@ -308,7 +308,7 @@ class AppStringsZh implements AppStrings {
   @override String get onboardPlatformSub      => '这样详情页只显示对你有用的链接。';
   @override String get platformLastfm          => 'Last.fm';
   @override String get platformSpotify         => 'Spotify';
-  @override String get platformYtMusic         => 'YT Music';
+  @override String get platformYtMusic         => 'YouTube Music';
   @override String get platformOther           => '其他 / 全部显示';
   @override String get settingsMusicPlatform          => '音乐平台';
   @override String get settingsMusicPlatformSub       => '过滤详情页显示的链接';

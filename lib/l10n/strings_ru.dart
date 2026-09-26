@@ -278,7 +278,7 @@ class AppStringsRu implements AppStrings {
   @override String get onboardPlatformSub => 'Это отображает только полезные ссылки на страницах треков/исполнителей/альбомов.';
   @override String get platformLastfm => 'Last.fm';
   @override String get platformSpotify => 'Spotify';
-  @override String get platformYtMusic => 'YT Music';
+  @override String get platformYtMusic => 'YouTube Music';
   @override String get platformOther => 'Другое / показать всё';
   @override String get settingsMusicPlatform => 'Музыкальная платформа';
   @override String get settingsMusicPlatformSub => 'Фильтрует ссылки, показанные на страницах деталей';

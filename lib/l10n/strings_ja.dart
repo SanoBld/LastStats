@@ -278,7 +278,7 @@ class AppStringsJa implements AppStrings {
   @override String get onboardPlatformSub => 'トラック・アーティスト・アルバムページで役立つリンクのみを表示します。';
   @override String get platformLastfm => 'Last.fm';
   @override String get platformSpotify => 'Spotify';
-  @override String get platformYtMusic => 'YT Music';
+  @override String get platformYtMusic => 'YouTube Music';
   @override String get platformOther => 'その他 / すべて表示';
   @override String get settingsMusicPlatform => '音楽プラットフォーム';
   @override String get settingsMusicPlatformSub => '詳細ページに表示するリンクをフィルタリングします';

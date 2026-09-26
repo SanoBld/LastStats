@@ -2166,21 +2166,21 @@ class _FriendsSection extends StatelessWidget {
 
 // ── Single friend card ────────────────────────────────────────────────────────
 
-// Rectangle-family M3 shapes sized for the friend card's fixed 116×168
-// footprint. Radii are capped well under half the shortest side (unlike
-// a stadium/pill, which on a card this narrow rounds so far into the
-// corners it slices the avatar and text off) — every variant here leaves
-// the 14px padding fully clear.
-ShapeBorder _friendCardShape(int idx) {
-  switch (idx % 5) {
-    case 0: return RoundedRectangleBorder(borderRadius: BorderRadius.circular(10));  // rounded rectangle
-    case 1: return RoundedRectangleBorder(borderRadius: BorderRadius.circular(20));  // softer rectangle
-    case 2: return BeveledRectangleBorder(borderRadius: BorderRadius.circular(16));  // cut corners
-    case 3: return ContinuousRectangleBorder(borderRadius: BorderRadius.circular(26)); // squircle
-    default: return const RoundedRectangleBorder(                                    // tab / leaf
-        borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(26), bottomRight: Radius.circular(26),
-            topRight: Radius.circular(8), bottomLeft: Radius.circular(8)));
+// Shape + matching padding for the friend card's fixed 116×168 footprint.
+// Every variant is a pure curve (rounded rect / continuous squircle /
+// stadium) — no beveled/cut corners, so there is never a straight corner
+// edge, only curves, per the "no sharp corners" rule. The stadium is a
+// real oval (half the short side), so it gets extra horizontal padding on
+// top of the base padding to keep the avatar and text clear of the curve.
+(ShapeBorder shape, EdgeInsetsGeometry padding) _friendCardStyle(int idx) {
+  const base = EdgeInsets.all(14);
+  switch (idx % 4) {
+    case 0: return (RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)), base); // rounded rectangle
+    case 1: return (RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)), base); // rounder rectangle
+    case 2: return (ContinuousRectangleBorder(borderRadius: BorderRadius.circular(42)),     // squircle
+        base.add(const EdgeInsets.symmetric(horizontal: 4)));
+    default: return (const StadiumBorder(),                                                // oval
+        base.add(const EdgeInsets.symmetric(horizontal: 14)));
   }
 }
 
@@ -2226,18 +2226,22 @@ class _FriendCardState extends State<_FriendCard> {
         ? friend.nowPlayingArtist
         : friend.lastArtist;
 
-    // Rectangle-family M3 shape, tuned for this card's fixed footprint (no
-    // circle/pill: on a card this narrow those round off far enough to
-    // slice into the avatar/text, which is the "cut off" look before this
-    // fix). Stable per friend so a card keeps its shape across rebuilds.
-    final shape = _friendCardShape(m3ShapeIndex('friend_${friend.username}'));
+    // Stable per friend so a card keeps its shape across rebuilds. Only
+    // curved shapes — never a beveled/cut corner, per the "always rounded,
+    // no sharp corner" rule.
+    final (shape, cardPadding) = _friendCardStyle(m3ShapeIndex('friend_${friend.username}'));
 
     // Base fill always follows the app's own chosen colour theme (the same
     // neutral tonal surface as the stats bubble elsewhere), so the card
-    // matches whatever accent colour is set in Settings. Being online adds
-    // one extra accent on top — primary tint + ring — instead of swapping
-    // the whole card to a different colour.
+    // matches whatever accent colour is set in Settings.
     final base = scheme.surfaceContainerHigh;
+    // "Currently listening" accent — same green used for the "En écoute"
+    // chip on the friend's own poster — covers the WHOLE card, not just a
+    // dot or a thin ring, so it reads at a glance from the list.
+    final listening = friend.isOnline;
+    final fill = listening
+        ? Color.alphaBlend(Colors.greenAccent.shade400.withValues(alpha: 0.30), base)
+        : base;
 
     return GestureDetector(
       onTap:       () { _haptic(_HapticImpact.light); _openProfile(context); },
@@ -2253,20 +2257,16 @@ class _FriendCardState extends State<_FriendCard> {
           height: 168,
           margin: const EdgeInsets.only(right: 10),
           child: PhysicalShape(
-            color: friend.isOnline
-                ? Color.alphaBlend(scheme.primary.withValues(alpha: 0.14), base)
-                : base,
+            color: fill,
             elevation: 0,
             clipper: ShapeBorderClipper(shape: shape),
             child: Container(
-              // Thin accent ring for the online state — drawn as a border
-              // inside the clip so it always follows the same shape.
-              decoration: friend.isOnline
+              decoration: listening
                   ? BoxDecoration(
-                      border: Border.all(color: scheme.primary, width: 1.6),
+                      border: Border.all(color: Colors.greenAccent.shade400, width: 1.6),
                     )
                   : null,
-              padding: const EdgeInsets.all(14),
+              padding: cardPadding,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,

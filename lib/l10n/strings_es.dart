@@ -311,7 +311,7 @@ class AppStringsEs implements AppStrings {
   @override String get onboardPlatformSub      => 'Así solo se muestran los enlaces útiles en las fichas de canción/artista/álbum.';
   @override String get platformLastfm          => 'Last.fm';
   @override String get platformSpotify         => 'Spotify';
-  @override String get platformYtMusic         => 'YT Music';
+  @override String get platformYtMusic         => 'YouTube Music';
   @override String get platformOther           => 'Otra / mostrar todo';
   @override String get settingsMusicPlatform          => 'Plataforma musical';
   @override String get settingsMusicPlatformSub       => 'Filtra los enlaces mostrados en las fichas de detalle';

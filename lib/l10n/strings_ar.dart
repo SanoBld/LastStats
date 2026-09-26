@@ -278,7 +278,7 @@ class AppStringsAr implements AppStrings {
   @override String get onboardPlatformSub => 'يعرض هذا فقط الروابط المفيدة في صفحات المقاطع/الفنانين/الألبومات.';
   @override String get platformLastfm => 'Last.fm';
   @override String get platformSpotify => 'Spotify';
-  @override String get platformYtMusic => 'YT Music';
+  @override String get platformYtMusic => 'YouTube Music';
   @override String get platformOther => 'أخرى / عرض الكل';
   @override String get settingsMusicPlatform => 'منصة الموسيقى';
   @override String get settingsMusicPlatformSub => 'يُصفّي الروابط المعروضة في صفحات التفاصيل';

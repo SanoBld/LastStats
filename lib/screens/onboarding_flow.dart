@@ -630,14 +630,19 @@ class _MusicPlatformStep extends StatefulWidget {
 }
 
 class _MusicPlatformStepState extends State<_MusicPlatformStep> {
-  String _platform = 'lastfm';
+  // "all" (show every platform link) matches what an unset preference
+  // already does in platformLinksShowAll() — using it as the default here
+  // too means what's highlighted on screen always matches what's actually
+  // applied, even before the person taps anything.
+  String _platform = 'all';
 
   @override
   void initState() { super.initState(); _load(); }
 
   Future<void> _load() async {
     final p = await SharedPreferences.getInstance();
-    if (mounted) setState(() => _platform = p.getString('ls_music_platform') ?? 'lastfm');
+    final raw = p.getString('ls_music_platform') ?? '';
+    if (mounted) setState(() => _platform = raw.isEmpty ? 'all' : raw);
   }
 
   Future<void> _set(String v) async {
@@ -651,10 +656,10 @@ class _MusicPlatformStepState extends State<_MusicPlatformStep> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final options = [
+      (value: 'all',     icon: Icons.done_all_rounded,          asset: null,                        label: L.settingsShowAllPlatformLinks),
       (value: 'lastfm',  icon: Icons.bar_chart_rounded,        asset: 'assets/icons/lastfm.svg',  label: L.platformLastfm),
       (value: 'spotify', icon: Icons.spatial_audio_off_rounded, asset: 'assets/icons/spotify.svg', label: L.platformSpotify),
       (value: 'ytmusic', icon: Icons.music_video_rounded,      asset: 'assets/icons/ytmusic.svg', label: L.platformYtMusic),
-      (value: 'other',   icon: Icons.apps_rounded,             asset: null,                        label: L.platformOther),
     ];
     return _Step(
       icon: Icons.headphones_rounded,

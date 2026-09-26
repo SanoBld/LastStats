@@ -104,22 +104,24 @@ class _StartupPageState extends State<StartupPage> {
           ),
           // Multi-select — pick every platform used; "Tout afficher" is
           // exclusive with the rest (picking it clears the others, and
-          // picking any other platform clears it). No more separate
-          // duplicate "show all" switch — it's just one of these chips now.
+          // picking any other platform clears it). "other" used to sit
+          // here too, but it read as a second "show everything" chip next
+          // to "all" (its label literally said "tout afficher") — dropped,
+          // kept as a legacy value only (see platformLinksShowAll).
           Wrap(spacing: 8, runSpacing: 8, children: [
             for (final (key, icon) in const [
               ('all',     Icons.done_all_rounded),
+              ('lastfm',  Icons.bar_chart_rounded),
               ('spotify', Icons.spatial_audio_off_rounded),
               ('ytmusic', Icons.music_video_rounded),
-              ('other',   Icons.apps_rounded),
             ])
               M3Chip(
                 avatar: Icon(icon, size: 16),
                 label: Text(switch (key) {
                   'all'     => L.settingsShowAllPlatformLinks,
+                  'lastfm'  => L.platformLastfm,
                   'spotify' => L.platformSpotify,
-                  'ytmusic' => L.platformYtMusic,
-                  _         => L.platformOther,
+                  _         => L.platformYtMusic,
                 }),
                 selected: _platforms.contains(key),
                 onSelected: (_) => _togglePlatform(key),
