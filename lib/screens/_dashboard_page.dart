@@ -2185,8 +2185,7 @@ class _FriendCard extends StatefulWidget {
 
 class _FriendCardState extends State<_FriendCard> {
   static const _ph = '2a96cbd8b46e442fc41c2b86b821562f';
-  String _bgUrl   = '';
-  bool   _pressed = false;
+  bool _pressed = false;
 
   _FriendData   get friend      => widget.friend;
   bool          get isFav       => widget.isFav;
@@ -2195,22 +2194,6 @@ class _FriendCardState extends State<_FriendCard> {
 
   bool get _hasAvatar =>
       friend.avatarUrl.isNotEmpty && !friend.avatarUrl.contains(_ph);
-
-  @override
-  void initState() {
-    super.initState();
-    if (friend.isOnline && friend.nowPlayingTrack.isNotEmpty) {
-      _resolveBg();
-    }
-  }
-
-  Future<void> _resolveBg() async {
-    final url = await ImageService.resolveTrack(
-      friend.nowPlayingTrack,
-      friend.nowPlayingArtist,
-    );
-    if (mounted && url.isNotEmpty) setState(() => _bgUrl = url);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -2225,6 +2208,12 @@ class _FriendCardState extends State<_FriendCard> {
         ? friend.nowPlayingArtist
         : friend.lastArtist;
 
+    // Same rectangle-only shape set as the Discover count badge (no
+    // circle/cookie: with this little surface, content would spill past
+    // a round outline). Stable per friend so a card keeps its shape
+    // across rebuilds.
+    final shape = _badgeShape(m3ShapeIndex('friend_${friend.username}'));
+
     return GestureDetector(
       onTap:       () { _haptic(_HapticImpact.light); _openProfile(context); },
       onTapDown:   (_) => setState(() => _pressed = true),
@@ -2235,152 +2224,96 @@ class _FriendCardState extends State<_FriendCard> {
         duration: const Duration(milliseconds: 130),
         curve:    M3Motion.emphasizedDecelerate,
         child: Container(
-          width: 116,
+          width:  116,
           margin: const EdgeInsets.only(right: 10),
-          decoration: BoxDecoration(
-            color: friend.isOnline
-                ? scheme.primaryContainer.withValues(alpha: 0.45)
-                : scheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: friend.isOnline
-                  ? scheme.primary.withValues(alpha: 0.28)
-                  : scheme.outlineVariant.withValues(alpha: 0.45),
-            ),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: Stack(children: [
+          child: PhysicalShape(
+            // Flat theme colour, no background photo/blur — solid card.
+            color: friend.isOnline ? scheme.primaryContainer : scheme.surfaceContainerHighest,
+            elevation: 0,
+            clipper: ShapeBorderClipper(shape: shape),
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
 
-              if (_bgUrl.isNotEmpty)
-                Positioned.fill(
-                  child: Opacity(
-                    opacity: 0.35,
-                    child: ImageFiltered(
-                      imageFilter: ImageFilter.blur(
-                          sigmaX: 14, sigmaY: 14, tileMode: TileMode.clamp),
-                      child: Image.network(
-                        _bgUrl,
-                        fit: BoxFit.cover,
-                        width:  double.infinity,
-                        height: double.infinity,
-                        errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                  SizedBox(
+                    width: 60, height: 60,
+                    child: Stack(children: [
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundColor: scheme.primary.withValues(alpha: 0.2),
+                        backgroundImage: _hasAvatar ? NetworkImage(friend.avatarUrl) : null,
+                        child: _hasAvatar
+                            ? null
+                            : Text(
+                                friend.username.isNotEmpty
+                                    ? friend.username[0].toUpperCase()
+                                    : '?',
+                                style: text.titleMedium?.copyWith(
+                                    color: scheme.primary, fontWeight: FontWeight.w800),
+                              ),
                       ),
-                    ),
-                  ),
-                ),
-
-              if (friend.isOnline)
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end:   Alignment.bottomCenter,
-                        colors: [
-                          scheme.primaryContainer.withValues(alpha: 0.25),
-                          scheme.primaryContainer.withValues(alpha: 0.45),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-
-                    SizedBox(
-                      width: 60, height: 60,
-                      child: Stack(children: [
-                        CircleAvatar(
-                          radius: 30,
-                          backgroundColor: scheme.primary.withValues(alpha: 0.2),
-                          backgroundImage: _hasAvatar ? NetworkImage(friend.avatarUrl) : null,
-                          child: _hasAvatar
-                              ? null
-                              : Text(
-                                  friend.username.isNotEmpty
-                                      ? friend.username[0].toUpperCase()
-                                      : '?',
-                                  style: text.titleMedium?.copyWith(
-                                      color: scheme.primary, fontWeight: FontWeight.w800),
-                                ),
-                        ),
-                        Positioned(
-                          right: 0, bottom: 0,
-                          child: Container(
-                            width: 14, height: 14,
-                            decoration: BoxDecoration(
-                              color:  friend.isOnline ? Colors.green : scheme.outline,
-                              shape:  BoxShape.circle,
-                              border: Border.all(color: scheme.surface, width: 2),
-                            ),
-                          ),
-                        ),
-                      ]),
-                    ),
-
-                    const SizedBox(height: 6),
-
-                    Text(
-                      friend.username,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: text.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        shadows: friend.isOnline
-                            ? [const Shadow(color: Colors.black26, blurRadius: 4)]
-                            : null,
-                      ) ?? const TextStyle(fontWeight: FontWeight.w700),
-                    ),
-
-                    const SizedBox(height: 2),
-
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      Flexible(
-                        child: Text(
-                          subtitle,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style: text.labelSmall?.copyWith(
-                            color: friend.isOnline
-                                ? Colors.green.shade700
-                                : scheme.onSurfaceVariant,
-                            fontWeight: friend.isOnline ? FontWeight.w600 : FontWeight.normal,
-                            shadows: friend.isOnline
-                                ? [const Shadow(color: Colors.black26, blurRadius: 3)]
-                                : null,
+                      Positioned(
+                        right: 0, bottom: 0,
+                        child: Container(
+                          width: 14, height: 14,
+                          decoration: BoxDecoration(
+                            color:  friend.isOnline ? Colors.green : scheme.outline,
+                            shape:  BoxShape.circle,
+                            border: Border.all(color: scheme.surface, width: 2),
                           ),
                         ),
                       ),
                     ]),
+                  ),
 
-                    if (subtitleArtist.isNotEmpty) ...[
-                      const SizedBox(height: 1),
-                      Text(
-                        subtitleArtist,
+                  const SizedBox(height: 6),
+
+                  Text(
+                    friend.username,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: text.bodySmall?.copyWith(fontWeight: FontWeight.w700) ??
+                        const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+
+                  const SizedBox(height: 2),
+
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Flexible(
+                      child: Text(
+                        subtitle,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.center,
                         style: text.labelSmall?.copyWith(
-                          color: scheme.onSurfaceVariant,
-                          fontSize: 9,
-                          shadows: friend.isOnline
-                              ? [const Shadow(color: Colors.black26, blurRadius: 3)]
-                              : null,
+                          color: friend.isOnline
+                              ? Colors.green.shade700
+                              : scheme.onSurfaceVariant,
+                          fontWeight: friend.isOnline ? FontWeight.w600 : FontWeight.normal,
                         ),
                       ),
-                    ],
-                  ],
-                ),
-              ),
+                    ),
+                  ]),
 
-            ]),
+                  if (subtitleArtist.isNotEmpty) ...[
+                    const SizedBox(height: 1),
+                    Text(
+                      subtitleArtist,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: text.labelSmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                        fontSize: 9,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ),
         ),
       ),

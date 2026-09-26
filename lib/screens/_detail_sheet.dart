@@ -3413,7 +3413,11 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           scheme: scheme,
           style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w900) ??
               const TextStyle(fontWeight: FontWeight.w900, fontSize: 28),
-          maxWidth: MediaQuery.of(ctx).size.width - 40,
+          // Room actually left in the row once the 20px side padding, the
+          // 84px avatar and the 14px gap are taken out — using the full
+          // screen width here (as before) hid the overflow, so the pseudo
+          // never scrolled even when too long to fit.
+          maxWidth: MediaQuery.of(ctx).size.width - 40 - 84 - 14,
         ),
         const SizedBox(height: 4),
 
@@ -3442,25 +3446,28 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            // Solid, same as the "Profil" badge above — no more see-through
+            // black pill.
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.28),
+              color: scheme.primary,
               borderRadius: AppRadius.xlR,
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               if (country.isNotEmpty && country != 'None')
-                _BannerMeta(icon: Icons.location_on_outlined, label: country),
+                _BannerMeta(icon: Icons.location_on_outlined, label: country, scheme: scheme),
               if (country.isNotEmpty && country != 'None' && since.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Container(
                     width: 1, height: 12,
-                    color: Colors.white.withValues(alpha: 0.3),
+                    color: scheme.onPrimary.withValues(alpha: 0.4),
                   ),
                 ),
               if (since.isNotEmpty)
                 _BannerMeta(
                     icon: Icons.calendar_today_outlined,
-                    label: L.memberSince(since)),
+                    label: L.memberSince(since),
+                    scheme: scheme),
             ]),
           ),
         ],
@@ -3918,25 +3925,20 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
 // ── Banner meta row ───────────────────────────────────────────────────────────
 
 class _BannerMeta extends StatelessWidget {
-  final IconData icon;
-  final String   label;
-  const _BannerMeta({required this.icon, required this.label});
+  final IconData    icon;
+  final String      label;
+  final ColorScheme scheme;
+  const _BannerMeta({required this.icon, required this.label, required this.scheme});
 
   @override
   Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
-    // Icon sits inside its own small circle — same rounded, contained
-    // look as the rest of the poster's Material You badges.
-    Container(
-      width: 20, height: 20,
-      decoration: BoxDecoration(
-        shape:  BoxShape.circle,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.7), width: 1.2),
-      ),
-      child: Icon(icon, size: 11, color: Colors.white.withValues(alpha: 0.9)),
-    ),
+    // Plain icon, no ring — sits directly on the solid pill like the
+    // "Profil" badge above it.
+    Icon(icon, size: 13, color: scheme.onPrimary),
     const SizedBox(width: 6),
     Text(label,
-      style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 12)),
+      style: TextStyle(
+          color: scheme.onPrimary, fontSize: 12, fontWeight: FontWeight.w600)),
   ]);
 }
 
