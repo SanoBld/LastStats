@@ -36,7 +36,16 @@ class MotionArtworkService {
       final hit = await _albumPageUrl(artist, album, track);
       String? video;
       if (hit != null) {
-        video = await _videoFromApi(hit.$1);
+        // A track can carry its own "motion video" distinct from (or
+        // absent from) its album's — Apple exposes that on the *song*
+        // catalog entry, not just the album's. Some tracks only have the
+        // per-song one, which is why the official app shows a video where
+        // this used to show none: try the song first, then fall back to
+        // the album-level video, then the page-scrape fallback.
+        if (track.isNotEmpty && hit.$3 != null) {
+          video = await _videoFromSongApi(hit.$3!);
+        }
+        video ??= await _videoFromApi(hit.$1);
         video ??= await _videoFromPage(hit.$2);
       }
       _cache[key] = video;
@@ -60,8 +69,9 @@ class MotionArtworkService {
     return s.length >= 4 && l.contains(s);
   }
 
-  // Returns (collectionId, album page URL) of the best match.
-  static Future<(String, String)?> _albumPageUrl(
+  // Returns (collectionId, album page URL, trackId) of the best match.
+  // trackId is only present when we searched by song (byAlbum == false).
+  static Future<(String, String, String?)?> _albumPageUrl(
       String artist, String album, String track) async {
     final byAlbum = album.isNotEmpty;
     final res = await http.get(Uri.https('itunes.apple.com', '/search', {
@@ -83,8 +93,10 @@ class MotionArtworkService {
       if (url.isEmpty) continue;
       final id = (item['collectionId'] ?? '').toString();
       if (id.isEmpty) continue;
+      final trackId = byAlbum ? null : (item['trackId'] ?? '').toString();
       // Drop the "?i=trackId" part so we get the album page itself.
-      return (id, url.split('?').first);
+      return (id, url.split('?').first,
+          (trackId != null && trackId.isNotEmpty) ? trackId : null);
     }
     return null;
   }
@@ -128,6 +140,37 @@ class MotionArtworkService {
       final ev = data.first['attributes']?['editorialVideo'];
       if (ev is! Map) return null;
       // Square first (matches album art), then tall.
+      for (final k in ['motionDetailSquare', 'motionSquareVideo1x1',
+                       'motionDetailTall', 'motionTallVideo3x4']) {
+        final v = ev[k]?['video'];
+        if (v is String && v.isNotEmpty) return v;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  // Same lookup as _videoFromApi, but on the *song* catalog entry — a
+  // track's own motion video, when Apple only attaches one there instead
+  // of (or in addition to) the album's.
+  static Future<String?> _videoFromSongApi(String trackId) async {
+    try {
+      final token = await _getToken();
+      if (token == null) return null;
+      final res = await http.get(
+        Uri.https('amp-api.music.apple.com', '/v1/catalog/us/songs/$trackId',
+            {'extend': 'editorialVideo'}),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Origin': 'https://music.apple.com',
+          'User-Agent': _ua,
+        },
+      ).timeout(_timeout);
+      if (res.statusCode == 401) _token = null;
+      if (res.statusCode != 200) return null;
+      final data = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
+      if (data.isEmpty) return null;
+      final ev = data.first['attributes']?['editorialVideo'];
+      if (ev is! Map) return null;
       for (final k in ['motionDetailSquare', 'motionSquareVideo1x1',
                        'motionDetailTall', 'motionTallVideo3x4']) {
         final v = ev[k]?['video'];

@@ -3436,16 +3436,28 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
 
         if (country.isNotEmpty || since.isNotEmpty) ...[
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 16,
-            children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.28),
+              borderRadius: AppRadius.xlR,
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
               if (country.isNotEmpty && country != 'None')
                 _BannerMeta(icon: Icons.location_on_outlined, label: country),
+              if (country.isNotEmpty && country != 'None' && since.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Container(
+                    width: 1, height: 12,
+                    color: Colors.white.withValues(alpha: 0.3),
+                  ),
+                ),
               if (since.isNotEmpty)
                 _BannerMeta(
                     icon: Icons.calendar_today_outlined,
                     label: L.memberSince(since)),
-            ],
+            ]),
           ),
         ],
       ],

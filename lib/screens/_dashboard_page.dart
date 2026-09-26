@@ -2286,6 +2286,32 @@ class _FriendCardState extends State<_FriendCard> {
                   ),
                 ),
 
+              // Fondu bas de carte — même technique que les autres fiches
+              // (l'image se fond dans le fond au lieu de s'arrêter net à la
+              // délimitation avec le bloc pseudo/titre).
+              if (_bgUrl.isNotEmpty)
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end:   Alignment.bottomCenter,
+                        stops: const [0.0, 0.45, 1.0],
+                        colors: [
+                          Colors.transparent,
+                          (friend.isOnline
+                                  ? scheme.primaryContainer
+                                  : scheme.surfaceContainerHighest)
+                              .withValues(alpha: 0.55),
+                          friend.isOnline
+                              ? scheme.primaryContainer
+                              : scheme.surfaceContainerHighest,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: Column(
@@ -2325,17 +2351,15 @@ class _FriendCardState extends State<_FriendCard> {
 
                     const SizedBox(height: 6),
 
-                    Text(
-                      friend.username,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
+                    _ScrollingLabel(
+                      text: friend.username,
+                      maxWidth: 96,
                       style: text.bodySmall?.copyWith(
                         fontWeight: FontWeight.w700,
                         shadows: friend.isOnline
                             ? [const Shadow(color: Colors.black26, blurRadius: 4)]
                             : null,
-                      ),
+                      ) ?? const TextStyle(fontWeight: FontWeight.w700),
                     ),
 
                     const SizedBox(height: 2),
@@ -2398,6 +2422,54 @@ class _FriendCardState extends State<_FriendCard> {
   }
 }
 
+
+// ── Scrolling label ────────────────────────────────────────────────────────
+// Centered, single-line text that becomes horizontally swipeable (instead of
+// ellipsizing) once it's too long for [maxWidth] — same principle as the
+// title bubble on the artist/album/track/profile posters.
+class _ScrollingLabel extends StatelessWidget {
+  final String    text;
+  final TextStyle style;
+  final double    maxWidth;
+  const _ScrollingLabel({
+    required this.text,
+    required this.style,
+    required this.maxWidth,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final tp = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: Directionality.of(context),
+      maxLines: 1,
+    )..layout();
+
+    final overflows = tp.width > maxWidth + 0.5;
+
+    final child = Text(
+      text,
+      maxLines: 1,
+      softWrap: false,
+      overflow: overflows ? TextOverflow.visible : TextOverflow.ellipsis,
+      textAlign: TextAlign.center,
+      style: style,
+    );
+
+    if (!overflows) {
+      return SizedBox(width: maxWidth, child: child);
+    }
+
+    return SizedBox(
+      width: maxWidth,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: child,
+      ),
+    );
+  }
+}
 
 // ── Friend card skeleton ──────────────────────────────────────────────────────
 
