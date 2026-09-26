@@ -2166,6 +2166,24 @@ class _FriendsSection extends StatelessWidget {
 
 // ── Single friend card ────────────────────────────────────────────────────────
 
+// Rectangle-family M3 shapes sized for the friend card's fixed 116×168
+// footprint. Radii are capped well under half the shortest side (unlike
+// a stadium/pill, which on a card this narrow rounds so far into the
+// corners it slices the avatar and text off) — every variant here leaves
+// the 14px padding fully clear.
+ShapeBorder _friendCardShape(int idx) {
+  switch (idx % 5) {
+    case 0: return RoundedRectangleBorder(borderRadius: BorderRadius.circular(10));  // rounded rectangle
+    case 1: return RoundedRectangleBorder(borderRadius: BorderRadius.circular(20));  // softer rectangle
+    case 2: return BeveledRectangleBorder(borderRadius: BorderRadius.circular(16));  // cut corners
+    case 3: return ContinuousRectangleBorder(borderRadius: BorderRadius.circular(26)); // squircle
+    default: return const RoundedRectangleBorder(                                    // tab / leaf
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(26), bottomRight: Radius.circular(26),
+            topRight: Radius.circular(8), bottomLeft: Radius.circular(8)));
+  }
+}
+
 class _FriendCard extends StatefulWidget {
   final _FriendData   friend;
   final bool          isFav;
@@ -2208,11 +2226,18 @@ class _FriendCardState extends State<_FriendCard> {
         ? friend.nowPlayingArtist
         : friend.lastArtist;
 
-    // Same rectangle-only shape set as the Discover count badge (no
-    // circle/cookie: with this little surface, content would spill past
-    // a round outline). Stable per friend so a card keeps its shape
-    // across rebuilds.
-    final shape = _badgeShape(m3ShapeIndex('friend_${friend.username}'));
+    // Rectangle-family M3 shape, tuned for this card's fixed footprint (no
+    // circle/pill: on a card this narrow those round off far enough to
+    // slice into the avatar/text, which is the "cut off" look before this
+    // fix). Stable per friend so a card keeps its shape across rebuilds.
+    final shape = _friendCardShape(m3ShapeIndex('friend_${friend.username}'));
+
+    // Base fill always follows the app's own chosen colour theme (the same
+    // neutral tonal surface as the stats bubble elsewhere), so the card
+    // matches whatever accent colour is set in Settings. Being online adds
+    // one extra accent on top — primary tint + ring — instead of swapping
+    // the whole card to a different colour.
+    final base = scheme.surfaceContainerHigh;
 
     return GestureDetector(
       onTap:       () { _haptic(_HapticImpact.light); _openProfile(context); },
@@ -2225,15 +2250,25 @@ class _FriendCardState extends State<_FriendCard> {
         curve:    M3Motion.emphasizedDecelerate,
         child: Container(
           width:  116,
+          height: 168,
           margin: const EdgeInsets.only(right: 10),
           child: PhysicalShape(
-            // Flat theme colour, no background photo/blur — solid card.
-            color: friend.isOnline ? scheme.primaryContainer : scheme.surfaceContainerHighest,
+            color: friend.isOnline
+                ? Color.alphaBlend(scheme.primary.withValues(alpha: 0.14), base)
+                : base,
             elevation: 0,
             clipper: ShapeBorderClipper(shape: shape),
-            child: Padding(
-              padding: const EdgeInsets.all(10),
+            child: Container(
+              // Thin accent ring for the online state — drawn as a border
+              // inside the clip so it always follows the same shape.
+              decoration: friend.isOnline
+                  ? BoxDecoration(
+                      border: Border.all(color: scheme.primary, width: 1.6),
+                    )
+                  : null,
+              padding: const EdgeInsets.all(14),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
 
