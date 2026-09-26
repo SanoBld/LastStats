@@ -80,7 +80,16 @@
     final hit = await _albumPageUrl(artist, album, track);
     String? video;
     if (hit != null) {
-      video = await _videoFromApi(hit.$1);
+      &#47;&#47; A track can carry its own &quot;motion video&quot; distinct from (or
+      &#47;&#47; absent from) its album&#39;s — Apple exposes that on the *song*
+      &#47;&#47; catalog entry, not just the album&#39;s. Some tracks only have the
+      &#47;&#47; per-song one, which is why the official app shows a video where
+      &#47;&#47; this used to show none: try the song first, then fall back to
+      &#47;&#47; the album-level video, then the page-scrape fallback.
+      if (track.isNotEmpty &amp;&amp; hit.$3 != null) {
+        video = await _videoFromSongApi(hit.$3!);
+      }
+      video ??= await _videoFromApi(hit.$1);
       video ??= await _videoFromPage(hit.$2);
     }
     _cache[key] = video;
