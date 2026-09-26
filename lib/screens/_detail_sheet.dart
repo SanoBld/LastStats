@@ -3243,7 +3243,9 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
         // Same as the artist/album/track poster: the system status bar only
         // gets a solid backing once the banner has scrolled past it.
         Positioned.fill(child: ScrollStatusBarHost(
-          threshold: imgH - 60,
+          // Same threshold as the artist/album/track poster so the status
+          // bar solidifies at the same scroll point on every poster type.
+          threshold: imgH + 170,
           color: Color.alphaBlend(scheme.primary.withValues(alpha: 0.16), surface),
           child: _DismissOnOverscroll(
           onDismiss: () => Navigator.pop(ctx),
@@ -3253,7 +3255,9 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Avatar tap zone — inline so hitbox moves with scroll
+                // Avatar tap zone — inline so hitbox moves with scroll.
+                // Same height as the artist/album/track poster's image tap
+                // zone so the same amount of photo shows above the header.
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: hasAv ? () {
@@ -3268,7 +3272,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                         profileUsername: widget.username,
                         source: 'Last.fm');
                   } : null,
-                  child: SizedBox(height: imgH - 90, width: double.infinity),
+                  child: SizedBox(height: imgH + 66, width: double.infinity),
                 ),
                 _buildProfileHeader(ctx, scheme, hasAv, avatarUrl),
                 Container(
