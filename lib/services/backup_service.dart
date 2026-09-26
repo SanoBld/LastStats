@@ -522,8 +522,8 @@ class BackupService {
     dayNightUseHoursNotifier.value      = p.getBool('ls_daynight_use_hours')      ?? false;
     dayStartHourNotifier.value          = p.getInt('ls_daynight_day_start_hour')   ?? 7;
     nightStartHourNotifier.value        = p.getInt('ls_daynight_night_start_hour') ?? 20;
-    musicPlatformNotifier.value         = p.getString('ls_music_platform')     ?? 'lastfm';
-    showAllPlatformLinksNotifier.value  = p.getBool('ls_show_all_platform_links') ?? false;
+    musicPlatformNotifier.value         = (p.getBool('ls_show_all_platform_links') ?? false)
+        ? 'all' : (p.getString('ls_music_platform') ?? '');
     // Last.fm write-access credentials (only present if they were restored).
     secretKeyNotifier.value             = p.getString('ls_secret_key')  ?? '';
     sessionKeyNotifier.value            = p.getString('ls_session_key') ?? '';

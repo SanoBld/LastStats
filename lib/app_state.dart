@@ -127,13 +127,24 @@ final notifNewsEnabledNotifier = ValueNotifier<bool>(false);
 // Saved as 'ls_show_news_badge' in SharedPreferences.
 final showNewsBadgeNotifier = ValueNotifier<bool>(true);
 
-// Preferred music-streaming platform, chosen at onboarding.
-// 'lastfm' | 'spotify' | 'ytmusic' | 'other'. Saved as 'ls_music_platform'.
-final musicPlatformNotifier = ValueNotifier<String>('lastfm');
+// Preferred music-streaming platform(s), chosen at onboarding or in
+// Startup settings — now multi-select. Stored as a comma-joined string:
+// any of 'spotify' | 'ytmusic' | 'other', or 'all' to always show every
+// platform link (an empty value means only Last.fm/Web show).
+// Saved as 'ls_music_platform'.
+final musicPlatformNotifier = ValueNotifier<String>('');
 
-// When true, always show all platform link pills on detail sheets
-// regardless of the chosen platform. Saved as 'ls_show_all_platform_links'.
-final showAllPlatformLinksNotifier = ValueNotifier<bool>(false);
+// True when the platform link pills on a poster should all show,
+// regardless of which platforms were picked — either because the person
+// chose "Tout afficher" or "Autre", or because nothing more specific
+// was ever selected.
+bool platformLinksShowAll() {
+  final v = musicPlatformNotifier.value;
+  return v.isEmpty || v == 'all' || v.split(',').contains('all') || v.split(',').contains('other');
+}
+
+bool platformLinkEnabled(String key) =>
+    platformLinksShowAll() || musicPlatformNotifier.value.split(',').contains(key);
 
 // Last.fm API secret key, used to sign write requests (favorites).
 // Optional — set during setup or later from the account settings.

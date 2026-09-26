@@ -1064,12 +1064,12 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 14),
           _TitleBubble(
             text: _name,
             subtitle: widget.type != 'artists' ? _artist : null,
-            onSubtitleTap: widget.type != 'artists' && _artist.isNotEmpty
-                ? () => showDetailSheet(ctx, {'name': _artist}, 'artists', widget.service)
+            onArtistTap: widget.type != 'artists'
+                ? (artist) => showDetailSheet(ctx, {'name': artist}, 'artists', widget.service)
                 : null,
             subtitleStyle: text.bodyLarge?.copyWith(
               color:      hasImage && onImg
@@ -1149,16 +1149,14 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       (label: 'YT Music', color: const Color(0xFFFF0033), icon: Icons.music_video_rounded,        asset: 'assets/icons/ytmusic.svg', url: 'https://music.youtube.com/search?q=$encoded'),
       (label: 'Web',      color: Colors.white.withValues(alpha: 0.85), icon: Icons.language_rounded, asset: null, url: 'https://www.google.com/search?q=${Uri.encodeComponent('$q music')}'),
     ].where((b) {
-      // Filters which pills show up, based on the platform chosen at
-      // onboarding (or in Startup settings). Last.fm and Web always show —
-      // they're the app's own source of truth and a universal fallback.
-      if (showAllPlatformLinksNotifier.value) return true;
-      switch (musicPlatformNotifier.value) {
-        case 'spotify': return b.label != 'YT Music';
-        case 'ytmusic': return b.label != 'Spotify';
-        case 'other':   return true;
-        default:        return b.label != 'Spotify' && b.label != 'YT Music'; // lastfm
-      }
+      // Filters which pills show up, based on the platform(s) chosen at
+      // onboarding (or in Startup settings, now multi-select). Last.fm
+      // and Web always show — they're the app's own source of truth and
+      // a universal fallback.
+      if (platformLinksShowAll()) return true;
+      if (b.label == 'Spotify')  return platformLinkEnabled('spotify');
+      if (b.label == 'YT Music') return platformLinkEnabled('ytmusic');
+      return true; // Last.fm / Web
     }).toList();
 
     // Full-width row of logo-only Material You buttons (monochrome, themed).
@@ -2721,13 +2719,45 @@ class _TitleBubble extends StatelessWidget {
   const _TitleBubble({
     required this.text, this.subtitle, required this.style,
     this.subtitleStyle, required this.scheme, required this.maxWidth,
-    this.onSubtitleTap,
+    this.onArtistTap,
   });
 
-  final VoidCallback? onSubtitleTap; // tapping the artist opens their own poster
+  // Tapping one of the (possibly several, independent) artist names in
+  // [subtitle] opens that artist's own poster.
+  final void Function(String artist)? onArtistTap;
 
   static const _h = 52.0;
   static const _hPad = 20.0;
+
+  // Splits "Artist A, Artist B", "Artist A feat. Artist B", "A & B", "A / B"
+  // etc into separate names — each one is its own independent tap target,
+  // the joining word/punctuation in between stays plain, non-clickable text.
+  static final RegExp _artistSep = RegExp(
+    r'\s*,\s*|\s*&\s*|\s+feat\.?\s+|\s+ft\.?\s+|\s+with\s+|\s+x\s+|\s+vs\.?\s+|\s*/\s*',
+    caseSensitive: false,
+  );
+
+  List<InlineSpan> _artistSpans(String raw, TextStyle style, Color dim) {
+    final onTap = onArtistTap;
+    InlineSpan nameSpan(String name) => TextSpan(
+      text: name,
+      style: style,
+      recognizer: (onTap != null && name.isNotEmpty)
+          ? (TapGestureRecognizer()..onTap = () => onTap(name)) : null,
+    );
+
+    final spans = <InlineSpan>[];
+    var last = 0;
+    for (final m in _artistSep.allMatches(raw)) {
+      final name = raw.substring(last, m.start).trim();
+      if (name.isNotEmpty) spans.add(nameSpan(name));
+      spans.add(TextSpan(text: raw.substring(m.start, m.end), style: style.copyWith(color: dim)));
+      last = m.end;
+    }
+    final tail = raw.substring(last).trim();
+    if (tail.isNotEmpty) spans.add(nameSpan(tail));
+    return spans;
+  }
 
   // A handful of shapes that stay clean at any aspect ratio — corner
   // radii are pinned to the bubble's fixed height, so stretching the
@@ -2755,24 +2785,19 @@ class _TitleBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasSubtitle = subtitle != null && subtitle!.isNotEmpty;
     final onColor     = scheme.onPrimaryContainer;
+    final dimColor    = onColor.withValues(alpha: 0.75);
 
-    // Title + artist are built as one rich run of text — that way, when
-    // it's too long, they scroll together inside the same shape instead
-    // of the artist being split off outside it. Tapping the artist part
-    // (when a callback is given) opens their own poster.
-    final subtitleRecognizer = (hasSubtitle && onSubtitleTap != null)
-        ? (TapGestureRecognizer()..onTap = onSubtitleTap) : null;
+    // Title + artist(s) are built as one rich run of text — that way,
+    // when it's too long, they scroll together inside the same shape
+    // instead of the artist being split off outside it. Each artist name
+    // is its own tap target — no underline, just a slightly dimmer tone
+    // than the rest of the subtitle so it doesn't look like a plain label.
+    final subtitleTextStyle = (subtitleStyle ?? style).copyWith(
+        color: dimColor, fontWeight: FontWeight.w600);
     final span = TextSpan(children: [
       TextSpan(text: text, style: style.copyWith(color: onColor)),
-      if (hasSubtitle)
-        TextSpan(
-          text: '  •  $subtitle',
-          recognizer: subtitleRecognizer,
-          style: (subtitleStyle ?? style).copyWith(
-              color: onColor.withValues(alpha: 0.75), fontWeight: FontWeight.w600,
-              decoration: subtitleRecognizer != null ? TextDecoration.underline : null,
-              decorationColor: onColor.withValues(alpha: 0.4)),
-        ),
+      if (hasSubtitle) TextSpan(text: '  •  ', style: subtitleTextStyle),
+      if (hasSubtitle) ..._artistSpans(subtitle!, subtitleTextStyle, dimColor),
     ]);
 
     final tp = TextPainter(
@@ -3371,7 +3396,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
             ),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 14),
 
         _TitleBubble(
           text: name,
@@ -3886,12 +3911,12 @@ class _BannerMeta extends StatelessWidget {
     // Icon sits inside its own small circle — same rounded, contained
     // look as the rest of the poster's Material You badges.
     Container(
-      width: 22, height: 22,
+      width: 20, height: 20,
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white.withValues(alpha: 0.18),
+        shape:  BoxShape.circle,
+        border: Border.all(color: Colors.white.withValues(alpha: 0.7), width: 1.2),
       ),
-      child: Icon(icon, size: 12, color: Colors.white.withValues(alpha: 0.9)),
+      child: Icon(icon, size: 11, color: Colors.white.withValues(alpha: 0.9)),
     ),
     const SizedBox(width: 6),
     Text(label,

@@ -111,8 +111,13 @@ Future<void> _mainImpl() async {
   oledModeNotifier.value               = prefs.getBool('ls_oled_mode')               ?? false;
   localeNotifier.value                 = prefs.getString('ls_locale')                ?? 'fr';
   displayNameNotifier.value            = prefs.getString('ls_display_name')          ?? '';
-  musicPlatformNotifier.value          = prefs.getString('ls_music_platform')         ?? 'lastfm';
-  showAllPlatformLinksNotifier.value   = prefs.getBool('ls_show_all_platform_links')  ?? false;
+  musicPlatformNotifier.value          = () {
+    // Migrates the old single-choice value + the separate "show all"
+    // switch (now folded into the multi-select itself as an "all" entry).
+    final legacyShowAll = prefs.getBool('ls_show_all_platform_links') ?? false;
+    if (legacyShowAll) return 'all';
+    return prefs.getString('ls_music_platform') ?? '';
+  }();
   secretKeyNotifier.value              = prefs.getString('ls_secret_key')            ?? '';
   sessionKeyNotifier.value             = prefs.getString('ls_session_key')           ?? '';
 

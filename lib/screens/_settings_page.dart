@@ -208,8 +208,15 @@ final List<_QuickLink> _quickLinks = [
       'ru': 'Музыкальная платформа', 'ja': '音楽プラットフォーム', 'zh': '音乐平台',
       'ar': 'منصة الموسيقى',
     },
-    trailing: (ctx, s, t) => Text(musicPlatformNotifier.value,
-        style: t.bodyMedium?.copyWith(color: s.onSurfaceVariant)),
+    trailing: (ctx, s, t) {
+      final v = musicPlatformNotifier.value;
+      final label = (v.isEmpty || v == 'all')
+          ? (localeNotifier.value == 'en' ? 'All' : 'Toutes')
+          : v.split(',').length > 1
+              ? '${v.split(',').length}'
+              : v;
+      return Text(label, style: t.bodyMedium?.copyWith(color: s.onSurfaceVariant));
+    },
     pageBuilder: (_) => const StartupPage(),
   ),
   _QuickLink(

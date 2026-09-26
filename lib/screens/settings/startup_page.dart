@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/l10n.dart';
 import '../../app_state.dart';
+import '../../widgets/m3_components.dart';
 import 'settings_helpers.dart';
 import 'settings_rows.dart';
 
@@ -16,8 +17,7 @@ class StartupPage extends StatefulWidget {
 
 class _StartupPageState extends State<StartupPage> {
   int _startupTab = 0;
-  String _platform = 'lastfm';
-  bool _showAll = false;
+  Set<String> _platforms = {}; // empty == show every platform link
 
   @override
   void initState() {
@@ -34,25 +34,29 @@ class _StartupPageState extends State<StartupPage> {
   Future<void> _load() async {
     final p = await SharedPreferences.getInstance();
     if (!mounted) return;
+    // Migrates the old separate "show all" switch into the "all" entry.
+    final legacyShowAll = p.getBool('ls_show_all_platform_links') ?? false;
+    final raw = legacyShowAll ? 'all' : (p.getString('ls_music_platform') ?? '');
     setState(() {
       _startupTab = p.getInt('ls_startup_tab') ?? 0;
-      _platform   = p.getString('ls_music_platform') ?? 'lastfm';
-      _showAll    = p.getBool('ls_show_all_platform_links') ?? false;
+      _platforms  = raw.split(',').where((e) => e.isNotEmpty).toSet();
     });
   }
 
-  Future<void> _setPlatform(String v) async {
+  Future<void> _togglePlatform(String key) async {
+    setState(() {
+      if (key == 'all') {
+        _platforms = _platforms.contains('all') ? {} : {'all'};
+      } else {
+        _platforms.remove('all');
+        if (!_platforms.remove(key)) _platforms.add(key);
+      }
+    });
     final p = await SharedPreferences.getInstance();
-    await p.setString('ls_music_platform', v);
-    musicPlatformNotifier.value = v;
-    setState(() => _platform = v);
-  }
-
-  Future<void> _setShowAll(bool v) async {
-    final p = await SharedPreferences.getInstance();
-    await p.setBool('ls_show_all_platform_links', v);
-    showAllPlatformLinksNotifier.value = v;
-    setState(() => _showAll = v);
+    final joined = _platforms.join(',');
+    await p.setString('ls_music_platform', joined);
+    await p.remove('ls_show_all_platform_links'); // fully replaced by "all" now
+    musicPlatformNotifier.value = joined;
   }
 
   @override
@@ -91,32 +95,36 @@ class _StartupPageState extends State<StartupPage> {
         const SizedBox(height: 16),
 
         SettingsSection(label: L.settingsMusicPlatform, children: [
-          Opacity(
-            opacity: _showAll ? 0.45 : 1.0,
-            child: IgnorePointer(
-              ignoring: _showAll,
-              child: SettingChoiceRow(
-                icon: Icons.headphones_rounded,
-                title: L.settingsMusicPlatform,
-                description: _showAll ? L.settingsPlatformDisabledByShowAll : L.settingsMusicPlatformSub,
-                options: [
-                  ('lastfm',  L.platformLastfm,  Icons.bar_chart_rounded),
-                  ('spotify', L.platformSpotify, Icons.spatial_audio_off_rounded),
-                  ('ytmusic', L.platformYtMusic, Icons.music_video_rounded),
-                  ('other',   L.platformOther,   Icons.apps_rounded),
-                ],
-                value: _platform,
-                onChanged: _setPlatform,
-              ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 4, 4, 10),
+            child: Text(
+              L.settingsMusicPlatformSub,
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
             ),
           ),
-          SettingSwitchRow(
-            icon: Icons.link_rounded,
-            title: L.settingsShowAllPlatformLinks,
-            subtitle: L.settingsShowAllPlatformLinksSub,
-            value: _showAll,
-            onChanged: _setShowAll,
-          ),
+          // Multi-select — pick every platform used; "Tout afficher" is
+          // exclusive with the rest (picking it clears the others, and
+          // picking any other platform clears it). No more separate
+          // duplicate "show all" switch — it's just one of these chips now.
+          Wrap(spacing: 8, runSpacing: 8, children: [
+            for (final (key, icon) in const [
+              ('all',     Icons.done_all_rounded),
+              ('spotify', Icons.spatial_audio_off_rounded),
+              ('ytmusic', Icons.music_video_rounded),
+              ('other',   Icons.apps_rounded),
+            ])
+              M3Chip(
+                avatar: Icon(icon, size: 16),
+                label: Text(switch (key) {
+                  'all'     => L.settingsShowAllPlatformLinks,
+                  'spotify' => L.platformSpotify,
+                  'ytmusic' => L.platformYtMusic,
+                  _         => L.platformOther,
+                }),
+                selected: _platforms.contains(key),
+                onSelected: (_) => _togglePlatform(key),
+              ),
+          ]),
         ]),
 
         const SizedBox(height: 16),
