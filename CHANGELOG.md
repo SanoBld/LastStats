@@ -110,8 +110,11 @@
 
 ## Unreleased
 
+**Nouveautés**
 - Friends: cards are now a single consistent rounded square shape (removed the mixed square/circle/oval variants)
 - Friends: online status now fills the whole card with your chosen accent color instead of a hardcoded, buggy green overlay
+- Friend profile poster: online status is now shown only by the green ring around the avatar (star-shaped for favourites, circle otherwise) — removed the separate "online" dot and "Now listening" pill
+- Friend profile poster: added Apple Music motion artwork (animated video preview) for the currently-playing track, with a photo/video switch next to the back and favourite buttons — respects the existing motion artwork setting
 - Album, artist and track posters: titles redesigned
 - New poster shapes added
 - New video mode for Apple Music posters: shows an animated video preview instead of a static cover

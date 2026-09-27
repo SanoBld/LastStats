@@ -3006,6 +3006,19 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
   Color?    _artworkColor;  // dominant color extracted from banner image
   late bool _localIsFav;
 
+  // Apple Music motion artwork (HLS video) for the now-playing track —
+  // same feature as the artist/album/track posters, gated by the same
+  // Settings toggle (and eco mode).
+  String? _motionUrl;
+  bool    _motionChecked = false;
+  bool    _showMotion    = true;
+
+  bool get _motionWanted =>
+      motionArtworkNotifier.value &&
+      !ecoModeActiveNotifier.value &&
+      MotionArtworkService.supported &&
+      _isNowPlaying;
+
   @override
   void initState() {
     super.initState();
@@ -3062,6 +3075,9 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
         // 2. Last.fm image embedded in the recent-tracks response
         if (url.isEmpty) url = _extractImage(t['image']);
 
+        // Apple Music motion artwork for the currently-playing track.
+        if (artist.isNotEmpty) _loadMotion(artist: artist, track: track);
+
         // When live, stop here — don't replace with the top-artist image.
       }
 
@@ -3092,6 +3108,16 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     } catch (_) {
       // Network error, timeout, or decode failure: skip the tint silently.
     }
+  }
+
+  Future<void> _loadMotion({required String artist, required String track}) async {
+    if (!_motionWanted) return;
+    final url = await MotionArtworkService.find(
+      artist: artist,
+      album: '',
+      track: track,
+    );
+    if (mounted) setState(() { _motionUrl = url; _motionChecked = true; });
   }
 
   int _total() => int.tryParse((_info?['playcount'] ?? '0').toString()) ?? 0;
@@ -3221,18 +3247,25 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                 Color(0x0F000000), Colors.transparent,
               ],
             ).createShader(r),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 500),
-              transitionBuilder: (child, anim) =>
-                  FadeTransition(opacity: anim, child: child),
-              child: hasImage
-                  ? _BlurFadeImage(
-                      key: ValueKey(_bannerUrl),
-                      url: _bannerUrl,
-                      fallback: _DetailGradientBg(scheme: scheme),
-                    )
-                  : _DetailGradientBg(
-                      key: const ValueKey('fallback'), scheme: scheme),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  transitionBuilder: (child, anim) =>
+                      FadeTransition(opacity: anim, child: child),
+                  child: hasImage
+                      ? _BlurFadeImage(
+                          key: ValueKey(_bannerUrl),
+                          url: _bannerUrl,
+                          fallback: _DetailGradientBg(scheme: scheme),
+                        )
+                      : _DetailGradientBg(
+                          key: const ValueKey('fallback'), scheme: scheme),
+                ),
+                if (hasImage && _showMotion && _motionUrl != null)
+                  MotionArtworkVideo(key: ValueKey(_motionUrl), url: _motionUrl!),
+              ],
             ),
           ),
         ),
@@ -3313,15 +3346,20 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
         // back+motion-toggle group, instead of a floating black circle.
         Positioned(
           top: topPad + 8, left: 12,
-          child: _headerButtonGroup(ctx, scheme),
+          child: _headerButtonGroup(
+            ctx, scheme,
+            showToggle: hasImage && _motionWanted && _motionChecked && _motionUrl != null,
+          ),
         ),
       ],
     );
   }
 
-  // Back button, plus the favourite star glued right next to it — same
-  // connected-pill language as the artist/album/track poster's header group.
-  Widget _headerButtonGroup(BuildContext ctx, ColorScheme scheme) {
+  // Back button, the favourite star, and (when there's motion art for the
+  // now-playing track) the photo/video switch — all one glued Material You
+  // group, same connected-pill language as the artist/album/track poster's
+  // header group.
+  Widget _headerButtonGroup(BuildContext ctx, ColorScheme scheme, {required bool showToggle}) {
     BorderRadius r(bool first, bool last) => BorderRadius.horizontal(
         left:  Radius.circular(first ? 22 : 6),
         right: Radius.circular(last  ? 22 : 6));
@@ -3349,8 +3387,24 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
             setState(() => _localIsFav = !_localIsFav);
             widget.onToggleFav();
           },
-          r(false, true),
+          r(false, !showToggle),
         ),
+      ),
+      AnimatedSize(
+        duration: const Duration(milliseconds: 320),
+        curve: M3Motion.emphasizedDecelerate,
+        alignment: Alignment.centerLeft,
+        child: showToggle
+            ? Padding(
+                padding: const EdgeInsets.only(left: 3),
+                child: _FadeIn(child: btn(
+                  Icon(_showMotion ? Icons.photo_rounded : Icons.videocam_rounded,
+                      color: scheme.onSecondaryContainer, size: 22),
+                  () => setState(() => _showMotion = !_showMotion),
+                  r(false, true),
+                )),
+              )
+            : const SizedBox.shrink(),
       ),
     ]);
   }
@@ -3421,27 +3475,6 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
         ),
         const SizedBox(height: 4),
 
-        if (_isNowPlaying) ...[
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color:        Colors.greenAccent.shade400.withValues(alpha: 0.2),
-              borderRadius: AppRadius.xlR,
-              border:       Border.all(color: Colors.greenAccent.shade400),
-            ),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(Icons.graphic_eq_rounded,
-                  size: 12, color: Colors.greenAccent.shade400),
-              const SizedBox(width: 4),
-              Text(L.commonNowPlayingLong,
-                style: TextStyle(
-                  color: Colors.greenAccent.shade400,
-                  fontSize: 11, fontWeight: FontWeight.w700)),
-            ]),
-          ),
-        ],
-
         if (country.isNotEmpty || since.isNotEmpty) ...[
           const SizedBox(height: 8),
           Container(
@@ -3477,7 +3510,10 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     // Avatar — anchored bottom-right, next to the text block. Shape follows
     // favourite status: a Material You star burst for favourite friends,
     // a plain circle otherwise — same shape language as the rest of the
-    // poster's Material You blocks.
+    // poster's Material You blocks. The green ring itself is now the only
+    // "online" indicator on this poster (star-shaped when the friend is a
+    // favourite, plain circle otherwise) — no separate dot or "En écoute"
+    // pill any more.
     final avatarShape = _localIsFav
         ? const M3CookieBorder(lobes: 10, amplitude: 0.20)
         : const CircleBorder();
@@ -3511,18 +3547,6 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                 ),
         ),
       ),
-      if (_isNowPlaying)
-        Positioned(
-          right: 2, bottom: 2,
-          child: Container(
-            width: 16, height: 16,
-            decoration: BoxDecoration(
-              color:  Colors.greenAccent.shade400,
-              shape:  BoxShape.circle,
-              border: Border.all(color: Colors.black38, width: 2),
-            ),
-          ),
-        ),
     ]);
 
     return Padding(
