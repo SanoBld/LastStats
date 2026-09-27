@@ -2167,21 +2167,12 @@ class _FriendsSection extends StatelessWidget {
 // ── Single friend card ────────────────────────────────────────────────────────
 
 // Shape + matching padding for the friend card's fixed 116×168 footprint.
-// Every variant is a pure curve (rounded rect / continuous squircle /
-// stadium) — no beveled/cut corners, so there is never a straight corner
-// edge, only curves, per the "no sharp corners" rule. The stadium is a
-// real oval (half the short side), so it gets extra horizontal padding on
-// top of the base padding to keep the avatar and text clear of the curve.
+// Single, consistent shape now: a rounded-corner square for every card
+// (the old per-card random rounded-rect / squircle / stadium variants are
+// gone, so cards no longer look mismatched next to each other).
 (ShapeBorder shape, EdgeInsetsGeometry padding) _friendCardStyle(int idx) {
   const base = EdgeInsets.all(14);
-  switch (idx % 4) {
-    case 0: return (RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)), base); // rounded rectangle
-    case 1: return (RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)), base); // rounder rectangle
-    case 2: return (ContinuousRectangleBorder(borderRadius: BorderRadius.circular(42)),     // squircle
-        base.add(const EdgeInsets.symmetric(horizontal: 4)));
-    default: return (const StadiumBorder(),                                                // oval
-        base.add(const EdgeInsets.symmetric(horizontal: 14)));
-  }
+  return (RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)), base);
 }
 
 class _FriendCard extends StatefulWidget {
@@ -2233,15 +2224,14 @@ class _FriendCardState extends State<_FriendCard> {
 
     // Base fill always follows the app's own chosen colour theme (the same
     // neutral tonal surface as the stats bubble elsewhere), so the card
-    // matches whatever accent colour is set in Settings.
+    // matches whatever accent colour is set in Settings. Fully opaque —
+    // no alpha blending — so the card reads as a solid, deliberate shape.
     final base = scheme.surfaceContainerHigh;
-    // "Currently listening" accent — same green used for the "En écoute"
-    // chip on the friend's own poster — covers the WHOLE card, not just a
-    // dot or a thin ring, so it reads at a glance from the list.
+    // "Currently listening" — the whole card switches to the app's own
+    // accent colour (scheme.primary), the same colour picked in Settings,
+    // instead of a hardcoded green. No more double-green (card + dot).
     final listening = friend.isOnline;
-    final fill = listening
-        ? Color.alphaBlend(Colors.greenAccent.shade400.withValues(alpha: 0.30), base)
-        : base;
+    final fill = listening ? scheme.primary : base;
 
     return GestureDetector(
       onTap:       () { _haptic(_HapticImpact.light); _openProfile(context); },
@@ -2261,11 +2251,7 @@ class _FriendCardState extends State<_FriendCard> {
             elevation: 0,
             clipper: ShapeBorderClipper(shape: shape),
             child: Container(
-              decoration: listening
-                  ? BoxDecoration(
-                      border: Border.all(color: Colors.greenAccent.shade400, width: 1.6),
-                    )
-                  : null,
+              decoration: null,
               padding: cardPadding,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -2277,7 +2263,9 @@ class _FriendCardState extends State<_FriendCard> {
                     child: Stack(children: [
                       CircleAvatar(
                         radius: 30,
-                        backgroundColor: scheme.primary.withValues(alpha: 0.2),
+                        backgroundColor: listening
+                            ? scheme.onPrimary.withValues(alpha: 0.2)
+                            : scheme.primary.withValues(alpha: 0.2),
                         backgroundImage: _hasAvatar ? NetworkImage(friend.avatarUrl) : null,
                         child: _hasAvatar
                             ? null
@@ -2286,7 +2274,8 @@ class _FriendCardState extends State<_FriendCard> {
                                     ? friend.username[0].toUpperCase()
                                     : '?',
                                 style: text.titleMedium?.copyWith(
-                                    color: scheme.primary, fontWeight: FontWeight.w800),
+                                    color: listening ? scheme.onPrimary : scheme.primary,
+                                    fontWeight: FontWeight.w800),
                               ),
                       ),
                       Positioned(
@@ -2294,9 +2283,12 @@ class _FriendCardState extends State<_FriendCard> {
                         child: Container(
                           width: 14, height: 14,
                           decoration: BoxDecoration(
-                            color:  friend.isOnline ? Colors.green : scheme.outline,
+                            color:  friend.isOnline ? scheme.onPrimary : scheme.outline,
                             shape:  BoxShape.circle,
-                            border: Border.all(color: scheme.surface, width: 2),
+                            border: Border.all(
+                              color: listening ? scheme.primary : scheme.surface,
+                              width: 2,
+                            ),
                           ),
                         ),
                       ),
@@ -2310,7 +2302,10 @@ class _FriendCardState extends State<_FriendCard> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
-                    style: text.bodySmall?.copyWith(fontWeight: FontWeight.w700) ??
+                    style: text.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: listening ? scheme.onPrimary : null,
+                        ) ??
                         const TextStyle(fontWeight: FontWeight.w700),
                   ),
 
@@ -2325,7 +2320,7 @@ class _FriendCardState extends State<_FriendCard> {
                         textAlign: TextAlign.center,
                         style: text.labelSmall?.copyWith(
                           color: friend.isOnline
-                              ? Colors.green.shade700
+                              ? scheme.onPrimary
                               : scheme.onSurfaceVariant,
                           fontWeight: friend.isOnline ? FontWeight.w600 : FontWeight.normal,
                         ),
@@ -2341,7 +2336,9 @@ class _FriendCardState extends State<_FriendCard> {
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                       style: text.labelSmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
+                        color: listening
+                            ? scheme.onPrimary.withValues(alpha: 0.85)
+                            : scheme.onSurfaceVariant,
                         fontSize: 9,
                       ),
                     ),

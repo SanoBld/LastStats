@@ -107,3 +107,12 @@
 - Side rail with rounded indicator, content in a rounded centered panel (tablet style)
 - Profile search grid and folder grid adapt to the screen width
 
+
+## Unreleased
+
+- Friends: cards are now a single consistent rounded square shape (removed the mixed square/circle/oval variants)
+- Friends: online status now fills the whole card with your chosen accent color instead of a hardcoded, buggy green overlay
+- Album, artist and track posters: titles redesigned
+- New poster shapes added
+- New video mode for Apple Music posters: shows an animated video preview instead of a static cover
+
