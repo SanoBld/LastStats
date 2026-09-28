@@ -33,20 +33,22 @@ class MotionArtworkService {
     final key = '${_norm(artist)}|${_norm(album)}|${_norm(track)}';
     if (_cache.containsKey(key)) return _cache[key];
     try {
-      final hit = await _albumPageUrl(artist, album, track);
+      // Every release that could carry the video: the song's own catalog
+      // entries (single, album, deluxe, compilation...), the album, and
+      // singles named after the track. The first hit used to be the only
+      // one tried, so a track whose first match was a video-less
+      // compilation showed nothing even though its single had one.
+      final cands = await _candidates(artist, album, track);
       String? video;
-      if (hit != null) {
-        // A track can carry its own "motion video" distinct from (or
-        // absent from) its album's — Apple exposes that on the *song*
-        // catalog entry, not just the album's. Some tracks only have the
-        // per-song one, which is why the official app shows a video where
-        // this used to show none: try the song first, then fall back to
-        // the album-level video, then the page-scrape fallback.
-        if (track.isNotEmpty && hit.$3 != null) {
-          video = await _videoFromSongApi(hit.$3!);
+      var pages = 0;
+      for (final c in cands) {
+        if (c.trackId != null) video = await _videoFromSongApi(c.trackId!);
+        video ??= await _videoFromApi(c.collectionId);
+        if (video == null && pages < 2) {
+          pages++;
+          video = await _videoFromPage(c.pageUrl);
         }
-        video ??= await _videoFromApi(hit.$1);
-        video ??= await _videoFromPage(hit.$2);
+        if (video != null) break;
       }
       _cache[key] = video;
       return video;
@@ -56,49 +58,106 @@ class MotionArtworkService {
     }
   }
 
-  static String _norm(String s) =>
-      s.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
-
-  // Loose match so "Album (Deluxe Edition)" still matches "Album".
-  static bool _similar(String a, String b) {
-    final x = _norm(a), y = _norm(b);
-    if (x.isEmpty || y.isEmpty) return false;
-    if (x == y) return true;
-    final s = x.length <= y.length ? x : y;
-    final l = x.length <= y.length ? y : x;
-    return s.length >= 4 && l.contains(s);
+  static String _norm(String s) {
+    const from = 'àáâãäåçèéêëìíîïñòóôõöùúûüýÿ';
+    const to   = 'aaaaaaceeeeiiiinooooouuuuyy';
+    var t = s.toLowerCase();
+    for (var i = 0; i < from.length; i++) {
+      t = t.replaceAll(from[i], to[i]);
+    }
+    return t.replaceAll(RegExp(r'[^a-z0-9]'), '');
   }
 
-  // Returns (collectionId, album page URL, trackId) of the best match.
-  // trackId is only present when we searched by song (byAlbum == false).
-  static Future<(String, String, String?)?> _albumPageUrl(
-      String artist, String album, String track) async {
-    final byAlbum = album.isNotEmpty;
-    final res = await http.get(Uri.https('itunes.apple.com', '/search', {
-      'term': byAlbum ? '$artist $album' : '$artist $track',
-      'entity': byAlbum ? 'album' : 'song',
-      'media': 'music',
-      'limit': '5',
-    })).timeout(_timeout);
-    if (res.statusCode != 200) return null;
-    final results =
-        (jsonDecode(utf8.decode(res.bodyBytes))['results'] as List?) ?? [];
-    for (final r in results) {
-      final item = r as Map<String, dynamic>;
-      if (!_similar(artist, (item['artistName'] ?? '').toString())) continue;
-      final title = (byAlbum ? item['collectionName'] : item['trackName'] ?? '')
-          .toString();
-      if (!_similar(byAlbum ? album : track, title)) continue;
-      final url = (item['collectionViewUrl'] ?? '').toString();
-      if (url.isEmpty) continue;
-      final id = (item['collectionId'] ?? '').toString();
-      if (id.isEmpty) continue;
-      final trackId = byAlbum ? null : (item['trackId'] ?? '').toString();
-      // Drop the "?i=trackId" part so we get the album page itself.
-      return (id, url.split('?').first,
-          (trackId != null && trackId.isNotEmpty) ? trackId : null);
+  // Drops "(feat. X)", "[Remastered]", " - Single", " - Live" suffixes so
+  // Last.fm titles match Apple's.
+  static String _core(String s) => s
+      .replaceAll(RegExp(r'\s*[\(\[][^\)\]]*[\)\]]'), '')
+      .replaceAll(RegExp(r'\s+-\s+.*$'), '')
+      .trim();
+
+  // Loose match so "Album (Deluxe Edition)" still matches "Album", and
+  // "Star Walkin'" matches "STARWALKIN'".
+  static bool _similar(String a, String b) {
+    for (final pair in [(a, b), (_core(a), _core(b))]) {
+      final x = _norm(pair.$1), y = _norm(pair.$2);
+      if (x.isEmpty || y.isEmpty) continue;
+      if (x == y) return true;
+      final s = x.length <= y.length ? x : y;
+      final l = x.length <= y.length ? y : x;
+      if (s.length >= 4 && l.contains(s)) return true;
     }
-    return null;
+    return false;
+  }
+
+  static final _artistSplit = RegExp(
+      r'\s*,\s*|\s+(&|feat\.?|ft\.?|x|and)\s+', caseSensitive: false);
+
+  // The artist may be credited as "A & B" / "A feat. B" on one side only.
+  static bool _artistMatch(String a, String b) =>
+      _similar(a, b) ||
+      _similar(a.split(_artistSplit).first, b) ||
+      _similar(a, b.split(_artistSplit).first);
+
+  static Future<List<Map<String, dynamic>>> _itunes(
+      String term, String entity, int limit) async {
+    try {
+      final res = await http.get(Uri.https('itunes.apple.com', '/search', {
+        'term': term, 'entity': entity, 'media': 'music', 'limit': '$limit',
+      })).timeout(_timeout);
+      if (res.statusCode != 200) return [];
+      final list = (jsonDecode(utf8.decode(res.bodyBytes))['results'] as List?) ?? [];
+      return list.whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  static Future<List<({String collectionId, String pageUrl, String? trackId})>>
+      _candidates(String artist, String album, String track) async {
+    final out = <({String collectionId, String pageUrl, String? trackId})>[];
+    final seen = <String>{};
+    void add(Map<String, dynamic> item, {required bool song}) {
+      final id  = (item['collectionId'] ?? '').toString();
+      final url = (item['collectionViewUrl'] ?? '').toString();
+      if (id.isEmpty || url.isEmpty) return;
+      final tid = song ? (item['trackId'] ?? '').toString() : '';
+      if (!seen.add('$id|$tid')) return;
+      out.add((collectionId: id, pageUrl: url.split('?').first,
+               trackId: tid.isEmpty ? null : tid));
+    }
+
+    final futures = <Future<List<Map<String, dynamic>>>>[
+      if (track.isNotEmpty) _itunes('$artist ${_core(track)}', 'song', 25),
+      if (album.isNotEmpty) _itunes('$artist ${_core(album)}', 'album', 10),
+      if (track.isNotEmpty) _itunes('$artist ${_core(track)}', 'album', 10),
+    ];
+    final res = await Future.wait(futures);
+    var i = 0;
+    if (track.isNotEmpty) {
+      for (final r in res[i++]) {
+        if (_artistMatch(artist, (r['artistName'] ?? '').toString()) &&
+            _similar(track, (r['trackName'] ?? '').toString())) {
+          add(r, song: true);
+        }
+      }
+    }
+    if (album.isNotEmpty) {
+      for (final r in res[i++]) {
+        if (_artistMatch(artist, (r['artistName'] ?? '').toString()) &&
+            _similar(album, (r['collectionName'] ?? '').toString())) {
+          add(r, song: false);
+        }
+      }
+    }
+    if (track.isNotEmpty) {
+      for (final r in res[i++]) {
+        if (_artistMatch(artist, (r['artistName'] ?? '').toString()) &&
+            _similar(track, (r['collectionName'] ?? '').toString())) {
+          add(r, song: false);
+        }
+      }
+    }
+    return out.take(8).toList();
   }
 
   // ── Catalog API path ───────────────────────────────────────────────────
@@ -111,13 +170,20 @@ class MotionArtworkService {
     final home = await http.get(Uri.parse('https://music.apple.com/us/browse'),
         headers: {'User-Agent': _ua}).timeout(_timeout);
     if (home.statusCode != 200) return null;
-    final src = RegExp(r'src="(/assets/index[^"]+\.js)"').firstMatch(home.body);
-    if (src == null) return null;
-    final js = await http.get(Uri.parse('https://music.apple.com${src.group(1)}'),
-        headers: {'User-Agent': _ua}).timeout(const Duration(seconds: 15));
-    if (js.statusCode != 200) return null;
-    final t = RegExp(r'eyJh[\w-]+\.[\w-]+\.[\w-]+').firstMatch(js.body);
-    return _token = t?.group(0);
+    // Try the main bundle first, then any other script of the page.
+    final scripts = RegExp(r'src="(/assets/[^"]+\.js)"')
+        .allMatches(home.body).map((m) => m.group(1)!).toList()
+      ..sort((a, b) => (b.contains('/index') ? 1 : 0) - (a.contains('/index') ? 1 : 0));
+    for (final path in scripts.take(6)) {
+      try {
+        final js = await http.get(Uri.parse('https://music.apple.com$path'),
+            headers: {'User-Agent': _ua}).timeout(const Duration(seconds: 15));
+        if (js.statusCode != 200) continue;
+        final t = RegExp(r'eyJh[\w-]+\.[\w-]+\.[\w-]+').firstMatch(js.body);
+        if (t != null) return _token = t.group(0);
+      } catch (_) {}
+    }
+    return null;
   }
 
   static Future<String?> _videoFromApi(String albumId) async {

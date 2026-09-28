@@ -430,38 +430,42 @@ class _AchvCardViewerState extends State<_AchvCardViewer> {
                   tier: a.def.tier,
                   child: Center(
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(icon, size: 60, color: Colors.black87),
+                      Icon(icon, size: 60, color: tierOnColor(a.def.tier)),
                       const SizedBox(height: 14),
-                      Text(_achvCategoryLabel(a.def.category), textAlign: TextAlign.center, style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w800, color: Colors.black87)),
+                      Text(_achvCategoryLabel(a.def.category), textAlign: TextAlign.center, style: TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.w800, color: tierOnColor(a.def.tier))),
                       const SizedBox(height: 2),
-                      Text(tierLabel(a.def.tier), style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black54)),
+                      Text(tierLabel(a.def.tier), style: TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.w600,
+                          color: tierOnColor(a.def.tier).withValues(alpha: 0.7))),
                     ]),
                   ),
                 ),
                 back: Container(
-                  color: const Color(0xFF171717),
+                  color: Theme.of(context).colorScheme.surfaceContainerHigh,
                   padding: const EdgeInsets.all(22),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(_achvCategoryLabel(a.def.category), style: const TextStyle(
-                          color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
+                      Text(_achvCategoryLabel(a.def.category), style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface, fontSize: 20, fontWeight: FontWeight.w700)),
                       const SizedBox(height: 4),
-                      Text(tierLabel(a.def.tier), style: const TextStyle(
-                          color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w600)),
+                      Text(tierLabel(a.def.tier), style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 10),
                       Text('${a.current} / ${a.def.threshold}',
-                          style: const TextStyle(color: Colors.white70, fontSize: 15)),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 15)),
                       const SizedBox(height: 10),
                       Row(children: [
                         Icon(a.unlocked ? Icons.check_circle_rounded : Icons.lock_outline_rounded,
-                            size: 16, color: a.unlocked ? Colors.green : Colors.white38),
+                            size: 16,
+                            color: a.unlocked
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context).colorScheme.onSurfaceVariant),
                         const SizedBox(width: 6),
                         Text(a.unlocked ? L.achvUnlockedBadge : L.achvLockedBadge,
-                            style: const TextStyle(color: Colors.white54, fontSize: 13)),
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 13)),
                       ]),
                     ],
                   ),
@@ -530,11 +534,11 @@ class _ShareBadgeArt extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter, end: Alignment.bottomCenter,
               stops: const [0.0, 0.5, 1.0],
-              colors: [Colors.transparent, Colors.black.withValues(alpha: 0.05), Colors.black.withValues(alpha: 0.85)],
+              colors: [Colors.transparent, Colors.black.withValues(alpha: 0.05), Colors.black.withValues(alpha: 0.6)],
             ),
           ),
         ),
-        Center(child: Icon(icon, size: 72, color: Colors.black87)),
+        Center(child: Icon(icon, size: 72, color: tierOnColor(a.def.tier))),
         Positioned(
           left: 24, right: 24, bottom: 22,
           child: Column(
@@ -737,30 +741,33 @@ class _AchvTierBadgeState extends State<_AchvTierBadge> {
   Widget build(BuildContext context) {
     final grad = tierGradient(widget.tier);
     final hasAvatar = (widget.avatarUrl ?? '').isNotEmpty;
+    final iconColor = grad == null
+        ? Theme.of(context).colorScheme.onSurfaceVariant
+        : tierOnColor(widget.tier);
 
     Widget content(double phase) {
       final s = math.sin(phase * 2 * math.pi) * 0.5;
       return Container(
         width: widget.size, height: widget.size,
         padding: hasAvatar ? const EdgeInsets.all(3) : EdgeInsets.zero,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
+        // Same cookie shape as every other icon badge in the app.
+        decoration: ShapeDecoration(
+          shape: const M3CookieBorder(lobes: 8, amplitude: 0.07),
           gradient: grad == null ? null : LinearGradient(
             colors: grad, stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
             begin: Alignment(-1 + s, -1), end: Alignment(1 + s, 1),
           ),
           color: grad == null ? Theme.of(context).colorScheme.surfaceContainerHighest : null,
-          boxShadow: grad == null ? null : [
-            BoxShadow(color: grad[1].withValues(alpha: 0.5), blurRadius: 10, spreadRadius: -2),
-          ],
         ),
         child: hasAvatar
-            ? ClipOval(
+            ? ClipPath(
+                clipper: ShapeBorderClipper(
+                    shape: const M3CookieBorder(lobes: 8, amplitude: 0.07)),
                 child: Image.network(widget.avatarUrl!, fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) => const Icon(Icons.person_rounded, color: Colors.black87)),
+                    errorBuilder: (_, _, _) => Icon(Icons.person_rounded, color: iconColor)),
               )
             : (widget.icon == null ? null
-                : Icon(widget.icon, size: widget.size * 0.42, color: Colors.black87)),
+                : Icon(widget.icon, size: widget.size * 0.42, color: iconColor)),
       );
     }
 

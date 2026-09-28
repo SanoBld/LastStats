@@ -46,6 +46,9 @@
 - Achievements redesigned to match the rest of the app: Material 3 Expressive header, level card, grouped category list and milestone lists with big outer and small inner corners, primary and container colors only
 - Level history page uses the same header
 - News list: same grouped tiles as settings, cookie-shaped icon badges, consistent spacing
+- Tier styles (bronze, silver, gold, platinum, emerald, sapphire, diamond, chrome, iridescent) redesigned in Material You: soft tonal colors instead of metallic sheens, cookie-shaped badges, theme-colored back of the 3D badge card
+- Rankings podium redesigned to match the recap podium: shaped covers with rank badge, text under the cover, tonal bars
+- Apple Music video: much better matching, tries every release of a track (single, album, deluxe), smarter title/artist matching and a more robust token lookup
 
 **Settings: redesigned in Material 3 Expressive**
 - Every settings page now shares one design: cookie-shaped icon badges, grouped tiles (big outer corners, small inner corners), spring press animation, a check icon inside switches, clearer section titles and an 8dp spacing scale

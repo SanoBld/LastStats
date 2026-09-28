@@ -231,8 +231,8 @@ class _Tilt3DCardState extends State<Tilt3DCard>
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: tierGradient(effTier)![1].withValues(alpha: 0.45),
-                            blurRadius: 16, spreadRadius: -2,
+                            color: tierGradient(effTier)![1].withValues(alpha: 0.28),
+                            blurRadius: 14, spreadRadius: -4,
                           ),
                         ],
                       ),

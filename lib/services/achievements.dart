@@ -83,50 +83,42 @@ int levelThreshold(int level) {
 // stays maxed out beyond its threshold (no cap on how high you can go).
 enum CardTier { none, bronze, silver, gold, platinum, emerald, sapphire, diamond, chrome, iridescent }
 
-// Rich multi-stop gradients: base tone → bright sheen → base → deeper
-// shadow tone. Gives a noticeable metallic/gem texture without any 3D
-// trick — just careful color stops. Used for both the card border and
-// the achievement badges so the look stays consistent everywhere.
-const _tierGradients = <CardTier, List<Color>>{
-  CardTier.bronze: [
-    Color(0xFF6B4321), Color(0xFFCD7F32), Color(0xFFF0B27A),
-    Color(0xFFCD7F32), Color(0xFF5A3818),
-  ],
-  CardTier.silver: [
-    Color(0xFF6B6B70), Color(0xFFC8C8CC), Color(0xFFFFFFFF),
-    Color(0xFFA8A8AD), Color(0xFF56565A),
-  ],
-  CardTier.gold: [
-    Color(0xFF8C6A0A), Color(0xFFFFD76A), Color(0xFFFFF3C4),
-    Color(0xFFD9A62B), Color(0xFF7A5A08),
-  ],
-  CardTier.platinum: [
-    Color(0xFFB9AC9A), Color(0xFFF3E9DA), Color(0xFFFFFDF8),
-    Color(0xFFDCCBB0), Color(0xFF9C8C74),
-  ],
-  CardTier.emerald: [
-    Color(0xFF045C42), Color(0xFF34D399), Color(0xFFB8FCE0),
-    Color(0xFF10B981), Color(0xFF03422F),
-  ],
-  CardTier.sapphire: [
-    Color(0xFF1E3A8A), Color(0xFF3B82F6), Color(0xFFBFDBFE),
-    Color(0xFF2563EB), Color(0xFF1E2E6B),
-  ],
-  CardTier.diamond: [
-    Color(0xFF2A8DA6), Color(0xFF9FF3FF), Color(0xFFFFFFFF),
-    Color(0xFF6FE0F5), Color(0xFF1F6D80),
-  ],
-  CardTier.chrome: [
-    Color(0xFF15171A), Color(0xFFFFFFFF), Color(0xFF1D2124),
-    Color(0xFFFFFFFF), Color(0xFF15171A),
-  ],
-  CardTier.iridescent: [
-    Color(0xFFFF9AF4), Color(0xFF9AD8FF), Color(0xFFC8FFEC),
-    Color(0xFFFFE29A), Color(0xFFFF9AF4),
-  ],
+// Material You tier look: every tier is one soft tonal colour (like an M3
+// container role) plus a matching "on" colour for icons/text. The gradient
+// is only a gentle tonal shift around that colour — no white hotspots, no
+// near-black shadows, no metallic sheen — so tiers sit naturally next to
+// the rest of the app's tonal surfaces.
+const _tierBase = <CardTier, Color>{
+  CardTier.bronze:   Color(0xFFDBA67A),
+  CardTier.silver:   Color(0xFFC6CBD4),
+  CardTier.gold:     Color(0xFFEBC65E),
+  CardTier.platinum: Color(0xFFDCCFF0),
+  CardTier.emerald:  Color(0xFF7ED3A2),
+  CardTier.sapphire: Color(0xFF8AAEF2),
+  CardTier.diamond:  Color(0xFF93DDEE),
+  CardTier.chrome:   Color(0xFF474C54),
 };
 
-List<Color>? tierGradient(CardTier t) => t == CardTier.none ? null : _tierGradients[t];
+Color _shade(Color c, double dl) {
+  final h = HSLColor.fromColor(c);
+  return h.withLightness((h.lightness + dl).clamp(0.0, 1.0)).toColor();
+}
+
+const _iridescentTonal = <Color>[
+  Color(0xFFF2B8EE), Color(0xFFB9DAF7), Color(0xFFC6F0E0),
+  Color(0xFFF5E2A8), Color(0xFFF2B8EE),
+];
+
+List<Color>? tierGradient(CardTier t) {
+  if (t == CardTier.none) return null;
+  if (t == CardTier.iridescent) return _iridescentTonal;
+  final b = _tierBase[t]!;
+  return [_shade(b, 0.05), b, _shade(b, 0.09), b, _shade(b, -0.06)];
+}
+
+// Icon / text colour that reads on top of the tier colour.
+Color tierOnColor(CardTier t) =>
+    t == CardTier.chrome ? const Color(0xFFF1F2F4) : const Color(0xFF2B2118);
 
 String tierLabel(CardTier t) => switch (t) {
   CardTier.bronze     => 'Bronze',

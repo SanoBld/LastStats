@@ -445,16 +445,12 @@ class _PodiumWidget extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
 
+    // Same podium as the recap: shaped avatar with a rank badge, text
+    // under it, then a tonal bar (2nd left, 1st middle, 3rd right).
     const order   = [1, 0, 2];
-    const heights = [100.0, 130.0, 80.0];
-    const medals  = ['🥈', '🥇', '🥉'];
-    const imgSz   = [54.0, 68.0, 46.0];
-
-    final podiumColors = [
-      (scheme.secondaryContainer, scheme.onSecondaryContainer),
-      (scheme.primaryContainer,   scheme.onPrimaryContainer),
-      (scheme.tertiaryContainer,  scheme.onTertiaryContainer),
-    ];
+    const heights = [96.0, 128.0, 78.0];
+    const imgSz   = [56.0, 68.0, 48.0];
+    final barColors = [scheme.secondaryContainer, scheme.primaryContainer, scheme.tertiaryContainer];
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
@@ -476,65 +472,66 @@ class _PodiumWidget extends StatelessWidget {
               case 'albums':  imgF = ImageService.resolveAlbum(name, art, lastfmUrl: raw.isNotEmpty ? raw : null); break;
               default:        imgF = ImageService.resolveTrack(name, art, lastfmUrl: raw.isNotEmpty ? raw : null);
             }
-            final (podC, podOn) = podiumColors[di];
 
             return Expanded(child: _PressScale(
               onTap: () { _haptic(_HapticImpact.light); onTap(item); },
-              child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-                ClipRRect(
-                  key: ValueKey('podium_img_${type}_$name'),
-                  borderRadius: BorderRadius.circular(imgSz[col] / 4),
-                  child: _SmartImage(size: imgSz[col], borderRadius: imgSz[col] / 4,
-                      initialUrl: raw, resolver: () => imgF),
-                ),
-                const SizedBox(height: 5),
-                Text(medals[col], style: TextStyle(fontSize: di == 0 ? 22 : 18)),
-                const SizedBox(height: 3),
-                // Bar grows up from 0 on first render
-                TweenAnimationBuilder<double>(
-                  tween:    Tween(begin: 0.0, end: heights[col]),
-                  duration: Duration(milliseconds: 550 + col * 80),
-                  curve:    M3Motion.emphasizedDecelerate,
-                  builder: (_, h, child) => SizedBox(height: h, child: child),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: podC,
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                      border: Border(
-                        top:   BorderSide(color: podOn.withValues(alpha: 0.15), width: 1),
-                        left:  BorderSide(color: podOn.withValues(alpha: 0.15), width: 1),
-                        right: BorderSide(color: podOn.withValues(alpha: 0.15), width: 1),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+                  Stack(clipBehavior: Clip.none, children: [
+                    M3ShapedBox(
+                      key: ValueKey('podium_img_${type}_$name'),
+                      size: imgSz[col],
+                      shapeIndex: col == 0 ? 0 : (col == 1 ? 2 : 7),
+                      child: _SmartImage(size: imgSz[col], borderRadius: 0,
+                          initialUrl: raw, resolver: () => imgF),
+                    ),
+                    Positioned(
+                      right: -2, bottom: -2,
+                      child: Container(
+                        width: 22, height: 22,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: scheme.primary,
+                          border: Border.all(color: scheme.surface, width: 2),
+                        ),
+                        child: Text('${di + 1}',
+                            style: TextStyle(color: scheme.onPrimary,
+                                fontSize: 11, fontWeight: FontWeight.w800)),
                       ),
                     ),
-                    padding: const EdgeInsets.all(7),
-                    child: Column(children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
-                        decoration: BoxDecoration(
-                          color: podOn.withValues(alpha: 0.12),
-                          borderRadius: AppRadius.xlR,
-                        ),
-                        child: Text('#${di + 1}', style: text.labelSmall?.copyWith(
-                            color: podOn, fontWeight: FontWeight.w800)),
+                  ]),
+                  const SizedBox(height: 8),
+                  Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: scheme.onSurface, fontSize: 12, fontWeight: FontWeight.w700)),
+                  if (art.isNotEmpty)
+                    Text(art, maxLines: 1, overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 10)),
+                  Text('$plays ${L.commonPlays}',
+                      style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 10)),
+                  const SizedBox(height: 8),
+                  // Bar grows up from 0 on first render
+                  TweenAnimationBuilder<double>(
+                    tween:    Tween(begin: 0.0, end: heights[col]),
+                    duration: Duration(milliseconds: 550 + col * 80),
+                    curve:    M3Motion.emphasizedDecelerate,
+                    builder: (_, h, child) => SizedBox(height: h, child: child),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: barColors[di],
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                       ),
-                      const SizedBox(height: 3),
-                      Text(name, maxLines: 2, overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style: text.bodySmall?.copyWith(
-                              color: podOn, fontWeight: FontWeight.w700, fontSize: di == 0 ? 11 : 10)),
-                      const SizedBox(height: 2),
-                      Text(plays, style: text.bodySmall
-                          ?.copyWith(color: podOn.withValues(alpha: 0.65), fontSize: 9)),
-                    ]),
+                    ),
                   ),
-                ),
-              ]),
+                ]),
+              ),
             ));
           }),
         ),
         const SizedBox(height: 12),
-        Divider(color: scheme.outlineVariant.withValues(alpha: 0.4)),
         Padding(
           padding: const EdgeInsets.only(left: 4, top: 4, bottom: 4),
           child: Text(L.rankingsContinued,
