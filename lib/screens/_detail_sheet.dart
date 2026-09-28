@@ -405,7 +405,11 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   AudioPlayer? _audioPlayer;
 
   String get _name   => (widget.item['name']            ?? '').toString();
-  String get _artist => (widget.item['artist']?['name'] ?? '').toString();
+  String get _artist {
+    final a = widget.item['artist'];
+    if (a is Map) return (a['name'] ?? a['#text'] ?? '').toString();
+    return (a ?? '').toString();
+  }
 
   // Apple Music motion artwork shown in the header (albums and tracks).
   String? _motionUrl;
@@ -3067,7 +3071,8 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
       if (isNp && recentList.isNotEmpty) {
         final t      = recentList.first as Map;
         final track  = (t['name'] ?? '').toString();
-        final artist = (t['artist']?['name'] ?? t['artist'] ?? '').toString();
+        final ar     = t['artist'];
+        final artist = (ar is Map ? (ar['name'] ?? ar['#text'] ?? '') : (ar ?? '')).toString();
 
         // 1. High-quality lookup (MusicBrainz / Fanart.tv)
         url = await ImageService.resolveTrack(track, artist);
@@ -3728,7 +3733,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     return GestureDetector(
       onTap: () {
         final item = Map<String, dynamic>.from(np);
-        item['artist'] ??= {'name': artist};
+        item['artist'] = {'name': artist};
         showDetailSheet(context, item, 'tracks', widget.service);
       },
       child: Padding(
@@ -3795,7 +3800,6 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
 
     return InkWell(
       onTap: () {
-        Navigator.pop(ctx);
         showDetailSheet(ctx, a, 'artists', widget.service);
       },
       child: Padding(
@@ -3851,7 +3855,6 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
 
           return GestureDetector(
             onTap: () {
-              Navigator.pop(ctx);
               showDetailSheet(ctx, al, 'albums', widget.service);
             },
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -3891,7 +3894,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     return GestureDetector(
       onTap: () {
         final item = Map<String, dynamic>.from(t);
-        item['artist'] ??= {'name': artist};
+        item['artist'] = {'name': artist};
         showDetailSheet(context, item, 'tracks', widget.service);
       },
       child: Padding(
