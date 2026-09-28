@@ -81,65 +81,92 @@ class _AchievementsSheet extends StatelessWidget {
     final visibleCategories = byCategory.keys.toList()
       ..sort((a, b) => AchvCategory.values.indexOf(a).compareTo(AchvCategory.values.indexOf(b)));
 
+    final text = Theme.of(context).textTheme;
+
+    // Everything below reuses the settings-page building blocks:
+    // M3PageHeader, M3PressCard, M3SegmentTile (big outer / small inner
+    // corners) and the theme's own colour roles — no custom colours.
     return Scaffold(
-      appBar: AppBar(title: Text(L.achvTitle), scrolledUnderElevation: 0),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 720),
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-            children: [
-          Center(
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 720),
             child: Column(children: [
-              _AchvTierBadge(tier: myTier, size: 92, avatarUrl: avatarUrl),
-              const SizedBox(height: 10),
-              GestureDetector(
-                onTap: isSelf ? () => Navigator.of(context).push(
-                    M3SharedAxisRoute(builder: (_) => const _LevelHistoryPage())) : null,
-                child: Column(children: [
-                  Row(mainAxisSize: MainAxisSize.min, children: [
-                    Text(_ct('Niveau $level', 'Level $level'),
-                        style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800)),
-                    if (isSelf) ...[
-                      const SizedBox(width: 4),
-                      Icon(Icons.chevron_right_rounded, size: 20, color: scheme.onSurfaceVariant),
-                    ],
-                  ]),
-                  const SizedBox(height: 6),
-                  SizedBox(
-                    width: 160,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(value: lvlRatio.clamp(0.0, 1.0), minHeight: 5),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text('$total / $lvlTo', style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12)),
-                ]),
+              M3PageHeader(
+                title: L.achvTitle,
+                subtitle: L.achvUnlocked(unlocked, list.length),
               ),
-              const SizedBox(height: 4),
-              Text(L.achvUnlocked(unlocked, list.length),
-                  style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13)),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                  children: [
+                    // Level card: tier badge, level, progress to next level.
+                    M3PressCard(
+                      color: scheme.primaryContainer,
+                      padding: const EdgeInsets.all(20),
+                      onTap: isSelf
+                          ? () => Navigator.of(context).push(M3SharedAxisRoute(
+                              builder: (_) => const _LevelHistoryPage()))
+                          : null,
+                      child: Row(children: [
+                        _AchvTierBadge(tier: myTier, size: 76, avatarUrl: avatarUrl),
+                        const SizedBox(width: 18),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(children: [
+                                Flexible(
+                                  child: Text(_ct('Niveau $level', 'Level $level'),
+                                      style: text.headlineSmall?.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                          color: scheme.onPrimaryContainer)),
+                                ),
+                                if (isSelf) ...[
+                                  const SizedBox(width: 4),
+                                  Icon(Icons.chevron_right_rounded,
+                                      color: scheme.onPrimaryContainer),
+                                ],
+                              ]),
+                              const SizedBox(height: 10),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: LinearProgressIndicator(
+                                  value: lvlRatio.clamp(0.0, 1.0),
+                                  minHeight: 8,
+                                  color: scheme.primary,
+                                  backgroundColor:
+                                      scheme.onPrimaryContainer.withValues(alpha: 0.15),
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text('$total / $lvlTo',
+                                  style: text.labelMedium?.copyWith(
+                                      color: scheme.onPrimaryContainer
+                                          .withValues(alpha: 0.75))),
+                            ],
+                          ),
+                        ),
+                      ]),
+                    ),
+                    const SizedBox(height: 20),
+                    // Categories: one grouped list, same as a settings section.
+                    for (var i = 0; i < visibleCategories.length; i++)
+                      _FadeSlideIn(
+                        delay: _staggerDelay(i),
+                        child: M3SegmentTile(
+                          index: i,
+                          count: visibleCategories.length,
+                          child: _AchvCategoryCard(
+                            category: visibleCategories[i],
+                            items: byCategory[visibleCategories[i]]!,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ]),
-          ),
-          const SizedBox(height: 22),
-          LayoutBuilder(builder: (context, box) {
-            // 2 columns on phones, more as the window gets wider (PC/tablet).
-            final cols = box.maxWidth >= 620 ? 3 : (box.maxWidth >= 420 ? 2 : 2);
-            return GridView.count(
-              crossAxisCount: cols,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 0.92,
-              children: visibleCategories.map((cat) {
-                final items = byCategory[cat]!;
-                return _AchvCategoryCard(category: cat, items: items);
-              }).toList(),
-            );
-          }),
-        ],
           ),
         ),
       ),
@@ -172,60 +199,52 @@ class _AchvCategoryCard extends StatelessWidget {
     final (title, desc, icon) = _meta();
     final summary = summarizeCategory(items);
     final scheme  = Theme.of(context).colorScheme;
+    final text    = Theme.of(context).textTheme;
 
-    return GestureDetector(
-      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+    // Row inside an M3SegmentTile: tier badge, title + description,
+    // progress pill and chevron.
+    return InkWell(
+      onTap: () => Navigator.of(context).push(M3SharedAxisRoute(
         builder: (_) => _AchvCategoryDetailPage(
           category: category, items: items, title: title, description: desc, icon: icon,
         ),
       )),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          color: scheme.surfaceContainerHigh,
-          border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Textured tier swatch at top — noticeable sheen, no 3D.
-            SizedBox(
-              height: 64,
-              width: double.infinity,
-              child: _AchvTierSurface(tier: summary.tier, child: Center(
-                child: Icon(icon, size: 26,
-                    color: summary.tier == CardTier.none ? scheme.onSurfaceVariant : Colors.black87),
-              )),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(children: [
+          _AchvTierBadge(tier: summary.tier, size: 48, icon: icon),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 2),
+                Text(desc,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              ],
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                        const SizedBox(height: 3),
-                        Text(desc, maxLines: 2, overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant, height: 1.25)),
-                      ],
-                    ),
-                    Text(
-                      summary.next == null
-                          ? '${summary.current} · ${tierLabel(summary.tier)}'
-                          : '${summary.current} / ${summary.next!.def.threshold}',
-                      style: AppText.badge.copyWith(color: scheme.primary),
-                    ),
-                  ],
-                ),
-              ),
+          ),
+          const SizedBox(width: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: scheme.secondaryContainer,
+              borderRadius: BorderRadius.circular(20),
             ),
-          ],
-        ),
+            child: Text(
+              summary.next == null
+                  ? '${summary.current} · ${tierLabel(summary.tier)}'
+                  : '${summary.current} / ${summary.next!.def.threshold}',
+              style: text.labelSmall?.copyWith(
+                  color: scheme.onSecondaryContainer, fontWeight: FontWeight.w700),
+            ),
+          ),
+          Icon(Icons.chevron_right_rounded, color: scheme.onSurfaceVariant),
+        ]),
       ),
     );
   }
@@ -245,19 +264,33 @@ class _AchvCategoryDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(title: Text(title), scrolledUnderElevation: 0),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 640),
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-            children: [
-              Text(description, style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13)),
-              const SizedBox(height: 18),
-              ...items.map((a) => _AchvMilestoneTile(a: a, icon: icon)),
-            ],
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 640),
+            child: Column(children: [
+              M3PageHeader(title: title, subtitle: description),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                  children: [
+                    for (var i = 0; i < items.length; i++)
+                      _FadeSlideIn(
+                        delay: _staggerDelay(i),
+                        child: M3SegmentTile(
+                          index: i,
+                          count: items.length,
+                          // Unlocked milestones use the primary container,
+                          // exactly like a selected settings row.
+                          selected: items[i].unlocked,
+                          child: _AchvMilestoneTile(a: items[i], icon: icon),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ]),
           ),
         ),
       ),
@@ -273,50 +306,48 @@ class _AchvMilestoneTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
     final ratio  = (a.current / a.def.threshold).clamp(0.0, 1.0);
-    return GestureDetector(
+    final fg     = a.unlocked ? scheme.onPrimaryContainer : scheme.onSurface;
+    final fgSoft = a.unlocked
+        ? scheme.onPrimaryContainer.withValues(alpha: 0.75)
+        : scheme.onSurfaceVariant;
+    return InkWell(
       onTap: () => _openAchvCard(context, a, icon),
-      child: Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: AppRadius.lgR,
-        color: scheme.surfaceContainerHigh,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _AchvTierBadge(tier: a.def.tier, size: 46, icon: icon, dim: !a.unlocked),
-          const SizedBox(width: 12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(children: [
+          _AchvTierBadge(tier: a.def.tier, size: 48, icon: icon, dim: !a.unlocked),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(children: [
-                  Text(tierLabel(a.def.tier),
-                      style: TextStyle(fontWeight: FontWeight.w700,
-                          color: a.unlocked ? null : scheme.onSurfaceVariant)),
-                  const SizedBox(width: 6),
-                  Icon(a.unlocked ? Icons.check_circle_rounded : Icons.lock_outline_rounded,
-                      size: 15, color: a.unlocked ? Colors.green : scheme.onSurfaceVariant),
-                ]),
-                const SizedBox(height: 4),
+                Text(tierLabel(a.def.tier),
+                    style: text.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: a.unlocked ? fg : scheme.onSurfaceVariant)),
+                const SizedBox(height: 8),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(8),
                   child: LinearProgressIndicator(
-                    value: ratio, minHeight: 5,
-                    backgroundColor: scheme.surfaceContainerHighest,
-                    color: a.unlocked ? scheme.primary : scheme.onSurfaceVariant,
+                    value: ratio, minHeight: 8,
+                    color: scheme.primary,
+                    backgroundColor: a.unlocked
+                        ? scheme.onPrimaryContainer.withValues(alpha: 0.15)
+                        : scheme.surfaceContainerHighest,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Text('${a.current} / ${a.def.threshold}',
-                    style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+                    style: text.labelMedium?.copyWith(color: fgSoft)),
               ],
             ),
           ),
-        ],
-      ),
+          const SizedBox(width: 12),
+          Icon(a.unlocked ? Icons.check_circle_rounded : Icons.lock_outline_rounded,
+              color: a.unlocked ? scheme.primary : scheme.onSurfaceVariant),
+        ]),
       ),
     );
   }
@@ -565,14 +596,12 @@ class _LevelHistoryPage extends StatelessWidget {
     final history = _computeLevelHistory();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_ct('Historique des niveaux', 'Level history')),
-        scrolledUnderElevation: 0,
-      ),
-      body: Center(
+      body: SafeArea(child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 640),
-          child: history.isEmpty
+          child: Column(children: [
+          M3PageHeader(title: _ct('Historique des niveaux', 'Level history')),
+          Expanded(child: history.isEmpty
           ? Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -611,9 +640,10 @@ class _LevelHistoryPage extends StatelessWidget {
                   ),
                 );
               },
-            ),
+            )),
+          ]),
         ),
-      ),
+      )),
     );
   }
 }

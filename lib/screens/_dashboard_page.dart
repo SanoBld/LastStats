@@ -4000,7 +4000,7 @@ class _NewsPageState extends State<_NewsPage> {
               : ListView.separated(
                   padding:     const EdgeInsets.fromLTRB(16, 4, 16, 32),
                   itemCount:   filtered.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 12),
+                  separatorBuilder: (_, _) => const SizedBox(height: 2),
                   itemBuilder: (_, i) {
                     final item  = filtered[i];
                     final title = (item['title'] ?? '').toString();
@@ -4013,6 +4013,7 @@ class _NewsPageState extends State<_NewsPage> {
                     return _FadeSlideIn(
                       delay: Duration(milliseconds: (i * 25).clamp(0, 250)),
                       child: _NewsListTile(
+                      index: i, count: filtered.length,
                       title: title, body: body, type: type, date: date,
                       emoji: emoji, icon: icon, color: color,
                       onTap: () => showModalBottomSheet(
@@ -4042,8 +4043,11 @@ class _NewsListTile extends StatefulWidget {
   final IconData   icon;
   final Color      color;
   final VoidCallback onTap;
+  final int index, count; // position in the grouped list (segment corners)
 
   const _NewsListTile({
+    required this.index,
+    required this.count,
     required this.title,
     required this.body,
     required this.type,
@@ -4076,42 +4080,24 @@ class _NewsListTileState extends State<_NewsListTile> {
         duration: const Duration(milliseconds: 120),
         curve:    M3Motion.emphasizedDecelerate,
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(16),
+          // Same grouped-tile shape as the settings rows: big outer
+          // corners, small inner corners, no border, no accent strip.
           decoration: BoxDecoration(
-            color:        scheme.surfaceContainerHighest,
-            borderRadius: AppRadius.lgR,
-            border: Border.all(
-              color: scheme.outlineVariant.withValues(alpha: 0.4),
-            ),
+            color:        scheme.surfaceContainerLow,
+            borderRadius: m3SegmentRadius(widget.index, widget.count),
           ),
-          child: IntrinsicHeight(child: Row(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Left accent strip
-              Container(
-                width: 4,
-                decoration: BoxDecoration(
-                  color:        widget.color,
-                  borderRadius: const BorderRadius.horizontal(
-                      left: Radius.circular(14)),
-                ),
+              M3CookieBadge(
+                size: 44,
+                color: widget.color.withValues(alpha: 0.16),
+                child: widget.emoji.isNotEmpty
+                    ? Text(widget.emoji, style: const TextStyle(fontSize: 20))
+                    : Icon(widget.icon, size: 22, color: widget.color),
               ),
-              const SizedBox(width: 12),
-              // Icon / emoji
-              Container(
-                width: 36, height: 36,
-                decoration: BoxDecoration(
-                  color:        widget.color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: widget.emoji.isNotEmpty
-                      ? Text(widget.emoji, style: const TextStyle(fontSize: 18))
-                      : Icon(widget.icon, size: 18, color: widget.color),
-                ),
-              ),
-              const SizedBox(width: 12),
-              // Content
+              const SizedBox(width: 14),
               Expanded(child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -4120,13 +4106,12 @@ class _NewsListTileState extends State<_NewsListTile> {
                     children: [
                       Expanded(
                         child: Text(widget.title,
-                          style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+                          style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
                       ),
                       if (widget.date.isNotEmpty) ...[
                         const SizedBox(width: 8),
                         Text(widget.date,
-                          style: text.labelSmall?.copyWith(
-                              color: scheme.onSurfaceVariant, fontSize: 10)),
+                          style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
                       ],
                     ],
                   ),
@@ -4138,32 +4123,30 @@ class _NewsListTileState extends State<_NewsListTile> {
                       style: text.bodySmall?.copyWith(
                           color: scheme.onSurfaceVariant, height: 1.4)),
                   ],
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   Row(children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                       decoration: BoxDecoration(
-                        color:        widget.color.withValues(alpha: 0.12),
-                        borderRadius: AppRadius.smR,
+                        color:        widget.color.withValues(alpha: 0.16),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         widget.type.toUpperCase(),
-                        style: TextStyle(
+                        style: text.labelSmall?.copyWith(
                           color:         widget.color,
-                          fontSize:      9,
                           fontWeight:    FontWeight.w700,
                           letterSpacing: 0.8,
                         ),
                       ),
                     ),
                     const Spacer(),
-                    Icon(Icons.chevron_right_rounded,
-                        size: 18, color: scheme.onSurfaceVariant.withValues(alpha: 0.5)),
+                    Icon(Icons.chevron_right_rounded, color: scheme.onSurfaceVariant),
                   ]),
                 ],
               )),
             ],
-          )),
+          ),
         ),
       ),
     );

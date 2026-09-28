@@ -32,6 +32,21 @@
 
 ## v3.6.0
 
+**Posters, friends and Apple Music video**
+- Friends: cards are now one consistent rounded square shape (removed the mixed square/circle/oval variants)
+- Friends: online status fills the whole card with your accent color instead of a hardcoded green overlay
+- Friend profile poster: online status is shown only by the ring around the avatar (star-shaped for favourites, circle otherwise); the separate dot and "Now listening" pill are gone
+- Friend profile poster: Apple Music motion artwork (animated video) for the currently playing track, with a photo/video switch glued next to the back and favourite buttons, following the existing motion artwork setting
+- Album, artist and track posters: redesigned titles
+- New poster shapes
+- New video mode for Apple Music posters: an animated video preview instead of a static cover
+- Fix: tracks, albums and artists opened from a friend's profile now load their video and your stats, and stack on top of the profile instead of replacing it
+
+**Achievements and news**
+- Achievements redesigned to match the rest of the app: Material 3 Expressive header, level card, grouped category list and milestone lists with big outer and small inner corners, primary and container colors only
+- Level history page uses the same header
+- News list: same grouped tiles as settings, cookie-shaped icon badges, consistent spacing
+
 **Settings: redesigned in Material 3 Expressive**
 - Every settings page now shares one design: cookie-shaped icon badges, grouped tiles (big outer corners, small inner corners), spring press animation, a check icon inside switches, clearer section titles and an 8dp spacing scale
 - Same controls everywhere: switch rows, "choice" rows, action rows, sliders, text/URL rows and time rows. The current value is always visible on the right (no more mixed chips, segmented buttons and cards)
@@ -106,17 +121,3 @@
 **Large screens**
 - Side rail with rounded indicator, content in a rounded centered panel (tablet style)
 - Profile search grid and folder grid adapt to the screen width
-
-
-## Unreleased
-
-**Nouveautés**
-- Friends: cards are now a single consistent rounded square shape (removed the mixed square/circle/oval variants)
-- Friends: online status now fills the whole card with your chosen accent color instead of a hardcoded, buggy green overlay
-- Friend profile poster: online status is now shown only by the green ring around the avatar (star-shaped for favourites, circle otherwise) — removed the separate "online" dot and "Now listening" pill
-- Friend profile poster: added Apple Music motion artwork (animated video preview) for the currently-playing track, with a photo/video switch next to the back and favourite buttons — respects the existing motion artwork setting
-- Fix: opening a track, album or artist from a friend's profile now loads its video and your stats correctly, and stacks on top of the profile instead of replacing it
-- Album, artist and track posters: titles redesigned
-- New poster shapes added
-- New video mode for Apple Music posters: shows an animated video preview instead of a static cover
-
