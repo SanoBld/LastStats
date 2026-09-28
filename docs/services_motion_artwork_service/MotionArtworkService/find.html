@@ -77,20 +77,22 @@
   final key = &#39;${_norm(artist)}|${_norm(album)}|${_norm(track)}&#39;;
   if (_cache.containsKey(key)) return _cache[key];
   try {
-    final hit = await _albumPageUrl(artist, album, track);
+    &#47;&#47; Every release that could carry the video: the song&#39;s own catalog
+    &#47;&#47; entries (single, album, deluxe, compilation...), the album, and
+    &#47;&#47; singles named after the track. The first hit used to be the only
+    &#47;&#47; one tried, so a track whose first match was a video-less
+    &#47;&#47; compilation showed nothing even though its single had one.
+    final cands = await _candidates(artist, album, track);
     String? video;
-    if (hit != null) {
-      &#47;&#47; A track can carry its own &quot;motion video&quot; distinct from (or
-      &#47;&#47; absent from) its album&#39;s — Apple exposes that on the *song*
-      &#47;&#47; catalog entry, not just the album&#39;s. Some tracks only have the
-      &#47;&#47; per-song one, which is why the official app shows a video where
-      &#47;&#47; this used to show none: try the song first, then fall back to
-      &#47;&#47; the album-level video, then the page-scrape fallback.
-      if (track.isNotEmpty &amp;&amp; hit.$3 != null) {
-        video = await _videoFromSongApi(hit.$3!);
+    var pages = 0;
+    for (final c in cands) {
+      if (c.trackId != null) video = await _videoFromSongApi(c.trackId!);
+      video ??= await _videoFromApi(c.collectionId);
+      if (video == null &amp;&amp; pages &lt; 2) {
+        pages++;
+        video = await _videoFromPage(c.pageUrl);
       }
-      video ??= await _videoFromApi(hit.$1);
-      video ??= await _videoFromPage(hit.$2);
+      if (video != null) break;
     }
     _cache[key] = video;
     return video;
