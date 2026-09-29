@@ -59,6 +59,10 @@
 <li><span class="parameter" id="exportToFile-param-includeSecretKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeSecretKey</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="exportToFile-param-includeFolders"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeFolders</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="exportToFile-param-includeThemes"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeThemes</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="exportToFile-param-includeLibrary"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeLibrary</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="exportToFile-param-includeDashboard"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeDashboard</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="exportToFile-param-includeNotifications"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeNotifications</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="exportToFile-param-includeProfiles"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeProfiles</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="exportToFile-param-includeScrobbles"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeScrobbles</span> = <span class="default-value">false</span>, </span></li>
 </ol>})
 
@@ -79,6 +83,10 @@
   bool includeSecretKey = true,
   bool includeFolders = true,
   bool includeThemes = true,
+  bool includeLibrary = true,
+  bool includeDashboard = true,
+  bool includeNotifications = true,
+  bool includeProfiles = true,
   bool includeScrobbles = false,
 }) async {
   try {
@@ -87,6 +95,10 @@
       includeSecretKey: includeSecretKey,
       includeFolders: includeFolders,
       includeThemes: includeThemes,
+      includeLibrary: includeLibrary,
+      includeDashboard: includeDashboard,
+      includeNotifications: includeNotifications,
+      includeProfiles: includeProfiles,
       includeScrobbles: includeScrobbles,
     );
     final bytes   = Uint8List.fromList(utf8.encode(payload));

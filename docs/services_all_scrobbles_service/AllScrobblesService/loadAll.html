@@ -84,10 +84,12 @@
     for (var i = 0; i &lt; years.length; i++) {
       final year = years[i];
 
-      &#47;&#47; Skip si déjà en cache complet (sauf l&#39;année en cours, qui peut
-      &#47;&#47; avoir de nouveaux scrobbles depuis le dernier chargement complet)
-      if (!force &amp;&amp; isYearCached(year) &amp;&amp; isYearComplete(year) &amp;&amp;
-          year != currentYear) {
+      &#47;&#47; Skip every year that is already cached and complete — the current
+      &#47;&#47; one too: its NEW scrobbles are fetched incrementally right after
+      &#47;&#47; the loop (syncNew), instead of downloading the whole year again.
+      &#47;&#47; This is what makes a restored backup cheap: only what came after
+      &#47;&#47; the backup is checked.
+      if (!force &amp;&amp; isYearCached(year) &amp;&amp; isYearComplete(year)) {
         continue;
       }
 
@@ -118,6 +120,11 @@
     _running = false;
     progressNotifier.value = AllScrobblesProgress.done(
         totalYears: years.length, mode: SyncMode.full);
+  }
+  &#47;&#47; Everything older is in cache: only look at what is newer than the
+  &#47;&#47; last cached scrobble.
+  if (!force &amp;&amp; lastCachedTimestamp &gt; 0) {
+    await syncNew(service, fromLoadAll: true);
   }
 }</code></pre>
 </section>

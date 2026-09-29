@@ -129,7 +129,14 @@ everything — nothing is lost either side.</p>
   &#47;&#47; Update &quot;loaded_years&quot; so the newly imported years are recognized by
   &#47;&#47; the rest of the app (AllScrobblesService etc.) on next read.
   final years = getCachedYears();
-  await setMeta({..._meta ?? {}, &#39;loaded_years&#39;: years});
+  &#47;&#47; Keep the newest of both sync times: the restored history is trusted,
+  &#47;&#47; so the next sync only asks Last.fm for what is newer than it.
+  final prevSync = (_meta?[&#39;last_sync_ts&#39;] as num?)?.toInt() ?? 0;
+  await setMeta({
+    ..._meta ?? {},
+    &#39;loaded_years&#39;: years,
+    &#39;last_sync_ts&#39;: prevSync &gt; 0 ? prevSync : DateTime.now().millisecondsSinceEpoch,
+  });
 }</code></pre>
 </section>
 

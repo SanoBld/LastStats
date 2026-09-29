@@ -55,8 +55,9 @@
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
-<span class="name ">syncNew</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="syncNew-param-service"><span class="type-annotation"><a href="../../services_lastfm_service/LastFmService-class.html">LastFmService</a></span> <span class="parameter-name">service</span></span></li>
-</ol>)
+<span class="name ">syncNew</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="syncNew-param-service"><span class="type-annotation"><a href="../../services_lastfm_service/LastFmService-class.html">LastFmService</a></span> <span class="parameter-name">service</span>, {</span></li>
+<li><span class="parameter" id="syncNew-param-fromLoadAll"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">fromLoadAll</span> = <span class="default-value">false</span>, </span></li>
+</ol>})
 
       
 
@@ -71,18 +72,18 @@ Fusionne avec les records existants.</p>
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; syncNew(LastFmService service) async {
+  <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; syncNew(LastFmService service, {bool fromLoadAll = false}) async {
   if (_running) return;
 
   final lastTs = lastCachedTimestamp;
-  if (lastTs == 0) return loadAll(service);
+  if (lastTs == 0) return fromLoadAll ? null : loadAll(service);
 
   &#47;&#47; Si des années en cache v1 (sans métadonnées), relancer un loadAll.
   &#47;&#47; On ne bloque pas pour ça — on le fait silencieusement.
   final incompleteYears = getCachedYears()
       .where((y) =&gt; isYearCached(y) &amp;&amp; !isYearComplete(y))
       .toList();
-  if (incompleteYears.isNotEmpty) {
+  if (incompleteYears.isNotEmpty &amp;&amp; !fromLoadAll) {
     debugPrint(&#39;[AllScrobbles] Années incomplètes (v1) → rechargement : &#39;
         &#39;$incompleteYears&#39;);
     return loadAll(service);

@@ -88,10 +88,13 @@
     items = await getTopTracks(period: period, limit: 200);
   }
 
+  final known = LibraryMerge.knownSync(username);
   for (var i = 0; i &lt; items.length; i++) {
     final n = (items[i][&#39;name&#39;] ?? &#39;&#39;).toString();
     final a = type != &#39;artists&#39; ? (items[i][&#39;artist&#39;]?[&#39;name&#39;] ?? &#39;&#39;).toString() : &#39;&#39;;
-    final match = n == name &amp;&amp; (type == &#39;artists&#39; || a == artistName);
+    final match = LibraryMerge.active
+        ? LibraryMerge.same(type, n, a, name, artistName, known)
+        : n == name &amp;&amp; (type == &#39;artists&#39; || a == artistName);
     if (match) {
       final plays = int.tryParse((items[i][&#39;playcount&#39;] ?? &#39;0&#39;).toString()) ?? 0;
       return (rank: i + 1, plays: plays);

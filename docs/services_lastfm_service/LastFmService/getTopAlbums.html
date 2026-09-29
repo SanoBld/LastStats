@@ -75,15 +75,12 @@
   int limit = 50,
   int page = 1,
   String? user,
-}) async {
-  final d = await _call({
-    &#39;method&#39;: &#39;user.getTopAlbums&#39;,
-    &#39;user&#39;:   user ?? username,
-    &#39;period&#39;: period,
-    &#39;limit&#39;:  &#39;$limit&#39;,
-    &#39;page&#39;:   &#39;$page&#39;,
-  });
-  return _asList(d[&#39;topalbums&#39;]?[&#39;album&#39;]);
+}) {
+  if (LibraryMerge.active) {
+    return LibraryMerge.topList(this,
+        type: &#39;albums&#39;, period: period, limit: limit, page: page, user: user);
+  }
+  return rawTopAlbums(period: period, limit: limit, page: page, user: user);
 }</code></pre>
 </section>
 

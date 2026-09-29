@@ -59,6 +59,10 @@
 <li><span class="parameter" id="buildBackupJson-param-includeSecretKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeSecretKey</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="buildBackupJson-param-includeFolders"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeFolders</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="buildBackupJson-param-includeThemes"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeThemes</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="buildBackupJson-param-includeLibrary"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeLibrary</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="buildBackupJson-param-includeDashboard"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeDashboard</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="buildBackupJson-param-includeNotifications"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeNotifications</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="buildBackupJson-param-includeProfiles"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeProfiles</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="buildBackupJson-param-includeScrobbles"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeScrobbles</span> = <span class="default-value">false</span>, </span></li>
 </ol>})
 
@@ -84,6 +88,10 @@ Both default to true so nothing changes for existing callers.</p>
   bool includeSecretKey = true,
   bool includeFolders = true,
   bool includeThemes = true,
+  bool includeLibrary = true,
+  bool includeDashboard = true,
+  bool includeNotifications = true,
+  bool includeProfiles = true,
   &#47;&#47; NEW: when true, the full scrobble history (every track ever played,
   &#47;&#47; as cached on this device) is embedded in the backup file too.
   bool includeScrobbles = false,
@@ -106,6 +114,10 @@ Both default to true so nothing changes for existing callers.</p>
     if (!includeThemes &amp;&amp; _kThemeKeys.contains(key)) {
       continue;
     }
+    if (!includeLibrary &amp;&amp; _kLibraryKeys.contains(key)) continue;
+    if (!includeDashboard &amp;&amp; _kDashboardKeys.contains(key)) continue;
+    if (!includeNotifications &amp;&amp; _kNotificationKeys.contains(key)) continue;
+    if (!includeProfiles &amp;&amp; _kProfileKeys.contains(key)) continue;
     final v = p.get(key);
     if (v != null) map[key] = v;
   }
