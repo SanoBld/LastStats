@@ -41,7 +41,47 @@ class _BackupPageState extends State<BackupPage> {
     super.initState();
     _refreshLogSize();
     _loadAutoBackupPrefs();
+    _loadExportOpts();
   }
+
+  // The export switches are remembered between visits (last choice wins).
+  // Stored under "bk_opt_*", not "ls_*", so they are never part of a backup.
+  static const _optKeys = {
+    'ApiKey': 'bk_opt_api_key', 'SecretKey': 'bk_opt_secret_key',
+    'Folders': 'bk_opt_folders', 'Themes': 'bk_opt_themes',
+    'Library': 'bk_opt_library', 'Dashboard': 'bk_opt_dashboard',
+    'Notifs': 'bk_opt_notifs', 'Profiles': 'bk_opt_profiles',
+    'Scrobbles': 'bk_opt_scrobbles',
+  };
+
+  Future<void> _loadExportOpts() async {
+    final p = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      _includeApiKey    = p.getBool(_optKeys['ApiKey']!)    ?? _includeApiKey;
+      _includeSecretKey = p.getBool(_optKeys['SecretKey']!) ?? _includeSecretKey;
+      _includeFolders   = p.getBool(_optKeys['Folders']!)   ?? _includeFolders;
+      _includeThemes    = p.getBool(_optKeys['Themes']!)    ?? _includeThemes;
+      _includeLibrary   = p.getBool(_optKeys['Library']!)   ?? _includeLibrary;
+      _includeDashboard = p.getBool(_optKeys['Dashboard']!) ?? _includeDashboard;
+      _includeNotifs    = p.getBool(_optKeys['Notifs']!)    ?? _includeNotifs;
+      _includeProfiles  = p.getBool(_optKeys['Profiles']!)  ?? _includeProfiles;
+      _includeScrobbles = p.getBool(_optKeys['Scrobbles']!) ?? _includeScrobbles;
+    });
+  }
+
+  Future<void> _saveExportOpts() async {
+    final p = await SharedPreferences.getInstance();
+    final v = {
+      'ApiKey': _includeApiKey, 'SecretKey': _includeSecretKey,
+      'Folders': _includeFolders, 'Themes': _includeThemes,
+      'Library': _includeLibrary, 'Dashboard': _includeDashboard,
+      'Notifs': _includeNotifs, 'Profiles': _includeProfiles,
+      'Scrobbles': _includeScrobbles,
+    };
+    for (final e in v.entries) { await p.setBool(_optKeys[e.key]!, e.value); }
+  }
+
 
   Future<void> _loadAutoBackupPrefs() async {
     final p = await SharedPreferences.getInstance();
@@ -398,7 +438,7 @@ class _BackupPageState extends State<BackupPage> {
             subtitle: Text(L.backupIncludeKeysDesc,
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             value: _includeApiKey,
-            onChanged: (v) => setState(() => _includeApiKey = v),
+            onChanged: (v) { setState(() => _includeApiKey = v); _saveExportOpts(); },
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
@@ -406,7 +446,7 @@ class _BackupPageState extends State<BackupPage> {
             title: Text(L.backupRestoreSecretKeyLabel,
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
             value: _includeSecretKey,
-            onChanged: (v) => setState(() => _includeSecretKey = v),
+            onChanged: (v) { setState(() => _includeSecretKey = v); _saveExportOpts(); },
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
@@ -416,7 +456,7 @@ class _BackupPageState extends State<BackupPage> {
             subtitle: Text(L.backupIncludeFoldersDesc,
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             value: _includeFolders,
-            onChanged: (v) => setState(() => _includeFolders = v),
+            onChanged: (v) { setState(() => _includeFolders = v); _saveExportOpts(); },
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
@@ -426,7 +466,7 @@ class _BackupPageState extends State<BackupPage> {
             subtitle: Text(L.backupIncludeThemesDesc,
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             value: _includeThemes,
-            onChanged: (v) => setState(() => _includeThemes = v),
+            onChanged: (v) { setState(() => _includeThemes = v); _saveExportOpts(); },
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
@@ -436,7 +476,7 @@ class _BackupPageState extends State<BackupPage> {
             subtitle: Text(localeNotifier.value == 'en' ? 'Sections, header, stat cards, discover, start-up tab' : 'Sections, en-tête, cartes de stats, découverte, onglet de démarrage',
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             value: _includeDashboard,
-            onChanged: (v) => setState(() => _includeDashboard = v),
+            onChanged: (v) { setState(() => _includeDashboard = v); _saveExportOpts(); },
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
@@ -446,7 +486,7 @@ class _BackupPageState extends State<BackupPage> {
             subtitle: Text(localeNotifier.value == 'en' ? 'Recaps, milestones, news and badges' : 'Récaps, jalons, actualités et pastilles',
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             value: _includeNotifs,
-            onChanged: (v) => setState(() => _includeNotifs = v),
+            onChanged: (v) { setState(() => _includeNotifs = v); _saveExportOpts(); },
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
@@ -456,7 +496,7 @@ class _BackupPageState extends State<BackupPage> {
             subtitle: Text(localeNotifier.value == 'en' ? 'Link track versions, split collaborations' : "Lier les versions d'un titre, séparer les collaborations",
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             value: _includeLibrary,
-            onChanged: (v) => setState(() => _includeLibrary = v),
+            onChanged: (v) { setState(() => _includeLibrary = v); _saveExportOpts(); },
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
@@ -466,7 +506,7 @@ class _BackupPageState extends State<BackupPage> {
             subtitle: Text(localeNotifier.value == 'en' ? 'The Last.fm profiles you starred' : 'Les profils Last.fm que tu as mis en favori',
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             value: _includeProfiles,
-            onChanged: (v) => setState(() => _includeProfiles = v),
+            onChanged: (v) { setState(() => _includeProfiles = v); _saveExportOpts(); },
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
@@ -481,7 +521,7 @@ class _BackupPageState extends State<BackupPage> {
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
             ),
             value: _includeScrobbles,
-            onChanged: (v) => setState(() => _includeScrobbles = v),
+            onChanged: (v) { setState(() => _includeScrobbles = v); _saveExportOpts(); },
           ),
         ]),
 

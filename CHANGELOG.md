@@ -56,6 +56,10 @@
 - Loading screen redesigned: rotating cookie badge, progress card with percentage, grouped step tiles
 - Restoring a backup that contains scrobbles no longer re-downloads years from A to Z: cached years are trusted and only scrobbles newer than the last cached one are fetched
 - Backup: separate switches for dashboard, notifications, library options and favourite profiles; runtime-only markers are no longer exported; image shape, achievements and eco mode are applied immediately on restore
+- Backup: the export switches you choose are remembered for next time instead of resetting to defaults
+- About: new README page (opened from About) showing the project README, latest release version, total downloads, stars, license, latest commits and latest workflow runs, loaded from GitHub with an offline fallback to the bundled README
+- About: long lists (favourites, sources, keyboard shortcuts, powered by) are folded behind a single row
+- Charts tab restyled to match the other tabs: flat tonal cards with large rounded corners, tonal stat chips and streak tiles, primary-container loading banner, tonal export button
 
 **Settings: redesigned in Material 3 Expressive**
 - Every settings page now shares one design: cookie-shaped icon badges, grouped tiles (big outer corners, small inner corners), spring press animation, a check icon inside switches, clearer section titles and an 8dp spacing scale

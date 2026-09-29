@@ -10,6 +10,8 @@ import '../../services/update_service.dart';
 import 'settings_helpers.dart';
 import 'settings_rows.dart';
 import '../../widgets/m3_components.dart';
+import '../../theme/m3_motion.dart';
+import 'readme_page.dart';
 
 /// Picks the self-contained logo SVG (own background baked in): the plain
 /// mono logo by default, the red-dot "Nothing" variant only when that theme
@@ -102,6 +104,19 @@ class AboutPage extends StatelessWidget {
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           ListTile(
+            leading: const Icon(Icons.menu_book_rounded),
+            title: Text(_tr({'fr': 'README et activité du projet', 'en': 'README and project activity'}),
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            subtitle: Text(_tr({
+                'fr': 'Lire le README, derniers commits, workflows, version, téléchargements',
+                'en': 'Read the README, latest commits, workflows, version, downloads'}),
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () => Navigator.of(context).push(
+                M3SharedAxisRoute(builder: (_) => const ReadmePage())),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          ListTile(
             leading: const Icon(Icons.code_rounded),
             title: Text(L.settingsSourceCode,
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
@@ -115,7 +130,7 @@ class AboutPage extends StatelessWidget {
         const SizedBox(height: 16),
 
         // ── Coup de cœur / credits ──────────────────────────────────────────
-        SettingsSection(
+        _FoldSection(
           label: _tr({
             'fr': 'Coups de cœur', 'en': 'Favorites',
             'es': 'Favoritos', 'de': 'Favoriten', 'it': 'Preferiti',
@@ -171,7 +186,7 @@ class AboutPage extends StatelessWidget {
         // All links below point to free, open documentation (Flutter's
         // own docs and the Material 3 spec) that guided the UI and the
         // animation work in this app.
-        SettingsSection(
+        _FoldSection(
           label: _tr({
             'fr': 'Sources', 'en': 'Sources',
             'es': 'Fuentes', 'de': 'Quellen', 'it': 'Fonti',
@@ -358,7 +373,7 @@ class AboutPage extends StatelessWidget {
         const SizedBox(height: 16),
 
         // ── Keyboard shortcuts (desktop) ─────────────────────────────────
-        SettingsSection(label: L.aboutShortcuts, children: [
+        _FoldSection(label: L.aboutShortcuts, children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
             child: Text(L.aboutShortcutsSub,
@@ -376,7 +391,7 @@ class AboutPage extends StatelessWidget {
         const SizedBox(height: 16),
 
         // ── Powered by ────────────────────────────────────────────────────
-        SettingsSection(label: L.aboutPoweredBy, children: [
+        _FoldSection(label: L.aboutPoweredBy, children: [
           _PoweredByTile(
             icon: Icons.music_note_rounded,
             label: 'Last.fm API',
@@ -522,6 +537,53 @@ class _PoweredByTile extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
       trailing: const Icon(Icons.open_in_new_rounded, size: 16),
       onTap: () => launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
+    );
+  }
+}
+/// A long section folded behind a single row, so the About page stays short.
+/// Same tiles as [SettingsSection]; tapping the first row shows or hides them.
+class _FoldSection extends StatefulWidget {
+  final String label;
+  final List<Widget> children;
+  const _FoldSection({required this.label, required this.children});
+
+  @override
+  State<_FoldSection> createState() => _FoldSectionState();
+}
+
+class _FoldSectionState extends State<_FoldSection> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final items  = widget.children.where((c) => c is! Divider).toList();
+    final n      = items.where((c) => c is! Padding).length;
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 280),
+      curve: M3Motion.emphasizedDecelerate,
+      alignment: Alignment.topCenter,
+      child: SettingsSection(
+        label: widget.label,
+        children: [
+          ListTile(
+            leading: Icon(Icons.unfold_more_rounded, color: scheme.primary),
+            title: Text(
+              _open
+                  ? _tr({'fr': 'Réduire', 'en': 'Collapse'})
+                  : _tr({'fr': 'Afficher ($n)', 'en': 'Show ($n)'}),
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            trailing: AnimatedRotation(
+              turns: _open ? 0.5 : 0,
+              duration: const Duration(milliseconds: 220),
+              child: const Icon(Icons.expand_more_rounded),
+            ),
+            onTap: () => setState(() => _open = !_open),
+          ),
+          if (_open) ...items,
+        ],
+      ),
     );
   }
 }

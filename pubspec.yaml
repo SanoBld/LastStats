@@ -65,6 +65,7 @@ flutter:
     - assets/images/
     - assets/fonts/
     - assets/icons/
+    - README.md
 
   fonts:
     # ── Nothing OS fonts ───────────────────────────────────────────────────

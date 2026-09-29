@@ -1195,14 +1195,8 @@ class _ChartsPageState extends State<_ChartsPage>
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: s.primaryContainer.withValues(alpha: 0.35),
-          borderRadius: BorderRadius.circular(16),
-          border: Border(
-            left: BorderSide(color: s.primary, width: 3),
-            top:    BorderSide(color: s.primary.withValues(alpha: 0.15), width: 1),
-            right:  BorderSide(color: s.primary.withValues(alpha: 0.15), width: 1),
-            bottom: BorderSide(color: s.primary.withValues(alpha: 0.15), width: 1),
-          ),
+          color: s.primaryContainer,
+          borderRadius: BorderRadius.circular(24),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
@@ -1222,11 +1216,11 @@ class _ChartsPageState extends State<_ChartsPage>
           ]),
           const SizedBox(height: 8),
           ClipRRect(
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(100),
             child: LinearProgressIndicator(
               value: p.fraction,
-              minHeight: 5,
-              backgroundColor: s.primary.withValues(alpha: 0.10),
+              minHeight: 6,
+              backgroundColor: s.onPrimaryContainer.withValues(alpha: 0.15),
               valueColor: AlwaysStoppedAnimation<Color>(s.primary),
             ),
           ),
@@ -1247,9 +1241,8 @@ class _ChartsPageState extends State<_ChartsPage>
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: s.surfaceContainerHigh,
-          borderRadius: AppRadius.lgR,
-          border: Border.all(color: s.outlineVariant.withValues(alpha: 0.45), width: 1),
+          color: s.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(24),
         ),
         child: Row(children: [
           Icon(Icons.cloud_download_outlined, size: 16, color: s.primary),
@@ -1356,7 +1349,7 @@ class _ChartsPageState extends State<_ChartsPage>
               Expanded(child:
                 Text(L.chartsTitle, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
               ),
-              IconButton(
+              IconButton.filledTonal(
                 icon: const Icon(Icons.ios_share_rounded),
                 tooltip: _ct('Exporter un graphique', 'Export a chart', es: 'Exportar un gráfico', zh: '导出图表', pt: 'Exportar um gráfico'),
                 onPressed: () => _exportFlow(context),
@@ -1694,21 +1687,11 @@ class _FadeInSectionState extends State<_FadeInSection> with SingleTickerProvide
 
 /// Shared card decoration: M3 surface, subtle gradient + soft shadow, used by
 /// every chart card so the whole tab reads as one cohesive, modern set.
+// Same tonal card as the settings sections: one flat container colour,
+// big rounded corners, no border, no shadow, no gradient.
 BoxDecoration _chartCardDecoration(ColorScheme s) => BoxDecoration(
-  gradient: LinearGradient(
-    begin: Alignment.topLeft,
-    end:   Alignment.bottomRight,
-    colors: [s.surfaceContainerHigh, s.surfaceContainer],
-  ),
-  borderRadius: AppRadius.xlR,
-  border: Border.all(color: s.outlineVariant.withValues(alpha: 0.35), width: 1),
-  boxShadow: [
-    BoxShadow(
-      color: s.shadow.withValues(alpha: 0.05),
-      blurRadius: 16,
-      offset: const Offset(0, 6),
-    ),
-  ],
+  color: s.surfaceContainerLow,
+  borderRadius: BorderRadius.circular(28),
 );
 
 /// Gradient bar fill: lighter at base, full color at top.
@@ -2796,15 +2779,8 @@ class _StreakTile extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(14),
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        begin: Alignment.topLeft, end: Alignment.bottomRight,
-        colors: [
-          color.withValues(alpha: 0.14),
-          color.withValues(alpha: 0.06),
-        ],
-      ),
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: color.withValues(alpha: 0.20), width: 1),
+      color: color.withValues(alpha: 0.12),
+      borderRadius: BorderRadius.circular(20),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -3426,16 +3402,15 @@ class _ChipStat extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     decoration: BoxDecoration(
-      color: s.primary.withValues(alpha: 0.10),
+      color: s.secondaryContainer,
       borderRadius: BorderRadius.circular(24),
-      border: Border.all(color: s.primary.withValues(alpha: 0.18), width: 1),
     ),
     child: Row(mainAxisSize: MainAxisSize.min, children: [
       Text(label, style: t.labelSmall
-          ?.copyWith(color: s.onSurface.withValues(alpha: 0.65), fontSize: 11)),
+          ?.copyWith(color: s.onSecondaryContainer.withValues(alpha: 0.75), fontSize: 11)),
       const SizedBox(width: 6),
       Text(value, style: t.labelSmall?.copyWith(
-          color: s.primary, fontWeight: FontWeight.w800, fontSize: 11)),
+          color: s.onSecondaryContainer, fontWeight: FontWeight.w800, fontSize: 11)),
     ]),
   );
 }
