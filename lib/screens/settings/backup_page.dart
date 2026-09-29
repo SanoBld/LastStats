@@ -453,7 +453,7 @@ class _BackupPageState extends State<BackupPage> {
             secondary: Icon(Icons.merge_type_rounded, color: scheme.primary),
             title: Text(localeNotifier.value == 'en' ? 'Library options' : 'Options de bibliothèque',
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-            subtitle: Text(localeNotifier.value == 'en' ? 'Link track versions, split collaborations' : 'Lier les versions d'un titre, séparer les collaborations',
+            subtitle: Text(localeNotifier.value == 'en' ? 'Link track versions, split collaborations' : "Lier les versions d'un titre, séparer les collaborations",
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             value: _includeLibrary,
             onChanged: (v) => setState(() => _includeLibrary = v),
