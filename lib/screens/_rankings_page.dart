@@ -253,41 +253,33 @@ class _TopListBodyState extends State<_TopListBody>
       return [];
     }
 
-    final counts   = <String, int>{};
-    final artistOf = <String, String>{}; // key → artist name
-
+    // Honours the "link versions" / "split collabs" options.
+    if (LibraryMerge.active) await LibraryMerge.ensureKnown(widget.service, null);
+    final tally = LocalTally(LibraryMerge.knownSync(widget.service.username));
     for (final r in records) {
-      final String key;
       switch (widget.type) {
         case 'artists':
-          key = r.artist;
+          if (r.artist.isEmpty) continue;
+          tally.addScrobble('artists', name: r.artist, artist: '');
         case 'albums':
-          key = '${r.album}|||${r.artist}';
-          artistOf[key] = r.artist;
+          if (r.album.isEmpty && r.artist.isEmpty) continue;
+          tally.addScrobble('albums', name: r.album, artist: r.artist);
         default: // tracks
-          key = '${r.track}|||${r.artist}';
-          artistOf[key] = r.artist;
+          if (r.track.isEmpty && r.artist.isEmpty) continue;
+          tally.addScrobble('tracks', name: r.track, artist: r.artist);
       }
-      if (key.isEmpty || key.startsWith('|||')) continue;
-      counts[key] = (counts[key] ?? 0) + 1;
     }
 
-    final sorted = counts.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-
-    return sorted.map((e) {
-      final playcount = e.value.toString();
+    return tally.sorted().map((e) {
+      final playcount = e.plays.toString();
       if (widget.type == 'artists') {
-        return {'name': e.key, 'playcount': playcount, 'image': <dynamic>[]};
+        return <String, dynamic>{'name': e.name, 'playcount': playcount, 'image': <dynamic>[]};
       }
-      final parts  = e.key.split('|||');
-      final name   = parts[0];
-      final artist = parts.length > 1 ? parts[1] : '';
-      return {
-        'name':      name,
+      return <String, dynamic>{
+        'name':      e.name,
         'playcount': playcount,
         'image':     <dynamic>[],
-        'artist':    {'name': artist},
+        'artist':    {'name': e.artist},
       };
     }).toList();
   }

@@ -10,6 +10,7 @@ import '../../app_state.dart';
 import '../../nothing_theme.dart';
 import '../../l10n/l10n.dart';
 import '../../services/widget_service.dart';
+import '../../services/library_merge.dart';
 import 'settings_helpers.dart';
 import 'settings_rows.dart';
 import 'pc_mode_section.dart';
@@ -1102,7 +1103,8 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return SettingsSection(
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    SettingsSection(
       label: L.apInteractionsSection,
       children: [
         SwitchListTile(
@@ -1144,7 +1146,39 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
           },
         ),
       ],
-    );
+    ),
+    const SizedBox(height: 20),
+    // Library clean-up: same two switches as the welcome flow.
+    SettingsSection(
+      label: _ct('Bibliothèque', 'Library'),
+      children: [
+        ValueListenableBuilder<bool>(
+          valueListenable: mergeVersionsNotifier,
+          builder: (_, on, _) => SwitchListTile(
+            secondary: Icon(Icons.merge_type_rounded, color: scheme.primary),
+            title: Text(_ct('Lier les versions d\'un même titre', 'Link versions of the same track')),
+            subtitle: Text(_ct(
+                'Remaster, single, (feat. …), édition deluxe… comptés comme un seul titre / album, écoutes additionnées. Les remix, lives et instrumentaux restent séparés.',
+                'Remasters, singles, (feat. …), deluxe editions… count as one track / album with plays added together. Remixes, live and instrumental versions stay separate.')),
+            value: on,
+            onChanged: (v) => LibraryMerge.setMerge(v),
+          ),
+        ),
+        ValueListenableBuilder<bool>(
+          valueListenable: splitCollabsNotifier,
+          builder: (_, on, _) => SwitchListTile(
+            secondary: Icon(Icons.call_split_rounded, color: scheme.primary),
+            title: Text(_ct('Séparer les collaborations', 'Split collaborations')),
+            subtitle: Text(_ct(
+                '« Gims & Damso » compte pour Gims et pour Damso au lieu d\'être un artiste à part. Les groupes comme « Simon & Garfunkel » restent entiers.',
+                '"Gims & Damso" counts for Gims and for Damso instead of being a separate artist. Bands like "Simon & Garfunkel" stay whole.')),
+            value: on,
+            onChanged: (v) => LibraryMerge.setSplit(v),
+          ),
+        ),
+      ],
+    ),
+    ]);
   }
 }
 

@@ -97,6 +97,12 @@ final livingArtworkNotifier = ValueNotifier<bool>(true);
 // Saved as 'ls_motion_artwork' in SharedPreferences.
 final motionArtworkNotifier = ValueNotifier<bool>(true);
 
+// Library clean-up options (see services/library_merge.dart). Both off by default.
+// Link versions of the same track/album/artist into one entry: 'ls_merge_versions'.
+final mergeVersionsNotifier = ValueNotifier<bool>(false);
+// Split collaboration credits ("A & B", "A feat. B") into separate artists: 'ls_split_collabs'.
+final splitCollabsNotifier = ValueNotifier<bool>(false);
+
 // How images are clipped. Saved as 'ls_image_shape'.
 // 'mix' = varied Material You shapes, 'square', 'circle', or 'shape:N' (N = 0..7).
 final imageShapeNotifier = ValueNotifier<String>('mix');

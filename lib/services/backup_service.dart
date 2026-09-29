@@ -24,11 +24,29 @@ import 'scrobbles_file_cache.dart';
 import 'all_scrobbles_service.dart';
 import 'lastfm_service.dart';
 
-/// Runtime-only / session state that should never be exported — everything
-/// else under the 'ls_' prefix (including any future theme or setting key)
-/// is included automatically.
+/// Runtime-only / session state that should never be exported: timers,
+/// "last notified / last seen" markers, scheduled-task ids and one-off
+/// migration flags. Everything else under the 'ls_' prefix (including any
+/// future key) is exported automatically — nothing to remember to update.
 const _kBackupExcludeKeys = {
   'ls_last_update_check',
+  'ls_last_notified_update_version',
+  'ls_last_artwork_color',
+  'ls_update_check',
+  'ls_news_check',
+  'ls_recap_check',
+  'ls_milestone_check',
+  'ls_notif_daily_last_day',
+  'ls_notif_weekly_last_week',
+  'ls_notif_grand_last',
+  'ls_notif_milestone_last_count',
+  'ls_notif_news_last_id',
+  'ls_story_last_seen_date',
+  'ls_auto_backup_last',
+  'ls_auto_backup_task',
+  'ls_scrobble_sync_task',
+  'ls_widget_refresh_task',
+  'ls_fav_stat_migrated',
 };
 
 /// Keys backing the folders feature (favorites_folders_service.dart).
@@ -56,14 +74,55 @@ const _kThemeKeys = {
   'ls_keep_last_artwork_color',
   'ls_living_artwork',
   'ls_motion_artwork',
+  'ls_image_shape',
+  'ls_nav_labels',
+  'ls_rail_collapsed',
   'ls_pc_mode',
-  // Day/night accent colors — was missing from the first version of this
-  // set, so "export themes off" was leaking this feature's settings.
+  'ls_widget_tint',
   'ls_use_daynight_accent',
   'ls_accent_dark',
   'ls_daynight_use_hours',
   'ls_daynight_day_start_hour',
   'ls_daynight_night_start_hour',
+};
+
+/// Library clean-up options (services/library_merge.dart): link versions of
+/// a track/album/artist, split collaborations. Own switch on export.
+const _kLibraryKeys = {
+  'ls_merge_versions',
+  'ls_split_collabs',
+};
+
+/// Dashboard layout: header, visible sections, stat cards, discover,
+/// start-up tab. Own switch on export.
+const _kDashboardKeys = {
+  'ls_header_source', 'ls_header_animation', 'ls_header_period',
+  'ls_header_blur', 'ls_header_custom_url', 'ls_header_music_anim',
+  'ls_header_fallback_enabled', 'ls_header_fallback_type',
+  'ls_header_fallback_period', 'ls_header_fallback_url',
+  'ls_show_nowplay', 'ls_show_stats', 'ls_show_recent', 'ls_show_discover',
+  'ls_show_friends', 'ls_show_favorites', 'ls_dashboard_chart',
+  'ls_stat_cards', 'ls_section_order', 'ls_infinite_scroll',
+  'ls_discover_smart', 'ls_discover_solo', 'ls_discover_sources',
+  'ls_startup_tab',
+};
+
+/// Notification preferences and news/loved badges. Own switch on export.
+const _kNotificationKeys = {
+  'ls_notif_news_enabled', 'ls_notif_sync_enabled',
+  'ls_notif_sync_progress_detail',
+  'ls_notif_daily_enabled', 'ls_notif_daily_hour', 'ls_notif_daily_min',
+  'ls_notif_weekly_enabled', 'ls_notif_weekly_day',
+  'ls_notif_weekly_hour', 'ls_notif_weekly_min',
+  'ls_notif_milestone_enabled', 'ls_notif_milestone_interval',
+  'ls_notif_grand_enabled',
+  'ls_show_news_badge', 'ls_show_loved_badge',
+};
+
+/// Favourite profiles chosen in the app. Own switch on export.
+const _kProfileKeys = {
+  'ls_fav_profiles',
+  'ls_fav_friends',
 };
 
 class BackupResult {
@@ -122,6 +181,10 @@ class BackupService {
     bool includeSecretKey = true,
     bool includeFolders = true,
     bool includeThemes = true,
+    bool includeLibrary = true,
+    bool includeDashboard = true,
+    bool includeNotifications = true,
+    bool includeProfiles = true,
     // NEW: when true, the full scrobble history (every track ever played,
     // as cached on this device) is embedded in the backup file too.
     bool includeScrobbles = false,
@@ -144,6 +207,10 @@ class BackupService {
       if (!includeThemes && _kThemeKeys.contains(key)) {
         continue;
       }
+      if (!includeLibrary && _kLibraryKeys.contains(key)) continue;
+      if (!includeDashboard && _kDashboardKeys.contains(key)) continue;
+      if (!includeNotifications && _kNotificationKeys.contains(key)) continue;
+      if (!includeProfiles && _kProfileKeys.contains(key)) continue;
       final v = p.get(key);
       if (v != null) map[key] = v;
     }
@@ -236,6 +303,10 @@ class BackupService {
     bool includeSecretKey = true,
     bool includeFolders = true,
     bool includeThemes = true,
+    bool includeLibrary = true,
+    bool includeDashboard = true,
+    bool includeNotifications = true,
+    bool includeProfiles = true,
     bool includeScrobbles = false,
   }) async {
     try {
@@ -244,6 +315,10 @@ class BackupService {
         includeSecretKey: includeSecretKey,
         includeFolders: includeFolders,
         includeThemes: includeThemes,
+        includeLibrary: includeLibrary,
+        includeDashboard: includeDashboard,
+        includeNotifications: includeNotifications,
+        includeProfiles: includeProfiles,
         includeScrobbles: includeScrobbles,
       );
       final bytes   = Uint8List.fromList(utf8.encode(payload));
@@ -532,6 +607,14 @@ class BackupService {
     navLabelNotifier.value              = p.getBool('ls_nav_labels')           ?? true;
     livingArtworkNotifier.value         = p.getBool('ls_living_artwork')       ?? true;
     motionArtworkNotifier.value         = p.getBool('ls_motion_artwork')       ?? true;
+    imageShapeNotifier.value            = p.getString('ls_image_shape')        ?? 'mix';
+    achievementsEnabledNotifier.value   = p.getBool('ls_achievements_enabled') ?? true;
+    ecoModeManualNotifier.value         = p.getBool('ls_eco_mode_manual')      ?? false;
+    ecoModeAutoNotifier.value           = p.getBool('ls_eco_mode_auto')        ?? false;
+    ecoModeThresholdNotifier.value      = p.getInt('ls_eco_mode_threshold')    ?? 20;
+    displayNameNotifier.value           = p.getString('ls_display_name')       ?? displayNameNotifier.value;
+    mergeVersionsNotifier.value         = p.getBool('ls_merge_versions')       ?? false;
+    splitCollabsNotifier.value          = p.getBool('ls_split_collabs')        ?? false;
     notifNewsEnabledNotifier.value      = p.getBool('ls_notif_news_enabled')   ?? false;
     showNewsBadgeNotifier.value         = p.getBool('ls_show_news_badge')      ?? true;
     showLovedBadgeNotifier.value        = p.getBool('ls_show_loved_badge')     ?? true;

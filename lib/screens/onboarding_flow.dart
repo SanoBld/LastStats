@@ -1,7 +1,9 @@
 // lib/screens/onboarding_flow.dart
 //
 // Shown once, right after the first scrobble load, before entering HomeScreen.
-// 3 pages: appearance, notifications, favorite profiles.
+// Pages: appearance, notifications, dashboard, library clean-up, start-up tab,
+// music platform, updates, favorite profiles. Every switch here writes the
+// same keys / notifiers as the matching Settings page, so nothing diverges.
 
 import 'dart:async';
 import '../theme/m3_motion.dart';
@@ -14,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/l10n.dart';
 import '../app_state.dart';
 import '../services/lastfm_service.dart';
+import '../services/library_merge.dart';
 import 'home_screen.dart';
 import 'settings/settings_helpers.dart';
 
@@ -32,7 +35,7 @@ class OnboardingFlow extends StatefulWidget {
 class _OnboardingFlowState extends State<OnboardingFlow> {
   final _pageCtrl = PageController();
   int _page = 0;
-  static const _pages = 7;
+  static const _pages = 8;
 
   void _goTo(int i) {
     setState(() => _page = i);
@@ -87,7 +90,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               physics: const NeverScrollableScrollPhysics(),
               onPageChanged: (i) => setState(() => _page = i),
               children: [
-                const _AppearanceStep(), const _NotificationsStep(), const _DashboardStep(),
+                const _AppearanceStep(), const _NotificationsStep(), const _DashboardStep(), const _LibraryStep(),
                 const _StartupStep(), const _MusicPlatformStep(), const _UpdatesStep(),
                 _FavoritesStep(username: widget.username, apiKey: widget.apiKey),
               ],
@@ -123,19 +126,125 @@ class _Step extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    return ListView(padding: const EdgeInsets.fromLTRB(24, 16, 24, 24), children: [
-      Container(
-        width: 56, height: 56,
-        decoration: BoxDecoration(color: scheme.primaryContainer, borderRadius: BorderRadius.circular(16)),
-        child: Icon(icon, color: scheme.onPrimaryContainer, size: 28),
+    // Header (cookie badge + title) and content slide/fade in one after the
+    // other, same entrance language as the rest of the app.
+    return ListView(padding: const EdgeInsets.fromLTRB(20, 12, 20, 24), children: [
+      _OnbReveal(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: scheme.primaryContainer,
+            borderRadius: BorderRadius.circular(28),
+          ),
+          child: Row(children: [
+            M3CookieBadge(
+              size: 56,
+              color: scheme.primary,
+              child: Icon(icon, color: scheme.onPrimary, size: 28),
+            ),
+            const SizedBox(width: 16),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title, style: text.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800, color: scheme.onPrimaryContainer)),
+              const SizedBox(height: 4),
+              Text(subtitle, style: text.bodyMedium?.copyWith(
+                  color: scheme.onPrimaryContainer.withValues(alpha: 0.8))),
+            ])),
+          ]),
+        ),
       ),
-      const SizedBox(height: 18),
-      Text(title, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
-      const SizedBox(height: 6),
-      Text(subtitle, style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
-      const SizedBox(height: 26),
-      child,
+      const SizedBox(height: 20),
+      _OnbReveal(delay: 90, child: child),
     ]);
+  }
+}
+
+// Fade + slide-up entrance.
+class _OnbReveal extends StatelessWidget {
+  final Widget child;
+  final int delay; // ms
+  const _OnbReveal({required this.child, this.delay = 0});
+
+  @override
+  Widget build(BuildContext context) => TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0, end: 1),
+        duration: Duration(milliseconds: 420 + delay),
+        curve: M3Motion.emphasizedDecelerate,
+        builder: (_, v, c) => Opacity(
+          opacity: v.clamp(0.0, 1.0),
+          child: Transform.translate(offset: Offset(0, (1 - v) * 18), child: c),
+        ),
+        child: child,
+      );
+}
+
+// Switch row used by every step: same rounded tonal tile as the settings
+// rows. Accepts the SwitchListTile parameters it replaces.
+class _OnbSwitch extends StatelessWidget {
+  final Widget? secondary, subtitle;
+  final Widget title;
+  final bool value;
+  final ValueChanged<bool>? onChanged;
+  const _OnbSwitch({
+    this.secondary, required this.title, this.subtitle,
+    required this.value, required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 2),
+      child: Material(
+        color: value ? scheme.secondaryContainer.withValues(alpha: 0.55)
+                     : scheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(20),
+        clipBehavior: Clip.antiAlias,
+        child: SwitchListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+          secondary: secondary,
+          title: title,
+          subtitle: subtitle,
+          value: value,
+          onChanged: onChanged,
+        ),
+      ),
+    );
+  }
+}
+
+// Selectable choice tile (start-up tab, music platform).
+class _OnbChoice extends StatelessWidget {
+  final Widget leading;
+  final String title;
+  final bool selected;
+  final VoidCallback onTap;
+  const _OnbChoice({required this.leading, required this.title, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 2),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 240),
+        curve: M3Motion.emphasizedDecelerate,
+        decoration: BoxDecoration(
+          color: selected ? scheme.primaryContainer : scheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(selected ? 28 : 20),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+          leading: leading,
+          title: Text(title, style: TextStyle(
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              color: selected ? scheme.onPrimaryContainer : scheme.onSurface)),
+          trailing: selected ? Icon(Icons.check_rounded, color: scheme.onPrimaryContainer) : null,
+          onTap: onTap,
+        ),
+      ),
+    );
   }
 }
 
@@ -248,8 +357,7 @@ class _AppearanceStepState extends State<_AppearanceStep> {
               ),
               const SizedBox(height: 22),
               if (style == 'default') ...[
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
+                _OnbSwitch(
                   title: Text(L.settingsDynamicColor, style: const TextStyle(fontWeight: FontWeight.w700)),
                   subtitle: Text(L.onboardDynamicColorSub,
                       style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
@@ -320,8 +428,7 @@ class _AppearanceStepState extends State<_AppearanceStep> {
               const SizedBox(height: 22),
               Text(L.onboardDisplay, style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
               const SizedBox(height: 6),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
+              _OnbSwitch(
                 secondary: Icon(Icons.contrast_rounded, color: scheme.primary),
                 title: Text(L.onboardOledTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
                 subtitle: Text(L.onboardOledSub,
@@ -329,9 +436,8 @@ class _AppearanceStepState extends State<_AppearanceStep> {
                 value: oled,
                 onChanged: _setOled,
               ),
-              const Divider(height: 8),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
+              const SizedBox(height: 2),
+              _OnbSwitch(
                 secondary: Icon(Icons.image_rounded, color: scheme.primary),
                 title: Text(L.onboardArtworkColorTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
                 subtitle: Text(L.onboardArtworkColorSub,
@@ -408,8 +514,7 @@ class _NotificationsStepState extends State<_NotificationsStep> {
           title: L.onboardNotifTitle,
           subtitle: L.onboardNotifSub,
           child: Column(children: [
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
+            _OnbSwitch(
               secondary: Icon(Icons.campaign_rounded, color: scheme.primary),
               title: Text(L.onboardNewsTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
               subtitle: Text(L.onboardNewsSub,
@@ -417,9 +522,8 @@ class _NotificationsStepState extends State<_NotificationsStep> {
               value: news,
               onChanged: (v) => _set('ls_notif_news_enabled', v, notifNewsEnabledNotifier),
             ),
-            const Divider(height: 24),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
+            const SizedBox(height: 2),
+            _OnbSwitch(
               secondary: Icon(Icons.circle_notifications_rounded, color: scheme.primary),
               title: Text(L.onboardNewsBadgeTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
               subtitle: Text(L.onboardNewsBadgeSub,
@@ -427,9 +531,8 @@ class _NotificationsStepState extends State<_NotificationsStep> {
               value: badge,
               onChanged: (v) => _set('ls_show_news_badge', v, showNewsBadgeNotifier),
             ),
-            const Divider(height: 24),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
+            const SizedBox(height: 2),
+            _OnbSwitch(
               secondary: Icon(Icons.vibration_rounded, color: scheme.primary),
               title: Text(L.onboardHapticTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
               subtitle: Text(L.onboardHapticSub,
@@ -443,8 +546,7 @@ class _NotificationsStepState extends State<_NotificationsStep> {
               style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface),
             )),
             const SizedBox(height: 6),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
+            _OnbSwitch(
               secondary: Icon(Icons.today_rounded, color: scheme.primary),
               title: Text(L.onboardDailyRecapTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
               subtitle: Text(L.onboardDailyRecapSub,
@@ -452,9 +554,8 @@ class _NotificationsStepState extends State<_NotificationsStep> {
               value: _daily,
               onChanged: (v) => _setLocal('ls_notif_daily_enabled', v, (x) => _daily = x),
             ),
-            const Divider(height: 24),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
+            const SizedBox(height: 2),
+            _OnbSwitch(
               secondary: Icon(Icons.date_range_rounded, color: scheme.primary),
               title: Text(L.onboardWeeklyRecapTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
               subtitle: Text(L.onboardWeeklyRecapSub,
@@ -468,8 +569,7 @@ class _NotificationsStepState extends State<_NotificationsStep> {
               style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface),
             )),
             const SizedBox(height: 6),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
+            _OnbSwitch(
               secondary: Icon(Icons.flag_rounded, color: scheme.primary),
               title: Text(L.onboardMilestonesTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
               subtitle: Text(L.onboardMilestonesSub,
@@ -477,9 +577,8 @@ class _NotificationsStepState extends State<_NotificationsStep> {
               value: _milestones,
               onChanged: (v) => _setLocal('ls_notif_milestone_enabled', v, (x) => _milestones = x),
             ),
-            const Divider(height: 24),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
+            const SizedBox(height: 2),
+            _OnbSwitch(
               secondary: Icon(Icons.emoji_events_rounded, color: scheme.primary),
               title: Text(L.onboardGrandMilestonesTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
               subtitle: Text(L.onboardGrandMilestonesSub,
@@ -493,8 +592,7 @@ class _NotificationsStepState extends State<_NotificationsStep> {
               style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface),
             )),
             const SizedBox(height: 6),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
+            _OnbSwitch(
               secondary: Icon(Icons.emoji_events_rounded, color: scheme.primary),
               title: Text(_ct('Succès et niveaux', 'Achievements and levels'),
                   style: const TextStyle(fontWeight: FontWeight.w700)),
@@ -519,19 +617,20 @@ class _DashboardStep extends StatefulWidget {
 }
 
 class _DashboardStepState extends State<_DashboardStep> {
+  // Same keys as Settings > Dashboard (the old "top artists / albums /
+  // tracks" blocks no longer exist there — the dashboard chart replaced them).
   final Map<String, bool> _v = {
-    'ls_show_nowplay': true, 'ls_show_stats': true, 'ls_show_artists': true,
-    'ls_show_albums': true,
-    'ls_show_tracks': true, 'ls_show_friends': true,
+    'ls_show_nowplay': true, 'ls_show_stats': true, 'ls_show_recent': true,
+    'ls_show_discover': true, 'ls_show_friends': true,
   };
   static const _labels = {
-    'ls_show_nowplay': (Icons.graphic_eq_rounded, 'En cours d\'écoute', 'Now playing'),
-    'ls_show_stats':   (Icons.bar_chart_rounded, 'Statistiques', 'Stats'),
-    'ls_show_artists': (Icons.person_rounded, 'Top artistes', 'Top artists'),
-    'ls_show_albums':  (Icons.album_rounded, 'Top albums', 'Top albums'),
-    'ls_show_tracks':  (Icons.music_note_rounded, 'Top titres', 'Top tracks'),
-    'ls_show_friends': (Icons.people_rounded, 'Amis', 'Friends'),
+    'ls_show_nowplay':  (Icons.play_circle_outline_rounded, 'En cours d\'écoute', 'Now playing'),
+    'ls_show_stats':    (Icons.bar_chart_rounded, 'Statistiques', 'Stats'),
+    'ls_show_recent':   (Icons.history_rounded, 'Écoutes récentes', 'Recent plays'),
+    'ls_show_discover': (Icons.explore_rounded, 'Découverte', 'Discover'),
+    'ls_show_friends':  (Icons.people_rounded, 'Amis', 'Friends'),
   };
+  String _chart = 'calendar';
 
   @override
   void initState() { super.initState(); _load(); }
@@ -539,13 +638,22 @@ class _DashboardStepState extends State<_DashboardStep> {
   Future<void> _load() async {
     final p = await SharedPreferences.getInstance();
     if (!mounted) return;
-    setState(() { for (final k in _v.keys) { _v[k] = p.getBool(k) ?? true; } });
+    setState(() {
+      for (final k in _v.keys) { _v[k] = p.getBool(k) ?? true; }
+      _chart = p.getString('ls_dashboard_chart') ?? 'calendar';
+    });
   }
 
   Future<void> _toggle(String k, bool val) async {
     final p = await SharedPreferences.getInstance();
     await p.setBool(k, val);
     setState(() => _v[k] = val);
+  }
+
+  Future<void> _setChart(String v) async {
+    final p = await SharedPreferences.getInstance();
+    await p.setString('ls_dashboard_chart', v);
+    setState(() => _chart = v);
   }
 
   @override
@@ -555,16 +663,78 @@ class _DashboardStepState extends State<_DashboardStep> {
     return _Step(
       icon: Icons.dashboard_customize_rounded,
       title: L.onboardDashTitle, subtitle: L.onboardDashSub,
-      child: Column(children: _v.keys.map((k) {
-        final l = _labels[k]!;
-        return SwitchListTile(
-          contentPadding: EdgeInsets.zero,
-          secondary: Icon(l.$1, color: scheme.primary),
-          title: Text(isEn ? l.$3 : l.$2, style: const TextStyle(fontWeight: FontWeight.w700)),
-          value: _v[k]!,
-          onChanged: (v) => _toggle(k, v),
-        );
-      }).toList()),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        ..._v.keys.map((k) {
+          final l = _labels[k]!;
+          return _OnbSwitch(
+            secondary: Icon(l.$1, color: scheme.primary),
+            title: Text(isEn ? l.$3 : l.$2, style: const TextStyle(fontWeight: FontWeight.w700)),
+            value: _v[k]!,
+            onChanged: (v) => _toggle(k, v),
+          );
+        }),
+        const SizedBox(height: 20),
+        Text(_ct('Graphique du tableau de bord', 'Dashboard chart'),
+            style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
+        const SizedBox(height: 10),
+        M3SegmentedButton<String>(
+          segments: [
+            ButtonSegment(value: 'calendar', icon: const Icon(Icons.calendar_month_rounded),
+                label: Text(_ct('Calendrier', 'Calendar'))),
+            ButtonSegment(value: 'monthly', icon: const Icon(Icons.bar_chart_rounded),
+                label: Text(_ct('Mensuel', 'Monthly'))),
+          ],
+          selected: {_chart},
+          onSelectionChanged: (s) => _setChart(s.first),
+        ),
+      ]),
+    );
+  }
+}
+
+// ── Step: Library clean-up (link versions / split collaborations) ───────────
+class _LibraryStep extends StatelessWidget {
+  const _LibraryStep();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return _Step(
+      icon: Icons.merge_type_rounded,
+      title: _ct('Ta bibliothèque', 'Your library'),
+      subtitle: _ct(
+          'Choisis comment regrouper tes écoutes. Tu peux changer ça à tout moment dans les réglages.',
+          'Choose how your listens are grouped. You can change this any time in settings.'),
+      child: Column(children: [
+        ValueListenableBuilder<bool>(
+          valueListenable: mergeVersionsNotifier,
+          builder: (_, on, _) => _OnbSwitch(
+            secondary: Icon(Icons.merge_type_rounded, color: scheme.primary),
+            title: Text(_ct('Lier les versions d\'un même titre', 'Link versions of the same track'),
+                style: const TextStyle(fontWeight: FontWeight.w700)),
+            subtitle: Text(_ct(
+                'Remaster, single, (feat. …), édition deluxe : comptés comme un seul titre ou album, écoutes additionnées. Les remix, lives et instrumentaux restent séparés.',
+                'Remasters, singles, (feat. …), deluxe editions: counted as one track or album, plays added together. Remixes, live and instrumental versions stay separate.'),
+                style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+            value: on,
+            onChanged: (v) => LibraryMerge.setMerge(v),
+          ),
+        ),
+        ValueListenableBuilder<bool>(
+          valueListenable: splitCollabsNotifier,
+          builder: (_, on, _) => _OnbSwitch(
+            secondary: Icon(Icons.call_split_rounded, color: scheme.primary),
+            title: Text(_ct('Séparer les collaborations', 'Split collaborations'),
+                style: const TextStyle(fontWeight: FontWeight.w700)),
+            subtitle: Text(_ct(
+                '« Gims & Damso » compte pour Gims et pour Damso au lieu d\'être un artiste à part. Les groupes comme « Simon & Garfunkel » restent entiers.',
+                '"Gims & Damso" counts for Gims and for Damso instead of being a separate artist. Bands like "Simon & Garfunkel" stay whole.'),
+                style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+            value: on,
+            onChanged: (v) => LibraryMerge.setSplit(v),
+          ),
+        ),
+      ]),
     );
   }
 }
@@ -602,20 +772,11 @@ class _StartupStepState extends State<_StartupStep> {
       title: L.onboardStartupTitle, subtitle: L.onboardStartupSub,
       child: Column(children: labels.asMap().entries.map((e) {
         final sel = _tab == e.key;
-        return Card(
-          elevation: 0,
-          margin: const EdgeInsets.only(bottom: 8),
-          color: sel ? scheme.primaryContainer : scheme.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: sel ? scheme.primary : scheme.outlineVariant.withValues(alpha: 0.4)),
-          ),
-          child: ListTile(
-            leading: Icon(e.value.$1, color: sel ? scheme.onPrimaryContainer : scheme.onSurfaceVariant),
-            title: Text(e.value.$2, style: TextStyle(fontWeight: sel ? FontWeight.w700 : FontWeight.w500)),
-            trailing: sel ? Icon(Icons.check_rounded, color: scheme.onPrimaryContainer) : null,
-            onTap: () => _set(e.key),
-          ),
+        return _OnbChoice(
+          leading: Icon(e.value.$1, color: sel ? scheme.onPrimaryContainer : scheme.onSurfaceVariant),
+          title: e.value.$2,
+          selected: sel,
+          onTap: () => _set(e.key),
         );
       }).toList()),
     );
@@ -666,25 +827,16 @@ class _MusicPlatformStepState extends State<_MusicPlatformStep> {
       title: L.onboardPlatformTitle, subtitle: L.onboardPlatformSub,
       child: Column(children: options.map((o) {
         final sel = _platform == o.value;
-        return Card(
-          elevation: 0,
-          margin: const EdgeInsets.only(bottom: 8),
-          color: sel ? scheme.primaryContainer : scheme.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: sel ? scheme.primary : scheme.outlineVariant.withValues(alpha: 0.4)),
-          ),
-          child: ListTile(
-            leading: _BrandGlyph(
+        return _OnbChoice(
+          leading: _BrandGlyph(
               asset: o.asset,
               fallbackIcon: o.icon,
               size: 22,
               color: sel ? scheme.onPrimaryContainer : scheme.onSurfaceVariant,
-            ),
-            title: Text(o.label, style: TextStyle(fontWeight: sel ? FontWeight.w700 : FontWeight.w500)),
-            trailing: sel ? Icon(Icons.check_rounded, color: scheme.onPrimaryContainer) : null,
-            onTap: () => _set(o.value),
           ),
+          title: o.label,
+          selected: sel,
+          onTap: () => _set(o.value),
         );
       }).toList()),
     );
@@ -768,16 +920,14 @@ class _UpdatesStepState extends State<_UpdatesStep> {
       icon: Icons.system_update_rounded,
       title: L.onboardUpdatesTitle, subtitle: L.onboardUpdatesSub,
       child: Column(children: [
-        SwitchListTile(
-          contentPadding: EdgeInsets.zero,
+        _OnbSwitch(
           secondary: Icon(Icons.notifications_outlined, color: scheme.primary),
           title: Text(L.settingsAutoUpdate, style: const TextStyle(fontWeight: FontWeight.w700)),
           value: _auto,
           onChanged: (v) => _set('ls_auto_update_check', v, (x) => _auto = x),
         ),
-        const Divider(height: 24),
-        SwitchListTile(
-          contentPadding: EdgeInsets.zero,
+        const SizedBox(height: 2),
+        _OnbSwitch(
           secondary: Icon(Icons.science_outlined, color: scheme.primary),
           title: Text(L.onboardBetaTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
           subtitle: Text(L.onboardBetaSub,
@@ -911,12 +1061,8 @@ class _FavoritesStepState extends State<_FavoritesStep> {
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 6),
-      color: sel ? scheme.primaryContainer : scheme.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: sel ? scheme.primary.withValues(alpha: 0.6)
-                                     : scheme.outlineVariant.withValues(alpha: 0.4)),
-      ),
+      color: sel ? scheme.primaryContainer : scheme.surfaceContainerLow,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: ListTile(
         leading: _userAvatar(_avatarUrl(user)),
         title: Text(name, style: TextStyle(

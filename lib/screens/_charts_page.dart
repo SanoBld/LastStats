@@ -217,21 +217,26 @@ class _ChartsPageState extends State<_ChartsPage>
       final recs = records;
       if (!mounted) return;
       // Compute top artists and albums from records
-      final artistCounts = <String, int>{};
-      final albumCounts  = <String, int>{};
+      // Honours the "link versions" / "split collabs" options.
+      if (LibraryMerge.active) await LibraryMerge.ensureKnown(widget.service, null);
+      final known        = LibraryMerge.knownSync(widget.service.username);
+      final artistTally  = LocalTally(known);
+      final albumTally   = LocalTally(known);
       try {
         for (final r in recs) {
           final a = _sanitizeName(_recField(r, 'artist'));
           final b = _sanitizeName(_recField(r, 'album'));
-          if (_isValidLabel(a)) artistCounts[a] = (artistCounts[a] ?? 0) + 1;
-          if (_isValidLabel(b)) albumCounts[b]  = (albumCounts[b]  ?? 0) + 1;
+          if (_isValidLabel(a)) artistTally.addScrobble('artists', name: a, artist: '');
+          if (_isValidLabel(b)) albumTally.addScrobble('albums', name: b, artist: a);
         }
       } catch (_) {}
-      List<Map<String, dynamic>> rankTop(Map<String, int> counts) =>
-          (counts.entries.toList()..sort((a, b) => b.value.compareTo(a.value)))
-              .take(10)
-              .map((e) => <String, dynamic>{'name': e.key, 'playcount': '${e.value}'})
-              .toList();
+      if (!mounted) return;
+      List<Map<String, dynamic>> rankTop(LocalTally t) => t.sorted()
+          .take(10)
+          .map((e) => <String, dynamic>{'name': e.name, 'playcount': '${e.plays}'})
+          .toList();
+      final artistCounts = artistTally.sorted();
+      final albumCounts  = albumTally.sorted();
       setState(() {
         _monthly         = AllScrobblesService.computeMonthly(recs);
         _hourlyData      = AllScrobblesService.computeHourly(recs);
@@ -241,8 +246,8 @@ class _ChartsPageState extends State<_ChartsPage>
         _hourlyLoading   = false;
         _calendarLoading = false;
         _yearDataLoading = false;
-        _topArtistsYear  = artistCounts.isNotEmpty ? rankTop(artistCounts) : [];
-        _topAlbumsYear   = albumCounts.isNotEmpty  ? rankTop(albumCounts)  : [];
+        _topArtistsYear  = artistCounts.isNotEmpty ? rankTop(artistTally) : [];
+        _topAlbumsYear   = albumCounts.isNotEmpty  ? rankTop(albumTally)  : [];
       });
       return;
     }

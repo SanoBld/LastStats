@@ -10,6 +10,8 @@ import '../l10n/l10n.dart';
 import '../supported_locales.dart';
 import '../services/lastfm_service.dart';
 import '../services/prefetch_service.dart';
+import '../services/all_scrobbles_service.dart';
+import '../widgets/m3_components.dart';
 import '../services/backup_service.dart';
 import '../services/favorites_auth.dart';
 import 'onboarding_flow.dart';
@@ -860,6 +862,8 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
   late final Animation<double>   _fade;
   late final AnimationController _pulseCtrl;
   late final Animation<double>   _pulse;
+  late final AnimationController _spinCtrl;
+  late final Animation<double>   _spin;
 
   // Welcome banner — triggered once when isComplete
   late final AnimationController _welcomeCtrl;
@@ -887,6 +891,11 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
       ..repeat(reverse: true);
     _pulse = Tween<double>(begin: 0.92, end: 1.0).animate(
         CurvedAnimation(parent: _pulseCtrl, curve: M3Motion.emphasized));
+
+    // Slow rotation of the cookie badge
+    _spinCtrl = AnimationController(
+        vsync: this, duration: const Duration(seconds: 14))..repeat();
+    _spin = _spinCtrl;
 
     // Welcome banner (scale-in + fade-in on completion)
     _welcomeCtrl = AnimationController(
@@ -930,6 +939,7 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
   void dispose() {
     _fadeCtrl.dispose();
     _pulseCtrl.dispose();
+    _spinCtrl.dispose();
     _welcomeCtrl.dispose();
     PrefetchService.progressNotifier.removeListener(_onProgress);
     super.dispose();
@@ -949,219 +959,206 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
 
+    // A restored backup already holds the history: only what came after it
+    // gets checked, so the message says so instead of "N to import".
+    final cached   = AllScrobblesService.getTotalCachedScrobbles();
+    final restored = cached > 0;
+    final pct      = (_state.fraction * 100).round().clamp(0, 100);
 
     return Scaffold(
       backgroundColor: scheme.surface,
       body: FadeTransition(
         opacity: _fade,
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+          child: Center(
             child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height
-                           - MediaQuery.of(context).padding.top
-                           - MediaQuery.of(context).padding.bottom
-                           - 48,
-              ),
-              child: IntrinsicHeight(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-
-                    const Spacer(flex: 2),
-
-                    // ── Pulsing icon ──────────────────────────────────────
-                    ScaleTransition(
-                      scale: _pulse,
-                      child: Container(
-                        width: 88, height: 88,
-                        decoration: BoxDecoration(
-                          color: scheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(26),
-                          boxShadow: [
-                            BoxShadow(
-                              color:        scheme.primary.withValues(alpha: 0.22),
-                              blurRadius:   28,
-                              spreadRadius: 4,
+              constraints: const BoxConstraints(maxWidth: 560),
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+                children: [
+                  // ── Hero card: spinning cookie badge, name, welcome ──
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color:        scheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(32),
+                    ),
+                    child: Column(children: [
+                      ScaleTransition(
+                        scale: _pulse,
+                        child: RotationTransition(
+                          turns: _spin,
+                          child: M3CookieBadge(
+                            size: 96,
+                            color: scheme.primary,
+                            child: RotationTransition(
+                              // Counter-rotate so the icon stays upright.
+                              turns: ReverseAnimation(_spin),
+                              child: Icon(Icons.headphones_rounded,
+                                  size: 44, color: scheme.onPrimary),
                             ),
-                          ],
+                          ),
                         ),
-                        child: Icon(Icons.headphones_rounded,
-                            size: 44, color: scheme.onPrimaryContainer),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // ── App name ──────────────────────────────────────────
-                    Text('LastStats',
-                        style: text.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: scheme.primary)),
-                    const SizedBox(height: 6),
-
-                    // ── "Welcome, username!" ──────────────────────────────
-                    Text(
-                      L.setupWelcome(widget.username),
-                      style: text.titleMedium?.copyWith(
-                          color:      scheme.onSurface,
-                          fontWeight: FontWeight.w600),
-                    ),
-
-                    // ── Scrobble count badge ──────────────────────────────
-                    if (widget.totalScrobbles > 0) ...[
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 18),
+                      Text('LastStats',
+                          style: text.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: scheme.onPrimaryContainer)),
+                      const SizedBox(height: 4),
+                      Text(L.setupWelcome(widget.username),
+                          textAlign: TextAlign.center,
+                          style: text.titleMedium?.copyWith(
+                              color: scheme.onPrimaryContainer.withValues(alpha: 0.85),
+                              fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 14),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                         decoration: BoxDecoration(
                           color:        scheme.secondaryContainer,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(mainAxisSize: MainAxisSize.min, children: [
-                          Icon(Icons.library_music_rounded,
-                              size: 14, color: scheme.onSecondaryContainer),
+                          Icon(restored ? Icons.restore_rounded : Icons.library_music_rounded,
+                              size: 15, color: scheme.onSecondaryContainer),
                           const SizedBox(width: 7),
-                          Text(
-                            L.setupScrobblesToImport(_fmtLarge(widget.totalScrobbles)),
+                          Flexible(child: Text(
+                            restored
+                                ? _t('${_fmtLarge(cached)} scrobbles restaurés',
+                                     '${_fmtLarge(cached)} scrobbles restored')
+                                : (widget.totalScrobbles > 0
+                                    ? L.setupScrobblesToImport(_fmtLarge(widget.totalScrobbles))
+                                    : _t('Prêt à importer', 'Ready to import')),
                             style: text.labelMedium?.copyWith(
-                                color:      scheme.onSecondaryContainer,
+                                color: scheme.onSecondaryContainer,
                                 fontWeight: FontWeight.w700),
-                          ),
+                          )),
                         ]),
                       ),
-                    ],
+                    ]),
+                  ),
+                  const SizedBox(height: 16),
 
-                    const Spacer(flex: 2),
-
-                    // ── Animated checklist ────────────────────────────────
-                    _FirstLoadChecklist(
-                      state:  _state,
-                      scheme: scheme,
-                      text:   text,
-                      t:      _t,
+                  // ── Progress ─────────────────────────────────────────
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
+                    decoration: BoxDecoration(
+                      color:        scheme.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(28),
                     ),
-                    const SizedBox(height: 22),
-
-                    // ── Progress bar ──────────────────────────────────────
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(100),
-                      child: TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0, end: _state.fraction),
-                        duration: const Duration(milliseconds: 400),
-                        curve: M3Motion.emphasizedDecelerate,
-                        builder: (_, v, _) => LinearProgressIndicator(
-                          value:           v,
-                          minHeight:       7,
-                          backgroundColor: scheme.surfaceContainerHigh,
-                          valueColor:
-                              AlwaysStoppedAnimation(scheme.primary),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Row(children: [
+                        Expanded(
+                          child: M3Switcher(
+                            duration: const Duration(milliseconds: 220),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              key: ValueKey(_state.isComplete ? 'done' : _state.currentStep),
+                              child: Text(
+                                _state.isComplete
+                                    ? _t('Import terminé', 'Import complete')
+                                    : _state.currentStep.isEmpty
+                                        ? _t('Connexion à Last.fm…', 'Connecting to Last.fm…')
+                                        : _state.currentStep,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text('$pct%',
+                            style: text.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w800, color: scheme.primary)),
+                      ]),
+                      const SizedBox(height: 12),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0, end: _state.fraction),
+                          duration: const Duration(milliseconds: 400),
+                          curve: M3Motion.emphasizedDecelerate,
+                          builder: (_, v, _) => LinearProgressIndicator(
+                            value:           v,
+                            minHeight:       10,
+                            color:           scheme.primary,
+                            backgroundColor: scheme.surfaceContainerHighest,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
+                    ]),
+                  ),
+                  const SizedBox(height: 16),
 
-                    // ── Current step label (below bar) ────────────────────
-                    M3Switcher(
-                      duration: const Duration(milliseconds: 220),
-                      child: Text(
-                        _state.isComplete
-                            ? _t('✨ Import terminé !', '✨ Import complete!')
-                            : _state.currentStep.isEmpty
-                                ? _t('Connexion à Last.fm…',
-                                     'Connecting to Last.fm…')
-                                : _state.currentStep,
-                        key: ValueKey(
-                            _state.isComplete ? 'done' : _state.currentStep),
-                        style: text.bodySmall?.copyWith(
-                            color: scheme.onSurfaceVariant),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                  // ── Steps ────────────────────────────────────────────
+                  _FirstLoadChecklist(
+                    state:  _state,
+                    scheme: scheme,
+                    text:   text,
+                    t:      _t,
+                  ),
+                  const SizedBox(height: 16),
 
-                    // ── Welcome banner — animates in when loading is done ──
-                    // Written in the chosen language (FR / EN)
-                    AnimatedSize(
-                      duration: const Duration(milliseconds: 400),
-                      curve: M3Motion.emphasizedDecelerate,
-                      child: _state.isComplete
-                          ? FadeTransition(
-                              opacity: _welcomeFade,
-                              child: ScaleTransition(
-                                scale: _welcomeScale,
-                                child: Container(
-                                  width: double.infinity,
-                                  margin: const EdgeInsets.only(bottom: 4),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 18),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        scheme.primaryContainer,
-                                        scheme.secondaryContainer,
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end:   Alignment.bottomRight,
-                                    ),
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: scheme.primary
-                                            .withValues(alpha: 0.18),
-                                        blurRadius:   24,
-                                        spreadRadius: 2,
+                  // ── Welcome banner — animates in when loading is done ──
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 400),
+                    curve: M3Motion.emphasizedDecelerate,
+                    child: _state.isComplete
+                        ? FadeTransition(
+                            opacity: _welcomeFade,
+                            child: ScaleTransition(
+                              scale: _welcomeScale,
+                              child: Container(
+                                width: double.infinity,
+                                margin: const EdgeInsets.only(bottom: 16),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 18),
+                                decoration: BoxDecoration(
+                                  color:        scheme.primary,
+                                  borderRadius: BorderRadius.circular(28),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.music_note_rounded,
+                                        color: scheme.onPrimary, size: 24),
+                                    const SizedBox(width: 10),
+                                    Flexible(child: Text(
+                                      L.setupWelcomeBanner,
+                                      style: text.titleMedium?.copyWith(
+                                        color:      scheme.onPrimary,
+                                        fontWeight: FontWeight.w800,
                                       ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.music_note_rounded,
-                                          color: scheme.primary, size: 26),
-                                      const SizedBox(width: 10),
-                                      Text(
-                                        L.setupWelcomeBanner,
-                                        style: text.titleMedium?.copyWith(
-                                          color:      scheme.primary,
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    )),
+                                  ],
                                 ),
                               ),
-                            )
-                          : const SizedBox.shrink(),
-                    ),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                  ),
 
-                    const Spacer(flex: 1),
-
-                    // ── One-time import note ──────────────────────────────
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 10),
-                      decoration: BoxDecoration(
-                        color:        scheme.surfaceContainerLow,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                            color: scheme.outlineVariant
-                                .withValues(alpha: 0.5)),
-                      ),
-                      child: Row(children: [
-                        Icon(Icons.bolt_rounded,
-                            size: 15, color: scheme.tertiary),
-                        const SizedBox(width: 10),
-                        Expanded(child: Text(
-                          L.setupOneTimeImportNote,
-                          style: text.bodySmall?.copyWith(
-                              color: scheme.onSurfaceVariant),
-                        )),
-                      ]),
+                  // ── Note ─────────────────────────────────────────────
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color:        scheme.tertiaryContainer.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    const SizedBox(height: 8),
-                  ],
-                ),
+                    child: Row(children: [
+                      Icon(Icons.bolt_rounded, size: 18, color: scheme.onTertiaryContainer),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(
+                        restored
+                            ? _t('Sauvegarde détectée : seuls les scrobbles plus récents seront vérifiés.',
+                                 'Backup found: only newer scrobbles will be checked.')
+                            : L.setupOneTimeImportNote,
+                        style: text.bodySmall?.copyWith(color: scheme.onTertiaryContainer),
+                      )),
+                    ]),
+                  ),
+                ],
               ),
             ),
           ),
@@ -1233,12 +1230,10 @@ class _FirstLoadChecklistState extends State<_FirstLoadChecklist> {
       curve: M3Motion.emphasizedDecelerate,
       width: double.infinity,
       constraints: const BoxConstraints(maxHeight: 340),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       decoration: BoxDecoration(
         color: scheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-            color: scheme.outlineVariant.withValues(alpha: 0.55)),
+        borderRadius: BorderRadius.circular(28),
       ),
       child: hasContent
           ? Column(
@@ -1340,42 +1335,51 @@ class _StepRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDone = status == _RowStatus.done;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: Row(children: [
-        // Status icon with switch animation
-        SizedBox(
-          width: 18, height: 18,
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 280),
-            transitionBuilder: (child, anim) =>
-                ScaleTransition(scale: anim, child: child),
-            child: isDone
-                ? Icon(Icons.check_circle_rounded,
-                    size: 18, color: scheme.primary,
-                    key: const ValueKey('done'))
-                : M3Spinner(),
-          ),
+    // Same tonal tile as the settings rows; the active one uses the
+    // primary container, finished ones fall back to a quiet surface.
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 320),
+      curve: M3Motion.emphasizedDecelerate,
+      builder: (_, v, child) => Opacity(
+        opacity: v.clamp(0.0, 1.0),
+        child: Transform.translate(offset: Offset(0, (1 - v) * 10), child: child),
+      ),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: isDone
+              ? scheme.surfaceContainerHigh.withValues(alpha: 0.6)
+              : scheme.primaryContainer,
+          borderRadius: BorderRadius.circular(16),
         ),
-        const SizedBox(width: 10),
-
-        // Label
-        Expanded(
-          child: Text(
-            label,
-            style: text.bodyMedium?.copyWith(
-              color:      isDone ? scheme.onSurface : scheme.primary,
-              fontWeight: FontWeight.w600,
+        child: Row(children: [
+          SizedBox(
+            width: 22, height: 22,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 280),
+              transitionBuilder: (child, anim) =>
+                  ScaleTransition(scale: anim, child: child),
+              child: isDone
+                  ? Icon(Icons.check_circle_rounded,
+                      size: 22, color: scheme.primary,
+                      key: const ValueKey('done'))
+                  : M3Spinner(),
             ),
           ),
-        ),
-
-        // Secondary check for done steps
-        if (isDone)
-          Icon(Icons.check_rounded,
-              size: 14,
-              color: scheme.primary.withValues(alpha: 0.6)),
-      ]),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              label,
+              style: text.bodyMedium?.copyWith(
+                color: isDone ? scheme.onSurfaceVariant : scheme.onPrimaryContainer,
+                fontWeight: isDone ? FontWeight.w500 : FontWeight.w700,
+              ),
+            ),
+          ),
+        ]),
+      ),
     );
   }
 }

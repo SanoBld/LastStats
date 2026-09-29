@@ -41,6 +41,9 @@
 - New poster shapes
 - New video mode for Apple Music posters: an animated video preview instead of a static cover
 - Fix: tracks, albums and artists opened from a friend's profile now load their video and your stats, and stack on top of the profile instead of replacing it
+- New option "Link versions of the same track": remasters, singles, (feat. ...) and deluxe editions count as one track or album with plays added together; remixes, live and instrumental versions stay separate
+- New option "Split collaborations": "Gims & Damso" counts for both artists instead of being a third artist; bands such as "Simon & Garfunkel" stay whole
+- Both library options apply to top lists, rankings, charts and item stats, and appear in Settings and in the welcome flow
 
 **Achievements and news**
 - Achievements redesigned to match the rest of the app: Material 3 Expressive header, level card, grouped category list and milestone lists with big outer and small inner corners, primary and container colors only
@@ -49,6 +52,10 @@
 - Tier styles (bronze, silver, gold, platinum, emerald, sapphire, diamond, chrome, iridescent) redesigned in Material You: soft tonal colors instead of metallic sheens, cookie-shaped badges, theme-colored back of the 3D badge card
 - Rankings podium redesigned to match the recap podium: shaped covers with rank badge, text under the cover, tonal bars
 - Apple Music video: much better matching, tries every release of a track (single, album, deluxe), smarter title/artist matching and a more robust token lookup
+- Welcome flow redesigned in Material You: animated header, tonal option tiles, new "Your library" step, and dashboard options now match the real dashboard settings (removed outdated top artists / albums / tracks switches)
+- Loading screen redesigned: rotating cookie badge, progress card with percentage, grouped step tiles
+- Restoring a backup that contains scrobbles no longer re-downloads years from A to Z: cached years are trusted and only scrobbles newer than the last cached one are fetched
+- Backup: separate switches for dashboard, notifications, library options and favourite profiles; runtime-only markers are no longer exported; image shape, achievements and eco mode are applied immediately on restore
 
 **Settings: redesigned in Material 3 Expressive**
 - Every settings page now shares one design: cookie-shaped icon badges, grouped tiles (big outer corners, small inner corners), spring press animation, a check icon inside switches, clearer section titles and an 8dp spacing scale

@@ -390,7 +390,14 @@ class ScrobblesFileCache {
     // Update "loaded_years" so the newly imported years are recognized by
     // the rest of the app (AllScrobblesService etc.) on next read.
     final years = getCachedYears();
-    await setMeta({..._meta ?? {}, 'loaded_years': years});
+    // Keep the newest of both sync times: the restored history is trusted,
+    // so the next sync only asks Last.fm for what is newer than it.
+    final prevSync = (_meta?['last_sync_ts'] as num?)?.toInt() ?? 0;
+    await setMeta({
+      ..._meta ?? {},
+      'loaded_years': years,
+      'last_sync_ts': prevSync > 0 ? prevSync : DateTime.now().millisecondsSinceEpoch,
+    });
   }
 
   // ──────────────────────────────────────────────────────────────────────────

@@ -144,6 +144,8 @@ Future<void> _mainImpl() async {
   hapticFeedbackNotifier.value = prefs.getBool('ls_haptic_feedback') ?? true;
   livingArtworkNotifier.value = prefs.getBool('ls_living_artwork') ?? true;
   motionArtworkNotifier.value = prefs.getBool('ls_motion_artwork') ?? true;
+  mergeVersionsNotifier.value = prefs.getBool('ls_merge_versions') ?? false;
+  splitCollabsNotifier.value  = prefs.getBool('ls_split_collabs')  ?? false;
   imageShapeNotifier.value = prefs.getString('ls_image_shape') ?? 'mix';
   achievementsEnabledNotifier.value = prefs.getBool('ls_achievements_enabled') ?? true;
   ecoModeManualNotifier.value    = prefs.getBool('ls_eco_mode_manual')    ?? false;

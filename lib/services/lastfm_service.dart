@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
+import 'library_merge.dart';
 
 class LastFmService {
   final String apiKey;
@@ -131,7 +132,22 @@ class LastFmService {
   }
 
   // ── Top lists ───────────────────────────────────────────
+  // Public entry point: honours the "link versions" / "split collabs"
+  // options (see LibraryMerge); plain Last.fm list when both are off.
   Future<List<dynamic>> getTopArtists({
+    String period = 'overall',
+    int limit = 50,
+    int page = 1,
+    String? user,
+  }) {
+    if (LibraryMerge.active) {
+      return LibraryMerge.topList(this,
+          type: 'artists', period: period, limit: limit, page: page, user: user);
+    }
+    return rawTopArtists(period: period, limit: limit, page: page, user: user);
+  }
+
+  Future<List<dynamic>> rawTopArtists({
     String period = 'overall',
     int limit = 50,
     int page = 1,
@@ -147,7 +163,22 @@ class LastFmService {
     return _asList(d['topartists']?['artist']);
   }
 
+  // Public entry point: honours the "link versions" / "split collabs"
+  // options (see LibraryMerge); plain Last.fm list when both are off.
   Future<List<dynamic>> getTopAlbums({
+    String period = 'overall',
+    int limit = 50,
+    int page = 1,
+    String? user,
+  }) {
+    if (LibraryMerge.active) {
+      return LibraryMerge.topList(this,
+          type: 'albums', period: period, limit: limit, page: page, user: user);
+    }
+    return rawTopAlbums(period: period, limit: limit, page: page, user: user);
+  }
+
+  Future<List<dynamic>> rawTopAlbums({
     String period = 'overall',
     int limit = 50,
     int page = 1,
@@ -163,7 +194,22 @@ class LastFmService {
     return _asList(d['topalbums']?['album']);
   }
 
+  // Public entry point: honours the "link versions" / "split collabs"
+  // options (see LibraryMerge); plain Last.fm list when both are off.
   Future<List<dynamic>> getTopTracks({
+    String period = 'overall',
+    int limit = 50,
+    int page = 1,
+    String? user,
+  }) {
+    if (LibraryMerge.active) {
+      return LibraryMerge.topList(this,
+          type: 'tracks', period: period, limit: limit, page: page, user: user);
+    }
+    return rawTopTracks(period: period, limit: limit, page: page, user: user);
+  }
+
+  Future<List<dynamic>> rawTopTracks({
     String period = 'overall',
     int limit = 50,
     int page = 1,
@@ -397,10 +443,13 @@ class LastFmService {
       items = await getTopTracks(period: period, limit: 200);
     }
 
+    final known = LibraryMerge.knownSync(username);
     for (var i = 0; i < items.length; i++) {
       final n = (items[i]['name'] ?? '').toString();
       final a = type != 'artists' ? (items[i]['artist']?['name'] ?? '').toString() : '';
-      final match = n == name && (type == 'artists' || a == artistName);
+      final match = LibraryMerge.active
+          ? LibraryMerge.same(type, n, a, name, artistName, known)
+          : n == name && (type == 'artists' || a == artistName);
       if (match) {
         final plays = int.tryParse((items[i]['playcount'] ?? '0').toString()) ?? 0;
         return (rank: i + 1, plays: plays);

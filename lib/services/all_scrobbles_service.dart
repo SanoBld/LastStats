@@ -266,10 +266,12 @@ class AllScrobblesService {
       for (var i = 0; i < years.length; i++) {
         final year = years[i];
 
-        // Skip si déjà en cache complet (sauf l'année en cours, qui peut
-        // avoir de nouveaux scrobbles depuis le dernier chargement complet)
-        if (!force && isYearCached(year) && isYearComplete(year) &&
-            year != currentYear) {
+        // Skip every year that is already cached and complete — the current
+        // one too: its NEW scrobbles are fetched incrementally right after
+        // the loop (syncNew), instead of downloading the whole year again.
+        // This is what makes a restored backup cheap: only what came after
+        // the backup is checked.
+        if (!force && isYearCached(year) && isYearComplete(year)) {
           continue;
         }
 
@@ -301,24 +303,29 @@ class AllScrobblesService {
       progressNotifier.value = AllScrobblesProgress.done(
           totalYears: years.length, mode: SyncMode.full);
     }
+    // Everything older is in cache: only look at what is newer than the
+    // last cached scrobble.
+    if (!force && lastCachedTimestamp > 0) {
+      await syncNew(service, fromLoadAll: true);
+    }
   }
 
   // ── Synchronisation incrémentale (lancements suivants) ───────────────────
 
   /// Récupère uniquement les scrobbles postérieurs au dernier timestamp connu.
   /// Fusionne avec les records existants.
-  static Future<void> syncNew(LastFmService service) async {
+  static Future<void> syncNew(LastFmService service, {bool fromLoadAll = false}) async {
     if (_running) return;
 
     final lastTs = lastCachedTimestamp;
-    if (lastTs == 0) return loadAll(service);
+    if (lastTs == 0) return fromLoadAll ? null : loadAll(service);
 
     // Si des années en cache v1 (sans métadonnées), relancer un loadAll.
     // On ne bloque pas pour ça — on le fait silencieusement.
     final incompleteYears = getCachedYears()
         .where((y) => isYearCached(y) && !isYearComplete(y))
         .toList();
-    if (incompleteYears.isNotEmpty) {
+    if (incompleteYears.isNotEmpty && !fromLoadAll) {
       debugPrint('[AllScrobbles] Années incomplètes (v1) → rechargement : '
           '$incompleteYears');
       return loadAll(service);

@@ -7,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/app_share.dart';
 import '../../l10n/l10n.dart';
+import '../../app_state.dart';
 import '../../services/backup_service.dart';
 import '../../services/crash_log_service.dart';
 import '../../services/auto_backup_service.dart';
@@ -164,6 +165,10 @@ class _BackupPageState extends State<BackupPage> {
   bool _includeSecretKey = true;
   bool _includeFolders   = true;
   bool _includeThemes    = true;
+  bool _includeLibrary   = true;
+  bool _includeDashboard = true;
+  bool _includeNotifs    = true;
+  bool _includeProfiles  = true;
   // NEW: off by default, since embedding the full listening history makes
   // the backup file much bigger.
   bool _includeScrobbles = false;
@@ -175,6 +180,10 @@ class _BackupPageState extends State<BackupPage> {
       includeSecretKey: _includeSecretKey,
       includeFolders:   _includeFolders,
       includeThemes:    _includeThemes,
+      includeLibrary:   _includeLibrary,
+      includeDashboard: _includeDashboard,
+      includeNotifications: _includeNotifs,
+      includeProfiles:  _includeProfiles,
       includeScrobbles: _includeScrobbles,
     );
     if (!mounted) return;
@@ -418,6 +427,46 @@ class _BackupPageState extends State<BackupPage> {
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             value: _includeThemes,
             onChanged: (v) => setState(() => _includeThemes = v),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          SwitchListTile(
+            secondary: Icon(Icons.dashboard_customize_rounded, color: scheme.primary),
+            title: Text(localeNotifier.value == 'en' ? 'Dashboard and start-up' : 'Tableau de bord et démarrage',
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            subtitle: Text(localeNotifier.value == 'en' ? 'Sections, header, stat cards, discover, start-up tab' : 'Sections, en-tête, cartes de stats, découverte, onglet de démarrage',
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            value: _includeDashboard,
+            onChanged: (v) => setState(() => _includeDashboard = v),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          SwitchListTile(
+            secondary: Icon(Icons.notifications_active_rounded, color: scheme.primary),
+            title: Text(localeNotifier.value == 'en' ? 'Notifications' : 'Notifications',
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            subtitle: Text(localeNotifier.value == 'en' ? 'Recaps, milestones, news and badges' : 'Récaps, jalons, actualités et pastilles',
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            value: _includeNotifs,
+            onChanged: (v) => setState(() => _includeNotifs = v),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          SwitchListTile(
+            secondary: Icon(Icons.merge_type_rounded, color: scheme.primary),
+            title: Text(localeNotifier.value == 'en' ? 'Library options' : 'Options de bibliothèque',
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            subtitle: Text(localeNotifier.value == 'en' ? 'Link track versions, split collaborations' : 'Lier les versions d'un titre, séparer les collaborations',
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            value: _includeLibrary,
+            onChanged: (v) => setState(() => _includeLibrary = v),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          SwitchListTile(
+            secondary: Icon(Icons.star_rounded, color: scheme.primary),
+            title: Text(localeNotifier.value == 'en' ? 'Favourite profiles' : 'Profils favoris',
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            subtitle: Text(localeNotifier.value == 'en' ? 'The Last.fm profiles you starred' : 'Les profils Last.fm que tu as mis en favori',
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            value: _includeProfiles,
+            onChanged: (v) => setState(() => _includeProfiles = v),
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
