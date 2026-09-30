@@ -84,7 +84,7 @@ gray attribution label shown under artwork. Returns '' if unknown.</p>
   };
   final raw = _sourceOf[key];
   if (raw == null || raw.isEmpty) return &#39;&#39;;
-  return _tr(_sourceNames[raw] ?? const {});
+  return _sourceDisplayNames.containsKey(raw) ? tx(&#39;img_src_$raw&#39;) : &#39;&#39;;
 }</code></pre>
 </section>
 

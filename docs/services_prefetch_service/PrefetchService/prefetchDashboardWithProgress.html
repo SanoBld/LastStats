@@ -79,13 +79,13 @@
   );
 
   final steps = &lt;(String, Future&lt;void&gt; Function())&gt;[
-    (_t(&#39;👤 Profil utilisateur&#39;,         &#39;👤 User profile&#39;),          () =&gt; _prefetchUserInfo(service,   force: force)),
-    (_t(&#39;🎤 Top artistes — Global&#39;,      &#39;🎤 Top artists — All time&#39;), () =&gt; _prefetchTopList(service, &#39;artists&#39;, &#39;overall&#39;, force: force)),
-    (_t(&#39;💿 Top albums — Global&#39;,        &#39;💿 Top albums — All time&#39;),  () =&gt; _prefetchTopList(service, &#39;albums&#39;,  &#39;overall&#39;, force: force)),
-    (_t(&#39;🎵 Top titres — Global&#39;,        &#39;🎵 Top tracks — All time&#39;),  () =&gt; _prefetchTopList(service, &#39;tracks&#39;,  &#39;overall&#39;, force: force)),
-    (_t(&#39;⏱️ Écoutes récentes&#39;,           &#39;⏱️ Recent plays&#39;),           () =&gt; _prefetchRecent(service,             force: force)),
-    (_t(&#39;🗓️ Top artistes — Semaine&#39;,     &#39;🗓️ Top artists — This week&#39;), () =&gt; _prefetchTopList(service, &#39;artists&#39;, &#39;7day&#39;, force: force)),
-    (_t(&#39;🗓️ Albums &amp; titres — Semaine&#39;,  &#39;🗓️ Albums &amp; tracks — This week&#39;), () async {
+    (tx(&#39;pf_1&#39;),          () =&gt; _prefetchUserInfo(service,   force: force)),
+    (tx(&#39;pf_2&#39;), () =&gt; _prefetchTopList(service, &#39;artists&#39;, &#39;overall&#39;, force: force)),
+    (tx(&#39;pf_3&#39;),  () =&gt; _prefetchTopList(service, &#39;albums&#39;,  &#39;overall&#39;, force: force)),
+    (tx(&#39;pf_4&#39;),  () =&gt; _prefetchTopList(service, &#39;tracks&#39;,  &#39;overall&#39;, force: force)),
+    (tx(&#39;pf_5&#39;),           () =&gt; _prefetchRecent(service,             force: force)),
+    (tx(&#39;pf_13&#39;), () =&gt; _prefetchTopList(service, &#39;artists&#39;, &#39;7day&#39;, force: force)),
+    (tx(&#39;pf_14&#39;), () async {
       await _prefetchTopList(service, &#39;albums&#39;, &#39;7day&#39;, force: force);
       await _prefetchTopList(service, &#39;tracks&#39;, &#39;7day&#39;, force: force);
     }),

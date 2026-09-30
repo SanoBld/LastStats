@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the tx function from the extra_strings library, for the Dart programming language.">
-  <title>tx function - extra_strings library - Dart API</title>
+  <meta name="description" content="API docs for the kTranslationLangNames constant from the l10n library, for the Dart programming language.">
+  <title>kTranslationLangNames constant - l10n library - Dart API</title>
 
 
   
@@ -25,10 +25,10 @@
   <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">laststats_mobile</a></li>
-    <li><a href="../l10n_extra_strings/">l10n&#47;extra_strings.dart</a></li>
-    <li class="self-crumb">tx function</li>
+    <li><a href="../l10n_l10n/">l10n&#47;l10n.dart</a></li>
+    <li class="self-crumb">kTranslationLangNames constant</li>
   </ol>
-  <div class="self-name">tx</div>
+  <div class="self-name">kTranslationLangNames</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -45,38 +45,35 @@
   <div
       id="dartdoc-main-content"
       class="main-content"
-      data-above-sidebar="l10n_extra_strings&#47;l10n_extra_strings-library-sidebar.html"
+      data-above-sidebar="l10n_l10n&#47;l10n_l10n-library-sidebar.html"
       data-below-sidebar="">
       <div>
-<h1><span class="kind-function">tx</span> function 
+<h1><span class="kind-top-level-property">kTranslationLangNames</span> top-level constant 
  
 </h1></div>
 
-    <section class="multi-line-signature">
+        <section class="multi-line-signature">
+          
+          <a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span>
+          const <span class="name ">kTranslationLangNames</span>
+          
+
+        </section>
         
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
-<span class="name ">tx</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="tx-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, [</span></li>
-<li><span class="parameter" id="tx-param-args"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">args</span></span></li>
-</ol>])
+<section class="desc markdown">
+  <p>Native names of the languages offered for translating bios.</p>
+</section>
 
         
-
-    </section>
-    
-
-
-    
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">String tx(String key, [Map&lt;String, String&gt;? args]) {
-  final m = _kExtra[key] ?? kUiStrings[key] ?? kScreenStrings[key];
-  var s = m?[localeNotifier.value] ?? m?[&#39;en&#39;] ?? m?[&#39;fr&#39;] ?? key;
-  if (args != null) {
-    args.forEach((k, v) { s = s.replaceAll(&#39;{$k}&#39;, v); });
-  }
-  return s;
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">const Map&lt;String, String&gt; kTranslationLangNames = {
+      &#39;fr&#39;: &#39;Français&#39;, &#39;en&#39;: &#39;English&#39;, &#39;es&#39;: &#39;Español&#39;,
+      &#39;de&#39;: &#39;Deutsch&#39;,  &#39;it&#39;: &#39;Italiano&#39;, &#39;pt&#39;: &#39;Português&#39;,
+      &#39;ja&#39;: &#39;日本語&#39;,     &#39;ko&#39;: &#39;한국어&#39;,    &#39;ar&#39;: &#39;العربية&#39;,
+    };</code></pre>
 </section>
+
 
 
   </div> <!-- /.main-content -->
@@ -89,11 +86,11 @@
 </header>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">laststats_mobile</a></li>
-    <li><a href="../l10n_extra_strings/">extra_strings</a></li>
-    <li class="self-crumb">tx function</li>
+    <li><a href="../l10n_l10n/">l10n</a></li>
+    <li class="self-crumb">kTranslationLangNames constant</li>
 </ol>
 
-    <h5>extra_strings library</h5>
+    <h5>l10n library</h5>
     <div id="dartdoc-sidebar-left-content"></div>
   </div><!--/.sidebar-offcanvas-left-->
   <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">

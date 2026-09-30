@@ -90,33 +90,33 @@ Utilisé uniquement lors de la première connexion (force: true).</p>
   final steps = &lt;(String, Future&lt;void&gt; Function())&gt;[
     &#47;&#47; ── Étape 1 : profil ───────────────────────────────────────────────
     (
-      _t(&#39;👤 Profil utilisateur&#39;, &#39;👤 User profile&#39;),
+      tx(&#39;pf_1&#39;),
       () =&gt; _prefetchUserInfo(service, force: force),
     ),
 
     &#47;&#47; ── Étape 2–4 : tops global ────────────────────────────────────────
     (
-      _t(&#39;🎤 Top artistes — Global&#39;, &#39;🎤 Top artists — All time&#39;),
+      tx(&#39;pf_2&#39;),
       () =&gt; _prefetchTopList(service, &#39;artists&#39;, &#39;overall&#39;, force: force),
     ),
     (
-      _t(&#39;💿 Top albums — Global&#39;, &#39;💿 Top albums — All time&#39;),
+      tx(&#39;pf_3&#39;),
       () =&gt; _prefetchTopList(service, &#39;albums&#39;, &#39;overall&#39;, force: force),
     ),
     (
-      _t(&#39;🎵 Top titres — Global&#39;, &#39;🎵 Top tracks — All time&#39;),
+      tx(&#39;pf_4&#39;),
       () =&gt; _prefetchTopList(service, &#39;tracks&#39;, &#39;overall&#39;, force: force),
     ),
 
     &#47;&#47; ── Étape 5 : écoutes récentes ─────────────────────────────────────
     (
-      _t(&#39;⏱️ Écoutes récentes&#39;, &#39;⏱️ Recent plays&#39;),
+      tx(&#39;pf_5&#39;),
       () =&gt; _prefetchRecent(service, force: force),
     ),
 
     &#47;&#47; ── Étape 6 : tops 7 jours ─────────────────────────────────────────
     (
-      _t(&#39;🗓️ Cette semaine&#39;, &#39;🗓️ This week&#39;),
+      tx(&#39;pf_6&#39;),
       () async {
         await _prefetchTopList(service, &#39;artists&#39;, &#39;7day&#39;, force: force);
         await _prefetchTopList(service, &#39;albums&#39;,  &#39;7day&#39;, force: force);
@@ -126,7 +126,7 @@ Utilisé uniquement lors de la première connexion (force: true).</p>
 
     &#47;&#47; ── Étape 7 : tops 1 mois ──────────────────────────────────────────
     (
-      _t(&#39;📅 Ce mois-ci&#39;, &#39;📅 This month&#39;),
+      tx(&#39;pf_7&#39;),
       () async {
         await _prefetchTopList(service, &#39;artists&#39;, &#39;1month&#39;, force: force);
         await _prefetchTopList(service, &#39;albums&#39;,  &#39;1month&#39;, force: force);
@@ -136,7 +136,7 @@ Utilisé uniquement lors de la première connexion (force: true).</p>
 
     &#47;&#47; ── Étape 8 : tops 3 mois ──────────────────────────────────────────
     (
-      _t(&#39;📅 3 derniers mois&#39;, &#39;📅 Last 3 months&#39;),
+      tx(&#39;pf_8&#39;),
       () async {
         await _prefetchTopList(service, &#39;artists&#39;, &#39;3month&#39;, force: force);
         await _prefetchTopList(service, &#39;albums&#39;,  &#39;3month&#39;, force: force);
@@ -146,7 +146,7 @@ Utilisé uniquement lors de la première connexion (force: true).</p>
 
     &#47;&#47; ── Étape 9 : tops 6 mois ──────────────────────────────────────────
     (
-      _t(&#39;📅 6 derniers mois&#39;, &#39;📅 Last 6 months&#39;),
+      tx(&#39;pf_9&#39;),
       () async {
         await _prefetchTopList(service, &#39;artists&#39;, &#39;6month&#39;, force: force);
         await _prefetchTopList(service, &#39;albums&#39;,  &#39;6month&#39;, force: force);
@@ -156,7 +156,7 @@ Utilisé uniquement lors de la première connexion (force: true).</p>
 
     &#47;&#47; ── Étape 10 : tops 12 mois ────────────────────────────────────────
     (
-      _t(&#39;📅 12 derniers mois&#39;, &#39;📅 Last 12 months&#39;),
+      tx(&#39;pf_10&#39;),
       () async {
         await _prefetchTopList(service, &#39;artists&#39;, &#39;12month&#39;, force: force);
         await _prefetchTopList(service, &#39;albums&#39;,  &#39;12month&#39;, force: force);
@@ -166,13 +166,13 @@ Utilisé uniquement lors de la première connexion (force: true).</p>
 
     &#47;&#47; ── Étape 11 : historique mensuel ──────────────────────────────────
     (
-      _t(&#39;📊 Historique mensuel&#39;, &#39;📊 Monthly history&#39;),
+      tx(&#39;pf_11&#39;),
       () =&gt; _prefetchMonthly(service, force: force),
     ),
 
     &#47;&#47; ── Étape 12 : titres aimés ────────────────────────────────────────
     (
-      _t(&#39;❤️ Titres aimés&#39;, &#39;❤️ Loved tracks&#39;),
+      tx(&#39;pf_12&#39;),
       () =&gt; _prefetchLoved(service, force: force),
     ),
   ];
