@@ -169,15 +169,19 @@
 </ol>
 <h3 id="macos">macOS</h3>
 <ol>
-<li>Download the macOS build from the <a href="https://github.com/SanoBld/LastStats-App/releases">releases page</a>.</li>
-<li>Move <code>LastStats.app</code> to your Applications folder.</li>
+<li>Download <code>LastStats-macos.dmg</code> from the <a href="https://github.com/SanoBld/LastStats-App/releases">releases page</a>.</li>
+<li>Open it and drag <code>LastStats.app</code> onto the <code>Applications</code> shortcut.</li>
 <li>Since the build isn't notarized, the first launch requires right-click → "Open" → "Open" again (macOS will otherwise refuse to run apps from an unidentified developer).</li>
 </ol>
 <h3 id="linux">Linux</h3>
-<ol>
-<li>Download the Linux build from the <a href="https://github.com/SanoBld/LastStats-App/releases">releases page</a>.</li>
-<li>Extract it, then run the <code>LastStats</code> executable (<code>chmod +x LastStats</code> first if needed).</li>
-</ol>
+<p>Pick the file for your CPU (<code>x64</code> for most PCs, <code>arm64</code> for ARM devices) on the <a href="https://github.com/SanoBld/LastStats-App/releases">releases page</a>:</p>
+<ul>
+<li><strong>One command (any distro):</strong> <code>curl -fsSL https://github.com/SanoBld/LastStats-App/releases/latest/download/install-linux.sh | bash</code> — detects your distro and CPU and installs the right package.</li>
+<li><strong>Debian / Ubuntu / Mint:</strong> <code>LastStats-linux-&lt;arch&gt;.deb</code> — double-click it (software center opens an install wizard) or run <code>sudo apt install ./LastStats-linux-&lt;arch&gt;.deb</code>. Uninstall with <code>sudo apt remove laststats</code>.</li>
+<li><strong>Fedora / openSUSE / RHEL:</strong> <code>LastStats-linux-&lt;arch&gt;.rpm</code> — double-click it or run <code>sudo dnf install ./LastStats-linux-&lt;arch&gt;.rpm</code>. Uninstall with <code>sudo dnf remove laststats</code>.</li>
+<li><strong>Any distro, no install:</strong> <code>LastStats-linux-&lt;arch&gt;.AppImage</code> — <code>chmod +x</code> it, then run it.</li>
+<li><strong>Manual:</strong> <code>laststats-linux.zip</code> (x64) / <code>laststats-linux-arm64.zip</code>, extract and run <code>laststats_mobile</code>.</li>
+</ul>
 <h3 id="building-from-source">Building from source</h3>
 <p>Requires the <a href="https://docs.flutter.dev/get-started/install">Flutter SDK</a> (matching the version in <code>pubspec.yaml</code>).</p>
 <pre class="language-bash"><code class="language-bash">git clone https://github.com/SanoBld/LastStats.git
