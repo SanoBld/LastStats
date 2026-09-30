@@ -1,148 +1,102 @@
 name: Build Windows
 
 # Reusable: called by build-all.yml / release.yml — also runnable manually.
-# If "version" is provided (release.yml), it's used and injected into the
-# app. Otherwise (build-all.yml's automatic checks), falls back to pubspec.yaml.
+# Builds x64 and ARM64 natively (Flutter can't cross-compile Windows), and for
+# each one: a .zip (used by the in-app updater) and a setup .exe installer
+# (Program Files, Start Menu + optional Desktop shortcut, uninstaller).
+#
+# NOTE: the ARM64 job uses GitHub's hosted "windows-11-arm" runner. If it fails
+# with "no runner matching 'windows-11-arm'", that label isn't enabled for this
+# repo/plan yet: remove the arm64 entry from the matrix until it is.
 on:
   workflow_call:
     inputs:
       version:
-        description: 'Version to build (e.g. 2.7.0). Empty = read from pubspec.yaml'
+        description: 'Version to build (e.g. 2.7.0). Empty = dev build'
         required: false
         type: string
         default: ''
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to build (e.g. 2.7.0). Empty = read from pubspec.yaml'
+        description: 'Version to build (e.g. 2.7.0). Empty = dev build'
         required: false
         type: string
         default: ''
 
 jobs:
-  build-x64:
-    runs-on: windows-latest
-    # Declared here so the env.VERSION reference below resolves statically
-    # (VSCode's Actions linter can't otherwise see the value set later via
-    # $GITHUB_ENV). Actual value is set at runtime in "Resolve version".
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runner: windows-latest
+            zip: laststats-windows.zip          # name kept: used by UpdateService
+          - arch: arm64
+            runner: windows-11-arm              # GitHub-hosted native ARM64 runner
+            zip: laststats-windows-arm64.zip
+    runs-on: ${{ matrix.runner }}
     env:
       VERSION: ''
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: subosito/flutter-action@v2
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Install Flutter
+        if: matrix.arch == 'x64'
+        uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           cache: true
-      - run: flutter pub get
-      - run: dart run flutter_launcher_icons
 
-      - name: Resolve version
-        shell: bash
-        run: |
-          if [ -n "${{ inputs.version }}" ]; then
-            VERSION="${{ inputs.version }}"
-          else
-            # No explicit version means this is an ad-hoc/dev build, not a
-            # real release: tag it as such instead of reusing the (possibly
-            # stale) pubspec.yaml version, so the app never claims to be a
-            # release it isn't.
-            VERSION="0.0.0-dev.${{ github.run_number }}"
-          fi
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-
-      - name: Build Windows (x64)
-        shell: bash
-        run: flutter build windows --release --build-name="$VERSION" --build-number=${{ github.run_number }}
-
-      # The /* makes sure the zip contains the files directly,
-      # not a wrapping "Release" folder.
-      - name: Zip Windows x64 build
-        shell: pwsh
-        run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath laststats-windows.zip
-      - uses: actions/upload-artifact@v4
-        with:
-          name: laststats-windows
-          path: laststats-windows.zip
-
-      # Proper installer: puts files in Program Files, adds Start Menu +
-      # optional Desktop shortcut with the app icon, and an uninstaller.
-      - name: Install Inno Setup
-        run: choco install innosetup -y --no-progress
-      - name: Build installer (x64)
-        shell: pwsh
-        env:
-          APP_VERSION: ${{ env.VERSION }}
-        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" windows\installer.iss /DMyArch=x64'
-      - uses: actions/upload-artifact@v4
-        with:
-          name: laststats-windows-installer
-          path: windows\installer_output\LastStats-Setup-x64.exe
-
-  # Windows on ARM (Snapdragon-powered devices, e.g. Surface Pro X / Surface
-  # Laptop 7 ARM). Unlike Android, Flutter has no "--target-platform" flag to
-  # cross-compile Windows ARM64 from an x64 host — it must be built natively
-  # on an ARM64 Windows machine. GitHub provides a hosted ARM64 Windows
-  # runner ("windows-11-arm", currently in public preview) for exactly this.
-  #
-  # NOTE: if this job fails with "no runner matching 'windows-11-arm'", it
-  # means that runner label isn't enabled for this repo/plan yet — remove
-  # this job (or ask GitHub support to enable it) until it is.
-  build-arm64:
-    runs-on: windows-11-arm
-    env:
-      VERSION: ''
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-
-      # subosito/flutter-action can't resolve a "stable" SDK build for the
-      # arm64 architecture on this runner ("Unable to determine Flutter
-      # version for ... architecture: arm64"). Installing directly from
-      # Flutter's own git repo sidesteps that lookup entirely and is the
-      # method Flutter itself recommends for less common host architectures.
+      # subosito/flutter-action can't always resolve an arm64 SDK, so on ARM
+      # we clone Flutter directly (same approach as the Linux ARM64 job).
       - name: Install Flutter (arm64)
+        if: matrix.arch == 'arm64'
         shell: pwsh
         run: |
           git clone https://github.com/flutter/flutter.git -b stable --depth 1 "$env:USERPROFILE\flutter"
           echo "$env:USERPROFILE\flutter\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-      - run: flutter doctor -v
-      - run: flutter pub get
-      - run: dart run flutter_launcher_icons
-
+      - name: Get dependencies
+        run: flutter pub get
+      - name: Generate launcher icons
+        run: dart run flutter_launcher_icons
+      # Ad-hoc/dev build (no version given): never claim to be a real release.
       - name: Resolve version
         shell: bash
         run: |
           if [ -n "${{ inputs.version }}" ]; then
             VERSION="${{ inputs.version }}"
           else
-            # No explicit version means this is an ad-hoc/dev build, not a
-            # real release: tag it as such instead of reusing the (possibly
-            # stale) pubspec.yaml version, so the app never claims to be a
-            # release it isn't.
             VERSION="0.0.0-dev.${{ github.run_number }}"
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
-      - name: Build Windows (ARM64)
+      - name: Build Windows (${{ matrix.arch }})
         shell: bash
         run: flutter build windows --release --build-name="$VERSION" --build-number=${{ github.run_number }}
 
-      - name: Zip Windows ARM64 build
+      # The /* makes sure the zip contains the files directly, not a wrapping
+      # "Release" folder.
+      - name: Zip Windows build
         shell: pwsh
-        run: Compress-Archive -Path build/windows/arm64/runner/Release/* -DestinationPath laststats-windows-arm64.zip
+        run: Compress-Archive -Path build/windows/${{ matrix.arch }}/runner/Release/* -DestinationPath ${{ matrix.zip }}
       - uses: actions/upload-artifact@v4
         with:
-          name: laststats-windows-arm64
-          path: laststats-windows-arm64.zip
+          name: ${{ matrix.zip }}
+          path: ${{ matrix.zip }}
 
+      # Installer built with Inno Setup.
       - name: Install Inno Setup
         run: choco install innosetup -y --no-progress
-      - name: Build installer (ARM64)
+      - name: Build installer
         shell: pwsh
         env:
           APP_VERSION: ${{ env.VERSION }}
-        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" windows\installer.iss /DMyArch=arm64'
+        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" windows\installer.iss /DMyArch=${{ matrix.arch }}'
       - uses: actions/upload-artifact@v4
         with:
-          name: laststats-windows-arm64-installer
-          path: windows\installer_output\LastStats-Setup-arm64.exe
+          name: laststats-windows-${{ matrix.arch }}-installer
+          path: windows/installer_output/LastStats-Setup-${{ matrix.arch }}.exe

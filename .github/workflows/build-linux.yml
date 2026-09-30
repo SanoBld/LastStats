@@ -37,7 +37,8 @@ jobs:
     env:
       VERSION: ''
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -51,8 +52,9 @@ jobs:
             gstreamer1.0-libav \
             curl dpkg-dev rpm
 
-      - uses: subosito/flutter-action@v2
+      - name: Install Flutter
         if: matrix.arch == 'x64'
+        uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           cache: true
@@ -65,10 +67,13 @@ jobs:
           git clone https://github.com/flutter/flutter.git -b stable --depth 1 "$HOME/flutter"
           echo "$HOME/flutter/bin" >> "$GITHUB_PATH"
 
-      - run: flutter pub get
-      - run: dart run flutter_launcher_icons
+      - name: Get dependencies
+        run: flutter pub get
+      - name: Generate launcher icons
+        run: dart run flutter_launcher_icons
 
       - name: Resolve version
+        shell: bash
         run: |
           if [ -n "${{ inputs.version }}" ]; then
             VERSION="${{ inputs.version }}"
@@ -79,6 +84,7 @@ jobs:
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Build Linux (${{ matrix.arch }})
+        shell: bash
         run: flutter build linux --release --build-name="$VERSION" --build-number=${{ github.run_number }}
 
       - name: Zip Linux build

@@ -1,8 +1,10 @@
-name: Build macOS
+name: Build iOS
 
 # Reusable: called by build-all.yml / release.yml — also runnable manually.
-# Builds a universal app (Intel + Apple Silicon): a .zip (used by the in-app
-# updater) and a .dmg installer (drag and drop into Applications).
+# Builds the iOS app WITHOUT code signing (no Apple certificate is needed on
+# CI) and packs it into an unsigned .ipa. An unsigned .ipa can't be installed
+# directly: sideload it with AltStore / Sideloadly / TrollStore, or re-sign it
+# with your own Apple ID or developer certificate.
 on:
   workflow_call:
     inputs:
@@ -50,26 +52,16 @@ jobs:
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
-      - name: Build macOS
-        run: flutter build macos --release --build-name="$VERSION" --build-number=${{ github.run_number }}
+      - name: Build iOS (no codesign)
+        run: flutter build ios --release --no-codesign --build-name="$VERSION" --build-number=${{ github.run_number }}
 
-      # cd into the actual app folder first, so the zip does not contain the
-      # long "build/macos/Build/Products/Release/" path inside it.
-      - name: Zip macOS build
+      # An .ipa is just a zip with the .app inside a "Payload" folder.
+      - name: Package unsigned .ipa
         run: |
-          cd build/macos/Build/Products/Release
-          zip -r "$GITHUB_WORKSPACE/laststats-macos.zip" .
+          mkdir -p Payload
+          cp -R build/ios/iphoneos/Runner.app Payload/
+          zip -r -y LastStats-ios.ipa Payload
       - uses: actions/upload-artifact@v4
         with:
-          name: laststats-macos.zip
-          path: laststats-macos.zip
-
-      # Installer: a .dmg that opens with the app + an "Applications" shortcut.
-      - name: Build DMG installer
-        run: |
-          sed -i '' 's/\r$//' macos/packaging/build-dmg.sh
-          bash macos/packaging/build-dmg.sh
-      - uses: actions/upload-artifact@v4
-        with:
-          name: laststats-macos-dmg
-          path: LastStats-macos.dmg
+          name: laststats-ios-ipa
+          path: LastStats-ios.ipa

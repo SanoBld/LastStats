@@ -1,6 +1,6 @@
 name: Build LastStats (All Platforms)
 
-# Runs automatically on every push touching app code — builds all 4
+# Runs automatically on every push touching app code — builds all 5
 # platforms for verification, without creating a GitHub Release.
 # (Releases are still handled separately by release.yml on tag push.)
 on:
@@ -11,6 +11,7 @@ on:
       - 'android/**'
       - 'linux/**'
       - 'macos/**'
+      - 'ios/**'
       - 'windows/**'
       - 'pubspec.yaml'
       - '.github/workflows/build-*.yml'
@@ -24,7 +25,7 @@ concurrency:
 jobs:
   # Skips the rest of the workflow for automated commits that contain
   # "[skip ci]" in their message (e.g. release.yml's version-bump commit),
-  # so a release doesn't trigger a redundant full 4-platform build.
+  # so a release doesn't trigger a redundant full 5-platform build.
   check-skip:
     runs-on: ubuntu-latest
     outputs:
@@ -61,3 +62,8 @@ jobs:
     needs: check-skip
     if: needs.check-skip.outputs.skip != 'true'
     uses: ./.github/workflows/build-android.yml
+
+  ios:
+    needs: check-skip
+    if: needs.check-skip.outputs.skip != 'true'
+    uses: ./.github/workflows/build-ios.yml
