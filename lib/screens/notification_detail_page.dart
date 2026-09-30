@@ -6,6 +6,7 @@
 // link if the notification carries one (updates, news items with a URL…).
 
 import 'package:flutter/material.dart';
+import '../widgets/m3_components.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../l10n/l10n.dart';
 import '../services/account_manager.dart';
@@ -56,10 +57,7 @@ class NotificationDetailPage extends StatelessWidget {
     final (icon, color) = _style();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(L.notifDetailTitle),
-        scrolledUnderElevation: 0,
-      ),
+      appBar: M3AppBar(title: L.notifDetailTitle),
       body: TweenAnimationBuilder<double>(
         tween: Tween(begin: 0, end: 1),
         duration: const Duration(milliseconds: 300),

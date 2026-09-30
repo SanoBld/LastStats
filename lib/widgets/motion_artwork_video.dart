@@ -3,6 +3,7 @@
 // disappears again on any error, so the static image is always the fallback.
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import '../services/video_disk_cache.dart';
 
 class MotionArtworkVideo extends StatefulWidget {
   final String url;
@@ -49,14 +50,29 @@ class _MotionArtworkVideoState extends State<MotionArtworkVideo>
 
   Future<void> _init() async {
     VideoPlayerController? c;
+    final options = VideoPlayerOptions(mixWithOthers: true);
+    var fromDisk = false;
     try {
+      // Prefer the on-disk copy (offline, no re-download); else stream.
       // mixWithOthers: never interrupt the user's music or the 30s preview.
-      c = VideoPlayerController.networkUrl(
-        Uri.parse(widget.url),
-        videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
-      );
+      c = await VideoDiskCache.localController(widget.url, options);
+      fromDisk = c != null;
+      c ??= VideoPlayerController.networkUrl(Uri.parse(widget.url),
+          videoPlayerOptions: options);
       _c = c;
-      await c.initialize();
+      try {
+        await c.initialize();
+      } catch (_) {
+        if (!fromDisk) rethrow;
+        // Corrupt/unreadable local copy: fall back to streaming.
+        await c.dispose();
+        c = VideoPlayerController.networkUrl(Uri.parse(widget.url),
+            videoPlayerOptions: options);
+        _c = c;
+        fromDisk = false;
+        await c.initialize();
+      }
+      if (!fromDisk) VideoDiskCache.storeInBackground(widget.url);
       // The widget may have been removed while the stream was loading:
       // release the player right away instead of leaking it.
       if (_disposed) { await c.dispose(); return; }

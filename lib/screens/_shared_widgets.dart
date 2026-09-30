@@ -728,9 +728,9 @@ class FoldersGridPage extends StatelessWidget {
     FavoritesFoldersService.ensureLoaded();
 
     return Scaffold(
-      body: SafeArea(child: Column(children: [
-        M3PageHeader(title: L.searchFolders),
-        Expanded(
+      appBar: M3AppBar(title: L.searchFolders),
+      body: SafeArea(top: false, child: Column(children: [
+Expanded(
           child: ValueListenableBuilder<List<FavFolder>>(
             valueListenable: FavoritesFoldersService.foldersNotifier,
             builder: (ctx, folders, _) {
@@ -861,7 +861,10 @@ class _FolderDetailPageState extends State<_FolderDetailPage> {
     final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      body: SafeArea(child: Column(children: [
+      // Live app bar: reflects folder edits (name/emoji/description).
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(76),
+        child:
         ValueListenableBuilder<List<FavFolder>>(
           valueListenable: FavoritesFoldersService.foldersNotifier,
           builder: (ctx, folders, _) {
@@ -869,7 +872,7 @@ class _FolderDetailPageState extends State<_FolderDetailPage> {
             // the folder we were opened with if it somehow got deleted.
             final folder = folders.firstWhere((f) => f.id == widget.folder.id,
                 orElse: () => widget.folder);
-            return M3PageHeader(
+            return M3AppBar(
               title: folder.name,
               subtitle: folder.description,
               leading: Text(folder.emoji, style: const TextStyle(fontSize: 24)),
@@ -887,6 +890,8 @@ class _FolderDetailPageState extends State<_FolderDetailPage> {
             );
           },
         ),
+      ),
+      body: SafeArea(top: false, child: Column(children: [
         M3ButtonGroup<_FolderSort>(
           items: [
             (_FolderSort.recent,   L.favSortRecent),
@@ -1044,19 +1049,9 @@ class _AddTracksToFolderPageState extends State<_AddTracksToFolderPage> {
     final text   = Theme.of(context).textTheme;
 
     return Scaffold(
-      body: SafeArea(child: Column(children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(4, 12, 16, 2),
-          child: Row(children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back_rounded),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            Expanded(child: Text(widget.folder.name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800))),
-          ]),
-        ),
-        Padding(
+      appBar: M3AppBar(title: widget.folder.name),
+      body: SafeArea(top: false, child: Column(children: [
+Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: TextField(
             controller: _ctrl,

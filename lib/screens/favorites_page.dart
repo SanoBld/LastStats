@@ -110,9 +110,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
     final items  = _filtered;
 
     return Scaffold(
-      body: SafeArea(child: Column(children: [
-        M3PageHeader(title: L.favPageTitle),
-        Expanded(child: M3Switcher(
+      appBar: M3AppBar(title: L.favPageTitle),
+      body: SafeArea(top: false, child: Column(children: [
+Expanded(child: M3Switcher(
         duration: const Duration(milliseconds: 250),
         child: _loading
           ? const SkeletonList(key: ValueKey('load'))

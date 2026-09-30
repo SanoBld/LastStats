@@ -15,8 +15,9 @@ import '../../l10n/extra_strings.dart';
 import '../../widgets/m3_components.dart';
 import '../../widgets/motion_artwork_video.dart';
 import '../../services/motion_artwork_service.dart';
+import '../../services/video_disk_cache.dart';
 
-// Storage limit presets in bytes. 0 = unlimited.
+// Photo cache limit presets in bytes. 0 = unlimited.
 const _limits = [
   (label: '100 MB', bytes: 100 * 1024 * 1024),
   (label: '250 MB', bytes: 250 * 1024 * 1024),
@@ -24,6 +25,17 @@ const _limits = [
   (label: '1 GB',   bytes: 1024 * 1024 * 1024),
   (label: '2 GB',   bytes: 2 * 1024 * 1024 * 1024),
   (label: '5 GB',   bytes: 5 * 1024 * 1024 * 1024),
+  (label: '∞',      bytes: 0),
+];
+
+// Video cache presets: -1 = off, 0 = unlimited.
+const _videoLimits = [
+  (label: '', bytes: -1), // label comes from tx('cache_video_off')
+  (label: '100 MB', bytes: 100 * 1024 * 1024),
+  (label: '250 MB', bytes: 250 * 1024 * 1024),
+  (label: '500 MB', bytes: 500 * 1024 * 1024),
+  (label: '1 GB',   bytes: 1024 * 1024 * 1024),
+  (label: '2 GB',   bytes: 2 * 1024 * 1024 * 1024),
   (label: '∞',      bytes: 0),
 ];
 
@@ -58,6 +70,11 @@ class _CachePageState extends State<CachePage> {
   Future<void> _setLimit(int bytes) async {
     await StorageManager.setMaxBytes(bytes);
     if (bytes > 0) await StorageManager.enforceQuota();
+    await _loadStats();
+  }
+
+  Future<void> _setVideoLimit(int bytes) async {
+    await StorageManager.setVideoMaxBytes(bytes);
     await _loadStats();
   }
 
@@ -100,6 +117,13 @@ class _CachePageState extends State<CachePage> {
         SnackBar(content: Text(tx('cache_video_cleared'))));
   }
 
+  Future<void> _clearVideoDisk() async {
+    setState(() => _clearing = true);
+    await VideoDiskCache.clear();
+    await _loadStats();
+    if (mounted) setState(() => _clearing = false);
+  }
+
   Future<void> _clearAll() async {
     final confirmed = await _confirm(
       L.cacheConfirmAllTitle,
@@ -110,6 +134,7 @@ class _CachePageState extends State<CachePage> {
     await ImageService.clearAllCache();
     await DataCache.clear();
     await ScrobblesFileCache.clear();
+    await VideoDiskCache.clear();
     MotionArtworkService.clearMemory();
     await _loadStats();
     setState(() => _clearing = false);
@@ -144,13 +169,13 @@ class _CachePageState extends State<CachePage> {
     final text   = Theme.of(context).textTheme;
 
     return Scaffold(
-      body: SafeArea(
+      appBar: M3AppBar(title: L.cacheTitle),
+      body: SafeArea(top: false, 
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 720),
             child: Column(children: [
-              M3PageHeader(title: L.cacheTitle),
-              Expanded(
+Expanded(
                 child: _loading
           ? const SkeletonList()
           : ListView(
@@ -186,12 +211,30 @@ class _CachePageState extends State<CachePage> {
                 // ── Storage limit + offline mode ────────────────────────────
                 SettingsSection(label: tx('cache_storage_section'), children: [
                   SettingChoiceRow(
-                    icon: Icons.storage_rounded,
-                    title: L.cacheLimit,
+                    icon: Icons.photo_library_rounded,
+                    title: tx('cache_img_limit_t'),
                     options: [for (final l in _limits) ('${l.bytes}', l.label, null)],
                     value: '${StorageManager.maxBytes}',
-                    description: L.cacheLimitHint,
+                    description: tx('cache_img_limit_s'),
                     onChanged: (v) => _setLimit(int.parse(v)),
+                  ),
+                  SettingChoiceRow(
+                    icon: Icons.movie_filter_rounded,
+                    title: tx('cache_vid_limit_t'),
+                    options: [
+                      for (final l in _videoLimits)
+                        ('${l.bytes}',
+                         l.bytes < 0 ? tx('cache_video_off') : l.label, null),
+                    ],
+                    value: '${StorageManager.videoMaxBytes}',
+                    description: tx('cache_vid_limit_s'),
+                    onChanged: (v) => _setVideoLimit(int.parse(v)),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                    child: Text(tx('cache_no_limit_note'),
+                        style: text.bodySmall
+                            ?.copyWith(color: scheme.onSurfaceVariant)),
                   ),
                   _OfflineModeCard(scheme: scheme, text: text),
                 ]),
@@ -211,6 +254,14 @@ class _CachePageState extends State<CachePage> {
                       title: L.cacheImages,
                       subtitle: '${StorageManager.formatBytes(_stats!.imageBytes)} · ${L.cacheImagesSubtitle}',
                       onTap: _clearImages,
+                    ),
+                    SettingActionRow(
+                      icon: Icons.movie_filter_rounded,
+                      title: tx('cache_vid_disk_t'),
+                      subtitle: tx('cache_vid_disk_s', {
+                        'size': StorageManager.formatBytes(_stats!.videoBytes),
+                      }),
+                      onTap: _clearVideoDisk,
                     ),
                     SettingActionRow(
                       icon: Icons.api_outlined,
@@ -261,14 +312,7 @@ class _UsageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final total     = stats.totalBytes;
-    final max       = stats.maxBytes;
-    final unlimited = max <= 0;
-    final fraction  = stats.usedFraction;
-
     final totalStr = StorageManager.formatBytes(total);
-    final maxStr   = unlimited
-        ? L.cacheUnlimited
-        : StorageManager.formatBytes(max);
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -288,31 +332,19 @@ class _UsageCard extends StatelessWidget {
             Text(L.cacheTotalUsed,
                 style: text.labelLarge?.copyWith(
                     color: scheme.onPrimaryContainer.withValues(alpha: 0.8))),
-            Text('$totalStr / $maxStr',
+            Text(totalStr,
                 style: text.titleLarge?.copyWith(
                     fontWeight: FontWeight.w800, color: scheme.onPrimaryContainer)),
           ])),
         ]),
-        if (!unlimited) ...[
-          const SizedBox(height: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(100),
-            child: TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0, end: fraction),
-              duration: const Duration(milliseconds: 500),
-              curve: M3Motion.emphasizedDecelerate,
-              builder: (_, v, _) => LinearProgressIndicator(
-                value:           v,
-                minHeight:       10,
-                color:           fraction > 0.9 ? scheme.error : scheme.primary,
-                backgroundColor: scheme.onPrimaryContainer.withValues(alpha: 0.15),
-              ),
-            ),
-          ),
-        ],
         const SizedBox(height: 18),
         _Bar(label: L.cacheImages, bytes: stats.imageBytes, total: total,
+            limit: stats.maxBytes,
             color: scheme.primary, scheme: scheme, text: text),
+        const SizedBox(height: 8),
+        _Bar(label: tx('cache_video_short'), bytes: stats.videoBytes, total: total,
+            limit: stats.videoMaxBytes,
+            color: scheme.error, scheme: scheme, text: text),
         const SizedBox(height: 8),
         _Bar(label: L.cacheApiData, bytes: stats.apiBytes, total: total,
             color: scheme.secondary, scheme: scheme, text: text),
@@ -328,6 +360,7 @@ class _Bar extends StatelessWidget {
   final String      label;
   final int         bytes;
   final int         total;
+  final int         limit; // >0: bar shows bytes / limit, else share of total
   final Color       color;
   final ColorScheme scheme;
   final TextTheme   text;
@@ -336,6 +369,7 @@ class _Bar extends StatelessWidget {
     required this.label,
     required this.bytes,
     required this.total,
+    this.limit = 0,
     required this.color,
     required this.scheme,
     required this.text,
@@ -343,7 +377,9 @@ class _Bar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final frac = total > 0 ? bytes / total : 0.0;
+    final frac = limit > 0
+        ? (bytes / limit).clamp(0.0, 1.0)
+        : (total > 0 ? bytes / total : 0.0);
 
     return Row(children: [
       Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
@@ -364,9 +400,11 @@ class _Bar extends StatelessWidget {
       ),
       const SizedBox(width: 8),
       SizedBox(
-        width: 60,
+        width: limit > 0 ? 112 : 60,
         child: Text(
-          StorageManager.formatBytes(bytes),
+          limit > 0
+              ? '${StorageManager.formatBytes(bytes)} / ${StorageManager.formatBytes(limit)}'
+              : StorageManager.formatBytes(bytes),
           style:     text.bodySmall?.copyWith(fontWeight: FontWeight.w700, color: scheme.onPrimaryContainer),
           textAlign: TextAlign.end,
         ),

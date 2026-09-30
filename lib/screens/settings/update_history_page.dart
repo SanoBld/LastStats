@@ -3,6 +3,7 @@
 // Lists every past release: version, date, full changelog, and a direct
 // download button per version — not just the newest one.
 import 'package:flutter/material.dart';
+import '../../l10n/extra_strings.dart';
 import 'settings_rows.dart';
 import '../../widgets/m3_components.dart';
 import '../../theme/m3_motion.dart';
@@ -104,15 +105,12 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
     final isEn   = localeNotifier.value == 'en';
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(isEn ? 'Version history' : 'Historique des versions'),
-        centerTitle: false,
-      ),
+      appBar: M3AppBar(title: tx('ui_version_history')),
       body: _loading
           ? const SkeletonList()
           : _releases.isEmpty
               ? Center(child: Text(
-                  isEn ? 'Could not load release history.' : 'Impossible de charger l\'historique.',
+                  tx('ui_could_not_load_release'),
                   style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)))
               : Column(children: [
                   Padding(
@@ -126,8 +124,8 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
                         const SizedBox(width: 6),
                         Text(
                           UpdateService.displayVersion == null
-                              ? (isEn ? 'Installed: dev build (unknown version)' : 'Installée : build de dev (version inconnue)')
-                              : (isEn ? 'Installed: ${UpdateService.displayVersion}' : 'Installée : ${UpdateService.displayVersion}'),
+                              ? (tx('ui_installed_dev_build_un'))
+                              : (tx('ui_installed', {'displayVer': '${UpdateService.displayVersion}'})),
                           style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                         ),
                       ]),
@@ -136,7 +134,7 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
                         controller: _searchCtrl,
                         onChanged: (v) => setState(() => _query = v),
                         decoration: InputDecoration(
-                          hintText: isEn ? 'Search a version or changelog…' : 'Rechercher une version ou un changelog…',
+                          hintText: tx('ui_search_a_version_or_ch'),
                           prefixIcon: const Icon(Icons.search_rounded, size: 20),
                           suffixIcon: _query.isEmpty ? null : IconButton(
                             icon: const Icon(Icons.close_rounded, size: 18),
@@ -148,9 +146,9 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
                       ),
                       const SizedBox(height: 10),
                       Row(children: [
-                        _filterChip(isEn ? 'All' : 'Toutes', _HistoryFilter.all, scheme, text),
+                        _filterChip(tx('ui_all'), _HistoryFilter.all, scheme, text),
                         const SizedBox(width: 8),
-                        _filterChip(isEn ? 'Official' : 'Officiel', _HistoryFilter.official, scheme, text),
+                        _filterChip(tx('ui_official'), _HistoryFilter.official, scheme, text),
                         const SizedBox(width: 8),
                         _filterChip('Beta', _HistoryFilter.beta, scheme, text),
                       ]),
@@ -178,7 +176,7 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
     final releases = _filtered;
     if (releases.isEmpty) {
       return Center(child: Text(
-          isEn ? 'No release matches your search.' : 'Aucune version ne correspond à votre recherche.',
+          tx('ui_no_release_matches_you'),
           style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)));
     }
     return ListView.separated(
@@ -216,9 +214,9 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
                                 Row(children: [
                                   Text('v${r.version}', style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
                                   const SizedBox(width: 8),
-                                  if (isLatest) _chip(isEn ? 'LATEST' : 'DERNIÈRE', scheme.tertiary, scheme.onTertiaryContainer, scheme),
+                                  if (isLatest) _chip(tx('ui_latest'), scheme.tertiary, scheme.onTertiaryContainer, scheme),
                                   if (r.isBeta)  _chip('BETA', scheme.secondary, scheme.onSecondaryContainer, scheme),
-                                  if (isCurrent) _chip(isEn ? 'INSTALLED' : 'INSTALLÉE', scheme.primary, scheme.onPrimaryContainer, scheme),
+                                  if (isCurrent) _chip(tx('ui_installed_2'), scheme.primary, scheme.onPrimaryContainer, scheme),
                                 ]),
                                 if (r.publishedAt != null) ...[
                                   const SizedBox(height: 2),
@@ -249,7 +247,7 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
                                 linkColor: scheme.primary,
                               )
                             else
-                              Text(isEn ? 'No description.' : 'Aucune description.',
+                              Text(tx('ui_no_description'),
                                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                             const SizedBox(height: 12),
                             SettingActionGroup(items: [
@@ -257,13 +255,13 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
                                 primary: true,
                                 icon: _downloadIcon(r.downloadKind),
                                 label: r.hasDownload
-                                    ? (isEn ? 'Download' : 'Télécharger')
-                                    : (isEn ? 'View release' : 'Voir la release'),
+                                    ? (tx('ui_download'))
+                                    : (tx('ui_view_release')),
                                 onPressed: () => _open(r.hasDownload ? r.downloadUrl! : r.releaseUrl),
                               ),
                               if (r.hasDownload)
                                 ActionGroupItem(
-                                  label: isEn ? 'Details' : 'Détails',
+                                  label: tx('ui_details'),
                                   onPressed: () => _open(r.releaseUrl),
                                 ),
                             ]),

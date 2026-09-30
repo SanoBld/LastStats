@@ -233,10 +233,7 @@ class _AppearancePageState extends State<AppearancePage> {
     final text   = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(L.settingsAppearance),
-        centerTitle: false,
-      ),
+      appBar: M3AppBar(title: L.settingsAppearance),
       body: ListView(padding: const EdgeInsets.all(20), children: [
 
         // ══════════════════════════════════════════════════════════════════
@@ -414,35 +411,12 @@ class _AppearancePageState extends State<AppearancePage> {
         //  Android widgets — separate from in-app accent, Android-only
         // ══════════════════════════════════════════════════════════════════
         SettingsSection(
-          label: _tr({
-            'fr': 'Widgets Android', 'en': 'Android widgets',
-            'es': 'Widgets de Android', 'de': 'Android-Widgets',
-            'it': 'Widget Android', 'pt': 'Widgets do Android',
-            'ru': 'Виджеты Android', 'ja': 'Android ウィジェット',
-            'zh': 'Android 小组件', 'ar': 'ودجات أندرويد',
-          }),
+          label: tx('ui_android_widgets'),
           children: [
             SwitchListTile(
               secondary: Icon(Icons.widgets_rounded, color: scheme.primary),
-              title: Text(_tr({
-                'fr': 'Widgets colorés', 'en': 'Colored widgets',
-                'es': 'Widgets con color', 'de': 'Farbige Widgets',
-                'it': 'Widget colorati', 'pt': 'Widgets coloridos',
-                'ru': 'Цветные виджеты', 'ja': 'カラーウィジェット',
-                'zh': '彩色小组件', 'ar': 'ودجات ملونة',
-              })),
-              subtitle: Text(_tr({
-                'fr': 'Applique la couleur d\'accent au fond des widgets de l\'écran d\'accueil. Désactivé : blanc ou noir pur.',
-                'en': 'Applies the accent color to the home screen widgets\' background. Off: pure white or black.',
-                'es': 'Aplica el color de acento al fondo de los widgets de la pantalla de inicio. Desactivado: blanco o negro puro.',
-                'de': 'Wendet die Akzentfarbe auf den Hintergrund der Homescreen-Widgets an. Aus: reines Weiß oder Schwarz.',
-                'it': 'Applica il colore d\'accento allo sfondo dei widget nella schermata home. Disattivato: bianco o nero puro.',
-                'pt': 'Aplica a cor de destaque ao fundo dos widgets da tela inicial. Desativado: branco ou preto puro.',
-                'ru': 'Применяет акцентный цвет к фону виджетов на главном экране. Выкл: чисто белый или чёрный.',
-                'ja': 'ホーム画面ウィジェットの背景にアクセントカラーを適用します。オフの場合は純白または純黒になります。',
-                'zh': '将强调色应用到主屏幕小组件的背景。关闭时为纯白或纯黑。',
-                'ar': 'يطبّق لون التمييز على خلفية أدوات الشاشة الرئيسية. عند الإيقاف: أبيض أو أسود خالص.',
-              })),
+              title: Text(tx('ui_colored_widgets')),
+              subtitle: Text(tx('ui_applies_the_accent_col')),
               value: _widgetTint,
               onChanged: (v) async {
                 await _set('ls_widget_tint', v);

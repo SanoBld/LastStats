@@ -3,6 +3,7 @@
 // app languages. Usage: tx('key') or tx('key', {'n': '3'}).
 // Falls back to English, then French, so a missing entry never shows blank.
 import '../app_state.dart';
+import 'ui_strings.dart';
 
 const Map<String, Map<String, String>> _kExtra = {
   'lib_section': {
@@ -713,10 +714,106 @@ const Map<String, Map<String, String>> _kExtra = {
     'ru': 'Ранги, значки и уровень аккаунта',
     'ar': 'الفئات والشارات ومستوى الحساب',
   },
+  'cache_img_limit_t': {
+    'fr': 'Limite du cache photos',
+    'en': 'Photo cache limit',
+    'es': 'Límite de caché de fotos',
+    'zh': '照片缓存上限',
+    'pt': 'Limite do cache de fotos',
+    'de': 'Limit für Foto-Cache',
+    'it': 'Limite cache foto',
+    'ja': '写真キャッシュの上限',
+    'ru': 'Лимит кэша фото',
+    'ar': 'حد ذاكرة الصور المؤقتة',
+  },
+  'cache_img_limit_s': {
+    'fr': 'Pochettes, photos d\'artistes et avatars. Les plus anciennes sont supprimées en premier.',
+    'en': 'Covers, artist photos and avatars. Oldest ones are removed first.',
+    'es': 'Portadas, fotos de artistas y avatares. Se borran primero las más antiguas.',
+    'zh': '封面、艺术家照片和头像。优先删除最旧的。',
+    'pt': 'Capas, fotos de artistas e avatares. As mais antigas são removidas primeiro.',
+    'de': 'Cover, Künstlerfotos und Avatare. Die ältesten werden zuerst gelöscht.',
+    'it': 'Copertine, foto degli artisti e avatar. Le più vecchie vengono eliminate per prime.',
+    'ja': 'ジャケット、アーティスト写真、アバター。古いものから削除されます。',
+    'ru': 'Обложки, фото артистов и аватары. Сначала удаляются самые старые.',
+    'ar': 'الأغلفة وصور الفنانين والصور الرمزية. تُحذف الأقدم أولاً.',
+  },
+  'cache_vid_limit_t': {
+    'fr': 'Limite du cache vidéo',
+    'en': 'Video cache limit',
+    'es': 'Límite de caché de vídeo',
+    'zh': '视频缓存上限',
+    'pt': 'Limite do cache de vídeo',
+    'de': 'Limit für Video-Cache',
+    'it': 'Limite cache video',
+    'ja': '動画キャッシュの上限',
+    'ru': 'Лимит кэша видео',
+    'ar': 'حد ذاكرة الفيديو المؤقتة',
+  },
+  'cache_vid_limit_s': {
+    'fr': 'Pochettes animées Apple Music gardées sur le disque pour les revoir hors ligne (Android).',
+    'en': 'Apple Music animated covers kept on disk to replay offline (Android).',
+    'es': 'Portadas animadas de Apple Music guardadas en disco para verlas sin conexión (Android).',
+    'zh': 'Apple Music 动态封面保存在磁盘上，可离线重播（Android）。',
+    'pt': 'Capas animadas do Apple Music guardadas no disco para rever offline (Android).',
+    'de': 'Animierte Apple-Music-Cover werden offline auf dem Gerät gespeichert (Android).',
+    'it': 'Copertine animate di Apple Music salvate su disco per rivederle offline (Android).',
+    'ja': 'Apple Musicのアニメーションカバーをディスクに保存し、オフラインで再生します（Android）。',
+    'ru': 'Анимированные обложки Apple Music хранятся на диске для просмотра офлайн (Android).',
+    'ar': 'أغلفة Apple Music المتحركة تُحفظ على القرص لإعادة عرضها دون اتصال (Android).',
+  },
+  'cache_video_off': {
+    'fr': 'Désactivé',
+    'en': 'Off',
+    'es': 'Desactivado',
+    'zh': '关闭',
+    'pt': 'Desativado',
+    'de': 'Aus',
+    'it': 'Disattivato',
+    'ja': 'オフ',
+    'ru': 'Выкл.',
+    'ar': 'متوقف',
+  },
+  'cache_vid_disk_t': {
+    'fr': 'Vidéos Apple Music',
+    'en': 'Apple Music videos',
+    'es': 'Vídeos de Apple Music',
+    'zh': 'Apple Music 视频',
+    'pt': 'Vídeos do Apple Music',
+    'de': 'Apple-Music-Videos',
+    'it': 'Video Apple Music',
+    'ja': 'Apple Music動画',
+    'ru': 'Видео Apple Music',
+    'ar': 'فيديوهات Apple Music',
+  },
+  'cache_vid_disk_s': {
+    'fr': '{size} · Pochettes animées enregistrées',
+    'en': '{size} · Saved animated covers',
+    'es': '{size} · Portadas animadas guardadas',
+    'zh': '{size} · 已保存的动态封面',
+    'pt': '{size} · Capas animadas guardadas',
+    'de': '{size} · Gespeicherte animierte Cover',
+    'it': '{size} · Copertine animate salvate',
+    'ja': '{size} · 保存済みのアニメーションカバー',
+    'ru': '{size} · Сохранённые анимированные обложки',
+    'ar': '{size} · أغلفة متحركة محفوظة',
+  },
+  'cache_no_limit_note': {
+    'fr': 'Les scrobbles et les données API ne sont jamais limités.',
+    'en': 'Scrobbles and API data are never limited.',
+    'es': 'Los scrobbles y los datos de la API nunca se limitan.',
+    'zh': '听歌记录和 API 数据永远不受限制。',
+    'pt': 'Scrobbles e dados da API nunca são limitados.',
+    'de': 'Scrobbles und API-Daten werden nie begrenzt.',
+    'it': 'Scrobble e dati API non hanno mai limiti.',
+    'ja': 'スクロブルとAPIデータは制限されません。',
+    'ru': 'Скробблы и данные API никогда не ограничиваются.',
+    'ar': 'لا يُقيَّد سجل الاستماع وبيانات API أبداً.',
+  },
 };
 
 String tx(String key, [Map<String, String>? args]) {
-  final m = _kExtra[key];
+  final m = _kExtra[key] ?? kUiStrings[key];
   var s = m?[localeNotifier.value] ?? m?['en'] ?? m?['fr'] ?? key;
   if (args != null) {
     args.forEach((k, v) { s = s.replaceAll('{$k}', v); });

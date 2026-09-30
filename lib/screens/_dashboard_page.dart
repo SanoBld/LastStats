@@ -881,7 +881,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
           child: Row(children: [
             const Icon(Icons.qr_code_scanner_rounded, size: 20),
             const SizedBox(width: 10),
-            Text(_ct('Scanner un profil', 'Scan a profile')),
+            Text(tx('ui_scan_a_profile')),
           ]),
         ),
       ],
@@ -1096,10 +1096,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => Scaffold(
-          appBar: AppBar(
-            title: Text(L.navSettings),
-            scrolledUnderElevation: 0,
-          ),
+          appBar: M3AppBar(title: L.navSettings),
           body: _SettingsPage(username: widget.username),
         ),
       ),
@@ -1412,7 +1409,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const _LevelHistoryPage())),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Text(_ct('Niv. $level', 'Lvl $level'),
+          Text(tx('ui_lvl', {'level': '$level'}),
               style: AppText.badge.copyWith(color: Colors.white.withValues(alpha: 0.9), shadows: const [Shadow(color: Colors.black45, blurRadius: 4)])),
           const SizedBox(width: 6),
           ClipRRect(
@@ -3926,27 +3923,19 @@ class _NewsPageState extends State<_NewsPage> {
     };
 
     return Scaffold(
-      body: SafeArea(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        // Header aligned with the other pages' style (title + trailing icon)
-        Padding(
-          padding: const EdgeInsets.fromLTRB(4, 12, 16, 2),
-          child: Row(children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back_rounded),
-              onPressed: () => Navigator.of(context).pop(),
+      appBar: M3AppBar(
+        title: L.newsWhatsNew,
+        actions: [
+          if (_type != null || _customRange != null)
+            IconButton.filledTonal(
+              icon: const Icon(Icons.filter_alt_off_rounded),
+              tooltip: L.newsAll,
+              onPressed: () => setState(() { _type = null; _customRange = null; }),
             ),
-            Expanded(child:
-              Text(L.newsWhatsNew, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
-            ),
-            if (_type != null || _customRange != null)
-              IconButton(
-                icon: const Icon(Icons.filter_alt_off_rounded),
-                tooltip: L.newsAll,
-                onPressed: () => setState(() { _type = null; _customRange = null; }),
-              ),
-          ]),
-        ),
-        Padding(
+        ],
+      ),
+      body: SafeArea(top: false, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(L.newsItemsCount(filtered.length),
@@ -4533,7 +4522,7 @@ class _CompactHeatmap extends StatelessWidget {
           const SizedBox(height: 10),
           Row(children: [
             const Spacer(),
-            Text(_ct('Moins', 'Less', es: 'Menos', zh: '少', pt: 'Menos'),
+            Text(tx('ui_less'),
                 style: t.labelSmall?.copyWith(fontSize: 9, color: s.onSurfaceVariant)),
             const SizedBox(width: 4),
             ...List.generate(5, (i) => Container(
@@ -4547,7 +4536,7 @@ class _CompactHeatmap extends StatelessWidget {
               ),
             )),
             const SizedBox(width: 4),
-            Text(_ct('Plus', 'More', es: 'Más', zh: '多', pt: 'Mais'),
+            Text(tx('ui_more'),
                 style: t.labelSmall?.copyWith(fontSize: 9, color: s.onSurfaceVariant)),
           ]),
         ],

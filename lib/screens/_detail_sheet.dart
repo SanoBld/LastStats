@@ -155,13 +155,7 @@ class _CardBack extends StatelessWidget {
               Row(children: [
                 Icon(Icons.info_outline_rounded, color: fgWeak, size: 16),
                 const SizedBox(width: 6),
-                Text(_tr({
-                  'fr': 'Source : $source', 'en': 'Source: $source',
-                  'es': 'Fuente: $source', 'de': 'Quelle: $source',
-                  'it': 'Fonte: $source', 'pt': 'Fonte: $source',
-                  'ru': 'Источник: $source', 'ja': '提供元: $source',
-                  'zh': '来源：$source', 'ar': 'المصدر: $source',
-                }), style: TextStyle(color: fgWeak, fontSize: 13)),
+                Text(tx('ui_source', {'source': '$source'}), style: TextStyle(color: fgWeak, fontSize: 13)),
               ]),
             ],
           ),
@@ -1500,13 +1494,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                 scheme: scheme,
                 filled: true,
                 icon: Icons.open_in_new_rounded,
-                label: _tr({
-                  'fr': 'Voir sur Last.fm', 'en': 'View on Last.fm',
-                  'es': 'Ver en Last.fm', 'de': 'Auf Last.fm ansehen',
-                  'it': 'Vedi su Last.fm', 'pt': 'Ver no Last.fm',
-                  'ru': 'Смотреть на Last.fm', 'ja': 'Last.fm で見る',
-                  'zh': '在 Last.fm 上查看', 'ar': 'عرض على Last.fm',
-                }),
+                label: tx('ui_view_on_last_fm'),
                 onTap: () => _openBioUrl(_lfmBioUrl()),
               ),
             ],
@@ -1514,25 +1502,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           const SizedBox(height: 4),
           Text(
             _showTranslated
-                ? _tr({
-                    'fr': 'Texte original : Last.fm — Traduction : Google Translate',
-                    'en': 'Original text: Last.fm — Translation: Google Translate',
-                    'es': 'Texto original: Last.fm — Traducción: Google Translate',
-                    'de': 'Originaltext: Last.fm — Übersetzung: Google Translate',
-                    'it': 'Testo originale: Last.fm — Traduzione: Google Translate',
-                    'pt': 'Texto original: Last.fm — Tradução: Google Translate',
-                    'ru': 'Исходный текст: Last.fm — Перевод: Google Translate',
-                    'ja': '原文: Last.fm — 翻訳: Google 翻訳',
-                    'zh': '原文来自 Last.fm — 翻译来自 Google 翻译',
-                    'ar': 'النص الأصلي: Last.fm — الترجمة: ترجمة جوجل',
-                  })
-                : _tr({
-                    'fr': 'Source : Last.fm', 'en': 'Source: Last.fm',
-                    'es': 'Fuente: Last.fm', 'de': 'Quelle: Last.fm',
-                    'it': 'Fonte: Last.fm', 'pt': 'Fonte: Last.fm',
-                    'ru': 'Источник: Last.fm', 'ja': '提供元: Last.fm',
-                    'zh': '来源：Last.fm', 'ar': 'المصدر: Last.fm',
-                  }),
+                ? tx('ui_original_text_last_fm_')
+                : tx('ui_source_last_fm'),
             style: text.bodySmall?.copyWith(
               color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
               fontSize: 11,
@@ -2396,17 +2367,15 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
     animationStyle: kM3DialogAnimation,
         context: context,
         builder: (ctx) => AlertDialog(
-          title: Text(_ct('QR code ?', 'QR code?')),
-          content: Text(_ct(
-              'Ajouter un QR code à l\u2019image partagée, pour que la personne qui la voit puisse scanner ton profil ?',
-              'Add a QR code to the shared image, so whoever sees it can scan your profile?')),
+          title: Text(tx('ui_qr_code')),
+          content: Text(tx('ui_add_a_qr_code_to_the_s')),
           actions: [
             TextButton(onPressed: () => Navigator.pop(ctx, 'none'),
-                child: Text(_ct('Sans QR', 'No QR'))),
+                child: Text(tx('ui_no_qr'))),
             TextButton(onPressed: () => Navigator.pop(ctx, 'app'),
-                child: Text(_ct('Vers l\u2019app', 'To the app'))),
+                child: Text(tx('ui_to_the_app'))),
             TextButton(onPressed: () => Navigator.pop(ctx, 'web'),
-                child: Text(_ct('Vers Last.fm', 'To Last.fm'))),
+                child: Text(tx('ui_to_last_fm'))),
           ],
         ),
       );
@@ -3635,7 +3604,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
               Icon(Icons.graphic_eq_rounded, size: 16, color: scheme.onSecondaryContainer),
               const SizedBox(width: 8),
               Text(
-                _ct('Comparer les goûts musicaux', 'Compare Music Taste'),
+                tx('ui_compare_music_taste'),
                 style: TextStyle(
                     fontWeight: FontWeight.w700, color: scheme.onSecondaryContainer),
               ),
@@ -3667,7 +3636,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
               SizedBox(width: 12, height: 12,
                   child: M3Spinner(color: scheme.onSurfaceVariant)),
               const SizedBox(width: 8),
-              Text(_ct('Synchronisation des données…', 'Syncing full library…'),
+              Text(tx('ui_syncing_full_library'),
                   style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
             ]),
           ),
@@ -3694,7 +3663,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
               Text(L.achvTitle, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
               _M3Pill(
                 icon: Icons.chevron_right_rounded,
-                label: _ct('Voir plus', 'See more'),
+                label: tx('ui_see_more'),
                 scheme: scheme,
                 onTap: () => showAchievementsSheet(ctx, _info),
               ),
@@ -3702,7 +3671,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           ),
           const SizedBox(height: 8),
           if (preview.isEmpty)
-            Text(_ct('Aucun succès débloqué pour l\u2019instant', 'No achievements unlocked yet'),
+            Text(tx('ui_no_achievements_unlock'),
                 style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13))
           else
             Row(
@@ -4126,8 +4095,7 @@ class _MotionToggleButton extends StatelessWidget {
           : available
               ? onToggle
               : () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(_ct('Pas de pochette animée pour cet album',
-                        'No animated cover for this album')),
+                    content: Text(tx('ui_no_animated_cover_for_')),
                     duration: const Duration(seconds: 2),
                   )),
       child: icon,

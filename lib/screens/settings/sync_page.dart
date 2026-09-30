@@ -7,6 +7,8 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
+import '../../l10n/extra_strings.dart';
+import '../../widgets/m3_components.dart';
 import '../../widgets/skeleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/l10n.dart';
@@ -155,7 +157,7 @@ class _SyncPageState extends State<SyncPage> {
     final totalCached = AllScrobblesService.getTotalCachedScrobbles();
 
     return Scaffold(
-      appBar: AppBar(title: Text(L.syncPageTitle)),
+      appBar: M3AppBar(title: L.syncPageTitle),
       body: !_loaded
           ? const SkeletonList()
           : ListView(
@@ -240,14 +242,14 @@ class _SyncPageState extends State<SyncPage> {
 
                 const SizedBox(height: 20),
                 SettingsSection(
-                  label: _syncCt('Synchronisation des amis', 'Friends sync'),
+                  label: tx('ui_friends_sync'),
                   children: [
                   SettingChoiceRow(
                     icon: Icons.update_rounded,
-                    title: _syncCt('Fréquence de synchronisation', 'Sync frequency'),
+                    title: tx('ui_sync_frequency'),
                     options: [
                       for (final h in _kFriendsIntervalOptions)
-                        ('$h', h == 24 ? _syncCt('Chaque jour', 'Daily') : '${h}h', null),
+                        ('$h', h == 24 ? tx('ui_daily') : '${h}h', null),
                     ],
                     value: '$_friendsIntervalH',
                     onChanged: (v) => _setFriendsInterval(int.parse(v)),
@@ -259,7 +261,7 @@ class _SyncPageState extends State<SyncPage> {
                         ActionGroupItem(
                           primary: true,
                           icon: Icons.sync_rounded,
-                          label: _syncCt('Tout resynchroniser', 'Resync everyone'),
+                          label: tx('ui_resync_everyone'),
                           onPressed: _resyncingAll ? null : _resyncAllFriends,
                         ),
                       ]),

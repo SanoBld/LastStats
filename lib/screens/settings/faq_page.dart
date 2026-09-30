@@ -1,6 +1,7 @@
 // lib/screens/settings/faq_page.dart
 
 import 'package:flutter/material.dart';
+import '../../widgets/m3_components.dart';
 import '../../l10n/l10n.dart';
 import '../../app_state.dart';
 import 'settings_helpers.dart';
@@ -47,10 +48,7 @@ class _FaqPageState extends State<FaqPage> {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(L.settingsFaq),
-        centerTitle: false,
-      ),
+      appBar: M3AppBar(title: L.settingsFaq),
       body: ListView(padding: const EdgeInsets.all(20), children: [
 
         // ── Questions / réponses ──────────────────────────────────────────

@@ -40,10 +40,7 @@ class AboutPage extends StatelessWidget {
     final text   = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(L.settingsAbout),
-        centerTitle: false,
-      ),
+      appBar: M3AppBar(title: L.settingsAbout),
       body: ListView(padding: const EdgeInsets.all(20), children: [
 
         // ── Logo / header ─────────────────────────────────────────────────
@@ -130,29 +127,13 @@ class AboutPage extends StatelessWidget {
 
         // ── Coup de cœur / credits ──────────────────────────────────────────
         _FoldSection(
-          label: _tr({
-            'fr': 'Coups de cœur', 'en': 'Favorites',
-            'es': 'Favoritos', 'de': 'Favoriten', 'it': 'Preferiti',
-            'pt': 'Favoritos', 'ru': 'Избранное', 'ja': 'お気に入り',
-            'zh': '精选推荐', 'ar': 'المفضلة',
-          }),
+          label: tx('ui_favorites'),
           children: [
             ListTile(
               leading: const Icon(Icons.library_music_rounded),
               title: const Text('Metrolist',
                   style: TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: Text(_tr({
-                'fr': 'Client YouTube Music avancé.',
-                'en': 'Advanced YouTube Music client.',
-                'es': 'Cliente avanzado de YouTube Music.',
-                'de': 'Fortschrittlicher YouTube-Music-Client.',
-                'it': 'Client avanzato per YouTube Music.',
-                'pt': 'Cliente avançado do YouTube Music.',
-                'ru': 'Продвинутый клиент YouTube Music.',
-                'ja': '高機能な YouTube Music クライアント。',
-                'zh': '功能强大的 YouTube Music 客户端。',
-                'ar': 'عميل متقدم لتطبيق يوتيوب ميوزك.',
-              }), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              subtitle: Text(tx('ui_advanced_youtube_music'), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               trailing: const Icon(Icons.open_in_new_rounded, size: 16),
               onTap: () => _open('https://github.com/MetrolistGroup/Metrolist'),
             ),
@@ -161,18 +142,7 @@ class AboutPage extends StatelessWidget {
               leading: const Icon(Icons.flare_rounded),
               title: const Text('Better Nothing Music Visualizer',
                   style: TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: Text(_tr({
-                'fr': 'Synchronise les Glyphs des téléphones Nothing à la musique.',
-                'en': 'Syncs the Glyphs of Nothing phones to the music.',
-                'es': 'Sincroniza los Glyphs de los Nothing phones con la música.',
-                'de': 'Synchronisiert die Glyphs der Nothing-Phones mit der Musik.',
-                'it': 'Sincronizza i Glyph dei telefoni Nothing con la musica.',
-                'pt': 'Sincroniza os Glyphs dos telefones Nothing com a música.',
-                'ru': 'Синхронизирует Glyph телефонов Nothing с музыкой.',
-                'ja': 'Nothing フォンの Glyph を音楽に同期させます。',
-                'zh': '将 Nothing 手机的 Glyph 灯效与音乐同步。',
-                'ar': 'يزامن مصابيح Glyph في هواتف Nothing مع الموسيقى.',
-              }), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              subtitle: Text(tx('ui_syncs_the_glyphs_of_no'), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               trailing: const Icon(Icons.open_in_new_rounded, size: 16),
               onTap: () => _open('https://github.com/Aleks-Levet/better-nothing-music-visualizer'),
             ),
@@ -186,29 +156,13 @@ class AboutPage extends StatelessWidget {
         // own docs and the Material 3 spec) that guided the UI and the
         // animation work in this app.
         _FoldSection(
-          label: _tr({
-            'fr': 'Sources', 'en': 'Sources',
-            'es': 'Fuentes', 'de': 'Quellen', 'it': 'Fonti',
-            'pt': 'Fontes', 'ru': 'Источники', 'ja': 'ソース',
-            'zh': '来源', 'ar': 'المصادر',
-          }),
+          label: tx('ui_sources'),
           children: [
             ListTile(
               leading: const Icon(Icons.menu_book_rounded),
               title: const Text('Flutter documentation',
                   style: TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: Text(_tr({
-                'fr': 'Doc officielle Flutter (widgets, thèmes, API).',
-                'en': 'Official Flutter docs (widgets, theming, API).',
-                'es': 'Documentación oficial de Flutter.',
-                'de': 'Offizielle Flutter-Dokumentation.',
-                'it': 'Documentazione ufficiale di Flutter.',
-                'pt': 'Documentação oficial do Flutter.',
-                'ru': 'Официальная документация Flutter.',
-                'ja': 'Flutter の公式ドキュメント。',
-                'zh': 'Flutter 官方文档。',
-                'ar': 'وثائق Flutter الرسمية.',
-              }), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              subtitle: Text(tx('ui_official_flutter_docs_'), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               trailing: const Icon(Icons.open_in_new_rounded, size: 16),
               onTap: () => _open('https://docs.flutter.dev/'),
             ),
@@ -217,18 +171,7 @@ class AboutPage extends StatelessWidget {
               leading: const Icon(Icons.palette_outlined),
               title: const Text('Material 3 — Flutter guide',
                   style: TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: Text(_tr({
-                'fr': "Guide officiel Material 3 pour développer avec Flutter.",
-                'en': 'Official Material 3 guide for developing with Flutter.',
-                'es': 'Guía oficial de Material 3 para Flutter.',
-                'de': 'Offizieller Material-3-Leitfaden für Flutter.',
-                'it': 'Guida ufficiale a Material 3 per Flutter.',
-                'pt': 'Guia oficial do Material 3 para Flutter.',
-                'ru': 'Официальное руководство Material 3 для Flutter.',
-                'ja': 'Flutter 向け Material 3 公式ガイド。',
-                'zh': '面向 Flutter 的 Material 3 官方指南。',
-                'ar': 'دليل Material 3 الرسمي لتطوير Flutter.',
-              }), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              subtitle: Text(tx('ui_official_material_3_gu'), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               trailing: const Icon(Icons.open_in_new_rounded, size: 16),
               onTap: () => _open('https://m3.material.io/develop/flutter'),
             ),
@@ -237,18 +180,7 @@ class AboutPage extends StatelessWidget {
               leading: const Icon(Icons.description_outlined),
               title: const Text('ThemeData.useMaterial3',
                   style: TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: Text(_tr({
-                'fr': 'Référence API Flutter pour le thème Material 3.',
-                'en': 'Flutter API reference for the Material 3 theme flag.',
-                'es': 'Referencia de la API de Flutter para Material 3.',
-                'de': 'Flutter-API-Referenz für das Material-3-Theme.',
-                'it': 'Riferimento API Flutter per Material 3.',
-                'pt': 'Referência da API Flutter para o Material 3.',
-                'ru': 'Справочник API Flutter для темы Material 3.',
-                'ja': 'Material 3 テーマの Flutter API リファレンス。',
-                'zh': 'Material 3 主题的 Flutter API 参考。',
-                'ar': 'مرجع Flutter API لسمة Material 3.',
-              }), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              subtitle: Text(tx('ui_flutter_api_reference_'), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               trailing: const Icon(Icons.open_in_new_rounded, size: 16),
               onTap: () => _open('https://api.flutter.dev/flutter/material/ThemeData/useMaterial3.html'),
             ),
@@ -257,18 +189,7 @@ class AboutPage extends StatelessWidget {
               leading: const Icon(Icons.dashboard_customize_outlined),
               title: const Text('flutter_adaptive_scaffold (pub.dev)',
                   style: TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: Text(_tr({
-                'fr': 'Package Flutter officiel pour les layouts adaptatifs.',
-                'en': 'Official Flutter package for adaptive layouts.',
-                'es': 'Paquete oficial de Flutter para layouts adaptativos.',
-                'de': 'Offizielles Flutter-Paket für adaptive Layouts.',
-                'it': 'Pacchetto ufficiale Flutter per layout adattivi.',
-                'pt': 'Pacote oficial do Flutter para layouts adaptativos.',
-                'ru': 'Официальный пакет Flutter для адаптивных макетов.',
-                'ja': 'アダプティブレイアウト用の Flutter 公式パッケージ。',
-                'zh': '用于自适应布局的 Flutter 官方包。',
-                'ar': 'حزمة Flutter الرسمية للتخطيطات المتكيفة.',
-              }), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              subtitle: Text(tx('ui_official_flutter_packa'), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               trailing: const Icon(Icons.open_in_new_rounded, size: 16),
               onTap: () => _open('https://pub.dev/packages/flutter_adaptive_scaffold'),
             ),

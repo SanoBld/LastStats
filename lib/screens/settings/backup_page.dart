@@ -1,6 +1,7 @@
 // lib/screens/settings/backup_page.dart
 
 import '../../l10n/extra_strings.dart';
+import '../../widgets/m3_components.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/skeleton.dart';
 import '../../theme/m3_shapes.dart';
@@ -379,10 +380,7 @@ class _BackupPageState extends State<BackupPage> {
     final text   = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(L.settingsBackup),
-        centerTitle: false,
-      ),
+      appBar: M3AppBar(title: L.settingsBackup),
       body: ListView(padding: const EdgeInsets.all(20), children: [
 
         // Info générale

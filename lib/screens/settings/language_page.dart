@@ -1,6 +1,7 @@
 // lib/screens/settings/language_page.dart
 
 import 'package:flutter/material.dart';
+import '../../widgets/m3_components.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/l10n.dart';
 import '../../app_state.dart';
@@ -42,10 +43,7 @@ class _LanguagePageState extends State<LanguagePage> {
     final text   = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(L.settingsLanguage),
-        centerTitle: false,
-      ),
+      appBar: M3AppBar(title: L.settingsLanguage),
       body: ListView(padding: const EdgeInsets.all(20), children: [
 
         SettingsSection(label: L.settingsLanguage, children: [

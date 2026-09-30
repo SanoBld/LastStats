@@ -228,6 +228,86 @@ class _M3PressCardState extends State<M3PressCard> {
   }
 }
 
+// ── App bar (shared by every sub page) ─────────────────────────────────────
+// Same look as [M3PageHeader] (tonal back button, bold headline title) but as a
+// real AppBar: Scaffold handles the status bar inset, and the bar switches to
+// surfaceContainer (same colour as the main tabs' status bar) once content
+// scrolls under it.
+class M3AppBar extends StatelessWidget implements PreferredSizeWidget {
+  const M3AppBar({
+    super.key,
+    required this.title,
+    this.subtitle,
+    this.leading,
+    this.actions = const [],
+  });
+
+  final String       title;
+  final String?      subtitle;
+  final Widget?      leading;   // for example an emoji, after the back button
+  final List<Widget> actions;
+
+  bool get _hasSub => subtitle != null && subtitle!.isNotEmpty;
+
+  @override
+  Size get preferredSize => Size.fromHeight(_hasSub ? 76 : 68);
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+    return AppBar(
+      automaticallyImplyLeading: false,
+      toolbarHeight: preferredSize.height,
+      centerTitle: false,
+      titleSpacing: 0,
+      leadingWidth: 68,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      surfaceTintColor: Colors.transparent,
+      backgroundColor: WidgetStateColor.resolveWith((states) =>
+          states.contains(WidgetState.scrolledUnder)
+              ? scheme.surfaceContainer
+              : scheme.surface),
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 12),
+        child: Center(
+          child: IconButton.filledTonal(
+            icon: const Icon(Icons.arrow_back_rounded),
+            onPressed: () => Navigator.of(context).maybePop(),
+          ),
+        ),
+      ),
+      title: Row(children: [
+        if (leading != null) ...[leading!, const SizedBox(width: 8)],
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: text.headlineSmall
+                      ?.copyWith(fontWeight: FontWeight.w800)),
+              if (_hasSub)
+                Text(subtitle!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: text.bodySmall
+                        ?.copyWith(color: scheme.onSurfaceVariant)),
+            ],
+          ),
+        ),
+      ]),
+      actions: [
+        for (final a in actions) ...[a, const SizedBox(width: 4)],
+        const SizedBox(width: 8),
+      ],
+    );
+  }
+}
+
 // ── Page header ────────────────────────────────────────────────────────────
 class M3PageHeader extends StatelessWidget {
   const M3PageHeader({

@@ -1,6 +1,7 @@
 // lib/screens/settings/notifications_page.dart
 
 import 'package:flutter/material.dart';
+import '../../widgets/m3_components.dart';
 import '../../widgets/skeleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app_state.dart';
@@ -232,10 +233,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
     final text   = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(L.settingsNotifications),
-        centerTitle: false,
-      ),
+      appBar: M3AppBar(title: L.settingsNotifications),
       body: _checkingPerm
           ? const SkeletonList()
           : ListView(

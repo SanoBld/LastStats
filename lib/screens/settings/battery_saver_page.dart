@@ -5,6 +5,8 @@
 // refresh timers. Can be forced on manually, or set to switch on by
 // itself once battery drops below a chosen %.
 import 'package:flutter/material.dart';
+import '../../l10n/extra_strings.dart';
+import '../../widgets/m3_components.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app_state.dart';
 import 'settings_helpers.dart';
@@ -64,33 +66,21 @@ class _BatterySaverPageState extends State<BatterySaverPage> {
     final isEn   = localeNotifier.value == 'en';
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(isEn ? 'Battery saver' : 'Mode éco'),
-        centerTitle: false,
-      ),
+      appBar: M3AppBar(title: tx('ui_battery_saver')),
       body: ListView(padding: const EdgeInsets.all(20), children: [
 
         SettingsSection(
-          label: isEn ? 'Battery saver' : 'Mode éco',
+          label: tx('ui_battery_saver'),
           children: [
             Padding(padding: const EdgeInsets.fromLTRB(16, 14, 16, 6), child: Text(
-              isEn
-                  ? 'Turns off tilt parallax, caps the screen refresh rate, '
-                    'and slows down background updates — everything else '
-                    'stays full quality (images, exports, share cards).'
-                  : 'Désactive le parallaxe au mouvement, plafonne le taux de '
-                    'rafraîchissement de l\'écran, et ralentit les mises à jour en '
-                    'arrière-plan — le reste garde sa pleine qualité (images, '
-                    'exports, cartes de partage).',
+              tx('ui_turns_off_tilt_paralla'),
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
             )),
             SwitchListTile(
               secondary: Icon(Icons.battery_saver_rounded, color: scheme.primary),
-              title: Text(isEn ? 'Always on' : 'Toujours activé',
+              title: Text(tx('ui_always_on'),
                   style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-              subtitle: Text(isEn
-                  ? 'Force eco mode on, regardless of battery level.'
-                  : 'Force le mode éco, quel que soit le niveau de batterie.',
+              subtitle: Text(tx('ui_force_eco_mode_on_rega'),
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               value: _manual,
               onChanged: _setManual,
@@ -101,22 +91,20 @@ class _BatterySaverPageState extends State<BatterySaverPage> {
         const SizedBox(height: 16),
 
         SettingsSection(
-          label: isEn ? 'Auto-activate' : 'Activation automatique',
+          label: tx('ui_auto_activate'),
           children: [
             SwitchListTile(
               secondary: Icon(Icons.battery_alert_rounded, color: scheme.primary),
-              title: Text(isEn ? 'Turn on below a battery %' : 'Activer sous un % de batterie',
+              title: Text(tx('ui_turn_on_below_a_batter'),
                   style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-              subtitle: Text(isEn
-                  ? 'Switches on by itself once the battery drops to the level below.'
-                  : 'S\'active toute seule dès que la batterie atteint le niveau ci-dessous.',
+              subtitle: Text(tx('ui_switches_on_by_itself_'),
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               value: _auto,
               onChanged: _setAuto,
             ),
             SettingSliderRow(
               icon: Icons.percent_rounded,
-              title: isEn ? 'Threshold' : 'Seuil',
+              title: tx('ui_threshold'),
               valueLabel: '$_threshold%',
               value: _threshold.toDouble(), min: 5, max: 90, divisions: 17,
               enabled: _auto,

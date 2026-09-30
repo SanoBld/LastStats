@@ -233,13 +233,11 @@ class _SetupScreenState extends State<SetupScreen>
     final apiKey   = _apikeyCtrl.text.trim();
 
     if (username.isEmpty || apiKey.isEmpty) {
-      setState(() => _errorMessage = localeNotifier.value == 'en'
-          ? 'Please fill both fields.' : 'Remplis les deux champs.');
+      setState(() => _errorMessage = tx('ui_please_fill_both_field'));
       return;
     }
     if (apiKey.length != 32) {
-      setState(() => _errorMessage = localeNotifier.value == 'en'
-          ? 'API key must be 32 characters.' : 'La clé API doit faire 32 caractères.');
+      setState(() => _errorMessage = tx('ui_api_key_must_be_32_cha'));
       return;
     }
 
@@ -251,7 +249,7 @@ class _SetupScreenState extends State<SetupScreen>
 
       if (userInfo == null) {
         throw Exception(
-          localeNotifier.value == 'en' ? 'Profile not found.' : 'Profil introuvable.');
+          tx('ui_profile_not_found'));
       }
 
       if (_rememberMe) {

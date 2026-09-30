@@ -4,6 +4,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'dart:convert';
+import '../../widgets/m3_components.dart';
 import '../../theme/m3_shapes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -283,7 +284,7 @@ class _AccountPageState extends State<AccountPage> {
 
     if (_loading) {
       return Scaffold(
-        appBar: AppBar(title: Text(L.settingsAccount), centerTitle: false),
+        appBar: M3AppBar(title: L.settingsAccount),
         body: const SkeletonList(),
       );
     }
@@ -291,10 +292,7 @@ class _AccountPageState extends State<AccountPage> {
     final active = _accounts.isNotEmpty ? _accounts[_activeIndex] : null;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(L.settingsAccount),
-        centerTitle: false,
-      ),
+      appBar: M3AppBar(title: L.settingsAccount),
       body: ListView(padding: const EdgeInsets.all(20), children: [
 
         // ── Active account header ──────────────────────────────────────────

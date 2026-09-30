@@ -448,14 +448,14 @@ class _ChartsPageState extends State<_ChartsPage>
   //   import 'package:share_plus/share_plus.dart';
   //   import 'package:path_provider/path_provider.dart';
   static const _kCharts = [
-    ('monthly',  'Barres mensuelles',   'Monthly bars',        'Barras mensuales',   '月度柱状图',         'Barras mensais',      Icons.calendar_month_rounded),
-    ('cumul',    'Progression',         'Progression',         'Progresión',         '进度趋势',           'Progressão',          Icons.trending_up_rounded),
-    ('genres',   'Genres musicaux',     'Musical genres',      'Géneros musicales',  '音乐风格',           'Gêneros musicais',    Icons.equalizer_rounded),
-    ('habits',   "Habitudes d'écoute",  'Listening habits',    'Hábitos de escucha', '收听习惯',           'Hábitos de escuta',   Icons.access_time_rounded),
-    ('artists',  'Top artistes',        'Artist distribution', 'Distribución de artistas', '艺术家分布',   'Distribuição de artistas', Icons.mic_rounded),
-    ('albums',   'Top albums',          'Album distribution',  'Distribución de álbumes',  '专辑分布',     'Distribuição de álbuns',   Icons.album_rounded),
-    ('calendar', 'Calendrier musical',  'Listening calendar',  'Calendario de escucha', '收听日历',        'Calendário de escuta', Icons.grid_on_rounded),
-    ('streaks',  "Séries d'écoute",     'Listening streaks',   'Rachas de escucha',   '连续收听',          'Sequências de escuta', Icons.local_fire_department_rounded),
+    ('monthly', 'ui_chart_monthly', Icons.calendar_month_rounded),
+    ('cumul', 'ui_chart_cumul', Icons.trending_up_rounded),
+    ('genres', 'ui_chart_genres', Icons.equalizer_rounded),
+    ('habits', 'ui_chart_habits', Icons.access_time_rounded),
+    ('artists', 'ui_chart_artists', Icons.mic_rounded),
+    ('albums', 'ui_chart_albums', Icons.album_rounded),
+    ('calendar', 'ui_chart_calendar', Icons.grid_on_rounded),
+    ('streaks', 'ui_chart_streaks', Icons.local_fire_department_rounded),
   ];
   late final Map<String, GlobalKey> _xkeys = {
     for (final c in _kCharts) c.$1: GlobalKey(),
@@ -508,9 +508,7 @@ class _ChartsPageState extends State<_ChartsPage>
         if (!mounted) return;
         final p = AllScrobblesService.progressNotifier.value;
         if (p.isLoading && p.currentYear != null) {
-          statusText.value = _ct(
-              'Récupération de ${p.currentYear}… (${p.yearIndex}/${p.totalYears})',
-              'Fetching ${p.currentYear}… (${p.yearIndex}/${p.totalYears})');
+          statusText.value = tx('ui_fetching', {'currentYea': '${p.currentYear}', 'yearIndex': '${p.yearIndex}', 'totalYears': '${p.totalYears}'});
         }
         // Only stop waiting once the sync actually stopped running.
         // (Do NOT stop early just because allReady() looks true here —
@@ -615,8 +613,7 @@ class _ChartsPageState extends State<_ChartsPage>
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
             child: Row(children: [
               Expanded(
-                child: Text(_ct('Quel graphique ?', 'Which chart?',
-                    es: '¿Qué gráfico?', zh: '选择图表', pt: 'Qual gráfico?'),
+                child: Text(tx('ui_which_chart'),
                     style: txt.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
               ),
               Container(
@@ -638,7 +635,7 @@ class _ChartsPageState extends State<_ChartsPage>
               child: Wrap(
                 spacing: 10, runSpacing: 10,
                 children: _kCharts.map((c) {
-                  final label = _ct(c.$2, c.$3, es: c.$4, zh: c.$5, pt: c.$6);
+                  final label = tx(c.$2);
                   return InkWell(
                     borderRadius: BorderRadius.circular(16),
                     onTap: () { _haptic(_HapticImpact.selection); Navigator.pop(sh, c.$1); },
@@ -651,7 +648,7 @@ class _ChartsPageState extends State<_ChartsPage>
                         border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
                       ),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Icon(c.$7, color: scheme.primary, size: 22),
+                        Icon(c.$3, color: scheme.primary, size: 22),
                         const SizedBox(height: 8),
                         Text(label, maxLines: 2, overflow: TextOverflow.ellipsis,
                             style: txt.labelLarge?.copyWith(fontWeight: FontWeight.w700)),
@@ -684,8 +681,7 @@ class _ChartsPageState extends State<_ChartsPage>
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
             child: Align(alignment: Alignment.centerLeft,
-              child: Text(_ct('Quelle période ?', 'Which period?',
-                  es: '¿Qué período?', zh: '选择时间段', pt: 'Qual período?'),
+              child: Text(tx('ui_which_period'),
                   style: txt.titleMedium?.copyWith(fontWeight: FontWeight.w700))),
           ),
           Padding(
@@ -694,7 +690,7 @@ class _ChartsPageState extends State<_ChartsPage>
               spacing: 8, runSpacing: 8,
               children: years.map((y) => M3Chip(
                 label: Text(y == 0
-                    ? _ct('Tout le temps', 'All time', es: 'Todo el tiempo', zh: '全部时间', pt: 'Todo período')
+                    ? tx('ui_all_time')
                     : '$y'),
                 selected: false,
                 showCheckmark: false,
@@ -906,7 +902,7 @@ class _ChartsPageState extends State<_ChartsPage>
     final switched = year != saved;
 
     final statusText = ValueNotifier<String>(
-        _ct('Export en cours…', 'Exporting…', es: 'Exportando…', zh: '正在导出…', pt: 'Exportando…'));
+        tx('ui_exporting'));
 
     // Show loading overlay with fade (no blocking popup)
     showGeneralDialog(
@@ -953,8 +949,7 @@ class _ChartsPageState extends State<_ChartsPage>
       if (year == 0) {
         await _ensureFullHistoryLoaded(statusText);
         if (!ctx.mounted) { closeDialog(); return; }
-        statusText.value = _ct('Export en cours…', 'Exporting…',
-            es: 'Exportando…', zh: '正在导出…', pt: 'Exportando…');
+        statusText.value = tx('ui_exporting');
       }
 
       if (switched) {
@@ -995,8 +990,7 @@ class _ChartsPageState extends State<_ChartsPage>
           closeDialog();
           if (ctx.mounted) {
             showAppSnackBar(ctx, SnackBar(content: Text(
-                _ct('Graphique non disponible pour cette période',
-                    'Chart not available for this period'))));
+                tx('ui_chart_not_available_fo'))));
           }
           return;
         }
@@ -1046,8 +1040,7 @@ class _ChartsPageState extends State<_ChartsPage>
           closeDialog();
           if (ctx.mounted) {
             showAppSnackBar(ctx, SnackBar(content: Text(
-                _ct('Graphique non disponible pour cette période',
-                    'Chart not available for this period'))));
+                tx('ui_chart_not_available_fo'))));
           }
           return;
         }
@@ -1067,8 +1060,7 @@ class _ChartsPageState extends State<_ChartsPage>
           closeDialog();
           if (ctx.mounted) {
             showAppSnackBar(ctx, SnackBar(content: Text(
-                _ct('Graphique non disponible pour cette période',
-                    'Chart not available for this period'))));
+                tx('ui_chart_not_available_fo'))));
           }
           return;
         }
@@ -1079,8 +1071,7 @@ class _ChartsPageState extends State<_ChartsPage>
           closeDialog();
           if (ctx.mounted) {
             showAppSnackBar(ctx, SnackBar(content: Text(
-                _ct('Graphique non disponible pour cette période',
-                    'Chart not available for this period'))));
+                tx('ui_chart_not_available_fo'))));
           }
           return;
         }
@@ -1090,10 +1081,10 @@ class _ChartsPageState extends State<_ChartsPage>
       if (!ctx.mounted) return;
       final scheme   = Theme.of(ctx).colorScheme;
       final chartDef = _kCharts.firstWhere((c) => c.$1 == chartId);
-      final title    = _ct(chartDef.$2, chartDef.$3, es: chartDef.$4, zh: chartDef.$5, pt: chartDef.$6);
+      final title    = tx(chartDef.$2);
       final yearStr  = year == 0 ? 'alltime' : '$year';
       final yearLabel = year == 0
-          ? _ct('Tout le temps', 'All time', es: 'Todo el tiempo', zh: '全部时间', pt: 'Todo período')
+          ? tx('ui_all_time')
           : '$year';
 
       // Compose the final shareable image out of real widgets (not manual
@@ -1113,7 +1104,7 @@ class _ChartsPageState extends State<_ChartsPage>
         closeDialog();
         if (ctx.mounted) {
           showAppSnackBar(ctx, SnackBar(content: Text(
-              _ct('Impossible de générer l\'image', 'Could not generate the image'))));
+              tx('ui_could_not_generate_the'))));
         }
         return;
       }
@@ -1130,7 +1121,7 @@ class _ChartsPageState extends State<_ChartsPage>
       closeDialog();
       if (ctx.mounted) {
         showAppSnackBar(ctx, 
-            SnackBar(content: Text('${_ct('Erreur', 'Error', es: 'Error', zh: '错误', pt: 'Erro')}: $e')));
+            SnackBar(content: Text('${tx('ui_error')}: $e')));
       }
     } finally {
       statusText.dispose();
@@ -1163,7 +1154,7 @@ class _ChartsPageState extends State<_ChartsPage>
         physics: const ClampingScrollPhysics(),
         children: years.map((year) {
           final selected = year == _selectedYear;
-          final label    = year == 0 ? _ct('Tout le temps', 'All time', es: 'Todo el tiempo', zh: '全部时间', pt: 'Todo período') : '$year';
+          final label    = year == 0 ? tx('ui_all_time') : '$year';
           return Padding(
             key: _chipKey(year),
             padding: const EdgeInsets.only(right: 8),
@@ -1207,8 +1198,7 @@ class _ChartsPageState extends State<_ChartsPage>
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                _ct('Chargement de l\'historique$yearLabel… $pct %',
-                    'Loading history$yearLabel… $pct%'),
+                tx('ui_loading_history', {'yearLabel': '$yearLabel', 'pct': '$pct'}),
                 style: t.bodySmall?.copyWith(
                     color: s.onPrimaryContainer, fontWeight: FontWeight.w600),
               ),
@@ -1226,8 +1216,7 @@ class _ChartsPageState extends State<_ChartsPage>
           ),
           const SizedBox(height: 5),
           Text(
-            _ct('Les graphiques seront plus précis une fois chargé.',
-                'Charts will be more accurate once loaded.'),
+            tx('ui_charts_will_be_more_ac'),
             style: t.labelSmall?.copyWith(
                 color: s.onPrimaryContainer.withValues(alpha: 0.60),
                 fontSize: 10),
@@ -1249,8 +1238,7 @@ class _ChartsPageState extends State<_ChartsPage>
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              _ct('Chargez l\'historique complet pour accéder à toutes les années.',
-                  'Load the full history to access all years.'),
+              tx('ui_load_the_full_history_'),
               style: t.bodySmall?.copyWith(color: s.onSurfaceVariant),
             ),
           ),
@@ -1263,7 +1251,7 @@ class _ChartsPageState extends State<_ChartsPage>
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               textStyle: t.labelSmall?.copyWith(fontWeight: FontWeight.w700),
             ),
-            child: Text(_ct('Charger', 'Load', es: 'Cargar', zh: '加载', pt: 'Carregar')),
+            child: Text(tx('ui_load')),
           ),
         ]),
       );
@@ -1285,7 +1273,7 @@ class _ChartsPageState extends State<_ChartsPage>
     // every month from start to end when "All time" is selected.
     final periodMonthly    = _isAllTime ? allTimeMonthly : (_monthly ?? const <String, int>{});
     final periodCumulative = _buildCumulative(periodMonthly);
-    final periodLabel      = _isAllTime ? _ct('Tout le temps', 'All time', es: 'Todo el tiempo', zh: '全部时间', pt: 'Todo período') : '$_selectedYear';
+    final periodLabel      = _isAllTime ? tx('ui_all_time') : '$_selectedYear';
 
     final cachedTs    = _isAllTime ? null : AllScrobblesService.getTimestampsForYear(_selectedYear);
     final hasFullData = _isAllTime
@@ -1305,17 +1293,13 @@ class _ChartsPageState extends State<_ChartsPage>
 
     final habitsSubtitle = _isAllTime
         ? (_hourlyCount > 0
-            ? _ct('Basé sur $_hourlyCount scrobbles (toutes les années)',
-                  'Based on $_hourlyCount scrobbles (all years)')
-            : _ct('Toutes les années disponibles', 'All available years'))
+            ? tx('ui_based_on_scrobbles_all', {'v_hourlyCou': '$_hourlyCount'})
+            : tx('ui_all_available_years'))
         : hasFullData
-            ? _ct('Basé sur $_hourlyCount scrobbles de $_selectedYear',
-                  'Based on $_hourlyCount scrobbles from $_selectedYear')
+            ? tx('ui_based_on_scrobbles_fro', {'v_hourlyCou': '$_hourlyCount', 'v_selectedY': '$_selectedYear'})
             : _hourlyCount > 0
-                ? _ct('Basé sur $_hourlyCount scrobbles récents',
-                      'Based on $_hourlyCount recent scrobbles')
-                : _ct('Analyse vos ~200 derniers scrobbles',
-                      'Analysing your last ~200 scrobbles');
+                ? tx('ui_based_on_recent_scrobb', {'v_hourlyCou': '$_hourlyCount'})
+                : tx('ui_analysing_your_last_20');
 
     // Top items: year-specific when cached, fallback to all-time API tops
     // with a note when year records aren't available in memory.
@@ -1329,7 +1313,7 @@ class _ChartsPageState extends State<_ChartsPage>
         : (_topAlbumsYear.isNotEmpty ? _topAlbumsYear
            : (yearHasRecords ? _topAlbums : <dynamic>[]));
     final usingFallback = !_isAllTime && _topArtistsYear.isEmpty && yearHasRecords && _topArtists.isNotEmpty;
-    final topLabel    = usingFallback ? _ct('All-time (données $_selectedYear en cours)', 'All-time ($_selectedYear loading)') : (_isAllTime ? _ct('All-time', 'All-time') : '$_selectedYear');
+    final topLabel    = usingFallback ? tx('ui_all_time_loading', {'v_selectedY': '$_selectedYear'}) : (_isAllTime ? tx('ui_all_time_2') : '$_selectedYear');
     final albumLabel  = topLabel;
 
     return M3Switcher(
@@ -1343,7 +1327,7 @@ class _ChartsPageState extends State<_ChartsPage>
         children: [
 
           // ── Fixed header — same style as every other tab ───────────────────
-          _FadeInSection(index: 0, slideFrom: -0.04, child: Padding(
+          Padding(
             padding: const EdgeInsets.fromLTRB(20, 12, 16, 2),
             child: Row(children: [
               Expanded(child:
@@ -1351,16 +1335,16 @@ class _ChartsPageState extends State<_ChartsPage>
               ),
               IconButton.filledTonal(
                 icon: const Icon(Icons.ios_share_rounded),
-                tooltip: _ct('Exporter un graphique', 'Export a chart', es: 'Exportar un gráfico', zh: '导出图表', pt: 'Exportar um gráfico'),
+                tooltip: tx('ui_export_a_chart'),
                 onPressed: () => _exportFlow(context),
               ),
             ]),
-          )),
+          ),
           const SizedBox(height: 10),
-          _FadeInSection(index: 1, slideFrom: -0.04, child: Padding(
+          Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: _buildYearChips(scheme, text),
-          )),
+          ),
           const SizedBox(height: 14),
 
           // ── Scrollable content ────────────────────────────────────────────
@@ -1403,7 +1387,7 @@ class _ChartsPageState extends State<_ChartsPage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _SectionHeader(
-                          title: _ct('Progression des scrobbles', 'Scrobble progression', es: 'Progresión de scrobbles', zh: 'Scrobble 进度', pt: 'Progressão de scrobbles'),
+                          title: tx('ui_scrobble_progression'),
                           icon: Icons.trending_up_rounded,
                         ),
                         const SizedBox(height: 4),
@@ -1424,13 +1408,12 @@ class _ChartsPageState extends State<_ChartsPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _SectionHeader(
-                        title: _ct('Vos genres musicaux', 'Your musical genres', es: 'Tus géneros musicales', zh: '你的音乐风格', pt: 'Seus gêneros musicais'),
+                        title: tx('ui_your_musical_genres'),
                         icon: Icons.equalizer_rounded,
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        _ct('Basé sur vos top artistes (all-time)',
-                            'Based on your top artists (all-time)'),
+                        tx('ui_based_on_your_top_arti'),
                         style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                       ),
                       const SizedBox(height: 12),
@@ -1457,7 +1440,7 @@ class _ChartsPageState extends State<_ChartsPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _SectionHeader(
-                        title: _ct("Habitudes d'écoute", 'Listening habits', es: 'Hábitos de escucha', zh: '收听习惯', pt: 'Hábitos de escuta'),
+                        title: tx('ui_listening_habits'),
                         icon: Icons.access_time_rounded,
                       ),
                       const SizedBox(height: 4),
@@ -1514,7 +1497,7 @@ class _ChartsPageState extends State<_ChartsPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _SectionHeader(
-                        title: _ct('Répartition par album', 'Album distribution', es: 'Distribución por álbum', zh: '专辑分布', pt: 'Distribuição por álbum'),
+                        title: tx('ui_album_distribution'),
                         icon: Icons.album_rounded,
                       ),
                       const SizedBox(height: 4),
@@ -1548,26 +1531,20 @@ class _ChartsPageState extends State<_ChartsPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _SectionHeader(
-                        title: _ct('Calendrier musical', 'Listening calendar', es: 'Calendario de escucha', zh: '收听日历', pt: 'Calendário de escuta'),
+                        title: tx('ui_listening_calendar'),
                         icon: Icons.grid_on_rounded,
                       ),
                       const SizedBox(height: 4),
                       Text(
                         _isAllTime
                             ? (heatmapYears.length > 1
-                                ? _ct(
-                                    'Activité journalière — ${heatmapYears.first} à ${heatmapYears.last}',
-                                    'Daily activity — ${heatmapYears.first} to ${heatmapYears.last}')
-                                : _ct('Activité journalière — toutes les années',
-                                      'Daily activity — all years'))
+                                ? tx('ui_daily_activity_to', {'first': '${heatmapYears.first}', 'last': '${heatmapYears.last}'})
+                                : tx('ui_daily_activity_all_yea'))
                             : hasFullData
-                                ? _ct('Activité journalière — $_selectedYear',
-                                      'Daily activity — $_selectedYear')
+                                ? tx('ui_daily_activity', {'v_selectedY': '$_selectedYear'})
                                 : _selectedYear != DateTime.now().year
-                                    ? _ct('Chargez l\'historique pour voir $_selectedYear',
-                                          'Load history to see $_selectedYear')
-                                    : _ct('Activité journalière — 12 mois',
-                                          'Daily activity — last 12 months'),
+                                    ? tx('ui_load_history_to_see', {'v_selectedY': '$_selectedYear'})
+                                    : tx('ui_daily_activity_last_12'),
                         style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                       ),
                       const SizedBox(height: 12),
@@ -1579,7 +1556,7 @@ class _ChartsPageState extends State<_ChartsPage>
                                     data: calendarForView, start: heatmapStart, end: heatmapEnd))
                             : _NoDataCard(
                                 year: 0,
-                                label: _ct('toutes les années', 'all years', es: 'todos los años', zh: '所有年份', pt: 'todos os anos'),
+                                label: tx('ui_all_years'),
                                 onLoad: () => AllScrobblesService.loadAll(widget.service),
                               )
                       else if (_calendarLoading)
@@ -1601,7 +1578,7 @@ class _ChartsPageState extends State<_ChartsPage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _SectionHeader(
-                          title: _ct('Séries d\'écoute', 'Listening streaks', es: 'Rachas de escucha', zh: '连续收听', pt: 'Sequências de escuta'),
+                          title: tx('ui_listening_streaks'),
                           icon: Icons.local_fire_department_rounded,
                         ),
                         const SizedBox(height: 12),
@@ -1781,8 +1758,8 @@ class _MonthlyCardState extends State<_MonthlyCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Wrap(spacing: 8, children: [
-            _ChipStat(label: _ct('Total', 'Total', es: 'Total', zh: '总计', pt: 'Total'), value: _fmt(total), s: s, t: t),
-            _ChipStat(label: _ct('Moy./mois', 'Avg/mo', es: 'Prom./mes', zh: '月均', pt: 'Média/mês'), value: _fmt(avg), s: s, t: t),
+            _ChipStat(label: tx('ui_total'), value: _fmt(total), s: s, t: t),
+            _ChipStat(label: tx('ui_avg_mo'), value: _fmt(avg), s: s, t: t),
           ]),
           const SizedBox(height: 18),
 
@@ -1976,10 +1953,10 @@ class _CumulativeLineCardState extends State<_CumulativeLineCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Wrap(spacing: 8, children: [
-            _ChipStat(label: _ct('Total', 'Total', es: 'Total', zh: '总计', pt: 'Total'), value: _fmt(total), s: s, t: t),
+            _ChipStat(label: tx('ui_total'), value: _fmt(total), s: s, t: t),
             if (bestMonth.isNotEmpty)
               _ChipStat(
-                label: _ct('Meilleur mois', 'Best month', es: 'Mejor mes', zh: '最佳月份', pt: 'Melhor mês'),
+                label: tx('ui_best_month'),
                 value: '${bestMonth.substring(5)} (+${_fmt(bestDelta)})',
                 s: s, t: t,
               ),
@@ -2228,10 +2205,10 @@ class _HourlyBarCardState extends State<_HourlyBarCard> {
   static const _kBandLabelH = 20.0;
 
   static const _bands = [
-    (start: 0,  end: 5,  emoji: '🌙', fr: 'Nuit',       en: 'Night'),
-    (start: 6,  end: 11, emoji: '☀️', fr: 'Matin',       en: 'Morning'),
-    (start: 12, end: 17, emoji: '🌤', fr: 'Après-midi',  en: 'Afternoon'),
-    (start: 18, end: 23, emoji: '🌆', fr: 'Soir',        en: 'Evening'),
+    (start: 0,  end: 5,  emoji: '🌙', key: 'ui_band_night'),
+    (start: 6,  end: 11, emoji: '☀️', key: 'ui_band_morning'),
+    (start: 12, end: 17, emoji: '🌤', key: 'ui_band_afternoon'),
+    (start: 18, end: 23, emoji: '🌆', key: 'ui_band_evening'),
   ];
 
   @override
@@ -2282,7 +2259,7 @@ class _HourlyBarCardState extends State<_HourlyBarCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            Text(_ct('Répartition horaire', 'Hourly distribution', es: 'Distribución horaria', zh: '每小时分布', pt: 'Distribuição por hora'),
+            Text(tx('ui_hourly_distribution'),
                 style: t.labelMedium?.copyWith(fontWeight: FontWeight.w700)),
             const Spacer(),
             _PeakChip(
@@ -2336,7 +2313,7 @@ class _HourlyBarCardState extends State<_HourlyBarCard> {
                       Row(
                         children: _bands.map((b) {
                           final bandW = (b.end - b.start + 1) * _colW;
-                          final label = isEn ? b.en : b.fr;
+                          final label = tx(b.key);
                           return Container(
                             width: bandW,
                             padding: const EdgeInsets.only(bottom: 4),
@@ -2456,7 +2433,7 @@ class _WeekdayBarCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            Text(_ct('Activité par jour de la semaine', 'Activity by day of week', es: 'Actividad por día de la semana', zh: '每周活跃度', pt: 'Atividade por dia da semana'),
+            Text(tx('ui_activity_by_day_of_wee'),
                 style: t.labelMedium?.copyWith(fontWeight: FontWeight.w700)),
             const Spacer(),
             _PeakChip(
@@ -2697,9 +2674,9 @@ class _StreakCard extends StatelessWidget {
             Expanded(
               child: _StreakTile(
                 icon: '🔥',
-                label: _ct('Série actuelle', 'Current streak', es: 'Racha actual', zh: '当前连续天数', pt: 'Sequência atual'),
+                label: tx('ui_current_streak'),
                 value: '${str.current}',
-                unit: _ct('j', 'd', es: 'd', zh: '天', pt: 'd'),
+                unit: tx('ui_d'),
                 color: s.primary,
                 s: s, t: t,
               ),
@@ -2708,9 +2685,9 @@ class _StreakCard extends StatelessWidget {
             Expanded(
               child: _StreakTile(
                 icon: '🏆',
-                label: _ct('Meilleure série', 'Best streak', es: 'Mejor racha', zh: '最长连续天数', pt: 'Melhor sequência'),
+                label: tx('ui_best_streak'),
                 value: '${str.best}',
-                unit: _ct('j', 'd', es: 'd', zh: '天', pt: 'd'),
+                unit: tx('ui_d'),
                 color: s.tertiary,
                 s: s, t: t,
               ),
@@ -2746,15 +2723,14 @@ class _StreakCard extends StatelessWidget {
                 ]),
               ),
             ),
-            Text('${str.best}${_ct('j', 'd', es: 'd', zh: '天', pt: 'd')}',
+            Text('${str.best}${tx('ui_d')}',
                 style: t.labelSmall?.copyWith(
                     fontSize: 9, color: s.onSurfaceVariant.withValues(alpha: 0.5))),
           ]),
           if (str.bestStart.isNotEmpty) ...[
             const SizedBox(height: 8),
             Text(
-              _ct('Meilleure série depuis le ${str.bestStart}',
-                  'Best streak started on ${str.bestStart}'),
+              tx('ui_best_streak_started_on', {'bestStart': '${str.bestStart}'}),
               style: t.labelSmall?.copyWith(
                   fontSize: 9, color: s.onSurfaceVariant.withValues(alpha: 0.55)),
             ),
@@ -3047,7 +3023,7 @@ class _EmptyYearCard extends StatelessWidget {
         Icon(Icons.bar_chart_outlined, color: s.onSurfaceVariant.withValues(alpha: 0.45), size: 20),
         const SizedBox(width: 12),
         Text(
-          _ct('Aucune donnée pour cette période', 'No data for this period', es: 'Sin datos para este período', zh: '该时段无数据', pt: 'Sem dados para este período'),
+          tx('ui_no_data_for_this_perio'),
           style: t.bodySmall?.copyWith(color: s.onSurfaceVariant.withValues(alpha: 0.65)),
         ),
       ]),
@@ -3078,8 +3054,7 @@ class _NoDataCard extends StatelessWidget {
         const SizedBox(width: 14),
         Expanded(
           child: Text(
-            _ct('Chargez l\'historique pour afficher $what',
-                'Load history to display $what'),
+            tx('ui_load_history_to_displa', {'what': '$what'}),
             style: t.bodySmall?.copyWith(color: s.onSurfaceVariant),
           ),
         ),
@@ -3091,7 +3066,7 @@ class _NoDataCard extends StatelessWidget {
             minimumSize: Size.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          child: Text(_ct('Charger', 'Load', es: 'Cargar', zh: '加载', pt: 'Carregar'),
+          child: Text(tx('ui_load'),
               style: t.labelSmall?.copyWith(fontWeight: FontWeight.w700)),
         ),
       ]),
@@ -3254,7 +3229,7 @@ class _HeatmapCard extends StatelessWidget {
           const SizedBox(height: 10),
           Row(children: [
             const Spacer(),
-            Text(_ct('Moins', 'Less', es: 'Menos', zh: '少', pt: 'Menos'),
+            Text(tx('ui_less'),
                 style: t.labelSmall?.copyWith(fontSize: 9, color: s.onSurfaceVariant)),
             const SizedBox(width: 4),
             ...List.generate(5, (i) => Container(
@@ -3269,7 +3244,7 @@ class _HeatmapCard extends StatelessWidget {
               ),
             )),
             const SizedBox(width: 4),
-            Text(_ct('Plus', 'More', es: 'Más', zh: '多', pt: 'Mais'),
+            Text(tx('ui_more'),
                 style: t.labelSmall?.copyWith(fontSize: 9, color: s.onSurfaceVariant)),
           ]),
         ],

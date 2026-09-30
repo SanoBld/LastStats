@@ -1,6 +1,7 @@
 // lib/screens/settings/startup_page.dart
 
 import 'package:flutter/material.dart';
+import '../../l10n/extra_strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/l10n.dart';
 import '../../app_state.dart';
@@ -67,19 +68,14 @@ class _StartupPageState extends State<StartupPage> {
     final labels = buildStartupLabels();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(L.settingsStartupPage),
-        centerTitle: false,
-      ),
+      appBar: M3AppBar(title: L.settingsStartupPage),
       body: ListView(padding: const EdgeInsets.all(20), children: [
 
         SettingsSection(label: L.settingsStartupTab, children: [
           SettingChoiceRow(
             icon: Icons.rocket_launch_rounded,
             title: L.settingsStartupTab,
-            description: isEn
-                ? 'Choose the tab displayed when the app launches.'
-                : 'Choisissez l\'onglet affiché au lancement de l\'app.',
+            description: tx('ui_choose_the_tab_display'),
             options: [
               for (final e in labels.asMap().entries) ('${e.key}', e.value.$2, e.value.$1),
             ],
@@ -143,9 +139,7 @@ class _StartupPageState extends State<StartupPage> {
             Icon(Icons.info_outline_rounded, size: 16, color: scheme.onTertiaryContainer),
             const SizedBox(width: 10),
             Expanded(child: Text(
-              isEn
-                  ? 'The selected tab will appear on next launch of the app.'
-                  : 'L\'onglet sélectionné apparaîtra au prochain démarrage de l\'app.',
+              tx('ui_the_selected_tab_will_'),
               style: text.bodySmall?.copyWith(color: scheme.onTertiaryContainer),
             )),
           ]),

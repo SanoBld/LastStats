@@ -1,6 +1,7 @@
 // lib/screens/settings/updates_page.dart
 
 import 'package:flutter/material.dart';
+import '../../l10n/extra_strings.dart';
 import '../../widgets/skeleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -79,10 +80,7 @@ class _UpdatesPageState extends State<UpdatesPage> {
     final text   = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(L.settingsUpdates),
-        centerTitle: false,
-      ),
+      appBar: M3AppBar(title: L.settingsUpdates),
       body: ListView(padding: const EdgeInsets.all(20), children: [
 
         // ── Bannière de mise à jour disponible ────────────────────────────
@@ -293,11 +291,9 @@ class _UpdatesPageState extends State<UpdatesPage> {
               ),
               child: Icon(Icons.history_rounded, color: scheme.onSecondaryContainer),
             ),
-            title: Text(localeNotifier.value == 'en' ? 'Version history' : 'Historique des versions',
+            title: Text(tx('ui_version_history'),
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-            subtitle: Text(localeNotifier.value == 'en'
-                ? 'All past releases, changelogs and downloads'
-                : 'Toutes les anciennes versions, changelogs et téléchargements',
+            subtitle: Text(tx('ui_all_past_releases_chan'),
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             trailing: Icon(Icons.chevron_right_rounded, color: scheme.onSurfaceVariant),
             onTap: () => Navigator.of(context).push(

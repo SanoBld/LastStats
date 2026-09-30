@@ -87,16 +87,14 @@ class _AchievementsSheet extends StatelessWidget {
     // M3PageHeader, M3PressCard, M3SegmentTile (big outer / small inner
     // corners) and the theme's own colour roles — no custom colours.
     return Scaffold(
-      body: SafeArea(
+      appBar: M3AppBar(title: L.achvTitle,
+                subtitle: L.achvUnlocked(unlocked, list.length),),
+      body: SafeArea(top: false, 
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 720),
             child: Column(children: [
-              M3PageHeader(
-                title: L.achvTitle,
-                subtitle: L.achvUnlocked(unlocked, list.length),
-              ),
-              Expanded(
+Expanded(
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
                   children: [
@@ -265,13 +263,13 @@ class _AchvCategoryDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      appBar: M3AppBar(title: title, subtitle: description),
+      body: SafeArea(top: false, 
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 640),
             child: Column(children: [
-              M3PageHeader(title: title, subtitle: description),
-              Expanded(
+Expanded(
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
                   children: [
@@ -600,18 +598,17 @@ class _LevelHistoryPage extends StatelessWidget {
     final history = _computeLevelHistory();
 
     return Scaffold(
-      body: SafeArea(child: Center(
+      appBar: M3AppBar(title: tx('lvl_history')),
+      body: SafeArea(top: false, child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 640),
           child: Column(children: [
-          M3PageHeader(title: tx('lvl_history')),
-          Expanded(child: history.isEmpty
+Expanded(child: history.isEmpty
           ? Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Text(
-                  _ct('Pas encore assez de données — synchronise ton historique complet dans les réglages.',
-                      'Not enough data yet — sync your full history in Settings.'),
+                  tx('ui_not_enough_data_yet_sy'),
                   textAlign: TextAlign.center,
                   style: TextStyle(color: scheme.onSurfaceVariant),
                 ),
@@ -638,7 +635,7 @@ class _LevelHistoryPage extends StatelessWidget {
                             color: scheme.onPrimaryContainer,
                             fontWeight: FontWeight.w800)),
                       ),
-                      title: Text(_ct('Niveau $level', 'Level $level')),
+                      title: Text(tx('ui_level', {'level': '$level'})),
                       trailing: Text(dateStr, style: TextStyle(color: scheme.onSurfaceVariant)),
                     ),
                   ),

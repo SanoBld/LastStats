@@ -63,8 +63,7 @@ class _QrScannerPageState extends State<_QrScannerPage> {
       }
     }
     if (!mounted || _error != null) return;
-    setState(() => _error = _ct('QR non reconnu — pas un profil LastStats/Last.fm',
-        'QR not recognized — not a LastStats/Last.fm profile'));
+    setState(() => _error = tx('ui_qr_not_recognized_not_'));
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) setState(() => _error = null);
     });
@@ -106,7 +105,7 @@ class _QrScannerPageState extends State<_QrScannerPage> {
         Positioned(
           left: 0, right: 0, bottom: 48,
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Text(_ct('Scanne un QR code de profil', "Scan a profile's QR code"),
+            Text(tx('ui_scan_a_profile_s_qr_co'),
                 style: const TextStyle(color: Colors.white, fontSize: 14)),
             if (_error != null) ...[
               const SizedBox(height: 8),

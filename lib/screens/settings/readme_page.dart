@@ -78,16 +78,14 @@ class _ReadmePageState extends State<ReadmePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      appBar: M3AppBar(title: 'README',
+                subtitle: tx('readme_sub'),),
+      body: SafeArea(top: false, 
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 720),
             child: Column(children: [
-              M3PageHeader(
-                title: 'README',
-                subtitle: tx('readme_sub'),
-              ),
-              Expanded(
+Expanded(
                 child: RefreshIndicator(
                   onRefresh: () async { setState(_load); },
                   child: ListView(

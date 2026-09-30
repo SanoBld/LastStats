@@ -171,15 +171,9 @@ final List<_QuickLink> _quickLinks = [
     },
     trailing: (ctx, s, t) {
       final mode = switch (themeModeNotifier.value) {
-        ThemeMode.dark   => _tr({'fr': 'Sombre', 'en': 'Dark', 'es': 'Oscuro',
-            'de': 'Dunkel', 'it': 'Scuro', 'pt': 'Escuro', 'ru': 'Тёмная',
-            'ja': 'ダーク', 'zh': '深色', 'ar': 'داكن'}),
-        ThemeMode.light  => _tr({'fr': 'Clair', 'en': 'Light', 'es': 'Claro',
-            'de': 'Hell', 'it': 'Chiaro', 'pt': 'Claro', 'ru': 'Светлая',
-            'ja': 'ライト', 'zh': '浅色', 'ar': 'فاتح'}),
-        ThemeMode.system => _tr({'fr': 'Système', 'en': 'System', 'es': 'Sistema',
-            'de': 'System', 'it': 'Sistema', 'pt': 'Sistema', 'ru': 'Системная',
-            'ja': 'システム', 'zh': '跟随系统', 'ar': 'النظام'}),
+        ThemeMode.dark   => tx('ui_dark'),
+        ThemeMode.light  => tx('ui_light'),
+        ThemeMode.system => tx('ui_system'),
       };
       return Text(mode, style: t.bodyMedium?.copyWith(color: s.onSurfaceVariant));
     },
@@ -211,7 +205,7 @@ final List<_QuickLink> _quickLinks = [
     trailing: (ctx, s, t) {
       final v = musicPlatformNotifier.value;
       final label = (v.isEmpty || v == 'all')
-          ? (localeNotifier.value == 'en' ? 'All' : 'Toutes')
+          ? (tx('ui_all'))
           : v.split(',').length > 1
               ? '${v.split(',').length}'
               : v;
@@ -357,24 +351,8 @@ class _SettingsPageState extends State<_SettingsPage> {
          'colore', 'cor', 'цвет', 'ウィジェット', '小组件', 'ودجة'])) {
       items.add(_quickToggleTile(
         icon: Icons.widgets_rounded,
-        title: _tr({
-          'fr': 'Widgets colorés', 'en': 'Colored widgets',
-          'es': 'Widgets con color', 'de': 'Farbige Widgets',
-          'it': 'Widget colorati', 'pt': 'Widgets coloridos',
-          'ru': 'Цветные виджеты', 'ja': 'カラーウィジェット',
-          'zh': '彩色小组件', 'ar': 'ودجات ملونة',
-        }),
-        subtitle: _tr({
-          'fr': 'Teinte les widgets de l\'écran d\'accueil avec l\'accent',
-          'en': 'Tint home screen widgets with the accent color',
-          'es': 'Aplica el color de acento a los widgets',
-          'de': 'Färbt die Homescreen-Widgets mit der Akzentfarbe',
-          'it': 'Colora i widget con il colore d\'accento',
-          'pt': 'Aplica a cor de destaque aos widgets',
-          'ru': 'Окрашивает виджеты акцентным цветом',
-          'ja': 'ウィジェットにアクセントカラーを適用',
-          'zh': '用强调色为小组件着色', 'ar': 'يلوّن الودجات بلون التمييز',
-        }),
+        title: tx('ui_colored_widgets'),
+        subtitle: tx('ui_tint_home_screen_widge'),
         value: _quickWidgetTint!,
         onChanged: (v) async {
           await _setQuickPref('ls_widget_tint', v);
@@ -569,10 +547,8 @@ class _SettingsPageState extends State<_SettingsPage> {
       icon: Icons.battery_saver_rounded,
       iconBgColor: (s) => s.tertiaryContainer,
       iconFgColor: (s) => s.onTertiaryContainer,
-      title:    () => localeNotifier.value == 'en' ? 'Battery saver' : 'Mode éco',
-      subtitle: () => localeNotifier.value == 'en'
-          ? 'Save battery, fewer effects'
-          : 'Économiser la batterie, moins d\'effets',
+      title:    () => tx('ui_battery_saver'),
+      subtitle: () => tx('ui_save_battery_fewer_eff'),
       pageBuilder: (_) => const BatterySaverPage(),
     ),
     // 4 — Language
@@ -755,13 +731,7 @@ class _SettingsPageState extends State<_SettingsPage> {
               _AppSearchField(
                 controller: _searchCtrl,
                 onChanged: (v) => setState(() => _searchQuery = v),
-                hintText: _tr({
-                  'fr': 'Rechercher un réglage…', 'en': 'Search settings…',
-                  'es': 'Buscar un ajuste…', 'de': 'Einstellung suchen…',
-                  'it': 'Cerca un\'impostazione…', 'pt': 'Pesquisar configuração…',
-                  'ru': 'Поиск настройки…', 'ja': '設定を検索…',
-                  'zh': '搜索设置…', 'ar': 'ابحث عن إعداد…',
-                }),
+                hintText: tx('ui_search_settings'),
                 onClear: () {
                   _searchCtrl.clear();
                   setState(() => _searchQuery = '');
@@ -794,13 +764,7 @@ class _SettingsPageState extends State<_SettingsPage> {
             SliverToBoxAdapter(child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
               child: Center(child: Text(
-                _tr({
-                  'fr': 'Aucun réglage trouvé', 'en': 'No settings found',
-                  'es': 'No se encontraron ajustes', 'de': 'Keine Einstellung gefunden',
-                  'it': 'Nessuna impostazione trovata', 'pt': 'Nenhuma configuração encontrada',
-                  'ru': 'Настройки не найдены', 'ja': '設定が見つかりません',
-                  'zh': '未找到设置', 'ar': 'لم يتم العثور على إعدادات',
-                }),
+                tx('ui_no_settings_found'),
                 style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
               )),
             ))

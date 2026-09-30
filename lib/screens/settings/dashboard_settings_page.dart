@@ -1,6 +1,7 @@
 // lib/screens/settings/dashboard_settings_page.dart
 
 import 'package:flutter/material.dart';
+import '../../widgets/m3_components.dart';
 import '../../theme/m3_shapes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/l10n.dart';
@@ -211,7 +212,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: Text(L.settingsDashboardSection), centerTitle: false),
+      appBar: M3AppBar(title: L.settingsDashboardSection),
       body: ListView(padding: const EdgeInsets.all(20), children: [
 
         // ── Header image ──────────────────────────────────────────────────
