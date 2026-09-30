@@ -44,6 +44,14 @@ class VideoDiskCache {
     return f.existsSync() ? f : null;
   }
 
+  static void _touchDir(Directory dir) {
+    final touch = File('${dir.path}/.last_played');
+    try {
+      touch.writeAsStringSync(DateTime.now().toIso8601String());
+      touch.deleteSync();
+    } catch (_) {}
+  }
+
   /// A player reading the cached copy, or null when the video isn't cached.
   static Future<VideoPlayerController?> localController(
       String url, VideoPlayerOptions options) async {
@@ -52,7 +60,7 @@ class VideoDiskCache {
       final idx = await _indexOf(url);
       if (idx == null) return null;
       // Bump the folder time so LRU keeps recently played videos.
-      idx.parent.setLastModifiedSync(DateTime.now());
+      _touchDir(idx.parent);
       final target = File(File('${idx.parent.path}/target').readAsStringSync());
       return VideoPlayerController.file(target, videoPlayerOptions: options);
     } catch (_) {
