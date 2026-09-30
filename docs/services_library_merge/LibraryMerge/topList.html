@@ -93,9 +93,14 @@
       &#39;albums&#39;  =&gt; s.rawTopAlbums( period: period, limit: 200, page: p, user: user),
       _         =&gt; s.rawTopTracks( period: period, limit: 200, page: p, user: user),
     };
-    final first = await raw(1);
-    final all = [...first];
-    if (first.length &gt;= 200) all.addAll(await raw(2));
+    &#47;&#47; Up to 3 raw pages (600 entries) so big requests such as the taste
+    &#47;&#47; profile&#39;s top 500 are still served after merging.
+    final all = &lt;dynamic&gt;[];
+    for (var p = 1; p &lt;= 3; p++) {
+      final chunk = await raw(p);
+      all.addAll(chunk);
+      if (chunk.length &lt; 200) break;
+    }
     hit = (at: DateTime.now(), list: process(type, all, known));
     _cache[key] = hit;
   }

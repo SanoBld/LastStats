@@ -76,6 +76,8 @@
 }) async {
   final key = &#39;${_norm(artist)}|${_norm(album)}|${_norm(track)}&#39;;
   if (_cache.containsKey(key)) return _cache[key];
+  &#47;&#47; Bounded: the oldest lookups are dropped so the map never grows forever.
+  if (_cache.length &gt;= _maxEntries) _cache.remove(_cache.keys.first);
   try {
     &#47;&#47; Every release that could carry the video: the song&#39;s own catalog
     &#47;&#47; entries (single, album, deluxe, compilation...), the album, and
