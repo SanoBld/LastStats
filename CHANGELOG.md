@@ -32,7 +32,7 @@
 
 ## v3.6.0
 
-**Linux and macOS installers**
+**Installers and deployment (Linux and macOS)**
 - New Linux ARM64 build (Raspberry Pi, ARM laptops and servers), built natively
 - Linux installers: `.deb` (Debian, Ubuntu, Mint), `.rpm` (Fedora, openSUSE, RHEL) and a portable `.AppImage`, for x64 and ARM64; app menu entry, icon and clean uninstall included
 - New `install-linux.sh` one-liner: detects your distro and CPU and installs the right package
@@ -40,116 +40,117 @@
 - In-app updater: Linux ARM64 now downloads the ARM64 build
 - Release workflow: all installers are built and published automatically with the rest of the release
 
-**Cache and translations**
-- Cache tab: each storage line now stays on one line (size, limit and percentage used), with the bar underneath
-- All app texts now live in the `l10n` folder, including previously hard-coded ones (quick settings search, image sources, loading steps, tiers), translated in all 10 languages
-- Code cleanup: removed unused translation helpers, variables, functions and imports
+**Loading screen, startup and onboarding**
+- Loading screen redesigned: rotating cookie badge, progress card with percentage, grouped step tiles
+- Welcome flow redesigned in Material You: animated header, tonal option tiles, new "Your library" step, and dashboard options now match the real dashboard settings (removed outdated top artists / albums / tracks switches)
 
-**Posters, friends and Apple Music video**
+**Overall design overhaul and Material 3 Expressive**
+- New wavy loading indicator (rotating bumpy shape) replaces the old spinners on full pages, chart sections and dialogs
+- Loading screens are centered and visible everywhere, skeleton blocks have more contrast in dark theme
+- Motion physics: spring-like curves (spatial and effects, fast / default / slow) for buttons, switches, chips and new components
+- All chips and segmented buttons now animate: the selected one becomes a pill, the others stay soft squares
+- Heart button: round when not loved, grows into the bumpy cookie shape with the vivid accent color when loved
+- Play button: round pill when stopped, turns into a rounded square with the vivid accent color while playing
+- Side-by-side buttons (update download/details, crash log share/clear) form a connected group of rounded squares that turn into a pill when pressed
+- Pop-up and drop-down menus use the same rounded tonal surface
+- Images, loading and pages: Images use Material You shapes (cookie, circle, clover, arch, leaf, oval…) in lists, popular albums, history and recaps, each item keeps its own shape
+- Posters, images and the biography show the wavy loading indicator while loading, all small spinners in the app now use it too
+- Page transitions no longer show the home screen behind while animating (fixes the achievements category animation)
+- Large screens: Side rail with rounded indicator, content in a rounded centered panel (tablet style)
+- Profile search grid and folder grid adapt to the screen width
+
+**Settings**
+- **General redesign (Material 3 Expressive):**
+  - Settings: redesigned in Material 3 Expressive
+  - Settings redesigned: grouped rows with big outer and small inner corners, cookie profile avatar and category badges, press-morph cards
+  - Every settings page now shares one design: cookie-shaped icon badges, grouped tiles (big outer corners, small inner corners), spring press animation, a check icon inside switches, clearer section titles and an 8dp spacing scale
+  - Same controls everywhere: switch rows, "choice" rows, action rows, sliders, text/URL rows and time rows. The current value is always visible on the right (no more mixed chips, segmented buttons and cards)
+  - New choice sheet: shows all options at once with shape-morphing cards, and scrolls only when the list is too long for the screen
+  - Applied to Dashboard, Appearance, Startup, Notifications, Backup, Sync, Cache, Battery saver and PC mode. Older rows on the other pages are restyled automatically
+  - Updates, About, Account, FAQ, Language and Version history now share the same style: softer rounded cards, cookie-shaped logo and icons, rounder update banner
+  - Destructive actions (log out, clear cache…) now use a red container with a matching icon instead of a red icon on a blue badge
+  - FAQ questions and the open-source libraries list are now Material 3 accordions: card that morphs when opened, spring chevron, smooth height animation
+  - Notification bars ("Backup saved", "Export failed"…) now float with the app accent color, rounded corners and a smooth slide-in/out animation
+- **Library options:**
+  - New option "Link versions of the same track": remasters, singles, (feat. ...) and deluxe editions count as one track or album with plays added together; remixes, live and instrumental versions stay separate
+  - New option "Split collaborations": "Gims & Damso" counts for both artists instead of being a third artist; bands such as "Simon & Garfunkel" stay whole
+  - Both library options apply to top lists, rankings, charts and item stats, and appear in Settings and in the welcome flow
+  - Library options now apply everywhere: top lists, rankings, charts, recap, history counters, taste comparison (both sides use the same keys) and friends' libraries; friends' cached libraries are rebuilt when the options change
+- **Appearance settings:**
+  - New setting Settings > Appearance > Image shapes: mix of Material You shapes, square, circle, or one single shape for all images
+
+**Dashboard and Discover feature**
+- Dashboard: the now-playing cover no longer uses a circle shape, since a rotating circle shows no animation
+- **Dashboard customization and reordering:**
+  - Dashboard: reorderable and more customizable
+  - Settings > Dashboard rebuilt: header image, animation and blur, visible sections, Discover, chart and stat cards, each with the same row types
+  - New "Reorder sections" button in Settings > Dashboard: drag Stats, Discover, Recent plays, Friends and the Chart/calendar block into any order you like
+  - New "Choose and sort" sheet for Discover filters and stat cards: tick what you want and use the Sort button to drag them in your order (the chosen order is now used on the dashboard)
+- **Discover:**
+  - New dashboard section "Discover" between the stats and the recent plays: swipeable music ideas (community picks, trending artists, similar to your top artist, your country) with Material You shaped images
+  - Show or hide it, and pick its sources, in Settings > Dashboard
+  - Discover: personal first
+  - The Discover section is now split in two: "Pour toi" (your top artist and your country) always comes first, "Tendances Last.fm" (worldwide top tracks / top artists) comes below
+  - Discover filters can be shown on their own row, outside their tab ("Show on its own row" icon in the sheet)
+  - Discover filters stay on one scrolling line
+  - New "Infinite scroll" option in Settings > Dashboard: the Discover section loops endlessly instead of stopping at the last card
+  - Discover source "On this day": tracks you played on this same day/month in previous years, pulled from your locally cached listening history (works offline once your history is loaded)
+  - Discover: smart order
+  - New option "Most relevant filter first": filters are sorted by usefulness for the moment (time of day, weekend, start of the month), your habits (filters you pick and cards you open, recent ones count more), and rotation so the same filter is not always first
+  - "On this day" jumps to the front once a day when you really listened to music on this date in past years, and is hidden when there is nothing to show
+  - Filters that come back empty go to the end
+
+**Media display, posters and Apple Music**
+- Album, artist and track posters: redesigned titles
+- New poster shapes
+- New video mode for Apple Music posters: an animated video preview instead of a static cover
+- Apple Music video: much better matching, tries every release of a track (single, album, deluxe), smarter title/artist matching and a more robust token lookup
+- Translate button redesigned in Material You, it changes color and shape when the bio is translated
+
+**Friends and social features**
 - Friends: cards are now one consistent rounded square shape (removed the mixed square/circle/oval variants)
 - Friends: online status fills the whole card with your accent color instead of a hardcoded green overlay
 - Friend profile poster: online status is shown only by the ring around the avatar (star-shaped for favourites, circle otherwise); the separate dot and "Now listening" pill are gone
 - Friend profile poster: Apple Music motion artwork (animated video) for the currently playing track, with a photo/video switch glued next to the back and favourite buttons, following the existing motion artwork setting
-- Album, artist and track posters: redesigned titles
-- New poster shapes
-- New video mode for Apple Music posters: an animated video preview instead of a static cover
-- Fix: tracks, albums and artists opened from a friend's profile now load their video and your stats, and stack on top of the profile instead of replacing it
-- New option "Link versions of the same track": remasters, singles, (feat. ...) and deluxe editions count as one track or album with plays added together; remixes, live and instrumental versions stay separate
-- New option "Split collaborations": "Gims & Damso" counts for both artists instead of being a third artist; bands such as "Simon & Garfunkel" stay whole
-- Both library options apply to top lists, rankings, charts and item stats, and appear in Settings and in the welcome flow
-
-**Achievements and news**
-- Achievements redesigned to match the rest of the app: Material 3 Expressive header, level card, grouped category list and milestone lists with big outer and small inner corners, primary and container colors only
-- Level history page uses the same header
-- News list: same grouped tiles as settings, cookie-shaped icon badges, consistent spacing
-- Tier styles (bronze, silver, gold, platinum, emerald, sapphire, diamond, chrome, iridescent) redesigned in Material You: soft tonal colors instead of metallic sheens, cookie-shaped badges, theme-colored back of the 3D badge card
-- Rankings podium redesigned to match the recap podium: shaped covers with rank badge, text under the cover, tonal bars
-- Apple Music video: much better matching, tries every release of a track (single, album, deluxe), smarter title/artist matching and a more robust token lookup
-- Welcome flow redesigned in Material You: animated header, tonal option tiles, new "Your library" step, and dashboard options now match the real dashboard settings (removed outdated top artists / albums / tracks switches)
-- Loading screen redesigned: rotating cookie badge, progress card with percentage, grouped step tiles
-- Restoring a backup that contains scrobbles no longer re-downloads years from A to Z: cached years are trusted and only scrobbles newer than the last cached one are fetched
-- Backup: separate switches for dashboard, notifications, library options and favourite profiles; runtime-only markers are no longer exported; image shape, achievements and eco mode are applied immediately on restore
-- Backup: the export switches you choose are remembered for next time instead of resetting to defaults
-- About: new README page (opened from About) showing the project README, latest release version, total downloads, stars, license, latest commits and latest workflow runs, loaded from GitHub with an offline fallback to the bundled README
-- About: long lists (favourites, sources, keyboard shortcuts, powered by) are folded behind a single row
-- Charts tab restyled to match the other tabs: flat tonal cards with large rounded corners, tonal stat chips and streak tiles, primary-container loading banner, tonal export button
-- Library options now apply everywhere: top lists, rankings, charts, recap, history counters, taste comparison (both sides use the same keys) and friends' libraries; friends' cached libraries are rebuilt when the options change
-- Dashboard: the now-playing cover no longer uses a circle shape, since a rotating circle shows no animation
-- Cache settings redesigned in Material You, with a new Apple Music animated covers entry showing video memory in use, active players and cached links, plus a one-tap release
-- Animated covers pause while the app is in the background and release their player immediately if closed while loading; in-memory caches are now bounded
-- Translations: all new features are available in all 10 app languages
-
-**Settings: redesigned in Material 3 Expressive**
-- Every settings page now shares one design: cookie-shaped icon badges, grouped tiles (big outer corners, small inner corners), spring press animation, a check icon inside switches, clearer section titles and an 8dp spacing scale
-- Same controls everywhere: switch rows, "choice" rows, action rows, sliders, text/URL rows and time rows. The current value is always visible on the right (no more mixed chips, segmented buttons and cards)
-- New choice sheet: shows all options at once with shape-morphing cards, and scrolls only when the list is too long for the screen
-- Applied to Dashboard, Appearance, Startup, Notifications, Backup, Sync, Cache, Battery saver and PC mode. Older rows on the other pages are restyled automatically
-- Updates, About, Account, FAQ, Language and Version history now share the same style: softer rounded cards, cookie-shaped logo and icons, rounder update banner
-- Destructive actions (log out, clear cache…) now use a red container with a matching icon instead of a red icon on a blue badge
-- All new texts are translated in the 10 app languages, reworded to sound natural
-- Notification bars ("Backup saved", "Export failed"…) now float with the app accent color, rounded corners and a smooth slide-in/out animation
-- Side-by-side buttons (update download/details, crash log share/clear) form a connected group of rounded squares that turn into a pill when pressed
-- FAQ questions and the open-source libraries list are now Material 3 accordions: card that morphs when opened, spring chevron, smooth height animation
-- Pop-up and drop-down menus use the same rounded tonal surface
-- Backups already include every Dashboard setting (sections order, stat cards, Discover filters, order, own-row filters, smart order, infinite scroll, header options); restore reloads them as before
-
-**Dashboard settings**
-- Settings > Dashboard rebuilt: header image, animation and blur, visible sections, Discover, chart and stat cards, each with the same row types
-- New "Choose and sort" sheet for Discover filters and stat cards: tick what you want and use the Sort button to drag them in your order (the chosen order is now used on the dashboard)
-- Discover filters can be shown on their own row, outside their tab ("Show on its own row" icon in the sheet)
-- Discover filters stay on one scrolling line
-
-**Discover: smart order**
-- New option "Most relevant filter first": filters are sorted by usefulness for the moment (time of day, weekend, start of the month), your habits (filters you pick and cards you open, recent ones count more), and rotation so the same filter is not always first
-- "On this day" jumps to the front once a day when you really listened to music on this date in past years, and is hidden when there is nothing to show
-- Filters that come back empty go to the end
-
-**Fixes**
-- Fixed Dart analyzer errors on the dashboard (weekly count type), the deprecated `onReorder` in the reorder sheet and missing braces in the taste engine
-
-**Dashboard: reorderable and more customizable**
-- New "Reorder sections" button in Settings > Dashboard: drag Stats, Discover, Recent plays, Friends and the Chart/calendar block into any order you like
-- New "Infinite scroll" option in Settings > Dashboard: the Discover section loops endlessly instead of stopping at the last card
-- New Discover source "On this day": tracks you played on this same day/month in previous years, pulled from your locally cached listening history (works offline once your history is loaded)
-
-**Fixes**
-- Fixed a white square that stayed visible on a chip (e.g. tapping "This month" in Discover) until scrolling — chips no longer keep a stuck highlight after a tap
-
-**Material 3 Expressive**
-- New wavy loading indicator (rotating bumpy shape) replaces the old spinners on full pages, chart sections and dialogs
-- Loading screens are centered and visible everywhere, skeleton blocks have more contrast in dark theme
-- Motion physics: spring-like curves (spatial and effects, fast / default / slow) for buttons, switches, chips and new components
 - Favorites and favorite folders redesigned: grouped buttons, grouped list rows, pill search, cookie badges, cards that change shape when pressed
 - "Add to folder" sheet redesigned with drag handle, tinted rows and animated check
 
-**Buttons and details**
-- Heart button: round when not loved, grows into the bumpy cookie shape with the vivid accent color when loved
-- Play button: round pill when stopped, turns into a rounded square with the vivid accent color while playing
-- History date buttons redesigned as connected Material You buttons that change shape when pressed
-- News colors now follow the app accent colors
-- New shared-axis animation when opening the level history, with grouped rows and cookie level badges
-
-**Discover: personal first**
-- The Discover section is now split in two: "Pour toi" (your top artist and your country) always comes first, "Tendances Last.fm" (worldwide top tracks / top artists) comes below
-- Fixed a plain grey loading box on Discover: it now shows the usual small animated wavy loader, correctly sized
-
-**Discover and image shapes**
-- New dashboard section "Discover" between the stats and the recent plays: swipeable music ideas (community picks, trending artists, similar to your top artist, your country) with Material You shaped images
-- Show or hide it, and pick its sources, in Settings > Dashboard
-- New setting Settings > Appearance > Image shapes: mix of Material You shapes, square, circle, or one single shape for all images
-
-**Images, loading and pages**
-- Images use Material You shapes (cookie, circle, clover, arch, leaf, oval…) in lists, popular albums, history and recaps, each item keeps its own shape
-- Posters, images and the biography show the wavy loading indicator while loading, all small spinners in the app now use it too
-- Translate button redesigned in Material You, it changes color and shape when the bio is translated
-- Recaps: tonal buttons, animated story bar, animated filters and shaped images
-- Page transitions no longer show the home screen behind while animating (fixes the achievements category animation)
-
-**Options and settings**
-- All chips and segmented buttons now animate: the selected one becomes a pill, the others stay soft squares
+**Charts, rankings, history and recaps**
+- Charts tab restyled to match the other tabs: flat tonal cards with large rounded corners, tonal stat chips and streak tiles, primary-container loading banner, tonal export button
+- Rankings podium redesigned to match the recap podium: shaped covers with rank badge, text under the cover, tonal bars
 - Rankings: new date button opens a Material You sheet to pick year and month
-- Settings redesigned: grouped rows with big outer and small inner corners, cookie profile avatar and category badges, press-morph cards
+- History date buttons redesigned as connected Material You buttons that change shape when pressed
+- Recaps: tonal buttons, animated story bar, animated filters and shaped images
 
-**Large screens**
-- Side rail with rounded indicator, content in a rounded centered panel (tablet style)
-- Profile search grid and folder grid adapt to the screen width
+**Achievements, news and level system**
+- Achievements redesigned to match the rest of the app: Material 3 Expressive header, level card, grouped category list and milestone lists with big outer and small inner corners, primary and container colors only
+- Level history page uses the same header
+- New shared-axis animation when opening the level history, with grouped rows and cookie level badges
+- Tier styles (bronze, silver, gold, platinum, emerald, sapphire, diamond, chrome, iridescent) redesigned in Material You: soft tonal colors instead of metallic sheens, cookie-shaped badges, theme-colored back of the 3D badge card
+- News list: same grouped tiles as settings, cookie-shaped icon badges, consistent spacing
+- News colors now follow the app accent colors
+
+**Cache management, backups and performance**
+- Cache tab: each storage line now stays on one line (size, limit and percentage used), with the bar underneath
+- Cache settings redesigned in Material You, with a new Apple Music animated covers entry showing video memory in use, active players and cached links, plus a one-tap release
+- Animated covers pause while the app is in the background and release their player immediately if closed while loading; in-memory caches are now bounded
+- Restoring a backup that contains scrobbles no longer re-downloads years from A to Z: cached years are trusted and only scrobbles newer than the last cached one are fetched
+- Backup: separate switches for dashboard, notifications, library options and favourite profiles; runtime-only markers are no longer exported; image shape, achievements and eco mode are applied immediately on restore
+- Backup: the export switches you choose are remembered for next time instead of resetting to defaults
+- Backups already include every Dashboard setting (sections order, stat cards, Discover filters, order, own-row filters, smart order, infinite scroll, header options); restore reloads them as before
+
+**About page and project info**
+- About: new README page (opened from About) showing the project README, latest release version, total downloads, stars, license, latest commits and latest workflow runs, loaded from GitHub with an offline fallback to the bundled README
+- About: long lists (favourites, sources, keyboard shortcuts, powered by) are folded behind a single row
+
+**Translations and code cleanup**
+- All app texts now live in the `l10n` folder, including previously hard-coded ones (quick settings search, image sources, loading steps, tiers), translated in all 10 languages
+- Code cleanup: removed unused translation helpers, variables, functions and imports
+- Translations: all new features are available in all 10 app languages
+- All new texts are translated in the 10 app languages, reworded to sound natural
+
+**Bug fixes**
+- Fix: tracks, albums and artists opened from a friend's profile now load their video and your stats, and stack on top of the profile instead of replacing it
+- Fixed Dart analyzer errors on the dashboard (weekly count type), the deprecated `onReorder` in the reorder sheet and missing braces in the taste engine
+- Fixed a white square that stayed visible on a chip (e.g. tapping "This month" in Discover) until scrolling — chips no longer keep a stuck highlight after a tap
+- Fixed a plain grey loading box on Discover: it now shows the usual small animated wavy loader, correctly sized
