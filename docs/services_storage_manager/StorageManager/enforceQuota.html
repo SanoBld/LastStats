@@ -68,8 +68,8 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; enforceQuota() async {
   if (_max &lt;= 0) return;
-  final stats    = await getStats();
-  final overflow = stats.totalBytes - _max;
+  final images   = await OfflineImageCache.totalBytes();
+  final overflow = images - _max;
   if (overflow &gt; 0) await OfflineImageCache.evictLru(overflow);
 }</code></pre>
 </section>

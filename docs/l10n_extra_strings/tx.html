@@ -69,7 +69,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">String tx(String key, [Map&lt;String, String&gt;? args]) {
-  final m = _kExtra[key];
+  final m = _kExtra[key] ?? kUiStrings[key];
   var s = m?[localeNotifier.value] ?? m?[&#39;en&#39;] ?? m?[&#39;fr&#39;] ?? key;
   if (args != null) {
     args.forEach((k, v) { s = s.replaceAll(&#39;{$k}&#39;, v); });

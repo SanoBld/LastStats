@@ -70,11 +70,14 @@
   final img      = await OfflineImageCache.totalBytes();
   final scrobble = await ScrobblesFileCache.getDiskUsageBytes();
   final api      = DataCache.estimateDiskBytes();
+  final video    = await VideoDiskCache.totalBytes();
   return StorageStats(
     imageBytes:    img,
     scrobbleBytes: scrobble,
     apiBytes:      api,
+    videoBytes:    video,
     maxBytes:      _max,
+    videoMaxBytes: _videoMax,
   );
 }</code></pre>
 </section>

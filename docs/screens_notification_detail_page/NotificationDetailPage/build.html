@@ -121,10 +121,7 @@ Widget build(BuildContext context) {
   final (icon, color) = _style();
 
   return Scaffold(
-    appBar: AppBar(
-      title: Text(L.notifDetailTitle),
-      scrolledUnderElevation: 0,
-    ),
+    appBar: M3AppBar(title: L.notifDetailTitle),
     body: TweenAnimationBuilder&lt;double&gt;(
       tween: Tween(begin: 0, end: 1),
       duration: const Duration(milliseconds: 300),

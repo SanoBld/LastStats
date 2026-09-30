@@ -68,7 +68,9 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; init() async {
   final p = await SharedPreferences.getInstance();
-  _max = p.getInt(_kPref) ?? defaultMax;
+  _max      = p.getInt(_kPref) ?? defaultMax;
+  _videoMax = p.getInt(_kVideoPref) ?? defaultVideoMax;
+  await VideoDiskCache.init(_videoMax);
 }</code></pre>
 </section>
 

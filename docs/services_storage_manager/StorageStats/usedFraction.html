@@ -72,7 +72,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">double get usedFraction {
   if (maxBytes &lt;= 0) return 0;
-  return (totalBytes &#47; maxBytes).clamp(0.0, 1.0);
+  return (imageBytes &#47; maxBytes).clamp(0.0, 1.0);
 }</code></pre>
 </section>
 

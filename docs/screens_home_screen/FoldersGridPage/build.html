@@ -112,9 +112,9 @@ Widget build(BuildContext context) {
   FavoritesFoldersService.ensureLoaded();
 
   return Scaffold(
-    body: SafeArea(child: Column(children: [
-      M3PageHeader(title: L.searchFolders),
-      Expanded(
+    appBar: M3AppBar(title: L.searchFolders),
+    body: SafeArea(top: false, child: Column(children: [
+Expanded(
         child: ValueListenableBuilder&lt;List&lt;FavFolder&gt;&gt;(
           valueListenable: FavoritesFoldersService.foldersNotifier,
           builder: (ctx, folders, _) {
