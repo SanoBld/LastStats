@@ -152,24 +152,24 @@
 <p>Prebuilt files are also generated automatically after each update, through GitHub Actions:</p>
 <p><a href="https://github.com/SanoBld/LastStats-App/actions">https://github.com/SanoBld/LastStats-App/actions</a></p>
 <p>Builds coming straight from Actions contain the latest code and may include bugs that have not been fixed yet. If you want a stable experience, use the releases page instead.</p>
-<p>Supported platforms: <strong>Android, Windows, macOS, and Linux.</strong></p>
+<p>Supported platforms: <strong>Android, Windows, macOS, Linux, and iOS (unsigned, sideload only).</strong></p>
 <hr>
 <h2 id="-installation">💻 Installation</h2>
 <h3 id="android">Android</h3>
 <ol>
-<li>Download the <code>.apk</code> file from the <a href="https://github.com/SanoBld/LastStats-App/releases">releases page</a>.</li>
+<li>Download the <code>.apk</code> file for your phone from the <a href="https://github.com/SanoBld/LastStats-App/releases">releases page</a>: <code>app-arm64-v8a-release.apk</code> for most phones (2018+), <code>app-armeabi-v7a-release.apk</code> for older 32-bit phones, <code>app-x86_64-release.apk</code> for emulators, or <code>app-universal-release.apk</code> if unsure.</li>
 <li>Open it on your phone. If Android blocks the install, allow "Install unknown apps" for the app you used to open the file (browser or file manager), then try again.</li>
 </ol>
 <h3 id="windows">Windows</h3>
 <ol>
-<li>Download the Windows <code>.zip</code> (or <code>.exe</code>, depending on the release) from the <a href="https://github.com/SanoBld/LastStats-App/releases">releases page</a>.</li>
-<li>Unzip it anywhere, then run <code>LastStats.exe</code>.</li>
+<li>Download the installer from the <a href="https://github.com/SanoBld/LastStats-App/releases">releases page</a>: <code>LastStats-Setup-x64.exe</code> for most PCs, <code>LastStats-Setup-arm64.exe</code> for Windows on ARM (Snapdragon). Prefer no install? Use <code>laststats-windows.zip</code> / <code>laststats-windows-arm64.zip</code>, unzip it anywhere, then run <code>LastStats.exe</code>.</li>
+<li>Run the installer and follow the wizard.</li>
 <li>Windows SmartScreen may warn about an unrecognized app since the build isn't code-signed — click "More info" then "Run anyway" to continue.</li>
 <li>Sharing files from the app (charts, artwork, etc.) saves them to your Downloads folder and opens Explorer with the file selected — this is expected on an unpackaged build like this one.</li>
 </ol>
 <h3 id="macos">macOS</h3>
 <ol>
-<li>Download <code>LastStats-macos.dmg</code> from the <a href="https://github.com/SanoBld/LastStats-App/releases">releases page</a>.</li>
+<li>Download the <code>.dmg</code> for your Mac from the <a href="https://github.com/SanoBld/LastStats-App/releases">releases page</a>: <code>LastStats-macos-arm64.dmg</code> for Apple Silicon (M1 and later), <code>LastStats-macos-x64.dmg</code> for Intel Macs, or <code>LastStats-macos.dmg</code> (universal, works on both). <code>.zip</code> versions (<code>laststats-macos-arm64.zip</code>, <code>laststats-macos-x64.zip</code>, <code>laststats-macos.zip</code>) are also available.</li>
 <li>Open it and drag <code>LastStats.app</code> onto the <code>Applications</code> shortcut.</li>
 <li>Since the build isn't notarized, the first launch requires right-click → "Open" → "Open" again (macOS will otherwise refuse to run apps from an unidentified developer).</li>
 </ol>
@@ -182,6 +182,11 @@
 <li><strong>Any distro, no install:</strong> <code>LastStats-linux-&lt;arch&gt;.AppImage</code> — <code>chmod +x</code> it, then run it.</li>
 <li><strong>Manual:</strong> <code>laststats-linux.zip</code> (x64) / <code>laststats-linux-arm64.zip</code>, extract and run <code>laststats_mobile</code>.</li>
 </ul>
+<h3 id="ios">iOS</h3>
+<ol>
+<li>Download <code>LastStats-ios.ipa</code> from the <a href="https://github.com/SanoBld/LastStats-App/releases">releases page</a>.</li>
+<li>The app is <strong>not signed</strong> (no Apple certificate is used on CI), so it can't be installed directly: sideload it with AltStore, Sideloadly or TrollStore, or re-sign it with your own Apple account.</li>
+</ol>
 <h3 id="building-from-source">Building from source</h3>
 <p>Requires the <a href="https://docs.flutter.dev/get-started/install">Flutter SDK</a> (matching the version in <code>pubspec.yaml</code>).</p>
 <pre class="language-bash"><code class="language-bash">git clone https://github.com/SanoBld/LastStats.git
