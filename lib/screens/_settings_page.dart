@@ -17,12 +17,12 @@ part of 'home_screen.dart';
 class _QuickToggle {
   final List<String> keywords;
   final IconData icon;
-  final Map<String, String> titles, subs;
+  final String titleKey, subKey;
   final ValueNotifier<bool> notifier;
   final String prefKey;
   const _QuickToggle({
     required this.keywords, required this.icon,
-    required this.titles, required this.subs,
+    required this.titleKey, required this.subKey,
     required this.notifier, required this.prefKey,
   });
 }
@@ -33,93 +33,40 @@ final List<_QuickToggle> _quickToggles = [
         'reines schwarz', 'nero puro', 'preto puro', 'чистый чёрный',
         '純黒', '纯黑', 'أسود خالص'],
     icon: Icons.contrast_rounded,
-    titles: {
-      'fr': 'Mode OLED', 'en': 'OLED mode', 'es': 'Modo OLED', 'de': 'OLED-Modus',
-      'it': 'Modalità OLED', 'pt': 'Modo OLED', 'ru': 'Режим OLED',
-      'ja': 'OLED モード', 'zh': 'OLED 模式', 'ar': 'وضع OLED',
-    },
-    subs: {
-      'fr': 'Fond noir pur', 'en': 'Pure black background', 'es': 'Fondo negro puro',
-      'de': 'Reiner schwarzer Hintergrund', 'it': 'Sfondo nero puro',
-      'pt': 'Fundo preto puro', 'ru': 'Чисто чёрный фон',
-      'ja': '純黒の背景', 'zh': '纯黑背景', 'ar': 'خلفية سوداء خالصة',
-    },
+    titleKey: 'qs_t1_t',
+    subKey: 'qs_t1_s',
     notifier: oledModeNotifier, prefKey: 'ls_oled_mode',
   ),
   _QuickToggle(
     keywords: ['éco', 'eco', 'batterie', 'battery', 'batería', 'akku', 'batteria',
         'bateria', 'батарея', 'バッテリー', '电池', 'بطارية'],
     icon: Icons.battery_saver_rounded,
-    titles: {
-      'fr': 'Mode éco (manuel)', 'en': 'Eco mode (manual)', 'es': 'Modo eco (manual)',
-      'de': 'Öko-Modus (manuell)', 'it': 'Modalità eco (manuale)',
-      'pt': 'Modo eco (manual)', 'ru': 'Режим экономии (вручную)',
-      'ja': 'エコモード（手動）', 'zh': '省电模式（手动）', 'ar': 'وضع توفير الطاقة (يدوي)',
-    },
-    subs: {
-      'fr': 'Réduit l\'usage batterie', 'en': 'Cuts battery use',
-      'es': 'Reduce el uso de batería', 'de': 'Reduziert den Akkuverbrauch',
-      'it': 'Riduce il consumo della batteria', 'pt': 'Reduz o uso da bateria',
-      'ru': 'Снижает расход батареи', 'ja': 'バッテリー消費を抑えます',
-      'zh': '降低电池消耗', 'ar': 'يقلل استهلاك البطارية',
-    },
+    titleKey: 'qs_t2_t',
+    subKey: 'qs_t2_s',
     notifier: ecoModeManualNotifier, prefKey: 'ls_eco_mode_manual',
   ),
   _QuickToggle(
     keywords: ['actualité', 'news', 'notification', 'noticias', 'nachrichten',
         'notizie', 'notícias', 'новости', 'ニュース', '新闻', 'أخبار'],
     icon: Icons.newspaper_rounded,
-    titles: {
-      'fr': 'Notifications actualités', 'en': 'News notifications',
-      'es': 'Notificaciones de noticias', 'de': 'Nachrichten-Benachrichtigungen',
-      'it': 'Notifiche notizie', 'pt': 'Notificações de notícias',
-      'ru': 'Уведомления о новостях', 'ja': 'ニュース通知',
-      'zh': '新闻通知', 'ar': 'إشعارات الأخبار',
-    },
-    subs: {
-      'fr': 'Alertes sur les nouveautés Last.fm', 'en': 'Alerts about Last.fm news',
-      'es': 'Alertas sobre novedades de Last.fm', 'de': 'Benachrichtigungen zu Last.fm-Neuigkeiten',
-      'it': 'Avvisi sulle novità di Last.fm', 'pt': 'Alertas sobre novidades do Last.fm',
-      'ru': 'Оповещения о новостях Last.fm', 'ja': 'Last.fm の最新情報の通知',
-      'zh': 'Last.fm 最新动态提醒', 'ar': 'تنبيهات حول أخبار Last.fm',
-    },
+    titleKey: 'qs_t3_t',
+    subKey: 'qs_t3_s',
     notifier: notifNewsEnabledNotifier, prefKey: 'ls_notif_news_enabled',
   ),
   _QuickToggle(
     keywords: ['vibration', 'haptique', 'haptic', 'retour', 'vibración', 'vibración háptica',
         'haptisch', 'aptico', 'вибрация', '振動', '振动', 'اهتزاز'],
     icon: Icons.vibration_rounded,
-    titles: {
-      'fr': 'Retour haptique', 'en': 'Haptic feedback', 'es': 'Retroalimentación háptica',
-      'de': 'Haptisches Feedback', 'it': 'Feedback aptico', 'pt': 'Feedback tátil',
-      'ru': 'Тактильная отдача', 'ja': '触覚フィードバック', 'zh': '触觉反馈',
-      'ar': 'الاستجابة اللمسية',
-    },
-    subs: {
-      'fr': 'Vibrations lors des interactions', 'en': 'Vibrations on interactions',
-      'es': 'Vibraciones al interactuar', 'de': 'Vibrationen bei Interaktionen',
-      'it': 'Vibrazioni durante le interazioni', 'pt': 'Vibrações nas interações',
-      'ru': 'Вибрация при взаимодействии', 'ja': '操作時に振動します',
-      'zh': '操作时振动', 'ar': 'اهتزاز عند التفاعل',
-    },
+    titleKey: 'qs_t4_t',
+    subKey: 'qs_t4_s',
     notifier: hapticFeedbackNotifier, prefKey: 'ls_haptic_feedback',
   ),
   _QuickToggle(
     keywords: ['succès', 'achievement', 'trophée', 'badge', 'logro', 'erfolg',
         'obiettivo', 'conquista', 'достижение', '実績', '成就', 'إنجاز'],
     icon: Icons.emoji_events_rounded,
-    titles: {
-      'fr': 'Succès', 'en': 'Achievements', 'es': 'Logros', 'de': 'Erfolge',
-      'it': 'Obiettivi', 'pt': 'Conquistas', 'ru': 'Достижения',
-      'ja': '実績', 'zh': '成就', 'ar': 'الإنجازات',
-    },
-    subs: {
-      'fr': 'Affiche les succès débloqués', 'en': 'Shows unlocked achievements',
-      'es': 'Muestra los logros desbloqueados', 'de': 'Zeigt freigeschaltete Erfolge',
-      'it': 'Mostra gli obiettivi sbloccati', 'pt': 'Mostra as conquistas desbloqueadas',
-      'ru': 'Показывает открытые достижения', 'ja': '解除した実績を表示します',
-      'zh': '显示已解锁的成就', 'ar': 'يعرض الإنجازات المفتوحة',
-    },
+    titleKey: 'qs_t5_t',
+    subKey: 'qs_t5_s',
     notifier: achievementsEnabledNotifier, prefKey: 'ls_achievements_enabled',
   ),
 ];
@@ -130,12 +77,12 @@ final List<_QuickToggle> _quickToggles = [
 class _QuickLink {
   final List<String> keywords;
   final IconData icon;
-  final Map<String, String> titles;
+  final String titleKey;
   final Widget Function(BuildContext ctx, ColorScheme s, TextTheme t) trailing;
   final Widget Function(String username) pageBuilder;
   const _QuickLink({
     required this.keywords, required this.icon,
-    required this.titles,
+    required this.titleKey,
     required this.trailing, required this.pageBuilder,
   });
 }
@@ -145,12 +92,7 @@ final List<_QuickLink> _quickLinks = [
     keywords: ['couleur', 'accent', 'color', 'palette', 'colore', 'farbe',
         'cor', 'цвет', '色', 'لون'],
     icon: Icons.palette_rounded,
-    titles: {
-      'fr': 'Couleur d\'accent', 'en': 'Accent color', 'es': 'Color de acento',
-      'de': 'Akzentfarbe', 'it': 'Colore accento', 'pt': 'Cor de destaque',
-      'ru': 'Акцентный цвет', 'ja': 'アクセントカラー', 'zh': '强调色',
-      'ar': 'لون التمييز',
-    },
+    titleKey: 'qs_l1_t',
     trailing: (ctx, s, t) => Container(
       width: 22, height: 22,
       decoration: BoxDecoration(
@@ -165,10 +107,7 @@ final List<_QuickLink> _quickLinks = [
         'tema', 'oscuro', 'claro', 'dunkel', 'hell', 'scuro', 'chiaro',
         'escuro', 'тема', 'тёмная', 'светлая', 'テーマ', '主题', 'المظهر'],
     icon: Icons.dark_mode_rounded,
-    titles: {
-      'fr': 'Thème', 'en': 'Theme', 'es': 'Tema', 'de': 'Design', 'it': 'Tema',
-      'pt': 'Tema', 'ru': 'Тема', 'ja': 'テーマ', 'zh': '主题', 'ar': 'المظهر',
-    },
+    titleKey: 'qs_l2_t',
     trailing: (ctx, s, t) {
       final mode = switch (themeModeNotifier.value) {
         ThemeMode.dark   => tx('ui_dark'),
@@ -183,11 +122,7 @@ final List<_QuickLink> _quickLinks = [
     keywords: ['langue', 'language', 'idioma', 'sprache', 'lingua', 'idioma',
         'язык', '言語', '语言', 'اللغة'],
     icon: Icons.language_rounded,
-    titles: {
-      'fr': 'Langue', 'en': 'Language', 'es': 'Idioma', 'de': 'Sprache',
-      'it': 'Lingua', 'pt': 'Idioma', 'ru': 'Язык', 'ja': '言語', 'zh': '语言',
-      'ar': 'اللغة',
-    },
+    titleKey: 'qs_l3_t',
     trailing: (ctx, s, t) => Text(localeNotifier.value.toUpperCase(),
         style: t.bodyMedium?.copyWith(color: s.onSurfaceVariant)),
     pageBuilder: (_) => const LanguagePage(),
@@ -196,12 +131,7 @@ final List<_QuickLink> _quickLinks = [
     keywords: ['plateforme', 'platform', 'spotify', 'lastfm', 'last.fm', 'ytmusic',
         'plataforma', 'piattaforma', 'платформа', 'プラットフォーム', '平台', 'منصة'],
     icon: Icons.graphic_eq_rounded,
-    titles: {
-      'fr': 'Plateforme musicale', 'en': 'Music platform', 'es': 'Plataforma musical',
-      'de': 'Musikplattform', 'it': 'Piattaforma musicale', 'pt': 'Plataforma musical',
-      'ru': 'Музыкальная платформа', 'ja': '音楽プラットフォーム', 'zh': '音乐平台',
-      'ar': 'منصة الموسيقى',
-    },
+    titleKey: 'qs_l4_t',
     trailing: (ctx, s, t) {
       final v = musicPlatformNotifier.value;
       final label = (v.isEmpty || v == 'all')
@@ -217,10 +147,7 @@ final List<_QuickLink> _quickLinks = [
     keywords: ['compte', 'account', 'déconnexion', 'logout', 'profil', 'cuenta',
         'konto', 'account', 'conta', 'аккаунт', 'アカウント', '账户', 'الحساب'],
     icon: Icons.person_rounded,
-    titles: {
-      'fr': 'Compte', 'en': 'Account', 'es': 'Cuenta', 'de': 'Konto', 'it': 'Account',
-      'pt': 'Conta', 'ru': 'Аккаунт', 'ja': 'アカウント', 'zh': '账户', 'ar': 'الحساب',
-    },
+    titleKey: 'qs_l5_t',
     trailing: (ctx, s, t) => Icon(Icons.chevron_right_rounded, color: s.onSurfaceVariant),
     pageBuilder: (username) => AccountPage(username: username),
   ),
@@ -229,11 +156,7 @@ final List<_QuickLink> _quickLinks = [
         'synchronisierung', 'sincronizzazione', 'sincronização', 'синхронизация',
         '同期', '同步', 'مزامنة'],
     icon: Icons.sync_rounded,
-    titles: {
-      'fr': 'Synchronisation', 'en': 'Sync', 'es': 'Sincronización',
-      'de': 'Synchronisierung', 'it': 'Sincronizzazione', 'pt': 'Sincronização',
-      'ru': 'Синхронизация', 'ja': '同期', 'zh': '同步', 'ar': 'المزامنة',
-    },
+    titleKey: 'qs_l6_t',
     trailing: (ctx, s, t) => Icon(Icons.chevron_right_rounded, color: s.onSurfaceVariant),
     pageBuilder: (_) => const SyncPage(),
   ),
@@ -242,10 +165,7 @@ final List<_QuickLink> _quickLinks = [
         'almacenamiento', 'speicher', 'archiviazione', 'armazenamento',
         'хранилище', 'ストレージ', '存储', 'التخزين'],
     icon: Icons.storage_rounded,
-    titles: {
-      'fr': 'Cache', 'en': 'Cache', 'es': 'Caché', 'de': 'Cache', 'it': 'Cache',
-      'pt': 'Cache', 'ru': 'Кэш', 'ja': 'キャッシュ', 'zh': '缓存', 'ar': 'الذاكرة المؤقتة',
-    },
+    titleKey: 'qs_l7_t',
     trailing: (ctx, s, t) => Icon(Icons.chevron_right_rounded, color: s.onSurfaceVariant),
     pageBuilder: (_) => const CachePage(),
   ),
@@ -333,8 +253,8 @@ class _SettingsPageState extends State<_SettingsPage> {
         valueListenable: t.notifier,
         builder: (context, value, child) => _quickToggleTile(
           icon: t.icon,
-          title: _tr(t.titles),
-          subtitle: _tr(t.subs),
+          title: tx(t.titleKey),
+          subtitle: tx(t.subKey),
           value: value,
           onChanged: (v) async {
             t.notifier.value = v;
@@ -382,7 +302,7 @@ class _SettingsPageState extends State<_SettingsPage> {
       if (!matches(l.keywords)) continue;
       items.add(_quickLinkTile(
         icon: l.icon,
-        title: _tr(l.titles),
+        title: tx(l.titleKey),
         trailing: l.trailing(context, scheme, text),
         onTap: () => _push(context, l.pageBuilder(widget.username)),
         scheme: scheme, text: text,

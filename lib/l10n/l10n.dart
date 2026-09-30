@@ -80,3 +80,10 @@ String discoverSourceLabel(String s) {
     _           => l.discoverSrcCountry,
   };
 }
+
+/// Native names of the languages offered for translating bios.
+const Map<String, String> kTranslationLangNames = {
+      'fr': 'Français', 'en': 'English', 'es': 'Español',
+      'de': 'Deutsch',  'it': 'Italiano', 'pt': 'Português',
+      'ja': '日本語',     'ko': '한국어',    'ar': 'العربية',
+    };

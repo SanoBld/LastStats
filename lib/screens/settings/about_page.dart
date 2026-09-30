@@ -23,10 +23,6 @@ String _logoAsset(BuildContext context) {
   return 'assets/icons/${family}_${dark ? 'black_bg' : 'white_bg'}.svg';
 }
 
-/// Full 10-language lookup — falls back to English, then French.
-String _tr(Map<String, String> byLocale) =>
-    byLocale[localeNotifier.value] ?? byLocale['en'] ?? byLocale['fr'] ?? '';
-
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
 

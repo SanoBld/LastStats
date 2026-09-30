@@ -24,7 +24,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'package:flutter/foundation.dart';
-import '../app_state.dart';
+import '../l10n/extra_strings.dart';
 import 'data_cache.dart';
 import 'lastfm_service.dart';
 
@@ -92,10 +92,6 @@ class PrefetchService {
     ),
   );
 
-  // ── i18n helper ───────────────────────────────────────────────────────────
-  static String _t(String fr, String en) =>
-      localeNotifier.value == 'en' ? en : fr;
-
   // ── Helpers de progression ────────────────────────────────────────────────
 
   static void _report({
@@ -136,33 +132,33 @@ class PrefetchService {
     final steps = <(String, Future<void> Function())>[
       // ── Étape 1 : profil ───────────────────────────────────────────────
       (
-        _t('👤 Profil utilisateur', '👤 User profile'),
+        tx('pf_1'),
         () => _prefetchUserInfo(service, force: force),
       ),
 
       // ── Étape 2–4 : tops global ────────────────────────────────────────
       (
-        _t('🎤 Top artistes — Global', '🎤 Top artists — All time'),
+        tx('pf_2'),
         () => _prefetchTopList(service, 'artists', 'overall', force: force),
       ),
       (
-        _t('💿 Top albums — Global', '💿 Top albums — All time'),
+        tx('pf_3'),
         () => _prefetchTopList(service, 'albums', 'overall', force: force),
       ),
       (
-        _t('🎵 Top titres — Global', '🎵 Top tracks — All time'),
+        tx('pf_4'),
         () => _prefetchTopList(service, 'tracks', 'overall', force: force),
       ),
 
       // ── Étape 5 : écoutes récentes ─────────────────────────────────────
       (
-        _t('⏱️ Écoutes récentes', '⏱️ Recent plays'),
+        tx('pf_5'),
         () => _prefetchRecent(service, force: force),
       ),
 
       // ── Étape 6 : tops 7 jours ─────────────────────────────────────────
       (
-        _t('🗓️ Cette semaine', '🗓️ This week'),
+        tx('pf_6'),
         () async {
           await _prefetchTopList(service, 'artists', '7day', force: force);
           await _prefetchTopList(service, 'albums',  '7day', force: force);
@@ -172,7 +168,7 @@ class PrefetchService {
 
       // ── Étape 7 : tops 1 mois ──────────────────────────────────────────
       (
-        _t('📅 Ce mois-ci', '📅 This month'),
+        tx('pf_7'),
         () async {
           await _prefetchTopList(service, 'artists', '1month', force: force);
           await _prefetchTopList(service, 'albums',  '1month', force: force);
@@ -182,7 +178,7 @@ class PrefetchService {
 
       // ── Étape 8 : tops 3 mois ──────────────────────────────────────────
       (
-        _t('📅 3 derniers mois', '📅 Last 3 months'),
+        tx('pf_8'),
         () async {
           await _prefetchTopList(service, 'artists', '3month', force: force);
           await _prefetchTopList(service, 'albums',  '3month', force: force);
@@ -192,7 +188,7 @@ class PrefetchService {
 
       // ── Étape 9 : tops 6 mois ──────────────────────────────────────────
       (
-        _t('📅 6 derniers mois', '📅 Last 6 months'),
+        tx('pf_9'),
         () async {
           await _prefetchTopList(service, 'artists', '6month', force: force);
           await _prefetchTopList(service, 'albums',  '6month', force: force);
@@ -202,7 +198,7 @@ class PrefetchService {
 
       // ── Étape 10 : tops 12 mois ────────────────────────────────────────
       (
-        _t('📅 12 derniers mois', '📅 Last 12 months'),
+        tx('pf_10'),
         () async {
           await _prefetchTopList(service, 'artists', '12month', force: force);
           await _prefetchTopList(service, 'albums',  '12month', force: force);
@@ -212,13 +208,13 @@ class PrefetchService {
 
       // ── Étape 11 : historique mensuel ──────────────────────────────────
       (
-        _t('📊 Historique mensuel', '📊 Monthly history'),
+        tx('pf_11'),
         () => _prefetchMonthly(service, force: force),
       ),
 
       // ── Étape 12 : titres aimés ────────────────────────────────────────
       (
-        _t('❤️ Titres aimés', '❤️ Loved tracks'),
+        tx('pf_12'),
         () => _prefetchLoved(service, force: force),
       ),
     ];
@@ -306,13 +302,13 @@ class PrefetchService {
     );
 
     final steps = <(String, Future<void> Function())>[
-      (_t('👤 Profil utilisateur',         '👤 User profile'),          () => _prefetchUserInfo(service,   force: force)),
-      (_t('🎤 Top artistes — Global',      '🎤 Top artists — All time'), () => _prefetchTopList(service, 'artists', 'overall', force: force)),
-      (_t('💿 Top albums — Global',        '💿 Top albums — All time'),  () => _prefetchTopList(service, 'albums',  'overall', force: force)),
-      (_t('🎵 Top titres — Global',        '🎵 Top tracks — All time'),  () => _prefetchTopList(service, 'tracks',  'overall', force: force)),
-      (_t('⏱️ Écoutes récentes',           '⏱️ Recent plays'),           () => _prefetchRecent(service,             force: force)),
-      (_t('🗓️ Top artistes — Semaine',     '🗓️ Top artists — This week'), () => _prefetchTopList(service, 'artists', '7day', force: force)),
-      (_t('🗓️ Albums & titres — Semaine',  '🗓️ Albums & tracks — This week'), () async {
+      (tx('pf_1'),          () => _prefetchUserInfo(service,   force: force)),
+      (tx('pf_2'), () => _prefetchTopList(service, 'artists', 'overall', force: force)),
+      (tx('pf_3'),  () => _prefetchTopList(service, 'albums',  'overall', force: force)),
+      (tx('pf_4'),  () => _prefetchTopList(service, 'tracks',  'overall', force: force)),
+      (tx('pf_5'),           () => _prefetchRecent(service,             force: force)),
+      (tx('pf_13'), () => _prefetchTopList(service, 'artists', '7day', force: force)),
+      (tx('pf_14'), () async {
         await _prefetchTopList(service, 'albums', '7day', force: force);
         await _prefetchTopList(service, 'tracks', '7day', force: force);
       }),

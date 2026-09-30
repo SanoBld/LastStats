@@ -15,11 +15,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'offline_image_cache.dart';
 import 'storage_manager.dart';
-import '../app_state.dart';
-
-/// Full 10-language lookup — falls back to English, then French.
-String _tr(Map<String, String> byLocale) =>
-    byLocale[localeNotifier.value] ?? byLocale['en'] ?? byLocale['fr'] ?? '';
+import '../l10n/extra_strings.dart';
 
 class ImageService {
   ImageService._();
@@ -128,7 +124,7 @@ class ImageService {
     };
     final raw = _sourceOf[key];
     if (raw == null || raw.isEmpty) return '';
-    return _tr(_sourceNames[raw] ?? const {});
+    return _sourceDisplayNames.containsKey(raw) ? tx('img_src_$raw') : '';
   }
 
   /// Bare brand name (e.g. "YouTube Music"), no "Source:" prefix — for
@@ -149,50 +145,7 @@ class ImageService {
     'wikipedia': 'Wikipedia',
   };
 
-  static const Map<String, Map<String, String>> _sourceNames = {
-    'lastfm': {
-      'fr': 'Source : Last.fm', 'en': 'Source: Last.fm', 'es': 'Fuente: Last.fm',
-      'de': 'Quelle: Last.fm', 'it': 'Fonte: Last.fm', 'pt': 'Fonte: Last.fm',
-      'ru': 'Источник: Last.fm', 'ja': '提供元: Last.fm', 'zh': '来源：Last.fm',
-      'ar': 'المصدر: Last.fm',
-    },
-    'ytmusic': {
-      'fr': 'Source : YouTube Music', 'en': 'Source: YouTube Music', 'es': 'Fuente: YouTube Music',
-      'de': 'Quelle: YouTube Music', 'it': 'Fonte: YouTube Music', 'pt': 'Fonte: YouTube Music',
-      'ru': 'Источник: YouTube Music', 'ja': '提供元: YouTube Music', 'zh': '来源：YouTube Music',
-      'ar': 'المصدر: YouTube Music',
-    },
-    'itunes': {
-      'fr': 'Source : iTunes', 'en': 'Source: iTunes', 'es': 'Fuente: iTunes',
-      'de': 'Quelle: iTunes', 'it': 'Fonte: iTunes', 'pt': 'Fonte: iTunes',
-      'ru': 'Источник: iTunes', 'ja': '提供元: iTunes', 'zh': '来源：iTunes',
-      'ar': 'المصدر: iTunes',
-    },
-    'deezer': {
-      'fr': 'Source : Deezer', 'en': 'Source: Deezer', 'es': 'Fuente: Deezer',
-      'de': 'Quelle: Deezer', 'it': 'Fonte: Deezer', 'pt': 'Fonte: Deezer',
-      'ru': 'Источник: Deezer', 'ja': '提供元: Deezer', 'zh': '来源：Deezer',
-      'ar': 'المصدر: Deezer',
-    },
-    'audiodb': {
-      'fr': 'Source : TheAudioDB', 'en': 'Source: TheAudioDB', 'es': 'Fuente: TheAudioDB',
-      'de': 'Quelle: TheAudioDB', 'it': 'Fonte: TheAudioDB', 'pt': 'Fonte: TheAudioDB',
-      'ru': 'Источник: TheAudioDB', 'ja': '提供元: TheAudioDB', 'zh': '来源：TheAudioDB',
-      'ar': 'المصدر: TheAudioDB',
-    },
-    'musicbrainz': {
-      'fr': 'Source : MusicBrainz', 'en': 'Source: MusicBrainz', 'es': 'Fuente: MusicBrainz',
-      'de': 'Quelle: MusicBrainz', 'it': 'Fonte: MusicBrainz', 'pt': 'Fonte: MusicBrainz',
-      'ru': 'Источник: MusicBrainz', 'ja': '提供元: MusicBrainz', 'zh': '来源：MusicBrainz',
-      'ar': 'المصدر: MusicBrainz',
-    },
-    'wikipedia': {
-      'fr': 'Source : Wikipédia', 'en': 'Source: Wikipedia', 'es': 'Fuente: Wikipedia',
-      'de': 'Quelle: Wikipedia', 'it': 'Fonte: Wikipedia', 'pt': 'Fonte: Wikipedia',
-      'ru': 'Источник: Википедия', 'ja': '提供元: Wikipedia', 'zh': '来源：维基百科',
-      'ar': 'المصدر: ويكيبيديا',
-    },
-  };
+  
 
   static void _cacheBytes(String url) {
     if (url.isEmpty) return;

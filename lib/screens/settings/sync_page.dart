@@ -28,9 +28,6 @@ const _kApiKey        = 'ls_apikey';
 const List<int> _kFrequencyOptions = [1, 3, 6, 12, 24];
 const List<int> _kFriendsIntervalOptions = [12, 24, 48];
 
-// Local 2-language helper (French/English) — this file isn't part of the
-// home_screen.dart library so it can't reuse the shared _ct() defined there.
-String _syncCt(String fr, String en) => localeNotifier.value == 'en' ? en : fr;
 
 class SyncPage extends StatefulWidget {
   const SyncPage({super.key});

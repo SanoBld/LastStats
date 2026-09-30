@@ -64,7 +64,6 @@ class _StartupPageState extends State<StartupPage> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final isEn   = localeNotifier.value == 'en';
     final labels = buildStartupLabels();
 
     return Scaffold(

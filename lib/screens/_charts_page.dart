@@ -1,19 +1,6 @@
 // ignore_for_file: unused_import
 part of 'home_screen.dart';
 
-// Legacy 2-language helper — now dispatches all 5 app languages. Callers
-// that haven't been given es/zh/pt strings yet gracefully fall back to
-// English for those locales (instead of leaking French, the old bug).
-String _ct(String fr, String en, {String? es, String? zh, String? pt}) {
-  switch (localeNotifier.value) {
-    case 'en': return en;
-    case 'es': return es ?? en;
-    case 'zh': return zh ?? en;
-    case 'pt': return pt ?? en;
-    default:   return fr;
-  }
-}
-
 List<String> get _chartWeekdayLabels => L.weekdaysShort;
 
 const _kTwoPi  = 6.283185307179586;
@@ -1612,8 +1599,7 @@ bool _chartsEntrancePlayed = false;
 class _FadeInSection extends StatefulWidget {
   final int index;
   final Widget child;
-  final double slideFrom; // fraction of height to slide up from
-  const _FadeInSection({required this.index, required this.child, this.slideFrom = 0.06});
+  const _FadeInSection({required this.index, required this.child});
 
   @override
   State<_FadeInSection> createState() => _FadeInSectionState();
@@ -1624,7 +1610,7 @@ class _FadeInSectionState extends State<_FadeInSection> with SingleTickerProvide
       vsync: this, duration: const Duration(milliseconds: 480));
   late final Animation<double> _fade = CurvedAnimation(parent: _c, curve: M3Motion.emphasizedDecelerate);
   late final Animation<Offset> _slide = Tween<Offset>(
-    begin: Offset(0, widget.slideFrom),
+    begin: const Offset(0, 0.06),
     end:   Offset.zero,
   ).animate(CurvedAnimation(parent: _c, curve: M3Motion.emphasizedDecelerate));
 
@@ -2243,7 +2229,6 @@ class _HourlyBarCardState extends State<_HourlyBarCard> {
     final maxVal = widget.data.values.fold(0, (a, b) => a > b ? a : b);
     final peakH  = widget.data.isEmpty ? 0
         : widget.data.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
-    final isEn   = localeNotifier.value == 'en';
 
     final bandColors = [
       s.primaryContainer.withValues(alpha: 0.07),
@@ -2286,12 +2271,12 @@ class _HourlyBarCardState extends State<_HourlyBarCard> {
             ),
             Expanded(
               child: widget.exportMode
-                ? _buildHourColumns(bandColors, maxVal, peakH, isEn, s, t)
+                ? _buildHourColumns(bandColors, maxVal, peakH, s, t)
                 : SingleChildScrollView(
                 controller: _sc,
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
-                child: _buildHourColumns(bandColors, maxVal, peakH, isEn, s, t),
+                child: _buildHourColumns(bandColors, maxVal, peakH, s, t),
               ),
             ),
           ]),
@@ -2303,7 +2288,7 @@ class _HourlyBarCardState extends State<_HourlyBarCard> {
   // Extracted so both the live scrollable view and the export (unclipped,
   // no scroll) path render the exact same 24-column content.
   Widget _buildHourColumns(List<Color> bandColors, int maxVal, int peakH,
-      bool isEn, ColorScheme s, TextTheme t) {
+      ColorScheme s, TextTheme t) {
     return SizedBox(
                   width: 24 * _colW,
                   child: Column(

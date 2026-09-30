@@ -613,11 +613,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   }
 
   void _pickTranslationLanguage() {
-    const langs = <String, String>{
-      'fr': 'Français', 'en': 'English', 'es': 'Español',
-      'de': 'Deutsch',  'it': 'Italiano', 'pt': 'Português',
-      'ja': '日本語',     'ko': '한국어',    'ar': 'العربية',
-    };
+    final langs = kTranslationLangNames;
     showModalBottomSheet(
     sheetAnimationStyle: kM3SheetAnimation,
       context: context,
@@ -870,38 +866,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                               ? (_info?['album']?['title'] ?? '').toString()
                               : '',
                       motionTrack: widget.type == 'tracks' ? _name : '',
-                      source: '${_tr({
-                        'fr': switch (widget.type) {
-                          'artists' => 'Artiste', 'albums' => 'Album', _ => 'Titre',
-                        },
-                        'en': switch (widget.type) {
-                          'artists' => 'Artist', 'albums' => 'Album', _ => 'Track',
-                        },
-                        'es': switch (widget.type) {
-                          'artists' => 'Artista', 'albums' => 'Álbum', _ => 'Canción',
-                        },
-                        'de': switch (widget.type) {
-                          'artists' => 'Künstler', 'albums' => 'Album', _ => 'Titel',
-                        },
-                        'it': switch (widget.type) {
-                          'artists' => 'Artista', 'albums' => 'Album', _ => 'Brano',
-                        },
-                        'pt': switch (widget.type) {
-                          'artists' => 'Artista', 'albums' => 'Álbum', _ => 'Faixa',
-                        },
-                        'ru': switch (widget.type) {
-                          'artists' => 'Исполнитель', 'albums' => 'Альбом', _ => 'Трек',
-                        },
-                        'ja': switch (widget.type) {
-                          'artists' => 'アーティスト', 'albums' => 'アルバム', _ => '曲',
-                        },
-                        'zh': switch (widget.type) {
-                          'artists' => '艺术家', 'albums' => '专辑', _ => '歌曲',
-                        },
-                        'ar': switch (widget.type) {
-                          'artists' => 'فنان', 'albums' => 'ألبوم', _ => 'أغنية',
-                        },
-                      })} · ${_currentImageSource()}') : null,
+                      source: '${tx(switch (widget.type) { 'artists' => 'ds_type_artist', 'albums' => 'ds_type_album', _ => 'ds_type_track' })} · ${_currentImageSource()}') : null,
                   child: SizedBox(height: imgH + 66, width: double.infinity),
                 ),
                 _buildHeader(ctx, scheme, imgH, hasImage),
@@ -1381,7 +1346,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         }
       });
       _audioPlayer!.onPlayerComplete.listen((_) {
-        if (mounted) setState(() { _isPlaying = false; _previewPos = 0; });
+        if (mounted) setState(() { _isPlaying = false; });
       });
     }
 
@@ -2059,8 +2024,6 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
   bool         _previewLoading = false;
   bool         _isPlaying = false;
   AudioPlayer? _player;
-  Duration     _previewDur = Duration.zero;
-  double       _previewPos = 0.0;
 
   // null = still checking, true/false = checked. The play button only
   // renders once we know a preview actually exists for this track.
@@ -2283,14 +2246,8 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
     }
 
     _player ??= AudioPlayer()
-      ..onDurationChanged.listen((d) { if (mounted) setState(() => _previewDur = d); })
-      ..onPositionChanged.listen((pos) {
-        if (!mounted) return;
-        final total = _previewDur.inMilliseconds;
-        setState(() => _previewPos = total > 0 ? pos.inMilliseconds / total : 0.0);
-      })
       ..onPlayerComplete.listen((_) {
-        if (mounted) setState(() { _isPlaying = false; _previewPos = 0; });
+        if (mounted) setState(() { _isPlaying = false; });
       });
 
     await _player!.play(UrlSource(_previewUrl!));
@@ -2337,14 +2294,14 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
                 ),
               ),
               const SizedBox(height: 6),
-              Text('${widget.myPlaycount} / $next pour le palier suivant',
+              Text(tx('ds_tier_next', {'n': '${widget.myPlaycount}', 'next': '$next'}),
                   style: TextStyle(color: Theme.of(ctx).colorScheme.onSurfaceVariant, fontSize: 12)),
             ] else if (widget.tier != CardTier.none) ...[
               const SizedBox(height: 12),
-              const Text('Palier maximum atteint 🎉', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text(tx('ds_tier_max'), style: TextStyle(fontWeight: FontWeight.w600)),
             ] else ...[
               const SizedBox(height: 12),
-              Text('Écoute ce titre pour débloquer un premier palier (dès ${kPlayTierThresholds.first} écoutes).',
+              Text(tx('ds_tier_first', {'n': '${kPlayTierThresholds.first}'}),
                   style: TextStyle(color: Theme.of(ctx).colorScheme.onSurfaceVariant, fontSize: 12)),
             ],
           ],
@@ -4055,50 +4012,6 @@ class _PlatformLinkButtonState extends State<_PlatformLinkButton> {
           ),
         ),
       ),
-    );
-  }
-}
-
-
-// Photo / video switch, Material You rounded-square style. While the lookup
-// runs it shows a spinner; if the album has no motion artwork it is dimmed
-// and a tap explains why.
-class _MotionToggleButton extends StatelessWidget {
-  final ColorScheme scheme;
-  final bool checked, available, showing;
-  final VoidCallback onToggle;
-  const _MotionToggleButton({
-    required this.scheme, required this.checked, required this.available,
-    required this.showing, required this.onToggle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final fg = scheme.onSecondaryContainer;
-    final Widget icon;
-    if (!checked) {
-      icon = SizedBox(width: 18, height: 18, child: M3Spinner(color: fg));
-    } else if (!available) {
-      icon = Icon(Icons.videocam_off_rounded, color: fg.withValues(alpha: 0.6), size: 22);
-    } else {
-      // Shows what a tap will switch TO.
-      icon = Icon(showing ? Icons.photo_rounded : Icons.videocam_rounded,
-          color: fg, size: 22);
-    }
-    return M3TonalButton(
-      width: 44, height: 44,
-      radius: BorderRadius.circular(16),
-      padding: EdgeInsets.zero,
-      color: scheme.secondaryContainer,
-      onTap: !checked
-          ? null
-          : available
-              ? onToggle
-              : () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(tx('ui_no_animated_cover_for_')),
-                    duration: const Duration(seconds: 2),
-                  )),
-      child: icon,
     );
   }
 }

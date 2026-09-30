@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'settings_helpers.dart';
 import 'settings_rows.dart';
 import '../../theme/m3_shapes.dart';
-import '../../theme/m3_motion.dart';
 import '../../widgets/skeleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/storage_manager.dart';
@@ -381,32 +380,38 @@ class _Bar extends StatelessWidget {
         ? (bytes / limit).clamp(0.0, 1.0)
         : (total > 0 ? bytes / total : 0.0);
 
-    return Row(children: [
-      Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-      const SizedBox(width: 8),
-      Expanded(child: Text(label, style: text.bodySmall?.copyWith(color: scheme.onPrimaryContainer))),
-      const SizedBox(width: 8),
-      SizedBox(
-        width: 100,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(2),
-          child: LinearProgressIndicator(
-            value:           frac,
-            minHeight:       4,
-            color:           color,
-            backgroundColor: scheme.onPrimaryContainer.withValues(alpha: 0.15),
-          ),
+    final pct = frac * 100;
+    final pctStr = '${pct < 1 && bytes > 0 ? '<1' : pct.round()}%';
+    final value = limit > 0
+        ? '${StorageManager.formatBytes(bytes)} / ${StorageManager.formatBytes(limit)} · $pctStr'
+        : '${StorageManager.formatBytes(bytes)} · $pctStr';
+    final fg = scheme.onPrimaryContainer;
+
+    // Line 1: dot + label (left), value + % (right). Line 2: full-width bar.
+    return Column(children: [
+      Row(children: [
+        Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: text.bodySmall?.copyWith(color: fg)),
         ),
-      ),
-      const SizedBox(width: 8),
-      SizedBox(
-        width: limit > 0 ? 112 : 60,
-        child: Text(
-          limit > 0
-              ? '${StorageManager.formatBytes(bytes)} / ${StorageManager.formatBytes(limit)}'
-              : StorageManager.formatBytes(bytes),
-          style:     text.bodySmall?.copyWith(fontWeight: FontWeight.w700, color: scheme.onPrimaryContainer),
-          textAlign: TextAlign.end,
+        const SizedBox(width: 8),
+        Text(value,
+            maxLines: 1,
+            softWrap: false,
+            style: text.bodySmall?.copyWith(fontWeight: FontWeight.w700, color: fg)),
+      ]),
+      const SizedBox(height: 4),
+      ClipRRect(
+        borderRadius: BorderRadius.circular(2),
+        child: LinearProgressIndicator(
+          value:           frac,
+          minHeight:       4,
+          color:           color,
+          backgroundColor: fg.withValues(alpha: 0.15),
         ),
       ),
     ]);

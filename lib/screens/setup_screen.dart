@@ -944,8 +944,6 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
     super.dispose();
   }
 
-  String _t(String fr, String en) =>
-      localeNotifier.value == 'en' ? en : fr;
 
   static String _fmtLarge(int n) {
     if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
@@ -1094,7 +1092,6 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
                     state:  _state,
                     scheme: scheme,
                     text:   text,
-                    t:      _t,
                   ),
                   const SizedBox(height: 16),
 
@@ -1173,13 +1170,11 @@ class _FirstLoadChecklist extends StatefulWidget {
   final PrefetchState state;
   final ColorScheme   scheme;
   final TextTheme     text;
-  final String Function(String fr, String en) t;
 
   const _FirstLoadChecklist({
     required this.state,
     required this.scheme,
     required this.text,
-    required this.t,
   });
 
   @override
@@ -1218,7 +1213,6 @@ class _FirstLoadChecklistState extends State<_FirstLoadChecklist> {
     final state      = widget.state;
     final scheme     = widget.scheme;
     final text       = widget.text;
-    final t          = widget.t;
     final hasContent = state.completedSteps.isNotEmpty ||
         state.currentStep.isNotEmpty;
 
@@ -1241,7 +1235,7 @@ class _FirstLoadChecklistState extends State<_FirstLoadChecklist> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Text(
-                    t('Import de tes données', 'Importing your data'),
+                    tx('sl_import'),
                     style: text.labelMedium?.copyWith(
                       color:         scheme.onSurfaceVariant,
                       fontWeight:    FontWeight.w600,
@@ -1284,7 +1278,7 @@ class _FirstLoadChecklistState extends State<_FirstLoadChecklist> {
                                 size: 15, color: scheme.primary),
                             const SizedBox(width: 8),
                             Text(
-                              t('Importé !', 'Imported!'),
+                              tx('sl_done'),
                               style: text.bodySmall?.copyWith(
                                   color:      scheme.primary,
                                   fontWeight: FontWeight.w700),
@@ -1304,7 +1298,7 @@ class _FirstLoadChecklistState extends State<_FirstLoadChecklist> {
               ),
               const SizedBox(width: 12),
               Text(
-                t('Connexion à Last.fm…', 'Connecting to Last.fm…'),
+                tx('sl_connect'),
                 style: text.bodyMedium?.copyWith(
                     color: scheme.onSurfaceVariant),
               ),

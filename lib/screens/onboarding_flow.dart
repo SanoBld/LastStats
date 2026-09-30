@@ -21,9 +21,6 @@ import '../services/library_merge.dart';
 import 'home_screen.dart';
 import 'settings/settings_helpers.dart';
 
-// Local 2-language helper (French/English) — this file isn't part of the
-// home_screen.dart library so it can't reuse the shared _ct() defined there.
-String _ct(String fr, String en) => localeNotifier.value == 'en' ? en : fr;
 
 class OnboardingFlow extends StatefulWidget {
   final String username, apiKey;

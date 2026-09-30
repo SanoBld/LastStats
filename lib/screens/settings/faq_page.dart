@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../../widgets/m3_components.dart';
 import '../../l10n/l10n.dart';
 import '../../app_state.dart';
-import 'settings_helpers.dart';
 import 'settings_rows.dart';
 
 class FaqPage extends StatefulWidget {

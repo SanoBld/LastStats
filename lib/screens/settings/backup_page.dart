@@ -9,7 +9,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/app_share.dart';
 import '../../l10n/l10n.dart';
-import '../../app_state.dart';
 import '../../services/backup_service.dart';
 import '../../services/crash_log_service.dart';
 import '../../services/auto_backup_service.dart';

@@ -63,7 +63,6 @@ class _BatterySaverPageState extends State<BatterySaverPage> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final isEn   = localeNotifier.value == 'en';
 
     return Scaffold(
       appBar: M3AppBar(title: tx('ui_battery_saver')),

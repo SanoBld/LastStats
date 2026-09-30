@@ -21,14 +21,6 @@ void _apHaptic() {
   if (hapticFeedbackNotifier.value) HapticFeedback.lightImpact();
 }
 
-// Local 2-language helper (French/English) — this file isn't part of the
-// home_screen.dart library so it can't reuse the shared _ct() defined there.
-String _ct(String fr, String en) => localeNotifier.value == 'en' ? en : fr;
-
-/// Full 10-language lookup — falls back to English, then French.
-/// Keys: fr, en, es, de, it, pt, ru, ja, zh, ar (same set as l10n.dart).
-String _tr(Map<String, String> byLocale) =>
-    byLocale[localeNotifier.value] ?? byLocale['en'] ?? byLocale['fr'] ?? '';
 
 class AppearancePage extends StatefulWidget {
   const AppearancePage({super.key});

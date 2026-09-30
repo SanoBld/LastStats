@@ -8,8 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
-import '../../app_state.dart';
-import '../../theme/m3_shapes.dart';
 import '../../widgets/m3_components.dart';
 
 const _owner = 'SanoBld';

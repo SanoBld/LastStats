@@ -27,27 +27,6 @@ class _FriendData {
 }
 
 
-// ── All available stat card definitions ──────────────────────────────────────
-// ignore: unused_element
-const _kAllStatCards = [
-  ('top_artist',      '🎤', 'Artiste #1',           'Artist #1'),
-  ('top_album',       '💿', 'Album #1',              'Album #1'),
-  ('top_track',       '🎵', 'Titre #1',              'Track #1'),
-  ('last_track',      '⏱️', 'Dernière écoute',       'Last played'),
-  ('total',           '🎯', 'Total scrobbles',        'Total scrobbles'),
-  ('avg_day',         '⚡', 'Moy. / jour',            'Avg / day'),
-  ('avg_week',        '📅', 'Moy. / semaine',         'Avg / week'),
-  ('days_active',     '🗓️', 'Jours actifs',           'Days active'),
-  ('since',           '📆', 'Membre depuis',           'Member since'),
-  ('country',         '🌍', 'Pays',                   'Country'),
-  ('top_artist_week', '🎤', 'Artiste #1 (semaine)',   'Artist #1 (week)'),
-  ('top_album_week',  '💿', 'Album #1 (semaine)',     'Album #1 (week)'),
-  ('top_track_week',  '🎵', 'Titre #1 (semaine)',     'Track #1 (week)'),
-  ('artist_count',    '🎸', 'Artistes uniques',       'Unique artists'),
-  ('track_count',     '🎼', 'Titres uniques',         'Unique tracks'),
-  ('album_count',     '💽', 'Albums uniques',         'Unique albums'),
-  ('scrobbles_week',  '📊', 'Scrobbles semaine',      'Scrobbles week'),
-];
 const _kDefaultStatCards = ['top_artist', 'top_album', 'top_track', 'last_track', 'favorites_count'];
 
 

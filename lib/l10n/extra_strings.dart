@@ -3,6 +3,7 @@
 // app languages. Usage: tx('key') or tx('key', {'n': '3'}).
 // Falls back to English, then French, so a missing entry never shows blank.
 import '../app_state.dart';
+import 'screen_strings.dart';
 import 'ui_strings.dart';
 
 const Map<String, Map<String, String>> _kExtra = {
@@ -813,7 +814,7 @@ const Map<String, Map<String, String>> _kExtra = {
 };
 
 String tx(String key, [Map<String, String>? args]) {
-  final m = _kExtra[key] ?? kUiStrings[key];
+  final m = _kExtra[key] ?? kUiStrings[key] ?? kScreenStrings[key];
   var s = m?[localeNotifier.value] ?? m?['en'] ?? m?['fr'] ?? key;
   if (args != null) {
     args.forEach((k, v) { s = s.replaceAll('{$k}', v); });
