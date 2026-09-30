@@ -37,6 +37,7 @@ import '../l10n/l10n.dart';
 import '../supported_locales.dart';
 import '../services/lastfm_service.dart';
 import '../services/library_merge.dart';
+import '../l10n/extra_strings.dart';
 import '../services/taste_engine.dart';
 import '../services/listenbrainz_service.dart';
 import '../services/image_service.dart';

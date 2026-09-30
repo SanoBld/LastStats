@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app_state.dart';
 import '../l10n/l10n.dart';
+import '../l10n/extra_strings.dart';
 import '../supported_locales.dart';
 import '../services/lastfm_service.dart';
 import '../services/prefetch_service.dart';
@@ -1024,11 +1025,10 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
                           const SizedBox(width: 7),
                           Flexible(child: Text(
                             restored
-                                ? _t('${_fmtLarge(cached)} scrobbles restaurés',
-                                     '${_fmtLarge(cached)} scrobbles restored')
+                                ? tx('load_restored', {'n': _fmtLarge(cached)})
                                 : (widget.totalScrobbles > 0
                                     ? L.setupScrobblesToImport(_fmtLarge(widget.totalScrobbles))
-                                    : _t('Prêt à importer', 'Ready to import')),
+                                    : tx('load_ready')),
                             style: text.labelMedium?.copyWith(
                                 color: scheme.onSecondaryContainer,
                                 fontWeight: FontWeight.w700),
@@ -1056,9 +1056,9 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
                               key: ValueKey(_state.isComplete ? 'done' : _state.currentStep),
                               child: Text(
                                 _state.isComplete
-                                    ? _t('Import terminé', 'Import complete')
+                                    ? tx('load_done')
                                     : _state.currentStep.isEmpty
-                                        ? _t('Connexion à Last.fm…', 'Connecting to Last.fm…')
+                                        ? tx('load_connecting')
                                         : _state.currentStep,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -1151,8 +1151,7 @@ class _FirstLoadScreenState extends State<_FirstLoadScreen>
                       const SizedBox(width: 12),
                       Expanded(child: Text(
                         restored
-                            ? _t('Sauvegarde détectée : seuls les scrobbles plus récents seront vérifiés.',
-                                 'Backup found: only newer scrobbles will be checked.')
+                            ? tx('load_backup_note')
                             : L.setupOneTimeImportNote,
                         style: text.bodySmall?.copyWith(color: scheme.onTertiaryContainer),
                       )),

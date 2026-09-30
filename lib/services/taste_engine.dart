@@ -193,6 +193,7 @@ class TasteEngine {
     final hit = _simCache[artist];
     if (hit != null && DateTime.now().difference(hit.$1) < _ttl) return hit.$2;
     final l = await _safe(s.getSimilarArtists(artist, limit: 40), <dynamic>[]);
+    if (_simCache.length >= 200) _simCache.remove(_simCache.keys.first);
     if (l.isNotEmpty) _simCache[artist] = (DateTime.now(), l);
     return l;
   }
@@ -201,6 +202,7 @@ class TasteEngine {
     final hit = _tagCache[artist];
     if (hit != null && DateTime.now().difference(hit.$1) < _ttl) return hit.$2;
     final l = await _safe(s.getArtistTopTags(artist), <dynamic>[]);
+    if (_tagCache.length >= 200) _tagCache.remove(_tagCache.keys.first);
     if (l.isNotEmpty) _tagCache[artist] = (DateTime.now(), l);
     return l;
   }

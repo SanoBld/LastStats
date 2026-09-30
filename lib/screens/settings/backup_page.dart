@@ -1,5 +1,6 @@
 // lib/screens/settings/backup_page.dart
 
+import '../../l10n/extra_strings.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/skeleton.dart';
 import '../../theme/m3_shapes.dart';
@@ -471,9 +472,9 @@ class _BackupPageState extends State<BackupPage> {
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
             secondary: Icon(Icons.dashboard_customize_rounded, color: scheme.primary),
-            title: Text(localeNotifier.value == 'en' ? 'Dashboard and start-up' : 'Tableau de bord et démarrage',
+            title: Text(tx('bk_dash_t'),
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-            subtitle: Text(localeNotifier.value == 'en' ? 'Sections, header, stat cards, discover, start-up tab' : 'Sections, en-tête, cartes de stats, découverte, onglet de démarrage',
+            subtitle: Text(tx('bk_dash_s'),
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             value: _includeDashboard,
             onChanged: (v) { setState(() => _includeDashboard = v); _saveExportOpts(); },
@@ -481,9 +482,9 @@ class _BackupPageState extends State<BackupPage> {
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
             secondary: Icon(Icons.notifications_active_rounded, color: scheme.primary),
-            title: Text(localeNotifier.value == 'en' ? 'Notifications' : 'Notifications',
+            title: Text(tx('bk_notif_t'),
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-            subtitle: Text(localeNotifier.value == 'en' ? 'Recaps, milestones, news and badges' : 'Récaps, jalons, actualités et pastilles',
+            subtitle: Text(tx('bk_notif_s'),
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             value: _includeNotifs,
             onChanged: (v) { setState(() => _includeNotifs = v); _saveExportOpts(); },
@@ -491,9 +492,9 @@ class _BackupPageState extends State<BackupPage> {
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
             secondary: Icon(Icons.merge_type_rounded, color: scheme.primary),
-            title: Text(localeNotifier.value == 'en' ? 'Library options' : 'Options de bibliothèque',
+            title: Text(tx('bk_lib_t'),
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-            subtitle: Text(localeNotifier.value == 'en' ? 'Link track versions, split collaborations' : "Lier les versions d'un titre, séparer les collaborations",
+            subtitle: Text(tx('bk_lib_s'),
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             value: _includeLibrary,
             onChanged: (v) { setState(() => _includeLibrary = v); _saveExportOpts(); },
@@ -501,9 +502,9 @@ class _BackupPageState extends State<BackupPage> {
           const Divider(height: 1, indent: 16, endIndent: 16),
           SwitchListTile(
             secondary: Icon(Icons.star_rounded, color: scheme.primary),
-            title: Text(localeNotifier.value == 'en' ? 'Favourite profiles' : 'Profils favoris',
+            title: Text(tx('bk_prof_t'),
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-            subtitle: Text(localeNotifier.value == 'en' ? 'The Last.fm profiles you starred' : 'Les profils Last.fm que tu as mis en favori',
+            subtitle: Text(tx('bk_prof_s'),
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             value: _includeProfiles,
             onChanged: (v) { setState(() => _includeProfiles = v); _saveExportOpts(); },

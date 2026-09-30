@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'settings_helpers.dart';
 import 'settings_rows.dart';
 import '../../theme/m3_shapes.dart';
+import '../../theme/m3_motion.dart';
 import '../../widgets/skeleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/storage_manager.dart';
@@ -10,6 +11,10 @@ import '../../services/data_cache.dart';
 import '../../services/scrobbles_file_cache.dart';
 import '../../services/image_service.dart';
 import '../../l10n/l10n.dart';
+import '../../l10n/extra_strings.dart';
+import '../../widgets/m3_components.dart';
+import '../../widgets/motion_artwork_video.dart';
+import '../../services/motion_artwork_service.dart';
 
 // Storage limit presets in bytes. 0 = unlimited.
 const _limits = [
@@ -84,6 +89,17 @@ class _CachePageState extends State<CachePage> {
     setState(() => _clearing = false);
   }
 
+  Future<void> _releaseVideo() async {
+    setState(() => _clearing = true);
+    await MotionArtworkVideo.releaseAll();
+    MotionArtworkService.clearMemory();
+    await _loadStats();
+    if (!mounted) return;
+    setState(() => _clearing = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(tx('cache_video_cleared'))));
+  }
+
   Future<void> _clearAll() async {
     final confirmed = await _confirm(
       L.cacheConfirmAllTitle,
@@ -94,6 +110,7 @@ class _CachePageState extends State<CachePage> {
     await ImageService.clearAllCache();
     await DataCache.clear();
     await ScrobblesFileCache.clear();
+    MotionArtworkService.clearMemory();
     await _loadStats();
     setState(() => _clearing = false);
   }
@@ -127,27 +144,47 @@ class _CachePageState extends State<CachePage> {
     final text   = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(L.cacheTitle),
-        scrolledUnderElevation: 0,
-      ),
-      body: _loading
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 720),
+            child: Column(children: [
+              M3PageHeader(title: L.cacheTitle),
+              Expanded(
+                child: _loading
           ? const SkeletonList()
           : ListView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
               children: [
                 // ── Usage overview ─────────────────────────────────────────
-                SettingsSection(label: L.cacheUsage, children: [
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: _UsageCard(stats: _stats!, scheme: scheme, text: text),
-                  ),
+                _UsageCard(stats: _stats!, scheme: scheme, text: text),
+
+                const SizedBox(height: 20),
+
+                // ── Memory: animated covers (Apple Music video) ────────────
+                SettingsSection(label: tx('cache_memory_section'), children: [
+                  if (_clearing)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(child: M3LoadingIndicator()),
+                    )
+                  else
+                    SettingActionRow(
+                      icon: Icons.movie_filter_rounded,
+                      title: tx('cache_video_t'),
+                      subtitle: tx('cache_video_s', {
+                        'mem': StorageManager.formatBytes(MotionArtworkVideo.liveBytes),
+                        'players': '${MotionArtworkVideo.liveCount}',
+                        'links': '${MotionArtworkService.cachedLinks}',
+                      }),
+                      onTap: _releaseVideo,
+                    ),
                 ]),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
                 // ── Storage limit + offline mode ────────────────────────────
-                SettingsSection(label: L.cacheLimit, children: [
+                SettingsSection(label: tx('cache_storage_section'), children: [
                   SettingChoiceRow(
                     icon: Icons.storage_rounded,
                     title: L.cacheLimit,
@@ -159,7 +196,7 @@ class _CachePageState extends State<CachePage> {
                   _OfflineModeCard(scheme: scheme, text: text),
                 ]),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
                 // ── Clear categories ───────────────────────────────────────
                 SettingsSection(label: L.cacheClearSection, children: [
@@ -199,6 +236,11 @@ class _CachePageState extends State<CachePage> {
                 const SizedBox(height: 32),
               ],
             ),
+              ),
+            ]),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -229,73 +271,54 @@ class _UsageCard extends StatelessWidget {
         : StorageManager.formatBytes(max);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color:        scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(20),
-        border:       Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45)),
+        color:        scheme.primaryContainer,
+        borderRadius: BorderRadius.circular(28),
       ),
-      child: Column(children: [
-        // Total usage row
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Icon(Icons.storage_rounded, color: scheme.primary, size: 22),
-          const SizedBox(width: 10),
-          Expanded(child: Text(
-            L.cacheTotalUsed,
-            style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-          )),
-          Text(
-            '$totalStr / $maxStr',
-            style: text.bodyMedium?.copyWith(
-              color:      scheme.primary,
-              fontWeight: FontWeight.w700,
-            ),
+          M3CookieBadge(
+            size: 52,
+            color: scheme.primary,
+            child: Icon(Icons.storage_rounded, color: scheme.onPrimary, size: 26),
           ),
+          const SizedBox(width: 14),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(L.cacheTotalUsed,
+                style: text.labelLarge?.copyWith(
+                    color: scheme.onPrimaryContainer.withValues(alpha: 0.8))),
+            Text('$totalStr / $maxStr',
+                style: text.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800, color: scheme.onPrimaryContainer)),
+          ])),
         ]),
-
-        const SizedBox(height: 12),
-
-        // Progress bar
         if (!unlimited) ...[
+          const SizedBox(height: 16),
           ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value:            fraction,
-              minHeight:        8,
-              color:            fraction > 0.9 ? scheme.error : scheme.primary,
-              backgroundColor:  scheme.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(100),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: fraction),
+              duration: const Duration(milliseconds: 500),
+              curve: M3Motion.emphasizedDecelerate,
+              builder: (_, v, _) => LinearProgressIndicator(
+                value:           v,
+                minHeight:       10,
+                color:           fraction > 0.9 ? scheme.error : scheme.primary,
+                backgroundColor: scheme.onPrimaryContainer.withValues(alpha: 0.15),
+              ),
             ),
           ),
-          const SizedBox(height: 16),
         ],
-
-        // Per-category breakdown
-        _Bar(
-          label:   L.cacheImages,
-          bytes:   stats.imageBytes,
-          total:   total,
-          color:   scheme.primary,
-          scheme:  scheme,
-          text:    text,
-        ),
-        const SizedBox(height: 6),
-        _Bar(
-          label:  L.cacheApiData,
-          bytes:  stats.apiBytes,
-          total:  total,
-          color:  scheme.secondary,
-          scheme: scheme,
-          text:   text,
-        ),
-        const SizedBox(height: 6),
-        _Bar(
-          label:  L.cacheScrobblesShort,
-          bytes:  stats.scrobbleBytes,
-          total:  total,
-          color:  scheme.tertiary,
-          scheme: scheme,
-          text:   text,
-        ),
+        const SizedBox(height: 18),
+        _Bar(label: L.cacheImages, bytes: stats.imageBytes, total: total,
+            color: scheme.primary, scheme: scheme, text: text),
+        const SizedBox(height: 8),
+        _Bar(label: L.cacheApiData, bytes: stats.apiBytes, total: total,
+            color: scheme.secondary, scheme: scheme, text: text),
+        const SizedBox(height: 8),
+        _Bar(label: L.cacheScrobblesShort, bytes: stats.scrobbleBytes, total: total,
+            color: scheme.tertiary, scheme: scheme, text: text),
       ]),
     );
   }
@@ -325,7 +348,7 @@ class _Bar extends StatelessWidget {
     return Row(children: [
       Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
       const SizedBox(width: 8),
-      Expanded(child: Text(label, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant))),
+      Expanded(child: Text(label, style: text.bodySmall?.copyWith(color: scheme.onPrimaryContainer))),
       const SizedBox(width: 8),
       SizedBox(
         width: 100,
@@ -335,7 +358,7 @@ class _Bar extends StatelessWidget {
             value:           frac,
             minHeight:       4,
             color:           color,
-            backgroundColor: scheme.surfaceContainerLowest,
+            backgroundColor: scheme.onPrimaryContainer.withValues(alpha: 0.15),
           ),
         ),
       ),
@@ -344,7 +367,7 @@ class _Bar extends StatelessWidget {
         width: 60,
         child: Text(
           StorageManager.formatBytes(bytes),
-          style:     text.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+          style:     text.bodySmall?.copyWith(fontWeight: FontWeight.w700, color: scheme.onPrimaryContainer),
           textAlign: TextAlign.end,
         ),
       ),

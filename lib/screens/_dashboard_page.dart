@@ -3089,17 +3089,22 @@ class _NowPlayingSpinningArtState extends State<_NowPlayingSpinningArt>
     final idx = m3ShapeIndex(widget.seed);
     return ValueListenableBuilder<String>(
       valueListenable: imageShapeNotifier,
-      builder: (_, mode, _) => AnimatedBuilder(
-        animation: _c,
-        builder: (_, child) => ClipPath(
-          clipper: _RotatingShapeClipper(
-            shape: m3ResolveShape(mode, idx, widget.size),
-            turns: _c.value,
+      builder: (_, mode, _) {
+        // A circle looks identical at every angle, so the rotation would be
+        // invisible: never use it here, fall back to the cookie instead.
+        var shape = m3ResolveShape(mode, idx, widget.size);
+        if (shape is CircleBorder) {
+          shape = m3ImageShape(idx % kM3ImageShapeCount == 1 ? 0 : idx, widget.size);
+        }
+        return AnimatedBuilder(
+          animation: _c,
+          builder: (_, child) => ClipPath(
+            clipper: _RotatingShapeClipper(shape: shape, turns: _c.value),
+            child: child,
           ),
-          child: child,
-        ),
-        child: SizedBox(width: widget.size, height: widget.size, child: widget.child),
-      ),
+          child: SizedBox(width: widget.size, height: widget.size, child: widget.child),
+        );
+      },
     );
   }
 }

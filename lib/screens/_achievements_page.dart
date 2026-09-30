@@ -117,7 +117,7 @@ class _AchievementsSheet extends StatelessWidget {
                             children: [
                               Row(children: [
                                 Flexible(
-                                  child: Text(_ct('Niveau $level', 'Level $level'),
+                                  child: Text(tx('lvl', {'n': '$level'}),
                                       style: text.headlineSmall?.copyWith(
                                           fontWeight: FontWeight.w800,
                                           color: scheme.onPrimaryContainer)),
@@ -604,7 +604,7 @@ class _LevelHistoryPage extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 640),
           child: Column(children: [
-          M3PageHeader(title: _ct('Historique des niveaux', 'Level history')),
+          M3PageHeader(title: tx('lvl_history')),
           Expanded(child: history.isEmpty
           ? Center(
               child: Padding(

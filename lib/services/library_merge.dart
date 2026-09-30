@@ -20,6 +20,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import '../app_state.dart';
 import 'data_cache.dart';
+import 'friends_library_service.dart';
 import 'lastfm_service.dart';
 
 class LibraryMerge {
@@ -165,6 +166,20 @@ class LibraryMerge {
     }
   }
 
+  // ── Comparison keys (taste compare): legacy lower-case keys when both
+  // options are off, normalised keys when active, so "my" side (local
+  // scrobbles) and "their" side (API lists) always use the same form.
+  static Set<String> get _allKnown =>
+      _known.values.fold<Set<String>>(<String>{}, (a, b) => a..addAll(b));
+
+  static String ckArtist(String name) => !active
+      ? name.toLowerCase()
+      : artistKey(primaryArtist(name, _allKnown));
+
+  static String ckTitle(String title, {bool album = false}) => !mergeOn
+      ? title.toLowerCase()
+      : alnum(album ? cleanAlbum(title) : cleanTrack(title));
+
   // ── Known artists (per Last.fm user) ───────────────────────────────────
   static final Map<String, Set<String>> _known = {};
   static Set<String> knownSync(String user) =>
@@ -208,9 +223,14 @@ class LibraryMerge {
         'albums'  => s.rawTopAlbums( period: period, limit: 200, page: p, user: user),
         _         => s.rawTopTracks( period: period, limit: 200, page: p, user: user),
       };
-      final first = await raw(1);
-      final all = [...first];
-      if (first.length >= 200) all.addAll(await raw(2));
+      // Up to 3 raw pages (600 entries) so big requests such as the taste
+      // profile's top 500 are still served after merging.
+      final all = <dynamic>[];
+      for (var p = 1; p <= 3; p++) {
+        final chunk = await raw(p);
+        all.addAll(chunk);
+        if (chunk.length < 200) break;
+      }
       hit = (at: DateTime.now(), list: process(type, all, known));
       _cache[key] = hit;
     }
@@ -295,6 +315,8 @@ class LibraryMerge {
 
   static Future<void> _changed() async {
     _cache.clear();
+    // Cached friend libraries were built with the previous setting.
+    await FriendsLibraryService.clearAll();
     for (final p in const ['7day', '1month', '3month', '6month', '12month', 'overall']) {
       await DataCache.invalidate(DataCache.keyTopArtists(p));
       await DataCache.invalidate(DataCache.keyTopAlbums(p));

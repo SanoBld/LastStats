@@ -74,7 +74,18 @@ class _HistoryPageState extends State<_HistoryPage>
     if (picked != null && mounted) { setState(() => _selectedDate = picked); _load(); }
   }
 
-  int get _uniqueArtists => _tracks.map((t) => (t as Map)['artist']?['#text'] ?? '').toSet().length;
+  int get _uniqueArtists {
+    final known = LibraryMerge.knownSync(widget.service.username);
+    final set = <String>{};
+    for (final t in _tracks) {
+      final name = ((t as Map)['artist']?['#text'] ?? '').toString();
+      if (name.isEmpty) continue;
+      final parts = LibraryMerge.splitOn
+          ? LibraryMerge.artistParts(name, known, ambiguous: true) : [name];
+      for (final p in parts) { set.add(LibraryMerge.active ? LibraryMerge.artistKey(p) : p); }
+    }
+    return set.length;
+  }
   int get _uniqueAlbums  => _tracks.map((t) => (t as Map)['album']?['#text']  ?? '')
       .where((a) => (a as String).isNotEmpty).toSet().length;
 

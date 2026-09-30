@@ -140,16 +140,16 @@ _TasteAnalysis _analyzeTaste({
   required Map<String, double> theirGenreW,
   required String dataLabel,
 }) {
-  String artistKey(dynamic a) => (a['name'] ?? '').toString().toLowerCase();
+  String artistKey(dynamic a) => LibraryMerge.ckArtist((a['name'] ?? '').toString());
 
   String trackKey(dynamic t) {
-    final ar = (t['artist']?['name'] ?? t['artist'] ?? '').toString().toLowerCase();
-    return '$ar::${(t['name'] ?? '').toString().toLowerCase()}';
+    final ar = LibraryMerge.ckArtist((t['artist']?['name'] ?? '').toString());
+    return '$ar::${LibraryMerge.ckTitle((t['name'] ?? '').toString())}';
   }
 
   String albumKey(dynamic a) {
-    final ar = (a['artist']?['name'] ?? a['artist'] ?? '').toString().toLowerCase();
-    return '$ar::${(a['name'] ?? '').toString().toLowerCase()}';
+    final ar = LibraryMerge.ckArtist((a['artist']?['name'] ?? '').toString());
+    return '$ar::${LibraryMerge.ckTitle((a['name'] ?? '').toString(), album: true)}';
   }
 
   final theirArtistW = _rankWeights(theirArtists, artistKey);
@@ -385,14 +385,20 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
           final records = AllScrobblesService.getRecordsForYear(year) ?? [];
           for (final r in records) {
             if (r.artist.isEmpty) continue;
-            final ak = r.artist.toLowerCase();
-            artistCounts[ak] = (artistCounts[ak] ?? 0) + 1;
+            final ak = LibraryMerge.ckArtist(r.artist);
+            final credited = LibraryMerge.splitOn
+                ? LibraryMerge.artistParts(r.artist, LibraryMerge.knownSync(_myUsername), ambiguous: true)
+                : [r.artist];
+            for (final part in credited) {
+              final pk = LibraryMerge.ckArtist(part);
+              artistCounts[pk] = (artistCounts[pk] ?? 0) + 1;
+            }
             if (r.track.isNotEmpty) {
-              final tk = '$ak::${r.track.toLowerCase()}';
+              final tk = '$ak::${LibraryMerge.ckTitle(r.track)}';
               trackCounts[tk] = (trackCounts[tk] ?? 0) + 1;
             }
             if (r.album.isNotEmpty) {
-              final abk = '$ak::${r.album.toLowerCase()}';
+              final abk = '$ak::${LibraryMerge.ckTitle(r.album, album: true)}';
               albumCounts[abk] = (albumCounts[abk] ?? 0) + 1;
             }
           }
@@ -451,26 +457,26 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
         final myArtistsFb = res[i++] as List<dynamic>;
         final myTracksFb  = res[i++] as List<dynamic>;
         final myAlbumsFb  = res[i++] as List<dynamic>;
-        myArtistW = _rankWeights(myArtistsFb, (a) => (a['name'] ?? '').toString().toLowerCase());
+        myArtistW = _rankWeights(myArtistsFb, (a) => LibraryMerge.ckArtist((a['name'] ?? '').toString()));
         myTrackW  = _rankWeights(myTracksFb, (t) {
-          final ar = (t['artist']?['name'] ?? '').toString().toLowerCase();
-          return '$ar::${(t['name'] ?? '').toString().toLowerCase()}';
+          final ar = LibraryMerge.ckArtist((t['artist']?['name'] ?? '').toString());
+          return '$ar::${LibraryMerge.ckTitle((t['name'] ?? '').toString())}';
         });
         myAlbumW  = _rankWeights(myAlbumsFb, (a) {
-          final ar = (a['artist']?['name'] ?? '').toString().toLowerCase();
-          return '$ar::${(a['name'] ?? '').toString().toLowerCase()}';
+          final ar = LibraryMerge.ckArtist((a['artist']?['name'] ?? '').toString());
+          return '$ar::${LibraryMerge.ckTitle((a['name'] ?? '').toString(), album: true)}';
         });
         // Real playcounts from the API fallback, for display in detail view.
         for (final a in myArtistsFb) {
-          artistCounts[(a['name'] ?? '').toString().toLowerCase()] = _playcount(a);
+          artistCounts[LibraryMerge.ckArtist((a['name'] ?? '').toString())] = _playcount(a);
         }
         for (final t in myTracksFb) {
-          final ar = (t['artist']?['name'] ?? '').toString().toLowerCase();
-          trackCounts['$ar::${(t['name'] ?? '').toString().toLowerCase()}'] = _playcount(t);
+          final ar = LibraryMerge.ckArtist((t['artist']?['name'] ?? '').toString());
+          trackCounts['$ar::${LibraryMerge.ckTitle((t['name'] ?? '').toString())}'] = _playcount(t);
         }
         for (final a in myAlbumsFb) {
-          final ar = (a['artist']?['name'] ?? '').toString().toLowerCase();
-          albumCounts['$ar::${(a['name'] ?? '').toString().toLowerCase()}'] = _playcount(a);
+          final ar = LibraryMerge.ckArtist((a['artist']?['name'] ?? '').toString());
+          albumCounts['$ar::${LibraryMerge.ckTitle((a['name'] ?? '').toString(), album: true)}'] = _playcount(a);
         }
       }
 
@@ -488,7 +494,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
               .toList();
           final theirTopNames = theirArtists
               .take(12)
-              .map((a) => (a['name'] ?? '').toString().toLowerCase())
+              .map((a) => LibraryMerge.ckArtist((a['name'] ?? '').toString()))
               .where((n) => n.isNotEmpty)
               .toList();
           final theirTopW = {

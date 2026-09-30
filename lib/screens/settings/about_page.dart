@@ -1,5 +1,6 @@
 // lib/screens/settings/about_page.dart
 
+import '../../l10n/extra_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_svg/flutter_svg.dart';
@@ -105,11 +106,9 @@ class AboutPage extends StatelessWidget {
           const Divider(height: 1, indent: 16, endIndent: 16),
           ListTile(
             leading: const Icon(Icons.menu_book_rounded),
-            title: Text(_tr({'fr': 'README et activité du projet', 'en': 'README and project activity'}),
+            title: Text(tx('about_readme_t'),
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-            subtitle: Text(_tr({
-                'fr': 'Lire le README, derniers commits, workflows, version, téléchargements',
-                'en': 'Read the README, latest commits, workflows, version, downloads'}),
+            subtitle: Text(tx('about_readme_s'),
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: () => Navigator.of(context).push(
@@ -570,8 +569,8 @@ class _FoldSectionState extends State<_FoldSection> {
             leading: Icon(Icons.unfold_more_rounded, color: scheme.primary),
             title: Text(
               _open
-                  ? _tr({'fr': 'Réduire', 'en': 'Collapse'})
-                  : _tr({'fr': 'Afficher ($n)', 'en': 'Show ($n)'}),
+                  ? tx('fold_hide')
+                  : tx('fold_show', {'n': '$n'}),
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
             trailing: AnimatedRotation(

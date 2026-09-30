@@ -5,6 +5,7 @@
 // music platform, updates, favorite profiles. Every switch here writes the
 // same keys / notifiers as the matching Settings page, so nothing diverges.
 
+import '../l10n/extra_strings.dart';
 import 'dart:async';
 import '../theme/m3_motion.dart';
 import 'package:flutter/material.dart';
@@ -624,11 +625,11 @@ class _DashboardStepState extends State<_DashboardStep> {
     'ls_show_discover': true, 'ls_show_friends': true,
   };
   static const _labels = {
-    'ls_show_nowplay':  (Icons.play_circle_outline_rounded, 'En cours d\'écoute', 'Now playing'),
-    'ls_show_stats':    (Icons.bar_chart_rounded, 'Statistiques', 'Stats'),
-    'ls_show_recent':   (Icons.history_rounded, 'Écoutes récentes', 'Recent plays'),
-    'ls_show_discover': (Icons.explore_rounded, 'Découverte', 'Discover'),
-    'ls_show_friends':  (Icons.people_rounded, 'Amis', 'Friends'),
+    'ls_show_nowplay':  (Icons.play_circle_outline_rounded, 'dash_nowplay'),
+    'ls_show_stats':    (Icons.bar_chart_rounded, 'dash_stats'),
+    'ls_show_recent':   (Icons.history_rounded, 'dash_recent'),
+    'ls_show_discover': (Icons.explore_rounded, 'dash_discover'),
+    'ls_show_friends':  (Icons.people_rounded, 'dash_friends'),
   };
   String _chart = 'calendar';
 
@@ -659,7 +660,6 @@ class _DashboardStepState extends State<_DashboardStep> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final isEn   = localeNotifier.value == 'en';
     return _Step(
       icon: Icons.dashboard_customize_rounded,
       title: L.onboardDashTitle, subtitle: L.onboardDashSub,
@@ -668,21 +668,21 @@ class _DashboardStepState extends State<_DashboardStep> {
           final l = _labels[k]!;
           return _OnbSwitch(
             secondary: Icon(l.$1, color: scheme.primary),
-            title: Text(isEn ? l.$3 : l.$2, style: const TextStyle(fontWeight: FontWeight.w700)),
+            title: Text(tx(l.$2), style: const TextStyle(fontWeight: FontWeight.w700)),
             value: _v[k]!,
             onChanged: (v) => _toggle(k, v),
           );
         }),
         const SizedBox(height: 20),
-        Text(_ct('Graphique du tableau de bord', 'Dashboard chart'),
+        Text(tx('dash_chart'),
             style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
         const SizedBox(height: 10),
         M3SegmentedButton<String>(
           segments: [
             ButtonSegment(value: 'calendar', icon: const Icon(Icons.calendar_month_rounded),
-                label: Text(_ct('Calendrier', 'Calendar'))),
+                label: Text(tx('dash_calendar'))),
             ButtonSegment(value: 'monthly', icon: const Icon(Icons.bar_chart_rounded),
-                label: Text(_ct('Mensuel', 'Monthly'))),
+                label: Text(tx('dash_monthly'))),
           ],
           selected: {_chart},
           onSelectionChanged: (s) => _setChart(s.first),
@@ -701,20 +701,16 @@ class _LibraryStep extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return _Step(
       icon: Icons.merge_type_rounded,
-      title: _ct('Ta bibliothèque', 'Your library'),
-      subtitle: _ct(
-          'Choisis comment regrouper tes écoutes. Tu peux changer ça à tout moment dans les réglages.',
-          'Choose how your listens are grouped. You can change this any time in settings.'),
+      title: tx('lib_step_t'),
+      subtitle: tx('lib_step_s'),
       child: Column(children: [
         ValueListenableBuilder<bool>(
           valueListenable: mergeVersionsNotifier,
           builder: (_, on, _) => _OnbSwitch(
             secondary: Icon(Icons.merge_type_rounded, color: scheme.primary),
-            title: Text(_ct('Lier les versions d\'un même titre', 'Link versions of the same track'),
+            title: Text(tx('lib_merge_t'),
                 style: const TextStyle(fontWeight: FontWeight.w700)),
-            subtitle: Text(_ct(
-                'Remaster, single, (feat. …), édition deluxe : comptés comme un seul titre ou album, écoutes additionnées. Les remix, lives et instrumentaux restent séparés.',
-                'Remasters, singles, (feat. …), deluxe editions: counted as one track or album, plays added together. Remixes, live and instrumental versions stay separate.'),
+            subtitle: Text(tx('lib_merge_s'),
                 style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
             value: on,
             onChanged: (v) => LibraryMerge.setMerge(v),
@@ -724,11 +720,9 @@ class _LibraryStep extends StatelessWidget {
           valueListenable: splitCollabsNotifier,
           builder: (_, on, _) => _OnbSwitch(
             secondary: Icon(Icons.call_split_rounded, color: scheme.primary),
-            title: Text(_ct('Séparer les collaborations', 'Split collaborations'),
+            title: Text(tx('lib_split_t'),
                 style: const TextStyle(fontWeight: FontWeight.w700)),
-            subtitle: Text(_ct(
-                '« Gims & Damso » compte pour Gims et pour Damso au lieu d\'être un artiste à part. Les groupes comme « Simon & Garfunkel » restent entiers.',
-                '"Gims & Damso" counts for Gims and for Damso instead of being a separate artist. Bands like "Simon & Garfunkel" stay whole.'),
+            subtitle: Text(tx('lib_split_s'),
                 style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
             value: on,
             onChanged: (v) => LibraryMerge.setSplit(v),

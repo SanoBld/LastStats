@@ -1,5 +1,6 @@
 // lib/screens/settings/appearance_page.dart
 
+import '../../l10n/extra_strings.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/m3_components.dart';
 import '../../theme/m3_motion.dart';
@@ -1109,8 +1110,8 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
       children: [
         SwitchListTile(
           secondary: Icon(Icons.blur_on_rounded, color: scheme.primary),
-          title: Text('Pochettes animées'),
-          subtitle: Text('Zoom doux et effet de profondeur sur les images'),
+          title: Text(tx('set_living_t')),
+          subtitle: Text(tx('set_living_s')),
           value: _enabled,
           onChanged: (v) async {
             final p = await SharedPreferences.getInstance();
@@ -1121,9 +1122,8 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
         ),
         SwitchListTile(
           secondary: Icon(Icons.movie_filter_rounded, color: scheme.primary),
-          title: Text(_ct('Pochettes vidéo (Apple Music)', 'Video covers (Apple Music)')),
-          subtitle: Text(_ct('Joue la pochette animée quand elle existe',
-              'Plays the animated cover when one exists')),
+          title: Text(tx('set_motion_t')),
+          subtitle: Text(tx('set_motion_s')),
           value: _motionOn,
           onChanged: (v) async {
             final p = await SharedPreferences.getInstance();
@@ -1134,9 +1134,8 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
         ),
         SwitchListTile(
           secondary: Icon(Icons.emoji_events_outlined, color: scheme.primary),
-          title: Text(_ct('Succès et niveaux', 'Achievements and levels')),
-          subtitle: Text(_ct('Paliers, badges et niveau de compte',
-              'Tiers, badges, and account level')),
+          title: Text(tx('set_achv_t')),
+          subtitle: Text(tx('set_achv_s')),
           value: _achievementsOn,
           onChanged: (v) async {
             final p = await SharedPreferences.getInstance();
@@ -1150,16 +1149,14 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
     const SizedBox(height: 20),
     // Library clean-up: same two switches as the welcome flow.
     SettingsSection(
-      label: _ct('Bibliothèque', 'Library'),
+      label: tx('lib_section'),
       children: [
         ValueListenableBuilder<bool>(
           valueListenable: mergeVersionsNotifier,
           builder: (_, on, _) => SwitchListTile(
             secondary: Icon(Icons.merge_type_rounded, color: scheme.primary),
-            title: Text(_ct('Lier les versions d\'un même titre', 'Link versions of the same track')),
-            subtitle: Text(_ct(
-                'Remaster, single, (feat. …), édition deluxe… comptés comme un seul titre / album, écoutes additionnées. Les remix, lives et instrumentaux restent séparés.',
-                'Remasters, singles, (feat. …), deluxe editions… count as one track / album with plays added together. Remixes, live and instrumental versions stay separate.')),
+            title: Text(tx('lib_merge_t')),
+            subtitle: Text(tx('lib_merge_s')),
             value: on,
             onChanged: (v) => LibraryMerge.setMerge(v),
           ),
@@ -1168,10 +1165,8 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
           valueListenable: splitCollabsNotifier,
           builder: (_, on, _) => SwitchListTile(
             secondary: Icon(Icons.call_split_rounded, color: scheme.primary),
-            title: Text(_ct('Séparer les collaborations', 'Split collaborations')),
-            subtitle: Text(_ct(
-                '« Gims & Damso » compte pour Gims et pour Damso au lieu d\'être un artiste à part. Les groupes comme « Simon & Garfunkel » restent entiers.',
-                '"Gims & Damso" counts for Gims and for Damso instead of being a separate artist. Bands like "Simon & Garfunkel" stay whole.')),
+            title: Text(tx('lib_split_t')),
+            subtitle: Text(tx('lib_split_s')),
             value: on,
             onChanged: (v) => LibraryMerge.setSplit(v),
           ),

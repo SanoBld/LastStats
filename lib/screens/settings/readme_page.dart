@@ -1,6 +1,7 @@
 // README viewer + live project activity (latest release, downloads, commits,
 // workflow runs). Opened from Settings > About. The README is fetched from
 // GitHub (always current) and falls back to the copy bundled in the app.
+import '../../l10n/extra_strings.dart';
 import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +16,6 @@ const _owner = 'SanoBld';
 const _repo  = 'LastStats';
 const _api   = 'https://api.github.com/repos/$_owner/$_repo';
 
-String _t(String fr, String en) => localeNotifier.value == 'en' ? en : fr;
 
 Future<dynamic> _getJson(String url) async {
   final res = await http.get(Uri.parse(url), headers: const {
@@ -30,9 +30,9 @@ String _ago(String iso) {
   final d = DateTime.tryParse(iso)?.toLocal();
   if (d == null) return '';
   final diff = DateTime.now().difference(d);
-  if (diff.inMinutes < 60) return _t('il y a ${diff.inMinutes.clamp(1, 59)} min', '${diff.inMinutes.clamp(1, 59)} min ago');
-  if (diff.inHours < 24)   return _t('il y a ${diff.inHours} h', '${diff.inHours} h ago');
-  if (diff.inDays < 30)    return _t('il y a ${diff.inDays} j', '${diff.inDays} d ago');
+  if (diff.inMinutes < 60) return tx('ago_min', {'n': '${diff.inMinutes.clamp(1, 59)}'});
+  if (diff.inHours < 24)   return tx('ago_h', {'n': '${diff.inHours}'});
+  if (diff.inDays < 30)    return tx('ago_d', {'n': '${diff.inDays}'});
   return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 }
 
@@ -85,7 +85,7 @@ class _ReadmePageState extends State<ReadmePage> {
             child: Column(children: [
               M3PageHeader(
                 title: 'README',
-                subtitle: _t('Le projet et son activité', 'The project and its activity'),
+                subtitle: tx('readme_sub'),
               ),
               Expanded(
                 child: RefreshIndicator(
@@ -96,7 +96,7 @@ class _ReadmePageState extends State<ReadmePage> {
                       _StatsCard(repo: _repoInfo, releases: _releases),
                       const SizedBox(height: 20),
                       _Block(
-                        title: _t('README', 'README'),
+                        title: 'README',
                         icon: Icons.menu_book_rounded,
                         child: FutureBuilder<String>(
                           future: _readme,
@@ -111,7 +111,7 @@ class _ReadmePageState extends State<ReadmePage> {
                       ),
                       const SizedBox(height: 20),
                       _ListBlock(
-                        title: _t('Derniers commits', 'Latest commits'),
+                        title: tx('readme_commits'),
                         icon: Icons.commit_rounded,
                         future: _commits,
                         onRetry: () => setState(_load),
@@ -129,7 +129,7 @@ class _ReadmePageState extends State<ReadmePage> {
                       ),
                       const SizedBox(height: 20),
                       _ListBlock(
-                        title: _t('Derniers workflows', 'Latest workflows'),
+                        title: tx('readme_workflows'),
                         icon: Icons.play_circle_outline_rounded,
                         future: _runs,
                         onRetry: () => setState(_load),
@@ -157,7 +157,7 @@ class _ReadmePageState extends State<ReadmePage> {
                       FilledButton.tonalIcon(
                         onPressed: () => _open('https://github.com/$_owner/$_repo'),
                         icon: const Icon(Icons.open_in_new_rounded),
-                        label: Text(_t('Ouvrir sur GitHub', 'Open on GitHub')),
+                        label: Text(tx('readme_github')),
                       ),
                     ],
                   ),
@@ -221,12 +221,12 @@ class _StatsCard extends StatelessWidget {
               );
           if (info == null && latest == null) return _Failed(onRetry: null);
           return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            stat(Icons.new_releases_rounded, _t('Version', 'Version'),
+            stat(Icons.new_releases_rounded, tx('readme_version'),
                 (latest?['tag_name'] ?? '—').toString()),
-            stat(Icons.download_rounded, _t('Téléchargements', 'Downloads'), '$downloads'),
-            stat(Icons.star_rounded, _t('Étoiles', 'Stars'),
+            stat(Icons.download_rounded, tx('readme_downloads'), '$downloads'),
+            stat(Icons.star_rounded, tx('readme_stars'),
                 '${info?['stargazers_count'] ?? '—'}'),
-            stat(Icons.balance_rounded, _t('Licence', 'License'),
+            stat(Icons.balance_rounded, tx('readme_license'),
                 (info?['license']?['spdx_id'] ?? '—').toString()),
           ]);
         },
@@ -378,11 +378,10 @@ class _Failed extends StatelessWidget {
     return Row(children: [
       Icon(Icons.cloud_off_rounded, color: scheme.onSurfaceVariant),
       const SizedBox(width: 12),
-      Expanded(child: Text(_t('Impossible de charger (hors ligne ou limite GitHub atteinte).',
-          'Could not load (offline or GitHub rate limit reached).'),
+      Expanded(child: Text(tx('readme_failed'),
           style: TextStyle(color: scheme.onSurfaceVariant))),
       if (onRetry != null)
-        TextButton(onPressed: onRetry, child: Text(_t('Réessayer', 'Retry'))),
+        TextButton(onPressed: onRetry, child: Text(tx('readme_retry'))),
     ]);
   }
 }

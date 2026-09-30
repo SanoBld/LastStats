@@ -336,6 +336,7 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
     }
     final items = _dedupe(await _fetch(s).timeout(const Duration(seconds: 5)));
     if (items.isNotEmpty) {
+      if (_cache.length >= 60) _cache.remove(_cache.keys.first);
       _cache[key] = (DateTime.now(), items);
       _emptySources.remove(s);
     } else {
@@ -406,6 +407,7 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
       items = [];
     }
     if (items.isNotEmpty) {
+      if (_cache.length >= 60) _cache.remove(_cache.keys.first);
       _cache[key] = (DateTime.now(), items);
       _emptySources.remove(source);
     } else {

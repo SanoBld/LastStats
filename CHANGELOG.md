@@ -60,6 +60,11 @@
 - About: new README page (opened from About) showing the project README, latest release version, total downloads, stars, license, latest commits and latest workflow runs, loaded from GitHub with an offline fallback to the bundled README
 - About: long lists (favourites, sources, keyboard shortcuts, powered by) are folded behind a single row
 - Charts tab restyled to match the other tabs: flat tonal cards with large rounded corners, tonal stat chips and streak tiles, primary-container loading banner, tonal export button
+- Library options now apply everywhere: top lists, rankings, charts, recap, history counters, taste comparison (both sides use the same keys) and friends' libraries; friends' cached libraries are rebuilt when the options change
+- Dashboard: the now-playing cover no longer uses a circle shape, since a rotating circle shows no animation
+- Cache settings redesigned in Material You, with a new Apple Music animated covers entry showing video memory in use, active players and cached links, plus a one-tap release
+- Animated covers pause while the app is in the background and release their player immediately if closed while loading; in-memory caches are now bounded
+- Translations: all new features are available in all 10 app languages
 
 **Settings: redesigned in Material 3 Expressive**
 - Every settings page now shares one design: cookie-shaped icon badges, grouped tiles (big outer corners, small inner corners), spring press animation, a check icon inside switches, clearer section titles and an 8dp spacing scale

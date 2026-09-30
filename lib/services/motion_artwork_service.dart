@@ -15,7 +15,17 @@ import 'package:http/http.dart' as http;
 class MotionArtworkService {
   // In-memory cache: key -> video URL (or null = checked, nothing found).
   static final Map<String, String?> _cache = {};
+  static const _maxEntries = 300;
   static const _timeout = Duration(seconds: 8);
+
+  static int get cachedLinks => _cache.values.where((v) => v != null).length;
+  static int get cachedLookups => _cache.length;
+
+  /// Forgets every looked-up video link (and the Apple token), freeing memory.
+  static void clearMemory() {
+    _cache.clear();
+    _token = null;
+  }
   static const _ua =
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
       '(KHTML, like Gecko) Chrome/124.0 Safari/537.36';
@@ -32,6 +42,8 @@ class MotionArtworkService {
   }) async {
     final key = '${_norm(artist)}|${_norm(album)}|${_norm(track)}';
     if (_cache.containsKey(key)) return _cache[key];
+    // Bounded: the oldest lookups are dropped so the map never grows forever.
+    if (_cache.length >= _maxEntries) _cache.remove(_cache.keys.first);
     try {
       // Every release that could carry the video: the song's own catalog
       // entries (single, album, deluxe, compilation...), the album, and

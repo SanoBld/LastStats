@@ -8,29 +8,59 @@ class MotionArtworkVideo extends StatefulWidget {
   final String url;
   const MotionArtworkVideo({super.key, required this.url});
 
+  // Live players, so Settings > Cache can show the video memory in use.
+  static final Set<VideoPlayerController> _live = {};
+  static int get liveCount => _live.length;
+
+  /// Rough decoded-frame memory: width x height x 4 bytes x ~4 buffered frames.
+  static int get liveBytes {
+    var total = 0;
+    for (final c in _live) {
+      final s = c.value.size;
+      total += (s.width * s.height * 4 * 4).round();
+    }
+    return total;
+  }
+
+  /// Stops and releases every running player (the widgets fall back to the
+  /// static cover until they are rebuilt).
+  static Future<void> releaseAll() async {
+    for (final c in _live.toList()) {
+      try { await c.pause(); } catch (_) {}
+    }
+  }
+
   @override
   State<MotionArtworkVideo> createState() => _MotionArtworkVideoState();
 }
 
-class _MotionArtworkVideoState extends State<MotionArtworkVideo> {
+class _MotionArtworkVideoState extends State<MotionArtworkVideo>
+    with WidgetsBindingObserver {
   VideoPlayerController? _c;
   bool _ready = false;
+  bool _disposed = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _init();
   }
 
   Future<void> _init() async {
+    VideoPlayerController? c;
     try {
       // mixWithOthers: never interrupt the user's music or the 30s preview.
-      final c = VideoPlayerController.networkUrl(
+      c = VideoPlayerController.networkUrl(
         Uri.parse(widget.url),
         videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
       );
       _c = c;
       await c.initialize();
+      // The widget may have been removed while the stream was loading:
+      // release the player right away instead of leaking it.
+      if (_disposed) { await c.dispose(); return; }
+      MotionArtworkVideo._live.add(c);
       await c.setLooping(true);
       await c.setVolume(0);
       await c.play();
@@ -41,9 +71,28 @@ class _MotionArtworkVideoState extends State<MotionArtworkVideo> {
     }
   }
 
+  // No decoding in the background: saves battery, CPU and video memory.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final c = _c;
+    if (c == null || !_ready || _disposed) return;
+    if (state == AppLifecycleState.resumed) {
+      c.play();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden) {
+      c.pause();
+    }
+  }
+
   @override
   void dispose() {
-    _c?.dispose();
+    _disposed = true;
+    WidgetsBinding.instance.removeObserver(this);
+    final c = _c;
+    if (c != null) {
+      MotionArtworkVideo._live.remove(c);
+      c.dispose();
+    }
     super.dispose();
   }
 

@@ -18,6 +18,7 @@ import 'package:path_provider/path_provider.dart';
 import '../services/app_share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/lastfm_service.dart';
+import '../services/library_merge.dart';
 import '../services/image_service.dart';
 import '../l10n/l10n.dart';
 import '../theme/story_style.dart';
@@ -264,9 +265,17 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
         final trackName = (t['name'] ?? '').toString();
         if (artistName.isEmpty) continue;
 
-        artistCount[artistName] = (artistCount[artistName] ?? 0) + 1;
+        final known = LibraryMerge.knownSync(widget.service.username);
+        final credited = LibraryMerge.splitOn
+            ? LibraryMerge.artistParts(artistName, known, ambiguous: true)
+            : [artistName];
+        for (final part in credited) {
+          artistCount[part] = (artistCount[part] ?? 0) + 1;
+        }
 
-        final key = '$artistName — $trackName';
+        final key = LibraryMerge.mergeOn
+            ? LibraryMerge.trackKey(trackName, artistName, known)
+            : '$artistName — $trackName';
         trackCount[key] = (trackCount[key] ?? 0) + 1;
         trackItem[key] = t;
 
