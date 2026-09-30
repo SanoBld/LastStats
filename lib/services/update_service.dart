@@ -144,6 +144,8 @@ class UpdateService {
         if (exe != null) return (exe, DownloadKind.installer);
         return (find('laststats-windows.zip'), DownloadKind.zip);
 
+      // macOS: the zip built for this chip, else the universal zip (older
+      // releases only have the universal one).
       case Abi.macosArm64:
         return (find('laststats-macos-arm64.zip') ?? find('laststats-macos.zip'), DownloadKind.zip);
       case Abi.macosX64:
@@ -154,6 +156,12 @@ class UpdateService {
       case Abi.linuxX64:
       case Abi.linuxIA32:
         return (find('laststats-linux.zip'), DownloadKind.zip);
+
+      // iOS: the unsigned .ipa (must be sideloaded).
+      case Abi.iosArm64:
+      case Abi.iosArm:
+      case Abi.iosX64:
+        return (find('LastStats-ios.ipa'), DownloadKind.zip);
 
       default:
         return (universal, universal != null ? DownloadKind.apk : DownloadKind.none);

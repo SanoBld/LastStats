@@ -114,24 +114,24 @@ https://github.com/SanoBld/LastStats-App/actions
 
 Builds coming straight from Actions contain the latest code and may include bugs that have not been fixed yet. If you want a stable experience, use the releases page instead.
 
-Supported platforms: **Android, Windows, macOS, and Linux.**
+Supported platforms: **Android, Windows, macOS, Linux, and iOS (unsigned, sideload only).**
 
 ---
 
 ## 💻 Installation
 
 ### Android
-1. Download the `.apk` file from the [releases page](https://github.com/SanoBld/LastStats-App/releases).
+1. Download the `.apk` file for your phone from the [releases page](https://github.com/SanoBld/LastStats-App/releases): `app-arm64-v8a-release.apk` for most phones (2018+), `app-armeabi-v7a-release.apk` for older 32-bit phones, `app-x86_64-release.apk` for emulators, or `app-universal-release.apk` if unsure.
 2. Open it on your phone. If Android blocks the install, allow "Install unknown apps" for the app you used to open the file (browser or file manager), then try again.
 
 ### Windows
-1. Download the Windows `.zip` (or `.exe`, depending on the release) from the [releases page](https://github.com/SanoBld/LastStats-App/releases).
-2. Unzip it anywhere, then run `LastStats.exe`.
+1. Download the installer from the [releases page](https://github.com/SanoBld/LastStats-App/releases): `LastStats-Setup-x64.exe` for most PCs, `LastStats-Setup-arm64.exe` for Windows on ARM (Snapdragon). Prefer no install? Use `laststats-windows.zip` / `laststats-windows-arm64.zip`, unzip it anywhere, then run `LastStats.exe`.
+2. Run the installer and follow the wizard.
 3. Windows SmartScreen may warn about an unrecognized app since the build isn't code-signed — click "More info" then "Run anyway" to continue.
 4. Sharing files from the app (charts, artwork, etc.) saves them to your Downloads folder and opens Explorer with the file selected — this is expected on an unpackaged build like this one.
 
 ### macOS
-1. Download `LastStats-macos.dmg` from the [releases page](https://github.com/SanoBld/LastStats-App/releases).
+1. Download the `.dmg` for your Mac from the [releases page](https://github.com/SanoBld/LastStats-App/releases): `LastStats-macos-arm64.dmg` for Apple Silicon (M1 and later), `LastStats-macos-x64.dmg` for Intel Macs, or `LastStats-macos.dmg` (universal, works on both). `.zip` versions (`laststats-macos-arm64.zip`, `laststats-macos-x64.zip`, `laststats-macos.zip`) are also available.
 2. Open it and drag `LastStats.app` onto the `Applications` shortcut.
 3. Since the build isn't notarized, the first launch requires right-click → "Open" → "Open" again (macOS will otherwise refuse to run apps from an unidentified developer).
 
@@ -142,6 +142,10 @@ Pick the file for your CPU (`x64` for most PCs, `arm64` for ARM devices) on the 
 - **Fedora / openSUSE / RHEL:** `LastStats-linux-<arch>.rpm` — double-click it or run `sudo dnf install ./LastStats-linux-<arch>.rpm`. Uninstall with `sudo dnf remove laststats`.
 - **Any distro, no install:** `LastStats-linux-<arch>.AppImage` — `chmod +x` it, then run it.
 - **Manual:** `laststats-linux.zip` (x64) / `laststats-linux-arm64.zip`, extract and run `laststats_mobile`.
+
+### iOS
+1. Download `LastStats-ios.ipa` from the [releases page](https://github.com/SanoBld/LastStats-App/releases).
+2. The app is **not signed** (no Apple certificate is used on CI), so it can't be installed directly: sideload it with AltStore, Sideloadly or TrollStore, or re-sign it with your own Apple account.
 
 ### Building from source
 Requires the [Flutter SDK](https://docs.flutter.dev/get-started/install) (matching the version in `pubspec.yaml`).
