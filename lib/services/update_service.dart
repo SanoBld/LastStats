@@ -145,8 +145,9 @@ class UpdateService {
         return (find('laststats-windows.zip'), DownloadKind.zip);
 
       case Abi.macosArm64:
+        return (find('laststats-macos-arm64.zip') ?? find('laststats-macos.zip'), DownloadKind.zip);
       case Abi.macosX64:
-        return (find('laststats-macos.zip'), DownloadKind.zip);
+        return (find('laststats-macos-x64.zip') ?? find('laststats-macos.zip'), DownloadKind.zip);
 
       case Abi.linuxArm64:
         return (find('laststats-linux-arm64.zip') ?? find('laststats-linux.zip'), DownloadKind.zip);

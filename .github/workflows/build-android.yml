@@ -1,9 +1,9 @@
 name: Build Android
 
 # Reusable: called by build-all.yml / release.yml — also runnable manually.
-# Builds a universal APK (works on every phone) plus one smaller APK per CPU
-# architecture (arm64-v8a, armeabi-v7a, x86_64). All of them are uploaded
-# together in a single artifact.
+# One job per target: a universal APK (works on every phone, biggest file) and
+# one smaller APK per CPU architecture (arm64-v8a, armeabi-v7a, x86_64).
+# File names are what the in-app updater looks for, so don't rename them.
 on:
   workflow_call:
     inputs:
@@ -22,6 +22,26 @@ on:
 
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - abi: universal
+            flags: ''
+            src: app-release.apk
+            apk: app-universal-release.apk
+          - abi: arm64-v8a                      # most modern phones (2018+)
+            flags: '--split-per-abi --target-platform android-arm64'
+            src: app-arm64-v8a-release.apk
+            apk: app-arm64-v8a-release.apk
+          - abi: armeabi-v7a                    # older 32-bit phones
+            flags: '--split-per-abi --target-platform android-arm'
+            src: app-armeabi-v7a-release.apk
+            apk: app-armeabi-v7a-release.apk
+          - abi: x86_64                         # emulators / x86 tablets
+            flags: '--split-per-abi --target-platform android-x64'
+            src: app-x86_64-release.apk
+            apk: app-x86_64-release.apk
     runs-on: ubuntu-latest
     env:
       VERSION: ''
@@ -57,25 +77,12 @@ jobs:
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
-      # Universal APK — works on every phone, biggest file size.
-      - name: Build Android (universal APK)
+      - name: Build Android (${{ matrix.abi }})
+        shell: bash
         run: |
-          flutter build apk --release --build-name="$VERSION" --build-number=${{ github.run_number }}
-          cp build/app/outputs/flutter-apk/app-release.apk app-universal-release.apk
-
-      # Per-CPU-architecture APKs — smaller, faster to install.
-      - name: Build Android (per-architecture APKs)
-        run: flutter build apk --release --split-per-abi --build-name="$VERSION" --build-number=${{ github.run_number }}
-
-      # Put every APK in one flat folder so the upload step is simple.
-      - name: Collect APKs
-        run: |
-          mkdir -p android-apks
-          cp app-universal-release.apk android-apks/
-          cp build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk android-apks/
-          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk   android-apks/
-          cp build/app/outputs/flutter-apk/app-x86_64-release.apk      android-apks/
+          flutter build apk --release ${{ matrix.flags }} --build-name="$VERSION" --build-number=${{ github.run_number }}
+          cp build/app/outputs/flutter-apk/${{ matrix.src }} ${{ matrix.apk }}
       - uses: actions/upload-artifact@v4
         with:
-          name: laststats-android-apk
-          path: android-apks/*
+          name: ${{ matrix.apk }}
+          path: ${{ matrix.apk }}

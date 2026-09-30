@@ -229,8 +229,12 @@ jobs:
             | `LastStats-linux-arm64.AppImage` | Linux ARM64, any distro (portable) |
             | `laststats-linux.zip`   | Linux x64, manual install |
             | `laststats-linux-arm64.zip` | Linux ARM64, manual install |
-            | `LastStats-macos.dmg`   | **macOS — recommended installer** (drag to Applications) |
-            | `laststats-macos.zip`   | macOS, manual install |
+            | `LastStats-macos-arm64.dmg` | **macOS Apple Silicon (M1 and later) — recommended installer** (drag to Applications) |
+            | `LastStats-macos-x64.dmg` | **macOS Intel — recommended installer** (drag to Applications) |
+            | `LastStats-macos.dmg`   | macOS universal (Intel + Apple Silicon) installer |
+            | `laststats-macos-arm64.zip` | macOS Apple Silicon, manual install |
+            | `laststats-macos-x64.zip` | macOS Intel, manual install |
+            | `laststats-macos.zip`   | macOS universal, manual install |
 
       # NOTE: publishing the update.json / update_beta.json file for the
       # app's auto-update check is handled by a separate workflow:

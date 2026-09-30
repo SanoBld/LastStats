@@ -1,8 +1,11 @@
 name: Build macOS
 
 # Reusable: called by build-all.yml / release.yml — also runnable manually.
-# Builds a universal app (Intel + Apple Silicon): a .zip (used by the in-app
-# updater) and a .dmg installer (drag and drop into Applications).
+# Flutter always builds a universal app (Intel + Apple Silicon). For each
+# target we publish a .zip (used by the in-app updater) and a .dmg installer:
+#   - universal : both chips in one app (names kept: old app versions use them)
+#   - x64       : Intel Macs only, smaller (universal build, arm64 stripped)
+#   - arm64     : Apple Silicon only, smaller (universal build, x86_64 stripped)
 on:
   workflow_call:
     inputs:
@@ -21,6 +24,19 @@ on:
 
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: universal
+            zip: laststats-macos.zip            # name kept: used by UpdateService
+            dmg: LastStats-macos.dmg
+          - arch: x64
+            zip: laststats-macos-x64.zip
+            dmg: LastStats-macos-x64.dmg
+          - arch: arm64
+            zip: laststats-macos-arm64.zip
+            dmg: LastStats-macos-arm64.dmg
     runs-on: macos-latest
     env:
       VERSION: ''
@@ -50,26 +66,33 @@ jobs:
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
-      - name: Build macOS
+      - name: Build macOS (universal)
         run: flutter build macos --release --build-name="$VERSION" --build-number=${{ github.run_number }}
+
+      # Strips the other CPU architecture from the app (x64 / arm64 only).
+      - name: Thin app to ${{ matrix.arch }}
+        if: matrix.arch != 'universal'
+        run: |
+          sed -i '' 's/\r$//' macos/packaging/thin-arch.sh
+          bash macos/packaging/thin-arch.sh build/macos/Build/Products/Release ${{ matrix.arch }}
 
       # cd into the actual app folder first, so the zip does not contain the
       # long "build/macos/Build/Products/Release/" path inside it.
       - name: Zip macOS build
         run: |
           cd build/macos/Build/Products/Release
-          zip -r "$GITHUB_WORKSPACE/laststats-macos.zip" .
+          zip -r -y "$GITHUB_WORKSPACE/${{ matrix.zip }}" .
       - uses: actions/upload-artifact@v4
         with:
-          name: laststats-macos.zip
-          path: laststats-macos.zip
+          name: ${{ matrix.zip }}
+          path: ${{ matrix.zip }}
 
       # Installer: a .dmg that opens with the app + an "Applications" shortcut.
       - name: Build DMG installer
         run: |
           sed -i '' 's/\r$//' macos/packaging/build-dmg.sh
-          bash macos/packaging/build-dmg.sh
+          bash macos/packaging/build-dmg.sh ${{ matrix.dmg }}
       - uses: actions/upload-artifact@v4
         with:
-          name: laststats-macos-dmg
-          path: LastStats-macos.dmg
+          name: laststats-macos-${{ matrix.arch }}-dmg
+          path: ${{ matrix.dmg }}
