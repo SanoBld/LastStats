@@ -78,7 +78,7 @@
     final idx = await _indexOf(url);
     if (idx == null) return null;
     &#47;&#47; Bump the folder time so LRU keeps recently played videos.
-    idx.parent.setLastModifiedSync(DateTime.now());
+    _touchDir(idx.parent);
     final target = File(File(&#39;${idx.parent.path}&#47;target&#39;).readAsStringSync());
     return VideoPlayerController.file(target, videoPlayerOptions: options);
   } catch (_) {
