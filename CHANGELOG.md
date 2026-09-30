@@ -32,6 +32,19 @@
 
 ## v3.6.0
 
+**Linux and macOS installers**
+- New Linux ARM64 build (Raspberry Pi, ARM laptops and servers), built natively
+- Linux installers: `.deb` (Debian, Ubuntu, Mint), `.rpm` (Fedora, openSUSE, RHEL) and a portable `.AppImage`, for x64 and ARM64; app menu entry, icon and clean uninstall included
+- New `install-linux.sh` one-liner: detects your distro and CPU and installs the right package
+- macOS: new `.dmg` installer (drag the app to Applications), universal build for Intel and Apple Silicon
+- In-app updater: Linux ARM64 now downloads the ARM64 build
+- Release workflow: all installers are built and published automatically with the rest of the release
+
+**Cache and translations**
+- Cache tab: each storage line now stays on one line (size, limit and percentage used), with the bar underneath
+- All app texts now live in the `l10n` folder, including previously hard-coded ones (quick settings search, image sources, loading steps, tiers), translated in all 10 languages
+- Code cleanup: removed unused translation helpers, variables, functions and imports
+
 **Posters, friends and Apple Music video**
 - Friends: cards are now one consistent rounded square shape (removed the mixed square/circle/oval variants)
 - Friends: online status fills the whole card with your accent color instead of a hardcoded green overlay

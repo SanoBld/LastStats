@@ -209,8 +209,17 @@ jobs:
             | `LastStats-Setup-arm64.exe` | **Windows on ARM (Snapdragon) — recommended installer** |
             | `laststats-windows.zip` | Windows (x64), portable / no install |
             | `laststats-windows-arm64.zip` | Windows on ARM, portable / no install |
-            | `laststats-linux.zip`   | Linux |
-            | `laststats-macos.zip`   | macOS |
+            | `LastStats-linux-x64.deb` | **Linux x64 (Debian/Ubuntu/Mint) — recommended installer** |
+            | `LastStats-linux-arm64.deb` | **Linux ARM64 (Debian/Ubuntu, Raspberry Pi...) — recommended installer** |
+            | `LastStats-linux-x64.rpm` | **Linux x64 (Fedora/openSUSE/RHEL) — recommended installer** |
+            | `LastStats-linux-arm64.rpm` | **Linux ARM64 (Fedora/openSUSE) — recommended installer** |
+            | `install-linux.sh` | Linux, any CPU: picks the right package for your distro |
+            | `LastStats-linux-x64.AppImage` | Linux x64, any distro (portable) |
+            | `LastStats-linux-arm64.AppImage` | Linux ARM64, any distro (portable) |
+            | `laststats-linux.zip`   | Linux x64, manual install |
+            | `laststats-linux-arm64.zip` | Linux ARM64, manual install |
+            | `LastStats-macos.dmg`   | **macOS — recommended installer** (drag to Applications) |
+            | `laststats-macos.zip`   | macOS, manual install |
 
       # NOTE: publishing the update.json / update_beta.json file for the
       # app's auto-update check is handled by a separate workflow:

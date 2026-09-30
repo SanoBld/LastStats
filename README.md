@@ -131,13 +131,17 @@ Supported platforms: **Android, Windows, macOS, and Linux.**
 4. Sharing files from the app (charts, artwork, etc.) saves them to your Downloads folder and opens Explorer with the file selected — this is expected on an unpackaged build like this one.
 
 ### macOS
-1. Download the macOS build from the [releases page](https://github.com/SanoBld/LastStats-App/releases).
-2. Move `LastStats.app` to your Applications folder.
+1. Download `LastStats-macos.dmg` from the [releases page](https://github.com/SanoBld/LastStats-App/releases).
+2. Open it and drag `LastStats.app` onto the `Applications` shortcut.
 3. Since the build isn't notarized, the first launch requires right-click → "Open" → "Open" again (macOS will otherwise refuse to run apps from an unidentified developer).
 
 ### Linux
-1. Download the Linux build from the [releases page](https://github.com/SanoBld/LastStats-App/releases).
-2. Extract it, then run the `LastStats` executable (`chmod +x LastStats` first if needed).
+Pick the file for your CPU (`x64` for most PCs, `arm64` for ARM devices) on the [releases page](https://github.com/SanoBld/LastStats-App/releases):
+- **One command (any distro):** `curl -fsSL https://github.com/SanoBld/LastStats-App/releases/latest/download/install-linux.sh | bash` — detects your distro and CPU and installs the right package.
+- **Debian / Ubuntu / Mint:** `LastStats-linux-<arch>.deb` — double-click it (software center opens an install wizard) or run `sudo apt install ./LastStats-linux-<arch>.deb`. Uninstall with `sudo apt remove laststats`.
+- **Fedora / openSUSE / RHEL:** `LastStats-linux-<arch>.rpm` — double-click it or run `sudo dnf install ./LastStats-linux-<arch>.rpm`. Uninstall with `sudo dnf remove laststats`.
+- **Any distro, no install:** `LastStats-linux-<arch>.AppImage` — `chmod +x` it, then run it.
+- **Manual:** `laststats-linux.zip` (x64) / `laststats-linux-arm64.zip`, extract and run `laststats_mobile`.
 
 ### Building from source
 Requires the [Flutter SDK](https://docs.flutter.dev/get-started/install) (matching the version in `pubspec.yaml`).

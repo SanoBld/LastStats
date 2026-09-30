@@ -566,8 +566,8 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
       final theirFull = theirLib != null; // full synced library vs top-200 fallback
       final dataLabel = hasMeaningfulData
           ? (theirFull
-              ? tx('ui_artists_from_your_hist', {'uniqueArti': '$uniqueArtists', 'targetUser': '${widget.targetUser}'})
-              : tx('ui_artists_from_your_hist_2', {'uniqueArti': '$uniqueArtists', 'targetUser': '${widget.targetUser}'}))
+              ? tx('ui_artists_from_your_hist', {'uniqueArti': '$uniqueArtists', 'targetUser': widget.targetUser})
+              : tx('ui_artists_from_your_hist_2', {'uniqueArti': '$uniqueArtists', 'targetUser': widget.targetUser}))
           : (theirFull
               ? tx('ui_full_library_api')
               : tx('ui_top_200_artists_tracks'));
@@ -716,17 +716,17 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
                 children: [
                   if (_totalArtists > 0) _CountPill(
                     icon: Icons.mic_rounded, seed: 0,
-                    label: tx('ui_artist', {'v_totalArti': '$_totalArtists', 'v_totalArti2': '${_totalArtists > 1 ? "s" : ""}'}),
+                    label: tx('ui_artist', {'v_totalArti': '$_totalArtists', 'v_totalArti2': _totalArtists > 1 ? "s" : ""}),
                     scheme: scheme, text: text,
                   ),
                   if (_totalTracks > 0) _CountPill(
                     icon: Icons.music_note_rounded, seed: 1,
-                    label: tx('ui_track', {'v_totalTrac': '$_totalTracks', 'v_totalTrac2': '${_totalTracks > 1 ? "s" : ""}'}),
+                    label: tx('ui_track', {'v_totalTrac': '$_totalTracks', 'v_totalTrac2': _totalTracks > 1 ? "s" : ""}),
                     scheme: scheme, text: text,
                   ),
                   if (_totalAlbums > 0) _CountPill(
                     icon: Icons.album_rounded, seed: 2,
-                    label: tx('ui_album', {'v_totalAlbu': '$_totalAlbums', 'v_totalAlbu2': '${_totalAlbums > 1 ? "ns" : ""}'}),
+                    label: tx('ui_album', {'v_totalAlbu': '$_totalAlbums', 'v_totalAlbu2': _totalAlbums > 1 ? "ns" : ""}),
                     scheme: scheme, text: text,
                   ),
                 ],
@@ -1214,11 +1214,11 @@ class _ItemCompareSheet extends StatelessWidget {
     }
     if (my / their > 1.3) {
       final x = (my / their).toStringAsFixed(1);
-      return tx('ui_you_listen_to_this_x_m', {'x': '$x', 'theirUsern': '$theirUsername'});
+      return tx('ui_you_listen_to_this_x_m', {'x': x, 'theirUsern': theirUsername});
     }
     if (their / my > 1.3) {
       final x = (their / my).toStringAsFixed(1);
-      return tx('ui_listens_to_this_x_more', {'theirUsern': '$theirUsername', 'x': '$x'});
+      return tx('ui_listens_to_this_x_more', {'theirUsern': theirUsername, 'x': x});
     }
     return tx('ui_you_both_listen_to_thi');
   }

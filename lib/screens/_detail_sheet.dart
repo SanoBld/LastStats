@@ -155,7 +155,7 @@ class _CardBack extends StatelessWidget {
               Row(children: [
                 Icon(Icons.info_outline_rounded, color: fgWeak, size: 16),
                 const SizedBox(width: 6),
-                Text(tx('ui_source', {'source': '$source'}), style: TextStyle(color: fgWeak, fontSize: 13)),
+                Text(tx('ui_source', {'source': source}), style: TextStyle(color: fgWeak, fontSize: 13)),
               ]),
             ],
           ),

@@ -54,3 +54,14 @@ jobs:
         with:
           name: laststats-macos
           path: laststats-macos.zip
+
+      # Installer: a .dmg that opens with the app + an "Applications" shortcut
+      # (drag and drop). Release builds are universal (Intel + Apple Silicon).
+      - name: Build DMG installer
+        run: |
+          sed -i '' 's/\r$//' macos/packaging/build-dmg.sh
+          bash macos/packaging/build-dmg.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: laststats-macos-dmg
+          path: LastStats-macos.dmg

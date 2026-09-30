@@ -1185,7 +1185,7 @@ class _ChartsPageState extends State<_ChartsPage>
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                tx('ui_loading_history', {'yearLabel': '$yearLabel', 'pct': '$pct'}),
+                tx('ui_loading_history', {'yearLabel': yearLabel, 'pct': '$pct'}),
                 style: t.bodySmall?.copyWith(
                     color: s.onPrimaryContainer, fontWeight: FontWeight.w600),
               ),
@@ -2715,7 +2715,7 @@ class _StreakCard extends StatelessWidget {
           if (str.bestStart.isNotEmpty) ...[
             const SizedBox(height: 8),
             Text(
-              tx('ui_best_streak_started_on', {'bestStart': '${str.bestStart}'}),
+              tx('ui_best_streak_started_on', {'bestStart': str.bestStart}),
               style: t.labelSmall?.copyWith(
                   fontSize: 9, color: s.onSurfaceVariant.withValues(alpha: 0.55)),
             ),
@@ -3039,7 +3039,7 @@ class _NoDataCard extends StatelessWidget {
         const SizedBox(width: 14),
         Expanded(
           child: Text(
-            tx('ui_load_history_to_displa', {'what': '$what'}),
+            tx('ui_load_history_to_displa', {'what': what}),
             style: t.bodySmall?.copyWith(color: s.onSurfaceVariant),
           ),
         ),

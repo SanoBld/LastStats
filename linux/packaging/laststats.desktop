@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=LastStats
+Comment=Last.fm statistics, charts and recaps
+Exec=laststats
+Icon=laststats
+Terminal=false
+Categories=AudioVideo;Audio;Music;
+StartupWMClass=com.example.laststats_mobile

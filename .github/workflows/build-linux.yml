@@ -1,24 +1,41 @@
 name: Build Linux
 
+# Reusable: called by build-all.yml / release.yml — also runnable manually.
+# Builds x64 and ARM64 natively (Flutter can't cross-compile Linux), and for
+# each one: a .zip (used by the in-app updater), a .deb (Debian/Ubuntu), an
+# .rpm (Fedora/openSUSE) and an .AppImage (portable, any distro). The x64 job
+# also publishes install-linux.sh, a one-liner that picks the right one.
 on:
   workflow_call:
     inputs:
       version:
-        description: 'Version to build (e.g. 2.7.0). Empty = read from pubspec.yaml'
+        description: 'Version to build (e.g. 2.7.0). Empty = dev build'
         required: false
         type: string
         default: ''
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to build (e.g. 2.7.0). Empty = read from pubspec.yaml'
+        description: 'Version to build (e.g. 2.7.0). Empty = dev build'
         required: false
         type: string
         default: ''
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runner: ubuntu-latest
+            zip: laststats-linux.zip            # name kept: used by UpdateService
+          - arch: arm64
+            runner: ubuntu-24.04-arm            # GitHub-hosted native ARM64 runner
+            zip: laststats-linux-arm64.zip
+    runs-on: ${{ matrix.runner }}
+    env:
+      VERSION: ''
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Install dependencies
@@ -31,11 +48,23 @@ jobs:
             libgstreamer-plugins-base1.0-dev \
             gstreamer1.0-plugins-good \
             gstreamer1.0-plugins-bad \
-            gstreamer1.0-libav
+            gstreamer1.0-libav \
+            curl dpkg-dev rpm
+
       - uses: subosito/flutter-action@v2
+        if: matrix.arch == 'x64'
         with:
           channel: 'stable'
           cache: true
+
+      # subosito/flutter-action can't always resolve an arm64 SDK, so on ARM
+      # we clone Flutter directly (same approach as the Windows ARM64 job).
+      - name: Install Flutter (arm64)
+        if: matrix.arch == 'arm64'
+        run: |
+          git clone https://github.com/flutter/flutter.git -b stable --depth 1 "$HOME/flutter"
+          echo "$HOME/flutter/bin" >> "$GITHUB_PATH"
+
       - run: flutter pub get
       - run: dart run flutter_launcher_icons
 
@@ -44,22 +73,50 @@ jobs:
           if [ -n "${{ inputs.version }}" ]; then
             VERSION="${{ inputs.version }}"
           else
-            # No explicit version means this is an ad-hoc/dev build, not a
-            # real release: tag it as such instead of reusing the (possibly
-            # stale) pubspec.yaml version, so the app never claims to be a
-            # release it isn't.
+            # Ad-hoc/dev build: never claim to be a real release.
             VERSION="0.0.0-dev.${{ github.run_number }}"
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
-      - name: Build Linux
+      - name: Build Linux (${{ matrix.arch }})
         run: flutter build linux --release --build-name="$VERSION" --build-number=${{ github.run_number }}
 
       - name: Zip Linux build
         run: |
-          cd build/linux/x64/release/bundle
-          zip -r "$GITHUB_WORKSPACE/laststats-linux.zip" .
+          cd build/linux/${{ matrix.arch }}/release/bundle
+          zip -r "$GITHUB_WORKSPACE/${{ matrix.zip }}" .
       - uses: actions/upload-artifact@v4
         with:
-          name: laststats-linux
-          path: laststats-linux.zip
+          name: ${{ matrix.zip }}
+          path: ${{ matrix.zip }}
+
+      # Installers: .deb (Debian/Ubuntu/Mint), .rpm (Fedora/openSUSE) and a
+      # portable AppImage. Double-click opens the distro's install wizard.
+      - name: Build .deb, .rpm and AppImage
+        run: |
+          sed -i 's/\r$//' linux/packaging/*.sh
+          bash linux/packaging/build-deb.sh ${{ matrix.arch }} "$VERSION"
+          bash linux/packaging/build-rpm.sh ${{ matrix.arch }} "$VERSION"
+          bash linux/packaging/build-appimage.sh ${{ matrix.arch }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: laststats-linux-${{ matrix.arch }}-deb
+          path: LastStats-linux-${{ matrix.arch }}.deb
+      - uses: actions/upload-artifact@v4
+        with:
+          name: laststats-linux-${{ matrix.arch }}-appimage
+          path: LastStats-linux-${{ matrix.arch }}.AppImage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: laststats-linux-${{ matrix.arch }}-rpm
+          path: LastStats-linux-${{ matrix.arch }}.rpm
+
+      # One-line installer (same file for x64 and ARM64, so upload it once).
+      - name: Prepare install script
+        if: matrix.arch == 'x64'
+        run: sed 's#__REPO__#${{ github.repository }}#g; s/\r$//' linux/packaging/install.sh > install-linux.sh
+      - uses: actions/upload-artifact@v4
+        if: matrix.arch == 'x64'
+        with:
+          name: laststats-linux-install-script
+          path: install-linux.sh
