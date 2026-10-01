@@ -155,3 +155,7 @@
 .legal-block ul { margin: .6rem 0 0 1.2rem; color: var(--md-on-surface-variant); font-size: .92rem; line-height: 1.6; }
 .legal-block li + li { margin-top: .3rem; }
 .legal-block p + p { margin-top: .6rem; }
+
+/* links inside legal blocks (contact, etc.) */
+.legal-block a { color: var(--md-primary); font-weight: 500; text-decoration: underline; text-underline-offset: 2px; transition: opacity .2s var(--m3-standard); }
+.legal-block a:hover { opacity: .8; }

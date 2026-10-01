@@ -1,38 +1,58 @@
 /* ==========================================================
-   MATERIAL 3 EXPRESSIVE — button shapes + spring motion
-   Look: the connected button group (big outer corners, small inner
-   corners) that melts into a pill when pressed. Loaded after every other
-   stylesheet; colors/tokens still come from style.css.
+   MATERIAL 3 EXPRESSIVE — same shapes and motion as the app
+   (lib/theme/m3_shapes.dart + m3_motion.dart):
+   - buttons are pills / circles, pressed = softer 14px square
+   - spring curves are the app's own cubic-bezier values
+   - connected groups keep big outer corners and small inner ones
+   Loaded after every other stylesheet; colors still come from style.css.
    ========================================================== */
 :root {
-  --spring-fast: cubic-bezier(.34, 1.56, .64, 1);
-  --spring-slow: cubic-bezier(.3, 1.35, .5, 1);
-  --r-outer: 28px;
+  /* app curves (M3Motion): spatial = moves/shape, effects = color/opacity */
+  --spring-fast: cubic-bezier(.42, 1.67, .21, .90);      /* 350 ms */
+  --spring-default: cubic-bezier(.38, 1.21, .22, 1);     /* 500 ms */
+  --spring-slow: cubic-bezier(.39, 1.29, .35, .98);      /* 650 ms */
+  --effects: cubic-bezier(.34, .80, .34, 1);             /* 200 ms */
+  --m3-emphasized-accel: cubic-bezier(.3, 0, .8, .15);
+
+  /* Radii are real half-heights, never 999px: a radius that is bigger than
+     the box only starts to show at the very end of the transition, which
+     looked like a freeze followed by a jump. */
+  --r-pill: 24px;   /* 48px buttons */
+  --r-chip: 18px;   /* 36px chips */
+  --r-outer: 24px;
   --r-inner: 6px;
+  --r-hover: 18px;
+  --r-press: 14px;  /* app: pressed button */
+  --r-card: 20px;   /* app: menus, snackbars */
+  --r-tile: 28px;
+
+  --font-heading: var(--font-display);
+  --md-surface-container-highest: #DFE3E5;
 }
-@supports (transition-timing-function: linear(0, 1)) {
-  :root {
-    --spring-fast: linear(0, .42 9%, .9 21%, 1.08 34%, 1.05 46%, .99 62%, 1.003 80%, 1);
-    --spring-slow: linear(0, .25 7%, .7 17%, 1.05 30%, 1.07 42%, 1.01 58%, .995 74%, 1);
-  }
-}
+[data-theme="dark"] { --md-surface-container-highest: #303638; }
+
 * { -webkit-tap-highlight-color: transparent; }
 a, button { touch-action: manipulation; }
 
-/* shared motion */
+/* shared motion: shape and position use springs, colors use the effects curve */
 .project-actions a, .project-actions button, .contact-links a, .about-cta,
 .lang-toggle, .theme-toggle, .nav-logo, .back-link, .help-external-link,
 .feature-chips span, .project-tags span, .dl-option, .dl-back, .lightbox-close, .dl-modal-close {
-  transition: border-radius .5s var(--spring-slow), transform .45s var(--spring-fast),
-              box-shadow .3s var(--m3-standard), background-color .25s var(--m3-standard);
+  transition: border-radius .5s var(--spring-default), transform .35s var(--spring-fast),
+              box-shadow .2s var(--effects), background-color .2s var(--effects);
 }
+
+/* ---------- Buttons: real touch height so the pill radius is exact ---------- */
+.project-actions a, .project-actions button, .contact-links a { min-height: 48px; justify-content: center; }
+.about-cta, .back-link { min-height: 40px; display: inline-flex; align-items: center; }
+.help-external-link { min-height: 44px; align-items: center; }
 
 /* ---------- Connected groups: GitHub + Download, contact links ---------- */
 .project-actions, .contact-links { gap: 2px; flex-wrap: nowrap; }
 .project-actions > *, .contact-links > * { border-radius: var(--r-inner); }
 .project-actions > :first-child, .contact-links > :first-child { border-radius: var(--r-outer) var(--r-inner) var(--r-inner) var(--r-outer); }
 .project-actions > :last-child,  .contact-links > :last-child  { border-radius: var(--r-inner) var(--r-outer) var(--r-outer) var(--r-inner); }
-.project-actions > :only-child,  .contact-links > :only-child  { border-radius: var(--r-outer); }
+.project-actions > :only-child,  .contact-links > :only-child  { border-radius: var(--r-pill); }
 @media (max-width: 520px) {
   .project-actions, .contact-links { flex-direction: column; align-items: stretch; }
   .project-actions > *, .contact-links > * { justify-content: center; text-align: center; }
@@ -40,33 +60,50 @@ a, button { touch-action: manipulation; }
   .project-actions > :last-child,  .contact-links > :last-child  { border-radius: var(--r-inner) var(--r-inner) var(--r-outer) var(--r-outer); }
 }
 
-/* ---------- Single buttons: pill, same look ---------- */
-.about-cta, .back-link, .help-external-link, .lang-toggle { border-radius: var(--r-outer); }
+/* ---------- Single buttons: pill ---------- */
+.about-cta, .back-link { border-radius: 20px; }
+.help-external-link { border-radius: 22px; }
+.lang-toggle { border-radius: 22px; }
 
-/* ---------- Icon buttons: round, same press morph ---------- */
+/* ---------- Icon buttons: circle ---------- */
 .theme-toggle, .nav-logo, .lightbox-close, .dl-modal-close { border-radius: 50%; }
 .nav-logo {
   display: flex; align-items: center; justify-content: center;
   width: 44px; height: 44px; background: var(--md-secondary-container); color: var(--md-on-secondary-container);
 }
 
-/* ---------- Info chips: ONE connected bar, only the two outer ends are round ---------- */
-.feature-chips, .project-tags { gap: 2px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
-.feature-chips::-webkit-scrollbar, .project-tags::-webkit-scrollbar { display: none; }
+/* ---------- Info chips (Flutter, Material You...) ----------
+   Desktop: ONE connected bar. Narrow screens: it wraps into separate pills
+   instead of a hidden horizontal scroll that cut chips off. */
+.feature-chips, .project-tags { gap: 2px; flex-wrap: nowrap; max-width: 100%; }
 .feature-chips { width: fit-content; margin-inline: auto; }
-.feature-chips span, .project-tags span { user-select: none; white-space: nowrap; flex: none; border-radius: var(--r-inner); }
-.feature-chips span:first-child, .project-tags span:first-child { border-radius: var(--r-outer) var(--r-inner) var(--r-inner) var(--r-outer); }
-.feature-chips span:last-child,  .project-tags span:last-child  { border-radius: var(--r-inner) var(--r-outer) var(--r-outer) var(--r-inner); }
+.feature-chips span, .project-tags span {
+  display: inline-flex; align-items: center; min-height: 36px;
+  user-select: none; white-space: nowrap; flex: none; border-radius: var(--r-inner);
+}
+.feature-chips span:first-child, .project-tags span:first-child { border-radius: var(--r-chip) var(--r-inner) var(--r-inner) var(--r-chip); }
+.feature-chips span:last-child,  .project-tags span:last-child  { border-radius: var(--r-inner) var(--r-chip) var(--r-chip) var(--r-inner); }
+@media (max-width: 900px) {
+  .feature-chips, .project-tags { flex-wrap: wrap; justify-content: center; gap: .45rem; width: auto; }
+  .feature-chips span, .project-tags span,
+  .feature-chips span:first-child, .project-tags span:first-child,
+  .feature-chips span:last-child, .project-tags span:last-child { border-radius: var(--r-chip); }
+}
 
-/* ---------- Live stats (stars / version / downloads): connected shaped tiles ---------- */
-.gh-stats { gap: 2px; flex-wrap: nowrap; width: fit-content; max-width: 100%; margin-inline: auto; overflow-x: auto; scrollbar-width: none; }
-.gh-stats::-webkit-scrollbar { display: none; }
+/* ---------- Live stats (stars / version / downloads) ---------- */
+.gh-stats { gap: 2px; flex-wrap: nowrap; width: fit-content; max-width: 100%; margin-inline: auto; min-height: 92px; }
+.gh-stats.is-empty { min-height: 0; margin-bottom: 0; }
 .gh-stats .gh-stat {
   flex: 1 0 auto; flex-direction: column; align-items: flex-start; gap: .15rem;
   min-width: 8.5rem; padding: 1rem 1.4rem; border-radius: var(--r-inner);
   background: var(--md-secondary-container); color: var(--md-on-secondary-container);
-  transition: border-radius .5s var(--spring-slow), transform .45s var(--spring-fast), background-color .25s var(--m3-standard);
+  transition: border-radius .5s var(--spring-default), transform .35s var(--spring-fast), background-color .2s var(--effects);
+  /* tiles appear together, staggered, once the data is in (no fill-mode forwards,
+     otherwise the end state would block the hover/press transforms) */
+  animation: stat-in .55s var(--m3-emphasized-decel) backwards;
+  animation-delay: calc(var(--n, 0) * 80ms);
 }
+@keyframes stat-in { from { opacity: 0; transform: translateY(14px) scale(.96); } }
 .gh-stats .gh-stat:nth-child(2) { background: var(--md-primary-container); color: var(--md-on-primary-container); }
 .gh-stats .gh-stat:nth-child(3) { background: var(--md-tertiary-container); color: var(--md-on-tertiary-container); }
 .gh-stats .gh-stat:first-child { border-radius: 32px var(--r-inner) var(--r-inner) 32px; }
@@ -75,64 +112,77 @@ a, button { touch-action: manipulation; }
 .gh-stats .gh-stat svg { color: currentColor; opacity: .8; margin-bottom: .35rem; }
 .gh-stats .gh-stat-value { font-family: var(--font-display); font-weight: 700; font-size: 1.7rem; line-height: 1.1; }
 .gh-stats .gh-stat-label { font-size: .78rem; font-weight: 500; opacity: .8; }
-@media (hover: hover) { .gh-stats .gh-stat:hover { border-radius: 28px; transform: translateY(-2px); } }
-.gh-stats .gh-stat:active { border-radius: 999px; transform: scale(.96); }
+@media (hover: hover) { .gh-stats .gh-stat:hover { border-radius: var(--r-tile); transform: translateY(-2px); } }
+.gh-stats .gh-stat:active { border-radius: var(--r-press); transform: scale(.96); transition-duration: .2s; }
 @media (max-width: 560px) {
-  .gh-stats { flex-direction: column; align-items: stretch; width: 100%; }
+  .gh-stats { flex-direction: column; align-items: stretch; width: 100%; min-height: 196px; }
+  .gh-stats.is-empty { min-height: 0; }
   .gh-stats .gh-stat { flex-direction: row; align-items: center; gap: .75rem; }
   .gh-stats .gh-stat svg { margin: 0; }
   .gh-stats .gh-stat-label { margin-left: auto; }
-  .gh-stats .gh-stat:first-child { border-radius: 28px 28px var(--r-inner) var(--r-inner); }
-  .gh-stats .gh-stat:last-child  { border-radius: var(--r-inner) var(--r-inner) 28px 28px; }
+  .gh-stats .gh-stat:first-child { border-radius: var(--r-tile) var(--r-tile) var(--r-inner) var(--r-inner); }
+  .gh-stats .gh-stat:last-child  { border-radius: var(--r-inner) var(--r-inner) var(--r-tile) var(--r-tile); }
+  .gh-stats .gh-stat:only-child  { border-radius: var(--r-tile); }
 }
 
-/* ---------- Download dialog ---------- */
+/* ---------- Download dialog (app: 250 ms in / 150 ms out, emphasized curves) ---------- */
 .dl-modal-box {
-  border-radius: 36px; transform: scale(.88) translateY(24px); opacity: 0;
-  transition: transform .55s var(--spring-slow), opacity .2s var(--m3-standard);
+  border-radius: 28px; transform: scale(.92) translateY(16px); opacity: 0;
+  transition: transform .15s var(--m3-emphasized-accel), opacity .15s linear;
 }
-.dl-modal.is-open .dl-modal-box { transform: none; opacity: 1; }
+.dl-modal.is-open .dl-modal-box {
+  transform: none; opacity: 1;
+  transition: transform .25s var(--m3-emphasized-decel), opacity .2s var(--effects);
+}
+#dl-modal-content { transition: opacity .15s var(--effects); }
+#dl-modal-content.is-switching { opacity: 0; filter: none; }
 .dl-options { gap: 2px; }
 .dl-option { border-radius: var(--r-inner); }
-.dl-option:first-child { border-radius: 20px 20px var(--r-inner) var(--r-inner); }
-.dl-option:last-child  { border-radius: var(--r-inner) var(--r-inner) 20px 20px; }
-.dl-option:only-child  { border-radius: 20px; }
-.dl-back { padding: .5rem 1rem; margin-left: -1rem; border-radius: var(--shape-full); }
+.dl-option:first-child { border-radius: var(--r-card) var(--r-card) var(--r-inner) var(--r-inner); }
+.dl-option:last-child  { border-radius: var(--r-inner) var(--r-inner) var(--r-card) var(--r-card); }
+.dl-option:only-child  { border-radius: var(--r-card); }
+.dl-back { padding: .5rem 1rem; margin-left: -1rem; border-radius: 20px; }
+
+/* ---------- Cards (app: 20px) ---------- */
+.help-card, .faq-list { border-radius: var(--r-card); }
 
 /* ---------- Screenshots ---------- */
-.showcase-media { border-radius: 28px; transition: transform .5s var(--spring-fast), box-shadow .35s var(--m3-emphasized-decel), border-radius .5s var(--spring-slow); }
+.showcase-media {
+  border-radius: var(--r-tile);
+  transition: transform .5s var(--spring-default), box-shadow .3s var(--effects), border-radius .5s var(--spring-default);
+}
 
 /* ---------- Hover (mouse only; touch devices use the press state) ---------- */
 @media (hover: hover) {
-  .project-actions > :hover, .contact-links > :hover { border-radius: 20px; transform: translateY(-2px); }
-  .about-cta:hover, .back-link:hover, .help-external-link:hover, .lang-toggle:hover { border-radius: 18px; transform: translateY(-2px); }
-  .theme-toggle:hover, .nav-logo:hover, .lightbox-close:hover, .dl-modal-close:hover { border-radius: 16px; transform: none; }
-  .feature-chips span:hover, .project-tags span:hover { border-radius: 20px; transform: translateY(-2px); }
-  .dl-option:hover { border-radius: 20px; }
-  .dl-back:hover { background: var(--md-primary-container); border-radius: 14px; }
-  .showcase-media:hover { border-radius: 40px; }
+  .project-actions > :hover, .contact-links > :hover { border-radius: var(--r-hover); transform: translateY(-2px); }
+  .about-cta:hover, .back-link:hover, .help-external-link:hover, .lang-toggle:hover { border-radius: var(--r-hover); transform: translateY(-2px); }
+  .theme-toggle:hover, .nav-logo:hover, .lightbox-close:hover, .dl-modal-close:hover { border-radius: var(--r-hover); transform: none; }
+  .feature-chips span:hover, .project-tags span:hover { border-radius: var(--r-chip); transform: translateY(-2px); }
+  .dl-option:hover { border-radius: var(--r-hover); }
+  .dl-back:hover { background: var(--md-primary-container); border-radius: var(--r-hover); }
+  .showcase-media:hover { border-radius: 36px; }
 }
 
-/* ---------- Pressed (mouse, touch, and JS-held so quick taps still show it) ---------- */
+/* ---------- Pressed: every button becomes the app's softer 14px square.
+   Mouse, touch, and JS-held (.is-pressed) so quick taps still show it. ---------- */
 .project-actions > :active, .contact-links > :active,
 .project-actions > .is-pressed, .contact-links > .is-pressed,
 .feature-chips span:active, .project-tags span:active,
 .feature-chips span.is-pressed, .project-tags span.is-pressed,
-.dl-option:active, .dl-option.is-pressed {
-  border-radius: 999px; transform: scale(.95); transition-duration: .16s, .16s, .3s, .25s;
-}
+.dl-option:active, .dl-option.is-pressed,
 .about-cta:active, .back-link:active, .help-external-link:active, .lang-toggle:active,
 .about-cta.is-pressed, .back-link.is-pressed, .help-external-link.is-pressed, .lang-toggle.is-pressed,
 .theme-toggle:active, .nav-logo:active, .lightbox-close:active, .dl-modal-close:active,
 .theme-toggle.is-pressed, .nav-logo.is-pressed,
 .dl-back:active, .dl-back.is-pressed {
-  border-radius: 12px; transform: scale(.92); transition-duration: .16s, .16s, .3s, .25s;
+  border-radius: var(--r-press); transform: scale(.95);
+  transition-duration: .2s, .2s, .2s, .2s;
 }
-.showcase-media:active { transform: scale(.97); border-radius: 44px; }
+.showcase-media:active { transform: scale(.97); border-radius: var(--r-card); }
 
 @media (hover: none) {
   .theme-toggle, .nav-logo { width: 48px; height: 48px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-delay: 0s !important; scroll-behavior: auto !important; }
 }
