@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/project.css">
 <link rel="stylesheet" href="css/expressive.css">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="adc52595-b992-434a-8eaf-2a4880979675"></script>
 </head>
 <body>
 
@@ -47,7 +48,7 @@
     </div>
 
     <h1 class="project-page-title reveal">LastStats</h1>
-    <p class="project-page-desc reveal" data-fr="Vos habitudes d'écoute méritent mieux qu'une page Last.fm figée. LastStats les transforme en un dashboard vivant, pensé Material You, disponible sur mobile comme sur desktop." data-en="Your listening habits deserve better than a static Last.fm page. LastStats turns them into a living dashboard, built around Material You, available on mobile and desktop alike.">
+    <p class="project-page-desc reveal" data-i18n="index.your_listening_habits_deserve_better">
       Vos habitudes d'écoute méritent mieux qu'une page Last.fm figée. LastStats les transforme
       en un dashboard vivant, pensé Material You, disponible sur mobile comme sur desktop.
     </p>
@@ -56,9 +57,9 @@
       <span>Flutter</span>
       <span>Material You</span>
       <span>Last.fm API</span>
-      <span data-fr="Dark / Light / AMOLED" data-en="Dark / Light / AMOLED">Dark / Light / AMOLED</span>
-      <span data-fr="Widgets Android" data-en="Android widgets">Widgets Android</span>
-      <span data-fr="Multi-langue" data-en="Multi-language">Multi-langue</span>
+      <span data-i18n="index.dark_light_amoled">Dark / Light / AMOLED</span>
+      <span data-i18n="index.android_widgets">Widgets Android</span>
+      <span data-i18n="index.multi_language">Multi-langue</span>
     </div>
 
     <!-- live github stats (stars + latest release), filled in by js -->
@@ -68,10 +69,10 @@
       <a href="https://github.com/SanoBld/LastStats-App" target="_blank" rel="noopener" class="md-ripple">
         <!-- github mark -->
         <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-        <span data-fr="Voir sur GitHub" data-en="View on GitHub">Voir sur GitHub</span>
+        <span data-i18n="index.view_on_github">Voir sur GitHub</span>
         <svg class="arrow-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
       </a>
-      <button type="button" id="download-trigger" class="md-ripple tonal" data-repo="SanoBld/LastStats-App" data-fr="Télécharger" data-en="Download">
+      <button type="button" id="download-trigger" class="md-ripple tonal" data-repo="SanoBld/LastStats-App" data-i18n="common.download">
         Télécharger
       </button>
     </div>
@@ -80,12 +81,12 @@
   <!-- about the app, quick explaination in plain words -->
   <section>
     <div class="about-app reveal">
-      <p data-fr="Connectez votre compte Last.fm, et LastStats prend le relais : vos artistes, vos albums, vos titres du moment, réunis dans un dashboard pensé pour être aussi beau qu'utile. Vos données restent les vôtres, tout simplement mises en valeur." data-en="Connect your Last.fm account and LastStats takes it from there: your artists, your albums, your current tracks, all brought together in a dashboard designed to be as beautiful as it is useful. Your data stays yours, simply showcased.">
+      <p data-i18n="index.connect_your_last_fm_account">
         Connectez votre compte Last.fm, et LastStats prend le relais : vos artistes, vos albums,
         vos titres du moment, réunis dans un dashboard pensé pour être aussi beau qu'utile.
         Vos données restent les vôtres, tout simplement mises en valeur.
       </p>
-      <p data-fr="Côté design, l'app suit Material You à la lettre : les couleurs s'accordent à votre téléphone, vous choisissez entre clair, sombre ou AMOLED, et l'accent coloré de toute l'app s'adapte même à la pochette de l'album que vous écoutez." data-en="On the design side, the app follows Material You to the letter: the colors match your phone, you choose between light, dark or AMOLED, and the app's accent color even adapts to the cover art of whatever album you're listening to.">
+      <p data-i18n="index.on_the_design_side_the">
         Côté design, l'app suit Material You à la lettre : les couleurs s'accordent à votre
         téléphone, vous choisissez entre clair, sombre ou AMOLED, et l'accent coloré de toute
         l'app s'adapte même à la pochette de l'album que vous écoutez.
@@ -95,7 +96,7 @@
     <!-- proper walkthrough instead of a plain grid of cards: a real screenshot next to a
          real explaination each time, alternating sides, sorted so it reads like a little
          story of the app (overview -> digging into your stats -> the fun bits). -->
-    <h2 class="gallery-section-title reveal" data-fr="L'app en détail" data-en="The app in detail">L'app en détail</h2>
+    <h2 class="gallery-section-title reveal" data-i18n="index.the_app_in_detail">L'app en détail</h2>
     <div class="showcase-wrap">
       <!-- side progress rail: dotted line fills solid as you scroll through the
            story, with a tick lighting up for each screenshot you pass. desktop only,
@@ -115,8 +116,8 @@
             <img src="assets/img/projects/laststats/dashboard.png" alt="Dashboard LastStats" loading="lazy">
           </div>
           <div class="showcase-text">
-            <h3 data-fr="Un dashboard qui résume tout" data-en="A dashboard that sums it all up">Un dashboard qui résume tout</h3>
-            <p data-fr="Dès l'ouverture, l'essentiel est sous vos yeux : votre artiste et votre titre du moment, votre total de scrobbles, et votre dernier album écouté. Tout, sans jamais fouiller." data-en="The moment you open it, the essentials are right there: your current artist and track, your total scrobbles, and your last played album. Everything, without ever digging.">Dès l'ouverture, l'essentiel est sous vos yeux : votre artiste et votre titre du moment, votre total de scrobbles, et votre dernier album écouté. Tout, sans jamais fouiller.</p>
+            <h3 data-i18n="index.a_dashboard_that_sums_it">Un dashboard qui résume tout</h3>
+            <p data-i18n="index.the_moment_you_open_it">Dès l'ouverture, l'essentiel est sous vos yeux : votre artiste et votre titre du moment, votre total de scrobbles, et votre dernier album écouté. Tout, sans jamais fouiller.</p>
           </div>
         </div>
 
@@ -125,8 +126,8 @@
             <img src="assets/img/projects/laststats/charts.png" alt="Graphiques LastStats" loading="lazy">
           </div>
           <div class="showcase-text">
-            <h3 data-fr="Tes stats en vrais graphiques" data-en="Your stats as real charts">Tes stats en vrais graphiques</h3>
-            <p data-fr="Vos scrobbles par mois, votre progression sur l'année, votre meilleur mois : des graphiques clairs et élégants, sur la période de votre choix, de 7 jours à toujours." data-en="Your scrobbles by month, your progress over the year, your best month: clear, elegant charts over the period you choose, from 7 days to all time.">Vos scrobbles par mois, votre progression sur l'année, votre meilleur mois : des graphiques clairs et élégants, sur la période de votre choix, de 7 jours à toujours.</p>
+            <h3 data-i18n="index.your_stats_as_real_charts">Tes stats en vrais graphiques</h3>
+            <p data-i18n="index.your_scrobbles_by_month_your">Vos scrobbles par mois, votre progression sur l'année, votre meilleur mois : des graphiques clairs et élégants, sur la période de votre choix, de 7 jours à toujours.</p>
           </div>
         </div>
 
@@ -135,8 +136,8 @@
             <img src="assets/img/projects/laststats/rankings.png" alt="Classements LastStats" loading="lazy">
           </div>
           <div class="showcase-text">
-            <h3 data-fr="Classements par période" data-en="Rankings by period">Classements par période</h3>
-            <p data-fr="Le podium de vos artistes, albums et titres préférés, avec la liste complète juste en dessous. Un tap suffit pour changer de période." data-en="The podium of your favorite artists, albums and tracks, with the full list right below. One tap is enough to change the period.">Le podium de vos artistes, albums et titres préférés, avec la liste complète juste en dessous. Un tap suffit pour changer de période.</p>
+            <h3 data-i18n="index.rankings_by_period">Classements par période</h3>
+            <p data-i18n="index.the_podium_of_your_favorite">Le podium de vos artistes, albums et titres préférés, avec la liste complète juste en dessous. Un tap suffit pour changer de période.</p>
           </div>
         </div>
 
@@ -145,8 +146,8 @@
             <img src="assets/img/projects/laststats/history.png" alt="Historique LastStats" loading="lazy">
           </div>
           <div class="showcase-text">
-            <h3 data-fr="Historique jour par jour" data-en="Day-by-day history">Historique jour par jour</h3>
-            <p data-fr="Toute votre écoute, classée jour par jour, avec l'heure exacte de chaque scrobble. Votre historique Last.fm complet, du premier jour à aujourd'hui." data-en="All your listening, sorted day by day, with the exact time of every scrobble. Your complete Last.fm history, from day one to today.">Toute votre écoute, classée jour par jour, avec l'heure exacte de chaque scrobble. Votre historique Last.fm complet, du premier jour à aujourd'hui.</p>
+            <h3 data-i18n="index.day_by_day_history">Historique jour par jour</h3>
+            <p data-i18n="index.all_your_listening_sorted_day">Toute votre écoute, classée jour par jour, avec l'heure exacte de chaque scrobble. Votre historique Last.fm complet, du premier jour à aujourd'hui.</p>
           </div>
         </div>
 
@@ -155,8 +156,8 @@
             <img src="assets/img/projects/laststats/artist_detail.png" alt="Page artiste LastStats" loading="lazy">
           </div>
           <div class="showcase-text">
-            <h3 data-fr="Fiche artiste complète" data-en="A complete artist page">Fiche artiste complète</h3>
-            <p data-fr="Biographie, vos statistiques sur l'artiste, tags, morceaux similaires : chaque artiste que vous écoutez mérite sa propre page complète." data-en="Biography, your stats on the artist, tags, similar tracks: every artist you listen to deserves its own complete page.">Biographie, vos statistiques sur l'artiste, tags, morceaux similaires : chaque artiste que vous écoutez mérite sa propre page complète.</p>
+            <h3 data-i18n="index.a_complete_artist_page">Fiche artiste complète</h3>
+            <p data-i18n="index.biography_your_stats_on_the">Biographie, vos statistiques sur l'artiste, tags, morceaux similaires : chaque artiste que vous écoutez mérite sa propre page complète.</p>
           </div>
         </div>
 
@@ -165,8 +166,8 @@
             <img src="assets/img/projects/laststats/album_view.png" alt="Vue album LastStats" loading="lazy">
           </div>
           <div class="showcase-text">
-            <h3 data-fr="Vue album détaillée" data-en="Detailed album view">Vue album détaillée</h3>
-            <p data-fr="Tracklist complète, durée totale, nombre d'écoutes par morceau : vous savez exactement où vous en êtes sur chaque album." data-en="Full tracklist, total duration, play count per track: you know exactly where you stand on every album.">Tracklist complète, durée totale, nombre d'écoutes par morceau : vous savez exactement où vous en êtes sur chaque album.</p>
+            <h3 data-i18n="index.detailed_album_view">Vue album détaillée</h3>
+            <p data-i18n="index.full_tracklist_total_duration_play">Tracklist complète, durée totale, nombre d'écoutes par morceau : vous savez exactement où vous en êtes sur chaque album.</p>
           </div>
         </div>
 
@@ -175,8 +176,8 @@
             <img src="assets/img/projects/laststats/flip_card.png" alt="Carte 3D pochette LastStats" loading="lazy">
           </div>
           <div class="showcase-text">
-            <h3 data-fr="La pochette en carte 3D" data-en="Cover art as a 3D card">La pochette en carte 3D</h3>
-            <p data-fr="Une touche de raffinement : la pochette se retourne en 3D d'un simple tap, comme une véritable carte, pour révéler ses informations au dos." data-en="A touch of refinement: the cover art flips in 3D with a single tap, like a real card, to reveal its details on the back.">Une touche de raffinement : la pochette se retourne en 3D d'un simple tap, comme une véritable carte, pour révéler ses informations au dos.</p>
+            <h3 data-i18n="index.cover_art_as_a_3d">La pochette en carte 3D</h3>
+            <p data-i18n="index.a_touch_of_refinement_the">Une touche de raffinement : la pochette se retourne en 3D d'un simple tap, comme une véritable carte, pour révéler ses informations au dos.</p>
           </div>
         </div>
 
@@ -185,8 +186,8 @@
             <img src="assets/img/projects/laststats/achievements.png" alt="Achievements LastStats" loading="lazy">
           </div>
           <div class="showcase-text">
-            <h3 data-fr="Débloque des achievements" data-en="Unlock achievements">Débloque des achievements</h3>
-            <p data-fr="Un système de niveaux fidèle à vos habitudes d'écoute, avec une collection d'achievements à débloquer au fil du temps." data-en="A leveling system tied to your listening habits, with a collection of achievements to unlock over time.">Un système de niveaux fidèle à vos habitudes d'écoute, avec une collection d'achievements à débloquer au fil du temps.</p>
+            <h3 data-i18n="index.unlock_achievements">Débloque des achievements</h3>
+            <p data-i18n="index.a_leveling_system_tied_to">Un système de niveaux fidèle à vos habitudes d'écoute, avec une collection d'achievements à débloquer au fil du temps.</p>
           </div>
         </div>
 
@@ -195,29 +196,35 @@
             <img src="assets/img/projects/laststats/share_card.png" alt="Carte partage LastStats" loading="lazy">
           </div>
           <div class="showcase-text">
-            <h3 data-fr="Partagez vos statistiques" data-en="Share your stats">Partagez vos statistiques</h3>
-            <p data-fr="Une carte élégante avec vos statistiques du moment, prête à publier en story, dans les couleurs de votre thème." data-en="An elegant card with your current stats, ready to post as a story, in the colors of your theme.">Une carte élégante avec vos statistiques du moment, prête à publier en story, dans les couleurs de votre thème.</p>
+            <h3 data-i18n="index.share_your_stats">Partagez vos statistiques</h3>
+            <p data-i18n="index.an_elegant_card_with_your">Une carte élégante avec vos statistiques du moment, prête à publier en story, dans les couleurs de votre thème.</p>
           </div>
         </div>
 
       </div>
     </div>
 
-    <!-- extra gallery, freshest screenshots straight from the repo, shown as
-         a stack of cards — click the top one and it flies to the back -->
-    <h2 class="gallery-section-title reveal" data-fr="Galerie" data-en="Gallery">Galerie</h2>
-    <div class="card-stack reveal" id="card-stack">
-      <button class="card-stack-item" type="button"><img src="assets/img/projects/laststats/gallery/dashboard.png" alt="Dashboard LastStats" loading="lazy"></button>
-      <button class="card-stack-item" type="button"><img src="assets/img/projects/laststats/gallery/charts.png" alt="Graphiques LastStats" loading="lazy"></button>
-      <button class="card-stack-item" type="button"><img src="assets/img/projects/laststats/gallery/rankings.png" alt="Classements LastStats" loading="lazy"></button>
-      <button class="card-stack-item" type="button"><img src="assets/img/projects/laststats/gallery/history.png" alt="Historique LastStats" loading="lazy"></button>
-      <button class="card-stack-item" type="button"><img src="assets/img/projects/laststats/gallery/artist_detail.png" alt="Page artiste LastStats" loading="lazy"></button>
-      <button class="card-stack-item" type="button"><img src="assets/img/projects/laststats/gallery/album_view.png" alt="Vue album LastStats" loading="lazy"></button>
-      <button class="card-stack-item" type="button"><img src="assets/img/projects/laststats/gallery/flip_card.png" alt="Carte 3D pochette LastStats" loading="lazy"></button>
-      <button class="card-stack-item" type="button"><img src="assets/img/projects/laststats/gallery/achievements.png" alt="Achievements LastStats" loading="lazy"></button>
-      <button class="card-stack-item" type="button"><img src="assets/img/projects/laststats/gallery/share_card.png" alt="Carte partage LastStats" loading="lazy"></button>
+    <!-- gallery: Material 3 hero carousel (scroll-snap + js for the size/opacity falloff) -->
+    <h2 class="gallery-section-title reveal" data-i18n="index.gallery">Galerie</h2>
+    <div class="m3-carousel reveal" id="m3-carousel" role="region" aria-roledescription="carousel" aria-label="Galerie de captures d'écran" data-i18n-aria="index.gallery_label">
+      <div class="m3-carousel-track" id="m3-carousel-track" tabindex="0">
+        <figure class="m3-carousel-item lightbox-trigger"><img src="assets/img/projects/laststats/gallery/dashboard.png" alt="Dashboard LastStats" loading="lazy" decoding="async" draggable="false"></figure>
+        <figure class="m3-carousel-item lightbox-trigger"><img src="assets/img/projects/laststats/gallery/charts.png" alt="Graphiques LastStats" loading="lazy" decoding="async" draggable="false"></figure>
+        <figure class="m3-carousel-item lightbox-trigger"><img src="assets/img/projects/laststats/gallery/rankings.png" alt="Classements LastStats" loading="lazy" decoding="async" draggable="false"></figure>
+        <figure class="m3-carousel-item lightbox-trigger"><img src="assets/img/projects/laststats/gallery/history.png" alt="Historique LastStats" loading="lazy" decoding="async" draggable="false"></figure>
+        <figure class="m3-carousel-item lightbox-trigger"><img src="assets/img/projects/laststats/gallery/artist_detail.png" alt="Page artiste LastStats" loading="lazy" decoding="async" draggable="false"></figure>
+        <figure class="m3-carousel-item lightbox-trigger"><img src="assets/img/projects/laststats/gallery/album_view.png" alt="Vue album LastStats" loading="lazy" decoding="async" draggable="false"></figure>
+        <figure class="m3-carousel-item lightbox-trigger"><img src="assets/img/projects/laststats/gallery/flip_card.png" alt="Carte 3D pochette LastStats" loading="lazy" decoding="async" draggable="false"></figure>
+        <figure class="m3-carousel-item lightbox-trigger"><img src="assets/img/projects/laststats/gallery/achievements.png" alt="Achievements LastStats" loading="lazy" decoding="async" draggable="false"></figure>
+        <figure class="m3-carousel-item lightbox-trigger"><img src="assets/img/projects/laststats/gallery/share_card.png" alt="Carte partage LastStats" loading="lazy" decoding="async" draggable="false"></figure>
+      </div>
+      <div class="m3-carousel-controls">
+        <button type="button" class="m3-carousel-btn" data-carousel="prev" aria-label="Image précédente" data-i18n-aria="index.gallery_prev"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+        <div class="m3-carousel-dots" id="m3-carousel-dots"></div>
+        <button type="button" class="m3-carousel-btn" data-carousel="next" aria-label="Image suivante" data-i18n-aria="index.gallery_next"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+      </div>
     </div>
-    <p class="card-stack-hint reveal" data-fr="Cliquez sur une carte pour passer à la suivante." data-en="Click a card to move to the next one.">Cliquez sur une carte pour passer à la suivante.</p>
+    <p class="m3-carousel-hint reveal" data-i18n="index.gallery_hint">Faites glisser la galerie ou utilisez les flèches. Touchez une image pour l'agrandir.</p>
   </section>
 
   <!-- lightbox overlay for the showcase screenshots, filled in by js -->
@@ -234,16 +241,18 @@
   <footer class="footer">
     <p>© 2026 Sano Bld</p>
     <div class="footer-links">
-      <a href="help.html" data-fr="Aide" data-en="Help">Aide</a>
+      <a href="help.html" data-i18n="common.help">Aide</a>
       <a href="https://github.com/SanoBld/LastStats-App" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://github.com/SanoBld/LastStats-App/releases" target="_blank" rel="noopener" data-fr="Télécharger" data-en="Download">Télécharger</a>
+      <a href="https://github.com/SanoBld/LastStats-App/releases" target="_blank" rel="noopener" data-i18n="common.download">Télécharger</a>
       <a href="https://discord.gg/JjqmkQgZBs" target="_blank" rel="noopener">Discord</a>
-      <a href="legal.html" data-fr="Mentions légales" data-en="Legal notice">Mentions légales</a>
+      <a href="legal.html" data-i18n="common.legal_notice">Mentions légales</a>
     </div>
-    <a href="about.html" class="about-cta md-ripple" data-fr="Description du projet" data-en="Project description">Description du projet</a>
+    <a href="about.html" class="about-cta md-ripple" data-i18n="common.project_description">Description du projet</a>
   </footer>
 
   <script src="js/theme.js"></script>
+  <script src="i18n/fr.js"></script>
+  <script src="i18n/en.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/main.js"></script>
   <script src="js/cursor.js"></script>
@@ -252,7 +261,7 @@
   <script src="js/showcase-progress.js"></script>
   <script src="js/lightbox.js"></script>
   <script src="js/nav-autohide.js"></script>
-  <script src="js/card-stack.js"></script>
+  <script src="js/carousel.js"></script>
   <script src="js/download-modal.js"></script>
   <script src="js/github-stats.js" data-repo="SanoBld/LastStats-App"></script>
 </body>

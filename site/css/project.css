@@ -35,6 +35,7 @@
   opacity: .8;
   z-index: -2;
   animation: drift 22s ease-in-out infinite alternate;
+  will-change: transform;
   -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
   mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
 }
@@ -230,56 +231,80 @@
 /* clickable screenshots open the lightbox */
 .showcase-media.lightbox-trigger { cursor: zoom-in; }
 
-/* bottom gallery, shown as a stack of cards you click through */
-.card-stack {
+/* bottom gallery: Material 3 hero carousel. Items keep a fixed layout size
+   (scroll-snap stays stable); js only adds transform/opacity falloff. */
+.m3-carousel { --item-w: min(64vw, 250px); --gap: 14px; position: relative; max-width: 780px; margin: 0 auto 1rem; }
+.m3-carousel-track {
   position: relative;
-  width: min(78vw, 260px);
-  aspect-ratio: 9/16;
-  margin: 0 auto 1rem;
+  display: flex;
+  gap: var(--gap);
+  padding: 1.4rem calc(50% - var(--item-w) / 2) 1.8rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  cursor: grab;
+  outline: none;
 }
-.card-stack-item {
-  position: absolute;
-  inset: 0;
-  padding: 0;
-  border: none;
-  border-radius: var(--shape-lg);
+.m3-carousel-track::-webkit-scrollbar { display: none; }
+.m3-carousel-track:focus-visible { box-shadow: inset 0 0 0 2px var(--md-primary); border-radius: var(--shape-xl); }
+.m3-carousel-track.is-dragging { scroll-snap-type: none; scroll-behavior: auto; cursor: grabbing; }
+.m3-carousel-item {
+  position: relative;
+  flex: 0 0 var(--item-w);
+  aspect-ratio: 9 / 16;
+  margin: 0;
+  border-radius: 28px;
   overflow: hidden;
-  cursor: pointer;
   background: var(--md-surface-container-low);
-  box-shadow: 0 10px 24px -10px rgba(var(--md-shadow), .4);
-  opacity: 1;
-  transition: transform .5s var(--m3-emphasized-decel), opacity .5s var(--m3-emphasized-decel), box-shadow .3s var(--m3-standard);
-  /* messy uno-pile look: --i is the stack depth (0 = on top, set by JS),
-     --jx/--jy/--r are a small random jitter fixed per card at init, and
-     both scale up with depth so lower cards peek out unevenly */
-  transform:
-    translate(calc(var(--jx, 0px) * (var(--i, 0) + 1)), calc(var(--jy, 0px) * (var(--i, 0) + 1) + var(--i, 0) * 6px))
-    rotate(calc(var(--r, 0deg) + var(--i, 0) * 1deg))
-    scale(calc(1 - var(--i, 0) * 0.035));
-  z-index: calc(20 - var(--i, 0));
+  box-shadow: 0 1px 3px rgba(var(--md-shadow), .2);
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  will-change: transform, opacity;
+  transition: box-shadow .3s var(--m3-standard);
 }
-.card-stack-item:hover { box-shadow: 0 16px 32px -12px rgba(var(--md-shadow), .5); }
-.card-stack-item img {
+.m3-carousel-item.is-active { box-shadow: 0 16px 32px -14px rgba(var(--md-shadow), .5); }
+.m3-carousel-item img {
   width: 100%; height: 100%; object-fit: cover; display: block;
-  /* a light zoom so the background decor around the phone mockup shows less,
-     without breaking the picture's proportions */
-  transform: scale(1.14);
+  /* light zoom so the decor around the phone mockup shows less */
+  transform: scale(1.12);
+  -webkit-user-drag: none; user-select: none;
 }
-.card-stack-item.is-leaving {
-  transition: transform .38s var(--m3-emphasized-accel), opacity .32s var(--m3-emphasized-accel);
-  transform: translate(55%, -6%) rotate(8deg) scale(.96);
-  opacity: 0;
-  z-index: 21; /* always stays above the rest while it flies off */
+.m3-carousel-item:not(.is-active) img { cursor: pointer !important; }
+
+.m3-carousel-controls { display: flex; align-items: center; justify-content: center; gap: .9rem; }
+.m3-carousel-btn {
+  width: 48px; height: 48px; flex: none;
+  display: grid; place-items: center;
+  border: none; border-radius: 50%; cursor: pointer;
+  background: var(--md-secondary-container); color: var(--md-on-secondary-container);
+  box-shadow: 0 1px 3px rgba(var(--md-shadow), .3);
+  transition: border-radius .5s var(--spring-default), transform .35s var(--spring-fast),
+              opacity .2s var(--effects), background-color .2s var(--effects);
 }
-/* used for one frame to snap the card straight into its back-of-pile spot
-   with no transition/fade, instead of animating the return trip */
-.card-stack-item.is-returning { transition: none; }
-.card-stack-hint {
+@media (hover: hover) { .m3-carousel-btn:hover:not(:disabled) { border-radius: 18px; } }
+.m3-carousel-btn:active:not(:disabled) { border-radius: var(--r-press); transform: scale(.92); transition-duration: .2s, .2s, .2s, .2s; }
+.m3-carousel-btn:disabled { opacity: .38; cursor: default; box-shadow: none; }
+.m3-carousel-btn:focus-visible { outline: 2px solid var(--md-primary); outline-offset: 2px; }
+
+.m3-carousel-dots { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; max-width: 220px; }
+.m3-carousel-dot {
+  position: relative; width: 8px; height: 8px; padding: 0; border: none; border-radius: 99px; cursor: pointer;
+  background: var(--md-outline-variant);
+  transition: width .5s var(--spring-default), background-color .2s var(--effects);
+}
+.m3-carousel-dot::after { content: ''; position: absolute; inset: -9px -3px; } /* bigger touch target */
+.m3-carousel-dot.is-active { width: 26px; background: var(--md-primary); }
+
+.m3-carousel-hint {
   text-align: center;
   font-size: .85rem;
   color: var(--md-on-surface-variant);
-  margin-bottom: 4rem;
+  margin: .9rem auto 4rem;
+  max-width: 28rem;
 }
+@media (prefers-reduced-motion: reduce) { .m3-carousel-track { scroll-behavior: auto; } }
 
 /* github stats strip: stars and latest release, pulled live from the API */
 .gh-stats {

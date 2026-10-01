@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="css/help.css">
 <link rel="stylesheet" href="css/about.css">
 <link rel="stylesheet" href="css/expressive.css">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="adc52595-b992-434a-8eaf-2a4880979675"></script>
 </head>
 <body>
 
@@ -39,11 +40,11 @@
 
     <a href="index.html" class="back-link md-ripple reveal">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-      <span data-fr="Retour à LastStats" data-en="Back to LastStats">Retour à LastStats</span>
+      <span data-i18n="common.back_to_laststats">Retour à LastStats</span>
     </a>
 
-    <h1 class="reveal" data-fr="Description du projet" data-en="Project description">Description du projet</h1>
-    <p class="help-subtitle reveal-fade" data-fr="Contenu du README du dépôt GitHub, récupéré en direct." data-en="Content of the GitHub repo's README, fetched live.">Contenu du README du dépôt GitHub, récupéré en direct.</p>
+    <h1 class="reveal" data-i18n="common.project_description">Description du projet</h1>
+    <p class="help-subtitle reveal-fade" data-i18n="about.content_of_the_github_repo">Contenu du README du dépôt GitHub, récupéré en direct.</p>
   </section>
 
   <main class="about-content">
@@ -51,7 +52,7 @@
       <div class="readme-progress-track"><div class="readme-progress-bar" id="readme-progress-bar"></div></div>
       <div class="readme-toc-list" id="readme-toc-list"></div>
     </nav>
-    <div id="readme-status" class="about-status" data-fr="Chargement du README…" data-en="Loading README…">Chargement du README…</div>
+    <div id="readme-status" class="about-status" data-i18n="about.loading_readme">Chargement du README…</div>
     <article id="readme-body" class="markdown-body reveal-fade"></article>
   </main>
 
@@ -69,16 +70,18 @@
   <footer class="footer">
     <p>© 2026 Sano Bld</p>
     <div class="footer-links">
-      <a href="help.html" data-fr="Aide" data-en="Help">Aide</a>
+      <a href="help.html" data-i18n="common.help">Aide</a>
       <a href="https://github.com/SanoBld/LastStats-App" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://github.com/SanoBld/LastStats-App/releases" target="_blank" rel="noopener" data-fr="Télécharger" data-en="Download">Télécharger</a>
+      <a href="https://github.com/SanoBld/LastStats-App/releases" target="_blank" rel="noopener" data-i18n="common.download">Télécharger</a>
       <a href="https://discord.gg/JjqmkQgZBs" target="_blank" rel="noopener">Discord</a>
-      <a href="index.html" data-fr="Accueil" data-en="Home">Accueil</a>
+      <a href="index.html" data-i18n="common.home">Accueil</a>
     </div>
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
   <script src="js/theme.js"></script>
+  <script src="i18n/fr.js"></script>
+  <script src="i18n/en.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/main.js"></script>
   <script src="js/cursor.js"></script>

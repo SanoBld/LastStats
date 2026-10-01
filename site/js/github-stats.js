@@ -1,6 +1,8 @@
-// Pulls live stats from the GitHub API (stars + latest release tag) and
-// drops them into the #gh-stats strip. Reads the repo from this script's
+// Pulls live stats from the GitHub API (stars + latest release tag + downloads)
+// and drops them into the #gh-stats strip. Reads the repo from this script's
 // own data-repo attribute so it stays reusable across project pages.
+// The strip is built once, after every request settled, so tiles never pop in
+// one by one and push the page around.
 (function () {
   const el = document.getElementById('gh-stats');
   const scriptTag = document.currentScript;
@@ -13,65 +15,60 @@
   const tagIcon = '<svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M1 7.775V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 0 1 0 2.474l-5.026 5.026a1.75 1.75 0 0 1-2.474 0l-6.25-6.25A1.75 1.75 0 0 1 1 7.775Zm5-3.025a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"/></svg>';
   const downloadIcon = '<svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M7.25 1a.75.75 0 0 1 .75.75v6.19l1.97-1.97a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L3.47 7.03a.75.75 0 1 1 1.06-1.06l1.97 1.97V1.75A.75.75 0 0 1 7.25 1ZM1.75 12a.75.75 0 0 0-.75.75v1.5A1.75 1.75 0 0 0 2.75 16h9a1.75 1.75 0 0 0 1.75-1.75v-1.5a.75.75 0 0 0-1.5 0v1.5a.25.25 0 0 1-.25.25h-9a.25.25 0 0 1-.25-.25v-1.5a.75.75 0 0 0-.75-.75Z"/></svg>';
 
-  // cache the raw numbers so a language switch can re-render without refetching
-  let stars = null;
-  let latestTag = null;
-  let totalDownloads = null;
+  const t = (key) => (window.i18n ? i18n.t(key) : key);
+  const lang = () => (window.i18n ? i18n.lang : 'fr');
 
-  function t(key, fallback) {
-    return (window.i18n && i18n.t(key)) || fallback;
-  }
+  // each tile keeps its own value + label refs so a language switch only updates text
+  let tiles = [];
 
-  // one tile = icon + big value + small label
-  function tile(icon, value, label) {
+  function tile(icon, raw, labelKey, n) {
     const span = document.createElement('span');
     span.className = 'gh-stat';
-    span.innerHTML = icon + `<span class="gh-stat-value">${value}</span><span class="gh-stat-label">${label}</span>`;
-    return span;
+    span.style.setProperty('--n', n);
+    span.innerHTML = icon + '<span class="gh-stat-value"></span><span class="gh-stat-label"></span>';
+    return { span, raw, labelKey, value: span.children[1], label: span.children[2] };
   }
 
-  function render() {
-    el.innerHTML = '';
-    if (typeof stars === 'number') el.appendChild(tile(starIcon, stars.toLocaleString(), t('ghFavorites', 'favoris')));
-    if (latestTag) el.appendChild(tile(tagIcon, latestTag, t('ghLatestVersion', 'Dernière version')));
-    if (typeof totalDownloads === 'number') el.appendChild(tile(downloadIcon, totalDownloads.toLocaleString(), t('ghDownloads', 'téléchargements')));
-    if (stars !== null || latestTag !== null || totalDownloads !== null) el.removeAttribute('aria-hidden');
+  function paint() {
+    tiles.forEach((x) => {
+      x.value.textContent = typeof x.raw === 'number' ? x.raw.toLocaleString(lang()) : x.raw;
+      x.label.textContent = t(x.labelKey);
+    });
   }
 
-  // stars come from the main repo endpoint
-  fetch(`https://api.github.com/repos/${repo}`)
-    .then((r) => (r.ok ? r.json() : null))
-    .then((data) => {
-      if (data && typeof data.stargazers_count === 'number') {
-        stars = data.stargazers_count;
-        render();
-      }
-    })
-    .catch(() => {});
+  function build(stars, tag, downloads) {
+    const defs = [];
+    if (typeof stars === 'number') defs.push([starIcon, stars, 'ghFavorites']);
+    if (tag) defs.push([tagIcon, tag, 'ghLatestVersion']);
+    if (typeof downloads === 'number') defs.push([downloadIcon, downloads, 'ghDownloads']);
 
-  // latest release tag, separate call since it 404s if there's no release yet
-  fetch(`https://api.github.com/repos/${repo}/releases/latest`)
-    .then((r) => (r.ok ? r.json() : null))
-    .then((data) => {
-      if (data && data.tag_name) {
-        latestTag = data.tag_name;
-        render();
-      }
-    })
-    .catch(() => {});
+    if (!defs.length) {
+      el.classList.add('is-empty'); // nothing to show: give the reserved space back
+      return;
+    }
+    tiles = defs.map((d, i) => tile(d[0], d[1], d[2], i));
+    el.textContent = '';
+    tiles.forEach((x) => el.appendChild(x.span));
+    paint();
+    el.removeAttribute('aria-hidden');
+    el.classList.add('is-ready');
+  }
 
-  // total downloads across every release's assets, same source as the README badge
-  fetch(`https://api.github.com/repos/${repo}/releases?per_page=100`)
-    .then((r) => (r.ok ? r.json() : null))
-    .then((releases) => {
-      if (!Array.isArray(releases)) return;
-      totalDownloads = releases.reduce(
-        (sum, rel) => sum + (rel.assets || []).reduce((s, a) => s + (a.download_count || 0), 0),
-        0
-      );
-      render();
-    })
-    .catch(() => {});
+  const getJson = (url) =>
+    fetch(url).then((r) => (r.ok ? r.json() : null)).catch(() => null);
 
-  if (window.i18n) i18n.onChange(render);
+  Promise.all([
+    getJson('https://api.github.com/repos/' + repo),
+    getJson('https://api.github.com/repos/' + repo + '/releases/latest'),
+    getJson('https://api.github.com/repos/' + repo + '/releases?per_page=100'),
+  ]).then(([info, latest, releases]) => {
+    const stars = info && typeof info.stargazers_count === 'number' ? info.stargazers_count : null;
+    const tag = latest && latest.tag_name ? latest.tag_name : null;
+    const downloads = Array.isArray(releases)
+      ? releases.reduce((sum, rel) => sum + (rel.assets || []).reduce((s, a) => s + (a.download_count || 0), 0), 0)
+      : null;
+    build(stars, tag, downloads);
+  });
+
+  if (window.i18n) i18n.onChange(paint);
 })();

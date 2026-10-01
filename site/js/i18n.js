@@ -1,142 +1,78 @@
-// Tiny i18n helper, no framework needed:
-// - static text: put both versions on the element as data-fr="..." data-en="..."
-//   and this script swaps textContent depending on the active language.
-// - dynamic strings built from JS (music widget, github stats, download
-//   modal...) call i18n.t('key') and re-render when i18n.onChange fires.
+// i18n helper. Dictionaries live in /i18n/<lang>.js (window.I18N.<lang>).
+// - static text: data-i18n="key" (textContent) or data-i18n-html="key" (trusted HTML, for links)
+// - aria labels: data-i18n-aria="key"
+// - scripts: i18n.t('key'), re-render with i18n.onChange(fn)
 (function () {
-  // dictionary for strings that get built dynamically in other scripts
-  const STRINGS = {
-    fr: {
-      nowPlaying: 'Écoute en cours',
-      ghFavorites: 'favoris',
-      ghDownloads: 'téléchargements',
-      ghLatestVersion: 'Dernière version',
-      lightboxZoomIn: 'Clique pour zoomer',
-      lightboxZoomOut: 'Clique pour dézoomer',
-      dlTitle: 'Télécharger LastStats',
-      dlChooseOs: "Choisissez votre système d'exploitation.",
-      dlChooseArch: 'Quel type de processeur ?',
-      dlAndroidNote: 'Les APK Android sont compilés par architecture pour rester légers. En cas de doute, choisissez « Universelle », elle fonctionne sur tous les appareils.',
-      dlArchArm64: 'La grande majorité des téléphones récents (2018+)',
-      dlArchArmv7: 'Anciens téléphones 32 bits',
-      dlArchX86: 'Émulateurs et quelques tablettes/Chromebooks',
-      dlArchUniversal: 'Toutes architectures, fichier plus lourd',
-      dlBackOs: '← Changer de système',
-      dlBackRetry: '← Retour',
-      dlSearching: 'Recherche de la dernière version…',
-      dlDownloadTitle: 'Téléchargement',
-      dlNoAsset: 'Aucun fichier correspondant trouvé pour cette plateforme. Ouverture de la page des releases…',
-      dlFetchError: 'Impossible de récupérer la dernière version. Ouverture de la page des releases…',
-      dlChooseFormat: 'Quel format ?',
-      dlBack: '← Retour',
-      dlArchPc: 'La plupart des PC',
-      dlArchWinArm: 'PC Snapdragon (Surface Pro X, PC Copilot+…)',
-      dlArchLinuxArm: 'Raspberry Pi, serveurs et PC ARM',
-      dlArchAppleSilicon: 'Mac de 2020 et plus récents (puces M1, M2, M3…)',
-      dlArchIntel: 'Anciens Mac avec processeur Intel',
-      dlArchMacUniversal: 'Fonctionne sur tous les Mac, fichier plus lourd',
-      dlFmtExe: 'Recommandé : installation guidée, raccourcis et désinstallation',
-      dlFmtZip: 'Sans installation, à décompresser',
-      dlFmtDmg: 'Recommandé : glisser l\'app dans Applications',
-      dlFmtDeb: 'Installateur pour les distributions basées sur Debian',
-      dlFmtRpm: 'Installateur pour les distributions basées sur Red Hat / SUSE',
-      dlFmtAppImage: 'Portable, fonctionne sur toutes les distributions',
-      dlFmtScript: 'Choisit automatiquement le bon paquet pour votre distribution',
-      dlFmtIpa: 'Non signé : à installer avec AltStore, Sideloadly ou TrollStore',
-      dlIosNote: 'Cette app iOS n\'est pas signée : installez le fichier .ipa avec AltStore, Sideloadly ou TrollStore (ou re-signez-le avec votre compte Apple).',
-    },
-    en: {
-      nowPlaying: 'Now playing',
-      ghFavorites: 'stars',
-      ghDownloads: 'downloads',
-      ghLatestVersion: 'Latest version',
-      lightboxZoomIn: 'Click to zoom in',
-      lightboxZoomOut: 'Click to zoom out',
-      dlTitle: 'Download LastStats',
-      dlChooseOs: 'Choose your operating system.',
-      dlChooseArch: 'Which processor type?',
-      dlAndroidNote: "Android APKs are built per architecture to keep the file size down. If unsure, pick \"Universal\", it works on every device.",
-      dlArchArm64: 'The vast majority of recent phones (2018+)',
-      dlArchArmv7: 'Older 32-bit phones',
-      dlArchX86: 'Emulators and some tablets/Chromebooks',
-      dlArchUniversal: 'All architectures, bigger file',
-      dlBackOs: '← Change system',
-      dlBackRetry: '← Back',
-      dlSearching: 'Looking up the latest version…',
-      dlDownloadTitle: 'Download',
-      dlNoAsset: 'No matching file found for this platform. Opening the releases page…',
-      dlFetchError: 'Could not fetch the latest version. Opening the releases page…',
-      dlChooseFormat: 'Which format?',
-      dlBack: '← Back',
-      dlArchPc: 'Most PCs',
-      dlArchWinArm: 'Snapdragon PCs (Surface Pro X, Copilot+ PCs…)',
-      dlArchLinuxArm: 'Raspberry Pi, ARM servers and PCs',
-      dlArchAppleSilicon: 'Macs from 2020 onwards (M1, M2, M3… chips)',
-      dlArchIntel: 'Older Macs with an Intel processor',
-      dlArchMacUniversal: 'Works on every Mac, bigger file',
-      dlFmtExe: 'Recommended: guided install, shortcuts and uninstaller',
-      dlFmtZip: 'No install needed, just unzip',
-      dlFmtDmg: 'Recommended: drag the app into Applications',
-      dlFmtDeb: 'Installer for Debian-based distributions',
-      dlFmtRpm: 'Installer for Red Hat / SUSE-based distributions',
-      dlFmtAppImage: 'Portable, works on every distribution',
-      dlFmtScript: 'Automatically picks the right package for your distribution',
-      dlFmtIpa: 'Unsigned: install with AltStore, Sideloadly or TrollStore',
-      dlIosNote: 'This iOS app is unsigned: install the .ipa file with AltStore, Sideloadly or TrollStore (or re-sign it with your own Apple account).',
-    },
-  };
+  const DICT = window.I18N || {};
+  const LANGS = Object.keys(DICT).sort((a, b) => (a === 'fr' ? -1 : b === 'fr' ? 1 : a.localeCompare(b)));
+  const FALLBACK = 'fr';
+
+  function lookup(lang, key) {
+    const d = DICT[lang];
+    if (d && d[key] !== undefined) return d[key];
+    const f = DICT[FALLBACK];
+    return f && f[key] !== undefined ? f[key] : null;
+  }
 
   function detect() {
     const saved = localStorage.getItem('lang');
-    if (saved === 'fr' || saved === 'en') return saved;
-    return navigator.language && navigator.language.toLowerCase().startsWith('fr') ? 'fr' : 'en';
+    if (saved && DICT[saved]) return saved;
+    const nav = (navigator.language || '').slice(0, 2).toLowerCase();
+    return DICT[nav] ? nav : 'en' in DICT ? 'en' : FALLBACK;
   }
 
   let lang = detect();
   const listeners = [];
 
+  function nextLang() {
+    return LANGS[(LANGS.indexOf(lang) + 1) % LANGS.length];
+  }
+
   function applyStatic() {
     document.documentElement.lang = lang;
 
-    document.querySelectorAll('[data-fr]').forEach((el) => {
-      const fr = el.getAttribute('data-fr');
-      const en = el.getAttribute('data-en');
-      el.textContent = lang === 'fr' ? fr : (en !== null ? en : fr);
+    document.querySelectorAll('[data-i18n]').forEach((el) => {
+      const v = lookup(lang, el.getAttribute('data-i18n'));
+      if (v !== null) el.textContent = v;
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach((el) => {
+      const v = lookup(lang, el.getAttribute('data-i18n-html'));
+      if (v !== null) el.innerHTML = v;
+    });
+    document.querySelectorAll('[data-i18n-aria]').forEach((el) => {
+      const v = lookup(lang, el.getAttribute('data-i18n-aria'));
+      if (v !== null) el.setAttribute('aria-label', v);
     });
 
-    // aria-label / title variants for non-text elements (icon buttons, etc.)
-    document.querySelectorAll('[data-fr-aria]').forEach((el) => {
-      const fr = el.getAttribute('data-fr-aria');
-      const en = el.getAttribute('data-en-aria');
-      el.setAttribute('aria-label', lang === 'fr' ? fr : (en || fr));
-    });
-
+    const next = nextLang();
+    const meta = (DICT[next] && DICT[next]._meta) || { short: next.toUpperCase(), name: next };
     document.querySelectorAll('.lang-toggle').forEach((btn) => {
-      btn.textContent = lang === 'fr' ? 'EN' : 'FR';
-      btn.setAttribute('aria-label', lang === 'fr' ? 'Switch to English' : 'Passer en français');
+      btn.textContent = meta.short;
+      btn.setAttribute('aria-label', meta.name);
     });
 
     listeners.forEach((fn) => fn(lang));
   }
 
   window.i18n = {
-    // legacy shape kept so any older code reading i18n.fr[key] still works
-    fr: STRINGS.fr,
-    en: STRINGS.en,
     get lang() {
       return lang;
     },
+    get langs() {
+      return LANGS.slice();
+    },
     t(key) {
-      return (STRINGS[lang] && STRINGS[lang][key]) || key;
+      const v = lookup(lang, key);
+      return v !== null ? v : key;
     },
     setLang(l) {
-      if (l !== 'fr' && l !== 'en') return;
+      if (!DICT[l]) return;
       lang = l;
       localStorage.setItem('lang', l);
       applyStatic();
     },
     toggle() {
-      window.i18n.setLang(lang === 'fr' ? 'en' : 'fr');
+      window.i18n.setLang(nextLang());
     },
     onChange(fn) {
       listeners.push(fn);
