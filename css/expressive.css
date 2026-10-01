@@ -50,11 +50,41 @@ a, button { touch-action: manipulation; }
   width: 44px; height: 44px; background: var(--md-secondary-container); color: var(--md-on-secondary-container);
 }
 
-/* ---------- Info chips: paired shapes, like the button group ---------- */
-.feature-chips, .project-tags { gap: 2px; }
-.feature-chips span, .project-tags span { user-select: none; }
-.feature-chips span:nth-child(odd), .project-tags span:nth-child(odd)   { border-radius: 20px var(--r-inner) var(--r-inner) 20px; }
-.feature-chips span:nth-child(even), .project-tags span:nth-child(even) { border-radius: var(--r-inner) 20px 20px var(--r-inner); }
+/* ---------- Info chips: ONE connected bar, only the two outer ends are round ---------- */
+.feature-chips, .project-tags { gap: 2px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+.feature-chips::-webkit-scrollbar, .project-tags::-webkit-scrollbar { display: none; }
+.feature-chips { width: fit-content; margin-inline: auto; }
+.feature-chips span, .project-tags span { user-select: none; white-space: nowrap; flex: none; border-radius: var(--r-inner); }
+.feature-chips span:first-child, .project-tags span:first-child { border-radius: var(--r-outer) var(--r-inner) var(--r-inner) var(--r-outer); }
+.feature-chips span:last-child,  .project-tags span:last-child  { border-radius: var(--r-inner) var(--r-outer) var(--r-outer) var(--r-inner); }
+
+/* ---------- Live stats (stars / version / downloads): connected shaped tiles ---------- */
+.gh-stats { gap: 2px; flex-wrap: nowrap; width: fit-content; max-width: 100%; margin-inline: auto; overflow-x: auto; scrollbar-width: none; }
+.gh-stats::-webkit-scrollbar { display: none; }
+.gh-stats .gh-stat {
+  flex: 1 0 auto; flex-direction: column; align-items: flex-start; gap: .15rem;
+  min-width: 8.5rem; padding: 1rem 1.4rem; border-radius: var(--r-inner);
+  background: var(--md-secondary-container); color: var(--md-on-secondary-container);
+  transition: border-radius .5s var(--spring-slow), transform .45s var(--spring-fast), background-color .25s var(--m3-standard);
+}
+.gh-stats .gh-stat:nth-child(2) { background: var(--md-primary-container); color: var(--md-on-primary-container); }
+.gh-stats .gh-stat:nth-child(3) { background: var(--md-tertiary-container); color: var(--md-on-tertiary-container); }
+.gh-stats .gh-stat:first-child { border-radius: 32px var(--r-inner) var(--r-inner) 32px; }
+.gh-stats .gh-stat:last-child  { border-radius: var(--r-inner) 32px 32px var(--r-inner); }
+.gh-stats .gh-stat:only-child  { border-radius: 32px; }
+.gh-stats .gh-stat svg { color: currentColor; opacity: .8; margin-bottom: .35rem; }
+.gh-stats .gh-stat-value { font-family: var(--font-display); font-weight: 700; font-size: 1.7rem; line-height: 1.1; }
+.gh-stats .gh-stat-label { font-size: .78rem; font-weight: 500; opacity: .8; }
+@media (hover: hover) { .gh-stats .gh-stat:hover { border-radius: 28px; transform: translateY(-2px); } }
+.gh-stats .gh-stat:active { border-radius: 999px; transform: scale(.96); }
+@media (max-width: 560px) {
+  .gh-stats { flex-direction: column; align-items: stretch; width: 100%; }
+  .gh-stats .gh-stat { flex-direction: row; align-items: center; gap: .75rem; }
+  .gh-stats .gh-stat svg { margin: 0; }
+  .gh-stats .gh-stat-label { margin-left: auto; }
+  .gh-stats .gh-stat:first-child { border-radius: 28px 28px var(--r-inner) var(--r-inner); }
+  .gh-stats .gh-stat:last-child  { border-radius: var(--r-inner) var(--r-inner) 28px 28px; }
+}
 
 /* ---------- Download dialog ---------- */
 .dl-modal-box {
@@ -77,7 +107,7 @@ a, button { touch-action: manipulation; }
   .project-actions > :hover, .contact-links > :hover { border-radius: 20px; transform: translateY(-2px); }
   .about-cta:hover, .back-link:hover, .help-external-link:hover, .lang-toggle:hover { border-radius: 18px; transform: translateY(-2px); }
   .theme-toggle:hover, .nav-logo:hover, .lightbox-close:hover, .dl-modal-close:hover { border-radius: 16px; transform: none; }
-  .feature-chips span:hover, .project-tags span:hover { border-radius: 999px; transform: translateY(-2px); }
+  .feature-chips span:hover, .project-tags span:hover { border-radius: 20px; transform: translateY(-2px); }
   .dl-option:hover { border-radius: 20px; }
   .dl-back:hover { background: var(--md-primary-container); border-radius: 14px; }
   .showcase-media:hover { border-radius: 40px; }
