@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:ffi' show Abi;
+import 'update_abi.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
@@ -113,7 +113,8 @@ class UpdateService {
   }
 
   // Picks the right release asset for the current OS + CPU architecture.
-  // Abi.current() is built into dart:ffi — no extra package needed.
+  // The CPU/OS key comes from update_abi.dart (dart:ffi on native platforms,
+  // a harmless stub on web where dart:ffi does not exist).
   static (String?, DownloadKind) _bestAssetForPlatform(List<Map<String, dynamic>> assets) {
     String? find(String name) {
       for (final a in assets) {
@@ -124,43 +125,43 @@ class UpdateService {
 
     final universal = find('app-universal-release.apk');
 
-    switch (Abi.current()) {
-      case Abi.androidArm64:
+    switch (currentAbiKey()) {
+      case 'android_arm64':
         return (find('app-arm64-v8a-release.apk') ?? universal, DownloadKind.apk);
-      case Abi.androidArm:
+      case 'android_arm':
         return (find('app-armeabi-v7a-release.apk') ?? universal, DownloadKind.apk);
-      case Abi.androidX64:
+      case 'android_x64':
         return (find('app-x86_64-release.apk') ?? universal, DownloadKind.apk);
-      case Abi.androidIA32:
+      case 'android_ia32':
         return (universal, DownloadKind.apk);
 
-      case Abi.windowsArm64:
+      case 'windows_arm64':
         final exe = find('LastStats-Setup-arm64.exe');
         if (exe != null) return (exe, DownloadKind.installer);
         return (find('laststats-windows-arm64.zip'), DownloadKind.zip);
-      case Abi.windowsX64:
-      case Abi.windowsIA32:
+      case 'windows_x64':
+      case 'windows_ia32':
         final exe = find('LastStats-Setup-x64.exe');
         if (exe != null) return (exe, DownloadKind.installer);
         return (find('laststats-windows.zip'), DownloadKind.zip);
 
       // macOS: the zip built for this chip, else the universal zip (older
       // releases only have the universal one).
-      case Abi.macosArm64:
+      case 'macos_arm64':
         return (find('laststats-macos-arm64.zip') ?? find('laststats-macos.zip'), DownloadKind.zip);
-      case Abi.macosX64:
+      case 'macos_x64':
         return (find('laststats-macos-x64.zip') ?? find('laststats-macos.zip'), DownloadKind.zip);
 
-      case Abi.linuxArm64:
+      case 'linux_arm64':
         return (find('laststats-linux-arm64.zip') ?? find('laststats-linux.zip'), DownloadKind.zip);
-      case Abi.linuxX64:
-      case Abi.linuxIA32:
+      case 'linux_x64':
+      case 'linux_ia32':
         return (find('laststats-linux.zip'), DownloadKind.zip);
 
       // iOS: the unsigned .ipa (must be sideloaded).
-      case Abi.iosArm64:
-      case Abi.iosArm:
-      case Abi.iosX64:
+      case 'ios_arm64':
+      case 'ios_arm':
+      case 'ios_x64':
         return (find('LastStats-ios.ipa'), DownloadKind.zip);
 
       default:

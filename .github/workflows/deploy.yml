@@ -2,7 +2,7 @@ name: Deploy Flutter Web to gh-pages
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   workflow_dispatch:
 
 permissions:
@@ -23,8 +23,9 @@ jobs:
       # Get dependencies
       - run: flutter pub get
 
-      # Build web app, base-href must match the /app/ subfolder
-      - run: flutter build web --release --base-href /LastStats-App/app/
+      # Build web app, base-href must match the repo name + /app/ subfolder
+      # (site URL: https://sanobld.github.io/LastStats/app/)
+      - run: flutter build web --release --base-href /LastStats/app/
 
       # Publish only to /app subfolder. keep_files protects the existing /docs folder
       - uses: peaceiris/actions-gh-pages@v4
