@@ -5,6 +5,7 @@ void showTasteCompareSheet(
   String targetUser,
   LastFmService service,
 ) {
+  m3Haptic(M3Haptic.medium);
   showModalBottomSheet(
     sheetAnimationStyle: kM3SheetAnimation,
     context: context,
@@ -48,19 +49,13 @@ typedef _TasteAnalysis = ({
   int totalSharedTracks,
   int totalSharedAlbums,
   List<String> sharedGenres,
+  Map<String, double> breakdown, // 0..1 per category: artists, genres, tracks, albums
 });
 
 // ── Weight helpers ────────────────────────────────────────────────────────────
 
 // Extract integer playcount from a Last.fm item map.
 int _playcount(dynamic m) => int.tryParse((m['playcount'] ?? '0').toString()) ?? 0;
-
-// Normalize a count map to [0..1] weights (most played = 1.0).
-Map<String, double> _countWeights(Map<String, int> counts) {
-  if (counts.isEmpty) return {};
-  final max = counts.values.reduce((a, b) => a > b ? a : b).toDouble();
-  return {for (final e in counts.entries) e.key: e.value / max};
-}
 
 // Convert a ranked API list to position-based weights (rank 0 = 1.0, last ≈ 0).
 Map<String, double> _rankWeights(List<dynamic> items, String Function(dynamic) key) {
@@ -100,28 +95,63 @@ Map<String, double> _buildGenreWeights(
   return _normalizeWeights(raw);
 }
 
-// Overlap score: avg recall from each side, then x*(2-x) curve.
-// 50% shared artists → ~75%, 25% → ~44%. More intuitive than Jaccard.
-double _overlapScore(Map<String, double> a, Map<String, double> b) {
-  if (a.isEmpty || b.isEmpty) return 0.0;
-  double shared = 0, sumA = 0, sumB = 0;
-  for (final wa in a.values) {
-    sumA += wa;
+// ── Similarity maths ──────────────────────────────────────────────────────────
+// Each listener is a vector: one entry per artist / track / album / genre,
+// sized by sqrt(plays). sqrt keeps favourites important without letting a
+// single huge artist drown everything else. Two listeners are compared with
+// cosine similarity (0 = nothing in common, 1 = identical taste).
+
+// Counts -> weights in [0..1] (sqrt of plays, most played = 1.0).
+Map<String, double> _dampedWeights(Map<String, int> counts) {
+  if (counts.isEmpty) return {};
+  final raw = {for (final e in counts.entries) e.key: sqrt(e.value.toDouble())};
+  return _normalizeWeights(raw);
+}
+
+// Weights for the other person's ranked API list. Uses real play counts;
+// falls back to the position in the list when counts are missing.
+Map<String, double> _itemWeights(List<dynamic> items, String Function(dynamic) key) {
+  final counts = <String, int>{};
+  for (final it in items) {
+    final k = key(it);
+    if (k.isEmpty) continue;
+    counts[k] = (counts[k] ?? 0) + _playcount(it);
   }
-  for (final wb in b.values) {
-    sumB += wb;
+  if (counts.values.every((c) => c == 0)) return _rankWeights(items, key);
+  return _dampedWeights(counts);
+}
+
+// Keeps only the [n] heaviest entries, so both sides are compared on equal
+// terms (a full library is never matched against a top-200 list).
+Map<String, double> _topWeights(Map<String, double> w, int n) {
+  if (w.length <= n) return w;
+  final list = w.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+  return {for (final e in list.take(n)) e.key: e.value};
+}
+
+double _cosine(Map<String, double> a, Map<String, double> b) {
+  double dot = 0, na = 0, nb = 0;
+  for (final v in a.values) { na += v * v; }
+  for (final v in b.values) { nb += v * v; }
+  if (na == 0 || nb == 0) return 0.0;
+  final small = a.length <= b.length ? a : b;
+  final big   = identical(small, a) ? b : a;
+  for (final e in small.entries) {
+    final o = big[e.key];
+    if (o != null) dot += e.value * o;
   }
-  for (final k in a.keys) {
-    final wb = b[k];
-    if (wb != null) {
-      final wa = a[k]!;
-      shared += wa < wb ? wa : wb;
-    }
-  }
-  final recA = sumA > 0 ? (shared / sumA).clamp(0.0, 1.0) : 0.0;
-  final recB = sumB > 0 ? (shared / sumB).clamp(0.0, 1.0) : 0.0;
-  final raw  = (recA + recB) / 2.0;
-  return raw * (2.0 - raw);
+  return (dot / (sqrt(na) * sqrt(nb))).clamp(0.0, 1.0);
+}
+
+// Cosine on the top [n] of each side, then a gentle curve so the result
+// reads like a percentage a person would expect: [curve] < 1 lifts small
+// values (strangers rarely reach a raw cosine above 0.3).
+// Returns null when one side has no data.
+double? _tasteSimilarity(
+    Map<String, double> a, Map<String, double> b, int n, double curve) {
+  if (a.isEmpty || b.isEmpty) return null;
+  final c = _cosine(_topWeights(a, n), _topWeights(b, n));
+  return math.pow(c, curve).toDouble().clamp(0.0, 1.0);
 }
 
 // ── Compatibility logic ────────────────────────────────────────────────────────
@@ -152,24 +182,30 @@ _TasteAnalysis _analyzeTaste({
     return '$ar::${LibraryMerge.ckTitle((a['name'] ?? '').toString(), album: true)}';
   }
 
-  final theirArtistW = _rankWeights(theirArtists, artistKey);
-  final theirTrackW  = _rankWeights(theirTracks,  trackKey);
-  final theirAlbumW  = _rankWeights(theirAlbums,  albumKey);
+  final theirArtistW = _itemWeights(theirArtists, artistKey);
+  final theirTrackW  = _itemWeights(theirTracks,  trackKey);
+  final theirAlbumW  = _itemWeights(theirAlbums,  albumKey);
 
-  // Score: artists carry the most long-term signal, but genres catch the
-  // case where two people share zero exact artists/tracks yet listen to
-  // the same kind of music — that used to drag the score down unfairly.
-  final artistScore = _overlapScore(myArtistW, theirArtistW);
-  final trackScore  = _overlapScore(myTrackW,  theirTrackW);
-  final albumScore  = _overlapScore(myAlbumW,  theirAlbumW);
-  final hasGenreData = myGenreW.isNotEmpty && theirGenreW.isNotEmpty;
-  final genreScore  = hasGenreData ? _overlapScore(myGenreW, theirGenreW) : 0.0;
-
-  final base = artistScore * 0.45 + trackScore * 0.20 + albumScore * 0.15;
-  final score = (hasGenreData
-          ? base + genreScore * 0.20   // 0.45+0.20+0.15+0.20 = 1.0
-          : base / 0.80)               // rescale to 0..1 when no genre data
-      .clamp(0.0, 1.0);
+  // Score = weighted mix of 4 similarities. Artists say the most about
+  // long-term taste, genres catch people who share a style but no exact
+  // artist. A missing category (no genre data, no albums) is left out and
+  // the other weights are rescaled, so it never drags the score down.
+  final sims = <String, (double?, double)>{
+    'artists': (_tasteSimilarity(myArtistW, theirArtistW, 300, 0.60), 0.40),
+    'genres':  (_tasteSimilarity(myGenreW,  theirGenreW,   60, 0.80), 0.25),
+    'tracks':  (_tasteSimilarity(myTrackW,  theirTrackW,  300, 0.50), 0.20),
+    'albums':  (_tasteSimilarity(myAlbumW,  theirAlbumW,  200, 0.50), 0.15),
+  };
+  double sum = 0, weight = 0;
+  final breakdown = <String, double>{};
+  sims.forEach((name, v) {
+    final s = v.$1;
+    if (s == null) return;
+    breakdown[name] = s;
+    sum    += s * v.$2;
+    weight += v.$2;
+  });
+  final score = weight == 0 ? 0.0 : (sum / weight).clamp(0.0, 1.0);
 
   // Top shared genres (by combined weight), for display.
   final genreOverlap = <(double, String)>[];
@@ -314,6 +350,7 @@ _TasteAnalysis _analyzeTaste({
     totalSharedTracks:   totalSharedTracks,
     totalSharedAlbums:   totalSharedAlbums,
     sharedGenres:        sharedGenres,
+    breakdown:           breakdown,
   );
 }
 
@@ -358,6 +395,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
   int                _totalTracks   = 0;
   int                _totalAlbums   = 0;
   List<String>       _sharedGenres  = [];
+  Map<String, double> _breakdown    = {};
 
   @override
   void initState() {
@@ -405,9 +443,9 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
         }
       }
 
-      var myArtistW = hasCached ? _countWeights(artistCounts) : <String, double>{};
-      var myTrackW  = hasCached ? _countWeights(trackCounts)  : <String, double>{};
-      var myAlbumW  = hasCached ? _countWeights(albumCounts)  : <String, double>{};
+      var myArtistW = hasCached ? _dampedWeights(artistCounts) : <String, double>{};
+      var myTrackW  = hasCached ? _dampedWeights(trackCounts) : <String, double>{};
+      var myAlbumW  = hasCached ? _dampedWeights(albumCounts) : <String, double>{};
 
       // Bug fix: if cache exists but records have no artist metadata (v1 format),
       // myArtistW will be empty. Fall back to API in that case.
@@ -467,6 +505,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
           return '$ar::${LibraryMerge.ckTitle((a['name'] ?? '').toString(), album: true)}';
         });
         // Real playcounts from the API fallback, for display in detail view.
+        // (Weights are rebuilt from them below, so both sides use play counts.)
         for (final a in myArtistsFb) {
           artistCounts[LibraryMerge.ckArtist((a['name'] ?? '').toString())] = _playcount(a);
         }
@@ -478,6 +517,12 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
           final ar = LibraryMerge.ckArtist((a['artist']?['name'] ?? '').toString());
           albumCounts['$ar::${LibraryMerge.ckTitle((a['name'] ?? '').toString(), album: true)}'] = _playcount(a);
         }
+      }
+
+      if (!isSelf && !hasMeaningfulData) {
+        myArtistW = _dampedWeights(artistCounts);
+        myTrackW  = _dampedWeights(trackCounts);
+        myAlbumW  = _dampedWeights(albumCounts);
       }
 
       // ── Genre signal ─────────────────────────────────────────────────────
@@ -601,6 +646,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
         _totalTracks   = analysis.totalSharedTracks;
         _totalAlbums   = analysis.totalSharedAlbums;
         _sharedGenres  = analysis.sharedGenres;
+        _breakdown     = analysis.breakdown;
         _loading       = false;
       });
       // Only real cross-profile comparisons count toward the achievement,
@@ -675,34 +721,24 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
       children: [
         _FadeSlideIn(
           delay: const Duration(milliseconds: 20),
-          child: Center(
-            child: _DuoAvatars(
-              myAvatar:      _myAvatar,
-              theirAvatar:   _theirAvatar,
-              myUsername:    _myUsername,
-              theirUsername: widget.targetUser,
-            ),
+          child: _CompatHero(
+            score:         _score,
+            myAvatar:      _myAvatar,
+            theirAvatar:   _theirAvatar,
+            myUsername:    _myUsername,
+            theirUsername: widget.targetUser,
+            tier:          _compatibilityTierLabel(_score),
           ),
         ),
-        const SizedBox(height: 22),
+        const SizedBox(height: 14),
 
-        _FadeSlideIn(
-          delay: const Duration(milliseconds: 80),
-          child: Center(child: _CompatibilityBadge(score: _score)),
-        ),
-        const SizedBox(height: 8),
-
-        _FadeSlideIn(
-          delay: const Duration(milliseconds: 120),
-          child: Center(
-            child: Text(
-              _compatibilityTierLabel(_score),
-              style: text.titleSmall?.copyWith(
-                  color: scheme.primary, fontWeight: FontWeight.w700),
-            ),
+        if (_breakdown.isNotEmpty) ...[
+          _FadeSlideIn(
+            delay: const Duration(milliseconds: 120),
+            child: _BreakdownCard(values: _breakdown),
           ),
-        ),
-        const SizedBox(height: 12),
+          const SizedBox(height: 14),
+        ],
 
         // Shared counts summary row
         if (_totalArtists > 0 || _totalTracks > 0 || _totalAlbums > 0)
@@ -1372,54 +1408,207 @@ class _DuoAvatars extends StatelessWidget {
   }
 }
 
-// ── Compatibility badge — Material You blob instead of a plain circular
-// progress ring, same scallop-shape language as the poster title blocks
-// and the "now playing" avatar ring. ──────────────────────────────────────
+// ── Hero: avatars + live percentage + tier ────────────────────────────────────
+// The percentage counts up while the cookie shape grows with it. A haptic
+// "tick" follows every few points (it slows down as the count settles), then
+// a heartbeat thump lands at the end. Stronger score = stronger thump.
 
-class _CompatibilityBadge extends StatelessWidget {
+class _CompatHero extends StatefulWidget {
   final double score;
-  const _CompatibilityBadge({required this.score});
+  final String myAvatar, theirAvatar, myUsername, theirUsername, tier;
+  const _CompatHero({
+    required this.score,
+    required this.myAvatar,
+    required this.theirAvatar,
+    required this.myUsername,
+    required this.theirUsername,
+    required this.tier,
+  });
+
+  @override
+  State<_CompatHero> createState() => _CompatHeroState();
+}
+
+class _CompatHeroState extends State<_CompatHero>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c =
+      AnimationController(vsync: this, duration: const Duration(milliseconds: 1500));
+  late final Animation<double> _curve =
+      CurvedAnimation(parent: _c, curve: Curves.easeOutCubic);
+  int _lastStep = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _curve.addListener(_tick);
+    _c.addStatusListener((s) { if (s == AnimationStatus.completed) _finish(); });
+    // Wait for the sheet to finish sliding up, then start.
+    Future.delayed(const Duration(milliseconds: 260), () {
+      if (!mounted) return;
+      if (M3Motion.reduced(context)) {
+        _c.value = 1.0;
+        _finish();
+      } else {
+        _c.forward();
+      }
+    });
+  }
+
+  // One soft tick every 4 points; firmer ticks near the end.
+  void _tick() {
+    final step = (_curve.value * widget.score * 100 / 4).floor();
+    if (step == _lastStep) return;
+    _lastStep = step;
+    m3Haptic(_curve.value > 0.8 ? M3Haptic.light : M3Haptic.selection);
+  }
+
+  // Heartbeat: thump-thump, more beats for a better match.
+  Future<void> _finish() async {
+    m3Haptic(M3Haptic.heavy);
+    if (widget.score >= 0.6) {
+      await Future.delayed(const Duration(milliseconds: 120));
+      if (!mounted) return;
+      m3Haptic(M3Haptic.medium);
+    }
+    if (widget.score >= 0.8) {
+      await Future.delayed(const Duration(milliseconds: 160));
+      if (!mounted) return;
+      m3Haptic(M3Haptic.light);
+    }
+  }
+
+  @override
+  void dispose() {
+    _curve.removeListener(_tick);
+    _c.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
+    return M3ShapeMorph(
+      radius: BorderRadius.circular(32),
+      color: scheme.surfaceContainerLow,
+      padding: const EdgeInsets.fromLTRB(16, 22, 16, 20),
+      child: Column(children: [
+        _DuoAvatars(
+          myAvatar:      widget.myAvatar,
+          theirAvatar:   widget.theirAvatar,
+          myUsername:    widget.myUsername,
+          theirUsername: widget.theirUsername,
+        ),
+        const SizedBox(height: 18),
+        AnimatedBuilder(
+          animation: _curve,
+          builder: (context, _) {
+            final v = _curve.value * widget.score;
+            // Small pop right as the count lands.
+            final t = ((_c.value - 0.85) / 0.15).clamp(0.0, 1.0);
+            final pop = 1 + 0.06 * (1 - (2 * t - 1) * (2 * t - 1));
+            return Transform.scale(
+              scale: pop,
+              child: Container(
+                width: 168, height: 168,
+                alignment: Alignment.center,
+                decoration: ShapeDecoration(
+                  color: scheme.primaryContainer,
+                  // Deeper scallops the higher the score.
+                  shape: M3CookieBorder(lobes: 10, amplitude: 0.05 + v * 0.12),
+                ),
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Text('${(v * 100).round()}%',
+                      style: text.displaySmall?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: scheme.onPrimaryContainer, height: 1)),
+                  const SizedBox(height: 2),
+                  Text(tx('ui_compatibility'),
+                      style: text.labelSmall?.copyWith(
+                          color: scheme.onPrimaryContainer.withValues(alpha: 0.75),
+                          letterSpacing: 0.6)),
+                ]),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 14),
+        Text(widget.tier,
+            textAlign: TextAlign.center,
+            style: text.titleMedium?.copyWith(
+                color: scheme.primary, fontWeight: FontWeight.w800)),
+      ]),
+    );
+  }
+}
 
-    return TweenAnimationBuilder<double>(
-      tween:    Tween(begin: 0, end: score),
-      duration: const Duration(milliseconds: 1100),
-      curve:    M3Motion.emphasizedDecelerate,
-      builder: (context, value, _) {
-        // The blob gets a touch more expressive (deeper scallops) the
-        // higher the compatibility — a shape that grows with the score,
-        // instead of a bar that just fills up.
-        final amplitude = 0.05 + value * 0.12;
-        return Container(
-          width: 168, height: 168,
-          alignment: Alignment.center,
-          decoration: ShapeDecoration(
-            color: scheme.primaryContainer,
-            shape: M3CookieBorder(lobes: 10, amplitude: amplitude),
+// ── Breakdown: one animated bar per category ──────────────────────────────────
+
+class _BreakdownCard extends StatelessWidget {
+  final Map<String, double> values; // artists, genres, tracks, albums
+  const _BreakdownCard({required this.values});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+    final rows = <(String, IconData, String, Color)>[
+      ('artists', Icons.mic_rounded,          tx('cmp_by_artists'), scheme.primary),
+      ('genres',  Icons.local_offer_rounded,  tx('cmp_by_genres'),  scheme.tertiary),
+      ('tracks',  Icons.music_note_rounded,   tx('cmp_by_tracks'),  scheme.secondary),
+      ('albums',  Icons.album_rounded,        tx('cmp_by_albums'),  scheme.primary),
+    ].where((r) => values.containsKey(r.$1)).toList();
+
+    return M3ShapeMorph(
+      radius: BorderRadius.circular(28),
+      color: scheme.surfaceContainerLow,
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 8),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(tx('cmp_breakdown'),
+            style: text.titleSmall?.copyWith(
+                color: scheme.primary, fontWeight: FontWeight.w800, letterSpacing: 0.4)),
+        const SizedBox(height: 12),
+        for (var i = 0; i < rows.length; i++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: values[rows[i].$1]!),
+              // Staggered: each row takes a little longer than the previous.
+              duration: Duration(milliseconds: 800 + i * 180),
+              curve: M3Motion.emphasizedDecelerate,
+              builder: (context, v, _) => Row(children: [
+                M3CookieBadge(
+                  size: 36,
+                  color: scheme.surfaceContainerHighest,
+                  child: Icon(rows[i].$2, size: 18, color: rows[i].$4),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(rows[i].$3,
+                        style: text.labelLarge?.copyWith(fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: LinearProgressIndicator(
+                        value: v,
+                        minHeight: 8,
+                        color: rows[i].$4,
+                        backgroundColor: scheme.surfaceContainerHighest,
+                      ),
+                    ),
+                  ]),
+                ),
+                SizedBox(
+                  width: 52,
+                  child: Text('${(v * 100).round()}%',
+                      textAlign: TextAlign.end,
+                      style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+                ),
+              ]),
+            ),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '${(value * 100).round()}%',
-                style: text.displaySmall?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: scheme.onPrimaryContainer, height: 1),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                tx('ui_compatibility'),
-                style: text.labelSmall?.copyWith(
-                    color: scheme.onPrimaryContainer.withValues(alpha: 0.75), letterSpacing: 0.6),
-              ),
-            ],
-          ),
-        );
-      },
+      ]),
     );
   }
 }

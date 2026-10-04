@@ -81,7 +81,8 @@ void _pushFullscreen(BuildContext ctx, String url,
      CardTier tier = CardTier.none, int myPlaycount = 0,
      String previewTrackName = '', String previewArtistName = '',
      String? qrData, String? profileUsername,
-     String motionArtist = '', String motionAlbum = '', String motionTrack = ''}) {
+     String motionArtist = '', String motionAlbum = '', String motionTrack = '',
+     bool motionIsArtist = false}) {
   Navigator.of(ctx).push(PageRouteBuilder(
     opaque: false,
     barrierColor: Colors.black,
@@ -92,7 +93,8 @@ void _pushFullscreen(BuildContext ctx, String url,
         myPlaycount: myPlaycount,
         previewTrackName: previewTrackName, previewArtistName: previewArtistName,
         qrData: qrData, profileUsername: profileUsername,
-        motionArtist: motionArtist, motionAlbum: motionAlbum, motionTrack: motionTrack),
+        motionArtist: motionArtist, motionAlbum: motionAlbum, motionTrack: motionTrack,
+        motionIsArtist: motionIsArtist),
     transitionsBuilder: (_, anim, _, child) =>
         FadeTransition(opacity: anim, child: child),
     transitionDuration: const Duration(milliseconds: 220),
@@ -412,7 +414,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   bool    _statusBarOn   = false; // solid status bar visible after scrolling
 
   bool get _motionWanted =>
-      widget.type != 'artists' &&
       motionArtworkNotifier.value &&
       !ecoModeActiveNotifier.value &&
       MotionArtworkService.supported;
@@ -422,12 +423,17 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       : (_info?['album']?['title'] ?? '').toString();
 
   Future<void> _loadMotion() async {
-    if (!_motionWanted || _artist.isEmpty) return;
-    final url = await MotionArtworkService.find(
-      artist: _artist,
-      album: _motionAlbum,
-      track: widget.type == 'tracks' ? _name : '',
-    );
+    if (!_motionWanted) return;
+    // Artists: the lookup uses the artist's own name.
+    final url = widget.type == 'artists'
+        ? (_name.isEmpty ? null : await MotionArtworkService.findArtist(_name))
+        : _artist.isEmpty
+            ? null
+            : await MotionArtworkService.find(
+                artist: _artist,
+                album: _motionAlbum,
+                track: widget.type == 'tracks' ? _name : '',
+              );
     if (mounted) setState(() { _motionUrl = url; _motionChecked = true; });
   }
 
@@ -859,7 +865,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       myPlaycount: _myPlaycount(),
                       previewTrackName: widget.type == 'tracks' ? _name : '',
                       previewArtistName: widget.type == 'tracks' ? _artist : '',
-                      motionArtist: widget.type == 'artists' ? '' : _artist,
+                      motionArtist: widget.type == 'artists' ? _name : _artist,
+                      motionIsArtist: widget.type == 'artists',
                       motionAlbum: widget.type == 'albums'
                           ? _name
                           : widget.type == 'tracks'
@@ -1982,6 +1989,7 @@ class _FullscreenImageViewer extends StatefulWidget {
   final String? profileUsername; // set only for profile cards
   // Used to look up Apple Music motion artwork (albums and tracks only).
   final String motionArtist, motionAlbum, motionTrack;
+  final bool motionIsArtist; // true: look up the artist's own video
   const _FullscreenImageViewer({
     required this.url,
     this.title = '',
@@ -1998,6 +2006,7 @@ class _FullscreenImageViewer extends StatefulWidget {
     this.motionArtist = '',
     this.motionAlbum = '',
     this.motionTrack = '',
+    this.motionIsArtist = false,
   });
 
   bool get isProfileCard => profileUsername != null && profileUsername!.isNotEmpty;
@@ -2164,15 +2173,19 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
       !ecoModeActiveNotifier.value &&
       MotionArtworkService.supported &&
       widget.motionArtist.isNotEmpty &&
-      (widget.motionAlbum.isNotEmpty || widget.motionTrack.isNotEmpty);
+      (widget.motionIsArtist ||
+          widget.motionAlbum.isNotEmpty ||
+          widget.motionTrack.isNotEmpty);
 
   Future<void> _loadMotion() async {
     if (!_motionWanted) return;
-    final url = await MotionArtworkService.find(
-      artist: widget.motionArtist,
-      album: widget.motionAlbum,
-      track: widget.motionTrack,
-    );
+    final url = widget.motionIsArtist
+        ? await MotionArtworkService.findArtist(widget.motionArtist)
+        : await MotionArtworkService.find(
+            artist: widget.motionArtist,
+            album: widget.motionAlbum,
+            track: widget.motionTrack,
+          );
     if (mounted) setState(() { _motionUrl = url; _motionChecked = true; });
   }
 

@@ -382,6 +382,19 @@ class _BackupPageState extends State<BackupPage> {
       appBar: M3AppBar(title: L.settingsBackup),
       body: ListView(padding: const EdgeInsets.all(20), children: [
 
+        SettingsStatusCard(
+          on: _autoBackupEnabled,
+          iconOn: Icons.cloud_done_rounded,
+          iconOff: Icons.cloud_off_rounded,
+          title: tx(_autoBackupEnabled ? 'st_bkp_on' : 'st_bkp_off'),
+          subtitle: !_autoBackupEnabled
+              ? tx('st_bkp_off_s')
+              : _autoBackupNextDue != null
+                  ? tx('st_bkp_next', {'d': _fmtDate(_autoBackupNextDue!)})
+                  : tx('st_bkp_on_s'),
+        ),
+        const SizedBox(height: 16),
+
         // Info générale
         Container(
           padding: const EdgeInsets.all(16),

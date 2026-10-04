@@ -1,5 +1,6 @@
 // lib/screens/settings/notifications_page.dart
 
+import '../../l10n/extra_strings.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/m3_components.dart';
 import '../../widgets/skeleton.dart';
@@ -239,6 +240,25 @@ class _NotificationsPageState extends State<NotificationsPage> {
           : ListView(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               children: [
+
+                // ── Status card ────────────────────────────────────────────
+                Builder(builder: (_) {
+                  final active = [_milestoneOn, _grandOn, _dailyOn, _weeklyOn, _newsOn, _syncNotifOn]
+                      .where((v) => v).length;
+                  final on = _hasPermission && active > 0;
+                  return SettingsStatusCard(
+                    on: on,
+                    iconOn: Icons.notifications_active_rounded,
+                    iconOff: Icons.notifications_off_rounded,
+                    title: tx(on ? 'st_notif_on' : 'st_notif_off'),
+                    subtitle: !_hasPermission
+                        ? tx('st_notif_perm')
+                        : active == 0
+                            ? tx('st_notif_none')
+                            : tx('st_notif_count', {'n': '$active'}),
+                  );
+                }),
+                const SizedBox(height: 16),
 
                 // ── Permission banner ──────────────────────────────────────
                 if (!_hasPermission) ...[

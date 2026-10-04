@@ -9,6 +9,7 @@ import '../../app_state.dart';
 import '../../l10n/l10n.dart';
 import 'settings_rows.dart';
 
+
 // ── Clés SharedPreferences (référence) ───────────────────────────────────────
 // ls_header_fallback_type   : 'none' | 'top_track' | 'top_album' | 'top_artist' | 'custom_url'
 // ls_header_fallback_period : '7day' | '1month' | 'overall'
@@ -234,6 +235,100 @@ class SettingsSection extends StatelessWidget {
 }
 
 // ── Bannière "redémarrage requis" ─────────────────────────────────────────────
+
+// ── Status card (top of a settings page) ───────────────────────────────────
+// Big card that shows if a feature is on or off. The shape and color morph
+// between the two states, the icon pops, and the phone gives a small
+// vibration when the state flips.
+class SettingsStatusCard extends StatefulWidget {
+  final bool on;
+  final String title;
+  final String subtitle;
+  final IconData iconOn;
+  final IconData iconOff;
+  final String? pill; // small tonal label on the right (optional)
+  const SettingsStatusCard({
+    super.key,
+    required this.on,
+    required this.title,
+    required this.subtitle,
+    required this.iconOn,
+    required this.iconOff,
+    this.pill,
+  });
+
+  @override
+  State<SettingsStatusCard> createState() => _SettingsStatusCardState();
+}
+
+class _SettingsStatusCardState extends State<SettingsStatusCard> {
+  @override
+  void didUpdateWidget(SettingsStatusCard old) {
+    super.didUpdateWidget(old);
+    if (old.on != widget.on) m3Haptic(M3Haptic.medium);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+    final on = widget.on;
+    final fg = on ? scheme.onPrimaryContainer : scheme.onSurfaceVariant;
+    return M3ShapeMorph(
+      radius: BorderRadius.circular(on ? 36 : 24),
+      color: on ? scheme.primaryContainer : scheme.surfaceContainerHigh,
+      padding: const EdgeInsets.all(20),
+      child: Row(children: [
+        M3CookieBadge(
+          size: 60,
+          color: on ? scheme.primary : scheme.surfaceContainerHighest,
+          child: AnimatedSwitcher(
+            duration: M3Motion.effectsDefaultDuration,
+            switchInCurve: M3Motion.spatialFast,
+            transitionBuilder: (c, a) =>
+                ScaleTransition(scale: a, child: FadeTransition(opacity: a, child: c)),
+            child: Icon(
+              on ? widget.iconOn : widget.iconOff,
+              key: ValueKey(on),
+              size: 30,
+              color: on ? scheme.onPrimary : scheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: AnimatedSwitcher(
+            duration: M3Motion.effectsDefaultDuration,
+            child: Column(
+              key: ValueKey('${widget.on}|${widget.title}|${widget.subtitle}'),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(widget.title,
+                    style: text.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800, color: fg)),
+                const SizedBox(height: 4),
+                Text(widget.subtitle,
+                    style: text.bodyMedium?.copyWith(color: fg.withValues(alpha: 0.8))),
+              ],
+            ),
+          ),
+        ),
+        if (widget.pill != null)
+          Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: M3ShapeMorph(
+              radius: BorderRadius.circular(14),
+              color: scheme.secondaryContainer,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              child: Text(widget.pill!,
+                  style: text.labelLarge?.copyWith(
+                      color: scheme.onSecondaryContainer, fontWeight: FontWeight.w700)),
+            ),
+          ),
+      ]),
+    );
+  }
+}
 
 class RestartBanner extends StatelessWidget {
   const RestartBanner({super.key});

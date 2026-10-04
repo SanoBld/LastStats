@@ -160,6 +160,14 @@ class _SyncPageState extends State<SyncPage> {
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                SettingsStatusCard(
+                  on: _enabled,
+                  iconOn: Icons.sync_rounded,
+                  iconOff: Icons.sync_disabled_rounded,
+                  title: tx(_enabled ? 'st_sync_on' : 'st_sync_off'),
+                  subtitle: tx(_enabled ? 'st_sync_on_s' : 'st_sync_off_s'),
+                ),
+                const SizedBox(height: 16),
                 // ── Auto sync section ────────────────────────────────────
                 SettingsSection(label: L.syncAutoTitle, children: [
                     SwitchListTile(

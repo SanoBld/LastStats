@@ -70,6 +70,65 @@ class MotionArtworkService {
     }
   }
 
+  /// Motion video for an artist page (Apple Music "artist motion").
+  /// Same rules as [find]: null when nothing is found.
+  static Future<String?> findArtist(String artist) async {
+    final key = 'artist|${_norm(artist)}';
+    if (_cache.containsKey(key)) return _cache[key];
+    if (_cache.length >= _maxEntries) _cache.remove(_cache.keys.first);
+    try {
+      final res = await _itunes(artist, 'musicArtist', 5);
+      String? video;
+      var pages = 0;
+      for (final r in res) {
+        if (!_similar(artist, (r['artistName'] ?? '').toString())) continue;
+        final id  = (r['artistId'] ?? '').toString();
+        final url = (r['artistLinkUrl'] ?? '').toString().split('?').first;
+        if (id.isNotEmpty) video = await _videoFromArtistApi(id);
+        if (video == null && url.isNotEmpty && pages < 2) {
+          pages++;
+          video = await _videoFromPage(url);
+        }
+        if (video != null) break;
+      }
+      _cache[key] = video;
+      return video;
+    } catch (_) {
+      return null; // network error: allow a retry
+    }
+  }
+
+  static Future<String?> _videoFromArtistApi(String artistId) async {
+    try {
+      final token = await _getToken();
+      if (token == null) return null;
+      final res = await http.get(
+        Uri.https('amp-api.music.apple.com', '/v1/catalog/us/artists/$artistId',
+            {'extend': 'editorialVideo'}),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Origin': 'https://music.apple.com',
+          'User-Agent': _ua,
+        },
+      ).timeout(_timeout);
+      if (res.statusCode == 401) _token = null;
+      if (res.statusCode != 200) return null;
+      final data = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
+      if (data.isEmpty) return null;
+      final ev = data.first['attributes']?['editorialVideo'];
+      if (ev is! Map) return null;
+      // Square first, then tall, then wide (the image box crops to fill).
+      for (final k in ['motionArtistSquare1x1', 'motionSquareVideo1x1',
+                       'motionDetailSquare', 'motionArtistFullscreen16x9',
+                       'motionDetailTall', 'motionTallVideo3x4',
+                       'motionArtistWide16x9']) {
+        final v = ev[k]?['video'];
+        if (v is String && v.isNotEmpty) return v;
+      }
+    } catch (_) {}
+    return null;
+  }
+
   static String _norm(String s) {
     const from = 'àáâãäåçèéêëìíîïñòóôõöùúûüýÿ';
     const to   = 'aaaaaaceeeeiiiinooooouuuuyy';
