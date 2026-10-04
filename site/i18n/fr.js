@@ -45,6 +45,13 @@ window.I18N.fr = {
   dlFmtScript: "Choisit automatiquement le bon paquet pour votre distribution",
   dlFmtIpa: "Non signé : à installer avec AltStore, Sideloadly ou TrollStore",
   dlIosNote: "Cette app iOS n'est pas signée : installez le fichier .ipa avec AltStore, Sideloadly ou TrollStore (ou re-signez-le avec votre compte Apple).",
+  webBtn: "Version web",
+  webBetaChip: "Bêta",
+  webWarnTitle: "Version web (bêta)",
+  webWarnBody: "La version web est expérimentale : elle est en cours de test et peut contenir des bugs ou des incompatibilités. Certaines fonctionnalités de l'application (widgets, notifications, sauvegardes automatiques, cache hors ligne…) peuvent être indisponibles ou se comporter différemment. Pour une expérience complète et stable, utilisez l'application native.",
+  webOpen: "Ouvrir la version web",
+  webCancel: "Annuler",
+  webClose: "Fermer",
   readmeError: "Impossible de charger le README pour le moment.",
 
   // ---- common ----

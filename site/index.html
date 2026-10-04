@@ -75,6 +75,11 @@
       <button type="button" id="download-trigger" class="md-ripple tonal" data-repo="SanoBld/LastStats-App" data-i18n="common.download">
         Télécharger
       </button>
+      <!-- web build of the app (Flutter Web), opens a beta warning first -->
+      <button type="button" id="web-trigger" class="md-ripple tonal" data-web-url="https://sanobld.github.io/LastStats/app/">
+        <span data-i18n="webBtn">Version web</span>
+        <span class="web-beta-chip" data-i18n="webBetaChip">Bêta</span>
+      </button>
     </div>
   </section>
 
@@ -263,6 +268,7 @@
   <script src="js/nav-autohide.js"></script>
   <script src="js/carousel.js"></script>
   <script src="js/download-modal.js"></script>
+  <script src="js/web-version.js"></script>
   <script src="js/github-stats.js" data-repo="SanoBld/LastStats-App"></script>
 </body>
 </html>

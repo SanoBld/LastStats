@@ -45,6 +45,13 @@ window.I18N.en = {
   dlFmtScript: "Automatically picks the right package for your distribution",
   dlFmtIpa: "Unsigned: install with AltStore, Sideloadly or TrollStore",
   dlIosNote: "This iOS app is unsigned: install the .ipa file with AltStore, Sideloadly or TrollStore (or re-sign it with your own Apple account).",
+  webBtn: "Web version",
+  webBetaChip: "Beta",
+  webWarnTitle: "Web version (beta)",
+  webWarnBody: "The web version is experimental: it is still being tested and may contain bugs or incompatibilities. Some app features (widgets, notifications, automatic backups, offline cache…) may be unavailable or behave differently. For the full and stable experience, use the native app.",
+  webOpen: "Open the web version",
+  webCancel: "Cancel",
+  webClose: "Close",
   readmeError: "Could not load the README right now.",
 
   // ---- common ----
