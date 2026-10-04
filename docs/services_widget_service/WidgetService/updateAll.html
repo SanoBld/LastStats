@@ -70,6 +70,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; updateAll() async {
+  if (kIsWeb) return;
   try {
     final prefs = await SharedPreferences.getInstance();
     final username = prefs.getString(&#39;ls_username&#39;) ?? &#39;&#39;;

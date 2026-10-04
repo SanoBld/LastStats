@@ -66,24 +66,10 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; showTest() =&gt; _plugin.show(
-      _idTest,
-      &#39;🔔 Test notification&#39;,
-      &#39;LastStats notifications are working!&#39;,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          _chMilestoneId, _chMilestoneName,
-          icon:    &#39;@mipmap&#47;ic_launcher&#39;,
-          color:   _kLastFmRed,
-          subText: &#39;LastStats&#39;,
-        ),
-      ),
-      payload: _payload(
-        type:  &#39;test&#39;,
-        title: &#39;🔔 Test notification&#39;,
-        body:  &#39;LastStats notifications are working!&#39;,
-      ),
-    );</code></pre>
+  <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; showTest() async {
+  if (kIsWeb) return;
+  await _showTest();
+}</code></pre>
 </section>
 
 

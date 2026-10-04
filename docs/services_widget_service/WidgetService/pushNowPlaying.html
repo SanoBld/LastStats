@@ -73,6 +73,7 @@ every poll tick (every 10–30s) and keeps the widget genuinely live.</p>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; pushNowPlaying(Map&lt;String, dynamic&gt;? np) async {
+  if (kIsWeb) return;
   try {
     await HomeWidget.setAppGroupId(_appGroupId);
     String trackName = &#39;&#39;, artistName = &#39;&#39;, trackArt = &#39;&#39;;

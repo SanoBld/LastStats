@@ -67,6 +67,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; scheduleAll() async {
+  if (kIsWeb) return; &#47;&#47; no background tasks in a browser
   final prefs = await SharedPreferences.getInstance();
 
   &#47;&#47; ── Milestone task ───────────────────────────────────────────────────

@@ -67,6 +67,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;bool&gt; requestPermission() async {
+  if (kIsWeb) return false;
   final android = _plugin.resolvePlatformSpecificImplementation&lt;
       AndroidFlutterLocalNotificationsPlugin&gt;();
   final ios = _plugin.resolvePlatformSpecificImplementation&lt;

@@ -80,7 +80,7 @@
 
   &#47;&#47; Charger plugged &#47; unplugged: cheap event, no polling needed.
   try {
-    _battery.onBatteryStateChanged.listen((_) =&gt; _refresh());
+    _battery.onBatteryStateChanged.listen((_) =&gt; _refresh(), onError: (_) {});
   } catch (_) {}
 
   &#47;&#47; Slow fallback poll: the level drifts while just discharging.
