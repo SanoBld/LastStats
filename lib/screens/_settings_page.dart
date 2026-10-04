@@ -720,8 +720,8 @@ class _SettingsPageState extends State<_SettingsPage> {
               const SizedBox(height: 10),
               Text(
                   UpdateService.displayVersion == null
-                      ? 'LastStats Mobile (dev)'
-                      : 'LastStats Mobile ${UpdateService.displayVersion}',
+                      ? 'LastStats (dev)'
+                      : 'LastStats ${UpdateService.displayVersion}',
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               if (_checkingUpdate) ...[
                 const SizedBox(height: 6),

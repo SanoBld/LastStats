@@ -4,6 +4,7 @@
 // Runs in a separate Dart isolate — no Flutter widgets available.
 // Only SharedPreferences, http, and notification_service are used here.
 
+import 'internal_keys.dart';
 import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart'             as http;
@@ -218,6 +219,7 @@ Future<void> _runScrobbleSync() async {
   if (AllScrobblesService.isRunning) return; // avoid overlapping runs
 
   await ScrobblesFileCache.init();
+  await InternalKeys.loadFallback(prefs);
   final service = LastFmService(apiKey: apiKey, username: username);
 
   void onProgress() {

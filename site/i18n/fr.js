@@ -116,7 +116,7 @@ window.I18N.fr = {
   "help.is_an_ios_version_planned": "Une version iOS est-elle prévue ?",
   "help.no_an_ios_version_is": "Non, pas pour le moment. Si la demande devient suffisamment forte, ce sera reconsidéré.",
   "help.does_the_app_work_on": "L'application fonctionne-t-elle sur macOS ou d'autres plateformes ?",
-  "help.laststats_mobile_is_developed_and": "LastStats Mobile est développée et testée sur Android. Le fonctionnement sur les autres plateformes (macOS, Windows, Linux…) n'est pas garanti, des bugs ou comportements inattendus restent possibles.",
+  "help.laststats_mobile_is_developed_and": "LastStats est développée et testée sur Android. Le fonctionnement sur les autres plateformes (macOS, Windows, Linux…) n'est pas garanti, des bugs ou comportements inattendus restent possibles.",
   "help.is_laststats_open_source": "LastStats est-elle open source ?",
   "help.yes_the_source_code_is": "Oui ! Le code source est en libre accès sur GitHub. C'est un projet indépendant, fait avec passion par SanoBld. Vous pouvez y contribuer, signaler un bug ou juste laisser une étoile ⭐.",
   "help.where_is_my_data_stored": "Où sont stockées mes données ?",

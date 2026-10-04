@@ -22,7 +22,7 @@ mkdir -p "$STAGE/opt/laststats" "$STAGE/usr/bin" "$STAGE/usr/share/applications"
          "$STAGE/usr/share/icons/hicolor/512x512/apps" "$TOP"/{BUILD,RPMS,SPECS}
 
 cp -r "$BUNDLE/." "$STAGE/opt/laststats/"
-ln -s /opt/laststats/laststats_mobile "$STAGE/usr/bin/laststats"
+ln -s /opt/laststats/LastStats "$STAGE/usr/bin/laststats"
 install -m 644 "$ROOT/linux/packaging/laststats.desktop" "$STAGE/usr/share/applications/laststats.desktop"
 install -m 644 "$ROOT/assets/images/icon-512.png" "$STAGE/usr/share/icons/hicolor/512x512/apps/laststats.png"
 

@@ -22,7 +22,7 @@ mkdir -p "$PKG/DEBIAN" "$PKG/opt/laststats" "$PKG/usr/bin" \
          "$PKG/usr/share/icons/hicolor/512x512/apps"
 
 cp -r "$BUNDLE/." "$PKG/opt/laststats/"
-ln -s /opt/laststats/laststats_mobile "$PKG/usr/bin/laststats"
+ln -s /opt/laststats/LastStats "$PKG/usr/bin/laststats"
 install -m 644 "$ROOT/linux/packaging/laststats.desktop" "$PKG/usr/share/applications/laststats.desktop"
 install -m 644 "$ROOT/assets/images/icon-512.png" "$PKG/usr/share/icons/hicolor/512x512/apps/laststats.png"
 

@@ -141,7 +141,7 @@ Pick the file for your CPU (`x64` for most PCs, `arm64` for ARM devices) on the 
 - **Debian / Ubuntu / Mint:** `LastStats-linux-<arch>.deb` — double-click it (software center opens an install wizard) or run `sudo apt install ./LastStats-linux-<arch>.deb`. Uninstall with `sudo apt remove laststats`.
 - **Fedora / openSUSE / RHEL:** `LastStats-linux-<arch>.rpm` — double-click it or run `sudo dnf install ./LastStats-linux-<arch>.rpm`. Uninstall with `sudo dnf remove laststats`.
 - **Any distro, no install:** `LastStats-linux-<arch>.AppImage` — `chmod +x` it, then run it.
-- **Manual:** `laststats-linux.zip` (x64) / `laststats-linux-arm64.zip`, extract and run `laststats_mobile`.
+- **Manual:** `laststats-linux.zip` (x64) / `laststats-linux-arm64.zip`, extract and run `LastStats`.
 
 ### iOS
 1. Download `LastStats-ios.ipa` from the [releases page](https://github.com/SanoBld/LastStats-App/releases).

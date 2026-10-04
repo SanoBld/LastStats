@@ -22,17 +22,38 @@ class LastFmService {
   });
 
   // ── Core request ────────────────────────────────────────
+  // Optional built-in key, retried once when the user's key is rejected.
+  static String fallbackKey = '';
+  // Last.fm errors tied to the key: 10 invalid, 26 suspended, 29 rate limit.
+  static const _keyErrors = {10, 26, 29};
+
   Future<dynamic> _call(Map<String, String> params) async {
+    try {
+      return await _get(params, apiKey);
+    } on _KeyRejected {
+      final fb = fallbackKey;
+      if (fb.isEmpty || fb == apiKey) rethrow;
+      return _get(params, fb);
+    }
+  }
+
+  Future<dynamic> _get(Map<String, String> params, String key) async {
     final uri = Uri.https(_host, _path, {
       ...params,
-      'api_key': apiKey,
+      'api_key': key,
       'format':  'json',
     });
     final res = await http.get(uri).timeout(_timeout);
+    if (res.statusCode == 403 || res.statusCode == 429) {
+      throw _KeyRejected('HTTP ${res.statusCode}');
+    }
     if (res.statusCode != 200) throw Exception('HTTP ${res.statusCode}');
     final body = jsonDecode(utf8.decode(res.bodyBytes));
     if (body['error'] != null) {
-      throw Exception(body['message'] ?? 'Erreur API Last.fm');
+      final msg  = (body['message'] ?? 'Last.fm API error').toString();
+      final code = int.tryParse(body['error'].toString());
+      if (_keyErrors.contains(code)) throw _KeyRejected(msg);
+      throw Exception(msg);
     }
     return body;
   }
@@ -549,4 +570,12 @@ class LastFmService {
     });
     return _asList(d['results']?['trackmatches']?['track']);
   }
+}
+
+/// Thrown when the API key itself is refused (invalid, suspended, rate-limited).
+class _KeyRejected implements Exception {
+  final String message;
+  const _KeyRejected(this.message);
+  @override
+  String toString() => message;
 }

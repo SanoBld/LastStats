@@ -695,7 +695,7 @@ class AppStringsEn implements AppStrings {
   @override String get faqQ2 => 'Is an iOS version planned?';
   @override String get faqA2 => 'No. An iOS version is not planned at this time.';
   @override String get faqQ3 => 'Does the app work on macOS or other platforms?';
-  @override String get faqA3 => 'LastStats Mobile is developed and tested on Android. Behaviour on other platforms (macOS, Windows, Linux…) is unverified, bugs or unexpected behaviour may occur.';
+  @override String get faqA3 => 'LastStats is developed and tested on Android. Behaviour on other platforms (macOS, Windows, Linux…) is unverified, bugs or unexpected behaviour may occur.';
   @override String get faqQ4 => 'Is LastStats open source?';
   @override String get faqA4 => 'Yes! The source code is freely available on GitHub. The project is independent, built with passion by SanoBld. Feel free to contribute, report bugs, or leave a star ⭐.';
   @override String get faqQ5 => 'Where is my data stored?';

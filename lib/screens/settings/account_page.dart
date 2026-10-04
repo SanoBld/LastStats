@@ -15,6 +15,9 @@ import '../../l10n/l10n.dart';
 import '../../app_state.dart';
 import '../../services/account_manager.dart';
 import '../../services/favorites_auth.dart';
+import '../../services/internal_keys.dart';
+import '../../widgets/internal_key_toggle.dart';
+import '../../l10n/extra_strings.dart';
 import '../setup_screen.dart';
 import '../home_screen.dart';
 import 'settings_helpers.dart';
@@ -37,6 +40,7 @@ class _AccountPageState extends State<AccountPage> {
   bool   _obscureApiKey  = true;
   bool   _obscureSecret  = true;
   bool   _connectingFav  = false;
+  bool   _keyFallback    = false;
   final  _secretCtrl     = TextEditingController();
   late final _nameCtrl   = TextEditingController(text: displayNameNotifier.value);
 
@@ -75,8 +79,10 @@ class _AccountPageState extends State<AccountPage> {
   Future<void> _load() async {
     final accounts = await AccountManager.getAll();
     final active   = await AccountManager.getActiveIndex();
+    final fallback = await InternalKeys.isFallbackEnabled();
     if (!mounted) return;
     setState(() {
+      _keyFallback = fallback;
       _accounts    = accounts;
       _activeIndex = accounts.isEmpty ? 0 : active.clamp(0, accounts.length - 1);
       _loading     = false;
@@ -487,12 +493,15 @@ class _AccountPageState extends State<AccountPage> {
                 leading: Icon(Icons.key_rounded, color: scheme.primary, size: 20),
                 title: Text(L.acctApiKeyLabel),
                 subtitle: Text(
-                  _obscureApiKey ? '•' * 20 : active.apiKey,
+                  InternalKeys.isInternal(active.apiKey)
+                      ? tx('key_internal_active')
+                      : (_obscureApiKey ? '•' * 20 : active.apiKey),
                   style: text.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant, fontFamily: 'monospace'),
+                      color: scheme.onSurfaceVariant,
+                      fontFamily: InternalKeys.isInternal(active.apiKey) ? null : 'monospace'),
                 ),
-                onTap: () => _copyKey(active.apiKey),
-                trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                onTap: InternalKeys.isInternal(active.apiKey) ? null : () => _copyKey(active.apiKey),
+                trailing: InternalKeys.isInternal(active.apiKey) ? null : Row(mainAxisSize: MainAxisSize.min, children: [
                   IconButton(
                     icon: const Icon(Icons.copy_rounded, size: 20),
                     onPressed: () => _copyKey(active.apiKey),
@@ -505,6 +514,21 @@ class _AccountPageState extends State<AccountPage> {
                 ]),
               ),
               const Divider(height: 1, indent: 16, endIndent: 16),
+              if (!InternalKeys.isInternal(active.apiKey)) ...[
+                SettingSwitchRow(
+                  icon:     Icons.shield_moon_outlined,
+                  title:    tx('key_fallback_title'),
+                  subtitle: tx('key_fallback_sub'),
+                  value:    _keyFallback,
+                  onChanged: (v) async {
+                    setState(() => _keyFallback = v);
+                    await InternalKeys.setFallback(v);
+                  },
+                ),
+                const Divider(height: 1, indent: 16, endIndent: 16),
+              ],
+              // Favorites need the user's own secret: unavailable with the built-in key.
+              if (!InternalKeys.isInternal(active.apiKey)) ...[
               ValueListenableBuilder<String>(
                 valueListenable: secretKeyNotifier,
                 builder: (_, secret, _) => SettingTile(
@@ -580,6 +604,7 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                 ]),
               ),
+              ],
             ],
           ),
 
@@ -645,6 +670,7 @@ class _AddAccountDialogState extends State<_AddAccountDialog> {
   final _usernameCtrl = TextEditingController();
   final _apiKeyCtrl   = TextEditingController();
   bool  _sameApiKey   = false;
+  bool  _useInternal  = false;
   bool  _obscureKey   = true;
   String? _error;
 
@@ -655,11 +681,12 @@ class _AddAccountDialogState extends State<_AddAccountDialog> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     final username = _usernameCtrl.text.trim();
     final apiKey   = _sameApiKey
         ? (widget.existingApiKey ?? '')
-        : _apiKeyCtrl.text.trim();
+        : (_useInternal ? await InternalKeys.pick() : _apiKeyCtrl.text.trim());
+    if (!mounted) return;
 
     if (username.isEmpty) {
       setState(() => _error = L.acctUsernameRequired);
@@ -723,7 +750,13 @@ class _AddAccountDialogState extends State<_AddAccountDialog> {
             ),
           ],
 
-          if (!_sameApiKey) ...[
+          if (!_sameApiKey)
+            InternalKeyToggle(
+              value:     _useInternal,
+              onChanged: (v) => setState(() { _useInternal = v; _error = null; }),
+            ),
+
+          if (!_sameApiKey && !_useInternal) ...[
             const SizedBox(height: 10),
             TextField(
               controller: _apiKeyCtrl,

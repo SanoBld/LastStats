@@ -629,7 +629,7 @@ class AppStringsAr implements AppStrings {
   @override String get faqQ2 => 'هل هناك نسخة مخطط لها لـ iOS؟';
   @override String get faqA2 => 'لا. لا توجد نسخة مخطط لها لـ iOS في الوقت الحالي.';
   @override String get faqQ3 => 'هل يعمل التطبيق على macOS أو منصات أخرى؟';
-  @override String get faqA3 => 'يتم تطوير واختبار LastStats Mobile على أندرويد. الأداء على المنصات الأخرى (macOS، Windows، Linux...) غير متحقق منه، قد تحدث أخطاء أو سلوك غير متوقع.';
+  @override String get faqA3 => 'يتم تطوير واختبار LastStats على أندرويد. الأداء على المنصات الأخرى (macOS، Windows، Linux...) غير متحقق منه، قد تحدث أخطاء أو سلوك غير متوقع.';
   @override String get faqQ4 => 'هل LastStats مفتوح المصدر؟';
   @override String get faqA4 => 'نعم! الكود المصدري متاح بحرية على GitHub. المشروع مستقل، صُنع بشغف من قبل SanoBld. لا تتردد في المساهمة أو الإبلاغ عن الأخطاء أو ترك نجمة ⭐.';
   @override String get faqQ5 => 'أين يتم تخزين بياناتي؟';

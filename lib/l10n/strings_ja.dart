@@ -629,7 +629,7 @@ class AppStringsJa implements AppStrings {
   @override String get faqQ2 => 'iOS版の予定はありますか？';
   @override String get faqA2 => 'いいえ。現時点でiOS版の予定はありません。';
   @override String get faqQ3 => 'macOSや他のプラットフォームでも動作しますか？';
-  @override String get faqA3 => 'LastStats MobileはAndroidで開発・テストされています。他のプラットフォーム（macOS、Windows、Linuxなど）での動作は検証されておらず、不具合や予期しない動作が発生する可能性があります。';
+  @override String get faqA3 => 'LastStatsはAndroidで開発・テストされています。他のプラットフォーム（macOS、Windows、Linuxなど）での動作は検証されておらず、不具合や予期しない動作が発生する可能性があります。';
   @override String get faqQ4 => 'LastStatsはオープンソースですか？';
   @override String get faqA4 => 'はい！ソースコードはGitHubで自由に公開されています。このプロジェクトはSanoBldが情熱を持って開発した独立プロジェクトです。ひ売貢献したり、不具合を報告したり、⭐を付けてください。';
   @override String get faqQ5 => 'データはどこに保存されますか？';

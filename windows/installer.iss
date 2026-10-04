@@ -4,11 +4,11 @@
 ; Usage: ISCC.exe windows\installer.iss /DMyArch=x64   (or arm64)
 ;        with env var APP_VERSION set (e.g. "2.7.0")
 ;
-; NOTE: assumes the built exe is named "laststats_mobile.exe" (from the
+; NOTE: assumes the built exe is named "LastStats.exe" (from the
 ; pubspec.yaml project name). If the actual exe has a different name,
 ; update MyAppExeName below.
 
-#define MyAppExeName "laststats_mobile.exe"
+#define MyAppExeName "LastStats.exe"
 #define MyAppVersion GetEnv("APP_VERSION")
 #ifndef MyArch
   #define MyArch "x64"

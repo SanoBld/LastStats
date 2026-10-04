@@ -629,7 +629,7 @@ class AppStringsRu implements AppStrings {
   @override String get faqQ2 => 'Планируется ли версия для iOS?';
   @override String get faqA2 => 'Нет. На данный момент версия для iOS не планируется.';
   @override String get faqQ3 => 'Работает ли приложение на macOS или других платформах?';
-  @override String get faqA3 => 'LastStats Mobile разрабатывается и тестируется на Android. Работа на других платформах (macOS, Windows, Linux…) не проверена, возможны ошибки или неожиданное поведение.';
+  @override String get faqA3 => 'LastStats разрабатывается и тестируется на Android. Работа на других платформах (macOS, Windows, Linux…) не проверена, возможны ошибки или неожиданное поведение.';
   @override String get faqQ4 => 'Является ли LastStats открытым исходным кодом?';
   @override String get faqA4 => 'Да! Исходный код свободно доступен на GitHub. Проект независимый, сделан с любовью SanoBld. Не стесняйтесь вносить вклад, сообщать об ошибках или просто поставить звездочку ⭐.';
   @override String get faqQ5 => 'Где хранятся мои данные?';

@@ -692,7 +692,7 @@ class AppStringsZh implements AppStrings {
   @override String get faqQ2 => '会推出 iOS 版本吗？';
   @override String get faqA2 => '不会。目前没有推出 iOS 版本的计划。';
   @override String get faqQ3 => '该应用能在 macOS 或其他平台运行吗？';
-  @override String get faqA3 => 'LastStats Mobile 是在 Android 上开发和测试的。其他平台（macOS、Windows、Linux 等）上的表现未经验证，可能出现错误或异常行为。';
+  @override String get faqA3 => 'LastStats 是在 Android 上开发和测试的。其他平台（macOS、Windows、Linux 等）上的表现未经验证，可能出现错误或异常行为。';
   @override String get faqQ4 => 'LastStats 是开源的吗？';
   @override String get faqA4 => '是的！源代码可在 GitHub 上自由获取。该项目由 SanoBld 独立用心打造。欢迎贡献代码、反馈问题，或点个 ⭐。';
   @override String get faqQ5 => '我的数据存储在哪里？';

@@ -13,14 +13,14 @@ rm -rf "$APPDIR"
 mkdir -p "$APPDIR/usr/bin"
 cp -r "$BUNDLE/." "$APPDIR/usr/bin/"
 
-sed 's/^Exec=.*/Exec=laststats_mobile/' "$ROOT/linux/packaging/laststats.desktop" > "$APPDIR/laststats.desktop"
+sed 's/^Exec=.*/Exec=LastStats/' "$ROOT/linux/packaging/laststats.desktop" > "$APPDIR/laststats.desktop"
 cp "$ROOT/assets/images/icon-512.png" "$APPDIR/laststats.png"
 ln -sf laststats.png "$APPDIR/.DirIcon"
 
 cat > "$APPDIR/AppRun" <<'SH'
 #!/bin/sh
 HERE="$(dirname "$(readlink -f "$0")")"
-exec "$HERE/usr/bin/laststats_mobile" "$@"
+exec "$HERE/usr/bin/LastStats" "$@"
 SH
 chmod +x "$APPDIR/AppRun"
 

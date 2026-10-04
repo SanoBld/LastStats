@@ -30,6 +30,7 @@ import 'services/lastfm_service.dart';
 import 'services/crash_log_service.dart';
 import 'services/auto_backup_service.dart';
 import 'widgets/custom_title_bar.dart';
+import 'services/internal_keys.dart';
 import 'theme/m3_motion.dart';
 import 'theme/m3_shapes.dart';
 import 'package:app_links/app_links.dart';
@@ -91,6 +92,7 @@ Future<void> _mainImpl() async {
   final username   = prefs.getString('ls_username') ?? '';
   final apiKey     = prefs.getString('ls_apikey')   ?? '';
   final startupTab = prefs.getInt('ls_startup_tab') ?? 0;
+  await InternalKeys.loadFallback(prefs);
 
   // ── Appearance ──────────────────────────────────────────────────────────
   themeStyleNotifier.value             = prefs.getString('ls_theme_style')           ?? 'default';

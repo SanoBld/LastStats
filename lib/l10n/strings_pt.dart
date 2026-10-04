@@ -695,7 +695,7 @@ class AppStringsPt implements AppStrings {
   @override String get faqQ2 => 'Está prevista uma versão para iOS?';
   @override String get faqA2 => 'Não. Por enquanto não há uma versão para iOS prevista.';
   @override String get faqQ3 => 'O app funciona no macOS ou em outras plataformas?';
-  @override String get faqA3 => 'O LastStats Mobile é desenvolvido e testado no Android. O funcionamento em outras plataformas (macOS, Windows, Linux…) não é verificado, podem ocorrer bugs ou comportamentos inesperados.';
+  @override String get faqA3 => 'O LastStats é desenvolvido e testado no Android. O funcionamento em outras plataformas (macOS, Windows, Linux…) não é verificado, podem ocorrer bugs ou comportamentos inesperados.';
   @override String get faqQ4 => 'O LastStats é open source?';
   @override String get faqA4 => 'Sim! O código-fonte está disponível livremente no GitHub. O projeto é independente, feito com paixão por SanoBld. Sinta-se à vontade para contribuir, reportar bugs ou deixar uma estrela ⭐.';
   @override String get faqQ5 => 'Onde meus dados são armazenados?';

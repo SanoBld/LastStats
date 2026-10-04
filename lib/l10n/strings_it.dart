@@ -629,7 +629,7 @@ class AppStringsIt implements AppStrings {
   @override String get faqQ2 => 'È prevista una versione iOS?';
   @override String get faqA2 => 'No. Al momento non è prevista una versione iOS.';
   @override String get faqQ3 => 'L\'app funziona su macOS o altre piattaforme?';
-  @override String get faqA3 => 'LastStats Mobile è sviluppato e testato su Android. Il funzionamento su altre piattaforme (macOS, Windows, Linux…) non è verificato: possono verificarsi bug o comportamenti imprevisti.';
+  @override String get faqA3 => 'LastStats è sviluppato e testato su Android. Il funzionamento su altre piattaforme (macOS, Windows, Linux…) non è verificato: possono verificarsi bug o comportamenti imprevisti.';
   @override String get faqQ4 => 'LastStats è open source?';
   @override String get faqA4 => 'Sì! Il codice sorgente è liberamente disponibile su GitHub. Il progetto è indipendente, realizzato con passione da SanoBld. Sentiti libero di contribuire, segnalare bug o lasciare una stella ⭐.';
   @override String get faqQ5 => 'Dove vengono archiviati i miei dati?';

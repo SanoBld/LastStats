@@ -15,6 +15,8 @@ import '../services/all_scrobbles_service.dart';
 import '../widgets/m3_components.dart';
 import '../services/backup_service.dart';
 import '../services/favorites_auth.dart';
+import '../services/internal_keys.dart';
+import '../widgets/internal_key_toggle.dart';
 import 'onboarding_flow.dart';
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -48,6 +50,7 @@ class _SetupScreenState extends State<SetupScreen>
   bool    _obscureApiKey   = true;
   bool    _obscureSecret   = true;
   bool    _enableFavorites = false;
+  bool    _useInternalKey  = false;
   bool    _rememberMe      = true;
   bool    _isLoading       = false;
   String? _errorMessage;
@@ -217,6 +220,7 @@ class _SetupScreenState extends State<SetupScreen>
     setState(() {
       _usernameCtrl.text = result.username!;
       _apikeyCtrl.text   = result.apiKey!;
+      _useInternalKey    = false;
       _errorMessage      = null;
       // Reflect a restored secret key in the UI too, not just prefs,
       // so the user can see/verify it before launching.
@@ -230,13 +234,15 @@ class _SetupScreenState extends State<SetupScreen>
   // Validate + connect
   Future<void> _launch() async {
     final username = _usernameCtrl.text.trim();
-    final apiKey   = _apikeyCtrl.text.trim();
+    final apiKey   = _useInternalKey
+        ? await InternalKeys.pick()
+        : _apikeyCtrl.text.trim();
 
     if (username.isEmpty || apiKey.isEmpty) {
       setState(() => _errorMessage = tx('ui_please_fill_both_field'));
       return;
     }
-    if (apiKey.length != 32) {
+    if (!_useInternalKey && apiKey.length != 32) {
       setState(() => _errorMessage = tx('ui_api_key_must_be_32_cha'));
       return;
     }
@@ -281,7 +287,7 @@ class _SetupScreenState extends State<SetupScreen>
           int.tryParse(userInfo['playcount']?.toString() ?? '0') ?? 0;
 
       // Optional: authorize favorites (loved tracks) — doesn't block setup on failure.
-      if (_enableFavorites && _secretCtrl.text.trim().isNotEmpty) {
+      if (!_useInternalKey && _enableFavorites && _secretCtrl.text.trim().isNotEmpty) {
         if (!mounted) return;
         await connectFavorites(
           context, username: username, apiKey: apiKey, secret: _secretCtrl.text,
@@ -472,9 +478,17 @@ class _SetupScreenState extends State<SetupScreen>
                                   ),
                                   const SizedBox(height: 14),
 
+                                  // Built-in key toggle (hidden once a key was typed/imported)
+                                  if (_apikeyCtrl.text.trim().isEmpty || _useInternalKey)
+                                    InternalKeyToggle(
+                                      value:     _useInternalKey,
+                                      onChanged: (v) => setState(() => _useInternalKey = v),
+                                    ),
+                                  if (!_useInternalKey) ...[
                                   // API key field
                                   TextField(
                                     controller:        _apikeyCtrl,
+                                    onChanged:         (_) => setState(() {}),
                                     textInputAction:   TextInputAction.done,
                                     obscureText:       _obscureApiKey,
                                     autocorrect:       false,
@@ -574,6 +588,7 @@ class _SetupScreenState extends State<SetupScreen>
                                             ),
                                           ),
                                   ),
+                                  ],
                                   const SizedBox(height: 6),
 
                                   // Remember me

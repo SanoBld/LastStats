@@ -635,7 +635,7 @@ class ImageService {
         Uri.https('musicbrainz.org', '/ws/2/artist/', {
           'query': 'artist:"$artist"', 'limit': '1', 'fmt': 'json',
         }),
-        headers: {'User-Agent': 'LastStatsMobile/2.0 (contact@laststats.app)'},
+        headers: {'User-Agent': 'LastStats/2.0 (contact@laststats.app)'},
       ).timeout(_timeout);
       if (searchRes.statusCode != 200) return '';
       final found = (jsonDecode(utf8.decode(searchRes.bodyBytes))['artists'] as List?) ?? [];
@@ -647,7 +647,7 @@ class ImageService {
 
       final relRes = await http.get(
         Uri.https('musicbrainz.org', '/ws/2/artist/$mbid', {'inc': 'url-rels', 'fmt': 'json'}),
-        headers: {'User-Agent': 'LastStatsMobile/2.0 (contact@laststats.app)'},
+        headers: {'User-Agent': 'LastStats/2.0 (contact@laststats.app)'},
       ).timeout(_timeout);
       if (relRes.statusCode != 200) return '';
       final rels = (jsonDecode(utf8.decode(relRes.bodyBytes))['relations'] as List?) ?? [];
@@ -715,7 +715,7 @@ class ImageService {
           'query': 'release:"$album" AND artist:"$artist"',
           'limit': '1', 'fmt': 'json',
         }),
-        headers: {'User-Agent': 'LastStatsMobile/2.0 (contact@laststats.app)'},
+        headers: {'User-Agent': 'LastStats/2.0 (contact@laststats.app)'},
       ).timeout(_timeout);
       if (searchRes.statusCode != 200) return '';
       final releases = (jsonDecode(utf8.decode(searchRes.bodyBytes))['releases'] as List?) ?? [];

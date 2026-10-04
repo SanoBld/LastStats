@@ -50,7 +50,7 @@ class TrackRowTile extends StatelessWidget {
                       color: scheme.onSecondaryContainer, size: 20),
                 );
               }
-              return Image.network(url, fit: BoxFit.cover,
+              return Image.network(url, fit: BoxFit.cover, cacheWidth: 160, cacheHeight: 160,
                   errorBuilder: (_, _, _) => Container(
                     color: scheme.secondaryContainer,
                     child: Icon(Icons.music_note_rounded,

@@ -1168,7 +1168,7 @@ class _ShareCard extends StatelessWidget {
 
           const SizedBox(height: 24),
           Center(
-            child: Text('laststats.app',
+            child: Text('LastStats',
                 style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 11, fontWeight: FontWeight.w600)),
           ),
         ]),
