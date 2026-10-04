@@ -391,11 +391,9 @@ class _AchvCardViewerState extends State<_AchvCardViewer> {
       final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
       img.dispose();
       if (bytes == null) return;
-      final tmp  = await getTemporaryDirectory();
-      final file = File('${tmp.path}/laststats_badge_${widget.a.def.id}.png');
-      await file.writeAsBytes(bytes.buffer.asUint8List());
       if (mounted) HapticFeedback.lightImpact();
-      await AppShare.shareFile(file);
+      await AppShare.shareBytes(
+          'laststats_badge_${widget.a.def.id}.png', bytes.buffer.asUint8List());
     } catch (_) {
       // Render/share failure: fail silently, nothing to share.
     } finally {

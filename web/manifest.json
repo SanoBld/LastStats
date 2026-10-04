@@ -1,12 +1,11 @@
 {
-    "name": "laststats_mobile",
-    "short_name": "laststats_mobile",
+    "name": "LastStats",
+    "short_name": "LastStats",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#101014",
+    "theme_color": "#1558D6",
+    "description": "LastStats — Your Last.fm stats, reinvented.",
     "prefer_related_applications": false,
     "icons": [
         {

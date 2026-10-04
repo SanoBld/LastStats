@@ -4,6 +4,7 @@
 // Runs in a separate Dart isolate — no Flutter widgets available.
 // Only SharedPreferences, http, and notification_service are used here.
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'internal_keys.dart';
 import 'dart:convert';
 import 'package:flutter/widgets.dart';
@@ -439,6 +440,7 @@ class NotificationWorker {
   NotificationWorker._();
 
   static Future<void> scheduleAll() async {
+    if (kIsWeb) return; // no background tasks in a browser
     final prefs = await SharedPreferences.getInstance();
 
     // ── Milestone task ───────────────────────────────────────────────────
@@ -545,6 +547,7 @@ class NotificationWorker {
   }
 
   static Future<void> cancelAll() async {
+    if (kIsWeb) return;
     await Workmanager().cancelAll();
   }
 

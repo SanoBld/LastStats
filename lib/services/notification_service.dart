@@ -1,5 +1,6 @@
 // lib/services/notification_service.dart
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -123,6 +124,7 @@ class NotificationService {
   // ── Permissions ──────────────────────────────────────────────────────────
 
   static Future<bool> requestPermission() async {
+    if (kIsWeb) return false;
     final android = _plugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
     final ios = _plugin.resolvePlatformSpecificImplementation<
@@ -134,6 +136,7 @@ class NotificationService {
   }
 
   static Future<bool> hasPermission() async {
+    if (kIsWeb) return false;
     final android = _plugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
     return await android?.areNotificationsEnabled() ?? true;
@@ -460,7 +463,12 @@ class NotificationService {
     );
   }
 
-  static Future<void> showTest() => _plugin.show(
+  static Future<void> showTest() async {
+    if (kIsWeb) return;
+    await _showTest();
+  }
+
+  static Future<void> _showTest() => _plugin.show(
         _idTest,
         '🔔 Test notification',
         'LastStats notifications are working!',

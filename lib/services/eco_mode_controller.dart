@@ -41,7 +41,7 @@ class EcoModeController {
 
     // Charger plugged / unplugged: cheap event, no polling needed.
     try {
-      _battery.onBatteryStateChanged.listen((_) => _refresh());
+      _battery.onBatteryStateChanged.listen((_) => _refresh(), onError: (_) {});
     } catch (_) {}
 
     // Slow fallback poll: the level drifts while just discharging.

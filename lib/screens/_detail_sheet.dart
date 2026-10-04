@@ -2368,13 +2368,10 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
       final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
       img.dispose();
       if (bytes == null) return;
-      final tmp  = await getTemporaryDirectory();
       final safe = widget.title.isEmpty
           ? 'artwork' : widget.title.replaceAll(RegExp(r'[^\w]+'), '_');
-      final file = File('${tmp.path}/laststats_$safe.png');
-      await file.writeAsBytes(bytes.buffer.asUint8List());
       if (mounted) _haptic(_HapticImpact.light);
-      await AppShare.shareFile(file);
+      await AppShare.shareBytes('laststats_$safe.png', bytes.buffer.asUint8List());
     } catch (_) {
       // Network or render failure: fail silently, nothing to share.
     } finally {

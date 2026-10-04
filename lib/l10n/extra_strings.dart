@@ -1244,7 +1244,7 @@ const Map<String, Map<String, String>> _kExtra = {
     'ar': 'استخدام مفتاح التطبيق الداخلي',
   },
   'key_internal_help': {
-    'fr': 'Option de secours : cette clé est partagée entre les utilisateurs. Elle peut atteindre ses limites ou cesser de fonctionner, et certaines fonctions peuvent alors dysfonctionner. Préfère ta propre clé quand tu le peux.',
+    'fr': 'Option de secours : cette clé est partagée entre les utilisateurs. Elle peut atteindre ses limites ou cesser de fonctionner, et certaines fonctions peuvent alors dysfonctionner. Préférez votre propre clé lorsque c\'est possible.',
     'en': 'Backup option: this key is shared between users. It may hit its limits or stop working, and some features may then fail. Prefer your own key when you can.',
     'es': 'Opción de respaldo: esta clave se comparte entre usuarios. Puede alcanzar su límite o dejar de funcionar y algunas funciones podrían fallar. Usa tu propia clave siempre que puedas.',
     'zh': '备用选项：此密钥由多个用户共用，可能达到上限或失效，部分功能可能因此出错。请尽量使用你自己的密钥。',
@@ -1280,7 +1280,7 @@ const Map<String, Map<String, String>> _kExtra = {
     'ar': 'المفتاح الداخلي كاحتياطي',
   },
   'key_fallback_sub': {
-    'fr': 'Essaie ta clé en premier, puis la clé interne si elle échoue',
+    'fr': 'Votre clé est essayée en premier, puis la clé interne en cas d\'échec',
     'en': 'Try your own key first, then the built-in key if it fails',
     'es': 'Prueba tu clave primero y la integrada si falla',
     'zh': '先使用你的密钥，失败时改用内置密钥',

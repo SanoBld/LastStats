@@ -18,7 +18,9 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="LastStats — Your Last.fm stats, reinvented.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1558D6">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -31,8 +33,15 @@
 
   <title>LastStats</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    html, body { margin: 0; height: 100%; background: #101014; }
+    #splash { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+    #splash i { width: 36px; height: 36px; border: 4px solid #ffffff33; border-top-color: #fff; border-radius: 50%; animation: s 0.9s linear infinite; }
+    @keyframes s { to { transform: rotate(360deg); } }
+  </style>
 </head>
 <body>
+  <div id="splash"><i></i></div>
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader
@@ -41,6 +50,7 @@
     For more details:
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
+  <script>window.addEventListener("flutter-first-frame", function () { var e = document.getElementById("splash"); if (e) e.remove(); });</script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

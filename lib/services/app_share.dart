@@ -17,12 +17,28 @@
 // share — that would just show the same broken dialog again — so the
 // very last resort is silently saving to the app's own documents folder.
 import 'dart:io' show Platform, Process, File;
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'web_download_stub.dart'
+    if (dart.library.js_interop) 'web_download_web.dart';
 
 class AppShare {
   AppShare._();
+
+  /// Shares PNG/other bytes. Web: browser download. Native: temp file + share.
+  static Future<void> shareBytes(String name, Uint8List bytes,
+      {String? text, String mime = 'image/png'}) async {
+    if (kIsWeb) {
+      downloadBytes(name, bytes, mime);
+      return;
+    }
+    final tmp  = await getTemporaryDirectory();
+    final file = File('${tmp.path}${Platform.pathSeparator}$name');
+    await file.writeAsBytes(bytes);
+    await shareFile(file, text: text);
+  }
 
   static Future<void> shareFile(File file, {String? text}) async {
     if (!kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {

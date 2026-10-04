@@ -1098,12 +1098,8 @@ class _ChartsPageState extends State<_ChartsPage>
       final composedBd = await composedImg.toByteData(format: ImageByteFormat.png);
       final bytes = composedBd!.buffer.asUint8List();
 
-      final tmp     = await getTemporaryDirectory();
-      final file    = File('${tmp.path}/laststats_${chartId}_$yearStr.png');
-      await file.writeAsBytes(bytes);
-
       closeDialog();
-      await AppShare.shareFile(file);
+      await AppShare.shareBytes('laststats_${chartId}_$yearStr.png', bytes);
     } catch (e) {
       closeDialog();
       if (ctx.mounted) {

@@ -3,6 +3,7 @@
 // Pushes Last.fm data to Android home screen widgets via home_widget.
 // Keep it simple: fetch, save keys, ask Android to redraw each widget.
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'lastfm_service.dart';
@@ -19,6 +20,7 @@ class WidgetService {
 
   /// Fetch fresh data and refresh every widget currently on the home screen.
   static Future<void> updateAll() async {
+    if (kIsWeb) return;
     try {
       final prefs = await SharedPreferences.getInstance();
       final username = prefs.getString('ls_username') ?? '';
@@ -115,6 +117,7 @@ class WidgetService {
   /// already fetched (dashboard polling), so it's cheap enough to call on
   /// every poll tick (every 10–30s) and keeps the widget genuinely live.
   static Future<void> pushNowPlaying(Map<String, dynamic>? np) async {
+    if (kIsWeb) return;
     try {
       await HomeWidget.setAppGroupId(_appGroupId);
       String trackName = '', artistName = '', trackArt = '';

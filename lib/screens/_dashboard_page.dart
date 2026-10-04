@@ -4255,10 +4255,7 @@ class _NewsDetailSheetState extends State<_NewsDetailSheet> {
     final bd  = await img.toByteData(format: ImageByteFormat.png);
     final bytes = bd!.buffer.asUint8List();
 
-    final tmp  = await getTemporaryDirectory();
-    final file = File('${tmp.path}/laststats_news.png');
-    await file.writeAsBytes(bytes);
-    await AppShare.shareFile(file);
+    await AppShare.shareBytes('laststats_news.png', bytes);
   }
 }
 

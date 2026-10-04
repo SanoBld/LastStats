@@ -14,7 +14,6 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'dart:async';
-import 'dart:io';
 import 'dart:math' show sqrt;
 import 'dart:math' as math;
 import 'dart:typed_data';
@@ -26,7 +25,6 @@ import 'package:flutter/gestures.dart' show TapGestureRecognizer;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData, HapticFeedback, rootBundle, LogicalKeyboardKey;
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:url_launcher/url_launcher.dart';
