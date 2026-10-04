@@ -146,7 +146,12 @@ Widget build(BuildContext context) {
           child: Slider(
             value: value, min: min, max: max, divisions: divisions,
             label: valueLabel,
-            onChanged: enabled ? onChanged : null,
+            onChanged: enabled
+                ? (v) {
+                    if (v != value) m3Haptic();
+                    onChanged(v);
+                  }
+                : null,
             onChangeEnd: onChangeEnd,
           ),
         ),
@@ -181,7 +186,7 @@ Widget build(BuildContext context) {
 <footer>
   <span class="no-break">
     laststats_mobile
-      3.5.0+24
+      3.6.0-beta+25
   </span>
   
 </footer>

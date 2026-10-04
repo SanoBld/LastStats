@@ -67,37 +67,28 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; init() async {
-  try {
-    _lastLevel = await _battery.batteryLevel;
-  } catch (_) {
-    _lastLevel = 100; &#47;&#47; no battery API (desktop&#47;web) → auto mode never fires
-  }
-  _recompute();
+  await _refresh();
 
-  &#47;&#47; Recheck on manual&#47;auto&#47;threshold changes.
+  &#47;&#47; Recheck on any switch &#47; threshold change.
   ecoModeManualNotifier.addListener(_recompute);
   ecoModeAutoNotifier.addListener(_recompute);
   ecoModeThresholdNotifier.addListener(_recompute);
-  &#47;&#47; Also drive the screen refresh-rate cap whenever the effective state flips.
+  ecoModeSystemNotifier.addListener(() { _refresh(); _updateFastPoll(); });
+  &#47;&#47; Drive the screen refresh-rate cap whenever the effective state flips.
   ecoModeActiveNotifier.addListener(_applyRefreshRate);
   _applyRefreshRate();
 
-  &#47;&#47; Recheck whenever the OS reports a charging-state change (charger
-  &#47;&#47; plugged&#47;unplugged) — cheap event, no polling needed.
+  &#47;&#47; Charger plugged &#47; unplugged: cheap event, no polling needed.
   try {
-    _battery.onBatteryStateChanged.listen((_) async {
-      try { _lastLevel = await _battery.batteryLevel; } catch (_) {}
-      _recompute();
-    });
+    _battery.onBatteryStateChanged.listen((_) =&gt; _refresh());
   } catch (_) {}
 
-  &#47;&#47; Also poll every 3 minutes as a fallback, since level can drift while
-  &#47;&#47; just discharging (no state-change event) — deliberately infrequent
-  &#47;&#47; so this itself doesn&#39;t cost meaningful battery.
-  Timer.periodic(const Duration(minutes: 3), (_) async {
-    try { _lastLevel = await _battery.batteryLevel; } catch (_) { return; }
-    _recompute();
-  });
+  &#47;&#47; Slow fallback poll: the level drifts while just discharging.
+  Timer.periodic(const Duration(minutes: 3), (_) { if (_resumed) _refresh(); });
+
+  &#47;&#47; Back in the app: the user may have changed the phone&#39;s power saver.
+  WidgetsBinding.instance.addObserver(_Lifecycle());
+  _updateFastPoll();
 }</code></pre>
 </section>
 
@@ -126,7 +117,7 @@
 <footer>
   <span class="no-break">
     laststats_mobile
-      3.5.0+24
+      3.6.0-beta+25
   </span>
   
 </footer>

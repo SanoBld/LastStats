@@ -111,10 +111,12 @@ and</li>
 Widget build(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
   final compact = visualDensity == VisualDensity.compact;
-  final r = BorderRadius.circular(selected ? 20 : 10);
   final fg = selected ? scheme.onSecondaryContainer : scheme.onSurfaceVariant;
+  return M3PressBuilder(builder: (context, down0, setDown) {
+  final down = down0 &amp;&amp; !M3Motion.reduced(context);
+  final r = BorderRadius.circular(down ? 8 : (selected ? 20 : 10));
   return AnimatedScale(
-    scale: selected ? 1.0 : 0.98,
+    scale: down ? 0.94 : (selected ? 1.0 : 0.98),
     duration: M3Motion.spatialFastDuration,
     curve: M3Motion.spatialFast,
     child: M3ShapeMorph(
@@ -133,7 +135,10 @@ Widget build(BuildContext context) {
           &#47;&#47; persisting highlight overlay.
           highlightColor: Colors.transparent,
           splashColor: fg.withValues(alpha: 0.10),
-          onTap: onSelected == null ? null : () =&gt; onSelected!(!selected),
+          onHighlightChanged: setDown,
+          onTap: onSelected == null
+              ? null
+              : () { m3Haptic(); onSelected!(!selected); },
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: compact ? 12 : 16),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -154,6 +159,7 @@ Widget build(BuildContext context) {
       ),
     ),
   );
+  });
 }</code></pre>
 </section>
 
@@ -182,7 +188,7 @@ Widget build(BuildContext context) {
 <footer>
   <span class="no-break">
     laststats_mobile
-      3.5.0+24
+      3.6.0-beta+25
   </span>
   
 </footer>

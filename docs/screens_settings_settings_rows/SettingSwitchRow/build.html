@@ -113,7 +113,12 @@ Widget build(BuildContext context) =&gt; SettingTile(
       title: Text(title),
       subtitle: subtitle == null ? null : Text(subtitle!),
       enabled: onChanged != null,
-      trailing: Switch(value: value, onChanged: onChanged),
+      trailing: Switch(
+        value: value,
+        onChanged: onChanged == null
+            ? null
+            : (v) { m3Haptic(); onChanged!(v); },
+      ),
       onTap: onChanged == null ? null : () =&gt; onChanged!(!value),
     );</code></pre>
 </section>
@@ -143,7 +148,7 @@ Widget build(BuildContext context) =&gt; SettingTile(
 <footer>
   <span class="no-break">
     laststats_mobile
-      3.5.0+24
+      3.6.0-beta+25
   </span>
   
 </footer>

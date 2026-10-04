@@ -119,15 +119,22 @@ Widget build(BuildContext context) {
       separatorBuilder: (_, _) =&gt; const SizedBox(width: 4),
       itemBuilder: (context, i) {
         final sel = items[i].$1 == selected;
-        final r = BorderRadius.circular(sel ? 22 : 12);
-        return M3ShapeMorph(
+        return M3PressBuilder(builder: (context, down0, setDown) {
+        final down = down0 &amp;&amp; !M3Motion.reduced(context);
+        final r = BorderRadius.circular(down ? 10 : (sel ? 22 : 12));
+        return AnimatedScale(
+          scale: down ? 0.94 : 1.0,
+          duration: M3Motion.spatialFastDuration,
+          curve: M3Motion.spatialFast,
+          child: M3ShapeMorph(
           radius: r,
           color: sel ? scheme.primary : scheme.surfaceContainerHigh,
           child: Material(
             type: MaterialType.transparency,
             child: InkWell(
               borderRadius: r,
-              onTap: () =&gt; onSelected(items[i].$1),
+              onHighlightChanged: setDown,
+              onTap: () { if (!sel) m3Haptic(); onSelected(items[i].$1); },
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 18),
                 child: Center(
@@ -146,7 +153,9 @@ Widget build(BuildContext context) {
               ),
             ),
           ),
+        ),
         );
+        });
       },
     ),
   );
@@ -178,7 +187,7 @@ Widget build(BuildContext context) {
 <footer>
   <span class="no-break">
     laststats_mobile
-      3.5.0+24
+      3.6.0-beta+25
   </span>
   
 </footer>
