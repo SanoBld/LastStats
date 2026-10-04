@@ -112,8 +112,12 @@ class _SettingTileState extends State<SettingTile> {
         duration: M3Motion.spatialFastDuration,
         curve: M3Motion.spatialFast,
         child: InkWell(
-          onTap: widget.enabled ? widget.onTap : null,
-          onLongPress: widget.enabled ? widget.onLongPress : null,
+          onTap: widget.enabled && widget.onTap != null
+              ? () { m3Haptic(); widget.onTap!(); }
+              : null,
+          onLongPress: widget.enabled && widget.onLongPress != null
+              ? () { m3Haptic(M3Haptic.medium); widget.onLongPress!(); }
+              : null,
           onHighlightChanged: (v) => setState(() => _down = v),
           child: ConstrainedBox(constraints: const BoxConstraints(minHeight: 64), child: content),
         ),
@@ -178,7 +182,12 @@ class SettingSwitchRow extends StatelessWidget {
         title: Text(title),
         subtitle: subtitle == null ? null : Text(subtitle!),
         enabled: onChanged != null,
-        trailing: Switch(value: value, onChanged: onChanged),
+        trailing: Switch(
+          value: value,
+          onChanged: onChanged == null
+              ? null
+              : (v) { m3Haptic(); onChanged!(v); },
+        ),
         onTap: onChanged == null ? null : () => onChanged!(!value),
       );
 }
@@ -317,7 +326,12 @@ class SettingSliderRow extends StatelessWidget {
             child: Slider(
               value: value, min: min, max: max, divisions: divisions,
               label: valueLabel,
-              onChanged: enabled ? onChanged : null,
+              onChanged: enabled
+                  ? (v) {
+                      if (v != value) m3Haptic();
+                      onChanged(v);
+                    }
+                  : null,
               onChangeEnd: onChangeEnd,
             ),
           ),
@@ -532,7 +546,7 @@ class _ChoiceSheet extends StatelessWidget {
             trailing: o.$1 == value
                 ? Icon(Icons.check_circle_rounded, color: scheme.primary)
                 : null,
-            onTap: () => Navigator.pop(context, o.$1),
+            onTap: () { m3Haptic(); Navigator.pop(context, o.$1); },
           ),
       ]),
     );
@@ -785,7 +799,9 @@ class _GroupButtonState extends State<_GroupButton> {
         child: Material(
           type: MaterialType.transparency,
           child: InkWell(
-            onTap: it.onPressed,
+            onTap: it.onPressed == null
+                ? null
+                : () { m3Haptic(); it.onPressed!(); },
             onHighlightChanged: (v) => setState(() => _down = v),
             child: ConstrainedBox(
               constraints: const BoxConstraints(minHeight: 48),

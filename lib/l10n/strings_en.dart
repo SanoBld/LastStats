@@ -706,8 +706,8 @@ class AppStringsEn implements AppStrings {
   @override String get faqA7 => 'A scrobble is a track logged as played on your Last.fm account \u2014 it\'s Last.fm\'s own term for \'one counted listen\'. All your totals (top artists, stats, etc.) are based on it.';
   @override String get faqQ8 => 'How do levels and achievements work?';
   @override String get faqA8 => 'Your account level grows with your total scrobble count (there\'s no max level). Cards also get a border (bronze \u2192 iridescent) based on how many times that artist/track/album has been played. Everything is computed automatically from stats already cached locally, with no extra network calls.';
-  @override String get faqQ9 => 'How does eco mode work?';
-  @override String get faqA9 => 'Eco mode spaces out automatic syncs to save battery. You can turn it on manually or let the app enable it itself based on battery level, from Settings > General.';
+  @override String get faqQ9 => 'How does power saving mode work?';
+  @override String get faqA9 => 'Power saving mode spaces out automatic syncs to save battery. It can be always on, follow your phone\'s own power saving mode, or turn on below a battery level you choose, from Settings > General.';
   @override String get faqQ10 => 'How do I back up or restore my data?';
   @override String get faqA10 => 'Go to Settings > Backup. You can export a backup file (with or without your Last.fm key) and re-import it later or on another device.';
   @override String get faqQ11 => 'Does the app work offline?';

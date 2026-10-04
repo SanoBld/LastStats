@@ -706,8 +706,8 @@ class AppStringsPt implements AppStrings {
   @override String get faqA7 => 'Um scrobble \u00e9 uma faixa registrada como ouvida na sua conta do Last.fm \u2014 \u00e9 o termo oficial do Last.fm para \'uma escuta contabilizada\'. Todos os seus totais (artistas mais ouvidos, estat\u00edsticas etc.) s\u00e3o baseados nisso.';
   @override String get faqQ8 => 'Como funcionam os n\u00edveis e conquistas?';
   @override String get faqA8 => 'Seu n\u00edvel de conta cresce com o total de scrobbles (n\u00e3o h\u00e1 n\u00edvel m\u00e1ximo). Os cart\u00f5es tamb\u00e9m ganham uma borda (bronze \u2192 iridescente) de acordo com quantas vezes aquele artista/faixa/\u00e1lbum foi tocado. Tudo \u00e9 calculado automaticamente a partir das estat\u00edsticas j\u00e1 em cache local, sem chamadas de rede extras.';
-  @override String get faqQ9 => 'Como funciona o modo econômico?';
-  @override String get faqA9 => 'O modo econômico espaça as sincronizações automáticas para economizar bateria. Você pode ativá-lo manualmente ou deixar o app fazer isso sozinho conforme o nível da bateria, em Configurações > Geral.';
+  @override String get faqQ9 => 'Como funciona o modo de economia de energia?';
+  @override String get faqA9 => 'O modo de economia de energia espaça as sincronizações automáticas para economizar bateria. Ele pode ficar sempre ativo, acompanhar o modo de economia do telefone ou ligar abaixo de um nível de bateria que você escolher, em Ajustes > Geral.';
   @override String get faqQ10 => 'Como faço backup ou restauro meus dados?';
   @override String get faqA10 => 'Acesse Configurações > Backup. Você pode exportar um arquivo de backup (com ou sem sua chave do Last.fm) e reimportá-lo depois ou em outro aparelho.';
   @override String get faqQ11 => 'O aplicativo funciona offline?';

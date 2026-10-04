@@ -151,6 +151,7 @@ Future<void> _mainImpl() async {
   ecoModeManualNotifier.value    = prefs.getBool('ls_eco_mode_manual')    ?? false;
   ecoModeAutoNotifier.value      = prefs.getBool('ls_eco_mode_auto')      ?? false;
   ecoModeThresholdNotifier.value = prefs.getInt('ls_eco_mode_threshold') ?? 20;
+  ecoModeSystemNotifier.value    = prefs.getBool('ls_eco_mode_system')    ?? false;
 
   // ── Data caches & storage ────────────────────────────────────────────────
   // These 5 inits don't depend on each other, so run them together instead

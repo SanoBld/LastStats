@@ -641,7 +641,7 @@ class AppStringsJa implements AppStrings {
   @override String get faqQ8 => '\u30ec\u30d9\u30eb\u3068\u5b9f\u7e3e\u306e\u4ed5\u7d44\u307f\u306f\uff1f';
   @override String get faqA8 => '\u30a2\u30ab\u30a6\u30f3\u30c8\u30ec\u30d9\u30eb\u306f\u7dcf scrobble \u6570\u306b\u5fdc\u3058\u3066\u4e0a\u304c\u308a\u3001\u4e0a\u9650\u306f\u3042\u308a\u307e\u305b\u3093\u3002\u30ab\u30fc\u30c9\u306b\u306f\u305d\u306e\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8/\u697d\u66f2/\u30a2\u30eb\u30d0\u30e0\u306e\u518d\u751f\u56de\u6570\u306b\u5fdc\u3058\u305f\u679a\u679a(\u30d6\u30ed\u30f3\u30ba\u2192\u865a\u5f69)\u304c\u4ed8\u304d\u307e\u3059\u3002\u3059\u3079\u3066\u30ed\u30fc\u30ab\u30eb\u306b\u30ad\u30e3\u30c3\u30b7\u30e5\u6e08\u307f\u306e\u7d71\u8a08\u304b\u3089\u81ea\u52d5\u8a08\u7b97\u3055\u308c\u3001\u8ffd\u52a0\u306e\u901a\u4fe1\u306f\u767a\u751f\u3057\u307e\u305b\u3093\u3002';
   @override String get faqQ9 => '省電力モードはどのように機能しますか？';
-  @override String get faqA9 => '省電力モードは自動同期の間隔を広げてバッテリーを節約します。設定 > 一般から手動でオンにするか、バッテリー残量に応じてアプリに自動で有効化させることもできます。';
+  @override String get faqA9 => '省電力モードは自動同期の間隔を広げてバッテリーを節約します。常にオンにする、スマートフォン標準の省電力モードに連動させる、選んだバッテリー残量を下回ったらオンにする、のいずれかを設定 > 一般から選べます。';
   @override String get faqQ10 => 'データのバックアップや復元はどうすればいいですか？';
   @override String get faqA10 => '設定 > バックアップから、バックアップファイルを書き出せます（Last.fmキーを含めるかどうかも選べます）。後で同じ端末や別の端末に読み込めます。';
   @override String get faqQ11 => 'オフラインでも使えますか？';

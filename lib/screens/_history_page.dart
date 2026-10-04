@@ -145,14 +145,14 @@ class _HistoryPageState extends State<_HistoryPage>
                 padding: EdgeInsets.zero,
                 radius: const BorderRadius.horizontal(
                     left: Radius.circular(24), right: Radius.circular(8)),
-                onTap: () { _haptic(_HapticImpact.selection); _prev(); },
+                onTap: _prev,
                 child: Icon(Icons.chevron_left_rounded, color: scheme.onSurface),
               ),
               const SizedBox(width: 2),
               Expanded(
                 child: M3TonalButton(
                   radius: BorderRadius.circular(8),
-                  onTap: () { _haptic(_HapticImpact.selection); _pickDate(); },
+                  onTap: _pickDate,
                   child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                     M3Switcher(
                       duration: M3Motion.effectsDefaultDuration,
@@ -195,7 +195,7 @@ class _HistoryPageState extends State<_HistoryPage>
                 padding: EdgeInsets.zero,
                 radius: const BorderRadius.horizontal(
                     left: Radius.circular(8), right: Radius.circular(24)),
-                onTap: _isToday ? null : () { _haptic(_HapticImpact.selection); _next(); },
+                onTap: _isToday ? null : _next,
                 child: Icon(Icons.chevron_right_rounded, color: scheme.onSurface),
               ),
             ]),

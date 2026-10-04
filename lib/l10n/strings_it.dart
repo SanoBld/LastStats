@@ -640,8 +640,8 @@ class AppStringsIt implements AppStrings {
   @override String get faqA7 => 'Uno scrobble \u00e8 un brano registrato come ascoltato sul suo account Last.fm: \u00e8 il termine ufficiale di Last.fm per \'un ascolto conteggiato\'. Tutti i suoi totali (artisti top, statistiche, ecc.) si basano su questo.';
   @override String get faqQ8 => 'Come funzionano livelli e obiettivi?';
   @override String get faqA8 => 'Il suo livello account cresce con il numero totale di scrobble (non c\u2019\u00e8 un livello massimo). Le card mostrano anche un bordo (bronzo \u2192 iridescente) in base a quante volte quell\u2019artista/brano/album \u00e8 stato ascoltato. Tutto viene calcolato automaticamente dalle statistiche gi\u00e0 in cache locale, senza chiamate di rete aggiuntive.';
-  @override String get faqQ9 => 'Come funziona la modalità risparmio?';
-  @override String get faqA9 => 'La modalità risparmio distanzia le sincronizzazioni automatiche per risparmiare batteria. Puoi attivarla manualmente o lasciare che l\'app lo faccia da sola in base al livello di batteria, da Impostazioni > Generali.';
+  @override String get faqQ9 => 'Come funziona la modalità risparmio energetico?';
+  @override String get faqA9 => 'La modalità risparmio energetico distanzia le sincronizzazioni automatiche per risparmiare batteria. Può restare sempre attiva, seguire il risparmio energetico del telefono o attivarsi sotto un livello di batteria scelto, da Impostazioni > Generali.';
   @override String get faqQ10 => 'Come faccio un backup o lo ripristino?';
   @override String get faqA10 => 'Vada su Impostazioni > Backup. Può esportare un file di backup (con o senza la sua chiave Last.fm) e reimportarlo in seguito o su un altro dispositivo.';
   @override String get faqQ11 => 'L\'app funziona offline?';

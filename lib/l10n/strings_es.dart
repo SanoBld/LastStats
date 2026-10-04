@@ -706,8 +706,8 @@ class AppStringsEs implements AppStrings {
   @override String get faqA7 => 'Un scrobble es una canci\u00f3n registrada como escuchada en su cuenta de Last.fm; es el t\u00e9rmino propio de Last.fm para \'una escucha contada\'. Todos sus totales (artistas top, estad\u00edsticas, etc.) se basan en ello.';
   @override String get faqQ8 => '\u00bfC\u00f3mo funcionan los niveles y los logros?';
   @override String get faqA8 => 'Su nivel de cuenta crece con su total de scrobbles (no hay nivel m\u00e1ximo). Las tarjetas tambi\u00e9n muestran un borde (bronce \u2192 iridiscente) seg\u00fan las veces que se ha escuchado ese artista/canci\u00f3n/\u00e1lbum. Todo se calcula autom\u00e1ticamente a partir de estad\u00edsticas ya guardadas en cach\u00e9, sin llamadas de red adicionales.';
-  @override String get faqQ9 => '¿Cómo funciona el modo ahorro?';
-  @override String get faqA9 => 'El modo ahorro espacia las sincronizaciones automáticas para ahorrar batería. Puedes activarlo manualmente o dejar que la app lo haga sola según el nivel de batería, desde Ajustes > General.';
+  @override String get faqQ9 => '¿Cómo funciona el modo de ahorro de energía?';
+  @override String get faqA9 => 'El modo de ahorro de energía espacia las sincronizaciones automáticas para ahorrar batería. Puede estar siempre activo, seguir el modo de ahorro del teléfono o activarse por debajo de un nivel de batería que elijas, desde Ajustes > General.';
   @override String get faqQ10 => '¿Cómo hago una copia de seguridad o la restauro?';
   @override String get faqA10 => 'Vaya a Ajustes > Copia de seguridad. Puede exportar un archivo de copia (con o sin su clave de Last.fm) y volver a importarlo más tarde o en otro dispositivo.';
   @override String get faqQ11 => '¿Funciona la app sin conexión?';

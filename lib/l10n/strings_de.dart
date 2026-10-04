@@ -641,7 +641,7 @@ class AppStringsDe implements AppStrings {
   @override String get faqQ8 => 'Wie funktionieren Level und Erfolge?';
   @override String get faqA8 => 'Ihr Kontolevel steigt mit Ihrer Gesamtzahl an Scrobbles (es gibt kein H\u00f6chstlevel). Karten erhalten au\u00dferdem einen Rahmen (Bronze \u2192 schillernd), je nachdem wie oft der jeweilige Interpret/Titel/das Album gespielt wurde. Alles wird automatisch aus bereits lokal zwischengespeicherten Statistiken berechnet, ohne zus\u00e4tzliche Netzwerkaufrufe.';
   @override String get faqQ9 => 'Wie funktioniert der Energiesparmodus?';
-  @override String get faqA9 => 'Der Energiesparmodus verlängert die Abstände zwischen automatischen Synchronisierungen, um Akku zu sparen. Du kannst ihn manuell aktivieren oder die App ihn je nach Akkustand selbst einschalten lassen, unter Einstellungen > Allgemein.';
+  @override String get faqA9 => 'Der Energiesparmodus verlängert die Abstände zwischen automatischen Synchronisierungen, um Akku zu sparen. Er kann dauerhaft an sein, dem Energiesparmodus deines Telefons folgen oder sich unter einem gewählten Akkustand einschalten, unter Einstellungen > Allgemein.';
   @override String get faqQ10 => 'Wie sichere oder stelle ich meine Daten wieder her?';
   @override String get faqA10 => 'Gehen Sie zu Einstellungen > Sicherung. Sie können eine Sicherungsdatei exportieren (mit oder ohne Ihren Last.fm-Schlüssel) und sie später oder auf einem anderen Gerät wieder importieren.';
   @override String get faqQ11 => 'Funktioniert die App offline?';

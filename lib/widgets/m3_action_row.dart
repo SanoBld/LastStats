@@ -67,8 +67,12 @@ class _M3PressableState extends State<_M3Pressable> {
           type: MaterialType.transparency,
           child: InkWell(
             customBorder: shape,
-            onTap: widget.onTap,
-            onLongPress: widget.onLongPress,
+            onTap: widget.onTap == null
+                ? null
+                : () { m3Haptic(M3Haptic.light); widget.onTap!(); },
+            onLongPress: widget.onLongPress == null
+                ? null
+                : () { m3Haptic(M3Haptic.medium); widget.onLongPress!(); },
             onHighlightChanged: (v) => setState(() => _down = v),
             child: Center(child: widget.child),
           ),

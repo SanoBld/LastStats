@@ -104,15 +104,22 @@ class M3ButtonGroup<T> extends StatelessWidget {
         separatorBuilder: (_, _) => const SizedBox(width: 4),
         itemBuilder: (context, i) {
           final sel = items[i].$1 == selected;
-          final r = BorderRadius.circular(sel ? 22 : 12);
-          return M3ShapeMorph(
+          return M3PressBuilder(builder: (context, down0, setDown) {
+          final down = down0 && !M3Motion.reduced(context);
+          final r = BorderRadius.circular(down ? 10 : (sel ? 22 : 12));
+          return AnimatedScale(
+            scale: down ? 0.94 : 1.0,
+            duration: M3Motion.spatialFastDuration,
+            curve: M3Motion.spatialFast,
+            child: M3ShapeMorph(
             radius: r,
             color: sel ? scheme.primary : scheme.surfaceContainerHigh,
             child: Material(
               type: MaterialType.transparency,
               child: InkWell(
                 borderRadius: r,
-                onTap: () => onSelected(items[i].$1),
+                onHighlightChanged: setDown,
+                onTap: () { if (!sel) m3Haptic(); onSelected(items[i].$1); },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 18),
                   child: Center(
@@ -131,7 +138,9 @@ class M3ButtonGroup<T> extends StatelessWidget {
                 ),
               ),
             ),
+          ),
           );
+          });
         },
       ),
     );
@@ -217,8 +226,12 @@ class _M3PressCardState extends State<M3PressCard> {
           type: MaterialType.transparency,
           child: InkWell(
             borderRadius: r,
-            onTap: widget.onTap,
-            onLongPress: widget.onLongPress,
+            onTap: widget.onTap == null
+                ? null
+                : () { m3Haptic(M3Haptic.light); widget.onTap!(); },
+            onLongPress: widget.onLongPress == null
+                ? null
+                : () { m3Haptic(M3Haptic.medium); widget.onLongPress!(); },
             onHighlightChanged: (v) => setState(() => _down = v),
             child: Padding(padding: widget.padding, child: widget.child),
           ),
@@ -483,10 +496,12 @@ class M3Chip extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final compact = visualDensity == VisualDensity.compact;
-    final r = BorderRadius.circular(selected ? 20 : 10);
     final fg = selected ? scheme.onSecondaryContainer : scheme.onSurfaceVariant;
+    return M3PressBuilder(builder: (context, down0, setDown) {
+    final down = down0 && !M3Motion.reduced(context);
+    final r = BorderRadius.circular(down ? 8 : (selected ? 20 : 10));
     return AnimatedScale(
-      scale: selected ? 1.0 : 0.98,
+      scale: down ? 0.94 : (selected ? 1.0 : 0.98),
       duration: M3Motion.spatialFastDuration,
       curve: M3Motion.spatialFast,
       child: M3ShapeMorph(
@@ -505,7 +520,10 @@ class M3Chip extends StatelessWidget {
             // persisting highlight overlay.
             highlightColor: Colors.transparent,
             splashColor: fg.withValues(alpha: 0.10),
-            onTap: onSelected == null ? null : () => onSelected!(!selected),
+            onHighlightChanged: setDown,
+            onTap: onSelected == null
+                ? null
+                : () { m3Haptic(); onSelected!(!selected); },
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: compact ? 12 : 16),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -526,6 +544,7 @@ class M3Chip extends StatelessWidget {
         ),
       ),
     );
+    });
   }
 }
 
@@ -562,13 +581,21 @@ class M3SegmentedButton<T> extends StatelessWidget {
     final n = segments.length;
     // Selected = full pill. Others: round outside, small inside.
     final big = 24.0, small = 8.0;
-    final r = sel
+    final fg = sel ? scheme.onSecondaryContainer : scheme.onSurfaceVariant;
+    return M3PressBuilder(builder: (context, down0, setDown) {
+    final down = down0 && !M3Motion.reduced(context);
+    final r = down
+        ? BorderRadius.circular(12)
+        : sel
         ? BorderRadius.circular(big)
         : BorderRadius.horizontal(
             left: Radius.circular(i == 0 ? big : small),
             right: Radius.circular(i == n - 1 ? big : small));
-    final fg = sel ? scheme.onSecondaryContainer : scheme.onSurfaceVariant;
-    return M3ShapeMorph(
+    return AnimatedScale(
+      scale: down ? 0.96 : 1.0,
+      duration: M3Motion.spatialFastDuration,
+      curve: M3Motion.spatialFast,
+      child: M3ShapeMorph(
       radius: r,
       height: 48,
       color: sel ? scheme.secondaryContainer : scheme.surfaceContainerHigh,
@@ -576,7 +603,10 @@ class M3SegmentedButton<T> extends StatelessWidget {
         type: MaterialType.transparency,
         child: InkWell(
           borderRadius: r,
-          onTap: onSelectionChanged == null ? null : () => onSelectionChanged!({s.value}),
+          onHighlightChanged: setDown,
+          onTap: onSelectionChanged == null
+              ? null
+              : () { if (!sel) m3Haptic(); onSelectionChanged!({s.value}); },
           child: Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -601,7 +631,9 @@ class M3SegmentedButton<T> extends StatelessWidget {
           ),
         ),
       ),
+      ),
     );
+    });
   }
 }
 
@@ -669,7 +701,9 @@ class _M3TonalButtonState extends State<M3TonalButton> {
             type: MaterialType.transparency,
             child: InkWell(
               borderRadius: r,
-              onTap: widget.onTap,
+              onTap: widget.onTap == null
+                  ? null
+                  : () { m3Haptic(); widget.onTap!(); },
               onHighlightChanged: (v) => setState(() => _down = v),
               child: Padding(
                 padding: widget.padding,

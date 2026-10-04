@@ -167,7 +167,10 @@ class SettingsSection extends StatelessWidget {
         title: w.title ?? const SizedBox.shrink(),
         subtitle: w.subtitle,
         enabled: cb != null,
-        trailing: Switch(value: v, onChanged: cb),
+        trailing: Switch(
+          value: v,
+          onChanged: cb == null ? null : (x) { m3Haptic(); cb(x); },
+        ),
         onTap: cb == null ? null : () => cb(!v),
       );
     }

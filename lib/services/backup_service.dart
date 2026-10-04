@@ -612,6 +612,7 @@ class BackupService {
     ecoModeManualNotifier.value         = p.getBool('ls_eco_mode_manual')      ?? false;
     ecoModeAutoNotifier.value           = p.getBool('ls_eco_mode_auto')        ?? false;
     ecoModeThresholdNotifier.value      = p.getInt('ls_eco_mode_threshold')    ?? 20;
+    ecoModeSystemNotifier.value         = p.getBool('ls_eco_mode_system')      ?? false;
     displayNameNotifier.value           = p.getString('ls_display_name')       ?? displayNameNotifier.value;
     mergeVersionsNotifier.value         = p.getBool('ls_merge_versions')       ?? false;
     splitCollabsNotifier.value          = p.getBool('ls_split_collabs')        ?? false;

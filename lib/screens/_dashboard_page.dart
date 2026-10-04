@@ -2996,95 +2996,6 @@ class _DashStatCard extends StatelessWidget {
 
 // ── Now playing card ──────────────────────────────────────────────────────────
 
-// Rotates the outer path of a ShapeBorder around the box center, without
-// touching the content it clips — used so the Material You shape itself
-// spins while the artwork underneath stays perfectly still.
-class _RotatingShapeClipper extends CustomClipper<Path> {
-  final ShapeBorder shape;
-  final double      turns; // 0..1 (fraction of a full turn)
-  const _RotatingShapeClipper({required this.shape, required this.turns});
-
-  @override
-  Path getClip(Size size) {
-    final rect = Offset.zero & size;
-    // Non-round shapes (squircle, leaf, arch…) reach all the way to the
-    // corners of their bounding box. Rotating that box-filling shape in
-    // place pushes its corners outside the widget's own bounds, so they
-    // got flatly cut off by the render box instead of spinning cleanly.
-    // Shrinking the rect the shape is drawn into by 1/√2 keeps the whole
-    // shape inside the circle inscribed in [size] at every angle, so it
-    // spins freely without ever touching (and clipping against) the edge.
-    final innerRect = Rect.fromCenter(
-      center: rect.center,
-      width:  size.width  * 0.7071,
-      height: size.height * 0.7071,
-    );
-    final path = shape.getOuterPath(innerRect);
-    final m = Matrix4.identity()
-      ..translateByDouble(rect.center.dx, rect.center.dy, 0, 1)
-      ..rotateZ(turns * 2 * math.pi)
-      ..translateByDouble(-rect.center.dx, -rect.center.dy, 0, 1);
-    return path.transform(m.storage);
-  }
-
-  @override
-  bool shouldReclip(_RotatingShapeClipper old) =>
-      old.turns != turns || old.shape != shape;
-}
-
-// While a track is playing live, the artwork's own Material You shape
-// (whichever one is currently selected in Settings) slowly spins in place.
-// The image itself never moves or rotates — it fully fills the square
-// underneath, so as the shape mask turns there is never a seam or gap,
-// just a different slice of the same still photo showing through.
-class _NowPlayingSpinningArt extends StatefulWidget {
-  final double size;
-  final String seed; // same seed as the rest of the app picks the same shape
-  final Widget child;
-  const _NowPlayingSpinningArt(
-      {required this.size, required this.seed, required this.child});
-
-  @override
-  State<_NowPlayingSpinningArt> createState() => _NowPlayingSpinningArtState();
-}
-
-class _NowPlayingSpinningArtState extends State<_NowPlayingSpinningArt>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _c =
-      AnimationController(vsync: this, duration: const Duration(seconds: 8))
-        ..repeat();
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final idx = m3ShapeIndex(widget.seed);
-    return ValueListenableBuilder<String>(
-      valueListenable: imageShapeNotifier,
-      builder: (_, mode, _) {
-        // A circle looks identical at every angle, so the rotation would be
-        // invisible: never use it here, fall back to the cookie instead.
-        var shape = m3ResolveShape(mode, idx, widget.size);
-        if (shape is CircleBorder) {
-          shape = m3ImageShape(idx % kM3ImageShapeCount == 1 ? 0 : idx, widget.size);
-        }
-        return AnimatedBuilder(
-          animation: _c,
-          builder: (_, child) => ClipPath(
-            clipper: _RotatingShapeClipper(shape: shape, turns: _c.value),
-            child: child,
-          ),
-          child: SizedBox(width: widget.size, height: widget.size, child: widget.child),
-        );
-      },
-    );
-  }
-}
-
 class _NowPlayingCard extends StatelessWidget {
   final Map<String, dynamic> track;
   final LastFmService        service;
@@ -3123,12 +3034,12 @@ class _NowPlayingCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Row(children: [
 
-          _NowPlayingSpinningArt(
-            size: 88,
-            seed: '$title-$artist',
+          // Static rounded square: no spin, no circle / cookie shape.
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
             child: _SmartImage(
               size: 88,
-              borderRadius: 12,
+              borderRadius: 20,
               shaped: false,
               initialUrl: rawUrl,
               resolver: () => ImageService.resolveTrack(title, artist,

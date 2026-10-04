@@ -868,8 +868,8 @@ const Map<String, Map<String, String>> kUiStrings = {
     'ar': 'الكل',
   },
   'ui_battery_saver': {
-    'fr': 'Mode éco',
-    'en': 'Battery saver',
+    'fr': 'Mode économie d\'énergie',
+    'en': 'Power saving mode',
     'es': 'Ahorro de batería',
     'zh': '省电模式',
     'pt': 'Economia de bateria',
@@ -1408,8 +1408,8 @@ const Map<String, Map<String, String>> kUiStrings = {
     'ar': 'مفعّل دائمًا',
   },
   'ui_force_eco_mode_on_rega': {
-    'fr': 'Force le mode éco, quel que soit le niveau de batterie.',
-    'en': 'Force eco mode on, regardless of battery level.',
+    'fr': 'Force le mode économie d\'énergie, quel que soit le niveau de batterie.',
+    'en': 'Force power saving mode on, regardless of battery level.',
     'es': 'Fuerza el modo ahorro, sea cual sea el nivel de batería.',
     'zh': '无论电量多少都强制开启省电模式。',
     'pt': 'Força o modo de economia, independentemente do nível da bateria.',

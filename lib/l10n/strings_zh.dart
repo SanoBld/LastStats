@@ -704,7 +704,7 @@ class AppStringsZh implements AppStrings {
   @override String get faqQ8 => '\u7b49\u7ea7\u4e0e\u6210\u5c31\u7cfb\u7edf\u662f\u600e\u4e48\u8fd0\u4f5c\u7684\uff1f';
   @override String get faqA8 => '\u4f60\u7684\u8d26\u6237\u7b49\u7ea7\u968f\u603b scrobble \u6570\u589e\u957f\uff08\u6ca1\u6709\u4e0a\u9650\uff09\u3002\u5361\u7247\u4e5f\u4f1a\u6839\u636e\u8be5\u827a\u672f\u5bb6/\u6b4c\u66f2/\u4e13\u8f91\u7684\u64ad\u653e\u6b21\u6570\u663e\u793a\u8fb9\u6846\u989c\u8272\uff08\u9752\u94dc\u2192\u4e94\u5f69\uff09\u3002\u8fd9\u4e9b\u90fd\u57fa\u4e8e\u672c\u5730\u5df2\u7f13\u5b58\u7684\u7edf\u8ba1\u6570\u636e\u81ea\u52a8\u8ba1\u7b97\uff0c\u4e0d\u4f1a\u989d\u5916\u8bf7\u6c42\u7f51\u7edc\u3002';
   @override String get faqQ9 => '省电模式是如何工作的？';
-  @override String get faqA9 => '省电模式会拉长自动同步的间隔以节省电量。你可以在设置 > 通用中手动开启，或让应用根据电量自行决定是否启用。';
+  @override String get faqA9 => '省电模式会拉长自动同步的间隔以节省电量。你可以在设置 > 通用中选择始终开启、跟随手机自带的省电模式，或在电量低于设定值时开启。';
   @override String get faqQ10 => '如何备份或恢复我的数据？';
   @override String get faqA10 => '前往设置 > 备份，可以导出备份文件（可选择是否包含 Last.fm 密钥），之后在本机或其他设备重新导入。';
   @override String get faqQ11 => '应用可以离线使用吗？';

@@ -15,6 +15,43 @@
 import 'dart:ui' show lerpDouble;
 import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show HapticFeedback;
+import '../app_state.dart';
+
+// ── Haptics ────────────────────────────────────────────────────────────────
+// One place for vibration. Respects the "haptic feedback" setting.
+enum M3Haptic { selection, light, medium, heavy }
+
+void m3Haptic([M3Haptic type = M3Haptic.selection]) {
+  if (!hapticFeedbackNotifier.value) return;
+  switch (type) {
+    case M3Haptic.selection: HapticFeedback.selectionClick();
+    case M3Haptic.light:     HapticFeedback.lightImpact();
+    case M3Haptic.medium:    HapticFeedback.mediumImpact();
+    case M3Haptic.heavy:     HapticFeedback.heavyImpact();
+  }
+}
+
+// Gives a builder the "finger is down" state. Plug [setDown] into
+// InkWell.onHighlightChanged so scrolling never counts as a press.
+class M3PressBuilder extends StatefulWidget {
+  const M3PressBuilder({super.key, required this.builder});
+  final Widget Function(BuildContext context, bool down, ValueChanged<bool> setDown) builder;
+
+  @override
+  State<M3PressBuilder> createState() => _M3PressBuilderState();
+}
+
+class _M3PressBuilderState extends State<M3PressBuilder> {
+  bool _down = false;
+
+  void _set(bool v) {
+    if (mounted && v != _down) setState(() => _down = v);
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(context, _down, _set);
+}
 
 class M3Motion {
   M3Motion._();

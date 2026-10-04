@@ -706,8 +706,8 @@ class AppStringsFr implements AppStrings {
   @override String get faqA7 => 'Un scrobble, c\'est un titre enregistr\u00e9 comme \u00e9cout\u00e9 sur votre compte Last.fm, c\'est le terme officiel de Last.fm pour \u00abune \u00e9coute compt\u00e9e\u00bb. Tous vos totaux (top artistes, statistiques, etc.) sont bas\u00e9s dessus.';
   @override String get faqQ8 => 'Comment fonctionnent les niveaux et les succ\u00e8s ?';
   @override String get faqA8 => 'Votre niveau de compte augmente avec votre nombre total de scrobbles, il n\'y a pas de maximum. Les cartes affichent aussi une bordure (du bronze \u00e0 l\'iridescent) selon le nombre d\'\u00e9coutes de l\'artiste, du titre ou de l\'album concern\u00e9. Tout est calcul\u00e9 automatiquement \u00e0 partir de vos statistiques d\u00e9j\u00e0 en cache, sans requ\u00eate suppl\u00e9mentaire.';
-  @override String get faqQ9 => 'Comment fonctionne le mode éco ?';
-  @override String get faqA9 => 'Le mode éco espace les synchronisations automatiques pour économiser la batterie. Vous pouvez l\'activer vous-même ou laisser l\'application le faire selon le niveau de batterie, depuis Paramètres > Général.';
+  @override String get faqQ9 => 'Comment fonctionne le mode économie d\'énergie ?';
+  @override String get faqA9 => 'Le mode économie d\'énergie espace les synchronisations automatiques pour économiser la batterie. Il peut s\'activer en permanence, avec le mode économie d\'énergie de votre téléphone, ou sous un niveau de batterie choisi, depuis Paramètres > Général.';
   @override String get faqQ10 => 'Comment sauvegarder ou restaurer mes données ?';
   @override String get faqA10 => 'Allez dans Paramètres > Sauvegarde. Vous pouvez exporter un fichier de sauvegarde (avec ou sans votre clé Last.fm) puis le réimporter plus tard ou sur un autre appareil.';
   @override String get faqQ11 => 'L\'application fonctionne-t-elle hors ligne ?';

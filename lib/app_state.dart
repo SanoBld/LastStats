@@ -119,6 +119,15 @@ final ecoModeManualNotifier = ValueNotifier<bool>(false);
 final ecoModeAutoNotifier = ValueNotifier<bool>(false);
 // Battery % threshold for the auto switch. Saved as 'ls_eco_mode_threshold'.
 final ecoModeThresholdNotifier = ValueNotifier<int>(20);
+// System switch — turn eco mode on while the phone's own battery saver
+// (Android power saver / iOS low power mode) is on. Saved as 'ls_eco_mode_system'.
+final ecoModeSystemNotifier = ValueNotifier<bool>(false);
+// Why eco mode is active right now: '' (off), 'manual', 'system' or 'battery'.
+// Only for display on the eco mode page.
+final ecoModeReasonNotifier = ValueNotifier<String>('');
+// Last known battery level (0-100, -1 = unknown) and system saver state.
+final ecoBatteryLevelNotifier = ValueNotifier<int>(-1);
+final ecoSystemSaverNotifier = ValueNotifier<bool>(false);
 // Combined "is eco mode actually active right now" — true if the manual
 // switch is on, OR auto is on and battery is at/below the threshold.
 // Widgets should only ever read/watch THIS one, not the raw switches above.
