@@ -45,6 +45,13 @@ window.I18N.fr = {
   dlFmtScript: "Choisit automatiquement le bon paquet pour votre distribution",
   dlFmtIpa: "Non signé : à installer avec AltStore, Sideloadly ou TrollStore",
   dlIosNote: "Cette app iOS n'est pas signée : installez le fichier .ipa avec AltStore, Sideloadly ou TrollStore (ou re-signez-le avec votre compte Apple).",
+  webBtn: "Version web",
+  webBetaChip: "Bêta",
+  webWarnTitle: "Version web (bêta)",
+  webWarnBody: "La version web est expérimentale : elle est en cours de test et peut contenir des bugs ou des incompatibilités. Certaines fonctionnalités de l'application (widgets, notifications, sauvegardes automatiques, cache hors ligne…) peuvent être indisponibles ou se comporter différemment. Pour une expérience complète et stable, utilisez l'application native.",
+  webOpen: "Ouvrir la version web",
+  webCancel: "Annuler",
+  webClose: "Fermer",
   readmeError: "Impossible de charger le README pour le moment.",
 
   // ---- common ----
@@ -116,7 +123,7 @@ window.I18N.fr = {
   "help.is_an_ios_version_planned": "Une version iOS est-elle prévue ?",
   "help.no_an_ios_version_is": "Non, pas pour le moment. Si la demande devient suffisamment forte, ce sera reconsidéré.",
   "help.does_the_app_work_on": "L'application fonctionne-t-elle sur macOS ou d'autres plateformes ?",
-  "help.laststats_mobile_is_developed_and": "LastStats Mobile est développée et testée sur Android. Le fonctionnement sur les autres plateformes (macOS, Windows, Linux…) n'est pas garanti, des bugs ou comportements inattendus restent possibles.",
+  "help.laststats_mobile_is_developed_and": "LastStats est développée et testée sur Android. Le fonctionnement sur les autres plateformes (macOS, Windows, Linux…) n'est pas garanti, des bugs ou comportements inattendus restent possibles.",
   "help.is_laststats_open_source": "LastStats est-elle open source ?",
   "help.yes_the_source_code_is": "Oui ! Le code source est en libre accès sur GitHub. C'est un projet indépendant, fait avec passion par SanoBld. Vous pouvez y contribuer, signaler un bug ou juste laisser une étoile ⭐.",
   "help.where_is_my_data_stored": "Où sont stockées mes données ?",

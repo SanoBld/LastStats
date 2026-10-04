@@ -162,6 +162,24 @@
 .dl-status { font-size: .85rem; color: var(--md-on-surface-variant); text-align: center; padding: 1rem 0; }
 .dl-status.is-error { color: var(--md-error, #b3261e); }
 
+/* web version button + beta warning (reuses the .dl-modal shell) */
+.web-beta-chip {
+  font-size: .68rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  padding: .15rem .5rem; margin-left: .15rem; border-radius: var(--shape-full);
+  background: var(--md-tertiary-container, var(--md-primary)); color: var(--md-on-tertiary-container, var(--md-on-primary));
+}
+.web-warn-icon { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-bottom: .8rem; border-radius: 50%; background: var(--md-tertiary-container, var(--md-secondary-container)); color: var(--md-on-tertiary-container, var(--md-on-secondary-container)); }
+.web-warn-body { font-size: .9rem; line-height: 1.55; color: var(--md-on-surface-variant); margin: 0 0 1.3rem; }
+.web-warn-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .6rem; }
+.web-warn-actions a, .web-warn-actions button {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: .65rem 1.2rem; border-radius: var(--shape-full);
+  font-family: inherit; font-size: .9rem; font-weight: 600; cursor: pointer; text-decoration: none; border: none;
+}
+.web-warn-open { background: var(--md-primary); color: var(--md-on-primary); }
+.web-warn-cancel { background: transparent; color: var(--md-primary); }
+.web-warn-cancel:hover { background: var(--md-surface-container-highest); }
+
 /* "About the app" text block, plain and readable */
 .about-app { max-width: 46rem; margin: 0 auto 4rem; text-align: left; }
 .about-app p { color: var(--md-on-surface-variant); font-size: 1.05rem; margin-bottom: 1rem; }

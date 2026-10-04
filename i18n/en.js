@@ -45,6 +45,13 @@ window.I18N.en = {
   dlFmtScript: "Automatically picks the right package for your distribution",
   dlFmtIpa: "Unsigned: install with AltStore, Sideloadly or TrollStore",
   dlIosNote: "This iOS app is unsigned: install the .ipa file with AltStore, Sideloadly or TrollStore (or re-sign it with your own Apple account).",
+  webBtn: "Web version",
+  webBetaChip: "Beta",
+  webWarnTitle: "Web version (beta)",
+  webWarnBody: "The web version is experimental: it is still being tested and may contain bugs or incompatibilities. Some app features (widgets, notifications, automatic backups, offline cache…) may be unavailable or behave differently. For the full and stable experience, use the native app.",
+  webOpen: "Open the web version",
+  webCancel: "Cancel",
+  webClose: "Close",
   readmeError: "Could not load the README right now.",
 
   // ---- common ----
@@ -116,7 +123,7 @@ window.I18N.en = {
   "help.is_an_ios_version_planned": "Is an iOS version planned?",
   "help.no_an_ios_version_is": "No. An iOS version is not planned at this time.",
   "help.does_the_app_work_on": "Does the app work on macOS or other platforms?",
-  "help.laststats_mobile_is_developed_and": "LastStats Mobile is developed and tested on Android. Behaviour on other platforms (macOS, Windows, Linux…) is unverified, bugs or unexpected behaviour may occur.",
+  "help.laststats_mobile_is_developed_and": "LastStats is developed and tested on Android. Behaviour on other platforms (macOS, Windows, Linux…) is unverified, bugs or unexpected behaviour may occur.",
   "help.is_laststats_open_source": "Is LastStats open source?",
   "help.yes_the_source_code_is": "Yes! The source code is freely available on GitHub. The project is independent, built with passion by SanoBld. Feel free to contribute, report bugs, or leave a star ⭐.",
   "help.where_is_my_data_stored": "Where is my data stored?",
