@@ -7,9 +7,14 @@
     const el = e.target.closest(SEL);
     if (!el) return;
     el.classList.add('is-pressed');
-    const release = () => setTimeout(() => el.classList.remove('is-pressed'), 140);
-    ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) =>
-      el.addEventListener(ev, release, { once: true }));
+    // release once, then drop all three listeners (a leftover pointerleave
+    // listener used to cut short the pressed shape of the next press)
+    const events = ['pointerup', 'pointercancel', 'pointerleave'];
+    const release = () => {
+      events.forEach((ev) => el.removeEventListener(ev, release));
+      setTimeout(() => el.classList.remove('is-pressed'), 140);
+    };
+    events.forEach((ev) => el.addEventListener(ev, release));
   });
 })();
 
