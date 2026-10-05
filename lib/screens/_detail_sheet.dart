@@ -42,17 +42,7 @@ Widget _linkifiedText(String body, TextStyle? style, Color linkColor) {
 // ── Simple fade-in wrapper for content that pops in after loading ──────────
 /// PC only: centres [child] in a column of at most [maxWidth] dp.
 /// Phones: returns [child] untouched.
-Widget _pcColumn(BuildContext ctx, Widget child, {double maxWidth = 980}) {
-  if (!_isDesktopLayout(ctx)) return child;
-  return Center(
-    child: ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: maxWidth),
-      // Full width inside the column so content stays left-aligned
-      // (without it the child shrink-wraps and ends up centred).
-      child: SizedBox(width: double.infinity, child: child),
-    ),
-  );
-}
+Widget _pcColumn(BuildContext ctx, Widget child, {double maxWidth = 980}) => child;
 
 class _FadeIn extends StatelessWidget {
   final Widget child;
@@ -1068,9 +1058,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             scheme: scheme,
             style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w900) ??
                 const TextStyle(fontWeight: FontWeight.w900, fontSize: 28),
-            maxWidth: (_isDesktopLayout(ctx)
-                ? math.min(MediaQuery.of(ctx).size.width, 980.0)
-                : MediaQuery.of(ctx).size.width) - 40,
+            maxWidth: MediaQuery.of(ctx).size.width - 40,
           ),
           const SizedBox(height: 4),
         ],

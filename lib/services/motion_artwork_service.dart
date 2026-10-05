@@ -5,12 +5,16 @@
 //      anonymous token that the public web player itself embeds.
 //   3. Fallback: read the album page's embedded JSON and pick an HLS
 //      (.m3u8) video if the album has one.
+//   4. Last resort (tracks only): the official YouTube video. The URL gets
+//      a "#yt=<startSec>,<lenSec>" suffix so the player loops one short
+//      moment of the clip instead of the whole video.
 // Returns null when nothing is found (most albums have no motion artwork),
 // so callers just keep showing the static cover.
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class MotionArtworkService {
   // In-memory cache: key -> video URL (or null = checked, nothing found).
@@ -62,6 +66,7 @@ class MotionArtworkService {
         }
         if (video != null) break;
       }
+      video ??= await _youtube(artist, track);
       _cache[key] = video;
       return video;
     } catch (_) {
@@ -126,6 +131,48 @@ class MotionArtworkService {
         if (v is String && v.isNotEmpty) return v;
       }
     } catch (_) {}
+    return null;
+  }
+
+  // ── YouTube fallback ───────────────────────────────────────────────────
+  static const _ytBad =
+      r'cover|live|reaction|remix|karaoke|instrumental|lyric|slowed|sped|'
+      r'8d|nightcore|tutorial|mashup|acoustic|audio only';
+
+  static Future<String?> _youtube(String artist, String track) async {
+    if (track.isEmpty) return null;
+    final yt = YoutubeExplode();
+    try {
+      final core  = _norm(_core(track));
+      final lead  = _norm(artist.split(_artistSplit).first);
+      if (core.isEmpty || lead.isEmpty) return null;
+      final res = await yt.search
+          .search('$artist ${_core(track)} official video')
+          .timeout(_timeout);
+      for (final v in res.take(8)) {
+        if (v.isLive) continue;
+        final d = v.duration?.inSeconds ?? 0;
+        if (d < 90 || d > 600) continue;
+        final title = v.title.toLowerCase();
+        if (RegExp(_ytBad).hasMatch(title) &&
+            !RegExp(_ytBad).hasMatch(track.toLowerCase())) continue;
+        if (!_norm(v.title).contains(core)) continue;
+        if (!_norm('${v.title} ${v.author}').contains(lead)) continue;
+        final m = await yt.videos.streams
+            .getManifest(v.id)
+            .timeout(const Duration(seconds: 15));
+        final mp4 = m.muxed.where((s) => s.container.name == 'mp4').toList();
+        if (mp4.isEmpty) continue;
+        final s = mp4.withHighestBitrate();
+        // Guess of a "good moment": ~35% in (usually past the intro, around
+        // the first chorus). Loops 12 s from there.
+        final start = (d * 0.35).round();
+        return '${s.url}#yt=$start,12';
+      }
+    } catch (_) {
+    } finally {
+      yt.close();
+    }
     return null;
   }
 

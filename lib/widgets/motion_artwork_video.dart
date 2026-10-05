@@ -48,16 +48,29 @@ class _MotionArtworkVideoState extends State<MotionArtworkVideo>
     _init();
   }
 
+  // YouTube fallback URLs end with "#yt=<start>,<len>" (seconds).
+  late final int _ytAt = widget.url.indexOf('#yt=');
+  late final String _url =
+      _ytAt < 0 ? widget.url : widget.url.substring(0, _ytAt);
+  int _ytStart = 0, _ytLen = 12;
+
   Future<void> _init() async {
     VideoPlayerController? c;
     final options = VideoPlayerOptions(mixWithOthers: true);
     var fromDisk = false;
+    final isYt = _ytAt >= 0;
+    if (isYt) {
+      final p = widget.url.substring(_ytAt + 4).split(',');
+      _ytStart = int.tryParse(p.first) ?? 0;
+      if (p.length > 1) _ytLen = int.tryParse(p[1]) ?? 12;
+    }
     try {
       // Prefer the on-disk copy (offline, no re-download); else stream.
       // mixWithOthers: never interrupt the user's music or the 30s preview.
-      c = await VideoDiskCache.localController(widget.url, options);
+      // YouTube links expire and are never cached.
+      if (!isYt) c = await VideoDiskCache.localController(_url, options);
       fromDisk = c != null;
-      c ??= VideoPlayerController.networkUrl(Uri.parse(widget.url),
+      c ??= VideoPlayerController.networkUrl(Uri.parse(_url),
           videoPlayerOptions: options);
       _c = c;
       try {
@@ -66,19 +79,35 @@ class _MotionArtworkVideoState extends State<MotionArtworkVideo>
         if (!fromDisk) rethrow;
         // Corrupt/unreadable local copy: fall back to streaming.
         await c.dispose();
-        c = VideoPlayerController.networkUrl(Uri.parse(widget.url),
+        c = VideoPlayerController.networkUrl(Uri.parse(_url),
             videoPlayerOptions: options);
         _c = c;
         fromDisk = false;
         await c.initialize();
       }
-      if (!fromDisk) VideoDiskCache.storeInBackground(widget.url);
+      if (!fromDisk && !isYt) VideoDiskCache.storeInBackground(_url);
       // The widget may have been removed while the stream was loading:
       // release the player right away instead of leaking it.
       if (_disposed) { await c.dispose(); return; }
       MotionArtworkVideo._live.add(c);
-      await c.setLooping(true);
       await c.setVolume(0);
+      if (isYt) {
+        // Loop one short moment of the clip instead of the whole video.
+        final ctl = c;
+        await ctl.setLooping(false);
+        await ctl.seekTo(Duration(seconds: _ytStart));
+        ctl.addListener(() {
+          final v = ctl.value;
+          if (!v.isInitialized || _disposed) return;
+          if (v.position.inSeconds >= _ytStart + _ytLen ||
+              (v.position >= v.duration && !v.isPlaying)) {
+            ctl.seekTo(Duration(seconds: _ytStart));
+            ctl.play();
+          }
+        });
+      } else {
+        await c.setLooping(true);
+      }
       await c.play();
       if (mounted) setState(() => _ready = true);
     } catch (_) {
