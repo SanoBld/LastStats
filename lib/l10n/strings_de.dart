@@ -771,4 +771,15 @@ class AppStringsDe implements AppStrings {
   @override String get dashSeparateRow => 'In eigener Zeile';
   @override String dashFiltersOf(String group) => 'Filter für „$group“';
   @override String get apShapeSingle => 'Nur eine Form';
+  @override String get mvSource => 'Videoquelle';
+  @override String get mvSrcAuto => 'Auto (Apple Music, dann YouTube)';
+  @override String get mvSrcApple => 'Nur Apple Music';
+  @override String get mvSrcYt => 'Nur YouTube (Titel)';
+  @override String get mvQualityT => 'Videoqualität';
+  @override String get mvQAuto => 'Auto';
+  @override String get mvQLow => 'Sparmodus (360p)';
+  @override String get mvTypesT => 'Video anzeigen für';
+  @override String get mvTracks => 'Titel';
+  @override String get mvAlbums => 'Alben';
+  @override String get mvArtists => 'Künstler';
 }

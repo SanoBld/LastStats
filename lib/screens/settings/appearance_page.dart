@@ -1118,17 +1118,17 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
         if (_motionOn) ...[
           ListTile(
             contentPadding: const EdgeInsets.only(left: 72, right: 16),
-            title: Text(tx('set_mv_source_t')),
+            title: Text(L.mvSource),
             trailing: DropdownButton<String>(
               value: _mvSource,
               underline: const SizedBox.shrink(),
               items: [
                 DropdownMenuItem(
-                    value: 'auto', child: Text(tx('set_mv_src_auto'))),
+                    value: 'auto', child: Text(L.mvSrcAuto)),
                 DropdownMenuItem(
-                    value: 'apple', child: Text(tx('set_mv_src_apple'))),
+                    value: 'apple', child: Text(L.mvSrcApple)),
                 DropdownMenuItem(
-                    value: 'youtube', child: Text(tx('set_mv_src_yt'))),
+                    value: 'youtube', child: Text(L.mvSrcYt)),
               ],
               onChanged: (v) {
                 if (v == null) return;
@@ -1139,15 +1139,15 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
           ),
           ListTile(
             contentPadding: const EdgeInsets.only(left: 72, right: 16),
-            title: Text(tx('set_mv_quality_t')),
+            title: Text(L.mvQualityT),
             trailing: DropdownButton<String>(
               value: _mvQuality,
               underline: const SizedBox.shrink(),
               items: [
                 DropdownMenuItem(
-                    value: 'auto', child: Text(tx('set_mv_q_auto'))),
+                    value: 'auto', child: Text(L.mvQAuto)),
                 DropdownMenuItem(
-                    value: '360', child: Text(tx('set_mv_q_low'))),
+                    value: '360', child: Text(L.mvQLow)),
                 const DropdownMenuItem(value: '480', child: Text('480p')),
                 const DropdownMenuItem(value: '720', child: Text('720p')),
                 const DropdownMenuItem(value: '1080', child: Text('1080p')),
@@ -1161,7 +1161,7 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 72, right: 16, top: 8),
-            child: Text(tx('set_mv_types_t'),
+            child: Text(L.mvTypesT,
                 style: Theme.of(context).textTheme.labelLarge),
           ),
           for (final t in [

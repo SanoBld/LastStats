@@ -771,4 +771,15 @@ class AppStringsAr implements AppStrings {
   @override String get dashSeparateRow => 'في صف خاص به';
   @override String dashFiltersOf(String group) => 'فلاتر «$group»';
   @override String get apShapeSingle => 'شكل واحد فقط';
+  @override String get mvSource => 'مصدر الفيديو';
+  @override String get mvSrcAuto => 'تلقائي (Apple Music ثم YouTube)';
+  @override String get mvSrcApple => 'Apple Music فقط';
+  @override String get mvSrcYt => 'YouTube فقط (المقاطع)';
+  @override String get mvQualityT => 'جودة الفيديو';
+  @override String get mvQAuto => 'تلقائي';
+  @override String get mvQLow => 'توفير (360p)';
+  @override String get mvTypesT => 'عرض الفيديو لـ';
+  @override String get mvTracks => 'المقاطع';
+  @override String get mvAlbums => 'الألبومات';
+  @override String get mvArtists => 'الفنانون';
 }

@@ -800,4 +800,15 @@ class AppStringsEn implements AppStrings {
   @override String get dashSeparateRow => 'On its own row';
   @override String dashFiltersOf(String group) => '$group filters';
   @override String get apShapeSingle => 'One shape only';
+  @override String get mvSource => 'Video source';
+  @override String get mvSrcAuto => 'Auto (Apple Music, then YouTube)';
+  @override String get mvSrcApple => 'Apple Music only';
+  @override String get mvSrcYt => 'YouTube only (tracks)';
+  @override String get mvQualityT => 'Video quality';
+  @override String get mvQAuto => 'Auto';
+  @override String get mvQLow => 'Data saver (360p)';
+  @override String get mvTypesT => 'Show video for';
+  @override String get mvTracks => 'Tracks';
+  @override String get mvAlbums => 'Albums';
+  @override String get mvArtists => 'Artists';
 }

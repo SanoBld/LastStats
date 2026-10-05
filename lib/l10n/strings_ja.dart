@@ -770,4 +770,15 @@ class AppStringsJa implements AppStrings {
   @override String get dashSeparateRow => '専用の行に表示';
   @override String dashFiltersOf(String group) => '「$group」のフィルター';
   @override String get apShapeSingle => '1つの形だけ';
+  @override String get mvSource => '動画ソース';
+  @override String get mvSrcAuto => '自動（Apple Music、次に YouTube）';
+  @override String get mvSrcApple => 'Apple Music のみ';
+  @override String get mvSrcYt => 'YouTube のみ（曲）';
+  @override String get mvQualityT => '動画の画質';
+  @override String get mvQAuto => '自動';
+  @override String get mvQLow => '節約 (360p)';
+  @override String get mvTypesT => '動画を表示する対象';
+  @override String get mvTracks => '曲';
+  @override String get mvAlbums => 'アルバム';
+  @override String get mvArtists => 'アーティスト';
 }

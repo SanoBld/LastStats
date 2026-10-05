@@ -771,4 +771,15 @@ class AppStringsRu implements AppStrings {
   @override String get dashSeparateRow => 'Отдельной строкой';
   @override String dashFiltersOf(String group) => 'Фильтры раздела «$group»';
   @override String get apShapeSingle => 'Только одна форма';
+  @override String get mvSource => 'Источник видео';
+  @override String get mvSrcAuto => 'Авто (сначала Apple Music, затем YouTube)';
+  @override String get mvSrcApple => 'Только Apple Music';
+  @override String get mvSrcYt => 'Только YouTube (треки)';
+  @override String get mvQualityT => 'Качество видео';
+  @override String get mvQAuto => 'Авто';
+  @override String get mvQLow => 'Экономия (360p)';
+  @override String get mvTypesT => 'Показывать видео для';
+  @override String get mvTracks => 'Треки';
+  @override String get mvAlbums => 'Альбомы';
+  @override String get mvArtists => 'Исполнители';
 }

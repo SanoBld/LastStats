@@ -800,4 +800,15 @@ class AppStringsPt implements AppStrings {
   @override String get dashSeparateRow => 'Em uma linha só dele';
   @override String dashFiltersOf(String group) => 'Filtros de “$group”';
   @override String get apShapeSingle => 'Uma só forma';
+  @override String get mvSource => 'Fonte do vídeo';
+  @override String get mvSrcAuto => 'Auto (Apple Music e depois YouTube)';
+  @override String get mvSrcApple => 'Apenas Apple Music';
+  @override String get mvSrcYt => 'Apenas YouTube (faixas)';
+  @override String get mvQualityT => 'Qualidade do vídeo';
+  @override String get mvQAuto => 'Auto';
+  @override String get mvQLow => 'Economia (360p)';
+  @override String get mvTypesT => 'Mostrar vídeo para';
+  @override String get mvTracks => 'Faixas';
+  @override String get mvAlbums => 'Álbuns';
+  @override String get mvArtists => 'Artistas';
 }

@@ -797,4 +797,15 @@ class AppStringsZh implements AppStrings {
   @override String get dashSeparateRow => '单独占一行';
   @override String dashFiltersOf(String group) => '「$group」的筛选';
   @override String get apShapeSingle => '只用一种形状';
+  @override String get mvSource => '视频来源';
+  @override String get mvSrcAuto => '自动（先 Apple Music，后 YouTube）';
+  @override String get mvSrcApple => '仅 Apple Music';
+  @override String get mvSrcYt => '仅 YouTube（歌曲）';
+  @override String get mvQualityT => '视频画质';
+  @override String get mvQAuto => '自动';
+  @override String get mvQLow => '节省流量 (360p)';
+  @override String get mvTypesT => '在以下内容显示视频';
+  @override String get mvTracks => '歌曲';
+  @override String get mvAlbums => '专辑';
+  @override String get mvArtists => '艺术家';
 }

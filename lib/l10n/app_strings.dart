@@ -864,4 +864,15 @@ abstract class AppStrings {
   String get dashSeparateRow;
   String dashFiltersOf(String group);
   String get apShapeSingle;
+  String get mvSource;
+  String get mvSrcAuto;
+  String get mvSrcApple;
+  String get mvSrcYt;
+  String get mvQualityT;
+  String get mvQAuto;
+  String get mvQLow;
+  String get mvTypesT;
+  String get mvTracks;
+  String get mvAlbums;
+  String get mvArtists;
 }
