@@ -96,6 +96,7 @@
       }
       if (video != null) break;
     }
+    video ??= await _youtube(artist, track);
     _cache[key] = video;
     return video;
   } catch (_) {
