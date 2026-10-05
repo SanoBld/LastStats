@@ -782,4 +782,10 @@ class AppStringsIt implements AppStrings {
   @override String get mvTracks => 'Brani';
   @override String get mvAlbums => 'Album';
   @override String get mvArtists => 'Artisti';
+  @override String get mvModeT => 'Modalità';
+  @override String get mvModeBest => 'Consigliato';
+  @override String get mvModeSaver => 'Risparmio';
+  @override String get mvModeMax => 'Qualità massima';
+  @override String get mvModeCustom => 'Personalizzato';
+  @override String get mvSrcYtFirst => 'YouTube, poi Apple Music';
 }

@@ -811,4 +811,10 @@ class AppStringsPt implements AppStrings {
   @override String get mvTracks => 'Faixas';
   @override String get mvAlbums => 'Álbuns';
   @override String get mvArtists => 'Artistas';
+  @override String get mvModeT => 'Modo';
+  @override String get mvModeBest => 'Recomendado';
+  @override String get mvModeSaver => 'Economia';
+  @override String get mvModeMax => 'Qualidade máxima';
+  @override String get mvModeCustom => 'Personalizado';
+  @override String get mvSrcYtFirst => 'YouTube e depois Apple Music';
 }

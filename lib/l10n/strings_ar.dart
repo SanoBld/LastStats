@@ -782,4 +782,10 @@ class AppStringsAr implements AppStrings {
   @override String get mvTracks => 'المقاطع';
   @override String get mvAlbums => 'الألبومات';
   @override String get mvArtists => 'الفنانون';
+  @override String get mvModeT => 'الوضع';
+  @override String get mvModeBest => 'موصى به';
+  @override String get mvModeSaver => 'توفير';
+  @override String get mvModeMax => 'أعلى جودة';
+  @override String get mvModeCustom => 'مخصص';
+  @override String get mvSrcYtFirst => 'YouTube ثم Apple Music';
 }

@@ -875,4 +875,10 @@ abstract class AppStrings {
   String get mvTracks;
   String get mvAlbums;
   String get mvArtists;
+  String get mvModeT;
+  String get mvModeBest;
+  String get mvModeSaver;
+  String get mvModeMax;
+  String get mvModeCustom;
+  String get mvSrcYtFirst;
 }

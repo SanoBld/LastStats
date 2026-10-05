@@ -782,4 +782,10 @@ class AppStringsRu implements AppStrings {
   @override String get mvTracks => 'Треки';
   @override String get mvAlbums => 'Альбомы';
   @override String get mvArtists => 'Исполнители';
+  @override String get mvModeT => 'Режим';
+  @override String get mvModeBest => 'Рекомендуется';
+  @override String get mvModeSaver => 'Экономия';
+  @override String get mvModeMax => 'Макс. качество';
+  @override String get mvModeCustom => 'Свой';
+  @override String get mvSrcYtFirst => 'Сначала YouTube, затем Apple Music';
 }

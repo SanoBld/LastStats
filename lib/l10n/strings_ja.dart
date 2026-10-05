@@ -781,4 +781,10 @@ class AppStringsJa implements AppStrings {
   @override String get mvTracks => '曲';
   @override String get mvAlbums => 'アルバム';
   @override String get mvArtists => 'アーティスト';
+  @override String get mvModeT => 'モード';
+  @override String get mvModeBest => 'おすすめ';
+  @override String get mvModeSaver => '節約';
+  @override String get mvModeMax => '最高画質';
+  @override String get mvModeCustom => 'カスタム';
+  @override String get mvSrcYtFirst => 'YouTube、次に Apple Music';
 }

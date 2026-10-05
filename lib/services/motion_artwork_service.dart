@@ -5,14 +5,20 @@
 //      anonymous token that the public web player itself embeds.
 //   3. Fallback: read the album page's embedded JSON and pick an HLS
 //      (.m3u8) video if the album has one.
-//   4. Fallback (tracks only, or the only source if chosen): the official
-//      YouTube video. The URL gets a "#yt=<startSec>,<lenSec>" suffix so the
+//   4. YouTube (tracks only): the official video. The URL gets a
+//      "#yt=<startSec>,<lenSec>" suffix (plus "&fb=<fallback url>") so the
 //      player loops one short moment of the clip instead of the whole video.
-//      YouTube constraints handled here: the stream link only answers when
-//      the request carries the User-Agent of the API client that produced it
-//      (see [ytUserAgent], also used by the player), links expire after a
-//      few hours (re-resolved after [_ytTtl]), and every link is probed
-//      before being returned so a dead one never reaches the player.
+//      The user picks the order (Apple first or YouTube first) or one source.
+//      YouTube constraints (checked against yt-dlp / youtube_explode_dart):
+//        - Since 2026 most adaptive (video-only) links need a "PO token" and
+//          answer 403 without it. The 360p muxed MP4 (itag 18) is the one
+//          format that still plays without a token, so it is always probed
+//          and kept as the fallback of any higher quality.
+//        - Links only answer with the User-Agent of the client that made
+//          them (see [ytUserAgentFor]); the player sends the same one.
+//        - Links expire after a few hours (re-resolved after [_ytTtl]).
+//        - A link can answer the first bytes and refuse the rest, so
+//          adaptive links are probed deeper in the file.
 // Returns null when nothing is found (most albums have no motion artwork),
 // so callers just keep showing the static cover.
 import 'dart:convert';
@@ -24,7 +30,9 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 // User choices for the video covers (read from SharedPreferences).
 class MotionPrefs {
-  final String source;   // 'auto' (Apple, then YouTube) | 'apple' | 'youtube'
+  // 'auto' (Apple, then YouTube) | 'yt_first' (YouTube, then Apple)
+  // | 'apple' (Apple only) | 'youtube' (YouTube only)
+  final String source;
   final String quality;  // 'auto' | '360' | '480' | '720' | '1080'
   final bool tracks, albums, artists;
   const MotionPrefs(this.source, this.quality, this.tracks, this.albums,
@@ -43,6 +51,7 @@ class MotionPrefs {
 
   bool get useApple => source != 'youtube';
   bool get useYoutube => source != 'apple';
+  bool get youtubeFirst => source == 'yt_first';
   // Max video height wanted; 0 = let the player decide (Apple adaptive).
   int get height => int.tryParse(quality) ?? 0;
   // Part of the cache key, so changing a setting gives fresh results.
@@ -78,10 +87,26 @@ class MotionArtworkService {
     }
   }
 
-  /// User-Agent the YouTube stream links require (403 without it).
-  static String get ytUserAgent =>
-      _ytClient.payload['context']['client']['userAgent'] as String;
-  static const YoutubeApiClient _ytClient = YoutubeApiClient.androidSdkless;
+  // User-Agents of the YouTube API clients. A stream link only answers
+  // with the UA of the client that produced it; the link says which one
+  // in its "c" parameter (c=ANDROID_VR, c=ANDROID, c=IOS).
+  static const _uaAndroidVr =
+      'com.google.android.apps.youtube.vr.oculus/1.56.21 '
+      '(Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip';
+  static const _uaAndroid =
+      'com.google.android.youtube/20.10.38 (Linux; U; Android 11) gzip';
+  static const _uaIos =
+      'com.google.ios.youtube/20.10.4 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)';
+
+  /// User-Agent to send with a YouTube stream [url] (also used by the player).
+  static String ytUserAgentFor(String url) {
+    switch (Uri.tryParse(url)?.queryParameters['c']) {
+      case 'ANDROID_VR': return _uaAndroidVr;
+      case 'ANDROID':    return _uaAndroid;
+      case 'IOS':        return _uaIos;
+      default:           return _ua;
+    }
+  }
 
   static int get cachedLinks => _cache.values.where((v) => v != null).length;
   static int get cachedLookups => _cache.length;
@@ -119,23 +144,31 @@ class MotionArtworkService {
       // singles named after the track. The first hit used to be the only
       // one tried, so a track whose first match was a video-less
       // compilation showed nothing even though its single had one.
-      final cands = cfg.useApple
-          ? await _candidates(artist, album, track)
-          : <({String collectionId, String pageUrl, String? trackId})>[];
-      String? video;
-      var pages = 0;
-      for (final c in cands) {
-        if (c.trackId != null) video = await _videoFromSongApi(c.trackId!);
-        video ??= await _videoFromApi(c.collectionId);
-        if (video == null && pages < 2) {
-          pages++;
-          video = await _videoFromPage(c.pageUrl);
+      Future<String?> viaApple() async {
+        if (!cfg.useApple) return null;
+        final cands = await _candidates(artist, album, track);
+        String? v;
+        var pages = 0;
+        for (final c in cands) {
+          if (c.trackId != null) v = await _videoFromSongApi(c.trackId!);
+          v ??= await _videoFromApi(c.collectionId);
+          if (v == null && pages < 2) {
+            pages++;
+            v = await _videoFromPage(c.pageUrl);
+          }
+          if (v != null) break;
         }
-        if (video != null) break;
+        return v == null ? null : await _pickVariant(v, cfg.height);
       }
-      if (video != null) video = await _pickVariant(video, cfg.height);
+
       // YouTube only has videos of songs (never albums or artists).
-      if (video == null && cfg.useYoutube && track.isNotEmpty) {
+      final ytOk = cfg.useYoutube && track.isNotEmpty;
+      String? video;
+      if (ytOk && cfg.youtubeFirst) {
+        video = await _youtube(artist, track, cfg.height);
+      }
+      video ??= await viaApple();
+      if (video == null && ytOk && !cfg.youtubeFirst) {
         video = await _youtube(artist, track, cfg.height);
       }
       _remember(key, video);
@@ -215,13 +248,15 @@ class MotionArtworkService {
       r'8d|nightcore|tutorial|mashup|acoustic|audio only';
 
   // Probes a stream link with the headers the player will use. A dead or
-  // refused link (403, expired, geo-blocked) is rejected here, so the
-  // next stream or video is tried instead of showing nothing.
-  static Future<bool> _ytReachable(String url) async {
+  // refused link (403, expired, geo-blocked) is rejected here. [deep]
+  // reads 1 KB far inside the file: PO-token enforcement can let the first
+  // bytes through and refuse the rest, which a first-bytes probe misses.
+  static Future<bool> _ytReachable(String url, {bool deep = false}) async {
     try {
+      final from = deep ? 1500000 : 0;
       final res = await http.get(Uri.parse(url), headers: {
-        'User-Agent': ytUserAgent,
-        'Range': 'bytes=0-1023',
+        'User-Agent': ytUserAgentFor(url),
+        'Range': 'bytes=$from-${from + 1023}',
       }).timeout(_timeout);
       return res.statusCode == 200 || res.statusCode == 206;
     } catch (_) {
@@ -229,27 +264,17 @@ class MotionArtworkService {
     }
   }
 
-  // Streams to try, best first: the closest height not above the wanted
-  // one (highest first), then the ones above it (lowest first). The video
-  // is muted, so video-only streams are used: they go up to 1080p+ while
-  // muxed streams stop at 360p. iOS/macOS only decode H.264, Android takes
-  // anything, so H.264 is preferred everywhere.
-  static List<StreamInfo> _ytStreams(StreamManifest m, int want) {
+  // Video-only MP4 streams no taller than the wanted height, tallest first.
+  // iOS/macOS only decode H.264 (Android takes anything).
+  static List<VideoOnlyStreamInfo> _ytAdaptive(StreamManifest m, int want) {
     final vo = m.videoOnly.where((s) => s.container.name == 'mp4').toList();
     final avc = vo.where((s) => s.videoCodec.contains('avc')).toList();
     final onlyAvc = !kIsWeb && !Platform.isAndroid;
-    final pool = avc.isNotEmpty ? avc : (onlyAvc ? <VideoOnlyStreamInfo>[] : vo);
-    final fit = pool.where((s) => s.videoResolution.height <= want).toList()
+    final pool =
+        avc.isNotEmpty ? avc : (onlyAvc ? <VideoOnlyStreamInfo>[] : vo);
+    return pool.where((s) => s.videoResolution.height <= want).toList()
       ..sort((a, b) =>
           b.videoResolution.height.compareTo(a.videoResolution.height));
-    final above = pool.where((s) => s.videoResolution.height > want).toList()
-      ..sort((a, b) =>
-          a.videoResolution.height.compareTo(b.videoResolution.height));
-    final out = <StreamInfo>[...fit, ...above];
-    // Last resort: a muxed (360p) stream.
-    final mux = m.muxed.where((s) => s.container.name == 'mp4').toList();
-    if (mux.isNotEmpty) out.add(mux.withHighestBitrate());
-    return out;
   }
 
   static Future<String?> _youtube(
@@ -263,6 +288,7 @@ class MotionArtworkService {
       final res = await yt.search
           .search('$artist ${_core(track)} official video')
           .timeout(_timeout);
+      // Auto = 720p when it plays, 360p otherwise.
       final want = height == 0 ? 720 : height;
       var tried = 0;
       for (final v in res.take(10)) {
@@ -277,20 +303,41 @@ class MotionArtworkService {
         if (!_norm('${v.title} ${v.author}').contains(lead)) continue;
         tried++;
         try {
-          // Same client as ytUserAgent: the links only work together.
+          // Android VR first (no PO token for the muxed 360p), then Android.
           final m = await yt.videos.streams
-              .getManifest(v.id, ytClients: [_ytClient])
+              .getManifest(v.id, ytClients: [
+                YoutubeApiClient.androidVr,
+                YoutubeApiClient.androidSdkless,
+              ])
               .timeout(const Duration(seconds: 15));
-          var probes = 0;
-          for (final pick in _ytStreams(m, want)) {
-            if (probes++ >= 3) break;
-            final url = pick.url.toString();
-            if (!await _ytReachable(url)) continue;
-            // Guess of a "good moment": ~35% in (usually past the intro,
-            // around the first chorus). Loops 12 s from there.
-            final start = (d * 0.35).round();
-            return '$url#yt=$start,12';
+
+          // 1) The safe one: muxed 360p MP4 (itag 18), always probed.
+          String? safe;
+          final mux = m.muxed.where((s) => s.container.name == 'mp4').toList();
+          if (mux.isNotEmpty) {
+            final u = mux.withHighestBitrate().url.toString();
+            if (await _ytReachable(u)) safe = u;
           }
+          // 2) A taller adaptive stream, only if asked (> 360p) and it
+          //    really answers deep in the file. At most 2 are probed.
+          String? best;
+          if (want > 360) {
+            var probes = 0;
+            for (final s in _ytAdaptive(m, want)) {
+              if (probes++ >= 2) break;
+              final u = s.url.toString();
+              if (await _ytReachable(u, deep: true)) { best = u; break; }
+            }
+          }
+          final primary = best ?? safe;
+          if (primary == null) continue;
+          // Guess of a "good moment": ~35% in (usually past the intro,
+          // around the first chorus). Loops 12 s from there.
+          final start = (d * 0.35).round();
+          final fb = (best != null && safe != null)
+              ? '&fb=${Uri.encodeComponent(safe)}'
+              : '';
+          return '$primary#yt=$start,12$fb';
         } catch (_) {
           // This video has no usable stream: try the next result.
         }

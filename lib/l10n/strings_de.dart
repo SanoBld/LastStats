@@ -782,4 +782,10 @@ class AppStringsDe implements AppStrings {
   @override String get mvTracks => 'Titel';
   @override String get mvAlbums => 'Alben';
   @override String get mvArtists => 'Künstler';
+  @override String get mvModeT => 'Modus';
+  @override String get mvModeBest => 'Empfohlen';
+  @override String get mvModeSaver => 'Sparmodus';
+  @override String get mvModeMax => 'Höchste Qualität';
+  @override String get mvModeCustom => 'Benutzerdefiniert';
+  @override String get mvSrcYtFirst => 'YouTube, dann Apple Music';
 }

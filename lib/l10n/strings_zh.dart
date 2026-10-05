@@ -808,4 +808,10 @@ class AppStringsZh implements AppStrings {
   @override String get mvTracks => '歌曲';
   @override String get mvAlbums => '专辑';
   @override String get mvArtists => '艺术家';
+  @override String get mvModeT => '模式';
+  @override String get mvModeBest => '推荐';
+  @override String get mvModeSaver => '省流量';
+  @override String get mvModeMax => '最高画质';
+  @override String get mvModeCustom => '自定义';
+  @override String get mvSrcYtFirst => '先 YouTube，后 Apple Music';
 }

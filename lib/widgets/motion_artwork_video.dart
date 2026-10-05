@@ -54,81 +54,134 @@ class _MotionArtworkVideoState extends State<MotionArtworkVideo>
     _init();
   }
 
-  // YouTube fallback URLs end with "#yt=<start>,<len>" (seconds).
+  // YouTube links end with "#yt=<start>,<len>" (seconds), optionally
+  // followed by "&fb=<url-encoded fallback link>" (the safe 360p stream).
   late final int _ytAt = widget.url.indexOf('#yt=');
   late final String _url =
       _ytAt < 0 ? widget.url : widget.url.substring(0, _ytAt);
   int _ytStart = 0, _ytLen = 12;
+  String? _fbUrl;
 
   Future<void> _init() async {
-    VideoPlayerController? c;
     final options = VideoPlayerOptions(mixWithOthers: true);
-    var fromDisk = false;
     final isYt = _ytAt >= 0;
-    // YouTube answers 403 unless the request carries the User-Agent of the
-    // client that produced the link. Apple's CDN needs no special header.
-    final headers = isYt
-        ? <String, String>{'User-Agent': MotionArtworkService.ytUserAgent}
-        : const <String, String>{};
     if (isYt) {
-      final p = widget.url.substring(_ytAt + 4).split(',');
+      final tail = widget.url.substring(_ytAt + 4);
+      final fbAt = tail.indexOf('&fb=');
+      final head = fbAt < 0 ? tail : tail.substring(0, fbAt);
+      if (fbAt >= 0) _fbUrl = Uri.decodeComponent(tail.substring(fbAt + 4));
+      final p = head.split(',');
       _ytStart = int.tryParse(p.first) ?? 0;
       if (p.length > 1) _ytLen = int.tryParse(p[1]) ?? 12;
     }
+    // Main link first; for YouTube, the safe 360p link if the main one
+    // is refused or never starts.
+    for (final url in [_url, if (_fbUrl != null) _fbUrl!]) {
+      if (_disposed) return;
+      try {
+        if (await _open(url, isYt, options)) return;
+      } catch (_) {}
+    }
+    // Nothing plays: keep the static cover and tell the page, which hides
+    // its video toggle.
+    if (mounted && !_disposed) {
+      setState(() => _ready = false);
+      widget.onFailed?.call();
+    }
+  }
+
+  // Tries one link. True = playing (or the widget is gone), false = failed.
+  Future<bool> _open(
+      String url, bool isYt, VideoPlayerOptions options) async {
+    VideoPlayerController? c;
+    var fromDisk = false;
     try {
       // Prefer the on-disk copy (offline, no re-download); else stream.
       // mixWithOthers: never interrupt the user's music or the 30s preview.
       // YouTube links expire and are never cached.
-      if (!isYt) c = await VideoDiskCache.localController(_url, options);
+      if (!isYt) c = await VideoDiskCache.localController(url, options);
       fromDisk = c != null;
-      c ??= VideoPlayerController.networkUrl(Uri.parse(_url),
-          httpHeaders: headers, videoPlayerOptions: options);
-      _c = c;
+      // YouTube refuses links sent with another User-Agent than the client
+      // that produced them.
+      c ??= VideoPlayerController.networkUrl(Uri.parse(url),
+          httpHeaders: isYt
+              ? {'User-Agent': MotionArtworkService.ytUserAgentFor(url)}
+              : const <String, String>{},
+          videoPlayerOptions: options);
       try {
-        await c.initialize();
+        await c.initialize().timeout(const Duration(seconds: 12));
       } catch (_) {
         if (!fromDisk) rethrow;
         // Corrupt/unreadable local copy: fall back to streaming.
         await c.dispose();
-        c = VideoPlayerController.networkUrl(Uri.parse(_url),
-            httpHeaders: headers, videoPlayerOptions: options);
-        _c = c;
+        c = VideoPlayerController.networkUrl(Uri.parse(url),
+            videoPlayerOptions: options);
         fromDisk = false;
-        await c.initialize();
+        await c.initialize().timeout(const Duration(seconds: 12));
       }
-      if (!fromDisk && !isYt) VideoDiskCache.storeInBackground(_url);
       // The widget may have been removed while the stream was loading:
       // release the player right away instead of leaking it.
-      if (_disposed) { await c.dispose(); return; }
-      MotionArtworkVideo._live.add(c);
+      if (_disposed) { await c.dispose(); return true; }
       await c.setVolume(0);
+      final from = Duration(seconds: isYt ? _ytStart : 0);
       if (isYt) {
         // Loop one short moment of the clip instead of the whole video.
+        await c.setLooping(false);
+        if (from > Duration.zero) await c.seekTo(from);
+      } else {
+        await c.setLooping(true);
+      }
+      await c.play();
+      // A YouTube link can open fine and then be refused while reading:
+      // only accept it once the picture really moves.
+      if (isYt && !await _confirmPlaying(c, from)) {
+        await c.dispose();
+        return _disposed;
+      }
+      if (_disposed) { await c.dispose(); return true; }
+      _c = c;
+      MotionArtworkVideo._live.add(c);
+      if (isYt) {
         final ctl = c;
-        await ctl.setLooping(false);
-        await ctl.seekTo(Duration(seconds: _ytStart));
         ctl.addListener(() {
           final v = ctl.value;
           if (!v.isInitialized || _disposed) return;
+          if (v.hasError) {
+            if (mounted && _ready) setState(() => _ready = false);
+            return;
+          }
           if (v.position.inSeconds >= _ytStart + _ytLen ||
               (v.position >= v.duration && !v.isPlaying)) {
             ctl.seekTo(Duration(seconds: _ytStart));
             ctl.play();
           }
         });
-      } else {
-        await c.setLooping(true);
+      } else if (!fromDisk) {
+        VideoDiskCache.storeInBackground(url);
       }
-      await c.play();
       if (mounted) setState(() => _ready = true);
+      return true;
     } catch (_) {
-      // Unsupported stream / network error: keep the static cover and tell
-      // the page, which hides its video toggle.
-      if (mounted) {
-        setState(() => _ready = false);
-        widget.onFailed?.call();
-      }
+      try { await c?.dispose(); } catch (_) {}
+      return false;
     }
+  }
+
+  // Waits (max 10 s) until the video really advances past [from].
+  Future<bool> _confirmPlaying(
+      VideoPlayerController c, Duration from) async {
+    final deadline = DateTime.now().add(const Duration(seconds: 10));
+    while (DateTime.now().isBefore(deadline)) {
+      if (_disposed) return false;
+      final v = c.value;
+      if (v.hasError) return false;
+      if (v.isPlaying &&
+          v.position > from + const Duration(milliseconds: 250)) {
+        return true;
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+    }
+    return false;
   }
 
   // No decoding in the background: saves battery, CPU and video memory.

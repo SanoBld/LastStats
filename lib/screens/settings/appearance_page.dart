@@ -232,12 +232,12 @@ class _AppearancePageState extends State<AppearancePage> {
         //  Style selector
         // ══════════════════════════════════════════════════════════════════
         Padding(
-          padding: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           child: Text(
             L.apVisualStyle,
-            style: text.labelMedium?.copyWith(
-                color: scheme.primary, fontWeight: FontWeight.w700,
-                letterSpacing: 0.8),
+            style: text.titleSmall?.copyWith(
+                color: scheme.primary, fontWeight: FontWeight.w800,
+                letterSpacing: 0.4),
           ),
         ),
 
@@ -397,32 +397,10 @@ class _AppearancePageState extends State<AppearancePage> {
           ),
         ]),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
 
         // ══════════════════════════════════════════════════════════════════
-        //  Android widgets — separate from in-app accent, Android-only
-        // ══════════════════════════════════════════════════════════════════
-        SettingsSection(
-          label: tx('ui_android_widgets'),
-          children: [
-            SwitchListTile(
-              secondary: Icon(Icons.widgets_rounded, color: scheme.primary),
-              title: Text(tx('ui_colored_widgets')),
-              subtitle: Text(tx('ui_applies_the_accent_col')),
-              value: _widgetTint,
-              onChanged: (v) async {
-                await _set('ls_widget_tint', v);
-                setState(() => _widgetTint = v);
-                WidgetService.updateAll();
-              },
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 16),
-
-        // ══════════════════════════════════════════════════════════════════
-        //  Accent color — grayed out when Nothing is active
+        //  Colors
         // ══════════════════════════════════════════════════════════════════
         Opacity(
           opacity: _isNothing ? 0.3 : 1.0,
@@ -536,11 +514,8 @@ class _AppearancePageState extends State<AppearancePage> {
           ),
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
 
-        // ══════════════════════════════════════════════════════════════════
-        //  Day/night accent — separate colors for light vs dark theme
-        // ══════════════════════════════════════════════════════════════════
         Opacity(
           opacity: (_isNothing || _useDynamicColor || _useNowPlayingColor) ? 0.3 : 1.0,
           child: IgnorePointer(
@@ -619,11 +594,8 @@ class _AppearancePageState extends State<AppearancePage> {
           ),
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
 
-        // ══════════════════════════════════════════════════════════════════
-        //  Dynamic color — grayed out when Nothing is active
-        // ══════════════════════════════════════════════════════════════════
         Opacity(
           opacity: _isNothing ? 0.3 : 1.0,
           child: IgnorePointer(
@@ -727,10 +699,10 @@ class _AppearancePageState extends State<AppearancePage> {
           ),
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
 
         // ══════════════════════════════════════════════════════════════════
-        //  Artwork color theme — ALWAYS active (works in all styles)
+        //  Covers & detail pages
         // ══════════════════════════════════════════════════════════════════
         SettingsSection(
           label: L.apDetailPagesSection,
@@ -762,24 +734,47 @@ class _AppearancePageState extends State<AppearancePage> {
           ],
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
 
-        // ── Navigation bar labels — always active ────────────────────────
-        _NavLabelSection(),
+        const _ImageShapeSection(),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
 
-        // ── PC / responsive layout mode — always active ───────────────────
-        const PcModeSection(),
-
-        const SizedBox(height: 16),
-        const _HapticSection(),
-
-        const SizedBox(height: 16),
         const _LivingArtworkSection(),
 
-        const SizedBox(height: 16),
-        const _ImageShapeSection(),
+        const SizedBox(height: 20),
+
+        // ══════════════════════════════════════════════════════════════════
+        //  Interface
+        // ══════════════════════════════════════════════════════════════════
+        _NavLabelSection(),
+
+        const SizedBox(height: 20),
+
+        const PcModeSection(),
+
+        const SizedBox(height: 20),
+
+        const _HapticSection(),
+
+        const SizedBox(height: 20),
+
+        SettingsSection(
+          label: tx('ui_android_widgets'),
+          children: [
+            SwitchListTile(
+              secondary: Icon(Icons.widgets_rounded, color: scheme.primary),
+              title: Text(tx('ui_colored_widgets')),
+              subtitle: Text(tx('ui_applies_the_accent_col')),
+              value: _widgetTint,
+              onChanged: (v) async {
+                await _set('ls_widget_tint', v);
+                setState(() => _widgetTint = v);
+                WidgetService.updateAll();
+              },
+            ),
+          ],
+        ),
 
         const SizedBox(height: 20),
         const RestartBanner(),
@@ -1065,6 +1060,34 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
     }
   }
 
+  // Which preset the current settings match ('custom' when none does).
+  String get _mvMode {
+    final all = _mvTracks && _mvAlbums && _mvArtists;
+    if (all && _mvSource == 'auto' && _mvQuality == 'auto') return 'best';
+    if (all && _mvSource == 'apple' && _mvQuality == '360') return 'saver';
+    if (all && _mvSource == 'auto' && _mvQuality == '1080') return 'max';
+    return 'custom';
+  }
+
+  Future<void> _mvPreset(String mode) async {
+    final (src, q) = switch (mode) {
+      'saver' => ('apple', '360'),   // small Apple clips only
+      'max'   => ('auto', '1080'),   // best quality available
+      _       => ('auto', 'auto'),   // recommended default
+    };
+    await _mvSet('ls_motion_source', src);
+    await _mvSet('ls_motion_quality', q);
+    await _mvSet('ls_motion_tracks', true);
+    await _mvSet('ls_motion_albums', true);
+    await _mvSet('ls_motion_artists', true);
+    if (!mounted) return;
+    setState(() {
+      _mvSource = src;
+      _mvQuality = q;
+      _mvTracks = _mvAlbums = _mvArtists = true;
+    });
+  }
+
   // One block of the video-cover section: icon + title, then a wrap of chips.
   Widget _mvBlock(BuildContext context, String title, IconData icon,
       List<Widget> chips) {
@@ -1160,11 +1183,28 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
       SettingsSection(
         label: tx('set_motion_t'),
         children: [
+          // Presets: one tap sets everything. "Recommended" is the default.
+          _mvBlock(context, L.mvModeT, Icons.tune_rounded, [
+            for (final (key, label) in [
+              ('best', L.mvModeBest),
+              ('saver', L.mvModeSaver),
+              ('max', L.mvModeMax),
+              ('custom', L.mvModeCustom),
+            ])
+              M3Chip(
+                label: Text(label),
+                selected: _mvMode == key,
+                // "Custom" is only an indicator: it lights up by itself
+                // when the settings below match no preset.
+                onSelected: key == 'custom' ? null : (_) => _mvPreset(key),
+              ),
+          ]),
           _mvBlock(context, L.mvSource, Icons.video_library_rounded, [
             for (final (key, icon, label) in [
-              ('auto', Icons.auto_awesome_rounded, L.mvQAuto),
-              ('apple', Icons.music_note_rounded, 'Apple Music'),
-              ('youtube', Icons.music_video_rounded, L.platformYtMusic),
+              ('auto', Icons.auto_awesome_rounded, L.mvSrcAuto),
+              ('yt_first', Icons.swap_horiz_rounded, L.mvSrcYtFirst),
+              ('apple', Icons.music_note_rounded, L.mvSrcApple),
+              ('youtube', Icons.music_video_rounded, L.mvSrcYt),
             ])
               M3Chip(
                 avatar: Icon(icon, size: 16),

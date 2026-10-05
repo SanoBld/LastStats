@@ -811,4 +811,10 @@ class AppStringsFr implements AppStrings {
   @override String get mvTracks => 'Titres';
   @override String get mvAlbums => 'Albums';
   @override String get mvArtists => 'Artistes';
+  @override String get mvModeT => 'Mode';
+  @override String get mvModeBest => 'Recommandé';
+  @override String get mvModeSaver => 'Économie';
+  @override String get mvModeMax => 'Qualité max';
+  @override String get mvModeCustom => 'Personnalisé';
+  @override String get mvSrcYtFirst => 'YouTube, puis Apple Music';
 }

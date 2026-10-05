@@ -166,9 +166,10 @@
 - Fixed a plain grey loading box on Discover: it now shows the usual small animated wavy loader, correctly sized
 
 **Video covers (fixes and settings)**
-- Fixed: videos found on YouTube never started (the stream link was refused without the right User-Agent). The player now sends it, and every link is tested before use; if one is dead, the next stream or video is tried
-- Fixed: YouTube links expire after a few hours, they are now looked up again after 90 minutes instead of being reused
-- Fixed: if a video cannot play, the photo / video button is hidden instead of offering a video that never starts
+- Fixed: YouTube videos did not start. Since 2026 YouTube refuses most separate video streams without a "PO token" (HTTP 403); only the 360p MP4 (itag 18) still plays. The app now uses the Android VR client, always keeps the 360p stream as a fallback, tests links deep inside the file, sends the User-Agent each link needs, and switches to the 360p stream if the chosen quality is refused
+- The photo / video button only disappears when nothing plays at all
+- YouTube links expire: they are looked up again after 90 minutes. On iOS / macOS only H.264 is used
+- New: choose the order, Apple Music then YouTube (default) or YouTube then Apple Music, or a single source
+- New: modes (Recommended = default, Data saver, Max quality; Custom shows when settings match none)
 - Apple Music: the chosen quality variant is checked before use, otherwise the adaptive video is kept
-- iOS / macOS: only H.264 YouTube streams are used (other codecs cannot be decoded there)
-- Settings: source (Auto / Apple Music / YouTube Music), quality and types (titles, albums, artists) are now chips, like the music platform picker; with YouTube only, albums and artists are greyed out (YouTube only has song videos)
+- Appearance tab harmonised: same section titles and spacing everywhere, sections grouped (Style, Theme, Colors, Covers & detail pages, Interface); video settings use the same chips as the music-platform picker

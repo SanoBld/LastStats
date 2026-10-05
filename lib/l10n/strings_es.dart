@@ -811,4 +811,10 @@ class AppStringsEs implements AppStrings {
   @override String get mvTracks => 'Canciones';
   @override String get mvAlbums => 'Álbumes';
   @override String get mvArtists => 'Artistas';
+  @override String get mvModeT => 'Modo';
+  @override String get mvModeBest => 'Recomendado';
+  @override String get mvModeSaver => 'Ahorro';
+  @override String get mvModeMax => 'Calidad máxima';
+  @override String get mvModeCustom => 'Personalizado';
+  @override String get mvSrcYtFirst => 'YouTube y luego Apple Music';
 }
