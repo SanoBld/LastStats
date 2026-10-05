@@ -10,3 +10,4 @@ class ImageCacheBackend {
   static Future<int>       totalBytes()                   async => 0;
   static Future<void>      clearAll()                     async {}
 }
+
