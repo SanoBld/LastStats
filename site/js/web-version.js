@@ -51,6 +51,7 @@
   function open() {
     if (!modal) modal = build();
     render();
+    void modal.offsetWidth; // reflow so the first open animates too
     modal.classList.add('is-open');
     modal.removeAttribute('aria-hidden');
   }

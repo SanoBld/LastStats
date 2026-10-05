@@ -452,7 +452,7 @@ class AppStringsPt implements AppStrings {
   @override String get updatesBetaSub              => 'Tenha acesso antecipado às versões pré-lançadas';
 
   @override String get backupWhatsIncluded         => 'O que está incluído';
-  @override String get backupDownloadFile          => 'Baixa um arquivo .json';
+  @override String get backupDownloadFile          => 'Baixe um arquivo .json';
   @override String get backupChooseFile            => 'Escolher um arquivo de backup';
   @override String get backupFileSaved             => 'Backup salvo';
   @override String get backupFileSaveFailed        => 'Falha ao salvar o arquivo';
@@ -532,7 +532,7 @@ class AppStringsPt implements AppStrings {
   @override String get dashChartCalendarLabel => 'Calendário de escuta';
   @override String get dashChartMonthlyLabel => 'Barras mensais';
   @override String get settingsDisplayNameSection => 'Nome personalizado';
-  @override String get settingsDisplayNameLabel => 'Como devemos te chamar?';
+  @override String get settingsDisplayNameLabel => 'Como devemos chamar você?';
   @override String get settingsDisplayNameHint => 'Ex. Sano Bld — deixe vazio para usar o nome da conta';
   @override String get newsSearchHint => 'Pesquisar nas novidades…';
   @override String get aboutOpenSourceLibs => 'Bibliotecas de código aberto';
@@ -675,7 +675,7 @@ class AppStringsPt implements AppStrings {
   @override String get favFoldersAll => 'Todos';
   @override String get favFolderNew => 'Nova pasta';
   @override String get favFolderNamePlaceholder => 'Nome da pasta';
-  @override String get favFolderCustomEmojiTitle => 'Escolhe um emoji';
+  @override String get favFolderCustomEmojiTitle => 'Escolha um emoji';
   @override String get favFolderCustomEmojiHelper => 'Apenas um emoji, sem texto.';
   @override String get favFolderDescPlaceholder => 'Descrição (opcional)';
   @override String get favFolderRecentlyPlayed => 'Ouvidas recentemente';

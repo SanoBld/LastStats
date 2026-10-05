@@ -67,7 +67,7 @@ class AppStringsZh implements AppStrings {
   @override String get chartsMonthly            => 'Scrobbles（12个月）';
   @override String get chartsArtistDist         => '热门艺术家（分布）';
   @override String get chartsMainstreamTitle    => '主流 vs 小众佳作';
-  @override String get chartsMainstreamSubtitle => '你喜爱艺术家的全球人气。';
+  @override String get chartsMainstreamSubtitle => '您喜爱艺术家的全球人气。';
   @override String get chartsCompute            => '计算';
   @override String get chartsRecompute          => '重新计算';
   @override String get chartsGem                => '小众佳作';
@@ -75,7 +75,7 @@ class AppStringsZh implements AppStrings {
   @override String globalListeners(String count) => '$count 名全球听众';
 
   @override String get historyTitle           => '历史记录';
-  @override String get historySubtitle        => '你的每日收听记录';
+  @override String get historySubtitle        => '您的每日收听记录';
   @override String get historyToday           => '今天';
   @override String get historySelectDate      => '选择日期';
   @override String get historyChronological   => '按时间顺序';
@@ -128,7 +128,7 @@ class AppStringsZh implements AppStrings {
   @override String get dashResetCache      => '重置缓存';
   @override String get dashResetCacheConfirm => '所有本地缓存的 scrobble 数据将被删除，并从 Last.fm 重新下载。';
 
-  @override String get dashFriendsActivity => '你的 Last.fm 好友动态';
+  @override String get dashFriendsActivity => '您的 Last.fm 好友动态';
 
   @override String get settingsTitle             => '设置';
   @override String get settingsAppearance        => '外观';
@@ -179,12 +179,12 @@ class AppStringsZh implements AppStrings {
   @override String get settingsTopArtistsSection => '热门艺术家';
   @override String get settingsTopTracksSection  => '热门歌曲';
   @override String get settingsFriendsSection    => '好友';
-  @override String get settingsFriendsSectionSub => '你的 Last.fm 好友动态';
+  @override String get settingsFriendsSectionSub => '您的 Last.fm 好友动态';
   @override String get settingsAccount           => '账号';
   @override String get settingsConnectedProfile  => '已连接的 Last.fm 账号';
   @override String get settingsLogout            => '退出登录';
   @override String get settingsLogoutTitle       => '退出登录？';
-  @override String get settingsLogoutContent     => '你的登录信息将被删除。';
+  @override String get settingsLogoutContent     => '您的登录信息将被删除。';
   @override String get settingsLogoutConfirm     => '退出登录';
   @override String get settingsBackup            => '备份与恢复';
   @override String get settingsExport            => '导出设置';
@@ -243,7 +243,7 @@ class AppStringsZh implements AppStrings {
   @override String get exportCopy       => '复制 JSON';
   @override String get exportCopied     => '已复制！';
   @override String get importTitle      => '恢复备份';
-  @override String get importHintLabel  => '在此粘贴你的 LastStats 备份。';
+  @override String get importHintLabel  => '在此粘贴您的 LastStats 备份。';
   @override String get importEmpty      => '内容为空。';
   @override String get importInvalidJson  => 'JSON 无效。';
   @override String get importUnknownFile  => '无法识别的文件。';
@@ -252,7 +252,7 @@ class AppStringsZh implements AppStrings {
   @override String get importRestore    => '恢复';
 
   @override String get setupImportJson      => '导入 JSON';
-  @override String get setupImportHintLabel => '在下方粘贴你的 JSON 文件内容。';
+  @override String get setupImportHintLabel => '在下方粘贴您的 JSON 文件内容。';
   @override String get setupImportNote      => '{ "username": "…", "api_key": "…" }';
   @override String get setupImportFormat    => '{ "username": "...", "api_key": "..." }';
   @override String get setupInvalidFields   => 'JSON 无效：缺少 "username" 或 "api_key" 字段。';
@@ -264,7 +264,7 @@ class AppStringsZh implements AppStrings {
   @override String get detailTopAlbums       => '热门专辑';
   @override String get detailBioReadMore     => '展开';
   @override String get detailBioReadLess     => '收起';
-  @override String get detailUserPlays       => '你的播放次数';
+  @override String get detailUserPlays       => '您的播放次数';
   @override String get detailGlobalPlays       => '总播放次数';
   @override String get detailUserRank        => '排名';
   @override String get detailUserRankNA      => '无';
@@ -286,26 +286,26 @@ class AppStringsZh implements AppStrings {
   @override String get onboardNext             => '下一步';
   @override String get onboardFinish           => '完成';
   @override String get onboardBack             => '返回';
-  @override String get onboardAppearanceTitle  => '自定义你的风格';
+  @override String get onboardAppearanceTitle  => '自定义您的风格';
   @override String get onboardAppearanceSub    => '主题、强调色和 Material You。';
   @override String get onboardNotifTitle       => '及时获知动态';
   @override String get onboardNotifSub         => '通知与震动。';
-  @override String get onboardFavTitle         => '你的收藏用户';
+  @override String get onboardFavTitle         => '您的收藏用户';
   @override String get onboardFavSub           => '添加 Last.fm 好友以便快速查看。';
   @override String get onboardFavHint          => 'Last.fm 用户名';
   @override String get onboardFavAdd           => '添加';
   @override String get onboardFavEmpty         => '暂无收藏';
   @override String get onboardFavSearchHint    => '搜索 Last.fm 用户…';
   @override String get onboardFavNoResults     => '未找到相关用户';
-  @override String get onboardFavFriendsTitle  => '你的 Last.fm 好友';
+  @override String get onboardFavFriendsTitle  => '您的 Last.fm 好友';
   @override String get onboardFavNoFriends     => '该账号没有好友';
   @override String get onboardFavSelected      => '已选收藏';
-  @override String get onboardDashTitle        => '你的仪表盘';
+  @override String get onboardDashTitle        => '您的仪表盘';
   @override String get onboardDashSub          => '选择要显示的板块。';
   @override String get onboardStartupTitle     => '启动界面';
-  @override String get onboardStartupSub       => '你想先看到哪个标签页？';
-  @override String get onboardPlatformTitle    => '你在哪里听音乐？';
-  @override String get onboardPlatformSub      => '这样详情页只显示对你有用的链接。';
+  @override String get onboardStartupSub       => '您想先看到哪个标签页？';
+  @override String get onboardPlatformTitle    => '您在哪里听音乐？';
+  @override String get onboardPlatformSub      => '这样详情页只显示对您有用的链接。';
   @override String get platformLastfm          => 'Last.fm';
   @override String get platformSpotify         => 'Spotify';
   @override String get platformYtMusic         => 'YouTube Music';
@@ -340,15 +340,15 @@ class AppStringsZh implements AppStrings {
   @override String get onboardHapticSub           => '在关键操作时感受轻微振动';
   @override String get onboardRecaps              => '汇总';
   @override String get onboardDailyRecapTitle     => '每日汇总';
-  @override String get onboardDailyRecapSub       => '你当天收听情况的简要汇总';
+  @override String get onboardDailyRecapSub       => '您当天收听情况的简要汇总';
   @override String get onboardWeeklyRecapTitle    => '每周汇总';
-  @override String get onboardWeeklyRecapSub      => '你本周的热门艺术家、专辑和歌曲';
+  @override String get onboardWeeklyRecapSub      => '您本周的热门艺术家、专辑和歌曲';
   @override String get onboardMilestonesSection   => 'Scrobble 里程碑';
   @override String get onboardMilestonesTitle     => '里程碑';
   @override String get onboardMilestonesSub       => '庆祝整数的 scrobble 次数';
   @override String get onboardGrandMilestonesTitle => '重大里程碑';
   @override String get onboardGrandMilestonesSub   => '为重大里程碑献上特别庆祝';
-  @override String get onboardDynamicColorSub      => '使用你的壁纸颜色（Android 12+）';
+  @override String get onboardDynamicColorSub      => '使用您的壁纸颜色（Android 12+）';
   @override String get onboardBetaTitle            => '测试版更新';
   @override String get onboardBetaSub              => '抢先体验预发布版本';
 
@@ -361,7 +361,7 @@ class AppStringsZh implements AppStrings {
   @override String get detailLookingForPreview     => '正在查找试听片段…';
   @override String get detailPreview30Sec          => '试听 · 30 秒';
 
-  @override String get setupTagline                => '你的 Last.fm 统计，焕然一新。';
+  @override String get setupTagline                => '您的 Last.fm 统计，焕然一新。';
   @override String get setupAnalyseProfile         => '分析一个账号';
   @override String get setupConnecting             => '连接中…';
   @override String get setupStartAnalysis          => '开始分析';
@@ -407,14 +407,14 @@ class AppStringsZh implements AppStrings {
   @override String get settingsCardSyncSub           => '后台自动同步 scrobble 记录';
   @override String get settingsCardAccountSub        => '已连接的 Last.fm 账号，退出登录';
   @override String get settingsCardCacheSub          => '历史记录、图片、API 数据';
-  @override String get settingsCardBackupSub         => '导出和恢复你的设置';
+  @override String get settingsCardBackupSub         => '导出和恢复您的设置';
   @override String get settingsCardUpdatesSub        => '检查新版本';
   @override String get settingsCardAboutSub          => '版本、源代码、鸣谢';
   @override String get settingsCardFaqSub            => 'Scrobbling、平台、开源';
   @override String get settingsRestartNotice => '部分设置需要重启应用才能完全生效。';
   @override String get syncPageTitle           => 'Scrobble 同步';
   @override String get syncAutoTitle           => '自动同步';
-  @override String get syncAutoSubtitle        => '按固定间隔在后台同步你的历史记录';
+  @override String get syncAutoSubtitle        => '按固定间隔在后台同步您的历史记录';
   @override String get syncFrequencyLabel      => '频率';
   @override String syncFrequencyHours(int h)   => '每 $h 小时';
   @override String get syncFrequencyDaily      => '每天一次';
@@ -435,10 +435,10 @@ class AppStringsZh implements AppStrings {
   @override String get pcModeHintAuto    => '宽屏（≥ 720 dp）使用侧边栏，窄屏使用底部导航栏。';
   @override String get pcModeHintOn      => '始终使用侧边导航栏，无论屏幕尺寸。';
   @override String get pcModeHintOff     => '始终使用底部导航栏，无论屏幕尺寸。';
-  @override String get aboutTagline               => '你的 Last.fm 统计伴侣';
+  @override String get aboutTagline               => '您的 Last.fm 统计伴侣';
   @override String get aboutAppInfo                => '应用信息';
   @override String get aboutScrobbleDownloader     => 'Scrobble 下载器';
-  @override String get aboutScrobbleDownloaderSub  => '将你所有的 scrobble 导出为文件';
+  @override String get aboutScrobbleDownloaderSub  => '将您所有的 scrobble 导出为文件';
   @override String get aboutPoweredBy              => '技术支持';
   @override String get aboutImageDisclaimer        => '艺术家、专辑和歌曲的图片会自动从这些来源获取，有时可能不准确或与实际内容不符。';
   @override String get aboutFooter                 => '用 ❤️ 制作 · 与 Last.fm / CBS 无关联';
@@ -454,13 +454,13 @@ class AppStringsZh implements AppStrings {
   @override String get backupFileSaved             => '备份已保存';
   @override String get backupFileSaveFailed        => '保存失败';
   @override String get setupRestoreBackup          => '恢复备份';
-  @override String get setupRestoreBackupSub       => '从 .json 备份文件恢复你的账号和设置';
+  @override String get setupRestoreBackupSub       => '从 .json 备份文件恢复您的账号和设置';
   @override String get backupRestoreKeysTitle => '恢复 API 密钥';
   @override String get backupRestoreKeysDesc => '选择要从此备份恢复的 Last.fm 密钥。';
   @override String get backupRestoreApiKeyLabel => 'API 密钥';
   @override String get backupRestoreSecretKeyLabel => '密钥';
   @override String get backupIncludeFoldersLabel => '包含文件夹';
-  @override String get backupIncludeFoldersDesc => '包含你的歌曲文件夹及其内容';
+  @override String get backupIncludeFoldersDesc => '包含您的歌曲文件夹及其内容';
   @override String get backupIncludeKeysDesc => '在导出的文件中包含密钥';
 
   @override String get backupIncludeThemesLabel => '导出主题';
@@ -477,11 +477,11 @@ class AppStringsZh implements AppStrings {
   @override String get backupAutoFolderLabel => '备份文件夹';
   @override String get backupAutoFolderDefault => '应用默认文件夹';
   @override String backupAutoNextLabel(String date) => '下次备份:$date';  @override String get backupIncludeScrobblesLabel => '包含完整历史记录';
-  @override String get backupIncludeScrobblesDesc => '添加你从一开始播放过的所有曲目(文件可能会很大)。';
+  @override String get backupIncludeScrobblesDesc => '添加您从一开始播放过的所有曲目(文件可能会很大)。';
 
   @override String get backupScrobblesSlowWarning => '这可能需要一些时间,比普通备份慢。';  @override String backupExportedOn(String date) => '备份于 $date';
   @override String get backupScrobblesErrorTitle => '历史记录出错';
-  @override String get backupScrobblesErrorDesc => '此文件中的部分年份历史记录似乎已损坏。你想怎么做?';
+  @override String get backupScrobblesErrorDesc => '此文件中的部分年份历史记录似乎已损坏。您想怎么做?';
   @override String get backupScrobblesKeepAnyway => '仍然继续';
   @override String get backupScrobblesCancel => '取消历史记录';
   @override String get backupScrobblesSkipRefetch => '跳过并重新在线下载';  @override String get settingsCrashLog => '错误日志';
@@ -493,7 +493,7 @@ class AppStringsZh implements AppStrings {
   @override String get backupCrashLogClearConfirm => '清空错误日志？';
 
   @override String get faqSectionLabel             => '常见问题';
-  @override String get backupOverwriteWarning => '恢复备份将覆盖你当前的设置。';
+  @override String get backupOverwriteWarning => '恢复备份将覆盖您当前的设置。';
   @override String get faqOpenSourceBadge => 'LastStats 是一个由 SanoBld 用 ❤️ 打造的免费开源项目。';
   @override String get cacheUnlimited     => '无限';
   @override String get cacheTotalUsed     => '已用总量';
@@ -529,13 +529,13 @@ class AppStringsZh implements AppStrings {
   @override String get dashChartCalendarLabel => '收听日历';
   @override String get dashChartMonthlyLabel => '月度柱状图';
   @override String get settingsDisplayNameSection => '自定义名称';
-  @override String get settingsDisplayNameLabel => '我们该怎么称呼你？';
+  @override String get settingsDisplayNameLabel => '我们该怎么称呼您？';
   @override String get settingsDisplayNameHint => '例如 Sano Bld — 留空则使用账号名称';
   @override String get newsSearchHint => '搜索动态…';
   @override String get aboutOpenSourceLibs => '开源库';
   @override String get aboutOpenSourceLibsSub => '构建此应用所使用的所有 Flutter 包。';
   @override String get aboutLicenseSection => '许可证';
-  @override String get aboutLicenseText => '本项目基于 MIT 许可证发布：你可以自由使用、修改、复制或再分发，只需注明出处即可。';
+  @override String get aboutLicenseText => '本项目基于 MIT 许可证发布：您可以自由使用、修改、复制或再分发，只需注明出处即可。';
   @override String get aboutLicenseLink => '查看完整许可证';
   @override String get languageAiNote => '翻译内容由 AI 生成，可能存在不准确之处。';
   @override String get aboutAiDevNote => '本应用的开发也使用了 AI。';
@@ -556,13 +556,13 @@ class AppStringsZh implements AppStrings {
   @override String get notifBadgeSubtitle       => '在资讯铃铛图标上显示未读红点';
   @override String get notifTestLabel           => '测试';
   @override String get notifPermissionDisabledTitle => '通知已禁用';
-  @override String get notifPermissionDisabledBody  => '授予权限，以便 LastStats 可以向你发送提醒。';
+  @override String get notifPermissionDisabledBody  => '授予权限，以便 LastStats 可以向您发送提醒。';
   @override String get notifGrantPermission     => '授予权限';
-  @override String get notifThresholdIntro      => '达到以下每个节点时，你都会收到一条特别通知：';
+  @override String get notifThresholdIntro      => '达到以下每个节点时，您都会收到一条特别通知：';
   @override List<String> get notifThresholdMessages => const [
-    '你的第一个 1,000 次 scrobble。旅程开始了。🎵',
-    '你达到了五位数！🎉',
-    '你是真正的音乐狂热者。🔥',
+    '您的第一个 1,000 次 scrobble。旅程开始了。🎵',
+    '您达到了五位数！🎉',
+    '您是真正的音乐狂热者。🔥',
     '一百万次 scrobble。这是传奇。🎸',
   ];
   @override String get notifIntervalDescription => '每 X 次 scrobble 发送一次通知';
@@ -573,7 +573,7 @@ class AppStringsZh implements AppStrings {
   @override List<String> get weekdaysNarrow => const ['一', '二', '三', '四', '五', '六', '日'];
   @override String get weekAbbrev => '周';
   @override String get notifSendTest            => '发送测试通知';
-  @override String get notifSentCheckBar        => '看看你的通知栏！';
+  @override String get notifSentCheckBar        => '看看您的通知栏！';
   @override String get notifMakeSureWorks       => '确认一切正常。';
   @override String get notifSentBang            => '已发送！';
   @override String get notifSendButton          => '发送';
@@ -604,11 +604,11 @@ class AppStringsZh implements AppStrings {
   @override String get apInteractionsSection     => '交互';
   @override String get apHapticFeedbackSub       => '点击、选择和手势时的振动反馈';
   @override String get acctRemoveTitle          => '删除账号？';
-  @override String acctRemoveBody(String username) => '从你的账号中删除 @$username？';
+  @override String acctRemoveBody(String username) => '从您的账号中删除 @$username？';
   @override String get acctRemoveAction         => '删除';
   @override String get acctAlreadyAddedOrFull   => '该账号已添加，或列表已满。';
   @override String acctAddedSuccess(String username) => '@$username 添加成功。';
-  @override String get acctLogoutAllBody        => '所有账号都将被删除，你将返回设置界面。';
+  @override String get acctLogoutAllBody        => '所有账号都将被删除，您将返回设置界面。';
   @override String acctMyAccounts(int count, int max) => '我的账号 ($count/$max)';
   @override String get acctActive               => '当前使用';
   @override String get acctTapSwitchToActivate  => '点击"切换"以激活';
@@ -616,7 +616,7 @@ class AppStringsZh implements AppStrings {
   @override String get acctAddAnAccount         => '添加账号';
   @override String acctSlotsRemaining(int n)    => '还可添加 $n 个';
   @override String acctMaxReached(int max)      => '已达到最多 $max 个账号的上限。';
-  @override String get acctApiKeyInfo           => '每个账号可以使用不同的 API 密钥，也可以共用同一个。你可以在 last.fm/api/accounts 找到你的 API 密钥。';
+  @override String get acctApiKeyInfo           => '每个账号可以使用不同的 API 密钥，也可以共用同一个。您可以在 last.fm/api/accounts 找到您的 API 密钥。';
   @override String get acctLastfmProfileSection => 'Last.fm 资料';
   @override String get acctViewOnLastfm         => '在 Last.fm 上查看';
   @override String get acctDangerZone           => '危险区域';
@@ -647,11 +647,11 @@ class AppStringsZh implements AppStrings {
   @override String get favConnectDialogBody      => '请在浏览器打开的 Last.fm 页面上授权本应用，然后返回此处确认。';
   @override String get favConnectDialogConfirm   => '我已授权';
   @override String get favConnectSuccess         => '收藏功能已成功启用！';
-  @override String get favConnectError           => '无法启用收藏功能，请检查你的密钥。';
+  @override String get favConnectError           => '无法启用收藏功能，请检查您的密钥。';
   @override String get acctApiKeysSection        => 'API 密钥';
   @override String get acctSecretKeyLabel        => '密钥';
   @override String get acctSecretKeyNotSet       => '未设置';
-  @override String get acctFavoritesExplain      => '密钥可让你直接在 Last.fm 上添加或取消收藏歌曲。';
+  @override String get acctFavoritesExplain      => '密钥可让您直接在 Last.fm 上添加或取消收藏歌曲。';
   @override String get acctConnectFavorites      => '启用收藏';
   @override String get acctDisconnectFavorites   => '停用收藏';
   @override String get settingsFavoritesSection    => '收藏';
@@ -688,7 +688,7 @@ class AppStringsZh implements AppStrings {
   @override String get rankingsWholeYear       => '全年';
   @override String get chartsExportGeneratedOn => '生成于';
   @override String get faqQ1 => 'LastStats 会记录我的音乐播放记录吗？';
-  @override String get faqA1 => '不会。LastStats 是一款可视化应用：它显示你 Last.fm 账户上已有的播放记录，但本身不会记录任何内容。\n\n如需自动记录音乐播放，请使用专门的应用，例如 Pano Scrobbler（Android 可用）。';
+  @override String get faqA1 => '不会。LastStats 是一款可视化应用：它显示您 Last.fm 账户上已有的播放记录，但本身不会记录任何内容。\n\n如需自动记录音乐播放，请使用专门的应用，例如 Pano Scrobbler（Android 可用）。';
   @override String get faqQ2 => '会推出 iOS 版本吗？';
   @override String get faqA2 => '不会。目前没有推出 iOS 版本的计划。';
   @override String get faqQ3 => '该应用能在 macOS 或其他平台运行吗？';
@@ -696,15 +696,15 @@ class AppStringsZh implements AppStrings {
   @override String get faqQ4 => 'LastStats 是开源的吗？';
   @override String get faqA4 => '是的！源代码可在 GitHub 上自由获取。该项目由 SanoBld 独立用心打造。欢迎贡献代码、反馈问题，或点个 ⭐。';
   @override String get faqQ5 => '我的数据存储在哪里？';
-  @override String get faqA5 => '仅存储在你的设备上。LastStats 没有服务器：你的播放记录会在本地缓存以便快速访问，你的 Last.fm 账户信息也保存在本地。除官方 Last.fm API 外，不会向任何地方发送数据。';
+  @override String get faqA5 => '仅存储在您的设备上。LastStats 没有服务器：您的播放记录会在本地缓存以便快速访问，您的 Last.fm 账户信息也保存在本地。除官方 Last.fm API 外，不会向任何地方发送数据。';
   @override String get faqQ6 => '如何启用收藏功能？';
-  @override String get faqA6 => '前往「设置 > 账户」并输入你的 Last.fm 密钥。连接成功后，即可直接在应用中收藏歌曲。';
+  @override String get faqA6 => '前往「设置 > 账户」并输入您的 Last.fm 密钥。连接成功后，即可直接在应用中收藏歌曲。';
   @override String get faqQ7 => '\u4ec0\u4e48\u662f\u201cscrobble\u201d\uff1f';
   @override String get faqA7 => 'scrobble \u662f\u6307\u5728\u4f60\u7684 Last.fm \u8d26\u6237\u4e0a\u8bb0\u5f55\u4e00\u6b21\u64ad\u653e\u2014\u2014\u8fd9\u662f Last.fm \u5b98\u65b9\u672f\u8bed\uff0c\u8868\u793a\u201c\u4e00\u6b21\u88ab\u8ba1\u5165\u7684\u64ad\u653e\u201d\u3002\u4f60\u7684\u6240\u6709\u7edf\u8ba1\u6570\u636e\uff08\u6392\u884c\u699c\u3001\u603b\u91cf\u7b49\uff09\u90fd\u57fa\u4e8e\u5b83\u3002';
   @override String get faqQ8 => '\u7b49\u7ea7\u4e0e\u6210\u5c31\u7cfb\u7edf\u662f\u600e\u4e48\u8fd0\u4f5c\u7684\uff1f';
   @override String get faqA8 => '\u4f60\u7684\u8d26\u6237\u7b49\u7ea7\u968f\u603b scrobble \u6570\u589e\u957f\uff08\u6ca1\u6709\u4e0a\u9650\uff09\u3002\u5361\u7247\u4e5f\u4f1a\u6839\u636e\u8be5\u827a\u672f\u5bb6/\u6b4c\u66f2/\u4e13\u8f91\u7684\u64ad\u653e\u6b21\u6570\u663e\u793a\u8fb9\u6846\u989c\u8272\uff08\u9752\u94dc\u2192\u4e94\u5f69\uff09\u3002\u8fd9\u4e9b\u90fd\u57fa\u4e8e\u672c\u5730\u5df2\u7f13\u5b58\u7684\u7edf\u8ba1\u6570\u636e\u81ea\u52a8\u8ba1\u7b97\uff0c\u4e0d\u4f1a\u989d\u5916\u8bf7\u6c42\u7f51\u7edc\u3002';
   @override String get faqQ9 => '省电模式是如何工作的？';
-  @override String get faqA9 => '省电模式会拉长自动同步的间隔以节省电量。你可以在设置 > 通用中选择始终开启、跟随手机自带的省电模式，或在电量低于设定值时开启。';
+  @override String get faqA9 => '省电模式会拉长自动同步的间隔以节省电量。您可以在设置 > 通用中选择始终开启、跟随手机自带的省电模式，或在电量低于设定值时开启。';
   @override String get faqQ10 => '如何备份或恢复我的数据？';
   @override String get faqA10 => '前往设置 > 备份，可以导出备份文件（可选择是否包含 Last.fm 密钥），之后在本机或其他设备重新导入。';
   @override String get faqQ11 => '应用可以离线使用吗？';
@@ -767,17 +767,17 @@ class AppStringsZh implements AppStrings {
 
   // ── Discover filters ─────────────────────────────────────────────────────
   @override String get discoverSmartTitle => '最有用的筛选排在最前';
-  @override String get discoverSmartSub => '根据时间、日期和你最常用的内容排序';
-  @override String get discoverForYou => '为你推荐';
+  @override String get discoverSmartSub => '根据时间、日期和您最常用的内容排序';
+  @override String get discoverForYou => '为您推荐';
   @override String get discoverGlobalTrends => '全球趋势';
-  @override String get discoverSrcForyou => '你的混合推荐';
+  @override String get discoverSrcForyou => '您的混合推荐';
   @override String get discoverSrcOnthisday => '历史上的今天';
   @override String get discoverSrcFresh => '本月';
-  @override String get discoverSrcGenre => '你的音乐类型';
+  @override String get discoverSrcGenre => '您的音乐类型';
   @override String get discoverSrcDeeper => '冷门佳作';
   @override String get discoverSrcForgotten => '被遗忘的歌';
   @override String get discoverSrcAlbums => '专辑';
-  @override String get discoverSrcCountry => '你的国家';
+  @override String get discoverSrcCountry => '您的国家';
   @override String get discoverTracks => '歌曲';
   @override String get discoverArtists => '艺术家';
   @override String get discoverWeek => '周';
@@ -787,7 +787,7 @@ class AppStringsZh implements AppStrings {
   @override String discoverLike(String names) => '类似 $names';
   @override String get dashReorderSections => '调整版块顺序';
   @override String get dashInfiniteTitle => '无限滚动';
-  @override String get dashInfiniteSub => '「发现」会循环播放，不断给你新推荐';
+  @override String get dashInfiniteSub => '「发现」会循环播放，不断给您新推荐';
   @override String get dashDiscoverTitle => '发现';
   @override String get dashDiscoverSub => '左右滑动，发现新音乐';
   @override String get dashSortButton => '排序';

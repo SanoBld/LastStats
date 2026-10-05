@@ -146,6 +146,8 @@
   function openModal() {
     if (!modal) modal = buildModal();
     renderPlatformStep();
+    // force a reflow so the CSS transition also runs on the very first open
+    void modal.offsetWidth;
     modal.classList.add('is-open');
     modal.removeAttribute('aria-hidden');
     fetchLatestRelease().catch(() => {}); // warm the cache while the user picks

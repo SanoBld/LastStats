@@ -235,7 +235,7 @@ class AppStringsRu implements AppStrings {
   @override String get detailTopAlbums => 'Популярные альбомы';
   @override String get detailBioReadMore => 'Читать далее';
   @override String get detailBioReadLess => 'Свернуть';
-  @override String get detailUserPlays => 'твои прослушивания';
+  @override String get detailUserPlays => 'ваши прослушивания';
   @override String get detailGlobalPlays => 'всего прослушиваний';
   @override String get detailUserRank => 'место';
   @override String get detailUserRankNA => 'Н/Д';
