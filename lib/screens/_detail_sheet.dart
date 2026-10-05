@@ -47,7 +47,9 @@ Widget _pcColumn(BuildContext ctx, Widget child, {double maxWidth = 980}) {
   return Center(
     child: ConstrainedBox(
       constraints: BoxConstraints(maxWidth: maxWidth),
-      child: child,
+      // Full width inside the column so content stays left-aligned
+      // (without it the child shrink-wraps and ends up centred).
+      child: SizedBox(width: double.infinity, child: child),
     ),
   );
 }
