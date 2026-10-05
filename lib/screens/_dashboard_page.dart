@@ -2078,6 +2078,29 @@ class _FriendsSection extends StatelessWidget {
     required this.onRefresh,
   });
 
+  Widget _friendsList(ScrollController? controller) {
+    return ListView.builder(
+      controller: controller,
+      scrollDirection: Axis.horizontal,
+      itemCount: friends.length,
+      padding: EdgeInsets.zero,
+      itemBuilder: (ctx, i) {
+        final f     = friends[i];
+        final isFav = favorites.contains(f.username)
+                   || favProfiles.contains(f.username);
+        return _FadeSlideIn(
+          delay: Duration(milliseconds: (i * 30).clamp(0, 240)),
+          child: _FriendCard(
+            friend:      f,
+            isFav:       isFav,
+            service:     service,
+            onToggleFav: () => onToggleFav(f.username, !isFav),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -2115,25 +2138,13 @@ class _FriendsSection extends StatelessWidget {
                       style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                     ),
                   )
-                : ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: friends.length,
-                    padding: EdgeInsets.zero,
-                    itemBuilder: (ctx, i) {
-                      final f     = friends[i];
-                      final isFav = favorites.contains(f.username)
-                                 || favProfiles.contains(f.username);
-                      return _FadeSlideIn(
-                        delay: Duration(milliseconds: (i * 30).clamp(0, 240)),
-                        child: _FriendCard(
-                          friend:      f,
-                          isFav:       isFav,
-                          service:     service,
-                          onToggleFav: () => onToggleFav(f.username, !isFav),
-                        ),
-                      );
-                    },
-                  ),
+                : (_isDesktopLayout(context)
+                    ? _HScrollArrows(
+                        step: 3 * 126.0,
+                        arrowY: 76,
+                        builder: (c) => _friendsList(c),
+                      )
+                    : _friendsList(null)),
       ),
     ]);
   }

@@ -104,6 +104,15 @@ part 'qr_scanner_page.dart';
 // ── Breakpoints ───────────────────────────────────────────────────────────────
 const double _kWideBreakpoint = 720.0;
 
+/// True when the app shows the PC layout (side rail). Shared by every screen
+/// that needs a different arrangement on desktop than on a phone.
+bool _isDesktopLayout(BuildContext context) {
+  final mode = pcModeNotifier.value;
+  if (mode == 'on')  return true;
+  if (mode == 'off') return false;
+  return MediaQuery.of(context).size.width >= _kWideBreakpoint;
+}
+
 // ── Tab indices ───────────────────────────────────────────────────────────────
 const int _kTabHistory   = 4;
 
@@ -198,12 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ── Layout decision ─────────────────────────────────────────────────────────
 
-  bool _useWideLayout(BuildContext context) {
-    final mode = pcModeNotifier.value;
-    if (mode == 'on')  return true;
-    if (mode == 'off') return false;
-    return MediaQuery.of(context).size.width >= _kWideBreakpoint;
-  }
+  bool _useWideLayout(BuildContext context) => _isDesktopLayout(context);
 
   // ── Pages (index 5 = Settings, only shown in wide mode) ────────────────────
 
@@ -281,44 +285,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ── Wide layout ─────────────────────────────────────────────────────────────
 
-  /// All rail destinations including Settings at position 5.
-  List<NavigationRailDestination> get _wideDestinations => [
-    NavigationRailDestination(
-      icon: const Icon(Icons.dashboard_outlined),
-      selectedIcon: const Icon(Icons.dashboard_rounded),
-      label: Text(L.navDashboard),
-    ),
-    NavigationRailDestination(
-      icon: const Icon(Icons.search_outlined),
-      selectedIcon: const Icon(Icons.search_rounded),
-      label: Text(L.navSearch),
-    ),
-    NavigationRailDestination(
-      icon: const Icon(Icons.emoji_events_outlined),
-      selectedIcon: const Icon(Icons.emoji_events_rounded),
-      label: Text(L.navRankings),
-    ),
-    NavigationRailDestination(
-      icon: const Icon(Icons.auto_graph_outlined),
-      selectedIcon: const Icon(Icons.auto_graph_rounded),
-      label: Text(L.navCharts),
-    ),
-    NavigationRailDestination(
-      icon: const Icon(Icons.history_outlined),
-      selectedIcon: const Icon(Icons.history_rounded),
-      label: Text(L.navHistory),
-    ),
-    NavigationRailDestination(
-      icon: const Icon(Icons.settings_outlined),
-      selectedIcon: const Icon(Icons.settings_rounded),
-      label: Text(L.navSettings),
-    ),
+  /// Rail entries (same icons/labels as the old NavigationRail destinations).
+  List<_SideRailItem> get _railItems => [
+    _SideRailItem(Icons.dashboard_outlined,     Icons.dashboard_rounded,     L.navDashboard),
+    _SideRailItem(Icons.search_outlined,        Icons.search_rounded,        L.navSearch),
+    _SideRailItem(Icons.emoji_events_outlined,  Icons.emoji_events_rounded,  L.navRankings),
+    _SideRailItem(Icons.auto_graph_outlined,    Icons.auto_graph_rounded,    L.navCharts),
+    _SideRailItem(Icons.history_outlined,       Icons.history_rounded,       L.navHistory),
+    _SideRailItem(Icons.settings_outlined,      Icons.settings_rounded,      L.navSettings),
   ];
 
   Widget _buildWideLayout(BuildContext context, List<Widget> pages) {
     final scheme    = Theme.of(context).colorScheme;
     final collapsed = _railCollapsed;
-    final railWidth = collapsed ? 56.0 : 200.0;
+    final railWidth = collapsed ? 80.0 : 240.0;
 
     return CallbackShortcuts(
       bindings: {
@@ -347,23 +327,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     // already shows the app name.
                     const SizedBox(height: 4),
 
-                    // Scrollable destinations
+                    // Destinations: centred in the free space (both ways) and
+                    // scrollable if the window is very short.
                     Expanded(
-                      child: SingleChildScrollView(
-                        child: IntrinsicHeight(
-                          child: NavigationRail(
-                            selectedIndex:         _idx,
-                            onDestinationSelected: (i) { _haptic(_HapticImpact.selection); setState(() => _idx = i); },
-                            extended:              !collapsed,
-                            labelType: collapsed
-                                ? NavigationRailLabelType.none
-                                : NavigationRailLabelType.none,
-                            minWidth:         56,
-                            minExtendedWidth: 200,
-                            backgroundColor:  Colors.transparent,
-                            indicatorShape:   RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16)),
-                            destinations:    _wideDestinations,
+                      child: LayoutBuilder(
+                        builder: (context, box) => SingleChildScrollView(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(minHeight: box.maxHeight),
+                            child: Center(
+                              child: _SideRail(
+                                selectedIndex: _idx,
+                                collapsed:     collapsed,
+                                items:         _railItems,
+                                onSelected: (i) {
+                                  _haptic(_HapticImpact.selection);
+                                  setState(() => _idx = i);
+                                },
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -427,5 +408,218 @@ class _HomeScreenState extends State<HomeScreen> {
     return wide
         ? _buildWideLayout(context, pages)
         : _buildNarrowLayout(pages);
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════
+//  Desktop side rail — custom (replaces NavigationRail so every entry is a
+//  full-width pill: icon + label inside the same highlight, centred in the
+//  rail, with a generous 52 dp click target).
+// ══════════════════════════════════════════════════════════════════════════
+
+class _SideRailItem {
+  final IconData icon, selectedIcon;
+  final String   label;
+  const _SideRailItem(this.icon, this.selectedIcon, this.label);
+}
+
+class _SideRail extends StatelessWidget {
+  final int                 selectedIndex;
+  final bool                collapsed;
+  final List<_SideRailItem> items;
+  final ValueChanged<int>   onSelected;
+
+  const _SideRail({
+    required this.selectedIndex,
+    required this.collapsed,
+    required this.items,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme    = Theme.of(context).colorScheme;
+    final railTheme = NavigationRailTheme.of(context);
+    final shape     = railTheme.indicatorShape ?? const StadiumBorder();
+    final pill      = railTheme.indicatorColor ?? scheme.secondaryContainer;
+    final onPill    = railTheme.selectedIconTheme?.color ?? scheme.onSecondaryContainer;
+    final idle      = railTheme.unselectedIconTheme?.color ?? scheme.onSurfaceVariant;
+    final text      = Theme.of(context).textTheme;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (int i = 0; i < items.length; i++)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3),
+              child: Tooltip(
+                message: collapsed ? items[i].label : '',
+                waitDuration: const Duration(milliseconds: 400),
+                child: Semantics(
+                  button: true,
+                  selected: i == selectedIndex,
+                  label: items[i].label,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    curve: M3Motion.emphasizedDecelerate,
+                    height: 52,
+                    decoration: ShapeDecoration(
+                      color: i == selectedIndex ? pill : Colors.transparent,
+                      shape: shape,
+                    ),
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: InkWell(
+                        customBorder: shape,
+                        onTap: () => onSelected(i),
+                        child: Row(
+                          mainAxisAlignment: collapsed
+                              ? MainAxisAlignment.center
+                              : MainAxisAlignment.start,
+                          children: [
+                            if (!collapsed) const SizedBox(width: 18),
+                            Icon(
+                              i == selectedIndex ? items[i].selectedIcon : items[i].icon,
+                              size: 24,
+                              color: i == selectedIndex ? onPill : idle,
+                            ),
+                            if (!collapsed) ...[
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Text(
+                                  items[i].label,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: text.labelLarge?.copyWith(
+                                    fontSize: 14,
+                                    fontWeight: i == selectedIndex
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
+                                    color: i == selectedIndex ? onPill : idle,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════
+//  Desktop horizontal strip helper: mouse-drag scrolling + left/right
+//  arrows. Used by Discover and the Friends row on PC (phones keep their
+//  swipe / touch behaviour untouched).
+// ══════════════════════════════════════════════════════════════════════════
+
+class _HScrollArrows extends StatefulWidget {
+  /// Builds the horizontal scrollable; it MUST use the given controller.
+  final Widget Function(ScrollController controller) builder;
+  /// Pixels scrolled per arrow click.
+  final double step;
+  /// Vertical centre of the arrows, measured from the top of the strip.
+  final double arrowY;
+
+  const _HScrollArrows({
+    required this.builder,
+    required this.step,
+    required this.arrowY,
+  });
+
+  @override
+  State<_HScrollArrows> createState() => _HScrollArrowsState();
+}
+
+class _HScrollArrowsState extends State<_HScrollArrows> {
+  final ScrollController _c = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Re-evaluate arrow visibility once the first layout is known.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  void _go(int dir) {
+    if (!_c.hasClients) return;
+    final max    = _c.position.maxScrollExtent;
+    final target = (_c.offset + dir * widget.step).clamp(0.0, max.isFinite ? max : double.maxFinite);
+    _c.animateTo(
+      target,
+      duration: const Duration(milliseconds: 320),
+      curve: M3Motion.emphasizedDecelerate,
+    );
+  }
+
+  Widget _arrow(bool left, bool visible) {
+    return Positioned(
+      left:  left ? 4 : null,
+      right: left ? null : 4,
+      top:   widget.arrowY - 20,
+      child: IgnorePointer(
+        ignoring: !visible,
+        child: AnimatedOpacity(
+          opacity: visible ? 1 : 0,
+          duration: const Duration(milliseconds: 150),
+          child: IconButton.filledTonal(
+            iconSize: 22,
+            tooltip: left ? '‹' : '›',
+            onPressed: () => _go(left ? -1 : 1),
+            icon: Icon(left ? Icons.chevron_left_rounded : Icons.chevron_right_rounded),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(
+        dragDevices: {
+          PointerDeviceKind.touch,
+          PointerDeviceKind.mouse,
+          PointerDeviceKind.trackpad,
+          PointerDeviceKind.stylus,
+        },
+      ),
+      child: Stack(children: [
+        widget.builder(_c),
+        AnimatedBuilder(
+          animation: _c,
+          builder: (context, _) {
+            final ready = _c.hasClients && _c.position.hasContentDimensions;
+            final canLeft  = ready && _c.offset > 4;
+            final canRight = !ready || _c.offset < _c.position.maxScrollExtent - 4;
+            return Stack(children: [
+              _arrow(true,  canLeft),
+              _arrow(false, canRight),
+            ]);
+          },
+        ),
+      ]),
+    );
   }
 }

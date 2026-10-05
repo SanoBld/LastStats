@@ -117,11 +117,13 @@ class _DiscoverSection extends StatelessWidget {
     final global   = _avail(_kDiscoverGlobal).where((s) => !solo.contains(s)).toList();
     if (personal.isEmpty && global.isEmpty && solo.isEmpty) return const SizedBox.shrink();
 
-    // Cap the whole section's width so it doesn't blow up on desktop.
+    // Phones: cap the section's width. PC: use the whole dashboard width with
+    // compact cards (see _DiscoverGroupState._desktopStrip).
+    final desktop = _isDesktopLayout(context);
     return Align(
       alignment: Alignment.topLeft,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: _kDiscoverMaxWidth),
+        constraints: BoxConstraints(maxWidth: desktop ? double.infinity : _kDiscoverMaxWidth),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           // Filters the user pulled out of their tab: one row each.
           for (final s in solo) ...[
@@ -198,6 +200,7 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
   static final Map<String, (DateTime, List<_DiscoverItem>)> _cache = {};
 
   final PageController _ctrl = PageController(viewportFraction: 0.6);
+  final ScrollController _strip = ScrollController(); // PC strip
   String _source = '';
   List<_DiscoverItem> _items = [];
   bool _loading = true;
@@ -379,6 +382,7 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
   @override
   void dispose() {
     _ctrl.dispose();
+    _strip.dispose();
     super.dispose();
   }
 
@@ -421,6 +425,7 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
   void _safeJumpToStart() {
     try {
       if (_ctrl.hasClients) _ctrl.jumpToPage(0);
+      if (_strip.hasClients) _strip.jumpTo(0);
     } catch (_) {
       // Controller can be mid-detach right after a source switch — never
       // worth crashing the whole section over a scroll reset.
@@ -541,8 +546,11 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
       if (sources.length > 1) _filters(sources),
       const SizedBox(height: 12),
       LayoutBuilder(builder: (context, box) {
+        // PC: fixed-size compact cards in a mouse-friendly strip.
+        // Phone: unchanged (big swipeable cards, 60 % of the width).
+        final desktop = _isDesktopLayout(context);
         final page  = box.maxWidth * 0.6;
-        final imgSz = page - 20;
+        final imgSz = desktop ? 172.0 : page - 20;
         final h     = imgSz + 76; // a little extra for the play-count badge overhang
         return SizedBox(
           height: h,
@@ -583,6 +591,8 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
                           ),
                         ),
                       )
+                    : desktop
+                    ? _desktopStrip(imgSz, scheme, text)
                     : PageView.builder(
                         key: ValueKey('${_source}_${widget.infiniteScroll}'),
                         controller: _ctrl,
@@ -659,7 +669,14 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
           child: Opacity(opacity: 1 - 0.35 * d, child: child),
         );
       },
-      child: GestureDetector(
+      child: _cardBody(it, imgSz, scheme, text),
+    );
+  }
+
+  // The card itself (image + play badge + titles), shared by the phone
+  // carousel and the PC strip.
+  Widget _cardBody(_DiscoverItem it, double imgSz, ColorScheme scheme, TextTheme text) {
+    return GestureDetector(
         onTap: () => _open(it),
         behavior: HitTestBehavior.opaque,
         child: Padding(
@@ -698,6 +715,52 @@ class _DiscoverGroupState extends State<_DiscoverGroup> {
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           ]),
         ),
+      );
+  }
+
+  // PC: a horizontal strip of compact cards. Mouse drag + arrows, hover lift.
+  Widget _desktopStrip(double imgSz, ColorScheme scheme, TextTheme text) {
+    final step = (imgSz + 12) * 3;
+    return _HScrollArrows(
+      step: step,
+      arrowY: imgSz / 2 + 12,
+      builder: (c) => ListView.builder(
+        key: ValueKey('strip_${_source}_${widget.infiniteScroll}'),
+        controller: c,
+        scrollDirection: Axis.horizontal,
+        physics: const ClampingScrollPhysics(),
+        itemExtent: imgSz + 12,
+        itemCount: widget.infiniteScroll ? null : _items.length,
+        itemBuilder: (_, i) => _HoverLift(
+          child: _cardBody(_items[i % _items.length], imgSz, scheme, text),
+        ),
+      ),
+    );
+  }
+}
+
+/// Tiny hover effect for PC cards (no effect with touch).
+class _HoverLift extends StatefulWidget {
+  final Widget child;
+  const _HoverLift({required this.child});
+  @override
+  State<_HoverLift> createState() => _HoverLiftState();
+}
+
+class _HoverLiftState extends State<_HoverLift> {
+  bool _hover = false;
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hover = true),
+      onExit:  (_) => setState(() => _hover = false),
+      child: AnimatedScale(
+        scale: _hover ? 1.04 : 1.0,
+        alignment: Alignment.topLeft,
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+        child: widget.child,
       ),
     );
   }

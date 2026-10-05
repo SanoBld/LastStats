@@ -3160,7 +3160,8 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
   Widget _buildContent(BuildContext ctx, ColorScheme scheme, Color surface) {
     final mediaH    = MediaQuery.of(ctx).size.height;
     final topPad    = MediaQuery.of(ctx).padding.top;
-    final imgH      = mediaH * 0.44;
+    final desktop   = _isDesktopLayout(ctx);
+    final imgH      = desktop ? math.min(mediaH * 0.44, 320.0) : mediaH * 0.44;
     final hasImage  = _bannerUrl.isNotEmpty;
     final info      = _info ?? {};
     final avatarUrl = _extractImage(info['image']);
@@ -3248,10 +3249,10 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                   } : null,
                   child: SizedBox(height: imgH + 66, width: double.infinity),
                 ),
-                _buildProfileHeader(ctx, scheme, hasAv, avatarUrl),
+                _desktopColumn(ctx, _buildProfileHeader(ctx, scheme, hasAv, avatarUrl)),
                 Container(
                   color: surface,
-                  child: Column(
+                  child: _desktopColumn(ctx, Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildStatsRow(scheme),
@@ -3275,7 +3276,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                       ],
                       const SizedBox(height: 48),
                     ],
-                  ),
+                  )),
                 ),
               ],
             ),
@@ -3769,18 +3770,38 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     );
   }
 
+  /// On PC the profile is a centred column (max 980 dp) instead of a phone
+  /// layout stretched over the whole window. Phones: unchanged.
+  Widget _desktopColumn(BuildContext ctx, Widget child) {
+    if (!_isDesktopLayout(ctx)) return child;
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 980),
+        child: child,
+      ),
+    );
+  }
+
   Widget _buildAlbumsGrid(BuildContext ctx, ColorScheme scheme) {
-    final albums = _topAlbums.take(6).toList();
+    final albums  = _topAlbums.take(6).toList();
+    final desktop = _isDesktopLayout(ctx);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3, mainAxisSpacing: 10,
-          crossAxisSpacing: 10, childAspectRatio: 0.78,
-        ),
+        // Phone: 3 columns. PC: as many ~150 dp covers as fit (the 6 albums
+        // sit on a single row instead of two huge rows).
+        gridDelegate: desktop
+            ? const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 150, mainAxisSpacing: 14,
+                crossAxisSpacing: 14, childAspectRatio: 0.78,
+              )
+            : const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3, mainAxisSpacing: 10,
+                crossAxisSpacing: 10, childAspectRatio: 0.78,
+              ),
         itemCount: albums.length,
         itemBuilder: (_, i) {
           final al      = albums[i] as Map<String, dynamic>;

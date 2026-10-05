@@ -186,3 +186,24 @@ a, button { touch-action: manipulation; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-delay: 0s !important; scroll-behavior: auto !important; }
 }
+
+/* ---------- Fix: hero buttons (GitHub / Download / Web) pressed + hover ----------
+   project.css has `.project-actions button:hover` (specificity 0,2,1), which beat
+   the shorter `.project-actions > :active` rule above. Result: with a mouse the
+   button stayed lifted (translateY) instead of morphing to the pressed shape, and
+   the shadow never went away, so it looked like a stuck / glitchy animation.
+   These rules have the same weight as project.css and come after it, so the
+   order is now always: rest -> hover (lift) -> pressed (soft square, scaled). */
+.project-actions a, .project-actions button { isolation: isolate; will-change: transform; }
+@media (hover: hover) {
+  .project-actions a:hover, .project-actions button:hover { transform: translateY(-2px); }
+}
+.project-actions a:active, .project-actions button:active,
+.project-actions a.is-pressed, .project-actions button.is-pressed {
+  border-radius: var(--r-press);
+  transform: scale(.95);
+  box-shadow: none;
+  transition-duration: .2s, .2s, .2s, .2s;
+}
+/* keep the ripple inside the rounded shape while the radius is animating */
+.project-actions .ripple-ink { z-index: -1; }
