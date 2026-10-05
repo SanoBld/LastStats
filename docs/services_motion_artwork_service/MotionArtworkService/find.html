@@ -87,23 +87,31 @@
     &#47;&#47; singles named after the track. The first hit used to be the only
     &#47;&#47; one tried, so a track whose first match was a video-less
     &#47;&#47; compilation showed nothing even though its single had one.
-    final cands = cfg.useApple
-        ? await _candidates(artist, album, track)
-        : &lt;({String collectionId, String pageUrl, String? trackId})&gt;[];
-    String? video;
-    var pages = 0;
-    for (final c in cands) {
-      if (c.trackId != null) video = await _videoFromSongApi(c.trackId!);
-      video ??= await _videoFromApi(c.collectionId);
-      if (video == null &amp;&amp; pages &lt; 2) {
-        pages++;
-        video = await _videoFromPage(c.pageUrl);
+    Future&lt;String?&gt; viaApple() async {
+      if (!cfg.useApple) return null;
+      final cands = await _candidates(artist, album, track);
+      String? v;
+      var pages = 0;
+      for (final c in cands) {
+        if (c.trackId != null) v = await _videoFromSongApi(c.trackId!);
+        v ??= await _videoFromApi(c.collectionId);
+        if (v == null &amp;&amp; pages &lt; 2) {
+          pages++;
+          v = await _videoFromPage(c.pageUrl);
+        }
+        if (v != null) break;
       }
-      if (video != null) break;
+      return v == null ? null : await _pickVariant(v, cfg.height);
     }
-    if (video != null) video = await _pickVariant(video, cfg.height);
+
     &#47;&#47; YouTube only has videos of songs (never albums or artists).
-    if (video == null &amp;&amp; cfg.useYoutube &amp;&amp; track.isNotEmpty) {
+    final ytOk = cfg.useYoutube &amp;&amp; track.isNotEmpty;
+    String? video;
+    if (ytOk &amp;&amp; cfg.youtubeFirst) {
+      video = await _youtube(artist, track, cfg.height);
+    }
+    video ??= await viaApple();
+    if (video == null &amp;&amp; ytOk &amp;&amp; !cfg.youtubeFirst) {
       video = await _youtube(artist, track, cfg.height);
     }
     _remember(key, video);
