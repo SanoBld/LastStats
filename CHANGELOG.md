@@ -164,3 +164,11 @@
 - Fixed Dart analyzer errors on the dashboard (weekly count type), the deprecated `onReorder` in the reorder sheet and missing braces in the taste engine
 - Fixed a white square that stayed visible on a chip (e.g. tapping "This month" in Discover) until scrolling — chips no longer keep a stuck highlight after a tap
 - Fixed a plain grey loading box on Discover: it now shows the usual small animated wavy loader, correctly sized
+
+**Video covers (fixes and settings)**
+- Fixed: videos found on YouTube never started (the stream link was refused without the right User-Agent). The player now sends it, and every link is tested before use; if one is dead, the next stream or video is tried
+- Fixed: YouTube links expire after a few hours, they are now looked up again after 90 minutes instead of being reused
+- Fixed: if a video cannot play, the photo / video button is hidden instead of offering a video that never starts
+- Apple Music: the chosen quality variant is checked before use, otherwise the adaptive video is kept
+- iOS / macOS: only H.264 YouTube streams are used (other codecs cannot be decoded there)
+- Settings: source (Auto / Apple Music / YouTube Music), quality and types (titles, albums, artists) are now chips, like the music platform picker; with YouTube only, albums and artists are greyed out (YouTube only has song videos)

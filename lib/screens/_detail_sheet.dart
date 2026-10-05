@@ -830,7 +830,10 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       : _DetailGradientBg(key: const ValueKey('fallback'), scheme: scheme),
                 ),
                 if (hasImage && _showMotion && _motionUrl != null)
-                  MotionArtworkVideo(key: ValueKey(_motionUrl), url: _motionUrl!),
+                  MotionArtworkVideo(
+                    key: ValueKey(_motionUrl),
+                    url: _motionUrl!,
+                    onFailed: () { if (mounted) setState(() => _motionUrl = null); }),
                 // No darkening scrim any more — the photo shows as-is.
                 // Legibility now comes from the title's own shaped
                 // background instead of a scrim over the whole image.
@@ -2471,7 +2474,9 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
                         ),
                         // Animated cover fades in over the static one.
                         if (_motionUrl != null && _showMotion)
-                          MotionArtworkVideo(url: _motionUrl!),
+                          MotionArtworkVideo(
+                            url: _motionUrl!,
+                            onFailed: () { if (mounted) setState(() => _motionUrl = null); }),
                       ],
                     ),
                     back: _CardBack(
@@ -3211,7 +3216,10 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                           key: const ValueKey('fallback'), scheme: scheme),
                 ),
                 if (hasImage && _showMotion && _motionUrl != null)
-                  MotionArtworkVideo(key: ValueKey(_motionUrl), url: _motionUrl!),
+                  MotionArtworkVideo(
+                    key: ValueKey(_motionUrl),
+                    url: _motionUrl!,
+                    onFailed: () { if (mounted) setState(() => _motionUrl = null); }),
               ],
             ),
           ),

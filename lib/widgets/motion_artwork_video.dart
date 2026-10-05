@@ -3,11 +3,17 @@
 // disappears again on any error, so the static image is always the fallback.
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import '../services/motion_artwork_service.dart';
 import '../services/video_disk_cache.dart';
 
 class MotionArtworkVideo extends StatefulWidget {
   final String url;
-  const MotionArtworkVideo({super.key, required this.url});
+  // Called once when the video cannot be played (refused link, unsupported
+  // stream, network error), so the page can drop its photo/video toggle
+  // instead of offering a video that never starts.
+  final VoidCallback? onFailed;
+  const MotionArtworkVideo(
+      {super.key, required this.url, this.onFailed});
 
   // Live players, so Settings > Cache can show the video memory in use.
   static final Set<VideoPlayerController> _live = {};
@@ -59,6 +65,11 @@ class _MotionArtworkVideoState extends State<MotionArtworkVideo>
     final options = VideoPlayerOptions(mixWithOthers: true);
     var fromDisk = false;
     final isYt = _ytAt >= 0;
+    // YouTube answers 403 unless the request carries the User-Agent of the
+    // client that produced the link. Apple's CDN needs no special header.
+    final headers = isYt
+        ? <String, String>{'User-Agent': MotionArtworkService.ytUserAgent}
+        : const <String, String>{};
     if (isYt) {
       final p = widget.url.substring(_ytAt + 4).split(',');
       _ytStart = int.tryParse(p.first) ?? 0;
@@ -71,7 +82,7 @@ class _MotionArtworkVideoState extends State<MotionArtworkVideo>
       if (!isYt) c = await VideoDiskCache.localController(_url, options);
       fromDisk = c != null;
       c ??= VideoPlayerController.networkUrl(Uri.parse(_url),
-          videoPlayerOptions: options);
+          httpHeaders: headers, videoPlayerOptions: options);
       _c = c;
       try {
         await c.initialize();
@@ -80,7 +91,7 @@ class _MotionArtworkVideoState extends State<MotionArtworkVideo>
         // Corrupt/unreadable local copy: fall back to streaming.
         await c.dispose();
         c = VideoPlayerController.networkUrl(Uri.parse(_url),
-            videoPlayerOptions: options);
+            httpHeaders: headers, videoPlayerOptions: options);
         _c = c;
         fromDisk = false;
         await c.initialize();
@@ -111,8 +122,12 @@ class _MotionArtworkVideoState extends State<MotionArtworkVideo>
       await c.play();
       if (mounted) setState(() => _ready = true);
     } catch (_) {
-      // Unsupported stream / network error: keep the static cover.
-      if (mounted) setState(() => _ready = false);
+      // Unsupported stream / network error: keep the static cover and tell
+      // the page, which hides its video toggle.
+      if (mounted) {
+        setState(() => _ready = false);
+        widget.onFailed?.call();
+      }
     }
   }
 

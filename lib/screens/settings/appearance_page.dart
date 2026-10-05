@@ -1065,6 +1065,30 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
     }
   }
 
+  // One block of the video-cover section: icon + title, then a wrap of chips.
+  Widget _mvBlock(BuildContext context, String title, IconData icon,
+      List<Widget> chips) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(icon, size: 20, color: scheme.primary),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(title,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleSmall
+                    ?.copyWith(fontWeight: FontWeight.w700)),
+          ),
+        ]),
+        const SizedBox(height: 12),
+        Wrap(spacing: 8, runSpacing: 8, children: chips),
+      ]),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -1115,76 +1139,6 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
             motionArtworkNotifier.value = v;
           },
         ),
-        if (_motionOn) ...[
-          ListTile(
-            contentPadding: const EdgeInsets.only(left: 72, right: 16),
-            title: Text(L.mvSource),
-            trailing: DropdownButton<String>(
-              value: _mvSource,
-              underline: const SizedBox.shrink(),
-              items: [
-                DropdownMenuItem(
-                    value: 'auto', child: Text(L.mvSrcAuto)),
-                DropdownMenuItem(
-                    value: 'apple', child: Text(L.mvSrcApple)),
-                DropdownMenuItem(
-                    value: 'youtube', child: Text(L.mvSrcYt)),
-              ],
-              onChanged: (v) {
-                if (v == null) return;
-                _mvSet('ls_motion_source', v);
-                setState(() => _mvSource = v);
-              },
-            ),
-          ),
-          ListTile(
-            contentPadding: const EdgeInsets.only(left: 72, right: 16),
-            title: Text(L.mvQualityT),
-            trailing: DropdownButton<String>(
-              value: _mvQuality,
-              underline: const SizedBox.shrink(),
-              items: [
-                DropdownMenuItem(
-                    value: 'auto', child: Text(L.mvQAuto)),
-                DropdownMenuItem(
-                    value: '360', child: Text(L.mvQLow)),
-                const DropdownMenuItem(value: '480', child: Text('480p')),
-                const DropdownMenuItem(value: '720', child: Text('720p')),
-                const DropdownMenuItem(value: '1080', child: Text('1080p')),
-              ],
-              onChanged: (v) {
-                if (v == null) return;
-                _mvSet('ls_motion_quality', v);
-                setState(() => _mvQuality = v);
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 72, right: 16, top: 8),
-            child: Text(L.mvTypesT,
-                style: Theme.of(context).textTheme.labelLarge),
-          ),
-          for (final t in [
-            ('ls_motion_tracks', 'set_mv_tracks', _mvTracks),
-            ('ls_motion_albums', 'set_mv_albums', _mvAlbums),
-            ('ls_motion_artists', 'set_mv_artists', _mvArtists),
-          ])
-            CheckboxListTile(
-              contentPadding: const EdgeInsets.only(left: 64, right: 16),
-              controlAffinity: ListTileControlAffinity.leading,
-              title: Text(tx(t.$2)),
-              value: t.$3,
-              onChanged: (v) {
-                if (v == null) return;
-                _mvSet(t.$1, v);
-                setState(() {
-                  if (t.$1 == 'ls_motion_tracks') _mvTracks = v;
-                  if (t.$1 == 'ls_motion_albums') _mvAlbums = v;
-                  if (t.$1 == 'ls_motion_artists') _mvArtists = v;
-                });
-              },
-            ),
-        ],
         SwitchListTile(
           secondary: Icon(Icons.emoji_events_outlined, color: scheme.primary),
           title: Text(tx('set_achv_t')),
@@ -1199,6 +1153,78 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
         ),
       ],
     ),
+    // Video covers: only shown while the main switch is on. Same chip
+    // look as the music-platform picker (Settings > Startup).
+    if (_motionOn) ...[
+      const SizedBox(height: 20),
+      SettingsSection(
+        label: tx('set_motion_t'),
+        children: [
+          _mvBlock(context, L.mvSource, Icons.video_library_rounded, [
+            for (final (key, icon, label) in [
+              ('auto', Icons.auto_awesome_rounded, L.mvQAuto),
+              ('apple', Icons.music_note_rounded, 'Apple Music'),
+              ('youtube', Icons.music_video_rounded, L.platformYtMusic),
+            ])
+              M3Chip(
+                avatar: Icon(icon, size: 16),
+                label: Text(label),
+                selected: _mvSource == key,
+                onSelected: (_) {
+                  _mvSet('ls_motion_source', key);
+                  setState(() => _mvSource = key);
+                },
+              ),
+          ]),
+          _mvBlock(context, L.mvQualityT, Icons.high_quality_rounded, [
+            for (final (key, label) in [
+              ('auto', L.mvQAuto),
+              ('360', L.mvQLow),
+              ('480', '480p'),
+              ('720', '720p'),
+              ('1080', '1080p'),
+            ])
+              M3Chip(
+                label: Text(label),
+                selected: _mvQuality == key,
+                onSelected: (_) {
+                  _mvSet('ls_motion_quality', key);
+                  setState(() => _mvQuality = key);
+                },
+              ),
+          ]),
+          _mvBlock(context, L.mvTypesT, Icons.checklist_rounded, [
+            for (final (key, icon, label, on) in [
+              ('ls_motion_tracks', Icons.music_note_rounded, L.mvTracks, _mvTracks),
+              ('ls_motion_albums', Icons.album_rounded, L.mvAlbums, _mvAlbums),
+              ('ls_motion_artists', Icons.person_rounded, L.mvArtists, _mvArtists),
+            ])
+              // YouTube only has videos of songs: with "YouTube only",
+              // the albums and artists chips are greyed out.
+              Opacity(
+                opacity: _mvSource == 'youtube' && key != 'ls_motion_tracks'
+                    ? 0.4
+                    : 1,
+                child: M3Chip(
+                  avatar: Icon(icon, size: 16),
+                  label: Text(label),
+                  selected: on,
+                  onSelected: _mvSource == 'youtube' && key != 'ls_motion_tracks'
+                      ? null
+                      : (v) {
+                          _mvSet(key, v);
+                          setState(() {
+                            if (key == 'ls_motion_tracks') _mvTracks = v;
+                            if (key == 'ls_motion_albums') _mvAlbums = v;
+                            if (key == 'ls_motion_artists') _mvArtists = v;
+                          });
+                        },
+                ),
+              ),
+          ]),
+        ],
+      ),
+    ],
     const SizedBox(height: 20),
     // Library clean-up: same two switches as the welcome flow.
     SettingsSection(

@@ -5,9 +5,14 @@
 //      anonymous token that the public web player itself embeds.
 //   3. Fallback: read the album page's embedded JSON and pick an HLS
 //      (.m3u8) video if the album has one.
-//   4. Fallback (tracks only, or the only source if chosen): the official YouTube video. The URL gets
-//      a "#yt=<startSec>,<lenSec>" suffix so the player loops one short
-//      moment of the clip instead of the whole video.
+//   4. Fallback (tracks only, or the only source if chosen): the official
+//      YouTube video. The URL gets a "#yt=<startSec>,<lenSec>" suffix so the
+//      player loops one short moment of the clip instead of the whole video.
+//      YouTube constraints handled here: the stream link only answers when
+//      the request carries the User-Agent of the API client that produced it
+//      (see [ytUserAgent], also used by the player), links expire after a
+//      few hours (re-resolved after [_ytTtl]), and every link is probed
+//      before being returned so a dead one never reaches the player.
 // Returns null when nothing is found (most albums have no motion artwork),
 // so callers just keep showing the static cover.
 import 'dart:convert';
@@ -50,12 +55,41 @@ class MotionArtworkService {
   static const _maxEntries = 300;
   static const _timeout = Duration(seconds: 8);
 
+  // YouTube stream links expire after a few hours: remember when each one
+  // was resolved so a stale link is looked up again instead of reused.
+  static final Map<String, DateTime> _ytAt = {};
+  static const _ytTtl = Duration(minutes: 90);
+
+  static bool _fresh(String key) {
+    if (!_cache.containsKey(key)) return false;
+    final t = _ytAt[key];
+    if (t == null || DateTime.now().difference(t) < _ytTtl) return true;
+    _cache.remove(key);
+    _ytAt.remove(key);
+    return false;
+  }
+
+  static void _remember(String key, String? video) {
+    _cache[key] = video;
+    if (video != null && video.contains('#yt=')) {
+      _ytAt[key] = DateTime.now();
+    } else {
+      _ytAt.remove(key);
+    }
+  }
+
+  /// User-Agent the YouTube stream links require (403 without it).
+  static String get ytUserAgent =>
+      _ytClient.payload['context']['client']['userAgent'] as String;
+  static const YoutubeApiClient _ytClient = YoutubeApiClient.androidSdkless;
+
   static int get cachedLinks => _cache.values.where((v) => v != null).length;
   static int get cachedLookups => _cache.length;
 
   /// Forgets every looked-up video link (and the Apple token), freeing memory.
   static void clearMemory() {
     _cache.clear();
+    _ytAt.clear();
     _token = null;
   }
   static const _ua =
@@ -76,7 +110,7 @@ class MotionArtworkService {
     // Track lookups follow the "tracks" switch, album lookups the "albums" one.
     if (track.isNotEmpty ? !cfg.tracks : !cfg.albums) return null;
     final key = '${_norm(artist)}|${_norm(album)}|${_norm(track)}|${cfg.sig}';
-    if (_cache.containsKey(key)) return _cache[key];
+    if (_fresh(key)) return _cache[key];
     // Bounded: the oldest lookups are dropped so the map never grows forever.
     if (_cache.length >= _maxEntries) _cache.remove(_cache.keys.first);
     try {
@@ -85,10 +119,9 @@ class MotionArtworkService {
       // singles named after the track. The first hit used to be the only
       // one tried, so a track whose first match was a video-less
       // compilation showed nothing even though its single had one.
-      final cands =
-          cfg.useApple
-              ? await _candidates(artist, album, track)
-              : <({String collectionId, String pageUrl, String? trackId})>[];
+      final cands = cfg.useApple
+          ? await _candidates(artist, album, track)
+          : <({String collectionId, String pageUrl, String? trackId})>[];
       String? video;
       var pages = 0;
       for (final c in cands) {
@@ -101,8 +134,11 @@ class MotionArtworkService {
         if (video != null) break;
       }
       if (video != null) video = await _pickVariant(video, cfg.height);
-      if (cfg.useYoutube) video ??= await _youtube(artist, track, cfg.height);
-      _cache[key] = video;
+      // YouTube only has videos of songs (never albums or artists).
+      if (video == null && cfg.useYoutube && track.isNotEmpty) {
+        video = await _youtube(artist, track, cfg.height);
+      }
+      _remember(key, video);
       return video;
     } catch (_) {
       // Network error: don't cache, allow a retry next time.
@@ -117,7 +153,7 @@ class MotionArtworkService {
     // Artist videos only exist on Apple Music.
     if (!cfg.artists || !cfg.useApple) return null;
     final key = 'artist|${_norm(artist)}|${cfg.sig}';
-    if (_cache.containsKey(key)) return _cache[key];
+    if (_fresh(key)) return _cache[key];
     if (_cache.length >= _maxEntries) _cache.remove(_cache.keys.first);
     try {
       final res = await _itunes(artist, 'musicArtist', 5);
@@ -135,7 +171,7 @@ class MotionArtworkService {
         if (video != null) break;
       }
       if (video != null) video = await _pickVariant(video, cfg.height);
-      _cache[key] = video;
+      _remember(key, video);
       return video;
     } catch (_) {
       return null; // network error: allow a retry
@@ -178,18 +214,59 @@ class MotionArtworkService {
       r'cover|live|reaction|remix|karaoke|instrumental|lyric|slowed|sped|'
       r'8d|nightcore|tutorial|mashup|acoustic|audio only';
 
+  // Probes a stream link with the headers the player will use. A dead or
+  // refused link (403, expired, geo-blocked) is rejected here, so the
+  // next stream or video is tried instead of showing nothing.
+  static Future<bool> _ytReachable(String url) async {
+    try {
+      final res = await http.get(Uri.parse(url), headers: {
+        'User-Agent': ytUserAgent,
+        'Range': 'bytes=0-1023',
+      }).timeout(_timeout);
+      return res.statusCode == 200 || res.statusCode == 206;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // Streams to try, best first: the closest height not above the wanted
+  // one (highest first), then the ones above it (lowest first). The video
+  // is muted, so video-only streams are used: they go up to 1080p+ while
+  // muxed streams stop at 360p. iOS/macOS only decode H.264, Android takes
+  // anything, so H.264 is preferred everywhere.
+  static List<StreamInfo> _ytStreams(StreamManifest m, int want) {
+    final vo = m.videoOnly.where((s) => s.container.name == 'mp4').toList();
+    final avc = vo.where((s) => s.videoCodec.contains('avc')).toList();
+    final onlyAvc = !kIsWeb && !Platform.isAndroid;
+    final pool = avc.isNotEmpty ? avc : (onlyAvc ? <VideoOnlyStreamInfo>[] : vo);
+    final fit = pool.where((s) => s.videoResolution.height <= want).toList()
+      ..sort((a, b) =>
+          b.videoResolution.height.compareTo(a.videoResolution.height));
+    final above = pool.where((s) => s.videoResolution.height > want).toList()
+      ..sort((a, b) =>
+          a.videoResolution.height.compareTo(b.videoResolution.height));
+    final out = <StreamInfo>[...fit, ...above];
+    // Last resort: a muxed (360p) stream.
+    final mux = m.muxed.where((s) => s.container.name == 'mp4').toList();
+    if (mux.isNotEmpty) out.add(mux.withHighestBitrate());
+    return out;
+  }
+
   static Future<String?> _youtube(
       String artist, String track, int height) async {
     if (track.isEmpty) return null;
     final yt = YoutubeExplode();
     try {
-      final core  = _norm(_core(track));
-      final lead  = _norm(artist.split(_artistSplit).first);
+      final core = _norm(_core(track));
+      final lead = _norm(artist.split(_artistSplit).first);
       if (core.isEmpty || lead.isEmpty) return null;
       final res = await yt.search
           .search('$artist ${_core(track)} official video')
           .timeout(_timeout);
-      for (final v in res.take(8)) {
+      final want = height == 0 ? 720 : height;
+      var tried = 0;
+      for (final v in res.take(10)) {
+        if (tried >= 3) break; // never hammer YouTube
         if (v.isLive) continue;
         final d = v.duration?.inSeconds ?? 0;
         if (d < 90 || d > 600) continue;
@@ -198,40 +275,25 @@ class MotionArtworkService {
             !RegExp(_ytBad).hasMatch(track.toLowerCase())) continue;
         if (!_norm(v.title).contains(core)) continue;
         if (!_norm('${v.title} ${v.author}').contains(lead)) continue;
-        final m = await yt.videos.streams
-            .getManifest(v.id)
-            .timeout(const Duration(seconds: 15));
-        // The video is muted, so video-only streams are fine: they allow
-        // up to 1080p+ (muxed streams stop at 360p).
-        final want = height == 0 ? 720 : height;
-        final vo = m.videoOnly
-            .where((s) => s.container.name == 'mp4')
-            .toList();
-        // Prefer H.264 (plays everywhere); keep the others as backup.
-        final avc = vo.where((s) => s.videoCodec.contains('avc')).toList();
-        final pool = avc.isNotEmpty ? avc : vo;
-        final fit =
-            pool.where((s) => s.videoResolution.height <= want).toList()
-              ..sort((a, b) => b.videoResolution.height
-                  .compareTo(a.videoResolution.height));
-        StreamInfo? pick = fit.isNotEmpty ? fit.first : null;
-        if (pick == null && pool.isNotEmpty) {
-          // Everything is above the wanted height: take the lowest one.
-          pick = (pool.toList()
-                ..sort((a, b) => a.videoResolution.height
-                    .compareTo(b.videoResolution.height)))
-              .first;
+        tried++;
+        try {
+          // Same client as ytUserAgent: the links only work together.
+          final m = await yt.videos.streams
+              .getManifest(v.id, ytClients: [_ytClient])
+              .timeout(const Duration(seconds: 15));
+          var probes = 0;
+          for (final pick in _ytStreams(m, want)) {
+            if (probes++ >= 3) break;
+            final url = pick.url.toString();
+            if (!await _ytReachable(url)) continue;
+            // Guess of a "good moment": ~35% in (usually past the intro,
+            // around the first chorus). Loops 12 s from there.
+            final start = (d * 0.35).round();
+            return '$url#yt=$start,12';
+          }
+        } catch (_) {
+          // This video has no usable stream: try the next result.
         }
-        if (pick == null) {
-          final mux =
-              m.muxed.where((s) => s.container.name == 'mp4').toList();
-          if (mux.isEmpty) continue;
-          pick = mux.withHighestBitrate();
-        }
-        // Guess of a "good moment": ~35% in (usually past the intro, around
-        // the first chorus). Loops 12 s from there.
-        final start = (d * 0.35).round();
-        return '${pick.url}#yt=$start,12';
       }
     } catch (_) {
     } finally {
@@ -262,7 +324,14 @@ class MotionArtworkService {
         if (h <= height && h > bestH) { bestH = h; best = uri; }
         if (h < lowH) { lowH = h; lowest = uri; }
       }
-      return best ?? lowest ?? url;
+      final pick = best ?? lowest;
+      if (pick == null) return url;
+      // Make sure the variant really answers; otherwise stay adaptive.
+      final chk = await http
+          .get(Uri.parse(pick), headers: {'User-Agent': _ua})
+          .timeout(_timeout);
+      if (chk.statusCode != 200 || !chk.body.contains('#EXTM3U')) return url;
+      return pick;
     } catch (_) {
       return url;
     }
