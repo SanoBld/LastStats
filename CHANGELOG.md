@@ -114,7 +114,7 @@
 - New poster shapes
 - New video mode for Apple Music posters: an animated video preview instead of a static cover
 - Apple Music video: much better matching, tries every release of a track (single, album, deluxe), smarter title/artist matching and a more robust token lookup
-- YouTube fallback for track video posters: when Apple Music has no motion artwork, a short loop of the official YouTube video is used (silent, one moment of the clip)
+- YouTube fallback for track video posters: when Apple Music has no motion artwork, a short loop of the official YouTube video is used (silent, one moment of the clip); new video cover settings: source (Auto/Apple Music/YouTube), quality (auto to 1080p) and which types (tracks/albums/artists) get a video
 - Translate button redesigned in Material You, it changes color and shape when the bio is translated
 
 **Friends and social features**

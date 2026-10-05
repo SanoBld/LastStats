@@ -1111,6 +1111,50 @@ const Map<String, Map<String, String>> _kExtra = {
     'ru': 'Воспроизводит анимированную обложку, если она есть',
     'ar': 'يشغّل الغلاف المتحرك عند توفره',
   },
+  'set_mv_source_t': {
+    'fr': 'Source vidéo',
+    'en': 'Video source',
+  },
+  'set_mv_src_auto': {
+    'fr': 'Auto (Apple Music, puis YouTube)',
+    'en': 'Auto (Apple Music, then YouTube)',
+  },
+  'set_mv_src_apple': {
+    'fr': 'Apple Music seulement',
+    'en': 'Apple Music only',
+  },
+  'set_mv_src_yt': {
+    'fr': 'YouTube seulement (titres)',
+    'en': 'YouTube only (tracks)',
+  },
+  'set_mv_quality_t': {
+    'fr': 'Qualité vidéo',
+    'en': 'Video quality',
+  },
+  'set_mv_q_auto': {
+    'fr': 'Auto',
+    'en': 'Auto',
+  },
+  'set_mv_q_low': {
+    'fr': 'Économie (360p)',
+    'en': 'Data saver (360p)',
+  },
+  'set_mv_types_t': {
+    'fr': 'Afficher la vidéo pour',
+    'en': 'Show video for',
+  },
+  'set_mv_tracks': {
+    'fr': 'Titres',
+    'en': 'Tracks',
+  },
+  'set_mv_albums': {
+    'fr': 'Albums',
+    'en': 'Albums',
+  },
+  'set_mv_artists': {
+    'fr': 'Artistes',
+    'en': 'Artists',
+  },
   'set_achv_t': {
     'fr': 'Succès et niveaux',
     'en': 'Achievements and levels',

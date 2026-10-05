@@ -5,7 +5,7 @@
 //      anonymous token that the public web player itself embeds.
 //   3. Fallback: read the album page's embedded JSON and pick an HLS
 //      (.m3u8) video if the album has one.
-//   4. Last resort (tracks only): the official YouTube video. The URL gets
+//   4. Fallback (tracks only, or the only source if chosen): the official YouTube video. The URL gets
 //      a "#yt=<startSec>,<lenSec>" suffix so the player loops one short
 //      moment of the clip instead of the whole video.
 // Returns null when nothing is found (most albums have no motion artwork),
@@ -14,7 +14,35 @@ import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+
+// User choices for the video covers (read from SharedPreferences).
+class MotionPrefs {
+  final String source;   // 'auto' (Apple, then YouTube) | 'apple' | 'youtube'
+  final String quality;  // 'auto' | '360' | '480' | '720' | '1080'
+  final bool tracks, albums, artists;
+  const MotionPrefs(this.source, this.quality, this.tracks, this.albums,
+      this.artists);
+
+  static Future<MotionPrefs> load() async {
+    final p = await SharedPreferences.getInstance();
+    return MotionPrefs(
+      p.getString('ls_motion_source') ?? 'auto',
+      p.getString('ls_motion_quality') ?? 'auto',
+      p.getBool('ls_motion_tracks') ?? true,
+      p.getBool('ls_motion_albums') ?? true,
+      p.getBool('ls_motion_artists') ?? true,
+    );
+  }
+
+  bool get useApple => source != 'youtube';
+  bool get useYoutube => source != 'apple';
+  // Max video height wanted; 0 = let the player decide (Apple adaptive).
+  int get height => int.tryParse(quality) ?? 0;
+  // Part of the cache key, so changing a setting gives fresh results.
+  String get sig => '$source$quality';
+}
 
 class MotionArtworkService {
   // In-memory cache: key -> video URL (or null = checked, nothing found).
@@ -44,7 +72,10 @@ class MotionArtworkService {
     String album = '',
     String track = '',
   }) async {
-    final key = '${_norm(artist)}|${_norm(album)}|${_norm(track)}';
+    final cfg = await MotionPrefs.load();
+    // Track lookups follow the "tracks" switch, album lookups the "albums" one.
+    if (track.isNotEmpty ? !cfg.tracks : !cfg.albums) return null;
+    final key = '${_norm(artist)}|${_norm(album)}|${_norm(track)}|${cfg.sig}';
     if (_cache.containsKey(key)) return _cache[key];
     // Bounded: the oldest lookups are dropped so the map never grows forever.
     if (_cache.length >= _maxEntries) _cache.remove(_cache.keys.first);
@@ -54,7 +85,10 @@ class MotionArtworkService {
       // singles named after the track. The first hit used to be the only
       // one tried, so a track whose first match was a video-less
       // compilation showed nothing even though its single had one.
-      final cands = await _candidates(artist, album, track);
+      final cands =
+          cfg.useApple
+              ? await _candidates(artist, album, track)
+              : <({String collectionId, String pageUrl, String? trackId})>[];
       String? video;
       var pages = 0;
       for (final c in cands) {
@@ -66,7 +100,8 @@ class MotionArtworkService {
         }
         if (video != null) break;
       }
-      video ??= await _youtube(artist, track);
+      if (video != null) video = await _pickVariant(video, cfg.height);
+      if (cfg.useYoutube) video ??= await _youtube(artist, track, cfg.height);
       _cache[key] = video;
       return video;
     } catch (_) {
@@ -78,7 +113,10 @@ class MotionArtworkService {
   /// Motion video for an artist page (Apple Music "artist motion").
   /// Same rules as [find]: null when nothing is found.
   static Future<String?> findArtist(String artist) async {
-    final key = 'artist|${_norm(artist)}';
+    final cfg = await MotionPrefs.load();
+    // Artist videos only exist on Apple Music.
+    if (!cfg.artists || !cfg.useApple) return null;
+    final key = 'artist|${_norm(artist)}|${cfg.sig}';
     if (_cache.containsKey(key)) return _cache[key];
     if (_cache.length >= _maxEntries) _cache.remove(_cache.keys.first);
     try {
@@ -96,6 +134,7 @@ class MotionArtworkService {
         }
         if (video != null) break;
       }
+      if (video != null) video = await _pickVariant(video, cfg.height);
       _cache[key] = video;
       return video;
     } catch (_) {
@@ -139,7 +178,8 @@ class MotionArtworkService {
       r'cover|live|reaction|remix|karaoke|instrumental|lyric|slowed|sped|'
       r'8d|nightcore|tutorial|mashup|acoustic|audio only';
 
-  static Future<String?> _youtube(String artist, String track) async {
+  static Future<String?> _youtube(
+      String artist, String track, int height) async {
     if (track.isEmpty) return null;
     final yt = YoutubeExplode();
     try {
@@ -161,19 +201,71 @@ class MotionArtworkService {
         final m = await yt.videos.streams
             .getManifest(v.id)
             .timeout(const Duration(seconds: 15));
-        final mp4 = m.muxed.where((s) => s.container.name == 'mp4').toList();
-        if (mp4.isEmpty) continue;
-        final s = mp4.withHighestBitrate();
+        // The video is muted, so video-only streams are fine: they allow
+        // up to 1080p+ (muxed streams stop at 360p).
+        final want = height == 0 ? 720 : height;
+        final vo = m.videoOnly
+            .where((s) => s.container.name == 'mp4')
+            .toList();
+        // Prefer H.264 (plays everywhere); keep the others as backup.
+        final avc = vo.where((s) => s.videoCodec.contains('avc')).toList();
+        final pool = avc.isNotEmpty ? avc : vo;
+        final fit =
+            pool.where((s) => s.videoResolution.height <= want).toList()
+              ..sort((a, b) => b.videoResolution.height
+                  .compareTo(a.videoResolution.height));
+        StreamInfo? pick = fit.isNotEmpty ? fit.first : null;
+        if (pick == null && pool.isNotEmpty) {
+          // Everything is above the wanted height: take the lowest one.
+          pick = (pool.toList()
+                ..sort((a, b) => a.videoResolution.height
+                    .compareTo(b.videoResolution.height)))
+              .first;
+        }
+        if (pick == null) {
+          final mux =
+              m.muxed.where((s) => s.container.name == 'mp4').toList();
+          if (mux.isEmpty) continue;
+          pick = mux.withHighestBitrate();
+        }
         // Guess of a "good moment": ~35% in (usually past the intro, around
         // the first chorus). Loops 12 s from there.
         final start = (d * 0.35).round();
-        return '${s.url}#yt=$start,12';
+        return '${pick.url}#yt=$start,12';
       }
     } catch (_) {
     } finally {
       yt.close();
     }
     return null;
+  }
+
+  // Apple videos are HLS playlists. With a chosen quality, read the master
+  // playlist and return the variant that fits (closest height not above
+  // the wanted one). On any problem the master URL is kept (adaptive).
+  static Future<String> _pickVariant(String url, int height) async {
+    if (height == 0 || !url.contains('.m3u8')) return url;
+    try {
+      final res = await http
+          .get(Uri.parse(url), headers: {'User-Agent': _ua})
+          .timeout(_timeout);
+      if (res.statusCode != 200) return url;
+      final lines = const LineSplitter().convert(res.body);
+      String? best, lowest;
+      var bestH = -1, lowH = 1 << 30;
+      for (var i = 0; i < lines.length - 1; i++) {
+        if (!lines[i].startsWith('#EXT-X-STREAM-INF')) continue;
+        final r = RegExp(r'RESOLUTION=\d+x(\d+)').firstMatch(lines[i]);
+        if (r == null) continue;
+        final h = int.parse(r.group(1)!);
+        final uri = Uri.parse(url).resolve(lines[i + 1].trim()).toString();
+        if (h <= height && h > bestH) { bestH = h; best = uri; }
+        if (h < lowH) { lowH = h; lowest = uri; }
+      }
+      return best ?? lowest ?? url;
+    } catch (_) {
+      return url;
+    }
   }
 
   static String _norm(String s) {

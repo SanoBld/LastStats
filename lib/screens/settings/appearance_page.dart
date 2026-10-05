@@ -1052,6 +1052,18 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
   bool _enabled = true;
   bool _achievementsOn = true;
   bool _motionOn = true;
+  String _mvSource = 'auto', _mvQuality = 'auto';
+  bool _mvTracks = true, _mvAlbums = true, _mvArtists = true;
+
+  // Saves one video-cover setting.
+  Future<void> _mvSet(String key, Object v) async {
+    final p = await SharedPreferences.getInstance();
+    if (v is bool) {
+      await p.setBool(key, v);
+    } else {
+      await p.setString(key, v as String);
+    }
+  }
 
   @override
   void initState() {
@@ -1062,6 +1074,11 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
           _enabled = p.getBool('ls_living_artwork') ?? true;
           _achievementsOn = p.getBool('ls_achievements_enabled') ?? true;
           _motionOn = p.getBool('ls_motion_artwork') ?? true;
+          _mvSource = p.getString('ls_motion_source') ?? 'auto';
+          _mvQuality = p.getString('ls_motion_quality') ?? 'auto';
+          _mvTracks = p.getBool('ls_motion_tracks') ?? true;
+          _mvAlbums = p.getBool('ls_motion_albums') ?? true;
+          _mvArtists = p.getBool('ls_motion_artists') ?? true;
         });
       }
     });
@@ -1098,6 +1115,76 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
             motionArtworkNotifier.value = v;
           },
         ),
+        if (_motionOn) ...[
+          ListTile(
+            contentPadding: const EdgeInsets.only(left: 72, right: 16),
+            title: Text(tx('set_mv_source_t')),
+            trailing: DropdownButton<String>(
+              value: _mvSource,
+              underline: const SizedBox.shrink(),
+              items: [
+                DropdownMenuItem(
+                    value: 'auto', child: Text(tx('set_mv_src_auto'))),
+                DropdownMenuItem(
+                    value: 'apple', child: Text(tx('set_mv_src_apple'))),
+                DropdownMenuItem(
+                    value: 'youtube', child: Text(tx('set_mv_src_yt'))),
+              ],
+              onChanged: (v) {
+                if (v == null) return;
+                _mvSet('ls_motion_source', v);
+                setState(() => _mvSource = v);
+              },
+            ),
+          ),
+          ListTile(
+            contentPadding: const EdgeInsets.only(left: 72, right: 16),
+            title: Text(tx('set_mv_quality_t')),
+            trailing: DropdownButton<String>(
+              value: _mvQuality,
+              underline: const SizedBox.shrink(),
+              items: [
+                DropdownMenuItem(
+                    value: 'auto', child: Text(tx('set_mv_q_auto'))),
+                DropdownMenuItem(
+                    value: '360', child: Text(tx('set_mv_q_low'))),
+                const DropdownMenuItem(value: '480', child: Text('480p')),
+                const DropdownMenuItem(value: '720', child: Text('720p')),
+                const DropdownMenuItem(value: '1080', child: Text('1080p')),
+              ],
+              onChanged: (v) {
+                if (v == null) return;
+                _mvSet('ls_motion_quality', v);
+                setState(() => _mvQuality = v);
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 72, right: 16, top: 8),
+            child: Text(tx('set_mv_types_t'),
+                style: Theme.of(context).textTheme.labelLarge),
+          ),
+          for (final t in [
+            ('ls_motion_tracks', 'set_mv_tracks', _mvTracks),
+            ('ls_motion_albums', 'set_mv_albums', _mvAlbums),
+            ('ls_motion_artists', 'set_mv_artists', _mvArtists),
+          ])
+            CheckboxListTile(
+              contentPadding: const EdgeInsets.only(left: 64, right: 16),
+              controlAffinity: ListTileControlAffinity.leading,
+              title: Text(tx(t.$2)),
+              value: t.$3,
+              onChanged: (v) {
+                if (v == null) return;
+                _mvSet(t.$1, v);
+                setState(() {
+                  if (t.$1 == 'ls_motion_tracks') _mvTracks = v;
+                  if (t.$1 == 'ls_motion_albums') _mvAlbums = v;
+                  if (t.$1 == 'ls_motion_artists') _mvArtists = v;
+                });
+              },
+            ),
+        ],
         SwitchListTile(
           secondary: Icon(Icons.emoji_events_outlined, color: scheme.primary),
           title: Text(tx('set_achv_t')),
