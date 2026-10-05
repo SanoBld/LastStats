@@ -111,7 +111,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
     return Scaffold(
       appBar: M3AppBar(title: L.favPageTitle),
-      body: SafeArea(top: false, child: Column(children: [
+      body: SafeArea(top: false, child: Align(alignment: Alignment.topCenter, child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 820), child: Column(children: [
 Expanded(child: M3Switcher(
         duration: const Duration(milliseconds: 250),
         child: _loading
@@ -164,7 +164,7 @@ Expanded(child: M3Switcher(
               ),
             ]),
       )),
-      ])),
+      ])))),
     );
   }
 }

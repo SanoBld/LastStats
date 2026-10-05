@@ -32,6 +32,15 @@
 
 ## v3.6.0
 
+**Large screens (PC) and web version**
+- PC side bar rebuilt: full-width pills with icon and label inside the highlight, 52 dp tall, centred in the bar; collapsed mode shows tooltips
+- "For you" / Discover on PC: 172 dp cards in a horizontal strip with mouse drag, left / right arrows and hover effect (phones unchanged)
+- Friends row on the dashboard: arrows and mouse drag on PC
+- Friend profile, title, album and artist pages: centred column (max 980 dp), banner capped at 320 dp, albums on a single row of ~150 dp covers on PC
+- Charts, Search, Rankings, History and Favorites tabs: centred content column on PC (phones unchanged)
+- French, Spanish, German, Italian, Chinese, Portuguese and Russian texts now use the formal "you" (vous / usted / Sie / Lei / 您)
+- Website: "Web version" (Beta) button with a warning window, Umami analytics on the web app, fixed the Download button press animation (first open and hover / pressed shape)
+
 **Installers and deployment (Linux and macOS)**
 - New Linux ARM64 build (Raspberry Pi, ARM laptops and servers), built natively
 - Linux installers: `.deb` (Debian, Ubuntu, Mint), `.rpm` (Fedora, openSUSE, RHEL) and a portable `.AppImage`, for x64 and ARM64; app menu entry, icon and clean uninstall included

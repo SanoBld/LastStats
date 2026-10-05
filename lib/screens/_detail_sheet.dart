@@ -40,6 +40,18 @@ Widget _linkifiedText(String body, TextStyle? style, Color linkColor) {
 }
 
 // ── Simple fade-in wrapper for content that pops in after loading ──────────
+/// PC only: centres [child] in a column of at most [maxWidth] dp.
+/// Phones: returns [child] untouched.
+Widget _pcColumn(BuildContext ctx, Widget child, {double maxWidth = 980}) {
+  if (!_isDesktopLayout(ctx)) return child;
+  return Center(
+    child: ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: child,
+    ),
+  );
+}
+
 class _FadeIn extends StatelessWidget {
   final Widget child;
   const _FadeIn({required this.child});
@@ -780,7 +792,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   Widget _buildContent(BuildContext ctx, ColorScheme scheme, Color surface) {
     final mediaH   = MediaQuery.of(ctx).size.height;
     final topPad   = MediaQuery.of(ctx).padding.top;
-    final imgH     = mediaH * 0.44;
+    final imgH     = _isDesktopLayout(ctx) ? math.min(mediaH * 0.44, 320.0) : mediaH * 0.44;
     final hasImage = _resolvedImage.isNotEmpty;
 
     return Stack(
@@ -876,7 +888,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       source: '${tx(switch (widget.type) { 'artists' => 'ds_type_artist', 'albums' => 'ds_type_album', _ => 'ds_type_track' })} · ${_currentImageSource()}') : null,
                   child: SizedBox(height: imgH + 66, width: double.infinity),
                 ),
-                _buildHeader(ctx, scheme, imgH, hasImage),
+                _pcColumn(ctx, _buildHeader(ctx, scheme, imgH, hasImage)),
                 // Soft blend from the image into the body panel — tall and
                 // gradual on purpose so it reads as a fade, not a hard
                 // white line cutting across the photo.
@@ -897,7 +909,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                 ),
                 Container(
                   color: surface,
-                  child: Column(
+                  width: double.infinity,
+                  child: _pcColumn(ctx, Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildPeriodSelector(scheme),
@@ -944,7 +957,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       _FadeIn(child: _buildShoutbox(scheme)),
                       const SizedBox(height: 48),
                     ],
-                  ),
+                  )),
                 ),
               ],
             ),
@@ -1053,7 +1066,9 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             scheme: scheme,
             style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w900) ??
                 const TextStyle(fontWeight: FontWeight.w900, fontSize: 28),
-            maxWidth: MediaQuery.of(ctx).size.width - 40,
+            maxWidth: (_isDesktopLayout(ctx)
+                ? math.min(MediaQuery.of(ctx).size.width, 980.0)
+                : MediaQuery.of(ctx).size.width) - 40,
           ),
           const SizedBox(height: 4),
         ],

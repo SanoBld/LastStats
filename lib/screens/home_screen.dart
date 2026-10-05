@@ -213,10 +213,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Widget> _buildPages() => [
     _DashboardPage(service: _service, username: widget.username),
-    _SearchPage(service: _service),
-    _RankingsPage(service: _service),
-    _ChartsPage(service: _service),
-    _HistoryPage(service: _service),
+    // PC: lists get a centred column instead of stretching across the window
+    // (phones: _pcColumn returns the page untouched).
+    _pcColumn(context, _SearchPage(service: _service), maxWidth: 960),
+    _pcColumn(context, _RankingsPage(service: _service), maxWidth: 960),
+    _pcColumn(context, _ChartsPage(service: _service), maxWidth: 1200),
+    _pcColumn(context, _HistoryPage(service: _service), maxWidth: 960),
     _SettingsPage(username: widget.username), // index 5 – wide only
   ];
 
