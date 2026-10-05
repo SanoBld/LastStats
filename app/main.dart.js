@@ -418,7 +418,7 @@ break
 default:s=null}s=A.O(s,t.N)
 return s},
 c29(){var s=A.fa().b,r=s==null?null:s.canvasKitVariant
-s=A.c6e(A.bUV(B.a9z,r==null?"auto":r))
+s=A.c6e(A.bUV(B.a9A,r==null?"auto":r))
 return new A.X(s,new A.buF(),A.aa(s).i("X<1,e>"))},
 c5h(a,b){return b+a},
 ao1(){var s=0,r=A.n(t.m),q,p,o,n
@@ -13390,7 +13390,7 @@ case 4:s=l.a
 s===$&&A.b()
 s=A.cG(s,200)
 r=A.cG(A.au4(l,B.Bd,B.a7C),24)
-q=A.cG(A.au4(l,B.Bd,B.aac),32)
+q=A.cG(A.au4(l,B.Bd,B.aad),32)
 p=A.cG(l.a,10)
 o=A.cG(l.a,12)
 l.d===$&&A.b()
@@ -24932,7 +24932,7 @@ r.toString
 A.f9(r)
 q=a.h(0,"swipeEdge")
 q.toString
-return new A.vr(s,r,B.a9e[A.ez(q)])},
+return new A.vr(s,r,B.a9f[A.ez(q)])},
 Rn:function Rn(a,b){this.a=a
 this.b=b},
 vr:function vr(a,b,c){this.a=a
@@ -27549,7 +27549,7 @@ if(a.as!==q)return q?-1:1
 return 0},
 bUH(a,b){var s=A.aa(b).i("X<1,hb>")
 s=A.O(new A.X(b,new A.av7(),s),s.i("ad.E"))
-return A.bTZ(!0,s,a,B.aaI,!0,B.Yh,null)},
+return A.bTZ(!0,s,a,B.aaJ,!0,B.Yh,null)},
 bzr(a){var s
 try{a.eN()}catch(s){a.afa()}a.w=B.aBC
 try{a.c5(A.c6b())}catch(s){}},
@@ -28312,7 +28312,7 @@ _.as=!0
 _.at=!1
 _.$ti=d},
 EK(a,b){var s
-if(a.j(0,b))return new A.a10(B.aaX)
+if(a.j(0,b))return new A.a10(B.aaY)
 s=A.a([],t.fJ)
 A.cJ()
 a.Eo(new A.azO(b,A.aK(t.F),s))
@@ -37813,7 +37813,7 @@ c6S(a){var s,r
 for(s=0;s<9;++s){r=B.rP[s]
 if(a<r)return r}return null},
 bNU(a){var s,r
-for(s=B.ed,r=0;r<9;++r)if(a>=B.aae[r])s=B.Ba[r]
+for(s=B.ed,r=0;r<9;++r)if(a>=B.aaf[r])s=B.Ba[r]
 return s},
 ap4(){var s=0,r=A.n(t.H),q,p
 var $async$ap4=A.j(function(a,b){if(a===1)return A.k(b,r)
@@ -40705,7 +40705,7 @@ s=2
 return A.c(A.axD(),$async$z8)
 case 2:q=0
 case 3:if(!(q<6)){s=5
-break}p=B.aai[q]
+break}p=B.aaj[q]
 s=6
 return A.c(A.uu("topartists_"+p),$async$z8)
 case 6:s=7
@@ -41526,7 +41526,7 @@ case 13:s=14
 return A.c(A.eW(a,"tracks","7day",i),$async$jG)
 case 14:k=0
 case 15:if(!(k<6)){s=17
-break}m=B.aaE[k]
+break}m=B.aaF[k]
 if(B.b.n(B.a6I,m)){s=16
 break}s=18
 return A.c(A.eW(a,"artists",m,i),$async$jG)
@@ -42008,7 +42008,7 @@ f=A.aY(J.w(n,"ok"))
 o=f!==!1}catch(b1){p=null}if(p==null){s=2
 break}if(i&&!o){s=2
 break}c=$.ew.h(0,g)
-if(c==null)c=B.aaM
+if(c==null)c=B.aaN
 f=A.z(k,j)
 for(b=J.b8(c);b.v();){a=b.gM()
 f.p(0,a.a,a)}for(b=p,a=b.length,a0=0;a0<b.length;b.length===a||(0,A.D)(b),++a0){a1=b[a0]
@@ -45064,7 +45064,7 @@ a5F(a,b){var s=A.a([],t.Di)
 B.b.C(s,a)
 return new A.jb(s,b)},
 bNM(a,b){var s,r,q,p
-if(a==="")return A.a5F(B.aaK,b==null?B.dW:b)
+if(a==="")return A.a5F(B.aaL,b==null?B.dW:b)
 s=new A.aPB(a,B.hy,a.length)
 s.O6()
 r=A.a([],t.Di)
@@ -49003,7 +49003,7 @@ Rv(){var s=this.as
 s===$&&A.b()
 return s},
 Rw(a,b,c,d){var s,r,q,p
-if(a<0||b<0)return B.aaW
+if(a<0||b<0)return B.aaX
 s=this.a
 s===$&&A.b()
 s=s.a
@@ -49022,7 +49022,7 @@ l.push(new A.i0(n[0],n[1],n[2],n[3],B.rM[m]))}return l},
 ev(a){var s,r,q=this.a
 q===$&&A.b()
 s=q.a.getGlyphPositionAtCoordinate(a.a,a.b)
-r=B.a9j[J.b3(s.affinity.value)]
+r=B.a9k[J.b3(s.affinity.value)]
 return new A.b9(J.b3(s.pos),r)},
 aa7(a){var s=this.a
 s===$&&A.b()
@@ -54814,7 +54814,7 @@ if(r.f!==B.zs){r.f=B.zs
 r.ai4()}}return r.d.a.ax8(a)},
 ai4(){var s,r
 for(s=this.w,r=0;r<s.length;++r)s[r].$1(this.f)},
-ax7(a){if(B.b.n(B.aao,a))return this.f===B.mM
+ax7(a){if(B.b.n(B.aap,a))return this.f===B.mM
 return!1}}
 A.avH.prototype={
 $0(){return new A.b0(Date.now(),0,!1)},
@@ -72100,7 +72100,7 @@ A.HO.prototype={
 K(){return"_CornerId."+this.b}}
 A.tB.prototype={}
 A.Fe.prototype={
-AU(){var s,r,q,p=this,o=A.c3L(B.a9Y,new A.aEF(p,p.b.gb8().a2(0,p.a.gb8()))),n=p.a
+AU(){var s,r,q,p=this,o=A.c3L(B.a9Z,new A.aEF(p,p.b.gb8().a2(0,p.a.gb8()))),n=p.a
 n.toString
 s=o.a
 r=p.HV(n,s)
@@ -75605,7 +75605,7 @@ A.Xi.prototype={
 og(){return this.cy},
 BB(a){this.ak()},
 le(a){a.toString
-return B.a9H[A.ez(a)]},
+return B.a9I[A.ez(a)]},
 lt(){var s=this.y
 return(s==null?A.u(this).i("aD.T").a(s):s).a}}
 A.aiT.prototype={
@@ -79989,7 +79989,7 @@ return s.b}}
 A.oQ.prototype={
 K(){return"_ListTileSlot."+this.b}}
 A.afk.prototype={
-ga_t(){return B.a9C},
+ga_t(){return B.a9D},
 a5z(a){var s,r=this
 switch(a.a){case 0:s=r.d
 break
@@ -81422,7 +81422,7 @@ $R:3,
 $S:238}
 A.OB.prototype={
 a07(a){var s=t.Tr
-s=A.O(new A.X(B.a9T,new A.aHk(a),s),s.i("ad.E"))
+s=A.O(new A.X(B.a9U,new A.aHk(a),s),s.i("ad.E"))
 return s},
 j(a,b){var s,r=this
 if(b==null)return!1
@@ -81587,7 +81587,7 @@ q=this.a
 n=A.xu(new A.cK(new A.aw(0,1/0,48,1/0),new A.S(B.h2,new A.df(B.hN,m,m,q.Q,m),m),m),B.D,B.z,o)
 return new A.vc(A.bH(m,!0,m,A.cT(!1,m,!0,A.bWp(n,B.L,m,o),m,!0,m,m,m,m,m,new A.adm(m,s.y),m,m,m,m,m,this.ga7p(),m,m,m,m,m,m,m),!1,m,m,m,!0,!1,!1,m,m,m,m,m,m,m,m,m,m,m,m,m,m,m,m,m,m,m,m,m,m,m,m,m,m,m,m,m,m,B.u4,m,m,m,m,m,m,m,m,B.E,m),m)}}
 A.IM.prototype={
-O(){return new A.Wq(B.aaT,this.$ti.i("Wq<1>"))}}
+O(){return new A.Wq(B.aaU,this.$ti.i("Wq<1>"))}}
 A.Wq.prototype={
 W(){this.ac()
 this.akt()},
@@ -85584,7 +85584,7 @@ gaD2(){return 48},
 gaD3(){return 40},
 gacf(){return 52},
 ga9m(){return 12},
-gZc(){return B.aaN},
+gZc(){return B.aaO},
 gL_(){return 32},
 gL1(){return 52},
 gZl(){return B.arI},
@@ -88409,7 +88409,7 @@ o=new A.q9(new A.ec(p,m,m,B.aC,m,m,m,m,m,m,b),B.ao,B.ah,o,m,m,m,m,B.aI,m)
 o.oU()
 l.push(new A.nj(q.a,!1,o,new A.b4A(n,q)))}return l},
 adi(a,b){var s,r,q,p,o,n,m=null,l=A.a([],t.sK)
-for(s=t.l,r=0;r<12;++r){q=B.a96[r]
+for(s=t.l,r=0;r<12;++r){q=B.a97[r]
 p=q.b
 this.e===$&&A.b()
 o=p<10?"0"+p:B.h.k(p)
@@ -92368,7 +92368,7 @@ return new A.uK(r.a.dz(s.glm()),r.b,r.c)},
 ev(a){var s=this.b
 return s.a.c.ev(a.a2(0,s.glm()))},
 Jw(){var s,r,q=this.b,p=q.glm()
-if(!isFinite(p.a)||!isFinite(p.b))return B.aaZ
+if(!isFinite(p.a)||!isFinite(p.b))return B.ab_
 s=q.f
 if(s==null){s=q.a.c.Jw()
 q.f=s}if(p.j(0,B.n))r=s
@@ -103669,7 +103669,7 @@ break
 case 1:return A.l(q,r)}})
 return A.m($async$a2g,r)},
 aK7(a,b){var s,r,q,p
-if(a===b)return B.aaU
+if(a===b)return B.aaV
 s=A.a([],t.QP)
 if(a==null)s.push(b)
 else{r=B.b.f1(B.ku,a)
@@ -105940,7 +105940,7 @@ A.rQ.prototype={}
 A.a67.prototype={
 BT(a,b){var s,r,q,p,o,n=$.an.a8$.d.c
 if(n==null||n.e==null)return!1
-for(s=t.vz,r=0;r<2;++r){q=B.aat[r]
+for(s=t.vz,r=0;r<2;++r){q=B.aau[r]
 p=n.e
 p.toString
 o=A.byM(p,q,s)
@@ -106368,7 +106368,7 @@ r=n.gaQf()
 q=n.a
 q=q.ch
 q.toString
-l.a=A.bVe(!0,A.bHB(B.j,r,s,q,A.bNE(),n.gaSE(),m,n.gaTr(),B.aaO,!0,"nav",B.azc),"Navigator Scope",!0,m,m,m,m)}else n.a.toString
+l.a=A.bVe(!0,A.bHB(B.j,r,s,q,A.bNE(),n.gaSE(),m,n.gaTr(),B.aaP,!0,"nav",B.azc),"Navigator Scope",!0,m,m,m,m)}else n.a.toString
 l.b=null
 s=n.a
 s.toString
@@ -109186,7 +109186,7 @@ h.a4N()
 r=h.gaLc()
 q=q.PJ
 h.e!==$&&A.b7()
-h.e=new A.a7S(f,new A.cy(B.aeJ,l),new A.zl(),p,B.f1,0,k,h.gaOz(),h.gaOB(),r,B.f1,0,j,h.gaOt(),h.gaOv(),r,i,B.aaY,s,g.CW,g.cx,g.cy,o,g,n,m,g.x,q,new A.a1J(),new A.a1J())
+h.e=new A.a7S(f,new A.cy(B.aeJ,l),new A.zl(),p,B.f1,0,k,h.gaOz(),h.gaOB(),r,B.f1,0,j,h.gaOt(),h.gaOv(),r,i,B.aaZ,s,g.CW,g.cx,g.cy,o,g,n,m,g.x,q,new A.a1J(),new A.a1J())
 return h},
 TX(a,b){var s,r,q,p=this,o=p.a.c,n=o.a.a.length
 if(n<a.b||n<a.a)return
@@ -112921,7 +112921,7 @@ j(a,b){var s=this
 if(b==null)return!1
 if(J.al(b)!==A.P(s))return!1
 return b instanceof A.Z&&b.a===s.a&&b.b==s.b&&b.d===s.d&&A.d9(null,null)},
-gD(a){return A.a5(this.a,this.b,null,this.d,A.bX(B.ab_),B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a)},
+gD(a){return A.a5(this.a,this.b,null,this.d,A.bX(B.ab0),B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a)},
 k(a){return"IconData(U+"+B.c.cs(B.h.jW(this.a,16).toUpperCase(),5,"0")+")"}}
 A.yW.prototype={
 cJ(a){return!this.w.j(0,a.w)},
@@ -114519,7 +114519,7 @@ b=r?a1:a3.fr
 if(b==null)b=a2.b.c.z
 a3=r?a1:a3.fx
 if(a3==null)a3=a2.b.c.Q
-a=new A.NU(a4,s,q,p,m,o,n,a5,g===!0,a6,a7,i,h,l,k,j,f,new A.E3(a1),B.aaH,e===!0,d,c,b,a3,A.bWF(a2))
+a=new A.NU(a4,s,q,p,m,o,n,a5,g===!0,a6,a7,i,h,l,k,j,f,new A.E3(a1),B.aaI,e===!0,d,c,b,a3,A.bWF(a2))
 if(!a.j(0,a0.e))a0.q(new A.be0(a0,a))},
 X5(){if(this.d==null)this.J7()},
 a6r(){this.J7()},
@@ -121878,7 +121878,7 @@ r.VQ()
 return s.b6()},
 l(){var s,r,q,p,o=this
 for(s=o.b,r=s.length,q=o.ga2k(),p=0;p<s.length;s.length===r||(0,A.D)(s),++p)s[p].L(q)
-o.b=B.aaJ
+o.b=B.aaK
 o.y=!1
 o.dM()},
 hi(a,b){return a.DD(b)},
@@ -123116,7 +123116,7 @@ r=(s.length===0?r+"no children":r+A.v(s))+")"
 return r.charCodeAt(0)==0?r:r}}
 A.lf.prototype={}
 A.Rx.prototype={
-cS(){return new A.akJ(B.aaQ,A.eS(t.lU),this,B.b6)},
+cS(){return new A.akJ(B.aaR,A.eS(t.lU),this,B.b6)},
 aN(a){var s,r,q,p,o,n,m,l=this,k=null,j=l.c,i=j.length
 j=i!==0?j[0].c.length:0
 s=a.ai(t.I).w
@@ -123126,7 +123126,7 @@ p=t.rZ
 o=t.bu
 n=A.a([],t.n)
 m=A.k5(k,k,k,q,t.PA)
-j=new A.G1(B.aaP,j,i,m,l.e,s,l.r,r,B.uK,k,A.z(q,p),A.z(q,o),A.z(p,o),n,new A.bj(),A.aE())
+j=new A.G1(B.aaQ,j,i,m,l.e,s,l.r,r,B.uK,k,A.z(q,p),A.z(q,o),A.z(p,o),n,new A.bj(),A.aE())
 j.aM()
 i=A.a([],t.Rs)
 B.b.sI(i,j.P*j.S)
@@ -123179,7 +123179,7 @@ n=new A.oA(q,new A.bq9())
 m=A.a([],t.lD)
 for(p=a.c,l=c.p3,k=t.PP,j=0;j<p.length;++j){i=p[j]
 h=n.v()
-g=h?q.gM().b:B.aaR
+g=h?q.gM().b:B.aaS
 h=i.c
 f=h.length
 e=A.a(new Array(f),k)
@@ -126692,8 +126692,8 @@ grO(){return"\u062f\u0631\u062f\u0634\u0629 \u0648\u0627\u0642\u062a\u0631\u0627
 y3(a){return""+a+" \u062a\u0634\u063a\u064a\u0644\u0629"},
 xX(a){return""+a+" \u0641\u0646\u0627\u0646"},
 xW(a){return""+a+" \u0623\u0644\u0628\u0648\u0645"},
-ghl(){return B.aa6},
-w0(a){return B.aaf[A.hU(a)-1]+"\u060c "+A.bh(a)+" "+B.aca[A.aN(a)]+" "+A.ao(a)},
+ghl(){return B.aa7},
+w0(a){return B.aag[A.hU(a)-1]+"\u060c "+A.bh(a)+" "+B.aca[A.aN(a)]+" "+A.ao(a)},
 ms(a){return"\u0639\u0636\u0648 \u0645\u0646\u0630 "+a},
 qF(a){return"\u0627\u0644\u0625\u0635\u062f\u0627\u0631 v"+a+" \u0645\u062a\u0627\u062d"},
 ng(a){return"\u062a\u062d\u062f\u064a\u062b v"+a},
@@ -126709,8 +126709,8 @@ t1(a){return"\u062a\u0645\u062a \u0625\u0636\u0627\u0641\u0629 @"+a+" \u0628\u06
 te(a,b){return"\u062d\u0633\u0627\u0628\u0627\u062a\u064a ("+a+"/"+b+")"},
 tj(a){return"\u0645\u062a\u0628\u0642\u064d "+a+" \u0645\u0643\u0627\u0646"},
 td(a){return"\u062a\u0645 \u0627\u0644\u0648\u0635\u0648\u0644 \u0625\u0644\u0649 \u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649 \u0648\u0647\u0648 "+a+" \u062d\u0633\u0627\u0628\u0627\u062a."},
-gpo(){return B.aaA},
-gAA(){return B.aam},
+gpo(){return B.aaB},
+gAA(){return B.aan},
 gAz(){return"\u0623"},
 gyV(){return B.a80},
 glU(){return"\u0627\u0644\u0625\u0646\u062c\u0627\u0632\u0627\u062a"},
@@ -126848,7 +126848,7 @@ gmQ(){return"Song finden"},
 gpE(){return"Oben in die Suchleiste tippen"},
 gpy(){return"Alle"},
 gmO(){return"Ordner"},
-gmP(){return"Erstelle einen Ordner, um Titel, Alben oder K\xfcnstler zu speichern."},
+gmP(){return"Erstellen Sie einen Ordner, um Titel, Alben oder K\xfcnstler zu speichern."},
 gzZ(){return"pro Tag"},
 gtD(){return"aktive Tage"},
 gvN(){return"Statistik"},
@@ -126932,7 +126932,7 @@ gqz(){return"github.com/SanoBld/LastStats-App"},
 gkM(){return"Sprache"},
 gpF(){return"LastStats ist ein pers\xf6nliches Open-Source-Projekt. Es kann Fehler enthalten."},
 gmU(){return"Projekt unterst\xfctzen"},
-gpG(){return"\u2b50 Hinterlasse einen Stern auf GitHub"},
+gpG(){return"\u2b50 Hinterlassen Sie einen Stern auf GitHub"},
 gn6(){return"FAQ"},
 gxO(){return"L\xe4uft gerade"},
 gxV(){return"Titel Nr. 1"},
@@ -126963,7 +126963,7 @@ gwe(){return"Beliebte Titel"},
 gwd(){return"Beliebte Alben"},
 got(){return"Mehr lesen"},
 gos(){return"Weniger anzeigen"},
-gwh(){return"deine Wiedergaben"},
+gwh(){return"Ihre Wiedergaben"},
 gw6(){return"Wiedergaben insgesamt"},
 gwi(){return"Rang"},
 gw5(){return"H\xf6rer"},
@@ -126985,16 +126985,16 @@ gz0(){return"Personalisieren Sie Ihren Stil"},
 gz_(){return"Design, Akzentfarbe und Material You."},
 gzv(){return"Immer auf dem Laufenden"},
 gzu(){return"Benachrichtigungen und Vibrationen."},
-gzi(){return"Deine Lieblingsprofile"},
-gzh(){return"F\xfcge Last.fm-Freunde hinzu, um sie schnell zu finden."},
+gzi(){return"Ihre Lieblingsprofile"},
+gzh(){return"F\xfcgen Sie Last.fm-Freunde hinzu, um sie schnell zu finden."},
 gzb(){return"Noch keine Favoriten"},
 gzf(){return"Last.fm-Profil suchen\u2026"},
 gze(){return"Kein Profil gefunden"},
-gzc(){return"Deine Last.fm-Freunde"},
+gzc(){return"Ihre Last.fm-Freunde"},
 gzd(){return"Keine Freunde auf diesem Konto gefunden"},
 gzg(){return"Ausgew\xe4hlte Favoriten"},
-gz8(){return"Deine \xdcbersicht"},
-gz7(){return"W\xe4hle, welche Bereiche angezeigt werden."},
+gz8(){return"Ihre \xdcbersicht"},
+gz7(){return"W\xe4hlen Sie, welche Bereiche angezeigt werden."},
 gzI(){return"Startbildschirm"},
 gzH(){return"Welchen Tab m\xf6chten Sie zuerst sehen?"},
 gzz(){return"Worauf h\xf6ren Sie Musik?"},
@@ -127024,19 +127024,19 @@ gzw(){return"Reiner schwarzer Hintergrund im Dunkelmodus"},
 gz2(){return"Farbe aus dem Cover"},
 gz1(){return"Akzentfarbe an das aktuelle Cover anpassen"},
 gp9(){return"Neuigkeiten-Benachrichtigungen"},
-gzq(){return"Werde \xfcber neue Funktionen und Fehlerbehebungen informiert"},
+gzq(){return"Werden Sie \xfcber neue Funktionen und Fehlerbehebungen informiert"},
 gzp(){return"Neuigkeiten-Punkt"},
 gzo(){return"Roter Punkt auf der Glocke, wenn es Neuigkeiten gibt"},
 gp7(){return"Haptisches Feedback"},
-gzl(){return"Sp\xfcre leichte Vibrationen bei wichtigen Interaktionen"},
+gzl(){return"Sp\xfcren Sie leichte Vibrationen bei wichtigen Interaktionen"},
 gzF(){return"Zusammenfassungen"},
 gp5(){return"Tageszusammenfassung"},
 gz6(){return"Eine kurze \xdcbersicht Ihres H\xf6ralltags"},
 gpa(){return"Wochenzusammenfassung"},
-gzO(){return"Deine Top-K\xfcnstler, Alben und Titel der Woche"},
+gzO(){return"Ihre Top-K\xfcnstler, Alben und Titel der Woche"},
 gp8(){return"Scrobble-Meilensteine"},
 gzn(){return"Meilensteine"},
-gzm(){return"Feiere runde Scrobble-Zahlen"},
+gzm(){return"Feiern Sie runde Scrobble-Zahlen"},
 gp6(){return"Gro\xdfe Meilensteine"},
 gzk(){return"Extra-Feier bei gro\xdfen Meilensteinen"},
 gza(){return"Farben aus Ihrem Hintergrundbild verwenden (Android 12+)"},
@@ -127045,7 +127045,7 @@ gz4(){return"Fr\xfcher Zugriff auf Vorabversionen"},
 gyA(){return"Link \xf6ffnen"},
 gpY(){return"Suche nach Updates\u2026"},
 gqC(){return"Zum Herunterladen tippen"},
-gqZ(){return"Deine Last.fm-Statistiken, neu erfunden."},
+gqZ(){return"Ihre Last.fm-Statistiken, neu erfunden."},
 gqJ(){return"Ein Profil analysieren"},
 gqN(){return"Verbindung wird hergestellt\u2026"},
 gqY(){return"Analyse starten"},
@@ -127109,7 +127109,7 @@ gzS(){return"Untere Leiste"},
 gzT(){return"Seitenleiste auf breiten Bildschirmen (\u2265 720 dp), untere Leiste auf schmalen Bildschirmen."},
 gzV(){return"Immer die seitliche Navigationsleiste verwenden, unabh\xe4ngig von der Bildschirmgr\xf6\xdfe."},
 gzU(){return"Immer die untere Navigationsleiste verwenden, unabh\xe4ngig von der Bildschirmgr\xf6\xdfe."},
-grZ(){return"Dein Last.fm-Statistik-Begleiter"},
+grZ(){return"Ihr Last.fm-Statistik-Begleiter"},
 grM(){return"App-Info"},
 grW(){return"Unterst\xfctzt von"},
 grQ(){return"Bilder von K\xfcnstlern, Alben und Titeln werden automatisch aus diesen Quellen abgerufen und k\xf6nnen gelegentlich falsch sein oder nicht zum tats\xe4chlichen Inhalt passen."},
@@ -127125,7 +127125,7 @@ guo(){return"Datei konnte nicht gespeichert werden"},
 gqU(){return"Sicherung wiederherstellen"},
 gqV(){return"Stellt Ihr Konto und Ihre Einstellungen aus einer .json-Sicherungsdatei wieder her"},
 guz(){return"API-Schl\xfcssel wiederherstellen"},
-guy(){return"W\xe4hle, welche Last.fm-Schl\xfcssel aus dieser Sicherung wiederhergestellt werden sollen."},
+guy(){return"W\xe4hlen Sie, welche Last.fm-Schl\xfcssel aus dieser Sicherung wiederhergestellt werden sollen."},
 gnY(){return"API-Schl\xfcssel"},
 gnZ(){return"Geheimer Schl\xfcssel"},
 gus(){return"Ordner einschlie\xdfen"},
@@ -127217,14 +127217,14 @@ gyT(){return"Test"},
 gyI(){return"Benachrichtigungen deaktiviert"},
 gyH(){return"Erteilen Sie die Berechtigung, damit LastStats Ihnen Hinweise senden kann."},
 gyB(){return"Berechtigung erteilen"},
-gyU(){return"Du erh\xe4ltst bei jedem dieser Meilensteine eine besondere Benachrichtigung:"},
+gyU(){return"Sie erhalten bei jedem dieser Meilensteine eine besondere Benachrichtigung:"},
 gyC(){return"Alle X Scrobbles eine Benachrichtigung ausl\xf6sen"},
 gyx(){return"Eigener Wert"},
 gp0(){return"Benachrichtigen um"},
 gyz(){return"Wochentag"},
 gyL(){return"Testbenachrichtigung senden"},
 gyN(){return"Schauen Sie in Ihre Benachrichtigungsleiste!"},
-gyE(){return"Stelle sicher, dass alles funktioniert."},
+gyE(){return"Stellen Sie sicher, dass alles funktioniert."},
 gyM(){return"Gesendet!"},
 gyK(){return"Senden"},
 gu3(){return"Visueller Stil"},
@@ -127256,7 +127256,7 @@ gtM(){return"Vibrationen bei Tipps, Auswahlen und Gesten"},
 gtg(){return"Konto entfernen?"},
 gnG(){return"Entfernen"},
 gt2(){return"Dieses Konto ist bereits hinzugef\xfcgt oder die Liste ist voll."},
-gtb(){return"Alle Konten werden entfernt. Du gelangst zur\xfcck zum Einrichtungsbildschirm."},
+gtb(){return"Alle Konten werden entfernt. Sie gelangen zur\xfcck zum Einrichtungsbildschirm."},
 gt_(){return"Aktiv"},
 gtl(){return"Zum Aktivieren auf \u201eWechseln\u201c tippen"},
 gtk(){return"Wechseln"},
@@ -127289,7 +127289,7 @@ gqP(){return"Mit Ihrem geheimen Schl\xfcssel kann die App Titel direkt auf Last.
 gqX(){return"Last.fm Secret Key"},
 gxj(){return"Der geheime Schl\xfcssel muss 32 Zeichen lang sein."},
 gxh(){return"Favoriten autorisieren"},
-gxf(){return"Autorisiere die App auf der im Browser ge\xf6ffneten Last.fm-Seite und kehre dann hierher zur\xfcck, um zu best\xe4tigen."},
+gxf(){return"Autorisieren Sie die App auf der im Browser ge\xf6ffneten Last.fm-Seite und kehren Sie dann hierher zur\xfcck, um zu best\xe4tigen."},
 gxg(){return"Ich habe autorisiert"},
 gxk(){return"Favoriten erfolgreich aktiviert!"},
 gxi(){return"Favoriten konnten nicht aktiviert werden. Pr\xfcfen Sie Ihren geheimen Schl\xfcssel."},
@@ -127336,7 +127336,7 @@ gwR(){return"Nein. Eine iOS-Version ist derzeit nicht geplant."},
 gx7(){return"Funktioniert die App unter macOS oder anderen Plattformen?"},
 gwS(){return"LastStats wird auf Android entwickelt und getestet. Das Verhalten auf anderen Plattformen (macOS, Windows, Linux\u2026) ist nicht \xfcberpr\xfcft, Fehler oder unerwartetes Verhalten sind m\xf6glich."},
 gx8(){return"Ist LastStats Open Source?"},
-gwT(){return"Ja! Der Quellcode ist frei auf GitHub verf\xfcgbar. Das Projekt ist unabh\xe4ngig und wird mit Leidenschaft von SanoBld entwickelt. Du kannst gerne beitragen, Fehler melden oder einfach einen Stern \u2b50 dalassen."},
+gwT(){return"Ja! Der Quellcode ist frei auf GitHub verf\xfcgbar. Das Projekt ist unabh\xe4ngig und wird mit Leidenschaft von SanoBld entwickelt. Sie k\xf6nnen gerne beitragen, Fehler melden oder einfach einen Stern \u2b50 dalassen."},
 gx9(){return"Wo werden meine Daten gespeichert?"},
 gwU(){return"Nur auf Ihrem Ger\xe4t. LastStats hat keinen Server: Ihre Scrobbles werden lokal zwischengespeichert, und auch Ihre Last.fm-Zugangsdaten bleiben lokal gespeichert. Es wird nichts irgendwohin gesendet au\xdfer an die offizielle Last.fm-API."},
 gxa(){return"Wie aktiviere ich Favoriten?"},
@@ -127346,7 +127346,7 @@ gwW(){return"Ein Scrobble ist ein Titel, der als geh\xf6rt auf Ihrem Last.fm-Kon
 gxc(){return"Wie funktionieren Level und Erfolge?"},
 gwX(){return"Ihr Kontolevel steigt mit Ihrer Gesamtzahl an Scrobbles (es gibt kein H\xf6chstlevel). Karten erhalten au\xdferdem einen Rahmen (Bronze \u2192 schillernd), je nachdem wie oft der jeweilige Interpret/Titel/das Album gespielt wurde. Alles wird automatisch aus bereits lokal zwischengespeicherten Statistiken berechnet, ohne zus\xe4tzliche Netzwerkaufrufe."},
 gxd(){return"Wie funktioniert der Energiesparmodus?"},
-gwY(){return"Der Energiesparmodus verl\xe4ngert die Abst\xe4nde zwischen automatischen Synchronisierungen, um Akku zu sparen. Er kann dauerhaft an sein, dem Energiesparmodus deines Telefons folgen oder sich unter einem gew\xe4hlten Akkustand einschalten, unter Einstellungen > Allgemein."},
+gwY(){return"Der Energiesparmodus verl\xe4ngert die Abst\xe4nde zwischen automatischen Synchronisierungen, um Akku zu sparen. Er kann dauerhaft an sein, dem Energiesparmodus Ihres Telefons folgen oder sich unter einem gew\xe4hlten Akkustand einschalten, unter Einstellungen > Allgemein."},
 gx0(){return"Wie sichere oder stelle ich meine Daten wieder her?"},
 gwN(){return"Gehen Sie zu Einstellungen > Sicherung. Sie k\xf6nnen eine Sicherungsdatei exportieren (mit oder ohne Ihren Last.fm-Schl\xfcssel) und sie sp\xe4ter oder auf einem anderen Ger\xe4t wieder importieren."},
 gx3(){return"Funktioniert die App offline?"},
@@ -127427,17 +127427,17 @@ gpk(){return"\xd8/Tag"},
 gpl(){return"Noch keine Scrobbles in diesem Zeitraum."},
 gAg(){return"Top 10"},
 gwo(){return"N\xfctzlichster Filter zuerst"},
-gwn(){return"Je nach Uhrzeit, Tag und deinen Vorlieben"},
-gmb(){return"F\xfcr dich"},
+gwn(){return"Je nach Uhrzeit, Tag und Ihren Vorlieben"},
+gmb(){return"F\xfcr Sie"},
 gmc(){return"Globale Trends"},
-gws(){return"Dein Mix"},
+gws(){return"Ihr Mix"},
 gwv(){return"An diesem Tag"},
 gwt(){return"Diesen Monat"},
-gwu(){return"Deine Genres"},
+gwu(){return"Ihre Genres"},
 gwq(){return"Deep Cuts"},
 gwr(){return"Vergessen"},
 gox(){return"Alben"},
-gwp(){return"Dein Land"},
+gwp(){return"Ihr Land"},
 gww(){return"Titel"},
 gwj(){return"K\xfcnstler"},
 gwx(){return"Woche"},
@@ -127912,7 +127912,7 @@ gyI(){return"Notifications disabled"},
 gyH(){return"Grant permission so LastStats can send you alerts."},
 gyB(){return"Grant permission"},
 gyU(){return"You'll get a special notification at each of these thresholds:"},
-gyV(){return B.aau},
+gyV(){return B.aav},
 gyC(){return"Fire a notification every X scrobbles"},
 gyx(){return"Custom value"},
 gp0(){return"Notify at"},
@@ -128198,18 +128198,18 @@ gy8(){return"Top \xe1lbumes"},
 gya(){return"Top canciones"},
 gxZ(){return"canci\xf3n"},
 ghl(){return B.acq},
-w0(a){return B.a9v[A.hU(a)-1]+", "+A.bh(a)+" de "+B.a6G[A.aN(a)]+" de "+A.ao(a)},
+w0(a){return B.a9w[A.hU(a)-1]+", "+A.bh(a)+" de "+B.a6G[A.aN(a)]+" de "+A.ao(a)},
 gpD(){return"Buscar"},
 gmR(){return"Perfiles"},
 gpB(){return"Artista, \xe1lbum, canci\xf3n o perfil\u2026"},
-gpC(){return"Busca un usuario de Last.fm"},
-gpA(){return"Busca un artista"},
-gpz(){return"Busca un \xe1lbum"},
-gmQ(){return"Busca una canci\xf3n"},
-gpE(){return"Escribe en la barra de arriba"},
+gpC(){return"Busque un usuario de Last.fm"},
+gpA(){return"Busque un artista"},
+gpz(){return"Busque un \xe1lbum"},
+gmQ(){return"Busque una canci\xf3n"},
+gpE(){return"Escriba en la barra de arriba"},
 gpy(){return"Todo"},
 gmO(){return"Carpetas"},
-gmP(){return"Crea una carpeta para guardar canciones, \xe1lbumes o artistas."},
+gmP(){return"Cree una carpeta para guardar canciones, \xe1lbumes o artistas."},
 ms(a){return"Desde "+a},
 gzZ(){return"por d\xeda"},
 gtD(){return"de actividad"},
@@ -128250,7 +128250,7 @@ gqp(){return"Usa el color del fondo de pantalla de Android"},
 gqq(){return"Color desde la m\xfasica"},
 gqt(){return"Extrae el color de la car\xe1tula actual"},
 gqs(){return"El color dominante de la car\xe1tula actual reemplaza el acento."},
-gqr(){return"Desactiva Material You primero"},
+gqr(){return"Desactive Material You primero"},
 gnb(){return"P\xe1gina de inicio"},
 gnc(){return"Pesta\xf1a al abrir"},
 gn1(){return"Panel"},
@@ -128295,8 +128295,8 @@ gqy(){return"C\xf3digo fuente"},
 gqz(){return"github.com/SanoBld/LastStats-App"},
 gkM(){return"Idioma"},
 gpF(){return"LastStats es un proyecto personal de c\xf3digo abierto. Puede contener errores."},
-gmU(){return"Apoya el proyecto"},
-gpG(){return"\u2b50 Deja una estrella en GitHub"},
+gmU(){return"Apoye el proyecto"},
+gpG(){return"\u2b50 Deje una estrella en GitHub"},
 gn6(){return"Preguntas frecuentes"},
 gxO(){return"Reproduciendo ahora"},
 gxV(){return"Canci\xf3n #1"},
@@ -128327,7 +128327,7 @@ gwe(){return"Canciones populares"},
 gwd(){return"\xc1lbumes populares"},
 got(){return"Leer m\xe1s"},
 gos(){return"Leer menos"},
-gwh(){return"tus reproducciones"},
+gwh(){return"sus reproducciones"},
 gw6(){return"reproducciones totales"},
 gwi(){return"posici\xf3n"},
 gw5(){return"oyentes"},
@@ -128349,19 +128349,19 @@ gz0(){return"Personalice su estilo"},
 gz_(){return"Tema, color de acento y Material You."},
 gzv(){return"Mantente informado"},
 gzu(){return"Notificaciones y vibraciones."},
-gzi(){return"Tus perfiles favoritos"},
-gzh(){return"A\xf1ade amigos de Last.fm para encontrarlos r\xe1pidamente."},
+gzi(){return"Sus perfiles favoritos"},
+gzh(){return"A\xf1ada amigos de Last.fm para encontrarlos r\xe1pidamente."},
 gzb(){return"Sin favoritos por ahora"},
 gzf(){return"Buscar un perfil de Last.fm\u2026"},
 gze(){return"No se encontr\xf3 ning\xfan perfil"},
-gzc(){return"Tus amigos de Last.fm"},
+gzc(){return"Sus amigos de Last.fm"},
 gzd(){return"No se encontraron amigos en esta cuenta"},
 gzg(){return"Favoritos seleccionados"},
-gz8(){return"Tu panel"},
-gz7(){return"Elige qu\xe9 secciones mostrar."},
+gz8(){return"Su panel"},
+gz7(){return"Elija qu\xe9 secciones mostrar."},
 gzI(){return"Pantalla de inicio"},
 gzH(){return"\xbfQu\xe9 pesta\xf1a quiere ver primero?"},
-gzz(){return"\xbfD\xf3nde escuchas m\xfasica?"},
+gzz(){return"\xbfD\xf3nde escucha m\xfasica?"},
 gzy(){return"As\xed solo se muestran los enlaces \xfatiles en las fichas de canci\xf3n/artista/\xe1lbum."},
 gpd(){return"Last.fm"},
 gpe(){return"Spotify"},
@@ -128388,16 +128388,16 @@ gzw(){return"Fondo negro puro en modo oscuro"},
 gz2(){return"Color desde la car\xe1tula"},
 gz1(){return"Adapta el color de acento a la car\xe1tula en reproducci\xf3n"},
 gp9(){return"Notificaciones de novedades"},
-gzq(){return"Recibe avisos de nuevas funciones y correcciones"},
+gzq(){return"Reciba avisos de nuevas funciones y correcciones"},
 gzp(){return"Punto de novedades"},
 gzo(){return"Punto rojo en la campana del panel cuando hay novedades"},
 gp7(){return"Retroalimentaci\xf3n h\xe1ptica"},
-gzl(){return"Siente ligeras vibraciones en interacciones clave"},
+gzl(){return"Sienta ligeras vibraciones en interacciones clave"},
 gzF(){return"Res\xfamenes"},
 gp5(){return"Resumen diario"},
 gz6(){return"Un resumen r\xe1pido de su escucha del d\xeda"},
 gpa(){return"Resumen semanal"},
-gzO(){return"Tus tops de artistas, \xe1lbumes y canciones de la semana"},
+gzO(){return"Sus tops de artistas, \xe1lbumes y canciones de la semana"},
 gp8(){return"Hitos de scrobbles"},
 gzn(){return"Hitos"},
 gzm(){return"Celebra cifras redondas de scrobbles"},
@@ -128408,8 +128408,8 @@ gz5(){return"Actualizaciones beta"},
 gz4(){return"Acceso anticipado a preversiones"},
 gyA(){return"Abrir enlace"},
 gpY(){return"Buscando actualizaciones\u2026"},
-gqC(){return"Toca para descargar"},
-gqZ(){return"Tus estad\xedsticas de Last.fm, reinventadas."},
+gqC(){return"Toque para descargar"},
+gqZ(){return"Sus estad\xedsticas de Last.fm, reinventadas."},
 gqJ(){return"Analizar un perfil"},
 gqN(){return"Conectando\u2026"},
 gqY(){return"Iniciar an\xe1lisis"},
@@ -128424,7 +128424,7 @@ gqQ(){return"Obtener una clave API gratis"},
 qW(a){return a+" scrobbles por importar"},
 gr1(){return"\xa1Bienvenido a LastStats!"},
 gqR(){return"Importaci\xf3n \xfanica, los pr\xf3ximos inicios ser\xe1n instant\xe1neos."},
-gvO(){return"Toca para descargar."},
+gvO(){return"Toque para descargar."},
 vY(a,b){return(b?"Beta":"Nueva")+" actualizaci\xf3n: v"+a},
 gvZ(){return"ESTA SEMANA"},
 gvx(){return"ESTE MES"},
@@ -128480,7 +128480,7 @@ gzS(){return"Barra inferior"},
 gzT(){return"Barra lateral en pantallas anchas (\u2265 720 dp), barra inferior en pantallas estrechas."},
 gzV(){return"Usar siempre la barra de navegaci\xf3n lateral, sin importar el tama\xf1o de pantalla."},
 gzU(){return"Usar siempre la barra de navegaci\xf3n inferior, sin importar el tama\xf1o de pantalla."},
-grZ(){return"Tu compa\xf1ero de estad\xedsticas de Last.fm"},
+grZ(){return"Su compa\xf1ero de estad\xedsticas de Last.fm"},
 grM(){return"Info de la app"},
 grW(){return"Con la ayuda de"},
 grQ(){return"Las im\xe1genes de artistas, \xe1lbumes y canciones se obtienen autom\xe1ticamente de estas fuentes y a veces pueden ser incorrectas o no coincidir con el contenido real."},
@@ -128488,23 +128488,23 @@ grP(){return"Hecho con \u2764\ufe0f \xb7 Sin afiliaci\xf3n con Last.fm / CBS"},
 Ax(a){return"Publicado el "+a},
 gAw(){return"Versi\xf3n actual"},
 gAv(){return"Actualizaciones beta"},
-gAu(){return"Recibe acceso anticipado a las versiones preliminares"},
+gAu(){return"Reciba acceso anticipado a las versiones preliminares"},
 guF(){return"Qu\xe9 incluye"},
-gum(){return"Descarga un archivo .json"},
+gum(){return"Descargue un archivo .json"},
 gnW(){return"Elegir un archivo de copia de seguridad"},
 guq(){return"Copia de seguridad guardada"},
 guo(){return"No se pudo guardar el archivo"},
 gqU(){return"Restaurar una copia de seguridad"},
-gqV(){return"Recupera su cuenta y ajustes desde un archivo .json de copia de seguridad"},
+gqV(){return"Recupere su cuenta y ajustes desde un archivo .json de copia de seguridad"},
 guz(){return"Restaurar claves de API"},
-guy(){return"Elige qu\xe9 claves de Last.fm restaurar desde esta copia de seguridad."},
+guy(){return"Elija qu\xe9 claves de Last.fm restaurar desde esta copia de seguridad."},
 gnY(){return"Clave de API"},
 gnZ(){return"Clave secreta"},
 gus(){return"Incluir carpetas"},
 gur(){return"Incluye sus carpetas de canciones y su contenido."},
 gut(){return"Incluir las claves en el archivo exportado"},
 guw(){return"Exportar temas"},
-guv(){return"Te permite compartir solo el aspecto (colores, estilo) con otra persona."},
+guv(){return"Le permite compartir solo el aspecto (colores, estilo) con otra persona."},
 guh(){return"Copia de seguridad autom\xe1tica"},
 gu7(){return"Activar copia de seguridad autom\xe1tica"},
 gu6(){return"Guarda una copia de seguridad sola, en el intervalo elegido abajo."},
@@ -128566,13 +128566,13 @@ gyo(){return"Buscar en las noticias\u2026"},
 grU(){return"Bibliotecas de c\xf3digo abierto"},
 grV(){return"Todos los paquetes de Flutter usados para crear la app."},
 grS(){return"Licencia"},
-grT(){return"Este proyecto se publica bajo la licencia MIT: eres libre de usarlo, modificarlo, duplicarlo o redistribuirlo, solo c\xedtame."},
+grT(){return"Este proyecto se publica bajo la licencia MIT: es libre de usarlo, modificarlo, duplicarlo o redistribuirlo, solo c\xedteme."},
 grR(){return"Ver licencia completa"},
 gyf(){return"Las traducciones fueron generadas por IA y pueden contener imprecisiones."},
 grL(){return"La IA tambi\xe9n se us\xf3 para desarrollar esta app."},
 gyX(){return"Las notificaciones se ejecutan en segundo plano mediante WorkManager. La app no necesita estar abierta. Se requiere conexi\xf3n a internet."},
 gp_(){return"Cada X scrobbles"},
-gyD(){return"Recibe avisos a intervalos regulares"},
+gyD(){return"Reciba avisos a intervalos regulares"},
 gyJ(){return"Res\xfamenes de escucha"},
 gyy(){return"Total de scrobbles + artista favorito del d\xeda"},
 gyW(){return"Total de scrobbles + artista favorito de la semana"},
@@ -128582,14 +128582,14 @@ gyS(){return"Notificaciones de sincronizaci\xf3n"},
 gyR(){return"Avisa cuando termina una sincronizaci\xf3n del historial"},
 gyP(){return"Detalle del progreso"},
 gyO(){return"Mostrar el avance (a\xf1o actual, contador) durante la sincronizaci\xf3n"},
-gyG(){return"Recibe avisos de nuevas funciones, correcciones y anuncios"},
+gyG(){return"Reciba avisos de nuevas funciones, correcciones y anuncios"},
 gyv(){return"Insignia en el panel"},
 gyw(){return"Mostrar el punto rojo en la campana de novedades"},
 gyT(){return"Prueba"},
 gyI(){return"Notificaciones desactivadas"},
-gyH(){return"Concede el permiso para que LastStats pueda enviarte avisos."},
+gyH(){return"Conceda el permiso para que LastStats pueda enviarle avisos."},
 gyB(){return"Conceder permiso"},
-gyU(){return"Recibir\xe1s una notificaci\xf3n especial en cada uno de estos hitos:"},
+gyU(){return"Recibir\xe1 una notificaci\xf3n especial en cada uno de estos hitos:"},
 gyV(){return B.abz},
 gyC(){return"Enviar una notificaci\xf3n cada X scrobbles"},
 gyx(){return"Valor personalizado"},
@@ -128600,7 +128600,7 @@ gAA(){return B.ac5},
 gAz(){return"S"},
 gyL(){return"Enviar una notificaci\xf3n de prueba"},
 gyN(){return"\xa1Revise su barra de notificaciones!"},
-gyE(){return"Verifica que todo funcione."},
+gyE(){return"Verifique que todo funcione."},
 gyM(){return"\xa1Enviado!"},
 gyK(){return"Enviar"},
 gu3(){return"Estilo visual"},
@@ -128634,10 +128634,10 @@ tf(a){return"\xbfEliminar @"+a+" de sus cuentas?"},
 gnG(){return"Eliminar"},
 gt2(){return"Esta cuenta ya est\xe1 a\xf1adida o la lista est\xe1 llena."},
 t1(a){return"@"+a+" a\xf1adido correctamente."},
-gtb(){return"Se eliminar\xe1n todas las cuentas. Volver\xe1s a la pantalla de configuraci\xf3n."},
+gtb(){return"Se eliminar\xe1n todas las cuentas. Volver\xe1 a la pantalla de configuraci\xf3n."},
 te(a,b){return"Mis cuentas ("+a+"/"+b+")"},
 gt_(){return"Activa"},
-gtl(){return'Toca "Cambiar" para activar'},
+gtl(){return'Toque "Cambiar" para activar'},
 gtk(){return"Cambiar"},
 gnE(){return"A\xf1adir una cuenta"},
 tj(a){return""+a+" espacio(s) restante(s)"},
@@ -128666,7 +128666,7 @@ gvV(){return"\xc1lbumes \xfanicos"},
 gvP(){return"Esta semana"},
 gvo(){return"d"},
 gqO(){return"Activar favoritos (opcional)"},
-gqP(){return"Tu clave secreta permite marcar (o quitar) canciones como favoritas directamente en Last.fm."},
+gqP(){return"Su clave secreta permite marcar (o quitar) canciones como favoritas directamente en Last.fm."},
 gqX(){return"Clave secreta de Last.fm"},
 gxj(){return"La clave secreta debe tener 32 caracteres."},
 gxh(){return"Autorizar favoritos"},
@@ -128695,7 +128695,7 @@ goG(){return"T\xedtulo A-Z"},
 gxz(){return"Manual"},
 gme(){return"Nueva carpeta"},
 gxx(){return"Nombre de la carpeta"},
-gxq(){return"Elige un emoji"},
+gxq(){return"Elija un emoji"},
 gxp(){return"Solo un emoji, sin texto."},
 gxt(){return"Descripci\xf3n (opcional)"},
 gxy(){return"Escuchado recientemente"},
@@ -128717,7 +128717,7 @@ gwR(){return"No. Por ahora no hay una versi\xf3n para iOS prevista."},
 gx7(){return"\xbfLa app funciona en macOS u otras plataformas?"},
 gwS(){return"LastStats se desarrolla y prueba en Android. El funcionamiento en otras plataformas (macOS, Windows, Linux\u2026) no est\xe1 verificado, pueden producirse errores o comportamientos inesperados."},
 gx8(){return"\xbfLastStats es de c\xf3digo abierto?"},
-gwT(){return"\xa1S\xed! El c\xf3digo fuente est\xe1 disponible libremente en GitHub. El proyecto es independiente, hecho con pasi\xf3n por SanoBld. Puedes contribuir, reportar errores o simplemente dejar una estrella \u2b50."},
+gwT(){return"\xa1S\xed! El c\xf3digo fuente est\xe1 disponible libremente en GitHub. El proyecto es independiente, hecho con pasi\xf3n por SanoBld. Puede contribuir, reportar errores o simplemente dejar una estrella \u2b50."},
 gx9(){return"\xbfD\xf3nde se almacenan mis datos?"},
 gwU(){return"Solo en su dispositivo. LastStats no tiene servidor: sus scrobbles se guardan en cach\xe9 localmente para un acceso r\xe1pido, y sus credenciales de Last.fm tambi\xe9n se almacenan localmente. No se env\xeda nada excepto a la API oficial de Last.fm."},
 gxa(){return"\xbfC\xf3mo activo los favoritos?"},
@@ -128783,17 +128783,17 @@ gpk(){return"Prom/d\xeda"},
 gpl(){return"Sin escuchas en este per\xedodo."},
 gAg(){return"Top 10"},
 gwo(){return"El filtro m\xe1s \xfatil primero"},
-gwn(){return"Seg\xfan la hora, el d\xeda y lo que m\xe1s usas"},
-gmb(){return"Para ti"},
+gwn(){return"Seg\xfan la hora, el d\xeda y lo que m\xe1s usa"},
+gmb(){return"Para usted"},
 gmc(){return"Tendencias globales"},
-gws(){return"Tu mix"},
+gws(){return"Su mix"},
 gwv(){return"Un d\xeda como hoy"},
 gwt(){return"Este mes"},
-gwu(){return"Tus g\xe9neros"},
+gwu(){return"Sus g\xe9neros"},
 gwq(){return"Joyas ocultas"},
 gwr(){return"Olvidadas"},
 gox(){return"\xc1lbumes"},
-gwp(){return"Tu pa\xeds"},
+gwp(){return"Su pa\xeds"},
 gww(){return"Canciones"},
 gwj(){return"Artistas"},
 gwx(){return"semana"},
@@ -128808,7 +128808,7 @@ gol(){return"Descubrir"},
 gvp(){return"Ideas de m\xfasica para deslizar"},
 gvI(){return"Ordenar"},
 gvJ(){return"Listo"},
-gvK(){return"Arrastra para cambiar el orden"},
+gvK(){return"Arrastre para cambiar el orden"},
 gvL(){return"El orden inteligente est\xe1 activado, as\xed que puede cambiar este orden seg\xfan el momento."},
 gvH(){return"En su propia fila"},
 m6(a){return"Filtros de \xab"+a+"\xbb"},
@@ -128876,15 +128876,15 @@ gy8(){return"Top albums"},
 gya(){return"Top titres"},
 gxZ(){return"titre"},
 ghl(){return B.a6A},
-w0(a){return B.a9N[A.hU(a)-1]+" "+A.bh(a)+" "+B.a7J[A.aN(a)]+" "+A.ao(a)},
+w0(a){return B.a9O[A.hU(a)-1]+" "+A.bh(a)+" "+B.a7J[A.aN(a)]+" "+A.ao(a)},
 gpD(){return"Recherche"},
 gmR(){return"Profils"},
 gpB(){return"Artiste, album, titre ou profil\u2026"},
-gpC(){return"Recherche un utilisateur Last.fm"},
-gpA(){return"Recherche un artiste"},
-gpz(){return"Recherche un album"},
-gmQ(){return"Recherche une chanson"},
-gpE(){return"Tape dans la barre ci-dessus"},
+gpC(){return"Recherchez un utilisateur Last.fm"},
+gpA(){return"Recherchez un artiste"},
+gpz(){return"Recherchez un album"},
+gmQ(){return"Recherchez une chanson"},
+gpE(){return"Tapez dans la barre ci-dessus"},
 gpy(){return"Tout"},
 gmO(){return"Dossiers"},
 gmP(){return"Cr\xe9ez un dossier pour ranger des titres, albums ou artistes."},
@@ -129005,7 +129005,7 @@ gwe(){return"Titres populaires"},
 gwd(){return"Albums populaires"},
 got(){return"Lire la suite"},
 gos(){return"R\xe9duire"},
-gwh(){return"tes \xe9coutes"},
+gwh(){return"vos \xe9coutes"},
 gw6(){return"\xe9coutes totales"},
 gwi(){return"classement"},
 gw5(){return"auditeurs"},
@@ -129039,7 +129039,7 @@ gz8(){return"Votre tableau de bord"},
 gz7(){return"Choisissez les sections \xe0 afficher."},
 gzI(){return"\xc9cran de d\xe9marrage"},
 gzH(){return"Quel onglet voir en premier ?"},
-gzz(){return"Vous \xe9coutes sur quoi ?"},
+gzz(){return"Vous \xe9coutez sur quoi ?"},
 gzy(){return"\xc7a permet de n'afficher que les liens utiles sur les fiches morceau/artiste/album."},
 gpd(){return"Last.fm"},
 gpe(){return"Spotify"},
@@ -129066,11 +129066,11 @@ gzw(){return"Fond noir pur en mode sombre"},
 gz2(){return"Couleur depuis la pochette"},
 gz1(){return"Adapter la couleur d'accent \xe0 la pochette en cours de lecture"},
 gp9(){return"Notifications d'actualit\xe9s"},
-gzq(){return"Sois notifi\xe9 des nouvelles fonctions et correctifs"},
+gzq(){return"Soyez notifi\xe9 des nouvelles fonctions et correctifs"},
 gzp(){return"Pastille d'actualit\xe9s"},
 gzo(){return"Point rouge sur la cloche du dashboard s'il y a du nouveau"},
 gp7(){return"Retour haptique"},
-gzl(){return"Ressens de l\xe9g\xe8res vibrations sur les interactions cl\xe9s"},
+gzl(){return"Ressentez de l\xe9g\xe8res vibrations sur les interactions cl\xe9s"},
 gzF(){return"R\xe9capitulatifs"},
 gp5(){return"R\xe9cap quotidien"},
 gz6(){return"Un r\xe9sum\xe9 de votre \xe9coute de la journ\xe9e"},
@@ -129173,13 +129173,13 @@ gnW(){return"Choisir un fichier de sauvegarde"},
 guq(){return"Sauvegarde enregistr\xe9e"},
 guo(){return"\xc9chec de l'enregistrement"},
 gqU(){return"Restaurer une sauvegarde"},
-gqV(){return"Retrouve votre compte et vos r\xe9glages depuis un fichier de sauvegarde .json"},
+gqV(){return"Retrouvez votre compte et vos r\xe9glages depuis un fichier de sauvegarde .json"},
 guz(){return"Restaurer les cl\xe9s API"},
-guy(){return"Choisis les cl\xe9s Last.fm \xe0 restaurer depuis cette sauvegarde."},
+guy(){return"Choisissez les cl\xe9s Last.fm \xe0 restaurer depuis cette sauvegarde."},
 gnY(){return"Cl\xe9 API"},
 gnZ(){return"Cl\xe9 secr\xe8te"},
 gus(){return"Inclure les dossiers"},
-gur(){return"Emporte vos dossiers de titres et leur contenu."},
+gur(){return"Emportez vos dossiers de titres et leur contenu."},
 gut(){return"Inclure les cl\xe9s dans le fichier export\xe9"},
 guw(){return"Exporter les th\xe8mes"},
 guv(){return"Permet de partager juste l'apparence (couleurs, style) avec quelqu'un d'autre."},
@@ -129238,13 +129238,13 @@ gn0(){return"Graphique du dashboard"},
 goh(){return"Calendrier musical"},
 goi(){return"Barres mensuelles"},
 gq6(){return"Nom personnalis\xe9"},
-gn3(){return"Comment voulez-vous qu'on t'appelle ?"},
-gn2(){return"Ex. Sano Bld \u2014 laisse vide pour utiliser votre nom de compte"},
+gn3(){return"Comment voulez-vous qu'on vous appelle ?"},
+gn2(){return"Ex. Sano Bld \u2014 laissez vide pour utiliser votre nom de compte"},
 gyo(){return"Rechercher dans les actualit\xe9s\u2026"},
 grU(){return"Biblioth\xe8ques open source"},
 grV(){return"Tous les packages Flutter utilis\xe9s pour construire l'app."},
 grS(){return"Licence"},
-grT(){return"Ce projet est publi\xe9 sous licence MIT : libre \xe0 vous de l'utiliser, le modifier, le dupliquer ou le redistribuer, tant que vous me cites."},
+grT(){return"Ce projet est publi\xe9 sous licence MIT : libre \xe0 vous de l'utiliser, le modifier, le dupliquer ou le redistribuer, tant que vous me citez."},
 grR(){return"Voir la licence compl\xe8te"},
 gyf(){return"Les traductions ont \xe9t\xe9 g\xe9n\xe9r\xe9es par IA et peuvent contenir des impr\xe9cisions."},
 grL(){return"L'IA a aussi \xe9t\xe9 utilis\xe9e pour le d\xe9veloppement de cette app."},
@@ -129312,7 +129312,7 @@ tf(a){return"Supprimer @"+a+" de vos comptes ?"},
 gnG(){return"Supprimer"},
 gt2(){return"Ce compte est d\xe9j\xe0 ajout\xe9 ou la liste est pleine."},
 t1(a){return"@"+a+" ajout\xe9 avec succ\xe8s."},
-gtb(){return"Tous les comptes seront supprim\xe9s, vous retourneras \xe0 l'\xe9cran de configuration."},
+gtb(){return"Tous les comptes seront supprim\xe9s, vous retournerez \xe0 l'\xe9cran de configuration."},
 te(a,b){return"Mes comptes ("+a+"/"+b+")"},
 gt_(){return"Actif"},
 gtl(){return'Touchez "Activer" pour basculer'},
@@ -129389,7 +129389,7 @@ gxw(){return"Aucun titre dans ce dossier"},
 gmE(){return"Toute l'ann\xe9e"},
 gv_(){return"g\xe9n\xe9r\xe9 le"},
 gx_(){return"LastStats scrobble-t-il ma musique ?"},
-gwM(){return"Non. LastStats se contente d\u2019afficher les scrobbles d\xe9j\xe0 enregistr\xe9s sur votre compte Last.fm, elle n\u2019en enregistre aucun elle-m\xeame.\n\nPour scrobbler automatiquement votre musique, il te faut une appli d\xe9di\xe9e comme Pano Scrobbler (sur Android)."},
+gwM(){return"Non. LastStats se contente d\u2019afficher les scrobbles d\xe9j\xe0 enregistr\xe9s sur votre compte Last.fm, elle n\u2019en enregistre aucun elle-m\xeame.\n\nPour scrobbler automatiquement votre musique, il vous faut une appli d\xe9di\xe9e comme Pano Scrobbler (sur Android)."},
 gx6(){return"Une version iOS est-elle pr\xe9vue ?"},
 gwR(){return"Non, pas pour le moment. Si la demande devient suffisamment forte, ce sera reconsid\xe9r\xe9."},
 gx7(){return"L\u2019application fonctionne-t-elle sur macOS ou d\u2019autres plateformes ?"},
@@ -129461,17 +129461,17 @@ gpk(){return"Moy/jour"},
 gpl(){return"Aucune \xe9coute pour cette p\xe9riode."},
 gAg(){return"Top 10"},
 gwo(){return"Filtre le plus utile en premier"},
-gwn(){return"Selon l'heure, le jour et ce que tu \xe9coutes le plus"},
-gmb(){return"Pour toi"},
+gwn(){return"Selon l'heure, le jour et ce que vous \xe9coutez le plus"},
+gmb(){return"Pour vous"},
 gmc(){return"Tendances mondiales"},
-gws(){return"Ton mix"},
+gws(){return"Votre mix"},
 gwv(){return"Ce jour-l\xe0"},
 gwt(){return"Ce mois-ci"},
-gwu(){return"Tes genres"},
+gwu(){return"Vos genres"},
 gwq(){return"Titres cach\xe9s"},
 gwr(){return"Oubli\xe9s"},
 gox(){return"Albums"},
-gwp(){return"Ton pays"},
+gwp(){return"Votre pays"},
 gww(){return"Titres"},
 gwj(){return"Artistes"},
 gwx(){return"semaine"},
@@ -129486,7 +129486,7 @@ gol(){return"D\xe9couvrir"},
 gvp(){return"Des id\xe9es de musique \xe0 faire d\xe9filer"},
 gvI(){return"Trier"},
 gvJ(){return"Termin\xe9"},
-gvK(){return"Glisse pour changer l'ordre"},
+gvK(){return"Glissez pour changer l'ordre"},
 gvL(){return"Le tri intelligent est activ\xe9, il peut donc changer cet ordre selon le moment."},
 gvH(){return"Sur sa propre ligne"},
 m6(a){return"Filtres de \xab "+a+" \xbb"},
@@ -129518,7 +129518,7 @@ guM(){return"L'intera cronologia verr\xe0 eliminata e riscaricata al prossimo av
 guL(){return"Cancellare tutta la cache?"},
 guK(){return"Immagini, dati API e cronologia scrobble verranno tutti eliminati."},
 guO(){return"Elimina"},
-guR(){return"Mostra dati salvati quando sei offline"},
+guR(){return"Mostra dati salvati quando \xe8 offline"},
 guQ(){return"I dati scaduti vengono comunque mostrati se non c'\xe8 connessione."},
 gm0(){return"Artisti"},
 gl2(){return"Album"},
@@ -129557,10 +129557,10 @@ gpC(){return"Trova un utente Last.fm"},
 gpA(){return"Trova un artista"},
 gpz(){return"Trova un album"},
 gmQ(){return"Trova un brano"},
-gpE(){return"Digita nella barra di ricerca sopra"},
+gpE(){return"Digiti nella barra di ricerca sopra"},
 gpy(){return"Tutti"},
 gmO(){return"Cartelle"},
-gmP(){return"Crea una cartella per salvare brani, album o artisti."},
+gmP(){return"Crei una cartella per salvare brani, album o artisti."},
 gzZ(){return"al giorno"},
 gtD(){return"di attivit\xe0"},
 gvN(){return"Statistiche"},
@@ -129600,7 +129600,7 @@ gqp(){return"Usa il colore dello sfondo Android"},
 gqq(){return"Colore dalla musica"},
 gqt(){return"Estrae il colore dalla copertina dell'album attuale"},
 gqs(){return"Il colore dominante della copertina attuale sostituisce l'accento."},
-gqr(){return"Disattiva prima Material You"},
+gqr(){return"Disattivi prima Material You"},
 gnb(){return"Pagina di avvio"},
 gnc(){return"Scheda all'avvio"},
 gn1(){return"Panoramica"},
@@ -129644,7 +129644,7 @@ gqz(){return"github.com/SanoBld/LastStats-App"},
 gkM(){return"Lingua"},
 gpF(){return"LastStats \xe8 un progetto open-source personale. Potrebbe contenere bug."},
 gmU(){return"Sostieni il progetto"},
-gpG(){return"\u2b50 Lascia una stella su GitHub"},
+gpG(){return"\u2b50 Lasci una stella su GitHub"},
 gn6(){return"FAQ"},
 gxO(){return"In riproduzione"},
 gxV(){return"Brano n. 1"},
@@ -129675,7 +129675,7 @@ gwe(){return"Brani popolari"},
 gwd(){return"Album popolari"},
 got(){return"Leggi di pi\xf9"},
 gos(){return"Mostra meno"},
-gwh(){return"i tuoi ascolti"},
+gwh(){return"i suoi ascolti"},
 gw6(){return"riproduzioni totali"},
 gwi(){return"posizione"},
 gw5(){return"ascoltatori"},
@@ -129698,18 +129698,18 @@ gz_(){return"Tema, colore accento e Material You."},
 gzv(){return"Resta aggiornato"},
 gzu(){return"Notifiche e vibrazioni."},
 gzi(){return"I suoi profili preferiti"},
-gzh(){return"Aggiungi amici Last.fm per trovarli rapidamente."},
+gzh(){return"Aggiunga amici Last.fm per trovarli rapidamente."},
 gzb(){return"Nessun preferito ancora"},
-gzf(){return"Cerca un profilo Last.fm\u2026"},
+gzf(){return"Cerchi un profilo Last.fm\u2026"},
 gze(){return"Nessun profilo trovato"},
 gzc(){return"I suoi amici Last.fm"},
 gzd(){return"Nessun amico trovato su questo account"},
 gzg(){return"Preferiti selezionati"},
 gz8(){return"La sua panoramica"},
-gz7(){return"Scegli quali sezioni mostrare."},
+gz7(){return"Scelga quali sezioni mostrare."},
 gzI(){return"Schermata di avvio"},
 gzH(){return"Quale scheda vuole vedere per prima?"},
-gzz(){return"Su cosa ascolti musica?"},
+gzz(){return"Su cosa ascolta musica?"},
 gzy(){return"Mostra solo i link utili sulle pagine di brani/artisti/album."},
 gpd(){return"Last.fm"},
 gpe(){return"Spotify"},
@@ -129736,7 +129736,7 @@ gzw(){return"Sfondo nero puro in modalit\xe0 scura"},
 gz2(){return"Colore dalla copertina"},
 gz1(){return"Adatta il colore accento alla copertina in riproduzione"},
 gp9(){return"Notifiche novit\xe0"},
-gzq(){return"Ricevi notifiche su nuove funzionalit\xe0 e correzioni"},
+gzq(){return"Riceva notifiche su nuove funzionalit\xe0 e correzioni"},
 gzp(){return"Puntino novit\xe0"},
 gzo(){return"Puntino rosso sulla campanella quando ci sono novit\xe0"},
 gp7(){return"Feedback aptico"},
@@ -129756,7 +129756,7 @@ gz5(){return"Aggiornamenti beta"},
 gz4(){return u.C},
 gyA(){return"Apri link"},
 gpY(){return"Ricerca aggiornamenti\u2026"},
-gqC(){return"Tocca per scaricare"},
+gqC(){return"Tocchi per scaricare"},
 gqZ(){return"Le sue statistiche Last.fm, reinventate."},
 gqJ(){return"Analizza un profilo"},
 gqN(){return"Connessione in corso\u2026"},
@@ -129770,7 +129770,7 @@ gqT(){return"Ricordami"},
 gqQ(){return"Ottieni una chiave API gratuita"},
 gr1(){return"Benvenuto su LastStats!"},
 gqR(){return"Importazione unica, i prossimi avvii saranno istantanei."},
-gvO(){return"Tocca per scaricare."},
+gvO(){return"Tocchi per scaricare."},
 gvZ(){return"QUESTA SETTIMANA"},
 gvx(){return"QUESTO MESE"},
 gw_(){return"QUEST'ANNO"},
@@ -129837,7 +129837,7 @@ guo(){return"Impossibile salvare il file"},
 gqU(){return"Ripristina un backup"},
 gqV(){return"Recupera il suo account e le impostazioni da un file di backup .json"},
 guz(){return"Ripristina chiavi API"},
-guy(){return"Scegli quali chiavi Last.fm ripristinare da questo backup."},
+guy(){return"Scelga quali chiavi Last.fm ripristinare da questo backup."},
 gnY(){return"Chiave API"},
 gnZ(){return"Chiave segreta"},
 gus(){return"Includi cartelle"},
@@ -129902,17 +129902,17 @@ goi(){return"Barre mensili"},
 gq6(){return"Nome personalizzato"},
 gn3(){return"Come vuole essere chiamato?"},
 gn2(){return"Es. Sano Bld \u2014 lascia vuoto per usare il nome dell'account"},
-gyo(){return"Cerca nelle novit\xe0\u2026"},
+gyo(){return"Cerchi nelle novit\xe0\u2026"},
 grU(){return"Librerie open source"},
 grV(){return"Tutti i pacchetti Flutter usati per creare l'app."},
 grS(){return"Licenza"},
-grT(){return"Questo progetto \xe8 pubblicato con licenza MIT: sei libero di usarlo, modificarlo, duplicarlo o ridistribuirlo, basta citarmi."},
+grT(){return"Questo progetto \xe8 pubblicato con licenza MIT: \xe8 libero di usarlo, modificarlo, duplicarlo o ridistribuirlo, basta citarmi."},
 grR(){return"Vedi la licenza completa"},
 gyf(){return"Le traduzioni sono state generate dall'IA e potrebbero contenere imprecisioni."},
 grL(){return"L'IA \xe8 stata usata anche per sviluppare questa app."},
 gyX(){return"Le notifiche vengono eseguite in background tramite WorkManager. L'app non deve essere aperta. \xc8 richiesta una connessione a internet."},
 gp_(){return"Ogni X scrobble"},
-gyD(){return"Ricevi notifiche a intervalli regolari"},
+gyD(){return"Riceva notifiche a intervalli regolari"},
 gyJ(){return"Riepiloghi d'ascolto"},
 gyy(){return"Numero di scrobble + artista principale del giorno"},
 gyW(){return"Numero di scrobble + artista principale della settimana"},
@@ -129922,21 +129922,21 @@ gyS(){return"Notifiche di sincronizzazione"},
 gyR(){return"Avvisa quando termina una sincronizzazione della cronologia"},
 gyP(){return"Dettaglio avanzamento"},
 gyO(){return"Mostra l'avanzamento in tempo reale (anno corrente, contatore) durante la sincronizzazione"},
-gyG(){return"Ricevi notifiche su nuove funzionalit\xe0, correzioni e annunci"},
+gyG(){return"Riceva notifiche su nuove funzionalit\xe0, correzioni e annunci"},
 gyv(){return"Badge sulla panoramica"},
 gyw(){return"Mostra il puntino non letto sull'icona della campanella"},
 gyT(){return"Test"},
 gyI(){return"Notifiche disattivate"},
-gyH(){return"Concedi il permesso affinch\xe9 LastStats possa inviarti avvisi."},
+gyH(){return"Conceda il permesso affinch\xe9 LastStats possa inviarle avvisi."},
 gyB(){return"Concedi permesso"},
-gyU(){return"Riceverai una notifica speciale a ciascuno di questi traguardi:"},
+gyU(){return"Ricever\xe0 una notifica speciale a ciascuno di questi traguardi:"},
 gyC(){return"Invia una notifica ogni X scrobble"},
 gyx(){return"Valore personalizzato"},
 gp0(){return"Notifica alle"},
 gyz(){return"Giorno della settimana"},
 gyL(){return"Invia una notifica di prova"},
-gyN(){return"Controlla la barra delle notifiche!"},
-gyE(){return"Assicurati che tutto funzioni."},
+gyN(){return"Controlli la barra delle notifiche!"},
+gyE(){return"Si assicuri che tutto funzioni."},
 gyM(){return"Inviata!"},
 gyK(){return"Invia"},
 gu3(){return"Stile visivo"},
@@ -129970,7 +129970,7 @@ gnG(){return"Rimuovi"},
 gt2(){return"Questo account \xe8 gi\xe0 stato aggiunto oppure l'elenco \xe8 pieno."},
 gtb(){return"Tutti gli account verranno rimossi. Tornerai alla schermata di configurazione."},
 gt_(){return"Attivo"},
-gtl(){return'Tocca "Cambia" per attivare'},
+gtl(){return'Tocchi "Cambia" per attivare'},
 gtk(){return"Cambia"},
 gnE(){return"Aggiungi un account"},
 gt3(){return"Ogni account pu\xf2 usare una chiave API diversa o la stessa. Pu\xf2 trovare la sua chiave API su last.fm/api/accounts."},
@@ -130001,10 +130001,10 @@ gqP(){return"La sua chiave segreta permette all'app di aggiungere (o rimuovere) 
 gqX(){return"Chiave segreta Last.fm"},
 gxj(){return"La chiave segreta deve avere 32 caratteri."},
 gxh(){return"Autorizza i preferiti"},
-gxf(){return"Autorizza l'app nella pagina Last.fm aperta nel browser, poi torna qui per confermare."},
+gxf(){return"Autorizzi l'app nella pagina Last.fm aperta nel browser, poi torni qui per confermare."},
 gxg(){return"Ho autorizzato"},
 gxk(){return"Preferiti attivati con successo!"},
-gxi(){return"Impossibile attivare i preferiti. Controlla la chiave segreta."},
+gxi(){return"Impossibile attivare i preferiti. Controlli la chiave segreta."},
 gt5(){return"Chiavi API"},
 gnH(){return"Chiave segreta"},
 gti(){return"Non impostata"},
@@ -130013,11 +130013,11 @@ gt6(){return"Attiva preferiti"},
 gt8(){return"Disattiva preferiti"},
 gq9(){return"Preferiti"},
 gqa(){return"Mostra il numero di preferiti nelle statistiche"},
-gq8(){return"Aggiungi la chiave segreta in Account per attivare"},
+gq8(){return"Aggiunga la chiave segreta in Account per attivare"},
 goC(){return"Preferiti"},
 go9(){return"Vedi altro"},
 gxA(){return"I miei preferiti"},
-gxB(){return"Cerca un brano o un artista"},
+gxB(){return"Cerchi un brano o un artista"},
 gxl(){return"Ancora nessun preferito."},
 goF(){return"Recenti"},
 goE(){return"Meno recenti"},
@@ -130082,7 +130082,7 @@ y3(a){return""+a+" scrobble"},
 xX(a){return""+a+" artisti"},
 xW(a){return""+a+" album"},
 ghl(){return B.a8x},
-w0(a){return B.aap[A.hU(a)-1]+" "+A.bh(a)+" "+B.ab3[A.aN(a)]+" "+A.ao(a)},
+w0(a){return B.aaq[A.hU(a)-1]+" "+A.bh(a)+" "+B.ab4[A.aN(a)]+" "+A.ao(a)},
 ms(a){return"Membro dal "+a},
 qF(a){return"v"+a+" disponibile"},
 ng(a){return"Aggiornamento v"+a},
@@ -130099,8 +130099,8 @@ t1(a){return"@"+a+" aggiunto con successo."},
 te(a,b){return"I miei account ("+a+"/"+b+")"},
 tj(a){return""+a+" posto/i rimanente/i"},
 td(a){return"Raggiunto il massimo di "+a+" account."},
-gpo(){return B.a9g},
-gAA(){return B.a99},
+gpo(){return B.a9h},
+gAA(){return B.a9a},
 gAz(){return"S"},
 gyV(){return B.a8s},
 glU(){return"Obiettivi"},
@@ -130139,17 +130139,17 @@ gpk(){return"Media/giorno"},
 gpl(){return"Nessun ascolto in questo periodo."},
 gAg(){return"Top 10"},
 gwo(){return"Il filtro pi\xf9 utile per primo"},
-gwn(){return"In base a ora, giorno e a ci\xf2 che usi di pi\xf9"},
-gmb(){return"Per te"},
+gwn(){return"In base a ora, giorno e a ci\xf2 che usa di pi\xf9"},
+gmb(){return"Per lei"},
 gmc(){return"Tendenze globali"},
-gws(){return"Il tuo mix"},
+gws(){return"Il suo mix"},
 gwv(){return"In questo giorno"},
 gwt(){return"Questo mese"},
-gwu(){return"I tuoi generi"},
+gwu(){return"I suoi generi"},
 gwq(){return"Perle nascoste"},
 gwr(){return"Dimenticate"},
 gox(){return"Album"},
-gwp(){return"Il tuo paese"},
+gwp(){return"Il suo paese"},
 gww(){return"Brani"},
 gwj(){return"Artisti"},
 gwx(){return"settimana"},
@@ -130164,7 +130164,7 @@ gol(){return"Scopri"},
 gvp(){return"Idee musicali da scorrere"},
 gvI(){return"Ordina"},
 gvJ(){return"Fatto"},
-gvK(){return"Trascina per cambiare l'ordine"},
+gvK(){return"Trascini per cambiare l'ordine"},
 gvL(){return"L'ordine intelligente \xe8 attivo, quindi pu\xf2 cambiare questa sequenza in base al momento."},
 gvH(){return"Su una riga a parte"},
 m6(a){return"Filtri di \xab"+a+"\xbb"},
@@ -130909,7 +130909,7 @@ gy8(){return"Top \xe1lbuns"},
 gya(){return"Top faixas"},
 gxZ(){return"faixa"},
 ghl(){return B.abG},
-w0(a){return B.a7N[A.hU(a)-1]+", "+A.bh(a)+" de "+B.a94[A.aN(a)]+" de "+A.ao(a)},
+w0(a){return B.a7N[A.hU(a)-1]+", "+A.bh(a)+" de "+B.a95[A.aN(a)]+" de "+A.ao(a)},
 gpD(){return"Buscar"},
 gmR(){return"Perfis"},
 gpB(){return"Artista, \xe1lbum, faixa ou perfil\u2026"},
@@ -131201,7 +131201,7 @@ gAw(){return"Vers\xe3o atual"},
 gAv(){return"Atualiza\xe7\xf5es beta"},
 gAu(){return"Tenha acesso antecipado \xe0s vers\xf5es pr\xe9-lan\xe7adas"},
 guF(){return"O que est\xe1 inclu\xeddo"},
-gum(){return"Baixa um arquivo .json"},
+gum(){return"Baixe um arquivo .json"},
 gnW(){return"Escolher um arquivo de backup"},
 guq(){return"Backup salvo"},
 guo(){return"Falha ao salvar o arquivo"},
@@ -131271,7 +131271,7 @@ gn0(){return"Gr\xe1fico do painel"},
 goh(){return"Calend\xe1rio de escuta"},
 goi(){return"Barras mensais"},
 gq6(){return"Nome personalizado"},
-gn3(){return"Como devemos te chamar?"},
+gn3(){return"Como devemos chamar voc\xea?"},
 gn2(){return"Ex. Sano Bld \u2014 deixe vazio para usar o nome da conta"},
 gyo(){return"Pesquisar nas novidades\u2026"},
 grU(){return"Bibliotecas de c\xf3digo aberto"},
@@ -131406,7 +131406,7 @@ goG(){return"T\xedtulo A-Z"},
 gxz(){return"Manual"},
 gme(){return"Nova pasta"},
 gxx(){return"Nome da pasta"},
-gxq(){return"Escolhe um emoji"},
+gxq(){return"Escolha um emoji"},
 gxp(){return"Apenas um emoji, sem texto."},
 gxt(){return"Descri\xe7\xe3o (opcional)"},
 gxy(){return"Ouvidas recentemente"},
@@ -131708,7 +131708,7 @@ gwe(){return"\u041f\u043e\u043f\u0443\u043b\u044f\u0440\u043d\u044b\u0435 \u0442
 gwd(){return"\u041f\u043e\u043f\u0443\u043b\u044f\u0440\u043d\u044b\u0435 \u0430\u043b\u044c\u0431\u043e\u043c\u044b"},
 got(){return"\u0427\u0438\u0442\u0430\u0442\u044c \u0434\u0430\u043b\u0435\u0435"},
 gos(){return"\u0421\u0432\u0435\u0440\u043d\u0443\u0442\u044c"},
-gwh(){return"\u0442\u0432\u043e\u0438 \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u044f"},
+gwh(){return"\u0432\u0430\u0448\u0438 \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u044f"},
 gw6(){return"\u0432\u0441\u0435\u0433\u043e \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u0439"},
 gwi(){return"\u043c\u0435\u0441\u0442\u043e"},
 gw5(){return"\u0441\u043b\u0443\u0448\u0430\u0442\u0435\u043b\u0435\u0439"},
@@ -132334,7 +132334,7 @@ gqG(){return"\u663e\u793a\u7684\u677f\u5757"},
 gqw(){return"\u6b63\u5728\u64ad\u653e"},
 gqA(){return"\u7edf\u8ba1"},
 gqb(){return"\u597d\u53cb"},
-gqc(){return"\u4f60\u7684 Last.fm \u597d\u53cb\u52a8\u6001"},
+gqc(){return"\u60a8\u7684 Last.fm \u597d\u53cb\u52a8\u6001"},
 glB(){return"\u8d26\u53f7"},
 gmY(){return"\u5df2\u8fde\u63a5\u7684 Last.fm \u8d26\u53f7"},
 gql(){return"\u9000\u51fa\u767b\u5f55"},
@@ -132394,7 +132394,7 @@ gwe(){return"\u70ed\u95e8\u6b4c\u66f2"},
 gwd(){return"\u70ed\u95e8\u4e13\u8f91"},
 got(){return"\u5c55\u5f00"},
 gos(){return"\u6536\u8d77"},
-gwh(){return"\u4f60\u7684\u64ad\u653e\u6b21\u6570"},
+gwh(){return"\u60a8\u7684\u64ad\u653e\u6b21\u6570"},
 gw6(){return"\u603b\u64ad\u653e\u6b21\u6570"},
 gwi(){return"\u6392\u540d"},
 gw5(){return"\u542c\u4f17"},
@@ -132412,24 +132412,24 @@ gzG(){return"\u8df3\u8fc7"},
 gzr(){return"\u4e0b\u4e00\u6b65"},
 gzj(){return"\u5b8c\u6210"},
 gz3(){return"\u8fd4\u56de"},
-gz0(){return"\u81ea\u5b9a\u4e49\u4f60\u7684\u98ce\u683c"},
+gz0(){return"\u81ea\u5b9a\u4e49\u60a8\u7684\u98ce\u683c"},
 gz_(){return"\u4e3b\u9898\u3001\u5f3a\u8c03\u8272\u548c Material You\u3002"},
 gzv(){return"\u53ca\u65f6\u83b7\u77e5\u52a8\u6001"},
 gzu(){return"\u901a\u77e5\u4e0e\u9707\u52a8\u3002"},
-gzi(){return"\u4f60\u7684\u6536\u85cf\u7528\u6237"},
+gzi(){return"\u60a8\u7684\u6536\u85cf\u7528\u6237"},
 gzh(){return"\u6dfb\u52a0 Last.fm \u597d\u53cb\u4ee5\u4fbf\u5feb\u901f\u67e5\u770b\u3002"},
 gzb(){return"\u6682\u65e0\u6536\u85cf"},
 gzf(){return"\u641c\u7d22 Last.fm \u7528\u6237\u2026"},
 gze(){return"\u672a\u627e\u5230\u76f8\u5173\u7528\u6237"},
-gzc(){return"\u4f60\u7684 Last.fm \u597d\u53cb"},
+gzc(){return"\u60a8\u7684 Last.fm \u597d\u53cb"},
 gzd(){return"\u8be5\u8d26\u53f7\u6ca1\u6709\u597d\u53cb"},
 gzg(){return"\u5df2\u9009\u6536\u85cf"},
-gz8(){return"\u4f60\u7684\u4eea\u8868\u76d8"},
+gz8(){return"\u60a8\u7684\u4eea\u8868\u76d8"},
 gz7(){return"\u9009\u62e9\u8981\u663e\u793a\u7684\u677f\u5757\u3002"},
 gzI(){return"\u542f\u52a8\u754c\u9762"},
-gzH(){return"\u4f60\u60f3\u5148\u770b\u5230\u54ea\u4e2a\u6807\u7b7e\u9875\uff1f"},
-gzz(){return"\u4f60\u5728\u54ea\u91cc\u542c\u97f3\u4e50\uff1f"},
-gzy(){return"\u8fd9\u6837\u8be6\u60c5\u9875\u53ea\u663e\u793a\u5bf9\u4f60\u6709\u7528\u7684\u94fe\u63a5\u3002"},
+gzH(){return"\u60a8\u60f3\u5148\u770b\u5230\u54ea\u4e2a\u6807\u7b7e\u9875\uff1f"},
+gzz(){return"\u60a8\u5728\u54ea\u91cc\u542c\u97f3\u4e50\uff1f"},
+gzy(){return"\u8fd9\u6837\u8be6\u60c5\u9875\u53ea\u663e\u793a\u5bf9\u60a8\u6709\u7528\u7684\u94fe\u63a5\u3002"},
 gpd(){return"Last.fm"},
 gpe(){return"Spotify"},
 gpf(){return"YouTube Music"},
@@ -132462,21 +132462,21 @@ gp7(){return"\u89e6\u611f\u53cd\u9988"},
 gzl(){return"\u5728\u5173\u952e\u64cd\u4f5c\u65f6\u611f\u53d7\u8f7b\u5fae\u632f\u52a8"},
 gzF(){return"\u6c47\u603b"},
 gp5(){return"\u6bcf\u65e5\u6c47\u603b"},
-gz6(){return"\u4f60\u5f53\u5929\u6536\u542c\u60c5\u51b5\u7684\u7b80\u8981\u6c47\u603b"},
+gz6(){return"\u60a8\u5f53\u5929\u6536\u542c\u60c5\u51b5\u7684\u7b80\u8981\u6c47\u603b"},
 gpa(){return"\u6bcf\u5468\u6c47\u603b"},
-gzO(){return"\u4f60\u672c\u5468\u7684\u70ed\u95e8\u827a\u672f\u5bb6\u3001\u4e13\u8f91\u548c\u6b4c\u66f2"},
+gzO(){return"\u60a8\u672c\u5468\u7684\u70ed\u95e8\u827a\u672f\u5bb6\u3001\u4e13\u8f91\u548c\u6b4c\u66f2"},
 gp8(){return"Scrobble \u91cc\u7a0b\u7891"},
 gzn(){return"\u91cc\u7a0b\u7891"},
 gzm(){return"\u5e86\u795d\u6574\u6570\u7684 scrobble \u6b21\u6570"},
 gp6(){return"\u91cd\u5927\u91cc\u7a0b\u7891"},
 gzk(){return"\u4e3a\u91cd\u5927\u91cc\u7a0b\u7891\u732e\u4e0a\u7279\u522b\u5e86\u795d"},
-gza(){return"\u4f7f\u7528\u4f60\u7684\u58c1\u7eb8\u989c\u8272\uff08Android 12+\uff09"},
+gza(){return"\u4f7f\u7528\u60a8\u7684\u58c1\u7eb8\u989c\u8272\uff08Android 12+\uff09"},
 gz5(){return"\u6d4b\u8bd5\u7248\u66f4\u65b0"},
 gz4(){return"\u62a2\u5148\u4f53\u9a8c\u9884\u53d1\u5e03\u7248\u672c"},
 gyA(){return"\u6253\u5f00\u94fe\u63a5"},
 gpY(){return"\u6b63\u5728\u68c0\u67e5\u66f4\u65b0\u2026"},
 gqC(){return"\u70b9\u51fb\u4e0b\u8f7d"},
-gqZ(){return"\u4f60\u7684 Last.fm \u7edf\u8ba1\uff0c\u7115\u7136\u4e00\u65b0\u3002"},
+gqZ(){return"\u60a8\u7684 Last.fm \u7edf\u8ba1\uff0c\u7115\u7136\u4e00\u65b0\u3002"},
 gqJ(){return"\u5206\u6790\u4e00\u4e2a\u8d26\u53f7"},
 gqN(){return"\u8fde\u63a5\u4e2d\u2026"},
 gqY(){return"\u5f00\u59cb\u5206\u6790"},
@@ -132518,14 +132518,14 @@ gqB(){return"\u540c\u6b65"},
 gpU(){return"\u540e\u53f0\u81ea\u52a8\u540c\u6b65 scrobble \u8bb0\u5f55"},
 gpM(){return"\u5df2\u8fde\u63a5\u7684 Last.fm \u8d26\u53f7\uff0c\u9000\u51fa\u767b\u5f55"},
 gpP(){return"\u5386\u53f2\u8bb0\u5f55\u3001\u56fe\u7247\u3001API \u6570\u636e"},
-gpO(){return"\u5bfc\u51fa\u548c\u6062\u590d\u4f60\u7684\u8bbe\u7f6e"},
+gpO(){return"\u5bfc\u51fa\u548c\u6062\u590d\u60a8\u7684\u8bbe\u7f6e"},
 gpV(){return"\u68c0\u67e5\u65b0\u7248\u672c"},
 gpL(){return"\u7248\u672c\u3001\u6e90\u4ee3\u7801\u3001\u9e23\u8c22"},
 gpR(){return"Scrobbling\u3001\u5e73\u53f0\u3001\u5f00\u6e90"},
 gqx(){return"\u90e8\u5206\u8bbe\u7f6e\u9700\u8981\u91cd\u542f\u5e94\u7528\u624d\u80fd\u5b8c\u5168\u751f\u6548\u3002"},
 grq(){return"Scrobble \u540c\u6b65"},
 gnl(){return"\u81ea\u52a8\u540c\u6b65"},
-grf(){return"\u6309\u56fa\u5b9a\u95f4\u9694\u5728\u540e\u53f0\u540c\u6b65\u4f60\u7684\u5386\u53f2\u8bb0\u5f55"},
+grf(){return"\u6309\u56fa\u5b9a\u95f4\u9694\u5728\u540e\u53f0\u540c\u6b65\u60a8\u7684\u5386\u53f2\u8bb0\u5f55"},
 gri(){return"\u9891\u7387"},
 rh(a){return"\u6bcf "+a+" \u5c0f\u65f6"},
 grg(){return"\u6bcf\u5929\u4e00\u6b21"},
@@ -132546,7 +132546,7 @@ gzS(){return"\u5e95\u90e8\u5bfc\u822a\u680f"},
 gzT(){return"\u5bbd\u5c4f\uff08\u2265 720 dp\uff09\u4f7f\u7528\u4fa7\u8fb9\u680f\uff0c\u7a84\u5c4f\u4f7f\u7528\u5e95\u90e8\u5bfc\u822a\u680f\u3002"},
 gzV(){return"\u59cb\u7ec8\u4f7f\u7528\u4fa7\u8fb9\u5bfc\u822a\u680f\uff0c\u65e0\u8bba\u5c4f\u5e55\u5c3a\u5bf8\u3002"},
 gzU(){return"\u59cb\u7ec8\u4f7f\u7528\u5e95\u90e8\u5bfc\u822a\u680f\uff0c\u65e0\u8bba\u5c4f\u5e55\u5c3a\u5bf8\u3002"},
-grZ(){return"\u4f60\u7684 Last.fm \u7edf\u8ba1\u4f34\u4fa3"},
+grZ(){return"\u60a8\u7684 Last.fm \u7edf\u8ba1\u4f34\u4fa3"},
 grM(){return"\u5e94\u7528\u4fe1\u606f"},
 grW(){return"\u6280\u672f\u652f\u6301"},
 grQ(){return"\u827a\u672f\u5bb6\u3001\u4e13\u8f91\u548c\u6b4c\u66f2\u7684\u56fe\u7247\u4f1a\u81ea\u52a8\u4ece\u8fd9\u4e9b\u6765\u6e90\u83b7\u53d6\uff0c\u6709\u65f6\u53ef\u80fd\u4e0d\u51c6\u786e\u6216\u4e0e\u5b9e\u9645\u5185\u5bb9\u4e0d\u7b26\u3002"},
@@ -132561,13 +132561,13 @@ gnW(){return"\u9009\u62e9\u5907\u4efd\u6587\u4ef6"},
 guq(){return"\u5907\u4efd\u5df2\u4fdd\u5b58"},
 guo(){return"\u4fdd\u5b58\u5931\u8d25"},
 gqU(){return"\u6062\u590d\u5907\u4efd"},
-gqV(){return"\u4ece .json \u5907\u4efd\u6587\u4ef6\u6062\u590d\u4f60\u7684\u8d26\u53f7\u548c\u8bbe\u7f6e"},
+gqV(){return"\u4ece .json \u5907\u4efd\u6587\u4ef6\u6062\u590d\u60a8\u7684\u8d26\u53f7\u548c\u8bbe\u7f6e"},
 guz(){return"\u6062\u590d API \u5bc6\u94a5"},
 guy(){return"\u9009\u62e9\u8981\u4ece\u6b64\u5907\u4efd\u6062\u590d\u7684 Last.fm \u5bc6\u94a5\u3002"},
 gnY(){return"API \u5bc6\u94a5"},
 gnZ(){return"\u5bc6\u94a5"},
 gus(){return"\u5305\u542b\u6587\u4ef6\u5939"},
-gur(){return"\u5305\u542b\u4f60\u7684\u6b4c\u66f2\u6587\u4ef6\u5939\u53ca\u5176\u5185\u5bb9"},
+gur(){return"\u5305\u542b\u60a8\u7684\u6b4c\u66f2\u6587\u4ef6\u5939\u53ca\u5176\u5185\u5bb9"},
 gut(){return"\u5728\u5bfc\u51fa\u7684\u6587\u4ef6\u4e2d\u5305\u542b\u5bc6\u94a5"},
 guw(){return"\u5bfc\u51fa\u4e3b\u9898"},
 guv(){return"\u4ec5\u5c06\u5916\u89c2(\u989c\u8272\u3001\u6837\u5f0f)\u5206\u4eab\u7ed9\u5176\u4ed6\u4eba\u3002"},
@@ -132583,11 +132583,11 @@ gu9(){return"\u5907\u4efd\u6587\u4ef6\u5939"},
 gu8(){return"\u5e94\u7528\u9ed8\u8ba4\u6587\u4ef6\u5939"},
 ug(a){return"\u4e0b\u6b21\u5907\u4efd:"+a},
 glY(){return"\u5305\u542b\u5b8c\u6574\u5386\u53f2\u8bb0\u5f55"},
-guu(){return"\u6dfb\u52a0\u4f60\u4ece\u4e00\u5f00\u59cb\u64ad\u653e\u8fc7\u7684\u6240\u6709\u66f2\u76ee(\u6587\u4ef6\u53ef\u80fd\u4f1a\u5f88\u5927)\u3002"},
+guu(){return"\u6dfb\u52a0\u60a8\u4ece\u4e00\u5f00\u59cb\u64ad\u653e\u8fc7\u7684\u6240\u6709\u66f2\u76ee(\u6587\u4ef6\u53ef\u80fd\u4f1a\u5f88\u5927)\u3002"},
 go_(){return"\u8fd9\u53ef\u80fd\u9700\u8981\u4e00\u4e9b\u65f6\u95f4,\u6bd4\u666e\u901a\u5907\u4efd\u6162\u3002"},
 un(a){return"\u5907\u4efd\u4e8e "+a},
 guC(){return"\u5386\u53f2\u8bb0\u5f55\u51fa\u9519"},
-guB(){return"\u6b64\u6587\u4ef6\u4e2d\u7684\u90e8\u5206\u5e74\u4efd\u5386\u53f2\u8bb0\u5f55\u4f3c\u4e4e\u5df2\u635f\u574f\u3002\u4f60\u60f3\u600e\u4e48\u505a?"},
+guB(){return"\u6b64\u6587\u4ef6\u4e2d\u7684\u90e8\u5206\u5e74\u4efd\u5386\u53f2\u8bb0\u5f55\u4f3c\u4e4e\u5df2\u635f\u574f\u3002\u60a8\u60f3\u600e\u4e48\u505a?"},
 guD(){return"\u4ecd\u7136\u7ee7\u7eed"},
 guA(){return"\u53d6\u6d88\u5386\u53f2\u8bb0\u5f55"},
 guE(){return"\u8df3\u8fc7\u5e76\u91cd\u65b0\u5728\u7ebf\u4e0b\u8f7d"},
@@ -132599,7 +132599,7 @@ glX(){return"\u6ca1\u6709\u8bb0\u5f55\u5230\u9519\u8bef"},
 guj(){return"\u65e5\u5fd7\u5df2\u6e05\u7a7a"},
 gui(){return"\u6e05\u7a7a\u9519\u8bef\u65e5\u5fd7\uff1f"},
 gxe(){return"\u5e38\u89c1\u95ee\u9898"},
-gux(){return"\u6062\u590d\u5907\u4efd\u5c06\u8986\u76d6\u4f60\u5f53\u524d\u7684\u8bbe\u7f6e\u3002"},
+gux(){return"\u6062\u590d\u5907\u4efd\u5c06\u8986\u76d6\u60a8\u5f53\u524d\u7684\u8bbe\u7f6e\u3002"},
 gwZ(){return"LastStats \u662f\u4e00\u4e2a\u7531 SanoBld \u7528 \u2764\ufe0f \u6253\u9020\u7684\u514d\u8d39\u5f00\u6e90\u9879\u76ee\u3002"},
 guW(){return"\u5df2\u7528\u603b\u91cf"},
 guT(){return"\u5386\u53f2\u8bb0\u5f55"},
@@ -132626,13 +132626,13 @@ gn0(){return"\u4eea\u8868\u76d8\u56fe\u8868"},
 goh(){return"\u6536\u542c\u65e5\u5386"},
 goi(){return"\u6708\u5ea6\u67f1\u72b6\u56fe"},
 gq6(){return"\u81ea\u5b9a\u4e49\u540d\u79f0"},
-gn3(){return"\u6211\u4eec\u8be5\u600e\u4e48\u79f0\u547c\u4f60\uff1f"},
+gn3(){return"\u6211\u4eec\u8be5\u600e\u4e48\u79f0\u547c\u60a8\uff1f"},
 gn2(){return"\u4f8b\u5982 Sano Bld \u2014 \u7559\u7a7a\u5219\u4f7f\u7528\u8d26\u53f7\u540d\u79f0"},
 gyo(){return"\u641c\u7d22\u52a8\u6001\u2026"},
 grU(){return"\u5f00\u6e90\u5e93"},
 grV(){return"\u6784\u5efa\u6b64\u5e94\u7528\u6240\u4f7f\u7528\u7684\u6240\u6709 Flutter \u5305\u3002"},
 grS(){return"\u8bb8\u53ef\u8bc1"},
-grT(){return"\u672c\u9879\u76ee\u57fa\u4e8e MIT \u8bb8\u53ef\u8bc1\u53d1\u5e03\uff1a\u4f60\u53ef\u4ee5\u81ea\u7531\u4f7f\u7528\u3001\u4fee\u6539\u3001\u590d\u5236\u6216\u518d\u5206\u53d1\uff0c\u53ea\u9700\u6ce8\u660e\u51fa\u5904\u5373\u53ef\u3002"},
+grT(){return"\u672c\u9879\u76ee\u57fa\u4e8e MIT \u8bb8\u53ef\u8bc1\u53d1\u5e03\uff1a\u60a8\u53ef\u4ee5\u81ea\u7531\u4f7f\u7528\u3001\u4fee\u6539\u3001\u590d\u5236\u6216\u518d\u5206\u53d1\uff0c\u53ea\u9700\u6ce8\u660e\u51fa\u5904\u5373\u53ef\u3002"},
 grR(){return"\u67e5\u770b\u5b8c\u6574\u8bb8\u53ef\u8bc1"},
 gyf(){return"\u7ffb\u8bd1\u5185\u5bb9\u7531 AI \u751f\u6210\uff0c\u53ef\u80fd\u5b58\u5728\u4e0d\u51c6\u786e\u4e4b\u5904\u3002"},
 grL(){return"\u672c\u5e94\u7528\u7684\u5f00\u53d1\u4e5f\u4f7f\u7528\u4e86 AI\u3002"},
@@ -132653,10 +132653,10 @@ gyv(){return"\u4eea\u8868\u76d8\u4e0a\u7684\u5fbd\u7ae0"},
 gyw(){return"\u5728\u8d44\u8baf\u94c3\u94db\u56fe\u6807\u4e0a\u663e\u793a\u672a\u8bfb\u7ea2\u70b9"},
 gyT(){return"\u6d4b\u8bd5"},
 gyI(){return"\u901a\u77e5\u5df2\u7981\u7528"},
-gyH(){return"\u6388\u4e88\u6743\u9650\uff0c\u4ee5\u4fbf LastStats \u53ef\u4ee5\u5411\u4f60\u53d1\u9001\u63d0\u9192\u3002"},
+gyH(){return"\u6388\u4e88\u6743\u9650\uff0c\u4ee5\u4fbf LastStats \u53ef\u4ee5\u5411\u60a8\u53d1\u9001\u63d0\u9192\u3002"},
 gyB(){return"\u6388\u4e88\u6743\u9650"},
-gyU(){return"\u8fbe\u5230\u4ee5\u4e0b\u6bcf\u4e2a\u8282\u70b9\u65f6\uff0c\u4f60\u90fd\u4f1a\u6536\u5230\u4e00\u6761\u7279\u522b\u901a\u77e5\uff1a"},
-gyV(){return B.ab4},
+gyU(){return"\u8fbe\u5230\u4ee5\u4e0b\u6bcf\u4e2a\u8282\u70b9\u65f6\uff0c\u60a8\u90fd\u4f1a\u6536\u5230\u4e00\u6761\u7279\u522b\u901a\u77e5\uff1a"},
+gyV(){return B.a91},
 gyC(){return"\u6bcf X \u6b21 scrobble \u53d1\u9001\u4e00\u6b21\u901a\u77e5"},
 gyx(){return"\u81ea\u5b9a\u4e49\u6570\u503c"},
 gp0(){return"\u901a\u77e5\u65f6\u95f4"},
@@ -132665,7 +132665,7 @@ gpo(){return B.a7s},
 gAA(){return B.Bj},
 gAz(){return"\u5468"},
 gyL(){return"\u53d1\u9001\u6d4b\u8bd5\u901a\u77e5"},
-gyN(){return"\u770b\u770b\u4f60\u7684\u901a\u77e5\u680f\uff01"},
+gyN(){return"\u770b\u770b\u60a8\u7684\u901a\u77e5\u680f\uff01"},
 gyE(){return"\u786e\u8ba4\u4e00\u5207\u6b63\u5e38\u3002"},
 gyM(){return"\u5df2\u53d1\u9001\uff01"},
 gyK(){return"\u53d1\u9001"},
@@ -132696,11 +132696,11 @@ gu1(){return"\u5728\u5e95\u90e8\u5bfc\u822a\u680f\u56fe\u6807\u4e0b\u65b9\u663e\
 gnU(){return"\u4ea4\u4e92"},
 gtM(){return"\u70b9\u51fb\u3001\u9009\u62e9\u548c\u624b\u52bf\u65f6\u7684\u632f\u52a8\u53cd\u9988"},
 gtg(){return"\u5220\u9664\u8d26\u53f7\uff1f"},
-tf(a){return"\u4ece\u4f60\u7684\u8d26\u53f7\u4e2d\u5220\u9664 @"+a+"\uff1f"},
+tf(a){return"\u4ece\u60a8\u7684\u8d26\u53f7\u4e2d\u5220\u9664 @"+a+"\uff1f"},
 gnG(){return"\u5220\u9664"},
 gt2(){return"\u8be5\u8d26\u53f7\u5df2\u6dfb\u52a0\uff0c\u6216\u5217\u8868\u5df2\u6ee1\u3002"},
 t1(a){return"@"+a+" \u6dfb\u52a0\u6210\u529f\u3002"},
-gtb(){return"\u6240\u6709\u8d26\u53f7\u90fd\u5c06\u88ab\u5220\u9664\uff0c\u4f60\u5c06\u8fd4\u56de\u8bbe\u7f6e\u754c\u9762\u3002"},
+gtb(){return"\u6240\u6709\u8d26\u53f7\u90fd\u5c06\u88ab\u5220\u9664\uff0c\u60a8\u5c06\u8fd4\u56de\u8bbe\u7f6e\u754c\u9762\u3002"},
 te(a,b){return"\u6211\u7684\u8d26\u53f7 ("+a+"/"+b+")"},
 gt_(){return"\u5f53\u524d\u4f7f\u7528"},
 gtl(){return'\u70b9\u51fb"\u5207\u6362"\u4ee5\u6fc0\u6d3b'},
@@ -132708,7 +132708,7 @@ gtk(){return"\u5207\u6362"},
 gnE(){return"\u6dfb\u52a0\u8d26\u53f7"},
 tj(a){return"\u8fd8\u53ef\u6dfb\u52a0 "+a+" \u4e2a"},
 td(a){return"\u5df2\u8fbe\u5230\u6700\u591a "+a+" \u4e2a\u8d26\u53f7\u7684\u4e0a\u9650\u3002"},
-gt3(){return"\u6bcf\u4e2a\u8d26\u53f7\u53ef\u4ee5\u4f7f\u7528\u4e0d\u540c\u7684 API \u5bc6\u94a5\uff0c\u4e5f\u53ef\u4ee5\u5171\u7528\u540c\u4e00\u4e2a\u3002\u4f60\u53ef\u4ee5\u5728 last.fm/api/accounts \u627e\u5230\u4f60\u7684 API \u5bc6\u94a5\u3002"},
+gt3(){return"\u6bcf\u4e2a\u8d26\u53f7\u53ef\u4ee5\u4f7f\u7528\u4e0d\u540c\u7684 API \u5bc6\u94a5\uff0c\u4e5f\u53ef\u4ee5\u5171\u7528\u540c\u4e00\u4e2a\u3002\u60a8\u53ef\u4ee5\u5728 last.fm/api/accounts \u627e\u5230\u60a8\u7684 API \u5bc6\u94a5\u3002"},
 gta(){return"Last.fm \u8d44\u6599"},
 gtp(){return"\u5728 Last.fm \u4e0a\u67e5\u770b"},
 gt7(){return"\u5371\u9669\u533a\u57df"},
@@ -132739,11 +132739,11 @@ gxh(){return"\u6388\u6743\u6536\u85cf\u529f\u80fd"},
 gxf(){return"\u8bf7\u5728\u6d4f\u89c8\u5668\u6253\u5f00\u7684 Last.fm \u9875\u9762\u4e0a\u6388\u6743\u672c\u5e94\u7528\uff0c\u7136\u540e\u8fd4\u56de\u6b64\u5904\u786e\u8ba4\u3002"},
 gxg(){return"\u6211\u5df2\u6388\u6743"},
 gxk(){return"\u6536\u85cf\u529f\u80fd\u5df2\u6210\u529f\u542f\u7528\uff01"},
-gxi(){return"\u65e0\u6cd5\u542f\u7528\u6536\u85cf\u529f\u80fd\uff0c\u8bf7\u68c0\u67e5\u4f60\u7684\u5bc6\u94a5\u3002"},
+gxi(){return"\u65e0\u6cd5\u542f\u7528\u6536\u85cf\u529f\u80fd\uff0c\u8bf7\u68c0\u67e5\u60a8\u7684\u5bc6\u94a5\u3002"},
 gt5(){return"API \u5bc6\u94a5"},
 gnH(){return"\u5bc6\u94a5"},
 gti(){return"\u672a\u8bbe\u7f6e"},
-gt9(){return"\u5bc6\u94a5\u53ef\u8ba9\u4f60\u76f4\u63a5\u5728 Last.fm \u4e0a\u6dfb\u52a0\u6216\u53d6\u6d88\u6536\u85cf\u6b4c\u66f2\u3002"},
+gt9(){return"\u5bc6\u94a5\u53ef\u8ba9\u60a8\u76f4\u63a5\u5728 Last.fm \u4e0a\u6dfb\u52a0\u6216\u53d6\u6d88\u6536\u85cf\u6b4c\u66f2\u3002"},
 gt6(){return"\u542f\u7528\u6536\u85cf"},
 gt8(){return"\u505c\u7528\u6536\u85cf"},
 gq9(){return"\u6536\u85cf"},
@@ -132777,7 +132777,7 @@ gxw(){return"\u6b64\u6587\u4ef6\u5939\u4e2d\u6ca1\u6709\u6b4c\u66f2"},
 gmE(){return"\u5168\u5e74"},
 gv_(){return"\u751f\u6210\u4e8e"},
 gx_(){return"LastStats \u4f1a\u8bb0\u5f55\u6211\u7684\u97f3\u4e50\u64ad\u653e\u8bb0\u5f55\u5417\uff1f"},
-gwM(){return"\u4e0d\u4f1a\u3002LastStats \u662f\u4e00\u6b3e\u53ef\u89c6\u5316\u5e94\u7528\uff1a\u5b83\u663e\u793a\u4f60 Last.fm \u8d26\u6237\u4e0a\u5df2\u6709\u7684\u64ad\u653e\u8bb0\u5f55\uff0c\u4f46\u672c\u8eab\u4e0d\u4f1a\u8bb0\u5f55\u4efb\u4f55\u5185\u5bb9\u3002\n\n\u5982\u9700\u81ea\u52a8\u8bb0\u5f55\u97f3\u4e50\u64ad\u653e\uff0c\u8bf7\u4f7f\u7528\u4e13\u95e8\u7684\u5e94\u7528\uff0c\u4f8b\u5982 Pano Scrobbler\uff08Android \u53ef\u7528\uff09\u3002"},
+gwM(){return"\u4e0d\u4f1a\u3002LastStats \u662f\u4e00\u6b3e\u53ef\u89c6\u5316\u5e94\u7528\uff1a\u5b83\u663e\u793a\u60a8 Last.fm \u8d26\u6237\u4e0a\u5df2\u6709\u7684\u64ad\u653e\u8bb0\u5f55\uff0c\u4f46\u672c\u8eab\u4e0d\u4f1a\u8bb0\u5f55\u4efb\u4f55\u5185\u5bb9\u3002\n\n\u5982\u9700\u81ea\u52a8\u8bb0\u5f55\u97f3\u4e50\u64ad\u653e\uff0c\u8bf7\u4f7f\u7528\u4e13\u95e8\u7684\u5e94\u7528\uff0c\u4f8b\u5982 Pano Scrobbler\uff08Android \u53ef\u7528\uff09\u3002"},
 gx6(){return"\u4f1a\u63a8\u51fa iOS \u7248\u672c\u5417\uff1f"},
 gwR(){return"\u4e0d\u4f1a\u3002\u76ee\u524d\u6ca1\u6709\u63a8\u51fa iOS \u7248\u672c\u7684\u8ba1\u5212\u3002"},
 gx7(){return"\u8be5\u5e94\u7528\u80fd\u5728 macOS \u6216\u5176\u4ed6\u5e73\u53f0\u8fd0\u884c\u5417\uff1f"},
@@ -132785,15 +132785,15 @@ gwS(){return"LastStats \u662f\u5728 Android \u4e0a\u5f00\u53d1\u548c\u6d4b\u8bd5
 gx8(){return"LastStats \u662f\u5f00\u6e90\u7684\u5417\uff1f"},
 gwT(){return"\u662f\u7684\uff01\u6e90\u4ee3\u7801\u53ef\u5728 GitHub \u4e0a\u81ea\u7531\u83b7\u53d6\u3002\u8be5\u9879\u76ee\u7531 SanoBld \u72ec\u7acb\u7528\u5fc3\u6253\u9020\u3002\u6b22\u8fce\u8d21\u732e\u4ee3\u7801\u3001\u53cd\u9988\u95ee\u9898\uff0c\u6216\u70b9\u4e2a \u2b50\u3002"},
 gx9(){return"\u6211\u7684\u6570\u636e\u5b58\u50a8\u5728\u54ea\u91cc\uff1f"},
-gwU(){return"\u4ec5\u5b58\u50a8\u5728\u4f60\u7684\u8bbe\u5907\u4e0a\u3002LastStats \u6ca1\u6709\u670d\u52a1\u5668\uff1a\u4f60\u7684\u64ad\u653e\u8bb0\u5f55\u4f1a\u5728\u672c\u5730\u7f13\u5b58\u4ee5\u4fbf\u5feb\u901f\u8bbf\u95ee\uff0c\u4f60\u7684 Last.fm \u8d26\u6237\u4fe1\u606f\u4e5f\u4fdd\u5b58\u5728\u672c\u5730\u3002\u9664\u5b98\u65b9 Last.fm API \u5916\uff0c\u4e0d\u4f1a\u5411\u4efb\u4f55\u5730\u65b9\u53d1\u9001\u6570\u636e\u3002"},
+gwU(){return"\u4ec5\u5b58\u50a8\u5728\u60a8\u7684\u8bbe\u5907\u4e0a\u3002LastStats \u6ca1\u6709\u670d\u52a1\u5668\uff1a\u60a8\u7684\u64ad\u653e\u8bb0\u5f55\u4f1a\u5728\u672c\u5730\u7f13\u5b58\u4ee5\u4fbf\u5feb\u901f\u8bbf\u95ee\uff0c\u60a8\u7684 Last.fm \u8d26\u6237\u4fe1\u606f\u4e5f\u4fdd\u5b58\u5728\u672c\u5730\u3002\u9664\u5b98\u65b9 Last.fm API \u5916\uff0c\u4e0d\u4f1a\u5411\u4efb\u4f55\u5730\u65b9\u53d1\u9001\u6570\u636e\u3002"},
 gxa(){return"\u5982\u4f55\u542f\u7528\u6536\u85cf\u529f\u80fd\uff1f"},
-gwV(){return"\u524d\u5f80\u300c\u8bbe\u7f6e > \u8d26\u6237\u300d\u5e76\u8f93\u5165\u4f60\u7684 Last.fm \u5bc6\u94a5\u3002\u8fde\u63a5\u6210\u529f\u540e\uff0c\u5373\u53ef\u76f4\u63a5\u5728\u5e94\u7528\u4e2d\u6536\u85cf\u6b4c\u66f2\u3002"},
+gwV(){return"\u524d\u5f80\u300c\u8bbe\u7f6e > \u8d26\u6237\u300d\u5e76\u8f93\u5165\u60a8\u7684 Last.fm \u5bc6\u94a5\u3002\u8fde\u63a5\u6210\u529f\u540e\uff0c\u5373\u53ef\u76f4\u63a5\u5728\u5e94\u7528\u4e2d\u6536\u85cf\u6b4c\u66f2\u3002"},
 gxb(){return"\u4ec0\u4e48\u662f\u201cscrobble\u201d\uff1f"},
 gwW(){return"scrobble \u662f\u6307\u5728\u4f60\u7684 Last.fm \u8d26\u6237\u4e0a\u8bb0\u5f55\u4e00\u6b21\u64ad\u653e\u2014\u2014\u8fd9\u662f Last.fm \u5b98\u65b9\u672f\u8bed\uff0c\u8868\u793a\u201c\u4e00\u6b21\u88ab\u8ba1\u5165\u7684\u64ad\u653e\u201d\u3002\u4f60\u7684\u6240\u6709\u7edf\u8ba1\u6570\u636e\uff08\u6392\u884c\u699c\u3001\u603b\u91cf\u7b49\uff09\u90fd\u57fa\u4e8e\u5b83\u3002"},
 gxc(){return"\u7b49\u7ea7\u4e0e\u6210\u5c31\u7cfb\u7edf\u662f\u600e\u4e48\u8fd0\u4f5c\u7684\uff1f"},
 gwX(){return"\u4f60\u7684\u8d26\u6237\u7b49\u7ea7\u968f\u603b scrobble \u6570\u589e\u957f\uff08\u6ca1\u6709\u4e0a\u9650\uff09\u3002\u5361\u7247\u4e5f\u4f1a\u6839\u636e\u8be5\u827a\u672f\u5bb6/\u6b4c\u66f2/\u4e13\u8f91\u7684\u64ad\u653e\u6b21\u6570\u663e\u793a\u8fb9\u6846\u989c\u8272\uff08\u9752\u94dc\u2192\u4e94\u5f69\uff09\u3002\u8fd9\u4e9b\u90fd\u57fa\u4e8e\u672c\u5730\u5df2\u7f13\u5b58\u7684\u7edf\u8ba1\u6570\u636e\u81ea\u52a8\u8ba1\u7b97\uff0c\u4e0d\u4f1a\u989d\u5916\u8bf7\u6c42\u7f51\u7edc\u3002"},
 gxd(){return"\u7701\u7535\u6a21\u5f0f\u662f\u5982\u4f55\u5de5\u4f5c\u7684\uff1f"},
-gwY(){return"\u7701\u7535\u6a21\u5f0f\u4f1a\u62c9\u957f\u81ea\u52a8\u540c\u6b65\u7684\u95f4\u9694\u4ee5\u8282\u7701\u7535\u91cf\u3002\u4f60\u53ef\u4ee5\u5728\u8bbe\u7f6e > \u901a\u7528\u4e2d\u9009\u62e9\u59cb\u7ec8\u5f00\u542f\u3001\u8ddf\u968f\u624b\u673a\u81ea\u5e26\u7684\u7701\u7535\u6a21\u5f0f\uff0c\u6216\u5728\u7535\u91cf\u4f4e\u4e8e\u8bbe\u5b9a\u503c\u65f6\u5f00\u542f\u3002"},
+gwY(){return"\u7701\u7535\u6a21\u5f0f\u4f1a\u62c9\u957f\u81ea\u52a8\u540c\u6b65\u7684\u95f4\u9694\u4ee5\u8282\u7701\u7535\u91cf\u3002\u60a8\u53ef\u4ee5\u5728\u8bbe\u7f6e > \u901a\u7528\u4e2d\u9009\u62e9\u59cb\u7ec8\u5f00\u542f\u3001\u8ddf\u968f\u624b\u673a\u81ea\u5e26\u7684\u7701\u7535\u6a21\u5f0f\uff0c\u6216\u5728\u7535\u91cf\u4f4e\u4e8e\u8bbe\u5b9a\u503c\u65f6\u5f00\u542f\u3002"},
 gx0(){return"\u5982\u4f55\u5907\u4efd\u6216\u6062\u590d\u6211\u7684\u6570\u636e\uff1f"},
 gwN(){return"\u524d\u5f80\u8bbe\u7f6e > \u5907\u4efd\uff0c\u53ef\u4ee5\u5bfc\u51fa\u5907\u4efd\u6587\u4ef6\uff08\u53ef\u9009\u62e9\u662f\u5426\u5305\u542b Last.fm \u5bc6\u94a5\uff09\uff0c\u4e4b\u540e\u5728\u672c\u673a\u6216\u5176\u4ed6\u8bbe\u5907\u91cd\u65b0\u5bfc\u5165\u3002"},
 gx3(){return"\u5e94\u7528\u53ef\u4ee5\u79bb\u7ebf\u4f7f\u7528\u5417\uff1f"},
@@ -132849,17 +132849,17 @@ gpk(){return"\u65e5\u5747"},
 gpl(){return"\u6b64\u65f6\u6bb5\u6682\u65e0\u64ad\u653e\u8bb0\u5f55\u3002"},
 gAg(){return"\u524d10\u540d"},
 gwo(){return"\u6700\u6709\u7528\u7684\u7b5b\u9009\u6392\u5728\u6700\u524d"},
-gwn(){return"\u6839\u636e\u65f6\u95f4\u3001\u65e5\u671f\u548c\u4f60\u6700\u5e38\u7528\u7684\u5185\u5bb9\u6392\u5e8f"},
-gmb(){return"\u4e3a\u4f60\u63a8\u8350"},
+gwn(){return"\u6839\u636e\u65f6\u95f4\u3001\u65e5\u671f\u548c\u60a8\u6700\u5e38\u7528\u7684\u5185\u5bb9\u6392\u5e8f"},
+gmb(){return"\u4e3a\u60a8\u63a8\u8350"},
 gmc(){return"\u5168\u7403\u8d8b\u52bf"},
-gws(){return"\u4f60\u7684\u6df7\u5408\u63a8\u8350"},
+gws(){return"\u60a8\u7684\u6df7\u5408\u63a8\u8350"},
 gwv(){return"\u5386\u53f2\u4e0a\u7684\u4eca\u5929"},
 gwt(){return"\u672c\u6708"},
-gwu(){return"\u4f60\u7684\u97f3\u4e50\u7c7b\u578b"},
+gwu(){return"\u60a8\u7684\u97f3\u4e50\u7c7b\u578b"},
 gwq(){return"\u51b7\u95e8\u4f73\u4f5c"},
 gwr(){return"\u88ab\u9057\u5fd8\u7684\u6b4c"},
 gox(){return"\u4e13\u8f91"},
-gwp(){return"\u4f60\u7684\u56fd\u5bb6"},
+gwp(){return"\u60a8\u7684\u56fd\u5bb6"},
 gww(){return"\u6b4c\u66f2"},
 gwj(){return"\u827a\u672f\u5bb6"},
 gwx(){return"\u5468"},
@@ -132869,7 +132869,7 @@ gwm(){return"\u6682\u65f6\u6ca1\u6709\u5185\u5bb9"},
 wk(a){return"\u7c7b\u4f3c "+a},
 gvE(){return"\u8c03\u6574\u7248\u5757\u987a\u5e8f"},
 gvu(){return"\u65e0\u9650\u6eda\u52a8"},
-gvt(){return"\u300c\u53d1\u73b0\u300d\u4f1a\u5faa\u73af\u64ad\u653e\uff0c\u4e0d\u65ad\u7ed9\u4f60\u65b0\u63a8\u8350"},
+gvt(){return"\u300c\u53d1\u73b0\u300d\u4f1a\u5faa\u73af\u64ad\u653e\uff0c\u4e0d\u65ad\u7ed9\u60a8\u65b0\u63a8\u8350"},
 gol(){return"\u53d1\u73b0"},
 gvp(){return"\u5de6\u53f3\u6ed1\u52a8\uff0c\u53d1\u73b0\u65b0\u97f3\u4e50"},
 gvI(){return"\u6392\u5e8f"},
@@ -136962,7 +136962,7 @@ a=A.cd(B.r.N(0.15),0.8)
 a=A.c5(a6,A.cb(B.ab,A.a([A.a8(a6,A.a2(B.A4,B.r.N(0.75),a6,a6,15),B.j,a6,a6,new A.ab(c,a6,a,a6,a6,a6,B.ac),a6,30,a6,a6,a6,a6,a6,30),new A.bb($.a03(),new A.b2w(a5),a6,a6,t.D0)],b),B.j,B.aa,a6),B.v,!1,a5.aG,a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,a5.gaTH(),a6,a6,a6,a6,a6,a6,!1,B.Y)
 c=B.u.N(0.28)
 a0=A.cd(B.r.N(0.15),0.8)
-a0=A.bJ2(!1,170,A.bGa(A.cb(B.ab,A.a([a8,d,new A.cH(!0,!0,!0,!0,B.L,!1,new A.S(B.a_a,s,a6),a6),A.cC(14,A.a3(A.a([a,B.a5,A.c5(a6,A.a8(a6,A.a2(B.ru,B.r.N(0.75),a6,a6,15),B.j,a6,a6,new A.ab(c,a6,a0,a6,a6,a6,B.ac),a6,30,a6,a6,a6,a6,a6,30),B.v,!1,a5.bg,a6,a6,a6,a6,a6,a6,new A.b2x(a5),a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,new A.b2y(a5),a6,a6,a6,a6,a6,a6,!1,B.Y)],b),B.i,a6,B.e,B.C,0,a6),a6,a6,a6,14,a6,a6),new A.bb($.js(),new A.b2z(a9),a6,a6,t.aS)],b),B.q,B.e_,a6),B.a9d),!0,!0,0)
+a0=A.bJ2(!1,170,A.bGa(A.cb(B.ab,A.a([a8,d,new A.cH(!0,!0,!0,!0,B.L,!1,new A.S(B.a_a,s,a6),a6),A.cC(14,A.a3(A.a([a,B.a5,A.c5(a6,A.a8(a6,A.a2(B.ru,B.r.N(0.75),a6,a6,15),B.j,a6,a6,new A.ab(c,a6,a0,a6,a6,a6,B.ac),a6,30,a6,a6,a6,a6,a6,30),B.v,!1,a5.bg,a6,a6,a6,a6,a6,a6,new A.b2x(a5),a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,a6,new A.b2y(a5),a6,a6,a6,a6,a6,a6,!1,B.Y)],b),B.i,a6,B.e,B.C,0,a6),a6,a6,a6,14,a6,a6),new A.bb($.js(),new A.b2z(a9),a6,a6,t.aS)],b),B.q,B.e_,a6),B.a9e),!0,!0,0)
 if(a5.rx&&a5.x!=null){a8=A.v(a5.x.h(0,"name"))
 s=a5.x.h(0,"artist")
 s=A.v(s==null?a6:J.w(s,"#text"))
@@ -137544,7 +137544,7 @@ aH_(a){var s,r,q,p,o,n=this,m=null,l=n.c,k=l.d,j=k==null,i=(j?l.b:k).N(0.55),h=l
 i=A.a([i,(g?l.y:h).N(0.45)],t.W)
 s=l.k3
 r=t.p
-i=A.bJ2(!0,230,A.bGa(A.a8(m,new A.cH(!0,!0,!0,!0,B.L,!1,new A.S(B.qj,A.a1(A.a([A.a3(A.a([A.a8(m,m,B.j,m,m,new A.ab(s.N(0.14),m,m,m,m,m,B.ac),m,58,m,m,m,m,m,58),B.cW,A.aq(A.a1(A.a([n.EV(16,8,120),B.aZ,n.EV(11,6,80),B.aZ,n.EV(10,6,100)],r),B.o,m,B.e,B.f,0,B.k),1)],r),B.i,m,B.e,B.f,0,m)],r),B.o,m,B.dB,B.f,0,B.k),m),m),B.j,m,m,new A.ab(m,m,m,m,m,new A.f4(B.cZ,B.lv,B.aR,i,m,m),B.p),m,m,m,m,m,m,m,m),B.a9c),!0,!1,56)
+i=A.bJ2(!0,230,A.bGa(A.a8(m,new A.cH(!0,!0,!0,!0,B.L,!1,new A.S(B.qj,A.a1(A.a([A.a3(A.a([A.a8(m,m,B.j,m,m,new A.ab(s.N(0.14),m,m,m,m,m,B.ac),m,58,m,m,m,m,m,58),B.cW,A.aq(A.a1(A.a([n.EV(16,8,120),B.aZ,n.EV(11,6,80),B.aZ,n.EV(10,6,100)],r),B.o,m,B.e,B.f,0,B.k),1)],r),B.i,m,B.e,B.f,0,m)],r),B.o,m,B.dB,B.f,0,B.k),m),m),B.j,m,m,new A.ab(m,m,m,m,m,new A.f4(B.cZ,B.lv,B.aR,i,m,m),B.p),m,m,m,m,m,m,m,m),B.a9d),!0,!1,56)
 h=(g?l.y:h).N(0.4)
 q=A.a3(A.a([n.EV(20,10,20),B.a5,n.EV(14,7,90)],r),B.i,m,B.e,B.f,0,m)
 l=A.a([new A.qp(l,80,m,m),B.at,new A.qp(l,64,h,m),B.ad,q,B.a8,new A.qp(l,110,(j?l.b:k).N(0.35),m),B.a8,A.a3(A.a([A.aq(new A.qp(l,90,m,m),1),B.am,A.aq(new A.qp(l,90,m,m),1)],r),B.i,m,B.e,B.f,0,m),B.a8,A.a3(A.a([A.aq(new A.qp(l,90,m,m),1),B.am,A.aq(new A.qp(l,90,m,m),1)],r),B.i,m,B.e,B.f,0,m),B.f_,A.a3(A.a([n.EV(20,10,20),B.a5,n.EV(14,7,110)],r),B.i,m,B.e,B.f,0,m),B.at],r)
@@ -138887,7 +138887,7 @@ n=A.qS(o.N(0.16),a2)
 m=r?new A.bbp(d,a0):c
 m=A.c5(B.aH,new A.af(1/0,s+66,c,c),B.v,!1,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,m,c,c,c,c,c,c,!1,B.Y)
 l=d.aEO(a0,a1,s,r)
-k=A.a8(c,c,B.j,c,c,new A.ab(c,c,c,c,c,new A.f4(B.bq,B.cB,B.aR,A.a([a2.N(0),a2.N(0.35),a2],t.W),B.aaz,c),B.p),c,30,c,c,c,c,c,c)
+k=A.a8(c,c,B.j,c,c,new A.ab(c,c,c,c,c,new A.f4(B.bq,B.cB,B.aR,A.a([a2.N(0),a2.N(0.35),a2],t.W),B.aaA,c),B.p),c,30,c,c,c,c,c,c)
 j=d.aF6(a1)
 i=a1.to
 if(i==null){i=a1.t
@@ -140064,7 +140064,7 @@ $S:198}
 A.ajN.prototype={
 b_m(a,b){var s=null
 return A.a3(A.a([A.a2(a,B.m1,s,s,13),B.bI,A.f(b,s,s,s,s,s,B.Na,s,s,s)],t.p),B.i,s,B.e,B.C,0,s)},
-u(a){var s,r,q,p,o=this,n=null,m=o.x,l=m!=null&&m.length!==0,k=A.ae(28),j=A.k7(o.c,n,n,new A.boz(),B.bT,!1,n,n,n),i=A.qY(n,new A.ab(n,n,n,n,n,new A.f4(B.bq,B.cB,B.aR,A.a([B.B,B.B,B.u.N(0.55)],t.W),B.aaC,n),B.p),B.ei),h=t.p,g=A.a([],h),f=o.d
+u(a){var s,r,q,p,o=this,n=null,m=o.x,l=m!=null&&m.length!==0,k=A.ae(28),j=A.k7(o.c,n,n,new A.boz(),B.bT,!1,n,n,n),i=A.qY(n,new A.ab(n,n,n,n,n,new A.f4(B.bq,B.cB,B.aR,A.a([B.B,B.B,B.u.N(0.55)],t.W),B.aaD,n),B.p),B.ei),h=t.p,g=A.a([],h),f=o.d
 if(f.length!==0)g.push(A.f(f,n,2,B.F,n,n,B.N6,n,n,n))
 f=o.e
 if(f.length!==0)B.b.C(g,A.a([B.au,A.f(f,n,1,B.F,n,n,B.Nj,n,n,n)],h))
@@ -146458,7 +146458,7 @@ for(b2=0;b2<24;++b2){d0=B.h.b7(b2,3)
 b1[d0]=b1[d0]+c[b2]}d0=A.aa(b1).i("X<1,C>")
 d0=A.O(new A.X(b1,new A.bjc(B.b.h3(b1,0,new A.bjd())),d0),d0.i("ad.E"))
 o.w=d0
-o.x=B.a9W
+o.x=B.a9X
 s=5
 break
 case 6:d0=d2===1
@@ -146568,7 +146568,7 @@ k=i.w
 n=k?new A.af(20,20,new A.ii(n,h),h):A.a2(B.ip,n,h,h,h)
 j=t.p
 l=A.a3(A.a([o,B.a5,m,A.yU(n,f.a===0||k?h:i.gaZb(),l)],j),B.i,h,B.e,B.f,0,h)
-return A.dj(h,d,A.cb(B.ab,A.a([A.qY(new A.cH(!0,!0,!0,!0,B.L,!1,A.a1(A.a([new A.S(B.yM,b,h),new A.S(B.a_X,l,h),A.aq(f.Q&&!f.as?A.bL(new A.kU(48,h,h),h,h,h):A.iY(i.aEu(a1,g,f,a,a0,new A.bs(""+i.gjz()+"-"+a,t.O)),B.q8,A.jo(),B.a3,B.D,A.x_()),1),new A.S(B.qg,A.a3(A.a([i.ai0(g,B.mQ,i.gjz()>0,new A.bjv(i)),B.bR,i.ai0(g,B.bt,i.gjz()<2,new A.bjw(i))],j),B.i,h,B.e,B.f,0,h),h)],j),B.i,h,B.e,B.f,0,B.k),h),new A.ab(h,h,h,h,h,new A.f4(B.bq,B.cB,B.aR,c,B.a98,h),B.p),B.ei),A.cC(h,new A.ff(new A.ajM(g,e[i.gjz()],i.a.d,f,i.gjz(),h),i.r),h,h,-9999,h,-9999,h)],j),B.q,B.aa,h),h)},
+return A.dj(h,d,A.cb(B.ab,A.a([A.qY(new A.cH(!0,!0,!0,!0,B.L,!1,A.a1(A.a([new A.S(B.yM,b,h),new A.S(B.a_X,l,h),A.aq(f.Q&&!f.as?A.bL(new A.kU(48,h,h),h,h,h):A.iY(i.aEu(a1,g,f,a,a0,new A.bs(""+i.gjz()+"-"+a,t.O)),B.q8,A.jo(),B.a3,B.D,A.x_()),1),new A.S(B.qg,A.a3(A.a([i.ai0(g,B.mQ,i.gjz()>0,new A.bjv(i)),B.bR,i.ai0(g,B.bt,i.gjz()<2,new A.bjw(i))],j),B.i,h,B.e,B.f,0,h),h)],j),B.i,h,B.e,B.f,0,B.k),h),new A.ab(h,h,h,h,h,new A.f4(B.bq,B.cB,B.aR,c,B.a99,h),B.p),B.ei),A.cC(h,new A.ff(new A.ajM(g,e[i.gjz()],i.a.d,f,i.gjz(),h),i.r),h,h,-9999,h,-9999,h)],j),B.q,B.aa,h),h)},
 ai0(a,b,c,d){var s,r,q,p=a.Q
 if(p==null)p=a.y
 s=A.ae(26)
@@ -151128,7 +151128,7 @@ if(q)q=g
 else{q=f.rx
 q=p.bA(q==null?f.k3:q,B.J)}q=A.f(i,g,g,g,g,g,q,g,g,g)
 i=t._p
-p=A.O(new A.X(B.a9U,new A.b0m(h,f),i),i.i("ad.E"))
+p=A.O(new A.X(B.a9V,new A.b0m(h,f),i),i.i("ad.E"))
 r=A.hi(A.a1(A.a([o,B.P,m,B.aZ,r,B.bJ,k,B.bJ,l,B.P,q,B.a6,A.fY(B.bc,p,B.bo,8,8),B.P],n),B.o,g,B.e,B.C,0,B.k),g,B.v,g,g,g,g,B.M)
 return A.kx(A.a([A.e5(A.f(A.h().ghg(),g,g,g,g,g,g,g,g,g),new A.b0n(a),g),A.iE(A.f(A.h().go7(),g,g,g,g,g,g,g,g,g),new A.b0o(h,a),g)],n),new A.af(340,g,r,g),B.yN,g,d)}}
 A.b0a.prototype={
@@ -151148,7 +151148,7 @@ o===$&&A.b()
 s=b.b
 s=B.d.aJ(o.b/360*s-12,0,s-24)
 o=A.ae(6)
-return A.c5(r,new A.af(r,36,A.cb(B.bE,A.a([p,A.cC(r,A.a8(r,r,B.j,r,r,new A.ab(B.r,r,A.cd(B.jE,1.5),o,B.a9M,r,B.p),r,36,r,r,r,r,r,24),r,r,s,r,r,r)],t.p),B.q,B.aa,r),r),B.v,!1,r,r,r,r,r,r,r,r,r,r,r,r,r,new A.b07(q,b),r,r,r,r,r,r,r,r,r,new A.b08(q,b),r,r,r,r,!1,B.Y)},
+return A.c5(r,new A.af(r,36,A.cb(B.bE,A.a([p,A.cC(r,A.a8(r,r,B.j,r,r,new A.ab(B.r,r,A.cd(B.jE,1.5),o,B.a9N,r,B.p),r,36,r,r,r,r,r,24),r,r,s,r,r,r)],t.p),B.q,B.aa,r),r),B.v,!1,r,r,r,r,r,r,r,r,r,r,r,r,r,new A.b07(q,b),r,r,r,r,r,r,r,r,r,new A.b08(q,b),r,r,r,r,!1,B.Y)},
 $S:377}
 A.b08.prototype={
 $1(a){var s=this.a
@@ -151999,7 +151999,7 @@ p=t.p
 q=A.a([A.dk(c,d.gaYa(),c,A.f(A.h().grf(),c,c,c,c,c,c,c,c,c),q,d.d)],p)
 if(d.d){o=A.h().gri()
 n=A.a([],t.dl)
-for(m=0;m<5;++m){l=B.a9X[m]
+for(m=0;m<5;++m){l=B.a9Y[m]
 k=l===24?A.h().grg():A.h().rh(l)
 n.push(new A.bu(""+l,k,c))}B.b.C(q,A.a([B.cP,A.jJ(c,B.Af,new A.bpQ(d),n,o,""+d.e)],p))}o=A.h().grl()
 n=A.h().grk()
@@ -157512,7 +157512,7 @@ h=i.c
 if((h==null?null:h.a)===B.th){s=1
 break}if(i.e){s=1
 break}m=B.pq
-l=new A.aPa(m,null,B.Y9,n.z,B.aaS,!1,!1,!1)
+l=new A.aPa(m,null,B.Y9,n.z,B.aaT,!1,!1,!1)
 p=4
 n.aYX()
 s=7
@@ -158628,7 +158628,7 @@ $ihc:1}
 A.bk.prototype={
 bX(a,b){var s=this.bU(new A.y_(a,b))
 return s instanceof A.ct?-1:s.b},
-geL(){return B.aaL},
+geL(){return B.aaM},
 mG(a,b){},
 k(a){return A.P(this).k(0)}}
 A.a7h.prototype={}
@@ -160975,7 +160975,7 @@ c8=A.a([],n)
 if((c4&1)!==0)c8.push(B.hA)
 if((c4&2)!==0)c8.push(B.MZ)
 if((c4&4)!==0)c8.push(B.N_)
-o.push(new A.akU(c7,c6,a0,a,B.BE[c3],A.bZQ(c8),B.a9n[c5],A.be(a1)))
+o.push(new A.akU(c7,c6,a0,a,B.BE[c3],A.bZQ(c8),B.a9o[c5],A.be(a1)))
 continue A
 case 44:a=r.getUint16(s.b,!0)
 a0=r.getUint16(s.b+=2,!0)
@@ -167767,9 +167767,9 @@ B.Qi=new A.a0z(B.MA,null,null,null,B.Qh,null,null,null,null,null,B.jb,null)
 B.Qj=new A.xE(null)
 B.pd=new A.Dj(!1,null,null)
 B.Qk=new A.Ku(null,null,null,null,null,null,null,null)
-B.aaV=s([],t.k8)
+B.aaW=s([],t.k8)
 B.T=new A.H(0,0)
-B.Ql=new A.kA(B.aaV,B.T)
+B.Ql=new A.kA(B.aaW,B.T)
 B.Qm=new A.hH(0,1,"all")
 B.vR=new A.hH(1024,12,"upcE")
 B.vS=new A.hH(128,9,"itf")
@@ -167906,8 +167906,8 @@ B.Wk=new A.F(1,0,1,0,B.m)
 B.WL=new A.F(1,0,1,1,B.m)
 B.Wu=new A.F(1,0,0,1,B.m)
 B.W8=new A.F(1,1,0,1,B.m)
-B.aax=s([B.x9,B.TS,B.xu,B.Wk,B.WL,B.Wu,B.W8,B.x9],t.W)
-B.a4H=new A.f4(B.bE,B.fN,B.aR,B.aax,null,null)
+B.aay=s([B.x9,B.TS,B.xu,B.Wk,B.WL,B.Wu,B.W8,B.x9],t.W)
+B.a4H=new A.f4(B.bE,B.fN,B.aR,B.aay,null,null)
 B.p=new A.a0Q(0,"rectangle")
 B.RN=new A.ab(null,null,null,null,null,B.a4H,B.p)
 B.ac=new A.a0Q(1,"circle")
@@ -168169,7 +168169,7 @@ B.cM=new A.aRX()
 B.po=new A.aRY()
 B.hY=new A.aS_()
 B.j2=new A.a9S(0,0,0,0)
-B.aaH=s([],A.aF("G<atz>"))
+B.aaI=s([],A.aF("G<atz>"))
 B.aDI=new A.aSq()
 B.c4={}
 B.td=new A.B(B.c4,[],t.w)
@@ -168899,8 +168899,8 @@ B.a08=new A.Ec(1,"open")
 B.a09=new A.Ec(2,"wpa")
 B.a0a=new A.Ec(3,"wep")
 B.a0b=new A.a2B(null)
-B.a9l=s([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.2126,0.7152,0.0722,0,0],t.n)
-B.a0c=new A.nQ(null,null,B.a9l,B.wV)
+B.a9m=s([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.2126,0.7152,0.0722,0,0],t.n)
+B.a0c=new A.nQ(null,null,B.a9m,B.wV)
 B.z0=new A.dg(0,"incrementable")
 B.qp=new A.dg(1,"scrollable")
 B.qq=new A.dg(10,"link")
@@ -169531,10 +169531,10 @@ B.rH=s([0,1],t.n)
 B.a4T=s([0,6,12,18],t.t)
 B.a5_=s([12,24,48],t.t)
 B.a53=s([192,193,194],t.t)
-B.aa9=s([1373.2198709594231,-1100.4251190754821,-7.278681089101213],t.n)
+B.aaa=s([1373.2198709594231,-1100.4251190754821,-7.278681089101213],t.n)
 B.a8Y=s([-271.815969077903,559.6580465940733,-32.46047482791194],t.n)
 B.acB=s([1.9622899599665666,-57.173814538844006,308.7233197812385],t.n)
-B.a54=s([B.aa9,B.a8Y,B.acB],t.zg)
+B.a54=s([B.aaa,B.a8Y,B.acB],t.zg)
 B.B_=s([1,0,2],t.t)
 B.a56=s([1,0,3,2],t.t)
 B.B0=s(["text","multiline","number","phone","datetime","emailAddress","url","visiblePassword","name","address","none","webSearch","twitter"],t.s)
@@ -169563,8 +169563,8 @@ B.a3K=new A.ps(B.a3y,!1,0,"png")
 B.a3w=new A.rl(B.abH,B.a3K,0,"png")
 B.abL=s([71,73,70,56,55,97],t.Z)
 B.a3v=new A.rl(B.abL,B.n5,1,"gif87a")
-B.a9K=s([71,73,70,56,57,97],t.Z)
-B.a3u=new A.rl(B.a9K,B.n5,2,"gif89a")
+B.a9L=s([71,73,70,56,57,97],t.Z)
+B.a3u=new A.rl(B.a9L,B.n5,2,"gif89a")
 B.a5l=s([255,216,255],t.Z)
 B.a3z=new A.uQ(2,"jpeg")
 B.a3O=new A.ps(B.a3z,!1,3,"jpeg")
@@ -169581,10 +169581,10 @@ B.vq=new A.Xm(0,"named")
 B.Os=new A.Xm(1,"anonymous")
 B.a6w=s([B.vq,B.Os],A.aF("G<Xm>"))
 B.B2=s(["January","February","March","April","May","June","July","August","September","October","November","December"],t.s)
-B.a91=s([0.41233895,0.35762064,0.18051042],t.n)
+B.a92=s([0.41233895,0.35762064,0.18051042],t.n)
 B.a7E=s([0.2126,0.7152,0.0722],t.n)
 B.acc=s([0.01932141,0.11916382,0.95034478],t.n)
-B.a6z=s([B.a91,B.a7E,B.acc],t.zg)
+B.a6z=s([B.a92,B.a7E,B.acc],t.zg)
 B.a6A=s(["","Jan","F\xe9v","Mar","Avr","Mai","Juin","Juil","Ao\xfbt","Sep","Oct","Nov","D\xe9c"],t.s)
 B.B3=s([0,4,12,1,5,13,3,7,15],t.t)
 B.a6E=s([65533],t.t)
@@ -169735,12 +169735,12 @@ B.abe=s([2.33888662,1.28698796],t.n)
 B.abl=s([2.48660575,1.36351941],t.n)
 B.a7w=s([2.62226596,1.44717976],t.n)
 B.a7Q=s([2.7514899,1.53385819],t.n)
-B.a9D=s([3.36298265,1.98288283],t.n)
+B.a9E=s([3.36298265,1.98288283],t.n)
 B.a8I=s([4.08649929,2.23811846],t.n)
-B.a9i=s([4.85481134,2.47563463],t.n)
+B.a9j=s([4.85481134,2.47563463],t.n)
 B.a7D=s([5.62945551,2.72948597],t.n)
 B.a8p=s([6.43023796,2.98020421],t.n)
-B.B6=s([B.a8m,B.a5M,B.abe,B.abl,B.a7w,B.a7Q,B.a9D,B.a8I,B.a9i,B.a7D,B.a8p],t.zg)
+B.B6=s([B.a8m,B.a5M,B.abe,B.abl,B.a7w,B.a7Q,B.a9E,B.a8I,B.a9j,B.a7D,B.a8p],t.zg)
 B.QE=new A.ee(0,"clear")
 B.QF=new A.ee(1,"src")
 B.QU=new A.ee(2,"dst")
@@ -169804,8 +169804,8 @@ B.a8C=s([82,73,70,70,0,0,0,0,87,65,86,69],t.t)
 B.aey=new A.el("audio/x-wav",B.a8C,B.rK)
 B.abM=s([71,73,70,56,55,97],t.t)
 B.aeB=new A.el("image/gif",B.abM,null)
-B.a9L=s([71,73,70,56,57,97],t.t)
-B.aez=new A.el("image/gif",B.a9L,null)
+B.a9M=s([71,73,70,56,57,97],t.t)
+B.aez=new A.el("image/gif",B.a9M,null)
 B.a5k=s([255,216],t.t)
 B.aeC=new A.el("image/jpeg",B.a5k,null)
 B.abI=s([137,80,78,71,13,10,26,10],t.t)
@@ -169827,13 +169827,13 @@ B.aei=new A.el("audio/mpeg",B.a5o,null)
 B.a77=s([79,112,117],t.t)
 B.aew=new A.el("audio/ogg",B.a77,null)
 B.a8E=s([0,0,0,0,102,116,121,112,51,103,112,53],t.t)
-B.aaq=s([255,255,255,0,255,255,255,255,255,255,255,255],t.t)
-B.aeG=new A.el("video/3gpp",B.a8E,B.aaq)
+B.aar=s([255,255,255,0,255,255,255,255,255,255,255,255],t.t)
+B.aeG=new A.el("video/3gpp",B.a8E,B.aar)
 B.a7x=s([0,0,0,0,102,116,121,112,97,118,99,49],t.t)
 B.fp=s([0,0,0,0,255,255,255,255,255,255,255,255],t.t)
 B.aek=new A.el("video/mp4",B.a7x,B.fp)
-B.aaa=s([0,0,0,0,102,116,121,112,105,115,111,50],t.t)
-B.ael=new A.el("video/mp4",B.aaa,B.fp)
+B.aab=s([0,0,0,0,102,116,121,112,105,115,111,50],t.t)
+B.ael=new A.el("video/mp4",B.aab,B.fp)
 B.a5F=s([0,0,0,0,102,116,121,112,105,115,111,109],t.t)
 B.aex=new A.el("video/mp4",B.a5F,B.fp)
 B.abp=s([0,0,0,0,102,116,121,112,109,112,52,49],t.t)
@@ -169842,12 +169842,12 @@ B.abv=s([0,0,0,0,102,116,121,112,109,112,52,50],t.t)
 B.aeI=new A.el("video/mp4",B.abv,B.fp)
 B.a72=s([70,84,108,103],t.t)
 B.aeh=new A.el("model/gltf-binary",B.a72,null)
-B.a9q=s([82,73,70,70,0,0,0,0,87,69,66,80],t.t)
-B.aer=new A.el("image/webp",B.a9q,B.rK)
+B.a9r=s([82,73,70,70,0,0,0,0,87,69,66,80],t.t)
+B.aer=new A.el("image/webp",B.a9r,B.rK)
 B.a4Y=s([119,79,70,50],t.t)
 B.aev=new A.el("font/woff2",B.a4Y,null)
-B.aar=s([0,0,0,0,102,116,121,112,104,101,105,99],t.t)
-B.aeF=new A.el("image/heic",B.aar,B.fp)
+B.aas=s([0,0,0,0,102,116,121,112,104,101,105,99],t.t)
+B.aeF=new A.el("image/heic",B.aas,B.fp)
 B.a63=s([0,0,0,0,102,116,121,112,104,101,105,120],t.t)
 B.aeE=new A.el("image/heic",B.a63,B.fp)
 B.a7P=s([0,0,0,0,102,116,121,112,109,105,102,49],t.t)
@@ -169943,26 +169943,26 @@ B.a6W=s([6,30,56,82],t.t)
 B.a6X=s([6,30,58,86],t.t)
 B.a70=s([6,34,62,90],t.t)
 B.a6B=s([6,28,50,72,94],t.t)
-B.a9G=s([6,26,50,74,98],t.t)
+B.a9H=s([6,26,50,74,98],t.t)
 B.abo=s([6,30,54,78,102],t.t)
 B.a8F=s([6,28,54,80,106],t.t)
-B.aa4=s([6,32,58,84,110],t.t)
+B.aa5=s([6,32,58,84,110],t.t)
 B.a88=s([6,30,58,86,114],t.t)
 B.a7R=s([6,34,62,90,118],t.t)
 B.acD=s([6,26,50,74,98,122],t.t)
-B.aaF=s([6,30,54,78,102,126],t.t)
+B.aaG=s([6,30,54,78,102,126],t.t)
 B.ac1=s([6,26,52,78,104,130],t.t)
-B.a9Q=s([6,30,56,82,108,134],t.t)
+B.a9R=s([6,30,56,82,108,134],t.t)
 B.acn=s([6,34,60,86,112,138],t.t)
 B.a7l=s([6,30,58,86,114,142],t.t)
 B.abV=s([6,34,62,90,118,146],t.t)
-B.a9O=s([6,30,54,78,102,126,150],t.t)
-B.aag=s([6,24,50,76,102,128,154],t.t)
+B.a9P=s([6,30,54,78,102,126,150],t.t)
+B.aah=s([6,24,50,76,102,128,154],t.t)
 B.a9_=s([6,28,54,80,106,132,158],t.t)
-B.a9Z=s([6,32,58,84,110,136,162],t.t)
+B.aa_=s([6,32,58,84,110,136,162],t.t)
 B.a4R=s([6,26,54,82,110,138,166],t.t)
 B.a8a=s([6,30,58,86,114,142,170],t.t)
-B.a8G=s([B.rN,B.a6J,B.a6K,B.a6N,B.a6T,B.a6Z,B.a6L,B.a6M,B.a6O,B.a6S,B.a6U,B.a6Y,B.a7_,B.a6P,B.a6Q,B.a6R,B.a6V,B.a6W,B.a6X,B.a70,B.a6B,B.a9G,B.abo,B.a8F,B.aa4,B.a88,B.a7R,B.acD,B.aaF,B.ac1,B.a9Q,B.acn,B.a7l,B.abV,B.a9O,B.aag,B.a9_,B.a9Z,B.a4R,B.a8a],t.Zb)
+B.a8G=s([B.rN,B.a6J,B.a6K,B.a6N,B.a6T,B.a6Z,B.a6L,B.a6M,B.a6O,B.a6S,B.a6U,B.a6Y,B.a7_,B.a6P,B.a6Q,B.a6R,B.a6V,B.a6W,B.a6X,B.a70,B.a6B,B.a9H,B.abo,B.a8F,B.aa5,B.a88,B.a7R,B.acD,B.aaG,B.ac1,B.a9R,B.acn,B.a7l,B.abV,B.a9P,B.aah,B.a9_,B.aa_,B.a4R,B.a8a],t.Zb)
 B.kq=s(["stats","discover","recent","friends","chart"],t.s)
 B.a8R=s(["\u6700\u521d\u306e1,000\u30b9\u30af\u30ed\u30d6\u30eb\u9054\u6210\u3002\u65c5\u306e\u59cb\u307e\u308a\u3067\u3059\u3002\ud83c\udfb5","5\u6841\u306b\u5230\u9054\u3057\u307e\u3057\u305f\uff01\ud83c\udf89","\u3042\u306a\u305f\u306f\u771f\u306e\u97f3\u697d\u4e2d\u6bd2\u8005\u3067\u3059\u3002\ud83d\udd25","100\u4e07\u30b9\u30af\u30ed\u30d6\u30eb\u9054\u6210\u3002\u4f1d\u8aac\u3067\u3059\u3002\ud83c\udfb8"],t.s)
 B.a8S=s(["","\u044f\u043d\u0432\u0430\u0440\u044f","\u0444\u0435\u0432\u0440\u0430\u043b\u044f","\u043c\u0430\u0440\u0442\u0430","\u0430\u043f\u0440\u0435\u043b\u044f","\u043c\u0430\u044f","\u0438\u044e\u043d\u044f","\u0438\u044e\u043b\u044f","\u0430\u0432\u0433\u0443\u0441\u0442\u0430","\u0441\u0435\u043d\u0442\u044f\u0431\u0440\u044f","\u043e\u043a\u0442\u044f\u0431\u0440\u044f","\u043d\u043e\u044f\u0431\u0440\u044f","\u0434\u0435\u043a\u0430\u0431\u0440\u044f"],t.s)
@@ -169980,7 +169980,8 @@ B.Rf=new A.a0M(2,"outer")
 B.xl=new A.F(0.09803921568627451,0,0,0,B.m)
 B.RT=new A.ef(0.2,B.Rf,B.xl,B.n,11)
 B.a90=s([B.RT],t.sq)
-B.a94=s(["","janeiro","fevereiro","mar\xe7o","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"],t.s)
+B.a91=s(["\u60a8\u7684\u7b2c\u4e00\u4e2a 1,000 \u6b21 scrobble\u3002\u65c5\u7a0b\u5f00\u59cb\u4e86\u3002\ud83c\udfb5","\u60a8\u8fbe\u5230\u4e86\u4e94\u4f4d\u6570\uff01\ud83c\udf89","\u60a8\u662f\u771f\u6b63\u7684\u97f3\u4e50\u72c2\u70ed\u8005\u3002\ud83d\udd25","\u4e00\u767e\u4e07\u6b21 scrobble\u3002\u8fd9\u662f\u4f20\u5947\u3002\ud83c\udfb8"],t.s)
+B.a95=s(["","janeiro","fevereiro","mar\xe7o","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"],t.s)
 B.ayP=new A.cj(0,5)
 B.ayH=new A.cj(0,10)
 B.ayI=new A.cj(0,15)
@@ -169992,19 +169993,19 @@ B.ayN=new A.cj(0,40)
 B.ayO=new A.cj(0,45)
 B.ayQ=new A.cj(0,50)
 B.ayR=new A.cj(0,55)
-B.a96=s([B.Np,B.ayP,B.ayH,B.ayI,B.ayJ,B.ayK,B.ayL,B.ayM,B.ayN,B.ayO,B.ayQ,B.ayR],t.JN)
-B.a98=s([0,0.32],t.n)
-B.a99=s(["L","M","M","G","V","S","D"],t.s)
+B.a97=s([B.Np,B.ayP,B.ayH,B.ayI,B.ayJ,B.ayK,B.ayL,B.ayM,B.ayN,B.ayO,B.ayQ,B.ayR],t.JN)
+B.a99=s([0,0.32],t.n)
+B.a9a=s(["L","M","M","G","V","S","D"],t.s)
 B.uw=new A.Rg(0,"zoomBackground")
-B.a9c=s([B.uw],t.EC)
+B.a9d=s([B.uw],t.EC)
 B.MD=new A.Rg(1,"blurBackground")
-B.a9d=s([B.uw,B.MD],t.EC)
+B.a9e=s([B.uw,B.MD],t.EC)
 B.MI=new A.Rn(0,"left")
 B.MJ=new A.Rn(1,"right")
-B.a9e=s([B.MI,B.MJ],A.aF("G<Rn>"))
-B.a9g=s(["Lun","Mar","Mer","Gio","Ven","Sab","Dom"],t.s)
+B.a9f=s([B.MI,B.MJ],A.aF("G<Rn>"))
+B.a9h=s(["Lun","Mar","Mer","Gio","Ven","Sab","Dom"],t.s)
 B.b2=new A.RH(0,"upstream")
-B.a9j=s([B.b2,B.x],A.aF("G<RH>"))
+B.a9k=s([B.b2,B.x],A.aF("G<RH>"))
 B.aV=new A.B8(0,"rtl")
 B.ah=new A.B8(1,"ltr")
 B.rM=s([B.aV,B.ah],A.aF("G<B8>"))
@@ -170013,23 +170014,23 @@ B.MW=new A.w1(1,"double")
 B.MX=new A.w1(2,"dotted")
 B.aty=new A.w1(3,"dashed")
 B.atA=new A.w1(4,"wavy")
-B.a9n=s([B.atu,B.MW,B.MX,B.aty,B.atA],A.aF("G<w1>"))
-B.a9v=s(["lunes","martes","mi\xe9rcoles","jueves","viernes","s\xe1bado","domingo"],t.s)
+B.a9o=s([B.atu,B.MW,B.MX,B.aty,B.atA],A.aF("G<w1>"))
+B.a9w=s(["lunes","martes","mi\xe9rcoles","jueves","viernes","s\xe1bado","domingo"],t.s)
 B.Bi=s(["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],t.s)
 B.Tv=new A.Dx(0,"auto")
 B.Tw=new A.Dx(1,"full")
 B.Tx=new A.Dx(2,"chromium")
-B.a9z=s([B.Tv,B.Tw,B.Tx],A.aF("G<Dx>"))
+B.a9A=s([B.Tv,B.Tw,B.Tx],A.aF("G<Dx>"))
 B.fJ=new A.oQ(0,"leading")
 B.dK=new A.oQ(1,"title")
 B.fK=new A.oQ(2,"subtitle")
 B.jc=new A.oQ(3,"trailing")
-B.a9C=s([B.fJ,B.dK,B.fK,B.jc],A.aF("G<oQ>"))
+B.a9D=s([B.fJ,B.dK,B.fK,B.jc],A.aF("G<oQ>"))
 B.Bj=s(["\u4e00","\u4e8c","\u4e09","\u56db","\u4e94","\u516d","\u65e5"],t.s)
-B.a9H=s([B.dr,B.d9,B.fZ,B.eh],A.aF("G<pj>"))
+B.a9I=s([B.dr,B.d9,B.fZ,B.eh],A.aF("G<pj>"))
 B.H3=new A.r(0,2)
 B.RR=new A.ef(0,B.cb,B.jE,B.H3,4)
-B.a9M=s([B.RR],t.sq)
+B.a9N=s([B.RR],t.sq)
 B.asU=new A.jK("fr","\ud83c\uddeb\ud83c\uddf7","Fran\xe7ais","French")
 B.asX=new A.jK("en","\ud83c\uddec\ud83c\udde7","English","English")
 B.asW=new A.jK("es","\ud83c\uddea\ud83c\uddf8","Espa\xf1ol","Spanish")
@@ -170041,20 +170042,20 @@ B.asZ=new A.jK("ja","\ud83c\uddef\ud83c\uddf5","\u65e5\u672c\u8a9e","Japanese")
 B.at_=new A.jK("ru","\ud83c\uddf7\ud83c\uddfa","\u0420\u0443\u0441\u0441\u043a\u0438\u0439","Russian")
 B.asR=new A.jK("ar","\ud83c\uddf8\ud83c\udde6","\u0627\u0644\u0639\u0631\u0628\u064a\u0629","Arabic")
 B.kr=s([B.asU,B.asX,B.asW,B.asS,B.asT,B.asV,B.asY,B.asZ,B.at_,B.asR],A.aF("G<jK>"))
-B.a9N=s(["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"],t.s)
+B.a9O=s(["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"],t.s)
 B.aU=new A.jL(0,"android")
 B.bX=new A.jL(1,"fuchsia")
 B.ag=new A.jL(2,"iOS")
 B.bY=new A.jL(3,"linux")
 B.bm=new A.jL(4,"macOS")
 B.bZ=new A.jL(5,"windows")
-B.a9T=s([B.aU,B.bX,B.ag,B.bY,B.bm,B.bZ],A.aF("G<jL>"))
+B.a9U=s([B.aU,B.bX,B.ag,B.bY,B.bm,B.bZ],A.aF("G<jL>"))
 B.WP=new A.F(1,0.9176470588235294,0.34509803921568627,0.047058823529411764,B.m)
 B.WB=new A.F(1,0.00784313725490196,0.5176470588235295,0.7803921568627451,B.m)
 B.WJ=new A.F(1,0.08627450980392157,0.6392156862745098,0.2901960784313726,B.m)
-B.a9U=s([B.eO,B.lN,B.m3,B.lV,B.m2,B.m4,B.m9,B.WP,B.WB,B.WJ,B.u,B.r],t.W)
-B.a9W=s(["0h","3h","6h","9h","12h","15h","18h","21h"],t.s)
-B.a9X=s([1,3,6,12,24],t.t)
+B.a9V=s([B.eO,B.lN,B.m3,B.lV,B.m2,B.m4,B.m9,B.WP,B.WB,B.WJ,B.u,B.r],t.W)
+B.a9X=s(["0h","3h","6h","9h","12h","15h","18h","21h"],t.s)
+B.a9Y=s([1,3,6,12,24],t.t)
 B.NY=new A.HO(0,"topLeft")
 B.O0=new A.HO(3,"bottomRight")
 B.aBw=new A.tB(B.NY,B.O0)
@@ -170063,35 +170064,35 @@ B.NZ=new A.HO(1,"topRight")
 B.O_=new A.HO(2,"bottomLeft")
 B.aBx=new A.tB(B.NZ,B.O_)
 B.aBy=new A.tB(B.O_,B.NZ)
-B.a9Y=s([B.aBw,B.aBz,B.aBx,B.aBy],A.aF("G<tB>"))
+B.a9Z=s([B.aBw,B.aBz,B.aBx,B.aBy],A.aF("G<tB>"))
 B.nc=s(["top_artist","top_album","top_track","last_track","favorites_count"],t.s)
 B.ks=s(["gt_week","gt_month","gt_year","ga_week","ga_month","ga_year","gb_week","gb_month","gb_year"],t.s)
 B.kt=s([0,10,20,30,40,50,60,70,80,90,95,99,100],t.t)
 B.Bk=s([B.e5,B.e6,B.e7,B.e8,B.e9,B.ea,B.dj,B.dk,B.dl,B.dm],A.aF("G<hF>"))
-B.aa6=s(["","\u064a\u0646\u0627","\u0641\u0628\u0631","\u0645\u0627\u0631","\u0623\u0628\u0631","\u0645\u0627\u064a","\u064a\u0648\u0646","\u064a\u0648\u0644","\u0623\u063a\u0633","\u0633\u0628\u062a","\u0623\u0643\u062a","\u0646\u0648\u0641","\u062f\u064a\u0633"],t.s)
-B.aac=s([35,30,20,25,30,35,30,25,25],t.n)
+B.aa7=s(["","\u064a\u0646\u0627","\u0641\u0628\u0631","\u0645\u0627\u0631","\u0623\u0628\u0631","\u0645\u0627\u064a","\u064a\u0648\u0646","\u064a\u0648\u0644","\u0623\u063a\u0633","\u0633\u0628\u062a","\u0623\u0643\u062a","\u0646\u0648\u0641","\u062f\u064a\u0633"],t.s)
+B.aad=s([35,30,20,25,30,35,30,25,25],t.n)
 B.Bl=s([B.ed,B.d0,B.d1,B.d2,B.d3,B.d4,B.d5,B.d6,B.cp,B.d7],t.ie)
 B.ja=new A.qk(0,"hour")
 B.oK=new A.qk(1,"minute")
 B.Bm=s([B.ja,B.oK],A.aF("G<qk>"))
-B.aae=s([2,4,6,8,10,12,13,15,17],t.t)
-B.aaf=s(["\u0627\u0644\u0627\u062b\u0646\u064a\u0646","\u0627\u0644\u062b\u0644\u0627\u062b\u0627\u0621","\u0627\u0644\u0623\u0631\u0628\u0639\u0627\u0621","\u0627\u0644\u062e\u0645\u064a\u0633","\u0627\u0644\u062c\u0645\u0639\u0629","\u0627\u0644\u0633\u0628\u062a","\u0627\u0644\u0623\u062d\u062f"],t.s)
-B.aai=s(["7day","1month","3month","6month","12month","overall"],t.s)
+B.aaf=s([2,4,6,8,10,12,13,15,17],t.t)
+B.aag=s(["\u0627\u0644\u0627\u062b\u0646\u064a\u0646","\u0627\u0644\u062b\u0644\u0627\u062b\u0627\u0621","\u0627\u0644\u0623\u0631\u0628\u0639\u0627\u0621","\u0627\u0644\u062e\u0645\u064a\u0633","\u0627\u0644\u062c\u0645\u0639\u0629","\u0627\u0644\u0633\u0628\u062a","\u0627\u0644\u0623\u062d\u062f"],t.s)
+B.aaj=s(["7day","1month","3month","6month","12month","overall"],t.s)
 B.nd=s(["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],t.s)
-B.aam=s(["\u0646","\u062b","\u0631","\u062e","\u062c","\u0633","\u062d"],t.s)
-B.aao=s(["click","scroll"],t.s)
-B.aap=s(["Luned\xec","Marted\xec","Mercoled\xec","Gioved\xec","Venerd\xec","Sabato","Domenica"],t.s)
+B.aan=s(["\u0646","\u062b","\u0631","\u062e","\u062c","\u0633","\u062d"],t.s)
+B.aap=s(["click","scroll"],t.s)
+B.aaq=s(["Luned\xec","Marted\xec","Mercoled\xec","Gioved\xec","Venerd\xec","Sabato","Domenica"],t.s)
 B.S1=new A.D9()
 B.nV=new A.a7K(1,"page")
 B.nW=new A.iL(B.c_,B.nV)
-B.aat=s([B.S1,B.nW],A.aF("G<c9>"))
-B.aau=s(["Your first 1,000 scrobbles. The journey begins. \ud83c\udfb5","You hit five figures! \ud83c\udf89","You're a true music addict. \ud83d\udd25","One million scrobbles. That's legendary. \ud83c\udfb8"],t.s)
+B.aau=s([B.S1,B.nW],A.aF("G<c9>"))
+B.aav=s(["Your first 1,000 scrobbles. The journey begins. \ud83c\udfb5","You hit five figures! \ud83c\udf89","You're a true music addict. \ud83d\udd25","One million scrobbles. That's legendary. \ud83c\udfb8"],t.s)
 B.Bn=s(["\u6708","\u706b","\u6c34","\u6728","\u91d1","\u571f","\u65e5"],t.s)
-B.aaz=s([0,0.7,1],t.n)
+B.aaA=s([0,0.7,1],t.n)
 B.aqv=new A.mZ(B.xt,B.n,4)
 B.ne=s([B.aqv],t.kO)
-B.aaA=s(["\u0627\u062b","\u062b\u0644","\u0623\u0631\u0628","\u062e\u0645","\u062c\u0645","\u0633\u0628\u062a","\u0623\u062d\u062f"],t.s)
-B.aaC=s([0,0.62,1],t.n)
+B.aaB=s(["\u0627\u062b","\u062b\u0644","\u0623\u0631\u0628","\u062e\u0645","\u062c\u0645","\u0633\u0628\u062a","\u0623\u062d\u062f"],t.s)
+B.aaD=s([0,0.62,1],t.n)
 B.a5b=s([1,26,19],t.t)
 B.a5a=s([1,26,16],t.t)
 B.a59=s([1,26,13],t.t)
@@ -170118,24 +170119,24 @@ B.a6h=s([4,43,19],t.t)
 B.a6g=s([4,43,15],t.t)
 B.a5D=s([2,98,78],t.t)
 B.a6j=s([4,49,31],t.t)
-B.a9I=s([2,32,14,4,33,15],t.t)
-B.a92=s([4,39,13,1,40,14],t.t)
+B.a9J=s([2,32,14,4,33,15],t.t)
+B.a93=s([4,39,13,1,40,14],t.t)
 B.a5v=s([2,121,97],t.t)
-B.aa_=s([2,60,38,2,61,39],t.t)
+B.aa0=s([2,60,38,2,61,39],t.t)
 B.abs=s([4,40,18,2,41,19],t.t)
 B.abT=s([4,40,14,2,41,15],t.t)
 B.a5w=s([2,146,116],t.t)
 B.a5u=s([3,58,36,2,59,37],t.t)
-B.a9k=s([4,36,16,4,37,17],t.t)
+B.a9l=s([4,36,16,4,37,17],t.t)
 B.abE=s([4,36,12,4,37,13],t.t)
-B.aa7=s([2,86,68,2,87,69],t.t)
+B.aa8=s([2,86,68,2,87,69],t.t)
 B.a7U=s([4,69,43,1,70,44],t.t)
 B.acs=s([6,43,19,2,44,20],t.t)
-B.aa5=s([6,43,15,2,44,16],t.t)
+B.aa6=s([6,43,15,2,44,16],t.t)
 B.a6d=s([4,101,81],t.t)
-B.aad=s([1,80,50,4,81,51],t.t)
+B.aae=s([1,80,50,4,81,51],t.t)
 B.a8t=s([4,50,22,4,51,23],t.t)
-B.aaw=s([3,36,12,8,37,13],t.t)
+B.aax=s([3,36,12,8,37,13],t.t)
 B.abu=s([2,116,92,2,117,93],t.t)
 B.a7F=s([6,58,36,2,59,37],t.t)
 B.a8K=s([4,46,20,6,47,21],t.t)
@@ -170144,25 +170145,25 @@ B.a6e=s([4,133,107],t.t)
 B.ac4=s([8,59,37,1,60,38],t.t)
 B.ace=s([8,44,20,4,45,21],t.t)
 B.acy=s([12,33,11,4,34,12],t.t)
-B.a9a=s([3,145,115,1,146,116],t.t)
+B.a9b=s([3,145,115,1,146,116],t.t)
 B.a79=s([4,64,40,5,65,41],t.t)
-B.ab2=s([11,36,16,5,37,17],t.t)
-B.a93=s([11,36,12,5,37,13],t.t)
-B.a9B=s([5,109,87,1,110,88],t.t)
-B.aa0=s([5,65,41,5,66,42],t.t)
+B.ab3=s([11,36,16,5,37,17],t.t)
+B.a94=s([11,36,12,5,37,13],t.t)
+B.a9C=s([5,109,87,1,110,88],t.t)
+B.aa1=s([5,65,41,5,66,42],t.t)
 B.a8n=s([5,54,24,7,55,25],t.t)
 B.a4Z=s([11,36,12],t.t)
 B.a85=s([5,122,98,1,123,99],t.t)
 B.ab9=s([7,73,45,3,74,46],t.t)
-B.a95=s([15,43,19,2,44,20],t.t)
+B.a96=s([15,43,19,2,44,20],t.t)
 B.a8z=s([3,45,15,13,46,16],t.t)
-B.a9w=s([1,135,107,5,136,108],t.t)
+B.a9x=s([1,135,107,5,136,108],t.t)
 B.a4S=s([10,74,46,1,75,47],t.t)
-B.aal=s([1,50,22,15,51,23],t.t)
+B.aam=s([1,50,22,15,51,23],t.t)
 B.a7T=s([2,42,14,17,43,15],t.t)
-B.a9V=s([5,150,120,1,151,121],t.t)
+B.a9W=s([5,150,120,1,151,121],t.t)
 B.a8J=s([9,69,43,4,70,44],t.t)
-B.a9m=s([17,50,22,1,51,23],t.t)
+B.a9n=s([17,50,22,1,51,23],t.t)
 B.abh=s([2,42,14,19,43,15],t.t)
 B.a8w=s([3,141,113,4,142,114],t.t)
 B.acr=s([3,70,44,11,71,45],t.t)
@@ -170175,39 +170176,39 @@ B.acj=s([15,43,15,10,44,16],t.t)
 B.a5r=s([4,144,116,4,145,117],t.t)
 B.a51=s([17,68,42],t.t)
 B.a7p=s([17,50,22,6,51,23],t.t)
-B.a9f=s([19,46,16,6,47,17],t.t)
+B.a9g=s([19,46,16,6,47,17],t.t)
 B.a8Z=s([2,139,111,7,140,112],t.t)
 B.a52=s([17,74,46],t.t)
 B.a7q=s([7,54,24,16,55,25],t.t)
 B.a5G=s([34,37,13],t.t)
-B.aa8=s([4,151,121,5,152,122],t.t)
-B.aas=s([4,75,47,14,76,48],t.t)
+B.aa9=s([4,151,121,5,152,122],t.t)
+B.aat=s([4,75,47,14,76,48],t.t)
 B.a8H=s([11,54,24,14,55,25],t.t)
 B.a4V=s([16,45,15,14,46,16],t.t)
 B.ac7=s([6,147,117,4,148,118],t.t)
 B.a8l=s([6,73,45,14,74,46],t.t)
 B.a5s=s([11,54,24,16,55,25],t.t)
-B.a9y=s([30,46,16,2,47,17],t.t)
+B.a9z=s([30,46,16,2,47,17],t.t)
 B.a84=s([8,132,106,4,133,107],t.t)
 B.a6b=s([8,75,47,13,76,48],t.t)
 B.abJ=s([7,54,24,22,55,25],t.t)
 B.a7t=s([22,45,15,13,46,16],t.t)
 B.ac9=s([10,142,114,2,143,115],t.t)
-B.a9o=s([19,74,46,4,75,47],t.t)
+B.a9p=s([19,74,46,4,75,47],t.t)
 B.a7O=s([28,50,22,6,51,23],t.t)
-B.a9R=s([33,46,16,4,47,17],t.t)
+B.a9S=s([33,46,16,4,47,17],t.t)
 B.a7L=s([8,152,122,4,153,123],t.t)
-B.aa3=s([22,73,45,3,74,46],t.t)
+B.aa4=s([22,73,45,3,74,46],t.t)
 B.abC=s([8,53,23,26,54,24],t.t)
 B.a8j=s([12,45,15,28,46,16],t.t)
 B.a7H=s([3,147,117,10,148,118],t.t)
 B.abQ=s([3,73,45,23,74,46],t.t)
-B.a9h=s([4,54,24,31,55,25],t.t)
+B.a9i=s([4,54,24,31,55,25],t.t)
 B.abg=s([11,45,15,31,46,16],t.t)
-B.a9P=s([7,146,116,7,147,117],t.t)
+B.a9Q=s([7,146,116,7,147,117],t.t)
 B.acz=s([21,73,45,7,74,46],t.t)
-B.a9p=s([1,53,23,37,54,24],t.t)
-B.a9b=s([19,45,15,26,46,16],t.t)
+B.a9q=s([1,53,23,37,54,24],t.t)
+B.a9c=s([19,45,15,26,46,16],t.t)
 B.act=s([5,145,115,10,146,116],t.t)
 B.a8B=s([19,75,47,10,76,48],t.t)
 B.abN=s([15,54,24,25,55,25],t.t)
@@ -170219,75 +170220,74 @@ B.a7W=s([23,45,15,28,46,16],t.t)
 B.a50=s([17,145,115],t.t)
 B.abj=s([10,74,46,23,75,47],t.t)
 B.a6c=s([10,54,24,35,55,25],t.t)
-B.aan=s([19,45,15,35,46,16],t.t)
-B.a9E=s([17,145,115,1,146,116],t.t)
+B.aao=s([19,45,15,35,46,16],t.t)
+B.a9F=s([17,145,115,1,146,116],t.t)
 B.acE=s([14,74,46,21,75,47],t.t)
 B.a87=s([29,54,24,19,55,25],t.t)
 B.ab8=s([11,45,15,46,46,16],t.t)
 B.a7V=s([13,145,115,6,146,116],t.t)
 B.abd=s([14,74,46,23,75,47],t.t)
-B.aaB=s([44,54,24,7,55,25],t.t)
-B.ab1=s([59,46,16,1,47,17],t.t)
-B.aay=s([12,151,121,7,152,122],t.t)
+B.aaC=s([44,54,24,7,55,25],t.t)
+B.ab2=s([59,46,16,1,47,17],t.t)
+B.aaz=s([12,151,121,7,152,122],t.t)
 B.a8e=s([12,75,47,26,76,48],t.t)
 B.a7i=s([39,54,24,14,55,25],t.t)
-B.aaD=s([22,45,15,41,46,16],t.t)
+B.aaE=s([22,45,15,41,46,16],t.t)
 B.a8A=s([6,151,121,14,152,122],t.t)
 B.a55=s([6,75,47,34,76,48],t.t)
-B.ab0=s([46,54,24,10,55,25],t.t)
+B.ab1=s([46,54,24,10,55,25],t.t)
 B.a8k=s([2,45,15,64,46,16],t.t)
 B.acd=s([17,152,122,4,153,123],t.t)
 B.a73=s([29,74,46,14,75,47],t.t)
-B.aak=s([49,54,24,10,55,25],t.t)
+B.aal=s([49,54,24,10,55,25],t.t)
 B.abY=s([24,45,15,46,46,16],t.t)
-B.a9J=s([4,152,122,18,153,123],t.t)
-B.aa2=s([13,74,46,32,75,47],t.t)
+B.a9K=s([4,152,122,18,153,123],t.t)
+B.aa3=s([13,74,46,32,75,47],t.t)
 B.a8h=s([48,54,24,14,55,25],t.t)
 B.acA=s([42,45,15,32,46,16],t.t)
 B.acl=s([20,147,117,4,148,118],t.t)
 B.ac3=s([40,75,47,7,76,48],t.t)
 B.ac6=s([43,54,24,22,55,25],t.t)
-B.aab=s([10,45,15,67,46,16],t.t)
+B.aac=s([10,45,15,67,46,16],t.t)
 B.a7M=s([19,148,118,6,149,119],t.t)
 B.a8T=s([18,75,47,31,76,48],t.t)
 B.a7Y=s([34,54,24,34,55,25],t.t)
 B.a8D=s([20,45,15,61,46,16],t.t)
-B.nf=s([B.a5b,B.a5a,B.a59,B.a5c,B.a5g,B.a5f,B.a5e,B.a5d,B.a5i,B.a5h,B.a5y,B.a5x,B.a57,B.a5A,B.a5z,B.a6f,B.a58,B.a5B,B.a8g,B.a81,B.a5C,B.a6i,B.a6h,B.a6g,B.a5D,B.a6j,B.a9I,B.a92,B.a5v,B.aa_,B.abs,B.abT,B.a5w,B.a5u,B.a9k,B.abE,B.aa7,B.a7U,B.acs,B.aa5,B.a6d,B.aad,B.a8t,B.aaw,B.abu,B.a7F,B.a8K,B.a7K,B.a6e,B.ac4,B.ace,B.acy,B.a9a,B.a79,B.ab2,B.a93,B.a9B,B.aa0,B.a8n,B.a4Z,B.a85,B.ab9,B.a95,B.a8z,B.a9w,B.a4S,B.aal,B.a7T,B.a9V,B.a8J,B.a9m,B.abh,B.a8w,B.acr,B.a7A,B.a5K,B.a7S,B.a86,B.abW,B.acj,B.a5r,B.a51,B.a7p,B.a9f,B.a8Z,B.a52,B.a7q,B.a5G,B.aa8,B.aas,B.a8H,B.a4V,B.ac7,B.a8l,B.a5s,B.a9y,B.a84,B.a6b,B.abJ,B.a7t,B.ac9,B.a9o,B.a7O,B.a9R,B.a7L,B.aa3,B.abC,B.a8j,B.a7H,B.abQ,B.a9h,B.abg,B.a9P,B.acz,B.a9p,B.a9b,B.act,B.a8B,B.abN,B.abD,B.acx,B.ab7,B.a78,B.a7W,B.a50,B.abj,B.a6c,B.aan,B.a9E,B.acE,B.a87,B.ab8,B.a7V,B.abd,B.aaB,B.ab1,B.aay,B.a8e,B.a7i,B.aaD,B.a8A,B.a55,B.ab0,B.a8k,B.acd,B.a73,B.aak,B.abY,B.a9J,B.aa2,B.a8h,B.acA,B.acl,B.ac3,B.ac6,B.aab,B.a7M,B.a8T,B.a7Y,B.a8D],t.Zb)
-B.aaE=s(["overall","7day","1month","3month","6month","12month"],t.s)
-B.aaU=s([],t.QP)
-B.aaS=s([],A.aF("G<hH>"))
-B.aaN=s([],t.sq)
-B.aaT=s([],t.Ug)
+B.nf=s([B.a5b,B.a5a,B.a59,B.a5c,B.a5g,B.a5f,B.a5e,B.a5d,B.a5i,B.a5h,B.a5y,B.a5x,B.a57,B.a5A,B.a5z,B.a6f,B.a58,B.a5B,B.a8g,B.a81,B.a5C,B.a6i,B.a6h,B.a6g,B.a5D,B.a6j,B.a9J,B.a93,B.a5v,B.aa0,B.abs,B.abT,B.a5w,B.a5u,B.a9l,B.abE,B.aa8,B.a7U,B.acs,B.aa6,B.a6d,B.aae,B.a8t,B.aax,B.abu,B.a7F,B.a8K,B.a7K,B.a6e,B.ac4,B.ace,B.acy,B.a9b,B.a79,B.ab3,B.a94,B.a9C,B.aa1,B.a8n,B.a4Z,B.a85,B.ab9,B.a96,B.a8z,B.a9x,B.a4S,B.aam,B.a7T,B.a9W,B.a8J,B.a9n,B.abh,B.a8w,B.acr,B.a7A,B.a5K,B.a7S,B.a86,B.abW,B.acj,B.a5r,B.a51,B.a7p,B.a9g,B.a8Z,B.a52,B.a7q,B.a5G,B.aa9,B.aat,B.a8H,B.a4V,B.ac7,B.a8l,B.a5s,B.a9z,B.a84,B.a6b,B.abJ,B.a7t,B.ac9,B.a9p,B.a7O,B.a9S,B.a7L,B.aa4,B.abC,B.a8j,B.a7H,B.abQ,B.a9i,B.abg,B.a9Q,B.acz,B.a9q,B.a9c,B.act,B.a8B,B.abN,B.abD,B.acx,B.ab7,B.a78,B.a7W,B.a50,B.abj,B.a6c,B.aao,B.a9F,B.acE,B.a87,B.ab8,B.a7V,B.abd,B.aaC,B.ab2,B.aaz,B.a8e,B.a7i,B.aaE,B.a8A,B.a55,B.ab1,B.a8k,B.acd,B.a73,B.aal,B.abY,B.a9K,B.aa3,B.a8h,B.acA,B.acl,B.ac3,B.ac6,B.aac,B.a7M,B.a8T,B.a7Y,B.a8D],t.Zb)
+B.aaF=s(["overall","7day","1month","3month","6month","12month"],t.s)
+B.aaV=s([],t.QP)
+B.aaT=s([],A.aF("G<hH>"))
+B.aaO=s([],t.sq)
+B.aaU=s([],t.Ug)
 B.Bs=s([],A.aF("G<c8C>"))
-B.aaI=s([],t.E)
+B.aaJ=s([],t.E)
 B.Bq=s([],t.SE)
-B.aaR=s([],t.lX)
-B.aaX=s([],t.fJ)
-B.aaZ=s([],t.ER)
+B.aaS=s([],t.lX)
+B.aaY=s([],t.fJ)
+B.ab_=s([],t.ER)
 B.aDY=s([],t.ss)
 B.Bo=s([],t.tc)
 B.ng=s([],t.jl)
 B.Br=s([],t.yv)
 B.Bp=s([],t.wi)
-B.aaO=s([],A.aF("G<pM<@>>"))
-B.aaL=s([],t.zU)
-B.aaK=s([],t.Di)
+B.aaP=s([],A.aF("G<pM<@>>"))
+B.aaM=s([],t.zU)
+B.aaL=s([],t.Di)
 B.rO=s([],t.AO)
-B.aaM=s([],t.ef)
-B.aaJ=s([],t.D1)
+B.aaN=s([],t.ef)
+B.aaK=s([],t.D1)
 B.ni=s([],t.QF)
 B.aDZ=s([],t.nk)
-B.aaW=s([],t.Lx)
-B.aaY=s([],t.AS)
+B.aaX=s([],t.Lx)
+B.aaZ=s([],t.AS)
 B.aM=s([],t.p)
-B.aaQ=s([],t.lD)
+B.aaR=s([],t.lD)
 B.nh=s([],t.n)
 B.Z=s([],t.ee)
-B.aaP=s([],t.Rs)
-B.ab_=s([],t._m)
+B.aaQ=s([],t.Rs)
+B.ab0=s([],t._m)
 B.aE_=s([],t.VU)
-B.ab3=s(["","Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"],t.s)
-B.ab4=s(["\u4f60\u7684\u7b2c\u4e00\u4e2a 1,000 \u6b21 scrobble\u3002\u65c5\u7a0b\u5f00\u59cb\u4e86\u3002\ud83c\udfb5","\u4f60\u8fbe\u5230\u4e86\u4e94\u4f4d\u6570\uff01\ud83c\udf89","\u4f60\u662f\u771f\u6b63\u7684\u97f3\u4e50\u72c2\u70ed\u8005\u3002\ud83d\udd25","\u4e00\u767e\u4e07\u6b21 scrobble\u3002\u8fd9\u662f\u4f20\u5947\u3002\ud83c\udfb8"],t.s)
+B.ab4=s(["","Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"],t.s)
 B.Bt=s(["S","M","T","W","T","F","S"],t.s)
 B.abc=s([3614090360,3905402710,606105819,3250441966,4118548399,1200080426,2821735955,4249261313,1770035416,2336552879,4294925233,2304563134,1804603682,4254626195,2792965006,1236535329,4129170786,3225465664,643717713,3921069994,3593408605,38016083,3634488961,3889429448,568446438,3275163606,4107603335,1163531501,2850285829,4243563512,1735328473,2368359562,4294588738,2272392833,1839030562,4259657740,2763975236,1272893353,4139469664,3200236656,681279174,3936430074,3572445317,76029189,3654602809,3873151461,530742520,3299628645,4096336452,1126891415,2878612391,4237533241,1700485571,2399980690,4293915773,2240044497,1873313359,4264355552,2734768916,1309151649,4149444226,3174756917,718787259,3951481745],t.t)
 B.abf=s(["singer","musician","band","rapper","songwriter","composer","dj","record producer","music group","vocalist","guitarist","drummer","rock band","pop group","album","song by","music duo","hip hop group","girl group","boy band","instrumentalist","orchestra"],t.s)
@@ -170320,9 +170320,9 @@ B.ao3=new A.a7("teal",B.m9)
 B.anN=new A.a7("neutral",B.py)
 B.abO=s([B.ao1,B.ao6,B.aob,B.aod,B.ao8,B.aof,B.ao3,B.anN],A.aF("G<+(e,F)>"))
 B.a7a=s([0.001200833568784504,0.002389694492170889,0.0002795742885861124],t.n)
-B.aav=s([0.0005891086651375999,0.0029785502573438758,0.0003270666104008398],t.n)
+B.aaw=s([0.0005891086651375999,0.0029785502573438758,0.0003270666104008398],t.n)
 B.a7B=s([0.00010146692491640572,0.0005364214359186694,0.0032979401770712076],t.n)
-B.abX=s([B.a7a,B.aav,B.a7B],t.zg)
+B.abX=s([B.a7a,B.aaw,B.a7B],t.zg)
 B.abZ=s([45,95,45,20,45,90,45,45,45],t.n)
 B.ac_=s([120,120,20,45,20,15,20,120,120],t.n)
 B.aoS=new A.Cg(["\ud83c\udf19",5,"ui_band_night",0])
@@ -170993,114 +170993,114 @@ B.arf=new A.b5(B.cw,!1,!1,!0,!1,B.O)
 B.Gw=new A.dc([B.arm,B.a1,B.aqN,B.a1,B.M5,B.a1,B.M2,B.a1,B.ara,B.a1,B.aqZ,B.a1,B.arr,B.a1,B.arf,B.a1],t.Fp)
 B.alr={st_notif_on:0,st_notif_off:1,st_notif_count:2,st_notif_perm:3,st_notif_none:4,st_sync_on:5,st_sync_off:6,st_sync_on_s:7,st_sync_off_s:8,st_bkp_on:9,st_bkp_off:10,st_bkp_on_s:11,st_bkp_off_s:12,st_bkp_next:13,cmp_breakdown:14,cmp_by_artists:15,cmp_by_genres:16,cmp_by_tracks:17,cmp_by_albums:18,eco_on:19,eco_off:20,eco_why_manual:21,eco_why_system:22,eco_why_battery:23,eco_off_hint:24,eco_trig:25,eco_sys_t:26,eco_sys_s:27,eco_sys_na:28,eco_chg:29,eco_chg1:30,eco_chg2:31,eco_chg3:32,eco_chg4:33,eco_chg_note:34,lib_section:35,lib_merge_t:36,lib_merge_s:37,lib_split_t:38,lib_split_s:39,lib_step_t:40,lib_step_s:41,bk_dash_t:42,bk_dash_s:43,bk_notif_t:44,bk_notif_s:45,bk_lib_t:46,bk_lib_s:47,bk_prof_t:48,bk_prof_s:49,about_readme_t:50,about_readme_s:51,fold_show:52,fold_hide:53,readme_sub:54,readme_version:55,readme_downloads:56,readme_stars:57,readme_license:58,readme_commits:59,readme_workflows:60,readme_retry:61,readme_github:62,readme_failed:63,ago_min:64,ago_h:65,ago_d:66,load_restored:67,load_ready:68,load_connecting:69,load_done:70,load_backup_note:71,dash_nowplay:72,dash_stats:73,dash_recent:74,dash_discover:75,dash_friends:76,dash_chart:77,dash_calendar:78,dash_monthly:79,cache_video_t:80,cache_video_s:81,cache_video_short:82,cache_video_cleared:83,cache_memory_section:84,cache_storage_section:85,lvl:86,lvl_history:87,set_living_t:88,set_living_s:89,set_motion_t:90,set_motion_s:91,set_achv_t:92,set_achv_s:93,cache_img_limit_t:94,cache_img_limit_s:95,cache_vid_limit_t:96,cache_vid_limit_s:97,cache_video_off:98,cache_vid_disk_t:99,cache_vid_disk_s:100,cache_no_limit_note:101,key_internal_use:102,key_internal_help:103,key_internal_active:104,key_fallback_title:105,key_fallback_sub:106}
 B.l={fr:0,en:1,es:2,zh:3,pt:4,de:5,it:6,ja:7,ru:8,ar:9}
-B.ahH=new A.B(B.l,["Notifications activ\xe9es","Notifications are on","Notificaciones activadas","\u901a\u77e5\u5df2\u5f00\u542f","Notifica\xe7\xf5es ativadas","Benachrichtigungen sind an","Notifiche attive","\u901a\u77e5\u306f\u30aa\u30f3\u3067\u3059","\u0423\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u044f \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u044b","\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a \u0645\u0641\u0639\u0651\u0644\u0629"],t.w)
-B.afX=new A.B(B.l,["Notifications d\xe9sactiv\xe9es","Notifications are off","Notificaciones desactivadas","\u901a\u77e5\u5df2\u5173\u95ed","Notifica\xe7\xf5es desativadas","Benachrichtigungen sind aus","Notifiche disattivate","\u901a\u77e5\u306f\u30aa\u30d5\u3067\u3059","\u0423\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u044f \u0432\u044b\u043a\u043b\u044e\u0447\u0435\u043d\u044b","\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a \u063a\u064a\u0631 \u0645\u0641\u0639\u0651\u0644\u0629"],t.w)
-B.ai7=new A.B(B.l,["{n} types actifs","{n} types active","{n} tipos activos","\u5df2\u542f\u7528 {n} \u79cd","{n} tipos ativos","{n} Typen aktiv","{n} tipi attivi","{n} \u7a2e\u985e\u304c\u6709\u52b9","\u0412\u043a\u043b\u044e\u0447\u0435\u043d\u043e \u0442\u0438\u043f\u043e\u0432: {n}","{n} \u0623\u0646\u0648\u0627\u0639 \u0645\u0641\u0639\u0651\u0644\u0629"],t.w)
-B.ahg=new A.B(B.l,["Autorisation du syst\xe8me requise","System permission needed","Se necesita el permiso del sistema","\u9700\u8981\u7cfb\u7edf\u6388\u6743","Permiss\xe3o do sistema necess\xe1ria","Systemberechtigung erforderlich","Serve il permesso di sistema","\u30b7\u30b9\u30c6\u30e0\u306e\u8a31\u53ef\u304c\u5fc5\u8981\u3067\u3059","\u041d\u0443\u0436\u043d\u043e \u0440\u0430\u0437\u0440\u0435\u0448\u0435\u043d\u0438\u0435 \u0441\u0438\u0441\u0442\u0435\u043c\u044b","\u0645\u0637\u0644\u0648\u0628 \u0625\u0630\u0646 \u0645\u0646 \u0627\u0644\u0646\u0638\u0627\u0645"],t.w)
-B.aiX=new A.B(B.l,["Aucun type de notification choisi","No notification type selected","Ning\xfan tipo de notificaci\xf3n elegido","\u672a\u9009\u62e9\u4efb\u4f55\u901a\u77e5\u7c7b\u578b","Nenhum tipo de notifica\xe7\xe3o escolhido","Kein Benachrichtigungstyp gew\xe4hlt","Nessun tipo di notifica scelto","\u901a\u77e5\u306e\u7a2e\u985e\u304c\u9078\u3070\u308c\u3066\u3044\u307e\u305b\u3093","\u041d\u0438 \u043e\u0434\u0438\u043d \u0442\u0438\u043f \u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u0439 \u043d\u0435 \u0432\u044b\u0431\u0440\u0430\u043d","\u0644\u0645 \u064a\u062a\u0645 \u0627\u062e\u062a\u064a\u0627\u0631 \u0623\u064a \u0646\u0648\u0639 \u0645\u0646 \u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a"],t.w)
+B.ahN=new A.B(B.l,["Notifications activ\xe9es","Notifications are on","Notificaciones activadas","\u901a\u77e5\u5df2\u5f00\u542f","Notifica\xe7\xf5es ativadas","Benachrichtigungen sind an","Notifiche attive","\u901a\u77e5\u306f\u30aa\u30f3\u3067\u3059","\u0423\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u044f \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u044b","\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a \u0645\u0641\u0639\u0651\u0644\u0629"],t.w)
+B.afW=new A.B(B.l,["Notifications d\xe9sactiv\xe9es","Notifications are off","Notificaciones desactivadas","\u901a\u77e5\u5df2\u5173\u95ed","Notifica\xe7\xf5es desativadas","Benachrichtigungen sind aus","Notifiche disattivate","\u901a\u77e5\u306f\u30aa\u30d5\u3067\u3059","\u0423\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u044f \u0432\u044b\u043a\u043b\u044e\u0447\u0435\u043d\u044b","\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a \u063a\u064a\u0631 \u0645\u0641\u0639\u0651\u0644\u0629"],t.w)
+B.aib=new A.B(B.l,["{n} types actifs","{n} types active","{n} tipos activos","\u5df2\u542f\u7528 {n} \u79cd","{n} tipos ativos","{n} Typen aktiv","{n} tipi attivi","{n} \u7a2e\u985e\u304c\u6709\u52b9","\u0412\u043a\u043b\u044e\u0447\u0435\u043d\u043e \u0442\u0438\u043f\u043e\u0432: {n}","{n} \u0623\u0646\u0648\u0627\u0639 \u0645\u0641\u0639\u0651\u0644\u0629"],t.w)
+B.ahk=new A.B(B.l,["Autorisation du syst\xe8me requise","System permission needed","Se necesita el permiso del sistema","\u9700\u8981\u7cfb\u7edf\u6388\u6743","Permiss\xe3o do sistema necess\xe1ria","Systemberechtigung erforderlich","Serve il permesso di sistema","\u30b7\u30b9\u30c6\u30e0\u306e\u8a31\u53ef\u304c\u5fc5\u8981\u3067\u3059","\u041d\u0443\u0436\u043d\u043e \u0440\u0430\u0437\u0440\u0435\u0448\u0435\u043d\u0438\u0435 \u0441\u0438\u0441\u0442\u0435\u043c\u044b","\u0645\u0637\u0644\u0648\u0628 \u0625\u0630\u0646 \u0645\u0646 \u0627\u0644\u0646\u0638\u0627\u0645"],t.w)
+B.aj_=new A.B(B.l,["Aucun type de notification choisi","No notification type selected","Ning\xfan tipo de notificaci\xf3n elegido","\u672a\u9009\u62e9\u4efb\u4f55\u901a\u77e5\u7c7b\u578b","Nenhum tipo de notifica\xe7\xe3o escolhido","Kein Benachrichtigungstyp gew\xe4hlt","Nessun tipo di notifica scelto","\u901a\u77e5\u306e\u7a2e\u985e\u304c\u9078\u3070\u308c\u3066\u3044\u307e\u305b\u3093","\u041d\u0438 \u043e\u0434\u0438\u043d \u0442\u0438\u043f \u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u0439 \u043d\u0435 \u0432\u044b\u0431\u0440\u0430\u043d","\u0644\u0645 \u064a\u062a\u0645 \u0627\u062e\u062a\u064a\u0627\u0631 \u0623\u064a \u0646\u0648\u0639 \u0645\u0646 \u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a"],t.w)
 B.ajq=new A.B(B.l,["Synchronisation automatique activ\xe9e","Automatic sync is on","Sincronizaci\xf3n autom\xe1tica activada","\u81ea\u52a8\u540c\u6b65\u5df2\u5f00\u542f","Sincroniza\xe7\xe3o autom\xe1tica ativada","Automatische Synchronisierung ist an","Sincronizzazione automatica attiva","\u81ea\u52d5\u540c\u671f\u306f\u30aa\u30f3\u3067\u3059","\u0410\u0432\u0442\u043e\u0441\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0430\u0446\u0438\u044f \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u0430","\u0627\u0644\u0645\u0632\u0627\u0645\u0646\u0629 \u0627\u0644\u062a\u0644\u0642\u0627\u0626\u064a\u0629 \u0645\u0641\u0639\u0651\u0644\u0629"],t.w)
-B.ajR=new A.B(B.l,["Synchronisation automatique d\xe9sactiv\xe9e","Automatic sync is off","Sincronizaci\xf3n autom\xe1tica desactivada","\u81ea\u52a8\u540c\u6b65\u5df2\u5173\u95ed","Sincroniza\xe7\xe3o autom\xe1tica desativada","Automatische Synchronisierung ist aus","Sincronizzazione automatica disattivata","\u81ea\u52d5\u540c\u671f\u306f\u30aa\u30d5\u3067\u3059","\u0410\u0432\u0442\u043e\u0441\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0430\u0446\u0438\u044f \u0432\u044b\u043a\u043b\u044e\u0447\u0435\u043d\u0430","\u0627\u0644\u0645\u0632\u0627\u0645\u0646\u0629 \u0627\u0644\u062a\u0644\u0642\u0627\u0626\u064a\u0629 \u063a\u064a\u0631 \u0645\u0641\u0639\u0651\u0644\u0629"],t.w)
-B.agJ=new A.B(B.l,["Vos donn\xe9es se mettent \xe0 jour toutes seules.","Your data updates by itself.","Tus datos se actualizan solos.","\u6570\u636e\u4f1a\u81ea\u52a8\u66f4\u65b0\u3002","Seus dados se atualizam sozinhos.","Deine Daten aktualisieren sich von selbst.","I tuoi dati si aggiornano da soli.","\u30c7\u30fc\u30bf\u306f\u81ea\u52d5\u7684\u306b\u66f4\u65b0\u3055\u308c\u307e\u3059\u3002","\u0414\u0430\u043d\u043d\u044b\u0435 \u043e\u0431\u043d\u043e\u0432\u043b\u044f\u044e\u0442\u0441\u044f \u0441\u0430\u043c\u0438.","\u062a\u062a\u062d\u062f\u0651\u062b \u0628\u064a\u0627\u0646\u0627\u062a\u0643 \u062a\u0644\u0642\u0627\u0626\u064a\u064b\u0627."],t.w)
-B.aiY=new A.B(B.l,["Les donn\xe9es ne se mettent \xe0 jour que sur demande.","Data only updates when you ask.","Los datos solo se actualizan cuando lo pides.","\u6570\u636e\u4ec5\u5728\u4f60\u624b\u52a8\u64cd\u4f5c\u65f6\u66f4\u65b0\u3002","Os dados s\xf3 s\xe3o atualizados quando voc\xea pede.","Daten werden nur auf Anfrage aktualisiert.","I dati si aggiornano solo su richiesta.","\u30c7\u30fc\u30bf\u306f\u624b\u52d5\u306e\u3068\u304d\u3060\u3051\u66f4\u65b0\u3055\u308c\u307e\u3059\u3002","\u0414\u0430\u043d\u043d\u044b\u0435 \u043e\u0431\u043d\u043e\u0432\u043b\u044f\u044e\u0442\u0441\u044f \u0442\u043e\u043b\u044c\u043a\u043e \u043f\u043e \u0437\u0430\u043f\u0440\u043e\u0441\u0443.","\u062a\u062a\u062d\u062f\u0651\u062b \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a \u0639\u0646\u062f \u0627\u0644\u0637\u0644\u0628 \u0641\u0642\u0637."],t.w)
+B.ajQ=new A.B(B.l,["Synchronisation automatique d\xe9sactiv\xe9e","Automatic sync is off","Sincronizaci\xf3n autom\xe1tica desactivada","\u81ea\u52a8\u540c\u6b65\u5df2\u5173\u95ed","Sincroniza\xe7\xe3o autom\xe1tica desativada","Automatische Synchronisierung ist aus","Sincronizzazione automatica disattivata","\u81ea\u52d5\u540c\u671f\u306f\u30aa\u30d5\u3067\u3059","\u0410\u0432\u0442\u043e\u0441\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0430\u0446\u0438\u044f \u0432\u044b\u043a\u043b\u044e\u0447\u0435\u043d\u0430","\u0627\u0644\u0645\u0632\u0627\u0645\u0646\u0629 \u0627\u0644\u062a\u0644\u0642\u0627\u0626\u064a\u0629 \u063a\u064a\u0631 \u0645\u0641\u0639\u0651\u0644\u0629"],t.w)
+B.ajL=new A.B(B.l,["Vos donn\xe9es se mettent \xe0 jour toutes seules.","Your data updates by itself.","Sus datos se actualizan solos.","\u6570\u636e\u4f1a\u81ea\u52a8\u66f4\u65b0\u3002","Seus dados se atualizam sozinhos.","Ihre Daten aktualisieren sich von selbst.","I suoi dati si aggiornano da soli.","\u30c7\u30fc\u30bf\u306f\u81ea\u52d5\u7684\u306b\u66f4\u65b0\u3055\u308c\u307e\u3059\u3002","\u0414\u0430\u043d\u043d\u044b\u0435 \u043e\u0431\u043d\u043e\u0432\u043b\u044f\u044e\u0442\u0441\u044f \u0441\u0430\u043c\u0438.","\u062a\u062a\u062d\u062f\u0651\u062b \u0628\u064a\u0627\u0646\u0627\u062a\u0643 \u062a\u0644\u0642\u0627\u0626\u064a\u064b\u0627."],t.w)
+B.ahZ=new A.B(B.l,["Les donn\xe9es ne se mettent \xe0 jour que sur demande.","Data only updates when you ask.","Los datos solo se actualizan cuando lo pide.","\u6570\u636e\u4ec5\u5728\u60a8\u624b\u52a8\u64cd\u4f5c\u65f6\u66f4\u65b0\u3002","Os dados s\xf3 s\xe3o atualizados quando voc\xea pede.","Daten werden nur auf Anfrage aktualisiert.","I dati si aggiornano solo su richiesta.","\u30c7\u30fc\u30bf\u306f\u624b\u52d5\u306e\u3068\u304d\u3060\u3051\u66f4\u65b0\u3055\u308c\u307e\u3059\u3002","\u0414\u0430\u043d\u043d\u044b\u0435 \u043e\u0431\u043d\u043e\u0432\u043b\u044f\u044e\u0442\u0441\u044f \u0442\u043e\u043b\u044c\u043a\u043e \u043f\u043e \u0437\u0430\u043f\u0440\u043e\u0441\u0443.","\u062a\u062a\u062d\u062f\u0651\u062b \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a \u0639\u0646\u062f \u0627\u0644\u0637\u0644\u0628 \u0641\u0642\u0637."],t.w)
 B.ajk=new A.B(B.l,["Sauvegarde automatique activ\xe9e","Automatic backup is on","Copia de seguridad autom\xe1tica activada","\u81ea\u52a8\u5907\u4efd\u5df2\u5f00\u542f","Backup autom\xe1tico ativado","Automatische Sicherung ist an","Backup automatico attivo","\u81ea\u52d5\u30d0\u30c3\u30af\u30a2\u30c3\u30d7\u306f\u30aa\u30f3\u3067\u3059","\u0410\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u043e\u0435 \u0440\u0435\u0437\u0435\u0440\u0432\u043d\u043e\u0435 \u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u0435 \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u043e","\u0627\u0644\u0646\u0633\u062e \u0627\u0644\u0627\u062d\u062a\u064a\u0627\u0637\u064a \u0627\u0644\u062a\u0644\u0642\u0627\u0626\u064a \u0645\u0641\u0639\u0651\u0644"],t.w)
 B.afC=new A.B(B.l,["Sauvegarde automatique d\xe9sactiv\xe9e","Automatic backup is off","Copia de seguridad autom\xe1tica desactivada","\u81ea\u52a8\u5907\u4efd\u5df2\u5173\u95ed","Backup autom\xe1tico desativado","Automatische Sicherung ist aus","Backup automatico disattivato","\u81ea\u52d5\u30d0\u30c3\u30af\u30a2\u30c3\u30d7\u306f\u30aa\u30d5\u3067\u3059","\u0410\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u043e\u0435 \u0440\u0435\u0437\u0435\u0440\u0432\u043d\u043e\u0435 \u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u0435 \u0432\u044b\u043a\u043b\u044e\u0447\u0435\u043d\u043e","\u0627\u0644\u0646\u0633\u062e \u0627\u0644\u0627\u062d\u062a\u064a\u0627\u0637\u064a \u0627\u0644\u062a\u0644\u0642\u0627\u0626\u064a \u063a\u064a\u0631 \u0645\u0641\u0639\u0651\u0644"],t.w)
-B.afW=new A.B(B.l,["Vos r\xe9glages sont sauvegard\xe9s automatiquement.","Your settings are backed up automatically.","Tus ajustes se guardan autom\xe1ticamente.","\u8bbe\u7f6e\u4f1a\u81ea\u52a8\u5907\u4efd\u3002","Suas configura\xe7\xf5es s\xe3o salvas automaticamente.","Deine Einstellungen werden automatisch gesichert.","Le tue impostazioni vengono salvate automaticamente.","\u8a2d\u5b9a\u306f\u81ea\u52d5\u3067\u30d0\u30c3\u30af\u30a2\u30c3\u30d7\u3055\u308c\u307e\u3059\u3002","\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438 \u0441\u043e\u0445\u0440\u0430\u043d\u044f\u044e\u0442\u0441\u044f \u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438.","\u064a\u062a\u0645 \u0646\u0633\u062e \u0625\u0639\u062f\u0627\u062f\u0627\u062a\u0643 \u0627\u062d\u062a\u064a\u0627\u0637\u064a\u064b\u0627 \u062a\u0644\u0642\u0627\u0626\u064a\u064b\u0627."],t.w)
-B.aih=new A.B(B.l,["Activez-la pour ne jamais perdre vos r\xe9glages.","Turn it on to never lose your settings.","Act\xedvala para no perder nunca tus ajustes.","\u5f00\u542f\u540e\u4e0d\u4f1a\u4e22\u5931\u8bbe\u7f6e\u3002","Ative para nunca perder suas configura\xe7\xf5es.","Schalte sie ein, damit nichts verloren geht.","Attivalo per non perdere mai le impostazioni.","\u30aa\u30f3\u306b\u3059\u308b\u3068\u8a2d\u5b9a\u3092\u5931\u3044\u307e\u305b\u3093\u3002","\u0412\u043a\u043b\u044e\u0447\u0438\u0442\u0435, \u0447\u0442\u043e\u0431\u044b \u043d\u0435 \u043f\u043e\u0442\u0435\u0440\u044f\u0442\u044c \u043d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438.","\u0641\u0639\u0651\u0644\u0647\u0627 \u0644\u0643\u064a \u0644\u0627 \u062a\u0641\u0642\u062f \u0625\u0639\u062f\u0627\u062f\u0627\u062a\u0643 \u0623\u0628\u062f\u064b\u0627."],t.w)
-B.aj6=new A.B(B.l,["Prochaine sauvegarde : {d}","Next backup: {d}","Pr\xf3xima copia: {d}","\u4e0b\u6b21\u5907\u4efd\uff1a{d}","Pr\xf3ximo backup: {d}","N\xe4chste Sicherung: {d}","Prossimo backup: {d}","\u6b21\u56de\u306e\u30d0\u30c3\u30af\u30a2\u30c3\u30d7\uff1a{d}","\u0421\u043b\u0435\u0434\u0443\u044e\u0449\u0435\u0435 \u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u0435: {d}","\u0627\u0644\u0646\u0633\u062e\u0629 \u0627\u0644\u062a\u0627\u0644\u064a\u0629: {d}"],t.w)
-B.agD=new A.B(B.l,["Ce qui vous rapproche","What brings you together","Lo que os une","\u4f60\u4eec\u7684\u5171\u540c\u70b9","O que aproxima voc\xeas","Was euch verbindet","Cosa vi avvicina","\u5171\u901a\u70b9\u306e\u5185\u8a33","\u0427\u0442\u043e \u0432\u0430\u0441 \u043e\u0431\u044a\u0435\u0434\u0438\u043d\u044f\u0435\u0442","\u0645\u0627 \u064a\u062c\u0645\u0639\u0643\u0645\u0627"],t.w)
-B.aiH=new A.B(B.l,["Artistes","Artists","Artistas","\u827a\u672f\u5bb6","Artistas","K\xfcnstler","Artisti","\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8","\u0418\u0441\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u0438","\u0627\u0644\u0641\u0646\u0627\u0646\u0648\u0646"],t.w)
+B.afE=new A.B(B.l,["Vos r\xe9glages sont sauvegard\xe9s automatiquement.","Your settings are backed up automatically.","Sus ajustes se guardan autom\xe1ticamente.","\u8bbe\u7f6e\u4f1a\u81ea\u52a8\u5907\u4efd\u3002","Suas configura\xe7\xf5es s\xe3o salvas automaticamente.","Ihre Einstellungen werden automatisch gesichert.","Le sue impostazioni vengono salvate automaticamente.","\u8a2d\u5b9a\u306f\u81ea\u52d5\u3067\u30d0\u30c3\u30af\u30a2\u30c3\u30d7\u3055\u308c\u307e\u3059\u3002","\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438 \u0441\u043e\u0445\u0440\u0430\u043d\u044f\u044e\u0442\u0441\u044f \u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438.","\u064a\u062a\u0645 \u0646\u0633\u062e \u0625\u0639\u062f\u0627\u062f\u0627\u062a\u0643 \u0627\u062d\u062a\u064a\u0627\u0637\u064a\u064b\u0627 \u062a\u0644\u0642\u0627\u0626\u064a\u064b\u0627."],t.w)
+B.ajo=new A.B(B.l,["Activez-la pour ne jamais perdre vos r\xe9glages.","Turn it on to never lose your settings.","Act\xedvela para no perder nunca sus ajustes.","\u5f00\u542f\u540e\u4e0d\u4f1a\u4e22\u5931\u8bbe\u7f6e\u3002","Ative para nunca perder suas configura\xe7\xf5es.","Schalten Sie sie ein, damit nichts verloren geht.","Attivalo per non perdere mai le impostazioni.","\u30aa\u30f3\u306b\u3059\u308b\u3068\u8a2d\u5b9a\u3092\u5931\u3044\u307e\u305b\u3093\u3002","\u0412\u043a\u043b\u044e\u0447\u0438\u0442\u0435, \u0447\u0442\u043e\u0431\u044b \u043d\u0435 \u043f\u043e\u0442\u0435\u0440\u044f\u0442\u044c \u043d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438.","\u0641\u0639\u0651\u0644\u0647\u0627 \u0644\u0643\u064a \u0644\u0627 \u062a\u0641\u0642\u062f \u0625\u0639\u062f\u0627\u062f\u0627\u062a\u0643 \u0623\u0628\u062f\u064b\u0627."],t.w)
+B.aja=new A.B(B.l,["Prochaine sauvegarde : {d}","Next backup: {d}","Pr\xf3xima copia: {d}","\u4e0b\u6b21\u5907\u4efd\uff1a{d}","Pr\xf3ximo backup: {d}","N\xe4chste Sicherung: {d}","Prossimo backup: {d}","\u6b21\u56de\u306e\u30d0\u30c3\u30af\u30a2\u30c3\u30d7\uff1a{d}","\u0421\u043b\u0435\u0434\u0443\u044e\u0449\u0435\u0435 \u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u0435: {d}","\u0627\u0644\u0646\u0633\u062e\u0629 \u0627\u0644\u062a\u0627\u0644\u064a\u0629: {d}"],t.w)
+B.aju=new A.B(B.l,["Ce qui vous rapproche","What brings you together","Lo que les une","\u60a8\u4e8c\u4f4d\u7684\u5171\u540c\u70b9","O que aproxima voc\xeas","Was Sie verbindet","Cosa li avvicina","\u5171\u901a\u70b9\u306e\u5185\u8a33","\u0427\u0442\u043e \u0432\u0430\u0441 \u043e\u0431\u044a\u0435\u0434\u0438\u043d\u044f\u0435\u0442","\u0645\u0627 \u064a\u062c\u0645\u0639\u0643\u0645\u0627"],t.w)
+B.aiI=new A.B(B.l,["Artistes","Artists","Artistas","\u827a\u672f\u5bb6","Artistas","K\xfcnstler","Artisti","\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8","\u0418\u0441\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u0438","\u0627\u0644\u0641\u0646\u0627\u0646\u0648\u0646"],t.w)
 B.ajW=new A.B(B.l,["Genres","Genres","G\xe9neros","\u98ce\u683c","G\xeaneros","Genres","Generi","\u30b8\u30e3\u30f3\u30eb","\u0416\u0430\u043d\u0440\u044b","\u0627\u0644\u0623\u0646\u0648\u0627\u0639"],t.w)
 B.ajp=new A.B(B.l,["Titres","Tracks","Canciones","\u66f2\u76ee","Faixas","Titel","Brani","\u30c8\u30e9\u30c3\u30af","\u0422\u0440\u0435\u043a\u0438","\u0627\u0644\u0645\u0642\u0627\u0637\u0639"],t.w)
-B.agW=new A.B(B.l,["Albums","Albums","\xc1lbumes","\u4e13\u8f91","\xc1lbuns","Alben","Album","\u30a2\u30eb\u30d0\u30e0","\u0410\u043b\u044c\u0431\u043e\u043c\u044b","\u0627\u0644\u0623\u0644\u0628\u0648\u0645\u0627\u062a"],t.w)
-B.ajV=new A.B(B.l,["\xc9conomie d'\xe9nergie activ\xe9e","Power saving is on","Ahorro de energ\xeda activado","\u7701\u7535\u5df2\u5f00\u542f","Economia de energia ativada","Energiesparen ist an","Risparmio energetico attivo","\u7701\u96fb\u529b\u304c\u30aa\u30f3\u3067\u3059","\u042d\u043d\u0435\u0440\u0433\u043e\u0441\u0431\u0435\u0440\u0435\u0436\u0435\u043d\u0438\u0435 \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u043e","\u062a\u0648\u0641\u064a\u0631 \u0627\u0644\u0637\u0627\u0642\u0629 \u0645\u0641\u0639\u0651\u0644"],t.w)
-B.ag5=new A.B(B.l,["\xc9conomie d'\xe9nergie d\xe9sactiv\xe9e","Power saving is off","Ahorro de energ\xeda desactivado","\u7701\u7535\u5df2\u5173\u95ed","Economia de energia desativada","Energiesparen ist aus","Risparmio energetico disattivato","\u7701\u96fb\u529b\u306f\u30aa\u30d5\u3067\u3059","\u042d\u043d\u0435\u0440\u0433\u043e\u0441\u0431\u0435\u0440\u0435\u0436\u0435\u043d\u0438\u0435 \u0432\u044b\u043a\u043b\u044e\u0447\u0435\u043d\u043e","\u062a\u0648\u0641\u064a\u0631 \u0627\u0644\u0637\u0627\u0642\u0629 \u063a\u064a\u0631 \u0645\u0641\u0639\u0651\u0644"],t.w)
-B.aiI=new A.B(B.l,["Activ\xe9e en permanence, par vos soins","Always on, set by you","Siempre activado, por ti","\u7531\u4f60\u8bbe\u4e3a\u59cb\u7ec8\u5f00\u542f","Sempre ativada, por voc\xea","Dauerhaft an, von dir eingestellt","Sempre attivo, scelto da te","\u5e38\u306b\u30aa\u30f3\uff08\u624b\u52d5\u8a2d\u5b9a\uff09","\u0412\u0441\u0435\u0433\u0434\u0430 \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u043e, \u043f\u043e \u0432\u0430\u0448\u0435\u043c\u0443 \u0432\u044b\u0431\u043e\u0440\u0443","\u0645\u0641\u0639\u0651\u0644 \u062f\u0627\u0626\u0645\u064b\u0627 \u0628\u0625\u0639\u062f\u0627\u062f \u0645\u0646\u0643"],t.w)
-B.aje=new A.B(B.l,["L'\xe9conomiseur de batterie de votre appareil est activ\xe9","Your device's battery saver is on","El ahorro de bater\xeda de tu dispositivo est\xe1 activado","\u8bbe\u5907\u7684\u7701\u7535\u6a21\u5f0f\u5df2\u5f00\u542f","A economia de bateria do seu dispositivo est\xe1 ativada","Der Energiesparmodus deines Ger\xe4ts ist an","Il risparmio batteria del dispositivo \xe8 attivo","\u7aef\u672b\u306e\u30d0\u30c3\u30c6\u30ea\u30fc\u30bb\u30fc\u30d0\u30fc\u304c\u30aa\u30f3\u3067\u3059","\u0420\u0435\u0436\u0438\u043c \u044d\u043a\u043e\u043d\u043e\u043c\u0438\u0438 \u0437\u0430\u0440\u044f\u0434\u0430 \u043d\u0430 \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u0435 \u0432\u043a\u043b\u044e\u0447\u0451\u043d","\u0648\u0636\u0639 \u062a\u0648\u0641\u064a\u0631 \u0627\u0644\u0628\u0637\u0627\u0631\u064a\u0629 \u0641\u064a \u062c\u0647\u0627\u0632\u0643 \u0645\u0641\u0639\u0651\u0644"],t.w)
+B.ah_=new A.B(B.l,["Albums","Albums","\xc1lbumes","\u4e13\u8f91","\xc1lbuns","Alben","Album","\u30a2\u30eb\u30d0\u30e0","\u0410\u043b\u044c\u0431\u043e\u043c\u044b","\u0627\u0644\u0623\u0644\u0628\u0648\u0645\u0627\u062a"],t.w)
+B.ajU=new A.B(B.l,["\xc9conomie d'\xe9nergie activ\xe9e","Power saving is on","Ahorro de energ\xeda activado","\u7701\u7535\u5df2\u5f00\u542f","Economia de energia ativada","Energiesparen ist an","Risparmio energetico attivo","\u7701\u96fb\u529b\u304c\u30aa\u30f3\u3067\u3059","\u042d\u043d\u0435\u0440\u0433\u043e\u0441\u0431\u0435\u0440\u0435\u0436\u0435\u043d\u0438\u0435 \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u043e","\u062a\u0648\u0641\u064a\u0631 \u0627\u0644\u0637\u0627\u0642\u0629 \u0645\u0641\u0639\u0651\u0644"],t.w)
+B.ag7=new A.B(B.l,["\xc9conomie d'\xe9nergie d\xe9sactiv\xe9e","Power saving is off","Ahorro de energ\xeda desactivado","\u7701\u7535\u5df2\u5173\u95ed","Economia de energia desativada","Energiesparen ist aus","Risparmio energetico disattivato","\u7701\u96fb\u529b\u306f\u30aa\u30d5\u3067\u3059","\u042d\u043d\u0435\u0440\u0433\u043e\u0441\u0431\u0435\u0440\u0435\u0436\u0435\u043d\u0438\u0435 \u0432\u044b\u043a\u043b\u044e\u0447\u0435\u043d\u043e","\u062a\u0648\u0641\u064a\u0631 \u0627\u0644\u0637\u0627\u0642\u0629 \u063a\u064a\u0631 \u0645\u0641\u0639\u0651\u0644"],t.w)
+B.afZ=new A.B(B.l,["Activ\xe9e en permanence, par vos soins","Always on, set by you","Siempre activado, por usted","\u7531\u60a8\u8bbe\u4e3a\u59cb\u7ec8\u5f00\u542f","Sempre ativada, por voc\xea","Dauerhaft an, von Ihnen eingestellt","Sempre attivo, scelto da lei","\u5e38\u306b\u30aa\u30f3\uff08\u624b\u52d5\u8a2d\u5b9a\uff09","\u0412\u0441\u0435\u0433\u0434\u0430 \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u043e, \u043f\u043e \u0432\u0430\u0448\u0435\u043c\u0443 \u0432\u044b\u0431\u043e\u0440\u0443","\u0645\u0641\u0639\u0651\u0644 \u062f\u0627\u0626\u0645\u064b\u0627 \u0628\u0625\u0639\u062f\u0627\u062f \u0645\u0646\u0643"],t.w)
+B.aiN=new A.B(B.l,["L'\xe9conomiseur de batterie de votre appareil est activ\xe9","Your device's battery saver is on","El ahorro de bater\xeda de su dispositivo est\xe1 activado","\u8bbe\u5907\u7684\u7701\u7535\u6a21\u5f0f\u5df2\u5f00\u542f","A economia de bateria do seu dispositivo est\xe1 ativada","Der Energiesparmodus Ihres Ger\xe4ts ist an","Il risparmio batteria del dispositivo \xe8 attivo","\u7aef\u672b\u306e\u30d0\u30c3\u30c6\u30ea\u30fc\u30bb\u30fc\u30d0\u30fc\u304c\u30aa\u30f3\u3067\u3059","\u0420\u0435\u0436\u0438\u043c \u044d\u043a\u043e\u043d\u043e\u043c\u0438\u0438 \u0437\u0430\u0440\u044f\u0434\u0430 \u043d\u0430 \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u0435 \u0432\u043a\u043b\u044e\u0447\u0451\u043d","\u0648\u0636\u0639 \u062a\u0648\u0641\u064a\u0631 \u0627\u0644\u0628\u0637\u0627\u0631\u064a\u0629 \u0641\u064a \u062c\u0647\u0627\u0632\u0643 \u0645\u0641\u0639\u0651\u0644"],t.w)
 B.afM=new A.B(B.l,["La batterie est \xe0 {n} %","Battery is at {n}%","La bater\xeda est\xe1 al {n} %","\u7535\u91cf\u4e3a {n}%","A bateria est\xe1 em {n}%","Akku bei {n} %","La batteria \xe8 al {n}%","\u30d0\u30c3\u30c6\u30ea\u30fc\u6b8b\u91cf\u306f {n}% \u3067\u3059","\u0417\u0430\u0440\u044f\u0434 \u0431\u0430\u0442\u0430\u0440\u0435\u0438: {n}%","\u0645\u0633\u062a\u0648\u0649 \u0627\u0644\u0628\u0637\u0627\u0631\u064a\u0629 {n}%"],t.w)
-B.aiV=new A.B(B.l,["Choisissez ci-dessous quand l'activer","Choose below when it should turn on","Elige abajo cu\xe1ndo activarlo","\u5728\u4e0b\u65b9\u9009\u62e9\u4f55\u65f6\u5f00\u542f","Escolha abaixo quando ativar","W\xe4hle unten, wann er sich einschalten soll","Scegli qui sotto quando attivarlo","\u30aa\u30f3\u306b\u3059\u308b\u30bf\u30a4\u30df\u30f3\u30b0\u3092\u4e0b\u3067\u9078\u3073\u307e\u3059","\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u043d\u0438\u0436\u0435, \u043a\u043e\u0433\u0434\u0430 \u0432\u043a\u043b\u044e\u0447\u0430\u0442\u044c","\u0627\u062e\u062a\u0631 \u0623\u062f\u0646\u0627\u0647 \u0645\u062a\u0649 \u064a\u062a\u0645 \u0627\u0644\u062a\u0641\u0639\u064a\u0644"],t.w)
-B.ah2=new A.B(B.l,["Quand l'activer","When to turn on","Cu\xe1ndo activarlo","\u4f55\u65f6\u5f00\u542f","Quando ativar","Wann einschalten","Quando attivarlo","\u30aa\u30f3\u306b\u3059\u308b\u30bf\u30a4\u30df\u30f3\u30b0","\u041a\u043e\u0433\u0434\u0430 \u0432\u043a\u043b\u044e\u0447\u0430\u0442\u044c","\u0645\u062a\u0649 \u064a\u062a\u0645 \u0627\u0644\u062a\u0641\u0639\u064a\u0644"],t.w)
-B.ajd=new A.B(B.l,["Quand l'\xe9conomiseur de batterie de l'appareil est activ\xe9","When the device battery saver is on","Cuando el ahorro de bater\xeda del dispositivo est\xe9 activado","\u8bbe\u5907\u7701\u7535\u6a21\u5f0f\u5f00\u542f\u65f6","Quando a economia de bateria do dispositivo estiver ativada","Wenn der Energiesparmodus des Ger\xe4ts an ist","Quando il risparmio batteria del dispositivo \xe8 attivo","\u7aef\u672b\u306e\u30d0\u30c3\u30c6\u30ea\u30fc\u30bb\u30fc\u30d0\u30fc\u304c\u30aa\u30f3\u306e\u3068\u304d","\u041a\u043e\u0433\u0434\u0430 \u043d\u0430 \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u0435 \u0432\u043a\u043b\u044e\u0447\u0451\u043d \u0440\u0435\u0436\u0438\u043c \u044d\u043a\u043e\u043d\u043e\u043c\u0438\u0438 \u0437\u0430\u0440\u044f\u0434\u0430","\u0639\u0646\u062f \u062a\u0641\u0639\u064a\u0644 \u062a\u0648\u0641\u064a\u0631 \u0627\u0644\u0628\u0637\u0627\u0631\u064a\u0629 \u0641\u064a \u0627\u0644\u062c\u0647\u0627\u0632"],t.w)
-B.afR=new A.B(B.l,["Suit le mode \xe9conomie d'\xe9nergie natif de votre t\xe9l\xe9phone et se d\xe9sactive avec lui.","Follows your phone's built-in power saving mode and turns off with it.","Sigue el modo de ahorro de energ\xeda integrado del tel\xe9fono y se desactiva con \xe9l.","\u8ddf\u968f\u624b\u673a\u81ea\u5e26\u7684\u7701\u7535\u6a21\u5f0f\uff0c\u5e76\u968f\u5176\u5173\u95ed\u800c\u5173\u95ed\u3002","Acompanha o modo de economia de energia nativo do telefone e desativa junto com ele.","Folgt dem integrierten Energiesparmodus deines Telefons und schaltet sich mit ihm aus.","Segue il risparmio energetico integrato del telefono e si disattiva con esso.","\u30b9\u30de\u30fc\u30c8\u30d5\u30a9\u30f3\u6a19\u6e96\u306e\u7701\u96fb\u529b\u30e2\u30fc\u30c9\u306b\u9023\u52d5\u3057\u3001\u89e3\u9664\u3055\u308c\u308b\u3068\u4e00\u7dd2\u306b\u30aa\u30d5\u306b\u306a\u308a\u307e\u3059\u3002","\u0421\u043b\u0435\u0434\u0443\u0435\u0442 \u0432\u0441\u0442\u0440\u043e\u0435\u043d\u043d\u043e\u043c\u0443 \u0440\u0435\u0436\u0438\u043c\u0443 \u044d\u043d\u0435\u0440\u0433\u043e\u0441\u0431\u0435\u0440\u0435\u0436\u0435\u043d\u0438\u044f \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430 \u0438 \u0432\u044b\u043a\u043b\u044e\u0447\u0430\u0435\u0442\u0441\u044f \u0432\u043c\u0435\u0441\u0442\u0435 \u0441 \u043d\u0438\u043c.","\u064a\u062a\u0628\u0639 \u0648\u0636\u0639 \u062a\u0648\u0641\u064a\u0631 \u0627\u0644\u0637\u0627\u0642\u0629 \u0627\u0644\u0645\u062f\u0645\u062c \u0641\u064a \u0647\u0627\u062a\u0641\u0643 \u0648\u064a\u062a\u0648\u0642\u0641 \u0645\u0639\u0647."],t.w)
-B.agF=new A.B(B.l,["Indisponible sur cet appareil.","Not available on this device.","No disponible en este dispositivo.","\u6b64\u8bbe\u5907\u4e0d\u652f\u6301\u3002","Indispon\xedvel neste dispositivo.","Auf diesem Ger\xe4t nicht verf\xfcgbar.","Non disponibile su questo dispositivo.","\u3053\u306e\u7aef\u672b\u3067\u306f\u5229\u7528\u3067\u304d\u307e\u305b\u3093\u3002","\u041d\u0435\u0434\u043e\u0441\u0442\u0443\u043f\u043d\u043e \u043d\u0430 \u044d\u0442\u043e\u043c \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u0435.","\u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u0639\u0644\u0649 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632."],t.w)
-B.ah6=new A.B(B.l,["Ce qui change","What changes","Qu\xe9 cambia","\u4f1a\u6709\u54ea\u4e9b\u53d8\u5316","O que muda","Was sich \xe4ndert","Cosa cambia","\u5909\u308f\u308b\u3053\u3068","\u0427\u0442\u043e \u043c\u0435\u043d\u044f\u0435\u0442\u0441\u044f","\u0645\u0627 \u0627\u0644\u0630\u064a \u064a\u062a\u063a\u064a\u0651\u0631"],t.w)
-B.ahv=new A.B(B.l,["Le parallaxe au mouvement est d\xe9sactiv\xe9","Tilt parallax is turned off","El paralaje al mover el m\xf3vil se desactiva","\u5173\u95ed\u503e\u659c\u89c6\u5dee","O paralaxe de movimento \xe9 desativado","Der Neige-Parallax wird abgeschaltet","Il parallasse al movimento viene disattivato","\u50be\u304d\u30d1\u30e9\u30e9\u30c3\u30af\u30b9\u3092\u30aa\u30d5\u306b\u3057\u307e\u3059","\u041f\u0430\u0440\u0430\u043b\u043b\u0430\u043a\u0441 \u043f\u0440\u0438 \u043d\u0430\u043a\u043b\u043e\u043d\u0435 \u043e\u0442\u043a\u043b\u044e\u0447\u0430\u0435\u0442\u0441\u044f","\u064a\u062a\u0645 \u062a\u0639\u0637\u064a\u0644 \u062a\u0623\u062b\u064a\u0631 \u0627\u0644\u0645\u0646\u0638\u0648\u0631 \u0639\u0646\u062f \u0627\u0644\u0625\u0645\u0627\u0644\u0629"],t.w)
-B.ah4=new A.B(B.l,["La fr\xe9quence de l'\xe9cran est limit\xe9e \xe0 environ 60 Hz","Screen refresh rate is capped at about 60 Hz","La frecuencia de la pantalla se limita a unos 60 Hz","\u5c4f\u5e55\u5237\u65b0\u7387\u9650\u5236\u5728\u7ea6 60 Hz","A taxa de atualiza\xe7\xe3o da tela \xe9 limitada a cerca de 60 Hz","Die Bildwiederholrate wird auf etwa 60 Hz begrenzt","La frequenza dello schermo \xe8 limitata a circa 60 Hz","\u753b\u9762\u306e\u30ea\u30d5\u30ec\u30c3\u30b7\u30e5\u30ec\u30fc\u30c8\u3092\u7d04 60 Hz \u306b\u5236\u9650\u3057\u307e\u3059","\u0427\u0430\u0441\u0442\u043e\u0442\u0430 \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u044f \u044d\u043a\u0440\u0430\u043d\u0430 \u043e\u0433\u0440\u0430\u043d\u0438\u0447\u0438\u0432\u0430\u0435\u0442\u0441\u044f \u043f\u0440\u0438\u043c\u0435\u0440\u043d\u043e 60 \u0413\u0446","\u064a\u064f\u062d\u062f\u0651 \u0645\u0639\u062f\u0644 \u062a\u062d\u062f\u064a\u062b \u0627\u0644\u0634\u0627\u0634\u0629 \u0628\u062d\u0648\u0627\u0644\u064a 60 \u0647\u0631\u062a\u0632"],t.w)
+B.ahS=new A.B(B.l,["Choisissez ci-dessous quand l'activer","Choose below when it should turn on","Elija abajo cu\xe1ndo activarlo","\u5728\u4e0b\u65b9\u9009\u62e9\u4f55\u65f6\u5f00\u542f","Escolha abaixo quando ativar","W\xe4hlen Sie unten, wann er sich einschalten soll","Scelga qui sotto quando attivarlo","\u30aa\u30f3\u306b\u3059\u308b\u30bf\u30a4\u30df\u30f3\u30b0\u3092\u4e0b\u3067\u9078\u3073\u307e\u3059","\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u043d\u0438\u0436\u0435, \u043a\u043e\u0433\u0434\u0430 \u0432\u043a\u043b\u044e\u0447\u0430\u0442\u044c","\u0627\u062e\u062a\u0631 \u0623\u062f\u0646\u0627\u0647 \u0645\u062a\u0649 \u064a\u062a\u0645 \u0627\u0644\u062a\u0641\u0639\u064a\u0644"],t.w)
+B.ah7=new A.B(B.l,["Quand l'activer","When to turn on","Cu\xe1ndo activarlo","\u4f55\u65f6\u5f00\u542f","Quando ativar","Wann einschalten","Quando attivarlo","\u30aa\u30f3\u306b\u3059\u308b\u30bf\u30a4\u30df\u30f3\u30b0","\u041a\u043e\u0433\u0434\u0430 \u0432\u043a\u043b\u044e\u0447\u0430\u0442\u044c","\u0645\u062a\u0649 \u064a\u062a\u0645 \u0627\u0644\u062a\u0641\u0639\u064a\u0644"],t.w)
+B.ajh=new A.B(B.l,["Quand l'\xe9conomiseur de batterie de l'appareil est activ\xe9","When the device battery saver is on","Cuando el ahorro de bater\xeda del dispositivo est\xe9 activado","\u8bbe\u5907\u7701\u7535\u6a21\u5f0f\u5f00\u542f\u65f6","Quando a economia de bateria do dispositivo estiver ativada","Wenn der Energiesparmodus des Ger\xe4ts an ist","Quando il risparmio batteria del dispositivo \xe8 attivo","\u7aef\u672b\u306e\u30d0\u30c3\u30c6\u30ea\u30fc\u30bb\u30fc\u30d0\u30fc\u304c\u30aa\u30f3\u306e\u3068\u304d","\u041a\u043e\u0433\u0434\u0430 \u043d\u0430 \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u0435 \u0432\u043a\u043b\u044e\u0447\u0451\u043d \u0440\u0435\u0436\u0438\u043c \u044d\u043a\u043e\u043d\u043e\u043c\u0438\u0438 \u0437\u0430\u0440\u044f\u0434\u0430","\u0639\u0646\u062f \u062a\u0641\u0639\u064a\u0644 \u062a\u0648\u0641\u064a\u0631 \u0627\u0644\u0628\u0637\u0627\u0631\u064a\u0629 \u0641\u064a \u0627\u0644\u062c\u0647\u0627\u0632"],t.w)
+B.ahG=new A.B(B.l,["Suit le mode \xe9conomie d'\xe9nergie natif de votre t\xe9l\xe9phone et se d\xe9sactive avec lui.","Follows your phone's built-in power saving mode and turns off with it.","Sigue el modo de ahorro de energ\xeda integrado del tel\xe9fono y se desactiva con \xe9l.","\u8ddf\u968f\u624b\u673a\u81ea\u5e26\u7684\u7701\u7535\u6a21\u5f0f\uff0c\u5e76\u968f\u5176\u5173\u95ed\u800c\u5173\u95ed\u3002","Acompanha o modo de economia de energia nativo do telefone e desativa junto com ele.","Folgt dem integrierten Energiesparmodus Ihres Telefons und schaltet sich mit ihm aus.","Segue il risparmio energetico integrato del telefono e si disattiva con esso.","\u30b9\u30de\u30fc\u30c8\u30d5\u30a9\u30f3\u6a19\u6e96\u306e\u7701\u96fb\u529b\u30e2\u30fc\u30c9\u306b\u9023\u52d5\u3057\u3001\u89e3\u9664\u3055\u308c\u308b\u3068\u4e00\u7dd2\u306b\u30aa\u30d5\u306b\u306a\u308a\u307e\u3059\u3002","\u0421\u043b\u0435\u0434\u0443\u0435\u0442 \u0432\u0441\u0442\u0440\u043e\u0435\u043d\u043d\u043e\u043c\u0443 \u0440\u0435\u0436\u0438\u043c\u0443 \u044d\u043d\u0435\u0440\u0433\u043e\u0441\u0431\u0435\u0440\u0435\u0436\u0435\u043d\u0438\u044f \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430 \u0438 \u0432\u044b\u043a\u043b\u044e\u0447\u0430\u0435\u0442\u0441\u044f \u0432\u043c\u0435\u0441\u0442\u0435 \u0441 \u043d\u0438\u043c.","\u064a\u062a\u0628\u0639 \u0648\u0636\u0639 \u062a\u0648\u0641\u064a\u0631 \u0627\u0644\u0637\u0627\u0642\u0629 \u0627\u0644\u0645\u062f\u0645\u062c \u0641\u064a \u0647\u0627\u062a\u0641\u0643 \u0648\u064a\u062a\u0648\u0642\u0641 \u0645\u0639\u0647."],t.w)
+B.agK=new A.B(B.l,["Indisponible sur cet appareil.","Not available on this device.","No disponible en este dispositivo.","\u6b64\u8bbe\u5907\u4e0d\u652f\u6301\u3002","Indispon\xedvel neste dispositivo.","Auf diesem Ger\xe4t nicht verf\xfcgbar.","Non disponibile su questo dispositivo.","\u3053\u306e\u7aef\u672b\u3067\u306f\u5229\u7528\u3067\u304d\u307e\u305b\u3093\u3002","\u041d\u0435\u0434\u043e\u0441\u0442\u0443\u043f\u043d\u043e \u043d\u0430 \u044d\u0442\u043e\u043c \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u0435.","\u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u0639\u0644\u0649 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632."],t.w)
+B.ahb=new A.B(B.l,["Ce qui change","What changes","Qu\xe9 cambia","\u4f1a\u6709\u54ea\u4e9b\u53d8\u5316","O que muda","Was sich \xe4ndert","Cosa cambia","\u5909\u308f\u308b\u3053\u3068","\u0427\u0442\u043e \u043c\u0435\u043d\u044f\u0435\u0442\u0441\u044f","\u0645\u0627 \u0627\u0644\u0630\u064a \u064a\u062a\u063a\u064a\u0651\u0631"],t.w)
+B.ahy=new A.B(B.l,["Le parallaxe au mouvement est d\xe9sactiv\xe9","Tilt parallax is turned off","El paralaje al mover el m\xf3vil se desactiva","\u5173\u95ed\u503e\u659c\u89c6\u5dee","O paralaxe de movimento \xe9 desativado","Der Neige-Parallax wird abgeschaltet","Il parallasse al movimento viene disattivato","\u50be\u304d\u30d1\u30e9\u30e9\u30c3\u30af\u30b9\u3092\u30aa\u30d5\u306b\u3057\u307e\u3059","\u041f\u0430\u0440\u0430\u043b\u043b\u0430\u043a\u0441 \u043f\u0440\u0438 \u043d\u0430\u043a\u043b\u043e\u043d\u0435 \u043e\u0442\u043a\u043b\u044e\u0447\u0430\u0435\u0442\u0441\u044f","\u064a\u062a\u0645 \u062a\u0639\u0637\u064a\u0644 \u062a\u0623\u062b\u064a\u0631 \u0627\u0644\u0645\u0646\u0638\u0648\u0631 \u0639\u0646\u062f \u0627\u0644\u0625\u0645\u0627\u0644\u0629"],t.w)
+B.ah9=new A.B(B.l,["La fr\xe9quence de l'\xe9cran est limit\xe9e \xe0 environ 60 Hz","Screen refresh rate is capped at about 60 Hz","La frecuencia de la pantalla se limita a unos 60 Hz","\u5c4f\u5e55\u5237\u65b0\u7387\u9650\u5236\u5728\u7ea6 60 Hz","A taxa de atualiza\xe7\xe3o da tela \xe9 limitada a cerca de 60 Hz","Die Bildwiederholrate wird auf etwa 60 Hz begrenzt","La frequenza dello schermo \xe8 limitata a circa 60 Hz","\u753b\u9762\u306e\u30ea\u30d5\u30ec\u30c3\u30b7\u30e5\u30ec\u30fc\u30c8\u3092\u7d04 60 Hz \u306b\u5236\u9650\u3057\u307e\u3059","\u0427\u0430\u0441\u0442\u043e\u0442\u0430 \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u044f \u044d\u043a\u0440\u0430\u043d\u0430 \u043e\u0433\u0440\u0430\u043d\u0438\u0447\u0438\u0432\u0430\u0435\u0442\u0441\u044f \u043f\u0440\u0438\u043c\u0435\u0440\u043d\u043e 60 \u0413\u0446","\u064a\u064f\u062d\u062f\u0651 \u0645\u0639\u062f\u0644 \u062a\u062d\u062f\u064a\u062b \u0627\u0644\u0634\u0627\u0634\u0629 \u0628\u062d\u0648\u0627\u0644\u064a 60 \u0647\u0631\u062a\u0632"],t.w)
 B.ait=new A.B(B.l,["Les mises \xe0 jour en arri\xe8re-plan sont moins fr\xe9quentes","Background updates run less often","Las actualizaciones en segundo plano son menos frecuentes","\u540e\u53f0\u66f4\u65b0\u9891\u7387\u964d\u4f4e","As atualiza\xe7\xf5es em segundo plano ficam menos frequentes","Hintergrundaktualisierungen laufen seltener","Gli aggiornamenti in background sono meno frequenti","\u30d0\u30c3\u30af\u30b0\u30e9\u30a6\u30f3\u30c9\u66f4\u65b0\u306e\u983b\u5ea6\u3092\u4e0b\u3052\u307e\u3059","\u0424\u043e\u043d\u043e\u0432\u044b\u0435 \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u044f \u0432\u044b\u043f\u043e\u043b\u043d\u044f\u044e\u0442\u0441\u044f \u0440\u0435\u0436\u0435","\u062a\u0635\u0628\u062d \u0627\u0644\u062a\u062d\u062f\u064a\u062b\u0627\u062a \u0641\u064a \u0627\u0644\u062e\u0644\u0641\u064a\u0629 \u0623\u0642\u0644 \u062a\u0643\u0631\u0627\u0631\u064b\u0627"],t.w)
-B.agU=new A.B(B.l,["Les pochettes anim\xe9es et les reflets des badges sont en pause","Animated artwork and badge shine are paused","Las car\xe1tulas animadas y el brillo de las insignias se pausan","\u52a8\u6001\u5c01\u9762\u548c\u5fbd\u7ae0\u5149\u6548\u6682\u505c","As capas animadas e o brilho dos emblemas ficam em pausa","Animierte Cover und der Glanz der Abzeichen pausieren","Le copertine animate e il riflesso dei badge sono in pausa","\u52d5\u304f\u30a2\u30fc\u30c8\u30ef\u30fc\u30af\u3068\u30d0\u30c3\u30b8\u306e\u8f1d\u304d\u3092\u505c\u6b62\u3057\u307e\u3059","\u0410\u043d\u0438\u043c\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0435 \u043e\u0431\u043b\u043e\u0436\u043a\u0438 \u0438 \u0431\u043b\u0435\u0441\u043a \u0437\u043d\u0430\u0447\u043a\u043e\u0432 \u043f\u0440\u0438\u043e\u0441\u0442\u0430\u043d\u0430\u0432\u043b\u0438\u0432\u0430\u044e\u0442\u0441\u044f","\u064a\u062a\u0645 \u0625\u064a\u0642\u0627\u0641 \u0627\u0644\u0623\u063a\u0644\u0641\u0629 \u0627\u0644\u0645\u062a\u062d\u0631\u0643\u0629 \u0648\u0644\u0645\u0639\u0627\u0646 \u0627\u0644\u0634\u0627\u0631\u0627\u062a \u0645\u0624\u0642\u062a\u064b\u0627"],t.w)
-B.agh=new A.B(B.l,["Tout le reste garde sa pleine qualit\xe9 : images, exports et cartes de partage.","Everything else keeps full quality: images, exports and share cards.","Todo lo dem\xe1s mantiene la calidad completa: im\xe1genes, exportaciones y tarjetas para compartir.","\u5176\u4ed6\u4e00\u5207\u4fdd\u6301\u5b8c\u6574\u54c1\u8d28\uff1a\u56fe\u7247\u3001\u5bfc\u51fa\u548c\u5206\u4eab\u5361\u7247\u3002","Todo o resto mant\xe9m a qualidade total: imagens, exporta\xe7\xf5es e cart\xf5es de compartilhamento.","Alles andere bleibt in voller Qualit\xe4t: Bilder, Exporte und Share-Karten.","Tutto il resto mantiene la piena qualit\xe0: immagini, esportazioni e schede di condivisione.","\u305d\u308c\u4ee5\u5916\u306f\u6700\u9ad8\u54c1\u8cea\u306e\u307e\u307e\u3067\u3059\uff1a\u753b\u50cf\u3001\u30a8\u30af\u30b9\u30dd\u30fc\u30c8\u3001\u5171\u6709\u30ab\u30fc\u30c9\u3002","\u0412\u0441\u0451 \u043e\u0441\u0442\u0430\u043b\u044c\u043d\u043e\u0435 \u043e\u0441\u0442\u0430\u0451\u0442\u0441\u044f \u0432 \u043f\u043e\u043b\u043d\u043e\u043c \u043a\u0430\u0447\u0435\u0441\u0442\u0432\u0435: \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f, \u044d\u043a\u0441\u043f\u043e\u0440\u0442 \u0438 \u043a\u0430\u0440\u0442\u043e\u0447\u043a\u0438 \u0434\u043b\u044f \u043e\u0431\u043c\u0435\u043d\u0430.","\u0643\u0644 \u0634\u064a\u0621 \u0622\u062e\u0631 \u064a\u0628\u0642\u0649 \u0628\u062c\u0648\u062f\u062a\u0647 \u0627\u0644\u0643\u0627\u0645\u0644\u0629: \u0627\u0644\u0635\u0648\u0631 \u0648\u0627\u0644\u062a\u0635\u062f\u064a\u0631 \u0648\u0628\u0637\u0627\u0642\u0627\u062a \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u0629."],t.w)
-B.ajS=new A.B(B.l,["Biblioth\xe8que","Library","Biblioteca","\u8d44\u6599\u5e93","Biblioteca","Bibliothek","Libreria","\u30e9\u30a4\u30d6\u30e9\u30ea","\u0411\u0438\u0431\u043b\u0438\u043e\u0442\u0435\u043a\u0430","\u0627\u0644\u0645\u0643\u062a\u0628\u0629"],t.w)
-B.ajN=new A.B(B.l,["Lier les versions d'un m\xeame titre","Link versions of the same track","Unir versiones de una misma canci\xf3n","\u5408\u5e76\u540c\u4e00\u66f2\u76ee\u7684\u4e0d\u540c\u7248\u672c","Unir vers\xf5es da mesma faixa","Versionen desselben Titels verkn\xfcpfen","Unisci le versioni dello stesso brano","\u540c\u3058\u66f2\u306e\u30d0\u30fc\u30b8\u30e7\u30f3\u3092\u307e\u3068\u3081\u308b","\u041e\u0431\u044a\u0435\u0434\u0438\u043d\u044f\u0442\u044c \u0432\u0435\u0440\u0441\u0438\u0438 \u043e\u0434\u043d\u043e\u0433\u043e \u0442\u0440\u0435\u043a\u0430","\u062f\u0645\u062c \u0646\u0633\u062e \u0627\u0644\u0623\u063a\u0646\u064a\u0629 \u0646\u0641\u0633\u0647\u0627"],t.w)
-B.agZ=new A.B(B.l,["Remaster, single, (feat. \u2026), \xe9dition deluxe : compt\xe9s comme un seul titre ou album, \xe9coutes additionn\xe9es. Les remix, lives et instrumentaux restent s\xe9par\xe9s.","Remasters, singles, (feat. \u2026), deluxe editions: counted as one track or album, plays added together. Remixes, live and instrumental versions stay separate.","Remasters, sencillos, (feat. \u2026) y ediciones deluxe cuentan como una sola canci\xf3n o \xe1lbum y sus reproducciones se suman. Los remixes, directos e instrumentales siguen separados.","\u91cd\u5236\u7248\u3001\u5355\u66f2\u3001(feat. \u2026)\u3001\u8c6a\u534e\u7248\u4f1a\u7b97\u4f5c\u540c\u4e00\u9996\u66f2\u76ee\u6216\u4e13\u8f91,\u64ad\u653e\u6b21\u6570\u5408\u5e76\u3002\u6df7\u97f3\u3001\u73b0\u573a\u548c\u7eaf\u97f3\u4e50\u7248\u672c\u4ecd\u5355\u72ec\u8ba1\u7b97\u3002","Remasters, singles, (feat. \u2026) e edi\xe7\xf5es deluxe contam como uma s\xf3 faixa ou \xe1lbum, com as reprodu\xe7\xf5es somadas. Remixes, ao vivo e instrumentais continuam separados.","Remaster, Singles, (feat. \u2026) und Deluxe-Editionen z\xe4hlen als ein Titel bzw. Album, die Wiedergaben werden addiert. Remixe, Live- und Instrumentalversionen bleiben getrennt.","Remaster, singoli, (feat. \u2026) ed edizioni deluxe contano come un solo brano o album, con gli ascolti sommati. Remix, live e strumentali restano separati.","\u30ea\u30de\u30b9\u30bf\u30fc\u3001\u30b7\u30f3\u30b0\u30eb\u3001(feat. \u2026)\u3001\u30c7\u30e9\u30c3\u30af\u30b9\u7248\u30921\u3064\u306e\u66f2/\u30a2\u30eb\u30d0\u30e0\u3068\u3057\u3066\u6570\u3048\u3001\u518d\u751f\u56de\u6570\u3092\u5408\u7b97\u3057\u307e\u3059\u3002\u30ea\u30df\u30c3\u30af\u30b9\u3001\u30e9\u30a4\u30d6\u3001\u30a4\u30f3\u30b9\u30c8\u306f\u5225\u6271\u3044\u3067\u3059\u3002","\u0420\u0435\u043c\u0430\u0441\u0442\u0435\u0440\u044b, \u0441\u0438\u043d\u0433\u043b\u044b, (feat. \u2026) \u0438 \u0434\u0435\u043b\u044e\u043a\u0441-\u0438\u0437\u0434\u0430\u043d\u0438\u044f \u0441\u0447\u0438\u0442\u0430\u044e\u0442\u0441\u044f \u043e\u0434\u043d\u0438\u043c \u0442\u0440\u0435\u043a\u043e\u043c \u0438\u043b\u0438 \u0430\u043b\u044c\u0431\u043e\u043c\u043e\u043c, \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u044f \u0441\u0443\u043c\u043c\u0438\u0440\u0443\u044e\u0442\u0441\u044f. \u0420\u0435\u043c\u0438\u043a\u0441\u044b, \u043a\u043e\u043d\u0446\u0435\u0440\u0442\u043d\u044b\u0435 \u0438 \u0438\u043d\u0441\u0442\u0440\u0443\u043c\u0435\u043d\u0442\u0430\u043b\u044c\u043d\u044b\u0435 \u0432\u0435\u0440\u0441\u0438\u0438 \u043e\u0441\u0442\u0430\u044e\u0442\u0441\u044f \u043e\u0442\u0434\u0435\u043b\u044c\u043d\u043e.","\u0627\u0644\u0646\u0633\u062e \u0627\u0644\u0645\u0639\u0627\u062f \u0625\u062a\u0642\u0627\u0646\u0647\u0627 \u0648\u0627\u0644\u0623\u063a\u0627\u0646\u064a \u0627\u0644\u0645\u0646\u0641\u0631\u062f\u0629 \u0648(feat. \u2026) \u0648\u0627\u0644\u0625\u0635\u062f\u0627\u0631\u0627\u062a \u0627\u0644\u0641\u0627\u062e\u0631\u0629 \u062a\u064f\u062d\u062a\u0633\u0628 \u0643\u0623\u063a\u0646\u064a\u0629 \u0623\u0648 \u0623\u0644\u0628\u0648\u0645 \u0648\u0627\u062d\u062f \u0648\u062a\u064f\u062c\u0645\u0639 \u0645\u0631\u0627\u062a \u0627\u0644\u062a\u0634\u063a\u064a\u0644. \u062a\u0628\u0642\u0649 \u0627\u0644\u0631\u064a\u0645\u0643\u0633\u0627\u062a \u0648\u0627\u0644\u0646\u0633\u062e \u0627\u0644\u062d\u064a\u0629 \u0648\u0627\u0644\u0645\u0648\u0633\u064a\u0642\u064a\u0629 \u0645\u0646\u0641\u0635\u0644\u0629."],t.w)
-B.ahB=new A.B(B.l,["S\xe9parer les collaborations","Split collaborations","Separar colaboraciones","\u62c6\u5206\u5408\u4f5c\u827a\u4eba","Separar colabora\xe7\xf5es","Kollaborationen aufteilen","Separa le collaborazioni","\u30b3\u30e9\u30dc\u3092\u5206\u5272","\u0420\u0430\u0437\u0434\u0435\u043b\u044f\u0442\u044c \u043a\u043e\u043b\u043b\u0430\u0431\u043e\u0440\u0430\u0446\u0438\u0438","\u0641\u0635\u0644 \u0627\u0644\u062a\u0639\u0627\u0648\u0646\u0627\u062a"],t.w)
-B.ag9=new A.B(B.l,["\xab Gims & Damso \xbb compte pour Gims et pour Damso au lieu d'\xeatre un artiste \xe0 part. Les groupes comme \xab Simon & Garfunkel \xbb restent entiers.",'"Gims & Damso" counts for Gims and for Damso instead of being a separate artist. Bands like "Simon & Garfunkel" stay whole.',"\xabGims & Damso\xbb cuenta para Gims y para Damso en lugar de ser un artista aparte. Grupos como \xabSimon & Garfunkel\xbb se mantienen enteros.","\u201cGims & Damso\u201d\u4f1a\u5206\u522b\u8ba1\u5165 Gims \u548c Damso,\u800c\u4e0d\u662f\u5355\u72ec\u7684\u827a\u4eba\u3002\u50cf\u201cSimon & Garfunkel\u201d\u8fd9\u6837\u7684\u4e50\u961f\u4fdd\u6301\u5b8c\u6574\u3002",'"Gims & Damso" conta para Gims e para Damso em vez de ser um artista \xe0 parte. Bandas como "Simon & Garfunkel" continuam inteiras.',"\u201eGims & Damso\u201c z\xe4hlt f\xfcr Gims und f\xfcr Damso, statt ein eigener K\xfcnstler zu sein. Bands wie \u201eSimon & Garfunkel\u201c bleiben ganz.","\xabGims & Damso\xbb conta per Gims e per Damso invece di essere un artista a s\xe9. Gruppi come \xabSimon & Garfunkel\xbb restano interi.","\u300cGims & Damso\u300d\u306f\u72ec\u7acb\u3057\u305f\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u3067\u306f\u306a\u304f\u3001Gims \u3068 Damso \u306e\u4e21\u65b9\u306b\u30ab\u30a6\u30f3\u30c8\u3055\u308c\u307e\u3059\u3002\u300cSimon & Garfunkel\u300d\u306e\u3088\u3046\u306a\u30b0\u30eb\u30fc\u30d7\u306f\u305d\u306e\u307e\u307e\u3067\u3059\u3002","\xabGims & Damso\xbb \u0437\u0430\u0441\u0447\u0438\u0442\u044b\u0432\u0430\u0435\u0442\u0441\u044f \u0438 Gims, \u0438 Damso, \u0430 \u043d\u0435 \u043a\u0430\u043a \u043e\u0442\u0434\u0435\u043b\u044c\u043d\u044b\u0439 \u0430\u0440\u0442\u0438\u0441\u0442. \u0413\u0440\u0443\u043f\u043f\u044b \u0432\u0440\u043e\u0434\u0435 \xabSimon & Garfunkel\xbb \u043e\u0441\u0442\u0430\u044e\u0442\u0441\u044f \u0446\u0435\u043b\u044b\u043c\u0438.","\u064a\u064f\u062d\u062a\u0633\u0628 \xabGims & Damso\xbb \u0644\u0643\u0644 \u0645\u0646 Gims \u0648Damso \u0628\u062f\u0644\u0627\u064b \u0645\u0646 \u0623\u0646 \u064a\u0643\u0648\u0646 \u0641\u0646\u0627\u0646\u0627\u064b \u0645\u0633\u062a\u0642\u0644\u0627\u064b. \u062a\u0628\u0642\u0649 \u0627\u0644\u0641\u0631\u0642 \u0645\u062b\u0644 \xabSimon & Garfunkel\xbb \u0643\u0645\u0627 \u0647\u064a."],t.w)
-B.afZ=new A.B(B.l,["Ta biblioth\xe8que","Your library","Tu biblioteca","\u4f60\u7684\u8d44\u6599\u5e93","Sua biblioteca","Deine Bibliothek","La tua libreria","\u3042\u306a\u305f\u306e\u30e9\u30a4\u30d6\u30e9\u30ea","\u0412\u0430\u0448\u0430 \u0431\u0438\u0431\u043b\u0438\u043e\u0442\u0435\u043a\u0430","\u0645\u0643\u062a\u0628\u062a\u0643"],t.w)
-B.ajI=new A.B(B.l,["Choisis comment regrouper tes \xe9coutes. Tu peux changer \xe7a \xe0 tout moment dans les r\xe9glages.","Choose how your listens are grouped. You can change this any time in settings.","Elige c\xf3mo se agrupan tus reproducciones. Puedes cambiarlo cuando quieras en los ajustes.","\u9009\u62e9\u5982\u4f55\u5f52\u7c7b\u4f60\u7684\u6536\u542c\u8bb0\u5f55\u3002\u4f60\u53ef\u4ee5\u968f\u65f6\u5728\u8bbe\u7f6e\u4e2d\u66f4\u6539\u3002","Escolha como agrupar suas reprodu\xe7\xf5es. Voc\xea pode mudar isso a qualquer momento nas configura\xe7\xf5es.","W\xe4hle, wie deine Wiedergaben gruppiert werden. Du kannst das jederzeit in den Einstellungen \xe4ndern.","Scegli come raggruppare i tuoi ascolti. Puoi cambiarlo in qualsiasi momento nelle impostazioni.","\u518d\u751f\u5c65\u6b74\u306e\u307e\u3068\u3081\u65b9\u3092\u9078\u3073\u307e\u3059\u3002\u8a2d\u5b9a\u3067\u3044\u3064\u3067\u3082\u5909\u66f4\u3067\u304d\u307e\u3059\u3002","\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435, \u043a\u0430\u043a \u0433\u0440\u0443\u043f\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u044f. \u042d\u0442\u043e \u043c\u043e\u0436\u043d\u043e \u0438\u0437\u043c\u0435\u043d\u0438\u0442\u044c \u0432 \u043b\u044e\u0431\u043e\u0439 \u043c\u043e\u043c\u0435\u043d\u0442 \u0432 \u043d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0430\u0445.","\u0627\u062e\u062a\u0631 \u0643\u064a\u0641\u064a\u0629 \u062a\u062c\u0645\u064a\u0639 \u0627\u0633\u062a\u0645\u0627\u0639\u0643. \u064a\u0645\u0643\u0646\u0643 \u062a\u063a\u064a\u064a\u0631 \u0630\u0644\u0643 \u0641\u064a \u0623\u064a \u0648\u0642\u062a \u0645\u0646 \u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a."],t.w)
-B.afT=new A.B(B.l,["Tableau de bord et d\xe9marrage","Dashboard and start-up","Panel e inicio","\u4eea\u8868\u76d8\u4e0e\u542f\u52a8","Painel e inicializa\xe7\xe3o","Dashboard und Start","Dashboard e avvio","\u30c0\u30c3\u30b7\u30e5\u30dc\u30fc\u30c9\u3068\u8d77\u52d5","\u0414\u0430\u0448\u0431\u043e\u0440\u0434 \u0438 \u0437\u0430\u043f\u0443\u0441\u043a","\u0644\u0648\u062d\u0629 \u0627\u0644\u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0648\u0627\u0644\u0628\u062f\u0621"],t.w)
-B.afE=new A.B(B.l,["Sections, en-t\xeate, cartes de stats, d\xe9couverte, onglet de d\xe9marrage","Sections, header, stat cards, discover, start-up tab","Secciones, cabecera, tarjetas de estad\xedsticas, descubrir, pesta\xf1a de inicio","\u677f\u5757\u3001\u5934\u56fe\u3001\u7edf\u8ba1\u5361\u7247\u3001\u53d1\u73b0\u3001\u542f\u52a8\u6807\u7b7e\u9875","Se\xe7\xf5es, cabe\xe7alho, cart\xf5es de estat\xedsticas, descobrir, aba inicial","Bereiche, Kopfbereich, Statistikkarten, Entdecken, Start-Tab","Sezioni, intestazione, schede statistiche, scopri, scheda iniziale","\u30bb\u30af\u30b7\u30e7\u30f3\u3001\u30d8\u30c3\u30c0\u30fc\u3001\u7d71\u8a08\u30ab\u30fc\u30c9\u3001\u767a\u898b\u3001\u8d77\u52d5\u30bf\u30d6","\u0420\u0430\u0437\u0434\u0435\u043b\u044b, \u0448\u0430\u043f\u043a\u0430, \u043a\u0430\u0440\u0442\u043e\u0447\u043a\u0438 \u0441\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0438, \u043e\u0431\u0437\u043e\u0440, \u0441\u0442\u0430\u0440\u0442\u043e\u0432\u0430\u044f \u0432\u043a\u043b\u0430\u0434\u043a\u0430","\u0627\u0644\u0623\u0642\u0633\u0627\u0645 \u0648\u0627\u0644\u062a\u0631\u0648\u064a\u0633\u0629 \u0648\u0628\u0637\u0627\u0642\u0627\u062a \u0627\u0644\u0625\u062d\u0635\u0627\u0621\u0627\u062a \u0648\u0627\u0644\u0627\u0643\u062a\u0634\u0627\u0641 \u0648\u0639\u0644\u0627\u0645\u0629 \u0627\u0644\u0628\u062f\u0621"],t.w)
-B.agw=new A.B(B.l,["Notifications","Notifications","Notificaciones","\u901a\u77e5","Notifica\xe7\xf5es","Benachrichtigungen","Notifiche","\u901a\u77e5","\u0423\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u044f","\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a"],t.w)
-B.agE=new A.B(B.l,["R\xe9caps, jalons, actualit\xe9s et pastilles","Recaps, milestones, news and badges","Res\xfamenes, hitos, noticias e insignias","\u56de\u987e\u3001\u91cc\u7a0b\u7891\u3001\u8d44\u8baf\u548c\u89d2\u6807","Resumos, marcos, novidades e selos","R\xfcckblicke, Meilensteine, News und Abzeichen","Riepiloghi, traguardi, novit\xe0 e badge","\u307e\u3068\u3081\u3001\u30de\u30a4\u30eb\u30b9\u30c8\u30fc\u30f3\u3001\u30cb\u30e5\u30fc\u30b9\u3001\u30d0\u30c3\u30b8","\u0418\u0442\u043e\u0433\u0438, \u0432\u0435\u0445\u0438, \u043d\u043e\u0432\u043e\u0441\u0442\u0438 \u0438 \u0437\u043d\u0430\u0447\u043a\u0438","\u0627\u0644\u0645\u0644\u062e\u0635\u0627\u062a \u0648\u0627\u0644\u0645\u0639\u0627\u0644\u0645 \u0648\u0627\u0644\u0623\u062e\u0628\u0627\u0631 \u0648\u0627\u0644\u0634\u0627\u0631\u0627\u062a"],t.w)
-B.ahS=new A.B(B.l,["Options de biblioth\xe8que","Library options","Opciones de biblioteca","\u8d44\u6599\u5e93\u9009\u9879","Op\xe7\xf5es da biblioteca","Bibliotheksoptionen","Opzioni libreria","\u30e9\u30a4\u30d6\u30e9\u30ea\u8a2d\u5b9a","\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438 \u0431\u0438\u0431\u043b\u0438\u043e\u0442\u0435\u043a\u0438","\u062e\u064a\u0627\u0631\u0627\u062a \u0627\u0644\u0645\u0643\u062a\u0628\u0629"],t.w)
-B.agj=new A.B(B.l,["Lier les versions d'un titre, s\xe9parer les collaborations","Link track versions, split collaborations","Unir versiones, separar colaboraciones","\u5408\u5e76\u7248\u672c\u3001\u62c6\u5206\u5408\u4f5c\u827a\u4eba","Unir vers\xf5es, separar colabora\xe7\xf5es","Versionen verkn\xfcpfen, Kollaborationen aufteilen","Unisci versioni, separa collaborazioni","\u30d0\u30fc\u30b8\u30e7\u30f3\u306e\u7d71\u5408\u3001\u30b3\u30e9\u30dc\u306e\u5206\u5272","\u041e\u0431\u044a\u0435\u0434\u0438\u043d\u0435\u043d\u0438\u0435 \u0432\u0435\u0440\u0441\u0438\u0439, \u0440\u0430\u0437\u0434\u0435\u043b\u0435\u043d\u0438\u0435 \u043a\u043e\u043b\u043b\u0430\u0431\u043e\u0440\u0430\u0446\u0438\u0439","\u062f\u0645\u062c \u0627\u0644\u0646\u0633\u062e \u0648\u0641\u0635\u0644 \u0627\u0644\u062a\u0639\u0627\u0648\u0646\u0627\u062a"],t.w)
-B.aj8=new A.B(B.l,["Profils favoris","Favourite profiles","Perfiles favoritos","\u6536\u85cf\u7684\u8d44\u6599","Perfis favoritos","Lieblingsprofile","Profili preferiti","\u304a\u6c17\u306b\u5165\u308a\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb","\u0418\u0437\u0431\u0440\u0430\u043d\u043d\u044b\u0435 \u043f\u0440\u043e\u0444\u0438\u043b\u0438","\u0627\u0644\u0645\u0644\u0641\u0627\u062a \u0627\u0644\u0645\u0641\u0636\u0644\u0629"],t.w)
-B.ajg=new A.B(B.l,["Les profils Last.fm que tu as mis en favori","The Last.fm profiles you starred","Los perfiles de Last.fm que marcaste","\u4f60\u52a0\u661f\u6807\u7684 Last.fm \u7528\u6237","Os perfis do Last.fm que voc\xea favoritou","Die Last.fm-Profile, die du markiert hast","I profili Last.fm che hai messo tra i preferiti","\u304a\u6c17\u306b\u5165\u308a\u306b\u3057\u305f Last.fm \u30d7\u30ed\u30d5\u30a3\u30fc\u30eb","\u041f\u0440\u043e\u0444\u0438\u043b\u0438 Last.fm, \u0434\u043e\u0431\u0430\u0432\u043b\u0435\u043d\u043d\u044b\u0435 \u0432 \u0438\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435","\u0645\u0644\u0641\u0627\u062a Last.fm \u0627\u0644\u062a\u064a \u0623\u0636\u0641\u062a\u0647\u0627 \u0625\u0644\u0649 \u0627\u0644\u0645\u0641\u0636\u0644\u0629"],t.w)
-B.ajO=new A.B(B.l,["README et activit\xe9 du projet","README and project activity","README y actividad del proyecto","README \u4e0e\u9879\u76ee\u52a8\u6001","README e atividade do projeto","README und Projektaktivit\xe4t","README e attivit\xe0 del progetto","README \u3068\u30d7\u30ed\u30b8\u30a7\u30af\u30c8\u306e\u52d5\u304d","README \u0438 \u0430\u043a\u0442\u0438\u0432\u043d\u043e\u0441\u0442\u044c \u043f\u0440\u043e\u0435\u043a\u0442\u0430","README \u0648\u0646\u0634\u0627\u0637 \u0627\u0644\u0645\u0634\u0631\u0648\u0639"],t.w)
-B.aie=new A.B(B.l,["Lire le README, derniers commits, workflows, version, t\xe9l\xe9chargements","Read the README, latest commits, workflows, version, downloads","Leer el README, \xfaltimos commits, workflows, versi\xf3n, descargas","\u9605\u8bfb README\u3001\u6700\u65b0\u63d0\u4ea4\u3001\u5de5\u4f5c\u6d41\u3001\u7248\u672c\u3001\u4e0b\u8f7d\u91cf","Ler o README, \xfaltimos commits, workflows, vers\xe3o, downloads","README lesen, letzte Commits, Workflows, Version, Downloads","Leggi il README, ultimi commit, workflow, versione, download","README\u3001\u6700\u65b0\u30b3\u30df\u30c3\u30c8\u3001\u30ef\u30fc\u30af\u30d5\u30ed\u30fc\u3001\u30d0\u30fc\u30b8\u30e7\u30f3\u3001\u30c0\u30a6\u30f3\u30ed\u30fc\u30c9\u6570","README, \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435 \u043a\u043e\u043c\u043c\u0438\u0442\u044b, workflow, \u0432\u0435\u0440\u0441\u0438\u044f, \u0437\u0430\u0433\u0440\u0443\u0437\u043a\u0438","\u0627\u0642\u0631\u0623 README \u0648\u0622\u062e\u0631 \u0627\u0644\u0627\u0644\u062a\u0632\u0627\u0645\u0627\u062a \u0648\u0633\u064a\u0631 \u0627\u0644\u0639\u0645\u0644 \u0648\u0627\u0644\u0625\u0635\u062f\u0627\u0631 \u0648\u0627\u0644\u062a\u0646\u0632\u064a\u0644\u0627\u062a"],t.w)
+B.agY=new A.B(B.l,["Les pochettes anim\xe9es et les reflets des badges sont en pause","Animated artwork and badge shine are paused","Las car\xe1tulas animadas y el brillo de las insignias se pausan","\u52a8\u6001\u5c01\u9762\u548c\u5fbd\u7ae0\u5149\u6548\u6682\u505c","As capas animadas e o brilho dos emblemas ficam em pausa","Animierte Cover und der Glanz der Abzeichen pausieren","Le copertine animate e il riflesso dei badge sono in pausa","\u52d5\u304f\u30a2\u30fc\u30c8\u30ef\u30fc\u30af\u3068\u30d0\u30c3\u30b8\u306e\u8f1d\u304d\u3092\u505c\u6b62\u3057\u307e\u3059","\u0410\u043d\u0438\u043c\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0435 \u043e\u0431\u043b\u043e\u0436\u043a\u0438 \u0438 \u0431\u043b\u0435\u0441\u043a \u0437\u043d\u0430\u0447\u043a\u043e\u0432 \u043f\u0440\u0438\u043e\u0441\u0442\u0430\u043d\u0430\u0432\u043b\u0438\u0432\u0430\u044e\u0442\u0441\u044f","\u064a\u062a\u0645 \u0625\u064a\u0642\u0627\u0641 \u0627\u0644\u0623\u063a\u0644\u0641\u0629 \u0627\u0644\u0645\u062a\u062d\u0631\u0643\u0629 \u0648\u0644\u0645\u0639\u0627\u0646 \u0627\u0644\u0634\u0627\u0631\u0627\u062a \u0645\u0624\u0642\u062a\u064b\u0627"],t.w)
+B.agk=new A.B(B.l,["Tout le reste garde sa pleine qualit\xe9 : images, exports et cartes de partage.","Everything else keeps full quality: images, exports and share cards.","Todo lo dem\xe1s mantiene la calidad completa: im\xe1genes, exportaciones y tarjetas para compartir.","\u5176\u4ed6\u4e00\u5207\u4fdd\u6301\u5b8c\u6574\u54c1\u8d28\uff1a\u56fe\u7247\u3001\u5bfc\u51fa\u548c\u5206\u4eab\u5361\u7247\u3002","Todo o resto mant\xe9m a qualidade total: imagens, exporta\xe7\xf5es e cart\xf5es de compartilhamento.","Alles andere bleibt in voller Qualit\xe4t: Bilder, Exporte und Share-Karten.","Tutto il resto mantiene la piena qualit\xe0: immagini, esportazioni e schede di condivisione.","\u305d\u308c\u4ee5\u5916\u306f\u6700\u9ad8\u54c1\u8cea\u306e\u307e\u307e\u3067\u3059\uff1a\u753b\u50cf\u3001\u30a8\u30af\u30b9\u30dd\u30fc\u30c8\u3001\u5171\u6709\u30ab\u30fc\u30c9\u3002","\u0412\u0441\u0451 \u043e\u0441\u0442\u0430\u043b\u044c\u043d\u043e\u0435 \u043e\u0441\u0442\u0430\u0451\u0442\u0441\u044f \u0432 \u043f\u043e\u043b\u043d\u043e\u043c \u043a\u0430\u0447\u0435\u0441\u0442\u0432\u0435: \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f, \u044d\u043a\u0441\u043f\u043e\u0440\u0442 \u0438 \u043a\u0430\u0440\u0442\u043e\u0447\u043a\u0438 \u0434\u043b\u044f \u043e\u0431\u043c\u0435\u043d\u0430.","\u0643\u0644 \u0634\u064a\u0621 \u0622\u062e\u0631 \u064a\u0628\u0642\u0649 \u0628\u062c\u0648\u062f\u062a\u0647 \u0627\u0644\u0643\u0627\u0645\u0644\u0629: \u0627\u0644\u0635\u0648\u0631 \u0648\u0627\u0644\u062a\u0635\u062f\u064a\u0631 \u0648\u0628\u0637\u0627\u0642\u0627\u062a \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u0629."],t.w)
+B.ajR=new A.B(B.l,["Biblioth\xe8que","Library","Biblioteca","\u8d44\u6599\u5e93","Biblioteca","Bibliothek","Libreria","\u30e9\u30a4\u30d6\u30e9\u30ea","\u0411\u0438\u0431\u043b\u0438\u043e\u0442\u0435\u043a\u0430","\u0627\u0644\u0645\u0643\u062a\u0628\u0629"],t.w)
+B.ajK=new A.B(B.l,["Lier les versions d'un m\xeame titre","Link versions of the same track","Unir versiones de una misma canci\xf3n","\u5408\u5e76\u540c\u4e00\u66f2\u76ee\u7684\u4e0d\u540c\u7248\u672c","Unir vers\xf5es da mesma faixa","Versionen desselben Titels verkn\xfcpfen","Unisci le versioni dello stesso brano","\u540c\u3058\u66f2\u306e\u30d0\u30fc\u30b8\u30e7\u30f3\u3092\u307e\u3068\u3081\u308b","\u041e\u0431\u044a\u0435\u0434\u0438\u043d\u044f\u0442\u044c \u0432\u0435\u0440\u0441\u0438\u0438 \u043e\u0434\u043d\u043e\u0433\u043e \u0442\u0440\u0435\u043a\u0430","\u062f\u0645\u062c \u0646\u0633\u062e \u0627\u0644\u0623\u063a\u0646\u064a\u0629 \u0646\u0641\u0633\u0647\u0627"],t.w)
+B.ah3=new A.B(B.l,["Remaster, single, (feat. \u2026), \xe9dition deluxe : compt\xe9s comme un seul titre ou album, \xe9coutes additionn\xe9es. Les remix, lives et instrumentaux restent s\xe9par\xe9s.","Remasters, singles, (feat. \u2026), deluxe editions: counted as one track or album, plays added together. Remixes, live and instrumental versions stay separate.","Remasters, sencillos, (feat. \u2026) y ediciones deluxe cuentan como una sola canci\xf3n o \xe1lbum y sus reproducciones se suman. Los remixes, directos e instrumentales siguen separados.","\u91cd\u5236\u7248\u3001\u5355\u66f2\u3001(feat. \u2026)\u3001\u8c6a\u534e\u7248\u4f1a\u7b97\u4f5c\u540c\u4e00\u9996\u66f2\u76ee\u6216\u4e13\u8f91,\u64ad\u653e\u6b21\u6570\u5408\u5e76\u3002\u6df7\u97f3\u3001\u73b0\u573a\u548c\u7eaf\u97f3\u4e50\u7248\u672c\u4ecd\u5355\u72ec\u8ba1\u7b97\u3002","Remasters, singles, (feat. \u2026) e edi\xe7\xf5es deluxe contam como uma s\xf3 faixa ou \xe1lbum, com as reprodu\xe7\xf5es somadas. Remixes, ao vivo e instrumentais continuam separados.","Remaster, Singles, (feat. \u2026) und Deluxe-Editionen z\xe4hlen als ein Titel bzw. Album, die Wiedergaben werden addiert. Remixe, Live- und Instrumentalversionen bleiben getrennt.","Remaster, singoli, (feat. \u2026) ed edizioni deluxe contano come un solo brano o album, con gli ascolti sommati. Remix, live e strumentali restano separati.","\u30ea\u30de\u30b9\u30bf\u30fc\u3001\u30b7\u30f3\u30b0\u30eb\u3001(feat. \u2026)\u3001\u30c7\u30e9\u30c3\u30af\u30b9\u7248\u30921\u3064\u306e\u66f2/\u30a2\u30eb\u30d0\u30e0\u3068\u3057\u3066\u6570\u3048\u3001\u518d\u751f\u56de\u6570\u3092\u5408\u7b97\u3057\u307e\u3059\u3002\u30ea\u30df\u30c3\u30af\u30b9\u3001\u30e9\u30a4\u30d6\u3001\u30a4\u30f3\u30b9\u30c8\u306f\u5225\u6271\u3044\u3067\u3059\u3002","\u0420\u0435\u043c\u0430\u0441\u0442\u0435\u0440\u044b, \u0441\u0438\u043d\u0433\u043b\u044b, (feat. \u2026) \u0438 \u0434\u0435\u043b\u044e\u043a\u0441-\u0438\u0437\u0434\u0430\u043d\u0438\u044f \u0441\u0447\u0438\u0442\u0430\u044e\u0442\u0441\u044f \u043e\u0434\u043d\u0438\u043c \u0442\u0440\u0435\u043a\u043e\u043c \u0438\u043b\u0438 \u0430\u043b\u044c\u0431\u043e\u043c\u043e\u043c, \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u044f \u0441\u0443\u043c\u043c\u0438\u0440\u0443\u044e\u0442\u0441\u044f. \u0420\u0435\u043c\u0438\u043a\u0441\u044b, \u043a\u043e\u043d\u0446\u0435\u0440\u0442\u043d\u044b\u0435 \u0438 \u0438\u043d\u0441\u0442\u0440\u0443\u043c\u0435\u043d\u0442\u0430\u043b\u044c\u043d\u044b\u0435 \u0432\u0435\u0440\u0441\u0438\u0438 \u043e\u0441\u0442\u0430\u044e\u0442\u0441\u044f \u043e\u0442\u0434\u0435\u043b\u044c\u043d\u043e.","\u0627\u0644\u0646\u0633\u062e \u0627\u0644\u0645\u0639\u0627\u062f \u0625\u062a\u0642\u0627\u0646\u0647\u0627 \u0648\u0627\u0644\u0623\u063a\u0627\u0646\u064a \u0627\u0644\u0645\u0646\u0641\u0631\u062f\u0629 \u0648(feat. \u2026) \u0648\u0627\u0644\u0625\u0635\u062f\u0627\u0631\u0627\u062a \u0627\u0644\u0641\u0627\u062e\u0631\u0629 \u062a\u064f\u062d\u062a\u0633\u0628 \u0643\u0623\u063a\u0646\u064a\u0629 \u0623\u0648 \u0623\u0644\u0628\u0648\u0645 \u0648\u0627\u062d\u062f \u0648\u062a\u064f\u062c\u0645\u0639 \u0645\u0631\u0627\u062a \u0627\u0644\u062a\u0634\u063a\u064a\u0644. \u062a\u0628\u0642\u0649 \u0627\u0644\u0631\u064a\u0645\u0643\u0633\u0627\u062a \u0648\u0627\u0644\u0646\u0633\u062e \u0627\u0644\u062d\u064a\u0629 \u0648\u0627\u0644\u0645\u0648\u0633\u064a\u0642\u064a\u0629 \u0645\u0646\u0641\u0635\u0644\u0629."],t.w)
+B.ahH=new A.B(B.l,["S\xe9parer les collaborations","Split collaborations","Separar colaboraciones","\u62c6\u5206\u5408\u4f5c\u827a\u4eba","Separar colabora\xe7\xf5es","Kollaborationen aufteilen","Separa le collaborazioni","\u30b3\u30e9\u30dc\u3092\u5206\u5272","\u0420\u0430\u0437\u0434\u0435\u043b\u044f\u0442\u044c \u043a\u043e\u043b\u043b\u0430\u0431\u043e\u0440\u0430\u0446\u0438\u0438","\u0641\u0635\u0644 \u0627\u0644\u062a\u0639\u0627\u0648\u0646\u0627\u062a"],t.w)
+B.agc=new A.B(B.l,["\xab Gims & Damso \xbb compte pour Gims et pour Damso au lieu d'\xeatre un artiste \xe0 part. Les groupes comme \xab Simon & Garfunkel \xbb restent entiers.",'"Gims & Damso" counts for Gims and for Damso instead of being a separate artist. Bands like "Simon & Garfunkel" stay whole.',"\xabGims & Damso\xbb cuenta para Gims y para Damso en lugar de ser un artista aparte. Grupos como \xabSimon & Garfunkel\xbb se mantienen enteros.","\u201cGims & Damso\u201d\u4f1a\u5206\u522b\u8ba1\u5165 Gims \u548c Damso,\u800c\u4e0d\u662f\u5355\u72ec\u7684\u827a\u4eba\u3002\u50cf\u201cSimon & Garfunkel\u201d\u8fd9\u6837\u7684\u4e50\u961f\u4fdd\u6301\u5b8c\u6574\u3002",'"Gims & Damso" conta para Gims e para Damso em vez de ser um artista \xe0 parte. Bandas como "Simon & Garfunkel" continuam inteiras.',"\u201eGims & Damso\u201c z\xe4hlt f\xfcr Gims und f\xfcr Damso, statt ein eigener K\xfcnstler zu sein. Bands wie \u201eSimon & Garfunkel\u201c bleiben ganz.","\xabGims & Damso\xbb conta per Gims e per Damso invece di essere un artista a s\xe9. Gruppi come \xabSimon & Garfunkel\xbb restano interi.","\u300cGims & Damso\u300d\u306f\u72ec\u7acb\u3057\u305f\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u3067\u306f\u306a\u304f\u3001Gims \u3068 Damso \u306e\u4e21\u65b9\u306b\u30ab\u30a6\u30f3\u30c8\u3055\u308c\u307e\u3059\u3002\u300cSimon & Garfunkel\u300d\u306e\u3088\u3046\u306a\u30b0\u30eb\u30fc\u30d7\u306f\u305d\u306e\u307e\u307e\u3067\u3059\u3002","\xabGims & Damso\xbb \u0437\u0430\u0441\u0447\u0438\u0442\u044b\u0432\u0430\u0435\u0442\u0441\u044f \u0438 Gims, \u0438 Damso, \u0430 \u043d\u0435 \u043a\u0430\u043a \u043e\u0442\u0434\u0435\u043b\u044c\u043d\u044b\u0439 \u0430\u0440\u0442\u0438\u0441\u0442. \u0413\u0440\u0443\u043f\u043f\u044b \u0432\u0440\u043e\u0434\u0435 \xabSimon & Garfunkel\xbb \u043e\u0441\u0442\u0430\u044e\u0442\u0441\u044f \u0446\u0435\u043b\u044b\u043c\u0438.","\u064a\u064f\u062d\u062a\u0633\u0628 \xabGims & Damso\xbb \u0644\u0643\u0644 \u0645\u0646 Gims \u0648Damso \u0628\u062f\u0644\u0627\u064b \u0645\u0646 \u0623\u0646 \u064a\u0643\u0648\u0646 \u0641\u0646\u0627\u0646\u0627\u064b \u0645\u0633\u062a\u0642\u0644\u0627\u064b. \u062a\u0628\u0642\u0649 \u0627\u0644\u0641\u0631\u0642 \u0645\u062b\u0644 \xabSimon & Garfunkel\xbb \u0643\u0645\u0627 \u0647\u064a."],t.w)
+B.ahw=new A.B(B.l,["Votre biblioth\xe8que","Your library","Su biblioteca","\u60a8\u7684\u8d44\u6599\u5e93","Sua biblioteca","Ihre Bibliothek","La sua libreria","\u3042\u306a\u305f\u306e\u30e9\u30a4\u30d6\u30e9\u30ea","\u0412\u0430\u0448\u0430 \u0431\u0438\u0431\u043b\u0438\u043e\u0442\u0435\u043a\u0430","\u0645\u0643\u062a\u0628\u062a\u0643"],t.w)
+B.ag1=new A.B(B.l,["Choisissez comment regrouper vos \xe9coutes. Vous pouvez changer cela \xe0 tout moment dans les r\xe9glages.","Choose how your listens are grouped. You can change this any time in settings.","Elija c\xf3mo se agrupan sus reproducciones. Puede cambiarlo cuando quiera en los ajustes.","\u9009\u62e9\u5982\u4f55\u5f52\u7c7b\u60a8\u7684\u6536\u542c\u8bb0\u5f55\u3002\u60a8\u53ef\u4ee5\u968f\u65f6\u5728\u8bbe\u7f6e\u4e2d\u66f4\u6539\u3002","Escolha como agrupar suas reprodu\xe7\xf5es. Voc\xea pode mudar isso a qualquer momento nas configura\xe7\xf5es.","W\xe4hlen Sie, wie Ihre Wiedergaben gruppiert werden. Sie k\xf6nnen das jederzeit in den Einstellungen \xe4ndern.","Scelga come raggruppare i suoi ascolti. Pu\xf2 cambiarlo in qualsiasi momento nelle impostazioni.","\u518d\u751f\u5c65\u6b74\u306e\u307e\u3068\u3081\u65b9\u3092\u9078\u3073\u307e\u3059\u3002\u8a2d\u5b9a\u3067\u3044\u3064\u3067\u3082\u5909\u66f4\u3067\u304d\u307e\u3059\u3002","\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435, \u043a\u0430\u043a \u0433\u0440\u0443\u043f\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u044f. \u042d\u0442\u043e \u043c\u043e\u0436\u043d\u043e \u0438\u0437\u043c\u0435\u043d\u0438\u0442\u044c \u0432 \u043b\u044e\u0431\u043e\u0439 \u043c\u043e\u043c\u0435\u043d\u0442 \u0432 \u043d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0430\u0445.","\u0627\u062e\u062a\u0631 \u0643\u064a\u0641\u064a\u0629 \u062a\u062c\u0645\u064a\u0639 \u0627\u0633\u062a\u0645\u0627\u0639\u0643. \u064a\u0645\u0643\u0646\u0643 \u062a\u063a\u064a\u064a\u0631 \u0630\u0644\u0643 \u0641\u064a \u0623\u064a \u0648\u0642\u062a \u0645\u0646 \u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a."],t.w)
+B.afS=new A.B(B.l,["Tableau de bord et d\xe9marrage","Dashboard and start-up","Panel e inicio","\u4eea\u8868\u76d8\u4e0e\u542f\u52a8","Painel e inicializa\xe7\xe3o","Dashboard und Start","Dashboard e avvio","\u30c0\u30c3\u30b7\u30e5\u30dc\u30fc\u30c9\u3068\u8d77\u52d5","\u0414\u0430\u0448\u0431\u043e\u0440\u0434 \u0438 \u0437\u0430\u043f\u0443\u0441\u043a","\u0644\u0648\u062d\u0629 \u0627\u0644\u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0648\u0627\u0644\u0628\u062f\u0621"],t.w)
+B.afF=new A.B(B.l,["Sections, en-t\xeate, cartes de stats, d\xe9couverte, onglet de d\xe9marrage","Sections, header, stat cards, discover, start-up tab","Secciones, cabecera, tarjetas de estad\xedsticas, descubrir, pesta\xf1a de inicio","\u677f\u5757\u3001\u5934\u56fe\u3001\u7edf\u8ba1\u5361\u7247\u3001\u53d1\u73b0\u3001\u542f\u52a8\u6807\u7b7e\u9875","Se\xe7\xf5es, cabe\xe7alho, cart\xf5es de estat\xedsticas, descobrir, aba inicial","Bereiche, Kopfbereich, Statistikkarten, Entdecken, Start-Tab","Sezioni, intestazione, schede statistiche, scopri, scheda iniziale","\u30bb\u30af\u30b7\u30e7\u30f3\u3001\u30d8\u30c3\u30c0\u30fc\u3001\u7d71\u8a08\u30ab\u30fc\u30c9\u3001\u767a\u898b\u3001\u8d77\u52d5\u30bf\u30d6","\u0420\u0430\u0437\u0434\u0435\u043b\u044b, \u0448\u0430\u043f\u043a\u0430, \u043a\u0430\u0440\u0442\u043e\u0447\u043a\u0438 \u0441\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0438, \u043e\u0431\u0437\u043e\u0440, \u0441\u0442\u0430\u0440\u0442\u043e\u0432\u0430\u044f \u0432\u043a\u043b\u0430\u0434\u043a\u0430","\u0627\u0644\u0623\u0642\u0633\u0627\u0645 \u0648\u0627\u0644\u062a\u0631\u0648\u064a\u0633\u0629 \u0648\u0628\u0637\u0627\u0642\u0627\u062a \u0627\u0644\u0625\u062d\u0635\u0627\u0621\u0627\u062a \u0648\u0627\u0644\u0627\u0643\u062a\u0634\u0627\u0641 \u0648\u0639\u0644\u0627\u0645\u0629 \u0627\u0644\u0628\u062f\u0621"],t.w)
+B.agB=new A.B(B.l,["Notifications","Notifications","Notificaciones","\u901a\u77e5","Notifica\xe7\xf5es","Benachrichtigungen","Notifiche","\u901a\u77e5","\u0423\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u044f","\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a"],t.w)
+B.agJ=new A.B(B.l,["R\xe9caps, jalons, actualit\xe9s et pastilles","Recaps, milestones, news and badges","Res\xfamenes, hitos, noticias e insignias","\u56de\u987e\u3001\u91cc\u7a0b\u7891\u3001\u8d44\u8baf\u548c\u89d2\u6807","Resumos, marcos, novidades e selos","R\xfcckblicke, Meilensteine, News und Abzeichen","Riepiloghi, traguardi, novit\xe0 e badge","\u307e\u3068\u3081\u3001\u30de\u30a4\u30eb\u30b9\u30c8\u30fc\u30f3\u3001\u30cb\u30e5\u30fc\u30b9\u3001\u30d0\u30c3\u30b8","\u0418\u0442\u043e\u0433\u0438, \u0432\u0435\u0445\u0438, \u043d\u043e\u0432\u043e\u0441\u0442\u0438 \u0438 \u0437\u043d\u0430\u0447\u043a\u0438","\u0627\u0644\u0645\u0644\u062e\u0635\u0627\u062a \u0648\u0627\u0644\u0645\u0639\u0627\u0644\u0645 \u0648\u0627\u0644\u0623\u062e\u0628\u0627\u0631 \u0648\u0627\u0644\u0634\u0627\u0631\u0627\u062a"],t.w)
+B.ahV=new A.B(B.l,["Options de biblioth\xe8que","Library options","Opciones de biblioteca","\u8d44\u6599\u5e93\u9009\u9879","Op\xe7\xf5es da biblioteca","Bibliotheksoptionen","Opzioni libreria","\u30e9\u30a4\u30d6\u30e9\u30ea\u8a2d\u5b9a","\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438 \u0431\u0438\u0431\u043b\u0438\u043e\u0442\u0435\u043a\u0438","\u062e\u064a\u0627\u0631\u0627\u062a \u0627\u0644\u0645\u0643\u062a\u0628\u0629"],t.w)
+B.agm=new A.B(B.l,["Lier les versions d'un titre, s\xe9parer les collaborations","Link track versions, split collaborations","Unir versiones, separar colaboraciones","\u5408\u5e76\u7248\u672c\u3001\u62c6\u5206\u5408\u4f5c\u827a\u4eba","Unir vers\xf5es, separar colabora\xe7\xf5es","Versionen verkn\xfcpfen, Kollaborationen aufteilen","Unisci versioni, separa collaborazioni","\u30d0\u30fc\u30b8\u30e7\u30f3\u306e\u7d71\u5408\u3001\u30b3\u30e9\u30dc\u306e\u5206\u5272","\u041e\u0431\u044a\u0435\u0434\u0438\u043d\u0435\u043d\u0438\u0435 \u0432\u0435\u0440\u0441\u0438\u0439, \u0440\u0430\u0437\u0434\u0435\u043b\u0435\u043d\u0438\u0435 \u043a\u043e\u043b\u043b\u0430\u0431\u043e\u0440\u0430\u0446\u0438\u0439","\u062f\u0645\u062c \u0627\u0644\u0646\u0633\u062e \u0648\u0641\u0635\u0644 \u0627\u0644\u062a\u0639\u0627\u0648\u0646\u0627\u062a"],t.w)
+B.ajc=new A.B(B.l,["Profils favoris","Favourite profiles","Perfiles favoritos","\u6536\u85cf\u7684\u8d44\u6599","Perfis favoritos","Lieblingsprofile","Profili preferiti","\u304a\u6c17\u306b\u5165\u308a\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb","\u0418\u0437\u0431\u0440\u0430\u043d\u043d\u044b\u0435 \u043f\u0440\u043e\u0444\u0438\u043b\u0438","\u0627\u0644\u0645\u0644\u0641\u0627\u062a \u0627\u0644\u0645\u0641\u0636\u0644\u0629"],t.w)
+B.aih=new A.B(B.l,["Les profils Last.fm que vous avez mis en favori","The Last.fm profiles you starred","Los perfiles de Last.fm que marc\xf3","\u60a8\u52a0\u661f\u6807\u7684 Last.fm \u7528\u6237","Os perfis do Last.fm que voc\xea favoritou","Die Last.fm-Profile, die Sie markiert haben","I profili Last.fm che ha messo tra i preferiti","\u304a\u6c17\u306b\u5165\u308a\u306b\u3057\u305f Last.fm \u30d7\u30ed\u30d5\u30a3\u30fc\u30eb","\u041f\u0440\u043e\u0444\u0438\u043b\u0438 Last.fm, \u0434\u043e\u0431\u0430\u0432\u043b\u0435\u043d\u043d\u044b\u0435 \u0432 \u0438\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435","\u0645\u0644\u0641\u0627\u062a Last.fm \u0627\u0644\u062a\u064a \u0623\u0636\u0641\u062a\u0647\u0627 \u0625\u0644\u0649 \u0627\u0644\u0645\u0641\u0636\u0644\u0629"],t.w)
+B.ajM=new A.B(B.l,["README et activit\xe9 du projet","README and project activity","README y actividad del proyecto","README \u4e0e\u9879\u76ee\u52a8\u6001","README e atividade do projeto","README und Projektaktivit\xe4t","README e attivit\xe0 del progetto","README \u3068\u30d7\u30ed\u30b8\u30a7\u30af\u30c8\u306e\u52d5\u304d","README \u0438 \u0430\u043a\u0442\u0438\u0432\u043d\u043e\u0441\u0442\u044c \u043f\u0440\u043e\u0435\u043a\u0442\u0430","README \u0648\u0646\u0634\u0627\u0637 \u0627\u0644\u0645\u0634\u0631\u0648\u0639"],t.w)
+B.aii=new A.B(B.l,["Lire le README, derniers commits, workflows, version, t\xe9l\xe9chargements","Read the README, latest commits, workflows, version, downloads","Leer el README, \xfaltimos commits, workflows, versi\xf3n, descargas","\u9605\u8bfb README\u3001\u6700\u65b0\u63d0\u4ea4\u3001\u5de5\u4f5c\u6d41\u3001\u7248\u672c\u3001\u4e0b\u8f7d\u91cf","Ler o README, \xfaltimos commits, workflows, vers\xe3o, downloads","README lesen, letzte Commits, Workflows, Version, Downloads","Leggi il README, ultimi commit, workflow, versione, download","README\u3001\u6700\u65b0\u30b3\u30df\u30c3\u30c8\u3001\u30ef\u30fc\u30af\u30d5\u30ed\u30fc\u3001\u30d0\u30fc\u30b8\u30e7\u30f3\u3001\u30c0\u30a6\u30f3\u30ed\u30fc\u30c9\u6570","README, \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435 \u043a\u043e\u043c\u043c\u0438\u0442\u044b, workflow, \u0432\u0435\u0440\u0441\u0438\u044f, \u0437\u0430\u0433\u0440\u0443\u0437\u043a\u0438","\u0627\u0642\u0631\u0623 README \u0648\u0622\u062e\u0631 \u0627\u0644\u0627\u0644\u062a\u0632\u0627\u0645\u0627\u062a \u0648\u0633\u064a\u0631 \u0627\u0644\u0639\u0645\u0644 \u0648\u0627\u0644\u0625\u0635\u062f\u0627\u0631 \u0648\u0627\u0644\u062a\u0646\u0632\u064a\u0644\u0627\u062a"],t.w)
 B.afO=new A.B(B.l,["Afficher ({n})","Show ({n})","Mostrar ({n})","\u663e\u793a ({n})","Mostrar ({n})","Anzeigen ({n})","Mostra ({n})","\u8868\u793a ({n})","\u041f\u043e\u043a\u0430\u0437\u0430\u0442\u044c ({n})","\u0639\u0631\u0636 ({n})"],t.w)
-B.aii=new A.B(B.l,["R\xe9duire","Collapse","Contraer","\u6536\u8d77","Recolher","Einklappen","Comprimi","\u9589\u3058\u308b","\u0421\u0432\u0435\u0440\u043d\u0443\u0442\u044c","\u0637\u064a\u0651"],t.w)
-B.ai5=new A.B(B.l,["Le projet et son activit\xe9","The project and its activity","El proyecto y su actividad","\u9879\u76ee\u53ca\u5176\u52a8\u6001","O projeto e sua atividade","Das Projekt und seine Aktivit\xe4t","Il progetto e la sua attivit\xe0","\u30d7\u30ed\u30b8\u30a7\u30af\u30c8\u3068\u305d\u306e\u52d5\u304d","\u041f\u0440\u043e\u0435\u043a\u0442 \u0438 \u0435\u0433\u043e \u0430\u043a\u0442\u0438\u0432\u043d\u043e\u0441\u0442\u044c","\u0627\u0644\u0645\u0634\u0631\u0648\u0639 \u0648\u0646\u0634\u0627\u0637\u0647"],t.w)
-B.ai0=new A.B(B.l,["Version","Version","Versi\xf3n","\u7248\u672c","Vers\xe3o","Version","Versione","\u30d0\u30fc\u30b8\u30e7\u30f3","\u0412\u0435\u0440\u0441\u0438\u044f","\u0627\u0644\u0625\u0635\u062f\u0627\u0631"],t.w)
-B.ago=new A.B(B.l,["T\xe9l\xe9chargements","Downloads","Descargas","\u4e0b\u8f7d\u91cf","Downloads","Downloads","Download","\u30c0\u30a6\u30f3\u30ed\u30fc\u30c9","\u0417\u0430\u0433\u0440\u0443\u0437\u043a\u0438","\u0627\u0644\u062a\u0646\u0632\u064a\u0644\u0627\u062a"],t.w)
-B.ahQ=new A.B(B.l,["\xc9toiles","Stars","Estrellas","\u661f\u6807","Estrelas","Sterne","Stelle","\u30b9\u30bf\u30fc","\u0417\u0432\u0451\u0437\u0434\u044b","\u0627\u0644\u0646\u062c\u0648\u0645"],t.w)
-B.ajT=new A.B(B.l,["Licence","License","Licencia","\u8bb8\u53ef\u8bc1","Licen\xe7a","Lizenz","Licenza","\u30e9\u30a4\u30bb\u30f3\u30b9","\u041b\u0438\u0446\u0435\u043d\u0437\u0438\u044f","\u0627\u0644\u062a\u0631\u062e\u064a\u0635"],t.w)
-B.ahy=new A.B(B.l,["Derniers commits","Latest commits","\xdaltimos commits","\u6700\u65b0\u63d0\u4ea4","\xdaltimos commits","Letzte Commits","Ultimi commit","\u6700\u65b0\u306e\u30b3\u30df\u30c3\u30c8","\u041f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435 \u043a\u043e\u043c\u043c\u0438\u0442\u044b","\u0622\u062e\u0631 \u0627\u0644\u0627\u0644\u062a\u0632\u0627\u0645\u0627\u062a"],t.w)
-B.ajn=new A.B(B.l,["Derniers workflows","Latest workflows","\xdaltimos workflows","\u6700\u65b0\u5de5\u4f5c\u6d41","\xdaltimos workflows","Letzte Workflows","Ultimi workflow","\u6700\u65b0\u306e\u30ef\u30fc\u30af\u30d5\u30ed\u30fc","\u041f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435 workflow","\u0622\u062e\u0631 \u0639\u0645\u0644\u064a\u0627\u062a \u0633\u064a\u0631 \u0627\u0644\u0639\u0645\u0644"],t.w)
-B.afU=new A.B(B.l,["R\xe9essayer","Retry","Reintentar","\u91cd\u8bd5","Tentar novamente","Erneut versuchen","Riprova","\u518d\u8a66\u884c","\u041f\u043e\u0432\u0442\u043e\u0440\u0438\u0442\u044c","\u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u0645\u062d\u0627\u0648\u0644\u0629"],t.w)
-B.aio=new A.B(B.l,["Ouvrir sur GitHub","Open on GitHub","Abrir en GitHub","\u5728 GitHub \u6253\u5f00","Abrir no GitHub","Auf GitHub \xf6ffnen","Apri su GitHub","GitHub \u3067\u958b\u304f","\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u043d\u0430 GitHub","\u0641\u062a\u062d \u0639\u0644\u0649 GitHub"],t.w)
-B.ahU=new A.B(B.l,["Impossible de charger (hors ligne ou limite GitHub atteinte).","Could not load (offline or GitHub rate limit reached).","No se pudo cargar (sin conexi\xf3n o l\xedmite de GitHub alcanzado).","\u65e0\u6cd5\u52a0\u8f7d(\u79bb\u7ebf\u6216\u5df2\u8fbe GitHub \u9891\u7387\u9650\u5236)\u3002","N\xe3o foi poss\xedvel carregar (offline ou limite do GitHub atingido).","Laden nicht m\xf6glich (offline oder GitHub-Limit erreicht).","Impossibile caricare (offline o limite GitHub raggiunto).","\u8aad\u307f\u8fbc\u3081\u307e\u305b\u3093\u3067\u3057\u305f(\u30aa\u30d5\u30e9\u30a4\u30f3\u3001\u307e\u305f\u306f GitHub \u306e\u5236\u9650)\u3002","\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c (\u043d\u0435\u0442 \u0441\u0435\u0442\u0438 \u0438\u043b\u0438 \u043b\u0438\u043c\u0438\u0442 GitHub).","\u062a\u0639\u0630\u0651\u0631 \u0627\u0644\u062a\u062d\u0645\u064a\u0644 (\u0644\u0627 \u0627\u062a\u0635\u0627\u0644 \u0623\u0648 \u062a\u0645 \u0628\u0644\u0648\u063a \u062d\u062f GitHub)."],t.w)
-B.ajc=new A.B(B.l,["il y a {n} min","{n} min ago","hace {n} min","{n} \u5206\u949f\u524d","h\xe1 {n} min","vor {n} Min.","{n} min fa","{n}\u5206\u524d","{n} \u043c\u0438\u043d \u043d\u0430\u0437\u0430\u0434","\u0645\u0646\u0630 {n} \u062f"],t.w)
+B.aij=new A.B(B.l,["R\xe9duire","Collapse","Contraer","\u6536\u8d77","Recolher","Einklappen","Comprimi","\u9589\u3058\u308b","\u0421\u0432\u0435\u0440\u043d\u0443\u0442\u044c","\u0637\u064a\u0651"],t.w)
+B.ai9=new A.B(B.l,["Le projet et son activit\xe9","The project and its activity","El proyecto y su actividad","\u9879\u76ee\u53ca\u5176\u52a8\u6001","O projeto e sua atividade","Das Projekt und seine Aktivit\xe4t","Il progetto e la sua attivit\xe0","\u30d7\u30ed\u30b8\u30a7\u30af\u30c8\u3068\u305d\u306e\u52d5\u304d","\u041f\u0440\u043e\u0435\u043a\u0442 \u0438 \u0435\u0433\u043e \u0430\u043a\u0442\u0438\u0432\u043d\u043e\u0441\u0442\u044c","\u0627\u0644\u0645\u0634\u0631\u0648\u0639 \u0648\u0646\u0634\u0627\u0637\u0647"],t.w)
+B.ai3=new A.B(B.l,["Version","Version","Versi\xf3n","\u7248\u672c","Vers\xe3o","Version","Versione","\u30d0\u30fc\u30b8\u30e7\u30f3","\u0412\u0435\u0440\u0441\u0438\u044f","\u0627\u0644\u0625\u0635\u062f\u0627\u0631"],t.w)
+B.agr=new A.B(B.l,["T\xe9l\xe9chargements","Downloads","Descargas","\u4e0b\u8f7d\u91cf","Downloads","Downloads","Download","\u30c0\u30a6\u30f3\u30ed\u30fc\u30c9","\u0417\u0430\u0433\u0440\u0443\u0437\u043a\u0438","\u0627\u0644\u062a\u0646\u0632\u064a\u0644\u0627\u062a"],t.w)
+B.ahU=new A.B(B.l,["\xc9toiles","Stars","Estrellas","\u661f\u6807","Estrelas","Sterne","Stelle","\u30b9\u30bf\u30fc","\u0417\u0432\u0451\u0437\u0434\u044b","\u0627\u0644\u0646\u062c\u0648\u0645"],t.w)
+B.ajS=new A.B(B.l,["Licence","License","Licencia","\u8bb8\u53ef\u8bc1","Licen\xe7a","Lizenz","Licenza","\u30e9\u30a4\u30bb\u30f3\u30b9","\u041b\u0438\u0446\u0435\u043d\u0437\u0438\u044f","\u0627\u0644\u062a\u0631\u062e\u064a\u0635"],t.w)
+B.ahD=new A.B(B.l,["Derniers commits","Latest commits","\xdaltimos commits","\u6700\u65b0\u63d0\u4ea4","\xdaltimos commits","Letzte Commits","Ultimi commit","\u6700\u65b0\u306e\u30b3\u30df\u30c3\u30c8","\u041f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435 \u043a\u043e\u043c\u043c\u0438\u0442\u044b","\u0622\u062e\u0631 \u0627\u0644\u0627\u0644\u062a\u0632\u0627\u0645\u0627\u062a"],t.w)
+B.ajm=new A.B(B.l,["Derniers workflows","Latest workflows","\xdaltimos workflows","\u6700\u65b0\u5de5\u4f5c\u6d41","\xdaltimos workflows","Letzte Workflows","Ultimi workflow","\u6700\u65b0\u306e\u30ef\u30fc\u30af\u30d5\u30ed\u30fc","\u041f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435 workflow","\u0622\u062e\u0631 \u0639\u0645\u0644\u064a\u0627\u062a \u0633\u064a\u0631 \u0627\u0644\u0639\u0645\u0644"],t.w)
+B.afT=new A.B(B.l,["R\xe9essayer","Retry","Reintentar","\u91cd\u8bd5","Tentar novamente","Erneut versuchen","Riprova","\u518d\u8a66\u884c","\u041f\u043e\u0432\u0442\u043e\u0440\u0438\u0442\u044c","\u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u0645\u062d\u0627\u0648\u0644\u0629"],t.w)
+B.aip=new A.B(B.l,["Ouvrir sur GitHub","Open on GitHub","Abrir en GitHub","\u5728 GitHub \u6253\u5f00","Abrir no GitHub","Auf GitHub \xf6ffnen","Apri su GitHub","GitHub \u3067\u958b\u304f","\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u043d\u0430 GitHub","\u0641\u062a\u062d \u0639\u0644\u0649 GitHub"],t.w)
+B.ahW=new A.B(B.l,["Impossible de charger (hors ligne ou limite GitHub atteinte).","Could not load (offline or GitHub rate limit reached).","No se pudo cargar (sin conexi\xf3n o l\xedmite de GitHub alcanzado).","\u65e0\u6cd5\u52a0\u8f7d(\u79bb\u7ebf\u6216\u5df2\u8fbe GitHub \u9891\u7387\u9650\u5236)\u3002","N\xe3o foi poss\xedvel carregar (offline ou limite do GitHub atingido).","Laden nicht m\xf6glich (offline oder GitHub-Limit erreicht).","Impossibile caricare (offline o limite GitHub raggiunto).","\u8aad\u307f\u8fbc\u3081\u307e\u305b\u3093\u3067\u3057\u305f(\u30aa\u30d5\u30e9\u30a4\u30f3\u3001\u307e\u305f\u306f GitHub \u306e\u5236\u9650)\u3002","\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c (\u043d\u0435\u0442 \u0441\u0435\u0442\u0438 \u0438\u043b\u0438 \u043b\u0438\u043c\u0438\u0442 GitHub).","\u062a\u0639\u0630\u0651\u0631 \u0627\u0644\u062a\u062d\u0645\u064a\u0644 (\u0644\u0627 \u0627\u062a\u0635\u0627\u0644 \u0623\u0648 \u062a\u0645 \u0628\u0644\u0648\u063a \u062d\u062f GitHub)."],t.w)
+B.ajg=new A.B(B.l,["il y a {n} min","{n} min ago","hace {n} min","{n} \u5206\u949f\u524d","h\xe1 {n} min","vor {n} Min.","{n} min fa","{n}\u5206\u524d","{n} \u043c\u0438\u043d \u043d\u0430\u0437\u0430\u0434","\u0645\u0646\u0630 {n} \u062f"],t.w)
 B.afB=new A.B(B.l,["il y a {n} h","{n} h ago","hace {n} h","{n} \u5c0f\u65f6\u524d","h\xe1 {n} h","vor {n} Std.","{n} h fa","{n}\u6642\u9593\u524d","{n} \u0447 \u043d\u0430\u0437\u0430\u0434","\u0645\u0646\u0630 {n} \u0633"],t.w)
 B.ajr=new A.B(B.l,["il y a {n} j","{n} d ago","hace {n} d","{n} \u5929\u524d","h\xe1 {n} d","vor {n} T.","{n} g fa","{n}\u65e5\u524d","{n} \u0434\u043d. \u043d\u0430\u0437\u0430\u0434","\u0645\u0646\u0630 {n} \u064a"],t.w)
-B.ahW=new A.B(B.l,["{n} scrobbles restaur\xe9s","{n} scrobbles restored","{n} scrobbles restaurados","\u5df2\u6062\u590d {n} \u6761 scrobble","{n} scrobbles restaurados","{n} Scrobbles wiederhergestellt","{n} scrobble ripristinati","{n} \u4ef6\u306e\u30b9\u30af\u30ed\u30d6\u30eb\u3092\u5fa9\u5143","\u0412\u043e\u0441\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d\u043e \u0441\u043a\u0440\u043e\u0431\u0431\u043b\u043e\u0432: {n}","\u062a\u0645\u062a \u0627\u0633\u062a\u0639\u0627\u062f\u0629 {n} \u0633\u0643\u0631\u0648\u0628\u0644"],t.w)
-B.aiS=new A.B(B.l,["Pr\xeat \xe0 importer","Ready to import","Listo para importar","\u51c6\u5907\u5bfc\u5165","Pronto para importar","Bereit zum Import","Pronto per importare","\u30a4\u30f3\u30dd\u30fc\u30c8\u6e96\u5099\u5b8c\u4e86","\u0413\u043e\u0442\u043e\u0432\u043e \u043a \u0438\u043c\u043f\u043e\u0440\u0442\u0443","\u062c\u0627\u0647\u0632 \u0644\u0644\u0627\u0633\u062a\u064a\u0631\u0627\u062f"],t.w)
+B.ahY=new A.B(B.l,["{n} scrobbles restaur\xe9s","{n} scrobbles restored","{n} scrobbles restaurados","\u5df2\u6062\u590d {n} \u6761 scrobble","{n} scrobbles restaurados","{n} Scrobbles wiederhergestellt","{n} scrobble ripristinati","{n} \u4ef6\u306e\u30b9\u30af\u30ed\u30d6\u30eb\u3092\u5fa9\u5143","\u0412\u043e\u0441\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d\u043e \u0441\u043a\u0440\u043e\u0431\u0431\u043b\u043e\u0432: {n}","\u062a\u0645\u062a \u0627\u0633\u062a\u0639\u0627\u062f\u0629 {n} \u0633\u0643\u0631\u0648\u0628\u0644"],t.w)
+B.aiV=new A.B(B.l,["Pr\xeat \xe0 importer","Ready to import","Listo para importar","\u51c6\u5907\u5bfc\u5165","Pronto para importar","Bereit zum Import","Pronto per importare","\u30a4\u30f3\u30dd\u30fc\u30c8\u6e96\u5099\u5b8c\u4e86","\u0413\u043e\u0442\u043e\u0432\u043e \u043a \u0438\u043c\u043f\u043e\u0440\u0442\u0443","\u062c\u0627\u0647\u0632 \u0644\u0644\u0627\u0633\u062a\u064a\u0631\u0627\u062f"],t.w)
 B.Gx=new A.B(B.l,["Connexion \xe0 Last.fm\u2026","Connecting to Last.fm\u2026","Conectando con Last.fm\u2026","\u6b63\u5728\u8fde\u63a5 Last.fm\u2026","Conectando ao Last.fm\u2026","Verbindung zu Last.fm \u2026","Connessione a Last.fm\u2026","Last.fm \u306b\u63a5\u7d9a\u4e2d\u2026","\u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0435 \u043a Last.fm\u2026","\u062c\u0627\u0631\u064d \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0628\u0640 Last.fm\u2026"],t.w)
-B.agL=new A.B(B.l,["Import termin\xe9","Import complete","Importaci\xf3n completada","\u5bfc\u5165\u5b8c\u6210","Importa\xe7\xe3o conclu\xedda","Import abgeschlossen","Importazione completata","\u30a4\u30f3\u30dd\u30fc\u30c8\u5b8c\u4e86","\u0418\u043c\u043f\u043e\u0440\u0442 \u0437\u0430\u0432\u0435\u0440\u0448\u0451\u043d","\u0627\u0643\u062a\u0645\u0644 \u0627\u0644\u0627\u0633\u062a\u064a\u0631\u0627\u062f"],t.w)
+B.agP=new A.B(B.l,["Import termin\xe9","Import complete","Importaci\xf3n completada","\u5bfc\u5165\u5b8c\u6210","Importa\xe7\xe3o conclu\xedda","Import abgeschlossen","Importazione completata","\u30a4\u30f3\u30dd\u30fc\u30c8\u5b8c\u4e86","\u0418\u043c\u043f\u043e\u0440\u0442 \u0437\u0430\u0432\u0435\u0440\u0448\u0451\u043d","\u0627\u0643\u062a\u0645\u0644 \u0627\u0644\u0627\u0633\u062a\u064a\u0631\u0627\u062f"],t.w)
 B.afL=new A.B(B.l,["Sauvegarde d\xe9tect\xe9e : seuls les scrobbles plus r\xe9cents seront v\xe9rifi\xe9s.","Backup found: only newer scrobbles will be checked.","Copia de seguridad detectada: solo se comprobar\xe1n los scrobbles m\xe1s recientes.","\u68c0\u6d4b\u5230\u5907\u4efd:\u53ea\u4f1a\u68c0\u67e5\u66f4\u65b0\u7684 scrobble\u3002","Backup detectado: s\xf3 os scrobbles mais recentes ser\xe3o verificados.","Backup gefunden: Es werden nur neuere Scrobbles gepr\xfcft.","Backup rilevato: verranno controllati solo gli scrobble pi\xf9 recenti.","\u30d0\u30c3\u30af\u30a2\u30c3\u30d7\u3092\u691c\u51fa:\u65b0\u3057\u3044\u30b9\u30af\u30ed\u30d6\u30eb\u306e\u307f\u78ba\u8a8d\u3057\u307e\u3059\u3002","\u041d\u0430\u0439\u0434\u0435\u043d\u0430 \u0440\u0435\u0437\u0435\u0440\u0432\u043d\u0430\u044f \u043a\u043e\u043f\u0438\u044f: \u043f\u0440\u043e\u0432\u0435\u0440\u044f\u044e\u0442\u0441\u044f \u0442\u043e\u043b\u044c\u043a\u043e \u043d\u043e\u0432\u044b\u0435 \u0441\u043a\u0440\u043e\u0431\u0431\u043b\u044b.","\u062a\u0645 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0646\u0633\u062e\u0629 \u0627\u062d\u062a\u064a\u0627\u0637\u064a\u0629: \u0633\u064a\u062a\u0645 \u0641\u062d\u0635 \u0627\u0644\u0633\u0643\u0631\u0648\u0628\u0644\u0627\u062a \u0627\u0644\u0623\u062d\u062f\u062b \u0641\u0642\u0637."],t.w)
-B.agz=new A.B(B.l,["En cours d'\xe9coute","Now playing","Reproduciendo ahora","\u6b63\u5728\u64ad\u653e","Tocando agora","L\xe4uft gerade","In riproduzione","\u518d\u751f\u4e2d","\u0421\u0435\u0439\u0447\u0430\u0441 \u0438\u0433\u0440\u0430\u0435\u0442","\u0642\u064a\u062f \u0627\u0644\u062a\u0634\u063a\u064a\u0644"],t.w)
+B.agE=new A.B(B.l,["En cours d'\xe9coute","Now playing","Reproduciendo ahora","\u6b63\u5728\u64ad\u653e","Tocando agora","L\xe4uft gerade","In riproduzione","\u518d\u751f\u4e2d","\u0421\u0435\u0439\u0447\u0430\u0441 \u0438\u0433\u0440\u0430\u0435\u0442","\u0642\u064a\u062f \u0627\u0644\u062a\u0634\u063a\u064a\u0644"],t.w)
 B.ajE=new A.B(B.l,["Statistiques","Stats","Estad\xedsticas","\u7edf\u8ba1","Estat\xedsticas","Statistiken","Statistiche","\u7d71\u8a08","\u0421\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0430","\u0627\u0644\u0625\u062d\u0635\u0627\u0621\u0627\u062a"],t.w)
 B.afK=new A.B(B.l,["\xc9coutes r\xe9centes","Recent plays","Reproducciones recientes","\u6700\u8fd1\u64ad\u653e","Reprodu\xe7\xf5es recentes","Zuletzt geh\xf6rt","Ascolti recenti","\u6700\u8fd1\u306e\u518d\u751f","\u041d\u0435\u0434\u0430\u0432\u043d\u0438\u0435 \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u044f","\u0627\u0644\u062a\u0634\u063a\u064a\u0644 \u0627\u0644\u0623\u062e\u064a\u0631"],t.w)
-B.aiw=new A.B(B.l,["D\xe9couverte","Discover","Descubrir","\u53d1\u73b0","Descobrir","Entdecken","Scopri","\u767a\u898b","\u041e\u0431\u0437\u043e\u0440","\u0627\u0643\u062a\u0634\u0641"],t.w)
-B.agY=new A.B(B.l,["Amis","Friends","Amigos","\u597d\u53cb","Amigos","Freunde","Amici","\u30d5\u30ec\u30f3\u30c9","\u0414\u0440\u0443\u0437\u044c\u044f","\u0627\u0644\u0623\u0635\u062f\u0642\u0627\u0621"],t.w)
-B.ahd=new A.B(B.l,["Graphique du tableau de bord","Dashboard chart","Gr\xe1fico del panel","\u4eea\u8868\u76d8\u56fe\u8868","Gr\xe1fico do painel","Dashboard-Diagramm","Grafico della dashboard","\u30c0\u30c3\u30b7\u30e5\u30dc\u30fc\u30c9\u306e\u30b0\u30e9\u30d5","\u0413\u0440\u0430\u0444\u0438\u043a \u0434\u0430\u0448\u0431\u043e\u0440\u0434\u0430","\u0645\u062e\u0637\u0637 \u0644\u0648\u062d\u0629 \u0627\u0644\u0645\u0639\u0644\u0648\u0645\u0627\u062a"],t.w)
-B.ag4=new A.B(B.l,["Calendrier","Calendar","Calendario","\u65e5\u5386","Calend\xe1rio","Kalender","Calendario","\u30ab\u30ec\u30f3\u30c0\u30fc","\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c","\u0627\u0644\u062a\u0642\u0648\u064a\u0645"],t.w)
+B.aiv=new A.B(B.l,["D\xe9couverte","Discover","Descubrir","\u53d1\u73b0","Descobrir","Entdecken","Scopri","\u767a\u898b","\u041e\u0431\u0437\u043e\u0440","\u0627\u0643\u062a\u0634\u0641"],t.w)
+B.ah2=new A.B(B.l,["Amis","Friends","Amigos","\u597d\u53cb","Amigos","Freunde","Amici","\u30d5\u30ec\u30f3\u30c9","\u0414\u0440\u0443\u0437\u044c\u044f","\u0627\u0644\u0623\u0635\u062f\u0642\u0627\u0621"],t.w)
+B.ahh=new A.B(B.l,["Graphique du tableau de bord","Dashboard chart","Gr\xe1fico del panel","\u4eea\u8868\u76d8\u56fe\u8868","Gr\xe1fico do painel","Dashboard-Diagramm","Grafico della dashboard","\u30c0\u30c3\u30b7\u30e5\u30dc\u30fc\u30c9\u306e\u30b0\u30e9\u30d5","\u0413\u0440\u0430\u0444\u0438\u043a \u0434\u0430\u0448\u0431\u043e\u0440\u0434\u0430","\u0645\u062e\u0637\u0637 \u0644\u0648\u062d\u0629 \u0627\u0644\u0645\u0639\u0644\u0648\u0645\u0627\u062a"],t.w)
+B.ag6=new A.B(B.l,["Calendrier","Calendar","Calendario","\u65e5\u5386","Calend\xe1rio","Kalender","Calendario","\u30ab\u30ec\u30f3\u30c0\u30fc","\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c","\u0627\u0644\u062a\u0642\u0648\u064a\u0645"],t.w)
 B.aiB=new A.B(B.l,["Mensuel","Monthly","Mensual","\u6309\u6708","Mensal","Monatlich","Mensile","\u6708\u5225","\u041f\u043e \u043c\u0435\u0441\u044f\u0446\u0430\u043c","\u0634\u0647\u0631\u064a"],t.w)
-B.aiD=new A.B(B.l,["Vid\xe9os anim\xe9es (Apple Music)","Animated covers (Apple Music)","Portadas animadas (Apple Music)","\u52a8\u6001\u5c01\u9762 (Apple Music)","Capas animadas (Apple Music)","Animierte Cover (Apple Music)","Copertine animate (Apple Music)","\u30a2\u30cb\u30e1\u30fc\u30b7\u30e7\u30f3\u30ab\u30d0\u30fc (Apple Music)","\u0410\u043d\u0438\u043c\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0435 \u043e\u0431\u043b\u043e\u0436\u043a\u0438 (Apple Music)","\u0623\u063a\u0644\u0641\u0629 \u0645\u062a\u062d\u0631\u0643\u0629 (Apple Music)"],t.w)
+B.aiE=new A.B(B.l,["Vid\xe9os anim\xe9es (Apple Music)","Animated covers (Apple Music)","Portadas animadas (Apple Music)","\u52a8\u6001\u5c01\u9762 (Apple Music)","Capas animadas (Apple Music)","Animierte Cover (Apple Music)","Copertine animate (Apple Music)","\u30a2\u30cb\u30e1\u30fc\u30b7\u30e7\u30f3\u30ab\u30d0\u30fc (Apple Music)","\u0410\u043d\u0438\u043c\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0435 \u043e\u0431\u043b\u043e\u0436\u043a\u0438 (Apple Music)","\u0623\u063a\u0644\u0641\u0629 \u0645\u062a\u062d\u0631\u0643\u0629 (Apple Music)"],t.w)
 B.ajt=new A.B(B.l,["M\xe9moire vid\xe9o utilis\xe9e : {mem} \xb7 {players} lecteur(s) actif(s) \xb7 {links} lien(s) en m\xe9moire","Video memory in use: {mem} \xb7 {players} active player(s) \xb7 {links} link(s) cached","Memoria de v\xeddeo en uso: {mem} \xb7 {players} reproductor(es) activo(s) \xb7 {links} enlace(s) en cach\xe9","\u89c6\u9891\u5185\u5b58\u5360\u7528:{mem} \xb7 {players} \u4e2a\u6d3b\u52a8\u64ad\u653e\u5668 \xb7 \u5df2\u7f13\u5b58 {links} \u4e2a\u94fe\u63a5","Mem\xf3ria de v\xeddeo em uso: {mem} \xb7 {players} player(s) ativo(s) \xb7 {links} link(s) em cache","Videospeicher in Nutzung: {mem} \xb7 {players} aktive(r) Player \xb7 {links} Link(s) im Cache","Memoria video in uso: {mem} \xb7 {players} player attivo/i \xb7 {links} link in cache","\u4f7f\u7528\u4e2d\u306e\u30d3\u30c7\u30aa\u30e1\u30e2\u30ea:{mem} \xb7 \u30a2\u30af\u30c6\u30a3\u30d6\u306a\u30d7\u30ec\u30fc\u30e4\u30fc {players} \xb7 \u30ad\u30e3\u30c3\u30b7\u30e5\u6e08\u307f\u30ea\u30f3\u30af {links}","\u0412\u0438\u0434\u0435\u043e\u043f\u0430\u043c\u044f\u0442\u044c: {mem} \xb7 \u0430\u043a\u0442\u0438\u0432\u043d\u044b\u0445 \u043f\u043b\u0435\u0435\u0440\u043e\u0432: {players} \xb7 \u0441\u0441\u044b\u043b\u043e\u043a \u0432 \u043a\u044d\u0448\u0435: {links}","\u0630\u0627\u0643\u0631\u0629 \u0627\u0644\u0641\u064a\u062f\u064a\u0648 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645\u0629: {mem} \xb7 {players} \u0645\u0634\u063a\u0651\u0644 \u0646\u0634\u0637 \xb7 {links} \u0631\u0627\u0628\u0637 \u0641\u064a \u0627\u0644\u0630\u0627\u0643\u0631\u0629"],t.w)
 B.ajG=new A.B(B.l,["Vid\xe9os anim\xe9es","Animated covers","Portadas animadas","\u52a8\u6001\u5c01\u9762","Capas animadas","Animierte Cover","Copertine animate","\u30a2\u30cb\u30e1\u30ab\u30d0\u30fc","\u0410\u043d\u0438\u043c\u0430\u0446\u0438\u0438","\u0623\u063a\u0644\u0641\u0629 \u0645\u062a\u062d\u0631\u0643\u0629"],t.w)
-B.aj5=new A.B(B.l,["M\xe9moire vid\xe9o lib\xe9r\xe9e","Video memory released","Memoria de v\xeddeo liberada","\u5df2\u91ca\u653e\u89c6\u9891\u5185\u5b58","Mem\xf3ria de v\xeddeo liberada","Videospeicher freigegeben","Memoria video liberata","\u30d3\u30c7\u30aa\u30e1\u30e2\u30ea\u3092\u89e3\u653e\u3057\u307e\u3057\u305f","\u0412\u0438\u0434\u0435\u043e\u043f\u0430\u043c\u044f\u0442\u044c \u043e\u0441\u0432\u043e\u0431\u043e\u0436\u0434\u0435\u043d\u0430","\u062a\u0645 \u062a\u062d\u0631\u064a\u0631 \u0630\u0627\u0643\u0631\u0629 \u0627\u0644\u0641\u064a\u062f\u064a\u0648"],t.w)
-B.aiF=new A.B(B.l,["M\xe9moire","Memory","Memoria","\u5185\u5b58","Mem\xf3ria","Speicher","Memoria","\u30e1\u30e2\u30ea","\u041f\u0430\u043c\u044f\u0442\u044c","\u0627\u0644\u0630\u0627\u0643\u0631\u0629"],t.w)
+B.aj8=new A.B(B.l,["M\xe9moire vid\xe9o lib\xe9r\xe9e","Video memory released","Memoria de v\xeddeo liberada","\u5df2\u91ca\u653e\u89c6\u9891\u5185\u5b58","Mem\xf3ria de v\xeddeo liberada","Videospeicher freigegeben","Memoria video liberata","\u30d3\u30c7\u30aa\u30e1\u30e2\u30ea\u3092\u89e3\u653e\u3057\u307e\u3057\u305f","\u0412\u0438\u0434\u0435\u043e\u043f\u0430\u043c\u044f\u0442\u044c \u043e\u0441\u0432\u043e\u0431\u043e\u0436\u0434\u0435\u043d\u0430","\u062a\u0645 \u062a\u062d\u0631\u064a\u0631 \u0630\u0627\u0643\u0631\u0629 \u0627\u0644\u0641\u064a\u062f\u064a\u0648"],t.w)
+B.aiG=new A.B(B.l,["M\xe9moire","Memory","Memoria","\u5185\u5b58","Mem\xf3ria","Speicher","Memoria","\u30e1\u30e2\u30ea","\u041f\u0430\u043c\u044f\u0442\u044c","\u0627\u0644\u0630\u0627\u0643\u0631\u0629"],t.w)
 B.aix=new A.B(B.l,["Stockage","Storage","Almacenamiento","\u5b58\u50a8","Armazenamento","Speicher","Archivio","\u30b9\u30c8\u30ec\u30fc\u30b8","\u0425\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0435","\u0627\u0644\u062a\u062e\u0632\u064a\u0646"],t.w)
-B.aib=new A.B(B.l,["Niveau {n}","Level {n}","Nivel {n}","\u7b49\u7ea7 {n}","N\xedvel {n}","Level {n}","Livello {n}","\u30ec\u30d9\u30eb {n}","\u0423\u0440\u043e\u0432\u0435\u043d\u044c {n}","\u0627\u0644\u0645\u0633\u062a\u0648\u0649 {n}"],t.w)
-B.aiO=new A.B(B.l,["Historique des niveaux","Level history","Historial de niveles","\u7b49\u7ea7\u5386\u53f2","Hist\xf3rico de n\xedveis","Levelverlauf","Cronologia livelli","\u30ec\u30d9\u30eb\u5c65\u6b74","\u0418\u0441\u0442\u043e\u0440\u0438\u044f \u0443\u0440\u043e\u0432\u043d\u0435\u0439","\u0633\u062c\u0644 \u0627\u0644\u0645\u0633\u062a\u0648\u064a\u0627\u062a"],t.w)
+B.aid=new A.B(B.l,["Niveau {n}","Level {n}","Nivel {n}","\u7b49\u7ea7 {n}","N\xedvel {n}","Level {n}","Livello {n}","\u30ec\u30d9\u30eb {n}","\u0423\u0440\u043e\u0432\u0435\u043d\u044c {n}","\u0627\u0644\u0645\u0633\u062a\u0648\u0649 {n}"],t.w)
+B.aiQ=new A.B(B.l,["Historique des niveaux","Level history","Historial de niveles","\u7b49\u7ea7\u5386\u53f2","Hist\xf3rico de n\xedveis","Levelverlauf","Cronologia livelli","\u30ec\u30d9\u30eb\u5c65\u6b74","\u0418\u0441\u0442\u043e\u0440\u0438\u044f \u0443\u0440\u043e\u0432\u043d\u0435\u0439","\u0633\u062c\u0644 \u0627\u0644\u0645\u0633\u062a\u0648\u064a\u0627\u062a"],t.w)
 B.air=new A.B(B.l,["Pochettes anim\xe9es","Animated covers","Portadas animadas","\u52a8\u6001\u5c01\u9762\u6548\u679c","Capas animadas","Animierte Cover","Copertine animate","\u52d5\u304f\u30ab\u30d0\u30fc","\u0416\u0438\u0432\u044b\u0435 \u043e\u0431\u043b\u043e\u0436\u043a\u0438","\u0623\u063a\u0644\u0641\u0629 \u062d\u064a\u0629"],t.w)
-B.agu=new A.B(B.l,["Zoom doux et effet de profondeur sur les images","Soft zoom and depth effect on images","Zoom suave y efecto de profundidad en las im\xe1genes","\u56fe\u7247\u5e26\u6709\u67d4\u548c\u7f29\u653e\u4e0e\u666f\u6df1\u6548\u679c","Zoom suave e efeito de profundidade nas imagens","Sanfter Zoom und Tiefeneffekt auf Bildern","Zoom morbido ed effetto profondit\xe0 sulle immagini","\u753b\u50cf\u306b\u3084\u308f\u3089\u304b\u306a\u30ba\u30fc\u30e0\u3068\u5965\u884c\u304d\u52b9\u679c","\u041f\u043b\u0430\u0432\u043d\u044b\u0439 \u0437\u0443\u043c \u0438 \u044d\u0444\u0444\u0435\u043a\u0442 \u0433\u043b\u0443\u0431\u0438\u043d\u044b \u043d\u0430 \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f\u0445","\u062a\u0643\u0628\u064a\u0631 \u0646\u0627\u0639\u0645 \u0648\u062a\u0623\u062b\u064a\u0631 \u0639\u0645\u0642 \u0639\u0644\u0649 \u0627\u0644\u0635\u0648\u0631"],t.w)
-B.afY=new A.B(B.l,["Pochettes vid\xe9o (Apple Music)","Video covers (Apple Music)","Portadas en v\xeddeo (Apple Music)","\u89c6\u9891\u5c01\u9762 (Apple Music)","Capas em v\xeddeo (Apple Music)","Video-Cover (Apple Music)","Copertine video (Apple Music)","\u30d3\u30c7\u30aa\u30ab\u30d0\u30fc (Apple Music)","\u0412\u0438\u0434\u0435\u043e\u043e\u0431\u043b\u043e\u0436\u043a\u0438 (Apple Music)","\u0623\u063a\u0644\u0641\u0629 \u0641\u064a\u062f\u064a\u0648 (Apple Music)"],t.w)
-B.ahw=new A.B(B.l,["Joue la pochette anim\xe9e quand elle existe","Plays the animated cover when one exists","Reproduce la portada animada cuando existe","\u6709\u52a8\u6001\u5c01\u9762\u65f6\u81ea\u52a8\u64ad\u653e","Reproduz a capa animada quando existir","Spielt das animierte Cover ab, wenn vorhanden","Riproduce la copertina animata quando esiste","\u30a2\u30cb\u30e1\u30fc\u30b7\u30e7\u30f3\u30ab\u30d0\u30fc\u304c\u3042\u308c\u3070\u518d\u751f\u3057\u307e\u3059","\u0412\u043e\u0441\u043f\u0440\u043e\u0438\u0437\u0432\u043e\u0434\u0438\u0442 \u0430\u043d\u0438\u043c\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u0443\u044e \u043e\u0431\u043b\u043e\u0436\u043a\u0443, \u0435\u0441\u043b\u0438 \u043e\u043d\u0430 \u0435\u0441\u0442\u044c","\u064a\u0634\u063a\u0651\u0644 \u0627\u0644\u063a\u0644\u0627\u0641 \u0627\u0644\u0645\u062a\u062d\u0631\u0643 \u0639\u0646\u062f \u062a\u0648\u0641\u0631\u0647"],t.w)
-B.ajw=new A.B(B.l,["Succ\xe8s et niveaux","Achievements and levels","Logros y niveles","\u6210\u5c31\u4e0e\u7b49\u7ea7","Conquistas e n\xedveis","Erfolge und Level","Traguardi e livelli","\u5b9f\u7e3e\u3068\u30ec\u30d9\u30eb","\u0414\u043e\u0441\u0442\u0438\u0436\u0435\u043d\u0438\u044f \u0438 \u0443\u0440\u043e\u0432\u043d\u0438","\u0627\u0644\u0625\u0646\u062c\u0627\u0632\u0627\u062a \u0648\u0627\u0644\u0645\u0633\u062a\u0648\u064a\u0627\u062a"],t.w)
-B.agp=new A.B(B.l,["Paliers, badges et niveau de compte","Tiers, badges, and account level","Niveles, insignias y nivel de cuenta","\u7b49\u7ea7\u6863\u4f4d\u3001\u5fbd\u7ae0\u4e0e\u8d26\u53f7\u7b49\u7ea7","N\xedveis, selos e n\xedvel da conta","Stufen, Abzeichen und Kontolevel","Livelli, badge e livello dell\u2019account","\u30c6\u30a3\u30a2\u3001\u30d0\u30c3\u30b8\u3001\u30a2\u30ab\u30a6\u30f3\u30c8\u30ec\u30d9\u30eb","\u0420\u0430\u043d\u0433\u0438, \u0437\u043d\u0430\u0447\u043a\u0438 \u0438 \u0443\u0440\u043e\u0432\u0435\u043d\u044c \u0430\u043a\u043a\u0430\u0443\u043d\u0442\u0430","\u0627\u0644\u0641\u0626\u0627\u062a \u0648\u0627\u0644\u0634\u0627\u0631\u0627\u062a \u0648\u0645\u0633\u062a\u0648\u0649 \u0627\u0644\u062d\u0633\u0627\u0628"],t.w)
-B.ah0=new A.B(B.l,["Limite du cache photos","Photo cache limit","L\xedmite de cach\xe9 de fotos","\u7167\u7247\u7f13\u5b58\u4e0a\u9650","Limite do cache de fotos","Limit f\xfcr Foto-Cache","Limite cache foto","\u5199\u771f\u30ad\u30e3\u30c3\u30b7\u30e5\u306e\u4e0a\u9650","\u041b\u0438\u043c\u0438\u0442 \u043a\u044d\u0448\u0430 \u0444\u043e\u0442\u043e","\u062d\u062f \u0630\u0627\u0643\u0631\u0629 \u0627\u0644\u0635\u0648\u0631 \u0627\u0644\u0645\u0624\u0642\u062a\u0629"],t.w)
-B.agG=new A.B(B.l,["Pochettes, photos d'artistes et avatars. Les plus anciennes sont supprim\xe9es en premier.","Covers, artist photos and avatars. Oldest ones are removed first.","Portadas, fotos de artistas y avatares. Se borran primero las m\xe1s antiguas.","\u5c01\u9762\u3001\u827a\u672f\u5bb6\u7167\u7247\u548c\u5934\u50cf\u3002\u4f18\u5148\u5220\u9664\u6700\u65e7\u7684\u3002","Capas, fotos de artistas e avatares. As mais antigas s\xe3o removidas primeiro.","Cover, K\xfcnstlerfotos und Avatare. Die \xe4ltesten werden zuerst gel\xf6scht.","Copertine, foto degli artisti e avatar. Le pi\xf9 vecchie vengono eliminate per prime.","\u30b8\u30e3\u30b1\u30c3\u30c8\u3001\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u5199\u771f\u3001\u30a2\u30d0\u30bf\u30fc\u3002\u53e4\u3044\u3082\u306e\u304b\u3089\u524a\u9664\u3055\u308c\u307e\u3059\u3002","\u041e\u0431\u043b\u043e\u0436\u043a\u0438, \u0444\u043e\u0442\u043e \u0430\u0440\u0442\u0438\u0441\u0442\u043e\u0432 \u0438 \u0430\u0432\u0430\u0442\u0430\u0440\u044b. \u0421\u043d\u0430\u0447\u0430\u043b\u0430 \u0443\u0434\u0430\u043b\u044f\u044e\u0442\u0441\u044f \u0441\u0430\u043c\u044b\u0435 \u0441\u0442\u0430\u0440\u044b\u0435.","\u0627\u0644\u0623\u063a\u0644\u0641\u0629 \u0648\u0635\u0648\u0631 \u0627\u0644\u0641\u0646\u0627\u0646\u064a\u0646 \u0648\u0627\u0644\u0635\u0648\u0631 \u0627\u0644\u0631\u0645\u0632\u064a\u0629. \u062a\u064f\u062d\u0630\u0641 \u0627\u0644\u0623\u0642\u062f\u0645 \u0623\u0648\u0644\u0627\u064b."],t.w)
+B.agz=new A.B(B.l,["Zoom doux et effet de profondeur sur les images","Soft zoom and depth effect on images","Zoom suave y efecto de profundidad en las im\xe1genes","\u56fe\u7247\u5e26\u6709\u67d4\u548c\u7f29\u653e\u4e0e\u666f\u6df1\u6548\u679c","Zoom suave e efeito de profundidade nas imagens","Sanfter Zoom und Tiefeneffekt auf Bildern","Zoom morbido ed effetto profondit\xe0 sulle immagini","\u753b\u50cf\u306b\u3084\u308f\u3089\u304b\u306a\u30ba\u30fc\u30e0\u3068\u5965\u884c\u304d\u52b9\u679c","\u041f\u043b\u0430\u0432\u043d\u044b\u0439 \u0437\u0443\u043c \u0438 \u044d\u0444\u0444\u0435\u043a\u0442 \u0433\u043b\u0443\u0431\u0438\u043d\u044b \u043d\u0430 \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f\u0445","\u062a\u0643\u0628\u064a\u0631 \u0646\u0627\u0639\u0645 \u0648\u062a\u0623\u062b\u064a\u0631 \u0639\u0645\u0642 \u0639\u0644\u0649 \u0627\u0644\u0635\u0648\u0631"],t.w)
+B.afX=new A.B(B.l,["Pochettes vid\xe9o (Apple Music)","Video covers (Apple Music)","Portadas en v\xeddeo (Apple Music)","\u89c6\u9891\u5c01\u9762 (Apple Music)","Capas em v\xeddeo (Apple Music)","Video-Cover (Apple Music)","Copertine video (Apple Music)","\u30d3\u30c7\u30aa\u30ab\u30d0\u30fc (Apple Music)","\u0412\u0438\u0434\u0435\u043e\u043e\u0431\u043b\u043e\u0436\u043a\u0438 (Apple Music)","\u0623\u063a\u0644\u0641\u0629 \u0641\u064a\u062f\u064a\u0648 (Apple Music)"],t.w)
+B.ahz=new A.B(B.l,["Joue la pochette anim\xe9e quand elle existe","Plays the animated cover when one exists","Reproduce la portada animada cuando existe","\u6709\u52a8\u6001\u5c01\u9762\u65f6\u81ea\u52a8\u64ad\u653e","Reproduz a capa animada quando existir","Spielt das animierte Cover ab, wenn vorhanden","Riproduce la copertina animata quando esiste","\u30a2\u30cb\u30e1\u30fc\u30b7\u30e7\u30f3\u30ab\u30d0\u30fc\u304c\u3042\u308c\u3070\u518d\u751f\u3057\u307e\u3059","\u0412\u043e\u0441\u043f\u0440\u043e\u0438\u0437\u0432\u043e\u0434\u0438\u0442 \u0430\u043d\u0438\u043c\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u0443\u044e \u043e\u0431\u043b\u043e\u0436\u043a\u0443, \u0435\u0441\u043b\u0438 \u043e\u043d\u0430 \u0435\u0441\u0442\u044c","\u064a\u0634\u063a\u0651\u0644 \u0627\u0644\u063a\u0644\u0627\u0641 \u0627\u0644\u0645\u062a\u062d\u0631\u0643 \u0639\u0646\u062f \u062a\u0648\u0641\u0631\u0647"],t.w)
+B.ajx=new A.B(B.l,["Succ\xe8s et niveaux","Achievements and levels","Logros y niveles","\u6210\u5c31\u4e0e\u7b49\u7ea7","Conquistas e n\xedveis","Erfolge und Level","Traguardi e livelli","\u5b9f\u7e3e\u3068\u30ec\u30d9\u30eb","\u0414\u043e\u0441\u0442\u0438\u0436\u0435\u043d\u0438\u044f \u0438 \u0443\u0440\u043e\u0432\u043d\u0438","\u0627\u0644\u0625\u0646\u062c\u0627\u0632\u0627\u062a \u0648\u0627\u0644\u0645\u0633\u062a\u0648\u064a\u0627\u062a"],t.w)
+B.ags=new A.B(B.l,["Paliers, badges et niveau de compte","Tiers, badges, and account level","Niveles, insignias y nivel de cuenta","\u7b49\u7ea7\u6863\u4f4d\u3001\u5fbd\u7ae0\u4e0e\u8d26\u53f7\u7b49\u7ea7","N\xedveis, selos e n\xedvel da conta","Stufen, Abzeichen und Kontolevel","Livelli, badge e livello dell\u2019account","\u30c6\u30a3\u30a2\u3001\u30d0\u30c3\u30b8\u3001\u30a2\u30ab\u30a6\u30f3\u30c8\u30ec\u30d9\u30eb","\u0420\u0430\u043d\u0433\u0438, \u0437\u043d\u0430\u0447\u043a\u0438 \u0438 \u0443\u0440\u043e\u0432\u0435\u043d\u044c \u0430\u043a\u043a\u0430\u0443\u043d\u0442\u0430","\u0627\u0644\u0641\u0626\u0627\u062a \u0648\u0627\u0644\u0634\u0627\u0631\u0627\u062a \u0648\u0645\u0633\u062a\u0648\u0649 \u0627\u0644\u062d\u0633\u0627\u0628"],t.w)
+B.ah5=new A.B(B.l,["Limite du cache photos","Photo cache limit","L\xedmite de cach\xe9 de fotos","\u7167\u7247\u7f13\u5b58\u4e0a\u9650","Limite do cache de fotos","Limit f\xfcr Foto-Cache","Limite cache foto","\u5199\u771f\u30ad\u30e3\u30c3\u30b7\u30e5\u306e\u4e0a\u9650","\u041b\u0438\u043c\u0438\u0442 \u043a\u044d\u0448\u0430 \u0444\u043e\u0442\u043e","\u062d\u062f \u0630\u0627\u0643\u0631\u0629 \u0627\u0644\u0635\u0648\u0631 \u0627\u0644\u0645\u0624\u0642\u062a\u0629"],t.w)
+B.agL=new A.B(B.l,["Pochettes, photos d'artistes et avatars. Les plus anciennes sont supprim\xe9es en premier.","Covers, artist photos and avatars. Oldest ones are removed first.","Portadas, fotos de artistas y avatares. Se borran primero las m\xe1s antiguas.","\u5c01\u9762\u3001\u827a\u672f\u5bb6\u7167\u7247\u548c\u5934\u50cf\u3002\u4f18\u5148\u5220\u9664\u6700\u65e7\u7684\u3002","Capas, fotos de artistas e avatares. As mais antigas s\xe3o removidas primeiro.","Cover, K\xfcnstlerfotos und Avatare. Die \xe4ltesten werden zuerst gel\xf6scht.","Copertine, foto degli artisti e avatar. Le pi\xf9 vecchie vengono eliminate per prime.","\u30b8\u30e3\u30b1\u30c3\u30c8\u3001\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u5199\u771f\u3001\u30a2\u30d0\u30bf\u30fc\u3002\u53e4\u3044\u3082\u306e\u304b\u3089\u524a\u9664\u3055\u308c\u307e\u3059\u3002","\u041e\u0431\u043b\u043e\u0436\u043a\u0438, \u0444\u043e\u0442\u043e \u0430\u0440\u0442\u0438\u0441\u0442\u043e\u0432 \u0438 \u0430\u0432\u0430\u0442\u0430\u0440\u044b. \u0421\u043d\u0430\u0447\u0430\u043b\u0430 \u0443\u0434\u0430\u043b\u044f\u044e\u0442\u0441\u044f \u0441\u0430\u043c\u044b\u0435 \u0441\u0442\u0430\u0440\u044b\u0435.","\u0627\u0644\u0623\u063a\u0644\u0641\u0629 \u0648\u0635\u0648\u0631 \u0627\u0644\u0641\u0646\u0627\u0646\u064a\u0646 \u0648\u0627\u0644\u0635\u0648\u0631 \u0627\u0644\u0631\u0645\u0632\u064a\u0629. \u062a\u064f\u062d\u0630\u0641 \u0627\u0644\u0623\u0642\u062f\u0645 \u0623\u0648\u0644\u0627\u064b."],t.w)
 B.aiJ=new A.B(B.l,["Limite du cache vid\xe9o","Video cache limit","L\xedmite de cach\xe9 de v\xeddeo","\u89c6\u9891\u7f13\u5b58\u4e0a\u9650","Limite do cache de v\xeddeo","Limit f\xfcr Video-Cache","Limite cache video","\u52d5\u753b\u30ad\u30e3\u30c3\u30b7\u30e5\u306e\u4e0a\u9650","\u041b\u0438\u043c\u0438\u0442 \u043a\u044d\u0448\u0430 \u0432\u0438\u0434\u0435\u043e","\u062d\u062f \u0630\u0627\u0643\u0631\u0629 \u0627\u0644\u0641\u064a\u062f\u064a\u0648 \u0627\u0644\u0645\u0624\u0642\u062a\u0629"],t.w)
-B.ahr=new A.B(B.l,["Pochettes anim\xe9es Apple Music gard\xe9es sur le disque pour les revoir hors ligne (Android).","Apple Music animated covers kept on disk to replay offline (Android).","Portadas animadas de Apple Music guardadas en disco para verlas sin conexi\xf3n (Android).","Apple Music \u52a8\u6001\u5c01\u9762\u4fdd\u5b58\u5728\u78c1\u76d8\u4e0a\uff0c\u53ef\u79bb\u7ebf\u91cd\u64ad\uff08Android\uff09\u3002","Capas animadas do Apple Music guardadas no disco para rever offline (Android).","Animierte Apple-Music-Cover werden offline auf dem Ger\xe4t gespeichert (Android).","Copertine animate di Apple Music salvate su disco per rivederle offline (Android).","Apple Music\u306e\u30a2\u30cb\u30e1\u30fc\u30b7\u30e7\u30f3\u30ab\u30d0\u30fc\u3092\u30c7\u30a3\u30b9\u30af\u306b\u4fdd\u5b58\u3057\u3001\u30aa\u30d5\u30e9\u30a4\u30f3\u3067\u518d\u751f\u3057\u307e\u3059\uff08Android\uff09\u3002","\u0410\u043d\u0438\u043c\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0435 \u043e\u0431\u043b\u043e\u0436\u043a\u0438 Apple Music \u0445\u0440\u0430\u043d\u044f\u0442\u0441\u044f \u043d\u0430 \u0434\u0438\u0441\u043a\u0435 \u0434\u043b\u044f \u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440\u0430 \u043e\u0444\u043b\u0430\u0439\u043d (Android).","\u0623\u063a\u0644\u0641\u0629 Apple Music \u0627\u0644\u0645\u062a\u062d\u0631\u0643\u0629 \u062a\u064f\u062d\u0641\u0638 \u0639\u0644\u0649 \u0627\u0644\u0642\u0631\u0635 \u0644\u0625\u0639\u0627\u062f\u0629 \u0639\u0631\u0636\u0647\u0627 \u062f\u0648\u0646 \u0627\u062a\u0635\u0627\u0644 (Android)."],t.w)
+B.aht=new A.B(B.l,["Pochettes anim\xe9es Apple Music gard\xe9es sur le disque pour les revoir hors ligne (Android).","Apple Music animated covers kept on disk to replay offline (Android).","Portadas animadas de Apple Music guardadas en disco para verlas sin conexi\xf3n (Android).","Apple Music \u52a8\u6001\u5c01\u9762\u4fdd\u5b58\u5728\u78c1\u76d8\u4e0a\uff0c\u53ef\u79bb\u7ebf\u91cd\u64ad\uff08Android\uff09\u3002","Capas animadas do Apple Music guardadas no disco para rever offline (Android).","Animierte Apple-Music-Cover werden offline auf dem Ger\xe4t gespeichert (Android).","Copertine animate di Apple Music salvate su disco per rivederle offline (Android).","Apple Music\u306e\u30a2\u30cb\u30e1\u30fc\u30b7\u30e7\u30f3\u30ab\u30d0\u30fc\u3092\u30c7\u30a3\u30b9\u30af\u306b\u4fdd\u5b58\u3057\u3001\u30aa\u30d5\u30e9\u30a4\u30f3\u3067\u518d\u751f\u3057\u307e\u3059\uff08Android\uff09\u3002","\u0410\u043d\u0438\u043c\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0435 \u043e\u0431\u043b\u043e\u0436\u043a\u0438 Apple Music \u0445\u0440\u0430\u043d\u044f\u0442\u0441\u044f \u043d\u0430 \u0434\u0438\u0441\u043a\u0435 \u0434\u043b\u044f \u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440\u0430 \u043e\u0444\u043b\u0430\u0439\u043d (Android).","\u0623\u063a\u0644\u0641\u0629 Apple Music \u0627\u0644\u0645\u062a\u062d\u0631\u0643\u0629 \u062a\u064f\u062d\u0641\u0638 \u0639\u0644\u0649 \u0627\u0644\u0642\u0631\u0635 \u0644\u0625\u0639\u0627\u062f\u0629 \u0639\u0631\u0636\u0647\u0627 \u062f\u0648\u0646 \u0627\u062a\u0635\u0627\u0644 (Android)."],t.w)
 B.afH=new A.B(B.l,["D\xe9sactiv\xe9","Off","Desactivado","\u5173\u95ed","Desativado","Aus","Disattivato","\u30aa\u30d5","\u0412\u044b\u043a\u043b.","\u0645\u062a\u0648\u0642\u0641"],t.w)
-B.ahM=new A.B(B.l,["Vid\xe9os Apple Music","Apple Music videos","V\xeddeos de Apple Music","Apple Music \u89c6\u9891","V\xeddeos do Apple Music","Apple-Music-Videos","Video Apple Music","Apple Music\u52d5\u753b","\u0412\u0438\u0434\u0435\u043e Apple Music","\u0641\u064a\u062f\u064a\u0648\u0647\u0627\u062a Apple Music"],t.w)
-B.ajK=new A.B(B.l,["{size} \xb7 Pochettes anim\xe9es enregistr\xe9es","{size} \xb7 Saved animated covers","{size} \xb7 Portadas animadas guardadas","{size} \xb7 \u5df2\u4fdd\u5b58\u7684\u52a8\u6001\u5c01\u9762","{size} \xb7 Capas animadas guardadas","{size} \xb7 Gespeicherte animierte Cover","{size} \xb7 Copertine animate salvate","{size} \xb7 \u4fdd\u5b58\u6e08\u307f\u306e\u30a2\u30cb\u30e1\u30fc\u30b7\u30e7\u30f3\u30ab\u30d0\u30fc","{size} \xb7 \u0421\u043e\u0445\u0440\u0430\u043d\u0451\u043d\u043d\u044b\u0435 \u0430\u043d\u0438\u043c\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0435 \u043e\u0431\u043b\u043e\u0436\u043a\u0438","{size} \xb7 \u0623\u063a\u0644\u0641\u0629 \u0645\u062a\u062d\u0631\u0643\u0629 \u0645\u062d\u0641\u0648\u0638\u0629"],t.w)
-B.aiE=new A.B(B.l,["Les scrobbles et les donn\xe9es API ne sont jamais limit\xe9s.","Scrobbles and API data are never limited.","Los scrobbles y los datos de la API nunca se limitan.","\u542c\u6b4c\u8bb0\u5f55\u548c API \u6570\u636e\u6c38\u8fdc\u4e0d\u53d7\u9650\u5236\u3002","Scrobbles e dados da API nunca s\xe3o limitados.","Scrobbles und API-Daten werden nie begrenzt.","Scrobble e dati API non hanno mai limiti.","\u30b9\u30af\u30ed\u30d6\u30eb\u3068API\u30c7\u30fc\u30bf\u306f\u5236\u9650\u3055\u308c\u307e\u305b\u3093\u3002","\u0421\u043a\u0440\u043e\u0431\u0431\u043b\u044b \u0438 \u0434\u0430\u043d\u043d\u044b\u0435 API \u043d\u0438\u043a\u043e\u0433\u0434\u0430 \u043d\u0435 \u043e\u0433\u0440\u0430\u043d\u0438\u0447\u0438\u0432\u0430\u044e\u0442\u0441\u044f.","\u0644\u0627 \u064a\u064f\u0642\u064a\u064e\u0651\u062f \u0633\u062c\u0644 \u0627\u0644\u0627\u0633\u062a\u0645\u0627\u0639 \u0648\u0628\u064a\u0627\u0646\u0627\u062a API \u0623\u0628\u062f\u0627\u064b."],t.w)
-B.ai6=new A.B(B.l,["Utiliser la cl\xe9 interne de l'application","Use the app's built-in key","Usar la clave integrada de la app","\u4f7f\u7528\u5e94\u7528\u5185\u7f6e\u5bc6\u94a5","Usar a chave interna do app","Interne App-Schl\xfcssel verwenden","Usa la chiave interna dell'app","\u30a2\u30d7\u30ea\u5185\u8535\u30ad\u30fc\u3092\u4f7f\u7528","\u0418\u0441\u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u044c \u0432\u0441\u0442\u0440\u043e\u0435\u043d\u043d\u044b\u0439 \u043a\u043b\u044e\u0447 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f","\u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0645\u0641\u062a\u0627\u062d \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0627\u0644\u062f\u0627\u062e\u0644\u064a"],t.w)
-B.ahR=new A.B(B.l,["Option de secours : cette cl\xe9 est partag\xe9e entre les utilisateurs. Elle peut atteindre ses limites ou cesser de fonctionner, et certaines fonctions peuvent alors dysfonctionner. Pr\xe9f\xe9rez votre propre cl\xe9 lorsque c'est possible.","Backup option: this key is shared between users. It may hit its limits or stop working, and some features may then fail. Prefer your own key when you can.","Opci\xf3n de respaldo: esta clave se comparte entre usuarios. Puede alcanzar su l\xedmite o dejar de funcionar y algunas funciones podr\xedan fallar. Usa tu propia clave siempre que puedas.","\u5907\u7528\u9009\u9879\uff1a\u6b64\u5bc6\u94a5\u7531\u591a\u4e2a\u7528\u6237\u5171\u7528\uff0c\u53ef\u80fd\u8fbe\u5230\u4e0a\u9650\u6216\u5931\u6548\uff0c\u90e8\u5206\u529f\u80fd\u53ef\u80fd\u56e0\u6b64\u51fa\u9519\u3002\u8bf7\u5c3d\u91cf\u4f7f\u7528\u4f60\u81ea\u5df1\u7684\u5bc6\u94a5\u3002","Op\xe7\xe3o de reserva: esta chave \xe9 partilhada entre utilizadores. Pode atingir o limite ou deixar de funcionar, e algumas fun\xe7\xf5es podem falhar. Prefere a tua pr\xf3pria chave sempre que poss\xedvel.","Notl\xf6sung: Dieser Schl\xfcssel wird von mehreren Nutzern geteilt. Er kann an Grenzen sto\xdfen oder ausfallen, dann funktionieren manche Funktionen nicht. Nutze nach M\xf6glichkeit deinen eigenen Schl\xfcssel.","Opzione di riserva: questa chiave \xe8 condivisa tra gli utenti. Pu\xf2 raggiungere i limiti o smettere di funzionare e alcune funzioni potrebbero non andare. Usa la tua chiave quando puoi.","\u4e88\u5099\u306e\u30aa\u30d7\u30b7\u30e7\u30f3\u3067\u3059\u3002\u3053\u306e\u30ad\u30fc\u306f\u8907\u6570\u306e\u30e6\u30fc\u30b6\u30fc\u3067\u5171\u6709\u3055\u308c\u308b\u305f\u3081\u3001\u4e0a\u9650\u306b\u9054\u3057\u305f\u308a\u4f7f\u3048\u306a\u304f\u306a\u3063\u305f\u308a\u3057\u3066\u3001\u4e00\u90e8\u306e\u6a5f\u80fd\u304c\u52d5\u4f5c\u3057\u306a\u3044\u3053\u3068\u304c\u3042\u308a\u307e\u3059\u3002\u53ef\u80fd\u306a\u3089\u81ea\u5206\u306e\u30ad\u30fc\u3092\u4f7f\u3063\u3066\u304f\u3060\u3055\u3044\u3002","\u0420\u0435\u0437\u0435\u0440\u0432\u043d\u044b\u0439 \u0432\u0430\u0440\u0438\u0430\u043d\u0442: \u044d\u0442\u043e\u0442 \u043a\u043b\u044e\u0447 \u043e\u0431\u0449\u0438\u0439 \u0434\u043b\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439. \u041e\u043d \u043c\u043e\u0436\u0435\u0442 \u0438\u0441\u0447\u0435\u0440\u043f\u0430\u0442\u044c \u043b\u0438\u043c\u0438\u0442\u044b \u0438\u043b\u0438 \u043f\u0435\u0440\u0435\u0441\u0442\u0430\u0442\u044c \u0440\u0430\u0431\u043e\u0442\u0430\u0442\u044c, \u0438 \u0447\u0430\u0441\u0442\u044c \u0444\u0443\u043d\u043a\u0446\u0438\u0439 \u0442\u043e\u0433\u0434\u0430 \u043d\u0435 \u0437\u0430\u0440\u0430\u0431\u043e\u0442\u0430\u0435\u0442. \u041f\u043e \u0432\u043e\u0437\u043c\u043e\u0436\u043d\u043e\u0441\u0442\u0438 \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0439\u0442\u0435 \u0441\u0432\u043e\u0439 \u043a\u043b\u044e\u0447.","\u062e\u064a\u0627\u0631 \u0627\u062d\u062a\u064a\u0627\u0637\u064a: \u0647\u0630\u0627 \u0627\u0644\u0645\u0641\u062a\u0627\u062d \u0645\u0634\u062a\u0631\u0643 \u0628\u064a\u0646 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645\u064a\u0646 \u0648\u0642\u062f \u064a\u0628\u0644\u063a \u062d\u062f\u0648\u062f\u0647 \u0623\u0648 \u064a\u062a\u0648\u0642\u0641 \u0639\u0646 \u0627\u0644\u0639\u0645\u0644\u060c \u0648\u0642\u062f \u062a\u062a\u0639\u0637\u0644 \u0628\u0639\u0636 \u0627\u0644\u0645\u064a\u0632\u0627\u062a. \u0641\u0636\u0651\u0644 \u0645\u0641\u062a\u0627\u062d\u0643 \u0627\u0644\u062e\u0627\u0635 \u0645\u062a\u0649 \u0623\u0645\u0643\u0646."],t.w)
-B.aiQ=new A.B(B.l,["Cl\xe9 interne de l'application","App built-in key","Clave integrada de la app","\u5e94\u7528\u5185\u7f6e\u5bc6\u94a5","Chave interna do app","Interner App-Schl\xfcssel","Chiave interna dell'app","\u30a2\u30d7\u30ea\u5185\u8535\u30ad\u30fc","\u0412\u0441\u0442\u0440\u043e\u0435\u043d\u043d\u044b\u0439 \u043a\u043b\u044e\u0447 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f","\u0645\u0641\u062a\u0627\u062d \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0627\u0644\u062f\u0627\u062e\u0644\u064a"],t.w)
-B.ajo=new A.B(B.l,["Cl\xe9 interne en secours","Built-in key as backup","Clave integrada como respaldo","\u5185\u7f6e\u5bc6\u94a5\u4f5c\u4e3a\u5907\u7528","Chave interna como reserva","Interner Schl\xfcssel als Reserve","Chiave interna di riserva","\u5185\u8535\u30ad\u30fc\u3092\u4e88\u5099\u306b\u4f7f\u3046","\u0412\u0441\u0442\u0440\u043e\u0435\u043d\u043d\u044b\u0439 \u043a\u043b\u044e\u0447 \u043a\u0430\u043a \u0440\u0435\u0437\u0435\u0440\u0432","\u0627\u0644\u0645\u0641\u062a\u0627\u062d \u0627\u0644\u062f\u0627\u062e\u0644\u064a \u0643\u0627\u062d\u062a\u064a\u0627\u0637\u064a"],t.w)
-B.ahp=new A.B(B.l,["Votre cl\xe9 est essay\xe9e en premier, puis la cl\xe9 interne en cas d'\xe9chec","Try your own key first, then the built-in key if it fails","Prueba tu clave primero y la integrada si falla","\u5148\u4f7f\u7528\u4f60\u7684\u5bc6\u94a5\uff0c\u5931\u8d25\u65f6\u6539\u7528\u5185\u7f6e\u5bc6\u94a5","Tenta a tua chave primeiro e a interna se falhar","Zuerst dein Schl\xfcssel, bei Fehler der interne","Prova prima la tua chiave, poi quella interna se fallisce","\u307e\u305a\u81ea\u5206\u306e\u30ad\u30fc\u3092\u8a66\u3057\u3001\u5931\u6557\u3057\u305f\u3089\u5185\u8535\u30ad\u30fc\u3092\u4f7f\u3044\u307e\u3059","\u0421\u043d\u0430\u0447\u0430\u043b\u0430 \u0432\u0430\u0448 \u043a\u043b\u044e\u0447, \u043f\u0440\u0438 \u0441\u0431\u043e\u0435 \u2014 \u0432\u0441\u0442\u0440\u043e\u0435\u043d\u043d\u044b\u0439","\u062c\u0631\u0651\u0628 \u0645\u0641\u062a\u0627\u062d\u0643 \u0623\u0648\u0644\u0627\u064b \u062b\u0645 \u0627\u0644\u062f\u0627\u062e\u0644\u064a \u0639\u0646\u062f \u0627\u0644\u0641\u0634\u0644"],t.w)
-B.ajX=new A.B(B.alr,[B.ahH,B.afX,B.ai7,B.ahg,B.aiX,B.ajq,B.ajR,B.agJ,B.aiY,B.ajk,B.afC,B.afW,B.aih,B.aj6,B.agD,B.aiH,B.ajW,B.ajp,B.agW,B.ajV,B.ag5,B.aiI,B.aje,B.afM,B.aiV,B.ah2,B.ajd,B.afR,B.agF,B.ah6,B.ahv,B.ah4,B.ait,B.agU,B.agh,B.ajS,B.ajN,B.agZ,B.ahB,B.ag9,B.afZ,B.ajI,B.afT,B.afE,B.agw,B.agE,B.ahS,B.agj,B.aj8,B.ajg,B.ajO,B.aie,B.afO,B.aii,B.ai5,B.ai0,B.ago,B.ahQ,B.ajT,B.ahy,B.ajn,B.afU,B.aio,B.ahU,B.ajc,B.afB,B.ajr,B.ahW,B.aiS,B.Gx,B.agL,B.afL,B.agz,B.ajE,B.afK,B.aiw,B.agY,B.ahd,B.ag4,B.aiB,B.aiD,B.ajt,B.ajG,B.aj5,B.aiF,B.aix,B.aib,B.aiO,B.air,B.agu,B.afY,B.ahw,B.ajw,B.agp,B.ah0,B.agG,B.aiJ,B.ahr,B.afH,B.ahM,B.ajK,B.aiE,B.ai6,B.ahR,B.aiQ,B.ajo,B.ahp],t.vb)
+B.ahQ=new A.B(B.l,["Vid\xe9os Apple Music","Apple Music videos","V\xeddeos de Apple Music","Apple Music \u89c6\u9891","V\xeddeos do Apple Music","Apple-Music-Videos","Video Apple Music","Apple Music\u52d5\u753b","\u0412\u0438\u0434\u0435\u043e Apple Music","\u0641\u064a\u062f\u064a\u0648\u0647\u0627\u062a Apple Music"],t.w)
+B.ajI=new A.B(B.l,["{size} \xb7 Pochettes anim\xe9es enregistr\xe9es","{size} \xb7 Saved animated covers","{size} \xb7 Portadas animadas guardadas","{size} \xb7 \u5df2\u4fdd\u5b58\u7684\u52a8\u6001\u5c01\u9762","{size} \xb7 Capas animadas guardadas","{size} \xb7 Gespeicherte animierte Cover","{size} \xb7 Copertine animate salvate","{size} \xb7 \u4fdd\u5b58\u6e08\u307f\u306e\u30a2\u30cb\u30e1\u30fc\u30b7\u30e7\u30f3\u30ab\u30d0\u30fc","{size} \xb7 \u0421\u043e\u0445\u0440\u0430\u043d\u0451\u043d\u043d\u044b\u0435 \u0430\u043d\u0438\u043c\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0435 \u043e\u0431\u043b\u043e\u0436\u043a\u0438","{size} \xb7 \u0623\u063a\u0644\u0641\u0629 \u0645\u062a\u062d\u0631\u0643\u0629 \u0645\u062d\u0641\u0648\u0638\u0629"],t.w)
+B.aiF=new A.B(B.l,["Les scrobbles et les donn\xe9es API ne sont jamais limit\xe9s.","Scrobbles and API data are never limited.","Los scrobbles y los datos de la API nunca se limitan.","\u542c\u6b4c\u8bb0\u5f55\u548c API \u6570\u636e\u6c38\u8fdc\u4e0d\u53d7\u9650\u5236\u3002","Scrobbles e dados da API nunca s\xe3o limitados.","Scrobbles und API-Daten werden nie begrenzt.","Scrobble e dati API non hanno mai limiti.","\u30b9\u30af\u30ed\u30d6\u30eb\u3068API\u30c7\u30fc\u30bf\u306f\u5236\u9650\u3055\u308c\u307e\u305b\u3093\u3002","\u0421\u043a\u0440\u043e\u0431\u0431\u043b\u044b \u0438 \u0434\u0430\u043d\u043d\u044b\u0435 API \u043d\u0438\u043a\u043e\u0433\u0434\u0430 \u043d\u0435 \u043e\u0433\u0440\u0430\u043d\u0438\u0447\u0438\u0432\u0430\u044e\u0442\u0441\u044f.","\u0644\u0627 \u064a\u064f\u0642\u064a\u064e\u0651\u062f \u0633\u062c\u0644 \u0627\u0644\u0627\u0633\u062a\u0645\u0627\u0639 \u0648\u0628\u064a\u0627\u0646\u0627\u062a API \u0623\u0628\u062f\u0627\u064b."],t.w)
+B.aia=new A.B(B.l,["Utiliser la cl\xe9 interne de l'application","Use the app's built-in key","Usar la clave integrada de la app","\u4f7f\u7528\u5e94\u7528\u5185\u7f6e\u5bc6\u94a5","Usar a chave interna do app","Interne App-Schl\xfcssel verwenden","Usa la chiave interna dell'app","\u30a2\u30d7\u30ea\u5185\u8535\u30ad\u30fc\u3092\u4f7f\u7528","\u0418\u0441\u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u044c \u0432\u0441\u0442\u0440\u043e\u0435\u043d\u043d\u044b\u0439 \u043a\u043b\u044e\u0447 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f","\u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0645\u0641\u062a\u0627\u062d \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0627\u0644\u062f\u0627\u062e\u0644\u064a"],t.w)
+B.ajV=new A.B(B.l,["Option de secours : cette cl\xe9 est partag\xe9e entre les utilisateurs. Elle peut atteindre ses limites ou cesser de fonctionner, et certaines fonctions peuvent alors dysfonctionner. Pr\xe9f\xe9rez votre propre cl\xe9 lorsque c'est possible.","Backup option: this key is shared between users. It may hit its limits or stop working, and some features may then fail. Prefer your own key when you can.","Opci\xf3n de respaldo: esta clave se comparte entre usuarios. Puede alcanzar su l\xedmite o dejar de funcionar y algunas funciones podr\xedan fallar. Use su propia clave siempre que pueda.","\u5907\u7528\u9009\u9879\uff1a\u6b64\u5bc6\u94a5\u7531\u591a\u4e2a\u7528\u6237\u5171\u7528\uff0c\u53ef\u80fd\u8fbe\u5230\u4e0a\u9650\u6216\u5931\u6548\uff0c\u90e8\u5206\u529f\u80fd\u53ef\u80fd\u56e0\u6b64\u51fa\u9519\u3002\u8bf7\u5c3d\u91cf\u4f7f\u7528\u60a8\u81ea\u5df1\u7684\u5bc6\u94a5\u3002","Op\xe7\xe3o de reserva: esta chave \xe9 partilhada entre utilizadores. Pode atingir o limite ou deixar de funcionar, e algumas fun\xe7\xf5es podem falhar. Prefere a tua pr\xf3pria chave sempre que poss\xedvel.","Notl\xf6sung: Dieser Schl\xfcssel wird von mehreren Nutzern geteilt. Er kann an Grenzen sto\xdfen oder ausfallen, dann funktionieren manche Funktionen nicht. Nutzen Sie nach M\xf6glichkeit Ihren eigenen Schl\xfcssel.","Opzione di riserva: questa chiave \xe8 condivisa tra gli utenti. Pu\xf2 raggiungere i limiti o smettere di funzionare e alcune funzioni potrebbero non andare. Usi la sua chiave quando pu\xf2.","\u4e88\u5099\u306e\u30aa\u30d7\u30b7\u30e7\u30f3\u3067\u3059\u3002\u3053\u306e\u30ad\u30fc\u306f\u8907\u6570\u306e\u30e6\u30fc\u30b6\u30fc\u3067\u5171\u6709\u3055\u308c\u308b\u305f\u3081\u3001\u4e0a\u9650\u306b\u9054\u3057\u305f\u308a\u4f7f\u3048\u306a\u304f\u306a\u3063\u305f\u308a\u3057\u3066\u3001\u4e00\u90e8\u306e\u6a5f\u80fd\u304c\u52d5\u4f5c\u3057\u306a\u3044\u3053\u3068\u304c\u3042\u308a\u307e\u3059\u3002\u53ef\u80fd\u306a\u3089\u81ea\u5206\u306e\u30ad\u30fc\u3092\u4f7f\u3063\u3066\u304f\u3060\u3055\u3044\u3002","\u0420\u0435\u0437\u0435\u0440\u0432\u043d\u044b\u0439 \u0432\u0430\u0440\u0438\u0430\u043d\u0442: \u044d\u0442\u043e\u0442 \u043a\u043b\u044e\u0447 \u043e\u0431\u0449\u0438\u0439 \u0434\u043b\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439. \u041e\u043d \u043c\u043e\u0436\u0435\u0442 \u0438\u0441\u0447\u0435\u0440\u043f\u0430\u0442\u044c \u043b\u0438\u043c\u0438\u0442\u044b \u0438\u043b\u0438 \u043f\u0435\u0440\u0435\u0441\u0442\u0430\u0442\u044c \u0440\u0430\u0431\u043e\u0442\u0430\u0442\u044c, \u0438 \u0447\u0430\u0441\u0442\u044c \u0444\u0443\u043d\u043a\u0446\u0438\u0439 \u0442\u043e\u0433\u0434\u0430 \u043d\u0435 \u0437\u0430\u0440\u0430\u0431\u043e\u0442\u0430\u0435\u0442. \u041f\u043e \u0432\u043e\u0437\u043c\u043e\u0436\u043d\u043e\u0441\u0442\u0438 \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0439\u0442\u0435 \u0441\u0432\u043e\u0439 \u043a\u043b\u044e\u0447.","\u062e\u064a\u0627\u0631 \u0627\u062d\u062a\u064a\u0627\u0637\u064a: \u0647\u0630\u0627 \u0627\u0644\u0645\u0641\u062a\u0627\u062d \u0645\u0634\u062a\u0631\u0643 \u0628\u064a\u0646 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645\u064a\u0646 \u0648\u0642\u062f \u064a\u0628\u0644\u063a \u062d\u062f\u0648\u062f\u0647 \u0623\u0648 \u064a\u062a\u0648\u0642\u0641 \u0639\u0646 \u0627\u0644\u0639\u0645\u0644\u060c \u0648\u0642\u062f \u062a\u062a\u0639\u0637\u0644 \u0628\u0639\u0636 \u0627\u0644\u0645\u064a\u0632\u0627\u062a. \u0641\u0636\u0651\u0644 \u0645\u0641\u062a\u0627\u062d\u0643 \u0627\u0644\u062e\u0627\u0635 \u0645\u062a\u0649 \u0623\u0645\u0643\u0646."],t.w)
+B.aiS=new A.B(B.l,["Cl\xe9 interne de l'application","App built-in key","Clave integrada de la app","\u5e94\u7528\u5185\u7f6e\u5bc6\u94a5","Chave interna do app","Interner App-Schl\xfcssel","Chiave interna dell'app","\u30a2\u30d7\u30ea\u5185\u8535\u30ad\u30fc","\u0412\u0441\u0442\u0440\u043e\u0435\u043d\u043d\u044b\u0439 \u043a\u043b\u044e\u0447 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f","\u0645\u0641\u062a\u0627\u062d \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0627\u0644\u062f\u0627\u062e\u0644\u064a"],t.w)
+B.ajn=new A.B(B.l,["Cl\xe9 interne en secours","Built-in key as backup","Clave integrada como respaldo","\u5185\u7f6e\u5bc6\u94a5\u4f5c\u4e3a\u5907\u7528","Chave interna como reserva","Interner Schl\xfcssel als Reserve","Chiave interna di riserva","\u5185\u8535\u30ad\u30fc\u3092\u4e88\u5099\u306b\u4f7f\u3046","\u0412\u0441\u0442\u0440\u043e\u0435\u043d\u043d\u044b\u0439 \u043a\u043b\u044e\u0447 \u043a\u0430\u043a \u0440\u0435\u0437\u0435\u0440\u0432","\u0627\u0644\u0645\u0641\u062a\u0627\u062d \u0627\u0644\u062f\u0627\u062e\u0644\u064a \u0643\u0627\u062d\u062a\u064a\u0627\u0637\u064a"],t.w)
+B.agy=new A.B(B.l,["Votre cl\xe9 est essay\xe9e en premier, puis la cl\xe9 interne en cas d'\xe9chec","Try your own key first, then the built-in key if it fails","Prueba su clave primero y la integrada si falla","\u5148\u4f7f\u7528\u60a8\u7684\u5bc6\u94a5\uff0c\u5931\u8d25\u65f6\u6539\u7528\u5185\u7f6e\u5bc6\u94a5","Tenta a sua chave primeiro e a interna se falhar","Zuerst Ihr Schl\xfcssel, bei Fehler der interne","Prova prima la sua chiave, poi quella interna se fallisce","\u307e\u305a\u81ea\u5206\u306e\u30ad\u30fc\u3092\u8a66\u3057\u3001\u5931\u6557\u3057\u305f\u3089\u5185\u8535\u30ad\u30fc\u3092\u4f7f\u3044\u307e\u3059","\u0421\u043d\u0430\u0447\u0430\u043b\u0430 \u0432\u0430\u0448 \u043a\u043b\u044e\u0447, \u043f\u0440\u0438 \u0441\u0431\u043e\u0435 \u2014 \u0432\u0441\u0442\u0440\u043e\u0435\u043d\u043d\u044b\u0439","\u062c\u0631\u0651\u0628 \u0645\u0641\u062a\u0627\u062d\u0643 \u0623\u0648\u0644\u0627\u064b \u062b\u0645 \u0627\u0644\u062f\u0627\u062e\u0644\u064a \u0639\u0646\u062f \u0627\u0644\u0641\u0634\u0644"],t.w)
+B.ajX=new A.B(B.alr,[B.ahN,B.afW,B.aib,B.ahk,B.aj_,B.ajq,B.ajQ,B.ajL,B.ahZ,B.ajk,B.afC,B.afE,B.ajo,B.aja,B.aju,B.aiI,B.ajW,B.ajp,B.ah_,B.ajU,B.ag7,B.afZ,B.aiN,B.afM,B.ahS,B.ah7,B.ajh,B.ahG,B.agK,B.ahb,B.ahy,B.ah9,B.ait,B.agY,B.agk,B.ajR,B.ajK,B.ah3,B.ahH,B.agc,B.ahw,B.ag1,B.afS,B.afF,B.agB,B.agJ,B.ahV,B.agm,B.ajc,B.aih,B.ajM,B.aii,B.afO,B.aij,B.ai9,B.ai3,B.agr,B.ahU,B.ajS,B.ahD,B.ajm,B.afT,B.aip,B.ahW,B.ajg,B.afB,B.ajr,B.ahY,B.aiV,B.Gx,B.agP,B.afL,B.agE,B.ajE,B.afK,B.aiv,B.ah2,B.ahh,B.ag6,B.aiB,B.aiE,B.ajt,B.ajG,B.aj8,B.aiG,B.aix,B.aid,B.aiQ,B.air,B.agz,B.afX,B.ahz,B.ajx,B.ags,B.ah5,B.agL,B.aiJ,B.aht,B.afH,B.ahQ,B.ajI,B.aiF,B.aia,B.ajV,B.aiS,B.ajn,B.agy],t.vb)
 B.al7={foryou:0,fresh:1,onthisday:2,genre:3,albums:4,deeper:5,forgotten:6,country:7,gt_week:8,ga_week:9,gb_week:10,gt_month:11,ga_month:12,gb_month:13,gt_year:14,ga_year:15,gb_year:16}
 B.ajY=new A.B(B.al7,[10,8,6,6,5,5,4,3,6,5,4,4,3,3,2,2,2],A.aF("B<e,C>"))
 B.al_={svg:0,g:1,a:2,use:3,symbol:4,mask:5,pattern:6,radialGradient:7,linearGradient:8,clipPath:9,image:10,text:11,tspan:12}
@@ -171252,19 +171252,19 @@ B.VV=new A.aG(4294967040)
 B.UL=new A.aG(4288335154)
 B.ak2=new A.B(B.alJ,[B.Vi,B.Vs,B.wW,B.Uv,B.Vk,B.Vn,B.VL,B.ff,B.VN,B.U_,B.UB,B.UN,B.Va,B.Un,B.Uu,B.V1,B.VB,B.Uo,B.VR,B.V7,B.wW,B.TY,B.U3,B.UU,B.x1,B.U0,B.x1,B.UX,B.UD,B.Um,B.VC,B.UK,B.UC,B.Vd,B.UF,B.Uj,B.wX,B.wX,B.U5,B.UI,B.Vx,B.U4,B.wY,B.wY,B.Ua,B.UT,B.VT,B.Uc,B.x3,B.V8,B.Vq,B.VH,B.V5,B.x0,B.x0,B.U1,B.UP,B.Vj,B.VA,B.V_,B.Ul,B.VX,B.Vh,B.Vc,B.VP,B.Ut,B.VS,B.UO,B.Vg,B.Vb,B.Vu,B.x2,B.UG,B.x2,B.VF,B.VD,B.Ub,B.UA,B.x_,B.x_,B.UR,B.VW,B.U7,B.Ue,B.Vt,B.x3,B.Uw,B.Up,B.TZ,B.UV,B.UH,B.Uf,B.Us,B.U6,B.Uk,B.UZ,B.U9,B.Vp,B.VM,B.VK,B.VJ,B.TX,B.Vv,B.Uy,B.Ur,B.VE,B.Vy,B.V4,B.Vf,B.UJ,B.UQ,B.V6,B.VO,B.VI,B.V0,B.VG,B.V9,B.US,B.Ux,B.Vw,B.UW,B.Uh,B.UE,B.Vr,B.Vl,B.Ud,B.VQ,B.UM,B.UY,B.Uz,B.Uq,B.wZ,B.wZ,B.VU,B.U8,B.Ui,B.V2,B.U2,B.V3,B.Vz,B.TT,B.Ug,B.Ve,B.Vm,B.px,B.Vo,B.VV,B.UL],A.aF("B<e,aG>"))
 B.a7h=s(["couleur","accent","color","th\xe8me","theme","sombre","dark","clair","light","oled","nothing","police","font","widget","farbe","colore","cor","\u0446\u0432\u0435\u0442","\u30a6\u30a3\u30b8\u30a7\u30c3\u30c8","\u5c0f\u7ec4\u4ef6","\u0644\u0648\u0646"],t.s)
-B.a9S=s(["ordre","order","carte","card","graphique","chart","p\xe9riode","period","orden","reihenfolge","ordine","ordem","\u043f\u043e\u0440\u044f\u0434\u043e\u043a","\u9806\u5e8f","\u987a\u5e8f","\u062a\u0631\u062a\u064a\u0628"],t.s)
+B.a9T=s(["ordre","order","carte","card","graphique","chart","p\xe9riode","period","orden","reihenfolge","ordine","ordem","\u043f\u043e\u0440\u044f\u0434\u043e\u043a","\u9806\u5e8f","\u987a\u5e8f","\u062a\u0631\u062a\u064a\u0628"],t.s)
 B.a6y=s(["\xe9cran","screen","accueil","home","ouverture","launch","pantalla","bildschirm","schermata","tela","\u044d\u043a\u0440\u0430\u043d","\u753b\u9762","\u5c4f\u5e55","\u0634\u0627\u0634\u0629"],t.s)
 B.acC=s(["notification","notif","palier","milestone","r\xe9cap","recap","actualit\xe9","news","notificaci\xf3n","benachrichtigung","\u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u0435","\u901a\u77e5","\u0625\u0634\u0639\u0627\u0631"],t.s)
-B.aa1=s(["synchro","sync","arri\xe8re-plan","background","sincronizaci\xf3n","synchronisierung","\u0441\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0430\u0446\u0438\u044f","\u540c\u671f","\u540c\u6b65","\u0645\u0632\u0627\u0645\u0646\u0629"],t.s)
+B.aa2=s(["synchro","sync","arri\xe8re-plan","background","sincronizaci\xf3n","synchronisierung","\u0441\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0430\u0446\u0438\u044f","\u540c\u671f","\u540c\u6b65","\u0645\u0632\u0627\u0645\u0646\u0629"],t.s)
 B.abK=s(["batterie","battery","\xe9co","eco","bater\xeda","akku","batteria","bateria","\u0431\u0430\u0442\u0430\u0440\u0435\u044f","\u30d0\u30c3\u30c6\u30ea\u30fc","\u7535\u6c60","\u0628\u0637\u0627\u0631\u064a\u0629"],t.s)
-B.a9x=s(["langue","language","fran\xe7ais","french","english","anglais","idioma","sprache","lingua","\u044f\u0437\u044b\u043a","\u8a00\u8a9e","\u8bed\u8a00","\u0627\u0644\u0644\u063a\u0629"],t.s)
+B.a9y=s(["langue","language","fran\xe7ais","french","english","anglais","idioma","sprache","lingua","\u044f\u0437\u044b\u043a","\u8a00\u8a9e","\u8bed\u8a00","\u0627\u0644\u0644\u063a\u0629"],t.s)
 B.a68=s(["compte","account","last.fm","lastfm","d\xe9connexion","logout","profil","cuenta","konto","conta","\u0430\u043a\u043a\u0430\u0443\u043d\u0442","\u30a2\u30ab\u30a6\u30f3\u30c8","\u8d26\u6237","\u0627\u0644\u062d\u0633\u0627\u0628"],t.s)
-B.a97=s(["cache","stockage","storage","vider","clear","hors-ligne","offline","almacenamiento","speicher","\u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0435","\u30b9\u30c8\u30ec\u30fc\u30b8","\u5b58\u50a8","\u0627\u0644\u062a\u062e\u0632\u064a\u0646"],t.s)
+B.a98=s(["cache","stockage","storage","vider","clear","hors-ligne","offline","almacenamiento","speicher","\u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0435","\u30b9\u30c8\u30ec\u30fc\u30b8","\u5b58\u50a8","\u0627\u0644\u062a\u062e\u0632\u064a\u0646"],t.s)
 B.a6v=s(["sauvegarde","backup","export","import","restaurer","restore","copia de seguridad","sicherung","backup","\u0440\u0435\u0437\u0435\u0440\u0432\u043d\u0430\u044f \u043a\u043e\u043f\u0438\u044f","\u30d0\u30c3\u30af\u30a2\u30c3\u30d7","\u5907\u4efd","\u0646\u0633\u062e\u0629 \u0627\u062d\u062a\u064a\u0627\u0637\u064a\u0629"],t.s)
 B.abR=s(["mise \xe0 jour","update","version","actualizaci\xf3n","aktualisierung","aggiornamento","atualiza\xe7\xe3o","\u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u0435","\u30a2\u30c3\u30d7\u30c7\u30fc\u30c8","\u66f4\u65b0","\u062a\u062d\u062f\u064a\u062b"],t.s)
 B.acv=s(["\xe0 propos","about","contact","cr\xe9dit","acerca de","\xfcber","informazioni","sobre","\u043e \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0438","\u30a2\u30d7\u30ea\u306b\u3064\u3044\u3066","\u5173\u4e8e","\u062d\u0648\u0644"],t.s)
 B.aci=s(["aide","faq","question","ayuda","hilfe","aiuto","ajuda","\u043f\u043e\u043c\u043e\u0449\u044c","\u30d8\u30eb\u30d7","\u5e2e\u52a9","\u0645\u0633\u0627\u0639\u062f\u0629"],t.s)
-B.ak3=new A.dc([0,B.a7h,1,B.a9S,2,B.a6y,3,B.acC,4,B.aa1,5,B.abK,6,B.a9x,7,B.a68,8,B.a97,9,B.a6v,10,B.abR,11,B.acv,12,B.aci],A.aF("dc<t,T<e>>"))
+B.ak3=new A.dc([0,B.a7h,1,B.a9T,2,B.a6y,3,B.acC,4,B.aa2,5,B.abK,6,B.a9y,7,B.a68,8,B.a98,9,B.a6v,10,B.abR,11,B.acv,12,B.aci],A.aF("dc<t,T<e>>"))
 B.alm={qs_t1_t:0,qs_t1_s:1,qs_t2_t:2,qs_t2_s:3,qs_t3_t:4,qs_t3_s:5,qs_t4_t:6,qs_t4_s:7,qs_t5_t:8,qs_t5_s:9,qs_l1_t:10,qs_l2_t:11,qs_l3_t:12,qs_l4_t:13,qs_l5_t:14,qs_l6_t:15,qs_l7_t:16,img_src_lastfm:17,img_src_ytmusic:18,img_src_itunes:19,img_src_deezer:20,img_src_audiodb:21,img_src_musicbrainz:22,img_src_wikipedia:23,ds_type_artist:24,ds_type_album:25,ds_type_track:26,pf_1:27,pf_2:28,pf_3:29,pf_4:30,pf_5:31,pf_6:32,pf_7:33,pf_8:34,pf_9:35,pf_10:36,pf_11:37,pf_12:38,pf_13:39,pf_14:40,ds_tier_next:41,ds_tier_max:42,ds_tier_first:43,sl_import:44,sl_done:45,sl_connect:46}
 B.ba={fr:0,en:1,es:2,de:3,it:4,pt:5,ru:6,ja:7,zh:8,ar:9}
 B.afl=new A.B(B.ba,["Mode OLED","OLED mode","Modo OLED","OLED-Modus","Modalit\xe0 OLED","Modo OLED","\u0420\u0435\u0436\u0438\u043c OLED","OLED \u30e2\u30fc\u30c9","OLED \u6a21\u5f0f","\u0648\u0636\u0639 OLED"],t.w)
@@ -171294,26 +171294,26 @@ B.afq=new A.B(B.ba,["Source : Wikip\xe9dia","Source: Wikipedia","Fuente: Wikiped
 B.af6=new A.B(B.ba,["Artiste","Artist","Artista","K\xfcnstler","Artista","Artista","\u0418\u0441\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c","\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8","\u827a\u672f\u5bb6","\u0641\u0646\u0627\u0646"],t.w)
 B.afa=new A.B(B.ba,["Album","Album","\xc1lbum","Album","Album","\xc1lbum","\u0410\u043b\u044c\u0431\u043e\u043c","\u30a2\u30eb\u30d0\u30e0","\u4e13\u8f91","\u0623\u0644\u0628\u0648\u0645"],t.w)
 B.afm=new A.B(B.ba,["Titre","Track","Canci\xf3n","Titel","Brano","Faixa","\u0422\u0440\u0435\u043a","\u66f2","\u6b4c\u66f2","\u0623\u063a\u0646\u064a\u0629"],t.w)
-B.agM=new A.B(B.l,["\ud83d\udc64 Profil utilisateur","\ud83d\udc64 User profile","\ud83d\udc64 Perfil de usuario","\ud83d\udc64 \u7528\u6237\u8d44\u6599","\ud83d\udc64 Perfil do usu\xe1rio","\ud83d\udc64 Nutzerprofil","\ud83d\udc64 Profilo utente","\ud83d\udc64 \u30e6\u30fc\u30b6\u30fc\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb","\ud83d\udc64 \u041f\u0440\u043e\u0444\u0438\u043b\u044c \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f","\ud83d\udc64 \u0645\u0644\u0641 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645"],t.w)
-B.agK=new A.B(B.l,["\ud83c\udfa4 Top artistes \u2014 Global","\ud83c\udfa4 Top artists \u2014 All time","\ud83c\udfa4 Top artistas \u2014 Global","\ud83c\udfa4 \u70ed\u95e8\u827a\u672f\u5bb6 \u2014 \u5168\u90e8\u65f6\u95f4","\ud83c\udfa4 Top artistas \u2014 Geral","\ud83c\udfa4 Top-K\xfcnstler \u2014 Gesamt","\ud83c\udfa4 Top artisti \u2014 Globale","\ud83c\udfa4 \u30c8\u30c3\u30d7\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8 \u2014 \u5168\u671f\u9593","\ud83c\udfa4 \u0422\u043e\u043f \u0438\u0441\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u0435\u0439 \u2014 \u0432\u0441\u0451 \u0432\u0440\u0435\u043c\u044f","\ud83c\udfa4 \u0623\u0641\u0636\u0644 \u0627\u0644\u0641\u0646\u0627\u0646\u064a\u0646 \u2014 \u0627\u0644\u0643\u0644"],t.w)
-B.aiP=new A.B(B.l,["\ud83d\udcbf Top albums \u2014 Global","\ud83d\udcbf Top albums \u2014 All time","\ud83d\udcbf Top \xe1lbumes \u2014 Global","\ud83d\udcbf \u70ed\u95e8\u4e13\u8f91 \u2014 \u5168\u90e8\u65f6\u95f4","\ud83d\udcbf Top \xe1lbuns \u2014 Geral","\ud83d\udcbf Top-Alben \u2014 Gesamt","\ud83d\udcbf Top album \u2014 Globale","\ud83d\udcbf \u30c8\u30c3\u30d7\u30a2\u30eb\u30d0\u30e0 \u2014 \u5168\u671f\u9593","\ud83d\udcbf \u0422\u043e\u043f \u0430\u043b\u044c\u0431\u043e\u043c\u043e\u0432 \u2014 \u0432\u0441\u0451 \u0432\u0440\u0435\u043c\u044f","\ud83d\udcbf \u0623\u0641\u0636\u0644 \u0627\u0644\u0623\u0644\u0628\u0648\u0645\u0627\u062a \u2014 \u0627\u0644\u0643\u0644"],t.w)
-B.ahc=new A.B(B.l,["\ud83c\udfb5 Top titres \u2014 Global","\ud83c\udfb5 Top tracks \u2014 All time","\ud83c\udfb5 Top canciones \u2014 Global","\ud83c\udfb5 \u70ed\u95e8\u6b4c\u66f2 \u2014 \u5168\u90e8\u65f6\u95f4","\ud83c\udfb5 Top faixas \u2014 Geral","\ud83c\udfb5 Top-Titel \u2014 Gesamt","\ud83c\udfb5 Top brani \u2014 Globale","\ud83c\udfb5 \u30c8\u30c3\u30d7\u30c8\u30e9\u30c3\u30af \u2014 \u5168\u671f\u9593","\ud83c\udfb5 \u0422\u043e\u043f \u0442\u0440\u0435\u043a\u043e\u0432 \u2014 \u0432\u0441\u0451 \u0432\u0440\u0435\u043c\u044f","\ud83c\udfb5 \u0623\u0641\u0636\u0644 \u0627\u0644\u0623\u063a\u0627\u0646\u064a \u2014 \u0627\u0644\u0643\u0644"],t.w)
-B.agn=new A.B(B.l,["\u23f1\ufe0f \xc9coutes r\xe9centes","\u23f1\ufe0f Recent plays","\u23f1\ufe0f Reproducciones recientes","\u23f1\ufe0f \u6700\u8fd1\u64ad\u653e","\u23f1\ufe0f Reprodu\xe7\xf5es recentes","\u23f1\ufe0f Zuletzt geh\xf6rt","\u23f1\ufe0f Ascolti recenti","\u23f1\ufe0f \u6700\u8fd1\u306e\u518d\u751f","\u23f1\ufe0f \u041d\u0435\u0434\u0430\u0432\u043d\u0438\u0435 \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u044f","\u23f1\ufe0f \u0627\u0644\u0627\u0633\u062a\u0645\u0627\u0639\u0627\u062a \u0627\u0644\u0623\u062e\u064a\u0631\u0629"],t.w)
-B.aho=new A.B(B.l,["\ud83d\uddd3\ufe0f Cette semaine","\ud83d\uddd3\ufe0f This week","\ud83d\uddd3\ufe0f Esta semana","\ud83d\uddd3\ufe0f \u672c\u5468","\ud83d\uddd3\ufe0f Esta semana","\ud83d\uddd3\ufe0f Diese Woche","\ud83d\uddd3\ufe0f Questa settimana","\ud83d\uddd3\ufe0f \u4eca\u9031","\ud83d\uddd3\ufe0f \u042d\u0442\u0430 \u043d\u0435\u0434\u0435\u043b\u044f","\ud83d\uddd3\ufe0f \u0647\u0630\u0627 \u0627\u0644\u0623\u0633\u0628\u0648\u0639"],t.w)
+B.agQ=new A.B(B.l,["\ud83d\udc64 Profil utilisateur","\ud83d\udc64 User profile","\ud83d\udc64 Perfil de usuario","\ud83d\udc64 \u7528\u6237\u8d44\u6599","\ud83d\udc64 Perfil do usu\xe1rio","\ud83d\udc64 Nutzerprofil","\ud83d\udc64 Profilo utente","\ud83d\udc64 \u30e6\u30fc\u30b6\u30fc\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb","\ud83d\udc64 \u041f\u0440\u043e\u0444\u0438\u043b\u044c \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f","\ud83d\udc64 \u0645\u0644\u0641 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645"],t.w)
+B.agO=new A.B(B.l,["\ud83c\udfa4 Top artistes \u2014 Global","\ud83c\udfa4 Top artists \u2014 All time","\ud83c\udfa4 Top artistas \u2014 Global","\ud83c\udfa4 \u70ed\u95e8\u827a\u672f\u5bb6 \u2014 \u5168\u90e8\u65f6\u95f4","\ud83c\udfa4 Top artistas \u2014 Geral","\ud83c\udfa4 Top-K\xfcnstler \u2014 Gesamt","\ud83c\udfa4 Top artisti \u2014 Globale","\ud83c\udfa4 \u30c8\u30c3\u30d7\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8 \u2014 \u5168\u671f\u9593","\ud83c\udfa4 \u0422\u043e\u043f \u0438\u0441\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u0435\u0439 \u2014 \u0432\u0441\u0451 \u0432\u0440\u0435\u043c\u044f","\ud83c\udfa4 \u0623\u0641\u0636\u0644 \u0627\u0644\u0641\u0646\u0627\u0646\u064a\u0646 \u2014 \u0627\u0644\u0643\u0644"],t.w)
+B.aiR=new A.B(B.l,["\ud83d\udcbf Top albums \u2014 Global","\ud83d\udcbf Top albums \u2014 All time","\ud83d\udcbf Top \xe1lbumes \u2014 Global","\ud83d\udcbf \u70ed\u95e8\u4e13\u8f91 \u2014 \u5168\u90e8\u65f6\u95f4","\ud83d\udcbf Top \xe1lbuns \u2014 Geral","\ud83d\udcbf Top-Alben \u2014 Gesamt","\ud83d\udcbf Top album \u2014 Globale","\ud83d\udcbf \u30c8\u30c3\u30d7\u30a2\u30eb\u30d0\u30e0 \u2014 \u5168\u671f\u9593","\ud83d\udcbf \u0422\u043e\u043f \u0430\u043b\u044c\u0431\u043e\u043c\u043e\u0432 \u2014 \u0432\u0441\u0451 \u0432\u0440\u0435\u043c\u044f","\ud83d\udcbf \u0623\u0641\u0636\u0644 \u0627\u0644\u0623\u0644\u0628\u0648\u0645\u0627\u062a \u2014 \u0627\u0644\u0643\u0644"],t.w)
+B.ahg=new A.B(B.l,["\ud83c\udfb5 Top titres \u2014 Global","\ud83c\udfb5 Top tracks \u2014 All time","\ud83c\udfb5 Top canciones \u2014 Global","\ud83c\udfb5 \u70ed\u95e8\u6b4c\u66f2 \u2014 \u5168\u90e8\u65f6\u95f4","\ud83c\udfb5 Top faixas \u2014 Geral","\ud83c\udfb5 Top-Titel \u2014 Gesamt","\ud83c\udfb5 Top brani \u2014 Globale","\ud83c\udfb5 \u30c8\u30c3\u30d7\u30c8\u30e9\u30c3\u30af \u2014 \u5168\u671f\u9593","\ud83c\udfb5 \u0422\u043e\u043f \u0442\u0440\u0435\u043a\u043e\u0432 \u2014 \u0432\u0441\u0451 \u0432\u0440\u0435\u043c\u044f","\ud83c\udfb5 \u0623\u0641\u0636\u0644 \u0627\u0644\u0623\u063a\u0627\u0646\u064a \u2014 \u0627\u0644\u0643\u0644"],t.w)
+B.agq=new A.B(B.l,["\u23f1\ufe0f \xc9coutes r\xe9centes","\u23f1\ufe0f Recent plays","\u23f1\ufe0f Reproducciones recientes","\u23f1\ufe0f \u6700\u8fd1\u64ad\u653e","\u23f1\ufe0f Reprodu\xe7\xf5es recentes","\u23f1\ufe0f Zuletzt geh\xf6rt","\u23f1\ufe0f Ascolti recenti","\u23f1\ufe0f \u6700\u8fd1\u306e\u518d\u751f","\u23f1\ufe0f \u041d\u0435\u0434\u0430\u0432\u043d\u0438\u0435 \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u044f","\u23f1\ufe0f \u0627\u0644\u0627\u0633\u062a\u0645\u0627\u0639\u0627\u062a \u0627\u0644\u0623\u062e\u064a\u0631\u0629"],t.w)
+B.ahs=new A.B(B.l,["\ud83d\uddd3\ufe0f Cette semaine","\ud83d\uddd3\ufe0f This week","\ud83d\uddd3\ufe0f Esta semana","\ud83d\uddd3\ufe0f \u672c\u5468","\ud83d\uddd3\ufe0f Esta semana","\ud83d\uddd3\ufe0f Diese Woche","\ud83d\uddd3\ufe0f Questa settimana","\ud83d\uddd3\ufe0f \u4eca\u9031","\ud83d\uddd3\ufe0f \u042d\u0442\u0430 \u043d\u0435\u0434\u0435\u043b\u044f","\ud83d\uddd3\ufe0f \u0647\u0630\u0627 \u0627\u0644\u0623\u0633\u0628\u0648\u0639"],t.w)
 B.afP=new A.B(B.l,["\ud83d\udcc5 Ce mois-ci","\ud83d\udcc5 This month","\ud83d\udcc5 Este mes","\ud83d\udcc5 \u672c\u6708","\ud83d\udcc5 Este m\xeas","\ud83d\udcc5 Diesen Monat","\ud83d\udcc5 Questo mese","\ud83d\udcc5 \u4eca\u6708","\ud83d\udcc5 \u042d\u0442\u043e\u0442 \u043c\u0435\u0441\u044f\u0446","\ud83d\udcc5 \u0647\u0630\u0627 \u0627\u0644\u0634\u0647\u0631"],t.w)
-B.ag8=new A.B(B.l,["\ud83d\udcc5 3 derniers mois","\ud83d\udcc5 Last 3 months","\ud83d\udcc5 \xdaltimos 3 meses","\ud83d\udcc5 \u6700\u8fd1 3 \u4e2a\u6708","\ud83d\udcc5 \xdaltimos 3 meses","\ud83d\udcc5 Letzte 3 Monate","\ud83d\udcc5 Ultimi 3 mesi","\ud83d\udcc5 \u904e\u53bb3\u304b\u6708","\ud83d\udcc5 \u041f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435 3 \u043c\u0435\u0441\u044f\u0446\u0430","\ud83d\udcc5 \u0622\u062e\u0631 3 \u0623\u0634\u0647\u0631"],t.w)
-B.ag_=new A.B(B.l,["\ud83d\udcc5 6 derniers mois","\ud83d\udcc5 Last 6 months","\ud83d\udcc5 \xdaltimos 6 meses","\ud83d\udcc5 \u6700\u8fd1 6 \u4e2a\u6708","\ud83d\udcc5 \xdaltimos 6 meses","\ud83d\udcc5 Letzte 6 Monate","\ud83d\udcc5 Ultimi 6 mesi","\ud83d\udcc5 \u904e\u53bb6\u304b\u6708","\ud83d\udcc5 \u041f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435 6 \u043c\u0435\u0441\u044f\u0446\u0435\u0432","\ud83d\udcc5 \u0622\u062e\u0631 6 \u0623\u0634\u0647\u0631"],t.w)
-B.ajB=new A.B(B.l,["\ud83d\udcc5 12 derniers mois","\ud83d\udcc5 Last 12 months","\ud83d\udcc5 \xdaltimos 12 meses","\ud83d\udcc5 \u6700\u8fd1 12 \u4e2a\u6708","\ud83d\udcc5 \xdaltimos 12 meses","\ud83d\udcc5 Letzte 12 Monate","\ud83d\udcc5 Ultimi 12 mesi","\ud83d\udcc5 \u904e\u53bb12\u304b\u6708","\ud83d\udcc5 \u041f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435 12 \u043c\u0435\u0441\u044f\u0446\u0435\u0432","\ud83d\udcc5 \u0622\u062e\u0631 12 \u0634\u0647\u0631\u064b\u0627"],t.w)
-B.ahm=new A.B(B.l,["\ud83d\udcca Historique mensuel","\ud83d\udcca Monthly history","\ud83d\udcca Historial mensual","\ud83d\udcca \u6708\u5ea6\u5386\u53f2","\ud83d\udcca Hist\xf3rico mensal","\ud83d\udcca Monatsverlauf","\ud83d\udcca Cronologia mensile","\ud83d\udcca \u6708\u5225\u5c65\u6b74","\ud83d\udcca \u0418\u0441\u0442\u043e\u0440\u0438\u044f \u043f\u043e \u043c\u0435\u0441\u044f\u0446\u0430\u043c","\ud83d\udcca \u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u0634\u0647\u0631\u064a"],t.w)
-B.ahu=new A.B(B.l,["\u2764\ufe0f Titres aim\xe9s","\u2764\ufe0f Loved tracks","\u2764\ufe0f Canciones favoritas","\u2764\ufe0f \u559c\u6b22\u7684\u6b4c\u66f2","\u2764\ufe0f Faixas curtidas","\u2764\ufe0f Gelikte Titel","\u2764\ufe0f Brani preferiti","\u2764\ufe0f \u304a\u6c17\u306b\u5165\u308a\u306e\u66f2","\u2764\ufe0f \u041b\u044e\u0431\u0438\u043c\u044b\u0435 \u0442\u0440\u0435\u043a\u0438","\u2764\ufe0f \u0627\u0644\u0623\u063a\u0627\u0646\u064a \u0627\u0644\u0645\u0641\u0636\u0644\u0629"],t.w)
-B.agV=new A.B(B.l,["\ud83d\uddd3\ufe0f Top artistes \u2014 Semaine","\ud83d\uddd3\ufe0f Top artists \u2014 This week","\ud83d\uddd3\ufe0f Top artistas \u2014 Semana","\ud83d\uddd3\ufe0f \u70ed\u95e8\u827a\u672f\u5bb6 \u2014 \u672c\u5468","\ud83d\uddd3\ufe0f Top artistas \u2014 Semana","\ud83d\uddd3\ufe0f Top-K\xfcnstler \u2014 Woche","\ud83d\uddd3\ufe0f Top artisti \u2014 Settimana","\ud83d\uddd3\ufe0f \u30c8\u30c3\u30d7\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8 \u2014 \u4eca\u9031","\ud83d\uddd3\ufe0f \u0422\u043e\u043f \u0438\u0441\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u0435\u0439 \u2014 \u043d\u0435\u0434\u0435\u043b\u044f","\ud83d\uddd3\ufe0f \u0623\u0641\u0636\u0644 \u0627\u0644\u0641\u0646\u0627\u0646\u064a\u0646 \u2014 \u0627\u0644\u0623\u0633\u0628\u0648\u0639"],t.w)
+B.aga=new A.B(B.l,["\ud83d\udcc5 3 derniers mois","\ud83d\udcc5 Last 3 months","\ud83d\udcc5 \xdaltimos 3 meses","\ud83d\udcc5 \u6700\u8fd1 3 \u4e2a\u6708","\ud83d\udcc5 \xdaltimos 3 meses","\ud83d\udcc5 Letzte 3 Monate","\ud83d\udcc5 Ultimi 3 mesi","\ud83d\udcc5 \u904e\u53bb3\u304b\u6708","\ud83d\udcc5 \u041f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435 3 \u043c\u0435\u0441\u044f\u0446\u0430","\ud83d\udcc5 \u0622\u062e\u0631 3 \u0623\u0634\u0647\u0631"],t.w)
+B.afY=new A.B(B.l,["\ud83d\udcc5 6 derniers mois","\ud83d\udcc5 Last 6 months","\ud83d\udcc5 \xdaltimos 6 meses","\ud83d\udcc5 \u6700\u8fd1 6 \u4e2a\u6708","\ud83d\udcc5 \xdaltimos 6 meses","\ud83d\udcc5 Letzte 6 Monate","\ud83d\udcc5 Ultimi 6 mesi","\ud83d\udcc5 \u904e\u53bb6\u304b\u6708","\ud83d\udcc5 \u041f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435 6 \u043c\u0435\u0441\u044f\u0446\u0435\u0432","\ud83d\udcc5 \u0622\u062e\u0631 6 \u0623\u0634\u0647\u0631"],t.w)
+B.ajC=new A.B(B.l,["\ud83d\udcc5 12 derniers mois","\ud83d\udcc5 Last 12 months","\ud83d\udcc5 \xdaltimos 12 meses","\ud83d\udcc5 \u6700\u8fd1 12 \u4e2a\u6708","\ud83d\udcc5 \xdaltimos 12 meses","\ud83d\udcc5 Letzte 12 Monate","\ud83d\udcc5 Ultimi 12 mesi","\ud83d\udcc5 \u904e\u53bb12\u304b\u6708","\ud83d\udcc5 \u041f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435 12 \u043c\u0435\u0441\u044f\u0446\u0435\u0432","\ud83d\udcc5 \u0622\u062e\u0631 12 \u0634\u0647\u0631\u064b\u0627"],t.w)
+B.ahq=new A.B(B.l,["\ud83d\udcca Historique mensuel","\ud83d\udcca Monthly history","\ud83d\udcca Historial mensual","\ud83d\udcca \u6708\u5ea6\u5386\u53f2","\ud83d\udcca Hist\xf3rico mensal","\ud83d\udcca Monatsverlauf","\ud83d\udcca Cronologia mensile","\ud83d\udcca \u6708\u5225\u5c65\u6b74","\ud83d\udcca \u0418\u0441\u0442\u043e\u0440\u0438\u044f \u043f\u043e \u043c\u0435\u0441\u044f\u0446\u0430\u043c","\ud83d\udcca \u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u0634\u0647\u0631\u064a"],t.w)
+B.ahx=new A.B(B.l,["\u2764\ufe0f Titres aim\xe9s","\u2764\ufe0f Loved tracks","\u2764\ufe0f Canciones favoritas","\u2764\ufe0f \u559c\u6b22\u7684\u6b4c\u66f2","\u2764\ufe0f Faixas curtidas","\u2764\ufe0f Gelikte Titel","\u2764\ufe0f Brani preferiti","\u2764\ufe0f \u304a\u6c17\u306b\u5165\u308a\u306e\u66f2","\u2764\ufe0f \u041b\u044e\u0431\u0438\u043c\u044b\u0435 \u0442\u0440\u0435\u043a\u0438","\u2764\ufe0f \u0627\u0644\u0623\u063a\u0627\u0646\u064a \u0627\u0644\u0645\u0641\u0636\u0644\u0629"],t.w)
+B.agZ=new A.B(B.l,["\ud83d\uddd3\ufe0f Top artistes \u2014 Semaine","\ud83d\uddd3\ufe0f Top artists \u2014 This week","\ud83d\uddd3\ufe0f Top artistas \u2014 Semana","\ud83d\uddd3\ufe0f \u70ed\u95e8\u827a\u672f\u5bb6 \u2014 \u672c\u5468","\ud83d\uddd3\ufe0f Top artistas \u2014 Semana","\ud83d\uddd3\ufe0f Top-K\xfcnstler \u2014 Woche","\ud83d\uddd3\ufe0f Top artisti \u2014 Settimana","\ud83d\uddd3\ufe0f \u30c8\u30c3\u30d7\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8 \u2014 \u4eca\u9031","\ud83d\uddd3\ufe0f \u0422\u043e\u043f \u0438\u0441\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u0435\u0439 \u2014 \u043d\u0435\u0434\u0435\u043b\u044f","\ud83d\uddd3\ufe0f \u0623\u0641\u0636\u0644 \u0627\u0644\u0641\u0646\u0627\u0646\u064a\u0646 \u2014 \u0627\u0644\u0623\u0633\u0628\u0648\u0639"],t.w)
 B.afD=new A.B(B.l,["\ud83d\uddd3\ufe0f Albums & titres \u2014 Semaine","\ud83d\uddd3\ufe0f Albums & tracks \u2014 This week","\ud83d\uddd3\ufe0f \xc1lbumes y canciones \u2014 Semana","\ud83d\uddd3\ufe0f \u4e13\u8f91\u548c\u6b4c\u66f2 \u2014 \u672c\u5468","\ud83d\uddd3\ufe0f \xc1lbuns e faixas \u2014 Semana","\ud83d\uddd3\ufe0f Alben & Titel \u2014 Woche","\ud83d\uddd3\ufe0f Album e brani \u2014 Settimana","\ud83d\uddd3\ufe0f \u30a2\u30eb\u30d0\u30e0\u3068\u30c8\u30e9\u30c3\u30af \u2014 \u4eca\u9031","\ud83d\uddd3\ufe0f \u0410\u043b\u044c\u0431\u043e\u043c\u044b \u0438 \u0442\u0440\u0435\u043a\u0438 \u2014 \u043d\u0435\u0434\u0435\u043b\u044f","\ud83d\uddd3\ufe0f \u0627\u0644\u0623\u0644\u0628\u0648\u0645\u0627\u062a \u0648\u0627\u0644\u0623\u063a\u0627\u0646\u064a \u2014 \u0627\u0644\u0623\u0633\u0628\u0648\u0639"],t.w)
-B.ahG=new A.B(B.l,["{n} / {next} pour le palier suivant","{n} / {next} to the next tier","{n} / {next} para el siguiente nivel","{n} / {next} \u5347\u81f3\u4e0b\u4e00\u7ea7","{n} / {next} para o pr\xf3ximo n\xedvel","{n} / {next} bis zur n\xe4chsten Stufe","{n} / {next} al prossimo livello","{n} / {next} \u3067\u6b21\u306e\u30c6\u30a3\u30a2\u3078","{n} / {next} \u0434\u043e \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0435\u0433\u043e \u0443\u0440\u043e\u0432\u043d\u044f","{n} / {next} \u0644\u0644\u0645\u0633\u062a\u0648\u0649 \u0627\u0644\u062a\u0627\u0644\u064a"],t.w)
-B.agC=new A.B(B.l,["Palier maximum atteint \ud83c\udf89","Max tier reached \ud83c\udf89","Nivel m\xe1ximo alcanzado \ud83c\udf89","\u5df2\u8fbe\u5230\u6700\u9ad8\u7b49\u7ea7 \ud83c\udf89","N\xedvel m\xe1ximo atingido \ud83c\udf89","H\xf6chste Stufe erreicht \ud83c\udf89","Livello massimo raggiunto \ud83c\udf89","\u6700\u9ad8\u30c6\u30a3\u30a2\u306b\u5230\u9054 \ud83c\udf89","\u041c\u0430\u043a\u0441\u0438\u043c\u0430\u043b\u044c\u043d\u044b\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c \u0434\u043e\u0441\u0442\u0438\u0433\u043d\u0443\u0442 \ud83c\udf89","\u062a\u0645 \u0628\u0644\u0648\u063a \u0627\u0644\u0645\u0633\u062a\u0648\u0649 \u0627\u0644\u0623\u0642\u0635\u0649 \ud83c\udf89"],t.w)
-B.ahL=new A.B(B.l,["\xc9coute ce titre pour d\xe9bloquer un premier palier (d\xe8s {n} \xe9coutes).","Listen to this track to unlock a first tier (from {n} plays).","Escucha este tema para desbloquear un primer nivel (desde {n} reproducciones).","\u542c\u8fd9\u9996\u6b4c\u6765\u89e3\u9501\u7b2c\u4e00\u4e2a\u7b49\u7ea7\uff08{n} \u6b21\u64ad\u653e\u8d77\uff09\u3002","Ou\xe7a esta faixa para desbloquear um primeiro n\xedvel (a partir de {n} reprodu\xe7\xf5es).","H\xf6re diesen Titel, um die erste Stufe freizuschalten (ab {n} Wiedergaben).","Ascolta questo brano per sbloccare un primo livello (da {n} ascolti).","\u3053\u306e\u66f2\u3092\u8074\u3044\u3066\u6700\u521d\u306e\u30c6\u30a3\u30a2\u3092\u89e3\u653e\u3057\u307e\u3057\u3087\u3046\uff08{n} \u56de\u518d\u751f\u304b\u3089\uff09\u3002","\u0421\u043b\u0443\u0448\u0430\u0439\u0442\u0435 \u044d\u0442\u043e\u0442 \u0442\u0440\u0435\u043a, \u0447\u0442\u043e\u0431\u044b \u043e\u0442\u043a\u0440\u044b\u0442\u044c \u043f\u0435\u0440\u0432\u044b\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c (\u043e\u0442 {n} \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u0439).","\u0627\u0633\u062a\u0645\u0639 \u0625\u0644\u0649 \u0647\u0630\u0647 \u0627\u0644\u0623\u063a\u0646\u064a\u0629 \u0644\u0641\u062a\u062d \u0623\u0648\u0644 \u0645\u0633\u062a\u0648\u0649 (\u0645\u0646 {n} \u0627\u0633\u062a\u0645\u0627\u0639\u0627\u062a)."],t.w)
-B.aif=new A.B(B.l,["Import de tes donn\xe9es","Importing your data","Importando tus datos","\u6b63\u5728\u5bfc\u5165\u4f60\u7684\u6570\u636e","Importando seus dados","Deine Daten werden importiert","Importazione dei tuoi dati","\u30c7\u30fc\u30bf\u3092\u30a4\u30f3\u30dd\u30fc\u30c8\u4e2d","\u0418\u043c\u043f\u043e\u0440\u0442 \u0432\u0430\u0448\u0438\u0445 \u0434\u0430\u043d\u043d\u044b\u0445","\u062c\u0627\u0631\u064d \u0627\u0633\u062a\u064a\u0631\u0627\u062f \u0628\u064a\u0627\u0646\u0627\u062a\u0643"],t.w)
-B.ahn=new A.B(B.l,["Import\xe9 !","Imported!","\xa1Importado!","\u5df2\u5bfc\u5165\uff01","Importado!","Importiert!","Importato!","\u30a4\u30f3\u30dd\u30fc\u30c8\u5b8c\u4e86\uff01","\u0418\u043c\u043f\u043e\u0440\u0442\u0438\u0440\u043e\u0432\u0430\u043d\u043e!","\u062a\u0645 \u0627\u0644\u0627\u0633\u062a\u064a\u0631\u0627\u062f!"],t.w)
-B.ak4=new A.B(B.alm,[B.afl,B.afh,B.afn,B.afk,B.afb,B.af8,B.afu,B.aft,B.afe,B.afv,B.afj,B.afs,B.afi,B.afp,B.afg,B.af9,B.afw,B.af7,B.afo,B.afd,B.afr,B.afc,B.aff,B.afq,B.af6,B.afa,B.afm,B.agM,B.agK,B.aiP,B.ahc,B.agn,B.aho,B.afP,B.ag8,B.ag_,B.ajB,B.ahm,B.ahu,B.agV,B.afD,B.ahG,B.agC,B.ahL,B.aif,B.ahn,B.Gx],t.vb)
+B.ahM=new A.B(B.l,["{n} / {next} pour le palier suivant","{n} / {next} to the next tier","{n} / {next} para el siguiente nivel","{n} / {next} \u5347\u81f3\u4e0b\u4e00\u7ea7","{n} / {next} para o pr\xf3ximo n\xedvel","{n} / {next} bis zur n\xe4chsten Stufe","{n} / {next} al prossimo livello","{n} / {next} \u3067\u6b21\u306e\u30c6\u30a3\u30a2\u3078","{n} / {next} \u0434\u043e \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0435\u0433\u043e \u0443\u0440\u043e\u0432\u043d\u044f","{n} / {next} \u0644\u0644\u0645\u0633\u062a\u0648\u0649 \u0627\u0644\u062a\u0627\u0644\u064a"],t.w)
+B.agH=new A.B(B.l,["Palier maximum atteint \ud83c\udf89","Max tier reached \ud83c\udf89","Nivel m\xe1ximo alcanzado \ud83c\udf89","\u5df2\u8fbe\u5230\u6700\u9ad8\u7b49\u7ea7 \ud83c\udf89","N\xedvel m\xe1ximo atingido \ud83c\udf89","H\xf6chste Stufe erreicht \ud83c\udf89","Livello massimo raggiunto \ud83c\udf89","\u6700\u9ad8\u30c6\u30a3\u30a2\u306b\u5230\u9054 \ud83c\udf89","\u041c\u0430\u043a\u0441\u0438\u043c\u0430\u043b\u044c\u043d\u044b\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c \u0434\u043e\u0441\u0442\u0438\u0433\u043d\u0443\u0442 \ud83c\udf89","\u062a\u0645 \u0628\u0644\u0648\u063a \u0627\u0644\u0645\u0633\u062a\u0648\u0649 \u0627\u0644\u0623\u0642\u0635\u0649 \ud83c\udf89"],t.w)
+B.agF=new A.B(B.l,["\xc9coutez ce titre pour d\xe9bloquer un premier palier (d\xe8s {n} \xe9coutes).","Listen to this track to unlock a first tier (from {n} plays).","Escuche este tema para desbloquear un primer nivel (desde {n} reproducciones).","\u542c\u8fd9\u9996\u6b4c\u6765\u89e3\u9501\u7b2c\u4e00\u4e2a\u7b49\u7ea7\uff08{n} \u6b21\u64ad\u653e\u8d77\uff09\u3002","Ou\xe7a esta faixa para desbloquear um primeiro n\xedvel (a partir de {n} reprodu\xe7\xf5es).","H\xf6ren Sie diesen Titel, um die erste Stufe freizuschalten (ab {n} Wiedergaben).","Ascolti questo brano per sbloccare un primo livello (da {n} ascolti).","\u3053\u306e\u66f2\u3092\u8074\u3044\u3066\u6700\u521d\u306e\u30c6\u30a3\u30a2\u3092\u89e3\u653e\u3057\u307e\u3057\u3087\u3046\uff08{n} \u56de\u518d\u751f\u304b\u3089\uff09\u3002","\u0421\u043b\u0443\u0448\u0430\u0439\u0442\u0435 \u044d\u0442\u043e\u0442 \u0442\u0440\u0435\u043a, \u0447\u0442\u043e\u0431\u044b \u043e\u0442\u043a\u0440\u044b\u0442\u044c \u043f\u0435\u0440\u0432\u044b\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c (\u043e\u0442 {n} \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u0439).","\u0627\u0633\u062a\u0645\u0639 \u0625\u0644\u0649 \u0647\u0630\u0647 \u0627\u0644\u0623\u063a\u0646\u064a\u0629 \u0644\u0641\u062a\u062d \u0623\u0648\u0644 \u0645\u0633\u062a\u0648\u0649 (\u0645\u0646 {n} \u0627\u0633\u062a\u0645\u0627\u0639\u0627\u062a)."],t.w)
+B.agb=new A.B(B.l,["Import de vos donn\xe9es","Importing your data","Importando sus datos","\u6b63\u5728\u5bfc\u5165\u60a8\u7684\u6570\u636e","Importando seus dados","Ihre Daten werden importiert","Importazione dei suoi dati","\u30c7\u30fc\u30bf\u3092\u30a4\u30f3\u30dd\u30fc\u30c8\u4e2d","\u0418\u043c\u043f\u043e\u0440\u0442 \u0432\u0430\u0448\u0438\u0445 \u0434\u0430\u043d\u043d\u044b\u0445","\u062c\u0627\u0631\u064d \u0627\u0633\u062a\u064a\u0631\u0627\u062f \u0628\u064a\u0627\u0646\u0627\u062a\u0643"],t.w)
+B.ahr=new A.B(B.l,["Import\xe9 !","Imported!","\xa1Importado!","\u5df2\u5bfc\u5165\uff01","Importado!","Importiert!","Importato!","\u30a4\u30f3\u30dd\u30fc\u30c8\u5b8c\u4e86\uff01","\u0418\u043c\u043f\u043e\u0440\u0442\u0438\u0440\u043e\u0432\u0430\u043d\u043e!","\u062a\u0645 \u0627\u0644\u0627\u0633\u062a\u064a\u0631\u0627\u062f!"],t.w)
+B.ak4=new A.B(B.alm,[B.afl,B.afh,B.afn,B.afk,B.afb,B.af8,B.afu,B.aft,B.afe,B.afv,B.afj,B.afs,B.afi,B.afp,B.afg,B.af9,B.afw,B.af7,B.afo,B.afd,B.afr,B.afc,B.aff,B.afq,B.af6,B.afa,B.afm,B.agQ,B.agO,B.aiR,B.ahg,B.agq,B.ahs,B.afP,B.aga,B.afY,B.ajC,B.ahq,B.ahx,B.agZ,B.afD,B.ahM,B.agH,B.agF,B.agb,B.ahr,B.Gx],t.vb)
 B.alE={type:0}
 B.ak5=new A.B(B.alE,["line"],t.w)
 B.ak8=new A.B(B.c4,[],A.aF("B<nM,C>"))
@@ -171342,28 +171342,28 @@ B.a6q=s([54,null,null,8589935158],t.Z)
 B.a6r=s([55,null,null,8589935159],t.Z)
 B.a6s=s([56,null,null,8589935160],t.Z)
 B.a6u=s([57,null,null,8589935161],t.Z)
-B.a9r=s([8589934852,8589934852,8589934853,null],t.Z)
+B.a9s=s([8589934852,8589934852,8589934853,null],t.Z)
 B.a5Q=s([4294967555,null,4294967555,null],t.Z)
 B.a5R=s([4294968065,null,null,8589935154],t.Z)
 B.a5S=s([4294968066,null,null,8589935156],t.Z)
 B.a5T=s([4294968067,null,null,8589935158],t.Z)
 B.a5U=s([4294968068,null,null,8589935160],t.Z)
 B.a5Z=s([4294968321,null,null,8589935157],t.Z)
-B.a9s=s([8589934848,8589934848,8589934849,null],t.Z)
+B.a9t=s([8589934848,8589934848,8589934849,null],t.Z)
 B.a5P=s([4294967423,null,null,8589935150],t.Z)
 B.a5V=s([4294968069,null,null,8589935153],t.Z)
 B.a5O=s([4294967309,null,null,8589935117],t.Z)
 B.a5W=s([4294968070,null,null,8589935159],t.Z)
 B.a6_=s([4294968327,null,null,8589935152],t.Z)
-B.a9t=s([8589934854,8589934854,8589934855,null],t.Z)
+B.a9u=s([8589934854,8589934854,8589934855,null],t.Z)
 B.a5X=s([4294968071,null,null,8589935155],t.Z)
 B.a5Y=s([4294968072,null,null,8589935161],t.Z)
-B.a9u=s([8589934850,8589934850,8589934851,null],t.Z)
-B.GF=new A.dc(["*",B.a60,"+",B.a61,"-",B.a64,".",B.a65,"/",B.a66,"0",B.a67,"1",B.a69,"2",B.a6l,"3",B.a6n,"4",B.a6o,"5",B.a6p,"6",B.a6q,"7",B.a6r,"8",B.a6s,"9",B.a6u,"Alt",B.a9r,"AltGraph",B.a5Q,"ArrowDown",B.a5R,"ArrowLeft",B.a5S,"ArrowRight",B.a5T,"ArrowUp",B.a5U,"Clear",B.a5Z,"Control",B.a9s,"Delete",B.a5P,"End",B.a5V,"Enter",B.a5O,"Home",B.a5W,"Insert",B.a6_,"Meta",B.a9t,"PageDown",B.a5X,"PageUp",B.a5Y,"Shift",B.a9u],A.aF("dc<e,T<t?>>"))
+B.a9v=s([8589934850,8589934850,8589934851,null],t.Z)
+B.GF=new A.dc(["*",B.a60,"+",B.a61,"-",B.a64,".",B.a65,"/",B.a66,"0",B.a67,"1",B.a69,"2",B.a6l,"3",B.a6n,"4",B.a6o,"5",B.a6p,"6",B.a6q,"7",B.a6r,"8",B.a6s,"9",B.a6u,"Alt",B.a9s,"AltGraph",B.a5Q,"ArrowDown",B.a5R,"ArrowLeft",B.a5S,"ArrowRight",B.a5T,"ArrowUp",B.a5U,"Clear",B.a5Z,"Control",B.a9t,"Delete",B.a5P,"End",B.a5V,"Enter",B.a5O,"Home",B.a5W,"Insert",B.a6_,"Meta",B.a9u,"PageDown",B.a5X,"PageUp",B.a5Y,"Shift",B.a9v],A.aF("dc<e,T<t?>>"))
 B.a6t=s([B.BN,null,null,B.Gn],t.L)
 B.ab6=s([B.Ge,null,null,B.Go],t.L)
 B.a8d=s([B.Gf,null,null,B.Gp],t.L)
-B.a9A=s([B.Gg,null,null,B.hf],t.L)
+B.a9B=s([B.Gg,null,null,B.hf],t.L)
 B.a4P=s([B.Gh,null,null,B.Gq],t.L)
 B.abS=s([B.Gi,null,null,B.t6],t.L)
 B.aby=s([B.rX,null,null,B.kE],t.L)
@@ -171383,16 +171383,16 @@ B.a8N=s([B.dS,null,null,B.hi],t.L)
 B.ac2=s([B.ex,null,null,B.hj],t.L)
 B.abq=s([B.rV,null,null,B.t7],t.L)
 B.a7c=s([B.kB,B.kB,B.no,null],t.L)
-B.aah=s([B.cw,null,null,B.hf],t.L)
+B.aai=s([B.cw,null,null,B.hf],t.L)
 B.a8O=s([B.hc,null,null,B.kE],t.L)
 B.a6C=s([B.nk,null,null,B.t5],t.L)
 B.a8P=s([B.hd,null,null,B.kG],t.L)
 B.abr=s([B.kA,null,null,B.t6],t.L)
 B.a7d=s([B.kD,B.kD,B.nq,null],t.L)
 B.a8Q=s([B.ky,null,null,B.kF],t.L)
-B.aaG=s([B.kz,null,null,B.kH],t.L)
+B.aaH=s([B.kz,null,null,B.kH],t.L)
 B.a7e=s([B.fr,B.fr,B.he,null],t.L)
-B.aka=new A.dc(["*",B.a6t,"+",B.ab6,"-",B.a8d,".",B.a9A,"/",B.a4P,"0",B.abS,"1",B.aby,"2",B.a6H,"3",B.ac8,"4",B.abw,"5",B.a6D,"6",B.a5t,"7",B.a7r,"8",B.abb,"9",B.abi,"Alt",B.a7b,"AltGraph",B.abU,"ArrowDown",B.a8L,"ArrowLeft",B.a8M,"ArrowRight",B.a8N,"ArrowUp",B.ac2,"Clear",B.abq,"Control",B.a7c,"Delete",B.aah,"End",B.a8O,"Enter",B.a6C,"Home",B.a8P,"Insert",B.abr,"Meta",B.a7d,"PageDown",B.a8Q,"PageUp",B.aaG,"Shift",B.a7e],A.aF("dc<e,T<y?>>"))
+B.aka=new A.dc(["*",B.a6t,"+",B.ab6,"-",B.a8d,".",B.a9B,"/",B.a4P,"0",B.abS,"1",B.aby,"2",B.a6H,"3",B.ac8,"4",B.abw,"5",B.a6D,"6",B.a5t,"7",B.a7r,"8",B.abb,"9",B.abi,"Alt",B.a7b,"AltGraph",B.abU,"ArrowDown",B.a8L,"ArrowLeft",B.a8M,"ArrowRight",B.a8N,"ArrowUp",B.ac2,"Clear",B.abq,"Control",B.a7c,"Delete",B.aai,"End",B.a8O,"Enter",B.a6C,"Home",B.a8P,"Insert",B.abr,"Meta",B.a7d,"PageDown",B.a8Q,"PageUp",B.aaH,"Shift",B.a7e],A.aF("dc<e,T<y?>>"))
 B.ald={multiply:0,screen:1,overlay:2,darken:3,lighten:4,"color-dodge":5,"color-burn":6,"hard-light":7,"soft-light":8,difference:9,exclusion:10,hue:11,saturation:12,color:13,luminosity:14}
 B.R3=new A.i9(24,"multiply")
 B.QJ=new A.i9(14,"screen")
@@ -171436,12 +171436,12 @@ B.alI={lastfm:0,ytmusic:1,itunes:2,deezer:3,audiodb:4,musicbrainz:5,wikipedia:6}
 B.GH=new A.B(B.alI,["Last.fm","YouTube Music","iTunes","Deezer","TheAudioDB","MusicBrainz","Wikipedia"],t.w)
 B.alj={"zh-Hant":0,"zh-TW":1,"zh-MO":2,"zh-HK":3,ja:4,ko:5,zh:6,"zh-Hans":7,"zh-CN":8}
 B.rL=s(["Noto Sans TC"],t.s)
-B.a9F=s(["Noto Sans HK","Noto Sans TC"],t.s)
+B.a9G=s(["Noto Sans HK","Noto Sans TC"],t.s)
 B.a6x=s(["Noto Sans JP"],t.s)
 B.a5E=s(["Noto Sans KR"],t.s)
 B.Bh=s(["Noto Sans SC"],t.s)
 B.acm=s(["Noto Sans SC","Noto Sans TC"],t.s)
-B.nt=new A.B(B.alj,[B.rL,B.rL,B.rL,B.a9F,B.a6x,B.a5E,B.Bh,B.Bh,B.acm],t.AH)
+B.nt=new A.B(B.alj,[B.rL,B.rL,B.rL,B.a9G,B.a6x,B.a5E,B.Bh,B.Bh,B.acm],t.AH)
 B.GI=new A.dc([B.lk,-7,B.fE,1,B.oq,7,B.f3,-1],A.aF("dc<to,t>"))
 B.ale={matrix:0,translate:1,scale:2,rotate:3,skewX:4,skewY:5}
 B.aki=new A.B(B.ale,[A.c7e(),A.c7j(),A.c7g(),A.c7f(),A.c7h(),A.c7i()],A.aF("B<e,nA(T<C>,nA)>"))
@@ -171678,162 +171678,162 @@ B.Kj=new A.a_(65667)
 B.KM=new A.a_(786994)
 B.GJ=new A.B(B.ala,[B.K6,B.JN,B.iI,B.iK,B.Jc,B.Jb,B.Ja,B.Jd,B.JV,B.JT,B.JU,B.IN,B.IK,B.ID,B.II,B.IJ,B.Km,B.Kl,B.KH,B.KL,B.KI,B.KG,B.KK,B.KF,B.KJ,B.hl,B.IO,B.Jv,B.iG,B.kT,B.K_,B.JQ,B.JP,B.J7,B.IB,B.Is,B.It,B.Iu,B.Iv,B.Iw,B.Ix,B.Iy,B.Iz,B.IA,B.Kk,B.Kv,B.J8,B.IC,B.IH,B.tx,B.tx,B.IR,B.J_,B.J0,B.J1,B.Jy,B.Jz,B.JA,B.JB,B.JC,B.JD,B.JE,B.IS,B.JF,B.JG,B.JH,B.JI,B.JJ,B.IT,B.IU,B.IV,B.IW,B.IX,B.IY,B.IZ,B.JS,B.kS,B.Hs,B.Hy,B.HH,B.HI,B.HJ,B.HK,B.HL,B.HM,B.HN,B.Hz,B.HA,B.HB,B.HC,B.HD,B.HE,B.HF,B.HG,B.HO,B.HP,B.HQ,B.HR,B.HS,B.HT,B.HU,B.HV,B.HW,B.HX,B.HY,B.HZ,B.I_,B.I0,B.I1,B.JL,B.J5,B.Hq,B.J4,B.Ju,B.JX,B.JZ,B.JY,B.I2,B.I3,B.I4,B.I5,B.I6,B.I7,B.I8,B.I9,B.Ia,B.Ib,B.Ic,B.Id,B.Ie,B.If,B.Ig,B.Ih,B.Ii,B.Ij,B.Ik,B.Il,B.Im,B.In,B.Io,B.Ip,B.Iq,B.Ir,B.KQ,B.K1,B.K2,B.K3,B.K4,B.K5,B.KA,B.Kz,B.KE,B.KB,B.Ky,B.KD,B.KO,B.KN,B.KP,B.Kq,B.Ko,B.Kn,B.Kw,B.Kp,B.Kr,B.Kx,B.Ku,B.Ks,B.Kt,B.iJ,B.kV,B.Hx,B.IG,B.K0,B.nB,B.Js,B.Jj,B.Jk,B.Jl,B.Jm,B.Jn,B.Jo,B.Jp,B.Jq,B.Jr,B.Jh,B.Ka,B.Kg,B.Kh,B.JW,B.Jt,B.Je,B.Ji,B.Jx,B.Ke,B.Kd,B.Kc,B.Kb,B.Kf,B.Jf,B.K8,B.K9,B.Jg,B.JK,B.J9,B.J6,B.JR,B.J3,B.IP,B.Jw,B.J2,B.Hw,B.K7,B.IM,B.Hu,B.nA,B.JM,B.KC,B.IL,B.iH,B.kU,B.KR,B.IQ,B.Ki,B.IF,B.Hr,B.Ht,B.IE,B.Hv,B.JO,B.Kj,B.KM],A.aF("B<e,a_>"))
 B.al5={ui_not_enough_data_yet_sy:0,ui_level:1,ui_fetching:2,ui_which_chart:3,ui_which_period:4,ui_all_time:5,ui_exporting:6,ui_chart_not_available_fo:7,ui_could_not_generate_the:8,ui_error:9,ui_loading_history:10,ui_charts_will_be_more_ac:11,ui_load_the_full_history_:12,ui_load:13,ui_based_on_scrobbles_all:14,ui_all_available_years:15,ui_based_on_scrobbles_fro:16,ui_based_on_recent_scrobb:17,ui_analysing_your_last_20:18,ui_all_time_loading:19,ui_all_time_2:20,ui_export_a_chart:21,ui_scrobble_progression:22,ui_your_musical_genres:23,ui_based_on_your_top_arti:24,ui_listening_habits:25,ui_album_distribution:26,ui_listening_calendar:27,ui_daily_activity_to:28,ui_daily_activity_all_yea:29,ui_daily_activity:30,ui_load_history_to_see:31,ui_daily_activity_last_12:32,ui_all_years:33,ui_listening_streaks:34,ui_total:35,ui_avg_mo:36,ui_best_month:37,ui_hourly_distribution:38,ui_activity_by_day_of_wee:39,ui_current_streak:40,ui_d:41,ui_best_streak:42,ui_best_streak_started_on:43,ui_no_data_for_this_perio:44,ui_load_history_to_displa:45,ui_less:46,ui_more:47,ui_scan_a_profile:48,ui_lvl:49,ui_qr_code:50,ui_add_a_qr_code_to_the_s:51,ui_no_qr:52,ui_to_the_app:53,ui_to_last_fm:54,ui_compare_music_taste:55,ui_syncing_full_library:56,ui_see_more:57,ui_no_achievements_unlock:58,ui_no_animated_cover_for_:59,ui_source:60,ui_view_on_last_fm:61,ui_original_text_last_fm_:62,ui_source_last_fm:63,ui_dark:64,ui_light:65,ui_system:66,ui_colored_widgets:67,ui_tint_home_screen_widge:68,ui_search_settings:69,ui_no_settings_found:70,ui_all:71,ui_battery_saver:72,ui_save_battery_fewer_eff:73,ui_musical_soulmates:74,ui_great_compatibility:75,ui_some_common_ground:76,ui_fairly_different_taste:77,ui_worlds_apart_musically:78,ui_this_is_your_own_profi:79,ui_artists_from_your_hist:80,ui_artists_from_your_hist_2:81,ui_full_library_api:82,ui_top_200_artists_tracks:83,ui_could_not_work_out_the:84,ui_music_compatibility:85,ui_analyzing_musical_tast:86,ui_artist:87,ui_track:88,ui_album:89,ui_shared_tracks:90,ui_shared_artists:91,ui_no_shared_artists_foun:92,ui_shared_albums:93,ui_play_count_unavailable:94,ui_you_listen_to_this_x_m:95,ui_listens_to_this_x_more:96,ui_you_both_listen_to_thi:97,ui_plays:98,ui_compatibility:99,ui_you_both_love:100,ui_shared_top_artist:101,ui_achievements:102,ui_qr_not_recognized_not_:103,ui_scan_a_profile_s_qr_co:104,ui_favorites:105,ui_advanced_youtube_music:106,ui_syncs_the_glyphs_of_no:107,ui_sources:108,ui_official_flutter_docs_:109,ui_official_material_3_gu:110,ui_flutter_api_reference_:111,ui_official_flutter_packa:112,ui_android_widgets:113,ui_applies_the_accent_col:114,ui_turns_off_tilt_paralla:115,ui_always_on:116,ui_force_eco_mode_on_rega:117,ui_auto_activate:118,ui_turn_on_below_a_batter:119,ui_switches_on_by_itself_:120,ui_threshold:121,ui_choose_the_tab_display:122,ui_the_selected_tab_will_:123,ui_friends_sync:124,ui_sync_frequency:125,ui_daily:126,ui_resync_everyone:127,ui_version_history:128,ui_could_not_load_release:129,ui_installed_dev_build_un:130,ui_installed:131,ui_search_a_version_or_ch:132,ui_official:133,ui_no_release_matches_you:134,ui_latest:135,ui_installed_2:136,ui_no_description:137,ui_download:138,ui_view_release:139,ui_details:140,ui_all_past_releases_chan:141,ui_please_fill_both_field:142,ui_api_key_must_be_32_cha:143,ui_profile_not_found:144,ui_chart_monthly:145,ui_chart_cumul:146,ui_chart_genres:147,ui_chart_habits:148,ui_chart_artists:149,ui_chart_albums:150,ui_chart_calendar:151,ui_chart_streaks:152,ui_band_night:153,ui_band_morning:154,ui_band_afternoon:155,ui_band_evening:156}
-B.ajl=new A.B(B.l,["Pas encore assez de donn\xe9es \u2014 synchronise ton historique complet dans les r\xe9glages.","Not enough data yet \u2014 sync your full history in Settings.","A\xfan no hay suficientes datos: sincroniza tu historial completo en los ajustes.","\u6570\u636e\u8fd8\u4e0d\u591f\uff0c\u8bf7\u5728\u8bbe\u7f6e\u4e2d\u540c\u6b65\u5b8c\u6574\u5386\u53f2\u8bb0\u5f55\u3002","Ainda n\xe3o h\xe1 dados suficientes \u2014 sincronize o hist\xf3rico completo nas configura\xe7\xf5es.","Noch nicht genug Daten \u2013 synchronisiere deinen kompletten Verlauf in den Einstellungen.","Non ci sono ancora abbastanza dati: sincronizza la cronologia completa nelle impostazioni.","\u30c7\u30fc\u30bf\u304c\u307e\u3060\u8db3\u308a\u307e\u305b\u3093\u3002\u8a2d\u5b9a\u3067\u5c65\u6b74\u5168\u4f53\u3092\u540c\u671f\u3057\u3066\u304f\u3060\u3055\u3044\u3002","\u041f\u043e\u043a\u0430 \u043d\u0435\u0434\u043e\u0441\u0442\u0430\u0442\u043e\u0447\u043d\u043e \u0434\u0430\u043d\u043d\u044b\u0445 \u2014 \u0441\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0438\u0440\u0443\u0439\u0442\u0435 \u0432\u0441\u044e \u0438\u0441\u0442\u043e\u0440\u0438\u044e \u0432 \u043d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0430\u0445.","\u0644\u0627 \u062a\u0648\u062c\u062f \u0628\u064a\u0627\u0646\u0627\u062a \u0643\u0627\u0641\u064a\u0629 \u0628\u0639\u062f \u2014 \u0632\u0627\u0645\u0646 \u0633\u062c\u0644\u0643 \u0627\u0644\u0643\u0627\u0645\u0644 \u0645\u0646 \u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a."],t.w)
-B.ajf=new A.B(B.l,["Niveau {level}","Level {level}","Nivel {level}","\u7b49\u7ea7 {level}","N\xedvel {level}","Level {level}","Livello {level}","\u30ec\u30d9\u30eb {level}","\u0423\u0440\u043e\u0432\u0435\u043d\u044c {level}","\u0627\u0644\u0645\u0633\u062a\u0648\u0649 {level}"],t.w)
-B.agr=new A.B(B.l,["R\xe9cup\xe9ration de {currentYea}\u2026 ({yearIndex}/{totalYears})","Fetching {currentYea}\u2026 ({yearIndex}/{totalYears})","Obteniendo {currentYea}\u2026 ({yearIndex}/{totalYears})","\u6b63\u5728\u83b7\u53d6 {currentYea}\u2026\uff08{yearIndex}/{totalYears}\uff09","Buscando {currentYea}\u2026 ({yearIndex}/{totalYears})","Lade {currentYea}\u2026 ({yearIndex}/{totalYears})","Recupero {currentYea}\u2026 ({yearIndex}/{totalYears})","{currentYea} \u3092\u53d6\u5f97\u4e2d\u2026\uff08{yearIndex}/{totalYears}\uff09","\u0417\u0430\u0433\u0440\u0443\u0437\u043a\u0430 {currentYea}\u2026 ({yearIndex}/{totalYears})","\u062c\u0627\u0631\u064d \u062c\u0644\u0628 {currentYea}\u2026 ({yearIndex}/{totalYears})"],t.w)
-B.ajQ=new A.B(B.l,["Quel graphique ?","Which chart?","\xbfQu\xe9 gr\xe1fico?","\u9009\u62e9\u56fe\u8868","Qual gr\xe1fico?","Welches Diagramm?","Quale grafico?","\u3069\u306e\u30b0\u30e9\u30d5\uff1f","\u041a\u0430\u043a\u043e\u0439 \u0433\u0440\u0430\u0444\u0438\u043a?","\u0623\u064a \u0631\u0633\u0645 \u0628\u064a\u0627\u0646\u064a\u061f"],t.w)
-B.ajb=new A.B(B.l,["Quelle p\xe9riode ?","Which period?","\xbfQu\xe9 per\xedodo?","\u9009\u62e9\u65f6\u95f4\u6bb5","Qual per\xedodo?","Welcher Zeitraum?","Quale periodo?","\u3069\u306e\u671f\u9593\uff1f","\u041a\u0430\u043a\u043e\u0439 \u043f\u0435\u0440\u0438\u043e\u0434?","\u0623\u064a \u0641\u062a\u0631\u0629\u061f"],t.w)
-B.ahE=new A.B(B.l,["Tout le temps","All time","Todo el tiempo","\u5168\u90e8\u65f6\u95f4","Todo per\xedodo","Gesamte Zeit","Sempre","\u5168\u671f\u9593","\u0417\u0430 \u0432\u0441\u0451 \u0432\u0440\u0435\u043c\u044f","\u0643\u0644 \u0627\u0644\u0623\u0648\u0642\u0627\u062a"],t.w)
-B.aiG=new A.B(B.l,["Export en cours\u2026","Exporting\u2026","Exportando\u2026","\u6b63\u5728\u5bfc\u51fa\u2026","Exportando\u2026","Export l\xe4uft\u2026","Esportazione in corso\u2026","\u30a8\u30af\u30b9\u30dd\u30fc\u30c8\u4e2d\u2026","\u042d\u043a\u0441\u043f\u043e\u0440\u0442\u2026","\u062c\u0627\u0631\u064d \u0627\u0644\u062a\u0635\u062f\u064a\u0631\u2026"],t.w)
-B.ajm=new A.B(B.l,["Graphique non disponible pour cette p\xe9riode","Chart not available for this period","Gr\xe1fico no disponible para este per\xedodo","\u6b64\u65f6\u95f4\u6bb5\u6ca1\u6709\u53ef\u7528\u56fe\u8868","Gr\xe1fico indispon\xedvel para este per\xedodo","Diagramm f\xfcr diesen Zeitraum nicht verf\xfcgbar","Grafico non disponibile per questo periodo","\u3053\u306e\u671f\u9593\u306e\u30b0\u30e9\u30d5\u306f\u5229\u7528\u3067\u304d\u307e\u305b\u3093","\u0413\u0440\u0430\u0444\u0438\u043a \u043d\u0435\u0434\u043e\u0441\u0442\u0443\u043f\u0435\u043d \u0437\u0430 \u044d\u0442\u043e\u0442 \u043f\u0435\u0440\u0438\u043e\u0434","\u0627\u0644\u0631\u0633\u0645 \u0627\u0644\u0628\u064a\u0627\u0646\u064a \u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u0644\u0647\u0630\u0647 \u0627\u0644\u0641\u062a\u0631\u0629"],t.w)
-B.afF=new A.B(B.l,["Impossible de g\xe9n\xe9rer l'image","Could not generate the image","No se pudo generar la imagen","\u65e0\u6cd5\u751f\u6210\u56fe\u7247","N\xe3o foi poss\xedvel gerar a imagem","Bild konnte nicht erstellt werden","Impossibile generare l'immagine","\u753b\u50cf\u3092\u751f\u6210\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f","\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0441\u043e\u0437\u0434\u0430\u0442\u044c \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u0435","\u062a\u0639\u0630\u0651\u0631 \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0635\u0648\u0631\u0629"],t.w)
-B.aic=new A.B(B.l,["Erreur","Error","Error","\u9519\u8bef","Erro","Fehler","Errore","\u30a8\u30e9\u30fc","\u041e\u0448\u0438\u0431\u043a\u0430","\u062e\u0637\u0623"],t.w)
+B.ah1=new A.B(B.l,["Pas encore assez de donn\xe9es \u2014 synchronisez votre historique complet dans les r\xe9glages.","Not enough data yet \u2014 sync your full history in Settings.","A\xfan no hay suficientes datos: sincronice su historial completo en los ajustes.","\u6570\u636e\u8fd8\u4e0d\u591f\uff0c\u8bf7\u5728\u8bbe\u7f6e\u4e2d\u540c\u6b65\u5b8c\u6574\u5386\u53f2\u8bb0\u5f55\u3002","Ainda n\xe3o h\xe1 dados suficientes \u2014 sincronize o hist\xf3rico completo nas configura\xe7\xf5es.","Noch nicht genug Daten \u2013 synchronisieren Sie Ihren kompletten Verlauf in den Einstellungen.","Non ci sono ancora abbastanza dati: sincronizza la cronologia completa nelle impostazioni.","\u30c7\u30fc\u30bf\u304c\u307e\u3060\u8db3\u308a\u307e\u305b\u3093\u3002\u8a2d\u5b9a\u3067\u5c65\u6b74\u5168\u4f53\u3092\u540c\u671f\u3057\u3066\u304f\u3060\u3055\u3044\u3002","\u041f\u043e\u043a\u0430 \u043d\u0435\u0434\u043e\u0441\u0442\u0430\u0442\u043e\u0447\u043d\u043e \u0434\u0430\u043d\u043d\u044b\u0445 \u2014 \u0441\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0438\u0440\u0443\u0439\u0442\u0435 \u0432\u0441\u044e \u0438\u0441\u0442\u043e\u0440\u0438\u044e \u0432 \u043d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0430\u0445.","\u0644\u0627 \u062a\u0648\u062c\u062f \u0628\u064a\u0627\u0646\u0627\u062a \u0643\u0627\u0641\u064a\u0629 \u0628\u0639\u062f \u2014 \u0632\u0627\u0645\u0646 \u0633\u062c\u0644\u0643 \u0627\u0644\u0643\u0627\u0645\u0644 \u0645\u0646 \u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a."],t.w)
+B.aji=new A.B(B.l,["Niveau {level}","Level {level}","Nivel {level}","\u7b49\u7ea7 {level}","N\xedvel {level}","Level {level}","Livello {level}","\u30ec\u30d9\u30eb {level}","\u0423\u0440\u043e\u0432\u0435\u043d\u044c {level}","\u0627\u0644\u0645\u0633\u062a\u0648\u0649 {level}"],t.w)
+B.agv=new A.B(B.l,["R\xe9cup\xe9ration de {currentYea}\u2026 ({yearIndex}/{totalYears})","Fetching {currentYea}\u2026 ({yearIndex}/{totalYears})","Obteniendo {currentYea}\u2026 ({yearIndex}/{totalYears})","\u6b63\u5728\u83b7\u53d6 {currentYea}\u2026\uff08{yearIndex}/{totalYears}\uff09","Buscando {currentYea}\u2026 ({yearIndex}/{totalYears})","Lade {currentYea}\u2026 ({yearIndex}/{totalYears})","Recupero {currentYea}\u2026 ({yearIndex}/{totalYears})","{currentYea} \u3092\u53d6\u5f97\u4e2d\u2026\uff08{yearIndex}/{totalYears}\uff09","\u0417\u0430\u0433\u0440\u0443\u0437\u043a\u0430 {currentYea}\u2026 ({yearIndex}/{totalYears})","\u062c\u0627\u0631\u064d \u062c\u0644\u0628 {currentYea}\u2026 ({yearIndex}/{totalYears})"],t.w)
+B.ajP=new A.B(B.l,["Quel graphique ?","Which chart?","\xbfQu\xe9 gr\xe1fico?","\u9009\u62e9\u56fe\u8868","Qual gr\xe1fico?","Welches Diagramm?","Quale grafico?","\u3069\u306e\u30b0\u30e9\u30d5\uff1f","\u041a\u0430\u043a\u043e\u0439 \u0433\u0440\u0430\u0444\u0438\u043a?","\u0623\u064a \u0631\u0633\u0645 \u0628\u064a\u0627\u0646\u064a\u061f"],t.w)
+B.ajf=new A.B(B.l,["Quelle p\xe9riode ?","Which period?","\xbfQu\xe9 per\xedodo?","\u9009\u62e9\u65f6\u95f4\u6bb5","Qual per\xedodo?","Welcher Zeitraum?","Quale periodo?","\u3069\u306e\u671f\u9593\uff1f","\u041a\u0430\u043a\u043e\u0439 \u043f\u0435\u0440\u0438\u043e\u0434?","\u0623\u064a \u0641\u062a\u0631\u0629\u061f"],t.w)
+B.ahK=new A.B(B.l,["Tout le temps","All time","Todo el tiempo","\u5168\u90e8\u65f6\u95f4","Todo per\xedodo","Gesamte Zeit","Sempre","\u5168\u671f\u9593","\u0417\u0430 \u0432\u0441\u0451 \u0432\u0440\u0435\u043c\u044f","\u0643\u0644 \u0627\u0644\u0623\u0648\u0642\u0627\u062a"],t.w)
+B.aiH=new A.B(B.l,["Export en cours\u2026","Exporting\u2026","Exportando\u2026","\u6b63\u5728\u5bfc\u51fa\u2026","Exportando\u2026","Export l\xe4uft\u2026","Esportazione in corso\u2026","\u30a8\u30af\u30b9\u30dd\u30fc\u30c8\u4e2d\u2026","\u042d\u043a\u0441\u043f\u043e\u0440\u0442\u2026","\u062c\u0627\u0631\u064d \u0627\u0644\u062a\u0635\u062f\u064a\u0631\u2026"],t.w)
+B.ajl=new A.B(B.l,["Graphique non disponible pour cette p\xe9riode","Chart not available for this period","Gr\xe1fico no disponible para este per\xedodo","\u6b64\u65f6\u95f4\u6bb5\u6ca1\u6709\u53ef\u7528\u56fe\u8868","Gr\xe1fico indispon\xedvel para este per\xedodo","Diagramm f\xfcr diesen Zeitraum nicht verf\xfcgbar","Grafico non disponibile per questo periodo","\u3053\u306e\u671f\u9593\u306e\u30b0\u30e9\u30d5\u306f\u5229\u7528\u3067\u304d\u307e\u305b\u3093","\u0413\u0440\u0430\u0444\u0438\u043a \u043d\u0435\u0434\u043e\u0441\u0442\u0443\u043f\u0435\u043d \u0437\u0430 \u044d\u0442\u043e\u0442 \u043f\u0435\u0440\u0438\u043e\u0434","\u0627\u0644\u0631\u0633\u0645 \u0627\u0644\u0628\u064a\u0627\u0646\u064a \u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u0644\u0647\u0630\u0647 \u0627\u0644\u0641\u062a\u0631\u0629"],t.w)
+B.afG=new A.B(B.l,["Impossible de g\xe9n\xe9rer l'image","Could not generate the image","No se pudo generar la imagen","\u65e0\u6cd5\u751f\u6210\u56fe\u7247","N\xe3o foi poss\xedvel gerar a imagem","Bild konnte nicht erstellt werden","Impossibile generare l'immagine","\u753b\u50cf\u3092\u751f\u6210\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f","\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0441\u043e\u0437\u0434\u0430\u0442\u044c \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u0435","\u062a\u0639\u0630\u0651\u0631 \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0635\u0648\u0631\u0629"],t.w)
+B.aie=new A.B(B.l,["Erreur","Error","Error","\u9519\u8bef","Erro","Fehler","Errore","\u30a8\u30e9\u30fc","\u041e\u0448\u0438\u0431\u043a\u0430","\u062e\u0637\u0623"],t.w)
 B.ajD=new A.B(B.l,["Chargement de l'historique{yearLabel}\u2026 {pct} %","Loading history{yearLabel}\u2026 {pct}%","Cargando historial{yearLabel}\u2026 {pct} %","\u6b63\u5728\u52a0\u8f7d\u5386\u53f2\u8bb0\u5f55{yearLabel}\u2026 {pct}%","Carregando hist\xf3rico{yearLabel}\u2026 {pct}%","Verlauf{yearLabel} wird geladen\u2026 {pct} %","Caricamento cronologia{yearLabel}\u2026 {pct}%","\u5c65\u6b74{yearLabel}\u3092\u8aad\u307f\u8fbc\u307f\u4e2d\u2026 {pct}%","\u0417\u0430\u0433\u0440\u0443\u0437\u043a\u0430 \u0438\u0441\u0442\u043e\u0440\u0438\u0438{yearLabel}\u2026 {pct}%","\u062c\u0627\u0631\u064d \u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0633\u062c\u0644{yearLabel}\u2026 {pct}%"],t.w)
 B.ajF=new A.B(B.l,["Les graphiques seront plus pr\xe9cis une fois charg\xe9.","Charts will be more accurate once loaded.","Los gr\xe1ficos ser\xe1n m\xe1s precisos una vez cargado.","\u52a0\u8f7d\u5b8c\u6210\u540e\u56fe\u8868\u4f1a\u66f4\u51c6\u786e\u3002","Os gr\xe1ficos ficar\xe3o mais precisos depois de carregado.","Die Diagramme werden nach dem Laden genauer.","I grafici saranno pi\xf9 precisi dopo il caricamento.","\u8aad\u307f\u8fbc\u307f\u5f8c\u3001\u30b0\u30e9\u30d5\u306f\u3088\u308a\u6b63\u78ba\u306b\u306a\u308a\u307e\u3059\u3002","\u041f\u043e\u0441\u043b\u0435 \u0437\u0430\u0433\u0440\u0443\u0437\u043a\u0438 \u0433\u0440\u0430\u0444\u0438\u043a\u0438 \u0441\u0442\u0430\u043d\u0443\u0442 \u0442\u043e\u0447\u043d\u0435\u0435.","\u0633\u062a\u0643\u0648\u0646 \u0627\u0644\u0631\u0633\u0648\u0645 \u0623\u062f\u0642 \u0628\u0639\u062f \u0627\u0643\u062a\u0645\u0627\u0644 \u0627\u0644\u062a\u062d\u0645\u064a\u0644."],t.w)
-B.ahK=new A.B(B.l,["Chargez l'historique complet pour acc\xe9der \xe0 toutes les ann\xe9es.","Load the full history to access all years.","Carga el historial completo para acceder a todos los a\xf1os.","\u52a0\u8f7d\u5b8c\u6574\u5386\u53f2\u8bb0\u5f55\u4ee5\u67e5\u770b\u6240\u6709\u5e74\u4efd\u3002","Carregue o hist\xf3rico completo para acessar todos os anos.","Lade den kompletten Verlauf, um alle Jahre zu sehen.","Carica la cronologia completa per accedere a tutti gli anni.","\u5168\u671f\u9593\u3092\u898b\u308b\u306b\u306f\u5b8c\u5168\u306a\u5c65\u6b74\u3092\u8aad\u307f\u8fbc\u3093\u3067\u304f\u3060\u3055\u3044\u3002","\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u043f\u043e\u043b\u043d\u0443\u044e \u0438\u0441\u0442\u043e\u0440\u0438\u044e, \u0447\u0442\u043e\u0431\u044b \u0443\u0432\u0438\u0434\u0435\u0442\u044c \u0432\u0441\u0435 \u0433\u043e\u0434\u044b.","\u062d\u0645\u0651\u0644 \u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u0643\u0627\u0645\u0644 \u0644\u0644\u0648\u0635\u0648\u0644 \u0625\u0644\u0649 \u0643\u0644 \u0627\u0644\u0633\u0646\u0648\u0627\u062a."],t.w)
+B.ai7=new A.B(B.l,["Chargez l'historique complet pour acc\xe9der \xe0 toutes les ann\xe9es.","Load the full history to access all years.","Cargue el historial completo para acceder a todos los a\xf1os.","\u52a0\u8f7d\u5b8c\u6574\u5386\u53f2\u8bb0\u5f55\u4ee5\u67e5\u770b\u6240\u6709\u5e74\u4efd\u3002","Carregue o hist\xf3rico completo para acessar todos os anos.","Laden Sie den kompletten Verlauf, um alle Jahre zu sehen.","Carichi la cronologia completa per accedere a tutti gli anni.","\u5168\u671f\u9593\u3092\u898b\u308b\u306b\u306f\u5b8c\u5168\u306a\u5c65\u6b74\u3092\u8aad\u307f\u8fbc\u3093\u3067\u304f\u3060\u3055\u3044\u3002","\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u043f\u043e\u043b\u043d\u0443\u044e \u0438\u0441\u0442\u043e\u0440\u0438\u044e, \u0447\u0442\u043e\u0431\u044b \u0443\u0432\u0438\u0434\u0435\u0442\u044c \u0432\u0441\u0435 \u0433\u043e\u0434\u044b.","\u062d\u0645\u0651\u0644 \u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u0643\u0627\u0645\u0644 \u0644\u0644\u0648\u0635\u0648\u0644 \u0625\u0644\u0649 \u0643\u0644 \u0627\u0644\u0633\u0646\u0648\u0627\u062a."],t.w)
 B.aiy=new A.B(B.l,["Charger","Load","Cargar","\u52a0\u8f7d","Carregar","Laden","Carica","\u8aad\u307f\u8fbc\u3080","\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c","\u062a\u062d\u0645\u064a\u0644"],t.w)
-B.agm=new A.B(B.l,["Bas\xe9 sur {v_hourlyCou} scrobbles (toutes les ann\xe9es)","Based on {v_hourlyCou} scrobbles (all years)","Basado en {v_hourlyCou} scrobbles (todos los a\xf1os)","\u57fa\u4e8e {v_hourlyCou} \u6761\u542c\u6b4c\u8bb0\u5f55\uff08\u6240\u6709\u5e74\u4efd\uff09","Baseado em {v_hourlyCou} scrobbles (todos os anos)","Basierend auf {v_hourlyCou} Scrobbles (alle Jahre)","Basato su {v_hourlyCou} scrobble (tutti gli anni)","{v_hourlyCou} \u4ef6\u306e\u30b9\u30af\u30ed\u30d6\u30eb\u306b\u57fa\u3065\u304f\uff08\u5168\u671f\u9593\uff09","\u041d\u0430 \u043e\u0441\u043d\u043e\u0432\u0435 {v_hourlyCou} \u0441\u043a\u0440\u043e\u0431\u0431\u043b\u043e\u0432 (\u0432\u0441\u0435 \u0433\u043e\u0434\u044b)","\u0627\u0633\u062a\u0646\u0627\u062f\u064b\u0627 \u0625\u0644\u0649 {v_hourlyCou} \u0633\u062c\u0644 \u0627\u0633\u062a\u0645\u0627\u0639 (\u0643\u0644 \u0627\u0644\u0633\u0646\u0648\u0627\u062a)"],t.w)
-B.aim=new A.B(B.l,["Toutes les ann\xe9es disponibles","All available years","Todos los a\xf1os disponibles","\u6240\u6709\u53ef\u7528\u5e74\u4efd","Todos os anos dispon\xedveis","Alle verf\xfcgbaren Jahre","Tutti gli anni disponibili","\u5229\u7528\u53ef\u80fd\u306a\u5168\u671f\u9593","\u0412\u0441\u0435 \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u044b\u0435 \u0433\u043e\u0434\u044b","\u0643\u0644 \u0627\u0644\u0633\u0646\u0648\u0627\u062a \u0627\u0644\u0645\u062a\u0627\u062d\u0629"],t.w)
+B.agp=new A.B(B.l,["Bas\xe9 sur {v_hourlyCou} scrobbles (toutes les ann\xe9es)","Based on {v_hourlyCou} scrobbles (all years)","Basado en {v_hourlyCou} scrobbles (todos los a\xf1os)","\u57fa\u4e8e {v_hourlyCou} \u6761\u542c\u6b4c\u8bb0\u5f55\uff08\u6240\u6709\u5e74\u4efd\uff09","Baseado em {v_hourlyCou} scrobbles (todos os anos)","Basierend auf {v_hourlyCou} Scrobbles (alle Jahre)","Basato su {v_hourlyCou} scrobble (tutti gli anni)","{v_hourlyCou} \u4ef6\u306e\u30b9\u30af\u30ed\u30d6\u30eb\u306b\u57fa\u3065\u304f\uff08\u5168\u671f\u9593\uff09","\u041d\u0430 \u043e\u0441\u043d\u043e\u0432\u0435 {v_hourlyCou} \u0441\u043a\u0440\u043e\u0431\u0431\u043b\u043e\u0432 (\u0432\u0441\u0435 \u0433\u043e\u0434\u044b)","\u0627\u0633\u062a\u0646\u0627\u062f\u064b\u0627 \u0625\u0644\u0649 {v_hourlyCou} \u0633\u062c\u0644 \u0627\u0633\u062a\u0645\u0627\u0639 (\u0643\u0644 \u0627\u0644\u0633\u0646\u0648\u0627\u062a)"],t.w)
+B.ain=new A.B(B.l,["Toutes les ann\xe9es disponibles","All available years","Todos los a\xf1os disponibles","\u6240\u6709\u53ef\u7528\u5e74\u4efd","Todos os anos dispon\xedveis","Alle verf\xfcgbaren Jahre","Tutti gli anni disponibili","\u5229\u7528\u53ef\u80fd\u306a\u5168\u671f\u9593","\u0412\u0441\u0435 \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u044b\u0435 \u0433\u043e\u0434\u044b","\u0643\u0644 \u0627\u0644\u0633\u0646\u0648\u0627\u062a \u0627\u0644\u0645\u062a\u0627\u062d\u0629"],t.w)
 B.aiq=new A.B(B.l,["Bas\xe9 sur {v_hourlyCou} scrobbles de {v_selectedY}","Based on {v_hourlyCou} scrobbles from {v_selectedY}","Basado en {v_hourlyCou} scrobbles de {v_selectedY}","\u57fa\u4e8e {v_selectedY} \u5e74\u7684 {v_hourlyCou} \u6761\u542c\u6b4c\u8bb0\u5f55","Baseado em {v_hourlyCou} scrobbles de {v_selectedY}","Basierend auf {v_hourlyCou} Scrobbles aus {v_selectedY}","Basato su {v_hourlyCou} scrobble del {v_selectedY}","{v_selectedY}\u5e74\u306e {v_hourlyCou} \u4ef6\u306e\u30b9\u30af\u30ed\u30d6\u30eb\u306b\u57fa\u3065\u304f","\u041d\u0430 \u043e\u0441\u043d\u043e\u0432\u0435 {v_hourlyCou} \u0441\u043a\u0440\u043e\u0431\u0431\u043b\u043e\u0432 \u0437\u0430 {v_selectedY}","\u0627\u0633\u062a\u0646\u0627\u062f\u064b\u0627 \u0625\u0644\u0649 {v_hourlyCou} \u0633\u062c\u0644 \u0627\u0633\u062a\u0645\u0627\u0639 \u0645\u0646 {v_selectedY}"],t.w)
-B.agS=new A.B(B.l,["Bas\xe9 sur {v_hourlyCou} scrobbles r\xe9cents","Based on {v_hourlyCou} recent scrobbles","Basado en {v_hourlyCou} scrobbles recientes","\u57fa\u4e8e\u6700\u8fd1 {v_hourlyCou} \u6761\u542c\u6b4c\u8bb0\u5f55","Baseado em {v_hourlyCou} scrobbles recentes","Basierend auf {v_hourlyCou} letzten Scrobbles","Basato su {v_hourlyCou} scrobble recenti","\u6700\u8fd1\u306e {v_hourlyCou} \u4ef6\u306e\u30b9\u30af\u30ed\u30d6\u30eb\u306b\u57fa\u3065\u304f","\u041d\u0430 \u043e\u0441\u043d\u043e\u0432\u0435 {v_hourlyCou} \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0445 \u0441\u043a\u0440\u043e\u0431\u0431\u043b\u043e\u0432","\u0627\u0633\u062a\u0646\u0627\u062f\u064b\u0627 \u0625\u0644\u0649 \u0622\u062e\u0631 {v_hourlyCou} \u0633\u062c\u0644 \u0627\u0633\u062a\u0645\u0627\u0639"],t.w)
-B.ag6=new A.B(B.l,["Analyse vos ~200 derniers scrobbles","Analysing your last ~200 scrobbles","Analizando tus \xfaltimos ~200 scrobbles","\u6b63\u5728\u5206\u6790\u4f60\u6700\u8fd1\u7ea6 200 \u6761\u542c\u6b4c\u8bb0\u5f55","Analisando seus \xfaltimos ~200 scrobbles","Analysiere deine letzten ~200 Scrobbles","Analisi degli ultimi ~200 scrobble","\u76f4\u8fd1\u7d04200\u4ef6\u306e\u30b9\u30af\u30ed\u30d6\u30eb\u3092\u5206\u6790\u4e2d","\u0410\u043d\u0430\u043b\u0438\u0437 \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0445 ~200 \u0441\u043a\u0440\u043e\u0431\u0431\u043b\u043e\u0432","\u062a\u062d\u0644\u064a\u0644 \u0622\u062e\u0631 ~200 \u0633\u062c\u0644 \u0627\u0633\u062a\u0645\u0627\u0639"],t.w)
-B.ai2=new A.B(B.l,["All-time (donn\xe9es {v_selectedY} en cours)","All-time ({v_selectedY} loading)","Todo el tiempo (datos de {v_selectedY} cargando)","\u5168\u90e8\u65f6\u95f4\uff08{v_selectedY} \u52a0\u8f7d\u4e2d\uff09","Todo o per\xedodo (dados de {v_selectedY} carregando)","Gesamt (Daten f\xfcr {v_selectedY} werden geladen)","Sempre (dati {v_selectedY} in caricamento)","\u5168\u671f\u9593\uff08{v_selectedY} \u8aad\u307f\u8fbc\u307f\u4e2d\uff09","\u0417\u0430 \u0432\u0441\u0451 \u0432\u0440\u0435\u043c\u044f (\u0434\u0430\u043d\u043d\u044b\u0435 {v_selectedY} \u0437\u0430\u0433\u0440\u0443\u0436\u0430\u044e\u0442\u0441\u044f)","\u0643\u0644 \u0627\u0644\u0623\u0648\u0642\u0627\u062a (\u0628\u064a\u0627\u0646\u0627\u062a {v_selectedY} \u0642\u064a\u062f \u0627\u0644\u062a\u062d\u0645\u064a\u0644)"],t.w)
-B.ags=new A.B(B.l,["All-time","All-time","Todo el tiempo","\u5168\u90e8\u65f6\u95f4","Todo o per\xedodo","Gesamt","Sempre","\u5168\u671f\u9593","\u0417\u0430 \u0432\u0441\u0451 \u0432\u0440\u0435\u043c\u044f","\u0643\u0644 \u0627\u0644\u0623\u0648\u0642\u0627\u062a"],t.w)
-B.aiW=new A.B(B.l,["Exporter un graphique","Export a chart","Exportar un gr\xe1fico","\u5bfc\u51fa\u56fe\u8868","Exportar um gr\xe1fico","Diagramm exportieren","Esporta un grafico","\u30b0\u30e9\u30d5\u3092\u30a8\u30af\u30b9\u30dd\u30fc\u30c8","\u042d\u043a\u0441\u043f\u043e\u0440\u0442 \u0433\u0440\u0430\u0444\u0438\u043a\u0430","\u062a\u0635\u062f\u064a\u0631 \u0631\u0633\u0645 \u0628\u064a\u0627\u0646\u064a"],t.w)
-B.agq=new A.B(B.l,["Progression des scrobbles","Scrobble progression","Progresi\xf3n de scrobbles","Scrobble \u8fdb\u5ea6","Progress\xe3o de scrobbles","Verlauf der Scrobbles","Andamento degli scrobble","\u30b9\u30af\u30ed\u30d6\u30eb\u306e\u63a8\u79fb","\u0414\u0438\u043d\u0430\u043c\u0438\u043a\u0430 \u0441\u043a\u0440\u043e\u0431\u0431\u043b\u043e\u0432","\u062a\u0637\u0648\u0631 \u0627\u0644\u0633\u062c\u0644\u0627\u062a"],t.w)
-B.aig=new A.B(B.l,["Vos genres musicaux","Your musical genres","Tus g\xe9neros musicales","\u4f60\u7684\u97f3\u4e50\u98ce\u683c","Seus g\xeaneros musicais","Deine Musikgenres","I tuoi generi musicali","\u3042\u306a\u305f\u306e\u97f3\u697d\u30b8\u30e3\u30f3\u30eb","\u0412\u0430\u0448\u0438 \u043c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u044b\u0435 \u0436\u0430\u043d\u0440\u044b","\u0623\u0646\u0648\u0627\u0639\u0643 \u0627\u0644\u0645\u0648\u0633\u064a\u0642\u064a\u0629"],t.w)
-B.ajH=new A.B(B.l,["Bas\xe9 sur vos top artistes (all-time)","Based on your top artists (all-time)","Basado en tus artistas favoritos (todo el tiempo)","\u57fa\u4e8e\u4f60\u7684\u5e38\u542c\u827a\u672f\u5bb6\uff08\u5168\u90e8\u65f6\u95f4\uff09","Baseado nos seus artistas favoritos (todo o per\xedodo)","Basierend auf deinen Top-K\xfcnstlern (gesamt)","Basato sui tuoi artisti preferiti (sempre)","\u3088\u304f\u8074\u304f\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u306b\u57fa\u3065\u304f\uff08\u5168\u671f\u9593\uff09","\u041d\u0430 \u043e\u0441\u043d\u043e\u0432\u0435 \u0432\u0430\u0448\u0438\u0445 \u0442\u043e\u043f-\u0430\u0440\u0442\u0438\u0441\u0442\u043e\u0432 (\u0437\u0430 \u0432\u0441\u0451 \u0432\u0440\u0435\u043c\u044f)","\u0627\u0633\u062a\u0646\u0627\u062f\u064b\u0627 \u0625\u0644\u0649 \u0623\u0641\u0636\u0644 \u0641\u0646\u0627\u0646\u064a\u0643 (\u0643\u0644 \u0627\u0644\u0623\u0648\u0642\u0627\u062a)"],t.w)
+B.agW=new A.B(B.l,["Bas\xe9 sur {v_hourlyCou} scrobbles r\xe9cents","Based on {v_hourlyCou} recent scrobbles","Basado en {v_hourlyCou} scrobbles recientes","\u57fa\u4e8e\u6700\u8fd1 {v_hourlyCou} \u6761\u542c\u6b4c\u8bb0\u5f55","Baseado em {v_hourlyCou} scrobbles recentes","Basierend auf {v_hourlyCou} letzten Scrobbles","Basato su {v_hourlyCou} scrobble recenti","\u6700\u8fd1\u306e {v_hourlyCou} \u4ef6\u306e\u30b9\u30af\u30ed\u30d6\u30eb\u306b\u57fa\u3065\u304f","\u041d\u0430 \u043e\u0441\u043d\u043e\u0432\u0435 {v_hourlyCou} \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0445 \u0441\u043a\u0440\u043e\u0431\u0431\u043b\u043e\u0432","\u0627\u0633\u062a\u0646\u0627\u062f\u064b\u0627 \u0625\u0644\u0649 \u0622\u062e\u0631 {v_hourlyCou} \u0633\u062c\u0644 \u0627\u0633\u062a\u0645\u0627\u0639"],t.w)
+B.agV=new A.B(B.l,["Analyse vos ~200 derniers scrobbles","Analysing your last ~200 scrobbles","Analizando sus \xfaltimos ~200 scrobbles","\u6b63\u5728\u5206\u6790\u60a8\u6700\u8fd1\u7ea6 200 \u6761\u542c\u6b4c\u8bb0\u5f55","Analisando seus \xfaltimos ~200 scrobbles","Analysiert Ihre letzten ~200 Scrobbles","Analisi degli ultimi ~200 scrobble","\u76f4\u8fd1\u7d04200\u4ef6\u306e\u30b9\u30af\u30ed\u30d6\u30eb\u3092\u5206\u6790\u4e2d","\u0410\u043d\u0430\u043b\u0438\u0437 \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0445 ~200 \u0441\u043a\u0440\u043e\u0431\u0431\u043b\u043e\u0432","\u062a\u062d\u0644\u064a\u0644 \u0622\u062e\u0631 ~200 \u0633\u062c\u0644 \u0627\u0633\u062a\u0645\u0627\u0639"],t.w)
+B.ai5=new A.B(B.l,["All-time (donn\xe9es {v_selectedY} en cours)","All-time ({v_selectedY} loading)","Todo el tiempo (datos de {v_selectedY} cargando)","\u5168\u90e8\u65f6\u95f4\uff08{v_selectedY} \u52a0\u8f7d\u4e2d\uff09","Todo o per\xedodo (dados de {v_selectedY} carregando)","Gesamt (Daten f\xfcr {v_selectedY} werden geladen)","Sempre (dati {v_selectedY} in caricamento)","\u5168\u671f\u9593\uff08{v_selectedY} \u8aad\u307f\u8fbc\u307f\u4e2d\uff09","\u0417\u0430 \u0432\u0441\u0451 \u0432\u0440\u0435\u043c\u044f (\u0434\u0430\u043d\u043d\u044b\u0435 {v_selectedY} \u0437\u0430\u0433\u0440\u0443\u0436\u0430\u044e\u0442\u0441\u044f)","\u0643\u0644 \u0627\u0644\u0623\u0648\u0642\u0627\u062a (\u0628\u064a\u0627\u0646\u0627\u062a {v_selectedY} \u0642\u064a\u062f \u0627\u0644\u062a\u062d\u0645\u064a\u0644)"],t.w)
+B.agw=new A.B(B.l,["All-time","All-time","Todo el tiempo","\u5168\u90e8\u65f6\u95f4","Todo o per\xedodo","Gesamt","Sempre","\u5168\u671f\u9593","\u0417\u0430 \u0432\u0441\u0451 \u0432\u0440\u0435\u043c\u044f","\u0643\u0644 \u0627\u0644\u0623\u0648\u0642\u0627\u062a"],t.w)
+B.aiZ=new A.B(B.l,["Exporter un graphique","Export a chart","Exportar un gr\xe1fico","\u5bfc\u51fa\u56fe\u8868","Exportar um gr\xe1fico","Diagramm exportieren","Esporta un grafico","\u30b0\u30e9\u30d5\u3092\u30a8\u30af\u30b9\u30dd\u30fc\u30c8","\u042d\u043a\u0441\u043f\u043e\u0440\u0442 \u0433\u0440\u0430\u0444\u0438\u043a\u0430","\u062a\u0635\u062f\u064a\u0631 \u0631\u0633\u0645 \u0628\u064a\u0627\u0646\u064a"],t.w)
+B.agt=new A.B(B.l,["Progression des scrobbles","Scrobble progression","Progresi\xf3n de scrobbles","Scrobble \u8fdb\u5ea6","Progress\xe3o de scrobbles","Verlauf der Scrobbles","Andamento degli scrobble","\u30b9\u30af\u30ed\u30d6\u30eb\u306e\u63a8\u79fb","\u0414\u0438\u043d\u0430\u043c\u0438\u043a\u0430 \u0441\u043a\u0440\u043e\u0431\u0431\u043b\u043e\u0432","\u062a\u0637\u0648\u0631 \u0627\u0644\u0633\u062c\u0644\u0627\u062a"],t.w)
+B.aj9=new A.B(B.l,["Vos genres musicaux","Your musical genres","Sus g\xe9neros musicales","\u60a8\u7684\u97f3\u4e50\u98ce\u683c","Seus g\xeaneros musicais","Ihre Musikgenres","I suoi generi musicali","\u3042\u306a\u305f\u306e\u97f3\u697d\u30b8\u30e3\u30f3\u30eb","\u0412\u0430\u0448\u0438 \u043c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u044b\u0435 \u0436\u0430\u043d\u0440\u044b","\u0623\u0646\u0648\u0627\u0639\u0643 \u0627\u0644\u0645\u0648\u0633\u064a\u0642\u064a\u0629"],t.w)
+B.aiL=new A.B(B.l,["Bas\xe9 sur vos top artistes (all-time)","Based on your top artists (all-time)","Basado en sus artistas favoritos (todo el tiempo)","\u57fa\u4e8e\u60a8\u7684\u5e38\u542c\u827a\u672f\u5bb6\uff08\u5168\u90e8\u65f6\u95f4\uff09","Baseado nos seus artistas favoritos (todo o per\xedodo)","Basierend auf Ihren Top-K\xfcnstlern (gesamt)","Basato sui suoi artisti preferiti (sempre)","\u3088\u304f\u8074\u304f\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u306b\u57fa\u3065\u304f\uff08\u5168\u671f\u9593\uff09","\u041d\u0430 \u043e\u0441\u043d\u043e\u0432\u0435 \u0432\u0430\u0448\u0438\u0445 \u0442\u043e\u043f-\u0430\u0440\u0442\u0438\u0441\u0442\u043e\u0432 (\u0437\u0430 \u0432\u0441\u0451 \u0432\u0440\u0435\u043c\u044f)","\u0627\u0633\u062a\u0646\u0627\u062f\u064b\u0627 \u0625\u0644\u0649 \u0623\u0641\u0636\u0644 \u0641\u0646\u0627\u0646\u064a\u0643 (\u0643\u0644 \u0627\u0644\u0623\u0648\u0642\u0627\u062a)"],t.w)
 B.Gz=new A.B(B.l,["Habitudes d'\xe9coute","Listening habits","H\xe1bitos de escucha","\u6536\u542c\u4e60\u60ef","H\xe1bitos de escuta","H\xf6rgewohnheiten","Abitudini di ascolto","\u30ea\u30b9\u30cb\u30f3\u30b0\u7fd2\u6163","\u041f\u0440\u0438\u0432\u044b\u0447\u043a\u0438 \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u044f","\u0639\u0627\u062f\u0627\u062a \u0627\u0644\u0627\u0633\u062a\u0645\u0627\u0639"],t.w)
-B.aiR=new A.B(B.l,["R\xe9partition par album","Album distribution","Distribuci\xf3n por \xe1lbum","\u4e13\u8f91\u5206\u5e03","Distribui\xe7\xe3o por \xe1lbum","Verteilung nach Album","Distribuzione per album","\u30a2\u30eb\u30d0\u30e0\u5225\u306e\u5185\u8a33","\u0420\u0430\u0441\u043f\u0440\u0435\u0434\u0435\u043b\u0435\u043d\u0438\u0435 \u043f\u043e \u0430\u043b\u044c\u0431\u043e\u043c\u0430\u043c","\u0627\u0644\u062a\u0648\u0632\u064a\u0639 \u062d\u0633\u0628 \u0627\u0644\u0623\u0644\u0628\u0648\u0645"],t.w)
-B.ahY=new A.B(B.l,["Calendrier musical","Listening calendar","Calendario de escucha","\u6536\u542c\u65e5\u5386","Calend\xe1rio de escuta","H\xf6rkalender","Calendario musicale","\u30ea\u30b9\u30cb\u30f3\u30b0\u30ab\u30ec\u30f3\u30c0\u30fc","\u041c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u044b\u0439 \u043a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c","\u062a\u0642\u0648\u064a\u0645 \u0627\u0644\u0627\u0633\u062a\u0645\u0627\u0639"],t.w)
-B.agT=new A.B(B.l,["Activit\xe9 journali\xe8re \u2014 {first} \xe0 {last}","Daily activity \u2014 {first} to {last}","Actividad diaria \u2014 {first} a {last}","\u6bcf\u65e5\u6d3b\u52a8 \u2014 {first} \u81f3 {last}","Atividade di\xe1ria \u2014 {first} a {last}","T\xe4gliche Aktivit\xe4t \u2014 {first} bis {last}","Attivit\xe0 giornaliera \u2014 da {first} a {last}","\u65e5\u5225\u30a2\u30af\u30c6\u30a3\u30d3\u30c6\u30a3 \u2014 {first}\u301c{last}","\u0410\u043a\u0442\u0438\u0432\u043d\u043e\u0441\u0442\u044c \u043f\u043e \u0434\u043d\u044f\u043c \u2014 {first} \u2013 {last}","\u0627\u0644\u0646\u0634\u0627\u0637 \u0627\u0644\u064a\u0648\u0645\u064a \u2014 \u0645\u0646 {first} \u0625\u0644\u0649 {last}"],t.w)
+B.aiT=new A.B(B.l,["R\xe9partition par album","Album distribution","Distribuci\xf3n por \xe1lbum","\u4e13\u8f91\u5206\u5e03","Distribui\xe7\xe3o por \xe1lbum","Verteilung nach Album","Distribuzione per album","\u30a2\u30eb\u30d0\u30e0\u5225\u306e\u5185\u8a33","\u0420\u0430\u0441\u043f\u0440\u0435\u0434\u0435\u043b\u0435\u043d\u0438\u0435 \u043f\u043e \u0430\u043b\u044c\u0431\u043e\u043c\u0430\u043c","\u0627\u0644\u062a\u0648\u0632\u064a\u0639 \u062d\u0633\u0628 \u0627\u0644\u0623\u0644\u0628\u0648\u0645"],t.w)
+B.ai0=new A.B(B.l,["Calendrier musical","Listening calendar","Calendario de escucha","\u6536\u542c\u65e5\u5386","Calend\xe1rio de escuta","H\xf6rkalender","Calendario musicale","\u30ea\u30b9\u30cb\u30f3\u30b0\u30ab\u30ec\u30f3\u30c0\u30fc","\u041c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u044b\u0439 \u043a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c","\u062a\u0642\u0648\u064a\u0645 \u0627\u0644\u0627\u0633\u062a\u0645\u0627\u0639"],t.w)
+B.agX=new A.B(B.l,["Activit\xe9 journali\xe8re \u2014 {first} \xe0 {last}","Daily activity \u2014 {first} to {last}","Actividad diaria \u2014 {first} a {last}","\u6bcf\u65e5\u6d3b\u52a8 \u2014 {first} \u81f3 {last}","Atividade di\xe1ria \u2014 {first} a {last}","T\xe4gliche Aktivit\xe4t \u2014 {first} bis {last}","Attivit\xe0 giornaliera \u2014 da {first} a {last}","\u65e5\u5225\u30a2\u30af\u30c6\u30a3\u30d3\u30c6\u30a3 \u2014 {first}\u301c{last}","\u0410\u043a\u0442\u0438\u0432\u043d\u043e\u0441\u0442\u044c \u043f\u043e \u0434\u043d\u044f\u043c \u2014 {first} \u2013 {last}","\u0627\u0644\u0646\u0634\u0627\u0637 \u0627\u0644\u064a\u0648\u0645\u064a \u2014 \u0645\u0646 {first} \u0625\u0644\u0649 {last}"],t.w)
 B.afQ=new A.B(B.l,["Activit\xe9 journali\xe8re \u2014 toutes les ann\xe9es","Daily activity \u2014 all years","Actividad diaria \u2014 todos los a\xf1os","\u6bcf\u65e5\u6d3b\u52a8 \u2014 \u6240\u6709\u5e74\u4efd","Atividade di\xe1ria \u2014 todos os anos","T\xe4gliche Aktivit\xe4t \u2014 alle Jahre","Attivit\xe0 giornaliera \u2014 tutti gli anni","\u65e5\u5225\u30a2\u30af\u30c6\u30a3\u30d3\u30c6\u30a3 \u2014 \u5168\u671f\u9593","\u0410\u043a\u0442\u0438\u0432\u043d\u043e\u0441\u0442\u044c \u043f\u043e \u0434\u043d\u044f\u043c \u2014 \u0432\u0441\u0435 \u0433\u043e\u0434\u044b","\u0627\u0644\u0646\u0634\u0627\u0637 \u0627\u0644\u064a\u0648\u0645\u064a \u2014 \u0643\u0644 \u0627\u0644\u0633\u0646\u0648\u0627\u062a"],t.w)
 B.afx=new A.B(B.l,["Activit\xe9 journali\xe8re \u2014 {v_selectedY}","Daily activity \u2014 {v_selectedY}","Actividad diaria \u2014 {v_selectedY}","\u6bcf\u65e5\u6d3b\u52a8 \u2014 {v_selectedY}","Atividade di\xe1ria \u2014 {v_selectedY}","T\xe4gliche Aktivit\xe4t \u2014 {v_selectedY}","Attivit\xe0 giornaliera \u2014 {v_selectedY}","\u65e5\u5225\u30a2\u30af\u30c6\u30a3\u30d3\u30c6\u30a3 \u2014 {v_selectedY}","\u0410\u043a\u0442\u0438\u0432\u043d\u043e\u0441\u0442\u044c \u043f\u043e \u0434\u043d\u044f\u043c \u2014 {v_selectedY}","\u0627\u0644\u0646\u0634\u0627\u0637 \u0627\u0644\u064a\u0648\u0645\u064a \u2014 {v_selectedY}"],t.w)
-B.agb=new A.B(B.l,["Chargez l'historique pour voir {v_selectedY}","Load history to see {v_selectedY}","Carga el historial para ver {v_selectedY}","\u52a0\u8f7d\u5386\u53f2\u8bb0\u5f55\u4ee5\u67e5\u770b {v_selectedY}","Carregue o hist\xf3rico para ver {v_selectedY}","Lade den Verlauf, um {v_selectedY} zu sehen","Carica la cronologia per vedere il {v_selectedY}","{v_selectedY} \u3092\u898b\u308b\u306b\u306f\u5c65\u6b74\u3092\u8aad\u307f\u8fbc\u3093\u3067\u304f\u3060\u3055\u3044","\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u0438\u0441\u0442\u043e\u0440\u0438\u044e, \u0447\u0442\u043e\u0431\u044b \u0443\u0432\u0438\u0434\u0435\u0442\u044c {v_selectedY}","\u062d\u0645\u0651\u0644 \u0627\u0644\u0633\u062c\u0644 \u0644\u0639\u0631\u0636 {v_selectedY}"],t.w)
-B.ahh=new A.B(B.l,["Activit\xe9 journali\xe8re \u2014 12 mois","Daily activity \u2014 last 12 months","Actividad diaria \u2014 \xfaltimos 12 meses","\u6bcf\u65e5\u6d3b\u52a8 \u2014 \u6700\u8fd1 12 \u4e2a\u6708","Atividade di\xe1ria \u2014 \xfaltimos 12 meses","T\xe4gliche Aktivit\xe4t \u2014 letzte 12 Monate","Attivit\xe0 giornaliera \u2014 ultimi 12 mesi","\u65e5\u5225\u30a2\u30af\u30c6\u30a3\u30d3\u30c6\u30a3 \u2014 \u76f4\u8fd112\u304b\u6708","\u0410\u043a\u0442\u0438\u0432\u043d\u043e\u0441\u0442\u044c \u043f\u043e \u0434\u043d\u044f\u043c \u2014 \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435 12 \u043c\u0435\u0441\u044f\u0446\u0435\u0432","\u0627\u0644\u0646\u0634\u0627\u0637 \u0627\u0644\u064a\u0648\u0645\u064a \u2014 \u0622\u062e\u0631 12 \u0634\u0647\u0631\u064b\u0627"],t.w)
-B.ahF=new A.B(B.l,["toutes les ann\xe9es","all years","todos los a\xf1os","\u6240\u6709\u5e74\u4efd","todos os anos","alle Jahre","tutti gli anni","\u5168\u671f\u9593","\u0432\u0441\u0435 \u0433\u043e\u0434\u044b","\u0643\u0644 \u0627\u0644\u0633\u0646\u0648\u0627\u062a"],t.w)
+B.aiw=new A.B(B.l,["Chargez l'historique pour voir {v_selectedY}","Load history to see {v_selectedY}","Cargue el historial para ver {v_selectedY}","\u52a0\u8f7d\u5386\u53f2\u8bb0\u5f55\u4ee5\u67e5\u770b {v_selectedY}","Carregue o hist\xf3rico para ver {v_selectedY}","Laden Sie den Verlauf, um {v_selectedY} zu sehen","Carichi la cronologia per vedere il {v_selectedY}","{v_selectedY} \u3092\u898b\u308b\u306b\u306f\u5c65\u6b74\u3092\u8aad\u307f\u8fbc\u3093\u3067\u304f\u3060\u3055\u3044","\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u0438\u0441\u0442\u043e\u0440\u0438\u044e, \u0447\u0442\u043e\u0431\u044b \u0443\u0432\u0438\u0434\u0435\u0442\u044c {v_selectedY}","\u062d\u0645\u0651\u0644 \u0627\u0644\u0633\u062c\u0644 \u0644\u0639\u0631\u0636 {v_selectedY}"],t.w)
+B.ahl=new A.B(B.l,["Activit\xe9 journali\xe8re \u2014 12 mois","Daily activity \u2014 last 12 months","Actividad diaria \u2014 \xfaltimos 12 meses","\u6bcf\u65e5\u6d3b\u52a8 \u2014 \u6700\u8fd1 12 \u4e2a\u6708","Atividade di\xe1ria \u2014 \xfaltimos 12 meses","T\xe4gliche Aktivit\xe4t \u2014 letzte 12 Monate","Attivit\xe0 giornaliera \u2014 ultimi 12 mesi","\u65e5\u5225\u30a2\u30af\u30c6\u30a3\u30d3\u30c6\u30a3 \u2014 \u76f4\u8fd112\u304b\u6708","\u0410\u043a\u0442\u0438\u0432\u043d\u043e\u0441\u0442\u044c \u043f\u043e \u0434\u043d\u044f\u043c \u2014 \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435 12 \u043c\u0435\u0441\u044f\u0446\u0435\u0432","\u0627\u0644\u0646\u0634\u0627\u0637 \u0627\u0644\u064a\u0648\u0645\u064a \u2014 \u0622\u062e\u0631 12 \u0634\u0647\u0631\u064b\u0627"],t.w)
+B.ahL=new A.B(B.l,["toutes les ann\xe9es","all years","todos los a\xf1os","\u6240\u6709\u5e74\u4efd","todos os anos","alle Jahre","tutti gli anni","\u5168\u671f\u9593","\u0432\u0441\u0435 \u0433\u043e\u0434\u044b","\u0643\u0644 \u0627\u0644\u0633\u0646\u0648\u0627\u062a"],t.w)
 B.Gy=new A.B(B.l,["S\xe9ries d'\xe9coute","Listening streaks","Rachas de escucha","\u8fde\u7eed\u6536\u542c","Sequ\xeancias de escuta","H\xf6rserien","Serie di ascolto","\u9023\u7d9a\u30ea\u30b9\u30cb\u30f3\u30b0","\u0421\u0435\u0440\u0438\u0438 \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u0439","\u0633\u0644\u0627\u0633\u0644 \u0627\u0644\u0627\u0633\u062a\u0645\u0627\u0639"],t.w)
-B.agf=new A.B(B.l,["Total","Total","Total","\u603b\u8ba1","Total","Gesamt","Totale","\u5408\u8a08","\u0412\u0441\u0435\u0433\u043e","\u0627\u0644\u0645\u062c\u0645\u0648\u0639"],t.w)
+B.agi=new A.B(B.l,["Total","Total","Total","\u603b\u8ba1","Total","Gesamt","Totale","\u5408\u8a08","\u0412\u0441\u0435\u0433\u043e","\u0627\u0644\u0645\u062c\u0645\u0648\u0639"],t.w)
 B.afy=new A.B(B.l,["Moy./mois","Avg/mo","Prom./mes","\u6708\u5747","M\xe9dia/m\xeas","\xd8/Monat","Media/mese","\u6708\u5e73\u5747","\u0412 \u0441\u0440\u0435\u0434\u043d\u0435\u043c/\u043c\u0435\u0441.","\u0627\u0644\u0645\u062a\u0648\u0633\u0637/\u0634\u0647\u0631"],t.w)
-B.aid=new A.B(B.l,["Meilleur mois","Best month","Mejor mes","\u6700\u4f73\u6708\u4efd","Melhor m\xeas","Bester Monat","Mese migliore","\u30d9\u30b9\u30c8\u306e\u6708","\u041b\u0443\u0447\u0448\u0438\u0439 \u043c\u0435\u0441\u044f\u0446","\u0623\u0641\u0636\u0644 \u0634\u0647\u0631"],t.w)
-B.ag2=new A.B(B.l,["R\xe9partition horaire","Hourly distribution","Distribuci\xf3n horaria","\u6bcf\u5c0f\u65f6\u5206\u5e03","Distribui\xe7\xe3o por hora","Verteilung nach Stunde","Distribuzione oraria","\u6642\u9593\u5e2f\u5225\u306e\u5206\u5e03","\u0420\u0430\u0441\u043f\u0440\u0435\u0434\u0435\u043b\u0435\u043d\u0438\u0435 \u043f\u043e \u0447\u0430\u0441\u0430\u043c","\u0627\u0644\u062a\u0648\u0632\u064a\u0639 \u0628\u0627\u0644\u0633\u0627\u0639\u0629"],t.w)
-B.agN=new A.B(B.l,["Activit\xe9 par jour de la semaine","Activity by day of week","Actividad por d\xeda de la semana","\u6bcf\u5468\u6d3b\u8dc3\u5ea6","Atividade por dia da semana","Aktivit\xe4t nach Wochentag","Attivit\xe0 per giorno della settimana","\u66dc\u65e5\u5225\u30a2\u30af\u30c6\u30a3\u30d3\u30c6\u30a3","\u0410\u043a\u0442\u0438\u0432\u043d\u043e\u0441\u0442\u044c \u043f\u043e \u0434\u043d\u044f\u043c \u043d\u0435\u0434\u0435\u043b\u0438","\u0627\u0644\u0646\u0634\u0627\u0637 \u062d\u0633\u0628 \u064a\u0648\u0645 \u0627\u0644\u0623\u0633\u0628\u0648\u0639"],t.w)
-B.ajx=new A.B(B.l,["S\xe9rie actuelle","Current streak","Racha actual","\u5f53\u524d\u8fde\u7eed\u5929\u6570","Sequ\xeancia atual","Aktuelle Serie","Serie attuale","\u73fe\u5728\u306e\u9023\u7d9a\u8a18\u9332","\u0422\u0435\u043a\u0443\u0449\u0430\u044f \u0441\u0435\u0440\u0438\u044f","\u0627\u0644\u0633\u0644\u0633\u0644\u0629 \u0627\u0644\u062d\u0627\u0644\u064a\u0629"],t.w)
-B.agd=new A.B(B.l,["j","d","d","\u5929","d","T","g","\u65e5","\u0434","\u064a"],t.w)
-B.ahZ=new A.B(B.l,["Meilleure s\xe9rie","Best streak","Mejor racha","\u6700\u957f\u8fde\u7eed\u5929\u6570","Melhor sequ\xeancia","Beste Serie","Serie migliore","\u6700\u9577\u306e\u9023\u7d9a\u8a18\u9332","\u041b\u0443\u0447\u0448\u0430\u044f \u0441\u0435\u0440\u0438\u044f","\u0623\u0641\u0636\u0644 \u0633\u0644\u0633\u0644\u0629"],t.w)
+B.aig=new A.B(B.l,["Meilleur mois","Best month","Mejor mes","\u6700\u4f73\u6708\u4efd","Melhor m\xeas","Bester Monat","Mese migliore","\u30d9\u30b9\u30c8\u306e\u6708","\u041b\u0443\u0447\u0448\u0438\u0439 \u043c\u0435\u0441\u044f\u0446","\u0623\u0641\u0636\u0644 \u0634\u0647\u0631"],t.w)
+B.ag3=new A.B(B.l,["R\xe9partition horaire","Hourly distribution","Distribuci\xf3n horaria","\u6bcf\u5c0f\u65f6\u5206\u5e03","Distribui\xe7\xe3o por hora","Verteilung nach Stunde","Distribuzione oraria","\u6642\u9593\u5e2f\u5225\u306e\u5206\u5e03","\u0420\u0430\u0441\u043f\u0440\u0435\u0434\u0435\u043b\u0435\u043d\u0438\u0435 \u043f\u043e \u0447\u0430\u0441\u0430\u043c","\u0627\u0644\u062a\u0648\u0632\u064a\u0639 \u0628\u0627\u0644\u0633\u0627\u0639\u0629"],t.w)
+B.agR=new A.B(B.l,["Activit\xe9 par jour de la semaine","Activity by day of week","Actividad por d\xeda de la semana","\u6bcf\u5468\u6d3b\u8dc3\u5ea6","Atividade por dia da semana","Aktivit\xe4t nach Wochentag","Attivit\xe0 per giorno della settimana","\u66dc\u65e5\u5225\u30a2\u30af\u30c6\u30a3\u30d3\u30c6\u30a3","\u0410\u043a\u0442\u0438\u0432\u043d\u043e\u0441\u0442\u044c \u043f\u043e \u0434\u043d\u044f\u043c \u043d\u0435\u0434\u0435\u043b\u0438","\u0627\u0644\u0646\u0634\u0627\u0637 \u062d\u0633\u0628 \u064a\u0648\u0645 \u0627\u0644\u0623\u0633\u0628\u0648\u0639"],t.w)
+B.ajy=new A.B(B.l,["S\xe9rie actuelle","Current streak","Racha actual","\u5f53\u524d\u8fde\u7eed\u5929\u6570","Sequ\xeancia atual","Aktuelle Serie","Serie attuale","\u73fe\u5728\u306e\u9023\u7d9a\u8a18\u9332","\u0422\u0435\u043a\u0443\u0449\u0430\u044f \u0441\u0435\u0440\u0438\u044f","\u0627\u0644\u0633\u0644\u0633\u0644\u0629 \u0627\u0644\u062d\u0627\u0644\u064a\u0629"],t.w)
+B.agg=new A.B(B.l,["j","d","d","\u5929","d","T","g","\u65e5","\u0434","\u064a"],t.w)
+B.ai1=new A.B(B.l,["Meilleure s\xe9rie","Best streak","Mejor racha","\u6700\u957f\u8fde\u7eed\u5929\u6570","Melhor sequ\xeancia","Beste Serie","Serie migliore","\u6700\u9577\u306e\u9023\u7d9a\u8a18\u9332","\u041b\u0443\u0447\u0448\u0430\u044f \u0441\u0435\u0440\u0438\u044f","\u0623\u0641\u0636\u0644 \u0633\u0644\u0633\u0644\u0629"],t.w)
 B.ajj=new A.B(B.l,["Meilleure s\xe9rie depuis le {bestStart}","Best streak started on {bestStart}","Mejor racha desde el {bestStart}","\u6700\u4f73\u8fde\u7eed\u8bb0\u5f55\u59cb\u4e8e {bestStart}","Melhor sequ\xeancia desde {bestStart}","Beste Serie seit dem {bestStart}","Miglior serie dal {bestStart}","\u6700\u9577\u306e\u9023\u7d9a\u8a18\u9332\u306f {bestStart} \u304b\u3089","\u041b\u0443\u0447\u0448\u0430\u044f \u0441\u0435\u0440\u0438\u044f \u0441 {bestStart}","\u0623\u0641\u0636\u0644 \u0633\u0644\u0633\u0644\u0629 \u0645\u0646\u0630 {bestStart}"],t.w)
-B.ajz=new A.B(B.l,["Aucune donn\xe9e pour cette p\xe9riode","No data for this period","Sin datos para este per\xedodo","\u8be5\u65f6\u6bb5\u65e0\u6570\u636e","Sem dados para este per\xedodo","Keine Daten f\xfcr diesen Zeitraum","Nessun dato per questo periodo","\u3053\u306e\u671f\u9593\u306e\u30c7\u30fc\u30bf\u306f\u3042\u308a\u307e\u305b\u3093","\u041d\u0435\u0442 \u0434\u0430\u043d\u043d\u044b\u0445 \u0437\u0430 \u044d\u0442\u043e\u0442 \u043f\u0435\u0440\u0438\u043e\u0434","\u0644\u0627 \u062a\u0648\u062c\u062f \u0628\u064a\u0627\u0646\u0627\u062a \u0644\u0647\u0630\u0647 \u0627\u0644\u0641\u062a\u0631\u0629"],t.w)
-B.ajh=new A.B(B.l,["Chargez l'historique pour afficher {what}","Load history to display {what}","Carga el historial para mostrar {what}","\u52a0\u8f7d\u5386\u53f2\u8bb0\u5f55\u4ee5\u663e\u793a{what}","Carregue o hist\xf3rico para exibir {what}","Lade den Verlauf, um {what} anzuzeigen","Carica la cronologia per mostrare {what}","{what} \u3092\u8868\u793a\u3059\u308b\u306b\u306f\u5c65\u6b74\u3092\u8aad\u307f\u8fbc\u3093\u3067\u304f\u3060\u3055\u3044","\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u0438\u0441\u0442\u043e\u0440\u0438\u044e, \u0447\u0442\u043e\u0431\u044b \u043f\u043e\u043a\u0430\u0437\u0430\u0442\u044c {what}","\u062d\u0645\u0651\u0644 \u0627\u0644\u0633\u062c\u0644 \u0644\u0639\u0631\u0636 {what}"],t.w)
-B.agA=new A.B(B.l,["Moins","Less","Menos","\u5c11","Menos","Weniger","Meno","\u5c11\u306a\u3044","\u041c\u0435\u043d\u044c\u0448\u0435","\u0623\u0642\u0644"],t.w)
-B.ahJ=new A.B(B.l,["Plus","More","M\xe1s","\u591a","Mais","Mehr","Pi\xf9","\u591a\u3044","\u0411\u043e\u043b\u044c\u0448\u0435","\u0623\u0643\u062b\u0631"],t.w)
-B.agI=new A.B(B.l,["Scanner un profil","Scan a profile","Escanear un perfil","\u626b\u63cf\u4e2a\u4eba\u8d44\u6599","Escanear um perfil","Profil scannen","Scansiona un profilo","\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb\u3092\u30b9\u30ad\u30e3\u30f3","\u0421\u043a\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043f\u0440\u043e\u0444\u0438\u043b\u044c","\u0645\u0633\u062d \u0645\u0644\u0641 \u0634\u062e\u0635\u064a"],t.w)
-B.ahC=new A.B(B.l,["Niv. {level}","Lvl {level}","Niv. {level}","\u7b49\u7ea7 {level}","N\xedv. {level}","Lvl {level}","Liv. {level}","Lv.{level}","\u0423\u0440. {level}","\u0645. {level}"],t.w)
-B.ahj=new A.B(B.l,["QR code ?","QR code?","\xbfC\xf3digo QR?","\u4e8c\u7ef4\u7801\uff1f","C\xf3digo QR?","QR-Code?","Codice QR?","QR\u30b3\u30fc\u30c9\uff1f","QR-\u043a\u043e\u0434?","\u0631\u0645\u0632 QR\u061f"],t.w)
-B.aiL=new A.B(B.l,["Ajouter un QR code \xe0 l\u2019image partag\xe9e, pour que la personne qui la voit puisse scanner ton profil ?","Add a QR code to the shared image, so whoever sees it can scan your profile?","\xbfA\xf1adir un c\xf3digo QR a la imagen compartida para que quien la vea pueda escanear tu perfil?","\u8981\u5728\u5206\u4eab\u7684\u56fe\u7247\u4e2d\u6dfb\u52a0\u4e8c\u7ef4\u7801\uff0c\u8ba9\u770b\u5230\u7684\u4eba\u53ef\u4ee5\u626b\u63cf\u4f60\u7684\u4e2a\u4eba\u8d44\u6599\u5417\uff1f","Adicionar um c\xf3digo QR \xe0 imagem compartilhada, para que quem a vir possa escanear seu perfil?","Einen QR-Code zum geteilten Bild hinzuf\xfcgen, damit jeder dein Profil scannen kann?","Aggiungere un codice QR all'immagine condivisa, cos\xec chi la vede pu\xf2 scansionare il tuo profilo?","\u5171\u6709\u3059\u308b\u753b\u50cf\u306bQR\u30b3\u30fc\u30c9\u3092\u8ffd\u52a0\u3057\u3066\u3001\u898b\u305f\u4eba\u304c\u3042\u306a\u305f\u306e\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb\u3092\u30b9\u30ad\u30e3\u30f3\u3067\u304d\u308b\u3088\u3046\u306b\u3057\u307e\u3059\u304b\uff1f","\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c QR-\u043a\u043e\u0434 \u043d\u0430 \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u044f\u0435\u043c\u043e\u0435 \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u0435, \u0447\u0442\u043e\u0431\u044b \u043b\u044e\u0431\u043e\u0439 \u043c\u043e\u0433 \u043e\u0442\u0441\u043a\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432\u0430\u0448 \u043f\u0440\u043e\u0444\u0438\u043b\u044c?","\u0647\u0644 \u062a\u0631\u064a\u062f \u0625\u0636\u0627\u0641\u0629 \u0631\u0645\u0632 QR \u0625\u0644\u0649 \u0627\u0644\u0635\u0648\u0631\u0629 \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u0629 \u0644\u064a\u062a\u0645\u0643\u0646 \u0645\u0646 \u064a\u0631\u0627\u0647\u0627 \u0645\u0646 \u0645\u0633\u062d \u0645\u0644\u0641\u0643 \u0627\u0644\u0634\u062e\u0635\u064a\u061f"],t.w)
-B.ajA=new A.B(B.l,["Sans QR","No QR","Sin QR","\u65e0\u4e8c\u7ef4\u7801","Sem QR","Ohne QR","Senza QR","QR\u306a\u3057","\u0411\u0435\u0437 QR","\u0628\u062f\u0648\u0646 QR"],t.w)
+B.ajA=new A.B(B.l,["Aucune donn\xe9e pour cette p\xe9riode","No data for this period","Sin datos para este per\xedodo","\u8be5\u65f6\u6bb5\u65e0\u6570\u636e","Sem dados para este per\xedodo","Keine Daten f\xfcr diesen Zeitraum","Nessun dato per questo periodo","\u3053\u306e\u671f\u9593\u306e\u30c7\u30fc\u30bf\u306f\u3042\u308a\u307e\u305b\u3093","\u041d\u0435\u0442 \u0434\u0430\u043d\u043d\u044b\u0445 \u0437\u0430 \u044d\u0442\u043e\u0442 \u043f\u0435\u0440\u0438\u043e\u0434","\u0644\u0627 \u062a\u0648\u062c\u062f \u0628\u064a\u0627\u0646\u0627\u062a \u0644\u0647\u0630\u0647 \u0627\u0644\u0641\u062a\u0631\u0629"],t.w)
+B.age=new A.B(B.l,["Chargez l'historique pour afficher {what}","Load history to display {what}","Cargue el historial para mostrar {what}","\u52a0\u8f7d\u5386\u53f2\u8bb0\u5f55\u4ee5\u663e\u793a{what}","Carregue o hist\xf3rico para exibir {what}","Laden Sie den Verlauf, um {what} anzuzeigen","Carichi la cronologia per mostrare {what}","{what} \u3092\u8868\u793a\u3059\u308b\u306b\u306f\u5c65\u6b74\u3092\u8aad\u307f\u8fbc\u3093\u3067\u304f\u3060\u3055\u3044","\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u0438\u0441\u0442\u043e\u0440\u0438\u044e, \u0447\u0442\u043e\u0431\u044b \u043f\u043e\u043a\u0430\u0437\u0430\u0442\u044c {what}","\u062d\u0645\u0651\u0644 \u0627\u0644\u0633\u062c\u0644 \u0644\u0639\u0631\u0636 {what}"],t.w)
+B.agG=new A.B(B.l,["Moins","Less","Menos","\u5c11","Menos","Weniger","Meno","\u5c11\u306a\u3044","\u041c\u0435\u043d\u044c\u0448\u0435","\u0623\u0642\u0644"],t.w)
+B.ahP=new A.B(B.l,["Plus","More","M\xe1s","\u591a","Mais","Mehr","Pi\xf9","\u591a\u3044","\u0411\u043e\u043b\u044c\u0448\u0435","\u0623\u0643\u062b\u0631"],t.w)
+B.agN=new A.B(B.l,["Scanner un profil","Scan a profile","Escanear un perfil","\u626b\u63cf\u4e2a\u4eba\u8d44\u6599","Escanear um perfil","Profil scannen","Scansiona un profilo","\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb\u3092\u30b9\u30ad\u30e3\u30f3","\u0421\u043a\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043f\u0440\u043e\u0444\u0438\u043b\u044c","\u0645\u0633\u062d \u0645\u0644\u0641 \u0634\u062e\u0635\u064a"],t.w)
+B.ahI=new A.B(B.l,["Niv. {level}","Lvl {level}","Niv. {level}","\u7b49\u7ea7 {level}","N\xedv. {level}","Lvl {level}","Liv. {level}","Lv.{level}","\u0423\u0440. {level}","\u0645. {level}"],t.w)
+B.ahn=new A.B(B.l,["QR code ?","QR code?","\xbfC\xf3digo QR?","\u4e8c\u7ef4\u7801\uff1f","C\xf3digo QR?","QR-Code?","Codice QR?","QR\u30b3\u30fc\u30c9\uff1f","QR-\u043a\u043e\u0434?","\u0631\u0645\u0632 QR\u061f"],t.w)
+B.aiY=new A.B(B.l,["Ajouter un QR code \xe0 l\u2019image partag\xe9e, pour que la personne qui la voit puisse scanner votre profil ?","Add a QR code to the shared image, so whoever sees it can scan your profile?","\xbfA\xf1adir un c\xf3digo QR a la imagen compartida para que quien la vea pueda escanear su perfil?","\u8981\u5728\u5206\u4eab\u7684\u56fe\u7247\u4e2d\u6dfb\u52a0\u4e8c\u7ef4\u7801\uff0c\u8ba9\u770b\u5230\u7684\u4eba\u53ef\u4ee5\u626b\u63cf\u60a8\u7684\u4e2a\u4eba\u8d44\u6599\u5417\uff1f","Adicionar um c\xf3digo QR \xe0 imagem compartilhada, para que quem a vir possa escanear seu perfil?","Einen QR-Code zum geteilten Bild hinzuf\xfcgen, damit jeder Ihr Profil scannen kann?","Aggiungere un codice QR all'immagine condivisa, cos\xec chi la vede pu\xf2 scansionare il suo profilo?","\u5171\u6709\u3059\u308b\u753b\u50cf\u306bQR\u30b3\u30fc\u30c9\u3092\u8ffd\u52a0\u3057\u3066\u3001\u898b\u305f\u4eba\u304c\u3042\u306a\u305f\u306e\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb\u3092\u30b9\u30ad\u30e3\u30f3\u3067\u304d\u308b\u3088\u3046\u306b\u3057\u307e\u3059\u304b\uff1f","\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c QR-\u043a\u043e\u0434 \u043d\u0430 \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u044f\u0435\u043c\u043e\u0435 \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u0435, \u0447\u0442\u043e\u0431\u044b \u043b\u044e\u0431\u043e\u0439 \u043c\u043e\u0433 \u043e\u0442\u0441\u043a\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432\u0430\u0448 \u043f\u0440\u043e\u0444\u0438\u043b\u044c?","\u0647\u0644 \u062a\u0631\u064a\u062f \u0625\u0636\u0627\u0641\u0629 \u0631\u0645\u0632 QR \u0625\u0644\u0649 \u0627\u0644\u0635\u0648\u0631\u0629 \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u0629 \u0644\u064a\u062a\u0645\u0643\u0646 \u0645\u0646 \u064a\u0631\u0627\u0647\u0627 \u0645\u0646 \u0645\u0633\u062d \u0645\u0644\u0641\u0643 \u0627\u0644\u0634\u062e\u0635\u064a\u061f"],t.w)
+B.ajB=new A.B(B.l,["Sans QR","No QR","Sin QR","\u65e0\u4e8c\u7ef4\u7801","Sem QR","Ohne QR","Senza QR","QR\u306a\u3057","\u0411\u0435\u0437 QR","\u0628\u062f\u0648\u0646 QR"],t.w)
 B.afN=new A.B(B.l,["Vers l\u2019app","To the app","A la app","\u6307\u5411\u5e94\u7528","Para o app","Zur App","All'app","\u30a2\u30d7\u30ea\u3078","\u0412 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435","\u0625\u0644\u0649 \u0627\u0644\u062a\u0637\u0628\u064a\u0642"],t.w)
-B.ahk=new A.B(B.l,["Vers Last.fm","To Last.fm","A Last.fm","\u6307\u5411 Last.fm","Para o Last.fm","Zu Last.fm","A Last.fm","Last.fm\u3078","\u041d\u0430 Last.fm","\u0625\u0644\u0649 Last.fm"],t.w)
-B.aj1=new A.B(B.l,["Comparer les go\xfbts musicaux","Compare Music Taste","Comparar gustos musicales","\u6bd4\u8f83\u97f3\u4e50\u54c1\u5473","Comparar gostos musicais","Musikgeschmack vergleichen","Confronta i gusti musicali","\u97f3\u697d\u306e\u597d\u307f\u3092\u6bd4\u8f03","\u0421\u0440\u0430\u0432\u043d\u0438\u0442\u044c \u043c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u044b\u0435 \u0432\u043a\u0443\u0441\u044b","\u0645\u0642\u0627\u0631\u0646\u0629 \u0627\u0644\u0623\u0630\u0648\u0627\u0642 \u0627\u0644\u0645\u0648\u0633\u064a\u0642\u064a\u0629"],t.w)
-B.agX=new A.B(B.l,["Synchronisation des donn\xe9es\u2026","Syncing full library\u2026","Sincronizando datos\u2026","\u6b63\u5728\u540c\u6b65\u6570\u636e\u2026","Sincronizando dados\u2026","Daten werden synchronisiert\u2026","Sincronizzazione dei dati\u2026","\u30c7\u30fc\u30bf\u3092\u540c\u671f\u4e2d\u2026","\u0421\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0430\u0446\u0438\u044f \u0434\u0430\u043d\u043d\u044b\u0445\u2026","\u062c\u0627\u0631\u064d \u0645\u0632\u0627\u0645\u0646\u0629 \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a\u2026"],t.w)
-B.ai3=new A.B(B.l,["Voir plus","See more","Ver m\xe1s","\u67e5\u770b\u66f4\u591a","Ver mais","Mehr anzeigen","Mostra altro","\u3082\u3063\u3068\u898b\u308b","\u041f\u043e\u043a\u0430\u0437\u0430\u0442\u044c \u0435\u0449\u0451","\u0639\u0631\u0636 \u0627\u0644\u0645\u0632\u064a\u062f"],t.w)
-B.ai9=new A.B(B.l,["Aucun succ\xe8s d\xe9bloqu\xe9 pour l\u2019instant","No achievements unlocked yet","A\xfan no has desbloqueado ning\xfan logro","\u5c1a\u672a\u89e3\u9501\u4efb\u4f55\u6210\u5c31","Nenhuma conquista desbloqueada ainda","Noch keine Erfolge freigeschaltet","Nessun traguardo sbloccato per ora","\u307e\u3060\u5b9f\u7e3e\u306f\u89e3\u9664\u3055\u308c\u3066\u3044\u307e\u305b\u3093","\u041f\u043e\u043a\u0430 \u043d\u0435\u0442 \u043e\u0442\u043a\u0440\u044b\u0442\u044b\u0445 \u0434\u043e\u0441\u0442\u0438\u0436\u0435\u043d\u0438\u0439","\u0644\u0645 \u064a\u062a\u0645 \u0641\u062a\u062d \u0623\u064a \u0625\u0646\u062c\u0627\u0632 \u0628\u0639\u062f"],t.w)
+B.aho=new A.B(B.l,["Vers Last.fm","To Last.fm","A Last.fm","\u6307\u5411 Last.fm","Para o Last.fm","Zu Last.fm","A Last.fm","Last.fm\u3078","\u041d\u0430 Last.fm","\u0625\u0644\u0649 Last.fm"],t.w)
+B.aj3=new A.B(B.l,["Comparer les go\xfbts musicaux","Compare Music Taste","Comparar gustos musicales","\u6bd4\u8f83\u97f3\u4e50\u54c1\u5473","Comparar gostos musicais","Musikgeschmack vergleichen","Confronta i gusti musicali","\u97f3\u697d\u306e\u597d\u307f\u3092\u6bd4\u8f03","\u0421\u0440\u0430\u0432\u043d\u0438\u0442\u044c \u043c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u044b\u0435 \u0432\u043a\u0443\u0441\u044b","\u0645\u0642\u0627\u0631\u0646\u0629 \u0627\u0644\u0623\u0630\u0648\u0627\u0642 \u0627\u0644\u0645\u0648\u0633\u064a\u0642\u064a\u0629"],t.w)
+B.ah0=new A.B(B.l,["Synchronisation des donn\xe9es\u2026","Syncing full library\u2026","Sincronizando datos\u2026","\u6b63\u5728\u540c\u6b65\u6570\u636e\u2026","Sincronizando dados\u2026","Daten werden synchronisiert\u2026","Sincronizzazione dei dati\u2026","\u30c7\u30fc\u30bf\u3092\u540c\u671f\u4e2d\u2026","\u0421\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0430\u0446\u0438\u044f \u0434\u0430\u043d\u043d\u044b\u0445\u2026","\u062c\u0627\u0631\u064d \u0645\u0632\u0627\u0645\u0646\u0629 \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a\u2026"],t.w)
+B.ai6=new A.B(B.l,["Voir plus","See more","Ver m\xe1s","\u67e5\u770b\u66f4\u591a","Ver mais","Mehr anzeigen","Mostra altro","\u3082\u3063\u3068\u898b\u308b","\u041f\u043e\u043a\u0430\u0437\u0430\u0442\u044c \u0435\u0449\u0451","\u0639\u0631\u0636 \u0627\u0644\u0645\u0632\u064a\u062f"],t.w)
+B.ahB=new A.B(B.l,["Aucun succ\xe8s d\xe9bloqu\xe9 pour l\u2019instant","No achievements unlocked yet","A\xfan no ha desbloqueado ning\xfan logro","\u5c1a\u672a\u89e3\u9501\u4efb\u4f55\u6210\u5c31","Nenhuma conquista desbloqueada ainda","Noch keine Erfolge freigeschaltet","Nessun traguardo sbloccato per ora","\u307e\u3060\u5b9f\u7e3e\u306f\u89e3\u9664\u3055\u308c\u3066\u3044\u307e\u305b\u3093","\u041f\u043e\u043a\u0430 \u043d\u0435\u0442 \u043e\u0442\u043a\u0440\u044b\u0442\u044b\u0445 \u0434\u043e\u0441\u0442\u0438\u0436\u0435\u043d\u0438\u0439","\u0644\u0645 \u064a\u062a\u0645 \u0641\u062a\u062d \u0623\u064a \u0625\u0646\u062c\u0627\u0632 \u0628\u0639\u062f"],t.w)
 B.afI=new A.B(B.l,["Pas de pochette anim\xe9e pour cet album","No animated cover for this album","No hay portada animada para este \xe1lbum","\u6b64\u4e13\u8f91\u6ca1\u6709\u52a8\u6001\u5c01\u9762","N\xe3o h\xe1 capa animada para este \xe1lbum","Kein animiertes Cover f\xfcr dieses Album","Nessuna copertina animata per questo album","\u3053\u306e\u30a2\u30eb\u30d0\u30e0\u306b\u306f\u30a2\u30cb\u30e1\u30fc\u30b7\u30e7\u30f3\u30ab\u30d0\u30fc\u304c\u3042\u308a\u307e\u305b\u3093","\u0423 \u044d\u0442\u043e\u0433\u043e \u0430\u043b\u044c\u0431\u043e\u043c\u0430 \u043d\u0435\u0442 \u0430\u043d\u0438\u043c\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u043e\u0439 \u043e\u0431\u043b\u043e\u0436\u043a\u0438","\u0644\u0627 \u064a\u0648\u062c\u062f \u063a\u0644\u0627\u0641 \u0645\u062a\u062d\u0631\u0643 \u0644\u0647\u0630\u0627 \u0627\u0644\u0623\u0644\u0628\u0648\u0645"],t.w)
-B.ajy=new A.B(B.l,["Source : {source}","Source: {source}","Fuente: {source}","\u6765\u6e90\uff1a{source}","Fonte: {source}","Quelle: {source}","Fonte: {source}","\u63d0\u4f9b\u5143: {source}","\u0418\u0441\u0442\u043e\u0447\u043d\u0438\u043a: {source}","\u0627\u0644\u0645\u0635\u062f\u0631: {source}"],t.w)
+B.ajz=new A.B(B.l,["Source : {source}","Source: {source}","Fuente: {source}","\u6765\u6e90\uff1a{source}","Fonte: {source}","Quelle: {source}","Fonte: {source}","\u63d0\u4f9b\u5143: {source}","\u0418\u0441\u0442\u043e\u0447\u043d\u0438\u043a: {source}","\u0627\u0644\u0645\u0635\u062f\u0631: {source}"],t.w)
 B.afV=new A.B(B.l,["Voir sur Last.fm","View on Last.fm","Ver en Last.fm","\u5728 Last.fm \u4e0a\u67e5\u770b","Ver no Last.fm","Auf Last.fm ansehen","Vedi su Last.fm","Last.fm \u3067\u898b\u308b","\u0421\u043c\u043e\u0442\u0440\u0435\u0442\u044c \u043d\u0430 Last.fm","\u0639\u0631\u0636 \u0639\u0644\u0649 Last.fm"],t.w)
 B.aiK=new A.B(B.l,["Texte original : Last.fm \u2014 Traduction : Google Translate","Original text: Last.fm \u2014 Translation: Google Translate","Texto original: Last.fm \u2014 Traducci\xf3n: Google Translate","\u539f\u6587\u6765\u81ea Last.fm \u2014 \u7ffb\u8bd1\u6765\u81ea Google \u7ffb\u8bd1","Texto original: Last.fm \u2014 Tradu\xe7\xe3o: Google Translate","Originaltext: Last.fm \u2014 \xdcbersetzung: Google Translate","Testo originale: Last.fm \u2014 Traduzione: Google Translate","\u539f\u6587: Last.fm \u2014 \u7ffb\u8a33: Google \u7ffb\u8a33","\u0418\u0441\u0445\u043e\u0434\u043d\u044b\u0439 \u0442\u0435\u043a\u0441\u0442: Last.fm \u2014 \u041f\u0435\u0440\u0435\u0432\u043e\u0434: Google Translate","\u0627\u0644\u0646\u0635 \u0627\u0644\u0623\u0635\u0644\u064a: Last.fm \u2014 \u0627\u0644\u062a\u0631\u062c\u0645\u0629: \u062a\u0631\u062c\u0645\u0629 \u062c\u0648\u062c\u0644"],t.w)
 B.afA=new A.B(B.l,["Source : Last.fm","Source: Last.fm","Fuente: Last.fm","\u6765\u6e90\uff1aLast.fm","Fonte: Last.fm","Quelle: Last.fm","Fonte: Last.fm","\u63d0\u4f9b\u5143: Last.fm","\u0418\u0441\u0442\u043e\u0447\u043d\u0438\u043a: Last.fm","\u0627\u0644\u0645\u0635\u062f\u0631: Last.fm"],t.w)
-B.ahx=new A.B(B.l,["Sombre","Dark","Oscuro","\u6df1\u8272","Escuro","Dunkel","Scuro","\u30c0\u30fc\u30af","\u0422\u0451\u043c\u043d\u0430\u044f","\u062f\u0627\u0643\u0646"],t.w)
-B.aju=new A.B(B.l,["Clair","Light","Claro","\u6d45\u8272","Claro","Hell","Chiaro","\u30e9\u30a4\u30c8","\u0421\u0432\u0435\u0442\u043b\u0430\u044f","\u0641\u0627\u062a\u062d"],t.w)
-B.ai8=new A.B(B.l,["Syst\xe8me","System","Sistema","\u8ddf\u968f\u7cfb\u7edf","Sistema","System","Sistema","\u30b7\u30b9\u30c6\u30e0","\u0421\u0438\u0441\u0442\u0435\u043c\u043d\u0430\u044f","\u0627\u0644\u0646\u0638\u0627\u0645"],t.w)
-B.ahD=new A.B(B.l,["Widgets color\xe9s","Colored widgets","Widgets con color","\u5f69\u8272\u5c0f\u7ec4\u4ef6","Widgets coloridos","Farbige Widgets","Widget colorati","\u30ab\u30e9\u30fc\u30a6\u30a3\u30b8\u30a7\u30c3\u30c8","\u0426\u0432\u0435\u0442\u043d\u044b\u0435 \u0432\u0438\u0434\u0436\u0435\u0442\u044b","\u0648\u062f\u062c\u0627\u062a \u0645\u0644\u0648\u0646\u0629"],t.w)
-B.agP=new A.B(B.l,["Teinte les widgets de l'\xe9cran d'accueil avec l'accent","Tint home screen widgets with the accent color","Aplica el color de acento a los widgets","\u7528\u5f3a\u8c03\u8272\u4e3a\u5c0f\u7ec4\u4ef6\u7740\u8272","Aplica a cor de destaque aos widgets","F\xe4rbt die Homescreen-Widgets mit der Akzentfarbe","Colora i widget con il colore d'accento","\u30a6\u30a3\u30b8\u30a7\u30c3\u30c8\u306b\u30a2\u30af\u30bb\u30f3\u30c8\u30ab\u30e9\u30fc\u3092\u9069\u7528","\u041e\u043a\u0440\u0430\u0448\u0438\u0432\u0430\u0435\u0442 \u0432\u0438\u0434\u0436\u0435\u0442\u044b \u0430\u043a\u0446\u0435\u043d\u0442\u043d\u044b\u043c \u0446\u0432\u0435\u0442\u043e\u043c","\u064a\u0644\u0648\u0651\u0646 \u0627\u0644\u0648\u062f\u062c\u0627\u062a \u0628\u0644\u0648\u0646 \u0627\u0644\u062a\u0645\u064a\u064a\u0632"],t.w)
-B.aik=new A.B(B.l,["Rechercher un r\xe9glage\u2026","Search settings\u2026","Buscar un ajuste\u2026","\u641c\u7d22\u8bbe\u7f6e\u2026","Pesquisar configura\xe7\xe3o\u2026","Einstellung suchen\u2026","Cerca un'impostazione\u2026","\u8a2d\u5b9a\u3092\u691c\u7d22\u2026","\u041f\u043e\u0438\u0441\u043a \u043d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438\u2026","\u0627\u0628\u062d\u062b \u0639\u0646 \u0625\u0639\u062f\u0627\u062f\u2026"],t.w)
-B.ahe=new A.B(B.l,["Aucun r\xe9glage trouv\xe9","No settings found","No se encontraron ajustes","\u672a\u627e\u5230\u8bbe\u7f6e","Nenhuma configura\xe7\xe3o encontrada","Keine Einstellung gefunden","Nessuna impostazione trovata","\u8a2d\u5b9a\u304c\u898b\u3064\u304b\u308a\u307e\u305b\u3093","\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u044b","\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0625\u0639\u062f\u0627\u062f\u0627\u062a"],t.w)
-B.ahs=new A.B(B.l,["Toutes","All","Todas","\u5168\u90e8","Todas","Alle","Tutte","\u3059\u3079\u3066","\u0412\u0441\u0435","\u0627\u0644\u0643\u0644"],t.w)
-B.ail=new A.B(B.l,["Mode \xe9conomie d'\xe9nergie","Power saving mode","Ahorro de bater\xeda","\u7701\u7535\u6a21\u5f0f","Economia de bateria","Energiesparmodus","Risparmio batteria","\u30d0\u30c3\u30c6\u30ea\u30fc\u30bb\u30fc\u30d0\u30fc","\u042d\u043a\u043e\u043d\u043e\u043c\u0438\u044f \u0437\u0430\u0440\u044f\u0434\u0430","\u062a\u0648\u0641\u064a\u0631 \u0627\u0644\u0628\u0637\u0627\u0631\u064a\u0629"],t.w)
-B.agQ=new A.B(B.l,["\xc9conomiser la batterie, moins d'effets","Save battery, fewer effects","Ahorra bater\xeda, menos efectos","\u7701\u7535\uff0c\u51cf\u5c11\u7279\u6548","Economize bateria, menos efeitos","Akku sparen, weniger Effekte","Risparmia batteria, meno effetti","\u30d0\u30c3\u30c6\u30ea\u30fc\u3092\u7bc0\u7d04\u3001\u30a8\u30d5\u30a7\u30af\u30c8\u63a7\u3048\u3081","\u042d\u043a\u043e\u043d\u043e\u043c\u0438\u044f \u0437\u0430\u0440\u044f\u0434\u0430, \u043c\u0435\u043d\u044c\u0448\u0435 \u044d\u0444\u0444\u0435\u043a\u0442\u043e\u0432","\u0648\u0641\u0651\u0631 \u0627\u0644\u0628\u0637\u0627\u0631\u064a\u0629 \u0628\u062a\u0623\u062b\u064a\u0631\u0627\u062a \u0623\u0642\u0644"],t.w)
-B.ah3=new A.B(B.l,["\xc2mes musicales s\u0153urs","Musical soulmates","Almas gemelas musicales","\u97f3\u4e50\u4e0a\u7684\u7075\u9b42\u4f34\u4fa3","Almas musicais g\xeameas","Musikalische Seelenverwandte","Anime musicali gemelle","\u97f3\u697d\u306e\u30bd\u30a6\u30eb\u30e1\u30a4\u30c8","\u041c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u044b\u0435 \u0440\u043e\u0434\u0441\u0442\u0432\u0435\u043d\u043d\u044b\u0435 \u0434\u0443\u0448\u0438","\u062a\u0648\u0623\u0645 \u0627\u0644\u0631\u0648\u062d \u0627\u0644\u0645\u0648\u0633\u064a\u0642\u064a"],t.w)
-B.ahI=new A.B(B.l,["Tr\xe8s belle compatibilit\xe9","Great compatibility","Muy buena compatibilidad","\u975e\u5e38\u5408\u62cd","\xd3tima compatibilidade","Sehr hohe Kompatibilit\xe4t","Ottima compatibilit\xe0","\u975e\u5e38\u306b\u9ad8\u3044\u76f8\u6027","\u041e\u0442\u043b\u0438\u0447\u043d\u0430\u044f \u0441\u043e\u0432\u043c\u0435\u0441\u0442\u0438\u043c\u043e\u0441\u0442\u044c","\u062a\u0648\u0627\u0641\u0642 \u0631\u0627\u0626\u0639"],t.w)
-B.ahV=new A.B(B.l,["Quelques points communs","Some common ground","Algunos puntos en com\xfan","\u6709\u4e9b\u5171\u540c\u70b9","Alguns pontos em comum","Einige Gemeinsamkeiten","Qualcosa in comune","\u3044\u304f\u3064\u304b\u306e\u5171\u901a\u70b9","\u0415\u0441\u0442\u044c \u043a\u043e\u0435-\u0447\u0442\u043e \u043e\u0431\u0449\u0435\u0435","\u0628\u0639\u0636 \u0627\u0644\u0642\u0648\u0627\u0633\u0645 \u0627\u0644\u0645\u0634\u062a\u0631\u0643\u0629"],t.w)
-B.agi=new A.B(B.l,["Go\xfbts plut\xf4t diff\xe9rents","Fairly different tastes","Gustos bastante diferentes","\u53e3\u5473\u5dee\u5f02\u8f83\u5927","Gostos bem diferentes","Eher unterschiedlicher Geschmack","Gusti piuttosto diversi","\u597d\u307f\u306f\u304b\u306a\u308a\u9055\u3046","\u0412\u043a\u0443\u0441\u044b \u0434\u043e\u0432\u043e\u043b\u044c\u043d\u043e \u0440\u0430\u0437\u043d\u044b\u0435","\u0623\u0630\u0648\u0627\u0642 \u0645\u062e\u062a\u0644\u0641\u0629 \u0625\u0644\u0649 \u062d\u062f \u0645\u0627"],t.w)
-B.ain=new A.B(B.l,["Univers musicaux oppos\xe9s","Worlds apart, musically","Universos musicales opuestos","\u97f3\u4e50\u54c1\u5473\u622a\u7136\u4e0d\u540c","Universos musicais opostos","Musikalisch gegens\xe4tzliche Welten","Mondi musicali opposti","\u97f3\u697d\u7684\u306b\u6b63\u53cd\u5bfe\u306e\u4e16\u754c","\u041f\u0440\u043e\u0442\u0438\u0432\u043e\u043f\u043e\u043b\u043e\u0436\u043d\u044b\u0435 \u043c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u044b\u0435 \u043c\u0438\u0440\u044b","\u0639\u0627\u0644\u0645\u0627\u0646 \u0645\u0648\u0633\u064a\u0642\u064a\u0627\u0646 \u0645\u062a\u0636\u0627\u062f\u0627\u0646"],t.w)
-B.ahT=new A.B(B.l,["C'est votre propre profil !","This is your own profile!","\xa1Este es tu propio perfil!","\u8fd9\u662f\u4f60\u81ea\u5df1\u7684\u8d44\u6599\uff01","Este \xe9 o seu pr\xf3prio perfil!","Das ist dein eigenes Profil!","\xc8 il tuo profilo!","\u3053\u308c\u306f\u3042\u306a\u305f\u81ea\u8eab\u306e\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb\u3067\u3059\uff01","\u042d\u0442\u043e \u0432\u0430\u0448 \u0441\u043e\u0431\u0441\u0442\u0432\u0435\u043d\u043d\u044b\u0439 \u043f\u0440\u043e\u0444\u0438\u043b\u044c!","\u0647\u0630\u0627 \u0645\u0644\u0641\u0643 \u0627\u0644\u0634\u062e\u0635\u064a!"],t.w)
-B.ahb=new A.B(B.l,["{uniqueArti} artistes de votre historique \xb7 biblioth\xe8que compl\xe8te de {targetUser}","{uniqueArti} artists from your history \xb7 {targetUser}'s full library","{uniqueArti} artistas de tu historial \xb7 biblioteca completa de {targetUser}","\u6765\u81ea\u4f60\u6536\u542c\u8bb0\u5f55\u7684 {uniqueArti} \u4f4d\u827a\u672f\u5bb6 \xb7 {targetUser} \u7684\u5b8c\u6574\u66f2\u5e93","{uniqueArti} artistas do seu hist\xf3rico \xb7 biblioteca completa de {targetUser}","{uniqueArti} K\xfcnstler aus deinem Verlauf \xb7 komplette Bibliothek von {targetUser}","{uniqueArti} artisti dalla tua cronologia \xb7 libreria completa di {targetUser}","\u3042\u306a\u305f\u306e\u5c65\u6b74\u304b\u3089{uniqueArti}\u7d44\u306e\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8 \xb7 {targetUser}\u306e\u30e9\u30a4\u30d6\u30e9\u30ea\u5168\u4f53","{uniqueArti} \u0430\u0440\u0442\u0438\u0441\u0442\u043e\u0432 \u0438\u0437 \u0432\u0430\u0448\u0435\u0439 \u0438\u0441\u0442\u043e\u0440\u0438\u0438 \xb7 \u0432\u0441\u044f \u0431\u0438\u0431\u043b\u0438\u043e\u0442\u0435\u043a\u0430 {targetUser}","{uniqueArti} \u0641\u0646\u0627\u0646\u064b\u0627 \u0645\u0646 \u0633\u062c\u0644\u0643 \xb7 \u0645\u0643\u062a\u0628\u0629 {targetUser} \u0627\u0644\u0643\u0627\u0645\u0644\u0629"],t.w)
-B.agR=new A.B(B.l,["{uniqueArti} artistes de votre historique \xb7 top 200 de {targetUser}","{uniqueArti} artists from your history \xb7 {targetUser}'s top 200","{uniqueArti} artistas de tu historial \xb7 top 200 de {targetUser}","\u6765\u81ea\u4f60\u6536\u542c\u8bb0\u5f55\u7684 {uniqueArti} \u4f4d\u827a\u672f\u5bb6 \xb7 {targetUser} \u7684\u524d 200 \u540d","{uniqueArti} artistas do seu hist\xf3rico \xb7 top 200 de {targetUser}","{uniqueArti} K\xfcnstler aus deinem Verlauf \xb7 Top 200 von {targetUser}","{uniqueArti} artisti dalla tua cronologia \xb7 top 200 di {targetUser}","\u3042\u306a\u305f\u306e\u5c65\u6b74\u304b\u3089{uniqueArti}\u7d44\u306e\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8 \xb7 {targetUser}\u306e\u30c8\u30c3\u30d7200","{uniqueArti} \u0430\u0440\u0442\u0438\u0441\u0442\u043e\u0432 \u0438\u0437 \u0432\u0430\u0448\u0435\u0439 \u0438\u0441\u0442\u043e\u0440\u0438\u0438 \xb7 \u0442\u043e\u043f-200 {targetUser}","{uniqueArti} \u0641\u0646\u0627\u0646\u064b\u0627 \u0645\u0646 \u0633\u062c\u0644\u0643 \xb7 \u0623\u0641\u0636\u0644 200 \u0644\u062f\u0649 {targetUser}"],t.w)
-B.agl=new A.B(B.l,["Biblioth\xe8que compl\xe8te (API)","Full library (API)","Biblioteca completa (API)","\u5b8c\u6574\u66f2\u5e93\uff08API\uff09","Biblioteca completa (API)","Komplette Bibliothek (API)","Libreria completa (API)","\u30e9\u30a4\u30d6\u30e9\u30ea\u5168\u4f53\uff08API\uff09","\u0412\u0441\u044f \u0431\u0438\u0431\u043b\u0438\u043e\u0442\u0435\u043a\u0430 (API)","\u0627\u0644\u0645\u0643\u062a\u0628\u0629 \u0627\u0644\u0643\u0627\u0645\u0644\u0629 (API)"],t.w)
-B.aiv=new A.B(B.l,["Top 200 artistes & titres (API)","Top 200 artists & tracks (API)","Top 200 artistas y canciones (API)","\u524d 200 \u540d\u827a\u672f\u5bb6\u4e0e\u6b4c\u66f2\uff08API\uff09","Top 200 artistas e faixas (API)","Top 200 K\xfcnstler & Titel (API)","Top 200 artisti e brani (API)","\u30c8\u30c3\u30d7200\u306e\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u3068\u66f2\uff08API\uff09","\u0422\u043e\u043f-200 \u0430\u0440\u0442\u0438\u0441\u0442\u043e\u0432 \u0438 \u0442\u0440\u0435\u043a\u043e\u0432 (API)","\u0623\u0641\u0636\u0644 200 \u0641\u0646\u0627\u0646 \u0648\u0623\u063a\u0646\u064a\u0629 (API)"],t.w)
-B.ah8=new A.B(B.l,["Impossible de calculer la compatibilit\xe9.","Could not work out the compatibility.","No se pudo calcular la compatibilidad.","\u65e0\u6cd5\u8ba1\u7b97\u517c\u5bb9\u5ea6\u3002","N\xe3o foi poss\xedvel calcular a compatibilidade.","Kompatibilit\xe4t konnte nicht berechnet werden.","Impossibile calcolare la compatibilit\xe0.","\u76f8\u6027\u3092\u8a08\u7b97\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002","\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0440\u0430\u0441\u0441\u0447\u0438\u0442\u0430\u0442\u044c \u0441\u043e\u0432\u043c\u0435\u0441\u0442\u0438\u043c\u043e\u0441\u0442\u044c.","\u062a\u0639\u0630\u0651\u0631 \u062d\u0633\u0627\u0628 \u0627\u0644\u062a\u0648\u0627\u0641\u0642."],t.w)
-B.aja=new A.B(B.l,["Compatibilit\xe9 musicale","Music compatibility","Compatibilidad musical","\u97f3\u4e50\u5951\u5408\u5ea6","Compatibilidade musical","Musikalische Kompatibilit\xe4t","Compatibilit\xe0 musicale","\u97f3\u697d\u306e\u76f8\u6027","\u041c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u0430\u044f \u0441\u043e\u0432\u043c\u0435\u0441\u0442\u0438\u043c\u043e\u0441\u0442\u044c","\u0627\u0644\u062a\u0648\u0627\u0641\u0642 \u0627\u0644\u0645\u0648\u0633\u064a\u0642\u064a"],t.w)
-B.ahN=new A.B(B.l,["Analyse des go\xfbts musicaux\u2026","Analyzing musical taste\u2026","Analizando gustos musicales\u2026","\u6b63\u5728\u5206\u6790\u97f3\u4e50\u54c1\u5473\u2026","Analisando gostos musicais\u2026","Musikgeschmack wird analysiert\u2026","Analisi dei gusti musicali\u2026","\u97f3\u697d\u306e\u597d\u307f\u3092\u5206\u6790\u4e2d\u2026","\u0410\u043d\u0430\u043b\u0438\u0437 \u043c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u044b\u0445 \u0432\u043a\u0443\u0441\u043e\u0432\u2026","\u062c\u0627\u0631\u064d \u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0623\u0630\u0648\u0627\u0642 \u0627\u0644\u0645\u0648\u0633\u064a\u0642\u064a\u0629\u2026"],t.w)
-B.aj0=new A.B(B.l,["{v_totalArti} artiste{v_totalArti2}","{v_totalArti} artist{v_totalArti2}","{v_totalArti} artista{v_totalArti2}","{v_totalArti} \u4f4d\u827a\u672f\u5bb6","{v_totalArti} artista{v_totalArti2}","{v_totalArti} K\xfcnstler","{v_totalArti} artisti","{v_totalArti}\u7d44\u306e\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8","\u0410\u0440\u0442\u0438\u0441\u0442\u043e\u0432: {v_totalArti}","{v_totalArti} \u0641\u0646\u0627\u0646"],t.w)
-B.ai1=new A.B(B.l,["{v_totalTrac} titre{v_totalTrac2}","{v_totalTrac} track{v_totalTrac2}","{v_totalTrac} canci\xf3n{v_totalTrac2}","{v_totalTrac} \u9996\u6b4c\u66f2","{v_totalTrac} faixa{v_totalTrac2}","{v_totalTrac} Titel","{v_totalTrac} brani","{v_totalTrac}\u66f2","\u0422\u0440\u0435\u043a\u043e\u0432: {v_totalTrac}","{v_totalTrac} \u0623\u063a\u0646\u064a\u0629"],t.w)
-B.aha=new A.B(B.l,["{v_totalAlbu} album{v_totalAlbu2}","{v_totalAlbu} album{v_totalAlbu2}","{v_totalAlbu} \xe1lbum{v_totalAlbu2}","{v_totalAlbu} \u5f20\u4e13\u8f91","{v_totalAlbu} \xe1lbum{v_totalAlbu2}","{v_totalAlbu} Alben","{v_totalAlbu} album","{v_totalAlbu}\u679a\u306e\u30a2\u30eb\u30d0\u30e0","\u0410\u043b\u044c\u0431\u043e\u043c\u043e\u0432: {v_totalAlbu}","{v_totalAlbu} \u0623\u0644\u0628\u0648\u0645"],t.w)
-B.ajv=new A.B(B.l,["Titres en commun","Shared tracks","Canciones en com\xfan","\u5171\u540c\u6b4c\u66f2","Faixas em comum","Gemeinsame Titel","Brani in comune","\u5171\u901a\u306e\u66f2","\u041e\u0431\u0449\u0438\u0435 \u0442\u0440\u0435\u043a\u0438","\u0623\u063a\u0627\u0646\u064d \u0645\u0634\u062a\u0631\u0643\u0629"],t.w)
-B.ajU=new A.B(B.l,["Artistes en commun","Shared artists","Artistas en com\xfan","\u5171\u540c\u827a\u672f\u5bb6","Artistas em comum","Gemeinsame K\xfcnstler","Artisti in comune","\u5171\u901a\u306e\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8","\u041e\u0431\u0449\u0438\u0435 \u0430\u0440\u0442\u0438\u0441\u0442\u044b","\u0641\u0646\u0627\u0646\u0648\u0646 \u0645\u0634\u062a\u0631\u0643\u0648\u0646"],t.w)
-B.aij=new A.B(B.l,["Aucun artiste en commun trouv\xe9.","No shared artists found.","No se encontraron artistas en com\xfan.","\u672a\u627e\u5230\u5171\u540c\u7684\u827a\u672f\u5bb6\u3002","Nenhum artista em comum encontrado.","Keine gemeinsamen K\xfcnstler gefunden.","Nessun artista in comune trovato.","\u5171\u901a\u306e\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u306f\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f\u3002","\u041e\u0431\u0449\u0438\u0445 \u0430\u0440\u0442\u0438\u0441\u0442\u043e\u0432 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e.","\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0641\u0646\u0627\u0646\u064a\u0646 \u0645\u0634\u062a\u0631\u0643\u064a\u0646."],t.w)
-B.aj4=new A.B(B.l,["Albums en commun","Shared albums","\xc1lbumes en com\xfan","\u5171\u540c\u4e13\u8f91","\xc1lbuns em comum","Gemeinsame Alben","Album in comune","\u5171\u901a\u306e\u30a2\u30eb\u30d0\u30e0","\u041e\u0431\u0449\u0438\u0435 \u0430\u043b\u044c\u0431\u043e\u043c\u044b","\u0623\u0644\u0628\u0648\u0645\u0627\u062a \u0645\u0634\u062a\u0631\u0643\u0629"],t.w)
-B.aip=new A.B(B.l,["D\xe9compte d'\xe9coutes indisponible pour l'un des deux.","Play count unavailable for one of you.","Recuento de reproducciones no disponible para uno de los dos.","\u5176\u4e2d\u4e00\u65b9\u7684\u64ad\u653e\u6b21\u6570\u4e0d\u53ef\u7528\u3002","Contagem de reprodu\xe7\xf5es indispon\xedvel para um dos dois.","Wiedergabezahl f\xfcr einen von euch nicht verf\xfcgbar.","Numero di ascolti non disponibile per uno di voi.","\u3069\u3061\u3089\u304b\u306e\u518d\u751f\u56de\u6570\u304c\u53d6\u5f97\u3067\u304d\u307e\u305b\u3093\u3002","\u0427\u0438\u0441\u043b\u043e \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u0439 \u043d\u0435\u0434\u043e\u0441\u0442\u0443\u043f\u043d\u043e \u0434\u043b\u044f \u043e\u0434\u043d\u043e\u0433\u043e \u0438\u0437 \u0432\u0430\u0441.","\u0639\u062f\u062f \u0645\u0631\u0627\u062a \u0627\u0644\u062a\u0634\u063a\u064a\u0644 \u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u0644\u0623\u062d\u062f\u0643\u0645\u0627."],t.w)
-B.afG=new A.B(B.l,["Tu \xe9coutes \xe7a {x}x plus que {theirUsern}.","You listen to this {x}x more than {theirUsern}.","Escuchas esto {x}x m\xe1s que {theirUsern}.","\u4f60\u542c\u8fd9\u4e2a\u7684\u6b21\u6570\u662f {theirUsern} \u7684 {x} \u500d\u3002","Voc\xea escuta isso {x}x mais que {theirUsern}.","Du h\xf6rst das {x}x \xf6fter als {theirUsern}.","Lo ascolti {x}x pi\xf9 di {theirUsern}.","\u3042\u306a\u305f\u306f{theirUsern}\u3088\u308a{x}\u500d\u591a\u304f\u8074\u3044\u3066\u3044\u307e\u3059\u3002","\u0412\u044b \u0441\u043b\u0443\u0448\u0430\u0435\u0442\u0435 \u044d\u0442\u043e \u0432 {x} \u0440\u0430\u0437 \u0447\u0430\u0449\u0435, \u0447\u0435\u043c {theirUsern}.","\u062a\u0633\u062a\u0645\u0639 \u0625\u0644\u0649 \u0647\u0630\u0627 \u0623\u0643\u062b\u0631 \u0645\u0646 {theirUsern} \u0628\u0645\u0642\u062f\u0627\u0631 {x} \u0645\u0631\u0629."],t.w)
-B.ahq=new A.B(B.l,["{theirUsern} \xe9coute \xe7a {x}x plus que toi.","{theirUsern} listens to this {x}x more than you.","{theirUsern} escucha esto {x}x m\xe1s que t\xfa.","{theirUsern} \u542c\u8fd9\u4e2a\u7684\u6b21\u6570\u662f\u4f60\u7684 {x} \u500d\u3002","{theirUsern} escuta isso {x}x mais que voc\xea.","{theirUsern} h\xf6rt das {x}x \xf6fter als du.","{theirUsern} lo ascolta {x}x pi\xf9 di te.","{theirUsern}\u306f\u3042\u306a\u305f\u3088\u308a{x}\u500d\u591a\u304f\u8074\u3044\u3066\u3044\u307e\u3059\u3002","{theirUsern} \u0441\u043b\u0443\u0448\u0430\u0435\u0442 \u044d\u0442\u043e \u0432 {x} \u0440\u0430\u0437 \u0447\u0430\u0449\u0435, \u0447\u0435\u043c \u0432\u044b.","{theirUsern} \u064a\u0633\u062a\u0645\u0639 \u0625\u0644\u0649 \u0647\u0630\u0627 \u0623\u0643\u062b\u0631 \u0645\u0646\u0643 \u0628\u0645\u0642\u062f\u0627\u0631 {x} \u0645\u0631\u0629."],t.w)
-B.aji=new A.B(B.l,["Vous l'\xe9coutez \xe0 peu pr\xe8s autant tous les deux.","You both listen to this about equally.","Ambos escuchan esto casi por igual.","\u4f60\u4eec\u4e24\u4eba\u542c\u8fd9\u4e2a\u7684\u9891\u7387\u5dee\u4e0d\u591a\u3002","Voc\xeas dois escutam isso quase igualmente.","Ihr h\xf6rt das beide etwa gleich oft.","Lo ascoltate pi\xf9 o meno allo stesso modo.","\u4e8c\u4eba\u3068\u3082\u307b\u307c\u540c\u3058\u56de\u6570\u8074\u3044\u3066\u3044\u307e\u3059\u3002","\u0412\u044b \u0441\u043b\u0443\u0448\u0430\u0435\u0442\u0435 \u044d\u0442\u043e \u043f\u0440\u0438\u043c\u0435\u0440\u043d\u043e \u043e\u0434\u0438\u043d\u0430\u043a\u043e\u0432\u043e.","\u0643\u0644\u0627\u0643\u0645\u0627 \u064a\u0633\u062a\u0645\u0639 \u0625\u0644\u0649 \u0647\u0630\u0627 \u0628\u0646\u0641\u0633 \u0627\u0644\u0642\u062f\u0631 \u062a\u0642\u0631\u064a\u0628\u064b\u0627."],t.w)
-B.aj3=new A.B(B.l,["{plays} \xe9coutes","{plays} plays","{plays} reproducciones","{plays} \u6b21\u64ad\u653e","{plays} reprodu\xe7\xf5es","{plays} Wiedergaben","{plays} ascolti","{plays}\u56de\u518d\u751f","{plays} \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u0439","{plays} \u062a\u0634\u063a\u064a\u0644"],t.w)
-B.ajP=new A.B(B.l,["compatibilit\xe9","compatibility","compatibilidad","\u5951\u5408\u5ea6","compatibilidade","Kompatibilit\xe4t","compatibilit\xe0","\u76f8\u6027","\u0441\u043e\u0432\u043c\u0435\u0441\u0442\u0438\u043c\u043e\u0441\u0442\u044c","\u0627\u0644\u062a\u0648\u0627\u0641\u0642"],t.w)
-B.ahO=new A.B(B.l,["VOUS ADOREZ TOUS LES DEUX","YOU BOTH LOVE","A AMBOS LES ENCANTA","\u4f60\u4eec\u90fd\u8d85\u7231","VOC\xcaS DOIS AMAM","IHR LIEBT BEIDE","VI PIACE A ENTRAMBI","\u4e8c\u4eba\u3068\u3082\u5927\u597d\u304d","\u0412\u042b \u041e\u0411\u0410 \u041b\u042e\u0411\u0418\u0422\u0415","\u0643\u0644\u0627\u0643\u0645\u0627 \u064a\u062d\u0628"],t.w)
+B.ahA=new A.B(B.l,["Sombre","Dark","Oscuro","\u6df1\u8272","Escuro","Dunkel","Scuro","\u30c0\u30fc\u30af","\u0422\u0451\u043c\u043d\u0430\u044f","\u062f\u0627\u0643\u0646"],t.w)
+B.ajv=new A.B(B.l,["Clair","Light","Claro","\u6d45\u8272","Claro","Hell","Chiaro","\u30e9\u30a4\u30c8","\u0421\u0432\u0435\u0442\u043b\u0430\u044f","\u0641\u0627\u062a\u062d"],t.w)
+B.aic=new A.B(B.l,["Syst\xe8me","System","Sistema","\u8ddf\u968f\u7cfb\u7edf","Sistema","System","Sistema","\u30b7\u30b9\u30c6\u30e0","\u0421\u0438\u0441\u0442\u0435\u043c\u043d\u0430\u044f","\u0627\u0644\u0646\u0638\u0627\u0645"],t.w)
+B.ahJ=new A.B(B.l,["Widgets color\xe9s","Colored widgets","Widgets con color","\u5f69\u8272\u5c0f\u7ec4\u4ef6","Widgets coloridos","Farbige Widgets","Widget colorati","\u30ab\u30e9\u30fc\u30a6\u30a3\u30b8\u30a7\u30c3\u30c8","\u0426\u0432\u0435\u0442\u043d\u044b\u0435 \u0432\u0438\u0434\u0436\u0435\u0442\u044b","\u0648\u062f\u062c\u0627\u062a \u0645\u0644\u0648\u0646\u0629"],t.w)
+B.agT=new A.B(B.l,["Teinte les widgets de l'\xe9cran d'accueil avec l'accent","Tint home screen widgets with the accent color","Aplica el color de acento a los widgets","\u7528\u5f3a\u8c03\u8272\u4e3a\u5c0f\u7ec4\u4ef6\u7740\u8272","Aplica a cor de destaque aos widgets","F\xe4rbt die Homescreen-Widgets mit der Akzentfarbe","Colora i widget con il colore d'accento","\u30a6\u30a3\u30b8\u30a7\u30c3\u30c8\u306b\u30a2\u30af\u30bb\u30f3\u30c8\u30ab\u30e9\u30fc\u3092\u9069\u7528","\u041e\u043a\u0440\u0430\u0448\u0438\u0432\u0430\u0435\u0442 \u0432\u0438\u0434\u0436\u0435\u0442\u044b \u0430\u043a\u0446\u0435\u043d\u0442\u043d\u044b\u043c \u0446\u0432\u0435\u0442\u043e\u043c","\u064a\u0644\u0648\u0651\u0646 \u0627\u0644\u0648\u062f\u062c\u0627\u062a \u0628\u0644\u0648\u0646 \u0627\u0644\u062a\u0645\u064a\u064a\u0632"],t.w)
+B.ail=new A.B(B.l,["Rechercher un r\xe9glage\u2026","Search settings\u2026","Buscar un ajuste\u2026","\u641c\u7d22\u8bbe\u7f6e\u2026","Pesquisar configura\xe7\xe3o\u2026","Einstellung suchen\u2026","Cerca un'impostazione\u2026","\u8a2d\u5b9a\u3092\u691c\u7d22\u2026","\u041f\u043e\u0438\u0441\u043a \u043d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438\u2026","\u0627\u0628\u062d\u062b \u0639\u0646 \u0625\u0639\u062f\u0627\u062f\u2026"],t.w)
+B.ahi=new A.B(B.l,["Aucun r\xe9glage trouv\xe9","No settings found","No se encontraron ajustes","\u672a\u627e\u5230\u8bbe\u7f6e","Nenhuma configura\xe7\xe3o encontrada","Keine Einstellung gefunden","Nessuna impostazione trovata","\u8a2d\u5b9a\u304c\u898b\u3064\u304b\u308a\u307e\u305b\u3093","\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u044b","\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0625\u0639\u062f\u0627\u062f\u0627\u062a"],t.w)
+B.ahu=new A.B(B.l,["Toutes","All","Todas","\u5168\u90e8","Todas","Alle","Tutte","\u3059\u3079\u3066","\u0412\u0441\u0435","\u0627\u0644\u0643\u0644"],t.w)
+B.aim=new A.B(B.l,["Mode \xe9conomie d'\xe9nergie","Power saving mode","Ahorro de bater\xeda","\u7701\u7535\u6a21\u5f0f","Economia de bateria","Energiesparmodus","Risparmio batteria","\u30d0\u30c3\u30c6\u30ea\u30fc\u30bb\u30fc\u30d0\u30fc","\u042d\u043a\u043e\u043d\u043e\u043c\u0438\u044f \u0437\u0430\u0440\u044f\u0434\u0430","\u062a\u0648\u0641\u064a\u0631 \u0627\u0644\u0628\u0637\u0627\u0631\u064a\u0629"],t.w)
+B.agU=new A.B(B.l,["\xc9conomiser la batterie, moins d'effets","Save battery, fewer effects","Ahorra bater\xeda, menos efectos","\u7701\u7535\uff0c\u51cf\u5c11\u7279\u6548","Economize bateria, menos efeitos","Akku sparen, weniger Effekte","Risparmia batteria, meno effetti","\u30d0\u30c3\u30c6\u30ea\u30fc\u3092\u7bc0\u7d04\u3001\u30a8\u30d5\u30a7\u30af\u30c8\u63a7\u3048\u3081","\u042d\u043a\u043e\u043d\u043e\u043c\u0438\u044f \u0437\u0430\u0440\u044f\u0434\u0430, \u043c\u0435\u043d\u044c\u0448\u0435 \u044d\u0444\u0444\u0435\u043a\u0442\u043e\u0432","\u0648\u0641\u0651\u0631 \u0627\u0644\u0628\u0637\u0627\u0631\u064a\u0629 \u0628\u062a\u0623\u062b\u064a\u0631\u0627\u062a \u0623\u0642\u0644"],t.w)
+B.ah8=new A.B(B.l,["\xc2mes musicales s\u0153urs","Musical soulmates","Almas gemelas musicales","\u97f3\u4e50\u4e0a\u7684\u7075\u9b42\u4f34\u4fa3","Almas musicais g\xeameas","Musikalische Seelenverwandte","Anime musicali gemelle","\u97f3\u697d\u306e\u30bd\u30a6\u30eb\u30e1\u30a4\u30c8","\u041c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u044b\u0435 \u0440\u043e\u0434\u0441\u0442\u0432\u0435\u043d\u043d\u044b\u0435 \u0434\u0443\u0448\u0438","\u062a\u0648\u0623\u0645 \u0627\u0644\u0631\u0648\u062d \u0627\u0644\u0645\u0648\u0633\u064a\u0642\u064a"],t.w)
+B.ahO=new A.B(B.l,["Tr\xe8s belle compatibilit\xe9","Great compatibility","Muy buena compatibilidad","\u975e\u5e38\u5408\u62cd","\xd3tima compatibilidade","Sehr hohe Kompatibilit\xe4t","Ottima compatibilit\xe0","\u975e\u5e38\u306b\u9ad8\u3044\u76f8\u6027","\u041e\u0442\u043b\u0438\u0447\u043d\u0430\u044f \u0441\u043e\u0432\u043c\u0435\u0441\u0442\u0438\u043c\u043e\u0441\u0442\u044c","\u062a\u0648\u0627\u0641\u0642 \u0631\u0627\u0626\u0639"],t.w)
+B.ahX=new A.B(B.l,["Quelques points communs","Some common ground","Algunos puntos en com\xfan","\u6709\u4e9b\u5171\u540c\u70b9","Alguns pontos em comum","Einige Gemeinsamkeiten","Qualcosa in comune","\u3044\u304f\u3064\u304b\u306e\u5171\u901a\u70b9","\u0415\u0441\u0442\u044c \u043a\u043e\u0435-\u0447\u0442\u043e \u043e\u0431\u0449\u0435\u0435","\u0628\u0639\u0636 \u0627\u0644\u0642\u0648\u0627\u0633\u0645 \u0627\u0644\u0645\u0634\u062a\u0631\u0643\u0629"],t.w)
+B.agl=new A.B(B.l,["Go\xfbts plut\xf4t diff\xe9rents","Fairly different tastes","Gustos bastante diferentes","\u53e3\u5473\u5dee\u5f02\u8f83\u5927","Gostos bem diferentes","Eher unterschiedlicher Geschmack","Gusti piuttosto diversi","\u597d\u307f\u306f\u304b\u306a\u308a\u9055\u3046","\u0412\u043a\u0443\u0441\u044b \u0434\u043e\u0432\u043e\u043b\u044c\u043d\u043e \u0440\u0430\u0437\u043d\u044b\u0435","\u0623\u0630\u0648\u0627\u0642 \u0645\u062e\u062a\u0644\u0641\u0629 \u0625\u0644\u0649 \u062d\u062f \u0645\u0627"],t.w)
+B.aio=new A.B(B.l,["Univers musicaux oppos\xe9s","Worlds apart, musically","Universos musicales opuestos","\u97f3\u4e50\u54c1\u5473\u622a\u7136\u4e0d\u540c","Universos musicais opostos","Musikalisch gegens\xe4tzliche Welten","Mondi musicali opposti","\u97f3\u697d\u7684\u306b\u6b63\u53cd\u5bfe\u306e\u4e16\u754c","\u041f\u0440\u043e\u0442\u0438\u0432\u043e\u043f\u043e\u043b\u043e\u0436\u043d\u044b\u0435 \u043c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u044b\u0435 \u043c\u0438\u0440\u044b","\u0639\u0627\u0644\u0645\u0627\u0646 \u0645\u0648\u0633\u064a\u0642\u064a\u0627\u0646 \u0645\u062a\u0636\u0627\u062f\u0627\u0646"],t.w)
+B.ahC=new A.B(B.l,["C'est votre propre profil !","This is your own profile!","\xa1Este es su propio perfil!","\u8fd9\u662f\u60a8\u81ea\u5df1\u7684\u8d44\u6599\uff01","Este \xe9 o seu pr\xf3prio perfil!","Das ist Ihr eigenes Profil!","\xc8 il suo profilo!","\u3053\u308c\u306f\u3042\u306a\u305f\u81ea\u8eab\u306e\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb\u3067\u3059\uff01","\u042d\u0442\u043e \u0432\u0430\u0448 \u0441\u043e\u0431\u0441\u0442\u0432\u0435\u043d\u043d\u044b\u0439 \u043f\u0440\u043e\u0444\u0438\u043b\u044c!","\u0647\u0630\u0627 \u0645\u0644\u0641\u0643 \u0627\u0644\u0634\u062e\u0635\u064a!"],t.w)
+B.aiU=new A.B(B.l,["{uniqueArti} artistes de votre historique \xb7 biblioth\xe8que compl\xe8te de {targetUser}","{uniqueArti} artists from your history \xb7 {targetUser}'s full library","{uniqueArti} artistas de su historial \xb7 biblioteca completa de {targetUser}","\u6765\u81ea\u60a8\u6536\u542c\u8bb0\u5f55\u7684 {uniqueArti} \u4f4d\u827a\u672f\u5bb6 \xb7 {targetUser} \u7684\u5b8c\u6574\u66f2\u5e93","{uniqueArti} artistas do seu hist\xf3rico \xb7 biblioteca completa de {targetUser}","{uniqueArti} K\xfcnstler aus Ihrem Verlauf \xb7 komplette Bibliothek von {targetUser}","{uniqueArti} artisti dalla sua cronologia \xb7 libreria completa di {targetUser}","\u3042\u306a\u305f\u306e\u5c65\u6b74\u304b\u3089{uniqueArti}\u7d44\u306e\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8 \xb7 {targetUser}\u306e\u30e9\u30a4\u30d6\u30e9\u30ea\u5168\u4f53","{uniqueArti} \u0430\u0440\u0442\u0438\u0441\u0442\u043e\u0432 \u0438\u0437 \u0432\u0430\u0448\u0435\u0439 \u0438\u0441\u0442\u043e\u0440\u0438\u0438 \xb7 \u0432\u0441\u044f \u0431\u0438\u0431\u043b\u0438\u043e\u0442\u0435\u043a\u0430 {targetUser}","{uniqueArti} \u0641\u0646\u0627\u0646\u064b\u0627 \u0645\u0646 \u0633\u062c\u0644\u0643 \xb7 \u0645\u0643\u062a\u0628\u0629 {targetUser} \u0627\u0644\u0643\u0627\u0645\u0644\u0629"],t.w)
+B.aiC=new A.B(B.l,["{uniqueArti} artistes de votre historique \xb7 top 200 de {targetUser}","{uniqueArti} artists from your history \xb7 {targetUser}'s top 200","{uniqueArti} artistas de su historial \xb7 top 200 de {targetUser}","\u6765\u81ea\u60a8\u6536\u542c\u8bb0\u5f55\u7684 {uniqueArti} \u4f4d\u827a\u672f\u5bb6 \xb7 {targetUser} \u7684\u524d 200 \u540d","{uniqueArti} artistas do seu hist\xf3rico \xb7 top 200 de {targetUser}","{uniqueArti} K\xfcnstler aus Ihrem Verlauf \xb7 Top 200 von {targetUser}","{uniqueArti} artisti dalla sua cronologia \xb7 top 200 di {targetUser}","\u3042\u306a\u305f\u306e\u5c65\u6b74\u304b\u3089{uniqueArti}\u7d44\u306e\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8 \xb7 {targetUser}\u306e\u30c8\u30c3\u30d7200","{uniqueArti} \u0430\u0440\u0442\u0438\u0441\u0442\u043e\u0432 \u0438\u0437 \u0432\u0430\u0448\u0435\u0439 \u0438\u0441\u0442\u043e\u0440\u0438\u0438 \xb7 \u0442\u043e\u043f-200 {targetUser}","{uniqueArti} \u0641\u0646\u0627\u0646\u064b\u0627 \u0645\u0646 \u0633\u062c\u0644\u0643 \xb7 \u0623\u0641\u0636\u0644 200 \u0644\u062f\u0649 {targetUser}"],t.w)
+B.ago=new A.B(B.l,["Biblioth\xe8que compl\xe8te (API)","Full library (API)","Biblioteca completa (API)","\u5b8c\u6574\u66f2\u5e93\uff08API\uff09","Biblioteca completa (API)","Komplette Bibliothek (API)","Libreria completa (API)","\u30e9\u30a4\u30d6\u30e9\u30ea\u5168\u4f53\uff08API\uff09","\u0412\u0441\u044f \u0431\u0438\u0431\u043b\u0438\u043e\u0442\u0435\u043a\u0430 (API)","\u0627\u0644\u0645\u0643\u062a\u0628\u0629 \u0627\u0644\u0643\u0627\u0645\u0644\u0629 (API)"],t.w)
+B.aiu=new A.B(B.l,["Top 200 artistes & titres (API)","Top 200 artists & tracks (API)","Top 200 artistas y canciones (API)","\u524d 200 \u540d\u827a\u672f\u5bb6\u4e0e\u6b4c\u66f2\uff08API\uff09","Top 200 artistas e faixas (API)","Top 200 K\xfcnstler & Titel (API)","Top 200 artisti e brani (API)","\u30c8\u30c3\u30d7200\u306e\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u3068\u66f2\uff08API\uff09","\u0422\u043e\u043f-200 \u0430\u0440\u0442\u0438\u0441\u0442\u043e\u0432 \u0438 \u0442\u0440\u0435\u043a\u043e\u0432 (API)","\u0623\u0641\u0636\u0644 200 \u0641\u0646\u0627\u0646 \u0648\u0623\u063a\u0646\u064a\u0629 (API)"],t.w)
+B.ahd=new A.B(B.l,["Impossible de calculer la compatibilit\xe9.","Could not work out the compatibility.","No se pudo calcular la compatibilidad.","\u65e0\u6cd5\u8ba1\u7b97\u517c\u5bb9\u5ea6\u3002","N\xe3o foi poss\xedvel calcular a compatibilidade.","Kompatibilit\xe4t konnte nicht berechnet werden.","Impossibile calcolare la compatibilit\xe0.","\u76f8\u6027\u3092\u8a08\u7b97\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002","\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0440\u0430\u0441\u0441\u0447\u0438\u0442\u0430\u0442\u044c \u0441\u043e\u0432\u043c\u0435\u0441\u0442\u0438\u043c\u043e\u0441\u0442\u044c.","\u062a\u0639\u0630\u0651\u0631 \u062d\u0633\u0627\u0628 \u0627\u0644\u062a\u0648\u0627\u0641\u0642."],t.w)
+B.aje=new A.B(B.l,["Compatibilit\xe9 musicale","Music compatibility","Compatibilidad musical","\u97f3\u4e50\u5951\u5408\u5ea6","Compatibilidade musical","Musikalische Kompatibilit\xe4t","Compatibilit\xe0 musicale","\u97f3\u697d\u306e\u76f8\u6027","\u041c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u0430\u044f \u0441\u043e\u0432\u043c\u0435\u0441\u0442\u0438\u043c\u043e\u0441\u0442\u044c","\u0627\u0644\u062a\u0648\u0627\u0641\u0642 \u0627\u0644\u0645\u0648\u0633\u064a\u0642\u064a"],t.w)
+B.ahR=new A.B(B.l,["Analyse des go\xfbts musicaux\u2026","Analyzing musical taste\u2026","Analizando gustos musicales\u2026","\u6b63\u5728\u5206\u6790\u97f3\u4e50\u54c1\u5473\u2026","Analisando gostos musicais\u2026","Musikgeschmack wird analysiert\u2026","Analisi dei gusti musicali\u2026","\u97f3\u697d\u306e\u597d\u307f\u3092\u5206\u6790\u4e2d\u2026","\u0410\u043d\u0430\u043b\u0438\u0437 \u043c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u044b\u0445 \u0432\u043a\u0443\u0441\u043e\u0432\u2026","\u062c\u0627\u0631\u064d \u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0623\u0630\u0648\u0627\u0642 \u0627\u0644\u0645\u0648\u0633\u064a\u0642\u064a\u0629\u2026"],t.w)
+B.aj2=new A.B(B.l,["{v_totalArti} artiste{v_totalArti2}","{v_totalArti} artist{v_totalArti2}","{v_totalArti} artista{v_totalArti2}","{v_totalArti} \u4f4d\u827a\u672f\u5bb6","{v_totalArti} artista{v_totalArti2}","{v_totalArti} K\xfcnstler","{v_totalArti} artisti","{v_totalArti}\u7d44\u306e\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8","\u0410\u0440\u0442\u0438\u0441\u0442\u043e\u0432: {v_totalArti}","{v_totalArti} \u0641\u0646\u0627\u0646"],t.w)
+B.ai4=new A.B(B.l,["{v_totalTrac} titre{v_totalTrac2}","{v_totalTrac} track{v_totalTrac2}","{v_totalTrac} canci\xf3n{v_totalTrac2}","{v_totalTrac} \u9996\u6b4c\u66f2","{v_totalTrac} faixa{v_totalTrac2}","{v_totalTrac} Titel","{v_totalTrac} brani","{v_totalTrac}\u66f2","\u0422\u0440\u0435\u043a\u043e\u0432: {v_totalTrac}","{v_totalTrac} \u0623\u063a\u0646\u064a\u0629"],t.w)
+B.ahf=new A.B(B.l,["{v_totalAlbu} album{v_totalAlbu2}","{v_totalAlbu} album{v_totalAlbu2}","{v_totalAlbu} \xe1lbum{v_totalAlbu2}","{v_totalAlbu} \u5f20\u4e13\u8f91","{v_totalAlbu} \xe1lbum{v_totalAlbu2}","{v_totalAlbu} Alben","{v_totalAlbu} album","{v_totalAlbu}\u679a\u306e\u30a2\u30eb\u30d0\u30e0","\u0410\u043b\u044c\u0431\u043e\u043c\u043e\u0432: {v_totalAlbu}","{v_totalAlbu} \u0623\u0644\u0628\u0648\u0645"],t.w)
+B.ajw=new A.B(B.l,["Titres en commun","Shared tracks","Canciones en com\xfan","\u5171\u540c\u6b4c\u66f2","Faixas em comum","Gemeinsame Titel","Brani in comune","\u5171\u901a\u306e\u66f2","\u041e\u0431\u0449\u0438\u0435 \u0442\u0440\u0435\u043a\u0438","\u0623\u063a\u0627\u0646\u064d \u0645\u0634\u062a\u0631\u0643\u0629"],t.w)
+B.ajT=new A.B(B.l,["Artistes en commun","Shared artists","Artistas en com\xfan","\u5171\u540c\u827a\u672f\u5bb6","Artistas em comum","Gemeinsame K\xfcnstler","Artisti in comune","\u5171\u901a\u306e\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8","\u041e\u0431\u0449\u0438\u0435 \u0430\u0440\u0442\u0438\u0441\u0442\u044b","\u0641\u0646\u0627\u0646\u0648\u0646 \u0645\u0634\u062a\u0631\u0643\u0648\u0646"],t.w)
+B.aik=new A.B(B.l,["Aucun artiste en commun trouv\xe9.","No shared artists found.","No se encontraron artistas en com\xfan.","\u672a\u627e\u5230\u5171\u540c\u7684\u827a\u672f\u5bb6\u3002","Nenhum artista em comum encontrado.","Keine gemeinsamen K\xfcnstler gefunden.","Nessun artista in comune trovato.","\u5171\u901a\u306e\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u306f\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f\u3002","\u041e\u0431\u0449\u0438\u0445 \u0430\u0440\u0442\u0438\u0441\u0442\u043e\u0432 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e.","\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0641\u0646\u0627\u0646\u064a\u0646 \u0645\u0634\u062a\u0631\u0643\u064a\u0646."],t.w)
+B.aj7=new A.B(B.l,["Albums en commun","Shared albums","\xc1lbumes en com\xfan","\u5171\u540c\u4e13\u8f91","\xc1lbuns em comum","Gemeinsame Alben","Album in comune","\u5171\u901a\u306e\u30a2\u30eb\u30d0\u30e0","\u041e\u0431\u0449\u0438\u0435 \u0430\u043b\u044c\u0431\u043e\u043c\u044b","\u0623\u0644\u0628\u0648\u0645\u0627\u062a \u0645\u0634\u062a\u0631\u0643\u0629"],t.w)
+B.aj4=new A.B(B.l,["D\xe9compte d'\xe9coutes indisponible pour l'un des deux.","Play count unavailable for one of you.","Recuento de reproducciones no disponible para uno de los dos.","\u5176\u4e2d\u4e00\u65b9\u7684\u64ad\u653e\u6b21\u6570\u4e0d\u53ef\u7528\u3002","Contagem de reprodu\xe7\xf5es indispon\xedvel para um dos dois.","Wiedergabezahl f\xfcr einen von Ihnen nicht verf\xfcgbar.","Numero di ascolti non disponibile per uno dei due.","\u3069\u3061\u3089\u304b\u306e\u518d\u751f\u56de\u6570\u304c\u53d6\u5f97\u3067\u304d\u307e\u305b\u3093\u3002","\u0427\u0438\u0441\u043b\u043e \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u0439 \u043d\u0435\u0434\u043e\u0441\u0442\u0443\u043f\u043d\u043e \u0434\u043b\u044f \u043e\u0434\u043d\u043e\u0433\u043e \u0438\u0437 \u0432\u0430\u0441.","\u0639\u062f\u062f \u0645\u0631\u0627\u062a \u0627\u0644\u062a\u0634\u063a\u064a\u0644 \u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u0644\u0623\u062d\u062f\u0643\u0645\u0627."],t.w)
+B.ag8=new A.B(B.l,["Vous \xe9coutez \xe7a {x}x plus que {theirUsern}.","You listen to this {x}x more than {theirUsern}.","Escucha esto {x}x m\xe1s que {theirUsern}.","\u60a8\u542c\u8fd9\u4e2a\u7684\u6b21\u6570\u662f {theirUsern} \u7684 {x} \u500d\u3002","Voc\xea escuta isso {x}x mais que {theirUsern}.","Sie h\xf6ren das {x}x \xf6fter als {theirUsern}.","Lo ascolta {x}x pi\xf9 di {theirUsern}.","\u3042\u306a\u305f\u306f{theirUsern}\u3088\u308a{x}\u500d\u591a\u304f\u8074\u3044\u3066\u3044\u307e\u3059\u3002","\u0412\u044b \u0441\u043b\u0443\u0448\u0430\u0435\u0442\u0435 \u044d\u0442\u043e \u0432 {x} \u0440\u0430\u0437 \u0447\u0430\u0449\u0435, \u0447\u0435\u043c {theirUsern}.","\u062a\u0633\u062a\u0645\u0639 \u0625\u0644\u0649 \u0647\u0630\u0627 \u0623\u0643\u062b\u0631 \u0645\u0646 {theirUsern} \u0628\u0645\u0642\u062f\u0627\u0631 {x} \u0645\u0631\u0629."],t.w)
+B.aiM=new A.B(B.l,["{theirUsern} \xe9coute \xe7a {x}x plus que vous.","{theirUsern} listens to this {x}x more than you.","{theirUsern} escucha esto {x}x m\xe1s que usted.","{theirUsern} \u542c\u8fd9\u4e2a\u7684\u6b21\u6570\u662f\u60a8\u7684 {x} \u500d\u3002","{theirUsern} escuta isso {x}x mais que voc\xea.","{theirUsern} h\xf6rt das {x}x \xf6fter als Sie.","{theirUsern} lo ascolta {x}x pi\xf9 di lei.","{theirUsern}\u306f\u3042\u306a\u305f\u3088\u308a{x}\u500d\u591a\u304f\u8074\u3044\u3066\u3044\u307e\u3059\u3002","{theirUsern} \u0441\u043b\u0443\u0448\u0430\u0435\u0442 \u044d\u0442\u043e \u0432 {x} \u0440\u0430\u0437 \u0447\u0430\u0449\u0435, \u0447\u0435\u043c \u0432\u044b.","{theirUsern} \u064a\u0633\u062a\u0645\u0639 \u0625\u0644\u0649 \u0647\u0630\u0627 \u0623\u0643\u062b\u0631 \u0645\u0646\u0643 \u0628\u0645\u0642\u062f\u0627\u0631 {x} \u0645\u0631\u0629."],t.w)
+B.ajO=new A.B(B.l,["Vous l'\xe9coutez \xe0 peu pr\xe8s autant tous les deux.","You both listen to this about equally.","Ambos escuchan esto casi por igual.","\u60a8\u4e8c\u4f4d\u542c\u8fd9\u4e2a\u7684\u9891\u7387\u5dee\u4e0d\u591a\u3002","Voc\xeas dois escutam isso quase igualmente.","Sie h\xf6ren das beide etwa gleich oft.","Lo ascoltano pi\xf9 o meno allo stesso modo.","\u4e8c\u4eba\u3068\u3082\u307b\u307c\u540c\u3058\u56de\u6570\u8074\u3044\u3066\u3044\u307e\u3059\u3002","\u0412\u044b \u0441\u043b\u0443\u0448\u0430\u0435\u0442\u0435 \u044d\u0442\u043e \u043f\u0440\u0438\u043c\u0435\u0440\u043d\u043e \u043e\u0434\u0438\u043d\u0430\u043a\u043e\u0432\u043e.","\u0643\u0644\u0627\u0643\u0645\u0627 \u064a\u0633\u062a\u0645\u0639 \u0625\u0644\u0649 \u0647\u0630\u0627 \u0628\u0646\u0641\u0633 \u0627\u0644\u0642\u062f\u0631 \u062a\u0642\u0631\u064a\u0628\u064b\u0627."],t.w)
+B.aj6=new A.B(B.l,["{plays} \xe9coutes","{plays} plays","{plays} reproducciones","{plays} \u6b21\u64ad\u653e","{plays} reprodu\xe7\xf5es","{plays} Wiedergaben","{plays} ascolti","{plays}\u56de\u518d\u751f","{plays} \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u0439","{plays} \u062a\u0634\u063a\u064a\u0644"],t.w)
+B.ajN=new A.B(B.l,["compatibilit\xe9","compatibility","compatibilidad","\u5951\u5408\u5ea6","compatibilidade","Kompatibilit\xe4t","compatibilit\xe0","\u76f8\u6027","\u0441\u043e\u0432\u043c\u0435\u0441\u0442\u0438\u043c\u043e\u0441\u0442\u044c","\u0627\u0644\u062a\u0648\u0627\u0641\u0642"],t.w)
+B.agI=new A.B(B.l,["VOUS ADOREZ TOUS LES DEUX","YOU BOTH LOVE","A AMBOS LES ENCANTA","\u60a8\u4e8c\u4f4d\u90fd\u8d85\u7231","VOC\xcaS DOIS AMAM","SIE LIEBEN BEIDE","PIACE A ENTRAMBI","\u4e8c\u4eba\u3068\u3082\u5927\u597d\u304d","\u0412\u042b \u041e\u0411\u0410 \u041b\u042e\u0411\u0418\u0422\u0415","\u0643\u0644\u0627\u0643\u0645\u0627 \u064a\u062d\u0628"],t.w)
 B.ajs=new A.B(B.l,["ARTISTE PR\xc9F\xc9R\xc9 EN COMMUN","SHARED TOP ARTIST","ARTISTA FAVORITO EN COM\xdaN","\u5171\u540c\u7684\u6700\u7231\u827a\u672f\u5bb6","ARTISTA FAVORITO EM COMUM","GEMEINSAMER LIEBLINGSK\xdcNSTLER","ARTISTA PREFERITO IN COMUNE","\u5171\u901a\u306e\u304a\u6c17\u306b\u5165\u308a\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8","\u041e\u0411\u0429\u0418\u0419 \u041b\u042e\u0411\u0418\u041c\u042b\u0419 \u0410\u0420\u0422\u0418\u0421\u0422","\u0627\u0644\u0641\u0646\u0627\u0646 \u0627\u0644\u0645\u0641\u0636\u0644 \u0627\u0644\u0645\u0634\u062a\u0631\u0643"],t.w)
-B.agc=new A.B(B.l,["Succ\xe8s","Achievements","Logros","\u6210\u5c31","Conquistas","Erfolge","Traguardi","\u5b9f\u7e3e","\u0414\u043e\u0441\u0442\u0438\u0436\u0435\u043d\u0438\u044f","\u0627\u0644\u0625\u0646\u062c\u0627\u0632\u0627\u062a"],t.w)
-B.aj9=new A.B(B.l,["QR non reconnu \u2014 pas un profil LastStats/Last.fm","QR not recognized \u2014 not a LastStats/Last.fm profile","QR no reconocido: no es un perfil de LastStats/Last.fm","\u65e0\u6cd5\u8bc6\u522b\u4e8c\u7ef4\u7801 \u2014 \u4e0d\u662f LastStats/Last.fm \u4e2a\u4eba\u8d44\u6599","QR n\xe3o reconhecido \u2014 n\xe3o \xe9 um perfil do LastStats/Last.fm","QR-Code nicht erkannt \u2013 kein LastStats/Last.fm-Profil","QR non riconosciuto: non \xe8 un profilo LastStats/Last.fm","QR\u30b3\u30fc\u30c9\u3092\u8a8d\u8b58\u3067\u304d\u307e\u305b\u3093 \u2014 LastStats/Last.fm\u306e\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb\u3067\u306f\u3042\u308a\u307e\u305b\u3093","QR-\u043a\u043e\u0434 \u043d\u0435 \u0440\u0430\u0441\u043f\u043e\u0437\u043d\u0430\u043d \u2014 \u044d\u0442\u043e \u043d\u0435 \u043f\u0440\u043e\u0444\u0438\u043b\u044c LastStats/Last.fm","\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u062a\u0639\u0631\u0641 \u0639\u0644\u0649 \u0631\u0645\u0632 QR \u2014 \u0644\u064a\u0633 \u0645\u0644\u0641\u064b\u0627 \u0634\u062e\u0635\u064a\u064b\u0627 \u0641\u064a LastStats/Last.fm"],t.w)
-B.aia=new A.B(B.l,["Scanne un QR code de profil","Scan a profile's QR code","Escanea el c\xf3digo QR de un perfil","\u626b\u63cf\u4e2a\u4eba\u8d44\u6599\u4e8c\u7ef4\u7801","Escaneie o c\xf3digo QR de um perfil","Scanne den QR-Code eines Profils","Scansiona il codice QR di un profilo","\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb\u306eQR\u30b3\u30fc\u30c9\u3092\u30b9\u30ad\u30e3\u30f3","\u041e\u0442\u0441\u043a\u0430\u043d\u0438\u0440\u0443\u0439\u0442\u0435 QR-\u043a\u043e\u0434 \u043f\u0440\u043e\u0444\u0438\u043b\u044f","\u0627\u0645\u0633\u062d \u0631\u0645\u0632 QR \u0644\u0645\u0644\u0641 \u0634\u062e\u0635\u064a"],t.w)
-B.aiT=new A.B(B.l,["Coups de c\u0153ur","Favorites","Favoritos","\u7cbe\u9009\u63a8\u8350","Favoritos","Favoriten","Preferiti","\u304a\u6c17\u306b\u5165\u308a","\u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435","\u0627\u0644\u0645\u0641\u0636\u0644\u0629"],t.w)
-B.ah9=new A.B(B.l,["Client YouTube Music avanc\xe9.","Advanced YouTube Music client.","Cliente avanzado de YouTube Music.","\u529f\u80fd\u5f3a\u5927\u7684 YouTube Music \u5ba2\u6237\u7aef\u3002","Cliente avan\xe7ado do YouTube Music.","Fortschrittlicher YouTube-Music-Client.","Client avanzato per YouTube Music.","\u9ad8\u6a5f\u80fd\u306a YouTube Music \u30af\u30e9\u30a4\u30a2\u30f3\u30c8\u3002","\u041f\u0440\u043e\u0434\u0432\u0438\u043d\u0443\u0442\u044b\u0439 \u043a\u043b\u0438\u0435\u043d\u0442 YouTube Music.","\u0639\u0645\u064a\u0644 \u0645\u062a\u0642\u062f\u0645 \u0644\u062a\u0637\u0628\u064a\u0642 \u064a\u0648\u062a\u064a\u0648\u0628 \u0645\u064a\u0648\u0632\u0643."],t.w)
-B.afS=new A.B(B.l,["Synchronise les Glyphs des t\xe9l\xe9phones Nothing \xe0 la musique.","Syncs the Glyphs of Nothing phones to the music.","Sincroniza los Glyphs de los Nothing phones con la m\xfasica.","\u5c06 Nothing \u624b\u673a\u7684 Glyph \u706f\u6548\u4e0e\u97f3\u4e50\u540c\u6b65\u3002","Sincroniza os Glyphs dos telefones Nothing com a m\xfasica.","Synchronisiert die Glyphs der Nothing-Phones mit der Musik.","Sincronizza i Glyph dei telefoni Nothing con la musica.","Nothing \u30d5\u30a9\u30f3\u306e Glyph \u3092\u97f3\u697d\u306b\u540c\u671f\u3055\u305b\u307e\u3059\u3002","\u0421\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0438\u0440\u0443\u0435\u0442 Glyph \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u043e\u0432 Nothing \u0441 \u043c\u0443\u0437\u044b\u043a\u043e\u0439.","\u064a\u0632\u0627\u0645\u0646 \u0645\u0635\u0627\u0628\u064a\u062d Glyph \u0641\u064a \u0647\u0648\u0627\u062a\u0641 Nothing \u0645\u0639 \u0627\u0644\u0645\u0648\u0633\u064a\u0642\u0649."],t.w)
-B.ag3=new A.B(B.l,["Sources","Sources","Fuentes","\u6765\u6e90","Fontes","Quellen","Fonti","\u30bd\u30fc\u30b9","\u0418\u0441\u0442\u043e\u0447\u043d\u0438\u043a\u0438","\u0627\u0644\u0645\u0635\u0627\u062f\u0631"],t.w)
-B.ahA=new A.B(B.l,["Doc officielle Flutter (widgets, th\xe8mes, API).","Official Flutter docs (widgets, theming, API).","Documentaci\xf3n oficial de Flutter.","Flutter \u5b98\u65b9\u6587\u6863\u3002","Documenta\xe7\xe3o oficial do Flutter.","Offizielle Flutter-Dokumentation.","Documentazione ufficiale di Flutter.","Flutter \u306e\u516c\u5f0f\u30c9\u30ad\u30e5\u30e1\u30f3\u30c8\u3002","\u041e\u0444\u0438\u0446\u0438\u0430\u043b\u044c\u043d\u0430\u044f \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430\u0446\u0438\u044f Flutter.","\u0648\u062b\u0627\u0626\u0642 Flutter \u0627\u0644\u0631\u0633\u0645\u064a\u0629."],t.w)
-B.ahf=new A.B(B.l,["Guide officiel Material 3 pour d\xe9velopper avec Flutter.","Official Material 3 guide for developing with Flutter.","Gu\xeda oficial de Material 3 para Flutter.","\u9762\u5411 Flutter \u7684 Material 3 \u5b98\u65b9\u6307\u5357\u3002","Guia oficial do Material 3 para Flutter.","Offizieller Material-3-Leitfaden f\xfcr Flutter.","Guida ufficiale a Material 3 per Flutter.","Flutter \u5411\u3051 Material 3 \u516c\u5f0f\u30ac\u30a4\u30c9\u3002","\u041e\u0444\u0438\u0446\u0438\u0430\u043b\u044c\u043d\u043e\u0435 \u0440\u0443\u043a\u043e\u0432\u043e\u0434\u0441\u0442\u0432\u043e Material 3 \u0434\u043b\u044f Flutter.","\u062f\u0644\u064a\u0644 Material 3 \u0627\u0644\u0631\u0633\u0645\u064a \u0644\u062a\u0637\u0648\u064a\u0631 Flutter."],t.w)
-B.aj2=new A.B(B.l,["R\xe9f\xe9rence API Flutter pour le th\xe8me Material 3.","Flutter API reference for the Material 3 theme flag.","Referencia de la API de Flutter para Material 3.","Material 3 \u4e3b\u9898\u7684 Flutter API \u53c2\u8003\u3002","Refer\xeancia da API Flutter para o Material 3.","Flutter-API-Referenz f\xfcr das Material-3-Theme.","Riferimento API Flutter per Material 3.","Material 3 \u30c6\u30fc\u30de\u306e Flutter API \u30ea\u30d5\u30a1\u30ec\u30f3\u30b9\u3002","\u0421\u043f\u0440\u0430\u0432\u043e\u0447\u043d\u0438\u043a API Flutter \u0434\u043b\u044f \u0442\u0435\u043c\u044b Material 3.","\u0645\u0631\u062c\u0639 Flutter API \u0644\u0633\u0645\u0629 Material 3."],t.w)
-B.agg=new A.B(B.l,["Package Flutter officiel pour les layouts adaptatifs.","Official Flutter package for adaptive layouts.","Paquete oficial de Flutter para layouts adaptativos.","\u7528\u4e8e\u81ea\u9002\u5e94\u5e03\u5c40\u7684 Flutter \u5b98\u65b9\u5305\u3002","Pacote oficial do Flutter para layouts adaptativos.","Offizielles Flutter-Paket f\xfcr adaptive Layouts.","Pacchetto ufficiale Flutter per layout adattivi.","\u30a2\u30c0\u30d7\u30c6\u30a3\u30d6\u30ec\u30a4\u30a2\u30a6\u30c8\u7528\u306e Flutter \u516c\u5f0f\u30d1\u30c3\u30b1\u30fc\u30b8\u3002","\u041e\u0444\u0438\u0446\u0438\u0430\u043b\u044c\u043d\u044b\u0439 \u043f\u0430\u043a\u0435\u0442 Flutter \u0434\u043b\u044f \u0430\u0434\u0430\u043f\u0442\u0438\u0432\u043d\u044b\u0445 \u043c\u0430\u043a\u0435\u0442\u043e\u0432.","\u062d\u0632\u0645\u0629 Flutter \u0627\u0644\u0631\u0633\u0645\u064a\u0629 \u0644\u0644\u062a\u062e\u0637\u064a\u0637\u0627\u062a \u0627\u0644\u0645\u062a\u0643\u064a\u0641\u0629."],t.w)
-B.aiM=new A.B(B.l,["Widgets Android","Android widgets","Widgets de Android","Android \u5c0f\u7ec4\u4ef6","Widgets do Android","Android-Widgets","Widget Android","Android \u30a6\u30a3\u30b8\u30a7\u30c3\u30c8","\u0412\u0438\u0434\u0436\u0435\u0442\u044b Android","\u0648\u062f\u062c\u0627\u062a \u0623\u0646\u062f\u0631\u0648\u064a\u062f"],t.w)
+B.agf=new A.B(B.l,["Succ\xe8s","Achievements","Logros","\u6210\u5c31","Conquistas","Erfolge","Traguardi","\u5b9f\u7e3e","\u0414\u043e\u0441\u0442\u0438\u0436\u0435\u043d\u0438\u044f","\u0627\u0644\u0625\u0646\u062c\u0627\u0632\u0627\u062a"],t.w)
+B.ajd=new A.B(B.l,["QR non reconnu \u2014 pas un profil LastStats/Last.fm","QR not recognized \u2014 not a LastStats/Last.fm profile","QR no reconocido: no es un perfil de LastStats/Last.fm","\u65e0\u6cd5\u8bc6\u522b\u4e8c\u7ef4\u7801 \u2014 \u4e0d\u662f LastStats/Last.fm \u4e2a\u4eba\u8d44\u6599","QR n\xe3o reconhecido \u2014 n\xe3o \xe9 um perfil do LastStats/Last.fm","QR-Code nicht erkannt \u2013 kein LastStats/Last.fm-Profil","QR non riconosciuto: non \xe8 un profilo LastStats/Last.fm","QR\u30b3\u30fc\u30c9\u3092\u8a8d\u8b58\u3067\u304d\u307e\u305b\u3093 \u2014 LastStats/Last.fm\u306e\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb\u3067\u306f\u3042\u308a\u307e\u305b\u3093","QR-\u043a\u043e\u0434 \u043d\u0435 \u0440\u0430\u0441\u043f\u043e\u0437\u043d\u0430\u043d \u2014 \u044d\u0442\u043e \u043d\u0435 \u043f\u0440\u043e\u0444\u0438\u043b\u044c LastStats/Last.fm","\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u062a\u0639\u0631\u0641 \u0639\u0644\u0649 \u0631\u0645\u0632 QR \u2014 \u0644\u064a\u0633 \u0645\u0644\u0641\u064b\u0627 \u0634\u062e\u0635\u064a\u064b\u0627 \u0641\u064a LastStats/Last.fm"],t.w)
+B.afU=new A.B(B.l,["Scannez un QR code de profil","Scan a profile's QR code","Escanee el c\xf3digo QR de un perfil","\u626b\u63cf\u4e2a\u4eba\u8d44\u6599\u4e8c\u7ef4\u7801","Escaneie o c\xf3digo QR de um perfil","Scannen Sie den QR-Code eines Profils","Scansioni il codice QR di un profilo","\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb\u306eQR\u30b3\u30fc\u30c9\u3092\u30b9\u30ad\u30e3\u30f3","\u041e\u0442\u0441\u043a\u0430\u043d\u0438\u0440\u0443\u0439\u0442\u0435 QR-\u043a\u043e\u0434 \u043f\u0440\u043e\u0444\u0438\u043b\u044f","\u0627\u0645\u0633\u062d \u0631\u0645\u0632 QR \u0644\u0645\u0644\u0641 \u0634\u062e\u0635\u064a"],t.w)
+B.aiW=new A.B(B.l,["Coups de c\u0153ur","Favorites","Favoritos","\u7cbe\u9009\u63a8\u8350","Favoritos","Favoriten","Preferiti","\u304a\u6c17\u306b\u5165\u308a","\u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435","\u0627\u0644\u0645\u0641\u0636\u0644\u0629"],t.w)
+B.ahe=new A.B(B.l,["Client YouTube Music avanc\xe9.","Advanced YouTube Music client.","Cliente avanzado de YouTube Music.","\u529f\u80fd\u5f3a\u5927\u7684 YouTube Music \u5ba2\u6237\u7aef\u3002","Cliente avan\xe7ado do YouTube Music.","Fortschrittlicher YouTube-Music-Client.","Client avanzato per YouTube Music.","\u9ad8\u6a5f\u80fd\u306a YouTube Music \u30af\u30e9\u30a4\u30a2\u30f3\u30c8\u3002","\u041f\u0440\u043e\u0434\u0432\u0438\u043d\u0443\u0442\u044b\u0439 \u043a\u043b\u0438\u0435\u043d\u0442 YouTube Music.","\u0639\u0645\u064a\u0644 \u0645\u062a\u0642\u062f\u0645 \u0644\u062a\u0637\u0628\u064a\u0642 \u064a\u0648\u062a\u064a\u0648\u0628 \u0645\u064a\u0648\u0632\u0643."],t.w)
+B.afR=new A.B(B.l,["Synchronise les Glyphs des t\xe9l\xe9phones Nothing \xe0 la musique.","Syncs the Glyphs of Nothing phones to the music.","Sincroniza los Glyphs de los Nothing phones con la m\xfasica.","\u5c06 Nothing \u624b\u673a\u7684 Glyph \u706f\u6548\u4e0e\u97f3\u4e50\u540c\u6b65\u3002","Sincroniza os Glyphs dos telefones Nothing com a m\xfasica.","Synchronisiert die Glyphs der Nothing-Phones mit der Musik.","Sincronizza i Glyph dei telefoni Nothing con la musica.","Nothing \u30d5\u30a9\u30f3\u306e Glyph \u3092\u97f3\u697d\u306b\u540c\u671f\u3055\u305b\u307e\u3059\u3002","\u0421\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0438\u0440\u0443\u0435\u0442 Glyph \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u043e\u0432 Nothing \u0441 \u043c\u0443\u0437\u044b\u043a\u043e\u0439.","\u064a\u0632\u0627\u0645\u0646 \u0645\u0635\u0627\u0628\u064a\u062d Glyph \u0641\u064a \u0647\u0648\u0627\u062a\u0641 Nothing \u0645\u0639 \u0627\u0644\u0645\u0648\u0633\u064a\u0642\u0649."],t.w)
+B.ag4=new A.B(B.l,["Sources","Sources","Fuentes","\u6765\u6e90","Fontes","Quellen","Fonti","\u30bd\u30fc\u30b9","\u0418\u0441\u0442\u043e\u0447\u043d\u0438\u043a\u0438","\u0627\u0644\u0645\u0635\u0627\u062f\u0631"],t.w)
+B.ahF=new A.B(B.l,["Doc officielle Flutter (widgets, th\xe8mes, API).","Official Flutter docs (widgets, theming, API).","Documentaci\xf3n oficial de Flutter.","Flutter \u5b98\u65b9\u6587\u6863\u3002","Documenta\xe7\xe3o oficial do Flutter.","Offizielle Flutter-Dokumentation.","Documentazione ufficiale di Flutter.","Flutter \u306e\u516c\u5f0f\u30c9\u30ad\u30e5\u30e1\u30f3\u30c8\u3002","\u041e\u0444\u0438\u0446\u0438\u0430\u043b\u044c\u043d\u0430\u044f \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430\u0446\u0438\u044f Flutter.","\u0648\u062b\u0627\u0626\u0642 Flutter \u0627\u0644\u0631\u0633\u0645\u064a\u0629."],t.w)
+B.ahj=new A.B(B.l,["Guide officiel Material 3 pour d\xe9velopper avec Flutter.","Official Material 3 guide for developing with Flutter.","Gu\xeda oficial de Material 3 para Flutter.","\u9762\u5411 Flutter \u7684 Material 3 \u5b98\u65b9\u6307\u5357\u3002","Guia oficial do Material 3 para Flutter.","Offizieller Material-3-Leitfaden f\xfcr Flutter.","Guida ufficiale a Material 3 per Flutter.","Flutter \u5411\u3051 Material 3 \u516c\u5f0f\u30ac\u30a4\u30c9\u3002","\u041e\u0444\u0438\u0446\u0438\u0430\u043b\u044c\u043d\u043e\u0435 \u0440\u0443\u043a\u043e\u0432\u043e\u0434\u0441\u0442\u0432\u043e Material 3 \u0434\u043b\u044f Flutter.","\u062f\u0644\u064a\u0644 Material 3 \u0627\u0644\u0631\u0633\u0645\u064a \u0644\u062a\u0637\u0648\u064a\u0631 Flutter."],t.w)
+B.aj5=new A.B(B.l,["R\xe9f\xe9rence API Flutter pour le th\xe8me Material 3.","Flutter API reference for the Material 3 theme flag.","Referencia de la API de Flutter para Material 3.","Material 3 \u4e3b\u9898\u7684 Flutter API \u53c2\u8003\u3002","Refer\xeancia da API Flutter para o Material 3.","Flutter-API-Referenz f\xfcr das Material-3-Theme.","Riferimento API Flutter per Material 3.","Material 3 \u30c6\u30fc\u30de\u306e Flutter API \u30ea\u30d5\u30a1\u30ec\u30f3\u30b9\u3002","\u0421\u043f\u0440\u0430\u0432\u043e\u0447\u043d\u0438\u043a API Flutter \u0434\u043b\u044f \u0442\u0435\u043c\u044b Material 3.","\u0645\u0631\u062c\u0639 Flutter API \u0644\u0633\u0645\u0629 Material 3."],t.w)
+B.agj=new A.B(B.l,["Package Flutter officiel pour les layouts adaptatifs.","Official Flutter package for adaptive layouts.","Paquete oficial de Flutter para layouts adaptativos.","\u7528\u4e8e\u81ea\u9002\u5e94\u5e03\u5c40\u7684 Flutter \u5b98\u65b9\u5305\u3002","Pacote oficial do Flutter para layouts adaptativos.","Offizielles Flutter-Paket f\xfcr adaptive Layouts.","Pacchetto ufficiale Flutter per layout adattivi.","\u30a2\u30c0\u30d7\u30c6\u30a3\u30d6\u30ec\u30a4\u30a2\u30a6\u30c8\u7528\u306e Flutter \u516c\u5f0f\u30d1\u30c3\u30b1\u30fc\u30b8\u3002","\u041e\u0444\u0438\u0446\u0438\u0430\u043b\u044c\u043d\u044b\u0439 \u043f\u0430\u043a\u0435\u0442 Flutter \u0434\u043b\u044f \u0430\u0434\u0430\u043f\u0442\u0438\u0432\u043d\u044b\u0445 \u043c\u0430\u043a\u0435\u0442\u043e\u0432.","\u062d\u0632\u0645\u0629 Flutter \u0627\u0644\u0631\u0633\u0645\u064a\u0629 \u0644\u0644\u062a\u062e\u0637\u064a\u0637\u0627\u062a \u0627\u0644\u0645\u062a\u0643\u064a\u0641\u0629."],t.w)
+B.aiO=new A.B(B.l,["Widgets Android","Android widgets","Widgets de Android","Android \u5c0f\u7ec4\u4ef6","Widgets do Android","Android-Widgets","Widget Android","Android \u30a6\u30a3\u30b8\u30a7\u30c3\u30c8","\u0412\u0438\u0434\u0436\u0435\u0442\u044b Android","\u0648\u062f\u062c\u0627\u062a \u0623\u0646\u062f\u0631\u0648\u064a\u062f"],t.w)
 B.ais=new A.B(B.l,["Applique la couleur d'accent au fond des widgets de l'\xe9cran d'accueil. D\xe9sactiv\xe9 : blanc ou noir pur.","Applies the accent color to the home screen widgets' background. Off: pure white or black.","Aplica el color de acento al fondo de los widgets de la pantalla de inicio. Desactivado: blanco o negro puro.","\u5c06\u5f3a\u8c03\u8272\u5e94\u7528\u5230\u4e3b\u5c4f\u5e55\u5c0f\u7ec4\u4ef6\u7684\u80cc\u666f\u3002\u5173\u95ed\u65f6\u4e3a\u7eaf\u767d\u6216\u7eaf\u9ed1\u3002","Aplica a cor de destaque ao fundo dos widgets da tela inicial. Desativado: branco ou preto puro.","Wendet die Akzentfarbe auf den Hintergrund der Homescreen-Widgets an. Aus: reines Wei\xdf oder Schwarz.","Applica il colore d'accento allo sfondo dei widget nella schermata home. Disattivato: bianco o nero puro.","\u30db\u30fc\u30e0\u753b\u9762\u30a6\u30a3\u30b8\u30a7\u30c3\u30c8\u306e\u80cc\u666f\u306b\u30a2\u30af\u30bb\u30f3\u30c8\u30ab\u30e9\u30fc\u3092\u9069\u7528\u3057\u307e\u3059\u3002\u30aa\u30d5\u306e\u5834\u5408\u306f\u7d14\u767d\u307e\u305f\u306f\u7d14\u9ed2\u306b\u306a\u308a\u307e\u3059\u3002","\u041f\u0440\u0438\u043c\u0435\u043d\u044f\u0435\u0442 \u0430\u043a\u0446\u0435\u043d\u0442\u043d\u044b\u0439 \u0446\u0432\u0435\u0442 \u043a \u0444\u043e\u043d\u0443 \u0432\u0438\u0434\u0436\u0435\u0442\u043e\u0432 \u043d\u0430 \u0433\u043b\u0430\u0432\u043d\u043e\u043c \u044d\u043a\u0440\u0430\u043d\u0435. \u0412\u044b\u043a\u043b: \u0447\u0438\u0441\u0442\u043e \u0431\u0435\u043b\u044b\u0439 \u0438\u043b\u0438 \u0447\u0451\u0440\u043d\u044b\u0439.","\u064a\u0637\u0628\u0651\u0642 \u0644\u0648\u0646 \u0627\u0644\u062a\u0645\u064a\u064a\u0632 \u0639\u0644\u0649 \u062e\u0644\u0641\u064a\u0629 \u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0634\u0627\u0634\u0629 \u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629. \u0639\u0646\u062f \u0627\u0644\u0625\u064a\u0642\u0627\u0641: \u0623\u0628\u064a\u0636 \u0623\u0648 \u0623\u0633\u0648\u062f \u062e\u0627\u0644\u0635."],t.w)
-B.ah7=new A.B(B.l,["D\xe9sactive le parallaxe au mouvement, plafonne le taux de rafra\xeechissement de l'\xe9cran, et ralentit les mises \xe0 jour en arri\xe8re-plan \u2014 le reste garde sa pleine qualit\xe9 (images, exports, cartes de partage).","Turns off tilt parallax, caps the screen refresh rate, and slows down background updates \u2014 everything else stays full quality (images, exports, share cards).","Desactiva el paralaje al mover el m\xf3vil, limita la frecuencia de actualizaci\xf3n de la pantalla y ralentiza las actualizaciones en segundo plano; todo lo dem\xe1s mantiene la calidad completa (im\xe1genes, exportaciones, tarjetas para compartir).","\u5173\u95ed\u503e\u659c\u89c6\u5dee\uff0c\u9650\u5236\u5c4f\u5e55\u5237\u65b0\u7387\uff0c\u5e76\u964d\u4f4e\u540e\u53f0\u66f4\u65b0\u9891\u7387 \u2014 \u5176\u4ed6\u4e00\u5207\u4fdd\u6301\u5b8c\u6574\u54c1\u8d28\uff08\u56fe\u7247\u3001\u5bfc\u51fa\u3001\u5206\u4eab\u5361\u7247\uff09\u3002","Desativa o paralaxe de movimento, limita a taxa de atualiza\xe7\xe3o da tela e desacelera as atualiza\xe7\xf5es em segundo plano \u2014 o resto mant\xe9m a qualidade total (imagens, exporta\xe7\xf5es, cart\xf5es de compartilhamento).","Deaktiviert den Neige-Parallax, begrenzt die Bildwiederholrate und verlangsamt Hintergrundaktualisierungen \u2013 alles andere bleibt in voller Qualit\xe4t (Bilder, Exporte, Share-Karten).","Disattiva il parallasse al movimento, limita la frequenza di aggiornamento dello schermo e rallenta gli aggiornamenti in background: tutto il resto mantiene la piena qualit\xe0 (immagini, esportazioni, schede di condivisione).","\u50be\u304d\u306b\u3088\u308b\u30d1\u30e9\u30e9\u30c3\u30af\u30b9\u3092\u7121\u52b9\u306b\u3057\u3001\u753b\u9762\u306e\u30ea\u30d5\u30ec\u30c3\u30b7\u30e5\u30ec\u30fc\u30c8\u3092\u5236\u9650\u3057\u3001\u30d0\u30c3\u30af\u30b0\u30e9\u30a6\u30f3\u30c9\u66f4\u65b0\u3092\u9045\u304f\u3057\u307e\u3059\u3002\u305d\u308c\u4ee5\u5916\u306f\u6700\u9ad8\u54c1\u8cea\u306e\u307e\u307e\u3067\u3059\uff08\u753b\u50cf\u3001\u30a8\u30af\u30b9\u30dd\u30fc\u30c8\u3001\u5171\u6709\u30ab\u30fc\u30c9\uff09\u3002","\u041e\u0442\u043a\u043b\u044e\u0447\u0430\u0435\u0442 \u043f\u0430\u0440\u0430\u043b\u043b\u0430\u043a\u0441 \u043f\u0440\u0438 \u043d\u0430\u043a\u043b\u043e\u043d\u0435, \u043e\u0433\u0440\u0430\u043d\u0438\u0447\u0438\u0432\u0430\u0435\u0442 \u0447\u0430\u0441\u0442\u043e\u0442\u0443 \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u044f \u044d\u043a\u0440\u0430\u043d\u0430 \u0438 \u0437\u0430\u043c\u0435\u0434\u043b\u044f\u0435\u0442 \u0444\u043e\u043d\u043e\u0432\u044b\u0435 \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u044f \u2014 \u0432\u0441\u0451 \u043e\u0441\u0442\u0430\u043b\u044c\u043d\u043e\u0435 \u043e\u0441\u0442\u0430\u0451\u0442\u0441\u044f \u0432 \u043f\u043e\u043b\u043d\u043e\u043c \u043a\u0430\u0447\u0435\u0441\u0442\u0432\u0435 (\u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f, \u044d\u043a\u0441\u043f\u043e\u0440\u0442, \u043a\u0430\u0440\u0442\u043e\u0447\u043a\u0438 \u0434\u043b\u044f \u043e\u0431\u043c\u0435\u043d\u0430).","\u064a\u0639\u0637\u0651\u0644 \u062a\u0623\u062b\u064a\u0631 \u0627\u0644\u0645\u0646\u0638\u0648\u0631 \u0639\u0646\u062f \u0625\u0645\u0627\u0644\u0629 \u0627\u0644\u062c\u0647\u0627\u0632\u060c \u0648\u064a\u062d\u062f\u0651 \u0645\u0646 \u0645\u0639\u062f\u0644 \u062a\u062d\u062f\u064a\u062b \u0627\u0644\u0634\u0627\u0634\u0629\u060c \u0648\u064a\u0628\u0637\u0651\u0626 \u0627\u0644\u062a\u062d\u062f\u064a\u062b\u0627\u062a \u0641\u064a \u0627\u0644\u062e\u0644\u0641\u064a\u0629 \u2014 \u0648\u0643\u0644 \u0634\u064a\u0621 \u0622\u062e\u0631 \u064a\u0628\u0642\u0649 \u0628\u062c\u0648\u062f\u062a\u0647 \u0627\u0644\u0643\u0627\u0645\u0644\u0629 (\u0627\u0644\u0635\u0648\u0631 \u0648\u0627\u0644\u062a\u0635\u062f\u064a\u0631 \u0648\u0628\u0637\u0627\u0642\u0627\u062a \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u0629)."],t.w)
-B.ahz=new A.B(B.l,["Toujours activ\xe9","Always on","Siempre activado","\u59cb\u7ec8\u5f00\u542f","Sempre ativado","Immer an","Sempre attivo","\u5e38\u306b\u30aa\u30f3","\u0412\u0441\u0435\u0433\u0434\u0430 \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u043e","\u0645\u0641\u0639\u0651\u0644 \u062f\u0627\u0626\u0645\u064b\u0627"],t.w)
-B.ah1=new A.B(B.l,["Force le mode \xe9conomie d'\xe9nergie, quel que soit le niveau de batterie.","Force power saving mode on, regardless of battery level.","Fuerza el modo ahorro, sea cual sea el nivel de bater\xeda.","\u65e0\u8bba\u7535\u91cf\u591a\u5c11\u90fd\u5f3a\u5236\u5f00\u542f\u7701\u7535\u6a21\u5f0f\u3002","For\xe7a o modo de economia, independentemente do n\xedvel da bateria.","Erzwingt den Sparmodus, unabh\xe4ngig vom Akkustand.","Forza la modalit\xe0 risparmio, indipendentemente dal livello della batteria.","\u30d0\u30c3\u30c6\u30ea\u30fc\u6b8b\u91cf\u306b\u95a2\u308f\u3089\u305a\u7701\u96fb\u529b\u30e2\u30fc\u30c9\u3092\u5f37\u5236\u7684\u306b\u30aa\u30f3\u306b\u3057\u307e\u3059\u3002","\u041f\u0440\u0438\u043d\u0443\u0434\u0438\u0442\u0435\u043b\u044c\u043d\u043e \u0432\u043a\u043b\u044e\u0447\u0430\u0435\u0442 \u0440\u0435\u0436\u0438\u043c \u044d\u043a\u043e\u043d\u043e\u043c\u0438\u0438 \u043f\u0440\u0438 \u043b\u044e\u0431\u043e\u043c \u0443\u0440\u043e\u0432\u043d\u0435 \u0437\u0430\u0440\u044f\u0434\u0430.","\u064a\u0641\u0631\u0636 \u062a\u0641\u0639\u064a\u0644 \u0648\u0636\u0639 \u0627\u0644\u062a\u0648\u0641\u064a\u0631 \u0628\u063a\u0636 \u0627\u0644\u0646\u0638\u0631 \u0639\u0646 \u0645\u0633\u062a\u0648\u0649 \u0627\u0644\u0628\u0637\u0627\u0631\u064a\u0629."],t.w)
-B.agH=new A.B(B.l,["Activation automatique","Auto-activate","Activaci\xf3n autom\xe1tica","\u81ea\u52a8\u542f\u7528","Ativa\xe7\xe3o autom\xe1tica","Automatisch aktivieren","Attivazione automatica","\u81ea\u52d5\u3067\u30aa\u30f3","\u0410\u0432\u0442\u043e\u0432\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0435","\u062a\u0641\u0639\u064a\u0644 \u062a\u0644\u0642\u0627\u0626\u064a"],t.w)
-B.agy=new A.B(B.l,["Activer sous un % de batterie","Turn on below a battery %","Activar por debajo de un % de bater\xeda","\u7535\u91cf\u4f4e\u4e8e\u767e\u5206\u6bd4\u65f6\u5f00\u542f","Ativar abaixo de um % de bateria","Unter einem Akkustand (%) aktivieren","Attiva sotto una % di batteria","\u30d0\u30c3\u30c6\u30ea\u30fc\u6b8b\u91cf\u304c\u4e00\u5b9a\uff05\u3092\u4e0b\u56de\u3063\u305f\u3089\u30aa\u30f3","\u0412\u043a\u043b\u044e\u0447\u0430\u0442\u044c \u043d\u0438\u0436\u0435 \u0437\u0430\u0434\u0430\u043d\u043d\u043e\u0433\u043e % \u0437\u0430\u0440\u044f\u0434\u0430","\u0627\u0644\u062a\u0641\u0639\u064a\u0644 \u0639\u0646\u062f \u0627\u0646\u062e\u0641\u0627\u0636 \u0627\u0644\u0628\u0637\u0627\u0631\u064a\u0629 \u0639\u0646 \u0646\u0633\u0628\u0629 \u0645\u0639\u064a\u0651\u0646\u0629"],t.w)
-B.agx=new A.B(B.l,["S'active toute seule d\xe8s que la batterie atteint le niveau ci-dessous.","Switches on by itself once the battery drops to the level below.","Se activa sola cuando la bater\xeda baja al nivel indicado abajo.","\u7535\u91cf\u964d\u5230\u4e0b\u65b9\u8bbe\u5b9a\u503c\u65f6\u81ea\u52a8\u5f00\u542f\u3002","Ativa sozinho quando a bateria cair at\xe9 o n\xedvel abaixo.","Schaltet sich von selbst ein, sobald der Akku den unten gew\xe4hlten Stand erreicht.","Si attiva da sola quando la batteria scende al livello indicato sotto.","\u30d0\u30c3\u30c6\u30ea\u30fc\u6b8b\u91cf\u304c\u4e0b\u306e\u30ec\u30d9\u30eb\u307e\u3067\u4e0b\u304c\u308b\u3068\u81ea\u52d5\u3067\u30aa\u30f3\u306b\u306a\u308a\u307e\u3059\u3002","\u0412\u043a\u043b\u044e\u0447\u0430\u0435\u0442\u0441\u044f \u0441\u0430\u043c\u0430, \u043a\u043e\u0433\u0434\u0430 \u0437\u0430\u0440\u044f\u0434 \u043e\u043f\u0443\u0441\u043a\u0430\u0435\u0442\u0441\u044f \u0434\u043e \u0443\u0440\u043e\u0432\u043d\u044f \u043d\u0438\u0436\u0435.","\u064a\u0639\u0645\u0644 \u062a\u0644\u0642\u0627\u0626\u064a\u064b\u0627 \u0639\u0646\u062f\u0645\u0627 \u062a\u0646\u062e\u0641\u0636 \u0627\u0644\u0628\u0637\u0627\u0631\u064a\u0629 \u0625\u0644\u0649 \u0627\u0644\u0645\u0633\u062a\u0648\u0649 \u0623\u062f\u0646\u0627\u0647."],t.w)
-B.ai4=new A.B(B.l,["Seuil","Threshold","Umbral","\u9608\u503c","Limite","Schwellenwert","Soglia","\u3057\u304d\u3044\u5024","\u041f\u043e\u0440\u043e\u0433","\u0627\u0644\u062d\u062f"],t.w)
-B.aiu=new A.B(B.l,["Choisissez l'onglet affich\xe9 au lancement de l'app.","Choose the tab displayed when the app launches.","Elige la pesta\xf1a que se muestra al iniciar la app.","\u9009\u62e9\u5e94\u7528\u542f\u52a8\u65f6\u663e\u793a\u7684\u6807\u7b7e\u9875\u3002","Escolha a aba exibida ao iniciar o app.","W\xe4hle den Tab, der beim Start der App angezeigt wird.","Scegli la scheda mostrata all'avvio dell'app.","\u30a2\u30d7\u30ea\u8d77\u52d5\u6642\u306b\u8868\u793a\u3059\u308b\u30bf\u30d6\u3092\u9078\u629e\u3057\u307e\u3059\u3002","\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u043a\u043b\u0430\u0434\u043a\u0443, \u043a\u043e\u0442\u043e\u0440\u0430\u044f \u043e\u0442\u043a\u0440\u044b\u0432\u0430\u0435\u0442\u0441\u044f \u043f\u0440\u0438 \u0437\u0430\u043f\u0443\u0441\u043a\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f.","\u0627\u062e\u062a\u0631 \u0639\u0644\u0627\u0645\u0629 \u0627\u0644\u062a\u0628\u0648\u064a\u0628 \u0627\u0644\u062a\u064a \u062a\u0638\u0647\u0631 \u0639\u0646\u062f \u062a\u0634\u063a\u064a\u0644 \u0627\u0644\u062a\u0637\u0628\u064a\u0642."],t.w)
-B.ajJ=new A.B(B.l,["L'onglet s\xe9lectionn\xe9 appara\xeetra au prochain d\xe9marrage de l'app.","The selected tab will appear on next launch of the app.","La pesta\xf1a seleccionada aparecer\xe1 en el pr\xf3ximo inicio de la app.","\u6240\u9009\u6807\u7b7e\u9875\u5c06\u5728\u4e0b\u6b21\u542f\u52a8\u5e94\u7528\u65f6\u663e\u793a\u3002","A aba selecionada aparecer\xe1 na pr\xf3xima vez que o app for iniciado.","Der gew\xe4hlte Tab erscheint beim n\xe4chsten Start der App.","La scheda selezionata apparir\xe0 al prossimo avvio dell'app.","\u9078\u629e\u3057\u305f\u30bf\u30d6\u306f\u6b21\u56de\u306e\u8d77\u52d5\u6642\u306b\u8868\u793a\u3055\u308c\u307e\u3059\u3002","\u0412\u044b\u0431\u0440\u0430\u043d\u043d\u0430\u044f \u0432\u043a\u043b\u0430\u0434\u043a\u0430 \u043f\u043e\u044f\u0432\u0438\u0442\u0441\u044f \u043f\u0440\u0438 \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0435\u043c \u0437\u0430\u043f\u0443\u0441\u043a\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f.","\u0633\u062a\u0638\u0647\u0631 \u0639\u0644\u0627\u0645\u0629 \u0627\u0644\u062a\u0628\u0648\u064a\u0628 \u0627\u0644\u0645\u062d\u062f\u062f\u0629 \u0639\u0646\u062f \u0627\u0644\u062a\u0634\u063a\u064a\u0644 \u0627\u0644\u0642\u0627\u062f\u0645 \u0644\u0644\u062a\u0637\u0628\u064a\u0642."],t.w)
-B.ah_=new A.B(B.l,["Synchronisation des amis","Friends sync","Sincronizaci\xf3n de amigos","\u597d\u53cb\u540c\u6b65","Sincroniza\xe7\xe3o de amigos","Freunde-Sync","Sincronizzazione amici","\u30d5\u30ec\u30f3\u30c9\u540c\u671f","\u0421\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0430\u0446\u0438\u044f \u0434\u0440\u0443\u0437\u0435\u0439","\u0645\u0632\u0627\u0645\u0646\u0629 \u0627\u0644\u0623\u0635\u062f\u0642\u0627\u0621"],t.w)
-B.ag1=new A.B(B.l,["Fr\xe9quence de synchronisation","Sync frequency","Frecuencia de sincronizaci\xf3n","\u540c\u6b65\u9891\u7387","Frequ\xeancia de sincroniza\xe7\xe3o","Sync-H\xe4ufigkeit","Frequenza di sincronizzazione","\u540c\u671f\u306e\u983b\u5ea6","\u0427\u0430\u0441\u0442\u043e\u0442\u0430 \u0441\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0430\u0446\u0438\u0438","\u0648\u062a\u064a\u0631\u0629 \u0627\u0644\u0645\u0632\u0627\u0645\u0646\u0629"],t.w)
-B.agt=new A.B(B.l,["Chaque jour","Daily","Cada d\xeda","\u6bcf\u5929","Todos os dias","T\xe4glich","Ogni giorno","\u6bce\u65e5","\u041a\u0430\u0436\u0434\u044b\u0439 \u0434\u0435\u043d\u044c","\u064a\u0648\u0645\u064a\u064b\u0627"],t.w)
-B.aiN=new A.B(B.l,["Tout resynchroniser","Resync everyone","Resincronizar todo","\u5168\u90e8\u91cd\u65b0\u540c\u6b65","Ressincronizar tudo","Alle neu synchronisieren","Risincronizza tutto","\u3059\u3079\u3066\u518d\u540c\u671f","\u0421\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432\u0441\u0435\u0445 \u0437\u0430\u043d\u043e\u0432\u043e","\u0625\u0639\u0627\u062f\u0629 \u0645\u0632\u0627\u0645\u0646\u0629 \u0627\u0644\u062c\u0645\u064a\u0639"],t.w)
-B.ah5=new A.B(B.l,["Historique des versions","Version history","Historial de versiones","\u7248\u672c\u5386\u53f2","Hist\xf3rico de vers\xf5es","Versionsverlauf","Cronologia versioni","\u30d0\u30fc\u30b8\u30e7\u30f3\u5c65\u6b74","\u0418\u0441\u0442\u043e\u0440\u0438\u044f \u0432\u0435\u0440\u0441\u0438\u0439","\u0633\u062c\u0644 \u0627\u0644\u0625\u0635\u062f\u0627\u0631\u0627\u062a"],t.w)
-B.agO=new A.B(B.l,["Impossible de charger l'historique.","Could not load release history.","No se pudo cargar el historial.","\u65e0\u6cd5\u52a0\u8f7d\u7248\u672c\u5386\u53f2\u3002","N\xe3o foi poss\xedvel carregar o hist\xf3rico.","Verlauf konnte nicht geladen werden.","Impossibile caricare la cronologia.","\u5c65\u6b74\u3092\u8aad\u307f\u8fbc\u3081\u307e\u305b\u3093\u3067\u3057\u305f\u3002","\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c \u0438\u0441\u0442\u043e\u0440\u0438\u044e.","\u062a\u0639\u0630\u0651\u0631 \u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0633\u062c\u0644."],t.w)
-B.aj7=new A.B(B.l,["Install\xe9e : build de dev (version inconnue)","Installed: dev build (unknown version)","Instalada: build de desarrollo (versi\xf3n desconocida)","\u5df2\u5b89\u88c5\uff1a\u5f00\u53d1\u7248\u672c\uff08\u7248\u672c\u672a\u77e5\uff09","Instalada: build de desenvolvimento (vers\xe3o desconhecida)","Installiert: Dev-Build (Version unbekannt)","Installata: build di sviluppo (versione sconosciuta)","\u30a4\u30f3\u30b9\u30c8\u30fc\u30eb\u6e08\u307f\uff1a\u958b\u767a\u30d3\u30eb\u30c9\uff08\u30d0\u30fc\u30b8\u30e7\u30f3\u4e0d\u660e\uff09","\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d\u0430: dev-\u0441\u0431\u043e\u0440\u043a\u0430 (\u0432\u0435\u0440\u0441\u0438\u044f \u043d\u0435\u0438\u0437\u0432\u0435\u0441\u0442\u043d\u0430)","\u0627\u0644\u0645\u062b\u0628\u0651\u062a\u0629: \u0646\u0633\u062e\u0629 \u062a\u0637\u0648\u064a\u0631 (\u0627\u0644\u0625\u0635\u062f\u0627\u0631 \u063a\u064a\u0631 \u0645\u0639\u0631\u0648\u0641)"],t.w)
-B.ai_=new A.B(B.l,["Install\xe9e : {displayVer}","Installed: {displayVer}","Instalada: {displayVer}","\u5df2\u5b89\u88c5\uff1a{displayVer}","Instalada: {displayVer}","Installiert: {displayVer}","Installata: {displayVer}","\u30a4\u30f3\u30b9\u30c8\u30fc\u30eb\u6e08\u307f\uff1a{displayVer}","\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d\u0430: {displayVer}","\u0627\u0644\u0645\u062b\u0628\u0651\u062a\u0629: {displayVer}"],t.w)
-B.ajL=new A.B(B.l,["Rechercher une version ou un changelog\u2026","Search a version or changelog\u2026","Buscar una versi\xf3n o un changelog\u2026","\u641c\u7d22\u7248\u672c\u6216\u66f4\u65b0\u65e5\u5fd7\u2026","Buscar uma vers\xe3o ou changelog\u2026","Version oder Changelog suchen\u2026","Cerca una versione o un changelog\u2026","\u30d0\u30fc\u30b8\u30e7\u30f3\u307e\u305f\u306f\u5909\u66f4\u5c65\u6b74\u3092\u691c\u7d22\u2026","\u041f\u043e\u0438\u0441\u043a \u0432\u0435\u0440\u0441\u0438\u0438 \u0438\u043b\u0438 \u0441\u043f\u0438\u0441\u043a\u0430 \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0439\u2026","\u0627\u0628\u062d\u062b \u0639\u0646 \u0625\u0635\u062f\u0627\u0631 \u0623\u0648 \u0633\u062c\u0644 \u062a\u063a\u064a\u064a\u0631\u0627\u062a\u2026"],t.w)
+B.ahc=new A.B(B.l,["D\xe9sactive le parallaxe au mouvement, plafonne le taux de rafra\xeechissement de l'\xe9cran, et ralentit les mises \xe0 jour en arri\xe8re-plan \u2014 le reste garde sa pleine qualit\xe9 (images, exports, cartes de partage).","Turns off tilt parallax, caps the screen refresh rate, and slows down background updates \u2014 everything else stays full quality (images, exports, share cards).","Desactiva el paralaje al mover el m\xf3vil, limita la frecuencia de actualizaci\xf3n de la pantalla y ralentiza las actualizaciones en segundo plano; todo lo dem\xe1s mantiene la calidad completa (im\xe1genes, exportaciones, tarjetas para compartir).","\u5173\u95ed\u503e\u659c\u89c6\u5dee\uff0c\u9650\u5236\u5c4f\u5e55\u5237\u65b0\u7387\uff0c\u5e76\u964d\u4f4e\u540e\u53f0\u66f4\u65b0\u9891\u7387 \u2014 \u5176\u4ed6\u4e00\u5207\u4fdd\u6301\u5b8c\u6574\u54c1\u8d28\uff08\u56fe\u7247\u3001\u5bfc\u51fa\u3001\u5206\u4eab\u5361\u7247\uff09\u3002","Desativa o paralaxe de movimento, limita a taxa de atualiza\xe7\xe3o da tela e desacelera as atualiza\xe7\xf5es em segundo plano \u2014 o resto mant\xe9m a qualidade total (imagens, exporta\xe7\xf5es, cart\xf5es de compartilhamento).","Deaktiviert den Neige-Parallax, begrenzt die Bildwiederholrate und verlangsamt Hintergrundaktualisierungen \u2013 alles andere bleibt in voller Qualit\xe4t (Bilder, Exporte, Share-Karten).","Disattiva il parallasse al movimento, limita la frequenza di aggiornamento dello schermo e rallenta gli aggiornamenti in background: tutto il resto mantiene la piena qualit\xe0 (immagini, esportazioni, schede di condivisione).","\u50be\u304d\u306b\u3088\u308b\u30d1\u30e9\u30e9\u30c3\u30af\u30b9\u3092\u7121\u52b9\u306b\u3057\u3001\u753b\u9762\u306e\u30ea\u30d5\u30ec\u30c3\u30b7\u30e5\u30ec\u30fc\u30c8\u3092\u5236\u9650\u3057\u3001\u30d0\u30c3\u30af\u30b0\u30e9\u30a6\u30f3\u30c9\u66f4\u65b0\u3092\u9045\u304f\u3057\u307e\u3059\u3002\u305d\u308c\u4ee5\u5916\u306f\u6700\u9ad8\u54c1\u8cea\u306e\u307e\u307e\u3067\u3059\uff08\u753b\u50cf\u3001\u30a8\u30af\u30b9\u30dd\u30fc\u30c8\u3001\u5171\u6709\u30ab\u30fc\u30c9\uff09\u3002","\u041e\u0442\u043a\u043b\u044e\u0447\u0430\u0435\u0442 \u043f\u0430\u0440\u0430\u043b\u043b\u0430\u043a\u0441 \u043f\u0440\u0438 \u043d\u0430\u043a\u043b\u043e\u043d\u0435, \u043e\u0433\u0440\u0430\u043d\u0438\u0447\u0438\u0432\u0430\u0435\u0442 \u0447\u0430\u0441\u0442\u043e\u0442\u0443 \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u044f \u044d\u043a\u0440\u0430\u043d\u0430 \u0438 \u0437\u0430\u043c\u0435\u0434\u043b\u044f\u0435\u0442 \u0444\u043e\u043d\u043e\u0432\u044b\u0435 \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u044f \u2014 \u0432\u0441\u0451 \u043e\u0441\u0442\u0430\u043b\u044c\u043d\u043e\u0435 \u043e\u0441\u0442\u0430\u0451\u0442\u0441\u044f \u0432 \u043f\u043e\u043b\u043d\u043e\u043c \u043a\u0430\u0447\u0435\u0441\u0442\u0432\u0435 (\u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f, \u044d\u043a\u0441\u043f\u043e\u0440\u0442, \u043a\u0430\u0440\u0442\u043e\u0447\u043a\u0438 \u0434\u043b\u044f \u043e\u0431\u043c\u0435\u043d\u0430).","\u064a\u0639\u0637\u0651\u0644 \u062a\u0623\u062b\u064a\u0631 \u0627\u0644\u0645\u0646\u0638\u0648\u0631 \u0639\u0646\u062f \u0625\u0645\u0627\u0644\u0629 \u0627\u0644\u062c\u0647\u0627\u0632\u060c \u0648\u064a\u062d\u062f\u0651 \u0645\u0646 \u0645\u0639\u062f\u0644 \u062a\u062d\u062f\u064a\u062b \u0627\u0644\u0634\u0627\u0634\u0629\u060c \u0648\u064a\u0628\u0637\u0651\u0626 \u0627\u0644\u062a\u062d\u062f\u064a\u062b\u0627\u062a \u0641\u064a \u0627\u0644\u062e\u0644\u0641\u064a\u0629 \u2014 \u0648\u0643\u0644 \u0634\u064a\u0621 \u0622\u062e\u0631 \u064a\u0628\u0642\u0649 \u0628\u062c\u0648\u062f\u062a\u0647 \u0627\u0644\u0643\u0627\u0645\u0644\u0629 (\u0627\u0644\u0635\u0648\u0631 \u0648\u0627\u0644\u062a\u0635\u062f\u064a\u0631 \u0648\u0628\u0637\u0627\u0642\u0627\u062a \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u0629)."],t.w)
+B.ahE=new A.B(B.l,["Toujours activ\xe9","Always on","Siempre activado","\u59cb\u7ec8\u5f00\u542f","Sempre ativado","Immer an","Sempre attivo","\u5e38\u306b\u30aa\u30f3","\u0412\u0441\u0435\u0433\u0434\u0430 \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u043e","\u0645\u0641\u0639\u0651\u0644 \u062f\u0627\u0626\u0645\u064b\u0627"],t.w)
+B.ah6=new A.B(B.l,["Force le mode \xe9conomie d'\xe9nergie, quel que soit le niveau de batterie.","Force power saving mode on, regardless of battery level.","Fuerza el modo ahorro, sea cual sea el nivel de bater\xeda.","\u65e0\u8bba\u7535\u91cf\u591a\u5c11\u90fd\u5f3a\u5236\u5f00\u542f\u7701\u7535\u6a21\u5f0f\u3002","For\xe7a o modo de economia, independentemente do n\xedvel da bateria.","Erzwingt den Sparmodus, unabh\xe4ngig vom Akkustand.","Forza la modalit\xe0 risparmio, indipendentemente dal livello della batteria.","\u30d0\u30c3\u30c6\u30ea\u30fc\u6b8b\u91cf\u306b\u95a2\u308f\u3089\u305a\u7701\u96fb\u529b\u30e2\u30fc\u30c9\u3092\u5f37\u5236\u7684\u306b\u30aa\u30f3\u306b\u3057\u307e\u3059\u3002","\u041f\u0440\u0438\u043d\u0443\u0434\u0438\u0442\u0435\u043b\u044c\u043d\u043e \u0432\u043a\u043b\u044e\u0447\u0430\u0435\u0442 \u0440\u0435\u0436\u0438\u043c \u044d\u043a\u043e\u043d\u043e\u043c\u0438\u0438 \u043f\u0440\u0438 \u043b\u044e\u0431\u043e\u043c \u0443\u0440\u043e\u0432\u043d\u0435 \u0437\u0430\u0440\u044f\u0434\u0430.","\u064a\u0641\u0631\u0636 \u062a\u0641\u0639\u064a\u0644 \u0648\u0636\u0639 \u0627\u0644\u062a\u0648\u0641\u064a\u0631 \u0628\u063a\u0636 \u0627\u0644\u0646\u0638\u0631 \u0639\u0646 \u0645\u0633\u062a\u0648\u0649 \u0627\u0644\u0628\u0637\u0627\u0631\u064a\u0629."],t.w)
+B.agM=new A.B(B.l,["Activation automatique","Auto-activate","Activaci\xf3n autom\xe1tica","\u81ea\u52a8\u542f\u7528","Ativa\xe7\xe3o autom\xe1tica","Automatisch aktivieren","Attivazione automatica","\u81ea\u52d5\u3067\u30aa\u30f3","\u0410\u0432\u0442\u043e\u0432\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0435","\u062a\u0641\u0639\u064a\u0644 \u062a\u0644\u0642\u0627\u0626\u064a"],t.w)
+B.agD=new A.B(B.l,["Activer sous un % de batterie","Turn on below a battery %","Activar por debajo de un % de bater\xeda","\u7535\u91cf\u4f4e\u4e8e\u767e\u5206\u6bd4\u65f6\u5f00\u542f","Ativar abaixo de um % de bateria","Unter einem Akkustand (%) aktivieren","Attiva sotto una % di batteria","\u30d0\u30c3\u30c6\u30ea\u30fc\u6b8b\u91cf\u304c\u4e00\u5b9a\uff05\u3092\u4e0b\u56de\u3063\u305f\u3089\u30aa\u30f3","\u0412\u043a\u043b\u044e\u0447\u0430\u0442\u044c \u043d\u0438\u0436\u0435 \u0437\u0430\u0434\u0430\u043d\u043d\u043e\u0433\u043e % \u0437\u0430\u0440\u044f\u0434\u0430","\u0627\u0644\u062a\u0641\u0639\u064a\u0644 \u0639\u0646\u062f \u0627\u0646\u062e\u0641\u0627\u0636 \u0627\u0644\u0628\u0637\u0627\u0631\u064a\u0629 \u0639\u0646 \u0646\u0633\u0628\u0629 \u0645\u0639\u064a\u0651\u0646\u0629"],t.w)
+B.agC=new A.B(B.l,["S'active toute seule d\xe8s que la batterie atteint le niveau ci-dessous.","Switches on by itself once the battery drops to the level below.","Se activa sola cuando la bater\xeda baja al nivel indicado abajo.","\u7535\u91cf\u964d\u5230\u4e0b\u65b9\u8bbe\u5b9a\u503c\u65f6\u81ea\u52a8\u5f00\u542f\u3002","Ativa sozinho quando a bateria cair at\xe9 o n\xedvel abaixo.","Schaltet sich von selbst ein, sobald der Akku den unten gew\xe4hlten Stand erreicht.","Si attiva da sola quando la batteria scende al livello indicato sotto.","\u30d0\u30c3\u30c6\u30ea\u30fc\u6b8b\u91cf\u304c\u4e0b\u306e\u30ec\u30d9\u30eb\u307e\u3067\u4e0b\u304c\u308b\u3068\u81ea\u52d5\u3067\u30aa\u30f3\u306b\u306a\u308a\u307e\u3059\u3002","\u0412\u043a\u043b\u044e\u0447\u0430\u0435\u0442\u0441\u044f \u0441\u0430\u043c\u0430, \u043a\u043e\u0433\u0434\u0430 \u0437\u0430\u0440\u044f\u0434 \u043e\u043f\u0443\u0441\u043a\u0430\u0435\u0442\u0441\u044f \u0434\u043e \u0443\u0440\u043e\u0432\u043d\u044f \u043d\u0438\u0436\u0435.","\u064a\u0639\u0645\u0644 \u062a\u0644\u0642\u0627\u0626\u064a\u064b\u0627 \u0639\u0646\u062f\u0645\u0627 \u062a\u0646\u062e\u0641\u0636 \u0627\u0644\u0628\u0637\u0627\u0631\u064a\u0629 \u0625\u0644\u0649 \u0627\u0644\u0645\u0633\u062a\u0648\u0649 \u0623\u062f\u0646\u0627\u0647."],t.w)
+B.ai8=new A.B(B.l,["Seuil","Threshold","Umbral","\u9608\u503c","Limite","Schwellenwert","Soglia","\u3057\u304d\u3044\u5024","\u041f\u043e\u0440\u043e\u0433","\u0627\u0644\u062d\u062f"],t.w)
+B.agu=new A.B(B.l,["Choisissez l'onglet affich\xe9 au lancement de l'app.","Choose the tab displayed when the app launches.","Elija la pesta\xf1a que se muestra al iniciar la app.","\u9009\u62e9\u5e94\u7528\u542f\u52a8\u65f6\u663e\u793a\u7684\u6807\u7b7e\u9875\u3002","Escolha a aba exibida ao iniciar o app.","W\xe4hlen Sie den Tab, der beim Start der App angezeigt wird.","Scelga la scheda mostrata all'avvio dell'app.","\u30a2\u30d7\u30ea\u8d77\u52d5\u6642\u306b\u8868\u793a\u3059\u308b\u30bf\u30d6\u3092\u9078\u629e\u3057\u307e\u3059\u3002","\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u043a\u043b\u0430\u0434\u043a\u0443, \u043a\u043e\u0442\u043e\u0440\u0430\u044f \u043e\u0442\u043a\u0440\u044b\u0432\u0430\u0435\u0442\u0441\u044f \u043f\u0440\u0438 \u0437\u0430\u043f\u0443\u0441\u043a\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f.","\u0627\u062e\u062a\u0631 \u0639\u0644\u0627\u0645\u0629 \u0627\u0644\u062a\u0628\u0648\u064a\u0628 \u0627\u0644\u062a\u064a \u062a\u0638\u0647\u0631 \u0639\u0646\u062f \u062a\u0634\u063a\u064a\u0644 \u0627\u0644\u062a\u0637\u0628\u064a\u0642."],t.w)
+B.ajH=new A.B(B.l,["L'onglet s\xe9lectionn\xe9 appara\xeetra au prochain d\xe9marrage de l'app.","The selected tab will appear on next launch of the app.","La pesta\xf1a seleccionada aparecer\xe1 en el pr\xf3ximo inicio de la app.","\u6240\u9009\u6807\u7b7e\u9875\u5c06\u5728\u4e0b\u6b21\u542f\u52a8\u5e94\u7528\u65f6\u663e\u793a\u3002","A aba selecionada aparecer\xe1 na pr\xf3xima vez que o app for iniciado.","Der gew\xe4hlte Tab erscheint beim n\xe4chsten Start der App.","La scheda selezionata apparir\xe0 al prossimo avvio dell'app.","\u9078\u629e\u3057\u305f\u30bf\u30d6\u306f\u6b21\u56de\u306e\u8d77\u52d5\u6642\u306b\u8868\u793a\u3055\u308c\u307e\u3059\u3002","\u0412\u044b\u0431\u0440\u0430\u043d\u043d\u0430\u044f \u0432\u043a\u043b\u0430\u0434\u043a\u0430 \u043f\u043e\u044f\u0432\u0438\u0442\u0441\u044f \u043f\u0440\u0438 \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0435\u043c \u0437\u0430\u043f\u0443\u0441\u043a\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f.","\u0633\u062a\u0638\u0647\u0631 \u0639\u0644\u0627\u0645\u0629 \u0627\u0644\u062a\u0628\u0648\u064a\u0628 \u0627\u0644\u0645\u062d\u062f\u062f\u0629 \u0639\u0646\u062f \u0627\u0644\u062a\u0634\u063a\u064a\u0644 \u0627\u0644\u0642\u0627\u062f\u0645 \u0644\u0644\u062a\u0637\u0628\u064a\u0642."],t.w)
+B.ah4=new A.B(B.l,["Synchronisation des amis","Friends sync","Sincronizaci\xf3n de amigos","\u597d\u53cb\u540c\u6b65","Sincroniza\xe7\xe3o de amigos","Freunde-Sync","Sincronizzazione amici","\u30d5\u30ec\u30f3\u30c9\u540c\u671f","\u0421\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0430\u0446\u0438\u044f \u0434\u0440\u0443\u0437\u0435\u0439","\u0645\u0632\u0627\u0645\u0646\u0629 \u0627\u0644\u0623\u0635\u062f\u0642\u0627\u0621"],t.w)
+B.ag0=new A.B(B.l,["Fr\xe9quence de synchronisation","Sync frequency","Frecuencia de sincronizaci\xf3n","\u540c\u6b65\u9891\u7387","Frequ\xeancia de sincroniza\xe7\xe3o","Sync-H\xe4ufigkeit","Frequenza di sincronizzazione","\u540c\u671f\u306e\u983b\u5ea6","\u0427\u0430\u0441\u0442\u043e\u0442\u0430 \u0441\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0430\u0446\u0438\u0438","\u0648\u062a\u064a\u0631\u0629 \u0627\u0644\u0645\u0632\u0627\u0645\u0646\u0629"],t.w)
+B.agx=new A.B(B.l,["Chaque jour","Daily","Cada d\xeda","\u6bcf\u5929","Todos os dias","T\xe4glich","Ogni giorno","\u6bce\u65e5","\u041a\u0430\u0436\u0434\u044b\u0439 \u0434\u0435\u043d\u044c","\u064a\u0648\u0645\u064a\u064b\u0627"],t.w)
+B.aiP=new A.B(B.l,["Tout resynchroniser","Resync everyone","Resincronizar todo","\u5168\u90e8\u91cd\u65b0\u540c\u6b65","Ressincronizar tudo","Alle neu synchronisieren","Risincronizza tutto","\u3059\u3079\u3066\u518d\u540c\u671f","\u0421\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432\u0441\u0435\u0445 \u0437\u0430\u043d\u043e\u0432\u043e","\u0625\u0639\u0627\u062f\u0629 \u0645\u0632\u0627\u0645\u0646\u0629 \u0627\u0644\u062c\u0645\u064a\u0639"],t.w)
+B.aha=new A.B(B.l,["Historique des versions","Version history","Historial de versiones","\u7248\u672c\u5386\u53f2","Hist\xf3rico de vers\xf5es","Versionsverlauf","Cronologia versioni","\u30d0\u30fc\u30b8\u30e7\u30f3\u5c65\u6b74","\u0418\u0441\u0442\u043e\u0440\u0438\u044f \u0432\u0435\u0440\u0441\u0438\u0439","\u0633\u062c\u0644 \u0627\u0644\u0625\u0635\u062f\u0627\u0631\u0627\u062a"],t.w)
+B.agS=new A.B(B.l,["Impossible de charger l'historique.","Could not load release history.","No se pudo cargar el historial.","\u65e0\u6cd5\u52a0\u8f7d\u7248\u672c\u5386\u53f2\u3002","N\xe3o foi poss\xedvel carregar o hist\xf3rico.","Verlauf konnte nicht geladen werden.","Impossibile caricare la cronologia.","\u5c65\u6b74\u3092\u8aad\u307f\u8fbc\u3081\u307e\u305b\u3093\u3067\u3057\u305f\u3002","\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c \u0438\u0441\u0442\u043e\u0440\u0438\u044e.","\u062a\u0639\u0630\u0651\u0631 \u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0633\u062c\u0644."],t.w)
+B.ajb=new A.B(B.l,["Install\xe9e : build de dev (version inconnue)","Installed: dev build (unknown version)","Instalada: build de desarrollo (versi\xf3n desconocida)","\u5df2\u5b89\u88c5\uff1a\u5f00\u53d1\u7248\u672c\uff08\u7248\u672c\u672a\u77e5\uff09","Instalada: build de desenvolvimento (vers\xe3o desconhecida)","Installiert: Dev-Build (Version unbekannt)","Installata: build di sviluppo (versione sconosciuta)","\u30a4\u30f3\u30b9\u30c8\u30fc\u30eb\u6e08\u307f\uff1a\u958b\u767a\u30d3\u30eb\u30c9\uff08\u30d0\u30fc\u30b8\u30e7\u30f3\u4e0d\u660e\uff09","\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d\u0430: dev-\u0441\u0431\u043e\u0440\u043a\u0430 (\u0432\u0435\u0440\u0441\u0438\u044f \u043d\u0435\u0438\u0437\u0432\u0435\u0441\u0442\u043d\u0430)","\u0627\u0644\u0645\u062b\u0628\u0651\u062a\u0629: \u0646\u0633\u062e\u0629 \u062a\u0637\u0648\u064a\u0631 (\u0627\u0644\u0625\u0635\u062f\u0627\u0631 \u063a\u064a\u0631 \u0645\u0639\u0631\u0648\u0641)"],t.w)
+B.ai2=new A.B(B.l,["Install\xe9e : {displayVer}","Installed: {displayVer}","Instalada: {displayVer}","\u5df2\u5b89\u88c5\uff1a{displayVer}","Instalada: {displayVer}","Installiert: {displayVer}","Installata: {displayVer}","\u30a4\u30f3\u30b9\u30c8\u30fc\u30eb\u6e08\u307f\uff1a{displayVer}","\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d\u0430: {displayVer}","\u0627\u0644\u0645\u062b\u0628\u0651\u062a\u0629: {displayVer}"],t.w)
+B.ag5=new A.B(B.l,["Rechercher une version ou un changelog\u2026","Search a version or changelog\u2026","Buscar una versi\xf3n o un changelog\u2026","\u641c\u7d22\u7248\u672c\u6216\u66f4\u65b0\u65e5\u5fd7\u2026","Buscar uma vers\xe3o ou changelog\u2026","Version oder Changelog suchen\u2026","Cerchi una versione o un changelog\u2026","\u30d0\u30fc\u30b8\u30e7\u30f3\u307e\u305f\u306f\u5909\u66f4\u5c65\u6b74\u3092\u691c\u7d22\u2026","\u041f\u043e\u0438\u0441\u043a \u0432\u0435\u0440\u0441\u0438\u0438 \u0438\u043b\u0438 \u0441\u043f\u0438\u0441\u043a\u0430 \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0439\u2026","\u0627\u0628\u062d\u062b \u0639\u0646 \u0625\u0635\u062f\u0627\u0631 \u0623\u0648 \u0633\u062c\u0644 \u062a\u063a\u064a\u064a\u0631\u0627\u062a\u2026"],t.w)
 B.afz=new A.B(B.l,["Officiel","Official","Oficial","\u5b98\u65b9","Oficial","Offiziell","Ufficiale","\u516c\u5f0f","\u041e\u0444\u0438\u0446\u0438\u0430\u043b\u044c\u043d\u044b\u0435","\u0631\u0633\u0645\u064a"],t.w)
-B.ajC=new A.B(B.l,["Aucune version ne correspond \xe0 votre recherche.","No release matches your search.","Ninguna versi\xf3n coincide con tu b\xfasqueda.","\u6ca1\u6709\u7b26\u5408\u641c\u7d22\u7684\u7248\u672c\u3002","Nenhuma vers\xe3o corresponde \xe0 sua busca.","Keine Version entspricht deiner Suche.","Nessuna versione corrisponde alla ricerca.","\u691c\u7d22\u306b\u4e00\u81f4\u3059\u308b\u30d0\u30fc\u30b8\u30e7\u30f3\u306f\u3042\u308a\u307e\u305b\u3093\u3002","\u041d\u0435\u0442 \u0432\u0435\u0440\u0441\u0438\u0439, \u0441\u043e\u043e\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0443\u044e\u0449\u0438\u0445 \u043f\u043e\u0438\u0441\u043a\u0443.","\u0644\u0627 \u064a\u0648\u062c\u062f \u0625\u0635\u062f\u0627\u0631 \u0645\u0637\u0627\u0628\u0642 \u0644\u0628\u062d\u062b\u0643."],t.w)
-B.ag0=new A.B(B.l,["DERNI\xc8RE","LATEST","\xdaLTIMA","\u6700\u65b0","\xdaLTIMA","NEUESTE","ULTIMA","\u6700\u65b0","\u041f\u041e\u0421\u041b\u0415\u0414\u041d\u042f\u042f","\u0627\u0644\u0623\u062d\u062f\u062b"],t.w)
-B.ahX=new A.B(B.l,["INSTALL\xc9E","INSTALLED","INSTALADA","\u5df2\u5b89\u88c5","INSTALADA","INSTALLIERT","INSTALLATA","\u30a4\u30f3\u30b9\u30c8\u30fc\u30eb\u6e08\u307f","\u0423\u0421\u0422\u0410\u041d\u041e\u0412\u041b\u0415\u041d\u0410","\u0645\u062b\u0628\u0651\u062a\u0629"],t.w)
+B.aif=new A.B(B.l,["Aucune version ne correspond \xe0 votre recherche.","No release matches your search.","Ninguna versi\xf3n coincide con su b\xfasqueda.","\u6ca1\u6709\u7b26\u5408\u641c\u7d22\u7684\u7248\u672c\u3002","Nenhuma vers\xe3o corresponde \xe0 sua busca.","Keine Version entspricht Ihrer Suche.","Nessuna versione corrisponde alla ricerca.","\u691c\u7d22\u306b\u4e00\u81f4\u3059\u308b\u30d0\u30fc\u30b8\u30e7\u30f3\u306f\u3042\u308a\u307e\u305b\u3093\u3002","\u041d\u0435\u0442 \u0432\u0435\u0440\u0441\u0438\u0439, \u0441\u043e\u043e\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0443\u044e\u0449\u0438\u0445 \u043f\u043e\u0438\u0441\u043a\u0443.","\u0644\u0627 \u064a\u0648\u062c\u062f \u0625\u0635\u062f\u0627\u0631 \u0645\u0637\u0627\u0628\u0642 \u0644\u0628\u062d\u062b\u0643."],t.w)
+B.ag_=new A.B(B.l,["DERNI\xc8RE","LATEST","\xdaLTIMA","\u6700\u65b0","\xdaLTIMA","NEUESTE","ULTIMA","\u6700\u65b0","\u041f\u041e\u0421\u041b\u0415\u0414\u041d\u042f\u042f","\u0627\u0644\u0623\u062d\u062f\u062b"],t.w)
+B.ai_=new A.B(B.l,["INSTALL\xc9E","INSTALLED","INSTALADA","\u5df2\u5b89\u88c5","INSTALADA","INSTALLIERT","INSTALLATA","\u30a4\u30f3\u30b9\u30c8\u30fc\u30eb\u6e08\u307f","\u0423\u0421\u0422\u0410\u041d\u041e\u0412\u041b\u0415\u041d\u0410","\u0645\u062b\u0628\u0651\u062a\u0629"],t.w)
 B.afJ=new A.B(B.l,["Aucune description.","No description.","Sin descripci\xf3n.","\u6682\u65e0\u63cf\u8ff0\u3002","Sem descri\xe7\xe3o.","Keine Beschreibung.","Nessuna descrizione.","\u8aac\u660e\u306f\u3042\u308a\u307e\u305b\u3093\u3002","\u041d\u0435\u0442 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u044f.","\u0644\u0627 \u064a\u0648\u062c\u062f \u0648\u0635\u0641."],t.w)
-B.aiC=new A.B(B.l,["T\xe9l\xe9charger","Download","Descargar","\u4e0b\u8f7d","Baixar","Herunterladen","Scarica","\u30c0\u30a6\u30f3\u30ed\u30fc\u30c9","\u0421\u043a\u0430\u0447\u0430\u0442\u044c","\u062a\u0646\u0632\u064a\u0644"],t.w)
-B.agv=new A.B(B.l,["Voir la release","View release","Ver versi\xf3n","\u67e5\u770b\u53d1\u5e03\u9875","Ver release","Release ansehen","Vedi release","\u30ea\u30ea\u30fc\u30b9\u3092\u898b\u308b","\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u0440\u0435\u043b\u0438\u0437","\u0639\u0631\u0636 \u0627\u0644\u0625\u0635\u062f\u0627\u0631"],t.w)
-B.aiU=new A.B(B.l,["D\xe9tails","Details","Detalles","\u8be6\u60c5","Detalhes","Details","Dettagli","\u8a73\u7d30","\u041f\u043e\u0434\u0440\u043e\u0431\u043d\u0435\u0435","\u0627\u0644\u062a\u0641\u0627\u0635\u064a\u0644"],t.w)
-B.ajM=new A.B(B.l,["Toutes les anciennes versions, changelogs et t\xe9l\xe9chargements","All past releases, changelogs and downloads","Todas las versiones anteriores, changelogs y descargas","\u6240\u6709\u5386\u53f2\u7248\u672c\u3001\u66f4\u65b0\u65e5\u5fd7\u548c\u4e0b\u8f7d","Todas as vers\xf5es anteriores, changelogs e downloads","Alle fr\xfcheren Versionen, Changelogs und Downloads","Tutte le versioni passate, changelog e download","\u904e\u53bb\u306e\u3059\u3079\u3066\u306e\u30d0\u30fc\u30b8\u30e7\u30f3\u3001\u5909\u66f4\u5c65\u6b74\u3001\u30c0\u30a6\u30f3\u30ed\u30fc\u30c9","\u0412\u0441\u0435 \u043f\u0440\u043e\u0448\u043b\u044b\u0435 \u0432\u0435\u0440\u0441\u0438\u0438, \u0441\u043f\u0438\u0441\u043a\u0438 \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0439 \u0438 \u0437\u0430\u0433\u0440\u0443\u0437\u043a\u0438","\u062c\u0645\u064a\u0639 \u0627\u0644\u0625\u0635\u062f\u0627\u0631\u0627\u062a \u0627\u0644\u0633\u0627\u0628\u0642\u0629 \u0648\u0633\u062c\u0644\u0627\u062a \u0627\u0644\u062a\u063a\u064a\u064a\u0631\u0627\u062a \u0648\u0627\u0644\u062a\u0646\u0632\u064a\u0644\u0627\u062a"],t.w)
-B.agB=new A.B(B.l,["Remplis les deux champs.","Please fill both fields.","Rellena los dos campos.","\u8bf7\u586b\u5199\u4e24\u4e2a\u5b57\u6bb5\u3002","Preencha os dois campos.","Bitte f\xfclle beide Felder aus.","Compila entrambi i campi.","\u4e21\u65b9\u306e\u6b04\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044\u3002","\u0417\u0430\u043f\u043e\u043b\u043d\u0438\u0442\u0435 \u043e\u0431\u0430 \u043f\u043e\u043b\u044f.","\u064a\u0631\u062c\u0649 \u0645\u0644\u0621 \u0627\u0644\u062d\u0642\u0644\u064a\u0646."],t.w)
+B.aiD=new A.B(B.l,["T\xe9l\xe9charger","Download","Descargar","\u4e0b\u8f7d","Baixar","Herunterladen","Scarica","\u30c0\u30a6\u30f3\u30ed\u30fc\u30c9","\u0421\u043a\u0430\u0447\u0430\u0442\u044c","\u062a\u0646\u0632\u064a\u0644"],t.w)
+B.agA=new A.B(B.l,["Voir la release","View release","Ver versi\xf3n","\u67e5\u770b\u53d1\u5e03\u9875","Ver release","Release ansehen","Vedi release","\u30ea\u30ea\u30fc\u30b9\u3092\u898b\u308b","\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u0440\u0435\u043b\u0438\u0437","\u0639\u0631\u0636 \u0627\u0644\u0625\u0635\u062f\u0627\u0631"],t.w)
+B.aiX=new A.B(B.l,["D\xe9tails","Details","Detalles","\u8be6\u60c5","Detalhes","Details","Dettagli","\u8a73\u7d30","\u041f\u043e\u0434\u0440\u043e\u0431\u043d\u0435\u0435","\u0627\u0644\u062a\u0641\u0627\u0635\u064a\u0644"],t.w)
+B.ajJ=new A.B(B.l,["Toutes les anciennes versions, changelogs et t\xe9l\xe9chargements","All past releases, changelogs and downloads","Todas las versiones anteriores, changelogs y descargas","\u6240\u6709\u5386\u53f2\u7248\u672c\u3001\u66f4\u65b0\u65e5\u5fd7\u548c\u4e0b\u8f7d","Todas as vers\xf5es anteriores, changelogs e downloads","Alle fr\xfcheren Versionen, Changelogs und Downloads","Tutte le versioni passate, changelog e download","\u904e\u53bb\u306e\u3059\u3079\u3066\u306e\u30d0\u30fc\u30b8\u30e7\u30f3\u3001\u5909\u66f4\u5c65\u6b74\u3001\u30c0\u30a6\u30f3\u30ed\u30fc\u30c9","\u0412\u0441\u0435 \u043f\u0440\u043e\u0448\u043b\u044b\u0435 \u0432\u0435\u0440\u0441\u0438\u0438, \u0441\u043f\u0438\u0441\u043a\u0438 \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0439 \u0438 \u0437\u0430\u0433\u0440\u0443\u0437\u043a\u0438","\u062c\u0645\u064a\u0639 \u0627\u0644\u0625\u0635\u062f\u0627\u0631\u0627\u062a \u0627\u0644\u0633\u0627\u0628\u0642\u0629 \u0648\u0633\u062c\u0644\u0627\u062a \u0627\u0644\u062a\u063a\u064a\u064a\u0631\u0627\u062a \u0648\u0627\u0644\u062a\u0646\u0632\u064a\u0644\u0627\u062a"],t.w)
+B.ag2=new A.B(B.l,["Remplissez les deux champs.","Please fill both fields.","Rellene los dos campos.","\u8bf7\u586b\u5199\u4e24\u4e2a\u5b57\u6bb5\u3002","Preencha os dois campos.","Bitte f\xfcllen Sie beide Felder aus.","Compili entrambi i campi.","\u4e21\u65b9\u306e\u6b04\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044\u3002","\u0417\u0430\u043f\u043e\u043b\u043d\u0438\u0442\u0435 \u043e\u0431\u0430 \u043f\u043e\u043b\u044f.","\u064a\u0631\u062c\u0649 \u0645\u0644\u0621 \u0627\u0644\u062d\u0642\u0644\u064a\u0646."],t.w)
 B.aiz=new A.B(B.l,["La cl\xe9 API doit faire 32 caract\xe8res.","API key must be 32 characters.","La clave API debe tener 32 caracteres.","API \u5bc6\u94a5\u5fc5\u987b\u4e3a 32 \u4e2a\u5b57\u7b26\u3002","A chave da API deve ter 32 caracteres.","Der API-Schl\xfcssel muss 32 Zeichen lang sein.","La chiave API deve avere 32 caratteri.","API\u30ad\u30fc\u306f32\u6587\u5b57\u3067\u3042\u308b\u5fc5\u8981\u304c\u3042\u308a\u307e\u3059\u3002","\u041a\u043b\u044e\u0447 API \u0434\u043e\u043b\u0436\u0435\u043d \u0441\u043e\u0434\u0435\u0440\u0436\u0430\u0442\u044c 32 \u0441\u0438\u043c\u0432\u043e\u043b\u0430.","\u064a\u062c\u0628 \u0623\u0646 \u064a\u062a\u0643\u0648\u0646 \u0645\u0641\u062a\u0627\u062d API \u0645\u0646 32 \u062d\u0631\u0641\u064b\u0627."],t.w)
-B.ahl=new A.B(B.l,["Profil introuvable.","Profile not found.","Perfil no encontrado.","\u627e\u4e0d\u5230\u4e2a\u4eba\u8d44\u6599\u3002","Perfil n\xe3o encontrado.","Profil nicht gefunden.","Profilo non trovato.","\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb\u304c\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3002","\u041f\u0440\u043e\u0444\u0438\u043b\u044c \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d.","\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062e\u0635\u064a."],t.w)
-B.ag7=new A.B(B.l,["Barres mensuelles","Monthly bars","Barras mensuales","\u6708\u5ea6\u67f1\u72b6\u56fe","Barras mensais","Monatliche Balken","Barre mensili","\u6708\u5225\u306e\u68d2\u30b0\u30e9\u30d5","\u0421\u0442\u043e\u043b\u0431\u0446\u044b \u043f\u043e \u043c\u0435\u0441\u044f\u0446\u0430\u043c","\u0623\u0639\u0645\u062f\u0629 \u0634\u0647\u0631\u064a\u0629"],t.w)
-B.ahi=new A.B(B.l,["Progression","Progression","Progresi\xf3n","\u8fdb\u5ea6\u8d8b\u52bf","Progress\xe3o","Verlauf","Progressione","\u63a8\u79fb","\u0414\u0438\u043d\u0430\u043c\u0438\u043a\u0430","\u0627\u0644\u062a\u0637\u0648\u0631"],t.w)
-B.age=new A.B(B.l,["Genres musicaux","Musical genres","G\xe9neros musicales","\u97f3\u4e50\u98ce\u683c","G\xeaneros musicais","Musikgenres","Generi musicali","\u97f3\u697d\u30b8\u30e3\u30f3\u30eb","\u041c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u044b\u0435 \u0436\u0430\u043d\u0440\u044b","\u0627\u0644\u0623\u0646\u0648\u0627\u0639 \u0627\u0644\u0645\u0648\u0633\u064a\u0642\u064a\u0629"],t.w)
-B.ahP=new A.B(B.l,["Top artistes","Artist distribution","Distribuci\xf3n de artistas","\u827a\u672f\u5bb6\u5206\u5e03","Distribui\xe7\xe3o de artistas","K\xfcnstlerverteilung","Distribuzione degli artisti","\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u5206\u5e03","\u0420\u0430\u0441\u043f\u0440\u0435\u0434\u0435\u043b\u0435\u043d\u0438\u0435 \u0430\u0440\u0442\u0438\u0441\u0442\u043e\u0432","\u062a\u0648\u0632\u064a\u0639 \u0627\u0644\u0641\u0646\u0627\u0646\u064a\u0646"],t.w)
-B.aiZ=new A.B(B.l,["Top albums","Album distribution","Distribuci\xf3n de \xe1lbumes","\u4e13\u8f91\u5206\u5e03","Distribui\xe7\xe3o de \xe1lbuns","Albumverteilung","Distribuzione degli album","\u30a2\u30eb\u30d0\u30e0\u5206\u5e03","\u0420\u0430\u0441\u043f\u0440\u0435\u0434\u0435\u043b\u0435\u043d\u0438\u0435 \u0430\u043b\u044c\u0431\u043e\u043c\u043e\u0432","\u062a\u0648\u0632\u064a\u0639 \u0627\u0644\u0623\u0644\u0628\u0648\u0645\u0627\u062a"],t.w)
+B.ahp=new A.B(B.l,["Profil introuvable.","Profile not found.","Perfil no encontrado.","\u627e\u4e0d\u5230\u4e2a\u4eba\u8d44\u6599\u3002","Perfil n\xe3o encontrado.","Profil nicht gefunden.","Profilo non trovato.","\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb\u304c\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3002","\u041f\u0440\u043e\u0444\u0438\u043b\u044c \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d.","\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062e\u0635\u064a."],t.w)
+B.ag9=new A.B(B.l,["Barres mensuelles","Monthly bars","Barras mensuales","\u6708\u5ea6\u67f1\u72b6\u56fe","Barras mensais","Monatliche Balken","Barre mensili","\u6708\u5225\u306e\u68d2\u30b0\u30e9\u30d5","\u0421\u0442\u043e\u043b\u0431\u0446\u044b \u043f\u043e \u043c\u0435\u0441\u044f\u0446\u0430\u043c","\u0623\u0639\u0645\u062f\u0629 \u0634\u0647\u0631\u064a\u0629"],t.w)
+B.ahm=new A.B(B.l,["Progression","Progression","Progresi\xf3n","\u8fdb\u5ea6\u8d8b\u52bf","Progress\xe3o","Verlauf","Progressione","\u63a8\u79fb","\u0414\u0438\u043d\u0430\u043c\u0438\u043a\u0430","\u0627\u0644\u062a\u0637\u0648\u0631"],t.w)
+B.agh=new A.B(B.l,["Genres musicaux","Musical genres","G\xe9neros musicales","\u97f3\u4e50\u98ce\u683c","G\xeaneros musicais","Musikgenres","Generi musicali","\u97f3\u697d\u30b8\u30e3\u30f3\u30eb","\u041c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u044b\u0435 \u0436\u0430\u043d\u0440\u044b","\u0627\u0644\u0623\u0646\u0648\u0627\u0639 \u0627\u0644\u0645\u0648\u0633\u064a\u0642\u064a\u0629"],t.w)
+B.ahT=new A.B(B.l,["Top artistes","Artist distribution","Distribuci\xf3n de artistas","\u827a\u672f\u5bb6\u5206\u5e03","Distribui\xe7\xe3o de artistas","K\xfcnstlerverteilung","Distribuzione degli artisti","\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u5206\u5e03","\u0420\u0430\u0441\u043f\u0440\u0435\u0434\u0435\u043b\u0435\u043d\u0438\u0435 \u0430\u0440\u0442\u0438\u0441\u0442\u043e\u0432","\u062a\u0648\u0632\u064a\u0639 \u0627\u0644\u0641\u0646\u0627\u0646\u064a\u0646"],t.w)
+B.aj0=new A.B(B.l,["Top albums","Album distribution","Distribuci\xf3n de \xe1lbumes","\u4e13\u8f91\u5206\u5e03","Distribui\xe7\xe3o de \xe1lbuns","Albumverteilung","Distribuzione degli album","\u30a2\u30eb\u30d0\u30e0\u5206\u5e03","\u0420\u0430\u0441\u043f\u0440\u0435\u0434\u0435\u043b\u0435\u043d\u0438\u0435 \u0430\u043b\u044c\u0431\u043e\u043c\u043e\u0432","\u062a\u0648\u0632\u064a\u0639 \u0627\u0644\u0623\u0644\u0628\u0648\u0645\u0627\u062a"],t.w)
 B.aiA=new A.B(B.l,["Calendrier musical","Listening calendar","Calendario de escucha","\u6536\u542c\u65e5\u5386","Calend\xe1rio de escuta","H\xf6rkalender","Calendario di ascolto","\u30ea\u30b9\u30cb\u30f3\u30b0\u30ab\u30ec\u30f3\u30c0\u30fc","\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u0439","\u062a\u0642\u0648\u064a\u0645 \u0627\u0644\u0627\u0633\u062a\u0645\u0627\u0639"],t.w)
-B.aga=new A.B(B.l,["Nuit","Night","Noche","\u591c\u95f4","Noite","Nacht","Notte","\u591c","\u041d\u043e\u0447\u044c","\u0644\u064a\u0644"],t.w)
-B.aht=new A.B(B.l,["Matin","Morning","Ma\xf1ana","\u4e0a\u5348","Manh\xe3","Morgen","Mattina","\u671d","\u0423\u0442\u0440\u043e","\u0635\u0628\u0627\u062d"],t.w)
-B.aj_=new A.B(B.l,["Apr\xe8s-midi","Afternoon","Tarde","\u4e0b\u5348","Tarde","Nachmittag","Pomeriggio","\u5348\u5f8c","\u0414\u0435\u043d\u044c","\u0638\u0647\u0631"],t.w)
-B.agk=new A.B(B.l,["Soir","Evening","Noche","\u665a\u4e0a","Noite","Abend","Sera","\u591c\uff08\u5915\u65b9\uff09","\u0412\u0435\u0447\u0435\u0440","\u0645\u0633\u0627\u0621"],t.w)
-B.akj=new A.B(B.al5,[B.ajl,B.ajf,B.agr,B.ajQ,B.ajb,B.ahE,B.aiG,B.ajm,B.afF,B.aic,B.ajD,B.ajF,B.ahK,B.aiy,B.agm,B.aim,B.aiq,B.agS,B.ag6,B.ai2,B.ags,B.aiW,B.agq,B.aig,B.ajH,B.Gz,B.aiR,B.ahY,B.agT,B.afQ,B.afx,B.agb,B.ahh,B.ahF,B.Gy,B.agf,B.afy,B.aid,B.ag2,B.agN,B.ajx,B.agd,B.ahZ,B.ajj,B.ajz,B.ajh,B.agA,B.ahJ,B.agI,B.ahC,B.ahj,B.aiL,B.ajA,B.afN,B.ahk,B.aj1,B.agX,B.ai3,B.ai9,B.afI,B.ajy,B.afV,B.aiK,B.afA,B.ahx,B.aju,B.ai8,B.ahD,B.agP,B.aik,B.ahe,B.ahs,B.ail,B.agQ,B.ah3,B.ahI,B.ahV,B.agi,B.ain,B.ahT,B.ahb,B.agR,B.agl,B.aiv,B.ah8,B.aja,B.ahN,B.aj0,B.ai1,B.aha,B.ajv,B.ajU,B.aij,B.aj4,B.aip,B.afG,B.ahq,B.aji,B.aj3,B.ajP,B.ahO,B.ajs,B.agc,B.aj9,B.aia,B.aiT,B.ah9,B.afS,B.ag3,B.ahA,B.ahf,B.aj2,B.agg,B.aiM,B.ais,B.ah7,B.ahz,B.ah1,B.agH,B.agy,B.agx,B.ai4,B.aiu,B.ajJ,B.ah_,B.ag1,B.agt,B.aiN,B.ah5,B.agO,B.aj7,B.ai_,B.ajL,B.afz,B.ajC,B.ag0,B.ahX,B.afJ,B.aiC,B.agv,B.aiU,B.ajM,B.agB,B.aiz,B.ahl,B.ag7,B.ahi,B.age,B.Gz,B.ahP,B.aiZ,B.aiA,B.Gy,B.aga,B.aht,B.aj_,B.agk],t.vb)
+B.agd=new A.B(B.l,["Nuit","Night","Noche","\u591c\u95f4","Noite","Nacht","Notte","\u591c","\u041d\u043e\u0447\u044c","\u0644\u064a\u0644"],t.w)
+B.ahv=new A.B(B.l,["Matin","Morning","Ma\xf1ana","\u4e0a\u5348","Manh\xe3","Morgen","Mattina","\u671d","\u0423\u0442\u0440\u043e","\u0635\u0628\u0627\u062d"],t.w)
+B.aj1=new A.B(B.l,["Apr\xe8s-midi","Afternoon","Tarde","\u4e0b\u5348","Tarde","Nachmittag","Pomeriggio","\u5348\u5f8c","\u0414\u0435\u043d\u044c","\u0638\u0647\u0631"],t.w)
+B.agn=new A.B(B.l,["Soir","Evening","Noche","\u665a\u4e0a","Noite","Abend","Sera","\u591c\uff08\u5915\u65b9\uff09","\u0412\u0435\u0447\u0435\u0440","\u0645\u0633\u0627\u0621"],t.w)
+B.akj=new A.B(B.al5,[B.ah1,B.aji,B.agv,B.ajP,B.ajf,B.ahK,B.aiH,B.ajl,B.afG,B.aie,B.ajD,B.ajF,B.ai7,B.aiy,B.agp,B.ain,B.aiq,B.agW,B.agV,B.ai5,B.agw,B.aiZ,B.agt,B.aj9,B.aiL,B.Gz,B.aiT,B.ai0,B.agX,B.afQ,B.afx,B.aiw,B.ahl,B.ahL,B.Gy,B.agi,B.afy,B.aig,B.ag3,B.agR,B.ajy,B.agg,B.ai1,B.ajj,B.ajA,B.age,B.agG,B.ahP,B.agN,B.ahI,B.ahn,B.aiY,B.ajB,B.afN,B.aho,B.aj3,B.ah0,B.ai6,B.ahB,B.afI,B.ajz,B.afV,B.aiK,B.afA,B.ahA,B.ajv,B.aic,B.ahJ,B.agT,B.ail,B.ahi,B.ahu,B.aim,B.agU,B.ah8,B.ahO,B.ahX,B.agl,B.aio,B.ahC,B.aiU,B.aiC,B.ago,B.aiu,B.ahd,B.aje,B.ahR,B.aj2,B.ai4,B.ahf,B.ajw,B.ajT,B.aik,B.aj7,B.aj4,B.ag8,B.aiM,B.ajO,B.aj6,B.ajN,B.agI,B.ajs,B.agf,B.ajd,B.afU,B.aiW,B.ahe,B.afR,B.ag4,B.ahF,B.ahj,B.aj5,B.agj,B.aiO,B.ais,B.ahc,B.ahE,B.ah6,B.agM,B.agD,B.agC,B.ai8,B.agu,B.ajH,B.ah4,B.ag0,B.agx,B.aiP,B.aha,B.agS,B.ajb,B.ai2,B.ag5,B.afz,B.aif,B.ag_,B.ai_,B.afJ,B.aiD,B.agA,B.aiX,B.ajJ,B.ag2,B.aiz,B.ahp,B.ag9,B.ahm,B.agh,B.Gz,B.ahT,B.aj0,B.aiA,B.Gy,B.agd,B.ahv,B.aj1,B.agn],t.vb)
 B.alF={"deleteBackward:":0,"deleteWordBackward:":1,"deleteToBeginningOfLine:":2,"deleteForward:":3,"deleteWordForward:":4,"deleteToEndOfLine:":5,"moveLeft:":6,"moveRight:":7,"moveForward:":8,"moveBackward:":9,"moveUp:":10,"moveDown:":11,"moveLeftAndModifySelection:":12,"moveRightAndModifySelection:":13,"moveUpAndModifySelection:":14,"moveDownAndModifySelection:":15,"moveWordLeft:":16,"moveWordRight:":17,"moveToBeginningOfParagraph:":18,"moveToEndOfParagraph:":19,"moveWordLeftAndModifySelection:":20,"moveWordRightAndModifySelection:":21,"moveParagraphBackwardAndModifySelection:":22,"moveParagraphForwardAndModifySelection:":23,"moveToLeftEndOfLine:":24,"moveToRightEndOfLine:":25,"moveToBeginningOfDocument:":26,"moveToEndOfDocument:":27,"moveToLeftEndOfLineAndModifySelection:":28,"moveToRightEndOfLineAndModifySelection:":29,"moveToBeginningOfDocumentAndModifySelection:":30,"moveToEndOfDocumentAndModifySelection:":31,"transpose:":32,"scrollToBeginningOfDocument:":33,"scrollToEndOfDocument:":34,"scrollPageUp:":35,"scrollPageDown:":36,"pageUpAndModifySelection:":37,"pageDownAndModifySelection:":38,"cancelOperation:":39,"insertTab:":40,"insertBacktab:":41}
 B.Ls=new A.t1(!1)
 B.Lt=new A.t1(!0)
@@ -172423,9 +172423,9 @@ B.u9=new A.AO(null)
 B.X3=new A.F(0.23529411764705882,0,0,0,B.m)
 B.alN=new A.r(0,4)
 B.RW=new A.ef(0.5,B.cb,B.X3,B.alN,10)
-B.aaj=s([B.RW],t.sq)
+B.aak=s([B.RW],t.sq)
 B.apq=new A.pV(B.lC,B.y)
-B.aqw=new A.eo(null,null,null,B.aaj,B.apq)
+B.aqw=new A.eo(null,null,null,B.aak,B.apq)
 B.aqx=new A.QH(0,"success")
 B.LU=new A.QH(1,"dismissed")
 B.LV=new A.QH(2,"unavailable")
