@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the clearMemory method from the MotionArtworkService class, for the Dart programming language.">
-  <title>clearMemory method - MotionArtworkService class - motion_artwork_service library - Dart API</title>
+  <meta name="description" content="API docs for the ytUserAgent property from the MotionArtworkService class, for the Dart programming language.">
+  <title>ytUserAgent property - MotionArtworkService class - motion_artwork_service library - Dart API</title>
 
 
   
@@ -27,9 +27,9 @@
     <li><a href="../../index.html">laststats_mobile</a></li>
     <li><a href="../../services_motion_artwork_service/">services&#47;motion_artwork_service.dart</a></li>
     <li><a href="../../services_motion_artwork_service/MotionArtworkService-class.html">MotionArtworkService</a></li>
-    <li class="self-crumb">clearMemory static method</li>
+    <li class="self-crumb">ytUserAgent property</li>
   </ol>
-  <div class="self-name">clearMemory</div>
+  <div class="self-name">ytUserAgent</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -49,37 +49,40 @@
     data-above-sidebar="services_motion_artwork_service&#47;MotionArtworkService-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">clearMemory</span> static method 
+<h1><span class="kind-property">ytUserAgent</span> property 
 </h1></div>
 
+    
+
+    
+        
+  <section id="getter">
     <section class="multi-line-signature">
       
-<span class="returntype">void</span>
-<span class="name ">clearMemory</span>(<wbr>)
-
+      <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+      get
+      <span class="name ">ytUserAgent</span>
       
 
     </section>
     
 <section class="desc markdown">
-  <p>Forgets every looked-up video link (and the Apple token), freeing memory.</p>
+  <p>User-Agent the YouTube stream links require (403 without it).</p>
 </section>
-
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static void clearMemory() {
-  _cache.clear();
-  _ytAt.clear();
-  _token = null;
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">static String get ytUserAgent =&gt;
+    _ytClient.payload[&#39;context&#39;][&#39;client&#39;][&#39;userAgent&#39;] as String;</code></pre>
 </section>
 
+  </section>
 
-  </div> <!-- /.main-content -->
-  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
-    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+
+</div> <!-- /.main-content -->
+<div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+  <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
 <header id="header-search-sidebar" class="hidden-l">
   <form class="search-sidebar" role="search">
     <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
@@ -89,13 +92,13 @@
     <li><a href="../../index.html">laststats_mobile</a></li>
     <li><a href="../../services_motion_artwork_service/">motion_artwork_service</a></li>
     <li><a href="../../services_motion_artwork_service/MotionArtworkService-class.html">MotionArtworkService</a></li>
-    <li class="self-crumb">clearMemory static method</li>
+    <li class="self-crumb">ytUserAgent property</li>
 </ol>
 
-    <h5>MotionArtworkService class</h5>
-    <div id="dartdoc-sidebar-left-content"></div>
-  </div><!--/.sidebar-offcanvas-->
-  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  <h5>MotionArtworkService class</h5>
+  <div id="dartdoc-sidebar-left-content"></div>
+</div><!--/.sidebar-offcanvas-->
+<div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
 </div><!--/.sidebar-offcanvas-->
 </main>
 <footer>

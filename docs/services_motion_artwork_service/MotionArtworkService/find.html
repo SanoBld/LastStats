@@ -78,7 +78,7 @@
   &#47;&#47; Track lookups follow the &quot;tracks&quot; switch, album lookups the &quot;albums&quot; one.
   if (track.isNotEmpty ? !cfg.tracks : !cfg.albums) return null;
   final key = &#39;${_norm(artist)}|${_norm(album)}|${_norm(track)}|${cfg.sig}&#39;;
-  if (_cache.containsKey(key)) return _cache[key];
+  if (_fresh(key)) return _cache[key];
   &#47;&#47; Bounded: the oldest lookups are dropped so the map never grows forever.
   if (_cache.length &gt;= _maxEntries) _cache.remove(_cache.keys.first);
   try {
@@ -87,10 +87,9 @@
     &#47;&#47; singles named after the track. The first hit used to be the only
     &#47;&#47; one tried, so a track whose first match was a video-less
     &#47;&#47; compilation showed nothing even though its single had one.
-    final cands =
-        cfg.useApple
-            ? await _candidates(artist, album, track)
-            : &lt;({String collectionId, String pageUrl, String? trackId})&gt;[];
+    final cands = cfg.useApple
+        ? await _candidates(artist, album, track)
+        : &lt;({String collectionId, String pageUrl, String? trackId})&gt;[];
     String? video;
     var pages = 0;
     for (final c in cands) {
@@ -103,8 +102,11 @@
       if (video != null) break;
     }
     if (video != null) video = await _pickVariant(video, cfg.height);
-    if (cfg.useYoutube) video ??= await _youtube(artist, track, cfg.height);
-    _cache[key] = video;
+    &#47;&#47; YouTube only has videos of songs (never albums or artists).
+    if (video == null &amp;&amp; cfg.useYoutube &amp;&amp; track.isNotEmpty) {
+      video = await _youtube(artist, track, cfg.height);
+    }
+    _remember(key, video);
     return video;
   } catch (_) {
     &#47;&#47; Network error: don&#39;t cache, allow a retry next time.
