@@ -53,6 +53,7 @@
       <div class="rel-filter" id="rel-filter" role="group">
         <button type="button" class="rel-filter-btn md-ripple is-active" data-filter="all" data-i18n="releases.filter_all">Toutes</button>
         <button type="button" class="rel-filter-btn md-ripple" data-filter="stable" data-i18n="releases.filter_stable">Stables</button>
+        <button type="button" class="rel-filter-btn md-ripple" data-filter="beta" data-i18n="releases.filter_beta">Bêta</button>
       </div>
       <a class="rel-gh md-ripple" href="https://github.com/SanoBld/LastStats-App/releases" target="_blank" rel="noopener">
         <span data-i18n="releases.all_on_github">Voir sur GitHub</span>
@@ -63,6 +64,7 @@
     <div class="rel-layout">
       <!-- bookmark rail: every version, click to jump, lights up while you scroll -->
       <aside class="rel-rail" id="rel-rail" aria-label="Versions" hidden>
+        <h2 class="rel-rail-title" data-i18n="releases.toc">Sommaire</h2>
         <div class="rel-rail-inner" id="rel-rail-inner">
           <div class="rel-rail-fill" id="rel-rail-fill"></div>
         </div>
@@ -95,6 +97,7 @@
   <script src="js/ripple.js"></script>
   <script src="js/expressive.js"></script>
   <script src="js/nav-autohide.js"></script>
+  <script src="js/gh-data.js"></script>
   <script src="js/releases.js" data-repo="SanoBld/LastStats-App"></script>
 </body>
 </html>

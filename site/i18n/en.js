@@ -213,5 +213,8 @@ window.I18N.en = {
   "releases.filter_stable": "Stable",
   "releases.downloads": "downloads",
   "releases.no_files": "No files.",
-  "releases.nav": "Versions"
+  "releases.nav": "Versions",
+  "releases.filter_beta": "Beta",
+  "releases.toc": "Contents",
+  "releases.empty": "No versions in this category."
 };
