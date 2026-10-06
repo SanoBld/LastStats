@@ -207,3 +207,16 @@ a, button { touch-action: manipulation; }
 }
 /* keep the ripple inside the rounded shape while the radius is animating */
 .project-actions .ripple-ink { z-index: -1; }
+
+/* ---------- Download button: same shape + motion as the stat tiles above ----------
+   rest = small inner corners, hover = big tile corners, press = soft square */
+.project-actions #download-trigger { border-radius: var(--r-inner); }
+@media (hover: hover) {
+  .project-actions #download-trigger:hover { border-radius: var(--r-tile); transform: translateY(-2px); box-shadow: none; }
+}
+.project-actions #download-trigger:active,
+.project-actions #download-trigger.is-pressed {
+  border-radius: var(--r-press); transform: scale(.96); box-shadow: none; transition-duration: .2s, .2s, .2s, .2s;
+}
+/* version tile is a link now */
+a.gh-stat { text-decoration: none; cursor: pointer; }

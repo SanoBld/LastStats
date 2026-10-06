@@ -21,8 +21,10 @@
   // each tile keeps its own value + label refs so a language switch only updates text
   let tiles = [];
 
-  function tile(icon, raw, labelKey, n) {
-    const span = document.createElement('span');
+  function tile(icon, raw, labelKey, n, href) {
+    // the version tile is a link to its entry on the versions page
+    const span = document.createElement(href ? 'a' : 'span');
+    if (href) span.href = href;
     span.className = 'gh-stat';
     span.style.setProperty('--n', n);
     span.innerHTML = icon + '<span class="gh-stat-value"></span><span class="gh-stat-label"></span>';
@@ -39,14 +41,14 @@
   function build(stars, tag, downloads) {
     const defs = [];
     if (typeof stars === 'number') defs.push([starIcon, stars, 'ghFavorites']);
-    if (tag) defs.push([tagIcon, tag, 'ghLatestVersion']);
+    if (tag) defs.push([tagIcon, tag, 'ghLatestVersion', 'releases.html#' + encodeURIComponent(tag)]);
     if (typeof downloads === 'number') defs.push([downloadIcon, downloads, 'ghDownloads']);
 
     if (!defs.length) {
       el.classList.add('is-empty'); // nothing to show: give the reserved space back
       return;
     }
-    tiles = defs.map((d, i) => tile(d[0], d[1], d[2], i));
+    tiles = defs.map((d, i) => tile(d[0], d[1], d[2], i, d[3]));
     el.textContent = '';
     tiles.forEach((x) => el.appendChild(x.span));
     paint();
