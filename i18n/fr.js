@@ -213,5 +213,8 @@ window.I18N.fr = {
   "releases.filter_stable": "Stables",
   "releases.downloads": "téléchargements",
   "releases.no_files": "Aucun fichier.",
-  "releases.nav": "Versions"
+  "releases.nav": "Versions",
+  "releases.filter_beta": "Bêta",
+  "releases.toc": "Sommaire",
+  "releases.empty": "Aucune version dans cette catégorie."
 };

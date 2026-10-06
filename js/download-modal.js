@@ -102,11 +102,13 @@
 
   function fetchLatestRelease() {
     if (fetchPromise) return fetchPromise;
-    fetchPromise = fetch(`https://api.github.com/repos/${repo}/releases/latest`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('no release'))))
-      .then((data) => {
-        latestRelease = data;
-        return data;
+    // shared loader: static copy first, GitHub API only as a fallback
+    fetchPromise = (window.ghData ? ghData.get() : Promise.reject(new Error('no loader')))
+      .then((d) => {
+        const rel = d.releases.find((r) => !r.prerelease && !r.draft);
+        if (!rel) throw new Error('no release');
+        latestRelease = rel;
+        return rel;
       });
     return fetchPromise;
   }

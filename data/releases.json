@@ -1,0 +1,1252 @@
+{
+  "updated": "2026-10-06T09:05:25Z",
+  "stars": 2,
+  "releases": [
+    {
+      "tag_name": "v3.6.0-beta",
+      "name": "LastStats v3.6.0-beta",
+      "published_at": "2026-09-30T20:25:25Z",
+      "prerelease": true,
+      "draft": false,
+      "body": "## LastStats v3.6.0-beta\n\n_(Pas d'\\''entrée trouvée dans CHANGELOG.md pour v3.6.0-beta — ajoute une section \"## v3.6.0-beta\" avant de créer le tag)_\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### iOS\n| File | Use case |\n|------|----------|\n| `LastStats-ios.ipa` | Unsigned: install with AltStore / Sideloadly / TrollStore (or re-sign it yourself) |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `LastStats-Setup-x64.exe` | **Windows (x64) — recommended installer** |\n| `LastStats-Setup-arm64.exe` | **Windows on ARM (Snapdragon) — recommended installer** |\n| `laststats-windows.zip` | Windows (x64), portable / no install |\n| `laststats-windows-arm64.zip` | Windows on ARM, portable / no install |\n| `LastStats-linux-x64.deb` | **Linux x64 (Debian/Ubuntu/Mint) — recommended installer** |\n| `LastStats-linux-arm64.deb` | **Linux ARM64 (Debian/Ubuntu, Raspberry Pi...) — recommended installer** |\n| `LastStats-linux-x64.rpm` | **Linux x64 (Fedora/openSUSE/RHEL) — recommended installer** |\n| `LastStats-linux-arm64.rpm` | **Linux ARM64 (Fedora/openSUSE) — recommended installer** |\n| `install-linux.sh` | Linux, any CPU: picks the right package for your distro |\n| `LastStats-linux-x64.AppImage` | Linux x64, any distro (portable) |\n| `LastStats-linux-arm64.AppImage` | Linux ARM64, any distro (portable) |\n| `laststats-linux.zip`   | Linux x64, manual install |\n| `laststats-linux-arm64.zip` | Linux ARM64, manual install |\n| `LastStats-macos-arm64.dmg` | **macOS Apple Silicon (M1 and later) — recommended installer** (drag to Applications) |\n| `LastStats-macos-x64.dmg` | **macOS Intel — recommended installer** (drag to Applications) |\n| `LastStats-macos.dmg`   | macOS universal (Intel + Apple Silicon) installer |\n| `laststats-macos-arm64.zip` | macOS Apple Silicon, manual install |\n| `laststats-macos-x64.zip` | macOS Intel, manual install |\n| `laststats-macos.zip`   | macOS universal, manual install |\n**Full Changelog**: https://github.com/SanoBld/LastStats/compare/v3.5.0...v3.6.0-beta",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 43194969,
+          "download_count": 9,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 39632397,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 96592235,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 45981103,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/app-x86_64-release.apk"
+        },
+        {
+          "name": "install-linux.sh",
+          "size": 1940,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/install-linux.sh"
+        },
+        {
+          "name": "LastStats-ios.ipa",
+          "size": 21211687,
+          "download_count": 5,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-ios.ipa"
+        },
+        {
+          "name": "LastStats-linux-arm64.AppImage",
+          "size": 14625288,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-linux-arm64.AppImage"
+        },
+        {
+          "name": "LastStats-linux-arm64.deb",
+          "size": 11989570,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-linux-arm64.deb"
+        },
+        {
+          "name": "LastStats-linux-arm64.rpm",
+          "size": 15040598,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-linux-arm64.rpm"
+        },
+        {
+          "name": "laststats-linux-arm64.zip",
+          "size": 15284204,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/laststats-linux-arm64.zip"
+        },
+        {
+          "name": "LastStats-linux-x64.AppImage",
+          "size": 15075832,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-linux-x64.AppImage"
+        },
+        {
+          "name": "LastStats-linux-x64.deb",
+          "size": 12337362,
+          "download_count": 1,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-linux-x64.deb"
+        },
+        {
+          "name": "LastStats-linux-x64.rpm",
+          "size": 15449887,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-linux-x64.rpm"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 15738446,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/laststats-linux.zip"
+        },
+        {
+          "name": "LastStats-macos-arm64.dmg",
+          "size": 18002133,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-macos-arm64.dmg"
+        },
+        {
+          "name": "laststats-macos-arm64.zip",
+          "size": 209317650,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/laststats-macos-arm64.zip"
+        },
+        {
+          "name": "LastStats-macos-x64.dmg",
+          "size": 19372472,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-macos-x64.dmg"
+        },
+        {
+          "name": "laststats-macos-x64.zip",
+          "size": 210384271,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/laststats-macos-x64.zip"
+        },
+        {
+          "name": "LastStats-macos.dmg",
+          "size": 32526955,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-macos.dmg"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 221110814,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/laststats-macos.zip"
+        },
+        {
+          "name": "LastStats-Setup-arm64.exe",
+          "size": 13835752,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-Setup-arm64.exe"
+        },
+        {
+          "name": "LastStats-Setup-x64.exe",
+          "size": 14630767,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-Setup-x64.exe"
+        },
+        {
+          "name": "laststats-windows-arm64.zip",
+          "size": 17435739,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/laststats-windows-arm64.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 18341260,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v3.5.0",
+      "name": "LastStats v3.5.0",
+      "published_at": "2026-09-16T05:09:37Z",
+      "prerelease": false,
+      "draft": false,
+      "body": "## LastStats v3.5.0\n\n**Dashboard**\n- New dashboard chart: a listening calendar (last 60 days) or monthly bars — replaces the old top artists/albums/tracks block, pick which one in Dashboard settings\n- New: set a custom display name (in the intro flow or Settings > Account) — shown big on the dashboard; if set, that's all that's shown (no more Last.fm account name underneath)\n- Faster dashboard chart loading: proper pagination (was silently missing scrobbles on busy periods) and background caching instead of refetching every time\n\n**Rankings**\n- Fixed: podium photos sometimes stayed stuck on the previous top 3 after changing the year/month filter\n- Year selector now stretches at the edges (Android style) instead of the iOS rubber-band bounce, same for the Charts tab\n\n**News**\n- New search bar in the news/what's-new page, filters by title and body as you type\n- Search bar visual style is now the same everywhere it appears: News, the Search tab, and Settings search\n\n**Sharing**\n- Fixed sharing (artwork, charts, achievement badges, crash logs, recap cards) on Windows, macOS and Linux: desktop no longer touches the native share charm at all (it was still being used as a silent fallback, which is what caused the \"we couldn't show all the possible shares\" error some of you saw) — it now always saves the file and reveals it in the file explorer/Finder instead\n\n**Performance (Windows)**\n- Notification system setup no longer blocks the app's first frame on Windows — the window now appears noticeably faster on startup\n- A few redundant startup steps now run in parallel instead of one after another\n\n**Transparency**\n- About page now lists every open-source Flutter package used to build the app, each linking to its pub.dev page\n- Added a proper open-source license (MIT) — use, modify, duplicate or redistribute freely, just credit the author — with a link to the full license text\n- Translations page now notes that ALL translations, including French, were generated with AI assistance and may contain inaccuracies\n- About page now also notes that AI was used to help develop a good part of the app's code\n- README rewritten to match the current app (dashboard chart picker, custom nickname, working desktop sharing, license, AI note) and now includes real per-platform installation steps\n\n**Texts**\n- Improved wording across all translations, more natural phrasing, fewer stiff/technical terms\n\n**Code cleanup**\n- Removed dead code left over from the old dashboard carousels\n- Cleaned up a handful of unused imports and analyzer warnings\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `LastStats-Setup-x64.exe` | **Windows (x64) — recommended installer** |\n| `LastStats-Setup-arm64.exe` | **Windows on ARM (Snapdragon) — recommended installer** |\n| `laststats-windows.zip` | Windows (x64), portable / no install |\n| `laststats-windows-arm64.zip` | Windows on ARM, portable / no install |\n| `laststats-linux.zip`   | Linux |\n| `laststats-macos.zip`   | macOS |\n**Full Changelog**: https://github.com/SanoBld/LastStats/compare/v3.2.0...v3.5.0",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 40397751,
+          "download_count": 13,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 36720495,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 92697289,
+          "download_count": 1,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 43118353,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/app-x86_64-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 15515706,
+          "download_count": 3,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 320083712,
+          "download_count": 3,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/laststats-macos.zip"
+        },
+        {
+          "name": "LastStats-Setup-arm64.exe",
+          "size": 13680593,
+          "download_count": 1,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/LastStats-Setup-arm64.exe"
+        },
+        {
+          "name": "LastStats-Setup-x64.exe",
+          "size": 14470607,
+          "download_count": 2,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/LastStats-Setup-x64.exe"
+        },
+        {
+          "name": "laststats-windows-arm64.zip",
+          "size": 17174296,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/laststats-windows-arm64.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 18116797,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v3.2.0",
+      "name": "LastStats v3.2.0",
+      "published_at": "2026-08-27T17:09:37Z",
+      "prerelease": false,
+      "draft": false,
+      "body": "## LastStats v3.2.0\n\n**Home Screen Widgets** (Android BETA)\n- New: 5 home screen widgets — total scrobbles, now playing, loved tracks, this week, and a full recap\n- Now Playing widget shows the album art full-bleed, with track and artist over a dark gradient\n- Widgets follow the app's theme (style, light/dark, and accent color), with a toggle to keep them pure white/black instead\n- Size-responsive: the 3 stat widgets adapt their layout as you resize them, down to a compact number-only square\n- Auto-refresh while the app is open (live for Now Playing, periodic for stats), plus a background task every ~30 min\n- Fully translated into all 10 supported languages, including the widget picker names\n\n**Settings**\n- New search bar in Settings, filtering every category and jumping straight into common options (accent color, theme, language, and more), some editable inline\n- New \"Favorite\" section in About, crediting Metrolist and Better Nothing Music Visualizer\n- Rebuilt settings tabs, including a redesigned FAQ page with more questions\n- Eco mode for battery saving\n- Reworked updates page, with a searchable, filterable version history\n- Fixed accent colors: picking black or white no longer looks tinted blue\n- New: separate accent color for light and dark theme, optionally switched by a fixed time of day instead of the active theme\n\n**Levels & Achievements**\n- New account level system, based on total scrobbles\n- New achievements system, with card borders (bronze to iridescent) based on play count\n- Two new achievement categories: friends added, and taste comparisons made\n- All computed automatically from cached stats, no extra network calls\n\n**3D Artwork Cards & Sharing**\n- Share options have been visually enhanced and modernized\n- Share artwork cards as an image\n- QR code sharing and QR code scanning for profiles\n- Achievement badges now show their name when shared, not just the tier\n\n**Performance**\n- General app optimization, faster and smoother overall\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `LastStats-Setup-x64.exe` | **Windows (x64) — recommended installer** |\n| `LastStats-Setup-arm64.exe` | **Windows on ARM (Snapdragon) — recommended installer** |\n| `laststats-windows.zip` | Windows (x64), portable / no install |\n| `laststats-windows-arm64.zip` | Windows on ARM, portable / no install |\n| `laststats-linux.zip`   | Linux |\n| `laststats-macos.zip`   | macOS |\n**Full Changelog**: https://github.com/SanoBld/LastStats/compare/v3.1.0...v3.2.0",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 41163790,
+          "download_count": 16,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 37453770,
+          "download_count": 1,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 92775204,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 43884392,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/app-x86_64-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 16308778,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 323975925,
+          "download_count": 2,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/laststats-macos.zip"
+        },
+        {
+          "name": "LastStats-Setup-arm64.exe",
+          "size": 14501930,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/LastStats-Setup-arm64.exe"
+        },
+        {
+          "name": "LastStats-Setup-x64.exe",
+          "size": 15299747,
+          "download_count": 1,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/LastStats-Setup-x64.exe"
+        },
+        {
+          "name": "laststats-windows-arm64.zip",
+          "size": 17945669,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/laststats-windows-arm64.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 18890483,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v3.1.0",
+      "name": "LastStats v3.1.0",
+      "published_at": "2026-08-14T11:57:30Z",
+      "prerelease": false,
+      "draft": false,
+      "body": "## LastStats v3.1.0\n\n**Levels & Achievements**\n- New account level system, based on total scrobbles\n- New achievements system, with card borders (bronze to iridescent) based on play count\n- Two new achievement categories: friends added, and taste comparisons made\n- All computed automatically from cached stats, no extra network calls\n\n**3D Artwork Cards**\n- Share artwork cards as an image\n- QR code sharing and QR code scanning for profiles\n- Achievement badges now show their name when shared, not just the tier\n\n**Settings**\n- Rebuilt settings tabs, including a redesigned FAQ page with more questions\n- Eco mode for battery saving\n- Reworked updates page, with a searchable, filterable version history\n- Fixed accent colors: picking black or white no longer looks tinted blue\n- New: separate accent color for light and dark theme, optionally switched by a fixed time of day instead of the active theme\n\n**Performance**\n- General app optimization, faster and smoother overall\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `LastStats-Setup-x64.exe` | **Windows (x64) — recommended installer** |\n| `LastStats-Setup-arm64.exe` | **Windows on ARM (Snapdragon) — recommended installer** |\n| `laststats-windows.zip` | Windows (x64), portable / no install |\n| `laststats-windows-arm64.zip` | Windows on ARM, portable / no install |\n| `laststats-linux.zip`   | Linux |\n| `laststats-macos.zip`   | macOS |\n**Full Changelog**: https://github.com/SanoBld/LastStats/compare/v3.0.0...v3.1.0",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 39440448,
+          "download_count": 7,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 35697656,
+          "download_count": 3,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 90888018,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 42161042,
+          "download_count": 4,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/app-x86_64-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 16268479,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 323489338,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/laststats-macos.zip"
+        },
+        {
+          "name": "LastStats-Setup-arm64.exe",
+          "size": 14475872,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/LastStats-Setup-arm64.exe"
+        },
+        {
+          "name": "LastStats-Setup-x64.exe",
+          "size": 15261407,
+          "download_count": 1,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/LastStats-Setup-x64.exe"
+        },
+        {
+          "name": "laststats-windows-arm64.zip",
+          "size": 17912514,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/laststats-windows-arm64.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 18849597,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v3.0.0",
+      "name": "LastStats v3.0.0",
+      "published_at": "2026-07-24T10:42:28Z",
+      "prerelease": false,
+      "draft": false,
+      "body": "## LastStats v3.0.0\n\n**Favorites & Interaction**\n- New Favorites system: like tracks/artists/albums, dedicated page with filters, cover art and removable items, clickable count in stats bar\n- Discreet loved badge in recent listens (toggleable in settings)\n- Friends system: add profiles and view their scrobbles\n- Comparison system between profiles\n- Chart sharing (beta)\n\n**Sync & Notifications**\n- Background scrobble sync with adjustable frequency and a progress notification\n- Customizable sync notifications, now available on Windows\n\n**Desktop**\n- Windows installer (.exe) for x64 and ARM64, with shortcuts and clean uninstall/update\n- New custom title bar on Windows and Linux\n- New option for large screens\n- Fixed app name showing as \"laststats_mobile\" in window title and Task Manager\n\n**Interface Overhaul**\n- Global UI rewrite across all views for a cleaner design\n- Redesigned Charts tab with modern, consistent styling\n- Harmonized headers across Rankings, Charts, History, and Search\n- Rankings now uses the same year filter chips as Charts\n- New Notification tab dedicated to notifications and milestones\n- Smoother navigation transitions and animations\n- Login screen redesign\n- New themes and customization options\n- General interface improvements across settings\n\n**Platforms & Localization**\n- Music platform selection (Last.fm, Spotify, YT Music) with official logos, used to filter links shown on track/artist/album pages\n- Updated onboarding favorites step, with Last.fm friend suggestions and profile search\n- Added translations for English, German, Italian, Japanese, Russian, Arabic, Spanish, Chinese, and Portuguese\n\n**Performance & Data**\n- Local cache: optimized loading times and reduced API requests\n- Import/Export: backup and restore your appearance settings\n- Search bar: added a quick search utility\n- Improved overall speed and stability, especially for scrobble management\n\n**Bug Fixes**\n- Fixed broken scroll pagination on Artists tab\n- Cleaned up redundant/illogical filter options\n- Fixed duplicate music platform setting\n- Fixed version display to reflect actual build status\n- Fixed issues with scrobbles tracking and caching\n- General bug fixes and stability improvements\n\n**Documentation**\n- FAQ rewritten (formal tone) with new questions, fully translated\n\n**Community**\n- New official Discord server: https://discord.gg/JjqmkQgZBs\n\n**Important:** before updating, make sure to save your two API keys (Last.fm and secret key). After updating, it is recommended to reset the app so both keys are properly reconfigured.\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `LastStats-Setup-x64.exe` | **Windows (x64) — recommended installer** |\n| `LastStats-Setup-arm64.exe` | **Windows on ARM (Snapdragon) — recommended installer** |\n| `laststats-windows.zip` | Windows (x64), portable / no install |\n| `laststats-windows-arm64.zip` | Windows on ARM, portable / no install |\n| `laststats-linux.zip`   | Linux |\n| `laststats-macos.zip`   | macOS |\n**Full Changelog**: https://github.com/SanoBld/LastStats/compare/v2.9.5.1...v3.0.0",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 32288236,
+          "download_count": 14,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 30044932,
+          "download_count": 2,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 73871090,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 33746056,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/app-x86_64-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 16425066,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 317510207,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/laststats-macos.zip"
+        },
+        {
+          "name": "LastStats-Setup-arm64.exe",
+          "size": 14758236,
+          "download_count": 1,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/LastStats-Setup-arm64.exe"
+        },
+        {
+          "name": "LastStats-Setup-x64.exe",
+          "size": 15541416,
+          "download_count": 2,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/LastStats-Setup-x64.exe"
+        },
+        {
+          "name": "laststats-windows-arm64.zip",
+          "size": 18205869,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/laststats-windows-arm64.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 19129738,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v2.9.9-beta",
+      "name": "LastStats v2.9.9-beta",
+      "published_at": "2026-07-18T10:09:24Z",
+      "prerelease": true,
+      "draft": false,
+      "body": "## LastStats v2.9.9-beta\n\n- New Favorites system: like tracks/artists/albums, dedicated page with filters, cover art and removable items, clickable count in stats bar\n- Discreet loved badge in recent listens (toggleable in settings)\n- Windows installer (.exe) for x64 and ARM64, with shortcuts and clean uninstall/update\n- Fixed app name showing as \"laststats_mobile\" in window title and Task Manager\n- Redesigned Charts tab with modern, consistent styling\n- Harmonized headers across Rankings, Charts, History, and Search\n- Rankings now uses the same year filter chips as Charts\n- Fixed broken scroll pagination on Artists tab\n- Cleaned up redundant/illogical filter options\n- FAQ rewritten (formal tone) with new questions, fully translated\n- Fixed duplicate music platform setting\n- Fixed version display to reflect actual build status\n- Background scrobble sync with adjustable frequency and a progress notification\n- Customizable sync notifications, now also available on Windows\n- New custom title bar on Windows and Linux\n- Music platform selection (Last.fm, Spotify, YT Music) with official logos, used to filter links shown on track/artist/album pages\n- Updated onboarding favorites step, with Last.fm friend suggestions and profile search\n- Added translations for German, Italian, Japanese, Russian, Arabic, Spanish, Chinese, and Portuguese\n- General interface improvements across settings\n- Login screen redesign\n- New comparison system\n- Chart sharing (beta)\n- New themes and customization options\n- Various fixes and stability improvements\n\n**Important:** before updating, make sure to save your two API keys (Last.fm and secret key). After updating, it is recommended to reset the app so both keys are properly reconfigured.\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `LastStats-Setup-x64.exe` | **Windows (x64) — recommended installer** |\n| `LastStats-Setup-arm64.exe` | **Windows on ARM (Snapdragon) — recommended installer** |\n| `laststats-windows.zip` | Windows (x64), portable / no install |\n| `laststats-windows-arm64.zip` | Windows on ARM, portable / no install |\n| `laststats-linux.zip`   | Linux |\n| `laststats-macos.zip`   | macOS |\n**Full Changelog**: https://github.com/SanoBld/LastStats/compare/v2.9.6-beta...v2.9.9-beta",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 32090372,
+          "download_count": 4,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 29879836,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 73378314,
+          "download_count": 1,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 33613728,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/app-x86_64-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 16362812,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 316592365,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/laststats-macos.zip"
+        },
+        {
+          "name": "LastStats-Setup-arm64.exe",
+          "size": 14714991,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/LastStats-Setup-arm64.exe"
+        },
+        {
+          "name": "LastStats-Setup-x64.exe",
+          "size": 15479240,
+          "download_count": 1,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/LastStats-Setup-x64.exe"
+        },
+        {
+          "name": "laststats-windows-arm64.zip",
+          "size": 18140187,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/laststats-windows-arm64.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 19065220,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v2.9.6-beta",
+      "name": "LastStats v2.9.6-beta",
+      "published_at": "2026-07-08T09:33:20Z",
+      "prerelease": true,
+      "draft": false,
+      "body": "## LastStats v2.9.6-beta\n\n- Background scrobble sync with adjustable frequency and a progress notification\n- Customizable sync notifications, now also available on Windows\n- New custom title bar on Windows and Linux\n- Music platform selection (Last.fm, Spotify, YT Music) with official logos, used to filter links shown on track/artist/album pages\n- Updated onboarding favorites step, with Last.fm friend suggestions and profile search\n- Added translations for Spanish, Chinese, and Portuguese\n- General interface improvements across settings\n- Login screen redesign\n- New comparison system\n- Chart sharing (beta)\n- New themes and customization options\n- Various fixes and stability improvements\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `laststats-windows.zip` | Windows |\n| `laststats-linux.zip`   | Linux |\n| `laststats-macos.zip`   | macOS |\n**Full Changelog**: https://github.com/SanoBld/LastStats/compare/v2.9.5.1-beta...v2.9.6-beta",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 31893148,
+          "download_count": 2,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.6-beta/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 29617072,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.6-beta/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 72722338,
+          "download_count": 6,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.6-beta/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 33416508,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.6-beta/app-x86_64-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 16191190,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.6-beta/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 314052096,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.6-beta/laststats-macos.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 18897662,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.6-beta/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v2.9.5.1-beta",
+      "name": "LastStats v2.9.5.1-beta",
+      "published_at": "2026-06-25T22:45:05Z",
+      "prerelease": true,
+      "draft": false,
+      "body": "## LastStats v2.9.5.1-beta\n\n      - TEST\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `laststats-windows.zip` | Windows |\n| `laststats-linux.zip`   | Linux |\n| `laststats-macos.zip`   | macOS |\n**Full Changelog**: https://github.com/SanoBld/LastStats/compare/v2.9.5...v2.9.5.1-beta",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 30986705,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5.1-beta/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 28612197,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5.1-beta/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 69947655,
+          "download_count": 7,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5.1-beta/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 32444065,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5.1-beta/app-x86_64-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 15723252,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5.1-beta/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 307934308,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5.1-beta/laststats-macos.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 18214786,
+          "download_count": 1,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5.1-beta/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v2.9.5",
+      "name": "LastStats v2.9.5",
+      "published_at": "2026-06-25T21:42:16Z",
+      "prerelease": true,
+      "draft": false,
+      "body": "## LastStats v2.9.5\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `laststats-windows.zip` | Windows |\n| `laststats-linux.zip`   | Linux |\n| `laststats-macos.zip`   | macOS |\n**Full Changelog**: https://github.com/SanoBld/LastStats/compare/v2.9.4.2...v2.9.5",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 30986705,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 28612197,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 69947651,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 32444061,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5/app-x86_64-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 15723164,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 307934653,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5/laststats-macos.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 18214782,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v2.9.4.2",
+      "name": "LastStats v2.9.4.2",
+      "published_at": "2026-06-23T15:06:38Z",
+      "prerelease": true,
+      "draft": false,
+      "body": "## LastStats v2.9.4.2\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `laststats-windows.zip` | Windows |\n| `laststats-linux.zip`   | Linux |\n| `laststats-macos.zip`   | macOS |\n**Full Changelog**: https://github.com/SanoBld/LastStats/compare/v2.9.4.1...v2.9.4.2",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 27717155,
+          "download_count": 1,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.2/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 25342647,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.2/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 66678105,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.2/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 29174515,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.2/app-x86_64-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 12447785,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.2/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 288306494,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.2/laststats-macos.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 14972945,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.2/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v2.9.4.1",
+      "name": "LastStats v2.9.4.1",
+      "published_at": "2026-06-23T14:52:18Z",
+      "prerelease": true,
+      "draft": false,
+      "body": "## LastStats v2.9.4.1\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `laststats-windows.zip` | Windows |\n| `laststats-linux.zip`   | Linux |\n| `laststats-macos.zip`   | macOS |\n**Full Changelog**: https://github.com/SanoBld/LastStats/compare/v2.9.4...v2.9.4.1",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 27717155,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.1/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 25342647,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.1/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 66678101,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.1/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 29174511,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.1/app-x86_64-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 12447851,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.1/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 288305606,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.1/laststats-macos.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 14973010,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.1/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v2.9.4",
+      "name": "LastStats v2.9.4",
+      "published_at": "2026-06-21T17:31:57Z",
+      "prerelease": true,
+      "draft": false,
+      "body": "## LastStats v2.9.4\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `laststats-windows.zip` | Windows |\n| `laststats-linux.zip`   | Linux |\n| `laststats-macos.zip`   | macOS |\n**Full Changelog**: https://github.com/SanoBld/LastStats/compare/v2.9.3...v2.9.4",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 27650607,
+          "download_count": 2,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 25341843,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 66611329,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 29173279,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4/app-x86_64-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 12444765,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 288296108,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4/laststats-macos.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 14969906,
+          "download_count": 1,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v2.9.3",
+      "name": "LastStats v2.9.3",
+      "published_at": "2026-06-21T13:51:24Z",
+      "prerelease": true,
+      "draft": false,
+      "body": "## LastStats v2.9.3\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `laststats-windows.zip` | Windows |\n| `laststats-linux.zip`   | Linux |\n| `laststats-macos.zip`   | macOS |\n**Full Changelog**: https://github.com/SanoBld/LastStats-App/compare/v2.9.2...v2.9.3",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 27650023,
+          "download_count": 2,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.3/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 25259343,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.3/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 66528829,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.3/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 29172695,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.3/app-x86_64-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 12422609,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.3/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 287989035,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.3/laststats-macos.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 14951749,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.3/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v2.9.2",
+      "name": "LastStats v2.9.2",
+      "published_at": "2026-06-20T14:31:27Z",
+      "prerelease": true,
+      "draft": false,
+      "body": "## LastStats v2.9.2\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `laststats-windows.zip` | Windows |\n| `laststats-linux.zip`   | Linux |\n| `laststats-macos.zip`   | macOS |\n**Full Changelog**: https://github.com/SanoBld/LastStats-App/compare/v2.9.1...v2.9.2",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 27518343,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.2/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 25209583,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.2/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 66216925,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.2/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 29041015,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.2/app-x86_64-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 12403984,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.2/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 287738702,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.2/laststats-macos.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 14928824,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.2/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v2.9.1",
+      "name": "LastStats v2.9.1",
+      "published_at": "2026-06-19T13:12:32Z",
+      "prerelease": true,
+      "draft": false,
+      "body": "## LastStats v2.9.1\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `laststats-windows.zip` | Windows |\n| `laststats-linux.zip`   | Linux |\n| `laststats-macos.zip`   | macOS |\n**Full Changelog**: https://github.com/SanoBld/LastStats-App/compare/v2.9.0...v2.9.1",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 27452655,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.1/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 25111123,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.1/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 65987397,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.1/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 28975327,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.1/app-x86_64-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 12367159,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.1/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 287242232,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.1/laststats-macos.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 14888554,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.1/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v2.9.0",
+      "name": "LastStats v2.9.0",
+      "published_at": "2026-06-18T22:07:49Z",
+      "prerelease": true,
+      "draft": false,
+      "body": "## LastStats v2.9.0\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `laststats-windows.zip` | Windows |\n| `laststats-linux.zip`   | Linux |\n| `laststats-macos.zip`   | macOS |\n**Full Changelog**: https://github.com/SanoBld/LastStats-App/compare/v2.6.0...v2.9.0",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 27452543,
+          "download_count": 1,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.0/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 25094627,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.0/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 65970897,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.0/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 28975215,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.0/app-x86_64-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 12358424,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.0/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 287178816,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.0/laststats-macos.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 14886479,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.0/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v2.6.0",
+      "name": "LastStats v2.6.0 — Optimization & New Features",
+      "published_at": "2026-05-31T08:36:08Z",
+      "prerelease": false,
+      "draft": false,
+      "body": "This update brings performance optimizations, new features, and important bug fixes to improve your experience.\r\n\r\nWhat's New?\r\n• Notification Tab: Added a brand new tab dedicated to notifications and milestones.\r\n• Chart Improvements: Visual updates and changes to the graphics tab for better data readability.\r\n• More Customization: New options added to personalize the interface to your liking.\r\n• Performance Optimization: Improved overall speed and stability, especially for scrobble management.\r\n• New option for large screens\r\n\r\nBug Fixes\r\n• Fixed issues with scrobbles tracking and caching.\r\n• General bug fixes and stability improvements.\r\n\r\n(There will be no more updates until July for personal reasons, but I'm not giving up on the project x))",
+      "assets": [
+        {
+          "name": "app-release.apk",
+          "size": 64920593,
+          "download_count": 6,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.6.0/app-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 12217826,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.6.0/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 285212349,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.6.0/laststats-macos.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 14447056,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.6.0/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v2.5.0",
+      "name": "LastStats v2.5.0 — UI Overhaul & Performance Update",
+      "published_at": "2026-05-24T22:15:26Z",
+      "prerelease": false,
+      "draft": false,
+      "body": "LastStats v2.5.0 — Overhaul & Optimization\r\n\r\nThis update focuses on a global UI rewrite, new features, and performance optimizations.\r\n\r\n\r\n🛠️ Changes & New Features\r\n\r\n• UI Overhaul: All views rewritten for a cleaner design.\r\n\r\n• Animations: Integrated smoother navigation transitions.\r\n\r\n• Import / Export: Backup and restore your appearance settings.\r\n\r\n• Enhanced Tabs: New functionalities added across all sections.\r\n\r\n• Friends System: Add profiles and view their scrobbles.\r\n\r\n• Search Bar: Added a quick search utility.\r\n\r\n• Adding English as a language.\r\n\r\n• Local Cache: Optimized loading times and reduced API requests.\r\n\r\n• First Connection: New loading UI for the initial profile setup.\r\n\r\n• Personalization: Added new UI configuration settings.\r\n\r\n• Bug Fixes: Resolved minor issues.\r\n\r\n\r\n<img width=\"1080\" height=\"2412\" alt=\"Screenshot_20260524-234303\" src=\"https://github.com/user-attachments/assets/40760a08-1587-42d4-ac59-0af49368867c\" />\r\n<img width=\"1080\" height=\"2412\" alt=\"Screenshot_20260524-234311\" src=\"https://github.com/user-attachments/assets/3f45829c-dd10-4daa-ad93-ac84e83d74ad\" />\r\n<img width=\"1080\" height=\"2412\" alt=\"Screenshot_20260524-234331\" src=\"https://github.com/user-attachments/assets/74f354b1-0968-4143-8ade-0a4671efef21\" />\r\n<img width=\"1080\" height=\"2412\" alt=\"Screenshot_20260524-234247\" src=\"https://github.com/user-attachments/assets/90da863d-b348-4e8a-a00e-48a5b7eb1336\" />\r\n<img width=\"1080\" height=\"2412\" alt=\"Screenshot_20260524-234252\" src=\"https://github.com/user-attachments/assets/033274e0-9a7e-45a8-ac83-5258904724a1\" />\r\n<img width=\"1080\" height=\"2412\" alt=\"Screenshot_20260524-234257\" src=\"https://github.com/user-attachments/assets/bce5dc70-51c9-4380-bc03-a5a956a730ce\" />\r\n",
+      "assets": [
+        {
+          "name": "app-release.apk",
+          "size": 58336480,
+          "download_count": 10,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.5.0/app-release.apk"
+        },
+        {
+          "name": "linux.zip",
+          "size": 11959779,
+          "download_count": 2,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.5.0/linux.zip"
+        },
+        {
+          "name": "macos.zip",
+          "size": 277544590,
+          "download_count": 4,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.5.0/macos.zip"
+        },
+        {
+          "name": "windows.zip",
+          "size": 14233900,
+          "download_count": 3,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.5.0/windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v2.1.0",
+      "name": "LastStats v2.1.0",
+      "published_at": "2026-05-23T12:05:56Z",
+      "prerelease": true,
+      "draft": false,
+      "body": "## LastStats v2.1.0\n\n### Downloads\n| Platform | File |\n|----------|------|\n| Android | `app-release.apk` |\n| Windows | `laststats-windows.zip` |\n| Linux   | `laststats-linux.zip` |\n| macOS   | `laststats-macos.zip` |\n**Full Changelog**: https://github.com/SanoBld/LastStats-App/compare/v2.0.1...v2.1.0",
+      "assets": [
+        {
+          "name": "app-release.apk",
+          "size": 57025238,
+          "download_count": 5,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.1.0/app-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 11880169,
+          "download_count": 2,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.1.0/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 276106767,
+          "download_count": 2,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.1.0/laststats-macos.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 14126922,
+          "download_count": 2,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.1.0/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v2.0.1",
+      "name": "LastStats v2.0.1",
+      "published_at": "2026-05-20T12:19:25Z",
+      "prerelease": true,
+      "draft": false,
+      "body": "## LastStats v2.0.1\n\n### Downloads\n| Platform | File |\n|----------|------|\n| Android | `app-release.apk` |\n| Windows | `laststats-windows.zip` |\n| Linux   | `laststats-linux.zip` |\n| macOS   | `laststats-macos.zip` |\n| Web     | `laststats-web.zip` |\n**Full Changelog**: https://github.com/SanoBld/LastStats-App/compare/v2.0.0...v2.0.1",
+      "assets": [
+        {
+          "name": "app-release.apk",
+          "size": 54651414,
+          "download_count": 1,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.1/app-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 10773686,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.1/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 268124873,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.1/laststats-macos.zip"
+        },
+        {
+          "name": "laststats-web.zip",
+          "size": 14362029,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.1/laststats-web.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 13016747,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.1/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v2.0.0",
+      "name": "LastStats v2.0.0",
+      "published_at": "2026-05-19T21:26:58Z",
+      "prerelease": true,
+      "draft": false,
+      "body": "## LastStats v2.0.0\n\n### Downloads\n| Platform | File |\n|----------|------|\n| Android | `app-release.apk` |\n| Windows | `laststats-windows.zip` |\n| Linux   | `laststats-linux.zip` |\n| macOS   | `laststats-macos.zip` |\n| Web     | `laststats-web.zip` |\n**Full Changelog**: https://github.com/SanoBld/LastStats-App/compare/v1.2.0...v2.0.0",
+      "assets": [
+        {
+          "name": "app-release.apk",
+          "size": 54421794,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.0/app-release.apk"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 10741503,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.0/laststats-linux.zip"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 267731912,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.0/laststats-macos.zip"
+        },
+        {
+          "name": "laststats-web.zip",
+          "size": 14352067,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.0/laststats-web.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 12989021,
+          "download_count": 1,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.0/laststats-windows.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v1.2.0",
+      "name": "LastStats v1.2.0 — Initial Release",
+      "published_at": "2026-05-17T09:36:41Z",
+      "prerelease": false,
+      "draft": false,
+      "body": "## LastStats — Version 1.2.0 (Initial Release)\r\n\r\nWelcome to the first official release of **LastStats**, a modern cross-platform application built with Flutter and Material You to explore, track, and analyze your Last.fm listening habits cleanly and efficiently.\r\n\r\n---\r\n\r\n### ✨ Key Features\r\n\r\n* **Technical & Sleek Interface:** A clean, minimalist UI inspired by modern technical design aesthetics, optimized for readability and fast data parsing.\r\n* **Material You Integration (M3):** Dynamic color adaptation (Dynamic Color) that syncs with your system palette, featuring full native dark theme support.\r\n* **Zero Simulated Data:** Direct and secure connection with the Last.fm API to fetch and display your genuine, real-time scrobbles, top artists, albums, and tracks.\r\n* **Smart Artwork Resolution:** A robust multi-source fallback chain (iTunes Search, Deezer, MusicBrainz, and Cover Art Archive) to automatically fetch missing album and artist covers from Last.fm.\r\n* **In-App Update Notifications:** Features a built-in network service that automatically checks GitHub Releases to notify you right inside the app when a new version is available.\r\n\r\n---\r\n\r\n*Built with passion. Feedback, feature requests, and bug reports are welcome in the Issues tab!*",
+      "assets": [
+        {
+          "name": "laststats-android-apk.zip",
+          "size": 24800742,
+          "download_count": 2,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v1.2.0/laststats-android-apk.zip"
+        },
+        {
+          "name": "laststats-linux-app.zip",
+          "size": 19597666,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v1.2.0/laststats-linux-app.zip"
+        },
+        {
+          "name": "laststats-macos-app.zip",
+          "size": 262411010,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v1.2.0/laststats-macos-app.zip"
+        },
+        {
+          "name": "laststats-web-app.zip",
+          "size": 12540752,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v1.2.0/laststats-web-app.zip"
+        },
+        {
+          "name": "laststats-windows-app.zip",
+          "size": 12960269,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v1.2.0/laststats-windows-app.zip"
+        }
+      ]
+    }
+  ]
+}

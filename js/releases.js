@@ -20,6 +20,9 @@
   let visible = []; // releases matching the filter (rail shows all of them)
   let navItems = [];
 
+  // beta = flagged pre-release on GitHub, or alpha/beta in the tag name
+  const isBeta = (r) => !!r.prerelease || /alpha|beta/i.test(r.tag_name || '');
+
   // same id on the card, the rail link and the URL hash
   const idOf = (rel) => (rel.tag_name || String(rel.id)).replace(/[^\w.-]/g, '_');
 
@@ -31,32 +34,113 @@
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  // inline markdown: **bold**, `code`, [text](url), bare urls
-  function inline(s) {
-    return esc(s)
-      .replace(/`([^`]+)`/g, '<code>$1</code>')
-      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-      .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  // ---- small markdown renderer (GitHub release notes) ----
+  // supports: headings, **bold**, *italic*, ~~strike~~, ==highlight==, `code`, code blocks,
+  // links + bare urls, @user, #123, lists (nested, ordered, task), tables, quotes, rules.
+  // Everything is escaped first, so notes can never inject HTML.
+  function inline(src) {
+    const codes = [];
+    let t = src.replace(/`([^`]+)`/g, (_, c) => { codes.push(c); return '\u0000' + (codes.length - 1) + '\u0000'; });
+    t = esc(t);
+    t = t
+      .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+      .replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>')
+      .replace(/(^|[\s(])@([A-Za-z0-9-]+)/g, '$1<a href="https://github.com/$2" target="_blank" rel="noopener">@$2</a>')
+      .replace(new RegExp('(^|[\\s(])#(\\d+)\\b', 'g'), '$1<a href="https://github.com/' + repo + '/issues/$2" target="_blank" rel="noopener">#$2</a>')
+      .replace(/\*\*(.+?)\*\*|__(.+?)__/g, (_, x, y) => '<strong>' + (x || y) + '</strong>')
+      .replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?!\*)/g, '$1<em>$2</em>')
+      .replace(/(^|[^_\w])_([^_\s][^_]*?)_(?![_\w])/g, '$1<em>$2</em>')
+      .replace(/~~(.+?)~~/g, '<del>$1</del>')
+      .replace(/==(.+?)==/g, '<mark>$1</mark>');
+    return t.replace(/\u0000(\d+)\u0000/g, (_, i) => '<code>' + esc(codes[i]) + '</code>');
   }
 
-  // tiny markdown renderer: headings, lists, paragraphs
+  const TABLE_SEP = /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/;
+  const LIST_ITEM = /^(\s*)([-*+]|\d+[.)])\s+(.*)$/;
+  const cells = (line) => line.trim().replace(/^\||\|$/g, '').split(/(?<!\\)\|/).map((c) => c.trim().replace(/\\\|/g, '|'));
+
   function md(text) {
+    const lines = text.replace(/\r/g, '').split('\n');
     const out = [];
-    let inList = false;
-    text.replace(/\r/g, '').split('\n').forEach((raw) => {
-      const line = raw.trim();
-      const li = line.match(/^[-*]\s+(.*)/);
-      if (li) {
-        if (!inList) { out.push('<ul>'); inList = true; }
-        out.push('<li>' + inline(li[1]) + '</li>');
-        return;
+    let i = 0;
+
+    // a line that starts something other than a plain paragraph
+    const isBlock = (k) => {
+      const l = lines[k].trim();
+      return /^(#{1,6}\s|```|>|[-*_]{3,}$)/.test(l) || LIST_ITEM.test(lines[k]) ||
+        (l.includes('|') && k + 1 < lines.length && TABLE_SEP.test(lines[k + 1]));
+    };
+
+    while (i < lines.length) {
+      const line = lines[i];
+      const l = line.trim();
+      if (!l) { i++; continue; }
+
+      // fenced code block
+      if (l.startsWith('```')) {
+        const code = [];
+        i++;
+        while (i < lines.length && !lines[i].trim().startsWith('```')) code.push(lines[i++]);
+        i++;
+        out.push('<pre><code>' + esc(code.join('\n')) + '</code></pre>');
+        continue;
       }
-      if (inList) { out.push('</ul>'); inList = false; }
-      if (!line) return;
-      const h = line.match(/^#{1,6}\s+(.*)/);
-      out.push(h ? '<h4>' + inline(h[1]) + '</h4>' : '<p>' + inline(line) + '</p>');
-    });
-    if (inList) out.push('</ul>');
+
+      // table
+      if (l.includes('|') && i + 1 < lines.length && TABLE_SEP.test(lines[i + 1])) {
+        const head = cells(l);
+        const align = cells(lines[i + 1]).map((c) => (/^:-+:$/.test(c) ? 'center' : /-:$/.test(c) ? 'right' : ''));
+        const cell = (tag, c, n) => `<${tag}${align[n] ? ` style="text-align:${align[n]}"` : ''}>${inline(c)}</${tag}>`;
+        let html = '<div class="rel-table-wrap"><table><thead><tr>' + head.map((c, n) => cell('th', c, n)).join('') + '</tr></thead><tbody>';
+        i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) {
+          html += '<tr>' + cells(lines[i]).map((c, n) => cell('td', c, n)).join('') + '</tr>';
+          i++;
+        }
+        out.push(html + '</tbody></table></div>');
+        continue;
+      }
+
+      // heading
+      const h = l.match(/^(#{1,6})\s+(.*)$/);
+      if (h) { out.push(`<h4 class="rel-h rel-h${h[1].length}">${inline(h[2])}</h4>`); i++; continue; }
+
+      // horizontal rule
+      if (/^([-*_])\1{2,}$/.test(l)) { out.push('<hr>'); i++; continue; }
+
+      // quote (content is rendered again, so it can hold lists, bold, ...)
+      if (l.startsWith('>')) {
+        const q = [];
+        while (i < lines.length && lines[i].trim().startsWith('>')) q.push(lines[i++].trim().replace(/^>\s?/, ''));
+        out.push('<blockquote>' + md(q.join('\n')) + '</blockquote>');
+        continue;
+      }
+
+      // list (nested by indentation, ordered or not, with task items)
+      if (LIST_ITEM.test(line)) {
+        const stack = [];
+        while (i < lines.length && LIST_ITEM.test(lines[i])) {
+          const m = lines[i].match(LIST_ITEM);
+          const indent = m[1].replace(/\t/g, '  ').length;
+          const type = /\d/.test(m[2][0]) ? 'ol' : 'ul';
+          while (stack.length && indent < stack[stack.length - 1].indent) out.push('</li></' + stack.pop().type + '>');
+          const top = stack[stack.length - 1];
+          if (!top || indent > top.indent) { out.push('<' + type + '>'); stack.push({ indent, type }); } else out.push('</li>');
+          const task = m[3].match(/^\[([ xX])\]\s+(.*)$/);
+          out.push(task
+            ? `<li class="rel-task"><input type="checkbox" disabled${task[1] === ' ' ? '' : ' checked'}> ${inline(task[2])}`
+            : '<li>' + inline(m[3]));
+          i++;
+        }
+        while (stack.length) out.push('</li></' + stack.pop().type + '>');
+        continue;
+      }
+
+      // paragraph: consecutive plain lines, single line breaks kept (like GitHub)
+      const para = [];
+      while (i < lines.length && lines[i].trim() && (para.length === 0 || !isBlock(i))) para.push(inline(lines[i++].trim()));
+      out.push('<p>' + para.join('<br>') + '</p>');
+    }
     return out.join('');
   }
 
@@ -72,7 +156,7 @@
     const date = rel.published_at
       ? new Date(rel.published_at).toLocaleDateString(lang(), { year: 'numeric', month: 'long', day: 'numeric' }) : '';
     const badges = (isLatest ? `<span class="rel-badge">${esc(t('releases.latest'))}</span>` : '') +
-      (rel.prerelease ? `<span class="rel-badge">${esc(t('releases.pre'))}</span>` : '');
+      (isBeta(rel) ? `<span class="rel-badge">${esc(t('releases.pre'))}</span>` : '');
     const body = (rel.body || '').trim();
     const assets = (rel.assets || []).filter((a) => !/\.(sha256|sig|blockmap)$/i.test(a.name));
 
@@ -115,10 +199,12 @@
 
   function render() {
     list.innerHTML = '';
-    const items = releases.filter((r) => filter === 'all' || !r.prerelease);
-    const latestId = (releases.find((r) => !r.prerelease) || {}).id;
+    const items = releases.filter((r) => filter === 'all' || (filter === 'beta') === isBeta(r));
+    const latestId = (releases.find((r) => !isBeta(r)) || {}).tag_name;
+    statusEl.hidden = items.length > 0;
+    if (!items.length) statusEl.textContent = t('releases.empty');
     visible = items;
-    items.slice(0, shown).forEach((r) => list.appendChild(card(r, r.id === latestId)));
+    items.slice(0, shown).forEach((r) => list.appendChild(card(r, r.tag_name === latestId)));
     moreBtn.hidden = items.length <= shown;
     buildRail();
     updateRail();
@@ -132,7 +218,7 @@
       a.className = 'rel-nav-item';
       a.href = '#' + idOf(r);
       a.textContent = r.tag_name || r.name;
-      if (r.prerelease) a.insertAdjacentHTML('beforeend', '<span class="rel-nav-pre">pre</span>');
+      if (isBeta(r)) a.insertAdjacentHTML('beforeend', '<span class="rel-nav-pre">pre</span>');
       a.addEventListener('click', (e) => { e.preventDefault(); goTo(idOf(r), true); });
       railInner.appendChild(a);
       return a;
@@ -188,10 +274,10 @@
   }));
   moreBtn.addEventListener('click', () => { shown += PAGE; render(); });
 
-  fetch(`https://api.github.com/repos/${repo}/releases?per_page=50`)
-    .then((r) => (r.ok ? r.json() : Promise.reject(new Error('api'))))
+  // data comes from js/gh-data.js (static copy first, GitHub API only as a fallback)
+  (window.ghData ? ghData.get() : Promise.reject(new Error('no loader')))
     .then((data) => {
-      releases = data.filter((r) => !r.draft);
+      releases = data.releases.filter((r) => !r.draft);
       statusEl.hidden = true;
       render();
       // coming from the index version tile: /releases.html#v3.5.0

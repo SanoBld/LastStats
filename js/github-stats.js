@@ -56,21 +56,14 @@
     el.classList.add('is-ready');
   }
 
-  const getJson = (url) =>
-    fetch(url).then((r) => (r.ok ? r.json() : null)).catch(() => null);
-
-  Promise.all([
-    getJson('https://api.github.com/repos/' + repo),
-    getJson('https://api.github.com/repos/' + repo + '/releases/latest'),
-    getJson('https://api.github.com/repos/' + repo + '/releases?per_page=100'),
-  ]).then(([info, latest, releases]) => {
-    const stars = info && typeof info.stargazers_count === 'number' ? info.stargazers_count : null;
-    const tag = latest && latest.tag_name ? latest.tag_name : null;
-    const downloads = Array.isArray(releases)
-      ? releases.reduce((sum, rel) => sum + (rel.assets || []).reduce((s, a) => s + (a.download_count || 0), 0), 0)
-      : null;
-    build(stars, tag, downloads);
-  });
+  // data comes from js/gh-data.js (static copy first, API only as fallback)
+  const ready = window.ghData ? ghData.get() : Promise.reject(new Error('no loader'));
+  ready.then((d) => {
+    const stable = d.releases.find((r) => !r.prerelease && !r.draft);
+    const tag = stable ? stable.tag_name : null;
+    const downloads = d.releases.reduce((sum, rel) => sum + (rel.assets || []).reduce((n, a) => n + (a.download_count || 0), 0), 0);
+    build(typeof d.stars === 'number' ? d.stars : null, tag, downloads);
+  }).catch(() => build(null, null, null));
 
   if (window.i18n) i18n.onChange(paint);
 })();
