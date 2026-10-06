@@ -2053,7 +2053,10 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
   // its colour — independent of the app-wide "artwork colour theme" toggle,
   // which only affects the rest of the app.
   ColorScheme _cardScheme(ColorScheme base) =>
-      _dominant != null ? _artworkScheme(base, _dominant!).scheme : base;
+      _dominant != null
+          ? _artworkScheme(base, _dominant!).scheme
+          : ColorScheme.fromSeed(
+              seedColor: Colors.blueGrey, brightness: Brightness.dark);
 
   // Share + close (+ photo/video switch when a video exists) glued together,
   // like the grouped settings items: big outer corners, small inner ones.
@@ -2068,39 +2071,39 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
           radius: radius,
           padding: EdgeInsets.zero,
           color: s.secondaryContainer,
+          colorDuration: const Duration(milliseconds: 600),
           onTap: onTap,
           child: icon,
         );
     return Row(mainAxisSize: MainAxisSize.min, children: [
-      // Fades (and makes room) instead of popping in.
-      AnimatedSize(
-        duration: const Duration(milliseconds: 320),
-        curve: M3Motion.emphasizedDecelerate,
-        alignment: Alignment.centerRight,
-        child: showToggle
-            ? Padding(
-                padding: const EdgeInsets.only(right: 3),
-                child: _FadeIn(
-                  child: btn(
-                    Icon(_showMotion ? Icons.photo_rounded : Icons.videocam_rounded,
-                        color: fg, size: 22),
-                    () => setState(() => _showMotion = !_showMotion),
-                    r(true, false),
-                  ),
-                ),
-              )
-            : const SizedBox.shrink(),
-      ),
+      btn(Icon(Icons.close_rounded, size: 22, color: fg),
+          () => Navigator.pop(context), r(true, false)),
+      const SizedBox(width: 3),
       btn(
         _sharing
             ? SizedBox(width: 18, height: 18, child: M3Spinner(color: fg))
             : Icon(Icons.ios_share_rounded, size: 21, color: fg),
         _sharing ? null : _shareCard,
-        r(!showToggle, false),
+        r(false, !showToggle),
       ),
-      const SizedBox(width: 3),
-      btn(Icon(Icons.close_rounded, size: 22, color: fg),
-          () => Navigator.pop(context), r(false, true)),
+      AnimatedSize(
+        duration: const Duration(milliseconds: 320),
+        curve: M3Motion.emphasizedDecelerate,
+        alignment: Alignment.centerLeft,
+        child: showToggle
+            ? Padding(
+                padding: const EdgeInsets.only(left: 3),
+                child: _FadeIn(
+                  child: btn(
+                    Icon(_showMotion ? Icons.photo_rounded : Icons.videocam_rounded,
+                        color: fg, size: 22),
+                    () => setState(() => _showMotion = !_showMotion),
+                    r(false, true),
+                  ),
+                ),
+              )
+            : const SizedBox.shrink(),
+      ),
     ]);
   }
 
@@ -2110,6 +2113,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
         radius: BorderRadius.circular(16),
         padding: EdgeInsets.zero,
         color: s.secondaryContainer,
+        colorDuration: const Duration(milliseconds: 600),
         onTap: onTap,
         child: icon,
       );
@@ -2290,6 +2294,9 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            ..._sourceRows(ctx),
+            if (achievementsEnabledNotifier.value) ...[
+            const SizedBox(height: 16),
             Row(children: [
               _AchvTierBadge(tier: widget.tier, size: 48),
               const SizedBox(width: 12),
@@ -2325,10 +2332,41 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
               Text(tx('ds_tier_first', {'n': '${kPlayTierThresholds.first}'}),
                   style: TextStyle(color: Theme.of(ctx).colorScheme.onSurfaceVariant, fontSize: 12)),
             ],
+            ],
           ],
         ),
       ),
     );
+  }
+
+  List<Widget> _sourceRows(BuildContext ctx) {
+    final cs = Theme.of(ctx).colorScheme;
+    final parts = widget.source.split(' · ');
+    final mu = _motionUrl ?? '';
+    final items = <(IconData, String, String)>[
+      (Icons.bar_chart_rounded, 'Last.fm', 'Scrobbles & metadata'),
+      (Icons.image_rounded, parts.last, 'Artwork'),
+      if (_previewAvailable == true)
+        (Icons.play_circle_outline_rounded, 'Deezer', 'Audio preview'),
+      if (mu.isNotEmpty)
+        (Icons.videocam_rounded,
+            mu.contains('google') || mu.contains('youtube') ? 'YouTube Music' : 'Apple Music',
+            'Video artwork'),
+    ];
+    return [
+      Text('Sources', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+      const SizedBox(height: 8),
+      for (final i in items)
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(children: [
+            Icon(i.$1, size: 20, color: cs.primary),
+            const SizedBox(width: 12),
+            Expanded(child: Text(i.$2, style: const TextStyle(fontWeight: FontWeight.w600))),
+            Text(i.$3, style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12)),
+          ]),
+        ),
+    ];
   }
 
   // Renders a clean, non-tilted share card (off-screen) and exports it as
@@ -2511,25 +2549,22 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
 
           // Share / close (+ video switch): connected Material You group.
           Positioned(
-            top: topPad + 8, right: 12,
+            top: topPad + 8, left: 12,
             child: _viewerGroup(
               _cardScheme(Theme.of(context).colorScheme),
               _motionWanted && _motionChecked && _motionUrl != null,
             ),
           ),
 
-          // Info button — top-left. Only relevant when the achievements
-          // system is on.
-          if (achievementsEnabledNotifier.value)
-            Positioned(
-              top: topPad + 8, left: 12,
-              child: _viewerBtn(
-                _cardScheme(Theme.of(context).colorScheme),
-                Icon(Icons.info_outline_rounded, size: 22,
-                    color: _cardScheme(Theme.of(context).colorScheme).onSecondaryContainer),
-                _showTierInfo,
-              ),
+          Positioned(
+            top: topPad + 8, right: 12,
+            child: _viewerBtn(
+              _cardScheme(Theme.of(context).colorScheme),
+              Icon(Icons.info_outline_rounded, size: 22,
+                  color: _cardScheme(Theme.of(context).colorScheme).onSecondaryContainer),
+              _showTierInfo,
             ),
+          ),
 
           // Play button — bottom center, only once a preview is confirmed
           // available. A thick progress ring wraps around it (same idea as

@@ -12,6 +12,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../widgets/skeleton.dart';
+import 'data_cache.dart';
 
 import 'image_cache_backend_stub.dart'
     if (dart.library.io)   'image_cache_backend_native.dart'
@@ -100,6 +101,7 @@ class OfflineImageCache {
     }
 
     // Not cached yet → start background download, return network for now.
+    if (DataCache.strictOffline) return const AssetImage('');
     _downloadAndCache(url).ignore();
     return NetworkImage(url);
   }
@@ -208,6 +210,7 @@ class OfflineImageCache {
   // ── Background download ───────────────────────────────────────────────────
 
   static Future<void> _downloadAndCache(String url) async {
+    if (DataCache.strictOffline) return;
     try {
       final res = await http.get(Uri.parse(url)).timeout(_timeout);
       if (res.statusCode == 200 && res.bodyBytes.isNotEmpty) {
@@ -261,7 +264,9 @@ class OfflineImageCache {
           );
         }
 
-        // Not cached → download in background, show network meanwhile.
+        if (DataCache.strictOffline) {
+          return errorWidget ?? placeholder ?? const SizedBox.shrink();
+        }
         _downloadAndCache(url).ignore();
 
         final webImg = buildCorsBypassImage(url, width: width, height: height, fit: fit);

@@ -32,6 +32,7 @@ class AppearancePage extends StatefulWidget {
 class _AppearancePageState extends State<AppearancePage> {
   String _themeStyle           = 'default';
   String _nothingAccent        = 'classic';
+  static const bool _showNothing = false;
   String _theme                = 'system';
   String _accent               = 'purple';
   bool   _useDynamicColor      = false;
@@ -67,6 +68,11 @@ class _AppearancePageState extends State<AppearancePage> {
     if (!mounted) return;
     setState(() {
       _themeStyle           = p.getString('ls_theme_style')             ?? 'default';
+      if (!_showNothing && _themeStyle == 'nothing') {
+        _themeStyle = 'default';
+        p.setString('ls_theme_style', 'default');
+        themeStyleNotifier.value = 'default';
+      }
       _nothingAccent        = p.getString('ls_nothing_accent')          ?? 'classic';
       _theme                = p.getString('ls_theme')                   ?? 'system';
       _accent               = p.getString('ls_accent')                  ?? 'purple';
@@ -267,8 +273,8 @@ class _AppearancePageState extends State<AppearancePage> {
               ],
             ),
           )),
-          const SizedBox(width: 12),
-          Expanded(child: _StyleCard(
+          if (_showNothing) const SizedBox(width: 12),
+          if (_showNothing) Expanded(child: _StyleCard(
             selected:    _isNothing,
             onTap:       () { _apHaptic(); _setStyle('nothing'); },
             showDark:    _theme != 'light', // light preview when light mode chosen
@@ -307,7 +313,7 @@ class _AppearancePageState extends State<AppearancePage> {
         ]),
 
         // ── Nothing sub-options (shown only when Nothing is active) ───────
-        if (_isNothing) ...[
+        if (_isNothing && _showNothing) ...[
           const SizedBox(height: 12),
 
           // Accent variant picker
@@ -1060,6 +1066,38 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
     }
   }
 
+  List<String> get _mvOrder => switch (_mvSource) {
+        'apple'    => ['apple'],
+        'youtube'  => ['youtube'],
+        'yt_first' => ['youtube', 'apple'],
+        _          => ['apple', 'youtube'],
+      };
+
+  String _mvLabel(String k) => k == 'apple' ? 'Apple Music' : 'YouTube Music';
+
+  Future<void> _pickMvSources() async {
+    final res = await showModalBottomSheet<PickSortResult>(
+      sheetAnimationStyle: kM3SheetAnimation,
+      context: context, isScrollControlled: true,
+      backgroundColor: Colors.transparent, useSafeArea: true,
+      builder: (_) => PickSortSheet(
+        title: L.mvSource,
+        items: const [
+          PickItem('apple', 'Apple Music', icon: Icons.music_note_rounded),
+          PickItem('youtube', 'YouTube Music', icon: Icons.music_video_rounded),
+        ],
+        selected: _mvOrder,
+      ),
+    );
+    if (res == null || res.selected.isEmpty || !mounted) return;
+    final l = res.selected;
+    final v = l.length == 1
+        ? l.first
+        : (l.first == 'youtube' ? 'yt_first' : 'auto');
+    _mvSet('ls_motion_source', v);
+    setState(() => _mvSource = v);
+  }
+
   // Which preset the current settings match ('custom' when none does).
   String get _mvMode {
     final all = _mvTracks && _mvAlbums && _mvArtists;
@@ -1199,23 +1237,12 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
                 onSelected: key == 'custom' ? null : (_) => _mvPreset(key),
               ),
           ]),
-          _mvBlock(context, L.mvSource, Icons.video_library_rounded, [
-            for (final (key, icon, label) in [
-              ('auto', Icons.auto_awesome_rounded, L.mvSrcAuto),
-              ('yt_first', Icons.swap_horiz_rounded, L.mvSrcYtFirst),
-              ('apple', Icons.music_note_rounded, L.mvSrcApple),
-              ('youtube', Icons.music_video_rounded, L.mvSrcYt),
-            ])
-              M3Chip(
-                avatar: Icon(icon, size: 16),
-                label: Text(label),
-                selected: _mvSource == key,
-                onSelected: (_) {
-                  _mvSet('ls_motion_source', key);
-                  setState(() => _mvSource = key);
-                },
-              ),
-          ]),
+          SettingActionRow(
+            icon: Icons.video_library_rounded,
+            title: L.mvSource,
+            subtitle: [for (final k in _mvOrder) _mvLabel(k)].join(' → '),
+            onTap: _pickMvSources,
+          ),
           _mvBlock(context, L.mvQualityT, Icons.high_quality_rounded, [
             for (final (key, label) in [
               ('auto', L.mvQAuto),

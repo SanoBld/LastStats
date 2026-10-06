@@ -42,8 +42,10 @@ class M3ShapeMorph extends StatelessWidget {
     this.child,
     this.padding,
     this.height,
+    this.colorDuration,
   });
 
+  final Duration? colorDuration;
   final BorderRadius radius;
   final Color        color;
   final Widget?      child;
@@ -59,7 +61,7 @@ class M3ShapeMorph extends StatelessWidget {
       curve: M3Motion.spatialFast,
       builder: (context, r, _) => TweenAnimationBuilder<Color?>(
         tween: ColorTween(end: color),
-        duration: reduce ? Duration.zero : M3Motion.effectsFastDuration,
+        duration: reduce ? Duration.zero : (colorDuration ?? M3Motion.effectsFastDuration),
         curve: M3Motion.effectsFast,
         builder: (context, c, _) => Container(
           height: height,
@@ -664,8 +666,10 @@ class M3TonalButton extends StatefulWidget {
     this.width,
     this.height = 48,
     this.padding = const EdgeInsets.symmetric(horizontal: 14),
+    this.colorDuration,
   });
 
+  final Duration? colorDuration;
   final Widget child;
   final VoidCallback? onTap;      // null = disabled
   final Color? color;
@@ -696,6 +700,7 @@ class _M3TonalButtonState extends State<M3TonalButton> {
         child: M3ShapeMorph(
           radius: r,
           height: widget.height,
+          colorDuration: widget.colorDuration,
           color: widget.onTap == null ? base.withValues(alpha: 0.5) : base,
           child: Material(
             type: MaterialType.transparency,

@@ -168,7 +168,8 @@ Future<void> _mainImpl() async {
     StorageManager.init(),
   ]);
 
-  DataCache.offlineMode = prefs.getBool('ls_cache_serve_stale') ?? true;
+  DataCache.offlineMode = true;
+  DataCache.strictOffline = prefs.getBool('ls_offline_strict') ?? false;
 
   // Fire-and-forget: silently writes a fresh backup file if the automatic
   // backup feature is on AND due (daily/weekly/monthly/yearly — see

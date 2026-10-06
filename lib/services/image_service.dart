@@ -14,6 +14,7 @@ import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'offline_image_cache.dart';
+import 'data_cache.dart';
 import 'storage_manager.dart';
 import '../l10n/extra_strings.dart';
 
@@ -161,6 +162,7 @@ class ImageService {
     await _ensureDiskCache();
     final mem = _getUrl(key);
     if (mem != null) return mem;
+    if (DataCache.strictOffline) return lastfmUrl ?? '';
 
     // YouTube Music moved down for artists specifically: artist photos on
     // there are often non-square (banners, portraits) and its thumbnail
@@ -200,6 +202,7 @@ class ImageService {
     await _ensureDiskCache();
     final mem = _getUrl(key);
     if (mem != null) return mem;
+    if (DataCache.strictOffline) return lastfmUrl ?? '';
 
     final ytMusic = await _ytMusicSearch('$artist $album', 'album', expectArtist: artist, expectTitle: album);
     if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic, 'ytmusic');
@@ -233,6 +236,7 @@ class ImageService {
     await _ensureDiskCache();
     final mem = _getUrl(key);
     if (mem != null) return mem;
+    if (DataCache.strictOffline) return lastfmUrl ?? '';
 
     final ytMusic = await _ytMusicSearch('$artist $track', 'song', expectArtist: artist, expectTitle: track);
     if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic, 'ytmusic');

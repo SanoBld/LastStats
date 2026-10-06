@@ -26,6 +26,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'data_cache.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 // User choices for the video covers (read from SharedPreferences).
@@ -136,6 +137,7 @@ class MotionArtworkService {
     if (track.isNotEmpty ? !cfg.tracks : !cfg.albums) return null;
     final key = '${_norm(artist)}|${_norm(album)}|${_norm(track)}|${cfg.sig}';
     if (_fresh(key)) return _cache[key];
+    if (DataCache.strictOffline) return null;
     // Bounded: the oldest lookups are dropped so the map never grows forever.
     if (_cache.length >= _maxEntries) _cache.remove(_cache.keys.first);
     try {
@@ -187,6 +189,7 @@ class MotionArtworkService {
     if (!cfg.artists || !cfg.useApple) return null;
     final key = 'artist|${_norm(artist)}|${cfg.sig}';
     if (_fresh(key)) return _cache[key];
+    if (DataCache.strictOffline) return null;
     if (_cache.length >= _maxEntries) _cache.remove(_cache.keys.first);
     try {
       final res = await _itunes(artist, 'musicArtist', 5);

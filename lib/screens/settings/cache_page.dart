@@ -434,7 +434,7 @@ class _OfflineModeCard extends StatefulWidget {
 }
 
 class _OfflineModeCardState extends State<_OfflineModeCard> {
-  bool _keepStale = true;
+  bool _keepStale = false;
 
   @override
   void initState() {
@@ -442,7 +442,7 @@ class _OfflineModeCardState extends State<_OfflineModeCard> {
     SharedPreferences.getInstance().then((p) {
       if (mounted) {
         setState(() {
-        _keepStale = p.getBool('ls_cache_serve_stale') ?? true;
+        _keepStale = p.getBool('ls_offline_strict') ?? false;
       });
       }
     });
@@ -450,9 +450,9 @@ class _OfflineModeCardState extends State<_OfflineModeCard> {
 
   Future<void> _toggle(bool v) async {
     setState(() => _keepStale = v);
-    DataCache.offlineMode = v;
+    DataCache.strictOffline = v;
     final p = await SharedPreferences.getInstance();
-    await p.setBool('ls_cache_serve_stale', v);
+    await p.setBool('ls_offline_strict', v);
   }
 
   @override

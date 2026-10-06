@@ -40,8 +40,8 @@ class AppStringsFr implements AppStrings {
   @override String get cacheConfirmAllTitle        => 'Vider tout le cache ?';
   @override String get cacheConfirmAllBody         => 'Images, données API et historique seront supprimés.';
   @override String get cacheDelete                 => 'Supprimer';
-  @override String get cacheOfflineTitle           => 'Afficher les données en cache hors ligne';
-  @override String get cacheOfflineSubtitle        => 'Les données expirées restent visibles si le réseau est indisponible.';
+  @override String get cacheOfflineTitle           => 'Mode hors ligne';
+  @override String get cacheOfflineSubtitle        => 'Aucune requête image ou vidéo : seuls les médias déjà stockés s\'affichent.';
 
   @override String get commonArtists          => 'Artistes';
   @override String get commonAlbums           => 'Albums';

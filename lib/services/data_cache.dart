@@ -25,6 +25,9 @@ class DataCache {
   // Set this to true when the device is offline.
   static bool offlineMode = false;
 
+  // Strict offline: no image/video network request at all.
+  static bool strictOffline = false;
+
   static final Map<String, _CacheEntry> _mem = {};
   static bool _warmedUp = false;
   static SharedPreferences? _prefs;

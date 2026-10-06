@@ -7,6 +7,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
+import '../../theme/m3_motion.dart';
 import '../../l10n/extra_strings.dart';
 import '../../widgets/m3_components.dart';
 import '../../widgets/skeleton.dart';
@@ -215,6 +216,14 @@ class _SyncPageState extends State<SyncPage> {
                       ]),
                       const SizedBox(height: 16),
 
+                      AnimatedSize(
+                        duration: M3Motion.spatialFastDuration,
+                        curve: M3Motion.emphasizedDecelerate,
+                        alignment: Alignment.topCenter,
+                        child: M3Switcher(child: Column(
+                          key: ValueKey(isSyncing),
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                       if (isSyncing) ...[
                         LinearProgressIndicator(
                           value: progress.total > 0 ? progress.fraction : null,
@@ -241,6 +250,9 @@ class _SyncPageState extends State<SyncPage> {
                           ),
                         ],
                       ],
+                          ],
+                        )),
+                      ),
                     ]),
                   ),
                 ]),
