@@ -153,6 +153,69 @@
     return Math.max(1, Math.round(bytes / 1024)) + ' KB';
   }
 
+  // ---- files grouped by platform ----
+  const PLATFORMS = [
+    { id: 'windows', name: 'Windows' },
+    { id: 'android', name: 'Android' },
+    { id: 'macos', name: 'macOS' },
+    { id: 'linux', name: 'Linux' },
+    { id: 'ios', name: 'iOS' },
+  ];
+
+  // guess the platform from the file extension first, then from the name
+  function platformOf(name) {
+    const n = name.toLowerCase();
+    if (/\.(exe|msi|msix)$/.test(n)) return 'windows';
+    if (/\.apk$/.test(n)) return 'android';
+    if (/\.dmg$/.test(n)) return 'macos';
+    if (/\.(deb|rpm|appimage)$/.test(n)) return 'linux';
+    if (/\.ipa$/.test(n)) return 'ios';
+    if (n.includes('windows') || n.includes('win')) return 'windows';
+    if (n.includes('android')) return 'android';
+    if (n.includes('macos') || n.includes('mac')) return 'macos';
+    if (n.includes('linux')) return 'linux';
+    if (n.includes('ios')) return 'ios';
+    return 'other';
+  }
+
+  // returns only the platforms that have files, in a fixed order
+  function groupAssets(assets) {
+    const map = {};
+    assets.forEach((a) => { (map[platformOf(a.name)] = map[platformOf(a.name)] || []).push(a); });
+    const list = PLATFORMS.filter((p) => map[p.id]).map((p) => ({ name: p.name, files: map[p.id] }));
+    if (map.other) list.push({ name: t('releases.other'), files: map.other });
+    return list;
+  }
+
+  function fileLink(a) {
+    const link = document.createElement('a');
+    link.className = 'rel-asset md-ripple';
+    link.href = a.browser_download_url;
+    link.innerHTML = `<span class="rel-asset-name">${esc(a.name)}</span>
+      <span class="rel-asset-meta">${size(a.size)} · ${a.download_count.toLocaleString(lang())}</span>`;
+    link.title = `${a.download_count} ${t('releases.downloads')}`;
+    return link;
+  }
+
+  // one file: plain link. several files: a dropdown (closed by default)
+  function platform(g) {
+    if (g.files.length === 1) {
+      const one = fileLink(g.files[0]);
+      one.classList.add('rel-plat-single');
+      return one;
+    }
+    const d = document.createElement('details');
+    d.className = 'rel-plat';
+    d.innerHTML = `<summary class="rel-plat-sum md-ripple">
+        <span class="rel-asset-name">${esc(g.name)}</span>
+        <span class="rel-asset-meta">${g.files.length} ${esc(t('releases.n_files'))}</span>
+        <svg class="rel-plat-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </summary><div class="rel-plat-files"></div>`;
+    const inner = d.querySelector('.rel-plat-files');
+    g.files.forEach((f) => inner.appendChild(fileLink(f)));
+    return d;
+  }
+
   function card(rel, isLatest) {
     const el = document.createElement('article');
     el.className = 'rel-card' + (isLatest ? ' is-latest' : '');
@@ -189,15 +252,7 @@
 
     const box = el.querySelector('.rel-assets');
     if (!assets.length) box.innerHTML = '<p>' + esc(t('releases.no_files')) + '</p>';
-    assets.forEach((a) => {
-      const link = document.createElement('a');
-      link.className = 'rel-asset md-ripple';
-      link.href = a.browser_download_url;
-      link.innerHTML = `<span class="rel-asset-name">${esc(a.name)}</span>
-        <span class="rel-asset-meta">${size(a.size)} · ${a.download_count.toLocaleString(lang())}</span>`;
-      link.title = `${a.download_count} ${t('releases.downloads')}`;
-      box.appendChild(link);
-    });
+    groupAssets(assets).forEach((g) => box.appendChild(platform(g)));
     return el;
   }
 

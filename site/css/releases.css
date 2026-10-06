@@ -7,7 +7,7 @@
 
 /* connected filter group, same idea as the hero buttons */
 .rel-filter { display: flex; gap: 2px; }
-.rel-filter-btn, .rel-gh, .rel-more, .rel-toggle, .rel-asset {
+.rel-filter-btn, .rel-gh, .rel-more, .rel-toggle, .rel-asset, .rel-plat-sum {
   font-family: inherit; font-size: .9rem; font-weight: 500; border: none; cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
   min-height: 44px; padding: 0 1.3rem; text-decoration: none;
@@ -61,15 +61,15 @@
 .rel-asset-meta { font-size: .75rem; opacity: .8; white-space: nowrap; }
 
 /* same spring motion + press shape as the other buttons */
-.rel-filter-btn, .rel-gh, .rel-more, .rel-toggle, .rel-asset {
+.rel-filter-btn, .rel-gh, .rel-more, .rel-toggle, .rel-asset, .rel-plat-sum {
   transition: border-radius .5s var(--spring-default), transform .35s var(--spring-fast),
               box-shadow .2s var(--effects), background-color .2s var(--effects);
 }
 @media (hover: hover) {
-  .rel-filter-btn:hover, .rel-gh:hover, .rel-more:hover, .rel-toggle:hover, .rel-asset:hover { border-radius: var(--r-hover); transform: translateY(-2px); }
+  .rel-filter-btn:hover, .rel-gh:hover, .rel-more:hover, .rel-toggle:hover, .rel-asset:hover, .rel-plat-sum:hover { border-radius: var(--r-hover); transform: translateY(-2px); }
 }
-.rel-filter-btn:active, .rel-gh:active, .rel-more:active, .rel-toggle:active, .rel-asset:active,
-.is-pressed.rel-filter-btn, .is-pressed.rel-gh, .is-pressed.rel-more, .is-pressed.rel-toggle, .is-pressed.rel-asset {
+.rel-filter-btn:active, .rel-gh:active, .rel-more:active, .rel-toggle:active, .rel-asset:active, .rel-plat-sum:active,
+.is-pressed.rel-filter-btn, .is-pressed.rel-gh, .is-pressed.rel-more, .is-pressed.rel-toggle, .is-pressed.rel-asset, .is-pressed.rel-plat-sum {
   border-radius: var(--r-press); transform: scale(.95); transition-duration: .2s, .2s, .2s, .2s;
 }
 
@@ -204,3 +204,39 @@
   .rel-asset:last-child { border-radius: var(--r-inner) var(--r-inner) var(--r-card) var(--r-card); }
   .rel-asset:only-child { border-radius: var(--r-card); }
 }
+
+/* ---------- files grouped by platform (dropdown when there are several files) ---------- */
+.rel-assets { flex-direction: column; }
+.rel-asset, .rel-plat { flex: none; width: 100%; }
+.rel-plat-single { font-weight: 500; }
+.rel-plat { display: flex; flex-direction: column; gap: 2px; }
+.rel-plat-sum { list-style: none; justify-content: space-between; border-radius: var(--r-inner); min-height: 48px; padding: .6rem 1.3rem; text-align: left; }
+.rel-plat-sum::-webkit-details-marker { display: none; }
+.rel-plat-sum .rel-asset-name { flex: 1; }
+.rel-plat-chev { flex-shrink: 0; transition: transform .25s var(--m3-standard); }
+.rel-plat[open] .rel-plat-chev { transform: rotate(180deg); }
+.rel-plat-files { display: flex; flex-direction: column; gap: 2px; padding-left: .8rem; }
+.rel-card.is-latest .rel-plat-sum { background: var(--md-primary); color: var(--md-on-primary); }
+.rel-asset:is(:first-child, :last-child, :only-child):not(:hover):not(:active):not(.is-pressed) { border-radius: var(--r-inner); }
+@media (max-width: 640px) {
+  .rel-plat-files .rel-asset { flex-direction: column; align-items: flex-start; }
+}
+
+/* file buttons: no lift on hover, so the gaps between them stay equal (only the corners morph) */
+@media (hover: hover) {
+  .rel-asset:hover, .rel-plat-sum:hover { transform: none; }
+}
+
+/* hover colors: accent on normal buttons, the opposite on buttons that are already accent (latest version) */
+.rel-asset, .rel-plat-sum {
+  transition: border-radius .5s var(--spring-default), transform .35s var(--spring-fast),
+              box-shadow .2s var(--effects), background-color .2s var(--effects), color .2s var(--effects);
+}
+@media (hover: hover) {
+  .rel-asset:hover, .rel-plat-sum:hover { background: var(--md-primary); color: var(--md-on-primary); }
+  .rel-card.is-latest .rel-asset:hover, .rel-card.is-latest .rel-plat-sum:hover { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+}
+
+/* original tight gaps everywhere, only a bigger gap where a dropdown meets a single file */
+.rel-assets, .rel-plat, .rel-plat-files { gap: 2px; }
+.rel-plat + .rel-plat-single, .rel-plat-single + .rel-plat { margin-top: 1rem; }

@@ -1,0 +1,30 @@
+/* table of contents layout for help.html and legal.html (reuses the .rel-* rail styles) */
+/* it is a div (not a section), so it needs its own centering and side space */
+.toc-page { max-width: 1100px; margin: 0 auto; padding: 1rem 2.5rem 5rem; box-sizing: border-box; }
+.toc-page .rel-layout { gap: 2rem; }
+.toc-page .rel-rail { flex-basis: 12rem; }
+.toc-page .rel-nav-item { font-size: .8rem; padding: .4rem .6rem; white-space: normal; }
+.toc-page .rel-nav-item.is-sub { font-size: .76rem; }
+@media (max-width: 900px) { .toc-page { padding: .5rem 1.25rem 4rem; } }
+.toc-main { min-width: 0; }
+.toc-main .legal-content { max-width: none; padding: 0; margin: 0; }
+.help-block { margin-bottom: 2.5rem; scroll-margin-top: 6rem; }
+.help-block[hidden], .toc-main [hidden] { display: none !important; }
+.help-card, .legal-block, .faq-item { scroll-margin-top: 6rem; }
+.help-card.is-target, .legal-block.is-target { animation: rel-flash 1.4s var(--m3-standard); }
+
+/* sub-items (cards inside a section) are indented in the rail */
+.rel-nav-item.is-sub { margin-left: .8rem; font-size: .8rem; font-weight: 400; }
+
+/* extra help blocks */
+.help-list { margin: .4rem 0 0 1.2rem; color: var(--md-on-surface-variant); font-size: .96rem; line-height: 1.6; }
+.help-list li + li { margin-top: .4rem; }
+.help-card a, .help-list a { color: var(--md-primary); font-weight: 500; text-decoration: underline; text-underline-offset: 2px; }
+.help-steps li strong { color: var(--md-on-surface); }
+.help-src { margin-top: .9rem; font-size: .82rem !important; opacity: .85; }
+
+/* phones: only top-level sections as chips in the sticky row */
+@media (max-width: 900px) {
+  .rel-nav-item.is-sub { display: none; }
+  .help-block, .help-card, .legal-block { scroll-margin-top: 8rem; }
+}
