@@ -7,7 +7,7 @@
 
   const list = document.getElementById('rel-list');
   const statusEl = document.getElementById('rel-status');
-  const moreBtn = document.getElementById('rel-more');
+  const sentinel = document.getElementById('rel-sentinel');
   const filterBtns = document.querySelectorAll('.rel-filter-btn');
   const rail = document.getElementById('rel-rail');
   const railInner = document.getElementById('rel-rail-inner');
@@ -20,6 +20,7 @@
   let releases = [];
   let filter = 'all';
   let shown = PAGE;
+  let latestTag = null;
   let visible = []; // releases matching the filter (rail shows all of them)
   let navItems = [];
 
@@ -203,15 +204,33 @@
   function render() {
     list.innerHTML = '';
     const items = releases.filter((r) => filter === 'all' || (filter === 'beta') === isBeta(r));
-    const latestId = (releases.find((r) => !isBeta(r)) || {}).tag_name;
+    latestTag = (releases.find((r) => !isBeta(r)) || {}).tag_name;
     statusEl.hidden = items.length > 0;
     if (!items.length) statusEl.textContent = t('releases.empty');
     visible = items;
-    items.slice(0, shown).forEach((r) => list.appendChild(card(r, r.tag_name === latestId)));
-    moreBtn.hidden = items.length <= shown;
+    items.slice(0, shown).forEach((r) => list.appendChild(card(r, r.tag_name === latestTag)));
     buildRail();
     updateRail();
+    checkSentinel();
   }
+
+  // infinite scroll: add the next cards (only the new ones) when the bottom comes near
+  function appendUpTo(count) {
+    shown = Math.max(shown, count);
+    visible.slice(list.children.length, shown).forEach((r) => list.appendChild(card(r, r.tag_name === latestTag)));
+    checkSentinel();
+    updateRail();
+  }
+  function checkSentinel() {
+    const more = visible.length > list.children.length;
+    sentinel.hidden = !more;
+    // observe again so it fires even if the sentinel is still in view after loading
+    if (io && more) { io.unobserve(sentinel); io.observe(sentinel); }
+    if (!io && more) appendUpTo(visible.length); // very old browser: show everything
+  }
+  const io = 'IntersectionObserver' in window
+    ? new IntersectionObserver((e) => { if (e[0].isIntersecting) appendUpTo(list.children.length + PAGE); }, { rootMargin: '600px 0px' })
+    : null;
 
   // left rail: one bookmark per version (all of them, even not rendered yet)
   function buildRail() {
@@ -249,7 +268,7 @@
   function goTo(id, pushHash) {
     const idx = visible.findIndex((r) => idOf(r) === id);
     if (idx < 0) return;
-    if (idx >= shown) { shown = idx + 1; render(); }
+    if (idx >= list.children.length) appendUpTo(idx + 1);
     const el = document.getElementById(id);
     if (!el) return;
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -293,7 +312,6 @@
     filterBtns.forEach((x) => x.classList.toggle('is-active', x === b));
     render();
   }));
-  moreBtn.addEventListener('click', () => { shown += PAGE; render(); });
 
   // data comes from js/gh-data.js (static copy first, GitHub API only as a fallback)
   (window.ghData ? ghData.get() : Promise.reject(new Error('no loader')))

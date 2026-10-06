@@ -169,3 +169,9 @@
   .rel-rail-scroll { overflow: auto hidden; }
   .rel-rail { max-height: none; }
 }
+
+/* infinite scroll loader */
+.rel-sentinel { display: flex; justify-content: center; padding: 1.5rem 0; min-height: 40px; }
+.rel-sentinel[hidden] { display: none; }
+.rel-spinner { width: 24px; height: 24px; border-radius: 50%; border: 3px solid var(--md-outline-variant); border-top-color: var(--md-primary); animation: rel-spin .8s linear infinite; }
+@keyframes rel-spin { to { transform: rotate(360deg); } }
