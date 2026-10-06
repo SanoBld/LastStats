@@ -17,6 +17,8 @@
       nav.classList.remove('nav-hidden'); // scrolling up
     }
     lastY = y;
+    // lets sticky elements (versions rail) follow the nav: below it when shown, at the top when hidden
+    document.body.classList.toggle('nav-is-hidden', nav.classList.contains('nav-hidden'));
     ticking = false;
   }
 

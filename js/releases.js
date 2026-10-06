@@ -279,6 +279,7 @@
   }
 
   // scroll spy: last card above 35% of the viewport is the active one
+  let lastActive = -1;
   function updateRail() {
     if (!navItems.length) return;
     const cards = Array.from(list.querySelectorAll('.rel-card'));
@@ -289,13 +290,21 @@
       n.classList.toggle('is-passed', i <= active);
     });
     const cur = navItems[active];
+    const changed = active !== lastActive;
+    lastActive = active;
     if (cur) {
       railFill.style.height = (cur.offsetTop + cur.offsetHeight / 2) + 'px';
       // keep the active bookmark visible inside the rail without moving the page
-      if (!cur.hidden) {
-        const top = cur.offsetTop, h = cur.offsetHeight;
-        if (top < railScroll.scrollTop) railScroll.scrollTop = top - 8;
-        else if (top + h > railScroll.scrollTop + railScroll.clientHeight) railScroll.scrollTop = top + h - railScroll.clientHeight + 8;
+      if (!cur.hidden && changed) {
+        if (window.matchMedia('(max-width: 900px)').matches) {
+          // phone/tablet: the rail is a horizontal row of chips
+          const left = cur.offsetLeft - (railScroll.clientWidth - cur.offsetWidth) / 2;
+          railScroll.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
+        } else {
+          const top = cur.offsetTop, h = cur.offsetHeight;
+          if (top < railScroll.scrollTop) railScroll.scrollTop = top - 8;
+          else if (top + h > railScroll.scrollTop + railScroll.clientHeight) railScroll.scrollTop = top + h - railScroll.clientHeight + 8;
+        }
       }
     }
   }
