@@ -1,0 +1,79 @@
+/* styles for the versions page (releases.html) */
+/* loads after help.css, before expressive.css */
+
+.releases-section { max-width: 900px; }
+
+.rel-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+
+/* connected filter group, same idea as the hero buttons */
+.rel-filter { display: flex; gap: 2px; }
+.rel-filter-btn, .rel-gh, .rel-more, .rel-toggle, .rel-asset {
+  font-family: inherit; font-size: .9rem; font-weight: 500; border: none; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 44px; padding: 0 1.3rem; text-decoration: none;
+  background: var(--md-secondary-container); color: var(--md-on-secondary-container);
+}
+.rel-filter-btn { border-radius: var(--r-inner); }
+.rel-filter-btn:first-child { border-radius: var(--r-chip) var(--r-inner) var(--r-inner) var(--r-chip); }
+.rel-filter-btn:last-child { border-radius: var(--r-inner) var(--r-chip) var(--r-chip) var(--r-inner); }
+.rel-filter-btn.is-active { background: var(--md-primary); color: var(--md-on-primary); }
+.rel-gh, .rel-more, .rel-toggle { border-radius: 22px; }
+.rel-more { margin: 1.5rem auto 0; display: flex; }
+
+.rel-status { color: var(--md-on-surface-variant); text-align: center; padding: 2rem 0; }
+.rel-status.is-error { color: var(--md-error, #B3261E); }
+
+/* one card per version */
+.rel-card {
+  background: var(--md-surface-container-low); border-radius: var(--r-card);
+  padding: 1.5rem 1.7rem; margin-bottom: 1.2rem; text-align: left;
+}
+.rel-card.is-latest { background: var(--md-primary-container); color: var(--md-on-primary-container); }
+.rel-head { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem; margin-bottom: .3rem; }
+.rel-tag { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; margin: 0; }
+.rel-badge {
+  font-size: .68rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  padding: .2rem .6rem; border-radius: var(--r-chip);
+  background: var(--md-tertiary-container); color: var(--md-on-tertiary-container);
+}
+.rel-card.is-latest .rel-badge { background: var(--md-primary); color: var(--md-on-primary); }
+.rel-date { font-size: .85rem; opacity: .75; margin: 0 0 1rem; }
+
+/* release notes (small markdown renderer in js/releases.js) */
+.rel-notes { font-size: .95rem; line-height: 1.6; overflow: hidden; }
+.rel-notes.is-collapsed { max-height: 9.5rem; -webkit-mask-image: linear-gradient(#000 60%, transparent); mask-image: linear-gradient(#000 60%, transparent); }
+.rel-notes h4 { font-family: var(--font-display); font-size: 1rem; margin: 1rem 0 .4rem; }
+.rel-notes h4:first-child { margin-top: 0; }
+.rel-notes ul { padding-left: 1.2rem; margin: .3rem 0; }
+.rel-notes li { margin: .2rem 0; }
+.rel-notes p { margin: .4rem 0; }
+.rel-notes code { background: var(--md-surface-container-highest); padding: .1rem .4rem; border-radius: 6px; font-size: .85em; }
+.rel-notes a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.rel-toggle { margin-top: .6rem; min-height: 36px; font-size: .82rem; background: transparent; padding: 0 .9rem; margin-left: -.9rem; }
+
+/* files */
+.rel-files-title { font-family: var(--font-display); font-size: .95rem; margin: 1.3rem 0 .6rem; }
+.rel-assets { display: flex; flex-wrap: wrap; gap: 2px; }
+.rel-asset { flex: 1 1 14rem; justify-content: space-between; border-radius: var(--r-inner); text-align: left; min-height: 48px; }
+.rel-asset:first-child { border-top-left-radius: var(--r-card); }
+.rel-card.is-latest .rel-asset { background: var(--md-primary); color: var(--md-on-primary); }
+.rel-asset-name { overflow-wrap: anywhere; }
+.rel-asset-meta { font-size: .75rem; opacity: .8; white-space: nowrap; }
+
+/* same spring motion + press shape as the other buttons */
+.rel-filter-btn, .rel-gh, .rel-more, .rel-toggle, .rel-asset {
+  transition: border-radius .5s var(--spring-default), transform .35s var(--spring-fast),
+              box-shadow .2s var(--effects), background-color .2s var(--effects);
+}
+@media (hover: hover) {
+  .rel-filter-btn:hover, .rel-gh:hover, .rel-more:hover, .rel-toggle:hover, .rel-asset:hover { border-radius: var(--r-hover); transform: translateY(-2px); }
+}
+.rel-filter-btn:active, .rel-gh:active, .rel-more:active, .rel-toggle:active, .rel-asset:active,
+.is-pressed.rel-filter-btn, .is-pressed.rel-gh, .is-pressed.rel-more, .is-pressed.rel-toggle, .is-pressed.rel-asset {
+  border-radius: var(--r-press); transform: scale(.95); transition-duration: .2s, .2s, .2s, .2s;
+}
+
+@media (max-width: 640px) {
+  .rel-card { padding: 1.2rem 1.2rem; }
+  .rel-asset { flex-basis: 100%; }
+}
