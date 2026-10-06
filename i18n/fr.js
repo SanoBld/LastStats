@@ -195,5 +195,23 @@ window.I18N.fr = {
 
   // ---- about ----
   "about.content_of_the_github_repo": "Contenu du README du dépôt GitHub, récupéré en direct.",
-  "about.loading_readme": "Chargement du README…"
+  "about.loading_readme": "Chargement du README…",
+
+  // ---- releases ----
+  "releases.title": "Versions",
+  "releases.desc": "Toutes les versions de LastStats : nouveautés, notes de version et fichiers à télécharger.",
+  "releases.latest": "Dernière",
+  "releases.pre": "Pré-version",
+  "releases.notes": "Nouveautés",
+  "releases.files": "Fichiers",
+  "releases.no_notes": "Aucune note pour cette version.",
+  "releases.loading": "Chargement des versions…",
+  "releases.error": "Impossible de charger les versions. Réessayez plus tard.",
+  "releases.all_on_github": "Voir sur GitHub",
+  "releases.show_more": "Afficher plus",
+  "releases.filter_all": "Toutes",
+  "releases.filter_stable": "Stables",
+  "releases.downloads": "téléchargements",
+  "releases.no_files": "Aucun fichier.",
+  "releases.nav": "Versions"
 };

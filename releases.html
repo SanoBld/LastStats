@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LastStats — Versions</title>
+<meta name="description" content="Toutes les versions de LastStats : nouveautés, notes de version et téléchargements.">
+<meta name="theme-color" content="#10617D">
+<link rel="icon" href="assets/img/favicon-light.png" media="(prefers-color-scheme: light)">
+<link rel="icon" href="assets/img/favicon-dark.png" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/project.css">
+<link rel="stylesheet" href="css/help.css">
+<link rel="stylesheet" href="css/releases.css">
+<link rel="stylesheet" href="css/expressive.css">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="adc52595-b992-434a-8eaf-2a4880979675"></script>
+</head>
+<body>
+
+  <div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
+
+  <nav class="nav">
+    <a href="index.html" class="nav-logo md-ripple" aria-label="Home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+    </a>
+    <div class="nav-toggles">
+      <button type="button" class="lang-toggle md-ripple" aria-label="Switch to English">EN</button>
+      <button id="theme-toggle" class="theme-toggle md-ripple" aria-label="Changer de thème">
+        <span class="dot"></span>
+      </button>
+    </div>
+  </nav>
+
+  <section class="project-page-header help-header">
+    <div class="project-hero-bg" aria-hidden="true"></div>
+    <div class="project-hero-grid" aria-hidden="true"></div>
+
+    <a href="index.html" class="back-link md-ripple reveal">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      <span data-i18n="common.back_to_laststats">Retour à LastStats</span>
+    </a>
+
+    <h1 class="project-page-title reveal" data-i18n="releases.title">Versions</h1>
+    <p class="project-page-desc reveal" data-i18n="releases.desc">
+      Toutes les versions de LastStats : nouveautés, notes de version et fichiers à télécharger.
+    </p>
+  </section>
+
+  <section class="help-section releases-section">
+    <div class="rel-toolbar reveal">
+      <div class="rel-filter" id="rel-filter" role="group">
+        <button type="button" class="rel-filter-btn md-ripple is-active" data-filter="all" data-i18n="releases.filter_all">Toutes</button>
+        <button type="button" class="rel-filter-btn md-ripple" data-filter="stable" data-i18n="releases.filter_stable">Stables</button>
+      </div>
+      <a class="rel-gh md-ripple" href="https://github.com/SanoBld/LastStats-App/releases" target="_blank" rel="noopener">
+        <span data-i18n="releases.all_on_github">Voir sur GitHub</span>
+        <svg class="arrow-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+      </a>
+    </div>
+
+    <p class="rel-status" id="rel-status" data-i18n="releases.loading">Chargement des versions…</p>
+    <div id="rel-list"></div>
+    <button type="button" class="rel-more md-ripple" id="rel-more" hidden data-i18n="releases.show_more">Afficher plus</button>
+  </section>
+
+  <footer class="footer">
+    <p>© 2026 Sano Bld</p>
+    <div class="footer-links">
+      <a href="releases.html" data-i18n="releases.nav">Versions</a>
+      <a href="help.html" data-i18n="common.help">Aide</a>
+      <a href="https://github.com/SanoBld/LastStats-App" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://discord.gg/JjqmkQgZBs" target="_blank" rel="noopener">Discord</a>
+      <a href="legal.html" data-i18n="common.legal_notice">Mentions légales</a>
+    </div>
+  </footer>
+
+  <script src="js/theme.js"></script>
+  <script src="i18n/fr.js"></script>
+  <script src="i18n/en.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/cursor.js"></script>
+  <script src="js/ripple.js"></script>
+  <script src="js/expressive.js"></script>
+  <script src="js/nav-autohide.js"></script>
+  <script src="js/releases.js" data-repo="SanoBld/LastStats-App"></script>
+</body>
+</html>

@@ -195,5 +195,23 @@ window.I18N.en = {
 
   // ---- about ----
   "about.content_of_the_github_repo": "Content of the GitHub repo's README, fetched live.",
-  "about.loading_readme": "Loading README…"
+  "about.loading_readme": "Loading README…",
+
+  // ---- releases ----
+  "releases.title": "Versions",
+  "releases.desc": "Every LastStats version: what's new, release notes and files to download.",
+  "releases.latest": "Latest",
+  "releases.pre": "Pre-release",
+  "releases.notes": "What's new",
+  "releases.files": "Files",
+  "releases.no_notes": "No notes for this version.",
+  "releases.loading": "Loading versions…",
+  "releases.error": "Could not load versions. Please try again later.",
+  "releases.all_on_github": "View on GitHub",
+  "releases.show_more": "Show more",
+  "releases.filter_all": "All",
+  "releases.filter_stable": "Stable",
+  "releases.downloads": "downloads",
+  "releases.no_files": "No files.",
+  "releases.nav": "Versions"
 };
