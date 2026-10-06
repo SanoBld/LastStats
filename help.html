@@ -13,6 +13,8 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/project.css">
 <link rel="stylesheet" href="css/help.css">
+<link rel="stylesheet" href="css/releases.css">
+<link rel="stylesheet" href="css/toc.css">
 <link rel="stylesheet" href="css/expressive.css">
 <script defer src="https://cloud.umami.is/script.js" data-website-id="adc52595-b992-434a-8eaf-2a4880979675"></script>
 </head>
@@ -48,11 +50,20 @@
     </p>
   </section>
 
-  <!-- ================= Understanding Last fm & scrobbling ================= -->
-  <section class="help-section">
+  <div class="help-section toc-page">
+    <div class="rel-layout">
+      <aside class="rel-rail" id="toc-rail" aria-label="Sommaire" hidden>
+        <h2 class="rel-rail-title" data-i18n="releases.toc">Sommaire</h2>
+        <input type="search" class="rel-search" id="toc-search" autocomplete="off" spellcheck="false" placeholder="Rechercher…" aria-label="Rechercher">
+        <div class="rel-rail-scroll"><div class="rel-rail-inner" id="toc-inner"><div class="rel-rail-fill" id="toc-fill"></div></div></div>
+        <p class="rel-rail-empty" id="toc-empty" hidden data-i18n="releases.no_match">Aucun résultat</p>
+      </aside>
+      <div class="rel-main toc-main" id="toc-main">
+<section class="help-block" id="start" data-toc="h2"><h2 class="gallery-section-title reveal" data-i18n="hp.sec.start">Démarrage et tutoriel</h2><div class="help-card reveal" id="tuto" data-toc="h3"><h3 data-i18n="hp.tuto.t">Tutoriel : de zéro à vos premières stats</h3><p data-i18n-html="hp.tuto.intro">Ce guide suit le chemin complet, du compte Last.fm jusqu'à l'écran de stats. Comptez quelques minutes si vous avez déjà un compte, un peu plus si vous partez de zéro.</p><ol class="help-steps"><li data-i18n-html="hp.tuto.s.1"><strong>Créez un compte Last.fm</strong> (gratuit) sur <a href="https://www.last.fm/join" target="_blank" rel="noopener">last.fm/join</a>. Retenez bien votre <em>nom d'utilisateur</em> : c'est lui que LastStats vous demandera.</li><li data-i18n-html="hp.tuto.s.2"><strong>Installez un scrobbler</strong> pour que vos écoutes soient envoyées à Last.fm. Le choix dépend de votre appareil : voir la section <a href="#scrobblers">Scrobbler sa musique</a>.</li><li data-i18n-html="hp.tuto.s.3"><strong>Vérifiez que ça marche</strong> : écoutez un titre, puis ouvrez votre profil sur <a href="https://www.last.fm" target="_blank" rel="noopener">last.fm</a>. Il doit apparaître dans vos écoutes récentes. Tant que ce n'est pas le cas, LastStats n'aura rien à afficher.</li><li data-i18n-html="hp.tuto.s.4"><strong>Créez une clé API</strong> sur <a href="https://www.last.fm/api/account/create" target="_blank" rel="noopener">la page de création de clé API</a> de Last.fm : donnez un nom et une description de votre choix à l'application, puis copiez la clé affichée à la fin.</li><li data-i18n-html="hp.tuto.s.5"><strong>Ouvrez LastStats</strong>, saisissez votre nom d'utilisateur Last.fm et la clé API, puis validez.</li><li data-i18n-html="hp.tuto.s.6"><strong>Optionnel : les favoris.</strong> Renseignez aussi la clé secrète Last.fm, sur le même écran ou plus tard dans Paramètres > Compte.</li><li data-i18n-html="hp.tuto.s.7"><strong>Laissez l'app charger votre historique.</strong> Le premier chargement dépend de la taille de votre historique ; ensuite le cache local rend l'affichage plus rapide.</li></ol><p class="help-src"><span data-i18n="hp.tuto.src">Sources :</span> <a href="https://www.last.fm/join" target="_blank" rel="noopener">Last.fm : inscription</a> · <a href="https://www.last.fm/api/account/create" target="_blank" rel="noopener">Last.fm : créer une clé API</a> · <a href="https://www.last.fm/api" target="_blank" rel="noopener">Last.fm API</a></p></div><div class="help-card reveal" id="how" data-toc="h3"><h3 data-i18n="hp.how.t">Comment ça marche ?</h3><p data-i18n-html="hp.how.p1">Trois maillons, chacun indépendant des autres : <strong>1.</strong> votre lecteur de musique (ou un scrobbler) envoie chaque écoute à <strong>Last.fm</strong> ; <strong>2.</strong> Last.fm conserve l'historique sur votre compte ; <strong>3.</strong> LastStats lit cet historique via l'API publique de Last.fm et le transforme en statistiques.</p><p data-i18n-html="hp.how.p2">LastStats n'a pas de serveur : le cache de vos écoutes et vos identifiants restent sur votre appareil (détails dans les <a href="legal.html">mentions légales</a>). Conséquence pratique : si une écoute n'est pas sur Last.fm, elle n'apparaîtra jamais dans LastStats.</p></div><div class="help-card reveal" id="account" data-toc="h3"><h3 data-i18n="hp.acct.t">Créer et gérer son compte Last.fm</h3><p data-i18n-html="hp.acct.p1">L'inscription se fait sur <a href="https://www.last.fm/join" target="_blank" rel="noopener">last.fm/join</a>. Les réglages de votre compte (profil, confidentialité, applications connectées) sont regroupés dans <a href="https://www.last.fm/settings" target="_blank" rel="noopener">vos paramètres Last.fm</a>.</p><ul class="help-list"><li data-i18n-html="hp.acct.l.1">Les services reliés à votre compte (par exemple Spotify) se gèrent dans <a href="https://www.last.fm/settings/applications" target="_blank" rel="noopener">Applications</a>.</li><li data-i18n-html="hp.acct.l.2">Le nom d'utilisateur Last.fm est celui qu'il faut saisir dans LastStats, pas votre nom d'affichage.</li><li data-i18n-html="hp.acct.l.3">Pour changer de compte dans LastStats : Paramètres > Compte, déconnexion, puis nouvelle connexion.</li></ul><p class="help-src"><span data-i18n="hp.acct.src">Sources :</span> <a href="https://www.last.fm/settings" target="_blank" rel="noopener">Last.fm : paramètres</a> · <a href="https://www.last.fm/settings/applications" target="_blank" rel="noopener">Last.fm : applications</a></p></div><div class="help-card reveal" id="keys" data-toc="h3"><h3 data-i18n="hp.keys.t">Clé API et clé secrète : à quoi ça sert ?</h3><ul class="help-list"><li data-i18n-html="hp.keys.l.1"><strong>Clé API</strong> : identifie l'application auprès de Last.fm et permet de lire votre historique. Indispensable pour utiliser LastStats.</li><li data-i18n-html="hp.keys.l.2"><strong>Clé secrète</strong> : optionnelle, nécessaire seulement pour les actions qui écrivent sur votre compte, comme les favoris.</li><li data-i18n-html="hp.keys.l.3">Ne partagez jamais ces clés. Une sauvegarde exportée peut les contenir : la clé secrète n'y est incluse que si vous le choisissez.</li></ul></div></section>  <!-- ================= Understanding Last fm & scrobbling ================= -->
+  <section class="help-block" id="understand" data-toc="h2">
     <h2 class="gallery-section-title reveal" data-i18n="help.understanding_last_fm_and_scrobbling">Comprendre Last.fm et le scrobbling</h2>
 
-    <div class="help-card reveal">
+    <div class="help-card reveal" id="what" data-toc="h3">
       <h3 data-i18n="help.what_is_last_fm">Qu'est-ce que Last.fm ?</h3>
       <p data-i18n="help.last_fm_is_a_service">
         Last.fm est un service qui garde un historique de tout ce que vous écoutez, peu importe
@@ -62,7 +73,7 @@
       </p>
     </div>
 
-    <div class="help-card reveal">
+    <div class="help-card reveal" id="scrobble" data-toc="h3">
       <h3 data-i18n="common.what_is_a_scrobble">C'est quoi un « scrobble » ?</h3>
       <p data-i18n="help.a_scrobble_is_a_track">
         Un scrobble, c'est un titre enregistré comme écouté sur votre compte Last.fm : c'est le
@@ -75,7 +86,7 @@
       </p>
     </div>
 
-    <div class="help-card reveal">
+    <div class="help-card reveal" id="which-app" data-toc="h3">
       <h3 data-i18n="help.which_app_should_i_use">Quelle app utiliser pour scrobbler ?</h3>
       <p>
         <span data-i18n="help.for_your_listens_to_reach">Pour que vos écoutes remontent sur </span><a href="https://www.last.fm" target="_blank" rel="noopener">Last.fm</a><span data-i18n="help.automatically_you_need_a_scrobbler"> automatiquement, il vous faut un « scrobbler ».</span>
@@ -83,7 +94,7 @@
       </p>
     </div>
 
-    <div class="help-card reveal">
+    <div class="help-card reveal" id="connect" data-toc="h3">
       <h3 data-i18n="help.how_do_i_connect_laststats">Comment connecter LastStats à mon compte ?</h3>
       <ol class="help-steps">
         <li>
@@ -102,13 +113,13 @@
     </div>
   </section>
 
-  <!-- ================= FAQ ================= -->
-  <section class="help-section">
+<section class="help-block" id="scrobblers" data-toc="h2"><h2 class="gallery-section-title reveal" data-i18n="hp.sec.scrob">Scrobbler sa musique</h2><div class="help-card reveal" id="sc-android" data-toc="h3"><h3 data-i18n="hp.sa.t">Android</h3><p data-i18n-html="hp.sa.p"><a href="https://play.google.com/store/apps/details?id=com.arn.scrobble" target="_blank" rel="noopener">Pano Scrobbler</a> détecte ce que vous écoutez dans vos apps de musique et l'envoie à Last.fm. Le projet est open source (<a href="https://github.com/kawaiiDango/pano-scrobbler" target="_blank" rel="noopener">code sur GitHub</a>).</p><p data-i18n-html="hp.sa.p2">Pour qu'il détecte vos écoutes, il faut lui accorder l'accès aux notifications quand il le demande. Si les scrobbles s'arrêtent, vérifiez aussi que l'économiseur de batterie d'Android ne ferme pas l'app en arrière-plan.</p><p class="help-src"><span data-i18n="hp.sa.src">Sources :</span> <a href="https://github.com/kawaiiDango/pano-scrobbler" target="_blank" rel="noopener">Pano Scrobbler (GitHub)</a></p></div><div class="help-card reveal" id="sc-ios" data-toc="h3"><h3 data-i18n="hp.si.t">iPhone et iPad</h3><p data-i18n-html="hp.si.p">Last.fm tient une liste de scrobblers par plateforme sur <a href="https://www.last.fm/about/trackmymusic" target="_blank" rel="noopener">sa page « Track My Music »</a> : c'est la source à consulter pour iOS, car l'offre évolue. À noter : LastStats ne propose pas de version iOS officielle pour le moment, mais Last.fm fonctionne indépendamment.</p></div><div class="help-card reveal" id="sc-desktop" data-toc="h3"><h3 data-i18n="hp.sd.t">Windows, macOS, Linux</h3><p data-i18n-html="hp.sd.p">Deux options : activer la connexion Last.fm intégrée à votre lecteur (quand il en a une), ou installer un scrobbler. Les scrobblers recommandés par Last.fm pour chaque système sont listés sur <a href="https://www.last.fm/about/trackmymusic" target="_blank" rel="noopener">Track My Music</a>.</p></div><div class="help-card reveal" id="sc-web" data-toc="h3"><h3 data-i18n="hp.sw.t">Navigateur (YouTube, SoundCloud, etc.)</h3><p data-i18n-html="hp.sw.p">Pour la musique écoutée dans un onglet, l'extension open source <a href="https://web-scrobbler.com" target="_blank" rel="noopener">Web Scrobbler</a> envoie les écoutes de nombreux sites vers Last.fm.</p></div><div class="help-card reveal" id="sc-spotify" data-toc="h3"><h3 data-i18n="hp.sp.t">Spotify</h3><p data-i18n-html="hp.sp.p">Spotify peut être relié directement à Last.fm depuis <a href="https://www.last.fm/settings/applications" target="_blank" rel="noopener">la page Applications</a> : le scrobbling se fait alors côté compte, quel que soit l'appareil utilisé.</p><p data-i18n-html="hp.sp.p2">Si les écoutes ne remontent plus, la solution la plus courante est de déconnecter puis reconnecter Spotify sur cette même page. Évitez d'activer plusieurs scrobblers pour la même source, sinon vous risquez des doublons.</p><p class="help-src"><span data-i18n="hp.sp.src">Sources :</span> <a href="https://www.last.fm/settings/applications" target="_blank" rel="noopener">Last.fm : applications</a> · <a href="https://community.spotify.com/t5/Desktop-Windows/Last-fm-Scrobbling/m-p/4649751" target="_blank" rel="noopener">Spotify Community</a></p></div></section><section class="help-block" id="app" data-toc="h2"><h2 class="gallery-section-title reveal" data-i18n="hp.sec.app">Utiliser LastStats</h2><div class="help-card reveal" id="app-backup" data-toc="h3"><h3 data-i18n="hp.bk.t">Sauvegarder et changer d'appareil</h3><ol class="help-steps"><li data-i18n-html="hp.bk.s.1">Sur l'ancien appareil : Paramètres > Sauvegarde, puis exportez un fichier de sauvegarde (avec ou sans votre clé Last.fm).</li><li data-i18n-html="hp.bk.s.2">Transférez le fichier sur le nouvel appareil, par exemple via un cloud ou un câble.</li><li data-i18n-html="hp.bk.s.3">Installez LastStats, puis importez le fichier depuis Paramètres > Sauvegarde.</li></ol><p class="help-note" data-i18n-html="hp.bk.n">Un fichier exporté avec votre clé peut contenir des identifiants : gardez-le privé.</p></div><div class="help-card reveal" id="app-switch" data-toc="h3"><h3 data-i18n="hp.sw2.t">Changer de compte Last.fm</h3><p data-i18n-html="hp.sw2.p">Paramètres > Compte, déconnectez-vous puis reconnectez-vous avec un autre nom d'utilisateur. Le cache local est réinitialisé automatiquement pour éviter tout mélange de données.</p></div><div class="help-card reveal" id="app-battery" data-toc="h3"><h3 data-i18n="hp.bat.t">Batterie et notifications</h3><ul class="help-list"><li data-i18n-html="hp.bat.l.1">Mode éco : espace les synchronisations automatiques ; activable à la main ou automatiquement selon le niveau de batterie (Paramètres > Général).</li><li data-i18n-html="hp.bat.l.2">Notifications : alertes de fin de synchronisation, fréquence réglable ou désactivation complète (Paramètres > Notifications).</li></ul></div></section><section class="help-block" id="trouble" data-toc="h2"><h2 class="gallery-section-title reveal" data-i18n="hp.sec.tr">Dépannage</h2><div class="help-card reveal" id="tr-empty" data-toc="h3"><h3 data-i18n="hp.t1.t">LastStats n'affiche aucune statistique</h3><ol class="help-steps"><li data-i18n-html="hp.t1.s.1">Ouvrez votre profil sur <a href="https://www.last.fm" target="_blank" rel="noopener">last.fm</a> : y a-t-il des écoutes ? Si non, le problème vient du scrobbler, pas de LastStats.</li><li data-i18n-html="hp.t1.s.2">Vérifiez le nom d'utilisateur (celui de l'URL de votre profil) et la clé API : recopiez-les sans espace avant ou après.</li><li data-i18n-html="hp.t1.s.3">Vérifiez votre connexion : une connexion est nécessaire pour récupérer de nouveaux scrobbles.</li></ol></div><div class="help-card reveal" id="tr-missing" data-toc="h3"><h3 data-i18n="hp.t2.t">Des écoutes récentes manquent</h3><ul class="help-list"><li data-i18n-html="hp.t2.l.1">Vérifiez d'abord qu'elles sont bien sur Last.fm : LastStats ne peut afficher que ce que Last.fm contient.</li><li data-i18n-html="hp.t2.l.2">Sur Android, un scrobbler fermé par l'économiseur de batterie cesse d'envoyer les écoutes.</li><li data-i18n-html="hp.t2.l.3">Pour Spotify, déconnectez puis reconnectez le lien sur <a href="https://www.last.fm/settings/applications" target="_blank" rel="noopener">la page Applications</a>.</li><li data-i18n-html="hp.t2.l.4">Relancez une synchronisation dans l'app une fois le scrobbler corrigé.</li></ul></div><div class="help-card reveal" id="tr-help" data-toc="h3"><h3 data-i18n="hp.t3.t">Toujours bloqué ?</h3><p data-i18n-html="hp.t3.p">Rejoignez le <a href="https://discord.gg/JjqmkQgZBs" target="_blank" rel="noopener">Discord</a> ou ouvrez un ticket sur <a href="https://github.com/SanoBld/LastStats-App/issues" target="_blank" rel="noopener">GitHub</a>. Indiquez votre appareil, la version de LastStats et ce que vous avez déjà essayé.</p></div></section>  <!-- ================= FAQ ================= -->
+  <section class="help-block" id="faq" data-toc="h2">
     <h2 class="gallery-section-title reveal" data-i18n="help.frequently_asked_questions">Questions fréquentes</h2>
 
     <div class="faq-list reveal">
 
-      <details class="faq-item">
+      <details class="faq-item" data-toc-item>
         <summary>
           <span data-i18n="help.does_laststats_scrobble_my_music">LastStats scrobble-t-il ma musique ?</span>
           <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -116,7 +127,7 @@
         <p data-i18n="help.no_laststats_is_a_visualisation">Non. LastStats se contente d'afficher les scrobbles déjà enregistrés sur votre compte Last.fm, elle n'en enregistre aucun elle-même. Pour scrobbler automatiquement votre musique, il vous faut une app dédiée comme Pano Scrobbler (sur Android).</p>
       </details>
 
-      <details class="faq-item">
+      <details class="faq-item" data-toc-item>
         <summary>
           <span data-i18n="common.what_is_a_scrobble">C'est quoi un « scrobble » ?</span>
           <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -124,7 +135,7 @@
         <p data-i18n="help.a_scrobble_is_a_track_2">Un scrobble, c'est un titre enregistré comme écouté sur votre compte Last.fm, c'est le terme officiel de Last.fm pour « une écoute comptée ». Tous vos totaux (top artistes, statistiques, etc.) sont basés dessus.</p>
       </details>
 
-      <details class="faq-item">
+      <details class="faq-item" data-toc-item>
         <summary>
           <span data-i18n="help.is_an_ios_version_planned">Une version iOS est-elle prévue ?</span>
           <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -132,7 +143,7 @@
         <p data-i18n="help.no_an_ios_version_is">Non, pas pour le moment. Si la demande devient suffisamment forte, ce sera reconsidéré.</p>
       </details>
 
-      <details class="faq-item">
+      <details class="faq-item" data-toc-item>
         <summary>
           <span data-i18n="help.does_the_app_work_on">L'application fonctionne-t-elle sur macOS ou d'autres plateformes ?</span>
           <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -140,7 +151,7 @@
         <p data-i18n="help.laststats_mobile_is_developed_and">LastStats est développée et testée sur Android. Le fonctionnement sur les autres plateformes (macOS, Windows, Linux…) n'est pas garanti, des bugs ou comportements inattendus restent possibles.</p>
       </details>
 
-      <details class="faq-item">
+      <details class="faq-item" data-toc-item>
         <summary>
           <span data-i18n="help.is_laststats_open_source">LastStats est-elle open source ?</span>
           <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -148,7 +159,7 @@
         <p data-i18n="help.yes_the_source_code_is">Oui ! Le code source est en libre accès sur GitHub. C'est un projet indépendant, fait avec passion par SanoBld. Vous pouvez y contribuer, signaler un bug ou juste laisser une étoile ⭐.</p>
       </details>
 
-      <details class="faq-item">
+      <details class="faq-item" data-toc-item>
         <summary>
           <span data-i18n="help.where_is_my_data_stored">Où sont stockées mes données ?</span>
           <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -156,7 +167,7 @@
         <p data-i18n="help.on_your_device_only_laststats">Uniquement sur votre appareil. LastStats n'a pas de serveur, vos scrobbles sont mis en cache en local pour aller plus vite, et vos identifiants Last.fm restent aussi sur votre appareil. Rien n'est envoyé à l'éditeur ; seules des requêtes vers Last.fm et des services d'images/métadonnées (Deezer, MusicBrainz, etc.) partent de votre appareil — voir les mentions légales.</p>
       </details>
 
-      <details class="faq-item">
+      <details class="faq-item" data-toc-item>
         <summary>
           <span data-i18n="help.how_do_i_enable_favorites">Comment activer les favoris ?</span>
           <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -164,7 +175,7 @@
         <p data-i18n="help.go_to_settings_account_and">Allez dans Paramètres > Compte et renseignez votre clé secrète Last.fm. Une fois connectée, vous pourrez ajouter des titres en favori directement depuis l'application.</p>
       </details>
 
-      <details class="faq-item">
+      <details class="faq-item" data-toc-item>
         <summary>
           <span data-i18n="help.how_do_levels_and_achievements">Comment fonctionnent les niveaux et les succès ?</span>
           <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -172,7 +183,7 @@
         <p data-i18n="help.your_account_level_grows_with">Votre niveau de compte augmente avec votre nombre total de scrobbles, il n'y a pas de maximum. Les cartes affichent aussi une bordure (du bronze à l'iridescent) selon le nombre d'écoutes de l'artiste, du titre ou de l'album concerné. Tout est calculé automatiquement à partir de vos statistiques déjà en cache, sans requête supplémentaire.</p>
       </details>
 
-      <details class="faq-item">
+      <details class="faq-item" data-toc-item>
         <summary>
           <span data-i18n="help.how_does_eco_mode_work">Comment fonctionne le mode éco ?</span>
           <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -180,7 +191,7 @@
         <p data-i18n="help.eco_mode_spaces_out_automatic">Le mode éco espace les synchronisations automatiques pour économiser la batterie. Vous pouvez l'activer vous-même ou laisser l'application le faire selon le niveau de batterie, depuis Paramètres > Général.</p>
       </details>
 
-      <details class="faq-item">
+      <details class="faq-item" data-toc-item>
         <summary>
           <span data-i18n="help.how_do_i_back_up">Comment sauvegarder ou restaurer mes données ?</span>
           <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -188,7 +199,7 @@
         <p data-i18n="help.go_to_settings_backup_you">Allez dans Paramètres > Sauvegarde. Vous pouvez exporter un fichier de sauvegarde (avec ou sans votre clé Last.fm) puis le réimporter plus tard ou sur un autre appareil.</p>
       </details>
 
-      <details class="faq-item">
+      <details class="faq-item" data-toc-item>
         <summary>
           <span data-i18n="help.does_the_app_work_offline">L'application fonctionne-t-elle hors ligne ?</span>
           <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -196,7 +207,7 @@
         <p data-i18n="help.yes_to_some_extent_stats">Oui, dans une certaine mesure. Les statistiques déjà chargées restent consultables sans connexion grâce au cache local, mais une connexion reste nécessaire pour récupérer de nouveaux scrobbles.</p>
       </details>
 
-      <details class="faq-item">
+      <details class="faq-item" data-toc-item>
         <summary>
           <span data-i18n="help.can_i_switch_last_fm">Puis-je changer de compte Last.fm ?</span>
           <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -204,7 +215,7 @@
         <p data-i18n="help.yes_from_settings_account_sign">Oui. Depuis Paramètres > Compte, déconnectez-vous puis reconnectez-vous avec un autre nom d'utilisateur. Le cache local est réinitialisé automatiquement pour éviter tout mélange de données.</p>
       </details>
 
-      <details class="faq-item">
+      <details class="faq-item" data-toc-item>
         <summary>
           <span data-i18n="help.how_do_i_set_up">Comment configurer les notifications ?</span>
           <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -229,6 +240,11 @@
     </p>
   </section>
 
+<section class="help-block" id="sources" data-toc="h2"><h2 class="gallery-section-title reveal" data-i18n="hp.sec.src">Sources</h2><div class="help-card reveal" id="sources-list" data-toc="h3"><h3 data-i18n="hp.src.t">Liens utiles</h3><ul class="help-list"><li data-i18n-html="hp.src.l.1"><a href="https://www.last.fm/join" target="_blank" rel="noopener">Last.fm : créer un compte</a></li><li data-i18n-html="hp.src.l.2"><a href="https://www.last.fm/api/account/create" target="_blank" rel="noopener">Last.fm : créer une clé API</a></li><li data-i18n-html="hp.src.l.3"><a href="https://www.last.fm/api" target="_blank" rel="noopener">Last.fm : documentation de l'API</a></li><li data-i18n-html="hp.src.l.4"><a href="https://www.last.fm/about/trackmymusic" target="_blank" rel="noopener">Last.fm : liste des scrobblers</a></li><li data-i18n-html="hp.src.l.5"><a href="https://www.last.fm/settings/applications" target="_blank" rel="noopener">Last.fm : applications connectées</a></li><li data-i18n-html="hp.src.l.6"><a href="https://github.com/kawaiiDango/pano-scrobbler" target="_blank" rel="noopener">Pano Scrobbler</a></li><li data-i18n-html="hp.src.l.7"><a href="https://web-scrobbler.com" target="_blank" rel="noopener">Web Scrobbler</a></li><li data-i18n-html="hp.src.l.8"><a href="https://listenbrainz.org" target="_blank" rel="noopener">ListenBrainz</a></li></ul></div></section>
+      </div>
+    </div>
+  </div>
+
   <footer class="footer">
     <p>© 2026 Sano Bld</p>
     <div class="footer-links">
@@ -249,5 +265,6 @@
   <script src="js/ripple.js"></script>
   <script src="js/expressive.js"></script>
   <script src="js/nav-autohide.js"></script>
+  <script src="js/toc.js"></script>
 </body>
 </html>

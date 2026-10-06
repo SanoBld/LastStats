@@ -14,6 +14,8 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/project.css">
 <link rel="stylesheet" href="css/help.css">
+<link rel="stylesheet" href="css/releases.css">
+<link rel="stylesheet" href="css/toc.css">
 <link rel="stylesheet" href="css/expressive.css">
 <script defer src="https://cloud.umami.is/script.js" data-website-id="adc52595-b992-434a-8eaf-2a4880979675"></script>
 </head>
@@ -46,36 +48,44 @@
     <p class="help-subtitle reveal-fade" data-i18n="legal.personal_non_commercial_site_no">Site personnel, non commercial. Aucune donnée personnelle collectée par l'éditeur ; seules des statistiques de visite anonymes sont mesurées.</p>
   </section>
 
-  <main class="legal-content">
-    <section class="legal-block reveal-fade">
+  <div class="help-section toc-page"><div class="rel-layout">
+      <aside class="rel-rail" id="toc-rail" aria-label="Sommaire" hidden>
+        <h2 class="rel-rail-title" data-i18n="releases.toc">Sommaire</h2>
+        <input type="search" class="rel-search" id="toc-search" autocomplete="off" spellcheck="false" placeholder="Rechercher…" aria-label="Rechercher">
+        <div class="rel-rail-scroll"><div class="rel-rail-inner" id="toc-inner"><div class="rel-rail-fill" id="toc-fill"></div></div></div>
+        <p class="rel-rail-empty" id="toc-empty" hidden data-i18n="releases.no_match">Aucun résultat</p>
+      </aside>
+      <div class="rel-main toc-main" id="toc-main"><main class="legal-content">
+
+    <section class="legal-block reveal-fade" id="site-publisher" data-toc="h2">
       <h2 data-i18n="legal.site_publisher">Éditeur du site</h2>
       <p data-i18n="legal.this_site_is_published_on">Ce site est édité à titre non professionnel et personnel par Sano Bld, dans le cadre d'un projet open source. Conformément à l'article 6-III de la LCEN, l'éditeur d'un site non professionnel peut préserver son anonymat vis-à-vis du public : ses coordonnées complètes ont été communiquées à l'hébergeur.</p>
       <p data-i18n-html="legal.contact_via_discord_or_github">Contact : via <a href="https://discord.gg/JjqmkQgZBs" target="_blank" rel="noopener">Discord</a> ou <a href="https://github.com/SanoBld/LastStats-App" target="_blank" rel="noopener">GitHub</a>.</p>
     </section>
 
-    <section class="legal-block reveal-fade">
+    <section class="legal-block reveal-fade" id="hosting" data-toc="h2">
       <h2 data-i18n="legal.hosting">Hébergement</h2>
       <p data-i18n="legal.this_site_is_hosted_free">Ce site est hébergé gratuitement par GitHub Pages : GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.</p>
     </section>
 
-    <section class="legal-block reveal-fade">
+    <section class="legal-block reveal-fade" id="intellectual-property" data-toc="h2">
       <h2 data-i18n="legal.intellectual_property">Propriété intellectuelle</h2>
       <p data-i18n="legal.laststats_is_an_open_source">LastStats est un projet open source. Le code source est disponible sur GitHub sous la licence indiquée dans le dépôt. Les captures d'écran, logos et textes de ce site restent la propriété de leur auteur.</p>
     </section>
 
-    <section class="legal-block reveal-fade">
+    <section class="legal-block reveal-fade" id="data-controller" data-toc="h2">
       <h2 data-i18n="legal.data_controller">Responsable de traitement</h2>
       <p data-i18n="legal.the_showcase_site_processes_no">Le site vitrine ne traite aucune donnée personnelle identifiante : seules des statistiques de visite anonymes sont mesurées (voir ci-dessous). L'application LastStats n'a pas de serveur : les données qu'elle utilise restent sur votre appareil et l'éditeur n'y a jamais accès. L'éditeur n'est donc pas destinataire de vos données ; les échanges réseau décrits ci-dessous ont lieu directement entre votre appareil et les services tiers.</p>
     </section>
 
-    <section class="legal-block reveal-fade">
+    <section class="legal-block reveal-fade" id="website-data-and-cookies" data-toc="h2">
       <h2 data-i18n="legal.website_data_and_cookies">Site web : données et cookies</h2>
       <p data-i18n="legal.no_form_account_analytics_ads">Aucun formulaire, compte, publicité ni cookie. Vos préférences de langue et de thème sont enregistrées uniquement dans le localStorage de votre navigateur (stockage strictement nécessaire à votre demande, exempté de consentement) et ne sont jamais transmises.</p>
       <p data-i18n="legal.the_site_loads_google_fonts">Le site charge les polices Google Fonts (Google LLC) et interroge l&#x27;API publique de GitHub pour afficher étoiles, version et téléchargements. Votre adresse IP est donc visible de ces services lors de la visite, ainsi que de GitHub Pages (hébergeur). Base légale : intérêt légitime (art. 6.1.f RGPD) à afficher le site. Voir leurs politiques de confidentialité.</p>
       <p data-i18n="legal.umami_analytics">Mesure d'audience : le site utilise Umami (Umami Software, Inc.), un outil de statistiques respectueux de la vie privée. Il n'utilise aucun cookie, ne dépose aucun identifiant persistant sur votre appareil et ne vous suit pas d'un site à l'autre. Il ne collecte que des données de visite anonymes et agrégées (pages vues, site référent, pays, type d'appareil, navigateur, langue, taille d'écran) ; votre adresse IP n'est pas conservée et aucune donnée ne permet à l'éditeur de vous identifier. Base légale : intérêt légitime (art. 6.1.f RGPD) à connaître la fréquentation du site. Vous pouvez vous y opposer à tout moment en bloquant le script avec un bloqueur de contenu.</p>
     </section>
 
-    <section class="legal-block reveal-fade">
+    <section class="legal-block reveal-fade" id="app-data-processed" data-toc="h2">
       <h2 data-i18n="legal.app_data_processed">Application : données traitées</h2>
       <p data-i18n="legal.the_app_stores_locally_device">L&#x27;application enregistre localement (stockage de l&#x27;appareil, jamais envoyé à l&#x27;éditeur) :</p>
       <ul>
@@ -86,12 +96,12 @@
       </ul>
     </section>
 
-    <section class="legal-block reveal-fade">
+    <section class="legal-block reveal-fade" id="app-purposes-and-legal-bases" data-toc="h2">
       <h2 data-i18n="legal.app_purposes_and_legal_bases">Application : finalités et bases légales</h2>
       <p data-i18n="legal.purpose_display_your_stats_generate">Finalité : afficher vos statistiques, générer cartes de partage, widgets et notifications. Bases légales : exécution du service que vous demandez (art. 6.1.b RGPD) et, pour les notifications et la caméra, votre consentement via les autorisations du système (art. 6.1.a), retirable à tout moment dans les réglages de votre appareil.</p>
     </section>
 
-    <section class="legal-block reveal-fade">
+    <section class="legal-block reveal-fade" id="third-party-services-and-data" data-toc="h2">
       <h2 data-i18n="legal.third_party_services_and_data">Services tiers et sources de données</h2>
       <p data-i18n="legal.the_app_contacts_these_services">L&#x27;application contacte directement ces services depuis votre appareil ; chacun reçoit au minimum votre adresse IP et la requête (ex. nom d&#x27;artiste ou d&#x27;album) :</p>
       <ul>
@@ -103,43 +113,70 @@
       </ul>
     </section>
 
-    <section class="legal-block reveal-fade">
+    <section class="legal-block reveal-fade" id="transfers-outside-the-eu" data-toc="h2">
       <h2 data-i18n="legal.transfers_outside_the_eu">Transferts hors Union européenne</h2>
       <p data-i18n="legal.several_of_these_services_are">Plusieurs de ces services, ainsi que l'outil de mesure d'audience Umami, sont situés aux États-Unis ou peuvent y traiter des données. Ces transferts sont encadrés par leurs propres garanties (clauses contractuelles types ou cadre UE-États-Unis de protection des données). LastStats n'effectue lui-même aucun transfert.</p>
     </section>
 
-    <section class="legal-block reveal-fade">
+    <section class="legal-block reveal-fade" id="app-permissions" data-toc="h2">
       <h2 data-i18n="legal.app_permissions">Autorisations de l&#x27;application</h2>
       <p data-i18n="legal.internet_requests_described_above_camera">Internet : requêtes décrites ci-dessus. Caméra : uniquement pour scanner un QR code, aucune image n&#x27;est enregistrée ni envoyée. Notifications, démarrage, alarmes et services en arrière-plan : actualités, rappels et mise à jour des widgets. Refuser une autorisation limite seulement la fonction concernée.</p>
     </section>
 
-    <section class="legal-block reveal-fade">
+    <section class="legal-block reveal-fade" id="retention-and-security" data-toc="h2">
       <h2 data-i18n="legal.retention_and_security">Durée de conservation et sécurité</h2>
       <p data-i18n="legal.data_stays_on_your_device">Les données restent sur votre appareil jusqu&#x27;à déconnexion, vidage du cache, suppression des données de l&#x27;app ou désinstallation, qui les effacent. L&#x27;éditeur ne détient aucune copie. Les identifiants sont stockés dans le stockage local de l&#x27;application, protégé par le système de votre appareil ; ne partagez pas vos sauvegardes ni votre clé secrète.</p>
     </section>
 
-    <section class="legal-block reveal-fade">
+    <section class="legal-block reveal-fade" id="your-rights" data-toc="h2">
       <h2 data-i18n="legal.your_rights">Vos droits</h2>
       <p data-i18n="legal.under_the_gdpr_art_15">Conformément au RGPD (art. 15 à 21), vous disposez des droits d&#x27;accès, de rectification, d&#x27;effacement, de limitation, de portabilité et d&#x27;opposition. Comme l&#x27;éditeur ne détient pas vos données, vous les exercez directement dans l&#x27;app (export de sauvegarde, déconnexion, suppression des données) et auprès de Last.fm et des autres services tiers pour les données qu&#x27;ils conservent.</p>
       <p data-i18n-html="legal.for_any_question_contact_via">Pour toute question : contact via <a href="https://discord.gg/JjqmkQgZBs" target="_blank" rel="noopener">Discord</a> ou <a href="https://github.com/SanoBld/LastStats-App" target="_blank" rel="noopener">GitHub</a>. Vous pouvez aussi introduire une réclamation auprès de la CNIL (cnil.fr) ou de l&#x27;autorité de protection des données de votre pays.</p>
     </section>
 
-    <section class="legal-block reveal-fade">
+    <section class="legal-block reveal-fade" id="minors" data-toc="h2">
       <h2 data-i18n="legal.minors">Mineurs</h2>
       <p data-i18n="legal.the_app_is_not_intended">L&#x27;application n&#x27;est pas destinée aux enfants de moins de 15 ans sans accord d&#x27;un parent ; les conditions de Last.fm s&#x27;appliquent à votre compte Last.fm.</p>
     </section>
 
-    <section class="legal-block reveal-fade">
+    <section class="legal-block reveal-fade" id="trademarks-credits-and-licenses" data-toc="h2">
       <h2 data-i18n="legal.trademarks_credits_and_licenses">Marques, crédits et licences</h2>
       <p data-i18n="legal.laststats_is_an_independent_app">LastStats est une application indépendante, non affiliée, ni approuvée par Last.fm, Spotify, YouTube, Apple, Deezer, TheAudioDB, MusicBrainz, Wikipedia ou GitHub. Les noms et logos appartiennent à leurs propriétaires. Les pochettes, images et métadonnées appartiennent à leurs ayants droit et proviennent des sources citées ci-dessus ; les textes Wikipedia sont sous licence CC BY-SA. Les composants open source utilisés (Flutter, packages pub.dev) restent sous leurs licences respectives, consultables dans l&#x27;application et le dépôt.</p>
     </section>
 
-    <section class="legal-block reveal-fade">
+    <section class="legal-block reveal-fade" id="license" data-toc="h2">
+      <h2 data-i18n="legal.license">Licence du code</h2>
+      <p data-i18n-html="legal.license.p1">Le code source de LastStats est publié sous <strong>licence MIT</strong> (voir le fichier LICENSE du dépôt GitHub). Vous pouvez l'utiliser, le copier, le modifier et le redistribuer, à condition de conserver la mention de copyright et le texte de la licence.</p>
+    </section>
+
+    <section class="legal-block reveal-fade" id="liability" data-toc="h2">
+      <h2 data-i18n="legal.liability">Limitation de responsabilité</h2>
+      <p data-i18n-html="legal.liability.p1">Le site et l'application sont fournis « tels quels », sans garantie d'aucune sorte, dans la mesure permise par la loi. Les statistiques affichées proviennent de services tiers (Last.fm notamment) : elles peuvent être incomplètes, en retard ou erronées, et l'éditeur ne peut en garantir l'exactitude.</p>
+      <p data-i18n-html="legal.liability.p2">L'éditeur ne peut être tenu responsable de l'indisponibilité d'un service tiers, ni d'un dommage résultant de l'utilisation du site ou de l'application, hors cas où la loi l'interdit.</p>
+    </section>
+
+    <section class="legal-block reveal-fade" id="links" data-toc="h2">
+      <h2 data-i18n="legal.links">Liens externes</h2>
+      <p data-i18n-html="legal.links.p1">Le site contient des liens vers des sites tiers (Last.fm, GitHub, Discord, etc.). L'éditeur n'exerce aucun contrôle sur leur contenu ni sur leurs pratiques de confidentialité, et décline toute responsabilité à ce titre. Consultez leurs propres conditions et politiques.</p>
+    </section>
+
+    <section class="legal-block reveal-fade" id="reporting" data-toc="h2">
+      <h2 data-i18n="legal.reporting">Signaler un contenu ou un problème</h2>
+      <p data-i18n-html="legal.reporting.p1">Pour signaler un contenu litigieux, une erreur ou une demande de retrait, écrivez via <a href="https://discord.gg/JjqmkQgZBs" target="_blank" rel="noopener">Discord</a> ou ouvrez un ticket sur <a href="https://github.com/SanoBld/LastStats-App/issues" target="_blank" rel="noopener">GitHub</a>, en précisant la page concernée.</p>
+    </section>
+
+    <section class="legal-block reveal-fade" id="law" data-toc="h2">
+      <h2 data-i18n="legal.law">Droit applicable</h2>
+      <p data-i18n-html="legal.law.p1">Le site et ces mentions sont soumis au droit français. En cas de litige, et à défaut de solution amiable, les tribunaux français sont compétents, sous réserve des règles impératives applicables aux consommateurs.</p>
+      <p data-i18n-html="legal.law.p2">Pour une réclamation relative aux données personnelles, vous pouvez aussi saisir la <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener">CNIL</a>.</p>
+    </section>
+
+    <section class="legal-block reveal-fade" id="changes" data-toc="h2">
       <h2 data-i18n="legal.changes">Modifications</h2>
       <p data-i18n="legal.this_page_may_be_updated">Cette page peut être mise à jour lorsque l&#x27;application évolue ; la date de dernière mise à jour est indiquée ci-dessous.</p>
       <p data-i18n="legal.last_updated_october_2026">Dernière mise à jour : octobre 2026.</p>
     </section>
-  </main>
+  </main></div></div></div>
 
   <footer class="footer">
     <p>© 2026 Sano Bld</p>
@@ -161,5 +198,6 @@
   <script src="js/ripple.js"></script>
   <script src="js/expressive.js"></script>
   <script src="js/nav-autohide.js"></script>
+  <script src="js/toc.js"></script>
 </body>
 </html>
