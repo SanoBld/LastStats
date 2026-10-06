@@ -73,6 +73,7 @@
   await _ensureDiskCache();
   final mem = _getUrl(key);
   if (mem != null) return mem;
+  if (DataCache.strictOffline) return lastfmUrl ?? &#39;&#39;;
 
   &#47;&#47; YouTube Music moved down for artists specifically: artist photos on
   &#47;&#47; there are often non-square (banners, portraits) and its thumbnail

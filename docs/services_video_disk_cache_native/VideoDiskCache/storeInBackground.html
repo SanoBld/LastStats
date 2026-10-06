@@ -71,7 +71,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static void storeInBackground(String url) {
-  if (!supported || maxBytes &lt; 0 || !_busy.add(url)) return;
+  if (DataCache.strictOffline || !supported || maxBytes &lt; 0 || !_busy.add(url)) return;
   _store(url).catchError((_) {}).whenComplete(() =&gt; _busy.remove(url));
 }</code></pre>
 </section>

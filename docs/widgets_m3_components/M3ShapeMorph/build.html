@@ -116,7 +116,7 @@ Widget build(BuildContext context) {
     curve: M3Motion.spatialFast,
     builder: (context, r, _) =&gt; TweenAnimationBuilder&lt;Color?&gt;(
       tween: ColorTween(end: color),
-      duration: reduce ? Duration.zero : M3Motion.effectsFastDuration,
+      duration: reduce ? Duration.zero : (colorDuration ?? M3Motion.effectsFastDuration),
       curve: M3Motion.effectsFast,
       builder: (context, c, _) =&gt; Container(
         height: height,

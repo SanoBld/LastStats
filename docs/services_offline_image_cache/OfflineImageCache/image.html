@@ -114,7 +114,9 @@
         );
       }
 
-      &#47;&#47; Not cached → download in background, show network meanwhile.
+      if (DataCache.strictOffline) {
+        return errorWidget ?? placeholder ?? const SizedBox.shrink();
+      }
       _downloadAndCache(url).ignore();
 
       final webImg = buildCorsBypassImage(url, width: width, height: height, fit: fit);

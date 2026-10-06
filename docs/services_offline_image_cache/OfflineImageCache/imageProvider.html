@@ -82,6 +82,7 @@ Also triggers a background download so the next call uses local cache.</p>
   }
 
   &#47;&#47; Not cached yet → start background download, return network for now.
+  if (DataCache.strictOffline) return const AssetImage(&#39;&#39;);
   _downloadAndCache(url).ignore();
   return NetworkImage(url);
 }</code></pre>

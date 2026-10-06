@@ -76,6 +76,7 @@
   await _ensureDiskCache();
   final mem = _getUrl(key);
   if (mem != null) return mem;
+  if (DataCache.strictOffline) return lastfmUrl ?? &#39;&#39;;
 
   final ytMusic = await _ytMusicSearch(&#39;$artist $track&#39;, &#39;song&#39;, expectArtist: artist, expectTitle: track);
   if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic, &#39;ytmusic&#39;);

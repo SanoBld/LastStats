@@ -79,6 +79,7 @@
   if (track.isNotEmpty ? !cfg.tracks : !cfg.albums) return null;
   final key = &#39;${_norm(artist)}|${_norm(album)}|${_norm(track)}|${cfg.sig}&#39;;
   if (_fresh(key)) return _cache[key];
+  if (DataCache.strictOffline) return null;
   &#47;&#47; Bounded: the oldest lookups are dropped so the map never grows forever.
   if (_cache.length &gt;= _maxEntries) _cache.remove(_cache.keys.first);
   try {
