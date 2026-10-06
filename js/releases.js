@@ -9,11 +9,19 @@
   const statusEl = document.getElementById('rel-status');
   const moreBtn = document.getElementById('rel-more');
   const filterBtns = document.querySelectorAll('.rel-filter-btn');
+  const rail = document.getElementById('rel-rail');
+  const railInner = document.getElementById('rel-rail-inner');
+  const railFill = document.getElementById('rel-rail-fill');
   if (!list) return;
 
   let releases = [];
   let filter = 'all';
   let shown = PAGE;
+  let visible = []; // releases matching the filter (rail shows all of them)
+  let navItems = [];
+
+  // same id on the card, the rail link and the URL hash
+  const idOf = (rel) => (rel.tag_name || String(rel.id)).replace(/[^\w.-]/g, '_');
 
   const t = (k) => (window.i18n ? i18n.t(k) : k);
   const lang = () => (window.i18n ? i18n.lang : 'fr');
@@ -60,6 +68,7 @@
   function card(rel, isLatest) {
     const el = document.createElement('article');
     el.className = 'rel-card' + (isLatest ? ' is-latest' : '');
+    el.id = idOf(rel);
     const date = rel.published_at
       ? new Date(rel.published_at).toLocaleDateString(lang(), { year: 'numeric', month: 'long', day: 'numeric' }) : '';
     const badges = (isLatest ? `<span class="rel-badge">${esc(t('releases.latest'))}</span>` : '') +
@@ -108,9 +117,68 @@
     list.innerHTML = '';
     const items = releases.filter((r) => filter === 'all' || !r.prerelease);
     const latestId = (releases.find((r) => !r.prerelease) || {}).id;
+    visible = items;
     items.slice(0, shown).forEach((r) => list.appendChild(card(r, r.id === latestId)));
     moreBtn.hidden = items.length <= shown;
+    buildRail();
+    updateRail();
   }
+
+  // left rail: one bookmark per version (all of them, even not rendered yet)
+  function buildRail() {
+    railInner.querySelectorAll('.rel-nav-item').forEach((n) => n.remove());
+    navItems = visible.map((r) => {
+      const a = document.createElement('a');
+      a.className = 'rel-nav-item';
+      a.href = '#' + idOf(r);
+      a.textContent = r.tag_name || r.name;
+      if (r.prerelease) a.insertAdjacentHTML('beforeend', '<span class="rel-nav-pre">pre</span>');
+      a.addEventListener('click', (e) => { e.preventDefault(); goTo(idOf(r), true); });
+      railInner.appendChild(a);
+      return a;
+    });
+    rail.hidden = !navItems.length;
+  }
+
+  // jump to a version; renders more cards first if it is further down the list
+  function goTo(id, pushHash) {
+    const idx = visible.findIndex((r) => idOf(r) === id);
+    if (idx < 0) return;
+    if (idx >= shown) { shown = idx + 1; render(); }
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    el.classList.remove('is-target');
+    void el.offsetWidth;
+    el.classList.add('is-target');
+    if (pushHash) history.replaceState(null, '', '#' + id);
+  }
+
+  // scroll spy: last card above 35% of the viewport is the active one
+  function updateRail() {
+    if (!navItems.length) return;
+    const cards = Array.from(list.querySelectorAll('.rel-card'));
+    let active = 0;
+    cards.forEach((c, i) => { if (c.getBoundingClientRect().top < window.innerHeight * 0.35) active = i; });
+    navItems.forEach((n, i) => {
+      n.classList.toggle('is-active', i === active);
+      n.classList.toggle('is-passed', i <= active);
+    });
+    const cur = navItems[active];
+    if (cur) {
+      railFill.style.height = (cur.offsetTop + cur.offsetHeight / 2) + 'px';
+      // keep the active bookmark visible inside the rail without moving the page
+      const top = cur.offsetTop, h = cur.offsetHeight;
+      if (top < rail.scrollTop) rail.scrollTop = top - 8;
+      else if (top + h > rail.scrollTop + rail.clientHeight) rail.scrollTop = top + h - rail.clientHeight + 8;
+    }
+  }
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => { updateRail(); ticking = false; });
+  }, { passive: true });
 
   filterBtns.forEach((b) => b.addEventListener('click', () => {
     filter = b.getAttribute('data-filter');
@@ -126,6 +194,9 @@
       releases = data.filter((r) => !r.draft);
       statusEl.hidden = true;
       render();
+      // coming from the index version tile: /releases.html#v3.5.0
+      const hash = decodeURIComponent(location.hash.slice(1)).replace(/[^\w.-]/g, '_');
+      if (hash) setTimeout(() => goTo(hash, false), 100);
     })
     .catch(() => {
       statusEl.textContent = t('releases.error');

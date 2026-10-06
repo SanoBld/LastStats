@@ -1,7 +1,7 @@
 /* styles for the versions page (releases.html) */
 /* loads after help.css, before expressive.css */
 
-.releases-section { max-width: 900px; }
+.releases-section { max-width: 1100px; }
 
 .rel-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
 
@@ -76,4 +76,46 @@
 @media (max-width: 640px) {
   .rel-card { padding: 1.2rem 1.2rem; }
   .rel-asset { flex-basis: 100%; }
+}
+
+/* ---------- layout + left bookmark rail ---------- */
+.rel-layout { display: flex; align-items: flex-start; gap: 2.5rem; }
+.rel-main { flex: 1; min-width: 0; }
+.rel-rail { flex: 0 0 8.5rem; position: sticky; top: 6rem; max-height: calc(100vh - 8rem); overflow-y: auto; scrollbar-width: thin; padding: .5rem 0; }
+.rel-rail[hidden] { display: none; }
+.rel-rail-inner { position: relative; padding-left: 1.2rem; }
+/* dotted track, filled solid up to the version you are reading */
+.rel-rail-inner::before {
+  content: ''; position: absolute; left: 3px; top: 0; bottom: 0; width: 2px; border-radius: var(--shape-full);
+  background: repeating-linear-gradient(to bottom, var(--md-outline-variant) 0 4px, transparent 4px 10px);
+}
+.rel-rail-fill { position: absolute; left: 3px; top: 0; width: 2px; height: 0; background: var(--md-primary); border-radius: var(--shape-full); transition: height .25s var(--m3-standard); }
+.rel-nav-item {
+  position: relative; display: block; padding: .45rem .7rem; margin: .1rem 0; border-radius: var(--r-chip);
+  font-size: .85rem; font-weight: 500; color: var(--md-on-surface-variant); text-decoration: none;
+  transition: background-color .2s var(--effects), color .2s var(--effects), border-radius .5s var(--spring-default);
+}
+.rel-nav-item::before {
+  content: ''; position: absolute; left: -1.2rem; top: 50%; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--md-surface-container-high); border: 2px solid var(--md-outline-variant);
+  transform: translate(0, -50%); transition: background .25s var(--m3-standard), border-color .25s var(--m3-standard), transform .25s var(--m3-standard);
+}
+.rel-nav-item.is-passed::before { background: var(--md-primary); border-color: var(--md-primary); }
+.rel-nav-item.is-active { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+.rel-nav-item.is-active::before { transform: translate(0, -50%) scale(1.3); }
+@media (hover: hover) { .rel-nav-item:hover { background: var(--md-surface-container-high); border-radius: var(--r-hover); } }
+.rel-nav-pre { font-size: .62rem; opacity: .7; margin-left: .3rem; text-transform: uppercase; }
+
+/* card you jumped to */
+.rel-card { scroll-margin-top: 6rem; }
+.rel-card.is-target { animation: rel-flash 1.4s var(--m3-standard); }
+@keyframes rel-flash { 0%, 60% { box-shadow: 0 0 0 3px var(--md-primary); } 100% { box-shadow: 0 0 0 3px transparent; } }
+
+/* narrow screens: rail becomes a horizontal strip above the cards */
+@media (max-width: 900px) {
+  .rel-layout { flex-direction: column; gap: 1rem; }
+  .rel-rail { flex: none; position: static; width: 100%; max-height: none; overflow: auto hidden; }
+  .rel-rail-inner { display: flex; gap: .3rem; padding-left: 0; }
+  .rel-rail-inner::before, .rel-rail-fill, .rel-nav-item::before { display: none; }
+  .rel-nav-item { white-space: nowrap; background: var(--md-surface-container-high); }
 }
