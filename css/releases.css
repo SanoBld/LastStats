@@ -81,7 +81,8 @@
 /* ---------- layout + left bookmark rail ---------- */
 .rel-layout { display: flex; align-items: flex-start; gap: 2.5rem; }
 .rel-main { flex: 1; min-width: 0; }
-.rel-rail { flex: 0 0 8.5rem; position: sticky; top: 6rem; max-height: calc(100vh - 8rem); overflow-y: auto; scrollbar-width: thin; padding: .5rem 0; }
+.rel-rail { flex: 0 0 14rem; position: sticky; top: 6rem; max-height: calc(100vh - 8rem); display: flex; flex-direction: column; padding: .5rem 0; }
+.rel-rail-scroll { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
 .rel-rail[hidden] { display: none; }
 .rel-rail-inner { position: relative; padding-left: 1.2rem; }
 /* dotted track, filled solid up to the version you are reading */
@@ -92,7 +93,7 @@
 .rel-rail-fill { position: absolute; left: 3px; top: 0; width: 2px; height: 0; background: var(--md-primary); border-radius: var(--shape-full); transition: height .25s var(--m3-standard); }
 .rel-nav-item {
   position: relative; display: block; padding: .45rem .7rem; margin: .1rem 0; border-radius: var(--r-chip);
-  font-size: .85rem; font-weight: 500; color: var(--md-on-surface-variant); text-decoration: none;
+  font-size: .85rem; font-weight: 500; color: var(--md-on-surface-variant); text-decoration: none; white-space: nowrap;
   transition: background-color .2s var(--effects), color .2s var(--effects), border-radius .5s var(--spring-default);
 }
 .rel-nav-item::before {
@@ -150,3 +151,21 @@
 .rel-notes tbody tr:last-child td { border-bottom: none; }
 .rel-notes tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--md-surface-container-high) 40%, transparent); }
 .rel-card.is-latest .rel-notes th { background: rgba(255, 255, 255, .25); }
+
+/* search box above the table of contents */
+.rel-search {
+  width: 100%; min-height: 40px; margin: 0 0 .8rem; padding: 0 1rem; box-sizing: border-box;
+  border: none; border-radius: 20px; outline: none; font-family: inherit; font-size: .85rem;
+  background: var(--md-surface-container-high); color: var(--md-on-surface);
+  box-shadow: inset 0 0 0 2px transparent; transition: box-shadow .2s var(--effects);
+}
+.rel-search:focus { box-shadow: inset 0 0 0 2px var(--md-primary); }
+.rel-search::placeholder { color: var(--md-on-surface-variant); }
+.rel-nav-item[hidden] { display: none; }
+.rel-rail-empty { font-size: .82rem; color: var(--md-on-surface-variant); margin: .3rem .7rem; }
+.rel-rail-empty[hidden] { display: none; }
+.rel-rail.is-searching .rel-rail-fill, .rel-rail.is-searching .rel-rail-inner::before { display: none; }
+@media (max-width: 900px) {
+  .rel-rail-scroll { overflow: auto hidden; }
+  .rel-rail { max-height: none; }
+}

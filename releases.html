@@ -65,9 +65,13 @@
       <!-- bookmark rail: every version, click to jump, lights up while you scroll -->
       <aside class="rel-rail" id="rel-rail" aria-label="Versions" hidden>
         <h2 class="rel-rail-title" data-i18n="releases.toc">Sommaire</h2>
-        <div class="rel-rail-inner" id="rel-rail-inner">
-          <div class="rel-rail-fill" id="rel-rail-fill"></div>
+        <input type="search" class="rel-search" id="rel-search" autocomplete="off" spellcheck="false" placeholder="Rechercher…" aria-label="Rechercher">
+        <div class="rel-rail-scroll" id="rel-rail-scroll">
+          <div class="rel-rail-inner" id="rel-rail-inner">
+            <div class="rel-rail-fill" id="rel-rail-fill"></div>
+          </div>
         </div>
+        <p class="rel-rail-empty" id="rel-rail-empty" hidden data-i18n="releases.no_match">Aucun résultat</p>
       </aside>
       <div class="rel-main">
         <p class="rel-status" id="rel-status" data-i18n="releases.loading">Chargement des versions…</p>

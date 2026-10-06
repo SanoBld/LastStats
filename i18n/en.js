@@ -216,5 +216,7 @@ window.I18N.en = {
   "releases.nav": "Versions",
   "releases.filter_beta": "Beta",
   "releases.toc": "Contents",
-  "releases.empty": "No versions in this category."
+  "releases.empty": "No versions in this category.",
+  "releases.search": "Search…",
+  "releases.no_match": "No results"
 };
