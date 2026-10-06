@@ -220,3 +220,22 @@ a, button { touch-action: manipulation; }
 }
 /* version tile is a link now */
 a.gh-stat { text-decoration: none; cursor: pointer; }
+
+/* ---------- Responsive safety net (all pages) ---------- */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: 5.5rem; }
+body { overflow-x: clip; }              /* no sideways scroll, and sticky still works */
+img, video { max-width: 100%; height: auto; }
+.help-card, .rel-card, .about-app, .project-page-desc { overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+  .project-page-title { font-size: clamp(1.9rem, 9vw, 2.6rem); }
+  .project-page-desc { font-size: .95rem; }
+  .footer { padding: 2rem 1.2rem; }
+  .footer .footer-links { gap: .6rem 1.1rem; }
+  .footer .footer-links a { padding: .3rem 0; }   /* bigger tap area */
+}
+@media (max-width: 400px) {
+  section { padding-left: 1rem; padding-right: 1rem; }
+  .nav { padding-left: 1rem; padding-right: 1rem; }
+}
+/* phones in landscape: the nav should not eat the screen */
+@media (max-height: 480px) and (orientation: landscape) { .nav { padding-top: .5rem; padding-bottom: .5rem; } }
