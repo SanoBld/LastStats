@@ -216,5 +216,7 @@ window.I18N.fr = {
   "releases.nav": "Versions",
   "releases.filter_beta": "Bêta",
   "releases.toc": "Sommaire",
-  "releases.empty": "Aucune version dans cette catégorie."
+  "releases.empty": "Aucune version dans cette catégorie.",
+  "releases.search": "Rechercher…",
+  "releases.no_match": "Aucun résultat"
 };

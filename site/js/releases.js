@@ -12,6 +12,9 @@
   const rail = document.getElementById('rel-rail');
   const railInner = document.getElementById('rel-rail-inner');
   const railFill = document.getElementById('rel-rail-fill');
+  const railScroll = document.getElementById('rel-rail-scroll');
+  const searchEl = document.getElementById('rel-search');
+  const railEmpty = document.getElementById('rel-rail-empty');
   if (!list) return;
 
   let releases = [];
@@ -224,7 +227,23 @@
       return a;
     });
     rail.hidden = !navItems.length;
+    searchEl.placeholder = t('releases.search');
+    applySearch();
   }
+
+  // hide the bookmarks that do not match the search box
+  function applySearch() {
+    const q = searchEl.value.trim().toLowerCase();
+    let count = 0;
+    navItems.forEach((n) => {
+      const hit = !q || n.textContent.toLowerCase().includes(q);
+      n.hidden = !hit;
+      if (hit) count++;
+    });
+    rail.classList.toggle('is-searching', !!q);
+    railEmpty.hidden = !q || count > 0;
+  }
+  searchEl.addEventListener('input', applySearch);
 
   // jump to a version; renders more cards first if it is further down the list
   function goTo(id, pushHash) {
@@ -254,9 +273,11 @@
     if (cur) {
       railFill.style.height = (cur.offsetTop + cur.offsetHeight / 2) + 'px';
       // keep the active bookmark visible inside the rail without moving the page
-      const top = cur.offsetTop, h = cur.offsetHeight;
-      if (top < rail.scrollTop) rail.scrollTop = top - 8;
-      else if (top + h > rail.scrollTop + rail.clientHeight) rail.scrollTop = top + h - rail.clientHeight + 8;
+      if (!cur.hidden) {
+        const top = cur.offsetTop, h = cur.offsetHeight;
+        if (top < railScroll.scrollTop) railScroll.scrollTop = top - 8;
+        else if (top + h > railScroll.scrollTop + railScroll.clientHeight) railScroll.scrollTop = top + h - railScroll.clientHeight + 8;
+      }
     }
   }
   let ticking = false;
