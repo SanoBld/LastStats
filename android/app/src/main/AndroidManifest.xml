@@ -43,6 +43,7 @@
 
     <application
         android:label="LastStats"
+        android:allowBackup="false"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
