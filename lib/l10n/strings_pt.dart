@@ -26,7 +26,6 @@ class AppStringsPt implements AppStrings {
   @override String get cacheUsage                  => 'Uso';
   @override String get cacheLimit                  => 'Limite de armazenamento';
   @override String get cacheLimitHint              => 'Ao atingir o limite, as imagens menos recentes são excluídas automaticamente.';
-  @override String get cacheOffline                => 'Modo offline';
   @override String get cacheClearSection           => 'Limpar';
   @override String get cacheImages                 => 'Imagens';
   @override String get cacheImagesSubtitle         => 'Capas de artistas, álbuns e faixas';
@@ -40,8 +39,6 @@ class AppStringsPt implements AppStrings {
   @override String get cacheConfirmAllTitle        => 'Limpar todo o cache?';
   @override String get cacheConfirmAllBody         => 'Imagens, dados da API e histórico serão excluídos.';
   @override String get cacheDelete                 => 'Excluir';
-  @override String get cacheOfflineTitle           => 'Mostrar dados em cache offline';
-  @override String get cacheOfflineSubtitle        => 'Dados expirados continuam visíveis se não houver rede disponível.';
 
   @override String get commonArtists          => 'Artistas';
   @override String get commonAlbums           => 'Álbuns';

@@ -24,7 +24,6 @@ class AppStringsDe implements AppStrings {
   @override String get cacheUsage => 'Belegung';
   @override String get cacheLimit => 'Speicherlimit';
   @override String get cacheLimitHint => 'Wird das Limit erreicht, werden die am längsten nicht verwendeten Bilder automatisch gelöscht.';
-  @override String get cacheOffline => 'Offline-Modus';
   @override String get cacheClearSection => 'Leeren';
   @override String get cacheImages => 'Bilder';
   @override String get cacheImagesSubtitle => 'Cover von Künstlern, Alben und Titeln';
@@ -38,8 +37,6 @@ class AppStringsDe implements AppStrings {
   @override String get cacheConfirmAllTitle => 'Gesamten Cache löschen?';
   @override String get cacheConfirmAllBody => 'Bilder, API-Daten und Scrobble-Verlauf werden vollständig gelöscht.';
   @override String get cacheDelete => 'Löschen';
-  @override String get cacheOfflineTitle => 'Zwischengespeicherte Daten offline anzeigen';
-  @override String get cacheOfflineSubtitle => 'Abgelaufene Daten werden trotzdem angezeigt, wenn keine Verbindung besteht.';
   @override String get commonArtists => 'Künstler';
   @override String get commonAlbums => 'Alben';
   @override String get commonTracks => 'Titel';

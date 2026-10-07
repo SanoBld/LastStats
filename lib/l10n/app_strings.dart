@@ -26,7 +26,6 @@ abstract class AppStrings {
   String get cacheUsage;
   String get cacheLimit;
   String get cacheLimitHint;
-  String get cacheOffline;
   String get cacheClearSection;
   String get cacheImages;
   String get cacheImagesSubtitle;
@@ -40,8 +39,6 @@ abstract class AppStrings {
   String get cacheConfirmAllTitle;
   String get cacheConfirmAllBody;
   String get cacheDelete;
-  String get cacheOfflineTitle;
-  String get cacheOfflineSubtitle;
 
   // ── Common ───────────────────────────────────────────────────────────────
   String get commonArtists;

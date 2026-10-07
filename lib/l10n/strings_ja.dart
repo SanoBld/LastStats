@@ -24,7 +24,6 @@ class AppStringsJa implements AppStrings {
   @override String get cacheUsage => '使用量';
   @override String get cacheLimit => 'ストレージ上限';
   @override String get cacheLimitHint => '上限に達すると、最も使われていない画像が自動的に削除されます。';
-  @override String get cacheOffline => 'オフラインモード';
   @override String get cacheClearSection => '消去';
   @override String get cacheImages => '画像';
   @override String get cacheImagesSubtitle => 'アーティスト・アルバム・トラックのアートワーク';
@@ -38,8 +37,6 @@ class AppStringsJa implements AppStrings {
   @override String get cacheConfirmAllTitle => 'すべてのキャッシュを消去しますか？';
   @override String get cacheConfirmAllBody => '画像、APIデータ、スクロブル履歴がすべて削除されます。';
   @override String get cacheDelete => '削除';
-  @override String get cacheOfflineTitle => 'オフライン時にキャッシュデータを表示';
-  @override String get cacheOfflineSubtitle => 'ネットワークが利用できない場合、期限切れのデータも表示されます。';
   @override String get commonArtists => 'アーティスト';
   @override String get commonAlbums => 'アルバム';
   @override String get commonTracks => 'トラック';

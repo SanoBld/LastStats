@@ -26,7 +26,6 @@ class AppStringsZh implements AppStrings {
   @override String get cacheUsage                  => '已用空间';
   @override String get cacheLimit                  => '存储上限';
   @override String get cacheLimitHint              => '达到上限后，最久未使用的图片会自动删除。';
-  @override String get cacheOffline                => '离线模式';
   @override String get cacheClearSection           => '清理';
   @override String get cacheImages                 => '图片';
   @override String get cacheImagesSubtitle         => '艺术家、专辑、歌曲封面';
@@ -40,8 +39,6 @@ class AppStringsZh implements AppStrings {
   @override String get cacheConfirmAllTitle        => '清空全部缓存？';
   @override String get cacheConfirmAllBody         => '图片、API 数据和历史记录都将被删除。';
   @override String get cacheDelete                 => '删除';
-  @override String get cacheOfflineTitle           => '离线时显示缓存数据';
-  @override String get cacheOfflineSubtitle        => '无网络时仍显示过期数据。';
 
   @override String get commonArtists          => '艺术家';
   @override String get commonAlbums           => '专辑';

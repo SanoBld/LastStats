@@ -24,7 +24,6 @@ class AppStringsRu implements AppStrings {
   @override String get cacheUsage => 'Использовано';
   @override String get cacheLimit => 'Лимит хранилища';
   @override String get cacheLimitHint => 'По достижении лимита давно не используемые изображения удаляются автоматически.';
-  @override String get cacheOffline => 'Офлайн-режим';
   @override String get cacheClearSection => 'Очистить';
   @override String get cacheImages => 'Изображения';
   @override String get cacheImagesSubtitle => 'Обложки исполнителей, альбомов и треков';
@@ -38,8 +37,6 @@ class AppStringsRu implements AppStrings {
   @override String get cacheConfirmAllTitle => 'Очистить весь кэш?';
   @override String get cacheConfirmAllBody => 'Изображения, данные API и история скробблов будут полностью удалены.';
   @override String get cacheDelete => 'Удалить';
-  @override String get cacheOfflineTitle => 'Показывать кэшированные данные офлайн';
-  @override String get cacheOfflineSubtitle => 'Устаревшие данные всё равно отображаются, если нет сети.';
   @override String get commonArtists => 'Исполнители';
   @override String get commonAlbums => 'Альбомы';
   @override String get commonTracks => 'Треки';

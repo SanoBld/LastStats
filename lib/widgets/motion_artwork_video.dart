@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import '../services/motion_artwork_service.dart';
 import '../services/video_disk_cache.dart';
-import '../services/data_cache.dart';
 
 class MotionArtworkVideo extends StatefulWidget {
   final String url;
@@ -102,7 +101,6 @@ class _MotionArtworkVideoState extends State<MotionArtworkVideo>
       // YouTube links expire and are never cached.
       if (!isYt) c = await VideoDiskCache.localController(url, options);
       fromDisk = c != null;
-      if (c == null && DataCache.strictOffline) return false;
       // YouTube refuses links sent with another User-Agent than the client
       // that produced them.
       c ??= VideoPlayerController.networkUrl(Uri.parse(url),

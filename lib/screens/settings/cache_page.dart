@@ -4,7 +4,6 @@ import 'settings_helpers.dart';
 import 'settings_rows.dart';
 import '../../theme/m3_shapes.dart';
 import '../../widgets/skeleton.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/storage_manager.dart';
 import '../../services/data_cache.dart';
 import '../../services/scrobbles_file_cache.dart';
@@ -235,7 +234,6 @@ Expanded(
                         style: text.bodySmall
                             ?.copyWith(color: scheme.onSurfaceVariant)),
                   ),
-                  _OfflineModeCard(scheme: scheme, text: text),
                 ]),
 
                 const SizedBox(height: 20),
@@ -416,51 +414,4 @@ class _Bar extends StatelessWidget {
       ),
     ]);
   }
-}
-
-// ── Offline mode toggle ───────────────────────────────────────────────────────
-
-class _OfflineModeCard extends StatefulWidget {
-  final ColorScheme scheme;
-  final TextTheme   text;
-
-  const _OfflineModeCard({
-    required this.scheme,
-    required this.text,
-  });
-
-  @override
-  State<_OfflineModeCard> createState() => _OfflineModeCardState();
-}
-
-class _OfflineModeCardState extends State<_OfflineModeCard> {
-  bool _keepStale = false;
-
-  @override
-  void initState() {
-    super.initState();
-    SharedPreferences.getInstance().then((p) {
-      if (mounted) {
-        setState(() {
-        _keepStale = p.getBool('ls_offline_strict') ?? false;
-      });
-      }
-    });
-  }
-
-  Future<void> _toggle(bool v) async {
-    setState(() => _keepStale = v);
-    DataCache.strictOffline = v;
-    final p = await SharedPreferences.getInstance();
-    await p.setBool('ls_offline_strict', v);
-  }
-
-  @override
-  Widget build(BuildContext context) => SettingSwitchRow(
-        icon: Icons.cloud_off_rounded,
-        title: L.cacheOfflineTitle,
-        subtitle: L.cacheOfflineSubtitle,
-        value: _keepStale,
-        onChanged: _toggle,
-      );
 }

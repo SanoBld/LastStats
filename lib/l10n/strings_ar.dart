@@ -24,7 +24,6 @@ class AppStringsAr implements AppStrings {
   @override String get cacheUsage => 'الاستخدام';
   @override String get cacheLimit => 'حد التخزين';
   @override String get cacheLimitHint => 'عند بلوغ الحد، تُحذف الصور الأقل استخدامًا تلقائيًا.';
-  @override String get cacheOffline => 'وضع عدم الاتصال';
   @override String get cacheClearSection => 'مسح';
   @override String get cacheImages => 'الصور';
   @override String get cacheImagesSubtitle => 'أغلفة الفنانين والألبومات والمقاطع';
@@ -38,8 +37,6 @@ class AppStringsAr implements AppStrings {
   @override String get cacheConfirmAllTitle => 'مسح كل التخزين المؤقت؟';
   @override String get cacheConfirmAllBody => 'ستُحذف الصور وبيانات API وسجل التشغيل بالكامل.';
   @override String get cacheDelete => 'حذف';
-  @override String get cacheOfflineTitle => 'عرض البيانات المخزنة عند عدم الاتصال';
-  @override String get cacheOfflineSubtitle => 'تُعرض البيانات المنتهية الصلاحية إذا تعذّر الاتصال بالشبكة.';
   @override String get commonArtists => 'الفنانون';
   @override String get commonAlbums => 'الألبومات';
   @override String get commonTracks => 'المقاطع';

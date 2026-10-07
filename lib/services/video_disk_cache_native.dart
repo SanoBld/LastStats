@@ -14,7 +14,6 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
-import 'data_cache.dart';
 
 class VideoDiskCache {
   VideoDiskCache._();
@@ -71,7 +70,7 @@ class VideoDiskCache {
 
   /// Downloads [url] in the background (fire and forget).
   static void storeInBackground(String url) {
-    if (DataCache.strictOffline || !supported || maxBytes < 0 || !_busy.add(url)) return;
+    if (!supported || maxBytes < 0 || !_busy.add(url)) return;
     _store(url).catchError((_) {}).whenComplete(() => _busy.remove(url));
   }
 

@@ -19,7 +19,6 @@ import 'package:flutter/widgets.dart';
 import 'api_http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'offline_image_cache.dart';
-import 'data_cache.dart';
 import 'storage_manager.dart';
 import '../l10n/extra_strings.dart';
 import 'image_sizing.dart';
@@ -215,7 +214,6 @@ class ImageService {
     final mem = _getUrl(key);
     if (mem != null) return mem;
     if (_isNegative(key)) return '';
-    if (DataCache.strictOffline) return _ok(lastfmUrl) ? lastfmUrl! : '';
 
     final hit = await _pick([
       _S('deezer',  () => _deezerArtist(artist)),
@@ -240,7 +238,6 @@ class ImageService {
     final mem = _getUrl(key);
     if (mem != null) return mem;
     if (_isNegative(key)) return '';
-    if (DataCache.strictOffline) return _ok(lastfmUrl) ? lastfmUrl! : '';
 
     final hit = await _pick([
       _S('itunes',  () => _itunesSearch('$artist $album', 'album', null, artist, album)),
@@ -269,7 +266,6 @@ class ImageService {
     final mem = _getUrl(key);
     if (mem != null) return mem;
     if (_isNegative(key)) return '';
-    if (DataCache.strictOffline) return _ok(lastfmUrl) ? lastfmUrl! : '';
 
     final hit = await _pick([
       _S('itunes',  () => _itunesSearch('$artist $track', 'song', null, artist, track)),

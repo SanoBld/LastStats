@@ -171,7 +171,6 @@ Future<void> _mainImpl() async {
   ]);
 
   DataCache.offlineMode = true;
-  DataCache.strictOffline = prefs.getBool('ls_offline_strict') ?? false;
 
   // Fire-and-forget: silently writes a fresh backup file if the automatic
   // backup feature is on AND due (daily/weekly/monthly/yearly — see

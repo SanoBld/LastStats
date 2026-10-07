@@ -31,7 +31,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../widgets/skeleton.dart';
-import 'data_cache.dart';
 import 'storage_manager.dart';
 import 'image_sizing.dart';
 
@@ -203,7 +202,6 @@ class OfflineImageCache {
     }
 
     // Not cached yet → start background download, return network for now.
-    if (DataCache.strictOffline) return const AssetImage('');
     _downloadAndCache(url).ignore();
     return NetworkImage(url);
   }
@@ -216,7 +214,6 @@ class OfflineImageCache {
     await _ensureMeta();
     final cached = await _getBytes(url);
     if (cached != null) return cached;
-    if (DataCache.strictOffline) return null;
     await _downloadAndCache(url);
     return _getBytes(url);
   }
@@ -364,7 +361,6 @@ class OfflineImageCache {
   // ── Background download ───────────────────────────────────────────────────
 
   static Future<void> _downloadAndCache(String url) {
-    if (DataCache.strictOffline) return Future.value();
     final now = DateTime.now().millisecondsSinceEpoch;
     final blockedUntil = _failedUntil[url];
     if (blockedUntil != null) {
@@ -484,9 +480,6 @@ class OfflineImageCache {
           );
         }
 
-        if (DataCache.strictOffline) {
-          return errorWidget ?? placeholder ?? const SizedBox.shrink();
-        }
         _downloadAndCache(url).ignore();
 
         final dpr = MediaQuery.of(context).devicePixelRatio;

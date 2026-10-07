@@ -26,7 +26,6 @@ class AppStringsFr implements AppStrings {
   @override String get cacheUsage                  => 'Utilisation';
   @override String get cacheLimit                  => 'Limite de stockage';
   @override String get cacheLimitHint              => 'Quand la limite est atteinte, les images les moins récentes sont supprimées automatiquement.';
-  @override String get cacheOffline                => 'Mode hors ligne';
   @override String get cacheClearSection           => 'Nettoyer';
   @override String get cacheImages                 => 'Images';
   @override String get cacheImagesSubtitle         => 'Artwork artistes, albums, titres';
@@ -40,8 +39,6 @@ class AppStringsFr implements AppStrings {
   @override String get cacheConfirmAllTitle        => 'Vider tout le cache ?';
   @override String get cacheConfirmAllBody         => 'Images, données API et historique seront supprimés.';
   @override String get cacheDelete                 => 'Supprimer';
-  @override String get cacheOfflineTitle           => 'Mode hors ligne';
-  @override String get cacheOfflineSubtitle        => 'Aucune requête image ou vidéo : seuls les médias déjà stockés s\'affichent.';
 
   @override String get commonArtists          => 'Artistes';
   @override String get commonAlbums           => 'Albums';
