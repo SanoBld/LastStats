@@ -1,6 +1,11 @@
 // lib/services/image_service.dart
 //
-// Resolves artwork URLs from Last.fm → YouTube Music → iTunes → Deezer → MusicBrainz.
+// Resolves artwork URLs. Priority (best first, Last.fm = last resort because
+// its artist images are a grey star since 2019 and albums are only ~300px):
+//   Artist: Deezer > YouTube Music > TheAudioDB > MusicBrainz > Wikipedia > Last.fm
+//   Album : iTunes > Deezer > YouTube Music > CoverArtArchive > TheAudioDB > Wikipedia > Last.fm
+//   Track : iTunes > Deezer > YouTube Music > TheAudioDB > album cover > Wikipedia > Last.fm
+// The first 3 sources run in parallel (result keeps priority order).
 // Downloads and caches image bytes via OfflineImageCache for offline use.
 //
 // Main entry points:
@@ -17,6 +22,13 @@ import 'offline_image_cache.dart';
 import 'data_cache.dart';
 import 'storage_manager.dart';
 import '../l10n/extra_strings.dart';
+import 'image_sizing.dart';
+
+class _S {
+  final String name;
+  final Future<String> Function() run;
+  const _S(this.name, this.run);
+}
 
 class ImageService {
   ImageService._();
@@ -107,7 +119,7 @@ class ImageService {
           // Entries cached before source-tracking existed have no 'source'
           // field — rather than show a guessed/fake source for those, drop
           // them so they get re-resolved (and properly tagged) next time.
-          if (url.isEmpty || src.isEmpty || (now - ts) > _diskTtlMs) {
+          if (url.isEmpty || src.isEmpty || url.contains(_placeholder) || (now - ts) > _diskTtlMs) {
             _prefs!.remove(k).ignore();
             continue;
           }
@@ -144,8 +156,8 @@ class ImageService {
         jsonEncode({'url': url, 'ts': DateTime.now().millisecondsSinceEpoch, 'source': source}),
       );
     } catch (_) {}
-    // Kick off background byte download.
-    _cacheBytes(url);
+    // Background download at list size (bigger sizes load on demand).
+    _cacheBytes(sizedImageUrl(url, 120, 2.0));
     return url;
   }
 
@@ -195,7 +207,7 @@ class ImageService {
 
   static Future<String> resolveArtist(String artist, {String? lastfmUrl}) =>
       _once('artist|$artist', () => _resolveArtist(artist, lastfmUrl: lastfmUrl))
-          .timeout(_maxResolve, onTimeout: () => lastfmUrl ?? '');
+          .timeout(_maxResolve, onTimeout: () => _ok(lastfmUrl) ? lastfmUrl! : '');
 
   static Future<String> _resolveArtist(String artist, {String? lastfmUrl}) async {
     final key = 'artist|$artist';
@@ -203,43 +215,24 @@ class ImageService {
     final mem = _getUrl(key);
     if (mem != null) return mem;
     if (_isNegative(key)) return '';
-    if (DataCache.strictOffline) return lastfmUrl ?? '';
+    if (DataCache.strictOffline) return _ok(lastfmUrl) ? lastfmUrl! : '';
 
-    // YouTube Music moved down for artists specifically: artist photos on
-    // there are often non-square (banners, portraits) and its thumbnail
-    // proxy can distort them in the app's square/round artist thumbnails —
-    // iTunes/Deezer's catalog art is consistently well-cropped for artists.
-    // (iTunes skipped: its artist results have no picture.)
-
-    final deezer = await _deezerArtist(artist);
-    if (deezer.isNotEmpty) return _persistUrl(key, deezer, 'deezer');
-
-    final audioDb = await _audioDbArtist(artist);
-    if (audioDb.isNotEmpty) return _persistUrl(key, audioDb, 'audiodb');
-
-    final ytMusic = await _ytMusicSearch(artist, 'artist', expectArtist: artist);
-    if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic, 'ytmusic');
-
-    final mb = await _mbArtistImage(artist);
-    if (mb.isNotEmpty) return _persistUrl(key, mb, 'musicbrainz');
-
-    final wiki = await _wikipediaImage(artist, expectName: artist);
-    if (wiki.isNotEmpty) return _persistUrl(key, wiki, 'wikipedia');
-
-    // Last.fm last — its own catalog images are usually much lower
-    // resolution (~300px) than the sources above, so it's a fallback here
-    // rather than an automatic first pick.
-    if (_ok(lastfmUrl)) {
-      _cacheBytes(lastfmUrl!);
-      return _persistUrl(key, lastfmUrl, 'lastfm');
-    }
-
+    final hit = await _pick([
+      _S('deezer',  () => _deezerArtist(artist)),
+      _S('ytmusic', () => _ytMusicSearch(artist, 'artist', expectArtist: artist)),
+      _S('audiodb', () => _audioDbArtist(artist)),
+    ], [
+      _S('musicbrainz', () => _mbArtistImage(artist)),
+      _S('wikipedia',   () => _wikipediaImage(artist, expectName: artist)),
+    ]);
+    if (hit != null) return _persistUrl(key, hit.value, hit.key);
+    if (_ok(lastfmUrl)) return _persistUrl(key, lastfmUrl!, 'lastfm');
     return _persistUrl(key, '');
   }
 
   static Future<String> resolveAlbum(String album, String artist, {String? lastfmUrl}) =>
       _once('album|$artist|$album', () => _resolveAlbum(album, artist, lastfmUrl: lastfmUrl))
-          .timeout(_maxResolve, onTimeout: () => lastfmUrl ?? '');
+          .timeout(_maxResolve, onTimeout: () => _ok(lastfmUrl) ? lastfmUrl! : '');
 
   static Future<String> _resolveAlbum(String album, String artist, {String? lastfmUrl}) async {
     final key = 'album|$artist|$album';
@@ -247,31 +240,19 @@ class ImageService {
     final mem = _getUrl(key);
     if (mem != null) return mem;
     if (_isNegative(key)) return '';
-    if (DataCache.strictOffline) return lastfmUrl ?? '';
+    if (DataCache.strictOffline) return _ok(lastfmUrl) ? lastfmUrl! : '';
 
-    final ytMusic = await _ytMusicSearch('$artist $album', 'album', expectArtist: artist, expectTitle: album);
-    if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic, 'ytmusic');
-
-    final itunes = await _itunesSearch('$artist $album', 'album', null, artist, album);
-    if (itunes.isNotEmpty) return _persistUrl(key, itunes, 'itunes');
-
-    final deezer = await _deezerAlbum(album, artist);
-    if (deezer.isNotEmpty) return _persistUrl(key, deezer, 'deezer');
-
-    final audioDb = await _audioDbAlbum(album, artist);
-    if (audioDb.isNotEmpty) return _persistUrl(key, audioDb, 'audiodb');
-
-    final mb = await _mbAlbum(album, artist);
-    if (mb.isNotEmpty) return _persistUrl(key, mb, 'musicbrainz');
-
-    final wiki = await _wikipediaImage('$artist $album album', expectName: album);
-    if (wiki.isNotEmpty) return _persistUrl(key, wiki, 'wikipedia');
-
-    if (_ok(lastfmUrl)) {
-      _cacheBytes(lastfmUrl!);
-      return _persistUrl(key, lastfmUrl, 'lastfm');
-    }
-
+    final hit = await _pick([
+      _S('itunes',  () => _itunesSearch('$artist $album', 'album', null, artist, album)),
+      _S('deezer',  () => _deezerAlbum(album, artist)),
+      _S('ytmusic', () => _ytMusicSearch('$artist $album', 'album', expectArtist: artist, expectTitle: album)),
+    ], [
+      _S('musicbrainz', () => _mbAlbum(album, artist)),
+      _S('audiodb',     () => _audioDbAlbum(album, artist)),
+      _S('wikipedia',   () => _wikipediaImage('$artist $album album', expectName: album)),
+    ]);
+    if (hit != null) return _persistUrl(key, hit.value, hit.key);
+    if (_ok(lastfmUrl)) return _persistUrl(key, lastfmUrl!, 'lastfm');
     return _persistUrl(key, '');
   }
 
@@ -279,7 +260,7 @@ class ImageService {
           {String? lastfmUrl, String album = ''}) =>
       _once('track|$artist|$track',
           () => _resolveTrack(track, artist, lastfmUrl: lastfmUrl, album: album))
-          .timeout(_maxResolve, onTimeout: () => lastfmUrl ?? '');
+          .timeout(_maxResolve, onTimeout: () => _ok(lastfmUrl) ? lastfmUrl! : '');
 
   static Future<String> _resolveTrack(String track, String artist,
       {String? lastfmUrl, String album = ''}) async {
@@ -288,35 +269,36 @@ class ImageService {
     final mem = _getUrl(key);
     if (mem != null) return mem;
     if (_isNegative(key)) return '';
-    if (DataCache.strictOffline) return lastfmUrl ?? '';
+    if (DataCache.strictOffline) return _ok(lastfmUrl) ? lastfmUrl! : '';
 
-    final ytMusic = await _ytMusicSearch('$artist $track', 'song', expectArtist: artist, expectTitle: track);
-    if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic, 'ytmusic');
-
-    final itunes = await _itunesSearch('$artist $track', 'song', null, artist, track);
-    if (itunes.isNotEmpty) return _persistUrl(key, itunes, 'itunes');
-
-    final deezer = await _deezerTrack(track, artist);
-    if (deezer.isNotEmpty) return _persistUrl(key, deezer, 'deezer');
-
-    final audioDb = await _audioDbTrack(track, artist);
-    if (audioDb.isNotEmpty) return _persistUrl(key, audioDb, 'audiodb');
-
-    // Reuses album cover art if the caller knows the parent album.
-    if (album.isNotEmpty) {
-      final mb = await _mbAlbum(album, artist);
-      if (mb.isNotEmpty) return _persistUrl(key, mb, 'musicbrainz');
-    }
-
-    final wiki = await _wikipediaImage('$artist $track song', expectName: track);
-    if (wiki.isNotEmpty) return _persistUrl(key, wiki, 'wikipedia');
-
-    if (_ok(lastfmUrl)) {
-      _cacheBytes(lastfmUrl!);
-      return _persistUrl(key, lastfmUrl, 'lastfm');
-    }
-
+    final hit = await _pick([
+      _S('itunes',  () => _itunesSearch('$artist $track', 'song', null, artist, track)),
+      _S('deezer',  () => _deezerTrack(track, artist)),
+      _S('ytmusic', () => _ytMusicSearch('$artist $track', 'song', expectArtist: artist, expectTitle: track)),
+    ], [
+      _S('audiodb', () => _audioDbTrack(track, artist)),
+      if (album.isNotEmpty) _S('musicbrainz', () => _mbAlbum(album, artist)),
+      _S('wikipedia', () => _wikipediaImage('$artist $track song', expectName: track)),
+    ]);
+    if (hit != null) return _persistUrl(key, hit.value, hit.key);
+    if (_ok(lastfmUrl)) return _persistUrl(key, lastfmUrl!, 'lastfm');
     return _persistUrl(key, '');
+  }
+
+  // ── Source priority helper ────────────────────────────────────────────────
+  // [fast] sources start together (parallel) but are read in priority order;
+  // [slow] ones (rate-limited MusicBrainz, Wikipedia) only run if all failed.
+  static Future<MapEntry<String, String>?> _pick(List<_S> fast, List<_S> slow) async {
+    final running = [for (final e in fast) e.run().catchError((_) => '')];
+    for (var i = 0; i < fast.length; i++) {
+      final u = await running[i];
+      if (_ok(u)) return MapEntry(fast[i].name, u);
+    }
+    for (final e in slow) {
+      final u = await e.run().catchError((_) => '');
+      if (_ok(u)) return MapEntry(e.name, u);
+    }
+    return null;
   }
 
   // ── Public: widget helper ─────────────────────────────────────────────────
@@ -393,7 +375,16 @@ class ImageService {
   // ── Helpers ───────────────────────────────────────────────────────────────
 
   static bool _ok(String? url) =>
-      url != null && url.isNotEmpty && !url.contains(_placeholder);
+      url != null && url.isNotEmpty && !url.contains(_placeholder) && !_deezerEmpty(url);
+
+  // Deezer serves a grey default image when it has no real picture.
+  static bool _deezerEmpty(String u) =>
+      u.contains('dzcdn.net') && (u.contains('//1000x1000') || u.contains('/images/artist//') ||
+      u.contains('/images/cover//') || u.contains('d41d8cd98f00b204e9800998ecf8427e'));
+
+  /// Artwork URL rewritten for the size it is shown at (logical px).
+  static String sized(String url, double logicalPx, double dpr) =>
+      sizedImageUrl(url, logicalPx, dpr);
 
   // Normalizes a name for loose comparison: lowercase, strips diacritics,
   // drops a leading "the/a/le/la/les", keeps only letters/digits.

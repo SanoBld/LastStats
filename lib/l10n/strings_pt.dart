@@ -716,6 +716,8 @@ class AppStringsPt implements AppStrings {
   @override String get faqA12 => 'Sim. Em Configurações > Conta, saia e entre novamente com outro nome de usuário. O cache local é limpo automaticamente para evitar misturar dados.';
   @override String get faqQ13 => 'Como configuro as notificações?';
   @override String get faqA13 => 'Em Configurações > Notificações, você pode ativar avisos de sincronização concluída, escolher a frequência ou desativá-los por completo.';
+  @override String get faqQ14 => 'Faltam imagens ou carregam sem parar. O que fazer?';
+  @override String get faqA14 => 'Limpe a cache na app (Definições > Cache) e depois no Android (Definições > Aplicações > LastStats > Armazenamento > Limpar cache). Se continuarem a faltar imagens, faça uma cópia de segurança (Definições > Cópia de segurança), desinstale e reinstale a app e restaure a cópia.';
   @override String get settingsPlatformDisabledByShowAll => 'Desativado: todos os links já estão sendo exibidos.';
   @override String get commonInDevelopment => 'Em desenvolvimento';
   @override String get commonSeeLess => 'Ver menos';

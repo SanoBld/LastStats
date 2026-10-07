@@ -716,6 +716,8 @@ class AppStringsFr implements AppStrings {
   @override String get faqA12 => 'Oui. Depuis Paramètres > Compte, déconnectez-vous puis reconnectez-vous avec un autre nom d\'utilisateur. Le cache local est réinitialisé automatiquement pour éviter tout mélange de données.';
   @override String get faqQ13 => 'Comment configurer les notifications ?';
   @override String get faqA13 => 'Depuis Paramètres > Notifications, vous pouvez activer les alertes de fin de synchronisation, choisir leur fréquence, ou les désactiver complètement si vous préférez.';
+  @override String get faqQ14 => 'Les images manquent ou chargent sans fin. Que faire ?';
+  @override String get faqA14 => 'Videz le cache dans l’application (Paramètres > Cache), puis dans Android (Paramètres > Applications > LastStats > Stockage > Vider le cache). Si les images manquent toujours, sauvegardez vos données (Paramètres > Sauvegarde), désinstallez puis réinstallez l’application, et restaurez la sauvegarde.';
   @override String get settingsPlatformDisabledByShowAll => 'Choix désactivé : tous les liens sont déjà affichés.';
   @override String get commonInDevelopment => 'En développement';
   @override String get commonSeeLess => 'Voir moins';

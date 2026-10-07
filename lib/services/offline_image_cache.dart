@@ -33,6 +33,7 @@ import 'package:flutter/material.dart';
 import '../widgets/skeleton.dart';
 import 'data_cache.dart';
 import 'storage_manager.dart';
+import 'image_sizing.dart';
 
 import 'image_cache_backend_stub.dart'
     if (dart.library.io)   'image_cache_backend_native.dart'
@@ -446,6 +447,14 @@ class OfflineImageCache {
     Widget? placeholder,
     Widget? errorWidget,
   }) {
+    // Download the resolution that matches the on-screen size.
+    final side = (width != null && width.isFinite ? width : 0.0) > (height != null && height.isFinite ? height : 0.0)
+        ? width! : (height != null && height.isFinite ? height : 0.0);
+    if (side > 0) {
+      final dpr = WidgetsBinding.instance.platformDispatcher.views.isNotEmpty
+          ? WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio : 2.0;
+      url = sizedImageUrl(url, side, dpr);
+    }
     final ph = placeholder ?? M3ImagePlaceholder(width: width, height: height);
     if (url.isEmpty) return placeholder ?? const SizedBox.shrink();
 

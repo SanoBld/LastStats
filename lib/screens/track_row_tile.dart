@@ -6,6 +6,7 @@
 //  add-to-folder search so every track list in the app looks the same.
 // ══════════════════════════════════════════════════════════════════════════
 
+import '../services/image_sizing.dart';
 import 'package:flutter/material.dart';
 import '../services/image_service.dart';
 import '../theme/story_style.dart';
@@ -50,7 +51,7 @@ class TrackRowTile extends StatelessWidget {
                       color: scheme.onSecondaryContainer, size: 20),
                 );
               }
-              return Image.network(url, fit: BoxFit.cover, cacheWidth: 160, cacheHeight: 160,
+              return Image.network(sizedImageUrl(url, 48, MediaQuery.of(ctx).devicePixelRatio), fit: BoxFit.cover, cacheWidth: 160, cacheHeight: 160,
                   errorBuilder: (_, _, _) => Container(
                     color: scheme.secondaryContainer,
                     child: Icon(Icons.music_note_rounded,

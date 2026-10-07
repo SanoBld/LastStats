@@ -716,6 +716,8 @@ class AppStringsEn implements AppStrings {
   @override String get faqA12 => 'Yes. From Settings > Account, sign out and sign back in with a different username. The local cache is automatically reset to avoid mixing data.';
   @override String get faqQ13 => 'How do I set up notifications?';
   @override String get faqA13 => 'From Settings > Notifications, you can enable sync-complete alerts, choose how often they appear, or turn them off entirely.';
+  @override String get faqQ14 => 'Artwork is missing or keeps loading. What can I do?';
+  @override String get faqA14 => 'Clear the cache in the app (Settings > Cache), then in Android (Settings > Apps > LastStats > Storage > Clear cache). If images are still missing, back up your data (Settings > Backup), uninstall and reinstall the app, then restore your backup.';
   @override String get settingsPlatformDisabledByShowAll => 'Disabled: all links are already shown.';
   @override String get commonInDevelopment => 'In development';
   @override String get commonSeeLess => 'See less';

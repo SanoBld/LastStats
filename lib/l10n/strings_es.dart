@@ -716,6 +716,8 @@ class AppStringsEs implements AppStrings {
   @override String get faqA12 => 'Sí. Desde Ajustes > Cuenta, cierre sesión y vuelva a iniciarla con otro nombre de usuario. La caché local se reinicia automáticamente para evitar mezclar datos.';
   @override String get faqQ13 => '¿Cómo configuro las notificaciones?';
   @override String get faqA13 => 'Desde Ajustes > Notificaciones, puede activar los avisos de sincronización completada, elegir su frecuencia o desactivarlos por completo.';
+  @override String get faqQ14 => 'Faltan imágenes o cargan sin fin. ¿Qué hago?';
+  @override String get faqA14 => 'Vacía la caché en la app (Ajustes > Caché) y luego en Android (Ajustes > Aplicaciones > LastStats > Almacenamiento > Borrar caché). Si siguen faltando imágenes, haz una copia de seguridad (Ajustes > Copia de seguridad), desinstala y reinstala la app y restaura la copia.';
   @override String get settingsPlatformDisabledByShowAll => 'Desactivado: ya se muestran todos los enlaces.';
   @override String get commonInDevelopment => 'En desarrollo';
   @override String get commonSeeLess => 'Ver menos';

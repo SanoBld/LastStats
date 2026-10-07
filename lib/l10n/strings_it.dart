@@ -650,6 +650,8 @@ class AppStringsIt implements AppStrings {
   @override String get faqA12 => 'Sì. Da Impostazioni > Account, esca e acceda di nuovo con un altro nome utente. La cache locale viene azzerata automaticamente per evitare di mescolare i dati.';
   @override String get faqQ13 => 'Come configuro le notifiche?';
   @override String get faqA13 => 'Da Impostazioni > Notifiche può attivare gli avvisi di sincronizzazione completata, sceglierne la frequenza o disattivarli del tutto.';
+  @override String get faqQ14 => 'Mancano le immagini o caricano all’infinito. Cosa fare?';
+  @override String get faqA14 => 'Svuota la cache nell’app (Impostazioni > Cache), poi in Android (Impostazioni > App > LastStats > Archiviazione > Svuota cache). Se le immagini mancano ancora, fai un backup (Impostazioni > Backup), disinstalla e reinstalla l’app, poi ripristina il backup.';
   @override String get settingsPlatformDisabledByShowAll => 'Disattivato: tutti i link sono già mostrati.';
   @override String get commonInDevelopment => 'In sviluppo';
   @override String get commonSeeLess => 'Vedi meno';

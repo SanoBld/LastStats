@@ -650,6 +650,8 @@ class AppStringsAr implements AppStrings {
   @override String get faqA12 => 'نعم. من الإعدادات > الحساب، سجّل الخروج ثم سجّل الدخول باسم مستخدم آخر. تتم إعادة ضبط التخزين المؤقت المحلي تلقائيًا لتجنب اختلاط البيانات.';
   @override String get faqQ13 => 'كيف أضبط الإشعارات؟';
   @override String get faqA13 => 'من الإعدادات > الإشعارات، يمكنك تفعيل تنبيهات اكتمال المزامنة واختيار تكرارها أو إيقافها بالكامل.';
+  @override String get faqQ14 => 'الصور مفقودة أو تحمّل بلا نهاية. ماذا أفعل؟';
+  @override String get faqA14 => 'امسح الذاكرة المؤقتة داخل التطبيق (الإعدادات > الذاكرة المؤقتة) ثم في أندرويد (الإعدادات > التطبيقات > LastStats > التخزين > مسح الذاكرة المؤقتة). إذا بقيت الصور مفقودة، انسخ بياناتك احتياطيًا (الإعدادات > النسخ الاحتياطي) ثم احذف التطبيق وأعد تثبيته واستعد النسخة.';
   @override String get settingsPlatformDisabledByShowAll => 'معطّل: يتم عرض جميع الروابط بالفعل.';
   @override String get commonInDevelopment => 'قيد التطوير';
   @override String get commonSeeLess => 'عرض أقل';

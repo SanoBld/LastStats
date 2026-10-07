@@ -13,6 +13,7 @@
 //    • Rail destinations are scrollable when they overflow
 // ══════════════════════════════════════════════════════════════════════════
 
+import '../services/image_sizing.dart';
 import 'dart:async';
 import 'dart:math' show sqrt;
 import 'dart:math' as math;

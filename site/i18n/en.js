@@ -142,6 +142,8 @@ window.I18N.en = {
   "help.yes_from_settings_account_sign": "Yes. From Settings > Account, sign out and sign back in with a different username. The local cache is automatically reset to avoid mixing data.",
   "help.how_do_i_set_up": "How do I set up notifications?",
   "help.from_settings_notifications_you_can": "From Settings > Notifications, you can enable sync-complete alerts, choose how often they appear, or turn them off entirely.",
+  "help.images_missing_q": "Artwork is missing or keeps loading. What can I do?",
+  "help.images_missing_a": "Clear the cache in the app (Settings > Cache), then in Android (Settings > Apps > LastStats > Storage > Clear cache). If images are still missing, back up your data (Settings > Backup), uninstall and reinstall the app, then restore your backup.",
   "help.laststats_is_a_free_open": "LastStats is a free, open-source project made with ❤️ by SanoBld.",
   "help.still_have_a_question_drop": "Still have a question? Drop by the Discord.",
   "help.drop_by_the_discord": "Drop by the Discord",

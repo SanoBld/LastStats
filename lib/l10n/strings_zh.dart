@@ -713,6 +713,8 @@ class AppStringsZh implements AppStrings {
   @override String get faqA12 => '可以。在设置 > 账号中退出登录，再用另一个用户名重新登录即可。本地缓存会自动清空，避免数据混淆。';
   @override String get faqQ13 => '如何设置通知？';
   @override String get faqA13 => '在设置 > 通知中，可以开启同步完成提醒、选择提醒频率，或完全关闭通知。';
+  @override String get faqQ14 => '图片缺失或一直加载怎么办？';
+  @override String get faqA14 => '先在应用内清除缓存（设置 > 缓存），再在 Android 中清除（设置 > 应用 > LastStats > 存储 > 清除缓存）。如果仍无图片，请先备份数据（设置 > 备份），卸载并重新安装应用，然后恢复备份。';
   @override String get settingsPlatformDisabledByShowAll => '已停用：已显示全部链接。';
   @override String get commonInDevelopment => '开发中';
   @override String get commonSeeLess => '收起';

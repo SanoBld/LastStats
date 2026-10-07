@@ -650,6 +650,8 @@ class AppStringsJa implements AppStrings {
   @override String get faqA12 => 'はい。設定 > アカウントからログアウトし、別のユーザー名で再度ログインしてください。データが混ざらないよう、ローカルキャッシュは自動的にリセットされます。';
   @override String get faqQ13 => '通知はどう設定しますか？';
   @override String get faqA13 => '設定 > 通知から、同期完了時の通知のオン/オフや頻度を設定できます。';
+  @override String get faqQ14 => '画像が表示されない／読み込みが終わらない場合は？';
+  @override String get faqA14 => 'アプリ内のキャッシュを消去し（設定 > キャッシュ）、次に Android 側でも消去してください（設定 > アプリ > LastStats > ストレージ > キャッシュを消去）。それでも表示されない場合は、データをバックアップ（設定 > バックアップ）し、アプリを再インストールして復元してください。';
   @override String get settingsPlatformDisabledByShowAll => '無効：すでにすべてのリンクが表示されています。';
   @override String get commonInDevelopment => '開発中';
   @override String get commonSeeLess => '閉じる';

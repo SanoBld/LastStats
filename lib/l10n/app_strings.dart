@@ -775,6 +775,8 @@ abstract class AppStrings {
   String get faqA12;
   String get faqQ13;
   String get faqA13;
+  String get faqQ14;
+  String get faqA14;
   String get settingsPlatformDisabledByShowAll;
   String get commonInDevelopment;
   String get commonSeeLess;

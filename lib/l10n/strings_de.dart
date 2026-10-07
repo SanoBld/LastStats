@@ -650,6 +650,8 @@ class AppStringsDe implements AppStrings {
   @override String get faqA12 => 'Ja. Melden Sie sich unter Einstellungen > Konto ab und mit einem anderen Benutzernamen wieder an. Der lokale Cache wird automatisch geleert, damit sich keine Daten vermischen.';
   @override String get faqQ13 => 'Wie richte ich Benachrichtigungen ein?';
   @override String get faqA13 => 'Unter Einstellungen > Benachrichtigungen können Sie Hinweise nach abgeschlossener Synchronisierung aktivieren, ihre Häufigkeit wählen oder sie ganz ausschalten.';
+  @override String get faqQ14 => 'Cover fehlen oder laden endlos. Was tun?';
+  @override String get faqA14 => 'Leere den Cache in der App (Einstellungen > Cache) und dann in Android (Einstellungen > Apps > LastStats > Speicher > Cache leeren). Fehlen die Bilder weiterhin, sichere deine Daten (Einstellungen > Sicherung), deinstalliere die App, installiere sie neu und stelle die Sicherung wieder her.';
   @override String get settingsPlatformDisabledByShowAll => 'Deaktiviert: Es werden bereits alle Links angezeigt.';
   @override String get commonInDevelopment => 'In Entwicklung';
   @override String get commonSeeLess => 'Weniger anzeigen';

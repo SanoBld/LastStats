@@ -44,6 +44,7 @@ class _FaqPageState extends State<FaqPage> {
       _FaqItem(Icons.wifi_off_rounded,        L.faqQ11, L.faqA11),
       _FaqItem(Icons.swap_horiz_rounded,      L.faqQ12, L.faqA12),
       _FaqItem(Icons.notifications_none_rounded, L.faqQ13, L.faqA13),
+      _FaqItem(Icons.image_not_supported_outlined, L.faqQ14, L.faqA14),
     ];
 
     return Scaffold(

@@ -254,7 +254,9 @@ class _SmartImageState extends State<_SmartImage> {
     // Decode at display resolution (x devicePixelRatio) instead of the
     // source's full size — big RAM saving for lists of small avatars,
     // no visible quality loss since it still matches screen pixels.
-    final px = (widget.size * MediaQuery.of(context).devicePixelRatio).round();
+    final dpr = MediaQuery.of(context).devicePixelRatio;
+    final px = (widget.size * dpr).round();
+    url = sizedImageUrl(url, widget.size, dpr);
     return _shaped(Image.network(url, width: widget.size, height: widget.size, fit: BoxFit.cover,
         cacheWidth: px, cacheHeight: px,
         loadingBuilder: (_, child, p) => p == null ? child : _loadingBox(s),
