@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the acquire method from the ApiUsage class, for the Dart programming language.">
-  <title>acquire method - ApiUsage class - api_usage library - Dart API</title>
+  <meta name="description" content="API docs for the limiterEnabled constant from the ApiUsage class, for the Dart programming language.">
+  <title>limiterEnabled constant - ApiUsage class - api_usage library - Dart API</title>
 
 
   
@@ -27,9 +27,9 @@
     <li><a href="../../index.html">laststats_mobile</a></li>
     <li><a href="../../services_api_usage/">services&#47;api_usage.dart</a></li>
     <li><a href="../../services_api_usage/ApiUsage-class.html">ApiUsage</a></li>
-    <li class="self-crumb">acquire static method</li>
+    <li class="self-crumb">limiterEnabled constant</li>
   </ol>
-  <div class="self-name">acquire</div>
+  <div class="self-name">limiterEnabled</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -49,59 +49,36 @@
     data-above-sidebar="services_api_usage&#47;ApiUsage-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">acquire</span> static method 
+<h1><span class="kind-property">limiterEnabled</span> constant 
 </h1></div>
 
-    <section class="multi-line-signature">
-      
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
-<span class="name ">acquire</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="acquire-param-def"><span class="type-annotation"><a href="../../services_api_registry/ApiDef-class.html">ApiDef</a></span> <span class="parameter-name">def</span></span></li>
-</ol>)
-
-      
-
-    </section>
     
+      <section class="multi-line-signature">
+        
+        <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>
+        const <span class="name ">limiterEnabled</span>
+        
 
+      </section>
+      
+<section class="desc markdown">
+  <p>Waits for a free slot. Returns false when the wait would exceed the
+API's maxWaitMs (the caller must then NOT send the request).</p>
+</section>
 
-    
+      
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Future&lt;bool&gt; acquire(ApiDef def) async {
-  if (!limiterEnabled) return true;
-  final l = _l(def.id);
-  final start = _now();
-  final deadline = start + (def.maxWaitMs &gt; 0 ? def.maxWaitMs : 60000);
-  while (true) {
-    final now = _now();
-    var wait = 0;
-    if (l.cooldownUntil &gt; now) {
-      wait = l.cooldownUntil - now;
-    } else if (def.headerLimits &amp;&amp;
-        l.hRemaining != null &amp;&amp;
-        l.hRemaining! &lt;= 0 &amp;&amp;
-        l.hResetAt &gt; now) {
-      wait = l.hResetAt - now;
-    } else {
-      final rule = def.ceiling;
-      if (rule == null) return true;
-      l.hits.removeWhere((t) =&gt; now - t &gt;= rule.windowMs);
-      if (l.hits.length &lt; rule.requests) {
-        l.hits.add(now);
-        return true;
-      }
-      wait = l.hits.first + rule.windowMs - now;
-    }
-    if (now + wait &gt; deadline) return false;
-    await Future.delayed(Duration(milliseconds: wait &lt; 20 ? 20 : wait + 5));
-  }
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">&#47;&#47; Client-side limiter is OFF: it queued or skipped requests and caused
+&#47;&#47; endless loading. Calls are still counted. Set to true to turn it back on.
+static const bool limiterEnabled = false;</code></pre>
 </section>
 
 
-  </div> <!-- /.main-content -->
-  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
-    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+    
+</div> <!-- /.main-content -->
+<div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+  <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
 <header id="header-search-sidebar" class="hidden-l">
   <form class="search-sidebar" role="search">
     <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
@@ -111,13 +88,13 @@
     <li><a href="../../index.html">laststats_mobile</a></li>
     <li><a href="../../services_api_usage/">api_usage</a></li>
     <li><a href="../../services_api_usage/ApiUsage-class.html">ApiUsage</a></li>
-    <li class="self-crumb">acquire static method</li>
+    <li class="self-crumb">limiterEnabled constant</li>
 </ol>
 
-    <h5>ApiUsage class</h5>
-    <div id="dartdoc-sidebar-left-content"></div>
-  </div><!--/.sidebar-offcanvas-->
-  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  <h5>ApiUsage class</h5>
+  <div id="dartdoc-sidebar-left-content"></div>
+</div><!--/.sidebar-offcanvas-->
+<div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
 </div><!--/.sidebar-offcanvas-->
 </main>
 <footer>
