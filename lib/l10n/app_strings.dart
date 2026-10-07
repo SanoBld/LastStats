@@ -933,6 +933,8 @@ abstract class AppStrings {
   String apiStorageValue(String used, String cap);
   String get apiStorageOver;
   String get apiReset;
+  String get apiLimiter => 'Limit requests';
+  String get apiLimiterSub => 'Slows down requests to stay under API limits. Off = faster, no waiting.';
   String get apiResetBody;
   String get apiResetDone;
 }

@@ -840,6 +840,8 @@ class AppStringsDe implements AppStrings {
   @override String apiStorageValue(String used, String cap) => '$used von $cap erlaubt';
   @override String get apiStorageOver => 'Über dem 100-MB-Limit der Last.fm-API-Bedingungen. Lösche den Scrobble-Verlauf unter Speicher, um die Bedingungen einzuhalten.';
   @override String get apiReset => 'Zähler zurücksetzen';
+  @override String get apiLimiter => 'Anfragen begrenzen';
+  @override String get apiLimiterSub => 'Bremst Anfragen, um unter den API-Limits zu bleiben. Aus = schneller, ohne Warten.';
   @override String get apiResetBody => 'Alle Anfragezähler werden auf null gesetzt.';
   @override String get apiResetDone => 'Zähler zurückgesetzt';
 }

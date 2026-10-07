@@ -869,6 +869,8 @@ class AppStringsEs implements AppStrings {
   @override String apiStorageValue(String used, String cap) => '$used de $cap permitidos';
   @override String get apiStorageOver => 'Supera el límite de 100 MB fijado por los términos de la API de Last.fm. Borra el historial de scrobbles en Almacenamiento para cumplirlo.';
   @override String get apiReset => 'Restablecer contadores';
+  @override String get apiLimiter => 'Limitar solicitudes';
+  @override String get apiLimiterSub => 'Ralentiza las solicitudes para respetar los límites de las API. Desactivado = más rápido, sin esperas.';
   @override String get apiResetBody => 'Todos los contadores de solicitudes volverán a cero.';
   @override String get apiResetDone => 'Contadores restablecidos';
 }

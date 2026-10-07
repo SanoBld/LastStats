@@ -866,6 +866,8 @@ class AppStringsZh implements AppStrings {
   @override String apiStorageValue(String used, String cap) => '允许的 $cap 中已用 $used';
   @override String get apiStorageOver => '已超过 Last.fm API 条款规定的 100 MB 上限。请在“存储”中清除 scrobble 历史记录以符合要求。';
   @override String get apiReset => '重置计数';
+  @override String get apiLimiter => '限制请求';
+  @override String get apiLimiterSub => '放慢请求以避免超出 API 限额。关闭 = 更快，无需等待。';
   @override String get apiResetBody => '所有请求计数将归零。';
   @override String get apiResetDone => '计数已重置';
 }

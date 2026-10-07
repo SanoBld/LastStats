@@ -32,6 +32,7 @@ class _ApiPageState extends State<ApiPage> {
   @override
   void initState() {
     super.initState();
+    ApiUsage.loadSettings().then((_) { if (mounted) setState(() {}); });
     _refresh();
     _timer = Timer.periodic(const Duration(seconds: 3), (_) => _refresh());
   }
@@ -162,6 +163,16 @@ class _ApiPageState extends State<ApiPage> {
               children: [
                 _summary(scheme, text, today, errors, limited),
                 const SizedBox(height: 12),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(L.apiLimiter),
+                  subtitle: Text(L.apiLimiterSub),
+                  value: ApiUsage.limiterEnabled,
+                  onChanged: (v) async {
+                    await ApiUsage.setLimiter(v);
+                    if (mounted) setState(() {});
+                  },
+                ),
                 Text(L.apiIntro,
                     style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                 for (final cat in order) ...[

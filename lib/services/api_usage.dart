@@ -93,9 +93,25 @@ class ApiUsage {
 
   /// Waits for a free slot. Returns false when the wait would exceed the
   /// API's maxWaitMs (the caller must then NOT send the request).
-  // Client-side limiter is OFF: it queued or skipped requests and caused
-  // endless loading. Calls are still counted. Set to true to turn it back on.
-  static const bool limiterEnabled = false;
+  // Client-side limiter. OFF by default (it caused endless loading).
+  // Calls are still counted. The user can turn it on in the API page.
+  static bool limiterEnabled = false;
+  static const _kLimiter = 'ls_api_limiter';
+
+  static Future<void> loadSettings() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      limiterEnabled = p.getBool(_kLimiter) ?? false;
+    } catch (_) {}
+  }
+
+  static Future<void> setLimiter(bool on) async {
+    limiterEnabled = on;
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setBool(_kLimiter, on);
+    } catch (_) {}
+  }
 
   static Future<bool> acquire(ApiDef def) async {
     if (!limiterEnabled) return true;

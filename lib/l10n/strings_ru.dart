@@ -840,6 +840,8 @@ class AppStringsRu implements AppStrings {
   @override String apiStorageValue(String used, String cap) => '$used из $cap разрешённых';
   @override String get apiStorageOver => 'Превышен лимит 100 МБ из условий API Last.fm. Очистите историю скробблов в разделе «Хранилище».';
   @override String get apiReset => 'Сбросить счётчики';
+  @override String get apiLimiter => 'Ограничивать запросы';
+  @override String get apiLimiterSub => 'Замедляет запросы, чтобы не превышать лимиты API. Выкл. = быстрее, без ожидания.';
   @override String get apiResetBody => 'Все счётчики запросов будут обнулены.';
   @override String get apiResetDone => 'Счётчики сброшены';
 }

@@ -869,6 +869,8 @@ class AppStringsPt implements AppStrings {
   @override String apiStorageValue(String used, String cap) => '$used de $cap permitidos';
   @override String get apiStorageOver => 'Acima do limite de 100 MB definido pelos termos da API do Last.fm. Limpe o histórico de scrobbles em Armazenamento para cumprir.';
   @override String get apiReset => 'Repor contadores';
+  @override String get apiLimiter => 'Limitar pedidos';
+  @override String get apiLimiterSub => 'Abranda os pedidos para respeitar os limites das APIs. Desligado = mais rápido, sem esperas.';
   @override String get apiResetBody => 'Todos os contadores de pedidos serão repostos a zero.';
   @override String get apiResetDone => 'Contadores repostos';
 }

@@ -840,6 +840,8 @@ class AppStringsAr implements AppStrings {
   @override String apiStorageValue(String used, String cap) => '$used من $cap المسموح';
   @override String get apiStorageOver => 'تجاوزت حد 100 ميغابايت في شروط واجهة Last.fm. امسح سجل الاستماع من التخزين للامتثال.';
   @override String get apiReset => 'إعادة ضبط العدادات';
+  @override String get apiLimiter => 'تحديد الطلبات';
+  @override String get apiLimiterSub => 'يبطئ الطلبات للبقاء ضمن حدود واجهات API. إيقاف = أسرع بدون انتظار.';
   @override String get apiResetBody => 'ستُعاد جميع عدادات الطلبات إلى الصفر.';
   @override String get apiResetDone => 'تمت إعادة الضبط';
 }

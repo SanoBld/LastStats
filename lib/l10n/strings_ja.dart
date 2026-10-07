@@ -839,6 +839,8 @@ class AppStringsJa implements AppStrings {
   @override String apiStorageValue(String used, String cap) => '許可された $cap のうち $used';
   @override String get apiStorageOver => 'Last.fm API 規約の 100 MB 上限を超えています。「ストレージ」でスクロブル履歴を消去してください。';
   @override String get apiReset => 'カウンターをリセット';
+  @override String get apiLimiter => 'リクエストを制限';
+  @override String get apiLimiterSub => 'API の上限を超えないようにリクエストを遅くします。オフ = 待ち時間なしで高速。';
   @override String get apiResetBody => 'すべてのリクエストカウンターが 0 に戻ります。';
   @override String get apiResetDone => 'カウンターをリセットしました';
 }
