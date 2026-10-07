@@ -23,6 +23,8 @@ class ImageService {
 
   static const _placeholder = '2a96cbd8b46e442fc41c2b86b821562f';
   static const _timeout     = Duration(seconds: 6);
+  // Hard cap for one full lookup, so a loading spinner never lasts forever.
+  static const _maxResolve  = Duration(seconds: 12);
   static const _diskPrefix  = 'imgcache_';
   static const _diskTtlMs   = 7 * 24 * 60 * 60 * 1000;
 
@@ -192,7 +194,8 @@ class ImageService {
   // ── Public: resolve URL ───────────────────────────────────────────────────
 
   static Future<String> resolveArtist(String artist, {String? lastfmUrl}) =>
-      _once('artist|$artist', () => _resolveArtist(artist, lastfmUrl: lastfmUrl));
+      _once('artist|$artist', () => _resolveArtist(artist, lastfmUrl: lastfmUrl))
+          .timeout(_maxResolve, onTimeout: () => lastfmUrl ?? '');
 
   static Future<String> _resolveArtist(String artist, {String? lastfmUrl}) async {
     final key = 'artist|$artist';
@@ -206,8 +209,7 @@ class ImageService {
     // there are often non-square (banners, portraits) and its thumbnail
     // proxy can distort them in the app's square/round artist thumbnails —
     // iTunes/Deezer's catalog art is consistently well-cropped for artists.
-    final itunes = await _itunesSearch(artist, 'musicArtist', 'artistTerm', artist);
-    if (itunes.isNotEmpty) return _persistUrl(key, itunes, 'itunes');
+    // (iTunes skipped: its artist results have no picture.)
 
     final deezer = await _deezerArtist(artist);
     if (deezer.isNotEmpty) return _persistUrl(key, deezer, 'deezer');
@@ -236,7 +238,8 @@ class ImageService {
   }
 
   static Future<String> resolveAlbum(String album, String artist, {String? lastfmUrl}) =>
-      _once('album|$artist|$album', () => _resolveAlbum(album, artist, lastfmUrl: lastfmUrl));
+      _once('album|$artist|$album', () => _resolveAlbum(album, artist, lastfmUrl: lastfmUrl))
+          .timeout(_maxResolve, onTimeout: () => lastfmUrl ?? '');
 
   static Future<String> _resolveAlbum(String album, String artist, {String? lastfmUrl}) async {
     final key = 'album|$artist|$album';
@@ -275,7 +278,8 @@ class ImageService {
   static Future<String> resolveTrack(String track, String artist,
           {String? lastfmUrl, String album = ''}) =>
       _once('track|$artist|$track',
-          () => _resolveTrack(track, artist, lastfmUrl: lastfmUrl, album: album));
+          () => _resolveTrack(track, artist, lastfmUrl: lastfmUrl, album: album))
+          .timeout(_maxResolve, onTimeout: () => lastfmUrl ?? '');
 
   static Future<String> _resolveTrack(String track, String artist,
       {String? lastfmUrl, String album = ''}) async {
@@ -604,7 +608,11 @@ class ImageService {
       if (items.isEmpty) return '';
       final item = items.first;
       if (!_similar(artist, (item['name'] ?? '').toString())) return '';
-      return (item['picture_xl'] ?? item['picture_big'] ?? '').toString();
+      final pic = (item['picture_xl'] ?? item['picture_big'] ?? '').toString();
+      // Deezer sends a grey placeholder when it has no real photo
+      // (empty hash in the path). Treat it as "no image".
+      if (pic.contains('/artist//') || pic.contains('d41d8cd98f00b204e9800998ecf8427e')) return '';
+      return pic;
     } catch (_) { return ''; }
   }
 

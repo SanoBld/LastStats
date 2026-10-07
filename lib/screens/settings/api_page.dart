@@ -11,6 +11,8 @@ import '../../services/internal_keys.dart';
 import '../../services/storage_manager.dart';
 import '../../widgets/m3_components.dart';
 import '../../widgets/skeleton.dart';
+import 'settings_helpers.dart';
+import 'settings_rows.dart';
 
 class ApiPage extends StatefulWidget {
   const ApiPage({super.key});
@@ -163,15 +165,20 @@ class _ApiPageState extends State<ApiPage> {
               children: [
                 _summary(scheme, text, today, errors, limited),
                 const SizedBox(height: 12),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(L.apiLimiter),
-                  subtitle: Text(L.apiLimiterSub),
-                  value: ApiUsage.limiterEnabled,
-                  onChanged: (v) async {
-                    await ApiUsage.setLimiter(v);
-                    if (mounted) setState(() {});
-                  },
+                SettingsSection(
+                  label: L.apiTitle,
+                  children: [
+                    SettingSwitchRow(
+                      icon: Icons.speed_rounded,
+                      title: L.apiLimiter,
+                      subtitle: L.apiLimiterSub,
+                      value: ApiUsage.limiterEnabled,
+                      onChanged: (v) async {
+                        await ApiUsage.setLimiter(v);
+                        if (mounted) setState(() {});
+                      },
+                    ),
+                  ],
                 ),
                 Text(L.apiIntro,
                     style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
