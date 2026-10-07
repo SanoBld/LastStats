@@ -77,7 +77,6 @@ Same rules as <a href="../../services_motion_artwork_service/MotionArtworkServic
   if (!cfg.artists || !cfg.useApple) return null;
   final key = &#39;artist|${_norm(artist)}|${cfg.sig}&#39;;
   if (_fresh(key)) return _cache[key];
-  if (DataCache.strictOffline) return null;
   if (_cache.length &gt;= _maxEntries) _cache.remove(_cache.keys.first);
   try {
     final res = await _itunes(artist, &#39;musicArtist&#39;, 5);

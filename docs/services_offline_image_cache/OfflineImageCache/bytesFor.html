@@ -77,7 +77,6 @@ extraction) so it does not download an image that is already cached.</p>
   await _ensureMeta();
   final cached = await _getBytes(url);
   if (cached != null) return cached;
-  if (DataCache.strictOffline) return null;
   await _downloadAndCache(url);
   return _getBytes(url);
 }</code></pre>

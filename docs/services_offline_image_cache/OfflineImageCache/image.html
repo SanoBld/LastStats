@@ -117,9 +117,6 @@
         );
       }
 
-      if (DataCache.strictOffline) {
-        return errorWidget ?? placeholder ?? const SizedBox.shrink();
-      }
       _downloadAndCache(url).ignore();
 
       final dpr = MediaQuery.of(context).devicePixelRatio;
