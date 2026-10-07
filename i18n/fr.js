@@ -142,6 +142,8 @@ window.I18N.fr = {
   "help.yes_from_settings_account_sign": "Oui. Depuis Paramètres > Compte, déconnectez-vous puis reconnectez-vous avec un autre nom d'utilisateur. Le cache local est réinitialisé automatiquement pour éviter tout mélange de données.",
   "help.how_do_i_set_up": "Comment configurer les notifications ?",
   "help.from_settings_notifications_you_can": "Depuis Paramètres > Notifications, vous pouvez activer les alertes de fin de synchronisation, choisir leur fréquence, ou les désactiver complètement si vous préférez.",
+  "help.images_missing_q": "Les images manquent ou chargent sans fin. Que faire ?",
+  "help.images_missing_a": "Videz le cache dans l'application (Paramètres > Cache), puis dans Android (Paramètres > Applications > LastStats > Stockage > Vider le cache). Si les images manquent toujours, sauvegardez vos données (Paramètres > Sauvegarde), désinstallez puis réinstallez l'application, et restaurez la sauvegarde.",
   "help.laststats_is_a_free_open": "LastStats est un projet gratuit et open source réalisé avec ❤️ par SanoBld.",
   "help.still_have_a_question_drop": "Une question sans réponse ici ? Passez sur le Discord.",
   "help.drop_by_the_discord": "Passez sur le Discord",
