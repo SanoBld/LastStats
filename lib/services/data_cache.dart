@@ -86,10 +86,9 @@ class DataCache {
   static dynamic getSync(String key) {
     final e = _mem[key];
     if (e == null) return null;
-    if (e.isExpired(_ttlOf(key)) && !offlineMode) {
-      _mem.remove(key);
-      return null;
-    }
+    // Expired entries are kept (not removed) so getStale() can still serve
+    // them if the connection drops afterwards. clearExpired() purges them.
+    if (e.isExpired(_ttlOf(key)) && !offlineMode) return null;
     return e.data;
   }
 
@@ -111,7 +110,16 @@ class DataCache {
   }
 
   /// Returns cached data regardless of expiry — for offline fallback.
-  static dynamic getStale(String key) => _mem[key]?.data;
+  static dynamic getStale(String key) {
+    final m = _mem[key];
+    if (m != null) return m.data;
+    // Not in memory (e.g. evicted by a failed write): fall back to disk.
+    final raw = _prefs?.getString('$_prefix$key');
+    if (raw == null) return null;
+    try {
+      return (jsonDecode(raw) as Map<String, dynamic>)['data'];
+    } catch (_) { return null; }
+  }
 
   // ── Write ─────────────────────────────────────────────────────────────────
 

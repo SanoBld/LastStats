@@ -141,7 +141,7 @@ class ScrobblesFileCache {
   // existed, we just trust it like before (assume complete).
   static final Map<int, bool>                 _yearOk = {};
   static Map<String, dynamic>?                _meta;
-  static bool                                 _initialized = false;
+  static Future<void>?                        _initFuture;
 
   // ── Clés de stockage ──────────────────────────────────────────────────────
   static String _yearKey(int year) => 'year_$year';
@@ -152,10 +152,12 @@ class ScrobblesFileCache {
   //  Les données ne sont jamais expirées ; tout ce qui est stocké est chargé.
   // ──────────────────────────────────────────────────────────────────────────
 
-  static Future<void> init() async {
-    if (_initialized) return;
-    _initialized = true;
+  // Memoized: concurrent callers share one load. Before, a boolean was set
+  // BEFORE loading, so a second caller returned immediately and read an
+  // empty cache (→ "first launch" → full re-download).
+  static Future<void> init() => _initFuture ??= _init();
 
+  static Future<void> _init() async {
     try {
       // ── Méta ──────────────────────────────────────────────────────────────
       final metaRaw = await CacheBackend.read(_metaKey);
@@ -414,8 +416,9 @@ class ScrobblesFileCache {
   /// À appeler uniquement lors d'une déconnexion du compte.
   static Future<void> clear() async {
     _years.clear();
+    _yearOk.clear();   // was left over: stale "download broken" flags survived a clear
     _meta = null;
-    _initialized = false;
+    _initFuture = null;
     await CacheBackend.clearAll();
     debugPrint('[ScrobblesCache] Cache vidé.');
   }

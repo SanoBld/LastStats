@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'update_abi.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
-import 'package:http/http.dart' as http;
+import 'api_http.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 enum UpdateChannel { stable, beta }
@@ -78,7 +78,7 @@ class UpdateService {
       final uri = Uri.parse(
         'https://api.github.com/repos/$_owner/$_repo/releases?per_page=$perPage',
       );
-      final res = await http.get(uri, headers: const {
+      final res = await ApiHttp.get(uri, headers: const {
         'Accept': 'application/vnd.github+json',
       }).timeout(_timeout);
 

@@ -1,7 +1,7 @@
 // lib/services/translation_service.dart
 // Simple translation via the free Google Translate endpoint (no API key).
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'api_http.dart';
 
 class TranslationService {
   TranslationService._();
@@ -22,7 +22,7 @@ class TranslationService {
         'dt':     't',
         'q':      text,
       });
-      final res = await http.get(uri).timeout(_timeout);
+      final res = await ApiHttp.get(uri).timeout(_timeout);
       if (res.statusCode != 200) return '';
 
       final data = jsonDecode(utf8.decode(res.bodyBytes)) as List;

@@ -1163,7 +1163,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
 
     // ── 1. Remote news.json ───────────────────────────────────────────────
     try {
-      final res = await http.get(
+      final res = await ApiHttp.get(
         Uri.parse('https://sanobld.github.io/LastStats/news.json'),
       ).timeout(const Duration(seconds: 6));
       if (res.statusCode == 200) {
@@ -1341,7 +1341,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     if (url == _lastExtractedUrl) return;
     _lastExtractedUrl = url;
     try {
-      final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 6));
+      final response = await OfflineImageCache.responseFor(url).timeout(const Duration(seconds: 8));
       if (!mounted) return;
       if (response.statusCode != 200 || response.bodyBytes.isEmpty) {
         _lastExtractedUrl = ''; // allow retry next tick

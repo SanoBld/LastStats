@@ -8,7 +8,6 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'internal_keys.dart';
 import 'dart:convert';
 import 'package:flutter/widgets.dart';
-import 'package:http/http.dart'             as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 import 'notification_service.dart';
@@ -17,7 +16,9 @@ import 'lastfm_service.dart';
 import 'all_scrobbles_service.dart';
 import 'scrobbles_file_cache.dart';
 import 'widget_service.dart';
-import 'auto_backup_service.dart';
+import 'auto_backup_service.dart';
+import 'api_http.dart';
+import 'api_usage.dart';
 
 // ── Task names ───────────────────────────────────────────────────────────────
 const _kTaskMilestone     = 'ls_milestone_check';
@@ -116,6 +117,8 @@ void callbackDispatcher() {
     }
     // Keep home screen widgets fresh on every background run.
     await WidgetService.updateAll();
+    // This isolate has its own API counters: persist them before it is killed.
+    await ApiUsage.flush();
     return true;
   });
 }
@@ -162,7 +165,7 @@ Future<void> _runNewsCheck() async {
   if (!(prefs.getBool(_kNotifNewsEnabled) ?? false)) return;
 
   try {
-    final res = await http
+    final res = await ApiHttp
         .get(Uri.parse(_kNewsUrl))
         .timeout(const Duration(seconds: 10));
     if (res.statusCode != 200) return;
@@ -358,7 +361,7 @@ Future<int?> _fetchPlaycount(String user, String key) async {
   try {
     final uri = Uri.parse(
         '$_lfmBase?method=user.getinfo&user=$user&api_key=$key&format=json');
-    final res = await http.get(uri).timeout(const Duration(seconds: 10));
+    final res = await ApiHttp.get(uri).timeout(const Duration(seconds: 10));
     if (res.statusCode != 200) return null;
     final json  = jsonDecode(res.body) as Map;
     final count = json['user']?['playcount']?.toString() ?? '';
@@ -384,7 +387,7 @@ Future<(int, String)?> _fetchRangeStats(
         '$_lfmBase?method=user.getrecenttracks'
         '&user=$user&api_key=$key&format=json'
         '&from=$fromTs&to=$toTs&limit=50');
-    final res = await http.get(uri).timeout(const Duration(seconds: 10));
+    final res = await ApiHttp.get(uri).timeout(const Duration(seconds: 10));
     if (res.statusCode != 200) return null;
 
     final json   = jsonDecode(res.body) as Map;

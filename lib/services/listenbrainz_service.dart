@@ -17,7 +17,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'api_http.dart';
 
 class ChartEntry {
   final String name, artist, imageUrl;
@@ -46,7 +46,7 @@ class ListenBrainzService {
       'range': range,
       'count': '$limit',
     });
-    final res = await http.get(uri).timeout(_timeout);
+    final res = await ApiHttp.get(uri).timeout(_timeout);
     if (res.statusCode != 200) return [];
     final body    = jsonDecode(utf8.decode(res.bodyBytes));
     final payload = body is Map ? body['payload'] : null;

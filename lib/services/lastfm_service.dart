@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import 'package:http/http.dart' as http;
+import 'api_http.dart';
 import 'library_merge.dart';
+import 'internal_keys.dart';
 
 class LastFmService {
   final String apiKey;
@@ -22,10 +23,20 @@ class LastFmService {
   });
 
   // ── Core request ────────────────────────────────────────
-  // Optional built-in key, retried once when the user's key is rejected.
+  // Optional built-in key, retried once when the user's key is INVALID or
+  // SUSPENDED. A rate-limit answer (HTTP 429 / error 29) is deliberately NOT
+  // retried with another key: the limit is enforced per IP address, and the
+  // Last.fm API Terms (clause 4.4) forbid circumventing it. Instead the
+  // request fails and ApiHttp pauses Last.fm for a short while.
   static String fallbackKey = '';
-  // Last.fm errors tied to the key: 10 invalid, 26 suspended, 29 rate limit.
-  static const _keyErrors = {10, 26, 29};
+  // Last.fm errors tied to the key itself: 10 invalid, 26 suspended.
+  static const _keyErrors = {10, 26};
+
+  /// Label used to count requests per key in the API usage screen.
+  static String keyLabel(String key) {
+    final i = InternalKeys.indexOf(key);
+    return i < 0 ? 'user' : 'builtin${i + 1}';
+  }
 
   Future<dynamic> _call(Map<String, String> params) async {
     try {
@@ -43,10 +54,11 @@ class LastFmService {
       'api_key': key,
       'format':  'json',
     });
-    final res = await http.get(uri).timeout(_timeout);
-    if (res.statusCode == 403 || res.statusCode == 429) {
-      throw _KeyRejected('HTTP ${res.statusCode}');
+    final res = await ApiHttp.get(uri, keyLabel: keyLabel(key)).timeout(_timeout);
+    if (res.statusCode == 429) {
+      throw Exception('Last.fm rate limit reached (HTTP 429)');
     }
+    if (res.statusCode == 403) throw _KeyRejected('HTTP 403');
     if (res.statusCode != 200) throw Exception('HTTP ${res.statusCode}');
     final body = jsonDecode(utf8.decode(res.bodyBytes));
     if (body['error'] != null) {
@@ -76,8 +88,8 @@ class LastFmService {
     final full   = {...base, 'api_sig': sig, 'format': 'json'};
     final uri    = Uri.https(_host, _path);
     final res    = post
-        ? await http.post(uri, body: full).timeout(_timeout)
-        : await http.get(uri.replace(queryParameters: full)).timeout(_timeout);
+        ? await ApiHttp.post(uri, body: full, keyLabel: keyLabel(apiKey)).timeout(_timeout)
+        : await ApiHttp.get(uri.replace(queryParameters: full), keyLabel: keyLabel(apiKey)).timeout(_timeout);
     if (res.statusCode != 200) throw Exception('HTTP ${res.statusCode}');
     final body = jsonDecode(utf8.decode(res.bodyBytes));
     if (body['error'] != null) throw Exception(body['message'] ?? 'Last.fm API error');

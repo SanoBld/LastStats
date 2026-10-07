@@ -381,7 +381,7 @@ class _SettingsPageState extends State<_SettingsPage> {
         '&api_key=$apiKey'
         '&format=json',
       );
-      final res = await http.get(uri);
+      final res = await ApiHttp.get(uri);
       if (res.statusCode != 200) return;
 
       final data   = jsonDecode(res.body) as Map<String, dynamic>;
@@ -501,6 +501,15 @@ class _SettingsPageState extends State<_SettingsPage> {
       subtitle: () => L.settingsCardCacheSub,
       pageBuilder: (_) => const CachePage(),
     ),
+    // 6b — API usage & limits
+    _SettingsCardData(
+      icon: Icons.hub_rounded,
+      iconBgColor: (s) => Color.lerp(s.secondaryContainer, s.primaryContainer, 0.5)!,
+      iconFgColor: (s) => s.onSecondaryContainer,
+      title:    () => L.apiTitle,
+      subtitle: () => L.apiCardSub,
+      pageBuilder: (_) => const ApiPage(),
+    ),
     // 7 — Backup
     _SettingsCardData(
       icon: Icons.backup_rounded,
@@ -562,13 +571,16 @@ class _SettingsPageState extends State<_SettingsPage> {
         'cuenta', 'konto', 'conta', 'аккаунт', 'アカウント', '账户', 'الحساب'],
     8: ['cache', 'stockage', 'storage', 'vider', 'clear', 'hors-ligne', 'offline',
         'almacenamiento', 'speicher', 'хранилище', 'ストレージ', '存储', 'التخزين'],
-    9: ['sauvegarde', 'backup', 'export', 'import', 'restaurer', 'restore',
+    9: ['api', 'quota', 'limite', 'limit', 'requêtes', 'requests', 'consommation',
+        'usage', 'musicbrainz', 'deezer', 'itunes', 'audiodb', 'listenbrainz', 'clé', 'key',
+        'límite', 'solicitudes', 'anfragen', 'richieste', 'pedidos', 'запросы', 'リクエスト', '请求', 'طلبات'],
+    10: ['sauvegarde', 'backup', 'export', 'import', 'restaurer', 'restore',
         'copia de seguridad', 'sicherung', 'backup', 'резервная копия', 'バックアップ', '备份', 'نسخة احتياطية'],
-    10: ['mise à jour', 'update', 'version', 'actualización', 'aktualisierung',
+    11: ['mise à jour', 'update', 'version', 'actualización', 'aktualisierung',
         'aggiornamento', 'atualização', 'обновление', 'アップデート', '更新', 'تحديث'],
-    11: ['à propos', 'about', 'contact', 'crédit', 'acerca de', 'über', 'informazioni',
+    12: ['à propos', 'about', 'contact', 'crédit', 'acerca de', 'über', 'informazioni',
         'sobre', 'о приложении', 'アプリについて', '关于', 'حول'],
-    12: ['aide', 'faq', 'question', 'ayuda', 'hilfe', 'aiuto', 'ajuda', 'помощь', 'ヘルプ', '帮助', 'مساعدة'],
+    13: ['aide', 'faq', 'question', 'ayuda', 'hilfe', 'aiuto', 'ajuda', 'помощь', 'ヘルプ', '帮助', 'مساعدة'],
   };
 
   bool _matchesQuery(_SettingsCardData c, int index, String q) {

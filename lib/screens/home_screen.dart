@@ -24,7 +24,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart' show TapGestureRecognizer;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData, HapticFeedback, rootBundle, LogicalKeyboardKey;
-import 'package:http/http.dart' as http;
+import '../services/api_http.dart';
+import '../services/offline_image_cache.dart';
+import '../services/cache_owner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:url_launcher/url_launcher.dart';
@@ -77,6 +79,7 @@ import 'settings/language_page.dart';
 import 'settings/account_page.dart';
 import 'settings/backup_page.dart';
 import 'settings/cache_page.dart';
+import 'settings/api_page.dart';
 import 'settings/updates_page.dart';
 import 'settings/about_page.dart';
 import 'settings/faq_page.dart';
@@ -186,7 +189,9 @@ class _HomeScreenState extends State<HomeScreen> {
     localeNotifier.addListener(_onLocaleChange);
     pcModeNotifier.addListener(_onLocaleChange);
 
-    DataCache.init().then((_) {
+    // Caches are not per-account: wipe them first if the account changed,
+    // otherwise the incremental sync would merge two users' histories.
+    CacheOwner.ensure(widget.username).then((_) => DataCache.init()).then((_) {
       PrefetchService.prefetchAll(_service);
       if (AllScrobblesService.isFirstLoad) {
         AllScrobblesService.loadAll(_service);

@@ -41,7 +41,11 @@ class CacheBackend {
   static Future<void> write(String key, String value) async {
     try {
       final dir = await _ensureDir();
-      await _file(dir, key).writeAsString(value);
+      // Temp file + rename: a crash mid-write used to leave a truncated
+      // year file, silently losing that whole year of history.
+      final tmp = File('${dir.path}/$key.json.tmp');
+      await tmp.writeAsString(value, flush: true);
+      await tmp.rename(_file(dir, key).path);
     } catch (_) {}
   }
 

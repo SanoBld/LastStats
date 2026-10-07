@@ -26,7 +26,11 @@ class ImageCacheBackend {
   static Future<void> writeMeta(String json) async {
     try {
       final dir = await _ensureDir();
-      await File('${dir.path}/meta.json').writeAsString(json);
+      // Write to a temp file, then rename: a crash mid-write can no longer
+      // leave a truncated meta.json (which made the whole cache unreadable).
+      final tmp = File('${dir.path}/meta.json.tmp');
+      await tmp.writeAsString(json, flush: true);
+      await tmp.rename('${dir.path}/meta.json');
     } catch (_) {}
   }
 
@@ -42,7 +46,9 @@ class ImageCacheBackend {
   static Future<void> write(String key, Uint8List bytes) async {
     try {
       final dir = await _ensureDir();
-      await File('${dir.path}/$key.bin').writeAsBytes(bytes);
+      final tmp = File('${dir.path}/$key.bin.tmp');
+      await tmp.writeAsBytes(bytes, flush: true);
+      await tmp.rename('${dir.path}/$key.bin');
     } catch (_) {}
   }
 

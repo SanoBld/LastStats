@@ -488,7 +488,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   // isolate (PaletteGenerator's heavier quantization is what froze the UI).
   Future<void> _extractArtworkColor(String url) async {
     try {
-      final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 6));
+      final response = await OfflineImageCache.responseFor(url).timeout(const Duration(seconds: 8));
       if (!mounted || response.statusCode != 200 || response.bodyBytes.isEmpty) return;
 
       final argb = await _extractDominantColorArgb(response.bodyBytes);
@@ -1315,7 +1315,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     try {
       final q   = Uri.encodeComponent('$_name $_artist');
       final uri = Uri.parse('https://api.deezer.com/search?q=$q&limit=5');
-      final res = await http.get(uri).timeout(const Duration(seconds: 6));
+      final res = await ApiHttp.get(uri).timeout(const Duration(seconds: 6));
       if (res.statusCode == 200) {
         final data   = jsonDecode(res.body) as Map<String, dynamic>;
         final tracks = (data['data'] as List?)?.cast<Map<String, dynamic>>();
@@ -2229,7 +2229,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
     try {
       final q   = Uri.encodeComponent('${widget.previewTrackName} ${widget.previewArtistName}');
       final uri = Uri.parse('https://api.deezer.com/search?q=$q&limit=5');
-      final res = await http.get(uri).timeout(const Duration(seconds: 6));
+      final res = await ApiHttp.get(uri).timeout(const Duration(seconds: 6));
       if (res.statusCode == 200) {
         final data   = jsonDecode(res.body) as Map<String, dynamic>;
         final tracks = (data['data'] as List?)?.cast<Map<String, dynamic>>() ?? [];
@@ -2246,7 +2246,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
   // here so the card back always gets a color, even if that setting is off.
   Future<void> _loadDominantColor() async {
     try {
-      final response = await http.get(Uri.parse(widget.url)).timeout(const Duration(seconds: 6));
+      final response = await OfflineImageCache.responseFor(widget.url).timeout(const Duration(seconds: 8));
       if (!mounted || response.statusCode != 200 || response.bodyBytes.isEmpty) return;
       final argb = await _extractDominantColorArgb(response.bodyBytes);
       if (argb != null && mounted) setState(() => _dominant = Color(argb));
@@ -3086,7 +3086,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
   // the cheap histogram-based color extraction (see _extractDominantColorArgb).
   Future<void> _extractArtworkColor(String url) async {
     try {
-      final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 6));
+      final response = await OfflineImageCache.responseFor(url).timeout(const Duration(seconds: 8));
       if (!mounted || response.statusCode != 200 || response.bodyBytes.isEmpty) return;
 
       final argb = await _extractDominantColorArgb(response.bodyBytes);

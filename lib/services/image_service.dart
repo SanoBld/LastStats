@@ -11,7 +11,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart' show Theme;
 import 'package:flutter/widgets.dart';
-import 'package:http/http.dart' as http;
+import 'api_http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'offline_image_cache.dart';
 import 'data_cache.dart';
@@ -57,13 +57,39 @@ class ImageService {
   }
 
   static SharedPreferences? _prefs;
-  static bool _diskLoaded = false;
+  static Future<void>? _diskLoading;
+
+  // Artist/album/track lookups that found nothing (or failed because a
+  // source was rate-limited / offline). Remembered for a short time only:
+  // before, an empty result was cached for the whole session, so one
+  // transient failure meant "no artwork" until the app was restarted.
+  static final Map<String, int> _negUntil = {};
+  static const _negTtlMs = 10 * 60 * 1000;
+
+  static bool _isNegative(String key) {
+    final t = _negUntil[key];
+    if (t == null) return false;
+    if (t > DateTime.now().millisecondsSinceEpoch) return true;
+    _negUntil.remove(key);
+    return false;
+  }
+
+  // One lookup at a time per key: a list showing the same artist 20 times
+  // used to run the whole source chain 20 times in parallel.
+  static final Map<String, Future<String>> _pending = {};
+  static Future<String> _once(String key, Future<String> Function() run) {
+    final running = _pending[key];
+    if (running != null) return running;
+    final f = run().whenComplete(() => _pending.remove(key));
+    _pending[key] = f;
+    return f;
+  }
 
   // ── URL cache (metadata only, not bytes) ──────────────────────────────────
 
-  static Future<void> _ensureDiskCache() async {
-    if (_diskLoaded) return;
-    _diskLoaded = true;
+  static Future<void> _ensureDiskCache() => _diskLoading ??= _loadDiskCache();
+
+  static Future<void> _loadDiskCache() async {
     try {
       _prefs ??= await SharedPreferences.getInstance();
       final now = DateTime.now().millisecondsSinceEpoch;
@@ -97,10 +123,18 @@ class ImageService {
   }
 
   static Future<String> _persistUrl(String key, String url, [String source = '']) async {
+    if (url.isEmpty) {
+      _negUntil[key] = DateTime.now().millisecondsSinceEpoch + _negTtlMs;
+      if (_negUntil.length > 2000) {
+        final now = DateTime.now().millisecondsSinceEpoch;
+        _negUntil.removeWhere((_, t) => t < now);
+      }
+      return url;
+    }
+    _negUntil.remove(key);
     _mem[key] = url;
     if (source.isNotEmpty) _sourceOf[key] = source;
     _touch(key);
-    if (url.isEmpty) return url;
     try {
       _prefs ??= await SharedPreferences.getInstance();
       await _prefs!.setString(
@@ -157,11 +191,15 @@ class ImageService {
 
   // ── Public: resolve URL ───────────────────────────────────────────────────
 
-  static Future<String> resolveArtist(String artist, {String? lastfmUrl}) async {
+  static Future<String> resolveArtist(String artist, {String? lastfmUrl}) =>
+      _once('artist|$artist', () => _resolveArtist(artist, lastfmUrl: lastfmUrl));
+
+  static Future<String> _resolveArtist(String artist, {String? lastfmUrl}) async {
     final key = 'artist|$artist';
     await _ensureDiskCache();
     final mem = _getUrl(key);
     if (mem != null) return mem;
+    if (_isNegative(key)) return '';
     if (DataCache.strictOffline) return lastfmUrl ?? '';
 
     // YouTube Music moved down for artists specifically: artist photos on
@@ -197,11 +235,15 @@ class ImageService {
     return _persistUrl(key, '');
   }
 
-  static Future<String> resolveAlbum(String album, String artist, {String? lastfmUrl}) async {
+  static Future<String> resolveAlbum(String album, String artist, {String? lastfmUrl}) =>
+      _once('album|$artist|$album', () => _resolveAlbum(album, artist, lastfmUrl: lastfmUrl));
+
+  static Future<String> _resolveAlbum(String album, String artist, {String? lastfmUrl}) async {
     final key = 'album|$artist|$album';
     await _ensureDiskCache();
     final mem = _getUrl(key);
     if (mem != null) return mem;
+    if (_isNegative(key)) return '';
     if (DataCache.strictOffline) return lastfmUrl ?? '';
 
     final ytMusic = await _ytMusicSearch('$artist $album', 'album', expectArtist: artist, expectTitle: album);
@@ -231,11 +273,17 @@ class ImageService {
   }
 
   static Future<String> resolveTrack(String track, String artist,
+          {String? lastfmUrl, String album = ''}) =>
+      _once('track|$artist|$track',
+          () => _resolveTrack(track, artist, lastfmUrl: lastfmUrl, album: album));
+
+  static Future<String> _resolveTrack(String track, String artist,
       {String? lastfmUrl, String album = ''}) async {
     final key = 'track|$artist|$track';
     await _ensureDiskCache();
     final mem = _getUrl(key);
     if (mem != null) return mem;
+    if (_isNegative(key)) return '';
     if (DataCache.strictOffline) return lastfmUrl ?? '';
 
     final ytMusic = await _ytMusicSearch('$artist $track', 'song', expectArtist: artist, expectTitle: track);
@@ -298,10 +346,12 @@ class ImageService {
   // ── Cache stats ───────────────────────────────────────────────────────────
 
   static int  get urlCacheSize => _mem.length;
-  static void clearUrlCache()  => _mem.clear();
+  static void clearUrlCache()  { _mem.clear(); _sourceOf.clear(); _negUntil.clear(); }
 
   static Future<void> clearAllCache() async {
     _mem.clear();
+    _sourceOf.clear();
+    _negUntil.clear();
     try {
       _prefs ??= await SharedPreferences.getInstance();
       final keys = _prefs!.getKeys().where((k) => k.startsWith(_diskPrefix)).toList();
@@ -327,6 +377,7 @@ class ImageService {
           if ((now - ts) > _diskTtlMs) {
             await _prefs!.remove(k);
             _mem.remove(k.substring(_diskPrefix.length));
+            _sourceOf.remove(k.substring(_diskPrefix.length));
             removed++;
           }
         } catch (_) { await _prefs!.remove(k); removed++; }
@@ -396,7 +447,7 @@ class ImageService {
     String? expectTitle,
   }) async {
     try {
-      final res = await http.post(
+      final res = await ApiHttp.post(
         Uri.https('music.youtube.com', '/youtubei/v1/search', {'key': _ytmApiKey}),
         headers: {
           'Content-Type': 'application/json',
@@ -525,7 +576,7 @@ class ImageService {
     try {
       final params = <String, String>{'term': term, 'entity': entity, 'limit': '1', 'media': 'music'};
       if (attribute != null) params['attribute'] = attribute;
-      final res = await http.get(Uri.https('itunes.apple.com', '/search', params)).timeout(_timeout);
+      final res = await ApiHttp.get(Uri.https('itunes.apple.com', '/search', params)).timeout(_timeout);
       if (res.statusCode != 200) return '';
       final results = (jsonDecode(utf8.decode(res.bodyBytes))['results'] as List?) ?? [];
       if (results.isEmpty) return '';
@@ -546,7 +597,7 @@ class ImageService {
 
   static Future<String> _deezerArtist(String artist) async {
     try {
-      final res = await http.get(Uri.https('api.deezer.com', '/search/artist', {'q': artist, 'limit': '1'}))
+      final res = await ApiHttp.get(Uri.https('api.deezer.com', '/search/artist', {'q': artist, 'limit': '1'}))
           .timeout(_timeout);
       if (res.statusCode != 200) return '';
       final items = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
@@ -559,7 +610,7 @@ class ImageService {
 
   static Future<String> _deezerAlbum(String album, String artist) async {
     try {
-      final res = await http.get(Uri.https('api.deezer.com', '/search/album', {'q': '$artist $album', 'limit': '1'}))
+      final res = await ApiHttp.get(Uri.https('api.deezer.com', '/search/album', {'q': '$artist $album', 'limit': '1'}))
           .timeout(_timeout);
       if (res.statusCode != 200) return '';
       final items = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
@@ -573,7 +624,7 @@ class ImageService {
   // Track search response embeds the parent album object with cover URLs.
   static Future<String> _deezerTrack(String track, String artist) async {
     try {
-      final res = await http.get(Uri.https('api.deezer.com', '/search/track', {'q': '$artist $track', 'limit': '1'}))
+      final res = await ApiHttp.get(Uri.https('api.deezer.com', '/search/track', {'q': '$artist $track', 'limit': '1'}))
           .timeout(_timeout);
       if (res.statusCode != 200) return '';
       final items = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
@@ -587,7 +638,7 @@ class ImageService {
 
   static Future<String> _audioDbAlbum(String album, String artist) async {
     try {
-      final res = await http
+      final res = await ApiHttp
           .get(Uri.https('www.theaudiodb.com', '/api/v1/json/123/searchalbum.php', {'s': artist, 'a': album}))
           .timeout(_timeout);
       if (res.statusCode != 200) return '';
@@ -603,7 +654,7 @@ class ImageService {
   // best-effort only — empty result just falls through to the next source.
   static Future<String> _audioDbTrack(String track, String artist) async {
     try {
-      final res = await http
+      final res = await ApiHttp
           .get(Uri.https('www.theaudiodb.com', '/api/v1/json/123/searchtrack.php', {'s': artist, 't': track}))
           .timeout(_timeout);
       if (res.statusCode != 200) return '';
@@ -619,7 +670,7 @@ class ImageService {
   // works on native builds (skipped silently on web, caught by try/catch).
   static Future<String> _audioDbArtist(String artist) async {
     try {
-      final res = await http
+      final res = await ApiHttp
           .get(Uri.https('www.theaudiodb.com', '/api/v1/json/123/search.php', {'s': artist}))
           .timeout(_timeout);
       if (res.statusCode != 200) return '';
@@ -635,7 +686,7 @@ class ImageService {
   // Wikimedia Commons. Freely licensed and CORS-safe (works on web too).
   static Future<String> _mbArtistImage(String artist) async {
     try {
-      final searchRes = await http.get(
+      final searchRes = await ApiHttp.get(
         Uri.https('musicbrainz.org', '/ws/2/artist/', {
           'query': 'artist:"$artist"', 'limit': '1', 'fmt': 'json',
         }),
@@ -649,7 +700,7 @@ class ImageService {
       final mbid = (candidate['id'] ?? '').toString();
       if (mbid.isEmpty) return '';
 
-      final relRes = await http.get(
+      final relRes = await ApiHttp.get(
         Uri.https('musicbrainz.org', '/ws/2/artist/$mbid', {'inc': 'url-rels', 'fmt': 'json'}),
         headers: {'User-Agent': 'LastStats/2.0 (contact@laststats.app)'},
       ).timeout(_timeout);
@@ -661,7 +712,7 @@ class ImageService {
 
       // pageUrl is a Commons "File:" page — resolve to the actual image URL.
       final title = Uri.decodeFull(pageUrl.split('/wiki/').last);
-      final fileRes = await http.get(Uri.https('commons.wikimedia.org', '/w/api.php', {
+      final fileRes = await ApiHttp.get(Uri.https('commons.wikimedia.org', '/w/api.php', {
         'action': 'query', 'titles': title, 'prop': 'imageinfo',
         'iiprop': 'url', 'format': 'json', 'origin': '*',
       })).timeout(_timeout);
@@ -681,7 +732,7 @@ class ImageService {
   // available, its short description before the thumbnail is trusted.
   static Future<String> _wikipediaImage(String query, {required String expectName}) async {
     try {
-      final res = await http.get(Uri.https('en.wikipedia.org', '/w/api.php', {
+      final res = await ApiHttp.get(Uri.https('en.wikipedia.org', '/w/api.php', {
         'action': 'query', 'generator': 'search', 'gsrsearch': query,
         'gsrlimit': '1', 'prop': 'pageimages|pageterms', 'piprop': 'thumbnail',
         'pithumbsize': '600', 'wbptterms': 'description',
@@ -714,7 +765,7 @@ class ImageService {
 
   static Future<String> _mbAlbum(String album, String artist) async {
     try {
-      final searchRes = await http.get(
+      final searchRes = await ApiHttp.get(
         Uri.https('musicbrainz.org', '/ws/2/release/', {
           'query': 'release:"$album" AND artist:"$artist"',
           'limit': '1', 'fmt': 'json',
@@ -728,7 +779,7 @@ class ImageService {
       if (!_similar(album, (candidate['title'] ?? '').toString())) return '';
       final mbid = (candidate['id'] ?? '').toString();
       if (mbid.isEmpty) return '';
-      final coverRes = await http.get(Uri.https('coverartarchive.org', '/release/$mbid/front')).timeout(_timeout);
+      final coverRes = await ApiHttp.get(Uri.https('coverartarchive.org', '/release/$mbid/front')).timeout(_timeout);
       if (coverRes.statusCode == 200 || coverRes.statusCode == 307) {
         final loc = coverRes.headers['location'];
         if (loc != null && loc.isNotEmpty) return loc;

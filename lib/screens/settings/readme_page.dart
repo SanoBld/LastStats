@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:http/http.dart' as http;
+import '../../services/api_http.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../widgets/m3_components.dart';
 
@@ -16,7 +16,7 @@ const _api   = 'https://api.github.com/repos/$_owner/$_repo';
 
 
 Future<dynamic> _getJson(String url) async {
-  final res = await http.get(Uri.parse(url), headers: const {
+  final res = await ApiHttp.get(Uri.parse(url), headers: const {
     'Accept': 'application/vnd.github+json',
     'User-Agent': 'LastStats-App',
   }).timeout(const Duration(seconds: 12));
@@ -59,7 +59,7 @@ class _ReadmePageState extends State<ReadmePage> {
   void _load() {
     _readme = () async {
       try {
-        final res = await http
+        final res = await ApiHttp
             .get(Uri.parse('https://raw.githubusercontent.com/$_owner/$_repo/main/README.md'))
             .timeout(const Duration(seconds: 12));
         if (res.statusCode == 200) return utf8.decode(res.bodyBytes);

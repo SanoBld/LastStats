@@ -24,7 +24,7 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:http/http.dart' as http;
+import 'api_http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'data_cache.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
@@ -218,7 +218,7 @@ class MotionArtworkService {
     try {
       final token = await _getToken();
       if (token == null) return null;
-      final res = await http.get(
+      final res = await ApiHttp.get(
         Uri.https('amp-api.music.apple.com', '/v1/catalog/us/artists/$artistId',
             {'extend': 'editorialVideo'}),
         headers: {
@@ -257,7 +257,7 @@ class MotionArtworkService {
   static Future<bool> _ytReachable(String url, {bool deep = false}) async {
     try {
       final from = deep ? 1500000 : 0;
-      final res = await http.get(Uri.parse(url), headers: {
+      final res = await ApiHttp.get(Uri.parse(url), headers: {
         'User-Agent': ytUserAgentFor(url),
         'Range': 'bytes=$from-${from + 1023}',
       }).timeout(_timeout);
@@ -358,7 +358,7 @@ class MotionArtworkService {
   static Future<String> _pickVariant(String url, int height) async {
     if (height == 0 || !url.contains('.m3u8')) return url;
     try {
-      final res = await http
+      final res = await ApiHttp
           .get(Uri.parse(url), headers: {'User-Agent': _ua})
           .timeout(_timeout);
       if (res.statusCode != 200) return url;
@@ -377,7 +377,7 @@ class MotionArtworkService {
       final pick = best ?? lowest;
       if (pick == null) return url;
       // Make sure the variant really answers; otherwise stay adaptive.
-      final chk = await http
+      final chk = await ApiHttp
           .get(Uri.parse(pick), headers: {'User-Agent': _ua})
           .timeout(_timeout);
       if (chk.statusCode != 200 || !chk.body.contains('#EXTM3U')) return url;
@@ -430,7 +430,7 @@ class MotionArtworkService {
   static Future<List<Map<String, dynamic>>> _itunes(
       String term, String entity, int limit) async {
     try {
-      final res = await http.get(Uri.https('itunes.apple.com', '/search', {
+      final res = await ApiHttp.get(Uri.https('itunes.apple.com', '/search', {
         'term': term, 'entity': entity, 'media': 'music', 'limit': '$limit',
       })).timeout(_timeout);
       if (res.statusCode != 200) return [];
@@ -496,7 +496,7 @@ class MotionArtworkService {
   // main JS bundle. We read it from there.
   static Future<String?> _getToken() async {
     if (_token != null) return _token;
-    final home = await http.get(Uri.parse('https://music.apple.com/us/browse'),
+    final home = await ApiHttp.get(Uri.parse('https://music.apple.com/us/browse'),
         headers: {'User-Agent': _ua}).timeout(_timeout);
     if (home.statusCode != 200) return null;
     // Try the main bundle first, then any other script of the page.
@@ -505,7 +505,7 @@ class MotionArtworkService {
       ..sort((a, b) => (b.contains('/index') ? 1 : 0) - (a.contains('/index') ? 1 : 0));
     for (final path in scripts.take(6)) {
       try {
-        final js = await http.get(Uri.parse('https://music.apple.com$path'),
+        final js = await ApiHttp.get(Uri.parse('https://music.apple.com$path'),
             headers: {'User-Agent': _ua}).timeout(const Duration(seconds: 15));
         if (js.statusCode != 200) continue;
         final t = RegExp(r'eyJh[\w-]+\.[\w-]+\.[\w-]+').firstMatch(js.body);
@@ -519,7 +519,7 @@ class MotionArtworkService {
     try {
       final token = await _getToken();
       if (token == null) return null;
-      final res = await http.get(
+      final res = await ApiHttp.get(
         Uri.https('amp-api.music.apple.com', '/v1/catalog/us/albums/$albumId',
             {'extend': 'editorialVideo'}),
         headers: {
@@ -551,7 +551,7 @@ class MotionArtworkService {
     try {
       final token = await _getToken();
       if (token == null) return null;
-      final res = await http.get(
+      final res = await ApiHttp.get(
         Uri.https('amp-api.music.apple.com', '/v1/catalog/us/songs/$trackId',
             {'extend': 'editorialVideo'}),
         headers: {
@@ -577,7 +577,7 @@ class MotionArtworkService {
 
   // ── Page scraping fallback ─────────────────────────────────────────────
   static Future<String?> _videoFromPage(String pageUrl) async {
-    final res = await http.get(Uri.parse(pageUrl), headers: {
+    final res = await ApiHttp.get(Uri.parse(pageUrl), headers: {
       'User-Agent': _ua,
       'Accept-Language': 'en-US,en;q=0.9',
     }).timeout(_timeout);

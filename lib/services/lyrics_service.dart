@@ -2,7 +2,7 @@
 // Fetches song lyrics. Primary: lrclib.net (good coverage, no key).
 // Fallback: lyrics.ovh.
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'api_http.dart';
 
 class LyricsService {
   LyricsService._();
@@ -18,7 +18,7 @@ class LyricsService {
         'artist_name': artist,
         'track_name':  track,
       });
-      final res = await http.get(uri).timeout(_timeout);
+      final res = await ApiHttp.get(uri).timeout(_timeout);
       if (res.statusCode == 200) {
         final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         final plain = (data['plainLyrics'] as String? ?? '').trim();
@@ -32,7 +32,7 @@ class LyricsService {
         'api.lyrics.ovh',
         '/v1/${Uri.encodeComponent(artist)}/${Uri.encodeComponent(track)}',
       );
-      final res = await http.get(uri).timeout(_timeout);
+      final res = await ApiHttp.get(uri).timeout(_timeout);
       if (res.statusCode == 200) {
         final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         return (data['lyrics'] as String? ?? '').trim();

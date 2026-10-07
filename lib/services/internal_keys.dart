@@ -25,6 +25,12 @@ class InternalKeys {
 
   static bool isInternal(String key) => _pool.contains(key);
 
+  /// Index of [key] in the built-in pool, or -1 when it is not a built-in key.
+  static int indexOf(String key) => _pool.indexOf(key);
+
+  /// Number of built-in keys.
+  static int get poolSize => _pool.length;
+
   /// Returns this install's random built-in key (picked once, then stored).
   static Future<String> pick([SharedPreferences? prefs]) async {
     final p = prefs ?? await SharedPreferences.getInstance();

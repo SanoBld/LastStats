@@ -9,7 +9,8 @@ import '../../theme/m3_shapes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../widgets/skeleton.dart';
-import 'package:http/http.dart' as http;
+import '../../services/api_http.dart';
+import '../../services/cache_owner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/l10n.dart';
 import '../../app_state.dart';
@@ -110,7 +111,7 @@ class _AccountPageState extends State<AccountPage> {
         '&api_key=$apiKey'
         '&format=json',
       );
-      final res = await http.get(uri);
+      final res = await ApiHttp.get(uri);
       if (res.statusCode != 200) return;
 
       final data   = jsonDecode(res.body) as Map<String, dynamic>;
@@ -273,6 +274,9 @@ class _AccountPageState extends State<AccountPage> {
     await p.remove('ls_apikey');
     await p.remove('ls_accounts');
     await p.remove('ls_active_account');
+    // Last.fm data must not outlive the session (and must not leak to the
+    // next account that logs in on this device).
+    await CacheOwner.purge();
 
     if (!mounted) return;
     Navigator.of(context).pushAndRemoveUntil(
