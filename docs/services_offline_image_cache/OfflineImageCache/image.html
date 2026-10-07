@@ -83,6 +83,16 @@
   final ph = placeholder ?? M3ImagePlaceholder(width: width, height: height);
   if (url.isEmpty) return placeholder ?? const SizedBox.shrink();
 
+  &#47;&#47; Fast path: already in RAM → no FutureBuilder, no placeholder flash.
+  final hot = _loaded &amp;&amp; _meta.containsKey(url) ? _ramGet(url) : null;
+  if (hot != null) {
+    return Builder(builder: (context) =&gt; _memoryImage(
+          context, hot,
+          width: width, height: height, fit: fit,
+          placeholder: placeholder, errorWidget: errorWidget,
+        ));
+  }
+
   &#47;&#47; Cache checked FIRST (offline or online) — network is only a fallback.
   return FutureBuilder&lt;Uint8List?&gt;(
     future: _ensureMeta().then((_) =&gt; _getBytes(url)),
@@ -91,26 +101,11 @@
         return ph;
       }
 
-      &#47;&#47; Decode at the actual display size (× device pixel ratio) instead
-      &#47;&#47; of the source&#39;s full resolution — a 40dp list thumbnail doesn&#39;t
-      &#47;&#47; need a 3000×3000 bitmap sitting in memory. Only applied when a
-      &#47;&#47; display size was actually requested; omitted otherwise (e.g. the
-      &#47;&#47; detail sheet&#39;s full-size hero image still wants native quality).
-      final dpr = MediaQuery.of(context).devicePixelRatio;
-      final cacheWidth  = width  != null ? (width * dpr).round()  : null;
-      final cacheHeight = height != null ? (height * dpr).round() : null;
-
       if (snap.data != null) {
-        return Image.memory(
-          snap.data!,
-          width: width,
-          height: height,
-          fit: fit,
-          cacheWidth: cacheWidth,
-          cacheHeight: cacheHeight,
-          gaplessPlayback: true,
-          errorBuilder: (_, _, _) =&gt;
-              errorWidget ?? placeholder ?? const SizedBox.shrink(),
+        return _memoryImage(
+          context, snap.data!,
+          width: width, height: height, fit: fit,
+          placeholder: placeholder, errorWidget: errorWidget,
         );
       }
 
@@ -118,6 +113,10 @@
         return errorWidget ?? placeholder ?? const SizedBox.shrink();
       }
       _downloadAndCache(url).ignore();
+
+      final dpr = MediaQuery.of(context).devicePixelRatio;
+      final cacheWidth  = width  != null ? (width * dpr).round()  : null;
+      final cacheHeight = height != null ? (height * dpr).round() : null;
 
       final webImg = buildCorsBypassImage(url, width: width, height: height, fit: fit);
       if (webImg != null) return webImg;

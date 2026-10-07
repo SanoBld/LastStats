@@ -72,8 +72,9 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; clear() async {
   _years.clear();
+  _yearOk.clear();   &#47;&#47; was left over: stale &quot;download broken&quot; flags survived a clear
   _meta = null;
-  _initialized = false;
+  _initFuture = null;
   await CacheBackend.clearAll();
   debugPrint(&#39;[ScrobblesCache] Cache vidé.&#39;);
 }</code></pre>

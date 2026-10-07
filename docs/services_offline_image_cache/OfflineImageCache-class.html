@@ -167,6 +167,21 @@
   <section class="summary offset-anchor" id="static-methods">
     <h2>Static Methods</h2>
     <dl class="callables">
+        <dt id="bytesFor" class="callable">
+  <span class="name"><a href="../services_offline_image_cache/OfflineImageCache/bytesFor.html">bytesFor</a></span><span class="signature">(<wbr><span class="parameter" id="bytesFor-param-url"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">url</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-typed_data/Uint8List-class.html">Uint8List</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Bytes of <code>url</code> — from the cache when present, otherwise downloaded once
+and stored. Used where the app needs the raw bytes (dominant-colour
+extraction) so it does not download an image that is already cached.
+  
+
+</dd>
+
         <dt id="clear" class="callable">
   <span class="name"><a href="../services_offline_image_cache/OfflineImageCache/clear.html">clear</a></span><span class="signature">(<wbr>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
@@ -229,6 +244,20 @@ Also triggers a background download so the next call uses local cache.
 </dt>
 <dd>
   
+  
+
+</dd>
+
+        <dt id="responseFor" class="callable">
+  <span class="name"><a href="../services_offline_image_cache/OfflineImageCache/responseFor.html">responseFor</a></span><span class="signature">(<wbr><span class="parameter" id="responseFor-param-url"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">url</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/http/1.6.0/http/Response-class.html">Response</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Same as <a href="../services_offline_image_cache/OfflineImageCache/bytesFor.html">bytesFor</a> but shaped as an http.Response, for call sites that
+used to download the image a second time just to read its colours.
   
 
 </dd>

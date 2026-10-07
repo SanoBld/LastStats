@@ -84,6 +84,7 @@
     freed      += kv.value.size;
     _totalBytes -= kv.value.size;
     _meta.remove(kv.key);
+    _ramDrop(kv.key);
   }
   await _saveMeta();
 }</code></pre>

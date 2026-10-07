@@ -70,7 +70,16 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static dynamic getStale(String key) =&gt; _mem[key]?.data;</code></pre>
+  <pre class="language-dart"><code class="language-dart">static dynamic getStale(String key) {
+  final m = _mem[key];
+  if (m != null) return m.data;
+  &#47;&#47; Not in memory (e.g. evicted by a failed write): fall back to disk.
+  final raw = _prefs?.getString(&#39;$_prefix$key&#39;);
+  if (raw == null) return null;
+  try {
+    return (jsonDecode(raw) as Map&lt;String, dynamic&gt;)[&#39;data&#39;];
+  } catch (_) { return null; }
+}</code></pre>
 </section>
 
 

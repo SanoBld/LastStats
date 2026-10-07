@@ -76,7 +76,7 @@
     final uri = Uri.parse(
       &#39;https:&#47;&#47;api.github.com&#47;repos&#47;$_owner&#47;$_repo&#47;releases?per_page=$perPage&#39;,
     );
-    final res = await http.get(uri, headers: const {
+    final res = await ApiHttp.get(uri, headers: const {
       &#39;Accept&#39;: &#39;application&#47;vnd.github+json&#39;,
     }).timeout(_timeout);
 

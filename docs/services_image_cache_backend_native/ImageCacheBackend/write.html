@@ -71,7 +71,9 @@
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; write(String key, Uint8List bytes) async {
   try {
     final dir = await _ensureDir();
-    await File(&#39;${dir.path}&#47;$key.bin&#39;).writeAsBytes(bytes);
+    final tmp = File(&#39;${dir.path}&#47;$key.bin.tmp&#39;);
+    await tmp.writeAsBytes(bytes, flush: true);
+    await tmp.rename(&#39;${dir.path}&#47;$key.bin&#39;);
   } catch (_) {}
 }</code></pre>
 </section>

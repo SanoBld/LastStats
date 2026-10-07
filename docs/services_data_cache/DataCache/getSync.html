@@ -73,10 +73,9 @@
   <pre class="language-dart"><code class="language-dart">static dynamic getSync(String key) {
   final e = _mem[key];
   if (e == null) return null;
-  if (e.isExpired(_ttlOf(key)) &amp;&amp; !offlineMode) {
-    _mem.remove(key);
-    return null;
-  }
+  &#47;&#47; Expired entries are kept (not removed) so getStale() can still serve
+  &#47;&#47; them if the connection drops afterwards. clearExpired() purges them.
+  if (e.isExpired(_ttlOf(key)) &amp;&amp; !offlineMode) return null;
   return e.data;
 }</code></pre>
 </section>

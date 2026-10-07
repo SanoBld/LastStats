@@ -74,7 +74,11 @@
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; write(String key, String value) async {
   try {
     final dir = await _ensureDir();
-    await _file(dir, key).writeAsString(value);
+    &#47;&#47; Temp file + rename: a crash mid-write used to leave a truncated
+    &#47;&#47; year file, silently losing that whole year of history.
+    final tmp = File(&#39;${dir.path}&#47;$key.json.tmp&#39;);
+    await tmp.writeAsString(value, flush: true);
+    await tmp.rename(_file(dir, key).path);
   } catch (_) {}
 }</code></pre>
 </section>

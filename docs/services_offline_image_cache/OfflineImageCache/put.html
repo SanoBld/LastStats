@@ -72,16 +72,25 @@
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; put(String url, Uint8List bytes, {int maxBytes = 0}) async {
   await _ensureMeta();
 
+  &#47;&#47; A single image larger than the whole quota is never stored — checked
+  &#47;&#47; first so it does not evict everything else for nothing.
+  if (maxBytes &gt; 0 &amp;&amp; bytes.length &gt; maxBytes) return;
+
   &#47;&#47; Update existing entry.
   if (_meta.containsKey(url)) {
     final old = _meta[url]!;
-    _totalBytes += bytes.length - old.size;
+    &#47;&#47; File first, metadata after: a reader must never see an entry whose
+    &#47;&#47; file is not on disk yet.
+    await ImageCacheBackend.write(old.fileKey, bytes);
+    final cur = _meta[url];
+    if (cur == null) return; &#47;&#47; evicted while writing
+    _totalBytes += bytes.length - cur.size;
     _meta[url] = _ImageEntry(
-      fileKey: old.fileKey,
+      fileKey: cur.fileKey,
       atime:   DateTime.now().millisecondsSinceEpoch,
       size:    bytes.length,
     );
-    await ImageCacheBackend.write(old.fileKey, bytes);
+    _ramPut(url, bytes);
     await _saveMeta();
     return;
   }
@@ -90,17 +99,22 @@
   if (maxBytes &gt; 0) {
     final overflow = _totalBytes + bytes.length - maxBytes;
     if (overflow &gt; 0) await evictLru(overflow);
-    if (bytes.length &gt; maxBytes) return; &#47;&#47; single image too big
   }
 
   final key = &#39;${_nextId++}&#39;;
+  await ImageCacheBackend.write(key, bytes);
+  if (_meta.containsKey(url)) {
+    &#47;&#47; Another download of the same URL finished first: drop our copy.
+    await ImageCacheBackend.delete(key);
+    return;
+  }
   _meta[url] = _ImageEntry(
     fileKey: key,
     atime:   DateTime.now().millisecondsSinceEpoch,
     size:    bytes.length,
   );
   _totalBytes += bytes.length;
-  await ImageCacheBackend.write(key, bytes);
+  _ramPut(url, bytes);
   await _saveMeta();
 }</code></pre>
 </section>

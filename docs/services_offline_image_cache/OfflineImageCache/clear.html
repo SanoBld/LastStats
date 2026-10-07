@@ -67,11 +67,22 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; clear() async {
+  _lazySave?.cancel();
+  _lazySave = null;
   _meta.clear();
+  _ram.clear();
+  _ramBytes   = 0;
   _totalBytes = 0;
   _nextId     = 0;
-  _loaded     = false;
+  _failedUntil.clear();
+  &#47;&#47; Wait for a metadata write in progress, then wipe the backend and
+  &#47;&#47; mark the (now empty) metadata as loaded.
+  while (_saving) {
+    await Future.delayed(const Duration(milliseconds: 20));
+  }
   await ImageCacheBackend.clearAll();
+  _loading = null;
+  _loaded  = true;
 }</code></pre>
 </section>
 

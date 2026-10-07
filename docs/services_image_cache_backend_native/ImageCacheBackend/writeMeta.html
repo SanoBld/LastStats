@@ -70,7 +70,11 @@
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; writeMeta(String json) async {
   try {
     final dir = await _ensureDir();
-    await File(&#39;${dir.path}&#47;meta.json&#39;).writeAsString(json);
+    &#47;&#47; Write to a temp file, then rename: a crash mid-write can no longer
+    &#47;&#47; leave a truncated meta.json (which made the whole cache unreadable).
+    final tmp = File(&#39;${dir.path}&#47;meta.json.tmp&#39;);
+    await tmp.writeAsString(json, flush: true);
+    await tmp.rename(&#39;${dir.path}&#47;meta.json&#39;);
   } catch (_) {}
 }</code></pre>
 </section>

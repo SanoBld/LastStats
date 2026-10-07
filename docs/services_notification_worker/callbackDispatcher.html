@@ -102,6 +102,8 @@ void callbackDispatcher() {
     }
     &#47;&#47; Keep home screen widgets fresh on every background run.
     await WidgetService.updateAll();
+    &#47;&#47; This isolate has its own API counters: persist them before it is killed.
+    await ApiUsage.flush();
     return true;
   });
 }</code></pre>

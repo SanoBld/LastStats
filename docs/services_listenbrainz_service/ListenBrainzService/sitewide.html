@@ -83,7 +83,7 @@
     &#39;range&#39;: range,
     &#39;count&#39;: &#39;$limit&#39;,
   });
-  final res = await http.get(uri).timeout(_timeout);
+  final res = await ApiHttp.get(uri).timeout(_timeout);
   if (res.statusCode != 200) return [];
   final body    = jsonDecode(utf8.decode(res.bodyBytes));
   final payload = body is Map ? body[&#39;payload&#39;] : null;

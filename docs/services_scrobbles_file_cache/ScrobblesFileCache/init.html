@@ -66,48 +66,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; init() async {
-  if (_initialized) return;
-  _initialized = true;
-
-  try {
-    &#47;&#47; ── Méta ──────────────────────────────────────────────────────────────
-    final metaRaw = await CacheBackend.read(_metaKey);
-    if (metaRaw != null) {
-      try {
-        final decoded = jsonDecode(metaRaw) as Map&lt;String, dynamic&gt;;
-        &#47;&#47; &#39;data&#39; contient loaded_years + last_sync_ts
-        _meta = decoded[&#39;data&#39;] as Map&lt;String, dynamic&gt;?;
-      } catch (_) {}
-    }
-
-    &#47;&#47; ── Années connues via la méta ─────────────────────────────────────────
-    final years = _meta == null
-        ? &lt;int&gt;[]
-        : ((_meta![&#39;loaded_years&#39;] as List?)
-                ?.map((e) =&gt; (e as num).toInt())
-                .toList() ??
-            []);
-
-    &#47;&#47; Read all raw blobs on the UI isolate (cheap I&#47;O), then decode+parse
-    &#47;&#47; everything at once in a single background isolate — avoids both
-    &#47;&#47; blocking the UI thread and spawning one isolate per year.
-    final rawByYear = &lt;int, String&gt;{};
-    for (final year in years) {
-      final raw = await CacheBackend.read(_yearKey(year));
-      if (raw != null) rawByYear[year] = raw;
-    }
-    final parsed = await compute(_decodeYearsRecords, rawByYear);
-    _years.addAll(parsed);
-    final okFlags = await compute(_decodeYearsOkFlags, rawByYear);
-    _yearOk.addAll(okFlags);
-
-    debugPrint(&#39;[ScrobblesCache] ${_years.length} année(s) chargée(s) &#39;
-        &#39;(${getTotalScrobbleCount()} scrobbles).&#39;);
-  } catch (e) {
-    debugPrint(&#39;[ScrobblesCache] Erreur init : $e&#39;);
-  }
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; init() =&gt; _initFuture ??= _init();</code></pre>
 </section>
 
 
