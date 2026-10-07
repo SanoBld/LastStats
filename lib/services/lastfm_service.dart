@@ -54,7 +54,12 @@ class LastFmService {
       'api_key': key,
       'format':  'json',
     });
-    final res = await ApiHttp.get(uri, keyLabel: keyLabel(key)).timeout(_timeout);
+    var res = await ApiHttp.get(uri, keyLabel: keyLabel(key)).timeout(_timeout);
+    // One simple retry after a short pause if Last.fm says "too many requests".
+    if (res.statusCode == 429) {
+      await Future.delayed(const Duration(milliseconds: 1500));
+      res = await ApiHttp.get(uri, keyLabel: keyLabel(key)).timeout(_timeout);
+    }
     if (res.statusCode == 429) {
       throw Exception('Last.fm rate limit reached (HTTP 429)');
     }

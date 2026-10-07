@@ -93,7 +93,12 @@ class ApiUsage {
 
   /// Waits for a free slot. Returns false when the wait would exceed the
   /// API's maxWaitMs (the caller must then NOT send the request).
+  // Client-side limiter is OFF: it queued or skipped requests and caused
+  // endless loading. Calls are still counted. Set to true to turn it back on.
+  static const bool limiterEnabled = false;
+
   static Future<bool> acquire(ApiDef def) async {
+    if (!limiterEnabled) return true;
     final l = _l(def.id);
     final start = _now();
     final deadline = start + (def.maxWaitMs > 0 ? def.maxWaitMs : 60000);
