@@ -69,7 +69,8 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;String&gt; resolveArtist(String artist, {String? lastfmUrl}) =&gt;
-    _once(&#39;artist|$artist&#39;, () =&gt; _resolveArtist(artist, lastfmUrl: lastfmUrl));</code></pre>
+    _once(&#39;artist|$artist&#39;, () =&gt; _resolveArtist(artist, lastfmUrl: lastfmUrl))
+        .timeout(_maxResolve, onTimeout: () =&gt; lastfmUrl ?? &#39;&#39;);</code></pre>
 </section>
 
 

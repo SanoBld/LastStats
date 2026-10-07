@@ -73,7 +73,8 @@
   <pre class="language-dart"><code class="language-dart">static Future&lt;String&gt; resolveTrack(String track, String artist,
         {String? lastfmUrl, String album = &#39;&#39;}) =&gt;
     _once(&#39;track|$artist|$track&#39;,
-        () =&gt; _resolveTrack(track, artist, lastfmUrl: lastfmUrl, album: album));</code></pre>
+        () =&gt; _resolveTrack(track, artist, lastfmUrl: lastfmUrl, album: album))
+        .timeout(_maxResolve, onTimeout: () =&gt; lastfmUrl ?? &#39;&#39;);</code></pre>
 </section>
 
 
