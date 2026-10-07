@@ -71,7 +71,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;String&gt; resolveAlbum(String album, String artist, {String? lastfmUrl}) =&gt;
     _once(&#39;album|$artist|$album&#39;, () =&gt; _resolveAlbum(album, artist, lastfmUrl: lastfmUrl))
-        .timeout(_maxResolve, onTimeout: () =&gt; lastfmUrl ?? &#39;&#39;);</code></pre>
+        .timeout(_maxResolve, onTimeout: () =&gt; _ok(lastfmUrl) ? lastfmUrl! : &#39;&#39;);</code></pre>
 </section>
 
 

@@ -74,7 +74,7 @@
         {String? lastfmUrl, String album = &#39;&#39;}) =&gt;
     _once(&#39;track|$artist|$track&#39;,
         () =&gt; _resolveTrack(track, artist, lastfmUrl: lastfmUrl, album: album))
-        .timeout(_maxResolve, onTimeout: () =&gt; lastfmUrl ?? &#39;&#39;);</code></pre>
+        .timeout(_maxResolve, onTimeout: () =&gt; _ok(lastfmUrl) ? lastfmUrl! : &#39;&#39;);</code></pre>
 </section>
 
 
