@@ -199,7 +199,8 @@
   transition: transform .35s var(--m3-emphasized-decel), box-shadow .35s var(--m3-emphasized-decel);
 }
 .showcase-media:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 12px 26px -10px rgba(var(--md-shadow), .35); }
-.showcase-media img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 9/16; display: block; transform: scale(1.12); }
+.showcase-media img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 9/16; display: block; }
+.showcase-media video { width: 100%; height: auto; aspect-ratio: 9/20; object-fit: cover; display: block; }
 .showcase-text { flex: 1; text-align: left; }
 .showcase-text h3 { font-family: var(--font-display); font-weight: 500; font-size: 1.4rem; margin-bottom: .7rem; color: var(--md-on-surface); }
 .showcase-text p { font-size: 1.02rem; line-height: 1.65; color: var(--md-on-surface-variant); }
@@ -285,8 +286,6 @@
 .m3-carousel-item.is-active { box-shadow: 0 16px 32px -14px rgba(var(--md-shadow), .5); }
 .m3-carousel-item img {
   width: 100%; height: 100%; object-fit: cover; display: block;
-  /* light zoom so the decor around the phone mockup shows less */
-  transform: scale(1.12);
   -webkit-user-drag: none; user-select: none;
 }
 .m3-carousel-item:not(.is-active) img { cursor: pointer !important; }
