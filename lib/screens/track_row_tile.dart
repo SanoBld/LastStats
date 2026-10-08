@@ -6,7 +6,6 @@
 //  add-to-folder search so every track list in the app looks the same.
 // ══════════════════════════════════════════════════════════════════════════
 
-import '../services/offline_image_cache.dart';
 import 'package:flutter/material.dart';
 import '../services/image_service.dart';
 import '../theme/story_style.dart';
@@ -44,22 +43,19 @@ class TrackRowTile extends StatelessWidget {
                 lastfmUrl: imageUrl.isNotEmpty ? imageUrl : null),
             builder: (ctx, snap) {
               final url = snap.data ?? imageUrl;
-              Widget fallback() => Container(
+              if (url.isEmpty) {
+                return Container(
+                  color: scheme.secondaryContainer,
+                  child: Icon(Icons.music_note_rounded,
+                      color: scheme.onSecondaryContainer, size: 20),
+                );
+              }
+              return Image.network(url, fit: BoxFit.cover, cacheWidth: 160, cacheHeight: 160,
+                  errorBuilder: (_, _, _) => Container(
                     color: scheme.secondaryContainer,
                     child: Icon(Icons.music_note_rounded,
                         color: scheme.onSecondaryContainer, size: 20),
-                  );
-              if (url.isEmpty) return fallback();
-              // Resized url first; if that variant fails, the original url.
-              final shown = OfflineImageCache.sized(
-                  url, 48, MediaQuery.of(ctx).devicePixelRatio);
-              return Image.network(shown, fit: BoxFit.cover, cacheWidth: 160, cacheHeight: 160,
-                  errorBuilder: (_, _, _) {
-                    if (shown == url) return fallback();
-                    OfflineImageCache.markSizedBad(shown);
-                    return Image.network(url, fit: BoxFit.cover, cacheWidth: 160, cacheHeight: 160,
-                        errorBuilder: (_, _, _) => fallback());
-                  });
+                  ));
             },
           ),
         ),

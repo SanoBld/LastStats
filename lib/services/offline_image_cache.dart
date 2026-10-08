@@ -7,32 +7,11 @@
 // Usage:
 //   final provider = await OfflineImageCache.imageProvider(url);
 //   Image(image: provider, ...)
-//
-// Fixes in this version (cache audit):
-//   • Metadata loading is memoized (a Completer). Before, `_loaded` was set
-//     to true BEFORE the metadata was read, so a second caller during startup
-//     saw an empty map and could re-download images and reuse file ids that
-//     already existed on disk (overwriting other images' bytes).
-//   • The same URL is never downloaded twice at once (in-flight map), and a
-//     URL that just failed is not retried on every widget rebuild.
-//   • The storage quota is now enforced on EVERY download. Widgets used to
-//     call put() without a limit, so only ImageService's own downloads were
-//     ever trimmed.
-//   • meta.json is written one write at a time, coalesced. Overlapping
-//     writes could interleave and corrupt the file; reading an image rewrote
-//     the whole file every time (now debounced).
-//   • A small RAM cache avoids re-reading the same file from disk on every
-//     rebuild (and the placeholder flicker that went with it).
-//   • Only responses that really are images are stored.
 
-import 'dart:async';
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../widgets/skeleton.dart';
-import 'storage_manager.dart';
-import 'image_sizing.dart';
 
 import 'image_cache_backend_stub.dart'
     if (dart.library.io)   'image_cache_backend_native.dart'
@@ -43,7 +22,6 @@ import 'web_img_stub.dart'
     if (dart.library.html) 'web_img_web.dart';
 
 import 'package:http/http.dart' as http;
-import 'api_http.dart';
 
 // ── Entry in the LRU metadata map ────────────────────────────────────────────
 
@@ -73,188 +51,38 @@ class OfflineImageCache {
   static int  _totalBytes = 0;
   static int  _nextId     = 0;
   static bool _loaded     = false;
-  static Future<void>? _loading;
 
   static const _timeout = Duration(seconds: 8);
 
-  // Small RAM cache of decoded-source bytes (LRU), so a rebuild does not hit
-  // the disk again. Capped by bytes, not by entry count.
-  static final LinkedHashMap<String, Uint8List> _ram = LinkedHashMap();
-  static int _ramBytes = 0;
-  static const _ramCap = 24 * 1024 * 1024;
-
-  // Downloads currently running, and URLs that failed recently.
-  static final Map<String, Future<void>> _inflight = {};
-  static final Map<String, int> _failedUntil = {};
-  static const _failCooldownMs = 2 * 60 * 1000;
-
-  // Background downloads run a few at a time: a list of 50 covers must not
-  // open 50 sockets at once (that starves the pictures actually on screen).
-  static const _maxParallelDownloads = 4;
-  static const _maxQueuedDownloads   = 150;
-  static int _dlActive = 0;
-  static final Queue<Completer<void>> _dlWaiters = Queue();
-
-  static Future<void> _dlAcquire() async {
-    if (_dlActive < _maxParallelDownloads) {
-      _dlActive++;
-      return;
-    }
-    final c = Completer<void>();
-    _dlWaiters.add(c);
-    await c.future; // slot handed over by _dlRelease (count unchanged)
-  }
-
-  static void _dlRelease() {
-    if (_dlWaiters.isNotEmpty) {
-      _dlWaiters.removeFirst().complete();
-    } else {
-      _dlActive--;
-    }
-  }
-
-  // Resized urls that failed to load while the original one worked: the
-  // original is used from then on instead of retrying the resized one.
-  static final Set<String> _badSized = {};
-
-  /// Artwork URL for the size it is shown at; the original URL when that
-  /// resized variant is known not to work.
-  static String sized(String url, double logicalPx, double dpr) {
-    final s = sizedImageUrl(url, logicalPx, dpr);
-    return (s != url && _badSized.contains(s)) ? url : s;
-  }
-
-  static void markSizedBad(String sizedUrl) {
-    if (_badSized.length > 500) _badSized.clear();
-    _badSized.add(sizedUrl);
-  }
-
-  // Only real pictures are stored: a 200 answer can still be an HTML/JSON
-  // error page, which would then sit in the cache as a permanently broken
-  // image.
-  static bool _isImageBytes(Uint8List b) {
-    if (b.length < 12) return false;
-    if (b[0] == 0xFF && b[1] == 0xD8) return true;                         // JPEG
-    if (b[0] == 0x89 && b[1] == 0x50 && b[2] == 0x4E && b[3] == 0x47) return true; // PNG
-    if (b[0] == 0x47 && b[1] == 0x49 && b[2] == 0x46) return true;         // GIF
-    if (b[0] == 0x42 && b[1] == 0x4D) return true;                         // BMP
-    if (b[0] == 0x52 && b[1] == 0x49 && b[2] == 0x46 && b[3] == 0x46 &&
-        b[8] == 0x57 && b[9] == 0x45 && b[10] == 0x42 && b[11] == 0x50) {
-      return true;                                                         // WebP
-    }
-    if (b[4] == 0x66 && b[5] == 0x74 && b[6] == 0x79 && b[7] == 0x70) {
-      return true;                                                         // AVIF / HEIC
-    }
-    return false;
-  }
-
-  // Forgets one cached entry (its bytes could not be decoded).
-  static Future<void> _drop(String url) async {
-    final e = _meta.remove(url);
-    _ramDrop(url);
-    if (e == null) return;
-    _totalBytes -= e.size;
-    await ImageCacheBackend.delete(e.fileKey);
-    _saveMetaLater();
-  }
-
   // ── Metadata persistence ──────────────────────────────────────────────────
 
-  static Future<void> _ensureMeta() {
-    if (_loaded) return Future.value();
-    return _loading ??= _loadMeta();
-  }
-
-  static Future<void> _loadMeta() async {
+  static Future<void> _ensureMeta() async {
+    if (_loaded) return;
+    _loaded = true;
     try {
       final raw = await ImageCacheBackend.readMeta();
-      if (raw != null) {
-        final json = jsonDecode(raw) as Map<String, dynamic>;
-        final entries = (json['e'] as Map<String, dynamic>?) ?? {};
-        final loaded = <String, _ImageEntry>{};
-        var total = 0;
-        var maxId = -1;
-        for (final kv in entries.entries) {
-          final e = _ImageEntry.fromJson(kv.value as Map<String, dynamic>);
-          loaded[kv.key] = e;
-          total += e.size;
-          final id = int.tryParse(e.fileKey);
-          if (id != null && id > maxId) maxId = id;
-        }
-        _meta
-          ..clear()
-          ..addAll(loaded);
-        _totalBytes = total;
-        // Never reuse an id that is already referenced.
-        final stored = (json['id'] as num?)?.toInt() ?? 0;
-        _nextId = stored > maxId + 1 ? stored : maxId + 1;
+      if (raw == null) return;
+      final json = jsonDecode(raw) as Map<String, dynamic>;
+      _nextId = (json['id'] as num?)?.toInt() ?? 0;
+      final entries = (json['e'] as Map<String, dynamic>?) ?? {};
+      _meta.clear();
+      _totalBytes = 0;
+      for (final kv in entries.entries) {
+        final e = _ImageEntry.fromJson(kv.value as Map<String, dynamic>);
+        _meta[kv.key] = e;
+        _totalBytes += e.size;
       }
-    } catch (_) {
-      // Unreadable metadata: start empty. Files left on disk are simply
-      // overwritten as ids are reused (no meta entry points at them).
-    } finally {
-      _loaded = true;
-    }
+    } catch (_) {}
   }
 
-  static bool _saving = false;
-  static bool _dirty  = false;
-  static Timer? _lazySave;
-
-  // One write at a time; writes requested while one is running are merged.
   static Future<void> _saveMeta() async {
-    _lazySave?.cancel();
-    _lazySave = null;
-    _dirty = true;
-    if (_saving) return;
-    _saving = true;
     try {
-      while (_dirty) {
-        _dirty = false;
-        final map = <String, dynamic>{};
-        for (final kv in _meta.entries) {
-          map[kv.key] = kv.value.toJson();
-        }
-        await ImageCacheBackend.writeMeta(jsonEncode({'id': _nextId, 'e': map}));
+      final map = <String, dynamic>{};
+      for (final kv in _meta.entries) {
+        map[kv.key] = kv.value.toJson();
       }
-    } catch (_) {
-    } finally {
-      _saving = false;
-    }
-  }
-
-  // Access-time updates are not worth a disk write each: batch them.
-  static void _saveMetaLater() {
-    if (_lazySave != null) return;
-    _lazySave = Timer(const Duration(seconds: 5), () {
-      _lazySave = null;
-      _saveMeta().ignore();
-    });
-  }
-
-  // ── RAM cache ─────────────────────────────────────────────────────────────
-
-  static Uint8List? _ramGet(String url) {
-    final b = _ram.remove(url);
-    if (b != null) _ram[url] = b;
-    return b;
-  }
-
-  static void _ramPut(String url, Uint8List bytes) {
-    if (bytes.length > _ramCap ~/ 4) return; // never let one image flush it all
-    final old = _ram.remove(url);
-    if (old != null) _ramBytes -= old.length;
-    _ram[url] = bytes;
-    _ramBytes += bytes.length;
-    while (_ramBytes > _ramCap && _ram.isNotEmpty) {
-      final k = _ram.keys.first;
-      _ramBytes -= _ram.remove(k)!.length;
-    }
-  }
-
-  static void _ramDrop(String url) {
-    final b = _ram.remove(url);
-    if (b != null) _ramBytes -= b.length;
+      await ImageCacheBackend.writeMeta(jsonEncode({'id': _nextId, 'e': map}));
+    } catch (_) {}
   }
 
   // ── Public: get ImageProvider (offline-capable) ───────────────────────────
@@ -276,9 +104,10 @@ class OfflineImageCache {
     return NetworkImage(url);
   }
 
-  /// Bytes of [url] — from the cache when present, otherwise downloaded once
-  /// and stored. Used where the app needs the raw bytes (dominant-colour
-  /// extraction) so it does not download an image that is already cached.
+  // ── Bytes helpers (used for dominant-colour extraction) ───────────────────
+
+  /// Bytes of [url]: from the cache when present, otherwise downloaded once
+  /// and stored.
   static Future<Uint8List?> bytesFor(String url) async {
     if (url.isEmpty) return null;
     await _ensureMeta();
@@ -288,8 +117,7 @@ class OfflineImageCache {
     return _getBytes(url);
   }
 
-  /// Same as [bytesFor] but shaped as an http.Response, for call sites that
-  /// used to download the image a second time just to read its colours.
+  /// Same as [bytesFor] but shaped as an http.Response.
   static Future<http.Response> responseFor(String url) async {
     final b = await bytesFor(url);
     return b == null ? http.Response('', 404) : http.Response.bytes(b, 200);
@@ -301,27 +129,21 @@ class OfflineImageCache {
     final entry = _meta[url];
     if (entry == null) return null;
 
-    var bytes = _ramGet(url);
-    bytes ??= await ImageCacheBackend.read(entry.fileKey);
+    final bytes = await ImageCacheBackend.read(entry.fileKey);
     if (bytes == null) {
       // File gone — remove from meta.
       _totalBytes -= entry.size;
       _meta.remove(url);
-      _saveMetaLater();
       return null;
     }
-    _ramPut(url, bytes);
 
-    // Update access time for LRU (the entry may have been replaced meanwhile).
-    final current = _meta[url];
-    if (current != null) {
-      _meta[url] = _ImageEntry(
-        fileKey: current.fileKey,
-        atime:   DateTime.now().millisecondsSinceEpoch,
-        size:    current.size,
-      );
-      _saveMetaLater();
-    }
+    // Update access time for LRU.
+    _meta[url] = _ImageEntry(
+      fileKey: entry.fileKey,
+      atime:   DateTime.now().millisecondsSinceEpoch,
+      size:    entry.size,
+    );
+    _saveMeta().ignore();
     return bytes;
   }
 
@@ -330,25 +152,16 @@ class OfflineImageCache {
   static Future<void> put(String url, Uint8List bytes, {int maxBytes = 0}) async {
     await _ensureMeta();
 
-    // A single image larger than the whole quota is never stored — checked
-    // first so it does not evict everything else for nothing.
-    if (maxBytes > 0 && bytes.length > maxBytes) return;
-
     // Update existing entry.
     if (_meta.containsKey(url)) {
       final old = _meta[url]!;
-      // File first, metadata after: a reader must never see an entry whose
-      // file is not on disk yet.
-      await ImageCacheBackend.write(old.fileKey, bytes);
-      final cur = _meta[url];
-      if (cur == null) return; // evicted while writing
-      _totalBytes += bytes.length - cur.size;
+      _totalBytes += bytes.length - old.size;
       _meta[url] = _ImageEntry(
-        fileKey: cur.fileKey,
+        fileKey: old.fileKey,
         atime:   DateTime.now().millisecondsSinceEpoch,
         size:    bytes.length,
       );
-      _ramPut(url, bytes);
+      await ImageCacheBackend.write(old.fileKey, bytes);
       await _saveMeta();
       return;
     }
@@ -357,22 +170,17 @@ class OfflineImageCache {
     if (maxBytes > 0) {
       final overflow = _totalBytes + bytes.length - maxBytes;
       if (overflow > 0) await evictLru(overflow);
+      if (bytes.length > maxBytes) return; // single image too big
     }
 
     final key = '${_nextId++}';
-    await ImageCacheBackend.write(key, bytes);
-    if (_meta.containsKey(url)) {
-      // Another download of the same URL finished first: drop our copy.
-      await ImageCacheBackend.delete(key);
-      return;
-    }
     _meta[url] = _ImageEntry(
       fileKey: key,
       atime:   DateTime.now().millisecondsSinceEpoch,
       size:    bytes.length,
     );
     _totalBytes += bytes.length;
-    _ramPut(url, bytes);
+    await ImageCacheBackend.write(key, bytes);
     await _saveMeta();
   }
 
@@ -393,7 +201,6 @@ class OfflineImageCache {
       freed      += kv.value.size;
       _totalBytes -= kv.value.size;
       _meta.remove(kv.key);
-      _ramDrop(kv.key);
     }
     await _saveMeta();
   }
@@ -410,160 +217,25 @@ class OfflineImageCache {
   // ── Clear ─────────────────────────────────────────────────────────────────
 
   static Future<void> clear() async {
-    _lazySave?.cancel();
-    _lazySave = null;
     _meta.clear();
-    _ram.clear();
-    _ramBytes   = 0;
     _totalBytes = 0;
     _nextId     = 0;
-    _failedUntil.clear();
-    // Wait for a metadata write in progress, then wipe the backend and
-    // mark the (now empty) metadata as loaded.
-    while (_saving) {
-      await Future.delayed(const Duration(milliseconds: 20));
-    }
+    _loaded     = false;
     await ImageCacheBackend.clearAll();
-    _loading = null;
-    _loaded  = true;
   }
 
   // ── Background download ───────────────────────────────────────────────────
 
-  static Future<void> _downloadAndCache(String url) {
-    final now = DateTime.now().millisecondsSinceEpoch;
-    final blockedUntil = _failedUntil[url];
-    if (blockedUntil != null) {
-      if (blockedUntil > now) return Future.value();
-      _failedUntil.remove(url);
-    }
-    final running = _inflight[url];
-    if (running != null) return running;
-    final f = _download(url).whenComplete(() => _inflight.remove(url));
-    _inflight[url] = f;
-    return f;
-  }
-
-  static Future<void> _download(String url) async {
-    var ok = false;
-    var skipped = false;
+  static Future<void> _downloadAndCache(String url) async {
     try {
-      await _ensureMeta();
-      if (_meta.containsKey(url)) { ok = true; return; }
-      if (_dlWaiters.length >= _maxQueuedDownloads) { skipped = true; return; }
-      await _dlAcquire();
-      try {
-        if (_meta.containsKey(url)) { ok = true; return; }
-        // The timeout starts now, once the download really begins (waiting
-        // for a free slot must not count against it).
-        final res = await ApiHttp.get(Uri.parse(url)).timeout(_timeout);
-        final type = (res.headers['content-type'] ?? '').toLowerCase();
-        final looksLikeImage = type.isEmpty ||
-            type.startsWith('image/') ||
-            type.startsWith('application/octet-stream') ||
-            type.startsWith('binary/');
-        if (res.statusCode == 200 &&
-            res.bodyBytes.isNotEmpty &&
-            looksLikeImage &&
-            _isImageBytes(res.bodyBytes)) {
-          await put(url, res.bodyBytes, maxBytes: StorageManager.maxBytes);
-          ok = true;
-        }
-      } finally {
-        _dlRelease();
+      final res = await http.get(Uri.parse(url)).timeout(_timeout);
+      if (res.statusCode == 200 && res.bodyBytes.isNotEmpty) {
+        await put(url, res.bodyBytes);
       }
-    } catch (_) {
-    } finally {
-      if (!ok && !skipped) {
-        _failedUntil[url] =
-            DateTime.now().millisecondsSinceEpoch + _failCooldownMs;
-        if (_failedUntil.length > 2000) {
-          final now = DateTime.now().millisecondsSinceEpoch;
-          _failedUntil.removeWhere((_, t) => t < now);
-        }
-      }
-    }
+    } catch (_) {}
   }
 
   // ── Widget helper ─────────────────────────────────────────────────────────
-
-  // Network picture with a safety net: if the resized url fails, the
-  // original (un-resized) url is tried before giving up.
-  static Widget _networkImage(
-    BuildContext context,
-    String url,
-    String original, {
-    double? width,
-    double? height,
-    required BoxFit fit,
-    Widget? placeholder,
-    Widget? errorWidget,
-  }) {
-    final ph = placeholder ?? M3ImagePlaceholder(width: width, height: height);
-    final dpr = MediaQuery.of(context).devicePixelRatio;
-    final cacheWidth  = width  != null ? (width * dpr).round()  : null;
-    final cacheHeight = height != null ? (height * dpr).round() : null;
-
-    final webImg = buildCorsBypassImage(url, width: width, height: height, fit: fit);
-    if (webImg != null) return webImg;
-
-    Widget failed() => errorWidget ?? placeholder ?? const SizedBox.shrink();
-    Widget net(String u, Widget Function() onError) => Image.network(
-          u,
-          width: width,
-          height: height,
-          fit: fit,
-          cacheWidth: cacheWidth,
-          cacheHeight: cacheHeight,
-          gaplessPlayback: true,
-          loadingBuilder: (_, child, p) => p == null ? child : ph,
-          errorBuilder: (_, _, _) => onError(),
-        );
-
-    return net(url, () {
-      if (original == url) return failed();
-      markSizedBad(url);
-      return net(original, failed);
-    });
-  }
-
-  static Widget _memoryImage(
-    BuildContext context,
-    Uint8List data, {
-    required String url,
-    required String original,
-    double? width,
-    double? height,
-    required BoxFit fit,
-    Widget? placeholder,
-    Widget? errorWidget,
-  }) {
-    // Decode at the actual display size (× device pixel ratio) instead
-    // of the source's full resolution — a 40dp list thumbnail doesn't
-    // need a 3000×3000 bitmap sitting in memory. Only applied when a
-    // display size was actually requested; omitted otherwise (e.g. the
-    // detail sheet's full-size hero image still wants native quality).
-    final dpr = MediaQuery.of(context).devicePixelRatio;
-    final cacheWidth  = width  != null ? (width * dpr).round()  : null;
-    final cacheHeight = height != null ? (height * dpr).round() : null;
-    return Image.memory(
-      data,
-      width: width,
-      height: height,
-      fit: fit,
-      cacheWidth: cacheWidth,
-      cacheHeight: cacheHeight,
-      gaplessPlayback: true,
-      errorBuilder: (ctx, _, _) {
-        // The cached bytes cannot be decoded (corrupt file): forget them and
-        // show the picture from the network instead of a blank square.
-        scheduleMicrotask(() => _drop(url));
-        return _networkImage(ctx, url, original,
-            width: width, height: height, fit: fit,
-            placeholder: placeholder, errorWidget: errorWidget);
-      },
-    );
-  }
 
   // Returns a widget that shows the cached image or falls back to network.
   static Widget image({
@@ -574,52 +246,58 @@ class OfflineImageCache {
     Widget? placeholder,
     Widget? errorWidget,
   }) {
-    final original = url;
-    // Download the resolution that matches the on-screen size.
-    final side = (width != null && width.isFinite ? width : 0.0) > (height != null && height.isFinite ? height : 0.0)
-        ? width! : (height != null && height.isFinite ? height : 0.0);
-    if (side > 0) {
-      final dpr = WidgetsBinding.instance.platformDispatcher.views.isNotEmpty
-          ? WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio : 2.0;
-      url = sized(url, side, dpr);
-    }
     final ph = placeholder ?? M3ImagePlaceholder(width: width, height: height);
     if (url.isEmpty) return placeholder ?? const SizedBox.shrink();
-    final shownUrl = url;
-
-    // Fast path: already in RAM → no FutureBuilder, no placeholder flash.
-    final hot = _loaded && _meta.containsKey(shownUrl) ? _ramGet(shownUrl) : null;
-    if (hot != null) {
-      return Builder(builder: (context) => _memoryImage(
-            context, hot,
-            url: shownUrl, original: original,
-            width: width, height: height, fit: fit,
-            placeholder: placeholder, errorWidget: errorWidget,
-          ));
-    }
 
     // Cache checked FIRST (offline or online) — network is only a fallback.
     return FutureBuilder<Uint8List?>(
-      future: _ensureMeta().then((_) => _getBytes(shownUrl)),
+      future: _ensureMeta().then((_) => _getBytes(url)),
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.done) {
           return ph;
         }
 
+        // Decode at the actual display size (× device pixel ratio) instead
+        // of the source's full resolution — a 40dp list thumbnail doesn't
+        // need a 3000×3000 bitmap sitting in memory. Only applied when a
+        // display size was actually requested; omitted otherwise (e.g. the
+        // detail sheet's full-size hero image still wants native quality).
+        final dpr = MediaQuery.of(context).devicePixelRatio;
+        final cacheWidth  = width  != null ? (width * dpr).round()  : null;
+        final cacheHeight = height != null ? (height * dpr).round() : null;
+
         if (snap.data != null) {
-          return _memoryImage(
-            context, snap.data!,
-            url: shownUrl, original: original,
-            width: width, height: height, fit: fit,
-            placeholder: placeholder, errorWidget: errorWidget,
+          return Image.memory(
+            snap.data!,
+            width: width,
+            height: height,
+            fit: fit,
+            cacheWidth: cacheWidth,
+            cacheHeight: cacheHeight,
+            gaplessPlayback: true,
+            errorBuilder: (_, _, _) =>
+                errorWidget ?? placeholder ?? const SizedBox.shrink(),
           );
         }
 
-        _downloadAndCache(shownUrl).ignore();
+        // Not cached → download in background, show network meanwhile.
+        _downloadAndCache(url).ignore();
 
-        return _networkImage(context, shownUrl, original,
-            width: width, height: height, fit: fit,
-            placeholder: placeholder, errorWidget: errorWidget);
+        final webImg = buildCorsBypassImage(url, width: width, height: height, fit: fit);
+        if (webImg != null) return webImg;
+
+        return Image.network(
+          url,
+          width: width,
+          height: height,
+          fit: fit,
+          cacheWidth: cacheWidth,
+          cacheHeight: cacheHeight,
+          gaplessPlayback: true,
+          loadingBuilder: (_, child, p) => p == null ? child : ph,
+          errorBuilder: (_, _, _) =>
+              errorWidget ?? placeholder ?? const SizedBox.shrink(),
+        );
       },
     );
   }
