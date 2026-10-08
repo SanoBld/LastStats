@@ -690,7 +690,7 @@ class AppStringsEn implements AppStrings {
   @override String get faqQ1 => 'Does LastStats scrobble my music?';
   @override String get faqA1 => 'No. LastStats is a visualisation app: it displays the scrobbles already recorded on your Last.fm account, but it does not record any itself.\n\nTo automatically scrobble your music, use a dedicated app such as Pano Scrobbler (available on Android).';
   @override String get faqQ2 => 'Is an iOS version planned?';
-  @override String get faqA2 => 'No. An iOS version is not planned at this time.';
+  @override String get faqA2 => 'No, an iOS version is not planned at the moment. If enough people ask for it, the decision may be reconsidered.';
   @override String get faqQ3 => 'Does the app work on macOS or other platforms?';
   @override String get faqA3 => 'LastStats is developed and tested on Android. Behaviour on other platforms (macOS, Windows, Linux…) is unverified, bugs or unexpected behaviour may occur.';
   @override String get faqQ4 => 'Is LastStats open source?';
@@ -698,7 +698,7 @@ class AppStringsEn implements AppStrings {
   @override String get faqQ5 => 'Where is my data stored?';
   @override String get faqA5 => 'On your device only. LastStats has no server: your scrobbles are cached locally for fast access, and your Last.fm credentials are stored locally too. Nothing is sent anywhere except Last.fm\'s official API.';
   @override String get faqQ6 => 'How do I enable favorites?';
-  @override String get faqA6 => 'Go to Settings > Account and enter your Last.fm secret key. Once connected, you\'ll be able to favorite tracks directly from the app.';
+  @override String get faqA6 => 'Go to Settings > Account and enter your Last.fm secret key (you can find it next to your API key at last.fm/api/accounts), then follow the steps on screen. Once connected, you can favorite tracks directly from the app. This is not available with the app\'s built-in key.';
   @override String get faqQ7 => 'What is a \'scrobble\'?';
   @override String get faqA7 => 'A scrobble is a track logged as played on your Last.fm account \u2014 it\'s Last.fm\'s own term for \'one counted listen\'. All your totals (top artists, stats, etc.) are based on it.';
   @override String get faqQ8 => 'How do levels and achievements work?';
@@ -706,13 +706,13 @@ class AppStringsEn implements AppStrings {
   @override String get faqQ9 => 'How does power saving mode work?';
   @override String get faqA9 => 'Power saving mode spaces out automatic syncs to save battery. It can be always on, follow your phone\'s own power saving mode, or turn on below a battery level you choose, from Settings > General.';
   @override String get faqQ10 => 'How do I back up or restore my data?';
-  @override String get faqA10 => 'Go to Settings > Backup. You can export a backup file (with or without your Last.fm key) and re-import it later or on another device.';
+  @override String get faqA10 => 'Go to Settings > Backup. You can export a backup file, with or without your Last.fm key as you prefer, and import it later on this phone or on another device to get your settings back.';
   @override String get faqQ11 => 'Does the app work offline?';
   @override String get faqA11 => 'Yes, to some extent. Stats already loaded stay available offline thanks to local caching, but a connection is still needed to fetch new scrobbles.';
   @override String get faqQ12 => 'Can I switch Last.fm accounts?';
-  @override String get faqA12 => 'Yes. From Settings > Account, sign out and sign back in with a different username. The local cache is automatically reset to avoid mixing data.';
+  @override String get faqA12 => 'Yes, you can save up to 3 Last.fm accounts. From Settings > Account, tap "Add an account" and then switch between them whenever you like. The local cache is automatically reset when you switch, so the data of two accounts never gets mixed.';
   @override String get faqQ13 => 'How do I set up notifications?';
-  @override String get faqA13 => 'From Settings > Notifications, you can enable sync-complete alerts, choose how often they appear, or turn them off entirely.';
+  @override String get faqA13 => 'From Settings > Notifications, you can turn on an alert when a sync finishes, choose how often alerts appear, or turn notifications off completely if you prefer.';
   @override String get faqQ14 => 'Artwork is missing or keeps loading. What can I do?';
   @override String get faqA14 => 'Clear the cache in the app (Settings > Cache), then in Android (Settings > Apps > LastStats > Storage > Clear cache). If images are still missing, back up your data (Settings > Backup), uninstall and reinstall the app, then restore your backup.';
   @override String get settingsPlatformDisabledByShowAll => 'Disabled: all links are already shown.';
@@ -986,7 +986,23 @@ const Map<String, String> kTxEn = {
   'key_internal_help': 'Backup option: this key is shared between users. It may hit its limits or stop working, and some features may then fail. Prefer your own key when you can.',
   'key_internal_active': 'App built-in key',
   'key_fallback_title': 'Built-in key as backup',
-  'key_fallback_sub': 'Try your own key first, then the built-in key if it fails',
+  'key_fallback_sub': 'Your own key is used first. If Last.fm rejects it, the app automatically tries again with the built-in key.',
+  'key_use_own': 'Use my own API key',
+  'key_change_title': 'Change API key',
+  'key_change_sub': 'Replace your key with another one, or switch to the app\'s built-in key.',
+  'key_change_sub_internal': 'You are using the app\'s shared key. Add your own key so you no longer depend on the limits of other users.',
+  'key_change_intro': 'Enter a new API key for this account, or go back to the app\'s built-in key. Your username and your stats stay the same.',
+  'key_change_intro_internal': 'This account currently uses the app\'s built-in key. Paste your own Last.fm API key below to replace it. Your username and your stats stay the same.',
+  'key_change_hint': 'An API key is 32 characters long. You can create or find yours at last.fm/api/accounts.',
+  'key_change_invalid_len': 'An API key must be exactly 32 characters long. Make sure you copied the whole key.',
+  'key_change_same': 'This account already uses this key. Enter a different one.',
+  'key_change_check_failed': 'Last.fm did not accept this key. Check that it is correct and that you are online, then try again.',
+  'key_change_favorites_warn': 'Your favorites connection will be removed because it depends on the old key. You can reconnect it afterwards with your secret key.',
+  'key_change_apply': 'Apply',
+  'key_change_success': 'Your API key has been updated.',
+  'key_internal_fav_note': 'Favorites need your own API key and your Last.fm secret key. Add your own key above to be able to turn them on.',
+  'faq_q15': 'Can I change my API key after signing in?',
+  'faq_a15': 'Yes. Go to Settings > Account and tap "Change API key". You can replace your key with another one, or add your own if you chose the built-in key at the start. Your stats stay the same, only the favorites connection has to be set up again.',
   'ui_play_preview': 'Play preview',
   'ntf_test_title': '🔔 Test notification',
   'ntf_test_body': 'LastStats notifications are working!',

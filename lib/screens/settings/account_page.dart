@@ -17,6 +17,7 @@ import '../../app_state.dart';
 import '../../services/account_manager.dart';
 import '../../services/favorites_auth.dart';
 import '../../services/internal_keys.dart';
+import '../../services/lastfm_service.dart';
 import '../../widgets/internal_key_toggle.dart';
 import '../../l10n/extra_strings.dart';
 import '../setup_screen.dart';
@@ -206,6 +207,53 @@ class _AccountPageState extends State<AccountPage> {
     } else {
       await _load();
     }
+  }
+
+  // ── Change the API key of the active account ──────────────────────────────
+  // Lets the user swap their own key for another one, switch to the app's
+  // built-in key, or (when the built-in key was chosen at setup) add their
+  // own key later. The session key used by favorites is tied to the old API
+  // key, so favorites are disconnected and can be reconnected afterwards.
+
+  Future<void> _changeKey() async {
+    if (_accounts.isEmpty) return;
+    final acc = _accounts[_activeIndex];
+
+    final newKey = await showDialog<String>(
+      animationStyle: kM3DialogAnimation,
+      context: context,
+      builder: (_) => _ChangeKeyDialog(
+        username:     acc.username,
+        currentKey:   acc.apiKey,
+        hasFavorites: sessionKeyNotifier.value.isNotEmpty ||
+                      secretKeyNotifier.value.isNotEmpty,
+      ),
+    );
+    if (newKey == null || !mounted) return;
+
+    await AccountManager.updateKey(_activeIndex, newKey);
+    await disconnectFavorites();
+    if (!mounted) return;
+
+    showAppSnackBar(context, SnackBar(
+      content: Text(tx('key_change_success')),
+      behavior: SnackBarBehavior.floating,
+    ));
+
+    // Restart the home screen so every service picks up the new key.
+    final p = await SharedPreferences.getInstance();
+    final startupTab = p.getInt('ls_startup_tab') ?? 0;
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (_) => HomeScreen(
+          username:   acc.username,
+          apiKey:     newKey,
+          startupTab: startupTab,
+        ),
+      ),
+      (_) => false,
+    );
   }
 
   // ── Add an account ────────────────────────────────────────────────────────
@@ -518,6 +566,32 @@ class _AccountPageState extends State<AccountPage> {
                 ]),
               ),
               const Divider(height: 1, indent: 16, endIndent: 16),
+              ListTile(
+                leading: Icon(Icons.swap_horiz_rounded, color: scheme.primary, size: 20),
+                title: Text(
+                  InternalKeys.isInternal(active.apiKey)
+                      ? tx('key_use_own')
+                      : tx('key_change_title'),
+                  style: text.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600, color: scheme.primary),
+                ),
+                subtitle: Text(
+                  InternalKeys.isInternal(active.apiKey)
+                      ? tx('key_change_sub_internal')
+                      : tx('key_change_sub'),
+                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                ),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: _changeKey,
+              ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              // With the built-in key there is no secret key, so say why.
+              if (InternalKeys.isInternal(active.apiKey))
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+                  child: Text(tx('key_internal_fav_note'),
+                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                ),
               if (!InternalKeys.isInternal(active.apiKey)) ...[
                 SettingSwitchRow(
                   icon:     Icons.shield_moon_outlined,
@@ -794,6 +868,167 @@ class _AddAccountDialogState extends State<_AddAccountDialog> {
         FilledButton(
           onPressed: _submit,
           child: Text(L.acctAdd),
+        ),
+      ],
+    );
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════
+//  Change API key dialog
+// ══════════════════════════════════════════════════════════════════════════
+
+class _ChangeKeyDialog extends StatefulWidget {
+  final String username;
+  final String currentKey;
+  final bool   hasFavorites;
+
+  const _ChangeKeyDialog({
+    required this.username,
+    required this.currentKey,
+    required this.hasFavorites,
+  });
+
+  @override
+  State<_ChangeKeyDialog> createState() => _ChangeKeyDialogState();
+}
+
+class _ChangeKeyDialogState extends State<_ChangeKeyDialog> {
+  final _keyCtrl   = TextEditingController();
+  bool    _useInternal = false;
+  bool    _obscure     = true;
+  bool    _checking    = false;
+  String? _error;
+
+  bool get _currentIsInternal => InternalKeys.isInternal(widget.currentKey);
+
+  @override
+  void dispose() {
+    _keyCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final key = _useInternal ? await InternalKeys.pick() : _keyCtrl.text.trim();
+    if (!mounted) return;
+
+    if (!_useInternal && key.length != 32) {
+      setState(() => _error = tx('key_change_invalid_len'));
+      return;
+    }
+    if (key == widget.currentKey) {
+      setState(() => _error = tx('key_change_same'));
+      return;
+    }
+
+    // Ask Last.fm whether the key really works before saving it. The backup
+    // key is switched off meanwhile, otherwise a wrong key would silently be
+    // replaced by the built-in one and look valid.
+    setState(() { _checking = true; _error = null; });
+    final savedFallback = LastFmService.fallbackKey;
+    LastFmService.fallbackKey = '';
+    var ok = false;
+    try {
+      final info = await LastFmService(apiKey: key, username: widget.username)
+          .getUserInfo();
+      ok = info != null;
+    } catch (_) {
+      ok = false;
+    } finally {
+      LastFmService.fallbackKey = savedFallback;
+    }
+    if (!mounted) return;
+
+    if (!ok) {
+      setState(() { _checking = false; _error = tx('key_change_check_failed'); });
+      return;
+    }
+    Navigator.pop(context, key);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+
+    return AlertDialog(
+      title: Text(_currentIsInternal ? tx('key_use_own') : tx('key_change_title')),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              _currentIsInternal
+                  ? tx('key_change_intro_internal')
+                  : tx('key_change_intro'),
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: 12),
+
+            // Going back to the built-in key only makes sense from your own key.
+            if (!_currentIsInternal)
+              InternalKeyToggle(
+                value:     _useInternal,
+                onChanged: (v) => setState(() { _useInternal = v; _error = null; }),
+              ),
+
+            if (!_useInternal) ...[
+              const SizedBox(height: 8),
+              TextField(
+                controller:  _keyCtrl,
+                obscureText: _obscure,
+                autofocus:   _currentIsInternal,
+                enabled:     !_checking,
+                decoration: InputDecoration(
+                  labelText:  L.acctApiKeyLabel,
+                  helperText: tx('key_change_hint'),
+                  helperMaxLines: 3,
+                  prefixIcon: const Icon(Icons.key_rounded),
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscure
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined),
+                    onPressed: () => setState(() => _obscure = !_obscure),
+                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                onChanged: (_) { if (_error != null) setState(() => _error = null); },
+              ),
+            ],
+
+            if (widget.hasFavorites) ...[
+              const SizedBox(height: 12),
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Icon(Icons.info_outline_rounded, size: 16, color: scheme.onSurfaceVariant),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(tx('key_change_favorites_warn'),
+                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                ),
+              ]),
+            ],
+
+            if (_error != null) ...[
+              const SizedBox(height: 10),
+              Text(_error!, style: TextStyle(color: scheme.error, fontSize: 12)),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _checking ? null : () => Navigator.pop(context),
+          child: Text(L.commonCancel),
+        ),
+        FilledButton(
+          onPressed: _checking ? null : _submit,
+          child: _checking
+              ? const SizedBox(
+                  width: 18, height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2))
+              : Text(tx('key_change_apply')),
         ),
       ],
     );

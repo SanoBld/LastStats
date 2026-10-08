@@ -690,7 +690,7 @@ class AppStringsPt implements AppStrings {
   @override String get faqQ1 => 'O LastStats faz scrobble da minha música?';
   @override String get faqA1 => 'Não. O LastStats é um aplicativo de visualização: ele exibe os scrobbles já registrados na sua conta do Last.fm, mas não registra nenhum por conta própria.\n\nPara fazer scrobble automático da sua música, use um app dedicado como o Pano Scrobbler (disponível para Android).';
   @override String get faqQ2 => 'Está prevista uma versão para iOS?';
-  @override String get faqA2 => 'Não. Por enquanto não há uma versão para iOS prevista.';
+  @override String get faqA2 => 'Não, por enquanto não há uma versão para iOS prevista. Se houver procura suficiente, essa decisão poderá ser reconsiderada.';
   @override String get faqQ3 => 'O app funciona no macOS ou em outras plataformas?';
   @override String get faqA3 => 'O LastStats é desenvolvido e testado no Android. O funcionamento em outras plataformas (macOS, Windows, Linux…) não é verificado, podem ocorrer bugs ou comportamentos inesperados.';
   @override String get faqQ4 => 'O LastStats é open source?';
@@ -698,7 +698,7 @@ class AppStringsPt implements AppStrings {
   @override String get faqQ5 => 'Onde meus dados são armazenados?';
   @override String get faqA5 => 'Apenas no seu dispositivo. O LastStats não tem servidor: seus scrobbles ficam em cache local para acesso rápido, e suas credenciais do Last.fm também ficam armazenadas localmente. Nada é enviado além da API oficial do Last.fm.';
   @override String get faqQ6 => 'Como ativo os favoritos?';
-  @override String get faqA6 => 'Acesse Configurações > Conta e informe sua chave secreta do Last.fm. Uma vez conectada, você poderá favoritar faixas diretamente pelo app.';
+  @override String get faqA6 => 'Acesse Configurações > Conta e informe sua chave secreta do Last.fm (você a encontra ao lado da chave API em last.fm/api/accounts), depois siga as etapas na tela. Depois de conectada, você poderá favoritar faixas diretamente pelo app. Esta opção não está disponível com a chave interna do app.';
   @override String get faqQ7 => 'O que \u00e9 um \'scrobble\'?';
   @override String get faqA7 => 'Um scrobble \u00e9 uma faixa registrada como ouvida na sua conta do Last.fm \u2014 \u00e9 o termo oficial do Last.fm para \'uma escuta contabilizada\'. Todos os seus totais (artistas mais ouvidos, estat\u00edsticas etc.) s\u00e3o baseados nisso.';
   @override String get faqQ8 => 'Como funcionam os n\u00edveis e conquistas?';
@@ -706,13 +706,13 @@ class AppStringsPt implements AppStrings {
   @override String get faqQ9 => 'Como funciona o modo de economia de energia?';
   @override String get faqA9 => 'O modo de economia de energia espaça as sincronizações automáticas para economizar bateria. Ele pode ficar sempre ativo, acompanhar o modo de economia do telefone ou ligar abaixo de um nível de bateria que você escolher, em Ajustes > Geral.';
   @override String get faqQ10 => 'Como faço backup ou restauro meus dados?';
-  @override String get faqA10 => 'Acesse Configurações > Backup. Você pode exportar um arquivo de backup (com ou sem sua chave do Last.fm) e reimportá-lo depois ou em outro aparelho.';
+  @override String get faqA10 => 'Acesse Configurações > Backup. Você pode exportar um arquivo de backup, com ou sem a sua chave do Last.fm, como preferir, e importá-lo depois neste celular ou em outro dispositivo para recuperar suas configurações.';
   @override String get faqQ11 => 'O aplicativo funciona offline?';
   @override String get faqA11 => 'Sim, até certo ponto. As estatísticas já carregadas continuam disponíveis offline graças ao cache local, mas é preciso conexão para buscar novos scrobbles.';
   @override String get faqQ12 => 'Posso trocar de conta do Last.fm?';
-  @override String get faqA12 => 'Sim. Em Configurações > Conta, saia e entre novamente com outro nome de usuário. O cache local é limpo automaticamente para evitar misturar dados.';
+  @override String get faqA12 => 'Sim, você pode salvar até 3 contas do Last.fm. Em Configurações > Conta, toque em "Adicionar uma conta" e alterne entre elas quando quiser. O cache local é reiniciado automaticamente ao trocar de conta, para que os dados de duas contas nunca se misturem.';
   @override String get faqQ13 => 'Como configuro as notificações?';
-  @override String get faqA13 => 'Em Configurações > Notificações, você pode ativar avisos de sincronização concluída, escolher a frequência ou desativá-los por completo.';
+  @override String get faqA13 => 'Em Configurações > Notificações, você pode ativar um aviso quando uma sincronização terminar, escolher com que frequência os avisos aparecem ou desativar as notificações por completo, se preferir.';
   @override String get faqQ14 => 'Faltam imagens ou carregam sem parar. O que fazer?';
   @override String get faqA14 => 'Limpe a cache na app (Definições > Cache) e depois no Android (Definições > Aplicações > LastStats > Armazenamento > Limpar cache). Se continuarem a faltar imagens, faça uma cópia de segurança (Definições > Cópia de segurança), desinstale e reinstale a app e restaure a cópia.';
   @override String get settingsPlatformDisabledByShowAll => 'Desativado: todos os links já estão sendo exibidos.';
@@ -986,7 +986,23 @@ const Map<String, String> kTxPt = {
   'key_internal_help': 'Opção de reserva: esta chave é partilhada entre utilizadores. Pode atingir o limite ou deixar de funcionar, e algumas funções podem falhar. Prefere a tua própria chave sempre que possível.',
   'key_internal_active': 'Chave interna do app',
   'key_fallback_title': 'Chave interna como reserva',
-  'key_fallback_sub': 'Tenta a sua chave primeiro e a interna se falhar',
+  'key_fallback_sub': 'A tua chave é usada primeiro. Se o Last.fm a recusar, a app tenta de novo automaticamente com a chave interna.',
+  'key_use_own': 'Usar a minha própria chave API',
+  'key_change_title': 'Mudar a chave API',
+  'key_change_sub': 'Substitui a tua chave por outra, ou passa para a chave interna da app.',
+  'key_change_sub_internal': 'Estás a usar a chave partilhada da app. Adiciona a tua própria chave para deixares de depender dos limites de outros utilizadores.',
+  'key_change_intro': 'Introduz uma nova chave API para esta conta, ou volta à chave interna da app. O teu nome de utilizador e as tuas estatísticas não mudam.',
+  'key_change_intro_internal': 'Esta conta usa neste momento a chave interna da app. Cola abaixo a tua própria chave API do Last.fm para a substituir. O teu nome de utilizador e as tuas estatísticas não mudam.',
+  'key_change_hint': 'Uma chave API tem 32 caracteres. Podes criá-la ou encontrá-la em last.fm/api/accounts.',
+  'key_change_invalid_len': 'Uma chave API tem de ter exatamente 32 caracteres. Confirma que a copiaste por inteiro.',
+  'key_change_same': 'Esta conta já usa esta chave. Introduz uma diferente.',
+  'key_change_check_failed': 'O Last.fm não aceitou esta chave. Confirma que está correta e que tens ligação à Internet, e tenta de novo.',
+  'key_change_favorites_warn': 'A ligação aos favoritos vai ser removida, porque depende da chave antiga. Depois podes voltar a ligá-la com a tua chave secreta.',
+  'key_change_apply': 'Aplicar',
+  'key_change_success': 'A chave API foi atualizada.',
+  'key_internal_fav_note': 'Os favoritos precisam da tua própria chave API e da tua chave secreta do Last.fm. Adiciona a tua chave acima para os poderes ativar.',
+  'faq_q15': 'Posso mudar minha chave API depois de entrar?',
+  'faq_a15': 'Sim. Acesse Configurações > Conta e toque em "Mudar a chave API". Você pode substituir sua chave por outra, ou adicionar a sua se tiver escolhido a chave interna no início. Suas estatísticas continuam as mesmas, só é preciso configurar de novo a conexão com os favoritos.',
   'ui_play_preview': 'Reproduzir prévia',
   'ntf_test_title': '🔔 Notificação de teste',
   'ntf_test_body': 'As notificações do LastStats estão funcionando!',

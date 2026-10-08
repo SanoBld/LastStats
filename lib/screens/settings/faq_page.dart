@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../widgets/m3_components.dart';
 import '../../l10n/l10n.dart';
 import '../../app_state.dart';
+import '../../l10n/extra_strings.dart';
 import 'settings_rows.dart';
 
 class FaqPage extends StatefulWidget {
@@ -45,6 +46,7 @@ class _FaqPageState extends State<FaqPage> {
       _FaqItem(Icons.swap_horiz_rounded,      L.faqQ12, L.faqA12),
       _FaqItem(Icons.notifications_none_rounded, L.faqQ13, L.faqA13),
       _FaqItem(Icons.image_not_supported_outlined, L.faqQ14, L.faqA14),
+      _FaqItem(Icons.key_rounded,                  tx('faq_q15'), tx('faq_a15')),
     ];
 
     return Scaffold(

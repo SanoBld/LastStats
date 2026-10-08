@@ -120,6 +120,20 @@ class AccountManager {
     await _syncPrefs(p, accounts[clamped]);
   }
 
+  /// Remplace la clé API du compte à [index] (même nom d'utilisateur).
+  /// Si ce compte est le compte actif, ls_apikey est resynchronisé aussi.
+  /// Retourne false si l'index est invalide ou si la clé est vide.
+  static Future<bool> updateKey(int index, String newKey) async {
+    final key = newKey.trim();
+    final accounts = await getAll();
+    if (key.isEmpty || index < 0 || index >= accounts.length) return false;
+    accounts[index] = AccountEntry(username: accounts[index].username, apiKey: key);
+    await _save(accounts);
+    final p = await SharedPreferences.getInstance();
+    if ((p.getInt(_kActive) ?? 0) == index) await _syncPrefs(p, accounts[index]);
+    return true;
+  }
+
   /// Active le compte à [index] et synchronise ls_username / ls_apikey.
   static Future<void> switchTo(int index) async {
     final accounts = await getAll();

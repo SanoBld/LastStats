@@ -687,7 +687,7 @@ class AppStringsZh implements AppStrings {
   @override String get faqQ1 => 'LastStats 会记录我的音乐播放记录吗？';
   @override String get faqA1 => '不会。LastStats 是一款可视化应用：它显示您 Last.fm 账户上已有的播放记录，但本身不会记录任何内容。\n\n如需自动记录音乐播放，请使用专门的应用，例如 Pano Scrobbler（Android 可用）。';
   @override String get faqQ2 => '会推出 iOS 版本吗？';
-  @override String get faqA2 => '不会。目前没有推出 iOS 版本的计划。';
+  @override String get faqA2 => '不会，目前没有推出 iOS 版本的计划。如果需求足够多，这个决定可能会重新考虑。';
   @override String get faqQ3 => '该应用能在 macOS 或其他平台运行吗？';
   @override String get faqA3 => 'LastStats 是在 Android 上开发和测试的。其他平台（macOS、Windows、Linux 等）上的表现未经验证，可能出现错误或异常行为。';
   @override String get faqQ4 => 'LastStats 是开源的吗？';
@@ -695,7 +695,7 @@ class AppStringsZh implements AppStrings {
   @override String get faqQ5 => '我的数据存储在哪里？';
   @override String get faqA5 => '仅存储在您的设备上。LastStats 没有服务器：您的播放记录会在本地缓存以便快速访问，您的 Last.fm 账户信息也保存在本地。除官方 Last.fm API 外，不会向任何地方发送数据。';
   @override String get faqQ6 => '如何启用收藏功能？';
-  @override String get faqA6 => '前往「设置 > 账户」并输入您的 Last.fm 密钥。连接成功后，即可直接在应用中收藏歌曲。';
+  @override String get faqA6 => '前往设置 > 账号，输入您的 Last.fm 私密密钥（可在 last.fm/api/accounts 页面中 API 密钥旁边找到），然后按屏幕提示操作。连接成功后，即可直接在应用中收藏歌曲。使用应用内置密钥时无法使用此功能。';
   @override String get faqQ7 => '\u4ec0\u4e48\u662f\u201cscrobble\u201d\uff1f';
   @override String get faqA7 => 'scrobble \u662f\u6307\u5728\u4f60\u7684 Last.fm \u8d26\u6237\u4e0a\u8bb0\u5f55\u4e00\u6b21\u64ad\u653e\u2014\u2014\u8fd9\u662f Last.fm \u5b98\u65b9\u672f\u8bed\uff0c\u8868\u793a\u201c\u4e00\u6b21\u88ab\u8ba1\u5165\u7684\u64ad\u653e\u201d\u3002\u4f60\u7684\u6240\u6709\u7edf\u8ba1\u6570\u636e\uff08\u6392\u884c\u699c\u3001\u603b\u91cf\u7b49\uff09\u90fd\u57fa\u4e8e\u5b83\u3002';
   @override String get faqQ8 => '\u7b49\u7ea7\u4e0e\u6210\u5c31\u7cfb\u7edf\u662f\u600e\u4e48\u8fd0\u4f5c\u7684\uff1f';
@@ -703,13 +703,13 @@ class AppStringsZh implements AppStrings {
   @override String get faqQ9 => '省电模式是如何工作的？';
   @override String get faqA9 => '省电模式会拉长自动同步的间隔以节省电量。您可以在设置 > 通用中选择始终开启、跟随手机自带的省电模式，或在电量低于设定值时开启。';
   @override String get faqQ10 => '如何备份或恢复我的数据？';
-  @override String get faqA10 => '前往设置 > 备份，可以导出备份文件（可选择是否包含 Last.fm 密钥），之后在本机或其他设备重新导入。';
+  @override String get faqA10 => '前往设置 > 备份，您可以导出备份文件，并自行选择是否包含 Last.fm 密钥。之后可以在本机或其他设备上重新导入，找回您的设置。';
   @override String get faqQ11 => '应用可以离线使用吗？';
   @override String get faqA11 => '可以，在一定程度上。已加载的统计数据会通过本地缓存离线保留，但获取新的 scrobble 仍需要联网。';
   @override String get faqQ12 => '可以切换 Last.fm 账号吗？';
-  @override String get faqA12 => '可以。在设置 > 账号中退出登录，再用另一个用户名重新登录即可。本地缓存会自动清空，避免数据混淆。';
+  @override String get faqA12 => '可以，最多可保存 3 个 Last.fm 账号。在设置 > 账号中点按“添加账号”，之后可随时在它们之间切换。切换时本地缓存会自动重置，因此两个账号的数据不会混在一起。';
   @override String get faqQ13 => '如何设置通知？';
-  @override String get faqA13 => '在设置 > 通知中，可以开启同步完成提醒、选择提醒频率，或完全关闭通知。';
+  @override String get faqA13 => '在设置 > 通知中，您可以开启同步完成时的提醒、选择提醒出现的频率，也可以完全关闭通知。';
   @override String get faqQ14 => '图片缺失或一直加载怎么办？';
   @override String get faqA14 => '先在应用内清除缓存（设置 > 缓存），再在 Android 中清除（设置 > 应用 > LastStats > 存储 > 清除缓存）。如果仍无图片，请先备份数据（设置 > 备份），卸载并重新安装应用，然后恢复备份。';
   @override String get settingsPlatformDisabledByShowAll => '已停用：已显示全部链接。';
@@ -983,7 +983,23 @@ const Map<String, String> kTxZh = {
   'key_internal_help': '备用选项：此密钥由多个用户共用，可能达到上限或失效，部分功能可能因此出错。请尽量使用您自己的密钥。',
   'key_internal_active': '应用内置密钥',
   'key_fallback_title': '内置密钥作为备用',
-  'key_fallback_sub': '先使用您的密钥，失败时改用内置密钥',
+  'key_fallback_sub': '会优先使用您自己的密钥。如果 Last.fm 拒绝该密钥，应用会自动改用内置密钥重试。',
+  'key_use_own': '使用我自己的 API 密钥',
+  'key_change_title': '更换 API 密钥',
+  'key_change_sub': '把您的密钥换成另一个，或改用应用内置密钥。',
+  'key_change_sub_internal': '您当前使用的是应用的共用密钥。添加您自己的密钥后，就不再受其他用户使用上限的影响。',
+  'key_change_intro': '为此账号输入新的 API 密钥，或切换回应用内置密钥。您的用户名和统计数据不会改变。',
+  'key_change_intro_internal': '此账号目前使用的是应用内置密钥。请在下方粘贴您自己的 Last.fm API 密钥来替换它。您的用户名和统计数据不会改变。',
+  'key_change_hint': 'API 密钥为 32 位字符。您可以在 last.fm/api/accounts 创建或查看自己的密钥。',
+  'key_change_invalid_len': 'API 密钥必须正好是 32 位字符，请确认您已完整复制。',
+  'key_change_same': '此账号已在使用这个密钥，请输入另一个密钥。',
+  'key_change_check_failed': 'Last.fm 未接受此密钥。请检查密钥是否正确以及网络是否正常，然后重试。',
+  'key_change_favorites_warn': '收藏连接将被移除，因为它依赖于旧密钥。之后您可以用您的私密密钥重新连接。',
+  'key_change_apply': '应用',
+  'key_change_success': 'API 密钥已更新。',
+  'key_internal_fav_note': '收藏功能需要您自己的 API 密钥和 Last.fm 私密密钥。请在上方添加您自己的密钥后再启用。',
+  'faq_q15': '登录后还能更换 API 密钥吗？',
+  'faq_a15': '可以。前往设置 > 账号，点按“更换 API 密钥”。您可以把密钥换成另一个，或者在最初选择了内置密钥的情况下添加自己的密钥。您的统计数据不变，只需重新设置收藏连接。',
   'ui_play_preview': '播放试听',
   'ntf_test_title': '🔔 测试通知',
   'ntf_test_body': 'LastStats 通知运行正常！',

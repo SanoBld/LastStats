@@ -624,7 +624,7 @@ class AppStringsJa implements AppStrings {
   @override String get faqQ1 => 'LastStatsは自分の音楽をスクロブリングしますか？';
   @override String get faqA1 => 'いいえ。LastStatsは可視化アプリで、すでにLast.fmアカウントに記録されているスクロブルを表示するだけで、自分では記録しません。\n\n音楽を自動でスクロブリングするには、Pano Scrobbler（Android用）などの専用アプリを使用してください。';
   @override String get faqQ2 => 'iOS版の予定はありますか？';
-  @override String get faqA2 => 'いいえ。現時点でiOS版の予定はありません。';
+  @override String get faqA2 => 'いいえ、現時点でiOS版の予定はありません。要望が十分に集まれば、この判断を見直す可能性があります。';
   @override String get faqQ3 => 'macOSや他のプラットフォームでも動作しますか？';
   @override String get faqA3 => 'LastStatsはAndroidで開発・テストされています。他のプラットフォーム（macOS、Windows、Linuxなど）での動作は検証されておらず、不具合や予期しない動作が発生する可能性があります。';
   @override String get faqQ4 => 'LastStatsはオープンソースですか？';
@@ -632,7 +632,7 @@ class AppStringsJa implements AppStrings {
   @override String get faqQ5 => 'データはどこに保存されますか？';
   @override String get faqA5 => 'お使いの端末のみです。LastStatsにはサーバーがなく、スクロブルは高速アクセスのためにローカルにキャッシュされ、Last.fmの認証情報もローカルに保存されます。公式Last.fm API以外にデータが送信されることはありません。';
   @override String get faqQ6 => 'お気に入りを有効にするには？';
-  @override String get faqA6 => '設定 > アカウントに進み、Last.fmのシークレットキーを入力してください。接続後、アプリから直接曲をお気に入り登録できるようになります。';
+  @override String get faqA6 => '設定 > アカウントを開き、Last.fmのシークレットキー（last.fm/api/accounts のAPIキーの隣にあります）を入力して、画面の案内に従ってください。接続後は、アプリから直接曲をお気に入りに登録できます。アプリ内蔵キーでは、この機能は使えません。';
   @override String get faqQ7 => '\u300cscrobble\uff08\u30b9\u30af\u30ed\u30d6\u30eb\uff09\u300d\u3068\u306f\uff1f';
   @override String get faqA7 => '\u300cscrobble\u300d\u3068\u306f\u3001Last.fm\u30a2\u30ab\u30a6\u30f3\u30c8\u306b\u518d\u751f\u3068\u3057\u3066\u8a18\u9332\u3055\u308c\u305f\u697d\u66f2\u3092\u6307\u3057\u3001Last.fm\u56fa\u6709\u306e\u7528\u8a9e\u3067\u300c1\u56de\u306e\u30ab\u30a6\u30f3\u30c8\u3055\u308c\u305f\u518d\u751f\u300d\u3092\u610f\u5473\u3057\u307e\u3059\u3002\u3059\u3079\u3066\u306e\u5408\u8a08\uff08\u30c8\u30c3\u30d7\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u3084\u7d71\u8a08\u306a\u3069\uff09\u306f\u3053\u308c\u306b\u57fa\u3065\u3044\u3066\u3044\u307e\u3059\u3002';
   @override String get faqQ8 => '\u30ec\u30d9\u30eb\u3068\u5b9f\u7e3e\u306e\u4ed5\u7d44\u307f\u306f\uff1f';
@@ -640,13 +640,13 @@ class AppStringsJa implements AppStrings {
   @override String get faqQ9 => '省電力モードはどのように機能しますか？';
   @override String get faqA9 => '省電力モードは自動同期の間隔を広げてバッテリーを節約します。常にオンにする、スマートフォン標準の省電力モードに連動させる、選んだバッテリー残量を下回ったらオンにする、のいずれかを設定 > 一般から選べます。';
   @override String get faqQ10 => 'データのバックアップや復元はどうすればいいですか？';
-  @override String get faqA10 => '設定 > バックアップから、バックアップファイルを書き出せます（Last.fmキーを含めるかどうかも選べます）。後で同じ端末や別の端末に読み込めます。';
+  @override String get faqA10 => '設定 > バックアップを開くと、バックアップファイルを書き出せます。Last.fmキーを含めるかどうかは選べます。後からこの端末や別の端末に読み込めば、設定を元に戻せます。';
   @override String get faqQ11 => 'オフラインでも使えますか？';
   @override String get faqA11 => 'ある程度は可能です。読み込み済みの統計はローカルキャッシュのおかげでオフラインでも見られますが、新しいスクロブルの取得には通信が必要です。';
   @override String get faqQ12 => 'Last.fmアカウントを切り替えられますか？';
-  @override String get faqA12 => 'はい。設定 > アカウントからログアウトし、別のユーザー名で再度ログインしてください。データが混ざらないよう、ローカルキャッシュは自動的にリセットされます。';
+  @override String get faqA12 => 'はい、Last.fmアカウントは最大3つまで登録できます。設定 > アカウントで「アカウントを追加」をタップし、好きなときに切り替えてください。切り替えるとローカルキャッシュは自動的にリセットされるので、2つのアカウントのデータが混ざることはありません。';
   @override String get faqQ13 => '通知はどう設定しますか？';
-  @override String get faqA13 => '設定 > 通知から、同期完了時の通知のオン/オフや頻度を設定できます。';
+  @override String get faqA13 => '設定 > 通知から、同期が終わったときの通知をオンにしたり、通知の頻度を選んだり、通知をすべてオフにしたりできます。';
   @override String get faqQ14 => '画像が表示されない／読み込みが終わらない場合は？';
   @override String get faqA14 => 'アプリ内のキャッシュを消去し（設定 > キャッシュ）、次に Android 側でも消去してください（設定 > アプリ > LastStats > ストレージ > キャッシュを消去）。それでも表示されない場合は、データをバックアップ（設定 > バックアップ）し、アプリを再インストールして復元してください。';
   @override String get settingsPlatformDisabledByShowAll => '無効：すでにすべてのリンクが表示されています。';
@@ -956,7 +956,23 @@ const Map<String, String> kTxJa = {
   'key_internal_help': '予備のオプションです。このキーは複数のユーザーで共有されるため、上限に達したり使えなくなったりして、一部の機能が動作しないことがあります。可能なら自分のキーを使ってください。',
   'key_internal_active': 'アプリ内蔵キー',
   'key_fallback_title': '内蔵キーを予備に使う',
-  'key_fallback_sub': 'まず自分のキーを試し、失敗したら内蔵キーを使います',
+  'key_fallback_sub': 'まず自分のキーを使い、Last.fmに拒否された場合は、アプリが自動的に内蔵キーでもう一度試します。',
+  'key_use_own': '自分のAPIキーを使う',
+  'key_change_title': 'APIキーを変更',
+  'key_change_sub': '現在のキーを別のキーに置き換えるか、アプリ内蔵キーに切り替えられます。',
+  'key_change_sub_internal': '現在はアプリの共有キーを使っています。自分のキーを追加すると、他のユーザーの利用上限の影響を受けなくなります。',
+  'key_change_intro': 'このアカウント用の新しいAPIキーを入力するか、アプリ内蔵キーに戻してください。ユーザー名や統計は変わりません。',
+  'key_change_intro_internal': 'このアカウントは現在、アプリ内蔵キーを使っています。自分のLast.fm APIキーを下に貼り付けると置き換えられます。ユーザー名や統計は変わりません。',
+  'key_change_hint': 'APIキーは32文字です。last.fm/api/accounts で作成または確認できます。',
+  'key_change_invalid_len': 'APIキーはちょうど32文字である必要があります。最後までコピーできているか確認してください。',
+  'key_change_same': 'このアカウントはすでにこのキーを使っています。別のキーを入力してください。',
+  'key_change_check_failed': 'Last.fmがこのキーを受け付けませんでした。キーが正しいか、ネットワークに接続しているかを確認して、もう一度お試しください。',
+  'key_change_favorites_warn': 'お気に入りの連携は、以前のキーに紐づいているため解除されます。あとでシークレットキーを使って再接続できます。',
+  'key_change_apply': '適用',
+  'key_change_success': 'APIキーを更新しました。',
+  'key_internal_fav_note': 'お気に入りには、自分のAPIキーとLast.fmのシークレットキーが必要です。上で自分のキーを追加すると有効にできます。',
+  'faq_q15': 'ログイン後にAPIキーを変更できますか？',
+  'faq_a15': 'はい。設定 > アカウントを開き、「APIキーを変更」をタップしてください。キーを別のものに置き換えたり、最初に内蔵キーを選んでいた場合は自分のキーを追加したりできます。統計はそのままで、お気に入りの連携だけ設定し直す必要があります。',
   'ui_play_preview': 'プレビューを再生',
   'ntf_test_title': '🔔 テスト通知',
   'ntf_test_body': 'LastStats の通知は正常に動作しています！',
