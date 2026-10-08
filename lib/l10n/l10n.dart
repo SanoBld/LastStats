@@ -5,7 +5,9 @@
 //
 //  To add a language:
 //    1. Create lib/l10n/strings_xx.dart implementing AppStrings
-//       (copy an existing one as a template).
+//       (copy an existing one as a template). The same file also holds the
+//       keyed strings used by tx('key'): the `kTxXx` map at the bottom.
+//       Register that map in extra_strings.dart (import + _kTx entry).
 //    2. Add its 4 strings to lib/supported_locales.dart.
 //    3. Add the two lines below (const + switch case).
 //  You never need to touch the other strings_xx.dart files.
