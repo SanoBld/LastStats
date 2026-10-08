@@ -1100,7 +1100,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                 active: _isPlaying,
                 progress: _previewPos,
                 onTap: _togglePreview,
-                tooltip: 'Play preview',
+                tooltip: tx('ui_play_preview'),
               )
             : null,
       ),

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/notification_detail_page.dart';
+import '../l10n/extra_strings.dart' show tx;
 
 const _kLastFmRed = Color(0xFFD51007);
 
@@ -482,8 +483,8 @@ class NotificationService {
         ),
         payload: _payload(
           type:  'test',
-          title: '🔔 Test notification',
-          body:  'LastStats notifications are working!',
+          title: tx('ntf_test_title'),
+          body:  tx('ntf_test_body'),
         ),
       );
 
