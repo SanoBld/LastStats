@@ -239,3 +239,38 @@ img, video { max-width: 100%; height: auto; }
 }
 /* phones in landscape: the nav should not eat the screen */
 @media (max-height: 480px) and (orientation: landscape) { .nav { padding-top: .5rem; padding-bottom: .5rem; } }
+
+/* ---------- Language dropdown (Android-style menu) ---------- */
+.lang-wrap { position: relative; display: inline-block; }
+.lang-toggle::after {
+  content: ""; display: inline-block; width: 6px; height: 6px; margin-inline-start: 8px; margin-bottom: 3px;
+  border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg);
+  transition: transform .3s var(--spring-fast);
+}
+.lang-wrap.is-open .lang-toggle::after { transform: rotate(225deg); margin-bottom: -1px; }
+.lang-menu {
+  position: absolute; top: calc(100% + 8px); inset-inline-end: 0; z-index: 200;
+  min-width: 210px; max-height: min(70vh, 460px); overflow-y: auto; padding: 8px;
+  background: var(--md-surface-container-high); color: var(--md-on-surface);
+  border-radius: 20px; box-shadow: 0 8px 28px rgba(0,0,0,.28);
+  transform-origin: top right; transform: scale(.8); opacity: 0; visibility: hidden; pointer-events: none;
+  transition: transform .35s var(--spring-default), opacity .15s var(--effects), visibility 0s .35s;
+}
+[dir="rtl"] .lang-menu { transform-origin: top left; }
+.lang-wrap.is-open .lang-menu {
+  transform: scale(1); opacity: 1; visibility: visible; pointer-events: auto;
+  transition: transform .35s var(--spring-default), opacity .15s var(--effects), visibility 0s;
+}
+.lang-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%;
+  min-height: 48px; padding: 0 16px; border: 0; border-radius: 14px; background: transparent;
+  color: inherit; font: inherit; font-size: .95rem; text-align: start; cursor: pointer;
+  position: relative; overflow: hidden;
+  transition: background-color .2s var(--effects), border-radius .4s var(--spring-default);
+}
+.lang-item:hover { background: var(--md-surface-container-low); }
+.lang-item:active { border-radius: 24px; }
+.lang-item.is-active { background: var(--md-secondary-container); color: var(--md-on-secondary-container); font-weight: 500; }
+.lang-item-tag { font-size: .75rem; opacity: .7; letter-spacing: .04em; }
+.cm-tr-btn.is-active { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+.cm-tr-note { opacity: .65; font-size: .8em; margin-inline-start: .4em; }

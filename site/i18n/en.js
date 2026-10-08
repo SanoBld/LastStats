@@ -7,6 +7,10 @@ window.I18N = window.I18N || {};
 window.I18N.en = {
   _meta: { short: "EN", name: "English" },
 
+  "langAuto": "Auto",
+  "commits.translate": "Translate",
+  "commits.show_original": "Show original",
+
   // ---- strings used by scripts ----
   nowPlaying: "Now playing",
   ghFavorites: "Stars",

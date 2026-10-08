@@ -14,6 +14,33 @@
   const filterBtns = document.querySelectorAll('#cm-filter .rel-filter-btn');
 
   searchEl.placeholder = (window.i18n && i18n.t('releases.search')) || 'Rechercher…';
+  // translation of commit messages: on by default, into the site language
+  let trOn = true;
+  try { trOn = localStorage.getItem('cmTr') !== '0'; } catch (e) {}
+  const trBtn = document.createElement('button');
+  trBtn.type = 'button';
+  trBtn.className = 'rel-filter-btn cm-tr-btn md-ripple';
+  searchEl.parentNode.insertBefore(trBtn, searchEl);
+  function paintTrBtn() {
+    trBtn.classList.toggle('is-active', trOn);
+    trBtn.setAttribute('aria-pressed', trOn ? 'true' : 'false');
+    trBtn.textContent = t(trOn ? 'commits.show_original' : 'commits.translate');
+  }
+  function applyTr() {
+    const to = lang();
+    document.querySelectorAll('#cm-list .cm-txt, #cm-latest .cm-txt').forEach((el) => {
+      const orig = el.getAttribute('data-orig');
+      if (!trOn || !window.i18n) { el.textContent = orig; return; }
+      i18n.translate(orig, to).then((out) => {
+        if (trOn && lang() === to) el.textContent = out;
+      });
+    });
+  }
+  trBtn.addEventListener('click', () => {
+    trOn = !trOn;
+    try { localStorage.setItem('cmTr', trOn ? '1' : '0'); } catch (e) {}
+    paintTrBtn(); applyTr();
+  });
   let commits = [];
   let filter = 'all';
   let query = '';
@@ -21,8 +48,8 @@
 
   // default texts, used when i18n/*.js is old or cached and has no "commits.*" key
   const DEF = {
-    fr: { view: 'Voir', zip: 'ZIP', zip_title: 'Télécharger le code de ce push (ZIP)', copy: 'Copier le hash', copied: 'Copié', latest: 'Dernier push', empty: 'Aucun push trouvé.', error: 'Impossible de charger les pushs.', push_one: 'push', push_many: 'pushs' },
-    en: { view: 'View', zip: 'ZIP', zip_title: 'Download the code of this push (ZIP)', copy: 'Copy hash', copied: 'Copied', latest: 'Latest push', empty: 'No push found.', error: 'Could not load pushes.', push_one: 'push', push_many: 'pushes' },
+    fr: { view: 'Voir', zip: 'ZIP', zip_title: 'Télécharger le code de ce push (ZIP)', translate: 'Traduire', show_original: 'Voir l\'original', copy: 'Copier le hash', copied: 'Copié', latest: 'Dernier push', empty: 'Aucun push trouvé.', error: 'Impossible de charger les pushs.', push_one: 'push', push_many: 'pushs' },
+    en: { view: 'View', zip: 'ZIP', zip_title: 'Download the code of this push (ZIP)', translate: 'Translate', show_original: 'Show original', copy: 'Copy hash', copied: 'Copied', latest: 'Latest push', empty: 'No push found.', error: 'Could not load pushes.', push_one: 'push', push_many: 'pushes' },
   };
   const t = (k) => {
     const v = window.i18n ? i18n.t(k) : k;
@@ -76,7 +103,7 @@
     el.className = 'cm-row';
     el.innerHTML = `
       <div class="cm-main">
-        <p class="cm-msg">${esc(lines[0])} ${tags}</p>
+        <p class="cm-msg"><span class="cm-txt" data-orig="${esc(lines[0])}">${esc(lines[0])}</span> ${tags}</p>
         <p class="cm-meta">
           <button type="button" class="cm-sha md-ripple" title="${esc(t('commits.copy'))}">${esc(c.sha.slice(0, 7))}</button>
           <span>${c.avatar ? `<img class="cm-avatar" src="${esc(c.avatar)}&s=36" alt="" loading="lazy"> ` : ''}${esc(c.author)}</span>
@@ -106,6 +133,7 @@
     card.innerHTML = `<div class="rel-head"><span class="rel-badge">${esc(t('commits.latest'))}</span></div>`;
     card.appendChild(row(c, true));
     latestEl.appendChild(card);
+    applyTr();
   }
 
   function render() {
@@ -137,6 +165,7 @@
     });
     if (count) count.textContent = `${n} ${t(n > 1 ? 'commits.push_many' : 'commits.push_one')}`;
     moreEl.hidden = items.length <= shown;
+    applyTr();
   }
 
   filterBtns.forEach((b) => b.addEventListener('click', () => {
@@ -146,6 +175,7 @@
   searchEl.addEventListener('input', () => { query = searchEl.value; shown = STEP; render(); });
   moreEl.addEventListener('click', () => { shown += STEP; render(); });
 
+  paintTrBtn();
   load().then((d) => {
     commits = d.commits;
     renderLatest();
@@ -155,5 +185,5 @@
     statusEl.classList.add('is-error');
   });
 
-  if (window.i18n) i18n.onChange(() => { searchEl.placeholder = t('releases.search'); if (commits.length) { renderLatest(); render(); } });
+  if (window.i18n) i18n.onChange(() => { paintTrBtn(); searchEl.placeholder = t('releases.search'); if (commits.length) { renderLatest(); render(); } });
 })();

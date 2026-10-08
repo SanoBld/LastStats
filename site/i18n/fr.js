@@ -7,6 +7,10 @@ window.I18N = window.I18N || {};
 window.I18N.fr = {
   _meta: { short: "FR", name: "Français" },
 
+  "langAuto": "Auto",
+  "commits.translate": "Traduire",
+  "commits.show_original": "Voir l'original",
+
   // ---- strings used by scripts ----
   nowPlaying: "Écoute en cours",
   ghFavorites: "Favoris",
