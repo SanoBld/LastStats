@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-08T20:55:53Z",
+  "updated": "2026-10-08T21:04:22Z",
   "commits": [
+    {
+      "sha": "67b0b84961763ae2b0de9227510c3af411268ddd",
+      "message": "feat: ajout de nouveaux éléments multimédias et amélioration de la galerie avec des vidéos animées et des GIFs",
+      "date": "2026-10-08T21:03:52Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/67b0b84961763ae2b0de9227510c3af411268ddd",
+      "tags": []
+    },
     {
       "sha": "61da058ca3d7c29941339b14a8da91e167dfebc2",
       "message": "Add showcase video playback control based on visibility and user preferences\n\n- Implemented Intersection Observer to play videos only when they are visible in the viewport.\n- Added support for reduced motion preferences, disabling autoplay and enabling controls for users who prefer reduced motion.\n- Ensured videos pause when not in view to improve performance and user experience.",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/bcdeca1444dfe6af7433196dff4b21825af58f23",
-      "tags": []
-    },
-    {
-      "sha": "9db204b890a9c91c92dd25797950bfa3e81b37c1",
-      "message": "feat: installer Flutter directement depuis le dépôt pour l'architecture ARM64",
-      "date": "2026-07-16T19:51:40Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/9db204b890a9c91c92dd25797950bfa3e81b37c1",
       "tags": []
     }
   ]

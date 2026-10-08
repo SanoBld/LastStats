@@ -11,9 +11,13 @@
   if (!lightbox) return;
 
   let isZoomed = false;
+  let vid = null; // <video> created on first use, shared by every video trigger
   const bound = new WeakSet();
 
   function open(src, alt) {
+    if (vid) { vid.pause(); vid.removeAttribute('src'); vid.hidden = true; }
+    img.hidden = false;
+    hint.hidden = false;
     img.src = src;
     img.alt = alt || '';
     isZoomed = false;
@@ -24,7 +28,34 @@
     document.body.classList.add('lightbox-locked');
   }
 
+  // videos: same overlay, no zoom, native controls, starts where the page video is
+  function openVideo(src, poster, time) {
+    if (!vid) {
+      vid = document.createElement('video');
+      vid.controls = true;
+      vid.loop = true;
+      vid.muted = true;
+      vid.playsInline = true;
+      vid.addEventListener('click', (e) => e.stopPropagation());
+      stage.appendChild(vid);
+    }
+    img.hidden = true;
+    hint.hidden = true;
+    vid.hidden = false;
+    vid.poster = poster || '';
+    vid.src = src;
+    vid.addEventListener('loadedmetadata', function seek() {
+      vid.removeEventListener('loadedmetadata', seek);
+      if (time && time < vid.duration) vid.currentTime = time;
+      vid.play().catch(() => {});
+    });
+    vid.load();
+    lightbox.classList.add('is-open');
+    document.body.classList.add('lightbox-locked');
+  }
+
   function close() {
+    if (vid) vid.pause();
     lightbox.classList.remove('is-open');
     document.body.classList.remove('lightbox-locked');
     isZoomed = false;
@@ -38,6 +69,12 @@
       bound.add(t);
       t.style.cursor = 'zoom-in';
       t.addEventListener('click', () => open(t.src, t.alt));
+    });
+    scope.querySelectorAll('.lightbox-trigger video').forEach((t) => {
+      if (bound.has(t)) return;
+      bound.add(t);
+      t.style.cursor = 'zoom-in';
+      t.addEventListener('click', () => openVideo(t.currentSrc || t.src, t.poster, t.currentTime));
     });
   }
 
