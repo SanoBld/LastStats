@@ -80,26 +80,8 @@
   Widget? placeholder,
   Widget? errorWidget,
 }) {
-  &#47;&#47; Download the resolution that matches the on-screen size.
-  final side = (width != null &amp;&amp; width.isFinite ? width : 0.0) &gt; (height != null &amp;&amp; height.isFinite ? height : 0.0)
-      ? width! : (height != null &amp;&amp; height.isFinite ? height : 0.0);
-  if (side &gt; 0) {
-    final dpr = WidgetsBinding.instance.platformDispatcher.views.isNotEmpty
-        ? WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio : 2.0;
-    url = sizedImageUrl(url, side, dpr);
-  }
   final ph = placeholder ?? M3ImagePlaceholder(width: width, height: height);
   if (url.isEmpty) return placeholder ?? const SizedBox.shrink();
-
-  &#47;&#47; Fast path: already in RAM → no FutureBuilder, no placeholder flash.
-  final hot = _loaded &amp;&amp; _meta.containsKey(url) ? _ramGet(url) : null;
-  if (hot != null) {
-    return Builder(builder: (context) =&gt; _memoryImage(
-          context, hot,
-          width: width, height: height, fit: fit,
-          placeholder: placeholder, errorWidget: errorWidget,
-        ));
-  }
 
   &#47;&#47; Cache checked FIRST (offline or online) — network is only a fallback.
   return FutureBuilder&lt;Uint8List?&gt;(
@@ -109,19 +91,31 @@
         return ph;
       }
 
-      if (snap.data != null) {
-        return _memoryImage(
-          context, snap.data!,
-          width: width, height: height, fit: fit,
-          placeholder: placeholder, errorWidget: errorWidget,
-        );
-      }
-
-      _downloadAndCache(url).ignore();
-
+      &#47;&#47; Decode at the actual display size (× device pixel ratio) instead
+      &#47;&#47; of the source&#39;s full resolution — a 40dp list thumbnail doesn&#39;t
+      &#47;&#47; need a 3000×3000 bitmap sitting in memory. Only applied when a
+      &#47;&#47; display size was actually requested; omitted otherwise (e.g. the
+      &#47;&#47; detail sheet&#39;s full-size hero image still wants native quality).
       final dpr = MediaQuery.of(context).devicePixelRatio;
       final cacheWidth  = width  != null ? (width * dpr).round()  : null;
       final cacheHeight = height != null ? (height * dpr).round() : null;
+
+      if (snap.data != null) {
+        return Image.memory(
+          snap.data!,
+          width: width,
+          height: height,
+          fit: fit,
+          cacheWidth: cacheWidth,
+          cacheHeight: cacheHeight,
+          gaplessPlayback: true,
+          errorBuilder: (_, _, _) =&gt;
+              errorWidget ?? placeholder ?? const SizedBox.shrink(),
+        );
+      }
+
+      &#47;&#47; Not cached → download in background, show network meanwhile.
+      _downloadAndCache(url).ignore();
 
       final webImg = buildCorsBypassImage(url, width: width, height: height, fit: fit);
       if (webImg != null) return webImg;

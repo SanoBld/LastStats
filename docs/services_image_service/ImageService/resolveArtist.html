@@ -68,9 +68,44 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Future&lt;String&gt; resolveArtist(String artist, {String? lastfmUrl}) =&gt;
-    _once(&#39;artist|$artist&#39;, () =&gt; _resolveArtist(artist, lastfmUrl: lastfmUrl))
-        .timeout(_maxResolve, onTimeout: () =&gt; _ok(lastfmUrl) ? lastfmUrl! : &#39;&#39;);</code></pre>
+  <pre class="language-dart"><code class="language-dart">static Future&lt;String&gt; resolveArtist(String artist, {String? lastfmUrl}) async {
+  final key = &#39;artist|$artist&#39;;
+  await _ensureDiskCache();
+  final mem = _getUrl(key);
+  if (mem != null) return mem;
+
+  &#47;&#47; YouTube Music moved down for artists specifically: artist photos on
+  &#47;&#47; there are often non-square (banners, portraits) and its thumbnail
+  &#47;&#47; proxy can distort them in the app&#39;s square&#47;round artist thumbnails —
+  &#47;&#47; iTunes&#47;Deezer&#39;s catalog art is consistently well-cropped for artists.
+  final itunes = await _itunesSearch(artist, &#39;musicArtist&#39;, &#39;artistTerm&#39;, artist);
+  if (itunes.isNotEmpty) return _persistUrl(key, itunes, &#39;itunes&#39;);
+
+  final deezer = await _deezerArtist(artist);
+  if (deezer.isNotEmpty) return _persistUrl(key, deezer, &#39;deezer&#39;);
+
+  final audioDb = await _audioDbArtist(artist);
+  if (audioDb.isNotEmpty) return _persistUrl(key, audioDb, &#39;audiodb&#39;);
+
+  final ytMusic = await _ytMusicSearch(artist, &#39;artist&#39;, expectArtist: artist);
+  if (ytMusic.isNotEmpty) return _persistUrl(key, ytMusic, &#39;ytmusic&#39;);
+
+  final mb = await _mbArtistImage(artist);
+  if (mb.isNotEmpty) return _persistUrl(key, mb, &#39;musicbrainz&#39;);
+
+  final wiki = await _wikipediaImage(artist, expectName: artist);
+  if (wiki.isNotEmpty) return _persistUrl(key, wiki, &#39;wikipedia&#39;);
+
+  &#47;&#47; Last.fm last — its own catalog images are usually much lower
+  &#47;&#47; resolution (~300px) than the sources above, so it&#39;s a fallback here
+  &#47;&#47; rather than an automatic first pick.
+  if (_ok(lastfmUrl)) {
+    _cacheBytes(lastfmUrl!);
+    return _persistUrl(key, lastfmUrl, &#39;lastfm&#39;);
+  }
+
+  return _persistUrl(key, &#39;&#39;);
+}</code></pre>
 </section>
 
 

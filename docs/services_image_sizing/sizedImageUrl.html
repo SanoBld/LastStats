@@ -72,33 +72,35 @@
   <pre class="language-dart"><code class="language-dart">String sizedImageUrl(String url, double logicalPx, double dpr) {
   if (url.isEmpty || !logicalPx.isFinite || logicalPx &lt;= 0) return url;
   final target = logicalPx * (dpr &lt;= 0 ? 2.0 : dpr);
-  final px = _buckets.firstWhere((b) =&gt; b &gt;= target, orElse: () =&gt; 3000);
 
   &#47;&#47; iTunes &#47; Apple: ...&#47;100x100bb.jpg (up to 3000)
   if (url.contains(&#39;mzstatic.com&#39;)) {
+    final px = _pick(_buckets, target);
     return url.replaceFirst(RegExp(r&#39;&#47;\d+x\d+bb&#39;), &#39;&#47;${px}x${px}bb&#39;);
   }
-  &#47;&#47; Deezer CDN: ...&#47;1000x1000-000000-80-0-0.jpg (1000 is plenty)
+  &#47;&#47; Deezer CDN: ...&#47;1000x1000-000000-80-0-0.jpg
   if (url.contains(&#39;dzcdn.net&#39;)) {
-    final n = px &gt; 1000 ? 1000 : px;
+    final n = _pick(_deezerSteps, target);
     return url.replaceFirst(RegExp(r&#39;&#47;\d+x\d+-&#39;), &#39;&#47;${n}x$n-&#39;);
   }
   &#47;&#47; YouTube Music &#47; Google: =w544-h544-l90-rj (keeps aspect ratio)
   final yt = RegExp(r&#39;=w(\d+)-h(\d+)&#39;).firstMatch(url);
   if (yt != null &amp;&amp; (url.contains(&#39;googleusercontent.com&#39;) || url.contains(&#39;ytimg.com&#39;))) {
+    final px = _pick(_buckets, target);
     final w = int.parse(yt.group(1)!), h = int.parse(yt.group(2)!);
     final k = px &#47; (w &gt; h ? w : h);
     final nw = (w * k).round(), nh = (h * k).round();
     return url.replaceFirst(RegExp(r&#39;=w\d+-h\d+&#39;), &#39;=w$nw-h$nh&#39;);
   }
-  &#47;&#47; Wikipedia thumbnails: ...&#47;thumb&#47;...&#47;600px-Name.jpg
+  &#47;&#47; Wikipedia thumbnails: ...&#47;thumb&#47;...&#47;600px-Name.jpg (standard widths only)
   if (url.contains(&#39;upload.wikimedia.org&#39;) &amp;&amp; url.contains(&#39;&#47;thumb&#47;&#39;)) {
-    final n = px &gt; 1500 ? 1500 : px;
+    final n = _pick(_wikiSteps, target);
     return url.replaceFirst(RegExp(r&#39;&#47;\d+px-&#39;), &#39;&#47;${n}px-&#39;);
   }
   &#47;&#47; Cover Art Archive: front-250 &#47; front-500 &#47; front-1200
   final caa = RegExp(r&#39;&#47;front-(\d+)$&#39;).firstMatch(url);
   if (url.contains(&#39;coverartarchive.org&#39;) &amp;&amp; caa != null) {
+    final px = _pick(_buckets, target);
     final n = px &lt;= 250 ? 250 : (px &lt;= 500 ? 500 : 1200);
     return url.replaceFirst(RegExp(r&#39;&#47;front-\d+$&#39;), &#39;&#47;front-$n&#39;);
   }

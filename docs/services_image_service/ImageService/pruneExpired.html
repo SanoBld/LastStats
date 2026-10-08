@@ -81,7 +81,6 @@
         if ((now - ts) &gt; _diskTtlMs) {
           await _prefs!.remove(k);
           _mem.remove(k.substring(_diskPrefix.length));
-          _sourceOf.remove(k.substring(_diskPrefix.length));
           removed++;
         }
       } catch (_) { await _prefs!.remove(k); removed++; }

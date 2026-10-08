@@ -68,8 +68,6 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; clearAllCache() async {
   _mem.clear();
-  _sourceOf.clear();
-  _negUntil.clear();
   try {
     _prefs ??= await SharedPreferences.getInstance();
     final keys = _prefs!.getKeys().where((k) =&gt; k.startsWith(_diskPrefix)).toList();
