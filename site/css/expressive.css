@@ -274,3 +274,26 @@ img, video { max-width: 100%; height: auto; }
 .lang-item-tag { font-size: .75rem; opacity: .7; letter-spacing: .04em; }
 .cm-tr-btn.is-active { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
 .cm-tr-note { opacity: .65; font-size: .8em; margin-inline-start: .4em; }
+
+/* ---------- Table of contents: keep the timeline dots from being clipped ---------- */
+@media (min-width: 901px) { .rel-rail-scroll { padding-left: 8px; } }
+
+/* ---------- Translate button: small round icon ---------- */
+.cm-tr-btn {
+  flex: 0 0 auto; width: 40px; height: 40px; min-width: 0; padding: 0 !important;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50% !important; background: var(--md-surface-container-high); color: var(--md-on-surface-variant);
+}
+.cm-tr-btn svg { width: 20px; height: 20px; fill: currentColor; pointer-events: none; }
+.cm-tr-btn.is-active { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+@media (hover: hover) { .cm-tr-btn:hover { border-radius: 14px !important; } }
+.cm-tr-btn:active { border-radius: 14px !important; transform: scale(.95); }
+
+/* round translate button: exact circle wherever it sits (toolbar or sidebar), never stretched */
+button.cm-tr-btn, .rel-rail button.cm-tr-btn, .rel-toolbar button.cm-tr-btn {
+  display: inline-flex; align-items: center; justify-content: center; align-self: flex-start;
+  flex: 0 0 40px; box-sizing: border-box; aspect-ratio: 1 / 1; line-height: 0; padding: 0 !important;
+  width: 40px; min-width: 40px; max-width: 40px; height: 40px; min-height: 40px; max-height: 40px;
+  margin: .3rem 0 .8rem;
+}
+@media (min-width: 641px) { .rel-toolbar button.cm-tr-btn { align-self: center; margin: 0; } }

@@ -256,6 +256,29 @@
     return el;
   }
 
+  // release notes are translated automatically into the site language (toggle button)
+  function mk(r, latest) {
+    const el = card(r, latest);
+    const n = el.querySelector('.rel-notes');
+    if (n && window.i18n && i18n.watchNotes) i18n.watchNotes(n);
+    return el;
+  }
+  const trBtn = document.createElement('button');
+  trBtn.type = 'button';
+  trBtn.className = 'rel-filter-btn cm-tr-btn md-ripple';
+  searchEl.parentNode.insertBefore(trBtn, searchEl);
+  function paintTr() {
+    const on = !window.i18n || i18n.dynTr;
+    trBtn.classList.toggle('is-active', on);
+    trBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    const lbl = t(on ? 'commits.show_original' : 'commits.translate');
+    trBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>';
+    trBtn.title = lbl;
+    trBtn.setAttribute('aria-label', lbl);
+  }
+  trBtn.addEventListener('click', () => { if (window.i18n) { i18n.setDynTr(!i18n.dynTr); paintTr(); } });
+  paintTr();
+
   function render() {
     list.innerHTML = '';
     const items = releases.filter((r) => filter === 'all' || (filter === 'beta') === isBeta(r));
@@ -263,7 +286,7 @@
     statusEl.hidden = items.length > 0;
     if (!items.length) statusEl.textContent = t('releases.empty');
     visible = items;
-    items.slice(0, shown).forEach((r) => list.appendChild(card(r, r.tag_name === latestTag)));
+    items.slice(0, shown).forEach((r) => list.appendChild(mk(r, r.tag_name === latestTag)));
     buildRail();
     updateRail();
     checkSentinel();
@@ -272,7 +295,7 @@
   // infinite scroll: add the next cards (only the new ones) when the bottom comes near
   function appendUpTo(count) {
     shown = Math.max(shown, count);
-    visible.slice(list.children.length, shown).forEach((r) => list.appendChild(card(r, r.tag_name === latestTag)));
+    visible.slice(list.children.length, shown).forEach((r) => list.appendChild(mk(r, r.tag_name === latestTag)));
     checkSentinel();
     updateRail();
   }
@@ -394,5 +417,5 @@
     });
 
   // refresh texts + dates when the language changes
-  if (window.i18n) i18n.onChange(() => { if (releases.length) render(); });
+  if (window.i18n) i18n.onChange(() => { paintTr(); if (releases.length) render(); });
 })();

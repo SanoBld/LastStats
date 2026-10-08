@@ -3,8 +3,9 @@
 // - aria labels: data-i18n-aria="key"
 // - scripts: i18n.t('key'), re-render with i18n.onChange(fn)
 // Language: saved choice, else the browser language (automatic), else English.
-// Missing keys fall back to English, then French; plain-text keys that are missing in
-// the chosen language are machine-translated on the fly (cached).
+// All fixed texts are translated locally (one file per language); missing keys fall back to
+// English, then French. Only changing content (release notes, commit messages) is
+// machine-translated through Google Translate (see translate / watchNotes below).
 (function () {
   const DICT = window.I18N || {};
   const ORDER = ['fr', 'en', 'de', 'es', 'it', 'pt', 'ru', 'ja', 'zh', 'ar'];
@@ -58,6 +59,58 @@
         return out || text;
       })
       .catch(() => text);
+  }
+
+
+  // ---- dynamic content (release notes): translated on demand, on by default ----
+  const dyn = { on: true };
+  try { dyn.on = localStorage.getItem('cmTr') !== '0'; } catch (e) {}
+  const orig = new WeakMap();
+  const roots = new Set();
+  function textNodes(root) {
+    const out = [];
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (/\p{L}{2,}/u.test(n.nodeValue) && !n.parentElement.closest('code,pre') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT),
+    });
+    while (w.nextNode()) out.push(w.currentNode);
+    return out;
+  }
+  function restore(root) {
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (w.nextNode()) if (orig.has(w.currentNode)) w.currentNode.nodeValue = orig.get(w.currentNode);
+  }
+  function trRoot(root) {
+    if (!dyn.on) return;
+    const to = lang;
+    const queue = textNodes(root);
+    queue.forEach((n) => { if (!orig.has(n)) orig.set(n, n.nodeValue); });
+    const work = () => {
+      const n = queue.shift();
+      if (!n) return;
+      const src = orig.get(n);
+      const lead = src.match(/^\s*/)[0], tail = src.match(/\s*$/)[0];
+      translate(src.trim(), to).then((out) => {
+        if (dyn.on && lang === to && n.isConnected) n.nodeValue = lead + out + tail;
+        work();
+      });
+    };
+    for (let i = 0; i < 4; i++) work();
+  }
+  const seenIO = 'IntersectionObserver' in window
+    ? new IntersectionObserver((es) => es.forEach((e) => {
+        if (e.isIntersecting) { seenIO.unobserve(e.target); e.target.__seen = true; trRoot(e.target); }
+      }), { rootMargin: '300px' })
+    : null;
+  function watchNotes(root) {
+    roots.add(root);
+    if (seenIO) seenIO.observe(root); else { root.__seen = true; trRoot(root); }
+  }
+  function refreshRoots() {
+    roots.forEach((r) => {
+      if (!r.isConnected) { roots.delete(r); return; }
+      restore(r);
+      if (r.__seen) trRoot(r);
+    });
   }
 
   // ---- language menu (Android-style dropdown) ----
@@ -115,18 +168,11 @@
   function applyStatic() {
     document.documentElement.lang = lang;
     document.documentElement.dir = RTL.includes(lang) ? 'rtl' : 'ltr';
-    const own = DICT[lang] || {};
 
     document.querySelectorAll('[data-i18n]').forEach((el) => {
-      const key = el.getAttribute('data-i18n');
-      const v = lookup(lang, key);
+      const v = lookup(lang, el.getAttribute('data-i18n'));
       if (v === null) return;
       el.textContent = v;
-      // missing in this language: translate the English text on the fly (plain text only)
-      if (own[key] === undefined && lang !== 'en' && lang !== 'fr' && DICT.en && DICT.en[key] !== undefined) {
-        const wanted = lang;
-        translate(v, lang).then((out) => { if (lang === wanted) el.textContent = out; });
-      }
     });
     document.querySelectorAll('[data-i18n-html]').forEach((el) => {
       const v = lookup(lang, el.getAttribute('data-i18n-html'));
@@ -143,6 +189,7 @@
       btn.setAttribute('aria-label', meta.name);
     });
     fillMenus();
+    refreshRoots();
     listeners.forEach((fn) => fn(lang));
   }
 
@@ -151,6 +198,13 @@
     get langs() { return LANGS.slice(); },
     t(key) { const v = lookup(lang, key); return v !== null ? v : key; },
     translate,
+    watchNotes,
+    get dynTr() { return dyn.on; },
+    setDynTr(on) {
+      dyn.on = !!on;
+      try { localStorage.setItem('cmTr', on ? '1' : '0'); } catch (e) {}
+      refreshRoots();
+    },
     setLang(l) {
       if (!DICT[l]) return;
       lang = l;
