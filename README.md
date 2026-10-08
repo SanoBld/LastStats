@@ -15,7 +15,9 @@
   <a href="https://discord.gg/JjqmkQgZBs"><img src="https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord"></a>
 </p>
 
-🎵 A modern, multiplatform app built with Flutter and Material You to track and explore your listening habits in real time, using the Last.fm API.
+🎵 A modern, multiplatform app built with Flutter and Material 3 Expressive to track and explore your listening habits in real time, using the Last.fm API: stats, rankings, recaps, friends, music compatibility, achievements and animated artist, album and track pages.
+
+🌐 Website: https://sanobld.github.io/LastStats/ · Web version (Beta): https://sanobld.github.io/LastStats/app/
 
 Join the Discord to chat, share feedback, or ask for help: https://discord.gg/JjqmkQgZBs
 
@@ -52,51 +54,68 @@ Join the Discord to chat, share feedback, or ask for help: https://discord.gg/Jj
 ## Features
 
 **🎨 Design and theming**
-- Clean, minimalist interface that works on phones, tablets, and desktop
+- Material 3 Expressive: shaped images (cookie, circle, clover, arch, leaf and more, or one single shape, or square), spring animations, wavy loading indicators and grouped, rounded settings
 - Full support for system light and dark mode, plus a pure black OLED theme for AMOLED screens
-- Custom accent colors, either from presets or your own hex code
-- Dynamic color that can match your device's system palette
-- A Nothing OS inspired theme, with a classic red style or a mixed red and yellow style
+- Custom accent colors, either from presets or your own hex code, or dynamic color that matches your device's system palette
 - Optional Now Playing color mode, where the app's accent shifts to match the artwork of the track you are listening to, with a fallback color and the option to keep the last color once playback stops
 - Optional tinted detail sheets, using the dominant color pulled from the album artwork
-- Adaptive navigation: a side rail on wide screens, a bottom bar on smaller ones, and a manual switch if you prefer one over the other
-- Show or hide labels under the navigation bar icons
+- Adaptive layout: a side rail and a centered panel on wide screens (tablet and PC), a bottom bar on phones, and a manual switch if you prefer one over the other
 
-**🏠 Dashboard**
-- Pick your own nickname (set during setup or later in Settings) — shown instead of your raw Last.fm account name
-- Choose which chart the dashboard shows: a listening calendar (last 60 days) or monthly bars
-- Quick stats, now playing, recent tracks, and a friends section, all customizable from Dashboard settings
+**🏠 Dashboard and Discover**
+- Your own nickname, shown instead of your raw Last.fm account name
+- Quick stats, now playing, recent tracks and a friends section, with a listening calendar (last 60 days) or monthly bars
+- Reorder the sections by drag and drop, and choose which stat cards and filters to show
+- Discover: swipeable music ideas (your top artist, your country, trending worldwide, and "On this day" from your own history), with an optional endless loop and filters sorted by what is most relevant right now
+
+**🎤 Artist, album and track pages**
+- Full pages with biography (with a translate button), your stats, global stats, rank, tags and popular tracks
+- Animated posters: Apple Music motion artwork, with a short silent YouTube loop as a fallback, plus a 3D flip card for the cover art
+- Lyrics for tracks, and quick links to your music platforms
+
+**👥 Friends and music compatibility**
+- Follow your Last.fm friends' activity, see who is listening right now, and open their full profile
+- Compare your music tastes: a compatibility score broken down by artists, genres, tracks and albums, with everything you have in common
+- Profile cards with an optional QR code: scan a QR code to open a profile
+
+**📊 Charts, rankings, history and recaps**
+- Charts for scrobbles per month, progress over time and a multi-year heatmap, for all time or a given year
+- Rankings of your top artists, albums and tracks with a podium, by year, month or all time
+- Day-by-day history with the exact time of each scrobble
+- Daily, weekly and monthly recaps in a story format, shareable as images
 
 **❤️ Favorites**
 - Like tracks, artists, and albums directly from the app, through your own Last.fm account
-- A dedicated Favorites page with filters and cover art, where you can also remove items
+- A dedicated Favorites page with folders, filters and cover art
 - A small heart badge next to loved tracks in your recent listens, history, and search results, with an option to turn it off
-- A favorites count shown on your dashboard, with an option to hide it
 
 **🏆 Achievements**
 - A leveling system based on your real listening activity, with dozens of achievements to unlock
-- Categories covering listening totals, artist and album diversity, loyalty, comparisons, and more
+- Categories covering listening totals, artist and album diversity, loyalty, pace, streaks, and more
 
-**📊 Data and sync**
+**📚 Library options**
+- Link versions of the same track: remasters, singles, (feat. ...) and deluxe editions count together, while remixes and live versions stay separate
+- Split collaborations: "Gims & Damso" counts for both artists, while bands such as "Simon & Garfunkel" stay whole
+
+**📊 Data, accounts and sync**
 - Direct connection to the Last.fm API for real, live scrobbles, top artists, albums, and tracks
+- Use your own API key, or the app's built-in backup key, and change it any time in Settings
+- An API tab showing today's requests per service, with an optional request limiter
 - Flexible time ranges: 7 days, 1 month, 3 months, 6 months, 12 months, or all time
 - Background sync that keeps your stats up to date automatically, even when the app is closed
-- Local cache to reduce loading times and API calls
-- Smart artwork search: if Last.fm has no image, the app looks it up through iTunes, Deezer, MusicBrainz, and the Cover Art Archive
+- Offline-friendly cache with a storage breakdown, and backups where you choose what to export and restore
+- Smart artwork search: if Last.fm has no image, the app looks it up through Wikipedia, iTunes, Deezer, TheAudioDB, MusicBrainz, and the Cover Art Archive
 - No fake or simulated data, everything comes from your real listening history
 
 **🔎 Search**
-- A dedicated search tab for artists, albums, tracks, and Last.fm profiles
+- A dedicated search tab for artists, albums, tracks, and Last.fm profiles, with rich detail sheets
 - Search bar in the news page too, filtering by title and content as you type
-- One consistent search bar look across the app: News, Search, and Settings
 
 **📤 Sharing**
-- Share artwork, charts, achievement badges, and recap cards anywhere — including Windows, macOS, and Linux, where the file is saved and revealed directly in your file explorer
+- Share artwork, charts, achievement badges, recap cards and your profile card (with an optional QR code) anywhere, including Windows, macOS, and Linux, where the file is saved and revealed directly in your file explorer
 
 **🔔 Notifications**
-- Get notified when new app updates or news posts are published
-- A small badge on the news bell so you never miss an update
-- Notifications can be turned on or off at any time, on every supported platform including Windows
+- Daily and weekly recaps, scrobble milestones, sync alerts, and news and update alerts
+- Every notification type can be turned on or off at any time, on every supported platform including Windows
 
 **🌍 Languages**
 - Available in French, English, Spanish, Chinese, Portuguese, German, Italian, Japanese, Russian, and Arabic
@@ -122,7 +141,9 @@ https://github.com/SanoBld/LastStats-App/actions
 
 Builds coming straight from Actions contain the latest code and may include bugs that have not been fixed yet. If you want a stable experience, use the releases page instead.
 
-Supported platforms: **Android, Windows, macOS, Linux, and iOS (unsigned, sideload only).**
+Supported platforms: **Android, Windows, macOS, Linux (x64 and ARM64), and iOS (unsigned, sideload only).**
+
+No install needed? Try the **web version (Beta)**: https://sanobld.github.io/LastStats/app/
 
 ---
 
@@ -172,7 +193,8 @@ flutter build apk        # or: windows / macos / linux
 
 - Flutter and Dart
 - Material Design 3 (Material You)
-- Last.fm REST API, with iTunes Search, Deezer, MusicBrainz, and the Cover Art Archive as backup sources for missing artwork
+- Last.fm REST API, with Wikipedia, iTunes Search, Deezer, TheAudioDB, MusicBrainz, and the Cover Art Archive as backup sources for missing artwork
+- Apple Music and YouTube for animated posters, LRCLIB (with lyrics.ovh as a fallback) for lyrics, ListenBrainz for worldwide trends in Discover, and Google Translate for biography translation
 - The full list of open-source packages used is visible in-app, under Settings → About, each linking to its pub.dev page
 
 ---
