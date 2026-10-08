@@ -1003,6 +1003,8 @@ const Map<String, String> kTxEn = {
   'key_internal_fav_note': 'Favorites need your own API key and your Last.fm secret key. Add your own key above to be able to turn them on.',
   'faq_q15': 'Can I change my API key after signing in?',
   'faq_a15': 'Yes. Go to Settings > Account and tap "Change API key". You can replace your key with another one, or add your own if you chose the built-in key at the start. Your stats stay the same, only the favorites connection has to be set up again.',
+  'nothing_wip_badge': 'Being improved',
+  'nothing_wip_msg': 'The Nothing OS style is being improved, so it is not available right now. It may be enabled in a future version.',
   'ui_play_preview': 'Play preview',
   'ntf_test_title': '🔔 Test notification',
   'ntf_test_body': 'LastStats notifications are working!',

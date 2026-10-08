@@ -310,6 +310,48 @@ class _AppearancePageState extends State<AppearancePage> {
               );
             }),
           )),
+          // Nothing OS is hidden for now (see _showNothing). Instead of
+          // removing it, show a greyed-out card that says it is being improved.
+          if (!_showNothing) ...[
+            const SizedBox(width: 12),
+            Expanded(child: _StyleCard(
+              selected: false,
+              showDark: true,
+              onTap: () {
+                _apHaptic();
+                showAppSnackBar(context, SnackBar(
+                  content: Text(tx('nothing_wip_msg')),
+                  behavior: SnackBarBehavior.floating,
+                ));
+              },
+              child: Opacity(
+                opacity: 0.55,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: [
+                      _dot(kNothingRed),
+                      const SizedBox(width: 4),
+                      _dot(kNothingWhite.withValues(alpha: 0.15)),
+                      const Spacer(),
+                      const Icon(Icons.construction_rounded,
+                          size: 15, color: kNothingYellow),
+                    ]),
+                    const Spacer(),
+                    Text(tx('nothing_wip_badge'),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontFamily: 'NType82', fontSize: 10,
+                            color: kNothingYellow, letterSpacing: 0.3)),
+                    const SizedBox(height: 2),
+                    const Text('Nothing OS',
+                        style: TextStyle(fontFamily: 'NType82', fontSize: 14,
+                            fontWeight: FontWeight.w700, color: kNothingWhite)),
+                  ],
+                ),
+              ),
+            )),
+          ],
         ]),
 
         // ── Nothing sub-options (shown only when Nothing is active) ───────

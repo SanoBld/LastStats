@@ -63,6 +63,13 @@
   - Library options now apply everywhere: top lists, rankings, charts, recap, history counters, taste comparison (both sides use the same keys) and friends' libraries; friends' cached libraries are rebuilt when the options change
 - **Appearance settings:**
   - New setting Settings > Appearance > Image shapes: mix of Material You shapes, square, circle, or one single shape for all images
+  - The Nothing OS style stays hidden for now: Settings > Appearance shows a greyed-out Nothing OS card marked "Being improved", with a message explaining it when tapped
+- **Account (API key):**
+  - New "Change API key" in Settings > Account: replace your key with another one, or switch to the app's built-in key
+  - If you picked the built-in key when you signed in, a new "Use my own API key" button lets you add your own key later
+  - The new key is checked with Last.fm before it is saved (the built-in backup key is paused during the check, so a wrong key can't pass unnoticed)
+  - The favorites connection is removed when the key changes, because it depends on the old key; you can reconnect it with your secret key, and the dashboard restarts with the new key
+  - With the built-in key, a short note explains why favorites need your own API key and secret key
 
 **Dashboard and Discover**
 - **Dashboard customization and reordering:**
@@ -163,6 +170,9 @@
 - Notifications (channels, milestones, daily and weekly recaps, updates, sync) are now translated in all 10 languages, and the background worker uses the language saved in the app
 - Formal "you" (vous / usted / Sie / Lei / 您) in French, Spanish, German, Italian, Chinese, Portuguese and Russian; Russian and Chinese notification texts added
 - All new features and texts are available in all 10 app languages, reworded to sound natural
+- New API key texts (change key, use my own key, errors, favorites warning) and a new FAQ question "Can I change my API key after signing in?" in all 10 languages, each in its own `strings_xx.dart`
+- FAQ answers that were too short or outdated (iOS, favorites, backup, accounts, notifications) rewritten as complete explanatory sentences; the accounts answer now explains the 3-account support and the cache reset when switching
+- "Built-in key as backup" description rewritten as a full sentence; new "Being improved" label and message for the Nothing OS style card in all 10 languages
 - Code cleanup: removed unused translation helpers (`pickLang`), variables, functions and imports
 
 **Bug fixes**

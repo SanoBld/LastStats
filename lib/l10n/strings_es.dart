@@ -1003,6 +1003,8 @@ const Map<String, String> kTxEs = {
   'key_internal_fav_note': 'Los favoritos necesitan su propia clave API y su clave secreta de Last.fm. Añada su clave arriba para poder activarlos.',
   'faq_q15': '¿Puedo cambiar mi clave API después de iniciar sesión?',
   'faq_a15': 'Sí. Vaya a Ajustes > Cuenta y toque «Cambiar la clave API». Puede sustituir su clave por otra, o añadir la suya si al principio eligió la clave integrada. Sus estadísticas no cambian; solo hay que volver a configurar la conexión de favoritos.',
+  'nothing_wip_badge': 'En mejora',
+  'nothing_wip_msg': 'El estilo Nothing OS se está mejorando, por lo que no está disponible por ahora. Podrá activarse en una versión futura.',
   'ui_play_preview': 'Reproducir vista previa',
   'ntf_test_title': '🔔 Notificación de prueba',
   'ntf_test_body': '¡Las notificaciones de LastStats funcionan!',

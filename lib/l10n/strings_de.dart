@@ -974,6 +974,8 @@ const Map<String, String> kTxDe = {
   'key_internal_fav_note': 'Favoriten benötigen Ihren eigenen API-Schlüssel und Ihren Last.fm-Secret-Key. Fügen Sie oben Ihren Schlüssel hinzu, um sie zu aktivieren.',
   'faq_q15': 'Kann ich meinen API-Schlüssel nach der Anmeldung ändern?',
   'faq_a15': 'Ja. Gehen Sie zu Einstellungen > Konto und tippen Sie auf „API-Schlüssel ändern“. Sie können Ihren Schlüssel durch einen anderen ersetzen oder Ihren eigenen hinzufügen, falls Sie am Anfang den internen Schlüssel gewählt haben. Ihre Statistiken bleiben gleich, nur die Verbindung für Favoriten muss neu eingerichtet werden.',
+  'nothing_wip_badge': 'Wird überarbeitet',
+  'nothing_wip_msg': 'Der Nothing-OS-Stil wird gerade überarbeitet und ist deshalb vorerst nicht verfügbar. In einer späteren Version kann er möglicherweise aktiviert werden.',
   'ui_play_preview': 'Vorschau abspielen',
   'ntf_test_title': '🔔 Testbenachrichtigung',
   'ntf_test_body': 'LastStats-Benachrichtigungen funktionieren!',

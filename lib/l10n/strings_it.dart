@@ -974,6 +974,8 @@ const Map<String, String> kTxIt = {
   'key_internal_fav_note': 'I preferiti richiedono la sua chiave API personale e la sua chiave segreta di Last.fm. Aggiunga la sua chiave qui sopra per poterli attivare.',
   'faq_q15': 'Posso cambiare la mia chiave API dopo aver effettuato l\'accesso?',
   'faq_a15': 'Sì. Vada su Impostazioni > Account e tocchi «Cambia la chiave API». Può sostituire la sua chiave con un\'altra, oppure aggiungere la propria se all\'inizio aveva scelto la chiave interna. Le statistiche restano le stesse, va solo rifatta la connessione ai preferiti.',
+  'nothing_wip_badge': 'In miglioramento',
+  'nothing_wip_msg': 'Lo stile Nothing OS è in fase di miglioramento e per ora non è disponibile. Potrà essere attivato in una versione futura.',
   'ui_play_preview': 'Riproduci anteprima',
   'ntf_test_title': '🔔 Notifica di prova',
   'ntf_test_body': 'Le notifiche di LastStats funzionano!',

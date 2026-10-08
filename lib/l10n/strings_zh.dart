@@ -1000,6 +1000,8 @@ const Map<String, String> kTxZh = {
   'key_internal_fav_note': '收藏功能需要您自己的 API 密钥和 Last.fm 私密密钥。请在上方添加您自己的密钥后再启用。',
   'faq_q15': '登录后还能更换 API 密钥吗？',
   'faq_a15': '可以。前往设置 > 账号，点按“更换 API 密钥”。您可以把密钥换成另一个，或者在最初选择了内置密钥的情况下添加自己的密钥。您的统计数据不变，只需重新设置收藏连接。',
+  'nothing_wip_badge': '改进中',
+  'nothing_wip_msg': 'Nothing OS 风格正在改进中，因此暂时无法使用。它可能会在后续版本中开放。',
   'ui_play_preview': '播放试听',
   'ntf_test_title': '🔔 测试通知',
   'ntf_test_body': 'LastStats 通知运行正常！',

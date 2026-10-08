@@ -1003,6 +1003,8 @@ const Map<String, String> kTxFr = {
   'key_internal_fav_note': 'Les favoris nécessitent votre propre clé API et votre clé secrète Last.fm. Ajoutez votre clé ci-dessus pour pouvoir les activer.',
   'faq_q15': 'Puis-je changer ma clé API après la connexion ?',
   'faq_a15': 'Oui. Allez dans Paramètres > Compte, puis touchez « Changer de clé API ». Vous pouvez remplacer votre clé par une autre, ou ajouter la vôtre si vous aviez choisi la clé interne au départ. Vos statistiques restent les mêmes, seule la connexion aux favoris doit être refaite.',
+  'nothing_wip_badge': 'En cours d\'amélioration',
+  'nothing_wip_msg': 'Le style Nothing OS est en cours d\'amélioration, il n\'est donc pas disponible pour le moment. Il pourra être activé dans une prochaine version.',
   'ui_play_preview': 'Écouter l\'extrait',
   'ntf_test_title': '🔔 Notification de test',
   'ntf_test_body': 'Les notifications LastStats fonctionnent !',
