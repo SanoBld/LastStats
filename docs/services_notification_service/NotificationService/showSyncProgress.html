@@ -84,7 +84,7 @@ indeterminate bar (e.g. before the total is known yet).</p>
   final detail = prefs.getBool(&#39;ls_notif_sync_progress_detail&#39;) ?? true;
 
   final indeterminate = max &lt;= 0 || !detail;
-  const title = &#39;🔄 Syncing scrobbles…&#39;;
+  final title = tx(&#39;ntf_sync_title&#39;);
   return _plugin.show(
     _idSync,
     title,

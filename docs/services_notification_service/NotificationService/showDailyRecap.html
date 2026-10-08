@@ -74,8 +74,8 @@
   required String topArtist,
   required String date,
 }) {
-  final title = &#39;📊 Daily recap · $date&#39;;
-  final body  = &#39;${_fmt(count)} scrobbles · Top: $topArtist&#39;;
+  final title = tx(&#39;ntf_daily_title&#39;, {&#39;d&#39;: date});
+  final body  = tx(&#39;ntf_recap_body&#39;, {&#39;n&#39;: _fmt(count), &#39;a&#39;: topArtist});
   return _plugin.show(
     _idDailyRecap,
     title,
@@ -87,7 +87,7 @@
         color:   _kLastFmRed,
         subText: &#39;LastStats&#39;,
         styleInformation: InboxStyleInformation(
-          [&#39;${_fmt(count)} scrobbles today&#39;, &#39;Top artist: $topArtist&#39;],
+          [tx(&#39;ntf_n_today&#39;, {&#39;n&#39;: _fmt(count)}), tx(&#39;ntf_top_artist&#39;, {&#39;a&#39;: topArtist})],
           contentTitle: title,
           summaryText:  &#39;LastStats&#39;,
         ),

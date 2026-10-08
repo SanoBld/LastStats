@@ -68,8 +68,8 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; showMilestone(int count) {
-  final title = &#39;🎵 Milestone: ${_fmt(count)} scrobbles&#39;;
-  final body  = &#39;You just hit ${_fmt(count)} scrobbles on Last.fm 🎶&#39;;
+  final title = tx(&#39;ntf_milestone_title&#39;, {&#39;n&#39;: _fmt(count)});
+  final body  = tx(&#39;ntf_milestone_body&#39;, {&#39;n&#39;: _fmt(count)});
   return _plugin.show(
     _idMilestone,
     title,

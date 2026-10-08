@@ -74,8 +74,8 @@ launches <code>downloadUrl</code> — it's no longer launched automatically.</p>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; showUpdateAvailable(String version, String downloadUrl) {
-  const title = &#39;🆕 Update available&#39;;
-  final body  = &#39;LastStats $version is ready — tap to view.&#39;;
+  final title = tx(&#39;ntf_update_avail&#39;);
+  final body  = tx(&#39;ntf_update_ready&#39;, {&#39;v&#39;: version});
   return _plugin.show(
     _idUpdate,
     title,

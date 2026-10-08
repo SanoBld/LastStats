@@ -103,7 +103,7 @@
     );
     final bytes   = Uint8List.fromList(utf8.encode(payload));
     final path = await FilePicker.platform.saveFile(
-      dialogTitle: &#39;Save LastStats backup&#39;,
+      dialogTitle: tx(&#39;bk_save_title&#39;),
       fileName:    defaultFileName(),
       type:        FileType.custom,
       allowedExtensions: [&#39;json&#39;],

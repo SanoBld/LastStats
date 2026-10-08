@@ -93,49 +93,49 @@
       AndroidFlutterLocalNotificationsPlugin&gt;();
 
   await androidImpl?.createNotificationChannel(
-    const AndroidNotificationChannel(
+    AndroidNotificationChannel(
       _chMilestoneId, _chMilestoneName,
-      description: &#39;Notifies when you hit a scrobble milestone&#39;,
+      description: tx(&#39;nch_milestone_d&#39;),
       importance:  Importance.defaultImportance,
     ),
   );
 
   await androidImpl?.createNotificationChannel(
-    const AndroidNotificationChannel(
+    AndroidNotificationChannel(
       _chGrandId, _chGrandName,
-      description: &#39;Special alerts for big milestones (1K, 10K, 100K, 1M…)&#39;,
+      description: tx(&#39;nch_grand_d&#39;),
       importance:  Importance.high,
     ),
   );
 
   await androidImpl?.createNotificationChannel(
-    const AndroidNotificationChannel(
+    AndroidNotificationChannel(
       _chRecapId, _chRecapName,
-      description: &#39;Daily and weekly listening summaries&#39;,
+      description: tx(&#39;nch_recap_d&#39;),
       importance:  Importance.low,
     ),
   );
 
   await androidImpl?.createNotificationChannel(
-    const AndroidNotificationChannel(
+    AndroidNotificationChannel(
       _chUpdateId, _chUpdateName,
-      description: &#39;Notifies when a new version of LastStats is available&#39;,
+      description: tx(&#39;nch_update_d&#39;),
       importance:  Importance.high,
     ),
   );
 
   await androidImpl?.createNotificationChannel(
-    const AndroidNotificationChannel(
+    AndroidNotificationChannel(
       _chNewsId, _chNewsName,
-      description: &#39;New features, fixes and announcements about LastStats&#39;,
+      description: tx(&#39;nch_news_d&#39;),
       importance:  Importance.defaultImportance,
     ),
   );
 
   await androidImpl?.createNotificationChannel(
-    const AndroidNotificationChannel(
+    AndroidNotificationChannel(
       _chSyncId, _chSyncName,
-      description: &#39;Progress while syncing your full scrobble history&#39;,
+      description: tx(&#39;nch_sync_d&#39;),
       importance:  Importance.low,
     ),
   );

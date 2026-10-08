@@ -74,7 +74,7 @@ Returns null if the user cancelled or the file couldn't be read/parsed.</p>
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;BackupPreview?&gt; pickAndPreviewFile() async {
   final result = await FilePicker.platform.pickFiles(
-    dialogTitle: &#39;Choose a LastStats backup file&#39;,
+    dialogTitle: tx(&#39;bk_pick_file&#39;),
     type: FileType.custom,
     allowedExtensions: [&#39;json&#39;],
     withData: true,

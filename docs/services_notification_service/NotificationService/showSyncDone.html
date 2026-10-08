@@ -76,8 +76,8 @@
   if (!(prefs.getBool(&#39;ls_notif_sync_enabled&#39;) ?? true)) {
     return cancelSyncProgress();
   }
-  const title = &#39;✅ Scrobbles synced&#39;;
-  final body  = &#39;$newCount new scrobble(s) added.&#39;;
+  final title = tx(&#39;ntf_sync_done&#39;);
+  final body  = tx(&#39;ntf_sync_new&#39;, {&#39;n&#39;: &#39;$newCount&#39;});
   return _plugin.show(
     _idSync,
     title,

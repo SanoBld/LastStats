@@ -70,6 +70,9 @@
 void callbackDispatcher() {
   Workmanager().executeTask((taskName, _) async {
     WidgetsFlutterBinding.ensureInitialized();
+    &#47;&#47; Load the saved language: this runs in a background isolate.
+    final langPrefs = await SharedPreferences.getInstance();
+    localeNotifier.value = langPrefs.getString(&#39;ls_locale&#39;) ?? &#39;fr&#39;;
     await NotificationService.init();
 
     try {

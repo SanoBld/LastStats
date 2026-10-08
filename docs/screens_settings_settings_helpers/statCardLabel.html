@@ -67,14 +67,27 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">String statCardLabel(String id) {
-  for (final c in kAllStatCards) {
-    if (c.$1 == id) {
-      return pickLang(fr: c.$3, en: c.$4, es: c.$5, zh: c.$6, pt: c.$7);
-    }
-  }
-  return id;
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">String statCardLabel(String id) =&gt; switch (id) {
+  &#39;top_artist&#39;      =&gt; L.dashArtist1,
+  &#39;top_album&#39;       =&gt; L.dashAlbum1,
+  &#39;top_track&#39;       =&gt; L.dashTrack1,
+  &#39;last_track&#39;      =&gt; L.dashLastTrack,
+  &#39;total&#39;           =&gt; L.dashTotalScrobblesLabel,
+  &#39;avg_day&#39;         =&gt; tx(&#39;stat_avg_day&#39;),
+  &#39;avg_week&#39;        =&gt; tx(&#39;stat_avg_week&#39;),
+  &#39;favorites_count&#39; =&gt; L.settingsFavoritesSection,
+  &#39;days_active&#39;     =&gt; tx(&#39;stat_days_active&#39;),
+  &#39;since&#39;           =&gt; L.dashMemberSinceLabel,
+  &#39;country&#39;         =&gt; L.dashCountryLabel,
+  &#39;top_artist_week&#39; =&gt; L.dashArtistWeekLabel,
+  &#39;top_album_week&#39;  =&gt; L.dashAlbumWeekLabel,
+  &#39;top_track_week&#39;  =&gt; L.dashTrackWeekLabel,
+  &#39;artist_count&#39;    =&gt; L.dashUniqueArtistsLabel,
+  &#39;track_count&#39;     =&gt; L.dashUniqueTracksLabel,
+  &#39;album_count&#39;     =&gt; L.dashUniqueAlbumsLabel,
+  &#39;scrobbles_week&#39;  =&gt; tx(&#39;stat_scrobbles_week&#39;),
+  _                 =&gt; id,
+};</code></pre>
 </section>
 
 

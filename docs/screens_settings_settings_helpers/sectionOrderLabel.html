@@ -68,11 +68,11 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">String sectionOrderLabel(String id) =&gt; switch (id) {
-  &#39;stats&#39;    =&gt; pickLang(fr: &#39;Statistiques&#39;, en: &#39;Stats&#39;, es: &#39;Estadísticas&#39;, zh: &#39;统计&#39;, pt: &#39;Estatísticas&#39;),
-  &#39;discover&#39; =&gt; pickLang(fr: &#39;Découvrir&#39;, en: &#39;Discover&#39;, es: &#39;Descubrir&#39;, zh: &#39;发现&#39;, pt: &#39;Descobrir&#39;),
-  &#39;recent&#39;   =&gt; pickLang(fr: &#39;Écoutes récentes&#39;, en: &#39;Recent plays&#39;, es: &#39;Reproducciones recientes&#39;, zh: &#39;最近播放&#39;, pt: &#39;Tocadas recentemente&#39;),
-  &#39;friends&#39;  =&gt; pickLang(fr: &#39;Amis&#39;, en: &#39;Friends&#39;, es: &#39;Amigos&#39;, zh: &#39;好友&#39;, pt: &#39;Amigos&#39;),
-  &#39;chart&#39;    =&gt; pickLang(fr: &#39;Graphique &#47; calendrier&#39;, en: &#39;Chart &#47; calendar&#39;, es: &#39;Gráfico &#47; calendario&#39;, zh: &#39;图表&#47;日历&#39;, pt: &#39;Gráfico &#47; calendário&#39;),
+  &#39;stats&#39;    =&gt; L.dashStats,
+  &#39;discover&#39; =&gt; L.dashDiscoverTitle,
+  &#39;recent&#39;   =&gt; L.dashRecentPlaysLabel,
+  &#39;friends&#39;  =&gt; L.dashFriends,
+  &#39;chart&#39;    =&gt; tx(&#39;sec_chart&#39;),
   _          =&gt; id,
 };</code></pre>
 </section>
