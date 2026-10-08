@@ -623,8 +623,6 @@ class AppStringsRu implements AppStrings {
   @override String get chartsExportGeneratedOn => 'создано';
   @override String get faqQ1 => 'Скробблит ли LastStats мою музыку?';
   @override String get faqA1 => 'Нет. LastStats, это приложение для визуализации: оно показывает скробблы, уже записанные в вашем аккаунте Last.fm, но само ничего не записывает.\n\nЧтобы автоматически скробблить музыку, используйте специальное приложение, например Pano Scrobbler (доступно на Android).';
-  @override String get faqQ2 => 'Планируется ли версия для iOS?';
-  @override String get faqA2 => 'Нет, версия для iOS пока не планируется. Если спрос станет достаточно большим, это решение могут пересмотреть.';
   @override String get faqQ3 => 'Работает ли приложение на macOS или других платформах?';
   @override String get faqA3 => 'LastStats разрабатывается и тестируется на Android. Работа на других платформах (macOS, Windows, Linux…) не проверена, возможны ошибки или неожиданное поведение.';
   @override String get faqQ4 => 'Является ли LastStats открытым исходным кодом?';

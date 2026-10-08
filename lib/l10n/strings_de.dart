@@ -623,8 +623,6 @@ class AppStringsDe implements AppStrings {
   @override String get chartsExportGeneratedOn => 'erstellt am';
   @override String get faqQ1 => 'Scrobbelt LastStats meine Musik?';
   @override String get faqA1 => 'Nein. LastStats ist eine Visualisierungs-App: Sie zeigt die bereits auf Ihrem Last.fm-Konto gespeicherten Scrobbles an, zeichnet aber selbst keine auf.\n\nUm Ihre Musik automatisch zu scrobbeln, nutzen Sie eine dedizierte App wie Pano Scrobbler (verfügbar für Android).';
-  @override String get faqQ2 => 'Ist eine iOS-Version geplant?';
-  @override String get faqA2 => 'Nein, eine iOS-Version ist derzeit nicht geplant. Wenn die Nachfrage groß genug wird, kann diese Entscheidung noch einmal überdacht werden.';
   @override String get faqQ3 => 'Funktioniert die App unter macOS oder anderen Plattformen?';
   @override String get faqA3 => 'LastStats wird auf Android entwickelt und getestet. Das Verhalten auf anderen Plattformen (macOS, Windows, Linux…) ist nicht überprüft, Fehler oder unerwartetes Verhalten sind möglich.';
   @override String get faqQ4 => 'Ist LastStats Open Source?';

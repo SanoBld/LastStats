@@ -748,8 +748,6 @@ abstract class AppStrings {
   // ── FAQ ──────────────────────────────────────────────────────────────────
   String get faqQ1;
   String get faqA1;
-  String get faqQ2;
-  String get faqA2;
   String get faqQ3;
   String get faqA3;
   String get faqQ4;

@@ -623,8 +623,6 @@ class AppStringsJa implements AppStrings {
   @override String get chartsExportGeneratedOn => '生成日';
   @override String get faqQ1 => 'LastStatsは自分の音楽をスクロブリングしますか？';
   @override String get faqA1 => 'いいえ。LastStatsは可視化アプリで、すでにLast.fmアカウントに記録されているスクロブルを表示するだけで、自分では記録しません。\n\n音楽を自動でスクロブリングするには、Pano Scrobbler（Android用）などの専用アプリを使用してください。';
-  @override String get faqQ2 => 'iOS版の予定はありますか？';
-  @override String get faqA2 => 'いいえ、現時点でiOS版の予定はありません。要望が十分に集まれば、この判断を見直す可能性があります。';
   @override String get faqQ3 => 'macOSや他のプラットフォームでも動作しますか？';
   @override String get faqA3 => 'LastStatsはAndroidで開発・テストされています。他のプラットフォーム（macOS、Windows、Linuxなど）での動作は検証されておらず、不具合や予期しない動作が発生する可能性があります。';
   @override String get faqQ4 => 'LastStatsはオープンソースですか？';

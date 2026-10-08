@@ -172,6 +172,7 @@
 - All new features and texts are available in all 10 app languages, reworded to sound natural
 - New API key texts (change key, use my own key, errors, favorites warning) and a new FAQ question "Can I change my API key after signing in?" in all 10 languages, each in its own `strings_xx.dart`
 - FAQ answers that were too short or outdated (iOS, favorites, backup, accounts, notifications) rewritten as complete explanatory sentences; the accounts answer now explains the 3-account support and the cache reset when switching
+- FAQ: removed the "Is an iOS version planned?" question (an iOS build now exists) and reordered the questions by theme (basics, account and API key, data, features, project)
 - "Built-in key as backup" description rewritten as a full sentence; new "Being improved" label and message for the Nothing OS style card in all 10 languages
 - Code cleanup: removed unused translation helpers (`pickLang`), variables, functions and imports
 
