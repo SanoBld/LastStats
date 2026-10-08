@@ -233,6 +233,21 @@ Si le compte supprimé était actif, bascule sur l'index 0.
 
 </dd>
 
+        <dt id="updateKey" class="callable">
+  <span class="name"><a href="../services_account_manager/AccountManager/updateKey.html">updateKey</a></span><span class="signature">(<wbr><span class="parameter" id="updateKey-param-index"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">index</span>, </span><span class="parameter" id="updateKey-param-newKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">newKey</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Remplace la clé API du compte à <code>index</code> (même nom d'utilisateur).
+Si ce compte est le compte actif, ls_apikey est resynchronisé aussi.
+Retourne false si l'index est invalide ou si la clé est vide.
+  
+
+</dd>
+
     </dl>
   </section>
     
