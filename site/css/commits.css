@@ -1,0 +1,46 @@
+/* styles for the pushes page (commits.html) */
+/* loads after releases.css: it reuses .rel-card, .rel-filter, .rel-badge... */
+
+.cm-search { width: auto; flex: 1 1 14rem; max-width: 22rem; margin: 0; min-height: 44px; border-radius: 22px; font-size: .9rem; }
+
+/* big card for the newest push */
+#cm-latest:empty { display: none; }
+.cm-latest { margin-bottom: 1.5rem; }
+.cm-latest .rel-tag { font-size: 1.15rem; line-height: 1.35; }
+
+/* one card per day, a list of pushes inside */
+.cm-day-title { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; margin: 0 0 .2rem; text-transform: capitalize; }
+.cm-day-count { font-size: .85rem; opacity: .75; margin: 0 0 .9rem; }
+.cm-rows { display: flex; flex-direction: column; gap: 2px; }
+.cm-row {
+  display: flex; align-items: center; gap: .9rem; padding: .8rem 1rem;
+  background: var(--md-surface-container); border-radius: var(--r-inner);
+}
+.cm-row:first-child { border-top-left-radius: var(--r-card); border-top-right-radius: var(--r-card); }
+.cm-row:last-child { border-bottom-left-radius: var(--r-card); border-bottom-right-radius: var(--r-card); }
+.cm-main { flex: 1; min-width: 0; }
+.cm-msg { margin: 0; font-size: .95rem; font-weight: 500; line-height: 1.4; overflow-wrap: anywhere; }
+.cm-meta { margin: .25rem 0 0; font-size: .78rem; opacity: .75; display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .6rem; }
+.cm-avatar { width: 18px; height: 18px; border-radius: 50%; vertical-align: middle; }
+.cm-sha {
+  font-family: 'Space Mono', ui-monospace, monospace; font-size: .75rem; border: none; cursor: pointer;
+  padding: .15rem .55rem; border-radius: var(--r-chip);
+  background: var(--md-surface-container-highest); color: var(--md-on-surface);
+}
+.cm-actions { display: flex; gap: 2px; flex-shrink: 0; }
+.cm-btn {
+  font-family: inherit; font-size: .82rem; font-weight: 500; text-decoration: none; cursor: pointer; border: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+  min-height: 40px; padding: 0 1rem;
+  background: var(--md-secondary-container); color: var(--md-on-secondary-container);
+  border-radius: var(--r-inner);
+}
+.cm-btn:first-child { border-radius: 20px var(--r-inner) var(--r-inner) 20px; }
+.cm-btn:last-child { border-radius: var(--r-inner) 20px 20px var(--r-inner); }
+.cm-btn.is-zip { background: var(--md-primary); color: var(--md-on-primary); }
+.rel-card.is-latest .cm-btn.is-zip { background: var(--md-on-primary-container); color: var(--md-primary-container); }
+
+@media (max-width: 640px) {
+  .cm-row { flex-direction: column; align-items: stretch; }
+  .cm-actions .cm-btn { flex: 1; }
+}

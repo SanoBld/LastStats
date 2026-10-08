@@ -32,6 +32,14 @@
 
 ## v3.6.0
 
+**Website: Pushes page, web version link and API tab**
+- New "Pushes" page on the website (footer link): every push grouped by day with the commit, author, version tag when there is one, search and filters (features / fixes / versions), a link to GitHub and a ZIP download of the code at each push; the list is refreshed at every push to main
+- Web version of the app is online: https://sanobld.github.io/LastStats/app/ (Beta, opened from the "Web version" button on the site)
+- New "API" tab in Settings: shows today's requests per service, a request limiter option to avoid rate-limit errors, a reset button, and a note that some services are unofficial
+- Last.fm rate-limit errors are now retried automatically; the client-side limiter is off by default
+- Website: Versions page rebuilt with a table of contents rail, search, Stable / Beta filters, files grouped by platform and infinite scroll; new FAQ entry about missing images
+- Offline images cache simplified (no more RAM cache, less memory used); Android app data backup disabled in the manifest; Russian and Chinese strings added for notifications
+
 **Large screens (PC) and web version**
 - PC side bar rebuilt: full-width pills with icon and label inside the highlight, 52 dp tall, centred in the bar; collapsed mode shows tooltips
 - "For you" / Discover on PC: 172 dp cards in a horizontal strip with mouse drag, left / right arrows and hover effect (phones unchanged)

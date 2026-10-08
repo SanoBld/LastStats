@@ -1,11 +1,9 @@
 name: Deploy showcase site to GitHub Pages
 
 on:
+  # every push to main: refreshes the site and the pushes page (site/data/commits.json)
   push:
     branches: [main]
-    paths:
-      - 'site/**'
-      - '.github/workflows/deploy-site.yml'
   # refresh the releases data (site/data/releases.json) every 6 hours
   schedule:
     - cron: '0 */6 * * *'
@@ -50,6 +48,20 @@ jobs:
               }))
             }' > site/data/releases.json
           jq '{updated, stars, count: (.releases | length)}' site/data/releases.json
+
+          # pushes page: last 300 commits + which commit each tag points to
+          tags=$(gh api "repos/$APP_REPO/tags?per_page=100" --jq '[.[] | {name, sha: .commit.sha}]')
+          for p in 1 2 3; do gh api "repos/$APP_REPO/commits?per_page=100&page=$p"; done | jq -s --argjson tags "$tags" '
+            {
+              updated: (now | todate),
+              commits: (add | map(. as $c | {
+                sha, message: .commit.message, date: .commit.author.date,
+                author: (.author.login // .commit.author.name),
+                avatar: .author.avatar_url, url: .html_url,
+                tags: [$tags[] | select(.sha == $c.sha) | .name]
+              }))
+            }' > site/data/commits.json
+          jq '{updated, count: (.commits | length)}' site/data/commits.json
 
       # Publish the static site to the root of gh-pages.
       # keep_files protects the /app subfolder (Flutter web build).
