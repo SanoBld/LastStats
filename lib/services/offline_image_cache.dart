@@ -88,6 +88,76 @@ class OfflineImageCache {
   static final Map<String, int> _failedUntil = {};
   static const _failCooldownMs = 2 * 60 * 1000;
 
+  // Background downloads run a few at a time: a list of 50 covers must not
+  // open 50 sockets at once (that starves the pictures actually on screen).
+  static const _maxParallelDownloads = 4;
+  static const _maxQueuedDownloads   = 150;
+  static int _dlActive = 0;
+  static final Queue<Completer<void>> _dlWaiters = Queue();
+
+  static Future<void> _dlAcquire() async {
+    if (_dlActive < _maxParallelDownloads) {
+      _dlActive++;
+      return;
+    }
+    final c = Completer<void>();
+    _dlWaiters.add(c);
+    await c.future; // slot handed over by _dlRelease (count unchanged)
+  }
+
+  static void _dlRelease() {
+    if (_dlWaiters.isNotEmpty) {
+      _dlWaiters.removeFirst().complete();
+    } else {
+      _dlActive--;
+    }
+  }
+
+  // Resized urls that failed to load while the original one worked: the
+  // original is used from then on instead of retrying the resized one.
+  static final Set<String> _badSized = {};
+
+  /// Artwork URL for the size it is shown at; the original URL when that
+  /// resized variant is known not to work.
+  static String sized(String url, double logicalPx, double dpr) {
+    final s = sizedImageUrl(url, logicalPx, dpr);
+    return (s != url && _badSized.contains(s)) ? url : s;
+  }
+
+  static void markSizedBad(String sizedUrl) {
+    if (_badSized.length > 500) _badSized.clear();
+    _badSized.add(sizedUrl);
+  }
+
+  // Only real pictures are stored: a 200 answer can still be an HTML/JSON
+  // error page, which would then sit in the cache as a permanently broken
+  // image.
+  static bool _isImageBytes(Uint8List b) {
+    if (b.length < 12) return false;
+    if (b[0] == 0xFF && b[1] == 0xD8) return true;                         // JPEG
+    if (b[0] == 0x89 && b[1] == 0x50 && b[2] == 0x4E && b[3] == 0x47) return true; // PNG
+    if (b[0] == 0x47 && b[1] == 0x49 && b[2] == 0x46) return true;         // GIF
+    if (b[0] == 0x42 && b[1] == 0x4D) return true;                         // BMP
+    if (b[0] == 0x52 && b[1] == 0x49 && b[2] == 0x46 && b[3] == 0x46 &&
+        b[8] == 0x57 && b[9] == 0x45 && b[10] == 0x42 && b[11] == 0x50) {
+      return true;                                                         // WebP
+    }
+    if (b[4] == 0x66 && b[5] == 0x74 && b[6] == 0x79 && b[7] == 0x70) {
+      return true;                                                         // AVIF / HEIC
+    }
+    return false;
+  }
+
+  // Forgets one cached entry (its bytes could not be decoded).
+  static Future<void> _drop(String url) async {
+    final e = _meta.remove(url);
+    _ramDrop(url);
+    if (e == null) return;
+    _totalBytes -= e.size;
+    await ImageCacheBackend.delete(e.fileKey);
+    _saveMetaLater();
+  }
+
   // ── Metadata persistence ──────────────────────────────────────────────────
 
   static Future<void> _ensureMeta() {
@@ -376,22 +446,35 @@ class OfflineImageCache {
 
   static Future<void> _download(String url) async {
     var ok = false;
+    var skipped = false;
     try {
       await _ensureMeta();
       if (_meta.containsKey(url)) { ok = true; return; }
-      final res = await ApiHttp.get(Uri.parse(url)).timeout(_timeout);
-      final type = (res.headers['content-type'] ?? '').toLowerCase();
-      final looksLikeImage = type.isEmpty ||
-          type.startsWith('image/') ||
-          type.startsWith('application/octet-stream') ||
-          type.startsWith('binary/');
-      if (res.statusCode == 200 && res.bodyBytes.isNotEmpty && looksLikeImage) {
-        await put(url, res.bodyBytes, maxBytes: StorageManager.maxBytes);
-        ok = true;
+      if (_dlWaiters.length >= _maxQueuedDownloads) { skipped = true; return; }
+      await _dlAcquire();
+      try {
+        if (_meta.containsKey(url)) { ok = true; return; }
+        // The timeout starts now, once the download really begins (waiting
+        // for a free slot must not count against it).
+        final res = await ApiHttp.get(Uri.parse(url)).timeout(_timeout);
+        final type = (res.headers['content-type'] ?? '').toLowerCase();
+        final looksLikeImage = type.isEmpty ||
+            type.startsWith('image/') ||
+            type.startsWith('application/octet-stream') ||
+            type.startsWith('binary/');
+        if (res.statusCode == 200 &&
+            res.bodyBytes.isNotEmpty &&
+            looksLikeImage &&
+            _isImageBytes(res.bodyBytes)) {
+          await put(url, res.bodyBytes, maxBytes: StorageManager.maxBytes);
+          ok = true;
+        }
+      } finally {
+        _dlRelease();
       }
     } catch (_) {
     } finally {
-      if (!ok) {
+      if (!ok && !skipped) {
         _failedUntil[url] =
             DateTime.now().millisecondsSinceEpoch + _failCooldownMs;
         if (_failedUntil.length > 2000) {
@@ -404,9 +487,51 @@ class OfflineImageCache {
 
   // ── Widget helper ─────────────────────────────────────────────────────────
 
+  // Network picture with a safety net: if the resized url fails, the
+  // original (un-resized) url is tried before giving up.
+  static Widget _networkImage(
+    BuildContext context,
+    String url,
+    String original, {
+    double? width,
+    double? height,
+    required BoxFit fit,
+    Widget? placeholder,
+    Widget? errorWidget,
+  }) {
+    final ph = placeholder ?? M3ImagePlaceholder(width: width, height: height);
+    final dpr = MediaQuery.of(context).devicePixelRatio;
+    final cacheWidth  = width  != null ? (width * dpr).round()  : null;
+    final cacheHeight = height != null ? (height * dpr).round() : null;
+
+    final webImg = buildCorsBypassImage(url, width: width, height: height, fit: fit);
+    if (webImg != null) return webImg;
+
+    Widget failed() => errorWidget ?? placeholder ?? const SizedBox.shrink();
+    Widget net(String u, Widget Function() onError) => Image.network(
+          u,
+          width: width,
+          height: height,
+          fit: fit,
+          cacheWidth: cacheWidth,
+          cacheHeight: cacheHeight,
+          gaplessPlayback: true,
+          loadingBuilder: (_, child, p) => p == null ? child : ph,
+          errorBuilder: (_, _, _) => onError(),
+        );
+
+    return net(url, () {
+      if (original == url) return failed();
+      markSizedBad(url);
+      return net(original, failed);
+    });
+  }
+
   static Widget _memoryImage(
     BuildContext context,
     Uint8List data, {
+    required String url,
+    required String original,
     double? width,
     double? height,
     required BoxFit fit,
@@ -429,8 +554,14 @@ class OfflineImageCache {
       cacheWidth: cacheWidth,
       cacheHeight: cacheHeight,
       gaplessPlayback: true,
-      errorBuilder: (_, _, _) =>
-          errorWidget ?? placeholder ?? const SizedBox.shrink(),
+      errorBuilder: (ctx, _, _) {
+        // The cached bytes cannot be decoded (corrupt file): forget them and
+        // show the picture from the network instead of a blank square.
+        scheduleMicrotask(() => _drop(url));
+        return _networkImage(ctx, url, original,
+            width: width, height: height, fit: fit,
+            placeholder: placeholder, errorWidget: errorWidget);
+      },
     );
   }
 
@@ -443,22 +574,25 @@ class OfflineImageCache {
     Widget? placeholder,
     Widget? errorWidget,
   }) {
+    final original = url;
     // Download the resolution that matches the on-screen size.
     final side = (width != null && width.isFinite ? width : 0.0) > (height != null && height.isFinite ? height : 0.0)
         ? width! : (height != null && height.isFinite ? height : 0.0);
     if (side > 0) {
       final dpr = WidgetsBinding.instance.platformDispatcher.views.isNotEmpty
           ? WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio : 2.0;
-      url = sizedImageUrl(url, side, dpr);
+      url = sized(url, side, dpr);
     }
     final ph = placeholder ?? M3ImagePlaceholder(width: width, height: height);
     if (url.isEmpty) return placeholder ?? const SizedBox.shrink();
+    final shownUrl = url;
 
     // Fast path: already in RAM → no FutureBuilder, no placeholder flash.
-    final hot = _loaded && _meta.containsKey(url) ? _ramGet(url) : null;
+    final hot = _loaded && _meta.containsKey(shownUrl) ? _ramGet(shownUrl) : null;
     if (hot != null) {
       return Builder(builder: (context) => _memoryImage(
             context, hot,
+            url: shownUrl, original: original,
             width: width, height: height, fit: fit,
             placeholder: placeholder, errorWidget: errorWidget,
           ));
@@ -466,7 +600,7 @@ class OfflineImageCache {
 
     // Cache checked FIRST (offline or online) — network is only a fallback.
     return FutureBuilder<Uint8List?>(
-      future: _ensureMeta().then((_) => _getBytes(url)),
+      future: _ensureMeta().then((_) => _getBytes(shownUrl)),
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.done) {
           return ph;
@@ -475,32 +609,17 @@ class OfflineImageCache {
         if (snap.data != null) {
           return _memoryImage(
             context, snap.data!,
+            url: shownUrl, original: original,
             width: width, height: height, fit: fit,
             placeholder: placeholder, errorWidget: errorWidget,
           );
         }
 
-        _downloadAndCache(url).ignore();
+        _downloadAndCache(shownUrl).ignore();
 
-        final dpr = MediaQuery.of(context).devicePixelRatio;
-        final cacheWidth  = width  != null ? (width * dpr).round()  : null;
-        final cacheHeight = height != null ? (height * dpr).round() : null;
-
-        final webImg = buildCorsBypassImage(url, width: width, height: height, fit: fit);
-        if (webImg != null) return webImg;
-
-        return Image.network(
-          url,
-          width: width,
-          height: height,
-          fit: fit,
-          cacheWidth: cacheWidth,
-          cacheHeight: cacheHeight,
-          gaplessPlayback: true,
-          loadingBuilder: (_, child, p) => p == null ? child : ph,
-          errorBuilder: (_, _, _) =>
-              errorWidget ?? placeholder ?? const SizedBox.shrink(),
-        );
+        return _networkImage(context, shownUrl, original,
+            width: width, height: height, fit: fit,
+            placeholder: placeholder, errorWidget: errorWidget);
       },
     );
   }

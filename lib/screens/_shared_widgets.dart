@@ -256,11 +256,20 @@ class _SmartImageState extends State<_SmartImage> {
     // no visible quality loss since it still matches screen pixels.
     final dpr = MediaQuery.of(context).devicePixelRatio;
     final px = (widget.size * dpr).round();
-    url = sizedImageUrl(url, widget.size, dpr);
-    return _shaped(Image.network(url, width: widget.size, height: widget.size, fit: BoxFit.cover,
+    final original = url;
+    // Resized url first; if the CDN refuses that size, fall back to the
+    // original url (and remember it) instead of showing a blank square.
+    final shown = OfflineImageCache.sized(original, widget.size, dpr);
+    Widget net(String u, Widget Function() onError) => Image.network(u,
+        width: widget.size, height: widget.size, fit: BoxFit.cover,
         cacheWidth: px, cacheHeight: px,
         loadingBuilder: (_, child, p) => p == null ? child : _loadingBox(s),
-        errorBuilder: (_, _, _) => _fallbackBox(s)));
+        errorBuilder: (_, _, _) => onError());
+    return _shaped(net(shown, () {
+      if (shown == original) return _fallbackBox(s);
+      OfflineImageCache.markSizedBad(shown);
+      return net(original, () => _fallbackBox(s));
+    }));
   }
 
   // Every image gets a Material You shape (cookie, circle, clover…),

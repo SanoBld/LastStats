@@ -1,11 +1,13 @@
 // lib/services/image_service.dart
 //
-// Resolves artwork URLs. Priority (best first, Last.fm = last resort because
-// its artist images are a grey star since 2019 and albums are only ~300px):
+// Resolves artwork URLs. Sources are tried one at a time, in priority order
+// (Last.fm = last resort: its artist images are a grey star since 2019 and
+// its albums are only ~300px):
 //   Artist: Deezer > YouTube Music > TheAudioDB > MusicBrainz > Wikipedia > Last.fm
-//   Album : iTunes > Deezer > YouTube Music > CoverArtArchive > TheAudioDB > Wikipedia > Last.fm
-//   Track : iTunes > Deezer > YouTube Music > TheAudioDB > album cover > Wikipedia > Last.fm
-// The first 3 sources run in parallel (result keeps priority order).
+//   Album : Deezer > iTunes > YouTube Music > MusicBrainz > TheAudioDB > Wikipedia > Last.fm
+//   Track : Deezer > iTunes > YouTube Music > TheAudioDB > album cover > Wikipedia > Last.fm
+// Every source goes through its own queue ("lane", see _Lane) so a page that
+// asks for 50 covers at once cannot flood — or get blocked by — the APIs.
 // Downloads and caches image bytes via OfflineImageCache for offline use.
 //
 // Main entry points:
@@ -13,9 +15,12 @@
 //   widgetImage(url, ...)                        → offline-capable Widget
 //   prefetchBytes(url)                           → background download
 
+import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 import 'package:flutter/material.dart' show Theme;
 import 'package:flutter/widgets.dart';
+import 'package:http/http.dart' as http;
 import 'api_http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'offline_image_cache.dart';
@@ -23,19 +28,117 @@ import 'storage_manager.dart';
 import '../l10n/extra_strings.dart';
 import 'image_sizing.dart';
 
+/// One artwork source in a lookup chain.
+/// [run] returns: a URL (found) · '' (the source answered: no artwork) ·
+/// null (the source could NOT answer: error, timeout, rate limit, paused).
 class _S {
   final String name;
-  final Future<String> Function() run;
+  final Future<String?> Function() run;
   const _S(this.name, this.run);
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  Per-source scheduler
+//
+//  WHY: a ranking / search / history page asks for dozens of covers at once.
+//  Every lookup used to fire its requests immediately (and in parallel over
+//  3 sources), i.e. 100+ simultaneous HTTPS calls. iTunes (~20/min) and Deezer
+//  (50 / 5 s) answered with 403/429/quota errors, the rest hit the 6 s timeout,
+//  every source "failed", and the empty result was remembered → no artwork at
+//  all, everywhere. The earlier client-side limiter made it worse: it DROPPED
+//  requests (fake 429) and its waiting time counted against the HTTP timeout.
+//
+//  A lane never drops a request: it queues it, spaces the calls, and the
+//  request timeout only starts once the request is really sent. After a
+//  rate-limit answer (or a run of failures) the source is paused for a while
+//  and the chain simply moves on to the next source.
+// ═════════════════════════════════════════════════════════════════════════════
+class _Lane {
+  final int maxConcurrent;
+  final int minGapMs;
+  final int maxWaitMs; // longer queue than this → "unavailable", try later
+  _Lane({required this.maxConcurrent, required this.minGapMs, this.maxWaitMs = 20000});
+
+  int _active = 0;
+  int _nextStart = 0;
+  int _blockedUntil = 0;
+  int _fails = 0;
+  final Queue<Completer<void>> _waiters = Queue();
+
+  static int _now() => DateTime.now().millisecondsSinceEpoch;
+
+  bool get blocked => _blockedUntil > _now();
+
+  void block(int ms) {
+    final until = _now() + ms;
+    if (until > _blockedUntil) _blockedUntil = until;
+    _fails = 0;
+  }
+
+  void ok() => _fails = 0;
+
+  // A few failures in a row (timeouts, 5xx…) → pause instead of piling up.
+  void fail() {
+    if (++_fails >= 6) block(30000);
+  }
+
+  void reset() {
+    _blockedUntil = 0;
+    _fails = 0;
+  }
+
+  int get _estimatedWaitMs {
+    final ahead = _active + _waiters.length;
+    final perSlot = minGapMs > 400 ? minGapMs : 400;
+    return ((ahead / maxConcurrent).ceil() * perSlot);
+  }
+
+  /// Runs [task] when a slot is free. Returns null (= unavailable) when the
+  /// source is paused or the queue is too long to be worth waiting for.
+  Future<Object?> run(Future<Object?> Function() task) async {
+    if (blocked || _estimatedWaitMs > maxWaitMs) return null;
+    await _acquire();
+    try {
+      if (blocked) return null; // paused while we were queued
+      return await task();
+    } finally {
+      _release();
+    }
+  }
+
+  Future<void> _acquire() async {
+    if (_active >= maxConcurrent) {
+      final c = Completer<void>();
+      _waiters.add(c);
+      await c.future; // the slot is handed over by _release (count unchanged)
+    } else {
+      _active++;
+    }
+    if (minGapMs > 0 && !blocked) {
+      final now = _now();
+      final start = _nextStart > now ? _nextStart : now;
+      _nextStart = start + minGapMs;
+      final wait = start - now;
+      if (wait > 0) await Future.delayed(Duration(milliseconds: wait));
+    }
+  }
+
+  void _release() {
+    if (_waiters.isNotEmpty) {
+      _waiters.removeFirst().complete();
+    } else {
+      _active--;
+    }
+  }
 }
 
 class ImageService {
   ImageService._();
 
   static const _placeholder = '2a96cbd8b46e442fc41c2b86b821562f';
-  static const _timeout     = Duration(seconds: 6);
+  static const _timeout     = Duration(seconds: 8);
   // Hard cap for one full lookup, so a loading spinner never lasts forever.
-  static const _maxResolve  = Duration(seconds: 12);
+  static const _maxResolve  = Duration(seconds: 30);
   static const _diskPrefix  = 'imgcache_';
   static const _diskTtlMs   = 7 * 24 * 60 * 60 * 1000;
 
@@ -77,7 +180,16 @@ class ImageService {
   // before, an empty result was cached for the whole session, so one
   // transient failure meant "no artwork" until the app was restarted.
   static final Map<String, int> _negUntil = {};
-  static const _negTtlMs = 10 * 60 * 1000;
+  static const _negTtlMs = 10 * 60 * 1000;      // every source said "nothing"
+  static const _negShortMs = 20 * 1000;          // some source was unavailable
+
+  static void _markNegative(String key, int ms) {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    _negUntil[key] = now + ms;
+    if (_negUntil.length > 2000) {
+      _negUntil.removeWhere((_, t) => t < now);
+    }
+  }
 
   static bool _isNegative(String key) {
     final t = _negUntil[key];
@@ -137,11 +249,7 @@ class ImageService {
 
   static Future<String> _persistUrl(String key, String url, [String source = '']) async {
     if (url.isEmpty) {
-      _negUntil[key] = DateTime.now().millisecondsSinceEpoch + _negTtlMs;
-      if (_negUntil.length > 2000) {
-        final now = DateTime.now().millisecondsSinceEpoch;
-        _negUntil.removeWhere((_, t) => t < now);
-      }
+      _markNegative(key, _negTtlMs);
       return url;
     }
     _negUntil.remove(key);
@@ -203,98 +311,117 @@ class ImageService {
   }
 
   // ── Public: resolve URL ───────────────────────────────────────────────────
+  // Source order (first answer wins, one source at a time):
+  //   Artist: Deezer > YouTube Music > TheAudioDB > MusicBrainz > Wikipedia
+  //   Album : Deezer > iTunes > YouTube Music > MusicBrainz > TheAudioDB > Wikipedia
+  //   Track : Deezer > iTunes > YouTube Music > TheAudioDB > album cover > Wikipedia
+  //   …and Last.fm's own picture when nothing else is found.
+  // Deezer goes first because its limit (50 req / 5 s) is the most generous;
+  // iTunes (~20 req / min) is kept for what Deezer does not know.
 
   static Future<String> resolveArtist(String artist, {String? lastfmUrl}) =>
-      _once('artist|$artist', () => _resolveArtist(artist, lastfmUrl: lastfmUrl))
-          .timeout(_maxResolve, onTimeout: () => _ok(lastfmUrl) ? lastfmUrl! : '');
-
-  static Future<String> _resolveArtist(String artist, {String? lastfmUrl}) async {
-    final key = 'artist|$artist';
-    await _ensureDiskCache();
-    final mem = _getUrl(key);
-    if (mem != null) return mem;
-    if (_isNegative(key)) return '';
-
-    final hit = await _pick([
-      _S('deezer',  () => _deezerArtist(artist)),
-      _S('ytmusic', () => _ytMusicSearch(artist, 'artist', expectArtist: artist)),
-      _S('audiodb', () => _audioDbArtist(artist)),
-    ], [
-      _S('musicbrainz', () => _mbArtistImage(artist)),
-      _S('wikipedia',   () => _wikipediaImage(artist, expectName: artist)),
-    ]);
-    if (hit != null) return _persistUrl(key, hit.value, hit.key);
-    if (_ok(lastfmUrl)) return _persistUrl(key, lastfmUrl!, 'lastfm');
-    return _persistUrl(key, '');
-  }
+      _once('artist|$artist', () => _resolve(
+            key: 'artist|$artist',
+            lastfmUrl: lastfmUrl,
+            chain: () => [
+              _S('deezer',      () => _deezerArtist(artist)),
+              _S('ytmusic',     () => _ytMusicSearch(artist, 'artist', expectArtist: artist)),
+              _S('audiodb',     () => _audioDbArtist(artist)),
+              _S('musicbrainz', () => _mbArtistImage(artist)),
+              _S('wikipedia',   () => _wikipediaImage(artist, expectName: artist)),
+            ],
+          )).timeout(_maxResolve, onTimeout: () => _ok(lastfmUrl) ? lastfmUrl! : '');
 
   static Future<String> resolveAlbum(String album, String artist, {String? lastfmUrl}) =>
-      _once('album|$artist|$album', () => _resolveAlbum(album, artist, lastfmUrl: lastfmUrl))
-          .timeout(_maxResolve, onTimeout: () => _ok(lastfmUrl) ? lastfmUrl! : '');
-
-  static Future<String> _resolveAlbum(String album, String artist, {String? lastfmUrl}) async {
-    final key = 'album|$artist|$album';
-    await _ensureDiskCache();
-    final mem = _getUrl(key);
-    if (mem != null) return mem;
-    if (_isNegative(key)) return '';
-
-    final hit = await _pick([
-      _S('itunes',  () => _itunesSearch('$artist $album', 'album', null, artist, album)),
-      _S('deezer',  () => _deezerAlbum(album, artist)),
-      _S('ytmusic', () => _ytMusicSearch('$artist $album', 'album', expectArtist: artist, expectTitle: album)),
-    ], [
-      _S('musicbrainz', () => _mbAlbum(album, artist)),
-      _S('audiodb',     () => _audioDbAlbum(album, artist)),
-      _S('wikipedia',   () => _wikipediaImage('$artist $album album', expectName: album)),
-    ]);
-    if (hit != null) return _persistUrl(key, hit.value, hit.key);
-    if (_ok(lastfmUrl)) return _persistUrl(key, lastfmUrl!, 'lastfm');
-    return _persistUrl(key, '');
-  }
+      _once('album|$artist|$album', () => _resolve(
+            key: 'album|$artist|$album',
+            lastfmUrl: lastfmUrl,
+            chain: () => [
+              _S('deezer',      () => _deezerAlbum(album, artist)),
+              _S('itunes',      () => _itunesSearch('$artist $album', 'album', null, artist, album)),
+              _S('ytmusic',     () => _ytMusicSearch('$artist $album', 'album', expectArtist: artist, expectTitle: album)),
+              _S('musicbrainz', () => _mbAlbum(album, artist)),
+              _S('audiodb',     () => _audioDbAlbum(album, artist)),
+              _S('wikipedia',   () => _wikipediaImage('$artist $album album', expectName: album)),
+            ],
+          )).timeout(_maxResolve, onTimeout: () => _ok(lastfmUrl) ? lastfmUrl! : '');
 
   static Future<String> resolveTrack(String track, String artist,
           {String? lastfmUrl, String album = ''}) =>
-      _once('track|$artist|$track',
-          () => _resolveTrack(track, artist, lastfmUrl: lastfmUrl, album: album))
-          .timeout(_maxResolve, onTimeout: () => _ok(lastfmUrl) ? lastfmUrl! : '');
+      _once('track|$artist|$track', () => _resolve(
+            key: 'track|$artist|$track',
+            lastfmUrl: lastfmUrl,
+            chain: () => [
+              _S('deezer',  () => _deezerTrack(track, artist)),
+              _S('itunes',  () => _itunesSearch('$artist $track', 'song', null, artist, track)),
+              _S('ytmusic', () => _ytMusicSearch('$artist $track', 'song', expectArtist: artist, expectTitle: track)),
+              _S('audiodb', () => _audioDbTrack(track, artist)),
+              if (album.isNotEmpty) _S('musicbrainz', () => _mbAlbum(album, artist)),
+              _S('wikipedia', () => _wikipediaImage('$artist $track song', expectName: track)),
+            ],
+          )).timeout(_maxResolve, onTimeout: () => _ok(lastfmUrl) ? lastfmUrl! : '');
 
-  static Future<String> _resolveTrack(String track, String artist,
-      {String? lastfmUrl, String album = ''}) async {
-    final key = 'track|$artist|$track';
+  // Shared lookup: memory/disk cache → source chain → Last.fm picture.
+  //
+  // A source that could not answer (null) is NOT the same as "no artwork":
+  //   • nothing found and a source was unavailable → NOT remembered for long
+  //     (20 s) and retried once after a short pause, so a rate-limit burst
+  //     heals by itself instead of leaving blank covers for 10 minutes;
+  //   • nothing found and every source answered → remembered 10 minutes.
+  static Future<String> _resolve({
+    required String key,
+    required List<_S> Function() chain,
+    String? lastfmUrl,
+  }) async {
     await _ensureDiskCache();
     final mem = _getUrl(key);
     if (mem != null) return mem;
-    if (_isNegative(key)) return '';
+    if (_isNegative(key)) return _ok(lastfmUrl) ? lastfmUrl! : '';
 
-    final hit = await _pick([
-      _S('itunes',  () => _itunesSearch('$artist $track', 'song', null, artist, track)),
-      _S('deezer',  () => _deezerTrack(track, artist)),
-      _S('ytmusic', () => _ytMusicSearch('$artist $track', 'song', expectArtist: artist, expectTitle: track)),
-    ], [
-      _S('audiodb', () => _audioDbTrack(track, artist)),
-      if (album.isNotEmpty) _S('musicbrainz', () => _mbAlbum(album, artist)),
-      _S('wikipedia', () => _wikipediaImage('$artist $track song', expectName: track)),
-    ]);
-    if (hit != null) return _persistUrl(key, hit.value, hit.key);
-    if (_ok(lastfmUrl)) return _persistUrl(key, lastfmUrl!, 'lastfm');
-    return _persistUrl(key, '');
+    for (var attempt = 0; ; attempt++) {
+      final r = await _pick(chain());
+      final hit = r.hit;
+      if (hit != null) return _persistUrl(key, hit.value, hit.key);
+
+      if (_ok(lastfmUrl)) {
+        if (!r.incomplete) return _persistUrl(key, lastfmUrl!, 'lastfm');
+        // Show Last.fm's picture now, but do not pin it: a better source
+        // may answer later.
+        _markNegative(key, _negShortMs);
+        return lastfmUrl!;
+      }
+
+      if (r.incomplete && attempt == 0) {
+        await Future.delayed(const Duration(seconds: 4));
+        final again = _getUrl(key); // another caller may have found it
+        if (again != null) return again;
+        continue;
+      }
+      _markNegative(key, r.incomplete ? _negShortMs : _negTtlMs);
+      return '';
+    }
   }
 
-  // ── Source priority helper ────────────────────────────────────────────────
-  // [fast] sources start together (parallel) but are read in priority order;
-  // [slow] ones (rate-limited MusicBrainz, Wikipedia) only run if all failed.
-  static Future<MapEntry<String, String>?> _pick(List<_S> fast, List<_S> slow) async {
-    final running = [for (final e in fast) e.run().catchError((_) => '')];
-    for (var i = 0; i < fast.length; i++) {
-      final u = await running[i];
-      if (_ok(u)) return MapEntry(fast[i].name, u);
+  // ── Source chain runner ───────────────────────────────────────────────────
+  // Sources are tried one after the other (priority order). [incomplete] is
+  // true when at least one of them could not answer.
+  static Future<({MapEntry<String, String>? hit, bool incomplete})> _pick(
+      List<_S> chain) async {
+    var incomplete = false;
+    for (final s in chain) {
+      String? u;
+      try {
+        u = await s.run();
+      } catch (_) {
+        u = null;
+      }
+      if (u == null) {
+        incomplete = true;
+        continue;
+      }
+      if (_ok(u)) return (hit: MapEntry(s.name, u), incomplete: incomplete);
     }
-    for (final e in slow) {
-      final u = await e.run().catchError((_) => '');
-      if (_ok(u)) return MapEntry(e.name, u);
-    }
-    return null;
+    return (hit: null, incomplete: incomplete);
   }
 
   // ── Public: widget helper ─────────────────────────────────────────────────
@@ -328,12 +455,16 @@ class ImageService {
   // ── Cache stats ───────────────────────────────────────────────────────────
 
   static int  get urlCacheSize => _mem.length;
-  static void clearUrlCache()  { _mem.clear(); _sourceOf.clear(); _negUntil.clear(); }
+  static void clearUrlCache()  {
+    _mem.clear(); _sourceOf.clear(); _negUntil.clear();
+    for (final l in _lanes.values) { l.reset(); }
+  }
 
   static Future<void> clearAllCache() async {
     _mem.clear();
     _sourceOf.clear();
     _negUntil.clear();
+    for (final l in _lanes.values) { l.reset(); }
     try {
       _prefs ??= await SharedPreferences.getInstance();
       final keys = _prefs!.getKeys().where((k) => k.startsWith(_diskPrefix)).toList();
@@ -380,7 +511,7 @@ class ImageService {
 
   /// Artwork URL rewritten for the size it is shown at (logical px).
   static String sized(String url, double logicalPx, double dpr) =>
-      sizedImageUrl(url, logicalPx, dpr);
+      OfflineImageCache.sized(url, logicalPx, dpr);
 
   // Normalizes a name for loose comparison: lowercase, strips diacritics,
   // drops a leading "the/a/le/la/les", keeps only letters/digits.
@@ -431,14 +562,115 @@ class ImageService {
     'song':   'EgWKAQIIAWoKEAMQBBAJEAoQBQ%3D%3D',
   };
 
-  static Future<String> _ytMusicSearch(
+  // ── Network layer (all sources go through their lane) ────────────────────
+  //
+  // Source functions below return:
+  //   a URL  → found
+  //   ''     → the source answered: it has no matching artwork
+  //   null   → the source could not answer (error / timeout / rate limit /
+  //            paused / queue too long). NOT a "no artwork" verdict.
+
+  static final Map<String, _Lane> _lanes = {
+    // Deezer: 50 req / 5 s per IP.
+    'deezer':      _Lane(maxConcurrent: 4, minGapMs: 130),
+    // iTunes: ~20 req / min per IP (Apple docs) → only a fallback source.
+    'itunes':      _Lane(maxConcurrent: 1, minGapMs: 1800, maxWaitMs: 12000),
+    // YouTube Music: unofficial endpoint, kept gentle.
+    'ytmusic':     _Lane(maxConcurrent: 2, minGapMs: 350),
+    // TheAudioDB free key: 30 req / min.
+    'audiodb':     _Lane(maxConcurrent: 1, minGapMs: 2200, maxWaitMs: 8000),
+    // MusicBrainz: 1 req / s.
+    'musicbrainz': _Lane(maxConcurrent: 1, minGapMs: 1150, maxWaitMs: 10000),
+    'wikimedia':   _Lane(maxConcurrent: 2, minGapMs: 250),
+    'coverart':    _Lane(maxConcurrent: 2, minGapMs: 250),
+  };
+
+  static Future<Object?> _exchange(
+      String api, Future<http.Response> Function() send) async {
+    final lane = _lanes[api]!;
+    try {
+      final res = await send().timeout(_timeout);
+      // Skipped by the optional client-side limiter of the API page.
+      if (res.headers['x-laststats-skipped'] == '1') return null;
+      final code = res.statusCode;
+      if (code == 429 || code == 403 || code == 503) {
+        lane.block(api == 'itunes' ? 60000 : 20000);
+        return null;
+      }
+      if (code >= 500) {
+        lane.fail();
+        return null;
+      }
+      // Other 4xx (404, 400…): the source answered, it just has nothing.
+      if (code != 200) {
+        lane.ok();
+        return const <String, dynamic>{};
+      }
+      final body = jsonDecode(utf8.decode(res.bodyBytes));
+      // Deezer answers HTTP 200 with {"error":{"code":4,...}} when over quota.
+      if (api == 'deezer' && body is Map && body['error'] != null) {
+        lane.block(8000);
+        return null;
+      }
+      lane.ok();
+      return body ?? const <String, dynamic>{};
+    } catch (_) {
+      lane.fail();
+      return null;
+    }
+  }
+
+  static Future<Object?> _getJson(String api, Uri uri, {Map<String, String>? headers}) =>
+      _lanes[api]!.run(() => _exchange(api, () => ApiHttp.get(uri, headers: headers)));
+
+  static Future<Object?> _postJson(String api, Uri uri,
+          {Map<String, String>? headers, Object? body}) =>
+      _lanes[api]!.run(() => _exchange(api, () => ApiHttp.post(uri, headers: headers, body: body)));
+
+  /// HTTP status of a GET, or null when the source could not answer.
+  static Future<int?> _statusOf(String api, Uri uri) async {
+    final lane = _lanes[api]!;
+    final r = await lane.run(() async {
+      try {
+        final res = await ApiHttp.get(uri).timeout(_timeout);
+        if (res.headers['x-laststats-skipped'] == '1') return null;
+        if (res.statusCode == 429 || res.statusCode == 503) {
+          lane.block(20000);
+          return null;
+        }
+        if (res.statusCode >= 500) {
+          lane.fail();
+          return null;
+        }
+        lane.ok();
+        return res.statusCode;
+      } catch (_) {
+        lane.fail();
+        return null;
+      }
+    });
+    return r as int?;
+  }
+
+  static List _list(Object? json, String key) {
+    if (json is Map) {
+      final v = json[key];
+      if (v is List) return v;
+    }
+    return const [];
+  }
+
+  static String _s(Object? v) => (v ?? '').toString();
+
+  static Future<String?> _ytMusicSearch(
     String term,
     String type, {
     String? expectArtist,
     String? expectTitle,
   }) async {
     try {
-      final res = await ApiHttp.post(
+      final data = await _postJson(
+        'ytmusic',
         Uri.https('music.youtube.com', '/youtubei/v1/search', {'key': _ytmApiKey}),
         headers: {
           'Content-Type': 'application/json',
@@ -462,13 +694,13 @@ class ImageService {
           'query': term,
           'params': _ytmFilters[type],
         }),
-      ).timeout(_timeout);
-      if (res.statusCode != 200) {
-        debugLog('[ytmusic] HTTP ${res.statusCode} for "$term" ($type)');
-        return '';
+      );
+      if (data == null) {
+        debugLog('[ytmusic] unavailable for "$term" ($type)');
+        return null;
       }
+      if (data is! Map) return '';
 
-      final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
       final sections = data['contents']?['tabbedSearchResultsRenderer']?['tabs']?[0]
           ?['tabRenderer']?['content']?['sectionListRenderer']?['contents'] as List?;
       if (sections == null) {
@@ -557,7 +789,7 @@ class ImageService {
   // Searches iTunes and only returns artwork if the result actually matches
   // who/what we asked for (expectArtist / expectTitle) — avoids grabbing the
   // first loosely-related hit when the catalog has an ambiguous match.
-  static Future<String> _itunesSearch(
+  static Future<String?> _itunesSearch(
     String term,
     String entity, [
     String? attribute,
@@ -567,35 +799,36 @@ class ImageService {
     try {
       final params = <String, String>{'term': term, 'entity': entity, 'limit': '1', 'media': 'music'};
       if (attribute != null) params['attribute'] = attribute;
-      final res = await ApiHttp.get(Uri.https('itunes.apple.com', '/search', params)).timeout(_timeout);
-      if (res.statusCode != 200) return '';
-      final results = (jsonDecode(utf8.decode(res.bodyBytes))['results'] as List?) ?? [];
+      final j = await _getJson('itunes', Uri.https('itunes.apple.com', '/search', params));
+      if (j == null) return null;
+      final results = _list(j, 'results');
       if (results.isEmpty) return '';
-      final item = results.first as Map<String, dynamic>;
+      final item = results.first as Map;
 
-      if (expectArtist != null && !_similar(expectArtist, (item['artistName'] ?? '').toString())) return '';
+      if (expectArtist != null && !_similar(expectArtist, _s(item['artistName']))) return '';
       if (expectTitle != null) {
         final titleField = entity == 'song' ? 'trackName' : 'collectionName';
-        if (!_similar(expectTitle, (item[titleField] ?? '').toString())) return '';
+        if (!_similar(expectTitle, _s(item[titleField]))) return '';
       }
 
-      final raw = (item['artworkUrl100'] ?? '').toString();
+      final raw = _s(item['artworkUrl100']);
       return raw.isEmpty ? '' : raw
           .replaceAll('100x100bb', '3000x3000bb')
           .replaceAll('100x100',   '3000x3000');
     } catch (_) { return ''; }
   }
 
-  static Future<String> _deezerArtist(String artist) async {
+  static Future<String?> _deezerArtist(String artist) async {
     try {
-      final res = await ApiHttp.get(Uri.https('api.deezer.com', '/search/artist', {'q': artist, 'limit': '1'}))
-          .timeout(_timeout);
-      if (res.statusCode != 200) return '';
-      final items = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
+      final j = await _getJson('deezer',
+          Uri.https('api.deezer.com', '/search/artist', {'q': artist, 'limit': '1'}));
+      if (j == null) return null;
+      final items = _list(j, 'data');
       if (items.isEmpty) return '';
-      final item = items.first;
-      if (!_similar(artist, (item['name'] ?? '').toString())) return '';
-      final pic = (item['picture_xl'] ?? item['picture_big'] ?? '').toString();
+      final item = items.first as Map;
+      if (!_similar(artist, _s(item['name']))) return '';
+      final xl  = _s(item['picture_xl']);
+      final pic = xl.isNotEmpty ? xl : _s(item['picture_big']);
       // Deezer sends a grey placeholder when it has no real photo
       // (empty hash in the path). Treat it as "no image".
       if (pic.contains('/artist//') || pic.contains('d41d8cd98f00b204e9800998ecf8427e')) return '';
@@ -603,119 +836,126 @@ class ImageService {
     } catch (_) { return ''; }
   }
 
-  static Future<String> _deezerAlbum(String album, String artist) async {
+  static Future<String?> _deezerAlbum(String album, String artist) async {
     try {
-      final res = await ApiHttp.get(Uri.https('api.deezer.com', '/search/album', {'q': '$artist $album', 'limit': '1'}))
-          .timeout(_timeout);
-      if (res.statusCode != 200) return '';
-      final items = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
+      final j = await _getJson('deezer',
+          Uri.https('api.deezer.com', '/search/album', {'q': '$artist $album', 'limit': '1'}));
+      if (j == null) return null;
+      final items = _list(j, 'data');
       if (items.isEmpty) return '';
-      final item = items.first;
-      if (!_similar(album, (item['title'] ?? '').toString())) return '';
-      return (item['cover_xl'] ?? item['cover_big'] ?? '').toString();
+      final item = items.first as Map;
+      if (!_similar(album, _s(item['title']))) return '';
+      final cover = item['cover_xl'] ?? item['cover_big'];
+      return _s(cover);
     } catch (_) { return ''; }
   }
 
   // Track search response embeds the parent album object with cover URLs.
-  static Future<String> _deezerTrack(String track, String artist) async {
+  static Future<String?> _deezerTrack(String track, String artist) async {
     try {
-      final res = await ApiHttp.get(Uri.https('api.deezer.com', '/search/track', {'q': '$artist $track', 'limit': '1'}))
-          .timeout(_timeout);
-      if (res.statusCode != 200) return '';
-      final items = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
+      final j = await _getJson('deezer',
+          Uri.https('api.deezer.com', '/search/track', {'q': '$artist $track', 'limit': '1'}));
+      if (j == null) return null;
+      final items = _list(j, 'data');
       if (items.isEmpty) return '';
-      final item = items.first;
-      if (!_similar(track, (item['title'] ?? '').toString())) return '';
-      final album = item['album'] as Map<String, dynamic>?;
-      return (album?['cover_xl'] ?? album?['cover_big'] ?? '').toString();
+      final item = items.first as Map;
+      if (!_similar(track, _s(item['title']))) return '';
+      final album = item['album'];
+      if (album is! Map) return '';
+      return _s(album['cover_xl'] ?? album['cover_big']);
     } catch (_) { return ''; }
   }
 
-  static Future<String> _audioDbAlbum(String album, String artist) async {
+  static Future<String?> _audioDbAlbum(String album, String artist) async {
     try {
-      final res = await ApiHttp
-          .get(Uri.https('www.theaudiodb.com', '/api/v1/json/123/searchalbum.php', {'s': artist, 'a': album}))
-          .timeout(_timeout);
-      if (res.statusCode != 200) return '';
-      final albums = (jsonDecode(utf8.decode(res.bodyBytes))['album'] as List?) ?? [];
+      final j = await _getJson('audiodb',
+          Uri.https('www.theaudiodb.com', '/api/v1/json/123/searchalbum.php', {'s': artist, 'a': album}));
+      if (j == null) return null;
+      final albums = _list(j, 'album');
       if (albums.isEmpty) return '';
-      final item = albums.first;
-      if (!_similar(album, (item['strAlbum'] ?? '').toString())) return '';
-      return (item['strAlbumThumb'] ?? '').toString();
+      final item = albums.first as Map;
+      if (!_similar(album, _s(item['strAlbum']))) return '';
+      return _s(item['strAlbumThumb']);
     } catch (_) { return ''; }
   }
 
   // Track-level art is rare on TheAudioDB (mostly filled for music videos),
   // best-effort only — empty result just falls through to the next source.
-  static Future<String> _audioDbTrack(String track, String artist) async {
+  static Future<String?> _audioDbTrack(String track, String artist) async {
     try {
-      final res = await ApiHttp
-          .get(Uri.https('www.theaudiodb.com', '/api/v1/json/123/searchtrack.php', {'s': artist, 't': track}))
-          .timeout(_timeout);
-      if (res.statusCode != 200) return '';
-      final tracks = (jsonDecode(utf8.decode(res.bodyBytes))['track'] as List?) ?? [];
+      final j = await _getJson('audiodb',
+          Uri.https('www.theaudiodb.com', '/api/v1/json/123/searchtrack.php', {'s': artist, 't': track}));
+      if (j == null) return null;
+      final tracks = _list(j, 'track');
       if (tracks.isEmpty) return '';
-      final item = tracks.first;
-      if (!_similar(track, (item['strTrack'] ?? '').toString())) return '';
-      return (item['strTrackThumb'] ?? '').toString();
+      final item = tracks.first as Map;
+      if (!_similar(track, _s(item['strTrack']))) return '';
+      return _s(item['strTrackThumb']);
     } catch (_) { return ''; }
   }
 
   // TheAudioDB — keyless public test key. No CORS support, so this only
   // works on native builds (skipped silently on web, caught by try/catch).
-  static Future<String> _audioDbArtist(String artist) async {
+  static Future<String?> _audioDbArtist(String artist) async {
     try {
-      final res = await ApiHttp
-          .get(Uri.https('www.theaudiodb.com', '/api/v1/json/123/search.php', {'s': artist}))
-          .timeout(_timeout);
-      if (res.statusCode != 200) return '';
-      final artists = (jsonDecode(utf8.decode(res.bodyBytes))['artists'] as List?) ?? [];
+      final j = await _getJson('audiodb',
+          Uri.https('www.theaudiodb.com', '/api/v1/json/123/search.php', {'s': artist}));
+      if (j == null) return null;
+      final artists = _list(j, 'artists');
       if (artists.isEmpty) return '';
-      final a = artists.first;
-      if (!_similar(artist, (a['strArtist'] ?? '').toString())) return '';
-      return (a['strArtistThumb'] ?? a['strArtistFanart'] ?? '').toString();
+      final a = artists.first as Map;
+      if (!_similar(artist, _s(a['strArtist']))) return '';
+      final thumb = _s(a['strArtistThumb']);
+      return thumb.isNotEmpty ? thumb : _s(a['strArtistFanart']);
     } catch (_) { return ''; }
   }
 
+  static const _mbHeaders = {'User-Agent': 'LastStats/2.0 (contact@laststats.app)'};
+
   // MusicBrainz curated "image" relation → resolved to a direct file URL via
   // Wikimedia Commons. Freely licensed and CORS-safe (works on web too).
-  static Future<String> _mbArtistImage(String artist) async {
+  static Future<String?> _mbArtistImage(String artist) async {
     try {
-      final searchRes = await ApiHttp.get(
-        Uri.https('musicbrainz.org', '/ws/2/artist/', {
-          'query': 'artist:"$artist"', 'limit': '1', 'fmt': 'json',
-        }),
-        headers: {'User-Agent': 'LastStats/2.0 (contact@laststats.app)'},
-      ).timeout(_timeout);
-      if (searchRes.statusCode != 200) return '';
-      final found = (jsonDecode(utf8.decode(searchRes.bodyBytes))['artists'] as List?) ?? [];
+      final search = await _getJson('musicbrainz',
+          Uri.https('musicbrainz.org', '/ws/2/artist/', {
+            'query': 'artist:"$artist"', 'limit': '1', 'fmt': 'json',
+          }),
+          headers: _mbHeaders);
+      if (search == null) return null;
+      final found = _list(search, 'artists');
       if (found.isEmpty) return '';
-      final candidate = found.first;
-      if (!_similar(artist, (candidate['name'] ?? '').toString())) return '';
-      final mbid = (candidate['id'] ?? '').toString();
+      final candidate = found.first as Map;
+      if (!_similar(artist, _s(candidate['name']))) return '';
+      final mbid = _s(candidate['id']);
       if (mbid.isEmpty) return '';
 
-      final relRes = await ApiHttp.get(
-        Uri.https('musicbrainz.org', '/ws/2/artist/$mbid', {'inc': 'url-rels', 'fmt': 'json'}),
-        headers: {'User-Agent': 'LastStats/2.0 (contact@laststats.app)'},
-      ).timeout(_timeout);
-      if (relRes.statusCode != 200) return '';
-      final rels = (jsonDecode(utf8.decode(relRes.bodyBytes))['relations'] as List?) ?? [];
-      final imgRel = rels.firstWhere((r) => r['type'] == 'image', orElse: () => null);
-      final pageUrl = (imgRel?['url']?['resource'] ?? '').toString();
+      final rel = await _getJson('musicbrainz',
+          Uri.https('musicbrainz.org', '/ws/2/artist/$mbid', {'inc': 'url-rels', 'fmt': 'json'}),
+          headers: _mbHeaders);
+      if (rel == null) return null;
+      final rels = _list(rel, 'relations');
+      Map? imgRel;
+      for (final r in rels) {
+        if (r is Map && r['type'] == 'image') { imgRel = r; break; }
+      }
+      final pageUrl = _s(imgRel?['url']?['resource']);
       if (pageUrl.isEmpty) return '';
 
       // pageUrl is a Commons "File:" page — resolve to the actual image URL.
       final title = Uri.decodeFull(pageUrl.split('/wiki/').last);
-      final fileRes = await ApiHttp.get(Uri.https('commons.wikimedia.org', '/w/api.php', {
-        'action': 'query', 'titles': title, 'prop': 'imageinfo',
-        'iiprop': 'url', 'format': 'json', 'origin': '*',
-      })).timeout(_timeout);
-      if (fileRes.statusCode != 200) return '';
-      final pages = (jsonDecode(utf8.decode(fileRes.bodyBytes))['query']?['pages'] as Map?) ?? {};
-      for (final p in pages.values) {
-        final info = (p['imageinfo'] as List?) ?? [];
-        if (info.isNotEmpty) return (info.first['url'] ?? '').toString();
+      final file = await _getJson('wikimedia',
+          Uri.https('commons.wikimedia.org', '/w/api.php', {
+            'action': 'query', 'titles': title, 'prop': 'imageinfo',
+            'iiprop': 'url', 'format': 'json', 'origin': '*',
+          }));
+      if (file == null) return null;
+      final fq = file is Map ? file['query'] : null;
+      final pages = fq is Map ? fq['pages'] : null;
+      if (pages is Map) {
+        for (final p in pages.values) {
+          final info = (p is Map ? p['imageinfo'] : null);
+          if (info is List && info.isNotEmpty) return _s((info.first as Map)['url']);
+        }
       }
       return '';
     } catch (_) { return ''; }
@@ -725,21 +965,24 @@ class ImageService {
   // riskiest source for false positives (a plain text search can land on a
   // totally unrelated page) — validated against the page title and, when
   // available, its short description before the thumbnail is trusted.
-  static Future<String> _wikipediaImage(String query, {required String expectName}) async {
+  static Future<String?> _wikipediaImage(String query, {required String expectName}) async {
     try {
-      final res = await ApiHttp.get(Uri.https('en.wikipedia.org', '/w/api.php', {
+      final j = await _getJson('wikimedia', Uri.https('en.wikipedia.org', '/w/api.php', {
         'action': 'query', 'generator': 'search', 'gsrsearch': query,
         'gsrlimit': '1', 'prop': 'pageimages|pageterms', 'piprop': 'thumbnail',
-        'pithumbsize': '600', 'wbptterms': 'description',
+        'pithumbsize': '500', 'wbptterms': 'description',
         'format': 'json', 'origin': '*',
-      })).timeout(_timeout);
-      if (res.statusCode != 200) return '';
-      final pages = (jsonDecode(utf8.decode(res.bodyBytes))['query']?['pages'] as Map?) ?? {};
+      }));
+      if (j == null) return null;
+      final jq = j is Map ? j['query'] : null;
+      final pages = jq is Map ? jq['pages'] : null;
+      if (pages is! Map) return '';
       for (final p in pages.values) {
+        if (p is! Map) continue;
         final thumb = p['thumbnail']?['source'];
         if (thumb == null) continue;
 
-        final title = (p['title'] ?? '').toString();
+        final title = _s(p['title']);
         if (!_similar(expectName, title)) continue; // page isn't about what we searched
 
         final descriptions = (p['terms']?['description'] as List?) ?? [];
@@ -758,28 +1001,29 @@ class ImageService {
     } catch (_) { return ''; }
   }
 
-  static Future<String> _mbAlbum(String album, String artist) async {
+  static Future<String?> _mbAlbum(String album, String artist) async {
     try {
-      final searchRes = await ApiHttp.get(
-        Uri.https('musicbrainz.org', '/ws/2/release/', {
-          'query': 'release:"$album" AND artist:"$artist"',
-          'limit': '1', 'fmt': 'json',
-        }),
-        headers: {'User-Agent': 'LastStats/2.0 (contact@laststats.app)'},
-      ).timeout(_timeout);
-      if (searchRes.statusCode != 200) return '';
-      final releases = (jsonDecode(utf8.decode(searchRes.bodyBytes))['releases'] as List?) ?? [];
+      final search = await _getJson('musicbrainz',
+          Uri.https('musicbrainz.org', '/ws/2/release/', {
+            'query': 'release:"$album" AND artist:"$artist"',
+            'limit': '1', 'fmt': 'json',
+          }),
+          headers: _mbHeaders);
+      if (search == null) return null;
+      final releases = _list(search, 'releases');
       if (releases.isEmpty) return '';
-      final candidate = releases.first;
-      if (!_similar(album, (candidate['title'] ?? '').toString())) return '';
-      final mbid = (candidate['id'] ?? '').toString();
+      final candidate = releases.first as Map;
+      if (!_similar(album, _s(candidate['title']))) return '';
+      final mbid = _s(candidate['id']);
       if (mbid.isEmpty) return '';
-      final coverRes = await ApiHttp.get(Uri.https('coverartarchive.org', '/release/$mbid/front')).timeout(_timeout);
-      if (coverRes.statusCode == 200 || coverRes.statusCode == 307) {
-        final loc = coverRes.headers['location'];
-        if (loc != null && loc.isNotEmpty) return loc;
-      }
-      return 'https://coverartarchive.org/release/$mbid/front-500';
+
+      // Only claim a cover when the Cover Art Archive really has one (a small
+      // 250px request, instead of downloading the full-size image).
+      final status = await _statusOf('coverart',
+          Uri.https('coverartarchive.org', '/release/$mbid/front-250'));
+      if (status == null) return null;
+      if (status == 200) return 'https://coverartarchive.org/release/$mbid/front-500';
+      return '';
     } catch (_) { return ''; }
   }
 
