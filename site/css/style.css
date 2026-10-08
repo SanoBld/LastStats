@@ -413,6 +413,13 @@ body.lightbox-locked { overflow: hidden; }
   box-shadow: 0 20px 60px -20px rgba(0, 0, 0, .6);
 }
 .lightbox-stage img.is-zoomed { transform: scale(2.2); cursor: zoom-out; }
+.lightbox-stage video {
+  max-width: 100%; max-height: 100%;
+  border-radius: var(--shape-md);
+  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, .6);
+}
+.lightbox-stage [hidden] { display: none; }
+.lightbox-hint[hidden] { display: none; }
 .lightbox-close {
   position: absolute; top: 1.3rem; right: 1.3rem;
   width: 44px; height: 44px;

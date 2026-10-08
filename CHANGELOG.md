@@ -159,6 +159,10 @@
 - Last.fm rate-limit errors are now retried automatically; the client-side limiter is off by default
 - Website: Versions page rebuilt with a table of contents rail, search, Stable / Beta filters, files grouped by platform and infinite scroll; new FAQ entry about missing images
 - Website: "Web version" (Beta) button with a warning window, Umami analytics on the web app, fixed the Download button press animation (first open and hover / pressed shape)
+- Website and README: all screenshots replaced with 13 new ones (weekly recap, friend profile, music compatibility, light artist page and more), with new texts translated in the 10 website languages, and the zoom on the screenshots removed
+- Website: new showcase blocks for the animated artist page and track page videos (play only while visible, controls shown if animations are reduced); the videos, like the screenshots, can be opened full screen from the page and from the gallery
+- Website: gallery is now an endless carousel (loops with no first or last image) and includes the two animated page videos, playing when centered; navigation dots stay on one line
+- README: new screenshot layout and two animated GIFs (artist page and track page)
 
 **About page and project info**
 - About: new README page (opened from About) showing the project README, latest release version, total downloads, stars, license, latest commits and latest workflow runs, loaded from GitHub with an offline fallback to the bundled README

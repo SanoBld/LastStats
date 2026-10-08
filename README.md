@@ -42,6 +42,10 @@ Join the Discord to chat, share feedback, or ask for help: https://discord.gg/Jj
   <img src="docs/screenshots/achievements.png" width="160" alt="Achievements">
   <img src="docs/screenshots/share_card.png" width="160" alt="Shareable profile card">
 </p>
+<p align="center">
+  <img src="docs/gifs/artist_page.gif" width="200" alt="Animated artist page">
+  <img src="docs/gifs/track_page.gif" width="200" alt="Animated track page">
+</p>
 
 ---
 
