@@ -123,7 +123,7 @@ class _BackupPageState extends State<BackupPage> {
   Future<void> _pickAutoBackupDir() async {
     setState(() => _autoBackupBusy = true);
     final path = await FilePicker.platform.getDirectoryPath(
-      dialogTitle: 'Choose auto-backup folder',
+      dialogTitle: tx('bk_pick_folder'),
     );
     if (!mounted) return;
     setState(() => _autoBackupBusy = false);

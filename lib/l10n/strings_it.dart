@@ -88,7 +88,7 @@ class AppStringsIt implements AppStrings {
   @override String get searchFolders => 'Cartelle';
   @override String get searchFoldersHint => 'Crei una cartella per salvare brani, album o artisti.';
   @override String get perDay => 'al giorno';
-  @override String get activityDays => 'di attività';
+  @override String get activityDays => 'giorni attivi';
   @override String get dashStats => 'Statistiche';
   @override String get dashTopTracks => 'Brani principali';
   @override String get dashFriends => 'Amici';
@@ -96,7 +96,7 @@ class AppStringsIt implements AppStrings {
   @override String get dashRefreshFriends => 'Aggiorna amici';
   @override String get dashScrobbles => 'scrobble';
   @override String get dashScrobblesPerDay => 'al giorno';
-  @override String get dashDaysActive => 'di attività';
+  @override String get dashDaysActive => 'giorni attivi';
   @override String get dashLastTrack => 'Ultimo ascoltato';
   @override String get dashArtist1 => 'Artista n. 1';
   @override String get dashAlbum1 => 'Album n. 1';
@@ -1165,4 +1165,72 @@ const Map<String, String> kTxIt = {
   'sl_import': 'Importazione dei suoi dati',
   'sl_done': 'Importato!',
   'sl_connect': 'Connessione a Last.fm…',
+  'sec_chart': 'Grafico / calendario',
+  'stat_avg_day': 'Media / giorno',
+  'stat_avg_week': 'Media / settimana',
+  'stat_days_active': 'Giorni attivi',
+  'stat_scrobbles_week': 'Scrobble (settimana)',
+  'accent_purple': 'Viola',
+  'accent_blue': 'Blu',
+  'accent_green': 'Verde',
+  'accent_red': 'Rosso',
+  'accent_orange': 'Arancione',
+  'accent_pink': 'Rosa',
+  'accent_teal': 'Verde acqua',
+  'accent_neutral': 'Neutro',
+  'shape_title': 'Forme delle immagini',
+  'shape_covers': 'Copertine, artisti e album',
+  'shape_mix': 'Misto',
+  'shape_square': 'Quadrato',
+  'shape_circle': 'Cerchio',
+  'shape_pick_one': 'O scegli una sola forma',
+  'friend_listening': 'In ascolto',
+  'friend_offline': 'Offline',
+  'tier_none': 'Nessun livello',
+  'src_title': 'Fonti',
+  'src_scrobbles_meta': 'Scrobble e metadati',
+  'src_artwork': 'Copertina',
+  'src_audio_preview': 'Anteprima audio',
+  'src_video_artwork': 'Copertina video',
+  'tip_love': 'Aggiungi ai preferiti',
+  'rail_expand': 'Espandi barra laterale',
+  'rail_collapse': 'Comprimi barra laterale',
+  'a11y_loading': 'Caricamento',
+  'bk_pick_folder': 'Scegli la cartella del backup automatico',
+  'bk_save_title': 'Salva il backup di LastStats',
+  'bk_pick_file': 'Scegli un file di backup di LastStats',
+  'nch_milestone_d': 'Avvisa quando raggiungi un traguardo di scrobble',
+  'nch_grand_d': 'Avvisi speciali per i grandi traguardi (1K, 10K, 100K, 1M…)',
+  'nch_recap_d': 'Riepiloghi di ascolto giornalieri e settimanali',
+  'nch_update_d': 'Avvisa quando è disponibile una nuova versione di LastStats',
+  'nch_news_d': 'Novità, correzioni e annunci su LastStats',
+  'nch_sync_d': 'Avanzamento della sincronizzazione dell’intera cronologia',
+  'ntf_grand_1000000': 'Un milione di scrobble. Leggendario. 🎸',
+  'ntf_grand_500000': 'Mezzo milione di scrobble. Non ti fermi mai. 🎧',
+  'ntf_grand_250000': '{n} scrobble: la musica non finisce mai. 🎶',
+  'ntf_grand_100000': '{n} scrobble! Sei un vero appassionato di musica. 🔥',
+  'ntf_grand_50000': '{n} scrobble. Davvero impressionante. 🎵',
+  'ntf_grand_25000': '{n} scrobble e sei ancora in forma!',
+  'ntf_grand_10000': '{n} scrobble: hai raggiunto le cinque cifre! 🎉',
+  'ntf_grand_5000': '{n} scrobble e si continua!',
+  'ntf_grand_1000': 'I tuoi primi {n} scrobble. Il viaggio inizia. 🎵',
+  'ntf_update_title': 'LastStats {v} disponibile',
+  'ntf_update_body': 'Una nuova versione è pronta per essere scaricata.',
+  'ntf_milestone_title': '🎵 Traguardo: {n} scrobble',
+  'ntf_milestone_body': 'Hai appena raggiunto {n} scrobble su Last.fm 🎶',
+  'ntf_daily_title': '📊 Riepilogo del giorno · {d}',
+  'ntf_weekly_title': '📅 Riepilogo settimanale · {w}',
+  'ntf_recap_body': '{n} scrobble · Top: {a}',
+  'ntf_n_today': '{n} scrobble oggi',
+  'ntf_n_week': '{n} scrobble questa settimana',
+  'ntf_top_artist': 'Artista top: {a}',
+  'ntf_update_avail': '🆕 Aggiornamento disponibile',
+  'ntf_update_ready': 'LastStats {v} è pronto: tocca per vedere.',
+  'ntf_sync_title': '🔄 Sincronizzazione scrobble…',
+  'ntf_sync_done': '✅ Scrobble sincronizzati',
+  'ntf_sync_new': '{n} nuovo/i scrobble aggiunto/i.',
+  'ntf_grand_t': '{v} scrobble!',
+  'ntf_year': 'Anno {y}',
+  'ntf_week': 'Settimana {w}',
+  'reorder': 'Riordina',
 };

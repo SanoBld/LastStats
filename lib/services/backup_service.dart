@@ -20,6 +20,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../app_state.dart';
+import '../l10n/extra_strings.dart' show tx;
 import 'scrobbles_file_cache.dart';
 import 'all_scrobbles_service.dart';
 import 'lastfm_service.dart';
@@ -328,7 +329,7 @@ class BackupService {
       );
       final bytes   = Uint8List.fromList(utf8.encode(payload));
       final path = await FilePicker.platform.saveFile(
-        dialogTitle: 'Save LastStats backup',
+        dialogTitle: tx('bk_save_title'),
         fileName:    defaultFileName(),
         type:        FileType.custom,
         allowedExtensions: ['json'],
@@ -363,7 +364,7 @@ class BackupService {
   /// Returns null if the user cancelled or the file couldn't be read/parsed.
   static Future<BackupPreview?> pickAndPreviewFile() async {
     final result = await FilePicker.platform.pickFiles(
-      dialogTitle: 'Choose a LastStats backup file',
+      dialogTitle: tx('bk_pick_file'),
       type: FileType.custom,
       allowedExtensions: ['json'],
       withData: true,

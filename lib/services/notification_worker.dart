@@ -11,6 +11,8 @@ import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 import 'notification_service.dart';
+import '../app_state.dart' show localeNotifier;
+import '../l10n/extra_strings.dart' show tx;
 import 'update_service.dart';
 import 'lastfm_service.dart';
 import 'all_scrobbles_service.dart';
@@ -85,6 +87,9 @@ const _kApiKey   = 'ls_apikey';
 void callbackDispatcher() {
   Workmanager().executeTask((taskName, _) async {
     WidgetsFlutterBinding.ensureInitialized();
+    // Load the saved language: this runs in a background isolate.
+    final langPrefs = await SharedPreferences.getInstance();
+    localeNotifier.value = langPrefs.getString('ls_locale') ?? 'fr';
     await NotificationService.init();
 
     try {
@@ -138,8 +143,8 @@ Future<void> _runUpdateCheck() async {
   final downloadUrl = info.hasDownload ? info.downloadUrl! : info.releaseUrl;
   final localItem = jsonEncode({
     'id':    'local_update_${info.version}',
-    'title': 'LastStats ${info.version} disponible',
-    'body':  'Une nouvelle version est prête à être téléchargée.',
+    'title': tx('ntf_update_title', {'v': info.version}),
+    'body':  tx('ntf_update_body'),
     'type':  'update',
     'emoji': '🆕',
     'date':  _shortDate(DateTime.now()),
@@ -230,7 +235,7 @@ Future<void> _runScrobbleSync() async {
     final p = AllScrobblesService.progressNotifier.value;
     if (!p.isLoading) return;
     final subtitle = p.mode == SyncMode.full && p.currentYear != null
-        ? 'Year ${p.currentYear}'
+        ? tx('ntf_year', {'y': '${p.currentYear}'})
         : '';
     NotificationService.showSyncProgress(
       progress: p.loaded,
@@ -344,7 +349,7 @@ Future<void> _runRecapCheck() async {
           await NotificationService.showWeeklyRecap(
             count:     result.$1,
             topArtist: result.$2,
-            weekLabel: 'Week ${_isoWeek(now)}',
+            weekLabel: tx('ntf_week', {'w': '${_isoWeek(now)}'}),
           );
           await prefs.setInt(_kWeeklyLastWeek, weekId);
         }

@@ -7,6 +7,7 @@ import '../../widgets/m3_components.dart';
 import 'package:flutter/services.dart';
 import '../../app_state.dart';
 import '../../l10n/l10n.dart';
+import '../../l10n/extra_strings.dart' show tx;
 import 'settings_rows.dart';
 
 
@@ -22,54 +23,38 @@ import 'settings_rows.dart';
 /// Picks the right label for the current [localeNotifier] value, falling
 /// back to French. Central helper so any data table (stat cards, accent
 /// names…) can support all 5 languages without per-call ternaries.
-String pickLang({
-  required String fr,
-  required String en,
-  required String es,
-  required String zh,
-  required String pt,
-}) {
-  switch (localeNotifier.value) {
-    case 'en': return en;
-    case 'es': return es;
-    case 'zh': return zh;
-    case 'pt': return pt;
-    default:   return fr;
-  }
-}
-
 const kSettingsAccentOptions = [
-  (Color(0xFF7C3AED), 'purple',  'Violet / Purple'),
-  (Color(0xFF1D4ED8), 'blue',    'Bleu / Blue'),
-  (Color(0xFF059669), 'green',   'Vert / Green'),
-  (Color(0xFFDC2626), 'red',     'Rouge / Red'),
-  (Color(0xFFD97706), 'orange',  'Orange'),
-  (Color(0xFFDB2777), 'pink',    'Rose / Pink'),
-  (Color(0xFF0F766E), 'teal',    'Sarcelle / Teal'),
-  (Color(0xFF607D8B), 'neutral', 'Neutre / Neutral'),
+  (Color(0xFF7C3AED), 'purple',  'accent_purple'),
+  (Color(0xFF1D4ED8), 'blue',    'accent_blue'),
+  (Color(0xFF059669), 'green',   'accent_green'),
+  (Color(0xFFDC2626), 'red',     'accent_red'),
+  (Color(0xFFD97706), 'orange',  'accent_orange'),
+  (Color(0xFFDB2777), 'pink',    'accent_pink'),
+  (Color(0xFF0F766E), 'teal',    'accent_teal'),
+  (Color(0xFF607D8B), 'neutral', 'accent_neutral'),
 ];
 
 /// Cartes de statistiques — dupliqué ici pour être accessible hors du part-of.
-/// Tuple: (id, emoji, fr, en, es, zh, pt)
+/// Tuple: (id, emoji). Labels live in lib/l10n (see statCardLabel).
 const kAllStatCards = [
-  ('top_artist',      '🎤', 'Artiste #1',            'Artist #1',        'Artista #1',           '第一艺术家',     'Artista #1'),
-  ('top_album',       '💿', 'Album #1',              'Album #1',         'Álbum #1',             '第一专辑',       'Álbum #1'),
-  ('top_track',       '🎵', 'Titre #1',              'Track #1',         'Canción #1',           '第一歌曲',       'Faixa #1'),
-  ('last_track',      '⏱️', 'Dernière écoute',       'Last played',      'Última escucha',       '最近播放',       'Última tocada'),
-  ('total',           '🎯', 'Total scrobbles',       'Total scrobbles',  'Total de scrobbles',   '总 scrobble 数', 'Total de scrobbles'),
-  ('avg_day',         '⚡', 'Moy. / jour',           'Avg / day',        'Prom. / día',          '日均',           'Média / dia'),
-  ('avg_week',        '📅', 'Moy. / semaine',        'Avg / week',       'Prom. / semana',       '周均',           'Média / semana'),
-  ('favorites_count', '❤️', 'Favoris',               'Favorites',        'Favoritos',            '收藏',           'Favoritos'),
-  ('days_active',     '🗓️', 'Jours actifs',          'Days active',      'Días activos',         '活跃天数',       'Dias ativos'),
-  ('since',           '📆', 'Membre depuis',         'Member since',     'Miembro desde',        '加入时间',       'Membro desde'),
-  ('country',         '🌍', 'Pays',                  'Country',          'País',                 '国家',           'País'),
-  ('top_artist_week', '🎤', 'Artiste #1 (semaine)',  'Artist #1 (week)', 'Artista #1 (semana)',  '第一艺术家（周）', 'Artista #1 (semana)'),
-  ('top_album_week',  '💿', 'Album #1 (semaine)',    'Album #1 (week)',  'Álbum #1 (semana)',    '第一专辑（周）',   'Álbum #1 (semana)'),
-  ('top_track_week',  '🎵', 'Titre #1 (semaine)',    'Track #1 (week)',  'Canción #1 (semana)',  '第一歌曲（周）',   'Faixa #1 (semana)'),
-  ('artist_count',    '🎸', 'Artistes uniques',      'Unique artists',   'Artistas únicos',     '独立艺术家数',   'Artistas únicos'),
-  ('track_count',     '🎼', 'Titres uniques',        'Unique tracks',    'Canciones únicas',    '独立歌曲数',     'Faixas únicas'),
-  ('album_count',     '💽', 'Albums uniques',        'Unique albums',    'Álbumes únicos',      '独立专辑数',     'Álbuns únicos'),
-  ('scrobbles_week',  '📊', 'Scrobbles semaine',     'Scrobbles week',   'Scrobbles semana',    '本周 scrobbles', 'Scrobbles semana'),
+  ('top_artist', '🎤'),
+  ('top_album', '💿'),
+  ('top_track', '🎵'),
+  ('last_track', '⏱️'),
+  ('total', '🎯'),
+  ('avg_day', '⚡'),
+  ('avg_week', '📅'),
+  ('favorites_count', '❤️'),
+  ('days_active', '🗓️'),
+  ('since', '📆'),
+  ('country', '🌍'),
+  ('top_artist_week', '🎤'),
+  ('top_album_week', '💿'),
+  ('top_track_week', '🎵'),
+  ('artist_count', '🎸'),
+  ('track_count', '🎼'),
+  ('album_count', '💽'),
+  ('scrobbles_week', '📊'),
 ];
 const kDefaultStatCards = ['top_artist', 'top_album', 'top_track', 'last_track', 'favorites_count'];
 
@@ -91,11 +76,11 @@ List<String> migrateSectionOrder(List<String>? saved) {
 }
 
 String sectionOrderLabel(String id) => switch (id) {
-  'stats'    => pickLang(fr: 'Statistiques', en: 'Stats', es: 'Estadísticas', zh: '统计', pt: 'Estatísticas'),
-  'discover' => pickLang(fr: 'Découvrir', en: 'Discover', es: 'Descubrir', zh: '发现', pt: 'Descobrir'),
-  'recent'   => pickLang(fr: 'Écoutes récentes', en: 'Recent plays', es: 'Reproducciones recientes', zh: '最近播放', pt: 'Tocadas recentemente'),
-  'friends'  => pickLang(fr: 'Amis', en: 'Friends', es: 'Amigos', zh: '好友', pt: 'Amigos'),
-  'chart'    => pickLang(fr: 'Graphique / calendrier', en: 'Chart / calendar', es: 'Gráfico / calendario', zh: '图表/日历', pt: 'Gráfico / calendário'),
+  'stats'    => L.dashStats,
+  'discover' => L.dashDiscoverTitle,
+  'recent'   => L.dashRecentPlaysLabel,
+  'friends'  => L.dashFriends,
+  'chart'    => tx('sec_chart'),
   _          => id,
 };
 
@@ -108,14 +93,27 @@ IconData sectionOrderIcon(String id) => switch (id) {
   _          => Icons.widgets_rounded,
 };
 
-String statCardLabel(String id) {
-  for (final c in kAllStatCards) {
-    if (c.$1 == id) {
-      return pickLang(fr: c.$3, en: c.$4, es: c.$5, zh: c.$6, pt: c.$7);
-    }
-  }
-  return id;
-}
+String statCardLabel(String id) => switch (id) {
+  'top_artist'      => L.dashArtist1,
+  'top_album'       => L.dashAlbum1,
+  'top_track'       => L.dashTrack1,
+  'last_track'      => L.dashLastTrack,
+  'total'           => L.dashTotalScrobblesLabel,
+  'avg_day'         => tx('stat_avg_day'),
+  'avg_week'        => tx('stat_avg_week'),
+  'favorites_count' => L.settingsFavoritesSection,
+  'days_active'     => tx('stat_days_active'),
+  'since'           => L.dashMemberSinceLabel,
+  'country'         => L.dashCountryLabel,
+  'top_artist_week' => L.dashArtistWeekLabel,
+  'top_album_week'  => L.dashAlbumWeekLabel,
+  'top_track_week'  => L.dashTrackWeekLabel,
+  'artist_count'    => L.dashUniqueArtistsLabel,
+  'track_count'     => L.dashUniqueTracksLabel,
+  'album_count'     => L.dashUniqueAlbumsLabel,
+  'scrobbles_week'  => tx('stat_scrobbles_week'),
+  _                 => id,
+};
 
 // ── Listes localisées ─────────────────────────────────────────────────────────
 
@@ -659,7 +657,7 @@ class _CardReorderSheetState extends State<CardReorderSheet> {
             }),
             children: _items.map((id) {
               final card = kAllStatCards.firstWhere((c) => c.$1 == id,
-                  orElse: () => (id, '📋', id, id, id, id, id));
+                  orElse: () => (id, '📋'));
               return Card(key: ValueKey(id), elevation: 0,
                 color: scheme.surfaceContainerHighest,
                 margin: const EdgeInsets.symmetric(vertical: 4),
@@ -709,7 +707,7 @@ class _SectionOrderSheetState extends State<SectionOrderSheet> {
               width: 36, height: 4, decoration: BoxDecoration(
                   color: scheme.outlineVariant, borderRadius: BorderRadius.circular(2)))),
           Padding(padding: const EdgeInsets.fromLTRB(20, 4, 16, 12), child: Row(children: [
-            Text(pickLang(fr: 'Réorganiser', en: 'Reorder', es: 'Reordenar', zh: '调整顺序', pt: 'Reordenar'),
+            Text(tx('reorder'),
                 style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
             const Spacer(),
             FilledButton(onPressed: () => Navigator.pop(ctx, _items),

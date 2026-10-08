@@ -7,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/notification_detail_page.dart';
 import '../l10n/extra_strings.dart' show tx;
+import '../l10n/l10n.dart';
 
 const _kLastFmRed = Color(0xFFD51007);
 
@@ -20,17 +21,17 @@ class NotificationService {
 
   // ── Channel IDs ──────────────────────────────────────────────────────────
   static const _chMilestoneId   = 'ls_milestone';
-  static const _chMilestoneName = 'Scrobble milestones';
+  static String get _chMilestoneName => L.onboardMilestonesSection;
   static const _chGrandId       = 'ls_grand_milestone';
-  static const _chGrandName     = 'Grand milestones';
+  static String get _chGrandName => L.onboardGrandMilestonesTitle;
   static const _chRecapId       = 'ls_recap';
-  static const _chRecapName     = 'Listening recaps';
+  static String get _chRecapName => L.notifRecapsSection;
   static const _chUpdateId      = 'ls_update';
-  static const _chUpdateName    = 'App updates';
+  static String get _chUpdateName => L.settingsUpdates;
   static const _chNewsId        = 'ls_news';
-  static const _chNewsName      = 'News & announcements';
+  static String get _chNewsName => L.notifNewsSection;
   static const _chSyncId        = 'ls_scrobble_sync';
-  static const _chSyncName      = 'Scrobble sync';
+  static String get _chSyncName => L.notifSyncSection;
 
   // ── Notification IDs ─────────────────────────────────────────────────────
   static const _idMilestone   = 1;
@@ -74,49 +75,49 @@ class NotificationService {
         AndroidFlutterLocalNotificationsPlugin>();
 
     await androidImpl?.createNotificationChannel(
-      const AndroidNotificationChannel(
+      AndroidNotificationChannel(
         _chMilestoneId, _chMilestoneName,
-        description: 'Notifies when you hit a scrobble milestone',
+        description: tx('nch_milestone_d'),
         importance:  Importance.defaultImportance,
       ),
     );
 
     await androidImpl?.createNotificationChannel(
-      const AndroidNotificationChannel(
+      AndroidNotificationChannel(
         _chGrandId, _chGrandName,
-        description: 'Special alerts for big milestones (1K, 10K, 100K, 1M…)',
+        description: tx('nch_grand_d'),
         importance:  Importance.high,
       ),
     );
 
     await androidImpl?.createNotificationChannel(
-      const AndroidNotificationChannel(
+      AndroidNotificationChannel(
         _chRecapId, _chRecapName,
-        description: 'Daily and weekly listening summaries',
+        description: tx('nch_recap_d'),
         importance:  Importance.low,
       ),
     );
 
     await androidImpl?.createNotificationChannel(
-      const AndroidNotificationChannel(
+      AndroidNotificationChannel(
         _chUpdateId, _chUpdateName,
-        description: 'Notifies when a new version of LastStats is available',
+        description: tx('nch_update_d'),
         importance:  Importance.high,
       ),
     );
 
     await androidImpl?.createNotificationChannel(
-      const AndroidNotificationChannel(
+      AndroidNotificationChannel(
         _chNewsId, _chNewsName,
-        description: 'New features, fixes and announcements about LastStats',
+        description: tx('nch_news_d'),
         importance:  Importance.defaultImportance,
       ),
     );
 
     await androidImpl?.createNotificationChannel(
-      const AndroidNotificationChannel(
+      AndroidNotificationChannel(
         _chSyncId, _chSyncName,
-        description: 'Progress while syncing your full scrobble history',
+        description: tx('nch_sync_d'),
         importance:  Importance.low,
       ),
     );
@@ -178,7 +179,7 @@ class NotificationService {
       // Legacy payload: a bare download URL from showUpdateAvailable().
       return {
         'type':  'update',
-        'title': '🆕 Update available',
+        'title': tx('ntf_update_avail'),
         'body':  '',
         'url':   raw,
       };
@@ -212,8 +213,8 @@ class NotificationService {
   // ── Show helpers ─────────────────────────────────────────────────────────
 
   static Future<void> showMilestone(int count) {
-    final title = '🎵 Milestone: ${_fmt(count)} scrobbles';
-    final body  = 'You just hit ${_fmt(count)} scrobbles on Last.fm 🎶';
+    final title = tx('ntf_milestone_title', {'n': _fmt(count)});
+    final body  = tx('ntf_milestone_body', {'n': _fmt(count)});
     return _plugin.show(
       _idMilestone,
       title,
@@ -266,8 +267,8 @@ class NotificationService {
     required String topArtist,
     required String date,
   }) {
-    final title = '📊 Daily recap · $date';
-    final body  = '${_fmt(count)} scrobbles · Top: $topArtist';
+    final title = tx('ntf_daily_title', {'d': date});
+    final body  = tx('ntf_recap_body', {'n': _fmt(count), 'a': topArtist});
     return _plugin.show(
       _idDailyRecap,
       title,
@@ -279,7 +280,7 @@ class NotificationService {
           color:   _kLastFmRed,
           subText: 'LastStats',
           styleInformation: InboxStyleInformation(
-            ['${_fmt(count)} scrobbles today', 'Top artist: $topArtist'],
+            [tx('ntf_n_today', {'n': _fmt(count)}), tx('ntf_top_artist', {'a': topArtist})],
             contentTitle: title,
             summaryText:  'LastStats',
           ),
@@ -294,8 +295,8 @@ class NotificationService {
     required String topArtist,
     required String weekLabel,
   }) {
-    final title = '📅 Weekly recap · $weekLabel';
-    final body  = '${_fmt(count)} scrobbles · Top: $topArtist';
+    final title = tx('ntf_weekly_title', {'w': weekLabel});
+    final body  = tx('ntf_recap_body', {'n': _fmt(count), 'a': topArtist});
     return _plugin.show(
       _idWeeklyRecap,
       title,
@@ -308,8 +309,8 @@ class NotificationService {
           subText: 'LastStats',
           styleInformation: InboxStyleInformation(
             [
-              '${_fmt(count)} scrobbles this week',
-              'Top artist: $topArtist',
+              tx('ntf_n_week', {'n': _fmt(count)}),
+              tx('ntf_top_artist', {'a': topArtist}),
             ],
             contentTitle: title,
             summaryText:  'LastStats',
@@ -324,8 +325,8 @@ class NotificationService {
   /// Tapping it opens the in-app detail page with an "Open" button that
   /// launches [downloadUrl] — it's no longer launched automatically.
   static Future<void> showUpdateAvailable(String version, String downloadUrl) {
-    const title = '🆕 Update available';
-    final body  = 'LastStats $version is ready — tap to view.';
+    final title = tx('ntf_update_avail');
+    final body  = tx('ntf_update_ready', {'v': version});
     return _plugin.show(
       _idUpdate,
       title,
@@ -409,7 +410,7 @@ class NotificationService {
     final detail = prefs.getBool('ls_notif_sync_progress_detail') ?? true;
 
     final indeterminate = max <= 0 || !detail;
-    const title = '🔄 Syncing scrobbles…';
+    final title = tx('ntf_sync_title');
     return _plugin.show(
       _idSync,
       title,
@@ -444,8 +445,8 @@ class NotificationService {
     if (!(prefs.getBool('ls_notif_sync_enabled') ?? true)) {
       return cancelSyncProgress();
     }
-    const title = '✅ Scrobbles synced';
-    final body  = '$newCount new scrobble(s) added.';
+    final title = tx('ntf_sync_done');
+    final body  = tx('ntf_sync_new', {'n': '$newCount'});
     return _plugin.show(
       _idSync,
       title,
@@ -471,8 +472,8 @@ class NotificationService {
 
   static Future<void> _showTest() => _plugin.show(
         _idTest,
-        '🔔 Test notification',
-        'LastStats notifications are working!',
+        tx('ntf_test_title'),
+        tx('ntf_test_body'),
         NotificationDetails(
           android: AndroidNotificationDetails(
             _chMilestoneId, _chMilestoneName,
@@ -503,23 +504,26 @@ class NotificationService {
   }
 
   static String _grandTitle(int count) {
-    if (count >= 1000000) return '${count ~/ 1000000}M scrobbles!';
-    if (count >= 1000)    return '${count ~/ 1000}K scrobbles!';
-    return '${_fmt(count)} scrobbles!';
+    if (count >= 1000000) return tx('ntf_grand_t', {'v': '${count ~/ 1000000}M'});
+    if (count >= 1000)    return tx('ntf_grand_t', {'v': '${count ~/ 1000}K'});
+    return tx('ntf_grand_t', {'v': _fmt(count)});
   }
 
   static String _grandBody(int count) {
+    final n = {'n': _fmt(count)};
     switch (count) {
-      case 1000000: return "One million scrobbles. That's legendary. 🎸";
-      case 500000:  return 'Half a million scrobbles. You never stop. 🎧';
-      case 250000:  return '250,000 scrobbles — the music never ends. 🎶';
-      case 100000:  return "100,000 scrobbles! You're a true music addict. 🔥";
-      case 50000:   return '50,000 scrobbles. Seriously impressive. 🎵';
-      case 25000:   return '25,000 scrobbles and still going strong!';
-      case 10000:   return '10,000 scrobbles — you hit five figures! 🎉';
-      case 5000:    return '5,000 scrobbles and counting!';
-      case 1000:    return 'Your first 1,000 scrobbles. The journey begins. 🎵';
-      default:      return 'You just hit ${_grandTitle(count)} on Last.fm!';
+      case 1000000:
+      case 500000:
+      case 250000:
+      case 100000:
+      case 50000:
+      case 25000:
+      case 10000:
+      case 5000:
+      case 1000:
+        return tx('ntf_grand_$count', n);
+      default:
+        return tx('ntf_milestone_body', n);
     }
   }
 }

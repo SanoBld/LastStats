@@ -444,7 +444,7 @@ class _AppearancePageState extends State<AppearancePage> {
                           onTap: (_useDynamicColor || _useNowPlayingColor)
                               ? null : () => _setAccentPreset(key, color),
                           child: Tooltip(
-                            message: label,
+                            message: tx(label),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               width: 36, height: 36,
@@ -1382,22 +1382,17 @@ class _ImageShapeSection extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
     return SettingsSection(
-      label: pickLang(fr: 'Formes des images', en: 'Image shapes', es: 'Formas de imágenes', zh: '图片形状', pt: 'Formas das imagens'),
+      label: tx('shape_title'),
       children: [
         ValueListenableBuilder<String>(
           valueListenable: imageShapeNotifier,
           builder: (_, mode, _) => SettingChoiceRow(
             icon: Icons.image_outlined,
-            title: pickLang(
-                fr: 'Pochettes, artistes et albums',
-                en: 'Covers, artists and albums',
-                es: 'Portadas, artistas y álbumes',
-                zh: '封面、艺术家和专辑',
-                pt: 'Capas, artistas e álbuns'),
+            title: tx('shape_covers'),
             options: [
-              ('mix',    pickLang(fr: 'Mélange', en: 'Mix', es: 'Mezcla', zh: '混合', pt: 'Mistura'), Icons.auto_awesome_rounded),
-              ('square', pickLang(fr: 'Carré', en: 'Square', es: 'Cuadrado', zh: '方形', pt: 'Quadrado'), Icons.crop_square_rounded),
-              ('circle', pickLang(fr: 'Cercle', en: 'Circle', es: 'Círculo', zh: '圆形', pt: 'Círculo'), Icons.circle_outlined),
+              ('mix',    tx('shape_mix'), Icons.auto_awesome_rounded),
+              ('square', tx('shape_square'), Icons.crop_square_rounded),
+              ('circle', tx('shape_circle'), Icons.circle_outlined),
               ('custom', L.apShapeSingle, Icons.interests_rounded),
             ],
             value: mode.startsWith('shape:') ? 'custom' : mode,
@@ -1410,12 +1405,7 @@ class _ImageShapeSection extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(
-                pickLang(
-                    fr: 'Ou choisis une seule forme',
-                    en: 'Or pick a single shape',
-                    es: 'O elige una sola forma',
-                    zh: '或选择单一形状',
-                    pt: 'Ou escolha uma só forma'),
+                tx('shape_pick_one'),
                 style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant),
               ),
               const SizedBox(height: 10),

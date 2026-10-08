@@ -7,6 +7,7 @@
 
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../l10n/extra_strings.dart' show tx;
 import '../theme/m3_motion.dart';
 import '../theme/m3_shapes.dart';
 
@@ -176,7 +177,7 @@ class _M3LoadingIndicatorState extends State<M3LoadingIndicator>
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Semantics(
-      label: 'Loading',
+      label: tx('a11y_loading'),
       child: RepaintBoundary(
         child: CustomPaint(
           size: Size.square(widget.size),

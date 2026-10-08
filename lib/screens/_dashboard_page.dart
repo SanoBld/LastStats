@@ -2197,8 +2197,8 @@ class _FriendCardState extends State<_FriendCard> {
     final text   = Theme.of(context).textTheme;
 
     final subtitle = friend.isOnline
-        ? (friend.nowPlayingTrack.isNotEmpty ? friend.nowPlayingTrack : 'En écoute')
-        : (friend.lastTrack.isNotEmpty       ? friend.lastTrack       : 'Hors ligne');
+        ? (friend.nowPlayingTrack.isNotEmpty ? friend.nowPlayingTrack : tx('friend_listening'))
+        : (friend.lastTrack.isNotEmpty       ? friend.lastTrack       : tx('friend_offline'));
 
     final subtitleArtist = friend.isOnline
         ? friend.nowPlayingArtist

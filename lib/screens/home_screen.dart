@@ -366,7 +366,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ? Icons.chevron_right_rounded
                               : Icons.chevron_left_rounded,
                         ),
-                        tooltip: collapsed ? 'Expand rail' : 'Collapse rail',
+                        tooltip: collapsed ? tx('rail_expand') : tx('rail_collapse'),
                         onPressed: () {
                           final next = !_railCollapsed;
                           setState(() => _railCollapsed = next);

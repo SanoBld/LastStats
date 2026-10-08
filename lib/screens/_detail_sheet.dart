@@ -1079,7 +1079,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         onTap: _toggleLove,
         onLongPress: () => showFolderAssignSheet(
             context, name: _name, artist: _artist, image: _resolvedImage),
-        tooltip: 'Love',
+        tooltip: tx('tip_love'),
       );
 
   // Heart + play, only shown together when there IS a preview to play;
@@ -2304,9 +2304,9 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(widget.tier == CardTier.none ? 'Aucun palier' : tierLabel(widget.tier),
+                    Text(widget.tier == CardTier.none ? tx('tier_none') : tierLabel(widget.tier),
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-                    Text('${widget.myPlaycount} scrobbles',
+                    Text('${widget.myPlaycount} ${L.dashScrobbles}',
                         style: TextStyle(color: Theme.of(ctx).colorScheme.onSurfaceVariant, fontSize: 13)),
                   ],
                 ),
@@ -2344,17 +2344,17 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
     final parts = widget.source.split(' · ');
     final mu = _motionUrl ?? '';
     final items = <(IconData, String, String)>[
-      (Icons.bar_chart_rounded, 'Last.fm', 'Scrobbles & metadata'),
-      (Icons.image_rounded, parts.last, 'Artwork'),
+      (Icons.bar_chart_rounded, 'Last.fm', tx('src_scrobbles_meta')),
+      (Icons.image_rounded, parts.last, tx('src_artwork')),
       if (_previewAvailable == true)
-        (Icons.play_circle_outline_rounded, 'Deezer', 'Audio preview'),
+        (Icons.play_circle_outline_rounded, 'Deezer', tx('src_audio_preview')),
       if (mu.isNotEmpty)
         (Icons.videocam_rounded,
             mu.contains('google') || mu.contains('youtube') ? 'YouTube Music' : 'Apple Music',
-            'Video artwork'),
+            tx('src_video_artwork')),
     ];
     return [
-      Text('Sources', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+      Text(tx('src_title'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
       const SizedBox(height: 8),
       for (final i in items)
         Padding(
