@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LastStats — Versions</title>
-<meta name="description" content="Toutes les versions de LastStats : nouveautés, notes de version et téléchargements.">
+<title>LastStats — Pushs</title>
+<meta name="description" content="Tous les pushs de LastStats : commits, versions et archives ZIP à télécharger.">
 <meta name="theme-color" content="#10617D">
 <link rel="icon" href="assets/img/favicon-light.png" media="(prefers-color-scheme: light)">
 <link rel="icon" href="assets/img/favicon-dark.png" media="(prefers-color-scheme: dark)">
@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="css/project.css">
 <link rel="stylesheet" href="css/help.css">
 <link rel="stylesheet" href="css/releases.css">
+<link rel="stylesheet" href="css/commits.css">
 <link rel="stylesheet" href="css/expressive.css">
 <script defer src="https://cloud.umami.is/script.js" data-website-id="adc52595-b992-434a-8eaf-2a4880979675"></script>
 </head>
@@ -42,43 +43,32 @@
       <span data-i18n="common.back_to_laststats">Retour à LastStats</span>
     </a>
 
-    <h1 class="project-page-title reveal" data-i18n="releases.title">Versions</h1>
-    <p class="project-page-desc reveal" data-i18n="releases.desc">
-      Toutes les versions de LastStats : nouveautés, notes de version et fichiers à télécharger.
+    <h1 class="project-page-title reveal" data-i18n="commits.title">Pushs</h1>
+    <p class="project-page-desc reveal" data-i18n="commits.desc">
+      Tous les pushs de LastStats : commits, versions et archives ZIP de chaque état du code.
     </p>
   </section>
 
   <section class="help-section releases-section">
+    <div id="cm-latest"></div>
+
     <div class="rel-toolbar reveal">
-      <div class="rel-filter" id="rel-filter" role="group">
-        <button type="button" class="rel-filter-btn md-ripple is-active" data-filter="all" data-i18n="releases.filter_all">Toutes</button>
-        <button type="button" class="rel-filter-btn md-ripple" data-filter="stable" data-i18n="releases.filter_stable">Stables</button>
-        <button type="button" class="rel-filter-btn md-ripple" data-filter="beta" data-i18n="releases.filter_beta">Bêta</button>
+      <div class="rel-filter" id="cm-filter" role="group">
+        <button type="button" class="rel-filter-btn md-ripple is-active" data-filter="all" data-i18n="commits.filter_all">Tous</button>
+        <button type="button" class="rel-filter-btn md-ripple" data-filter="feat" data-i18n="commits.filter_feat">Nouveautés</button>
+        <button type="button" class="rel-filter-btn md-ripple" data-filter="fix" data-i18n="commits.filter_fix">Correctifs</button>
+        <button type="button" class="rel-filter-btn md-ripple" data-filter="tag" data-i18n="commits.filter_tag">Versions</button>
       </div>
-      <a class="rel-gh md-ripple" href="https://github.com/SanoBld/LastStats-App/releases" target="_blank" rel="noopener">
+      <input type="search" class="rel-search cm-search" id="cm-search" autocomplete="off" spellcheck="false" placeholder="Rechercher…" aria-label="Rechercher">
+      <a class="rel-gh md-ripple" href="https://github.com/SanoBld/LastStats-App/commits" target="_blank" rel="noopener">
         <span data-i18n="releases.all_on_github">Voir sur GitHub</span>
         <svg class="arrow-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
       </a>
     </div>
 
-    <div class="rel-layout">
-      <!-- bookmark rail: every version, click to jump, lights up while you scroll -->
-      <aside class="rel-rail" id="rel-rail" aria-label="Versions" hidden>
-        <h2 class="rel-rail-title" data-i18n="releases.toc">Sommaire</h2>
-        <input type="search" class="rel-search" id="rel-search" autocomplete="off" spellcheck="false" placeholder="Rechercher…" aria-label="Rechercher">
-        <div class="rel-rail-scroll" id="rel-rail-scroll">
-          <div class="rel-rail-inner" id="rel-rail-inner">
-            <div class="rel-rail-fill" id="rel-rail-fill"></div>
-          </div>
-        </div>
-        <p class="rel-rail-empty" id="rel-rail-empty" hidden data-i18n="releases.no_match">Aucun résultat</p>
-      </aside>
-      <div class="rel-main">
-        <p class="rel-status" id="rel-status" data-i18n="releases.loading">Chargement des versions…</p>
-        <div id="rel-list"></div>
-        <div class="rel-sentinel" id="rel-sentinel" hidden aria-hidden="true"><span class="rel-spinner"></span></div>
-      </div>
-    </div>
+    <p class="rel-status" id="cm-status" data-i18n="commits.loading">Chargement des pushs…</p>
+    <div id="cm-list"></div>
+    <button type="button" class="rel-more md-ripple" id="cm-more" hidden data-i18n="releases.show_more">Afficher plus</button>
   </section>
 
   <footer class="footer">
@@ -102,7 +92,6 @@
   <script src="js/ripple.js"></script>
   <script src="js/expressive.js"></script>
   <script src="js/nav-autohide.js"></script>
-  <script src="js/gh-data.js"></script>
-  <script src="js/releases.js" data-repo="SanoBld/LastStats-App"></script>
+  <script src="js/commits.js" data-repo="SanoBld/LastStats-App"></script>
 </body>
 </html>
