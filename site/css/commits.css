@@ -44,3 +44,15 @@
   .cm-row { flex-direction: column; align-items: stretch; }
   .cm-actions .cm-btn { flex: 1; }
 }
+
+/* same spring motion as the other buttons: hover = softer shape + lift, press = squeezed shape */
+.cm-btn, .cm-sha {
+  transition: border-radius .5s var(--spring-default), transform .35s var(--spring-fast),
+              box-shadow .2s var(--effects), background-color .2s var(--effects);
+}
+@media (hover: hover) {
+  .cm-btn:hover { border-radius: var(--r-hover); transform: translateY(-2px); }
+  .cm-sha:hover { transform: translateY(-1px); }
+}
+.cm-btn:active, .cm-btn.is-pressed { border-radius: var(--r-press); transform: scale(.95); transition-duration: .2s, .2s, .2s, .2s; }
+.cm-sha:active, .cm-sha.is-pressed { transform: scale(.92); transition-duration: .2s; }

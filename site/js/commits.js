@@ -19,7 +19,17 @@
   let query = '';
   let shown = STEP;
 
-  const t = (k) => (window.i18n ? i18n.t(k) : k);
+  // default texts, used when i18n/*.js is old or cached and has no "commits.*" key
+  const DEF = {
+    fr: { view: 'Voir', zip: 'ZIP', zip_title: 'Télécharger le code de ce push (ZIP)', copy: 'Copier le hash', copied: 'Copié', latest: 'Dernier push', empty: 'Aucun push trouvé.', error: 'Impossible de charger les pushs.', push_one: 'push', push_many: 'pushs' },
+    en: { view: 'View', zip: 'ZIP', zip_title: 'Download the code of this push (ZIP)', copy: 'Copy hash', copied: 'Copied', latest: 'Latest push', empty: 'No push found.', error: 'Could not load pushes.', push_one: 'push', push_many: 'pushes' },
+  };
+  const t = (k) => {
+    const v = window.i18n ? i18n.t(k) : k;
+    if (v !== k) return v;
+    const d = DEF[lang()] || DEF.fr;
+    return d[k.replace('commits.', '')] || v;
+  };
   const lang = () => (window.i18n ? i18n.lang : 'fr');
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const zipUrl = (sha) => `https://github.com/${repo}/archive/${sha}.zip`;
