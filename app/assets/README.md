@@ -24,19 +24,23 @@ Join the Discord to chat, share feedback, or ask for help: https://discord.gg/Jj
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="docs/screenshots/dashboard.png" width="200" alt="Dashboard">
-  <img src="docs/screenshots/rankings.png" width="200" alt="Rankings">
-  <img src="docs/screenshots/charts.png" width="200" alt="Charts">
-  <img src="docs/screenshots/history.png" width="200" alt="History">
+  <img src="docs/screenshots/dashboard.png" width="160" alt="Dashboard">
+  <img src="docs/screenshots/weekly_recap.png" width="160" alt="Weekly recap">
+  <img src="docs/screenshots/rankings.png" width="160" alt="Rankings">
+  <img src="docs/screenshots/charts.png" width="160" alt="Charts">
 </p>
 <p align="center">
-  <img src="docs/screenshots/artist_detail.png" width="200" alt="Artist detail page">
-  <img src="docs/screenshots/flip_card.png" width="200" alt="3D artwork flip card">
-  <img src="docs/screenshots/album_view.png" width="200" alt="Album artwork viewer">
+  <img src="docs/screenshots/history.png" width="160" alt="History">
+  <img src="docs/screenshots/artist_detail.png" width="160" alt="Artist detail page">
+  <img src="docs/screenshots/artist_detail_light.png" width="160" alt="Artist detail page, light theme">
+  <img src="docs/screenshots/friend_profile.png" width="160" alt="Friend profile">
 </p>
 <p align="center">
-  <img src="docs/screenshots/achievements.png" width="200" alt="Achievements">
-  <img src="docs/screenshots/share_card.png" width="200" alt="Shareable stats card">
+  <img src="docs/screenshots/compatibility.png" width="160" alt="Music compatibility">
+  <img src="docs/screenshots/flip_card.png" width="160" alt="3D artwork flip card">
+  <img src="docs/screenshots/album_view.png" width="160" alt="Animated artwork viewer">
+  <img src="docs/screenshots/achievements.png" width="160" alt="Achievements">
+  <img src="docs/screenshots/share_card.png" width="160" alt="Shareable profile card">
 </p>
 
 ---
