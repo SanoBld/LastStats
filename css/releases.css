@@ -97,7 +97,7 @@
   transition: background-color .2s var(--effects), color .2s var(--effects), border-radius .5s var(--spring-default);
 }
 .rel-nav-item::before {
-  content: ''; position: absolute; left: -1.2rem; top: 50%; width: 7px; height: 7px; border-radius: 50%;
+  content: ''; position: absolute; left: calc(-1.2rem - 1.5px); top: 50%; width: 11px; height: 11px; box-sizing: border-box; border-radius: 50%;
   background: var(--md-surface-container-high); border: 2px solid var(--md-outline-variant);
   transform: translate(0, -50%); transition: background .25s var(--m3-standard), border-color .25s var(--m3-standard), transform .25s var(--m3-standard);
 }

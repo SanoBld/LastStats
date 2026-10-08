@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-08T12:35:20Z",
+  "updated": "2026-10-08T12:41:48Z",
   "commits": [
+    {
+      "sha": "d376801402a82f7945d6d17a01add96ec4421d2b",
+      "message": "feat: améliorer les animations des boutons sur la page des commits et des versions",
+      "date": "2026-10-08T12:41:25Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/d376801402a82f7945d6d17a01add96ec4421d2b",
+      "tags": []
+    },
     {
       "sha": "261627c01f60f4dd094296a9febfbba708dd97d2",
       "message": "feat: ajouter une page \"Pushs\" avec liste des commits, options de filtrage et téléchargement ZIP",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/9538b15ca3f61ad29762cbfc2c4d1e2e1c7b1e4d",
-      "tags": []
-    },
-    {
-      "sha": "be7ac468f2b746f8899630117adfe4cfc87f36a0",
-      "message": "feat: ajouter un mode de tri pour les éléments affichés en fonction de l'année sélectionnée",
-      "date": "2026-07-14T22:44:22Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/be7ac468f2b746f8899630117adfe4cfc87f36a0",
       "tags": []
     }
   ]
