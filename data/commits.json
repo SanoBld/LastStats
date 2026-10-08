@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-08T20:47:54Z",
+  "updated": "2026-10-08T20:55:53Z",
   "commits": [
+    {
+      "sha": "61da058ca3d7c29941339b14a8da91e167dfebc2",
+      "message": "Add showcase video playback control based on visibility and user preferences\n\n- Implemented Intersection Observer to play videos only when they are visible in the viewport.\n- Added support for reduced motion preferences, disabling autoplay and enabling controls for users who prefer reduced motion.\n- Ensured videos pause when not in view to improve performance and user experience.",
+      "date": "2026-10-08T20:55:29Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/61da058ca3d7c29941339b14a8da91e167dfebc2",
+      "tags": []
+    },
     {
       "sha": "cb07c966e1e9d7d3a790ca7b7fcb897b8c82f6cc",
       "message": "Add new images for LastStats project gallery\n\n- Added friend_profile.png to the gallery\n- Added weekly_recap.png to the gallery\n- Updated weekly_recap.png in the main LastStats directory",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/9db204b890a9c91c92dd25797950bfa3e81b37c1",
-      "tags": []
-    },
-    {
-      "sha": "f711617ac7ad4545a142c6d5221fea2f32d97162",
-      "message": "feat: ajouter la prise en charge de la construction pour Windows ARM64 avec des ajustements de version",
-      "date": "2026-07-16T19:48:46Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/f711617ac7ad4545a142c6d5221fea2f32d97162",
       "tags": []
     }
   ]
