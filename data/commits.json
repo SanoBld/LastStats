@@ -1,6 +1,60 @@
 {
-  "updated": "2026-10-08T12:58:13Z",
+  "updated": "2026-10-08T20:47:54Z",
   "commits": [
+    {
+      "sha": "cb07c966e1e9d7d3a790ca7b7fcb897b8c82f6cc",
+      "message": "Add new images for LastStats project gallery\n\n- Added friend_profile.png to the gallery\n- Added weekly_recap.png to the gallery\n- Updated weekly_recap.png in the main LastStats directory",
+      "date": "2026-10-08T20:47:19Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/cb07c966e1e9d7d3a790ca7b7fcb897b8c82f6cc",
+      "tags": []
+    },
+    {
+      "sha": "23644b4c4d0b7976afffdfc6b85d3d6d81161864",
+      "message": "Add translations for Portuguese, Russian, and Chinese languages in i18n files",
+      "date": "2026-10-08T20:18:34Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/23644b4c4d0b7976afffdfc6b85d3d6d81161864",
+      "tags": []
+    },
+    {
+      "sha": "acd66fa410c2eac628079d8769b1e89e4de1a2a9",
+      "message": "feat: mise à jour de la FAQ pour refléter l'absence de version iOS et réorganisation des questions par thème",
+      "date": "2026-10-08T18:57:44Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/acd66fa410c2eac628079d8769b1e89e4de1a2a9",
+      "tags": []
+    },
+    {
+      "sha": "59e0d5c1859f033106cc3213b7aa2384f3a15982",
+      "message": "feat: ajouter des textes et des messages pour le style Nothing OS en cours d'amélioration, et mise à jour des traductions pour le changement de clé API",
+      "date": "2026-10-08T18:49:15Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/59e0d5c1859f033106cc3213b7aa2384f3a15982",
+      "tags": []
+    },
+    {
+      "sha": "8f3229af4759557a6aecc3f1d951200b4763ea21",
+      "message": "feat: add functionality to change API key in account settings\n\n- Implemented a dialog for users to change their API key or switch to the app's internal key.\n- Updated FAQ section to include information about changing the API key.\n- Enhanced localization strings for Portuguese, Russian, and Chinese to reflect new features and instructions.\n- Added logic to validate the new API key and check its validity with Last.fm before saving.\n- Updated account manager to handle API key updates and synchronize preferences accordingly.",
+      "date": "2026-10-08T18:38:05Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/8f3229af4759557a6aecc3f1d951200b4763ea21",
+      "tags": []
+    },
+    {
+      "sha": "351ca2c29d82ae8b7f9cba51056a6e6f9cd7a0d1",
+      "message": "Refactor strings to use localization in various screens and services\n\n- Updated friend card subtitle to use localized strings for online and offline status.\n- Changed tooltip messages in detail sheet and home screen to use localization.\n- Refactored appearance settings page to utilize localized strings for tooltips and titles.\n- Updated backup page to use localized dialog titles for folder selection.\n- Refactored notification service to use localized strings for channel names and notification messages.\n- Updated notification worker to load saved language preferences and use localization for update messages and sync notifications.\n- Refactored skeleton widget to use localized accessibility labels.",
+      "date": "2026-10-08T18:20:14Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/351ca2c29d82ae8b7f9cba51056a6e6f9cd7a0d1",
+      "tags": []
+    },
     {
       "sha": "d376801402a82f7945d6d17a01add96ec4421d2b",
       "message": "feat: améliorer les animations des boutons sur la page des commits et des versions",
@@ -2659,60 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/f711617ac7ad4545a142c6d5221fea2f32d97162",
-      "tags": []
-    },
-    {
-      "sha": "c874b6ece2557979888fef6489d85c09ceb547a5",
-      "message": "feat: ajouter la prise en charge de la construction pour Windows ARM64 et ajouter un badge \"Beta\" sur l'écran des graphiques",
-      "date": "2026-07-16T19:36:22Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/c874b6ece2557979888fef6489d85c09ceb547a5",
-      "tags": []
-    },
-    {
-      "sha": "7d2d1eda03bdd53b56e53f7e96ac90637aca4284",
-      "message": "feat: ajouter une fonction de rendu hors écran pour l'exportation des graphiques sans découpage",
-      "date": "2026-07-16T09:36:18Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/7d2d1eda03bdd53b56e53f7e96ac90637aca4284",
-      "tags": []
-    },
-    {
-      "sha": "a2717c95dcd59133e11bd8a38ba70f4bc65de84e",
-      "message": "feat: ajouter un contrôleur de défilement pour améliorer la capture des graphiques et rendre la sélection de graphiques défilable",
-      "date": "2026-07-16T09:20:06Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/a2717c95dcd59133e11bd8a38ba70f4bc65de84e",
-      "tags": []
-    },
-    {
-      "sha": "e3819fea8a38bba2a50840409770d993bd92c899",
-      "message": "fix: corriger l'apostrophe dans la chaîne de classement pour l'année entière",
-      "date": "2026-07-15T21:34:50Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/e3819fea8a38bba2a50840409770d993bd92c899",
-      "tags": []
-    },
-    {
-      "sha": "a0b08aeb918a5521aa531f804a899e2dea4dfcc2",
-      "message": "feat: ajouter des chaînes pour le classement annuel et l'exportation des graphiques",
-      "date": "2026-07-15T21:28:40Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/a0b08aeb918a5521aa531f804a899e2dea4dfcc2",
-      "tags": []
-    },
-    {
-      "sha": "9538b15ca3f61ad29762cbfc2c4d1e2e1c7b1e4d",
-      "message": "feat: remplacer le mode de tri par un sélecteur de mois pour les classements par année",
-      "date": "2026-07-15T21:12:47Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/9538b15ca3f61ad29762cbfc2c4d1e2e1c7b1e4d",
       "tags": []
     }
   ]

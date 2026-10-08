@@ -7,6 +7,10 @@ window.I18N = window.I18N || {};
 window.I18N.en = {
   _meta: { short: "EN", name: "English" },
 
+  "langAuto": "Auto",
+  "commits.translate": "Translate",
+  "commits.show_original": "Show original",
+
   // ---- strings used by scripts ----
   nowPlaying: "Now playing",
   ghFavorites: "Stars",
@@ -82,14 +86,20 @@ window.I18N.en = {
   "index.all_your_listening_sorted_day": "All your listening, sorted day by day, with the exact time of every scrobble. Your complete Last.fm history, from day one to today.",
   "index.a_complete_artist_page": "A complete artist page",
   "index.biography_your_stats_on_the": "Biography, your stats on the artist, tags, similar tracks: every artist you listen to deserves its own complete page.",
-  "index.detailed_album_view": "Detailed album view",
-  "index.full_tracklist_total_duration_play": "Full tracklist, total duration, play count per track: you know exactly where you stand on every album.",
   "index.cover_art_as_a_3d": "Cover art as a 3D card",
   "index.a_touch_of_refinement_the": "A touch of refinement: the cover art flips in 3D with a single tap, like a real card, to reveal its details on the back.",
   "index.unlock_achievements": "Unlock achievements",
   "index.a_leveling_system_tied_to": "A leveling system tied to your listening habits, with a collection of achievements to unlock over time.",
-  "index.share_your_stats": "Share your stats",
-  "index.an_elegant_card_with_your": "An elegant card with your current stats, ready to post as a story, in the colors of your theme.",
+  "index.share_your_stats": "Share your profile",
+  "index.an_elegant_card_with_your": "An elegant profile card with your name, your scrobbles and an optional QR code: just scan the shared image to find your profile.",
+  "index.weekly_recap_title": "Your weekly recap",
+  "index.weekly_recap_text": "Your week at a glance: plays, artists, tracks, daily average, change from the previous week and the podium of your top artists.",
+  "index.friend_profile_title": "Your friends' profiles",
+  "index.friend_profile_text": "Open a friend's profile to see their scrobbles, listening pace and achievements, then compare your music tastes in one tap.",
+  "index.taste_compat_title": "Music compatibility",
+  "index.taste_compat_text": "A compatibility score with a friend, broken down by artists, genres, tracks and albums, along with everything you have in common.",
+  "index.animated_artwork_title": "Artwork that moves",
+  "index.animated_artwork_text": "When a cover is animated, it comes to life full screen on its 3D card, with a pause button and one-tap sharing.",
   "index.gallery": "Gallery",
   "index.gallery_hint": "Drag the gallery or use the arrows. Tap an image to enlarge it.",
   "index.gallery_prev": "Previous image",
@@ -326,5 +336,7 @@ window.I18N.en = {
   "commits.empty": "No push found.",
   "commits.updated": "Updated on",
   "commits.push_one": "push",
-  "commits.push_many": "pushes"
+  "commits.push_many": "pushes",
+  "legal.translate": "Automatic translation",
+  "legal.translate.p1": "Fixed texts on the site are translated locally. Content that changes (release notes, commit messages) is translated automatically or on request through Google Translate: the text to translate is then sent to Google LLC from your browser, together with your IP address. You can turn it off with the “Show original” button on the Versions and Pushes pages; nothing is sent then."
 };
