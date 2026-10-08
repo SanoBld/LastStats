@@ -1,6 +1,33 @@
 {
-  "updated": "2026-10-08T21:04:22Z",
+  "updated": "2026-10-08T21:17:15Z",
   "commits": [
+    {
+      "sha": "4eed272acf939e3481d58885eb405cda46aa815e",
+      "message": "Merge branch 'master' of https://github.com/SanoBld/LastStats",
+      "date": "2026-10-08T21:10:24Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/4eed272acf939e3481d58885eb405cda46aa815e",
+      "tags": []
+    },
+    {
+      "sha": "d509f19b8f8bef1ceab7648bc6517220222a31d5",
+      "message": "feat: mise à jour du README pour refléter les nouvelles fonctionnalités et améliorations de l'application",
+      "date": "2026-10-08T21:10:18Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/d509f19b8f8bef1ceab7648bc6517220222a31d5",
+      "tags": []
+    },
+    {
+      "sha": "83195a1bdd0f3c17d461485addd3121e358b075d",
+      "message": "chore: bump version to 4.0.0 [skip ci]",
+      "date": "2026-10-08T21:04:36Z",
+      "author": "github-actions[bot]",
+      "avatar": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/83195a1bdd0f3c17d461485addd3121e358b075d",
+      "tags": []
+    },
     {
       "sha": "67b0b84961763ae2b0de9227510c3af411268ddd",
       "message": "feat: ajout de nouveaux éléments multimédias et amélioration de la galerie avec des vidéos animées et des GIFs",
@@ -8,7 +35,9 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/67b0b84961763ae2b0de9227510c3af411268ddd",
-      "tags": []
+      "tags": [
+        "v4.0.0"
+      ]
     },
     {
       "sha": "61da058ca3d7c29941339b14a8da91e167dfebc2",
@@ -2686,33 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/b11e220324a631a7d38f8d17461a4b32f1c2bf33",
-      "tags": []
-    },
-    {
-      "sha": "7c04990a112281bdfd7d39071bb6f2fa2890f2dc",
-      "message": "feat: mettre à jour les informations de l'installateur et du fichier de ressources pour refléter le nom de l'application \"LastStats\"",
-      "date": "2026-07-16T20:33:15Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/7c04990a112281bdfd7d39071bb6f2fa2890f2dc",
-      "tags": []
-    },
-    {
-      "sha": "9b083f3da53f329f7eaf9388501a84d0609258bb",
-      "message": "fix: corriger les chemins d'accès pour les fichiers d'installation Windows",
-      "date": "2026-07-16T20:21:08Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/9b083f3da53f329f7eaf9388501a84d0609258bb",
-      "tags": []
-    },
-    {
-      "sha": "bcdeca1444dfe6af7433196dff4b21825af58f23",
-      "message": "feat: ajouter un installateur pour Windows x64 et ARM64 avec Inno Setup",
-      "date": "2026-07-16T20:10:29Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/bcdeca1444dfe6af7433196dff4b21825af58f23",
       "tags": []
     }
   ]
