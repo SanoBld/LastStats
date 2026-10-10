@@ -3595,25 +3595,21 @@ class _SyncProgressChip extends StatelessWidget {
     final text   = Theme.of(context).textTheme;
     return Container(
       constraints: const BoxConstraints(minWidth: 84, maxWidth: 150),
-      padding: const EdgeInsets.fromLTRB(8, 6, 12, 8),
+      padding: const EdgeInsets.fromLTRB(12, 6, 12, 8),
       decoration: BoxDecoration(
         color:        scheme.primaryContainer.withValues(alpha: 0.95),
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Row(mainAxisSize: MainAxisSize.min, children: [
-          M3LoadingIndicator(size: 22, color: scheme.primary),
-          const SizedBox(width: 6),
-          Flexible(
-            child: Text(progress.shortLabel,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: text.labelSmall?.copyWith(
-                    color: scheme.onPrimaryContainer,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 11)),
-          ),
-        ]),
+        Text(
+          progress.total > 0 ? '${progress.loaded}/${progress.total}' : progress.shortLabel,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: text.labelSmall?.copyWith(
+              color: scheme.onPrimaryContainer,
+              fontWeight: FontWeight.w800,
+              fontSize: 11),
+        ),
         const SizedBox(height: 4),
         M3WavyProgress(
           value: progress.fraction,

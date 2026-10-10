@@ -150,7 +150,7 @@ class _M3LoadingIndicatorState extends State<M3LoadingIndicator>
     with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 2400),
+    duration: const Duration(milliseconds: 5600),
   );
   bool _started = false;
 
@@ -192,6 +192,38 @@ class _M3LoadingIndicatorState extends State<M3LoadingIndicator>
   }
 }
 
+// Shapes the loader cycles through (like the Material 3 Expressive loading
+// indicator): soft burst, 9-sided cookie, pentagon, pill, sunny, 4-sided
+// cookie and oval. Each one is a radius function of the angle.
+const _kLoaderShapes = 7;
+
+double _lobes(double th, int n, double a) => 1 + a * math.cos(n * th);
+
+double _shapeR(int i, double th) {
+  switch (i) {
+    case 0: return _lobes(th, 10, 0.13);               // soft burst
+    case 1: return _lobes(th, 9, 0.07);                // cookie 9
+    case 2: {                                          // pentagon (rounded)
+      const k = 5;
+      final seg = math.pi * 2 / k;
+      final a = (th % seg) - seg / 2;
+      final poly = math.cos(math.pi / k) / math.cos(a);
+      return poly * 0.8 + 0.2;
+    }
+    case 3: {                                          // pill
+      final x = math.cos(th).abs(), y = (math.sin(th) / 0.62).abs();
+      return 1 / math.pow(math.pow(x, 4) + math.pow(y, 4), 0.25);
+    }
+    case 4: return _lobes(th, 8, 0.12) + 0.06 * math.cos(16 * th); // sunny
+    case 5: return _lobes(th, 4, 0.11);                // cookie 4
+    default: {                                         // oval
+      final x = math.cos(th), y = math.sin(th) / 0.74;
+      return 1 / math.sqrt(x * x + y * y);
+    }
+  }
+}
+
+
 class _LoaderPainter extends CustomPainter {
   _LoaderPainter({
     required this.progress,
@@ -210,10 +242,28 @@ class _LoaderPainter extends CustomPainter {
     if (container != null) canvas.drawCircle(c, r, Paint()..color = container!);
 
     final t = progress.value;
-    // Bumps get softer and sharper again while it spins.
-    final amp = 0.07 + 0.09 * (0.5 - 0.5 * math.cos(t * math.pi * 4));
-    final path = M3CookieBorder(lobes: 9, amplitude: amp)
-        .getOuterPath(Rect.fromCircle(center: Offset.zero, radius: r * (container == null ? 0.95 : 0.58)));
+    final n = _kLoaderShapes;
+    final f = t * n;
+    final i = f.floor() % n;
+    final local = f - f.floor();
+    // Hold the shape for a moment, then morph into the next one.
+    final m = local < 0.35 ? 0.0 : Curves.easeInOutCubic.transform((local - 0.35) / 0.65);
+    final rad = r * (container == null ? 0.95 : 0.58);
+    const steps = 140;
+    double maxR = 0;
+    final rs = List<double>.generate(steps, (k) {
+      final th = k / steps * math.pi * 2;
+      final v = _shapeR(i, th) * (1 - m) + _shapeR((i + 1) % n, th) * m;
+      if (v > maxR) maxR = v;
+      return v;
+    });
+    final path = Path();
+    for (var k = 0; k < steps; k++) {
+      final th = k / steps * math.pi * 2;
+      final p = Offset(math.cos(th), math.sin(th)) * (rad * rs[k] / maxR);
+      k == 0 ? path.moveTo(p.dx, p.dy) : path.lineTo(p.dx, p.dy);
+    }
+    path.close();
 
     canvas.save();
     canvas.translate(c.dx, c.dy);

@@ -1,6 +1,7 @@
 // Last.fm login on the real website, inside the app. When the user is
 // logged in, we read the user name from the page header and close.
 import 'package:flutter/material.dart';
+import '../../widgets/m3_components.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import '../../l10n/extra_strings.dart';
 import '../../services/spotify_web_session.dart';
@@ -74,7 +75,11 @@ class _LastfmLoginPageState extends State<LastfmLoginPage> {
     return Scaffold(
       appBar: AppBar(title: Text(tx('lfm_login_t'))),
       body: Column(children: [
-        if (_progress < 1) LinearProgressIndicator(value: _progress),
+        if (_progress < 1)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            child: M3WavyProgress(value: _progress),
+          ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
           child: Text(tx('lfm_login_hint'),

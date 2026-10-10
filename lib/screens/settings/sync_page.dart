@@ -225,9 +225,9 @@ class _SyncPageState extends State<SyncPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                       if (isSyncing) ...[
-                        LinearProgressIndicator(
-                          value: progress.total > 0 ? progress.fraction : null,
-                        ),
+                        progress.total > 0
+                            ? M3WavyProgress(value: progress.fraction)
+                            : const Center(child: M3LoadingIndicator(size: 32)),
                         const SizedBox(height: 8),
                         Text('${L.syncInProgress} ${progress.shortLabel}',
                             style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
