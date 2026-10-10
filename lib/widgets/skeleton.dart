@@ -195,8 +195,8 @@ class _M3LoadingIndicatorState extends State<M3LoadingIndicator>
 // The loader cycles through the app's own image shapes (cookie, circle,
 // clover, arch, burst, squircle, leaf, oval). Each outline is sampled once
 // into a radius per angle so two shapes can be blended point by point.
-// Only the soft, rounded shapes: circle, squircle, oval.
-const _kLoaderShapeIds = [1, 5, 7];
+// Only the soft, rounded shapes: squircle, oval.
+const _kLoaderShapeIds = [5, 7];
 const _kLoaderSteps = 140;
 final Map<int, List<double>> _loaderRadiiCache = {};
 
