@@ -1,6 +1,8 @@
 // lib/screens/onboarding_flow.dart
 //
-// Shown once, right after the first scrobble load, before entering HomeScreen.
+// Shown once, right after the first login, before entering HomeScreen.
+// The data + scrobble sync runs in the background while the user sets up
+// the app; the percentage is shown at the top left.
 // Pages: appearance, notifications, dashboard, library clean-up, start-up tab,
 // music platform, updates, favorite profiles. Every switch here writes the
 // same keys / notifiers as the matching Settings page, so nothing diverges.
@@ -18,6 +20,10 @@ import '../l10n/l10n.dart';
 import '../app_state.dart';
 import '../services/lastfm_service.dart';
 import '../services/library_merge.dart';
+import '../services/cache_owner.dart';
+import '../services/data_cache.dart';
+import '../services/prefetch_service.dart';
+import '../services/all_scrobbles_service.dart';
 import 'home_screen.dart';
 import 'settings/settings_helpers.dart';
 
@@ -34,6 +40,59 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   final _pageCtrl = PageController();
   int _page = 0;
   static const _pages = 8;
+
+  // ── Background sync (profile data 30 %, scrobble history 70 %) ──────────
+  late final LastFmService _service;
+  double _syncFraction = 0;
+  bool _syncDone = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _service = LastFmService(apiKey: widget.apiKey, username: widget.username);
+    PrefetchService.progressNotifier.addListener(_onSync);
+    AllScrobblesService.progressNotifier.addListener(_onSync);
+    _startSync();
+  }
+
+  Future<void> _startSync() async {
+    try {
+      await CacheOwner.ensure(widget.username);
+      await DataCache.init();
+      await PrefetchService.prefetchAllWithProgress(_service, force: true);
+      if (AllScrobblesService.isFirstLoad) {
+        await AllScrobblesService.loadAll(_service);
+      } else {
+        await AllScrobblesService.syncNew(_service);
+      }
+    } catch (_) {/* HomeScreen retries the sync on its own */}
+    if (!mounted) return;
+    setState(() { _syncDone = true; _syncFraction = 1; });
+  }
+
+  void _onSync() {
+    if (!mounted || _syncDone) return;
+    final pf = PrefetchService.progressNotifier.value;
+    final sc = AllScrobblesService.progressNotifier.value;
+    double scrobbles = 0;
+    if (sc.isDone) {
+      scrobbles = 1;
+    } else if (sc.isLoading) {
+      scrobbles = sc.total > 0
+          ? sc.loaded / sc.total
+          : (sc.totalYears > 0 ? sc.yearIndex / sc.totalYears : 0);
+    }
+    final f = (pf.fraction * 0.3 + scrobbles.clamp(0.0, 1.0) * 0.7).clamp(0.0, 1.0);
+    if (f > _syncFraction) setState(() => _syncFraction = f);
+  }
+
+  @override
+  void dispose() {
+    PrefetchService.progressNotifier.removeListener(_onSync);
+    AllScrobblesService.progressNotifier.removeListener(_onSync);
+    _pageCtrl.dispose();
+    super.dispose();
+  }
 
   void _goTo(int i) {
     setState(() => _page = i);
@@ -76,6 +135,22 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 10, 12, 4),
             child: Row(children: [
+              M3Switcher(
+                duration: const Duration(milliseconds: 220),
+                child: _syncDone
+                    ? Row(key: const ValueKey('done'), mainAxisSize: MainAxisSize.min, children: [
+                        Icon(Icons.check_circle_rounded, size: 20, color: scheme.primary),
+                        const SizedBox(width: 6),
+                        Text('100%', style: TextStyle(color: scheme.primary, fontSize: 14, fontWeight: FontWeight.w800)),
+                      ])
+                    : Row(key: const ValueKey('run'), mainAxisSize: MainAxisSize.min, children: [
+                        const M3LoadingIndicator(size: 28),
+                        const SizedBox(width: 8),
+                        Text('${(_syncFraction * 100).round()}%',
+                            style: TextStyle(color: scheme.primary, fontSize: 14, fontWeight: FontWeight.w800)),
+                      ]),
+              ),
+              const SizedBox(width: 12),
               Text('${_page + 1}/$_pages',
                   style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12, fontWeight: FontWeight.w600)),
               const Spacer(),
