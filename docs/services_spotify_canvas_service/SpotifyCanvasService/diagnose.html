@@ -80,11 +80,10 @@
     final s = await _session(force: true);
     out.add(&#39;2. web token: ${s == null ? &#39;FAILED (${lastError ?? &#39;?&#39;})&#39; : &#39;ok&#39;}&#39;);
     if (s == null) return out.join(&#39;\n&#39;);
-    final r = await ApiHttp.get(
-        Uri.https(&#39;api.spotify.com&#39;, &#39;&#47;v1&#47;search&#39;,
-            {&#39;q&#39;: &#39;SZA Kill Bill&#39;, &#39;type&#39;: &#39;track&#39;, &#39;limit&#39;: &#39;1&#39;}),
-        headers: {&#39;Authorization&#39;: s.bearer}).timeout(_timeout);
-    out.add(&#39;3. search: HTTP ${r.statusCode}&#39;);
+    final r = await _get(
+        s, &#39;&#47;v1&#47;search&#39;, {&#39;q&#39;: &#39;SZA Kill Bill&#39;, &#39;type&#39;: &#39;track&#39;, &#39;limit&#39;: &#39;1&#39;});
+    out.add(&#39;3. search: HTTP ${r.statusCode}&#39;
+        &#39;${r.statusCode == 200 ? &#39;&#39; : &#39; retry-after=${r.headers[&#39;retry-after&#39;]} ${r.body.length &gt; 120 ? r.body.substring(0, 120) : r.body}&#39;}&#39;);
     final (code, body) = await _canvasRaw(s, &#39;spotify:track:3OHfY25tqY28d16oZczHc8&#39;);
     final mp4 = code == 200 ? _findMp4(jsonDecode(body)) : null;
     out.add(&#39;4. canvas: HTTP $code, ${mp4 != null ? &#39;video found&#39; : &#39;no video&#39;}&#39;);
