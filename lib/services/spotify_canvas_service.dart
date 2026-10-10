@@ -9,6 +9,7 @@
 // Returns null when nothing is found, like the other sources.
 import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'api_http.dart';
 import 'spotify_web_session.dart';
@@ -182,16 +183,34 @@ class SpotifyCanvasService {
 
   // ── Calls ──────────────────────────────────────────────────────────────
 
+  // Search/album calls. Plain http (not ApiHttp): its client-side rate
+  // limiter must not answer 429 for us. Web-player headers are sent so the
+  // call looks like the web player's own. One short retry on a real 429.
+  static Future<http.Response> _get(_Sess s, String path, Map<String, String> q) =>
+      http.get(Uri.https('api.spotify.com', path, q), headers: {
+        'Authorization': s.bearer,
+        'client-token': s.clientToken,
+        'app-platform': 'WebPlayer',
+        'Accept': 'application/json',
+        'Accept-Language': 'en',
+        'Origin': 'https://open.spotify.com',
+        'Referer': 'https://open.spotify.com/',
+        'User-Agent': SpotifyWebSession.ua,
+      }).timeout(_timeout);
+
   static Future<Map<String, dynamic>?> _api(
       _Sess s, String path, Map<String, String> q) async {
-    final res = await ApiHttp.get(Uri.https('api.spotify.com', path, q),
-        headers: {
-          'Authorization': s.bearer,
-          'User-Agent': SpotifyWebSession.ua,
-        }).timeout(_timeout);
+    var res = await _get(s, path, q);
+    if (res.statusCode == 429) {
+      final wait = int.tryParse(res.headers['retry-after'] ?? '') ?? 2;
+      if (wait <= 4) {
+        await Future.delayed(Duration(seconds: wait + 1));
+        res = await _get(s, path, q);
+      }
+    }
     if (res.statusCode == 401) throw _Expired();
     if (res.statusCode != 200) {
-      lastError = 'api ${res.statusCode}';
+      lastError = 'api ${res.statusCode} retry-after=${res.headers['retry-after']}';
       return null;
     }
     final d = jsonDecode(utf8.decode(res.bodyBytes));
@@ -256,11 +275,10 @@ class SpotifyCanvasService {
       final s = await _session(force: true);
       out.add('2. web token: ${s == null ? 'FAILED (${lastError ?? '?'})' : 'ok'}');
       if (s == null) return out.join('\n');
-      final r = await ApiHttp.get(
-          Uri.https('api.spotify.com', '/v1/search',
-              {'q': 'SZA Kill Bill', 'type': 'track', 'limit': '1'}),
-          headers: {'Authorization': s.bearer}).timeout(_timeout);
-      out.add('3. search: HTTP ${r.statusCode}');
+      final r = await _get(
+          s, '/v1/search', {'q': 'SZA Kill Bill', 'type': 'track', 'limit': '1'});
+      out.add('3. search: HTTP ${r.statusCode}'
+          '${r.statusCode == 200 ? '' : ' retry-after=${r.headers['retry-after']} ${r.body.length > 120 ? r.body.substring(0, 120) : r.body}'}');
       final (code, body) = await _canvasRaw(s, 'spotify:track:3OHfY25tqY28d16oZczHc8');
       final mp4 = code == 200 ? _findMp4(jsonDecode(body)) : null;
       out.add('4. canvas: HTTP $code, ${mp4 != null ? 'video found' : 'no video'}');
