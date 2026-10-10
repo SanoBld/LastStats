@@ -1284,4 +1284,11 @@ const Map<String, String> kTxIt = {
   'lfm_web_sub': 'Nessuna chiave API: viene usata la chiave integrata nell\'app.',
   'lfm_manual_hint': 'Nome utente non trovato automaticamente. Lo inserisca qui sotto dopo l\'accesso.',
   'lfm_manual_label': 'Nome utente',
+  'rec': 'consigliato',
+  'not_rec': 'sconsigliato',
+  'sm_title': 'Metodo di connessione',
+  'sm_key_t': 'La mia chiave API',
+  'sm_key_s': 'Quota solo sua, preferiti possibili.',
+  'sm_builtin_t': 'Chiave integrata',
+  'sm_builtin_s': 'Solo nome utente. Quota condivisa con altri utenti.',
 };

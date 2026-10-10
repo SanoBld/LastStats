@@ -24,6 +24,7 @@ import '../l10n/extra_strings.dart' show tx;
 import 'scrobbles_file_cache.dart';
 import 'all_scrobbles_service.dart';
 import 'lastfm_service.dart';
+import 'internal_keys.dart';
 
 /// Runtime-only / session state that should never be exported: timers,
 /// "last notified / last seen" markers, scheduled-task ids and one-off
@@ -50,6 +51,8 @@ const _kBackupExcludeKeys = {
   'ls_fav_stat_migrated',
   // Spotify login cookie, tokens and copied web-player requests are
   // secrets or short-lived: never put them in a backup file.
+  // Each device draws its own built-in key (keeps the load spread out).
+  'ls_internal_key',
   'ls_spotify_sp_dc',
   'ls_spotify_token',
   'ls_spotify_client_token',
@@ -561,6 +564,7 @@ class BackupService {
     final p = await SharedPreferences.getInstance();
     for (final e in prefs.entries) {
       if (!e.key.startsWith('ls_')) continue;
+      if (e.key == 'ls_internal_key') continue; // old backups: keep this device's own pick
       final v = e.value;
       if (v is bool) {
         await p.setBool(e.key, v);
@@ -573,6 +577,25 @@ class BackupService {
       } else if (v is List) {
         await p.setStringList(e.key, List<String>.from(v));
       }
+    }
+
+    // A backup carries the OTHER device's built-in key. Swap it for this
+    // device's own pick, so keys stay spread across installs.
+    final own = await InternalKeys.pick(p);
+    final rawAcc = p.getString('ls_accounts');
+    if (rawAcc != null && rawAcc.isNotEmpty) {
+      try {
+        final list = jsonDecode(rawAcc) as List;
+        for (final a in list) {
+          if (a is Map && InternalKeys.isInternal((a['apiKey'] ?? '').toString())) {
+            a['apiKey'] = own;
+          }
+        }
+        await p.setString('ls_accounts', jsonEncode(list));
+      } catch (_) {}
+    }
+    if (InternalKeys.isInternal(p.getString('ls_apikey') ?? '')) {
+      await p.setString('ls_apikey', own);
     }
 
     // Keep ls_username/ls_apikey in sync with the active multi-account entry.

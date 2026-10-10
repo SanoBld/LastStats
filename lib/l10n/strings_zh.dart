@@ -1310,4 +1310,11 @@ const Map<String, String> kTxZh = {
   'lfm_web_sub': '无需 API 密钥：将使用应用内置密钥。',
   'lfm_manual_hint': '未能自动识别用户名。登录后请在下方输入。',
   'lfm_manual_label': '用户名',
+  'rec': '推荐',
+  'not_rec': '不推荐',
+  'sm_title': '连接方式',
+  'sm_key_t': '我的 API 密钥',
+  'sm_key_s': '独享配额，可使用收藏。',
+  'sm_builtin_t': '内置密钥',
+  'sm_builtin_s': '仅需用户名。配额与其他用户共享。',
 };

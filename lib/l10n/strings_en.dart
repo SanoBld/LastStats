@@ -1313,4 +1313,11 @@ const Map<String, String> kTxEn = {
   'lfm_web_sub': 'No API key needed: the key built into the app is used.',
   'lfm_manual_hint': 'Username not found automatically. Enter it below once you are signed in.',
   'lfm_manual_label': 'Username',
+  'rec': 'recommended',
+  'not_rec': 'not recommended',
+  'sm_title': 'Connection method',
+  'sm_key_t': 'My API key',
+  'sm_key_s': 'Your own quota, favorites possible.',
+  'sm_builtin_t': 'Built-in key',
+  'sm_builtin_s': 'Username only. Quota shared with other users.',
 };

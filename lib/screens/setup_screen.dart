@@ -53,6 +53,7 @@ class _SetupScreenState extends State<SetupScreen>
   bool    _obscureSecret   = true;
   bool    _enableFavorites = false;
   bool    _useInternalKey  = false;
+  int     _method          = 0; // 0 own key, 1 built-in key, 2 Last.fm website
   bool    _rememberMe      = true;
   bool    _isLoading       = false;
   String? _errorMessage;
@@ -223,6 +224,7 @@ class _SetupScreenState extends State<SetupScreen>
       _usernameCtrl.text = result.username!;
       _apikeyCtrl.text   = result.apiKey!;
       _useInternalKey    = false;
+      _method            = 0;
       _errorMessage      = null;
       // Reflect a restored secret key in the UI too, not just prefs,
       // so the user can see/verify it before launching.
@@ -464,6 +466,37 @@ class _SetupScreenState extends State<SetupScreen>
                                   ]),
                                   const SizedBox(height: 24),
 
+                                  // Connection method: three big choices
+                                  Text(tx('sm_title'),
+                                      style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+                                  const SizedBox(height: 10),
+                                  _MethodCard(
+                                    selected: _method == 0,
+                                    icon: Icons.key_rounded,
+                                    title: '${tx('sm_key_t')} (${tx('rec')})',
+                                    subtitle: tx('sm_key_s'),
+                                    onTap: () => setState(() { _method = 0; _useInternalKey = false; }),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  _MethodCard(
+                                    selected: _method == 1,
+                                    icon: Icons.bolt_rounded,
+                                    title: tx('sm_builtin_t'),
+                                    subtitle: tx('sm_builtin_s'),
+                                    onTap: () => setState(() { _method = 1; _useInternalKey = true; }),
+                                  ),
+                                  if (_canWebLogin) ...[
+                                    const SizedBox(height: 8),
+                                    _MethodCard(
+                                      selected: _method == 2,
+                                      icon: Icons.login_rounded,
+                                      title: '${tx('conn_lfm_web')} (${tx('not_rec')})',
+                                      subtitle: tx('lfm_web_sub'),
+                                      onTap: () => setState(() { _method = 2; _useInternalKey = true; }),
+                                    ),
+                                  ],
+                                  const SizedBox(height: 18),
+                                  if (_method != 2) ...[
                                   // Username field
                                   TextField(
                                     controller:      _usernameCtrl,
@@ -480,6 +513,7 @@ class _SetupScreenState extends State<SetupScreen>
                                     ),
                                   ),
                                   const SizedBox(height: 14),
+                                  ],
 
                                   // Custom display name — optional, editable
                                   // later in Settings > Account.
@@ -498,12 +532,6 @@ class _SetupScreenState extends State<SetupScreen>
                                   ),
                                   const SizedBox(height: 14),
 
-                                  // Built-in key toggle (hidden once a key was typed/imported)
-                                  if (_apikeyCtrl.text.trim().isEmpty || _useInternalKey)
-                                    InternalKeyToggle(
-                                      value:     _useInternalKey,
-                                      onChanged: (v) => setState(() => _useInternalKey = v),
-                                    ),
                                   if (!_useInternalKey) ...[
                                   // API key field
                                   TextField(
@@ -630,7 +658,7 @@ class _SetupScreenState extends State<SetupScreen>
 
                                   // Launch button
                                   FilledButton.icon(
-                                    onPressed: _isLoading ? null : _launch,
+                                    onPressed: _isLoading ? null : (_method == 2 ? _lastfmWeb : _launch),
                                     icon: _isLoading
                                         ? SizedBox(
                                             width: 18, height: 18,
@@ -638,7 +666,7 @@ class _SetupScreenState extends State<SetupScreen>
                                         : const Icon(Icons.bar_chart_rounded),
                                     label: Text(_isLoading
                                         ? L.setupConnecting
-                                        : L.setupStartAnalysis),
+                                        : (_method == 2 ? tx('conn_lfm_web') : L.setupStartAnalysis)),
                                     style: FilledButton.styleFrom(
                                       padding: const EdgeInsets.symmetric(vertical: 15),
                                       shape: RoundedRectangleBorder(
@@ -647,25 +675,6 @@ class _SetupScreenState extends State<SetupScreen>
                                   ),
 
                                   // Error block — with AnimatedSize
-                                  // Second method: Last.fm website login
-                                  if (_canWebLogin) ...[
-                                    const SizedBox(height: 10),
-                                    OutlinedButton.icon(
-                                      onPressed: _isLoading ? null : _lastfmWeb,
-                                      icon: const Icon(Icons.login_rounded),
-                                      label: Text(tx('conn_lfm_web')),
-                                      style: OutlinedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(vertical: 15),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(14)),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(tx('lfm_web_sub'),
-                                        textAlign: TextAlign.center,
-                                        style: text.bodySmall?.copyWith(
-                                            color: scheme.onSurfaceVariant)),
-                                  ],
 
                                   if (_errorMessage != null) ...[
                                     const SizedBox(height: 16),
@@ -1425,6 +1434,66 @@ class _StepRow extends StatelessWidget {
             ),
           ),
         ]),
+      ),
+    );
+  }
+}
+
+// One choice of the connection method list.
+class _MethodCard extends StatelessWidget {
+  final bool selected;
+  final IconData icon;
+  final String title, subtitle;
+  final VoidCallback onTap;
+  const _MethodCard({
+    required this.selected,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    return Material(
+      color: selected ? scheme.primaryContainer : scheme.surface,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: selected ? scheme.primary : scheme.outlineVariant,
+              width: selected ? 2 : 1,
+            ),
+          ),
+          child: Row(children: [
+            Icon(icon,
+                color: selected ? scheme.onPrimaryContainer : scheme.primary),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(title,
+                    style: text.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: selected ? scheme.onPrimaryContainer : null)),
+                const SizedBox(height: 2),
+                Text(subtitle,
+                    style: text.bodySmall?.copyWith(
+                        color: selected
+                            ? scheme.onPrimaryContainer
+                            : scheme.onSurfaceVariant)),
+              ]),
+            ),
+            Icon(selected ? Icons.check_circle_rounded : Icons.circle_outlined,
+                color: selected ? scheme.primary : scheme.outline),
+          ]),
+        ),
       ),
     );
   }

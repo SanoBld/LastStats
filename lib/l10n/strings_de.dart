@@ -1284,4 +1284,11 @@ const Map<String, String> kTxDe = {
   'lfm_web_sub': 'Kein API-Schlüssel nötig: Der in der App integrierte Schlüssel wird verwendet.',
   'lfm_manual_hint': 'Der Benutzername wurde nicht automatisch gefunden. Geben Sie ihn nach der Anmeldung unten ein.',
   'lfm_manual_label': 'Benutzername',
+  'rec': 'empfohlen',
+  'not_rec': 'nicht empfohlen',
+  'sm_title': 'Verbindungsmethode',
+  'sm_key_t': 'Mein API-Schlüssel',
+  'sm_key_s': 'Eigenes Kontingent, Favoriten möglich.',
+  'sm_builtin_t': 'Integrierter Schlüssel',
+  'sm_builtin_s': 'Nur Benutzername. Kontingent wird mit anderen geteilt.',
 };

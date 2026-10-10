@@ -36,7 +36,9 @@ class InternalKeys {
     final p = prefs ?? await SharedPreferences.getInstance();
     final saved = p.getString(_kPicked) ?? '';
     if (_pool.contains(saved)) return saved;
-    final key = _pool[Random().nextInt(_pool.length)];
+    // Random.secure: every install draws its own key, so the load is
+    // spread evenly over the built-in keys.
+    final key = _pool[Random.secure().nextInt(_pool.length)];
     await p.setString(_kPicked, key);
     return key;
   }

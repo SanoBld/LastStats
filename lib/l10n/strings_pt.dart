@@ -1313,4 +1313,11 @@ const Map<String, String> kTxPt = {
   'lfm_web_sub': 'Sem chave de API: a chave integrada ao aplicativo é usada.',
   'lfm_manual_hint': 'Não foi possível encontrar o nome de usuário automaticamente. Digite-o abaixo depois de entrar.',
   'lfm_manual_label': 'Nome de usuário',
+  'rec': 'recomendado',
+  'not_rec': 'não recomendado',
+  'sm_title': 'Método de conexão',
+  'sm_key_t': 'Minha chave de API',
+  'sm_key_s': 'Cota só sua, favoritos possíveis.',
+  'sm_builtin_t': 'Chave integrada',
+  'sm_builtin_s': 'Só o nome de usuário. Cota compartilhada com outros usuários.',
 };

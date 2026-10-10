@@ -1313,4 +1313,11 @@ const Map<String, String> kTxEs = {
   'lfm_web_sub': 'Sin clave API: se usa la clave integrada en la aplicación.',
   'lfm_manual_hint': 'No se encontró el nombre de usuario automáticamente. Introdúzcalo abajo una vez iniciada la sesión.',
   'lfm_manual_label': 'Nombre de usuario',
+  'rec': 'recomendado',
+  'not_rec': 'no recomendado',
+  'sm_title': 'Método de conexión',
+  'sm_key_t': 'Mi clave API',
+  'sm_key_s': 'Cuota propia, favoritos posibles.',
+  'sm_builtin_t': 'Clave integrada',
+  'sm_builtin_s': 'Solo nombre de usuario. Cuota compartida con otros usuarios.',
 };

@@ -1283,4 +1283,11 @@ const Map<String, String> kTxJa = {
   'lfm_web_sub': 'APIキーは不要です：アプリ内蔵のキーを使用します。',
   'lfm_manual_hint': 'ユーザー名を自動で取得できませんでした。ログイン後に下に入力してください。',
   'lfm_manual_label': 'ユーザー名',
+  'rec': '推奨',
+  'not_rec': '非推奨',
+  'sm_title': '接続方法',
+  'sm_key_t': '自分のAPIキー',
+  'sm_key_s': '専用の利用枠、お気に入りも利用可。',
+  'sm_builtin_t': '内蔵キー',
+  'sm_builtin_s': 'ユーザー名のみ。利用枠は他のユーザーと共有。',
 };

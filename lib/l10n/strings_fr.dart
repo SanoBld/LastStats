@@ -1313,4 +1313,11 @@ const Map<String, String> kTxFr = {
   'lfm_web_sub': 'Sans clé API : la clé intégrée à l\'application est utilisée.',
   'lfm_manual_hint': 'Nom d\'utilisateur introuvable automatiquement. Saisissez-le ci-dessous une fois connecté.',
   'lfm_manual_label': 'Nom d\'utilisateur',
+  'rec': 'recommandé',
+  'not_rec': 'non recommandé',
+  'sm_title': 'Méthode de connexion',
+  'sm_key_t': 'Ma clé API',
+  'sm_key_s': 'Quota à vous seul, favoris possibles.',
+  'sm_builtin_t': 'Clé intégrée',
+  'sm_builtin_s': 'Nom d\'utilisateur seulement. Quota partagé avec les autres utilisateurs.',
 };
