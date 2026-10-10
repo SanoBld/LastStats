@@ -1280,4 +1280,7 @@ const Map<String, String> kTxJa = {
   'dg_nofound': '動画なし',
   'dg_notpl': '検索テンプレートがありません（しばらくしてから再試行してください）',
   'dg_results': '件の結果',
+  'lfm_web_sub': 'APIキーは不要です：アプリ内蔵のキーを使用します。',
+  'lfm_manual_hint': 'ユーザー名を自動で取得できませんでした。ログイン後に下に入力してください。',
+  'lfm_manual_label': 'ユーザー名',
 };

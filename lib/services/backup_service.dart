@@ -48,6 +48,14 @@ const _kBackupExcludeKeys = {
   'ls_scrobble_sync_task',
   'ls_widget_refresh_task',
   'ls_fav_stat_migrated',
+  // Spotify login cookie, tokens and copied web-player requests are
+  // secrets or short-lived: never put them in a backup file.
+  'ls_spotify_sp_dc',
+  'ls_spotify_token',
+  'ls_spotify_client_token',
+  'ls_spotify_token_exp',
+  'ls_spotify_search_tpl',
+  'ls_spotify_canvas_hash',
 };
 
 /// Keys backing the folders feature (favorites_folders_service.dart).

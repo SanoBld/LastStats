@@ -1310,4 +1310,7 @@ const Map<String, String> kTxEs = {
   'dg_nofound': 'sin vídeo',
   'dg_notpl': 'falta el modelo de búsqueda (inténtelo de nuevo en un momento)',
   'dg_results': 'resultados',
+  'lfm_web_sub': 'Sin clave API: se usa la clave integrada en la aplicación.',
+  'lfm_manual_hint': 'No se encontró el nombre de usuario automáticamente. Introdúzcalo abajo una vez iniciada la sesión.',
+  'lfm_manual_label': 'Nombre de usuario',
 };

@@ -14,6 +14,8 @@ import '../services/prefetch_service.dart';
 import '../services/all_scrobbles_service.dart';
 import '../widgets/m3_components.dart';
 import '../services/backup_service.dart';
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
+import 'settings/lastfm_login_page.dart';
 import '../services/favorites_auth.dart';
 import '../services/internal_keys.dart';
 import '../widgets/internal_key_toggle.dart';
@@ -229,6 +231,24 @@ class _SetupScreenState extends State<SetupScreen>
         _enableFavorites   = true;
       }
     });
+  }
+
+  // Phones only: the Last.fm website login runs in a WebView.
+  bool get _canWebLogin =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS);
+
+  // Log in on the Last.fm website, then connect with the built-in key.
+  Future<void> _lastfmWeb() async {
+    final name = await LastfmLoginPage.open(context);
+    if (name == null || !mounted) return;
+    setState(() {
+      _usernameCtrl.text = name;
+      _useInternalKey = true;
+      _errorMessage = null;
+    });
+    await _launch();
   }
 
   // Validate + connect
@@ -627,6 +647,26 @@ class _SetupScreenState extends State<SetupScreen>
                                   ),
 
                                   // Error block — with AnimatedSize
+                                  // Second method: Last.fm website login
+                                  if (_canWebLogin) ...[
+                                    const SizedBox(height: 10),
+                                    OutlinedButton.icon(
+                                      onPressed: _isLoading ? null : _lastfmWeb,
+                                      icon: const Icon(Icons.login_rounded),
+                                      label: Text(tx('conn_lfm_web')),
+                                      style: OutlinedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(vertical: 15),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(14)),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(tx('lfm_web_sub'),
+                                        textAlign: TextAlign.center,
+                                        style: text.bodySmall?.copyWith(
+                                            color: scheme.onSurfaceVariant)),
+                                  ],
+
                                   if (_errorMessage != null) ...[
                                     const SizedBox(height: 16),
                                     AnimatedSize(

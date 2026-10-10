@@ -21,21 +21,40 @@ class _LastfmLoginPageState extends State<LastfmLoginPage> {
   bool _done = false;
   double _progress = 0;
 
-  // Reads the name from the "/user/NAME" link of the page header.
+  // Reads the name from a "/user/NAME" link of the page header. Tries
+  // several places, because the page markup is not documented.
   static const _js = r'''
 (function () {
-  var a = document.querySelector('a.auth-link[href^="/user/"]');
-  if (!a) {
-    var l = document.querySelectorAll('a[href^="/user/"]');
-    for (var i = 0; i < l.length; i++) {
-      if (/auth|header|nav/i.test(l[i].className)) { a = l[i]; break; }
-    }
+  var sels = ['a.auth-link[href^="/user/"]', 'header a[href^="/user/"]',
+              'nav a[href^="/user/"]', '[class*="auth"] a[href^="/user/"]'];
+  var a = null;
+  for (var i = 0; i < sels.length && !a; i++) a = document.querySelector(sels[i]);
+  if (a) {
+    var m = a.getAttribute('href').match(/^\/user\/([^\/?#]+)/);
+    if (m) return m[1];
   }
-  if (!a) return '';
-  var m = a.getAttribute('href').match(/^\/user\/([^\/?#]+)/);
-  return m ? m[1] : '';
+  var d = document.querySelector('[data-user-name],[data-username]');
+  if (d) return d.getAttribute('data-user-name') || d.getAttribute('data-username') || '';
+  return '';
 })()
 ''';
+
+  // Shown when the name could not be read: the user types it.
+  bool _manual = false;
+  final _ctrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  void _submitManual() {
+    final n = _ctrl.text.trim().replaceFirst('@', '');
+    if (n.isEmpty || _done) return;
+    _done = true;
+    Navigator.of(context).pop(n);
+  }
 
   Future<void> _check(InAppWebViewController c, WebUri? url) async {
     if (_done) return;
@@ -45,6 +64,8 @@ class _LastfmLoginPageState extends State<LastfmLoginPage> {
     if (r is String && r.isNotEmpty && mounted) {
       _done = true;
       Navigator.of(context).pop(Uri.decodeComponent(r));
+    } else if (mounted && !_manual) {
+      setState(() => _manual = true);
     }
   }
 
@@ -73,6 +94,29 @@ class _LastfmLoginPageState extends State<LastfmLoginPage> {
             },
           ),
         ),
+        if (_manual)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(tx('lfm_manual_hint'),
+                  style: Theme.of(context).textTheme.bodySmall),
+              const SizedBox(height: 8),
+              Row(children: [
+                Expanded(
+                  child: TextField(
+                    controller: _ctrl,
+                    onSubmitted: (_) => _submitManual(),
+                    decoration: InputDecoration(
+                        labelText: tx('lfm_manual_label'),
+                        border: const OutlineInputBorder()),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                FilledButton(
+                    onPressed: _submitManual, child: Text(tx('conn_connect'))),
+              ]),
+            ]),
+          ),
       ]),
     );
   }

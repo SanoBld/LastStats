@@ -1307,4 +1307,7 @@ const Map<String, String> kTxZh = {
   'dg_nofound': '没有视频',
   'dg_notpl': '缺少搜索模板（请稍后重试）',
   'dg_results': '个结果',
+  'lfm_web_sub': '无需 API 密钥：将使用应用内置密钥。',
+  'lfm_manual_hint': '未能自动识别用户名。登录后请在下方输入。',
+  'lfm_manual_label': '用户名',
 };

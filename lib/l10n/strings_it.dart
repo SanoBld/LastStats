@@ -1281,4 +1281,7 @@ const Map<String, String> kTxIt = {
   'dg_nofound': 'nessun video',
   'dg_notpl': 'modello di ricerca assente (riprovi tra un momento)',
   'dg_results': 'risultati',
+  'lfm_web_sub': 'Nessuna chiave API: viene usata la chiave integrata nell\'app.',
+  'lfm_manual_hint': 'Nome utente non trovato automaticamente. Lo inserisca qui sotto dopo l\'accesso.',
+  'lfm_manual_label': 'Nome utente',
 };

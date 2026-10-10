@@ -1310,4 +1310,7 @@ const Map<String, String> kTxEn = {
   'dg_nofound': 'no video',
   'dg_notpl': 'search template missing (try again in a moment)',
   'dg_results': 'results',
+  'lfm_web_sub': 'No API key needed: the key built into the app is used.',
+  'lfm_manual_hint': 'Username not found automatically. Enter it below once you are signed in.',
+  'lfm_manual_label': 'Username',
 };

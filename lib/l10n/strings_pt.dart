@@ -1310,4 +1310,7 @@ const Map<String, String> kTxPt = {
   'dg_nofound': 'sem vídeo',
   'dg_notpl': 'modelo de busca ausente (tente de novo em instantes)',
   'dg_results': 'resultados',
+  'lfm_web_sub': 'Sem chave de API: a chave integrada ao aplicativo é usada.',
+  'lfm_manual_hint': 'Não foi possível encontrar o nome de usuário automaticamente. Digite-o abaixo depois de entrar.',
+  'lfm_manual_label': 'Nome de usuário',
 };

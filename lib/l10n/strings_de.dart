@@ -1281,4 +1281,7 @@ const Map<String, String> kTxDe = {
   'dg_nofound': 'kein Video',
   'dg_notpl': 'Suchvorlage fehlt (bitte gleich erneut versuchen)',
   'dg_results': 'Ergebnisse',
+  'lfm_web_sub': 'Kein API-Schlüssel nötig: Der in der App integrierte Schlüssel wird verwendet.',
+  'lfm_manual_hint': 'Der Benutzername wurde nicht automatisch gefunden. Geben Sie ihn nach der Anmeldung unten ein.',
+  'lfm_manual_label': 'Benutzername',
 };

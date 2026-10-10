@@ -1310,4 +1310,7 @@ const Map<String, String> kTxFr = {
   'dg_nofound': 'aucune vidéo',
   'dg_notpl': 'modèle de recherche absent (réessayez dans un instant)',
   'dg_results': 'résultats',
+  'lfm_web_sub': 'Sans clé API : la clé intégrée à l\'application est utilisée.',
+  'lfm_manual_hint': 'Nom d\'utilisateur introuvable automatiquement. Saisissez-le ci-dessous une fois connecté.',
+  'lfm_manual_label': 'Nom d\'utilisateur',
 };
