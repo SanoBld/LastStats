@@ -1,6 +1,78 @@
 {
-  "updated": "2026-10-10T12:03:03Z",
+  "updated": "2026-10-10T21:16:18Z",
   "commits": [
+    {
+      "sha": "d6ca87fc272ba5703412e0d146955df9910cfac1",
+      "message": "feat: ajout d'une pochette animée sur le dashboard avec options de configuration",
+      "date": "2026-10-10T21:02:27Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/d6ca87fc272ba5703412e0d146955df9910cfac1",
+      "tags": []
+    },
+    {
+      "sha": "e846ce4cc217bf90e854e054000cc0d755d7b2c2",
+      "message": "feat: amélioration des indicateurs de chargement avec de nouvelles animations et styles pour les pages de connexion et de synchronisation",
+      "date": "2026-10-10T20:44:26Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/e846ce4cc217bf90e854e054000cc0d755d7b2c2",
+      "tags": []
+    },
+    {
+      "sha": "e997de2a5a1a48bc24e34e500944391cb0b57d9e",
+      "message": "feat: ajout de la synchronisation en arrière-plan et de nouvelles options de personnalisation pour l'onboarding",
+      "date": "2026-10-10T20:11:08Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/e997de2a5a1a48bc24e34e500944391cb0b57d9e",
+      "tags": []
+    },
+    {
+      "sha": "00c5329fb168e72baa474b136e80cc3766de1e0e",
+      "message": "feat: mise à jour de la version à 4.1.0 et ajout de la synchronisation en arrière-plan pour le flux d'intégration",
+      "date": "2026-10-10T19:53:00Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/00c5329fb168e72baa474b136e80cc3766de1e0e",
+      "tags": []
+    },
+    {
+      "sha": "6d5990a575e0a62b3d6992a72131826c0785c760",
+      "message": "feat: ajout de chaînes de bienvenue pour l'interface de connexion dans plusieurs langues",
+      "date": "2026-10-10T19:32:03Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/6d5990a575e0a62b3d6992a72131826c0785c760",
+      "tags": []
+    },
+    {
+      "sha": "dda82e85736996ef876dd43607d024ed80b22a9f",
+      "message": "feat: ajout de nouvelles chaînes de localisation et amélioration de l'interface de connexion",
+      "date": "2026-10-10T19:18:07Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/dda82e85736996ef876dd43607d024ed80b22a9f",
+      "tags": []
+    },
+    {
+      "sha": "5e1fbb30cdb16c960fdaa82fcd90c717c1c137df",
+      "message": "feat: ajout de la prise en charge de la connexion Last.fm avec interface utilisateur pour la saisie manuelle du nom d'utilisateur et mise à jour des chaînes de localisation",
+      "date": "2026-10-10T18:55:56Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/5e1fbb30cdb16c960fdaa82fcd90c717c1c137df",
+      "tags": []
+    },
+    {
+      "sha": "a6409e4de61c2e459c592f2c5d3b90c14bf8ddb5",
+      "message": "Add Last.fm login functionality and improve localization strings\n\n- Implemented Last.fm login page using InAppWebView to allow users to log in directly within the app.\n- Enhanced localization strings for English, Spanish, French, Italian, Japanese, Portuguese, Russian, and Chinese to improve clarity and consistency.\n- Updated SpotifyCanvasService to utilize a search template for better track searching without hitting API rate limits.\n- Added new keys for diagnostic messages related to login cookies, web tokens, and search results.\n- Improved user feedback in the connections page with snack bars for successful account additions.",
+      "date": "2026-10-10T18:34:42Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/a6409e4de61c2e459c592f2c5d3b90c14bf8ddb5",
+      "tags": []
+    },
     {
       "sha": "1610130e3b3e9ba289e5a04d481e5f94863bf7b0",
       "message": "feat: amélioration des appels API pour gérer les erreurs 429 et 401 dans SpotifyCanvasService",
@@ -2641,80 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/67fb26f6cd2cd6f24c6fdda099dda9dbe8852866",
-      "tags": []
-    },
-    {
-      "sha": "f350b0d436802026c535e1e973dc872bf5a76f35",
-      "message": "fix: corriger l'URL de téléchargement pour les mises à jour",
-      "date": "2026-07-19T16:24:39Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/f350b0d436802026c535e1e973dc872bf5a76f35",
-      "tags": []
-    },
-    {
-      "sha": "84f4ecaed41257c627ab4f0a5f6e4fc1e1b1e1f6",
-      "message": "feat: Add Discord link and share functionality; update localization strings\n\n- Added new localization strings for sharing, custom date, and Discord.\n- Implemented a new About page section for joining Discord.\n- Updated the news page to allow sharing news items as images.\n- Refactored the news sheet to a dedicated news page with improved filtering options.\n- Enhanced update service to handle different download types and platforms.\n- Updated version number in pubspec.yaml.\n- Added Discord SVG icon asset.",
-      "date": "2026-07-19T16:17:02Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/84f4ecaed41257c627ab4f0a5f6e4fc1e1b1e1f6",
-      "tags": []
-    },
-    {
-      "sha": "b72db86aea1ede1e93845f6198dd488ee8cd5c71",
-      "message": "chore: bump version to 2.9.9-beta [skip ci]",
-      "date": "2026-07-18T10:02:25Z",
-      "author": "github-actions[bot]",
-      "avatar": "https://avatars.githubusercontent.com/in/15368?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/b72db86aea1ede1e93845f6198dd488ee8cd5c71",
-      "tags": []
-    },
-    {
-      "sha": "ffab98377fecdbac580ec2fae5ab72a05b0a0c7e",
-      "message": "fix",
-      "date": "2026-07-18T10:01:58Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/ffab98377fecdbac580ec2fae5ab72a05b0a0c7e",
-      "tags": []
-    },
-    {
-      "sha": "85243c23594f3d83884e548c245a38fd7603aba5",
-      "message": "fix: corriger la commande de checkout pour garantir un fast-forward propre",
-      "date": "2026-07-18T09:58:14Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/85243c23594f3d83884e548c245a38fd7603aba5",
-      "tags": []
-    },
-    {
-      "sha": "005005adf93eb7e0a993ca5b0c13c7171d9a1b43",
-      "message": "update",
-      "date": "2026-07-18T09:55:16Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/005005adf93eb7e0a993ca5b0c13c7171d9a1b43",
-      "tags": [
-        "v2.9.9-beta"
-      ]
-    },
-    {
-      "sha": "8c2a67e49191ceaec4d56c432f16c5e6d368063e",
-      "message": "feat: ajouter des questions fréquentes et des réponses sur le stockage des données et l'activation des favoris",
-      "date": "2026-07-18T07:22:18Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/8c2a67e49191ceaec4d56c432f16c5e6d368063e",
-      "tags": []
-    },
-    {
-      "sha": "2d792c15ee92f7f1005fc2b4a1efae50469b1209",
-      "message": "feat: ajouter des questions fréquentes et des raccourcis clavier dans l'application",
-      "date": "2026-07-17T21:07:10Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/2d792c15ee92f7f1005fc2b4a1efae50469b1209",
       "tags": []
     }
   ]
