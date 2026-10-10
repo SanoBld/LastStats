@@ -3651,8 +3651,9 @@ class _SyncProgressChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
+    final showBar = progress.mode == SyncMode.full || progress.total >= 200;
     return Container(
-      constraints: const BoxConstraints(minWidth: 84, maxWidth: 150),
+      constraints: BoxConstraints(minWidth: 52, maxWidth: showBar ? 150 : 110),
       padding: const EdgeInsets.fromLTRB(12, 6, 12, 8),
       decoration: BoxDecoration(
         color:        scheme.primaryContainer.withValues(alpha: 0.95),
@@ -3668,14 +3669,18 @@ class _SyncProgressChip extends StatelessWidget {
               fontWeight: FontWeight.w800,
               fontSize: 11),
         ),
-        const SizedBox(height: 4),
-        M3WavyProgress(
-          value: progress.fraction,
-          height: 8,
-          stroke: 3,
-          color: scheme.primary,
-          trackColor: scheme.onPrimaryContainer.withValues(alpha: 0.18),
-        ),
+        // The wavy bar is only worth it for a big sync (first load or
+        // 200+ scrobbles); a few new scrobbles just show the count.
+        if (showBar) ...[
+          const SizedBox(height: 4),
+          M3WavyProgress(
+            value: progress.fraction,
+            height: 8,
+            stroke: 3,
+            color: scheme.primary,
+            trackColor: scheme.onPrimaryContainer.withValues(alpha: 0.18),
+          ),
+        ],
       ]),
     );
   }

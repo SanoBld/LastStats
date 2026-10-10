@@ -38,8 +38,8 @@
 - Notification switches now ask for the system permission and schedule the tasks, like the Notifications settings
 
 **Loading bars**
-- New wavy progress bar (Material You) used wherever a loading has real progress: history sync chip on the dashboard (now shows loaded/total scrobbles), history card in charts, Sync settings and the Spotify / Last.fm login pages
-- The round loader now morphs between the app's own image shapes (cookie, circle, clover, arch, burst, squircle, leaf, oval), like the Material 3 Expressive loading indicator
+- New wavy progress bar (Material You) used wherever a loading has real progress: history sync chip on the dashboard (now shows loaded/total scrobbles; the wavy bar only appears for big syncs, 200+ scrobbles), Sync settings and the Spotify / Last.fm login pages
+- The round loader now morphs between soft rounded shapes of the app (cookie, circle, squircle, oval), like the Material 3 Expressive loading indicator
 - Dashboard: when "motion covers" is on, the animated cover of the track now playing plays on the now-playing card and in the top header (profile / level area) (new switch in Settings > Dashboard > Header image to turn it on or off)
 
 **Spotify Canvas**
