@@ -16,7 +16,6 @@ import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, Tar
 import 'settings/lastfm_login_page.dart';
 import '../services/favorites_auth.dart';
 import '../services/internal_keys.dart';
-import '../widgets/internal_key_toggle.dart';
 import 'onboarding_flow.dart';
 
 // ══════════════════════════════════════════════════════════════════════════

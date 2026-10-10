@@ -9,7 +9,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../l10n/extra_strings.dart' show tx;
 import '../theme/m3_motion.dart';
-import '../theme/m3_shapes.dart';
+import 'm3_components.dart' show m3ImageShape;
 
 /// Makes everything inside it pulse softly.
 class SkeletonPulse extends StatefulWidget {
@@ -192,37 +192,39 @@ class _M3LoadingIndicatorState extends State<M3LoadingIndicator>
   }
 }
 
-// Shapes the loader cycles through (like the Material 3 Expressive loading
-// indicator): soft burst, 9-sided cookie, pentagon, pill, sunny, 4-sided
-// cookie and oval. Each one is a radius function of the angle.
-const _kLoaderShapes = 7;
+// The loader cycles through the app's own image shapes (cookie, circle,
+// clover, arch, burst, squircle, leaf, oval). Each outline is sampled once
+// into a radius per angle so two shapes can be blended point by point.
+// Only the soft, rounded shapes: circle, squircle, oval.
+const _kLoaderShapeIds = [1, 5, 7];
+const _kLoaderSteps = 140;
+final Map<int, List<double>> _loaderRadiiCache = {};
 
-double _lobes(double th, int n, double a) => 1 + a * math.cos(n * th);
-
-double _shapeR(int i, double th) {
-  switch (i) {
-    case 0: return _lobes(th, 10, 0.13);               // soft burst
-    case 1: return _lobes(th, 9, 0.07);                // cookie 9
-    case 2: {                                          // pentagon (rounded)
-      const k = 5;
-      final seg = math.pi * 2 / k;
-      final a = (th % seg) - seg / 2;
-      final poly = math.cos(math.pi / k) / math.cos(a);
-      return poly * 0.8 + 0.2;
-    }
-    case 3: {                                          // pill
-      final x = math.cos(th).abs(), y = (math.sin(th) / 0.62).abs();
-      return 1 / math.pow(math.pow(x, 4) + math.pow(y, 4), 0.25);
-    }
-    case 4: return _lobes(th, 8, 0.12) + 0.06 * math.cos(16 * th); // sunny
-    case 5: return _lobes(th, 4, 0.11);                // cookie 4
-    default: {                                         // oval
-      final x = math.cos(th), y = math.sin(th) / 0.74;
-      return 1 / math.sqrt(x * x + y * y);
-    }
-  }
-}
-
+List<double> _loaderRadii(int index) =>
+    _loaderRadiiCache.putIfAbsent(index, () {
+      const side = 100.0;
+      final path = m3ImageShape(index, side)
+          .getOuterPath(const Rect.fromLTWH(0, 0, side, side));
+      final c = const Offset(side / 2, side / 2);
+      final bins = List<double>.filled(_kLoaderSteps, 0);
+      for (final metric in path.computeMetrics()) {
+        for (double d = 0; d < metric.length; d += 0.4) {
+          final pos = metric.getTangentForOffset(d)!.position - c;
+          var a = math.atan2(pos.dy, pos.dx);
+          if (a < 0) a += math.pi * 2;
+          final k = (a / (math.pi * 2) * _kLoaderSteps).floor() % _kLoaderSteps;
+          final dist = pos.distance;
+          if (dist > bins[k]) bins[k] = dist;
+        }
+      }
+      for (var k = 0; k < _kLoaderSteps; k++) {
+        if (bins[k] == 0) {
+          bins[k] = bins[(k + _kLoaderSteps - 1) % _kLoaderSteps];
+        }
+      }
+      final mx = bins.reduce(math.max);
+      return [for (final v in bins) v / mx];
+    });
 
 class _LoaderPainter extends CustomPainter {
   _LoaderPainter({
@@ -242,25 +244,21 @@ class _LoaderPainter extends CustomPainter {
     if (container != null) canvas.drawCircle(c, r, Paint()..color = container!);
 
     final t = progress.value;
-    final n = _kLoaderShapes;
+    final n = _kLoaderShapeIds.length;
     final f = t * n;
     final i = f.floor() % n;
     final local = f - f.floor();
     // Hold the shape for a moment, then morph into the next one.
     final m = local < 0.35 ? 0.0 : Curves.easeInOutCubic.transform((local - 0.35) / 0.65);
     final rad = r * (container == null ? 0.95 : 0.58);
-    const steps = 140;
-    double maxR = 0;
-    final rs = List<double>.generate(steps, (k) {
-      final th = k / steps * math.pi * 2;
-      final v = _shapeR(i, th) * (1 - m) + _shapeR((i + 1) % n, th) * m;
-      if (v > maxR) maxR = v;
-      return v;
-    });
+    final ra = _loaderRadii(_kLoaderShapeIds[i]),
+        rb = _loaderRadii(_kLoaderShapeIds[(i + 1) % n]);
+    const steps = _kLoaderSteps;
+    final rs = List<double>.generate(steps, (k) => ra[k] * (1 - m) + rb[k] * m);
     final path = Path();
     for (var k = 0; k < steps; k++) {
       final th = k / steps * math.pi * 2;
-      final p = Offset(math.cos(th), math.sin(th)) * (rad * rs[k] / maxR);
+      final p = Offset(math.cos(th), math.sin(th)) * (rad * rs[k]);
       k == 0 ? path.moveTo(p.dx, p.dy) : path.lineTo(p.dx, p.dy);
     }
     path.close();
