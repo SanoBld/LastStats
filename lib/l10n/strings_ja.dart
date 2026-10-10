@@ -919,6 +919,8 @@ const Map<String, String> kTxJa = {
   'load_ready': 'インポート準備完了',
   'load_connecting': 'Last.fm に接続中…',
   'load_done': 'インポート完了',
+  'dash_motion_t': 'ダッシュボードのアニメーションカバー',
+  'dash_motion_s': '再生中の曲の動画を再生カードとヘッダーで再生します。動画カバーが必要です。',
   'onb_cov_t': 'カバーと画像',
   'onb_cov_s': '画像の形とカバーの動作を選択してください。',
   'onb_sync_t': '同期とバッテリー',

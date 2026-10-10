@@ -5,6 +5,7 @@ import '../../widgets/m3_components.dart';
 import '../../theme/m3_shapes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/l10n.dart';
+import '../../l10n/extra_strings.dart';
 import '../../app_state.dart';
 import 'settings_helpers.dart';
 import 'settings_rows.dart';
@@ -302,6 +303,19 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
                 : L.dashMusicAnimationSub,
             value: _headerMusicAnim,
             onChanged: (v) => _setBool('ls_header_music_anim', v, () => _headerMusicAnim = v),
+          ),
+          ValueListenableBuilder<bool>(
+            valueListenable: dashMotionNotifier,
+            builder: (_, on, _) => SettingSwitchRow(
+              icon: Icons.movie_filter_rounded,
+              title: tx('dash_motion_t'),
+              subtitle: tx('dash_motion_s'),
+              value: on,
+              onChanged: (v) async {
+                dashMotionNotifier.value = v;
+                await _set('ls_dash_motion', v);
+              },
+            ),
           ),
         ]),
 

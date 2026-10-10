@@ -645,6 +645,7 @@ class BackupService {
     navLabelNotifier.value              = p.getBool('ls_nav_labels')           ?? true;
     livingArtworkNotifier.value         = p.getBool('ls_living_artwork')       ?? true;
     motionArtworkNotifier.value         = p.getBool('ls_motion_artwork')       ?? true;
+    dashMotionNotifier.value            = p.getBool('ls_dash_motion')          ?? true;
     imageShapeNotifier.value            = p.getString('ls_image_shape')        ?? 'mix';
     achievementsEnabledNotifier.value   = p.getBool('ls_achievements_enabled') ?? true;
     ecoModeManualNotifier.value         = p.getBool('ls_eco_mode_manual')      ?? false;

@@ -97,6 +97,10 @@ final livingArtworkNotifier = ValueNotifier<bool>(true);
 // Saved as 'ls_motion_artwork' in SharedPreferences.
 final motionArtworkNotifier = ValueNotifier<bool>(true);
 
+// Show the animated (video) cover of the playing track on the dashboard.
+// Saved as 'ls_dash_motion'. Needs [motionArtworkNotifier] to be on too.
+final dashMotionNotifier = ValueNotifier<bool>(true);
+
 // Library clean-up options (see services/library_merge.dart). Both off by default.
 // Link versions of the same track/album/artist into one entry: 'ls_merge_versions'.
 final mergeVersionsNotifier = ValueNotifier<bool>(false);

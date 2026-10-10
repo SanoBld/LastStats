@@ -949,6 +949,8 @@ const Map<String, String> kTxEn = {
   'load_ready': 'Ready to import',
   'load_connecting': 'Connecting to Last.fm…',
   'load_done': 'Import complete',
+  'dash_motion_t': 'Animated cover on the dashboard',
+  'dash_motion_s': 'Plays the video of the current track on the now-playing card and in the header. Requires video covers.',
   'onb_cov_t': 'Covers and images',
   'onb_cov_s': 'Choose the shape of images and how covers behave.',
   'onb_sync_t': 'Sync and battery',

@@ -53,6 +53,36 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   List<dynamic> _topTracks     = [];
   List<dynamic> _recentTracks  = [];
   Map<String, dynamic>? _nowPlaying;
+
+  // Animated cover (Apple Music / Spotify / YouTube video) of the playing track.
+  String? _npMotionUrl;
+  String  _npMotionKey = '';
+
+  Future<void> _loadNpMotion() async {
+    final np = _nowPlaying;
+    final wanted = np != null &&
+        motionArtworkNotifier.value &&
+        dashMotionNotifier.value &&
+        !ecoModeActiveNotifier.value &&
+        MotionArtworkService.supported;
+    if (!wanted) {
+      _npMotionKey = '';
+      if (mounted && _npMotionUrl != null) setState(() => _npMotionUrl = null);
+      return;
+    }
+    final artist = (np['artist']?['#text'] ?? '').toString();
+    final album  = (np['album']?['#text']  ?? '').toString();
+    final title  = (np['name'] ?? '').toString();
+    final key = '$artist|$album|$title';
+    if (artist.isEmpty || key == _npMotionKey) return;
+    _npMotionKey = key;
+    if (_npMotionUrl != null && mounted) setState(() => _npMotionUrl = null);
+    final url = await MotionArtworkService.find(
+        artist: artist, album: album, track: title);
+    if (!mounted || _npMotionKey != key) return;
+    setState(() => _npMotionUrl = url);
+  }
+
   List<dynamic> _topArtistsWeek  = [];
   List<dynamic> _topAlbumsWeek   = [];
   List<dynamic> _topTracksWeek   = [];
@@ -711,6 +741,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
       if (changed) {
         setState(() => _nowPlaying = np);
         _resolveHeaderImage();
+        _loadNpMotion();
       }
     } catch (_) {}
     if (_showFriends && mounted) _loadFriends(silent: true);
@@ -1736,6 +1767,20 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                           : _GradientHeader(key: const ValueKey('gradient'), scheme: scheme),
                 ),
 
+                // Animated cover of the track now playing (if enabled).
+                ValueListenableBuilder<bool>(
+                  valueListenable: dashMotionNotifier,
+                  builder: (_, on, _) => (on && motionArtworkNotifier.value && _nowPlaying != null && _npMotionUrl != null)
+                      ? Positioned.fill(
+                          child: MotionArtworkVideo(
+                            key: ValueKey('hdr_$_npMotionUrl'),
+                            url: _npMotionUrl!,
+                            onFailed: () { if (mounted) setState(() => _npMotionUrl = null); },
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
+
                 Positioned(
                   left: 0, right: 0, bottom: 0,
                   child: Container(
@@ -2003,7 +2048,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                           '${_nowPlaying!['name']}_${_nowPlaying!['artist']?['#text']}',
                         ),
                         children: [
-                          _NowPlayingCard(track: _nowPlaying!, service: widget.service),
+                          _NowPlayingCard(track: _nowPlaying!, service: widget.service, motionUrl: _npMotionUrl),
                           const SizedBox(height: 12),
                         ],
                       )
@@ -3010,7 +3055,8 @@ class _DashStatCard extends StatelessWidget {
 class _NowPlayingCard extends StatelessWidget {
   final Map<String, dynamic> track;
   final LastFmService        service;
-  const _NowPlayingCard({required this.track, required this.service});
+  final String?              motionUrl;
+  const _NowPlayingCard({required this.track, required this.service, this.motionUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -3048,13 +3094,25 @@ class _NowPlayingCard extends StatelessWidget {
           // Static rounded square: no spin, no circle / cookie shape.
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child: _SmartImage(
-              size: 88,
-              borderRadius: 20,
-              shaped: false,
-              initialUrl: rawUrl,
-              resolver: () => ImageService.resolveTrack(title, artist,
-                  lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null),
+            child: SizedBox(
+              width: 88, height: 88,
+              child: Stack(fit: StackFit.expand, children: [
+                _SmartImage(
+                  size: 88,
+                  borderRadius: 20,
+                  shaped: false,
+                  initialUrl: rawUrl,
+                  resolver: () => ImageService.resolveTrack(title, artist,
+                      lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null),
+                ),
+                ValueListenableBuilder<bool>(
+                  valueListenable: dashMotionNotifier,
+                  builder: (_, on, _) => (on && motionArtworkNotifier.value && motionUrl != null)
+                      ? MotionArtworkVideo(
+                          key: ValueKey('np_$motionUrl'), url: motionUrl!)
+                      : const SizedBox.shrink(),
+                ),
+              ]),
             ),
           ),
 

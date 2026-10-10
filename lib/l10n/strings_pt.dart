@@ -949,6 +949,8 @@ const Map<String, String> kTxPt = {
   'load_ready': 'Pronto para importar',
   'load_connecting': 'Conectando ao Last.fm…',
   'load_done': 'Importação concluída',
+  'dash_motion_t': 'Capa animada no painel',
+  'dash_motion_s': 'Reproduz o vídeo da faixa atual no cartão de reprodução e no cabeçalho. Requer as capas de vídeo.',
   'onb_cov_t': 'Capas e imagens',
   'onb_cov_s': 'Escolha a forma das imagens e o comportamento das capas.',
   'onb_sync_t': 'Sincronização e bateria',
