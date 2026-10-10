@@ -27,7 +27,9 @@ import 'settings_rows.dart';
 
 class AccountPage extends StatefulWidget {
   final String username;
-  const AccountPage({super.key, required this.username});
+  // true = shows only the API keys section (opened from Connections).
+  final bool keysOnly;
+  const AccountPage({super.key, required this.username, this.keysOnly = false});
 
   @override
   State<AccountPage> createState() => _AccountPageState();
@@ -335,6 +337,157 @@ class _AccountPageState extends State<AccountPage> {
 
   // ── Build ─────────────────────────────────────────────────────────────────
 
+  // API keys + favorites connection (shown on the Connections page).
+  Widget _apiKeysSection(AccountEntry active, ColorScheme scheme, TextTheme text) {
+    return SettingsSection(
+            label: L.acctApiKeysSection,
+            children: [
+              ListTile(
+                leading: Icon(Icons.key_rounded, color: scheme.primary, size: 20),
+                title: Text(L.acctApiKeyLabel),
+                subtitle: Text(
+                  InternalKeys.isInternal(active.apiKey)
+                      ? tx('key_internal_active')
+                      : (_obscureApiKey ? '•' * 20 : active.apiKey),
+                  style: text.bodySmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      fontFamily: InternalKeys.isInternal(active.apiKey) ? null : 'monospace'),
+                ),
+                onTap: InternalKeys.isInternal(active.apiKey) ? null : () => _copyKey(active.apiKey),
+                trailing: InternalKeys.isInternal(active.apiKey) ? null : Row(mainAxisSize: MainAxisSize.min, children: [
+                  IconButton(
+                    icon: const Icon(Icons.copy_rounded, size: 20),
+                    onPressed: () => _copyKey(active.apiKey),
+                  ),
+                  IconButton(
+                    icon: Icon(_obscureApiKey
+                        ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+                    onPressed: () => setState(() => _obscureApiKey = !_obscureApiKey),
+                  ),
+                ]),
+              ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              ListTile(
+                leading: Icon(Icons.swap_horiz_rounded, color: scheme.primary, size: 20),
+                title: Text(
+                  InternalKeys.isInternal(active.apiKey)
+                      ? tx('key_use_own')
+                      : tx('key_change_title'),
+                  style: text.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600, color: scheme.primary),
+                ),
+                subtitle: Text(
+                  InternalKeys.isInternal(active.apiKey)
+                      ? tx('key_change_sub_internal')
+                      : tx('key_change_sub'),
+                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                ),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: _changeKey,
+              ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              // With the built-in key there is no secret key, so say why.
+              if (InternalKeys.isInternal(active.apiKey))
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+                  child: Text(tx('key_internal_fav_note'),
+                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                ),
+              if (!InternalKeys.isInternal(active.apiKey)) ...[
+                SettingSwitchRow(
+                  icon:     Icons.shield_moon_outlined,
+                  title:    tx('key_fallback_title'),
+                  subtitle: tx('key_fallback_sub'),
+                  value:    _keyFallback,
+                  onChanged: (v) async {
+                    setState(() => _keyFallback = v);
+                    await InternalKeys.setFallback(v);
+                  },
+                ),
+                const Divider(height: 1, indent: 16, endIndent: 16),
+              ],
+              // Favorites need the user's own secret: unavailable with the built-in key.
+              if (!InternalKeys.isInternal(active.apiKey)) ...[
+              ValueListenableBuilder<String>(
+                valueListenable: secretKeyNotifier,
+                builder: (_, secret, _) => SettingTile(
+                  leading: Icon(Icons.favorite_rounded,
+                      color: secret.isNotEmpty ? Colors.redAccent : scheme.onSurfaceVariant,
+                      size: 20),
+                  title: Text(L.acctSecretKeyLabel),
+                  subtitle: Text(
+                    secret.isEmpty
+                        ? L.acctSecretKeyNotSet
+                        : (_obscureSecret ? '•' * 20 : secret),
+                    style: text.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant, fontFamily: 'monospace'),
+                  ),
+                  onTap: secret.isEmpty ? null : () => _copyKey(secret),
+                  trailing: secret.isEmpty
+                      ? null
+                      : Row(mainAxisSize: MainAxisSize.min, children: [
+                          IconButton(
+                            icon: const Icon(Icons.copy_rounded, size: 20),
+                            onPressed: () => _copyKey(secret),
+                          ),
+                          IconButton(
+                            icon: Icon(_obscureSecret
+                                ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+                            onPressed: () => setState(() => _obscureSecret = !_obscureSecret),
+                          ),
+                        ]),
+                ),
+              ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(L.acctFavoritesExplain,
+                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                  const SizedBox(height: 10),
+                  ValueListenableBuilder<String>(
+                    valueListenable: sessionKeyNotifier,
+                    builder: (_, session, _) {
+                      if (session.isNotEmpty) {
+                        return SettingActionGroup(items: [
+                          ActionGroupItem(
+                            danger: true,
+                            icon: Icons.link_off_rounded,
+                            label: L.acctDisconnectFavorites,
+                            onPressed: disconnectFavorites,
+                          ),
+                        ]);
+                      }
+                      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        TextField(
+                          controller:  _secretCtrl,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            labelText:  L.acctSecretKeyLabel,
+                            prefixIcon: const Icon(Icons.vpn_key_rounded),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            isDense: true,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        SettingActionGroup(items: [
+                          ActionGroupItem(
+                            primary: true,
+                            icon: Icons.favorite_border_rounded,
+                            label: L.acctConnectFavorites,
+                            onPressed: _connectingFav ? null : () => _connectFav(active),
+                          ),
+                        ]),
+                      ]);
+                    },
+                  ),
+                ]),
+              ),
+              ],
+            ],
+          );
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -342,7 +495,7 @@ class _AccountPageState extends State<AccountPage> {
 
     if (_loading) {
       return Scaffold(
-        appBar: M3AppBar(title: L.settingsAccount),
+        appBar: M3AppBar(title: widget.keysOnly ? tx('conn_keys') : L.settingsAccount),
         body: const SkeletonList(),
       );
     }
@@ -350,8 +503,10 @@ class _AccountPageState extends State<AccountPage> {
     final active = _accounts.isNotEmpty ? _accounts[_activeIndex] : null;
 
     return Scaffold(
-      appBar: M3AppBar(title: L.settingsAccount),
-      body: ListView(padding: const EdgeInsets.all(20), children: [
+      appBar: M3AppBar(title: widget.keysOnly ? tx('conn_keys') : L.settingsAccount),
+      body: ListView(padding: const EdgeInsets.all(20), children: widget.keysOnly ? [
+        if (active != null) _apiKeysSection(active, scheme, text),
+      ] : [
 
         // ── Active account header ──────────────────────────────────────────
         if (active != null) ...[
@@ -535,156 +690,6 @@ class _AccountPageState extends State<AccountPage> {
         ),
 
         const SizedBox(height: 16),
-
-        // ── API keys (favorites) ────────────────────────────────────────────
-        if (active != null)
-          SettingsSection(
-            label: L.acctApiKeysSection,
-            children: [
-              ListTile(
-                leading: Icon(Icons.key_rounded, color: scheme.primary, size: 20),
-                title: Text(L.acctApiKeyLabel),
-                subtitle: Text(
-                  InternalKeys.isInternal(active.apiKey)
-                      ? tx('key_internal_active')
-                      : (_obscureApiKey ? '•' * 20 : active.apiKey),
-                  style: text.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                      fontFamily: InternalKeys.isInternal(active.apiKey) ? null : 'monospace'),
-                ),
-                onTap: InternalKeys.isInternal(active.apiKey) ? null : () => _copyKey(active.apiKey),
-                trailing: InternalKeys.isInternal(active.apiKey) ? null : Row(mainAxisSize: MainAxisSize.min, children: [
-                  IconButton(
-                    icon: const Icon(Icons.copy_rounded, size: 20),
-                    onPressed: () => _copyKey(active.apiKey),
-                  ),
-                  IconButton(
-                    icon: Icon(_obscureApiKey
-                        ? Icons.visibility_outlined : Icons.visibility_off_outlined),
-                    onPressed: () => setState(() => _obscureApiKey = !_obscureApiKey),
-                  ),
-                ]),
-              ),
-              const Divider(height: 1, indent: 16, endIndent: 16),
-              ListTile(
-                leading: Icon(Icons.swap_horiz_rounded, color: scheme.primary, size: 20),
-                title: Text(
-                  InternalKeys.isInternal(active.apiKey)
-                      ? tx('key_use_own')
-                      : tx('key_change_title'),
-                  style: text.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600, color: scheme.primary),
-                ),
-                subtitle: Text(
-                  InternalKeys.isInternal(active.apiKey)
-                      ? tx('key_change_sub_internal')
-                      : tx('key_change_sub'),
-                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-                ),
-                trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: _changeKey,
-              ),
-              const Divider(height: 1, indent: 16, endIndent: 16),
-              // With the built-in key there is no secret key, so say why.
-              if (InternalKeys.isInternal(active.apiKey))
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
-                  child: Text(tx('key_internal_fav_note'),
-                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                ),
-              if (!InternalKeys.isInternal(active.apiKey)) ...[
-                SettingSwitchRow(
-                  icon:     Icons.shield_moon_outlined,
-                  title:    tx('key_fallback_title'),
-                  subtitle: tx('key_fallback_sub'),
-                  value:    _keyFallback,
-                  onChanged: (v) async {
-                    setState(() => _keyFallback = v);
-                    await InternalKeys.setFallback(v);
-                  },
-                ),
-                const Divider(height: 1, indent: 16, endIndent: 16),
-              ],
-              // Favorites need the user's own secret: unavailable with the built-in key.
-              if (!InternalKeys.isInternal(active.apiKey)) ...[
-              ValueListenableBuilder<String>(
-                valueListenable: secretKeyNotifier,
-                builder: (_, secret, _) => SettingTile(
-                  leading: Icon(Icons.favorite_rounded,
-                      color: secret.isNotEmpty ? Colors.redAccent : scheme.onSurfaceVariant,
-                      size: 20),
-                  title: Text(L.acctSecretKeyLabel),
-                  subtitle: Text(
-                    secret.isEmpty
-                        ? L.acctSecretKeyNotSet
-                        : (_obscureSecret ? '•' * 20 : secret),
-                    style: text.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant, fontFamily: 'monospace'),
-                  ),
-                  onTap: secret.isEmpty ? null : () => _copyKey(secret),
-                  trailing: secret.isEmpty
-                      ? null
-                      : Row(mainAxisSize: MainAxisSize.min, children: [
-                          IconButton(
-                            icon: const Icon(Icons.copy_rounded, size: 20),
-                            onPressed: () => _copyKey(secret),
-                          ),
-                          IconButton(
-                            icon: Icon(_obscureSecret
-                                ? Icons.visibility_outlined : Icons.visibility_off_outlined),
-                            onPressed: () => setState(() => _obscureSecret = !_obscureSecret),
-                          ),
-                        ]),
-                ),
-              ),
-              const Divider(height: 1, indent: 16, endIndent: 16),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(L.acctFavoritesExplain,
-                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                  const SizedBox(height: 10),
-                  ValueListenableBuilder<String>(
-                    valueListenable: sessionKeyNotifier,
-                    builder: (_, session, _) {
-                      if (session.isNotEmpty) {
-                        return SettingActionGroup(items: [
-                          ActionGroupItem(
-                            danger: true,
-                            icon: Icons.link_off_rounded,
-                            label: L.acctDisconnectFavorites,
-                            onPressed: disconnectFavorites,
-                          ),
-                        ]);
-                      }
-                      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        TextField(
-                          controller:  _secretCtrl,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            labelText:  L.acctSecretKeyLabel,
-                            prefixIcon: const Icon(Icons.vpn_key_rounded),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                            isDense: true,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        SettingActionGroup(items: [
-                          ActionGroupItem(
-                            primary: true,
-                            icon: Icons.favorite_border_rounded,
-                            label: L.acctConnectFavorites,
-                            onPressed: _connectingFav ? null : () => _connectFav(active),
-                          ),
-                        ]),
-                      ]);
-                    },
-                  ),
-                ]),
-              ),
-              ],
-            ],
-          ),
 
         const SizedBox(height: 16),
 

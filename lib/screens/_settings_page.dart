@@ -657,6 +657,28 @@ class _SettingsPageState extends State<_SettingsPage> {
                     Icon(Icons.chevron_right_rounded, color: scheme.primary),
                   ])),
               ),
+              const SizedBox(height: 12),
+
+              // Connections page: Last.fm, Spotify, API keys.
+              M3PressCard(
+                color: scheme.secondaryContainer,
+                padding: const EdgeInsets.all(16),
+                onTap: () {
+                  _haptic(_HapticImpact.light);
+                  _push(context, ConnectionsPage(username: widget.username));
+                },
+                child: Row(children: [
+                  Icon(Icons.link_rounded, color: scheme.onSecondaryContainer),
+                  const SizedBox(width: 14),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(tx('conn_btn_t'),
+                        style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+                    Text(tx('conn_btn_s'),
+                        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                  ])),
+                  Icon(Icons.chevron_right_rounded, color: scheme.onSecondaryContainer),
+                ]),
+              ),
               const SizedBox(height: 16),
 
               // Search bar — filters the category grid below by title/subtitle.

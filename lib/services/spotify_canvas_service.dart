@@ -198,7 +198,8 @@ class SpotifyCanvasService {
     return d is Map<String, dynamic> ? d : null;
   }
 
-  static Future<String?> _canvas(_Sess s, String trackUri) async {
+  // Raw "canvas" call: HTTP status + body (used by _canvas and diagnose).
+  static Future<(int, String)> _canvasRaw(_Sess s, String trackUri) async {
     final p = await SharedPreferences.getInstance();
     final hash = p.getString(_kHash) ?? defaultHash;
     final res = await ApiHttp.post(
@@ -221,18 +222,55 @@ class SpotifyCanvasService {
         },
       }),
     ).timeout(_timeout);
-    if (res.statusCode == 401) throw _Expired();
-    if (res.statusCode != 200) {
-      lastError = 'canvas ${res.statusCode}';
+    return (res.statusCode, utf8.decode(res.bodyBytes));
+  }
+
+  static Future<String?> _canvas(_Sess s, String trackUri) async {
+    final (code, body) = await _canvasRaw(s, trackUri);
+    if (code == 401) throw _Expired();
+    if (code != 200) {
+      lastError = 'canvas $code';
       return null;
     }
-    final body = utf8.decode(res.bodyBytes);
     if (body.contains('PersistedQueryNotFound')) {
       lastError = 'canvas hash outdated';
       return null;
     }
     // The answer's shape may change: look for the MP4 link anywhere.
-    return _findMp4(jsonDecode(body));
+    final v = _findMp4(jsonDecode(body));
+    if (v == null) {
+      lastError = 'canvas: no mp4 in answer: ${body.length > 160 ? body.substring(0, 160) : body}';
+    }
+    return v;
+  }
+
+  /// Step-by-step test on a track known to have a Canvas. For the
+  /// "Test Spotify" button: tells which step fails.
+  static Future<String> diagnose() async {
+    final out = <String>[];
+    try {
+      final p = await SharedPreferences.getInstance();
+      final spDc = p.getString(kSpDc) ?? '';
+      out.add('1. login cookie: ${spDc.isEmpty ? 'MISSING' : 'ok'}');
+      if (spDc.isEmpty) return out.join('\n');
+      final s = await _session(force: true);
+      out.add('2. web token: ${s == null ? 'FAILED (${lastError ?? '?'})' : 'ok'}');
+      if (s == null) return out.join('\n');
+      final r = await ApiHttp.get(
+          Uri.https('api.spotify.com', '/v1/search',
+              {'q': 'SZA Kill Bill', 'type': 'track', 'limit': '1'}),
+          headers: {'Authorization': s.bearer}).timeout(_timeout);
+      out.add('3. search: HTTP ${r.statusCode}');
+      final (code, body) = await _canvasRaw(s, 'spotify:track:3OHfY25tqY28d16oZczHc8');
+      final mp4 = code == 200 ? _findMp4(jsonDecode(body)) : null;
+      out.add('4. canvas: HTTP $code, ${mp4 != null ? 'video found' : 'no video'}');
+      if (mp4 == null) {
+        out.add(body.length > 220 ? body.substring(0, 220) : body);
+      }
+    } catch (e) {
+      out.add('error: $e');
+    }
+    return out.join('\n');
   }
 
   static String? _findMp4(dynamic n) {

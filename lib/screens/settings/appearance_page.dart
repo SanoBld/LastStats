@@ -12,7 +12,6 @@ import '../../nothing_theme.dart';
 import '../../l10n/l10n.dart';
 import '../../services/motion_artwork_service.dart';
 import '../../services/spotify_canvas_service.dart';
-import 'spotify_login_page.dart';
 import '../../services/widget_service.dart';
 import '../../services/library_merge.dart';
 import 'settings_helpers.dart';
@@ -1136,21 +1135,6 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
     return false;
   }
 
-  // Spotify row: log in (WebView) or log out.
-  Future<void> _spotifyTap() async {
-    if (_spOn) {
-      await SpotifyCanvasService.disconnect();
-      if (!mounted) return;
-      setState(() => _spOn = false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(tx('sp_off_s'))));
-      return;
-    }
-    final ok = await SpotifyLoginPage.open(context);
-    if (!mounted) return;
-    setState(() => _spOn = ok);
-  }
-
   Future<void> _pickMvSources() async {
     final res = await showModalBottomSheet<PickSortResult>(
       sheetAnimationStyle: kM3SheetAnimation,
@@ -1168,9 +1152,10 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
     );
     if (res == null || res.selected.isEmpty || !mounted) return;
     await _mvSaveOrder(List.of(res.selected));
-    // Spotify chosen but not logged in: open the login right away.
+    // Spotify chosen but not logged in: tell where to log in.
     if (res.selected.contains('spotify') && !_spOn && mounted) {
-      await _spotifyTap();
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(tx('sp_need'))));
     }
   }
 
@@ -1320,14 +1305,6 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
             subtitle: [for (final k in _mvOrder) _mvLabel(k)].join(' → '),
             onTap: _pickMvSources,
           ),
-          // Spotify Canvas needs the user's own Spotify login (phones only).
-          if (MotionArtworkService.supported)
-            SettingActionRow(
-              icon: Icons.graphic_eq_rounded,
-              title: tx('sp_t'),
-              subtitle: tx(_spOn ? 'sp_on' : 'sp_off'),
-              onTap: _spotifyTap,
-            ),
           _mvBlock(context, L.mvQualityT, Icons.high_quality_rounded, [
             for (final (key, label) in [
               ('auto', L.mvQAuto),

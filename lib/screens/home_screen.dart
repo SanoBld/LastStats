@@ -71,6 +71,7 @@ import '../widgets/m3_components.dart';
 
 // ── Settings sub-pages ────────────────────────────────────────────────────────
 import 'settings/appearance_page.dart';
+import 'settings/connections_page.dart';
 import 'settings/notifications_page.dart';
 import 'settings/dashboard_settings_page.dart';
 import 'settings/settings_helpers.dart';

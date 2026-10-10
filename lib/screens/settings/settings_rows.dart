@@ -839,8 +839,10 @@ class SettingExpandable extends StatefulWidget {
   final Widget body;
   final bool boxed;
   final bool initiallyExpanded;
+  final Widget? leadingWidget; // replaces the icon (brand logos)
   const SettingExpandable({
     super.key,
+    this.leadingWidget,
     required this.icon,
     required this.title,
     required this.body,
@@ -862,7 +864,7 @@ class _SettingExpandableState extends State<SettingExpandable> {
 
     final content = Column(mainAxisSize: MainAxisSize.min, children: [
       SettingTile(
-        leading: Icon(widget.icon),
+        leading: widget.leadingWidget ?? Icon(widget.icon),
         title: Text(widget.title),
         trailing: AnimatedRotation(
           turns: _open ? 0.5 : 0,
