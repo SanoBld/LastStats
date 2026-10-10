@@ -3593,48 +3593,36 @@ class _SyncProgressChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final label  = progress.shortLabel;
-    final frac   = progress.fraction;
-
-    return AnimatedOpacity(
-      opacity:  1.0,
-      duration: const Duration(milliseconds: 300),
-      child: Container(
-        height: 26,
-        constraints: const BoxConstraints(minWidth: 52, maxWidth: 96),
-        decoration: BoxDecoration(
-          color:        scheme.surfaceContainerHighest.withValues(alpha: 0.85),
-          borderRadius: BorderRadius.circular(13),
-          border:       Border.all(
-              color: scheme.outlineVariant.withValues(alpha: 0.5), width: 0.8),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(children: [
-          if (frac > 0)
-            Positioned.fill(
-              child: FractionallySizedBox(
-                widthFactor: frac,
-                alignment: Alignment.centerLeft,
-                child: Container(color: scheme.primary.withValues(alpha: 0.15)),
-              ),
-            ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Text(
-                label,
-                style: text.labelSmall?.copyWith(
-                  color:      scheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                  fontSize:   10,
-                ),
+    return Container(
+      constraints: const BoxConstraints(minWidth: 84, maxWidth: 150),
+      padding: const EdgeInsets.fromLTRB(8, 6, 12, 8),
+      decoration: BoxDecoration(
+        color:        scheme.primaryContainer.withValues(alpha: 0.95),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Row(mainAxisSize: MainAxisSize.min, children: [
+          M3LoadingIndicator(size: 22, color: scheme.primary),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(progress.shortLabel,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-              ),
-            ),
+                style: text.labelSmall?.copyWith(
+                    color: scheme.onPrimaryContainer,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 11)),
           ),
         ]),
-      ),
+        const SizedBox(height: 4),
+        M3WavyProgress(
+          value: progress.fraction,
+          height: 8,
+          stroke: 3,
+          color: scheme.primary,
+          trackColor: scheme.onPrimaryContainer.withValues(alpha: 0.18),
+        ),
+      ]),
     );
   }
 }

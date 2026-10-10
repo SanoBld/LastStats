@@ -842,3 +842,115 @@ class M3NetImage extends StatelessWidget {
     );
   }
 }
+
+
+// ── Wavy progress bar (Material 3 Expressive) ──────────────────────────────
+// The finished part is a moving wave in the accent colour, the rest is a flat
+// rounded track, separated by a small gap and a round "stop" dot at the end.
+class M3WavyProgress extends StatefulWidget {
+  const M3WavyProgress({
+    super.key,
+    required this.value,
+    this.height = 12,
+    this.color,
+    this.trackColor,
+    this.stroke = 4,
+  });
+  final double value;       // 0..1
+  final double height;
+  final double stroke;
+  final Color? color;
+  final Color? trackColor;
+
+  @override
+  State<M3WavyProgress> createState() => _M3WavyProgressState();
+}
+
+class _M3WavyProgressState extends State<M3WavyProgress>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+      vsync: this, duration: const Duration(milliseconds: 1600));
+  bool _started = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (M3Motion.reduced(context)) {
+      _c.stop();
+      _started = false;
+    } else if (!_started) {
+      _c.repeat();
+      _started = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    final color = widget.color ?? s.primary;
+    final track = widget.trackColor ?? s.primary.withValues(alpha: 0.22);
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: widget.value.clamp(0.0, 1.0)),
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutCubic,
+      builder: (_, v, _) => AnimatedBuilder(
+        animation: _c,
+        builder: (_, _) => CustomPaint(
+          size: Size(double.infinity, widget.height),
+          painter: _WavyPainter(v, _c.value, color, track, widget.stroke),
+        ),
+      ),
+    );
+  }
+}
+
+class _WavyPainter extends CustomPainter {
+  _WavyPainter(this.v, this.phase, this.color, this.track, this.stroke);
+  final double v, phase, stroke;
+  final Color color, track;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final midY = size.height / 2;
+    final r = stroke / 2;
+    final amp = (size.height - stroke) / 2;
+    final endX = (size.width - r * 2) * v + r;
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = stroke;
+
+    // Flat track after a small gap.
+    final trackStart = endX + stroke + 2;
+    if (trackStart < size.width - r) {
+      paint.color = track;
+      canvas.drawLine(Offset(trackStart, midY), Offset(size.width - r, midY), paint);
+    }
+    // Stop dot at the far end of the track.
+    canvas.drawCircle(Offset(size.width - r, midY), r * 0.6,
+        Paint()..color = color);
+
+    if (v <= 0) return;
+    // Wave: flat near the start so it eases in, full amplitude after 16 px.
+    const waveLen = 22.0;
+    final path = Path();
+    paint.color = color;
+    for (double x = r; x <= endX; x += 1.5) {
+      final ease = ((x - r) / 16).clamp(0.0, 1.0);
+      final y = midY +
+          math.sin((x / waveLen - phase) * 2 * math.pi) * amp * ease;
+      x == r ? path.moveTo(x, y) : path.lineTo(x, y);
+    }
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(_WavyPainter o) =>
+      o.v != v || o.phase != phase || o.color != color || o.track != track;
+}

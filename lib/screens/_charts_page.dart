@@ -1174,10 +1174,7 @@ class _ChartsPageState extends State<_ChartsPage>
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            SizedBox(
-              width: 13, height: 13,
-              child: M3Spinner(color: s.primary),
-            ),
+            M3LoadingIndicator(size: 28, color: s.primary),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -1188,15 +1185,8 @@ class _ChartsPageState extends State<_ChartsPage>
             ),
           ]),
           const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(100),
-            child: LinearProgressIndicator(
-              value: p.fraction,
-              minHeight: 6,
-              backgroundColor: s.onPrimaryContainer.withValues(alpha: 0.15),
-              valueColor: AlwaysStoppedAnimation<Color>(s.primary),
-            ),
-          ),
+          M3WavyProgress(value: p.fraction, color: s.primary,
+              trackColor: s.onPrimaryContainer.withValues(alpha: 0.15)),
           const SizedBox(height: 5),
           Text(
             tx('ui_charts_will_be_more_ac'),

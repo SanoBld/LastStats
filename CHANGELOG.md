@@ -32,6 +32,14 @@
 
 ## v4.1.0
 
+**Welcome setup**
+- The first-launch sync screen is gone: data and scrobbles now sync in the background while you set up the app, with a live percentage at the top left
+- New setup pages: covers and images (shape, animated covers, motion covers, tab labels) and sync and battery (automatic sync, battery saver)
+- Notification switches now ask for the system permission and schedule the tasks, like the Notifications settings
+
+**Loading bars**
+- New wavy progress bar (Material You) used for the history sync chip on the dashboard and the history loading card in charts
+
 **Spotify Canvas**
 - New video cover source: Spotify Canvas (tracks and albums), with in-app Spotify login in Settings > Appearance > Video covers
 - Video sources can now be chosen and sorted freely (Apple Music, Spotify, YouTube Music)

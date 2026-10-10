@@ -20,6 +20,8 @@ import '../l10n/l10n.dart';
 import '../app_state.dart';
 import '../services/lastfm_service.dart';
 import '../services/library_merge.dart';
+import '../services/notification_worker.dart';
+import '../services/notification_service.dart';
 import '../services/cache_owner.dart';
 import '../services/data_cache.dart';
 import '../services/prefetch_service.dart';
@@ -39,7 +41,7 @@ class OnboardingFlow extends StatefulWidget {
 class _OnboardingFlowState extends State<OnboardingFlow> {
   final _pageCtrl = PageController();
   int _page = 0;
-  static const _pages = 8;
+  static const _pages = 10;
 
   // ── Background sync (profile data 30 %, scrobble history 70 %) ──────────
   late final LastFmService _service;
@@ -163,8 +165,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               physics: const NeverScrollableScrollPhysics(),
               onPageChanged: (i) => setState(() => _page = i),
               children: [
-                const _AppearanceStep(), const _NotificationsStep(), const _DashboardStep(), const _LibraryStep(),
-                const _StartupStep(), const _MusicPlatformStep(), const _UpdatesStep(),
+                const _AppearanceStep(), const _CoversStep(), const _NotificationsStep(), const _DashboardStep(), const _LibraryStep(),
+                const _StartupStep(), const _MusicPlatformStep(), const _SyncBatteryStep(), const _UpdatesStep(),
                 _FavoritesStep(username: widget.username, apiKey: widget.apiKey),
               ],
             ),
@@ -555,10 +557,20 @@ class _NotificationsStepState extends State<_NotificationsStep> {
     });
   }
 
+  // Ask the OS for permission when something is switched on, then
+  // re-schedule the background tasks (same as the Notifications settings).
+  Future<void> _apply(bool v) async {
+    try {
+      if (v) await NotificationService.requestPermission();
+      await NotificationWorker.scheduleAll();
+    } catch (_) {}
+  }
+
   Future<void> _set(String key, bool v, ValueNotifier<bool> notifier) async {
     final p = await SharedPreferences.getInstance();
     await p.setBool(key, v);
     notifier.value = v;
+    _apply(v);
     if (v) HapticFeedback.selectionClick();
     setState(() {});
   }
@@ -566,6 +578,7 @@ class _NotificationsStepState extends State<_NotificationsStep> {
   Future<void> _setLocal(String key, bool v, void Function(bool) apply) async {
     final p = await SharedPreferences.getInstance();
     await p.setBool(key, v);
+    _apply(v);
     if (v) HapticFeedback.selectionClick();
     setState(() => apply(v));
   }
@@ -803,6 +816,182 @@ class _LibraryStep extends StatelessWidget {
     );
   }
 }
+
+// ── Covers & images: image shape, animated covers, motion covers, tab labels ─
+class _CoversStep extends StatefulWidget {
+  const _CoversStep();
+  @override
+  State<_CoversStep> createState() => _CoversStepState();
+}
+
+class _CoversStepState extends State<_CoversStep> {
+  Future<void> _bool(String key, ValueNotifier<bool> n, bool v) async {
+    n.value = v;
+    final p = await SharedPreferences.getInstance();
+    await p.setBool(key, v);
+  }
+
+  Future<void> _shape(String v) async {
+    imageShapeNotifier.value = v;
+    final p = await SharedPreferences.getInstance();
+    await p.setString('ls_image_shape', v);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    Widget sw(String k, IconData i, ValueNotifier<bool> n, String t, String sub) =>
+        ValueListenableBuilder<bool>(
+          valueListenable: n,
+          builder: (_, on, _) => _OnbSwitch(
+            secondary: Icon(i, color: scheme.primary),
+            title: Text(t, style: const TextStyle(fontWeight: FontWeight.w700)),
+            subtitle: Text(sub, style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+            value: on,
+            onChanged: (v) => _bool(k, n, v),
+          ),
+        );
+    return _Step(
+      icon: Icons.photo_library_rounded,
+      title: tx('onb_cov_t'),
+      subtitle: tx('onb_cov_s'),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(tx('shape_title'),
+              style: TextStyle(fontWeight: FontWeight.w800, color: scheme.primary)),
+        ),
+        ValueListenableBuilder<String>(
+          valueListenable: imageShapeNotifier,
+          builder: (_, cur, _) {
+            final isMix = cur == 'mix';
+            final isSq = cur == 'square';
+            final isCi = cur == 'circle';
+            return Column(children: [
+              _OnbChoice(leading: Icon(Icons.auto_awesome_mosaic_rounded, color: scheme.primary),
+                  title: tx('shape_mix'), selected: isMix, onTap: () => _shape('mix')),
+              _OnbChoice(leading: Icon(Icons.crop_square_rounded, color: scheme.primary),
+                  title: tx('shape_square'), selected: isSq, onTap: () => _shape('square')),
+              _OnbChoice(leading: Icon(Icons.circle_outlined, color: scheme.primary),
+                  title: tx('shape_circle'), selected: isCi, onTap: () => _shape('circle')),
+            ]);
+          },
+        ),
+        const SizedBox(height: 16),
+        sw('ls_living_artwork', Icons.view_in_ar_rounded, livingArtworkNotifier,
+            tx('set_living_t'), tx('set_living_s')),
+        sw('ls_motion_artwork', Icons.movie_filter_rounded, motionArtworkNotifier,
+            tx('set_motion_t'), tx('set_motion_s')),
+        sw('ls_nav_labels', Icons.label_outline_rounded, navLabelNotifier,
+            L.apShowTabLabels, L.apShowTabLabelsSub),
+      ]),
+    );
+  }
+}
+
+// ── Sync & battery: background scrobble sync, auto battery saver ───────────
+class _SyncBatteryStep extends StatefulWidget {
+  const _SyncBatteryStep();
+  @override
+  State<_SyncBatteryStep> createState() => _SyncBatteryStepState();
+}
+
+class _SyncBatteryStepState extends State<_SyncBatteryStep> {
+  bool _sync = false;
+  int _freq = 6;
+  static const _freqs = [1, 3, 6, 12, 24];
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((p) {
+      if (!mounted) return;
+      setState(() {
+        _sync = p.getBool('ls_scrobble_sync_enabled') ?? false;
+        _freq = p.getInt('ls_scrobble_sync_freq_hours') ?? 6;
+      });
+    });
+  }
+
+  Future<void> _setSync(bool v) async {
+    setState(() => _sync = v);
+    final p = await SharedPreferences.getInstance();
+    await p.setBool('ls_scrobble_sync_enabled', v);
+    await NotificationWorker.scheduleAll();
+  }
+
+  Future<void> _setFreq(int h) async {
+    setState(() => _freq = h);
+    final p = await SharedPreferences.getInstance();
+    await p.setInt('ls_scrobble_sync_freq_hours', h);
+    if (_sync) await NotificationWorker.scheduleAll();
+  }
+
+  Future<void> _setEco(bool v) async {
+    ecoModeAutoNotifier.value = v;
+    final p = await SharedPreferences.getInstance();
+    await p.setBool('ls_eco_mode_auto', v);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return _Step(
+      icon: Icons.battery_charging_full_rounded,
+      title: tx('onb_sync_t'),
+      subtitle: tx('onb_sync_s'),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        _OnbSwitch(
+          secondary: Icon(Icons.sync_rounded, color: scheme.primary),
+          title: Text(tx('onb_autosync_t'), style: const TextStyle(fontWeight: FontWeight.w700)),
+          subtitle: Text(tx('onb_autosync_s'),
+              style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+          value: _sync,
+          onChanged: _setSync,
+        ),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 250),
+          curve: M3Motion.emphasizedDecelerate,
+          child: !_sync
+              ? const SizedBox(width: double.infinity)
+              : Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4, bottom: 8),
+                      child: Text(tx('onb_freq'),
+                          style: TextStyle(fontWeight: FontWeight.w800, color: scheme.primary)),
+                    ),
+                    Wrap(spacing: 8, runSpacing: 8, children: [
+                      for (final h in _freqs)
+                        ChoiceChip(
+                          label: Text(tx('onb_every_h', {'h': '$h'})),
+                          selected: _freq == h,
+                          onSelected: (_) => _setFreq(h),
+                        ),
+                    ]),
+                    const SizedBox(height: 4),
+                  ]),
+                ),
+        ),
+        const SizedBox(height: 12),
+        ValueListenableBuilder<bool>(
+          valueListenable: ecoModeAutoNotifier,
+          builder: (_, on, _) => _OnbSwitch(
+            secondary: Icon(Icons.battery_alert_rounded, color: scheme.primary),
+            title: Text(tx('ui_turn_on_below_a_batter'),
+                style: const TextStyle(fontWeight: FontWeight.w700)),
+            subtitle: Text(tx('ui_switches_on_by_itself_'),
+                style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+            value: on,
+            onChanged: _setEco,
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
 
 // ── Step 4: Startup tab ──────────────────────────────────────────────────────
 class _StartupStep extends StatefulWidget {
