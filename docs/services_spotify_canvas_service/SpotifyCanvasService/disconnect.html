@@ -68,7 +68,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; disconnect() async {
   final p = await SharedPreferences.getInstance();
-  for (final k in [kSpDc, _kTok, _kCt, _kExp]) {
+  for (final k in [kSpDc, _kTok, _kCt, _kExp, _kTpl]) {
     await p.remove(k);
   }
   await SpotifyWebSession.clear();

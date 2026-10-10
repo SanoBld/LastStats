@@ -62,8 +62,8 @@
     </section>
     
 <section class="desc markdown">
-  <p>Step-by-step test on a track known to have a Canvas. For the
-"Test Spotify" button: tells which step fails.</p>
+  <p>Step-by-step test (for the "Test Spotify" button). Texts come from
+the language files (dg_* keys).</p>
 </section>
 
 
@@ -75,23 +75,27 @@
   try {
     final p = await SharedPreferences.getInstance();
     final spDc = p.getString(kSpDc) ?? &#39;&#39;;
-    out.add(&#39;1. login cookie: ${spDc.isEmpty ? &#39;MISSING&#39; : &#39;ok&#39;}&#39;);
+    out.add(&#39;1. ${tx(&#39;dg_cookie&#39;)}: ${spDc.isEmpty ? tx(&#39;dg_missing&#39;) : tx(&#39;dg_ok&#39;)}&#39;);
     if (spDc.isEmpty) return out.join(&#39;\n&#39;);
     final s = await _session(force: true);
-    out.add(&#39;2. web token: ${s == null ? &#39;FAILED (${lastError ?? &#39;?&#39;})&#39; : &#39;ok&#39;}&#39;);
+    out.add(&#39;2. ${tx(&#39;dg_token&#39;)}: ${s == null ? &#39;${tx(&#39;dg_failed&#39;)} (${lastError ?? &#39;?&#39;})&#39; : tx(&#39;dg_ok&#39;)}&#39;);
     if (s == null) return out.join(&#39;\n&#39;);
-    final r = await _get(
-        s, &#39;&#47;v1&#47;search&#39;, {&#39;q&#39;: &#39;SZA Kill Bill&#39;, &#39;type&#39;: &#39;track&#39;, &#39;limit&#39;: &#39;1&#39;});
-    out.add(&#39;3. search: HTTP ${r.statusCode}&#39;
-        &#39;${r.statusCode == 200 ? &#39;&#39; : &#39; retry-after=${r.headers[&#39;retry-after&#39;]} ${r.body.length &gt; 120 ? r.body.substring(0, 120) : r.body}&#39;}&#39;);
+    final tpl = await _template();
+    if (tpl == null) {
+      out.add(&#39;3. ${tx(&#39;dg_search&#39;)}: ${tx(&#39;dg_notpl&#39;)}&#39;);
+    } else {
+      lastError = null;
+      final c = await _search(s, &#39;SZA Kill Bill&#39;);
+      out.add(&#39;3. ${tx(&#39;dg_search&#39;)}: ${c.isEmpty ? &#39;${tx(&#39;dg_failed&#39;)} (${lastError ?? &#39;0&#39;})&#39; : &#39;${c.length} ${tx(&#39;dg_results&#39;)}&#39;}&#39;);
+    }
     final (code, body) = await _canvasRaw(s, &#39;spotify:track:3OHfY25tqY28d16oZczHc8&#39;);
     final mp4 = code == 200 ? _findMp4(jsonDecode(body)) : null;
-    out.add(&#39;4. canvas: HTTP $code, ${mp4 != null ? &#39;video found&#39; : &#39;no video&#39;}&#39;);
+    out.add(&#39;4. Canvas: HTTP $code, ${mp4 != null ? tx(&#39;dg_found&#39;) : tx(&#39;dg_nofound&#39;)}&#39;);
     if (mp4 == null) {
       out.add(body.length &gt; 220 ? body.substring(0, 220) : body);
     }
   } catch (e) {
-    out.add(&#39;error: $e&#39;);
+    out.add(&#39;$e&#39;);
   }
   return out.join(&#39;\n&#39;);
 }</code></pre>
