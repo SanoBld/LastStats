@@ -1291,4 +1291,6 @@ const Map<String, String> kTxDe = {
   'sm_key_s': 'Eigenes Kontingent, Favoriten möglich.',
   'sm_builtin_t': 'Integrierter Schlüssel',
   'sm_builtin_s': 'Nur Benutzername. Kontingent wird mit anderen geteilt.',
+  'wl_title': 'Willkommen',
+  'wl_sub': 'Wählen Sie, wie Sie sich mit Last.fm verbinden möchten.',
 };

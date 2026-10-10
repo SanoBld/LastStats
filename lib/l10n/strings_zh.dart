@@ -1317,4 +1317,6 @@ const Map<String, String> kTxZh = {
   'sm_key_s': '独享配额，可使用收藏。',
   'sm_builtin_t': '内置密钥',
   'sm_builtin_s': '仅需用户名。配额与其他用户共享。',
+  'wl_title': '欢迎',
+  'wl_sub': '请选择连接 Last.fm 的方式。',
 };

@@ -82,7 +82,7 @@ class _SetupScreenState extends State<SetupScreen>
     // Entry animation — runs once on open
     _entryCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 900),
+      duration: const Duration(milliseconds: 1100),
     );
 
     _langFade  = CurvedAnimation(parent: _entryCtrl,
@@ -91,15 +91,15 @@ class _SetupScreenState extends State<SetupScreen>
         .animate(CurvedAnimation(parent: _entryCtrl,
             curve: const Interval(0.0, 0.5, curve: M3Motion.emphasizedDecelerate)));
 
-    _logoScale = Tween<double>(begin: 0.55, end: 1.0).animate(
+    _logoScale = Tween<double>(begin: 0.3, end: 1.0).animate(
         CurvedAnimation(parent: _entryCtrl,
-            curve: const Interval(0.1, 0.65, curve: M3Motion.emphasizedDecelerate)));
+            curve: const Interval(0.05, 0.75, curve: M3Motion.spatialDefault)));
     _logoFade  = CurvedAnimation(parent: _entryCtrl,
         curve: const Interval(0.1, 0.55, curve: M3Motion.emphasizedDecelerate));
 
-    _cardSlide = Tween<Offset>(begin: const Offset(0, 0.14), end: Offset.zero)
+    _cardSlide = Tween<Offset>(begin: const Offset(0, 0.10), end: Offset.zero)
         .animate(CurvedAnimation(parent: _entryCtrl,
-            curve: const Interval(0.35, 0.95, curve: M3Motion.emphasizedDecelerate)));
+            curve: const Interval(0.30, 0.95, curve: M3Motion.spatialDefault)));
     _cardFade  = CurvedAnimation(parent: _entryCtrl,
         curve: const Interval(0.35, 0.85, curve: M3Motion.emphasizedDecelerate));
 
@@ -109,12 +109,17 @@ class _SetupScreenState extends State<SetupScreen>
     _entryCtrl.forward();
 
     // Logo float — 2.6 s, repeating
+    // The cookie behind the logo turns slowly (replaces the old floating).
+    // Skipped when the system asks for reduced animations.
     _floatCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2600),
-    )..repeat(reverse: true);
-    _floatAnim = Tween<double>(begin: -5.5, end: 5.5).animate(
-        CurvedAnimation(parent: _floatCtrl, curve: M3Motion.emphasized));
+      duration: const Duration(seconds: 28),
+    );
+    if (!WidgetsBinding.instance.platformDispatcher.accessibilityFeatures
+        .disableAnimations) {
+      _floatCtrl.repeat();
+    }
+    _floatAnim = Tween<double>(begin: 0, end: 1).animate(_floatCtrl);
   }
 
   @override
@@ -334,39 +339,64 @@ class _SetupScreenState extends State<SetupScreen>
     }
   }
 
+  // Filled rounded field, same look for every input of the screen.
+  InputDecoration _dec(ColorScheme scheme, String label, IconData icon,
+      {String? hint, Widget? suffix}) {
+    OutlineInputBorder b(Color c, double w) => OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: c == Colors.transparent
+            ? BorderSide.none
+            : BorderSide(color: c, width: w));
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      prefixIcon: Icon(icon),
+      suffixIcon: suffix,
+      filled: true,
+      fillColor: scheme.surfaceContainerHighest,
+      border: b(Colors.transparent, 0),
+      enabledBorder: b(Colors.transparent, 0),
+      focusedBorder: b(scheme.primary, 2),
+    );
+  }
+
+  // Fade + slide up, driven by one entry animation.
+  Widget _in(Animation<double> a, Widget child, [double dy = 0.08]) =>
+      FadeTransition(
+        opacity: a,
+        child: SlideTransition(
+          position: Tween<Offset>(begin: Offset(0, dy), end: Offset.zero)
+              .animate(a),
+          child: child,
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-
     final size   = MediaQuery.of(context).size;
 
     return Scaffold(
       body: Stack(
         children: [
-          // Soft decorative blobs behind everything
-          _SetupBackground(scheme: scheme, size: size),
-
+          _SetupBackground(scheme: scheme, size: size, spin: _floatAnim),
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400),
+                  constraints: const BoxConstraints(maxWidth: 440),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-
-                      // ── Language selector — compact dropdown button ─────
-                      // Scales cleanly to 50+ languages: shows only the
-                      // current selection, opens a scrollable sheet on tap
-                      // instead of laying out every option at once.
+                      // ── Language pill (top right) ──
                       SlideTransition(
                         position: _langSlide,
                         child: FadeTransition(
                           opacity: _langFade,
                           child: Align(
-                            alignment: Alignment.center,
+                            alignment: Alignment.centerRight,
                             child: _LangSelectorButton(
                               current: supportedLocaleFor(localeNotifier.value),
                               scheme: scheme, text: text,
@@ -375,422 +405,346 @@ class _SetupScreenState extends State<SetupScreen>
                           ),
                         ),
                       ),
+                      const SizedBox(height: 20),
 
-                      const SizedBox(height: 44),
-
-                      // ── Logo — scale entry + glow + continuous float ─────
+                      // ── Hero: logo on a slowly turning cookie ──
                       FadeTransition(
                         opacity: _logoFade,
                         child: ScaleTransition(
                           scale: _logoScale,
-                          child: AnimatedBuilder(
-                            animation: _floatAnim,
-                            builder: (_, child) => Transform.translate(
-                              offset: Offset(0, _floatAnim.value),
-                              child: child,
-                            ),
-                            child: Column(children: [
-                              // Icon with primary color glow
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(28),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: scheme.primary.withValues(alpha: 0.30),
-                                      blurRadius: 40,
-                                      spreadRadius: 8,
+                          child: Column(children: [
+                            SizedBox(
+                              width: 140, height: 140,
+                              child: Stack(alignment: Alignment.center, children: [
+                                RotationTransition(
+                                  turns: _floatAnim,
+                                  child: Container(
+                                    width: 140, height: 140,
+                                    decoration: ShapeDecoration(
+                                      color: scheme.primaryContainer,
+                                      shape: const M3CookieBorder(
+                                          lobes: 9, amplitude: 0.07),
                                     ),
-                                  ],
+                                  ),
                                 ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(24),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(22),
                                   child: SvgPicture.asset(_logoAsset(context),
-                                      width: 90, height: 90),
+                                      width: 76, height: 76),
                                 ),
-                              ),
-                              const SizedBox(height: 18),
-                              Text(
-                                'LastStats',
-                                style: text.headlineLarge?.copyWith(
-                                  fontWeight:    FontWeight.w800,
-                                  color:         scheme.primary,
-                                  letterSpacing: -0.5,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                L.setupTagline,
+                              ]),
+                            ),
+                            const SizedBox(height: 14),
+                            Text('LastStats',
+                                style: text.displaySmall?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: scheme.primary,
+                                  letterSpacing: -1,
+                                )),
+                            const SizedBox(height: 4),
+                            Text(L.setupTagline,
+                                textAlign: TextAlign.center,
                                 style: text.bodyMedium?.copyWith(
-                                    color: scheme.onSurfaceVariant),
-                              ),
-                            ]),
-                          ),
+                                    color: scheme.onSurfaceVariant)),
+                          ]),
                         ),
                       ),
+                      const SizedBox(height: 28),
 
-                      const SizedBox(height: 40),
-
-                      // ── Main card — slide up + fade ─────────────────────
+                      // ── Welcome + connection card ──
                       SlideTransition(
                         position: _cardSlide,
                         child: FadeTransition(
                           opacity: _cardFade,
-                          child: Card(
-                            elevation: 0,
-                            color: scheme.surfaceContainerHighest,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(28)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(24),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  // Card header with icon badge
-                                  Row(children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(9),
-                                      decoration: BoxDecoration(
-                                        color: scheme.primaryContainer,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Icon(Icons.person_search_rounded,
-                                          size: 20,
-                                          color: scheme.onPrimaryContainer),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      L.setupAnalyseProfile,
-                                      style: text.titleLarge?.copyWith(
-                                          fontWeight: FontWeight.w700),
-                                    ),
-                                  ]),
-                                  const SizedBox(height: 24),
+                          child: Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: scheme.surfaceContainer,
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(tx('wl_title'),
+                                    style: text.headlineSmall?.copyWith(
+                                        fontWeight: FontWeight.w800)),
+                                const SizedBox(height: 4),
+                                Text(tx('wl_sub'),
+                                    style: text.bodyMedium?.copyWith(
+                                        color: scheme.onSurfaceVariant)),
+                                const SizedBox(height: 18),
 
-                                  // Connection method: three big choices
-                                  Text(tx('sm_title'),
-                                      style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
-                                  const SizedBox(height: 10),
-                                  _MethodCard(
-                                    selected: _method == 0,
-                                    icon: Icons.key_rounded,
-                                    title: '${tx('sm_key_t')} (${tx('rec')})',
-                                    subtitle: tx('sm_key_s'),
-                                    onTap: () => setState(() { _method = 0; _useInternalKey = false; }),
-                                  ),
+                                // Connection method tiles
+                                _MethodTile(
+                                  selected: _method == 0,
+                                  icon: Icons.key_rounded,
+                                  title: '${tx('sm_key_t')} (${tx('rec')})',
+                                  subtitle: tx('sm_key_s'),
+                                  onTap: () => setState(() {
+                                    _method = 0; _useInternalKey = false;
+                                  }),
+                                ),
+                                const SizedBox(height: 8),
+                                _MethodTile(
+                                  selected: _method == 1,
+                                  icon: Icons.bolt_rounded,
+                                  title: tx('sm_builtin_t'),
+                                  subtitle: tx('sm_builtin_s'),
+                                  onTap: () => setState(() {
+                                    _method = 1; _useInternalKey = true;
+                                  }),
+                                ),
+                                if (_canWebLogin) ...[
                                   const SizedBox(height: 8),
-                                  _MethodCard(
-                                    selected: _method == 1,
-                                    icon: Icons.bolt_rounded,
-                                    title: tx('sm_builtin_t'),
-                                    subtitle: tx('sm_builtin_s'),
-                                    onTap: () => setState(() { _method = 1; _useInternalKey = true; }),
+                                  _MethodTile(
+                                    selected: _method == 2,
+                                    icon: Icons.login_rounded,
+                                    title: '${tx('conn_lfm_web')} (${tx('not_rec')})',
+                                    subtitle: tx('lfm_web_sub'),
+                                    onTap: () => setState(() {
+                                      _method = 2; _useInternalKey = true;
+                                    }),
                                   ),
-                                  if (_canWebLogin) ...[
-                                    const SizedBox(height: 8),
-                                    _MethodCard(
-                                      selected: _method == 2,
-                                      icon: Icons.login_rounded,
-                                      title: '${tx('conn_lfm_web')} (${tx('not_rec')})',
-                                      subtitle: tx('lfm_web_sub'),
-                                      onTap: () => setState(() { _method = 2; _useInternalKey = true; }),
-                                    ),
-                                  ],
-                                  const SizedBox(height: 18),
-                                  if (_method != 2) ...[
-                                  // Username field
-                                  TextField(
-                                    controller:      _usernameCtrl,
-                                    textInputAction: TextInputAction.next,
-                                    autocorrect:     false,
-                                    decoration: InputDecoration(
-                                      labelText: L.setupUsernameLabel,
-                                      prefixIcon: const Icon(
-                                          Icons.person_outline_rounded),
-                                      border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14)),
-                                      filled:    true,
-                                      fillColor: scheme.surface,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 14),
-                                  ],
+                                ],
+                                const SizedBox(height: 18),
 
-                                  // Custom display name — optional, editable
-                                  // later in Settings > Account.
-                                  TextField(
-                                    controller:      _displayNameCtrl,
-                                    textInputAction: TextInputAction.next,
-                                    decoration: InputDecoration(
-                                      labelText: L.settingsDisplayNameLabel,
-                                      hintText:  L.settingsDisplayNameHint,
-                                      prefixIcon: const Icon(Icons.badge_outlined),
-                                      border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14)),
-                                      filled:    true,
-                                      fillColor: scheme.surface,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 14),
-
-                                  if (!_useInternalKey) ...[
-                                  // API key field
-                                  TextField(
-                                    controller:        _apikeyCtrl,
-                                    onChanged:         (_) => setState(() {}),
-                                    textInputAction:   TextInputAction.done,
-                                    obscureText:       _obscureApiKey,
-                                    autocorrect:       false,
-                                    enableSuggestions: false,
-                                    onSubmitted:       (_) => _launch(),
-                                    decoration: InputDecoration(
-                                      labelText: L.setupApiKeyLabel,
-                                      hintText: L.setupApiKeyHint,
-                                      prefixIcon: const Icon(Icons.key_rounded),
-                                      suffixIcon: IconButton(
-                                        icon: Icon(_obscureApiKey
-                                            ? Icons.visibility_outlined
-                                            : Icons.visibility_off_outlined),
-                                        onPressed: () => setState(
-                                            () => _obscureApiKey = !_obscureApiKey),
-                                      ),
-                                      border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14)),
-                                      filled:    true,
-                                      fillColor: scheme.surface,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-
-                                  // Security hint
-                                  Row(children: [
-                                    Icon(Icons.shield_outlined,
-                                        size: 14, color: scheme.onSurfaceVariant),
-                                    const SizedBox(width: 6),
-                                    Expanded(child: Text(
-                                      L.setupApiKeyPrivacyNote,
-                                      style: text.bodySmall?.copyWith(
-                                          color: scheme.onSurfaceVariant),
-                                    )),
-                                  ]),
-                                  const SizedBox(height: 4),
-
-                                  // Optional favorites (secret key) section
-                                  InkWell(
-                                    borderRadius: BorderRadius.circular(12),
-                                    onTap: () => setState(
-                                        () => _enableFavorites = !_enableFavorites),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 4),
-                                      child: Row(children: [
-                                        Checkbox(
-                                          value: _enableFavorites,
-                                          onChanged: (v) => setState(
-                                              () => _enableFavorites = v ?? false),
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(4)),
+                                // Fields (they grow / shrink with the method)
+                                AnimatedSize(
+                                  duration: M3Motion.spatialFastDuration,
+                                  curve: M3Motion.emphasized,
+                                  alignment: Alignment.topCenter,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [
+                                      if (_method != 2) ...[
+                                        TextField(
+                                          controller: _usernameCtrl,
+                                          textInputAction: TextInputAction.next,
+                                          autocorrect: false,
+                                          decoration: _dec(scheme,
+                                              L.setupUsernameLabel,
+                                              Icons.person_outline_rounded),
                                         ),
-                                        Expanded(child: Text(
-                                          L.setupEnableFavorites,
-                                          style: text.bodySmall,
-                                        )),
-                                      ]),
-                                    ),
-                                  ),
-                                  AnimatedSize(
-                                    duration: const Duration(milliseconds: 220),
-                                    child: !_enableFavorites
-                                        ? const SizedBox.shrink()
-                                        : Padding(
-                                            padding: const EdgeInsets.only(top: 2, bottom: 10),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  L.setupFavoritesExplain,
-                                                  style: text.bodySmall?.copyWith(
-                                                      color: scheme.onSurfaceVariant),
-                                                ),
-                                                const SizedBox(height: 10),
-                                                TextField(
-                                                  controller:        _secretCtrl,
-                                                  obscureText:       _obscureSecret,
-                                                  autocorrect:       false,
-                                                  enableSuggestions: false,
-                                                  decoration: InputDecoration(
-                                                    labelText: L.setupSecretKeyLabel,
-                                                    prefixIcon: const Icon(Icons.favorite_border_rounded),
-                                                    suffixIcon: IconButton(
-                                                      icon: Icon(_obscureSecret
-                                                          ? Icons.visibility_outlined
-                                                          : Icons.visibility_off_outlined),
-                                                      onPressed: () => setState(
-                                                          () => _obscureSecret = !_obscureSecret),
-                                                    ),
-                                                    border: OutlineInputBorder(
-                                                        borderRadius: BorderRadius.circular(14)),
-                                                    filled:    true,
-                                                    fillColor: scheme.surface,
-                                                  ),
-                                                ),
-                                              ],
+                                        const SizedBox(height: 12),
+                                      ],
+                                      TextField(
+                                        controller: _displayNameCtrl,
+                                        textInputAction: TextInputAction.next,
+                                        decoration: _dec(scheme,
+                                            L.settingsDisplayNameLabel,
+                                            Icons.badge_outlined,
+                                            hint: L.settingsDisplayNameHint),
+                                      ),
+                                      if (!_useInternalKey) ...[
+                                        const SizedBox(height: 12),
+                                        TextField(
+                                          controller: _apikeyCtrl,
+                                          onChanged: (_) => setState(() {}),
+                                          textInputAction: TextInputAction.done,
+                                          obscureText: _obscureApiKey,
+                                          autocorrect: false,
+                                          enableSuggestions: false,
+                                          onSubmitted: (_) => _launch(),
+                                          decoration: _dec(scheme,
+                                            L.setupApiKeyLabel, Icons.key_rounded,
+                                            hint: L.setupApiKeyHint,
+                                            suffix: IconButton(
+                                              icon: Icon(_obscureApiKey
+                                                  ? Icons.visibility_outlined
+                                                  : Icons.visibility_off_outlined),
+                                              onPressed: () => setState(() =>
+                                                  _obscureApiKey = !_obscureApiKey),
                                             ),
                                           ),
-                                  ),
-                                  ],
-                                  const SizedBox(height: 6),
-
-                                  // Remember me
-                                  Row(children: [
-                                    Checkbox(
-                                      value:     _rememberMe,
-                                      onChanged: (v) => setState(
-                                          () => _rememberMe = v ?? true),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(4)),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () => setState(
-                                          () => _rememberMe = !_rememberMe),
-                                      child: Text(L.setupRememberMe),
-                                    ),
-                                  ]),
-                                  const SizedBox(height: 20),
-
-                                  // Launch button
-                                  FilledButton.icon(
-                                    onPressed: _isLoading ? null : (_method == 2 ? _lastfmWeb : _launch),
-                                    icon: _isLoading
-                                        ? SizedBox(
-                                            width: 18, height: 18,
-                                            child: M3Spinner(color: scheme.onPrimary))
-                                        : const Icon(Icons.bar_chart_rounded),
-                                    label: Text(_isLoading
-                                        ? L.setupConnecting
-                                        : (_method == 2 ? tx('conn_lfm_web') : L.setupStartAnalysis)),
-                                    style: FilledButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(vertical: 15),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(14)),
-                                    ),
-                                  ),
-
-                                  // Error block — with AnimatedSize
-
-                                  if (_errorMessage != null) ...[
-                                    const SizedBox(height: 16),
-                                    AnimatedSize(
-                                      duration: const Duration(milliseconds: 250),
-                                      child: Container(
-                                        padding: const EdgeInsets.all(12),
-                                        decoration: BoxDecoration(
-                                          color: scheme.errorContainer,
-                                          borderRadius: BorderRadius.circular(12),
                                         ),
-                                        child: Row(children: [
-                                          Icon(Icons.warning_amber_rounded,
-                                              color: scheme.onErrorContainer,
-                                              size: 18),
-                                          const SizedBox(width: 8),
+                                        const SizedBox(height: 10),
+                                        Row(children: [
+                                          Icon(Icons.shield_outlined, size: 14,
+                                              color: scheme.onSurfaceVariant),
+                                          const SizedBox(width: 6),
                                           Expanded(child: Text(
-                                            _errorMessage!,
+                                            L.setupApiKeyPrivacyNote,
                                             style: text.bodySmall?.copyWith(
-                                                color: scheme.onErrorContainer),
+                                                color: scheme.onSurfaceVariant),
                                           )),
                                         ]),
+                                        const SizedBox(height: 4),
+                                        // Optional favorites (secret key)
+                                        SwitchListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          value: _enableFavorites,
+                                          onChanged: (v) => setState(
+                                              () => _enableFavorites = v),
+                                          title: Text(L.setupEnableFavorites,
+                                              style: text.bodyMedium),
+                                        ),
+                                        AnimatedSize(
+                                          duration: M3Motion.spatialFastDuration,
+                                          curve: M3Motion.emphasized,
+                                          alignment: Alignment.topCenter,
+                                          child: !_enableFavorites
+                                              ? const SizedBox(width: double.infinity)
+                                              : Padding(
+                                                  padding: const EdgeInsets.only(bottom: 8),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(L.setupFavoritesExplain,
+                                                          style: text.bodySmall?.copyWith(
+                                                              color: scheme.onSurfaceVariant)),
+                                                      const SizedBox(height: 10),
+                                                      TextField(
+                                                        controller: _secretCtrl,
+                                                        obscureText: _obscureSecret,
+                                                        autocorrect: false,
+                                                        enableSuggestions: false,
+                                                        decoration: _dec(scheme,
+                                                          L.setupSecretKeyLabel,
+                                                          Icons.favorite_border_rounded,
+                                                          suffix: IconButton(
+                                                            icon: Icon(_obscureSecret
+                                                                ? Icons.visibility_outlined
+                                                                : Icons.visibility_off_outlined),
+                                                            onPressed: () => setState(() =>
+                                                                _obscureSecret = !_obscureSecret),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                        ),
+                                      ],
+                                      SwitchListTile(
+                                        contentPadding: EdgeInsets.zero,
+                                        value: _rememberMe,
+                                        onChanged: (v) =>
+                                            setState(() => _rememberMe = v),
+                                        title: Text(L.setupRememberMe,
+                                            style: text.bodyMedium),
                                       ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+
+                                // Main button
+                                SizedBox(
+                                  height: 56,
+                                  child: FilledButton.icon(
+                                    onPressed: _isLoading
+                                        ? null
+                                        : (_method == 2 ? _lastfmWeb : _launch),
+                                    icon: _isLoading
+                                        ? SizedBox(
+                                            width: 20, height: 20,
+                                            child: M3Spinner(color: scheme.onPrimary))
+                                        : Icon(_method == 2
+                                            ? Icons.login_rounded
+                                            : Icons.arrow_forward_rounded),
+                                    label: Text(_isLoading
+                                        ? L.setupConnecting
+                                        : (_method == 2
+                                            ? tx('conn_lfm_web')
+                                            : tx('conn_connect'))),
+                                    style: FilledButton.styleFrom(
+                                      shape: const StadiumBorder(),
+                                      textStyle: text.titleMedium?.copyWith(
+                                          fontWeight: FontWeight.w700),
                                     ),
-                                  ],
-                                ],
-                              ),
+                                  ),
+                                ),
+
+                                // Error message
+                                AnimatedSize(
+                                  duration: M3Motion.spatialFastDuration,
+                                  curve: M3Motion.emphasized,
+                                  alignment: Alignment.topCenter,
+                                  child: _errorMessage == null
+                                      ? const SizedBox(width: double.infinity)
+                                      : Padding(
+                                          padding: const EdgeInsets.only(top: 14),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(12),
+                                            decoration: BoxDecoration(
+                                              color: scheme.errorContainer,
+                                              borderRadius: BorderRadius.circular(16),
+                                            ),
+                                            child: Row(children: [
+                                              Icon(Icons.warning_amber_rounded,
+                                                  color: scheme.onErrorContainer,
+                                                  size: 18),
+                                              const SizedBox(width: 8),
+                                              Expanded(child: Text(_errorMessage!,
+                                                  style: text.bodySmall?.copyWith(
+                                                      color: scheme.onErrorContainer))),
+                                            ]),
+                                          ),
+                                        ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
                       ),
+                      const SizedBox(height: 14),
 
-                      const SizedBox(height: 16),
-
-                      // ── Footer (divider + JSON + API link) — last to fade ─
-                      FadeTransition(
-                        opacity: _footerFade,
-                        child: Column(children: [
-
-                          // "or" divider
-                          Row(children: [
-                            Expanded(child: Divider(color: scheme.outlineVariant)),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              child: Text(L.setupOr,
-                                  style: text.bodySmall?.copyWith(
-                                      color: scheme.onSurfaceVariant)),
-                            ),
-                            Expanded(child: Divider(color: scheme.outlineVariant)),
-                          ]),
-                          const SizedBox(height: 16),
-
-                          // Restore from backup file (real file picker)
-                          Card(
-                            elevation: 0,
-                            color: scheme.surfaceContainerHighest,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(24),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                      // ── Restore a backup + API key link ──
+                      _in(_footerFade, Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          M3PressCard(
+                            color: scheme.surfaceContainer,
+                            padding: const EdgeInsets.all(16),
+                            onTap: _restoring ? null : _restoreFromFile,
+                            child: Row(children: [
+                              M3CookieBadge(
+                                color: scheme.tertiaryContainer,
+                                size: 44,
+                                child: Icon(Icons.upload_file_rounded,
+                                    size: 22,
+                                    color: scheme.onTertiaryContainer),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(children: [
-                                    Icon(Icons.upload_file_rounded,
-                                        size: 20, color: scheme.primary),
-                                    const SizedBox(width: 8),
-                                    Text(L.setupRestoreBackup,
-                                        style: text.titleMedium?.copyWith(
-                                            fontWeight: FontWeight.w700)),
-                                  ]),
-                                  const SizedBox(height: 8),
+                                  Text(L.setupRestoreBackup,
+                                      style: text.titleSmall?.copyWith(
+                                          fontWeight: FontWeight.w700)),
                                   Text(L.setupRestoreBackupSub,
                                       style: text.bodySmall?.copyWith(
                                           color: scheme.onSurfaceVariant)),
-                                  const SizedBox(height: 16),
-
-                                  OutlinedButton.icon(
-                                    onPressed: _restoring ? null : _restoreFromFile,
-                                    icon: _restoring
-                                        ? const SizedBox(width: 16, height: 16,
-                                            child: M3Spinner())
-                                        : const Icon(Icons.folder_open_rounded, size: 18),
-                                    label: Text(L.backupChooseFile),
-                                    style: OutlinedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12)),
-                                    ),
-                                  ),
                                 ],
+                              )),
+                              _restoring
+                                  ? SizedBox(width: 20, height: 20,
+                                      child: M3Spinner(color: scheme.primary))
+                                  : Icon(Icons.chevron_right_rounded,
+                                      color: scheme.onSurfaceVariant),
+                            ]),
+                          ),
+                          if (_method == 0) ...[
+                            const SizedBox(height: 6),
+                            Center(
+                              child: TextButton.icon(
+                                onPressed: () async {
+                                  final uri = Uri.parse(
+                                      'https://www.last.fm/api/account/create');
+                                  if (await canLaunchUrl(uri)) {
+                                    await launchUrl(uri,
+                                        mode: LaunchMode.externalApplication);
+                                  }
+                                },
+                                icon: const Icon(Icons.open_in_new_rounded, size: 16),
+                                label: Text(L.setupGetApiKey),
                               ),
                             ),
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          // Last.fm API key link
-                          Center(
-                            child: TextButton.icon(
-                              onPressed: () async {
-                                final uri = Uri.parse(
-                                    'https://www.last.fm/api/account/create');
-                                if (await canLaunchUrl(uri)) {
-                                  await launchUrl(uri,
-                                      mode: LaunchMode.externalApplication);
-                                }
-                              },
-                              icon: const Icon(Icons.open_in_new_rounded, size: 16),
-                              label: Text(L.setupGetApiKey),
-                            ),
-                          ),
-
-                          const SizedBox(height: 16),
-                        ]),
-                      ),
+                          ],
+                          const SizedBox(height: 12),
+                        ],
+                      )),
                     ],
                   ),
                 ),
@@ -803,43 +757,44 @@ class _SetupScreenState extends State<SetupScreen>
   }
 }
 
-// ── Two soft decorative blobs behind the UI ───────────────────────────────────
+// ── Background: two big cookie shapes turning slowly ─────────────────────────
 class _SetupBackground extends StatelessWidget {
   final ColorScheme scheme;
   final Size        size;
+  final Animation<double> spin; // 0..1, looped slowly
+  const _SetupBackground(
+      {required this.scheme, required this.size, required this.spin});
 
-  const _SetupBackground({required this.scheme, required this.size});
+  Widget _cookie(double d, Color c, int lobes, Animation<double> turns) =>
+      RotationTransition(
+        turns: turns,
+        child: Container(
+          width: d, height: d,
+          decoration: ShapeDecoration(
+            color: c,
+            shape: M3CookieBorder(lobes: lobes, amplitude: 0.08),
+          ),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
-    return Stack(children: [
-      // Top-right blob (primary color, very low opacity)
-      Positioned(
-        top:   -size.height * 0.10,
-        right: -size.width  * 0.20,
-        child: Container(
-          width:  size.width * 0.72,
-          height: size.width * 0.72,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: scheme.primary.withValues(alpha: 0.07),
-          ),
+    return IgnorePointer(
+      child: Stack(children: [
+        Positioned(
+          top:   -size.width * 0.30,
+          right: -size.width * 0.30,
+          child: _cookie(size.width * 0.95,
+              scheme.primary.withValues(alpha: 0.08), 7, spin),
         ),
-      ),
-      // Bottom-left blob (tertiary color, very low opacity)
-      Positioned(
-        bottom: -size.height * 0.08,
-        left:   -size.width  * 0.25,
-        child: Container(
-          width:  size.width * 0.65,
-          height: size.width * 0.65,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: scheme.tertiary.withValues(alpha: 0.06),
-          ),
+        Positioned(
+          bottom: -size.width * 0.35,
+          left:   -size.width * 0.35,
+          child: _cookie(size.width * 0.90,
+              scheme.tertiary.withValues(alpha: 0.07), 5, ReverseAnimation(spin)),
         ),
-      ),
-    ]);
+      ]),
+    );
   }
 }
 
@@ -1439,13 +1394,14 @@ class _StepRow extends StatelessWidget {
   }
 }
 
-// One choice of the connection method list.
-class _MethodCard extends StatelessWidget {
+// One choice of the connection method list (expressive: cookie badge,
+// press morph, colour change when selected).
+class _MethodTile extends StatelessWidget {
   final bool selected;
   final IconData icon;
   final String title, subtitle;
   final VoidCallback onTap;
-  const _MethodCard({
+  const _MethodTile({
     required this.selected,
     required this.icon,
     required this.title,
@@ -1457,44 +1413,43 @@ class _MethodCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    return Material(
-      color: selected ? scheme.primaryContainer : scheme.surface,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: selected ? scheme.primary : scheme.outlineVariant,
-              width: selected ? 2 : 1,
-            ),
-          ),
-          child: Row(children: [
-            Icon(icon,
-                color: selected ? scheme.onPrimaryContainer : scheme.primary),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(title,
-                    style: text.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: selected ? scheme.onPrimaryContainer : null)),
-                const SizedBox(height: 2),
-                Text(subtitle,
-                    style: text.bodySmall?.copyWith(
-                        color: selected
-                            ? scheme.onPrimaryContainer
-                            : scheme.onSurfaceVariant)),
-              ]),
-            ),
-            Icon(selected ? Icons.check_circle_rounded : Icons.circle_outlined,
-                color: selected ? scheme.primary : scheme.outline),
+    return M3PressCard(
+      color: selected ? scheme.primaryContainer : scheme.surfaceContainerHigh,
+      padding: const EdgeInsets.all(14),
+      onTap: onTap,
+      child: Row(children: [
+        M3CookieBadge(
+          color: selected ? scheme.primary : scheme.secondaryContainer,
+          size: 44,
+          child: Icon(icon,
+              size: 22,
+              color: selected ? scheme.onPrimary : scheme.onSecondaryContainer),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(title,
+                style: text.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: selected ? scheme.onPrimaryContainer : null)),
+            const SizedBox(height: 2),
+            Text(subtitle,
+                style: text.bodySmall?.copyWith(
+                    color: selected
+                        ? scheme.onPrimaryContainer
+                        : scheme.onSurfaceVariant)),
           ]),
         ),
-      ),
+        const SizedBox(width: 8),
+        AnimatedSwitcher(
+          duration: M3Motion.effectsFastDuration,
+          child: Icon(
+            selected ? Icons.check_circle_rounded : Icons.circle_outlined,
+            key: ValueKey(selected),
+            color: selected ? scheme.primary : scheme.outline,
+          ),
+        ),
+      ]),
     );
   }
 }

@@ -1320,4 +1320,6 @@ const Map<String, String> kTxEn = {
   'sm_key_s': 'Your own quota, favorites possible.',
   'sm_builtin_t': 'Built-in key',
   'sm_builtin_s': 'Username only. Quota shared with other users.',
+  'wl_title': 'Welcome',
+  'wl_sub': 'Choose how you want to connect to Last.fm.',
 };

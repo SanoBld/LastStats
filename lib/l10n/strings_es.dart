@@ -1320,4 +1320,6 @@ const Map<String, String> kTxEs = {
   'sm_key_s': 'Cuota propia, favoritos posibles.',
   'sm_builtin_t': 'Clave integrada',
   'sm_builtin_s': 'Solo nombre de usuario. Cuota compartida con otros usuarios.',
+  'wl_title': 'Bienvenido',
+  'wl_sub': 'Elija cómo desea conectarse a Last.fm.',
 };
