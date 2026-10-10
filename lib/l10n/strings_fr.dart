@@ -1278,4 +1278,11 @@ const Map<String, String> kTxFr = {
   'ntf_year': 'Année {y}',
   'ntf_week': 'Semaine {w}',
   'reorder': 'Réorganiser',
+  'sp_login_t': 'Connexion à Spotify',
+  'sp_login_hint': 'Connecte-toi avec ton e-mail et ton mot de passe Spotify. La fenêtre se ferme toute seule quand c\'est bon.',
+  'sp_t': 'Spotify (Canvas)',
+  'sp_off': 'Non connecté. Touche pour te connecter.',
+  'sp_on': 'Connecté. Touche pour te déconnecter.',
+  'sp_off_s': 'Déconnecté de Spotify',
+  'sp_need': 'Spotify demande une connexion : connecte-toi dans les réglages.',
 };

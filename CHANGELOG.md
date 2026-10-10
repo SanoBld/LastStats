@@ -193,3 +193,7 @@
 - YouTube links expire: they are looked up again after 90 minutes. On iOS / macOS only H.264 is used
 - Apple Music: the chosen quality variant is checked before use, otherwise the adaptive video is kept
 - Fixed Dart analyzer errors on the dashboard (weekly count type), the deprecated `onReorder` in the reorder sheet and missing braces in the taste engine
+
+**Spotify Canvas**
+- New video cover source: Spotify Canvas (tracks and albums), with in-app Spotify login in Settings > Appearance > Video covers
+- Video sources can now be chosen and sorted freely (Apple Music, Spotify, YouTube Music)

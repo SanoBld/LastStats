@@ -76,6 +76,7 @@ const _kThemeKeys = {
   'ls_living_artwork',
   'ls_motion_artwork',
   'ls_motion_source',
+  'ls_motion_order',
   'ls_motion_quality',
   'ls_motion_tracks',
   'ls_motion_albums',

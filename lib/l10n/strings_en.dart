@@ -1278,4 +1278,11 @@ const Map<String, String> kTxEn = {
   'ntf_year': 'Year {y}',
   'ntf_week': 'Week {w}',
   'reorder': 'Reorder',
+  'sp_login_t': 'Spotify login',
+  'sp_login_hint': 'Sign in with your Spotify email and password. This window closes by itself when it works.',
+  'sp_t': 'Spotify (Canvas)',
+  'sp_off': 'Not connected. Tap to log in.',
+  'sp_on': 'Connected. Tap to log out.',
+  'sp_off_s': 'Logged out of Spotify',
+  'sp_need': 'Spotify needs a login: connect in settings.',
 };

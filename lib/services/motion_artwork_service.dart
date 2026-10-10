@@ -19,43 +19,64 @@
 //        - Links expire after a few hours (re-resolved after [_ytTtl]).
 //        - A link can answer the first bytes and refuse the rest, so
 //          adaptive links are probed deeper in the file.
+//   5. Spotify Canvas (tracks and albums): needs the user's Spotify login,
+//      see spotify_canvas_service.dart.
+//      The user picks which sources are used and in which order.
 // Returns null when nothing is found (most albums have no motion artwork),
 // so callers just keep showing the static cover.
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'api_http.dart';
+import 'spotify_canvas_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 // User choices for the video covers (read from SharedPreferences).
 class MotionPrefs {
-  // 'auto' (Apple, then YouTube) | 'yt_first' (YouTube, then Apple)
-  // | 'apple' (Apple only) | 'youtube' (YouTube only)
-  final String source;
+  static const defaultOrder = ['apple', 'spotify', 'youtube'];
+  // Sources used, in order: 'apple' | 'spotify' | 'youtube'.
+  final List<String> order;
   final String quality;  // 'auto' | '360' | '480' | '720' | '1080'
   final bool tracks, albums, artists;
-  const MotionPrefs(this.source, this.quality, this.tracks, this.albums,
-      this.artists);
+  final bool spotifyOn;  // the user is logged in to Spotify
+  const MotionPrefs(this.order, this.quality, this.tracks, this.albums,
+      this.artists, this.spotifyOn);
 
   static Future<MotionPrefs> load() async {
     final p = await SharedPreferences.getInstance();
     return MotionPrefs(
-      p.getString('ls_motion_source') ?? 'auto',
+      readOrder(p),
       p.getString('ls_motion_quality') ?? 'auto',
       p.getBool('ls_motion_tracks') ?? true,
       p.getBool('ls_motion_albums') ?? true,
       p.getBool('ls_motion_artists') ?? true,
+      (p.getString(SpotifyCanvasService.kSpDc) ?? '').isNotEmpty,
     );
   }
 
-  bool get useApple => source != 'youtube';
-  bool get useYoutube => source != 'apple';
-  bool get youtubeFirst => source == 'yt_first';
+  // New key first; else convert the old 'ls_motion_source' value.
+  static List<String> readOrder(SharedPreferences p) {
+    final o = p.getString('ls_motion_order');
+    if (o != null) {
+      final l = o.split(',').where(defaultOrder.contains).toList();
+      if (l.isNotEmpty) return l;
+    }
+    switch (p.getString('ls_motion_source') ?? 'auto') {
+      case 'apple':    return ['apple'];
+      case 'youtube':  return ['youtube'];
+      case 'yt_first': return ['youtube', 'apple'];
+      default:         return defaultOrder;
+    }
+  }
+
+  bool get useApple => order.contains('apple');
+  bool get useSpotify => order.contains('spotify') && spotifyOn;
+  bool get useYoutube => order.contains('youtube');
   // Max video height wanted; 0 = let the player decide (Apple adaptive).
   int get height => int.tryParse(quality) ?? 0;
   // Part of the cache key, so changing a setting gives fresh results.
-  String get sig => '$source$quality';
+  String get sig => '${order.join('-')}$quality${spotifyOn ? 'S' : ''}';
 }
 
 class MotionArtworkService {
@@ -161,15 +182,26 @@ class MotionArtworkService {
         return v == null ? null : await _pickVariant(v, cfg.height);
       }
 
+      // Spotify Canvas: a track's own loop, or the first tracks of an album.
+      Future<String?> viaSpotify() async {
+        if (!cfg.useSpotify) return null;
+        if (track.isNotEmpty) return SpotifyCanvasService.findTrack(artist, track);
+        if (album.isNotEmpty) return SpotifyCanvasService.findAlbum(artist, album);
+        return null;
+      }
+
       // YouTube only has videos of songs (never albums or artists).
       final ytOk = cfg.useYoutube && track.isNotEmpty;
       String? video;
-      if (ytOk && cfg.youtubeFirst) {
-        video = await _youtube(artist, track, cfg.height);
-      }
-      video ??= await viaApple();
-      if (video == null && ytOk && !cfg.youtubeFirst) {
-        video = await _youtube(artist, track, cfg.height);
+      // Try the sources in the order chosen by the user.
+      for (final src in cfg.order) {
+        if (video != null) break;
+        switch (src) {
+          case 'apple':   video = await viaApple();
+          case 'spotify': video = await viaSpotify();
+          case 'youtube':
+            if (ytOk) video = await _youtube(artist, track, cfg.height);
+        }
       }
       _remember(key, video);
       return video;

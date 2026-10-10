@@ -10,6 +10,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../app_state.dart';
 import '../../nothing_theme.dart';
 import '../../l10n/l10n.dart';
+import '../../services/motion_artwork_service.dart';
+import '../../services/spotify_canvas_service.dart';
+import 'spotify_login_page.dart';
 import '../../services/widget_service.dart';
 import '../../services/library_merge.dart';
 import 'settings_helpers.dart';
@@ -1095,7 +1098,9 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
   bool _enabled = true;
   bool _achievementsOn = true;
   bool _motionOn = true;
-  String _mvSource = 'auto', _mvQuality = 'auto';
+  List<String> _mvOrderL = List.of(MotionPrefs.defaultOrder);
+  String _mvQuality = 'auto';
+  bool _spOn = false; // logged in to Spotify
   bool _mvTracks = true, _mvAlbums = true, _mvArtists = true;
 
   // Saves one video-cover setting.
@@ -1108,14 +1113,43 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
     }
   }
 
-  List<String> get _mvOrder => switch (_mvSource) {
-        'apple'    => ['apple'],
-        'youtube'  => ['youtube'],
-        'yt_first' => ['youtube', 'apple'],
-        _          => ['apple', 'youtube'],
+  List<String> get _mvOrder => _mvOrderL;
+
+  String _mvLabel(String k) => switch (k) {
+        'apple'   => 'Apple Music',
+        'spotify' => 'Spotify',
+        _         => 'YouTube Music',
       };
 
-  String _mvLabel(String k) => k == 'apple' ? 'Apple Music' : 'YouTube Music';
+  // Saves the source order (also used by the presets).
+  Future<void> _mvSaveOrder(List<String> l) async {
+    await _mvSet('ls_motion_order', l.join(','));
+    if (mounted) setState(() => _mvOrderL = l);
+  }
+
+  // Albums: Apple or Spotify. Artists: Apple only. Tracks: any source.
+  bool _mvGrey(String key) {
+    if (key == 'ls_motion_albums') {
+      return !_mvOrderL.contains('apple') && !_mvOrderL.contains('spotify');
+    }
+    if (key == 'ls_motion_artists') return !_mvOrderL.contains('apple');
+    return false;
+  }
+
+  // Spotify row: log in (WebView) or log out.
+  Future<void> _spotifyTap() async {
+    if (_spOn) {
+      await SpotifyCanvasService.disconnect();
+      if (!mounted) return;
+      setState(() => _spOn = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(tx('sp_off_s'))));
+      return;
+    }
+    final ok = await SpotifyLoginPage.open(context);
+    if (!mounted) return;
+    setState(() => _spOn = ok);
+  }
 
   Future<void> _pickMvSources() async {
     final res = await showModalBottomSheet<PickSortResult>(
@@ -1126,43 +1160,43 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
         title: L.mvSource,
         items: const [
           PickItem('apple', 'Apple Music', icon: Icons.music_note_rounded),
+          PickItem('spotify', 'Spotify', icon: Icons.graphic_eq_rounded),
           PickItem('youtube', 'YouTube Music', icon: Icons.music_video_rounded),
         ],
         selected: _mvOrder,
       ),
     );
     if (res == null || res.selected.isEmpty || !mounted) return;
-    final l = res.selected;
-    final v = l.length == 1
-        ? l.first
-        : (l.first == 'youtube' ? 'yt_first' : 'auto');
-    _mvSet('ls_motion_source', v);
-    setState(() => _mvSource = v);
+    await _mvSaveOrder(List.of(res.selected));
+    // Spotify chosen but not logged in: open the login right away.
+    if (res.selected.contains('spotify') && !_spOn && mounted) {
+      await _spotifyTap();
+    }
   }
 
   // Which preset the current settings match ('custom' when none does).
   String get _mvMode {
     final all = _mvTracks && _mvAlbums && _mvArtists;
-    if (all && _mvSource == 'auto' && _mvQuality == 'auto') return 'best';
-    if (all && _mvSource == 'apple' && _mvQuality == '360') return 'saver';
-    if (all && _mvSource == 'auto' && _mvQuality == '1080') return 'max';
+    final def = _mvOrderL.join(',') == MotionPrefs.defaultOrder.join(',');
+    if (all && def && _mvQuality == 'auto') return 'best';
+    if (all && _mvOrderL.join(',') == 'apple' && _mvQuality == '360') return 'saver';
+    if (all && def && _mvQuality == '1080') return 'max';
     return 'custom';
   }
 
   Future<void> _mvPreset(String mode) async {
-    final (src, q) = switch (mode) {
-      'saver' => ('apple', '360'),   // small Apple clips only
-      'max'   => ('auto', '1080'),   // best quality available
-      _       => ('auto', 'auto'),   // recommended default
+    final (order, q) = switch (mode) {
+      'saver' => (['apple'], '360'),                  // small Apple clips only
+      'max'   => (List.of(MotionPrefs.defaultOrder), '1080'),
+      _       => (List.of(MotionPrefs.defaultOrder), 'auto'),
     };
-    await _mvSet('ls_motion_source', src);
+    await _mvSaveOrder(order);
     await _mvSet('ls_motion_quality', q);
     await _mvSet('ls_motion_tracks', true);
     await _mvSet('ls_motion_albums', true);
     await _mvSet('ls_motion_artists', true);
     if (!mounted) return;
     setState(() {
-      _mvSource = src;
       _mvQuality = q;
       _mvTracks = _mvAlbums = _mvArtists = true;
     });
@@ -1201,7 +1235,8 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
           _enabled = p.getBool('ls_living_artwork') ?? true;
           _achievementsOn = p.getBool('ls_achievements_enabled') ?? true;
           _motionOn = p.getBool('ls_motion_artwork') ?? true;
-          _mvSource = p.getString('ls_motion_source') ?? 'auto';
+          _mvOrderL = MotionPrefs.readOrder(p);
+          _spOn = (p.getString(SpotifyCanvasService.kSpDc) ?? '').isNotEmpty;
           _mvQuality = p.getString('ls_motion_quality') ?? 'auto';
           _mvTracks = p.getBool('ls_motion_tracks') ?? true;
           _mvAlbums = p.getBool('ls_motion_albums') ?? true;
@@ -1285,6 +1320,14 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
             subtitle: [for (final k in _mvOrder) _mvLabel(k)].join(' → '),
             onTap: _pickMvSources,
           ),
+          // Spotify Canvas needs the user's own Spotify login (phones only).
+          if (MotionArtworkService.supported)
+            SettingActionRow(
+              icon: Icons.graphic_eq_rounded,
+              title: tx('sp_t'),
+              subtitle: tx(_spOn ? 'sp_on' : 'sp_off'),
+              onTap: _spotifyTap,
+            ),
           _mvBlock(context, L.mvQualityT, Icons.high_quality_rounded, [
             for (final (key, label) in [
               ('auto', L.mvQAuto),
@@ -1311,14 +1354,14 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
               // YouTube only has videos of songs: with "YouTube only",
               // the albums and artists chips are greyed out.
               Opacity(
-                opacity: _mvSource == 'youtube' && key != 'ls_motion_tracks'
+                opacity: _mvGrey(key)
                     ? 0.4
                     : 1,
                 child: M3Chip(
                   avatar: Icon(icon, size: 16),
                   label: Text(label),
                   selected: on,
-                  onSelected: _mvSource == 'youtube' && key != 'ls_motion_tracks'
+                  onSelected: _mvGrey(key)
                       ? null
                       : (v) {
                           _mvSet(key, v);
