@@ -69,11 +69,12 @@
   <pre class="language-dart"><code class="language-dart">static Future&lt;MotionPrefs&gt; load() async {
   final p = await SharedPreferences.getInstance();
   return MotionPrefs(
-    p.getString(&#39;ls_motion_source&#39;) ?? &#39;auto&#39;,
+    readOrder(p),
     p.getString(&#39;ls_motion_quality&#39;) ?? &#39;auto&#39;,
     p.getBool(&#39;ls_motion_tracks&#39;) ?? true,
     p.getBool(&#39;ls_motion_albums&#39;) ?? true,
     p.getBool(&#39;ls_motion_artists&#39;) ?? true,
+    (p.getString(SpotifyCanvasService.kSpDc) ?? &#39;&#39;).isNotEmpty,
   );
 }</code></pre>
 </section>
@@ -103,7 +104,7 @@
 <footer>
   <span class="no-break">
     laststats_mobile
-      3.6.0-beta+25
+      4.0.0+26
   </span>
   
 </footer>

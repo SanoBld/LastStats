@@ -104,15 +104,26 @@
       return v == null ? null : await _pickVariant(v, cfg.height);
     }
 
+    &#47;&#47; Spotify Canvas: a track&#39;s own loop, or the first tracks of an album.
+    Future&lt;String?&gt; viaSpotify() async {
+      if (!cfg.useSpotify) return null;
+      if (track.isNotEmpty) return SpotifyCanvasService.findTrack(artist, track);
+      if (album.isNotEmpty) return SpotifyCanvasService.findAlbum(artist, album);
+      return null;
+    }
+
     &#47;&#47; YouTube only has videos of songs (never albums or artists).
     final ytOk = cfg.useYoutube &amp;&amp; track.isNotEmpty;
     String? video;
-    if (ytOk &amp;&amp; cfg.youtubeFirst) {
-      video = await _youtube(artist, track, cfg.height);
-    }
-    video ??= await viaApple();
-    if (video == null &amp;&amp; ytOk &amp;&amp; !cfg.youtubeFirst) {
-      video = await _youtube(artist, track, cfg.height);
+    &#47;&#47; Try the sources in the order chosen by the user.
+    for (final src in cfg.order) {
+      if (video != null) break;
+      switch (src) {
+        case &#39;apple&#39;:   video = await viaApple();
+        case &#39;spotify&#39;: video = await viaSpotify();
+        case &#39;youtube&#39;:
+          if (ytOk) video = await _youtube(artist, track, cfg.height);
+      }
     }
     _remember(key, video);
     return video;
@@ -148,7 +159,7 @@
 <footer>
   <span class="no-break">
     laststats_mobile
-      3.6.0-beta+25
+      4.0.0+26
   </span>
   
 </footer>

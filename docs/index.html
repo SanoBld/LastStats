@@ -57,81 +57,111 @@
   <img src="https://img.shields.io/github/license/SanoBld/LastStats-App?style=flat-square&amp;color=7C3AED&amp;label=License" alt="License">
   <a href="https://discord.gg/JjqmkQgZBs"><img src="https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&amp;logo=discord&amp;logoColor=white" alt="Discord"></a>
 </p>
-<p>🎵 A modern, multiplatform app built with Flutter and Material You to track and explore your listening habits in real time, using the Last.fm API.</p>
+<p>🎵 A modern, multiplatform app built with Flutter and Material 3 Expressive to track and explore your listening habits in real time, using the Last.fm API: stats, rankings, recaps, friends, music compatibility, achievements and animated artist, album and track pages.</p>
+<p>🌐 Website: <a href="https://sanobld.github.io/LastStats/">https://sanobld.github.io/LastStats/</a> · Web version (Beta): <a href="https://sanobld.github.io/LastStats/app/">https://sanobld.github.io/LastStats/app/</a></p>
 <p>Join the Discord to chat, share feedback, or ask for help: <a href="https://discord.gg/JjqmkQgZBs">https://discord.gg/JjqmkQgZBs</a></p>
 <hr>
 <h2 id="-screenshots">📸 Screenshots</h2>
 <p align="center">
-  <img src="docs/screenshots/dashboard.png" width="200" alt="Dashboard">
-  <img src="docs/screenshots/rankings.png" width="200" alt="Rankings">
-  <img src="docs/screenshots/charts.png" width="200" alt="Charts">
-  <img src="docs/screenshots/history.png" width="200" alt="History">
+  <img src="docs/screenshots/dashboard.png" width="160" alt="Dashboard">
+  <img src="docs/screenshots/weekly_recap.png" width="160" alt="Weekly recap">
+  <img src="docs/screenshots/rankings.png" width="160" alt="Rankings">
+  <img src="docs/screenshots/charts.png" width="160" alt="Charts">
 </p>
 <p align="center">
-  <img src="docs/screenshots/artist_detail.png" width="200" alt="Artist detail page">
-  <img src="docs/screenshots/flip_card.png" width="200" alt="3D artwork flip card">
-  <img src="docs/screenshots/album_view.png" width="200" alt="Album artwork viewer">
+  <img src="docs/screenshots/history.png" width="160" alt="History">
+  <img src="docs/screenshots/artist_detail.png" width="160" alt="Artist detail page">
+  <img src="docs/screenshots/artist_detail_light.png" width="160" alt="Artist detail page, light theme">
+  <img src="docs/screenshots/friend_profile.png" width="160" alt="Friend profile">
 </p>
 <p align="center">
-  <img src="docs/screenshots/achievements.png" width="200" alt="Achievements">
-  <img src="docs/screenshots/share_card.png" width="200" alt="Shareable stats card">
+  <img src="docs/screenshots/compatibility.png" width="160" alt="Music compatibility">
+  <img src="docs/screenshots/flip_card.png" width="160" alt="3D artwork flip card">
+  <img src="docs/screenshots/album_view.png" width="160" alt="Animated artwork viewer">
+  <img src="docs/screenshots/achievements.png" width="160" alt="Achievements">
+  <img src="docs/screenshots/share_card.png" width="160" alt="Shareable profile card">
+</p>
+<p align="center">
+  <img src="docs/gifs/artist_page.gif" width="200" alt="Animated artist page">
+  <img src="docs/gifs/track_page.gif" width="200" alt="Animated track page">
 </p>
 <hr>
 <h2 id="features">Features</h2>
 <p><strong>🎨 Design and theming</strong></p>
 <ul>
-<li>Clean, minimalist interface that works on phones, tablets, and desktop</li>
+<li>Material 3 Expressive: shaped images (cookie, circle, clover, arch, leaf and more, or one single shape, or square), spring animations, wavy loading indicators and grouped, rounded settings</li>
 <li>Full support for system light and dark mode, plus a pure black OLED theme for AMOLED screens</li>
-<li>Custom accent colors, either from presets or your own hex code</li>
-<li>Dynamic color that can match your device's system palette</li>
-<li>A Nothing OS inspired theme, with a classic red style or a mixed red and yellow style</li>
+<li>Custom accent colors, either from presets or your own hex code, or dynamic color that matches your device's system palette</li>
 <li>Optional Now Playing color mode, where the app's accent shifts to match the artwork of the track you are listening to, with a fallback color and the option to keep the last color once playback stops</li>
 <li>Optional tinted detail sheets, using the dominant color pulled from the album artwork</li>
-<li>Adaptive navigation: a side rail on wide screens, a bottom bar on smaller ones, and a manual switch if you prefer one over the other</li>
-<li>Show or hide labels under the navigation bar icons</li>
+<li>Adaptive layout: a side rail and a centered panel on wide screens (tablet and PC), a bottom bar on phones, and a manual switch if you prefer one over the other</li>
 </ul>
-<p><strong>🏠 Dashboard</strong></p>
+<p><strong>🏠 Dashboard and Discover</strong></p>
 <ul>
-<li>Pick your own nickname (set during setup or later in Settings) — shown instead of your raw Last.fm account name</li>
-<li>Choose which chart the dashboard shows: a listening calendar (last 60 days) or monthly bars</li>
-<li>Quick stats, now playing, recent tracks, and a friends section, all customizable from Dashboard settings</li>
+<li>Your own nickname, shown instead of your raw Last.fm account name</li>
+<li>Quick stats, now playing, recent tracks and a friends section, with a listening calendar (last 60 days) or monthly bars</li>
+<li>Reorder the sections by drag and drop, and choose which stat cards and filters to show</li>
+<li>Discover: swipeable music ideas (your top artist, your country, trending worldwide, and "On this day" from your own history), with an optional endless loop and filters sorted by what is most relevant right now</li>
+</ul>
+<p><strong>🎤 Artist, album and track pages</strong></p>
+<ul>
+<li>Full pages with biography (with a translate button), your stats, global stats, rank, tags and popular tracks</li>
+<li>Animated posters: Apple Music motion artwork, with a short silent YouTube loop as a fallback, plus a 3D flip card for the cover art</li>
+<li>Lyrics for tracks, and quick links to your music platforms</li>
+</ul>
+<p><strong>👥 Friends and music compatibility</strong></p>
+<ul>
+<li>Follow your Last.fm friends' activity, see who is listening right now, and open their full profile</li>
+<li>Compare your music tastes: a compatibility score broken down by artists, genres, tracks and albums, with everything you have in common</li>
+<li>Profile cards with an optional QR code: scan a QR code to open a profile</li>
+</ul>
+<p><strong>📊 Charts, rankings, history and recaps</strong></p>
+<ul>
+<li>Charts for scrobbles per month, progress over time and a multi-year heatmap, for all time or a given year</li>
+<li>Rankings of your top artists, albums and tracks with a podium, by year, month or all time</li>
+<li>Day-by-day history with the exact time of each scrobble</li>
+<li>Daily, weekly and monthly recaps in a story format, shareable as images</li>
 </ul>
 <p><strong>❤️ Favorites</strong></p>
 <ul>
 <li>Like tracks, artists, and albums directly from the app, through your own Last.fm account</li>
-<li>A dedicated Favorites page with filters and cover art, where you can also remove items</li>
+<li>A dedicated Favorites page with folders, filters and cover art</li>
 <li>A small heart badge next to loved tracks in your recent listens, history, and search results, with an option to turn it off</li>
-<li>A favorites count shown on your dashboard, with an option to hide it</li>
 </ul>
 <p><strong>🏆 Achievements</strong></p>
 <ul>
 <li>A leveling system based on your real listening activity, with dozens of achievements to unlock</li>
-<li>Categories covering listening totals, artist and album diversity, loyalty, comparisons, and more</li>
+<li>Categories covering listening totals, artist and album diversity, loyalty, pace, streaks, and more</li>
 </ul>
-<p><strong>📊 Data and sync</strong></p>
+<p><strong>📚 Library options</strong></p>
+<ul>
+<li>Link versions of the same track: remasters, singles, (feat. ...) and deluxe editions count together, while remixes and live versions stay separate</li>
+<li>Split collaborations: "Gims &amp; Damso" counts for both artists, while bands such as "Simon &amp; Garfunkel" stay whole</li>
+</ul>
+<p><strong>📊 Data, accounts and sync</strong></p>
 <ul>
 <li>Direct connection to the Last.fm API for real, live scrobbles, top artists, albums, and tracks</li>
+<li>Use your own API key, or the app's built-in backup key, and change it any time in Settings</li>
+<li>An API tab showing today's requests per service, with an optional request limiter</li>
 <li>Flexible time ranges: 7 days, 1 month, 3 months, 6 months, 12 months, or all time</li>
 <li>Background sync that keeps your stats up to date automatically, even when the app is closed</li>
-<li>Local cache to reduce loading times and API calls</li>
-<li>Smart artwork search: if Last.fm has no image, the app looks it up through iTunes, Deezer, MusicBrainz, and the Cover Art Archive</li>
+<li>Offline-friendly cache with a storage breakdown, and backups where you choose what to export and restore</li>
+<li>Smart artwork search: if Last.fm has no image, the app looks it up through Wikipedia, iTunes, Deezer, TheAudioDB, MusicBrainz, and the Cover Art Archive</li>
 <li>No fake or simulated data, everything comes from your real listening history</li>
 </ul>
 <p><strong>🔎 Search</strong></p>
 <ul>
-<li>A dedicated search tab for artists, albums, tracks, and Last.fm profiles</li>
+<li>A dedicated search tab for artists, albums, tracks, and Last.fm profiles, with rich detail sheets</li>
 <li>Search bar in the news page too, filtering by title and content as you type</li>
-<li>One consistent search bar look across the app: News, Search, and Settings</li>
 </ul>
 <p><strong>📤 Sharing</strong></p>
 <ul>
-<li>Share artwork, charts, achievement badges, and recap cards anywhere — including Windows, macOS, and Linux, where the file is saved and revealed directly in your file explorer</li>
+<li>Share artwork, charts, achievement badges, recap cards and your profile card (with an optional QR code) anywhere, including Windows, macOS, and Linux, where the file is saved and revealed directly in your file explorer</li>
 </ul>
 <p><strong>🔔 Notifications</strong></p>
 <ul>
-<li>Get notified when new app updates or news posts are published</li>
-<li>A small badge on the news bell so you never miss an update</li>
-<li>Notifications can be turned on or off at any time, on every supported platform including Windows</li>
+<li>Daily and weekly recaps, scrobble milestones, sync alerts, and news and update alerts</li>
+<li>Every notification type can be turned on or off at any time, on every supported platform including Windows</li>
 </ul>
 <p><strong>🌍 Languages</strong></p>
 <ul>
@@ -152,7 +182,8 @@
 <p>Prebuilt files are also generated automatically after each update, through GitHub Actions:</p>
 <p><a href="https://github.com/SanoBld/LastStats-App/actions">https://github.com/SanoBld/LastStats-App/actions</a></p>
 <p>Builds coming straight from Actions contain the latest code and may include bugs that have not been fixed yet. If you want a stable experience, use the releases page instead.</p>
-<p>Supported platforms: <strong>Android, Windows, macOS, Linux, and iOS (unsigned, sideload only).</strong></p>
+<p>Supported platforms: <strong>Android, Windows, macOS, Linux (x64 and ARM64), and iOS (unsigned, sideload only).</strong></p>
+<p>No install needed? Try the <strong>web version (Beta)</strong>: <a href="https://sanobld.github.io/LastStats/app/">https://sanobld.github.io/LastStats/app/</a></p>
 <hr>
 <h2 id="-installation">💻 Installation</h2>
 <h3 id="android">Android</h3>
@@ -200,7 +231,8 @@ flutter build apk        # or: windows / macos / linux
 <ul>
 <li>Flutter and Dart</li>
 <li>Material Design 3 (Material You)</li>
-<li>Last.fm REST API, with iTunes Search, Deezer, MusicBrainz, and the Cover Art Archive as backup sources for missing artwork</li>
+<li>Last.fm REST API, with Wikipedia, iTunes Search, Deezer, TheAudioDB, MusicBrainz, and the Cover Art Archive as backup sources for missing artwork</li>
+<li>Apple Music and YouTube for animated posters, LRCLIB (with lyrics.ovh as a fallback) for lyrics, ListenBrainz for worldwide trends in Discover, and Google Translate for biography translation</li>
 <li>The full list of open-source packages used is visible in-app, under Settings → About, each linking to its pub.dev page</li>
 </ul>
 <hr>
@@ -478,6 +510,13 @@ flutter build apk        # or: windows / macos / linux
 
           <dt id="settings_rows">
   <span class="name"><a href="screens_settings_settings_rows/">screens/settings/settings_rows</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="spotify_login_page">
+  <span class="name"><a href="screens_settings_spotify_login_page/">screens/settings/spotify_login_page</a></span> 
 
 </dt>
 <dd>
@@ -770,6 +809,20 @@ flutter build apk        # or: windows / macos / linux
 <dd>
 </dd>
 
+          <dt id="spotify_canvas_service">
+  <span class="name"><a href="services_spotify_canvas_service/">services/spotify_canvas_service</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="spotify_web_session">
+  <span class="name"><a href="services_spotify_web_session/">services/spotify_web_session</a></span> 
+
+</dt>
+<dd>
+</dd>
+
           <dt id="storage_manager">
   <span class="name"><a href="services_storage_manager/">services/storage_manager</a></span> 
 
@@ -1026,6 +1079,7 @@ flutter build apk        # or: windows / macos / linux
       <li><a href="screens_settings_readme_page/">screens/settings/readme_page</a></li>
       <li><a href="screens_settings_settings_helpers/">screens/settings/settings_helpers</a></li>
       <li><a href="screens_settings_settings_rows/">screens/settings/settings_rows</a></li>
+      <li><a href="screens_settings_spotify_login_page/">screens/settings/spotify_login_page</a></li>
       <li><a href="screens_settings_startup_page/">screens/settings/startup_page</a></li>
       <li><a href="screens_settings_sync_page/">screens/settings/sync_page</a></li>
       <li><a href="screens_settings_update_history_page/">screens/settings/update_history_page</a></li>
@@ -1067,6 +1121,8 @@ flutter build apk        # or: windows / macos / linux
       <li><a href="services_scrobbles_cache_backend_stub/">services/scrobbles_cache_backend_stub</a></li>
       <li><a href="services_scrobbles_cache_backend_web/">services/scrobbles_cache_backend_web</a></li>
       <li><a href="services_scrobbles_file_cache/">services/scrobbles_file_cache</a></li>
+      <li><a href="services_spotify_canvas_service/">services/spotify_canvas_service</a></li>
+      <li><a href="services_spotify_web_session/">services/spotify_web_session</a></li>
       <li><a href="services_storage_manager/">services/storage_manager</a></li>
       <li><a href="services_taste_engine/">services/taste_engine</a></li>
       <li><a href="services_translation_service/">services/translation_service</a></li>
@@ -1105,7 +1161,7 @@ flutter build apk        # or: windows / macos / linux
 <footer>
   <span class="no-break">
     laststats_mobile
-      3.6.0-beta+25
+      4.0.0+26
   </span>
   
 </footer>

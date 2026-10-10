@@ -61,7 +61,7 @@
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
         <dt id="MotionPrefs.new" class="callable">
-          <span class="name"><a href="../services_motion_artwork_service/MotionPrefs/MotionPrefs.html">MotionPrefs</a></span><span class="signature">(<span class="parameter" id="param-source"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">source</span>, </span><span class="parameter" id="param-quality"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">quality</span>, </span><span class="parameter" id="param-tracks"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">tracks</span>, </span><span class="parameter" id="param-albums"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">albums</span>, </span><span class="parameter" id="param-artists"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">artists</span></span>)</span>
+          <span class="name"><a href="../services_motion_artwork_service/MotionPrefs/MotionPrefs.html">MotionPrefs</a></span><span class="signature">(<span class="parameter" id="param-order"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">order</span>, </span><span class="parameter" id="param-quality"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">quality</span>, </span><span class="parameter" id="param-tracks"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">tracks</span>, </span><span class="parameter" id="param-albums"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">albums</span>, </span><span class="parameter" id="param-artists"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">artists</span>, </span><span class="parameter" id="param-spotifyOn"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">spotifyOn</span></span>)</span>
         </dt>
         <dd>
           
@@ -123,6 +123,18 @@
 
 </dd>
 
+        <dt id="order" class="property">
+  <span class="name"><a href="../services_motion_artwork_service/MotionPrefs/order.html">order</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
         <dt id="quality" class="property">
   <span class="name"><a href="../services_motion_artwork_service/MotionPrefs/quality.html">quality</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
@@ -159,9 +171,9 @@
 
 </dd>
 
-        <dt id="source" class="property">
-  <span class="name"><a href="../services_motion_artwork_service/MotionPrefs/source.html">source</a></span>
-  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+        <dt id="spotifyOn" class="property">
+  <span class="name"><a href="../services_motion_artwork_service/MotionPrefs/spotifyOn.html">spotifyOn</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
   
 
 </dt>
@@ -195,8 +207,8 @@
 
 </dd>
 
-        <dt id="useYoutube" class="property">
-  <span class="name"><a href="../services_motion_artwork_service/MotionPrefs/useYoutube.html">useYoutube</a></span>
+        <dt id="useSpotify" class="property">
+  <span class="name"><a href="../services_motion_artwork_service/MotionPrefs/useSpotify.html">useSpotify</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
   
 
@@ -207,8 +219,8 @@
 
 </dd>
 
-        <dt id="youtubeFirst" class="property">
-  <span class="name"><a href="../services_motion_artwork_service/MotionPrefs/youtubeFirst.html">youtubeFirst</a></span>
+        <dt id="useYoutube" class="property">
+  <span class="name"><a href="../services_motion_artwork_service/MotionPrefs/useYoutube.html">useYoutube</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
   
 
@@ -295,10 +307,40 @@
 
 </dd>
 
+        <dt id="readOrder" class="callable">
+  <span class="name"><a href="../services_motion_artwork_service/MotionPrefs/readOrder.html">readOrder</a></span><span class="signature">(<wbr><span class="parameter" id="readOrder-param-p"><span class="type-annotation"><a href="https://pub.dev/documentation/shared_preferences/2.5.5/shared_preferences/SharedPreferences-class.html">SharedPreferences</a></span> <span class="parameter-name">p</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
     </dl>
   </section>
     
 
+  <section class="summary offset-anchor" id="constants">
+    <h2>Constants</h2>
+    <dl class="properties">
+        <dt id="defaultOrder" class="constant">
+    <span class="name "><a href="../services_motion_artwork_service/MotionPrefs/defaultOrder-constant.html">defaultOrder</a></span>
+  <span class="signature">&#8594; const <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+    </dl>
+  </section>
   </div> <!-- /.main-content -->
   <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
     <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
@@ -322,7 +364,7 @@
 <footer>
   <span class="no-break">
     laststats_mobile
-      3.6.0-beta+25
+      4.0.0+26
   </span>
   
 </footer>
