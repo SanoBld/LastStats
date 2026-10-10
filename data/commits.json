@@ -1,6 +1,33 @@
 {
-  "updated": "2026-10-10T04:46:56Z",
+  "updated": "2026-10-10T12:03:03Z",
   "commits": [
+    {
+      "sha": "1610130e3b3e9ba289e5a04d481e5f94863bf7b0",
+      "message": "feat: amélioration des appels API pour gérer les erreurs 429 et 401 dans SpotifyCanvasService",
+      "date": "2026-10-10T08:34:55Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/1610130e3b3e9ba289e5a04d481e5f94863bf7b0",
+      "tags": []
+    },
+    {
+      "sha": "3d2160c6563e319088dd28eb76e881caad7cba03",
+      "message": "feat: Add Spotify connection and management features\n\n- Implemented a new Connections page to manage Last.fm and Spotify accounts.\n- Added localization strings for Spotify login and connection status in multiple languages (DE, EN, ES, FR, IT, JA, PT, RU, ZH).\n- Created a BrandIcon widget to display brand logos with fallback support.\n- Enhanced account management with API key handling and connection testing for Spotify.\n- Updated settings UI to include connection options and improved user experience for managing Spotify connections.",
+      "date": "2026-10-10T08:13:50Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/3d2160c6563e319088dd28eb76e881caad7cba03",
+      "tags": []
+    },
+    {
+      "sha": "996a7d11a4308f7d2f68990a59932b76eb4899b4",
+      "message": "feat: ajout de la prise en charge de Spotify Canvas avec connexion intégrée et gestion des vidéos",
+      "date": "2026-10-10T07:45:47Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/996a7d11a4308f7d2f68990a59932b76eb4899b4",
+      "tags": []
+    },
     {
       "sha": "4eed272acf939e3481d58885eb405cda46aa815e",
       "message": "Merge branch 'master' of https://github.com/SanoBld/LastStats",
@@ -2688,33 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/2d792c15ee92f7f1005fc2b4a1efae50469b1209",
-      "tags": []
-    },
-    {
-      "sha": "d022ebd4dfe2033e6dab4bb7e9557761d4f398c0",
-      "message": "fix: supprimer le téléchargement du fichier de langue chinois simplifié en raison de l'absence d'une source fiable",
-      "date": "2026-07-17T08:09:21Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/d022ebd4dfe2033e6dab4bb7e9557761d4f398c0",
-      "tags": []
-    },
-    {
-      "sha": "e2ae138d162b753b24f9448ab43255d94e1cb053",
-      "message": "feat: ajouter le support des fichiers de langue supplémentaires pour l'installateur Windows",
-      "date": "2026-07-17T08:00:32Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/e2ae138d162b753b24f9448ab43255d94e1cb053",
-      "tags": []
-    },
-    {
-      "sha": "b11e220324a631a7d38f8d17461a4b32f1c2bf33",
-      "message": "feat: ajouter la prise en charge de la statistique \"Favoris\" dans le tableau de bord",
-      "date": "2026-07-17T07:44:27Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/b11e220324a631a7d38f8d17461a4b32f1c2bf33",
       "tags": []
     }
   ]
