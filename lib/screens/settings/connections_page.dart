@@ -2,10 +2,14 @@
 // Tap a service to unfold it, then connect or disconnect.
 import 'package:flutter/material.dart';
 import '../../l10n/extra_strings.dart';
+import '../../l10n/l10n.dart';
+import '../../services/account_manager.dart';
+import '../../services/internal_keys.dart';
 import '../../services/spotify_canvas_service.dart';
 import '../../widgets/brand_icon.dart';
 import '../../widgets/m3_components.dart';
 import 'account_page.dart';
+import 'lastfm_login_page.dart';
 import 'settings_helpers.dart';
 import 'settings_rows.dart';
 import 'spotify_login_page.dart';
@@ -53,6 +57,18 @@ class _ConnectionsPageState extends State<ConnectionsPage> {
     if (mounted) setState(() { _testing = false; _test = r; });
   }
 
+  // Log in on the Last.fm website: the app adds the account with its
+  // built-in API key (no key needed from the user).
+  Future<void> _lfmWeb() async {
+    final name = await LastfmLoginPage.open(context);
+    if (name == null || !mounted) return;
+    final ok = await AccountManager.add(
+        AccountEntry(username: name, apiKey: await InternalKeys.pick()));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(ok ? L.acctAddedSuccess(name) : L.acctAlreadyAddedOrFull)));
+  }
+
   void _open(Widget page) =>
       Navigator.push(context, MaterialPageRoute(builder: (_) => page));
 
@@ -75,9 +91,16 @@ class _ConnectionsPageState extends State<ConnectionsPage> {
                   Icons.bar_chart_rounded, color: scheme.primary),
               title: 'Last.fm',
               body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('${tx('sp_on')}: @${widget.username}', style: sub),
+                Text('${tx('sp_on')}: @${widget.username}',
+                    style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 6),
+                Text(tx('conn_lfm_desc'), style: sub),
                 const SizedBox(height: 12),
                 Wrap(spacing: 8, runSpacing: 8, children: [
+                  FilledButton(
+                    onPressed: _lfmWeb,
+                    child: Text(tx('conn_lfm_web')),
+                  ),
                   FilledButton.tonal(
                     onPressed: () => _open(AccountPage(username: widget.username)),
                     child: Text(tx('conn_manage')),

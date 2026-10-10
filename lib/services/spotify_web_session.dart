@@ -2,6 +2,8 @@
 // WebView. A hook injected before the page's own scripts copies the
 // "authorization" and "client-token" headers of the page's own requests.
 // (Home-made tokens are refused by Spotify, so we reuse the page's.)
+// The hook also copies the web player's own search request (a "template"),
+// so we can search tracks without api.spotify.com (rate limited).
 import 'dart:async';
 import 'dart:collection';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -36,8 +38,29 @@ class SpotifyWebSession {
     else if (typeof h.forEach === 'function') { h.forEach(function (v, k) { look(k, v); }); }
     else { for (var k in h) look(k, h[k]); }
   }
+  var tplSent = false;
+  function noteSearch(input, init) {
+    if (tplSent) return;
+    try {
+      var url = typeof input === 'string' ? input : (input && input.url);
+      url = String(url || '');
+      if (url.indexOf('pathfinder') < 0) return;
+      var body = init && typeof init.body === 'string' ? init.body : null;
+      var op = null;
+      if (body) { try { op = JSON.parse(body).operationName; } catch (e) {} }
+      if (!op) { var m = url.match(/operationName=([^&]+)/); if (m) op = decodeURIComponent(m[1]); }
+      if (!op || !/search/i.test(op) || /suggest|autocomplete/i.test(op)) return;
+      tplSent = true;
+      if (window.flutter_inappwebview) {
+        window.flutter_inappwebview.callHandler('lsSearch', JSON.stringify({
+          method: (init && init.method) || 'GET', url: url, body: body, op: op
+        }));
+      }
+    } catch (e) {}
+  }
   var f = window.fetch;
   window.fetch = function (input, init) {
+    noteSearch(input, init);
     try {
       if (input && input.headers) scan(input.headers);
       if (init && init.headers) scan(init.headers);
@@ -95,16 +118,21 @@ class SpotifyWebSession {
     } catch (_) {}
   }
 
-  // Loads the web player in a hidden WebView and waits for the headers.
-  // Returns null if nothing comes in time (not logged in, no network...).
-  static Future<({String token, String clientToken})?> refresh(
+  // Search page of the web player: it sends the search request we copy.
+  static const searchTerm = 'hello';
+  static final _searchPage = WebUri('https://open.spotify.com/search/$searchTerm/tracks');
+
+  // Loads the web player in a hidden WebView and waits for the headers
+  // (and the search template). Returns null if no token comes in time.
+  static Future<({String token, String clientToken, String? search})?> refresh(
       String spDc) async {
     HeadlessInAppWebView? hw;
-    final done = Completer<({String token, String clientToken})?>();
+    final tok = Completer<({String token, String clientToken})?>();
+    final tpl = Completer<String?>();
     try {
       await _setSpDc(spDc);
       hw = HeadlessInAppWebView(
-        initialUrlRequest: URLRequest(url: _site),
+        initialUrlRequest: URLRequest(url: _searchPage),
         initialUserScripts: scripts(),
         initialSettings: InAppWebViewSettings(
           javaScriptEnabled: true,
@@ -114,18 +142,30 @@ class SpotifyWebSession {
           c.addJavaScriptHandler(
             handlerName: 'lsTok',
             callback: (a) {
-              if (a.length >= 2 && !done.isCompleted) {
-                done.complete(
+              if (a.length >= 2 && !tok.isCompleted) {
+                tok.complete(
                     (token: a[0].toString(), clientToken: a[1].toString()));
               }
+              return null;
+            },
+          );
+          c.addJavaScriptHandler(
+            handlerName: 'lsSearch',
+            callback: (a) {
+              if (a.isNotEmpty && !tpl.isCompleted) tpl.complete(a[0].toString());
               return null;
             },
           );
         },
       );
       await hw.run();
-      return await done.future
+      final t = await tok.future
           .timeout(const Duration(seconds: 25), onTimeout: () => null);
+      if (t == null) return null;
+      // The search request usually comes right after the token.
+      final q = await tpl.future
+          .timeout(const Duration(seconds: 10), onTimeout: () => null);
+      return (token: t.token, clientToken: t.clientToken, search: q);
     } catch (_) {
       return null;
     } finally {

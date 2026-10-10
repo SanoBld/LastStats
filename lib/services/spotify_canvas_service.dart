@@ -2,8 +2,10 @@
 // Spotify has no public API for it. This uses the same private calls as
 // the Spotify web player, with the user's own Spotify login:
 //   1. Login in a WebView (see SpotifyLoginPage). We keep the "sp_dc" cookie.
-//   2. A hidden web player gives a short token (see SpotifyWebSession).
-//   3. v1/search finds the track id.
+//   2. A hidden web player gives a short token and a copy of its own
+//      search request (see SpotifyWebSession).
+//   3. That search request, replayed with our words, finds the track id.
+//      (api.spotify.com/v1/search is NOT used: it answers 429 all the time.)
 //   4. api-partner.spotify.com "canvas" query returns the MP4 link.
 // It can break if Spotify changes its private calls (the query hash).
 // Returns null when nothing is found, like the other sources.
@@ -11,12 +13,19 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../l10n/extra_strings.dart';
 import 'api_http.dart';
 import 'spotify_web_session.dart';
 
 class _Sess {
   final String bearer, clientToken;
   const _Sess(this.bearer, this.clientToken);
+}
+
+class _Cand {
+  final String uri, name, album;
+  final List<String> artists;
+  const _Cand(this.uri, this.name, this.artists, this.album);
 }
 
 class _Expired implements Exception {}
@@ -26,6 +35,7 @@ class SpotifyCanvasService {
   static const _kTok = 'ls_spotify_token';
   static const _kCt = 'ls_spotify_client_token';
   static const _kExp = 'ls_spotify_token_exp';
+  static const _kTpl = 'ls_spotify_search_tpl';
   static const _kHash = 'ls_spotify_canvas_hash'; // optional override
   // Hash of Spotify's "canvas" query. It changes when Spotify updates
   // the web player: then paste the new one in ls_spotify_canvas_hash.
@@ -60,13 +70,14 @@ class SpotifyCanvasService {
 
   static Future<void> disconnect() async {
     final p = await SharedPreferences.getInstance();
-    for (final k in [kSpDc, _kTok, _kCt, _kExp]) {
+    for (final k in [kSpDc, _kTok, _kCt, _kExp, _kTpl]) {
       await p.remove(k);
     }
     await SpotifyWebSession.clear();
   }
 
   static Future<_Sess?>? _refreshing;
+  static DateTime? _lastRefresh;
 
   static Future<_Sess?> _session({bool force = false}) async {
     if (kIsWeb) return null;
@@ -84,17 +95,42 @@ class SpotifyCanvasService {
     // One refresh at a time, even if many covers ask together.
     return _refreshing ??= () async {
       try {
+        _lastRefresh = DateTime.now();
         final r = await SpotifyWebSession.refresh(spDc);
         if (r == null) {
           lastError = 'no token (login expired?)';
           return null;
         }
         await _saveToken(p, r.token, r.clientToken);
+        if (r.search != null) await p.setString(_kTpl, r.search!);
         return _Sess(r.token, r.clientToken);
       } finally {
         _refreshing = null;
       }
     }();
+  }
+
+  // The copied search request. If missing, one refresh is tried
+  // (at most every 10 minutes).
+  static Future<Map<String, dynamic>?> _template() async {
+    final p = await SharedPreferences.getInstance();
+    var raw = p.getString(_kTpl);
+    if (raw == null) {
+      final t = _lastRefresh;
+      if (t == null || DateTime.now().difference(t).inMinutes >= 10) {
+        await _session(force: true);
+        raw = p.getString(_kTpl);
+      }
+    }
+    if (raw == null) {
+      lastError = 'no search template';
+      return null;
+    }
+    try {
+      return jsonDecode(raw) as Map<String, dynamic>;
+    } catch (_) {
+      return null;
+    }
   }
 
   // ── Public lookups ─────────────────────────────────────────────────────
@@ -132,21 +168,14 @@ class SpotifyCanvasService {
     final core = _core(track);
     if (core.isEmpty) return null;
     final lead = artist.split(_artistSplit).first;
-    final j = await _api(s, '/v1/search',
-        {'q': '$lead $core', 'type': 'track', 'limit': '10'});
-    final items = (j?['tracks']?['items'] as List?) ?? [];
+    final cands = await _search(s, '$lead $core');
     var tried = 0;
-    for (final it in items) {
-      if (it is! Map || tried >= 3) continue;
-      if (!_similar(track, (it['name'] ?? '').toString())) continue;
-      final names = [
-        for (final a in (it['artists'] as List? ?? [])) (a['name'] ?? '').toString()
-      ];
-      if (!names.any((n) => _artistMatch(artist, n))) continue;
-      final id = (it['id'] ?? '').toString();
-      if (id.isEmpty) continue;
+    for (final c in cands) {
+      if (tried >= 3) break;
+      if (!_similar(track, c.name)) continue;
+      if (!c.artists.any((n) => _artistMatch(artist, n))) continue;
       tried++;
-      final v = await _canvas(s, 'spotify:track:$id');
+      final v = await _canvas(s, c.uri);
       if (v != null) return v;
     }
     return null;
@@ -157,73 +186,24 @@ class SpotifyCanvasService {
     final core = _core(album);
     if (core.isEmpty) return null;
     final lead = artist.split(_artistSplit).first;
-    final j = await _api(s, '/v1/search',
-        {'q': '$lead $core', 'type': 'album', 'limit': '5'});
-    final items = (j?['albums']?['items'] as List?) ?? [];
-    for (final it in items) {
-      if (it is! Map) continue;
-      if (!_similar(album, (it['name'] ?? '').toString())) continue;
-      final names = [
-        for (final a in (it['artists'] as List? ?? [])) (a['name'] ?? '').toString()
-      ];
-      if (!names.any((n) => _artistMatch(artist, n))) continue;
-      final id = (it['id'] ?? '').toString();
-      if (id.isEmpty) continue;
-      final t = await _api(s, '/v1/albums/$id/tracks', {'limit': '4'});
-      for (final tr in (t?['items'] as List? ?? [])) {
-        final tid = (tr is Map ? tr['id'] : null)?.toString() ?? '';
-        if (tid.isEmpty) continue;
-        final v = await _canvas(s, 'spotify:track:$tid');
-        if (v != null) return v;
-      }
-      return null; // first matching album only
+    final cands = await _search(s, '$lead $core');
+    var tried = 0;
+    final seen = <String>{};
+    for (final c in cands) {
+      if (tried >= 4) break;
+      if (!_similar(album, c.album)) continue;
+      if (!c.artists.any((n) => _artistMatch(artist, n))) continue;
+      if (!seen.add(c.uri)) continue;
+      tried++;
+      final v = await _canvas(s, c.uri);
+      if (v != null) return v;
     }
     return null;
   }
 
   // ── Calls ──────────────────────────────────────────────────────────────
 
-  // Search/album calls. Plain http (not ApiHttp): its client-side rate
-  // limiter must not answer 429 for us. Web-player headers are sent so the
-  // call looks like the web player's own. One short retry on a real 429.
-  static Future<http.Response> _get(_Sess s, String path, Map<String, String> q) =>
-      http.get(Uri.https('api.spotify.com', path, q), headers: {
-        'Authorization': s.bearer,
-        'client-token': s.clientToken,
-        'app-platform': 'WebPlayer',
-        'Accept': 'application/json',
-        'Accept-Language': 'en',
-        'Origin': 'https://open.spotify.com',
-        'Referer': 'https://open.spotify.com/',
-        'User-Agent': SpotifyWebSession.ua,
-      }).timeout(_timeout);
-
-  static Future<Map<String, dynamic>?> _api(
-      _Sess s, String path, Map<String, String> q) async {
-    var res = await _get(s, path, q);
-    if (res.statusCode == 429) {
-      final wait = int.tryParse(res.headers['retry-after'] ?? '') ?? 2;
-      if (wait <= 4) {
-        await Future.delayed(Duration(seconds: wait + 1));
-        res = await _get(s, path, q);
-      }
-    }
-    if (res.statusCode == 401) throw _Expired();
-    if (res.statusCode != 200) {
-      lastError = 'api ${res.statusCode} retry-after=${res.headers['retry-after']}';
-      return null;
-    }
-    final d = jsonDecode(utf8.decode(res.bodyBytes));
-    return d is Map<String, dynamic> ? d : null;
-  }
-
-  // Raw "canvas" call: HTTP status + body (used by _canvas and diagnose).
-  static Future<(int, String)> _canvasRaw(_Sess s, String trackUri) async {
-    final p = await SharedPreferences.getInstance();
-    final hash = p.getString(_kHash) ?? defaultHash;
-    final res = await ApiHttp.post(
-      Uri.https('api-partner.spotify.com', '/pathfinder/v2/query'),
-      headers: {
+  static Map<String, String> _headers(_Sess s) => {
         'Authorization': s.bearer,
         'client-token': s.clientToken,
         'Content-Type': 'application/json;charset=UTF-8',
@@ -232,7 +212,93 @@ class SpotifyCanvasService {
         'Origin': 'https://open.spotify.com',
         'Referer': 'https://open.spotify.com/',
         'User-Agent': SpotifyWebSession.ua,
-      },
+      };
+
+  // Replays the web player's own search with our words (plain http:
+  // not ApiHttp, so its client-side limiter never answers for us).
+  static Future<List<_Cand>> _search(_Sess s, String query) async {
+    final tpl = await _template();
+    if (tpl == null) return [];
+    const orig = SpotifyWebSession.searchTerm;
+    dynamic swap(dynamic n) {
+      if (n is String) return n == orig ? query : n;
+      if (n is Map) return {for (final e in n.entries) e.key: swap(e.value)};
+      if (n is List) return [for (final e in n) swap(e)];
+      return n;
+    }
+
+    final url = Uri.parse('https://open.spotify.com')
+        .resolve((tpl['url'] ?? '').toString());
+    http.Response res;
+    if ((tpl['method'] ?? 'GET').toString().toUpperCase() == 'POST' &&
+        tpl['body'] != null) {
+      final body = jsonEncode(swap(jsonDecode(tpl['body'].toString())));
+      res = await http
+          .post(url, headers: _headers(s), body: body)
+          .timeout(_timeout);
+    } else {
+      final q = Map<String, String>.from(url.queryParameters);
+      if (q['variables'] != null) {
+        q['variables'] = jsonEncode(swap(jsonDecode(q['variables']!)));
+      }
+      res = await http
+          .get(url.replace(queryParameters: q), headers: _headers(s))
+          .timeout(_timeout);
+    }
+    if (res.statusCode == 401) throw _Expired();
+    if (res.statusCode != 200) {
+      lastError = 'search ${res.statusCode}';
+      return [];
+    }
+    final out = <_Cand>[];
+    _collect(jsonDecode(utf8.decode(res.bodyBytes)), out);
+    if (out.isEmpty) lastError = 'search: no tracks in answer';
+    return out;
+  }
+
+  // Finds every track object (uri "spotify:track:...") anywhere in the JSON.
+  static void _collect(dynamic n, List<_Cand> out) {
+    if (n is Map) {
+      final uri = n['uri'];
+      if (uri is String &&
+          uri.startsWith('spotify:track:') &&
+          n['name'] is String) {
+        final names = <String>[];
+        _names(n['artists'], names);
+        final alb = n['albumOfTrack'];
+        out.add(_Cand(uri, n['name'] as String, names,
+            alb is Map ? (alb['name'] ?? '').toString() : ''));
+      }
+      for (final v in n.values) {
+        _collect(v, out);
+      }
+    } else if (n is List) {
+      for (final v in n) {
+        _collect(v, out);
+      }
+    }
+  }
+
+  static void _names(dynamic n, List<String> out) {
+    if (n is Map) {
+      if (n['name'] is String) out.add(n['name'] as String);
+      for (final v in n.values) {
+        _names(v, out);
+      }
+    } else if (n is List) {
+      for (final v in n) {
+        _names(v, out);
+      }
+    }
+  }
+
+  // Raw "canvas" call: HTTP status + body (used by _canvas and diagnose).
+  static Future<(int, String)> _canvasRaw(_Sess s, String trackUri) async {
+    final p = await SharedPreferences.getInstance();
+    final hash = p.getString(_kHash) ?? defaultHash;
+    final res = await ApiHttp.post(
+      Uri.https('api-partner.spotify.com', '/pathfinder/v2/query'),
+      headers: _headers(s),
       body: jsonEncode({
         'operationName': 'canvas',
         'variables': {'trackUri': trackUri},
@@ -263,30 +329,34 @@ class SpotifyCanvasService {
     return v;
   }
 
-  /// Step-by-step test on a track known to have a Canvas. For the
-  /// "Test Spotify" button: tells which step fails.
+  /// Step-by-step test (for the "Test Spotify" button). Texts come from
+  /// the language files (dg_* keys).
   static Future<String> diagnose() async {
     final out = <String>[];
     try {
       final p = await SharedPreferences.getInstance();
       final spDc = p.getString(kSpDc) ?? '';
-      out.add('1. login cookie: ${spDc.isEmpty ? 'MISSING' : 'ok'}');
+      out.add('1. ${tx('dg_cookie')}: ${spDc.isEmpty ? tx('dg_missing') : tx('dg_ok')}');
       if (spDc.isEmpty) return out.join('\n');
       final s = await _session(force: true);
-      out.add('2. web token: ${s == null ? 'FAILED (${lastError ?? '?'})' : 'ok'}');
+      out.add('2. ${tx('dg_token')}: ${s == null ? '${tx('dg_failed')} (${lastError ?? '?'})' : tx('dg_ok')}');
       if (s == null) return out.join('\n');
-      final r = await _get(
-          s, '/v1/search', {'q': 'SZA Kill Bill', 'type': 'track', 'limit': '1'});
-      out.add('3. search: HTTP ${r.statusCode}'
-          '${r.statusCode == 200 ? '' : ' retry-after=${r.headers['retry-after']} ${r.body.length > 120 ? r.body.substring(0, 120) : r.body}'}');
+      final tpl = await _template();
+      if (tpl == null) {
+        out.add('3. ${tx('dg_search')}: ${tx('dg_notpl')}');
+      } else {
+        lastError = null;
+        final c = await _search(s, 'SZA Kill Bill');
+        out.add('3. ${tx('dg_search')}: ${c.isEmpty ? '${tx('dg_failed')} (${lastError ?? '0'})' : '${c.length} ${tx('dg_results')}'}');
+      }
       final (code, body) = await _canvasRaw(s, 'spotify:track:3OHfY25tqY28d16oZczHc8');
       final mp4 = code == 200 ? _findMp4(jsonDecode(body)) : null;
-      out.add('4. canvas: HTTP $code, ${mp4 != null ? 'video found' : 'no video'}');
+      out.add('4. Canvas: HTTP $code, ${mp4 != null ? tx('dg_found') : tx('dg_nofound')}');
       if (mp4 == null) {
         out.add(body.length > 220 ? body.substring(0, 220) : body);
       }
     } catch (e) {
-      out.add('error: $e');
+      out.add('$e');
     }
     return out.join('\n');
   }
