@@ -329,9 +329,11 @@ class _ItemTile extends StatelessWidget {
       borderRadius: AppRadius.mdR,
       child: Padding(padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
         child: Row(children: [
-          SizedBox(width: 28, child: Text(rank, textAlign: TextAlign.center,
-              style: AppText.label.copyWith(color: scheme.onSurfaceVariant))),
-          const SizedBox(width: 8),
+          if (rank.isNotEmpty) ...[
+            SizedBox(width: 28, child: Text(rank, textAlign: TextAlign.center,
+                style: AppText.label.copyWith(color: scheme.onSurfaceVariant))),
+            const SizedBox(width: 8),
+          ],
           _SmartImage(size: 48, borderRadius: AppRadius.sm, initialUrl: imageUrl, seed: name,
               resolver: imageFuture != null ? () => imageFuture! : () => Future.value('')),
           const SizedBox(width: 12),

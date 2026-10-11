@@ -1310,4 +1310,9 @@ const Map<String, String> kTxJa = {
   'sm_builtin_s': 'ユーザー名のみ。利用枠は他のユーザーと共有。',
   'wl_title': 'ようこそ',
   'wl_sub': 'Last.fm への接続方法をお選びください。',
+  'sr_from_recent': '最近の検索から',
+  'sr_recent': '最近の検索',
+  'sr_suggestions': '候補',
+  'sr_recommended': 'おすすめ',
+  'sr_best': 'トップ結果',
 };

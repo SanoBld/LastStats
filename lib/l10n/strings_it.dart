@@ -1311,4 +1311,9 @@ const Map<String, String> kTxIt = {
   'sm_builtin_s': 'Solo nome utente. Quota condivisa con altri utenti.',
   'wl_title': 'Benvenuto',
   'wl_sub': 'Scelga come desidera connettersi a Last.fm.',
+  'sr_from_recent': 'Dalle tue ricerche recenti',
+  'sr_recent': 'Ricerche recenti',
+  'sr_suggestions': 'Suggerimenti',
+  'sr_recommended': 'Consigliato',
+  'sr_best': 'Migliori risultati',
 };

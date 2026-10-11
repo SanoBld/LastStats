@@ -1340,4 +1340,9 @@ const Map<String, String> kTxPt = {
   'sm_builtin_s': 'Só o nome de usuário. Cota compartilhada com outros usuários.',
   'wl_title': 'Bem-vindo',
   'wl_sub': 'Escolha como deseja se conectar ao Last.fm.',
+  'sr_from_recent': 'Das suas pesquisas recentes',
+  'sr_recent': 'Pesquisas recentes',
+  'sr_suggestions': 'Sugestões',
+  'sr_recommended': 'Recomendado',
+  'sr_best': 'Melhores resultados',
 };

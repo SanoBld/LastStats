@@ -1340,4 +1340,9 @@ const Map<String, String> kTxEs = {
   'sm_builtin_s': 'Solo nombre de usuario. Cuota compartida con otros usuarios.',
   'wl_title': 'Bienvenido',
   'wl_sub': 'Elija cómo desea conectarse a Last.fm.',
+  'sr_from_recent': 'Desde tus búsquedas recientes',
+  'sr_recent': 'Búsquedas recientes',
+  'sr_suggestions': 'Sugerencias',
+  'sr_recommended': 'Recomendado',
+  'sr_best': 'Mejores resultados',
 };

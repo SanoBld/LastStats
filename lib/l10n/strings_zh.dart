@@ -1337,4 +1337,9 @@ const Map<String, String> kTxZh = {
   'sm_builtin_s': '仅需用户名。配额与其他用户共享。',
   'wl_title': '欢迎',
   'wl_sub': '请选择连接 Last.fm 的方式。',
+  'sr_from_recent': '来自你最近的搜索',
+  'sr_recent': '最近搜索',
+  'sr_suggestions': '搜索建议',
+  'sr_recommended': '推荐',
+  'sr_best': '最佳结果',
 };

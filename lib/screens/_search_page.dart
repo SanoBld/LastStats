@@ -398,28 +398,45 @@ class _SearchPageState extends State<_SearchPage> {
       () { _haptic(_HapticImpact.light); _openMusicDetail(context, norm, 'tracks'); }, plain: plain);
   }
 
-  Widget _profilesStrip(ColorScheme scheme, List<dynamic> profiles) => SizedBox(
-        height: 164,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          itemCount: profiles.length,
-          separatorBuilder: (_, _) => const SizedBox(width: 10),
-          itemBuilder: (ctx, i) {
-            final u     = profiles[i] as Map<String, dynamic>;
-            final uname = (u['name'] ?? '').toString();
-            final isFav = _favProfiles.contains(uname);
-            return SizedBox(
-              width: 124,
-              child: _SearchUserCard(
-                user: u, isFav: isFav,
-                onTap: () { _haptic(_HapticImpact.light); _openProfile(ctx, uname); },
-                onToggleFav: () => _toggleFavProfile(uname, !isFav),
-              ),
-            );
-          },
-        ),
-      );
+  // Profile row: same look as an artist row (avatar, name, plays, star)
+  Widget _profileRow(ColorScheme scheme, TextTheme text, dynamic m, {bool plain = false}) {
+    final u     = m as Map<String, dynamic>;
+    final uname = (u['name'] ?? '').toString();
+    final plays = (u['playcount'] ?? '').toString();
+    final avatar = _extractImage(u['image']);
+    final has   = avatar.isNotEmpty && !avatar.contains(_ph);
+    final isFav = _favProfiles.contains(uname);
+    final sub   = (plays.isNotEmpty && plays != '0')
+        ? '${_fmt(int.tryParse(plays) ?? 0)} ${L.commonPlays}' : '';
+    return _card(scheme,
+      _FadeSlideIn(child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+        child: Row(children: [
+          CircleAvatar(
+            radius: 24,
+            backgroundColor: scheme.primaryContainer,
+            backgroundImage: has ? NetworkImage(avatar) : null,
+            child: has ? null : Text(uname.isNotEmpty ? uname[0].toUpperCase() : '?',
+                style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w900)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(uname, maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+            if (sub.isNotEmpty) Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
+          ])),
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            icon: Icon(isFav ? Icons.star_rounded : Icons.star_outline_rounded,
+                color: isFav ? Colors.amber.shade400 : scheme.onSurfaceVariant),
+            onPressed: () => _toggleFavProfile(uname, !isFav),
+          ),
+        ]),
+      )),
+      () { _haptic(_HapticImpact.light); _openProfile(context, uname); },
+      plain: plain);
+  }
 
   // One category block of the "All" view: cookie badge + title + count.
   Widget _section(ColorScheme scheme, TextTheme text, int cat) {
@@ -434,11 +451,9 @@ class _SearchPageState extends State<_SearchPage> {
       padding: const EdgeInsets.only(bottom: 14),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _title(text, scheme, label),
-        if (cat == _kSearchProfiles)
-          _profilesStrip(scheme, items)
-        else
-          for (final m in items)
+        for (final m in items)
             switch (cat) {
+              _kSearchProfiles => _profileRow(scheme, text, m),
               _kSearchArtists => _artistRow(scheme, m),
               _kSearchAlbums  => _albumRow(scheme, m),
               _               => _trackRow(scheme, m),
@@ -462,7 +477,7 @@ class _SearchPageState extends State<_SearchPage> {
       );
 
   Widget _rowFor(ColorScheme scheme, int cat, dynamic m, {bool plain = false}) => switch (cat) {
-        _kSearchProfiles => _profilesStrip(scheme, [m]),
+        _kSearchProfiles => _profileRow(scheme, Theme.of(context).textTheme, m, plain: plain),
         _kSearchArtists  => _artistRow(scheme, m, plain: plain),
         _kSearchAlbums   => _albumRow(scheme, m, plain: plain),
         _                => _trackRow(scheme, m, plain: plain),
@@ -706,29 +721,6 @@ class _SearchPageState extends State<_SearchPage> {
           style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)));
     }
 
-    if (_tab == _kSearchProfiles) {
-      return GridView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 220, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 1.0,
-        ),
-        itemCount: _results.length,
-        itemBuilder: (ctx, i) {
-          final u     = _results[i] as Map<String, dynamic>;
-          final uname = (u['name'] ?? '').toString();
-          final isFav = _favProfiles.contains(uname);
-          return _FadeSlideIn(
-            delay: _staggerDelay(i),
-            child: _SearchUserCard(
-              user: u, isFav: isFav,
-              onTap: () { _haptic(_HapticImpact.light); _openProfile(ctx, uname); },
-              onToggleFav: () => _toggleFavProfile(uname, !isFav),
-            ),
-          );
-        },
-      );
-    }
-
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       itemCount: _results.length + 1,
@@ -736,6 +728,7 @@ class _SearchPageState extends State<_SearchPage> {
         if (i == _results.length) return const SizedBox(height: 32);
         final m = _results[i];
         return switch (_tab) {
+          _kSearchProfiles => _profileRow(scheme, text, m),
           _kSearchArtists => _artistRow(scheme, m, rank: '${i + 1}', listeners: true),
           _kSearchAlbums  => _albumRow(scheme, m, rank: '${i + 1}'),
           _               => _trackRow(scheme, m, rank: '${i + 1}'),

@@ -1311,4 +1311,9 @@ const Map<String, String> kTxAr = {
   'sm_builtin_s': 'اسم المستخدم فقط. الحصة مشتركة مع مستخدمين آخرين.',
   'wl_title': 'مرحبًا',
   'wl_sub': 'اختاروا طريقة الاتصال بـ Last.fm.',
+  'sr_from_recent': 'من عمليات بحثك الأخيرة',
+  'sr_recent': 'عمليات البحث الأخيرة',
+  'sr_suggestions': 'اقتراحات',
+  'sr_recommended': 'موصى به',
+  'sr_best': 'أفضل النتائج',
 };
