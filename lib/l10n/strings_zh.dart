@@ -1342,4 +1342,9 @@ const Map<String, String> kTxZh = {
   'sr_suggestions': '搜索建议',
   'sr_recommended': '推荐',
   'sr_best': '最佳结果',
+  'cx_best_month': '最佳月份',
+  'cx_active_days': '活跃天数',
+  'cx_peak_hour': '高峰时段',
+  'cx_top_artist': '第一艺术家',
+  'cx_top_artists': '热门艺术家',
 };

@@ -1316,4 +1316,9 @@ const Map<String, String> kTxDe = {
   'sr_suggestions': 'Vorschläge',
   'sr_recommended': 'Empfohlen',
   'sr_best': 'Beste Ergebnisse',
+  'cx_best_month': 'Bester Monat',
+  'cx_active_days': 'Aktive Tage',
+  'cx_peak_hour': 'Spitzenzeit',
+  'cx_top_artist': 'Künstler Nr. 1',
+  'cx_top_artists': 'Top-Künstler',
 };

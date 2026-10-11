@@ -1316,4 +1316,9 @@ const Map<String, String> kTxAr = {
   'sr_suggestions': 'اقتراحات',
   'sr_recommended': 'موصى به',
   'sr_best': 'أفضل النتائج',
+  'cx_best_month': 'أفضل شهر',
+  'cx_active_days': 'الأيام النشطة',
+  'cx_peak_hour': 'ساعة الذروة',
+  'cx_top_artist': 'الفنان الأول',
+  'cx_top_artists': 'أفضل الفنانين',
 };

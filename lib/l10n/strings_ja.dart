@@ -1315,4 +1315,9 @@ const Map<String, String> kTxJa = {
   'sr_suggestions': '候補',
   'sr_recommended': 'おすすめ',
   'sr_best': 'トップ結果',
+  'cx_best_month': 'ベストな月',
+  'cx_active_days': 'アクティブな日',
+  'cx_peak_hour': 'ピーク時間',
+  'cx_top_artist': '1位のアーティスト',
+  'cx_top_artists': 'トップアーティスト',
 };

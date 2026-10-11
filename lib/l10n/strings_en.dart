@@ -1345,4 +1345,9 @@ const Map<String, String> kTxEn = {
   'sr_suggestions': 'Suggestions',
   'sr_recommended': 'Recommended',
   'sr_best': 'Best results',
+  'cx_best_month': 'Best month',
+  'cx_active_days': 'Active days',
+  'cx_peak_hour': 'Peak hour',
+  'cx_top_artist': 'Top artist',
+  'cx_top_artists': 'Top artists',
 };

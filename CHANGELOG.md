@@ -32,6 +32,13 @@
 
 ## v4.1.0
 
+**Search tab and Charts tab redesign**
+- Search: recent searches, "From your recent searches" carousel, live suggestions with a recommended result, category chips and a "Best results" card once you validate
+- Search: Last.fm profiles are now plain rows (avatar, name, plays, star) like artists, and titles and albums are aligned to the left
+- Search: the photo now follows the result (the old picture no longer stays when the suggestion changes)
+- Charts: new large collapsing app bar with pinned year chips, an overview with the total, best month, active days, peak hour and top artist, a top artists carousel and Material You section headers
+- All new texts are translated in all 10 languages
+
 **Welcome setup**
 - The first-launch sync screen is gone: data and scrobbles now sync in the background while you set up the app, with a live percentage at the top left
 - New setup pages: covers and images (shape, animated covers, motion covers, tab labels) and sync and battery (automatic sync, battery saver)

@@ -1153,6 +1153,66 @@ class _ChartsPageState extends State<_ChartsPage>
 
   // ── Year chips ────────────────────────────────────────────────────────────
 
+  // Overview block: big total tile + 2x2 bento tiles
+  Widget _heroBento(ColorScheme s, TextTheme t, Map<String, int> monthly,
+      Map<String, int>? cal, List<dynamic> artists, String periodLabel) {
+    final total = monthly.values.fold<int>(0, (a, b) => a + b);
+    var best = '–';
+    if (monthly.isNotEmpty) {
+      final e = monthly.entries.reduce((a, b) => b.value > a.value ? b : a);
+      final m = RegExp(r'^(\d{4})-(\d{1,2})').firstMatch(e.key);
+      best = m == null ? e.key : '${m.group(2)!.padLeft(2, '0')}/${m.group(1)}';
+    }
+    final days = cal == null ? 0 : cal.values.where((v) => v > 0).length;
+    var peak = '–';
+    final hd = _hourlyData;
+    if (hd != null && hd.isNotEmpty) {
+      final e = hd.entries.reduce((a, b) => b.value > a.value ? b : a);
+      peak = '${e.key.toString().padLeft(2, '0')}:00';
+    }
+    final top = artists.isEmpty ? '–' : _sanitizeName((artists.first['name'] ?? '').toString());
+    return Column(children: [
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(22, 20, 20, 20),
+        decoration: BoxDecoration(
+          color: s.primaryContainer, borderRadius: BorderRadius.circular(36)),
+        child: Row(children: [
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(tx('ui_total'), style: t.labelLarge?.copyWith(
+                color: s.onPrimaryContainer.withValues(alpha: 0.75), fontWeight: FontWeight.w700)),
+            const SizedBox(height: 4),
+            Text(total > 0 ? _fmtExact(total) : '–', maxLines: 1,
+                style: t.displayMedium?.copyWith(
+                    fontWeight: FontWeight.w900, color: s.onPrimaryContainer)),
+            Text(periodLabel, style: t.bodyMedium?.copyWith(
+                color: s.onPrimaryContainer.withValues(alpha: 0.75))),
+          ])),
+          M3CookieBadge(
+            color: s.primary, size: 72,
+            child: Icon(Icons.graphic_eq_rounded, size: 34, color: s.onPrimary),
+          ),
+        ]),
+      ),
+      const SizedBox(height: 12),
+      Row(children: [
+        Expanded(child: _StatTile(icon: Icons.calendar_month_rounded, label: tx('cx_best_month'),
+            value: best, bg: s.secondaryContainer, fg: s.onSecondaryContainer)),
+        const SizedBox(width: 12),
+        Expanded(child: _StatTile(icon: Icons.event_available_rounded, label: tx('cx_active_days'),
+            value: days > 0 ? '$days' : '–', bg: s.tertiaryContainer, fg: s.onTertiaryContainer)),
+      ]),
+      const SizedBox(height: 12),
+      Row(children: [
+        Expanded(child: _StatTile(icon: Icons.schedule_rounded, label: tx('cx_peak_hour'),
+            value: peak, bg: s.tertiaryContainer, fg: s.onTertiaryContainer)),
+        const SizedBox(width: 12),
+        Expanded(child: _StatTile(icon: Icons.mic_rounded, label: tx('cx_top_artist'),
+            value: top, bg: s.secondaryContainer, fg: s.onSecondaryContainer)),
+      ]),
+    ]);
+  }
+
   Widget _buildYearChips(ColorScheme s, TextTheme t) {
     // 0 = sentinel for "All time"
     final years = [0, ...(_availableYears.isNotEmpty ? _availableYears : [_selectedYear])];
@@ -1332,51 +1392,77 @@ class _ChartsPageState extends State<_ChartsPage>
         ? const SkeletonList(key: ValueKey('c_l'), header: true)
         : _error != null
           ? KeyedSubtree(key: const ValueKey('c_e'), child: _ErrorView(message: _error!, onRetry: _load))
-          : SafeArea(key: const ValueKey('c_ok'), child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-
-          // ── Fixed header — same style as every other tab ───────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 16, 2),
-            child: Row(children: [
-              Expanded(child:
-                Text(L.chartsTitle, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
-              ),
-              IconButton.filledTonal(
-                icon: const Icon(Icons.ios_share_rounded),
-                tooltip: tx('ui_export_a_chart'),
-                onPressed: () => _exportFlow(context),
-              ),
-            ]),
-          ),
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: _buildYearChips(scheme, text),
-          ),
-          const SizedBox(height: 14),
-
-          // ── Scrollable content ────────────────────────────────────────────
-          Expanded(
-            child: AnimatedOpacity(
-              opacity: _yearDataLoading ? 0.5 : 1.0,
-              duration: const Duration(milliseconds: 200),
-              curve: M3Motion.emphasizedDecelerate,
-              child: RefreshIndicator(
-                onRefresh: _load,
-                child: ListView(
-                controller: _mainScroll,
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 48),
-                children: [
-
+          : KeyedSubtree(
+              key: const ValueKey('c_ok'),
+              child: AnimatedOpacity(
+                opacity: _yearDataLoading ? 0.5 : 1.0,
+                duration: const Duration(milliseconds: 200),
+                curve: M3Motion.emphasizedDecelerate,
+                child: RefreshIndicator(
+                  onRefresh: _load,
+                  child: CustomScrollView(
+                    controller: _mainScroll,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      // Large collapsing app bar, year chips stay pinned
+                      SliverAppBar.large(
+                        pinned: true,
+                        backgroundColor: scheme.surface,
+                        surfaceTintColor: Colors.transparent,
+                        title: Text(L.chartsTitle,
+                            style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
+                        actions: [
+                          IconButton.filledTonal(
+                            icon: const Icon(Icons.ios_share_rounded),
+                            tooltip: tx('ui_export_a_chart'),
+                            onPressed: () => _exportFlow(context),
+                          ),
+                          const SizedBox(width: 12),
+                        ],
+                        bottom: PreferredSize(
+                          preferredSize: const Size.fromHeight(56),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                            child: _buildYearChips(scheme, text),
+                          ),
+                        ),
+                      ),
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 48),
+                        sliver: SliverList(
+                          delegate: SliverChildListDelegate([
                   _buildHistoryBanner(context),
+
+                  // Overview: big total + bento tiles
+                  _FadeInSection(index: 0, child: _heroBento(scheme, text,
+                      periodMonthly, calendarForView, artistItems, periodLabel)),
+                  const SizedBox(height: 28),
+
+                  // Top artists carousel
+                  if (!_yearDataLoading && artistItems.isNotEmpty) ...[
+                    _FadeInSection(index: 0, child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _ChartHead(title: tx('cx_top_artists'), icon: Icons.emoji_events_rounded),
+                        const SizedBox(height: 4),
+                        Text(topLabel,
+                            style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                        const SizedBox(height: 12),
+                        _TopCarousel(
+                          items: artistItems.take(10).toList(),
+                          onTap: (e) => showDetailSheet(context,
+                              Map<String, dynamic>.from(e as Map), 'artists', widget.service),
+                        ),
+                      ],
+                    )),
+                    const SizedBox(height: 28),
+                  ],
 
                   // 1. Monthly bars — scoped to the selected period
                   _FadeInSection(index: 0, child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _SectionHeader(title: L.chartsMonthly, icon: Icons.calendar_month_rounded),
+                      _ChartHead(title: L.chartsMonthly, icon: Icons.calendar_month_rounded),
                       const SizedBox(height: 4),
                       Text(periodLabel,
                           style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
@@ -1396,7 +1482,7 @@ class _ChartsPageState extends State<_ChartsPage>
                     _FadeInSection(index: 1, child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _SectionHeader(
+                        _ChartHead(
                           title: tx('ui_scrobble_progression'),
                           icon: Icons.trending_up_rounded,
                         ),
@@ -1417,7 +1503,7 @@ class _ChartsPageState extends State<_ChartsPage>
                   _FadeInSection(index: 2, child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _SectionHeader(
+                      _ChartHead(
                         title: tx('ui_your_musical_genres'),
                         icon: Icons.equalizer_rounded,
                       ),
@@ -1449,7 +1535,7 @@ class _ChartsPageState extends State<_ChartsPage>
                   _FadeInSection(index: 3, child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _SectionHeader(
+                      _ChartHead(
                         title: tx('ui_listening_habits'),
                         icon: Icons.access_time_rounded,
                       ),
@@ -1476,7 +1562,7 @@ class _ChartsPageState extends State<_ChartsPage>
                   _FadeInSection(index: 4, child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _SectionHeader(title: L.chartsArtistDist, icon: Icons.mic_rounded),
+                      _ChartHead(title: L.chartsArtistDist, icon: Icons.mic_rounded),
                       const SizedBox(height: 4),
                       Text(topLabel,
                           style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
@@ -1506,7 +1592,7 @@ class _ChartsPageState extends State<_ChartsPage>
                   _FadeInSection(index: 5, child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _SectionHeader(
+                      _ChartHead(
                         title: tx('ui_album_distribution'),
                         icon: Icons.album_rounded,
                       ),
@@ -1540,7 +1626,7 @@ class _ChartsPageState extends State<_ChartsPage>
                   _FadeInSection(index: 6, child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _SectionHeader(
+                      _ChartHead(
                         title: tx('ui_listening_calendar'),
                         icon: Icons.grid_on_rounded,
                       ),
@@ -1587,7 +1673,7 @@ class _ChartsPageState extends State<_ChartsPage>
                     _FadeInSection(index: 7, child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _SectionHeader(
+                        _ChartHead(
                           title: tx('ui_listening_streaks'),
                           icon: Icons.local_fire_department_rounded,
                         ),
@@ -1597,16 +1683,16 @@ class _ChartsPageState extends State<_ChartsPage>
                     )),
                     const SizedBox(height: 20),
                   ],
-                ],
+                          ]),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-      ],
-    ),
-    ), // SafeArea
-    ); // AnimatedSwitcher
-}
+    );
+  }
 }
 
 // Session-level flag: the cascading entrance only plays the very first time
@@ -3419,4 +3505,127 @@ class _PeakChip extends StatelessWidget {
 class _TagEntry {
   final String name; final int count;
   const _TagEntry({required this.name, required this.count});
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  Redesign widgets (Material You): section head, stat tile, top carousel
+// ══════════════════════════════════════════════════════════════════════════
+
+class _ChartHead extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  const _ChartHead({required this.title, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    final t = Theme.of(context).textTheme;
+    return Row(children: [
+      M3CookieBadge(
+        color: s.primaryContainer, size: 40,
+        child: Icon(icon, size: 20, color: s.primary),
+      ),
+      const SizedBox(width: 12),
+      Expanded(child: Text(title,
+          style: t.titleLarge?.copyWith(fontWeight: FontWeight.w800))),
+    ]);
+  }
+}
+
+class _StatTile extends StatelessWidget {
+  final IconData icon;
+  final String label, value;
+  final Color bg, fg;
+  const _StatTile({required this.icon, required this.label, required this.value,
+      required this.bg, required this.fg});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(28)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Icon(icon, color: fg.withValues(alpha: 0.8)),
+        const SizedBox(height: 14),
+        Text(value, maxLines: 1, overflow: TextOverflow.ellipsis,
+            style: t.titleLarge?.copyWith(fontWeight: FontWeight.w900, color: fg)),
+        const SizedBox(height: 2),
+        Text(label, maxLines: 1, overflow: TextOverflow.ellipsis,
+            style: t.labelMedium?.copyWith(color: fg.withValues(alpha: 0.75))),
+      ]),
+    );
+  }
+}
+
+class _TopCarousel extends StatelessWidget {
+  final List<dynamic> items;
+  final void Function(dynamic) onTap;
+  const _TopCarousel({required this.items, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    final t = Theme.of(context).textTheme;
+    return SizedBox(
+      height: 216,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const ClampingScrollPhysics(),
+        itemCount: items.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
+        itemBuilder: (ctx, i) {
+          final e     = items[i];
+          final name  = _sanitizeName((e['name'] ?? '').toString());
+          final plays = int.tryParse((e['playcount'] ?? '0').toString()) ?? 0;
+          final raw   = _extractImage(e['image']);
+          return GestureDetector(
+            onTap: () => onTap(e),
+            child: SizedBox(
+              width: 144,
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Stack(children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(28),
+                    child: SizedBox(
+                      width: 144, height: 144,
+                      child: FutureBuilder<String>(
+                        future: ImageService.resolveArtist(name,
+                            lastfmUrl: raw.isNotEmpty ? raw : null),
+                        initialData: '',
+                        builder: (_, snap) {
+                          final u = snap.data ?? '';
+                          return (u.isEmpty || u.contains(_ph))
+                              ? Container(
+                                  color: s.primaryContainer,
+                                  child: Icon(Icons.person_rounded, size: 44, color: s.primary))
+                              : Image.network(u, fit: BoxFit.cover,
+                                  errorBuilder: (_, _, _) => Container(color: s.primaryContainer));
+                        },
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 8, left: 8,
+                    child: Container(
+                      width: 28, height: 28,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(color: s.primary, shape: BoxShape.circle),
+                      child: Text('${i + 1}', style: t.labelLarge?.copyWith(
+                          color: s.onPrimary, fontWeight: FontWeight.w900)),
+                    ),
+                  ),
+                ]),
+                const SizedBox(height: 8),
+                Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: t.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+                Text('${_fmt(plays)} ${L.commonPlays}', maxLines: 1,
+                    style: t.bodySmall?.copyWith(color: s.onSurfaceVariant)),
+              ]),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }

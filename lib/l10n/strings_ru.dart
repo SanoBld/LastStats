@@ -1316,4 +1316,9 @@ const Map<String, String> kTxRu = {
   'sr_suggestions': 'Подсказки',
   'sr_recommended': 'Рекомендуем',
   'sr_best': 'Лучшие результаты',
+  'cx_best_month': 'Лучший месяц',
+  'cx_active_days': 'Активных дней',
+  'cx_peak_hour': 'Пиковый час',
+  'cx_top_artist': 'Артист №1',
+  'cx_top_artists': 'Топ артистов',
 };

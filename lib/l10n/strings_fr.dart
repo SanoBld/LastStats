@@ -1345,4 +1345,9 @@ const Map<String, String> kTxFr = {
   'sr_suggestions': 'Suggestions',
   'sr_recommended': 'Recommandé',
   'sr_best': 'Meilleurs résultats',
+  'cx_best_month': 'Meilleur mois',
+  'cx_active_days': 'Jours actifs',
+  'cx_peak_hour': 'Heure de pointe',
+  'cx_top_artist': 'Artiste n°1',
+  'cx_top_artists': 'Top artistes',
 };

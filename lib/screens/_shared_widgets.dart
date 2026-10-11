@@ -179,6 +179,7 @@ class _SmartImageState extends State<_SmartImage> {
   Future<String>? _future;
   String?         _resolvedUrl;   // URL déjà résolue → pas de FutureBuilder
   String?         _lastInitialUrl;
+  Object?         _lastSeed;
 
   bool get _needsResolve =>
       widget.initialUrl == null ||
@@ -189,6 +190,7 @@ class _SmartImageState extends State<_SmartImage> {
   void initState() {
     super.initState();
     _lastInitialUrl = widget.initialUrl;
+    _lastSeed = widget.seed;
     if (!_needsResolve) {
       _resolvedUrl = widget.initialUrl;
     } else {
@@ -200,7 +202,8 @@ class _SmartImageState extends State<_SmartImage> {
   void didUpdateWidget(_SmartImage old) {
     super.didUpdateWidget(old);
     // Relancer uniquement si l'URL source a changé (piste différente)
-    if (widget.initialUrl != _lastInitialUrl) {
+    if (widget.initialUrl != _lastInitialUrl || widget.seed != _lastSeed) {
+      _lastSeed = widget.seed;
       _lastInitialUrl = widget.initialUrl;
       _resolvedUrl    = null;
       if (!_needsResolve) {
