@@ -125,7 +125,17 @@ Widget build(BuildContext context) {
         return MediaQuery(
           data: mq.copyWith(
               textScaler: TextScaler.linear(mq.textScaler.scale(1) * scale)),
-          child: Theme(data: theme, child: child),
+          &#47;&#47; Status bar icons follow the app theme (not the phone&#39;s): dark
+          &#47;&#47; icons on a light app, light icons on a dark app.
+          child: AnnotatedRegion&lt;SystemUiOverlayStyle&gt;(
+            value: SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness:
+                  theme.brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+              statusBarBrightness: theme.brightness,
+            ),
+            child: Theme(data: theme, child: child),
+          ),
         );
       },
     ),
