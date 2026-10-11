@@ -1,6 +1,42 @@
 {
-  "updated": "2026-10-11T04:32:12Z",
+  "updated": "2026-10-11T12:15:49Z",
   "commits": [
+    {
+      "sha": "a09cf85af72b3175380c4ddfd680f318e7c5877e",
+      "message": "feat: ajout d'un bouton pour ouvrir le lien de biographie et amélioration de l'affichage des éléments",
+      "date": "2026-10-11T11:01:51Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/a09cf85af72b3175380c4ddfd680f318e7c5877e",
+      "tags": []
+    },
+    {
+      "sha": "f0a461b7ec1a2237c60c16254be36dbfbcdce114",
+      "message": "feat: ajustement des couleurs des composants pour une meilleure intégration visuelle",
+      "date": "2026-10-11T10:43:14Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/f0a461b7ec1a2237c60c16254be36dbfbcdce114",
+      "tags": []
+    },
+    {
+      "sha": "06f75b12e8e0a3d5c4a1ce6496fe752df6d49c58",
+      "message": "feat: amélioration de l'interface utilisateur avec des cartes accentuées et des ajustements de couleurs pour une meilleure lisibilité",
+      "date": "2026-10-11T10:04:06Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/06f75b12e8e0a3d5c4a1ce6496fe752df6d49c58",
+      "tags": []
+    },
+    {
+      "sha": "fb9ddbd1f8357ba38aa18d686cf455f9e8f693a2",
+      "message": "feat: ajout d'une logique d'affichage conditionnel pour la bannière d'historique et mise à jour des icônes de services",
+      "date": "2026-10-11T09:42:42Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/fb9ddbd1f8357ba38aa18d686cf455f9e8f693a2",
+      "tags": []
+    },
     {
       "sha": "632b6ddae4b8a11ffcf152c5562d8411387f4d23",
       "message": "feat: mise à jour des formes du loader pour inclure uniquement le squircle et l'oval",
@@ -2677,42 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/c6da2b208754031a870e3f5704600ab823369fe6",
-      "tags": []
-    },
-    {
-      "sha": "b614dc2fe729d83f0172fd25f6bfa8899c73f36f",
-      "message": "feat: ajouter un bouton de retour sur la page des nouvelles et améliorer la gestion des clés secrètes dans l'interface de configuration",
-      "date": "2026-07-23T22:41:30Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/b614dc2fe729d83f0172fd25f6bfa8899c73f36f",
-      "tags": []
-    },
-    {
-      "sha": "12e4cc7e91722f5a5cf17b78f96d993c8954905f",
-      "message": "feat: ajouter des animations de transition pour les cartes d'amis et les éléments de recherche",
-      "date": "2026-07-23T22:25:48Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/12e4cc7e91722f5a5cf17b78f96d993c8954905f",
-      "tags": []
-    },
-    {
-      "sha": "25992c3ecd054a447c88632095568a206ef5c08a",
-      "message": "feat: ajouter des animations de transition pour les pages Favorites et NotificationDetail",
-      "date": "2026-07-23T21:47:10Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/25992c3ecd054a447c88632095568a206ef5c08a",
-      "tags": []
-    },
-    {
-      "sha": "d8674992b18ec3e690d1f5375bedf0383b4c7da9",
-      "message": "feat: ajouter l'option d'inclure les clés API et secrètes dans le fichier de sauvegarde",
-      "date": "2026-07-19T18:07:49Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/d8674992b18ec3e690d1f5375bedf0383b4c7da9",
       "tags": []
     }
   ]
