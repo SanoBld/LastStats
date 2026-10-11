@@ -36,7 +36,7 @@
 - Search: recent searches, "From your recent searches" carousel, live suggestions with a recommended result, category chips and a "Best results" card once you validate
 - Search: Last.fm profiles are now plain rows (avatar, name, plays, star) like artists, and titles and albums are aligned to the left
 - Search: the photo now follows the result (the old picture no longer stays when the suggestion changes)
-- Charts: new large collapsing app bar with pinned year chips, an overview with the total, best month, active days, peak hour and top artist, a top artists carousel and Material You section headers
+- Charts: tab rebuilt around real charts: a smooth area chart (monthly or cumulative, touch to inspect), a 24-hour listening clock, a week bar chart, donut charts for artists and albums and a genre radar, all in the app theme; large collapsing app bar with pinned year chips
 - All new texts are translated in all 10 languages
 
 **Welcome setup**

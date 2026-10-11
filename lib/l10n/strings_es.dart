@@ -1350,4 +1350,8 @@ const Map<String, String> kTxEs = {
   'cx_peak_hour': 'Hora pico',
   'cx_top_artist': 'Artista n.º 1',
   'cx_top_artists': 'Top artistas',
+  'cx_by_month': 'Por mes',
+  'cx_cumulative': 'Acumulado',
+  'cx_clock': 'Reloj de escucha',
+  'cx_others': 'Otros',
 };

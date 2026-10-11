@@ -1321,4 +1321,8 @@ const Map<String, String> kTxAr = {
   'cx_peak_hour': 'ساعة الذروة',
   'cx_top_artist': 'الفنان الأول',
   'cx_top_artists': 'أفضل الفنانين',
+  'cx_by_month': 'شهريًا',
+  'cx_cumulative': 'تراكمي',
+  'cx_clock': 'ساعة الاستماع',
+  'cx_others': 'أخرى',
 };

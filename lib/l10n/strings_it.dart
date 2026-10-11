@@ -1321,4 +1321,8 @@ const Map<String, String> kTxIt = {
   'cx_peak_hour': 'Ora di punta',
   'cx_top_artist': 'Artista n°1',
   'cx_top_artists': 'Top artisti',
+  'cx_by_month': 'Per mese',
+  'cx_cumulative': 'Cumulativo',
+  'cx_clock': 'Orologio d\'ascolto',
+  'cx_others': 'Altri',
 };

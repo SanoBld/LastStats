@@ -1320,4 +1320,8 @@ const Map<String, String> kTxJa = {
   'cx_peak_hour': 'ピーク時間',
   'cx_top_artist': '1位のアーティスト',
   'cx_top_artists': 'トップアーティスト',
+  'cx_by_month': '月別',
+  'cx_cumulative': '累計',
+  'cx_clock': 'リスニングクロック',
+  'cx_others': 'その他',
 };

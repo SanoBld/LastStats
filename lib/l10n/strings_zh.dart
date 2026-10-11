@@ -1347,4 +1347,8 @@ const Map<String, String> kTxZh = {
   'cx_peak_hour': '高峰时段',
   'cx_top_artist': '第一艺术家',
   'cx_top_artists': '热门艺术家',
+  'cx_by_month': '按月',
+  'cx_cumulative': '累计',
+  'cx_clock': '收听时钟',
+  'cx_others': '其他',
 };

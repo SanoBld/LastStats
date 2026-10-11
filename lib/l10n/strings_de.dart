@@ -1321,4 +1321,8 @@ const Map<String, String> kTxDe = {
   'cx_peak_hour': 'Spitzenzeit',
   'cx_top_artist': 'Künstler Nr. 1',
   'cx_top_artists': 'Top-Künstler',
+  'cx_by_month': 'Pro Monat',
+  'cx_cumulative': 'Kumuliert',
+  'cx_clock': 'Hörzeit-Uhr',
+  'cx_others': 'Andere',
 };

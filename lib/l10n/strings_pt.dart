@@ -1350,4 +1350,8 @@ const Map<String, String> kTxPt = {
   'cx_peak_hour': 'Hora de pico',
   'cx_top_artist': 'Artista nº 1',
   'cx_top_artists': 'Top artistas',
+  'cx_by_month': 'Por mês',
+  'cx_cumulative': 'Acumulado',
+  'cx_clock': 'Relógio de audição',
+  'cx_others': 'Outros',
 };

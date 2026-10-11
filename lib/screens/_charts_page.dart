@@ -1153,66 +1153,6 @@ class _ChartsPageState extends State<_ChartsPage>
 
   // ── Year chips ────────────────────────────────────────────────────────────
 
-  // Overview block: big total tile + 2x2 bento tiles
-  Widget _heroBento(ColorScheme s, TextTheme t, Map<String, int> monthly,
-      Map<String, int>? cal, List<dynamic> artists, String periodLabel) {
-    final total = monthly.values.fold<int>(0, (a, b) => a + b);
-    var best = '–';
-    if (monthly.isNotEmpty) {
-      final e = monthly.entries.reduce((a, b) => b.value > a.value ? b : a);
-      final m = RegExp(r'^(\d{4})-(\d{1,2})').firstMatch(e.key);
-      best = m == null ? e.key : '${m.group(2)!.padLeft(2, '0')}/${m.group(1)}';
-    }
-    final days = cal == null ? 0 : cal.values.where((v) => v > 0).length;
-    var peak = '–';
-    final hd = _hourlyData;
-    if (hd != null && hd.isNotEmpty) {
-      final e = hd.entries.reduce((a, b) => b.value > a.value ? b : a);
-      peak = '${e.key.toString().padLeft(2, '0')}:00';
-    }
-    final top = artists.isEmpty ? '–' : _sanitizeName((artists.first['name'] ?? '').toString());
-    return Column(children: [
-      Container(
-        width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(22, 20, 20, 20),
-        decoration: BoxDecoration(
-          color: s.primaryContainer, borderRadius: BorderRadius.circular(36)),
-        child: Row(children: [
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(tx('ui_total'), style: t.labelLarge?.copyWith(
-                color: s.onPrimaryContainer.withValues(alpha: 0.75), fontWeight: FontWeight.w700)),
-            const SizedBox(height: 4),
-            Text(total > 0 ? _fmtExact(total) : '–', maxLines: 1,
-                style: t.displayMedium?.copyWith(
-                    fontWeight: FontWeight.w900, color: s.onPrimaryContainer)),
-            Text(periodLabel, style: t.bodyMedium?.copyWith(
-                color: s.onPrimaryContainer.withValues(alpha: 0.75))),
-          ])),
-          M3CookieBadge(
-            color: s.primary, size: 72,
-            child: Icon(Icons.graphic_eq_rounded, size: 34, color: s.onPrimary),
-          ),
-        ]),
-      ),
-      const SizedBox(height: 12),
-      Row(children: [
-        Expanded(child: _StatTile(icon: Icons.calendar_month_rounded, label: tx('cx_best_month'),
-            value: best, bg: s.secondaryContainer, fg: s.onSecondaryContainer)),
-        const SizedBox(width: 12),
-        Expanded(child: _StatTile(icon: Icons.event_available_rounded, label: tx('cx_active_days'),
-            value: days > 0 ? '$days' : '–', bg: s.tertiaryContainer, fg: s.onTertiaryContainer)),
-      ]),
-      const SizedBox(height: 12),
-      Row(children: [
-        Expanded(child: _StatTile(icon: Icons.schedule_rounded, label: tx('cx_peak_hour'),
-            value: peak, bg: s.tertiaryContainer, fg: s.onTertiaryContainer)),
-        const SizedBox(width: 12),
-        Expanded(child: _StatTile(icon: Icons.mic_rounded, label: tx('cx_top_artist'),
-            value: top, bg: s.secondaryContainer, fg: s.onSecondaryContainer)),
-      ]),
-    ]);
-  }
-
   Widget _buildYearChips(ColorScheme s, TextTheme t) {
     // 0 = sentinel for "All time"
     final years = [0, ...(_availableYears.isNotEmpty ? _availableYears : [_selectedYear])];
@@ -1433,193 +1373,81 @@ class _ChartsPageState extends State<_ChartsPage>
                           delegate: SliverChildListDelegate([
                   _buildHistoryBanner(context),
 
-                  // Overview: big total + bento tiles
-                  _FadeInSection(index: 0, child: _heroBento(scheme, text,
-                      periodMonthly, calendarForView, artistItems, periodLabel)),
-                  const SizedBox(height: 28),
+                  // 1. Trend (monthly / cumulative area chart)
+                  _ChartSec(
+                    index: 0, title: tx('ui_scrobble_progression'),
+                    icon: Icons.show_chart_rounded, sub: periodLabel,
+                    child: RepaintBoundary(
+                      key: _xkeys['monthly'],
+                      child: periodMonthly.isNotEmpty
+                          ? _TrendChart(key: ValueKey('trend_$_selectedYear'), monthly: periodMonthly)
+                          : _EmptyYearCard(),
+                    ),
+                  ),
 
-                  // Top artists carousel
-                  if (!_yearDataLoading && artistItems.isNotEmpty) ...[
-                    _FadeInSection(index: 0, child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _ChartHead(title: tx('cx_top_artists'), icon: Icons.emoji_events_rounded),
-                        const SizedBox(height: 4),
-                        Text(topLabel,
-                            style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                        const SizedBox(height: 12),
-                        _TopCarousel(
-                          items: artistItems.take(10).toList(),
-                          onTap: (e) => showDetailSheet(context,
-                              Map<String, dynamic>.from(e as Map), 'artists', widget.service),
-                        ),
-                      ],
-                    )),
-                    const SizedBox(height: 28),
-                  ],
-
-                  // 1. Monthly bars — scoped to the selected period
-                  _FadeInSection(index: 0, child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _ChartHead(title: L.chartsMonthly, icon: Icons.calendar_month_rounded),
-                      const SizedBox(height: 4),
-                      Text(periodLabel,
-                          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                      const SizedBox(height: 12),
-                      RepaintBoundary(
-                        key: _xkeys['monthly'],
-                        child: periodMonthly.isNotEmpty
-                            ? _MonthlyCard(monthly: periodMonthly)
+                  // 2. Listening habits: clock + week
+                  _ChartSec(
+                    index: 1, title: tx('ui_listening_habits'),
+                    icon: Icons.access_time_rounded, sub: habitsSubtitle,
+                    child: _hourlyLoading
+                        ? const SkeletonBlock(height: 220)
+                        : (_hourlyData != null && _weekdayData != null)
+                            ? RepaintBoundary(
+                                key: _xkeys['habits'],
+                                child: Column(children: [
+                                  _ClockChart(data: _hourlyData!),
+                                  const SizedBox(height: 12),
+                                  _WeekChart(data: _weekdayData!),
+                                ]))
                             : const SizedBox.shrink(),
-                      ),
-                    ],
-                  )),
-                  const SizedBox(height: 28),
+                  ),
 
-                  // 2. Cumulative line — scoped to the selected period
-                  if (periodCumulative.length >= 2) ...[
-                    _FadeInSection(index: 1, child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _ChartHead(
-                          title: tx('ui_scrobble_progression'),
-                          icon: Icons.trending_up_rounded,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(periodLabel,
-                            style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                        const SizedBox(height: 12),
-                        RepaintBoundary(
-                          key: _xkeys['cumul'],
-                          child: _CumulativeLineCard(data: periodCumulative),
-                        ),
-                      ],
-                    )),
-                    const SizedBox(height: 28),
-                  ],
+                  // 3. Artists share
+                  _ChartSec(
+                    index: 2, title: L.chartsArtistDist, icon: Icons.mic_rounded, sub: topLabel,
+                    child: _yearDataLoading
+                        ? const SkeletonBlock(height: 180)
+                        : artistItems.isNotEmpty
+                            ? RepaintBoundary(
+                                key: _xkeys['artists'],
+                                child: _ShareDonut(
+                                  items: artistItems,
+                                  getLabel: (e) => _sanitizeName((e['name'] ?? '').toString()),
+                                  getPlays: (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
+                                  onTap: (e) => showDetailSheet(context,
+                                      Map<String, dynamic>.from(e as Map), 'artists', widget.service),
+                                ))
+                            : _EmptyYearCard(),
+                  ),
 
-                  // 3. Musical genres (all-time)
-                  _FadeInSection(index: 2, child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _ChartHead(
-                        title: tx('ui_your_musical_genres'),
-                        icon: Icons.equalizer_rounded,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        tx('ui_based_on_your_top_arti'),
-                        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-                      ),
-                      const SizedBox(height: 12),
-                      if (_tagsLoading)
-                        const SkeletonBlock(height: 180)
-                      else if (_tags.isNotEmpty)
-                        RepaintBoundary(
-                          key: _xkeys['genres'],
-                          child: _SwipeDistributionCard(
-                            items:       _tags,
-                            getLabel:    (e) => (e as _TagEntry).name,
-                            getPlays:    (e) => (e as _TagEntry).count,
-                            baseColor:   scheme.tertiary,
-                            secondColor: scheme.primary,
-                            onTap:       (_) {},
-                          ),
-                        ),
-                    ],
-                  )),
-                  const SizedBox(height: 28),
+                  // 4. Albums share
+                  _ChartSec(
+                    index: 3, title: tx('ui_album_distribution'), icon: Icons.album_rounded, sub: albumLabel,
+                    child: _yearDataLoading
+                        ? const SkeletonBlock(height: 180)
+                        : albumItems.isNotEmpty
+                            ? RepaintBoundary(
+                                key: _xkeys['albums'],
+                                child: _ShareDonut(
+                                  items: albumItems,
+                                  getLabel: (e) => _sanitizeName((e['name'] ?? '').toString()),
+                                  getPlays: (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
+                                  onTap: (e) => showDetailSheet(context,
+                                      Map<String, dynamic>.from(e as Map), 'albums', widget.service),
+                                ))
+                            : _EmptyYearCard(),
+                  ),
 
-                  // 4. Listening habits
-                  _FadeInSection(index: 3, child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _ChartHead(
-                        title: tx('ui_listening_habits'),
-                        icon: Icons.access_time_rounded,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(habitsSubtitle,
-                          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                      const SizedBox(height: 12),
-                      if (_hourlyLoading)
-                        const SkeletonBlock(height: 180)
-                      else if (_hourlyData != null)
-                        RepaintBoundary(
-                          key: _xkeys['habits'],
-                          child: Column(children: [
-                            _HourlyBarCard(data: _hourlyData!),
-                            const SizedBox(height: 12),
-                            _WeekdayBarCard(data: _weekdayData!),
-                          ]),
-                        ),
-                    ],
-                  )),
-                  const SizedBox(height: 28),
-
-                  // 5. Artist distribution — always shown, loader inside while year loads
-                  _FadeInSection(index: 4, child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _ChartHead(title: L.chartsArtistDist, icon: Icons.mic_rounded),
-                      const SizedBox(height: 4),
-                      Text(topLabel,
-                          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                      const SizedBox(height: 12),
-                      if (_yearDataLoading)
-                        const SkeletonBlock(height: 180)
-                      else if (artistItems.isNotEmpty)
-                        RepaintBoundary(
-                          key: _xkeys['artists'],
-                          child: _SwipeDistributionCard(
-                            items:       artistItems,
-                            getLabel:    (e) => _sanitizeName((e['name'] ?? '').toString()),
-                            getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
-                            baseColor:   scheme.primary,
-                            secondColor: scheme.tertiary,
-                            onTap: (e) => showDetailSheet(context,
-                                Map<String, dynamic>.from(e as Map), 'artists', widget.service),
-                          ),
-                        )
-                      else
-                        _EmptyYearCard(),
-                    ],
-                  )),
-                  const SizedBox(height: 28),
-
-                  // 6. Album distribution — always shown, loader inside while year loads
-                  _FadeInSection(index: 5, child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _ChartHead(
-                        title: tx('ui_album_distribution'),
-                        icon: Icons.album_rounded,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(albumLabel,
-                          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-                      const SizedBox(height: 12),
-                      if (_yearDataLoading)
-                        const SkeletonBlock(height: 180)
-                      else if (albumItems.isNotEmpty)
-                        RepaintBoundary(
-                          key: _xkeys['albums'],
-                          child: _SwipeDistributionCard(
-                            items:       albumItems,
-                            getLabel:    (e) => _sanitizeName((e['name'] ?? '').toString()),
-                            getPlays:    (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
-                            baseColor:   scheme.secondary,
-                            secondColor: scheme.primary,
-                            onTap: (e) => showDetailSheet(context,
-                                Map<String, dynamic>.from(e as Map), 'albums', widget.service),
-                          ),
-                        )
-                      else
-                        _EmptyYearCard(),
-                    ],
-                  )),
-                  const SizedBox(height: 28),
+                  // 5. Genres radar
+                  _ChartSec(
+                    index: 4, title: tx('ui_your_musical_genres'), icon: Icons.equalizer_rounded,
+                    sub: tx('ui_based_on_your_top_arti'),
+                    child: _tagsLoading
+                        ? const SkeletonBlock(height: 180)
+                        : _tags.isNotEmpty
+                            ? RepaintBoundary(key: _xkeys['genres'], child: _GenreChart(tags: _tags))
+                            : const SizedBox.shrink(),
+                  ),
 
                   // 7. Listening calendar — single year, or every year glued
                   // together (separated by a marker) for "All time"
@@ -3529,103 +3357,5 @@ class _ChartHead extends StatelessWidget {
       Expanded(child: Text(title,
           style: t.titleLarge?.copyWith(fontWeight: FontWeight.w800))),
     ]);
-  }
-}
-
-class _StatTile extends StatelessWidget {
-  final IconData icon;
-  final String label, value;
-  final Color bg, fg;
-  const _StatTile({required this.icon, required this.label, required this.value,
-      required this.bg, required this.fg});
-
-  @override
-  Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(28)),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Icon(icon, color: fg.withValues(alpha: 0.8)),
-        const SizedBox(height: 14),
-        Text(value, maxLines: 1, overflow: TextOverflow.ellipsis,
-            style: t.titleLarge?.copyWith(fontWeight: FontWeight.w900, color: fg)),
-        const SizedBox(height: 2),
-        Text(label, maxLines: 1, overflow: TextOverflow.ellipsis,
-            style: t.labelMedium?.copyWith(color: fg.withValues(alpha: 0.75))),
-      ]),
-    );
-  }
-}
-
-class _TopCarousel extends StatelessWidget {
-  final List<dynamic> items;
-  final void Function(dynamic) onTap;
-  const _TopCarousel({required this.items, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final s = Theme.of(context).colorScheme;
-    final t = Theme.of(context).textTheme;
-    return SizedBox(
-      height: 216,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        physics: const ClampingScrollPhysics(),
-        itemCount: items.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 12),
-        itemBuilder: (ctx, i) {
-          final e     = items[i];
-          final name  = _sanitizeName((e['name'] ?? '').toString());
-          final plays = int.tryParse((e['playcount'] ?? '0').toString()) ?? 0;
-          final raw   = _extractImage(e['image']);
-          return GestureDetector(
-            onTap: () => onTap(e),
-            child: SizedBox(
-              width: 144,
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Stack(children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(28),
-                    child: SizedBox(
-                      width: 144, height: 144,
-                      child: FutureBuilder<String>(
-                        future: ImageService.resolveArtist(name,
-                            lastfmUrl: raw.isNotEmpty ? raw : null),
-                        initialData: '',
-                        builder: (_, snap) {
-                          final u = snap.data ?? '';
-                          return (u.isEmpty || u.contains(_ph))
-                              ? Container(
-                                  color: s.primaryContainer,
-                                  child: Icon(Icons.person_rounded, size: 44, color: s.primary))
-                              : Image.network(u, fit: BoxFit.cover,
-                                  errorBuilder: (_, _, _) => Container(color: s.primaryContainer));
-                        },
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 8, left: 8,
-                    child: Container(
-                      width: 28, height: 28,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(color: s.primary, shape: BoxShape.circle),
-                      child: Text('${i + 1}', style: t.labelLarge?.copyWith(
-                          color: s.onPrimary, fontWeight: FontWeight.w900)),
-                    ),
-                  ),
-                ]),
-                const SizedBox(height: 8),
-                Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                    style: t.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
-                Text('${_fmt(plays)} ${L.commonPlays}', maxLines: 1,
-                    style: t.bodySmall?.copyWith(color: s.onSurfaceVariant)),
-              ]),
-            ),
-          );
-        },
-      ),
-    );
   }
 }

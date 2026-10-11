@@ -98,6 +98,7 @@ part '_search_page.dart';
 part '_rankings_page.dart';
 part '_detail_sheet.dart';
 part '_charts_page.dart';
+part '_charts_visuals.dart';
 part '_history_page.dart';
 part '_settings_page.dart';
 part '_shared_widgets.dart';

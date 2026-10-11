@@ -1321,4 +1321,8 @@ const Map<String, String> kTxRu = {
   'cx_peak_hour': 'Пиковый час',
   'cx_top_artist': 'Артист №1',
   'cx_top_artists': 'Топ артистов',
+  'cx_by_month': 'По месяцам',
+  'cx_cumulative': 'Накопительно',
+  'cx_clock': 'Часы прослушивания',
+  'cx_others': 'Другие',
 };
