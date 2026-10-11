@@ -225,20 +225,20 @@ Widget build(BuildContext context) {
                           return ValueListenableBuilder&lt;String&gt;(
                             valueListenable: localeNotifier,
                             builder: (_, _, _) {
-                              final ColorScheme lightScheme =
+                              final ColorScheme lightScheme = monochromeAccents(
                                   (useDynamic &amp;&amp; lightDynamic != null)
                                       ? neutralizeIfGraySchemeItself(lightDynamic.harmonized())
                                       : neutralizeIfGraySeed(ColorScheme.fromSeed(
                                           seedColor:  seedColorForScheme(lightAccent),
                                           brightness: Brightness.light,
-                                        ), lightAccent);
-                              final ColorScheme darkSchemeBase =
+                                        ), lightAccent));
+                              final ColorScheme darkSchemeBase = monochromeAccents(
                                   (useDynamic &amp;&amp; darkDynamic != null)
                                       ? neutralizeIfGraySchemeItself(darkDynamic.harmonized())
                                       : neutralizeIfGraySeed(ColorScheme.fromSeed(
                                           seedColor:  seedColorForScheme(darkAccent),
                                           brightness: Brightness.dark,
-                                        ), darkAccent);
+                                        ), darkAccent));
                               final ColorScheme darkScheme = oled
                                   ? darkSchemeBase.copyWith(
                                       surface:                 Colors.black,
