@@ -128,7 +128,7 @@ Widget build(BuildContext context) {
           curve: M3Motion.spatialFast,
           child: M3ShapeMorph(
           radius: r,
-          color: sel ? scheme.primaryContainer : scheme.surfaceContainerHigh,
+          color: sel ? scheme.primary : scheme.primaryContainer.withValues(alpha: 0.55),
           child: Material(
             type: MaterialType.transparency,
             child: InkWell(
@@ -144,7 +144,7 @@ Widget build(BuildContext context) {
                     style: Theme.of(context).textTheme.labelLarge!.copyWith(
                           fontWeight: FontWeight.w600,
                           color: sel
-                              ? scheme.primary
+                              ? scheme.onPrimary
                               : scheme.onSurfaceVariant,
                         ),
                     child: Text(items[i].$2),

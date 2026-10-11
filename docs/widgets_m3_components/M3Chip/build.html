@@ -111,7 +111,7 @@ and</li>
 Widget build(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
   final compact = visualDensity == VisualDensity.compact;
-  final fg = selected ? scheme.primary : scheme.onSurfaceVariant;
+  final fg = selected ? scheme.onPrimary : scheme.onSurfaceVariant;
   return M3PressBuilder(builder: (context, down0, setDown) {
   final down = down0 &amp;&amp; !M3Motion.reduced(context);
   final r = BorderRadius.circular(down ? 8 : (selected ? 20 : 10));
@@ -123,8 +123,8 @@ Widget build(BuildContext context) {
       radius: r,
       height: compact ? 32 : 40,
       color: selected
-          ? scheme.primaryContainer
-          : scheme.surfaceContainerHigh,
+          ? scheme.primary
+          : scheme.primaryContainer.withValues(alpha: 0.55),
       child: Material(
         type: MaterialType.transparency,
         child: InkWell(

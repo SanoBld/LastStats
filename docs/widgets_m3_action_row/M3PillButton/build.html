@@ -110,10 +110,10 @@ and</li>
   <pre class="language-dart"><code class="language-dart">@override
 Widget build(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
-  final fg = scheme.primary; &#47;&#47; accent colour on a soft tonal background
+  final fg = active ? scheme.onPrimary : scheme.primary; &#47;&#47; dark accent when on
   return _M3Pressable(
     height: 56,
-    color: active ? scheme.primaryContainer : scheme.surfaceContainerHigh,
+    color: active ? scheme.primary : scheme.primaryContainer,
     idleShape: active
         ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))
         : const StadiumBorder(),
@@ -133,7 +133,7 @@ Widget build(BuildContext context) {
                 alignment: Alignment.centerLeft,
                 widthFactor: v,
                 child: ColoredBox(
-                    color: scheme.primary
+                    color: (active ? scheme.onPrimary : scheme.primary)
                         .withValues(alpha: 0.22)),
               ),
             ),
