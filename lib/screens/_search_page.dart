@@ -150,91 +150,291 @@ class _SearchPageState extends State<_SearchPage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+  // ── Smart ordering of the "All" sections ──────────────────────────────
+  // The category holding the best match comes first (an artist named like the
+  // query beats a random profile), instead of a fixed profile > artist > ...
+  int _nameScore(dynamic item, String q) {
+    final name = (item is Map ? (item['name'] ?? '') : '').toString().toLowerCase();
+    final qq = q.toLowerCase();
+    if (name.isEmpty || qq.isEmpty) return 0;
+    if (name == qq) return 3;
+    if (name.startsWith(qq)) return 2;
+    if (name.contains(qq)) return 1;
+    return 0;
+  }
 
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 16, 2),
-              child: Text(L.searchTitle,
-                style: Theme.of(context).textTheme.headlineSmall
-                    ?.copyWith(fontWeight: FontWeight.w800)),
+  List<int> _sectionOrder(String q) {
+    const prior = {
+      _kSearchArtists: 0.3, _kSearchTracks: 0.2, _kSearchAlbums: 0.1, _kSearchProfiles: 0.0,
+    };
+    final cats = <(int, double)>[];
+    for (final c in prior.keys) {
+      final items = _allResults[c] ?? const [];
+      if (items.isEmpty) continue;
+      var best = 0;
+      for (final it in items) {
+        final sc = _nameScore(it, q);
+        if (sc > best) best = sc;
+      }
+      cats.add((c, best + prior[c]!));
+    }
+    cats.sort((x, y) => y.$2.compareTo(x.$2));
+    return [for (final c in cats) c.$1];
+  }
+
+  // ── Material You pieces ───────────────────────────────────────────────
+  Widget _bar(ColorScheme scheme, TextTheme text) {
+    return Container(
+      height: 56,
+      decoration: BoxDecoration(
+        color: Color.lerp(scheme.surfaceContainerHigh, scheme.primaryContainer, 0.5),
+        borderRadius: BorderRadius.circular(28),
+      ),
+      padding: const EdgeInsets.only(left: 18, right: 6),
+      child: Row(children: [
+        Icon(Icons.search_rounded, color: scheme.primary),
+        const SizedBox(width: 12),
+        Expanded(
+          child: TextField(
+            controller: _ctrl,
+            focusNode: _focusNode,
+            onChanged: _onChanged,
+            textInputAction: TextInputAction.search,
+            style: text.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+            cursorColor: scheme.primary,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              filled: false,
+              isDense: true,
+              hintText: L.searchHintBar,
+              hintStyle: text.bodyLarge?.copyWith(
+                  color: scheme.onSurfaceVariant.withValues(alpha: 0.8)),
             ),
-            const SizedBox(height: 10),
+            onSubmitted: (v) {
+              if (v.trim().isNotEmpty) _search(v.trim());
+              _dismissKeyboard();
+            },
+          ),
+        ),
+        if (_searching)
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: M3LoadingIndicator(size: 28),
+          ),
+        ValueListenableBuilder<TextEditingValue>(
+          valueListenable: _ctrl,
+          builder: (_, v, _) => v.text.isEmpty
+              ? const SizedBox(width: 12)
+              : IconButton(
+                  icon: Icon(Icons.close_rounded, color: scheme.primary),
+                  onPressed: () {
+                    _ctrl.clear();
+                    _dismissKeyboard();
+                    setState(() { _results = []; _allResults = {}; _error = null; _searching = false; });
+                  },
+                ),
+        ),
+      ]),
+    );
+  }
 
+  Widget _rail(ColorScheme scheme, TextTheme text) {
+    return SizedBox(
+      height: 44,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        children: [
+          for (final t in _kTabs)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: _AppSearchField(
-                controller:      _ctrl,
-                focusNode:       _focusNode,
-                onChanged:       _onChanged,
-                textInputAction: TextInputAction.search,
-                hintText:        L.searchHintBar,
-                loading:         _searching,
-                onSubmitted: (v) {
-                  if (v.trim().isNotEmpty) _search(v.trim());
-                  // Dismiss keyboard on submit
-                  _dismissKeyboard();
-                },
-                onClear: () {
-                  _ctrl.clear();
-                  _dismissKeyboard();
-                  setState(() { _results = []; _error = null; _searching = false; });
-                },
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            // Dedicated button to a real, separate Folders page — folders
-            // are not a search tab, they're their own space for saved tracks.
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.folder_rounded, size: 18),
-                  label: Text(L.searchFolders),
-                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => FoldersGridPage(service: widget.service))),
+              padding: const EdgeInsets.only(right: 8),
+              child: GestureDetector(
+                onTap: () { _haptic(_HapticImpact.selection); _switchTab(t.$1); },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 240),
+                  curve: Curves.easeOutCubic,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: t.$1 == _tab
+                        ? scheme.primary
+                        : scheme.primaryContainer.withValues(alpha: 0.55),
+                    borderRadius: BorderRadius.circular(t.$1 == _tab ? 22 : 14),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Icon(t.$3, size: 18,
+                        color: t.$1 == _tab ? scheme.onPrimary : scheme.primary),
+                    const SizedBox(width: 8),
+                    Text(t.$2, style: text.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: t.$1 == _tab ? scheme.onPrimary : scheme.primary)),
+                  ]),
                 ),
               ),
             ),
+        ],
+      ),
+    );
+  }
 
-            const SizedBox(height: 8),
-
-            SizedBox(
-              height: 36,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: _kTabs.map((t) {
-                  final sel = t.$1 == _tab;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: M3Chip(
-                      avatar: Icon(t.$3, size: 14,
-                          color: sel ? scheme.onSecondaryContainer : scheme.onSurfaceVariant),
-                      label:  Text(t.$2),
-                      selected: sel,
-                      showCheckmark: false,
-                      onSelected: (_) { _haptic(_HapticImpact.selection); _switchTab(t.$1); },
-                    ),
-                  );
-                }).toList(),
-              ),
+  Widget _card(ColorScheme scheme, Widget child, VoidCallback onTap) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: Material(
+          color: Color.lerp(scheme.primaryContainer, scheme.surface, 0.55),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              child: child,
             ),
-
-            const SizedBox(height: 8),
-
-            Expanded(child: _buildResults(context, scheme, Theme.of(context).textTheme)),
-          ],
+          ),
         ),
+      );
+
+  Widget _artistRow(ColorScheme scheme, dynamic m, {String rank = '', bool listeners = false}) {
+    final item = m as Map<String, dynamic>;
+    final name = (item['name'] ?? '').toString();
+    final raw  = _extractImage(item['image']);
+    final sub  = listeners
+        ? '${_fmt(int.tryParse((item['listeners'] ?? '0').toString()) ?? 0)} ${L.commonListeners}'
+        : '';
+    return _card(scheme,
+      _FadeSlideIn(child: _ItemTile(name: name, sub: sub, imageUrl: raw, rank: rank,
+          imageFuture: ImageService.resolveArtist(name, lastfmUrl: raw.isNotEmpty ? raw : null))),
+      () { _haptic(_HapticImpact.light); _openMusicDetail(context, item, 'artists'); });
+  }
+
+  Widget _albumRow(ColorScheme scheme, dynamic m, {String rank = ''}) {
+    final item   = m as Map<String, dynamic>;
+    final name   = (item['name'] ?? '').toString();
+    final artist = (item['artist'] ?? '').toString();
+    final raw    = _extractImage(item['image']);
+    final norm   = Map<String, dynamic>.from(item);
+    if (item['artist'] is String) norm['artist'] = {'name': artist};
+    return _card(scheme,
+      _FadeSlideIn(child: _ItemTile(name: name, sub: artist, imageUrl: raw, rank: rank,
+          imageFuture: ImageService.resolveAlbum(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null))),
+      () { _haptic(_HapticImpact.light); _openMusicDetail(context, norm, 'albums'); });
+  }
+
+  Widget _trackRow(ColorScheme scheme, dynamic m, {String rank = ''}) {
+    final item   = m as Map<String, dynamic>;
+    final name   = (item['name'] ?? '').toString();
+    final artist = (item['artist'] ?? '').toString();
+    final raw    = _extractImage(item['image']);
+    final norm   = Map<String, dynamic>.from(item);
+    if (item['artist'] is String) norm['artist'] = {'name': artist};
+    return _card(scheme,
+      _FadeSlideIn(child: _FolderAwareItemTile(name: name, sub: artist, imageUrl: raw, rank: rank,
+          artist: artist, image: raw,
+          imageFuture: ImageService.resolveTrack(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null))),
+      () { _haptic(_HapticImpact.light); _openMusicDetail(context, norm, 'tracks'); });
+  }
+
+  Widget _profilesStrip(ColorScheme scheme, List<dynamic> profiles) => SizedBox(
+        height: 164,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          itemCount: profiles.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 10),
+          itemBuilder: (ctx, i) {
+            final u     = profiles[i] as Map<String, dynamic>;
+            final uname = (u['name'] ?? '').toString();
+            final isFav = _favProfiles.contains(uname);
+            return SizedBox(
+              width: 124,
+              child: _SearchUserCard(
+                user: u, isFav: isFav,
+                onTap: () { _haptic(_HapticImpact.light); _openProfile(ctx, uname); },
+                onToggleFav: () => _toggleFavProfile(uname, !isFav),
+              ),
+            );
+          },
+        ),
+      );
+
+  // One category block of the "All" view: cookie badge + title + count.
+  Widget _section(ColorScheme scheme, TextTheme text, int cat) {
+    final items = _allResults[cat] ?? const [];
+    final (label, icon) = switch (cat) {
+      _kSearchProfiles => (L.searchProfiles, Icons.person_rounded),
+      _kSearchArtists  => (L.commonArtists,  Icons.mic_rounded),
+      _kSearchAlbums   => (L.commonAlbums,   Icons.album_rounded),
+      _                => (L.commonTracks,   Icons.music_note_rounded),
+    };
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 10, 4, 8),
+          child: Row(children: [
+            M3CookieBadge(
+              color: scheme.primary, size: 36,
+              child: Icon(icon, size: 18, color: scheme.onPrimary),
+            ),
+            const SizedBox(width: 10),
+            Expanded(child: Text(label, style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800))),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+              decoration: BoxDecoration(
+                color: scheme.primaryContainer, borderRadius: BorderRadius.circular(12)),
+              child: Text('${items.length}', style: text.labelMedium?.copyWith(
+                  color: scheme.onPrimaryContainer, fontWeight: FontWeight.w800)),
+            ),
+          ]),
+        ),
+        if (cat == _kSearchProfiles)
+          _profilesStrip(scheme, items)
+        else
+          for (final m in items)
+            switch (cat) {
+              _kSearchArtists => _artistRow(scheme, m),
+              _kSearchAlbums  => _albumRow(scheme, m),
+              _               => _trackRow(scheme, m),
+            },
+      ]),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text   = Theme.of(context).textTheme;
+
+    return Scaffold(
+      body: SafeArea(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 12, 2),
+            child: Row(children: [
+              Expanded(
+                child: Text(L.searchTitle,
+                    style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
+              ),
+              // Folders are their own page (saved tracks), not a search tab.
+              IconButton.filledTonal(
+                tooltip: L.searchFolders,
+                style: IconButton.styleFrom(
+                  backgroundColor: scheme.primaryContainer,
+                  foregroundColor: scheme.primary,
+                ),
+                icon: const Icon(Icons.folder_rounded),
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => FoldersGridPage(service: widget.service))),
+              ),
+            ]),
+          ),
+          const SizedBox(height: 10),
+          Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: _bar(scheme, text)),
+          const SizedBox(height: 12),
+          _rail(scheme, text),
+          const SizedBox(height: 8),
+          Expanded(child: _buildResults(context, scheme, text)),
+        ]),
       ),
     );
   }
@@ -243,8 +443,8 @@ class _SearchPageState extends State<_SearchPage> {
     return M3Switcher(
       duration: const Duration(milliseconds: 280),
       child: _searching
-        ? const SkeletonList(key: ValueKey('search_load'))
-        : _buildResultsContent(context, scheme, text),
+          ? const SkeletonList(key: ValueKey('search_load'))
+          : _buildResultsContent(context, scheme, text),
     );
   }
 
@@ -252,106 +452,19 @@ class _SearchPageState extends State<_SearchPage> {
     if (_error != null) {
       return _ErrorView(message: _error!, onRetry: () => _search(_ctrl.text.trim()));
     }
-
-    if (_ctrl.text.trim().isEmpty) return _SearchEmptyState(tab: _tab);
+    final q = _ctrl.text.trim();
+    if (q.isEmpty) return _SearchEmptyState(tab: _tab);
 
     if (_tab == _kSearchAll) {
-      final profiles = _allResults[_kSearchProfiles] ?? [];
-      final artists  = _allResults[_kSearchArtists]  ?? [];
-      final albums   = _allResults[_kSearchAlbums]   ?? [];
-      final tracks   = _allResults[_kSearchTracks]   ?? [];
-
-      if (profiles.isEmpty && artists.isEmpty && albums.isEmpty && tracks.isEmpty) {
+      final order = _sectionOrder(q);
+      if (order.isEmpty) {
         return Center(child: Text(L.commonNoResults,
             style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)));
       }
-
       return ListView(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         children: [
-          // Profiles section in "All" tab — horizontal scrollable row of user cards
-          if (profiles.isNotEmpty) ...[
-            _SearchSectionHeader(
-              label: L.searchProfiles, icon: Icons.person_rounded,
-              scheme: scheme, text: text,
-            ),
-            SizedBox(
-              height: 160,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                itemCount: profiles.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 10),
-                itemBuilder: (ctx, i) {
-                  final u     = profiles[i] as Map<String, dynamic>;
-                  final uname = (u['name'] ?? '').toString();
-                  final isFav = _favProfiles.contains(uname);
-                  return SizedBox(
-                    width: 120,
-                    child: _SearchUserCard(
-                      user:        u,
-                      isFav:       isFav,
-                      onTap:       () { _haptic(_HapticImpact.light); _openProfile(ctx, uname); },
-                      onToggleFav: () => _toggleFavProfile(uname, !isFav),
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 4),
-          ],
-          if (artists.isNotEmpty) ...[
-            _SearchSectionHeader(label: L.commonArtists, icon: Icons.mic_rounded, scheme: scheme, text: text),
-            ...artists.map((m) {
-              final item = m as Map<String, dynamic>;
-              final name = (item['name'] ?? '').toString();
-              final raw  = _extractImage(item['image']);
-              return InkWell(
-                borderRadius: BorderRadius.circular(10),
-                onTap: () { _haptic(_HapticImpact.light); _openMusicDetail(context, item, 'artists'); },
-                child: _FadeSlideIn(
-                  child: _ItemTile(name: name, sub: '', imageUrl: raw, rank: '',
-                  imageFuture: ImageService.resolveArtist(name, lastfmUrl: raw.isNotEmpty ? raw : null))),
-              );
-            }),
-          ],
-          if (albums.isNotEmpty) ...[
-            _SearchSectionHeader(label: L.commonAlbums, icon: Icons.album_rounded, scheme: scheme, text: text),
-            ...albums.map((m) {
-              final item   = m as Map<String, dynamic>;
-              final name   = (item['name'] ?? '').toString();
-              final artist = (item['artist'] ?? '').toString();
-              final raw    = _extractImage(item['image']);
-              final norm   = Map<String, dynamic>.from(item);
-              if (item['artist'] is String) norm['artist'] = {'name': artist};
-              return InkWell(
-                borderRadius: BorderRadius.circular(10),
-                onTap: () { _haptic(_HapticImpact.light); _openMusicDetail(context, norm, 'albums'); },
-                child: _FadeSlideIn(
-                  child: _ItemTile(name: name, sub: artist, imageUrl: raw, rank: '',
-                  imageFuture: ImageService.resolveAlbum(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null))),
-              );
-            }),
-          ],
-          if (tracks.isNotEmpty) ...[
-            _SearchSectionHeader(label: L.commonTracks, icon: Icons.music_note_rounded, scheme: scheme, text: text),
-            ...tracks.map((m) {
-              final item   = m as Map<String, dynamic>;
-              final name   = (item['name'] ?? '').toString();
-              final artist = (item['artist'] ?? '').toString();
-              final raw    = _extractImage(item['image']);
-              final norm   = Map<String, dynamic>.from(item);
-              if (item['artist'] is String) norm['artist'] = {'name': artist};
-              return InkWell(
-                borderRadius: BorderRadius.circular(10),
-                onTap: () { _haptic(_HapticImpact.light); _openMusicDetail(context, norm, 'tracks'); },
-                child: _FadeSlideIn(
-                  child: _FolderAwareItemTile(name: name, sub: artist, imageUrl: raw, rank: '',
-                  artist: artist, image: raw,
-                  imageFuture: ImageService.resolveTrack(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null))),
-              );
-            }),
-          ],
+          for (final c in order) _section(scheme, text, c),
           const SizedBox(height: 32),
         ],
       );
@@ -363,15 +476,10 @@ class _SearchPageState extends State<_SearchPage> {
     }
 
     if (_tab == _kSearchProfiles) {
-      // Grid of user cards — tapping one unfocuses the search field automatically
-      // via _openProfile which calls _dismissKeyboard()
       return GridView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 220,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio: 1.0,
+          maxCrossAxisExtent: 220, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 1.0,
         ),
         itemCount: _results.length,
         itemBuilder: (ctx, i) {
@@ -381,9 +489,8 @@ class _SearchPageState extends State<_SearchPage> {
           return _FadeSlideIn(
             delay: _staggerDelay(i),
             child: _SearchUserCard(
-              user:        u,
-              isFav:       isFav,
-              onTap:       () { _haptic(_HapticImpact.light); _openProfile(ctx, uname); },
+              user: u, isFav: isFav,
+              onTap: () { _haptic(_HapticImpact.light); _openProfile(ctx, uname); },
               onToggleFav: () => _toggleFavProfile(uname, !isFav),
             ),
           );
@@ -393,49 +500,20 @@ class _SearchPageState extends State<_SearchPage> {
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 12),
-      itemCount: _results.length,
+      itemCount: _results.length + 1,
       itemBuilder: (ctx, i) {
-        final m      = _results[i] as Map<String, dynamic>;
-        final name   = (m['name']   ?? '').toString();
-        final artist = (m['artist'] ?? '').toString();
-        final imgRaw = _extractImage(m['image']);
-
-        Future<String> imgF;
-        String sub;
-        String type;
-        final normalized = Map<String, dynamic>.from(m);
-        if (m['artist'] is String) normalized['artist'] = {'name': artist};
-
-        switch (_tab) {
-          case _kSearchArtists:
-            type = 'artists';
-            sub  = '${_fmt(int.tryParse((m['listeners'] ?? '0').toString()) ?? 0)} ${L.commonListeners}';
-            imgF = ImageService.resolveArtist(name, lastfmUrl: imgRaw.isNotEmpty ? imgRaw : null);
-          case _kSearchAlbums:
-            type = 'albums';
-            sub  = artist;
-            imgF = ImageService.resolveAlbum(name, artist, lastfmUrl: imgRaw.isNotEmpty ? imgRaw : null);
-          default:
-            type = 'tracks';
-            sub  = artist;
-            imgF = ImageService.resolveTrack(name, artist, lastfmUrl: imgRaw.isNotEmpty ? imgRaw : null);
-        }
-
-        return InkWell(
-          onTap: () => _openMusicDetail(context, normalized, type),
-          borderRadius: AppRadius.smR,
-          child: _FadeSlideIn(
-            delay: Duration(milliseconds: (i * 25).clamp(0, 250)),
-            child: type == 'tracks'
-                ? _FolderAwareItemTile(name: name, sub: sub, imageUrl: imgRaw, imageFuture: imgF,
-                    rank: '${i + 1}', artist: artist, image: imgRaw)
-                : _ItemTile(name: name, sub: sub, imageUrl: imgRaw, imageFuture: imgF, rank: '${i + 1}'),
-          ),
-        );
+        if (i == _results.length) return const SizedBox(height: 32);
+        final m = _results[i];
+        return switch (_tab) {
+          _kSearchArtists => _artistRow(scheme, m, rank: '${i + 1}', listeners: true),
+          _kSearchAlbums  => _albumRow(scheme, m, rank: '${i + 1}'),
+          _               => _trackRow(scheme, m, rank: '${i + 1}'),
+        };
       },
     );
   }
 }
+
 
 // ── Empty state ───────────────────────────────────────────────────────────────
 
@@ -458,15 +536,19 @@ class _SearchEmptyState extends StatelessWidget {
 
     return Center(
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Icon(t.$1, size: 56, color: scheme.outlineVariant),
-        const SizedBox(height: 12),
-        Text(t.$2, style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
+        M3CookieBadge(
+          color: scheme.primaryContainer, size: 96,
+          child: Icon(t.$1, size: 42, color: scheme.primary),
+        ),
+        const SizedBox(height: 18),
+        Text(t.$2, style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
         const SizedBox(height: 4),
-        Text(L.searchTypePrompt, style: text.bodySmall?.copyWith(color: scheme.outlineVariant)),
+        Text(L.searchTypePrompt, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
       ]),
     );
   }
 }
+
 
 // ── User card (search grid) ───────────────────────────────────────────────────
 

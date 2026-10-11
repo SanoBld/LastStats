@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../app_state.dart';
 
 /// Applies the user's text size (on top of the system one) and font family
@@ -25,7 +26,17 @@ class AppTextScale extends StatelessWidget {
           return MediaQuery(
             data: mq.copyWith(
                 textScaler: TextScaler.linear(mq.textScaler.scale(1) * scale)),
-            child: Theme(data: theme, child: child),
+            // Status bar icons follow the app theme (not the phone's): dark
+            // icons on a light app, light icons on a dark app.
+            child: AnnotatedRegion<SystemUiOverlayStyle>(
+              value: SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness:
+                    theme.brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+                statusBarBrightness: theme.brightness,
+              ),
+              child: Theme(data: theme, child: child),
+            ),
           );
         },
       ),

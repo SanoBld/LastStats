@@ -50,6 +50,11 @@
 - Settings > Appearance: text size slider (default a bit bigger) and font choice
 - History list: fixed track cards drawing over the header
 
+**Search and status bar**
+- Search fully redone in Material You: pill search bar, category pills, results in rounded cards, sections ordered by best match instead of a fixed order
+- Status bar icons now follow the app theme (no more white on white)
+- Folder cards are more readable (stronger tint, solid badge and counter)
+
 **Loading bars**
 - New wavy progress bar (Material You) used wherever a loading has real progress: history sync chip on the dashboard (now shows loaded/total scrobbles; the wavy bar only appears for big syncs, 200+ scrobbles), Sync settings and the Spotify / Last.fm login pages
 - The round loader now morphs between soft rounded shapes of the app (squircle, oval), like the Material 3 Expressive loading indicator

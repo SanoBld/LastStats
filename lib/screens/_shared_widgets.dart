@@ -791,14 +791,17 @@ class _FolderCard extends StatelessWidget {
       valueListenable: FavoritesFoldersService.assignNotifier,
       builder: (ctx, _, _) {
         final count = FavoritesFoldersService.itemsInFolder(folder.id).length;
+        // Stronger tint + solid badge so the folder never fades into the page.
+        final onFolder = folder.color.computeLuminance() > 0.5
+            ? Colors.black87 : Colors.white;
         return M3PressCard(
-          color: folder.color.withValues(alpha: 0.18),
+          color: Color.alphaBlend(folder.color.withValues(alpha: 0.30), scheme.surface),
           onTap: onTap,
           onLongPress: onLongPress,
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             M3CookieBadge(
               size: 52,
-              color: folder.color.withValues(alpha: 0.35),
+              color: folder.color,
               child: Text(folder.emoji, style: const TextStyle(fontSize: 26)),
             ),
             const Spacer(),
@@ -810,8 +813,13 @@ class _FolderCard extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             ],
             const SizedBox(height: 6),
-            Text('$count', style: Theme.of(context).textTheme.labelSmall
-                ?.copyWith(color: scheme.onSurfaceVariant)),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+              decoration: BoxDecoration(
+                color: folder.color, borderRadius: BorderRadius.circular(12)),
+              child: Text('$count', style: Theme.of(context).textTheme.labelMedium
+                  ?.copyWith(color: onFolder, fontWeight: FontWeight.w800)),
+            ),
           ]),
         );
       },
