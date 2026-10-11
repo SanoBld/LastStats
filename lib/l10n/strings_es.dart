@@ -1354,4 +1354,5 @@ const Map<String, String> kTxEs = {
   'cx_cumulative': 'Acumulado',
   'cx_clock': 'Reloj de escucha',
   'cx_others': 'Otros',
+  'cx_artist_distribution': 'Distribución por artista',
 };

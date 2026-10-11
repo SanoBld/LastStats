@@ -37,6 +37,9 @@
 - Search: Last.fm profiles are now plain rows (avatar, name, plays, star) like artists, and titles and albums are aligned to the left
 - Search: the photo now follows the result (the old picture no longer stays when the suggestion changes)
 - Charts: tab rebuilt around real charts: a smooth area chart (monthly or cumulative, touch to inspect), a 24-hour listening clock, a week bar chart, donut charts for artists and albums and a genre radar, all in the app theme; large collapsing app bar with pinned year chips
+- Charts: the title is back in the fixed header like every other tab, and changing the year no longer scrolls back to the top
+- Charts: pinch to zoom (or use the zoom buttons) on the progression chart, drag to move when zoomed, double tap to reset
+- Charts: artist and album breakdown share the same title style, with a bigger donut and clearer theme colors
 - All new texts are translated in all 10 languages
 
 **Welcome setup**

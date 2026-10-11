@@ -1354,4 +1354,5 @@ const Map<String, String> kTxEn = {
   'cx_cumulative': 'Cumulative',
   'cx_clock': 'Listening clock',
   'cx_others': 'Others',
+  'cx_artist_distribution': 'Artist distribution',
 };

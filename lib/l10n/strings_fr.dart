@@ -1354,4 +1354,5 @@ const Map<String, String> kTxFr = {
   'cx_cumulative': 'Cumulé',
   'cx_clock': 'Horloge d\'écoute',
   'cx_others': 'Autres',
+  'cx_artist_distribution': 'Répartition par artiste',
 };

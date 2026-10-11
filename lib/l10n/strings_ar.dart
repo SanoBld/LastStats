@@ -1325,4 +1325,5 @@ const Map<String, String> kTxAr = {
   'cx_cumulative': 'تراكمي',
   'cx_clock': 'ساعة الاستماع',
   'cx_others': 'أخرى',
+  'cx_artist_distribution': 'التوزيع حسب الفنان',
 };

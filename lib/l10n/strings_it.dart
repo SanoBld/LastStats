@@ -1325,4 +1325,5 @@ const Map<String, String> kTxIt = {
   'cx_cumulative': 'Cumulativo',
   'cx_clock': 'Orologio d\'ascolto',
   'cx_others': 'Altri',
+  'cx_artist_distribution': 'Distribuzione per artista',
 };

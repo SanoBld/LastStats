@@ -1325,4 +1325,5 @@ const Map<String, String> kTxRu = {
   'cx_cumulative': 'Накопительно',
   'cx_clock': 'Часы прослушивания',
   'cx_others': 'Другие',
+  'cx_artist_distribution': 'Распределение по исполнителям',
 };

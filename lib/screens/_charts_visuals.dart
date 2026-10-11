@@ -68,12 +68,34 @@ class _TrendChartState extends State<_TrendChart> with SingleTickerProviderState
   bool _cumul = false;
   int? _sel;
 
+  // Zoom: _zoom >= 1, _lo = first visible index (in index units)
+  double _zoom = 1, _lo = 0;
+  double _gZoom = 1, _gLo = 0, _gFx = 0;
+
   @override
   void dispose() { _anim.dispose(); super.dispose(); }
 
   void _setMode(bool c) {
     setState(() { _cumul = c; _sel = null; });
     _anim.forward(from: 0);
+  }
+
+  double _maxZoom(int n) => n <= 3 ? 1 : math.min(16.0, (n - 1) / 2);
+  double _span(int n, double z) => n <= 1 ? 0 : (n - 1) / z;
+  double _clampLo(int n, double lo, double span) =>
+      n <= 1 ? 0 : lo.clamp(0.0, math.max(0.0, (n - 1) - span)).toDouble();
+
+  // Zoom around a screen fraction (0..1) of the plot area
+  void _zoomTo(int n, double z, double frac) {
+    z = z.clamp(1.0, _maxZoom(n)).toDouble();
+    final oldSpan = _span(n, _zoom);
+    final anchor = _lo + frac * oldSpan;
+    final span = _span(n, z);
+    setState(() {
+      _zoom = z;
+      _lo = _clampLo(n, anchor - frac * span, span);
+      _sel = null;
+    });
   }
 
   @override
@@ -101,31 +123,74 @@ class _TrendChartState extends State<_TrendChart> with SingleTickerProviderState
             _ChipStat(label: tx('cx_best_month'), value: labels[bestI], s: s, t: t),
         ]),
         const SizedBox(height: 14),
-        M3SegmentedButton<bool>(
-          segments: [
-            ButtonSegment(value: false, label: Text(tx('cx_by_month'))),
-            ButtonSegment(value: true,  label: Text(tx('cx_cumulative'))),
+        Row(children: [
+          Expanded(
+            child: M3SegmentedButton<bool>(
+              segments: [
+                ButtonSegment(value: false, label: Text(tx('cx_by_month'))),
+                ButtonSegment(value: true,  label: Text(tx('cx_cumulative'))),
+              ],
+              selected: {_cumul},
+              onSelectionChanged: (v) => _setMode(v.first),
+            ),
+          ),
+          if (raw.length > 3) ...[
+            const SizedBox(width: 8),
+            IconButton.filledTonal(
+              icon: const Icon(Icons.zoom_out_rounded),
+              onPressed: _zoom > 1 ? () => _zoomTo(raw.length, _zoom / 1.6, 0.5) : null,
+            ),
+            IconButton.filledTonal(
+              icon: const Icon(Icons.zoom_in_rounded),
+              onPressed: _zoom < _maxZoom(raw.length)
+                  ? () => _zoomTo(raw.length, _zoom * 1.6, 0.5) : null,
+            ),
           ],
-          selected: {_cumul},
-          onSelectionChanged: (v) => _setMode(v.first),
-        ),
+        ]),
         const SizedBox(height: 16),
         SizedBox(
           height: 230,
           child: LayoutBuilder(builder: (ctx, c) {
+            final n = vals.length;
+            final pw = c.maxWidth - _TrendPainter.padL - _TrendPainter.padR;
+            final span = _span(n, _zoom);
+            final lo = _clampLo(n, _lo, span);
             void pick(Offset p) {
-              if (vals.isEmpty) return;
-              final w = c.maxWidth - _TrendPainter.padL - _TrendPainter.padR;
-              final i = vals.length == 1 ? 0
-                  : (((p.dx - _TrendPainter.padL) / w) * (vals.length - 1)).round()
-                      .clamp(0, vals.length - 1).toInt();
+              if (n == 0) return;
+              final i = n == 1 ? 0
+                  : (lo + ((p.dx - _TrendPainter.padL) / pw) * span).round()
+                      .clamp(0, n - 1).toInt();
               if (i != _sel) setState(() => _sel = i);
             }
             return GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTapDown: (d) => pick(d.localPosition),
-              onHorizontalDragStart: (d) => pick(d.localPosition),
-              onHorizontalDragUpdate: (d) => pick(d.localPosition),
+              onDoubleTap: () => _zoomTo(n, 1, 0.5),
+              onScaleStart: (d) {
+                _gZoom = _zoom; _gLo = lo; _gFx = d.localFocalPoint.dx;
+                if (d.pointerCount == 1 && _zoom <= 1) pick(d.localFocalPoint);
+              },
+              onScaleUpdate: (d) {
+                if (n < 2 || pw <= 0) return;
+                if (d.pointerCount >= 2) {
+                  final z = (_gZoom * d.scale).clamp(1.0, _maxZoom(n)).toDouble();
+                  final startSpan = _span(n, _gZoom);
+                  final anchor = _gLo + ((_gFx - _TrendPainter.padL) / pw) * startSpan;
+                  final ns = _span(n, z);
+                  final frac = (d.localFocalPoint.dx - _TrendPainter.padL) / pw;
+                  setState(() {
+                    _zoom = z;
+                    _lo = _clampLo(n, anchor - frac * ns, ns);
+                    _sel = null;
+                  });
+                } else if (_zoom > 1) {
+                  final startSpan = _span(n, _gZoom);
+                  final dIdx = (d.localFocalPoint.dx - _gFx) / pw * startSpan;
+                  setState(() => _lo = _clampLo(n, _gLo - dIdx, startSpan));
+                } else {
+                  pick(d.localFocalPoint);
+                }
+              },
               child: AnimatedBuilder(
                 animation: _anim,
                 builder: (_, _) => CustomPaint(
@@ -133,7 +198,7 @@ class _TrendChartState extends State<_TrendChart> with SingleTickerProviderState
                   painter: _TrendPainter(
                     v: vals, labels: labels,
                     progress: Curves.easeOutCubic.transform(_anim.value),
-                    sel: _sel,
+                    sel: _sel, lo: lo, hi: lo + span,
                     line: s.primary, accent: s.tertiary,
                     grid: s.outlineVariant.withValues(alpha: 0.45),
                     text: s.onSurfaceVariant, surface: s.surfaceContainerLow,
@@ -154,10 +219,12 @@ class _TrendPainter extends CustomPainter {
   final List<String> labels;
   final double progress;
   final int? sel;
+  final double lo, hi;
   final Color line, accent, grid, text, surface, onSurface;
   static const padL = 38.0, padR = 10.0, padT = 28.0, padB = 24.0;
 
   _TrendPainter({required this.v, required this.labels, required this.progress, required this.sel,
+      required this.lo, required this.hi,
       required this.line, required this.accent, required this.grid, required this.text,
       required this.surface, required this.onSurface});
 
@@ -167,9 +234,13 @@ class _TrendPainter extends CustomPainter {
     if (n == 0) return;
     final w = size.width - padL - padR;
     final h = size.height - padT - padB;
-    var maxV = v.reduce(math.max);
+    final i0 = lo.floor().clamp(0, n - 1).toInt();
+    final i1 = hi.ceil().clamp(0, n - 1).toInt();
+    var maxV = 0.0;
+    for (var i = i0; i <= i1; i++) { if (v[i] > maxV) maxV = v[i]; }
     if (maxV <= 0) maxV = 1;
-    double x(int i) => n == 1 ? padL + w / 2 : padL + w * i / (n - 1);
+    final span = hi - lo;
+    double x(int i) => (n == 1 || span <= 0) ? padL + w / 2 : padL + w * (i - lo) / span;
     double y(double val) => padT + h * (1 - val / maxV);
 
     // grid + y labels
@@ -191,7 +262,7 @@ class _TrendPainter extends CustomPainter {
     }
 
     canvas.save();
-    canvas.clipRect(Rect.fromLTRB(0, 0, padL + w * progress + 2, size.height));
+    canvas.clipRect(Rect.fromLTRB(padL - 6, 0, math.min(size.width, padL + w * progress + 6), size.height));
     final fill = Path.from(path)
       ..lineTo(pts.last.dx, padT + h)
       ..lineTo(pts.first.dx, padT + h)
@@ -208,16 +279,16 @@ class _TrendPainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.round
       ..shader = LinearGradient(colors: [line, accent])
           .createShader(Rect.fromLTWH(padL, padT, w, h)));
-    if (n <= 24) {
-      for (final p in pts) {
-        canvas.drawCircle(p, 4, Paint()..color = surface);
-        canvas.drawCircle(p, 2.5, Paint()..color = line);
+    if (span <= 24) {
+      for (var i = i0; i <= i1; i++) {
+        canvas.drawCircle(pts[i], 4, Paint()..color = surface);
+        canvas.drawCircle(pts[i], 2.5, Paint()..color = line);
       }
     }
     canvas.restore();
 
     // x labels: first, middle, last
-    final idxs = <int>{0, n ~/ 2, n - 1};
+    final idxs = <int>{for (var k = 0; k <= 3; k++) (lo + span * k / 3).round().clamp(0, n - 1).toInt()};
     for (final i in idxs) {
       _paintText(canvas, labels[i], Offset(pts[i].dx.clamp(padL + 14, size.width - padR - 14).toDouble(), size.height - 8),
           color: text, size: 9);
@@ -225,7 +296,7 @@ class _TrendPainter extends CustomPainter {
 
     // selection: guide line, dot, bubble
     final si = sel;
-    if (si != null && si < n) {
+    if (si != null && si < n && si >= lo - 0.5 && si <= hi + 0.5) {
       final p = pts[si];
       canvas.drawLine(Offset(p.dx, padT), Offset(p.dx, padT + h),
           Paint()..color = accent.withValues(alpha: 0.4)..strokeWidth = 1.5);
@@ -249,7 +320,7 @@ class _TrendPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_TrendPainter o) =>
-      o.progress != progress || o.sel != sel || o.v != v || o.line != line;
+      o.progress != progress || o.sel != sel || o.v != v || o.line != line || o.lo != lo || o.hi != hi;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -431,11 +502,15 @@ class _ShareDonut extends StatelessWidget {
     final total = items.fold<int>(0, (a, e) => a + getPlays(e));
     final vals = [for (final e in top) getPlays(e)];
     final rest = total - vals.fold<int>(0, (a, b) => a + b);
+    // Distinct hues derived from the theme (primary / tertiary rotated)
+    Color rot(Color c, double d) {
+      final h = HSLColor.fromColor(c);
+      return h.withHue((h.hue + d) % 360).toColor();
+    }
     final palette = [
-      s.primary, s.tertiary, s.secondary,
-      Color.lerp(s.primary, s.tertiary, 0.5)!,
-      Color.lerp(s.secondary, s.primary, 0.5)!,
-      s.outlineVariant,
+      s.primary, s.tertiary,
+      rot(s.primary, 120), rot(s.tertiary, 120), rot(s.primary, 240),
+      s.outline,
     ];
     final segs = [...vals, if (rest > 0) rest];
     String pct(int v) => total > 0 ? '${(v * 100 / total).round()}%' : '';
@@ -449,7 +524,7 @@ class _ShareDonut extends StatelessWidget {
           duration: const Duration(milliseconds: 1000),
           curve: Curves.easeOutCubic,
           builder: (_, p, _) => SizedBox(
-            width: 140, height: 140,
+            width: 150, height: 150,
             child: CustomPaint(
               painter: _DonutShare(values: segs, colors: palette, progress: p,
                   bg: s.surfaceContainerHighest),
@@ -469,7 +544,7 @@ class _ShareDonut extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 5),
                 child: Row(children: [
-                  Container(width: 10, height: 10,
+                  Container(width: 12, height: 12,
                       decoration: BoxDecoration(color: palette[i], shape: BoxShape.circle)),
                   const SizedBox(width: 8),
                   Expanded(child: Text(getLabel(top[i]), maxLines: 1, overflow: TextOverflow.ellipsis,
@@ -483,7 +558,7 @@ class _ShareDonut extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 5),
               child: Row(children: [
-                Container(width: 10, height: 10,
+                Container(width: 12, height: 12,
                     decoration: BoxDecoration(color: palette[5], shape: BoxShape.circle)),
                 const SizedBox(width: 8),
                 Expanded(child: Text(tx('cx_others'), style: t.bodySmall?.copyWith(
@@ -506,13 +581,13 @@ class _DonutShare extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    const stroke = 22.0;
+    const stroke = 30.0;
     final rect = Rect.fromLTWH(stroke / 2, stroke / 2, size.width - stroke, size.height - stroke);
     final total = values.fold<int>(0, (a, b) => a + b);
     canvas.drawArc(rect, 0, 2 * math.pi, false, Paint()
       ..style = PaintingStyle.stroke..strokeWidth = stroke..color = bg);
     if (total <= 0) return;
-    final gap = values.length > 1 ? 0.12 : 0.0;
+    final gap = values.length > 1 ? 0.05 : 0.0;
     var start = -math.pi / 2;
     for (var i = 0; i < values.length; i++) {
       final full = values[i] / total * 2 * math.pi;
@@ -521,7 +596,7 @@ class _DonutShare extends CustomPainter {
         canvas.drawArc(rect, start + gap / 2, sweep, false, Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = stroke
-          ..strokeCap = StrokeCap.round
+          ..strokeCap = StrokeCap.butt
           ..color = colors[i % colors.length]);
       }
       start += full;

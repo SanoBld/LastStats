@@ -281,7 +281,7 @@ class _ChartsPageState extends State<_ChartsPage>
 
   /// Aggregate hourly & weekday data across ALL cached years.
   Future<void> _loadAllTimeHabits() async {
-    setState(() { _hourlyLoading = true; _hourlyData = null; _weekdayData = null; });
+    setState(() { _hourlyLoading = true; });
     final hours    = <int, int>{for (var i = 0; i < 24; i++) i: 0};
     final weekdays = <int, int>{for (var i = 1; i <= 7; i++) i: 0};
     int count = 0;
@@ -322,8 +322,6 @@ class _ChartsPageState extends State<_ChartsPage>
     if (_hourlyLoading) return;
     setState(() {
       _hourlyLoading = true;
-      _hourlyData    = null;
-      _weekdayData   = null;
       _hourlyCount   = 0;
     });
     try {
@@ -368,7 +366,7 @@ class _ChartsPageState extends State<_ChartsPage>
       return;
     }
     if (_calendarLoading) return;
-    setState(() { _calendarLoading = true; _calendarData = null; });
+    setState(() { _calendarLoading = true; });
     try {
       final now  = DateTime.now();
       final data = <String, int>{};
@@ -587,13 +585,8 @@ class _ChartsPageState extends State<_ChartsPage>
       _hasFullYearData   = year == 0
           ? AllScrobblesService.getCachedYears().isNotEmpty
           : AllScrobblesService.isYearCached(year);
-      _hourlyData        = null;
-      _weekdayData       = null;
-      _calendarData      = null;
       _hourlyLoading     = true;
       _calendarLoading   = year != 0;
-      _topArtistsYear    = [];
-      _topAlbumsYear     = [];
     });
     _loadYearData(year);
     if (!AllScrobblesService.isRunning && !AllScrobblesService.isYearCached(year) && year != 0) {
@@ -1332,45 +1325,44 @@ class _ChartsPageState extends State<_ChartsPage>
         ? const SkeletonList(key: ValueKey('c_l'), header: true)
         : _error != null
           ? KeyedSubtree(key: const ValueKey('c_e'), child: _ErrorView(message: _error!, onRetry: _load))
-          : KeyedSubtree(
+          : SafeArea(
               key: const ValueKey('c_ok'),
-              child: AnimatedOpacity(
-                opacity: _yearDataLoading ? 0.5 : 1.0,
-                duration: const Duration(milliseconds: 200),
-                curve: M3Motion.emphasizedDecelerate,
-                child: RefreshIndicator(
-                  onRefresh: _load,
-                  child: CustomScrollView(
-                    controller: _mainScroll,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    slivers: [
-                      // Large collapsing app bar, year chips stay pinned
-                      SliverAppBar.large(
-                        pinned: true,
-                        backgroundColor: scheme.surface,
-                        surfaceTintColor: Colors.transparent,
-                        title: Text(L.chartsTitle,
-                            style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
-                        actions: [
-                          IconButton.filledTonal(
-                            icon: const Icon(Icons.ios_share_rounded),
-                            tooltip: tx('ui_export_a_chart'),
-                            onPressed: () => _exportFlow(context),
-                          ),
-                          const SizedBox(width: 12),
-                        ],
-                        bottom: PreferredSize(
-                          preferredSize: const Size.fromHeight(56),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                            child: _buildYearChips(scheme, text),
-                          ),
-                        ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Fixed header, same style as every other tab
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 16, 2),
+                    child: Row(children: [
+                      Expanded(
+                        child: Text(L.chartsTitle,
+                            style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
                       ),
-                      SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 48),
-                        sliver: SliverList(
-                          delegate: SliverChildListDelegate([
+                      IconButton.filledTonal(
+                        icon: const Icon(Icons.ios_share_rounded),
+                        tooltip: tx('ui_export_a_chart'),
+                        onPressed: () => _exportFlow(context),
+                      ),
+                    ]),
+                  ),
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: _buildYearChips(scheme, text),
+                  ),
+                  const SizedBox(height: 14),
+                  Expanded(
+                    child: AnimatedOpacity(
+                      opacity: _yearDataLoading ? 0.5 : 1.0,
+                      duration: const Duration(milliseconds: 200),
+                      curve: M3Motion.emphasizedDecelerate,
+                      child: RefreshIndicator(
+                        onRefresh: _load,
+                        child: ListView(
+                          controller: _mainScroll,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 48),
+                          children: [
                   _buildHistoryBanner(context),
 
                   // 1. Trend (monthly / cumulative area chart)
@@ -1389,7 +1381,7 @@ class _ChartsPageState extends State<_ChartsPage>
                   _ChartSec(
                     index: 1, title: tx('ui_listening_habits'),
                     icon: Icons.access_time_rounded, sub: habitsSubtitle,
-                    child: _hourlyLoading
+                    child: (_hourlyLoading && _hourlyData == null)
                         ? const SkeletonBlock(height: 220)
                         : (_hourlyData != null && _weekdayData != null)
                             ? RepaintBoundary(
@@ -1404,8 +1396,8 @@ class _ChartsPageState extends State<_ChartsPage>
 
                   // 3. Artists share
                   _ChartSec(
-                    index: 2, title: L.chartsArtistDist, icon: Icons.mic_rounded, sub: topLabel,
-                    child: _yearDataLoading
+                    index: 2, title: tx('cx_artist_distribution'), icon: Icons.mic_rounded, sub: topLabel,
+                    child: (_yearDataLoading && artistItems.isEmpty)
                         ? const SkeletonBlock(height: 180)
                         : artistItems.isNotEmpty
                             ? RepaintBoundary(
@@ -1423,7 +1415,7 @@ class _ChartsPageState extends State<_ChartsPage>
                   // 4. Albums share
                   _ChartSec(
                     index: 3, title: tx('ui_album_distribution'), icon: Icons.album_rounded, sub: albumLabel,
-                    child: _yearDataLoading
+                    child: (_yearDataLoading && albumItems.isEmpty)
                         ? const SkeletonBlock(height: 180)
                         : albumItems.isNotEmpty
                             ? RepaintBoundary(
@@ -1483,7 +1475,7 @@ class _ChartsPageState extends State<_ChartsPage>
                                 label: tx('ui_all_years'),
                                 onLoad: () => AllScrobblesService.loadAll(widget.service),
                               )
-                      else if (_calendarLoading)
+                      else if (_calendarLoading && calendarForView == null)
                         const SkeletonBlock(height: 180)
                       else if (calendarForView != null)
                         RepaintBoundary(
@@ -1511,12 +1503,12 @@ class _ChartsPageState extends State<_ChartsPage>
                     )),
                     const SizedBox(height: 20),
                   ],
-                          ]),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
     );

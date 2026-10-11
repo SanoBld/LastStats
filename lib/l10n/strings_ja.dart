@@ -1324,4 +1324,5 @@ const Map<String, String> kTxJa = {
   'cx_cumulative': '累計',
   'cx_clock': 'リスニングクロック',
   'cx_others': 'その他',
+  'cx_artist_distribution': 'アーティスト別の内訳',
 };

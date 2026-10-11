@@ -1325,4 +1325,5 @@ const Map<String, String> kTxDe = {
   'cx_cumulative': 'Kumuliert',
   'cx_clock': 'Hörzeit-Uhr',
   'cx_others': 'Andere',
+  'cx_artist_distribution': 'Verteilung nach Künstler',
 };

@@ -1354,4 +1354,5 @@ const Map<String, String> kTxPt = {
   'cx_cumulative': 'Acumulado',
   'cx_clock': 'Relógio de audição',
   'cx_others': 'Outros',
+  'cx_artist_distribution': 'Distribuição por artista',
 };

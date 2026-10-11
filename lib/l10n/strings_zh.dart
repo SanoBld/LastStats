@@ -1351,4 +1351,5 @@ const Map<String, String> kTxZh = {
   'cx_cumulative': '累计',
   'cx_clock': '收听时钟',
   'cx_others': '其他',
+  'cx_artist_distribution': '艺人分布',
 };
