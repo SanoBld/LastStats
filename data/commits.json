@@ -1,6 +1,114 @@
 {
-  "updated": "2026-10-11T12:15:49Z",
+  "updated": "2026-10-11T21:36:14Z",
   "commits": [
+    {
+      "sha": "fad7b586299922f43446be8be597b24dfd2972a3",
+      "message": "feat: ajout de la prise en charge de la répartition week-end vs semaine dans les graphiques",
+      "date": "2026-10-11T21:24:23Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/fad7b586299922f43446be8be597b24dfd2972a3",
+      "tags": []
+    },
+    {
+      "sha": "de3d489928606d03cd3ee812086054b2d1fa4beb",
+      "message": "feat: ajout d'un cache pour les données annuelles et amélioration de l'interaction des graphiques hebdomadaires",
+      "date": "2026-10-11T21:14:17Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/de3d489928606d03cd3ee812086054b2d1fa4beb",
+      "tags": []
+    },
+    {
+      "sha": "28e84749fb0674fdb9449b7f3ffd53c7c9122b36",
+      "message": "feat: ajout de l'option \"Style des couleurs\" dans les paramètres d'apparence, prise en charge de plusieurs styles de couleurs et sauvegarde des préférences",
+      "date": "2026-10-11T19:20:43Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/28e84749fb0674fdb9449b7f3ffd53c7c9122b36",
+      "tags": []
+    },
+    {
+      "sha": "f936eb82d649bc17d17659027e71a9bb5459d3e2",
+      "message": "feat: ajout de nouveaux graphiques pour la répartition par moment de la journée et l'intensité des jours, amélioration des visuels des graphiques",
+      "date": "2026-10-11T19:06:52Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/f936eb82d649bc17d17659027e71a9bb5459d3e2",
+      "tags": []
+    },
+    {
+      "sha": "dbe0bd9cea538c5e1a3414901426f48a6cd6ce48",
+      "message": "feat: ajout de la prise en charge de la répartition par artiste dans plusieurs langues, amélioration des graphiques et des interactions",
+      "date": "2026-10-11T18:49:06Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/dbe0bd9cea538c5e1a3414901426f48a6cd6ce48",
+      "tags": []
+    },
+    {
+      "sha": "492b31f8957fbcfffea841684ca60c18b33c6a2e",
+      "message": "Add charts visuals to home screen with new chart widgets\n\n- Introduced a new part file '_charts_visuals.dart' for organizing chart-related widgets.\n- Implemented various chart types including trend charts, clock charts, week charts, share donuts, and genre radar charts.\n- Enhanced visual representation of data with animations and interactive elements.\n- Updated home screen to include the new charts section.",
+      "date": "2026-10-11T18:26:14Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/492b31f8957fbcfffea841684ca60c18b33c6a2e",
+      "tags": []
+    },
+    {
+      "sha": "cfb89b68a0021dfdefa8357889596f5ee5123af6",
+      "message": "feat: refonte de l'onglet de recherche et de l'onglet des graphiques, ajout de nouvelles traductions et amélioration des widgets",
+      "date": "2026-10-11T18:15:29Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/cfb89b68a0021dfdefa8357889596f5ee5123af6",
+      "tags": []
+    },
+    {
+      "sha": "98a9cb3367b7b38ba8dabb9985d75e9e368d2eec",
+      "message": "feat: ajout de la prise en charge des recherches récentes et des suggestions dans plusieurs langues, amélioration de l'affichage des résultats",
+      "date": "2026-10-11T17:41:28Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/98a9cb3367b7b38ba8dabb9985d75e9e368d2eec",
+      "tags": []
+    },
+    {
+      "sha": "d067e152da9128b7066ca32addcd237b3a4269ee",
+      "message": "feat: ajout de la gestion des recherches récentes et des suggestions, amélioration de l'affichage des résultats",
+      "date": "2026-10-11T17:20:23Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/d067e152da9128b7066ca32addcd237b3a4269ee",
+      "tags": []
+    },
+    {
+      "sha": "fddfe9097b068c3523f8148912e1111b1ed0db5d",
+      "message": "feat: refonte de la barre de recherche et amélioration de l'affichage des résultats, ajout de la gestion des icônes de la barre d'état",
+      "date": "2026-10-11T16:05:11Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/fddfe9097b068c3523f8148912e1111b1ed0db5d",
+      "tags": []
+    },
+    {
+      "sha": "42caf9f498b600b8ea44ad640d2d48d9939f03af",
+      "message": "feat: ajout de la prise en charge de la taille et de la police du texte, amélioration de l'affichage des artistes récents et mise à jour de l'historique",
+      "date": "2026-10-11T15:44:52Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/42caf9f498b600b8ea44ad640d2d48d9939f03af",
+      "tags": []
+    },
+    {
+      "sha": "f5a53c0000962b32b721d44935273af81116e0c8",
+      "message": "feat: ajout d'un service de secours pour les biographies via Wikipedia et mise à jour des chaînes de langue",
+      "date": "2026-10-11T15:18:52Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/f5a53c0000962b32b721d44935273af81116e0c8",
+      "tags": []
+    },
     {
       "sha": "a09cf85af72b3175380c4ddfd680f318e7c5877e",
       "message": "feat: ajout d'un bouton pour ouvrir le lien de biographie et amélioration de l'affichage des éléments",
@@ -2603,116 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/60b153a11ff8b633a59e1988e2de082041fda54f",
-      "tags": []
-    },
-    {
-      "sha": "8c6c95bb24a2a395742e38ee7f9941171dbe440d",
-      "message": "feat: ajouter un toggle pour les pochettes animées avec effet de zoom et de profondeur",
-      "date": "2026-08-08T20:57:30Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/8c6c95bb24a2a395742e38ee7f9941171dbe440d",
-      "tags": []
-    },
-    {
-      "sha": "f157eac54b004a5894e07e473c73bfc565dd6bae",
-      "message": "fix: corriger la version dans pubspec.yaml de 3.0.0+20 à 2.6.0+1\nrefactor: remplacer LivingArtwork par ClipRRect dans _img pour une meilleure gestion des images",
-      "date": "2026-08-08T20:45:00Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/f157eac54b004a5894e07e473c73bfc565dd6bae",
-      "tags": []
-    },
-    {
-      "sha": "94e7b85c24663a63b0d989f6ddb86eec72b89764",
-      "message": "Merge branch 'master' of https://github.com/SanoBld/LastStats",
-      "date": "2026-08-08T20:29:49Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/94e7b85c24663a63b0d989f6ddb86eec72b89764",
-      "tags": []
-    },
-    {
-      "sha": "e84b41c2fd36b31e7e3b442848642c8b469ab3c9",
-      "message": "feat: ajouter le widget LivingArtwork pour des effets visuels dynamiques sur les images",
-      "date": "2026-08-08T20:29:39Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/e84b41c2fd36b31e7e3b442848642c8b469ab3c9",
-      "tags": []
-    },
-    {
-      "sha": "457a7b772e750533b6acaf0e6a89954c7b89b9b6",
-      "message": "chore: bump version to 3.0.0 [skip ci]",
-      "date": "2026-07-24T10:34:08Z",
-      "author": "github-actions[bot]",
-      "avatar": "https://avatars.githubusercontent.com/in/15368?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/457a7b772e750533b6acaf0e6a89954c7b89b9b6",
-      "tags": []
-    },
-    {
-      "sha": "82e9ae41715076d9e6f5c03094d6832efda1d1c1",
-      "message": "fix: corriger la branche de référence de 'main' à 'master' dans le workflow de publication",
-      "date": "2026-07-24T10:32:59Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/82e9ae41715076d9e6f5c03094d6832efda1d1c1",
-      "tags": []
-    },
-    {
-      "sha": "7bef7dc25f876ea79a352bd301c9f7728ab0676a",
-      "message": "fix: corriger la branche de référence de 'main' à 'master' dans le workflow de publication",
-      "date": "2026-07-24T10:31:20Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/7bef7dc25f876ea79a352bd301c9f7728ab0676a",
-      "tags": []
-    },
-    {
-      "sha": "1dcaaba5bd4ba91539edd90b0149c81fe91e8b54",
-      "message": "update",
-      "date": "2026-07-24T09:59:17Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/1dcaaba5bd4ba91539edd90b0149c81fe91e8b54",
-      "tags": [
-        "v3.0.0"
-      ]
-    },
-    {
-      "sha": "7a14d29a4bc0cda5166a832591a46a6f3aa23e9a",
-      "message": "update readme",
-      "date": "2026-07-24T09:48:43Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/7a14d29a4bc0cda5166a832591a46a6f3aa23e9a",
-      "tags": []
-    },
-    {
-      "sha": "413ad1b325bd2abaf5bab1242e01c85b33ad4590",
-      "message": "refactor: mise à jour du README pour améliorer la clarté et la structure des fonctionnalités",
-      "date": "2026-07-24T09:46:02Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/413ad1b325bd2abaf5bab1242e01c85b33ad4590",
-      "tags": []
-    },
-    {
-      "sha": "8f5c0d77de30f41194ec4a646c8319e47912a2f0",
-      "message": "feat: mise à jour du changelog pour la version 3.0.0 avec de nouvelles fonctionnalités, améliorations et corrections de bugs",
-      "date": "2026-07-23T23:12:36Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/8f5c0d77de30f41194ec4a646c8319e47912a2f0",
-      "tags": []
-    },
-    {
-      "sha": "c6da2b208754031a870e3f5704600ab823369fe6",
-      "message": "feat: ajouter un bouton de retour et améliorer l'affichage du titre sur la page des favoris",
-      "date": "2026-07-23T22:52:59Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/c6da2b208754031a870e3f5704600ab823369fe6",
       "tags": []
     }
   ]
