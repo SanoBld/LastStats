@@ -67,6 +67,7 @@ import '../theme/m3_shapes.dart';
 import '../widgets/skeleton.dart';
 import '../widgets/m3_action_row.dart';
 import '../widgets/m3_components.dart';
+import '../services/wiki_bio_service.dart';
 
 
 // ── Settings sub-pages ────────────────────────────────────────────────────────

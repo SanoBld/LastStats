@@ -41,6 +41,10 @@
 - Biography, lyrics, top tracks, top albums, tracklist, track info, stats and the Last.fm discussion now sit in accent cards with expressive shapes (leaf, arch, squircle)
 - Play, favourite, period and filter buttons use the accent colour on a soft tonal background instead of white on a coloured one
 
+**Biographies and history**
+- Biographies fall back to Wikipedia (your language first, then English) when Last.fm has none, with the source shown
+- History: every track sits in its own rounded accent card, hour headers and the stat pills use the dark accent
+
 **Loading bars**
 - New wavy progress bar (Material You) used wherever a loading has real progress: history sync chip on the dashboard (now shows loaded/total scrobbles; the wavy bar only appears for big syncs, 200+ scrobbles), Sync settings and the Spotify / Last.fm login pages
 - The round loader now morphs between soft rounded shapes of the app (squircle, oval), like the Material 3 Expressive loading indicator

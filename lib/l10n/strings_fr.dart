@@ -949,6 +949,8 @@ const Map<String, String> kTxFr = {
   'load_ready': 'Prêt à importer',
   'load_connecting': 'Connexion à Last.fm…',
   'load_done': 'Import terminé',
+  'bio_src_wiki': 'Source : Wikipédia',
+  'bio_src_wiki_orig': 'Texte original · Wikipédia',
   'dash_motion_t': 'Pochette animée sur le dashboard',
   'dash_motion_s': 'Joue la vidéo du titre en cours sur la carte de lecture et dans l\'en-tête. Nécessite les pochettes vidéo.',
   'onb_cov_t': 'Pochettes et images',

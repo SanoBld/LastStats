@@ -298,14 +298,14 @@ class _HistStatPill extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     decoration: BoxDecoration(
-      color: scheme.secondaryContainer.withValues(alpha: 0.6),
+      color: scheme.primary,
       borderRadius: AppRadius.xlR,
     ),
     child: Row(mainAxisSize: MainAxisSize.min, children: [
-      Icon(icon, size: 14, color: scheme.primary),
+      Icon(icon, size: 14, color: scheme.onPrimary),
       const SizedBox(width: 6),
       Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600,
-          color: scheme.onSecondaryContainer)),
+          color: scheme.onPrimary)),
     ]),
   );
 }
@@ -349,21 +349,25 @@ class _HistChronView extends StatelessWidget {
           final n = hTracks.length;
           final trackWord = L.historyHourTracks;
           return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            if (i > 0) const Divider(height: 1, thickness: 1),
+            if (i > 0) const SizedBox(height: 6),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
               child: Row(children: [
-                Container(width: 3, height: 18,
-                  decoration: BoxDecoration(color: scheme.primary, borderRadius: BorderRadius.circular(2))),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: scheme.primary,
+                    borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(18), bottomRight: Radius.circular(18),
+                        topRight: Radius.circular(8), bottomLeft: Radius.circular(8)),
+                  ),
+                  child: Text(hour, style: text.titleSmall?.copyWith(
+                      color: scheme.onPrimary, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                ),
                 const SizedBox(width: 10),
-                Text(hour, style: text.titleSmall?.copyWith(
-                  color: scheme.primary, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
-                const SizedBox(width: 10),
-                Expanded(child: Container(height: 1, color: scheme.primary.withValues(alpha: 0.15))),
-                const SizedBox(width: 8),
                 Text('$n $trackWord${n > 1 ? 's' : ''}',
-                  style: text.labelSmall?.copyWith(
-                    color: scheme.onSurfaceVariant, fontStyle: FontStyle.italic)),
+                    style: text.labelMedium?.copyWith(
+                        color: scheme.primary, fontWeight: FontWeight.w700)),
               ]),
             ),
             for (final (i, t) in hTracks.indexed)
@@ -395,7 +399,13 @@ class _HistTrackRow extends StatelessWidget {
     final alb    = (track['album']?['#text']  ?? '').toString();
     final raw    = _extractImage(track['image']);
 
-    return InkWell(
+    return Padding(
+     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+     child: Material(
+      color: Color.lerp(scheme.primaryContainer, scheme.surface, 0.55),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
       onTap: () {
         _haptic(_HapticImpact.light);
         showDetailSheet(
@@ -406,13 +416,13 @@ class _HistTrackRow extends StatelessWidget {
         );
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
         child: Row(children: [
           SizedBox(width: 40,
             child: Text(time, style: text.labelSmall?.copyWith(
-                color: scheme.onSurfaceVariant, fontWeight: FontWeight.w500))),
+                color: scheme.primary, fontWeight: FontWeight.w800))),
           const SizedBox(width: 8),
-          _SmartImage(size: 42, borderRadius: 6, initialUrl: raw,
+          _SmartImage(size: 44, borderRadius: 14, initialUrl: raw,
               resolver: () => ImageService.resolveTrack(tit, art, lastfmUrl: raw.isNotEmpty ? raw : null)),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -430,7 +440,7 @@ class _HistTrackRow extends StatelessWidget {
           ])),
         ]),
       ),
-    );
+    )));
   }
 }
 
@@ -456,9 +466,13 @@ class _HistListeView extends StatelessWidget {
         final timeOnly = _localTimeString(t);
         return _FadeSlideIn(
           delay: Duration(milliseconds: (i * 20).clamp(0, 200)),
-          child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-          leading: _SmartImage(size: 44, borderRadius: 6, initialUrl: raw,
+          child: Padding(
+         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+         child: ListTile(
+          tileColor: Color.lerp(scheme.primaryContainer, scheme.surface, 0.55),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+          leading: _SmartImage(size: 44, borderRadius: 14, initialUrl: raw,
               resolver: () => ImageService.resolveTrack(tit, art, lastfmUrl: raw.isNotEmpty ? raw : null)),
           title: Text(tit, maxLines: 1, overflow: TextOverflow.ellipsis,
               style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
@@ -466,7 +480,7 @@ class _HistListeView extends StatelessWidget {
               maxLines: 1, overflow: TextOverflow.ellipsis,
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           trailing: Text(timeOnly,
-              style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
+              style: text.labelSmall?.copyWith(color: scheme.primary, fontWeight: FontWeight.w800)),
           onTap: () {
             _haptic(_HapticImpact.light);
             showDetailSheet(
@@ -476,7 +490,7 @@ class _HistListeView extends StatelessWidget {
               service,
             );
           },
-        ));
+        )));
       },
     );
   }

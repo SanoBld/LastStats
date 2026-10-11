@@ -949,6 +949,8 @@ const Map<String, String> kTxEs = {
   'load_ready': 'Listo para importar',
   'load_connecting': 'Conectando con Last.fm…',
   'load_done': 'Importación completada',
+  'bio_src_wiki': 'Fuente: Wikipedia',
+  'bio_src_wiki_orig': 'Texto original · Wikipedia',
   'dash_motion_t': 'Portada animada en el panel',
   'dash_motion_s': 'Reproduce el vídeo de la canción actual en la tarjeta de reproducción y en la cabecera. Requiere las portadas de vídeo.',
   'onb_cov_t': 'Portadas e imágenes',

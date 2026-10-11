@@ -920,6 +920,8 @@ const Map<String, String> kTxDe = {
   'load_ready': 'Bereit zum Import',
   'load_connecting': 'Verbindung zu Last.fm …',
   'load_done': 'Import abgeschlossen',
+  'bio_src_wiki': 'Quelle: Wikipedia',
+  'bio_src_wiki_orig': 'Originaltext · Wikipedia',
   'dash_motion_t': 'Animiertes Cover im Dashboard',
   'dash_motion_s': 'Spielt das Video des aktuellen Titels auf der Wiedergabekarte und im Kopfbereich ab. Erfordert Video-Cover.',
   'onb_cov_t': 'Cover und Bilder',

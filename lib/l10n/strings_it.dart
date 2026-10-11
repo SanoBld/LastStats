@@ -920,6 +920,8 @@ const Map<String, String> kTxIt = {
   'load_ready': 'Pronto per importare',
   'load_connecting': 'Connessione a Last.fm…',
   'load_done': 'Importazione completata',
+  'bio_src_wiki': 'Fonte: Wikipedia',
+  'bio_src_wiki_orig': 'Testo originale · Wikipedia',
   'dash_motion_t': 'Copertina animata nella dashboard',
   'dash_motion_s': 'Riproduce il video del brano in ascolto sulla scheda di riproduzione e nell\'intestazione. Richiede le copertine video.',
   'onb_cov_t': 'Copertine e immagini',

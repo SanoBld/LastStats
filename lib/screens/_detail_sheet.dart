@@ -517,7 +517,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             });
           }
           // Auto-translate bio for all types
-          if (_bio().isNotEmpty) _translateTo(localeNotifier.value);
+          if (_bio().isNotEmpty) { _translateTo(localeNotifier.value); } else { _wikiFallback(); }
 
         case 'albums':
           final info = await widget.service.getAlbumInfo(_name, _artist);
@@ -527,7 +527,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               _tracklist = _asList(info?['tracks']?['track']);
             });
           }
-          if (_bio().isNotEmpty) _translateTo(localeNotifier.value);
+          if (_bio().isNotEmpty) { _translateTo(localeNotifier.value); } else { _wikiFallback(); }
 
         case 'tracks':
           final info = await widget.service.getTrackInfo(_name, _artist);
@@ -537,7 +537,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               _isLoved = info?['userloved']?.toString() == '1';
             });
           }
-          if (_bio().isNotEmpty) _translateTo(localeNotifier.value);
+          if (_bio().isNotEmpty) { _translateTo(localeNotifier.value); } else { _wikiFallback(); }
           _fetchLyrics();
       }
     } catch (_) {}
@@ -714,7 +714,26 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     }
   }
 
+  // Wikipedia text used when Last.fm has no bio.
+  WikiBio? _wiki;
+
+  bool get _bioFromWiki => _lfmBio().isEmpty && _wiki != null;
+
+  Future<void> _wikiFallback() async {
+    if (_lfmBio().isNotEmpty || _wiki != null) return;
+    final w = await WikiBioService.find(
+        type: widget.type, name: _name, artist: _artist, lang: localeNotifier.value);
+    if (w == null || !mounted) return;
+    setState(() => _wiki = w);
+    _translateTo(localeNotifier.value);
+  }
+
   String _bio() {
+    final l = _lfmBio();
+    return l.isNotEmpty ? l : (_wiki?.text ?? '');
+  }
+
+  String _lfmBio() {
     final raw = (_info?['bio']?['content'] ?? _info?['wiki']?['content'] ?? '').toString();
     if (raw.isEmpty) return '';
     final idx = raw.indexOf(RegExp(r'<a href="https?://www\.last\.fm'));
@@ -1374,6 +1393,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   // In-app 30s preview player — shown just above the biography for tracks.
   Widget _buildPreviewPlayer(ColorScheme scheme) => const SizedBox.shrink();
 
+  String _bioUrl() => _bioFromWiki ? _wiki!.url : _lfmBioUrl();
+
   String _lfmBioUrl() {
     final n = Uri.encodeComponent(_name), a = Uri.encodeComponent(_artist);
     return switch (widget.type) {
@@ -1406,7 +1427,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                   radius: BorderRadius.circular(18),
                   color: scheme.primary,
                   padding: const EdgeInsets.symmetric(horizontal: 10),
-                  onTap: () => _openBioUrl(_lfmBioUrl()),
+                  onTap: () => _openBioUrl(_bioUrl()),
                   child: Icon(Icons.open_in_new_rounded,
                       size: 18, color: scheme.onPrimary),
                 ),
@@ -1483,9 +1504,11 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           ),
           const SizedBox(height: 4),
           Text(
-            _showTranslated
-                ? tx('ui_original_text_last_fm_')
-                : tx('ui_source_last_fm'),
+            _bioFromWiki
+                ? (_showTranslated ? tx('bio_src_wiki_orig') : tx('bio_src_wiki'))
+                : (_showTranslated
+                    ? tx('ui_original_text_last_fm_')
+                    : tx('ui_source_last_fm')),
             style: text.bodySmall?.copyWith(
               color: scheme.onPrimaryContainer.withValues(alpha: 0.7),
               fontSize: 11,

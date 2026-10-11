@@ -135,7 +135,7 @@ class ApiRegistry {
     ),
     ApiDef(
       id: 'wikimedia', name: 'Wikipedia / Wikimedia Commons', category: ApiCategory.artwork,
-      hosts: ['en.wikipedia.org', 'commons.wikimedia.org'],
+      hosts: ['en.wikipedia.org', 'fr.wikipedia.org', 'de.wikipedia.org', 'es.wikipedia.org', 'it.wikipedia.org', 'pt.wikipedia.org', 'ru.wikipedia.org', 'ja.wikipedia.org', 'zh.wikipedia.org', 'ar.wikipedia.org', 'commons.wikimedia.org'],
       ceiling: ApiRule(8, 1000),
       maxWaitMs: 3000, needsUserAgent: true,
     ),

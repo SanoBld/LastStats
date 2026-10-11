@@ -946,6 +946,8 @@ const Map<String, String> kTxZh = {
   'load_ready': '准备导入',
   'load_connecting': '正在连接 Last.fm…',
   'load_done': '导入完成',
+  'bio_src_wiki': '来源：维基百科',
+  'bio_src_wiki_orig': '原文 · 维基百科',
   'dash_motion_t': '仪表盘动态封面',
   'dash_motion_s': '在播放卡片和顶部栏中播放当前曲目的视频。需要开启视频封面。',
   'onb_cov_t': '封面和图片',
