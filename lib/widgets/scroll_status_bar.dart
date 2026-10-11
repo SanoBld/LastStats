@@ -11,6 +11,7 @@ class ScrollStatusBarHost extends StatefulWidget {
   final Object? resetToken;
   final double threshold;
   final ValueChanged<bool>? onVisibleChanged;
+  final bool enabled;
   const ScrollStatusBarHost({
     super.key,
     required this.child,
@@ -18,6 +19,7 @@ class ScrollStatusBarHost extends StatefulWidget {
     this.resetToken,
     this.threshold = 24,
     this.onVisibleChanged,
+    this.enabled = true,
   });
 
   @override
@@ -36,7 +38,7 @@ class _ScrollStatusBarHostState extends State<ScrollStatusBarHost> {
   @override
   void didUpdateWidget(covariant ScrollStatusBarHost old) {
     super.didUpdateWidget(old);
-    if (old.resetToken != widget.resetToken && _visible) {
+    if ((old.resetToken != widget.resetToken || !widget.enabled) && _visible) {
       // Post-frame: the callback may call setState on a parent.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _set(false);
@@ -47,7 +49,7 @@ class _ScrollStatusBarHostState extends State<ScrollStatusBarHost> {
   bool _onScroll(ScrollNotification n) {
     // Only the main vertical scrollable (ignore nested horizontal lists).
     if (n.depth != 0 || n.metrics.axis != Axis.vertical) return false;
-    _set(n.metrics.pixels > widget.threshold);
+    _set(widget.enabled && n.metrics.pixels > widget.threshold);
     return false;
   }
 

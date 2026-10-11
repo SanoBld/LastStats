@@ -80,6 +80,8 @@ class _ChartsPageState extends State<_ChartsPage>
   List<dynamic> _topArtistsYear = [];
   List<dynamic> _topAlbumsYear  = [];
   bool _yearDataLoading = false;
+  // Per-year computed results: switching back to a year is instant.
+  final Map<int, Map<String, dynamic>> _yearCache = {};
 
   // ── Genres (derived from all-time top artists) ────────────────────────────
   bool _tagsLoading = false;
@@ -132,6 +134,7 @@ class _ChartsPageState extends State<_ChartsPage>
     _refreshAvailableYears();
     if (!_isAllTime && !_hasFullYearData && AllScrobblesService.isYearCached(_selectedYear)) {
       _hasFullYearData = true;
+      _yearCache.remove(_selectedYear);
       _loadYearData(_selectedYear);
     }
     // If sync finished and year still not cached, stop the loader
@@ -141,6 +144,7 @@ class _ChartsPageState extends State<_ChartsPage>
   }
 
   Future<void> _load() async {
+    _yearCache.clear();
     setState(() { _loading = true; _error = null; });
     try {
       final res = await Future.wait([
@@ -204,6 +208,23 @@ class _ChartsPageState extends State<_ChartsPage>
       return;
     }
 
+    final cached = _yearCache[year];
+    if (cached != null && AllScrobblesService.getRecordsForYear(year) != null) {
+      if (!mounted) return;
+      setState(() {
+        _monthly         = cached['monthly'];
+        _hourlyData      = cached['hourly'];
+        _weekdayData     = cached['weekday'];
+        _hourlyCount     = cached['count'];
+        _calendarData    = cached['calendar'];
+        _hourlyLoading   = false;
+        _calendarLoading = false;
+        _yearDataLoading = false;
+        _topArtistsYear  = cached['artists'];
+        _topAlbumsYear   = cached['albums'];
+      });
+      return;
+    }
     var records = AllScrobblesService.getRecordsForYear(year);
     // If records not in memory but timestamps exist, try loading from service
     if (records == null && AllScrobblesService.isYearCached(year)) {
@@ -223,15 +244,16 @@ class _ChartsPageState extends State<_ChartsPage>
       try {
         // Work in slices and let the UI draw a frame between them: doing
         // tens of thousands of scrobbles in one go froze the tab.
-        var n = 0;
+        final sw = Stopwatch()..start();
         for (final r in recs) {
           final a = _sanitizeName(_recField(r, 'artist'));
           final b = _sanitizeName(_recField(r, 'album'));
           if (_isValidLabel(a)) artistTally.addScrobble('artists', name: a, artist: '');
           if (_isValidLabel(b)) albumTally.addScrobble('albums', name: b, artist: a);
-          if (++n % 1500 == 0) {
+          if (sw.elapsedMilliseconds > 6) {
             await Future.delayed(Duration.zero);
-            if (!mounted) return;
+            if (!mounted || _selectedYear != year) return;
+            sw.reset();
           }
         }
       } catch (_) {}
@@ -250,7 +272,16 @@ class _ChartsPageState extends State<_ChartsPage>
       final weekday = AllScrobblesService.computeWeekday(recs);
       await Future.delayed(Duration.zero);
       final calendar = AllScrobblesService.computeCalendar(recs);
-      if (!mounted) return;
+      if (!mounted || _selectedYear != year) return;
+      final topA = artistCounts.isNotEmpty ? rankTop(artistTally) : <Map<String, dynamic>>[];
+      final topB = albumCounts.isNotEmpty  ? rankTop(albumTally)  : <Map<String, dynamic>>[];
+      if (AllScrobblesService.isYearComplete(year)) {
+        _yearCache[year] = {
+          'monthly': monthly, 'hourly': hourly, 'weekday': weekday,
+          'count': recs.length, 'calendar': calendar,
+          'artists': topA, 'albums': topB,
+        };
+      }
       setState(() {
         _monthly         = monthly;
         _hourlyData      = hourly;
@@ -260,8 +291,8 @@ class _ChartsPageState extends State<_ChartsPage>
         _hourlyLoading   = false;
         _calendarLoading = false;
         _yearDataLoading = false;
-        _topArtistsYear  = artistCounts.isNotEmpty ? rankTop(artistTally) : [];
-        _topAlbumsYear   = albumCounts.isNotEmpty  ? rankTop(albumTally)  : [];
+        _topArtistsYear  = topA;
+        _topAlbumsYear   = topB;
       });
       return;
     }
@@ -577,6 +608,28 @@ class _ChartsPageState extends State<_ChartsPage>
     return result;
   }
 
+  /// PC: pairs compact chart sections side by side. Phones: untouched.
+  List<Widget> _pcLayout(bool wide, List<Widget> items) {
+    if (!wide) return items;
+    const pairable = {2, 3, 4, 5, 8, 9};
+    final out = <Widget>[];
+    Widget? held;
+    void flush() { if (held != null) { out.add(held!); held = null; } }
+    for (final w in items) {
+      if (w is _ChartSec && pairable.contains(w.index)) {
+        if (held == null) { held = w; }
+        else {
+          out.add(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Expanded(child: held!), const SizedBox(width: 16), Expanded(child: w),
+          ]));
+          held = null;
+        }
+      } else { flush(); out.add(w); }
+    }
+    flush();
+    return out;
+  }
+
   void _onYearChanged(int year) {
     if (year == _selectedYear) return;
     setState(() {
@@ -588,7 +641,9 @@ class _ChartsPageState extends State<_ChartsPage>
       _hourlyLoading     = true;
       _calendarLoading   = year != 0;
     });
-    _loadYearData(year);
+    Future.delayed(const Duration(milliseconds: 60), () {
+      if (mounted && _selectedYear == year) _loadYearData(year);
+    });
     if (!AllScrobblesService.isRunning && !AllScrobblesService.isYearCached(year) && year != 0) {
       AllScrobblesService.loadAll(widget.service);
     }
@@ -1353,7 +1408,7 @@ class _ChartsPageState extends State<_ChartsPage>
                   const SizedBox(height: 14),
                   Expanded(
                     child: AnimatedOpacity(
-                      opacity: _yearDataLoading ? 0.5 : 1.0,
+                      opacity: _yearDataLoading ? 0.6 : 1.0,
                       duration: const Duration(milliseconds: 200),
                       curve: M3Motion.emphasizedDecelerate,
                       child: RefreshIndicator(
@@ -1362,7 +1417,7 @@ class _ChartsPageState extends State<_ChartsPage>
                           controller: _mainScroll,
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: const EdgeInsets.fromLTRB(16, 0, 16, 48),
-                          children: [
+                          children: _pcLayout(_isDesktopLayout(context), [
                   _buildHistoryBanner(context),
 
                   // 1. Trend (monthly / cumulative area chart)
@@ -1386,11 +1441,17 @@ class _ChartsPageState extends State<_ChartsPage>
                         : (_hourlyData != null && _weekdayData != null)
                             ? RepaintBoundary(
                                 key: _xkeys['habits'],
-                                child: Column(children: [
-                                  _ClockChart(data: _hourlyData!),
-                                  const SizedBox(height: 12),
-                                  _WeekChart(data: _weekdayData!),
-                                ]))
+                                child: _isDesktopLayout(context)
+                                    ? Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                        Expanded(child: _ClockChart(data: _hourlyData!)),
+                                        const SizedBox(width: 16),
+                                        Expanded(child: _WeekChart(data: _weekdayData!)),
+                                      ])
+                                    : Column(children: [
+                                        _ClockChart(data: _hourlyData!),
+                                        const SizedBox(height: 12),
+                                        _WeekChart(data: _weekdayData!),
+                                      ]))
                             : const SizedBox.shrink(),
                   ),
 
@@ -1518,7 +1579,7 @@ class _ChartsPageState extends State<_ChartsPage>
                       child: _BusiestDays(data: calendarForView),
                     ),
                   ],
-                          ],
+                          ]),
                         ),
                       ),
                     ),
@@ -2896,7 +2957,7 @@ class _SwipeDistributionCardState extends State<_SwipeDistributionCard> {
             height: height,
             child: PageView(
               controller: _ctrl,
-              onPageChanged: (i) => setState(() => _page = i),
+              onPageChanged: (i) { _haptic(_HapticImpact.selection); setState(() => _page = i); },
               children: [
                 _DonutDistributionCard(
                   items:       widget.items,

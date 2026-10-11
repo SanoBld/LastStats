@@ -491,16 +491,24 @@ class _ClockPainter extends CustomPainter {
 //  3. Week: rounded gradient bars
 // ══════════════════════════════════════════════════════════════════════════
 
-class _WeekChart extends StatelessWidget {
+class _WeekChart extends StatefulWidget {
   final Map<int, int> data;
   const _WeekChart({required this.data});
+  @override
+  State<_WeekChart> createState() => _WeekChartState();
+}
+
+class _WeekChartState extends State<_WeekChart> {
+  int? _sel;
 
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
     final t = Theme.of(context).textTheme;
+    final data = widget.data;
     final labels = _chartWeekdayLabels;
     final maxV = data.values.fold(0, (a, b) => a > b ? a : b);
+    final total = data.values.fold<int>(0, (a, b) => a + b);
     final peak = data.isEmpty ? 1
         : data.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
     return Container(
@@ -508,52 +516,61 @@ class _WeekChart extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Text(tx('ui_activity_by_day_of_wee'),
-              style: t.labelMedium?.copyWith(fontWeight: FontWeight.w700)),
-          const Spacer(),
+          Expanded(child: Text(tx('ui_activity_by_day_of_wee'),
+              style: t.labelMedium?.copyWith(fontWeight: FontWeight.w700))),
           _PeakChip(label: '📅 ${labels[peak - 1]}',
               color: s.tertiaryContainer, onColor: s.onTertiaryContainer, t: t),
         ]),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         TweenAnimationBuilder<double>(
           tween: Tween(begin: 0, end: 1),
-          duration: const Duration(milliseconds: 800),
+          duration: const Duration(milliseconds: 700),
           curve: Curves.easeOutCubic,
-          builder: (_, p, _) => SizedBox(
-            height: 150,
-            child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              for (var d = 1; d <= 7; d++)
-                Expanded(child: Builder(builder: (_) {
-                  final v = data[d] ?? 0;
-                  final ratio = maxV > 0 ? v / maxV : 0.0;
-                  final isPeak = d == peak && maxV > 0;
-                  return Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    Text(v > 0 ? _fmt(v) : '', style: t.labelSmall?.copyWith(
-                        fontSize: 9,
+          builder: (_, p, _) => Column(children: [
+            for (var d = 1; d <= 7; d++) Builder(builder: (_) {
+              final v = data[d] ?? 0;
+              final ratio = maxV > 0 ? v / maxV : 0.0;
+              final isPeak = d == peak && maxV > 0;
+              final isSel = _sel == d;
+              final pct = total > 0 ? v * 100 / total : 0.0;
+              final fg = isPeak ? s.tertiary : s.primary;
+              return InkWell(
+                borderRadius: BorderRadius.circular(14),
+                onTap: () { _haptic(_HapticImpact.selection); setState(() => _sel = isSel ? null : d); },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: isSel ? s.surfaceContainerHighest.withValues(alpha: 0.7) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(14)),
+                  child: Row(children: [
+                    SizedBox(width: 40, child: Text(labels[d - 1], style: t.labelMedium?.copyWith(
                         color: isPeak ? s.tertiary : s.onSurfaceVariant,
-                        fontWeight: isPeak ? FontWeight.w800 : FontWeight.w500)),
-                    const SizedBox(height: 4),
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      height: 10 + 96 * ratio * p,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomCenter, end: Alignment.topCenter,
-                          colors: isPeak
-                              ? [s.tertiary.withValues(alpha: 0.6), s.tertiary]
-                              : [s.primaryContainer, s.primary.withValues(alpha: 0.4 + 0.6 * ratio)],
-                        ),
+                        fontWeight: isPeak ? FontWeight.w800 : FontWeight.w600))),
+                    Expanded(child: LayoutBuilder(builder: (_, c) => Stack(children: [
+                      Container(height: 14, decoration: BoxDecoration(
+                          color: s.surfaceContainerHighest.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(7))),
+                      Container(
+                        height: 14,
+                        width: math.max(14.0, c.maxWidth * ratio * p),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(7),
+                          gradient: LinearGradient(colors: [fg.withValues(alpha: 0.45), fg])),
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(labels[d - 1], style: t.labelSmall?.copyWith(
-                        color: isPeak ? s.tertiary : s.onSurfaceVariant,
-                        fontWeight: isPeak ? FontWeight.w800 : FontWeight.w600)),
-                  ]);
-                })),
-            ]),
-          ),
+                    ]))),
+                    const SizedBox(width: 10),
+                    SizedBox(width: 64, child: Text(
+                      isSel ? '${pct.toStringAsFixed(1)}%' : (v > 0 ? _fmt(v) : '–'),
+                      textAlign: TextAlign.end,
+                      style: t.labelMedium?.copyWith(
+                        color: isPeak ? s.tertiary : s.onSurface,
+                        fontWeight: isPeak || isSel ? FontWeight.w800 : FontWeight.w600))),
+                  ]),
+                ),
+              );
+            }),
+          ]),
         ),
       ]),
     );
@@ -680,36 +697,81 @@ class _DonutShare extends CustomPainter {
 //  5. Genres: radar chart
 // ══════════════════════════════════════════════════════════════════════════
 
-class _GenreChart extends StatelessWidget {
+class _GenreChart extends StatefulWidget {
   final List<_TagEntry> tags;
   const _GenreChart({required this.tags});
+  @override
+  State<_GenreChart> createState() => _GenreChartState();
+}
+
+class _GenreChartState extends State<_GenreChart> {
+  final _ctrl = PageController();
+  int _page = 0;
+
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
 
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
+    final tags = widget.tags;
     if (tags.length < 3) {
       return _ShareDonut(items: tags,
           getLabel: (e) => (e as _TagEntry).name, getPlays: (e) => (e as _TagEntry).count);
     }
     final top = tags.take(7).toList();
-    return Container(
-      decoration: _chartCardDecoration(s, s.secondaryContainer),
-      padding: const EdgeInsets.all(12),
-      child: TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0, end: 1),
-        duration: const Duration(milliseconds: 1000),
-        curve: Curves.easeOutCubic,
-        builder: (_, p, _) => AspectRatio(
-          aspectRatio: 1.1,
-          child: CustomPaint(painter: _RadarPainter(
-            labels: [for (final e in top) e.name.length > 12 ? '${e.name.substring(0, 11)}…' : e.name],
-            values: [for (final e in top) e.count.toDouble()],
-            progress: p,
-            line: s.primary, fill: s.primary.withValues(alpha: 0.25), dot: s.tertiary,
-            grid: s.outlineVariant.withValues(alpha: 0.5), text: s.onSurface)),
+    String label(dynamic e) => (e as _TagEntry).name;
+    int plays(dynamic e) => (e as _TagEntry).count;
+    final n = top.length;
+    return LayoutBuilder(builder: (ctx, c) {
+      final radarH = (c.maxWidth - 24) / 1.1 + 24;
+      final listH = math.max(n * 26.0, 130.0) + 40;
+      final barsH = n * 38.0 + 48;
+      final h = [radarH, listH, barsH][_page];
+      return Column(children: [
+        AnimatedSize(
+          duration: const Duration(milliseconds: 260),
+          curve: M3Motion.emphasized,
+          child: SizedBox(
+            height: h,
+            child: PageView(
+              controller: _ctrl,
+              onPageChanged: (i) { _haptic(_HapticImpact.selection); setState(() => _page = i); },
+              children: [
+                Container(
+                  decoration: _chartCardDecoration(s, s.secondaryContainer),
+                  padding: const EdgeInsets.all(12),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0, end: 1),
+                    duration: const Duration(milliseconds: 1000),
+                    curve: Curves.easeOutCubic,
+                    builder: (_, p, _) => CustomPaint(painter: _RadarPainter(
+                      labels: [for (final e in top) e.name.length > 12 ? '${e.name.substring(0, 11)}…' : e.name],
+                      values: [for (final e in top) e.count.toDouble()],
+                      progress: p,
+                      line: s.primary, fill: s.primary.withValues(alpha: 0.25), dot: s.tertiary,
+                      grid: s.outlineVariant.withValues(alpha: 0.5), text: s.onSurface)),
+                  ),
+                ),
+                _DonutDistributionCard(items: top, getLabel: label, getPlays: plays,
+                    baseColor: s.primary, secondColor: s.tertiary, onTap: (_) {}),
+                _TopHorizontalBarCard(items: top, getLabel: label, getPlays: plays,
+                    barColor: s.primary, onTap: (_) {}),
+              ],
+            ),
+          ),
         ),
-      ),
-    );
+        const SizedBox(height: 10),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(3, (i) => AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: _page == i ? 18 : 6, height: 6,
+          margin: const EdgeInsets.symmetric(horizontal: 3),
+          decoration: BoxDecoration(
+            color: _page == i ? s.primary : s.outlineVariant.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(3)),
+        ))),
+      ]);
+    });
   }
 }
 
