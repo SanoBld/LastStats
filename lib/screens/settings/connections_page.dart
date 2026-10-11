@@ -24,8 +24,6 @@ class ConnectionsPage extends StatefulWidget {
 
 class _ConnectionsPageState extends State<ConnectionsPage> {
   bool _sp = false;
-  bool _testing = false;
-  String? _test;
 
   // The website logins run in a WebView: phones only.
   bool get _canWebLogin =>
@@ -51,18 +49,12 @@ class _ConnectionsPageState extends State<ConnectionsPage> {
     if (_sp) {
       await SpotifyCanvasService.disconnect();
       if (!mounted) return;
-      setState(() { _sp = false; _test = null; });
+      setState(() => _sp = false);
       _snack(tx('sp_off_s'));
       return;
     }
     final ok = await SpotifyLoginPage.open(context);
     if (mounted) setState(() => _sp = ok);
-  }
-
-  Future<void> _runTest() async {
-    setState(() { _testing = true; _test = null; });
-    final r = await SpotifyCanvasService.diagnose();
-    if (mounted) setState(() { _testing = false; _test = r; });
   }
 
   // Log in on the Last.fm website: the account is added with the
@@ -143,26 +135,7 @@ class _ConnectionsPageState extends State<ConnectionsPage> {
               label: tx(_sp ? 'conn_disconnect' : 'conn_connect'),
               onPressed: _spTap,
             ),
-            if (_sp)
-              _ActionButton(
-                style: _BtnStyle.tonal,
-                icon: Icons.network_check_rounded,
-                label: tx(_testing ? 'conn_testing' : 'conn_test'),
-                onPressed: _testing ? null : _runTest,
-              ),
           ],
-          footer: _test == null
-              ? null
-              : Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: scheme.surfaceContainerHigh,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: SelectableText(_test!,
-                      style: text.bodySmall?.copyWith(fontFamily: 'monospace')),
-                ),
         ),
       ]),
     );

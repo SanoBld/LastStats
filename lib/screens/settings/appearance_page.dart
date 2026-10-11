@@ -1143,9 +1143,9 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
       builder: (_) => PickSortSheet(
         title: L.mvSource,
         items: const [
-          PickItem('apple', 'Apple Music', icon: Icons.music_note_rounded),
-          PickItem('spotify', 'Spotify', icon: Icons.graphic_eq_rounded),
-          PickItem('youtube', 'YouTube Music', icon: Icons.music_video_rounded),
+          PickItem('apple', 'Apple Music', icon: Icons.music_note_rounded, asset: 'assets/icons/applemusic.svg'),
+          PickItem('spotify', 'Spotify', icon: Icons.graphic_eq_rounded, asset: 'assets/icons/spotify.svg'),
+          PickItem('youtube', 'YouTube Music', icon: Icons.music_video_rounded, asset: 'assets/icons/ytmusic.svg'),
         ],
         selected: _mvOrder,
       ),

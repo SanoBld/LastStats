@@ -16,6 +16,7 @@ import '../../l10n/l10n.dart';
 import '../../theme/m3_shapes.dart';
 import '../../theme/m3_motion.dart';
 import '../../widgets/m3_components.dart';
+import '../../widgets/brand_icon.dart';
 
 // ── Base tile ───────────────────────────────────────────────────────────────
 
@@ -506,14 +507,17 @@ class _OptionCard extends StatelessWidget {
   }
 }
 
-Widget _badge(BuildContext context, IconData? icon, {bool selected = false}) {
+Widget _badge(BuildContext context, IconData? icon, {bool selected = false, String? asset}) {
   final scheme = Theme.of(context).colorScheme;
   return M3CookieBadge(
     size: 40,
     color: selected ? scheme.primary : scheme.secondaryContainer,
-    child: icon == null
-        ? const SizedBox.shrink()
-        : Icon(icon, size: 20, color: selected ? scheme.onPrimary : scheme.onSecondaryContainer),
+    child: asset != null
+        ? BrandIcon(asset, icon ?? Icons.music_note_rounded, size: 20,
+            color: selected ? scheme.onPrimary : scheme.onSecondaryContainer)
+        : icon == null
+            ? const SizedBox.shrink()
+            : Icon(icon, size: 20, color: selected ? scheme.onPrimary : scheme.onSecondaryContainer),
   );
 }
 
@@ -559,8 +563,9 @@ class PickItem {
   final String id, label;
   final String? emoji;     // shown before the label (stat cards)
   final IconData? icon;    // or an icon (filters)
+  final String? asset;     // or a brand logo (svg) with [icon] as fallback
   final bool hint;         // small "tappable" hint icon
-  const PickItem(this.id, this.label, {this.emoji, this.icon, this.hint = false});
+  const PickItem(this.id, this.label, {this.emoji, this.icon, this.asset, this.hint = false});
 }
 
 class PickSortResult {
@@ -616,7 +621,7 @@ class _PickSortSheetState extends State<PickSortSheet> {
         child: Text(it.emoji!, style: const TextStyle(fontSize: 20)),
       );
     }
-    return _badge(context, it.icon, selected: on);
+    return _badge(context, it.icon, selected: on, asset: it.asset);
   }
 
   void _toggle(String id, bool on) => setState(() {

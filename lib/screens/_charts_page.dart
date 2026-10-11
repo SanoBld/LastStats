@@ -54,6 +54,9 @@ class _ChartsPage extends StatefulWidget {
   State<_ChartsPage> createState() => _ChartsPageState();
 }
 
+// The history banner only shows for a really big sync (scrobbles to load).
+const _kBigSync = 500;
+
 class _ChartsPageState extends State<_ChartsPage>
     with AutomaticKeepAliveClientMixin {
 
@@ -117,7 +120,15 @@ class _ChartsPageState extends State<_ChartsPage>
   void _onHistoryProgress() {
     if (!mounted) return;
     final p = AllScrobblesService.progressNotifier.value;
-    setState(() => _historyProgress = p);
+    // Only rebuild for the banner on a big sync, or when it has to disappear:
+    // rebuilding the whole tab on every tick made it freeze.
+    final prevBig = _historyProgress.total >= _kBigSync;
+    final needsBanner = p.total >= _kBigSync || prevBig;
+    if (needsBanner) {
+      setState(() => _historyProgress = p);
+    } else {
+      _historyProgress = p;
+    }
     _refreshAvailableYears();
     if (!_isAllTime && !_hasFullYearData && AllScrobblesService.isYearCached(_selectedYear)) {
       _hasFullYearData = true;
@@ -1160,7 +1171,7 @@ class _ChartsPageState extends State<_ChartsPage>
     final t = Theme.of(context).textTheme;
     final p = _historyProgress;
 
-    if (p.isDone) return const SizedBox.shrink();
+    if (p.isDone || p.total < _kBigSync) return const SizedBox.shrink();
 
     if (p.isLoading) {
       final yearLabel = p.currentYear != null ? ' ${p.currentYear}' : '';
@@ -1174,7 +1185,10 @@ class _ChartsPageState extends State<_ChartsPage>
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            M3LoadingIndicator(size: 28, color: s.primary),
+            SizedBox(
+              width: 13, height: 13,
+              child: M3Spinner(color: s.primary),
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -1185,8 +1199,15 @@ class _ChartsPageState extends State<_ChartsPage>
             ),
           ]),
           const SizedBox(height: 8),
-          M3WavyProgress(value: p.fraction, color: s.primary,
-              trackColor: s.onPrimaryContainer.withValues(alpha: 0.15)),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(100),
+            child: LinearProgressIndicator(
+              value: p.fraction,
+              minHeight: 6,
+              backgroundColor: s.onPrimaryContainer.withValues(alpha: 0.15),
+              valueColor: AlwaysStoppedAnimation<Color>(s.primary),
+            ),
+          ),
           const SizedBox(height: 5),
           Text(
             tx('ui_charts_will_be_more_ac'),

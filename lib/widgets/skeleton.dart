@@ -150,7 +150,7 @@ class _M3LoadingIndicatorState extends State<M3LoadingIndicator>
     with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 5600),
+    duration: const Duration(milliseconds: 3600),
   );
   bool _started = false;
 
