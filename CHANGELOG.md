@@ -45,6 +45,11 @@
 - Biographies fall back to Wikipedia (your language first, then English) when Last.fm has none, with the source shown
 - History: every track sits in its own rounded accent card, hour headers and the stat pills use the dark accent
 
+**Artists, text and fixes**
+- Artist page: popular and recent tracks with covers, in the right order, swipe left / right to switch
+- Settings > Appearance: text size slider (default a bit bigger) and font choice
+- History list: fixed track cards drawing over the header
+
 **Loading bars**
 - New wavy progress bar (Material You) used wherever a loading has real progress: history sync chip on the dashboard (now shows loaded/total scrobbles; the wavy bar only appears for big syncs, 200+ scrobbles), Sync settings and the Spotify / Last.fm login pages
 - The round loader now morphs between soft rounded shapes of the app (squircle, oval), like the Material 3 Expressive loading indicator

@@ -506,7 +506,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         case 'artists':
           final results = await Future.wait([
             widget.service.getArtistInfo(_name),
-            widget.service.getArtistTopTracks(_name, limit: 5),
+            widget.service.getArtistTopTracks(_name, limit: 10),
             widget.service.getArtistTopAlbums(_name, limit: 8),
           ]);
           if (mounted) {
@@ -516,6 +516,9 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               _topAlbums = results[2] as List<dynamic>;
             });
           }
+          ArtistTracksService.recent(_name).then((r) {
+            if (mounted) setState(() => _recentTracks = r);
+          });
           // Auto-translate bio for all types
           if (_bio().isNotEmpty) { _translateTo(localeNotifier.value); } else { _wikiFallback(); }
 
@@ -1522,83 +1525,208 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
   // ── Top tracks (artist view) ────────────────────────────────────────────────
 
-  Widget _buildTopTracks(ColorScheme scheme) {
-    final text   = Theme.of(context).textTheme;
-    final tracks = _topTracks.take(5).toList();
-    final maxPlay = tracks.fold<int>(0, (m, t) {
-      final n = int.tryParse((t['playcount'] ?? t['listeners'] ?? '0').toString()) ?? 0;
-      return n > m ? n : m;
-    });
+  // Artist tracks: swipe left / right between "popular" and "recent".
+  List<RecentTrack> _recentTracks = [];
+  int _trkTab = 0;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: _AccentCard(scheme: scheme, soft: true, shape: 2, child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(L.detailTopTracks,
-              style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
-          const SizedBox(height: 12),
-          ...tracks.asMap().entries.map((e) {
-            final i     = e.key;
-            final t     = e.value;
-            final tName = (t['name'] ?? '').toString();
-            final plays = int.tryParse((t['playcount'] ?? t['listeners'] ?? '0').toString()) ?? 0;
-            final frac  = maxPlay > 0 ? plays / maxPlay : 0.0;
+  void _setTrkTab(int i) {
+    if (i == _trkTab || i < 0 || i > 1) return;
+    HapticFeedback.selectionClick();
+    setState(() => _trkTab = i);
+  }
 
-            return _FadeSlideIn(
-              delay: Duration(milliseconds: i * 55),
-              child: InkWell(
-                borderRadius: AppRadius.smR,
-                onTap: () {
-                  final item = Map<String, dynamic>.from(t);
-                  item['artist'] ??= {'name': _name};
-                  Navigator.pop(context);
-                  showDetailSheet(context, item, 'tracks', widget.service);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 14),
-                  child: Row(children: [
-                    SizedBox(
-                      width: 20,
-                      child: Text('${i + 1}', style: text.bodySmall?.copyWith(
-                          color: scheme.onSurfaceVariant, fontWeight: FontWeight.w700)),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(tName, maxLines: 1, overflow: TextOverflow.ellipsis,
-                            style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 4),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(3),
-                          child: TweenAnimationBuilder<double>(
-                            tween: Tween(begin: 0, end: frac.clamp(0.0, 1.0)),
-                            duration: Duration(milliseconds: 600 + i * 80),
-                            curve: M3Motion.emphasizedDecelerate,
-                            builder: (_, v, _) => LinearProgressIndicator(
-                              value: v, minHeight: 5,
-                              color:           scheme.primary,
-                              backgroundColor: scheme.surfaceContainerHighest,
-                            ),
-                          ),
+  Widget _trackTile(ColorScheme scheme, int i, {
+    required String name, required String sub, required String trailing,
+    required String image, double? frac, required VoidCallback onTap,
+    required Future<String> Function() resolver,
+  }) {
+    final text = Theme.of(context).textTheme;
+    return _FadeSlideIn(
+      delay: Duration(milliseconds: i * 45),
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Material(
+          color: scheme.surface.withValues(alpha: 0.55),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 8, 12, 8),
+              child: Row(children: [
+                SizedBox(
+                  width: 22,
+                  child: Text('${i + 1}', textAlign: TextAlign.center,
+                      style: text.labelLarge?.copyWith(
+                          color: scheme.primary, fontWeight: FontWeight.w800)),
+                ),
+                const SizedBox(width: 8),
+                _SmartImage(size: 48, borderRadius: 14, initialUrl: image, resolver: resolver),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                        style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+                    if (sub.isNotEmpty)
+                      Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis,
+                          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                    if (frac != null) ...[
+                      const SizedBox(height: 5),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(3),
+                        child: LinearProgressIndicator(
+                          value: frac.clamp(0.0, 1.0), minHeight: 4,
+                          color: scheme.primary,
+                          backgroundColor: scheme.primary.withValues(alpha: 0.15),
                         ),
-                      ]),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(_fmt(plays), style: text.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
+                      ),
+                    ],
                   ]),
                 ),
-              ),
-            );
-          }),
-          const SizedBox(height: 8),
-        ],
-      )),
+                const SizedBox(width: 10),
+                Text(trailing, style: text.labelMedium?.copyWith(
+                    color: scheme.primary, fontWeight: FontWeight.w800)),
+              ]),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
-  // ── Top albums grid (artist view) ───────────────────────────────────────────
+  Widget _buildTopTracks(ColorScheme scheme) {
+    final text = Theme.of(context).textTheme;
+
+    // Popular: strictly by play count, highest first.
+    int plays(dynamic t) =>
+        int.tryParse((t['playcount'] ?? t['listeners'] ?? '0').toString()) ?? 0;
+    final popular = [..._topTracks]..sort((a, b) => plays(b).compareTo(plays(a)));
+    final maxPlay = popular.isEmpty ? 0 : plays(popular.first);
+
+    final tiles = <Widget>[];
+    if (_trkTab == 0) {
+      for (final (i, t) in popular.take(10).indexed) {
+        final tName = (t['name'] ?? '').toString();
+        final raw   = _extractImage(t['image']);
+        tiles.add(_trackTile(scheme, i,
+          name: tName,
+          sub: _name,
+          trailing: _fmt(plays(t)),
+          image: raw,
+          frac: maxPlay > 0 ? plays(t) / maxPlay : 0,
+          resolver: () => ImageService.resolveTrack(tName, _name,
+              lastfmUrl: raw.isNotEmpty ? raw : null),
+          onTap: () {
+            final item = Map<String, dynamic>.from(t as Map);
+            item['artist'] ??= {'name': _name};
+            Navigator.pop(context);
+            showDetailSheet(context, item, 'tracks', widget.service);
+          },
+        ));
+      }
+    } else {
+      for (final (i, t) in _recentTracks.indexed) {
+        tiles.add(_trackTile(scheme, i,
+          name: t.name,
+          sub: t.album,
+          trailing: t.date,
+          image: t.image,
+          resolver: () async => t.image,
+          onTap: () {
+            Navigator.pop(context);
+            showDetailSheet(context, {
+              'name': t.name, 'artist': {'name': _name}, 'album': {'title': t.album},
+            }, 'tracks', widget.service);
+          },
+        ));
+      }
+    }
+    if (tiles.isEmpty) {
+      tiles.add(Padding(
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        child: Center(
+          child: _trkTab == 1 && _recentTracks.isEmpty && _topTracks.isNotEmpty
+              ? const M3LoadingIndicator(size: 36)
+              : Text('—', style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
+        ),
+      ));
+    }
+
+    Widget tab(int i, String label) => Expanded(
+          child: GestureDetector(
+            onTap: () => _setTrkTab(i),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              padding: const EdgeInsets.symmetric(vertical: 9),
+              decoration: BoxDecoration(
+                color: _trkTab == i ? scheme.primary : Colors.transparent,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Center(
+                child: Text(label,
+                    style: text.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: _trkTab == i ? scheme.onPrimary : scheme.primary)),
+              ),
+            ),
+          ),
+        );
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: _AccentCard(
+        scheme: scheme, soft: true, shape: 2,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onHorizontalDragEnd: (d) {
+            final v = d.primaryVelocity ?? 0;
+            if (v < -250) _setTrkTab(1);   // swipe left  -> recent
+            if (v >  250) _setTrkTab(0);   // swipe right -> popular
+          },
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(L.detailTopTracks,
+                style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: scheme.primary.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(22),
+              ),
+              child: Row(children: [
+                tab(0, tx('art_popular')),
+                tab(1, tx('art_recent')),
+              ]),
+            ),
+            const SizedBox(height: 14),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              alignment: Alignment.topCenter,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 260),
+                transitionBuilder: (c, a) => FadeTransition(
+                  opacity: a,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: Offset(_trkTab == 1 ? 0.12 : -0.12, 0),
+                      end: Offset.zero,
+                    ).animate(a),
+                    child: c,
+                  ),
+                ),
+                child: Column(
+                  key: ValueKey('trk_$_trkTab${_recentTracks.length}'),
+                  children: tiles,
+                ),
+              ),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
 
   Widget _buildTopAlbums(ColorScheme scheme) {
     final text   = Theme.of(context).textTheme;

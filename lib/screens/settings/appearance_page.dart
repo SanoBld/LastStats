@@ -405,6 +405,55 @@ class _AppearancePageState extends State<AppearancePage> {
         const SizedBox(height: 20),
 
         // ══════════════════════════════════════════════════════════════════
+        SettingsSection(label: tx('txt_sec'), children: [
+          ValueListenableBuilder<double>(
+            valueListenable: textScaleNotifier,
+            builder: (_, v, _) => Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Icon(Icons.format_size_rounded, color: Theme.of(context).colorScheme.primary),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(tx('txt_size'),
+                      style: const TextStyle(fontWeight: FontWeight.w700))),
+                  Text('${(v * 100).round()} %',
+                      style: TextStyle(fontWeight: FontWeight.w800,
+                          color: Theme.of(context).colorScheme.primary)),
+                ]),
+                Slider(
+                  value: v.clamp(0.8, 1.5),
+                  min: 0.8, max: 1.5, divisions: 14,
+                  onChanged: (x) => textScaleNotifier.value = x,
+                  onChangeEnd: (x) async {
+                    final p = await SharedPreferences.getInstance();
+                    await p.setDouble('ls_text_scale', x);
+                  },
+                ),
+              ]),
+            ),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          ValueListenableBuilder<String>(
+            valueListenable: appFontNotifier,
+            builder: (_, f, _) => SettingChoiceRow(
+              icon: Icons.font_download_rounded,
+              title: tx('txt_font'),
+              options: [
+                ('',            tx('txt_font_def'), Icons.android_rounded),
+                ('Inter',       'Inter',            Icons.text_fields_rounded),
+                ('SpaceGrotesk','Space Grotesk',     Icons.text_fields_rounded),
+              ],
+              value: f,
+              onChanged: (v) async {
+                appFontNotifier.value = v;
+                final p = await SharedPreferences.getInstance();
+                await p.setString('ls_app_font', v);
+              },
+            ),
+          ),
+        ]),
+        const SizedBox(height: 12),
+
         //  Theme — ALWAYS active (Nothing supports light + dark)
         // ══════════════════════════════════════════════════════════════════
         SettingsSection(label: L.settingsTheme, children: [

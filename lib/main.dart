@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:window_manager/window_manager.dart';
 import 'app_state.dart';
+import 'widgets/app_text_scale.dart';
 import 'nothing_theme.dart';
 import 'screens/setup_screen.dart';
 import 'screens/home_screen.dart';
@@ -148,6 +149,8 @@ Future<void> _mainImpl() async {
   livingArtworkNotifier.value = prefs.getBool('ls_living_artwork') ?? true;
   motionArtworkNotifier.value = prefs.getBool('ls_motion_artwork') ?? true;
   dashMotionNotifier.value = prefs.getBool('ls_dash_motion') ?? true;
+  textScaleNotifier.value  = prefs.getDouble('ls_text_scale') ?? 1.1;
+  appFontNotifier.value    = prefs.getString('ls_app_font') ?? '';
   mergeVersionsNotifier.value = prefs.getBool('ls_merge_versions') ?? false;
   splitCollabsNotifier.value  = prefs.getBool('ls_split_collabs')  ?? false;
   imageShapeNotifier.value = prefs.getString('ls_image_shape') ?? 'mix';
@@ -369,7 +372,7 @@ class LastStatsApp extends StatelessWidget {
                                 darkTheme: nDarkWithNav,
                                 themeMode: mode,
                                 builder: (context, child) =>
-                                    DesktopTitleBarShell(child: child!),
+                                    AppTextScale(child: DesktopTitleBarShell(child: child!)),
                                 home: (username.isNotEmpty && apiKey.isNotEmpty)
                                     ? HomeScreen(username: username, apiKey: apiKey,
                                         startupTab: startupTab)
@@ -490,7 +493,7 @@ class LastStatsApp extends StatelessWidget {
                                       darkTheme: dTheme,
                                       themeMode: mode,
                                       builder: (context, child) =>
-                                          DesktopTitleBarShell(child: child!),
+                                          AppTextScale(child: DesktopTitleBarShell(child: child!)),
                                       home: (username.isNotEmpty && apiKey.isNotEmpty)
                                           ? HomeScreen(username: username, apiKey: apiKey,
                                               startupTab: startupTab)

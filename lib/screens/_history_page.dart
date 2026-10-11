@@ -468,9 +468,13 @@ class _HistListeView extends StatelessWidget {
           delay: Duration(milliseconds: (i * 20).clamp(0, 200)),
           child: Padding(
          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
-         child: ListTile(
-          tileColor: Color.lerp(scheme.primaryContainer, scheme.surface, 0.55),
+         // Own Material: a ListTile's tileColor is painted on the page's
+         // Material and bled out of the scrolling list over the header.
+         child: Material(
+          color: Color.lerp(scheme.primaryContainer, scheme.surface, 0.55),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          clipBehavior: Clip.antiAlias,
+          child: ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
           leading: _SmartImage(size: 44, borderRadius: 14, initialUrl: raw,
               resolver: () => ImageService.resolveTrack(tit, art, lastfmUrl: raw.isNotEmpty ? raw : null)),
@@ -490,7 +494,7 @@ class _HistListeView extends StatelessWidget {
               service,
             );
           },
-        )));
+        ))));
       },
     );
   }

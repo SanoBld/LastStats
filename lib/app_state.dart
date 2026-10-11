@@ -101,6 +101,10 @@ final motionArtworkNotifier = ValueNotifier<bool>(true);
 // Saved as 'ls_dash_motion'. Needs [motionArtworkNotifier] to be on too.
 final dashMotionNotifier = ValueNotifier<bool>(true);
 
+// Text size (x system scale) and font family ('' = Flutter/Android default).
+final textScaleNotifier = ValueNotifier<double>(1.1);
+final appFontNotifier   = ValueNotifier<String>('');
+
 // Library clean-up options (see services/library_merge.dart). Both off by default.
 // Link versions of the same track/album/artist into one entry: 'ls_merge_versions'.
 final mergeVersionsNotifier = ValueNotifier<bool>(false);
