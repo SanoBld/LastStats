@@ -222,10 +222,12 @@ class _CardBack extends StatelessWidget {
     // bubble, the plain M3Pill/M3TonalButton fill) reads this role, so
     // leaving it out meant they kept the app's flat neutral colour
     // instead of the poster's own tint even with the option on.
-    surfaceContainerHigh:    seeded.surfaceContainerHigh,
+    surfaceContainerHigh:    Color.lerp(seeded.surfaceContainerHigh, seeded.primaryContainer, 0.35)!,
     onSurfaceVariant:        seeded.onSurfaceVariant,
   );
-  final surface = Color.lerp(base.surface, artworkColor, 0.18)!;
+  // Tint the page with the poster scheme's own soft accent (not the raw
+  // artwork colour, which gave a flat grey when the cover was dull).
+  final surface = Color.lerp(base.surface, scheme.primaryContainer, 0.38)!;
   return (scheme: scheme, surface: surface);
 }
 
@@ -2907,9 +2909,10 @@ class _AccentCard extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
+          // Slightly toned down so big cards never look flashy.
           color: soft
               ? scheme.primaryContainer.withValues(alpha: 0.42)
-              : scheme.primaryContainer,
+              : Color.lerp(scheme.primaryContainer, scheme.surface, 0.3),
           borderRadius: _radius,
         ),
         child: soft
