@@ -161,7 +161,7 @@ Widget build(BuildContext context) {
                               darkTheme: nDarkWithNav,
                               themeMode: mode,
                               builder: (context, child) =&gt;
-                                  DesktopTitleBarShell(child: child!),
+                                  AppTextScale(child: DesktopTitleBarShell(child: child!)),
                               home: (username.isNotEmpty &amp;&amp; apiKey.isNotEmpty)
                                   ? HomeScreen(username: username, apiKey: apiKey,
                                       startupTab: startupTab)
@@ -282,7 +282,7 @@ Widget build(BuildContext context) {
                                     darkTheme: dTheme,
                                     themeMode: mode,
                                     builder: (context, child) =&gt;
-                                        DesktopTitleBarShell(child: child!),
+                                        AppTextScale(child: DesktopTitleBarShell(child: child!)),
                                     home: (username.isNotEmpty &amp;&amp; apiKey.isNotEmpty)
                                         ? HomeScreen(username: username, apiKey: apiKey,
                                             startupTab: startupTab)
