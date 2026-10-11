@@ -29,6 +29,9 @@ class _SearchPageState extends State<_SearchPage> {
   Timer?        _debounce;
 
   Set<String> _favProfiles = {};
+  bool _submitted = false;
+  List<String> _recents = [];
+  List<Map<String, dynamic>> _recentItems = [];
 
   List<(int, String, IconData)> get _kTabs => [
     (_kSearchAll,      L.searchAll,       Icons.apps_rounded),
@@ -57,7 +60,61 @@ class _SearchPageState extends State<_SearchPage> {
     if (!mounted) return;
     setState(() {
       _favProfiles = Set<String>.from(p.getStringList('ls_fav_profiles') ?? []);
+      _recents = p.getStringList('ls_recent_searches') ?? [];
+      try {
+        _recentItems = [
+          for (final e in (p.getStringList('ls_recent_items') ?? []))
+            Map<String, dynamic>.from(jsonDecode(e) as Map)
+        ];
+      } catch (_) { _recentItems = []; }
     });
+  }
+
+  // Save recent searches and opened items
+  Future<void> _saveRecents() async {
+    final p = await SharedPreferences.getInstance();
+    await p.setStringList('ls_recent_searches', _recents);
+    await p.setStringList('ls_recent_items',
+        [for (final e in _recentItems) jsonEncode(e)]);
+  }
+
+  void _addRecent(String q) {
+    _recents.removeWhere((r) => r.toLowerCase() == q.toLowerCase());
+    _recents.insert(0, q);
+    if (_recents.length > 10) _recents = _recents.sublist(0, 10);
+    _saveRecents();
+  }
+
+  void _rememberItem(Map<String, dynamic> item, String type) {
+    final name = (item['name'] ?? '').toString();
+    _recentItems.removeWhere((e) => e['type'] == type && (e['item']?['name'] ?? '') == name);
+    _recentItems.insert(0, {'type': type, 'item': item});
+    if (_recentItems.length > 12) _recentItems = _recentItems.sublist(0, 12);
+    _saveRecents();
+  }
+
+  void _clearRecents() { setState(() => _recents = []); _saveRecents(); }
+  void _clearRecentItems() { setState(() => _recentItems = []); _saveRecents(); }
+
+  // Put text in the field without searching
+  void _fill(String t) {
+    _ctrl.value = TextEditingValue(
+        text: t, selection: TextSelection.collapsed(offset: t.length));
+    _focusNode.requestFocus();
+    _onChanged(t);
+  }
+
+  // Run the search and show the results page
+  void _submit(String q) {
+    q = q.trim();
+    if (q.isEmpty) return;
+    _debounce?.cancel();
+    _ctrl.value = TextEditingValue(
+        text: q, selection: TextSelection.collapsed(offset: q.length));
+    _addRecent(q);
+    _dismissKeyboard();
+    setState(() => _submitted = true);
+    _search(q);
   }
 
   Future<void> _toggleFavProfile(String username, bool nowFav) async {
@@ -75,11 +132,11 @@ class _SearchPageState extends State<_SearchPage> {
   void _onChanged(String q) {
     _debounce?.cancel();
     if (q.trim().isEmpty) {
-      setState(() { _results = []; _error = null; _searching = false; });
+      setState(() { _results = []; _allResults = {}; _error = null; _searching = false; _submitted = false; });
       return;
     }
-    setState(() { _searching = true; _error = null; });
-    _debounce = Timer(const Duration(milliseconds: 500), () => _search(q.trim()));
+    setState(() { _searching = true; _error = null; _submitted = false; });
+    _debounce = Timer(const Duration(milliseconds: 400), () => _search(q.trim()));
   }
 
   Future<void> _search(String q) async {
@@ -137,6 +194,7 @@ class _SearchPageState extends State<_SearchPage> {
   void _openMusicDetail(BuildContext ctx, Map<String, dynamic> item, String type) {
     // Dismiss keyboard before opening detail sheet
     _dismissKeyboard();
+    _rememberItem(item, type);
     showDetailSheet(ctx, item, type, widget.service);
   }
 
@@ -192,13 +250,18 @@ class _SearchPageState extends State<_SearchPage> {
       ),
       padding: const EdgeInsets.only(left: 18, right: 6),
       child: Row(children: [
-        Icon(Icons.search_rounded, color: scheme.primary),
+        _submitted
+            ? GestureDetector(
+                onTap: () { setState(() => _submitted = false); _focusNode.requestFocus(); },
+                child: Icon(Icons.arrow_back_rounded, color: scheme.primary))
+            : Icon(Icons.search_rounded, color: scheme.primary),
         const SizedBox(width: 12),
         Expanded(
           child: TextField(
             controller: _ctrl,
             focusNode: _focusNode,
             onChanged: _onChanged,
+            onTap: () { if (_submitted) setState(() => _submitted = false); },
             textInputAction: TextInputAction.search,
             style: text.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
             cursorColor: scheme.primary,
@@ -212,10 +275,7 @@ class _SearchPageState extends State<_SearchPage> {
               hintStyle: text.bodyLarge?.copyWith(
                   color: scheme.onSurfaceVariant.withValues(alpha: 0.8)),
             ),
-            onSubmitted: (v) {
-              if (v.trim().isNotEmpty) _search(v.trim());
-              _dismissKeyboard();
-            },
+            onSubmitted: _submit,
           ),
         ),
         if (_searching)
@@ -226,13 +286,18 @@ class _SearchPageState extends State<_SearchPage> {
         ValueListenableBuilder<TextEditingValue>(
           valueListenable: _ctrl,
           builder: (_, v, _) => v.text.isEmpty
-              ? const SizedBox(width: 12)
+              ? IconButton(
+                  tooltip: L.searchFolders,
+                  icon: Icon(Icons.folder_rounded, color: scheme.primary),
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => FoldersGridPage(service: widget.service))),
+                )
               : IconButton(
                   icon: Icon(Icons.close_rounded, color: scheme.primary),
                   onPressed: () {
                     _ctrl.clear();
-                    _dismissKeyboard();
-                    setState(() { _results = []; _allResults = {}; _error = null; _searching = false; });
+                    _focusNode.requestFocus();
+                    setState(() { _results = []; _allResults = {}; _error = null; _searching = false; _submitted = false; });
                   },
                 ),
         ),
@@ -263,9 +328,6 @@ class _SearchPageState extends State<_SearchPage> {
                     borderRadius: BorderRadius.circular(t.$1 == _tab ? 22 : 14),
                   ),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(t.$3, size: 18,
-                        color: t.$1 == _tab ? scheme.onPrimary : scheme.primary),
-                    const SizedBox(width: 8),
                     Text(t.$2, style: text.labelLarge?.copyWith(
                         fontWeight: FontWeight.w800,
                         color: t.$1 == _tab ? scheme.onPrimary : scheme.primary)),
@@ -278,7 +340,9 @@ class _SearchPageState extends State<_SearchPage> {
     );
   }
 
-  Widget _card(ColorScheme scheme, Widget child, VoidCallback onTap) => Padding(
+  Widget _card(ColorScheme scheme, Widget child, VoidCallback onTap, {bool plain = false}) => plain
+      ? InkWell(onTap: onTap, borderRadius: BorderRadius.circular(16), child: child)
+      : Padding(
         padding: const EdgeInsets.symmetric(vertical: 3),
         child: Material(
           color: Color.lerp(scheme.primaryContainer, scheme.surface, 0.55),
@@ -294,7 +358,7 @@ class _SearchPageState extends State<_SearchPage> {
         ),
       );
 
-  Widget _artistRow(ColorScheme scheme, dynamic m, {String rank = '', bool listeners = false}) {
+  Widget _artistRow(ColorScheme scheme, dynamic m, {String rank = '', bool listeners = false, bool plain = false}) {
     final item = m as Map<String, dynamic>;
     final name = (item['name'] ?? '').toString();
     final raw  = _extractImage(item['image']);
@@ -304,10 +368,10 @@ class _SearchPageState extends State<_SearchPage> {
     return _card(scheme,
       _FadeSlideIn(child: _ItemTile(name: name, sub: sub, imageUrl: raw, rank: rank,
           imageFuture: ImageService.resolveArtist(name, lastfmUrl: raw.isNotEmpty ? raw : null))),
-      () { _haptic(_HapticImpact.light); _openMusicDetail(context, item, 'artists'); });
+      () { _haptic(_HapticImpact.light); _openMusicDetail(context, item, 'artists'); }, plain: plain);
   }
 
-  Widget _albumRow(ColorScheme scheme, dynamic m, {String rank = ''}) {
+  Widget _albumRow(ColorScheme scheme, dynamic m, {String rank = '', bool plain = false}) {
     final item   = m as Map<String, dynamic>;
     final name   = (item['name'] ?? '').toString();
     final artist = (item['artist'] ?? '').toString();
@@ -317,10 +381,10 @@ class _SearchPageState extends State<_SearchPage> {
     return _card(scheme,
       _FadeSlideIn(child: _ItemTile(name: name, sub: artist, imageUrl: raw, rank: rank,
           imageFuture: ImageService.resolveAlbum(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null))),
-      () { _haptic(_HapticImpact.light); _openMusicDetail(context, norm, 'albums'); });
+      () { _haptic(_HapticImpact.light); _openMusicDetail(context, norm, 'albums'); }, plain: plain);
   }
 
-  Widget _trackRow(ColorScheme scheme, dynamic m, {String rank = ''}) {
+  Widget _trackRow(ColorScheme scheme, dynamic m, {String rank = '', bool plain = false}) {
     final item   = m as Map<String, dynamic>;
     final name   = (item['name'] ?? '').toString();
     final artist = (item['artist'] ?? '').toString();
@@ -331,7 +395,7 @@ class _SearchPageState extends State<_SearchPage> {
       _FadeSlideIn(child: _FolderAwareItemTile(name: name, sub: artist, imageUrl: raw, rank: rank,
           artist: artist, image: raw,
           imageFuture: ImageService.resolveTrack(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null))),
-      () { _haptic(_HapticImpact.light); _openMusicDetail(context, norm, 'tracks'); });
+      () { _haptic(_HapticImpact.light); _openMusicDetail(context, norm, 'tracks'); }, plain: plain);
   }
 
   Widget _profilesStrip(ColorScheme scheme, List<dynamic> profiles) => SizedBox(
@@ -369,24 +433,7 @@ class _SearchPageState extends State<_SearchPage> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(4, 10, 4, 8),
-          child: Row(children: [
-            M3CookieBadge(
-              color: scheme.primary, size: 36,
-              child: Icon(icon, size: 18, color: scheme.onPrimary),
-            ),
-            const SizedBox(width: 10),
-            Expanded(child: Text(label, style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800))),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-              decoration: BoxDecoration(
-                color: scheme.primaryContainer, borderRadius: BorderRadius.circular(12)),
-              child: Text('${items.length}', style: text.labelMedium?.copyWith(
-                  color: scheme.onPrimaryContainer, fontWeight: FontWeight.w800)),
-            ),
-          ]),
-        ),
+        _title(text, scheme, label),
         if (cat == _kSearchProfiles)
           _profilesStrip(scheme, items)
         else
@@ -400,40 +447,223 @@ class _SearchPageState extends State<_SearchPage> {
     );
   }
 
+  // ── Layout helpers ────────────────────────────────────────────────────
+  Widget _title(TextTheme text, ColorScheme scheme, String label, {VoidCallback? onClear}) => Padding(
+        padding: const EdgeInsets.fromLTRB(4, 14, 0, 6),
+        child: Row(children: [
+          Expanded(child: Text(label, style: text.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w800, color: scheme.primary))),
+          if (onClear != null)
+            IconButton(
+              icon: Icon(Icons.close_rounded, color: scheme.onSurfaceVariant),
+              onPressed: onClear,
+            ),
+        ]),
+      );
+
+  Widget _rowFor(ColorScheme scheme, int cat, dynamic m, {bool plain = false}) => switch (cat) {
+        _kSearchProfiles => _profilesStrip(scheme, [m]),
+        _kSearchArtists  => _artistRow(scheme, m, plain: plain),
+        _kSearchAlbums   => _albumRow(scheme, m, plain: plain),
+        _                => _trackRow(scheme, m, plain: plain),
+      };
+
+  // Best result card: top item + up to 3 tracks
+  Widget _bestCard(ColorScheme scheme, TextTheme text, int topCat) {
+    final top = (_allResults[topCat] ?? const [])[0];
+    final tracks = (_allResults[_kSearchTracks] ?? const [])
+        .skip(topCat == _kSearchTracks ? 1 : 0).take(3).toList();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      _title(text, scheme, tx('sr_best')),
+      Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Color.lerp(scheme.primaryContainer, scheme.surface, 0.55),
+          borderRadius: BorderRadius.circular(26),
+        ),
+        child: Column(children: [
+          _rowFor(scheme, topCat, top, plain: true),
+          if (tracks.isNotEmpty) Divider(
+              height: 16, color: scheme.outlineVariant.withValues(alpha: 0.5)),
+          for (final t in tracks) _trackRow(scheme, t, plain: true),
+        ]),
+      ),
+    ]);
+  }
+
+  // Suggestions: matching recent searches + names found by the live search
+  List<String> _suggestions(String q) {
+    final ql = q.toLowerCase();
+    final out = <String>[];
+    void add(String t) {
+      if (t.isNotEmpty && !out.any((o) => o.toLowerCase() == t.toLowerCase())) out.add(t);
+    }
+    for (final r in _recents) { if (r.toLowerCase().startsWith(ql)) add(r); }
+    final src = _tab == _kSearchAll
+        ? [...?_allResults[_kSearchArtists], ...?_allResults[_kSearchTracks]]
+        : _results;
+    for (final it in src) { if (it is Map) add((it['name'] ?? '').toString()); }
+    return out.take(5).toList();
+  }
+
+  Widget _suggestRow(ColorScheme scheme, TextTheme text, String t, {bool history = false}) => InkWell(
+        onTap: () => _submit(t),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          child: Row(children: [
+            history
+                ? Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Icon(Icons.history_rounded, color: scheme.onSurfaceVariant))
+                : CircleAvatar(
+                    radius: 20,
+                    backgroundColor: scheme.primaryContainer,
+                    child: Icon(Icons.search_rounded, size: 20, color: scheme.primary)),
+            const SizedBox(width: 14),
+            Expanded(child: Text(t, maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700))),
+            IconButton(
+              icon: Icon(Icons.north_west_rounded, color: scheme.onSurfaceVariant),
+              onPressed: () => _fill(t),
+            ),
+          ]),
+        ),
+      );
+
+  Widget _recentCarousel(ColorScheme scheme, TextTheme text) => SizedBox(
+        height: 220,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemCount: _recentItems.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 14),
+          itemBuilder: (ctx, i) {
+            final e    = _recentItems[i];
+            final type = (e['type'] ?? 'tracks').toString();
+            final item = Map<String, dynamic>.from(e['item'] as Map);
+            final name = (item['name'] ?? '').toString();
+            final a    = item['artist'];
+            final artist = a is Map ? (a['name'] ?? '').toString() : (a ?? '').toString();
+            final sub  = type == 'artists' ? L.commonArtists : artist;
+            final raw  = _extractImage(item['image']);
+            final fut  = switch (type) {
+              'artists' => ImageService.resolveArtist(name, lastfmUrl: raw.isNotEmpty ? raw : null),
+              'albums'  => ImageService.resolveAlbum(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null),
+              _         => ImageService.resolveTrack(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null),
+            };
+            return GestureDetector(
+              onTap: () {
+                _haptic(_HapticImpact.light);
+                final norm = Map<String, dynamic>.from(item);
+                if (type != 'artists' && item['artist'] is String) norm['artist'] = {'name': artist};
+                _openMusicDetail(ctx, norm, type);
+                setState(() {});
+              },
+              child: SizedBox(
+                width: 156,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: SizedBox(
+                      width: 156, height: 156,
+                      child: FutureBuilder<String>(
+                        future: fut,
+                        initialData: raw,
+                        builder: (_, snap) {
+                          final u = snap.data ?? '';
+                          return (u.isEmpty || u.contains(_ph))
+                              ? Container(
+                                  color: scheme.primaryContainer,
+                                  child: Icon(Icons.music_note_rounded, color: scheme.primary, size: 40))
+                              : Image.network(u, fit: BoxFit.cover,
+                                  errorBuilder: (_, _, _) => Container(color: scheme.primaryContainer));
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+                  Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                ]),
+              ),
+            );
+          },
+        ),
+      );
+
+  // Home: recent searches (empty field) or suggestions (typing)
+  Widget _buildHome(BuildContext context, ColorScheme scheme, TextTheme text, String q) {
+    const pad = EdgeInsets.symmetric(horizontal: 16);
+    if (q.isEmpty) {
+      if (_recents.isEmpty && _recentItems.isEmpty) return _SearchEmptyState(tab: _tab);
+      return ListView(padding: pad, children: [
+        if (_recentItems.isNotEmpty) ...[
+          _title(text, scheme, tx('sr_from_recent'), onClear: _clearRecentItems),
+          _recentCarousel(scheme, text),
+        ],
+        if (_recents.isNotEmpty) ...[
+          _title(text, scheme, tx('sr_recent'), onClear: _clearRecents),
+          for (final r in _recents) _suggestRow(scheme, text, r, history: true),
+        ],
+        const SizedBox(height: 32),
+      ]);
+    }
+    final sugg = _suggestions(q);
+    final hasBest = !_searching && (_tab == _kSearchAll
+        ? _sectionOrder(q).isNotEmpty : _results.isNotEmpty);
+    int bestCat = _tab;
+    dynamic best;
+    if (hasBest) {
+      if (_tab == _kSearchAll) {
+        bestCat = _sectionOrder(q).first;
+        best = _allResults[bestCat]![0];
+      } else {
+        best = _results[0];
+      }
+    }
+    return ListView(padding: pad, children: [
+      if (sugg.isNotEmpty) ...[
+        _title(text, scheme, tx('sr_suggestions')),
+        Container(
+          decoration: BoxDecoration(
+            color: scheme.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(children: [for (final t in sugg) _suggestRow(scheme, text, t)]),
+        ),
+      ],
+      if (hasBest) ...[
+        _title(text, scheme, tx('sr_recommended')),
+        _rowFor(scheme, bestCat, best),
+      ],
+      const SizedBox(height: 32),
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
+    final q = _ctrl.text.trim();
+    final showResults = q.isNotEmpty && _submitted;
 
     return Scaffold(
       body: SafeArea(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 12, 2),
-            child: Row(children: [
-              Expanded(
-                child: Text(L.searchTitle,
-                    style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
-              ),
-              // Folders are their own page (saved tracks), not a search tab.
-              IconButton.filledTonal(
-                tooltip: L.searchFolders,
-                style: IconButton.styleFrom(
-                  backgroundColor: scheme.primaryContainer,
-                  foregroundColor: scheme.primary,
-                ),
-                icon: const Icon(Icons.folder_rounded),
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => FoldersGridPage(service: widget.service))),
-              ),
-            ]),
-          ),
-          const SizedBox(height: 10),
-          Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: _bar(scheme, text)),
           const SizedBox(height: 12),
-          _rail(scheme, text),
+          Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: _bar(scheme, text)),
+          if (showResults) ...[
+            const SizedBox(height: 12),
+            _rail(scheme, text),
+          ],
           const SizedBox(height: 8),
-          Expanded(child: _buildResults(context, scheme, text)),
+          Expanded(
+            child: showResults
+                ? _buildResults(context, scheme, text)
+                : _buildHome(context, scheme, text, q),
+          ),
         ]),
       ),
     );
@@ -464,6 +694,7 @@ class _SearchPageState extends State<_SearchPage> {
       return ListView(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         children: [
+          _bestCard(scheme, text, order.first),
           for (final c in order) _section(scheme, text, c),
           const SizedBox(height: 32),
         ],

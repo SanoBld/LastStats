@@ -1340,4 +1340,9 @@ const Map<String, String> kTxEn = {
   'sm_builtin_s': 'Username only. Quota shared with other users.',
   'wl_title': 'Welcome',
   'wl_sub': 'Choose how you want to connect to Last.fm.',
+  'sr_from_recent': 'From your recent searches',
+  'sr_recent': 'Recent searches',
+  'sr_suggestions': 'Suggestions',
+  'sr_recommended': 'Recommended',
+  'sr_best': 'Best results',
 };

@@ -1340,4 +1340,9 @@ const Map<String, String> kTxFr = {
   'sm_builtin_s': 'Nom d\'utilisateur seulement. Quota partagé avec les autres utilisateurs.',
   'wl_title': 'Bienvenue',
   'wl_sub': 'Choisissez comment vous connecter à Last.fm.',
+  'sr_from_recent': 'Depuis vos recherches récentes',
+  'sr_recent': 'Recherches récentes',
+  'sr_suggestions': 'Suggestions',
+  'sr_recommended': 'Recommandé',
+  'sr_best': 'Meilleurs résultats',
 };
