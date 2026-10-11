@@ -1,6 +1,33 @@
 {
-  "updated": "2026-10-10T21:16:18Z",
+  "updated": "2026-10-11T04:32:12Z",
   "commits": [
+    {
+      "sha": "632b6ddae4b8a11ffcf152c5562d8411387f4d23",
+      "message": "feat: mise à jour des formes du loader pour inclure uniquement le squircle et l'oval",
+      "date": "2026-10-10T21:37:33Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/632b6ddae4b8a11ffcf152c5562d8411387f4d23",
+      "tags": []
+    },
+    {
+      "sha": "1a7ecd69d34b08a4b457695d050d88e91214567f",
+      "message": "feat: mise à jour des barres de chargement avec de nouvelles formes et optimisation des imports",
+      "date": "2026-10-10T21:24:06Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/1a7ecd69d34b08a4b457695d050d88e91214567f",
+      "tags": []
+    },
+    {
+      "sha": "4d1bac288bf7c66a6ca24bf029c504bf67d1ed52",
+      "message": "feat: amélioration de la barre de progression avec affichage conditionnel pour les synchronisations importantes",
+      "date": "2026-10-10T21:19:09Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/4d1bac288bf7c66a6ca24bf029c504bf67d1ed52",
+      "tags": []
+    },
     {
       "sha": "d6ca87fc272ba5703412e0d146955df9910cfac1",
       "message": "feat: ajout d'une pochette animée sur le dashboard avec options de configuration",
@@ -2686,33 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/d8674992b18ec3e690d1f5375bedf0383b4c7da9",
-      "tags": []
-    },
-    {
-      "sha": "67dfa939d0f3899598c373c22cf55e264510c7cd",
-      "message": "feat: ajouter la fonctionnalité de prévisualisation des fichiers de sauvegarde et options de restauration des clés API",
-      "date": "2026-07-19T17:48:20Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/67dfa939d0f3899598c373c22cf55e264510c7cd",
-      "tags": []
-    },
-    {
-      "sha": "e35e14d19bf45fb639b7a454fc4e5dd254ee783e",
-      "message": "feat: ajouter le support des tableaux dans le rendu Markdown",
-      "date": "2026-07-19T17:28:23Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/e35e14d19bf45fb639b7a454fc4e5dd254ee783e",
-      "tags": []
-    },
-    {
-      "sha": "67fb26f6cd2cd6f24c6fdda099dda9dbe8852866",
-      "message": "feat: ajouter un widget MarkdownLite pour le rendu de texte enrichi",
-      "date": "2026-07-19T16:44:25Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/67fb26f6cd2cd6f24c6fdda099dda9dbe8852866",
       "tags": []
     }
   ]
