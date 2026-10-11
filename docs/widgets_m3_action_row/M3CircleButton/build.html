@@ -110,11 +110,11 @@ and</li>
   <pre class="language-dart"><code class="language-dart">@override
 Widget build(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
-  final fg = active ? scheme.onPrimary : scheme.onSecondaryContainer;
+  final fg = scheme.primary; &#47;&#47; accent colour on a soft tonal background
   return _M3Pressable(
     width: 56,
     height: 56,
-    color: active ? scheme.primary : scheme.secondaryContainer,
+    color: active ? scheme.primaryContainer : scheme.surfaceContainerHigh,
     &#47;&#47; amplitude 0 is a perfect circle, so the shape grows its bumps
     idleShape: M3CookieBorder(lobes: 8, amplitude: active ? 0.09 : 0.0),
     pressedShape: M3CookieBorder(lobes: 8, amplitude: active ? 0.0 : 0.05),
