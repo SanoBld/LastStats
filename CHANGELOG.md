@@ -40,6 +40,10 @@
 - Charts: the title is back in the fixed header like every other tab, and changing the year no longer scrolls back to the top
 - Charts: pinch to zoom (or use the zoom buttons) on the progression chart, drag to move when zoomed, double tap to reset
 - Charts: artist and album breakdown share the same title style, with a bigger donut and clearer theme colors
+- Charts: more accent colors (filled containers, tinted cards and chips from the theme)
+- Charts: tap the listening clock to inspect any hour (scrobbles and share)
+- Charts: 3 new charts: time of day, day intensity (tap a bar) and busiest days
+- Theme: all accent colors (secondary, tertiary, charts, posters) now use the same hue as the chosen theme, only the intensity changes
 - All new texts are translated in all 10 languages
 
 **Welcome setup**

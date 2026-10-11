@@ -436,20 +436,20 @@ class LastStatsApp extends StatelessWidget {
                             return ValueListenableBuilder<String>(
                               valueListenable: localeNotifier,
                               builder: (_, _, _) {
-                                final ColorScheme lightScheme =
+                                final ColorScheme lightScheme = monochromeAccents(
                                     (useDynamic && lightDynamic != null)
                                         ? neutralizeIfGraySchemeItself(lightDynamic.harmonized())
                                         : neutralizeIfGraySeed(ColorScheme.fromSeed(
                                             seedColor:  seedColorForScheme(lightAccent),
                                             brightness: Brightness.light,
-                                          ), lightAccent);
-                                final ColorScheme darkSchemeBase =
+                                          ), lightAccent));
+                                final ColorScheme darkSchemeBase = monochromeAccents(
                                     (useDynamic && darkDynamic != null)
                                         ? neutralizeIfGraySchemeItself(darkDynamic.harmonized())
                                         : neutralizeIfGraySeed(ColorScheme.fromSeed(
                                             seedColor:  seedColorForScheme(darkAccent),
                                             brightness: Brightness.dark,
-                                          ), darkAccent);
+                                          ), darkAccent));
                                 final ColorScheme darkScheme = oled
                                     ? darkSchemeBase.copyWith(
                                         surface:                 Colors.black,

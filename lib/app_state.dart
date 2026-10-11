@@ -293,3 +293,38 @@ ColorScheme neutralizeIfGraySeed(ColorScheme scheme, Color seed) {
     onSurfaceVariant:        _toNeutralGray(scheme.onSurfaceVariant),
   );
 }
+
+/// Makes every accent role share the primary's hue (only lightness and
+/// saturation change). Material's tertiary is normally a different hue,
+/// which put unrelated colors next to a blue/teal/... theme. Pure grays are
+/// left untouched.
+ColorScheme monochromeAccents(ColorScheme s) {
+  if (isNeutralColor(s.primary)) return s;
+  final p = HSLColor.fromColor(s.primary);
+  final dark = s.brightness == Brightness.dark;
+
+  Color same(Color ref, {double sat = 1.0, double dl = 0.0}) {
+    final r = HSLColor.fromColor(ref);
+    return HSLColor.fromAHSL(1, p.hue,
+        (p.saturation * sat).clamp(0.0, 1.0).toDouble(),
+        (r.lightness + dl).clamp(0.0, 1.0).toDouble()).toColor();
+  }
+  Color on(Color c) =>
+      ThemeData.estimateBrightnessForColor(c) == Brightness.dark
+          ? const Color(0xFFFFFFFF) : const Color(0xFF000000);
+
+  final secondary = same(s.secondary, sat: 0.6);
+  final secondaryContainer = same(s.secondaryContainer, sat: 0.6);
+  final tertiary = same(s.primary, dl: dark ? -0.16 : 0.16);
+  final tertiaryContainer = same(s.primaryContainer, sat: 0.9, dl: dark ? 0.09 : -0.07);
+  return s.copyWith(
+    secondary: secondary,
+    onSecondary: on(secondary),
+    secondaryContainer: secondaryContainer,
+    onSecondaryContainer: same(s.onSecondaryContainer, sat: 0.6),
+    tertiary: tertiary,
+    onTertiary: on(tertiary),
+    tertiaryContainer: tertiaryContainer,
+    onTertiaryContainer: same(s.onPrimaryContainer, sat: 0.8),
+  );
+}

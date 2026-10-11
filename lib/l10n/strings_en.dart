@@ -1355,4 +1355,12 @@ const Map<String, String> kTxEn = {
   'cx_clock': 'Listening clock',
   'cx_others': 'Others',
   'cx_artist_distribution': 'Artist distribution',
+  'cx_daypart': 'Time of day',
+  'cx_night': 'Night',
+  'cx_morning': 'Morning',
+  'cx_afternoon': 'Afternoon',
+  'cx_evening': 'Evening',
+  'cx_intensity': 'Day intensity',
+  'cx_days': 'days',
+  'cx_busiest': 'Busiest days',
 };

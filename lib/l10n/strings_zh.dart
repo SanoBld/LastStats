@@ -1352,4 +1352,12 @@ const Map<String, String> kTxZh = {
   'cx_clock': '收听时钟',
   'cx_others': '其他',
   'cx_artist_distribution': '艺人分布',
+  'cx_daypart': '时段分布',
+  'cx_night': '凌晨',
+  'cx_morning': '早晨',
+  'cx_afternoon': '下午',
+  'cx_evening': '晚上',
+  'cx_intensity': '每日强度',
+  'cx_days': '天',
+  'cx_busiest': '听歌最多的日子',
 };

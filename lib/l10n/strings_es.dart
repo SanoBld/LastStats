@@ -1355,4 +1355,12 @@ const Map<String, String> kTxEs = {
   'cx_clock': 'Reloj de escucha',
   'cx_others': 'Otros',
   'cx_artist_distribution': 'Distribución por artista',
+  'cx_daypart': 'Momentos del día',
+  'cx_night': 'Madrugada',
+  'cx_morning': 'Mañana',
+  'cx_afternoon': 'Tarde',
+  'cx_evening': 'Noche',
+  'cx_intensity': 'Intensidad de los días',
+  'cx_days': 'días',
+  'cx_busiest': 'Días más intensos',
 };

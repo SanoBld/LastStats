@@ -1325,4 +1325,12 @@ const Map<String, String> kTxJa = {
   'cx_clock': 'リスニングクロック',
   'cx_others': 'その他',
   'cx_artist_distribution': 'アーティスト別の内訳',
+  'cx_daypart': '時間帯',
+  'cx_night': '深夜',
+  'cx_morning': '朝',
+  'cx_afternoon': '昼',
+  'cx_evening': '夜',
+  'cx_intensity': '日ごとの強度',
+  'cx_days': '日',
+  'cx_busiest': '最も多く聴いた日',
 };

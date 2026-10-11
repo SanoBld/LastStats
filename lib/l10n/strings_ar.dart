@@ -1326,4 +1326,12 @@ const Map<String, String> kTxAr = {
   'cx_clock': 'ساعة الاستماع',
   'cx_others': 'أخرى',
   'cx_artist_distribution': 'التوزيع حسب الفنان',
+  'cx_daypart': 'أوقات اليوم',
+  'cx_night': 'ليل',
+  'cx_morning': 'صباحًا',
+  'cx_afternoon': 'بعد الظهر',
+  'cx_evening': 'مساءً',
+  'cx_intensity': 'شدة الأيام',
+  'cx_days': 'أيام',
+  'cx_busiest': 'أكثر الأيام نشاطًا',
 };

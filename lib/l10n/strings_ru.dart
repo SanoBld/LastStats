@@ -1326,4 +1326,12 @@ const Map<String, String> kTxRu = {
   'cx_clock': 'Часы прослушивания',
   'cx_others': 'Другие',
   'cx_artist_distribution': 'Распределение по исполнителям',
+  'cx_daypart': 'Время суток',
+  'cx_night': 'Ночь',
+  'cx_morning': 'Утро',
+  'cx_afternoon': 'День',
+  'cx_evening': 'Вечер',
+  'cx_intensity': 'Интенсивность дней',
+  'cx_days': 'дней',
+  'cx_busiest': 'Самые насыщенные дни',
 };

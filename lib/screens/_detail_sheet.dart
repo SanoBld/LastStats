@@ -206,7 +206,7 @@ class _CardBack extends StatelessWidget {
     seedColor:  seedColorForScheme(artworkColor),
     brightness: base.brightness,
   ), artworkColor);
-  final scheme = base.copyWith(
+  final scheme = monochromeAccents(base.copyWith(
     primary:                 seeded.primary,
     onPrimary:               seeded.onPrimary,
     primaryContainer:        seeded.primaryContainer,
@@ -224,7 +224,7 @@ class _CardBack extends StatelessWidget {
     // instead of the poster's own tint even with the option on.
     surfaceContainerHigh:    Color.lerp(seeded.surfaceContainerHigh, seeded.primaryContainer, 0.35)!,
     onSurfaceVariant:        seeded.onSurfaceVariant,
-  );
+  ));
   // Tint the page with the poster scheme's own soft accent (not the raw
   // artwork colour, which gave a flat grey when the cover was dull).
   final surface = Color.lerp(base.surface, scheme.primaryContainer, 0.38)!;

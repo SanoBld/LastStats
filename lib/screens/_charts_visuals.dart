@@ -19,6 +19,22 @@ void _paintText(Canvas c, String text, Offset o,
   tp.paint(c, Offset(o.dx + dx, o.dy - tp.height / 2));
 }
 
+// Same hue as the theme (primary), different intensities
+List<Color> _themePalette(ColorScheme s) {
+  final p = HSLColor.fromColor(s.primary);
+  final dark = s.brightness == Brightness.dark;
+  final ls = dark ? const [0.82, 0.70, 0.58, 0.47, 0.37]
+                  : const [0.28, 0.40, 0.52, 0.64, 0.76];
+  return [
+    for (final l in ls)
+      HSLColor.fromAHSL(1, p.hue, math.max(p.saturation, 0.3), l).toColor(),
+    s.outline,
+  ];
+}
+
+Color _onColor(Color c) =>
+    ThemeData.estimateBrightnessForColor(c) == Brightness.dark ? Colors.white : Colors.black;
+
 // Section wrapper: cookie header + subtitle + chart
 class _ChartSec extends StatelessWidget {
   final int index;
@@ -112,15 +128,19 @@ class _TrendChartState extends State<_TrendChart> with SingleTickerProviderState
     for (var i = 0; i < raw.length; i++) { if (raw[i] > raw[bestI]) bestI = i; }
     final labels = [for (final k in keys) _monthShort(k)];
 
+    final bg = _cardBg(s, s.primaryContainer);
     return Container(
-      decoration: _chartCardDecoration(s),
+      decoration: _chartCardDecoration(s, s.primaryContainer),
       padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Wrap(spacing: 8, runSpacing: 8, children: [
-          _ChipStat(label: tx('ui_total'), value: _fmt(total), s: s, t: t),
-          _ChipStat(label: tx('ui_avg_mo'), value: _fmt(avg), s: s, t: t),
+          _ChipStat(label: tx('ui_total'), value: _fmt(total), s: s, t: t,
+              bg: s.primaryContainer, fg: s.onPrimaryContainer),
+          _ChipStat(label: tx('ui_avg_mo'), value: _fmt(avg), s: s, t: t,
+              bg: s.secondaryContainer, fg: s.onSecondaryContainer),
           if (raw.isNotEmpty)
-            _ChipStat(label: tx('cx_best_month'), value: labels[bestI], s: s, t: t),
+            _ChipStat(label: tx('cx_best_month'), value: labels[bestI], s: s, t: t,
+                bg: s.tertiaryContainer, fg: s.onTertiaryContainer),
         ]),
         const SizedBox(height: 14),
         Row(children: [
@@ -201,7 +221,7 @@ class _TrendChartState extends State<_TrendChart> with SingleTickerProviderState
                     sel: _sel, lo: lo, hi: lo + span,
                     line: s.primary, accent: s.tertiary,
                     grid: s.outlineVariant.withValues(alpha: 0.45),
-                    text: s.onSurfaceVariant, surface: s.surfaceContainerLow,
+                    text: s.onSurfaceVariant, surface: bg,
                     onSurface: s.onSurface,
                   ),
                 ),
@@ -327,39 +347,92 @@ class _TrendPainter extends CustomPainter {
 //  2. Listening clock: 24 radial bars
 // ══════════════════════════════════════════════════════════════════════════
 
-class _ClockChart extends StatelessWidget {
+class _ClockChart extends StatefulWidget {
   final Map<int, int> data;
   const _ClockChart({required this.data});
+  @override
+  State<_ClockChart> createState() => _ClockChartState();
+}
+
+class _ClockChartState extends State<_ClockChart> {
+  int? _sel;
+
+  String _hh(int h) => h.toString().padLeft(2, '0');
 
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
     final t = Theme.of(context).textTheme;
+    final data = widget.data;
     final peak = data.isEmpty ? 0
         : data.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
+    final total = data.values.fold<int>(0, (a, b) => a + b);
+    final cur = _sel ?? peak;
+    final cnt = data[cur] ?? 0;
+    final pct = total > 0 ? cnt * 100 / total : 0.0;
+    final bg = _cardBg(s, s.tertiaryContainer);
+
     return Container(
-      decoration: _chartCardDecoration(s),
+      decoration: _chartCardDecoration(s, s.tertiaryContainer),
       padding: const EdgeInsets.all(16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Text(tx('cx_clock'), style: t.labelMedium?.copyWith(fontWeight: FontWeight.w700)),
           const Spacer(),
           _PeakChip(
-            label: '🕗 ${peak.toString().padLeft(2, '0')}:00',
-            color: s.primaryContainer, onColor: s.onPrimaryContainer, t: t),
+            label: '🕗 ${_hh(peak)}:00',
+            color: s.tertiaryContainer, onColor: s.onTertiaryContainer, t: t),
         ]),
         const SizedBox(height: 8),
-        TweenAnimationBuilder<double>(
-          tween: Tween(begin: 0, end: 1),
-          duration: const Duration(milliseconds: 1000),
-          curve: Curves.easeOutCubic,
-          builder: (_, p, _) => AspectRatio(
-            aspectRatio: 1,
-            child: CustomPaint(painter: _ClockPainter(
-              data: data, peak: peak, progress: p,
-              low: s.primaryContainer, high: s.primary, peakColor: s.tertiary,
-              ring: s.outlineVariant.withValues(alpha: 0.4),
-              text: s.onSurfaceVariant, onSurface: s.onSurface)),
+        LayoutBuilder(builder: (ctx, c) {
+          final side = c.maxWidth;
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTapDown: (d) {
+              final off = d.localPosition - Offset(side / 2, side / 2);
+              if (off.distance < side * 0.08) { setState(() => _sel = null); return; }
+              var a = math.atan2(off.dy, off.dx) + math.pi / 2;
+              if (a < 0) a += 2 * math.pi;
+              final h = (a / (2 * math.pi) * 24).floor().clamp(0, 23).toInt();
+              setState(() => _sel = h == _sel ? null : h);
+            },
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: 1),
+              duration: const Duration(milliseconds: 1000),
+              curve: Curves.easeOutCubic,
+              builder: (_, p, _) => AspectRatio(
+                aspectRatio: 1,
+                child: CustomPaint(painter: _ClockPainter(
+                  data: data, peak: peak, hi: cur, selected: _sel != null, progress: p,
+                  centerSub: _sel == null ? tx('cx_peak_hour') : '${_fmt(cnt)} ${L.commonPlays}',
+                  low: s.primaryContainer, high: s.primary, peakColor: s.tertiary,
+                  ring: s.outlineVariant.withValues(alpha: 0.4),
+                  text: s.onSurfaceVariant, onSurface: s.onSurface, bg: bg)),
+              ),
+            ),
+          );
+        }),
+        const SizedBox(height: 8),
+        Center(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: Container(
+              key: ValueKey(cur),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: s.tertiaryContainer, borderRadius: BorderRadius.circular(20)),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.schedule_rounded, size: 16, color: s.onTertiaryContainer),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    '${_hh(cur)}:00 – ${_hh((cur + 1) % 24)}:00  ·  ${_fmt(cnt)} ${L.commonPlays}  ·  ${pct.toStringAsFixed(1)}%',
+                    maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: t.labelMedium?.copyWith(
+                        color: s.onTertiaryContainer, fontWeight: FontWeight.w800)),
+                ),
+              ]),
+            ),
           ),
         ),
       ]),
@@ -369,12 +442,15 @@ class _ClockChart extends StatelessWidget {
 
 class _ClockPainter extends CustomPainter {
   final Map<int, int> data;
-  final int peak;
+  final int peak, hi;
+  final bool selected;
+  final String centerSub;
   final double progress;
-  final Color low, high, peakColor, ring, text, onSurface;
-  _ClockPainter({required this.data, required this.peak, required this.progress,
+  final Color low, high, peakColor, ring, text, onSurface, bg;
+  _ClockPainter({required this.data, required this.peak, required this.hi,
+      required this.selected, required this.centerSub, required this.progress,
       required this.low, required this.high, required this.peakColor, required this.ring,
-      required this.text, required this.onSurface});
+      required this.text, required this.onSurface, required this.bg});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -390,23 +466,25 @@ class _ClockPainter extends CustomPainter {
       final ang = -math.pi / 2 + (h + 0.5) / 24 * 2 * math.pi;
       final dir = Offset(math.cos(ang), math.sin(ang));
       final len = (outer - r0) * (0.1 + 0.9 * ratio) * progress;
+      final isHi = h == hi && maxV > 0;
       canvas.drawLine(c + dir * r0, c + dir * (r0 + len), Paint()
-        ..strokeWidth = bw
+        ..strokeWidth = isHi ? bw * 1.25 : bw
         ..strokeCap = StrokeCap.round
-        ..color = h == peak && maxV > 0 ? peakColor : Color.lerp(low, high, ratio)!);
+        ..color = isHi ? peakColor : Color.lerp(low, high, ratio)!);
     }
     for (final h in const [0, 6, 12, 18]) {
       final ang = -math.pi / 2 + h / 24 * 2 * math.pi;
       _paintText(canvas, h.toString().padLeft(2, '0'),
           c + Offset(math.cos(ang), math.sin(ang)) * (outer + 14), color: text, size: 10);
     }
-    _paintText(canvas, '${peak.toString().padLeft(2, '0')}h', c,
+    _paintText(canvas, '${hi.toString().padLeft(2, '0')}h', c,
         color: onSurface, size: 24, weight: FontWeight.w900);
-    _paintText(canvas, tx('cx_peak_hour'), c + const Offset(0, 22), color: text, size: 10);
+    _paintText(canvas, centerSub, c + const Offset(0, 22), color: text, size: 10);
   }
 
   @override
-  bool shouldRepaint(_ClockPainter o) => o.progress != progress || o.data != data;
+  bool shouldRepaint(_ClockPainter o) =>
+      o.progress != progress || o.data != data || o.hi != hi || o.selected != selected;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -426,7 +504,7 @@ class _WeekChart extends StatelessWidget {
     final peak = data.isEmpty ? 1
         : data.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
     return Container(
-      decoration: _chartCardDecoration(s),
+      decoration: _chartCardDecoration(s, s.secondaryContainer),
       padding: const EdgeInsets.all(16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
@@ -434,7 +512,7 @@ class _WeekChart extends StatelessWidget {
               style: t.labelMedium?.copyWith(fontWeight: FontWeight.w700)),
           const Spacer(),
           _PeakChip(label: '📅 ${labels[peak - 1]}',
-              color: s.secondaryContainer, onColor: s.onSecondaryContainer, t: t),
+              color: s.tertiaryContainer, onColor: s.onTertiaryContainer, t: t),
         ]),
         const SizedBox(height: 16),
         TweenAnimationBuilder<double>(
@@ -502,21 +580,12 @@ class _ShareDonut extends StatelessWidget {
     final total = items.fold<int>(0, (a, e) => a + getPlays(e));
     final vals = [for (final e in top) getPlays(e)];
     final rest = total - vals.fold<int>(0, (a, b) => a + b);
-    // Distinct hues derived from the theme (primary / tertiary rotated)
-    Color rot(Color c, double d) {
-      final h = HSLColor.fromColor(c);
-      return h.withHue((h.hue + d) % 360).toColor();
-    }
-    final palette = [
-      s.primary, s.tertiary,
-      rot(s.primary, 120), rot(s.tertiary, 120), rot(s.primary, 240),
-      s.outline,
-    ];
+    final palette = _themePalette(s);
     final segs = [...vals, if (rest > 0) rest];
     String pct(int v) => total > 0 ? '${(v * 100 / total).round()}%' : '';
 
     return Container(
-      decoration: _chartCardDecoration(s),
+      decoration: _chartCardDecoration(s, s.primaryContainer),
       padding: const EdgeInsets.all(16),
       child: Row(children: [
         TweenAnimationBuilder<double>(
@@ -624,7 +693,7 @@ class _GenreChart extends StatelessWidget {
     }
     final top = tags.take(7).toList();
     return Container(
-      decoration: _chartCardDecoration(s),
+      decoration: _chartCardDecoration(s, s.secondaryContainer),
       padding: const EdgeInsets.all(12),
       child: TweenAnimationBuilder<double>(
         tween: Tween(begin: 0, end: 1),
@@ -684,4 +753,293 @@ class _RadarPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_RadarPainter o) => o.progress != progress || o.values != values;
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════
+//  6. Time of day: stacked bar + 4 accent tiles
+// ══════════════════════════════════════════════════════════════════════════
+
+class _DaypartChart extends StatelessWidget {
+  final Map<int, int> data;
+  const _DaypartChart({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    final t = Theme.of(context).textTheme;
+    final parts = <(String, IconData, int, int)>[
+      (tx('cx_night'),     Icons.bedtime_rounded,    0, 6),
+      (tx('cx_morning'),   Icons.wb_twilight_rounded, 6, 12),
+      (tx('cx_afternoon'), Icons.wb_sunny_rounded,   12, 18),
+      (tx('cx_evening'),   Icons.nights_stay_rounded, 18, 24),
+    ];
+    final sums = [
+      for (final p in parts)
+        [for (var h = p.$3; h < p.$4; h++) data[h] ?? 0].fold<int>(0, (a, b) => a + b),
+    ];
+    final total = sums.fold<int>(0, (a, b) => a + b);
+    if (total == 0) return const SizedBox.shrink();
+    var top = 0;
+    for (var i = 1; i < 4; i++) { if (sums[i] > sums[top]) top = i; }
+    final pal = _themePalette(s).sublist(0, 4);
+
+    Widget tile(int i) {
+      final isTop = i == top;
+      final pct = (sums[i] * 100 / total).round();
+      return Expanded(
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: isTop ? s.primaryContainer : s.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(children: [
+            Container(
+              width: 34, height: 34,
+              decoration: BoxDecoration(color: pal[i], shape: BoxShape.circle),
+              child: Icon(parts[i].$2, size: 18, color: _onColor(pal[i])),
+            ),
+            const SizedBox(width: 10),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(parts[i].$1, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: t.labelMedium?.copyWith(
+                      color: isTop ? s.onPrimaryContainer : s.onSurfaceVariant,
+                      fontWeight: FontWeight.w700)),
+              Text('$pct%', style: t.titleMedium?.copyWith(
+                  color: isTop ? s.onPrimaryContainer : s.onSurface,
+                  fontWeight: FontWeight.w900)),
+            ])),
+          ]),
+        ),
+      );
+    }
+
+    return Container(
+      decoration: _chartCardDecoration(s, s.secondaryContainer),
+      padding: const EdgeInsets.all(16),
+      child: Column(children: [
+        TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: const Duration(milliseconds: 900),
+          curve: Curves.easeOutCubic,
+          builder: (_, p, _) => ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: SizedBox(
+              height: 34,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: FractionallySizedBox(
+                  widthFactor: p,
+                  child: Row(children: [
+                    for (var i = 0; i < 4; i++)
+                      if (sums[i] > 0)
+                        Expanded(
+                          flex: math.max(1, (sums[i] * 1000 / total).round()),
+                          child: Container(
+                            margin: EdgeInsets.only(right: i < 3 ? 3 : 0),
+                            color: pal[i],
+                          ),
+                        ),
+                  ]),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        Row(children: [tile(0), const SizedBox(width: 10), tile(1)]),
+        const SizedBox(height: 10),
+        Row(children: [tile(2), const SizedBox(width: 10), tile(3)]),
+      ]),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  7. Day intensity: how many days fall in each scrobble range (tap a bar)
+// ══════════════════════════════════════════════════════════════════════════
+
+class _IntensityChart extends StatefulWidget {
+  final Map<String, int> data;
+  const _IntensityChart({super.key, required this.data});
+  @override
+  State<_IntensityChart> createState() => _IntensityChartState();
+}
+
+class _IntensityChartState extends State<_IntensityChart> {
+  int? _sel;
+  static const _edges = [1, 10, 20, 40, 80];
+  static const _labels = ['1–9', '10–19', '20–39', '40–79', '80+'];
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    final t = Theme.of(context).textTheme;
+    final counts = List<int>.filled(5, 0);
+    for (final v in widget.data.values) {
+      if (v < 1) continue;
+      var b = 0;
+      for (var i = 0; i < _edges.length; i++) { if (v >= _edges[i]) b = i; }
+      counts[b]++;
+    }
+    final active = counts.fold<int>(0, (a, b) => a + b);
+    if (active == 0) return const SizedBox.shrink();
+    var top = 0;
+    for (var i = 1; i < 5; i++) { if (counts[i] > counts[top]) top = i; }
+    final cur = _sel ?? top;
+    final maxV = counts[top];
+    final pct = (counts[cur] * 100 / active).round();
+
+    return Container(
+      decoration: _chartCardDecoration(s, s.primaryContainer),
+      padding: const EdgeInsets.all(16),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          _PeakChip(label: '$active ${tx('cx_days')}',
+              color: s.primaryContainer, onColor: s.onPrimaryContainer, t: t),
+        ]),
+        const SizedBox(height: 14),
+        TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: const Duration(milliseconds: 800),
+          curve: Curves.easeOutCubic,
+          builder: (_, p, _) => SizedBox(
+            height: 150,
+            child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              for (var i = 0; i < 5; i++)
+                Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => setState(() => _sel = i == _sel ? null : i),
+                    child: Builder(builder: (_) {
+                      final ratio = maxV > 0 ? counts[i] / maxV : 0.0;
+                      final isCur = i == cur;
+                      return Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+                        Text(counts[i] > 0 ? '${counts[i]}' : '', style: t.labelSmall?.copyWith(
+                            fontSize: 10,
+                            color: isCur ? s.tertiary : s.onSurfaceVariant,
+                            fontWeight: isCur ? FontWeight.w800 : FontWeight.w500)),
+                        const SizedBox(height: 4),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          margin: const EdgeInsets.symmetric(horizontal: 5),
+                          height: 10 + 100 * ratio * p,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter, end: Alignment.topCenter,
+                              colors: isCur
+                                  ? [s.tertiary.withValues(alpha: 0.6), s.tertiary]
+                                  : [s.primaryContainer, s.primary.withValues(alpha: 0.4 + 0.6 * ratio)],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(_labels[i], style: t.labelSmall?.copyWith(
+                            fontSize: 10,
+                            color: isCur ? s.tertiary : s.onSurfaceVariant,
+                            fontWeight: isCur ? FontWeight.w800 : FontWeight.w600)),
+                      ]);
+                    }),
+                  ),
+                ),
+            ]),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+                color: s.tertiaryContainer, borderRadius: BorderRadius.circular(20)),
+            child: Text(
+              '${_labels[cur]} ${L.commonPlays}  ·  ${counts[cur]} ${tx('cx_days')}  ·  $pct%',
+              style: t.labelMedium?.copyWith(
+                  color: s.onTertiaryContainer, fontWeight: FontWeight.w800)),
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  8. Busiest days: top 5 horizontal bars
+// ══════════════════════════════════════════════════════════════════════════
+
+class _BusiestDays extends StatelessWidget {
+  final Map<String, int> data;
+  const _BusiestDays({required this.data});
+
+  String _date(String k) {
+    final m = RegExp(r'^(\d{4})-(\d{2})-(\d{2})').firstMatch(k);
+    return m == null ? k : '${m.group(3)}/${m.group(2)}/${m.group(1)}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    final t = Theme.of(context).textTheme;
+    final top = (data.entries.where((e) => e.value > 0).toList()
+          ..sort((a, b) => b.value.compareTo(a.value)))
+        .take(5).toList();
+    if (top.isEmpty) return const SizedBox.shrink();
+    final maxV = top.first.value;
+
+    return Container(
+      decoration: _chartCardDecoration(s, s.tertiaryContainer),
+      padding: const EdgeInsets.all(16),
+      child: TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0, end: 1),
+        duration: const Duration(milliseconds: 900),
+        curve: Curves.easeOutCubic,
+        builder: (_, p, _) => Column(children: [
+          for (var i = 0; i < top.length; i++)
+            Padding(
+              padding: EdgeInsets.only(bottom: i < top.length - 1 ? 12 : 0),
+              child: Row(children: [
+                Container(
+                  width: 28, height: 28, alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: i == 0 ? s.tertiary : s.primaryContainer),
+                  child: Text('${i + 1}', style: t.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: i == 0 ? s.onTertiary : s.onPrimaryContainer)),
+                ),
+                const SizedBox(width: 10),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    Text(_date(top[i].key), style: t.labelMedium?.copyWith(fontWeight: FontWeight.w700)),
+                    const Spacer(),
+                    Text(_fmt(top[i].value), style: t.labelMedium?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        color: i == 0 ? s.tertiary : s.primary)),
+                  ]),
+                  const SizedBox(height: 5),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Stack(children: [
+                      Container(height: 10, color: s.surfaceContainerHighest),
+                      FractionallySizedBox(
+                        widthFactor: (top[i].value / maxV * p).clamp(0.02, 1.0).toDouble(),
+                        child: Container(
+                          height: 10,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(colors: i == 0
+                                ? [s.tertiary.withValues(alpha: 0.7), s.tertiary]
+                                : [s.primary.withValues(alpha: 0.55), s.primary]),
+                          ),
+                        ),
+                      ),
+                    ]),
+                  ),
+                ])),
+              ]),
+            ),
+        ]),
+      ),
+    );
+  }
 }

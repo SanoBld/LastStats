@@ -1394,6 +1394,13 @@ class _ChartsPageState extends State<_ChartsPage>
                             : const SizedBox.shrink(),
                   ),
 
+                  // 2b. Time of day
+                  if (_hourlyData != null && _hourlyData!.values.any((v) => v > 0))
+                    _ChartSec(
+                      index: 5, title: tx('cx_daypart'), icon: Icons.wb_twilight_rounded,
+                      child: _DaypartChart(data: _hourlyData!),
+                    ),
+
                   // 3. Artists share
                   _ChartSec(
                     index: 2, title: tx('cx_artist_distribution'), icon: Icons.mic_rounded, sub: topLabel,
@@ -1502,6 +1509,14 @@ class _ChartsPageState extends State<_ChartsPage>
                       ],
                     )),
                     const SizedBox(height: 20),
+                    _ChartSec(
+                      index: 8, title: tx('cx_intensity'), icon: Icons.bar_chart_rounded,
+                      child: _IntensityChart(key: ValueKey('int_$_selectedYear'), data: calendarForView),
+                    ),
+                    _ChartSec(
+                      index: 9, title: tx('cx_busiest'), icon: Icons.emoji_events_rounded,
+                      child: _BusiestDays(data: calendarForView),
+                    ),
                   ],
                           ],
                         ),
@@ -1581,8 +1596,13 @@ class _FadeInSectionState extends State<_FadeInSection> with SingleTickerProvide
 /// every chart card so the whole tab reads as one cohesive, modern set.
 // Same tonal card as the settings sections: one flat container colour,
 // big rounded corners, no border, no shadow, no gradient.
-BoxDecoration _chartCardDecoration(ColorScheme s) => BoxDecoration(
-  color: s.surfaceContainerLow,
+// Card background; an optional accent tint is blended in (theme containers)
+Color _cardBg(ColorScheme s, [Color? tint]) => tint == null
+    ? s.surfaceContainerLow
+    : Color.alphaBlend(tint.withValues(alpha: 0.32), s.surfaceContainerLow);
+
+BoxDecoration _chartCardDecoration(ColorScheme s, [Color? tint]) => BoxDecoration(
+  color: _cardBg(s, tint),
   borderRadius: BorderRadius.circular(28),
 );
 
@@ -3284,24 +3304,28 @@ class _ChipStat extends StatelessWidget {
   final String label, value;
   final ColorScheme s;
   final TextTheme   t;
+  final Color? bg, fg;
   const _ChipStat({required this.label, required this.value,
-      required this.s, required this.t});
+      required this.s, required this.t, this.bg, this.fg});
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-    decoration: BoxDecoration(
-      color: s.secondaryContainer,
-      borderRadius: BorderRadius.circular(24),
-    ),
-    child: Row(mainAxisSize: MainAxisSize.min, children: [
-      Text(label, style: t.labelSmall
-          ?.copyWith(color: s.onSecondaryContainer.withValues(alpha: 0.75), fontSize: 11)),
-      const SizedBox(width: 6),
-      Text(value, style: t.labelSmall?.copyWith(
-          color: s.onSecondaryContainer, fontWeight: FontWeight.w800, fontSize: 11)),
-    ]),
-  );
+  Widget build(BuildContext context) {
+    final f = fg ?? s.onSecondaryContainer;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: bg ?? s.secondaryContainer,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Text(label, style: t.labelSmall
+            ?.copyWith(color: f.withValues(alpha: 0.75), fontSize: 11)),
+        const SizedBox(width: 6),
+        Text(value, style: t.labelSmall?.copyWith(
+            color: f, fontWeight: FontWeight.w800, fontSize: 11)),
+      ]),
+    );
+  }
 }
 
 class _PeakChip extends StatelessWidget {
