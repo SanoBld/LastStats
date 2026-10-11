@@ -1363,6 +1363,7 @@ const Map<String, String> kTxFr = {
   'cx_intensity': 'Intensité des jours',
   'cx_days': 'jours',
   'cx_busiest': 'Jours les plus intenses',
+  'cx_weekend': 'Semaine vs week-end',
   'ap_harmony_title': 'Style des couleurs',
   'ap_harmony_mono': 'Monochrome',
   'ap_harmony_mono_sub': 'Une seule teinte, en différentes intensités',

@@ -611,7 +611,7 @@ class _ChartsPageState extends State<_ChartsPage>
   /// PC: pairs compact chart sections side by side. Phones: untouched.
   List<Widget> _pcLayout(bool wide, List<Widget> items) {
     if (!wide) return items;
-    const pairable = {2, 3, 4, 5, 8, 9};
+    const pairable = {2, 3, 4, 5, 8, 9, 10};
     final out = <Widget>[];
     Widget? held;
     void flush() { if (held != null) { out.add(held!); held = null; } }
@@ -1460,6 +1460,12 @@ class _ChartsPageState extends State<_ChartsPage>
                     _ChartSec(
                       index: 5, title: tx('cx_daypart'), icon: Icons.wb_twilight_rounded,
                       child: _DaypartChart(data: _hourlyData!),
+                    ),
+
+                  if (_weekdayData != null && _weekdayData!.values.any((v) => v > 0))
+                    _ChartSec(
+                      index: 10, title: tx('cx_weekend'), icon: Icons.weekend_rounded,
+                      child: _WeekendCard(data: _weekdayData!),
                     ),
 
                   // 3. Artists share

@@ -705,73 +705,76 @@ class _GenreChart extends StatefulWidget {
 }
 
 class _GenreChartState extends State<_GenreChart> {
-  final _ctrl = PageController();
-  int _page = 0;
-
-  @override
-  void dispose() { _ctrl.dispose(); super.dispose(); }
+  int? _sel;
 
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
+    final t = Theme.of(context).textTheme;
     final tags = widget.tags;
     if (tags.length < 3) {
       return _ShareDonut(items: tags,
           getLabel: (e) => (e as _TagEntry).name, getPlays: (e) => (e as _TagEntry).count);
     }
     final top = tags.take(7).toList();
-    String label(dynamic e) => (e as _TagEntry).name;
-    int plays(dynamic e) => (e as _TagEntry).count;
     final n = top.length;
-    return LayoutBuilder(builder: (ctx, c) {
-      final radarH = (c.maxWidth - 24) / 1.1 + 24;
-      final listH = math.max(n * 26.0, 130.0) + 40;
-      final barsH = n * 38.0 + 48;
-      final h = [radarH, listH, barsH][_page];
-      return Column(children: [
-        AnimatedSize(
-          duration: const Duration(milliseconds: 260),
-          curve: M3Motion.emphasized,
-          child: SizedBox(
-            height: h,
-            child: PageView(
-              controller: _ctrl,
-              onPageChanged: (i) { _haptic(_HapticImpact.selection); setState(() => _page = i); },
-              children: [
-                Container(
-                  decoration: _chartCardDecoration(s, s.secondaryContainer),
-                  padding: const EdgeInsets.all(12),
-                  child: TweenAnimationBuilder<double>(
-                    tween: Tween(begin: 0, end: 1),
-                    duration: const Duration(milliseconds: 1000),
-                    curve: Curves.easeOutCubic,
-                    builder: (_, p, _) => CustomPaint(painter: _RadarPainter(
-                      labels: [for (final e in top) e.name.length > 12 ? '${e.name.substring(0, 11)}…' : e.name],
-                      values: [for (final e in top) e.count.toDouble()],
-                      progress: p,
-                      line: s.primary, fill: s.primary.withValues(alpha: 0.25), dot: s.tertiary,
-                      grid: s.outlineVariant.withValues(alpha: 0.5), text: s.onSurface)),
-                  ),
-                ),
-                _DonutDistributionCard(items: top, getLabel: label, getPlays: plays,
-                    baseColor: s.primary, secondColor: s.tertiary, onTap: (_) {}),
-                _TopHorizontalBarCard(items: top, getLabel: label, getPlays: plays,
-                    barColor: s.primary, onTap: (_) {}),
-              ],
+    final total = tags.fold<int>(0, (a, e) => a + e.count);
+    final cur = _sel == null ? null : top[_sel!];
+
+    void pick(Offset local, Size size) {
+      final off = local - Offset(size.width / 2, size.height / 2);
+      if (off.distance < 12) { if (_sel != null) setState(() => _sel = null); return; }
+      var a = math.atan2(off.dy, off.dx) + math.pi / 2;
+      if (a < 0) a += 2 * math.pi;
+      final i = (a / (2 * math.pi) * n).round() % n;
+      if (i != _sel) { _haptic(_HapticImpact.selection); setState(() => _sel = i); }
+    }
+
+    return Container(
+      decoration: _chartCardDecoration(s, s.secondaryContainer),
+      padding: const EdgeInsets.all(12),
+      child: Column(children: [
+        LayoutBuilder(builder: (ctx, c) {
+          final size = Size(c.maxWidth, c.maxWidth / 1.1);
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTapDown: (d) => pick(d.localPosition, size),
+            onPanUpdate: (d) => pick(d.localPosition, size),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: 1),
+              duration: const Duration(milliseconds: 1000),
+              curve: Curves.easeOutCubic,
+              builder: (_, p, _) => AspectRatio(
+                aspectRatio: 1.1,
+                child: CustomPaint(painter: _RadarPainter(
+                  labels: [for (final e in top) e.name.length > 12 ? '${e.name.substring(0, 11)}…' : e.name],
+                  values: [for (final e in top) e.count.toDouble()],
+                  progress: p, sel: _sel,
+                  line: s.primary, fill: s.primary.withValues(alpha: 0.25), dot: s.tertiary,
+                  grid: s.outlineVariant.withValues(alpha: 0.5), text: s.onSurface)),
+              ),
             ),
+          );
+        }),
+        const SizedBox(height: 8),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          child: Container(
+            key: ValueKey(_sel),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: s.tertiaryContainer, borderRadius: BorderRadius.circular(20)),
+            child: Text(
+              cur == null
+                  ? '${top.first.name}  ·  ${_fmt(top.first.count)}  ·  ${(top.first.count * 100 / math.max(total, 1)).toStringAsFixed(1)}%'
+                  : '${cur.name}  ·  ${_fmt(cur.count)}  ·  ${(cur.count * 100 / math.max(total, 1)).toStringAsFixed(1)}%',
+              maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: t.labelMedium?.copyWith(
+                  color: s.onTertiaryContainer, fontWeight: FontWeight.w800)),
           ),
         ),
-        const SizedBox(height: 10),
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(3, (i) => AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          width: _page == i ? 18 : 6, height: 6,
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          decoration: BoxDecoration(
-            color: _page == i ? s.primary : s.outlineVariant.withValues(alpha: 0.6),
-            borderRadius: BorderRadius.circular(3)),
-        ))),
-      ]);
-    });
+      ]),
+    );
   }
 }
 
@@ -779,8 +782,9 @@ class _RadarPainter extends CustomPainter {
   final List<String> labels;
   final List<double> values;
   final double progress;
+  final int? sel;
   final Color line, fill, dot, grid, text;
-  _RadarPainter({required this.labels, required this.values, required this.progress,
+  _RadarPainter({required this.labels, required this.values, required this.progress, this.sel,
       required this.line, required this.fill, required this.dot, required this.grid, required this.text});
 
   @override
@@ -810,11 +814,19 @@ class _RadarPainter extends CustomPainter {
     canvas.drawPath(poly, Paint()..color = fill);
     canvas.drawPath(poly, Paint()
       ..style = PaintingStyle.stroke..strokeWidth = 3..strokeJoin = StrokeJoin.round..color = line);
-    for (final p in pts) { canvas.drawCircle(p, 4.5, Paint()..color = dot); }
+    for (var i = 0; i < pts.length; i++) {
+      if (i == sel) {
+        canvas.drawCircle(pts[i], 11, Paint()..color = dot.withValues(alpha: 0.25));
+        canvas.drawCircle(pts[i], 7, Paint()..color = dot);
+        canvas.drawLine(c, pt(i, R), Paint()..color = line..strokeWidth = 2);
+      } else {
+        canvas.drawCircle(pts[i], 4.5, Paint()..color = dot);
+      }
+    }
   }
 
   @override
-  bool shouldRepaint(_RadarPainter o) => o.progress != progress || o.values != values;
+  bool shouldRepaint(_RadarPainter o) => o.progress != progress || o.values != values || o.sel != sel;
 }
 
 
@@ -1102,6 +1114,65 @@ class _BusiestDays extends StatelessWidget {
             ),
         ]),
       ),
+    );
+  }
+}
+
+
+// Weekdays vs weekend share (derived from the weekday data)
+class _WeekendCard extends StatefulWidget {
+  final Map<int, int> data;
+  const _WeekendCard({required this.data});
+  @override
+  State<_WeekendCard> createState() => _WeekendCardState();
+}
+
+class _WeekendCardState extends State<_WeekendCard> {
+  int _sel = -1;
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    final t = Theme.of(context).textTheme;
+    final l = _chartWeekdayLabels;
+    var wk = 0, we = 0;
+    widget.data.forEach((d, v) { if (d >= 6) { we += v; } else { wk += v; } });
+    final total = math.max(wk + we, 1);
+    final parts = [
+      ('${l[0]}–${l[4]}', wk, 5, s.primary),
+      ('${l[5]}–${l[6]}', we, 2, s.tertiary),
+    ];
+    return Container(
+      decoration: _chartCardDecoration(s, s.tertiaryContainer),
+      padding: const EdgeInsets.all(16),
+      child: Column(children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: SizedBox(height: 28, child: Row(children: [
+            for (var i = 0; i < 2; i++)
+              Expanded(
+                flex: math.max((parts[i].$2 * 1000 / total).round(), 1),
+                child: GestureDetector(
+                  onTap: () { _haptic(_HapticImpact.selection); setState(() => _sel = _sel == i ? -1 : i); },
+                  child: Container(color: parts[i].$4.withValues(alpha: _sel == -1 || _sel == i ? 1 : 0.4)),
+                ),
+              ),
+          ])),
+        ),
+        const SizedBox(height: 12),
+        Row(children: [
+          for (var i = 0; i < 2; i++)
+            Expanded(child: Column(children: [
+              Text(parts[i].$1, style: t.labelMedium?.copyWith(color: s.onSurfaceVariant)),
+              const SizedBox(height: 2),
+              Text('${(parts[i].$2 * 100 / total).toStringAsFixed(1)}%',
+                  style: t.titleLarge?.copyWith(fontWeight: FontWeight.w800, color: parts[i].$4)),
+              Text(_sel == i
+                      ? '${_fmt((parts[i].$2 / parts[i].$3).round())} / ${l[i == 0 ? 0 : 5].substring(0, 1)}'
+                      : _fmt(parts[i].$2),
+                  style: t.labelSmall?.copyWith(color: s.onSurfaceVariant)),
+            ])),
+        ]),
+      ]),
     );
   }
 }

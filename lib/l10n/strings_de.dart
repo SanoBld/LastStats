@@ -1334,6 +1334,7 @@ const Map<String, String> kTxDe = {
   'cx_intensity': 'Intensität der Tage',
   'cx_days': 'Tage',
   'cx_busiest': 'Intensivste Tage',
+  'cx_weekend': 'Woche vs Wochenende',
   'ap_harmony_title': 'Farbstil',
   'ap_harmony_mono': 'Monochrom',
   'ap_harmony_mono_sub': 'Ein Farbton in verschiedenen Intensitäten',

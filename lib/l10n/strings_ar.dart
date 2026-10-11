@@ -1334,6 +1334,7 @@ const Map<String, String> kTxAr = {
   'cx_intensity': 'شدة الأيام',
   'cx_days': 'أيام',
   'cx_busiest': 'أكثر الأيام نشاطًا',
+  'cx_weekend': 'أيام الأسبوع والعطلة',
   'ap_harmony_title': 'نمط الألوان',
   'ap_harmony_mono': 'أحادي اللون',
   'ap_harmony_mono_sub': 'درجة لونية واحدة بشدّات مختلفة',
