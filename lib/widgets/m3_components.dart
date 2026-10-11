@@ -115,7 +115,7 @@ class M3ButtonGroup<T> extends StatelessWidget {
             curve: M3Motion.spatialFast,
             child: M3ShapeMorph(
             radius: r,
-            color: sel ? scheme.primary : scheme.surfaceContainerHigh,
+            color: sel ? scheme.primaryContainer : scheme.surfaceContainerHigh,
             child: Material(
               type: MaterialType.transparency,
               child: InkWell(
@@ -131,7 +131,7 @@ class M3ButtonGroup<T> extends StatelessWidget {
                       style: Theme.of(context).textTheme.labelLarge!.copyWith(
                             fontWeight: FontWeight.w600,
                             color: sel
-                                ? scheme.onPrimary
+                                ? scheme.primary
                                 : scheme.onSurfaceVariant,
                           ),
                       child: Text(items[i].$2),
@@ -498,7 +498,7 @@ class M3Chip extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final compact = visualDensity == VisualDensity.compact;
-    final fg = selected ? scheme.onSecondaryContainer : scheme.onSurfaceVariant;
+    final fg = selected ? scheme.primary : scheme.onSurfaceVariant;
     return M3PressBuilder(builder: (context, down0, setDown) {
     final down = down0 && !M3Motion.reduced(context);
     final r = BorderRadius.circular(down ? 8 : (selected ? 20 : 10));
@@ -510,7 +510,7 @@ class M3Chip extends StatelessWidget {
         radius: r,
         height: compact ? 32 : 40,
         color: selected
-            ? scheme.secondaryContainer
+            ? scheme.primaryContainer
             : scheme.surfaceContainerHigh,
         child: Material(
           type: MaterialType.transparency,

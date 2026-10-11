@@ -1273,8 +1273,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 6),
         decoration: BoxDecoration(
-          color:        scheme.surfaceContainerHigh,
-          borderRadius: AppRadius.xlR,
+          color: scheme.primaryContainer.withValues(alpha: 0.55),
+          borderRadius: const BorderRadius.only(topLeft: Radius.circular(32), bottomRight: Radius.circular(32), topRight: Radius.circular(14), bottomLeft: Radius.circular(14)),
         ),
         child: IntrinsicHeight(
           child: Row(children: rowChildren),
@@ -1390,14 +1390,14 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Column(
+      child: _AccentCard(scheme: scheme, shape: 0, child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(L.detailBiography,
-                  style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                  style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800, color: scheme.onPrimaryContainer)),
               _translating
                   ? const SizedBox(width: 28, height: 28, child: M3Spinner())
                   : GestureDetector(
@@ -1407,7 +1407,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                         radius: BorderRadius.circular(18),
                         // translated = vivid accent, original = calm color
                         color: _showTranslated
-                            ? scheme.primaryContainer
+                            ? scheme.primary
                             : scheme.surfaceContainerHigh,
                         padding: const EdgeInsets.symmetric(horizontal: 14),
                         onTap: _toggleTranslate,
@@ -1423,7 +1423,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                                     : Icons.translate_rounded,
                                 size: 16,
                                 color: _showTranslated
-                                    ? scheme.onPrimaryContainer
+                                    ? scheme.onPrimary
                                     : scheme.primary,
                               ),
                               const SizedBox(width: 6),
@@ -1435,7 +1435,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                   color: _showTranslated
-                                      ? scheme.onPrimaryContainer
+                                      ? scheme.onPrimary
                                       : scheme.onSurfaceVariant,
                                 ),
                               ),
@@ -1455,7 +1455,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             alignment: Alignment.topCenter,
             child: _linkifiedText(
               shown,
-              text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant, height: 1.55),
+              text.bodyMedium?.copyWith(color: scheme.onPrimaryContainer, height: 1.55),
               scheme.primary,
             ),
           ),
@@ -1472,7 +1472,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                 ),
               _M3Pill(
                 scheme: scheme,
-                filled: true,
                 icon: Icons.open_in_new_rounded,
                 label: tx('ui_view_on_last_fm'),
                 onTap: () => _openBioUrl(_lfmBioUrl()),
@@ -1485,13 +1484,13 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                 ? tx('ui_original_text_last_fm_')
                 : tx('ui_source_last_fm'),
             style: text.bodySmall?.copyWith(
-              color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
+              color: scheme.onPrimaryContainer.withValues(alpha: 0.7),
               fontSize: 11,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 4),
         ],
-      ),
+      )),
     );
   }
 
@@ -1507,7 +1506,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Column(
+      child: _AccentCard(scheme: scheme, soft: true, shape: 2, child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(L.detailTopTracks,
@@ -1569,7 +1568,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           }),
           const SizedBox(height: 8),
         ],
-      ),
+      )),
     );
   }
 
@@ -1580,7 +1579,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Column(
+      child: _AccentCard(scheme: scheme, soft: true, shape: 0, child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(L.detailTopAlbums,
@@ -1638,7 +1637,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           }),
           const SizedBox(height: 16),
         ],
-      ),
+      )),
     );
   }
 
@@ -1650,7 +1649,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Column(
+      child: _AccentCard(scheme: scheme, soft: true, shape: 1, child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(L.detailTracklist,
@@ -1689,7 +1688,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           }),
           const SizedBox(height: 8),
         ],
-      ),
+      )),
     );
   }
 
@@ -1724,13 +1723,13 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(label, style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
+              Text(label, style: text.labelMedium?.copyWith(color: scheme.onPrimaryContainer.withValues(alpha: 0.8))),
               const SizedBox(height: 2),
               Row(mainAxisSize: MainAxisSize.min, children: [
                 Flexible(child: Text(value, overflow: TextOverflow.ellipsis,
                     style: text.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: onTap != null ? scheme.primary : null))),
+                        color: scheme.primary))),
                 if (onTap != null) ...[
                   const SizedBox(width: 4),
                   Icon(Icons.chevron_right_rounded, size: 16, color: scheme.primary),
@@ -1746,8 +1745,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       child: Container(
         decoration: BoxDecoration(
-          color:        scheme.surfaceContainerHigh,
-          borderRadius: AppRadius.xlR,
+          color: scheme.primaryContainer.withValues(alpha: 0.55),
+          borderRadius: const BorderRadius.only(topLeft: Radius.circular(14), bottomRight: Radius.circular(14), topRight: Radius.circular(32), bottomLeft: Radius.circular(32)),
         ),
         child: IntrinsicHeight(
           child: Row(children: [
@@ -1797,8 +1796,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: scheme.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(20),
+        color: scheme.primaryContainer.withValues(alpha: 0.55),
+        borderRadius: const BorderRadius.only(topLeft: Radius.circular(32), bottomRight: Radius.circular(32), topRight: Radius.circular(14), bottomLeft: Radius.circular(14)),
       ),
       child: Row(
         children: [
@@ -1831,17 +1830,17 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Column(
+      child: _AccentCard(scheme: scheme, shape: 1, child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(L.detailLyrics,
-                  style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                  style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800, color: scheme.onPrimaryContainer)),
               if (_lyrics.isNotEmpty)
                 IconButton(
-                  icon: const Icon(Icons.copy_rounded, size: 18),
+                  icon: Icon(Icons.copy_rounded, size: 18, color: scheme.onPrimaryContainer),
                   tooltip: L.detailCopyLyrics,
                   visualDensity: VisualDensity.compact,
                   onPressed: () {
@@ -1861,7 +1860,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ))
           else if (_lyrics.isEmpty)
             Text(L.detailLyricsNotFound,
-                style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant))
+                style: text.bodyMedium?.copyWith(color: scheme.onPrimaryContainer))
           else ...[
             AnimatedSize(
               duration: const Duration(milliseconds: 320),
@@ -1869,7 +1868,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               alignment: Alignment.topCenter,
               child: Text(shown,
                   style: text.bodyMedium?.copyWith(
-                      color: scheme.onSurfaceVariant, height: 1.6)),
+                      color: scheme.onPrimaryContainer, height: 1.6)),
             ),
             if (_lyrics.length > maxChars) ...[
               const SizedBox(height: 10),
@@ -1881,9 +1880,9 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               ),
             ],
           ],
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
         ],
-      ),
+      )),
     );
   }
 }
@@ -2880,6 +2879,47 @@ class _M3Pill extends StatelessWidget {
   }
 }
 
+// Text block (bio, lyrics...) inside a rounded accent card instead of
+// sitting straight on the page background.
+class _AccentCard extends StatelessWidget {
+  final ColorScheme scheme;
+  final Widget      child;
+  final int         shape; // 0 leaf, 1 arch, 2 squircle
+  final bool        soft;  // soft = light accent tint, text keeps its colours
+  const _AccentCard({
+    required this.scheme, required this.child, this.shape = 2, this.soft = false,
+  });
+
+  BorderRadius get _radius {
+    switch (shape % 3) {
+      case 0: return const BorderRadius.only(
+          topLeft: Radius.circular(40), bottomRight: Radius.circular(40),
+          topRight: Radius.circular(16), bottomLeft: Radius.circular(16));
+      case 1: return const BorderRadius.only(
+          topLeft: Radius.circular(40), topRight: Radius.circular(40),
+          bottomLeft: Radius.circular(16), bottomRight: Radius.circular(16));
+      default: return BorderRadius.circular(28);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: soft
+              ? scheme.primaryContainer.withValues(alpha: 0.42)
+              : scheme.primaryContainer,
+          borderRadius: _radius,
+        ),
+        child: soft
+            ? child
+            : DefaultTextStyle.merge(
+                style: TextStyle(color: scheme.onPrimaryContainer),
+                child: child),
+      );
+}
+
 // ── Gradient fallback when no image is available ──────────────────────────────
 
 class _DetailGradientBg extends StatelessWidget {
@@ -2915,7 +2955,7 @@ class _StatChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    final fg   = highlight ? scheme.onPrimaryContainer : scheme.onSurfaceVariant;
+    final fg   = scheme.onPrimaryContainer;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
@@ -2923,11 +2963,11 @@ class _StatChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(icon, size: 15, color: highlight ? scheme.primary : fg),
+            Icon(icon, size: 15, color: scheme.primary),
             const SizedBox(width: 5),
             Text(value, style: text.titleSmall?.copyWith(
                 fontWeight: FontWeight.w800,
-                color: highlight ? scheme.primary : scheme.onSurface)),
+                color: scheme.primary)),
           ]),
           const SizedBox(height: 2),
           Text(label, style: text.labelSmall?.copyWith(

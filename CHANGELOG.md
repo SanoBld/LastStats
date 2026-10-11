@@ -37,6 +37,10 @@
 - New setup pages: covers and images (shape, animated covers, motion covers, tab labels) and sync and battery (automatic sync, battery saver)
 - Notification switches now ask for the system permission and schedule the tasks, like the Notifications settings
 
+**Material You details**
+- Biography, lyrics, top tracks, top albums, tracklist, track info, stats and the Last.fm discussion now sit in accent cards with expressive shapes (leaf, arch, squircle)
+- Play, favourite, period and filter buttons use the accent colour on a soft tonal background instead of white on a coloured one
+
 **Loading bars**
 - New wavy progress bar (Material You) used wherever a loading has real progress: history sync chip on the dashboard (now shows loaded/total scrobbles; the wavy bar only appears for big syncs, 200+ scrobbles), Sync settings and the Spotify / Last.fm login pages
 - The round loader now morphs between soft rounded shapes of the app (squircle, oval), like the Material 3 Expressive loading indicator

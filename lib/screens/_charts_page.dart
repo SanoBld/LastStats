@@ -221,11 +221,18 @@ class _ChartsPageState extends State<_ChartsPage>
       final artistTally  = LocalTally(known);
       final albumTally   = LocalTally(known);
       try {
+        // Work in slices and let the UI draw a frame between them: doing
+        // tens of thousands of scrobbles in one go froze the tab.
+        var n = 0;
         for (final r in recs) {
           final a = _sanitizeName(_recField(r, 'artist'));
           final b = _sanitizeName(_recField(r, 'album'));
           if (_isValidLabel(a)) artistTally.addScrobble('artists', name: a, artist: '');
           if (_isValidLabel(b)) albumTally.addScrobble('albums', name: b, artist: a);
+          if (++n % 1500 == 0) {
+            await Future.delayed(Duration.zero);
+            if (!mounted) return;
+          }
         }
       } catch (_) {}
       if (!mounted) return;
@@ -235,12 +242,21 @@ class _ChartsPageState extends State<_ChartsPage>
           .toList();
       final artistCounts = artistTally.sorted();
       final albumCounts  = albumTally.sorted();
+      // One pass per frame instead of four in a row.
+      final monthly = AllScrobblesService.computeMonthly(recs);
+      await Future.delayed(Duration.zero);
+      final hourly = AllScrobblesService.computeHourly(recs);
+      await Future.delayed(Duration.zero);
+      final weekday = AllScrobblesService.computeWeekday(recs);
+      await Future.delayed(Duration.zero);
+      final calendar = AllScrobblesService.computeCalendar(recs);
+      if (!mounted) return;
       setState(() {
-        _monthly         = AllScrobblesService.computeMonthly(recs);
-        _hourlyData      = AllScrobblesService.computeHourly(recs);
-        _weekdayData     = AllScrobblesService.computeWeekday(recs);
+        _monthly         = monthly;
+        _hourlyData      = hourly;
+        _weekdayData     = weekday;
         _hourlyCount     = recs.length;
-        _calendarData    = AllScrobblesService.computeCalendar(recs);
+        _calendarData    = calendar;
         _hourlyLoading   = false;
         _calendarLoading = false;
         _yearDataLoading = false;

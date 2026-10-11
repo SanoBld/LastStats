@@ -109,11 +109,11 @@ class M3CircleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final fg = active ? scheme.onPrimary : scheme.onSecondaryContainer;
+    final fg = scheme.primary; // accent colour on a soft tonal background
     return _M3Pressable(
       width: 56,
       height: 56,
-      color: active ? scheme.primary : scheme.secondaryContainer,
+      color: active ? scheme.primaryContainer : scheme.surfaceContainerHigh,
       // amplitude 0 is a perfect circle, so the shape grows its bumps
       idleShape: M3CookieBorder(lobes: 8, amplitude: active ? 0.09 : 0.0),
       pressedShape: M3CookieBorder(lobes: 8, amplitude: active ? 0.0 : 0.05),
@@ -157,10 +157,10 @@ class M3PillButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final fg = active ? scheme.onPrimary : scheme.onSecondaryContainer;
+    final fg = scheme.primary; // accent colour on a soft tonal background
     return _M3Pressable(
       height: 56,
-      color: active ? scheme.primary : scheme.secondaryContainer,
+      color: active ? scheme.primaryContainer : scheme.surfaceContainerHigh,
       idleShape: active
           ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))
           : const StadiumBorder(),
@@ -180,7 +180,7 @@ class M3PillButton extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   widthFactor: v,
                   child: ColoredBox(
-                      color: (active ? scheme.onPrimary : scheme.secondary)
+                      color: scheme.primary
                           .withValues(alpha: 0.22)),
                 ),
               ),
