@@ -1334,4 +1334,13 @@ const Map<String, String> kTxAr = {
   'cx_intensity': 'شدة الأيام',
   'cx_days': 'أيام',
   'cx_busiest': 'أكثر الأيام نشاطًا',
+  'ap_harmony_title': 'نمط الألوان',
+  'ap_harmony_mono': 'أحادي اللون',
+  'ap_harmony_mono_sub': 'درجة لونية واحدة بشدّات مختلفة',
+  'ap_harmony_classic': 'كلاسيكي',
+  'ap_harmony_classic_sub': 'Material You القياسي مع درجات لونية مكمّلة',
+  'ap_harmony_vivid': 'نابض',
+  'ap_harmony_vivid_sub': 'درجة لونية واحدة أكثر تشبّعًا',
+  'ap_harmony_soft': 'هادئ',
+  'ap_harmony_soft_sub': 'درجة لونية واحدة أكثر هدوءًا',
 };

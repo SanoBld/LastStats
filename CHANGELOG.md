@@ -44,6 +44,7 @@
 - Charts: tap the listening clock to inspect any hour (scrobbles and share)
 - Charts: 3 new charts: time of day, day intensity (tap a bar) and busiest days
 - Theme: all accent colors (secondary, tertiary, charts, posters) now use the same hue as the chosen theme, only the intensity changes
+- Settings: new "Color style" option in Appearance (Monochrome, Classic, Vivid, Soft); it is saved in backups and translated in all 10 languages
 - All new texts are translated in all 10 languages
 
 **Welcome setup**

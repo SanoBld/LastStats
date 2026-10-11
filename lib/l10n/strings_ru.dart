@@ -1334,4 +1334,13 @@ const Map<String, String> kTxRu = {
   'cx_intensity': 'Интенсивность дней',
   'cx_days': 'дней',
   'cx_busiest': 'Самые насыщенные дни',
+  'ap_harmony_title': 'Стиль цветов',
+  'ap_harmony_mono': 'Монохром',
+  'ap_harmony_mono_sub': 'Один оттенок разной интенсивности',
+  'ap_harmony_classic': 'Классический',
+  'ap_harmony_classic_sub': 'Стандартный Material You с дополнительными оттенками',
+  'ap_harmony_vivid': 'Яркий',
+  'ap_harmony_vivid_sub': 'Один оттенок, насыщеннее',
+  'ap_harmony_soft': 'Мягкий',
+  'ap_harmony_soft_sub': 'Один оттенок, сдержаннее',
 };

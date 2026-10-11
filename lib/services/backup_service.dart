@@ -82,6 +82,7 @@ const _kThemeKeys = {
   'ls_theme_style',
   'ls_nothing_accent',
   'ls_oled_mode',
+  'ls_color_harmony',
   'ls_artwork_color_theme',
   'ls_keep_last_artwork_color',
   'ls_living_artwork',
@@ -624,6 +625,7 @@ class BackupService {
     themeStyleNotifier.value            = p.getString('ls_theme_style')        ?? 'default';
     nothingAccentNotifier.value         = p.getString('ls_nothing_accent')     ?? 'classic';
     oledModeNotifier.value              = p.getBool('ls_oled_mode')            ?? false;
+    colorHarmonyNotifier.value          = p.getString('ls_color_harmony')      ?? 'mono';
     // Day/night accent colors — these were being written to disk on
     // restore but never pushed into the live notifiers, so a backup
     // restored on a fresh device (or mid-session) silently ignored this

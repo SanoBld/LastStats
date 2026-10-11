@@ -33,6 +33,7 @@ class AppearancePage extends StatefulWidget {
 
 class _AppearancePageState extends State<AppearancePage> {
   String _themeStyle           = 'default';
+  String _harmony              = 'mono';
   String _nothingAccent        = 'classic';
   static const bool _showNothing = false;
   String _theme                = 'system';
@@ -69,6 +70,7 @@ class _AppearancePageState extends State<AppearancePage> {
     final p = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
+      _harmony              = p.getString('ls_color_harmony')           ?? 'mono';
       _themeStyle           = p.getString('ls_theme_style')             ?? 'default';
       if (!_showNothing && _themeStyle == 'nothing') {
         _themeStyle = 'default';
@@ -124,6 +126,32 @@ class _AppearancePageState extends State<AppearancePage> {
       setState(() => _themeStyle = v);
     }
     themeStyleNotifier.value = v;
+  }
+
+  Future<void> _setHarmony(String v) async {
+    if (v == _harmony) return;
+    await _set('ls_color_harmony', v);
+    setState(() => _harmony = v);
+    colorHarmonyNotifier.value = v;
+  }
+
+  Widget _harmonyTile(String key, ColorScheme scheme) {
+    final prev = buildAppScheme(accentNotifier.value, Theme.of(context).brightness, key);
+    final sel = _harmony == key;
+    Widget dot(Color c) => Container(
+        width: 16, height: 16, margin: const EdgeInsets.only(right: 3),
+        decoration: BoxDecoration(color: c, shape: BoxShape.circle));
+    return ListTile(
+      selected: sel,
+      selectedColor: scheme.primary,
+      leading: Row(mainAxisSize: MainAxisSize.min, children: [
+        dot(prev.primary), dot(prev.tertiary), dot(prev.secondaryContainer),
+      ]),
+      title: Text(tx('ap_harmony_$key')),
+      subtitle: Text(tx('ap_harmony_${key}_sub')),
+      trailing: sel ? Icon(Icons.check_circle_rounded, color: scheme.primary) : null,
+      onTap: () => _setHarmony(key),
+    );
   }
 
   Future<void> _setNothingAccent(String v) async {
@@ -494,6 +522,15 @@ class _AppearancePageState extends State<AppearancePage> {
               ),
             ),
           ),
+        ]),
+
+        const SizedBox(height: 20),
+
+        SettingsSection(label: tx('ap_harmony_title'), children: [
+          for (var i = 0; i < 4; i++) ...[
+            if (i > 0) const Divider(height: 1, indent: 16, endIndent: 16),
+            _harmonyTile(const ['mono', 'classic', 'vivid', 'soft'][i], scheme),
+          ],
         ]),
 
         const SizedBox(height: 20),

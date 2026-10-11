@@ -113,6 +113,7 @@ Future<void> _mainImpl() async {
   artworkColorThemeNotifier.value      = prefs.getBool('ls_artwork_color_theme')     ?? false;
   keepLastArtworkColorNotifier.value   = prefs.getBool('ls_keep_last_artwork_color') ?? false;
   oledModeNotifier.value               = prefs.getBool('ls_oled_mode')               ?? false;
+  colorHarmonyNotifier.value           = prefs.getString('ls_color_harmony')         ?? 'mono';
   localeNotifier.value                 = prefs.getString('ls_locale')                ?? 'fr';
   displayNameNotifier.value            = prefs.getString('ls_display_name')          ?? '';
   musicPlatformNotifier.value          = () {
@@ -433,23 +434,18 @@ class LastStatsApp extends StatelessWidget {
                         return ValueListenableBuilder<bool>(
                           valueListenable: oledModeNotifier,
                           builder: (_, oled, _) {
-                            return ValueListenableBuilder<String>(
-                              valueListenable: localeNotifier,
-                              builder: (_, _, _) {
-                                final ColorScheme lightScheme = monochromeAccents(
+                            return ListenableBuilder(
+                              listenable: Listenable.merge([localeNotifier, colorHarmonyNotifier]),
+                              builder: (_, _) {
+                                final harmony = colorHarmonyNotifier.value;
+                                final ColorScheme lightScheme =
                                     (useDynamic && lightDynamic != null)
-                                        ? neutralizeIfGraySchemeItself(lightDynamic.harmonized())
-                                        : neutralizeIfGraySeed(ColorScheme.fromSeed(
-                                            seedColor:  seedColorForScheme(lightAccent),
-                                            brightness: Brightness.light,
-                                          ), lightAccent));
-                                final ColorScheme darkSchemeBase = monochromeAccents(
+                                        ? applyColorHarmony(neutralizeIfGraySchemeItself(lightDynamic.harmonized()), harmony)
+                                        : buildAppScheme(lightAccent, Brightness.light, harmony);
+                                final ColorScheme darkSchemeBase =
                                     (useDynamic && darkDynamic != null)
-                                        ? neutralizeIfGraySchemeItself(darkDynamic.harmonized())
-                                        : neutralizeIfGraySeed(ColorScheme.fromSeed(
-                                            seedColor:  seedColorForScheme(darkAccent),
-                                            brightness: Brightness.dark,
-                                          ), darkAccent));
+                                        ? applyColorHarmony(neutralizeIfGraySchemeItself(darkDynamic.harmonized()), harmony)
+                                        : buildAppScheme(darkAccent, Brightness.dark, harmony);
                                 final ColorScheme darkScheme = oled
                                     ? darkSchemeBase.copyWith(
                                         surface:                 Colors.black,

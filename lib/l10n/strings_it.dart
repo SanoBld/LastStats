@@ -1334,4 +1334,13 @@ const Map<String, String> kTxIt = {
   'cx_intensity': 'Intensità dei giorni',
   'cx_days': 'giorni',
   'cx_busiest': 'Giorni più intensi',
+  'ap_harmony_title': 'Stile dei colori',
+  'ap_harmony_mono': 'Monocromatico',
+  'ap_harmony_mono_sub': 'Una sola tonalità, con intensità diverse',
+  'ap_harmony_classic': 'Classico',
+  'ap_harmony_classic_sub': 'Material You standard, con tonalità complementari',
+  'ap_harmony_vivid': 'Vivace',
+  'ap_harmony_vivid_sub': 'Una sola tonalità, più satura',
+  'ap_harmony_soft': 'Morbido',
+  'ap_harmony_soft_sub': 'Una sola tonalità, più discreta',
 };

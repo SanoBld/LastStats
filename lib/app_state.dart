@@ -72,6 +72,11 @@ final artworkColorThemeNotifier = ValueNotifier<bool>(false);
 // Saved as 'ls_keep_last_artwork_color' in SharedPreferences.
 final keepLastArtworkColorNotifier = ValueNotifier<bool>(false);
 
+// Color harmony of the theme: 'mono' (one hue, default), 'classic'
+// (standard Material You hues), 'vivid', 'soft'.
+// Saved as 'ls_color_harmony' in SharedPreferences.
+final colorHarmonyNotifier = ValueNotifier<String>('mono');
+
 // Pure black dark theme for OLED screens (default style only).
 // Saved as 'ls_oled_mode' in SharedPreferences.
 final oledModeNotifier = ValueNotifier<bool>(false);
@@ -328,3 +333,22 @@ ColorScheme monochromeAccents(ColorScheme s) {
     onTertiaryContainer: same(s.onPrimaryContainer, sat: 0.8),
   );
 }
+
+/// Builds the app color scheme for a seed and a harmony style.
+ColorScheme buildAppScheme(Color seed, Brightness b, String harmony) {
+  final variant = switch (harmony) {
+    'vivid' => DynamicSchemeVariant.vibrant,
+    'soft'  => DynamicSchemeVariant.neutral,
+    _       => DynamicSchemeVariant.tonalSpot,
+  };
+  final base = neutralizeIfGraySeed(ColorScheme.fromSeed(
+    seedColor: seedColorForScheme(seed),
+    brightness: b,
+    dynamicSchemeVariant: variant,
+  ), seed);
+  return applyColorHarmony(base, harmony);
+}
+
+/// 'classic' keeps the scheme as is, every other style uses one hue.
+ColorScheme applyColorHarmony(ColorScheme s, String harmony) =>
+    harmony == 'classic' ? s : monochromeAccents(s);

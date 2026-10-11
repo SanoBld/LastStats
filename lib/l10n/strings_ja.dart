@@ -1333,4 +1333,13 @@ const Map<String, String> kTxJa = {
   'cx_intensity': '日ごとの強度',
   'cx_days': '日',
   'cx_busiest': '最も多く聴いた日',
+  'ap_harmony_title': 'カラースタイル',
+  'ap_harmony_mono': 'モノクロ調',
+  'ap_harmony_mono_sub': '1つの色相で濃淡を変える',
+  'ap_harmony_classic': 'クラシック',
+  'ap_harmony_classic_sub': '補色を使う標準のMaterial You',
+  'ap_harmony_vivid': 'ビビッド',
+  'ap_harmony_vivid_sub': '1つの色相で、より鮮やか',
+  'ap_harmony_soft': 'ソフト',
+  'ap_harmony_soft_sub': '1つの色相で、より控えめ',
 };

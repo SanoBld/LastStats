@@ -1360,4 +1360,13 @@ const Map<String, String> kTxZh = {
   'cx_intensity': '每日强度',
   'cx_days': '天',
   'cx_busiest': '听歌最多的日子',
+  'ap_harmony_title': '配色风格',
+  'ap_harmony_mono': '单色',
+  'ap_harmony_mono_sub': '同一色相，不同深浅',
+  'ap_harmony_classic': '经典',
+  'ap_harmony_classic_sub': '标准 Material You，带互补色',
+  'ap_harmony_vivid': '鲜艳',
+  'ap_harmony_vivid_sub': '同一色相，更饱和',
+  'ap_harmony_soft': '柔和',
+  'ap_harmony_soft_sub': '同一色相，更低调',
 };
