@@ -1400,6 +1400,17 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             children: [
               Text(L.detailBiography,
                   style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800, color: scheme.onPrimaryContainer)),
+              Row(mainAxisSize: MainAxisSize.min, children: [
+                M3TonalButton(
+                  height: 36,
+                  radius: BorderRadius.circular(18),
+                  color: scheme.primary,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  onTap: () => _openBioUrl(_lfmBioUrl()),
+                  child: Icon(Icons.open_in_new_rounded,
+                      size: 18, color: scheme.onPrimary),
+                ),
+                const SizedBox(width: 8),
               _translating
                   ? const SizedBox(width: 28, height: 28, child: M3Spinner())
                   : GestureDetector(
@@ -1408,9 +1419,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                         height: 36,
                         radius: BorderRadius.circular(18),
                         // translated = vivid accent, original = calm color
-                        color: _showTranslated
-                            ? scheme.primary
-                            : scheme.surfaceContainerHigh,
+                        color: scheme.primary,
                         padding: const EdgeInsets.symmetric(horizontal: 14),
                         onTap: _toggleTranslate,
                         child: M3Switcher(
@@ -1424,9 +1433,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                                     ? Icons.undo_rounded
                                     : Icons.translate_rounded,
                                 size: 16,
-                                color: _showTranslated
-                                    ? scheme.onPrimary
-                                    : scheme.primary,
+                                color: scheme.onPrimary,
                               ),
                               const SizedBox(width: 6),
                               Text(
@@ -1436,9 +1443,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
-                                  color: _showTranslated
-                                      ? scheme.onPrimary
-                                      : scheme.onSurfaceVariant,
+                                  color: scheme.onPrimary,
                                 ),
                               ),
                             ],
@@ -1446,6 +1451,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                         ),
                       ),
                     ),
+              ]),
             ],
           ),
           const SizedBox(height: 8),
@@ -1468,16 +1474,11 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               if (bio.length > maxChars)
                 _M3Pill(
                   scheme: scheme,
+                  strong: true,
                   icon: _bioExpanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
                   label: _bioExpanded ? L.detailBioReadLess : L.detailBioReadMore,
                   onTap: () => setState(() => _bioExpanded = !_bioExpanded),
                 ),
-              _M3Pill(
-                scheme: scheme,
-                icon: Icons.open_in_new_rounded,
-                label: tx('ui_view_on_last_fm'),
-                onTap: () => _openBioUrl(_lfmBioUrl()),
-              ),
             ],
           ),
           const SizedBox(height: 4),
@@ -1876,6 +1877,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               const SizedBox(height: 10),
               _M3Pill(
                 scheme: scheme,
+                strong: true,
                 icon: _lyricsExpanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
                 label: _lyricsExpanded ? L.detailBioReadLess : L.detailBioReadMore,
                 onTap: () => setState(() => _lyricsExpanded = !_lyricsExpanded),
@@ -2857,15 +2859,20 @@ class _M3Pill extends StatelessWidget {
   final VoidCallback  onTap;
   final ColorScheme   scheme;
   final bool          filled; // filled = primaryContainer, else surface tonal
+  final bool          strong; // strong = solid dark accent (main actions)
   const _M3Pill({
     required this.icon, required this.label, required this.onTap,
-    required this.scheme, this.filled = false,
+    required this.scheme, this.filled = false, this.strong = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bg = filled ? scheme.primaryContainer : scheme.surfaceContainerHigh;
-    final fg = filled ? scheme.onPrimaryContainer : scheme.primary;
+    final bg = strong
+        ? scheme.primary
+        : (filled ? scheme.primaryContainer : scheme.surfaceContainerHigh);
+    final fg = strong
+        ? scheme.onPrimary
+        : (filled ? scheme.onPrimaryContainer : scheme.primary);
     return M3TonalButton(
       height: 36,
       radius: BorderRadius.circular(999),
