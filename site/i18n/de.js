@@ -173,6 +173,8 @@ window.I18N.de = {
   "color.pick": "Farbe",
   "color.save": "In diesem Browser merken",
   "color.random": "Zufällig",
+  "color.mono": "Eine Farbe",
+  "color.multi": "Mehrfarbig",
   "commits.translate": "Übersetzen",
   "commits.show_original": "Original anzeigen",
 

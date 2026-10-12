@@ -173,6 +173,8 @@ window.I18N.es = {
   "color.pick": "Color",
   "color.save": "Recordar en este navegador",
   "color.random": "Aleatorio",
+  "color.mono": "Un color",
+  "color.multi": "Multicolor",
   "commits.translate": "Traducir",
   "commits.show_original": "Ver original",
 

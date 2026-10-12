@@ -173,6 +173,8 @@ window.I18N.it = {
   "color.pick": "Colore",
   "color.save": "Ricorda su questo browser",
   "color.random": "Casuale",
+  "color.mono": "Un colore",
+  "color.multi": "Multicolore",
   "commits.translate": "Traduci",
   "commits.show_original": "Mostra originale",
 

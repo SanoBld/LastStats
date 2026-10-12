@@ -11,6 +11,8 @@ window.I18N.en = {
   "color.pick": "Color",
   "color.save": "Remember on this browser",
   "color.random": "Random",
+  "color.mono": "One color",
+  "color.multi": "Multicolor",
   "commits.translate": "Translate",
   "commits.show_original": "Show original",
 

@@ -173,6 +173,8 @@ window.I18N.ar = {
   "color.pick": "اللون",
   "color.save": "تذكّر في هذا المتصفح",
   "color.random": "عشوائي",
+  "color.mono": "لون واحد",
+  "color.multi": "متعدد الألوان",
   "commits.translate": "ترجمة",
   "commits.show_original": "عرض الأصل",
 

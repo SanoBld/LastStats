@@ -6,6 +6,9 @@
 (function () {
   const KEY = 'accent-hue';          // saved on this browser (localStorage)
   const SKEY = 'accent-hue-session'; // chosen but not saved: kept for this tab only
+  const MKEY = 'accent-mode'; // 'mono' (one color, tonal variants) | 'multi' (tertiary hue shifted)
+  const rdMode = (st) => { try { const v = st.getItem(MKEY); return v === 'multi' || v === 'mono' ? v : null; } catch (e) { return null; } };
+  let mode = rdMode(localStorage) || rdMode(sessionStorage) || 'mono';
   const rnd = () => Math.floor(Math.random() * 360);
   const read = (st, k) => { try { const v = parseInt(st.getItem(k), 10); return v >= 0 && v <= 360 ? v : null; } catch (e) { return null; } };
   const savedHue = read(localStorage, KEY);
@@ -15,15 +18,16 @@
   document.head.appendChild(st);
 
   function apply(hue) {
-  const h2 = (hue + 60) % 360; // tertiary hue, like the app (shifted hue)
+  const h2 = (hue + 60) % 360; // multi: tertiary hue shifted
+  const multi = mode === 'multi';
 
   const light = {
     'primary': c(hue, 60, 30), 'on-primary': '#FFFFFF',
     'primary-container': c(hue, 100, 87), 'on-primary-container': c(hue, 100, 10),
     'secondary': c(hue, 18, 35), 'on-secondary': '#FFFFFF',
     'secondary-container': c(hue, 35, 87), 'on-secondary-container': c(hue, 45, 10),
-    'tertiary': c(h2, 18, 42), 'on-tertiary': '#FFFFFF',
-    'tertiary-container': c(h2, 100, 93), 'on-tertiary-container': c(h2, 40, 16),
+    'tertiary': multi ? c(h2, 18, 42) : c(hue, 38, 40), 'on-tertiary': '#FFFFFF',
+    'tertiary-container': multi ? c(h2, 100, 93) : c(hue, 60, 90), 'on-tertiary-container': multi ? c(h2, 40, 16) : c(hue, 50, 14),
     'background': c(hue, 30, 97), 'on-background': c(hue, 12, 10),
     'on-surface': c(hue, 12, 10), 'on-surface-variant': c(hue, 10, 27),
     'outline-variant': c(hue, 12, 78),
@@ -35,8 +39,8 @@
     'primary-container': c(hue, 100, 19), 'on-primary-container': c(hue, 100, 87),
     'secondary': c(hue, 25, 76), 'on-secondary': c(hue, 30, 18),
     'secondary-container': c(hue, 22, 25), 'on-secondary-container': c(hue, 35, 87),
-    'tertiary': c(h2, 50, 82), 'on-tertiary': c(h2, 30, 22),
-    'tertiary-container': c(h2, 20, 30), 'on-tertiary-container': c(h2, 100, 93),
+    'tertiary': multi ? c(h2, 50, 82) : c(hue, 45, 80), 'on-tertiary': multi ? c(h2, 30, 22) : c(hue, 40, 20),
+    'tertiary-container': multi ? c(h2, 20, 30) : c(hue, 30, 28), 'on-tertiary-container': multi ? c(h2, 100, 93) : c(hue, 60, 90),
     'background': c(hue, 22, 7), 'on-background': c(hue, 10, 88),
     'on-surface': c(hue, 10, 88), 'on-surface-variant': c(hue, 10, 77),
     'outline-variant': c(hue, 10, 27),
@@ -72,6 +76,7 @@
       '<div class="color-menu" role="dialog">' +
         '<input class="color-range" type="range" min="0" max="360" step="1">' +
         '<div class="color-swatches"></div>' +
+        '<div class="color-modes"><button type="button" data-m="mono" class="md-ripple"></button><button type="button" data-m="multi" class="md-ripple"></button></div>' +
         '<label class="color-save"><input type="checkbox"><span class="color-save-label"></span></label>' +
         '<button type="button" class="color-random md-ripple"></button>' +
       '</div>';
@@ -84,6 +89,7 @@
     const rand = wrap.querySelector('.color-random');
     range.value = hue;
     chk.checked = read(localStorage, KEY) !== null;
+    chk.checked = chk.checked || rdMode(localStorage) !== null;
 
     [0, 28, 52, 140, 175, 197, 230, 265, 320].forEach((h) => {
       const b = document.createElement('button');
@@ -96,12 +102,13 @@
     function marks() {
       sw.querySelectorAll('.color-sw').forEach((b) => b.classList.toggle('is-active', +b.dataset.h === hue));
       range.style.setProperty('--thumb', c(hue, 60, 45));
+      wrap.querySelectorAll('.color-modes button').forEach((b) => b.classList.toggle('is-active', b.dataset.m === mode));
     }
     function persist() {
       try {
-        if (chk.checked) { localStorage.setItem(KEY, hue); }
-        else { localStorage.removeItem(KEY); }
-        sessionStorage.setItem(SKEY, hue);
+        if (chk.checked) { localStorage.setItem(KEY, hue); localStorage.setItem(MKEY, mode); }
+        else { localStorage.removeItem(KEY); localStorage.removeItem(MKEY); }
+        sessionStorage.setItem(SKEY, hue); sessionStorage.setItem(MKEY, mode);
       } catch (e) {}
     }
     function set(h) { hue = +h; range.value = hue; apply(hue); persist(); marks(); }
@@ -109,8 +116,11 @@
       btn.setAttribute('aria-label', t('color.pick', 'Color')); btn.title = t('color.pick', 'Color');
       wrap.querySelector('.color-save-label').textContent = t('color.save', 'Remember on this browser');
       rand.textContent = t('color.random', 'Random');
+      wrap.querySelector('[data-m=mono]').textContent = t('color.mono', 'One color');
+      wrap.querySelector('[data-m=multi]').textContent = t('color.multi', 'Multicolor');
     }
 
+    wrap.querySelectorAll('.color-modes button').forEach((b) => b.addEventListener('click', () => { mode = b.dataset.m; apply(hue); persist(); marks(); }));
     range.addEventListener('input', () => set(range.value));
     chk.addEventListener('change', persist);
     rand.addEventListener('click', () => { try { sessionStorage.removeItem(SKEY); } catch (e) {} set(rnd()); });

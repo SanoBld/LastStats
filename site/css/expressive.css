@@ -350,3 +350,19 @@ button.cm-tr-btn, .rel-rail button.cm-tr-btn, .rel-toolbar button.cm-tr-btn {
   .nav { justify-content: center; }
   .color-menu { position: fixed; top: 4.6rem; left: 50%; inset-inline-end: auto; translate: -50% 0; transform-origin: top center; width: min(300px, calc(100vw - 2rem)); }
 }
+
+.color-modes { display: flex; gap: 2px; }
+.color-modes button {
+  flex: 1; min-height: 40px; border: 0; cursor: pointer; font: inherit; font-size: .85rem; font-weight: 500;
+  background: var(--md-surface-container-highest); color: var(--md-on-surface-variant);
+  border-radius: 6px; position: relative; overflow: hidden;
+  transition: background-color .2s var(--effects), color .2s var(--effects), border-radius .4s var(--spring-default);
+}
+.color-modes button:first-child { border-radius: 20px 6px 6px 20px; }
+.color-modes button:last-child { border-radius: 6px 20px 20px 6px; }
+.color-modes button.is-active { background: var(--md-primary); color: var(--md-on-primary); }
+.color-random { transition: background-color .2s var(--effects), border-radius .4s var(--spring-default); }
+@media (hover: hover) {
+  .color-random:hover { background: color-mix(in srgb, var(--md-secondary-container) 78%, var(--md-on-secondary-container)); }
+}
+.color-random:active { background: color-mix(in srgb, var(--md-secondary-container) 65%, var(--md-on-secondary-container)); }

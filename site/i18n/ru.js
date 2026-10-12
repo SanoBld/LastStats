@@ -173,6 +173,8 @@ window.I18N.ru = {
   "color.pick": "Цвет",
   "color.save": "Запомнить в этом браузере",
   "color.random": "Случайный",
+  "color.mono": "Один цвет",
+  "color.multi": "Несколько цветов",
   "commits.translate": "Перевести",
   "commits.show_original": "Показать оригинал",
 

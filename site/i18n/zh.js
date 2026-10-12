@@ -173,6 +173,8 @@ window.I18N.zh = {
   "color.pick": "颜色",
   "color.save": "在此浏览器中记住",
   "color.random": "随机",
+  "color.mono": "单色",
+  "color.multi": "多彩",
   "commits.translate": "翻译",
   "commits.show_original": "显示原文",
 

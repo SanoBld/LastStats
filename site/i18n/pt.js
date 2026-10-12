@@ -173,6 +173,8 @@ window.I18N.pt = {
   "color.pick": "Cor",
   "color.save": "Lembrar neste navegador",
   "color.random": "Aleatório",
+  "color.mono": "Uma cor",
+  "color.multi": "Multicolor",
   "commits.translate": "Traduzir",
   "commits.show_original": "Ver original",
 

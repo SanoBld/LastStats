@@ -173,6 +173,8 @@ window.I18N.ja = {
   "color.pick": "カラー",
   "color.save": "このブラウザに保存",
   "color.random": "ランダム",
+  "color.mono": "単色",
+  "color.multi": "マルチカラー",
   "commits.translate": "翻訳",
   "commits.show_original": "原文を表示",
 
